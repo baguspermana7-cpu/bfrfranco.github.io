@@ -23,6 +23,7 @@ import {
     type SparesRow, type SparesResult,
 } from '@/state/adapters/spares-adapter';
 import { ShieldCheck, Flame, Waves, Package, FileDown } from 'lucide-react';
+import { Tooltip } from '@/components/ui/Tooltip';
 
 const REDUNDANCY_KEY: Record<string, string> = { 'N+1': 'n1', '2N': '2n', '2N+1': '2n1' };
 const useCfg = () => {
@@ -37,8 +38,8 @@ function Head({ icon: Icon, title, sub, tone }: { icon: React.ElementType; title
         </div>
     );
 }
-function Metric({ label, value, sub }: { label: string; value: string; sub?: string }) {
-    return <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 transition-colors hover:border-rz-info/50"><div className="text-[10px] uppercase tracking-wide text-slate-500">{label}</div><div className="text-xl font-bold text-slate-900 dark:text-white tabular-nums">{value}</div>{sub && <div className="text-[10px] text-slate-500">{sub}</div>}</div>;
+function Metric({ label, value, sub, tip }: { label: string; value: string; sub?: string; tip?: string }) {
+    return <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 transition-colors hover:border-rz-info/50"><div className="text-[10px] uppercase tracking-wide text-slate-500 flex items-center gap-1">{label}{tip && <Tooltip content={tip} />}</div><div className="text-xl font-bold text-slate-900 dark:text-white tabular-nums">{value}</div>{sub && <div className="text-[10px] text-slate-500">{sub}</div>}</div>;
 }
 function Card({ children }: { children: React.ReactNode }) { return <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">{children}</div>; }
 function Loading() { return <div className="text-sm text-slate-500 p-8 text-center">Engine loading…</div>; }
@@ -193,6 +194,13 @@ export function collectDesignToolsDiagnostics(model: DesignToolsDiagnosticsModel
  * is not mistaken for a fully-sourced derivation. */
 const COOL_SCORE: Record<string, number> = { air: 60, inrow: 72, rdhx: 82, liquid: 92, immersion: 96 };
 const RED_SCORE: Record<string, number> = { n: 50, n1: 75, '2n': 92, '2n1': 98 };
+const SUBSCORE_TIPS: Record<string, string> = {
+    power: 'Power-path redundancy score (0–100), mapped from the redundancy configuration (N → 2N+1). More redundancy scores higher.',
+    cooling: 'Cooling-method score (0–100), mapped from the selected cooling type (air → immersion). More advanced liquid cooling scores higher.',
+    network: 'Network / connectivity resilience score (0–100), scaled from the target tier level.',
+    physical: 'Physical security & facility hardening score (0–100), scaled from the target tier level.',
+    monitoring: 'Monitoring & controls (DCIM/BMS) maturity score (0–100), scaled from the target tier level.',
+};
 export function TierDashboard() {
     const { inputs, redKey } = useCfg();
     const m = rzModels().tier;
@@ -211,16 +219,16 @@ export function TierDashboard() {
         <div className="space-y-4">
             <Head icon={ShieldCheck} title="Tier Classification" sub="DC-OS · models.tier (Uptime-style)" tone="bg-rz-info/10 border border-rz-info/30 text-rz-info" />
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                <Metric label="Classified Tier" value={`Tier ${r.tier}`} sub={r.label.split('—')[1]?.trim()} />
-                <Metric label="Infra Score" value={`${r.score}/100`} sub={r.capped ? 'capped by redundancy' : 'weighted'} />
-                <Metric label="Target Tier" value={`Tier ${inputs.tierLevel}`} sub={r.tier >= inputs.tierLevel ? 'met' : 'gap'} />
+                <Metric label="Classified Tier" value={`Tier ${r.tier}`} sub={r.label.split('—')[1]?.trim()} tip="Uptime Institute tier (I–IV) the engine classifies from the mapped sub-scores. Higher tiers demand more redundancy and deliver higher availability." />
+                <Metric label="Infra Score" value={`${r.score}/100`} sub={r.capped ? 'capped by redundancy' : 'weighted'} tip="Weighted 0–100 infrastructure score from the five sub-scores; may be capped by the redundancy level. Feeds the tier classification." />
+                <Metric label="Target Tier" value={`Tier ${inputs.tierLevel}`} sub={r.tier >= inputs.tierLevel ? 'met' : 'gap'} tip="The tier you are designing to (set in Requirements). 'met' = the classified tier reaches it; 'gap' = it falls short." />
             </div>
             <Card>
-                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Sub-scores <span className="normal-case text-[9px] text-amber-500">screening inputs mapped from project config → engine classify()</span></h2>
+                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1">Sub-scores<Tooltip content="The five 0–100 screening inputs (power, cooling, network, physical, monitoring) mapped from the project config and fed to the engine's tier classifier." /> <span className="normal-case text-[9px] text-amber-500">screening inputs mapped from project config → engine classify()</span></h2>
                 <div className="space-y-1.5">
                     {(['power', 'cooling', 'network', 'physical', 'monitoring'] as const).map((k) => (
                         <div key={k} className="flex items-center gap-2 text-xs">
-                            <span className="w-24 text-slate-600 dark:text-slate-300 capitalize">{k}</span>
+                            <span className="w-24 text-slate-600 dark:text-slate-300 capitalize flex items-center gap-1">{k}<Tooltip content={SUBSCORE_TIPS[k]} /></span>
                             <div className="flex-1 h-2 rounded bg-slate-100 dark:bg-slate-800"><div className="h-2 rounded bg-indigo-500" style={{ width: `${scores[k]}%` }} /></div>
                             <span className="w-10 text-right tabular-nums text-slate-500">{scores[k]}</span>
                         </div>
@@ -249,7 +257,7 @@ export function FireDashboard() {
         <div className="space-y-4">
             <Head icon={Flame} title="Fire Suppression" sub="DC-OS · models.fire (NFPA 2001 / 72 / 855)" tone="bg-rz-alert/10 border border-rz-alert/30 text-rz-alert" />
             <div className="flex items-center gap-2 text-xs">
-                <span className="text-slate-500">Agent</span>
+                <span className="text-slate-500 flex items-center gap-1">Agent<Tooltip content="Clean fire-suppression agent to size. Novec 1230 and FM-200 are halocarbons (dosed by mass); IG-541 is an inert-gas blend (dosed by volume). Each has a different design concentration and climate footprint (GWP)." /></span>
                 <select value={agent} onChange={(e) => setAgent(e.target.value)} className="rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 text-slate-700 dark:text-slate-200">
                     {/* clean-agent classes per NFPA 2001 (IG-541 = inert blend) */}
                     <option value="novec1230">Novec 1230</option>
@@ -258,20 +266,20 @@ export function FireDashboard() {
                 </select>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <Metric label="Protected Volume" value={`${volumeM3.toLocaleString()} m³`} sub={`${Math.round(floorM2).toLocaleString()} m² × 3.5 m`} />
+                <Metric label="Protected Volume" value={`${volumeM3.toLocaleString()} m³`} sub={`${Math.round(floorM2).toLocaleString()} m² × 3.5 m`} tip="Enclosed room volume the suppression system floods (white-space floor area × 3.5 m clear height). Agent quantity scales with this volume." />
                 {halo
-                    ? <Metric label="Agent Mass" value={`${(r.massKg as number).toLocaleString()} kg`} sub={`${r.cylinders ?? '—'} cylinders`} />
-                    : <Metric label="Agent Volume" value={`${(r.agentVolumeM3 as number)?.toLocaleString() ?? '—'} m³`} sub={r.agent} />}
-                <Metric label="Design Conc." value={`${r.designConcPct ?? r.designConcentration}%`} sub={r.type} />
+                    ? <Metric label="Agent Mass" value={`${(r.massKg as number).toLocaleString()} kg`} sub={`${r.cylinders ?? '—'} cylinders`} tip="Mass of halocarbon agent (kg) needed to reach the design concentration in the protected volume per NFPA 2001, and the number of storage cylinders." />
+                    : <Metric label="Agent Volume" value={`${(r.agentVolumeM3 as number)?.toLocaleString() ?? '—'} m³`} sub={r.agent} tip="Volume of inert gas (m³) needed to reach the design concentration in the protected volume per NFPA 2001." />}
+                <Metric label="Design Conc." value={`${r.designConcPct ?? r.designConcentration}%`} sub={r.type} tip="Design concentration (%): the agent concentration required to suppress fire, including the NFPA 2001 safety factor." />
                 {r.safetyMarginPct != null
-                    ? <Metric label="NOAEL Margin" value={`${r.safetyMarginPct}%`} sub={r.occupiableOk ? '✓ occupiable' : '⚠ review'} />
-                    : <Metric label="CO₂e" value={r.co2eTonnes != null ? `${r.co2eTonnes} t` : '—'} sub="agent GWP" />}
+                    ? <Metric label="NOAEL Margin" value={`${r.safetyMarginPct}%`} sub={r.occupiableOk ? '✓ occupiable' : '⚠ review'} tip="Safety margin between the design concentration and the NOAEL (No-Observed-Adverse-Effect Level). A positive margin means the space stays occupiable during discharge." />
+                    : <Metric label="CO₂e" value={r.co2eTonnes != null ? `${r.co2eTonnes} t` : '—'} sub="agent GWP" tip="Lifecycle CO₂-equivalent of the agent charge (mass × GWP100) — a climate footprint, not an occupant-safety metric." />}
             </div>
             {r.co2eTonnes != null && (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    <Metric label="Agent CO₂e" value={`${r.co2eTonnes} t`} sub="charge × GWP100" />
-                    {r.noaelPct != null && <Metric label="NOAEL / LOAEL" value={`${r.noaelPct}% / ${r.loaelPct}%`} sub="occupant safety" />}
-                    {r.spotDetectors != null && <Metric label="Spot Detectors" value={String(r.spotDetectors)} sub="NFPA 72 (≤84 m²)" />}
+                    <Metric label="Agent CO₂e" value={`${r.co2eTonnes} t`} sub="charge × GWP100" tip="Global-warming footprint of the agent charge = charge mass × GWP100 (tonnes CO₂-equivalent)." />
+                    {r.noaelPct != null && <Metric label="NOAEL / LOAEL" value={`${r.noaelPct}% / ${r.loaelPct}%`} sub="occupant safety" tip="Occupant-exposure limits: NOAEL (no adverse effect) and LOAEL (lowest observed adverse effect) concentrations. The design concentration should stay below these in occupiable spaces." />}
+                    {r.spotDetectors != null && <Metric label="Spot Detectors" value={String(r.spotDetectors)} sub="NFPA 72 (≤84 m²)" tip="Estimated number of spot smoke detectors for the space at NFPA 72 coverage (≤84 m² per detector)." />}
                 </div>
             )}
             {/* AG5 — fire zones + capex + suppression basis */}
@@ -299,21 +307,21 @@ function FireZonesSection({ volumeM3, agent }: { volumeM3: number; agent: string
     if (!zones && !fireCost) return null;
     return (
         <Card>
-            <h3 className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Suppression Zones & Cost Basis <span className="normal-case text-[9px] text-emerald-500">engine equipment scaling + capex engine</span></h3>
+            <h3 className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500 flex items-center gap-1">Suppression Zones &amp; Cost Basis<Tooltip content="How the protected space splits into independently actuated suppression zones, and the CAPEX of the detection + suppression system from the shared CAPEX engine." /> <span className="normal-case text-[9px] text-emerald-500">engine equipment scaling + capex engine</span></h3>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <Metric label="Fire Zones" value={String(zones)} sub="equipScale (1 per ~200 kW)" />
-                <Metric label="Volume / Zone" value={`${perZoneM3.toLocaleString()} m³`} sub="protected volume ÷ zones" />
+                <Metric label="Fire Zones" value={String(zones)} sub="equipScale (1 per ~200 kW)" tip="Number of independent fire-suppression zones, scaled by the engine at roughly one zone per 200 kW of IT load." />
+                <Metric label="Volume / Zone" value={`${perZoneM3.toLocaleString()} m³`} sub="protected volume ÷ zones" tip="Average protected air volume per suppression zone (total volume ÷ zone count). Sets the agent charge per zone." />
                 {fireCost > 0
-                    ? <Metric label="Fire System CAPEX" value={money(fireCost)} sub={`${capexInputs.fireType} + ${capexInputs.alarmType} (capex engine)`} />
+                    ? <Metric label="Fire System CAPEX" value={money(fireCost)} sub={`${capexInputs.fireType} + ${capexInputs.alarmType} (capex engine)`} tip="Capital cost of the fire detection + suppression system from the CAPEX engine (selected suppression + alarm type)." />
                     : (
                         /* capex results absent — honest empty state with a route to the source */
                         <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
-                            <div className="text-[10px] uppercase tracking-wide text-slate-500">Fire System CAPEX</div>
+                            <div className="text-[10px] uppercase tracking-wide text-slate-500 flex items-center gap-1">Fire System CAPEX<Tooltip content="Capital cost of the fire detection + suppression system from the CAPEX engine. Appears once the CAPEX engine has been run." /></div>
                             <div className="text-xl font-bold text-slate-900 dark:text-white tabular-nums">—</div>
                             <button onClick={() => setActiveTab('capex')} className="text-[10px] font-medium text-rz-mint hover:text-rz-mint/80">run the CAPEX Engine →</button>
                         </div>
                     )}
-                <Metric label="Selected Agent" value={agent === 'novec1230' ? 'Novec 1230' : agent === 'fm200' ? 'FM-200' : 'IG-541'} sub={`shared capex: ${capexInputs.fireType}`} />
+                <Metric label="Selected Agent" value={agent === 'novec1230' ? 'Novec 1230' : agent === 'fm200' ? 'FM-200' : 'IG-541'} sub={`shared capex: ${capexInputs.fireType}`} tip="The clean-agent chosen above for sizing, shown alongside the suppression type carried in the shared CAPEX assumptions." />
             </div>
             <p className="mt-1.5 text-[9px] text-slate-400">{fireCost > 0
                 ? 'Zone count and system cost read the SAME engine scaling + capex results as Commissioning and CAPEX — one source, no divergence.'
@@ -469,21 +477,21 @@ export function CduDashboard() {
             {/* (a) Sizing & Control — models.cdu.size live */}
             <Card>
                 <h3 className="mb-2 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-                    Sizing &amp; Control <EngChip src="models.cdu.size" />
+                    Sizing &amp; Control<Tooltip content="CDU (Coolant Distribution Unit) sizing for the liquid-cooling loop: coolant flow, unit count with N+1 redundancy, and the loop temperature-rise setpoint." /> <EngChip src="models.cdu.size" />
                 </h3>
                 <div className="mb-2 flex items-center gap-2 text-xs">
-                    <span className="text-slate-500">Loop ΔT (K)</span>
+                    <span className="text-slate-500 flex items-center gap-1">Loop ΔT (K)<Tooltip content="Loop temperature rise (supply → return), in kelvin. A larger ΔT needs less coolant flow for the same heat, but raises surface temperatures." /></span>
                     <input type="range" min={5} max={20} value={dT} onChange={(e) => setDT(Number(e.target.value))} className="accent-cyan-500"
                         title={`Loop ΔT setpoint: ${dT} K (supply→return)`} />
                     <span className="tabular-nums text-slate-600 dark:text-slate-300">{dT} K</span>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <Metric label="Coolant Flow" value={`${(r.flowLpm as number).toLocaleString()} L/min`} sub={rich ? `${r.velocityMs} m/s` : `${r.flowM3h} m³/h`} />
-                    <Metric label="Heat Load" value={`${(inputs.itLoad / 1000).toFixed(1)} MW`} sub="IT load (project config)" />
+                    <Metric label="Coolant Flow" value={`${(r.flowLpm as number).toLocaleString()} L/min`} sub={rich ? `${r.velocityMs} m/s` : `${r.flowM3h} m³/h`} tip="Required coolant flow rate for the IT heat load at the chosen loop ΔT (Q = ṁ·cp·ΔT)." />
+                    <Metric label="Heat Load" value={`${(inputs.itLoad / 1000).toFixed(1)} MW`} sub="IT load (project config)" tip="IT heat rejected into the cooling loop, taken from the project IT load — the thermal duty the CDU must move." />
                     {sz
-                        ? <Metric label="CDU Units" value={`${sz.cduUnits}`} sub={`${sz.cduUnitsRedundant} with N+1`} />
-                        : !rich && <Metric label="CDU Units" value={`${r.cduUnits}`} sub={`${r.cduUnitsRedundant} with N+1`} />}
-                    <Metric label="ΔT Setpoint" value={`${dT} K`} sub="supply→return control" />
+                        ? <Metric label="CDU Units" value={`${sz.cduUnits}`} sub={`${sz.cduUnitsRedundant} with N+1`} tip="Number of Coolant Distribution Units required, with the redundant count at N+1." />
+                        : !rich && <Metric label="CDU Units" value={`${r.cduUnits}`} sub={`${r.cduUnitsRedundant} with N+1`} tip="Number of Coolant Distribution Units required, with the redundant count at N+1." />}
+                    <Metric label="ΔT Setpoint" value={`${dT} K`} sub="supply→return control" tip="The supply-to-return temperature-rise control setpoint for the loop (kelvin)." />
                 </div>
             </Card>
 
@@ -491,7 +499,7 @@ export function CduDashboard() {
             {rich && (
                 <Card>
                     <h3 className="mb-1.5 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-                        Hydraulics &amp; Thermal <EngChip src="models.cdu.hydraulics" />
+                        Hydraulics &amp; Thermal<Tooltip content="Thermohydraulic check of the loop: flow velocity, Reynolds/friction regime, pressure drop, pump power and dew-point margin (Darcy-Weisbach + Magnus)." /> <EngChip src="models.cdu.hydraulics" />
                         <span className="text-[9px] normal-case text-slate-400">Darcy-Weisbach / Haaland + Magnus dew point</span>
                     </h3>
                     <table className="w-full text-[10.5px]">
@@ -519,7 +527,7 @@ export function CduDashboard() {
             {/* (d) Water & Glycol balance — CDU technical loop makeup + heat-rejection tower losses */}
             <Card>
                 <h3 className="mb-2 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-                    Water &amp; Glycol Balance <EngChip src="models.water.coolingLoop" />
+                    Water &amp; Glycol Balance<Tooltip content="Water balance for the liquid-cooling system: the closed water+glycol technical loop plus heat-rejection tower losses (evaporation, blowdown, drift), yielding annual site water and WUE." /> <EngChip src="models.water.coolingLoop" />
                     <span className="text-[9px] normal-case text-slate-400">closed loop + evaporation + blowdown + drift</span>
                 </h3>
                 {!water ? (
@@ -534,7 +542,7 @@ export function CduDashboard() {
                         {/* controls */}
                         <div className="mb-3 grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px]">
                             <label className="flex flex-col gap-1">
-                                <span className="text-slate-500">Heat rejection</span>
+                                <span className="text-slate-500 flex items-center gap-1">Heat rejection<Tooltip content="How loop heat is rejected to atmosphere. Evaporative towers use the most water; hybrid/adiabatic about half; dry coolers use no water but more fan energy (higher PUE)." /></span>
                                 <select value={rejectionType} onChange={(e) => setRejectionType(e.target.value as 'evaporative' | 'hybrid' | 'dry')}
                                     className="rounded border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-2 py-1 text-slate-700 dark:text-slate-200">
                                     <option value="evaporative">Evaporative tower (max water)</option>
@@ -543,20 +551,20 @@ export function CduDashboard() {
                                 </select>
                             </label>
                             <label className="flex flex-col gap-1">
-                                <span className="text-slate-500">Glycol %: <span className="tabular-nums text-slate-600 dark:text-slate-300">{glycolPct}%</span></span>
+                                <span className="text-slate-500 flex items-center gap-1">Glycol %: <span className="tabular-nums text-slate-600 dark:text-slate-300">{glycolPct}%</span><Tooltip content="Inhibited-glycol fraction of the technical-loop fluid (freeze/corrosion protection). Typical 20–35%; more glycol slightly lowers heat transfer." /></span>
                                 <input type="range" min={20} max={35} value={glycolPct} onChange={(e) => setGlycolPct(Number(e.target.value))} className="accent-[color:var(--rz-accent-info)]" title={`Inhibited glycol fraction: ${glycolPct}% (20–35% typical)`} />
                             </label>
                             <label className="flex flex-col gap-1">
-                                <span className="text-slate-500">Cycles of conc.: <span className="tabular-nums text-slate-600 dark:text-slate-300">{coc}×</span></span>
+                                <span className="text-slate-500 flex items-center gap-1">Cycles of conc.: <span className="tabular-nums text-slate-600 dark:text-slate-300">{coc}×</span><Tooltip content="Tower cycles of concentration: how many times makeup water is recirculated before blowdown. Higher cycles cut blowdown water but raise scaling risk." /></span>
                                 <input type="range" min={3} max={7} value={coc} onChange={(e) => setCoc(Number(e.target.value))} className="accent-[color:var(--rz-accent-info)]" title={`Tower cycles-of-concentration: ${coc} (higher = less blowdown, more scaling risk)`} />
                             </label>
                         </div>
                         {/* KPI band */}
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                            <Metric label="Annual Water" value={`${water.annualWaterM3.toLocaleString()} m³`} sub={`WUE ${water.wue} L/kWh`} />
-                            <Metric label="Evaporation" value={`${water.evaporationM3.toLocaleString()} m³`} sub={rejectionType === 'dry' ? 'no wet stage' : `${Math.round(water.wetFraction * 100)}% wet reject`} />
-                            <Metric label="Blowdown + Drift" value={`${(water.blowdownM3 + water.driftM3).toLocaleString()} m³`} sub={`CoC ${water.cyclesOfConcentration}× · drift`} />
-                            <Metric label="Glycol Makeup" value={`${water.annualGlycolMakeupM3.toLocaleString()} m³/yr`} sub={`charge ${(water.glycolChargeL / 1000).toLocaleString()} m³`} />
+                            <Metric label="Annual Water" value={`${water.annualWaterM3.toLocaleString()} m³`} sub={`WUE ${water.wue} L/kWh`} tip="Total annual site water consumption for cooling (tower makeup + loop makeup), with the resulting Water Usage Effectiveness (WUE, litres per kWh IT)." />
+                            <Metric label="Evaporation" value={`${water.evaporationM3.toLocaleString()} m³`} sub={rejectionType === 'dry' ? 'no wet stage' : `${Math.round(water.wetFraction * 100)}% wet reject`} tip="Annual water lost to evaporation at the heat-rejection tower (≈ latent heat of the rejected duty × wet fraction)." />
+                            <Metric label="Blowdown + Drift" value={`${(water.blowdownM3 + water.driftM3).toLocaleString()} m³`} sub={`CoC ${water.cyclesOfConcentration}× · drift`} tip="Annual water bled off to control mineral concentration (blowdown) plus droplets carried out of the tower (drift)." />
+                            <Metric label="Glycol Makeup" value={`${water.annualGlycolMakeupM3.toLocaleString()} m³/yr`} sub={`charge ${(water.glycolChargeL / 1000).toLocaleString()} m³`} tip="Annual glycol replenishment for the closed loop — a chemical cost, counted separately from water." />
                         </div>
                         {/* balance table */}
                         <table className="mt-3 w-full text-[10.5px]">
@@ -589,7 +597,7 @@ export function CduDashboard() {
             {/* (c) Cooling Efficiency — PUE mini-bars, liquid vs air delta */}
             <Card>
                 <h3 className="mb-2 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-                    Cooling Efficiency <EngChip src="DATA.pueMatrix" />
+                    Cooling Efficiency<Tooltip content="Power Usage Effectiveness (PUE) at your tier — air vs current vs direct-to-chip liquid. PUE = total facility power ÷ IT power; lower is more efficient." /> <EngChip src="DATA.pueMatrix" />
                     <span className="text-[9px] normal-case text-slate-400">Tier {inputs.tierLevel} column</span>
                 </h3>
                 <div className="space-y-1.5">
@@ -616,12 +624,12 @@ export function CduDashboard() {
             {Object.keys(refDb).length > 0 && (
                 <Card>
                     <h3 className="mb-1.5 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-                        Refrigerant Selection <EngChip src="DATA.refrigerants" />
+                        Refrigerant Selection<Tooltip content="Refrigerant options from the engine database with their climate (GWP), safety class, efficiency and cost trade-offs. Click a row to set the shared CAPEX refrigerant." /> <EngChip src="DATA.refrigerants" />
                         <span className="text-[9px] normal-case text-slate-400">{Object.keys(refDb).length} refrigerants · shared capex field</span>
                     </h3>
                     <div className="overflow-x-auto">
                         <table className="w-full text-[10.5px]">
-                            <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Refrigerant</th><th className="text-right">GWP</th><th className="text-center">Safety</th><th className="text-right">COP idx</th><th className="text-right">CAPEX ×</th><th className="text-left pl-2">Note</th></tr></thead>
+                            <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Refrigerant</th><th className="text-right"><span className="inline-flex items-center gap-1">GWP<Tooltip content="Global Warming Potential (GWP100): CO₂-equivalent warming per kg of refrigerant over 100 years. Lower is better; red exceeds the AIM Act / F-Gas phase-down line." /></span></th><th className="text-center"><span className="inline-flex items-center gap-1">Safety<Tooltip content="ASHRAE 34 safety class (A1 non-flammable, A2L mildly flammable, A3 flammable, B toxic). Drives leak-detection and charge-limit requirements." /></span></th><th className="text-right"><span className="inline-flex items-center gap-1">COP idx<Tooltip content="Coefficient-of-performance index relative to R-134a (1.00). Higher means better cooling efficiency for the same work." /></span></th><th className="text-right"><span className="inline-flex items-center gap-1">CAPEX ×<Tooltip content="Relative capital-cost multiplier vs a baseline refrigerant, reflecting flammability/toxicity mitigation (detection, charge limits, machine-room isolation)." /></span></th><th className="text-left pl-2">Note</th></tr></thead>
                             <tbody>
                                 {Object.entries(refDb).map(([k, v]) => (
                                     <tr key={k} onClick={() => setCapexInputs({ refrigerantType: k })}
@@ -710,12 +718,12 @@ export function CduDashboard() {
             {Object.keys(data.coolingTech ?? {}).length > 0 && (
                 <Card>
                     <h3 className="mb-1.5 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-                        Advanced &amp; Emerging Cooling <EngChip src="DATA.coolingTech" />
+                        Advanced &amp; Emerging Cooling<Tooltip content="Advanced and emerging cooling technologies (direct-to-chip, immersion, microfluidic) classified by maturity (TRL) and per-rack heat-removal capacity." /> <EngChip src="DATA.coolingTech" />
                         <span className="text-[9px] normal-case text-slate-400">{Object.keys(data.coolingTech ?? {}).length} techs · TRL-classified ladder</span>
                     </h3>
                     <div className="overflow-x-auto">
                         <table className="w-full text-[10.5px]">
-                            <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Vendor</th><th className="text-left pl-2">Technology</th><th className="text-center">TRL</th><th className="text-right">Rack kW</th><th className="text-center">Confidence</th></tr></thead>
+                            <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Vendor</th><th className="text-left pl-2">Technology</th><th className="text-center"><span className="inline-flex items-center gap-1">TRL<Tooltip content="Technology Readiness Level (1–9): maturity of the cooling technology. TRL 8–9 is commercially shipping; TRL 5–7 is pilot/emerging." /></span></th><th className="text-right"><span className="inline-flex items-center gap-1">Rack kW<Tooltip content="Manufacturer-claimed per-rack heat-removal capacity (kW) for this cooling technology." /></span></th><th className="text-center"><span className="inline-flex items-center gap-1">Confidence<Tooltip content="Deployment confidence: Commercial (TRL 8–9, shipping) vs Emerging (TRL 5–7, pilot/research)." /></span></th></tr></thead>
                             <tbody>
                                 {Object.entries(data.coolingTech ?? {}).map(([k, t]) => {
                                     const emerging = t.confidence === 'emerging';
@@ -744,35 +752,35 @@ export function CduDashboard() {
             {capexInputs.deepSea && ds ? (
                 <Card>
                     <h3 className="mb-2 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wide text-cyan-500">
-                        Deep-Sea Water Cooling — Advanced <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 text-[8px] font-bold text-emerald-500">ENGINE</span>
+                        Deep-Sea Water Cooling — Advanced<Tooltip content="Chiller-less cooling using cold seawater drawn from depth: intake temperature, seawater flow, pump energy, PUE and marine CAPEX/OPEX from the engine deep-sea model." /> <span className="rounded bg-emerald-500/15 px-1.5 py-0.5 text-[8px] font-bold text-emerald-500">ENGINE</span>
                         <span className="text-[9px] normal-case text-slate-400">models.cooling.deepSea · {ds.mode} mode</span>
                     </h3>
                     <div className="mb-3 grid grid-cols-3 gap-3">
-                        <label className="block text-[10px] text-slate-500">Depth
+                        <label className="block text-[10px] text-slate-500"><span className="inline-flex items-center gap-1">Depth<Tooltip content="Seawater intake depth (m). Deeper water is colder and more stable, enabling chiller-less cooling, but needs more pump head." /></span>
                             <input type="number" value={capexInputs.dsDepthM ?? 60} min={20} max={1000}
                                 onChange={(e) => setCapexInputs({ dsDepthM: Number(e.target.value) })}
                                 className="mt-0.5 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1 text-xs text-slate-900 dark:text-slate-100" /> m
                         </label>
-                        <label className="block text-[10px] text-slate-500">Pipeline
+                        <label className="block text-[10px] text-slate-500"><span className="inline-flex items-center gap-1">Pipeline<Tooltip content="Length of the seawater intake/outfall pipeline to shore (km). Longer runs raise pump energy and marine CAPEX." /></span>
                             <input type="number" value={capexInputs.dsPipelineKm ?? 3} min={0.5} max={50} step={0.5}
                                 onChange={(e) => setCapexInputs({ dsPipelineKm: Number(e.target.value) })}
                                 className="mt-0.5 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1 text-xs text-slate-900 dark:text-slate-100" /> km
                         </label>
-                        <label className="block text-[10px] text-slate-500">ΔT
+                        <label className="block text-[10px] text-slate-500"><span className="inline-flex items-center gap-1">ΔT<Tooltip content="Seawater temperature rise across the heat exchanger (°C). Larger ΔT reduces required flow but must stay within environmental discharge limits." /></span>
                             <input type="number" value={capexInputs.dsDeltaTC ?? 8} min={4} max={15}
                                 onChange={(e) => setCapexInputs({ dsDeltaTC: Number(e.target.value) })}
                                 className="mt-0.5 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1 text-xs text-slate-900 dark:text-slate-100" /> °C
                         </label>
                     </div>
                     <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                        <Metric label="Seawater Flow" value={`${ds.flow.m3s} m³/s`} sub={`${ds.flow.m3h.toLocaleString()} m³/h`} />
-                        <Metric label="Intake Temp" value={`${ds.intakeTempC} °C`} sub={`@ ${ds.depthM} m depth`} />
-                        <Metric label="Pumps" value={`${ds.pumps.duty}+1 × ${ds.pumps.perPumpKw} kW`} sub={`head ${ds.pumps.headM} m`} />
-                        <Metric label="PUE (chiller-less)" value={String(ds.pue)} sub={`pPUE ${ds.pPUE} · WUE 0 · basis ≤1.15`} />
-                        <Metric label="Marine CAPEX" value={`$${(ds.capex.total / 1e6).toFixed(1)}M`} sub={`$${(ds.capex.perMw / 1e3).toFixed(0)}K/MW`} />
-                        <Metric label="vs Baseline Cooling" value={`${ds.capex.vsBaselineCooling >= 0 ? '+' : ''}$${(ds.capex.vsBaselineCooling / 1e6).toFixed(1)}M`} sub="capex delta" />
-                        <Metric label="OPEX" value={`$${(ds.opex.totalYr / 1e6).toFixed(2)}M/yr`} sub={`pumps ${ds.opex.pumpMwhYr.toLocaleString()} MWh/yr`} />
-                        <Metric label="Env. ΔT" value={ds.env.deltaTCompliant ? 'Compliant' : 'Review'} sub={`redundancy ${ds.redundancy}`} />
+                        <Metric label="Seawater Flow" value={`${ds.flow.m3s} m³/s`} sub={`${ds.flow.m3h.toLocaleString()} m³/h`} tip="Seawater volume flow needed to reject the IT heat at the chosen ΔT (m³/s and m³/h)." />
+                        <Metric label="Intake Temp" value={`${ds.intakeTempC} °C`} sub={`@ ${ds.depthM} m depth`} tip="Seawater temperature at the intake depth — the cold source that enables chiller-less operation." />
+                        <Metric label="Pumps" value={`${ds.pumps.duty}+1 × ${ds.pumps.perPumpKw} kW`} sub={`head ${ds.pumps.headM} m`} tip="Seawater pump configuration: duty pumps plus one standby (N+1), per-pump power and required head." />
+                        <Metric label="PUE (chiller-less)" value={String(ds.pue)} sub={`pPUE ${ds.pPUE} · WUE 0 · basis ≤1.15`} tip="Power Usage Effectiveness without mechanical chillers — near the ≤1.15 basis because only pumps (not compressors) draw power; water usage effectiveness is ~0." />
+                        <Metric label="Marine CAPEX" value={`$${(ds.capex.total / 1e6).toFixed(1)}M`} sub={`$${(ds.capex.perMw / 1e3).toFixed(0)}K/MW`} tip="Capital cost of the marine cooling scope (intake, pipeline, pumps, heat exchangers), total and per MW." />
+                        <Metric label="vs Baseline Cooling" value={`${ds.capex.vsBaselineCooling >= 0 ? '+' : ''}$${(ds.capex.vsBaselineCooling / 1e6).toFixed(1)}M`} sub="capex delta" tip="CAPEX difference versus the conventional cooling system it replaces (positive = more expensive)." />
+                        <Metric label="OPEX" value={`$${(ds.opex.totalYr / 1e6).toFixed(2)}M/yr`} sub={`pumps ${ds.opex.pumpMwhYr.toLocaleString()} MWh/yr`} tip="Annual operating cost, dominated by seawater pump energy (MWh/yr)." />
+                        <Metric label="Env. ΔT" value={ds.env.deltaTCompliant ? 'Compliant' : 'Review'} sub={`redundancy ${ds.redundancy}`} tip="Whether the seawater discharge temperature rise stays within environmental compliance limits, plus the loop redundancy level." />
                     </div>
                     {ds.warnings?.length > 0 && (
                         <div className="mt-2 space-y-1">
@@ -924,29 +932,29 @@ export function SparesDashboard() {
                 );
             })()}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <Metric label="Recommended Stock Value" value={money(totals.inventoryValue)} sub={totals.inventoryValue === 0 ? "all Q*=0 — ROP covers demand at this fleet size" : "Σ Q* × unit cost"} />
-                <Metric label="Annual Cost" value={money(totals.annualCost)} sub="holding + shortage risk" />
-                <Metric label="Weighted Fill Rate" value={`${totals.weightedFillPct}%`} sub="demand-weighted" />
-                <Metric label="Below Fill Target" value={String(totals.belowTarget)} sub={`of ${rows.length} classes`} />
+                <Metric label="Recommended Stock Value" value={money(totals.inventoryValue)} sub={totals.inventoryValue === 0 ? "all Q*=0 — ROP covers demand at this fleet size" : "Σ Q* × unit cost"} tip="Total value of recommended on-shelf spares (Σ optimal quantity Q* × unit cost). Zero means the reorder point already covers the low failure demand." />
+                <Metric label="Annual Cost" value={money(totals.annualCost)} sub="holding + shortage risk" tip="Expected yearly cost of the spares policy: inventory holding cost plus shortage (stockout) risk cost." />
+                <Metric label="Weighted Fill Rate" value={`${totals.weightedFillPct}%`} sub="demand-weighted" tip="Demand-weighted service level across all equipment classes — the share of spare-part demand met from stock." />
+                <Metric label="Below Fill Target" value={String(totals.belowTarget)} sub={`of ${rows.length} classes`} tip="Number of equipment classes whose achieved fill rate falls short of their service-level target." />
             </div>
             <Card>
-                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Per-class newsvendor recommendation</h2>
+                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1">Per-class newsvendor recommendation<Tooltip content="Per equipment-class spare recommendation from a newsvendor (critical-fractile) model: optimal stock Q*, reorder point, safety stock and achieved fill rate." /></h2>
                 <div className="overflow-x-auto">
                     <table className="w-full min-w-[900px] text-[11px]">
                         <thead>
                             <tr className="text-left text-slate-500 border-b border-slate-200 dark:border-slate-800">
-                                <th className="py-1.5 pr-3 font-medium">Class</th>
-                                <th className="py-1.5 pr-3 font-medium">Fleet</th>
-                                <th className="py-1.5 pr-3 font-medium">MTBF h</th>
-                                <th className="py-1.5 pr-3 font-medium">Demand/yr</th>
-                                <th className="py-1.5 pr-3 font-medium">Q*</th>
-                                <th className="py-1.5 pr-3 font-medium">ROP</th>
-                                <th className="py-1.5 pr-3 font-medium">Safety</th>
-                                <th className="py-1.5 pr-3 font-medium">Fill</th>
-                                <th className="py-1.5 pr-3 font-medium">Annual cost</th>
-                                <th className="py-1.5 pr-3 font-medium text-rz-mint">Unit cost</th>
-                                <th className="py-1.5 pr-3 font-medium text-rz-mint">Lead wk</th>
-                                <th className="py-1.5 font-medium text-rz-mint">Fill target</th>
+                                <th className="py-1.5 pr-3 font-medium"><span className="inline-flex items-center gap-1">Class<Tooltip content="Equipment class and its criticality (Critical / Major / Minor). Criticality drives the fill-rate target and the stockout cost." /></span></th>
+                                <th className="py-1.5 pr-3 font-medium"><span className="inline-flex items-center gap-1">Fleet<Tooltip content="Number of installed units of this class, scaled from the IT load and rack density (commissioning equipment scaling)." /></span></th>
+                                <th className="py-1.5 pr-3 font-medium"><span className="inline-flex items-center gap-1">MTBF h<Tooltip content="Mean Time Between Failures (hours) from the engine reliability data (IEEE-493 typical). Lower MTBF means more spare demand." /></span></th>
+                                <th className="py-1.5 pr-3 font-medium"><span className="inline-flex items-center gap-1">Demand/yr<Tooltip content="Expected spare-part demand per year = fleet × 8760 h ÷ MTBF." /></span></th>
+                                <th className="py-1.5 pr-3 font-medium"><span className="inline-flex items-center gap-1">Q*<Tooltip content="Optimal order-up-to quantity from the newsvendor critical-fractile solution — the cost-optimal on-shelf spare count." /></span></th>
+                                <th className="py-1.5 pr-3 font-medium"><span className="inline-flex items-center gap-1">ROP<Tooltip content="Reorder point: the inventory level that triggers a replenishment order, covering demand over the lead time." /></span></th>
+                                <th className="py-1.5 pr-3 font-medium"><span className="inline-flex items-center gap-1">Safety<Tooltip content="Safety stock: buffer units held above expected lead-time demand to hit the fill-rate target." /></span></th>
+                                <th className="py-1.5 pr-3 font-medium"><span className="inline-flex items-center gap-1">Fill<Tooltip content="Achieved fill rate: the probability a spare is on the shelf when needed. Red means it is below the class target." /></span></th>
+                                <th className="py-1.5 pr-3 font-medium"><span className="inline-flex items-center gap-1">Annual cost<Tooltip content="Expected annual holding + shortage cost for this class at the recommended stock position." /></span></th>
+                                <th className="py-1.5 pr-3 font-medium text-rz-mint"><span className="inline-flex items-center gap-1">Unit cost<Tooltip content="Screening unit price of one spare (user-overridable). Drives holding cost and the newsvendor trade-off." /></span></th>
+                                <th className="py-1.5 pr-3 font-medium text-rz-mint"><span className="inline-flex items-center gap-1">Lead wk<Tooltip content="Procurement lead time in weeks (country-based default, user-overridable). Longer leads need more safety stock." /></span></th>
+                                <th className="py-1.5 font-medium text-rz-mint"><span className="inline-flex items-center gap-1">Fill target<Tooltip content="Target service level for this class — the fill rate the newsvendor policy aims to achieve." /></span></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1148,7 +1156,7 @@ export function SparesDashboard() {
                 <p className="mt-2 text-[10px] text-slate-500"><span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1" />engine data (IEEE-493) · <span className="rounded px-1 py-px text-[9px] font-semibold bg-amber-500/15 text-amber-600 dark:text-amber-300">scr</span> screening assumption · <span className="rounded px-1 py-px text-[9px] font-semibold bg-rz-mint/15 text-rz-mint">user</span> your override. Fleet from commissioning.equipScale ({bucket} density, {inputs.itLoad.toLocaleString()} kW IT).</p>
             </Card>
             <Card>
-                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Critical ratio — CR = Cu / (Cu + Co)</h2>
+                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1">Critical ratio — CR = Cu / (Cu + Co)<Tooltip content="Newsvendor critical ratio = understock cost Cu ÷ (understock Cu + overstock Co). Stock is held up to the point where the no-stockout probability equals this ratio." /></h2>
                 <p className="text-[11px] text-slate-500">
                     Cu = understock (stockout) cost — {money(UNDERSTOCK_COST_SCREENING.Critical)}/event Critical, {money(UNDERSTOCK_COST_SCREENING.Major)}/event Major (screening). Co = overstock cost = {CARRY_RATE_PCT}%/yr carry × unit cost × {PART_LIFE_YRS} yr part life.
                     Q* solves Φ⁻¹(CR) over lead-time demand (Poisson CDF for low-demand movers). Lead-time basis: {res.leadBasis}. Planning heuristic, not an inventory policy.

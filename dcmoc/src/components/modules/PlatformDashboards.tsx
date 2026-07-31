@@ -19,6 +19,7 @@ import { rzData, rzModels } from '@/lib/rz-engine';
 import { useRequirementsStore } from '@/store/requirements';
 import { applyUseCaseProfile, USE_CASE_TO_ENGINE } from '@/lib/requirementsMappings';
 import { PlatformHeader, KpiChips } from '@/components/modules/platform/ScenariosPage';
+import { Tooltip as InfoTip } from '@/components/ui/Tooltip';
 import { VALUE_BINDINGS, BINDING_GROUPS } from '@/lib/value-bindings';
 import ENGINE_CATALOG from '@/lib/engine-catalog.json';
 import RESEARCH_LIB from '@/lib/research-library.json';
@@ -125,17 +126,18 @@ function CountryCoverageSection() {
         <div className="space-y-3">
             <div className="flex items-center gap-2 flex-wrap">
                 <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Country Data Coverage — {COV_FIELDS.length} fields × {cov.rows.length} countries</h2>
+                <InfoTip content="Per-country × field-group completeness matrix over the 40-country reference DB. Every cell is derived live from the real COUNTRIES objects (no hardcoded coverage), so filling a gap in countries.ts updates this view automatically." />
                 <span className="rounded-full bg-rz-data/15 px-2 py-0.5 text-[9px] font-medium uppercase text-rz-data">computed live</span>
             </div>
             {/* Summary: totals + biggest gaps + fullest/thinnest countries */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
                 <div className="rounded-lg border border-slate-200 dark:border-white/10 px-3 py-2">
-                    <p className="text-[9px] uppercase text-slate-400">Total coverage</p>
+                    <p className="text-[9px] uppercase text-slate-400">Total coverage <InfoTip content="Share of all country×field cells that carry a value: filled cells ÷ (countries × fields)." /></p>
                     <p className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{(cov.coverage * 100).toFixed(1)}%</p>
                     <p className="text-[9px] text-slate-400">{cov.filledCells.toLocaleString()} / {cov.totalCells.toLocaleString()} cells filled</p>
                 </div>
                 <div className="rounded-lg border border-slate-200 dark:border-white/10 px-3 py-2">
-                    <p className="text-[9px] uppercase text-slate-400">Biggest gaps</p>
+                    <p className="text-[9px] uppercase text-slate-400">Biggest gaps <InfoTip content="Fields left empty in the most countries — the highest-impact data gaps to fill first." /></p>
                     {cov.fieldGaps.length === 0
                         ? <p className="text-xs text-rz-data font-medium">No gaps — all fields filled</p>
                         : cov.fieldGaps.slice(0, 3).map((g) => (
@@ -143,12 +145,12 @@ function CountryCoverageSection() {
                         ))}
                 </div>
                 <div className="rounded-lg border border-slate-200 dark:border-white/10 px-3 py-2">
-                    <p className="text-[9px] uppercase text-slate-400">Most complete</p>
+                    <p className="text-[9px] uppercase text-slate-400">Most complete <InfoTip content="Countries with the highest number of populated fields." /></p>
                     <p className="text-xs font-medium text-slate-700 dark:text-slate-200">{cov.fullest.length > 3 ? `${cov.fullest.length} countries` : cov.fullest.map((r) => r.name).join(', ')}</p>
                     <p className="text-[9px] text-slate-400 tabular-nums">{cov.maxFill}/{COV_FIELDS.length} fields</p>
                 </div>
                 <div className="rounded-lg border border-slate-200 dark:border-white/10 px-3 py-2">
-                    <p className="text-[9px] uppercase text-slate-400">Least complete</p>
+                    <p className="text-[9px] uppercase text-slate-400">Least complete <InfoTip content="Countries with the fewest populated fields — priority for data entry." /></p>
                     <p className="text-xs font-medium text-slate-700 dark:text-slate-200">{cov.thinnest.length > 3 ? `${cov.thinnest.length} countries` : cov.thinnest.map((r) => r.name).join(', ')}</p>
                     <p className="text-[9px] text-slate-400 tabular-nums">{cov.minFill}/{COV_FIELDS.length} fields</p>
                 </div>
@@ -187,13 +189,13 @@ function CountryCoverageSection() {
                 <table className="text-[10px]">
                     <thead>
                         <tr className="text-slate-400">
-                            <th className="py-1 pr-3 text-left sticky left-0 bg-white dark:bg-slate-900 z-10">Country</th>
+                            <th className="py-1 pr-3 text-left sticky left-0 bg-white dark:bg-slate-900 z-10">Country <InfoTip content="Country name and region from constants/countries.ts." /></th>
                             {visFields.map(({ f }) => (
                                 <th key={f.key} className="px-0.5 pb-1 align-bottom font-medium" title={`${COV_GROUP_LABELS[f.group]} · ${f.key}`}>
                                     <span className="inline-block whitespace-nowrap text-[8px]" style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}>{f.short}</span>
                                 </th>
                             ))}
-                            <th className="pl-2 text-right">Filled</th>
+                            <th className="pl-2 text-right">Filled <InfoTip content="Count of populated fields for this country out of the total tracked fields." /></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -301,12 +303,13 @@ export function DataLibraryDashboard() {
                 <Card>
                     <div className="mb-2 flex items-center gap-2">
                         <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">DATA.sources — provenance ledger ({Object.keys(sources).length} entries)</h2>
+                        <InfoTip content="Every economically-material DATA value in the engine carries a source + as-of date (gate-enforced). Read-only." />
                         <input value={srcQuery} onChange={(e) => setSrcQuery(e.target.value)} placeholder="Search key/source…"
                             className="ml-auto w-56 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1 text-xs outline-none focus:border-cyan-400 text-slate-900 dark:text-slate-100" />
                     </div>
                     <div className="max-h-[480px] overflow-y-auto">
                         <table className="w-full text-[11px]">
-                            <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400 sticky top-0 bg-white dark:bg-slate-900"><th className="py-1 text-left">Data key</th><th className="text-left">Source</th><th className="text-right">As of</th></tr></thead>
+                            <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400 sticky top-0 bg-white dark:bg-slate-900"><th className="py-1 text-left">Data key <InfoTip content="Dotted path of the value inside rz-engine.js DATA (e.g. capexPerMw)." /></th><th className="text-left">Source <InfoTip content="Origin publication or dataset the value is taken from, with method note." /></th><th className="text-right">As of <InfoTip content="As-of date of the source data — how recent the figure is." /></th></tr></thead>
                             <tbody>
                                 {Object.entries(sources)
                                     .filter(([k, v]) => !srcQuery || (k + ' ' + (v.source ?? '')).toLowerCase().includes(srcQuery.toLowerCase()))
@@ -326,7 +329,7 @@ export function DataLibraryDashboard() {
             {tab === 'corpus' && <CorpusSection corpus={corpus} />}
             {tab === 'countries' && (
                     <table className="w-full text-xs min-w-[560px]">
-                        <thead><tr className="text-slate-400 text-left"><th className="py-1.5 pr-3">Country</th><th className="pr-3">Region</th><th className="pr-3 text-right">Electricity $/kWh</th><th className="pr-3 text-right">Tax</th><th className="pr-3 text-right">Grid kgCO₂/kWh</th><th className="text-right">Constr. idx</th></tr></thead>
+                        <thead><tr className="text-slate-400 text-left"><th className="py-1.5 pr-3">Country <InfoTip content="Country in the reference database." /></th><th className="pr-3">Region <InfoTip content="Geographic region grouping (e.g. APAC, EMEA, Americas)." /></th><th className="pr-3 text-right">Electricity $/kWh <InfoTip content="Industrial electricity tariff in USD per kWh — the main driver of energy OPEX." /></th><th className="pr-3 text-right">Tax <InfoTip content="Corporate income tax rate applied in the financial models." /></th><th className="pr-3 text-right">Grid kgCO₂/kWh <InfoTip content="Grid carbon intensity — kg CO₂ emitted per kWh consumed; drives Scope-2 carbon." /></th><th className="text-right">Constr. idx <InfoTip content="Construction cost index relative to a US baseline (1.0) — scales local CAPEX." /></th></tr></thead>
                         <tbody>{(Object.values(countries) as Record<string, unknown>[]).map((c) => {
                             const cc = c as { id: string; name: string; region: string; economy: { electricityRate: number; taxRate: number }; environment: { gridCarbonIntensity: number }; constructionIndex?: number };
                             return (<tr key={cc.id} className="border-t border-slate-100 dark:border-white/5"><td className="py-1.5 pr-3 font-medium text-slate-700 dark:text-slate-200">{cc.name}</td><td className="pr-3 text-slate-500">{cc.region}</td><td className="pr-3 text-right tabular-nums">{cc.economy.electricityRate.toFixed(3)}</td><td className="pr-3 text-right tabular-nums">{pct(cc.economy.taxRate)}</td><td className="pr-3 text-right tabular-nums">{cc.environment.gridCarbonIntensity.toFixed(2)}</td><td className="text-right tabular-nums">{cc.constructionIndex?.toFixed(2) ?? '—'}</td></tr>);
@@ -336,12 +339,12 @@ export function DataLibraryDashboard() {
                 {tab === 'coverage' && <CountryCoverageSection />}
                 {tab === 'markets' && (
                     <table className="w-full text-xs min-w-[520px]">
-                        <thead><tr className="text-slate-400 text-left"><th className="py-1.5 pr-3">Market</th><th className="pr-3 text-right">Power $/kWh</th><th className="pr-3 text-right">Colo $/kW·mo</th><th className="pr-3 text-right">Vacancy</th><th className="text-right">CAGR</th></tr></thead>
+                        <thead><tr className="text-slate-400 text-left"><th className="py-1.5 pr-3">Market <InfoTip content="Named data-center metro market." /></th><th className="pr-3 text-right">Power $/kWh <InfoTip content="Wholesale/retail power price in the market, USD per kWh." /></th><th className="pr-3 text-right">Colo $/kW·mo <InfoTip content="Colocation lease rate — USD per kW of IT capacity per month." /></th><th className="pr-3 text-right">Vacancy <InfoTip content="Share of colocation capacity in the market currently unleased." /></th><th className="text-right">CAGR <InfoTip content="Compound annual growth rate of the market's capacity/demand." /></th></tr></thead>
                         <tbody>{Object.entries(markets).map(([k, v]) => { const mm = v as { powerCost?: number; coloPrice?: number; vacancy?: number; cagr?: number }; return (<tr key={k} className="border-t border-slate-100 dark:border-white/5"><td className="py-1.5 pr-3 font-medium text-slate-700 dark:text-slate-200 capitalize">{k.replace(/-/g, ' ')}</td><td className="pr-3 text-right tabular-nums">{mm.powerCost ?? '—'}</td><td className="pr-3 text-right tabular-nums">{mm.coloPrice ?? '—'}</td><td className="pr-3 text-right tabular-nums">{mm.vacancy != null ? pct(mm.vacancy) : '—'}</td><td className="text-right tabular-nums">{mm.cagr != null ? pct(mm.cagr) : '—'}</td></tr>); })}</tbody>
                     </table>
                 )}
                 {tab === 'pue' && (
-                    <table className="w-full text-xs"><thead><tr className="text-slate-400 text-left"><th className="py-1.5 pr-3">Cooling</th><th className="pr-3 text-right">Tier 2</th><th className="pr-3 text-right">Tier 3</th><th className="text-right">Tier 4</th></tr></thead>
+                    <table className="w-full text-xs"><thead><tr className="text-slate-400 text-left"><th className="py-1.5 pr-3">Cooling <InfoTip content="Cooling technology / topology class." /></th><th className="pr-3 text-right">Tier 2 <InfoTip content="Design PUE (power usage effectiveness) for this cooling type at Uptime Tier II." /></th><th className="pr-3 text-right">Tier 3 <InfoTip content="Design PUE for this cooling type at Uptime Tier III." /></th><th className="text-right">Tier 4 <InfoTip content="Design PUE for this cooling type at Uptime Tier IV." /></th></tr></thead>
                         <tbody>{Object.entries(pue).map(([k, v]) => { const p = v as Record<string, number>; return (<tr key={k} className="border-t border-slate-100 dark:border-white/5"><td className="py-1.5 pr-3 font-medium capitalize text-slate-700 dark:text-slate-200">{k}</td><td className="pr-3 text-right tabular-nums">{p.tier2 ?? '—'}</td><td className="pr-3 text-right tabular-nums">{p.tier3 ?? '—'}</td><td className="text-right tabular-nums">{p.tier4 ?? '—'}</td></tr>); })}</tbody>
                     </table>
                 )}
@@ -352,13 +355,14 @@ export function DataLibraryDashboard() {
                     <div className="space-y-3">
                         <div className="flex items-center gap-2">
                             <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Advanced &amp; Emerging Cooling — DATA.coolingTech (cooling ladder + microfluidic)</h2>
+                            <InfoTip content="Vendor cooling technologies from air to immersion/microfluidic, classified by Technology Readiness Level (TRL) and commercial vs emerging confidence." />
                             <span className="rounded-full bg-rz-data/15 px-2 py-0.5 text-[9px] font-medium uppercase text-rz-data">engine · TRL-classified</span>
                         </div>
                         {Object.keys(coolingTech).length === 0
                             ? <p className="text-xs text-slate-400">Engine not loaded — DATA.coolingTech unavailable in this session.</p>
                             : (<>
                                 <table className="w-full text-xs min-w-[720px]">
-                                    <thead><tr className="text-slate-400 text-left"><th className="py-1.5 pr-3">Vendor</th><th className="pr-3">Technology</th><th className="pr-3">Family</th><th className="pr-3 text-right">TRL</th><th className="pr-3 text-right">Rack kW</th><th className="pr-3">Coolant</th><th className="pr-3">WUE basis</th><th className="pr-3">Confidence</th><th>Ref</th></tr></thead>
+                                    <thead><tr className="text-slate-400 text-left"><th className="py-1.5 pr-3">Vendor <InfoTip content="Vendor / provider of the cooling technology." /></th><th className="pr-3">Technology <InfoTip content="Description of the cooling approach." /></th><th className="pr-3">Family <InfoTip content="Cooling family / category key (e.g. air, immersion)." /></th><th className="pr-3 text-right">TRL <InfoTip content="Technology Readiness Level (1–9) — maturity from lab (low) to commercial deployment (high)." /></th><th className="pr-3 text-right">Rack kW <InfoTip content="Claimed heat-rejection capacity per rack, in kW." /></th><th className="pr-3">Coolant <InfoTip content="Working coolant / fluid used." /></th><th className="pr-3">WUE basis <InfoTip content="Water Usage Effectiveness basis / assumption for the technology." /></th><th className="pr-3">Confidence <InfoTip content="Commercial (TRL 8–9, shipping) vs Emerging (TRL 5–7, pilot / research)." /></th><th>Ref <InfoTip content="Source reference backing the claim." /></th></tr></thead>
                                     <tbody>{Object.entries(coolingTech).map(([k, t]) => {
                                         const emerging = t.confidence === 'emerging';
                                         return (
@@ -386,10 +390,11 @@ export function DataLibraryDashboard() {
                     <div className="space-y-3">
                         <div className="flex items-center gap-2">
                             <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Supply Chain &amp; Import — per-country landed cost / export tier / customs lead</h2>
+                            <InfoTip content="Per-country import screening: duty on the imported-equipment fraction, US-BIS export-control proxy tier, and added customs lead time." />
                             <span className="rounded-full bg-rz-data/15 px-2 py-0.5 text-[9px] font-medium uppercase text-rz-data">engine · proxy screen</span>
                         </div>
                         <table className="w-full text-xs min-w-[680px]">
-                            <thead><tr className="text-slate-400 text-left"><th className="py-1.5 pr-3">Country</th><th className="pr-3">Region</th><th className="pr-3">Import-Duty Band</th><th className="pr-3 text-right">Duty %</th><th className="pr-3 text-right">Export Tier</th><th className="pr-3 text-right">Customs Lead (wk)</th><th className="text-center">FTA?</th></tr></thead>
+                            <thead><tr className="text-slate-400 text-left"><th className="py-1.5 pr-3">Country <InfoTip content="Country in the import-screening database." /></th><th className="pr-3">Region <InfoTip content="Geographic region grouping." /></th><th className="pr-3">Import-Duty Band <InfoTip content="Duty band assigned to the country (e.g. fta, standard, high)." /></th><th className="pr-3 text-right">Duty % <InfoTip content="Import duty rate applied to the imported-equipment fraction only (screening)." /></th><th className="pr-3 text-right">Export Tier <InfoTip content="US BIS export-control proxy tier for frontier GPUs — advisory (AI Diffusion Rule rescinded), not statutory." /></th><th className="pr-3 text-right">Customs Lead (wk) <InfoTip content="Extra customs-clearance lead time added, in weeks." /></th><th className="text-center">FTA? <InfoTip content="Whether the country qualifies under a free-trade agreement (zero-duty band)." /></th></tr></thead>
                             <tbody>{Object.values(COUNTRIES).map((c) => {
                                 const band = c.supplyChain.importDutyBand;
                                 const dutyPct = ((importDutyBands[band] ?? 0) * 100);
@@ -415,13 +420,14 @@ export function DataLibraryDashboard() {
                     <div className="space-y-3">
                         <div className="flex items-center gap-2">
                             <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">O&amp;M Contract Pricing — DATA.omContracts ($/kW IT per year, fixed-fee)</h2>
+                            <InfoTip content="Operations &amp; maintenance contract fee bands in USD per kW IT per year, consumed by the Maintenance SLA tab (vendor tier fee = band × IT kW)." />
                             <span className="rounded-full bg-rz-data/15 px-2 py-0.5 text-[9px] font-medium uppercase text-rz-data">engine · sourced band</span>
                         </div>
                         {Object.keys(omContracts.tiers || {}).length === 0
                             ? <p className="text-xs text-slate-400">Engine not loaded — DATA.omContracts unavailable in this session.</p>
                             : (<>
                                 <table className="w-full text-xs min-w-[560px]">
-                                    <thead><tr className="text-slate-400 text-left"><th className="py-1.5 pr-3">Contract tier</th><th className="pr-3">Scope</th><th className="pr-3 text-right">Low</th><th className="pr-3 text-right font-bold">Mid</th><th className="text-right">High</th></tr></thead>
+                                    <thead><tr className="text-slate-400 text-left"><th className="py-1.5 pr-3">Contract tier <InfoTip content="O&amp;M contract service tier." /></th><th className="pr-3">Scope <InfoTip content="What the tier covers." /></th><th className="pr-3 text-right">Low <InfoTip content="Low end of the price band — USD per kW IT per year." /></th><th className="pr-3 text-right font-bold">Mid <InfoTip content="Mid price band — the default fee used by the Maintenance SLA adapter (USD per kW IT/yr)." /></th><th className="text-right">High <InfoTip content="High end of the price band — USD per kW IT per year." /></th></tr></thead>
                                     <tbody>{Object.entries(omContracts.tiers || {}).map(([k, t]) => (
                                         <tr key={k} className="border-t border-slate-100 dark:border-white/5 align-top">
                                             <td className="py-1.5 pr-3 font-medium capitalize text-slate-700 dark:text-slate-200">{k.replace(/([A-Z])/g, ' $1')}</td>
@@ -433,8 +439,8 @@ export function DataLibraryDashboard() {
                                     ))}</tbody>
                                 </table>
                                 <div className="flex flex-wrap gap-2 text-[10px]">
-                                    <span className="rounded-lg border border-slate-200 dark:border-white/10 px-2 py-1 text-slate-500">Third-party vs OEM: <b className="text-slate-700 dark:text-slate-200">×{omContracts.thirdPartyMultiplier ?? '—'}</b></span>
-                                    <span className="rounded-lg border border-slate-200 dark:border-white/10 px-2 py-1 text-slate-500">Facility &gt;10 yr: <b className="text-slate-700 dark:text-slate-200">×{omContracts.agingFacilityMultiplier ?? '—'}</b></span>
+                                    <span className="rounded-lg border border-slate-200 dark:border-white/10 px-2 py-1 text-slate-500">Third-party vs OEM: <b className="text-slate-700 dark:text-slate-200">×{omContracts.thirdPartyMultiplier ?? '—'}</b> <InfoTip content="Cost multiplier applied when using a third-party contractor instead of the OEM." /></span>
+                                    <span className="rounded-lg border border-slate-200 dark:border-white/10 px-2 py-1 text-slate-500">Facility &gt;10 yr: <b className="text-slate-700 dark:text-slate-200">×{omContracts.agingFacilityMultiplier ?? '—'}</b> <InfoTip content="Cost multiplier for aging facilities (older than 10 years) reflecting higher maintenance effort." /></span>
                                 </div>
                                 {omContracts.basis && <p className="text-[10px] text-slate-400">Basis: {omContracts.basis}</p>}
                                 <p className="text-[9px] text-slate-400">Consumed by Maintenance → SLA (vendor tier fee = band × IT kW) — screening bands, source in DATA.sources[&apos;omContracts&apos;].</p>
@@ -445,13 +451,14 @@ export function DataLibraryDashboard() {
                     <div className="space-y-3">
                         <div className="flex items-center gap-2">
                             <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Spares Pricing — DATA.sparesPricing (unit list-price bands, USD)</h2>
+                            <InfoTip content="Unit list-price bands (USD) per spare-part class; the Mid band is the default unit cost in the newsvendor spares adapter (Maintenance → Spares)." />
                             <span className="rounded-full bg-rz-data/15 px-2 py-0.5 text-[9px] font-medium uppercase text-rz-data">engine · sourced band</span>
                         </div>
                         {Object.keys(sparesPricing).length === 0
                             ? <p className="text-xs text-slate-400">Engine not loaded — DATA.sparesPricing unavailable in this session.</p>
                             : (<>
                                 <table className="w-full text-xs min-w-[560px]">
-                                    <thead><tr className="text-slate-400 text-left"><th className="py-1.5 pr-3">Spare class</th><th className="pr-3">Unit</th><th className="pr-3 text-right">Low</th><th className="pr-3 text-right font-bold">Mid</th><th className="text-right">High</th></tr></thead>
+                                    <thead><tr className="text-slate-400 text-left"><th className="py-1.5 pr-3">Spare class <InfoTip content="Spare-part class / category key." /></th><th className="pr-3">Unit <InfoTip content="Costing unit for the spare (e.g. per unit, per set)." /></th><th className="pr-3 text-right">Low <InfoTip content="Low end of the unit list-price band, USD." /></th><th className="pr-3 text-right font-bold">Mid <InfoTip content="Mid band — the default unit cost used by the newsvendor spares adapter, USD." /></th><th className="text-right">High <InfoTip content="High end of the unit list-price band, USD." /></th></tr></thead>
                                     <tbody>{Object.entries(sparesPricing).map(([k, b]) => (
                                         <tr key={k} className="border-t border-slate-100 dark:border-white/5">
                                             <td className="py-1.5 pr-3 font-mono text-slate-700 dark:text-slate-200">{k}</td>
@@ -470,6 +477,7 @@ export function DataLibraryDashboard() {
                     <div className="space-y-3">
                         <div className="flex items-center gap-2">
                             <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Environmental Costs — DATA.envCosts (carbon compliance price + waste bands)</h2>
+                            <InfoTip content="Per-country carbon compliance price (USD per tonne CO₂e) plus screening-grade waste-disposal cost and generation-intensity bands." />
                             <span className="rounded-full bg-rz-data/15 px-2 py-0.5 text-[9px] font-medium uppercase text-rz-data">engine · sourced band</span>
                         </div>
                         {carbonRows.length === 0
@@ -479,8 +487,8 @@ export function DataLibraryDashboard() {
                                     <div className="max-h-[420px] overflow-y-auto">
                                         <table className="w-full text-xs">
                                             <thead><tr className="text-slate-400 text-left sticky top-0 bg-white dark:bg-slate-900">
-                                                <th className="py-1.5 pr-3"><button onClick={envSortBtn('country')} className="uppercase text-[10px] font-medium hover:text-cyan-500">Country {envSort === 'country' ? (envDir === 1 ? '▲' : '▼') : ''}</button></th>
-                                                <th className="text-right"><button onClick={envSortBtn('price')} className="uppercase text-[10px] font-medium hover:text-cyan-500">Carbon $/tCO₂e {envSort === 'price' ? (envDir === 1 ? '▲' : '▼') : ''}</button></th>
+                                                <th className="py-1.5 pr-3"><button onClick={envSortBtn('country')} className="uppercase text-[10px] font-medium hover:text-cyan-500">Country {envSort === 'country' ? (envDir === 1 ? '▲' : '▼') : ''}</button> <InfoTip content="Country the carbon price applies to. Click the header to sort." /></th>
+                                                <th className="text-right"><button onClick={envSortBtn('price')} className="uppercase text-[10px] font-medium hover:text-cyan-500">Carbon $/tCO₂e {envSort === 'price' ? (envDir === 1 ? '▲' : '▼') : ''}</button> <InfoTip content="Carbon compliance price in USD per tonne CO₂-equivalent, or a voluntary-offset basis where no compliance scheme exists (labeled). Click to sort." /></th>
                                             </tr></thead>
                                             <tbody>{sortedCarbon.map(([code, price]) => (
                                                 <tr key={code} className="border-t border-slate-100 dark:border-white/5">
@@ -495,16 +503,16 @@ export function DataLibraryDashboard() {
                                     <p className="mt-1 text-[9px] text-slate-400">{carbonRows.length} countries — compliance price where a scheme exists; <span className="text-amber-500">offset</span> = voluntary basis (no compliance scheme), labeled.</p>
                                 </div>
                                 <div className="space-y-2">
-                                    <h3 className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Waste management bands (screening)</h3>
+                                    <h3 className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Waste management bands (screening) <InfoTip content="Screening-grade unit costs for general and e-waste disposal, plus how much waste is generated per MW of IT load per year." /></h3>
                                     {([
-                                        ['General waste — developed markets', envCosts.wasteMgmt?.generalUsdPerTonne?.developed, '$/tonne'],
-                                        ['General waste — emerging markets', envCosts.wasteMgmt?.generalUsdPerTonne?.emerging, '$/tonne'],
-                                        ['E-waste (certified ITAD/recycling)', envCosts.wasteMgmt?.eWasteUsdPerKg, '$/kg'],
-                                        ['General waste intensity', envCosts.wasteMgmt?.generalTonnesPerMwItYr, 't / MW-IT·yr'],
-                                        ['E-waste intensity', envCosts.wasteMgmt?.eWasteKgPerMwItYr, 'kg / MW-IT·yr'],
-                                    ] as [string, number | undefined, string][]).map(([label, val, unit]) => (
+                                        ['General waste — developed markets', envCosts.wasteMgmt?.generalUsdPerTonne?.developed, '$/tonne', 'Disposal cost for general (non-hazardous) waste in developed markets, USD per tonne.'],
+                                        ['General waste — emerging markets', envCosts.wasteMgmt?.generalUsdPerTonne?.emerging, '$/tonne', 'Disposal cost for general (non-hazardous) waste in emerging markets, USD per tonne.'],
+                                        ['E-waste (certified ITAD/recycling)', envCosts.wasteMgmt?.eWasteUsdPerKg, '$/kg', 'Certified IT-asset-disposition / e-waste recycling cost, USD per kg.'],
+                                        ['General waste intensity', envCosts.wasteMgmt?.generalTonnesPerMwItYr, 't / MW-IT·yr', 'General waste generated per MW of IT load per year, in tonnes.'],
+                                        ['E-waste intensity', envCosts.wasteMgmt?.eWasteKgPerMwItYr, 'kg / MW-IT·yr', 'E-waste generated per MW of IT load per year, in kg.'],
+                                    ] as [string, number | undefined, string, string][]).map(([label, val, unit, tip]) => (
                                         <div key={label} className="flex justify-between text-xs border border-slate-100 dark:border-white/5 rounded-lg px-3 py-2">
-                                            <span className="text-slate-700 dark:text-slate-200">{label}</span>
+                                            <span className="text-slate-700 dark:text-slate-200">{label} <InfoTip content={tip} /></span>
                                             <span className="text-slate-500 tabular-nums">{val != null ? `${val.toLocaleString()} ${unit}` : '—'}</span>
                                         </div>
                                     ))}
@@ -587,9 +595,9 @@ export function ProjectsDashboard() {
                         <div className="flex items-start justify-between"><h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">{s.name}</h3><button onClick={() => deleteScenario(s.id)} className="text-[10px] text-slate-400 hover:text-rose-500">Delete</button></div>
                         <div className="text-[10px] text-slate-400 mt-1">{new Date(s.timestamp).toLocaleString()}</div>
                         <div className="grid grid-cols-3 gap-2 mt-2 text-[10px]">
-                            <div><span className="text-slate-500 block">Country</span><span className="font-medium text-slate-700 dark:text-slate-300">{s.countryId}</span></div>
-                            <div><span className="text-slate-500 block">Staff</span><span className="font-medium text-slate-700 dark:text-slate-300">{s.summary?.totalStaff ?? '—'}</span></div>
-                            <div><span className="text-slate-500 block">CAPEX</span><span className="font-medium text-slate-700 dark:text-slate-300">{s.summary?.annualCapex ? `$${(s.summary.annualCapex / 1e6).toFixed(1)}M` : '—'}</span></div>
+                            <div><span className="text-slate-500 block">Country <InfoTip content="Country selected in this saved scenario." /></span><span className="font-medium text-slate-700 dark:text-slate-300">{s.countryId}</span></div>
+                            <div><span className="text-slate-500 block">Staff <InfoTip content="Total headcount (FTE) captured in this saved scenario." /></span><span className="font-medium text-slate-700 dark:text-slate-300">{s.summary?.totalStaff ?? '—'}</span></div>
+                            <div><span className="text-slate-500 block">CAPEX <InfoTip content="Annualized capital expenditure of the saved scenario, in USD millions." /></span><span className="font-medium text-slate-700 dark:text-slate-300">{s.summary?.annualCapex ? `$${(s.summary.annualCapex / 1e6).toFixed(1)}M` : '—'}</span></div>
                         </div>
                     </Card>
                 ))}</div>}
@@ -606,18 +614,18 @@ export function SettingsDashboard() {
         <div className="space-y-4">
             <Head icon={Wrench} title="Settings" sub="Appearance, data source, and AI overlay" tone="" />
             <Card>
-                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Appearance</h2>
+                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Appearance <InfoTip content="Light / dark theme for the dashboard UI." /></h2>
                 <div className="flex gap-2">
                     <button onClick={() => setTheme('light')} className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs border ${theme === 'light' ? 'border-cyan-400/60 bg-cyan-500/10 text-cyan-600' : 'border-slate-200 dark:border-white/10 text-slate-500'}`}><Sun className="w-3.5 h-3.5" /> Light</button>
                     <button onClick={() => setTheme('dark')} className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs border ${theme === 'dark' ? 'border-cyan-400/60 bg-cyan-500/10 text-cyan-400' : 'border-slate-200 dark:border-white/10 text-slate-500'}`}><Moon className="w-3.5 h-3.5" /> Dark</button>
                 </div>
             </Card>
             <Card>
-                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Engine &amp; Data</h2>
+                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Engine &amp; Data <InfoTip content="Reference data source and AI overlay status for the platform." /></h2>
                 <div className="text-xs text-slate-600 dark:text-slate-300 space-y-1">
-                    <div className="flex justify-between"><span>Reference source</span><span className="text-slate-500">rz-engine.js DATA (single source)</span></div>
-                    <div className="flex justify-between"><span>Active country</span><span className="text-slate-500">{selectedCountry?.name || '—'}</span></div>
-                    <div className="flex justify-between"><span>AI decision overlay</span><span className={ai.enabled ? 'text-rz-data' : 'text-slate-500'}>{ai.enabled ? `${ai.provider} · ${ai.model}` : 'built-in deterministic engine'}</span></div>
+                    <div className="flex justify-between"><span>Reference source <InfoTip content="Where every calculator and module reads its reference data from — the single source of truth." /></span><span className="text-slate-500">rz-engine.js DATA (single source)</span></div>
+                    <div className="flex justify-between"><span>Active country <InfoTip content="Country currently selected for the simulation." /></span><span className="text-slate-500">{selectedCountry?.name || '—'}</span></div>
+                    <div className="flex justify-between"><span>AI decision overlay <InfoTip content="Whether an external AI provider augments the built-in deterministic engine (optional)." /></span><span className={ai.enabled ? 'text-rz-data' : 'text-slate-500'}>{ai.enabled ? `${ai.provider} · ${ai.model}` : 'built-in deterministic engine'}</span></div>
                 </div>
                 <p className="mt-2 text-[10px] text-slate-400">Configure the AI overlay from the dashboard top bar (AI Assistant).</p>
             </Card>
@@ -681,21 +689,21 @@ export function KnowledgeDashboard() {
                             {open === b.id && (
                                 <div className="grid gap-3 border-t border-slate-100 dark:border-slate-800/60 px-3 py-2.5 text-[11px] md:grid-cols-2">
                                     <div className="space-y-1.5">
-                                        <div><span className="text-[9px] font-semibold uppercase text-slate-400">Formula / derivation</span>
+                                        <div><span className="text-[9px] font-semibold uppercase text-slate-400">Formula / derivation <InfoTip content="How the value is computed — the formula or derivation chain." /></span>
                                             <p className="text-slate-600 dark:text-slate-300">{b.formula}</p></div>
-                                        {b.engineFn && <div><span className="text-[9px] font-semibold uppercase text-slate-400">Engine function</span>
+                                        {b.engineFn && <div><span className="text-[9px] font-semibold uppercase text-slate-400">Engine function <InfoTip content="The rz-engine / module function that produces this value." /></span>
                                             <p><code className="text-rz-data">{b.engineFn}</code></p></div>}
-                                        <div><span className="text-[9px] font-semibold uppercase text-slate-400">Source parameters</span>
+                                        <div><span className="text-[9px] font-semibold uppercase text-slate-400">Source parameters <InfoTip content="Input parameters this value is derived from — its single origin." /></span>
                                             <div className="flex flex-wrap gap-1">{b.sourceParams.map((sp) => <code key={sp} className="rounded bg-rz-mint/10 px-1.5 py-0.5 text-[9px] text-rz-mint">{sp}</code>)}</div></div>
                                         {b.notes && <p className="rounded-lg border border-amber-500/30 bg-amber-500/5 px-2 py-1 text-[10px] text-amber-600 dark:text-amber-400">{b.notes}</p>}
                                     </div>
                                     <div className="space-y-1.5">
-                                        <div><span className="text-[9px] font-semibold uppercase text-slate-400">Rendered on</span>
+                                        <div><span className="text-[9px] font-semibold uppercase text-slate-400">Rendered on <InfoTip content="DCMOC pages / tabs where this value is displayed." /></span>
                                             <div className="flex flex-wrap gap-1">{b.pages.map((pg) => (
                                                 <button key={pg} onClick={() => setActiveTab(pg as never)}
                                                     className="rounded border border-slate-300 dark:border-slate-700 px-1.5 py-0.5 text-[9px] text-slate-500 hover:border-rz-mint hover:text-rz-mint">{pg} ↗</button>
                                             ))}</div></div>
-                                        <div><span className="text-[9px] font-semibold uppercase text-slate-400">Consumers (sync targets)</span>
+                                        <div><span className="text-[9px] font-semibold uppercase text-slate-400">Consumers (sync targets) <InfoTip content="Downstream places that consume this value and must stay in sync with it." /></span>
                                             <ul className="list-disc pl-4 text-[10px] text-slate-600 dark:text-slate-300">{b.consumers.map((c, i) => <li key={i}>{c}</li>)}</ul></div>
                                     </div>
                                 </div>
@@ -712,6 +720,7 @@ export function KnowledgeDashboard() {
                         <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
                             Engine catalog — {ENGINE_CATALOG.modelCount} namespaces · {ENGINE_CATALOG.functionCount} functions · {ENGINE_CATALOG.sourceCount} sourced tables · DATA v{ENGINE_CATALOG.dataVersion}
                         </h2>
+                        <InfoTip content="Auto-generated inventory of engine model namespaces, functions, params, sources and consumers — regenerated from rz-engine.js so it is current by construction." />
                         <span className="rounded-full bg-rz-data/15 px-2 py-0.5 text-[9px] font-medium uppercase text-rz-data">auto-generated</span>
                     </div>
                     <p className="mb-2 text-[10px] text-slate-400">
@@ -753,7 +762,7 @@ export function KnowledgeDashboard() {
                     </div>
                 </Card>
                 <Card>
-                    <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Data provenance ({ENGINE_CATALOG.sourceCount} sources)</h2>
+                    <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Data provenance ({ENGINE_CATALOG.sourceCount} sources) <InfoTip content="Every sourced DATA table with its origin publication and as-of date (gate-enforced)." /></h2>
                     <div className="max-h-64 overflow-y-auto space-y-0.5 pr-1">
                         {ENGINE_CATALOG.sources.map((s) => (
                             <div key={s.key} className="flex items-baseline gap-2 text-[10px]">
@@ -767,6 +776,7 @@ export function KnowledgeDashboard() {
                 <Card>
                     <div className="mb-2 flex items-center gap-2">
                         <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Research Library — dokumen korpus publik ({RESEARCH_LIB.docs.length})</h2>
+                        <InfoTip content="Public journal / research documents that supply the benchmark corpus — every fact is traceable to its source document and original quote." />
                         <span className="rounded-full bg-rz-data/15 px-2 py-0.5 text-[9px] font-medium uppercase text-rz-data">auto-generated</span>
                     </div>
                     <div className="space-y-1.5">
@@ -813,6 +823,7 @@ function CorpusSection({ corpus }: { corpus: Record<string, Record<string, Corpu
         <Card>
             <div className="mb-2 flex items-center gap-2">
                 <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">DC Public-Data Corpus — distribusi multi-sumber</h2>
+                <InfoTip content="Multi-source distribution of public data-center facts — percentiles (p10–p90) per metric × segment, each fact traceable to a source_url + verbatim quote." />
                 <span className="rounded-full bg-rz-data/15 px-2 py-0.5 text-[9px] font-medium uppercase text-rz-data">auto-generated</span>
             </div>
             <p className="mb-2 text-[10px] text-slate-400">Setiap fakta membawa source_url + kutipan verbatim (gate-enforced) — pipeline tools/dc-corpus (markitdown). Persentil p10-p90 per metrik × segmen. Klik baris untuk drill-down fakta mentah.</p>
@@ -828,9 +839,9 @@ function CorpusSection({ corpus }: { corpus: Record<string, Record<string, Corpu
             </div>
             <div className="overflow-x-auto"><table className="w-full min-w-[640px] text-[11px]">
                 <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-left text-slate-500">
-                    <th className="py-1.5 pr-3">Metrik</th><th className="py-1.5 pr-3">Segmen</th><th className="py-1.5 pr-3">n</th>
-                    <th className="py-1.5 pr-3">p10</th><th className="py-1.5 pr-3">p25</th><th className="py-1.5 pr-3 font-bold">p50</th>
-                    <th className="py-1.5 pr-3">p75</th><th className="py-1.5 pr-3">p90</th><th className="py-1.5">Perusahaan</th>
+                    <th className="py-1.5 pr-3">Metrik <InfoTip content="Benchmarked metric, shown with its unit." /></th><th className="py-1.5 pr-3">Segmen <InfoTip content="Data segment: finance (operator/REIT filings) · hyperscale (sustainability reports) · pm (planning/permitting) · research (IEA/LBNL/DOE/Uptime) · spec (ASHRAE/Green Grid)." /></th><th className="py-1.5 pr-3">n <InfoTip content="Number of source facts in this distribution (n < 5 is flagged indicative)." /></th>
+                    <th className="py-1.5 pr-3">p10 <InfoTip content="10th percentile of the collected values." /></th><th className="py-1.5 pr-3">p25 <InfoTip content="25th percentile of the collected values." /></th><th className="py-1.5 pr-3 font-bold">p50 <InfoTip content="Median (50th percentile) of the collected values." /></th>
+                    <th className="py-1.5 pr-3">p75 <InfoTip content="75th percentile of the collected values." /></th><th className="py-1.5 pr-3">p90 <InfoTip content="90th percentile of the collected values." /></th><th className="py-1.5">Perusahaan <InfoTip content="Companies / sources contributing facts to this distribution." /></th>
                 </tr></thead>
                 <tbody>{rows.flatMap(({ metric, seg, dta }) => {
                     const key = metric + '|' + seg;
@@ -931,7 +942,7 @@ export function AuditDashboard() {
                 { label: 'Projects', value: String(projects.length), sub: 'bundles' },
             ]} />
             <Card>
-                <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Local Change History</h2>
+                <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Local Change History <InfoTip content="Recent local events — settings changes, scenario saves and project updates (localStorage-backed)." /></h2>
                 {rows.length === 0 && <p className="text-xs text-slate-400">No local events yet — settings changes, scenario saves and project updates land here.</p>}
                 <table className="w-full text-[11px]">
                     <tbody>
@@ -958,7 +969,7 @@ export function UsersDashboard() {
         <div className="space-y-4">
             <Head icon={Users} title="User Management" sub="Accounts + roles" tone="" />
             <Card>
-                <div className="text-xs text-slate-600 dark:text-slate-300"><div className="flex justify-between py-1"><span>Signed in as</span><span className="font-medium">{user?.email || '—'}</span></div><div className="flex justify-between py-1"><span>Role</span><span className="font-medium capitalize">{user?.role || '—'}</span></div></div>
+                <div className="text-xs text-slate-600 dark:text-slate-300"><div className="flex justify-between py-1"><span>Signed in as <InfoTip content="Email of the currently authenticated account." /></span><span className="font-medium">{user?.email || '—'}</span></div><div className="flex justify-between py-1"><span>Role <InfoTip content="Access role of the signed-in account (e.g. free, pro, root) — governs feature access." /></span><span className="font-medium capitalize">{user?.role || '—'}</span></div></div>
                 <p className="mt-2 text-[10px] text-slate-400">{root ? 'Account provisioning (create / reset / migrate) is handled by the rz-ops admin panel via the Supabase admin-users Edge Function.' : 'User administration is available to root accounts via the rz-ops panel.'}</p>
             </Card>
         </div>

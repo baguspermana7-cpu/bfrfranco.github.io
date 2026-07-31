@@ -16,14 +16,49 @@ import { useCapexStore } from '@/store/capex';
 import { useSimulationStore } from '@/store/simulation';
 import { COUNTRIES } from '@/constants/countries';
 import { Layers, GitCompare, Search, Star, Trash2, FolderOpen, ChevronRight } from 'lucide-react';
+import { Tooltip as InfoTip } from '@/components/ui/Tooltip';
+
+/* ─── Explanation tooltip texts (shared metric vocabulary + page/section) ─── */
+export const SCEN_TIP = {
+    scenariosPage: 'Saved input snapshots of the project configuration. Compare how CAPEX, OPEX, PUE and returns shift across different setups without overwriting the live project.',
+    comparePage: 'Side-by-side comparison of up to 4 saved scenarios across cost, efficiency, financial and carbon dimensions.',
+    // KPI chips
+    totalScenarios: 'Number of scenarios saved in this browser (local storage).',
+    inComparison: 'How many scenarios are currently starred (★) for the comparison view. Maximum of 4.',
+    countriesCovered: 'Count of distinct countries across your saved scenarios.',
+    baseline: 'The oldest saved scenario — the reference every delta (Δ) column is measured against.',
+    // metric vocabulary (reused across table columns, detail rail, compare rows)
+    capex: 'Total capital expenditure — the upfront cost to build the data center (equipment, structure, site), in $. Lower is better.',
+    opex: 'Monthly operating expenditure — recurring running cost (energy, staff, maintenance) per month, in $. Lower is better.',
+    pue: 'Power Usage Effectiveness — total facility power ÷ IT power. Closer to 1.0 means less overhead and higher efficiency.',
+    staff: 'Total full-time-equivalent (FTE) operations headcount required to run the facility.',
+    irr: 'Internal Rate of Return — the annualized return on the investment over its life (%). Higher is better.',
+    npv: 'Net Present Value — discounted lifetime cash flows minus CAPEX, in today’s dollars. Positive means value-creating.',
+    co2: 'Annual operational carbon emissions in tonnes CO₂, driven by grid carbon intensity and PUE. Lower is better.',
+    country: 'Country the scenario is modeled in — sets electricity price, grid carbon intensity, tax rate and labor cost.',
+    itLoad: 'IT power capacity of the facility in megawatts (MW) — the primary sizing driver for every engine.',
+    tier: 'Uptime Institute tier (2–4) — the redundancy / availability class. A higher tier is more resilient and costlier.',
+    cooling: 'Cooling technology (air / in-row / rear-door / liquid) — a key driver of PUE, water use and cost.',
+    delta: 'Percent change versus the baseline scenario (oldest save). Green = improvement, red = worse.',
+    saved: 'Date this snapshot was captured. All values are engine-computed at save time, not recalculated live.',
+    scenarioName: 'Your label for this saved configuration snapshot.',
+    starCol: 'Star a scenario to add it to the comparison set (maximum 4).',
+    scenarioDetails: 'Full saved snapshot of inputs and computed KPIs for the selected scenario.',
+    quickActions: 'Restore this scenario into the live project, or add / remove it from the comparison set.',
+    // comparison page
+    metricCol: 'The performance metric being compared. The best value in each row is highlighted.',
+    dimensionRadar: 'Each scenario scored 0–100 on Cost, Efficiency, Financial and Carbon, normalized within the chosen set.',
+    scoreSummary: 'Weighted composite score per scenario (cost 35% · efficiency 25% · financial 25% · carbon 15%). Grade A ≥ 80, B ≥ 65, C ≥ 50, else D.',
+    scenarioInsights: 'Plain-language takeaways derived by deterministic rules from the compared scenarios.',
+} as const;
 
 const SC_COLORS = ['#7DDDB4', '#22d3ee', '#34d399', '#f59e0b'];
 const fm = (v: number | undefined | null, pfx = '$') =>
     v == null ? '—' : v >= 1e6 ? `${pfx}${(v / 1e6).toFixed(1)}M` : v >= 1e3 ? `${pfx}${(v / 1e3).toFixed(0)}K` : `${pfx}${Math.round(v)}`;
 
 /* shared platform primitives (AE) */
-export function PlatformHeader({ icon: Icon, title, sub, tone, actions }: {
-    icon: React.ElementType; title: string; sub: string; tone: string; actions?: React.ReactNode;
+export function PlatformHeader({ icon: Icon, title, sub, tone, actions, titleTip }: {
+    icon: React.ElementType; title: string; sub: string; tone: string; actions?: React.ReactNode; titleTip?: string;
 }) {
     return (
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -31,7 +66,7 @@ export function PlatformHeader({ icon: Icon, title, sub, tone, actions }: {
                 <div className="flex h-11 w-11 items-center justify-center rounded border border-rz-2 bg-rz-elevated"><Icon className="h-6 w-6 text-rz-info" /></div>
                 <div>
                     <div className="text-[10px] uppercase tracking-wide text-slate-400">Platform</div>
-                    <h1 className="text-2xl font-bold leading-tight text-slate-900 dark:text-white">{title}</h1>
+                    <h1 className="text-2xl font-bold leading-tight text-slate-900 dark:text-white flex items-center gap-1">{title}{titleTip && <InfoTip content={titleTip} />}</h1>
                     <p className="text-sm text-slate-500 dark:text-slate-400">{sub}</p>
                 </div>
             </div>
@@ -40,13 +75,13 @@ export function PlatformHeader({ icon: Icon, title, sub, tone, actions }: {
     );
 }
 
-export function KpiChips({ items }: { items: { label: string; value: string; sub?: string }[] }) {
+export function KpiChips({ items }: { items: { label: string; value: string; sub?: string; tip?: string }[] }) {
     return (
         <div className={`grid grid-cols-2 gap-3 md:grid-cols-${Math.min(5, items.length)}`}>
             {items.map((k) => (
                 <div key={k.label} title={`${k.label}: ${k.value}${k.sub ? ` — ${k.sub}` : ''}`}
                     className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
-                    <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label}</div>
+                    <div className="text-[10px] uppercase tracking-wide text-slate-500 flex items-center gap-0.5">{k.label}{k.tip && <InfoTip content={k.tip} />}</div>
                     <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
                     {k.sub && <div className="truncate text-[10px] text-slate-500">{k.sub}</div>}
                 </div>
@@ -84,17 +119,17 @@ export function ScenariosPage() {
 
     return (
         <div className="space-y-4">
-            <PlatformHeader icon={Layers} title="Scenarios" sub="Create, compare, and analyze different configurations and outcomes" tone="from-cyan-500 to-blue-600"
+            <PlatformHeader icon={Layers} title="Scenarios" sub="Create, compare, and analyze different configurations and outcomes" tone="from-cyan-500 to-blue-600" titleTip={SCEN_TIP.scenariosPage}
                 actions={<>
                     <button onClick={() => setActiveTab('scenario-compare')} className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:border-rz-mint"><GitCompare className="h-3.5 w-3.5" /> Compare</button>
                     <button onClick={() => st.openPanel()} className="rounded-lg bg-rz-signal px-3 py-1.5 text-xs font-semibold text-rz-base hover:bg-rz-signal/90">＋ New Scenario</button>
                 </>} />
 
             <KpiChips items={[
-                { label: 'Total Scenarios', value: String(scenarios.length), sub: 'saved locally' },
-                { label: 'In Comparison', value: String(st.comparisonIds.length), sub: 'selected for compare' },
-                { label: 'Countries', value: String(new Set(scenarios.map((s) => s.countryId)).size), sub: 'covered' },
-                { label: 'Baseline', value: baseline?.name.slice(0, 14) ?? '—', sub: 'oldest save = baseline' },
+                { label: 'Total Scenarios', value: String(scenarios.length), sub: 'saved locally', tip: SCEN_TIP.totalScenarios },
+                { label: 'In Comparison', value: String(st.comparisonIds.length), sub: 'selected for compare', tip: SCEN_TIP.inComparison },
+                { label: 'Countries', value: String(new Set(scenarios.map((s) => s.countryId)).size), sub: 'covered', tip: SCEN_TIP.countriesCovered },
+                { label: 'Baseline', value: baseline?.name.slice(0, 14) ?? '—', sub: 'oldest save = baseline', tip: SCEN_TIP.baseline },
             ]} />
 
             <div className="flex items-center gap-2">
@@ -110,11 +145,17 @@ export function ScenariosPage() {
                 <div className="min-w-0 overflow-hidden rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
                     <table className="w-full text-xs">
                         <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400">
-                            <th className="w-8 px-2 py-2"></th><th className="text-left">Scenario</th><th className="text-left">Country</th>
-                            <th className="text-right">CAPEX</th><th className="text-right">Δ</th>
-                            <th className="text-right">OPEX/mo</th><th className="text-right">Δ</th>
-                            <th className="text-right">PUE</th><th className="text-right">Staff</th>
-                            <th className="text-left pl-3">Saved</th><th className="w-8"></th>
+                            <th className="w-8 px-2 py-2"><span className="flex justify-center"><InfoTip content={SCEN_TIP.starCol} /></span></th>
+                            <th className="text-left"><span className="flex items-center gap-1">Scenario <InfoTip content={SCEN_TIP.scenarioName} /></span></th>
+                            <th className="text-left"><span className="flex items-center gap-1">Country <InfoTip content={SCEN_TIP.country} /></span></th>
+                            <th className="text-right"><span className="flex items-center justify-end gap-1">CAPEX <InfoTip content={SCEN_TIP.capex} /></span></th>
+                            <th className="text-right"><span className="flex items-center justify-end gap-0.5">Δ <InfoTip content={SCEN_TIP.delta} /></span></th>
+                            <th className="text-right"><span className="flex items-center justify-end gap-1">OPEX/mo <InfoTip content={SCEN_TIP.opex} /></span></th>
+                            <th className="text-right"><span className="flex items-center justify-end gap-0.5">Δ <InfoTip content={SCEN_TIP.delta} /></span></th>
+                            <th className="text-right"><span className="flex items-center justify-end gap-1">PUE <InfoTip content={SCEN_TIP.pue} /></span></th>
+                            <th className="text-right"><span className="flex items-center justify-end gap-1">Staff <InfoTip content={SCEN_TIP.staff} /></span></th>
+                            <th className="text-left pl-3"><span className="flex items-center gap-1">Saved <InfoTip content={SCEN_TIP.saved} /></span></th>
+                            <th className="w-8"></th>
                         </tr></thead>
                         <tbody>
                             {filtered.length === 0 && (
@@ -154,7 +195,7 @@ export function ScenariosPage() {
                 {/* detail rail */}
                 <div className="space-y-3">
                     <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
-                        <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Scenario Details</h3>
+                        <h3 className="mb-1.5 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Scenario Details <InfoTip content={SCEN_TIP.scenarioDetails} /></h3>
                         {!sel ? <p className="text-[10px] text-slate-400">Select a scenario.</p> : (
                             <div className="space-y-1 text-[11px]">
                                 <div className="text-xs font-bold text-slate-900 dark:text-white">{sel.name}</div>
@@ -166,25 +207,25 @@ export function ScenariosPage() {
                                     )}
                                 </div>
                                 {([
-                                    ['Country', COUNTRIES[sel.countryId]?.name ?? sel.countryId],
-                                    ['IT Load', `${((sel.simInputs?.itLoad ?? 0) / 1000).toFixed(1)} MW`],
-                                    ['Tier', `Tier ${sel.simInputs?.tierLevel ?? '—'}`],
-                                    ['Cooling', String(sel.simInputs?.coolingType ?? '—')],
-                                    ['CAPEX', fm(sel.summary?.annualCapex)],
-                                    ['OPEX / mo', fm(sel.summary?.monthlyOpex)],
-                                    ['PUE', sel.summary?.pue?.toFixed(2) ?? '—'],
-                                    ['IRR', sel.summary?.irr != null ? `${(sel.summary.irr * 100).toFixed(1)}%` : '—'],
-                                    ['NPV', fm(sel.summary?.npv)],
-                                    ['CO₂ / yr', sel.summary?.annualCO2 != null ? `${Math.round(sel.summary.annualCO2).toLocaleString()} t` : '—'],
-                                ] as [string, string][]).map(([l, v]) => (
-                                    <div key={l} className="flex justify-between"><span className="text-slate-500">{l}</span><span className="font-medium tabular-nums text-slate-800 dark:text-slate-200">{v}</span></div>
+                                    ['Country', COUNTRIES[sel.countryId]?.name ?? sel.countryId, SCEN_TIP.country],
+                                    ['IT Load', `${((sel.simInputs?.itLoad ?? 0) / 1000).toFixed(1)} MW`, SCEN_TIP.itLoad],
+                                    ['Tier', `Tier ${sel.simInputs?.tierLevel ?? '—'}`, SCEN_TIP.tier],
+                                    ['Cooling', String(sel.simInputs?.coolingType ?? '—'), SCEN_TIP.cooling],
+                                    ['CAPEX', fm(sel.summary?.annualCapex), SCEN_TIP.capex],
+                                    ['OPEX / mo', fm(sel.summary?.monthlyOpex), SCEN_TIP.opex],
+                                    ['PUE', sel.summary?.pue?.toFixed(2) ?? '—', SCEN_TIP.pue],
+                                    ['IRR', sel.summary?.irr != null ? `${(sel.summary.irr * 100).toFixed(1)}%` : '—', SCEN_TIP.irr],
+                                    ['NPV', fm(sel.summary?.npv), SCEN_TIP.npv],
+                                    ['CO₂ / yr', sel.summary?.annualCO2 != null ? `${Math.round(sel.summary.annualCO2).toLocaleString()} t` : '—', SCEN_TIP.co2],
+                                ] as [string, string, string][]).map(([l, v, tip]) => (
+                                    <div key={l} className="flex justify-between"><span className="flex items-center gap-1 text-slate-500">{l}<InfoTip content={tip} /></span><span className="font-medium tabular-nums text-slate-800 dark:text-slate-200">{v}</span></div>
                                 ))}
                             </div>
                         )}
                     </div>
                     {sel && (
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 space-y-1.5">
-                            <h3 className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">Quick Actions</h3>
+                            <h3 className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Quick Actions <InfoTip content={SCEN_TIP.quickActions} /></h3>
                             <button onClick={() => { simActions.setInputs(sel.simInputs); capexSetInputs(sel.capexInputs); simActions.selectCountry(sel.countryId); }}
                                 className="w-full rounded-lg bg-rz-signal py-1.5 text-[11px] font-semibold text-rz-base hover:bg-rz-signal/90"><FolderOpen className="mr-1 inline h-3 w-3" /> Open (restore inputs)</button>
                             <button onClick={() => { st.toggleComparisonSelection(sel.id); }} className="w-full rounded-lg border border-slate-300 dark:border-slate-700 py-1.5 text-[11px] text-slate-600 dark:text-slate-300 hover:border-rz-mint">{st.comparisonIds.includes(sel.id) ? 'Remove from' : 'Add to'} comparison</button>
@@ -261,19 +302,19 @@ export function ScenarioComparePage() {
         return ((Math.max(...v) - Math.min(...v)) / Math.min(...v)) * 100;
     }
 
-    const rows: { label: string; get: (s: SavedScenario) => number | undefined; fmt: (v: number) => string; invert?: boolean }[] = [
-        { label: 'CAPEX', get: (s) => s.summary?.annualCapex, fmt: (v) => fm(v), invert: true },
-        { label: 'OPEX (monthly)', get: (s) => s.summary?.monthlyOpex, fmt: (v) => fm(v), invert: true },
-        { label: 'PUE', get: (s) => s.summary?.pue, fmt: (v) => v.toFixed(2), invert: true },
-        { label: 'Total Staff', get: (s) => s.summary?.totalStaff, fmt: (v) => String(Math.round(v)), invert: true },
-        { label: 'IRR', get: (s) => s.summary?.irr, fmt: (v) => `${(v * 100).toFixed(1)}%` },
-        { label: 'NPV', get: (s) => s.summary?.npv, fmt: (v) => fm(v) },
-        { label: 'CO₂ (t/yr)', get: (s) => s.summary?.annualCO2, fmt: (v) => Math.round(v).toLocaleString(), invert: true },
+    const rows: { label: string; get: (s: SavedScenario) => number | undefined; fmt: (v: number) => string; invert?: boolean; tip: string }[] = [
+        { label: 'CAPEX', get: (s) => s.summary?.annualCapex, fmt: (v) => fm(v), invert: true, tip: SCEN_TIP.capex },
+        { label: 'OPEX (monthly)', get: (s) => s.summary?.monthlyOpex, fmt: (v) => fm(v), invert: true, tip: SCEN_TIP.opex },
+        { label: 'PUE', get: (s) => s.summary?.pue, fmt: (v) => v.toFixed(2), invert: true, tip: SCEN_TIP.pue },
+        { label: 'Total Staff', get: (s) => s.summary?.totalStaff, fmt: (v) => String(Math.round(v)), invert: true, tip: SCEN_TIP.staff },
+        { label: 'IRR', get: (s) => s.summary?.irr, fmt: (v) => `${(v * 100).toFixed(1)}%`, tip: SCEN_TIP.irr },
+        { label: 'NPV', get: (s) => s.summary?.npv, fmt: (v) => fm(v), tip: SCEN_TIP.npv },
+        { label: 'CO₂ (t/yr)', get: (s) => s.summary?.annualCO2, fmt: (v) => Math.round(v).toLocaleString(), invert: true, tip: SCEN_TIP.co2 },
     ];
 
     return (
         <div className="space-y-4">
-            <PlatformHeader icon={GitCompare} title="Scenario Comparison" sub="Compare multiple scenarios across key performance, cost, risk, and sustainability" tone="from-cyan-500 to-blue-600"
+            <PlatformHeader icon={GitCompare} title="Scenario Comparison" sub="Compare multiple scenarios across key performance, cost, risk, and sustainability" tone="from-cyan-500 to-blue-600" titleTip={SCEN_TIP.comparePage}
                 actions={<button onClick={() => setActiveTab('scenarios')} className="rounded-lg border border-slate-300 dark:border-slate-700 px-3 py-1.5 text-xs text-slate-600 dark:text-slate-300 hover:border-rz-mint">Manage scenarios</button>} />
 
             {chosen.length < 2 ? (
@@ -306,7 +347,7 @@ export function ScenarioComparePage() {
                 <div className="overflow-hidden rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
                     <table className="w-full text-xs">
                         <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400">
-                            <th className="px-3 py-2 text-left">Metric</th>
+                            <th className="px-3 py-2 text-left"><span className="flex items-center gap-1">Metric <InfoTip content={SCEN_TIP.metricCol} /></span></th>
                             {chosen.map((s, i) => <th key={s.id} className="px-2 text-right" style={{ color: SC_COLORS[i] }}>{s.name.slice(0, 16)}</th>)}
                         </tr></thead>
                         <tbody>
@@ -316,7 +357,7 @@ export function ScenarioComparePage() {
                                 const bestVal = defined.length > 1 ? (r.invert ? Math.min(...defined) : Math.max(...defined)) : null;
                                 return (
                                     <tr key={r.label} className="border-b border-slate-100 dark:border-slate-800/60">
-                                        <td className="px-3 py-1.5 text-slate-500">{r.label}{r.invert && <span className="ml-1 text-[8px]">(lower better)</span>}</td>
+                                        <td className="px-3 py-1.5 text-slate-500"><span className="flex items-center gap-1">{r.label}{r.invert && <span className="ml-1 text-[8px]">(lower better)</span>} <InfoTip content={r.tip} /></span></td>
                                         {chosen.map((s, i) => {
                                             const v = vals[i];
                                             const best = v != null && v === bestVal;
@@ -333,7 +374,7 @@ export function ScenarioComparePage() {
                 <div className="grid gap-4 xl:grid-cols-[1fr_1fr]">
                     {/* radar */}
                     <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                        <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Dimension Radar <span className="text-[9px] normal-case text-slate-400">normalized within the chosen set</span></h2>
+                        <h2 className="mb-1 flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Dimension Radar <InfoTip content={SCEN_TIP.dimensionRadar} /> <span className="text-[9px] normal-case text-slate-400">normalized within the chosen set</span></h2>
                         <div className="h-60">
                             <ResponsiveContainer width="100%" height="100%">
                                 <RadarChart data={radarData} outerRadius="72%">
@@ -352,7 +393,7 @@ export function ScenarioComparePage() {
                     {/* score summary + insights */}
                     <div className="space-y-3">
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                            <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Score Summary <span className="text-[9px] normal-case text-slate-400">weights: cost 35 · efficiency 25 · financial 25 · carbon 15</span></h2>
+                            <h2 className="mb-2 flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Score Summary <InfoTip content={SCEN_TIP.scoreSummary} /> <span className="text-[9px] normal-case text-slate-400">weights: cost 35 · efficiency 25 · financial 25 · carbon 15</span></h2>
                             <div className="space-y-1.5">
                                 {[...scores].sort((a, b) => b.total - a.total).map((sc) => {
                                     const i = chosen.findIndex((c) => c.id === sc.s.id);
@@ -368,7 +409,7 @@ export function ScenarioComparePage() {
                             </div>
                         </div>
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                            <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Scenario Insights <span className="text-[9px] normal-case text-slate-400">deterministic rules</span></h2>
+                            <h2 className="mb-1.5 flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Scenario Insights <InfoTip content={SCEN_TIP.scenarioInsights} /> <span className="text-[9px] normal-case text-slate-400">deterministic rules</span></h2>
                             <ul className="space-y-1 text-[11px] text-slate-600 dark:text-slate-300">
                                 {insights.map((t, i) => <li key={i} className="flex gap-1.5"><span className="text-rz-mint">▸</span>{t}</li>)}
                             </ul>

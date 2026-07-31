@@ -20,6 +20,22 @@ import { writeSharedItLoad, writeSharedCooling, writeSharedCountry } from '@/lib
 import { COUNTRIES } from '@/constants/countries';
 import { FolderOpen, Plus, Trash2, Save, ChevronRight, Cloud, Download, Share2, Copy, RefreshCw, Link2 } from 'lucide-react';
 import { PlatformHeader, KpiChips } from './ScenariosPage';
+import { Tooltip as InfoTip } from '@/components/ui/Tooltip';
+
+/* ─── Explanation tooltip texts ─── */
+const PROJ_TIP = {
+    projectsPage: 'Full-state project bundles — every engine store (requirements, site, CAPEX, construction, commissioning, ops, financial) snapshotted together and restorable as one unit.',
+    totalProjects: 'Projects saved in this browser, out of a 10-slot local limit.',
+    active: 'The saved project currently loaded into the live engines — or “unsaved” if the active configuration has not been saved yet.',
+    enginesReady: 'How many of the 9 lifecycle stages have their minimum inputs completed for the active configuration.',
+    scenarios: 'Count of lightweight input-only scenario snapshots (managed on the Scenarios page).',
+    countries: 'Number of distinct countries across your saved projects.',
+    activeConfig: 'The configuration currently live in the engines. Save it as a new project, or Update the open one, to persist it.',
+    lifecycle: 'The 9-stage delivery lifecycle. A green tick means that stage has its required inputs; click a stage to jump straight to it.',
+    savedProjects: 'Your saved project bundles (max 10). Open restores every engine store from that snapshot.',
+    cloud: 'Optional cloud backup. Local storage stays the primary store — there is no automatic sync; upload and load are manual.',
+    templates: 'Preset configuration bundles sourced from the engine’s commissioning scenarios. Applying one writes IT load, cooling and redundancy through the shared writers.',
+} as const;
 
 /* ── Arc-4: local→cloud mapping (kecil, hanya id + waktu upload terakhir) ── */
 const CLOUD_MAP_KEY = 'dcmoc_cloud_map';
@@ -191,22 +207,23 @@ export function ProjectsPage() {
 
     return (
         <div className="space-y-4">
-            <PlatformHeader icon={FolderOpen} title="Saved Projects" sub="Full-state project bundles — every engine store snapshotted & restorable (the workflow spine)" tone="from-cyan-500 to-blue-600" />
+            <PlatformHeader icon={FolderOpen} title="Saved Projects" sub="Full-state project bundles — every engine store snapshotted & restorable (the workflow spine)" tone="from-cyan-500 to-blue-600" titleTip={PROJ_TIP.projectsPage} />
 
             <KpiChips items={[
-                { label: 'Total Projects', value: `${projects.projects.length}/10`, sub: 'local bundles' },
-                { label: 'Active', value: projects.activeProjectId ? (projects.projects.find((p) => p.id === projects.activeProjectId)?.name.slice(0, 14) ?? '—') : 'unsaved', sub: 'current configuration' },
-                { label: 'Engines Ready', value: `${doneCount}/9`, sub: 'lifecycle completion' },
-                { label: 'Scenarios', value: String(scenarios.length), sub: 'input-only snapshots' },
-                { label: 'Countries', value: String(new Set(projects.projects.map((p) => p.countryId)).size || (country ? 1 : 0)), sub: 'covered' },
+                { label: 'Total Projects', value: `${projects.projects.length}/10`, sub: 'local bundles', tip: PROJ_TIP.totalProjects },
+                { label: 'Active', value: projects.activeProjectId ? (projects.projects.find((p) => p.id === projects.activeProjectId)?.name.slice(0, 14) ?? '—') : 'unsaved', sub: 'current configuration', tip: PROJ_TIP.active },
+                { label: 'Engines Ready', value: `${doneCount}/9`, sub: 'lifecycle completion', tip: PROJ_TIP.enginesReady },
+                { label: 'Scenarios', value: String(scenarios.length), sub: 'input-only snapshots', tip: PROJ_TIP.scenarios },
+                { label: 'Countries', value: String(new Set(projects.projects.map((p) => p.countryId)).size || (country ? 1 : 0)), sub: 'covered', tip: PROJ_TIP.countries },
             ]} />
 
             {/* active configuration + lifecycle strip */}
             <div className="rounded border border-rz-mint/30 bg-rz-mint/5 p-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                        <div className="text-sm font-semibold text-slate-900 dark:text-white">
+                        <div className="flex items-center gap-1 text-sm font-semibold text-slate-900 dark:text-white">
                             Active configuration{projects.activeProjectId ? ` — ${projects.projects.find((p) => p.id === projects.activeProjectId)?.name ?? ''}` : ' (unsaved)'}
+                            <InfoTip content={PROJ_TIP.activeConfig} />
                         </div>
                         <div className="text-[11px] text-slate-500">{(simInputs.itLoad / 1000).toFixed(1)} MW · {simInputs.coolingType} · {simInputs.powerRedundancy} · Tier {simInputs.tierLevel} · {country?.name ?? '—'}</div>
                     </div>
@@ -234,13 +251,13 @@ export function ProjectsPage() {
                             {i < LIFECYCLE.length - 1 && <ChevronRight className="h-3 w-3 text-slate-300 dark:text-slate-700" />}
                         </React.Fragment>
                     ))}
-                    <span className="ml-2 text-[10px] text-slate-500">{doneCount}/9 engines ready</span>
+                    <span className="ml-2 flex items-center gap-1 text-[10px] text-slate-500">{doneCount}/9 engines ready <InfoTip content={PROJ_TIP.lifecycle} /></span>
                 </div>
             </div>
 
             {/* saved projects */}
             <div>
-                <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Saved Projects ({projects.projects.length}/10)</h2>
+                <h2 className="mb-2 flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Saved Projects ({projects.projects.length}/10) <InfoTip content={PROJ_TIP.savedProjects} /></h2>
                 {projects.projects.length === 0 ? (
                     <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-6 text-center text-xs text-slate-500">
                         No projects saved yet — configure the engines, then “Save as Project”.
@@ -308,7 +325,7 @@ export function ProjectsPage() {
             {user && (
                 <div>
                     <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                        <Cloud className="h-3.5 w-3.5" /> Cloud (opsional)
+                        <Cloud className="h-3.5 w-3.5" /> Cloud (opsional) <InfoTip content={PROJ_TIP.cloud} />
                         <button onClick={() => void refreshCloud()} disabled={cloudBusy === 'list'}
                             title="Muat ulang daftar cloud"
                             className="ml-1 rounded border border-slate-300 dark:border-slate-700 p-0.5 text-slate-500 hover:border-cyan-400 disabled:opacity-50">
@@ -400,7 +417,7 @@ export function ProjectsPage() {
 
             {/* templates */}
             <div>
-                <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Template Library <span className="text-[9px] normal-case text-slate-400">engine preset bundles (cx scenarios) — applied through the shared writers</span></h2>
+                <h2 className="mb-2 flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Template Library <InfoTip content={PROJ_TIP.templates} /> <span className="text-[9px] normal-case text-slate-400">engine preset bundles (cx scenarios) — applied through the shared writers</span></h2>
                 <div className="grid gap-2 md:grid-cols-3 xl:grid-cols-6">
                     {templates.map((t) => (
                         <button key={t.key} onClick={() => applyTemplate(t)}

@@ -19,6 +19,7 @@ import { SiteCards, SiteDetailPanels, IntegratedAnalysesPanels } from './SiteCar
 import { SiteComparisonTable, SiteRightRail, type AxisExplainSel } from './SiteComparisonRail';
 import { SiteEditorDrawer } from './SiteEditorDrawer';
 import { ScoreValue } from '@/components/ui/ScoreValue';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { MapPin, Loader2 } from 'lucide-react';
 
 const STRIP = [
@@ -90,8 +91,8 @@ export function SiteIntelligencePage() {
                     </div>
                 </div>
                 <div className="flex items-center gap-2 text-[11px] text-slate-500">
-                    <span className="rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1.5">{sites.length} site{sites.length > 1 ? 's' : ''} selected</span>
-                    <span className="rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1.5">IT Load Target: <b className="text-slate-900 dark:text-white">{itLoadMw.toFixed(0)} MW</b></span>
+                    <span className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1.5">{sites.length} site{sites.length > 1 ? 's' : ''} selected <Tooltip content="Number of candidate sites currently being compared (1–5). Add or remove sites via Edit Criteria; with a single site the 'Overall Best' comparison degrades to a neutral candidate label." /></span>
+                    <span className="inline-flex items-center gap-1 rounded-lg border border-slate-300 dark:border-slate-700 px-2 py-1.5">IT Load Target: <b className="text-slate-900 dark:text-white">{itLoadMw.toFixed(0)} MW</b> <Tooltip content="Target critical IT load the facility is sized for (MW), from the simulation inputs. Each site is screened on whether its available power, cooling and land can support this load." /></span>
                     <button onClick={() => setDrawer(true)} className="rounded-lg bg-rz-signal px-3 py-1.5 font-semibold text-black hover:bg-rz-signal/90">Edit Criteria</button>
                 </div>
             </div>

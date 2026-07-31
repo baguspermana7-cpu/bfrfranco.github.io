@@ -30,6 +30,52 @@ import {
     Settings as SettingsIcon, Plug, Database, Trash2, Building2, Globe2, Coins,
     SunMoon, Shield, Users, ScrollText, DownloadCloud, HelpCircle, BookOpen, Search,
 } from 'lucide-react';
+import { Tooltip as InfoTip } from '@/components/ui/Tooltip';
+
+/* ─── Explanation tooltip texts ─── */
+const SET_TIP = {
+    // overview KPI chips
+    kpiProjects: 'Saved full-state project bundles in this browser (local storage).',
+    kpiScenarios: 'Saved input-only scenario snapshots.',
+    kpiIntegrations: 'Configured outbound connections (webhooks, REST, BMS feeds, scheduled exports) and how many are currently reachable.',
+    kpiEngineData: 'Version of the loaded RZ engine DATA reference — the single source for all model constants.',
+    kpiStorage: 'Browser local-storage used by DCMOC out of the total quota this browser grants the site.',
+    // sections + quick settings
+    quickSettings: 'Frequently changed platform settings. Every control is live and writes immediately.',
+    orgName: 'Organization name printed on the header of every PDF export. Display only.',
+    defaultCountry: 'The default project country. Apply writes it to both the simulation and CAPEX stores (electricity price, grid carbon, tax, labor).',
+    defaultCurrency: 'Currency used to seed the Requirements currency for new projects. Display formatting only.',
+    theme: 'Light or dark appearance — binds the same ThemeProvider as the sidebar toggle.',
+    systemPreferences: 'Shortcuts into data management, integrations, users, audit, backup and security surfaces.',
+    // right rail
+    platformInfo: 'Runtime build and environment details for this DCMOC instance.',
+    recentActivity: 'Chronological log of the settings changes you have made this session.',
+    needHelp: 'Links to the FAQ and knowledge base covering every engine and workflow.',
+    // general tab
+    orgDefaults: 'Organization identity and default project parameters seeded into new projects.',
+    appearance: 'Light / dark theme selection — same as the sidebar toggle.',
+    genOrgName: 'Organization name shown on PDF export headers. Display only.',
+    genCountry: 'Default country. Apply writes both the simulation and CAPEX stores through the shared writer.',
+    genCurrency: 'Seeds the Requirements currency default for new projects. Display formatting only.',
+    // data tab
+    backup: 'Download every dcmoc* local-storage key (projects, scenarios, tracking stores, settings) as one JSON file.',
+    storeResets: 'Clear an individual store’s local data. Each reset is immediate and irreversible.',
+    // integrations tab
+    intTotal: 'Total number of integrations configured.',
+    intReachable: 'Integrations whose endpoint responded to the last reachability test.',
+    intConfigured: 'Integrations that have an endpoint URL set but are not yet confirmed reachable.',
+    intErrors: 'Integrations whose last test failed — endpoint unreachable from this browser.',
+    colIntegration: 'Integration name and type icon.',
+    colKind: 'Integration kind — webhook, REST read, BMS read-only feed or scheduled export.',
+    colStatus: 'Current state: reachable, configured, error or unconfigured.',
+    colLastTest: 'Time of the most recent reachability test.',
+    colActions: 'Run a reachability test, or delete the integration.',
+    intDetails: 'Configure the selected integration. Secrets are never stored here — only a reference label.',
+    fName: 'Display name for this integration.',
+    fKind: 'Connection type — determines how the test (and, at deploy time, the transport) behaves.',
+    fEndpoint: 'The URL this integration targets. Setting it marks the integration as configured.',
+    fSecret: 'A reference label for the secret (e.g. a vault key name) — never the secret value itself.',
+} as const;
 
 const KINDS: { value: IntegrationKind; label: string; note: string }[] = [
     { value: 'webhook', label: 'Webhook (outbound)', note: 'test = reachability ping' },
@@ -38,12 +84,12 @@ const KINDS: { value: IntegrationKind; label: string; note: string }[] = [
     { value: 'export-schedule', label: 'Scheduled export', note: 'runs while the app is open' },
 ];
 
-function QuickRow({ icon: Icon, title, sub, children }: { icon: React.ElementType; title: string; sub: string; children: React.ReactNode }) {
+function QuickRow({ icon: Icon, title, sub, tip, children }: { icon: React.ElementType; title: string; sub: string; tip?: string; children: React.ReactNode }) {
     return (
         <div className="flex items-center gap-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 px-3 py-2.5">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-rz-mint/10"><Icon className="h-4 w-4 text-rz-mint" /></div>
             <div className="min-w-0 flex-1">
-                <div className="text-xs font-semibold text-slate-900 dark:text-white">{title}</div>
+                <div className="flex items-center gap-0.5 text-xs font-semibold text-slate-900 dark:text-white">{title}{tip && <InfoTip content={tip} />}</div>
                 <div className="truncate text-[10px] text-slate-500">{sub}</div>
             </div>
             <div className="shrink-0">{children}</div>
@@ -111,11 +157,11 @@ export function SettingsPage({ initialTab }: { initialTab?: 'overview' | 'genera
     const reachable = s.integrations.filter((i) => i.status === 'reachable').length;
     const engineOk = !!rzData()?.version;
     const kpis = [
-        { label: 'Projects', value: String(projects.length), sub: 'local bundles' },
-        { label: 'Scenarios', value: String(scenarios.length), sub: 'saved' },
-        { label: 'Integrations', value: `${s.integrations.length}`, sub: `${reachable} reachable` },
-        { label: 'Engine Data', value: engineOk ? `v${rzData()?.version}` : '—', sub: engineOk ? 'loaded' : 'loading' },
-        { label: 'Local Storage', value: storage ? `${(storage.used / 1e6).toFixed(1)} MB` : '—', sub: storage ? `of ${(storage.quota / 1e9).toFixed(1)} GB quota` : 'estimating' },
+        { label: 'Projects', value: String(projects.length), sub: 'local bundles', tip: SET_TIP.kpiProjects },
+        { label: 'Scenarios', value: String(scenarios.length), sub: 'saved', tip: SET_TIP.kpiScenarios },
+        { label: 'Integrations', value: `${s.integrations.length}`, sub: `${reachable} reachable`, tip: SET_TIP.kpiIntegrations },
+        { label: 'Engine Data', value: engineOk ? `v${rzData()?.version}` : '—', sub: engineOk ? 'loaded' : 'loading', tip: SET_TIP.kpiEngineData },
+        { label: 'Local Storage', value: storage ? `${(storage.used / 1e6).toFixed(1)} MB` : '—', sub: storage ? `of ${(storage.quota / 1e9).toFixed(1)} GB quota` : 'estimating', tip: SET_TIP.kpiStorage },
     ];
 
     const sysCards: { icon: React.ElementType; title: string; sub: string; onClick: () => void; chip?: string }[] = [
@@ -152,7 +198,7 @@ export function SettingsPage({ initialTab }: { initialTab?: 'overview' | 'genera
                         <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
                             {kpis.map((k) => (
                                 <div key={k.label} title={`${k.label}: ${k.value} — ${k.sub}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
-                                    <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label}</div>
+                                    <div className="flex items-center gap-0.5 text-[10px] uppercase tracking-wide text-slate-500">{k.label}<InfoTip content={k.tip} /></div>
                                     <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
                                     <div className="truncate text-[10px] text-slate-500">{k.sub}</div>
                                 </div>
@@ -161,26 +207,26 @@ export function SettingsPage({ initialTab }: { initialTab?: 'overview' | 'genera
 
                         {/* Quick Settings */}
                         <div>
-                            <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Quick Settings</h2>
+                            <h2 className="mb-2 flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Quick Settings <InfoTip content={SET_TIP.quickSettings} /></h2>
                             <div className="space-y-2">
-                                <QuickRow icon={Building2} title="Organization" sub="Shown on every PDF export header">
+                                <QuickRow icon={Building2} title="Organization" sub="Shown on every PDF export header" tip={SET_TIP.orgName}>
                                     <input className="w-44 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs outline-none focus:border-rz-mint text-slate-900 dark:text-slate-100"
                                         value={s.general.orgName} onChange={(e) => s.actions.setGeneral({ orgName: e.target.value })} placeholder="Organization name" />
                                 </QuickRow>
-                                <QuickRow icon={Globe2} title="Default Country" sub={`Current project country: ${country?.name ?? '—'} · Apply writes sim + capex`}>
+                                <QuickRow icon={Globe2} title="Default Country" sub={`Current project country: ${country?.name ?? '—'} · Apply writes sim + capex`} tip={SET_TIP.defaultCountry}>
                                     <div className="flex w-56 gap-1.5">
                                         <CountrySelect className="flex-1" value={s.general.defaultCountryId} onChange={(v) => s.actions.setGeneral({ defaultCountryId: v })} />
                                         <button onClick={() => { writeSharedCountry(s.general.defaultCountryId); show(`Applied: ${COUNTRIES[s.general.defaultCountryId]?.name}`); }}
                                             className="rounded-lg bg-rz-mint px-2 py-1 text-[10px] font-semibold text-rz-base hover:bg-rz-mint/80">Apply</button>
                                     </div>
                                 </QuickRow>
-                                <QuickRow icon={Coins} title="Default Currency" sub="Seeds the Requirements currency for new projects">
+                                <QuickRow icon={Coins} title="Default Currency" sub="Seeds the Requirements currency for new projects" tip={SET_TIP.defaultCurrency}>
                                     <select className="w-24 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs outline-none focus:border-rz-mint text-slate-900 dark:text-slate-100"
                                         value={s.general.defaultCurrency} onChange={(e) => s.actions.setGeneral({ defaultCurrency: e.target.value })}>
                                         {CURRENCY_LIST.map((c) => <option key={c} value={c}>{c}</option>)}
                                     </select>
                                 </QuickRow>
-                                <QuickRow icon={SunMoon} title="Theme & Appearance" sub="Binds the real ThemeProvider (same as the sidebar toggle)">
+                                <QuickRow icon={SunMoon} title="Theme & Appearance" sub="Binds the real ThemeProvider (same as the sidebar toggle)" tip={SET_TIP.theme}>
                                     <div className="flex gap-1">
                                         {(['light', 'dark'] as const).map((t) => (
                                             <button key={t} onClick={() => { setTheme(t); s.actions.logActivity(`Theme → ${t}`); }}
@@ -195,7 +241,7 @@ export function SettingsPage({ initialTab }: { initialTab?: 'overview' | 'genera
 
                         {/* System Preferences grid */}
                         <div>
-                            <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">System Preferences</h2>
+                            <h2 className="mb-2 flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">System Preferences <InfoTip content={SET_TIP.systemPreferences} /></h2>
                             <div className="grid gap-2 md:grid-cols-3">
                                 {sysCards.map((c) => (
                                     <button key={c.title} onClick={c.onClick} title={`${c.title} — ${c.sub}`}
@@ -212,7 +258,7 @@ export function SettingsPage({ initialTab }: { initialTab?: 'overview' | 'genera
                     {/* right rail */}
                     <div className="space-y-3">
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
-                            <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Platform Information</h3>
+                            <h3 className="mb-1.5 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Platform Information <InfoTip content={SET_TIP.platformInfo} /></h3>
                             <div className="space-y-1 text-[11px]">
                                 {[
                                     ['Platform', 'DC-OS · DCMOC'],
@@ -231,7 +277,7 @@ export function SettingsPage({ initialTab }: { initialTab?: 'overview' | 'genera
                             </div>
                         </div>
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
-                            <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Recent Activity <span className="text-[8px] normal-case text-cyan-500">real change log</span></h3>
+                            <h3 className="mb-1.5 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Recent Activity <InfoTip content={SET_TIP.recentActivity} /> <span className="text-[8px] normal-case text-cyan-500">real change log</span></h3>
                             {(s.activity ?? []).length === 0 && <p className="text-[10px] text-slate-400">No settings changes yet.</p>}
                             <div className="space-y-1">
                                 {(s.activity ?? []).slice(0, 8).map((a, i) => (
@@ -243,7 +289,7 @@ export function SettingsPage({ initialTab }: { initialTab?: 'overview' | 'genera
                             </div>
                         </div>
                         <div className="rounded border border-rz-mint/30 bg-rz-mint/5 p-3">
-                            <h3 className="mb-1 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-rz-mint"><HelpCircle className="h-3.5 w-3.5" /> Need help?</h3>
+                            <h3 className="mb-1 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wide text-rz-mint"><HelpCircle className="h-3.5 w-3.5" /> Need help? <InfoTip content={SET_TIP.needHelp} /></h3>
                             <p className="mb-2 text-[10px] text-slate-500">FAQ and the knowledge base cover every engine and workflow.</p>
                             <div className="flex gap-1.5">
                                 <button onClick={() => setActiveTab('faq' as never)} className="flex-1 rounded-lg bg-rz-mint py-1.5 text-[10px] font-semibold text-rz-base hover:bg-rz-mint/80">Open FAQ</button>
@@ -257,14 +303,14 @@ export function SettingsPage({ initialTab }: { initialTab?: 'overview' | 'genera
             {tab === 'general' && (
                 <div className="grid gap-4 md:grid-cols-2">
                     <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 space-y-3">
-                        <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Organization & Defaults</h2>
+                        <h2 className="flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Organization & Defaults <InfoTip content={SET_TIP.orgDefaults} /></h2>
                         <label className="block">
-                            <span className="text-[10px] font-semibold uppercase text-slate-500">Organization name</span>
+                            <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold uppercase text-slate-500">Organization name <InfoTip content={SET_TIP.genOrgName} /></span>
                             <input className="mt-0.5 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs outline-none focus:border-rz-mint text-slate-900 dark:text-slate-100"
                                 value={s.general.orgName} onChange={(e) => s.actions.setGeneral({ orgName: e.target.value })} placeholder="Shown on PDF exports" />
                         </label>
                         <label className="block">
-                            <span className="text-[10px] font-semibold uppercase text-slate-500">Default country</span>
+                            <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold uppercase text-slate-500">Default country <InfoTip content={SET_TIP.genCountry} /></span>
                             <div className="mt-0.5 flex gap-1.5">
                                 <CountrySelect className="flex-1" value={s.general.defaultCountryId} onChange={(v) => s.actions.setGeneral({ defaultCountryId: v })} />
                                 <button onClick={() => { writeSharedCountry(s.general.defaultCountryId); show(`Country applied: ${COUNTRIES[s.general.defaultCountryId]?.name}`); }}
@@ -273,7 +319,7 @@ export function SettingsPage({ initialTab }: { initialTab?: 'overview' | 'genera
                             <span className="text-[9px] text-slate-400">Current: {country?.name ?? '—'} · Apply writes both sim + capex stores (shared writer)</span>
                         </label>
                         <label className="block">
-                            <span className="text-[10px] font-semibold uppercase text-slate-500">Default currency (display)</span>
+                            <span className="inline-flex items-center gap-0.5 text-[10px] font-semibold uppercase text-slate-500">Default currency (display) <InfoTip content={SET_TIP.genCurrency} /></span>
                             <select className="mt-0.5 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs outline-none focus:border-rz-mint text-slate-900 dark:text-slate-100"
                                 value={s.general.defaultCurrency} onChange={(e) => s.actions.setGeneral({ defaultCurrency: e.target.value })}>
                                 {CURRENCY_LIST.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -282,7 +328,7 @@ export function SettingsPage({ initialTab }: { initialTab?: 'overview' | 'genera
                         </label>
                     </div>
                     <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                        <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Appearance</h2>
+                        <h2 className="mb-2 flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Appearance <InfoTip content={SET_TIP.appearance} /></h2>
                         <div className="flex gap-1.5">
                             {(['light', 'dark'] as const).map((t) => (
                                 <button key={t} onClick={() => setTheme(t)}
@@ -299,12 +345,12 @@ export function SettingsPage({ initialTab }: { initialTab?: 'overview' | 'genera
             {tab === 'data' && (
                 <div className="space-y-3">
                     <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                        <h2 className="mb-1 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500"><DownloadCloud className="h-3.5 w-3.5" /> Backup</h2>
+                        <h2 className="mb-1 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500"><DownloadCloud className="h-3.5 w-3.5" /> Backup <InfoTip content={SET_TIP.backup} /></h2>
                         <button onClick={exportBackup} className="rounded-lg bg-rz-mint px-3 py-1.5 text-xs font-semibold text-rz-base hover:bg-rz-mint/80">Download all local data (JSON)</button>
                         <p className="mt-1 text-[9px] text-slate-400">Exports every dcmoc* localStorage key — projects, scenarios, tracking stores, settings.</p>
                     </div>
                     <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                        <h2 className="mb-1 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500"><Database className="h-3.5 w-3.5" /> Store Resets</h2>
+                        <h2 className="mb-1 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500"><Database className="h-3.5 w-3.5" /> Store Resets <InfoTip content={SET_TIP.storeResets} /></h2>
                         <p className="mb-2 text-[10px] text-amber-500">⚠ Each reset clears that store&apos;s local data immediately (irreversible).</p>
                         <div className="grid gap-1.5 md:grid-cols-3">
                             {([
@@ -332,14 +378,14 @@ export function SettingsPage({ initialTab }: { initialTab?: 'overview' | 'genera
                         {/* KPI row */}
                         <div className="grid grid-cols-4 gap-3">
                             {[
-                                { label: 'Total', value: s.integrations.length },
-                                { label: 'Reachable', value: reachable },
-                                { label: 'Configured', value: s.integrations.filter((i) => i.status === 'configured').length },
-                                { label: 'Errors', value: s.integrations.filter((i) => i.status === 'error').length },
+                                { label: 'Total', value: s.integrations.length, tip: SET_TIP.intTotal },
+                                { label: 'Reachable', value: reachable, tip: SET_TIP.intReachable },
+                                { label: 'Configured', value: s.integrations.filter((i) => i.status === 'configured').length, tip: SET_TIP.intConfigured },
+                                { label: 'Errors', value: s.integrations.filter((i) => i.status === 'error').length, tip: SET_TIP.intErrors },
                             ].map((k) => (
                                 <div key={k.label} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 text-center">
                                     <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
-                                    <div className="text-[9px] uppercase text-slate-500">{k.label}</div>
+                                    <div className="flex items-center justify-center gap-0.5 text-[9px] uppercase text-slate-500">{k.label}<InfoTip content={k.tip} /></div>
                                 </div>
                             ))}
                         </div>
@@ -357,7 +403,11 @@ export function SettingsPage({ initialTab }: { initialTab?: 'overview' | 'genera
                         <div className="overflow-hidden rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50">
                             <table className="w-full text-xs">
                                 <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400">
-                                    <th className="px-3 py-2 text-left">Integration</th><th className="text-left">Kind</th><th className="text-left">Status</th><th className="text-left">Last test</th><th className="px-2 text-right">Actions</th>
+                                    <th className="px-3 py-2 text-left"><span className="flex items-center gap-1">Integration <InfoTip content={SET_TIP.colIntegration} /></span></th>
+                                    <th className="text-left"><span className="flex items-center gap-1">Kind <InfoTip content={SET_TIP.colKind} /></span></th>
+                                    <th className="text-left"><span className="flex items-center gap-1">Status <InfoTip content={SET_TIP.colStatus} /></span></th>
+                                    <th className="text-left"><span className="flex items-center gap-1">Last test <InfoTip content={SET_TIP.colLastTest} /></span></th>
+                                    <th className="px-2 text-right"><span className="flex items-center justify-end gap-1">Actions <InfoTip content={SET_TIP.colActions} /></span></th>
                                 </tr></thead>
                                 <tbody>
                                     {filteredInts.length === 0 && (
@@ -384,17 +434,17 @@ export function SettingsPage({ initialTab }: { initialTab?: 'overview' | 'genera
 
                     {/* detail rail */}
                     <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
-                        <h3 className="mb-2 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Integration Details</h3>
+                        <h3 className="mb-2 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Integration Details <InfoTip content={SET_TIP.intDetails} /></h3>
                         {!sel && <p className="text-[10px] text-slate-400">Select an integration to configure it.</p>}
                         {sel && (
                             <div className="space-y-2 text-[10px]">
                                 <label className="block">
-                                    <span className="font-semibold uppercase text-slate-500">Name</span>
+                                    <span className="inline-flex items-center gap-0.5 font-semibold uppercase text-slate-500">Name <InfoTip content={SET_TIP.fName} /></span>
                                     <input className="mt-0.5 w-full rounded border border-slate-300 dark:border-slate-700 bg-transparent px-1.5 py-1 text-xs text-slate-800 dark:text-slate-200"
                                         value={sel.name} onChange={(e) => s.actions.upsertIntegration({ ...sel, name: e.target.value })} />
                                 </label>
                                 <label className="block">
-                                    <span className="font-semibold uppercase text-slate-500">Kind</span>
+                                    <span className="inline-flex items-center gap-0.5 font-semibold uppercase text-slate-500">Kind <InfoTip content={SET_TIP.fKind} /></span>
                                     <select className="mt-0.5 w-full rounded border border-slate-300 dark:border-slate-700 bg-transparent px-1.5 py-1 text-xs text-slate-800 dark:text-slate-200"
                                         value={sel.kind} onChange={(e) => s.actions.upsertIntegration({ ...sel, kind: e.target.value as IntegrationKind })}>
                                         {KINDS.map((k) => <option key={k.value} value={k.value}>{k.label}</option>)}
@@ -402,13 +452,13 @@ export function SettingsPage({ initialTab }: { initialTab?: 'overview' | 'genera
                                     <span className="text-[9px] text-slate-400">{KINDS.find((k) => k.value === sel.kind)?.note}</span>
                                 </label>
                                 <label className="block">
-                                    <span className="font-semibold uppercase text-slate-500">Endpoint URL</span>
+                                    <span className="inline-flex items-center gap-0.5 font-semibold uppercase text-slate-500">Endpoint URL <InfoTip content={SET_TIP.fEndpoint} /></span>
                                     <input className="mt-0.5 w-full rounded border border-slate-300 dark:border-slate-700 bg-transparent px-1.5 py-1 text-xs text-slate-800 dark:text-slate-200"
                                         placeholder="https://endpoint…" value={sel.url}
                                         onChange={(e) => s.actions.upsertIntegration({ ...sel, url: e.target.value, status: e.target.value ? 'configured' : 'unconfigured' })} />
                                 </label>
                                 <label className="block">
-                                    <span className="font-semibold uppercase text-slate-500">Secret reference</span>
+                                    <span className="inline-flex items-center gap-0.5 font-semibold uppercase text-slate-500">Secret reference <InfoTip content={SET_TIP.fSecret} /></span>
                                     <input className="mt-0.5 w-full rounded border border-slate-300 dark:border-slate-700 bg-transparent px-1.5 py-1 text-xs text-slate-800 dark:text-slate-200"
                                         placeholder="ref label only — never the secret" value={sel.secretRef}
                                         onChange={(e) => s.actions.upsertIntegration({ ...sel, secretRef: e.target.value })} />

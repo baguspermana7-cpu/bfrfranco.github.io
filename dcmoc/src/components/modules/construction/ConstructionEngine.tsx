@@ -223,7 +223,7 @@ export function ConstructionEngine() {
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
-                    <label className="flex items-center gap-1.5 text-[10px] uppercase text-slate-500">Status month
+                    <label className="flex items-center gap-1.5 text-[10px] uppercase text-slate-500">Status month <InfoTip content="Reporting cut-off month, counted from NTP (M0). Enter the current elapsed month — together with per-phase actual % — to switch from baseline Plan Mode into live EVM tracking (SPI/CPI). Leave blank to stay in Plan Mode." />
                         <div className="w-28 normal-case">
                             <CreatableCombobox<number> options={[6, 12, 18, 24].map((v) => ({ value: v, label: `M${v}` }))}
                                 value={statusVal} min={0} max={Math.ceil(sched.totalMonths)} unit="mo" placeholder="Plan Mode"
@@ -287,7 +287,7 @@ export function ConstructionEngine() {
                 <div className="min-w-0 space-y-4">
                     {/* master schedule */}
                     <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                        <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Master Construction Schedule <span className="ml-1 text-[9px] normal-case text-slate-400">engine CPM · L2 detail from CAPEX timeline</span></h2>
+                        <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Master Construction Schedule <InfoTip content="Baseline construction plan from the engine CPM (Critical Path Method) schedule, expanded to L2 phase detail from the CAPEX timeline. Each bar spans a phase's start-to-end months; enter an actual % per phase to track earned value. Red bars are phases running behind plan." /> <span className="ml-1 text-[9px] normal-case text-slate-400">engine CPM · L2 detail from CAPEX timeline</span></h2>
                         <div className="mb-3 space-y-1">
                             {sched.rows.map((r) => {
                                 const pctVal: ComboValue<number> | null = t.phaseActualPct[r.key] == null ? null : { value: t.phaseActualPct[r.key]!, isCustom: true };
@@ -314,7 +314,7 @@ export function ConstructionEngine() {
                     {/* S-curve + manpower */}
                     <div className="grid gap-4 xl:grid-cols-2">
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                            <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Progress S-Curve (PV{planMode ? '' : ' vs EV'})</h2>
+                            <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Progress S-Curve (PV{planMode ? '' : ' vs EV'}) <InfoTip content="Cumulative planned progress (Planned Value %) across the build — an S-shaped curve: slow at mobilization, fast mid-build, tapering at commissioning. Once actuals are entered, the Earned Value point plots against it to show whether the project is ahead of or behind plan." /></h2>
                             <div className="h-44">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <ComposedChart data={curve}>
@@ -331,7 +331,7 @@ export function ConstructionEngine() {
                             </div>
                         </div>
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                            <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Manpower Plan <span className="rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">SCREENING MODEL</span></h2>
+                            <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Manpower Plan <InfoTip content="Planned site head-count (crew) over the build, peaking mid-construction. A screening estimate shaped from the peak-crew figure below — not a fully resourced staffing plan. Drives labor logistics, site welfare and safety sizing." /> <span className="rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">SCREENING MODEL</span></h2>
                             <div className="h-44">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <ComposedChart data={manpower}>
@@ -344,7 +344,7 @@ export function ConstructionEngine() {
                                 </ResponsiveContainer>
                             </div>
                             <div className="mt-1 flex items-center gap-2 text-[10px] text-slate-500">
-                                Peak crew:
+                                <span className="inline-flex items-center gap-1">Peak crew: <InfoTip content="Maximum number of workers on site at the busiest point of construction (persons). Sets the height and shape of the manpower curve — larger builds and compressed schedules need higher peaks." /></span>
                                 <div className="w-28">
                                     <CreatableCombobox<number> options={[250, 500, 800, 1500].map((v) => ({ value: v, label: String(v) }))}
                                         value={{ value: t.peakManpowerPlanned, isCustom: true }} min={10} max={20000}
@@ -357,9 +357,9 @@ export function ConstructionEngine() {
 
                     {/* procurement */}
                     <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                        <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Procurement & Delivery <span className="ml-1 text-[9px] normal-case text-slate-400">engine long-lead data · 2024-26 supply-constrained market · vendors = examples</span></h2>
+                        <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Procurement & Delivery <InfoTip content="Long-lead equipment order tracker. The engine back-calculates the latest PO date needed to meet the power-on milestone from each item's lead time. Items flagged 'Order now' are on the critical path and risk delaying energization if not ordered." /> <span className="ml-1 text-[9px] normal-case text-slate-400">engine long-lead data · 2024-26 supply-constrained market · vendors = examples</span></h2>
                         <table className="w-full text-[11px]">
-                            <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Item</th><th className="text-left">Vendor</th><th className="text-right">Lead</th><th className="text-right">PO by</th><th className="text-right">ETA</th><th className="text-right">Status</th></tr></thead>
+                            <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Item <InfoTip content="Long-lead equipment package (e.g. transformers, gensets, switchgear, chillers) whose delivery can gate the schedule." /></th><th className="text-left">Vendor <InfoTip content="Illustrative example supplier — not a procurement recommendation." /></th><th className="text-right">Lead <InfoTip content="Procurement lead time in months from purchase order to on-site delivery." /></th><th className="text-right">PO by <InfoTip content="Latest month (from NTP, M0) to place the purchase order so the item arrives before it is needed on the critical path." /></th><th className="text-right">ETA <InfoTip content="Expected on-site delivery month, counted from NTP (M0)." /></th><th className="text-right">Status <InfoTip content="'Order now' = critical, the PO date has passed or is imminent and the item threatens the power-on date; 'In window' = still enough lead time." /></th></tr></thead>
                             <tbody>
                                 {proc.rows.map((r) => (
                                     <tr key={r.item} className="border-b border-slate-100 dark:border-slate-800/60">
@@ -391,7 +391,7 @@ export function ConstructionEngine() {
                         </div>
                     )}
                     <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
-                        <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Milestones (engine)</h3>
+                        <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Milestones (engine) <InfoTip content="Key schedule dates from the engine CPM, in months from NTP (M0) — e.g. power-on/energization, topping-out, handover. Final handover reflects the SPI-adjusted forecast completion." /></h3>
                         <div className="space-y-1 text-[11px]">
                             {Object.entries(sched.milestones).map(([k, v]) => (
                                 <div key={k} className="flex justify-between"><span className="capitalize text-slate-600 dark:text-slate-300">{k.replace(/([A-Z])/g, ' $1')}</span><span className="tabular-nums text-slate-500">M{(v as number).toFixed(1)}</span></div>
@@ -400,7 +400,7 @@ export function ConstructionEngine() {
                         </div>
                     </div>
                     <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
-                        <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Risks (Top)</h3>
+                        <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Risks (Top) <InfoTip content="Top construction risks (potential future events) from the tracking store, each ranked by impact severity and probability. Items marked EXAMPLE are illustrative placeholders — replace with project-specific risks." /></h3>
                         <div className="space-y-1">
                             {t.risks.slice(0, 5).map((r) => (
                                 <div key={r.id} className="text-[11px]">
@@ -414,7 +414,7 @@ export function ConstructionEngine() {
                         </div>
                     </div>
                     <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
-                        <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Issues ({openIssues} open)</h3>
+                        <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Issues ({openIssues} open) <InfoTip content="Open construction issues — problems already occurring (vs risks, which are potential) — from the tracking store, with status and owner. EXAMPLE items are placeholders." /></h3>
                         <div className="space-y-1">
                             {t.issues.slice(0, 5).map((i2) => (
                                 <div key={i2.id} className="text-[11px]">

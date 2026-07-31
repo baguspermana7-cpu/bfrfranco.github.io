@@ -37,6 +37,7 @@ import {
 } from 'lucide-react';
 import clsx from 'clsx';
 import { fmtMoney, fmtMoneyFull } from '@/lib/format';
+import { Tooltip as InfoTip } from '@/components/ui/Tooltip';
 
 type SectionId = 'kpis' | 'cost' | 'tco' | 'capex-shift' | 'risk' | 'insights' | 'maintStrategy' | 'sensitivity' | 'sankey';
 
@@ -520,10 +521,11 @@ export function ReportDashboard() {
                         <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
                             <Shield className="w-4 h-4 text-rz-data" />
                             Branding Configuration
+                            <InfoTip content="Logo, company name and accent color applied to the exported PDF reports." />
                         </h3>
                         <div className="space-y-3">
                             <div>
-                                <label className="text-xs text-slate-500 dark:text-slate-400 block mb-1">Company Name</label>
+                                <label className="text-xs text-slate-500 dark:text-slate-400 block mb-1">Company Name <InfoTip content="Name printed on the exported PDF report header." /></label>
                                 <input
                                     type="text"
                                     value={branding.companyName}
@@ -533,7 +535,7 @@ export function ReportDashboard() {
                             </div>
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="text-xs text-slate-500 dark:text-slate-400 block mb-1">Primary Color</label>
+                                    <label className="text-xs text-slate-500 dark:text-slate-400 block mb-1">Primary Color <InfoTip content="Primary accent color used for headings and rules in the PDF report." /></label>
                                     <div className="flex items-center gap-2">
                                         <input
                                             type="color"
@@ -545,7 +547,7 @@ export function ReportDashboard() {
                                     </div>
                                 </div>
                                 <div>
-                                    <label className="text-xs text-slate-500 dark:text-slate-400 block mb-1">Company Logo</label>
+                                    <label className="text-xs text-slate-500 dark:text-slate-400 block mb-1">Company Logo <InfoTip content="Logo image embedded in the PDF report header (uploaded and stored as base64)." /></label>
                                     <label className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded cursor-pointer border border-slate-300 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 transition-colors">
                                         <Download className="w-3 h-3" />
                                         {branding.logoBase64 ? 'Change Logo' : 'Upload Logo'}
@@ -561,6 +563,7 @@ export function ReportDashboard() {
                         <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
                             <Eye className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
                             Report Sections
+                            <InfoTip content="Toggle which sections are included in the on-screen preview and the generated PDF report." />
                         </h3>
                         <div className="grid grid-cols-2 gap-2">
                             {REPORT_SECTIONS.map(section => (
@@ -586,6 +589,7 @@ export function ReportDashboard() {
                         <h3 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2">
                             <StickyNote className="w-4 h-4 text-amber-500 dark:text-amber-400" />
                             Analyst Notes
+                            <InfoTip content="Custom executive commentary appended to the report and shown in the preview." />
                         </h3>
                         <textarea
                             value={analystNotes}
@@ -641,7 +645,7 @@ export function ReportDashboard() {
                     <div className="p-6">
                         <div className="flex gap-4 mb-6">
                             <div className="flex-1 space-y-1">
-                                <label className="text-xs text-slate-500 dark:text-slate-400 uppercase font-medium">Scenario A</label>
+                                <label className="text-xs text-slate-500 dark:text-slate-400 uppercase font-medium">Scenario A <InfoTip content="First saved scenario to compare — treated as the baseline." /></label>
                                 <select
                                     value={scenarioA}
                                     onChange={(e) => setScenarioA(e.target.value)}
@@ -654,7 +658,7 @@ export function ReportDashboard() {
                                 </select>
                             </div>
                             <div className="flex-1 space-y-1">
-                                <label className="text-xs text-slate-500 dark:text-slate-400 uppercase font-medium">Scenario B</label>
+                                <label className="text-xs text-slate-500 dark:text-slate-400 uppercase font-medium">Scenario B <InfoTip content="Second saved scenario, compared against Scenario A (Delta = B − A)." /></label>
                                 <select
                                     value={scenarioB}
                                     onChange={(e) => setScenarioB(e.target.value)}
@@ -678,26 +682,26 @@ export function ReportDashboard() {
                             const deltaStaff = sB.summary.totalStaff - sA.summary.totalStaff;
                             const deltaPue = sB.summary.pue - sA.summary.pue;
                             const rows = [
-                                { label: 'Monthly OPEX', a: fmtMoney(sA.summary.monthlyOpex), b: fmtMoney(sB.summary.monthlyOpex), delta: deltaOpex, fmtDelta: fmtMoney(Math.abs(deltaOpex)) },
-                                { label: 'Annual CAPEX', a: fmtMoney(sA.summary.annualCapex), b: fmtMoney(sB.summary.annualCapex), delta: deltaCapex, fmtDelta: fmtMoney(Math.abs(deltaCapex)) },
-                                { label: 'Total Staff', a: `${sA.summary.totalStaff}`, b: `${sB.summary.totalStaff}`, delta: deltaStaff, fmtDelta: `${Math.abs(deltaStaff)}` },
-                                { label: 'PUE', a: sA.summary.pue.toFixed(2), b: sB.summary.pue.toFixed(2), delta: deltaPue, fmtDelta: Math.abs(deltaPue).toFixed(2) },
+                                { label: 'Monthly OPEX', a: fmtMoney(sA.summary.monthlyOpex), b: fmtMoney(sB.summary.monthlyOpex), delta: deltaOpex, fmtDelta: fmtMoney(Math.abs(deltaOpex)), tip: 'Monthly operating expenditure for the scenario.' },
+                                { label: 'Annual CAPEX', a: fmtMoney(sA.summary.annualCapex), b: fmtMoney(sB.summary.annualCapex), delta: deltaCapex, fmtDelta: fmtMoney(Math.abs(deltaCapex)), tip: 'Annualized capital expenditure for the scenario.' },
+                                { label: 'Total Staff', a: `${sA.summary.totalStaff}`, b: `${sB.summary.totalStaff}`, delta: deltaStaff, fmtDelta: `${Math.abs(deltaStaff)}`, tip: 'Total headcount (FTE) for the scenario.' },
+                                { label: 'PUE', a: sA.summary.pue.toFixed(2), b: sB.summary.pue.toFixed(2), delta: deltaPue, fmtDelta: Math.abs(deltaPue).toFixed(2), tip: 'Power Usage Effectiveness — total facility power ÷ IT power.' },
                             ];
                             return (
                                 <div className="overflow-x-auto">
                                 <table className="w-full min-w-[480px] text-sm">
                                     <thead>
                                         <tr className="border-b border-slate-200 dark:border-slate-700">
-                                            <th className="py-2 text-left text-xs text-slate-500 font-medium">Metric</th>
+                                            <th className="py-2 text-left text-xs text-slate-500 font-medium">Metric <InfoTip content="The metric being compared across the two scenarios." /></th>
                                             <th className="py-2 text-right text-xs text-rz-mint font-medium">{sA.name}</th>
                                             <th className="py-2 text-right text-xs text-cyan-600 dark:text-cyan-400 font-medium">{sB.name}</th>
-                                            <th className="py-2 text-right text-xs text-slate-500 font-medium">Delta (B-A)</th>
+                                            <th className="py-2 text-right text-xs text-slate-500 font-medium">Delta (B-A) <InfoTip content="Difference between scenario B and A (B − A). Green = B is lower/better, red = higher." /></th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {rows.map((row, i) => (
                                             <tr key={i} className="border-b border-slate-100 dark:border-slate-800/50">
-                                                <td className="py-3 text-slate-700 dark:text-slate-300">{row.label}</td>
+                                                <td className="py-3 text-slate-700 dark:text-slate-300">{row.label} <InfoTip content={row.tip} /></td>
                                                 <td className="py-3 text-right font-mono text-slate-600 dark:text-slate-400">{row.a}</td>
                                                 <td className="py-3 text-right font-mono text-slate-600 dark:text-slate-400">{row.b}</td>
                                                 <td className="py-3 text-right font-mono">
@@ -794,17 +798,18 @@ export function ReportDashboard() {
             {visibleSections.has('kpis') && (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                     {[
-                        { label: 'Total Headcount', value: `${fullData.totalHeadcount}`, sub: 'FTE', icon: Users, color: 'text-cyan-600 dark:text-cyan-400' },
-                        { label: 'Monthly OPEX', value: fmtMoney(fullData.totalMonthlyLabor), sub: 'Labor + Staff', icon: DollarSign, color: 'text-rz-data' },
-                        { label: 'Annual TCO', value: fmtMoney(fullData.annualTCO), sub: 'OPEX + Maint + Depr', icon: TrendingUp, color: 'text-amber-600 dark:text-amber-400' },
-                        { label: '5-Year TCO', value: fmtMoney(fullData.fiveYearTCO), sub: `${simYear}-${simYear + 4}`, icon: BarChart3, color: 'text-rz-mint' },
-                        { label: 'CAPEX $/kW', value: `$${fullData.capex.metrics?.perKw?.toLocaleString() || '0'}`, sub: `PUE ${fullData.capex.pue?.toFixed(2) || 'N/A'}`, icon: Zap, color: 'text-orange-600 dark:text-orange-400' },
-                        { label: 'Availability', value: `${fullData.riskData?.availability?.toFixed(3) || ({2:'99.741',3:'99.982',4:'99.995'}[inputs.tierLevel as 2|3|4] || '—')}%`, sub: `Tier ${inputs.tierLevel}`, icon: Shield, color: 'text-blue-600 dark:text-blue-400' },
+                        { label: 'Total Headcount', value: `${fullData.totalHeadcount}`, sub: 'FTE', icon: Users, color: 'text-cyan-600 dark:text-cyan-400', tip: 'Total data-center staff across all roles, in full-time equivalents (FTE).' },
+                        { label: 'Monthly OPEX', value: fmtMoney(fullData.totalMonthlyLabor), sub: 'Labor + Staff', icon: DollarSign, color: 'text-rz-data', tip: 'Total monthly labor + staff operating cost across all roles.' },
+                        { label: 'Annual TCO', value: fmtMoney(fullData.annualTCO), sub: 'OPEX + Maint + Depr', icon: TrendingUp, color: 'text-amber-600 dark:text-amber-400', tip: 'Annual total cost of ownership — operating OPEX + maintenance + CAPEX depreciation.' },
+                        { label: '5-Year TCO', value: fmtMoney(fullData.fiveYearTCO), sub: `${simYear}-${simYear + 4}`, icon: BarChart3, color: 'text-rz-mint', tip: 'Cumulative total cost of ownership summed over the 5-year window shown.' },
+                        { label: 'CAPEX $/kW', value: `$${fullData.capex.metrics?.perKw?.toLocaleString() || '0'}`, sub: `PUE ${fullData.capex.pue?.toFixed(2) || 'N/A'}`, icon: Zap, color: 'text-orange-600 dark:text-orange-400', tip: 'Total construction CAPEX divided by IT capacity, in USD per kW.' },
+                        { label: 'Availability', value: `${fullData.riskData?.availability?.toFixed(3) || ({2:'99.741',3:'99.982',4:'99.995'}[inputs.tierLevel as 2|3|4] || '—')}%`, sub: `Tier ${inputs.tierLevel}`, icon: Shield, color: 'text-blue-600 dark:text-blue-400', tip: 'Expected annual uptime for the selected Uptime Tier, from the downtime-risk model.' },
                     ].map((kpi, i) => (
                         <div key={i} className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-4 hover:border-slate-300 dark:hover:border-slate-700 transition-colors shadow-sm dark:shadow-none">
                             <div className="flex items-center gap-2 mb-2">
                                 <kpi.icon className={clsx('w-4 h-4', kpi.color)} />
                                 <span className="text-xs text-slate-500 uppercase tracking-wider">{kpi.label}</span>
+                                <InfoTip content={kpi.tip} />
                             </div>
                             <div className="text-xl font-bold text-slate-900 dark:text-white">{kpi.value}</div>
                             <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">{kpi.sub}</div>
@@ -823,6 +828,7 @@ export function ReportDashboard() {
                         <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                             <DollarSign className="w-5 h-5 text-rz-data" />
                             Annual Cost Capitulation
+                            <InfoTip content="Breakdown of annual operating cost by category, each with its share of total annual TCO." />
                         </h3>
                         <ChevronDown className={clsx('w-5 h-5 text-slate-400 transition-transform', expandedSection === 'cost' && 'rotate-180')} />
                     </button>
@@ -832,10 +838,10 @@ export function ReportDashboard() {
                             <table className="w-full min-w-[480px] text-sm">
                                 <thead>
                                     <tr className="border-b border-slate-200 dark:border-slate-700">
-                                        <th className="py-2 text-left text-xs text-slate-500 font-medium">Cost Category</th>
-                                        <th className="py-2 text-right text-xs text-slate-500 font-medium">Monthly</th>
-                                        <th className="py-2 text-right text-xs text-slate-500 font-medium">Annual</th>
-                                        <th className="py-2 text-right text-xs text-slate-500 font-medium">% of Total</th>
+                                        <th className="py-2 text-left text-xs text-slate-500 font-medium">Cost Category <InfoTip content="Line item of annual operating cost." /></th>
+                                        <th className="py-2 text-right text-xs text-slate-500 font-medium">Monthly <InfoTip content="Monthly amount for this cost category." /></th>
+                                        <th className="py-2 text-right text-xs text-slate-500 font-medium">Annual <InfoTip content="Annualized amount for this category (monthly × 12)." /></th>
+                                        <th className="py-2 text-right text-xs text-slate-500 font-medium">% of Total <InfoTip content="Share of total annual TCO this category represents." /></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -891,6 +897,7 @@ export function ReportDashboard() {
                         <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                             <TrendingUp className="w-5 h-5 text-amber-500 dark:text-amber-400" />
                             5-Year Total Cost of Ownership
+                            <InfoTip content="Year-by-year projected TCO over a 5-year horizon with labor (4%/yr) and maintenance (3%/yr) escalation plus straight-line depreciation." />
                         </h3>
                         <ChevronDown className={clsx('w-5 h-5 text-slate-400 transition-transform', expandedSection === 'tco' && 'rotate-180')} />
                     </button>
@@ -900,13 +907,13 @@ export function ReportDashboard() {
                             <table className="w-full min-w-[640px] text-sm">
                                 <thead>
                                     <tr className="border-b border-slate-200 dark:border-slate-700">
-                                        <th className="py-2 text-left text-xs text-slate-500 font-medium">Year</th>
-                                        <th className="py-2 text-right text-xs text-slate-500 font-medium">Headcount</th>
-                                        <th className="py-2 text-right text-xs text-slate-500 font-medium">Labor Cost</th>
-                                        <th className="py-2 text-right text-xs text-slate-500 font-medium">Maintenance</th>
-                                        <th className="py-2 text-right text-xs text-slate-500 font-medium">Depreciation</th>
-                                        <th className="py-2 text-right text-xs text-slate-500 font-medium">Annual TCO</th>
-                                        <th className="py-2 text-right text-xs text-slate-500 font-medium">Cumulative</th>
+                                        <th className="py-2 text-left text-xs text-slate-500 font-medium">Year <InfoTip content="Projection year." /></th>
+                                        <th className="py-2 text-right text-xs text-slate-500 font-medium">Headcount <InfoTip content="Total staff (FTE) in that year." /></th>
+                                        <th className="py-2 text-right text-xs text-slate-500 font-medium">Labor Cost <InfoTip content="Annual labor cost, escalated 4%/yr for wage inflation." /></th>
+                                        <th className="py-2 text-right text-xs text-slate-500 font-medium">Maintenance <InfoTip content="Annual maintenance cost, escalated 3%/yr (CPI-class)." /></th>
+                                        <th className="py-2 text-right text-xs text-slate-500 font-medium">Depreciation <InfoTip content="Straight-line CAPEX depreciation (total CAPEX ÷ 20 years)." /></th>
+                                        <th className="py-2 text-right text-xs text-slate-500 font-medium">Annual TCO <InfoTip content="Total cost of ownership for the year — labor + maintenance + depreciation." /></th>
+                                        <th className="py-2 text-right text-xs text-slate-500 font-medium">Cumulative <InfoTip content="Running sum of annual TCO through this year." /></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -942,23 +949,24 @@ export function ReportDashboard() {
                         <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
                             <Building2 className="w-5 h-5 text-orange-500 dark:text-orange-400" />
                             CAPEX Summary
+                            <InfoTip content="Key capital-cost metrics for the build — total, per-kW intensity, PUE, timeline and annual depreciation." />
                         </h3>
                         <div className="space-y-3">
                             {[
-                                { label: 'Total CAPEX', value: fmtMoney(fullData.totalCAPEX), highlight: true },
-                                { label: 'Cost per kW', value: `$${fullData.capex.metrics?.perKw?.toLocaleString() || 'N/A'}` },
-                                { label: 'PUE', value: fullData.capex.pue?.toFixed(2) || 'N/A' },
-                                { label: 'Construction Timeline', value: `${fullData.capex.metrics?.timelineMonths || 'N/A'} months` },
-                                { label: 'Annual Depreciation', value: fmtMoney(fullData.annualDepreciation) },
+                                { label: 'Total CAPEX', value: fmtMoney(fullData.totalCAPEX), highlight: true, tip: 'Total capital cost to build the facility.' },
+                                { label: 'Cost per kW', value: `$${fullData.capex.metrics?.perKw?.toLocaleString() || 'N/A'}`, tip: 'CAPEX divided by IT capacity, in USD per kW.' },
+                                { label: 'PUE', value: fullData.capex.pue?.toFixed(2) || 'N/A', tip: 'Power Usage Effectiveness — total facility power ÷ IT power (lower is more efficient).' },
+                                { label: 'Construction Timeline', value: `${fullData.capex.metrics?.timelineMonths || 'N/A'} months`, tip: 'Estimated build duration in months.' },
+                                { label: 'Annual Depreciation', value: fmtMoney(fullData.annualDepreciation), tip: 'Straight-line CAPEX depreciation charged per year.' },
                             ].map((item, i) => (
                                 <div key={i} className="flex justify-between items-center py-2 border-b border-slate-100 dark:border-slate-800/50">
-                                    <span className="text-sm text-slate-500 dark:text-slate-400">{item.label}</span>
+                                    <span className="text-sm text-slate-500 dark:text-slate-400">{item.label} <InfoTip content={item.tip} /></span>
                                     <span className={clsx('font-mono text-sm', item.highlight ? 'text-slate-900 dark:text-white font-bold' : 'text-slate-600 dark:text-slate-300')}>{item.value}</span>
                                 </div>
                             ))}
                             {/* Top cost categories */}
                             <div className="mt-4">
-                                <div className="text-xs text-slate-500 uppercase mb-2">Top Cost Categories</div>
+                                <div className="text-xs text-slate-500 uppercase mb-2">Top Cost Categories <InfoTip content="The five largest CAPEX line items by cost, with each item's share of total CAPEX." /></div>
                                 {Object.entries(fullData.capex.costs || {})
                                     .sort(([, a], [, b]) => (b as number) - (a as number))
                                     .slice(0, 5)
@@ -983,27 +991,28 @@ export function ReportDashboard() {
                         <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
                             <Clock className="w-5 h-5 text-rz-mint" />
                             Shift Model Analysis
+                            <InfoTip content="Details of the selected staffing shift rotation — hours, cycle, crews and overtime." />
                         </h3>
                         <div className="space-y-3">
                             {[
-                                { label: 'Active Pattern', value: pattern.label },
-                                { label: 'Shift Duration', value: `${pattern.shiftHours}h (${pattern.effectiveHours}h effective)` },
-                                { label: 'Cycle', value: `${pattern.workDays} on / ${pattern.offDays} off (${pattern.cycleDays}-day cycle)` },
-                                { label: 'Scheduled Hours/Week', value: `${pattern.avgWeeklyScheduled.toFixed(1)}h` },
-                                { label: 'Effective Hours/Week', value: `${pattern.avgWeeklyEffective.toFixed(1)}h`, highlight: true },
-                                { label: 'Break per Shift', value: `${pattern.breakMinutes} min` },
-                                { label: 'Teams Required', value: `${pattern.teamsRequired}` },
-                                { label: 'Overtime', value: pattern.overtimeHours > 0 ? `${pattern.overtimeHours}h/week` : '✓ Zero Overtime' },
+                                { label: 'Active Pattern', value: pattern.label, tip: 'The selected shift rotation pattern.' },
+                                { label: 'Shift Duration', value: `${pattern.shiftHours}h (${pattern.effectiveHours}h effective)`, tip: 'Length of one shift, and the effective on-clock hours after breaks.' },
+                                { label: 'Cycle', value: `${pattern.workDays} on / ${pattern.offDays} off (${pattern.cycleDays}-day cycle)`, tip: 'Work-on / off days and the full rotation cycle length.' },
+                                { label: 'Scheduled Hours/Week', value: `${pattern.avgWeeklyScheduled.toFixed(1)}h`, tip: 'Average scheduled hours per week per employee.' },
+                                { label: 'Effective Hours/Week', value: `${pattern.avgWeeklyEffective.toFixed(1)}h`, highlight: true, tip: 'Average productive hours per week after breaks are removed.' },
+                                { label: 'Break per Shift', value: `${pattern.breakMinutes} min`, tip: 'Break minutes per shift.' },
+                                { label: 'Teams Required', value: `${pattern.teamsRequired}`, tip: 'Number of crews needed to cover the rotation 24/7.' },
+                                { label: 'Overtime', value: pattern.overtimeHours > 0 ? `${pattern.overtimeHours}h/week` : '✓ Zero Overtime', tip: 'Weekly overtime hours implied by the pattern (0 = none).' },
                             ].map((item, i) => (
                                 <div key={i} className="flex justify-between items-center py-1.5 border-b border-slate-100 dark:border-slate-800/50">
-                                    <span className="text-sm text-slate-500 dark:text-slate-400">{item.label}</span>
+                                    <span className="text-sm text-slate-500 dark:text-slate-400">{item.label} <InfoTip content={item.tip} /></span>
                                     <span className={clsx('text-sm font-mono', item.highlight ? 'text-cyan-600 dark:text-cyan-400 font-bold' : 'text-slate-600 dark:text-slate-300')}>{item.value}</span>
                                 </div>
                             ))}
                         </div>
                         {/* Comparison callout */}
                         <div className="mt-4 p-3 bg-slate-50 dark:bg-slate-950/50 rounded-lg border border-slate-200 dark:border-slate-800/50">
-                            <div className="text-xs text-slate-500 uppercase mb-1">Recommendation</div>
+                            <div className="text-xs text-slate-500 uppercase mb-1">Recommendation <InfoTip content="Suggested shift model from the comparison engine, weighing coverage, overtime and cost." /></div>
                             <p className="text-sm text-slate-700 dark:text-slate-300">{fullData.shiftComparison.recommendation}</p>
                         </div>
                     </div>
@@ -1016,23 +1025,24 @@ export function ReportDashboard() {
                     <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
                         <Shield className="w-5 h-5 text-blue-500 dark:text-blue-400" />
                         Risk Assessment
+                        <InfoTip content="Redundancy, availability and downtime for the selected Uptime Tier, plus the yearly maintenance-event load." />
                     </h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="text-center p-3 bg-slate-50 dark:bg-slate-950/50 rounded-lg border border-slate-100 dark:border-slate-800">
                             <div className="text-2xl font-bold text-slate-900 dark:text-white">Tier {inputs.tierLevel}</div>
-                            <div className="text-xs text-slate-500">Redundancy Level</div>
+                            <div className="text-xs text-slate-500">Redundancy Level <InfoTip content="Uptime Institute Tier — infrastructure redundancy classification (higher tier = more fault tolerance)." /></div>
                         </div>
                         <div className="text-center p-3 bg-slate-50 dark:bg-slate-950/50 rounded-lg border border-slate-100 dark:border-slate-800">
                             <div className="text-2xl font-bold text-rz-data">{fullData.riskData?.availability?.toFixed(3) || ({2:'99.741',3:'99.982',4:'99.995'}[inputs.tierLevel as 2|3|4] || '—')}%</div>
-                            <div className="text-xs text-slate-500">Expected Availability</div>
+                            <div className="text-xs text-slate-500">Expected Availability <InfoTip content="Modeled annual uptime percentage for the tier (from the downtime-risk model)." /></div>
                         </div>
                         <div className="text-center p-3 bg-slate-50 dark:bg-slate-950/50 rounded-lg border border-slate-100 dark:border-slate-800">
                             <div className="text-2xl font-bold text-amber-500 dark:text-amber-400">{fullData.riskData?.expectedDowntimeMinutes?.toFixed(0) || '9.5'} min</div>
-                            <div className="text-xs text-slate-500">Annual Downtime</div>
+                            <div className="text-xs text-slate-500">Annual Downtime <InfoTip content="Expected outage time per year, in minutes, implied by the availability figure." /></div>
                         </div>
                         <div className="text-center p-3 bg-slate-50 dark:bg-slate-950/50 rounded-lg border border-slate-100 dark:border-slate-800">
                             <div className="text-2xl font-bold text-slate-900 dark:text-white">{fullData.schedule.length}</div>
-                            <div className="text-xs text-slate-500">Maintenance Events/Year</div>
+                            <div className="text-xs text-slate-500">Maintenance Events/Year <InfoTip content="Count of scheduled maintenance events generated for the facility's asset base per year." /></div>
                         </div>
                     </div>
                 </div>
@@ -1044,6 +1054,7 @@ export function ReportDashboard() {
                     <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2 mb-4">
                         <Wrench className="w-5 h-5 text-rz-data" />
                         Maintenance Strategy Overview
+                        <InfoTip content="Cost and reliability comparison of the candidate maintenance strategies; the recommended option is tagged REC." />
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                         {fullData.strategyData.strategies.map((s) => (
@@ -1059,11 +1070,11 @@ export function ReportDashboard() {
                                     )}
                                 </div>
                                 <div className="grid grid-cols-2 gap-y-1 text-xs">
-                                    <span className="text-slate-500 dark:text-slate-500">Annual Cost:</span>
+                                    <span className="text-slate-500 dark:text-slate-500">Annual Cost: <InfoTip content="Total yearly cost of this maintenance strategy." /></span>
                                     <span className="font-mono text-slate-900 dark:text-white text-right">{fmtMoney(s.totalAnnualCost)}</span>
-                                    <span className="text-slate-500 dark:text-slate-500">5-Yr NPV:</span>
+                                    <span className="text-slate-500 dark:text-slate-500">5-Yr NPV: <InfoTip content="Net present value of the strategy's costs over 5 years." /></span>
                                     <span className="font-mono text-slate-600 dark:text-slate-300 text-right">{fmtMoney(s.fiveYearNPV)}</span>
-                                    <span className="text-slate-500 dark:text-slate-500">Reliability:</span>
+                                    <span className="text-slate-500 dark:text-slate-500">Reliability: <InfoTip content="Composite reliability index (0–100) for the strategy — higher is better." /></span>
                                     <span className="font-mono text-slate-600 dark:text-slate-300 text-right">{s.reliabilityIndex}/100</span>
                                 </div>
                             </div>
@@ -1079,7 +1090,7 @@ export function ReportDashboard() {
             {visibleSections.has('insights') && (
                 <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-sm dark:shadow-none">
                     <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800">
-                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">AI-Generated Insights & Recommendations</h3>
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">AI-Generated Insights & Recommendations <InfoTip content="Rule-derived findings computed from live figures (financials, staffing), each tagged by severity with a recommendation; high-severity items expand to a root cause." /></h3>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-6">
                         {fullData.insights.map((insight, index) => (
@@ -1187,7 +1198,7 @@ export function ReportDashboard() {
                 ];
                 return (
                     <div id="sankey-diagram-container" className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm dark:shadow-none">
-                        <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Cost Flow Analysis — Sankey Diagram</h3>
+                        <h3 className="text-sm font-semibold text-slate-900 dark:text-white mb-4 flex items-center gap-2">Cost Flow Analysis — Sankey Diagram <InfoTip content="Flow of annual OPEX from the total into labor, energy, maintenance and compliance, then into their sub-components (roles, IT vs cooling energy)." /></h3>
                         <SankeyDiagram data={{ nodes, links }} />
                     </div>
                 );
@@ -1209,6 +1220,7 @@ export function ReportDashboard() {
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                     <Printer className="w-5 h-5 text-cyan-600 dark:text-cyan-400" />
                     Export Reports
+                    <InfoTip content="Download stakeholder-ready PDF reports for each module (simulation, staffing, CAPEX, maintenance, country intel, capacity)." />
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {[

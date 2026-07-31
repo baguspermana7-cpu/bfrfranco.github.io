@@ -35,6 +35,7 @@ import { useConstructionTracking } from '@/store/constructionTracking';
 import { useCxTracking } from '@/store/cxTracking';
 import { runRealOptimization, proposalToPatch, type RealOptimizationResult, type ObjectiveOutcome } from '@/lib/optimizer/optimize';
 import { Cpu, Server, Building, Repeat, Gauge, TrendingUp, CircleDot, ArrowRight, Sparkles, FileText, CheckCircle2, AlertTriangle, Minus, Wrench } from 'lucide-react';
+import { Tooltip } from '@/components/ui/Tooltip';
 
 type TabId = ReturnType<typeof useSimulationStore.getState>['activeTab'];
 
@@ -245,7 +246,7 @@ export function ExecutiveDashboard() {
             {has('reports') && (
                 <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f1424]/80 p-8 text-center">
                     <FileText className="w-8 h-8 text-cyan-400 mx-auto mb-3" />
-                    <h2 className="text-sm font-bold text-slate-900 dark:text-white mb-1">Reports &amp; Exports</h2>
+                    <h2 className="text-sm font-bold text-slate-900 dark:text-white mb-1 flex items-center justify-center gap-1">Reports &amp; Exports<Tooltip content="Generate the full Executive PDF from this view, or open the Reports module for per-engine documents. All figures are engine-real." /></h2>
                     <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto mb-4">Generate the super-complete Executive PDF from this view, or open the Reports module for per-engine documents.</p>
                     <div className="flex items-center justify-center gap-2">
                         <button onClick={() => handleAction('Generate Report')} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-medium transition-colors">
@@ -291,7 +292,7 @@ export function ExecutiveDashboard() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                 {has('schedule') && (
                 <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f1424]/80 p-4">
-                    <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Schedule &amp; Milestones</h2>
+                    <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1">Schedule &amp; Milestones<Tooltip content="Project build timeline and key milestones from the CAPEX engine's construction schedule (phases and total months from NTP to completion)." /></h2>
                     {capexResults?.timeline?.phases?.length
                         ? <ScheduleTimeline phases={capexResults.timeline.phases} totalMonths={capexResults.timeline.totalMonths} startYear={startYear} />
                         : <p className="text-xs text-slate-500">Run the CAPEX engine for the build schedule.</p>}
@@ -310,7 +311,7 @@ export function ExecutiveDashboard() {
                 <div className="rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0f1424]/80 p-4">
                     <div className="flex items-center gap-2 mb-3">
                         <Sparkles className="w-4 h-4 text-cyan-400" />
-                        <h2 className="text-sm font-bold text-slate-900 dark:text-white">AI Recommendations</h2>
+                        <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1">AI Recommendations<Tooltip content="Rule-based recommendations from the Layer-13 decision engine, evaluated against the real engine outputs (CAPEX, OPEX, financials, PUE, availability). Each carries a confidence score." /></h2>
                         <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-slate-400">Layer 13</span>
                     </div>
                     {ai ? (
@@ -352,22 +353,22 @@ export function ExecutiveDashboard() {
                     <div className="absolute inset-0 bg-black/60" onClick={() => setOptResult(null)} />
                     <div className="relative w-full max-w-lg rounded-xl border border-cyan-500/40 bg-white dark:bg-[#0f1424] shadow-2xl p-4 max-h-[85vh] overflow-y-auto">
                         <div className="text-[10px] font-bold uppercase tracking-wider text-cyan-600 dark:text-cyan-400">Run Optimization — deterministic solver</div>
-                        <div className="mt-1 text-sm font-bold text-slate-900 dark:text-white">{optResult.objectives.length} objectives evaluated</div>
+                        <div className="mt-1 text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1">{optResult.objectives.length} objectives evaluated<Tooltip content="Each optimization objective (e.g. IRR hurdle, capacity band, budget vs P80) evaluated by the deterministic bisection solver, with its status and any parameter proposal." /></div>
                         <p className="mt-1 text-[10px] text-slate-500 dark:text-slate-400">Bisection (40 iterations) over the same importable models the pages render from — no separate estimate, no LLM. Only allowlisted fine-tune parameters can move; requirement base data is locked by the optimizer guard.</p>
                         <div className="mt-3 space-y-2">
                             {optResult.objectives.map((o: ObjectiveOutcome, i: number) => {
                                 const chip = o.status === 'cleared' || o.status === 'in-band'
-                                    ? { cls: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/40', icon: <CheckCircle2 className="w-3 h-3" />, label: o.status === 'in-band' ? 'IN-BAND' : 'CLEARED' }
+                                    ? { cls: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/40', icon: <CheckCircle2 className="w-3 h-3" />, label: o.status === 'in-band' ? 'IN-BAND' : 'CLEARED', tip: o.status === 'in-band' ? 'The metric already sits inside its acceptable band — no change needed.' : 'The solver found tunable settings that clear this objective.' }
                                     : o.status === 'proposal'
-                                        ? { cls: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/40', icon: <Wrench className="w-3 h-3" />, label: 'PROPOSAL' }
+                                        ? { cls: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/40', icon: <Wrench className="w-3 h-3" />, label: 'PROPOSAL', tip: 'A parameter change is proposed to meet this objective — preview it below, then Apply.' }
                                         : o.status === 'flag'
-                                            ? { cls: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/40', icon: <AlertTriangle className="w-3 h-3" />, label: 'FLAG' }
-                                            : { cls: 'bg-slate-500/10 text-slate-500 border-slate-500/40', icon: <Minus className="w-3 h-3" />, label: 'N/A' };
+                                            ? { cls: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/40', icon: <AlertTriangle className="w-3 h-3" />, label: 'FLAG', tip: 'This objective cannot be met inside the tunable band — an honest flag, nothing applied.' }
+                                            : { cls: 'bg-slate-500/10 text-slate-500 border-slate-500/40', icon: <Minus className="w-3 h-3" />, label: 'N/A', tip: 'Not applicable — this objective was not evaluated for the current configuration.' };
                                 const applied = o.proposal ? appliedKeys.includes(o.proposal.items[0]?.key ?? '') : false;
                                 return (
                                     <div key={i} className="rounded-lg border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-slate-900/40 p-2.5">
                                         <div className="flex items-center gap-2">
-                                            <span className={`inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[9px] font-bold ${chip.cls}`}>{chip.icon}{chip.label}</span>
+                                            <span className={`inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[9px] font-bold ${chip.cls}`}>{chip.icon}{chip.label}<Tooltip content={chip.tip} /></span>
                                             <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">{o.name}</span>
                                         </div>
                                         <p className="mt-1.5 text-[11px] leading-relaxed text-slate-600 dark:text-slate-400">{o.detail}</p>

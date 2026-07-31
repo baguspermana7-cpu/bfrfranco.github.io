@@ -15,6 +15,7 @@ import { rzModels, rzData } from '@/lib/rz-engine';
 import { generatePillarPDF, type PillarReport } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
 import { MapPin, Boxes, HardHat, CheckCircle2, Activity, FileDown } from 'lucide-react';
+import { Tooltip } from '@/components/ui/Tooltip';
 
 const REDUNDANCY_KEY: Record<string, string> = { 'N+1': 'n1', '2N': '2n', '2N+1': '2n1' };
 const useCfg = () => {
@@ -40,9 +41,45 @@ function Head({ icon: Icon, title, sub, tone = 'from-cyan-500 to-blue-600', repo
     );
 }
 function Card({ children }: { children: React.ReactNode }) { return <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">{children}</div>; }
-function Metric({ label, value, sub }: { label: string; value: string; sub?: string }) {
-    return <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 transition-colors hover:border-rz-info/50"><div className="text-[10px] uppercase tracking-wide text-slate-500">{label}</div><div className="text-xl font-bold text-slate-900 dark:text-white tabular-nums">{value}</div>{sub && <div className="text-[10px] text-slate-500">{sub}</div>}</div>;
+function Metric({ label, value, sub, tip }: { label: string; value: string; sub?: string; tip?: string }) {
+    return <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3 transition-colors hover:border-rz-info/50"><div className="text-[10px] uppercase tracking-wide text-slate-500 flex items-center gap-1">{label}{tip && <Tooltip content={tip} />}</div><div className="text-xl font-bold text-slate-900 dark:text-white tabular-nums">{value}</div>{sub && <div className="text-[10px] text-slate-500">{sub}</div>}</div>;
 }
+
+const SITE_FACTOR_TIPS: Record<string, string> = {
+    power: 'Grid power reliability of the country (uptime / outage exposure). Higher is better.',
+    grid: 'Grid strength & interconnection quality — capacity headroom and stability of the local network.',
+    seismic: 'Seismic safety — a lower earthquake-zone hazard scores higher (less structural risk/cost).',
+    talent: 'Availability of skilled data-centre operations and engineering talent in the market.',
+    tax: 'Tax & incentive attractiveness (corporate tax, DC incentives) for the location.',
+    carbon: 'Grid carbon intensity — cleaner electricity (lower gCO₂/kWh) scores higher.',
+    flood: 'Flood / climate hazard exposure of the site; lower risk scores higher.',
+    latency: 'Network latency & connectivity to major population and peering hubs.',
+    water: 'Water availability & stress for evaporative cooling; less water stress scores higher.',
+};
+
+const ASSET_CLASS_TIPS: Record<string, string> = {
+    battery: 'UPS battery strings — the highest wear-out rate; Li-ion/VRLA degrade with cycles and heat.',
+    ups: 'UPS power modules (rectifier/inverter/capacitors) — mid-life power-electronics wear.',
+    generator: 'Standby diesel/gas generators — mechanical wear driven by runtime and start cycles.',
+    crac: 'CRAC/CRAH cooling units — compressors, fans and coils wearing over duty hours.',
+    chiller: 'Chillers — compressor and refrigerant-circuit wear over operating hours.',
+    transformer: 'Power transformers — long-lived; insulation ages slowly with thermal load.',
+};
+
+const EQUIP_TIPS: Record<string, string> = {
+    switchgear: 'Number of medium/low-voltage switchgear line-ups to commission, scaled from IT load.',
+    transformers: 'Number of power transformers in scope, scaled from IT load and redundancy.',
+    generators: 'Number of standby generators, scaled from IT load and redundancy level.',
+    ups_modules: 'Number of UPS modules to commission, scaled from IT load and redundancy.',
+    cooling_units: 'Number of cooling units (CRAC/CRAH or CDU), scaled from the cooling type and heat load.',
+    chillers: 'Number of chillers in the cooling plant, scaled from heat load.',
+    pumps: 'Number of chilled-water / condenser-water pumps in scope.',
+    pdus: 'Number of Power Distribution Units feeding the racks.',
+    sts: 'Number of Static Transfer Switches for dual-corded loads.',
+    racks: 'Number of IT racks, scaled from IT load and rack density.',
+    fireZones: 'Number of fire-suppression zones to commission (~1 per 200 kW).',
+    ats: 'Number of Automatic Transfer Switches between utility and generator sources.',
+};
 function Loading() { return <div className="text-sm text-slate-500 p-8 text-center">Engine loading…</div>; }
 
 /* ── L2 Site Intelligence ── */
@@ -75,16 +112,16 @@ export function SiteIntelDashboard() {
                     note: `Factors derived from the ${country?.name || 'selected country'} reference profile (DATA.countries) — engine-real, country-varying.`,
                 })} />
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                <Metric label="Site Score" value={`${r.score}/100`} sub={`Grade ${r.grade} · ${r.label}`} />
-                <Metric label="Coverage" value={`${Math.round(r.coverage * 100)}%`} sub="factors supplied" />
-                <Metric label="Factors" value={String(r.breakdown.length)} sub="weighted" />
+                <Metric label="Site Score" value={`${r.score}/100`} sub={`Grade ${r.grade} · ${r.label}`} tip="Overall 0–100 site-suitability score, weighting all location factors from the selected country's reference profile. Higher = better data-centre location." />
+                <Metric label="Coverage" value={`${Math.round(r.coverage * 100)}%`} sub="factors supplied" tip="Share of the scoring factors that have real data supplied for this country. Lower coverage means the score rests on fewer inputs." />
+                <Metric label="Factors" value={String(r.breakdown.length)} sub="weighted" tip="Number of weighted location factors (power, grid, seismic, talent, tax, carbon, flood, latency, water) combined into the site score." />
             </div>
             <Card>
-                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Factor Breakdown</h2>
+                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1">Factor Breakdown<Tooltip content="Each location factor's 0–100 score and its weight (w). Bars are sorted by contribution to the overall site score." /></h2>
                 <div className="space-y-1.5">
                     {r.breakdown.sort((a: { contribution: number }, b: { contribution: number }) => b.contribution - a.contribution).map((f: { key: string; value: number; weight: number }) => (
                         <div key={f.key} className="flex items-center gap-2 text-xs">
-                            <span className="w-24 text-slate-600 dark:text-slate-300 capitalize">{f.key}</span>
+                            <span className="w-24 text-slate-600 dark:text-slate-300 capitalize flex items-center gap-1">{f.key}{SITE_FACTOR_TIPS[f.key] && <Tooltip content={SITE_FACTOR_TIPS[f.key]} />}</span>
                             <div className="flex-1 h-2 rounded bg-slate-100 dark:bg-slate-800"><div className="h-2 rounded bg-cyan-500" style={{ width: `${f.value * 100}%` }} /></div>
                             <span className="w-10 text-right tabular-nums text-slate-500">{Math.round(f.value * 100)}%</span>
                             <span className="w-10 text-right tabular-nums text-slate-400">w{Math.round(f.weight * 100)}</span>
@@ -147,7 +184,7 @@ export function CommissioningDashboard() {
         return (
             <div className="space-y-4">
                 <Head icon={CheckCircle2} title="Commissioning" sub="DC-OS Layer 7 · models.commissioning" tone="" />
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3"><Metric label="Cx Program Cost" value={pc ? cxMoney(pc.total) : '—'} sub={pc ? `${cxMoney(pc.perKw)}/kW` : ''} /></div>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3"><Metric label="Cx Program Cost" value={pc ? cxMoney(pc.total) : '—'} sub={pc ? `${cxMoney(pc.perKw)}/kW` : ''} tip="Total commissioning program cost (compact estimate), with the cost per kW of IT load." /></div>
                 <p className="text-[10px] text-slate-400">Rich Cx engine not present in this build — showing compact estimate.</p>
             </div>
         );
@@ -179,31 +216,31 @@ export function CommissioningDashboard() {
                 })} />
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <Metric label="Cx Program Cost" value={cxMoney(rich.grand)} sub={`${cxMoney(rich.perKw)}/kW · ${rich.pctCapex.toFixed(1)}% of capex`} />
-                <Metric label="Program Duration" value={`${rich.durationDays} d`} sub={`~${rich.durationMonths} mo · L0→L6`} />
-                <Metric label="Contingency (15%)" value={cxMoney(rich.contingency)} sub={`subtotal ${cxMoney(rich.subtotal)}`} />
-                <Metric label="Scope" value={`${(inputs.itLoad / 1000).toFixed(1)} MW`} sub={`${inputs.coolingType} · ${inputs.powerRedundancy} · ${tierLabel}`} />
+                <Metric label="Cx Program Cost" value={cxMoney(rich.grand)} sub={`${cxMoney(rich.perKw)}/kW · ${rich.pctCapex.toFixed(1)}% of capex`} tip="Total equipment-scaled commissioning program cost, shown per kW of IT load and as a percentage of total CAPEX." />
+                <Metric label="Program Duration" value={`${rich.durationDays} d`} sub={`~${rich.durationMonths} mo · L0→L6`} tip="Total commissioning duration in working days (≈ months), covering the staffed L0→L6 levels from factory tests through integrated systems tests." />
+                <Metric label="Contingency (15%)" value={cxMoney(rich.contingency)} sub={`subtotal ${cxMoney(rich.subtotal)}`} tip="Cost contingency (15% of the subtotal) added for scope uncertainty in the commissioning program." />
+                <Metric label="Scope" value={`${(inputs.itLoad / 1000).toFixed(1)} MW`} sub={`${inputs.coolingType} · ${inputs.powerRedundancy} · ${tierLabel}`} tip="The build being commissioned: IT load (MW), cooling type, power redundancy and tier — the drivers of Cx cost and duration." />
             </div>
 
             {mc && (
                 <Card>
-                    <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Cost Uncertainty <span className="text-[9px] text-slate-400">(Monte-Carlo · IT load ±7.5%, pricing ±5% · N=4000)</span></h2>
+                    <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1">Cost Uncertainty<Tooltip content="Monte-Carlo spread of the Cx program cost from randomising the key inputs (IT load ±7.5%, pricing ±5%) over 4000 trials — the P5–P95 range around the P50 median." /> <span className="text-[9px] text-slate-400">(Monte-Carlo · IT load ±7.5%, pricing ±5% · N=4000)</span></h2>
                     <div className="relative h-3 rounded-full bg-gradient-to-r from-[#00FF88] via-[#FFAA00] to-[#FF3030] mb-1">
                         <div className="absolute -top-1 w-0.5 h-5 bg-slate-900 dark:bg-white" style={{ left: `${p50pos}%` }} title={`P50 ${cxMoney(mc.p50)}`} />
                     </div>
                     <div className="flex justify-between text-[10px] text-slate-500 tabular-nums"><span>P5 {cxMoney(mc.p5)}</span><span>P50 {cxMoney(mc.p50)}</span><span>P95 {cxMoney(mc.p95)}</span></div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3">
-                        <Metric label="P50 (median)" value={cxMoney(mc.p50)} />
-                        <Metric label="P95" value={cxMoney(mc.p95)} sub="95th percentile" />
-                        <Metric label="CVaR 95%" value={cxMoney(mc.cvar95)} sub="expected tail" />
-                        <Metric label="Std Dev" value={cxMoney(mc.stdDev)} sub={`±${((mc.stdDev / mc.mean) * 100).toFixed(1)}% CoV`} />
+                        <Metric label="P50 (median)" value={cxMoney(mc.p50)} tip="Median (50th-percentile) commissioning cost — half the Monte-Carlo trials land below this value." />
+                        <Metric label="P95" value={cxMoney(mc.p95)} sub="95th percentile" tip="95th-percentile cost: only 5% of trials exceed it. A conservative budgeting figure." />
+                        <Metric label="CVaR 95%" value={cxMoney(mc.cvar95)} sub="expected tail" tip="Conditional Value-at-Risk at 95%: the average cost of the worst 5% of outcomes (expected tail loss)." />
+                        <Metric label="Std Dev" value={cxMoney(mc.stdDev)} sub={`±${((mc.stdDev / mc.mean) * 100).toFixed(1)}% CoV`} tip="Standard deviation of the cost distribution, with the coefficient of variation (spread relative to the mean)." />
                     </div>
                 </Card>
             )}
 
             <div className="grid md:grid-cols-2 gap-4">
                 <Card>
-                    <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Cx Program by Level (L0–L6)</h2>
+                    <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1">Cx Program by Level (L0–L6)<Tooltip content="Commissioning cost and duration split across the standard levels L0–L6 (factory acceptance → integrated systems tests). Each bar shows the level's share of the program." /></h2>
                     <div className="space-y-1.5">
                         {rich.levels.map((l) => (
                             <div key={l.id} className="flex items-center gap-2 text-xs">
@@ -216,7 +253,7 @@ export function CommissioningDashboard() {
                     </div>
                 </Card>
                 <Card>
-                    <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Cost by Discipline</h2>
+                    <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1">Cost by Discipline<Tooltip content="Commissioning cost broken down by engineering discipline (electrical, mechanical, controls, etc.). The longest bar is the biggest cost driver." /></h2>
                     <div className="space-y-1.5">
                         {rich.disciplines.map((d) => (
                             <div key={d.name} className="flex items-center gap-2 text-xs">
@@ -230,12 +267,12 @@ export function CommissioningDashboard() {
             </div>
 
             <Card>
-                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Equipment Scaled <span className="text-[9px] text-slate-400">(from IT load {(inputs.itLoad / 1000).toFixed(1)} MW · verification scope)</span></h2>
+                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1">Equipment Scaled<Tooltip content="Counts of major equipment the commissioning program must verify, auto-scaled from IT load, cooling type and redundancy — the physical scope behind the Cx cost." /> <span className="text-[9px] text-slate-400">(from IT load {(inputs.itLoad / 1000).toFixed(1)} MW · verification scope)</span></h2>
                 <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
                     {EQUIP_SHOWN.map(([k, l]) => (
                         <div key={k} className="rounded-lg border border-slate-200 dark:border-slate-800 p-2 text-center">
                             <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{rich.equip[k]}</div>
-                            <div className="text-[9px] uppercase tracking-wide text-slate-500">{l}</div>
+                            <div className="text-[9px] uppercase tracking-wide text-slate-500 flex items-center justify-center gap-1">{l}{EQUIP_TIPS[k] && <Tooltip content={EQUIP_TIPS[k]} />}</div>
                         </div>
                     ))}
                 </div>
@@ -243,7 +280,7 @@ export function CommissioningDashboard() {
 
             {sens && (
                 <Card>
-                    <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Sensitivity Tornado <span className="text-[9px] text-slate-400">(cost swing per parameter · low → high)</span></h2>
+                    <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1">Sensitivity Tornado<Tooltip content="How much the total Cx cost swings when each parameter moves from its low to high case (all else fixed). The longest bar is the most influential cost driver." /> <span className="text-[9px] text-slate-400">(cost swing per parameter · low → high)</span></h2>
                     <div className="space-y-1.5">
                         {sens.map((s) => (
                             <div key={s.name} className="flex items-center gap-2 text-xs">
@@ -300,13 +337,13 @@ export function AssetIntelDashboard() {
                     note: 'Screening health + lifecycle model — not a condition survey.',
                 })} />
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                <Metric label="Sample Health (UPS 3yr)" value={`${health.health}/100`} sub={health.status} />
-                <Metric label="Remaining Life" value={`${health.remainingYears} yr`} sub={`of ${health.designLifeYears}`} />
-                <Metric label="Tracked Assets" value={String(rows.length)} sub="15-yr horizon" />
+                <Metric label="Sample Health (UPS 3yr)" value={`${health.health}/100`} sub={health.status} tip="Example asset-health index (0–100) for a 3-year-old UPS at typical condition and duty. Falls as assets age toward end of life." />
+                <Metric label="Remaining Life" value={`${health.remainingYears} yr`} sub={`of ${health.designLifeYears}`} tip="Estimated remaining useful life for that sample asset, out of its design life, based on age, condition and duty." />
+                <Metric label="Tracked Assets" value={String(rows.length)} sub="15-yr horizon" tip="Number of asset classes modelled in the 15-year replacement schedule below." />
             </div>
             {m.failureProbability && (
                 <Card>
-                    <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">Wear-Out Failure Risk <span className="text-[9px] text-slate-400">(Weibull, at 60% of design life)</span></h2>
+                    <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1">Wear-Out Failure Risk<Tooltip content="Cumulative probability that each asset class has failed by 60% of its design life, from a Weibull wear-out model (β>1). Drives condition-based replacement timing." /> <span className="text-[9px] text-slate-400">(Weibull, at 60% of design life)</span></h2>
                     <div className="space-y-1.5">
                         {['battery', 'ups', 'generator', 'crac', 'chiller', 'transformer'].map((cls) => {
                             const life = m.designLife(cls) || 15;
@@ -316,7 +353,7 @@ export function AssetIntelDashboard() {
                             const col = pctv >= 40 ? 'bg-rose-500' : pctv >= 20 ? 'bg-amber-500' : 'bg-rz-data';
                             return (
                                 <div key={cls} className="flex items-center gap-2 text-xs">
-                                    <span className="w-24 capitalize text-slate-600 dark:text-slate-300">{cls}</span>
+                                    <span className="w-24 capitalize text-slate-600 dark:text-slate-300 flex items-center gap-1">{cls}{ASSET_CLASS_TIPS[cls] && <Tooltip content={ASSET_CLASS_TIPS[cls]} />}</span>
                                     <span className="w-14 text-[10px] text-slate-400 tabular-nums">age {age}yr</span>
                                     <div className="flex-1 h-2 rounded bg-slate-100 dark:bg-slate-800"><div className={`h-2 rounded ${col}`} style={{ width: `${Math.min(100, pctv)}%` }} /></div>
                                     <span className="w-16 text-right tabular-nums text-slate-500">{pctv}% CDF</span>
@@ -328,9 +365,9 @@ export function AssetIntelDashboard() {
                 </Card>
             )}
             <Card>
-                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2">15-Year Replacement Schedule</h2>
+                <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-1">15-Year Replacement Schedule<Tooltip content="Planned asset refresh over a 15-year horizon: how often each asset is replaced, how many replacement events fall in the window, and the nominal (inflated) spend." /></h2>
                 <table className="w-full text-xs">
-                    <thead><tr className="text-[10px] uppercase text-slate-400 border-b border-slate-200 dark:border-slate-800"><th className="text-left py-1">Asset</th><th className="text-right">Interval</th><th className="text-right">Events</th><th className="text-right">Nominal $</th></tr></thead>
+                    <thead><tr className="text-[10px] uppercase text-slate-400 border-b border-slate-200 dark:border-slate-800"><th className="text-left py-1">Asset</th><th className="text-right"><span className="inline-flex items-center gap-1">Interval<Tooltip content="Replacement interval — the useful life in years after which the asset is refreshed." /></span></th><th className="text-right"><span className="inline-flex items-center gap-1">Events<Tooltip content="Number of replacement events for this asset within the 15-year horizon." /></span></th><th className="text-right"><span className="inline-flex items-center gap-1">Nominal $<Tooltip content="Total nominal (inflation-adjusted) replacement spend for this asset over the 15-year horizon, in USD millions." /></span></th></tr></thead>
                     <tbody>
                         {rows.map((r: { component: string; label: string; intervalYears: number; events: number; totalNominalUsd: number }) => (
                             <tr key={r.component} className="border-b border-slate-100 dark:border-slate-800/50">

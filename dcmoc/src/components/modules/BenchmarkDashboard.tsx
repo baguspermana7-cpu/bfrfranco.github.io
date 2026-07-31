@@ -81,6 +81,16 @@ const TOOLTIP_TEXTS = {
     // Strengths & Gaps tab
     strengthsHeading: 'Metrics where your configuration excels relative to industry peers. Sorted by percentile rank (best first).',
     gapsHeading: 'Metrics with the largest gap between your performance and industry best-in-class. Each includes an actionable recommendation.',
+
+    // Corpus distributions + Model Calibration sections
+    corpusDistributions: 'Where your project sits within the multi-source public corpus (real announced/surveyed data centers). The bar shows the p10–p90 distribution per metric and segment; your project marker is interpolated to a percentile.',
+    modelCalibration: 'Validates the engine’s constants (PUE, CAPEX/MW, water) against the live public corpus using the same spec as the ship gate. “Drift” flags a constant outside the corpus band — reported, never silently loosened.',
+    calibEngineConstant: 'The engine constant being validated, its current value, and its documented source.',
+    calibCorpus: 'The corpus reference band (percentile range) the engine constant is compared against.',
+    calibPosition: 'Where the engine constant falls within the corpus band, or the ratio between engine and corpus values.',
+    calibVerdict: 'Result of the comparison: in-band (agrees with the corpus), drift (outside the band), or indicative (small-sample, directional only).',
+    calibLimitation: 'Known limits of this calibration — e.g. aggregate-only validation, small sample size, or missing per-project pairing.',
+    notCalibratable: 'Metrics that cannot be calibrated against the corpus, with the reason why (e.g. no comparable public data or no honest denominator).',
 } as const;
 
 // Map benchmark category IDs to tooltip keys
@@ -442,6 +452,7 @@ export default function BenchmarkDashboard() {
                 <div className="rounded border border-emerald-500/30 bg-white dark:bg-slate-900/50 p-4">
                     <div className="mb-2 flex items-center gap-2">
                         <h3 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">Corpus Distributions — Project Position vs Multi-Source Public Corpus</h3>
+                        <InfoTooltip content={TOOLTIP_TEXTS.corpusDistributions} />
                         <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-medium uppercase text-emerald-500">live corpus</span>
                     </div>
                     <div className="space-y-4">
@@ -517,6 +528,7 @@ export default function BenchmarkDashboard() {
                                 ))}
                             </span>
                         </button>
+                        <InfoTooltip content={TOOLTIP_TEXTS.modelCalibration} />
                         {/* Diagnostics Tier-1: drift is no longer tooltip-only — a
                           * visible chip opens the per-mapping correction panel. */}
                         {driftRows.length > 0 && (
@@ -540,11 +552,11 @@ export default function BenchmarkDashboard() {
                                 <table className="w-full text-[10px]">
                                     <thead>
                                         <tr className="border-b border-slate-200 dark:border-slate-700 text-left text-[9px] uppercase tracking-wide text-slate-400">
-                                            <th className="py-1.5 pr-3 font-medium">Engine constant</th>
-                                            <th className="py-1.5 pr-3 font-medium">Corpus</th>
-                                            <th className="py-1.5 pr-3 font-medium">Position / ratio</th>
-                                            <th className="py-1.5 pr-3 font-medium">Verdict</th>
-                                            <th className="py-1.5 font-medium">Limitation</th>
+                                            <th className="py-1.5 pr-3 font-medium"><span className="flex items-center gap-1">Engine constant <InfoTooltip content={TOOLTIP_TEXTS.calibEngineConstant} /></span></th>
+                                            <th className="py-1.5 pr-3 font-medium"><span className="flex items-center gap-1">Corpus <InfoTooltip content={TOOLTIP_TEXTS.calibCorpus} /></span></th>
+                                            <th className="py-1.5 pr-3 font-medium"><span className="flex items-center gap-1">Position / ratio <InfoTooltip content={TOOLTIP_TEXTS.calibPosition} /></span></th>
+                                            <th className="py-1.5 pr-3 font-medium"><span className="flex items-center gap-1">Verdict <InfoTooltip content={TOOLTIP_TEXTS.calibVerdict} /></span></th>
+                                            <th className="py-1.5 font-medium"><span className="flex items-center gap-1">Limitation <InfoTooltip content={TOOLTIP_TEXTS.calibLimitation} /></span></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -628,7 +640,7 @@ export default function BenchmarkDashboard() {
                             </div>
                             {calib.notMappable.length > 0 && (
                                 <div className="rounded-lg border border-slate-200 bg-slate-50 p-2.5 dark:border-slate-700 dark:bg-slate-800/40">
-                                    <div className="text-[9px] font-semibold uppercase tracking-wide text-slate-500">Not calibratable &amp; why</div>
+                                    <div className="flex items-center gap-1 text-[9px] font-semibold uppercase tracking-wide text-slate-500">Not calibratable &amp; why <InfoTooltip content={TOOLTIP_TEXTS.notCalibratable} /></div>
                                     <ul className="mt-1 space-y-0.5 text-[10px] text-slate-500">
                                         {calib.notMappable.map((nm) => (
                                             <li key={nm.metric}><b className="text-slate-600 dark:text-slate-300">{nm.metric}</b> — {nm.reason}</li>

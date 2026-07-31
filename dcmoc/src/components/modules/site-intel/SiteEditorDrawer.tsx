@@ -195,17 +195,17 @@ export function SiteEditorDrawer({ open, onClose }: { open: boolean; onClose: ()
 
                 <div className="mb-3 grid grid-cols-2 gap-2">
                     <label className="block">
-                        <span className="text-[10px] font-semibold uppercase text-slate-500">Name</span>
+                        <span className="text-[10px] font-semibold uppercase text-slate-500 inline-flex items-center gap-0.5">Name <Tooltip content="Display name for this candidate site (free text) — shown across the comparison table, map and site cards." /></span>
                         <input className="mt-0.5 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs outline-none focus:border-rz-mint text-slate-900 dark:text-slate-100"
                             value={site.name} onChange={(e) => updateSite(site.id, { name: e.target.value })} />
                     </label>
                     <label className="block">
-                        <span className="text-[10px] font-semibold uppercase text-slate-500">Country</span>
+                        <span className="text-[10px] font-semibold uppercase text-slate-500 inline-flex items-center gap-0.5">Country <Tooltip content="Country the site sits in — sets the per-country baselines (power price, grid reliability, tax, natural hazards) used to pre-fill any attribute you leave unset." /></span>
                         <CountrySelect className="mt-0.5" value={site.countryId} onChange={(v) => updateSite(site.id, { countryId: v })} />
                     </label>
                 </div>
 
-                <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-rz-mint">Numeric attributes (preset or custom — clears to country baseline)</h3>
+                <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-rz-mint inline-flex items-center gap-0.5">Numeric attributes (preset or custom — clears to country baseline) <Tooltip content="Quantitative site criteria (power capacity, costs, distances, climate). Pick a preset or type a custom value; clearing a field reverts it to the country baseline the score engine uses." /></h3>
                 <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
                     {NUM_FIELDS.map((f) => {
                         const b = ATTR_BOUNDS[f.key]!;
@@ -222,7 +222,7 @@ export function SiteEditorDrawer({ open, onClose }: { open: boolean; onClose: ()
                     })}
                 </div>
 
-                <h3 className="mb-1 mt-3 text-[10px] font-semibold uppercase tracking-wide text-rz-mint">Categorical attributes</h3>
+                <h3 className="mb-1 mt-3 text-[10px] font-semibold uppercase tracking-wide text-rz-mint inline-flex items-center gap-0.5">Categorical attributes <Tooltip content="Ranked qualitative criteria (risk levels, quality grades, terrain). Leave blank to use the country baseline; each choice maps to a score band in the engine." /></h3>
                 <div className="grid grid-cols-2 gap-x-2 gap-y-1.5">
                     {ENUM_FIELDS.map((f) => (
                         <label key={String(f.key)} className={`block${hl(String(f.key))}`}>
@@ -237,7 +237,7 @@ export function SiteEditorDrawer({ open, onClose }: { open: boolean; onClose: ()
                     ))}
                 </div>
 
-                <h3 className="mb-1 mt-3 text-[10px] font-semibold uppercase tracking-wide text-rz-mint">Text attributes</h3>
+                <h3 className="mb-1 mt-3 text-[10px] font-semibold uppercase tracking-wide text-rz-mint inline-flex items-center gap-0.5">Text attributes <Tooltip content="Free-text descriptors (utility name, water source, incentives) — documentation only; they don't feed the numeric site score." /></h3>
                 <div className="grid grid-cols-1 gap-1.5">
                     {TEXT_FIELDS.map((f) => (
                         <label key={String(f.key)} className="block">

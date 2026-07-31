@@ -13,6 +13,21 @@ release sections rather than semver.
 
 ---
 
+## v1.120.5 — 2026-07-31 (DCMOC parameter-tooltip coverage — wave 2, +12 dashboards)
+
+Wave 2 of the every-parameter-explained program — **12 more dashboards, ~267 new
+explanation tooltips** (accurate per-value engineering/finance meaning + unit, matching
+the existing `<Tooltip content>` style; no value/logic changed):
+Platform Data-Library (all catalog tables), Report (KPIs + TCO/CAPEX/shift/risk tables),
+Design Tools (tier/fire/CDU/water/deep-sea/spares), Executive (headers + solver chips),
+NewEngine (site-score/commissioning/asset factors), Site Editor + Site Intelligence,
+Construction (schedule/procurement), Settings, Benchmark, Scenarios, Projects.
+
+Cumulative across waves 1–2: ~19 dashboards covered. Remaining dashboards
+(Portfolio/Grid/Tax/Risk/Talent/Sustainability/Capacity/Results/Energy/Strategic and the
+smaller panels — several already partially covered) follow in wave 3 until a coverage gate
+reports zero parameter-tooltip gaps.
+
 ## v1.120.4 — 2026-07-31 (DCMOC parameter-tooltip coverage — wave 1)
 
 Owner: "saya mau semua parameter ada tooltip penjelasan parameter apa itu" (every
