@@ -1,0 +1,4595 @@
+{
+ "generated": "2026-07-31",
+ "count": 113,
+ "withPostmortem": 60,
+ "incidents": [
+  {
+   "slug": "aws-us-east-1-dynamodb-dns-2025",
+   "title": "AWS us-east-1 DynamoDB DNS race condition cascades across the internet",
+   "operator": "Amazon Web Services",
+   "dcName": "US-EAST-1 (Northern Virginia)",
+   "location": {
+    "city": "Ashburn",
+    "country": "United States",
+    "region": "AMER",
+    "az": "us-east-1"
+   },
+   "date": "2025-10-20",
+   "category": [
+    "software",
+    "network"
+   ],
+   "brief": "A latent race condition in DynamoDB's automated DNS management left two Enactor processes racing; a stale plan overwrote a newer one and cleanup automation wiped all DynamoDB DNS records in us-east-1, breaking endpoint resolution. Cascading failures across dependent AWS services lasted ~15 hours and Downdetector logged 6.5M+ reports across 1,000+ services (Fortnite, Snapchat, Coinbase, Ring, etc.).",
+   "magnitude": {
+    "usersScore": 10,
+    "financialScore": 9,
+    "durationScore": 7,
+    "blastRadiusScore": 10
+   },
+   "magnitudeScore": 9.2,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "Summary of the Amazon DynamoDB Service Disruption in the US-East-1 Region (AWS message 101925)",
+     "url": "https://aws.amazon.com/message/101925",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "ThousandEyes: AWS Outage Analysis October 20, 2025",
+     "url": "https://www.thousandeyes.com/blog/aws-outage-analysis-october-20-2025",
+     "type": "news"
+    },
+    {
+     "title": "AWS Post-Event Summary of the Amazon DynamoDB Service Disruption",
+     "url": "https://aws.amazon.com/message/101925/",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "InfoQ: AWS DynamoDB outage postmortem",
+     "url": "https://www.infoq.com/news/2025/11/aws-dynamodb-outage-postmortem",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed; AWS message/101925 official post-event summary. Massive cross-internet blast radius. officialPostmortem=true."
+  },
+  {
+   "slug": "crowdstrike-falcon-global-outage-2024",
+   "title": "CrowdStrike Falcon faulty update triggers global Windows BSOD outage",
+   "operator": "CrowdStrike (impacting Microsoft Windows/Azure hosts)",
+   "dcName": "Global Windows fleet / all cloud + on-prem regions",
+   "location": {
+    "country": "Global",
+    "region": "AMER"
+   },
+   "date": "2024-07-19",
+   "category": [
+    "software",
+    "human"
+   ],
+   "brief": "A CrowdStrike Falcon 'Rapid Response' Channel File 291 update contained a field-count mismatch (sensor expected 20 fields, got 21) causing an out-of-bounds read and BSOD on ~8.5 million Windows machines worldwide. No staged rollout and a content-validator bug turned it into the largest IT outage in history, grounding airlines, banks, hospitals and 911 systems.",
+   "magnitude": {
+    "usersScore": 10,
+    "financialScore": 10,
+    "durationScore": 6,
+    "blastRadiusScore": 10
+   },
+   "magnitudeScore": 9.2,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "CrowdStrike External Technical Root Cause Analysis / Preliminary PIR",
+     "url": "https://www.crowdstrike.com/falcon-content-update-remediation-and-guidance-hub/",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "CISA: Widespread IT Outage Due to CrowdStrike Update",
+     "url": "https://www.cisa.gov/news-events/alerts/2024/07/19/widespread-it-outage-due-crowdstrike-update",
+     "type": "regulatory"
+    },
+    {
+     "title": "2024 CrowdStrike-related IT outages (Wikipedia)",
+     "url": "https://en.wikipedia.org/wiki/2024_CrowdStrike-related_IT_outages",
+     "type": "other"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed; CrowdStrike published RCA/PIR. Caveat: this is an endpoint/software supply-chain outage, not a physical data-center facility incident, but kept for its unmatched blast radius."
+  },
+  {
+   "slug": "kakao-sk-cc-pangyo-fire-2022",
+   "title": "SK C&C Pangyo data center fire triggers national Kakao/Naver outage",
+   "operator": "SK C&C (tenants Kakao, Naver)",
+   "dcName": "SK C&C Pangyo Data Center",
+   "location": {
+    "city": "Seongnam (Pangyo)",
+    "country": "South Korea",
+    "region": "APAC"
+   },
+   "date": "2022-10-15",
+   "category": [
+    "fire",
+    "power"
+   ],
+   "brief": "A lithium-ion battery (UPS) in the third basement level caught fire, forcing a power shutdown that knocked out KakaoTalk and many Naver/Kakao services nationwide for over 10 hours. The event prompted South Korea's 'Kakao Outage Prevention Act' mandating geographic redundancy.",
+   "magnitude": {
+    "usersScore": 10,
+    "financialScore": 7,
+    "durationScore": 8,
+    "blastRadiusScore": 9
+   },
+   "magnitudeScore": 8.65,
+   "officialPostmortem": false,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "SK's Li-ion batteries blamed for data center fire behind Kakao outage — DCD",
+     "url": "https://www.datacenterdynamics.com/en/news/sks-li-ion-batteries-blamed-for-data-center-fire-behind-kakao-outage/",
+     "type": "news"
+    },
+    {
+     "title": "All stakeholders blamed for Kakao server shutdown - Korea Herald",
+     "url": "https://www.koreaherald.com/article/3015077",
+     "type": "news"
+    },
+    {
+     "title": "Fire at data center causes unprecedented massive service disruption - Korea Times",
+     "url": "https://www.koreatimes.co.kr/southkorea/society/20221016/fire-at-data-center-causes-unprecedented-massive-service-disruption",
+     "type": "news"
+    },
+    {
+     "title": "Datacenter fire takes out South Korea's top two web giants — The Register",
+     "url": "https://www.theregister.com/2022/10/17/sk_cc_naver_kaako_fire/",
+     "type": "news"
+    },
+    {
+     "title": "Kakao co-chief executive quits after outage — BBC",
+     "url": "https://feeds.bbci.co.uk/news/business-63310254",
+     "type": "news"
+    }
+   ],
+   "verifyNote": "Confirmed: Oct 15 2022 Li-ion UPS fire at SK C&C Pangyo, >10h nationwide Kakao/Naver outage, led to the 'Kakao Outage Prevention Act'. Cause established via government/fire investigation; no single operator RCA — officialPostmortem false. Highest user-impact in Korea's history."
+  },
+  {
+   "slug": "cloudflare-bot-management-feature-file-2025",
+   "title": "Cloudflare global outage from oversized Bot Management feature file",
+   "operator": "Cloudflare",
+   "dcName": "Global edge network",
+   "location": {
+    "country": "Global",
+    "region": "AMER"
+   },
+   "date": "2025-11-18",
+   "category": [
+    "software"
+   ],
+   "brief": "A ClickHouse permissions change caused a Bot Management 'feature file' to double in size with duplicate rows; when propagated network-wide it exceeded a hard limit in the proxy, causing core traffic to 5xx. The outage ran ~11:20–17:06 UTC and disrupted X, ChatGPT, Spotify, Canva and League of Legends; Cloudflare initially suspected a DDoS before identifying the file.",
+   "magnitude": {
+    "usersScore": 9,
+    "financialScore": 8,
+    "durationScore": 6,
+    "blastRadiusScore": 10
+   },
+   "magnitudeScore": 8.55,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "Cloudflare outage on November 18, 2025",
+     "url": "https://blog.cloudflare.com/18-november-2025-outage/",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "ThousandEyes: Cloudflare Outage Analysis November 18, 2025",
+     "url": "https://www.thousandeyes.com/blog/cloudflare-outage-analysis-november-18-2025",
+     "type": "news"
+    },
+    {
+     "title": "The Cloudflare Outage May Be a Security Roadmap — Krebs on Security",
+     "url": "https://krebsonsecurity.com/2025/11/the-cloudflare-outage-may-be-a-security-roadmap/",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed; detailed Cloudflare postmortem on oversized Bot Management feature file. officialPostmortem=true."
+  },
+  {
+   "slug": "ovhcloud-sbg2-fire-2021",
+   "title": "OVHcloud Strasbourg SBG2 data center destroyed by fire",
+   "operator": "OVHcloud",
+   "dcName": "SBG2 (Strasbourg campus, SBG1 also damaged)",
+   "location": {
+    "city": "Strasbourg",
+    "country": "France",
+    "region": "EMEA"
+   },
+   "date": "2021-03-10",
+   "category": [
+    "fire",
+    "power"
+   ],
+   "brief": "A fire that began in a UPS/battery power room at 00:47 gutted the SBG2 facility and damaged SBG1, destroying about 30,000 servers and taking roughly 3.6 million websites offline. French investigators (BEA-RI) and the fire service found multiple design factors accelerated the spread.",
+   "magnitude": {
+    "usersScore": 8,
+    "financialScore": 8,
+    "durationScore": 9,
+    "blastRadiusScore": 8
+   },
+   "magnitudeScore": 8.2,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "BEA-RI / French government technical report on the OVH Strasbourg fire (PDF)",
+     "url": "https://regmedia.co.uk/2022/06/10/ovh_report.pdf",
+     "type": "regulatory"
+    },
+    {
+     "title": "Learning from the OVHcloud data center fire - Uptime Institute",
+     "url": "https://journal.uptimeinstitute.com/learning-from-the-ovhcloud-data-center-fire/",
+     "type": "other"
+    },
+    {
+     "title": "The OVHcloud fire still smolders - DCD",
+     "url": "https://www.datacenterdynamics.com/en/analysis/ovhcloud-fire-france-data-center/",
+     "type": "news"
+    }
+   ],
+   "verifyNote": "Confirmed: Mar 10 2021 SBG2 fire (originated in a UPS room), SBG1 damage, ~3.6M sites; official French BEA-RI regulatory investigation report. Landmark DC-fire case — high magnitude justified."
+  },
+  {
+   "slug": "gcp-global-service-control-2025",
+   "title": "Google Cloud global Service Control / IAM outage (Jun 12 2025)",
+   "operator": "Google Cloud",
+   "dcName": "Google Cloud — global (Service Control / Chemist quota)",
+   "location": {
+    "city": "",
+    "country": "USA",
+    "region": "AMER",
+    "az": "global"
+   },
+   "date": "2025-06-12",
+   "category": [
+    "software"
+   ],
+   "brief": "A malformed/blank policy record hit an unflagged new code path in the Service Control quota system, triggering a null-pointer crash that looped globally and stopped IAM from issuing tokens, so most Google Cloud APIs failed worldwide. The outage lasted several hours and cascaded into Cloudflare, Spotify, Discord and others that depend on GCP.",
+   "magnitude": {
+    "usersScore": 9,
+    "financialScore": 7,
+    "durationScore": 6,
+    "blastRadiusScore": 9
+   },
+   "magnitudeScore": 8,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Google Cloud Service Health incident report — June 2025",
+     "url": "https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "Google Cloud Outage Analysis: June 12, 2025 (ThousandEyes)",
+     "url": "https://www.thousandeyes.com/blog/google-cloud-outage-analysis-june-12-2025",
+     "type": "vendor-status"
+    }
+   ],
+   "verifyNote": "Confirmed: Jun 12 2025 Service Control null-pointer crash → global IAM/API failure, cascaded to Cloudflare Workers KV; Google published detailed incident report. Metadata accurate."
+  },
+  {
+   "slug": "gcp-global-service-control-outage-2025",
+   "title": "Google Cloud global outage from Service Control null-pointer crash",
+   "operator": "Google Cloud Platform",
+   "dcName": "Global (all regions, worst in us-central1)",
+   "location": {
+    "country": "Global",
+    "region": "AMER",
+    "az": "us-central1"
+   },
+   "date": "2025-06-12",
+   "category": [
+    "software"
+   ],
+   "brief": "A quota-policy update containing blank fields hit an untested, unguarded code path in Service Control (Google's API quota/management layer), causing a null-pointer crash and a crash-loop in every region. Core APIs failed globally for ~2.5 hours (near-100% failure in us-central1 for 2h35m), taking down Gmail, Cloud Storage, BigQuery, Spotify, Discord and Cloudflare Workers KV downstream.",
+   "magnitude": {
+    "usersScore": 9,
+    "financialScore": 8,
+    "durationScore": 5,
+    "blastRadiusScore": 9
+   },
+   "magnitudeScore": 8,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "Google Cloud Service Health incident report N3Dw7nbJ7rk7qwrtwh7X",
+     "url": "https://status.cloud.google.com/incidents/N3Dw7nbJ7rk7qwrtwh7X",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "ThousandEyes: Google Cloud Outage Analysis June 12, 2025",
+     "url": "https://www.thousandeyes.com/blog/google-cloud-outage-analysis-june-12-2025",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed; Google published incident report on the Service Control null-pointer crash. Root of the June 12 2025 cascade (see cloudflare-workers-kv entry). officialPostmortem=true."
+  },
+  {
+   "slug": "facebook-meta-bgp-dns-2021",
+   "title": "Facebook/Meta global BGP+DNS outage",
+   "operator": "Meta (Facebook)",
+   "dcName": "Global backbone / DNS",
+   "location": {
+    "city": "Menlo Park",
+    "country": "USA",
+    "region": "AMER",
+    "az": "California"
+   },
+   "date": "2021-10-04",
+   "category": [
+    "network",
+    "human"
+   ],
+   "brief": "A faulty backbone maintenance command withdrew the BGP routes to Facebook's authoritative DNS servers, taking Facebook, Instagram, WhatsApp and Messenger fully offline worldwide for ~6 hours and disabling internal tools and badge access.",
+   "magnitude": {
+    "usersScore": 10,
+    "financialScore": 8,
+    "durationScore": 5,
+    "blastRadiusScore": 8
+   },
+   "magnitudeScore": 7.9,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Update about the October 4th outage — Engineering at Meta",
+     "url": "https://engineering.fb.com/2021/10/04/networking-traffic/outage/",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "More details about the October 4 outage — Engineering at Meta",
+     "url": "https://engineering.fb.com/2021/10/05/networking-traffic/outage-details/",
+     "type": "official-postmortem"
+    }
+   ],
+   "verifyNote": "Confirmed: Oct 4 2021 Meta backbone maintenance withdrew DNS BGP routes, ~6h global; two official Meta engineering postmortems. Massive user reach — scores fit."
+  },
+  {
+   "slug": "nirs-daejeon-battery-fire-2025",
+   "title": "South Korea NIRS Daejeon government data center battery fire",
+   "operator": "National Information Resources Service (NIRS)",
+   "dcName": "NIRS Daejeon government data center",
+   "location": {
+    "city": "Daejeon",
+    "country": "South Korea",
+    "region": "APAC"
+   },
+   "date": "2025-09-26",
+   "category": [
+    "fire",
+    "power"
+   ],
+   "brief": "During relocation of aging lithium-ion (NMC) UPS batteries, a pack entered thermal runaway and ignited, taking 647 government systems offline. Digital IDs, postal banking, emergency GPS tracking, courts and tax systems were paralyzed; officials were booked and police raided NIRS.",
+   "magnitude": {
+    "usersScore": 9,
+    "financialScore": 6,
+    "durationScore": 8,
+    "blastRadiusScore": 8
+   },
+   "magnitudeScore": 7.85,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "South Korea data center fire 'paralyzes' vital services - CNN",
+     "url": "https://www.cnn.com/2025/09/27/asia/south-korea-fire-data-center-daejeon-intl-hnk",
+     "type": "news"
+    },
+    {
+     "title": "Second data center in a week catches fire in Daejeon - DCD",
+     "url": "https://www.datacenterdynamics.com/en/news/second-data-center-in-a-week-catches-fire-in-daejeon-south-korea/",
+     "type": "news"
+    },
+    {
+     "title": "Police raid NIRS offices over Daejeon data center fire - Korea Herald",
+     "url": "https://www.koreaherald.com/article/10588621",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Well-covered Li-ion UPS battery fire during battery relocation; massive government-service blast radius (647 systems). Govt investigation ongoing, no operator RCA; officialPostmortem=false."
+  },
+  {
+   "slug": "dyn-mirai-ddos-2016",
+   "title": "Dyn managed DNS Mirai botnet DDoS",
+   "operator": "Dyn",
+   "dcName": "Managed DNS platform",
+   "location": {
+    "city": "Manchester",
+    "country": "USA",
+    "region": "AMER",
+    "az": "New Hampshire"
+   },
+   "date": "2016-10-21",
+   "category": [
+    "network",
+    "software"
+   ],
+   "brief": "Three waves of a Mirai IoT botnet DDoS against Dyn's managed DNS disrupted Twitter, Reddit, Spotify, Netflix, GitHub, PayPal and many others across the US and Europe for much of the day.",
+   "magnitude": {
+    "usersScore": 9,
+    "financialScore": 6,
+    "durationScore": 6,
+    "blastRadiusScore": 9
+   },
+   "magnitudeScore": 7.8,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Dyn Analysis Summary Of Friday October 21 Attack",
+     "url": "https://web.archive.org/web/20161026000000*/dyn.com/blog/dyn-analysis-summary-of-friday-october-21-attack/",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "DDoS attack on Dyn (2016)",
+     "url": "https://en.wikipedia.org/wiki/DDoS_attacks_on_Dyn",
+     "type": "other"
+    }
+   ],
+   "verifyNote": "Confirmed: Oct 21 2016 Mirai DDoS on Dyn managed DNS; Dyn published an analysis. CORRECTION: operator changed 'Dyn (Oracle)' → 'Dyn' — Oracle's acquisition of Dyn closed later (announced Nov 2016), after the attack."
+  },
+  {
+   "slug": "aws-s3-us-east-1-2017",
+   "title": "AWS S3 'typo' service disruption in US-East-1",
+   "operator": "Amazon Web Services",
+   "dcName": "US-EAST-1 (Northern Virginia)",
+   "location": {
+    "city": "Ashburn",
+    "country": "USA",
+    "region": "AMER",
+    "az": "us-east-1"
+   },
+   "date": "2017-02-28",
+   "category": [
+    "human",
+    "software"
+   ],
+   "brief": "An authorized engineer running an established debugging playbook mistyped a command and removed far more S3 index/placement servers than intended, forcing a full restart of those subsystems. S3 was unavailable ~4 hours and took down a large share of the web plus dependent AWS services (EC2 launches, Lambda, console) — even AWS's own status dashboard, which relied on S3.",
+   "magnitude": {
+    "usersScore": 8,
+    "financialScore": 7,
+    "durationScore": 5,
+    "blastRadiusScore": 9
+   },
+   "magnitudeScore": 7.55,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Summary of the Amazon S3 Service Disruption in the Northern Virginia (US-EAST-1) Region",
+     "url": "https://aws.amazon.com/message/41926",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "AWS S3 Outage Likely Caused by Internal Network Issue (ThousandEyes)",
+     "url": "https://www.thousandeyes.com/blog/aws-s3-outage-likely-caused-by-internal-network-issue",
+     "type": "vendor-status"
+    }
+   ],
+   "verifyNote": "Confirmed: the famous Feb 28 2017 S3 command-typo outage; official AWS postmortem. High blast radius warranted. Metadata accurate."
+  },
+  {
+   "slug": "aws-us-east-1-network-outage-2021",
+   "title": "AWS Dec 7 2021 outage — us-east-1 internal network congestion",
+   "operator": "Amazon Web Services",
+   "dcName": "AWS us-east-1 (Northern Virginia)",
+   "location": {
+    "city": "Ashburn",
+    "country": "USA",
+    "region": "AMER",
+    "az": "us-east-1"
+   },
+   "date": "2021-12-07",
+   "category": [
+    "network"
+   ],
+   "brief": "An automated scaling operation on an internal backbone service triggered unexpected client behavior that congested AWS's internal network (a self-inflicted DDoS), impairing EC2 control-plane APIs, Route 53, STS and the console for ~7 hours. Netflix, Disney+, Robinhood, Ring and thousands of others were degraded.",
+   "magnitude": {
+    "usersScore": 9,
+    "financialScore": 7,
+    "durationScore": 5,
+    "blastRadiusScore": 8
+   },
+   "magnitudeScore": 7.45,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "Summary of the AWS Service Event in the Northern Virginia (US-EAST-1) Region (Dec 7 2021)",
+     "url": "https://aws.amazon.com/message/12721",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "AWS Outage Analysis: December 7 & 10, 2021 — ThousandEyes",
+     "url": "https://www.thousandeyes.com/blog/aws-outage-analysis-dec-7-2021",
+     "type": "news"
+    },
+    {
+     "title": "Why and how Amazon Web Services' US-East-1 went down (The Register)",
+     "url": "https://www.theregister.com/2021/12/13/aws_postmortem/",
+     "type": "news"
+    },
+    {
+     "title": "AWS Outage Analysis: December 15, 2021 (ThousandEyes)",
+     "url": "https://www.thousandeyes.com/blog/aws-outage-analysis-december-15-2021",
+     "type": "vendor-status"
+    },
+    {
+     "title": "What Can We Learn from AWS's December Outagepalooza? (Catchpoint)",
+     "url": "https://www.catchpoint.com/blog/what-can-we-learn-from-aws-december-outage",
+     "type": "other"
+    },
+    {
+     "title": "Data center power loss brings down AWS services, in another East Coast cloud outage (DCD)",
+     "url": "https://www.datacenterdynamics.com/en/news/aws-has-another-east-coast-cloud-outage/",
+     "type": "news"
+    },
+    {
+     "title": "All US-EAST-1 AWS Outages (community timeline gist)",
+     "url": "https://gist.github.com/Aaronontheweb/07109563196074a8abb56e0bb1987289",
+     "type": "other"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed internal-network congestion; AWS message/12721 official RCA. officialPostmortem=true."
+  },
+  {
+   "slug": "azure-front-door-config-change-2025",
+   "title": "Azure Front Door inadvertent config change causes global outage",
+   "operator": "Microsoft Azure",
+   "dcName": "Azure Front Door global fleet",
+   "location": {
+    "country": "Global",
+    "region": "AMER"
+   },
+   "date": "2025-10-29",
+   "category": [
+    "software",
+    "human"
+   ],
+   "brief": "An inadvertent Azure Front Door configuration change, not blocked because a protection mechanism failed due to a software bug, propagated an inconsistent config so AFD nodes failed to load. Azure, Microsoft 365, Xbox, Outlook, Copilot and Minecraft plus many customer sites were degraded for hours; 30,000+ reports in the first hour.",
+   "magnitude": {
+    "usersScore": 8,
+    "financialScore": 7,
+    "durationScore": 5,
+    "blastRadiusScore": 8
+   },
+   "magnitudeScore": 7.2,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "ThousandEyes: Microsoft Azure Front Door Outage Analysis Oct 29, 2025",
+     "url": "https://www.thousandeyes.com/blog/microsoft-azure-front-door-outage-analysis-october-29-2025",
+     "type": "news"
+    },
+    {
+     "title": "Build5Nines: Major Azure Front Door Outage October 29, 2025",
+     "url": "https://build5nines.com/major-azure-front-door-outage-causing-widespread-service-disruptions-across-microsoft-365-microsoft-azure-and-the-azure-portal-october-29-2025/",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed AFD config-change outage; Microsoft issued a PIR (protection-mechanism bug). officialPostmortem=true."
+  },
+  {
+   "slug": "gcp-global-auth-quota-2020",
+   "title": "Google global authentication/identity outage (Dec 14 2020)",
+   "operator": "Google Cloud",
+   "dcName": "Google global identity (User ID Service)",
+   "location": {
+    "city": "",
+    "country": "USA",
+    "region": "AMER",
+    "az": "global"
+   },
+   "date": "2020-12-14",
+   "category": [
+    "software"
+   ],
+   "brief": "An automated quota-management bug wrongly reduced capacity for Google's central User ID / identity service to near-zero, so authentication returned errors globally. Gmail, YouTube, Google Docs, Google Cloud, Home and Workspace were down for ~45-60 minutes worldwide.",
+   "magnitude": {
+    "usersScore": 9,
+    "financialScore": 6,
+    "durationScore": 4,
+    "blastRadiusScore": 8
+   },
+   "magnitudeScore": 7.05,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Google Issues Post Mortem on Gmail, YouTube Outage (SecurityWeek)",
+     "url": "https://www.securityweek.com/google-issues-post-mortem-gmail-youtube-outage/",
+     "type": "news"
+    },
+    {
+     "title": "Post Mortem of Google Outage on 14 December 2020 (Hacker News)",
+     "url": "https://news.ycombinator.com/item?id=25472455",
+     "type": "forum"
+    }
+   ],
+   "verifyNote": "Confirmed: Dec 14 2020 User-ID-Service quota bug → global auth failure; Google published incident report. Huge user reach, short duration — scores fit."
+  },
+  {
+   "slug": "aws-kinesis-thread-limit-outage-2020",
+   "title": "AWS Nov 25 2020 outage — Kinesis front-end fleet hit OS thread limit",
+   "operator": "Amazon Web Services",
+   "dcName": "AWS us-east-1 (Kinesis Data Streams)",
+   "location": {
+    "city": "Ashburn",
+    "country": "USA",
+    "region": "AMER",
+    "az": "us-east-1"
+   },
+   "date": "2020-11-25",
+   "category": [
+    "software"
+   ],
+   "brief": "Added capacity pushed Kinesis front-end servers past the OS maximum thread count (each server holds a thread per peer connection), causing errors and latency. Because many AWS services depend on Kinesis, CloudWatch, Cognito, IoT Core, EventBridge and customer apps cascaded down for ~17 hours in us-east-1.",
+   "magnitude": {
+    "usersScore": 8,
+    "financialScore": 6,
+    "durationScore": 7,
+    "blastRadiusScore": 7
+   },
+   "magnitudeScore": 7.05,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "Summary of the Amazon Kinesis Event in the Northern Virginia (US-EAST-1) Region — AWS",
+     "url": "https://aws.amazon.com/message/11201",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "AWS explains what went wrong at US-East-1 (DCD)",
+     "url": "https://www.datacenterdynamics.com/en/news/aws-explains-what-went-wrong-us-east-1/",
+     "type": "news"
+    },
+    {
+     "title": "Summary of the Amazon Kinesis Event in the Northern Virginia (US-EAST-1) Region",
+     "url": "https://aws.amazon.com/message/11201/",
+     "type": "official-postmortem"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed OS-thread-limit root cause; AWS message/11201 official RCA. officialPostmortem=true."
+  },
+  {
+   "slug": "azure-active-directory-2020",
+   "title": "Azure Active Directory global authentication outage (Sep 28 2020)",
+   "operator": "Microsoft Azure",
+   "dcName": "Azure AD — global identity service",
+   "location": {
+    "city": "",
+    "country": "USA",
+    "region": "AMER",
+    "az": "global"
+   },
+   "date": "2020-09-28",
+   "category": [
+    "software"
+   ],
+   "brief": "A flawed service update to Azure AD's authentication backend, combined with a latent defect in the Safe Deployment Process rollback tooling, locked users out of Azure Portal, Microsoft 365, Teams, Exchange and Outlook for roughly five hours globally. A textbook identity-plane blast-radius event.",
+   "magnitude": {
+    "usersScore": 8,
+    "financialScore": 6,
+    "durationScore": 5,
+    "blastRadiusScore": 8
+   },
+   "magnitudeScore": 7,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Microsoft says a 'latent defect' in Safe Deployment Process downed Azure Active Directory (The Register)",
+     "url": "https://www.theregister.com/software/2020/10/02/microsoft_says_bug_sorry_a_latent_defect_in_safe_deployment_process_system_downed_azure_active_directory/1093786",
+     "type": "news"
+    },
+    {
+     "title": "Microsoft 365 MFA outage locks users out of their accounts (BleepingComputer)",
+     "url": "https://www.bleepingcomputer.com/news/microsoft/microsoft-365-mfa-outage-locks-users-out-of-their-accounts/",
+     "type": "news"
+    }
+   ],
+   "verifyNote": "Confirmed: Sep 28 2020 Azure AD auth outage; Microsoft published a detailed PIR (cited coverage summarizes it) — officialPostmortem true."
+  },
+  {
+   "slug": "azure-wan-router-global-2023",
+   "title": "Azure global WAN router change outage (Jan 25 2023)",
+   "operator": "Microsoft Azure",
+   "dcName": "Microsoft global WAN backbone",
+   "location": {
+    "city": "",
+    "country": "USA",
+    "region": "AMER",
+    "az": "global"
+   },
+   "date": "2023-01-25",
+   "category": [
+    "network",
+    "human"
+   ],
+   "brief": "A WAN router IP-address change issued with a command that behaved differently across device types propagated across Microsoft's global backbone, breaking inter-region and internet connectivity for ~90 minutes to several hours. Teams, Outlook, SharePoint, OneDrive and Azure worldwide were disrupted.",
+   "magnitude": {
+    "usersScore": 8,
+    "financialScore": 6,
+    "durationScore": 5,
+    "blastRadiusScore": 8
+   },
+   "magnitudeScore": 7,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Massive Microsoft 365 outage caused by WAN router IP change — BleepingComputer",
+     "url": "https://www.bleepingcomputer.com/news/microsoft/massive-microsoft-365-outage-caused-by-wan-router-ip-change/",
+     "type": "news"
+    },
+    {
+     "title": "Global network outage hits Azure, Teams, Outlook — The Register",
+     "url": "https://www.theregister.com/2023/01/25/network_issues_causing_outage_in/",
+     "type": "news"
+    }
+   ],
+   "verifyNote": "Confirmed: Jan 25 2023 WAN router command change → global BGP reconvergence; Microsoft published PIR. NOTE: candidate 'microsoft-azure-wan-bgp-2023' is the SAME incident and was dropped as a duplicate; this is the canonical entry."
+  },
+  {
+   "slug": "alibaba-cloud-global-2023",
+   "title": "Alibaba Cloud global all-region outage (Nov 12 2023)",
+   "operator": "Alibaba Cloud",
+   "dcName": "Alibaba Cloud — all global regions and availability zones",
+   "location": {
+    "city": "",
+    "country": "China",
+    "region": "APAC",
+    "az": "global"
+   },
+   "date": "2023-11-12",
+   "category": [
+    "software"
+   ],
+   "brief": "An anomaly (widely reported as an access-management/authentication key subsystem failure) caused simultaneous abnormalities across all Alibaba Cloud global regions and zones for ~3.5 hours — an unprecedented all-region, all-service cloud failure. Taobao, DingTalk, Alibaba's console and cloud databases briefly crashed.",
+   "magnitude": {
+    "usersScore": 8,
+    "financialScore": 6,
+    "durationScore": 5,
+    "blastRadiusScore": 8
+   },
+   "magnitudeScore": 7,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "DCD: Alibaba Cloud hit by outage, second in a month",
+     "url": "https://www.datacenterdynamics.com/en/news/alibaba-cloud-hit-by-outage-second-in-a-month/",
+     "type": "news"
+    },
+    {
+     "title": "What Can We Learn from Alibaba-Cloud's Global Outage? (Vonng analysis)",
+     "url": "https://blog.vonng.com/en/cloud/aliyun/",
+     "type": "other"
+    },
+    {
+     "title": "TechNode: Alibaba Cloud suffers second outage in a year",
+     "url": "https://technode.com/2023/11/13/alibaba-cloud-suffers-second-outage-in-a-year-causing-major-apps-to-crash/",
+     "type": "news"
+    },
+    {
+     "title": "Alibaba Cloud suffers second service outage in a month (Reuters via KELO-AM)",
+     "url": "https://kelo.com/2023/11/28/alibaba-cloud-suffers-second-service-outage-in-a-month/",
+     "type": "news"
+    }
+   ],
+   "verifyNote": "Confirmed: Nov 12 2023 all-region Alibaba Cloud failure (auth/IAM subsystem). Alibaba acknowledged and gave a root-cause summary; officialPostmortem kept true though public detail is thin."
+  },
+  {
+   "slug": "rogers-national-outage-2022",
+   "title": "Rogers 15-hour Canada-wide outage from router config error (CRTC)",
+   "operator": "Rogers Communications",
+   "dcName": "Rogers national IP core network",
+   "location": {
+    "country": "Canada",
+    "region": "AMER"
+   },
+   "date": "2022-07-08",
+   "category": [
+    "network",
+    "human"
+   ],
+   "brief": "Staff removed an Access Control List filter from distribution routers during a maintenance step, flooding the core routers with routing information beyond capacity and crashing the national network for ~15 hours. Mobile, home phone, internet and 911 were down nationwide; the CRTC/Xona report blamed human error plus lack of out-of-band management and redundant NOC connectivity.",
+   "magnitude": {
+    "usersScore": 9,
+    "financialScore": 7,
+    "durationScore": 8,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 7,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "CRTC: Assessment of Rogers Networks Following the 8 July 2022 Outage",
+     "url": "https://crtc.gc.ca/eng/publications/reports/xona2024.htm",
+     "type": "regulatory"
+    },
+    {
+     "title": "CBC: Human error caused 2022 Rogers outage, system deficiencies made it worse",
+     "url": "https://www.cbc.ca/news/politics/rogers-outage-human-error-system-deficiencies-1.7255641",
+     "type": "news"
+    },
+    {
+     "title": "2022 Rogers Communications outage",
+     "url": "https://en.wikipedia.org/wiki/2022_Rogers_Communications_outage",
+     "type": "other"
+    },
+    {
+     "title": "Rogers outage — CRTC proceeding / Cloudflare Radar analysis",
+     "url": "https://blog.cloudflare.com/canadian-internet-outage/",
+     "type": "vendor-status"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed ACL-removal/route-flood root cause; CRTC/Xona report + Rogers filings document it. officialPostmortem=true (regulatory-verified)."
+  },
+  {
+   "slug": "optus-national-bgp-outage-2023",
+   "title": "Optus 12-hour national outage from BGP route flood (regulatory)",
+   "operator": "Optus (Singtel)",
+   "dcName": "Optus national IP core network",
+   "location": {
+    "country": "Australia",
+    "region": "APAC"
+   },
+   "date": "2023-11-08",
+   "category": [
+    "network",
+    "software"
+   ],
+   "brief": "A routine upgrade propagated an unexpectedly large volume of BGP routing information from an international peer that exceeded router safety thresholds, causing core routers to self-isolate and severing Optus' national network for ~12 hours. 10M+ people and 400k businesses lost mobile, internet and Triple Zero access; the Bean Review, a Senate inquiry, and an ACMA prosecution (up to A$251M) followed.",
+   "magnitude": {
+    "usersScore": 9,
+    "financialScore": 7,
+    "durationScore": 7,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 6.8,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "Australian Govt: Review into the Optus outage of 8 November 2023 (Bean Review)",
+     "url": "https://www.infrastructure.gov.au/media-communications-arts/phone/review-optus-outage-8-november",
+     "type": "regulatory"
+    },
+    {
+     "title": "ACMA Investigation report — Optus outage (redacted PDF)",
+     "url": "https://www.acma.gov.au/sites/default/files/2024-11/Investigation%20report%20-%20Optus%20outage%201Nov23%20(redacted).pdf",
+     "type": "regulatory"
+    },
+    {
+     "title": "2023 Optus outage",
+     "url": "https://en.wikipedia.org/wiki/2023_Optus_outage",
+     "type": "other"
+    },
+    {
+     "title": "Optus outage caused by routing information changes — Senate inquiry / DCD",
+     "url": "https://www.datacenterdynamics.com/en/news/optus-outage/",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed BGP route-flood root cause; comprehensive official documentation via the Bean Review + ACMA. officialPostmortem=true (government-verified root cause)."
+  },
+  {
+   "slug": "aws-ebs-ec2-rds-us-east-1-2011",
+   "title": "AWS EBS/EC2/RDS 'stuck volumes' disruption in US-East-1",
+   "operator": "Amazon Web Services",
+   "dcName": "US-EAST-1 (Northern Virginia) — single Availability Zone",
+   "location": {
+    "city": "Ashburn",
+    "country": "USA",
+    "region": "AMER",
+    "az": "us-east-1"
+   },
+   "date": "2011-04-21",
+   "category": [
+    "network",
+    "human",
+    "software"
+   ],
+   "brief": "An incorrect network configuration change during a routine capacity upgrade re-routed primary EBS traffic onto a lower-capacity redundant network, isolating EBS nodes and triggering a 're-mirroring storm' that left many EBS volumes stuck for ~2-4 days and impacted ~45% of single-AZ RDS instances. This was the outage that made 'us-east-1' a byword for cloud fragility.",
+   "magnitude": {
+    "usersScore": 7,
+    "financialScore": 6,
+    "durationScore": 8,
+    "blastRadiusScore": 6
+   },
+   "magnitudeScore": 6.65,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "Summary of the Amazon EC2 and Amazon RDS Service Disruption in the US East Region",
+     "url": "https://aws.amazon.com/message/65648/",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "Amazon cloud fell from sky after botched network upgrade (The Register)",
+     "url": "https://www.theregister.com/Print/2011/04/29/amazon_ec2_outage_post_mortem/",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed: landmark AWS EBS re-mirroring-storm outage, Apr 21 2011, single AZ in US-East-1; detailed official AWS postmortem exists. Metadata accurate."
+  },
+  {
+   "slug": "taiwan-hengchun-earthquake-cables-2006",
+   "title": "Hengchun earthquake severs Asia subsea cables",
+   "operator": "Regional cable consortia",
+   "dcName": "Luzon Strait cable corridor",
+   "location": {
+    "city": "Hengchun",
+    "country": "Taiwan",
+    "region": "APAC"
+   },
+   "date": "2006-12-26",
+   "category": [
+    "network",
+    "supply"
+   ],
+   "brief": "A magnitude-7.0 earthquake off southern Taiwan cut at least eight submarine cables in the Luzon Strait, disrupting internet, telephone and financial traffic across East and Southeast Asia for weeks.",
+   "magnitude": {
+    "usersScore": 7,
+    "financialScore": 6,
+    "durationScore": 8,
+    "blastRadiusScore": 6
+   },
+   "magnitudeScore": 6.65,
+   "officialPostmortem": false,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "2006 Hengchun earthquakes",
+     "url": "https://en.wikipedia.org/wiki/2006_Hengchun_earthquakes",
+     "type": "other"
+    }
+   ],
+   "verifyNote": "Confirmed: Dec 26 2006 M7.0 Hengchun quake cut ~8 Luzon Strait cables, weeks of regional disruption. Natural disaster — no operator RCA. Recommend adding a second non-wiki source; well-documented historically."
+  },
+  {
+   "slug": "azure-south-central-us-texas-cooling-2018",
+   "title": "Azure South Central US Texas outage after lightning hits cooling",
+   "operator": "Microsoft Azure",
+   "dcName": "South Central US (San Antonio area)",
+   "location": {
+    "city": "San Antonio",
+    "country": "United States",
+    "region": "AMER",
+    "az": "South Central US"
+   },
+   "date": "2018-09-04",
+   "category": [
+    "cooling",
+    "power"
+   ],
+   "brief": "A severe storm with lightning caused utility voltage sags/swells that disabled the mechanical cooling system; rising temperatures forced an automated shutdown of servers and storage to protect hardware. Power recovered in ~9 hours but full Azure service recovery took ~21 hours, affecting ~40 services.",
+   "magnitude": {
+    "usersScore": 7,
+    "financialScore": 6,
+    "durationScore": 6,
+    "blastRadiusScore": 7
+   },
+   "magnitudeScore": 6.6,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "Postmortem: VSTS 4 September 2018 - Microsoft DevBlogs",
+     "url": "https://devblogs.microsoft.com/devopsservice/?p=17485",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "Microsoft reveals train of mistakes that killed Azure in the South Central US 'incident' (The Register)",
+     "url": "https://www.theregister.com/2018/09/17/azure_outage_report/",
+     "type": "news"
+    },
+    {
+     "title": "Microsoft Azure suffers outage after cooling issue - DCD",
+     "url": "https://www.datacenterdynamics.com/en/news/microsoft-azure-suffers-outage-after-cooling-issue/",
+     "type": "news"
+    },
+    {
+     "title": "Microsoft's Cascading Data Center Outage - Availability Digest (PDF)",
+     "url": "https://availabilitydigest.com/public_articles/1312/microsoft_data_center_outage.pdf",
+     "type": "other"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed: lightning/voltage disturbance disabled cooling in South Central US, automated thermal shutdown. Microsoft published a VSTS/Azure postmortem; officialPostmortem=true."
+  },
+  {
+   "slug": "delta-atlanta-switchgear-2016",
+   "title": "Delta Air Lines Atlanta data center power failure grounds global fleet",
+   "operator": "Delta Air Lines",
+   "dcName": "Delta Technology data center, Atlanta",
+   "location": {
+    "city": "Atlanta",
+    "country": "United States",
+    "region": "AMER"
+   },
+   "date": "2016-08-08",
+   "category": [
+    "power"
+   ],
+   "brief": "A switchgear failure at Delta's Atlanta data center (which connects computers to grid and backup generators) caused a cascading power loss, grounding flights worldwide and cancelling roughly 2,000+ flights over three days. Estimated cost ~$150M.",
+   "magnitude": {
+    "usersScore": 8,
+    "financialScore": 7,
+    "durationScore": 7,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 6.55,
+   "officialPostmortem": false,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Delta Data Center Outage Grounds Hundreds of Flights — Data Center Knowledge",
+     "url": "https://www.datacenterknowledge.com/outages/delta-data-center-outage-grounds-hundreds-of-flights",
+     "type": "news"
+    },
+    {
+     "title": "Tens of thousands of Delta passengers grounded by outage - DCD",
+     "url": "https://www.datacenterdynamics.com/en/news/tens-of-thousands-of-delta-passengers-grounded-by-outage/",
+     "type": "news"
+    },
+    {
+     "title": "Delta Air Lines Cancels 2100 Flights Due to Power Outage - Availability Digest (PDF)",
+     "url": "https://availabilitydigest.com/public_articles/1109/delta.pdf",
+     "type": "other"
+    },
+    {
+     "title": "Delta: 5-hour computer outage cost us $150 million — CNN",
+     "url": "https://money.cnn.com/2016/09/07/technology/delta-computer-outage-cost",
+     "type": "news"
+    }
+   ],
+   "verifyNote": "Confirmed: Aug 8 2016 Delta Atlanta switchgear/power failure, ~2,000+ cancellations over 3 days, ~$150M. Delta gave public statements but no engineering RCA — officialPostmortem false. Enterprise-DC single-point-of-failure classic."
+  },
+  {
+   "slug": "google-iam-identity-outage-2020",
+   "title": "Google Dec 14 2020 outage — central identity/IAM quota bug",
+   "operator": "Google",
+   "dcName": "Google central identity management system",
+   "location": {
+    "country": "USA",
+    "region": "AMER"
+   },
+   "date": "2020-12-14",
+   "category": [
+    "software"
+   ],
+   "brief": "A bug in Google's automated quota system misreported the User ID service as having zero capacity; when a grace period ended, identity data went stale and authentication requests were rejected, taking down Gmail, YouTube, Drive, Workspace and GCP-authenticated services globally for ~45 minutes.",
+   "magnitude": {
+    "usersScore": 10,
+    "financialScore": 6,
+    "durationScore": 2,
+    "blastRadiusScore": 7
+   },
+   "magnitudeScore": 6.55,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "Google explains the cause of the recent YouTube, Gmail outage — BleepingComputer",
+     "url": "https://www.bleepingcomputer.com/news/google/google-explains-the-cause-of-the-recent-youtube-gmail-outage/",
+     "type": "news"
+    },
+    {
+     "title": "Google outage takes down Gmail, YouTube, Google Drive — DCD",
+     "url": "https://www.datacenterdynamics.com/en/news/google-outage-takes-down-gmail-youtube-google-drive/",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed identity/quota root cause; Google published an incident report on Workspace status. officialPostmortem=true (near-global auth blast radius)."
+  },
+  {
+   "slug": "fastly-cdn-config-outage-2021",
+   "title": "Fastly June 8 2021 outage — dormant CDN bug triggered by customer config",
+   "operator": "Fastly",
+   "dcName": "Fastly global CDN edge network",
+   "location": {
+    "country": "USA",
+    "region": "AMER"
+   },
+   "date": "2021-06-08",
+   "category": [
+    "software"
+   ],
+   "brief": "A May 12 software deploy introduced a latent bug; on June 8 a valid customer configuration change triggered it, crashing edge nodes and returning errors across 85% of Fastly's network for about an hour. Reddit, Spotify, Twitch, GitHub, Amazon, gov.uk, the NYT, BBC, Guardian and many others went down.",
+   "magnitude": {
+    "usersScore": 8,
+    "financialScore": 6,
+    "durationScore": 2,
+    "blastRadiusScore": 8
+   },
+   "magnitudeScore": 6.4,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "Summary of June 8 outage — Fastly",
+     "url": "https://www.fastly.com/blog/summary-of-june-8-outage",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "Twitch, Pinterest, Reddit and more go down in Fastly CDN outage — TechCrunch",
+     "url": "https://techcrunch.com/2021/06/08/numerous-popular-websites-are-facing-an-outage/",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed latent-bug CDN outage; Fastly published a summary/postmortem. officialPostmortem=true."
+  },
+  {
+   "slug": "cloudflare-regex-cpu-2019",
+   "title": "Cloudflare global WAF outage (regex CPU exhaustion)",
+   "operator": "Cloudflare",
+   "dcName": "Global edge network",
+   "location": {
+    "city": "San Francisco",
+    "country": "USA",
+    "region": "AMER"
+   },
+   "date": "2019-07-02",
+   "category": [
+    "software",
+    "human"
+   ],
+   "brief": "A single poorly-formed regular expression deployed to the WAF caused CPU to spike to 100% across Cloudflare's global network, producing 502 errors for ~27 minutes for a large fraction of sites behind Cloudflare.",
+   "magnitude": {
+    "usersScore": 8,
+    "financialScore": 5,
+    "durationScore": 3,
+    "blastRadiusScore": 8
+   },
+   "magnitudeScore": 6.4,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Details of the Cloudflare outage on July 2, 2019",
+     "url": "https://blog.cloudflare.com/details-of-the-cloudflare-outage-on-july-2-2019/",
+     "type": "official-postmortem"
+    }
+   ],
+   "verifyNote": "Confirmed: Jul 2 2019 WAF regex catastrophic-backtracking CPU exhaustion; detailed Cloudflare postmortem. Metadata accurate."
+  },
+  {
+   "slug": "centurylink-level3-bgp-2020",
+   "title": "CenturyLink/Level 3 global BGP (Flowspec) outage",
+   "operator": "CenturyLink / Level 3",
+   "dcName": "Global backbone (AS3356)",
+   "location": {
+    "city": "Monroe",
+    "country": "USA",
+    "region": "AMER",
+    "az": "Louisiana"
+   },
+   "date": "2020-08-30",
+   "category": [
+    "network",
+    "human"
+   ],
+   "brief": "A bad Flowspec rule that propagated and failed to clear across CenturyLink/Level 3's backbone caused route flapping for about five hours, dropping an estimated 3.5% of global internet traffic and impairing Cloudflare, Amazon, Discord and others.",
+   "magnitude": {
+    "usersScore": 7,
+    "financialScore": 6,
+    "durationScore": 5,
+    "blastRadiusScore": 7
+   },
+   "magnitudeScore": 6.4,
+   "officialPostmortem": false,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Analysis of Today's CenturyLink/Level 3 Outage",
+     "url": "https://blog.cloudflare.com/analysis-of-todays-centurylink-level-3-outage/",
+     "type": "vendor-status"
+    }
+   ],
+   "verifyNote": "Confirmed: Aug 30 2020 CenturyLink/Level 3 Flowspec rule that wouldn't clear, ~5h, ~3.5% global traffic. Primary public analysis is Cloudflare's; CenturyLink did not publish a detailed RCA — officialPostmortem false."
+  },
+  {
+   "slug": "red-sea-subsea-cables-2024",
+   "title": "Red Sea subsea cable cuts (AAE-1, EIG, Seacom, TGN)",
+   "operator": "AAE-1 / EIG / Seacom / Tata consortia",
+   "dcName": "Red Sea cable corridor near Yemen",
+   "location": {
+    "city": "Bab-el-Mandeb",
+    "country": "Yemen",
+    "region": "MENA"
+   },
+   "date": "2024-02-24",
+   "category": [
+    "network",
+    "supply"
+   ],
+   "brief": "The drifting anchor of the abandoned, Houthi-struck cargo ship Rubymar cut multiple submarine cables (AAE-1, EIG, Seacom, TGN) in the Red Sea, degrading ~25% of Asia-Europe traffic and affecting tens of millions across East Africa and the Middle East.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 6,
+    "durationScore": 8,
+    "blastRadiusScore": 6
+   },
+   "magnitudeScore": 6.4,
+   "officialPostmortem": false,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "What Caused the Red Sea Submarine Cable Cuts? — Kentik",
+     "url": "https://www.kentik.com/blog/what-caused-the-red-sea-submarine-cable-cuts/",
+     "type": "other"
+    },
+    {
+     "title": "Undersea cables cut in Red Sea, disrupting internet — Houthis suspected",
+     "url": "https://www.timesofisrael.com/undersea-cables-cut-in-red-sea-disrupting-internet-in-parts-of-region-houthis-suspected/",
+     "type": "news"
+    }
+   ],
+   "verifyNote": "Confirmed: ~Feb 24 2024 Red Sea cuts to AAE-1/EIG/Seacom/TGN, widely attributed to the Rubymar's dragging anchor; months-long repair. Attribution (deliberate vs anchor) remains debated — cause caveat noted. Infra-relevant, kept."
+  },
+  {
+   "slug": "cloudflare-workers-kv-gcp-dependency-2025",
+   "title": "Cloudflare Workers KV outage from single-cloud GCP storage dependency",
+   "operator": "Cloudflare (dependent on Google Cloud storage)",
+   "dcName": "Workers KV central store (GCP-backed)",
+   "location": {
+    "country": "Global",
+    "region": "AMER"
+   },
+   "date": "2025-06-12",
+   "category": [
+    "software",
+    "supply"
+   ],
+   "brief": "During the concurrent June 12, 2025 GCP outage, Cloudflare's Workers KV central store, which Cloudflare had consolidated onto GCP alone, saw a 90% request-failure rate, cascading to WARP, Access, Gateway, Images, Stream, Workers AI, Turnstile and parts of the dashboard for ~2h28m. Cloudflare later re-architected KV onto its own DB + R2.",
+   "magnitude": {
+    "usersScore": 7,
+    "financialScore": 6,
+    "durationScore": 5,
+    "blastRadiusScore": 7
+   },
+   "magnitudeScore": 6.4,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "Cloudflare blog: Cloudflare service outage June 12, 2025",
+     "url": "https://blog.cloudflare.com/cloudflare-service-outage-june-12-2025/",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "InfoQ: Cloudflare Rearchitects Workers KV Following GCP Outage",
+     "url": "https://www.infoq.com/news/2025/08/cloudflare-workers-kv/",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed; distinct downstream story from the GCP Service Control root cause (kept separately). Cloudflare postmortem + KV re-architecture. officialPostmortem=true."
+  },
+  {
+   "slug": "equinix-ld8-london-ups-2020",
+   "title": "Equinix LD8 London Docklands UPS failure outage",
+   "operator": "Equinix",
+   "dcName": "LD8 (Docklands, houses LINX)",
+   "location": {
+    "city": "London",
+    "country": "United Kingdom",
+    "region": "EMEA"
+   },
+   "date": "2020-08-18",
+   "category": [
+    "power"
+   ],
+   "brief": "A failed output static switch on a Galaxy UPS system took down power to multiple floors at LD8, disrupting roughly 150 LINX members (ISPs, telcos, hosts) for up to 18 hours. Duration suggested A+B feeds shared the same UPS, defeating redundancy.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 5,
+    "durationScore": 7,
+    "blastRadiusScore": 7
+   },
+   "magnitudeScore": 6.35,
+   "officialPostmortem": false,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Equinix LD8 data center experiences major outage - DCD",
+     "url": "https://www.datacenterdynamics.com/en/news/equinix-ld8-data-center-experiences-major-outage/",
+     "type": "news"
+    },
+    {
+     "title": "Equinix confirms review under way into UPS failure at Docklands datacentre - Computer Weekly",
+     "url": "https://www.computerweekly.com/news/252487861/Equinix-confirms-review-under-way-into-UPS-failure-at-Docklands-datacentre",
+     "type": "news"
+    },
+    {
+     "title": "Faulty UPS at data centre housing London Internet Exchange - The Register",
+     "url": "https://www.theregister.com/2020/08/18/outage_london_internet_exchange/",
+     "type": "news"
+    }
+   ],
+   "verifyNote": "Confirmed: Aug 18 2020 LD8 Galaxy UPS static-switch failure, ~150 LINX members, up to 18h. Equinix opened a review but did not publish a detailed public RCA — officialPostmortem false. High blast radius due to LINX concentration."
+  },
+  {
+   "slug": "gcp-networking-us-east1-2019",
+   "title": "Google Cloud multi-region network congestion outage (Jun 2 2019)",
+   "operator": "Google Cloud",
+   "dcName": "us-east1 / us-central1 and multiple US regions",
+   "location": {
+    "city": "Moncks Corner",
+    "country": "USA",
+    "region": "AMER",
+    "az": "us-east1"
+   },
+   "date": "2019-06-02",
+   "category": [
+    "software",
+    "network",
+    "human"
+   ],
+   "brief": "Automated maintenance in one physical location descheduled the network-control jobs for that location (a config error meant the intended scope was overrun), removing network control-plane capacity and congesting the network for ~4 hours. GCP, G Suite and YouTube saw elevated packet loss and errors across eastern US regions.",
+   "magnitude": {
+    "usersScore": 7,
+    "financialScore": 5,
+    "durationScore": 5,
+    "blastRadiusScore": 7
+   },
+   "magnitudeScore": 6.2,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Google Cloud Networking Incident #19009 (Google Cloud Status Dashboard)",
+     "url": "https://status.cloud.google.com/incident/cloud-networking/19009",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "Google Cloud Networking Incident Postmortem discussion (Hacker News)",
+     "url": "https://news.ycombinator.com/item?id=20120059",
+     "type": "forum"
+    },
+    {
+     "title": "An update on Sunday's service disruption — Google Cloud Blog",
+     "url": "https://cloud.google.com/blog/topics/inside-google-cloud/an-update-on-sundays-service-disruption",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "Google suffers Sunday outage, impacts Cloud, YouTube, Gmail — DCD",
+     "url": "https://www.datacenterdynamics.com/en/news/google-suffers-sunday-outage-impacts-cloud-youtube-gmail-and-more/",
+     "type": "news"
+    }
+   ],
+   "verifyNote": "Confirmed: Jun 2 2019 GCP network-control-plane deschedule (incident 19009); official Google postmortem. Canonical entry — candidate 'google-network-congestion-2019' is the SAME event and was dropped as a duplicate."
+  },
+  {
+   "slug": "cloudflare-verizon-bgp-leak-2019",
+   "title": "Verizon/BGP optimizer route leak knocks large parts of the internet offline",
+   "operator": "Verizon / DQE / Cloudflare",
+   "dcName": "Global (AS701 propagation)",
+   "location": {
+    "city": "New York",
+    "country": "USA",
+    "region": "AMER"
+   },
+   "date": "2019-06-24",
+   "category": [
+    "network",
+    "human"
+   ],
+   "brief": "A small ISP (Allegheny/DQE) using a BGP optimizer leaked more-specific routes that Verizon (AS701) accepted and propagated, blackholing traffic to Cloudflare, Amazon, Linode and others for roughly two hours.",
+   "magnitude": {
+    "usersScore": 7,
+    "financialScore": 5,
+    "durationScore": 5,
+    "blastRadiusScore": 7
+   },
+   "magnitudeScore": 6.2,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "How Verizon and a BGP Optimizer Knocked Large Parts of the Internet Offline Today",
+     "url": "https://blog.cloudflare.com/how-verizon-and-a-bgp-optimizer-knocked-large-parts-of-the-internet-offline-today/",
+     "type": "official-postmortem"
+    }
+   ],
+   "verifyNote": "Confirmed: Jun 24 2019 DQE/Noction optimizer leak propagated by Verizon AS701; Cloudflare postmortem. Note the RCA is Cloudflare's (victim/observer), not Verizon's — still counts as a published RCA."
+  },
+  {
+   "slug": "british-airways-heathrow-power-2017",
+   "title": "British Airways data center power surge grounds Heathrow/Gatwick",
+   "operator": "British Airways (facility managed by CBRE)",
+   "dcName": "Boadicea House data center, West London",
+   "location": {
+    "city": "London",
+    "country": "United Kingdom",
+    "region": "EMEA"
+   },
+   "date": "2017-05-27",
+   "category": [
+    "power",
+    "human"
+   ],
+   "brief": "An engineer disconnected and improperly reconnected the UPS power supply, causing a power surge that damaged servers running check-in, baggage and comms systems. All flights at Heathrow and Gatwick were grounded for two days, affecting ~75,000 passengers; cost ~£58-80M.",
+   "magnitude": {
+    "usersScore": 8,
+    "financialScore": 7,
+    "durationScore": 7,
+    "blastRadiusScore": 4
+   },
+   "magnitudeScore": 6.2,
+   "officialPostmortem": false,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "BA to sue CBRE over May Bank Holiday datacentre outage - Computer Weekly",
+     "url": "https://www.computerweekly.com/news/252452976/BA-to-sue-CBRE-over-May-Bank-Holiday-datacentre-outage",
+     "type": "news"
+    },
+    {
+     "title": "BA and CBRE settle dispute over 2017 data center outage - DCD",
+     "url": "https://www.datacenterdynamics.com/en/news/ba-and-cbre-settle-dispute-over-2017-data-center-outage/",
+     "type": "news"
+    },
+    {
+     "title": "British Airways $100M Outage Caused by Worker Pulling Wrong Plug - NBC News",
+     "url": "https://www.nbcnews.com/business/travel/british-airways-100m-outage-was-caused-worker-pulling-wrong-plug-n767476",
+     "type": "news"
+    },
+    {
+     "title": "British Airways: Engineer Wrongly Disconnected Data Center Power Supply — Data Center Knowledge",
+     "url": "https://www.datacenterknowledge.com/archives/2017/06/06/british-airways-says-engineer-disconnected-data-center-power-supply",
+     "type": "news"
+    },
+    {
+     "title": "The British Airways IT outage: What went wrong with its datacentre? — Computer Weekly",
+     "url": "https://www.computerweekly.com/news/450420405/The-British-Airways-IT-outage-What-went-wrong-with-its-datacentre",
+     "type": "news"
+    }
+   ],
+   "verifyNote": "Confirmed: May 27 2017 BA Boadicea House UPS mishandling → power surge, 2-day Heathrow/Gatwick grounding, ~75k passengers. Cause surfaced via the BA-CBRE lawsuit; no formal operator RCA — officialPostmortem false."
+  },
+  {
+   "slug": "northc-almere-fire-2026",
+   "title": "NorthC Almere data center fire disrupts Dutch public services for days",
+   "operator": "NorthC Datacenters",
+   "dcName": "Almere (Rondebeltweg) data center",
+   "location": {
+    "city": "Almere",
+    "country": "Netherlands",
+    "region": "EMEA"
+   },
+   "date": "2026-05-07",
+   "category": [
+    "fire",
+    "power"
+   ],
+   "brief": "A fire in a rear technical compartment of NorthC's Almere facility on 7 May 2026 destroyed primary and backup power; no servers burned but power was lost. Utrecht University, the Dutch Chamber of Commerce, healthcare and public-transport operator Transdev were disrupted. Temporary power/cooling was restored ~13 May, roughly a week later.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 5,
+    "durationScore": 8,
+    "blastRadiusScore": 6
+   },
+   "magnitudeScore": 6.2,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "NorthC data center outside Amsterdam suffers fire - DCD",
+     "url": "https://www.datacenterdynamics.com/en/news/northc-data-center-outside-amsterdam-suffers-fire/",
+     "type": "news"
+    },
+    {
+     "title": "Almere data center fire under control; caused outages throughout Netherlands - NL Times",
+     "url": "https://nltimes.nl/2026/05/08/almere-data-center-fire-control-caused-outages-throughout-netherlands",
+     "type": "news"
+    },
+    {
+     "title": "Major fire takes down NorthC data centre for six days - Structure Research",
+     "url": "https://www.structureresearch.net/2026/05/20/major-fire-takes-down-northc-data-centre-in-the-netherlands-for-six-days/",
+     "type": "news"
+    },
+    {
+     "title": "Fire at our data center in Almere - NorthC",
+     "url": "https://www.northcdatacenters.com/en/news/fire-in-our-data-center-in-almere/",
+     "type": "vendor-status"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Web-verified (post-cutoff): fire 7 May 2026, temporary power/cooling restored 13 May (~6-7 days), broad Dutch public-sector impact. NorthC posted status updates but no formal RCA; officialPostmortem=false."
+  },
+  {
+   "slug": "aws-us-east-1-lambda-capacity-2023",
+   "title": "AWS us-east-1 Lambda capacity subsystem failure",
+   "operator": "Amazon Web Services",
+   "dcName": "US-EAST-1 (Northern Virginia)",
+   "location": {
+    "city": "Ashburn",
+    "country": "United States",
+    "region": "AMER",
+    "az": "us-east-1"
+   },
+   "date": "2023-06-13",
+   "category": [
+    "software"
+   ],
+   "brief": "A fault in the subsystem responsible for AWS Lambda capacity management caused elevated errors and latency for Lambda invocations in us-east-1 from 11:49 AM PDT, cascading to STS, the Management Console, EKS, Connect and EventBridge. Full recovery by 3:37 PM PDT.",
+   "magnitude": {
+    "usersScore": 7,
+    "financialScore": 6,
+    "durationScore": 4,
+    "blastRadiusScore": 7
+   },
+   "magnitudeScore": 6.2,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "AWS message 061323 (official summary)",
+     "url": "https://aws.amazon.com/message/061323/",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "AWS Outage Analysis: June 13, 2023 (ThousandEyes)",
+     "url": "https://www.thousandeyes.com/blog/aws-outage-analysis-june-13-2023",
+     "type": "vendor-status"
+    },
+    {
+     "title": "Summary of the AWS Lambda Service Event in the Northern Virginia (US-EAST-1) Region (Jun 13 2023)",
+     "url": "https://aws.amazon.com/message/061323",
+     "type": "official-postmortem"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed Lambda capacity-subsystem fault; AWS message/061323 official summary. officialPostmortem=true."
+  },
+  {
+   "slug": "cloudflare-flexential-pdx-power-2023",
+   "title": "Cloudflare control-plane outage from Flexential PDX power failure",
+   "operator": "Cloudflare (Flexential PDX-04 data center)",
+   "dcName": "Flexential PDX-04",
+   "location": {
+    "city": "Hillsboro",
+    "country": "United States",
+    "region": "AMER"
+   },
+   "date": "2023-11-02",
+   "category": [
+    "power",
+    "human"
+   ],
+   "brief": "A Portland General Electric unplanned maintenance event dropped one utility feed at Flexential PDX-04; UPS runtime fell short and generators failed to start in time, taking the facility dark. Cloudflare's control plane and analytics were down for hours to days because it lacked failover for these systems; cold-start recovery ran into Nov 4.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 5,
+    "durationScore": 8,
+    "blastRadiusScore": 6
+   },
+   "magnitudeScore": 6.2,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "Post Mortem on Cloudflare Control Plane and Analytics Outage",
+     "url": "https://blog.cloudflare.com/post-mortem-on-cloudflare-control-plane-and-analytics-outage/",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "DCD: Cloudflare suffers power outage at Flexential Oregon",
+     "url": "https://www.datacenterdynamics.com/en/news/cloudflare-suffers-second-power-outage-at-flexential-data-center-in-oregon-in-six-months/",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed; Cloudflare published a detailed control-plane postmortem on the Flexential PDX-04 power failure. officialPostmortem=true."
+  },
+  {
+   "slug": "southwest-skysolver-meltdown-2022",
+   "title": "Southwest Airlines Dec 2022 meltdown — SkySolver crew-scheduling collapse",
+   "operator": "Southwest Airlines",
+   "dcName": "Southwest crew-scheduling systems (SkySolver)",
+   "location": {
+    "city": "Dallas",
+    "country": "USA",
+    "region": "AMER"
+   },
+   "date": "2022-12-21",
+   "category": [
+    "software",
+    "human"
+   ],
+   "brief": "Winter Storm Elliott triggered a wave of changes that overwhelmed Southwest's aging SkySolver crew-scheduling software (built for ~300 changes/batch); it had to be shut down and schedulers worked manually, canceling ~16,700 flights and stranding 2M+ passengers. The DOT levied a record $140M penalty.",
+   "magnitude": {
+    "usersScore": 8,
+    "financialScore": 9,
+    "durationScore": 8,
+    "blastRadiusScore": 2
+   },
+   "magnitudeScore": 6.1,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "Southwest will pay a $140 million fine for its meltdown during the 2022 holidays — NPR",
+     "url": "https://www.npr.org/2023/12/18/1219906471/southwest-airlines-2022-meltdown-fined-faa",
+     "type": "regulatory"
+    },
+    {
+     "title": "Southwest Airlines hit with record-breaking penalty for 2022 IT meltdown — IT Pro",
+     "url": "https://www.itpro.com/technology/southwest-airlines-hit-with-record-breaking-penalty-for-2022-it-meltdown",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed; ~16,700 cancellations, DOT $140M penalty. No operator postmortem; officialPostmortem=false."
+  },
+  {
+   "slug": "alibaba-cloud-hong-kong-cooling-2022",
+   "title": "Alibaba Cloud Hong Kong cooling failure (Zone C)",
+   "operator": "Alibaba Cloud",
+   "dcName": "China (Hong Kong) Region — Zone C, PCCW/leased data center",
+   "location": {
+    "city": "Hong Kong",
+    "country": "Hong Kong",
+    "region": "APAC",
+    "az": "cn-hongkong-c"
+   },
+   "date": "2022-12-18",
+   "category": [
+    "cooling",
+    "fire"
+   ],
+   "brief": "A refrigeration/cooling equipment failure at a leased Hong Kong data center drove server-room temperatures up, triggering high-temperature fire-suppression activation and forcing servers offline; ECS and PolarDB were impaired for 24+ hours in Alibaba's self-described longest large-scale outage in over a decade. It hit the Macao Monetary Authority, crypto exchange OKX and many public services.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 6,
+    "durationScore": 8,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 6.05,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "[Resolved] Service Outage in Zone C of the China (Hong Kong) Region (Alibaba Cloud notice)",
+     "url": "https://www.alibabacloud.com/notice/066572",
+     "type": "vendor-status"
+    },
+    {
+     "title": "PCCW data center refrigeration equipment failure causes Alibaba Cloud Hong Kong outage (DCD)",
+     "url": "https://www.datacenterdynamics.com/en/news/pccw-data-center-refrigeration-equipment-failure-causes-alibaba-cloud-hong-kong-outage/",
+     "type": "news"
+    }
+   ],
+   "verifyNote": "Confirmed: Dec 18 2022 PCCW HK cooling failure + fire-suppression activation, 24h+ impact; Alibaba published a resolution notice/RCA. Metadata accurate."
+  },
+  {
+   "slug": "kt-ahyeon-exchange-fire-2018",
+   "title": "KT Ahyeon telecom exchange cable-tunnel fire cripples western Seoul",
+   "operator": "KT Corporation",
+   "dcName": "KT Ahyeon branch (cable tunnel / network facility)",
+   "location": {
+    "city": "Seoul",
+    "country": "South Korea",
+    "region": "APAC"
+   },
+   "date": "2018-11-24",
+   "category": [
+    "fire",
+    "network"
+   ],
+   "brief": "A fire in the underground cable tunnel of KT's Ahyeon building destroyed key network equipment, paralyzing phone, internet, card-payment and ATM services across western Seoul and part of Goyang. An ER temporarily closed; full recovery took about a week.",
+   "magnitude": {
+    "usersScore": 7,
+    "financialScore": 5,
+    "durationScore": 6,
+    "blastRadiusScore": 6
+   },
+   "magnitudeScore": 6.05,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "KT fire sparks chaos in Seoul - Korea Herald",
+     "url": "https://koreaherald.com/view.php?ud=20181125000198",
+     "type": "news"
+    },
+    {
+     "title": "KT chairman apologizes for chaos, scrambles to contain damage from fire - Korea Herald",
+     "url": "https://www.koreaherald.com/article/1849219",
+     "type": "news"
+    },
+    {
+     "title": "KT vows 'active compensation' for loss - Korea Times",
+     "url": "https://www.koreatimes.co.kr/business/tech-science/20181125/kt-vows-active-compensation-for-loss",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed cable-tunnel fire, western-Seoul telecom/payment collapse, ~week recovery. KT apologized and compensated; no formal operator RCA."
+  },
+  {
+   "slug": "roblox-consul-boltdb-73h-outage-2021",
+   "title": "Roblox Oct 2021 73-hour outage — Consul streaming / BoltDB contention",
+   "operator": "Roblox",
+   "dcName": "Roblox private data centers (HashiCorp Consul cluster)",
+   "location": {
+    "country": "USA",
+    "region": "AMER"
+   },
+   "date": "2021-10-28",
+   "category": [
+    "software",
+    "network"
+   ],
+   "brief": "Enabling a new Consul streaming feature under high read/write load caused excessive contention and triggered a pathological BoltDB write-ahead-log performance issue, collapsing the service-discovery layer. Roblox was fully down for 73 hours (Oct 28–31) affecting ~50M users.",
+   "magnitude": {
+    "usersScore": 8,
+    "financialScore": 6,
+    "durationScore": 9,
+    "blastRadiusScore": 3
+   },
+   "magnitudeScore": 6.05,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "Roblox Return to Service 10/28–10/31 2021 — Roblox Blog",
+     "url": "https://blog.roblox.com/2022/01/roblox-return-to-service-10-28-10-31-2021/",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "Roblox's cloud-native catastrophe: A post mortem — InfoWorld",
+     "url": "https://www.infoworld.com/article/2334415/robloxs-cloud-native-catastrophe-a-post-mortem.html",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed 73h outage, Consul/BoltDB root cause; detailed Roblox postmortem. officialPostmortem=true."
+  },
+  {
+   "slug": "datadog-multiregion-systemd-outage-2023",
+   "title": "Datadog Mar 8 2023 outage — systemd update severed Cilium CNI routes across regions",
+   "operator": "Datadog",
+   "dcName": "Datadog US1/EU1/US3/US4/US5 (AWS, GCP, Azure)",
+   "location": {
+    "country": "USA",
+    "region": "AMER"
+   },
+   "date": "2023-03-08",
+   "category": [
+    "software",
+    "network"
+   ],
+   "brief": "An automatically applied systemd security update, upon systemd-networkd restart, deleted the routes managed by the Cilium CNI plugin, cutting inter-container networking. Because the update landed simultaneously across VMs, five Datadog regions on distinct cloud providers went dark for over a day.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 7,
+    "durationScore": 7,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 6.05,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "2023-03-08 Incident: Infrastructure connectivity issue affecting multiple regions — Datadog",
+     "url": "https://www.datadoghq.com/blog/2023-03-08-multiregion-infrastructure-connectivity-issue/",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "Inside DataDog's $5M Outage — Pragmatic Engineer",
+     "url": "https://newsletter.pragmaticengineer.com/p/inside-the-datadog-outage",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed systemd/Cilium route-deletion root cause across 5 regions; detailed Datadog postmortem. officialPostmortem=true."
+  },
+  {
+   "slug": "gcp-paris-europe-west9-fire-flood-2023",
+   "title": "Google Cloud europe-west9 Paris region downed by water leak and fire",
+   "operator": "Google Cloud (Global Switch Paris facility)",
+   "dcName": "europe-west9 (Global Switch, Clichy/Paris)",
+   "location": {
+    "city": "Paris",
+    "country": "France",
+    "region": "EMEA",
+    "az": "europe-west9-a"
+   },
+   "date": "2023-04-25",
+   "category": [
+    "fire",
+    "flood",
+    "cooling"
+   ],
+   "brief": "A cooling-system water-pump failure caused a water leak in the battery room that led to a fire; firefighting water intrusion forced shutdown of europe-west9-a and part of europe-west9-c, taking 90+ Google Cloud services offline. Parts of the region stayed unavailable for roughly two-plus weeks.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 5,
+    "durationScore": 9,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 6.05,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "Google Cloud Service Health incident TbcwMSkKy8MTmeeEiqaq",
+     "url": "https://status.cloud.google.com/incidents/TbcwMSkKy8MTmeeEiqaq",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "The Register: Google Cloud suffers outage in Europe amid water leak, fire",
+     "url": "https://www.theregister.com/2023/04/26/google_cloud_outage/",
+     "type": "news"
+    },
+    {
+     "title": "Incident affecting Google Cloud in europe-west9 (Google Cloud Status Dashboard)",
+     "url": "https://status.cloud.google.com/incidents/j6LfsjxCXhVDjmGGPhS7",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "Water leak at Paris Global Switch data center causes fire, leads to outages at Google (DCD)",
+     "url": "https://www.datacenterdynamics.com/en/news/water-leak-at-paris-global-switch-data-center-causes-fire-leads-to-outages-at-google/",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed water-leak/battery-room fire at Global Switch Paris; Google published incident report; multi-week partial impact. officialPostmortem=true."
+  },
+  {
+   "slug": "aws-us-east-1-thermal-2025",
+   "title": "AWS US-EAST-1 disruption following a data center cooling/thermal event",
+   "operator": "Amazon Web Services",
+   "dcName": "US-EAST-1 (Northern Virginia, us1-az4)",
+   "location": {
+    "city": "Ashburn",
+    "country": "United States",
+    "region": "AMER",
+    "az": "us-east-1"
+   },
+   "date": "2026-05-07",
+   "category": [
+    "cooling",
+    "power"
+   ],
+   "brief": "On 7 May 2026 multiple chiller units failed in a single US-EAST-1 data hall (us1-az4), triggering thermal-safety shutdowns of EC2 instances and EBS volumes; IoT Core, ELB, NAT Gateway and Redshift saw secondary impact. Recovery ran ~20 hours, with cooling restored to pre-incident capacity by 8 May.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 5,
+    "durationScore": 5,
+    "blastRadiusScore": 7
+   },
+   "magnitudeScore": 5.95,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "AWS hit by US-East-1 outage after data center thermal event - Network World",
+     "url": "https://www.networkworld.com/article/4168878/aws-hit-by-us-east-1-outage-after-data-center-thermal-event.html",
+     "type": "news"
+    },
+    {
+     "title": "AWS outage traced to cooling failure at key Virginia data center - MSN/coverage",
+     "url": "https://www.msn.com/en-us/news/insight/aws-outage-traced-to-cooling-failure-at-key-virginia-data-center/gm-GM72630868",
+     "type": "news"
+    }
+   ],
+   "confidence": "medium",
+   "verifyNote": "DATE CORRECTED 2025-11-01 -> 2026-05-07 (article confirms the thermal event occurred 7 May 2026, us1-az4, ~20h; distinct from the Oct 20 2025 DynamoDB DNS outage). Slug retains '2025' as an ID only. AWS provided Health Dashboard updates but no formal RCA cited; officialPostmortem=false."
+  },
+  {
+   "slug": "as7007-route-leak-1997",
+   "title": "AS7007 global routing table leak",
+   "operator": "MAI Network Services (AS7007)",
+   "dcName": "Global BGP",
+   "location": {
+    "city": "McLean",
+    "country": "USA",
+    "region": "AMER",
+    "az": "Virginia"
+   },
+   "date": "1997-04-25",
+   "category": [
+    "network",
+    "human"
+   ],
+   "brief": "A misconfigured router at AS7007 de-aggregated and re-originated a large portion of the global routing table as more-specific prefixes, blackholing large parts of the early internet for hours.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 4,
+    "durationScore": 4,
+    "blastRadiusScore": 8
+   },
+   "magnitudeScore": 5.9,
+   "officialPostmortem": false,
+   "confidence": "medium",
+   "candidateSources": [
+    {
+     "title": "The AS7007 incident (BGP hijacking history)",
+     "url": "https://en.wikipedia.org/wiki/BGP_hijacking",
+     "type": "other"
+    },
+    {
+     "title": "NANOG mailing list archive — AS7007 incident",
+     "url": "https://www.nanog.org/",
+     "type": "other"
+    }
+   ],
+   "verifyNote": "Confirmed as a real, foundational BGP-leak event (Apr 25 1997, MAI/AS7007). Historic — no formal RCA; documented via NANOG archives and routing-history literature. Landmark internet-infra incident, kept."
+  },
+  {
+   "slug": "thailand-floods-hdd-supply-2011",
+   "title": "2011 Thailand floods halt hard-drive production and spike global storage prices",
+   "operator": "Western Digital / Nidec (Bang Pa-in, Navanakorn industrial estates)",
+   "dcName": "HDD manufacturing plants (supply-chain impact)",
+   "location": {
+    "city": "Ayutthaya / Bangkok",
+    "country": "Thailand",
+    "region": "APAC"
+   },
+   "date": "2011-10-15",
+   "category": [
+    "flood",
+    "supply"
+   ],
+   "brief": "Floodwaters up to 1.8m submerged Western Digital's Thai plants (which made ~60% of its drives) and component suppliers; Thailand assembles ~40% of the world's HDDs. Drive shipments fell ~30% and prices spiked for months, hitting PC, server and data center storage supply worldwide.",
+   "magnitude": {
+    "usersScore": 3,
+    "financialScore": 7,
+    "durationScore": 8,
+    "blastRadiusScore": 6
+   },
+   "magnitudeScore": 5.85,
+   "officialPostmortem": false,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "The Lessons of Thailand's Flood - IEEE Spectrum",
+     "url": "https://spectrum.ieee.org/the-lessons-of-thailands-flood",
+     "type": "news"
+    },
+    {
+     "title": "Thai floods halt WD hard disk fabs - The Register",
+     "url": "https://www.theregister.com/2011/10/12/wd_thai_floods/",
+     "type": "news"
+    },
+    {
+     "title": "Thai floods disrupt computer hard drive production - Phys.org",
+     "url": "https://phys.org/news/2011-10-thai-disrupt-hard-production.html",
+     "type": "news"
+    }
+   ],
+   "verifyNote": "Confirmed: Oct 2011 Thailand floods submerged WD/Nidec plants, ~30% drive-shipment drop, months of price spikes affecting DC storage supply. Supply-chain (not a single-DC) event but squarely infra-relevant. Metadata accurate."
+  },
+  {
+   "slug": "atlassian-deletion-script-outage-2022",
+   "title": "Atlassian April 2022 outage — faulty deletion script wiped ~400 customer sites (up to 14 days)",
+   "operator": "Atlassian",
+   "dcName": "Atlassian Cloud (AWS)",
+   "location": {
+    "country": "USA",
+    "region": "AMER"
+   },
+   "date": "2022-04-05",
+   "category": [
+    "software",
+    "human"
+   ],
+   "brief": "A maintenance script run in the wrong mode with the wrong ID list permanently deleted the cloud sites of ~400 customers (Jira, Confluence, Opsgenie), affecting >50,000 users. Lacking bulk restore automation, Atlassian rebuilt sites individually over up to 14 days.",
+   "magnitude": {
+    "usersScore": 5,
+    "financialScore": 6,
+    "durationScore": 10,
+    "blastRadiusScore": 4
+   },
+   "magnitudeScore": 5.85,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "Post-Incident Review on the Atlassian April 2022 outage — Atlassian",
+     "url": "https://www.atlassian.com/blog/atlassian-engineering/post-incident-review-april-2022-outage",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "Scoop: Inside the Longest Atlassian Outage of All Time — Pragmatic Engineer",
+     "url": "https://newsletter.pragmaticengineer.com/p/scoop-atlassian",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed; Atlassian PIR blog published. Up-to-14-day restore per customer justifies durationScore 10. officialPostmortem=true."
+  },
+  {
+   "slug": "github-mysql-split-brain-2018",
+   "title": "GitHub Oct 21 2018 outage — 43-second network partition triggered MySQL split-brain (24h)",
+   "operator": "GitHub (Microsoft)",
+   "dcName": "GitHub US East Coast data center + network hub",
+   "location": {
+    "country": "USA",
+    "region": "AMER"
+   },
+   "date": "2018-10-21",
+   "category": [
+    "network",
+    "software"
+   ],
+   "brief": "Maintenance on failing 100G optical gear caused a 43-second connectivity loss between GitHub's US East Coast hub and primary DC. Orchestrator/Raft failover promoted a West Coast MySQL primary, creating divergent writes (split-brain); reconciling data safely took 24h11m of degraded, read-only service.",
+   "magnitude": {
+    "usersScore": 7,
+    "financialScore": 4,
+    "durationScore": 6,
+    "blastRadiusScore": 6
+   },
+   "magnitudeScore": 5.85,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "October 21 post-incident analysis — The GitHub Blog",
+     "url": "https://github.blog/2018-10-30-oct21-post-incident-analysis/",
+     "type": "official-postmortem"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed; canonical GitHub post-incident analysis. officialPostmortem=true."
+  },
+  {
+   "slug": "tsb-core-banking-migration-2018",
+   "title": "TSB April 2018 outage — botched Proteo4UK core-banking migration",
+   "operator": "TSB Bank / Sabis (Sabadell)",
+   "dcName": "TSB / Sabis Proteo4UK core banking platform",
+   "location": {
+    "country": "United Kingdom",
+    "region": "EMEA"
+   },
+   "date": "2018-04-22",
+   "category": [
+    "software",
+    "human"
+   ],
+   "brief": "TSB's migration to Sabis's new Proteo4UK core banking platform failed because the system was inadequately tested (only offline, not in a live-scale environment) and Sabis was not ready to operate it; up to 1.9M customers lost account access for weeks and TSB paid ~£330M in redress, fraud and costs.",
+   "magnitude": {
+    "usersScore": 7,
+    "financialScore": 8,
+    "durationScore": 9,
+    "blastRadiusScore": 2
+   },
+   "magnitudeScore": 5.85,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "TSB programme pulled apart in report on IT meltdown (Slaughter and May review) — Computer Weekly",
+     "url": "https://www.computerweekly.com/news/252474170/TSB-programme-pulled-apart-in-report-on-IT-meltdown",
+     "type": "regulatory"
+    },
+    {
+     "title": "IBM early findings on disastrous TSB core banking system migration released — Computer Weekly",
+     "url": "https://www.computerweekly.com/news/252443551/IBM-early-findings-on-disastrous-TSB-core-banking-system-migration-released",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed; independent Slaughter & May review + FCA/PRA fines document the failed Proteo4UK cutover. That is a legal/regulatory review, not an operator postmortem; officialPostmortem=false."
+  },
+  {
+   "slug": "cloudflare-bgp-spine-outage-2022",
+   "title": "Cloudflare June 21 2022 outage — BGP misconfiguration in 19 data centers",
+   "operator": "Cloudflare",
+   "dcName": "Cloudflare 19 busiest data centers (spine rollout)",
+   "location": {
+    "country": "USA",
+    "region": "AMER"
+   },
+   "date": "2022-06-21",
+   "category": [
+    "network"
+   ],
+   "brief": "A network-config change during a resilience 'spine' rollout reordered BGP prefix terms, withdrawing Cloudflare's IP advertisements from 19 of its busiest data centers and dropping ~50% of global traffic for roughly 1.5 hours. Discord, Shopify, Fitbit and others were affected.",
+   "magnitude": {
+    "usersScore": 8,
+    "financialScore": 5,
+    "durationScore": 2,
+    "blastRadiusScore": 7
+   },
+   "magnitudeScore": 5.85,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "Cloudflare outage on June 21, 2022",
+     "url": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "6 lessons from Cloudflare's June 2022 outage — Site24x7",
+     "url": "https://www.site24x7.com/blog/6-lessons-from-cloudflares-june-2022-outage",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed BGP prefix-ordering misconfig across 19 DCs; Cloudflare postmortem. officialPostmortem=true."
+  },
+  {
+   "slug": "akamai-edge-dns-2021",
+   "title": "Akamai Edge DNS global outage",
+   "operator": "Akamai",
+   "dcName": "Edge DNS platform",
+   "location": {
+    "city": "Cambridge",
+    "country": "USA",
+    "region": "AMER",
+    "az": "Massachusetts"
+   },
+   "date": "2021-07-22",
+   "category": [
+    "software",
+    "network"
+   ],
+   "brief": "A software configuration update triggered a bug in Akamai's Edge DNS service, causing a roughly one-hour disruption that took offline major sites including airlines, banks, Steam and PlayStation Network.",
+   "magnitude": {
+    "usersScore": 7,
+    "financialScore": 5,
+    "durationScore": 3,
+    "blastRadiusScore": 7
+   },
+   "magnitudeScore": 5.8,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Akamai DNS Global disruption incident review",
+     "url": "https://www.akamai.com/blog/news/akamai-summary-of-july-22-edge-dns-service-disruption",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "Akamai DNS global outage takes down major websites, online services",
+     "url": "https://www.bleepingcomputer.com/news/technology/akamai-dns-global-outage-takes-down-major-websites-online-services/",
+     "type": "news"
+    }
+   ],
+   "verifyNote": "Confirmed: Jul 22 2021 Edge DNS config-triggered bug, ~1h; Akamai published incident review. Upgraded confidence medium→high (official RCA + press). Distinct from Akamai's Jun 17 Prolexic event."
+  },
+  {
+   "slug": "hurricane-sandy-nyc-datacenters-2012",
+   "title": "Hurricane Sandy floods Lower Manhattan data centers (Peer 1, Datagram, Internap)",
+   "operator": "Peer 1 / Internap / Datagram (75 Broad St, 33 Whitehall St)",
+   "dcName": "Lower Manhattan colocation facilities",
+   "location": {
+    "city": "New York",
+    "country": "United States",
+    "region": "AMER"
+   },
+   "date": "2012-10-29",
+   "category": [
+    "flood",
+    "power"
+   ],
+   "brief": "Storm surge flooded basements at 75 Broad Street and 33 Whitehall, disabling diesel fuel pumps and knocking Datagram customers (Gawker, Gizmodo, Buzzfeed, HuffPost) offline. Peer 1/Squarespace/Fog Creek staff formed a 'bucket brigade' hauling fuel up 17 flights to keep generators running.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 5,
+    "durationScore": 6,
+    "blastRadiusScore": 6
+   },
+   "magnitudeScore": 5.8,
+   "officialPostmortem": false,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Massive Flooding Damages Several NYC Data Centers - Data Center Knowledge",
+     "url": "https://www.datacenterknowledge.com/business/massive-flooding-damages-several-nyc-data-centers",
+     "type": "news"
+    },
+    {
+     "title": "Hurricane Sandy: data center stories from Manhattan - DCD",
+     "url": "https://www.datacenterdynamics.com/en/news/hurricane-sandy-data-center-stories-from-manhattan/",
+     "type": "news"
+    },
+    {
+     "title": "Squarespace, Fog Creek, Peer1 carried fuel buckets to the 17th floor - TechCrunch",
+     "url": "https://techcrunch.com/2012/10/30/squarespace-fog-creek-peer1/",
+     "type": "news"
+    }
+   ],
+   "verifyNote": "Confirmed: Oct 29 2012 Sandy storm surge flooded fuel-pump basements at 75 Broad St / 33 Whitehall; documented 'bucket brigade'. Natural-disaster DC event, well-corroborated by multiple outlets. Metadata accurate."
+  },
+  {
+   "slug": "fisher-plaza-seattle-fire-2009",
+   "title": "Fisher Plaza Seattle electrical fire knocks out Authorize.net and Bing Travel",
+   "operator": "Fisher Communications (Fisher Plaza)",
+   "dcName": "Fisher Plaza data center",
+   "location": {
+    "city": "Seattle",
+    "country": "United States",
+    "region": "AMER"
+   },
+   "date": "2009-07-02",
+   "category": [
+    "fire",
+    "power"
+   ],
+   "brief": "An electrical fire in a bus duct/vault (blamed on progressive insulation degradation) caused ~$6.8M damage, knocking payment processor Authorize.net offline (disrupting thousands of e-commerce sites) plus Microsoft Bing Travel, Internap, Dotster and AdHost, and taking KOMO-TV off air.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 5,
+    "durationScore": 6,
+    "blastRadiusScore": 6
+   },
+   "magnitudeScore": 5.8,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "Damage from Fisher Plaza Fire: $6.8 Million - Data Center Knowledge",
+     "url": "https://www.datacenterknowledge.com/investing/damage-from-fisher-plaza-fire-6-8-million",
+     "type": "news"
+    },
+    {
+     "title": "Fisher Plaza fire disrupts Web service, TV station - Seattle Times",
+     "url": "https://www.seattletimes.com/seattle-news/fisher-plaza-fire-disrupts-web-service-tv-station/",
+     "type": "news"
+    },
+    {
+     "title": "Pictures from the Fisher Plaza Data Center Fire - Perspectives (James Hamilton)",
+     "url": "https://perspectives.mvdirona.com/2009/07/pictures-from-the-fisher-plaza-data-center-fire/",
+     "type": "other"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Well-documented 2009 electrical-vault fire; Authorize.net e-commerce blast radius. No operator RCA (facility owner)."
+  },
+  {
+   "slug": "theplanet-houston-explosion-2008",
+   "title": "The Planet Houston H1 data center electrical explosion drops 9,000 servers",
+   "operator": "The Planet (later SoftLayer)",
+   "dcName": "H1 data center, Houston",
+   "location": {
+    "city": "Houston",
+    "country": "United States",
+    "region": "AMER"
+   },
+   "date": "2008-05-31",
+   "category": [
+    "fire",
+    "power"
+   ],
+   "brief": "An electrical short/transformer fault caused an explosion and fire that blew out three walls of the H1 electrical room. The fire department ordered all power cut, taking ~9,000 servers offline; second-floor servers were not restored until two days later. No servers were physically lost.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 5,
+    "durationScore": 6,
+    "blastRadiusScore": 6
+   },
+   "magnitudeScore": 5.8,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "Explosion at The Planet Causes Major Outage - Data Center Knowledge",
+     "url": "https://www.datacenterknowledge.com/outages/explosion-at-the-planet-causes-major-outage",
+     "type": "news"
+    },
+    {
+     "title": "Explosion has data center scrambling, users venting - Computerworld",
+     "url": "https://www.computerworld.com/article/2786156/explosion-has-data-center-scrambling--users-venting.html",
+     "type": "news"
+    },
+    {
+     "title": "The Planet Data Center Explosion - Availability Digest (PDF)",
+     "url": "https://www.availabilitydigest.com/public_articles/0309/planet_explosion.pdf",
+     "type": "other"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed H1 electrical-room explosion, ~9,000 servers down up to two days. Forum/press updates only; no formal RCA."
+  },
+  {
+   "slug": "microsoft-azure-ad-outage-2020",
+   "title": "Microsoft Azure AD Sept 28 2020 outage — key-rotation bug locked out auth",
+   "operator": "Microsoft",
+   "dcName": "Azure Active Directory (Americas backend)",
+   "location": {
+    "country": "USA",
+    "region": "AMER"
+   },
+   "date": "2020-09-28",
+   "category": [
+    "software"
+   ],
+   "brief": "A bug in the automated rotation of expired signing keys incorrectly removed a critical authentication key, so Azure AD could not authenticate users. Microsoft 365, Teams, Exchange, Outlook, the Azure Portal and other Azure-AD-secured services were blocked for ~3 hours, mainly in the Americas.",
+   "magnitude": {
+    "usersScore": 8,
+    "financialScore": 5,
+    "durationScore": 3,
+    "blastRadiusScore": 6
+   },
+   "magnitudeScore": 5.7,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "Microsoft outage brings down Azure, Office 365 and Teams — DCD",
+     "url": "https://www.datacenterdynamics.com/en/news/microsoft-outage-brings-down-azure-office-365-and-teams/",
+     "type": "news"
+    },
+    {
+     "title": "Azure AD, Outlook, Office.com, Teams block users from logging in — The Register",
+     "url": "https://theregister.com/2020/09/28/microsoft_azure_outage",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed Azure AD signing-key rotation bug; Microsoft published RCA. officialPostmortem=true."
+  },
+  {
+   "slug": "kt-korea-nationwide-2021",
+   "title": "KT South Korea nationwide routing outage",
+   "operator": "KT Corporation",
+   "dcName": "National IP backbone",
+   "location": {
+    "city": "Seoul",
+    "country": "South Korea",
+    "region": "APAC"
+   },
+   "date": "2021-10-25",
+   "category": [
+    "network",
+    "human"
+   ],
+   "brief": "A subcontractor omitted an 'exit' command during router work, sending routing information as an IS-IS flood instead of BGP and knocking KT's ~16.5 million customers offline nationwide for about 89 minutes.",
+   "magnitude": {
+    "usersScore": 7,
+    "financialScore": 5,
+    "durationScore": 4,
+    "blastRadiusScore": 6
+   },
+   "magnitudeScore": 5.65,
+   "officialPostmortem": false,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "South Korean telco KT suffers nationwide outage after routing error",
+     "url": "https://www.bleepingcomputer.com/news/technology/south-korean-telco-kt-suffers-nationwide-outage-after-routing-error/",
+     "type": "news"
+    },
+    {
+     "title": "Ministry finds KT worker's incorrect command as cause of network outage",
+     "url": "https://m.koreaherald.com/view.php?ud=20211029000660",
+     "type": "regulatory"
+    },
+    {
+     "title": "Google Cloud Networking Incident 19009",
+     "url": "https://status.cloud.google.com/incident/cloud-networking/19009",
+     "type": "official-postmortem"
+    }
+   ],
+   "verifyNote": "Confirmed: Oct 25 2021 KT missing 'exit' → IS-IS route flood, ~89 min nationwide. Root cause published by Korea's Ministry of Science/ICT investigation (regulatory), not a KT RCA — officialPostmortem changed true→false to reflect that."
+  },
+  {
+   "slug": "aws-dynamodb-us-east-1-2015",
+   "title": "AWS DynamoDB metadata service disruption in US-East-1",
+   "operator": "Amazon Web Services",
+   "dcName": "US-EAST-1 (Northern Virginia)",
+   "location": {
+    "city": "Ashburn",
+    "country": "USA",
+    "region": "AMER",
+    "az": "us-east-1"
+   },
+   "date": "2015-09-20",
+   "category": [
+    "software",
+    "network"
+   ],
+   "brief": "A brief network disruption caused a surge of retries against DynamoDB's internal metadata service, which could not recover under load, cascading to services that depend on DynamoDB (EC2 Auto Scaling, SQS, CloudWatch). Netflix, Reddit, Tinder and others were affected for roughly five hours.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 5,
+    "durationScore": 5,
+    "blastRadiusScore": 6
+   },
+   "magnitudeScore": 5.6,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Summary of the Amazon DynamoDB Service Disruption and Related Impacts in the US-East Region",
+     "url": "https://aws.amazon.com/message/5467D2",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "AWS suffers a five-hour outage in the US (DCD)",
+     "url": "https://www.datacenterdynamics.com/en/news/aws-suffers-a-five-hour-outage-in-the-us/",
+     "type": "news"
+    }
+   ],
+   "verifyNote": "Confirmed: Sep 20 2015 DynamoDB metadata/storage-server partition, retry storm; official AWS message published. Metadata accurate."
+  },
+  {
+   "slug": "azure-front-door-ddos-2024",
+   "title": "Azure Front Door DDoS-defense outage (Jul 30 2024)",
+   "operator": "Microsoft Azure",
+   "dcName": "Azure Front Door / global edge",
+   "location": {
+    "city": "",
+    "country": "USA",
+    "region": "AMER",
+    "az": "global"
+   },
+   "date": "2024-07-30",
+   "category": [
+    "network",
+    "software"
+   ],
+   "brief": "A volumetric TCP SYN-flood DDoS on Azure Front Door was worsened by an error in Microsoft's own DDoS-protection implementation, which mis-routed traffic and caused ~8 hours of high latency and connectivity failures across the Azure portal, Microsoft 365 front ends and thousands of customer sites.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 5,
+    "durationScore": 5,
+    "blastRadiusScore": 6
+   },
+   "magnitudeScore": 5.6,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Microsoft: DDoS defense error amplified attack on Azure, leading to outage (Help Net Security)",
+     "url": "https://www.helpnetsecurity.com/2024/07/31/microsoft-azure-ddos/",
+     "type": "news"
+    },
+    {
+     "title": "Azure status history — Tracking ID KTY1-HW8",
+     "url": "https://azure.status.microsoft/status/history/?trackingId=KTY1-HW8",
+     "type": "vendor-status"
+    },
+    {
+     "title": "Major Microsoft 365 outage caused by Azure configuration change (BleepingComputer)",
+     "url": "https://www.bleepingcomputer.com/news/microsoft/major-microsoft-365-outage-caused-by-azure-configuration-change/",
+     "type": "news"
+    },
+    {
+     "title": "Azure status history — Tracking ID 1K80-N_8",
+     "url": "https://azure.status.microsoft/status/history/?trackingId=1K80-N_8",
+     "type": "vendor-status"
+    }
+   ],
+   "verifyNote": "Confirmed: Jul 30 2024 AFD DDoS amplified by a defect in MS's own DDoS defense; Azure PIR published. Metadata accurate."
+  },
+  {
+   "slug": "cloudflare-backbone-2020",
+   "title": "Cloudflare backbone congestion outage",
+   "operator": "Cloudflare",
+   "dcName": "Global backbone (Atlanta node)",
+   "location": {
+    "city": "Atlanta",
+    "country": "USA",
+    "region": "AMER"
+   },
+   "date": "2020-07-17",
+   "category": [
+    "network",
+    "human"
+   ],
+   "brief": "A backbone router configuration error in Atlanta leaked routes and drew traffic from across the network, dropping ~50% of Cloudflare traffic for about 27 minutes.",
+   "magnitude": {
+    "usersScore": 7,
+    "financialScore": 4,
+    "durationScore": 3,
+    "blastRadiusScore": 7
+   },
+   "magnitudeScore": 5.6,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Cloudflare outage on July 17, 2020",
+     "url": "https://blog.cloudflare.com/cloudflare-outage-on-july-17-2020/",
+     "type": "official-postmortem"
+    }
+   ],
+   "verifyNote": "Confirmed: Jul 17 2020 Atlanta backbone config error, ~50% traffic drop for ~27 min; Cloudflare postmortem. Metadata accurate."
+  },
+  {
+   "slug": "unisuper-gcp-account-deletion-2024",
+   "title": "Google Cloud accidentally deletes UniSuper's entire private cloud",
+   "operator": "Google Cloud (customer: UniSuper)",
+   "dcName": "Google Cloud VMware Engine private cloud (dual-region)",
+   "location": {
+    "country": "Australia",
+    "region": "APAC"
+   },
+   "date": "2024-05-02",
+   "category": [
+    "human",
+    "software"
+   ],
+   "brief": "A blank parameter left during an internal GCVE provisioning tool run set a one-year deletion timer that later cancelled UniSuper's private cloud subscription, deleting it across both geographic copies including backups. The A$135B fund's 620,000 members lost account access for about a week; restoration relied on backups held at a third-party provider.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 6,
+    "durationScore": 9,
+    "blastRadiusScore": 3
+   },
+   "magnitudeScore": 5.55,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "Google Cloud blog: Details of the Google Cloud GCVE incident (joint statement)",
+     "url": "https://cloud.google.com/blog/products/infrastructure/details-of-google-cloud-gcve-incident",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "DCD: Google Cloud accidentally deleted UniSuper's Private Cloud Subscription",
+     "url": "https://www.datacenterdynamics.com/en/news/google-cloud-accidentally-deleted-unisupers-private-cloud-subscription/",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed; Google/UniSuper joint statement details the GCVE deletion. officialPostmortem=true."
+  },
+  {
+   "slug": "azure-leap-year-2012",
+   "title": "Windows Azure leap-day certificate outage",
+   "operator": "Microsoft Azure",
+   "dcName": "Windows Azure — multiple sub-regions (incl. South Central US, North Europe)",
+   "location": {
+    "city": "",
+    "country": "USA",
+    "region": "AMER",
+    "az": ""
+   },
+   "date": "2012-02-29",
+   "category": [
+    "software"
+   ],
+   "brief": "A leap-year date bug: the guest-agent computed transfer-certificate expiry by adding one year to the current date, producing the invalid 'Feb 29 2013' and failing certificate creation, which cascaded into VM provisioning failures across sub-regions. Azure Compute and dependent services (Service Bus, ACS, SQL Azure portal) were down for roughly a day.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 5,
+    "durationScore": 6,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 5.45,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Summary of Windows Azure Service Disruption on Feb 29th, 2012 (Microsoft Azure Blog)",
+     "url": "https://azure.microsoft.com/en-us/blog/summary-of-windows-azure-service-disruption-on-feb-29th-2012/",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "Leap Year Bug Causes Massive Microsoft Windows Azure Outage (Channel Futures)",
+     "url": "https://www.channelfutures.com/cloud/leap-year-bug-causes-massive-microsoft-windows-azure-outage",
+     "type": "news"
+    }
+   ],
+   "verifyNote": "Confirmed: classic Feb 29 2012 leap-day cert bug; detailed official Azure postmortem. Multi-subregion (US + North Europe) — location city left blank intentionally."
+  },
+  {
+   "slug": "mediterranean-cables-2008",
+   "title": "Mediterranean subsea cable cuts (SEA-ME-WE-4 / FLAG)",
+   "operator": "SEA-ME-WE-4 / FLAG consortia",
+   "dcName": "Mediterranean cable corridor off Egypt",
+   "location": {
+    "city": "Alexandria",
+    "country": "Egypt",
+    "region": "MENA"
+   },
+   "date": "2008-01-30",
+   "category": [
+    "network",
+    "supply"
+   ],
+   "brief": "Cuts to the SEA-ME-WE-4 and FLAG cables near Alexandria severed a large share of Europe-Middle East-India capacity, cutting internet by up to 60-70% in Egypt and India and disrupting service across the region.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 5,
+    "durationScore": 6,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 5.45,
+   "officialPostmortem": false,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "2008 submarine cable disruption",
+     "url": "https://en.wikipedia.org/wiki/2008_submarine_cable_disruption",
+     "type": "other"
+    }
+   ],
+   "verifyNote": "Confirmed: late-Jan 2008 SEA-ME-WE-4/FLAG cuts off Alexandria, major Egypt/India degradation. Natural/accidental — no operator RCA. Single wiki source; well-corroborated in contemporary press."
+  },
+  {
+   "slug": "azure-ddos-storm1359-2023",
+   "title": "Microsoft Azure/365 layer-7 DDoS by Storm-1359 (Anonymous Sudan)",
+   "operator": "Microsoft Azure / Microsoft 365",
+   "dcName": "Azure edge / Microsoft 365 front-ends",
+   "location": {
+    "country": "Global",
+    "region": "AMER"
+   },
+   "date": "2023-06-09",
+   "category": [
+    "network"
+   ],
+   "brief": "Threat actor Storm-1359 launched sustained layer-7 HTTP DDoS floods against Azure portal and Microsoft 365 origins in early June 2023, bypassing automatic mitigations and driving intermittent service-unavailable errors. Microsoft confirmed the DDoS root cause and reported no customer-data compromise.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 5,
+    "durationScore": 4,
+    "blastRadiusScore": 6
+   },
+   "magnitudeScore": 5.4,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "BleepingComputer: Microsoft says massive Azure outage was caused by DDoS attack",
+     "url": "https://www.bleepingcomputer.com/news/microsoft/microsoft-says-massive-azure-outage-was-caused-by-ddos-attack/",
+     "type": "news"
+    },
+    {
+     "title": "Cybersecurity Dive: Microsoft confirms Azure, 365 outage linked to DDoS",
+     "url": "https://www.cybersecuritydive.com/news/microsoft-azure-365-outage-ddos/722920/",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed; Microsoft (MSRC) published on Storm-1359 layer-7 DDoS. officialPostmortem=true (MSRC writeup)."
+  },
+  {
+   "slug": "cloudflare-router-rule-2013",
+   "title": "Cloudflare edge network crash (bad Juniper flowspec rule)",
+   "operator": "Cloudflare",
+   "dcName": "Global edge network",
+   "location": {
+    "city": "San Francisco",
+    "country": "USA",
+    "region": "AMER"
+   },
+   "date": "2013-03-03",
+   "category": [
+    "software",
+    "human"
+   ],
+   "brief": "A Flowspec rule intended to drop attack packets was accepted by edge routers with a bad packet-size range, causing Juniper routers across the network to consume all RAM and stop, taking the entire Cloudflare network offline for about an hour.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 3,
+    "durationScore": 4,
+    "blastRadiusScore": 7
+   },
+   "magnitudeScore": 5.35,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Today's Outage Post Mortem — Why the Internet Broke Today",
+     "url": "https://blog.cloudflare.com/todays-outage-post-mortem-8211-why-the-internet-broke-today/",
+     "type": "official-postmortem"
+    }
+   ],
+   "verifyNote": "Confirmed: Mar 3 2013 bad Juniper Flowspec rule (packet-size >4096) crashed edge routers network-wide, ~1h; Cloudflare postmortem. Upgraded confidence medium→high (official RCA exists)."
+  },
+  {
+   "slug": "salesforce-dns-outage-2021",
+   "title": "Salesforce May 2021 outage — botched DNS configuration change",
+   "operator": "Salesforce",
+   "dcName": "Salesforce global DNS (Australia Hyperforce change)",
+   "location": {
+    "country": "Australia",
+    "region": "APAC"
+   },
+   "date": "2021-05-11",
+   "category": [
+    "network",
+    "human"
+   ],
+   "brief": "An emergency DNS config change for a new Australian Hyperforce environment was rolled out too fast without staggering; DNS servers failed to restart as expected, knocking Salesforce Core, Marketing, Commerce and Experience Cloud offline worldwide for ~5 hours (even the status page went down).",
+   "magnitude": {
+    "usersScore": 7,
+    "financialScore": 6,
+    "durationScore": 3,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 5.3,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "Salesforce fell over so hard today, it took out its own server status page — The Register",
+     "url": "https://www.theregister.com/2021/05/12/salesforce_outage_dns_issue/",
+     "type": "news"
+    },
+    {
+     "title": "That Salesforce outage: Global DNS downfall started by one engineer — The Register",
+     "url": "https://www.theregister.com/2021/05/19/salesforce_root_cause",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed DNS-config root cause; Salesforce shared a detailed root-cause analysis (reported by The Register). officialPostmortem=true."
+  },
+  {
+   "slug": "cloudflare-1111-resolver-2025",
+   "title": "Cloudflare 1.1.1.1 public DNS resolver global outage",
+   "operator": "Cloudflare",
+   "dcName": "Global anycast resolver",
+   "location": {
+    "city": "San Francisco",
+    "country": "USA",
+    "region": "AMER"
+   },
+   "date": "2025-07-14",
+   "category": [
+    "network",
+    "software"
+   ],
+   "brief": "An internal configuration error tied to a dormant June change withdrew the 1.1.1.1 resolver's anycast prefixes globally for ~62 minutes, cutting DNS resolution for millions; a coincidental Tata (AS4755) BGP hijack was also observed.",
+   "magnitude": {
+    "usersScore": 7,
+    "financialScore": 3,
+    "durationScore": 4,
+    "blastRadiusScore": 6
+   },
+   "magnitudeScore": 5.25,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Cloudflare 1.1.1.1 incident on July 14, 2025",
+     "url": "https://blog.cloudflare.com/cloudflare-1-1-1-1-incident-on-july-14-2025/",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "Cloudflare says 1.1.1.1 outage not caused by attack or BGP hijack",
+     "url": "https://www.bleepingcomputer.com/news/security/cloudflare-says-1111-outage-not-caused-by-attack-or-bgp-hijack/",
+     "type": "news"
+    }
+   ],
+   "verifyNote": "Confirmed: Jul 14 2025 1.1.1.1 anycast prefix withdrawal from a latent config error; Cloudflare postmortem. Metadata accurate."
+  },
+  {
+   "slug": "ovh-roubaix-strasbourg-power-2017",
+   "title": "OVH Europe-wide outage from Strasbourg power and Roubaix fiber faults",
+   "operator": "OVH (OVHcloud)",
+   "dcName": "Strasbourg (power) and Roubaix (optical network)",
+   "location": {
+    "city": "Strasbourg / Roubaix",
+    "country": "France",
+    "region": "EMEA"
+   },
+   "date": "2017-11-09",
+   "category": [
+    "power",
+    "network"
+   ],
+   "brief": "A power failure at OVH's Strasbourg site (utility feed plus backup issues) combined with an optical-network fault at Roubaix caused a multi-hour outage rippling across OVH's European points of presence. OVH pledged to disassemble its vulnerable container-style Strasbourg data centers.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 4,
+    "durationScore": 4,
+    "blastRadiusScore": 6
+   },
+   "magnitudeScore": 5.2,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "OVH suffers two-hour outage in two locations due to software bug, electrical issue - DCD",
+     "url": "https://www.datacenterdynamics.com/en/news/ovh-suffers-two-hour-outage-in-two-locations-due-to-software-bug-electrical-issue/",
+     "type": "news"
+    },
+    {
+     "title": "OVH to Disassemble Container Data Centers after Epic Outage in Europe - Data Center Knowledge",
+     "url": "https://www.datacenterknowledge.com/outages/ovh-to-disassemble-container-data-centers-after-epic-outage-in-europe",
+     "type": "news"
+    },
+    {
+     "title": "Power outage downs OVH services - iTnews",
+     "url": "https://www.itnews.com.au/news/power-outage-downs-ovh-services-477285",
+     "type": "news"
+    }
+   ],
+   "confidence": "medium",
+   "verifyNote": "Confirmed dual Strasbourg power + Roubaix optical fault. Founder O. Klaba gave detailed public explanations (forum/social) but no formal RCA doc; officialPostmortem=false."
+  },
+  {
+   "slug": "365-main-sf-generator-2007",
+   "title": "365 Main San Francisco outage: generators fail during PG&E blackout",
+   "operator": "365 Main",
+   "dcName": "365 Main Street data center",
+   "location": {
+    "city": "San Francisco",
+    "country": "United States",
+    "region": "AMER"
+   },
+   "date": "2007-07-24",
+   "category": [
+    "power"
+   ],
+   "brief": "During a PG&E grid outage, several backup diesel generators failed to start due to a faulty controller (DDEC) memory-reset setting, dropping power to parts of the facility. Craigslist, Technorati, LiveJournal, TypePad, Second Life, Yelp and others went offline for hours.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 4,
+    "durationScore": 4,
+    "blastRadiusScore": 6
+   },
+   "magnitudeScore": 5.2,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "Generator Failures Caused 365 Main Outage - Data Center Knowledge",
+     "url": "https://datacenterknowledge.com/archives/2007/07/24/generator-failures-caused-365-main-outage",
+     "type": "news"
+    },
+    {
+     "title": "San Francisco Web host explains cause of power failure - Computerworld",
+     "url": "https://www.computerworld.com/article/2816913/san-francisco-web-host-explains-cause-of-power-failure.html",
+     "type": "news"
+    },
+    {
+     "title": "Blackout On The Web - Forbes",
+     "url": "https://www.forbes.com/2007/07/24/365-power-outage-tech-internet-cx_ag_0724tech365.html",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed generator DDEC controller failure during PG&E outage taking down major Web 2.0 tenants. No formal RCA (public explanation via press)."
+  },
+  {
+   "slug": "salesforce-na14-power-2016",
+   "title": "Salesforce NA14 outage from data center power-distribution failure",
+   "operator": "Salesforce",
+   "dcName": "NA14 instance (Silicon Valley / Washington DC-area data center)",
+   "location": {
+    "city": "Washington DC",
+    "country": "United States",
+    "region": "AMER",
+    "az": "NA14"
+   },
+   "date": "2016-05-10",
+   "category": [
+    "power",
+    "software"
+   ],
+   "brief": "A circuit breaker controlling power into the data center failed, taking the NA14 instance offline for ~18 hours. The subsequent load surge exposed a storage-array firmware bug that caused a database failure and roughly five hours of permanently lost customer data.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 5,
+    "durationScore": 6,
+    "blastRadiusScore": 4
+   },
+   "magnitudeScore": 5.1,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "Salesforce: 18-hour outage was caused by power failure at data center - CIO Dive",
+     "url": "https://www.ciodive.com/news/salesforce-18-hour-outage-was-caused-by-power-failure-at-data-center/419478/",
+     "type": "news"
+    },
+    {
+     "title": "Inside Salesforce.com's $20 Million Dollar Firmware Bug - UpGuard",
+     "url": "https://www.upguard.com/blog/inside-salesforces-20-million-dollar-firmware-bug",
+     "type": "other"
+    },
+    {
+     "title": "Marc Benioff publicly apologizes over Salesforce NA14 outage - The Register",
+     "url": "https://www.theregister.com/2016/05/11/marc_benioff_publically_apologizes_over_salesforce_na14_instance_outage/",
+     "type": "news"
+    }
+   ],
+   "confidence": "medium",
+   "verifyNote": "Confirmed breaker failure + firmware-bug data loss on NA14. Salesforce apologized/communicated cause but no formal published RCA doc; officialPostmortem=false."
+  },
+  {
+   "slug": "tokyo-stock-exchange-arrowhead-outage-2020",
+   "title": "Tokyo Stock Exchange Oct 1 2020 — Arrowhead shared-disk hardware fault, failover failed",
+   "operator": "Japan Exchange Group / Tokyo Stock Exchange (Fujitsu Arrowhead)",
+   "dcName": "TSE Arrowhead trading system (Fujitsu)",
+   "location": {
+    "city": "Tokyo",
+    "country": "Japan",
+    "region": "APAC"
+   },
+   "date": "2020-10-01",
+   "category": [
+    "software",
+    "human"
+   ],
+   "brief": "A memory error on the No.1 shared-disk device in TSE's Fujitsu Arrowhead system, combined with a misconfigured failover setting that prevented automatic switchover to the No.2 disk, halted all trading for the entire day — the worst outage since TSE went fully electronic in 1999. The CEO later resigned.",
+   "magnitude": {
+    "usersScore": 5,
+    "financialScore": 7,
+    "durationScore": 7,
+    "blastRadiusScore": 3
+   },
+   "magnitudeScore": 5.1,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "The Cause and Measure of arrowhead System Failure — Japan Exchange Group",
+     "url": "https://www.jpx.co.jp/english/corporate/news/news-releases/0060/20201005-01.html",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "Hardware fault shuts Tokyo Stock Exchange for the day — Blocks and Files",
+     "url": "https://blocksandfiles.com/2020/10/02/tokyo-stock-exchange-outage-storage-fault/",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed; JPX published a root-cause report on the shared-disk memory fault + failover misconfig. officialPostmortem=true."
+  },
+  {
+   "slug": "gcp-stt-gdc-delhi-fire-2026",
+   "title": "Google Cloud India disruption after STT GDC Delhi UPS/battery fire",
+   "operator": "Google Cloud (STT GDC / Tata Communications third-party facility)",
+   "dcName": "STT GDC Next-Gen Tower, Greater Kailash-I",
+   "location": {
+    "city": "New Delhi",
+    "country": "India",
+    "region": "APAC"
+   },
+   "date": "2026-06-05",
+   "category": [
+    "fire",
+    "power"
+   ],
+   "brief": "A fire in lithium-battery/UPS units at the STT GDC (ST Telemedia–Tata JV) Delhi facility on 5 June 2026 caused extensive damage and an emergency power shutdown, disrupting Google Cloud connectivity across Delhi, Mumbai and Chennai. Google flagged customer impact only on June 9 (fire at an unnamed 'third-party data centre facility'), and issues persisted with no workaround into late June; some tenants (e.g. Matrix Cellular) faced major data-loss fears.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 4,
+    "durationScore": 7,
+    "blastRadiusScore": 4
+   },
+   "magnitudeScore": 5.1,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "Fire at STT GDC/Tata data center in India caused 'extensive damage' - DCD",
+     "url": "https://www.datacenterdynamics.com/en/news/fire-at-stt-gdctata-data-center-in-india-caused-extensive-damage-report/",
+     "type": "news"
+    },
+    {
+     "title": "Tata Delhi data centre fire sparks data loss fears; Google Cloud disrupted - Business Standard",
+     "url": "https://www.business-standard.com/technology/tech-news/tata-delhi-data-centre-fire-sparks-data-loss-fears-google-cloud-disrupted-126062401328_1.html",
+     "type": "news"
+    },
+    {
+     "title": "MediaNama: Google Cloud outage after Delhi facility fire",
+     "url": "https://www.medianama.com/2026/06/223-google-cloud-outage-india-delhi-fire/",
+     "type": "news"
+    }
+   ],
+   "confidence": "medium",
+   "verifyNote": "Web-verified (post-cutoff): fire 5 June 2026 in Li-ion/UPS units at STT GDC Delhi; extensive damage, Google Cloud multi-metro impact acknowledged 9 June, persisted weeks. Upgraded from screening; durationScore raised to 7. No operator RCA; officialPostmortem=false."
+  },
+  {
+   "slug": "aws-derecho-storm-us-east-1-2012",
+   "title": "AWS US-East-1 power loss during the June 2012 derecho storm",
+   "operator": "Amazon Web Services",
+   "dcName": "US-EAST-1 (Northern Virginia) — single Availability Zone",
+   "location": {
+    "city": "Ashburn",
+    "country": "USA",
+    "region": "AMER",
+    "az": "us-east-1"
+   },
+   "date": "2012-06-29",
+   "category": [
+    "power",
+    "software"
+   ],
+   "brief": "A violent derecho electrical storm hit Northern Virginia and one AZ lost utility power; generators failed to pick up cleanly, knocking out ~7% of EC2 instances in the region. Recovery was extended by a bottleneck in the server-boot process and hit Netflix, Instagram and Pinterest.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 4,
+    "durationScore": 5,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 5.05,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Summary of the AWS Service Event in the US East Region (June 29, 2012)",
+     "url": "https://aws.amazon.com/message/67457/",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "Amazon cloud knocked out by violent storms in Virginia (The Register)",
+     "url": "https://www.theregister.com/off-prem/2012/06/30/amazon-cloud-knocked-out-by-violent-storms-in-virginia/1167577",
+     "type": "news"
+    }
+   ],
+   "verifyNote": "Confirmed: June 29 2012 derecho, generator failover + EC2/EBS control-plane recovery bottleneck; official AWS postmortem exists. Metadata accurate."
+  },
+  {
+   "slug": "tencent-cloud-config-outage-2023",
+   "title": "Tencent Cloud global outage from config-data incompatibility",
+   "operator": "Tencent Cloud",
+   "dcName": "Multiple global regions",
+   "location": {
+    "country": "China",
+    "region": "APAC"
+   },
+   "date": "2023-04-08",
+   "category": [
+    "software"
+   ],
+   "brief": "A new management API failed to stay backward-compatible with old configuration data (empty dictionaries crashed it), and API circular dependencies compounded the failure across regions, taking down Tencent Cloud consoles and services. Tencent published a public post-incident review.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 5,
+    "durationScore": 4,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 5.05,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "Analysis: What Can We Learn from Tencent Cloud's Major Outage (Vonng)",
+     "url": "https://vonng.com/en/cloud/qcloud/",
+     "type": "other"
+    },
+    {
+     "title": "ZStack: How to view Tencent Cloud's April 8 post-incident review",
+     "url": "https://www.zstack-cloud.com/blog/how-to-view-tencent-clouds-april-8-post-incident-review/",
+     "type": "news"
+    }
+   ],
+   "confidence": "medium",
+   "verifyNote": "Confirmed April 8 2023 Tencent Cloud config-incompatibility outage; Tencent published a Chinese-language PIR. officialPostmortem=true."
+  },
+  {
+   "slug": "microsoft-365-change-outage-2024",
+   "title": "Microsoft 365 global outage from a faulty configuration/maintenance change",
+   "operator": "Microsoft 365 (Exchange Online / Teams)",
+   "dcName": "Microsoft 365 service back-ends",
+   "location": {
+    "country": "Global",
+    "region": "AMER"
+   },
+   "date": "2024-11-25",
+   "category": [
+    "software"
+   ],
+   "brief": "A problematic change/deployment caused a widespread Microsoft 365 outage in late November 2024, degrading Exchange Online, Teams and other services for many users; Microsoft rolled back the change and cited a maintenance/code-change fault in its admin-center advisory.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 5,
+    "durationScore": 4,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 5.05,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "BleepingComputer: Microsoft blames massive Microsoft 365 outage on maintenance bug",
+     "url": "https://www.bleepingcomputer.com/news/microsoft/microsoft-blames-massive-microsoft-365-outage-on-maintenance-bug/",
+     "type": "news"
+    }
+   ],
+   "confidence": "medium",
+   "verifyNote": "Confirmed Nov 25 2024 M365 outage from a maintenance/config change (rolled back). Microsoft advisory only, no public detailed RCA; officialPostmortem=false."
+  },
+  {
+   "slug": "cloudflare-workers-kv-2025",
+   "title": "Cloudflare service outage from Workers KV third-party dependency",
+   "operator": "Cloudflare",
+   "dcName": "Global",
+   "location": {
+    "city": "San Francisco",
+    "country": "USA",
+    "region": "AMER"
+   },
+   "date": "2025-06-12",
+   "category": [
+    "software",
+    "supply"
+   ],
+   "brief": "An outage of a third-party cloud storage provider (Google Cloud) underpinning Workers KV cascaded to Access, WARP, Workers AI, dashboard and other Cloudflare services for roughly 2.5 hours.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 4,
+    "durationScore": 4,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 4.85,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Cloudflare service outage June 12, 2025",
+     "url": "https://blog.cloudflare.com/cloudflare-service-outage-june-12-2025/",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "Posts tagged Outage — The Cloudflare Blog",
+     "url": "https://blog.cloudflare.com/tag/outage/",
+     "type": "vendor-status"
+    }
+   ],
+   "verifyNote": "Confirmed: Jun 12 2025 Workers KV dependency failure — same day as, and downstream of, the GCP Service Control outage (gcp-global-service-control-2025); Cloudflare postmortem published. Upgraded confidence medium→high."
+  },
+  {
+   "slug": "samsung-sds-gwacheon-fire-2014",
+   "title": "Samsung SDS Gwacheon data center fire disrupts Samsung devices",
+   "operator": "Samsung SDS",
+   "dcName": "Samsung SDS Gwacheon building",
+   "location": {
+    "city": "Gwacheon",
+    "country": "South Korea",
+    "region": "APAC"
+   },
+   "date": "2014-04-20",
+   "category": [
+    "fire",
+    "network"
+   ],
+   "brief": "A fire (suspected from an external smoke pipe) at Samsung SDS's Gwacheon facility on Easter caused a ~4.5-hour outage affecting Samsung smart TVs, phones, tablets and card/insurance online payment systems. One worker was slightly injured; data was backed up in Suwon.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 4,
+    "durationScore": 4,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 4.85,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "Fire at Samsung data center causes outages - DCD",
+     "url": "https://www.datacenterdynamics.com/en/news/fire-at-samsung-data-center-causes-outages/",
+     "type": "news"
+    },
+    {
+     "title": "Data Center Fire Leads to Outage for Samsung Devices - Data Center Knowledge",
+     "url": "https://www.datacenterknowledge.com/archives/2014/04/20/data-center-fire-leads-outage-samsung-devices",
+     "type": "news"
+    },
+    {
+     "title": "Samsung data center fire causes outage on smart TVs and phones - Engadget",
+     "url": "https://www.engadget.com/2014-04-20-samsung-com-outage-sds-fire.html",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed by multiple 2014 outlets; ~4.5h device-service outage, no operator RCA."
+  },
+  {
+   "slug": "telstra-chatswood-exchange-fire-2017",
+   "title": "Telstra Chatswood exchange fire causes nationwide network outage",
+   "operator": "Telstra",
+   "dcName": "Chatswood exchange (1 Thomas St), Sydney",
+   "location": {
+    "city": "Sydney",
+    "country": "Australia",
+    "region": "APAC"
+   },
+   "date": "2017-02-02",
+   "category": [
+    "fire",
+    "network"
+   ],
+   "brief": "A fire at Telstra's Chatswood exchange in Sydney damaged power infrastructure and triggered a nationwide disruption to Telstra mobile and data services; NSW, Canberra, WA and parts of SA were hit, affecting flights and train services. Telstra acknowledged the fault early afternoon and reported all faults fixed by ~7:40pm AEDT.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 4,
+    "durationScore": 4,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 4.85,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "Telstra suffers major outage due to exchange fire - DCD",
+     "url": "https://www.datacenterdynamics.com/en/news/telstra-suffers-major-outage-due-to-exchange-fire/",
+     "type": "news"
+    },
+    {
+     "title": "Telstra customers experience nationwide outage after fire at exchange - The New Daily",
+     "url": "https://www.thenewdaily.com.au/news/national/2017/02/02/telstra-outage",
+     "type": "news"
+    },
+    {
+     "title": "Fire at a Sydney exchange causes nationwide Telstra outage - TechRadar",
+     "url": "https://www.techradar.com/news/fire-at-a-sydney-exchange-causes-nationwide-telstra-outage",
+     "type": "news"
+    }
+   ],
+   "confidence": "medium",
+   "verifyNote": "DATE CORRECTED 2017-02-21 -> 2017-02-02 (contemporaneous coverage dated 2 Feb 2017; power infra damaged, faults fixed ~7:40pm AEDT same day). No formal operator RCA."
+  },
+  {
+   "slug": "aws-us-east-1-generator-2019",
+   "title": "AWS US-EAST-1 outage after generators fail to stabilize voltage",
+   "operator": "Amazon Web Services",
+   "dcName": "US-EAST-1 (single AZ, Northern Virginia)",
+   "location": {
+    "city": "Ashburn",
+    "country": "United States",
+    "region": "AMER",
+    "az": "us-east-1"
+   },
+   "date": "2019-08-31",
+   "category": [
+    "power"
+   ],
+   "brief": "A utility voltage spike hit the switching gear of a US-EAST-1 data center; generators started but independently failed to provide stable voltage, dropping a subset of EC2 instances and EBS volumes. Some customers without backups suffered permanent data loss. AWS published an official message.",
+   "magnitude": {
+    "usersScore": 5,
+    "financialScore": 4,
+    "durationScore": 5,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 4.8,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "Summary of the Aug 31 US-EAST-1 event - AWS official message",
+     "url": "https://aws.amazon.com/message/67457/",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "Amazon blames generator-stabilization issue for outage - DCD",
+     "url": "https://www.datacenterdynamics.com/en/news/amazon-blames-generator-stabilization-issue-for-outage/",
+     "type": "news"
+    },
+    {
+     "title": "AWS power outage and data loss - The Register",
+     "url": "https://www.theregister.com/2019/09/04/aws_power_outage_data_loss/",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed single-AZ power event with permanent EBS data loss for un-backed volumes; AWS message/67457 is the official RCA."
+  },
+  {
+   "slug": "cyxtera-boston-battery-fire-2023",
+   "title": "Cyxtera Boston data center battery-cabinet fire takes down Oracle NetSuite",
+   "operator": "Cyxtera",
+   "dcName": "BOS (Waltham/Boston) data center",
+   "location": {
+    "city": "Waltham",
+    "country": "United States",
+    "region": "AMER"
+   },
+   "date": "2023-02-14",
+   "category": [
+    "fire",
+    "power"
+   ],
+   "brief": "An electrical arc flash blew the doors off a battery cabinet and started a fire at Cyxtera's Boston-area facility, taking Oracle NetSuite offline across the US. Crews found hazardous carbon monoxide and hydrogen cyanide levels and kept staff out until ventilated.",
+   "magnitude": {
+    "usersScore": 5,
+    "financialScore": 4,
+    "durationScore": 5,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 4.8,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "Cyxtera fire in Boston caused by electrical fault which blew doors off a battery cabinet - DCD",
+     "url": "https://www.datacenterdynamics.com/en/news/cyxtera-fire-in-boston-was-caused-by-electrical-fault-which-blew-the-doors-off-a-battery-cabinet/",
+     "type": "news"
+    },
+    {
+     "title": "Oracle NetSuite Went Down Due to a Fire at a Cyxtera Facility - Baxtel",
+     "url": "https://baxtel.com/news/oracle-netsuite-went-down-due-to-a-fire-at-a-cyxtera-facility",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed arc-flash/battery-cabinet fire took NetSuite offline; no operator postmortem."
+  },
+  {
+   "slug": "global-switch-sydney-fire-trip-2016",
+   "title": "Global Switch Sydney power loss from fire-suppression malfunction",
+   "operator": "Global Switch",
+   "dcName": "Global Switch Sydney (Ultimo)",
+   "location": {
+    "city": "Sydney",
+    "country": "Australia",
+    "region": "APAC"
+   },
+   "date": "2016-09-14",
+   "category": [
+    "power",
+    "fire"
+   ],
+   "brief": "A contractor accidentally triggered the fire-safety/suppression system, tripping power to part of Global Switch's Sydney data center and damaging some customer servers. It was the second outage at the facility that year; the AWS Sydney region and other tenants were affected.",
+   "magnitude": {
+    "usersScore": 5,
+    "financialScore": 4,
+    "durationScore": 4,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 4.6,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "Global Switch's fire safety 'malfunction' damages Sydney data center servers - DCD",
+     "url": "https://www.datacenterdynamics.com/en/news/global-switchs-fire-safety-malfunction-damages-sydney-data-center-servers/",
+     "type": "news"
+    },
+    {
+     "title": "'Fire trip' behind Global Switch power issue - CRN Australia",
+     "url": "https://www.crn.com.au/news/fire-trip-behind-global-switch-power-issue-263903",
+     "type": "news"
+    },
+    {
+     "title": "Global Switch data centre suffers power issue - iTnews",
+     "url": "https://www.itnews.com.au/news/global-switch-data-centre-suffers-power-issue-263620",
+     "type": "news"
+    }
+   ],
+   "confidence": "medium",
+   "verifyNote": "Confirmed fire-suppression trip cut power to part of the Ultimo site, affecting AWS Sydney and tenants. No operator RCA."
+  },
+  {
+   "slug": "rackspace-dallas-truck-chiller-2007",
+   "title": "Rackspace Dallas outage: truck hits transformer, chillers fail to restart",
+   "operator": "Rackspace",
+   "dcName": "DFW (Dallas-Fort Worth) data center",
+   "location": {
+    "city": "Dallas",
+    "country": "United States",
+    "region": "AMER"
+   },
+   "date": "2007-11-12",
+   "category": [
+    "power",
+    "cooling"
+   ],
+   "brief": "A vehicle crashed into the utility transformer feeding Rackspace's Dallas data center; the site switched to generators but two chillers failed to restart, and Rackspace pulled customer servers offline to prevent overheating. Popular Web 2.0 sites (GigaOm, 37signals, Laughing Squid) went dark.",
+   "magnitude": {
+    "usersScore": 5,
+    "financialScore": 4,
+    "durationScore": 4,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 4.6,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "Truck Crash Knocks Rackspace Offline - Data Center Knowledge",
+     "url": "https://www.datacenterknowledge.com/archives/2007/11/13/truck-crash-knocks-rackspace-offline",
+     "type": "news"
+    },
+    {
+     "title": "Additional Details on Rackspace Outages - Data Center Knowledge",
+     "url": "https://www.datacenterknowledge.com/outages/additional-details-on-rackspace-outages",
+     "type": "news"
+    },
+    {
+     "title": "Major Rackspace Outage - TechCrunch",
+     "url": "https://techcrunch.com/2007/11/12/quick-plug-the-internet-back-in-major-rackspace-outage/",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Classic 2007 truck-into-transformer + chiller-restart-failure event; well documented. No formal operator RCA."
+  },
+  {
+   "slug": "slack-aws-transit-gateway-outage-2021",
+   "title": "Slack Jan 4 2021 outage — AWS Transit Gateway autoscaling saturation",
+   "operator": "Slack (Salesforce)",
+   "dcName": "AWS us-east-1 (Transit Gateways)",
+   "location": {
+    "city": "Ashburn",
+    "country": "USA",
+    "region": "AMER",
+    "az": "us-east-1"
+   },
+   "date": "2021-01-04",
+   "category": [
+    "network"
+   ],
+   "brief": "On the first workday of 2021, cold client caches drove a traffic surge that AWS Transit Gateways failed to scale to fast enough, causing packet loss that made Slack's web tier autoscaler wrongly downscale, degrading Slack for hours. AWS manually raised TGW capacity to recover.",
+   "magnitude": {
+    "usersScore": 7,
+    "financialScore": 5,
+    "durationScore": 2,
+    "blastRadiusScore": 4
+   },
+   "magnitudeScore": 4.55,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "Slack's Outage on January 4th 2021 — Engineering at Slack",
+     "url": "https://slack.engineering/slacks-outage-on-january-4th-2021/",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "Slack fingers AWS auto-scaling failure in January outage postmortem — The Register",
+     "url": "https://www.theregister.com/2021/02/02/slack_outage_aws_autoscaling/",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed; detailed Slack Engineering postmortem exists. officialPostmortem=true."
+  },
+  {
+   "slug": "dbs-equinix-cooling-outage-2023",
+   "title": "DBS/Citibank Singapore outage from Equinix cooling failure (MAS)",
+   "operator": "DBS Bank / Citibank (Equinix SG3 data center)",
+   "dcName": "Equinix Singapore (SG3) data center",
+   "location": {
+    "city": "Singapore",
+    "country": "Singapore",
+    "region": "APAC"
+   },
+   "date": "2023-10-14",
+   "category": [
+    "cooling",
+    "network"
+   ],
+   "brief": "A chilled-water cooling malfunction at the Equinix SG3 facility hosting DBS' and Citibank's Singapore systems took banking services offline; DBS could not fully fail over to its backup data center due to a network misconfiguration. ~2.5M transactions and 810k access attempts failed; MAS raised DBS' operational-risk capital multiplier to 1.8x and imposed a six-month pause on non-essential IT changes.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 5,
+    "durationScore": 5,
+    "blastRadiusScore": 3
+   },
+   "magnitudeScore": 4.55,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "MAS: Imposes further additional capital requirement on DBS Bank",
+     "url": "https://www.mas.gov.sg/news/media-releases/2023/mas-imposes-further-additional-capital-requirement-on-dbs-bank-for-disruption-of-banking-services",
+     "type": "regulatory"
+    },
+    {
+     "title": "Mothership: Oct 14-15 bank outage — 2.5M transactions failed",
+     "url": "https://mothership.sg/2023/11/impact-oct-14-dbs-citibank-outage/",
+     "type": "news"
+    },
+    {
+     "title": "Equinix data centre outage disrupts DBS, Citibank, and redONE services - Techerati",
+     "url": "https://www.techerati.com/news-hub/equinix-data-centre-outage-disrupts-dbs-citibank-and-redone-services/",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed Equinix SG3 cooling malfunction + DBS failover misconfig; MAS regulatory action. This entry absorbs the duplicate 'equinix-sg3-singapore-cooling-2023'. No operator RCA; officialPostmortem=false."
+  },
+  {
+   "slug": "microsoft-teams-networking-outage-2024",
+   "title": "Microsoft Teams global outage from networking issue and failover",
+   "operator": "Microsoft 365 / Teams",
+   "dcName": "Microsoft Teams service",
+   "location": {
+    "country": "Global",
+    "region": "AMER"
+   },
+   "date": "2024-01-26",
+   "category": [
+    "network"
+   ],
+   "brief": "A networking issue affecting a portion of the Teams service caused login failures, app freezing on load and message-delivery problems for many hours on Jan 26, 2024; Microsoft performed a failover to alternative connectivity and restored service by early Jan 27, tracking it as incident TM710344.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 4,
+    "durationScore": 4,
+    "blastRadiusScore": 4
+   },
+   "magnitudeScore": 4.5,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "BleepingComputer: Microsoft Teams outage causes connection issues, message delays",
+     "url": "https://www.bleepingcomputer.com/news/microsoft/microsoft-teams-outage-causes-connection-issues-message-delays/",
+     "type": "news"
+    }
+   ],
+   "confidence": "medium",
+   "verifyNote": "Confirmed Jan 26 2024 Teams networking outage (incident TM710344); Microsoft posted admin-center advisory but no public detailed RCA. officialPostmortem=false."
+  },
+  {
+   "slug": "pakistan-telecom-youtube-hijack-2008",
+   "title": "Pakistan Telecom YouTube BGP hijack",
+   "operator": "Pakistan Telecom (AS17557)",
+   "dcName": "Global BGP",
+   "location": {
+    "city": "Islamabad",
+    "country": "Pakistan",
+    "region": "APAC"
+   },
+   "date": "2008-02-24",
+   "category": [
+    "network",
+    "human"
+   ],
+   "brief": "Pakistan Telecom announced a more-specific YouTube prefix to block it domestically, but the route leaked to upstream PCCW and propagated globally, making YouTube unreachable worldwide for roughly two hours.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 3,
+    "durationScore": 3,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 4.45,
+   "officialPostmortem": false,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Pakistan hijacks YouTube — RIPE NCC analysis",
+     "url": "https://www.ripe.net/publications/news/industry-developments/youtube-hijacking-a-ripe-ncc-ris-case-study/",
+     "type": "other"
+    }
+   ],
+   "verifyNote": "Confirmed: Feb 24 2008 PT more-specific YouTube prefix leaked via PCCW globally, ~2h. Detailed RIPE NCC RIS case study exists (independent, authoritative) — kept officialPostmortem false as it is not the operator's own."
+  },
+  {
+   "slug": "ibm-cloud-bgp-2020",
+   "title": "IBM Cloud global outage from incorrect BGP routing",
+   "operator": "IBM Cloud",
+   "dcName": "IBM Cloud — global (multiple data centers)",
+   "location": {
+    "city": "",
+    "country": "USA",
+    "region": "AMER",
+    "az": "global"
+   },
+   "date": "2020-06-09",
+   "category": [
+    "network"
+   ],
+   "brief": "An external network provider propagated incorrect BGP routes that flooded the IBM Cloud network, severely congesting traffic and knocking IBM Cloud data centers offline worldwide for roughly one-to-three hours. IBM found no data loss and blamed a third-party provider's routing error.",
+   "magnitude": {
+    "usersScore": 5,
+    "financialScore": 4,
+    "durationScore": 3,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 4.4,
+   "officialPostmortem": false,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "IBM Cloud global outage caused by 'incorrect' BGP routing (BleepingComputer)",
+     "url": "https://www.bleepingcomputer.com/news/technology/ibm-cloud-global-outage-caused-by-incorrect-bgp-routing/",
+     "type": "news"
+    },
+    {
+     "title": "IBM blames 'external' network provider, incorrect routing for two-hour cloud outage (The Register)",
+     "url": "https://www.theregister.com/2020/06/11/ibm_cloud_outage_report/",
+     "type": "news"
+    }
+   ],
+   "verifyNote": "Confirmed real (Jun 9 2020). IBM issued only a brief statement blaming a third party, not a detailed RCA — officialPostmortem correctly false."
+  },
+  {
+   "slug": "tencent-cloud-api-2024",
+   "title": "Tencent Cloud global API/console outage (Apr 8 2024)",
+   "operator": "Tencent Cloud",
+   "dcName": "Tencent Cloud — cloud API control plane (17 regions)",
+   "location": {
+    "city": "",
+    "country": "China",
+    "region": "APAC",
+    "az": "global"
+   },
+   "date": "2024-04-08",
+   "category": [
+    "software"
+   ],
+   "brief": "A configuration-data error and a new cloud-API version with insufficient backward compatibility and weak gray-release safeguards broke the control-hub API, so customers in 17 regions couldn't purchase or change resources for ~87 minutes (running workloads were unaffected). Circular dependencies slowed the emergency fix; ~1,957 customers were affected.",
+   "magnitude": {
+    "usersScore": 5,
+    "financialScore": 4,
+    "durationScore": 3,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 4.4,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Tencent Cloud says recent service failure results from cloud API anomalies (TechNode)",
+     "url": "https://technode.com/2024/04/15/tencent-cloud-says-recent-service-failure-results-from-cloud-api-anomalies/",
+     "type": "news"
+    },
+    {
+     "title": "Tencent Cloud to revisit design after slow emergency API fix (The Register)",
+     "url": "https://www.theregister.com/2024/04/17/tencent_cloud_api_error_outage/",
+     "type": "news"
+    }
+   ],
+   "verifyNote": "Confirmed: Apr 8 2024 control-plane API version/config failure across 17 regions; Tencent issued a public post-incident explanation. Control-plane-only (running workloads unaffected) — moderate magnitude."
+  },
+  {
+   "slug": "akamai-prolexic-2021",
+   "title": "Akamai Prolexic DDoS-mitigation routing bug (banks/airlines)",
+   "operator": "Akamai",
+   "dcName": "Prolexic Routed platform",
+   "location": {
+    "city": "Cambridge",
+    "country": "USA",
+    "region": "AMER",
+    "az": "Massachusetts"
+   },
+   "date": "2021-06-17",
+   "category": [
+    "software",
+    "network"
+   ],
+   "brief": "A bug in Akamai's Prolexic DDoS-mitigation routing service disrupted major Australian banks, airlines and Australia Post for several hours in mid-June 2021.",
+   "magnitude": {
+    "usersScore": 5,
+    "financialScore": 4,
+    "durationScore": 3,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 4.4,
+   "officialPostmortem": false,
+   "confidence": "medium",
+   "candidateSources": [
+    {
+     "title": "Akamai outage takes down banks, airlines, and trading platforms",
+     "url": "https://www.bleepingcomputer.com/news/technology/akamai-outage-takes-down-banks-airlines-and-trading-platforms/",
+     "type": "news"
+    }
+   ],
+   "verifyNote": "Confirmed real (Jun 17 2021 Prolexic Routed bug, mostly Australia). Akamai issued a brief acknowledgment rather than a detailed RCA — officialPostmortem false. Distinct from the Jul 22 Edge DNS event."
+  },
+  {
+   "slug": "telecity-meridian-gate-london-2015",
+   "title": "Telecity Meridian Gate London power outage hits LINX and cloud",
+   "operator": "Telecity (later Equinix)",
+   "dcName": "Meridian Gate, London Docklands",
+   "location": {
+    "city": "London",
+    "country": "United Kingdom",
+    "region": "EMEA"
+   },
+   "date": "2015-11-17",
+   "category": [
+    "power"
+   ],
+   "brief": "A fault in a power-distribution breaker at Telecity's Meridian Gate facility caused an outage affecting a LINX peering node, cloud providers and VoIP services across London. It followed a series of power incidents at the site that year.",
+   "magnitude": {
+    "usersScore": 5,
+    "financialScore": 3,
+    "durationScore": 4,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 4.4,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "Telecity Data Center Outage in London Dings Cloud, Internet Exchange - Data Center Knowledge",
+     "url": "https://www.datacenterknowledge.com/archives/2015/11/18/telecity-data-center-outage-in-london-dings-cloud-internet-exchange",
+     "type": "news"
+    },
+    {
+     "title": "Power outage brings down Telecity's Meridian Gate data center in London - DCD",
+     "url": "https://www.datacenterdynamics.com/en/news/updated-power-outage-brings-down-telecitys-meridian-gate-data-center-in-london/",
+     "type": "news"
+    },
+    {
+     "title": "Telecity VoIP outage - The Register",
+     "url": "https://www.theregister.com/2015/11/17/telecity_voip_outage/",
+     "type": "news"
+    }
+   ],
+   "confidence": "medium",
+   "verifyNote": "Confirmed breaker fault at Meridian Gate hitting a LINX node and cloud/VoIP tenants. No operator RCA."
+  },
+  {
+   "slug": "china-telecom-route-leak-2010",
+   "title": "China Telecom global route leak",
+   "operator": "China Telecom (AS23724)",
+   "dcName": "Global BGP",
+   "location": {
+    "city": "Beijing",
+    "country": "China",
+    "region": "APAC"
+   },
+   "date": "2010-04-08",
+   "category": [
+    "network",
+    "human"
+   ],
+   "brief": "China Telecom briefly leaked roughly 50,000 prefixes (about 15% of internet routes) into the global routing table for around 18 minutes, drawing a slice of world traffic through Chinese networks.",
+   "magnitude": {
+    "usersScore": 5,
+    "financialScore": 3,
+    "durationScore": 2,
+    "blastRadiusScore": 6
+   },
+   "magnitudeScore": 4.35,
+   "officialPostmortem": false,
+   "confidence": "medium",
+   "candidateSources": [
+    {
+     "title": "China's 18-minute mystery — Renesys/Oracle analysis",
+     "url": "https://blogs.oracle.com/internetintelligence/chinas-18-minute-mystery",
+     "type": "other"
+    },
+    {
+     "title": "BGP hijacking — Wikipedia (China Telecom 2010)",
+     "url": "https://en.wikipedia.org/wiki/BGP_hijacking",
+     "type": "other"
+    }
+   ],
+   "verifyNote": "Confirmed: Apr 8 2010 China Telecom leak of ~50k prefixes for ~18 min; documented by Renesys and a US-China Commission report. Brief and limited actual disruption — low duration. Kept as a notable routing-infra event."
+  },
+  {
+   "slug": "spamhaus-cyberbunker-ddos-2013",
+   "title": "Spamhaus/CyberBunker DNS amplification DDoS",
+   "operator": "Spamhaus / Cloudflare",
+   "dcName": "European IX fabric",
+   "location": {
+    "city": "London",
+    "country": "United Kingdom",
+    "region": "EMEA"
+   },
+   "date": "2013-03-18",
+   "category": [
+    "network"
+   ],
+   "brief": "A DNS-amplification DDoS peaking around 300 Gbps against Spamhaus (mitigated by Cloudflare) congested European internet exchanges such as LINX, in an attack dubbed 'the DDoS that almost broke the internet'.",
+   "magnitude": {
+    "usersScore": 4,
+    "financialScore": 3,
+    "durationScore": 5,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 4.35,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "The DDoS That Almost Broke the Internet",
+     "url": "https://blog.cloudflare.com/the-ddos-that-almost-broke-the-internet/",
+     "type": "official-postmortem"
+    }
+   ],
+   "verifyNote": "Confirmed: Mar 2013 ~300 Gbps DNS-amplification DDoS on Spamhaus, LINX congestion; Cloudflare published detailed writeup. 'Almost broke the internet' framing is somewhat hyped but the event is real and well-documented."
+  },
+  {
+   "slug": "azure-west-europe-power-2023",
+   "title": "Azure West Europe power/cooling outage (Oct 2023)",
+   "operator": "Microsoft Azure",
+   "dcName": "West Europe region — Netherlands data center",
+   "location": {
+    "city": "Amsterdam",
+    "country": "Netherlands",
+    "region": "EMEA",
+    "az": "west-europe"
+   },
+   "date": "2023-10-22",
+   "category": [
+    "power",
+    "cooling"
+   ],
+   "brief": "Microsoft attributed a West Europe service degradation to a utility power sag/issue at one of its Netherlands data centers that tripped cooling and storage infrastructure, causing several hours of impact to Azure and Microsoft 365 services in the region.",
+   "magnitude": {
+    "usersScore": 5,
+    "financialScore": 4,
+    "durationScore": 4,
+    "blastRadiusScore": 4
+   },
+   "magnitudeScore": 4.25,
+   "officialPostmortem": false,
+   "confidence": "medium",
+   "candidateSources": [
+    {
+     "title": "Microsoft admits 'power issue' downed Azure in West Europe (The Register)",
+     "url": "https://www.theregister.com/2023/10/23/microsoft_azure_power_issue/",
+     "type": "news"
+    }
+   ],
+   "verifyNote": "Confirmed real (Oct 2023 West Europe power/cooling event) but only lightly sourced via press + Azure status; no detailed public RCA. Regional, moderate impact."
+  },
+  {
+   "slug": "google-oracle-london-heatwave-cooling-2022",
+   "title": "UK heatwave cooling failures down Google and Oracle London regions",
+   "operator": "Google Cloud (europe-west2) and Oracle Cloud (UK South)",
+   "dcName": "europe-west2-a (Google) / UK South (Oracle)",
+   "location": {
+    "city": "London",
+    "country": "United Kingdom",
+    "region": "EMEA",
+    "az": "europe-west2-a"
+   },
+   "date": "2022-07-19",
+   "category": [
+    "cooling"
+   ],
+   "brief": "During the record ~40C UK heatwave, simultaneous failure of multiple redundant cooling systems in a europe-west2-a facility caused VM terminations and capacity loss for Google Cloud, while Oracle's UK South cooling units failed and triggered a protective compute shutdown. Both restored service within hours.",
+   "magnitude": {
+    "usersScore": 5,
+    "financialScore": 4,
+    "durationScore": 4,
+    "blastRadiusScore": 4
+   },
+   "magnitudeScore": 4.25,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "DCD: Google's London data center outage caused by simultaneous cooling failures",
+     "url": "https://www.datacenterdynamics.com/en/news/googles-london-data-center-outage-during-heatwave-caused-by-simultaneous-failure-of-multiple-redundant-cooling-systems/",
+     "type": "news"
+    },
+    {
+     "title": "BleepingComputer: UK heat wave causes Google and Oracle cloud outages",
+     "url": "https://www.bleepingcomputer.com/news/security/uk-heat-wave-causes-google-and-oracle-cloud-outages/",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed heatwave cooling failures at Google europe-west2 and Oracle UK South; Google published an incident report. officialPostmortem=true."
+  },
+  {
+   "slug": "mainone-google-route-leak-2018",
+   "title": "MainOne route leak reroutes Google traffic via China Telecom",
+   "operator": "MainOne (AS37282) / China Telecom",
+   "dcName": "Global BGP",
+   "location": {
+    "city": "Lagos",
+    "country": "Nigeria",
+    "region": "AFR"
+   },
+   "date": "2018-11-12",
+   "category": [
+    "network",
+    "human"
+   ],
+   "brief": "A BGP misconfiguration at Nigeria's MainOne leaked Google prefixes that propagated via China Telecom and TransTelecom, rerouting Google/GCP traffic through China and Russia and causing outages for about 74 minutes.",
+   "magnitude": {
+    "usersScore": 5,
+    "financialScore": 3,
+    "durationScore": 3,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 4.2,
+   "officialPostmortem": false,
+   "confidence": "medium",
+   "candidateSources": [
+    {
+     "title": "Google Cloud traffic hijacked via BGP leak — ThousandEyes/BleepingComputer",
+     "url": "https://www.bleepingcomputer.com/news/security/google-services-interrupted-by-bgp-leak-with-china-telecom-involvement/",
+     "type": "news"
+    },
+    {
+     "title": "Google Cloud Networking Incident #18010 (Google Cloud Status)",
+     "url": "https://status.cloud.google.com/",
+     "type": "vendor-status"
+    }
+   ],
+   "verifyNote": "Confirmed: Nov 12 2018 MainOne leaked Google prefixes via China Telecom/TransTelecom, ~74 min. MainOne acknowledged a config error; ThousandEyes analysis is the detailed public record. Metadata accurate."
+  },
+  {
+   "slug": "level3-centurylink-route-leak-2017",
+   "title": "Level 3/CenturyLink US route leak",
+   "operator": "Level 3 (AS3356)",
+   "dcName": "US backbone",
+   "location": {
+    "city": "Broomfield",
+    "country": "USA",
+    "region": "AMER",
+    "az": "Colorado"
+   },
+   "date": "2017-11-06",
+   "category": [
+    "network",
+    "human"
+   ],
+   "brief": "A route leak/misconfiguration in Level 3's network propagated bad routes across the US, degrading Comcast, Spectrum, Verizon and other ISPs' connectivity for roughly 90 minutes.",
+   "magnitude": {
+    "usersScore": 5,
+    "financialScore": 3,
+    "durationScore": 3,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 4.2,
+   "officialPostmortem": false,
+   "confidence": "medium",
+   "candidateSources": [
+    {
+     "title": "Widespread impact caused by Level 3 BGP route leak — BGPmon/Cisco",
+     "url": "https://www.bgpmon.net/widespread-impact-caused-by-level-3-bgp-route-leak/",
+     "type": "other"
+    },
+    {
+     "title": "Level 3 outage: a study in how not to run a network — Ars Technica",
+     "url": "https://arstechnica.com/",
+     "type": "news"
+    }
+   ],
+   "verifyNote": "Confirmed: Nov 6 2017 Level 3 route leak degrading major US ISPs, ~90 min; BGPmon analysis is the detailed record. Level 3/CenturyLink issued only brief acknowledgment — officialPostmortem false."
+  },
+  {
+   "slug": "tonga-subsea-cable-2022",
+   "title": "Tonga subsea cable severed by Hunga volcano eruption",
+   "operator": "Tonga Cable Ltd / Southern Cross",
+   "dcName": "Tonga domestic + international cable",
+   "location": {
+    "city": "Nuku'alofa",
+    "country": "Tonga",
+    "region": "APAC"
+   },
+   "date": "2022-01-15",
+   "category": [
+    "network",
+    "supply"
+   ],
+   "brief": "The Hunga Tonga-Hunga Ha'apai eruption and tsunami severed Tonga's single international subsea cable (and domestic cable), cutting the nation off from the internet for roughly five weeks.",
+   "magnitude": {
+    "usersScore": 3,
+    "financialScore": 4,
+    "durationScore": 9,
+    "blastRadiusScore": 2
+   },
+   "magnitudeScore": 4.05,
+   "officialPostmortem": false,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Tonga's internet restored weeks after severed by volcano eruption",
+     "url": "https://www.reuters.com/business/media-telecom/tonga-fully-connected-again-after-volcano-cut-communications-2022-02-22/",
+     "type": "news"
+    },
+    {
+     "title": "2022 Hunga Tonga eruption",
+     "url": "https://en.wikipedia.org/wiki/2022_Hunga_Tonga%E2%80%93Hunga_Ha%27apai_eruption_and_tsunami",
+     "type": "other"
+    }
+   ],
+   "verifyNote": "Confirmed: Jan 15 2022 eruption severed Tonga's sole international cable, ~5 weeks offline. Natural-disaster telecom event (not a DC RCA) — officialPostmortem false; kept for infra relevance. Low blast radius (one small nation) but very long duration."
+  },
+  {
+   "slug": "telia-backbone-misconfig-2016",
+   "title": "Telia (AS1299) backbone misconfiguration",
+   "operator": "Telia Carrier",
+   "dcName": "Global backbone (AS1299)",
+   "location": {
+    "city": "Stockholm",
+    "country": "Sweden",
+    "region": "EMEA"
+   },
+   "date": "2016-06-20",
+   "category": [
+    "network",
+    "human"
+   ],
+   "brief": "A Telia configuration error briefly rerouted large volumes of European and US traffic toward a peering point in Hong Kong, causing widespread packet loss and reachability problems for many Tier-1 downstream networks.",
+   "magnitude": {
+    "usersScore": 5,
+    "financialScore": 3,
+    "durationScore": 2,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 4,
+   "officialPostmortem": false,
+   "confidence": "medium",
+   "candidateSources": [
+    {
+     "title": "Telia routing mistake takes down European internet — coverage",
+     "url": "https://www.theregister.com/2016/06/20/telia_engineer_blamed_for_european_traffic_snafu/",
+     "type": "news"
+    }
+   ],
+   "verifyNote": "Confirmed: Jun 20 2016 Telia AS1299 misconfig rerouted EU/US traffic via Hong Kong, brief but widespread packet loss. Telia apologized publicly but published no detailed RCA — officialPostmortem false."
+  },
+  {
+   "slug": "google-council-bluffs-arcflash-2022",
+   "title": "Google Council Bluffs Iowa arc-flash explosion injures three, causes outage",
+   "operator": "Google",
+   "dcName": "Council Bluffs, Iowa data center (power substation)",
+   "location": {
+    "city": "Council Bluffs",
+    "country": "United States",
+    "region": "AMER"
+   },
+   "date": "2022-08-08",
+   "category": [
+    "power",
+    "fire"
+   ],
+   "brief": "An arc-flash electrical explosion at a power substation serving one of Google's largest data centers critically burned three electricians and caused a temporary outage affecting some us-central1 services while the site was made safe.",
+   "magnitude": {
+    "usersScore": 4,
+    "financialScore": 4,
+    "durationScore": 4,
+    "blastRadiusScore": 4
+   },
+   "magnitudeScore": 4,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "Three people critical after electrical incident and explosion at Google Iowa data center - DCD",
+     "url": "https://www.datacenterdynamics.com/en/news/three-people-in-critical-condition-after-electrical-incident-and-explosion-at-google-iowa-data-center/",
+     "type": "news"
+    },
+    {
+     "title": "Incident at Google Data Center Highlights Risks of Arc Flash - Data Center Frontier",
+     "url": "https://www.datacenterfrontier.com/featured/article/11427156/incident-at-google-data-center-highlights-risks-of-arc-flash",
+     "type": "news"
+    },
+    {
+     "title": "Explosion at Google Data Center Critically Burns 3 Workers - Newsweek",
+     "url": "https://www.newsweek.com/explosion-google-data-center-critically-burns-3-workers-1732178",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed arc-flash injuring three workers with brief us-central1 impact; primarily a workplace-safety incident, minor service outage. No operator RCA."
+  },
+  {
+   "slug": "nse-india-telecom-clearing-outage-2021",
+   "title": "NSE India Feb 24 2021 outage — telecom link failure, DR failover did not work",
+   "operator": "National Stock Exchange of India / NSE Clearing (NCL)",
+   "dcName": "NSE / NSE Clearing risk-management systems",
+   "location": {
+    "city": "Mumbai",
+    "country": "India",
+    "region": "APAC"
+   },
+   "date": "2021-02-24",
+   "category": [
+    "network"
+   ],
+   "brief": "Failure of links from multiple telecom providers made NSE Clearing's online risk-management system unavailable, and the exchange could not switch to its disaster-recovery site, forcing a trading halt of over three hours (its longest ever) across all segments. NSE and executives later settled with SEBI.",
+   "magnitude": {
+    "usersScore": 5,
+    "financialScore": 5,
+    "durationScore": 5,
+    "blastRadiusScore": 2
+   },
+   "magnitudeScore": 3.95,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "NSE Trading Halt: RBI Says Failure at NSE Clearing Led to Outage — Moneylife",
+     "url": "https://www.moneylife.in/article/nse-trading-halt-rbi-says-failure-at-nse-clearing-led-to-outage-on-24th-february/63276.html",
+     "type": "regulatory"
+    },
+    {
+     "title": "Longest NSE Outage Spurs India Exchanges to Extend Trading — Bloomberg",
+     "url": "https://www.bloomberg.com/news/articles/2021-02-24/india-s-top-stock-bourse-halts-trading-after-telecom-disruption",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed telecom-link failure + DR failover failure; SEBI settlement. No operator postmortem; officialPostmortem=false."
+  },
+  {
+   "slug": "asx-trade-nasdaq-upgrade-outage-2020",
+   "title": "ASX Nov 16 2020 outage — Nasdaq trading-system upgrade go-live failure",
+   "operator": "ASX (Australian Securities Exchange) / Nasdaq",
+   "dcName": "ASX Trade platform (Nasdaq)",
+   "location": {
+    "city": "Sydney",
+    "country": "Australia",
+    "region": "APAC"
+   },
+   "date": "2020-11-16",
+   "category": [
+    "software"
+   ],
+   "brief": "On go-live day of the refreshed Nasdaq-supplied ASX Trade system, a software issue with combination (multi-security single-order) trading produced inaccurate market data in one partition; ASX closed the cash equity market at 10:24 and did not reopen that day. Regulators ASIC and the RBA launched reviews.",
+   "magnitude": {
+    "usersScore": 4,
+    "financialScore": 5,
+    "durationScore": 6,
+    "blastRadiusScore": 2
+   },
+   "magnitudeScore": 3.9,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "20-284MR ASIC statement on ASX equity market outage — ASIC",
+     "url": "https://www.asic.gov.au/about-asic/news-centre/find-a-media-release/2020-releases/20-284mr-asic-statement-on-asx-equity-market-outage/",
+     "type": "regulatory"
+    },
+    {
+     "title": "ASX statement on the equity market outage November 2020 (PDF)",
+     "url": "https://download.asic.gov.au/media/5853659/asx-statement-on-the-equity-market-outage-november-2020.pdf",
+     "type": "vendor-status"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed go-live failure of ASX Trade (combination-order bug); market closed for the day. ASX issued a statement; the detailed independent (IBM) review came via ASIC — treated as regulatory, officialPostmortem=false."
+  },
+  {
+   "slug": "nyse-opening-auction-dr-glitch-2023",
+   "title": "NYSE Jan 24 2023 — primary and DR systems run simultaneously, opening auctions failed",
+   "operator": "New York Stock Exchange (ICE)",
+   "dcName": "NYSE Pillar Production + Pillar DR (disaster recovery)",
+   "location": {
+    "city": "Mahwah / New York",
+    "country": "USA",
+    "region": "AMER"
+   },
+   "date": "2023-01-24",
+   "category": [
+    "software",
+    "human"
+   ],
+   "brief": "Staff left the Pillar DR backup system running overnight after maintenance; at market open the primary treated opening auctions for 2,824 securities as already done, launching continuous trading without an opening price. ~84 symbols hit LULD halts and NYSE busted 4,000+ trades. The SEC fined NYSE $9M.",
+   "magnitude": {
+    "usersScore": 5,
+    "financialScore": 6,
+    "durationScore": 2,
+    "blastRadiusScore": 3
+   },
+   "magnitudeScore": 3.9,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "SEC Fines NYSE $9m for Opening Auction Glitch — Markets Media",
+     "url": "https://www.marketsmedia.com/sec-fines-nyse-9m-for-opening-auction-glitch/",
+     "type": "regulatory"
+    },
+    {
+     "title": "Resolution of NYSE Opening Auctions Technical Issue — Markets Media",
+     "url": "https://www.marketsmedia.com/nyse-opening-auctions-technical-issue-on-january-24-2023-resolution/",
+     "type": "vendor-status"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed DR-left-running root cause; SEC $9M fine. No operator postmortem; officialPostmortem=false."
+  },
+  {
+   "slug": "reddit-pi-day-kubernetes-outage-2023",
+   "title": "Reddit Mar 14 2023 'Pi-Day' outage — Kubernetes upgrade broke the cluster",
+   "operator": "Reddit",
+   "dcName": "Reddit primary Kubernetes cluster (AWS)",
+   "location": {
+    "country": "USA",
+    "region": "AMER"
+   },
+   "date": "2023-03-14",
+   "category": [
+    "software"
+   ],
+   "brief": "A routine Kubernetes version upgrade of Reddit's oldest/largest cluster hit a networking incompatibility (a removed label used by Calico route reflectors), collapsing the cluster and taking Reddit down for several hours. Reddit recovered by restoring from backup and published a detailed postmortem.",
+   "magnitude": {
+    "usersScore": 7,
+    "financialScore": 3,
+    "durationScore": 4,
+    "blastRadiusScore": 2
+   },
+   "magnitudeScore": 3.85,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "You Broke Reddit: The Pi-Day Outage — r/RedditEng",
+     "url": "https://www.reddit.com/r/RedditEng/comments/11xx5o0/you_broke_reddit_the_piday_outage/",
+     "type": "official-postmortem"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed K8s-upgrade/Calico-label root cause; detailed r/RedditEng postmortem. officialPostmortem=true."
+  },
+  {
+   "slug": "oci-europe-identity-outage-2025",
+   "title": "Oracle Cloud Infrastructure identity outage in Europe",
+   "operator": "Oracle Cloud Infrastructure",
+   "dcName": "Germany Central (Frankfurt) region",
+   "location": {
+    "city": "Frankfurt",
+    "country": "Germany",
+    "region": "EMEA",
+    "az": "eu-frankfurt-1"
+   },
+   "date": "2025-05-19",
+   "category": [
+    "software",
+    "network"
+   ],
+   "brief": "OCI's identity platform went down across parts of Europe around 07:00 UTC on May 19, 2025, with Frankfurt affected and failover to Amsterdam unsuccessful; Downdetector reports ran from ~08:00 to ~14:00 UTC. Oracle's status page did not acknowledge the incident and no official RCA was published.",
+   "magnitude": {
+    "usersScore": 4,
+    "financialScore": 3,
+    "durationScore": 5,
+    "blastRadiusScore": 3
+   },
+   "magnitudeScore": 3.65,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "European customers report Oracle Cloud identity outage, Big Red is silent (The Register)",
+     "url": "https://www.theregister.com/2025/05/19/oci_outage_europe/",
+     "type": "news"
+    },
+    {
+     "title": "Oracle Cloud experiences outage in Europe, users say (DCD)",
+     "url": "https://www.datacenterdynamics.com/en/news/oracle-cloud-experiences-outage-in-europe-users-say/",
+     "type": "news"
+    }
+   ],
+   "confidence": "medium",
+   "verifyNote": "Real per Register/DCD (OCI identity outage, Frankfurt, failed Amsterdam failover). Oracle never acknowledged; officialPostmortem=false. Thinner sourcing, moderate confidence."
+  },
+  {
+   "slug": "google-belgium-lightning-2015",
+   "title": "Google Belgium data center lightning strikes cause minor persistent data loss",
+   "operator": "Google (Google Cloud)",
+   "dcName": "St. Ghislain (europe-west1)",
+   "location": {
+    "city": "Saint-Ghislain",
+    "country": "Belgium",
+    "region": "EMEA"
+   },
+   "date": "2015-08-13",
+   "category": [
+    "power"
+   ],
+   "brief": "Four successive lightning strikes on the local utility grid caused power fluctuations that briefly cut supply to storage systems, permanently wiping a tiny fraction (~0.000001%) of Google Compute Engine persistent disks. Google published an incident report and hardened its systems.",
+   "magnitude": {
+    "usersScore": 4,
+    "financialScore": 3,
+    "durationScore": 3,
+    "blastRadiusScore": 4
+   },
+   "magnitudeScore": 3.6,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Lightning strikes and old disks cause Google data loss - DCD",
+     "url": "https://www.datacenterdynamics.com/en/news/lightning-strikes-and-old-disks-cause-google-data-loss/",
+     "type": "news"
+    },
+    {
+     "title": "Four Lightning Strikes in Belgium Erase Google Customer Data - NBC News",
+     "url": "https://www.nbcnews.com/tech/internet/four-lightning-strikes-belgium-erase-google-customer-data-n412561",
+     "type": "news"
+    },
+    {
+     "title": "GCE Incident 15056 — persistent disk (Google Cloud Status)",
+     "url": "https://status.cloud.google.com/",
+     "type": "official-postmortem"
+    }
+   ],
+   "verifyNote": "Confirmed: Aug 13 2015 lightning near St. Ghislain europe-west1, tiny permanent PD loss; Google published an incident report. Notable as a rare permanent-data-loss cloud event despite small magnitude."
+  },
+  {
+   "slug": "zoom-back-to-school-outage-2020",
+   "title": "Zoom Aug 24 2020 outage — back-to-school first-day disruption",
+   "operator": "Zoom",
+   "dcName": "Zoom cloud infrastructure (cause undisclosed)",
+   "location": {
+    "country": "USA",
+    "region": "AMER"
+   },
+   "date": "2020-08-24",
+   "category": [
+    "software"
+   ],
+   "brief": "On the first day of school for many US districts, Zoom suffered a partial outage from ~9 AM to ~11:30 AM ET (webinars until ~1 PM), disrupting classes and businesses across the US East Coast and Europe. Zoom apologized but never publicly disclosed a root cause.",
+   "magnitude": {
+    "usersScore": 7,
+    "financialScore": 3,
+    "durationScore": 2,
+    "blastRadiusScore": 2
+   },
+   "magnitudeScore": 3.45,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "Zoom outages disrupt first day of online classes — Washington Post",
+     "url": "https://www.washingtonpost.com/local/education/zoom-outages-disrupt-first-day-of-online-classes-for-many-schools-and-universities/2020/08/24/5caf1494-e61e-11ea-bc79-834454439a44_story.html",
+     "type": "news"
+    },
+    {
+     "title": "Zoom service outages cause disruption in schools, businesses — UPI",
+     "url": "https://www.upi.com/Top_News/US/2020/08/24/Zoom-service-outages-cause-disruption-in-schools-businesses/2721598289407/",
+     "type": "news"
+    }
+   ],
+   "confidence": "medium",
+   "verifyNote": "Real, well-covered (WaPo) back-to-school outage but no root cause ever disclosed; officialPostmortem=false. Thin on cause but notability confirmed."
+  },
+  {
+   "slug": "baltic-sea-cables-2024",
+   "title": "Baltic Sea subsea cable cuts (C-Lion1 and BCS East-West)",
+   "operator": "Cinia / Arelion consortia",
+   "dcName": "Baltic Sea telecom cables",
+   "location": {
+    "city": "Baltic Sea",
+    "country": "Finland",
+    "region": "EMEA"
+   },
+   "date": "2024-11-17",
+   "category": [
+    "network",
+    "supply"
+   ],
+   "brief": "The C-Lion1 (Finland-Germany) and BCS East-West (Lithuania-Sweden) submarine cables were severed within a day, attributed to the anchor of the Chinese vessel Yi Peng 3, amid heightened concern over deliberate infrastructure sabotage.",
+   "magnitude": {
+    "usersScore": 3,
+    "financialScore": 3,
+    "durationScore": 5,
+    "blastRadiusScore": 3
+   },
+   "magnitudeScore": 3.4,
+   "officialPostmortem": false,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Two Baltic Sea data cables cut, raising fears of sabotage",
+     "url": "https://www.reuters.com/world/europe/germany-finland-warn-threats-security-after-undersea-cable-damaged-2024-11-18/",
+     "type": "news"
+    }
+   ],
+   "verifyNote": "Confirmed: Nov 17-18 2024 C-Lion1 + BCS East-West cuts, attributed to Yi Peng 3 anchor drag. Redundancy limited service impact (capacity rerouted) — modest scores. Attribution/intent still under investigation."
+  },
+  {
+   "slug": "slack-database-config-outage-2022",
+   "title": "Slack Feb 22 2022 outage — config change overloaded databases",
+   "operator": "Slack (Salesforce)",
+   "dcName": "Slack database infrastructure (AWS)",
+   "location": {
+    "city": "Ashburn",
+    "country": "USA",
+    "region": "AMER",
+    "az": "us-east-1"
+   },
+   "date": "2022-02-22",
+   "category": [
+    "software"
+   ],
+   "brief": "A configuration change triggered a sudden spike in database activity that caused databases to stop serving connection requests, taking Slack down from ~6:00–9:14 AM PST. Slack recovered by rate-limiting connections and shifting traffic to replicas.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 4,
+    "durationScore": 2,
+    "blastRadiusScore": 2
+   },
+   "magnitudeScore": 3.4,
+   "officialPostmortem": true,
+   "candidateSources": [
+    {
+     "title": "Slack status incident — Tuesday February 22, 2022",
+     "url": "https://slack-status.com/2022-02-22",
+     "type": "vendor-status"
+    },
+    {
+     "title": "Ongoing services outage at Slack — The Register",
+     "url": "https://www.theregister.com/off-prem/2022/02/22/ongoing-services-outage-at-slack/",
+     "type": "news"
+    }
+   ],
+   "confidence": "high",
+   "verifyNote": "Confirmed config-driven DB overload; Slack published an incident summary (status page). officialPostmortem=true (summary-grade)."
+  },
+  {
+   "slug": "amazon-route53-bgp-hijack-2018",
+   "title": "Amazon Route 53 DNS BGP hijack (MyEtherWallet)",
+   "operator": "Amazon Web Services",
+   "dcName": "Route 53 authoritative DNS",
+   "location": {
+    "city": "Ashburn",
+    "country": "USA",
+    "region": "AMER",
+    "az": "Virginia"
+   },
+   "date": "2018-04-24",
+   "category": [
+    "network",
+    "software"
+   ],
+   "brief": "Attackers hijacked Amazon Route 53 DNS IP prefixes via a BGP route leak through eNet/AS10297, redirecting MyEtherWallet users to a malicious server to steal cryptocurrency for about two hours.",
+   "magnitude": {
+    "usersScore": 3,
+    "financialScore": 4,
+    "durationScore": 3,
+    "blastRadiusScore": 3
+   },
+   "magnitudeScore": 3.2,
+   "officialPostmortem": false,
+   "confidence": "medium",
+   "candidateSources": [
+    {
+     "title": "BGP hijack of Amazon DNS to steal crypto — Internet Society/OONI analysis",
+     "url": "https://blog.cloudflare.com/bgp-leaks-and-crypto-currencies/",
+     "type": "other"
+    },
+    {
+     "title": "Suspicious event hijacks Amazon traffic for 2 hours, stole cryptocurrency — Ars Technica",
+     "url": "https://arstechnica.com/information-technology/2018/04/suspicious-event-hijacks-amazon-traffic-for-1-hour-stole-cryptocurrency/",
+     "type": "news"
+    }
+   ],
+   "verifyNote": "Confirmed: Apr 24 2018 malicious BGP hijack of Route 53 prefixes via eNet AS10297 targeting MyEtherWallet, ~2h. Narrow, targeted attack (low blast radius) but notable. AWS did not publish a formal RCA — officialPostmortem false."
+  },
+  {
+   "slug": "taiwan-matsu-cables-2023",
+   "title": "Taiwan Matsu Islands subsea cables cut by passing vessels",
+   "operator": "Chunghwa Telecom",
+   "dcName": "Taiwan-Matsu No.2 & No.3 cables",
+   "location": {
+    "city": "Matsu Islands",
+    "country": "Taiwan",
+    "region": "APAC"
+   },
+   "date": "2023-02-08",
+   "category": [
+    "network",
+    "supply"
+   ],
+   "brief": "Both submarine cables linking Taiwan's Matsu Islands to the main island were severed within days by a Chinese fishing vessel and a cargo ship, leaving ~14,000 residents with degraded connectivity for weeks.",
+   "magnitude": {
+    "usersScore": 2,
+    "financialScore": 2,
+    "durationScore": 8,
+    "blastRadiusScore": 1
+   },
+   "magnitudeScore": 2.85,
+   "officialPostmortem": false,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Taiwan's Matsu Islands lose internet after cables cut",
+     "url": "https://www.reuters.com/technology/taiwan-says-matsu-islands-internet-restored-after-cables-cut-2023-04-27/",
+     "type": "news"
+    }
+   ],
+   "verifyNote": "Confirmed: early-Feb 2023 both Taiwan-Matsu cables severed by vessels, weeks to restore, ~14k residents. Very low blast radius (small island group) but long duration; kept as a documented infra/geopolitical cable event."
+  },
+  {
+   "slug": "github-memcached-ddos-2018",
+   "title": "GitHub 1.35 Tbps memcached amplification DDoS",
+   "operator": "GitHub / Akamai",
+   "dcName": "GitHub edge / Prolexic scrubbing",
+   "location": {
+    "city": "San Francisco",
+    "country": "USA",
+    "region": "AMER"
+   },
+   "date": "2018-02-28",
+   "category": [
+    "network"
+   ],
+   "brief": "GitHub absorbed a then-record 1.35 Tbps memcached reflection/amplification DDoS, causing intermittent unavailability for about 10 minutes before Akamai Prolexic scrubbed the traffic.",
+   "magnitude": {
+    "usersScore": 4,
+    "financialScore": 2,
+    "durationScore": 2,
+    "blastRadiusScore": 3
+   },
+   "magnitudeScore": 2.85,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "February 28th DDoS Incident Report — GitHub Blog",
+     "url": "https://github.blog/2018-03-01-ddos-incident-report/",
+     "type": "official-postmortem"
+    }
+   ],
+   "verifyNote": "Confirmed: Feb 28 2018 record 1.35 Tbps memcached-reflection DDoS, ~10 min intermittent; official GitHub incident report. Mostly notable for record scale, low actual outage — low magnitude appropriate."
+  },
+  {
+   "slug": "vantage-san-antonio-transformer-2026",
+   "title": "Vantage San Antonio transformer explosion injures worker",
+   "operator": "Vantage Data Centers",
+   "dcName": "Vantage San Antonio campus (Wiseman Blvd construction site)",
+   "location": {
+    "city": "San Antonio",
+    "country": "United States",
+    "region": "AMER"
+   },
+   "date": "2026-02-27",
+   "category": [
+    "power",
+    "fire"
+   ],
+   "brief": "A transformer near a gas tank exploded at a Vantage data center construction site on Wiseman Blvd, San Antonio, on the night of 27 Feb 2026, critically burning a construction worker and forcing evacuation of the site and a neighboring apartment building. Officials flagged a major gas line feeding the site; no service outage.",
+   "magnitude": {
+    "usersScore": 2,
+    "financialScore": 3,
+    "durationScore": 3,
+    "blastRadiusScore": 2
+   },
+   "magnitudeScore": 2.4,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "Worker injured after transformer explosion at Vantage data center in San Antonio - DCD",
+     "url": "https://www.datacenterdynamics.com/en/news/worker-injured-after-transformer-explosion-at-vantage-data-center-in-san-antonio-texas/",
+     "type": "news"
+    },
+    {
+     "title": "Explosion near a Vantage Data Center injures 1, SAPD says - Yahoo/KSAT",
+     "url": "https://www.yahoo.com/news/articles/explosion-near-vantage-data-center-161100579.html",
+     "type": "news"
+    },
+    {
+     "title": "Transformer explosion near Vantage Data Centers injures construction worker - News4SanAntonio",
+     "url": "https://news4sanantonio.com/news/local/transformer-explosion-near-vantage-data-centers-injures-construction-worker-injury-san-antonio",
+     "type": "news"
+    }
+   ],
+   "confidence": "medium",
+   "verifyNote": "DATE CORRECTED 2026-02-01 -> 2026-02-27 (SAPD called ~10:19pm Fri 27 Feb, per local coverage). Real physical/safety incident at construction site; no service outage. Low magnitude."
+  },
+  {
+   "slug": "discord-gcp-redis-outage-2020",
+   "title": "Discord March 2020 outage — GCP Redis migration triggered cascading failover",
+   "operator": "Discord (on Google Cloud)",
+   "dcName": "Discord API services on Google Cloud (Redis cluster)",
+   "location": {
+    "country": "USA",
+    "region": "AMER"
+   },
+   "date": "2020-03-13",
+   "category": [
+    "software",
+    "network"
+   ],
+   "brief": "Google Cloud automatically migrated a Redis primary for Discord's API cluster, causing the node to drop offline and exposing known Redis failover handling issues; a cascading real-time-system failure forced a full service restart, reconnecting millions of clients over ~20 minutes.",
+   "magnitude": {
+    "usersScore": 5,
+    "financialScore": 2,
+    "durationScore": 2,
+    "blastRadiusScore": 1
+   },
+   "magnitudeScore": 2.4,
+   "officialPostmortem": false,
+   "candidateSources": [
+    {
+     "title": "Google Cloud issues linked to Spotify and Discord outages — DCD",
+     "url": "https://www.datacenterdynamics.com/en/news/google-cloud-issues-linked-to-spotify-and-discord-outages/",
+     "type": "news"
+    },
+    {
+     "title": "Discord outage postmortem — Hacker News discussion",
+     "url": "https://news.ycombinator.com/item?id=22663013",
+     "type": "forum"
+    }
+   ],
+   "confidence": "low",
+   "verifyNote": "Real but minor (~20-min recovery). Downgraded officialPostmortem to false — sourcing is DCD news + HN discussion, no clearly published Discord postmortem for this incident. Low magnitude."
+  },
+  {
+   "slug": "aws-cldap-ddos-2020",
+   "title": "AWS Shield mitigates record 2.3 Tbps DDoS",
+   "operator": "Amazon Web Services",
+   "dcName": "AWS global edge",
+   "location": {
+    "city": "Seattle",
+    "country": "USA",
+    "region": "AMER",
+    "az": "Washington"
+   },
+   "date": "2020-02-01",
+   "category": [
+    "network"
+   ],
+   "brief": "AWS Shield mitigated a 2.3 Tbps CLDAP reflection DDoS, the largest recorded at the time, disclosed in AWS's Q1 2020 threat landscape report. It was absorbed with no major customer-facing outage.",
+   "magnitude": {
+    "usersScore": 2,
+    "financialScore": 2,
+    "durationScore": 2,
+    "blastRadiusScore": 2
+   },
+   "magnitudeScore": 2,
+   "officialPostmortem": true,
+   "confidence": "medium",
+   "candidateSources": [
+    {
+     "title": "AWS said it mitigated a 2.3 Tbps DDoS attack, the largest ever",
+     "url": "https://www.zdnet.com/article/aws-said-it-mitigated-a-2-3-tbps-ddos-attack-the-largest-ever/",
+     "type": "news"
+    },
+    {
+     "title": "AWS Shield Threat Landscape Report — Q1 2020 (AWS)",
+     "url": "https://aws.amazon.com/blogs/security/",
+     "type": "official-postmortem"
+    },
+    {
+     "title": "Google Cloud Networking Incident 19009",
+     "url": "https://status.cloud.google.com/incident/cloud-networking/19009",
+     "type": "official-postmortem"
+    }
+   ],
+   "verifyNote": "Confirmed via AWS Q1 2020 Shield threat report. Caveat: this was a MITIGATED attack with no significant service outage — it is a record-scale security event more than an incident; lowest magnitude in the batch. Kept as a notable DDoS-scale data point."
+  }
+ ]
+}

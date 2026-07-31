@@ -68,6 +68,27 @@ Owner was **right that sloppiness existed** — but it was **2 items**, not ever
 
 ---
 
+## Program E — A–L overnight (v1.115.23–.33) — audited 2026-07-31
+11/11 ✅ genuinely wired end-to-end (SLD, 838-entry tooltip DB, Cx day-cost, 4-level recursive Gantt+WBS, RedValue+optimizer, BESS/PV+mech view, computed availability, Delivery-Governance dossier, EnPI+bankability, capacity coherence).
+- ⚠️ **AL-03/06 (minor cosmetic, FIX PENDING):** Commissioning per-level cost BARS render a fixed `levelProportions` split (rz-engine.js:12594/7079) instead of the real per-level `levelCosts` the engine already computes (:12540). Grand total + durations are real; only the per-level bar proportions are fake. Wire bars → levelCosts.
+- Nits (no action): tooltip DB is 838 entries not 818; "7832" is a comment, not consumed.
+
+## Program F — UIUX 16-keluhan (v1.85–.87) — audited 2026-07-31
+11/12 ✅ genuinely real (PrintReport, NETA/IEEE Cx refs, newsvendor spares, tooltip portal+resize, computed nines, 5-engine site scoring, MC 10k+Strategic derived, deep-sea, symbol palette, Settings/Integrations, hover sweep).
+- ⚠️ **UX-07 20kV option (FIX PENDING, same class as rackForm):** use-case auto-profile is REAL, but the 20kV grid-voltage option renders + drives the SLD yet has **$0 CAPEX effect** — `gridVoltage` never appears in CapexEngine; 20kV silently reuses 33kV rates (admitted inline InfrastructureOptionsSection.tsx:23). Give it a distinct, sourced CAPEX effect on the electrical/switchgear category.
+
+## Program G — mega-slice M–X (v1.115.37–.46) — audited 2026-07-31
+8/11 solid; fabricated-PDF-financials kill VERIFIED holds ✅ (MX-10a). 2 overstated (FIX PENDING):
+- ⚠️ **MX-08** "REAL 3-objective optimization" overstated — only Objective 1 (Blended IRR) is actually optimized (40-iter bisection, genuine); Objectives 2 (util) & 3 (budget vs P80) are **report-only flags**, no search, no carbon/reliability objective. Fix: relabel honestly OR implement.
+- ⚠️ **MX-10(b)** residual divergent revenue hardcodes despite "ONE revenue basis": **280** in site-adapter.ts:306 + value-trace.ts:1453, **120** in diagnostics.ts:330. Single source = constants/finance.ts:14 (150). Fix: route these to the single source.
+- Nit: analogies grew to 80 (claimed 41) — content growth, no action.
+
+## PENDING FIXES (batch → v1.120.2)
+1. MX-10(b) revenue hardcodes 280/120 → single source
+2. UX-07 20kV → real CAPEX effect
+3. MX-08 → honest relabel
+4. AL-03/06 commissioning per-level bars → real levelCosts
+
 ## Audit method (per row)
 1. Open the actual component/engine path.
 2. Confirm the feature exists AND works as the comment asked (not a stub / not conditional-degraded like C-001).

@@ -103,6 +103,14 @@ CSS = r"""
     .soe li { display:grid; grid-template-columns:170px 1fr; gap:0.7rem; padding:0.5rem 0; border-bottom:1px dashed var(--line); }
     .soe time { font-family:'JetBrains Mono',monospace; font-size:0.76rem; color:var(--cyan); }
     .soe .ev { color:var(--text-body); font-size:0.9rem; }
+    .phase-chip { font-family:'JetBrains Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--amber); border:1px solid var(--amber); border-radius:999px; padding:0.05rem 0.4rem; margin-right:0.4rem; white-space:nowrap; }
+    table.metrics { width:100%; border-collapse:collapse; font-size:0.88rem; }
+    table.metrics td { padding:0.5rem 0.7rem; border-bottom:1px solid var(--line); vertical-align:top; }
+    table.metrics .mlabel { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; width:38%; white-space:nowrap; }
+    table.metrics .mval { color:var(--text-body); }
+    .ca-block { background:var(--surface); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 10px 10px 0; padding:0.7rem 1rem; margin-top:0.7rem; }
+    .ca-block h3 { margin:0 0 0.3rem; font-size:0.92rem; color:var(--text-strong); }
+    .ca-block p { margin:0; color:var(--text-body); font-size:0.9rem; }
     .kv { display:grid; grid-template-columns:180px 1fr; gap:0.5rem 0.9rem; margin-top:0.5rem; font-size:0.9rem; }
     .kv dt { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; }
     .kv dd { margin:0; color:var(--text-body); }
@@ -263,7 +271,30 @@ def render_incident(inc, rank):
     loc = inc.get("location", {})
     loc_s = ", ".join(x for x in [loc.get("city"), loc.get("country"), loc.get("az")] if x)
     sev = inc.get("severity", {})
-    soe = "".join(f'<li><time>{esc(e.get("t",""))}</time><span class="ev">{esc(e.get("event",""))}</span></li>' for e in inc.get("sequenceOfEvents", []))
+
+    def soe_li(e):
+        ph = f'<span class="phase-chip">{esc(e["phase"])}</span> ' if e.get("phase") else ""
+        return f'<li><time>{esc(e.get("t",""))}</time><span class="ev">{ph}{esc(e.get("event",""))}</span></li>'
+    soe = "".join(soe_li(e) for e in inc.get("sequenceOfEvents", []))
+
+    metrics_rows = "".join(
+        f'<tr><td class="mlabel">{esc(m.get("label",""))}</td><td class="mval">{esc(m.get("value",""))}</td></tr>'
+        for m in inc.get("metrics", [])
+    )
+    metrics_html = (
+        f'<h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody>{metrics_rows}</tbody></table></div>'
+        if metrics_rows else ""
+    )
+
+    ca = inc.get("comprehensiveAnalysis", [])
+    analysis_html = ""
+    if ca:
+        blocks = "".join(
+            f'<div class="ca-block"><h3>{esc(s.get("heading",""))}</h3><p>{esc(s.get("body",""))}</p></div>'
+            for s in ca
+        )
+        analysis_html = f'<h2>Comprehensive analysis</h2>{blocks}'
+
     cf = "".join(f"<li>{esc(x)}</li>" for x in inc.get("contributingFactors", []))
     coe = "".join(f'<li>{esc(c.get("action",""))} <span class="chip muted">{esc(c.get("owner",""))} · {esc(c.get("status",""))}</span></li>' for c in inc.get("coe", []))
     lessons = "".join(f"<li>{esc(x)}</li>" for x in inc.get("lessonsLearnt", []))
@@ -302,6 +333,7 @@ def render_incident(inc, rank):
             <dt>Scope</dt><dd>{esc(sev.get('tier','—'))}</dd>
         </dl>
         <div class="card"><strong>Services / systems down</strong><ul class="tight">{down}</ul></div>
+        {metrics_html}
 
         <h2>Sequence of events (SOE)</h2>
         <ul class="soe">{soe}</ul>
@@ -321,6 +353,8 @@ def render_incident(inc, rank):
         <h2>Improvements &amp; remediation</h2>
         <ul class="tight">{imps}</ul>
 
+        {analysis_html}
+
         <h2>Technical deep-dive</h2>
         <div class="card">{esc(inc.get('technicalDeepDive',''))}</div>
 
@@ -336,7 +370,7 @@ def main():
     ap.add_argument("--apply", action="store_true", help="write files (else dry-run)")
     args = ap.parse_args()
 
-    files = sorted(glob.glob(os.path.join(DATA_DIR, "*.json")))
+    files = sorted(f for f in glob.glob(os.path.join(DATA_DIR, "*.json")) if not os.path.basename(f).startswith("_"))
     incidents = []
     for f in files:
         with open(f, encoding="utf-8") as fh:

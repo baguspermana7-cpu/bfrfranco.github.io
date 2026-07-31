@@ -23,7 +23,7 @@ const MAG_KEYS = ['usersScore', 'financialScore', 'durationScore', 'blastRadiusS
 let failures = [];
 let checked = 0;
 
-const files = readdirSync(DIR).filter((f) => f.endsWith('.json'));
+const files = readdirSync(DIR).filter((f) => f.endsWith('.json') && !f.startsWith('_'));
 for (const f of files) {
   checked++;
   const id = f.replace(/\.json$/, '');
