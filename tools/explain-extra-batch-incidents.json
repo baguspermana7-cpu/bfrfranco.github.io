@@ -1,0 +1,248 @@
+{
+ "version": "1.0.0",
+ "note": "DC-incident / outage glossary — terms and abbreviations used across the root-gated DC-Incidents dossier. Consumed by RZExplain (data-explain-scan / scanText).",
+ "entries": {
+  "blast-radius": {
+   "t": "Blast radius",
+   "d": "The scope of everything affected when one component fails — how far a fault propagates into other systems, services and customers. Reducing blast radius (cells, regional isolation, bulkheads) is the central reliability lever after an incident.",
+   "aliases": [
+    "blast radius",
+    "blast-radius"
+   ]
+  },
+  "cascading-failure": {
+   "t": "Cascading failure",
+   "d": "A failure that propagates: one component's outage overloads or breaks its dependents, which break theirs, amplifying a local fault into a systemic one. Retry storms and shared dependencies are common accelerants.",
+   "aliases": [
+    "cascading failure",
+    "cascade",
+    "cascading"
+   ]
+  },
+  "control-plane": {
+   "t": "Control plane",
+   "d": "The management/orchestration layer that provisions, configures and directs a system (e.g. launching instances, updating DNS, issuing tokens) — as opposed to the data plane that carries the actual traffic. Control-plane faults often cause wide outages even when stored data is intact.",
+   "aliases": [
+    "control plane",
+    "control-plane"
+   ]
+  },
+  "data-plane": {
+   "t": "Data plane",
+   "d": "The layer that actually moves or serves traffic/data (packet forwarding, request serving), separate from the control plane that manages it. A data plane can keep running on last-known config while the control plane is down.",
+   "aliases": [
+    "data plane",
+    "data-plane"
+   ]
+  },
+  "thermal-runaway": {
+   "t": "Thermal runaway",
+   "d": "A self-accelerating failure in a battery (typically lithium-ion) where rising temperature drives exothermic reactions that raise temperature further, leading to venting, fire or explosion. A leading cause of data-center UPS-room fires.",
+   "aliases": [
+    "thermal runaway",
+    "thermal-runaway"
+   ]
+  },
+  "lithium-ion-battery": {
+   "t": "Lithium-ion battery",
+   "d": "High-energy-density rechargeable battery increasingly used for data-center UPS in place of lead-acid (smaller, longer life) — but with a thermal-runaway fire risk that has featured in several major DC fires (Kakao/SK C&C 2022, NIRS Daejeon 2025).",
+   "aliases": [
+    "lithium-ion battery",
+    "lithium-ion",
+    "li-ion",
+    "lithium ion"
+   ]
+  },
+  "automatic-transfer-switch": {
+   "t": "ATS (Automatic Transfer Switch)",
+   "d": "Switch that automatically transfers the load between power sources (utility → generator) on loss of the primary. A stuck or mis-sequenced ATS can defeat backup power even when generators are healthy.",
+   "aliases": [
+    "automatic transfer switch",
+    "transfer switch",
+    "ATS"
+   ]
+  },
+  "static-transfer-switch": {
+   "t": "Static switch / STS",
+   "d": "Solid-state (thyristor) switch that transfers load between sources in milliseconds, e.g. the UPS output static switch. A failed output static switch took down Equinix LD8 (2020).",
+   "aliases": [
+    "static transfer switch",
+    "output static switch",
+    "static switch",
+    "STS"
+   ]
+  },
+  "switchgear": {
+   "t": "Switchgear",
+   "d": "The assembly of switches, breakers, busbars and protective relays that distributes and isolates electrical power in a facility. A switchgear failure severs the path between grid, generators and the load — as in the Delta Atlanta 2016 outage.",
+   "aliases": [
+    "switchgear"
+   ]
+  },
+  "genset": {
+   "t": "Generator (genset)",
+   "d": "Standby diesel/gas generator set that supplies the facility during extended utility loss, after the UPS bridges the start-up gap. 'Generators failed to start in time' is a classic power-outage root cause (Cloudflare/Flexential 2023).",
+   "aliases": [
+    "generator set",
+    "genset",
+    "gensets",
+    "standby generator"
+   ]
+  },
+  "de-energisation": {
+   "t": "De-energisation",
+   "d": "Removing electrical power from equipment/a site. Slow or inaccessible de-energisation delays firefighting (water cannot be applied while current is present) — a key finding in the OVHcloud SBG2 fire.",
+   "aliases": [
+    "de-energisation",
+    "de-energization",
+    "de-energise",
+    "de-energized"
+   ]
+  },
+  "free-cooling": {
+   "t": "Free cooling",
+   "d": "Cooling that uses ambient air or water (economiser) instead of mechanical refrigeration, cutting energy. Some free-cooling airflow designs (open plenums, combustible materials) can accelerate fire spread, as investigators noted at OVHcloud SBG2.",
+   "aliases": [
+    "free cooling",
+    "free-cooling",
+    "freecooling"
+   ]
+  },
+  "chiller": {
+   "t": "Chiller",
+   "d": "The mechanical refrigeration plant that rejects data-center heat by cooling a water/glycol loop. Loss of chilled water forces temperatures up and can trigger protective server shutdowns within minutes (Azure Texas 2018).",
+   "aliases": [
+    "chiller",
+    "chilled water",
+    "mechanical cooling"
+   ]
+  },
+  "failover": {
+   "t": "Failover",
+   "d": "Automatic switch to a standby component/site when the primary fails. Failover that is untested, too slow, or itself depends on the failed system is a frequent reason a local fault becomes a long outage.",
+   "aliases": [
+    "failover",
+    "fail over",
+    "fail-over"
+   ]
+  },
+  "postmortem": {
+   "t": "Post-mortem (RCA)",
+   "d": "Structured post-incident analysis documenting timeline, root cause and corrective actions. Blameless post-mortems are the reliability-engineering norm; an operator-published one is the gold-standard source for an incident.",
+   "aliases": [
+    "post-mortem",
+    "postmortem",
+    "post mortem",
+    "root cause analysis",
+    "RCA"
+   ]
+  },
+  "correction-of-errors": {
+   "t": "COE (Correction of Errors)",
+   "d": "Amazon's post-incident process/document that captures what happened, the root cause and the specific, tracked corrective actions to prevent recurrence. The 'COE' term is now used broadly for that discipline.",
+   "aliases": [
+    "correction of errors",
+    "COE"
+   ]
+  },
+  "sequence-of-events": {
+   "t": "SOE (Sequence of Events)",
+   "d": "The precise, timestamped chronology of an incident from trigger through detection, mitigation and recovery — the backbone of any credible post-incident report.",
+   "aliases": [
+    "sequence of events",
+    "SOE"
+   ]
+  },
+  "rto-rpo": {
+   "t": "RTO / RPO",
+   "d": "Recovery Time Objective (how fast service must be restored) and Recovery Point Objective (how much data loss is tolerable). The targets a DR/failover design must meet.",
+   "aliases": [
+    "RTO",
+    "RPO",
+    "recovery time objective",
+    "recovery point objective"
+   ]
+  },
+  "bgp": {
+   "t": "BGP (Border Gateway Protocol)",
+   "d": "The internet's inter-network routing protocol that advertises which networks are reachable via which paths. A bad BGP withdrawal can make a company vanish from the internet — as when Meta withdrew the routes to its own DNS (2021).",
+   "aliases": [
+    "border gateway protocol",
+    "BGP routes",
+    "BGP withdrawal",
+    "BGP"
+   ]
+  },
+  "dns": {
+   "t": "DNS (Domain Name System)",
+   "d": "The system that resolves human names (example.com) to IP addresses. Because almost everything depends on DNS first, a DNS-layer fault (empty record, unreachable resolvers) causes broad, hard-to-diagnose outages (AWS DynamoDB 2025, Dyn 2016).",
+   "aliases": [
+    "domain name system",
+    "DNS records",
+    "DNS resolution",
+    "DNS"
+   ]
+  },
+  "ddos": {
+   "t": "DDoS (Distributed Denial of Service)",
+   "d": "An attack that overwhelms a target with traffic from many sources (often a botnet) to exhaust its capacity. The Mirai IoT botnet's DDoS on Dyn (2016) disrupted much of the US internet.",
+   "aliases": [
+    "distributed denial of service",
+    "DDoS attack",
+    "DDoS"
+   ]
+  },
+  "iam": {
+   "t": "IAM (Identity & Access Management)",
+   "d": "The service that authenticates identities and issues authorization tokens. Because nearly every request needs a token, an IAM/identity fault fails the whole platform even if compute and storage are healthy (Google 2020/2025).",
+   "aliases": [
+    "identity and access management",
+    "identity service",
+    "IAM"
+   ]
+  },
+  "retry-storm": {
+   "t": "Retry storm",
+   "d": "A self-reinforcing overload where failing requests trigger aggressive client retries, multiplying load and sustaining the very congestion that caused the failures — effectively a self-inflicted DDoS (AWS Dec 2021).",
+   "aliases": [
+    "retry storm",
+    "self-inflicted DDoS",
+    "congestive collapse"
+   ]
+  },
+  "race-condition": {
+   "t": "Race condition",
+   "d": "A latent bug where the outcome depends on the timing/interleaving of concurrent operations. A DNS-management race let one process overwrite another and delete the records in the AWS DynamoDB 2025 outage.",
+   "aliases": [
+    "race condition",
+    "race-condition"
+   ]
+  },
+  "feature-file": {
+   "t": "Feature file",
+   "d": "A machine-generated configuration/data file pushed fleet-wide. When one doubled in size past a hard limit, it crashed Cloudflare's proxy globally (2025) — an example of unvalidated config as a blast-radius amplifier.",
+   "aliases": [
+    "feature file",
+    "Bot Management feature file"
+   ]
+  },
+  "safe-deployment": {
+   "t": "Safe Deployment Process (SDP)",
+   "d": "Staged, ringed rollout with automated validation and fast rollback, intended to catch a bad change before it goes global. A latent defect in the rollback tooling turned an Azure AD update into a global outage (2020).",
+   "aliases": [
+    "safe deployment process",
+    "staged rollout",
+    "ringed deployment",
+    "SDP"
+   ]
+  },
+  "single-point-of-failure": {
+   "t": "Single point of failure (SPOF)",
+   "d": "A component whose failure alone takes down the whole system. Concentrating a globally-scoped control plane in one region (e.g. AWS us-east-1) creates systemic SPOFs.",
+   "aliases": [
+    "single point of failure",
+    "SPOF"
+   ]
+  }
+ }
+}

@@ -20,7 +20,7 @@ from datetime import datetime
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(ROOT, "data", "incidents")
-VER_TAG = "2026-08-01-viz"
+VER_TAG = "2026-08-01-gloss"
 
 CATEGORY_LABEL = {
     "power": "Power", "cooling": "Cooling", "network": "Network",
@@ -47,6 +47,41 @@ def magnitude_score(inc):
 
 def esc(s):
     return html.escape(str(s), quote=True)
+
+
+# ── RZExplain linkify: wrap the first occurrence of each glossary term in prose with a
+#    data-explain span (wired by rz-explain.js wireAll — robust vs the alias-scan cache). ──
+import re as _re
+_TERMS = [
+    ("automatic transfer switch", "automatic-transfer-switch"), ("single point of failure", "single-point-of-failure"),
+    ("safe deployment process", "safe-deployment"), ("safe deployment", "safe-deployment"),
+    ("cascading failure", "cascading-failure"), ("control plane", "control-plane"), ("data plane", "data-plane"),
+    ("thermal runaway", "thermal-runaway"), ("blast radius", "blast-radius"), ("static switch", "static-transfer-switch"),
+    ("static transfer switch", "static-transfer-switch"), ("free cooling", "free-cooling"), ("retry storm", "retry-storm"),
+    ("race condition", "race-condition"), ("feature file", "feature-file"), ("lithium-ion", "lithium-ion-battery"),
+    ("de-energisation", "de-energisation"), ("de-energization", "de-energisation"), ("switchgear", "switchgear"),
+    ("chiller", "chiller"), ("failover", "failover"), ("post-mortem", "postmortem"), ("postmortem", "postmortem"),
+    ("genset", "genset"), ("DDoS", "ddos"), ("BGP", "bgp"),
+]
+# longest-first so multi-word terms win
+_TERMS.sort(key=lambda kv: -len(kv[0]))
+
+
+def linkify(text, used=None):
+    """esc() then wrap the first occurrence of each known term in a data-explain span. Pass a shared 'used' set to dedupe across a page."""
+    s = esc(text or "")
+    if used is None:
+        used = set()
+    for term, key in _TERMS:
+        if key in used:
+            continue
+        pat = _re.compile(r"(?<![\w-])(" + _re.escape(term) + r")(?![\w-])", _re.IGNORECASE)
+        m = pat.search(s)
+        if m:
+            span = f'<span data-explain="{key}" tabindex="0">{m.group(1)}</span>'
+            s = s[:m.start()] + span + s[m.end():]
+            used.add(key)
+    return s
 
 
 CSS = r"""
@@ -199,7 +234,7 @@ SCRIPTS_TMPL = """
     (function(){{var t=document.getElementById('themeToggle');function a(theme){{document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme);var m=document.querySelector('meta[name=\\"theme-color\\"]');if(m)m.setAttribute('content',theme==='dark'?'#0c1512':'#f4f1e7');}}a(localStorage.getItem('theme')||'dark');if(t)t.addEventListener('click',function(){{var c=document.documentElement.getAttribute('data-theme');a(c==='dark'?'light':'dark');}});}})();
     (function(){{function ag(){{if(window._rzAuth&&typeof window._rzAuth.enforceTierFeatureAccess==='function'){{window._rzAuth.enforceTierFeatureAccess('dc-incidents');}}else{{try{{var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');var r=s&&s.role,t=s&&s.tier;var passes=!!s&&(r==='root'||t==='root');document.body.classList.toggle('locked',!passes);}}catch(e){{document.body.classList.add('locked');}}}}}}var b=document.getElementById('rootLoginBtn');if(b)b.addEventListener('click',function(){{if(window._rzAuth&&typeof window._rzAuth.showRootGatePrompt==='function'){{window._rzAuth.showRootGatePrompt('Root account required for the DC Incidents dossier.');}}else if(window._rzAuth&&typeof window._rzAuth.showModal==='function'){{window._rzAuth.showModal();}}}});window.addEventListener('rz-auth-change',function(){{setTimeout(ag,50);}});window.addEventListener('storage',function(e){{if(e.key==='rz_premium_session')ag();}});ag();setTimeout(ag,60);setTimeout(ag,550);setTimeout(ag,1600);}})();
     (function(){{var el=document.getElementById('versionStamp');if(!el)return;var v=window.RZ_VERSION||'1.x.x',d=window.RZ_VERSION_DATE||'',cn=window.RZ_VERSION_CODENAME||'';el.textContent='· ResistanceZero · v'+v+(d?' · '+d:'')+(cn?' · '+cn:'')+' ·';}})();
-    (function(){{var n=0;function sc(){{if(window.RZExplain&&window.RZExplain.scanText){{var m=document.getElementById('main-content');if(m)window.RZExplain.scanText(m,120);}}else if(n++<25){{setTimeout(sc,200);}}}}setTimeout(sc,350);}})();
+    (function(){{var n=0;function sc(){{if(window.RZExplain&&window.RZExplain.scanText&&window.RZ_EXPLAIN_DB){{var m=document.getElementById('main-content');if(m)window.RZExplain.scanText(m,140);}}else if(n++<40){{setTimeout(sc,200);}}}}setTimeout(sc,350);}})();
     </script>
 """
 
@@ -237,7 +272,7 @@ def page_shell(title, desc, canonical_path, body_html, base=""):
             <button class="theme-btn" id="themeToggle" type="button" aria-label="Toggle theme">◐</button>
         </div>
     </div></nav>
-    <main class="wrap" id="main-content" data-explain-scan>
+    <main class="wrap" id="main-content">
 {body_html}
     </main>
     <footer><div class="footer-grid"></div><span class="ver" id="versionStamp"></span></footer>
@@ -537,6 +572,7 @@ def render_incident(inc, rank):
         if metrics_rows else ""
     )
 
+    _used = set()
     cascade_html = cascade_svg(inc)
     radar_html = radar_svg(inc.get("magnitude", {}))
     timeline_html = soe_timeline_svg(inc.get("sequenceOfEvents", []))
@@ -546,7 +582,7 @@ def render_incident(inc, rank):
     analysis_html = ""
     if ca:
         blocks = "".join(
-            f'<div class="ca-block"><h3>{esc(s.get("heading",""))}</h3><p>{esc(s.get("body",""))}</p></div>'
+            f'<div class="ca-block"><h3>{esc(s.get("heading",""))}</h3><p>{linkify(s.get("body",""), _used)}</p></div>'
             for s in ca
         )
         analysis_html = f'<h2>Comprehensive analysis</h2>{blocks}'
@@ -572,7 +608,7 @@ def render_incident(inc, rank):
             <span class="chip amber">{esc(_dur(inc.get('durationMin')))} core impact</span>
             {cat_chips(inc.get('category',[]))}
         </div>
-        <p class="lede">{esc(inc.get('brief',''))}</p>
+        <p class="lede">{linkify(inc.get('brief',''), _used)}</p>
 
         <h2>Failure cascade</h2>
         {cascade_html}
@@ -604,7 +640,7 @@ def render_incident(inc, rank):
         <ul class="soe">{soe}</ul>
 
         <h2>Root cause</h2>
-        <div class="card">{esc(inc.get('rootCause',''))}</div>
+        <div class="card">{linkify(inc.get('rootCause',''), _used)}</div>
 
         <h2>Contributing factors</h2>
         <ul class="tight">{cf}</ul>
@@ -621,7 +657,7 @@ def render_incident(inc, rank):
         {analysis_html}
 
         <h2>Technical deep-dive</h2>
-        <div class="card">{esc(inc.get('technicalDeepDive',''))}</div>
+        <div class="card">{linkify(inc.get('technicalDeepDive',''), _used)}</div>
 
         <h2>References &amp; provenance</h2>
         <ul class="refs">{refs}</ul>
