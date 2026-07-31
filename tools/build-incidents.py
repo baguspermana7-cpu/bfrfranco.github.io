@@ -397,6 +397,21 @@ def main():
             with open(os.path.join(ROOT, name), "w", encoding="utf-8") as fh:
                 fh.write(content)
         print(f"[build-incidents] wrote {len(outputs)} pages from {len(incidents)} incident(s)")
+        # auto-update the count marker on the Articles landing page (root-gated feature card)
+        import re as _re
+        n = len(incidents)
+        pm = sum(1 for x in incidents if (x.get("sourcing", {}) or {}).get("officialPostmortem") or x.get("officialPostmortem"))
+        txt = f"{n} major incidents catalogued \u00b7 {pm} with official post-mortems"
+        ap = os.path.join(ROOT, "articles.html")
+        try:
+            a = open(ap, encoding="utf-8").read()
+            a2 = _re.sub(r"<!--INC_COUNT-->.*?<!--/INC_COUNT-->", f"<!--INC_COUNT-->{txt}<!--/INC_COUNT-->", a, flags=_re.S)
+            if a2 != a:
+                open(ap, "w", encoding="utf-8").write(a2)
+                print(f"[build-incidents] articles.html count updated: {txt}")
+        except FileNotFoundError:
+            pass
+
     else:
         print(f"[build-incidents] DRY RUN — {len(incidents)} incident(s) → {len(outputs)} pages")
         for i, inc in enumerate(incidents, 1):
