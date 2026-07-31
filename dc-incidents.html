@@ -82,6 +82,29 @@
     .ca-block { background:var(--surface); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 10px 10px 0; padding:0.7rem 1rem; margin-top:0.7rem; }
     .ca-block h3 { margin:0 0 0.3rem; font-size:0.92rem; color:var(--text-strong); }
     .ca-block p { margin:0; color:var(--text-body); font-size:0.9rem; }
+    /* ── inline-SVG visualizations (theme-aware via vars) ── */
+    .viz { overflow-x:auto; margin-top:0.9rem; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:0.9rem 1rem; }
+    .viz svg { display:block; max-width:100%; height:auto; }
+    .viz-radar svg { max-width:280px; margin:0 auto; }
+    .vz-grid { fill:none; stroke:var(--line); stroke-width:1; }
+    .vz-accent-fill { fill:var(--cyan); fill-opacity:0.16; stroke:var(--cyan); stroke-width:1.4; }
+    .vz-accent-dot { fill:var(--cyan); }
+    .vz-accent-bar { fill:var(--cyan); }
+    .vz-cat-bar { fill:var(--amber); }
+    .vz-lbl { font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--muted); }
+    .vz-box-trigger { fill:color-mix(in srgb, var(--red) 12%, var(--surface)); stroke:var(--red); stroke-width:1.2; }
+    .vz-box-fault { fill:color-mix(in srgb, var(--amber) 12%, var(--surface)); stroke:var(--amber); stroke-width:1.2; }
+    .vz-box-down { fill:color-mix(in srgb, var(--cyan) 10%, var(--surface)); stroke:var(--cyan); stroke-width:1; }
+    .vz-box-t { font-family:'IBM Plex Sans',sans-serif; font-size:11px; font-weight:600; fill:var(--text-strong); }
+    .vz-box-s { font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--muted); }
+    .vz-flow { stroke:var(--muted); stroke-width:1.3; fill:none; }
+    .vz-arrhead { fill:var(--muted); }
+    .vz-tl-ph { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.04em; text-transform:uppercase; fill:var(--amber); }
+    .vz-tl-t { font-family:'JetBrains Mono',monospace; font-size:8.5px; fill:var(--muted); }
+    .vz-hb-lbl { font-family:'IBM Plex Sans',sans-serif; font-size:11px; fill:var(--text-body); }
+    .vz-hb-val { font-family:'JetBrains Mono',monospace; font-size:10px; fill:var(--muted); }
+    .viz-grid3 { display:grid; grid-template-columns:1fr 1fr; gap:0.9rem; }
+    @media (max-width:720px){ .viz-grid3 { grid-template-columns:1fr; } }
     .kv { display:grid; grid-template-columns:180px 1fr; gap:0.5rem 0.9rem; margin-top:0.5rem; font-size:0.9rem; }
     .kv dt { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; }
     .kv dd { margin:0; color:var(--text-body); }
@@ -146,6 +169,14 @@
             <span class="chip green">Provenance-mandatory</span>
             <span class="chip red">Root access</span>
         </div>
+        <h2>Portfolio analytics</h2>
+        <div class="viz"><svg viewBox="0 0 640 328" role="img" aria-label="Incidents ranked by magnitude"><title>Ranked by magnitude score</title><text class="vz-hb-lbl" x="8" y="22">CrowdStrike (impacting Mic</text><rect class="vz-accent-bar" x="230" y="11" width="380" height="15" rx="3"/><text class="vz-hb-val" x="616" y="22">9.6</text><text class="vz-hb-lbl" x="8" y="48">SK C&amp;C (tenants: Kakao, Na</text><rect class="vz-accent-bar" x="230" y="37" width="380" height="15" rx="3"/><text class="vz-hb-val" x="616" y="48">9.6</text><text class="vz-hb-lbl" x="8" y="74">National Information Resou</text><rect class="vz-accent-bar" x="230" y="63" width="362" height="15" rx="3"/><text class="vz-hb-val" x="598" y="74">9.2</text><text class="vz-hb-lbl" x="8" y="100">Meta (Facebook)</text><rect class="vz-accent-bar" x="230" y="89" width="356" height="15" rx="3"/><text class="vz-hb-val" x="592" y="100">9.0</text><text class="vz-hb-lbl" x="8" y="126">Google Cloud</text><rect class="vz-accent-bar" x="230" y="115" width="356" height="15" rx="3"/><text class="vz-hb-val" x="592" y="126">9.0</text><text class="vz-hb-lbl" x="8" y="152">Amazon Web Services</text><rect class="vz-accent-bar" x="230" y="141" width="346" height="15" rx="3"/><text class="vz-hb-val" x="582" y="152">8.8</text><text class="vz-hb-lbl" x="8" y="178">Amazon Web Services</text><rect class="vz-accent-bar" x="230" y="167" width="340" height="15" rx="3"/><text class="vz-hb-val" x="576" y="178">8.6</text><text class="vz-hb-lbl" x="8" y="204">OVHcloud</text><rect class="vz-accent-bar" x="230" y="193" width="340" height="15" rx="3"/><text class="vz-hb-val" x="576" y="204">8.6</text><text class="vz-hb-lbl" x="8" y="230">Amazon Web Services</text><rect class="vz-accent-bar" x="230" y="219" width="338" height="15" rx="3"/><text class="vz-hb-val" x="574" y="230">8.6</text><text class="vz-hb-lbl" x="8" y="256">Dyn</text><rect class="vz-accent-bar" x="230" y="245" width="338" height="15" rx="3"/><text class="vz-hb-val" x="574" y="256">8.6</text><text class="vz-hb-lbl" x="8" y="282">Microsoft Azure</text><rect class="vz-accent-bar" x="230" y="271" width="331" height="15" rx="3"/><text class="vz-hb-val" x="567" y="282">8.3</text><text class="vz-hb-lbl" x="8" y="308">Amazon Web Services</text><rect class="vz-accent-bar" x="230" y="297" width="323" height="15" rx="3"/><text class="vz-hb-val" x="559" y="308">8.2</text></svg></div>
+        <div class="viz-grid3">
+            <div><div class="eyebrow" style="margin-bottom:0.3rem">By category</div><div class="viz"><svg viewBox="0 0 460 146" role="img" aria-label="Incidents by category"><title>Incidents by failure category</title><text class="vz-hb-lbl" x="8" y="22">Software</text><rect class="vz-cat-bar" x="140" y="11" width="260" height="15" rx="3"/><text class="vz-hb-val" x="406" y="22">11</text><text class="vz-hb-lbl" x="8" y="48">Human error</text><rect class="vz-cat-bar" x="140" y="37" width="95" height="15" rx="3"/><text class="vz-hb-val" x="241" y="48">4</text><text class="vz-hb-lbl" x="8" y="74">Network</text><rect class="vz-cat-bar" x="140" y="63" width="95" height="15" rx="3"/><text class="vz-hb-val" x="241" y="74">4</text><text class="vz-hb-lbl" x="8" y="100">Fire</text><rect class="vz-cat-bar" x="140" y="89" width="71" height="15" rx="3"/><text class="vz-hb-val" x="217" y="100">3</text><text class="vz-hb-lbl" x="8" y="126">Power</text><rect class="vz-cat-bar" x="140" y="115" width="71" height="15" rx="3"/><text class="vz-hb-val" x="217" y="126">3</text></svg></div></div>
+            <div><div class="eyebrow" style="margin-bottom:0.3rem">Risk map · blast radius × duration</div><div class="viz"><svg viewBox="0 0 320 320" role="img" aria-label="Blast radius vs duration risk map"><title>Risk map: blast radius × duration (dot size = magnitude)</title><line class="vz-grid" x1="34" y1="286" x2="312" y2="286"/><line class="vz-grid" x1="34" y1="8" x2="34" y2="286"/><text class="vz-lbl" x="160" y="314" text-anchor="middle">Blast radius →</text><text class="vz-lbl" x="12" y="160" text-anchor="middle" transform="rotate(-90 12 160)">Duration →</text><circle class="vz-accent-dot" cx="308" cy="64" r="6.8"><title>CrowdStrike (impacting Microsoft Windows / Azure hosts) — 2024-07-19</title></circle><circle class="vz-accent-dot" cx="308" cy="36" r="6.8"><title>SK C&amp;C (tenants: Kakao, Naver) — 2022-10-15</title></circle><circle class="vz-accent-dot" cx="308" cy="36" r="6.7"><title>National Information Resources Service (NIRS) — 2025-09-26</title></circle><circle class="vz-accent-dot" cx="308" cy="91" r="6.6"><title>Meta (Facebook) — 2021-10-04</title></circle><circle class="vz-accent-dot" cx="308" cy="91" r="6.6"><title>Google Cloud — 2025-06-12</title></circle><circle class="vz-accent-dot" cx="308" cy="91" r="6.5"><title>Amazon Web Services — 2025-10-20</title></circle><circle class="vz-accent-dot" cx="281" cy="64" r="6.4"><title>Amazon Web Services — 2021-12-07</title></circle><circle class="vz-accent-dot" cx="281" cy="64" r="6.4"><title>OVHcloud — 2021-03-10</title></circle><circle class="vz-accent-dot" cx="308" cy="119" r="6.4"><title>Amazon Web Services — 2017-02-28</title></circle><circle class="vz-accent-dot" cx="308" cy="91" r="6.4"><title>Dyn — 2016-10-21</title></circle><circle class="vz-accent-dot" cx="308" cy="119" r="6.3"><title>Microsoft Azure — 2025-10-29</title></circle><circle class="vz-accent-dot" cx="281" cy="64" r="6.3"><title>Amazon Web Services — 2020-11-25</title></circle><circle class="vz-accent-dot" cx="281" cy="119" r="6.2"><title>Cloudflare — 2025-11-18</title></circle><circle class="vz-accent-dot" cx="308" cy="175" r="6.2"><title>Google Cloud — 2020-12-14</title></circle><circle class="vz-accent-dot" cx="281" cy="119" r="6.0"><title>Microsoft Azure — 2020-09-28</title></circle></svg></div></div>
+        </div>
+
+        <h2>All incidents</h2>
         <div class="table-wrap">
             <table class="inc-index">
                 <thead><tr><th>Rank</th><th>Incident</th><th>Date</th><th>DC / Location</th><th>Category</th><th>Duration · Magnitude</th><th>Brief</th></tr></thead>
@@ -318,13 +349,13 @@
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=2026-07-31-inc2"></script>
-    <script src="js/rz-feature-flags.js?v=2026-07-31-inc2" defer></script>
-    <script src="auth.js?v=2026-07-31-inc2" defer></script>
-    <script src="js/rz-mobile-nav.js?v=2026-07-31-inc2" defer></script>
-    <script src="js/rz-cookie-consent.js?v=2026-07-31-inc2" defer></script>
-    <script src="js/rz-explain-db.js?v=2026-07-31-inc2" defer></script>
-    <script src="js/rz-explain.js?v=2026-07-31-inc2" defer></script>
+    <script src="js/rz-version.js?v=2026-08-01-viz"></script>
+    <script src="js/rz-feature-flags.js?v=2026-08-01-viz" defer></script>
+    <script src="auth.js?v=2026-08-01-viz" defer></script>
+    <script src="js/rz-mobile-nav.js?v=2026-08-01-viz" defer></script>
+    <script src="js/rz-cookie-consent.js?v=2026-08-01-viz" defer></script>
+    <script src="js/rz-explain-db.js?v=2026-08-01-viz" defer></script>
+    <script src="js/rz-explain.js?v=2026-08-01-viz" defer></script>
     <script>
     (function(){var t=document.getElementById('themeToggle');function a(theme){document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme);var m=document.querySelector('meta[name=\"theme-color\"]');if(m)m.setAttribute('content',theme==='dark'?'#0c1512':'#f4f1e7');}a(localStorage.getItem('theme')||'dark');if(t)t.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme');a(c==='dark'?'light':'dark');});})();
     (function(){function ag(){if(window._rzAuth&&typeof window._rzAuth.enforceTierFeatureAccess==='function'){window._rzAuth.enforceTierFeatureAccess('dc-incidents');}else{try{var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');var r=s&&s.role,t=s&&s.tier;var passes=!!s&&(r==='root'||t==='root');document.body.classList.toggle('locked',!passes);}catch(e){document.body.classList.add('locked');}}}var b=document.getElementById('rootLoginBtn');if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showRootGatePrompt==='function'){window._rzAuth.showRootGatePrompt('Root account required for the DC Incidents dossier.');}else if(window._rzAuth&&typeof window._rzAuth.showModal==='function'){window._rzAuth.showModal();}});window.addEventListener('rz-auth-change',function(){setTimeout(ag,50);});window.addEventListener('storage',function(e){if(e.key==='rz_premium_session')ag();});ag();setTimeout(ag,60);setTimeout(ag,550);setTimeout(ag,1600);})();

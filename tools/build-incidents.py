@@ -20,7 +20,7 @@ from datetime import datetime
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(ROOT, "data", "incidents")
-VER_TAG = "2026-07-31-inc2"
+VER_TAG = "2026-08-01-viz"
 
 CATEGORY_LABEL = {
     "power": "Power", "cooling": "Cooling", "network": "Network",
@@ -117,6 +117,29 @@ CSS = r"""
     .ca-block { background:var(--surface); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 10px 10px 0; padding:0.7rem 1rem; margin-top:0.7rem; }
     .ca-block h3 { margin:0 0 0.3rem; font-size:0.92rem; color:var(--text-strong); }
     .ca-block p { margin:0; color:var(--text-body); font-size:0.9rem; }
+    /* ── inline-SVG visualizations (theme-aware via vars) ── */
+    .viz { overflow-x:auto; margin-top:0.9rem; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:0.9rem 1rem; }
+    .viz svg { display:block; max-width:100%; height:auto; }
+    .viz-radar svg { max-width:280px; margin:0 auto; }
+    .vz-grid { fill:none; stroke:var(--line); stroke-width:1; }
+    .vz-accent-fill { fill:var(--cyan); fill-opacity:0.16; stroke:var(--cyan); stroke-width:1.4; }
+    .vz-accent-dot { fill:var(--cyan); }
+    .vz-accent-bar { fill:var(--cyan); }
+    .vz-cat-bar { fill:var(--amber); }
+    .vz-lbl { font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--muted); }
+    .vz-box-trigger { fill:color-mix(in srgb, var(--red) 12%, var(--surface)); stroke:var(--red); stroke-width:1.2; }
+    .vz-box-fault { fill:color-mix(in srgb, var(--amber) 12%, var(--surface)); stroke:var(--amber); stroke-width:1.2; }
+    .vz-box-down { fill:color-mix(in srgb, var(--cyan) 10%, var(--surface)); stroke:var(--cyan); stroke-width:1; }
+    .vz-box-t { font-family:'IBM Plex Sans',sans-serif; font-size:11px; font-weight:600; fill:var(--text-strong); }
+    .vz-box-s { font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--muted); }
+    .vz-flow { stroke:var(--muted); stroke-width:1.3; fill:none; }
+    .vz-arrhead { fill:var(--muted); }
+    .vz-tl-ph { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.04em; text-transform:uppercase; fill:var(--amber); }
+    .vz-tl-t { font-family:'JetBrains Mono',monospace; font-size:8.5px; fill:var(--muted); }
+    .vz-hb-lbl { font-family:'IBM Plex Sans',sans-serif; font-size:11px; fill:var(--text-body); }
+    .vz-hb-val { font-family:'JetBrains Mono',monospace; font-size:10px; fill:var(--muted); }
+    .viz-grid3 { display:grid; grid-template-columns:1fr 1fr; gap:0.9rem; }
+    @media (max-width:720px){ .viz-grid3 { grid-template-columns:1fr; } }
     .kv { display:grid; grid-template-columns:180px 1fr; gap:0.5rem 0.9rem; margin-top:0.5rem; font-size:0.9rem; }
     .kv dt { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; }
     .kv dd { margin:0; color:var(--text-body); }
@@ -255,6 +278,14 @@ def render_hub(incidents):
             <span class="chip green">Provenance-mandatory</span>
             <span class="chip red">Root access</span>
         </div>
+        <h2>Portfolio analytics</h2>
+        {hub_magnitude_svg(incidents)}
+        <div class="viz-grid3">
+            <div><div class="eyebrow" style="margin-bottom:0.3rem">By category</div>{hub_category_svg(incidents)}</div>
+            <div><div class="eyebrow" style="margin-bottom:0.3rem">Risk map · blast radius × duration</div>{hub_quadrant_svg(incidents)}</div>
+        </div>
+
+        <h2>All incidents</h2>
         <div class="table-wrap">
             <table class="inc-index">
                 <thead><tr><th>Rank</th><th>Incident</th><th>Date</th><th>DC / Location</th><th>Category</th><th>Duration · Magnitude</th><th>Brief</th></tr></thead>
@@ -276,6 +307,146 @@ def _dur(mins):
     return f"{h}h {m}m" if h else f"{m}m"
 
 
+# ─────────── inline-SVG visualizations (data-driven, theme-aware, no runtime lib) ───────────
+import math as _math
+
+
+def _pts(vals, cx, cy, r):
+    n = len(vals); out = []
+    for i, v in enumerate(vals):
+        a = -_math.pi / 2 + i * 2 * _math.pi / n
+        out.append(f"{cx + _math.cos(a) * r * v:.1f},{cy + _math.sin(a) * r * v:.1f}")
+    return " ".join(out)
+
+
+def radar_svg(mag):
+    axes = [("Users", "usersScore"), ("Financial", "financialScore"), ("Duration", "durationScore"), ("Blast", "blastRadiusScore")]
+    cx = cy = 100; R = 60
+    vals = [max(0.0, min(10.0, float(mag.get(k, 0)))) / 10 for _, k in axes]
+    rings = "".join(f'<polygon class="vz-grid" points="{_pts([f, f, f, f], cx, cy, R)}"/>' for f in (0.34, 0.67, 1.0))
+    spokes = labels = ""
+    anchors = ["middle", "start", "middle", "end"]
+    dys = [-6, 4, 14, 4]
+    for i, (lbl, k) in enumerate(axes):
+        a = -_math.pi / 2 + i * 2 * _math.pi / 4
+        ex, ey = cx + _math.cos(a) * R, cy + _math.sin(a) * R
+        spokes += f'<line class="vz-grid" x1="{cx}" y1="{cy}" x2="{ex:.1f}" y2="{ey:.1f}"/>'
+        lx, ly = cx + _math.cos(a) * (R + 12), cy + _math.sin(a) * (R + 12) + dys[i]
+        labels += f'<text class="vz-lbl" x="{lx:.1f}" y="{ly:.1f}" text-anchor="{anchors[i]}">{esc(lbl)} {int(round(float(mag.get(k, 0))))}</text>'
+    poly = f'<polygon class="vz-accent-fill" points="{_pts(vals, cx, cy, R)}"/>'
+    dots = "".join(f'<circle class="vz-accent-dot" cx="{p.split(",")[0]}" cy="{p.split(",")[1]}" r="2.4"/>' for p in _pts(vals, cx, cy, R).split(" "))
+    return f'<div class="viz viz-radar"><svg viewBox="0 0 200 205" role="img" aria-label="Magnitude sub-scores radar chart"><title>Magnitude sub-scores (0–10)</title>{rings}{spokes}{poly}{dots}{labels}</svg></div>'
+
+
+def cascade_svg(inc):
+    cat = (inc.get("category") or ["software"])[0]
+    trigger = CATEGORY_LABEL.get(cat, cat)
+    op = (inc.get("operator", "") or "")[:26]
+    dc = (inc.get("dcName", "") or "")[:30]
+    downs = ((inc.get("severity", {}) or {}).get("servicesDown", []) or [])
+    shown = downs[:4]
+    more = len(downs) - len(shown)
+
+    def box(x, y, w, h, cls, lines):
+        t = "".join(f'<text class="{("vz-box-t" if i == 0 else "vz-box-s")}" x="{x + 10}" y="{y + (18 if i == 0 else 16) + i * 14}">{esc(str(l)[:32])}</text>' for i, l in enumerate(lines))
+        return f'<rect class="{cls}" x="{x}" y="{y}" width="{w}" height="{h}" rx="8"/>{t}'
+    W = 720
+    rows = max(1, len(shown))
+    H = max(150, 44 + rows * 40)
+    midY = H / 2 - 24
+    svg = [f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="Failure cascade block diagram"><title>Failure cascade: trigger → fault → downstream impact</title>']
+    # arrows defs
+    svg.append('<defs><marker id="ic-ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path class="vz-arrhead" d="M0,0 L6,3 L0,6 Z"/></marker></defs>')
+    svg.append(box(8, midY, 168, 50, "vz-box-trigger", [f"Trigger · {trigger}", inc.get("date", "")]))
+    svg.append(box(232, midY, 200, 50, "vz-box-fault", [op or "Operator", dc or "Facility / system"]))
+    svg.append(f'<line class="vz-flow" x1="176" y1="{midY+25}" x2="230" y2="{midY+25}" marker-end="url(#ic-ar)"/>')
+    for i, d in enumerate(shown):
+        by = 22 + i * 40
+        svg.append(box(500, by, 212, 32, "vz-box-down", [d]))
+        svg.append(f'<line class="vz-flow" x1="432" y1="{midY+25}" x2="498" y2="{by+16}" marker-end="url(#ic-ar)"/>')
+    if more > 0:
+        svg.append(f'<text class="vz-box-s" x="500" y="{22 + rows * 40 + 4}">+{more} more downstream services</text>')
+    svg.append('</svg>')
+    return f'<div class="viz viz-cascade">{"".join(svg)}</div>'
+
+
+def soe_timeline_svg(soe):
+    if not soe:
+        return ""
+    n = len(soe)
+    W = max(560, 40 + n * 92)
+    H = 96
+    x0, x1 = 30, W - 30
+    step = (x1 - x0) / max(1, n - 1)
+    parts = [f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="Sequence-of-events timeline"><title>Phased sequence of events</title>']
+    parts.append(f'<line class="vz-grid" x1="{x0}" y1="48" x2="{x1}" y2="48"/>')
+    for i, e in enumerate(soe):
+        x = x0 + i * step
+        ph = (e.get("phase", "") or "")
+        parts.append(f'<circle class="vz-accent-dot" cx="{x:.0f}" cy="48" r="4.5"/>')
+        parts.append(f'<text class="vz-tl-ph" x="{x:.0f}" y="30" text-anchor="middle">{esc(ph[:12])}</text>')
+        t = (e.get("t", "") or "")
+        t = t.split("T")[0] if "T" in t else t[:16]
+        parts.append(f'<text class="vz-tl-t" x="{x:.0f}" y="68" text-anchor="middle">{esc(t)}</text>')
+    parts.append('</svg>')
+    return f'<div class="viz viz-timeline">{"".join(parts)}</div>'
+
+
+def hub_magnitude_svg(incidents):
+    top = incidents[:12]
+    if not top:
+        return ""
+    mx = max((x["_score"] for x in top), default=10) or 10
+    rowH = 26; W = 640; H = len(top) * rowH + 16
+    bars = []
+    for i, x in enumerate(top):
+        y = 8 + i * rowH
+        w = (x["_score"] / mx) * 380
+        lbl = (x.get("operator", "") or x.get("slug", ""))[:26]
+        bars.append(f'<text class="vz-hb-lbl" x="8" y="{y+14}">{esc(lbl)}</text>')
+        bars.append(f'<rect class="vz-accent-bar" x="230" y="{y+3}" width="{w:.0f}" height="15" rx="3"/>')
+        bars.append(f'<text class="vz-hb-val" x="{230+w+6:.0f}" y="{y+14}">{x["_score"]:.1f}</text>')
+    return f'<div class="viz"><svg viewBox="0 0 {W} {H}" role="img" aria-label="Incidents ranked by magnitude"><title>Ranked by magnitude score</title>{"".join(bars)}</svg></div>'
+
+
+def hub_category_svg(incidents):
+    from collections import Counter
+    c = Counter()
+    for x in incidents:
+        for cat in x.get("category", []):
+            c[cat] += 1
+    if not c:
+        return ""
+    items = c.most_common()
+    mx = max(v for _, v in items)
+    rowH = 26; W = 460; H = len(items) * rowH + 16
+    bars = []
+    for i, (cat, v) in enumerate(items):
+        y = 8 + i * rowH
+        w = (v / mx) * 260
+        bars.append(f'<text class="vz-hb-lbl" x="8" y="{y+14}">{esc(CATEGORY_LABEL.get(cat, cat))}</text>')
+        bars.append(f'<rect class="vz-cat-bar" x="140" y="{y+3}" width="{w:.0f}" height="15" rx="3"/>')
+        bars.append(f'<text class="vz-hb-val" x="{140+w+6:.0f}" y="{y+14}">{v}</text>')
+    return f'<div class="viz"><svg viewBox="0 0 {W} {H}" role="img" aria-label="Incidents by category"><title>Incidents by failure category</title>{"".join(bars)}</svg></div>'
+
+
+def hub_quadrant_svg(incidents):
+    if not incidents:
+        return ""
+    W = H = 320; pad = 34
+    ax = f'<line class="vz-grid" x1="{pad}" y1="{H-pad}" x2="{W-8}" y2="{H-pad}"/><line class="vz-grid" x1="{pad}" y1="8" x2="{pad}" y2="{H-pad}"/>'
+    ax += f'<text class="vz-lbl" x="{W/2:.0f}" y="{H-6}" text-anchor="middle">Blast radius →</text>'
+    ax += f'<text class="vz-lbl" x="12" y="{H/2:.0f}" text-anchor="middle" transform="rotate(-90 12 {H/2:.0f})">Duration →</text>'
+    dots = []
+    for x in incidents:
+        m = x.get("magnitude", {})
+        bx = pad + (float(m.get("blastRadiusScore", 0)) / 10) * (W - pad - 12)
+        dy = (H - pad) - (float(m.get("durationScore", 0)) / 10) * (H - pad - 8)
+        r = 3 + (x["_score"] / 10) * 4
+        dots.append(f'<circle class="vz-accent-dot" cx="{bx:.0f}" cy="{dy:.0f}" r="{r:.1f}"><title>{esc(x.get("operator",""))} — {esc(x.get("date",""))}</title></circle>')
+    return f'<div class="viz"><svg viewBox="0 0 {W} {H}" role="img" aria-label="Blast radius vs duration risk map"><title>Risk map: blast radius × duration (dot size = magnitude)</title>{ax}{"".join(dots)}</svg></div>'
+
+
 def render_incident(inc, rank):
     loc = inc.get("location", {})
     loc_s = ", ".join(x for x in [loc.get("city"), loc.get("country"), loc.get("az")] if x)
@@ -294,6 +465,11 @@ def render_incident(inc, rank):
         f'<h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody>{metrics_rows}</tbody></table></div>'
         if metrics_rows else ""
     )
+
+    cascade_html = cascade_svg(inc)
+    radar_html = radar_svg(inc.get("magnitude", {}))
+    timeline_html = soe_timeline_svg(inc.get("sequenceOfEvents", []))
+    mag_note = esc((inc.get("magnitude", {}) or {}).get("note", ""))
 
     ca = inc.get("comprehensiveAnalysis", [])
     analysis_html = ""
@@ -327,6 +503,10 @@ def render_incident(inc, rank):
         </div>
         <p class="lede">{esc(inc.get('brief',''))}</p>
 
+        <h2>Failure cascade</h2>
+        {cascade_html}
+        <p class="disclaimer">Trigger → primary fault → downstream blast radius, derived from the sourced root cause and affected-services record.</p>
+
         <h2>Facility &amp; location</h2>
         <dl class="kv">
             <dt>Operator</dt><dd>{esc(inc.get('operator',''))}</dd>
@@ -344,7 +524,12 @@ def render_incident(inc, rank):
         <div class="card"><strong>Services / systems down</strong><ul class="tight">{down}</ul></div>
         {metrics_html}
 
+        <h2>Magnitude profile</h2>
+        {radar_html}
+        <p class="disclaimer">{mag_note}</p>
+
         <h2>Sequence of events (SOE)</h2>
+        {timeline_html}
         <ul class="soe">{soe}</ul>
 
         <h2>Root cause</h2>
