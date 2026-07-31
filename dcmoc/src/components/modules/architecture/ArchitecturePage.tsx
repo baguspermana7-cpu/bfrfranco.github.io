@@ -27,6 +27,7 @@ import { getPUE } from '@/constants/pue';
 import { Boxes, FileDown, Save, ChevronRight } from 'lucide-react';
 import { Explain } from '@/components/ui/Explain';
 import { TraceValue } from '@/components/ui/TraceValue';
+import { Tooltip } from '@/components/ui/Tooltip';
 
 const COOL_LABEL: Record<string, string> = { liquid: 'D2C Liquid', rdhx: 'Rear-Door HX', inrow: 'In-Row', air: 'Air CRAC/CRAH' };
 
@@ -220,13 +221,13 @@ export function ArchitecturePage() {
                     </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                    <label className="text-[10px] uppercase text-slate-500">Standard
+                    <label className="text-[10px] uppercase text-slate-500">Standard <Tooltip content="Design standard / reliability tier the architecture is validated against (e.g. Uptime Institute Tier or TIA-942 rating). Selecting one sets the target Tier level, which drives the required redundancy, availability target and equipment counts." />
                         <select value={arch.designStandard} onChange={(e) => onStandard(e.target.value as DesignStandard)}
                             className="ml-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs normal-case text-slate-900 dark:text-slate-100 outline-none focus:border-rz-signal">
                             {DESIGN_STANDARDS.map((d) => <option key={d.id} value={d.id}>{d.label}</option>)}
                         </select>
                     </label>
-                    <label className="text-[10px] uppercase text-slate-500">Profile
+                    <label className="text-[10px] uppercase text-slate-500">Profile <Tooltip content="Pre-configured architecture preset (e.g. AI/HPC liquid-cooled, enterprise air-cooled). Applying a profile writes a matched set of cooling type, rack density, redundancy and tier into the design at once. A picker only — an amber chip warns when the selected profile has not actually been applied." />
                         <select value={arch.profileId} onChange={(e) => onProfile(e.target.value)}
                             className={`ml-1.5 rounded-lg border ${profileDrift ? 'border-amber-500/70' : 'border-slate-300 dark:border-slate-700'} bg-white dark:bg-slate-900/60 px-2 py-1.5 text-xs normal-case text-slate-900 dark:text-slate-100 outline-none focus:border-rz-signal`}>
                             {ARCH_PROFILES.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}
@@ -256,15 +257,15 @@ export function ArchitecturePage() {
                     {/* KPI row */}
                     <div id="sec-arch-overview" className="grid scroll-mt-24 grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                         {[
-                            { label: 'Total IT Load', value: `${f.itMw} MW`, sub: `${eq.racks.toLocaleString()} racks`, trace: 'sim.itLoad' },
-                            { label: 'Total Facility Load', value: `${f.facilityMw} MW`, sub: 'incl. losses & overhead', trace: 'arch.facilityMw' },
+                            { label: 'Total IT Load', value: `${f.itMw} MW`, sub: `${eq.racks.toLocaleString()} racks`, trace: 'sim.itLoad', tip: 'The critical IT power the facility is designed to serve, in megawatts — the compute/storage/network load, before cooling and electrical overhead. It is the primary sizing driver for every downstream count (racks, UPS, generators, chillers).' },
+                            { label: 'Total Facility Load', value: `${f.facilityMw} MW`, sub: 'incl. losses & overhead', trace: 'arch.facilityMw', tip: 'Total electrical demand at the utility/generator, in megawatts — the IT load plus cooling, power-conversion losses and other overhead (facility load = IT load × PUE). This is what the incoming supply, transformers and gensets must be sized for.' },
                             { label: 'PUE (Design)', value: String(f.pue), sub: f.pue <= 1.2 ? 'Excellent' : f.pue <= 1.4 ? 'Good' : 'Standard', explain: 'pue', trace: 'engine.pueMatrix' },
-                            { label: 'Cooling Approach', value: COOL_LABEL[i.coolingType], sub: dens.ok ? `${i.rackDensityKw} kW/rack` : `${i.rackDensityKw} kW/rack — above ${dens.ceilKw} kW ${i.coolingType} ceiling`, warn: !dens.ok },
-                            { label: 'Availability Target', value: `${f.availabilityPct}%`, sub: `Tier ${i.tier} · ${f.downtimeMinYr} min/yr`, trace: 'rel.tierTarget' },
+                            { label: 'Cooling Approach', value: COOL_LABEL[i.coolingType], sub: dens.ok ? `${i.rackDensityKw} kW/rack` : `${i.rackDensityKw} kW/rack — above ${dens.ceilKw} kW ${i.coolingType} ceiling`, warn: !dens.ok, tip: 'The heat-rejection method for the racks — direct-to-chip liquid, rear-door heat exchanger, in-row, or air CRAC/CRAH. Each has a maximum rack density it can handle; the sub-line warns (amber) when the configured kW/rack exceeds that method’s ceiling.' },
+                            { label: 'Availability Target', value: `${f.availabilityPct}%`, sub: `Tier ${i.tier} · ${f.downtimeMinYr} min/yr`, trace: 'rel.tierTarget', tip: 'The uptime the design is targeting, as a percentage of the year, set by the chosen Tier. The sub-line shows the equivalent maximum allowed downtime in minutes per year (e.g. Tier III ≈ 99.982% ≈ 95 min/yr).' },
                             { label: 'Redundancy Level', value: i.redundancy, sub: 'Power & Cooling', explain: 'redundancy' },
                         ].map((k) => (
                             <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
-                                <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label} {(k as { explain?: string }).explain && <Explain k={(k as { explain?: string }).explain!} />}</div>
+                                <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label} {(k as { explain?: string }).explain && <Explain k={(k as { explain?: string }).explain!} />}{(k as { tip?: string }).tip && <Tooltip content={(k as { tip?: string }).tip!} />}</div>
                                 {(k as { trace?: string }).trace ? (
                                     <TraceValue traceId={(k as { trace?: string }).trace!}>
                                         <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
@@ -280,7 +281,7 @@ export function ArchitecturePage() {
                     {/* dynamic diagram */}
                     <div id="sec-arch-diagram" className="scroll-mt-24 rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
                         <div className="mb-2 flex items-center justify-between">
-                            <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">System Architecture Diagram <span className="ml-1 text-[9px] normal-case text-rz-mint">live — recomputed from requirements</span></h2>
+                            <h2 className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">System Architecture Diagram <Tooltip content="Auto-generated schematic of the facility, redrawn live from the requirements and design inputs. Switch views: Logical (block topology of power/cooling/IT), Single Line Diagram (electrical one-line — utility, transformers, gensets, UPS, distribution), or Mechanical & Cooling (the heat-rejection loop)." /><span className="ml-1 text-[9px] normal-case text-rz-mint">live — recomputed from requirements</span></h2>
                             <div className="flex gap-1">
                                 {(['logical', 'sld', 'mech'] as const).map((v) => (
                                     <button key={v} onClick={() => arch.actions.set({ diagramView: v })}

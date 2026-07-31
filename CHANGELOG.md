@@ -13,6 +13,27 @@ release sections rather than semver.
 
 ---
 
+## v1.120.4 — 2026-07-31 (DCMOC parameter-tooltip coverage — wave 1)
+
+Owner: "saya mau semua parameter ada tooltip penjelasan parameter apa itu" (every
+parameter must carry a hover tooltip explaining what it is). Coverage audit found
+many high-density dashboards with 0–1 tooltips. **Wave 1 — 7 dashboards, ~76 new
+explanation tooltips** (accurate to each value's real engineering/finance basis + unit,
+matching the existing `<Tooltip content>` style; no value/logic changed):
+
+### Added
+- **Financial (EVM overview)** — 6 KPI cards (Total/Revised Budget, Committed, Actual,
+  Forecast at Completion, CPI/SPI) now explain the earned-value meaning on hover.
+- **Operations** — 7 KPI cards + 6 section headers (availability/PUE/load/alarms/tickets/PM/energy).
+- **CAPEX Engine** — 9 section headers + 4 forecast percentile readouts (P10/50/80/90).
+- **Reliability** — 7 section headers + Component-RAM table columns (MTBF/MTTR/λ/availability).
+- **Commissioning** — WBS/readiness/systems headers + table columns.
+- **Architecture** — load/cooling/availability KPIs + diagram-view heading.
+- **Asset Intelligence** — fleet controls + 3 table header groups (health/criticality/replacement).
+
+Further dashboards (Platform/Report/DesignTools/Executive/Settings/Benchmark/Scenarios/…)
+follow in the next waves until parameter-tooltip coverage is complete.
+
 ## v1.120.3 — 2026-07-31 (DCMOC owner-comment audit — final 2 programs clean, 1 residual purge)
 
 Audited the last 2 prior owner programs (DCMOC quality v1.110 + CAPEX AI-arch

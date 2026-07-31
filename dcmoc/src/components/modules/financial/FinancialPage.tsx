@@ -383,15 +383,15 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
                     {/* KPI row */}
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
                         {[
-                            { label: 'Total Budget (Baseline)', value: fmtMoney(model.baseline), sub: 'engine capex P50', trace: 'capex.total' },
-                            { label: 'Revised Budget', value: fmtMoney(model.revised), sub: `+${fmtMoney(model.approvedRev)} approved changes`, trace: 'fin.revisedBudget' },
-                            { label: 'Total Committed', value: fmtMoney(model.committed), sub: `${Math.round((model.committed / model.revised) * 100)}% of revised`, trace: 'fin.committed' },
-                            { label: 'Total Actual (Paid)', value: fmtMoney(model.paid), sub: `${Math.round((model.paid / model.revised) * 100)}% of revised`, trace: 'fin.paid' },
-                            { label: 'Forecast at Completion', value: fmtMoney(model.fac), sub: model.planMode ? 'Plan Mode ≡ revised' : `variance ${fmtMoney(model.fac - model.revised)}`, trace: 'fin.fac' },
-                            { label: 'CPI / SPI', value: `${model.cpi} / ${model.spi}`, sub: 'from Construction EVM (single source)', trace: 'constr.cpi', red: evmDiag },
+                            { label: 'Total Budget (Baseline)', value: fmtMoney(model.baseline), sub: 'engine capex P50', trace: 'capex.total', explain: 'Baseline project budget — the CAPEX engine P50 estimate before any approved change orders. All earned-value variance (CPI/SPI/FAC) is measured against this figure.' },
+                            { label: 'Revised Budget', value: fmtMoney(model.revised), sub: `+${fmtMoney(model.approvedRev)} approved changes`, trace: 'fin.revisedBudget', explain: 'Baseline plus approved change orders. An approved scope change moves the baseline here instead of showing up as a cost overrun on CPI — that is the point of a budget revision.' },
+                            { label: 'Total Committed', value: fmtMoney(model.committed), sub: `${Math.round((model.committed / model.revised) * 100)}% of revised`, trace: 'fin.committed', explain: 'Value of purchase orders and contracts placed but not yet paid — money legally obligated. Shown as a percentage of the revised budget.' },
+                            { label: 'Total Actual (Paid)', value: fmtMoney(model.paid), sub: `${Math.round((model.paid / model.revised) * 100)}% of revised`, trace: 'fin.paid', explain: 'Cash actually disbursed to date — the EVM Actual Cost (AC). Shown as a percentage of the revised budget.' },
+                            { label: 'Forecast at Completion', value: fmtMoney(model.fac), sub: model.planMode ? 'Plan Mode ≡ revised' : `variance ${fmtMoney(model.fac - model.revised)}`, trace: 'fin.fac', explain: 'Projected final project cost = AC + (revised − EV) ÷ CPI. In Plan Mode (no construction actuals entered yet) it equals the revised budget.' },
+                            { label: 'CPI / SPI', value: `${model.cpi} / ${model.spi}`, sub: 'from Construction EVM (single source)', trace: 'constr.cpi', red: evmDiag, explain: 'Cost Performance Index (earned ÷ spent) and Schedule Performance Index (earned ÷ planned). 1.00 = on budget / on schedule; below 1 = over budget / behind. Passthrough from the Construction EVM — never recomputed here.' },
                         ].map((k) => (
-                            <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
-                                <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label}</div>
+                            <div key={k.label} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
+                                <div className="text-[10px] uppercase tracking-wide text-slate-500 flex items-center gap-1">{k.label} <InfoTip content={(k as { explain?: string }).explain ?? ''} /></div>
                                 {(k as { trace?: string }).trace ? (
                                     <TraceValue traceId={(k as { trace?: string }).trace!}>
                                         {(k as { red?: Diagnosis | null }).red ? (

@@ -577,7 +577,7 @@ export function CommissioningEnginePage() {
                     <div className="grid gap-4 xl:grid-cols-2">
                         {/* level timeline — full-width: a 7-level WBS with sub-activities needs the room */}
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4 xl:col-span-2">
-                            <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Commissioning WBS (L0–L6 · calendar windows · expand levels for sub-activities)</h2>
+                            <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Commissioning WBS (L0–L6 · calendar windows · expand levels for sub-activities) <InfoTip content="Work-breakdown schedule of the commissioning program across levels L0–L6 on a calendar timeline. Level durations are engine-real (staffed and equipment-scaled, crews working in parallel). Expand a level to see its sub-activities; the bar width is that level's share of the calendar window." /></h2>
                             {wbs?.tree ? (
                                 <GanttChart tree={wbs.tree} totalMonths={Math.max(1, Math.ceil(wbs.totalMonths))} />
                             ) : (
@@ -604,7 +604,7 @@ export function CommissioningEnginePage() {
 
                         {/* readiness completion input */}
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                            <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Readiness Completion <span className="text-[9px] normal-case text-rz-mint">feeds engine readinessIndex (weights engine-real)</span></h2>
+                            <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Readiness Completion <InfoTip content="Per-level percent-complete you enter, or that is auto-derived from the Cx checklist pass/fail ticks. These feed the engine readinessIndex using engine-real weights (heavier on L4/L5) to produce the headline go-live readiness index. Levels driven by the checklist are locked to their derived value." /><span className="text-[9px] normal-case text-rz-mint">feeds engine readinessIndex (weights engine-real)</span></h2>
                             <div className="space-y-1.5">
                                 {READY_KEYS.map((rk) => {
                                     const st = checklistStats[rk.key];
@@ -646,9 +646,9 @@ export function CommissioningEnginePage() {
                     <div className="grid gap-4 xl:grid-cols-[1.3fr_1fr]">
                         {/* systems table */}
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                            <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Commissioning by System <span className="ml-1 rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">TESTS = SCREENING (counts × per-unit)</span></h2>
+                            <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Commissioning by System <InfoTip content="Commissionable system classes derived from the engine equipment-scaling model, with their installed unit counts and a SCREENING test estimate (units × tests-per-unit). Use it for budgeting and duration sanity checks — it is not the contractual Cx test matrix." /><span className="ml-1 rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">TESTS = SCREENING (counts × per-unit)</span></h2>
                             <table className="w-full text-[11px]">
-                                <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">System</th><th className="text-right">Units</th><th className="text-right">Tests</th></tr></thead>
+                                <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">System</th><th className="text-right">Units <InfoTip content="Installed unit count for this system class, from the engine equipment-scaling model (equipScale) — grows with IT load and redundancy." /></th><th className="text-right">Tests <InfoTip content="Screening test-count estimate = units × tests-per-unit for the class. A budgeting figure, not the contractual test matrix." /></th></tr></thead>
                                 <tbody>
                                     {systems.map((s) => (
                                         <tr key={s.label} className="border-b border-slate-100 dark:border-slate-800/60">
@@ -663,7 +663,7 @@ export function CommissioningEnginePage() {
 
                         {/* issues & punch */}
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                            <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Issues & Punch List</h2>
+                            <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Issues & Punch List <InfoTip content="Open commissioning issues and punch-list items (severity High/Medium/Low, tagged issue vs. punch). Tick the box to close an item. Open L4/L5 issues gate the readiness index and the go-live recommendation until cleared or formally deferred." /></h2>
                             <div className="space-y-1">
                                 {t.issues.map((x) => (
                                     <label key={x.id} className="flex items-center gap-2 text-[11px]">

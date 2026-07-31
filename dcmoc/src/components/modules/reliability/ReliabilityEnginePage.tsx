@@ -456,7 +456,7 @@ export function ReliabilityEnginePage() {
 
                     <div className="grid gap-4 xl:grid-cols-2">
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                            <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Availability by System <span className="text-[9px] normal-case text-slate-400">documented chains · {inputs.powerRedundancy} = {model.paths} path(s)</span></h2>
+                            <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Availability by System <InfoTip content="Per-system availability composed from the IEEE-493 component MTBF/MTTR chains at the current redundancy (path count shown). The 'Chain' column is each system's series/parallel path composition; Status compares its availability against the tier unavailability budget." /><span className="text-[9px] normal-case text-slate-400">documented chains · {inputs.powerRedundancy} = {model.paths} path(s)</span></h2>
                             <table className="w-full text-[11px]">
                                 <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">System</th><th className="text-left">Chain</th><th className="text-right">Availability</th><th className="text-right">Status</th></tr></thead>
                                 <tbody>
@@ -475,7 +475,7 @@ export function ReliabilityEnginePage() {
                             </table>
                             {/* downtime-budget waterfall */}
                             <div className="mt-3 border-t border-slate-100 dark:border-slate-800/60 pt-2">
-                                <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">Downtime vs Tier {inputs.tierLevel} budget <span className="text-[9px] normal-case text-slate-400">min/yr, unplanned</span></h3>
+                                <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">Downtime vs Tier {inputs.tierLevel} budget <InfoTip content="Unplanned downtime per year for each system (= (1 − availability) × 525,960 min/yr) drawn against the tier's allowed downtime budget. Bars that exceed the budget turn red — those systems are what pull the composite below target. Planned maintenance is excluded." /><span className="text-[9px] normal-case text-slate-400">min/yr, unplanned</span></h3>
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2" title={`Tier ${inputs.tierLevel} budget · ${fmtDowntime(model.budgetMin)}`}>
                                         <span className="w-32 shrink-0 truncate text-[9px] text-slate-500">Tier budget</span>
@@ -499,7 +499,7 @@ export function ReliabilityEnginePage() {
 
                         <div className="space-y-4">
                             <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                                <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">SPOF — Single Points of Failure ({model.spof.length})</h2>
+                                <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">SPOF — Single Points of Failure ({model.spof.length}) <InfoTip content="Single Points of Failure — components sitting on a single path at the current redundancy, so their failure takes the facility down (no parallel backup). The count is in parentheses; each entry has a one-click remediation lever (add a path / cut MTTR). Zero SPOFs means fully redundant paths." /></h2>
                                 {model.spof.length === 0 ? (
                                     <p className="text-[11px] text-rz-data">✓ No single-path components at {inputs.powerRedundancy} — fully redundant paths.</p>
                                 ) : (
@@ -549,7 +549,7 @@ export function ReliabilityEnginePage() {
                                 </div>
                             </div>
                             <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                                <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Sensitivity <span className="text-[9px] normal-case text-slate-400">vs base (β-adjusted)</span></h2>
+                                <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Sensitivity <InfoTip content="How the composed availability moves when key inputs are stressed (all MTTR ×1.5, or one fewer redundancy path), versus the β-adjusted base case. Reveals which lever — repair time or redundancy depth — the design is most sensitive to." /><span className="text-[9px] normal-case text-slate-400">vs base (β-adjusted)</span></h2>
                                 <table className="w-full text-[11px]">
                                     <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Scenario</th><th className="text-right">Availability</th><th className="text-right">Δ downtime</th></tr></thead>
                                     <tbody>
@@ -564,7 +564,7 @@ export function ReliabilityEnginePage() {
                                 </table>
                             </div>
                             <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                                <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Active Failure Events <span className="text-[9px] normal-case text-slate-400">from the shared ops log</span></h2>
+                                <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Active Failure Events <InfoTip content="Uncleared alarms from the shared operations log (P1/P2 priority, with equipment tag and message). This is the live fault feed, not a reliability prediction — events are cleared in the Operations log." /><span className="text-[9px] normal-case text-slate-400">from the shared ops log</span></h2>
                                 {failures.length === 0 ? <p className="text-[11px] text-slate-500">No active events.</p> : (
                                     <div className="space-y-1">
                                         {failures.slice(0, 5).map((a) => (
@@ -664,10 +664,10 @@ export function ReliabilityEnginePage() {
 
                     {/* per-component RAM table (IEEE-493 + equipScale fleet) */}
                     <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                        <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Component RAM <span className="text-[9px] normal-case text-slate-400">IEEE-493 data{model.hasFleet ? ' · fleet counts from engine equipScale' : ''}</span></h2>
+                        <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Component RAM <InfoTip content="Reliability/Availability/Maintainability data per component class from IEEE-493: MTBF, MTTR, failure rate, installed fleet count (engine equipScale), stand-alone availability, and each component's share of total unavailability — the top-share rows are the best repair-time / redundancy targets." /><span className="text-[9px] normal-case text-slate-400">IEEE-493 data{model.hasFleet ? ' · fleet counts from engine equipScale' : ''}</span></h2>
                         <div className="overflow-x-auto">
                             <table className="w-full text-[11px]">
-                                <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Component</th><th className="text-right">MTBF (h)</th><th className="text-right">MTTR (h)</th><th className="text-right">λ (f/Myr)</th><th className="text-right">Fleet</th><th className="text-right">Availability</th><th className="text-right">Unavail. share</th></tr></thead>
+                                <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Component</th><th className="text-right">MTBF (h) <InfoTip content="Mean Time Between Failures — average operating hours between failures of this component class (IEEE-493). Higher is more reliable." /></th><th className="text-right">MTTR (h) <InfoTip content="Mean Time To Repair — average hours to restore this component after a failure (detect + dispatch + repair). Lower MTTR directly raises availability." /></th><th className="text-right">λ (f/Myr) <InfoTip content="Failure rate — failures per million operating hours (= 1,000,000 / MTBF). This is the additive quantity used to compose the series failure chain." /></th><th className="text-right">Fleet <InfoTip content="Installed unit count for this component class, from the engine equipment-scaling model (equipScale). Shows '—' when the fleet count is unavailable." /></th><th className="text-right">Availability <InfoTip content="Stand-alone availability of one unit = MTBF / (MTBF + MTTR), before any redundancy is applied — the fraction of time a single unit is up." /></th><th className="text-right">Unavail. share <InfoTip content="This component's share of the total component unavailability (Σ of 1 − availability). The largest shares are the best targets for repair-time or redundancy improvement." /></th></tr></thead>
                                 <tbody>
                                     {model.componentRows.map((c) => (
                                         <tr key={c.key} className="border-b border-slate-100 dark:border-slate-800/60">
@@ -692,7 +692,7 @@ export function ReliabilityEnginePage() {
 
                     {/* component MTBF chart */}
                     <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                        <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Component MTBF (engine IEEE-493 data)</h2>
+                        <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Component MTBF (engine IEEE-493 data) <InfoTip content="Mean Time Between Failures for each component class in thousands of hours, from the engine's IEEE-493 dataset. Longer bars are more reliable classes; the shortest-MTBF components dominate the series-composite failure rate." /></h2>
                         <div className="h-40">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={Object.entries(model.comps).map(([k, c]) => ({ name: c.label ?? k, mtbfK: +(c.mtbf / 1000).toFixed(0) }))}>

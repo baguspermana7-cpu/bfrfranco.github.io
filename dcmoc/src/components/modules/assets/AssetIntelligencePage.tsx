@@ -189,7 +189,7 @@ export function AssetIntelligencePage() {
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
-                    <label className="flex items-center gap-1.5 text-[10px] uppercase text-slate-500">Fleet age
+                    <label className="flex items-center gap-1.5 text-[10px] uppercase text-slate-500">Fleet age <InfoTip content="Assumed operating age of the equipment fleet, in years. It is the main input to the Weibull ageing model — a higher age pushes health down and failure probability up across every class. Set it to the real average age (or explore a future year) to see how the fleet degrades." />
                         <div className="w-24 normal-case">
                             <CreatableCombobox<number> options={[1, 3, 5, 8, 12].map((v) => ({ value: v, label: `${v} yr` }))}
                                 value={ageVal} min={0} max={30} unit="yr"
@@ -243,7 +243,7 @@ export function AssetIntelligencePage() {
                     <div className="grid gap-4 xl:grid-cols-[1fr_1.4fr]">
                         <div className="space-y-4">
                             <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                                <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Assets by Category</h2>
+                                <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Assets by Category <InfoTip content="Breakdown of the design fleet's unit counts grouped by discipline — Power Infrastructure (switchgear, transformers, generators, UPS, PDUs, batteries), Cooling Infrastructure (chillers/CDU, CRAC/AHU) and Controls (BMS). The donut and legend show how many units fall in each category." /></h2>
                                 <div className="flex items-center gap-2">
                                     <div className="h-32 w-32 shrink-0">
                                         <ResponsiveContainer width="100%" height="100%">
@@ -267,9 +267,9 @@ export function AssetIntelligencePage() {
                                 </div>
                             </div>
                             <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                                <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Fleet Condition Assumption</h2>
+                                <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Fleet Condition Assumption <InfoTip content="A single physical-condition factor (30-100%) applied across the fleet, standing in for a real condition survey. Together with fleet age and duty it weights the engine health index — 100% = as-new, lower values pull every class's health down. Set it to match the observed condition of the installed base." /></h2>
                                 <div className="flex items-center gap-2 text-[11px]">
-                                    <span className="w-24 text-slate-600 dark:text-slate-300">Condition</span>
+                                    <span className="w-24 text-slate-600 dark:text-slate-300">Condition <InfoTip content="Assumed physical condition of the fleet as a percentage (30-100%). A component of the health index alongside remaining-life and duty; slide it down to model a worn or poorly-maintained fleet." /></span>
                                     <input type="range" min={30} max={100} step={5} value={Math.round(condition * 100)}
                                         onChange={(e) => setCondition(Number(e.target.value) / 100)} className="flex-1 accent-rz-mint" />
                                     <span className="w-10 text-right tabular-nums text-slate-500">{Math.round(condition * 100)}%</span>
@@ -279,9 +279,9 @@ export function AssetIntelligencePage() {
                         </div>
 
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                            <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Class Health & Reliability <span className="text-[9px] normal-case text-slate-400">MTBF/MTTR = engine IEEE-493 component data · — = class not in the component table</span></h2>
+                            <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Class Health & Reliability <InfoTip content="Per equipment-class table of unit count, health index, failure probability and reliability metrics. It is the detail behind the KPI cards and charts — use it to see which specific classes (e.g. UPS batteries, chillers) are driving the fleet's health and risk." /><span className="text-[9px] normal-case text-slate-400">MTBF/MTTR = engine IEEE-493 component data · — = class not in the component table</span></h2>
                             <table className="w-full text-[11px]">
-                                <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Class</th><th className="text-right">Units</th><th className="text-right">Health</th><th className="text-right">Weibull CDF</th><th className="text-right">MTBF</th><th className="text-right">MTTR</th></tr></thead>
+                                <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Class <InfoTip content="Equipment class — a group of like units (e.g. MV switchgear, transformers, UPS modules, chillers) that share reliability and lifecycle parameters. The '· status' tag next to each is the class's health band." /></th><th className="text-right">Units <InfoTip content="Number of units of this class in the design fleet, scaled by the engine from IT load and redundancy. A design count, not an as-built inventory." /></th><th className="text-right">Health <InfoTip content="Class health index, 0-100 — higher is better. Computed from remaining life (Weibull ageing at the set fleet age), the condition assumption and duty. Colour-coded green/amber/red by band." /></th><th className="text-right">Weibull CDF <InfoTip content="Weibull cumulative failure probability — the modeled chance a unit of this class has already failed by the assumed fleet age (%). Rises steeply as the class enters the wear-out zone of the bathtub curve; based on IEEE-493 class life data, not sensor readings." /></th><th className="text-right">MTBF <InfoTip content="Mean Time Between Failures, in hours — the average operating time between failures for this class (shown in thousands of hours, k h). Higher means more reliable. Source: IEEE-493 component reliability data." /></th><th className="text-right">MTTR <InfoTip content="Mean Time To Repair, in hours — the average time to restore a failed unit to service. Drives downtime and the criticality score; higher MTTR classes justify more on-site spares. Source: IEEE-493." /></th></tr></thead>
                                 <tbody>
                                     {model.rows.map((r) => (
                                         <tr key={r.cls + r.label} className="border-b border-slate-100 dark:border-slate-800/60">
@@ -299,7 +299,7 @@ export function AssetIntelligencePage() {
                     </div>
 
                     <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                        <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Health Distribution by Class</h2>
+                        <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Health Distribution by Class <InfoTip content="Bar chart of the health index (0-100) for each equipment class at the set fleet age and condition. Bars are colour-coded — green ≥70, amber 50-69, red <50 — so the classes needing attention stand out at a glance." /></h2>
                         <div className="h-44">
                             <ResponsiveContainer width="100%" height="100%">
                                 <BarChart data={model.rows}>
@@ -326,7 +326,7 @@ export function AssetIntelligencePage() {
                                 <p className="text-[11px] text-slate-500">No classes with engine MTTR data at this configuration.</p>
                             ) : (
                                 <table className="w-full text-[11px]">
-                                    <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">#</th><th className="text-left">Class</th><th className="text-right">Weibull CDF</th><th className="text-right">MTTR</th><th className="text-right">Units</th><th className="text-right">Score</th></tr></thead>
+                                    <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left"># <InfoTip content="Priority rank by criticality score — 1 = highest. The top three are flagged FOCUS as the classes where maintenance and spares spend buys the most risk reduction." /></th><th className="text-left">Class <InfoTip content="Equipment class being ranked (e.g. UPS modules, chillers), grouping like units that share reliability parameters." /></th><th className="text-right">Weibull CDF <InfoTip content="Weibull cumulative failure probability at the assumed fleet age (%) — the chance a unit has failed by now. One of the three factors in the criticality score." /></th><th className="text-right">MTTR <InfoTip content="Mean Time To Repair, hours — average time to restore a failed unit. A long repair time raises criticality because each failure costs more downtime. Source: IEEE-493." /></th><th className="text-right">Units <InfoTip content="Number of units of this class in the fleet. More units means more failure opportunities, so it multiplies into the criticality score." /></th><th className="text-right">Score <InfoTip content="Criticality score = Weibull failure probability × MTTR (hours) × unit count. A screening priority (not a full FMECA) — higher scores read red and mark where to concentrate PM and spares." /></th></tr></thead>
                                     <tbody>
                                         {model.criticality.map((r, i) => (
                                             <tr key={r.cls + r.label} className="border-b border-slate-100 dark:border-slate-800/60">
@@ -362,7 +362,7 @@ export function AssetIntelligencePage() {
                             ) : (
                                 <>
                                     <table className="w-full text-[11px]">
-                                        <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Component</th><th className="text-right">Interval</th><th className="text-right">Per Event</th><th className="text-right">Years</th><th className="text-right">{model.replacement.horizon}-yr Total</th></tr></thead>
+                                        <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Component <InfoTip content="Equipment class in the lifecycle model that gets periodically replaced or refreshed (e.g. UPS batteries, chillers). Rows tagged ALT are alternatives excluded from the totals." /></th><th className="text-right">Interval <InfoTip content="Replacement / refresh interval in years — how often this class is renewed under the lifecycle model. Deferring past this interval saves CAPEX now but raises Weibull wear-out risk." /></th><th className="text-right">Per Event <InfoTip content="Cost of a single replacement event for this class, in dollars — the class's $/kW replacement cost applied to the facility IT kW." /></th><th className="text-right">Years <InfoTip content="The specific years within the planning horizon when a replacement of this class is scheduled to fall (based on its interval)." /></th><th className="text-right">{model.replacement.horizon}-yr Total <InfoTip content={`Total nominal replacement cost for this class over the ${model.replacement.horizon}-year horizon — the per-event cost summed across every scheduled replacement. Nominal dollars, no escalation or discounting.`} /></th></tr></thead>
                                         <tbody>
                                             {model.replacement.rows.map((r) => (
                                                 <tr key={r.component} className={`border-b border-slate-100 dark:border-slate-800/60 ${r.alt ? 'opacity-60' : ''}`}>

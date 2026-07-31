@@ -180,7 +180,7 @@ export function CapexEnginePage() {
                     <div className="grid gap-4 xl:grid-cols-2">
                         {/* breakdown */}
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                            <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">CAPEX Breakdown (P50)</h2>
+                            <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">CAPEX Breakdown (P50) <InfoTip content="The P50 (base-case) total split by cost category — construction, electrical, mechanical/cooling, soft costs and contingency. Each percentage is the category's share of total CAPEX. IT fit-out (racks/servers) is excluded: the engine has no cost model for it." /></h2>
                             <div className="flex items-center gap-3">
                                 <div className="h-40 w-40 shrink-0">
                                     <ResponsiveContainer width="100%" height="100%">
@@ -210,7 +210,7 @@ export function CapexEnginePage() {
 
                         {/* risk curve */}
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                            <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">CAPEX Forecast (Risk-Adjusted) <span className="ml-1 text-[9px] normal-case text-slate-400">AACE band · deterministic normal approx</span></h2>
+                            <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">CAPEX Forecast (Risk-Adjusted) <InfoTip content="Probability distribution of total CAPEX, built as a deterministic normal approximation over the AACE Class-4 accuracy band (−30%/+50%). The P10/P50/P80/P90 markers are the cost levels with a 10/50/80/90% chance of finishing at or below — budget to P80, never P10." /><span className="ml-1 text-[9px] normal-case text-slate-400">AACE band · deterministic normal approx</span></h2>
                             <div className="h-40">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <ComposedChart data={band.curve}>
@@ -222,12 +222,12 @@ export function CapexEnginePage() {
                                 </ResponsiveContainer>
                             </div>
                             <div className="mt-1 grid grid-cols-4 gap-2 text-center text-[10px]">
-                                {[['P10', band.p10, 'text-rz-data', 'capex.p10'], ['P50 · Base', band.p50, 'text-rz-mint', 'capex.total'], ['P80', band.p80, 'text-amber-500', 'capex.p80'], ['P90', band.p90, 'text-rose-500', 'capex.p90']].map(([l, v, c, t]) => (
+                                {[['P10', band.p10, 'text-rz-data', 'capex.p10', 'Optimistic bound — only a 10% chance the final cost lands at or below this. Never budget to it.'], ['P50 · Base', band.p50, 'text-rz-mint', 'capex.total', 'Base case — an even (50%) chance the outcome is above or below. The headline estimate, but approvals should use P80.'], ['P80', band.p80, 'text-amber-500', 'capex.p80', 'Risk-adjusted budget number — 80% chance of finishing at or below. The delta over P50 is the priced-in risk premium.'], ['P90', band.p90, 'text-rose-500', 'capex.p90', 'Conservative bound — 90% chance of coming in at or below. Used as a downside/worst-case reserve level, not the working budget.']].map(([l, v, c, t, tip]) => (
                                     <div key={l as string}>
                                         <TraceValue traceId={t as string}>
                                             <div className={`font-bold tabular-nums ${c}`}>{fmtMoney(v as number)}</div>
                                         </TraceValue>
-                                        <div className="text-slate-500">{l}</div>
+                                        <div className="text-slate-500">{l} <InfoTip content={tip as string} /></div>
                                     </div>
                                 ))}
                             </div>
@@ -237,7 +237,7 @@ export function CapexEnginePage() {
                     <div className="grid gap-4 xl:grid-cols-2">
                         {/* BOQ */}
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                            <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">BOQ Summary (by category) <span className="ml-1 text-[9px] normal-case text-slate-400">assembly-level Class-4 budgetary — not a QTO</span></h2>
+                            <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">BOQ Summary (by category) <InfoTip content="Bill of quantities: the P50 estimate decomposed into line items grouped by discipline/category, each with its share of total. Assembly-level Class-4 budgetary depth — not a quantity take-off (QTO) measured off drawings. Use the BOQ button for the full dossier." /><span className="ml-1 text-[9px] normal-case text-slate-400">assembly-level Class-4 budgetary — not a QTO</span></h2>
                             <div className="max-h-64 overflow-y-auto">
                                 <table className="w-full text-[11px]">
                                     <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">Line Item</th><th className="text-right">Total</th><th className="text-right">%</th></tr></thead>
@@ -257,7 +257,7 @@ export function CapexEnginePage() {
                         {/* sensitivity sweep + tornado */}
                         <div className="space-y-4">
                             <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                                <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Cost Sensitivity — IT Load sweep</h2>
+                                <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Cost Sensitivity — IT Load sweep <InfoTip content="How total CAPEX (P10/P50/P90 bands) scales as IT load is swept across a range with all other inputs held fixed. Reveals IT load as the dominant, near-linear cost driver and how wide the risk band is at each facility size." /></h2>
                                 <div className="h-36">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <ComposedChart data={model.sweep}>
@@ -274,7 +274,7 @@ export function CapexEnginePage() {
                                 </div>
                             </div>
                             <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                                <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Top Cost Drivers (one-at-a-time swing)</h2>
+                                <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Top Cost Drivers (one-at-a-time swing) <InfoTip content="Tornado analysis: each input is varied one at a time and the resulting swing in total CAPEX is ranked largest-first. The longest bars are the assumptions worth firming up first, since they move the estimate the most." /></h2>
                                 <div className="space-y-1">
                                     {model.tornado.map((d) => {
                                         const max = model.tornado[0]?.swing ?? 1;
@@ -294,7 +294,7 @@ export function CapexEnginePage() {
                     {/* bottom row */}
                     <div className="grid gap-3 md:grid-cols-3">
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
-                            <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Contingency & Soft Costs</h3>
+                            <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Contingency & Soft Costs <InfoTip content="Non-construction cost lines applied on top of the direct works — design/engineering, project management and the contingency allowance — each shown with its calculation basis. Contingency is progressively drawn down as the design matures." /></h3>
                             {model.cont.map((c) => (
                                 <div key={c.type} className="flex justify-between gap-2 py-0.5 text-[11px]">
                                     <span className="text-slate-600 dark:text-slate-300">{c.type}<span className="block text-[9px] text-slate-400">{c.basis}</span></span>
@@ -303,7 +303,7 @@ export function CapexEnginePage() {
                             ))}
                         </div>
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
-                            <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Cost Escalation <span className="text-[8px] normal-case text-slate-400">· basis: projYear index (engine-real, no commodity indices)</span></h3>
+                            <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Cost Escalation <InfoTip content="Cost-index multiplier applied for the selected project year, escalating the base cost DB to that year's price level. Engine-real index only — it does not track live commodity or labour price indices. The selected year is highlighted." /><span className="text-[8px] normal-case text-slate-400">· basis: projYear index (engine-real, no commodity indices)</span></h3>
                             {model.esc.map((e) => (
                                 <div key={e.year} className={`flex justify-between py-0.5 text-[11px] ${e.year === inputs.projYear ? 'font-semibold text-rz-mint' : 'text-slate-600 dark:text-slate-300'}`}>
                                     <span>{e.year}{e.year === inputs.projYear ? ' · selected' : ''}</span>
@@ -312,7 +312,7 @@ export function CapexEnginePage() {
                             ))}
                         </div>
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
-                            <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Payment Terms <span className="rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">ASSUMPTION</span></h3>
+                            <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Payment Terms <InfoTip content="Assumed disbursement schedule — the share of contract value paid at each project milestone. An illustrative cash-flow assumption for financing and working-capital planning, not a contracted payment schedule." /><span className="rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">ASSUMPTION</span></h3>
                             <div className="h-24">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart data={PAYMENT_TERMS}>
@@ -327,7 +327,7 @@ export function CapexEnginePage() {
                     </div>
 
                     <div className="rounded border border-rz-mint/30 bg-rz-mint/5 p-3">
-                        <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-rz-mint">Key Insights</h3>
+                        <h3 className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-rz-mint">Key Insights <InfoTip content="Auto-generated observations about the cost estimate — largest drivers, notable ratios and risk flags — derived deterministically from the current inputs and results, not hand-written commentary." /></h3>
                         <ul className="space-y-0.5">
                             {model.insights.map((s, idx) => <li key={idx} className="flex gap-1.5 text-[11px] text-slate-700 dark:text-slate-300"><span className="text-rz-mint">✓</span>{s}</li>)}
                         </ul>

@@ -12,6 +12,7 @@
 
 import React from 'react';
 import { TraceValue } from '@/components/ui/TraceValue';
+import { Tooltip as InfoTip } from '@/components/ui/Tooltip';
 import { ComposedChart, Area, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useSimulationStore } from '@/store/simulation';
 import { useOpsLog } from '@/store/opsLog';
@@ -187,16 +188,16 @@ export function OperationsDashboard() {
                     {/* KPI row */}
                     <div className="grid grid-cols-2 gap-3 md:grid-cols-4 xl:grid-cols-7">
                         {[
-                            { label: 'Availability Target', value: `${model.availTargetPct}%`, sub: `Tier ${inputs.tierLevel} design target`, trace: 'rel.tierTarget' },
-                            { label: 'PUE (at load)', value: String(model.livePue), sub: `design ${model.designPue} · ${Math.round(model.occ * 100)}% occ`, trace: 'ops.pueAtLoad' },
-                            { label: 'Active IT Load', value: `${model.activeItMw} MW`, sub: `of ${model.capMw.toFixed(1)} MW (${Math.round(model.occ * 100)}%)`, trace: 'ops.activeItMw' },
-                            { label: 'Active Alarms', value: String(activeAlarms.length), sub: `P1:${byPri('P1')} P2:${byPri('P2')} P3:${byPri('P3')}`, trace: 'ops.activeAlarms' },
-                            { label: 'Open Tickets', value: String(openTickets.length), sub: `${openIncidents.length} incidents open`, trace: 'ops.openTickets' },
-                            { label: 'PM Compliance', value: log.completedPmWeeks.length > 0 ? `${Math.min(100, Math.round((log.completedPmWeeks.length / 52) * 100))}%` : '—', sub: log.completedPmWeeks.length > 0 ? `${log.completedPmWeeks.length}/52 weeks logged` : 'no PM logged yet — log PM weeks in the Maintenance tab', trace: 'ops.pmCompliancePct' },
-                            { label: 'Energy Cost (24h)', value: `$${model.energyCostToday.toLocaleString()}`, sub: `@ $${model.rate}/kWh (${country?.name ?? '—'})`, trace: 'ops.energyCostDaily' },
+                            { label: 'Availability Target', value: `${model.availTargetPct}%`, sub: `Tier ${inputs.tierLevel} design target`, trace: 'rel.tierTarget', tip: 'Design uptime target for the selected tier, from the engine tierAvailability table (e.g. Tier 3 ≈ 99.982%). This is the reliability the topology is engineered to — not a measured/achieved figure; each additional nine roughly cuts allowable annual downtime tenfold.' },
+                            { label: 'PUE (at load)', value: String(model.livePue), sub: `design ${model.designPue} · ${Math.round(model.occ * 100)}% occ`, trace: 'ops.pueAtLoad', tip: 'Power Usage Effectiveness at the current occupancy = total facility power ÷ IT power. Derived from the design PUE de-rated for partial load (partial-load PUE model); 1.0 is the ideal floor and it rises above design PUE when the hall runs below full load. Lower is more efficient.' },
+                            { label: 'Active IT Load', value: `${model.activeItMw} MW`, sub: `of ${model.capMw.toFixed(1)} MW (${Math.round(model.occ * 100)}%)`, trace: 'ops.activeItMw', tip: 'IT power drawn right now = nameplate IT capacity × occupancy, in MW against total provisioned capacity. The gap to capacity is unsold/unfilled white space that still carries fixed facility overhead.' },
+                            { label: 'Active Alarms', value: String(activeAlarms.length), sub: `P1:${byPri('P1')} P2:${byPri('P2')} P3:${byPri('P3')}`, trace: 'ops.activeAlarms', tip: 'Number of alarms in the ops log currently in the Active state, split by priority (P1 most severe → P4 informational). Sourced from the user-entered alarm log, not a live BMS feed.' },
+                            { label: 'Open Tickets', value: String(openTickets.length), sub: `${openIncidents.length} incidents open`, trace: 'ops.openTickets', tip: 'Service / work-order tickets in the ops log not yet Closed, with the count of still-open incidents alongside. A backlog indicator for the operations and maintenance team.' },
+                            { label: 'PM Compliance', value: log.completedPmWeeks.length > 0 ? `${Math.min(100, Math.round((log.completedPmWeeks.length / 52) * 100))}%` : '—', sub: log.completedPmWeeks.length > 0 ? `${log.completedPmWeeks.length}/52 weeks logged` : 'no PM logged yet — log PM weeks in the Maintenance tab', trace: 'ops.pmCompliancePct', tip: 'Preventive-maintenance completion = PM weeks logged ÷ 52. Measures how much of the scheduled annual PM program has actually been executed; low compliance raises failure risk on aging assets. Log weeks in the Maintenance tab.' },
+                            { label: 'Energy Cost (24h)', value: `$${model.energyCostToday.toLocaleString()}`, sub: `@ $${model.rate}/kWh (${country?.name ?? '—'})`, trace: 'ops.energyCostDaily', tip: 'Estimated electricity spend over 24h = facility energy (active IT × PUE × 24h, in MWh) × the country electricity rate ($/kWh). A run-rate indicator, not a billed amount; excludes demand charges and tariff structure.' },
                         ].map((k) => (
                             <div key={k.label} title={`${k.label}: ${k.value}${(k as {sub?: string}).sub ? " — " + (k as {sub?: string}).sub : ""}`} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
-                                <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label}</div>
+                                <div className="text-[10px] uppercase tracking-wide text-slate-500">{k.label} {(k as { tip?: string }).tip && <InfoTip content={(k as { tip?: string }).tip!} />}</div>
                                 {(k as { trace?: string }).trace ? (
                                     <TraceValue traceId={(k as { trace?: string }).trace!}>
                                         <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{k.value}</div>
@@ -216,7 +217,7 @@ export function OperationsDashboard() {
                         <div className="min-w-0 space-y-4">
                             {/* load curve */}
                             <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                                <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">IT & Facility Load — 24h <span className="ml-1 rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">SIMULATED PROFILE</span> <span className="text-[9px] normal-case text-slate-400">deterministic diurnal cosine ±5% · peak 14:00</span></h2>
+                                <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">IT & Facility Load — 24h <InfoTip content="24-hour load profile: IT load and total facility load (IT × PUE) plotted against provisioned IT capacity, in MW. The shape is a documented deterministic diurnal cosine (±5%, peak at 14:00) — an illustrative profile, not metered data." /><span className="ml-1 rounded bg-amber-500/15 px-1 py-0.5 text-[8px] font-semibold text-amber-500">SIMULATED PROFILE</span> <span className="text-[9px] normal-case text-slate-400">deterministic diurnal cosine ±5% · peak 14:00</span></h2>
                                 <div className="h-48">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <ComposedChart data={model.load24}>
@@ -236,7 +237,7 @@ export function OperationsDashboard() {
                             {/* alarms + asset health */}
                             <div className="grid gap-4 xl:grid-cols-2">
                                 <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                                    <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Recent Alarms (ops log)</h2>
+                                    <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Recent Alarms (ops log) <InfoTip content="Most recent entries from the user-entered alarm log, tagged by priority (P1 most severe → P4 informational). Change an alarm's status (Active/Acked/Cleared) inline; EXAMPLE-chipped rows are seed data until you edit them." /></h2>
                                     <div className="space-y-1">
                                         {log.alarms.slice(0, 6).map((a) => (
                                             <div key={a.id} className="flex items-center gap-2 text-[11px]">
@@ -265,7 +266,7 @@ export function OperationsDashboard() {
                                     )}
                                 </div>
                                 <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                                    <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Asset Health <span className="text-[9px] normal-case text-slate-400">Weibull model @ 40% design life (screening age)</span></h2>
+                                    <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Asset Health <InfoTip content="Condition index (0–100) per equipment class from the Weibull reliability model, evaluated at 40% of each asset's design life as a common screening age. Failure CDF% is the cumulative probability of failure by that age; lower health / higher CDF flags the assets to prioritise for maintenance or replacement." /><span className="text-[9px] normal-case text-slate-400">Weibull model @ 40% design life (screening age)</span></h2>
                                     <div className="mb-1 text-2xl font-bold tabular-nums text-slate-900 dark:text-white">{model.assetHealth.avg}<span className="text-sm text-slate-400">/100 avg</span></div>
                                     <div className="space-y-1">
                                         {model.assetHealth.rows.slice(0, 6).map((r) => (
@@ -284,7 +285,7 @@ export function OperationsDashboard() {
                             {/* incidents + tickets */}
                             <div className="grid gap-4 xl:grid-cols-2">
                                 <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                                    <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Incidents ({openIncidents.length} open)</h2>
+                                    <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Incidents ({openIncidents.length} open) <InfoTip content="Operational incidents from the ops log, by priority (P1–P4). Open = not yet Resolved; set status inline. Distinct from an alarm — an incident is a tracked event or investigation, not a single point alarm." /></h2>
                                     <div className="space-y-1">
                                         {log.incidents.slice(0, 5).map((i2) => (
                                             <div key={i2.id} className="flex items-center gap-2 text-[11px]">
@@ -300,7 +301,7 @@ export function OperationsDashboard() {
                                     </div>
                                 </div>
                                 <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                                    <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Service Tickets ({openTickets.length} open)</h2>
+                                    <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Service Tickets ({openTickets.length} open) <InfoTip content="Work-order / service tickets from the ops log, by priority (High/Medium/Low). Open = not yet Closed — a measure of outstanding operational work waiting on the team." /></h2>
                                     <div className="space-y-1">
                                         {log.tickets.slice(0, 5).map((tk) => (
                                             <div key={tk.id} className="flex items-center gap-2 text-[11px]">
@@ -321,7 +322,7 @@ export function OperationsDashboard() {
                         {/* rail */}
                         <aside className="space-y-4 lg:sticky lg:top-4 self-start">
                             <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-3">
-                                <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Shift Overview <span className="text-[8px] normal-case text-slate-400">({inputs.shiftModel} model · engine staffing basis)</span></h3>
+                                <h3 className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Shift Overview <InfoTip content="On-duty vs planned headcount per shift, derived from total staffing (shift leads + engineers + technicians) spread across the selected rotation — 12h gives 2 shifts, 8h gives 3. Shows how the planned crew covers the 24h clock." /><span className="text-[8px] normal-case text-slate-400">({inputs.shiftModel} model · engine staffing basis)</span></h3>
                                 <div className="space-y-1.5">
                                     {shifts.map((s) => (
                                         <div key={s.id} className="rounded-lg border border-slate-200 dark:border-slate-800 p-2 text-[11px]">
