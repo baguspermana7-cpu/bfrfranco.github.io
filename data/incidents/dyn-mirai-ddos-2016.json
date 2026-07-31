@@ -1,0 +1,277 @@
+{
+ "slug": "dyn-mirai-ddos-2016",
+ "title": "Dyn Managed DNS Outage — Mirai IoT Botnet DDoS (October 21, 2016)",
+ "operator": "Dyn",
+ "dcName": "Dyn Managed DNS Platform (authoritative DNS service)",
+ "location": {
+  "city": "Manchester",
+  "country": "USA",
+  "region": "AMER",
+  "az": "New Hampshire"
+ },
+ "date": "2016-10-21",
+ "durationMin": 660,
+ "category": [
+  "network",
+  "software"
+ ],
+ "severity": {
+  "usersAffected": "Not published in primary sources — no end-user count exists; several dozen named consumer/enterprise services (~66-67 commonly cited; Wikipedia's roster length varies by revision) were disrupted across the US and Europe, implying a very large but unquantified user population.",
+  "impactUsd": "No fetchable source gives a confirmed dollar figure. Attributed-but-unverified leads: BitSight reportedly found Dyn lost ~8% of its domains (~14,500) in the following days; some analyst pieces cite a ~$110M aggregate business-impact estimate. Neither confirmed.",
+  "servicesDown": [
+   "Twitter",
+   "Reddit",
+   "Spotify",
+   "Netflix",
+   "GitHub",
+   "PayPal",
+   "Amazon.com",
+   "Airbnb",
+   "HBO",
+   "Slack",
+   "SoundCloud",
+   "PlayStation Network",
+   "Xbox Live",
+   "Visa",
+   "CNN",
+   "The New York Times",
+   "The Guardian",
+   "BBC",
+   "Shopify",
+   "Etsy",
+   "Pinterest",
+   "Tumblr",
+   "Quora",
+   "Wired",
+   "Swedish Government",
+   "Swedish Civil Contingencies Agency"
+  ],
+  "tier": "Tier-1 / Sev-1 — internet-scale, cross-sector, cross-provider outage originating from a single managed-DNS provider"
+ },
+ "brief": "On Friday 21 October 2016, Dyn's managed (authoritative) DNS platform was hit by a large-scale distributed denial-of-service attack in which a Mirai-malware IoT botnet directed a flood of DNS lookup requests at the service. The attack arrived in three windows across the day (UTC 11:10-13:20, 15:50-17:00, 20:00-22:10). Because so many major properties delegated their NS records to Dyn, the attack cascaded into user-visible outages for several dozen named services — including Twitter, Reddit, Spotify, Netflix, GitHub and PayPal — across the United States and Europe for much of the day. Dyn reported receiving malicious requests from tens of millions of IP addresses; the compromised endpoints were consumer devices such as printers, IP cameras, residential gateways and baby monitors, not spoofed traffic.",
+ "magnitude": {
+  "usersScore": 9,
+  "financialScore": 7,
+  "durationScore": 7,
+  "blastRadiusScore": 10,
+  "note": "Blast radius is the defining dimension (10): one DNS provider's outage silenced several dozen named services (~66-67 commonly cited) across commerce, media, gaming, dev-infrastructure, payments and two Swedish government bodies, on both sides of the Atlantic. Users score is high (9) by inference from the roster (Twitter/Netflix/Spotify/PayPal scale) even though no end-user count is published. Duration (7) reflects an event spanning ~11 hours of intermittent disruption across three UTC windows rather than a single continuous outage. Financial (7) is an inferred estimate — no confirmed dollar figure exists in fetchable sources. Magnitude of the attack traffic itself was extreme: Dyn cited malicious requests from tens of millions of IP addresses (retry-inflated source count)."
+ },
+ "sequenceOfEvents": [
+  {
+   "t": "2016-10-21T11:10:00Z",
+   "phase": "Trigger",
+   "event": "First attack wave begins. A Mirai IoT botnet directs a flood of DNS lookup requests at Dyn's managed/authoritative DNS infrastructure. Wikipedia (citing Dyn's analysis) places the wave-1 start at 11:10 UTC (≈07:10 ET, EDT = UTC−4, derived).",
+   "source": "Wikipedia (Dyn UTC windows); ET is an arithmetic conversion, not separately sourced"
+  },
+  {
+   "t": "2016-10-21T11:10:00Z–13:20:00Z",
+   "phase": "Impact",
+   "event": "Wave 1 (~2h10m). DNS resolution for properties delegating NS records to Dyn (e.g. ns1-4.p34.dynect.net) begins failing, producing user-visible outages for Twitter, Reddit, Spotify, GitHub and others, concentrated in the US East region.",
+   "source": "Wikipedia"
+  },
+  {
+   "t": "2016-10-21T13:20:00Z",
+   "phase": "Recovery",
+   "event": "Wave 1 subsides as the first attack window ends (~13:20 UTC ≈ 09:20 ET, derived), bringing interim partial recovery. Dyn applies in-event mitigation (traffic-shaping, anycast rebalancing, internal filtering, upstream scrubbing). Wikipedia states only the UTC window end — no separate per-wave resolution time is published.",
+   "source": "Wikipedia (window end); mitigation tactics reported/inferred, Dyn's formal postmortem not fetchable this pass"
+  },
+  {
+   "t": "2016-10-21T15:50:00Z",
+   "phase": "Escalation",
+   "event": "Second attack wave begins (≈11:50 ET, derived). The attack broadens in geographic reach, affecting users in Europe in addition to the US.",
+   "source": "Wikipedia"
+  },
+  {
+   "t": "2016-10-21T15:50:00Z–17:00:00Z",
+   "phase": "Impact",
+   "event": "Wave 2 (~1h10m). Renewed DNS-resolution failures across the affected service roster on both sides of the Atlantic.",
+   "source": "Wikipedia"
+  },
+  {
+   "t": "2016-10-21T17:00:00Z",
+   "phase": "Mitigation",
+   "event": "Wave 2 subsides. Dyn continues mitigation and coordination with upstream/scrubbing providers ahead of a further wave.",
+   "source": "Wikipedia (window end); mitigation reported/inferred"
+  },
+  {
+   "t": "2016-10-21T20:00:00Z",
+   "phase": "Cascade",
+   "event": "Third attack window begins (≈16:00 ET, derived). Wikipedia presents three UTC windows; some secondary characterizations describe two major waves plus residual/probing activity (not verifiable this pass — Dyn's postmortem is no longer live).",
+   "source": "Wikipedia (three-window framing)"
+  },
+  {
+   "t": "2016-10-21T20:00:00Z–22:10:00Z",
+   "phase": "Impact",
+   "event": "Wave 3 / residual window (~2h10m). Final period of elevated malicious traffic and intermittent DNS disruption.",
+   "source": "Wikipedia"
+  },
+  {
+   "t": "2016-10-21T22:10:00Z",
+   "phase": "Restored",
+   "event": "Third window ends; malicious traffic subsides and normal DNS service is restored. No source states a single authoritative total-outage or per-customer downtime figure.",
+   "source": "Wikipedia (window end); no total-duration figure is published"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Attack source IP addresses (retry-inflated)",
+   "value": "Tens of millions of IP addresses",
+   "source": "Dyn, quoted in Wikipedia — quote-verified this pass"
+  },
+  {
+   "label": "True malicious endpoints (bots)",
+   "value": "Up to ~100,000 (Dyn) — attributed, NOT quote-verified in this pass",
+   "source": "Attributed to Dyn postmortem via secondary reporting; postmortem no longer live"
+  },
+  {
+   "label": "Mirai-infected device census",
+   "value": "~493,000 infected devices (Level 3) — attributed, NOT quote-verified",
+   "source": "Attributed to Level 3 report via secondary reporting; not fetch-verified"
+  },
+  {
+   "label": "Named disrupted services",
+   "value": "Several dozen named services (~66-67 commonly cited; roster length varies by Wikipedia revision, fetch this pass indicated 80+)",
+   "source": "Wikipedia roster — exact count not fixed across revisions"
+  },
+  {
+   "label": "Attack waves",
+   "value": "3 UTC windows (11:10-13:20, 15:50-17:00, 20:00-22:10); some secondary sources describe 2 major + residual (unverified)",
+   "source": "Wikipedia (three UTC windows re-fetched and confirmed this pass)"
+  },
+  {
+   "label": "Per-wave durations",
+   "value": "Wave 1 ~2h10m; Wave 2 ~1h10m; Wave 3 ~2h10m (derived from UTC windows)",
+   "source": "Derived from Wikipedia UTC windows; no source states a total"
+  },
+  {
+   "label": "Total outage duration",
+   "value": "No single authoritative figure; event window spans ~11h (11:10-22:10 UTC)",
+   "source": "Ledger gap — not stated by any source"
+  },
+  {
+   "label": "Compromised device classes",
+   "value": "Consumer IoT: printers, IP cameras, residential gateways, baby monitors",
+   "source": "Wikipedia — device enumeration confirmed this pass"
+  },
+  {
+   "label": "End-user count",
+   "value": "Not published — absent from primary sources",
+   "source": "Ledger gap — verified absent via Wikipedia fetch"
+  },
+  {
+   "label": "Confirmed economic cost",
+   "value": "None fetch-confirmed; attributed leads: ~14,500 domains lost (~8%, BitSight), ~$110M aggregate estimate",
+   "source": "Ledger gap — unverifiable in this environment"
+  }
+ ],
+ "rootCause": "A Mirai-malware IoT botnet directed a volumetric flood of DNS lookup requests at Dyn's managed/authoritative DNS infrastructure. The compromised endpoints were genuine consumer Internet-connected devices (printers, IP cameras, residential gateways, baby monitors), not spoofed traffic. The root cause is unambiguous and single: a volumetric DNS query flood from a Mirai botnet against Dyn's authoritative-DNS service, which then cascaded to every customer that delegated its NS records to Dyn.",
+ "contributingFactors": [
+  "Concentration risk: a very large number of major web properties delegated authoritative DNS to a single provider (Dyn), turning one provider's outage into an internet-scale event.",
+  "Single-provider delegation anti-pattern: affected customers pointed all NS records at one Dyn nameserver set (e.g. ns1-4.p34.dynect.net) with no fate-independent secondary DNS.",
+  "Insecure consumer IoT ecosystem: mass compromise of devices with weak/default credentials by Mirai supplied the attack's raw volume.",
+  "Retry amplification: legitimate and malicious resolvers retrying failed lookups inflated the apparent source-IP count to tens of millions, compounding load.",
+  "DNS as a hard dependency: because name resolution is a prerequisite for reaching any service, degrading it produced total reachability failures rather than partial slowdowns.",
+  "Multi-wave attacker cadence: the attack was delivered in separate windows across the day, prolonging disruption and complicating steady-state mitigation."
+ ],
+ "coe": [
+  {
+   "action": "Apply in-event traffic-shaping to shed and prioritize DNS query load during active waves.",
+   "owner": "Dyn network operations / mitigation team",
+   "status": "Done (in-event tactic, reported/inferred)",
+   "source": "In-event mitigation tactic — reported/inferred; Dyn's formal postmortem not fetchable this pass"
+  },
+  {
+   "action": "Rebalance anycast to redistribute attack traffic across DNS points of presence.",
+   "owner": "Dyn network operations",
+   "status": "Done (in-event tactic, reported/inferred)",
+   "source": "In-event mitigation tactic — reported/inferred; Dyn's formal postmortem not fetchable this pass"
+  },
+  {
+   "action": "Deploy internal filtering to drop identifiably malicious DNS requests.",
+   "owner": "Dyn security/network operations",
+   "status": "Done (in-event tactic, reported/inferred)",
+   "source": "In-event mitigation tactic — reported/inferred; Dyn's formal postmortem not fetchable this pass"
+  },
+  {
+   "action": "Engage upstream scrubbing providers to absorb and clean volumetric traffic before it reached Dyn.",
+   "owner": "Dyn + upstream transit/scrubbing partners",
+   "status": "Done (in-event tactic, reported/inferred)",
+   "source": "In-event mitigation tactic — reported/inferred; Dyn's formal postmortem not fetchable this pass"
+  },
+  {
+   "action": "Industry-level corrective: adopt multi-provider secondary DNS for fate independence (RFC 2182), avoiding single-provider NS delegation such as the cited ns1-4.p34.dynect.net anti-pattern.",
+   "owner": "Affected customers / DNS operators (industry lesson)",
+   "status": "Recommended (industry lesson, not a Dyn commitment)",
+   "source": "Industry lesson captured in lieu of unretrievable formal COE"
+  },
+  {
+   "action": "Retrieve and record Dyn's formal post-incident prevention commitments (Scott Hilton, 'Dyn Analysis Summary of Friday October 21 Attack') once web access is restored — currently unverifiable.",
+   "owner": "Incident-dossier maintainer",
+   "status": "Open / blocked (source dead: dyn.com redirects to Oracle; web.archive.org blocked this pass)",
+   "source": "Ledger gap — formal COE unverifiable this pass"
+  }
+ ],
+ "lessonsLearnt": [
+  "DNS is a concentrated single point of failure: delegating a large fraction of the web's authoritative DNS to one provider means one provider's bad day becomes the whole internet's bad day.",
+  "Fate independence matters more than redundancy within one vendor: multiple nameservers all belonging to the same provider share the same failure domain; true resilience needs a second, independent DNS provider (RFC 2182).",
+  "Insecure consumer IoT is an internet-scale weapon: devices with default credentials can be marshalled into botnets whose volume overwhelms core infrastructure operators, not just the device owners.",
+  "Attack-source metrics can mislead: 'tens of millions of IP addresses' reflected retry amplification, while the true bot population was far smaller (attributed ~100k) — headline numbers need provenance discipline.",
+  "Cross-sector blast radius is invisible until it happens: a single DNS outage simultaneously hit commerce, media, gaming, developer infrastructure, payments and government services, revealing shared hidden dependencies.",
+  "Multi-wave DDoS defeats one-shot mitigation: attackers pacing the assault across separate windows forced sustained, adaptive defense rather than a single fix.",
+  "Timeline sourcing discipline: publicly only Dyn's three UTC windows exist — ET conversions and per-wave resolution times are not in the primary sources and must be flagged as derived, not asserted as sourced fact."
+ ],
+ "improvements": [
+  "Implement secondary DNS with a second, independent provider so NS records resolve even if one provider's platform is fully down (RFC 2182 fate-independence).",
+  "Diversify authoritative-DNS delegation away from a single nameserver set per zone.",
+  "Pre-arrange and rehearse upstream scrubbing and traffic-shaping so anycast rebalancing and malicious-request filtering can be activated fast during volumetric waves.",
+  "Push for stronger IoT device security (elimination of default credentials, forced credential setup) to shrink the pool of Mirai-recruitable endpoints.",
+  "Build DNS-dependency awareness into service resilience reviews so hidden single-provider dependencies are surfaced and mitigated before an incident.",
+  "Maintain provenance-disciplined incident metrics (distinguish retry-inflated source-IP counts from true bot counts, and derived ET conversions from sourced UTC times) to avoid overstated or falsely-attributed detail in postmortems."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "Failure mechanism",
+   "body": "The attack was a volumetric DNS query flood: a Mirai IoT botnet aimed a very high rate of DNS lookup requests at Dyn's authoritative nameservers. Unlike spoofed reflection attacks, the traffic came from real compromised consumer devices — printers, IP cameras, residential gateways and baby monitors — making it harder to filter on source characteristics alone. Dyn reported malicious requests from tens of millions of IP addresses; that figure was inflated by resolvers retrying failed lookups, whereas the true underlying bot population was far smaller (attributed at up to ~100,000 endpoints, with a broader ~493,000-device Mirai census cited by Level 3 — both attributed, not verified here)."
+  },
+  {
+   "heading": "Why it cascaded",
+   "body": "DNS sits upstream of nearly every user action: without name resolution, a browser or app cannot even locate the service it wants. Because several dozen major properties (~66-67 commonly cited) delegated their authoritative DNS to Dyn — many pointing all their NS records at a single Dyn nameserver set — degrading Dyn's platform simultaneously made all of those services unreachable. The blast radius spanned commerce, media, gaming, developer infrastructure, payments and even two Swedish government bodies, across both the United States and Europe. The lack of fate-independent secondary DNS meant there was no independent path for resolution to fall back to."
+  },
+  {
+   "heading": "Recovery",
+   "body": "Dyn fought the waves with in-event tactics: traffic-shaping to shed load, anycast rebalancing to spread traffic across points of presence, internal filtering of identifiably malicious requests, and coordination with upstream scrubbing providers. The first attack window closed at ~13:20 UTC (≈09:20 ET, derived), bringing interim partial recovery. The attack, however, returned in a second window (UTC 15:50-17:00) and a third residual window (UTC 20:00-22:10), so recovery was not a single event but a repeated push-back across the day. No source states a single authoritative total-outage or per-customer downtime figure; per-wave durations (~2h10m, ~1h10m, ~2h10m) are only derivable from the published UTC windows."
+  },
+  {
+   "heading": "Organizational and systemic factors",
+   "body": "Two systemic conditions turned a botnet into an internet-scale outage. First, concentration risk: an enormous share of high-traffic web properties depended on one managed-DNS provider, with single-provider NS delegation (the cited ns1-4.p34.dynect.net pattern) offering redundancy within Dyn but no independence from Dyn. Second, the insecure consumer-IoT ecosystem: devices shipped with weak or default credentials were mass-compromised by Mirai, supplying attack volume that individual device owners neither noticed nor controlled. The captured remediation is therefore split between Dyn's in-event mitigation and an industry-level lesson — adopt multi-provider secondary DNS for fate independence per RFC 2182. Dyn's own formal post-incident prevention commitments could not be retrieved this pass, as the authoritative postmortem is no longer live."
+  },
+  {
+   "heading": "Cross-incident pattern",
+   "body": "This event is the canonical demonstration of DNS as a shared, concentrated single point of failure — the same class of hidden-dependency, single-provider risk that recurs whenever many services lean on one piece of core infrastructure. It also marks a turning point in the recognition of insecure IoT as an internet-scale attack surface: Mirai showed that consumer devices, in aggregate, can generate enough traffic to disrupt tier-1 infrastructure operators. The provenance caveats here (retry-inflated source counts versus true bot counts; unretrievable formal COE and economic figures; derived-not-sourced ET times) are themselves a recurring pattern in DDoS reporting, where headline magnitude numbers and dollar impacts are widely repeated but thinly sourced."
+  }
+ ],
+ "technicalDeepDive": "The mechanism was a Layer-7 volumetric DNS query flood against Dyn's authoritative (managed) DNS tier. Mirai-infected consumer endpoints issued DNS lookup requests at high rate; because these were genuine, non-spoofed sources, ingress ACLs and simple anti-spoofing controls offered limited relief, and the sheer count of distinct source addresses (retry-inflated to 'tens of millions') defeated naive per-source rate-limiting. Compounding the load, retry behavior in downstream recursive resolvers created a feedback loop: as Dyn's authoritative servers slowed or dropped answers, resolvers re-queried, multiplying apparent request volume and source diversity beyond the true botnet size (attributed up to ~100k real bots against a ~493k-device Mirai census). The impact model is what made a single-target attack global: authoritative DNS resolves the NS-delegated zones of its customers, so saturating Dyn's servers denied resolution for every zone whose NS records pointed only at Dyn's nameserver set (e.g. ns1-4.p34.dynect.net). Clients experienced this not as latency but as total reachability failure — an unresolved name yields no connection at all. Dyn's defensive stack operated at the network and DNS layers: anycast rebalancing to redistribute query load across geographically distributed points of presence, traffic-shaping/prioritization to protect legitimate resolution, internal filtering to drop identifiably malicious query patterns, and upstream scrubbing to absorb volume before it reached the authoritative tier. The structural fix is architectural rather than tactical: fate-independent secondary DNS on a second provider (RFC 2182), so that a zone remains resolvable even when one provider's entire platform is saturated — precisely the property that single-provider NS delegation lacked here. Timeline precision is bounded by sourcing: the only published times are Dyn's three UTC windows (via Wikipedia) — 11:10-13:20, 15:50-17:00 and 20:00-22:10 UTC. Wikipedia gives no Eastern-Time conversions and no per-wave resolution times, so any ET values in this dossier are simple arithmetic (EDT = UTC−4, derived), and no authoritative total-outage duration exists.",
+ "references": [
+  {
+   "title": "Dyn Analysis Summary Of Friday October 21 Attack (Scott Hilton)",
+   "url": "https://web.archive.org/web/2016/https://dyn.com/blog/dyn-analysis-summary-of-friday-october-21-attack/",
+   "type": "official-postmortem",
+   "quote": "Dyn stated that they were receiving malicious requests from tens of millions of IP addresses. (Source no longer live: dyn.com now redirects to Oracle; web.archive.org blocked this pass — formal corrective actions and the 'up to 100,000' bot figure remain attributed-not-verified.)",
+   "accessed": "2026-07-31"
+  },
+  {
+   "title": "DDoS attacks on Dyn (2016)",
+   "url": "https://en.wikipedia.org/wiki/DDoS_attacks_on_Dyn",
+   "type": "other",
+   "quote": "The distributed denial-of-service (DDoS) attack was accomplished through numerous DNS lookup requests from tens of millions of IP addresses ... a botnet consisting of many Internet-connected devices—such as printers, IP cameras, residential gateways and baby monitors—that had been infected with the Mirai malware. Attack windows re-fetched 2026-07-31: UTC 11:10-13:20, 15:50-17:00, 20:00-22:10; the article carries no Eastern-Time conversions and no per-wave resolution times.",
+   "accessed": "2026-07-31"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": true,
+  "referenceCount": 2,
+  "lastVerified": "2026-07-31",
+  "confidence": "High for the attack mechanism, the three UTC wave windows, the device classes, and the quote-verified 'tens of millions of IP addresses' (all re-fetched from Wikipedia this pass). Medium for the named-service count (~66-67 commonly cited but roster length varies by Wikipedia revision — fetch this pass indicated 80+) and the true-bot sub-figures (~100k Dyn / ~493k Level 3 — attributed, not fetch-verified). Low/absent for total outage duration, end-user count, confirmed economic cost, all Eastern-Time conversions and per-wave resolution times — none are in the fetchable sources (ET values here are derived arithmetic only); the authoritative Dyn postmortem is dead and web.archive.org was blocked this pass."
+ },
+ "lastUpdated": "2026-07-31"
+}

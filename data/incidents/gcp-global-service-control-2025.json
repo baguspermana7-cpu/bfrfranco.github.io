@@ -1,0 +1,297 @@
+{
+ "slug": "gcp-global-service-control-2025",
+ "title": "Google Cloud Global Service Control / IAM Outage — June 12, 2025",
+ "operator": "Google Cloud",
+ "dcName": "Google Cloud — Service Control quota system (global control plane)",
+ "location": {
+  "city": "",
+  "country": "USA",
+  "region": "AMER",
+  "az": "global"
+ },
+ "date": "2025-06-12",
+ "durationMin": 447,
+ "category": [
+  "software"
+ ],
+ "severity": {
+  "usersAffected": "Global — customers of dozens of Google Cloud products (~70+, approximate) across every region, plus downstream end-users of dependent platforms (Cloudflare, and widely reported others such as Spotify and Discord). No authoritative aggregate end-user count published; Downdetector peak report counts (e.g. Spotify ~46k) are report tallies, not user counts.",
+  "impactUsd": "Not publicly quantified — no official SLA-credit total, insurer, or analyst dollar estimate located.",
+  "servicesDown": [
+   "Identity and Access Management (IAM token issuance)",
+   "Cloud Build",
+   "Cloud Key Management Service",
+   "Google Cloud Storage",
+   "Cloud Monitoring",
+   "Cloud Dataproc",
+   "Security Command Center",
+   "Artifact Registry",
+   "Cloud Workflows",
+   "Cloud Run",
+   "BigQuery",
+   "Cloud Spanner",
+   "Compute Engine",
+   "Cloud Firestore",
+   "Cloud Pub/Sub",
+   "Cloud SQL",
+   "Apigee",
+   "Vertex AI (Gemini API) / Vertex AI Search",
+   "Looker",
+   "Memorystore",
+   "Cloud Functions",
+   "Cloud Load Balancing",
+   "App Engine",
+   "Cloud Console",
+   "Cloud DNS",
+   "Google Security Operations"
+  ],
+  "tier": "SEV-1 / global control-plane outage"
+ },
+ "brief": "A latent, unguarded code path in Google Cloud's Service Control quota system — added on 2025-05-29 without error handling or feature-flag protection — was triggered on 2025-06-12 when a policy change containing unintended blank fields was inserted into the regional Spanner tables Service Control reads for policy data. The blank metadata replicated globally within seconds; regional quota checks pulled the blank fields, exercised the unprotected path, dereferenced a null pointer, and, with no error handling to contain it, the Service Control binaries crashed and entered a global crash loop. Because Service Control gates API authorization, IAM could no longer issue tokens and most Google Cloud APIs failed worldwide for several hours. The failure cascaded into downstream platforms that depend on GCP, most notably Cloudflare, whose Workers KV backend relied on the affected infrastructure.",
+ "magnitude": {
+  "usersScore": 10,
+  "financialScore": 8,
+  "durationScore": 7,
+  "blastRadiusScore": 10,
+  "note": "Global blast radius across all regions and ~70+ products (approximate) with IAM token issuance down (blast/users = 10). Duration ~7h27m end-to-end, meaningful but bounded and recoverable (7). Financial magnitude inferred high from breadth and multi-platform cascade, but no official dollar figure is published (8, low-confidence)."
+ },
+ "sequenceOfEvents": [
+  {
+   "t": "2025-05-29 (PDT)",
+   "phase": "Trigger",
+   "event": "A new feature is added to Service Control for additional quota policy checks. The change ships with no appropriate error handling and is not feature-flag protected, leaving a latent, unguarded code path in the global quota system.",
+   "source": "https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW"
+  },
+  {
+   "t": "2025-06-12 ~10:45 PDT (17:45 UTC)",
+   "phase": "Trigger",
+   "event": "A policy change containing unintended blank fields is inserted into the regional Spanner tables that Service Control uses for policies. The metadata replicates globally within seconds.",
+   "source": "https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW"
+  },
+  {
+   "t": "2025-06-12 10:51 PDT (17:51 UTC)",
+   "phase": "Impact",
+   "event": "Incident officially begins. Service Control's regional quota checks read the blank fields, exercise the unprotected May-29 code path, hit a null pointer, and — lacking error handling — the binaries crash and enter a global crash loop, so IAM can no longer issue tokens and most Google Cloud APIs fail worldwide.",
+   "source": "https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW"
+  },
+  {
+   "t": "2025-06-12 ~10:52 PDT (17:52 UTC)",
+   "phase": "Cascade",
+   "event": "Downstream Cloudflare outage begins, roughly one minute after the GCP incident starts: Cloudflare's Workers KV backend depended on the affected third-party (Google Cloud) infrastructure, degrading dependent Cloudflare products.",
+   "source": "https://blog.cloudflare.com/cloudflare-service-outage-june-12-2025/"
+  },
+  {
+   "t": "2025-06-12 ~11:31 PDT (18:31 UTC) (begin +40 min)",
+   "phase": "Mitigation",
+   "event": "The 'red-button' rollout that disables the offending path is completed within 40 minutes of the incident, and recovery begins across regions, smaller regions first.",
+   "source": "https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW"
+  },
+  {
+   "t": "2025-06-12 13:28 PDT (20:28 UTC)",
+   "phase": "Recovery",
+   "event": "Cloudflare's outage ends. Cloudflare states the outage 'lasted 2 hours and 28 minutes'; note the stated window (17:52-20:28 UTC) spans ~2h36m by the clock, so 2h28m is Cloudflare's stated figure rather than the window arithmetic.",
+   "source": "https://blog.cloudflare.com/cloudflare-service-outage-june-12-2025/"
+  },
+  {
+   "t": "2025-06-12 ~13:31 PDT (20:31 UTC) (arithmetic; begin +~2h40m)",
+   "phase": "Recovery",
+   "event": "us-central1 takes up to ~2h40m to fully resolve — the longest region — because Google throttled Service Control task creation to minimize impact on the underlying infrastructure and routed traffic to multi-regional databases to shed load. (Wall-clock ~13:31 PDT is arithmetic, not a verbatim published timestamp.)",
+   "source": "https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW"
+  },
+  {
+   "t": "2025-06-12 18:18 PDT (2025-06-13 01:18 UTC)",
+   "phase": "Restored",
+   "event": "Incident ends ('All the services are fully recovered from the service issue'). Total end-to-end duration ~7h27m from the 10:51 PDT begin.",
+   "source": "https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW"
+  },
+  {
+   "t": "2025-06-12 23:34 PDT / 2025-06-13 16:45 PDT",
+   "phase": "Restored",
+   "event": "Status-page update stream continues past recovery with posts timestamped 23:34 PDT (12 June) and 16:45 PDT (13 June), consistent with post-incident report publication/edits rather than new customer impact.",
+   "source": "https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Total incident duration (GCP)",
+   "value": "~7h27m (10:51–18:18 PDT)",
+   "source": "https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW"
+  },
+  {
+   "label": "Time to red-button mitigation",
+   "value": "~40 min from incident begin",
+   "source": "https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW"
+  },
+  {
+   "label": "Longest region full-resolution (us-central1)",
+   "value": "up to ~2h40m",
+   "source": "https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW"
+  },
+  {
+   "label": "Global metadata replication time",
+   "value": "within seconds",
+   "source": "https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW"
+  },
+  {
+   "label": "Affected Google Cloud products (approximate)",
+   "value": "~70+ (order-of-magnitude; status page enumerates on the order of 60–70)",
+   "source": "https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW"
+  },
+  {
+   "label": "Downstream Cloudflare outage window",
+   "value": "17:52–20:28 UTC; Cloudflare states it 'lasted 2h28m' (window spans ~2h36m by the clock)",
+   "source": "https://blog.cloudflare.com/cloudflare-service-outage-june-12-2025/"
+  },
+  {
+   "label": "Cloudflare Durable Objects (SQLite) / D1 peak error rate",
+   "value": "22%",
+   "source": "https://blog.cloudflare.com/cloudflare-service-outage-june-12-2025/"
+  },
+  {
+   "label": "Cloudflare AI Gateway peak error rate",
+   "value": "97%",
+   "source": "https://blog.cloudflare.com/cloudflare-service-outage-june-12-2025/"
+  },
+  {
+   "label": "Cloudflare Realtime TURN / Pages peak error rate",
+   "value": "near 100% / ~100%",
+   "source": "https://blog.cloudflare.com/cloudflare-service-outage-june-12-2025/"
+  },
+  {
+   "label": "Cloudflare Stream peak error rate",
+   "value": ">90%",
+   "source": "https://blog.cloudflare.com/cloudflare-service-outage-june-12-2025/"
+  },
+  {
+   "label": "Cloudflare Workers / Workers for Platforms error rate",
+   "value": "~2% / ~10%",
+   "source": "https://blog.cloudflare.com/cloudflare-service-outage-june-12-2025/"
+  },
+  {
+   "label": "Cloudflare Workers KV peak error rate",
+   "value": "~90%",
+   "source": "https://blog.cloudflare.com/cloudflare-service-outage-june-12-2025/"
+  },
+  {
+   "label": "Cloudflare Images batch-upload failure at peak",
+   "value": "100% (~97% success overall)",
+   "source": "https://blog.cloudflare.com/cloudflare-service-outage-june-12-2025/"
+  }
+ ],
+ "rootCause": "A latent, unguarded code path was introduced into Service Control on 2025-05-29 to perform additional quota policy checks; it had neither error handling nor feature-flag protection. On 2025-06-12 at ~10:45 PDT a policy change carrying unintended blank fields was inserted into the regional Spanner policy tables Service Control reads, and this metadata replicated globally within seconds. Regional quota checks pulled the blank fields, exercised the unprotected path, dereferenced a null pointer, and — with no error handling to contain the fault — the Service Control binaries crashed and entered a synchronized global crash loop. Because Service Control authorizes API requests, IAM could no longer issue tokens and most Google Cloud APIs failed worldwide.",
+ "contributingFactors": [
+  "Code change lacked error handling on a critical binary code path, so a null dereference crashed the binary rather than degrading gracefully.",
+  "Change was not feature-flag protected, so it activated globally at once with no incremental exposure or blast-radius containment (Google notes flag protection would have caught the issue in staging).",
+  "Service Control read globally-replicated policy metadata that was not validated for blank/malformed fields before use.",
+  "Global replication of policy metadata within seconds meant a single bad insert propagated to every region almost instantly, giving no time-to-detect buffer.",
+  "Recovery was constrained by a herd effect: restarting Service Control tasks en masse threatened to overload the underlying infrastructure. Missing randomized exponential backoff plus the need to throttle task creation and route to multi-regional databases lengthened resolution in the largest region (us-central1).",
+  "Deep, shared dependency on Service Control / IAM as a single global control-plane chokepoint meant one component's failure took down ~70+ products and cascaded to external platforms."
+ ],
+ "coe": [
+  {
+   "action": "Modularize Service Control so it fails open — serving degraded results rather than crashing — when it encounters invalid or blank metadata.",
+   "owner": "Google Cloud — Service Control",
+   "status": "committed",
+   "source": "https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW"
+  },
+  {
+   "action": "Enforce that all changes to critical binaries are feature-flag protected and rolled out incrementally rather than activated globally and instantly.",
+   "owner": "Google Cloud",
+   "status": "committed",
+   "source": "https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW"
+  },
+  {
+   "action": "Improve static analysis and testing practices to catch this class of defect (unhandled null/exception on a critical path) before it ships.",
+   "owner": "Google Cloud",
+   "status": "committed",
+   "source": "https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW"
+  },
+  {
+   "action": "Audit all systems that consume globally-replicated data for equivalent unvalidated-input exposure, and ensure such data is propagated/consumed safely.",
+   "owner": "Google Cloud",
+   "status": "committed",
+   "source": "https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW"
+  },
+  {
+   "action": "Audit and ensure Service Control uses randomized exponential backoff on task restart/retry to prevent the herd effect that overloaded infrastructure during recovery.",
+   "owner": "Google Cloud — Service Control",
+   "status": "committed",
+   "source": "https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW"
+  },
+  {
+   "action": "Ensure monitoring and external customer-communication infrastructure remains operational even when Google Cloud itself is down, so customers get information as soon as possible.",
+   "owner": "Google Cloud",
+   "status": "committed",
+   "source": "https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW"
+  }
+ ],
+ "lessonsLearnt": [
+  "Critical control-plane code must fail open, not crash — a null dereference on invalid input should degrade service, never take down a global authorization path.",
+  "Every change to a globally-replicated, blast-radius-wide system must ship behind a feature flag with incremental rollout; instant global activation removes the only chance to catch a bad change in staging before it is everywhere.",
+  "Systems that consume globally-replicated metadata must validate that data at the point of use; a single blank-field insert replicating in seconds is enough to weaponize an unvalidated read path across every region.",
+  "Recovery of a large control plane is itself a distributed-systems problem — mass task restarts create a herd effect, so recovery needs randomized exponential backoff, throttled task creation, and load re-routing, which realistically lengthens time-to-restore in the biggest regions.",
+  "Concentrating authorization in one shared component (Service Control/IAM) makes it a single point of failure whose blast radius spans ~70+ products and cascades to external customers who depend on GCP.",
+  "Monitoring and customer-communication tooling must not share fate with the platform they observe; when Google Cloud went down, the ability to monitor and communicate must survive independently."
+ ],
+ "improvements": [
+  "Introduce fail-open modularization in Service Control so invalid metadata yields degraded-but-available authorization instead of a crash loop.",
+  "Mandate feature-flagged, incremental rollout for all changes to global control-plane systems, replacing instant global activation.",
+  "Add error handling and static-analysis/testing coverage across critical binary code paths to catch unhandled null/exception conditions pre-release.",
+  "Systematically audit and harden all consumers of globally-replicated data against blank/malformed inputs.",
+  "Stand up monitoring and external-communication infrastructure that remains operational independently of Google Cloud's own health.",
+  "Adopt throttled, load-aware recovery procedures — randomized exponential backoff, task-creation throttling, and multi-regional database routing — as a standard playbook to avoid herd-effect overload during control-plane restarts."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "Failure mechanism",
+   "body": "The outage was a textbook latent-defect-meets-bad-data failure. On 2025-05-29 a quota-policy-check feature entered Service Control without error handling or a feature flag, creating a dormant, unguarded code path. It stayed inert until 2025-06-12, when a policy insert with unintended blank fields landed in the regional Spanner policy tables. When quota checks read those blank fields, they exercised the unguarded path and dereferenced a null pointer. With nothing to catch the fault, the binaries did not degrade — they crashed, and immediately restarted into the same poisoned state, producing a self-sustaining crash loop."
+  },
+  {
+   "heading": "Why it cascaded",
+   "body": "Two amplifiers turned a local defect into a global outage. First, the triggering metadata replicated to every region within seconds, so there was no staggered exposure and effectively no detect-and-halt window — every region hit the null pointer at nearly the same moment. Second, Service Control sits on the authorization critical path: when it crash-looped, IAM could not issue tokens, and without tokens most Google Cloud APIs across ~70+ products failed simultaneously. The blast radius then extended beyond Google: platforms built on GCP failed downstream, most notably Cloudflare, whose Workers KV backend depended on the affected infrastructure, dragging down Durable Objects/D1, AI Gateway, Pages, Stream, Realtime and Images for roughly a 2.5-hour window (17:52–20:28 UTC; Cloudflare states the outage lasted 2h28m)."
+  },
+  {
+   "heading": "Detection, mitigation and recovery",
+   "body": "Mitigation was fast; full recovery was deliberately slow. Engineers identified the offending path and completed a 'red-button' rollout within ~40 minutes of the 10:51 PDT begin, after which regions recovered smaller-first. But bringing Service Control back was itself a distributed-systems hazard: restarting all tasks at once risked a herd-effect overload of the underlying infrastructure. Google therefore throttled Service Control task creation and routed traffic to multi-regional databases to shed load, which is why us-central1 — the largest region — took up to ~2h40m to fully resolve (implying ~13:31 PDT, an arithmetic estimate). The incident was declared over at 18:18 PDT, ~7h27m end-to-end, with status-page posts continuing to 23:34 PDT (12 Jun) and 16:45 PDT (13 Jun) as post-incident publication rather than new impact."
+  },
+  {
+   "heading": "Organizational and systemic factors",
+   "body": "The corrective actions read as an admission that process guardrails, not just code, failed. A change reached a global, blast-radius-wide system with neither error handling nor a feature flag, and a consumer of globally-replicated data trusted that data without validating it. The remediation set — fail-open modularization, mandatory incremental feature-flagged rollout, static analysis on critical paths, an audit of all global-metadata consumers, randomized exponential backoff to blunt the recovery herd effect, and independent monitoring/communication infrastructure — targets each systemic gap. The last item is notable: it concedes that observability and customer comms shared fate with the platform, so operators were partly blind and constrained in communicating precisely when they most needed both."
+  },
+  {
+   "heading": "Cross-incident pattern",
+   "body": "This incident fits a recurring cloud-era failure archetype: a single shared control-plane component (identity/authorization/quota) becomes a global single point of failure, and a benign-looking configuration or metadata change — not a hardware fault — triggers correlated, simultaneous failure everywhere at once. The same shape recurs across major providers: unvalidated input or a bad config replicates faster than humans can react, an unhandled exception converts a data problem into a crash, and deep dependency graphs turn one vendor's control-plane outage into a multi-company internet event. The durable lesson across all of them is identical to Google's own action items: validate replicated inputs, fail open on the critical path, and roll changes out incrementally with flags."
+  }
+ ],
+ "technicalDeepDive": "Service Control is Google Cloud's per-request policy/quota enforcement layer that gates API authorization; IAM token issuance and virtually all Google Cloud API traffic transit it. On 2025-05-29 a feature adding additional quota policy checks was merged with two defects that only mattered together: no error handling around the new logic, and no feature flag to gate its activation. The path was reachable but never exercised on a value that would fault it — until 2025-06-12 ~10:45 PDT, when a policy change with unintended blank fields was written to the regional Spanner tables that Service Control consults for policy data. Spanner's global replication propagated that record to every region within seconds, so the poisoned metadata was ubiquitous before any human or automated guard could quarantine it. At the next quota evaluation in each region, Service Control read the blank fields, entered the unguarded May-29 branch, and performed a null-pointer dereference. Absent a try/catch or equivalent boundary, the null did not surface as a handled error or a degraded (fail-open) response — it crashed the binary. Crucially, the crash was deterministic and input-driven: on restart the task re-read the same replicated policy state, re-hit the same null, and crashed again, producing a synchronized global crash loop rather than an isolated flap. Because the loop disabled the authorization plane, IAM could not mint tokens and dependent APIs across ~70+ products returned errors worldwide. The engineered mitigation was a 'red-button' disable of the offending path, completed within ~40 minutes, but recovery exposed a second-order distributed-systems constraint: simultaneously restarting a very large fleet of Service Control tasks would create a herd effect against the underlying infrastructure and the policy/database tier it depends on. Google therefore throttled task creation and routed load to multi-regional databases, trading a slower restore (up to ~2h40m in us-central1) for controlled recovery instead of a secondary overload. The remediation directly maps to the failure primitives: fail-open modularization (a null/invalid-metadata condition must yield degraded service, not a crash), feature-flagged incremental rollout (bound the blast radius of any new path), input validation on consumers of globally-replicated data (blank fields must never reach a live code path), static analysis and testing to catch unhandled dereferences before release, randomized exponential backoff on restart to avoid herd-effect recovery overload, and fate-independent monitoring/comms (so the control plane's failure does not blind its own operators).",
+ "references": [
+  {
+   "title": "Google Cloud Service Health — Incident report (June 12, 2025), incident ow5i3PPK96RduMcb1SsW",
+   "url": "https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW",
+   "type": "official-postmortem",
+   "quote": "Without the appropriate error handling, the null pointer caused the binary to crash.",
+   "accessed": "2026-07-31"
+  },
+  {
+   "title": "Google Cloud Outage Analysis: June 12, 2025 (ThousandEyes)",
+   "url": "https://www.thousandeyes.com/blog/google-cloud-outage-analysis-june-12-2025",
+   "type": "vendor-status",
+   "quote": "(summary) Independent third-party analysis corroborating the Service Control root cause and its API-wide impact on dependent services.",
+   "accessed": "2026-07-31"
+  },
+  {
+   "title": "Cloudflare service outage June 12, 2025",
+   "url": "https://blog.cloudflare.com/cloudflare-service-outage-june-12-2025/",
+   "type": "vendor-postmortem",
+   "quote": "This outage lasted 2 hours and 28 minutes.",
+   "accessed": "2026-07-31"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": true,
+  "referenceCount": 3,
+  "lastVerified": "2026-07-31",
+  "confidence": "high — root cause, timeline (10:51 PDT begin, +40min red button, ~2h40m us-central1, 18:18 PDT end / 7h27m), recovery method and remediation verbatim-verified from the primary Google Cloud incident report; Cloudflare cascade metrics verified from Cloudflare's own postmortem. Open gaps/caveats: no official financial figure; no authoritative aggregate end-user count; the '~70+ products' figure is an order-of-magnitude approximation; the us-central1 wall-clock restore (~13:31 PDT) is arithmetic; and Cloudflare's stated 2h28m duration is inconsistent with its own 17:52–20:28 UTC window (~2h36m)."
+ },
+ "lastUpdated": "2026-07-31"
+}
