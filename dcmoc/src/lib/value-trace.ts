@@ -45,6 +45,7 @@ import { calculateCapacityPlan } from '@/modules/capacity/CapacityPlanningEngine
 import { calculateDisasterRisk } from '@/modules/risk/DisasterRiskEngine';
 import { calculateGridReliability } from '@/modules/infrastructure/GridReliabilityEngine';
 import { calculateTalentAvailability } from '@/modules/staffing/TalentAvailabilityEngine';
+import { calculateRiskProfile, calculateRiskScore } from '@/modules/risk/RiskEngine';
 
 export type TraceProvenance = 'input' | 'engine' | 'derived' | 'screening';
 
@@ -142,6 +143,23 @@ const siteAn = (): SiteAnalyses | null => {
         const an = analyzeSite(site, ctx);
         _siteAnCache = { key, an };
         return an;
+    } catch { return null; }
+};
+
+/* RISK DASHBOARD composite score — mirrors RiskDashboard `analysis` memo EXACTLY
+ * (same generateAssetCounts → calculateRiskProfile → calculateRiskScore chain,
+ * same sim inputs) so the ƒx trace can never drift from the rendered KPI. The
+ * card renders `totalScore` (colored by normalizedScore); get() returns totalScore. */
+const riskAgg = (): { totalScore: number; normalizedScore: number } | null => {
+    try {
+        const st = sim(); const i = st.inputs; const country = st.selectedCountry;
+        if (!country) return null;
+        const tierLevel = (i.tierLevel === 4 ? 4 : 3) as 3 | 4;
+        const coolingMap: 'air' | 'pumped' = i.coolingType === 'liquid' || i.coolingType === 'rdhx' ? 'pumped' : 'air';
+        const assets = generateAssetCounts(i.itLoad, tierLevel, coolingMap, Math.ceil(i.itLoad * 0.6), i.coolingTopology, i.powerRedundancy);
+        const risks = calculateRiskProfile(country, tierLevel, assets);
+        const agg = calculateRiskScore(risks, tierLevel);
+        return { totalScore: agg.totalScore, normalizedScore: agg.normalizedScore };
     } catch { return null; }
 };
 
@@ -284,6 +302,16 @@ export const TRACE: Record<string, TraceNode> = {
             return +npv.toFixed(0);
         },
     },
+    /* ── RISK ASSESSMENT DASHBOARD — composite Risk Score KPI (page 'risk') ──
+     * Displays totalScore (Σ likelihood×impact over the country/tier risk
+     * profile); color keyed to normalizedScore (% of theoretical max). ── */
+    'risk.compositeScore': {
+        label: 'Risk Score (aggregate)', page: 'risk', provenance: 'engine',
+        formulaTemplate: 'Σ (probability 1–4 × impact 1–4) over the risk profile — calculateRiskProfile(selected country, tier, generateAssetCounts(sim.itLoad,…)) → calculateRiskScore.totalScore; normalizedScore = totalScore ÷ (risks × 16) × 100',
+        deps: ['sim.itLoad', 'sim.tierLevel'],
+        get: () => riskAgg()?.totalScore ?? null,
+    },
+
     /* ── EB-instrument: page-KPI nodes (append-only) ── */
     'ops.energyCostDaily': {
         label: 'Energy Cost (24h)', page: 'ops', unit: '$', provenance: 'derived',

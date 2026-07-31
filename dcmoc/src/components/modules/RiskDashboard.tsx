@@ -114,7 +114,7 @@ export default function RiskDashboard() {
                         <ShieldAlert className="w-3 h-3" /> Risk Score <Tooltip content="Aggregated risk score across all categories. Higher = more risk. Normalized to % of maximum possible score." />
                     </div>
                     {/* Workstream M — ScoreValue: composite risk is LOWER-better; color keyed to the normalized (0-100) score */}
-                    <div><ScoreValue value={normalizedScore} direction="lower" max={100} display={totalScore} className="text-3xl" /></div>
+                    <div><ScoreValue value={normalizedScore} direction="lower" max={100} display={totalScore} traceId="risk.compositeScore" className="text-3xl" /></div>
                     <div className={`text-xs mt-1 ${normalizedScore > 60 ? 'text-red-600 dark:text-red-400' : normalizedScore > 35 ? 'text-amber-600 dark:text-amber-400' : 'text-rz-data'}`}>
                         {normalizedScore}% of maximum • {risks.length} risks
                     </div>
