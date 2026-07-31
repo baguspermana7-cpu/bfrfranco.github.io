@@ -1,0 +1,343 @@
+{
+ "slug": "kakao-sk-cc-pangyo-fire-2022",
+ "title": "SK C&C Pangyo Data Center Fire and the National Kakao/Naver Outage",
+ "operator": "SK C&C (tenants: Kakao, Naver)",
+ "dcName": "SK C&C Pangyo Data Center",
+ "location": {
+  "city": "Seongnam (Pangyo)",
+  "country": "South Korea",
+  "region": "APAC"
+ },
+ "date": "2022-10-15",
+ "durationMin": 7650,
+ "category": [
+  "fire",
+  "power"
+ ],
+ "severity": {
+  "usersAffected": "Nationwide — the majority of South Korea's population relies on KakaoTalk; ~2M users reported to have left the app in the immediate aftermath (single-source, low confidence)",
+  "impactUsd": "Over KRW 2 trillion in Kakao-affiliate market-cap loss on Oct 17 (single-source, low confidence); Kakao committed KRW 460B (~US$323M) to new Ansan capacity",
+  "servicesDown": [
+   "KakaoTalk (messaging)",
+   "KakaoPage",
+   "Daum portal / Daum News",
+   "Brunch (blogging)",
+   "Kakao Map",
+   "Kakao Bank (partial — Kakao-auth-dependent functions)",
+   "KakaoT (ride-hailing)",
+   "Kakao Pay securities/real-estate functions"
+  ],
+  "tier": "National-infrastructure-grade outage"
+ },
+ "brief": "On 15 October 2022, a lithium-ion UPS battery on the third basement level (B3) of the SK C&C Pangyo Data Center ignited and spread, forcing firefighters and operators to cut power to the entire facility. Because tenant Kakao had concentrated core functions — including its sole authentication service — at this single site, the power cut cascaded into a nationwide outage of KakaoTalk, Daum, Kakao-linked banking, KakaoT and dozens of downstream services. Co-tenant Naver, which kept its own separate data center, was far less affected. KakaoTalk stayed down for more than 11 hours, the longest in its history, and full restoration of all Kakao services took roughly five days. The event triggered a CEO resignation, a three-way blame dispute, and South Korea's \"Kakao Outage Prevention Act\" mandating geographic redundancy for major platforms.",
+ "magnitude": {
+  "usersScore": 10,
+  "financialScore": 9,
+  "durationScore": 9,
+  "blastRadiusScore": 10,
+  "note": "Blast radius and user impact are at ceiling: KakaoTalk is de-facto national communications infrastructure, and the outage propagated into banking, ride-hailing, deliveries and grocery. Duration scores high on the 5-day-plus full-restoration tail (7,650 min ≈ 127.5 h) even though the headline KakaoTalk downtime was ~11 hours. Financial score reflects the reported >KRW 2 trillion affiliate market-cap loss (low-confidence, single-source) plus the KRW 460B remediation commitment."
+ },
+ "sequenceOfEvents": [
+  {
+   "t": "2022-10-15 ~15:30 KST",
+   "phase": "Trigger",
+   "event": "Fire ignites in the lithium-ion batteries of a UPS system in the B3 (third basement) battery room and spreads to the rest of the building.",
+   "source": "Uptime Institute Journal / NamuWiki"
+  },
+  {
+   "t": "2022-10-15 ~15:30 KST",
+   "phase": "Impact",
+   "event": "Power to the facility is cut to enable firefighting. Kakao — single-homed at this site — loses nearly all services; co-tenant Naver, backed by its own separate data center and off-site backups, sustains or restores most services within hours.",
+   "source": "NamuWiki; The Register / DCD (Naver redundancy)"
+  },
+  {
+   "t": "2022-10-15",
+   "phase": "Mitigation",
+   "event": "Firefighting escalates: 114 firefighters and 46 units of equipment are mobilized. Gas fire extinguishers prove ineffective against the li-ion cells, which keep heating the UPS.",
+   "source": "NamuWiki / Korea Herald (ministry finding)"
+  },
+  {
+   "t": "2022-10-15 18:43 KST",
+   "phase": "Diagnosis",
+   "event": "Kakao publicly predicts restoration 'within two hours' of power resumption.",
+   "source": "NamuWiki (single-source)"
+  },
+  {
+   "t": "2022-10-15 20:31 KST",
+   "phase": "Escalation",
+   "event": "Kakao announces recovery delays due to ongoing power issues.",
+   "source": "NamuWiki (single-source)"
+  },
+  {
+   "t": "2022-10-15 21:39 KST",
+   "phase": "Escalation",
+   "event": "Kakao states power cannot be immediately supplied for safety reasons.",
+   "source": "NamuWiki (single-source)"
+  },
+  {
+   "t": "2022-10-15 23:21 KST",
+   "phase": "Recovery",
+   "event": "Partial Daum News service is restored — the first meaningful service recovery.",
+   "source": "NamuWiki (single-source)"
+  },
+  {
+   "t": "2022-10-16 02:16 KST",
+   "phase": "Recovery",
+   "event": "Some KakaoTalk message send/receive functionality is restored, roughly 11 hours after onset.",
+   "source": "NamuWiki / allkpop (duration corroborated)"
+  },
+  {
+   "t": "2022-10-16 07:24 KST",
+   "phase": "Recovery",
+   "event": "Text messaging (excluding photos/videos) normalizes in general chat.",
+   "source": "NamuWiki (single-source)"
+  },
+  {
+   "t": "2022-10-16 10:15 KST",
+   "phase": "Cascade",
+   "event": "Photo/video transmission fails again amid recurring instability during the staged bring-up.",
+   "source": "NamuWiki (single-source)"
+  },
+  {
+   "t": "2022-10-16 12:00 KST",
+   "phase": "Recovery",
+   "event": "SK reports 12,000 of 32,000 servers restored.",
+   "source": "NamuWiki (single-source)"
+  },
+  {
+   "t": "2022-10-16 14:00 KST",
+   "phase": "Recovery",
+   "event": "Server recovery reaches 27,000 of 32,000.",
+   "source": "NamuWiki (single-source)"
+  },
+  {
+   "t": "2022-10-16 21:59 KST",
+   "phase": "Restored",
+   "event": "Most of Kakao's main services are restored to normal operation.",
+   "source": "NamuWiki (single-source)"
+  },
+  {
+   "t": "2022-10-17 07:26 KST",
+   "phase": "Recovery",
+   "event": "Brunch and Kakao Map web normalize (long-tail services).",
+   "source": "NamuWiki (single-source)"
+  },
+  {
+   "t": "2022-10-18 22:02 KST",
+   "phase": "Recovery",
+   "event": "Kakao Pay securities and real-estate services restored.",
+   "source": "NamuWiki (single-source)"
+  },
+  {
+   "t": "2022-10-20 23:00 KST",
+   "phase": "Restored",
+   "event": "Kakao declares all services fully restored — a total of 5 days, 7 hours, 30 minutes (~127.5 h) from onset.",
+   "source": "NamuWiki (single-source)"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "KakaoTalk core downtime",
+   "value": "11+ hours (record — longest in ~12-year app history)",
+   "source": "allkpop (corroborated by SOE)"
+  },
+  {
+   "label": "Total time to full restoration",
+   "value": "5 days 7 hours 30 minutes ≈ 127.5 h (onset ~15:30 Oct 15 → 23:00 Oct 20)",
+   "source": "NamuWiki"
+  },
+  {
+   "label": "Servers affected / restored",
+   "value": "32,000 total; 12,000 restored by 12:00 Oct 16, 27,000 by 14:00 Oct 16",
+   "source": "NamuWiki"
+  },
+  {
+   "label": "Firefighting mobilization",
+   "value": "114 firefighters, 46 equipment units",
+   "source": "NamuWiki"
+  },
+  {
+   "label": "Ignition source & location",
+   "value": "Lithium-ion UPS battery, B3 battery room",
+   "source": "Uptime Institute Journal / police reports (battery room); NamuWiki (B3 level)"
+  },
+  {
+   "label": "Reported user departure",
+   "value": "~2 million users left KakaoTalk (single-source, low confidence)",
+   "source": "NamuWiki"
+  },
+  {
+   "label": "Market-cap impact",
+   "value": ">KRW 2 trillion Kakao-affiliate loss on Oct 17; stock -9% at open; Kakao Pay & Kakao Bank -6%+ (single-source, low confidence)",
+   "source": "NamuWiki"
+  },
+  {
+   "label": "Kakao remediation commitment",
+   "value": "KRW 460 billion (~US$323M) for Ansan DC; second DC in Siheung (2024 target)",
+   "source": "Data Center Knowledge"
+  },
+  {
+   "label": "Regulatory deadline",
+   "value": "1 month for SK C&C, Kakao and Naver to submit emergency-response measures",
+   "source": "DatacenterDynamics"
+  }
+ ],
+ "rootCause": "The immediate cause was ignition of lithium-ion batteries in a UPS system in the B3 battery room, which spread through the building (fuel and location multiply corroborated by Kakao's CEO and police reports; exact thermal-runaway trigger and legal fault remain officially disputed, with SK Group denying responsibility on the basis of its battery-management-system records). The catastrophic recovery, per South Korea's Ministry of Science and ICT, stemmed from a design and architecture failure: the lithium-ion batteries were not physically separated from the UPS, so they resisted the gas fire-suppression system, continued heating the UPS, and forced a full facility power cut-off. This was compounded by Kakao concentrating core functions — including its single authentication/verification service — at one data center with no geographic redundancy.",
+ "contributingFactors": [
+  "Lithium-ion battery banks were not physically separated from the UPS, defeating the gas-based fire suppression and necessitating a total power cut.",
+  "Kakao concentrated core functions — including its sole authentication/verification feature — in a single data center, removing any geographic failover path.",
+  "SK C&C had a 'sketchy' fire-response protocol with no detailed action plans and no fire drills, per the ICT ministry.",
+  "Poor information-sharing with firefighters during the incident slowed coordinated response.",
+  "Weak battery monitoring and fire-detection systems that the ministry subsequently ordered SK C&C to strengthen.",
+  "Staged bring-up on partially recovered infrastructure produced recurring instability (e.g., photo/video transmission failing again on Oct 16 at 10:15)."
+ ],
+ "coe": [
+  {
+   "action": "SK C&C, Kakao and Naver each produce emergency-response measures and a contingency plan for future data-center fires/disasters, and report results of ministry-ordered fire drills.",
+   "owner": "SK C&C / Kakao / Naver (mandated by ICT ministry)",
+   "status": "Mandated — 1-month deadline; completion not confirmed in sources",
+   "source": "DatacenterDynamics"
+  },
+  {
+   "action": "SK C&C strengthen battery monitoring and fire-detection systems and fix its fire-response protocol (add detailed action plans and drills).",
+   "owner": "SK C&C",
+   "status": "Ordered by ministry; verification not captured",
+   "source": "DatacenterDynamics"
+  },
+  {
+   "action": "Kakao build service redundancy within two months to prevent similar disruptions.",
+   "owner": "Kakao",
+   "status": "Pledged",
+   "source": "Data Center Knowledge"
+  },
+  {
+   "action": "Kakao invest KRW 460B (~US$323M) to complete its own Ansan data center and build a second data center in Siheung (2024 target).",
+   "owner": "Kakao",
+   "status": "Committed; post-2024 completion not independently confirmed",
+   "source": "Data Center Knowledge"
+  },
+  {
+   "action": "ICT ministry publish national guidelines for resilient digital services.",
+   "owner": "Ministry of Science and ICT",
+   "status": "Announced for early 2023; contents not captured in sources",
+   "source": "DatacenterDynamics"
+  },
+  {
+   "action": "Legislate mandatory geographic redundancy and disaster-recovery obligations for major platforms (the 'Kakao Outage Prevention Act').",
+   "owner": "South Korean government / National Assembly",
+   "status": "Enacted 2023 (per seed brief; no external reference carried in this dossier)",
+   "source": "Seed brief (uncited — flagged for citation)"
+  }
+ ],
+ "lessonsLearnt": [
+  "Fire-suppression design must match the fuel: gas-based extinguishers are ineffective against lithium-ion thermal runaway, so battery rooms need physical separation from critical power equipment and suppression rated for li-ion.",
+  "Single-site concentration of a mandatory dependency (here, the sole authentication service) turns a facility incident into a total-service outage — no amount of intra-DC redundancy substitutes for geographic redundancy; the same fire left redundancy-holding co-tenant Naver largely functional.",
+  "A total power cut-off is a plausible and catastrophic failure mode; disaster-recovery planning must assume the loss of an entire data center, not just individual components.",
+  "Recovery estimates given to the public should be conservative; Kakao's '2 hours' prediction was overtaken repeatedly and eroded trust as the outage stretched past 11 hours.",
+  "Fire-response protocols are worthless without rehearsal — the absence of detailed action plans and fire drills materially worsened SK C&C's response.",
+  "Effective incident response depends on clear information-sharing with emergency services; poor coordination with firefighters slowed containment."
+ ],
+ "improvements": [
+  "Physically separate lithium-ion battery banks from UPS and IT power equipment, with dedicated li-ion-rated detection and suppression.",
+  "Establish true geographic redundancy for core services, with special priority for single-points-of-failure such as authentication/verification.",
+  "Implement and regularly drill a facility-loss disaster-recovery runbook that assumes full power cut-off.",
+  "Strengthen battery-management, monitoring and early fire-detection instrumentation to catch thermal runaway before ignition.",
+  "Formalize emergency-response protocols with detailed, rehearsed action plans and structured information-sharing channels with firefighters.",
+  "Stage service bring-up on validated infrastructure to avoid the recurring instability seen when partially recovered systems were reloaded."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "Failure mechanism",
+   "body": "The incident began as a battery-room fire: lithium-ion cells in a UPS system on the B3 basement level entered thermal runaway and ignited, then spread through the building. Critically, the batteries were not physically isolated from the UPS, so the facility's gas fire-suppression system could not extinguish the reaction — the cells kept generating heat and re-feeding the fire. With suppression defeated and a spreading blaze in a live electrical room, the only safe option was to cut power to the entire facility, converting a localized fire into a complete loss of the data center."
+  },
+  {
+   "heading": "Why it cascaded nationally",
+   "body": "The blast radius was set not by the fire but by architecture. Kakao had concentrated core functions at this single Pangyo site, including its sole authentication/verification service. When the site went dark there was no geographic failover, so nearly every dependent Kakao service — KakaoTalk, Daum, KakaoT, Kakao Pay, and many Kakao-auth-dependent banking and payment functions — was disrupted at once, and downstream sectors that had built on Kakao (banking, ride-hailing, deliveries, grocery) were hit with them. Co-tenant Naver, by contrast, kept most of its services running by failing over to its own separate data center — the same fire, opposite outcome, determined almost entirely by redundancy. A facility incident thus became a de-facto national-infrastructure outage affecting most of the population."
+  },
+  {
+   "heading": "Recovery dynamics",
+   "body": "Recovery was slow and non-linear. Power could not be safely restored quickly, so Kakao's early '2-hour' estimate slipped through a sequence of delay announcements on Oct 15. Restoration proceeded in stages: partial Daum News by 23:21, first KakaoTalk text by 02:16 Oct 16 (~11 hours in), then a server bring-up from 12,000 to 27,000 of 32,000 servers across Oct 16. The staged bring-up on partially recovered infrastructure produced fresh instability — photo/video transmission failed again at 10:15 — and long-tail services (Brunch, Kakao Map, securities/real-estate) trickled back over the following days, with full restoration declared only at 23:00 on Oct 20, a total of 5 days 7.5 hours (~127.5 h)."
+  },
+  {
+   "heading": "Organizational and systemic factors",
+   "body": "The ICT ministry assigned blame across all three stakeholders. SK C&C was faulted for a sketchy fire-response protocol with no action plans or drills, weak battery monitoring and fire detection, and poor information-sharing with firefighters. Kakao was faulted for concentrating core functions at one site. The accountability fallout included a CEO-level resignation at Kakao and multiple lawsuits, plus a public blame dispute: SK Group — whose subsidiary SK On supplied the batteries and whose affiliate SK C&C operated the facility — denied responsibility, citing its battery-management-system records. The regulatory response was forceful — one-month deadlines for emergency-response plans, ordered fire drills, and a national push toward resilient-services guidelines and the Kakao Outage Prevention Act mandating geographic redundancy."
+  },
+  {
+   "heading": "Cross-incident pattern",
+   "body": "This incident sits squarely in a recurring class of failures where a physical-plant event (fire, power) exposes a latent architectural single point of failure. The technical trigger — lithium-ion energy storage that resists conventional suppression and forces a full power cut — is a known and rising risk as li-ion displaces VRLA in data-center UPS fleets. The amplification pattern — one facility, one authentication dependency, no geographic failover — mirrors other national-scale platform outages where concentration, not the initial fault, determined severity, and the sharply better outcome for redundancy-holding Naver in the very same building makes the point concrete. The regulatory outcome (mandated redundancy) reflects a broader trend of treating dominant consumer platforms as critical infrastructure subject to resilience law."
+  }
+ ],
+ "technicalDeepDive": "The engineering crux is the interaction between lithium-ion energy storage and the facility's fire-suppression and power topology. Lithium-ion cells in thermal runaway are self-sustaining exothermic reactions that generate their own oxidizer and are not extinguished by inert-gas (clean-agent) suppression, which is designed to interrupt combustion by displacing oxygen or absorbing heat in ordinary fires. Because the UPS batteries at Pangyo were co-located with — not physically separated from — the UPS itself, the runaway continued to heat the UPS even after gas discharge, meaning suppression bought no time and containment was impossible without removing the energy source. With a spreading fire in an energized electrical room, de-energizing the facility became the only safe action, and cutting power to a UPS-backed data center means the batteries that would normally ride through a utility loss are themselves the hazard being isolated — so there is no bridging power and the load drops instantly. The downstream failure was then a software-architecture problem: with roughly 32,000 servers dark and Kakao's authentication/verification function resident only at this site, every service that gated on login failed simultaneously and could not be failed over — whereas co-tenant Naver, holding a second data center, rode out the same event with only partial disruption. Recovery was bounded by two serial constraints — first, the fire had to be safe enough to restore power (repeatedly deferred for safety on Oct 15), and second, servers and stateful services had to be rebuilt and re-synchronized in stages, a process that itself reintroduced instability (the Oct 16 10:15 photo/video regression) because dependent services were brought up against not-yet-consistent infrastructure. The durable engineering lessons are therefore threefold: isolate and li-ion-rate battery-room suppression and separate it from the UPS; never make a mandatory dependency (authentication) single-homed; and design DR runbooks around the realistic worst case of an instantaneous, multi-day total facility loss rather than component-level degradation.",
+ "references": [
+  {
+   "title": "SK's Li-ion batteries blamed for data center fire behind Kakao outage — DatacenterDynamics",
+   "url": "https://www.datacenterdynamics.com/en/news/sks-li-ion-batteries-blamed-for-data-center-fire-behind-kakao-outage/",
+   "type": "news",
+   "quote": "SK's lithium-ion batteries were blamed for the data center fire behind the Kakao outage.",
+   "accessed": "2026-07-31"
+  },
+  {
+   "title": "All stakeholders blamed for Kakao server shutdown — Korea Herald",
+   "url": "https://www.koreaherald.com/article/3015077",
+   "type": "news",
+   "quote": "The ministry pinpointed lithium-ion batteries not being physically separated from the UPS as the main cause of the slow recovery.",
+   "accessed": "2026-07-31"
+  },
+  {
+   "title": "Fire at data center causes unprecedented massive service disruption — Korea Times",
+   "url": "https://www.koreatimes.co.kr/southkorea/society/20221016/fire-at-data-center-causes-unprecedented-massive-service-disruption",
+   "type": "news",
+   "quote": "A fire at a data center caused an unprecedented, massive disruption of internet services.",
+   "accessed": "2026-07-31"
+  },
+  {
+   "title": "Major data center fire highlights criticality of IT services — Uptime Institute Journal",
+   "url": "https://journal.uptimeinstitute.com/major-data-center-fire-highlights-criticality-of-it-services/",
+   "type": "analysis",
+   "quote": "According to police reports, the fire started in a battery room before spreading quickly to the rest of the building.",
+   "accessed": "2026-07-31"
+  },
+  {
+   "title": "South Korea data center fire fallout: CEO resigns — Data Center Knowledge",
+   "url": "https://www.datacenterknowledge.com/management/south-korea-data-center-fire-fallout-ceo-resigns",
+   "type": "news",
+   "quote": "Investing 460 billion won ($323 million) to complete new data center in Ansan by next year.",
+   "accessed": "2026-07-31"
+  },
+  {
+   "title": "Korea's ICT ministry gives Kakao, SK and Naver one month to implement emergency response — DatacenterDynamics",
+   "url": "https://www.datacenterdynamics.com/en/news/koreas-ict-ministry-gives-kakao-sk-and-naver-one-month-to-implement-emergency-response-system/",
+   "type": "news",
+   "quote": "South Korea's ICT ministry has given Kakao and other players one month to come up with emergency response measures.",
+   "accessed": "2026-07-31"
+  },
+  {
+   "title": "Fire at data center causes KakaoTalk to go down for 11+ hours — allkpop",
+   "url": "https://www.allkpop.com/article/2022/10/fire-at-data-center-causes-kakaotalk-to-go-down-for-11-hours-longest-inoperable-period-of-apps-history",
+   "type": "news",
+   "quote": "KakaoTalk went down for 11+ hours, the longest inoperable period of the app's history.",
+   "accessed": "2026-07-31"
+  },
+  {
+   "title": "SK C&C fire disrupts Kakao and Naver — The Register",
+   "url": "https://www.theregister.com/2022/10/17/sk_cc_naver_kaako_fire/",
+   "type": "news",
+   "quote": "Naver already operates one datacenter of its own and has another one planned for next year.",
+   "accessed": "2026-07-31"
+  },
+  {
+   "title": "SK C&C Pangyo data center fire — internet service outage (aggregator)",
+   "url": "https://en.namu.wiki/w/SK%20C&C%20%ED%8C%90%EA%B5%90%20%EB%8D%B0%EC%9D%B4%ED%84%B0%EC%84%BC%ED%84%B0%20%ED%99%94%EC%9E%AC%EB%A1%9C%20%EC%9D%B8%ED%95%9C%20%EC%9D%B8%ED%84%B0%EB%84%B7%20%EC%84%9C%EB%B9%84%EC%8A%A4%20%EC%9E%A5%EC%95%A0%20%EC%82%AC%EA%B1%B4",
+   "type": "aggregator",
+   "quote": "15:30 - Service failures began; power supply cut during firefighting.",
+   "accessed": "2026-07-31"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": false,
+  "referenceCount": 9,
+  "lastVerified": "2026-07-31",
+  "confidence": "medium — fuel/location/root cause, the SK-Group battery-and-facility linkage, Naver's redundancy advantage, and headline duration are high-confidence and multiply corroborated; fine-grained recovery timestamps and financial/user-impact figures rest on a single aggregator (NamuWiki) and are treated as low confidence; the 'Kakao Outage Prevention Act' enactment is carried on the seed brief without an external citation"
+ },
+ "lastUpdated": "2026-07-31"
+}

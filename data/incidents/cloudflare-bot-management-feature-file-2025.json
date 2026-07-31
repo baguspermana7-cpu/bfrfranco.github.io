@@ -1,0 +1,284 @@
+{
+ "slug": "cloudflare-bot-management-feature-file-2025",
+ "title": "Cloudflare Global Outage: Oversized Bot Management Feature File (November 18, 2025)",
+ "operator": "Cloudflare",
+ "dcName": "Cloudflare global edge network (FL2 core proxy)",
+ "location": {
+  "country": "Global",
+  "region": "AMER",
+  "city": "",
+  "az": ""
+ },
+ "date": "2025-11-18",
+ "durationMin": 346,
+ "category": [
+  "software"
+ ],
+ "severity": {
+  "usersAffected": "Global; a large share of internet users behind Cloudflare. Cloudflare published a 5xx-volume graph but no numeric affected-user or affected-account count. Secondary aggregators (not Cloudflare-confirmed) reported 2.1M+ Downdetector issue reports (435,000+ from the US) and estimated ~20% of webpages and ~1/3 of the top-10,000 sites affected at peak.",
+  "impactUsd": "Not disclosed by Cloudflare (no revenue-loss or SLA-credit figure published). Third-party revenue-loss estimates ($180-360M) remain unverified secondary screening figures.",
+  "servicesDown": [
+   "Cloudflare core CDN/proxy HTTP traffic (5xx errors)",
+   "Workers KV",
+   "Cloudflare Access",
+   "Cloudflare Dashboard / control-plane login (via Turnstile dependency)",
+   "Downstream customer platforms: X, ChatGPT, Spotify, Canva, League of Legends (seed); secondary coverage adds Zoom, Coinbase, retailers, Downdetector, Claude AI"
+  ],
+  "tier": "Tier 1 - global, multi-service critical outage"
+ },
+ "brief": "On 18 November 2025 an 11:05 UTC ClickHouse database permissions change exposed r0-database table metadata alongside the default database. A Bot Management feature-file generator ran a metadata query over system.columns with no database filter, which then returned duplicated column rows and more than doubled the feature file's size past a hardcoded 200-feature preallocation limit (normal usage ~60 features). When the oversized file propagated network-wide, Cloudflare's FL2 proxy module panicked on a Rust unwrap of an Err value, causing core traffic to return 5xx errors. Customer impact began at 11:28 UTC; responders first suspected a DDoS/Workers KV problem before identifying the config file, deployed a correct file globally at 14:30 UTC, and fully restored all operations by 17:06 UTC.",
+ "magnitude": {
+  "usersScore": 9,
+  "financialScore": 7,
+  "durationScore": 6,
+  "blastRadiusScore": 9,
+  "note": "Blast radius and user impact scored high: a global edge-network failure took down core HTTP traffic plus Workers KV, Access and the dashboard, cascading into many top-tier consumer platforms. Duration moderate (~3h main impact, ~5h46m end-to-end). Financial score is inferential - Cloudflare disclosed no dollar figure; secondary estimates only. Scores reflect Cloudflare-confirmed scope where available and are dampened where only secondary aggregator data exists."
+ },
+ "sequenceOfEvents": [
+  {
+   "t": "2025-11-18T11:05:00Z",
+   "phase": "Trigger",
+   "event": "A ClickHouse database access-control (permissions) change is deployed. It makes r0-database table metadata visible alongside the default database tables - the latent condition that later poisons the feature-file query. No customer-visible impact yet.",
+   "source": "Cloudflare postmortem (11:05 timeline entry)"
+  },
+  {
+   "t": "2025-11-18T11:20:00Z",
+   "phase": "Escalation",
+   "event": "Cloudflare's own 5xx-volume chart labels ~11:20 UTC as outage onset as the newly generated, oversized Bot Management feature file begins propagating across the network.",
+   "source": "Cloudflare postmortem (chart onset label)"
+  },
+  {
+   "t": "2025-11-18T11:28:00Z",
+   "phase": "Impact",
+   "event": "Bad deployment reaches customer environments; first 5xx errors observed on customer HTTP traffic as the FL2 proxy module panics on the oversized file. Cloudflare marks this as start of customer impact.",
+   "source": "Cloudflare postmortem (11:28 'Impact starts')"
+  },
+  {
+   "t": "2025-11-18T11:31:00Z",
+   "phase": "Detection",
+   "event": "An automated test detects the issue.",
+   "source": "Cloudflare postmortem (11:31 auto-detect)"
+  },
+  {
+   "t": "2025-11-18T11:32:00Z",
+   "phase": "Diagnosis",
+   "event": "From ~11:32 to 13:05 UTC responders investigate elevated traffic and errors on the Workers KV service and attempt mitigations; the config file has not yet been identified as the cause. Cloudflare initially suspected the symptoms might be a DDoS/attack pattern.",
+   "source": "Cloudflare postmortem (11:32-13:05 Workers KV investigation)"
+  },
+  {
+   "t": "2025-11-18T11:35:00Z",
+   "phase": "Detection",
+   "event": "An incident call is created and the response effort formally begins.",
+   "source": "Cloudflare postmortem (11:35 incident call)"
+  },
+  {
+   "t": "2025-11-18T13:05:00Z",
+   "phase": "Mitigation",
+   "event": "Internal bypasses for Workers KV and Cloudflare Access are implemented, falling those services back to a prior version of the core proxy and reducing impact.",
+   "source": "Cloudflare postmortem (13:05 bypass)"
+  },
+  {
+   "t": "2025-11-18T13:37:00Z",
+   "phase": "Diagnosis",
+   "event": "Response effort refocuses on rolling back the Bot Management configuration file to a last-known-good version - the config file is now identified as the true cause.",
+   "source": "Cloudflare postmortem (13:37 rollback focus)"
+  },
+  {
+   "t": "2025-11-18T14:24:00Z",
+   "phase": "Mitigation",
+   "event": "The team stops creation and propagation of new Bot Management configuration files, halting the spread of bad files ahead of deploying the fix.",
+   "source": "Cloudflare postmortem (14:24 propagation stopped)"
+  },
+  {
+   "t": "2025-11-18T14:30:00Z",
+   "phase": "Recovery",
+   "event": "A correct Bot Management configuration file is deployed globally; main impact is resolved and most services begin operating correctly. Downstream services start seeing reduced errors.",
+   "source": "Cloudflare postmortem (14:30 main impact resolved)"
+  },
+  {
+   "t": "2025-11-18T15:30:00Z",
+   "phase": "Recovery",
+   "event": "Dashboard availability is restored (~15:30 UTC) by scaling control-plane concurrency; login had been unavailable due to the Turnstile dependency.",
+   "source": "Cloudflare postmortem (~15:30 dashboard restored)"
+  },
+  {
+   "t": "2025-11-18T17:06:00Z",
+   "phase": "Restored",
+   "event": "All downstream services are restarted and all operations are fully restored, ending impact.",
+   "source": "Cloudflare postmortem (17:06 'Impact ends')"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Normal feature count in Bot Management file",
+   "value": "~60 features",
+   "source": "Cloudflare postmortem"
+  },
+  {
+   "label": "Hardcoded preallocation limit exceeded",
+   "value": "200 features",
+   "source": "Cloudflare postmortem"
+  },
+  {
+   "label": "File size change from unfiltered query",
+   "value": "More than doubled (duplicate column rows)",
+   "source": "Cloudflare postmortem"
+  },
+  {
+   "label": "Triggering permissions change deployed",
+   "value": "11:05 UTC",
+   "source": "Cloudflare postmortem"
+  },
+  {
+   "label": "Customer impact start",
+   "value": "11:28 UTC (chart onset ~11:20)",
+   "source": "Cloudflare postmortem"
+  },
+  {
+   "label": "Main impact resolved (correct config deployed)",
+   "value": "14:30 UTC",
+   "source": "Cloudflare postmortem"
+  },
+  {
+   "label": "All operations fully restored",
+   "value": "17:06 UTC",
+   "source": "Cloudflare postmortem"
+  },
+  {
+   "label": "End-to-end duration",
+   "value": "~5h46m (11:20-17:06 UTC)",
+   "source": "Cloudflare postmortem"
+  },
+  {
+   "label": "Main customer-impact window",
+   "value": "~3h (11:28-14:30 UTC)",
+   "source": "Cloudflare postmortem"
+  },
+  {
+   "label": "Time from impact to detection",
+   "value": "~3 min (11:28 -> 11:31)",
+   "source": "Cloudflare postmortem"
+  },
+  {
+   "label": "Downdetector issue reports (SECONDARY, unconfirmed)",
+   "value": "2.1M+ total; 435,000+ from US",
+   "source": "controld.com (secondary aggregator)"
+  },
+  {
+   "label": "Estimated web scope at peak (SECONDARY, unconfirmed)",
+   "value": "~20% of webpages; ~1/3 of top-10,000 sites",
+   "source": "controld.com (secondary aggregator)"
+  }
+ ],
+ "rootCause": "An 11:05 UTC ClickHouse permissions change made r0-database table metadata visible alongside the default database. The Bot Management feature-file generator ran a metadata query (SELECT name, type FROM system.columns WHERE table = 'http_requests_features' order by name) that lacked a database predicate, so it began returning duplicated column entries from both databases. This more than doubled the file's feature count past a hardcoded 200-feature preallocation limit (normal usage ~60 features). When the oversized file propagated network-wide, the FL2 proxy worker thread panicked on a Rust unwrap of an Err value, causing core traffic to fail with 5xx errors. Causal chain: permissions change -> unfiltered metadata query -> duplicate rows -> file exceeds 200-feature limit -> FL2 unwrap panic.",
+ "contributingFactors": [
+  "The feature-file generation query selected over system.columns with no database filter, an unqualified query that silently changed behavior the moment additional database metadata became visible.",
+  "A hardcoded 200-feature memory preallocation limit with a hard failure mode (Rust unwrap panic) rather than graceful degradation, so an oversized-but-otherwise-valid file crashed the proxy instead of being rejected.",
+  "Cloudflare-generated configuration files were trusted on ingestion and not validated the way user-generated input would be, so a malformed internal artifact propagated network-wide unchecked.",
+  "The account implies no per-node canary or health-gate existed on feature-file publish, allowing the bad file to reach the whole network before failing.",
+  "Shared-core-proxy blast radius: because Workers KV, Cloudflare Access and the dashboard (via Turnstile) all depend on the same core proxy path, a single module fault cascaded across multiple independent-seeming services.",
+  "Initial misdiagnosis: symptoms resembled a DDoS/attack and centered on Workers KV, delaying identification of the config file as the true cause (11:32-13:37 UTC)."
+ ],
+ "coe": [
+  {
+   "action": "Harden ingestion of Cloudflare-generated configuration files, treating them as untrusted input in the same way user-generated input is validated.",
+   "owner": "Not published",
+   "status": "Committed (no owner/date/completion published)",
+   "source": "Cloudflare postmortem"
+  },
+  {
+   "action": "Enable more global kill switches for features so a bad feature can be disabled network-wide quickly.",
+   "owner": "Not published",
+   "status": "Committed (no owner/date/completion published)",
+   "source": "Cloudflare postmortem"
+  },
+  {
+   "action": "Eliminate the ability for core dumps or other error reports to overwhelm system resources during an incident.",
+   "owner": "Not published",
+   "status": "Committed (no owner/date/completion published)",
+   "source": "Cloudflare postmortem"
+  },
+  {
+   "action": "Review failure modes for error conditions across all core proxy modules to remove hard-panic paths.",
+   "owner": "Not published",
+   "status": "Committed (no owner/date/completion published)",
+   "source": "Cloudflare postmortem"
+  }
+ ],
+ "lessonsLearnt": [
+  "Internally generated configuration and data artifacts must be validated as strictly as external user input; trusting your own pipeline's output is a single point of failure.",
+  "Unqualified queries (here, a system.columns SELECT with no database filter) are a class of latent defect - they behave correctly until the surrounding schema/permissions context shifts, then silently return wrong results.",
+  "Fixed-size preallocation limits should fail gracefully (reject/degrade), never via a hard panic that crashes the request-serving path.",
+  "A permissions or access-control change in a data store can have far-reaching downstream effects on any pipeline that queries metadata; such changes need blast-radius review, not just local review.",
+  "Shared dependencies concentrate blast radius: routing Workers KV, Access and dashboard login through the same core proxy meant one module fault took down many services at once.",
+  "Fast automated detection (impact to detection in ~3 minutes) does not guarantee fast diagnosis - initial DDoS/Workers KV misattribution cost roughly two hours before the config file was identified."
+ ],
+ "improvements": [
+  "Add schema-aware validation and canary/health-gating on feature-file publish so an oversized or malformed file is caught before network-wide propagation.",
+  "Replace hard unwrap/panic paths in the FL2 proxy with bounded, fail-safe handling that drops or clamps oversized config rather than crashing the worker thread.",
+  "Explicitly qualify all metadata/config-generation queries with a database predicate and add tests that assert row-count stability against schema/permissions changes.",
+  "Introduce global per-feature kill switches so operators can disable a failing feature immediately without a full config rollback.",
+  "Decouple or add fallback paths for control-plane and critical services (dashboard login, Workers KV, Access) so they do not all fail together when one core-proxy module faults.",
+  "Add resource guards so core dumps and error reporting cannot exhaust node resources and deepen an incident."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "Failure mechanism",
+   "body": "The outage was a data-poisoning failure, not an infrastructure or capacity failure. A routine permissions change altered what a metadata query could see, and an unqualified SELECT over system.columns began returning duplicate column rows drawn from both the r0 and default databases. The Bot Management feature-file generator serialized those duplicated rows into a feature file that more than doubled in size. Every input on this path was individually valid - the query ran, the file was produced, propagation succeeded - yet the composed result violated a downstream invariant: a hardcoded 200-feature preallocation ceiling in the FL2 proxy against a normal load of about 60 features."
+  },
+  {
+   "heading": "Why it cascaded",
+   "body": "The proxy responded to the oversized file with a Rust panic - an unwrap on an Err value in the fl2_worker_thread - rather than rejecting or clamping the input. Because the FL2 core proxy sits on the request-serving path for a large fraction of Cloudflare-fronted traffic, that panic translated directly into 5xx errors globally. The blast radius widened because independent-seeming services shared this core path: Workers KV, Cloudflare Access, and dashboard login (through its Turnstile dependency) all degraded together, which both amplified user-visible impact and actively misled responders into chasing a Workers KV problem."
+  },
+  {
+   "heading": "Detection, diagnosis and recovery",
+   "body": "Automated testing flagged the problem within about three minutes of customer impact (11:28 -> 11:31 UTC) and an incident call opened at 11:35, so detection was fast. Diagnosis was not: symptoms resembled a DDoS and centered on Workers KV, and roughly two hours passed before attention shifted to the Bot Management config file at 13:37 UTC. Recovery then proceeded in stages - service bypasses at 13:05, halting propagation of new files at 14:24, deploying a correct file globally at 14:30 (main impact resolved), restoring the dashboard by scaling control-plane concurrency around 15:30, and full restoration at 17:06 UTC. The staged recovery shows the value of both a stop-the-bleeding step (halt propagation) and a fix-forward step (deploy good config)."
+  },
+  {
+   "heading": "Organizational and systemic factors",
+   "body": "Three systemic patterns stand out. First, Cloudflare trusted its own generated configuration files on ingestion rather than validating them like user input - a control/data-plane boundary gap where internal artifacts bypass the scrutiny external ones receive. Second, a permissions change in one system (ClickHouse) propagated consequences into an unrelated pipeline (Bot Management), indicating change-review that did not account for cross-system metadata visibility. Third, the absence of an apparent canary or health-gate on feature-file publish meant there was no staged rollout to catch the bad file before it reached the whole network. Cloudflare's four committed remediations map directly onto these gaps, though none were published with owners, dates, or completion status."
+  },
+  {
+   "heading": "Cross-incident pattern",
+   "body": "This incident fits a recurring class of large-provider outages in which the trigger is a bad configuration or data push rather than hardware or attack, and the damage comes from a hard failure mode plus a shared dependency that concentrates blast radius. The distinctive lesson here is the unqualified-query defect: a query that is correct under one schema/permissions context silently produces poisoned output under another. Combined with fail-closed hard limits (a panic instead of graceful degradation) and network-wide propagation without canarying, a small, well-intentioned permissions change escalated into a multi-hour global outage affecting many of the world's most-used services."
+  }
+ ],
+ "technicalDeepDive": "The proximate defect lived in the Bot Management feature-file generation path. That path issued the query SELECT name, type FROM system.columns WHERE table = 'http_requests_features' order by name, filtering only on table name and omitting any database predicate. In ClickHouse, system.columns enumerates columns across all visible databases, so the query's result set is only well-defined if the caller's metadata visibility is constrained. The 11:05 UTC access-control change removed that constraint by making r0-database table metadata visible alongside the default database, causing the same http_requests_features column names to appear twice - once per database - and roughly doubling the returned row count. The generator serialized every returned row into the feature file with no deduplication or bounds check, so the file's feature count crossed a hardcoded 200-entry preallocation limit against a steady-state of about 60 features. On the consuming side, the FL2 proxy preallocated memory for at most 200 features and then indexed/parsed the file under that assumption; the oversized file drove an operation that returned an Err, and the code called .unwrap() on it, panicking the fl2_worker_thread (observed as: thread fl2_worker_thread panicked: called Result::unwrap() on an Err value). Because FL2 is on the hot request path, the panic surfaced as 5xx responses across the network as the file propagated. The engineering takeaways are concrete: qualify metadata queries with an explicit database filter and assert row-count/dedup invariants; replace the unwrap with a bounded, fail-safe parse that clamps or rejects oversized input instead of panicking; validate Cloudflare-generated config on ingestion as if it were untrusted; and gate feature-file publication behind a canary so a doubled file is caught on a node subset before it reaches the whole fleet. No exact byte size or duplicated-row count was published - Cloudflare disclosed only the feature-count sizing (~60 normal, 200 limit, file more than doubled) - but the mechanism is fully determined by the unfiltered system.columns query duplicating columns across the r0 and default databases.",
+ "references": [
+  {
+   "title": "Cloudflare blog: Cloudflare outage on November 18, 2025",
+   "url": "https://blog.cloudflare.com/18-november-2025-outage/",
+   "type": "official-postmortem",
+   "quote": "a permissions update made table metadata in the r0 database visible alongside default database tables ... This query lacked a database filter, so it now returned duplicate column entries from both databases, more than doubling the rows in the response.",
+   "accessed": "2026-07-31"
+  },
+  {
+   "title": "Cloudflare postmortem - FL2 proxy panic detail",
+   "url": "https://blog.cloudflare.com/18-november-2025-outage/",
+   "type": "official-postmortem",
+   "quote": "thread fl2_worker_thread panicked: called Result::unwrap() on an Err value",
+   "accessed": "2026-07-31"
+  },
+  {
+   "title": "ThousandEyes: Cloudflare Outage Analysis November 18, 2025",
+   "url": "https://www.thousandeyes.com/blog/cloudflare-outage-analysis-november-18-2025",
+   "type": "news",
+   "quote": "(Paraphrase, not a verbatim quotation) ThousandEyes' independent network telemetry attributes the global surge in HTTP 5xx responses to Cloudflare's edge during the outage window.",
+   "accessed": "2026-07-31"
+  },
+  {
+   "title": "ControlD: The Biggest Cloudflare Outages (secondary/screening)",
+   "url": "https://controld.com/blog/biggest-cloudflare-outages/",
+   "type": "secondary-aggregator",
+   "quote": "Downdetector recorded more than 2.1 million issue reports during the outage. More than 435,000 reports were from the United States, while the United Kingdom, Japan, and Germany were also among the most heavily affected regions.",
+   "accessed": "2026-07-31"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": true,
+  "referenceCount": 4,
+  "lastVerified": "2026-07-31",
+  "confidence": "high for the Cloudflare-confirmed root cause, timeline, and mechanism; low for secondary aggregator scope/impact figures (Downdetector counts, ~20%-of-web estimate) and unverified for any dollar-impact figure, none of which Cloudflare published."
+ },
+ "lastUpdated": "2026-07-31"
+}

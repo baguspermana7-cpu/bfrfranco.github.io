@@ -1,0 +1,297 @@
+{
+ "slug": "aws-us-east-1-dynamodb-dns-2025",
+ "title": "AWS US-EAST-1 DynamoDB DNS Race Condition Cascades Across the Internet",
+ "operator": "Amazon Web Services",
+ "dcName": "US-EAST-1 (Northern Virginia)",
+ "location": {
+  "city": "Ashburn",
+  "country": "United States",
+  "region": "AMER",
+  "az": "us-east-1"
+ },
+ "date": "2025-10-20",
+ "durationMin": 872,
+ "category": [
+  "software",
+  "network"
+ ],
+ "severity": {
+  "usersAffected": "Millions of end users across 1,000+ downstream internet services; press estimates of affected businesses range ~1,000-2,500 companies (secondary, unreconciled). AWS disclosed no official customer count.",
+  "impactUsd": "No official AWS figure. Analyst/press estimates: >US$1B to the global economy, with one industry CEO suggesting the true toll could reach hundreds of billions in lost productivity (Catchpoint, via CNN) — estimates, not measured.",
+  "servicesDown": [
+   "Amazon DynamoDB",
+   "Amazon EC2",
+   "Amazon ECS",
+   "Amazon EKS",
+   "AWS Fargate",
+   "Amazon Connect",
+   "AWS STS",
+   "AWS IAM",
+   "Amazon Redshift",
+   "Network Load Balancer (NLB)"
+  ],
+  "tier": "Sev-1 / Large-scale multi-service regional disruption"
+ },
+ "brief": "A latent race condition in DynamoDB's automated DNS management system left two DNS Enactor processes racing in the us-east-1 region. An unusually delayed Enactor applied an old plan that overwrote a newer one, and a second Enactor's cleanup automation then deleted the plan as stale — instantly removing every IP address for the DynamoDB regional endpoint and leaving clients unable to resolve the service. Because core AWS control planes depend on DynamoDB, the fault cascaded: EC2's DropletWorkflow Manager fell into congestive collapse (insufficient-capacity launch failures), and NLB health-checks began flapping as new instances were brought into service before their network state propagated. DynamoDB DNS was manually corrected by 2:25 AM PDT, but full recovery of dependent services did not complete until 2:20 PM PDT on October 20, 2025 — roughly 14.5 hours after onset. Downdetector logged millions of reports across more than a thousand consumer and enterprise services.",
+ "magnitude": {
+  "usersScore": 9,
+  "financialScore": 8,
+  "durationScore": 7,
+  "blastRadiusScore": 10,
+  "note": "Blast radius maximal: a single region's DNS fault for one foundational service (DynamoDB) propagated through EC2 and NLB control planes into 1,000+ downstream internet services worldwide. Duration substantial (~14.5h to full recovery) though the root DNS fault was corrected within ~2.6h. User and financial scores reflect millions of Downdetector reports and >$1B press-estimated economic impact, tempered because AWS disclosed no official user or dollar figures."
+ },
+ "sequenceOfEvents": [
+  {
+   "t": "2025-10-19 23:48 PDT (2025-10-20 06:48 UTC)",
+   "phase": "Trigger",
+   "event": "A latent race condition in DynamoDB's DNS management fires in us-east-1: an unusually delayed first DNS Enactor applies a much older plan to the regional DynamoDB endpoint, overwriting the newer plan. The second Enactor's cleanup then deletes the now-stale older plan, immediately removing all IP addresses for the regional endpoint. Clients can no longer resolve the DynamoDB endpoint.",
+   "source": "https://aws.amazon.com/message/101925"
+  },
+  {
+   "t": "2025-10-19 23:48 PDT",
+   "phase": "Escalation",
+   "event": "Concurrent with the DNS failure, EC2's DropletWorkflow Manager (DWFM) state checks begin to fail because DWFM depends on DynamoDB and can no longer complete its checks; droplet leases begin timing out.",
+   "source": "https://aws.amazon.com/message/101925"
+  },
+  {
+   "t": "2025-10-20 (early hours PDT)",
+   "phase": "Cascade",
+   "event": "DWFM enters congestive collapse, unable to make forward progress recovering droplet leases. EC2 launch requests begin returning insufficient-capacity errors.",
+   "source": "https://aws.amazon.com/message/101925"
+  },
+  {
+   "t": "2025-10-20 (during outage)",
+   "phase": "Impact",
+   "event": "The originating DynamoDB dependency ripples into named AWS services — ECS, EKS, Fargate, Amazon Connect, STS, IAM, Redshift and others — and into 1,000+ downstream consumer and enterprise apps (Snapchat, Reddit, Roblox, Fortnite, Venmo, Lyft, Apple Music/TV, Disney+, Hulu, DoorDash, PlayStation, Zoom, Bank of America, Alexa, and more).",
+   "source": "https://www.engadget.com/big-tech/amazons-aws-outage-has-knocked-services-like-alexa-snapchat-fortnite-venmo-and-more-offline-142935812.html"
+  },
+  {
+   "t": "2025-10-20 02:25 PDT",
+   "phase": "Mitigation",
+   "event": "Engineers manually correct the empty DNS record; all DNS information for the DynamoDB regional endpoint is restored. The root fault is resolved, but dependent control planes remain impaired.",
+   "source": "https://aws.amazon.com/message/101925"
+  },
+  {
+   "t": "2025-10-20 05:30 PDT",
+   "phase": "Cascade",
+   "event": "NLB connection errors begin (per derived NLB error window). The NLB health-checking subsystem brings newly launched EC2 instances into service before their network state has propagated, so health checks alternate between healthy and failing, repeatedly removing and re-adding NLB nodes and backend targets from DNS.",
+   "source": "https://aws.amazon.com/message/101925"
+  },
+  {
+   "t": "2025-10-20 06:52 PDT",
+   "phase": "Detection",
+   "event": "Monitoring detects the NLB health-check failures caused by the flapping/network-propagation problem.",
+   "source": "https://aws.amazon.com/message/101925"
+  },
+  {
+   "t": "2025-10-20 10:36 PDT",
+   "phase": "Recovery",
+   "event": "Network configuration propagation times return to normal, stabilizing the health-check flapping behavior for newly launched instances.",
+   "source": "https://aws.amazon.com/message/101925"
+  },
+  {
+   "t": "2025-10-20 11:23 PDT",
+   "phase": "Recovery",
+   "event": "AWS begins relaxing request throttles that had been applied to protect recovering subsystems.",
+   "source": "https://aws.amazon.com/message/101925"
+  },
+  {
+   "t": "2025-10-20 14:20 PDT (21:20 UTC)",
+   "phase": "Restored",
+   "event": "The overall event ends — approximately 14.5 hours after the 11:48 PM PDT October 19 onset.",
+   "source": "https://aws.amazon.com/message/101925"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Onset",
+   "value": "2025-10-19 23:48 PDT (06:48 UTC Oct 20)",
+   "source": "https://aws.amazon.com/message/101925"
+  },
+  {
+   "label": "DynamoDB DNS restored",
+   "value": "2025-10-20 02:25 PDT",
+   "source": "https://aws.amazon.com/message/101925"
+  },
+  {
+   "label": "Event end / full recovery",
+   "value": "2025-10-20 14:20 PDT",
+   "source": "https://aws.amazon.com/message/101925"
+  },
+  {
+   "label": "Total event duration",
+   "value": "~14.5 hours (872 min)",
+   "source": "https://aws.amazon.com/message/101925"
+  },
+  {
+   "label": "DynamoDB API error window (derived)",
+   "value": "~2h52m (11:48 PM-2:40 AM PDT)",
+   "source": "https://aws.amazon.com/message/101925"
+  },
+  {
+   "label": "EC2 launch-failure window (derived)",
+   "value": "~14h (11:48 PM-1:50 PM PDT)",
+   "source": "https://aws.amazon.com/message/101925"
+  },
+  {
+   "label": "NLB connection-error window (derived)",
+   "value": "~8h39m (5:30 AM-2:09 PM PDT)",
+   "source": "https://aws.amazon.com/message/101925"
+  },
+  {
+   "label": "Downstream services affected",
+   "value": "1,000+ services (Downdetector-tracked)",
+   "source": "https://www.thousandeyes.com/blog/aws-outage-analysis-october-20-2025"
+  },
+  {
+   "label": "Internal AWS services affected (press)",
+   "value": "64 (secondary paraphrase; not an AWS-stated count)",
+   "source": "https://www.pbs.org/newshour/nation/amazon-cloud-computing-outage-disrupts-snapchat-ring-and-many-other-online-services"
+  },
+  {
+   "label": "Snapchat Downdetector peak",
+   "value": ">22,000 reports",
+   "source": "https://www.cnn.com/business/live-news/amazon-tech-outage-10-20-25-intl"
+  },
+  {
+   "label": "Aggregate Downdetector volume (secondary, unreconciled)",
+   "value": "~4M within 2h; ~6.5M worldwide",
+   "source": "https://www.demandsage.com/internet-outage-statistics/"
+  },
+  {
+   "label": "Affected businesses (secondary, unreconciled)",
+   "value": "~1,000-2,500 companies (vs CyberCube ~70,000 orgs)",
+   "source": "https://leanware.co/insights/aws-outage-2025-causes-impact-prevention"
+  },
+  {
+   "label": "Estimated economic impact (analyst/press)",
+   "value": ">US$1B global; up to hundreds of billions (Catchpoint est.)",
+   "source": "https://www.cnn.com/business/live-news/amazon-tech-outage-10-20-25-intl"
+  }
+ ],
+ "rootCause": "A latent race condition in DynamoDB's automated DNS management system produced an incorrect empty DNS record for the service's us-east-1 regional endpoint. Two DNS Enactor processes raced: an unusually delayed first Enactor applied a much older plan that overwrote a newer one, and the second Enactor's cleanup process then deleted that plan as stale (many generations older than what it had just applied). As the plan was deleted, all IP addresses for the regional endpoint were immediately removed, so clients could no longer resolve the DynamoDB endpoint. Because foundational AWS control planes depend on DynamoDB, this single resolution failure cascaded into EC2 and NLB.",
+ "contributingFactors": [
+  "Automated DNS Planner/Enactor design permitted two Enactor processes to operate concurrently without a guard preventing a stale, older plan from overwriting a newer active one.",
+  "Cleanup automation deleted a plan judged 'stale' by generation age without verifying it was the currently active/applied plan — turning a benign garbage-collection step into total record removal.",
+  "Deep, unguarded dependency of the EC2 DropletWorkflow Manager (DWFM) on DynamoDB, so a DynamoDB resolution failure directly stalled droplet-lease management.",
+  "DWFM lacked back-pressure/recovery safeguards, allowing it to enter congestive collapse rather than degrade gracefully once leases began timing out.",
+  "NLB health-checking brought newly launched EC2 instances into service before their network state had propagated, so health checks flapped and nodes/targets were repeatedly pulled from and returned to DNS.",
+  "Concentration of critical control-plane dependencies in us-east-1, amplifying blast radius when a single regional endpoint failed."
+ ],
+ "coe": [
+  {
+   "action": "Disable the DynamoDB DNS Planner and DNS Enactor automation worldwide; fix the race-condition scenario and add protections preventing application of incorrect DNS plans before re-enabling.",
+   "owner": "AWS DynamoDB team",
+   "status": "Automation disabled (done); race-condition fix and additional protections pending before re-enable",
+   "source": "https://aws.amazon.com/message/101925"
+  },
+  {
+   "action": "Add an additional EC2 test suite that specifically exercises DWFM recovery, so congestive-collapse recovery paths are validated.",
+   "owner": "AWS EC2 team",
+   "status": "Committed",
+   "source": "https://aws.amazon.com/message/101925"
+  },
+  {
+   "action": "Introduce an NLB velocity-control mechanism that limits how much capacity can be removed during health-check-driven AZ failover, preventing mass removal from DNS.",
+   "owner": "AWS NLB team",
+   "status": "Committed",
+   "source": "https://aws.amazon.com/message/101925"
+  },
+  {
+   "action": "Investigate additional ways to avoid impact from a similar event and to further reduce time to recovery.",
+   "owner": "AWS (broad/organizational)",
+   "status": "Committed",
+   "source": "https://aws.amazon.com/message/101925"
+  }
+ ],
+ "lessonsLearnt": [
+  "A benign-looking cleanup/garbage-collection step (deleting a 'stale' plan) can be catastrophic when it acts on the currently active record without confirming it is not in use — 'stale by age' is not the same as 'safe to delete.'",
+  "Automation that mutates shared authoritative state (DNS records) must be serialized or fenced so a delayed actor cannot overwrite a newer plan; last-writer-wins on stale data is a latent time bomb.",
+  "Deep, implicit dependencies on a single foundational service (DynamoDB) turn a localized fault into a regional cascade; control planes need dependency isolation and graceful degradation.",
+  "Congestive collapse in a recovery subsystem (DWFM) shows that recovery paths themselves must have back-pressure and be load-tested, not just steady-state operations.",
+  "Bringing capacity into rotation before its network state has propagated causes health-check flapping; readiness gating must confirm full propagation before a target is advertised in DNS.",
+  "Regional concentration of critical dependencies (us-east-1) magnifies blast radius; the same single fault reached 1,000+ downstream services because so much depends on one region."
+ ],
+ "improvements": [
+  "Add mutual-exclusion / plan-generation fencing to the DNS Enactor so an older plan can never overwrite a newer applied plan, and cleanup can never delete the active plan.",
+  "Gate DNS-record deletion on an explicit 'not currently applied' check rather than generation age alone.",
+  "Build DWFM recovery test coverage and add back-pressure/circuit-breaking so lease recovery degrades gracefully instead of collapsing.",
+  "Add NLB velocity control to bound capacity removal during health-check AZ failover, and gate target advertisement on confirmed network-state propagation.",
+  "Reduce cross-service dependency concentration on a single regional endpoint and strengthen recovery automation to shorten time-to-recovery.",
+  "Improve observability so an empty/incorrect authoritative DNS record is detected and alarmed within seconds of being written, not after downstream failures surface."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "Failure mechanism: how an empty DNS record was written",
+   "body": "DynamoDB manages the IP addresses behind its regional endpoint through an automated pipeline of DNS Planners (which compute the desired record) and DNS Enactors (which apply plans). The design tolerated two Enactors operating at once. On the night of October 19, one Enactor was unusually delayed and applied a much older plan to the us-east-1 regional endpoint, overwriting the newer, correct plan. The second Enactor's cleanup routine then evaluated that older plan as stale — many generations behind the plan it had just applied — and deleted it. Because deletion removed the record's IP addresses, the endpoint was left with an incorrect empty DNS record. The bug was not in any single component behaving wrongly in isolation; it was the timing interleaving of a delayed apply followed by an age-based cleanup, i.e. a classic latent race condition that had never before lined up."
+  },
+  {
+   "heading": "Why it cascaded: foundational dependency and congestive collapse",
+   "body": "DynamoDB is a foundational dependency for AWS control planes, so an unresolvable endpoint did not stay contained. Starting at the same 11:48 PM PDT moment, EC2's DropletWorkflow Manager (DWFM) — which relies on DynamoDB for state — could no longer complete its state checks, and droplet leases began timing out. DWFM then entered congestive collapse: it could not make forward progress recovering leases, so EC2 launch requests returned insufficient-capacity errors. A second, distinct cascade hop hit Network Load Balancer: as recovery brought new EC2 instances online, the health-checking subsystem advertised them before their network state had propagated. Health checks flapped between healthy and failing, and NLB nodes and backend targets were repeatedly pulled from and returned to DNS, producing widespread connection errors. The single DNS fault thus fanned out through two independent failure modes into ECS/EKS/Fargate, Connect, STS, IAM, Redshift and 1,000+ downstream internet services."
+  },
+  {
+   "heading": "Recovery: root fix fast, tail long",
+   "body": "The root fault was corrected relatively quickly — engineers manually restored all DNS information for the regional endpoint by 2:25 AM PDT, roughly 2.6 hours after onset. But restoring DNS did not restore the dependent systems, which had accumulated their own backlog and instability. NLB health-check failures were detected by monitoring at 6:52 AM; network configuration propagation times did not return to normal until 10:36 AM; and AWS only began relaxing protective request throttles at 11:23 AM. The overall event did not end until 2:20 PM PDT — about 14.5 hours total. The long tail illustrates that in tightly coupled systems, mean-time-to-recovery is governed less by fixing the trigger than by draining the cascade it set off."
+  },
+  {
+   "heading": "Organizational and systemic factors",
+   "body": "Several systemic conditions turned a rare timing bug into a global event. The DNS automation lacked fencing to stop a stale actor from overwriting newer state, and its cleanup deleted a record on age alone without confirming it was inactive. Recovery subsystems like DWFM had no tested back-pressure to prevent congestive collapse. Readiness gating in NLB advertised targets before their network state propagated. And the concentration of critical control-plane dependencies in us-east-1 meant one region's fault propagated widely. AWS's remediation set — disabling the DNS automation worldwide pending a race fix and added plan-validation protections, a DWFM-recovery test suite, and an NLB velocity control — maps directly onto these systemic gaps rather than merely patching the immediate symptom."
+  },
+  {
+   "heading": "Cross-incident pattern: DNS and automation-induced outages",
+   "body": "This event fits a recurring industry pattern in which large-scale cloud outages originate not from hardware failure but from automation acting on authoritative shared state — frequently DNS or configuration systems — under a rare timing condition. The trigger is small and self-inflicted (an automated cleanup deleting a record), the blast radius is enormous because foundational services sit beneath everything else, and the visible damage is measured in downstream consumer apps (Snapchat, Reddit, Roblox, Venmo, Alexa, and more) rather than in the originating component. It reinforces the standing lesson that control-plane automation touching global state needs the same rigor — serialization, validation gates, blast-radius limits, and tested recovery — as the data plane it manages."
+  }
+ ],
+ "technicalDeepDive": "The precipitating defect was a data race in DynamoDB's DNS management control loop. The system splits responsibility between DNS Planners, which generate versioned plans describing the set of IP addresses that should sit behind the regional endpoint, and DNS Enactors, which apply those plans to the authoritative DNS records. The pipeline permitted concurrent Enactors and relied on plan generation numbers to keep them consistent. The failure interleaving was: Enactor A was unusually delayed and, when it finally ran, applied a plan several generations old to the us-east-1 regional endpoint, clobbering the newer plan that had already been applied. Enactor B then executed its cleanup pass, compared generation numbers, saw the plan now on the endpoint was far older than the current generation, and garbage-collected it as stale. Crucially, the cleanup deleted based on generation age without a guard confirming the plan was not the live, in-service record — so deletion stripped every IP from the regional endpoint, yielding an incorrect empty DNS record and total resolution failure for DynamoDB clients in the region. The correct fix class is fencing plus liveness-checked deletion: enforce monotonic last-writer-wins so an older plan can never overwrite a newer one, and never delete a record that is the currently applied plan. Downstream, the cascade exposed two coupling defects. EC2's DropletWorkflow Manager (DWFM) synchronously depends on DynamoDB for droplet-lease state; when reads failed, leases timed out en masse and DWFM entered congestive collapse — a state where the recovery workload itself exceeds capacity, so the system cannot drain its own backlog without external throttling and staged relief (hence AWS's later request-throttle relaxation at 11:23 AM). Separately, NLB's health-checking advertised freshly launched instances into DNS before their network configuration had propagated across the fabric; the resulting health-check oscillation between healthy and failing caused NLB nodes and backend targets to be repeatedly withdrawn from and re-added to DNS, manifesting as connection errors until propagation times normalized at 10:36 AM. The engineering countermeasures — disabling the Planner/Enactor automation worldwide pending a race fix and added incorrect-plan protections, a DWFM recovery test suite, and an NLB velocity-control limiting capacity removal during health-check-driven AZ failover — each target a specific link in this chain.",
+ "references": [
+  {
+   "title": "Summary of the Amazon DynamoDB Service Disruption in the US-East-1 Region (AWS message 101925)",
+   "url": "https://aws.amazon.com/message/101925",
+   "type": "official-postmortem",
+   "accessed": "2026-07-31",
+   "quote": "AWS: \"The root cause of this issue was a latent race condition in the DynamoDB DNS management system that resulted in an incorrect empty DNS record for the service's regional endpoint.\""
+  },
+  {
+   "title": "ThousandEyes: AWS Outage Analysis October 20, 2025",
+   "url": "https://www.thousandeyes.com/blog/aws-outage-analysis-october-20-2025",
+   "type": "news",
+   "accessed": "2026-07-31",
+   "quote": "Analysis tying the disruption to DynamoDB endpoint resolution failure in us-east-1 propagating across dependent services."
+  },
+  {
+   "title": "InfoQ: AWS DynamoDB outage postmortem",
+   "url": "https://www.infoq.com/news/2025/11/aws-dynamodb-outage-postmortem",
+   "type": "news",
+   "accessed": "2026-07-31",
+   "quote": "Coverage of the DNS Enactor race and the DWFM/NLB cascade described in AWS's postmortem."
+  },
+  {
+   "title": "Engadget: AWS outage knocks Alexa, Snapchat, Fortnite, Venmo and more offline",
+   "url": "https://www.engadget.com/big-tech/amazons-aws-outage-has-knocked-services-like-alexa-snapchat-fortnite-venmo-and-more-offline-142935812.html",
+   "type": "news",
+   "accessed": "2026-07-31",
+   "quote": "Report listing knocked-offline services: \"Amazon Alexa, Bank of America, Snapchat, Reddit, Lyft, Apple Music... Fortnite, Roblox... Disney+, Venmo, DoorDash, Hulu... PlayStation, Zoom.\""
+  },
+  {
+   "title": "CNN Business live coverage: Amazon tech outage, Oct 20, 2025",
+   "url": "https://www.cnn.com/business/live-news/amazon-tech-outage-10-20-25-intl",
+   "type": "news",
+   "accessed": "2026-07-31",
+   "quote": "On Snapchat's peak: \"At their peak, the reports numbered over 22,000\"; a Catchpoint executive suggested the toll could \"reach into the hundreds of billions.\""
+  },
+  {
+   "title": "PBS NewsHour: Amazon cloud outage disrupts Snapchat, Ring and many other services",
+   "url": "https://www.pbs.org/newshour/nation/amazon-cloud-computing-outage-disrupts-snapchat-ring-and-many-other-online-services",
+   "type": "news",
+   "accessed": "2026-07-31",
+   "quote": "Press paraphrase: \"Sixty-four internal AWS services were affected\" (not an AWS-stated count)."
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": true,
+  "referenceCount": 6,
+  "lastVerified": "2026-07-31",
+  "confidence": "high"
+ },
+ "lastUpdated": "2026-07-31"
+}
