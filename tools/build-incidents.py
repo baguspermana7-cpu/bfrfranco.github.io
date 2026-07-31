@@ -140,6 +140,13 @@ CSS = r"""
     .vz-hb-val { font-family:'JetBrains Mono',monospace; font-size:10px; fill:var(--muted); }
     .viz-grid3 { display:grid; grid-template-columns:1fr 1fr; gap:0.9rem; }
     @media (max-width:720px){ .viz-grid3 { grid-template-columns:1fr; } }
+    .filterbar { display:flex; flex-wrap:wrap; align-items:center; gap:0.4rem 0.6rem; margin:0.9rem 0 0.2rem; }
+    .fb-group { display:flex; flex-wrap:wrap; gap:0.35rem; }
+    .fb-chip { font-family:'JetBrains Mono',monospace; font-size:0.72rem; padding:0.28rem 0.6rem; border-radius:999px; border:1px solid var(--line); background:var(--surface); color:var(--text-body); cursor:pointer; }
+    .fb-chip:hover { border-color:var(--cyan); }
+    .fb-chip.active { background:var(--cyan); border-color:var(--cyan); color:var(--surface); font-weight:700; }
+    .fb-search { flex:1 1 200px; min-width:160px; font-family:'IBM Plex Sans',sans-serif; font-size:0.82rem; padding:0.3rem 0.6rem; border-radius:8px; border:1px solid var(--line); background:var(--surface); color:var(--text); }
+    .fb-count { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); margin-left:auto; }
     .kv { display:grid; grid-template-columns:180px 1fr; gap:0.5rem 0.9rem; margin-top:0.5rem; font-size:0.9rem; }
     .kv dt { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; }
     .kv dd { margin:0; color:var(--text-body); }
@@ -253,13 +260,57 @@ def cat_chips(cats):
     return "".join(f'<span class="chip {CATEGORY_TONE.get(c,"muted")}">{esc(CATEGORY_LABEL.get(c,c))}</span>' for c in cats)
 
 
+FILTER_JS = r"""<script>
+        (function(){
+          var FAC={power:1,cooling:1,fire:1,flood:1}, LOG={network:1,software:1,human:1};
+          var st={domain:null,cat:null,pm:false,q:''};
+          var bar=document.getElementById('filterbar'), tbl=document.getElementById('incTable'), cnt=document.getElementById('fbCount');
+          if(!bar||!tbl)return;
+          var rows=[].slice.call(tbl.querySelectorAll('tbody tr'));
+          var search=document.getElementById('fbSearch');
+          function apply(){
+            var shown=0;
+            rows.forEach(function(r){
+              var cats=(r.getAttribute('data-cats')||'').split(' ');
+              var ok=true;
+              if(st.cat) ok=ok&&cats.indexOf(st.cat)>=0;
+              if(st.domain){var set=st.domain==='facility'?FAC:LOG; ok=ok&&cats.some(function(c){return set[c];});}
+              if(st.pm) ok=ok&&r.getAttribute('data-pm')==='1';
+              if(st.q) ok=ok&&(r.getAttribute('data-search')||'').indexOf(st.q)>=0;
+              r.style.display=ok?'':'none'; if(ok)shown++;
+            });
+            cnt.textContent=shown+' of '+rows.length+' shown';
+          }
+          bar.addEventListener('click',function(e){
+            var b=e.target.closest('.fb-chip'); if(!b)return;
+            if(b.getAttribute('data-f')==='all'){st.domain=null;st.cat=null;st.pm=false;
+              bar.querySelectorAll('.fb-chip').forEach(function(x){x.classList.remove('active');}); b.classList.add('active'); apply(); return;}
+            bar.querySelector('[data-f=all]').classList.remove('active');
+            if(b.hasAttribute('data-domain')){st.domain=st.domain===b.getAttribute('data-domain')?null:b.getAttribute('data-domain'); st.cat=null;
+              bar.querySelectorAll('[data-cat]').forEach(function(x){x.classList.remove('active');});
+              bar.querySelectorAll('[data-domain]').forEach(function(x){x.classList.toggle('active',x===b&&!!st.domain);});}
+            else if(b.hasAttribute('data-cat')){st.cat=st.cat===b.getAttribute('data-cat')?null:b.getAttribute('data-cat'); st.domain=null;
+              bar.querySelectorAll('[data-domain]').forEach(function(x){x.classList.remove('active');});
+              bar.querySelectorAll('[data-cat]').forEach(function(x){x.classList.toggle('active',x===b&&!!st.cat);});}
+            else if(b.hasAttribute('data-pm')){st.pm=!st.pm; b.classList.toggle('active',st.pm);}
+            if(!st.domain&&!st.cat&&!st.pm&&!st.q) bar.querySelector('[data-f=all]').classList.add('active');
+            apply();
+          });
+          if(search)search.addEventListener('input',function(){st.q=search.value.toLowerCase();apply();});
+          apply();
+        })();
+        </script>"""
+
+
 def render_hub(incidents):
     rows = []
     for i, inc in enumerate(incidents, 1):
         loc = inc.get("location", {})
         loc_s = ", ".join(x for x in [loc.get("city"), loc.get("country")] if x)
         mag = inc["_score"]
-        rows.append(f"""            <tr>
+        cats = inc.get("category", [])
+        search = (inc.get("title", "") + " " + inc.get("operator", "") + " " + inc.get("dcName", "") + " " + (loc.get("country", "") or "")).lower().replace('"', "")
+        rows.append(f"""            <tr data-cats="{esc(' '.join(cats))}" data-score="{mag:.2f}" data-pm="{1 if (inc.get('sourcing',{}) or {}).get('officialPostmortem') or inc.get('officialPostmortem') else 0}" data-search="{esc(search)}">
                 <td><span class="rank-badge">#{i}</span></td>
                 <td><a href="incident-{esc(inc['slug'])}.html">{esc(inc['title'])}</a>
                     <div style="font-size:0.78rem;color:var(--muted)">{esc(inc.get('operator',''))}</div></td>
@@ -286,8 +337,27 @@ def render_hub(incidents):
         </div>
 
         <h2>All incidents</h2>
+        <div class="filterbar" id="filterbar">
+            <div class="fb-group" role="group" aria-label="Filter by domain">
+                <button class="fb-chip active" data-f="all">All</button>
+                <button class="fb-chip" data-domain="facility" title="Power · cooling · fire · flood">Facility</button>
+                <button class="fb-chip" data-domain="logical" title="Network · software · human error">Network / logical</button>
+                <button class="fb-chip" data-pm="1" title="Has an official post-mortem / regulatory report">Official RCA</button>
+            </div>
+            <div class="fb-group" role="group" aria-label="Filter by category">
+                <button class="fb-chip" data-cat="power">Power</button>
+                <button class="fb-chip" data-cat="cooling">Cooling</button>
+                <button class="fb-chip" data-cat="fire">Fire</button>
+                <button class="fb-chip" data-cat="network">Network</button>
+                <button class="fb-chip" data-cat="software">Software</button>
+                <button class="fb-chip" data-cat="human">Human error</button>
+                <button class="fb-chip" data-cat="flood">Flood</button>
+            </div>
+            <input class="fb-search" id="fbSearch" type="search" placeholder="Search operator / DC / country…" aria-label="Search incidents">
+            <span class="fb-count" id="fbCount"></span>
+        </div>
         <div class="table-wrap">
-            <table class="inc-index">
+            <table class="inc-index" id="incTable">
                 <thead><tr><th>Rank</th><th>Incident</th><th>Date</th><th>DC / Location</th><th>Category</th><th>Duration · Magnitude</th><th>Brief</th></tr></thead>
                 <tbody>
 {chr(10).join(rows)}
@@ -295,6 +365,7 @@ def render_hub(incidents):
             </table>
         </div>
         <p class="disclaimer">Ranking is a transparent composite of sourced sub-scores (blast radius 35% · users 25% · financial 20% · duration 20%). Summaries are original and substantially shorter than their sources; short attributed excerpts on each incident page are provenance only. This library is for engineering education and does not reproduce source material in full.</p>
+        {FILTER_JS}
 """
     return page_shell("DC Incidents — Case Library", "Root-only ranked library of major data-center and cloud incidents with full RCA, COE, SOE and lessons learnt, each source-cited.", "dc-incidents.html", body, base="")
 
