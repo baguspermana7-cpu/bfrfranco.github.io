@@ -229,6 +229,11 @@ window.RZ_FEATURE_FLAGS = {
     'page-access':             { free: false, demo: false, pro: false, root: true }
   },
 
+  /* ── DC Incidents dossier (ROOT-ONLY: post-incident case library) ────────── */
+  'dc-incidents': {
+    'page-access':             { free: false, demo: false, pro: false, root: true }
+  },
+
   /* ── DC Conventional ──────────────────────────────────────────────────── */
   'dc-conventional': {
     'page-access':             { free: false, demo: false, pro: true, root: true  },

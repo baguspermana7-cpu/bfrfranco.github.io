@@ -319,6 +319,10 @@ export default function StrategicPlanningDashboard() {
         const targetPUE = getPUE(inputs.coolingType);
         return { landAreaM2, gridCapacityMW, climateZone, targetPUE };
     }, [activeSite, selectedCountry, inputs.coolingType]);
+    // Feasibility land+grid are SOURCED from Site Intelligence (single-source, never
+    // re-entered here). Without a site there is no phantom editable seed — show an
+    // empty state instead. (#335 dedup — owner: "kenapa ada isian ini")
+    const hasSiteData = derivedFeas.landAreaM2 != null && derivedFeas.gridCapacityMW != null;
     const derivedExp = useMemo(() => {
         const y0 = inputs.itLoad / 1000;
         const y5 = req.growth.itLoadMwByYear.y5 || 0;
@@ -618,7 +622,23 @@ export default function StrategicPlanningDashboard() {
             </div>
 
             {/* ── FEASIBILITY MODE ── */}
-            {mode === 'feasibility' && (
+            {mode === 'feasibility' && !hasSiteData && (
+                <div className="bg-white dark:bg-slate-900/50 border border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-8 text-center">
+                    <Building className="w-8 h-8 text-slate-400 mx-auto mb-3" />
+                    <h3 className="font-semibold text-slate-700 dark:text-slate-200 text-sm mb-1">Select a site to run feasibility</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
+                        Land area and grid capacity are <b>sourced from Site Intelligence</b> — they are not entered
+                        here (single-source). Pick or add a site with usable acreage and available grid capacity, and
+                        this feasibility analysis fills in automatically.
+                    </p>
+                    <button
+                        onClick={() => useSimulationStore.getState().actions.setActiveTab('site' as never)}
+                        className="mt-4 rounded-lg bg-rz-data/10 px-3 py-1.5 text-xs font-semibold text-rz-data hover:bg-rz-data/20">
+                        Go to Site Intelligence ↗
+                    </button>
+                </div>
+            )}
+            {mode === 'feasibility' && hasSiteData && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Inputs */}
                     <div className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-5 space-y-5">
@@ -636,8 +656,8 @@ export default function StrategicPlanningDashboard() {
                                 type="number"
                                 className="w-full p-2 border rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700"
                                 value={feasibility.landAreaM2}
-                                disabled={derivedFeas.landAreaM2 != null}
-                                title={derivedFeas.landAreaM2 != null ? 'Derived from Site Intelligence — edit it there (#335 dedup)' : undefined}
+                                disabled
+                                title="Derived from Site Intelligence — edit it there (#335 dedup, single-source)"
                                 onChange={e => setFeasibility(f => ({ ...f, landAreaM2: Number(e.target.value) }))}
                             />
                             <div className="text-[10px] text-slate-400 mt-0.5">Hall floor approx: {Math.round(feasibility.landAreaM2 * 0.40).toLocaleString()} m²</div>
@@ -652,8 +672,8 @@ export default function StrategicPlanningDashboard() {
                                 type="number"
                                 className="w-full p-2 border rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700"
                                 value={feasibility.gridCapacityMW}
-                                disabled={derivedFeas.gridCapacityMW != null}
-                                title={derivedFeas.gridCapacityMW != null ? 'Derived from Site Intelligence — edit it there (#335 dedup)' : undefined}
+                                disabled
+                                title="Derived from Site Intelligence — edit it there (#335 dedup, single-source)"
                                 onChange={e => setFeasibility(f => ({ ...f, gridCapacityMW: Number(e.target.value) }))}
                             />
                         </div>
@@ -666,8 +686,8 @@ export default function StrategicPlanningDashboard() {
                             <select
                                 className="w-full p-2 border rounded-lg text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white border-slate-300 dark:border-slate-700"
                                 value={feasibility.climateZone}
-                                disabled={derivedFeas.climateZone != null}
-                                title={derivedFeas.climateZone != null ? 'Derived from country/site — edit it there (#335 dedup)' : undefined}
+                                disabled
+                                title="Derived from the site / country — edit it there (#335 dedup, single-source)"
                                 onChange={e => setFeasibility(f => ({ ...f, climateZone: e.target.value as FeasibilityInputs['climateZone'] }))}
                             >
                                 {(Object.keys(CLIMATE_LABELS) as FeasibilityInputs['climateZone'][]).map(z => (
@@ -683,9 +703,10 @@ export default function StrategicPlanningDashboard() {
                             </label>
                             <input
                                 type="range" min={1.10} max={2.0} step={0.05}
-                                className="w-full accent-cyan-500"
+                                className="w-full accent-cyan-500 disabled:opacity-60 disabled:cursor-not-allowed"
                                 value={feasibility.targetPUE}
-                                onChange={e => setFeasibility(f => ({ ...f, targetPUE: Number(e.target.value) }))}
+                                disabled
+                                title="Derived from the engine PUE (cooling type) — change it in Requirements (#335 dedup, single-source)"
                             />
                             <div className="flex justify-between text-[10px] text-slate-400">
                                 <span>1.10 (Excellent)</span>

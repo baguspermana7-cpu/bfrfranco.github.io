@@ -207,6 +207,12 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
     const yearMult = cd.yearEscalation?.[projYear] ?? yearEscalation[projYear]?.mult ?? 1.0;
     const globalMult = yearMult; // Simplified for now
 
+    // Rack form factor (42U std / 48U dense / OCP 21" open) — a REAL cost driver:
+    // it scales required white-space floor area, so it multiplies the space-driven
+    // `building` (shell + civil) category, not just the reported floorSpace metric.
+    // std42u 1.0 baseline · 48U denser → 0.90× · OCP open → 1.15×. (#C-03 fix)
+    const rackFormFactor: number = ((rzData() as any)?.requirements?.rackFormFactor?.[input.rackForm ?? 'std42u']) ?? 1.0;
+
     // 2. Calculate Hard Costs
     const costs: Record<string, number> = {};
     let totalHardCost = 0;
@@ -220,7 +226,7 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
         const landedFactor = (rzModels() as any)?.supplyChain?.landedFactor ? (rzModels() as any).supplyChain.landedFactor(country ?? null, key) : 1.0;
         multiplier *= landedFactor;
 
-        if (key === 'building') multiplier *= buildMult * rackMult;
+        if (key === 'building') multiplier *= buildMult * rackMult * rackFormFactor;
         else if (key === 'seismic') multiplier *= seismicMult * buildMult;
         else if (key === 'electrical') multiplier *= redMult * rackMult * upsMult * powerUplift;
         else if (key === 'ups') multiplier *= redMult * rackMult * upsMult * powerUplift;
@@ -328,10 +334,7 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
     // A8: PUE from shared constants (modern 2025 standards)
     const pue = getPUE(coolingType);
     const annualEnergy = itLoad * pue * 8760 * 0.10; // Global avg estimate; country-specific rate used in SensitivityEngine
-    // Workstream C — rack form factor drives floor-space m²/rack (48U tall packs
-    // denser → 0.90×; OCP 21" open rack → 1.15×). Engine DATA.requirements.rackFormFactor.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const rackFormFactor: number = ((rzData() as any)?.requirements?.rackFormFactor?.[input.rackForm ?? 'std42u']) ?? 1.0;
+    // rackFormFactor now defined before the hard-cost loop (wired into `building`).
     const floorSpace = Math.ceil(racks * 2.5 * rackFormFactor); // 2.5 m2 per rack × form factor
 
     // Compute Timeline

@@ -13,6 +13,14 @@ release sections rather than semver.
 
 ---
 
+## v1.120.0 — 2026-07-31 (DC Incidents dossier — root-gated case library, Phase A foundation)
+
+### Added
+- **DC Incidents — Case Library** (`dc-incidents.html`), a **root-only** knowledge base of major data-center / cloud incidents worldwide. Ranked hub (transparent magnitude composite: blast radius 35% · users 25% · financial 20% · duration 20%) → each incident opens a dedicated dossier page (`incident-<slug>.html`) with a full **sequence of events (SOE)**, root cause, **correction of errors (COE)**, contributing factors, lessons learnt, engineering improvements, technical deep-dive, and a **provenance-mandatory** reference list (every fact traces to a public post-incident report).
+- **Data-driven build:** `data/incidents/*.json` corpus → `tools/build-incidents.py` renders the hub + all incident pages from one audit-passing template (gate markup, dark palette, mobile patch, version stamp, cookie consent). New ship gate `tools/test-incidents-corpus.mjs` rejects any incident missing sourcing/SOE/COE/≥2 references.
+- **Gating + landing padlock:** root-only `page-access` feature flag `dc-incidents`; `enforceTierFeatureAccess('dc-incidents')` on every page; `/dc-incidents.html` added to `ROOT_ONLY_PATHS`; a **🔒 DC Incidents** entry on the landing-page menu. Anonymous visitors see the locked overlay; root accounts see the content (verified headless).
+- **Phase A reference incident:** AWS S3 US-EAST-1 (28 Feb 2017) — the archetype of COE/SOE post-incident culture — hand-built from the official AWS postmortem. Gated pages are intentionally excluded from the public sitemap / llms / search-index. Gates green: page-gates, dark-coverage, responsive-layout, mobile-responsive, version-stamp, script-tags, incidents-corpus.
+
 ## v1.119.1 — 2026-07-27 (DCMOC — OPEX-breakdown deferred-engine race hardening)
 
 ### Fixed

@@ -224,7 +224,9 @@
     var ROOT_ONLY_PATHS = [
         '/dc-market',
         '/dc-market-tracker.html',
-        '/dcmoc'
+        '/dcmoc',
+        '/dc-incidents.html',
+        '/incident-'
     ];
     function isRootOnlyHref(href) {
         var path = normalizePathFromHref(href);
