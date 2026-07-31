@@ -26,6 +26,9 @@ import { densityToEngineBucket } from '@/lib/requirementsMappings';
 /* EB-cov wave (trace-coverage ≥60% of core pages) — live readers */
 import { useOpsLog } from '@/store/opsLog';
 import { getPUE } from '@/constants/pue';
+// Single-source the results-dimension scoring: use the SAME helpers ResultsEnginePage
+// renders with, so the ƒx trace popover can never drift from the displayed score.
+import { capexScoreOf, susScoreOf, finScoreOf, constrScoreOf, opsScoreOf, archScoreOf, finScreening } from '@/components/modules/results/dimension-explain';
 import { riskBand } from '@/state/adapters/capex-adapter';
 import { sanitizeCap, facilitySnapshot, utilization, forecastSeries, type UtilRow } from '@/state/adapters/capacity-adapter';
 import { calculateFinancials, defaultOccupancyRamp, type FinancialResult } from '@/modules/analytics/FinancialEngine';
@@ -640,7 +643,7 @@ export const TRACE: Record<string, TraceNode> = {
     },
     'results.finScore': {
         label: 'Financial Score', page: 'report', unit: '/100', provenance: 'derived',
-        formulaTemplate: 'clamp(50 + (15-yr screening IRR − 10% hurdle) × 400, 10–100) — IRR = models.roi.irr(year-0 −capex.total; annual flow = revenue sim.itLoad × revenuePerKwMonth − dcContract opex)',
+        formulaTemplate: 'finScoreOf(IRR) — shared with the Results page: IRR = finScreening(sim.itLoad, PUE, country, capex.total) 15-yr screening cashflow vs the 10% hurdle',
         deps: ['capex.total', 'sim.itLoad'],
         get: () => resultsDims()?.finScore ?? null,
     },
@@ -1475,38 +1478,31 @@ function resultsDims(): { capexScore: number; susScore: number; finScore: number
         let siteScore = 50;
         try { siteScore = Math.round(scoreAllSites(useSitesStore.getState().sites)[0]?.engine.score ?? 50); } catch { /* */ }
         // Architecture: 100 − 0.35 × complexity index
+        // All dim scores below use the SAME dimension-explain helpers + finScreening
+        // the ResultsEnginePage renders with — so the trace can't drift from the card.
         let archScore = 60;
         try {
             const c = M.architecture?.complexity?.({ coolingType: i.coolingType, tier: i.tierLevel, redundancy: i.powerRedundancy === 'N+1' ? 'n1' : i.powerRedundancy === '2N' ? '2n' : '2n1' });
-            archScore = c ? Math.round(100 - c.index * 0.35) : 60;
+            if (c) archScore = archScoreOf(c.index);
         } catch { /* */ }
-        // CAPEX: $/kW vs reference band
+        // CAPEX: $/kW vs reference band (shared capexScoreOf)
         const perKw = capexRes.metrics?.perKw ?? Math.round(capexRes.total / Math.max(1, i.itLoad));
         const band = D.commissioning?.cx?.rich?.capexPerKw?.standard ?? 10500;
-        const capexScore = Math.round(Math.max(10, Math.min(100, 100 - ((perKw - band * 0.6) / (band * 0.8)) * 60)));
+        const capexScore = capexScoreOf(perKw, band);
         // Construction: SPI/CPI blend (Plan Mode → 100)
         const cp = constrPlan();
-        const constrScore = cp ? Math.min(100, Math.round(50 * Math.min(1.2, cp.e.spi) + 50 * Math.min(1.2, cp.e.cpi))) : 100;
-        // Ops readiness: tier availability positioned on the Uptime Institute
-        // band 99.700–99.995% (parity pair with dimension-explain opsScoreOf)
+        const constrScore = cp ? constrScoreOf(cp.e.spi, cp.e.cpi) : 100;
+        // Ops readiness: tier availability (shared opsScoreOf)
         const tierAvail = D.reliability?.tierAvailability ?? {};
-        const opsScore = Math.max(0, Math.min(100, Math.round((((tierAvail[String(i.tierLevel)] ?? 0.9998) - 0.997) / (0.99995 - 0.997)) * 100)));
-        // Sustainability: PUE band 1.10–1.60
-        const pue = D.pueMatrix?.[i.coolingType]?.['tier' + i.tierLevel];
-        const susScore = pue != null ? Math.round(Math.max(0, Math.min(100, ((1.6 - pue) / 0.5) * 100))) : 60;
-        // Financial: IRR screening vs 10% hurdle
+        const opsScore = opsScoreOf((tierAvail as Record<string, number>)[String(i.tierLevel)] ?? 0.9998);
+        // Sustainability: PUE band 1.10–1.60 (shared susScoreOf; getPUE fallback like the page)
+        const pue = D.pueMatrix?.[i.coolingType]?.['tier' + i.tierLevel] ?? getPUE(i.coolingType);
+        const susScore = susScoreOf(pue);
+        // Financial: IRR screening vs 10% hurdle — SAME finScreening + finScoreOf as the page
         let finScore = 60;
         try {
-            if (M.roi?.npv) {
-                const revenue = (D.decision?.revenuePerKwMonth ?? DEFAULT_REVENUE_PER_KW_MONTH) * i.itLoad * 12;
-                let opexAnnual = revenue * 0.4;
-                try {
-                    if (M.opex?.totalAnnual) opexAnnual = M.opex.totalAnnual(i.itLoad / 1000, pue ?? 1.3, country?.id ?? 'US', 12, { capex: capexRes.total, basisPreset: 'dcContract' }).total;
-                } catch { /* keep 40% proxy */ }
-                const flows = Array.from({ length: 15 }, () => revenue - opexAnnual);
-                const irr = M.roi.irr ? M.roi.irr([-capexRes.total, ...flows]) : null;
-                finScore = Math.round(Math.max(10, Math.min(100, 50 + (irr != null ? (irr - 0.10) * 400 : 0))));
-            }
+            const fin = finScreening(i.itLoad, pue, country?.id ?? 'US', capexRes.total);
+            if (fin) finScore = finScoreOf(fin.irr);
         } catch { /* */ }
         const dims = [
             { s: reqScore, w: 0.12 }, { s: siteScore, w: 0.13 }, { s: archScore, w: 0.12 }, { s: capexScore, w: 0.13 },

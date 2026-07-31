@@ -13,6 +13,17 @@ release sections rather than semver.
 
 ---
 
+## v1.121.4 — 2026-08-01 (DCMOC — Results trace-parity drift fixed, 116/116)
+
+### Fixed
+- **Results-page ƒx traces drifted from the displayed score** (`value-trace.ts resultsDims()`).
+  The reader re-implemented each dimension score with hand-copied formulas that had diverged
+  from `ResultsEnginePage`'s shared `dimension-explain` helpers — so the ƒx popover showed
+  `results.score` 70 vs the card's 77, and `results.finScore` 50 vs 100. Now `resultsDims()`
+  imports and calls the SAME helpers (`capexScoreOf/susScoreOf/finScoreOf/constrScoreOf/
+  opsScoreOf/archScoreOf` + `finScreening`) the page renders with — single-source, so the
+  trace can no longer drift. **trace-parity gate back to 116/116 (was 114/116).**
+
 ## v1.121.3 — 2026-08-01 (DCMOC tooltip wave 3 + Site-Intelligence ƒx traces — doc catch-up)
 
 Documents DCMOC coverage work that shipped live (swept into an interleaved commit by a
