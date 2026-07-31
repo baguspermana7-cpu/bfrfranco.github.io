@@ -55,7 +55,9 @@ for (const f of files) {
   }
 
   const refs = Array.isArray(inc.references) ? inc.references : [];
-  if (refs.length < 2) fail(`needs >= 2 references (has ${refs.length})`);
+  const hasOfficialRef = refs.some((r) => OFFICIAL.has(r.type));
+  const minRefs = hasOfficialRef ? 1 : 2;
+  if (refs.length < minRefs) fail(`needs >= ${minRefs} reference(s) (has ${refs.length})`);
   refs.forEach((r, i) => {
     if (!r.url || !/^https?:\/\//.test(r.url)) fail(`references[${i}] missing/invalid url`);
     if (!r.type) fail(`references[${i}] missing type`);

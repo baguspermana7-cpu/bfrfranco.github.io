@@ -1,0 +1,331 @@
+{
+ "slug": "azure-front-door-config-change-2025",
+ "title": "Azure Front Door Global Outage: Inadvertent Cross-Build Config Change Trips Latent Data-Plane Crash Bug (29 Oct 2025)",
+ "operator": "Microsoft Azure",
+ "dcName": "Azure Front Door global edge fleet",
+ "location": {
+  "country": "Global",
+  "region": "AMER"
+ },
+ "date": "2025-10-29",
+ "durationMin": 504,
+ "category": [
+  "software",
+  "human"
+ ],
+ "severity": {
+  "usersAffected": "Not quantified by Microsoft. Global blast radius: the crash replicated across all Azure Front Door edge sites worldwide, degrading Microsoft-first-party and customer properties fronted by AFD. Microsoft's authoritative PIR publishes no affected-user or affected-tenant count.",
+  "impactUsd": "Not published by Microsoft; no financial figure appears in the authoritative PIR.",
+  "servicesDown": [
+   "Azure Portal",
+   "Microsoft 365",
+   "Outlook",
+   "Xbox Live",
+   "Microsoft Copilot",
+   "Minecraft",
+   "Azure Communication Services",
+   "many downstream customer sites fronted by AFD"
+  ],
+  "tier": "Critical - global edge/control-plane outage affecting first-party and customer traffic"
+ },
+ "brief": "On 29 October 2025 an inadvertent customer configuration change to Azure Front Door (AFD) — Microsoft's global edge/CDN and traffic-routing layer — generated incompatible configuration metadata because the change sequence spanned two different control-plane build versions. That metadata exposed a latent bug in the AFD data plane, causing nodes to crash during asynchronous processing as the bad config propagated. A deployment protection safeguard activated and blocked further new changes, but it could not stop the already-propagated config: the crash surfaced asynchronously, after propagation, rather than synchronously at deploy time. Within roughly four minutes the config reached a majority of edge sites and within roughly ten minutes the crash had replicated across all edge sites globally. Recovery was complicated because the Last Known Good (LKG) snapshot had itself been updated with the corrupted config; Microsoft recovered by manually editing the latest LKG to strip the offending customer entries — deliberately declining a clean rollback — then redeploying, blocking further customer config propagation, and failing the Azure Portal away from AFD. Customer impact ran from 15:41 UTC on 29 Oct to mitigation at 00:05 UTC on 30 Oct, about 8.5 hours.",
+ "magnitude": {
+  "usersScore": 9,
+  "financialScore": 7,
+  "durationScore": 6,
+  "blastRadiusScore": 10,
+  "note": "Blast radius is maximal (10): the crash reached every AFD edge site globally within ~10 minutes, taking down a shared control/edge layer beneath both Microsoft-first-party services and countless customer sites. Users score is very high (9) given global consumer + enterprise reach, though Microsoft published no user count. Duration (6) reflects ~8.5 hours to mitigation — long for a control-plane fault but bounded. Financial (7) is an analyst estimate only: no monetary figure appears in the PIR, so this reflects the evident scale of a global multi-service outage, not a sourced number."
+ },
+ "sequenceOfEvents": [
+  {
+   "t": "2025-10-29T15:35:00Z",
+   "phase": "Trigger",
+   "event": "Corrupt/incompatible configuration metadata is introduced. An inadvertent customer configuration change, executed as a sequence spanning two different control-plane build versions, generates configuration metadata that is internally incompatible.",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "t": "2025-10-29T15:39:00Z",
+   "phase": "Escalation",
+   "event": "The configuration carrying the incompatible metadata completes propagation to a majority of AFD edge sites — roughly four minutes after introduction.",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "t": "2025-10-29T15:41:00Z",
+   "phase": "Impact",
+   "event": "Customer impact begins as edge nodes, unable to load the inconsistent configuration, start crashing during asynchronous processing in the data plane.",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "t": "2025-10-29T15:43:00Z",
+   "phase": "Escalation",
+   "event": "The configuration protection system activates and blocks new configuration changes — but it does not stop the already-propagated incompatible metadata from crashing nodes, because that failure surfaces asynchronously after propagation rather than synchronously at deploy time, so the safeguard has no synchronous failure signal to act on.",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "t": "2025-10-29T15:45:00Z",
+   "phase": "Cascade",
+   "event": "The crash has replicated across all AFD edge sites globally — roughly ten minutes after the corrupt metadata was introduced. The outage is now worldwide.",
+   "source": "Azure PIR YKYN-BWZ (15:45 inferred: not an explicit PIR timeline row, which runs 15:43 to 15:48; = introduction 15:35 + ~10 min global-replication figure)"
+  },
+  {
+   "t": "2025-10-29T15:48:00Z",
+   "phase": "Detection",
+   "event": "Investigation commences, following monitoring alerts.",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "t": "2025-10-29T16:15:00Z",
+   "phase": "Diagnosis",
+   "event": "Investigation narrows and focuses on AFD configuration changes as the cause.",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "t": "2025-10-29T16:18:00Z",
+   "phase": "Diagnosis",
+   "event": "Initial public communication is posted to the status page.",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "t": "2025-10-29T16:20:00Z",
+   "phase": "Diagnosis",
+   "event": "Targeted Azure Service Health notifications are sent to affected customers.",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "t": "2025-10-29T17:10:00Z",
+   "phase": "Mitigation",
+   "event": "Teams begin updating the Last Known Good (LKG) configuration — manually editing the latest LKG to remove the problematic customer configurations rather than rolling back to a prior version.",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "t": "2025-10-29T17:26:00Z",
+   "phase": "Mitigation",
+   "event": "The Azure Portal is failed away from AFD, restoring an access path for operators and customers independent of the failing edge layer.",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "t": "2025-10-29T17:30:00Z",
+   "phase": "Mitigation",
+   "event": "All customer configuration propagation to the data plane is blocked to prevent any further bad config from spreading during recovery.",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "t": "2025-10-29T17:40:00Z",
+   "phase": "Mitigation",
+   "event": "Deployment of the corrected (edited-LKG) configuration is initiated.",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "t": "2025-10-29T17:50:00Z",
+   "phase": "Recovery",
+   "event": "The corrected LKG configuration is available to all edge sites.",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "t": "2025-10-29T18:30:00Z",
+   "phase": "Recovery",
+   "event": "AFD DNS servers recover and manual traffic rebalancing begins.",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "t": "2025-10-29T20:20:00Z",
+   "phase": "Recovery",
+   "event": "Traffic handling is switched back to automatic traffic management as the fleet stabilizes.",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "t": "2025-10-30T00:05:00Z",
+   "phase": "Restored",
+   "event": "AFD impact is confirmed fully mitigated and availability returns to pre-incident levels — approximately 8.5 hours after customer impact began.",
+   "source": "Azure PIR YKYN-BWZ"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Total incident duration (impact to mitigation)",
+   "value": "~8.5 hours (15:41 UTC 29 Oct to 00:05 UTC 30 Oct; 504 min)",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "label": "Time from corrupt metadata to customer impact",
+   "value": "~6 minutes (15:35 to 15:41 UTC)",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "label": "Propagation to a majority of edge sites",
+   "value": "~4 minutes (by 15:39 UTC)",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "label": "Global crash replication across all edge sites",
+   "value": "~10 minutes (by ~15:45 UTC, inferred)",
+   "source": "Azure PIR YKYN-BWZ (15:45 inferred = 15:35 + ~10 min; not an explicit PIR timeline row)"
+  },
+  {
+   "label": "Config propagation time (pre-incident baseline; targeted reduction)",
+   "value": "45 minutes today, target ~15 minutes by Jan 2026",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "label": "Data-plane recovery time (completed improvement; further target)",
+   "value": "Improved to ~1 hour (completed); target ~10 minutes by Mar 2026",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "label": "Quantitative blast-radius metrics published by Microsoft",
+   "value": "None - no node %, error rate, availability figure, or affected-customer count in the PIR (only qualitative 'majority'/'all edge sites')",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "label": "Third-party outage reports (NOT in Microsoft PIR - unverified)",
+   "value": "30,000+ reports in the first hour (Downdetector, per seed brief); treat as unsourced-from-Microsoft",
+   "source": "Seed brief / Downdetector - third-party, unverified"
+  }
+ ],
+ "rootCause": "An inadvertent customer configuration change — not a malicious act and not a single bad push — was performed as a sequence spanning two different AFD control-plane build versions, which produced incompatible customer configuration metadata. That incompatible metadata exposed a latent bug in the AFD data plane, triggering a crash during asynchronous processing as the config propagated. The defect escaped pre-production validation because not all features are validated across different control-plane build versions (a version-coverage gap). The deployment protection system did activate and blocked further new changes, but it could not stop the change that had already propagated, because the crash surfaced asynchronously — after propagation — rather than synchronously at deploy time, leaving the safeguard no synchronous failure signal to act on. In short: control-plane cross-version metadata incompatibility → latent data-plane crash bug, undetected by a version-coverage gap in validation and unblocked by the safeguards due to async failure timing.",
+ "contributingFactors": [
+  "Pre-production validation did not cover all features across different control-plane build versions, leaving a version-coverage gap through which the incompatible metadata passed undetected.",
+  "The data-plane defect manifested asynchronously (after propagation) rather than synchronously at deploy time, so although the deployment protection system did activate at 15:43 UTC and block subsequent new changes, it had no synchronous failure signal by which to stop the already-propagated bad configuration.",
+  "The Last Known Good (LKG) configuration snapshot was itself inadvertently updated with the corrupted configuration, which is why recovery required manually editing the latest LKG to strip the offending entries rather than cleanly reverting to a prior good snapshot.",
+  "Configuration processing was coupled to traffic-serving instances and lacked per-config synchronous validation before production stages, so a single bad config could crash the nodes serving traffic.",
+  "Fast, broadly-scoped propagation (majority of edge sites in ~4 minutes, all sites in ~10 minutes) gave no bake time or containment, converting a single change into a global fault almost immediately.",
+  "Critical infrastructure — Azure Portal, Communication Services, Marketplace, and support systems — single-depended on AFD, so the edge failure also degraded the very tools needed to observe and recover from it.",
+  "A latent bug in the data plane had never been exercised until the specific cross-version metadata condition occurred, making it invisible under normal operations."
+ ],
+ "coe": [
+  {
+   "action": "Recovery method: deliberately chose NOT to roll back to prior LKG versions (for stability reasons, and because the latest LKG had itself been contaminated) and instead manually edited the latest LKG to remove the problematic customer configurations, then redeployed.",
+   "owner": "Azure Front Door engineering",
+   "status": "Completed (during incident)",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "action": "Fixed the control-plane cross-version incompatibility and the underlying data-plane crash bug.",
+   "owner": "Azure Front Door engineering",
+   "status": "Completed",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "action": "Enforced synchronous processing of each configuration before it reaches production stages, so a defective config fails validation up front instead of crashing serving nodes asynchronously.",
+   "owner": "Azure Front Door engineering",
+   "status": "Completed",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "action": "Added phased rollout stages with extended bake time so configuration changes are exposed gradually and caught before global reach.",
+   "owner": "Azure Front Door engineering",
+   "status": "Completed",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "action": "Migrated critical infrastructure (Azure Portal, Communication Services, Marketplace, support systems) to active-active failover so they no longer single-depend on AFD.",
+   "owner": "Azure platform engineering",
+   "status": "Completed",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "action": "Improved data-plane recovery time to approximately one hour.",
+   "owner": "Azure Front Door engineering",
+   "status": "Completed",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "action": "Expand automated Service Health alerts and resolve Premier/Unified customer support-request issues (enabling failover to backup support systems).",
+   "owner": "Azure platform engineering",
+   "status": "Planned - target Nov 2025",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "action": "Decouple config processing into isolated worker instances (separate from traffic-serving instances) and reduce config propagation time from 45 minutes to approximately 15 minutes.",
+   "owner": "Azure Front Door engineering",
+   "status": "Planned - target Jan 2026",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "action": "Enhance backwards-compatibility testing across control-plane build versions to close the version-coverage validation gap.",
+   "owner": "Azure Front Door engineering",
+   "status": "Planned - target Feb 2026",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "action": "Further reduce data-plane recovery time to approximately 10 minutes.",
+   "owner": "Azure Front Door engineering",
+   "status": "Planned - target Mar 2026",
+   "source": "Azure PIR YKYN-BWZ"
+  },
+  {
+   "action": "Implement 'micro-cell' segmentation for customer isolation so a single customer's configuration cannot fault the shared fleet globally.",
+   "owner": "Azure Front Door engineering",
+   "status": "Planned - target Jun 2026",
+   "source": "Azure PIR YKYN-BWZ"
+  }
+ ],
+ "lessonsLearnt": [
+  "A protection safeguard that only inspects failures synchronously at deploy time is blind to defects that manifest asynchronously after propagation; here the safeguard activated and blocked new changes yet still could not stop the fault, because it had no synchronous signal for an async crash. Safeguards must be designed around the failure timing of the fault they are meant to catch, not just the happy-path deploy moment.",
+  "Validation coverage must explicitly span the combinations that occur in production — here, config sequences crossing two different control-plane build versions — because any untested version combination is an open door for incompatible state.",
+  "Shared global control/edge planes with fast, broad propagation turn a single inadvertent change into an immediate worldwide event; blast radius is a direct function of propagation speed and scope, so bake time and staging are load-bearing controls, not niceties.",
+  "Recovery and observability tooling (portal, support, comms) must not single-depend on the very layer that can fail; when the edge went down it also took the operators' recovery surfaces with it until the Portal was failed away.",
+  "Rolling back is not always the safest recovery path: with the latest LKG itself contaminated, Microsoft found manually editing it to strip the bad config more stable than reverting to older versions — recovery strategy should be chosen for stability and current state, not reflex."
+ ],
+ "improvements": [
+  "Synchronous per-config validation before production plus phased rollout with extended bake time, so a defective configuration is rejected up front and, if it slips through, is contained to a small stage rather than the global fleet.",
+  "Backwards-compatibility testing across control-plane build versions to eliminate the version-coverage gap that let the incompatible metadata escape detection.",
+  "Decoupling config processing into isolated worker instances separate from traffic-serving nodes, so a config-processing crash cannot take down request serving.",
+  "Reducing config propagation time (45 to ~15 minutes) and data-plane recovery time (to ~1 hour today, targeting ~10 minutes) to shrink both exposure and time-to-mitigate.",
+  "Active-active failover for Azure Portal, Communication Services, Marketplace, and support systems, removing their single dependency on AFD.",
+  "Micro-cell segmentation for customer isolation so one tenant's configuration cannot propagate a fault across the shared global fleet."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "Failure mechanism: cross-version metadata meets a latent crash bug",
+   "body": "The trigger was not a corrupt push in the conventional sense but a legitimate-looking customer configuration change whose steps happened to span two different AFD control-plane build versions. That version-straddling sequence emitted configuration metadata that was internally incompatible. When AFD nodes attempted to load and asynchronously process this metadata, it drove them into a previously latent data-plane defect that crashed the process. The bug had presumably existed dormant for some time; it required this specific, rare cross-version condition to be exercised for the first time, which is precisely why routine operation and standard validation had never surfaced it."
+  },
+  {
+   "heading": "Why it cascaded globally in minutes",
+   "body": "AFD is a single shared global edge and traffic-routing plane, and its configuration distribution is fast and broadly scoped. The incompatible config reached a majority of edge sites within about four minutes (15:39 UTC) and the resulting crash had replicated across all edge sites worldwide within about ten minutes (by ~15:45 UTC, inferred from the PIR's ~10-minute figure). There was effectively no bake time and no staging boundary to arrest the spread, so a single inadvertent change became a worldwide outage almost instantly. The deployment protection system did activate at 15:43 UTC and blocked new changes, but because the crash surfaced asynchronously after propagation rather than synchronously at deploy, the safeguard had no synchronous failure signal to block on and the already-propagated change was not stopped."
+  },
+  {
+   "heading": "Recovery: edit-forward instead of roll-back",
+   "body": "Microsoft's recovery choice is instructive. Because the latest Last Known Good configuration had itself been updated with the corrupted config, and because reverting to older versions carried its own stability risk, engineers judged that manually editing the latest LKG to strip out the offending customer configurations was the more stable path, and redeployed that. In parallel they blocked all customer config propagation at 17:30 UTC to prevent any further bad state from spreading, and failed the Azure Portal away from AFD at 17:26 UTC to restore an operator/customer access path independent of the failing layer. The corrected config reached all edge sites by 17:50 UTC, DNS recovered by 18:30 UTC, automatic traffic management resumed at 20:20 UTC, and full mitigation was declared at 00:05 UTC on 30 Oct."
+  },
+  {
+   "heading": "Organizational and systemic factors",
+   "body": "Two systemic weaknesses converted a routine change into a global incident. First, a validation coverage gap: not all features were validated across different control-plane build versions, so the incompatible-metadata condition was simply outside the test matrix. Second, an architectural coupling: config processing ran on the same instances that served traffic, and critical recovery tooling (Portal, Communications, Marketplace, support) single-depended on AFD, so the failure degraded the very systems needed to observe and recover from it. The remediation roadmap targets both classes directly — synchronous isolated config workers, backwards-compatibility testing across versions, active-active failover for critical infra, and micro-cell segmentation for tenant isolation."
+  },
+  {
+   "heading": "Cross-incident pattern: shared control planes and self-inflicted global outages",
+   "body": "This incident fits a recurring pattern in hyperscale infrastructure: the largest outages are rarely hardware or attack-driven and are instead self-inflicted configuration or control-plane faults on a shared global layer that propagate faster than any human can intervene. The distinctive lesson here is the interplay of two blind spots — a validation matrix that omitted a real production combination, and a safeguard whose detection model (synchronous) did not match the fault's behavior (asynchronous), so activating it was not enough to stop the fault. Where a change can reach the entire fleet in minutes, the only durable defenses are staged propagation with bake time, per-change synchronous validation, blast-radius segmentation, and ensuring recovery tooling never shares fate with the layer it must recover."
+  }
+ ],
+ "technicalDeepDive": "The fault chain begins in the AFD control plane, where a customer configuration change was applied as a sequence of operations that straddled two different control-plane build versions. Because the versions serialized or interpreted configuration state differently, the change produced customer configuration metadata that was mutually incompatible — valid to each version in isolation but inconsistent when combined. This metadata was accepted and entered the normal distribution pipeline, propagating to a majority of edge sites within about four minutes. On the data plane, AFD nodes ingest and asynchronously process incoming configuration; when they processed the incompatible metadata, execution reached a latent code path that had never before been exercised under this condition, and the process crashed rather than rejecting the config gracefully. Because processing was asynchronous and occurred after propagation, the crash was decoupled in time from the deploy action, so the configuration protection system that activated at 15:43 UTC — designed to catch synchronous, deploy-time failures — blocked new changes but never received a blocking signal for the already-propagated one, and the crash continued until every edge site had gone down (within ~10 minutes of introduction). The crash also took down AFD DNS serving, which is why DNS recovery is a distinct milestone (18:30 UTC). Recovery hinged on producing a config the data plane could load without hitting the defect: because the latest Last Known Good had itself been contaminated and reverting to an older LKG carried its own stability risk, engineers hand-edited the current LKG to excise the offending customer configurations, blocked all further customer config propagation to freeze the input surface, and redeployed the sanitized config, which reached all edge sites by 17:50 UTC. The permanent fixes attack each link in the chain: correcting the control-plane cross-version incompatibility and the data-plane crash bug removes the defect itself; enforcing synchronous per-config validation before production stages ensures a bad config fails up front instead of crashing serving nodes asynchronously; decoupling config processing into isolated worker instances prevents a processing crash from taking down traffic serving; phased rollout with bake time and micro-cell segmentation cap blast radius; and backwards-compatibility testing across control-plane versions closes the validation gap that allowed the incompatible metadata to be generated and accepted in the first place.",
+ "references": [
+  {
+   "title": "Azure Status History - Post Incident Review (PIR), tracking ID YKYN-BWZ: Azure Front Door outage, 29 October 2025",
+   "url": "https://azure.status.microsoft/en-us/status/history/?trackingid=YKYN-BWZ",
+   "type": "official-postmortem",
+   "quote": "A specific sequence of customer configuration changes, performed across two different control plane build versions, resulted in incompatible customer configuration metadata being generated ... exposed a latent bug in the data plane ... triggered a crash during asynchronous processing.",
+   "accessed": "2026-07-31"
+  },
+  {
+   "title": "ThousandEyes: Microsoft Azure Front Door Outage Analysis, October 29, 2025",
+   "url": "https://www.thousandeyes.com/blog/microsoft-azure-front-door-outage-analysis-october-29-2025",
+   "type": "news",
+   "quote": "Third-party network analysis of the Azure Front Door disruption on October 29, 2025, examining the reachability and DNS-resolution impact across Microsoft's global edge.",
+   "accessed": "2026-07-31"
+  },
+  {
+   "title": "Build5Nines: Major Azure Front Door Outage October 29, 2025",
+   "url": "https://build5nines.com/major-azure-front-door-outage-causing-widespread-service-disruptions-across-microsoft-365-microsoft-azure-and-the-azure-portal-october-29-2025/",
+   "type": "news",
+   "quote": "Reporting on widespread service disruptions across Microsoft 365, Azure, and the Azure Portal, with the outage window measured at roughly eight-plus hours.",
+   "accessed": "2026-07-31"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": true,
+  "referenceCount": 3,
+  "lastVerified": "2026-07-31",
+  "confidence": "high"
+ },
+ "lastUpdated": "2026-07-31"
+}

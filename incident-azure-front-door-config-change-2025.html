@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azure Front Door Global Outage: Inadvertent Cross-Build Config Change Trips Latent Data-Plane Crash Bug (29 Oct 2025) | ResistanceZero</title>
+    <meta name="description" content="On 29 October 2025 an inadvertent customer configuration change to Azure Front Door (AFD) — Microsoft&#x27;s global edge/CDN and traffic-routing layer — generated incompatible configura">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="ai-content-declaration" content="human-curated, sourced from public post-incident reports">
+    <meta name="author" content="Bagus Dwi Permana">
+    <link rel="canonical" href="https://resistancezero.com/incident-azure-front-door-config-change-2025.html">
+    <meta name="theme-color" content="#0c1512">
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+    <style>
+    /* ── Governed Incident Dossier — editorial register (v2): forest-green + warm ivory,
+       serif display, evidence-class provenance. Accent vars remapped so all components
+       re-skin. AA-contrast in both themes. No gradients / glass / dot-grid (anti-slop). */
+    :root:not([data-theme="dark"]) {
+        --bg:#f4f1e7; --surface:#fffdf6; --surface-2:#efeadc; --line:rgba(26,45,36,0.16);
+        --text:#1a2d24; --text-strong:#10201a; --text-body:#3b463d; --muted:#6a7367;
+        --cyan:#2f6b4f; --amber:#87671b; --green:#2f7d54; --red:#9c3b32; --gold:#87671b;
+        --hero-ink:#f4f1e7; --hero-bg:#183329; --shadow-deep:rgba(26,45,36,0.10);
+    }
+    [data-theme="dark"] {
+        --bg:#0c1512; --surface:#11201a; --surface-2:#16281f; --line:rgba(233,229,216,0.15);
+        --text:#e9e5d8; --text-strong:#f5f2e9; --text-body:#c6ccbc; --muted:#8b9484;
+        --cyan:#7fd1a8; --amber:#d8b25c; --green:#7fd1a8; --red:#e0917f; --gold:#d8b25c;
+        --hero-ink:#e9e5d8; --hero-bg:#0f221a; --shadow-deep:rgba(0,0,0,0.5);
+    }
+    * { box-sizing:border-box; }
+    html,body { margin:0; padding:0; }
+    body { background:var(--bg); color:var(--text); font-family:'IBM Plex Sans',system-ui,sans-serif; line-height:1.62; }
+    a { color:var(--cyan); }
+    h1,h2,.serif { font-family:'Fraunces','Newsreader',Georgia,serif; font-weight:600; letter-spacing:-0.01em; }
+    .wrap { max-width:1120px; margin:0 auto; padding:1.5rem 1.1rem 3rem; }
+    .navbar { display:flex; align-items:center; justify-content:space-between; padding:0.7rem 1.1rem; border-bottom:1px solid var(--line); background:var(--surface); position:sticky; top:0; z-index:50; }
+    .nav-container { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:1120px; margin:0 auto; }
+    .nav-logo { display:flex; align-items:center; }
+    .nav-avatar { width:34px; height:34px; border-radius:50%; }
+    .nav-menu { display:flex; gap:1rem; list-style:none; margin:0; padding:0; }
+    .nav-menu a { color:var(--text-body); text-decoration:none; font-size:0.85rem; font-weight:600; }
+    .nav-menu a:hover { color:var(--cyan); }
+    .nav-right { display:flex; align-items:center; gap:0.6rem; }
+    .theme-btn { background:none; border:1px solid var(--line); color:var(--text); border-radius:8px; padding:0.35rem 0.5rem; cursor:pointer; font-size:0.8rem; }
+    .lock-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--red); border:1px solid var(--red); border-radius:999px; padding:0.12rem 0.5rem; }
+    h1 { font-size:2.4rem; color:var(--text-strong); margin:0.35rem 0 0.5rem; line-height:1.12; }
+    h2 { font-size:1.4rem; color:var(--text-strong); margin:2rem 0 0.7rem; }
+    .eyebrow { font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); }
+    .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
+    .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
+    .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:999px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    .chip.cyan { color:var(--cyan); border-color:var(--cyan); }
+    .chip.amber { color:var(--amber); border-color:var(--amber); }
+    .chip.green { color:var(--green); border-color:var(--green); }
+    .chip.red { color:var(--red); border-color:var(--red); }
+    .chip.muted { color:var(--muted); }
+    .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:1rem 1.1rem; margin-top:0.9rem; }
+    .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:12px; margin-top:0.9rem; }
+    table.inc-index { width:100%; border-collapse:collapse; font-size:0.86rem; min-width:760px; }
+    table.inc-index th { text-align:left; font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); background:var(--surface-2); }
+    table.inc-index td { padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); color:var(--text-body); vertical-align:top; }
+    table.inc-index tr:hover td { background:var(--surface-2); }
+    table.inc-index a { font-weight:700; color:var(--text-strong); text-decoration:none; }
+    table.inc-index a:hover { color:var(--cyan); text-decoration:underline; }
+    .rank-badge { font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--amber); }
+    .mag-bar { height:4px; border-radius:3px; background:var(--line); margin-top:0.35rem; overflow:hidden; }
+    .mag-bar > span { display:block; height:4px; background:var(--amber); }
+    ul.tight { margin:0.4rem 0 0; padding-left:1.15rem; }
+    ul.tight li { color:var(--text-body); margin:0.3rem 0; font-size:0.92rem; }
+    .soe { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .soe li { display:grid; grid-template-columns:170px 1fr; gap:0.7rem; padding:0.5rem 0; border-bottom:1px dashed var(--line); }
+    .soe time { font-family:'JetBrains Mono',monospace; font-size:0.76rem; color:var(--cyan); }
+    .soe .ev { color:var(--text-body); font-size:0.9rem; }
+    .phase-chip { font-family:'JetBrains Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--amber); border:1px solid var(--amber); border-radius:999px; padding:0.05rem 0.4rem; margin-right:0.4rem; white-space:nowrap; }
+    table.metrics { width:100%; border-collapse:collapse; font-size:0.88rem; }
+    table.metrics td { padding:0.5rem 0.7rem; border-bottom:1px solid var(--line); vertical-align:top; }
+    table.metrics .mlabel { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; width:38%; white-space:nowrap; }
+    table.metrics .mval { color:var(--text-body); }
+    .ca-block { background:var(--surface); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 10px 10px 0; padding:0.7rem 1rem; margin-top:0.7rem; }
+    .ca-block h3 { margin:0 0 0.3rem; font-size:0.92rem; color:var(--text-strong); }
+    .ca-block p { margin:0; color:var(--text-body); font-size:0.9rem; }
+    .kv { display:grid; grid-template-columns:180px 1fr; gap:0.5rem 0.9rem; margin-top:0.5rem; font-size:0.9rem; }
+    .kv dt { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; }
+    .kv dd { margin:0; color:var(--text-body); }
+    .refs { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .refs li { padding:0.55rem 0; border-bottom:1px solid var(--line); }
+    .refs .rtitle { color:var(--text-strong); font-weight:600; font-size:0.9rem; }
+    .refs .rquote { color:var(--muted); font-size:0.84rem; font-style:italic; margin-top:0.2rem; display:block; }
+    .refs a { font-size:0.78rem; word-break:break-all; }
+    .backlink { display:inline-block; margin-bottom:0.6rem; font-size:0.82rem; color:var(--cyan); text-decoration:none; }
+    footer { border-top:1px solid var(--line); margin-top:2.5rem; padding:1.4rem 1.1rem; text-align:center; }
+    footer .ver { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .disclaimer { font-size:0.76rem; color:var(--muted); margin-top:0.8rem; max-width:80ch; }
+    .skip-link { position:absolute; top:-50px; left:0; background:#0e7490; color:#fff; padding:10px 20px; text-decoration:none; font-weight:600; z-index:10000; border-radius:0 0 8px 0; transition:top 0.2s; }
+    .skip-link:focus { top:0; }
+    .root-gate { position:fixed; inset:0; z-index:99999; display:none; align-items:center; justify-content:center; background:rgba(2,6,23,0.74); padding:1rem; backdrop-filter:blur(6px); }
+    body.locked .root-gate { display:flex; }
+    body.locked .wrap { filter:blur(4px); pointer-events:none; user-select:none; }
+    .root-card { max-width:430px; width:100%; background:var(--surface); border:1px solid var(--cyan); border-radius:14px; padding:1.3rem 1.15rem; text-align:center; box-shadow:0 18px 36px var(--shadow-deep); }
+    .root-card h2 { margin:0 0 0.4rem; font-size:1.1rem; color:var(--text-strong); }
+    .root-card p { font-size:0.86rem; color:var(--text-body); }
+    .root-actions { margin-top:0.9rem; display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; }
+    .root-actions button, .root-actions a { border-radius:9px; padding:0.5rem 0.85rem; font-size:0.8rem; font-weight:700; border:1px solid var(--line); text-decoration:none; cursor:pointer; color:var(--text); font-family:inherit; }
+    .root-actions button { background:var(--cyan); color:#04121a; border:none; }
+    .rz-nav-burger { display:none; }
+    /* v1.8.0 — mobile responsive patch */
+    @media (max-width:768px) {
+        html,body { overflow-x:hidden; max-width:100vw; }
+        img { max-width:100%; height:auto; display:block; }
+        .nav-menu, .nav-links { display:none; }
+        .navbar { padding:0.5rem 0.75rem; }
+        footer .footer-grid { grid-template-columns:1fr; gap:1.25rem; padding:1rem; }
+        button, a.btn, [role="button"] { min-height:44px; }
+        h1 { font-size:1.4rem; }
+        .soe li { grid-template-columns:1fr; gap:0.15rem; }
+        .kv { grid-template-columns:1fr; }
+        .root-card { max-width:92vw; }
+    }
+    @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
+</style>
+</head>
+<body class="locked">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <nav class="navbar"><div class="nav-container">
+        <a href="index.html" class="nav-logo"><img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dc-incidents.html">DC Incidents</a></li>
+            <li><a href="datacenter-solutions.html">DC Solutions</a></li>
+        </ul>
+        <div class="nav-right">
+            <span class="lock-tag" title="Root-only module">🔒 Root</span>
+            <button class="theme-btn" id="themeToggle" type="button" aria-label="Toggle theme">◐</button>
+        </div>
+    </div></nav>
+    <main class="wrap" id="main-content" data-explain-scan>
+        <a class="backlink" href="dc-incidents.html">← All incidents</a>
+        <div class="eyebrow">Incident dossier · Rank #11</div>
+        <h1>Azure Front Door Global Outage: Inadvertent Cross-Build Config Change Trips Latent Data-Plane Crash Bug (29 Oct 2025)</h1>
+        <div class="chips">
+            <span class="chip">Microsoft Azure</span>
+            <span class="chip cyan">2025-10-29</span>
+            <span class="chip amber">8h 24m core impact</span>
+            <span class="chip amber">Software</span><span class="chip red">Human error</span>
+        </div>
+        <p class="lede">On 29 October 2025 an inadvertent customer configuration change to Azure Front Door (AFD) — Microsoft&#x27;s global edge/CDN and traffic-routing layer — generated incompatible configuration metadata because the change sequence spanned two different control-plane build versions. That metadata exposed a latent bug in the AFD data plane, causing nodes to crash during asynchronous processing as the bad config propagated. A deployment protection safeguard activated and blocked further new changes, but it could not stop the already-propagated config: the crash surfaced asynchronously, after propagation, rather than synchronously at deploy time. Within roughly four minutes the config reached a majority of edge sites and within roughly ten minutes the crash had replicated across all edge sites globally. Recovery was complicated because the Last Known Good (LKG) snapshot had itself been updated with the corrupted config; Microsoft recovered by manually editing the latest LKG to strip the offending customer entries — deliberately declining a clean rollback — then redeploying, blocking further customer config propagation, and failing the Azure Portal away from AFD. Customer impact ran from 15:41 UTC on 29 Oct to mitigation at 00:05 UTC on 30 Oct, about 8.5 hours.</p>
+
+        <h2>Facility &amp; location</h2>
+        <dl class="kv">
+            <dt>Operator</dt><dd>Microsoft Azure</dd>
+            <dt>Data center</dt><dd>Azure Front Door global edge fleet</dd>
+            <dt>Location</dt><dd>Global</dd>
+            <dt>Date</dt><dd>2025-10-29</dd>
+        </dl>
+
+        <h2>Impact &amp; scale</h2>
+        <dl class="kv">
+            <dt>Users affected</dt><dd>Not quantified by Microsoft. Global blast radius: the crash replicated across all Azure Front Door edge sites worldwide, degrading Microsoft-first-party and customer properties fronted by AFD. Microsoft&#x27;s authoritative PIR publishes no affected-user or affected-tenant count.</dd>
+            <dt>Financial</dt><dd>Not published by Microsoft; no financial figure appears in the authoritative PIR.</dd>
+            <dt>Scope</dt><dd>Critical - global edge/control-plane outage affecting first-party and customer traffic</dd>
+        </dl>
+        <div class="card"><strong>Services / systems down</strong><ul class="tight"><li>Azure Portal</li><li>Microsoft 365</li><li>Outlook</li><li>Xbox Live</li><li>Microsoft Copilot</li><li>Minecraft</li><li>Azure Communication Services</li><li>many downstream customer sites fronted by AFD</li></ul></div>
+        <h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Total incident duration (impact to mitigation)</td><td class="mval">~8.5 hours (15:41 UTC 29 Oct to 00:05 UTC 30 Oct; 504 min)</td></tr><tr><td class="mlabel">Time from corrupt metadata to customer impact</td><td class="mval">~6 minutes (15:35 to 15:41 UTC)</td></tr><tr><td class="mlabel">Propagation to a majority of edge sites</td><td class="mval">~4 minutes (by 15:39 UTC)</td></tr><tr><td class="mlabel">Global crash replication across all edge sites</td><td class="mval">~10 minutes (by ~15:45 UTC, inferred)</td></tr><tr><td class="mlabel">Config propagation time (pre-incident baseline; targeted reduction)</td><td class="mval">45 minutes today, target ~15 minutes by Jan 2026</td></tr><tr><td class="mlabel">Data-plane recovery time (completed improvement; further target)</td><td class="mval">Improved to ~1 hour (completed); target ~10 minutes by Mar 2026</td></tr><tr><td class="mlabel">Quantitative blast-radius metrics published by Microsoft</td><td class="mval">None - no node %, error rate, availability figure, or affected-customer count in the PIR (only qualitative &#x27;majority&#x27;/&#x27;all edge sites&#x27;)</td></tr><tr><td class="mlabel">Third-party outage reports (NOT in Microsoft PIR - unverified)</td><td class="mval">30,000+ reports in the first hour (Downdetector, per seed brief); treat as unsourced-from-Microsoft</td></tr></tbody></table></div>
+
+        <h2>Sequence of events (SOE)</h2>
+        <ul class="soe"><li><time>2025-10-29T15:35:00Z</time><span class="ev"><span class="phase-chip">Trigger</span> Corrupt/incompatible configuration metadata is introduced. An inadvertent customer configuration change, executed as a sequence spanning two different control-plane build versions, generates configuration metadata that is internally incompatible.</span></li><li><time>2025-10-29T15:39:00Z</time><span class="ev"><span class="phase-chip">Escalation</span> The configuration carrying the incompatible metadata completes propagation to a majority of AFD edge sites — roughly four minutes after introduction.</span></li><li><time>2025-10-29T15:41:00Z</time><span class="ev"><span class="phase-chip">Impact</span> Customer impact begins as edge nodes, unable to load the inconsistent configuration, start crashing during asynchronous processing in the data plane.</span></li><li><time>2025-10-29T15:43:00Z</time><span class="ev"><span class="phase-chip">Escalation</span> The configuration protection system activates and blocks new configuration changes — but it does not stop the already-propagated incompatible metadata from crashing nodes, because that failure surfaces asynchronously after propagation rather than synchronously at deploy time, so the safeguard has no synchronous failure signal to act on.</span></li><li><time>2025-10-29T15:45:00Z</time><span class="ev"><span class="phase-chip">Cascade</span> The crash has replicated across all AFD edge sites globally — roughly ten minutes after the corrupt metadata was introduced. The outage is now worldwide.</span></li><li><time>2025-10-29T15:48:00Z</time><span class="ev"><span class="phase-chip">Detection</span> Investigation commences, following monitoring alerts.</span></li><li><time>2025-10-29T16:15:00Z</time><span class="ev"><span class="phase-chip">Diagnosis</span> Investigation narrows and focuses on AFD configuration changes as the cause.</span></li><li><time>2025-10-29T16:18:00Z</time><span class="ev"><span class="phase-chip">Diagnosis</span> Initial public communication is posted to the status page.</span></li><li><time>2025-10-29T16:20:00Z</time><span class="ev"><span class="phase-chip">Diagnosis</span> Targeted Azure Service Health notifications are sent to affected customers.</span></li><li><time>2025-10-29T17:10:00Z</time><span class="ev"><span class="phase-chip">Mitigation</span> Teams begin updating the Last Known Good (LKG) configuration — manually editing the latest LKG to remove the problematic customer configurations rather than rolling back to a prior version.</span></li><li><time>2025-10-29T17:26:00Z</time><span class="ev"><span class="phase-chip">Mitigation</span> The Azure Portal is failed away from AFD, restoring an access path for operators and customers independent of the failing edge layer.</span></li><li><time>2025-10-29T17:30:00Z</time><span class="ev"><span class="phase-chip">Mitigation</span> All customer configuration propagation to the data plane is blocked to prevent any further bad config from spreading during recovery.</span></li><li><time>2025-10-29T17:40:00Z</time><span class="ev"><span class="phase-chip">Mitigation</span> Deployment of the corrected (edited-LKG) configuration is initiated.</span></li><li><time>2025-10-29T17:50:00Z</time><span class="ev"><span class="phase-chip">Recovery</span> The corrected LKG configuration is available to all edge sites.</span></li><li><time>2025-10-29T18:30:00Z</time><span class="ev"><span class="phase-chip">Recovery</span> AFD DNS servers recover and manual traffic rebalancing begins.</span></li><li><time>2025-10-29T20:20:00Z</time><span class="ev"><span class="phase-chip">Recovery</span> Traffic handling is switched back to automatic traffic management as the fleet stabilizes.</span></li><li><time>2025-10-30T00:05:00Z</time><span class="ev"><span class="phase-chip">Restored</span> AFD impact is confirmed fully mitigated and availability returns to pre-incident levels — approximately 8.5 hours after customer impact began.</span></li></ul>
+
+        <h2>Root cause</h2>
+        <div class="card">An inadvertent customer configuration change — not a malicious act and not a single bad push — was performed as a sequence spanning two different AFD control-plane build versions, which produced incompatible customer configuration metadata. That incompatible metadata exposed a latent bug in the AFD data plane, triggering a crash during asynchronous processing as the config propagated. The defect escaped pre-production validation because not all features are validated across different control-plane build versions (a version-coverage gap). The deployment protection system did activate and blocked further new changes, but it could not stop the change that had already propagated, because the crash surfaced asynchronously — after propagation — rather than synchronously at deploy time, leaving the safeguard no synchronous failure signal to act on. In short: control-plane cross-version metadata incompatibility → latent data-plane crash bug, undetected by a version-coverage gap in validation and unblocked by the safeguards due to async failure timing.</div>
+
+        <h2>Contributing factors</h2>
+        <ul class="tight"><li>Pre-production validation did not cover all features across different control-plane build versions, leaving a version-coverage gap through which the incompatible metadata passed undetected.</li><li>The data-plane defect manifested asynchronously (after propagation) rather than synchronously at deploy time, so although the deployment protection system did activate at 15:43 UTC and block subsequent new changes, it had no synchronous failure signal by which to stop the already-propagated bad configuration.</li><li>The Last Known Good (LKG) configuration snapshot was itself inadvertently updated with the corrupted configuration, which is why recovery required manually editing the latest LKG to strip the offending entries rather than cleanly reverting to a prior good snapshot.</li><li>Configuration processing was coupled to traffic-serving instances and lacked per-config synchronous validation before production stages, so a single bad config could crash the nodes serving traffic.</li><li>Fast, broadly-scoped propagation (majority of edge sites in ~4 minutes, all sites in ~10 minutes) gave no bake time or containment, converting a single change into a global fault almost immediately.</li><li>Critical infrastructure — Azure Portal, Communication Services, Marketplace, and support systems — single-depended on AFD, so the edge failure also degraded the very tools needed to observe and recover from it.</li><li>A latent bug in the data plane had never been exercised until the specific cross-version metadata condition occurred, making it invisible under normal operations.</li></ul>
+
+        <h2>Correction of errors (COE)</h2>
+        <ul class="tight"><li>Recovery method: deliberately chose NOT to roll back to prior LKG versions (for stability reasons, and because the latest LKG had itself been contaminated) and instead manually edited the latest LKG to remove the problematic customer configurations, then redeployed. <span class="chip muted">Azure Front Door engineering · Completed (during incident)</span></li><li>Fixed the control-plane cross-version incompatibility and the underlying data-plane crash bug. <span class="chip muted">Azure Front Door engineering · Completed</span></li><li>Enforced synchronous processing of each configuration before it reaches production stages, so a defective config fails validation up front instead of crashing serving nodes asynchronously. <span class="chip muted">Azure Front Door engineering · Completed</span></li><li>Added phased rollout stages with extended bake time so configuration changes are exposed gradually and caught before global reach. <span class="chip muted">Azure Front Door engineering · Completed</span></li><li>Migrated critical infrastructure (Azure Portal, Communication Services, Marketplace, support systems) to active-active failover so they no longer single-depend on AFD. <span class="chip muted">Azure platform engineering · Completed</span></li><li>Improved data-plane recovery time to approximately one hour. <span class="chip muted">Azure Front Door engineering · Completed</span></li><li>Expand automated Service Health alerts and resolve Premier/Unified customer support-request issues (enabling failover to backup support systems). <span class="chip muted">Azure platform engineering · Planned - target Nov 2025</span></li><li>Decouple config processing into isolated worker instances (separate from traffic-serving instances) and reduce config propagation time from 45 minutes to approximately 15 minutes. <span class="chip muted">Azure Front Door engineering · Planned - target Jan 2026</span></li><li>Enhance backwards-compatibility testing across control-plane build versions to close the version-coverage validation gap. <span class="chip muted">Azure Front Door engineering · Planned - target Feb 2026</span></li><li>Further reduce data-plane recovery time to approximately 10 minutes. <span class="chip muted">Azure Front Door engineering · Planned - target Mar 2026</span></li><li>Implement &#x27;micro-cell&#x27; segmentation for customer isolation so a single customer&#x27;s configuration cannot fault the shared fleet globally. <span class="chip muted">Azure Front Door engineering · Planned - target Jun 2026</span></li></ul>
+
+        <h2>Lessons learnt</h2>
+        <ul class="tight"><li>A protection safeguard that only inspects failures synchronously at deploy time is blind to defects that manifest asynchronously after propagation; here the safeguard activated and blocked new changes yet still could not stop the fault, because it had no synchronous signal for an async crash. Safeguards must be designed around the failure timing of the fault they are meant to catch, not just the happy-path deploy moment.</li><li>Validation coverage must explicitly span the combinations that occur in production — here, config sequences crossing two different control-plane build versions — because any untested version combination is an open door for incompatible state.</li><li>Shared global control/edge planes with fast, broad propagation turn a single inadvertent change into an immediate worldwide event; blast radius is a direct function of propagation speed and scope, so bake time and staging are load-bearing controls, not niceties.</li><li>Recovery and observability tooling (portal, support, comms) must not single-depend on the very layer that can fail; when the edge went down it also took the operators&#x27; recovery surfaces with it until the Portal was failed away.</li><li>Rolling back is not always the safest recovery path: with the latest LKG itself contaminated, Microsoft found manually editing it to strip the bad config more stable than reverting to older versions — recovery strategy should be chosen for stability and current state, not reflex.</li></ul>
+
+        <h2>Improvements &amp; remediation</h2>
+        <ul class="tight"><li>Synchronous per-config validation before production plus phased rollout with extended bake time, so a defective configuration is rejected up front and, if it slips through, is contained to a small stage rather than the global fleet.</li><li>Backwards-compatibility testing across control-plane build versions to eliminate the version-coverage gap that let the incompatible metadata escape detection.</li><li>Decoupling config processing into isolated worker instances separate from traffic-serving nodes, so a config-processing crash cannot take down request serving.</li><li>Reducing config propagation time (45 to ~15 minutes) and data-plane recovery time (to ~1 hour today, targeting ~10 minutes) to shrink both exposure and time-to-mitigate.</li><li>Active-active failover for Azure Portal, Communication Services, Marketplace, and support systems, removing their single dependency on AFD.</li><li>Micro-cell segmentation for customer isolation so one tenant&#x27;s configuration cannot propagate a fault across the shared global fleet.</li></ul>
+
+        <h2>Comprehensive analysis</h2><div class="ca-block"><h3>Failure mechanism: cross-version metadata meets a latent crash bug</h3><p>The trigger was not a corrupt push in the conventional sense but a legitimate-looking customer configuration change whose steps happened to span two different AFD control-plane build versions. That version-straddling sequence emitted configuration metadata that was internally incompatible. When AFD nodes attempted to load and asynchronously process this metadata, it drove them into a previously latent data-plane defect that crashed the process. The bug had presumably existed dormant for some time; it required this specific, rare cross-version condition to be exercised for the first time, which is precisely why routine operation and standard validation had never surfaced it.</p></div><div class="ca-block"><h3>Why it cascaded globally in minutes</h3><p>AFD is a single shared global edge and traffic-routing plane, and its configuration distribution is fast and broadly scoped. The incompatible config reached a majority of edge sites within about four minutes (15:39 UTC) and the resulting crash had replicated across all edge sites worldwide within about ten minutes (by ~15:45 UTC, inferred from the PIR&#x27;s ~10-minute figure). There was effectively no bake time and no staging boundary to arrest the spread, so a single inadvertent change became a worldwide outage almost instantly. The deployment protection system did activate at 15:43 UTC and blocked new changes, but because the crash surfaced asynchronously after propagation rather than synchronously at deploy, the safeguard had no synchronous failure signal to block on and the already-propagated change was not stopped.</p></div><div class="ca-block"><h3>Recovery: edit-forward instead of roll-back</h3><p>Microsoft&#x27;s recovery choice is instructive. Because the latest Last Known Good configuration had itself been updated with the corrupted config, and because reverting to older versions carried its own stability risk, engineers judged that manually editing the latest LKG to strip out the offending customer configurations was the more stable path, and redeployed that. In parallel they blocked all customer config propagation at 17:30 UTC to prevent any further bad state from spreading, and failed the Azure Portal away from AFD at 17:26 UTC to restore an operator/customer access path independent of the failing layer. The corrected config reached all edge sites by 17:50 UTC, DNS recovered by 18:30 UTC, automatic traffic management resumed at 20:20 UTC, and full mitigation was declared at 00:05 UTC on 30 Oct.</p></div><div class="ca-block"><h3>Organizational and systemic factors</h3><p>Two systemic weaknesses converted a routine change into a global incident. First, a validation coverage gap: not all features were validated across different control-plane build versions, so the incompatible-metadata condition was simply outside the test matrix. Second, an architectural coupling: config processing ran on the same instances that served traffic, and critical recovery tooling (Portal, Communications, Marketplace, support) single-depended on AFD, so the failure degraded the very systems needed to observe and recover from it. The remediation roadmap targets both classes directly — synchronous isolated config workers, backwards-compatibility testing across versions, active-active failover for critical infra, and micro-cell segmentation for tenant isolation.</p></div><div class="ca-block"><h3>Cross-incident pattern: shared control planes and self-inflicted global outages</h3><p>This incident fits a recurring pattern in hyperscale infrastructure: the largest outages are rarely hardware or attack-driven and are instead self-inflicted configuration or control-plane faults on a shared global layer that propagate faster than any human can intervene. The distinctive lesson here is the interplay of two blind spots — a validation matrix that omitted a real production combination, and a safeguard whose detection model (synchronous) did not match the fault&#x27;s behavior (asynchronous), so activating it was not enough to stop the fault. Where a change can reach the entire fleet in minutes, the only durable defenses are staged propagation with bake time, per-change synchronous validation, blast-radius segmentation, and ensuring recovery tooling never shares fate with the layer it must recover.</p></div>
+
+        <h2>Technical deep-dive</h2>
+        <div class="card">The fault chain begins in the AFD control plane, where a customer configuration change was applied as a sequence of operations that straddled two different control-plane build versions. Because the versions serialized or interpreted configuration state differently, the change produced customer configuration metadata that was mutually incompatible — valid to each version in isolation but inconsistent when combined. This metadata was accepted and entered the normal distribution pipeline, propagating to a majority of edge sites within about four minutes. On the data plane, AFD nodes ingest and asynchronously process incoming configuration; when they processed the incompatible metadata, execution reached a latent code path that had never before been exercised under this condition, and the process crashed rather than rejecting the config gracefully. Because processing was asynchronous and occurred after propagation, the crash was decoupled in time from the deploy action, so the configuration protection system that activated at 15:43 UTC — designed to catch synchronous, deploy-time failures — blocked new changes but never received a blocking signal for the already-propagated one, and the crash continued until every edge site had gone down (within ~10 minutes of introduction). The crash also took down AFD DNS serving, which is why DNS recovery is a distinct milestone (18:30 UTC). Recovery hinged on producing a config the data plane could load without hitting the defect: because the latest Last Known Good had itself been contaminated and reverting to an older LKG carried its own stability risk, engineers hand-edited the current LKG to excise the offending customer configurations, blocked all further customer config propagation to freeze the input surface, and redeployed the sanitized config, which reached all edge sites by 17:50 UTC. The permanent fixes attack each link in the chain: correcting the control-plane cross-version incompatibility and the data-plane crash bug removes the defect itself; enforcing synchronous per-config validation before production stages ensures a bad config fails up front instead of crashing serving nodes asynchronously; decoupling config processing into isolated worker instances prevents a processing crash from taking down traffic serving; phased rollout with bake time and micro-cell segmentation cap blast radius; and backwards-compatibility testing across control-plane versions closes the validation gap that allowed the incompatible metadata to be generated and accepted in the first place.</div>
+
+        <h2>References &amp; provenance</h2>
+        <ul class="refs"><li><span class="chip green">official-postmortem</span> <span class="rtitle">Azure Status History - Post Incident Review (PIR), tracking ID YKYN-BWZ: Azure Front Door outage, 29 October 2025</span><span class="rquote">“A specific sequence of customer configuration changes, performed across two different control plane build versions, resulted in incompatible customer configuration metadata being generated ... exposed a latent bug in the data plane ... triggered a crash during asynchronous processing.”</span><a href="https://azure.status.microsoft/en-us/status/history/?trackingid=YKYN-BWZ" target="_blank" rel="noopener nofollow">https://azure.status.microsoft/en-us/status/history/?trackingid=YKYN-BWZ</a></li><li><span class="chip amber">news</span> <span class="rtitle">ThousandEyes: Microsoft Azure Front Door Outage Analysis, October 29, 2025</span><span class="rquote">“Third-party network analysis of the Azure Front Door disruption on October 29, 2025, examining the reachability and DNS-resolution impact across Microsoft&#x27;s global edge.”</span><a href="https://www.thousandeyes.com/blog/microsoft-azure-front-door-outage-analysis-october-29-2025" target="_blank" rel="noopener nofollow">https://www.thousandeyes.com/blog/microsoft-azure-front-door-outage-analysis-october-29-2025</a></li><li><span class="chip amber">news</span> <span class="rtitle">Build5Nines: Major Azure Front Door Outage October 29, 2025</span><span class="rquote">“Reporting on widespread service disruptions across Microsoft 365, Azure, and the Azure Portal, with the outage window measured at roughly eight-plus hours.”</span><a href="https://build5nines.com/major-azure-front-door-outage-causing-widespread-service-disruptions-across-microsoft-365-microsoft-azure-and-the-azure-portal-october-29-2025/" target="_blank" rel="noopener nofollow">https://build5nines.com/major-azure-front-door-outage-causing-widespread-service-disruptions-across-microsoft-365-microsoft-azure-and-the-azure-portal-october-29-2025/</a></li></ul>
+        <p class="disclaimer">Sourced from public post-incident reports. Quotes are short attributed excerpts for provenance only; the analysis above is original and substantially shorter than its sources. Last verified 2026-07-31.</p>
+
+    </main>
+    <footer><div class="footer-grid"></div><span class="ver" id="versionStamp"></span></footer>
+    <div class="root-gate">
+        <div class="root-card">
+            <h2>🔒 Root access required</h2>
+            <p>The DC Incidents dossier is a root-only module. Sign in with an authorized account to continue.</p>
+            <div class="root-actions">
+                <button id="rootLoginBtn" type="button">Sign In</button>
+                <a href="index.html">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/rz-version.js?v=2026-07-31-inc2"></script>
+    <script src="js/rz-feature-flags.js?v=2026-07-31-inc2" defer></script>
+    <script src="auth.js?v=2026-07-31-inc2" defer></script>
+    <script src="js/rz-mobile-nav.js?v=2026-07-31-inc2" defer></script>
+    <script src="js/rz-cookie-consent.js?v=2026-07-31-inc2" defer></script>
+    <script src="js/rz-explain-db.js?v=2026-07-31-inc2" defer></script>
+    <script src="js/rz-explain.js?v=2026-07-31-inc2" defer></script>
+    <script>
+    (function(){var t=document.getElementById('themeToggle');function a(theme){document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme);var m=document.querySelector('meta[name=\"theme-color\"]');if(m)m.setAttribute('content',theme==='dark'?'#0c1512':'#f4f1e7');}a(localStorage.getItem('theme')||'dark');if(t)t.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme');a(c==='dark'?'light':'dark');});})();
+    (function(){function ag(){if(window._rzAuth&&typeof window._rzAuth.enforceTierFeatureAccess==='function'){window._rzAuth.enforceTierFeatureAccess('dc-incidents');}else{try{var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');var r=s&&s.role,t=s&&s.tier;var passes=!!s&&(r==='root'||t==='root');document.body.classList.toggle('locked',!passes);}catch(e){document.body.classList.add('locked');}}}var b=document.getElementById('rootLoginBtn');if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showRootGatePrompt==='function'){window._rzAuth.showRootGatePrompt('Root account required for the DC Incidents dossier.');}else if(window._rzAuth&&typeof window._rzAuth.showModal==='function'){window._rzAuth.showModal();}});window.addEventListener('rz-auth-change',function(){setTimeout(ag,50);});window.addEventListener('storage',function(e){if(e.key==='rz_premium_session')ag();});ag();setTimeout(ag,60);setTimeout(ag,550);setTimeout(ag,1600);})();
+    (function(){var el=document.getElementById('versionStamp');if(!el)return;var v=window.RZ_VERSION||'1.x.x',d=window.RZ_VERSION_DATE||'',cn=window.RZ_VERSION_CODENAME||'';el.textContent='· ResistanceZero · v'+v+(d?' · '+d:'')+(cn?' · '+cn:'')+' ·';})();
+    (function(){var n=0;function sc(){if(window.RZExplain&&window.RZExplain.scanText){var m=document.getElementById('main-content');if(m)window.RZExplain.scanText(m,120);}else if(n++<25){setTimeout(sc,200);}}setTimeout(sc,350);})();
+    </script>
+
+</body>
+</html>

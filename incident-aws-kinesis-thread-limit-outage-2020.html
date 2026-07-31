@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Kinesis OS Thread-Limit Cascade — US-EAST-1 (Nov 25, 2020) | ResistanceZero</title>
+    <meta name="description" content="A small addition of capacity to the Kinesis Data Streams front-end fleet in US-EAST-1 pushed every server past an operating-system maximum thread-count limit. Because each front-en">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="ai-content-declaration" content="human-curated, sourced from public post-incident reports">
+    <meta name="author" content="Bagus Dwi Permana">
+    <link rel="canonical" href="https://resistancezero.com/incident-aws-kinesis-thread-limit-outage-2020.html">
+    <meta name="theme-color" content="#0c1512">
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+    <style>
+    /* ── Governed Incident Dossier — editorial register (v2): forest-green + warm ivory,
+       serif display, evidence-class provenance. Accent vars remapped so all components
+       re-skin. AA-contrast in both themes. No gradients / glass / dot-grid (anti-slop). */
+    :root:not([data-theme="dark"]) {
+        --bg:#f4f1e7; --surface:#fffdf6; --surface-2:#efeadc; --line:rgba(26,45,36,0.16);
+        --text:#1a2d24; --text-strong:#10201a; --text-body:#3b463d; --muted:#6a7367;
+        --cyan:#2f6b4f; --amber:#87671b; --green:#2f7d54; --red:#9c3b32; --gold:#87671b;
+        --hero-ink:#f4f1e7; --hero-bg:#183329; --shadow-deep:rgba(26,45,36,0.10);
+    }
+    [data-theme="dark"] {
+        --bg:#0c1512; --surface:#11201a; --surface-2:#16281f; --line:rgba(233,229,216,0.15);
+        --text:#e9e5d8; --text-strong:#f5f2e9; --text-body:#c6ccbc; --muted:#8b9484;
+        --cyan:#7fd1a8; --amber:#d8b25c; --green:#7fd1a8; --red:#e0917f; --gold:#d8b25c;
+        --hero-ink:#e9e5d8; --hero-bg:#0f221a; --shadow-deep:rgba(0,0,0,0.5);
+    }
+    * { box-sizing:border-box; }
+    html,body { margin:0; padding:0; }
+    body { background:var(--bg); color:var(--text); font-family:'IBM Plex Sans',system-ui,sans-serif; line-height:1.62; }
+    a { color:var(--cyan); }
+    h1,h2,.serif { font-family:'Fraunces','Newsreader',Georgia,serif; font-weight:600; letter-spacing:-0.01em; }
+    .wrap { max-width:1120px; margin:0 auto; padding:1.5rem 1.1rem 3rem; }
+    .navbar { display:flex; align-items:center; justify-content:space-between; padding:0.7rem 1.1rem; border-bottom:1px solid var(--line); background:var(--surface); position:sticky; top:0; z-index:50; }
+    .nav-container { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:1120px; margin:0 auto; }
+    .nav-logo { display:flex; align-items:center; }
+    .nav-avatar { width:34px; height:34px; border-radius:50%; }
+    .nav-menu { display:flex; gap:1rem; list-style:none; margin:0; padding:0; }
+    .nav-menu a { color:var(--text-body); text-decoration:none; font-size:0.85rem; font-weight:600; }
+    .nav-menu a:hover { color:var(--cyan); }
+    .nav-right { display:flex; align-items:center; gap:0.6rem; }
+    .theme-btn { background:none; border:1px solid var(--line); color:var(--text); border-radius:8px; padding:0.35rem 0.5rem; cursor:pointer; font-size:0.8rem; }
+    .lock-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--red); border:1px solid var(--red); border-radius:999px; padding:0.12rem 0.5rem; }
+    h1 { font-size:2.4rem; color:var(--text-strong); margin:0.35rem 0 0.5rem; line-height:1.12; }
+    h2 { font-size:1.4rem; color:var(--text-strong); margin:2rem 0 0.7rem; }
+    .eyebrow { font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); }
+    .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
+    .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
+    .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:999px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    .chip.cyan { color:var(--cyan); border-color:var(--cyan); }
+    .chip.amber { color:var(--amber); border-color:var(--amber); }
+    .chip.green { color:var(--green); border-color:var(--green); }
+    .chip.red { color:var(--red); border-color:var(--red); }
+    .chip.muted { color:var(--muted); }
+    .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:1rem 1.1rem; margin-top:0.9rem; }
+    .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:12px; margin-top:0.9rem; }
+    table.inc-index { width:100%; border-collapse:collapse; font-size:0.86rem; min-width:760px; }
+    table.inc-index th { text-align:left; font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); background:var(--surface-2); }
+    table.inc-index td { padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); color:var(--text-body); vertical-align:top; }
+    table.inc-index tr:hover td { background:var(--surface-2); }
+    table.inc-index a { font-weight:700; color:var(--text-strong); text-decoration:none; }
+    table.inc-index a:hover { color:var(--cyan); text-decoration:underline; }
+    .rank-badge { font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--amber); }
+    .mag-bar { height:4px; border-radius:3px; background:var(--line); margin-top:0.35rem; overflow:hidden; }
+    .mag-bar > span { display:block; height:4px; background:var(--amber); }
+    ul.tight { margin:0.4rem 0 0; padding-left:1.15rem; }
+    ul.tight li { color:var(--text-body); margin:0.3rem 0; font-size:0.92rem; }
+    .soe { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .soe li { display:grid; grid-template-columns:170px 1fr; gap:0.7rem; padding:0.5rem 0; border-bottom:1px dashed var(--line); }
+    .soe time { font-family:'JetBrains Mono',monospace; font-size:0.76rem; color:var(--cyan); }
+    .soe .ev { color:var(--text-body); font-size:0.9rem; }
+    .phase-chip { font-family:'JetBrains Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--amber); border:1px solid var(--amber); border-radius:999px; padding:0.05rem 0.4rem; margin-right:0.4rem; white-space:nowrap; }
+    table.metrics { width:100%; border-collapse:collapse; font-size:0.88rem; }
+    table.metrics td { padding:0.5rem 0.7rem; border-bottom:1px solid var(--line); vertical-align:top; }
+    table.metrics .mlabel { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; width:38%; white-space:nowrap; }
+    table.metrics .mval { color:var(--text-body); }
+    .ca-block { background:var(--surface); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 10px 10px 0; padding:0.7rem 1rem; margin-top:0.7rem; }
+    .ca-block h3 { margin:0 0 0.3rem; font-size:0.92rem; color:var(--text-strong); }
+    .ca-block p { margin:0; color:var(--text-body); font-size:0.9rem; }
+    .kv { display:grid; grid-template-columns:180px 1fr; gap:0.5rem 0.9rem; margin-top:0.5rem; font-size:0.9rem; }
+    .kv dt { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; }
+    .kv dd { margin:0; color:var(--text-body); }
+    .refs { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .refs li { padding:0.55rem 0; border-bottom:1px solid var(--line); }
+    .refs .rtitle { color:var(--text-strong); font-weight:600; font-size:0.9rem; }
+    .refs .rquote { color:var(--muted); font-size:0.84rem; font-style:italic; margin-top:0.2rem; display:block; }
+    .refs a { font-size:0.78rem; word-break:break-all; }
+    .backlink { display:inline-block; margin-bottom:0.6rem; font-size:0.82rem; color:var(--cyan); text-decoration:none; }
+    footer { border-top:1px solid var(--line); margin-top:2.5rem; padding:1.4rem 1.1rem; text-align:center; }
+    footer .ver { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .disclaimer { font-size:0.76rem; color:var(--muted); margin-top:0.8rem; max-width:80ch; }
+    .skip-link { position:absolute; top:-50px; left:0; background:#0e7490; color:#fff; padding:10px 20px; text-decoration:none; font-weight:600; z-index:10000; border-radius:0 0 8px 0; transition:top 0.2s; }
+    .skip-link:focus { top:0; }
+    .root-gate { position:fixed; inset:0; z-index:99999; display:none; align-items:center; justify-content:center; background:rgba(2,6,23,0.74); padding:1rem; backdrop-filter:blur(6px); }
+    body.locked .root-gate { display:flex; }
+    body.locked .wrap { filter:blur(4px); pointer-events:none; user-select:none; }
+    .root-card { max-width:430px; width:100%; background:var(--surface); border:1px solid var(--cyan); border-radius:14px; padding:1.3rem 1.15rem; text-align:center; box-shadow:0 18px 36px var(--shadow-deep); }
+    .root-card h2 { margin:0 0 0.4rem; font-size:1.1rem; color:var(--text-strong); }
+    .root-card p { font-size:0.86rem; color:var(--text-body); }
+    .root-actions { margin-top:0.9rem; display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; }
+    .root-actions button, .root-actions a { border-radius:9px; padding:0.5rem 0.85rem; font-size:0.8rem; font-weight:700; border:1px solid var(--line); text-decoration:none; cursor:pointer; color:var(--text); font-family:inherit; }
+    .root-actions button { background:var(--cyan); color:#04121a; border:none; }
+    .rz-nav-burger { display:none; }
+    /* v1.8.0 — mobile responsive patch */
+    @media (max-width:768px) {
+        html,body { overflow-x:hidden; max-width:100vw; }
+        img { max-width:100%; height:auto; display:block; }
+        .nav-menu, .nav-links { display:none; }
+        .navbar { padding:0.5rem 0.75rem; }
+        footer .footer-grid { grid-template-columns:1fr; gap:1.25rem; padding:1rem; }
+        button, a.btn, [role="button"] { min-height:44px; }
+        h1 { font-size:1.4rem; }
+        .soe li { grid-template-columns:1fr; gap:0.15rem; }
+        .kv { grid-template-columns:1fr; }
+        .root-card { max-width:92vw; }
+    }
+    @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
+</style>
+</head>
+<body class="locked">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <nav class="navbar"><div class="nav-container">
+        <a href="index.html" class="nav-logo"><img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dc-incidents.html">DC Incidents</a></li>
+            <li><a href="datacenter-solutions.html">DC Solutions</a></li>
+        </ul>
+        <div class="nav-right">
+            <span class="lock-tag" title="Root-only module">🔒 Root</span>
+            <button class="theme-btn" id="themeToggle" type="button" aria-label="Toggle theme">◐</button>
+        </div>
+    </div></nav>
+    <main class="wrap" id="main-content" data-explain-scan>
+        <a class="backlink" href="dc-incidents.html">← All incidents</a>
+        <div class="eyebrow">Incident dossier · Rank #12</div>
+        <h1>AWS Kinesis OS Thread-Limit Cascade — US-EAST-1 (Nov 25, 2020)</h1>
+        <div class="chips">
+            <span class="chip">Amazon Web Services</span>
+            <span class="chip cyan">2020-11-25</span>
+            <span class="chip amber">17h 8m core impact</span>
+            <span class="chip amber">Software</span>
+        </div>
+        <p class="lede">A small addition of capacity to the Kinesis Data Streams front-end fleet in US-EAST-1 pushed every server past an operating-system maximum thread-count limit. Because each front-end server creates OS threads for every other server in the fleet, the added hosts made the per-server thread count breach the OS ceiling; cache construction failed and servers were left with useless shard-maps, unable to route requests. Kinesis errored and slowed, and because many AWS services depend on Kinesis, CloudWatch, Cognito, Lambda, EventBridge and customer workloads cascaded down. Recovery was throttled by slow membership propagation and restart contention, so full Kinesis restoration took roughly 17 hours.</p>
+
+        <h2>Facility &amp; location</h2>
+        <dl class="kv">
+            <dt>Operator</dt><dd>Amazon Web Services</dd>
+            <dt>Data center</dt><dd>AWS US-EAST-1 (Kinesis Data Streams front-end fleet)</dd>
+            <dt>Location</dt><dd>Ashburn, USA, us-east-1</dd>
+            <dt>Date</dt><dd>2020-11-25</dd>
+        </dl>
+
+        <h2>Impact &amp; scale</h2>
+        <dl class="kv">
+            <dt>Users affected</dt><dd>Not publicly quantified by AWS; broad impact across many AWS customers in US-EAST-1 whose applications depend on Kinesis and dependent services (CloudWatch, Cognito, Lambda, EventBridge/CloudWatch Events, and downstream ECS/EKS provisioning and AWS Auto Scaling).</dd>
+            <dt>Financial</dt><dd>Not published by AWS for this event. (The ~$34M Parametrix estimate belongs to the separate Dec 7, 2021 US-EAST-1 outage and does not apply here.)</dd>
+            <dt>Scope</dt><dd>Major regional multi-service outage</dd>
+        </dl>
+        <div class="card"><strong>Services / systems down</strong><ul class="tight"><li>Amazon Kinesis Data Streams</li><li>Amazon CloudWatch (metrics and alarms)</li><li>Amazon Cognito (User Pools)</li><li>AWS Lambda (invocation error rates)</li><li>Amazon EventBridge / CloudWatch Events</li><li>Amazon ECS / EKS (provisioning and scaling delays, via EventBridge)</li><li>AWS Auto Scaling (metric-dependent policy delays)</li></ul></div>
+        <h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Time to full Kinesis recovery (from first alarms)</td><td class="mval">~17 hours (05:15 AM → 10:23 PM PST)</td></tr><tr><td class="mlabel">Detection lag (capacity-add finish → first alarms)</td><td class="mval">~1.5 hours (03:47 AM → 05:15 AM PST)</td></tr><tr><td class="mlabel">Diagnosis time (first alarms → root cause confirmed)</td><td class="mval">~4h24m (05:15 AM → 09:39 AM PST)</td></tr><tr><td class="mlabel">Restart-to-full-recovery span</td><td class="mval">~12 hours (10:07 AM → 10:23 PM PST)</td></tr><tr><td class="mlabel">Front-end restart rate ceiling</td><td class="mval">A few hundred servers per hour (limited by contention)</td></tr><tr><td class="mlabel">Membership-propagation delay</td><td class="mval">Up to 1 hour for any existing fleet member to learn of a new participant</td></tr><tr><td class="mlabel">Cognito recovery duration</td><td class="mval">~4h03m (mitigation 10:15 AM → normal 02:18 PM PST)</td></tr><tr><td class="mlabel">CloudWatch local-metric persistence added (remediation)</td><td class="mval">3 hours of metric data buffered locally</td></tr></tbody></table></div>
+
+        <h2>Sequence of events (SOE)</h2>
+        <ul class="soe"><li><time>2020-11-25 02:44 AM PST</time><span class="ev"><span class="phase-chip">Trigger</span> AWS begins adding a relatively small amount of capacity to the Kinesis front-end fleet.</span></li><li><time>2020-11-25 03:47 AM PST</time><span class="ev"><span class="phase-chip">Escalation</span> Capacity addition finishes. The larger fleet means each front-end server now creates OS threads for more peers, driving per-server thread count past the OS maximum-thread ceiling; shard-map cache construction begins failing.</span></li><li><time>2020-11-25 05:15 AM PST</time><span class="ev"><span class="phase-chip">Detection</span> First alarms fire for errors putting and getting Kinesis records — roughly 1.5 hours after the capacity add completed.</span></li><li><time>2020-11-25 05:15 AM PST</time><span class="ev"><span class="phase-chip">Impact</span> Front-end servers end up with useless shard-maps and cannot route requests; Kinesis experiences elevated errors and latency, and dependent services begin to degrade.</span></li><li><time>2020-11-25 07:51 AM PST</time><span class="ev"><span class="phase-chip">Diagnosis</span> AWS narrows the root cause to a couple of candidate hypotheses (memory pressure among them) and determines a full fleet restart will be required.</span></li><li><time>2020-11-25 09:39 AM PST</time><span class="ev"><span class="phase-chip">Diagnosis</span> AWS confirms the root cause and rules out memory pressure — the earlier leading hypothesis — identifying the OS thread-limit breach.</span></li><li><time>2020-11-25 10:07 AM PST</time><span class="ev"><span class="phase-chip">Recovery</span> AWS begins bringing front-end servers back online; the first group starts taking Kinesis traffic.</span></li><li><time>2020-11-25 10:15 AM PST</time><span class="ev"><span class="phase-chip">Mitigation</span> AWS begins deploying a short-term Cognito mitigation to reduce its Kinesis dependency; Cognito User Pools error rates begin falling.</span></li><li><time>2020-11-25 10:36 AM PST</time><span class="ev"><span class="phase-chip">Mitigation</span> Engineers take action to mitigate Lambda memory contention caused by buffered metric data growing on the underlying invocation-service hosts.</span></li><li><time>2020-11-25 12:15 PM PST</time><span class="ev"><span class="phase-chip">Recovery</span> Cognito error rates significantly reduced.</span></li><li><time>2020-11-25 02:18 PM PST</time><span class="ev"><span class="phase-chip">Restored</span> Cognito operating normally again.</span></li><li><time>2020-11-25 04:15 PM PST</time><span class="ev"><span class="phase-chip">Recovery</span> Majority of EventBridge / CloudWatch Events issues (and the dependent ECS/EKS provisioning and scaling delays) resolved.</span></li><li><time>2020-11-25 05:47 PM PST</time><span class="ev"><span class="phase-chip">Recovery</span> CloudWatch shows early signs of recovery as Kinesis availability improves.</span></li><li><time>2020-11-25 10:23 PM PST</time><span class="ev"><span class="phase-chip">Restored</span> Kinesis fully returns to normal — roughly 17 hours after the first alarms and about 12 hours after the restart began.</span></li><li><time>2020-11-25 10:31 PM PST</time><span class="ev"><span class="phase-chip">Restored</span> CloudWatch metrics and alarms fully recovered.</span></li></ul>
+
+        <h2>Root cause</h2>
+        <div class="card">The trigger was a small addition of capacity to the Kinesis Data Streams front-end fleet (begun 02:44 AM PST, finished 03:47 AM PST). Each front-end server creates OS threads for every other server in the fleet, so the per-server thread count scales with fleet size. The added capacity pushed every server past the maximum number of threads permitted by an operating-system configuration. As that limit was breached, shard-map cache construction failed to complete, leaving front-end servers with useless shard-maps and unable to route requests — producing fleet-wide errors and latency. AWS explicitly confirmed at 09:39 AM PST that the cause was the thread-limit breach and NOT memory pressure (the earlier leading hypothesis). AWS has not published the numeric OS thread ceiling or the pre-event per-host thread count, so the exact fleet size at which the limit trips cannot be computed from the disclosure.</div>
+
+        <h2>Contributing factors</h2>
+        <ul class="tight"><li>Thread-per-peer design: each front-end server holds OS threads for every other server, making per-server thread consumption O(fleet size) and turning a routine capacity add into a fleet-wide ceiling breach.</li><li>No fine-grained alarming on thread consumption, so the fleet crossed the OS thread limit without an early, specific warning; the first signal was downstream put/get errors ~1.5h later.</li><li>A monolithic (non-cellularized) front-end fleet meant thread growth was bounded by the whole fleet rather than a smaller cell, so the whole fleet was affected at once.</li><li>Slow cold-start and slow membership propagation (up to an hour to learn of new participants) plus restart contention capped recovery at a few hundred servers per hour, stretching restoration to ~12 hours after restart began.</li><li>Latent buffering bug in Cognito webservers: they could not survive sustained Kinesis API errors and exhausted their buffers, coupling Cognito authentication/credential availability to the Kinesis data plane.</li><li>CloudWatch buffered metric data with no local persistence limit, so during the outage buffering grew until it caused memory contention on downstream hosts — the mechanism that then propagated into Lambda invocation errors.</li><li>Operational blind spot: the primary Service Health Dashboard status tool depended on the impaired Cognito, and support engineers were not regularly trained on the backup status-communication tool.</li></ul>
+
+        <h2>Correction of errors (COE)</h2>
+        <ul class="tight"><li>Modify Cognito webservers so they can sustain Kinesis API errors without exhausting buffers, decoupling Cognito availability from the Kinesis data plane. <span class="chip muted">AWS Cognito team · Completed as a post-incident remediation (&#x27;we have modified...&#x27;); a separate short-term Cognito mitigation was deployed at 10:15 AM PST during the event.</span></li><li>Persist 3 hours of metric data in the CloudWatch local metrics data store so metrics and alarms survive a Kinesis outage. <span class="chip muted">AWS CloudWatch team · Completed in US-EAST-1; global rollout planned</span></li><li>Move the Kinesis front-end fleet to larger CPU/memory servers to reduce the total number of servers (and thus the peer-thread count per host). <span class="chip muted">AWS Kinesis team · Planned near-term fix</span></li><li>Add fine-grained alarming for thread consumption on the front-end fleet. <span class="chip muted">AWS Kinesis team · Planned near-term fix</span></li><li>Finish testing an increase in the OS thread-count limit. <span class="chip muted">AWS Kinesis team · In progress (testing)</span></li><li>Radically improve front-end server cold-start time to speed future recovery. <span class="chip muted">AWS Kinesis team · Planned</span></li><li>Move the front-end server cache to a dedicated fleet. <span class="chip muted">AWS Kinesis team · Planned</span></li><li>Move a few large AWS services, such as CloudWatch, to a separate, partitioned front-end fleet. <span class="chip muted">AWS Kinesis team · Planned</span></li><li>Greatly accelerate the cellularization of the front-end fleet to match what was already done for the back-end, bounding per-server thread growth to a cell. <span class="chip muted">AWS Kinesis team · Planned (acceleration of existing effort)</span></li><li>Change support training so support engineers are regularly trained on the backup status-communication tool (the primary Service Health Dashboard depended on the impaired Cognito). <span class="chip muted">AWS Support · Completed (process change)</span></li></ul>
+
+        <h2>Lessons learnt</h2>
+        <ul class="tight"><li>Resource limits that scale with fleet size are latent scaling traps: a thread-per-peer model makes per-host thread usage grow with the whole fleet, so an ordinary, small capacity add can silently push every host over an OS ceiling at once.</li><li>Alarm on the failing resource, not just its symptoms: with no thread-consumption alarming, the first signal was downstream put/get errors ~1.5 hours after the breach — precious lead time lost to indirect detection.</li><li>Blast radius follows dependencies: a single data-plane service (Kinesis) coupled to CloudWatch, Cognito, Lambda and EventBridge turned one fleet&#x27;s failure into a multi-service regional outage.</li><li>Design dependents to degrade, not die: latent buffering assumptions (Cognito exhausting buffers on upstream errors; CloudWatch metric buffers growing into memory contention that reached Lambda) converted a Kinesis fault into independent secondary failures.</li><li>Recovery must be planned as carefully as failure: slow membership propagation (up to 1h) and restart contention capped restart at a few hundred servers/hour, so the fix itself took ~12 hours — cold-start speed is a first-class reliability property.</li><li>Status-communication tooling must not share the failure domain it reports on: the primary dashboard depended on the impaired Cognito, so operators needed a rehearsed, independent backup channel.</li></ul>
+
+        <h2>Improvements &amp; remediation</h2>
+        <ul class="tight"><li>Bound the fault domain via cellularization of the front-end fleet so thread growth (and any similar resource pressure) is contained within a cell rather than the entire fleet.</li><li>Reduce per-host peer-thread pressure by consolidating onto larger CPU/memory servers and raising the tested OS thread-count limit, giving headroom against fleet-size-driven thread growth.</li><li>Add fine-grained thread-consumption alarming to detect the actual limiting resource before it manifests as downstream request errors.</li><li>Isolate high-fan-in tenants by moving large services like CloudWatch to a separate, partitioned front-end fleet and moving the front-end cache to a dedicated fleet.</li><li>Harden dependents against upstream failure: Cognito webservers now tolerate Kinesis errors without exhausting buffers, and CloudWatch persists 3 hours of metrics locally so alarms survive a Kinesis outage.</li><li>Make recovery faster and safer by radically improving cold-start time so a throttled, contention-limited restart no longer dominates the outage duration.</li><li>Decouple operational status communications from the services being reported on, and keep support engineers regularly trained on the independent backup tool.</li></ul>
+
+        <h2>Comprehensive analysis</h2><div class="ca-block"><h3>Failure mechanism: a fleet-size-coupled resource limit</h3><p>The front-end fleet used a design in which every server maintains OS threads for every other server in the fleet, so the per-server thread count is a function of fleet size. Adding even a small amount of capacity therefore raised the thread count on all existing hosts simultaneously. When that count crossed the operating-system&#x27;s configured maximum thread ceiling, the servers could no longer complete construction of their shard-map cache. The result was not a clean crash but a corrupt operating state: front-end servers came up holding useless shard-maps and could not route requests, so the whole fleet degraded in unison rather than losing a subset of hosts.</p></div><div class="ca-block"><h3>Why it cascaded across AWS</h3><p>Kinesis Data Streams sits beneath a wide set of AWS control- and data-plane services, so its degradation propagated by dependency. CloudWatch buffered metric data it could not flush, and that buffering grew until it caused memory contention on downstream hosts — which in turn raised AWS Lambda function-invocation error rates. Cognito User Pools suffered elevated API failures and latency because a latent buffering bug meant its webservers could not survive sustained Kinesis errors, exhausting buffers and blocking authentication and credential access. EventBridge / CloudWatch Events processing was delayed, which in turn slowed dependent Amazon ECS/EKS provisioning and scaling and AWS Auto Scaling policies. One fleet&#x27;s internal limit thus became a regional, multi-service event.</p></div><div class="ca-block"><h3>Recovery: why it took ~17 hours</h3><p>Restoration could not be rushed. AWS first had to carefully reduce thread counts and remove the added capacity, then bring servers back gradually. Two properties throttled this: it takes up to an hour for any existing fleet member to learn of new participants, and restarting too quickly creates contention between membership propagation and handling incoming requests, starving request-handling and re-inducing errors. Consequently AWS could only add servers at a few hundred per hour. Restart began at 10:07 AM PST but Kinesis did not fully normalize until 10:23 PM PST — roughly 12 hours later. Dependent services recovered on their own tracks: Cognito normal by 2:18 PM, EventBridge largely resolved by 4:15 PM, CloudWatch fully recovered by 10:31 PM PST.</p></div><div class="ca-block"><h3>Organizational and systemic factors</h3><p>Several systemic gaps amplified the event. There was no fine-grained alarm on thread consumption, so the first indication was indirect (put/get errors) about 1.5 hours after the breach. The front-end fleet had not yet been cellularized the way the back-end had, so there was no bulkhead to contain the thread growth to a subset. Downstream services embedded fragile assumptions (Cognito buffer exhaustion; CloudWatch unbounded metric buffering) that turned an upstream fault into independent secondary failures. And operational communication was itself in the blast radius: the primary Service Health Dashboard depended on the impaired Cognito, and support engineers were not routinely trained on the backup tool.</p></div><div class="ca-block"><h3>Cross-incident pattern</h3><p>This event exemplifies a recurring class of large-scale outages: a routine, low-risk operational change (a small capacity add) interacts with a resource limit that scales with system size, and the fault then propagates along a hidden dependency web from a foundational service outward. The remediations — cellularization to bound fault domains, alarming on the true limiting resource, hardening dependents to degrade rather than fail, isolating high-fan-in tenants, and decoupling status tooling from the services it monitors — are the same structural defenses that recur across major cloud incidents. Notably, no dollar cost or affected-user count was published for this specific event, and the widely cited ~$34M Parametrix figure pertains to the separate December 7, 2021 US-EAST-1 outage, not this one.</p></div>
+
+        <h2>Technical deep-dive</h2>
+        <div class="card">The front-end tier of Kinesis Data Streams routes producer/consumer requests to the correct back-end shards using an in-memory shard-map, and it discovers and tracks its peers by maintaining an OS thread per peer server. That thread-per-peer construction makes the resident thread count on any single host proportional to the size of the entire front-end fleet — an O(N) coupling that is invisible under steady state but becomes the dominant scaling term whenever the fleet grows. On November 25, 2020, a small capacity addition (02:44–03:47 AM PST) increased N enough that the per-host thread total crossed a maximum-thread ceiling imposed by an operating-system configuration. Critically, the failure surfaced during cache (shard-map) construction: as the thread ceiling was hit, cache build could not complete, and servers finished startup holding useless shard-maps. With no valid shard-map, a front-end server cannot map an incoming request to a back-end shard, so requests error out — a correctness failure of the routing layer, not mere overload. AWS investigated memory pressure as the leading hypothesis and explicitly disconfirmed it at 09:39 AM PST, isolating the OS thread limit as the true cause. Remediation had to respect two operational realities of the peer-membership subsystem: membership convergence is slow (up to an hour for an existing member to learn of a new participant), and the CPU/memory a server spends converging membership contends with the resources it needs to serve traffic. Bringing hosts back too fast therefore re-manifested the outage as elevated errors and latency, so AWS was forced to a few-hundred-servers-per-hour restart cadence after first reducing thread counts and removing the added capacity. AWS did not disclose the numeric thread ceiling, the pre-event per-host thread count, the peer-messaging concurrency model (e.g., whether thread-per-peer is a blocking-IO worker model versus a framework artifact, and why async multiplexing was not used), or the membership protocol (gossip versus central push) behind the one-hour convergence figure — so the exact N at which the limit trips and the precise convergence mechanics remain qualitative in the public record.</div>
+
+        <h2>References &amp; provenance</h2>
+        <ul class="refs"><li><span class="chip green">official-postmortem</span> <span class="rtitle">Summary of the Amazon Kinesis Event in the Northern Virginia (US-EAST-1) Region</span><span class="rquote">“the new capacity had caused all of the servers in the fleet to exceed the maximum number of threads allowed by an operating system configuration”</span><a href="https://aws.amazon.com/message/11201" target="_blank" rel="noopener nofollow">https://aws.amazon.com/message/11201</a></li><li><span class="chip amber">news</span> <span class="rtitle">AWS explains what went wrong at US-East-1</span><span class="rquote">“Reporting on AWS&#x27;s own account of the November 25, 2020 Kinesis event in US-East-1.”</span><a href="https://www.datacenterdynamics.com/en/news/aws-explains-what-went-wrong-us-east-1/" target="_blank" rel="noopener nofollow">https://www.datacenterdynamics.com/en/news/aws-explains-what-went-wrong-us-east-1/</a></li></ul>
+        <p class="disclaimer">Sourced from public post-incident reports. Quotes are short attributed excerpts for provenance only; the analysis above is original and substantially shorter than its sources. Last verified 2026-07-31.</p>
+
+    </main>
+    <footer><div class="footer-grid"></div><span class="ver" id="versionStamp"></span></footer>
+    <div class="root-gate">
+        <div class="root-card">
+            <h2>🔒 Root access required</h2>
+            <p>The DC Incidents dossier is a root-only module. Sign in with an authorized account to continue.</p>
+            <div class="root-actions">
+                <button id="rootLoginBtn" type="button">Sign In</button>
+                <a href="index.html">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/rz-version.js?v=2026-07-31-inc2"></script>
+    <script src="js/rz-feature-flags.js?v=2026-07-31-inc2" defer></script>
+    <script src="auth.js?v=2026-07-31-inc2" defer></script>
+    <script src="js/rz-mobile-nav.js?v=2026-07-31-inc2" defer></script>
+    <script src="js/rz-cookie-consent.js?v=2026-07-31-inc2" defer></script>
+    <script src="js/rz-explain-db.js?v=2026-07-31-inc2" defer></script>
+    <script src="js/rz-explain.js?v=2026-07-31-inc2" defer></script>
+    <script>
+    (function(){var t=document.getElementById('themeToggle');function a(theme){document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme);var m=document.querySelector('meta[name=\"theme-color\"]');if(m)m.setAttribute('content',theme==='dark'?'#0c1512':'#f4f1e7');}a(localStorage.getItem('theme')||'dark');if(t)t.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme');a(c==='dark'?'light':'dark');});})();
+    (function(){function ag(){if(window._rzAuth&&typeof window._rzAuth.enforceTierFeatureAccess==='function'){window._rzAuth.enforceTierFeatureAccess('dc-incidents');}else{try{var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');var r=s&&s.role,t=s&&s.tier;var passes=!!s&&(r==='root'||t==='root');document.body.classList.toggle('locked',!passes);}catch(e){document.body.classList.add('locked');}}}var b=document.getElementById('rootLoginBtn');if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showRootGatePrompt==='function'){window._rzAuth.showRootGatePrompt('Root account required for the DC Incidents dossier.');}else if(window._rzAuth&&typeof window._rzAuth.showModal==='function'){window._rzAuth.showModal();}});window.addEventListener('rz-auth-change',function(){setTimeout(ag,50);});window.addEventListener('storage',function(e){if(e.key==='rz_premium_session')ag();});ag();setTimeout(ag,60);setTimeout(ag,550);setTimeout(ag,1600);})();
+    (function(){var el=document.getElementById('versionStamp');if(!el)return;var v=window.RZ_VERSION||'1.x.x',d=window.RZ_VERSION_DATE||'',cn=window.RZ_VERSION_CODENAME||'';el.textContent='· ResistanceZero · v'+v+(d?' · '+d:'')+(cn?' · '+cn:'')+' ·';})();
+    (function(){var n=0;function sc(){if(window.RZExplain&&window.RZExplain.scanText){var m=document.getElementById('main-content');if(m)window.RZExplain.scanText(m,120);}else if(n++<25){setTimeout(sc,200);}}setTimeout(sc,350);})();
+    </script>
+
+</body>
+</html>

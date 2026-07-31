@@ -1,0 +1,280 @@
+{
+ "slug": "azure-active-directory-2020",
+ "title": "Azure Active Directory Global Authentication Outage (September 28, 2020)",
+ "operator": "Microsoft Azure",
+ "dcName": "Azure Active Directory — global identity/authentication service",
+ "location": {
+  "city": "",
+  "country": "USA",
+  "region": "AMER",
+  "az": "global"
+ },
+ "date": "2020-09-28",
+ "durationMin": 300,
+ "category": [
+  "software"
+ ],
+ "severity": {
+  "usersAffected": "Not disclosed by Microsoft — scope described only as 'a subset of customers' across Azure Public and Azure Government clouds; impact quantified via regional authentication success rates rather than an absolute count",
+  "impactUsd": "Not disclosed — Microsoft published no SLA-credit total and no third party quantified business loss",
+  "servicesDown": [
+   "Azure Active Directory (core)",
+   "Azure Portal",
+   "Microsoft 365",
+   "Microsoft Teams",
+   "Exchange / Outlook email",
+   "Microsoft Office desktop (some installations)",
+   "Visual Studio (licensing verification, some installations)",
+   "OneDrive / SharePoint (related follow-on disruption)"
+  ],
+  "tier": "Tier 1 — global identity-plane / single-point-of-failure event"
+ },
+ "brief": "On 28 September 2020 a service update meant only for an internal Azure AD validation test ring crashed on startup and, because of a latent defect in the Safe Deployment Process (SDP) tooling, was pushed straight into global production. The same defect corrupted the deployment metadata so that all deployment rings were targeted at once and the automated rollback could not run, forcing a slower manual recovery. Users were locked out of Azure Portal, Microsoft 365, Teams, Exchange/Outlook and downstream apps for roughly five hours end-to-end. It is a textbook identity-plane blast-radius event: a single canary-scoped change became a worldwide authentication failure.",
+ "magnitude": {
+  "usersScore": 8,
+  "financialScore": 6,
+  "durationScore": 6,
+  "blastRadiusScore": 9,
+  "note": "Blast radius is the dominant dimension: AAD is the identity control plane for the entire Microsoft cloud, so one backend change removed login for Portal, M365, Teams, Outlook and downstream third-party apps across both Public and Government clouds. Users/financial scores are estimates because Microsoft never published an absolute affected-user count or dollar figure; duration ~5h end-to-end (~2h58m to normal operational parameters)."
+ },
+ "sequenceOfEvents": [
+  {
+   "t": "2020-09-28T21:25:00Z",
+   "phase": "Trigger",
+   "event": "A service update targeting an internal Azure AD validation test ring is deployed to the AAD backend and crashes on startup (Tracking ID SM79-F88). Impact begins.",
+   "source": "build5nines RCA reproduction (SM79-F88): 'a service update targeting an internal validation test ring was deployed, causing a crash upon startup'; impact start 21:25 UTC"
+  },
+  {
+   "t": "2020-09-28T21:25:00Z",
+   "phase": "Escalation",
+   "event": "A latent code defect in the Azure AD backend SDP system misinterprets deployment metadata and, instead of scoping the change to the validation test ring, targets all deployment rings concurrently — deploying the crash-on-startup build directly into production and bypassing normal validation.",
+   "source": "build5nines RCA reproduction: SDP defect 'caused this to deploy directly into our production environment, bypassing our normal validation process'; 'all rings were targeted concurrently'"
+  },
+  {
+   "t": "2020-09-28T21:25:00Z",
+   "phase": "Impact",
+   "event": "Production AAD backend instances crash on boot, leaving no healthy instances to serve token requests; authentication calls return HTTP 503 (Service Unavailable). Users cannot sign in to Azure Portal, Microsoft 365, Teams and Outlook.",
+   "source": "build5nines RCA reproduction: HTTP 503 errors on Azure Portal / AAD authentication operations"
+  },
+  {
+   "t": "2020-09-28T21:45:00Z",
+   "phase": "Detection",
+   "event": "Microsoft posts its first public notice, tweeting it is investigating 'an issue affecting access to multiple Microsoft 365 services.'",
+   "source": "The Register: 10:45pm UK time (BST = 21:45 UTC) Microsoft tweet investigating 'an issue affecting access to multiple Microsoft 365 services'"
+  },
+  {
+   "t": "2020-09-28T22:00:00Z",
+   "phase": "Cascade",
+   "event": "Blast radius spreads across dependent services and both clouds: Azure Portal, Teams, Outlook, some Office desktop and Visual Studio installations, across Azure Public and Azure Government. Regional authentication success rates fall unevenly (Americas as low as 17%, Asia to 32%, Australia ~37%, Europe holding ~81%). Timing approximate — mid-outage window.",
+   "source": "build5nines regional success-rate figures; The Register service-scope list (Outlook/Teams/portal/Office/Visual Studio)"
+  },
+  {
+   "t": "2020-09-28T22:36:00Z",
+   "phase": "Mitigation",
+   "event": "Microsoft posts that it has 'rolled back the change that is likely the source of impact,' but the automated rollback is ineffective: the same latent SDP defect corrupted the deployment metadata the rollback tooling relies on.",
+   "source": "The Register: 11:36pm UK (=22:36 UTC) 'We've rolled back the change that is likely the source of impact'; build5nines RCA: 'the latent defect in our SDP system had corrupted the deployment metadata'"
+  },
+  {
+   "t": "2020-09-28T22:47:00Z",
+   "phase": "Mitigation",
+   "event": "With automated rollback blocked, engineers begin manual intervention — manual rollback and staged re-enablement of instances.",
+   "source": "build5nines RCA reproduction: manual intervention at 22:47 UTC"
+  },
+  {
+   "t": "2020-09-28T22:49:00Z",
+   "phase": "Mitigation",
+   "event": "Microsoft reports it is 'not observing an increase in successful connections after rolling back,' confirming the rollback did not immediately restore authentication and manual recovery is required.",
+   "source": "The Register: 11:49pm UK (=22:49 UTC)"
+  },
+  {
+   "t": "2020-09-28T23:48:00Z",
+   "phase": "Mitigation",
+   "event": "Microsoft reroutes traffic 'to alternate infrastructure to improve the user experience' while manual recovery proceeds.",
+   "source": "The Register: 12:48am UK (=23:48 UTC)"
+  },
+  {
+   "t": "2020-09-29T00:23:00Z",
+   "phase": "Restored",
+   "event": "Services return to normal operational parameters roughly 2h58m after impact start; the primary authentication outage is over for most users, though some recovering instances remain.",
+   "source": "build5nines RCA (SM79-F88): 'Resolved: 00:23 UTC September 29, 2020'"
+  },
+  {
+   "t": "2020-09-29T00:40:00Z",
+   "phase": "Recovery",
+   "event": "Microsoft reports 'seeing improvement for multiple services after applying mitigation steps' as staged re-enablement continues.",
+   "source": "The Register: 1:40am UK (=00:40 UTC)"
+  },
+  {
+   "t": "2020-09-29T02:25:00Z",
+   "phase": "Restored",
+   "event": "Residual impact on remaining recovering instances fully clears — ~5 hours end-to-end from impact start.",
+   "source": "build5nines RCA (SM79-F88): 'Residual impact cleared: 02:25 UTC September 29, 2020'"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Primary impact duration (to normal operational parameters)",
+   "value": "~2h58m (21:25 UTC 09-28 → 00:23 UTC 09-29)",
+   "source": "build5nines RCA SM79-F88 timestamps"
+  },
+  {
+   "label": "End-to-end duration (to residual cleared)",
+   "value": "~5h (21:25 UTC 09-28 → 02:25 UTC 09-29)",
+   "source": "build5nines RCA SM79-F88; The Register ('roughly five hours')"
+  },
+  {
+   "label": "Auth success rate — Europe",
+   "value": "~81% during outage",
+   "source": "build5nines RCA reproduction"
+  },
+  {
+   "label": "Auth success rate — Americas",
+   "value": "17% at trough, improved to ~37% before mitigation",
+   "source": "build5nines RCA reproduction"
+  },
+  {
+   "label": "Auth success rate — Asia",
+   "value": "72% initially, dropped to ~32% at peak business hours",
+   "source": "build5nines RCA reproduction"
+  },
+  {
+   "label": "Auth success rate — Australia",
+   "value": "~37% during outage",
+   "source": "build5nines RCA reproduction"
+  },
+  {
+   "label": "Front-end error symptom",
+   "value": "HTTP 503 (Service Unavailable) on AAD auth calls",
+   "source": "build5nines RCA reproduction"
+  },
+  {
+   "label": "Cloud scope",
+   "value": "Azure Public + Azure Government clouds",
+   "source": "build5nines RCA reproduction"
+  },
+  {
+   "label": "Absolute users/tenants affected",
+   "value": "Not disclosed ('a subset of customers')",
+   "source": "build5nines RCA reproduction; Microsoft published no count"
+  },
+  {
+   "label": "Financial impact",
+   "value": "Not disclosed (no SLA-credit total, no third-party estimate)",
+   "source": "Ledger gap — unclosable primary"
+  },
+  {
+   "label": "Deployment rings targeted",
+   "value": "All rings concurrently (intended: 1 validation test ring)",
+   "source": "build5nines RCA reproduction"
+  },
+  {
+   "label": "Comms remediation target",
+   "value": "Initial customer comms within 15 min of impact (committed)",
+   "source": "build5nines RCA reproduction — SDP CoE commitment"
+  }
+ ],
+ "rootCause": "A service update intended only for an internal Azure AD validation test ring crashed on startup. A latent code defect in the Azure AD backend Safe Deployment Process (SDP) system corrupted its ability to interpret deployment metadata, so instead of scoping the change to the canary validation ring it targeted all deployment rings concurrently — pushing the crash-on-startup build directly into global production and bypassing the normal validation gate. The same metadata corruption then blocked the automated rollback, forcing a slower manual recovery that extended the outage to roughly five hours end-to-end.",
+ "contributingFactors": [
+  "Latent defect in the SDP rollout tooling itself — the very system meant to contain bad deployments was the vector that globalized this one.",
+  "Metadata-driven ring targeting with no independent safeguard: a single corrupted metadata interpretation collapsed the canary-to-production boundary.",
+  "Automated rollback depended on the same (now corrupted) deployment metadata, so the recovery mechanism failed exactly when it was needed, coupling failure and recovery to a single point.",
+  "Identity-plane centralization: AAD is a shared single point of failure for Portal, M365, Teams, Outlook and downstream third-party apps, so one backend fault produced a global blast radius.",
+  "Slow initial customer communication relative to impact, later addressed by a 15-minute comms commitment.",
+  "Organizational strain / pattern: this was the second major Azure disruption in roughly two weeks, shortly after the Ignite conference."
+ ],
+ "coe": [
+  {
+   "action": "Onboard Azure AD scenarios to an automated communications pipeline that posts an initial notification to affected customers within 15 minutes of impact, closing the slow-notification gap seen in this incident.",
+   "owner": "Azure AD / Microsoft communications engineering",
+   "status": "Committed",
+   "source": "build5nines RCA reproduction: 'automated communications pipeline which posts initial communication to affected customers within 15 minutes of impact'"
+  },
+  {
+   "action": "Fix the latent SDP defect so deployment metadata is interpreted correctly and a change can never be targeted to all rings when only the validation test ring was intended.",
+   "owner": "Azure AD backend SDP engineering",
+   "status": "Implied by RCA (root-cause remediation)",
+   "source": "build5nines RCA reproduction: 'a latent defect that impacted the system's ability to interpret deployment metadata. Consequently, all rings were targeted concurrently.'"
+  },
+  {
+   "action": "Harden rollback so recovery does not depend on the same deployment metadata that a defect can corrupt, preventing automated rollback from failing during an SDP-induced incident.",
+   "owner": "Azure AD backend SDP engineering",
+   "status": "Implied by RCA (recovery-path remediation)",
+   "source": "build5nines RCA reproduction: 'the latent defect in our SDP system had corrupted the deployment metadata'"
+  },
+  {
+   "action": "Reinforce validation-ring enforcement so a crash-on-startup build cannot bypass the validation gate and reach production.",
+   "owner": "Azure AD deployment safety",
+   "status": "Implied by RCA",
+   "source": "build5nines RCA reproduction: 'deploy directly into our production environment, bypassing our normal validation process'"
+  }
+ ],
+ "lessonsLearnt": [
+  "Your safety system is part of your attack surface: a latent defect in the Safe Deployment Process — the tooling designed to prevent global blast radius — was precisely what created it. Progressive-rollout tooling must itself be validated as safety-critical.",
+  "Never let the rollback path share a failure mode with the deployment path. Because automated rollback depended on the same corrupted metadata, the recovery mechanism died with the change it was meant to reverse.",
+  "A crash-on-startup build should be caught by an independent gate before it can ever reach production; ring targeting alone is not a sufficient safeguard if the metadata that drives it can be misread.",
+  "Centralizing identity creates a global single point of failure — when AAD fails, everything that authenticates through it fails together, including third-party platforms outside Microsoft's own catalog.",
+  "Communication speed is part of incident severity: the gap before customers were informed was material enough to warrant a specific 15-minute-notification commitment.",
+  "Distinguish co-occurring incidents: a separate SharePoint/OneDrive disruption the next morning (UK time) stemmed from a change Microsoft made to mitigate this AAD outage — a distinct follow-on event, not the same fault — and conflating the two muddies root-cause analysis."
+ ],
+ "improvements": [
+  "Treat deployment/rollback tooling (SDP) as safety-critical software with its own validation, canary and metadata-integrity checks — verify the safety system before trusting it to protect production.",
+  "Make rollback independent of potentially corrupt deployment metadata (e.g. a separate, verified last-known-good path) so recovery cannot be blocked by the same defect that caused the outage.",
+  "Add an independent pre-production gate that blocks crash-on-startup builds regardless of ring targeting, so a single misinterpreted metadata field cannot collapse the canary-to-production boundary.",
+  "Automate fast customer communication — initial notice within 15 minutes of detected impact — decoupled from the manual investigation timeline.",
+  "Reduce identity-plane blast radius through cell/partition isolation and graceful auth degradation, so a bad backend deployment cannot simultaneously drain success rates across all regions and both clouds.",
+  "Publish clearer scope quantification (beyond 'a subset of customers') so downstream operators — including safety-critical third parties like emergency-dispatch platforms — can assess their own exposure."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "Failure mechanism: the safety net became the weapon",
+   "body": "The trigger was mundane — a service update aimed at an internal validation test ring crashed on startup. In a healthy pipeline that crash is the point: the canary ring catches it and nothing ships. Here, a latent code defect in the Safe Deployment Process corrupted the system's interpretation of deployment metadata, so the ring scoping that should have confined the change instead evaluated to 'all rings.' The crash-on-startup build was therefore deployed to global production concurrently, bypassing validation entirely. The very mechanism designed to make deployments safe was the mechanism that made this one catastrophic."
+  },
+  {
+   "heading": "Why it cascaded to a global blast radius",
+   "body": "Azure Active Directory is the identity control plane for the entire Microsoft cloud, so the fault did not stay contained to one service. With backend instances crashing and no healthy instances to issue tokens, authentication calls returned HTTP 503, and every product that logs in through AAD failed together: Azure Portal, Microsoft 365, Teams, Exchange/Outlook, and even some Office desktop and Visual Studio installations. Impact spanned both Azure Public and Azure Government clouds. Regional authentication success rates fell sharply and unevenly — Americas as low as 17% while Europe held near 81% — reflecting how the manual, staged recovery brought regions back at different rates. Downstream third parties were plausibly caught too: The Register noted unconfirmed claims that the Azure-based RapidDeploy Nimbus emergency-dispatch platform was affected, illustrating how far an identity-plane fault can reach beyond the operator's own catalog."
+  },
+  {
+   "heading": "Recovery: coupled failure and recovery paths",
+   "body": "The outage ran long — roughly three hours to normal operational parameters and about five hours end-to-end — precisely because the recovery path shared a failure mode with the deployment path. Automated rollback could not execute cleanly because the same latent SDP defect had already corrupted the deployment metadata it relied on; Microsoft even posted mid-incident that it was 'not observing an increase in successful connections after rolling back.' Engineers fell back to a slower manual rollback and staged re-enablement of instances beginning around 22:47 UTC, which is why success rates recovered region by region rather than all at once. The authoritative RCA (Tracking ID SM79-F88) fixes impact start at 21:25 UTC on 28 September, return to normal parameters at 00:23 UTC, and residual instances fully cleared by 02:25 UTC on 29 September."
+  },
+  {
+   "heading": "Organizational and systemic factors",
+   "body": "Beyond the code, the incident exposed systemic fragilities. Identity centralization concentrates blast radius by design — convenient until the control plane fails, at which point everything fails together. The deployment tooling was trusted as a safety guarantee without an independent check that the safety system itself was behaving. Customer communication also lagged the impact, prompting a specific corrective commitment to post an initial notice within 15 minutes of impact. Contextually, this was the second major Azure disruption in roughly two weeks and came shortly after Microsoft's Ignite conference, sharpening scrutiny on the reliability of a service so many organizations depend on."
+  },
+  {
+   "heading": "Cross-incident pattern: the automation-that-globalizes-a-canary",
+   "body": "This event is a canonical instance of a recurring cloud failure pattern: a change intended for a tiny scope is amplified to global scope by the automation meant to contain it, and then the automated remediation fails through the same defect. The countermeasures generalize across providers — validate the safety/rollout system as safety-critical software, keep the rollback path independent of any state a deployment defect can corrupt, and add an independent gate that blocks crash-on-startup builds regardless of ring targeting. Notably, a separate SharePoint/OneDrive disruption the following morning (UK time) stemmed from a change Microsoft put in place to mitigate this AAD outage — a distinct follow-on event, not the same defect — a reminder that co-occurring symptoms can have different (even causally-linked-but-separate) root causes and must be analyzed independently."
+  }
+ ],
+ "technicalDeepDive": "The proximate fault was a crash-on-startup service update in the Azure AD backend, but the amplifying defect lived in the Safe Deployment Process (SDP) control layer. SDP normally enforces progressive exposure: a change is expressed with deployment metadata that scopes it to a specific ring (starting with an internal validation test ring), and the system advances the rollout only as health signals stay green. The latent defect corrupted SDP's interpretation of that metadata, so the ring predicate that should have resolved to 'validation test ring only' instead resolved to every ring simultaneously. The result was a single-step, all-rings-concurrent deployment of a build that could not even start — meaning production backend instances crashed on boot and the fleet had no healthy instances to mint tokens. Downstream, authentication endpoints surfaced this as HTTP 503 (Service Unavailable): with the token-issuing backend absent, the front door correctly reported the dependency as unavailable, and every relying service (Portal, M365, Teams, Outlook) lost sign-in. The second, duration-defining failure was in the recovery path. SDP's automated rollback is metadata-driven — it reverts by re-targeting the prior known-good deployment via the same metadata substrate. Because the latent defect had corrupted that deployment metadata, automated rollback could not run reliably, so operators executed a manual rollback and staged re-enablement of instances region by region (beginning around 22:47 UTC), which explains both the ~2h58m-to-normal / ~5h-to-residual-cleared timeline and the uneven regional success-rate recovery (Americas ~17%→37%, Asia 72%→32%, Australia ~37%, Europe ~81%). The engineering lesson is architectural: the deploy and rollback paths shared a single corruptible dependency (deployment metadata), collapsing what should have been two independent safety layers into one, while the canary boundary itself rested on that same metadata rather than on an independent crash-on-startup gate. Impact spanned both Azure Public and Azure Government clouds, and because AAD is the shared identity control plane, the fault propagated to third-party Azure-dependent platforms as well.",
+ "references": [
+  {
+   "title": "Microsoft says a latent defect in Safe Deployment Process downed Azure Active Directory",
+   "url": "https://www.theregister.com/software/2020/10/02/microsoft_says_bug_sorry_a_latent_defect_in_safe_deployment_process_system_downed_azure_active_directory/",
+   "type": "news",
+   "quote": "a latent defect in Safe Deployment Process",
+   "accessed": "2026-07-31"
+  },
+  {
+   "title": "Azure AD is Down blocking access to Azure, Teams and more — RCA reproduction (Tracking ID SM79-F88)",
+   "url": "https://build5nines.com/azure-ad-is-down-blocking-access-to-azure-teams-and-more-september-28-2020-microsoft-azure-outage/",
+   "type": "rca",
+   "quote": "A latent code defect in the Azure AD backend service Safe Deployment Process (SDP) system caused this to deploy directly into our production environment, bypassing our normal validation process.",
+   "accessed": "2026-07-31"
+  },
+  {
+   "title": "With so many cloud services dependent on it, Azure Active Directory has become a single point of failure for Microsoft",
+   "url": "https://www.theregister.com/off-prem/2020/09/29/with-so-many-cloud-services-dependent-on-it-azure-active-directory-has-become-a-single-point-of-failure-for-microsoft/717645",
+   "type": "news",
+   "quote": "The core service affected was Azure Active Directory, which controls login to everything from Outlook email to Teams to the Azure portal.",
+   "accessed": "2026-07-31"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": false,
+  "referenceCount": 3,
+  "lastVerified": "2026-07-31",
+  "confidence": "high"
+ },
+ "lastUpdated": "2026-07-31"
+}

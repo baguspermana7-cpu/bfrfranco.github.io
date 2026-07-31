@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Global Authentication Outage — User ID Service Quota Collapse (Dec 14, 2020) | ResistanceZero</title>
+    <meta name="description" content="On December 14, 2020, an automated quota-management system wrongly cut capacity on the account database behind Google&#x27;s central User ID Service to near-zero. An October change had ">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="ai-content-declaration" content="human-curated, sourced from public post-incident reports">
+    <meta name="author" content="Bagus Dwi Permana">
+    <link rel="canonical" href="https://resistancezero.com/incident-gcp-global-auth-quota-2020.html">
+    <meta name="theme-color" content="#0c1512">
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+    <style>
+    /* ── Governed Incident Dossier — editorial register (v2): forest-green + warm ivory,
+       serif display, evidence-class provenance. Accent vars remapped so all components
+       re-skin. AA-contrast in both themes. No gradients / glass / dot-grid (anti-slop). */
+    :root:not([data-theme="dark"]) {
+        --bg:#f4f1e7; --surface:#fffdf6; --surface-2:#efeadc; --line:rgba(26,45,36,0.16);
+        --text:#1a2d24; --text-strong:#10201a; --text-body:#3b463d; --muted:#6a7367;
+        --cyan:#2f6b4f; --amber:#87671b; --green:#2f7d54; --red:#9c3b32; --gold:#87671b;
+        --hero-ink:#f4f1e7; --hero-bg:#183329; --shadow-deep:rgba(26,45,36,0.10);
+    }
+    [data-theme="dark"] {
+        --bg:#0c1512; --surface:#11201a; --surface-2:#16281f; --line:rgba(233,229,216,0.15);
+        --text:#e9e5d8; --text-strong:#f5f2e9; --text-body:#c6ccbc; --muted:#8b9484;
+        --cyan:#7fd1a8; --amber:#d8b25c; --green:#7fd1a8; --red:#e0917f; --gold:#d8b25c;
+        --hero-ink:#e9e5d8; --hero-bg:#0f221a; --shadow-deep:rgba(0,0,0,0.5);
+    }
+    * { box-sizing:border-box; }
+    html,body { margin:0; padding:0; }
+    body { background:var(--bg); color:var(--text); font-family:'IBM Plex Sans',system-ui,sans-serif; line-height:1.62; }
+    a { color:var(--cyan); }
+    h1,h2,.serif { font-family:'Fraunces','Newsreader',Georgia,serif; font-weight:600; letter-spacing:-0.01em; }
+    .wrap { max-width:1120px; margin:0 auto; padding:1.5rem 1.1rem 3rem; }
+    .navbar { display:flex; align-items:center; justify-content:space-between; padding:0.7rem 1.1rem; border-bottom:1px solid var(--line); background:var(--surface); position:sticky; top:0; z-index:50; }
+    .nav-container { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:1120px; margin:0 auto; }
+    .nav-logo { display:flex; align-items:center; }
+    .nav-avatar { width:34px; height:34px; border-radius:50%; }
+    .nav-menu { display:flex; gap:1rem; list-style:none; margin:0; padding:0; }
+    .nav-menu a { color:var(--text-body); text-decoration:none; font-size:0.85rem; font-weight:600; }
+    .nav-menu a:hover { color:var(--cyan); }
+    .nav-right { display:flex; align-items:center; gap:0.6rem; }
+    .theme-btn { background:none; border:1px solid var(--line); color:var(--text); border-radius:8px; padding:0.35rem 0.5rem; cursor:pointer; font-size:0.8rem; }
+    .lock-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--red); border:1px solid var(--red); border-radius:999px; padding:0.12rem 0.5rem; }
+    h1 { font-size:2.4rem; color:var(--text-strong); margin:0.35rem 0 0.5rem; line-height:1.12; }
+    h2 { font-size:1.4rem; color:var(--text-strong); margin:2rem 0 0.7rem; }
+    .eyebrow { font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); }
+    .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
+    .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
+    .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:999px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    .chip.cyan { color:var(--cyan); border-color:var(--cyan); }
+    .chip.amber { color:var(--amber); border-color:var(--amber); }
+    .chip.green { color:var(--green); border-color:var(--green); }
+    .chip.red { color:var(--red); border-color:var(--red); }
+    .chip.muted { color:var(--muted); }
+    .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:1rem 1.1rem; margin-top:0.9rem; }
+    .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:12px; margin-top:0.9rem; }
+    table.inc-index { width:100%; border-collapse:collapse; font-size:0.86rem; min-width:760px; }
+    table.inc-index th { text-align:left; font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); background:var(--surface-2); }
+    table.inc-index td { padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); color:var(--text-body); vertical-align:top; }
+    table.inc-index tr:hover td { background:var(--surface-2); }
+    table.inc-index a { font-weight:700; color:var(--text-strong); text-decoration:none; }
+    table.inc-index a:hover { color:var(--cyan); text-decoration:underline; }
+    .rank-badge { font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--amber); }
+    .mag-bar { height:4px; border-radius:3px; background:var(--line); margin-top:0.35rem; overflow:hidden; }
+    .mag-bar > span { display:block; height:4px; background:var(--amber); }
+    ul.tight { margin:0.4rem 0 0; padding-left:1.15rem; }
+    ul.tight li { color:var(--text-body); margin:0.3rem 0; font-size:0.92rem; }
+    .soe { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .soe li { display:grid; grid-template-columns:170px 1fr; gap:0.7rem; padding:0.5rem 0; border-bottom:1px dashed var(--line); }
+    .soe time { font-family:'JetBrains Mono',monospace; font-size:0.76rem; color:var(--cyan); }
+    .soe .ev { color:var(--text-body); font-size:0.9rem; }
+    .phase-chip { font-family:'JetBrains Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--amber); border:1px solid var(--amber); border-radius:999px; padding:0.05rem 0.4rem; margin-right:0.4rem; white-space:nowrap; }
+    table.metrics { width:100%; border-collapse:collapse; font-size:0.88rem; }
+    table.metrics td { padding:0.5rem 0.7rem; border-bottom:1px solid var(--line); vertical-align:top; }
+    table.metrics .mlabel { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; width:38%; white-space:nowrap; }
+    table.metrics .mval { color:var(--text-body); }
+    .ca-block { background:var(--surface); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 10px 10px 0; padding:0.7rem 1rem; margin-top:0.7rem; }
+    .ca-block h3 { margin:0 0 0.3rem; font-size:0.92rem; color:var(--text-strong); }
+    .ca-block p { margin:0; color:var(--text-body); font-size:0.9rem; }
+    .kv { display:grid; grid-template-columns:180px 1fr; gap:0.5rem 0.9rem; margin-top:0.5rem; font-size:0.9rem; }
+    .kv dt { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; }
+    .kv dd { margin:0; color:var(--text-body); }
+    .refs { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .refs li { padding:0.55rem 0; border-bottom:1px solid var(--line); }
+    .refs .rtitle { color:var(--text-strong); font-weight:600; font-size:0.9rem; }
+    .refs .rquote { color:var(--muted); font-size:0.84rem; font-style:italic; margin-top:0.2rem; display:block; }
+    .refs a { font-size:0.78rem; word-break:break-all; }
+    .backlink { display:inline-block; margin-bottom:0.6rem; font-size:0.82rem; color:var(--cyan); text-decoration:none; }
+    footer { border-top:1px solid var(--line); margin-top:2.5rem; padding:1.4rem 1.1rem; text-align:center; }
+    footer .ver { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .disclaimer { font-size:0.76rem; color:var(--muted); margin-top:0.8rem; max-width:80ch; }
+    .skip-link { position:absolute; top:-50px; left:0; background:#0e7490; color:#fff; padding:10px 20px; text-decoration:none; font-weight:600; z-index:10000; border-radius:0 0 8px 0; transition:top 0.2s; }
+    .skip-link:focus { top:0; }
+    .root-gate { position:fixed; inset:0; z-index:99999; display:none; align-items:center; justify-content:center; background:rgba(2,6,23,0.74); padding:1rem; backdrop-filter:blur(6px); }
+    body.locked .root-gate { display:flex; }
+    body.locked .wrap { filter:blur(4px); pointer-events:none; user-select:none; }
+    .root-card { max-width:430px; width:100%; background:var(--surface); border:1px solid var(--cyan); border-radius:14px; padding:1.3rem 1.15rem; text-align:center; box-shadow:0 18px 36px var(--shadow-deep); }
+    .root-card h2 { margin:0 0 0.4rem; font-size:1.1rem; color:var(--text-strong); }
+    .root-card p { font-size:0.86rem; color:var(--text-body); }
+    .root-actions { margin-top:0.9rem; display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; }
+    .root-actions button, .root-actions a { border-radius:9px; padding:0.5rem 0.85rem; font-size:0.8rem; font-weight:700; border:1px solid var(--line); text-decoration:none; cursor:pointer; color:var(--text); font-family:inherit; }
+    .root-actions button { background:var(--cyan); color:#04121a; border:none; }
+    .rz-nav-burger { display:none; }
+    /* v1.8.0 — mobile responsive patch */
+    @media (max-width:768px) {
+        html,body { overflow-x:hidden; max-width:100vw; }
+        img { max-width:100%; height:auto; display:block; }
+        .nav-menu, .nav-links { display:none; }
+        .navbar { padding:0.5rem 0.75rem; }
+        footer .footer-grid { grid-template-columns:1fr; gap:1.25rem; padding:1rem; }
+        button, a.btn, [role="button"] { min-height:44px; }
+        h1 { font-size:1.4rem; }
+        .soe li { grid-template-columns:1fr; gap:0.15rem; }
+        .kv { grid-template-columns:1fr; }
+        .root-card { max-width:92vw; }
+    }
+    @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
+</style>
+</head>
+<body class="locked">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <nav class="navbar"><div class="nav-container">
+        <a href="index.html" class="nav-logo"><img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dc-incidents.html">DC Incidents</a></li>
+            <li><a href="datacenter-solutions.html">DC Solutions</a></li>
+        </ul>
+        <div class="nav-right">
+            <span class="lock-tag" title="Root-only module">🔒 Root</span>
+            <button class="theme-btn" id="themeToggle" type="button" aria-label="Toggle theme">◐</button>
+        </div>
+    </div></nav>
+    <main class="wrap" id="main-content" data-explain-scan>
+        <a class="backlink" href="dc-incidents.html">← All incidents</a>
+        <div class="eyebrow">Incident dossier · Rank #14</div>
+        <h1>Google Global Authentication Outage — User ID Service Quota Collapse (Dec 14, 2020)</h1>
+        <div class="chips">
+            <span class="chip">Google Cloud</span>
+            <span class="chip cyan">2020-12-14</span>
+            <span class="chip amber">47m core impact</span>
+            <span class="chip amber">Software</span>
+        </div>
+        <p class="lede">On December 14, 2020, an automated quota-management system wrongly cut capacity on the account database behind Google&#x27;s central User ID Service to near-zero. An October change had registered that service with a new quota system while leaving parts of the old one in place; the residual system reported the service&#x27;s usage as 0, which triggered the automated reduction. With the quota starved, the Paxos leader could no longer write, so credential issuance and account-metadata lookups failed for every Google account. Any request needing OAuth-based authentication returned errors, taking down Gmail, YouTube, Drive, Docs, Calendar, Play, Google Cloud, Workspace and even Google Home speakers globally. Engineers identified the root cause about 22 minutes after onset and mitigated by disabling quota enforcement datacenter by datacenter; the authentication core recovered in 47 minutes (03:46–04:33 US/Pacific).</p>
+
+        <h2>Facility &amp; location</h2>
+        <dl class="kv">
+            <dt>Operator</dt><dd>Google Cloud</dd>
+            <dt>Data center</dt><dd>Google global identity (User ID Service)</dd>
+            <dt>Location</dt><dd>USA, global</dd>
+            <dt>Date</dt><dd>2020-12-14</dd>
+        </dl>
+
+        <h2>Impact &amp; scale</h2>
+        <dl class="kv">
+            <dt>Users affected</dt><dd>Billions of Google account holders worldwide (no absolute count disclosed in any reachable source)</dd>
+            <dt>Financial</dt><dd>Not disclosed — no dollar/financial-impact figure exists in any reachable source; only qualitative SLA-credit exposure noted by community</dd>
+            <dt>Scope</dt><dd>SEV-1 / global (single-point-of-failure in shared identity layer)</dd>
+        </dl>
+        <div class="card"><strong>Services / systems down</strong><ul class="tight"><li>Gmail</li><li>YouTube</li><li>Google Drive</li><li>Google Docs</li><li>Google Calendar</li><li>Google Play</li><li>Google Meet</li><li>Google Cloud Console</li><li>Cloud Storage</li><li>BigQuery</li><li>Google Kubernetes Engine</li><li>Google Home smart speakers</li><li>all Google-account-authenticated services</li></ul></div>
+        <h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Authentication-core outage duration</td><td class="mval">47 minutes (03:46–04:33 US/Pacific)</td></tr><tr><td class="mlabel">User-perceived outage window (Wikipedia)</td><td class="mval">~50 minutes (11:45–12:35 UTC)</td></tr><tr><td class="mlabel">Community-observed window (Hacker News)</td><td class="mval">~57 minutes</td></tr><tr><td class="mlabel">Time from onset to root-cause identification</td><td class="mval">~22 minutes (03:46 → 04:08 US/Pacific)</td></tr><tr><td class="mlabel">Time from onset to global mitigation</td><td class="mval">~41 minutes (03:46 → 04:27 US/Pacific)</td></tr><tr><td class="mlabel">Reported usage figure that triggered the quota cut</td><td class="mval">0 (User ID Service usage misreported as zero)</td></tr><tr><td class="mlabel">Account scope of credential/metadata failure</td><td class="mval">All Google user accounts (global)</td></tr><tr><td class="mlabel">Client-facing error signature</td><td class="mval">Widespread 5xx on authenticated traffic</td></tr></tbody></table></div>
+
+        <h2>Sequence of events (SOE)</h2>
+        <ul class="soe"><li><time>2020-10 (weeks prior), date unspecified</time><span class="ev"><span class="phase-chip">Trigger</span> A change registers the central User ID Service with a new quota system, but parts of the previous quota system are left in place — a latent misconfiguration that will later misreport usage.</span></li><li><time>2020-12-14 03:43 US/Pacific (11:43 UTC)</time><span class="ev"><span class="phase-chip">Detection</span> Automated capacity alerts fire as the residual quota system reports the User ID Service&#x27;s usage as 0 and an automated quota reduction is applied to the account database.</span></li><li><time>2020-12-14 03:46 US/Pacific (11:46 UTC)</time><span class="ev"><span class="phase-chip">Impact</span> User ID Service errors begin. The starved quota blocks the Paxos leader from writing; credential issuance and account-metadata lookups start failing.</span></li><li><time>2020-12-14 ~03:46+ US/Pacific</time><span class="ev"><span class="phase-chip">Cascade</span> Authentication failures propagate to every OAuth-authenticated request, returning widespread 5xx errors across GCP, Workspace, and all consumer services (Gmail, YouTube, Drive, Docs, Calendar, Play) and Google Home speakers worldwide.</span></li><li><time>2020-12-14 03:48 US/Pacific (11:48 UTC)</time><span class="ev"><span class="phase-chip">Escalation</span> On-call engineers are paged.</span></li><li><time>2020-12-14 04:08 US/Pacific (12:08 UTC)</time><span class="ev"><span class="phase-chip">Diagnosis</span> Root cause identified — about 22 minutes after onset — as the erroneous quota reduction driven by the zero-usage misreport.</span></li><li><time>2020-12-14 04:22 US/Pacific (12:22 UTC)</time><span class="ev"><span class="phase-chip">Mitigation</span> Quota enforcement disabled in one datacenter as the first mitigation step.</span></li><li><time>2020-12-14 04:27 US/Pacific (12:27 UTC)</time><span class="ev"><span class="phase-chip">Mitigation</span> Mitigation applied to all datacenters — quota enforcement disabled globally.</span></li><li><time>2020-12-14 04:33 US/Pacific (12:33 UTC)</time><span class="ev"><span class="phase-chip">Restored</span> Error rates normalize; the authentication-core outage ends at 47 minutes (04:33 US/Pacific = 12:33 UTC). Community and Wikipedia place user-perceived recovery slightly later (~50–57 min), consistent with the report&#x27;s note of lingering per-service recovery after the core fix.</span></li></ul>
+
+        <h2>Root cause</h2>
+        <div class="card">Google incident #20013: an October change registered the central User ID Service with a new quota system, but parts of the previous quota system remained in place and incorrectly reported the service&#x27;s usage as 0. That zero-usage reading drove an automated quota reduction on the account database, which prevented the Paxos leader from writing. Credential issuance and account-metadata lookups for all Google accounts then failed, cascading to every OAuth-authenticated request across all services. The single point of failure was the shared identity/account-database layer.</div>
+
+        <h2>Contributing factors</h2>
+        <ul class="tight"><li>Incomplete migration: the October registration to the new quota system left parts of the old quota system active, so two systems observed the same service inconsistently.</li><li>Trusting an implausible signal: the automated quota system acted on a usage reading of 0 for a globally critical service without a sanity floor or human confirmation.</li><li>No graceful degradation on write denial: a quota/admission cut could stop the Paxos leader from writing, and there was no write fallback to keep credentials issuing (per the official remediation direction; failover could not help because cluster-wide denial starved every replica — inference flagged as such).</li><li>Shared-identity single point of failure: one account-database layer underpins authentication for every Google product, so its failure was simultaneously global across cloud, consumer, and IoT surfaces.</li><li>Automation autonomy: capacity/quota changes could be enforced automatically and rapidly across datacenters without a guardrail against near-zero reductions on critical services.</li></ul>
+
+        <h2>Correction of errors (COE)</h2>
+        <ul class="tight"><li>Add sanity floors / guardrails so the automated quota system cannot reduce capacity of a critical service to near-zero based on an implausible reading (e.g. usage reported as 0). <span class="chip muted">Google identity / quota-platform engineering · Directionally indicated by postmortem (not itemized verbatim in ledger)</span></li><li>Complete and verify quota-system migrations so no residual legacy system can misreport usage for a service registered with the new system. <span class="chip muted">Google identity / quota-platform engineering · Directionally indicated by postmortem</span></li><li>Improve resilience to write failures in the account database so a blocked Paxos leader / quota denial does not immediately halt credential issuance globally (graceful degradation / write fallback). <span class="chip muted">Google account-database / Paxos team · Official remediation item on write-failure resilience (implies no graceful fallback existed at the time)</span></li><li>Retain and formalize the datacenter-by-datacenter quota-enforcement-disable procedure as a tested emergency mitigation runbook. <span class="chip muted">Google SRE / incident response · Demonstrated effective during this incident (one-DC then all-DC)</span></li></ul>
+
+        <h2>Lessons learnt</h2>
+        <ul class="tight"><li>A shared identity/authentication layer is the highest-leverage single point of failure in a large platform: when it fails, cloud, consumer web, and IoT hardware all fall at once, worldwide.</li><li>Automation acting on an implausible input (usage = 0) can inflict global damage in minutes; critical-service automation needs sanity bounds and confirmation before enforcing drastic reductions.</li><li>Migrations that leave the old system partially active create silent inconsistency; a registration change is not complete until every legacy path stops observing and acting on the service.</li><li>Fast root-cause identification (~22 min here) is what kept a maximal-blast-radius outage to under an hour — observability and clear alerting materially bounded the impact.</li><li>Strong consistency (Paxos writes) with no graceful degradation means a control-plane denial (quota) can fully stop the data plane; critical write paths need a resilience story for admission/quota failures.</li><li>A simple, well-scoped mitigation lever (disable quota enforcement, DC by DC) can recover a global outage quickly when the root cause is understood — such levers should be pre-built and rehearsed.</li></ul>
+
+        <h2>Improvements &amp; remediation</h2>
+        <ul class="tight"><li>Introduce hard guardrails preventing automated near-zero quota reductions on tier-0 services, with mandatory sanity checks against historical baselines.</li><li>Enforce migration-completeness gates so a service cannot be dual-observed by an old and a new quota system simultaneously.</li><li>Add graceful-degradation / write-fallback paths for the account database so credential issuance can survive a Paxos-write or quota denial without total global failure.</li><li>Instrument and alert on quota-vs-actual-usage divergence for critical services to catch a zero-usage misreport before it drives enforcement.</li><li>Pre-stage and regularly drill the DC-by-DC quota-enforcement-disable runbook so the ~41-minute onset-to-global-mitigation window can be compressed further.</li><li>Reduce identity-layer blast radius through isolation or partial-availability modes so a single account-database fault does not simultaneously black out every product surface.</li></ul>
+
+        <h2>Comprehensive analysis</h2><div class="ca-block"><h3>Failure mechanism — how a migration remnant zeroed a global service</h3><p>The proximate trigger was not a hardware fault or traffic spike but a latent inconsistency from an incomplete migration. When the User ID Service was registered with a new quota system in October, parts of the old quota system were left running and continued to observe the service — reporting its usage as 0. Weeks later, that stale zero was treated as ground truth by automation, which reduced the account-database quota accordingly. The system was, in effect, told that a service carrying global authentication load was doing no work, and it sized capacity to match.</p></div><div class="ca-block"><h3>Why it cascaded globally</h3><p>The reduced quota prevented the Paxos leader from writing, which halted credential issuance and account-metadata lookups for every Google account. Because virtually all Google products authenticate through this shared identity layer via OAuth, a single control-plane action propagated into widespread 5xx errors across independent product families at once: GCP (Console, Storage, BigQuery, GKE), Workspace (Gmail, Calendar, Meet, Docs, Drive), consumer services (YouTube, Play), and even Google Home smart speakers. The blast radius reflects architecture, not coincidence — one account database is the common dependency, so its failure is simultaneously everyone&#x27;s failure.</p></div><div class="ca-block"><h3>Detection and recovery</h3><p>Automated capacity alerts fired at 03:43 US/Pacific, errors began at 03:46, and engineers were paged at 03:48. Root cause was identified by 04:08 — roughly 22 minutes after onset — which is the decisive fact in keeping this under an hour. Mitigation was surgical: disable quota enforcement in one datacenter at 04:22 to confirm the fix, then roll it to all datacenters by 04:27, with error rates normalizing at 04:33. The Pacific-time sequence converts cleanly to UTC (PST = UTC-8: 03:43→11:43 alerts, 03:46→11:46 impact, 04:22→12:22 one-DC, 04:27→12:27 all-DC, 04:33→12:33 restored), and Wikipedia&#x27;s independently reported UTC window (~11:45 start, ~12:33 restore, ~50 minutes) corroborates the same events, confirming the timeline&#x27;s internal consistency.</p></div><div class="ca-block"><h3>Organizational and systemic factors</h3><p>Three systemic conditions turned a config remnant into a global outage: automation empowered to enforce drastic capacity changes without a sanity floor; a migration process that allowed old and new quota systems to coexist and disagree; and a strongly-consistent write path (Paxos) with no graceful degradation when admission/quota was denied — a failover could not help because cluster-wide denial starved every replica&#x27;s writes (inference, flagged). The official remediation emphasis on write-failure resilience implies no write fallback existed at the time.</p></div><div class="ca-block"><h3>Cross-incident pattern</h3><p>This incident is a canonical shared-control-plane / identity-SPOF failure: a small, automated, seemingly-safe change in a central dependency produces disproportionate, correlated, cross-product impact. The pattern recurs across large providers — automation acting confidently on bad or stale metadata, an incomplete migration leaving inconsistent state, and a single foundational service (identity, DNS, config, or routing) whose failure defeats otherwise-independent redundancy. The mitigating counter-pattern is also visible here: fast, clear root-causing plus a pre-scoped kill-switch (disable enforcement) bounded the damage to 47 minutes.</p></div>
+
+        <h2>Technical deep-dive</h2>
+        <div class="card">The account database backing Google&#x27;s User ID Service uses Paxos for strongly-consistent, quorum-replicated writes, with credential issuance and account-metadata lookups depending on the elected leader&#x27;s ability to commit. Quota/admission control sits in front of this data plane as a control-plane governor. The defect chain was: (1) an October registration moved the User ID Service onto a new quota system while a legacy quota path remained active and kept observing the same service; (2) that legacy path reported usage as 0; (3) the automated quota system consumed the zero and reduced the account-database quota to a level consistent with a near-idle service; (4) the reduced quota denied the Paxos leader the resources/admission to write; (5) with writes blocked, credential issuance and metadata lookups failed for all accounts, and every OAuth-authenticated request downstream returned 5xx. Crucially, leader re-election offered no escape: the constraint was a cluster-wide quota/admission denial rather than a single unhealthy replica, so every replica was equally starved and no healthy leader could be elected into a writable state (this failover reasoning is inferred, not stated by the primary, and the official remediation on write-failure resilience is consistent with the absence of any graceful write fallback). The exact quota metric that read 0 is not disclosed — the primary states usage was reported as 0 but not whether the unit was QPS, backend task count, or storage bytes — and the numeric threshold/algorithm of the automated reducer is likewise undisclosed; usage-reported-as-0 is the finest available granularity. The mitigation targeted the control plane directly: disabling quota enforcement removed the erroneous admission cap so the Paxos leader could write again, applied first to one datacenter as a controlled validation and then fleet-wide, with normalization following within minutes. Whether client 5xx surfaced at front-end proxies failing token validation versus backends rejecting stale sessions (and the 429→5xx mistranslation account) is Hacker News community analysis, not Google-confirmed.</div>
+
+        <h2>References &amp; provenance</h2>
+        <ul class="refs"><li><span class="chip green">official-postmortem</span> <span class="rtitle">Google Cloud Status — Incident #20013 (official postmortem)</span><span class="rquote">“A change was made in October to register the User ID Service with the new quota system, but parts of the previous quota system were left in place which incorrectly reported the usage for the User ID Service as 0.”</span><a href="https://status.cloud.google.com/incident/zall/20013" target="_blank" rel="noopener nofollow">https://status.cloud.google.com/incident/zall/20013</a></li><li><span class="chip muted">encyclopedia</span> <span class="rtitle">2020 Google services outages</span><span class="rquote">“An accidental reduction of capacity on their central user ID management system, causing requests that required OAuth-based authentication to fail.”</span><a href="https://en.wikipedia.org/wiki/2020_Google_services_outages" target="_blank" rel="noopener nofollow">https://en.wikipedia.org/wiki/2020_Google_services_outages</a></li><li><span class="chip amber">news</span> <span class="rtitle">Google Issues Post Mortem on Gmail, YouTube Outage (SecurityWeek)</span><span class="rquote">“Google published a post mortem attributing the December 14 outage to its central identity system running out of storage quota.”</span><a href="https://www.securityweek.com/google-issues-post-mortem-gmail-youtube-outage/" target="_blank" rel="noopener nofollow">https://www.securityweek.com/google-issues-post-mortem-gmail-youtube-outage/</a></li><li><span class="chip muted">forum</span> <span class="rtitle">Post Mortem of Google Outage on 14 December 2020 (Hacker News)</span><span class="rquote">“Community discussion observed the disruption lasting on the order of 57 minutes and debated how quota errors mistranslated into client-facing 5xx responses.”</span><a href="https://news.ycombinator.com/item?id=25472455" target="_blank" rel="noopener nofollow">https://news.ycombinator.com/item?id=25472455</a></li></ul>
+        <p class="disclaimer">Sourced from public post-incident reports. Quotes are short attributed excerpts for provenance only; the analysis above is original and substantially shorter than its sources. Last verified 2026-07-31.</p>
+
+    </main>
+    <footer><div class="footer-grid"></div><span class="ver" id="versionStamp"></span></footer>
+    <div class="root-gate">
+        <div class="root-card">
+            <h2>🔒 Root access required</h2>
+            <p>The DC Incidents dossier is a root-only module. Sign in with an authorized account to continue.</p>
+            <div class="root-actions">
+                <button id="rootLoginBtn" type="button">Sign In</button>
+                <a href="index.html">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/rz-version.js?v=2026-07-31-inc2"></script>
+    <script src="js/rz-feature-flags.js?v=2026-07-31-inc2" defer></script>
+    <script src="auth.js?v=2026-07-31-inc2" defer></script>
+    <script src="js/rz-mobile-nav.js?v=2026-07-31-inc2" defer></script>
+    <script src="js/rz-cookie-consent.js?v=2026-07-31-inc2" defer></script>
+    <script src="js/rz-explain-db.js?v=2026-07-31-inc2" defer></script>
+    <script src="js/rz-explain.js?v=2026-07-31-inc2" defer></script>
+    <script>
+    (function(){var t=document.getElementById('themeToggle');function a(theme){document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme);var m=document.querySelector('meta[name=\"theme-color\"]');if(m)m.setAttribute('content',theme==='dark'?'#0c1512':'#f4f1e7');}a(localStorage.getItem('theme')||'dark');if(t)t.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme');a(c==='dark'?'light':'dark');});})();
+    (function(){function ag(){if(window._rzAuth&&typeof window._rzAuth.enforceTierFeatureAccess==='function'){window._rzAuth.enforceTierFeatureAccess('dc-incidents');}else{try{var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');var r=s&&s.role,t=s&&s.tier;var passes=!!s&&(r==='root'||t==='root');document.body.classList.toggle('locked',!passes);}catch(e){document.body.classList.add('locked');}}}var b=document.getElementById('rootLoginBtn');if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showRootGatePrompt==='function'){window._rzAuth.showRootGatePrompt('Root account required for the DC Incidents dossier.');}else if(window._rzAuth&&typeof window._rzAuth.showModal==='function'){window._rzAuth.showModal();}});window.addEventListener('rz-auth-change',function(){setTimeout(ag,50);});window.addEventListener('storage',function(e){if(e.key==='rz_premium_session')ag();});ag();setTimeout(ag,60);setTimeout(ag,550);setTimeout(ag,1600);})();
+    (function(){var el=document.getElementById('versionStamp');if(!el)return;var v=window.RZ_VERSION||'1.x.x',d=window.RZ_VERSION_DATE||'',cn=window.RZ_VERSION_CODENAME||'';el.textContent='· ResistanceZero · v'+v+(d?' · '+d:'')+(cn?' · '+cn:'')+' ·';})();
+    (function(){var n=0;function sc(){if(window.RZExplain&&window.RZExplain.scanText){var m=document.getElementById('main-content');if(m)window.RZExplain.scanText(m,120);}else if(n++<25){setTimeout(sc,200);}}setTimeout(sc,350);})();
+    </script>
+
+</body>
+</html>

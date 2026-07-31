@@ -1,0 +1,253 @@
+{
+ "slug": "gcp-global-auth-quota-2020",
+ "title": "Google Global Authentication Outage — User ID Service Quota Collapse (Dec 14, 2020)",
+ "operator": "Google Cloud",
+ "dcName": "Google global identity (User ID Service)",
+ "location": {
+  "city": "",
+  "country": "USA",
+  "region": "AMER",
+  "az": "global"
+ },
+ "date": "2020-12-14",
+ "durationMin": 47,
+ "category": [
+  "software"
+ ],
+ "severity": {
+  "usersAffected": "Billions of Google account holders worldwide (no absolute count disclosed in any reachable source)",
+  "impactUsd": "Not disclosed — no dollar/financial-impact figure exists in any reachable source; only qualitative SLA-credit exposure noted by community",
+  "servicesDown": [
+   "Gmail",
+   "YouTube",
+   "Google Drive",
+   "Google Docs",
+   "Google Calendar",
+   "Google Play",
+   "Google Meet",
+   "Google Cloud Console",
+   "Cloud Storage",
+   "BigQuery",
+   "Google Kubernetes Engine",
+   "Google Home smart speakers",
+   "all Google-account-authenticated services"
+  ],
+  "tier": "SEV-1 / global (single-point-of-failure in shared identity layer)"
+ },
+ "brief": "On December 14, 2020, an automated quota-management system wrongly cut capacity on the account database behind Google's central User ID Service to near-zero. An October change had registered that service with a new quota system while leaving parts of the old one in place; the residual system reported the service's usage as 0, which triggered the automated reduction. With the quota starved, the Paxos leader could no longer write, so credential issuance and account-metadata lookups failed for every Google account. Any request needing OAuth-based authentication returned errors, taking down Gmail, YouTube, Drive, Docs, Calendar, Play, Google Cloud, Workspace and even Google Home speakers globally. Engineers identified the root cause about 22 minutes after onset and mitigated by disabling quota enforcement datacenter by datacenter; the authentication core recovered in 47 minutes (03:46–04:33 US/Pacific).",
+ "magnitude": {
+  "usersScore": 10,
+  "financialScore": 6,
+  "durationScore": 4,
+  "blastRadiusScore": 10,
+  "note": "Blast radius maximal: a shared identity single-point-of-failure took out every Google-account-authenticated surface worldwide, including consumer IoT hardware. Users score maximal (whole global Google account base). Duration modest (47-min auth core; ~50–57 min user-perceived) thanks to fast root-cause identification. Financial score is a mid estimate reflecting massive reach but NO disclosed dollar figure in any reachable source."
+ },
+ "sequenceOfEvents": [
+  {
+   "t": "2020-10 (weeks prior), date unspecified",
+   "phase": "Trigger",
+   "event": "A change registers the central User ID Service with a new quota system, but parts of the previous quota system are left in place — a latent misconfiguration that will later misreport usage.",
+   "source": "status.cloud.google.com/incident/zall/20013"
+  },
+  {
+   "t": "2020-12-14 03:43 US/Pacific (11:43 UTC)",
+   "phase": "Detection",
+   "event": "Automated capacity alerts fire as the residual quota system reports the User ID Service's usage as 0 and an automated quota reduction is applied to the account database.",
+   "source": "status.cloud.google.com/incident/zall/20013"
+  },
+  {
+   "t": "2020-12-14 03:46 US/Pacific (11:46 UTC)",
+   "phase": "Impact",
+   "event": "User ID Service errors begin. The starved quota blocks the Paxos leader from writing; credential issuance and account-metadata lookups start failing.",
+   "source": "status.cloud.google.com/incident/zall/20013"
+  },
+  {
+   "t": "2020-12-14 ~03:46+ US/Pacific",
+   "phase": "Cascade",
+   "event": "Authentication failures propagate to every OAuth-authenticated request, returning widespread 5xx errors across GCP, Workspace, and all consumer services (Gmail, YouTube, Drive, Docs, Calendar, Play) and Google Home speakers worldwide.",
+   "source": "status.cloud.google.com/incident/zall/20013 + en.wikipedia.org/wiki/2020_Google_services_outages"
+  },
+  {
+   "t": "2020-12-14 03:48 US/Pacific (11:48 UTC)",
+   "phase": "Escalation",
+   "event": "On-call engineers are paged.",
+   "source": "status.cloud.google.com/incident/zall/20013"
+  },
+  {
+   "t": "2020-12-14 04:08 US/Pacific (12:08 UTC)",
+   "phase": "Diagnosis",
+   "event": "Root cause identified — about 22 minutes after onset — as the erroneous quota reduction driven by the zero-usage misreport.",
+   "source": "status.cloud.google.com/incident/zall/20013"
+  },
+  {
+   "t": "2020-12-14 04:22 US/Pacific (12:22 UTC)",
+   "phase": "Mitigation",
+   "event": "Quota enforcement disabled in one datacenter as the first mitigation step.",
+   "source": "status.cloud.google.com/incident/zall/20013 + en.wikipedia.org/wiki/2020_Google_services_outages"
+  },
+  {
+   "t": "2020-12-14 04:27 US/Pacific (12:27 UTC)",
+   "phase": "Mitigation",
+   "event": "Mitigation applied to all datacenters — quota enforcement disabled globally.",
+   "source": "status.cloud.google.com/incident/zall/20013 + en.wikipedia.org/wiki/2020_Google_services_outages"
+  },
+  {
+   "t": "2020-12-14 04:33 US/Pacific (12:33 UTC)",
+   "phase": "Restored",
+   "event": "Error rates normalize; the authentication-core outage ends at 47 minutes (04:33 US/Pacific = 12:33 UTC). Community and Wikipedia place user-perceived recovery slightly later (~50–57 min), consistent with the report's note of lingering per-service recovery after the core fix.",
+   "source": "status.cloud.google.com/incident/zall/20013 + en.wikipedia.org/wiki/2020_Google_services_outages"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Authentication-core outage duration",
+   "value": "47 minutes (03:46–04:33 US/Pacific)",
+   "source": "status.cloud.google.com/incident/zall/20013"
+  },
+  {
+   "label": "User-perceived outage window (Wikipedia)",
+   "value": "~50 minutes (11:45–12:35 UTC)",
+   "source": "en.wikipedia.org/wiki/2020_Google_services_outages"
+  },
+  {
+   "label": "Community-observed window (Hacker News)",
+   "value": "~57 minutes",
+   "source": "news.ycombinator.com/item?id=25472455"
+  },
+  {
+   "label": "Time from onset to root-cause identification",
+   "value": "~22 minutes (03:46 → 04:08 US/Pacific)",
+   "source": "status.cloud.google.com/incident/zall/20013"
+  },
+  {
+   "label": "Time from onset to global mitigation",
+   "value": "~41 minutes (03:46 → 04:27 US/Pacific)",
+   "source": "status.cloud.google.com/incident/zall/20013"
+  },
+  {
+   "label": "Reported usage figure that triggered the quota cut",
+   "value": "0 (User ID Service usage misreported as zero)",
+   "source": "status.cloud.google.com/incident/zall/20013"
+  },
+  {
+   "label": "Account scope of credential/metadata failure",
+   "value": "All Google user accounts (global)",
+   "source": "status.cloud.google.com/incident/zall/20013"
+  },
+  {
+   "label": "Client-facing error signature",
+   "value": "Widespread 5xx on authenticated traffic",
+   "source": "status.cloud.google.com/incident/zall/20013"
+  }
+ ],
+ "rootCause": "Google incident #20013: an October change registered the central User ID Service with a new quota system, but parts of the previous quota system remained in place and incorrectly reported the service's usage as 0. That zero-usage reading drove an automated quota reduction on the account database, which prevented the Paxos leader from writing. Credential issuance and account-metadata lookups for all Google accounts then failed, cascading to every OAuth-authenticated request across all services. The single point of failure was the shared identity/account-database layer.",
+ "contributingFactors": [
+  "Incomplete migration: the October registration to the new quota system left parts of the old quota system active, so two systems observed the same service inconsistently.",
+  "Trusting an implausible signal: the automated quota system acted on a usage reading of 0 for a globally critical service without a sanity floor or human confirmation.",
+  "No graceful degradation on write denial: a quota/admission cut could stop the Paxos leader from writing, and there was no write fallback to keep credentials issuing (per the official remediation direction; failover could not help because cluster-wide denial starved every replica — inference flagged as such).",
+  "Shared-identity single point of failure: one account-database layer underpins authentication for every Google product, so its failure was simultaneously global across cloud, consumer, and IoT surfaces.",
+  "Automation autonomy: capacity/quota changes could be enforced automatically and rapidly across datacenters without a guardrail against near-zero reductions on critical services."
+ ],
+ "coe": [
+  {
+   "action": "Add sanity floors / guardrails so the automated quota system cannot reduce capacity of a critical service to near-zero based on an implausible reading (e.g. usage reported as 0).",
+   "owner": "Google identity / quota-platform engineering",
+   "status": "Directionally indicated by postmortem (not itemized verbatim in ledger)",
+   "source": "status.cloud.google.com/incident/zall/20013"
+  },
+  {
+   "action": "Complete and verify quota-system migrations so no residual legacy system can misreport usage for a service registered with the new system.",
+   "owner": "Google identity / quota-platform engineering",
+   "status": "Directionally indicated by postmortem",
+   "source": "status.cloud.google.com/incident/zall/20013"
+  },
+  {
+   "action": "Improve resilience to write failures in the account database so a blocked Paxos leader / quota denial does not immediately halt credential issuance globally (graceful degradation / write fallback).",
+   "owner": "Google account-database / Paxos team",
+   "status": "Official remediation item on write-failure resilience (implies no graceful fallback existed at the time)",
+   "source": "status.cloud.google.com/incident/zall/20013"
+  },
+  {
+   "action": "Retain and formalize the datacenter-by-datacenter quota-enforcement-disable procedure as a tested emergency mitigation runbook.",
+   "owner": "Google SRE / incident response",
+   "status": "Demonstrated effective during this incident (one-DC then all-DC)",
+   "source": "status.cloud.google.com/incident/zall/20013"
+  }
+ ],
+ "lessonsLearnt": [
+  "A shared identity/authentication layer is the highest-leverage single point of failure in a large platform: when it fails, cloud, consumer web, and IoT hardware all fall at once, worldwide.",
+  "Automation acting on an implausible input (usage = 0) can inflict global damage in minutes; critical-service automation needs sanity bounds and confirmation before enforcing drastic reductions.",
+  "Migrations that leave the old system partially active create silent inconsistency; a registration change is not complete until every legacy path stops observing and acting on the service.",
+  "Fast root-cause identification (~22 min here) is what kept a maximal-blast-radius outage to under an hour — observability and clear alerting materially bounded the impact.",
+  "Strong consistency (Paxos writes) with no graceful degradation means a control-plane denial (quota) can fully stop the data plane; critical write paths need a resilience story for admission/quota failures.",
+  "A simple, well-scoped mitigation lever (disable quota enforcement, DC by DC) can recover a global outage quickly when the root cause is understood — such levers should be pre-built and rehearsed."
+ ],
+ "improvements": [
+  "Introduce hard guardrails preventing automated near-zero quota reductions on tier-0 services, with mandatory sanity checks against historical baselines.",
+  "Enforce migration-completeness gates so a service cannot be dual-observed by an old and a new quota system simultaneously.",
+  "Add graceful-degradation / write-fallback paths for the account database so credential issuance can survive a Paxos-write or quota denial without total global failure.",
+  "Instrument and alert on quota-vs-actual-usage divergence for critical services to catch a zero-usage misreport before it drives enforcement.",
+  "Pre-stage and regularly drill the DC-by-DC quota-enforcement-disable runbook so the ~41-minute onset-to-global-mitigation window can be compressed further.",
+  "Reduce identity-layer blast radius through isolation or partial-availability modes so a single account-database fault does not simultaneously black out every product surface."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "Failure mechanism — how a migration remnant zeroed a global service",
+   "body": "The proximate trigger was not a hardware fault or traffic spike but a latent inconsistency from an incomplete migration. When the User ID Service was registered with a new quota system in October, parts of the old quota system were left running and continued to observe the service — reporting its usage as 0. Weeks later, that stale zero was treated as ground truth by automation, which reduced the account-database quota accordingly. The system was, in effect, told that a service carrying global authentication load was doing no work, and it sized capacity to match."
+  },
+  {
+   "heading": "Why it cascaded globally",
+   "body": "The reduced quota prevented the Paxos leader from writing, which halted credential issuance and account-metadata lookups for every Google account. Because virtually all Google products authenticate through this shared identity layer via OAuth, a single control-plane action propagated into widespread 5xx errors across independent product families at once: GCP (Console, Storage, BigQuery, GKE), Workspace (Gmail, Calendar, Meet, Docs, Drive), consumer services (YouTube, Play), and even Google Home smart speakers. The blast radius reflects architecture, not coincidence — one account database is the common dependency, so its failure is simultaneously everyone's failure."
+  },
+  {
+   "heading": "Detection and recovery",
+   "body": "Automated capacity alerts fired at 03:43 US/Pacific, errors began at 03:46, and engineers were paged at 03:48. Root cause was identified by 04:08 — roughly 22 minutes after onset — which is the decisive fact in keeping this under an hour. Mitigation was surgical: disable quota enforcement in one datacenter at 04:22 to confirm the fix, then roll it to all datacenters by 04:27, with error rates normalizing at 04:33. The Pacific-time sequence converts cleanly to UTC (PST = UTC-8: 03:43→11:43 alerts, 03:46→11:46 impact, 04:22→12:22 one-DC, 04:27→12:27 all-DC, 04:33→12:33 restored), and Wikipedia's independently reported UTC window (~11:45 start, ~12:33 restore, ~50 minutes) corroborates the same events, confirming the timeline's internal consistency."
+  },
+  {
+   "heading": "Organizational and systemic factors",
+   "body": "Three systemic conditions turned a config remnant into a global outage: automation empowered to enforce drastic capacity changes without a sanity floor; a migration process that allowed old and new quota systems to coexist and disagree; and a strongly-consistent write path (Paxos) with no graceful degradation when admission/quota was denied — a failover could not help because cluster-wide denial starved every replica's writes (inference, flagged). The official remediation emphasis on write-failure resilience implies no write fallback existed at the time."
+  },
+  {
+   "heading": "Cross-incident pattern",
+   "body": "This incident is a canonical shared-control-plane / identity-SPOF failure: a small, automated, seemingly-safe change in a central dependency produces disproportionate, correlated, cross-product impact. The pattern recurs across large providers — automation acting confidently on bad or stale metadata, an incomplete migration leaving inconsistent state, and a single foundational service (identity, DNS, config, or routing) whose failure defeats otherwise-independent redundancy. The mitigating counter-pattern is also visible here: fast, clear root-causing plus a pre-scoped kill-switch (disable enforcement) bounded the damage to 47 minutes."
+  }
+ ],
+ "technicalDeepDive": "The account database backing Google's User ID Service uses Paxos for strongly-consistent, quorum-replicated writes, with credential issuance and account-metadata lookups depending on the elected leader's ability to commit. Quota/admission control sits in front of this data plane as a control-plane governor. The defect chain was: (1) an October registration moved the User ID Service onto a new quota system while a legacy quota path remained active and kept observing the same service; (2) that legacy path reported usage as 0; (3) the automated quota system consumed the zero and reduced the account-database quota to a level consistent with a near-idle service; (4) the reduced quota denied the Paxos leader the resources/admission to write; (5) with writes blocked, credential issuance and metadata lookups failed for all accounts, and every OAuth-authenticated request downstream returned 5xx. Crucially, leader re-election offered no escape: the constraint was a cluster-wide quota/admission denial rather than a single unhealthy replica, so every replica was equally starved and no healthy leader could be elected into a writable state (this failover reasoning is inferred, not stated by the primary, and the official remediation on write-failure resilience is consistent with the absence of any graceful write fallback). The exact quota metric that read 0 is not disclosed — the primary states usage was reported as 0 but not whether the unit was QPS, backend task count, or storage bytes — and the numeric threshold/algorithm of the automated reducer is likewise undisclosed; usage-reported-as-0 is the finest available granularity. The mitigation targeted the control plane directly: disabling quota enforcement removed the erroneous admission cap so the Paxos leader could write again, applied first to one datacenter as a controlled validation and then fleet-wide, with normalization following within minutes. Whether client 5xx surfaced at front-end proxies failing token validation versus backends rejecting stale sessions (and the 429→5xx mistranslation account) is Hacker News community analysis, not Google-confirmed.",
+ "references": [
+  {
+   "title": "Google Cloud Status — Incident #20013 (official postmortem)",
+   "url": "https://status.cloud.google.com/incident/zall/20013",
+   "type": "official-postmortem",
+   "quote": "A change was made in October to register the User ID Service with the new quota system, but parts of the previous quota system were left in place which incorrectly reported the usage for the User ID Service as 0.",
+   "accessed": "2026-07-31"
+  },
+  {
+   "title": "2020 Google services outages",
+   "url": "https://en.wikipedia.org/wiki/2020_Google_services_outages",
+   "type": "encyclopedia",
+   "quote": "An accidental reduction of capacity on their central user ID management system, causing requests that required OAuth-based authentication to fail.",
+   "accessed": "2026-07-31"
+  },
+  {
+   "title": "Google Issues Post Mortem on Gmail, YouTube Outage (SecurityWeek)",
+   "url": "https://www.securityweek.com/google-issues-post-mortem-gmail-youtube-outage/",
+   "type": "news",
+   "quote": "Google published a post mortem attributing the December 14 outage to its central identity system running out of storage quota.",
+   "accessed": "2026-07-31"
+  },
+  {
+   "title": "Post Mortem of Google Outage on 14 December 2020 (Hacker News)",
+   "url": "https://news.ycombinator.com/item?id=25472455",
+   "type": "forum",
+   "quote": "Community discussion observed the disruption lasting on the order of 57 minutes and debated how quota errors mistranslated into client-facing 5xx responses.",
+   "accessed": "2026-07-31"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": true,
+  "referenceCount": 4,
+  "lastVerified": "2026-07-31",
+  "confidence": "high-verified — root cause, timeline, duration, and blast radius from Google's own incident #20013 (fetched and cross-checked), independently corroborated by Wikipedia's UTC timeline (Pacific+8h). Gaps: no absolute user count and no financial figure exist in any reachable source; exact zeroed quota unit and Paxos-failover reasoning are undisclosed/inferred (flagged)."
+ },
+ "lastUpdated": "2026-07-31"
+}

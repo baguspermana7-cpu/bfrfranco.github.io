@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS US-EAST-1 Internal Network Congestion Outage (December 7, 2021) | ResistanceZero</title>
+    <meta name="description" content="On December 7, 2021, an automated capacity-scaling operation on a service hosted in AWS&#x27;s main network in US-EAST-1 provoked unexpected behavior from a large population of internal">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="ai-content-declaration" content="human-curated, sourced from public post-incident reports">
+    <meta name="author" content="Bagus Dwi Permana">
+    <link rel="canonical" href="https://resistancezero.com/incident-aws-us-east-1-network-outage-2021.html">
+    <meta name="theme-color" content="#0c1512">
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+    <style>
+    /* ── Governed Incident Dossier — editorial register (v2): forest-green + warm ivory,
+       serif display, evidence-class provenance. Accent vars remapped so all components
+       re-skin. AA-contrast in both themes. No gradients / glass / dot-grid (anti-slop). */
+    :root:not([data-theme="dark"]) {
+        --bg:#f4f1e7; --surface:#fffdf6; --surface-2:#efeadc; --line:rgba(26,45,36,0.16);
+        --text:#1a2d24; --text-strong:#10201a; --text-body:#3b463d; --muted:#6a7367;
+        --cyan:#2f6b4f; --amber:#87671b; --green:#2f7d54; --red:#9c3b32; --gold:#87671b;
+        --hero-ink:#f4f1e7; --hero-bg:#183329; --shadow-deep:rgba(26,45,36,0.10);
+    }
+    [data-theme="dark"] {
+        --bg:#0c1512; --surface:#11201a; --surface-2:#16281f; --line:rgba(233,229,216,0.15);
+        --text:#e9e5d8; --text-strong:#f5f2e9; --text-body:#c6ccbc; --muted:#8b9484;
+        --cyan:#7fd1a8; --amber:#d8b25c; --green:#7fd1a8; --red:#e0917f; --gold:#d8b25c;
+        --hero-ink:#e9e5d8; --hero-bg:#0f221a; --shadow-deep:rgba(0,0,0,0.5);
+    }
+    * { box-sizing:border-box; }
+    html,body { margin:0; padding:0; }
+    body { background:var(--bg); color:var(--text); font-family:'IBM Plex Sans',system-ui,sans-serif; line-height:1.62; }
+    a { color:var(--cyan); }
+    h1,h2,.serif { font-family:'Fraunces','Newsreader',Georgia,serif; font-weight:600; letter-spacing:-0.01em; }
+    .wrap { max-width:1120px; margin:0 auto; padding:1.5rem 1.1rem 3rem; }
+    .navbar { display:flex; align-items:center; justify-content:space-between; padding:0.7rem 1.1rem; border-bottom:1px solid var(--line); background:var(--surface); position:sticky; top:0; z-index:50; }
+    .nav-container { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:1120px; margin:0 auto; }
+    .nav-logo { display:flex; align-items:center; }
+    .nav-avatar { width:34px; height:34px; border-radius:50%; }
+    .nav-menu { display:flex; gap:1rem; list-style:none; margin:0; padding:0; }
+    .nav-menu a { color:var(--text-body); text-decoration:none; font-size:0.85rem; font-weight:600; }
+    .nav-menu a:hover { color:var(--cyan); }
+    .nav-right { display:flex; align-items:center; gap:0.6rem; }
+    .theme-btn { background:none; border:1px solid var(--line); color:var(--text); border-radius:8px; padding:0.35rem 0.5rem; cursor:pointer; font-size:0.8rem; }
+    .lock-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--red); border:1px solid var(--red); border-radius:999px; padding:0.12rem 0.5rem; }
+    h1 { font-size:2.4rem; color:var(--text-strong); margin:0.35rem 0 0.5rem; line-height:1.12; }
+    h2 { font-size:1.4rem; color:var(--text-strong); margin:2rem 0 0.7rem; }
+    .eyebrow { font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); }
+    .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
+    .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
+    .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:999px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    .chip.cyan { color:var(--cyan); border-color:var(--cyan); }
+    .chip.amber { color:var(--amber); border-color:var(--amber); }
+    .chip.green { color:var(--green); border-color:var(--green); }
+    .chip.red { color:var(--red); border-color:var(--red); }
+    .chip.muted { color:var(--muted); }
+    .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:1rem 1.1rem; margin-top:0.9rem; }
+    .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:12px; margin-top:0.9rem; }
+    table.inc-index { width:100%; border-collapse:collapse; font-size:0.86rem; min-width:760px; }
+    table.inc-index th { text-align:left; font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); background:var(--surface-2); }
+    table.inc-index td { padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); color:var(--text-body); vertical-align:top; }
+    table.inc-index tr:hover td { background:var(--surface-2); }
+    table.inc-index a { font-weight:700; color:var(--text-strong); text-decoration:none; }
+    table.inc-index a:hover { color:var(--cyan); text-decoration:underline; }
+    .rank-badge { font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--amber); }
+    .mag-bar { height:4px; border-radius:3px; background:var(--line); margin-top:0.35rem; overflow:hidden; }
+    .mag-bar > span { display:block; height:4px; background:var(--amber); }
+    ul.tight { margin:0.4rem 0 0; padding-left:1.15rem; }
+    ul.tight li { color:var(--text-body); margin:0.3rem 0; font-size:0.92rem; }
+    .soe { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .soe li { display:grid; grid-template-columns:170px 1fr; gap:0.7rem; padding:0.5rem 0; border-bottom:1px dashed var(--line); }
+    .soe time { font-family:'JetBrains Mono',monospace; font-size:0.76rem; color:var(--cyan); }
+    .soe .ev { color:var(--text-body); font-size:0.9rem; }
+    .phase-chip { font-family:'JetBrains Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--amber); border:1px solid var(--amber); border-radius:999px; padding:0.05rem 0.4rem; margin-right:0.4rem; white-space:nowrap; }
+    table.metrics { width:100%; border-collapse:collapse; font-size:0.88rem; }
+    table.metrics td { padding:0.5rem 0.7rem; border-bottom:1px solid var(--line); vertical-align:top; }
+    table.metrics .mlabel { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; width:38%; white-space:nowrap; }
+    table.metrics .mval { color:var(--text-body); }
+    .ca-block { background:var(--surface); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 10px 10px 0; padding:0.7rem 1rem; margin-top:0.7rem; }
+    .ca-block h3 { margin:0 0 0.3rem; font-size:0.92rem; color:var(--text-strong); }
+    .ca-block p { margin:0; color:var(--text-body); font-size:0.9rem; }
+    .kv { display:grid; grid-template-columns:180px 1fr; gap:0.5rem 0.9rem; margin-top:0.5rem; font-size:0.9rem; }
+    .kv dt { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; }
+    .kv dd { margin:0; color:var(--text-body); }
+    .refs { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .refs li { padding:0.55rem 0; border-bottom:1px solid var(--line); }
+    .refs .rtitle { color:var(--text-strong); font-weight:600; font-size:0.9rem; }
+    .refs .rquote { color:var(--muted); font-size:0.84rem; font-style:italic; margin-top:0.2rem; display:block; }
+    .refs a { font-size:0.78rem; word-break:break-all; }
+    .backlink { display:inline-block; margin-bottom:0.6rem; font-size:0.82rem; color:var(--cyan); text-decoration:none; }
+    footer { border-top:1px solid var(--line); margin-top:2.5rem; padding:1.4rem 1.1rem; text-align:center; }
+    footer .ver { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .disclaimer { font-size:0.76rem; color:var(--muted); margin-top:0.8rem; max-width:80ch; }
+    .skip-link { position:absolute; top:-50px; left:0; background:#0e7490; color:#fff; padding:10px 20px; text-decoration:none; font-weight:600; z-index:10000; border-radius:0 0 8px 0; transition:top 0.2s; }
+    .skip-link:focus { top:0; }
+    .root-gate { position:fixed; inset:0; z-index:99999; display:none; align-items:center; justify-content:center; background:rgba(2,6,23,0.74); padding:1rem; backdrop-filter:blur(6px); }
+    body.locked .root-gate { display:flex; }
+    body.locked .wrap { filter:blur(4px); pointer-events:none; user-select:none; }
+    .root-card { max-width:430px; width:100%; background:var(--surface); border:1px solid var(--cyan); border-radius:14px; padding:1.3rem 1.15rem; text-align:center; box-shadow:0 18px 36px var(--shadow-deep); }
+    .root-card h2 { margin:0 0 0.4rem; font-size:1.1rem; color:var(--text-strong); }
+    .root-card p { font-size:0.86rem; color:var(--text-body); }
+    .root-actions { margin-top:0.9rem; display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; }
+    .root-actions button, .root-actions a { border-radius:9px; padding:0.5rem 0.85rem; font-size:0.8rem; font-weight:700; border:1px solid var(--line); text-decoration:none; cursor:pointer; color:var(--text); font-family:inherit; }
+    .root-actions button { background:var(--cyan); color:#04121a; border:none; }
+    .rz-nav-burger { display:none; }
+    /* v1.8.0 — mobile responsive patch */
+    @media (max-width:768px) {
+        html,body { overflow-x:hidden; max-width:100vw; }
+        img { max-width:100%; height:auto; display:block; }
+        .nav-menu, .nav-links { display:none; }
+        .navbar { padding:0.5rem 0.75rem; }
+        footer .footer-grid { grid-template-columns:1fr; gap:1.25rem; padding:1rem; }
+        button, a.btn, [role="button"] { min-height:44px; }
+        h1 { font-size:1.4rem; }
+        .soe li { grid-template-columns:1fr; gap:0.15rem; }
+        .kv { grid-template-columns:1fr; }
+        .root-card { max-width:92vw; }
+    }
+    @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
+</style>
+</head>
+<body class="locked">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <nav class="navbar"><div class="nav-container">
+        <a href="index.html" class="nav-logo"><img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dc-incidents.html">DC Incidents</a></li>
+            <li><a href="datacenter-solutions.html">DC Solutions</a></li>
+        </ul>
+        <div class="nav-right">
+            <span class="lock-tag" title="Root-only module">🔒 Root</span>
+            <button class="theme-btn" id="themeToggle" type="button" aria-label="Toggle theme">◐</button>
+        </div>
+    </div></nav>
+    <main class="wrap" id="main-content" data-explain-scan>
+        <a class="backlink" href="dc-incidents.html">← All incidents</a>
+        <div class="eyebrow">Incident dossier · Rank #7</div>
+        <h1>AWS US-EAST-1 Internal Network Congestion Outage (December 7, 2021)</h1>
+        <div class="chips">
+            <span class="chip">Amazon Web Services</span>
+            <span class="chip cyan">2021-12-07</span>
+            <span class="chip amber">6h 52m core impact</span>
+            <span class="chip cyan">Network</span><span class="chip amber">Software</span>
+        </div>
+        <p class="lede">On December 7, 2021, an automated capacity-scaling operation on a service hosted in AWS&#x27;s main network in US-EAST-1 provoked unexpected behavior from a large population of internal clients, generating a surge of connection activity that overwhelmed the networking devices bridging AWS&#x27;s internal network and its main network. Rising latency and errors drove clients to retry more aggressively, creating a self-reinforcing congestion loop — effectively a self-inflicted internal denial of service. Because the internal network hosts foundational services (monitoring, internal DNS, authorization, and parts of the EC2 control plane), the congestion cascaded into control-plane, authentication, DNS, and API failures across dozens of services for roughly seven hours. The same congestion blinded AWS&#x27;s own real-time monitoring, slowing diagnosis, and impaired the Service Health Dashboard tooling from failing over to its standby region, delaying public communication.</p>
+
+        <h2>Facility &amp; location</h2>
+        <dl class="kv">
+            <dt>Operator</dt><dd>Amazon Web Services</dd>
+            <dt>Data center</dt><dd>AWS US-EAST-1 (Northern Virginia)</dd>
+            <dt>Location</dt><dd>Ashburn, USA, us-east-1</dd>
+            <dt>Date</dt><dd>2021-12-07</dd>
+        </dl>
+
+        <h2>Impact &amp; scale</h2>
+        <dl class="kv">
+            <dt>Users affected</dt><dd>Thousands of AWS-hosted services and their end users; consumer-facing names including Netflix, Disney+, Robinhood, and Ring were reported degraded (per press coverage, not the AWS postmortem)</dd>
+            <dt>Financial</dt><dd>Not quantified against a primary source in the record; no confirmed aggregate dollar-loss figure</dd>
+            <dt>Scope</dt><dd>SEV-1 / major multi-service regional impairment</dd>
+        </dl>
+        <div class="card"><strong>Services / systems down</strong><ul class="tight"><li>EC2 control-plane APIs (launch/describe)</li><li>Route 53 APIs</li><li>STS</li><li>AWS Console / login</li><li>API Gateway</li><li>EventBridge</li><li>Amazon Connect</li><li>ECS/EKS/Fargate APIs</li><li>RDS (unable to create resources — blocked EC2 launches)</li><li>EMR (unable to create resources — blocked EC2 launches)</li><li>WorkSpaces (unable to create resources — blocked EC2 launches)</li><li>Elastic Load Balancing APIs</li><li>Redshift (via STS login failures)</li><li>CloudWatch (monitoring delays/data loss)</li><li>S3/DynamoDB access via VPC endpoints</li><li>Support-case creation</li></ul></div>
+        <h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Trigger time (automated scaling)</td><td class="mval">07:30 AM PST, Dec 7 2021</td></tr><tr><td class="mlabel">Core congestion duration (onset to full network-device recovery)</td><td class="mval">~6h52m (07:30 → 14:22 PST)</td></tr><tr><td class="mlabel">EC2 API / support-case impairment start</td><td class="mval">07:33 AM PST</td></tr><tr><td class="mlabel">Internal DNS full recovery (first major mitigation)</td><td class="mval">09:28 AM PST (~2h into event)</td></tr><tr><td class="mlabel">Support-case intake outage window</td><td class="mval">07:33 → 14:25 PST (~6h52m; postmortem-verbatim window)</td></tr><tr><td class="mlabel">Amazon Connect impairment window (longest tail)</td><td class="mval">onset → 16:41 PST (~9h11m)</td></tr><tr><td class="mlabel">EventBridge delivery deliberately disabled</td><td class="mval">12:35 → 14:35 PST (2h mitigation window)</td></tr><tr><td class="mlabel">Distinct AWS services impaired</td><td class="mval">16 named/impacted (EC2, RDS, EMR, WorkSpaces, ELB, Redshift, CloudWatch, ECS/EKS/Fargate, Route 53, STS, Console, API Gateway, EventBridge, Amazon Connect, S3/DynamoDB-via-VPC-endpoints, support-case creation). Note: Lambda operated normally throughout.</td></tr></tbody></table></div>
+
+        <h2>Sequence of events (SOE)</h2>
+        <ul class="soe"><li><time>2021-12-07 07:30 AM PST</time><span class="ev"><span class="phase-chip">Trigger</span> An automated activity to scale capacity of one of the AWS services hosted in the main AWS network triggers unexpected behavior from a large number of clients inside the internal network, producing a surge of connection activity that overwhelms the networking devices bridging the internal and main AWS networks.</span></li><li><time>2021-12-07 ~07:30 AM PST (concurrent; no discrete timestamp in postmortem)</time><span class="ev"><span class="phase-chip">Escalation</span> Cross-network delays raise latency and errors; clients respond with even more connection attempts and retries, forming a self-reinforcing retry storm that converts the transient surge into persistent congestion on the bridging devices. The postmortem describes this dynamic without assigning it a separate timestamp.</span></li><li><time>2021-12-07 07:33 AM PST</time><span class="ev"><span class="phase-chip">Impact</span> EC2 APIs used to launch and describe instances begin showing increased error rates and latencies; the ability to create support cases is impaired (postmortem: impaired from 7:33 AM until 2:25 PM PST).</span></li><li><time>2021-12-07 ~07:33 AM PST (concurrent; no discrete timestamp in postmortem)</time><span class="ev"><span class="phase-chip">Cascade</span> Because foundational services (monitoring, internal DNS, authorization, and parts of the EC2 control plane) live on the congested internal network, failures spread to Route 53, STS, the AWS Console/login, API Gateway, EventBridge, ECS/EKS/Fargate, ELB, CloudWatch, and S3/DynamoDB-via-VPC-endpoint paths. RDS, EMR and WorkSpaces are impacted via inability to launch EC2 instances; Redshift via STS login failures. (Lambda operated normally.)</span></li><li><time>2021-12-07 ~07:30 AM PST (immediately at onset; no discrete timestamp)</time><span class="ev"><span class="phase-chip">Detection</span> The congestion immediately degrades real-time monitoring data for AWS&#x27;s internal operations teams, impairing their ability to locate the source of congestion; the Service Health Dashboard tooling cannot fail over to its standby region, delaying public acknowledgement.</span></li><li><time>2021-12-07 08:22 AM PST</time><span class="ev"><span class="phase-chip">Diagnosis</span> Service Health Dashboard update posting begins to succeed after the tooling could not fail over to standby; operators continue diagnosing with degraded telemetry and deliberately move cautiously with remediations to avoid harming the many still-healthy workloads on the main network.</span></li><li><time>2021-12-07 09:28 AM PST</time><span class="ev"><span class="phase-chip">Mitigation</span> Internal DNS is prioritized as an early recovery target; internal DNS errors fully recover, removing one of the largest sources of impact roughly two hours into the event.</span></li><li><time>2021-12-07 12:35 PM PST</time><span class="ev"><span class="phase-chip">Mitigation</span> As a further mitigation, operators disable EventBridge event delivery.</span></li><li><time>2021-12-07 01:15 PM PST</time><span class="ev"><span class="phase-chip">Recovery</span> As congestion improves, EC2 API error rates begin to improve (except for new instance launches, which recover later).</span></li><li><time>2021-12-07 01:34 PM PST</time><span class="ev"><span class="phase-chip">Recovery</span> Network congestion significantly improves.</span></li><li><time>2021-12-07 01:35 PM PST</time><span class="ev"><span class="phase-chip">Recovery</span> Most container-related (ECS/EKS/Fargate) API error rates return to normal; API Gateway recovery begins.</span></li><li><time>2021-12-07 02:22 PM PST</time><span class="ev"><span class="phase-chip">Restored</span> All network devices fully recover, ending the underlying congestion that drove the event; AWS Console access is restored (~6h52m from the 07:30 onset).</span></li><li><time>2021-12-07 02:25 PM PST</time><span class="ev"><span class="phase-chip">Restored</span> Support-case creation capability is restored (impaired since 07:33, ~6h52m of degraded customer-support intake).</span></li><li><time>2021-12-07 02:30 PM PST</time><span class="ev"><span class="phase-chip">Restored</span> Route 53 APIs fully recover.</span></li><li><time>2021-12-07 02:35 PM PST</time><span class="ev"><span class="phase-chip">Restored</span> EventBridge event delivery is re-enabled.</span></li><li><time>2021-12-07 02:40 PM PST</time><span class="ev"><span class="phase-chip">Restored</span> EC2 new instance launches fully recover.</span></li><li><time>2021-12-07 04:28 PM PST</time><span class="ev"><span class="phase-chip">Restored</span> STS full recovery completes, ending authentication-related login failures for dependent services.</span></li><li><time>2021-12-07 04:37 PM PST</time><span class="ev"><span class="phase-chip">Restored</span> API Gateway is largely recovered.</span></li><li><time>2021-12-07 04:41 PM PST</time><span class="ev"><span class="phase-chip">Restored</span> Amazon Connect (dependent on API Gateway) resumes normal operations — one of the last services to recover, ~9h11m from onset.</span></li></ul>
+
+        <h2>Root cause</h2>
+        <div class="card">At 07:30 AM PST an automated activity to scale capacity of one of the AWS services hosted in the main AWS network triggered unexpected behavior from a large number of clients inside AWS&#x27;s internal network. The resulting surge of connection activity overwhelmed the networking devices bridging the internal and main networks. The elevated latency and error rates then drove those clients to attempt still more connections and retries — a self-reinforcing feedback loop that turned a transient surge into sustained congestion (a self-inflicted internal denial of service) on the very devices that connect the two networks.</div>
+
+        <h2>Contributing factors</h2>
+        <ul class="tight"><li>The internal network hosts foundational services — monitoring, internal DNS, authorization, and parts of the EC2 control plane — so congestion on the bridging devices had an outsized, cascading blast radius.</li><li>Client retry logic amplified rather than relieved the congestion: rising latency/errors produced more connection attempts, sustaining the overload.</li><li>The same congestion degraded AWS operators&#x27; real-time monitoring, leaving teams effectively flying blind and unable to quickly locate the source — a primary reason resolution took hours rather than minutes.</li><li>Operators intentionally throttled the pace of remediation to avoid harming the many still-healthy workloads on the main network, extending the recovery timeline.</li><li>The Service Health Dashboard tooling shared fate with the impaired network and could not fail over to its standby region, so public communication lagged behind the actual event.</li></ul>
+
+        <h2>Correction of errors (COE)</h2>
+        <ul class="tight"><li>Immediately disabled the automated scaling activities that triggered the event and committed not to resume them until all remediations are deployed — a hard gate against re-triggering the latent client behavior. <span class="chip muted">AWS networking / service team · Completed (containment); resumption gated on full remediation</span></li><li>Deployed additional network configuration that protects potentially impacted networking devices even in the face of a similar congestion event. <span class="chip muted">AWS networking team · Completed / deployed (per postmortem)</span></li><li>Developing a fix for the client back-off/retry behavior that amplified the congestion, expected to deploy over the following two weeks. <span class="chip muted">AWS networking / service team · In progress (~2 weeks from postmortem; public confirmation of completion not in record)</span></li><li>API Gateway team working on a set of mitigations to ensure API Gateway servers remain healthy even when the internal network is unavailable, decoupling the service from internal-network shared fate. <span class="chip muted">AWS API Gateway team · In progress (as of postmortem)</span></li><li>Commit to release a new version of the Service Health Dashboard in early 2022, plus a new support system architecture that runs actively across multiple AWS regions, to remove the status/communication shared-fate that delayed acknowledgement. <span class="chip muted">AWS (communications / support tooling) · Committed for early 2022 (on-schedule delivery not confirmed in record)</span></li></ul>
+
+        <h2>Lessons learnt</h2>
+        <ul class="tight"><li>Retry amplification is a systemic risk: when a shared bottleneck degrades, naive client retry behavior can convert a transient surge into a self-sustaining congestion loop. Backpressure, jitter, and circuit-breaking on internal clients are as important as on external ones.</li><li>Monitoring must not share fate with the systems it observes. When congestion blinded operators&#x27; telemetry, diagnosis stretched from minutes to hours — observability needs an independent path that survives the failure it is meant to reveal.</li><li>Foundational services (DNS, auth, monitoring, control plane) concentrated on one internal network create a single correlated failure domain whose blast radius vastly exceeds the triggering component.</li><li>Status/communication tooling must be able to fail over independently of the region it reports on; a status page that shares infrastructure with the outage cannot inform customers during the outage.</li><li>Cautious, workload-protective remediation is a deliberate trade-off: protecting healthy workloads is correct, but it lengthens recovery, so faster safe-remediation playbooks are valuable.</li><li>Concentrating globally-scoped control planes in US-EAST-1 means a regional event can have ecosystem-wide consequences, including for customers&#x27; own disaster-recovery paths.</li></ul>
+
+        <h2>Improvements &amp; remediation</h2>
+        <ul class="tight"><li>Add backpressure, exponential backoff with jitter, and circuit breakers to internal clients of backbone services so retry storms cannot overwhelm shared bridging devices.</li><li>Provision an out-of-band monitoring/telemetry path that does not traverse the internal network it observes, so operators retain visibility during internal-network congestion.</li><li>Decouple critical services (starting with API Gateway, per AWS&#x27;s own commitment) from internal-network shared fate so they degrade gracefully rather than failing when the internal network is impaired.</li><li>Re-architect the Service Health Dashboard and support/status tooling to run actively across multiple regions and fail over independently, ensuring communications survive a regional network event.</li><li>Gate re-enablement of the triggering automated scaling behind deployment of all remediations, with staged/canaried scaling operations and blast-radius limits.</li><li>Reduce single-region concentration of foundational and globally-scoped control-plane services to shrink correlated failure domains.</li><li>Establish faster, pre-validated remediation playbooks that can act decisively without endangering still-healthy workloads.</li></ul>
+
+        <h2>Comprehensive analysis</h2><div class="ca-block"><h3>Failure mechanism: a self-inflicted internal denial of service</h3><p>The event began with a routine-looking automated capacity-scaling operation, not a hardware fault or external attack. That operation provoked unexpected behavior from a large population of internal clients, which flooded the networking devices bridging AWS&#x27;s internal network and its main network with connection activity. The trigger itself was momentary; what made it dangerous was the client response. As the bridging devices saturated, latency and error rates rose, and the affected clients reacted by opening still more connections and issuing more retries. That positive-feedback loop is the defining characteristic of the incident: the system attacked itself, sustaining congestion long after the initial scaling surge would otherwise have dissipated.</p></div><div class="ca-block"><h3>Why it cascaded so widely</h3><p>The severity was not a function of the bridging devices alone but of what depends on the internal network. AWS runs foundational services there — monitoring, internal DNS, authorization, and parts of the EC2 control plane. Congestion on that shared substrate therefore did not stay contained to one service; it propagated into DNS resolution failures, authentication (STS) errors, control-plane API failures for EC2 and containers, and login/console impairment. Services whose control plane or client path crossed the internal network — ELB, CloudWatch, API Gateway, EventBridge, Amazon Connect, and even S3/DynamoDB access via VPC endpoints — inherited the failure, while RDS, EMR and WorkSpaces could not create resources because new EC2 launches were blocked and Redshift saw login failures via STS. Notably, AWS reported that Lambda continued to operate normally. A single congested failure domain became an ecosystem-wide event.</p></div><div class="ca-block"><h3>Recovery: constrained by blindness and caution</h3><p>Two factors stretched recovery to roughly seven hours. First, the congestion degraded operators&#x27; own real-time monitoring, so the teams could not quickly pinpoint the source — they were diagnosing a network problem with the network instrument impaired. Second, because much of the main network and most customer workloads were still functioning, operators deliberately moved slowly to avoid harming healthy systems. Recovery was therefore incremental and prioritized: internal DNS was restored first (09:28), congestion eased through the early afternoon (13:34), container APIs normalized (13:35), all network devices fully recovered and the Console returned (14:22), and dependent services such as Amazon Connect trailed until 16:41 as their upstream API Gateway healed.</p></div><div class="ca-block"><h3>Organizational and systemic factors</h3><p>Several systemic choices shaped the outcome. Concentrating foundational and globally-scoped control-plane services on a single internal network created a large correlated failure domain. Client retry logic lacked sufficient backpressure to prevent amplification under stress. Observability shared fate with the monitored network, defeating the very tooling meant to accelerate diagnosis. And the Service Health Dashboard tooling could not fail over to its standby region, so the public communication channel shared fate with the outage it needed to describe — compounding customer uncertainty at the worst moment.</p></div><div class="ca-block"><h3>Cross-incident pattern</h3><p>This outage fits a recurring pattern in large-scale distributed systems: a small, automated, control-plane action interacts with retry/feedback dynamics and shared foundational dependencies to produce an outsized, cascading failure. The same ingredients — an automated change as trigger, a metastable congestion or retry loop that persists after the trigger, foundational services (DNS/auth/control plane) as the amplifier, and monitoring or status tooling that shares fate with the failure — recur across major cloud and internet outages. The durable defenses are likewise consistent: retry discipline with backpressure, out-of-band observability, decoupling of critical services from shared substrates, independent status/communication paths, and reduced single-region concentration.</p></div>
+
+        <h2>Technical deep-dive</h2>
+        <div class="card">The proximate trigger was an automated capacity-scaling activity for a service on the main AWS network at 07:30 AM PST, which induced unexpected behavior from a large number of clients inside AWS&#x27;s internal network. Those clients generated a surge of connection activity that saturated the networking devices sitting between the internal network and the main AWS network — the chokepoint through which cross-network communication flows. The critical dynamic was metastability: once the bridging devices were congested, cross-network communication saw elevated latency and error rates, and the client population responded to those failures with additional connection attempts and retries. This retry amplification created a self-reinforcing loop in which the demand causing the congestion grew precisely because of the congestion, holding the system in a degraded steady state that did not clear on its own. The blast radius followed directly from AWS&#x27;s placement of foundational services on this internal network: monitoring, internal DNS, authorization services, and parts of the EC2 control plane all depend on it. Consequently the congestion manifested to customers as EC2 launch/describe API error-rate and latency spikes (from 07:33), DNS resolution failures (cleared at 09:28 as an early prioritized fix), STS/authorization and console/login failures, and impairment of any service whose control plane or client path crossed the internal network — including API Gateway, whose degradation in turn took down the dependent Amazon Connect until API Gateway was largely recovered around 16:37 and Connect resumed at 16:41. Downstream, RDS, EMR and WorkSpaces could not create resources because EC2 launches were blocked, and Redshift saw login failures through STS; Lambda, by contrast, operated normally. Two second-order effects dominated the recovery profile. First, the congestion collapsed operators&#x27; real-time monitoring visibility, so root-cause localization proceeded with impaired telemetry, converting a device-congestion problem into a multi-hour diagnostic exercise. Second, because the failure did not span the whole region — the main network and many customer workloads kept running — operators deliberately constrained the aggressiveness of remediation to avoid collateral damage, trading recovery speed for safety. Remediation sequencing (internal DNS first, then a temporary EventBridge delivery disable from 12:35 to 14:35 to relieve load, congestion materially easing by 13:34, and full network-device recovery at 14:22) reflects that cautious, dependency-ordered approach. The committed engineering fixes target the structural weaknesses directly: gating resumption of the scaling behavior on complete remediation, deploying additional protective network configuration, hardening API Gateway to survive internal-network unavailability, and re-architecting the Service Health Dashboard plus a multi-region support system so status communication no longer shares fate with the network it reports on.</div>
+
+        <h2>References &amp; provenance</h2>
+        <ul class="refs"><li><span class="chip green">official-postmortem</span> <span class="rtitle">Summary of the AWS Service Event in the Northern Virginia (US-EAST-1) Region</span><span class="rquote">“At 7:30 AM PST, an automated activity to scale capacity of one of the AWS services hosted in the main AWS network triggered an unexpected behavior from a large number of clients inside the internal network.”</span><a href="https://aws.amazon.com/message/12721/" target="_blank" rel="noopener nofollow">https://aws.amazon.com/message/12721/</a></li></ul>
+        <p class="disclaimer">Sourced from public post-incident reports. Quotes are short attributed excerpts for provenance only; the analysis above is original and substantially shorter than its sources. Last verified 2026-07-31.</p>
+
+    </main>
+    <footer><div class="footer-grid"></div><span class="ver" id="versionStamp"></span></footer>
+    <div class="root-gate">
+        <div class="root-card">
+            <h2>🔒 Root access required</h2>
+            <p>The DC Incidents dossier is a root-only module. Sign in with an authorized account to continue.</p>
+            <div class="root-actions">
+                <button id="rootLoginBtn" type="button">Sign In</button>
+                <a href="index.html">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/rz-version.js?v=2026-07-31-inc2"></script>
+    <script src="js/rz-feature-flags.js?v=2026-07-31-inc2" defer></script>
+    <script src="auth.js?v=2026-07-31-inc2" defer></script>
+    <script src="js/rz-mobile-nav.js?v=2026-07-31-inc2" defer></script>
+    <script src="js/rz-cookie-consent.js?v=2026-07-31-inc2" defer></script>
+    <script src="js/rz-explain-db.js?v=2026-07-31-inc2" defer></script>
+    <script src="js/rz-explain.js?v=2026-07-31-inc2" defer></script>
+    <script>
+    (function(){var t=document.getElementById('themeToggle');function a(theme){document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme);var m=document.querySelector('meta[name=\"theme-color\"]');if(m)m.setAttribute('content',theme==='dark'?'#0c1512':'#f4f1e7');}a(localStorage.getItem('theme')||'dark');if(t)t.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme');a(c==='dark'?'light':'dark');});})();
+    (function(){function ag(){if(window._rzAuth&&typeof window._rzAuth.enforceTierFeatureAccess==='function'){window._rzAuth.enforceTierFeatureAccess('dc-incidents');}else{try{var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');var r=s&&s.role,t=s&&s.tier;var passes=!!s&&(r==='root'||t==='root');document.body.classList.toggle('locked',!passes);}catch(e){document.body.classList.add('locked');}}}var b=document.getElementById('rootLoginBtn');if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showRootGatePrompt==='function'){window._rzAuth.showRootGatePrompt('Root account required for the DC Incidents dossier.');}else if(window._rzAuth&&typeof window._rzAuth.showModal==='function'){window._rzAuth.showModal();}});window.addEventListener('rz-auth-change',function(){setTimeout(ag,50);});window.addEventListener('storage',function(e){if(e.key==='rz_premium_session')ag();});ag();setTimeout(ag,60);setTimeout(ag,550);setTimeout(ag,1600);})();
+    (function(){var el=document.getElementById('versionStamp');if(!el)return;var v=window.RZ_VERSION||'1.x.x',d=window.RZ_VERSION_DATE||'',cn=window.RZ_VERSION_CODENAME||'';el.textContent='· ResistanceZero · v'+v+(d?' · '+d:'')+(cn?' · '+cn:'')+' ·';})();
+    (function(){var n=0;function sc(){if(window.RZExplain&&window.RZExplain.scanText){var m=document.getElementById('main-content');if(m)window.RZExplain.scanText(m,120);}else if(n++<25){setTimeout(sc,200);}}setTimeout(sc,350);})();
+    </script>
+
+</body>
+</html>
