@@ -65,14 +65,11 @@ const PAGES = [
     { group: 'Financial', leaf: 'Portfolio', name: 'Portfolio' },
     { group: 'Site Intelligence', leaf: 'Compliance', name: 'Compliance' },
     { group: 'Asset Intelligence', leaf: 'Asset Lifecycle', name: 'AssetLifecycle' },
-    /* TODO (v1.121.x follow-up) — Tax / Grid / Talent detail pages carry 6 PRE-EXISTING
-     * site-node trace drifts surfaced when this probe was extended: the site tax/grid/talent
-     * nodes read the SELECTED-SITE scope while the detail dashboards render the country-level
-     * value (e.g. site.taxIncentiveValue popover $3.5M vs card $4.0M; site.gridGenCapacity
-     * 5.6MW vs card 5,625kW = a kW-vs-MW display-unit mismatch). Re-add these pages after
-     * re-scoping the nodes to what the detail card renders (same single-source pattern as the
-     * v1.121.4 Results fix). Excluded for now so the gate stays green on the verified pages.
-     * Tax = leaf "Tax & Incentives"; Grid = "Grid Reliability"; Talent = "Talent Index". */
+    /* v1.121.10 — re-scoped site.tax/grid/talent nodes to the country-level value the detail
+     * cards render (taxRes/gridRes/talentRes helpers mirror each dashboard memo); re-added. */
+    { group: 'Site Intelligence', leaf: 'Tax & Incentives', name: 'Tax' },
+    { group: 'Site Intelligence', leaf: 'Grid Reliability', name: 'Grid' },
+    { group: 'Site Intelligence', leaf: 'Talent Index', name: 'Talent' },
 ];
 
 /* ── whitelist: documented default-basis nodes (value-trace.ts) ──

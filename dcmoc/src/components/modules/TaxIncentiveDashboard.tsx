@@ -191,7 +191,19 @@ const TaxIncentiveDashboard = () => {
                             <span className="text-xs text-slate-500 uppercase">Total Savings</span>
                             <Tooltip content="Net present value of all tax incentives over the project lifetime." />
                         </div>
-                        <div className="text-2xl font-bold text-slate-900 dark:text-white"><TraceValue traceId="site.taxIncentiveValue">{fmtMoney(result.totalIncentiveValue)}</TraceValue></div>
+                        <div className="text-2xl font-bold text-slate-900 dark:text-white"><TraceValue trace={{
+                            id: 'tax.totalIncentiveValue',
+                            label: 'Total Incentive Value (NPV)',
+                            value: result.totalIncentiveValue,
+                            unit: '$', provenance: 'derived', page: 'tax',
+                            formulaTemplate: 'discountedTaxPv + ftzBenefits + landSubsidy + usSpecific',
+                            deps: [
+                                { id: 'discountedTaxPv', label: 'Holiday tax savings (discounted, PV)', value: savingsDecomp?.discountedTaxPv ?? null, unit: '$', provenance: 'derived' },
+                                { id: 'ftzBenefits', label: 'FTZ import-duty savings', value: result.ftzBenefits, unit: '$', provenance: 'derived' },
+                                { id: 'landSubsidy', label: 'Government land subsidy', value: result.landSubsidyValue, unit: '$', provenance: 'derived' },
+                                { id: 'usSpecific', label: 'US-specific extras (bonus dep / ITC / state — residual)', value: savingsDecomp?.usSpecific ?? null, unit: '$', provenance: 'derived' },
+                            ],
+                        }}>{fmtMoney(result.totalIncentiveValue)}</TraceValue></div>
                         <div className="text-xs text-rz-data mt-1">NPV of incentives</div>
                         {/* Tier-2 toggle — SIBLING of the TraceValue button, never nested */}
                         <button
@@ -232,7 +244,17 @@ const TaxIncentiveDashboard = () => {
                             <span className="text-xs text-slate-500 uppercase">NPV Uplift</span>
                             <Tooltip content="Net Present Value of all tax benefits over the project lifecycle. Key input for site selection." />
                         </div>
-                        <div className="text-2xl font-bold text-slate-900 dark:text-white"><TraceValue traceId="site.taxNpvUplift">{fmtMoney(result.npvWithIncentives - result.npvWithoutIncentives)}</TraceValue></div>
+                        <div className="text-2xl font-bold text-slate-900 dark:text-white"><TraceValue trace={{
+                            id: 'tax.npvUplift',
+                            label: 'NPV Uplift (incentives)',
+                            value: result.npvWithIncentives - result.npvWithoutIncentives,
+                            unit: '$', provenance: 'derived', page: 'tax',
+                            formulaTemplate: 'npvWith − npvWithout',
+                            deps: [
+                                { id: 'npvWith', label: 'NPV with incentives (15 yr @10%)', value: result.npvWithIncentives, unit: '$', provenance: 'derived' },
+                                { id: 'npvWithout', label: 'NPV without incentives (full standard rate)', value: result.npvWithoutIncentives, unit: '$', provenance: 'derived' },
+                            ],
+                        }}>{fmtMoney(result.npvWithIncentives - result.npvWithoutIncentives)}</TraceValue></div>
                     </CardContent>
                 </Card>
 
@@ -255,7 +277,19 @@ const TaxIncentiveDashboard = () => {
                             <span className="text-xs text-slate-500 uppercase">FTZ Savings</span>
                             <Tooltip content="Exemption or reduction on import duties for data center equipment and construction materials." />
                         </div>
-                        <div className="text-2xl font-bold text-slate-900 dark:text-white"><TraceValue traceId="site.taxFtz">{fmtMoney(result.ftzBenefits)}</TraceValue></div>
+                        <div className="text-2xl font-bold text-slate-900 dark:text-white"><TraceValue trace={{
+                            id: 'tax.ftzBenefits',
+                            label: 'FTZ Import-Duty Savings',
+                            value: result.ftzBenefits,
+                            unit: '$', provenance: 'derived', page: 'tax',
+                            formulaTemplate: selectedCountry.taxIncentives?.importDutyExemption
+                                ? 'capexTotal × equipmentShare × country import-duty rate'
+                                : 'no import-duty exemption in this jurisdiction → 0',
+                            deps: [
+                                { id: 'capexTotal', label: 'Total CAPEX', value: capexStore.results?.total || ((capexStore.inputs.itLoad || inputs.itLoad) * 10000), unit: '$', provenance: capexStore.results?.total ? 'derived' : 'screening' },
+                                { id: 'equipmentShare', label: 'Equipment CAPEX share', value: EQUIPMENT_CAPEX_SHARE, unit: 'ratio', provenance: 'engine' },
+                            ],
+                        }}>{fmtMoney(result.ftzBenefits)}</TraceValue></div>
                         <div className="text-xs text-slate-500 mt-1">import duty saved</div>
                     </CardContent>
                 </Card>

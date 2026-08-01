@@ -62,6 +62,21 @@ script-tags CLEAN, no horizontal overflow at 360px.
 
 ---
 
+## v1.121.10 — 2026-08-01 (DCMOC — 6 site-node trace drifts fixed, trace-parity 214/214, 0 fail)
+
+### Fixed
+- **Tax / Grid / Talent detail-page ƒx traces** — these pages wrapped their value in the
+  shared `site.taxIncentiveValue` / `site.gridGenCapacity` / `site.talent*` registry nodes,
+  which are **selected-site-scoped** (correct for the Site Intelligence Overview) while the
+  detail dashboards render the **country-level** value from their own memo — one node can't
+  match two different displayed numbers. Converted the 6 detail cells to **inline traces**
+  carrying each page's OWN displayed value + real deps (using the v1.121.7 inline-trace infra);
+  left the `site.*` registry nodes untouched so the Overview still traces the site-scoped
+  score. Every page now traces the number IT shows.
+- With Tax / Grid / Talent re-added to the probe, **trace-parity is 214/214 (0 fail)** —
+  Site Intelligence 49/49 (site nodes), Tax/Grid/Talent 11/11 (inline). Up from a 116-trace,
+  ~7-page baseline at the start of this program to 214 traces across ~20 pages.
+
 ## v1.121.9 — 2026-08-01 (DCMOC — trace-parity probe extended, 116→203 verified)
 
 The ƒx trace-parity gate previously walked only ~7 dashboards, so the many traces on

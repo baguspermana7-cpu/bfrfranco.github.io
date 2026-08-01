@@ -352,7 +352,17 @@ const GridReliabilityDashboard = () => {
                             <span className="text-xs text-slate-500 uppercase">Gen Capacity</span>
                             <Tooltip content="Seconds from power failure to generator reaching rated voltage and frequency. Typically 10-15s for diesel." />
                         </div>
-                        <div className="text-2xl font-bold text-slate-900 dark:text-white"><TraceValue traceId="site.gridGenCapacity">{fmt(result.requiredGenCapacity)}</TraceValue></div>
+                        <div className="text-2xl font-bold text-slate-900 dark:text-white"><TraceValue trace={{
+                            id: 'grid.requiredGenCapacity',
+                            label: 'Required Gen Capacity',
+                            value: result.requiredGenCapacity,
+                            unit: 'kW', provenance: 'derived', page: 'grid',
+                            formulaTemplate: 'ceil(itLoadKw × PUE(cooling) × tierRedundancy)',
+                            deps: [
+                                { id: 'itLoadKw', label: 'IT Load', value: capexStore.inputs.itLoad || inputs.itLoad, unit: 'kW', provenance: 'input' },
+                                { id: 'tierRedundancy', label: `Tier ${inputs.tierLevel} redundancy factor`, value: inputs.tierLevel === 4 ? 2.0 : inputs.tierLevel === 3 ? 1.5 : 1.25, unit: '×', provenance: 'engine' },
+                            ],
+                        }}>{fmt(result.requiredGenCapacity)}</TraceValue></div>
                         <div className="text-xs text-slate-500 mt-1">kW required</div>
                     </CardContent>
                 </Card>

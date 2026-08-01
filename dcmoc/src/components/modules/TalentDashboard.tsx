@@ -250,7 +250,17 @@ const TalentDashboard = () => {
                             <span className="text-xs text-slate-500 uppercase">Time to Staff</span>
                             <Tooltip content="Estimated months to recruit and onboard the full operations team based on local talent pool depth and competition." />
                         </div>
-                        <div><ScoreValue value={result.timeToFullStaff} direction="lower" max={24} traceId="site.talentTimeToStaff" className="text-2xl" /></div>
+                        <div><ScoreValue value={result.timeToFullStaff} direction="lower" max={24} trace={{
+                            id: 'talent.timeToFullStaff',
+                            label: 'Time to Full Staff',
+                            value: result.timeToFullStaff,
+                            unit: 'mo', provenance: 'derived', page: 'talent',
+                            formulaTemplate: 'totalFTE ÷ hires-per-month (2 parallel recruiters, avgHiringDays ÷ 30)',
+                            deps: [
+                                { id: 'totalFTE', label: 'Total FTE (team size)', value: totalFTE, unit: 'FTE', provenance: 'derived' },
+                                { id: 'avgHiringDays', label: 'Avg hiring time (country)', value: selectedCountry.talentPool?.avgHiringDays ?? 40, unit: 'days', provenance: 'input' },
+                            ],
+                        }} className="text-2xl" /></div>
                         <div className="text-xs text-slate-500 mt-1">months to full team</div>
                     </CardContent>
                 </Card>
@@ -285,7 +295,17 @@ const TalentDashboard = () => {
                             <span className="text-xs text-slate-500 uppercase">Recruit Cost</span>
                             <Tooltip content="Total one-time recruitment expenditure for staffing the facility. Includes agency fees, relocation, and onboarding costs." />
                         </div>
-                        <div className="text-2xl font-bold text-slate-900 dark:text-white"><TraceValue traceId="site.talentRecruitCost">{fmtMoney(result.totalRecruitmentCost)}</TraceValue></div>
+                        <div className="text-2xl font-bold text-slate-900 dark:text-white"><TraceValue trace={{
+                            id: 'talent.totalRecruitmentCost',
+                            label: 'Total Recruitment Cost',
+                            value: result.totalRecruitmentCost,
+                            unit: '$', provenance: 'derived', page: 'talent',
+                            formulaTemplate: 'recruitmentCostPerHire × totalFTE',
+                            deps: [
+                                { id: 'recruitmentCostPerHire', label: 'Recruitment cost per hire', value: result.recruitmentCostPerHire, unit: '$/hire', provenance: 'derived' },
+                                { id: 'totalFTE', label: 'Total FTE (team size)', value: totalFTE, unit: 'FTE', provenance: 'derived' },
+                            ],
+                        }}>{fmtMoney(result.totalRecruitmentCost)}</TraceValue></div>
                         <div className="text-xs text-slate-500 mt-1">{fmtMoney(result.recruitmentCostPerHire)}/hire</div>
                     </CardContent>
                 </Card>
