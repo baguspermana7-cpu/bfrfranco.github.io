@@ -74,13 +74,16 @@ def check_file(filepath):
             warnings["title"] = f"LONG ({len(t)} chars, want 30-60): {t[:60]!r}..."
 
     # meta description
-    m = re.search(r'<meta[^>]+name=["\']description["\'][^>]+content=["\'](.*?)["\']', head, re.IGNORECASE)
+    # match the FULL attribute value: backreference the opening quote so an
+    # apostrophe inside a double-quoted description (e.g. "Nvidia Rubin's …")
+    # doesn't truncate it → false SHORT warnings (fixed 2026-08-01).
+    m = re.search(r'<meta[^>]+name=["\']description["\'][^>]+content=(?P<q>["\'])(?P<desc>.*?)(?P=q)', head, re.IGNORECASE)
     if not m:
-        m = re.search(r'<meta[^>]+content=["\'](.*?)["\'][^>]+name=["\']description["\']', head, re.IGNORECASE)
+        m = re.search(r'<meta[^>]+content=(?P<q>["\'])(?P<desc>.*?)(?P=q)[^>]+name=["\']description["\']', head, re.IGNORECASE)
     if not m:
         errors["meta_description"] = "MISSING"
     else:
-        d = m.group(1).strip()
+        d = m.group("desc").strip()
         if len(d) < 120:
             warnings["meta_description"] = f"SHORT ({len(d)} chars, want 120-160)"
         elif len(d) > 160:

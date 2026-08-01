@@ -92,6 +92,16 @@ script-tags CLEAN, no horizontal overflow at 360px.
 
 ---
 
+## v1.121.11 — 2026-08-01 (SEO audit — apostrophe-truncation false-positive fixed)
+
+### Fixed
+- **`tools/audit-seo.py` meta-description regex** — `content=["'](.*?)["']` truncated at the
+  first quote/apostrophe INSIDE a double-quoted description (e.g. "Nvidia Rubin's …" was read
+  as 12 chars), producing ~6 bogus SHORT warnings on real 140-char descriptions. Now
+  backreferences the opening quote (`content=(?P<q>["'])(?P<desc>.*?)(?P=q)`) so the full value
+  is captured. SEO SHORT warnings: ~6 → 0 (all were false positives; the audit's length
+  measurement is now trustworthy for descriptions containing apostrophes).
+
 ## v1.121.10 — 2026-08-01 (DCMOC — 6 site-node trace drifts fixed, trace-parity 214/214, 0 fail)
 
 ### Fixed
