@@ -277,7 +277,7 @@ export function ConstructionEngine() {
                         )}
                         <div className="truncate text-[10px] text-slate-500">{k.sub}</div>
                         {(k as { baselineChip?: boolean }).baselineChip && (
-                            <span className="mt-1 inline-block rounded bg-slate-400/15 px-1 py-0.5 text-[8px] font-semibold leading-tight text-slate-500">Plan Mode — baseline (belum ada actuals)</span>
+                            <span className="mt-1 inline-block rounded bg-slate-400/15 px-1 py-0.5 text-[8px] font-semibold leading-tight text-slate-500">Plan Mode — baseline (no actuals yet)</span>
                         )}
                     </div>
                 ))}
@@ -386,7 +386,7 @@ export function ConstructionEngine() {
                             <div><ScoreValue value={health.score} unit="/100" className="text-3xl" /></div>
                             <div className="text-[10px] text-slate-500">{health.band} · SPI 40 + CPI 30 + schedule 15 + issues 15</div>
                             {planMode && (
-                                <span className="mt-1 inline-block rounded bg-slate-400/15 px-1 py-0.5 text-[8px] font-semibold text-slate-500">Plan Mode — baseline (belum ada actuals)</span>
+                                <span className="mt-1 inline-block rounded bg-slate-400/15 px-1 py-0.5 text-[8px] font-semibold text-slate-500">Plan Mode — baseline (no actuals yet)</span>
                             )}
                         </div>
                     )}

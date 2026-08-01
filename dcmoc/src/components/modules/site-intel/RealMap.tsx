@@ -109,7 +109,7 @@ export function RealMap({ sites, selectedId, onSelect, height = 300, mapStyle = 
         <div className="relative overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700/60">
             <div ref={ref} style={{ height }} className="w-full" />
             <span className="absolute left-2 top-2 z-10 rounded bg-slate-900/80 px-2 py-0.5 text-[9px] font-medium text-emerald-400">
-                🌍 Peta geografis nyata · OpenFreeMap
+                🌍 Real geographic map · OpenFreeMap
             </span>
         </div>
     );

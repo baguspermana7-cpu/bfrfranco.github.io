@@ -81,7 +81,7 @@ export function SiteComparisonTable({ sites, results, selectedId, analysesById, 
                                         {raw != null && r && best(goodVals, good) && <span className="ml-0.5 text-[9px] text-rz-signal" aria-label="best of row">★</span>}
                                         {band && (isBad && onExplainAxis ? (
                                             <button onClick={() => onExplainAxis(isOpen ? null : { siteId: s.id, axis: k })}
-                                                title={`Kenapa ${band.label}? Klik untuk alasan + lever terukur`}
+                                                title={`Why ${band.label}? Click for reason + measured lever`}
                                                 className={`ml-1 rounded px-1 text-[9px] font-semibold underline decoration-dotted underline-offset-2 ${band.cls} ${isOpen ? 'bg-amber-500/15' : 'hover:bg-amber-500/10'}`}>
                                                 · {band.label} ⓘ
                                             </button>
@@ -298,14 +298,14 @@ export function SiteRightRail({ sites, results, selectedId, onSelect, onEdit, on
                     if (weak.length === 0) return null;
                     return (
                         <div className="mt-2">
-                            <p className="mb-1 text-[9px] font-semibold uppercase tracking-wide text-slate-500">Axis lemah — klik untuk alasan + lever</p>
+                            <p className="mb-1 text-[9px] font-semibold uppercase tracking-wide text-slate-500">Weak axis — click for reason + lever</p>
                             <div className="flex flex-wrap gap-1">
                                 {weak.map(({ k, g, shown }) => {
                                     const band = axisBand(shown, k === 'naturalRisks');
                                     return (
                                         <button key={k}
                                             onClick={() => { onExplainAxis({ siteId: sel.id, axis: k }); document.getElementById('sec-compare')?.scrollIntoView({ behavior: 'smooth' }); }}
-                                            title={`${AXIS_LABELS[k]} ${g}/100 — klik untuk kontributor terbesar + lever terukur`}
+                                            title={`${AXIS_LABELS[k]} ${g}/100 — click for the biggest contributor + measured lever`}
                                             className={`rounded-full border px-2 py-0.5 text-[9px] font-semibold ${band.label === 'Poor' ? 'border-rose-500/40 bg-rose-500/10 text-rose-500' : 'border-amber-500/40 bg-amber-500/10 text-amber-500'} hover:bg-amber-500/20`}>
                                             {AXIS_LABELS[k]} {shown} · {band.label} ⓘ
                                         </button>

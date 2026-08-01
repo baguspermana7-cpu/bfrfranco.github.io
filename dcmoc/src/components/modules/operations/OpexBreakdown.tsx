@@ -13,6 +13,7 @@
 import React from 'react';
 import { rzModels, rzData, useEngineReady } from '@/lib/rz-engine';
 import { useSimulationStore } from '@/store/simulation';
+import { useEffectiveInputs } from '@/store/useEffectiveInputs';
 import { useCapexStore } from '@/store/capex';
 import { getPUE } from '@/constants/pue';
 import { Tooltip } from '@/components/ui/Tooltip';
@@ -57,8 +58,14 @@ const STRATEGY_ORDER = ['oem_full', 'predictive_cbm', 'hybrid', 'standard_annual
 
 export function OpexBreakdown() {
     const inputs = useSimulationStore((s) => s.inputs);
+    const eff = useEffectiveInputs();   // C6: auto-resolved staffing roster (single canonical source)
     const country = useSimulationStore((s) => s.selectedCountry);
     const capexTotal = useCapexStore((s) => s.results?.total ?? 0);
+    /* C6 — in-house manpower headcount = effective (auto-resolved) in-house roster:
+     * shift-lead + engineer + technician + admin. Janitor is EXCLUDED — cleaning is
+     * priced as its own outsourced line in the model (double-count guard). Same
+     * headcount basis as the Dashboard + Financial surfaces ⇒ identical Total OPEX. */
+    const inHouseFte = (eff.headcount_ShiftLead ?? 0) + (eff.headcount_Engineer ?? 0) + (eff.headcount_Technician ?? 0) + (eff.headcount_Admin ?? 0);
 
     /* OPEX maintenance strategy is its own selection (the store's `maintenanceStrategy`
      * is the staffing-mix preset with a different enum) — kept local here; WS3 unifies. */
@@ -79,9 +86,10 @@ export function OpexBreakdown() {
                 capex: capexTotal,
                 cooling: inputs.coolingType,
                 maintenanceStrategy: strategy,
+                headcount: inHouseFte,
             }) as OpexResult;
         } catch { return null; }
-    }, [inputs.itLoad, inputs.coolingType, inputs.tierLevel, country?.id, capexTotal, strategy, engineReady]);
+    }, [inputs.itLoad, inputs.coolingType, inputs.tierLevel, country?.id, capexTotal, strategy, inHouseFte, engineReady]);
 
     if (!result) return null;
 

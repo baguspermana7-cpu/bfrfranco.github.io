@@ -39,7 +39,15 @@ import { Tooltip } from '@/components/ui/Tooltip';
 
 type TabId = ReturnType<typeof useSimulationStore.getState>['activeTab'];
 
-const fmtUsd = (n: number | null) => n == null ? '—' : n >= 1e9 ? `$${(n / 1e9).toFixed(2)}B` : n >= 1e6 ? `$${(n / 1e6).toFixed(1)}M` : n >= 1e3 ? `$${(n / 1e3).toFixed(0)}K` : `$${Math.round(n)}`;
+/* U1 fix: format the magnitude and prepend the sign, so negatives compact the
+ * same way positives do (−$295K, not the raw $-295156 the old positive-only
+ * thresholds produced for e.g. a negative Year-5 EBITDA). */
+const fmtUsd = (n: number | null) => {
+    if (n == null) return '—';
+    const s = n < 0 ? '-' : '';
+    const a = Math.abs(n);
+    return a >= 1e9 ? `${s}$${(a / 1e9).toFixed(2)}B` : a >= 1e6 ? `${s}$${(a / 1e6).toFixed(1)}M` : a >= 1e3 ? `${s}$${(a / 1e3).toFixed(0)}K` : `${s}$${Math.round(a)}`;
+};
 
 // Row keys → which top-tab views include them. Every figure stays engine-real;
 // tabs just focus the surface (honest subsets of the full Executive Overview).

@@ -136,6 +136,39 @@ script-tags CLEAN, no horizontal overflow at 360px.
 
 ---
 
+## v1.121.13 — 2026-08-01 (DCMOC deep-audit fixes, batch 2 — OPEX single-source + UI)
+
+Batch 2 of the 5-Opus-agent deep-audit fixes (`dcmoc/DEEP_AUDIT.md`): the data-wiring/
+integration + UI/UX findings.
+
+### Fixed
+- **Annual OPEX no longer diverges 3 ways** (C2/C3, HIGH). Dashboard $4.40M vs Financial
+  $5.1-5.36M vs Operations $4.70M — same project, three "annual OPEX" numbers, and the
+  Dashboard figure was structurally under-counted (maintenance=$0, extended lines dropped)
+  yet fed the headline EBITDA/IRR/LCC. All three now route through the SAME per-country
+  sourced SSOT `models.opex.fullBreakdown` → one identical OPEX number everywhere; the
+  `opex.*` trace nodes were re-pointed to match (trace-parity 214/214 holds).
+- **OPEX now uses effective (auto-resolved) headcount** (C6) — all surfaces read
+  `useEffectiveInputs()` (honours `staffingAutoMode`, default ON) with one canonical FTE
+  roster; janitor excluded (fullBreakdown already prices cleaning separately).
+- **Balance sheet now does a REAL reconciliation** (C7) — was a tautology (cash = plug so
+  A≡L+E). Assets and L+E now accumulate independently from the P&L; negative cash is flagged
+  as a funding shortfall (not a positive asset); the unlevered interest/principal basis is
+  disclosed.
+- **Hero EBITDA formats negatives compactly** (U1) — `$-295156` → `-$295K`.
+- **Onboarding tour fixed** (U2) — backdrop is `pointer-events-none` (ƒx-trace clicks pass
+  through), repositions off the page title, persists dismissed across tabs.
+- **Indonesian→English** on the PRO UI (U3): tour, map attribution, weak-axis label, Plan-Mode
+  chips. **Over-precision** (U4): availability tiles round to 3 dp (no more "99.9980 2%" wrap).
+  **RANK #0→#1** (U5a).
+
+### Deferred (documented in DEEP_AUDIT.md)
+- C8 (CAPEX FOM multipliers over-scoped) — conservative skip; re-baselines non-default configs,
+  default provably unaffected; `// TODO(C8)` in code.
+- U5b (Risk/Strategic header normalization) — no canonical header component to match.
+
+All gates green: engine 763/0, value-bindings 85/0, reference-parity 155/0, trace-parity 214/214.
+
 ## v1.121.12 — 2026-08-01 (DCMOC deep-audit fixes, batch 1 — correctness + skin)
 
 A 5-Opus-agent deep audit (algorithm · data-wiring · UI/UX · skin · bugs, live-render +

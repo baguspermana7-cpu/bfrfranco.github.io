@@ -89,23 +89,40 @@ export function FinancialStatements({ cashflows, capex, taxRate, depreciationYea
     const equity0 = capex - debt0;
     const amortYears = Math.max(1, projectLifeYears);
     const principalPerYear = debt0 / amortYears;
+    /* C7 — REAL reconciliation (was a tautology: cash used to be derived as the
+     * plug debt+equity−PP&E, so Assets≡L+E by construction and the "balances" tick
+     * proved nothing). Both sides are now accumulated INDEPENDENTLY from the P&L:
+     *  • Assets  = net PP&E (capex − accumulated depreciation) + a real cash roll
+     *              (cumulative after-tax operating cash − debt principal repaid).
+     *  • L+E     = remaining debt (amortization schedule) + equity (paid-in +
+     *              retained ACCOUNTING net income = engine netIncome − depreciation).
+     * These close to a genuine ≈0 residual by the accounting identity, so a real
+     * modelling error (broken depreciation add-back, principal handling) would now
+     * surface a non-zero residual instead of being masked. */
     const bs = React.useMemo(() => {
-        let accDep = 0, retained = 0, debt = debt0;
+        let accDep = 0, retained = 0, debt = debt0, cash = 0;
         const rows = cashflows.map((c) => {
             accDep += c.depreciation;
-            retained += c.netIncome;
+            // engine convention: c.netIncome = EBITDA − tax = after-tax OPERATING cash
+            // (D&A already added back). Accounting net income subtracts depreciation.
+            retained += c.netIncome - c.depreciation;
             const interest = debt * debtRate;
             const principal = Math.min(principalPerYear, debt);
             debt = Math.max(0, debt - principal);
+            cash += c.netIncome - principal;               // independent cash roll (not a plug)
             const ppe = Math.max(0, capex - accDep);
             const equity = equity0 + retained;
-            const cash = debt + equity - ppe; // identity plug
-            const assets = ppe + cash;
-            return { year: c.year, ppe, cash, assets, debt, equity, paidIn: equity0, retained, interest, principal, balanceErr: assets - (debt + equity) };
+            const assets = ppe + cash;                     // independent asset total
+            const liabEquity = debt + equity;              // independent L+E total
+            return { year: c.year, ppe, cash, assets, debt, equity, paidIn: equity0, retained, interest, principal, balanceErr: assets - liabEquity };
         });
         return rows;
     }, [cashflows, debt0, equity0, principalPerYear, debtRate, capex]);
     const maxBalErr = bs.reduce((m, r) => Math.max(m, Math.abs(r.balanceErr)), 0);
+    // C7 — negative cash is a funding shortfall (an overdraft), NOT a positive asset:
+    // flag the year(s) it occurs so the sheet never presents a self-funding fiction.
+    const minCash = bs.reduce((m, r) => Math.min(m, r.cash), 0);
+    const shortfallYear = bs.find((r) => r.cash < 0)?.year ?? null;
 
     // ── Sankey — pick a stabilized (fully-ramped) year
     const stableIdx = years - 1;
@@ -220,8 +237,14 @@ export function FinancialStatements({ cashflows, capex, taxRate, depreciationYea
                                 ['Total Liab. + Equity', (r: typeof bs[number]) => r.debt + r.equity, 'font-semibold text-rz-info'],
                             ] as const).map(([label, get, cls]) => (
                                 <tr key={label} className="border-b border-slate-100 dark:border-slate-800/60">
-                                    <td className={`${lbl} ${cls}`}>{label}</td>
-                                    {shownIdx.map((i) => <td key={i} className={`${th} ${cls}`}>{fmt(get(bs[i]))}</td>)}
+                                    <td className={`${lbl} ${cls}`}>{label}{label === 'Cash' && minCash < 0 && <span className="ml-1 rounded bg-rz-alert/15 px-1 text-[7px] font-semibold uppercase text-rz-alert">shortfall</span>}</td>
+                                    {shownIdx.map((i) => {
+                                        const v = get(bs[i]);
+                                        // C7: a negative cash balance is an overdraft/funding gap — render it
+                                        // flagged (alert) rather than as an ordinary positive-looking asset.
+                                        const cellCls = label === 'Cash' && v < 0 ? 'text-rz-alert font-semibold' : cls;
+                                        return <td key={i} className={`${th} ${cellCls}`}>{fmt(v)}</td>;
+                                    })}
                                 </tr>
                             ))}
                             <tr className="text-[10px] text-slate-400">
@@ -232,8 +255,11 @@ export function FinancialStatements({ cashflows, capex, taxRate, depreciationYea
                     </table>
                 </div>
                 <div className={`mt-1.5 rounded px-2 py-1 text-[10px] ${maxBalErr < 1 ? 'bg-rz-data/10 text-rz-data' : 'bg-rz-alert/10 text-rz-alert'}`}>
-                    {maxBalErr < 1 ? '✓ Balances — Assets = Liabilities + Equity every year (max residual < $1).' : `⚠ Balance residual ${fmt(maxBalErr)} — check inputs.`}
-                    <span className="ml-1 text-slate-400">Cash = cumulative (net income + D&amp;A − principal). Interest is a financing memo, not deducted from the unlevered operating P&amp;L.</span>
+                    {maxBalErr < 1
+                        ? `✓ Reconciles — assets (net PP&E + independent cash roll) and liabilities+equity (debt schedule + accounting retained earnings) are summed separately and close to a ${fmt(maxBalErr)} residual.`
+                        : `⚠ Balance residual ${fmt(maxBalErr)} — the two independent sides do not close; check the depreciation / principal schedule.`}
+                    {minCash < 0 && <span className="ml-1 font-semibold text-rz-alert">Cash goes negative ({fmt(minCash)} low, first in Y{shortfallYear}) — a real project needs a revolver / equity top-up; shown as a financing gap, not a positive asset.</span>}
+                    <span className="ml-1 text-slate-400">Cash roll = cumulative (after-tax operating cash − debt principal). Note: the operating P&amp;L is UNLEVERED, so the cash roll deducts principal but not interest (interest is a financing memo only) — a fully levered statement would deduct both.</span>
                 </div>
             </div>
 

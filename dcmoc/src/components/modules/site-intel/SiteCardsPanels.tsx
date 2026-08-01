@@ -179,7 +179,7 @@ export function IntegratedAnalysesPanels({ site, analyses }: { site: CandidateSi
                 <div className={card}>
                     <h3 className="mb-1.5 flex items-center justify-between text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                         Tax & Incentives
-                        {tax && <span className="rounded bg-rz-mint/15 px-1.5 py-0.5 text-[9px] font-bold text-rz-mint">rank #{tax.countryRanking}</span>}
+                        {tax && <span className="rounded bg-rz-mint/15 px-1.5 py-0.5 text-[9px] font-bold text-rz-mint">rank #{tax.countryRanking + 1}</span>}
                     </h3>
                     {tax ? (
                         <div className="space-y-1">

@@ -761,8 +761,8 @@ function ShellContent({ children, user, shareUi }: { children: React.ReactNode; 
                         <button
                             onClick={() => setTourOpen(true)}
                             className="w-6 h-6 flex items-center justify-center rounded-full border border-amber-500/30 bg-amber-500/10 text-[11px] font-bold text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 transition-colors"
-                            title="Putar ulang tur panduan"
-                            aria-label="Putar ulang tur panduan DCMOC"
+                            title="Replay guided tour"
+                            aria-label="Replay DCMOC guided tour"
                         >
                             ?
                         </button>

@@ -258,20 +258,12 @@ export const TRACE: Record<string, TraceNode> = {
         },
     },
     'opex.totalAnnual': {
-        label: 'Annual OPEX (dcContract)', page: 'finance', unit: '$', provenance: 'engine',
-        formulaTemplate: 'models.opex.totalAnnual(sim.itLoad, country, staff.fte — dcContract basis)',
-        deps: ['sim.itLoad', 'staff.fte'],
-        get: () => {
-            try {
-                /* parity-fix 2026-07-20: engine signature POSITIONAL (mw, pue, region, headcount, opts) — mirrors the FinancialPage call exactly */
-                const m = (rzModels() as { opex?: { totalAnnual?: (mw: number, pue: number | undefined, region: string, headcount: number, opts?: Record<string, unknown>) => { total?: number } } }).opex;
-                const st = sim(); const i = st.inputs;
-                const hc = (i.headcount_ShiftLead ?? 0) + (i.headcount_Engineer ?? 0) + (i.headcount_Technician ?? 0) + (i.headcount_Admin ?? 0);
-                const r = m?.totalAnnual?.(i.itLoad / 1000, undefined, st.selectedCountry?.id ?? 'US', hc,
-                    { capex: cap().results?.total, extendedOpex: true, basisPreset: 'dcContract' });
-                return r?.total ?? null;
-            } catch { return null; }
-        },
+        label: 'Annual OPEX (per-country breakdown)', page: 'finance', unit: '$', provenance: 'engine',
+        /* C2/C3 single-source: identical to the Dashboard's opex.dashboardAnnual — the
+         * Financial "Total OPEX/yr" card renders the same models.opex.fullBreakdown total. */
+        formulaTemplate: 'models.opex.fullBreakdown(sim.itLoad in MW, design PUE, country, capex, effective in-house headcount) — per-country sourced SSOT (same figure as the Dashboard & Operations)',
+        deps: ['sim.itLoad', 'capex.total', 'staff.fte'],
+        get: () => dashOpexAnnual(),
     },
     'cap.totalMw': {
         label: 'Total Capacity (committed phases)', page: 'capacity', unit: 'MW', provenance: 'derived',
@@ -803,9 +795,12 @@ export const TRACE: Record<string, TraceNode> = {
         },
     },
     'opex.dashboardAnnual': {
-        label: 'Total OPEX / yr (dashboard basis)', page: 'finance', unit: '$', provenance: 'engine',
-        formulaTemplate: 'models.opex.totalAnnual(sim.itLoad in MW, design PUE, country, manual headcount) — DC-contract basis at 100% util',
-        deps: ['sim.itLoad'],
+        label: 'Total OPEX / yr', page: 'finance', unit: '$', provenance: 'engine',
+        /* C2/C3/C6 single-source: models.opex.fullBreakdown (per-country sourced SSOT) —
+         * the SAME call the Financial page and Operations' OpexBreakdown make, so the
+         * dashboard "Total OPEX/yr" is identical across all three surfaces. */
+        formulaTemplate: 'models.opex.fullBreakdown(sim.itLoad in MW, design PUE, country, capex, effective in-house headcount) — per-country sourced SSOT (same figure as Financial & Operations)',
+        deps: ['sim.itLoad', 'capex.total', 'staff.fte'],
         get: () => dashOpexAnnual(),
     },
     'fin.lcc15': {
@@ -1657,16 +1652,26 @@ function opsPueAtLoad(): number | null {
     } catch { return null; }
 }
 
-/** Annual OPEX on the DASHBOARD basis — mirrors useDashboardData opexAnnual
- *  (legacy positional signature: MW, design PUE, region, manual headcount). */
+/** Single-source annual OPEX (C2/C3/C6) — the IDENTICAL models.opex.fullBreakdown
+ *  call the Dashboard, Financial and Operations surfaces all make (per-country
+ *  sourced SSOT). In-house manpower headcount = the effective (auto-resolved)
+ *  in-house roster shift-lead+engineer+technician+admin (janitor excluded — the
+ *  model prices cleaning as its own outsourced line). Feeds opex.dashboardAnnual,
+ *  opex.totalAnnual, fin.lcc15, fin.ebitdaY5 and fin.irrProject so every trace
+ *  popover matches the card it belongs to. */
 function dashOpexAnnual(): number | null {
     try {
-        const m = (rzModels() as { opex?: { totalAnnual?: (mw: number, pue: number, region: string, hc: number) => { total?: number } | number } }).opex;
-        if (!m?.totalAnnual) return null;
+        const m = (rzModels() as { opex?: { fullBreakdown?: (i: Record<string, unknown>) => { total?: number } } }).opex;
+        if (!m?.fullBreakdown) return null;
         const i = sim().inputs;
-        const hc = (i.headcount_ShiftLead ?? 0) + (i.headcount_Engineer ?? 0) + (i.headcount_Technician ?? 0) + (i.headcount_Admin ?? 0) + (i.headcount_Janitor ?? 0);
-        const r = m.totalAnnual(i.itLoad / 1000, getPUE(i.coolingType), sim().selectedCountry?.id || 'US', hc);
-        const v = typeof r === 'object' ? r?.total : r;
+        const hc = effHeadcounts();
+        const inHouseFte = (hc[0] ?? 0) + (hc[1] ?? 0) + (hc[2] ?? 0) + (hc[3] ?? 0);   // exclude janitor (separate cleaning line)
+        const pue = (rzData() as { pueMatrix?: Record<string, Record<string, number>> }).pueMatrix?.[i.coolingType]?.['tier' + i.tierLevel] ?? getPUE(i.coolingType);
+        const fb = m.fullBreakdown({
+            itMw: i.itLoad / 1000, pue, countryCode: sim().selectedCountry?.id || 'US', capex: cap().results?.total ?? 0,
+            cooling: i.coolingType, maintenanceStrategy: 'standard_annual_compliance', headcount: inHouseFte,
+        });
+        const v = fb?.total;
         return v != null && Number.isFinite(v) ? Math.round(v) : null;
     } catch { return null; }
 }

@@ -10,6 +10,7 @@
 import { useMemo } from 'react';
 import { useSimulationStore } from '@/store/simulation';
 import { useCapexStore } from '@/store/capex';
+import { useEffectiveInputs } from '@/store/useEffectiveInputs';
 import { getPUE } from '@/constants/pue';
 import { calculateFinancials, defaultOccupancyRamp, type FinancialResult } from '@/modules/analytics/FinancialEngine';
 import { rzModels, rzData } from '@/lib/rz-engine';
@@ -41,6 +42,7 @@ export interface DashboardData {
 export function useDashboardData(): DashboardData {
     const { inputs, selectedCountry } = useSimulationStore();
     const capex = useCapexStore((s) => s.results);
+    const eff = useEffectiveInputs();   // C6: auto-resolved staffing roster (single canonical source)
 
     return useMemo(() => {
         const m = rzModels();
@@ -63,8 +65,27 @@ export function useDashboardData(): DashboardData {
                 cue = facilityMwh > 0 ? +(t * 1000 / (facilityMwh * 1000)).toFixed(3) : null; // kgCO2/kWh
             }
         } catch { }
-        const headcount = inputs.headcount_ShiftLead + inputs.headcount_Engineer + inputs.headcount_Technician + inputs.headcount_Admin + inputs.headcount_Janitor;
-        try { if (m.opex?.totalAnnual) opexAnnual = Math.round(m.opex.totalAnnual(itLoadMw, pue, region, headcount).total ?? m.opex.totalAnnual(itLoadMw, pue, region, headcount)); } catch { }
+        /* C2/C3/C6 — single-source annual OPEX: the IDENTICAL engine call the
+         * Financial page and Operations' OpexBreakdown make (models.opex.fullBreakdown —
+         * the per-country sourced SSOT), so the "Total OPEX/yr" is the SAME number on
+         * all three surfaces. The old totalAnnual call omitted capex + extendedOpex →
+         * maintenance=0 and water/carbon/insurance/connectivity excluded (structurally
+         * under-counted). In-house manpower headcount = the effective (auto-resolved,
+         * staffingAutoMode-aware) in-house roster: shift-lead + engineer + technician +
+         * admin. Janitor is EXCLUDED — the model prices cleaning as its own outsourced
+         * line, so counting janitors in manpower would double-count. Same pue-matrix
+         * lookup + canonical maintenance strategy as the other two surfaces. */
+        const opexPue = (rzData() as { pueMatrix?: Record<string, Record<string, number>> }).pueMatrix?.[inputs.coolingType]?.['tier' + inputs.tierLevel] ?? getPUE(inputs.coolingType);
+        const inHouseFte = (eff.headcount_ShiftLead ?? 0) + (eff.headcount_Engineer ?? 0) + (eff.headcount_Technician ?? 0) + (eff.headcount_Admin ?? 0);
+        try {
+            if (m.opex?.fullBreakdown) {
+                const fb = m.opex.fullBreakdown({
+                    itMw: itLoadMw, pue: opexPue, countryCode: region, capex: capex?.total ?? 0,
+                    cooling: inputs.coolingType, maintenanceStrategy: 'standard_annual_compliance', headcount: inHouseFte,
+                });
+                opexAnnual = fb?.total != null ? Math.round(fb.total) : null;
+            }
+        } catch { }
 
         // ── reliability / architecture / construction / site ──
         let availabilityPct: number | null = null, availabilityTarget: number | null = null, downtimeMin: number | null = null;
@@ -138,5 +159,5 @@ export function useDashboardData(): DashboardData {
             architecture, construction, siteScore,
             financial, ebitda, financialIllustrative: true,
         };
-    }, [inputs, selectedCountry, capex]);
+    }, [inputs, selectedCountry, capex, eff]);
 }

@@ -51,7 +51,7 @@ export function CapacityArchOverview({ d }: { d: DashboardData }) {
                 <Tile label="Power Config" value={d.redundancy} sub="redundancy" tip="redundancy" />
                 <Tile label="Cooling" value={coolingLabel[d.coolingType] || d.coolingType} tip="cooling-type" />
                 <TraceValue traceId="engine.pueTier3" className="block h-full w-full"><Tile label="PUE Target" value={`≤ ${d.pue.toFixed(2)}`} sub="design" tip="pue" state={pueGood ? 'good' : 'neutral'} /></TraceValue>
-                <TraceValue traceId="rel.systemAvailability" className="block h-full w-full"><Tile label="Availability" value={d.availabilityPct != null ? `${d.availabilityPct}%` : '—'} sub={d.availabilityTarget ? `target ${d.availabilityTarget}%` : 'Tier'} tip="availability" state={availGood ? 'good' : 'neutral'} /></TraceValue>
+                <TraceValue traceId="rel.systemAvailability" className="block h-full w-full"><Tile label="Availability" value={d.availabilityPct != null ? `${d.availabilityPct.toFixed(3)}%` : '—'} sub={d.availabilityTarget ? `target ${d.availabilityTarget}%` : 'Tier'} tip="availability" state={availGood ? 'good' : 'neutral'} /></TraceValue>
             </div>
             <div className="mt-2 text-[10px] text-slate-500">CAPEX/kW {fmtUsd(d.perKw)} · build {d.timelineMonths ?? '—'} mo</div>
         </div>

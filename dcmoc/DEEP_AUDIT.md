@@ -18,13 +18,13 @@ Date: 2026-08-01 · Method: 5 Opus specialist agents, each live-rendering the ap
 | ID | Sev | Finding | File | Status |
 |---|---|---|---|---|
 | C1 | HIGH | staffing region-map (country→region, US fallback removed) | rz-engine.js:11538 | ✅ |
-| C2 | HIGH | Annual OPEX **3-way divergence**: Dashboard $4.40M / Financial $5.1-5.36M / Operations $4.70M — same project, all labeled "annual OPEX" | useDashboardData:67, FinancialPage:70, fullBreakdown | ⏳ |
-| C3 | HIGH | Dashboard OPEX **structurally under-counted** — `totalAnnual` called w/o capex+extendedOpex → maintenance=$0 → poisons headline EBITDA/IRR/LCC (optimistic $300-950k/yr) | useDashboardData:66 | ⏳ |
+| C2 | HIGH | Annual OPEX **3-way divergence**: Dashboard $4.40M / Financial $5.1-5.36M / Operations $4.70M — same project, all labeled "annual OPEX" | useDashboardData:67, FinancialPage:70, fullBreakdown | ✅ |
+| C3 | HIGH | Dashboard OPEX **structurally under-counted** — `totalAnnual` called w/o capex+extendedOpex → maintenance=$0 → poisons headline EBITDA/IRR/LCC (optimistic $300-950k/yr) | useDashboardData:66 | ✅ |
 | C4 | HIGH | electrical upsMult double-count removed | CapexEngine.ts:231 | ✅ |
 | C5 | MED | electricity tariff single-sourced (country rate) | rz-engine.js:11573 | ✅ |
-| C6 | MED | Dashboard/Financial OPEX use RAW headcount, ignore `staffingAutoMode` (default ON) + disagree on Janitor scope | useDashboardData:66, FinancialPage:72 | ⏳ |
-| C7 | MED | Balance-sheet "✓ Balances" is a **tautology** (cash = plug); negative cash rendered as asset; interest/principal inconsistent | FinancialStatements.tsx:102 | ⏳ |
-| C8 | MED | `CapexEngine` FOM multipliers applied GLOBALLY (qualityM on all disciplines) instead of scoping power/transformer to electrical | CapexEngine.ts:291 | ⏳ |
+| C6 | MED | Dashboard/Financial OPEX use RAW headcount, ignore `staffingAutoMode` (default ON) + disagree on Janitor scope | useDashboardData:66, FinancialPage:72 | ✅ |
+| C7 | MED | Balance-sheet "✓ Balances" is a **tautology** (cash = plug); negative cash rendered as asset; interest/principal inconsistent | FinancialStatements.tsx:102 | ✅ |
+| C8 | MED | MED | `CapexEngine` FOM multipliers applied GLOBALLY (qualityM on all disciplines) instead of scoping power/transformer to electrical | CapexEngine.ts:291 | ⏸ deferred (conservative — re-baselines; TODO in code) |
 
 ### Bugs
 | ID | Sev | Finding | File | Status |
@@ -34,11 +34,11 @@ Date: 2026-08-01 · Method: 5 Opus specialist agents, each live-rendering the ap
 ### UI/UX
 | ID | Sev | Finding | Status |
 |---|---|---|---|
-| U1 | HIGH | EBITDA hero KPI renders raw `$-295156` not compact `-$295K` | ⏳ |
-| U2 | MED | Onboarding tour overlaps content + intercepts clicks on every tab | ⏳ |
-| U3 | MED | Indonesian/English string mixing on "PRO" UI | ⏳ |
-| U4 | MED | "AVAILABILITY 99.9980 2%" wraps mid-number (over-precision) | ⏳ |
-| U5 | LOW | RANK #0 off-by-one; Risk/Strategic header inconsistent; 9px readability floor | ⏳ |
+| U1 | HIGH | EBITDA hero KPI renders raw `$-295156` not compact `-$295K` | ✅ |
+| U2 | MED | Onboarding tour overlaps content + intercepts clicks on every tab | ✅ |
+| U3 | MED | Indonesian/English string mixing on "PRO" UI | ✅ |
+| U4 | MED | "AVAILABILITY 99.9980 2%" wraps mid-number (over-precision) | ✅ |
+| U5 | LOW | rank #0 fixed (+1); Risk/Strategic header ⏸ (no canonical target) | ✅/⏸ |
 
 ### Skin/design
 | ID | Sev | Finding | Status |

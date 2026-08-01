@@ -50,45 +50,45 @@ function findRecChip(): HTMLElement | null {
 
 const STEPS: TourStep[] = [
     {
-        title: 'Konteks Proyek',
-        body: 'Bar ini menampilkan proyek yang sedang dikerjakan: nama, negara, beban IT (MW), Tier, dan tipe cooling. Semua engine membaca konteks yang sama, sehingga angka di seluruh halaman selalu konsisten.',
+        title: 'Project Context',
+        body: 'This bar shows the project you are working on: name, country, IT load (MW), Tier, and cooling type. Every engine reads the same context, so the numbers stay consistent across all pages.',
         selectors: ['[data-tour="context-bar"]', 'header .breadcrumbs'],
     },
     {
-        title: '13 Engine Lifecycle',
-        body: 'Sidebar mengelompokkan seluruh modul ke dalam 13 engine lifecycle — dari Requirements sampai Financial. Klik sebuah grup untuk membuka modul di dalamnya; badge angka menunjukkan urutan lifecycle-nya.',
+        title: '13 Lifecycle Engines',
+        body: 'The sidebar groups every module into 13 lifecycle engines — from Requirements to Financial. Click a group to open the modules inside it; the number badge shows its lifecycle order.',
         selectors: ['aside[aria-label="Sidebar navigation"]'],
     },
     {
-        title: 'Angka ƒx — bisa ditelusuri',
-        body: 'Angka bertanda ƒx terhubung langsung ke engine. Klik untuk melihat rumus, parameter input, dan drill-down sampai ke sumber datanya — bukan angka hardcode.',
+        title: 'ƒx numbers — traceable',
+        body: 'Numbers marked ƒx connect directly to the engine. Click one to see the formula, its input parameters, and drill down to the source data — not a hardcoded number.',
         selectors: ['main [data-trace]'],
     },
     {
-        title: 'Panel "kenapa?" & verdict',
-        body: 'Banyak KPI dilengkapi chip verdict dan panel penjelasan "kenapa angka ini keluar". Ubah lever/input desain (Tier, cooling, redundancy) dan perhatikan bagaimana verdict serta angka turunannya ikut bergerak.',
+        title: 'Verdict & "why" panels',
+        body: 'Many KPIs come with a verdict chip and a "why this number" explanation panel. Change a design lever/input (Tier, cooling, redundancy) and watch how the verdict and its derived numbers move.',
         selectors: ['main [data-tour="verdict"]', 'main [data-verdict]'],
     },
     {
-        title: 'Chip rekomendasi (rec:)',
-        body: 'Di halaman Requirements, chip amber "rec:" menampilkan nilai rekomendasi yang dihitung dari parameter Anda saat ini. Klik chip untuk menerapkannya — rekomendasi tidak pernah diterapkan otomatis.',
+        title: 'Recommendation chip (rec:)',
+        body: 'On the Requirements page, the amber "rec:" chip shows a recommended value computed from your current parameters. Click the chip to apply it — recommendations are never applied automatically.',
         find: findRecChip,
     },
     {
         title: 'Data Library',
-        body: 'Seluruh data referensi — benchmark, asumsi biaya, dan sumbernya — terdokumentasi di Data Library, lengkap dengan provenance (source + asOf) per nilai.',
+        body: 'All reference data — benchmarks, cost assumptions, and their sources — is documented in the Data Library, complete with provenance (source + asOf) per value.',
         selectors: ['button[title="Data Library"]'],
         explainKey: 'tab-data-library',
     },
     {
         title: 'Knowledge Base',
-        body: 'Knowledge Base merender katalog engine secara live: model, fungsi, parameter, dan sumber datanya — selalu sinkron dengan versi engine yang sedang berjalan.',
+        body: 'The Knowledge Base renders the engine catalog live: models, functions, parameters, and their data sources — always in sync with the running engine version.',
         selectors: ['button[title="Knowledge Base"]'],
         explainKey: 'tab-knowledge',
     },
     {
         title: 'Export PDF',
-        body: 'Hampir semua halaman menyediakan tombol Export PDF untuk membuat laporan executive assessment dari hasil engine — siap dibagikan ke stakeholder tanpa menyalin angka manual.',
+        body: 'Almost every page offers an Export PDF button to produce an executive-assessment report from the engine results — ready to share with stakeholders without copying numbers by hand.',
         selectors: ['button[aria-label*="PDF"]', 'button[aria-label*="Export"]'],
     },
 ];
@@ -176,7 +176,10 @@ export function TourOverlay({ onClose }: { onClose: () => void }) {
         if (rect) {
             top = rect.bottom + TOOLTIP_GAP;
             if (top + ttr.height > vh - VIEWPORT_PAD) top = rect.top - ttr.height - TOOLTIP_GAP;
-            left = rect.left;
+            /* Wide targets (e.g. the full-width context bar) span the top-left
+             * page title / first KPI — right-align the card so it never sits
+             * over those primary controls (U2b). */
+            left = rect.width > vw * 0.6 ? vw - ttr.width - VIEWPORT_PAD : rect.left;
         } else {
             top = (vh - ttr.height) / 2;
             left = (vw - ttr.width) / 2;
@@ -196,9 +199,12 @@ export function TourOverlay({ onClose }: { onClose: () => void }) {
     const dbEntry = step.explainKey ? explain(step.explainKey) : null;
 
     return createPortal(
+        /* Backdrop is click-transparent (pointer-events-none): the dim scrim /
+         * spotlight is purely visual, so it never intercepts ƒx-trace clicks or
+         * covers-and-blocks primary controls. Only the tour card below opts back
+         * into pointer events. Dismiss via Skip / Next / Escape (U2a). */
         <div
-            className="fixed inset-0 z-[8000] cursor-pointer overflow-hidden"
-            onClick={onClose}
+            className="pointer-events-none fixed inset-0 z-[8000] overflow-hidden"
             data-tour-overlay=""
         >
             {rect ? (
@@ -224,10 +230,9 @@ export function TourOverlay({ onClose }: { onClose: () => void }) {
                 ref={tooltipRef}
                 role="dialog"
                 aria-modal="true"
-                aria-label={`Tur DCMOC — langkah ${stepIdx + 1} dari ${STEPS.length}: ${step.title}`}
+                aria-label={`DCMOC tour — step ${stepIdx + 1} of ${STEPS.length}: ${step.title}`}
                 tabIndex={-1}
-                onClick={(e) => e.stopPropagation()}
-                className="fixed z-[8001] w-[min(320px,calc(100vw-20px))] cursor-default rounded-xl border border-amber-500/25 bg-slate-800 p-4 shadow-2xl outline-none"
+                className="pointer-events-auto fixed z-[8001] w-[min(320px,calc(100vw-20px))] cursor-default rounded-xl border border-amber-500/25 bg-slate-800 p-4 shadow-2xl outline-none"
                 style={{ top: 0, left: 0 }}
             >
                 <div className="mb-1.5 text-[11px] font-extrabold uppercase tracking-wide text-amber-400">{step.title}</div>
@@ -244,7 +249,7 @@ export function TourOverlay({ onClose }: { onClose: () => void }) {
                                 onClick={onClose}
                                 className="px-2 py-1 text-[11px] text-slate-500 transition-colors hover:text-slate-300"
                             >
-                                Lewati
+                                Skip
                             </button>
                         )}
                         {stepIdx > 0 && (
@@ -253,7 +258,7 @@ export function TourOverlay({ onClose }: { onClose: () => void }) {
                                 onClick={() => setStepIdx((i) => Math.max(0, i - 1))}
                                 className="rounded-md border border-slate-600 px-3 py-1 text-[11px] font-semibold text-slate-300 transition-colors hover:bg-slate-700"
                             >
-                                Kembali
+                                Back
                             </button>
                         )}
                         <button
@@ -261,7 +266,7 @@ export function TourOverlay({ onClose }: { onClose: () => void }) {
                             onClick={() => { if (isLast) onClose(); else setStepIdx((i) => i + 1); }}
                             className="rounded-md bg-amber-500 px-3.5 py-1 text-[11px] font-bold text-slate-900 transition-colors hover:bg-amber-400"
                         >
-                            {isLast ? 'Selesai' : 'Berikutnya'}
+                            {isLast ? 'Finish' : 'Next'}
                         </button>
                     </div>
                 </div>

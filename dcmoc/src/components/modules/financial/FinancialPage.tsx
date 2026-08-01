@@ -18,6 +18,8 @@ import { useConstructionTracking } from '@/store/constructionTracking';
 import { plannedSchedule, evm, pvCurve } from '@/state/adapters/construction-adapter';
 import { rzModels, rzData } from '@/lib/rz-engine';
 import { resolveMarketKey } from '@/lib/market-key';
+import { getPUE } from '@/constants/pue';
+import { useEffectiveInputs } from '@/store/useEffectiveInputs';
 import { DEFAULT_REVENUE_PER_KW_MONTH } from '@/constants/finance';
 import FinancialDashboard from '@/components/modules/FinancialDashboard';
 import MonteCarloDashboard from '@/components/modules/MonteCarloDashboard';
@@ -31,7 +33,7 @@ import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
 import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 
-const OPEX_COLORS = ['#f59e0b', '#00FF88', '#3b82f6', '#7DDDB4', '#64748b', '#14b8a6'];
+const OPEX_COLORS = ['#f59e0b', '#00FF88', '#3b82f6', '#7DDDB4', '#64748b', '#14b8a6', '#22d3ee', '#f43f5e'];
 
 export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledger' | 'proforma' | 'montecarlo' } = {}) {
     const setActiveTab = useSimulationStore((s) => s.actions.setActiveTab);
@@ -42,6 +44,7 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
     const cityMarket = useCapexStore((s) => s.inputs.cityMarket);
     const fin = useFinancialTracking();
     const ct = useConstructionTracking();
+    const eff = useEffectiveInputs();   // C6: auto-resolved staffing roster (single canonical source)
     const [tab, setTab] = React.useState<'overview' | 'ledger' | 'proforma' | 'montecarlo'>(initialTab ?? 'overview');
     /* deep-link fix: 'montecarlo' router case re-renders an already-mounted page —
      * useState won't re-read the prop, so sync tab when initialTab changes */
@@ -63,27 +66,34 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
         const cpi = e?.cpi ?? 1, spi = e?.spi ?? 1;
         const fac = e && !e.planMode ? Math.round(e.acUsd + (revised - e.evUsd) / Math.max(0.5, cpi)) : revised;
         const curve = sched ? pvCurve(sched, revised) : [];
-        // OPEX (engine, dcContract preset) — annual + YTD proxy at status month
-        let opex: Record<string, number> | null = null;
+        /* C2/C3/C6 — single-source annual OPEX: the IDENTICAL engine call the Dashboard
+         * and Operations' OpexBreakdown make (models.opex.fullBreakdown — the per-country
+         * sourced SSOT), so "Total OPEX/yr" is the SAME number on all three surfaces. The
+         * in-house manpower headcount = the effective (auto-resolved, staffingAutoMode-aware)
+         * in-house roster (shift-lead + engineer + technician + admin); janitor is excluded
+         * because the model prices cleaning as its own outsourced line (double-count guard). */
+        let opex: { total: number; groups: { group: string; lines: { annual: number }[] }[] } | null = null;
         try {
             const m = rzModels();
-            if (m?.opex?.totalAnnual) {
-                opex = m.opex.totalAnnual(inputs.itLoad / 1000, undefined, country?.id ?? 'US',
-                    (inputs.headcount_ShiftLead ?? 0) + (inputs.headcount_Engineer ?? 0) + (inputs.headcount_Technician ?? 0) + (inputs.headcount_Admin ?? 0),
-                    { capex: baseline, extendedOpex: true, basisPreset: 'dcContract' });
+            const D = rzData();
+            const opexPue = D?.pueMatrix?.[inputs.coolingType]?.['tier' + inputs.tierLevel] ?? getPUE(inputs.coolingType);
+            const inHouseFte = (eff.headcount_ShiftLead ?? 0) + (eff.headcount_Engineer ?? 0) + (eff.headcount_Technician ?? 0) + (eff.headcount_Admin ?? 0);
+            if (m?.opex?.fullBreakdown) {
+                opex = m.opex.fullBreakdown({
+                    itMw: inputs.itLoad / 1000, pue: opexPue, countryCode: country?.id ?? 'US', capex: baseline,
+                    cooling: inputs.coolingType, maintenanceStrategy: 'standard_annual_compliance', headcount: inHouseFte,
+                });
             }
         } catch { /* */ }
-        const opexDonut = opex ? [
-            { name: 'Utilities (power)', v: opex.power }, { name: 'Maintenance', v: opex.maintenance },
-            { name: 'Labor', v: opex.staffing }, { name: 'Services (contract)', v: opex.contract },
-            { name: 'Insurance', v: opex.insurance }, { name: 'Others', v: (opex.overhead ?? 0) + (opex.water ?? 0) + (opex.carbon ?? 0) + (opex.connectivity ?? 0) },
-        ].filter((x) => x.v > 0) : [];
+        const opexDonut = opex?.groups
+            ? opex.groups.map((g) => ({ name: g.group, v: g.lines.reduce((s, l) => s + l.annual, 0) })).filter((x) => x.v > 0)
+            : [];
         // health composite (documented): 0.3 budget-variance + 0.35 cpi + 0.35 spi
         const bv = revised > 0 ? Math.max(0, 1 - Math.abs(fac - revised) / revised * 5) : 1;
         const health = Math.round(100 * (0.3 * bv + 0.35 * Math.min(1, cpi) + 0.35 * Math.min(1, spi)));
         const grade = health >= 85 ? 'A' : health >= 70 ? 'B' : health >= 55 ? 'C' : health >= 40 ? 'D' : 'E';
         return { baseline, approvedRev, revised, committed, paid, cpi, spi, fac, curve, opex, opexDonut, health, grade, planMode: e?.planMode ?? true };
-    }, [results, fin.transactions, fin.revisions, ct.statusMonth, ct.phaseActualPct, ct.acSpentUsd, inputs, country]);
+    }, [results, fin.transactions, fin.revisions, ct.statusMonth, ct.phaseActualPct, ct.acSpentUsd, inputs, country, eff]);
 
     /* ── Workstream H · WACC build-up + scenario NPV + break-even occupancy +
      * TCO $/kW·mo — SAME cashflow construction as this page's PDF pro-forma
@@ -109,7 +119,7 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
         const revRef: number = marketColo ?? inputs.revenuePerKwMonth ?? DEFAULT_REVENUE_PER_KW_MONTH;
         const revSrc = marketColo != null ? `engine market coloPrice · ${marketKey}` : `live revenue basis $${inputs.revenuePerKwMonth ?? DEFAULT_REVENUE_PER_KW_MONTH}/kW·mo (no market selected)`;
         const revenueYr = revRef * inputs.itLoad * 12;
-        const opexYr: number = model.opex ? (model.opex.totalExtended ?? model.opex.total) : revenueYr * 0.4;
+        const opexYr: number = model.opex ? (model.opex.total) : revenueYr * 0.4;
         const npvAt = (capex: number, rev: number, rate: number): number =>
             m.roi.npv(Array.from({ length: YEARS }, () => rev - opexYr), rate) - capex;
         const irrAt = (capex: number, rev: number): number | null => {
@@ -180,7 +190,7 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
     const insights = [
         `Budget baseline ${fmtMoney(model.baseline)} + approved changes ${fmtMoney(model.approvedRev)} → revised ${fmtMoney(model.revised)}.`,
         model.planMode ? 'Plan Mode — FAC ≡ revised budget (no construction actuals yet).' : `FAC ${fmtMoney(model.fac)} at CPI ${model.cpi} (from Construction tracking — single source).`,
-        model.opex ? `Annual OPEX ${fmtMoney(model.opex.totalExtended ?? model.opex.total)} on the DC-contract 100%-util basis (engine preset).` : 'OPEX engine loading…',
+        model.opex ? `Annual OPEX ${fmtMoney(model.opex.total)} — per-country sourced breakdown (engine models.opex.fullBreakdown; same figure as the Dashboard & Operations).` : 'OPEX engine loading…',
         `Committed ${Math.round((model.committed / model.revised) * 100)}% · paid ${Math.round((model.paid / model.revised) * 100)}% of revised budget${fin.touched ? '' : ' (EXAMPLE ledger)'}.`,
     ];
 
@@ -192,7 +202,7 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
             // revenue × IT load vs the page's dcContract OPEX — roi model, no new data.
             const m = rzModels();
             const revenueYr = (rzData()?.decision?.revenuePerKwMonth ?? 280) * inputs.itLoad * 12;
-            const opexYr = model.opex ? (model.opex.totalExtended ?? model.opex.total) : revenueYr * 0.4;
+            const opexYr = model.opex ? (model.opex.total) : revenueYr * 0.4;
             const flows = Array.from({ length: 15 }, () => revenueYr - opexYr);
             const npv = m?.roi?.npv ? m.roi.npv(flows, 0.1) - model.baseline : 0;
             const irrFrac = m?.roi?.irr ? m.roi.irr([-model.baseline, ...flows]) : null;
@@ -221,9 +231,9 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
                         ],
                     },
                     ...(model.opex ? [{
-                        title: 'Annual OPEX by Type (DC-contract basis)', head: ['Type', 'Annual'], rows: [
+                        title: 'Annual OPEX by Group (per-country sourced breakdown)', head: ['Group', 'Annual'], rows: [
                             ...model.opexDonut.map((r) => [r.name, fmtMoney(r.v)]),
-                            ['Total', fmtMoney(model.opex.totalExtended ?? model.opex.total)],
+                            ['Total', fmtMoney(model.opex.total)],
                         ],
                     }] : []),
                 ],
@@ -429,7 +439,7 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
 
                             {/* OPEX */}
                             <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                                <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Annual OPEX by Type <span className="text-[9px] normal-case text-slate-400">engine models.opex · DC-contract basis (Phase-Q preset)</span></h2>
+                                <h2 className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Annual OPEX by Group <span className="text-[9px] normal-case text-slate-400">engine models.opex.fullBreakdown · per-country sourced (same as Dashboard &amp; Operations)</span></h2>
                                 {model.opex ? (
                                     <div className="flex items-center gap-3">
                                         <div className="h-36 w-36 shrink-0">
@@ -452,7 +462,7 @@ export function FinancialPage({ initialTab }: { initialTab?: 'overview' | 'ledge
                                             ))}
                                             <TraceValue traceId="opex.totalAnnual">
                                                 <div className="border-t border-slate-200 dark:border-slate-800 pt-0.5 text-[11px] font-bold text-slate-900 dark:text-white">
-                                                    {fmtMoney(model.opex.totalExtended ?? model.opex.total)} <span className="font-normal text-slate-400">/ year</span>
+                                                    {fmtMoney(model.opex.total)} <span className="font-normal text-slate-400">/ year</span>
                                                 </div>
                                             </TraceValue>
                                         </div>
