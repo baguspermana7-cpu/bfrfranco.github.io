@@ -338,6 +338,7 @@ FILTER_JS = r"""<script>
 
 
 def render_hub(incidents):
+    _CLUSTER_SVG = hub_cluster_svg()
     rows = []
     for i, inc in enumerate(incidents, 1):
         loc = inc.get("location", {})
@@ -370,6 +371,7 @@ def render_hub(incidents):
             <div><div class="eyebrow" style="margin-bottom:0.3rem">By category</div>{hub_category_svg(incidents)}</div>
             <div><div class="eyebrow" style="margin-bottom:0.3rem">Risk map · blast radius × duration</div>{hub_quadrant_svg(incidents)}</div>
         </div>
+        {('<div class="eyebrow" style="margin:0.6rem 0 0.3rem">Semantic map · incidents near each other share a failure signature</div>' + _CLUSTER_SVG) if _CLUSTER_SVG else ''}
 
         <h2>All incidents</h2>
         <div class="filterbar" id="filterbar">
@@ -551,6 +553,34 @@ def hub_quadrant_svg(incidents):
         r = 3 + (x["_score"] / 10) * 4
         dots.append(f'<circle class="vz-accent-dot" cx="{bx:.0f}" cy="{dy:.0f}" r="{r:.1f}"><title>{esc(x.get("operator",""))} — {esc(x.get("date",""))}</title></circle>')
     return f'<div class="viz"><svg viewBox="0 0 {W} {H}" role="img" aria-label="Blast radius vs duration risk map"><title>Risk map: blast radius × duration (dot size = magnitude)</title>{ax}{"".join(dots)}</svg></div>'
+
+
+_CAT_HEX = {"power": "#d8b25c", "software": "#d8b25c", "cooling": "#7fd1a8", "network": "#7fd1a8",
+            "flood": "#7fd1a8", "human": "#e0917f", "fire": "#e0917f", "supply": "#d8b25c"}
+
+
+def hub_cluster_svg():
+    """Semantic-similarity map from the vector index (_cluster.json, if built)."""
+    path = os.path.join(DATA_DIR, "_cluster.json")
+    if not os.path.exists(path):
+        return ""
+    try:
+        pts = json.load(open(path)).get("incidents", [])
+    except Exception:
+        return ""
+    if not pts:
+        return ""
+    W = H = 340; pad = 18
+    dots = []
+    for p in pts:
+        x = pad + p["x"] * (W - 2 * pad)
+        y = pad + (1 - p["y"]) * (H - 2 * pad)
+        cat = (p.get("category") or ["software"])[0]
+        col = _CAT_HEX.get(cat, "#8b9484")
+        r = 4 + (float(p.get("score", 0)) / 10) * 4
+        dots.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{r:.1f}" fill="{col}" fill-opacity="0.85"><title>{esc(p.get("operator",""))} ({esc(cat)})</title></circle>')
+    return (f'<div class="viz"><svg viewBox="0 0 {W} {H}" role="img" aria-label="Semantic similarity map of incidents">'
+            f'<title>Semantic map — incidents near each other share a failure signature (from the vector index)</title>{"".join(dots)}</svg></div>')
 
 
 def render_incident(inc, rank):

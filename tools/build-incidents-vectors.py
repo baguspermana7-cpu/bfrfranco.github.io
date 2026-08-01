@@ -119,6 +119,30 @@ def main():
     np.savez_compressed(VECTORS, vectors=mat, hashes=np.array(hashes), ids=np.array(ids))
     print(f"[incidents-vectors] wrote {mat.shape[0]}×{mat.shape[1]} embeddings → incidents-vectors.npz")
 
+    # ── semantic-cluster projection: mean embedding per incident → 2D PCA → _cluster.json
+    # (a private "vector-index namespace" the root-gated hub renders as a similarity map). ──
+    by_slug = {}
+    for r, v in zip(records, mat):
+        by_slug.setdefault(r["slug"], {"vs": [], "meta": r})["vs"].append(v)
+    slugs = list(by_slug)
+    means = np.array([np.mean(by_slug[s]["vs"], axis=0) for s in slugs], dtype="float32")
+    if len(slugs) >= 2:
+        X = means - means.mean(axis=0, keepdims=True)
+        # PCA via SVD → first two components
+        U, S, Vt = np.linalg.svd(X, full_matrices=False)
+        proj = U[:, :2] * S[:2]
+        # normalize to 0..1
+        mn, mx = proj.min(axis=0), proj.max(axis=0)
+        norm = (proj - mn) / (mx - mn + 1e-9)
+        cluster = [{
+            "slug": s, "operator": by_slug[s]["meta"].get("operator", ""),
+            "category": by_slug[s]["meta"].get("category", []),
+            "score": by_slug[s]["meta"].get("magnitudeScore", 0),
+            "x": round(float(norm[i][0]), 4), "y": round(float(norm[i][1]), 4),
+        } for i, s in enumerate(slugs)]
+        json.dump({"incidents": cluster}, open(os.path.join(DATA_DIR, "_cluster.json"), "w"), ensure_ascii=False)
+        print(f"[incidents-vectors] wrote 2D semantic projection → _cluster.json ({len(slugs)} incidents)")
+
 
 if __name__ == "__main__":
     main()
