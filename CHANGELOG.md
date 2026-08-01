@@ -13,6 +13,23 @@ release sections rather than semver.
 
 ---
 
+## v1.121.5 — 2026-08-01 (DCMOC — ƒx trace coverage: Risk composite + structural finding)
+
+### Added
+- **Risk Dashboard composite score** now carries an ƒx trace (`risk.compositeScore`) — a new
+  `riskAgg()` reader mirrors the page's `analysis` memo EXACTLY (`generateAssetCounts →
+  calculateRiskProfile → calculateRiskScore().totalScore`), so the popover can't drift.
+
+### Finding (why remaining "untraced" values mostly can't be single-node traced)
+A sweep of the un-traced `<ScoreValue>` cells found the remaining gaps are **structural**, not
+omissions: (a) **per-row table cells** (rendered inside `.map()` — one static trace node returns
+one number, so it would be wrong on every other row) and (b) **component-local `useState` values**
+(e.g. Strategic Planning acquisition what-if bids) that `value-trace.ts` cannot read without
+re-implementing the math (banned — that is precisely what caused the Results drift). Tracing those
+would need per-row dynamic trace nodes (infra change) or lifting the state into a store (refactor) —
+flagged for a decision, not force-fitted. KPI-card-level scores (Site Intelligence ×5, Results,
+Risk) are now traced. trace-parity 116/116, value-bindings 85/0.
+
 ## v1.121.4 — 2026-08-01 (DCMOC — Results trace-parity drift fixed, 116/116)
 
 ### Fixed
