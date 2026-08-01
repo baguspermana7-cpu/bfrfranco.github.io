@@ -13,6 +13,36 @@ release sections rather than semver.
 
 ---
 
+## v1.123.0 — 2026-08-01 (DC Incidents — official-RCA deep-crawl, all 25 dossiers)
+
+### Changed
+Owner: the official root-cause analysis must be present for every incident, crawled and
+**reassembled faithfully even where the official record is fragmented** across pages, PDFs,
+status-update threads and regulatory/court filings — deep and comprehensive, no fabrication.
+
+Deployed a **multi-agent research program** (75 Opus agents across two Workflow runs, ~3.4M
+tokens): per incident a 3-stage pipeline — **crawl** (hunt + WebFetch official post-incident
+sources, extract verbatim RCA fragments) → **assemble** (reconstruct a detailed causal narrative,
+5-whys, every claim mapped to a quote) → **adversarial verify** (strike any claim the sources
+don't support, emit the final source-grounded fields). Merged via `tools/_ingest_rca.py`.
+
+- **`rootCause` depth 760 → ~3,760 chars average** (5×), now multi-paragraph: trigger →
+  mechanism → why safeguards failed → escalation → recovery, with verbatim official quotes
+  (AWS "message" post-mortems, Azure PIRs, Google status RCAs, Cloudflare/Meta engineering
+  blogs, CrowdStrike RCA, OVH/SDIS fire findings, UniSuper/Google joint statement).
+- **`technicalDeepDive` and `contributingFactors`** rewritten to the official mechanism.
+- **17 of 25 now carry a verified `officialPostmortem`** (up from 15); the remaining 8 are left
+  **honestly false** — the authoritative cause is disputed or unpublished (Red Sea cable cuts,
+  data-center fires still under investigation, Delta/Dyn with no full public RCA) and the dossier
+  states that plainly rather than invent one.
+- Official/regulatory/vendor-status references merged in (dedup + type-normalised to the
+  provenance-gate vocabulary); the research is re-chunked into the vector index.
+
+Root-gated; no public-SEO surface. Gates: incidents-corpus 25/25 (provenance + structure),
+page-gates CLEAN (35 gated), script-tags CLEAN.
+
+---
+
 ## v1.122.9 — 2026-08-01 (DC Incidents — real geographic incident map)
 
 ### Added
