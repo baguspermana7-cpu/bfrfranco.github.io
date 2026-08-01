@@ -582,15 +582,15 @@ export default function StrategicPlanningDashboard() {
 
     return (
         <div className="space-y-6">
-            {/* Header */}
-            <div className="p-5 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm dark:shadow-none">
-                <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <Target className="w-5 h-5 text-cyan-500" />
-                    Strategic Planning
-                </h2>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                    Land feasibility, site acquisition analysis, and multi-phase expansion scheduling
-                </p>
+            {/* Header — normalized engine-title (icon-box + title + subtitle) */}
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-rz-data/15 border border-rz-data/40"><Target className="h-6 w-6 text-cyan-500" /></div>
+                    <div>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Strategic Planning</h1>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">Land feasibility, site acquisition analysis, and multi-phase expansion scheduling</p>
+                    </div>
+                </div>
             </div>
             {/* #335 — PURPOSE (owner bingung fungsinya): halaman OUTPUT analisis strategis. */}
             <p className="rounded-lg border border-rz-mint/30 bg-rz-mint/5 px-3 py-2 text-[11px] text-slate-600 dark:text-slate-300">

@@ -27,7 +27,7 @@ const CATEGORY_COLORS: Record<string, string> = {
 const SEVERITY_COLORS: Record<string, string> = {
     critical: 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800',
     high: 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800',
-    medium: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800',
+    medium: 'text-cyan-700 dark:text-rz-info bg-rz-info/10 border-rz-info/30',
     low: 'text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700',
 };
 
@@ -461,7 +461,7 @@ export default function AssetLifecycleDashboard() {
                                         ) : (
                                         <span className={clsx("text-[9px] font-bold uppercase px-1.5 py-0.5 rounded",
                                             h.riskLevel === 'high' ? 'bg-amber-100 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400' :
-                                            h.riskLevel === 'medium' ? 'bg-blue-100 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400' :
+                                            h.riskLevel === 'medium' ? 'bg-rz-info/15 text-cyan-700 dark:text-rz-info' :
                                             'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400'
                                         )}>{h.riskLevel}</span>
                                         )}
@@ -658,12 +658,12 @@ export default function AssetLifecycleDashboard() {
                         </div>
                         <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{fmtMoney(fi.earlyReplacementNpv)}</div>
                     </div>
-                    <div className="bg-blue-50 dark:bg-blue-950/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+                    <div className="bg-rz-info/10 rounded-lg p-4 border border-rz-info/30">
                         <div className="flex items-center gap-1.5 mb-1">
-                            <Calendar className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                            <span className="text-[10px] text-blue-700 dark:text-blue-400 uppercase font-semibold flex items-center gap-0.5">On-Time <Tooltip content="NPV of replacing assets exactly at their scheduled end-of-life. Baseline strategy with no early or deferred cost adjustments." /></span>
+                            <Calendar className="w-3.5 h-3.5 text-cyan-600 dark:text-rz-info" />
+                            <span className="text-[10px] text-cyan-700 dark:text-rz-info uppercase font-semibold flex items-center gap-0.5">On-Time <Tooltip content="NPV of replacing assets exactly at their scheduled end-of-life. Baseline strategy with no early or deferred cost adjustments." /></span>
                         </div>
-                        <div className="text-lg font-bold text-blue-600 dark:text-blue-400">{fmtMoney(result.npvOfReplacements)}</div>
+                        <div className="text-lg font-bold text-cyan-600 dark:text-rz-info">{fmtMoney(result.npvOfReplacements)}</div>
                     </div>
                     <div className="bg-red-50 dark:bg-red-950/20 rounded-lg p-4 border border-red-200 dark:border-red-800">
                         <div className="flex items-center gap-1.5 mb-1">

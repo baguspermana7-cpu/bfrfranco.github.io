@@ -10,7 +10,7 @@ import { generateAssetCounts } from '@/lib/AssetGenerator';
 import {
     AlertTriangle, ShieldAlert, Waves, Zap, Construction,
     Activity, TrendingUp, Clock, DollarSign, Thermometer,
-    Droplets, Truck, FileCheck, Server
+    Droplets, Truck, FileCheck, Server, ChevronRight
 } from 'lucide-react';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { ScoreValue } from '@/components/ui/ScoreValue';
@@ -18,6 +18,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsToolti
 
 export default function RiskDashboard() {
     const { selectedCountry, inputs } = useSimulationStore();
+    const setActiveTab = useSimulationStore((s) => s.actions.setActiveTab);
     const tierLevel = (inputs.tierLevel === 4 ? 4 : 3) as 3 | 4;
     const [isExporting, setIsExporting] = useState(false);
     const [selectedRiskCell, setSelectedRiskCell] = useState<{ row: number; col: number } | null>(null);
@@ -88,24 +89,30 @@ export default function RiskDashboard() {
 
     return (
         <div className="p-6 space-y-6 overflow-y-auto h-[calc(100vh-140px)]">
-            <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                    <ShieldAlert className="w-5 h-5 text-cyan-500" />
-                    Risk Assessment Dashboard
-                </h2>
-                <ExportPDFButton
-                    isGenerating={isExporting}
-                    onExport={async () => {
-                        setIsExporting(true);
-                        try {
-                            const { generateRiskPDF } = await import('@/modules/reporting/PdfGenerator');
-                            const { generateRiskNarrative } = await import('@/modules/reporting/ExecutiveSummaryGenerator');
-                            await generateRiskPDF(selectedCountry, aggregation, generateRiskNarrative(aggregation));
-                        } finally {
-                            setIsExporting(false);
-                        }
-                    }}
-                />
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-rz-data/15 border border-rz-data/40"><ShieldAlert className="h-6 w-6 text-cyan-500" /></div>
+                    <div>
+                        <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Risk Analysis</h1>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">Country &amp; design risk profile — 5×5 matrix, downtime exposure and mitigation, engine-real</p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-2">
+                    <ExportPDFButton
+                        isGenerating={isExporting}
+                        onExport={async () => {
+                            setIsExporting(true);
+                            try {
+                                const { generateRiskPDF } = await import('@/modules/reporting/PdfGenerator');
+                                const { generateRiskNarrative } = await import('@/modules/reporting/ExecutiveSummaryGenerator');
+                                await generateRiskPDF(selectedCountry, aggregation, generateRiskNarrative(aggregation));
+                            } finally {
+                                setIsExporting(false);
+                            }
+                        }}
+                    />
+                    <button onClick={() => setActiveTab('reliability')} className="inline-flex items-center gap-1 rounded-lg bg-rz-signal px-3 py-1.5 text-xs font-semibold text-black hover:bg-rz-signal/90">Next: Reliability <ChevronRight className="h-3.5 w-3.5" /></button>
+                </div>
             </div>
             {/* KPI Row */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

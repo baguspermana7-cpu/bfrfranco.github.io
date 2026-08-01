@@ -915,7 +915,7 @@ export function SparesDashboard() {
                     <div className="rounded-xl border border-slate-200 dark:border-slate-700/70 bg-white dark:bg-slate-900/50 p-3">
                         <div className="flex flex-wrap items-start gap-3">
                             <div className="shrink-0 rounded-lg px-3 py-1.5 text-center text-white" style={{ background: assess.color }}>
-                                <div className="text-[9px] uppercase opacity-80">Spares</div>
+                                <div className="text-[10px] uppercase opacity-80">Spares</div>
                                 <div className="text-sm font-bold">{assess.label}</div>
                             </div>
                             <p className="min-w-0 flex-1 text-[11px] leading-relaxed text-slate-600 dark:text-slate-300">{assess.narrative}</p>

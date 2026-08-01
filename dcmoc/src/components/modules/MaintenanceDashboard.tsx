@@ -936,7 +936,7 @@ function AssetsTab({ assets, assetCounts, isPencilMode, handleCountChange, selec
                                                 <span className={clsx(
                                                     "px-1.5 py-0.5 rounded text-[10px] font-medium border",
                                                     task.criticality === 'Statutory' ? "bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 border-red-200 dark:border-red-900/30" :
-                                                        task.criticality === 'Optimal' ? "bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-900/30" : "bg-slate-100 dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700"
+                                                        task.criticality === 'Optimal' ? "bg-rz-info/15 text-cyan-700 dark:text-rz-info border-rz-info/30" : "bg-slate-100 dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700"
                                                 )}>
                                                     {task.criticality}
                                                 </span>
@@ -1039,7 +1039,7 @@ function ScheduleTab({ assetCounts, schedule, weeks }: {
     const critChipClass = (crit: string) => clsx(
         "font-medium px-1.5 py-0.5 rounded text-[9px]",
         crit === 'Statutory' ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400" :
-            crit === 'Optimal' ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400" :
+            crit === 'Optimal' ? "bg-rz-info/15 text-cyan-700 dark:text-rz-info" :
                 "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400"
     );
 
@@ -1513,7 +1513,7 @@ function SLATab({ data, fmt, thirdParty, onThirdParty, facilityAged, onFacilityA
                                                                 ))}
                                                                 {altTier && (
                                                                     <div className="flex items-start gap-2 p-2 rounded-md bg-white/70 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700">
-                                                                        <span className="shrink-0 mt-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 whitespace-nowrap">Tier IV design</span>
+                                                                        <span className="shrink-0 mt-0.5 text-[10px] font-bold px-1.5 py-0.5 rounded bg-rz-info/15 text-cyan-700 dark:text-rz-info whitespace-nowrap">Tier IV design</span>
                                                                         <span className="flex-1 text-[11px] text-slate-600 dark:text-slate-400 leading-snug">
                                                                             Expected incidents {slaBaseFailures(3)} → {slaBaseFailures(4)}/yr → exposure {tier.label} {fmt(tier.riskExposure)} → {fmt(altTier.riskExposure)}/yr (−{fmt(tier.riskExposure - altTier.riskExposure)}) — the result of re-running the same model at tier level 4 (a design decision, not the contract).
                                                                         </span>
@@ -1698,7 +1698,7 @@ function SparesTab({ data, fmt, bands }: {
                                         <span className={clsx("px-2 py-0.5 rounded text-[10px] uppercase font-bold",
                                             item.criticality === 'Critical' ? "bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-900/30" :
                                                 item.criticality === 'Major' ? "bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-900/30" :
-                                                    "bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-900/30"
+                                                    "bg-rz-info/15 text-cyan-700 dark:text-rz-info border border-rz-info/30"
                                         )}>
                                             {item.criticality}
                                         </span>
@@ -1717,7 +1717,7 @@ function SparesTab({ data, fmt, bands }: {
             {/* Inventory KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {[
-                    { label: 'Total Inventory Value', value: fmt(data.totalInventoryValue), desc: 'Capital tied up in spares', color: 'text-blue-600 dark:text-blue-400', tip: 'Total capital investment tied up in spare parts inventory. Higher values increase working capital requirements but reduce downtime risk.' },
+                    { label: 'Total Inventory Value', value: fmt(data.totalInventoryValue), desc: 'Capital tied up in spares', color: 'text-cyan-600 dark:text-cyan-400', tip: 'Total capital investment tied up in spare parts inventory. Higher values increase working capital requirements but reduce downtime risk.' },
                     { label: 'Annual Holding Cost', value: fmt(data.totalHoldingCost), desc: 'Storage & depreciation', color: 'text-rz-signal', tip: 'Annual cost of maintaining spare parts inventory: warehousing, insurance, depreciation, and opportunity cost of capital.' },
                     { label: 'Annual Spares Budget', value: fmt(data.totalAnnualSparesBudget), desc: 'Consumption + Holding', color: 'text-rz-data', tip: 'Total annual budget for spare parts: consumption (parts used in maintenance) plus holding costs (storage and depreciation).' },
                 ].map((kpi, i) => (

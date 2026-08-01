@@ -17,7 +17,7 @@ export const costFactors = {
     building: { base: 1050, label: 'Building & Civil', icon: 'building', color: '#64748b' },
     seismic: { base: 130, label: 'Seismic Protection', icon: 'mountain', color: '#78716c' },
     electrical: { base: 1550, label: 'Electrical (MV/LV)', icon: 'zap', color: '#3b82f6' },
-    ups: { base: 780, label: 'UPS Systems', icon: 'battery-charging', color: '#8b5cf6' },
+    ups: { base: 780, label: 'UPS Systems', icon: 'battery-charging', color: '#22d3ee' },
     generator: { base: 520, label: 'Generator & Fuel', icon: 'fuel', color: '#f59e0b' },
     cooling: { base: 900, label: 'Cooling Systems', icon: 'snowflake', color: '#06b6d4' },
     fireSuppression: { base: 195, label: 'Fire Suppression', icon: 'fire-extinguisher', color: '#ef4444' },

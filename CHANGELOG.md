@@ -63,6 +63,24 @@ buttons, magnitude score-trace tooltip, and deep re-research batches 2–5.)
 
 ---
 
+## v1.124.2 — 2026-08-02 (DCMOC deep-audit — UI/skin "improve" pass)
+
+Follows the 5-Opus deep audit (`dcmoc/DEEP_AUDIT.md`). Correctness fixes C1-C7/B1 already
+shipped (v1.121.12-.13); this is the value-neutral UI/skin remainder. Trace-parity 214/214.
+
+### Changed (DCMOC)
+- **Risk + Strategic Planning headers** rebuilt to the canonical dashboard header (U5b — the two
+  that had no canonical target in the first pass).
+- **Readability floor** — sub-10px labels lifted to a legible floor across Simulation, Carbon,
+  Benchmark, DesignTools, NewEngine, Platform, Maintenance dashboards.
+- **Asset-lifecycle strip** (`LifecycleStrip.tsx`) tidied on the AssetLifecycle dashboard.
+- **Residual `#8b5cf6` purge** (K5) — UPS category swatch and remaining rejected-purple leaks
+  moved to instrument cyan `#22d3ee` / brand tokens.
+
+### Deferred
+- **C8** (`CapexEngine` FOM multiplier scoping) — reverted from this batch, kept ⏸: it re-baselines
+  CAPEX and needs a dedicated parity check. TODO stays in `DEEP_AUDIT.md`.
+
 ## v1.124.1 — 2026-08-02 (DC AI/HPC + DC Conventional → root+educator gate + lock icons)
 
 Owner: the DC AI/HPC and DC Conventional dashboards should be openable ONLY by root and

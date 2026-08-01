@@ -108,7 +108,7 @@ const CarbonDashboard = () => {
                     <div className="rounded-xl border border-slate-200 dark:border-slate-700/70 bg-white dark:bg-slate-800/50 p-4">
                         <div className="flex flex-wrap items-start gap-3">
                             <div className="shrink-0 rounded-lg px-3 py-2 text-center text-white" style={{ background: assess.color }}>
-                                <div className="text-[9px] uppercase opacity-80">Profile</div>
+                                <div className="text-[10px] uppercase opacity-80">Profile</div>
                                 <div className="text-sm font-bold">{assess.label}</div>
                                 <div className="text-[10px] opacity-90">{assess.valueLine}</div>
                             </div>

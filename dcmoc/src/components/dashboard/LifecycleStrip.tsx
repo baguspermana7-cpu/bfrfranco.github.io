@@ -117,7 +117,10 @@ export function LifecycleStrip({ onOpen, onViewGraph }: { onOpen: (tab?: TabId) 
                     </button>
                 </div>
             </div>
-            <div className="flex items-stretch gap-0.5 overflow-x-auto pb-1">
+            <div
+                className="flex items-stretch gap-0.5 overflow-x-auto pb-1 [mask-image:linear-gradient(to_right,transparent_0,#000_18px,#000_calc(100%-18px),transparent_100%)] [-webkit-mask-image:linear-gradient(to_right,transparent_0,#000_18px,#000_calc(100%-18px),transparent_100%)]"
+                title="Scroll horizontally to see all 13 engines"
+            >
                 {ENGINES.map((e, i) => {
                     const Icon = e.icon;
                     const col = ENGINE_COLORS[e.num];

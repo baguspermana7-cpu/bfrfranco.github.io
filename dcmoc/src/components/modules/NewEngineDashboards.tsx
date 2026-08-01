@@ -272,7 +272,7 @@ export function CommissioningDashboard() {
                     {EQUIP_SHOWN.map(([k, l]) => (
                         <div key={k} className="rounded-lg border border-slate-200 dark:border-slate-800 p-2 text-center">
                             <div className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{rich.equip[k]}</div>
-                            <div className="text-[9px] uppercase tracking-wide text-slate-500 flex items-center justify-center gap-1">{l}{EQUIP_TIPS[k] && <Tooltip content={EQUIP_TIPS[k]} />}</div>
+                            <div className="text-[10px] uppercase tracking-wide text-slate-500 flex items-center justify-center gap-1">{l}{EQUIP_TIPS[k] && <Tooltip content={EQUIP_TIPS[k]} />}</div>
                         </div>
                     ))}
                 </div>

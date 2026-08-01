@@ -777,7 +777,7 @@ function ScorecardTab({ result, tier, coolingType }: { result: ReturnType<typeof
                                 <div className="mt-1.5 space-y-1.5">
                                     {diag.levers.map((lv, i) => (
                                         <div key={i} className="flex items-start gap-2 rounded-md border border-slate-200 bg-white/70 p-2 dark:border-slate-700 dark:bg-slate-900/50">
-                                            <span className="shrink-0 whitespace-nowrap rounded bg-blue-100 px-1.5 py-0.5 text-[10px] font-bold text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">{lv.label}</span>
+                                            <span className="shrink-0 whitespace-nowrap rounded bg-rz-info/15 px-1.5 py-0.5 text-[10px] font-bold text-cyan-700 dark:text-rz-info">{lv.label}</span>
                                             <span className="flex-1 text-[11px] leading-snug text-slate-600 dark:text-slate-400">{lv.detail}</span>
                                         </div>
                                     ))}
@@ -907,7 +907,7 @@ function BulletChart({ score, tier }: { score: MetricScore; tier: 2 | 3 | 4 }) {
             <div className="relative h-6 bg-slate-100 dark:bg-slate-700/50 rounded overflow-hidden">
                 {/* Benchmark zones */}
                 <div className="absolute inset-y-0 bg-emerald-200 dark:bg-emerald-900/40 rounded-l" style={{ left: pct(Math.min(b.p10, b.p90)), width: pct(Math.abs(b.p25 - Math.min(b.p10, b.p90)) + minVal) }} />
-                <div className="absolute inset-y-0 bg-blue-200 dark:bg-blue-900/30" style={{ left: pct(Math.min(b.p25, b.p75)), width: `calc(${pct(Math.max(b.p25, b.p75))} - ${pct(Math.min(b.p25, b.p75))})` }} />
+                <div className="absolute inset-y-0 bg-cyan-200 dark:bg-cyan-900/30" style={{ left: pct(Math.min(b.p25, b.p75)), width: `calc(${pct(Math.max(b.p25, b.p75))} - ${pct(Math.min(b.p25, b.p75))})` }} />
                 {/* Median marker */}
                 <div className="absolute inset-y-0 w-0.5 bg-slate-400 dark:bg-slate-500" style={{ left: pct(b.median) }} />
                 {/* User value marker */}

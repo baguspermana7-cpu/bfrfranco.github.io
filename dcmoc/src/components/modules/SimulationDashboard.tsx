@@ -751,22 +751,22 @@ export function SimulationDashboard() {
                                 return (
                                     <>
                                         <div className="bg-slate-300 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-400 dark:border-slate-700">
-                                            <div className="text-[9px] text-slate-600 dark:text-slate-400 font-bold uppercase mb-1 flex items-center gap-1">PUE <Tooltip content="Power Usage Effectiveness — ratio of total facility power to IT equipment power. Lower is better (1.0 = perfect)." /></div>
+                                            <div className="text-[10px] text-slate-600 dark:text-slate-400 font-bold uppercase mb-1 flex items-center gap-1">PUE <Tooltip content="Power Usage Effectiveness — ratio of total facility power to IT equipment power. Lower is better (1.0 = perfect)." /></div>
                                             <div className="text-lg font-bold text-orange-600 dark:text-amber-400">{pue.toFixed(2)}</div>
                                             <div className="text-[9px] text-slate-500">{pueLabel}</div>
                                         </div>
                                         <div className="bg-slate-300 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-400 dark:border-slate-700">
-                                            <div className="text-[9px] text-slate-600 dark:text-slate-400 font-bold uppercase mb-1 flex items-center gap-1">Cooling Load <Tooltip content="Power consumed by cooling systems in kW. Derived from IT load multiplied by (PUE - 1)." /></div>
+                                            <div className="text-[10px] text-slate-600 dark:text-slate-400 font-bold uppercase mb-1 flex items-center gap-1">Cooling Load <Tooltip content="Power consumed by cooling systems in kW. Derived from IT load multiplied by (PUE - 1)." /></div>
                                             <div className="text-lg font-bold text-cyan-600 dark:text-cyan-400">{fmtUnit(coolingLoadKw, 'kW')}</div>
                                             <div className="text-[9px] text-slate-500">{coolingPct}% overhead</div>
                                         </div>
                                         <div className="bg-slate-300 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-400 dark:border-slate-700">
-                                            <div className="text-[9px] text-slate-600 dark:text-slate-400 font-bold uppercase mb-1 flex items-center gap-1">Total Facility <Tooltip content="Total facility power consumption including IT load, cooling, lighting, UPS losses, and mechanical systems. Total = IT Load × PUE." /></div>
+                                            <div className="text-[10px] text-slate-600 dark:text-slate-400 font-bold uppercase mb-1 flex items-center gap-1">Total Facility <Tooltip content="Total facility power consumption including IT load, cooling, lighting, UPS losses, and mechanical systems. Total = IT Load × PUE." /></div>
                                             <div className="text-lg font-bold text-slate-900 dark:text-white">{fmtUnit(totalFacilityKw, 'kW')}</div>
                                             <div className="text-[9px] text-slate-500">IT + Cooling + Losses</div>
                                         </div>
                                         <div className="bg-slate-300 dark:bg-slate-800/50 p-3 rounded-lg border border-slate-400 dark:border-slate-700">
-                                            <div className="text-[9px] text-slate-600 dark:text-slate-400 font-bold uppercase mb-1 flex items-center gap-1">Annual Energy <Tooltip content="Total facility energy consumption over a year in megawatt-hours." /></div>
+                                            <div className="text-[10px] text-slate-600 dark:text-slate-400 font-bold uppercase mb-1 flex items-center gap-1">Annual Energy <Tooltip content="Total facility energy consumption over a year in megawatt-hours." /></div>
                                             <div className="text-lg font-bold text-rz-mint truncate">{fmtUnit(annualEnergyMWh, 'MWh')}</div>
                                             <div className="text-[9px] text-slate-500">{fmtMoney(annualCost)} @ ${elecRate.toFixed(2)}</div>
                                         </div>

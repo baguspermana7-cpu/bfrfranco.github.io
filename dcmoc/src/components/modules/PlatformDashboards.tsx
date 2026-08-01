@@ -132,12 +132,12 @@ function CountryCoverageSection() {
             {/* Summary: totals + biggest gaps + fullest/thinnest countries */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
                 <div className="rounded-lg border border-slate-200 dark:border-white/10 px-3 py-2">
-                    <p className="text-[9px] uppercase text-slate-400">Total coverage <InfoTip content="Share of all country×field cells that carry a value: filled cells ÷ (countries × fields)." /></p>
+                    <p className="text-[10px] uppercase text-slate-400">Total coverage <InfoTip content="Share of all country×field cells that carry a value: filled cells ÷ (countries × fields)." /></p>
                     <p className="text-lg font-bold tabular-nums text-slate-900 dark:text-white">{(cov.coverage * 100).toFixed(1)}%</p>
                     <p className="text-[9px] text-slate-400">{cov.filledCells.toLocaleString()} / {cov.totalCells.toLocaleString()} cells filled</p>
                 </div>
                 <div className="rounded-lg border border-slate-200 dark:border-white/10 px-3 py-2">
-                    <p className="text-[9px] uppercase text-slate-400">Biggest gaps <InfoTip content="Fields left empty in the most countries — the highest-impact data gaps to fill first." /></p>
+                    <p className="text-[10px] uppercase text-slate-400">Biggest gaps <InfoTip content="Fields left empty in the most countries — the highest-impact data gaps to fill first." /></p>
                     {cov.fieldGaps.length === 0
                         ? <p className="text-xs text-rz-data font-medium">No gaps — all fields filled</p>
                         : cov.fieldGaps.slice(0, 3).map((g) => (
@@ -145,12 +145,12 @@ function CountryCoverageSection() {
                         ))}
                 </div>
                 <div className="rounded-lg border border-slate-200 dark:border-white/10 px-3 py-2">
-                    <p className="text-[9px] uppercase text-slate-400">Most complete <InfoTip content="Countries with the highest number of populated fields." /></p>
+                    <p className="text-[10px] uppercase text-slate-400">Most complete <InfoTip content="Countries with the highest number of populated fields." /></p>
                     <p className="text-xs font-medium text-slate-700 dark:text-slate-200">{cov.fullest.length > 3 ? `${cov.fullest.length} countries` : cov.fullest.map((r) => r.name).join(', ')}</p>
                     <p className="text-[9px] text-slate-400 tabular-nums">{cov.maxFill}/{COV_FIELDS.length} fields</p>
                 </div>
                 <div className="rounded-lg border border-slate-200 dark:border-white/10 px-3 py-2">
-                    <p className="text-[9px] uppercase text-slate-400">Least complete <InfoTip content="Countries with the fewest populated fields — priority for data entry." /></p>
+                    <p className="text-[10px] uppercase text-slate-400">Least complete <InfoTip content="Countries with the fewest populated fields — priority for data entry." /></p>
                     <p className="text-xs font-medium text-slate-700 dark:text-slate-200">{cov.thinnest.length > 3 ? `${cov.thinnest.length} countries` : cov.thinnest.map((r) => r.name).join(', ')}</p>
                     <p className="text-[9px] text-slate-400 tabular-nums">{cov.minFill}/{COV_FIELDS.length} fields</p>
                 </div>
