@@ -13,6 +13,28 @@ release sections rather than semver.
 
 ---
 
+## v1.121.7 — 2026-08-01 (DCMOC — per-row ƒx trace infrastructure)
+
+Solves the structural limit flagged in v1.121.5: the trace registry is one node → one
+value, so per-row table cells (rendered in `.map()`) and component-local `useState` values
+could not carry an ƒx trace. New **inline-trace** path lets the component that already holds
+the per-row value + formula pass the trace directly — parity holds by construction (same
+number the cell renders).
+
+### Added
+- **`InlineTrace` type + `resolveInline()`** (`value-trace.ts`) — deps may be registry ids
+  (string, resolved live) or nested inline leaves; `ResolvedTrace` now carries `formulaTemplate`
+  so inline traces keep the formula view.
+- **`<TraceValue trace={...}>`** and **`<ScoreValue trace={...}>`** — accept an inline spec as
+  an alternative to a registry `traceId`; the ƒx badge, popover, drill-down tree and Copy-chain
+  all work identically.
+- **Demo wiring** — Asset Intelligence per-class Health cells now carry a per-row ƒx trace
+  (value = the row's health; drill-down leaves = that class's MTBF / MTTR / failure-probability).
+  **trace-parity gate rose 116/116 → 125/125** (the 9 new per-row traces all match).
+
+Rollout of inline traces to the remaining per-row surfaces (Capacity systems, Strategic bid
+scenarios, Risk scenarios, Compliance, Asset-lifecycle) follows next, using this infra.
+
 ## v1.121.6 — 2026-08-01 (DCMOC — tooltip stragglers closed + coverage monitor gate)
 
 ### Added
