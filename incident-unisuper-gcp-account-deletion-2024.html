@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Cloud Accidentally Deletes UniSuper&#x27;s Entire GCVE Private Cloud | ResistanceZero</title>
+    <meta name="description" content="During the initial provisioning of UniSuper&#x27;s Google Cloud VMware Engine (GCVE) Private Cloud, one input parameter was left blank in an internal Google deployment tool. Per Google&#x27;">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="ai-content-declaration" content="human-curated, sourced from public post-incident reports">
+    <meta name="author" content="Bagus Dwi Permana">
+    <link rel="canonical" href="https://resistancezero.com/incident-unisuper-gcp-account-deletion-2024.html">
+    <meta name="theme-color" content="#0c1512">
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+    <style>
+    /* ── Governed Incident Dossier — editorial register (v2): forest-green + warm ivory,
+       serif display, evidence-class provenance. Accent vars remapped so all components
+       re-skin. AA-contrast in both themes. No gradients / glass / dot-grid (anti-slop). */
+    :root:not([data-theme="dark"]) {
+        --bg:#f4f1e7; --surface:#fffdf6; --surface-2:#efeadc; --line:rgba(26,45,36,0.16);
+        --text:#1a2d24; --text-strong:#10201a; --text-body:#3b463d; --muted:#6a7367;
+        --cyan:#2f6b4f; --amber:#87671b; --green:#2f7d54; --red:#9c3b32; --gold:#87671b;
+        --hero-ink:#f4f1e7; --hero-bg:#183329; --shadow-deep:rgba(26,45,36,0.10);
+    }
+    [data-theme="dark"] {
+        --bg:#0c1512; --surface:#11201a; --surface-2:#16281f; --line:rgba(233,229,216,0.15);
+        --text:#e9e5d8; --text-strong:#f5f2e9; --text-body:#c6ccbc; --muted:#8b9484;
+        --cyan:#7fd1a8; --amber:#d8b25c; --green:#7fd1a8; --red:#e0917f; --gold:#d8b25c;
+        --hero-ink:#e9e5d8; --hero-bg:#0f221a; --shadow-deep:rgba(0,0,0,0.5);
+    }
+    * { box-sizing:border-box; }
+    html,body { margin:0; padding:0; }
+    body { background:var(--bg); color:var(--text); font-family:'IBM Plex Sans',system-ui,sans-serif; line-height:1.62; }
+    a { color:var(--cyan); }
+    h1,h2,.serif { font-family:'Fraunces','Newsreader',Georgia,serif; font-weight:600; letter-spacing:-0.01em; }
+    .wrap { max-width:1120px; margin:0 auto; padding:1.5rem 1.1rem 3rem; }
+    .navbar { display:flex; align-items:center; justify-content:space-between; padding:0.7rem 1.1rem; border-bottom:1px solid var(--line); background:var(--surface); position:sticky; top:0; z-index:50; }
+    .nav-container { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:1120px; margin:0 auto; }
+    .nav-logo { display:flex; align-items:center; }
+    .nav-avatar { width:34px; height:34px; border-radius:50%; }
+    .nav-menu { display:flex; gap:1rem; list-style:none; margin:0; padding:0; }
+    .nav-menu a { color:var(--text-body); text-decoration:none; font-size:0.85rem; font-weight:600; }
+    .nav-menu a:hover { color:var(--cyan); }
+    .nav-right { display:flex; align-items:center; gap:0.6rem; }
+    .theme-btn { background:none; border:1px solid var(--line); color:var(--text); border-radius:8px; padding:0.35rem 0.5rem; cursor:pointer; font-size:0.8rem; }
+    .lock-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--red); border:1px solid var(--red); border-radius:999px; padding:0.12rem 0.5rem; }
+    h1 { font-size:2.4rem; color:var(--text-strong); margin:0.35rem 0 0.5rem; line-height:1.12; }
+    h2 { font-size:1.4rem; color:var(--text-strong); margin:2rem 0 0.7rem; }
+    .eyebrow { font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); }
+    .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
+    .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
+    .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:999px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    .chip.cyan { color:var(--cyan); border-color:var(--cyan); }
+    .chip.amber { color:var(--amber); border-color:var(--amber); }
+    .chip.green { color:var(--green); border-color:var(--green); }
+    .chip.red { color:var(--red); border-color:var(--red); }
+    .chip.muted { color:var(--muted); }
+    .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:1rem 1.1rem; margin-top:0.9rem; }
+    .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:12px; margin-top:0.9rem; }
+    table.inc-index { width:100%; border-collapse:collapse; font-size:0.86rem; min-width:760px; }
+    table.inc-index th { text-align:left; font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); background:var(--surface-2); }
+    table.inc-index td { padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); color:var(--text-body); vertical-align:top; }
+    table.inc-index tr:hover td { background:var(--surface-2); }
+    table.inc-index a { font-weight:700; color:var(--text-strong); text-decoration:none; }
+    table.inc-index a:hover { color:var(--cyan); text-decoration:underline; }
+    .rank-badge { font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--amber); }
+    .mag-bar { height:4px; border-radius:3px; background:var(--line); margin-top:0.35rem; overflow:hidden; }
+    .mag-bar > span { display:block; height:4px; background:var(--amber); }
+    ul.tight { margin:0.4rem 0 0; padding-left:1.15rem; }
+    ul.tight li { color:var(--text-body); margin:0.3rem 0; font-size:0.92rem; }
+    .soe { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .soe li { display:grid; grid-template-columns:170px 1fr; gap:0.7rem; padding:0.5rem 0; border-bottom:1px dashed var(--line); }
+    .soe time { font-family:'JetBrains Mono',monospace; font-size:0.76rem; color:var(--cyan); }
+    .soe .ev { color:var(--text-body); font-size:0.9rem; }
+    .phase-chip { font-family:'JetBrains Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--amber); border:1px solid var(--amber); border-radius:999px; padding:0.05rem 0.4rem; margin-right:0.4rem; white-space:nowrap; }
+    table.metrics { width:100%; border-collapse:collapse; font-size:0.88rem; }
+    table.metrics td { padding:0.5rem 0.7rem; border-bottom:1px solid var(--line); vertical-align:top; }
+    table.metrics .mlabel { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; width:38%; white-space:nowrap; }
+    table.metrics .mval { color:var(--text-body); }
+    .ca-block { background:var(--surface); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 10px 10px 0; padding:0.7rem 1rem; margin-top:0.7rem; }
+    .ca-block h3 { margin:0 0 0.3rem; font-size:0.92rem; color:var(--text-strong); }
+    .ca-block p { margin:0; color:var(--text-body); font-size:0.9rem; }
+    /* ── inline-SVG visualizations (theme-aware via vars) ── */
+    .viz { overflow-x:auto; margin-top:0.9rem; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:0.9rem 1rem; }
+    .viz svg { display:block; max-width:100%; height:auto; }
+    .viz-radar svg { max-width:280px; margin:0 auto; }
+    .vz-grid { fill:none; stroke:var(--line); stroke-width:1; }
+    .vz-accent-fill { fill:var(--cyan); fill-opacity:0.16; stroke:var(--cyan); stroke-width:1.4; }
+    .vz-accent-dot { fill:var(--cyan); }
+    .vz-accent-bar { fill:var(--cyan); }
+    .vz-cat-bar { fill:var(--amber); }
+    .vz-lbl { font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--muted); }
+    .vz-box-trigger { fill:color-mix(in srgb, var(--red) 12%, var(--surface)); stroke:var(--red); stroke-width:1.2; }
+    .vz-box-fault { fill:color-mix(in srgb, var(--amber) 12%, var(--surface)); stroke:var(--amber); stroke-width:1.2; }
+    .vz-box-down { fill:color-mix(in srgb, var(--cyan) 10%, var(--surface)); stroke:var(--cyan); stroke-width:1; }
+    .vz-box-t { font-family:'IBM Plex Sans',sans-serif; font-size:11px; font-weight:600; fill:var(--text-strong); }
+    .vz-box-s { font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--muted); }
+    .vz-flow { stroke:var(--muted); stroke-width:1.3; fill:none; }
+    .vz-arrhead { fill:var(--muted); }
+    .vz-tl-ph { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.04em; text-transform:uppercase; fill:var(--amber); }
+    .vz-tl-t { font-family:'JetBrains Mono',monospace; font-size:8.5px; fill:var(--muted); }
+    .vz-hb-lbl { font-family:'IBM Plex Sans',sans-serif; font-size:11px; fill:var(--text-body); }
+    .vz-hb-val { font-family:'JetBrains Mono',monospace; font-size:10px; fill:var(--muted); }
+    .viz-grid3 { display:grid; grid-template-columns:1fr 1fr; gap:0.9rem; }
+    @media (max-width:720px){ .viz-grid3 { grid-template-columns:1fr; } }
+    .filterbar { display:flex; flex-wrap:wrap; align-items:center; gap:0.4rem 0.6rem; margin:0.9rem 0 0.2rem; }
+    .fb-group { display:flex; flex-wrap:wrap; gap:0.35rem; }
+    .fb-chip { font-family:'JetBrains Mono',monospace; font-size:0.72rem; padding:0.28rem 0.6rem; border-radius:999px; border:1px solid var(--line); background:var(--surface); color:var(--text-body); cursor:pointer; }
+    .fb-chip:hover { border-color:var(--cyan); }
+    .fb-chip.active { background:var(--cyan); border-color:var(--cyan); color:var(--surface); font-weight:700; }
+    .fb-search { flex:1 1 200px; min-width:160px; font-family:'IBM Plex Sans',sans-serif; font-size:0.82rem; padding:0.3rem 0.6rem; border-radius:8px; border:1px solid var(--line); background:var(--surface); color:var(--text); }
+    .fb-count { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); margin-left:auto; }
+    .kv { display:grid; grid-template-columns:180px 1fr; gap:0.5rem 0.9rem; margin-top:0.5rem; font-size:0.9rem; }
+    .kv dt { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; }
+    .kv dd { margin:0; color:var(--text-body); }
+    .refs { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .refs li { padding:0.55rem 0; border-bottom:1px solid var(--line); }
+    .refs .rtitle { color:var(--text-strong); font-weight:600; font-size:0.9rem; }
+    .refs .rquote { color:var(--muted); font-size:0.84rem; font-style:italic; margin-top:0.2rem; display:block; }
+    .refs a { font-size:0.78rem; word-break:break-all; }
+    .backlink { display:inline-block; margin-bottom:0.6rem; font-size:0.82rem; color:var(--cyan); text-decoration:none; }
+    footer { border-top:1px solid var(--line); margin-top:2.5rem; padding:1.4rem 1.1rem; text-align:center; }
+    footer .ver { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .disclaimer { font-size:0.76rem; color:var(--muted); margin-top:0.8rem; max-width:80ch; }
+    .skip-link { position:absolute; top:-50px; left:0; background:#0e7490; color:#fff; padding:10px 20px; text-decoration:none; font-weight:600; z-index:10000; border-radius:0 0 8px 0; transition:top 0.2s; }
+    .skip-link:focus { top:0; }
+    .root-gate { position:fixed; inset:0; z-index:99999; display:none; align-items:center; justify-content:center; background:rgba(2,6,23,0.74); padding:1rem; backdrop-filter:blur(6px); }
+    body.locked .root-gate { display:flex; }
+    body.locked .wrap { filter:blur(4px); pointer-events:none; user-select:none; }
+    .root-card { max-width:430px; width:100%; background:var(--surface); border:1px solid var(--cyan); border-radius:14px; padding:1.3rem 1.15rem; text-align:center; box-shadow:0 18px 36px var(--shadow-deep); }
+    .root-card h2 { margin:0 0 0.4rem; font-size:1.1rem; color:var(--text-strong); }
+    .root-card p { font-size:0.86rem; color:var(--text-body); }
+    .root-actions { margin-top:0.9rem; display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; }
+    .root-actions button, .root-actions a { border-radius:9px; padding:0.5rem 0.85rem; font-size:0.8rem; font-weight:700; border:1px solid var(--line); text-decoration:none; cursor:pointer; color:var(--text); font-family:inherit; }
+    .root-actions button { background:var(--cyan); color:#04121a; border:none; }
+    .rz-nav-burger { display:none; }
+    /* v1.8.0 — mobile responsive patch */
+    @media (max-width:768px) {
+        html,body { overflow-x:hidden; max-width:100vw; }
+        img { max-width:100%; height:auto; display:block; }
+        .nav-menu, .nav-links { display:none; }
+        .navbar { padding:0.5rem 0.75rem; }
+        footer .footer-grid { grid-template-columns:1fr; gap:1.25rem; padding:1rem; }
+        button, a.btn, [role="button"] { min-height:44px; }
+        h1 { font-size:1.4rem; }
+        .soe li { grid-template-columns:1fr; gap:0.15rem; }
+        .kv { grid-template-columns:1fr; }
+        .root-card { max-width:92vw; }
+    }
+    @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
+</style>
+</head>
+<body class="locked">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <nav class="navbar"><div class="nav-container">
+        <a href="index.html" class="nav-logo"><img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dc-incidents.html">DC Incidents</a></li>
+            <li><a href="datacenter-solutions.html">DC Solutions</a></li>
+        </ul>
+        <div class="nav-right">
+            <span class="lock-tag" title="Root-only module">🔒 Root</span>
+            <button class="theme-btn" id="themeToggle" type="button" aria-label="Toggle theme">◐</button>
+        </div>
+    </div></nav>
+    <main class="wrap" id="main-content">
+        <a class="backlink" href="dc-incidents.html">← All incidents</a>
+        <div class="eyebrow">Incident dossier · Rank #14</div>
+        <h1>Google Cloud Accidentally Deletes UniSuper&#x27;s Entire GCVE Private Cloud</h1>
+        <div class="chips">
+            <span class="chip">Google Cloud (customer: UniSuper)</span>
+            <span class="chip cyan">2024-05-02</span>
+            <span class="chip amber">216h 0m core impact</span>
+            <span class="chip red">Human error</span><span class="chip amber">Software</span>
+        </div>
+        <p class="lede">During the initial provisioning of UniSuper&#x27;s Google Cloud VMware Engine (GCVE) Private Cloud, one input parameter was left blank in an internal Google deployment tool. Per Google&#x27;s disclosure the blank value caused the system to assign a then-unknown default fixed one-year term to the Private Cloud, which silently armed an automatic-deletion action. Roughly a year later, at the end of that system-assigned term, the Private Cloud was deleted across both of its copies. The A$135B fund&#x27;s 647,000+ members lost access to online services for nine days. The deletion did not reach data backups stored in Google Cloud Storage in the same region, which — together with third-party backup software — enabled a rebuild rather than permanent data loss. Members&#x27; account balances and investments were not lost, and the incident was operational, not a cyberattack.</p>
+
+        <h2>Failure cascade</h2>
+        <div class="viz viz-cascade"><svg viewBox="0 0 720 164" role="img" aria-label="Failure cascade block diagram"><title>Failure cascade: trigger → fault → downstream impact</title><defs><marker id="ic-ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path class="vz-arrhead" d="M0,0 L6,3 L0,6 Z"/></marker></defs><rect class="vz-box-trigger" x="8" y="58.0" width="168" height="50" rx="8"/><text class="vz-box-t" x="18" y="76.0">Trigger · Human error</text><text class="vz-box-s" x="18" y="88.0">2024-05-02</text><rect class="vz-box-fault" x="232" y="58.0" width="200" height="50" rx="8"/><text class="vz-box-t" x="242" y="76.0">Google Cloud (customer: Un</text><text class="vz-box-s" x="242" y="88.0">Google Cloud VMware Engine (GC</text><line class="vz-flow" x1="176" y1="83.0" x2="230" y2="83.0" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="500" y="22" width="212" height="32" rx="8"/><text class="vz-box-t" x="510" y="40">UniSuper member-facing online po</text><line class="vz-flow" x1="432" y1="83.0" x2="498" y2="38" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="500" y="62" width="212" height="32" rx="8"/><text class="vz-box-t" x="510" y="80">UniSuper mobile app</text><line class="vz-flow" x1="432" y1="83.0" x2="498" y2="78" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="500" y="102" width="212" height="32" rx="8"/><text class="vz-box-t" x="510" y="120">Back-end estate: hundreds of VMs</text><line class="vz-flow" x1="432" y1="83.0" x2="498" y2="118" marker-end="url(#ic-ar)"/></svg></div>
+        <p class="disclaimer">Trigger → primary fault → downstream blast radius, derived from the sourced root cause and affected-services record.</p>
+
+        <h2>Facility &amp; location</h2>
+        <dl class="kv">
+            <dt>Operator</dt><dd>Google Cloud (customer: UniSuper)</dd>
+            <dt>Data center</dt><dd>Google Cloud VMware Engine (GCVE) Private Cloud — UniSuper tenant</dd>
+            <dt>Location</dt><dd>Australia, GCVE Private Cloud replicated across two copies (joint statement: &#x27;two geographies&#x27;; Google technical detail/itnews: &#x27;two zones&#x27;)</dd>
+            <dt>Date</dt><dd>2024-05-02</dd>
+        </dl>
+
+        <h2>Impact &amp; scale</h2>
+        <dl class="kv">
+            <dt>Users affected</dt><dd>647,000+ members</dd>
+            <dt>Financial</dt><dd>Not quantified in accessible sources; A$135B+ funds under management exposed but no member-dollar loss or compensation figure disclosed (itnews and the 8 May joint statement are both silent on a figure)</dd>
+            <dt>Scope</dt><dd>Tier-1 (fund-wide member-facing outage; full private-cloud loss across both surviving copies)</dd>
+        </dl>
+        <div class="card"><strong>Services / systems down</strong><ul class="tight"><li>UniSuper member-facing online portal</li><li>UniSuper mobile app</li><li>Back-end estate: hundreds of VMs, databases and applications</li></ul></div>
+        <h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Members affected</td><td class="mval">647,000+ (as of 31 Mar 2024)</td></tr><tr><td class="mlabel">Funds under management exposed</td><td class="mval">A$135 billion+</td></tr><tr><td class="mlabel">Online services blackout</td><td class="mval">9 days inaccessible / rebuilt from backups</td></tr><tr><td class="mlabel">End-to-end disruption window</td><td class="mval">~12 days (2 May – 13 May 2024)</td></tr><tr><td class="mlabel">Copies destroyed</td><td class="mval">Both copies deleted — joint statement: &#x27;two geographies&#x27;; Google technical detail / itnews: &#x27;two zones&#x27;</td></tr><tr><td class="mlabel">Latent term before deletion</td><td class="mval">1 year (system-assigned default fixed term)</td></tr><tr><td class="mlabel">Misconfigured inputs</td><td class="mval">1 blank input parameter</td></tr><tr><td class="mlabel">Backups lost</td><td class="mval">0 — GCS same-region backups + third-party backup software survived</td></tr><tr><td class="mlabel">Recovery cadence</td><td class="mval">24x7 over several days (network/security config, apps, data)</td></tr><tr><td class="mlabel">Financial loss / compensation</td><td class="mval">Not disclosed in any accessible source</td></tr></tbody></table></div>
+
+        <h2>Magnitude profile</h2>
+        <div class="viz viz-radar"><svg viewBox="0 0 200 205" role="img" aria-label="Magnitude sub-scores radar chart"><title>Magnitude sub-scores (0–10)</title><polygon class="vz-grid" points="100.0,79.6 120.4,100.0 100.0,120.4 79.6,100.0"/><polygon class="vz-grid" points="100.0,59.8 140.2,100.0 100.0,140.2 59.8,100.0"/><polygon class="vz-grid" points="100.0,40.0 160.0,100.0 100.0,160.0 40.0,100.0"/><line class="vz-grid" x1="100" y1="100" x2="100.0" y2="40.0"/><line class="vz-grid" x1="100" y1="100" x2="160.0" y2="100.0"/><line class="vz-grid" x1="100" y1="100" x2="100.0" y2="160.0"/><line class="vz-grid" x1="100" y1="100" x2="40.0" y2="100.0"/><polygon class="vz-accent-fill" points="100.0,46.0 136.0,100.0 100.0,136.0 40.0,100.0"/><circle class="vz-accent-dot" cx="100.0" cy="46.0" r="2.4"/><circle class="vz-accent-dot" cx="136.0" cy="100.0" r="2.4"/><circle class="vz-accent-dot" cx="100.0" cy="136.0" r="2.4"/><circle class="vz-accent-dot" cx="40.0" cy="100.0" r="2.4"/><text class="vz-lbl" x="100.0" y="22.0" text-anchor="middle">Users 9</text><text class="vz-lbl" x="172.0" y="104.0" text-anchor="start">Financial 6</text><text class="vz-lbl" x="100.0" y="186.0" text-anchor="middle">Duration 6</text><text class="vz-lbl" x="28.0" y="104.0" text-anchor="end">Blast 10</text></svg></div>
+        <p class="disclaimer">Blast radius maxed: both surviving copies of the GCVE Private Cloud were deleted, an outcome geographic redundancy is specifically meant to prevent. Sources vary on terminology — the 8 May joint statement says the copies spanned &#x27;two geographies&#x27; and that deletion hit &#x27;both of these geographies&#x27;, while Google&#x27;s technical write-up and itnews describe &#x27;two zones&#x27; of one Private Cloud — but either way both copies were destroyed together and redundancy gave no protection. Users score high (fund-wide, 647k+ members locked out). Duration mid (9-day member blackout, ~12-day end-to-end window). Financial mid and uncertain — no dollar-loss or compensation figure was ever disclosed and surviving backups prevented data loss, so exposure is bounded by service disruption not asset loss.</p>
+
+        <h2>Sequence of events (SOE)</h2>
+        <div class="viz viz-timeline"><svg viewBox="0 0 1052 96" role="img" aria-label="Sequence-of-events timeline"><title>Phased sequence of events</title><line class="vz-grid" x1="30" y1="48" x2="1022" y2="48"/><circle class="vz-accent-dot" cx="30" cy="48" r="4.5"/><text class="vz-tl-ph" x="30" y="30" text-anchor="middle">Trigger</text><text class="vz-tl-t" x="30" y="68" text-anchor="middle">early-to-mid 202</text><circle class="vz-accent-dot" cx="129" cy="48" r="4.5"/><text class="vz-tl-ph" x="129" y="30" text-anchor="middle">Escalation</text><text class="vz-tl-t" x="129" y="68" text-anchor="middle">early-to-mid 202</text><circle class="vz-accent-dot" cx="228" cy="48" r="4.5"/><text class="vz-tl-ph" x="228" y="30" text-anchor="middle">Impact</text><text class="vz-tl-t" x="228" y="68" text-anchor="middle">2024-05-02</text><circle class="vz-accent-dot" cx="328" cy="48" r="4.5"/><text class="vz-tl-ph" x="328" y="30" text-anchor="middle">Cascade</text><text class="vz-tl-t" x="328" y="68" text-anchor="middle">2024-05-02</text><circle class="vz-accent-dot" cx="427" cy="48" r="4.5"/><text class="vz-tl-ph" x="427" y="30" text-anchor="middle">Diagnosis</text><text class="vz-tl-t" x="427" y="68" text-anchor="middle">2024-05-02 (earl</text><circle class="vz-accent-dot" cx="526" cy="48" r="4.5"/><text class="vz-tl-ph" x="526" y="30" text-anchor="middle">Mitigation</text><text class="vz-tl-t" x="526" y="68" text-anchor="middle">2024-05-07</text><circle class="vz-accent-dot" cx="625" cy="48" r="4.5"/><text class="vz-tl-ph" x="625" y="30" text-anchor="middle">Mitigation</text><text class="vz-tl-t" x="625" y="68" text-anchor="middle">2024-05-08</text><circle class="vz-accent-dot" cx="724" cy="48" r="4.5"/><text class="vz-tl-ph" x="724" y="30" text-anchor="middle">Recovery</text><text class="vz-tl-t" x="724" y="68" text-anchor="middle">2024-05-02 to ~2</text><circle class="vz-accent-dot" cx="824" cy="48" r="4.5"/><text class="vz-tl-ph" x="824" y="30" text-anchor="middle">Restored</text><text class="vz-tl-t" x="824" y="68" text-anchor="middle">~2024-05-13</text><circle class="vz-accent-dot" cx="923" cy="48" r="4.5"/><text class="vz-tl-ph" x="923" y="30" text-anchor="middle">Restored</text><text class="vz-tl-t" x="923" y="68" text-anchor="middle">2024-05-21</text><circle class="vz-accent-dot" cx="1022" cy="48" r="4.5"/><text class="vz-tl-ph" x="1022" y="30" text-anchor="middle">Restored</text><text class="vz-tl-t" x="1022" y="68" text-anchor="middle">2024-05-25</text></svg></div>
+        <ul class="soe"><li><time>early-to-mid 2023 (~1 year before deletion; exact date not disclosed)</time><span class="ev"><span class="phase-chip">Trigger</span> During the initial deployment of UniSuper&#x27;s GCVE Private Cloud, one input parameter is left blank in an internal Google provisioning tool. The system substitutes a then-unknown default value for that parameter: a fixed one-year term. (Google&#x27;s blog phrases this passively; Miles Ward&#x27;s later account attributes the null value to a bug in the creation script.)</span></li><li><time>early-to-mid 2023 onward (latent)</time><span class="ev"><span class="phase-chip">Escalation</span> The defaulted fixed-term value silently arms an automatic-deletion action on the Private Cloud. No party is aware the subscription now carries an expiry; the misconfiguration remains dormant for the full term.</span></li><li><time>2024-05-02</time><span class="ev"><span class="phase-chip">Impact</span> The system-assigned one-year term elapses and the automatic-deletion process deletes UniSuper&#x27;s GCVE Private Cloud. Member-facing online services go dark.</span></li><li><time>2024-05-02</time><span class="ev"><span class="phase-chip">Cascade</span> The deletion propagates across both copies of the Private Cloud (the joint statement&#x27;s &#x27;two geographies&#x27;), taking down the member portal, the mobile app, and the back-end estate of hundreds of VMs, databases and applications. Geographic redundancy provides no protection because the deletion is a subscription-level action, not a regional fault.</span></li><li><time>2024-05-02 (early)</time><span class="ev"><span class="phase-chip">Diagnosis</span> UniSuper and Google engineers confirm data backups held in Google Cloud Storage in the same region survived the deletion; combined with third-party backup software, these become the primary basis for reconstruction rather than the destroyed Private Cloud.</span></li><li><time>2024-05-07</time><span class="ev"><span class="phase-chip">Mitigation</span> UniSuper issues a member update attributing the disruption to a combination of rare Google Cloud issues that resulted in an inadvertent misconfiguration during provisioning, which triggered a previously unknown software bug.</span></li><li><time>2024-05-08</time><span class="ev"><span class="phase-chip">Mitigation</span> UniSuper and Google Cloud publish a joint statement confirming the outage, the scale (A$135B / 647,000+ members), that duplication existed in two geographies but deletion occurred across both, and that surviving backups minimised data loss.</span></li><li><time>2024-05-02 to ~2024-05-11 (nine-day blackout)</time><span class="ev"><span class="phase-chip">Recovery</span> Customer and Google teams work 24x7 over several days to rebuild the Private Cloud from backups: restoring network and security configurations, restoring applications, and recovering data. Online services remain inaccessible for nine days.</span></li><li><time>~2024-05-13</time><span class="ev"><span class="phase-chip">Restored</span> End of the end-to-end disruption window; online services restored to members. The overall outage spanned roughly 2–13 May 2024, with the nine-day online-services blackout sitting inside it.</span></li><li><time>2024-05-21</time><span class="ev"><span class="phase-chip">Restored</span> Google Cloud&#x27;s Miles Ward publicly clarifies the root cause via an X thread (blank/null parameter defaulting the Private Cloud to a one-year subscription, not a customer action or cyberattack).</span></li><li><time>2024-05-25</time><span class="ev"><span class="phase-chip">Restored</span> Google publishes its technical-details blog documenting the blank-parameter root cause, the defaulted one-year term mechanism, and the backup-driven recovery.</span></li></ul>
+
+        <h2>Root cause</h2>
+        <div class="card">Operator/tooling misconfiguration via a defaulted term value. During the initial deployment of UniSuper&#x27;s GCVE Private Cloud with an internal provisioning tool, one input parameter was left blank. Per Google, the system assigned a then-unknown default fixed one-year term for that parameter, and at the end of the system-assigned year the Private Cloud was automatically deleted. Google&#x27;s blog phrases the blank passively while Miles Ward&#x27;s later account attributes the null to a creation-script bug — either way it was an inadvertent misconfiguration, NOT a customer action, a cyberattack, or a data-integrity/hardware fault.</div>
+
+        <h2>Contributing factors</h2>
+        <ul class="tight"><li>A blank input in the internal provisioning tool silently defaulted to a fixed one-year term instead of failing, warning, or defaulting to no-expiry — an unsafe default with a destructive terminal action (deletion) rather than an alert or hold.</li><li>The consequence of the defaulted parameter was &#x27;then unknown&#x27; even to Google at the time: the tool offered no visibility that a deletion timer had been armed, so the misconfiguration remained latent and undetected for a full year.</li><li>The automatic-deletion action operated at the subscription/Private Cloud level and therefore propagated across BOTH copies (the joint statement&#x27;s &#x27;two geographies&#x27;), so geographic redundancy — designed for regional faults — provided no protection against a subscription-level delete.</li><li>No independent safeguard (deletion cool-off, second-person approval, or customer confirmation) stood between the expiring term and irreversible destruction of an entire production Private Cloud.</li><li>Recoverability depended on backups held OUTSIDE the deleted GCVE estate (Google Cloud Storage same-region plus third-party backup software); had those been inside the Private Cloud&#x27;s deletion scope, the loss would have been permanent.</li></ul>
+
+        <h2>Correction of errors (COE)</h2>
+        <ul class="tight"><li>Eliminate the unsafe default: internal GCVE provisioning tooling must never silently substitute a destructive fixed-term/auto-deletion value for a blank input; require an explicit value or fail closed with no expiry. <span class="chip muted">Google Cloud — GCVE provisioning/tooling engineering · Implied by postmortem</span></li><li>Add guardrails against subscription-level deletion of production Private Clouds: deletion cool-off / soft-delete window, mandatory second-person approval, and customer notification before any term-driven deletion executes. <span class="chip muted">Google Cloud — GCVE platform/reliability · Recommended</span></li><li>Surface term/expiry state to operators and customers: make any fixed-term or scheduled-deletion attribute visible in tooling and customer consoles so an armed deletion timer cannot remain latent and unknown for a year. <span class="chip muted">Google Cloud — GCVE product · Recommended</span></li><li>Preserve and validate independent, out-of-scope backups (GCS same-region + third-party backup software) and rehearse restore-from-backup for full Private Cloud reconstruction. <span class="chip muted">UniSuper — infrastructure/DR; with Google Cloud · Validated in-incident (backups were instrumental to recovery)</span></li><li>Publish a transparent joint root-cause disclosure to reassure members that the event was operational, not a cyberattack or member-data compromise, and that balances were not lost. <span class="chip muted">UniSuper + Google Cloud — communications/leadership · Done (joint statement 8 May; Google technical blog 25 May)</span></li></ul>
+
+        <h2>Lessons learnt</h2>
+        <ul class="tight"><li>Defaults must fail safe. A blank field defaulting to an irreversible, delayed self-destruct is the antithesis of safe design; unsafe defaults on destructive actions are as dangerous as an explicit destructive command because no human ever consciously chose them.</li><li>Redundancy is not backup. Duplicate copies protect against regional failure, not against a valid control-plane instruction to delete the resource itself — such an instruction hits every copy at once. True recoverability came only from backups held outside the deletion&#x27;s blast radius.</li><li>Latent misconfigurations with long fuses are uniquely dangerous. A destructive timer that stays invisible for a year defeats normal monitoring, change review, and incident-response reflexes because nothing appears wrong until the moment of loss.</li><li>Out-of-estate backups saved the fund. GCS same-region backups plus third-party backup software turned a potential permanent-data-loss catastrophe into a nine-day service outage — the single control that most changed the outcome.</li><li>Transparent, joint vendor-customer communication limited reputational damage: clearly stating this was an operational misconfiguration, not a cyberattack or member-data breach, and that member balances were not lost, was essential for a 647,000-member fund.</li><li>Even hyperscaler-managed platforms carry residual operational risk; customers of managed private clouds should assume misconfiguration is possible and retain independent, tested recovery paths they control.</li></ul>
+
+        <h2>Improvements &amp; remediation</h2>
+        <ul class="tight"><li>Fail-closed provisioning: internal tools reject or halt on missing parameters that control retention/lifecycle rather than substituting a destructive default.</li><li>Soft-delete and cool-off on Private Cloud deletion, with mandatory multi-party approval and advance customer notification before any term-driven or automated deletion.</li><li>Operator- and customer-visible display of any term, expiry, or scheduled-deletion attribute so armed timers cannot remain unknown.</li><li>Independent, out-of-scope backups (separate storage domain plus third-party backup software) as a standing requirement, with periodic full-reconstruction restore drills.</li><li>Proactive alerting on approaching lifecycle/retention deadlines so an impending automated deletion generates warnings well before execution.</li><li>Post-incident joint transparency reporting as standard practice for tenant-impacting control-plane errors.</li></ul>
+
+        <h2>Comprehensive analysis</h2><div class="ca-block"><h3>Failure mechanism: a blank field became a one-year self-destruct</h3><p>The proximate cause was mundane: while standing up UniSuper&#x27;s GCVE Private Cloud through an internal deployment tool, a single input parameter was left blank. What made that omission catastrophic was the system&#x27;s response — instead of rejecting the blank or defaulting to a benign no-expiry state, it substituted a then-unknown default fixed one-year term. That value quietly converted a permanent production resource into a time-limited one carrying an automatic-deletion action at term end. Google&#x27;s own account is explicit that this was inadvertent misconfiguration, not a customer action, cyberattack, or hardware/data-integrity fault. The defect lives at the intersection of human factors and software design: whether a person left the field empty or the internal provisioning script passed a null value (Miles Ward&#x27;s later account points to a script bug), the tooling amplified an ordinary omission into a destructive, irreversible outcome with a delayed fuse.</p></div><div class="ca-block"><h3>Why it hit both copies</h3><p>UniSuper&#x27;s Private Cloud was replicated across two copies — described as &#x27;two geographies&#x27; in the joint statement and &#x27;two zones&#x27; in Google&#x27;s technical detail — an architecture intended to survive the loss of a single copy. It provided no defense here because the failure was not a regional outage; it was a valid, subscription-level deletion instruction generated by the platform&#x27;s own lifecycle machinery. A control-plane &#x27;delete this Private Cloud&#x27; action targets the logical resource, so both copies were removed together. This is the classic distinction between fault-tolerance and blast-radius containment: redundancy multiplies copies of the data but does not multiply protection against an authoritative command to destroy the resource. The single armed timer was, in effect, a correlated-failure source sitting above the redundancy layer, which is precisely why the outcome was total rather than degraded.</p></div><div class="ca-block"><h3>Recovery: backups outside the blast radius were the decisive control</h3><p>The incident became a recoverable outage rather than a permanent loss for one reason: the deletion&#x27;s scope did not include the data backups. Backups stored in Google Cloud Storage in the same region survived, and together with third-party backup software they were the instrumental basis for the rebuild. Customer and Google teams then worked 24x7 over several days to reconstruct the Private Cloud — re-establishing network and security configurations, restoring applications, and recovering data — before full operations returned. Member-facing online services were inaccessible for nine days and had to be rebuilt from those backups. The lesson is stark: the control that most changed the outcome was not the redundancy that failed, but the independent, out-of-estate backups that fell outside the deletion&#x27;s reach.</p></div><div class="ca-block"><h3>Organizational and systemic factors</h3><p>Several systemic weaknesses lined up. The internal tool embodied an unsafe default — a blank on a lifecycle-critical field mapped to a destructive terminal action instead of failing closed. The consequence was invisible: Google described the effect as &#x27;then unknown&#x27;, meaning no operator dashboard or customer console surfaced that a deletion timer had been armed, so the fault stayed latent for a full year, immune to normal change review and monitoring. And there was no independent circuit-breaker — no cool-off, second-person approval, or customer confirmation — between an expiring term and the irreversible destruction of an entire production estate. Any one of these controls, present, would likely have prevented the loss.</p></div><div class="ca-block"><h3>Cross-incident pattern: unsafe defaults and destructive automation</h3><p>This event sits in a well-worn category of cloud and infrastructure failures where a routine operational input, mishandled by automation, produces disproportionate destruction. The recurring signature is: a human enters (or omits) a value, or a script passes a null; a system applies a permissive or destructive default without confirmation; the action executes at a scope that redundancy cannot contain; and recovery hinges on backups that happen to survive. The durable countermeasures are equally consistent across the pattern — fail-closed defaults on destructive fields, soft-delete/cool-off windows, multi-party approval for high-blast-radius actions, visible lifecycle state, and independent tested backups outside the primary estate. UniSuper&#x27;s case is a textbook illustration that in large-scale infrastructure, the dangerous failures are often not dramatic attacks but quiet defaults with long fuses.</p></div>
+
+        <h2>Technical deep-dive</h2>
+        <div class="card">The chain, per Google&#x27;s disclosure, is precise and closes on the parameter&#x27;s semantics even though Google never names the field itself. During initial GCVE Private Cloud provisioning through an internal tool, one input parameter was left blank. Rather than validating for a required value, the system assigned a then-unknown default: a fixed one-year term for that parameter. This is the load-bearing detail — the blank did not merely leave a setting empty; it bound the Private Cloud to a lifecycle attribute (term/expiry) that carried an automatic-deletion action at term end. The value sat latent and unmonitored for the full period. After the end of the system-assigned one-year term, the platform&#x27;s lifecycle machinery executed the deletion of the Private Cloud. Because the deletion targeted the subscription-level logical resource, it removed both replicated copies simultaneously — redundancy at the data/copy layer offers no protection against an authoritative delete of the resource above it. The single surviving fault-boundary was storage scope: data backups in Google Cloud Storage in the same region were outside the deletion&#x27;s target set and were untouched, and third-party backup software provided the tooling to reconstitute state. Recovery was therefore a full rebuild-from-backup rather than a <span data-explain="failover" tabindex="0">failover</span>: teams restored network and security configurations, then applications, then data, over several days of 24x7 work, yielding a nine-day member-facing blackout. Several residual technical unknowns remain in the public record: Google does not name the specific input field; sources diverge on whether the blank was a manual operator omission or a creation-script bug that passed a null value (Miles Ward&#x27;s 21 May account suggests the latter); sources also describe the two deleted copies inconsistently as &#x27;two geographies&#x27; (8 May joint statement) versus &#x27;two zones&#x27; (Google&#x27;s technical write-up and itnews); and Google does not state whether the internal-tool &#x27;fixed term&#x27; path shares the same soft-delete/expireTime mechanism exposed by the public GCVE API, so it is unconfirmed whether a standard soft-delete grace window existed on this internal deletion path. The absence of any effective cool-off, approval gate, or expiry-visibility surface is the key engineering gap: a destructive, delayed action executed with neither a warning nor a reversible-hold window in front of it.</div>
+
+        <h2>References &amp; provenance</h2>
+        <ul class="refs"><li><span class="chip green">official-postmortem</span> <span class="rtitle">Details of the Google Cloud GCVE incident (technical blog)</span><span class="rquote">“One input parameter was left blank when using an internal tool to provision the customer&#x27;s Private Cloud. As a result of the blank parameter, the system assigned a then unknown default fixed 1 year term value for this parameter.”</span><a href="https://cloud.google.com/blog/products/infrastructure/details-of-google-cloud-gcve-incident" target="_blank" rel="noopener nofollow">https://cloud.google.com/blog/products/infrastructure/details-of-google-cloud-gcve-incident</a></li><li><span class="chip green">official-postmortem</span> <span class="rtitle">Google Cloud blog — recovery and backups (official postmortem)</span><span class="rquote">“Data backups that were stored in Google Cloud Storage in the same region were not impacted by the deletion, and, along with third party backup software, were instrumental in aiding the rapid restoration.”</span><a href="https://cloud.google.com/blog/products/infrastructure/details-of-google-cloud-gcve-incident" target="_blank" rel="noopener nofollow">https://cloud.google.com/blog/products/infrastructure/details-of-google-cloud-gcve-incident</a></li><li><span class="chip amber">news</span> <span class="rtitle">UniSuper&#x27;s Google Cloud deletion traced to blank parameter in setup</span><span class="rquote">“UniSuper&#x27;s online services being inaccessible for nine days and having to be rebuilt from backups.”</span><a href="https://www.itnews.com.au/news/unisupers-google-cloud-deletion-traced-to-blank-parameter-in-setup-608286" target="_blank" rel="noopener nofollow">https://www.itnews.com.au/news/unisupers-google-cloud-deletion-traced-to-blank-parameter-in-setup-608286</a></li><li><span class="chip muted">official-statement</span> <span class="rtitle">A joint statement from UniSuper and Google Cloud (8 May 2024)</span><span class="rquote">“UniSuper currently invests over $135 billion on behalf of more than 647,000 members ... When the deletion of UniSuper&#x27;s Private Cloud subscription occurred, it caused deletion across both of these geographies.”</span><a href="https://www.unisuper.com.au/about-us/media-centre/2024/a-joint-statement-from-unisuper-and-google-cloud" target="_blank" rel="noopener nofollow">https://www.unisuper.com.au/about-us/media-centre/2024/a-joint-statement-from-unisuper-and-google-cloud</a></li><li><span class="chip amber">news</span> <span class="rtitle">Google Cloud accidentally deleted UniSuper&#x27;s Private Cloud Subscription</span><span class="rquote">“The deletion removed UniSuper&#x27;s Private Cloud across both of its geographic locations.”</span><a href="https://www.datacenterdynamics.com/en/news/google-cloud-accidentally-deleted-unisupers-private-cloud-subscription/" target="_blank" rel="noopener nofollow">https://www.datacenterdynamics.com/en/news/google-cloud-accidentally-deleted-unisupers-private-cloud-subscription/</a></li><li><span class="chip muted">analysis</span> <span class="rtitle">Google Cloud &amp; UniSuper outage timeline (community analysis)</span><span class="rquote">“From May 2nd to 13th, UniSuper experienced a major outage.”</span><a href="https://danielcompton.net/google-cloud-unisuper" target="_blank" rel="noopener nofollow">https://danielcompton.net/google-cloud-unisuper</a></li></ul>
+        <p class="disclaimer">Sourced from public post-incident reports. Quotes are short attributed excerpts for provenance only; the analysis above is original and substantially shorter than its sources. Last verified 2026-08-01.</p>
+
+    </main>
+    <footer><div class="footer-grid"></div><span class="ver" id="versionStamp"></span></footer>
+    <div class="root-gate">
+        <div class="root-card">
+            <h2>🔒 Root access required</h2>
+            <p>The DC Incidents dossier is a root-only module. Sign in with an authorized account to continue.</p>
+            <div class="root-actions">
+                <button id="rootLoginBtn" type="button">Sign In</button>
+                <a href="index.html">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/rz-version.js?v=2026-08-01-gloss"></script>
+    <script src="js/rz-feature-flags.js?v=2026-08-01-gloss" defer></script>
+    <script src="auth.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-mobile-nav.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-cookie-consent.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-explain-db.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-explain.js?v=2026-08-01-gloss" defer></script>
+    <script>
+    (function(){var t=document.getElementById('themeToggle');function a(theme){document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme);var m=document.querySelector('meta[name=\"theme-color\"]');if(m)m.setAttribute('content',theme==='dark'?'#0c1512':'#f4f1e7');}a(localStorage.getItem('theme')||'dark');if(t)t.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme');a(c==='dark'?'light':'dark');});})();
+    (function(){function ag(){if(window._rzAuth&&typeof window._rzAuth.enforceTierFeatureAccess==='function'){window._rzAuth.enforceTierFeatureAccess('dc-incidents');}else{try{var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');var r=s&&s.role,t=s&&s.tier;var passes=!!s&&(r==='root'||t==='root');document.body.classList.toggle('locked',!passes);}catch(e){document.body.classList.add('locked');}}}var b=document.getElementById('rootLoginBtn');if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showRootGatePrompt==='function'){window._rzAuth.showRootGatePrompt('Root account required for the DC Incidents dossier.');}else if(window._rzAuth&&typeof window._rzAuth.showModal==='function'){window._rzAuth.showModal();}});window.addEventListener('rz-auth-change',function(){setTimeout(ag,50);});window.addEventListener('storage',function(e){if(e.key==='rz_premium_session')ag();});ag();setTimeout(ag,60);setTimeout(ag,550);setTimeout(ag,1600);})();
+    (function(){var el=document.getElementById('versionStamp');if(!el)return;var v=window.RZ_VERSION||'1.x.x',d=window.RZ_VERSION_DATE||'',cn=window.RZ_VERSION_CODENAME||'';el.textContent='· ResistanceZero · v'+v+(d?' · '+d:'')+(cn?' · '+cn:'')+' ·';})();
+    (function(){var n=0;function sc(){if(window.RZExplain&&window.RZExplain.scanText&&window.RZ_EXPLAIN_DB){var m=document.getElementById('main-content');if(m)window.RZExplain.scanText(m,140);}else if(n++<40){setTimeout(sc,200);}}setTimeout(sc,350);})();
+    </script>
+
+</body>
+</html>

@@ -11,6 +11,7 @@
 
 import React from 'react';
 import { TraceValue } from '@/components/ui/TraceValue';
+import type { InlineTrace } from '@/lib/value-trace';
 import { Explain } from '@/components/ui/Explain';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { scoreColor, scoreBand, BAND_CHIP, type ScoreScaleOpts } from '@/lib/score-color';
@@ -27,6 +28,8 @@ export interface ScoreValueProps {
     max?: number;
     /** value-trace id → ƒx trace tooltip; omit when no trace node exists (yet) */
     traceId?: string;
+    /** inline trace spec → ƒx for per-row / component-local values the registry can't reach */
+    trace?: InlineTrace;
     /** RZ_EXPLAIN_DB key → rich explanation tooltip */
     explainKey?: string;
     /** detailed fallback tip when no DB key exists */
@@ -36,7 +39,7 @@ export interface ScoreValueProps {
     className?: string;
 }
 
-export function ScoreValue({ value, display, unit, direction = 'higher', max = 100, traceId, explainKey, tip, grade, className = '' }: ScoreValueProps) {
+export function ScoreValue({ value, display, unit, direction = 'higher', max = 100, traceId, trace, explainKey, tip, grade, className = '' }: ScoreValueProps) {
     const color = Number.isFinite(value) ? scoreColor(value, { direction, max }) : undefined;
     const band = Number.isFinite(value) ? scoreBand(value, { direction, max }) : 'watch';
     const num = (
@@ -47,7 +50,7 @@ export function ScoreValue({ value, display, unit, direction = 'higher', max = 1
     );
     return (
         <span className="inline-flex items-center gap-1">
-            {traceId ? <TraceValue traceId={traceId}>{num}</TraceValue> : num}
+            {traceId || trace ? <TraceValue traceId={traceId} trace={trace}>{num}</TraceValue> : num}
             {grade && <span className={`rounded border px-1 py-0.5 text-[9px] font-bold ${BAND_CHIP[band]}`}>{grade}</span>}
             {explainKey ? <Explain k={explainKey} /> : tip ? <Tooltip content={tip} /> : null}
         </span>

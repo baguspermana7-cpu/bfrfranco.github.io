@@ -1,0 +1,308 @@
+{
+ "slug": "gcp-stt-gdc-delhi-fire-2026",
+ "title": "Google Cloud India Disruption After STT GDC Delhi Data-Center Fire",
+ "operator": "Google Cloud (impacted tenant); STT GDC / Tata Communications JV (named as the third-party facility operator only by third-party reporting; not confirmed by Google)",
+ "dcName": "Third-party colocation facility, New Delhi (attributed by third-party reporting to the STT GDC / Tata JV site in Greater Kailash-I; the facility is never named or confirmed by Google)",
+ "location": {
+  "city": "New Delhi",
+  "country": "India",
+  "region": "APAC",
+  "az": "asia-south2 (Delhi) metro; effects across Delhi, Mumbai, Chennai"
+ },
+ "date": "2026-06-05",
+ "durationMin": 28673,
+ "category": [
+  "fire",
+  "power",
+  "network"
+ ],
+ "severity": {
+  "usersAffected": "Not quantified by Google; qualitative impact to Google Cloud customers whose traffic ingressed via the Delhi metro, with effects noted across Delhi, Mumbai and Chennai",
+  "impactUsd": "Not disclosed by Google (no SLA/credit figure). Only unverified third-party tenant claims in circulation (e.g. R2 Net ~$2M; Matrix Cellular '20+ years of data' at risk)",
+  "servicesDown": [
+   "Hybrid Connectivity",
+   "Virtual Private Cloud (VPC)",
+   "Media CDN"
+  ],
+  "tier": "Regional network-capacity degradation (metro POP isolation); non-compute"
+ },
+ "brief": "On or about 5 June 2026, a fire at a third-party data-center facility in New Delhi forced an emergency power shutdown of networking equipment, isolating a non-compute Google Cloud Point of Presence (POP) in the Delhi metro and reducing available network capacity across the region. Google Cloud customers experienced elevated latency, intermittent packet loss and non-optimal routing across Delhi, Mumbai and Chennai. Google first disclosed customer impact on 9 June and worked the incident through nine status updates until resolution on 29 June, with no workaround available throughout. Recovery was gated by out-of-region capacity augmentation and, ultimately, by safety-cleared physical re-entry to the damaged site around 22-23 June. Google never named the facility, operator or ignition source; the lithium-battery/UPS attribution comes only from third-party reporting, not from Google's record.",
+ "magnitude": {
+  "usersScore": 6,
+  "financialScore": 5,
+  "durationScore": 8,
+  "blastRadiusScore": 6,
+  "note": "Duration scores high because the disclosed impact window spanned ~20 days (9-29 June) and true onset-to-resolution from ~5 June is longer. Blast radius is moderate: three metros (Delhi, Mumbai, Chennai) and three products (Hybrid Connectivity, VPC, Media CDN), but the affected POP was non-compute so no VM/data-plane loss on Google's side. Users and financial scores are constrained by the absence of any Google-disclosed quantitative metric; financial reflects unverified third-party tenant loss claims only."
+ },
+ "sequenceOfEvents": [
+  {
+   "t": "2026-06-05 (approx., local IST)",
+   "phase": "Trigger",
+   "event": "A fire breaks out at a third-party data-center facility serving Google Cloud's Delhi metro networking. Google's record never names the facility, operator or ignition source; third-party press attributes it to lithium-battery/UPS units at the STT GDC (ST Telemedia-Tata JV) site in Greater Kailash-I, but this is not confirmed by Google.",
+   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (fire attribution); ignition source per third-party reporting only (ledger gap)"
+  },
+  {
+   "t": "2026-06-05 (approx., local IST)",
+   "phase": "Escalation",
+   "event": "The fire forces an emergency power shutdown of networking equipment at the facility as a safety measure.",
+   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr"
+  },
+  {
+   "t": "2026-06-05 (approx., local IST)",
+   "phase": "Impact",
+   "event": "The emergency power-down isolates a non-compute local Point of Presence (POP) in Delhi, removing its networking capacity from service.",
+   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr"
+  },
+  {
+   "t": "2026-06-05 (approx., local IST)",
+   "phase": "Cascade",
+   "event": "Loss of the Delhi POP reduces available network capacity across the metro; surviving backbone and peering links lack sufficient headroom, producing elevated latency, intermittent packet loss and non-optimal routing into Google Cloud across Delhi, Chennai and Mumbai.",
+   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr"
+  },
+  {
+   "t": "2026-06-09 18:13 PDT",
+   "phase": "Detection",
+   "event": "First customer-facing disclosure. Google publishes update 1 of 9, attributing the disruption to a fire at a third-party facility and an emergency power shutdown; a ~4-day gap between the ~5 June onset and this first notice is never explained in Google's record.",
+   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (update 1/9)"
+  },
+  {
+   "t": "2026-06-10 15:25 PDT",
+   "phase": "Diagnosis",
+   "event": "Update 2 of 9 issued as Google continues to characterize impact and remediation; no workaround offered.",
+   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (update 2/9)"
+  },
+  {
+   "t": "2026-06-11 16:25 PDT",
+   "phase": "Diagnosis",
+   "event": "Update 3 of 9 issued; incident ongoing, still no workaround.",
+   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (update 3/9)"
+  },
+  {
+   "t": "2026-06-12 15:50 PDT",
+   "phase": "Mitigation",
+   "event": "Update 4 of 9 gives the first concrete remediation ETAs: Delhi backbone-capacity augmentation expected complete by Mon 15 June PDT, and out-of-region Internet Edge peering augmentation in Chennai (load-balancing/redundancy for large Indian ISPs) expected done by Wed 17 June PDT.",
+   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (update 4/9)"
+  },
+  {
+   "t": "2026-06-15 16:11 PDT",
+   "phase": "Recovery",
+   "event": "Update 5 of 9: Google restores a portion of Internet Edge peering capacity to cut Delhi-metro latency, optimizes capacity across backbones to increase headroom, and reports augmenting Delhi backbone capacity over the weekend — partial, incremental recovery.",
+   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (update 5/9)"
+  },
+  {
+   "t": "2026-06-17 15:36 PDT",
+   "phase": "Recovery",
+   "event": "Update 6 of 9: additional capacity restored between the Delhi-Chennai and Delhi-Mumbai backbone links, confirming link restoration was underway by mid-June, ahead of physical site re-entry.",
+   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (update 6/9)"
+  },
+  {
+   "t": "2026-06-22 16:51 PDT",
+   "phase": "Recovery",
+   "event": "Update 7 of 9: teams obtain access to the damaged site and plan to restore further incremental user-facing backbone capacity on Tue 23 June — confirming recovery was gated by safety-cleared physical access, not network reconvergence.",
+   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (update 7/9)"
+  },
+  {
+   "t": "2026-06-23 15:52 PDT",
+   "phase": "Recovery",
+   "event": "Update 8 of 9: augmentation of Chennai peering completed and all capacity between the Delhi-Chennai and Delhi-Mumbai links restored — the last substantive remediation step.",
+   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (update 8/9)"
+  },
+  {
+   "t": "2026-06-29 16:06 PDT",
+   "phase": "Restored",
+   "event": "Update 9 of 9: Google marks the incident resolved. No workaround had been available across any of the nine updates for the full disclosed ~20-day window.",
+   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (update 9/9)"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Affected Google Cloud products",
+   "value": "3 (Hybrid Connectivity, VPC, Media CDN)",
+   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr"
+  },
+  {
+   "label": "Disclosed impact window",
+   "value": "~20 days (9 Jun 18:13 PDT to 29 Jun 16:06 PDT); true onset ~5 Jun, longer",
+   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr"
+  },
+  {
+   "label": "Public status updates",
+   "value": "9 (byte-verified count and timestamps)",
+   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr"
+  },
+  {
+   "label": "Metros affected",
+   "value": "3 (Delhi, Mumbai, Chennai)",
+   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr"
+  },
+  {
+   "label": "Disclosure gap (onset to first notice)",
+   "value": "~4 days (~5 Jun to 9 Jun 18:13 PDT); reason unexplained",
+   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr + ledger gap"
+  },
+  {
+   "label": "Symptom profile",
+   "value": "Elevated latency + intermittent packet loss + non-optimal routing (qualitative only; no ms/%, no affected-count)",
+   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr"
+  },
+  {
+   "label": "Workaround availability",
+   "value": "None across all 9 updates",
+   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr"
+  },
+  {
+   "label": "Google-disclosed financial/SLA figure",
+   "value": "None (no credit or $ impact published)",
+   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr + ledger gap"
+  },
+  {
+   "label": "Unverified third-party tenant loss claims",
+   "value": "R2 Net ~$2M; Matrix Cellular '20+ years of data' at risk (not confirmed here)",
+   "source": "Business Standard / DCD (third-party; unverified in ledger)"
+  }
+ ],
+ "rootCause": "Proximate root cause (stated by Google at the network layer): a fire at a third-party data-center facility required an emergency power shutdown of networking equipment, which isolated a non-compute local Point of Presence (POP) in Delhi and reduced available network capacity in the metro. The causal chain fire to emergency power-down to POP isolation to reduced Delhi-metro network capacity is unambiguous from Google's own incident description. Google does NOT state the fire's ignition source; the lithium-battery/UPS/BESS attribution originates solely from third-party reporting and is unverified here. The deeper capacity-planning root cause (why surviving regional links lacked failover headroom when the POP dropped) is inferred from 'reduced available network capacity' and is not disclosed in any Google COE.",
+ "contributingFactors": [
+  "Single facility dependency: a non-compute Delhi POP whose loss materially reduced metro network capacity, indicating limited local redundancy or headroom for its traffic.",
+  "Insufficient failover headroom on surviving links: the cascade into elevated latency, packet loss and non-optimal routing implies backbone/peering capacity was provisioned close to the lost POP's share rather than with margin to absorb its full failure.",
+  "Concentration of Internet Edge peering serving large Indian ISPs, requiring out-of-region augmentation in Chennai to restore load-balancing and redundancy.",
+  "Physical-access dependency for full recovery: substantive restoration was gated by safety-cleared re-entry to the fire-damaged site (~22-23 June), extending duration well beyond network reconvergence.",
+  "Third-party facility ownership: Google had no direct control over fire suppression, power sequencing or re-entry timelines at the (third-party-attributed STT GDC/Tata) facility, limiting its remediation levers to network-side rerouting and augmentation.",
+  "Delayed disclosure: a ~4-day gap between ~5 June onset and the first 9 June customer notice left tenants without early guidance (reason unexplained in the record)."
+ ],
+ "coe": [
+  {
+   "action": "Augment Delhi backbone capacity to raise available headroom in the metro.",
+   "owner": "Google Cloud networking",
+   "status": "Completed (reported over the weekend before 15 Jun; ETA had been Mon 15 Jun PDT)",
+   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (updates 4-5/9)"
+  },
+  {
+   "action": "Restore a portion of Internet Edge peering capacity to reduce Delhi-metro latency, and optimize capacity across backbones for headroom.",
+   "owner": "Google Cloud networking",
+   "status": "Completed (partial peering restored by 15 Jun; full Chennai peering augmentation completed 23 Jun)",
+   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (updates 5/9, 8/9)"
+  },
+  {
+   "action": "Augment out-of-region Internet Edge regional peering capacity in Chennai to provide load-balancing and redundancy for large Indian ISPs.",
+   "owner": "Google Cloud networking",
+   "status": "Completed (ETA had been Wed 17 Jun PDT; completion confirmed 23 Jun)",
+   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (updates 4/9, 8/9)"
+  },
+  {
+   "action": "Restore capacity between the Delhi-Chennai and Delhi-Mumbai backbone links.",
+   "owner": "Google Cloud networking",
+   "status": "Completed (additional capacity by 17 Jun; all capacity restored by 23 Jun)",
+   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (updates 6/9, 8/9)"
+  },
+  {
+   "action": "Obtain safety-cleared access to the fire-damaged site and restore incremental user-facing backbone capacity.",
+   "owner": "Google Cloud + third-party facility operator",
+   "status": "Completed (access obtained ~22 Jun; restoration on 23 Jun; incident resolved 29 Jun)",
+   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (updates 7/9, 9/9)"
+  },
+  {
+   "action": "Publish a formal preventive-action / capacity-redundancy COE explaining why surviving links lacked headroom (single-homing of Delhi peering, edge N/N+1 design, failover margin).",
+   "owner": "Google Cloud (recommended; not yet published)",
+   "status": "Open / not disclosed",
+   "source": "Ledger gap: no public Google COE/PSD beyond reactive remediation"
+  },
+  {
+   "action": "Complete and publish the facility operator's independent root-cause analysis of the fire, including ignition source and equipment type.",
+   "owner": "STT GDC / Tata Communications (third-party-attributed operator)",
+   "status": "Open / pending (RCA expected ~early-to-mid Aug 2026 per third-party reporting; unverifiable here)",
+   "source": "Ledger gap: fire ignition source not confirmed"
+  }
+ ],
+ "lessonsLearnt": [
+  "A non-compute network POP can be a single point of regional degradation: losing one Delhi POP reduced capacity across three metros, showing that edge/peering redundancy matters as much as compute-region redundancy.",
+  "Failover headroom must be provisioned for full-node loss, not incremental load: the latency/packet-loss cascade shows surviving links were not sized to absorb the isolated POP's entire traffic share.",
+  "Third-party-facility incidents put recovery on someone else's clock: substantive restoration was gated by safety-cleared physical re-entry (~22-23 June), a timeline Google could not control, which stretched the outage beyond network-side fixes.",
+  "Out-of-region capacity is a viable but slow mitigation: augmenting Chennai peering and Delhi-Mumbai/Chennai links provided redundancy but took roughly two weeks to reach full restoration.",
+  "Disclosure discipline is a reputational risk: the ~4-day gap between onset and first notice, with no workaround for the full window, left tenants exposed and fueled third-party data-loss fears.",
+  "Provenance discipline matters in postmortems: the widely-repeated lithium/UPS ignition story is not in Google's record; conflating third-party attribution with operator-confirmed cause risks an inaccurate dossier."
+ ],
+ "improvements": [
+  "Re-home or dual-home Delhi metro peering so no single non-compute POP failure can strip regional capacity; validate with node-loss failure testing.",
+  "Provision N+1 (or better) failover headroom on Delhi-Mumbai and Delhi-Chennai backbones sized to absorb full POP loss, not just marginal load, and monitor headroom continuously.",
+  "Establish pre-arranged out-of-region peering/backbone burst capacity (e.g. standing Chennai edge capacity) that can be activated in hours rather than provisioned over days.",
+  "Formalize third-party-facility incident playbooks: contractual re-entry/inspection SLAs, joint safety-clearance procedures, and independent RCA delivery timelines with the operator.",
+  "Tighten incident-disclosure SLAs so customer-facing notice follows detection closely, with explicit guidance even when no workaround exists.",
+  "Require battery/UPS energy-storage rooms at third-party facilities to meet recognized fire-safety standards (e.g. NFPA 855 for ESS, UL 9540A thermal-runaway testing, NFPA 76/TIA-942 telecom facility protection) and audit compliance as a hosting prerequisite.",
+  "Publish a quantified impact and preventive-action COE (affected-project counts, latency deltas, capacity design) to restore tenant confidence and enable independent verification."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "Failure mechanism",
+   "body": "The initiating event was a fire at a third-party data-center facility hosting a non-compute Google Cloud POP in the Delhi metro. Fire response required an emergency power shutdown of the networking equipment, which is the correct safety action but instantly removed that POP's capacity from the network. Because the POP terminated metro peering and backbone ingress, its de-energization did not merely fail one device, it subtracted a whole node's worth of capacity from the region. Notably, Google's record never confirms what ignited the fire; the popular lithium-battery/UPS narrative is third-party attribution, so the mechanism is verified only from the emergency power-down onward, not at the point of ignition."
+  },
+  {
+   "heading": "Why it cascaded",
+   "body": "Losing the POP would have been contained if surviving backbone and peering links carried enough headroom to absorb its traffic. They did not. Google's own remediation, augmenting Delhi backbone capacity, restoring and adding Internet Edge peering, and building out Delhi-Mumbai and Delhi-Chennai link capacity, is the signature of a headroom shortfall: the fixes all added capacity rather than merely rerouting. The result was elevated latency, intermittent packet loss and non-optimal routing that spread across Delhi, Chennai and Mumbai, because traffic that normally ingressed via Delhi was forced onto congested or longer paths. Google states the effect (reduced available capacity) but not the design flaw (single-homing, edge redundancy tier, or provisioned margin), so the deeper cascade cause is inferred, not disclosed."
+  },
+  {
+   "heading": "Recovery trajectory",
+   "body": "Recovery was incremental over roughly two weeks and split into two phases. The first phase (through ~17 June) was network-side and did not require the damaged building: Google optimized backbone headroom, restored a portion of Internet Edge peering to cut Delhi latency, and augmented Delhi-Mumbai and Delhi-Chennai link capacity, plus out-of-region Chennai peering for large Indian ISPs. The second, decisive phase was physical: teams obtained safety-cleared access to the fire-damaged site around 22 June and restored further user-facing backbone capacity on 23 June, with the Chennai peering augmentation completing the same day. Resolution was declared on 29 June. Crucially, the gating constraint for full recovery was site re-entry, not network reconvergence, meaning the outage duration was set by fire-safety clearance timelines outside Google's direct control."
+  },
+  {
+   "heading": "Organizational and systemic factors",
+   "body": "Two organizational patterns shaped the incident. First, the facility was third-party (attributed to an STT GDC/Tata JV by external reporting), so Google owned the customer relationship and the network response but not fire suppression, power sequencing, or re-entry authority, which lengthened recovery and created an accountability seam. Second, disclosure lagged: the fire began around 5 June but the first customer notice was 9 June, a roughly four-day gap Google never explains, and no workaround was offered across any of the nine updates for the full ~20-day disclosed window. That combination, an opaque onset and prolonged no-workaround status, is what fueled tenant data-loss fears reported in the press, even though those tenant-loss figures are unverified here and asymmetric against the operator's 'majority recovered / not material' posture."
+  },
+  {
+   "heading": "Cross-incident pattern",
+   "body": "This incident fits a recurring class of cloud outages where a facilities-layer failure (fire, power, cooling) at a single site propagates into the network layer because edge/peering capacity lacks full-node failover headroom. The tell is the remediation shape: when the fix is 'add capacity elsewhere and wait for physical access' rather than 'reroute instantly,' the underlying system was provisioned near capacity with a single-site dependency. It also illustrates the shared-responsibility blind spot of third-party colocation: hyperscaler resilience narratives assume region-level redundancy, but a non-compute POP concentrated in one leased building can still degrade multiple metros. Finally, it is a provenance cautionary tale, the most-repeated cause (lithium/UPS fire) is not the operator-confirmed cause, underscoring that battery/ESS fire risk is real engineering context but was not a load-bearing, verified fact in this record."
+  }
+ ],
+ "technicalDeepDive": "At the network-engineering level, the incident is a POP-isolation event that exposed a metro capacity-headroom deficit. The Delhi POP was a non-compute node, meaning it hosted networking functions (backbone termination, Internet Edge peering, load-balancing ingress) rather than customer VMs or storage; its emergency de-energization therefore had no data-plane compute blast radius but a large control/transport-plane one. When the POP dropped, the traffic it normally sourced and sinked, particularly peering with large Indian ISPs, had to reconverge onto remaining paths. The observed symptom triad (elevated latency, intermittent packet loss, non-optimal routing) is the classic signature of links driven past their congestion knee: queueing delay rises (latency), buffers overflow (packet loss), and BGP/traffic-engineering shifts push flows onto longer or transit-heavy paths (non-optimal routing). That the three affected products were Hybrid Connectivity, VPC and Media CDN is consistent with an edge/transport failure: Hybrid Connectivity (Interconnect/VPN attachment points) and Media CDN (edge cache egress/peering) are peering- and edge-sensitive, and VPC traffic transiting the metro inherited the degraded paths, whereas core compute regions kept running. The remediation sequence is diagnostic of the root design gap. Google did not simply reroute; it (a) optimized backbone capacity to reclaim headroom, (b) restored then augmented Internet Edge peering, and (c) added capacity on Delhi-Mumbai and Delhi-Chennai backbone links plus out-of-region Chennai peering for redundancy and load-balancing. This is remediation by capacity addition, which only helps if the pre-incident state lacked N-node failover margin, implying the Delhi metro's peering/backbone was single-homed or thin-provisioned through the lost POP. Full restoration further required physical re-entry (~22-23 June) to bring the site's own equipment back, confirming that some capacity was irreplaceable off-site and that fire-safety clearance, not routing convergence, set the recovery clock. What remains unverified and load-bearing for a complete RCA: the ignition source and equipment type (Google never states them; the lithium/UPS/BESS attribution is third-party), and the capacity-planning design (edge N/N+1 tier, single-homing, provisioned failover margin) that Google discloses only as 'reduced available network capacity.' No quantitative impact (error rate, latency-ms, packet-loss %, affected-project count, SLA credit) was published, so severity is characterized qualitatively.",
+ "references": [
+  {
+   "title": "Google Cloud Service Health incident 5fGQt4VbkDnr3Yp8PXPr (primary status record)",
+   "url": "https://status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr",
+   "type": "official-status",
+   "accessed": "2026-07-31",
+   "quote": "A fire at a third-party data center facility required an emergency power shutdown of networking equipment, isolating a non-compute local Point of Presence (POP) in Delhi and reducing available network capacity in the metro area."
+  },
+  {
+   "title": "Google Cloud Service Health incident 5fGQt4VbkDnr3Yp8PXPr (affected services)",
+   "url": "https://status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr",
+   "type": "official-status",
+   "accessed": "2026-07-31",
+   "quote": "Affected Services: Hybrid Connectivity, Virtual Private Cloud (VPC), Media CDN"
+  },
+  {
+   "title": "Google Cloud Service Health incident 5fGQt4VbkDnr3Yp8PXPr (12 June remediation ETAs)",
+   "url": "https://status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr",
+   "type": "official-status",
+   "accessed": "2026-07-31",
+   "quote": "we are further augmenting our Delhi backbone capacity (expected to be complete by Monday, 2026-06-15 PDT) ... augmenting out-of-region Internet Edge regional peering capacity in Chennai ... (expected to be done by Wednesday, 2026-06-17 PDT)"
+  },
+  {
+   "title": "Google Cloud Service Health incident 5fGQt4VbkDnr3Yp8PXPr (22 June site access)",
+   "url": "https://status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr",
+   "type": "official-status",
+   "accessed": "2026-07-31",
+   "quote": "teams obtained access to the damaged site and will further restore additional incremental user-facing backbone capacity on Tuesday, 2026-06-23"
+  },
+  {
+   "title": "Fire at STT GDC/Tata data center in India caused 'extensive damage' (report)",
+   "url": "https://www.datacenterdynamics.com/en/news/fire-at-stt-gdctata-data-center-in-india-caused-extensive-damage-report/",
+   "type": "news",
+   "accessed": "2026-07-31",
+   "quote": "Third-party reporting attributes the fire and extensive damage to the STT GDC (ST Telemedia-Tata JV) Delhi facility; Google's own record names neither the facility nor the ignition source."
+  },
+  {
+   "title": "Tata Delhi data centre fire sparks data loss fears; Google Cloud disrupted",
+   "url": "https://www.business-standard.com/technology/tech-news/tata-delhi-data-centre-fire-sparks-data-loss-fears-google-cloud-disrupted-126062401328_1.html",
+   "type": "news",
+   "accessed": "2026-07-31",
+   "quote": "Press reporting describes tenant data-loss fears (e.g. Matrix Cellular's multi-decade records, R2 Net's ~$2M) that remain unverified against the operator's 'majority recovered / not material' position."
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": false,
+  "referenceCount": 6,
+  "lastVerified": "2026-07-31",
+  "confidence": "High on the network-layer mechanism, timeline and affected products (byte-verified from Google's primary status record); Low on ignition source, tenant data-loss reconciliation, and quantitative impact (unverified third-party reporting; WebSearch budget exhausted this session). Reference note: the 6 reference entries resolve to 3 unique URLs (references 1-4 all cite the same Google status incident)."
+ },
+ "lastUpdated": "2026-07-31"
+}

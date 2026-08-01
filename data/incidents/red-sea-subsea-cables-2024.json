@@ -1,0 +1,268 @@
+{
+ "slug": "red-sea-subsea-cables-2024",
+ "title": "Red Sea Subsea Cable Cuts — Rubymar Anchor Severs AAE-1, Seacom/TGN-EA and EIG off Yemen",
+ "operator": "AAE-1 / EIG / Seacom / Tata (TGN) consortia",
+ "dcName": "Red Sea cable corridor (Bab-el-Mandeb / off west coast of Yemen)",
+ "location": {
+  "city": "Bab-el-Mandeb",
+  "country": "Yemen",
+  "region": "MENA"
+ },
+ "date": "2024-02-24",
+ "durationMin": 204480,
+ "category": [
+  "network",
+  "supply"
+ ],
+ "severity": {
+  "usersAffected": "Reported as tens of millions across East Africa and the Middle East in the seed brief, but UNCORROBORATED — no reachable source provides an absolute affected-user count; documented impact is country-level connectivity degradation plus one operator's earnings hit.",
+  "impactUsd": "Not disclosed in absolute terms. Only quantified figure: Seacom's contribution to 30%-shareholder Remgro's headline earnings fell to ~R2M from ~R32M the prior year (~R30M / ~94% drop), attributed mainly to once-off cable-repair costs. Absolute repair spend never published.",
+  "servicesDown": [
+   "Seacom submarine cable (Kentik lists the damaged system as 'Seacom/TGN-EA')",
+   "AAE-1 (Asia-Africa-Europe-1)",
+   "EIG (Europe India Gateway)",
+   "~25% of Asia-Europe / Asia-Middle-East transit capacity degraded (screening estimate, unattributed)"
+  ],
+  "tier": "Major regional connectivity incident — multi-cable, multi-country, ~5-month restoration"
+ },
+ "brief": "On 24 February 2024 three submarine cable systems — Seacom (which Kentik groups with TGN-EA), AAE-1 and EIG — were severed off the west coast of Yemen in the Red Sea. The generally-accepted cause is the anchor of the MV Rubymar, an abandoned cargo ship struck by Houthi forces on 18 February, dragging across the cable corridor after the anchor was dropped when the vessel came under fire. The cuts degraded a large share of Asia-Europe-Middle-East transit (commonly cited at ~25%, though that figure is unattributed in reachable sources) and were felt across East Africa and the Middle East. Physical repair did not begin until July 2024, when an E-Marine cable ship restored AAE-1 first and then the remaining two cables. The cause is the accepted narrative rather than a forensic consortium finding; TGN-EA is named alongside Seacom by Kentik, but whether it is a physically distinct 4th cable or shares the Seacom system remains only partly corroborated.",
+ "magnitude": {
+  "usersScore": 7,
+  "financialScore": 4,
+  "durationScore": 8,
+  "blastRadiusScore": 8,
+  "note": "Blast radius and duration dominate: multiple international backbones down for roughly five months across a chokepoint carrying a large share of Asia-Europe traffic. User score is provisional — the 'tens of millions' figure is uncorroborated. Financial score is low because only one operator's ~R30M earnings delta is documented; the absolute repair bill and wider economic cost were never disclosed."
+ },
+ "sequenceOfEvents": [
+  {
+   "t": "2024-02-18 (days prior, context)",
+   "phase": "Trigger",
+   "event": "The cargo vessel MV Rubymar is struck by Houthi forces in the southern Red Sea and abandoned by its crew, left drifting with its anchor down near the Bab-el-Mandeb cable corridor.",
+   "source": "Kentik (strike dated 18 Feb 2024); TechCentral (generally-accepted account) — techcentral.co.za/red-sea-cable-break-eats-away-at-seacom"
+  },
+  {
+   "t": "2024-02-24",
+   "phase": "Escalation",
+   "event": "The drifting, dropped anchor drags across the seabed cable corridor off Yemen's west coast, contacting multiple submarine cable systems in close proximity.",
+   "source": "TechCentral / Kentik (generally-accepted cause narrative, not forensic RCA)"
+  },
+  {
+   "t": "2024-02-24 ~09:46 UTC",
+   "phase": "Impact",
+   "event": "BGP routing telemetry shows the first failure cluster (East Africa, involving loss of Tata/TGN transit); analyst attribution assigns this cluster to the Seacom cable.",
+   "source": "Kentik / Doug Madory BGP-timing analysis (analyst-reasoned, not operator-published)"
+  },
+  {
+   "t": "2024-02-24 ~09:51 UTC",
+   "phase": "Impact",
+   "event": "A second BGP failure cluster appears roughly five minutes later, primarily along the path of AAE-1; analyst attribution assigns it to AAE-1.",
+   "source": "Kentik / Doug Madory BGP-timing analysis (analyst-reasoned)"
+  },
+  {
+   "t": "2024-02-24",
+   "phase": "Cascade",
+   "event": "Three cable systems in total — Seacom (grouped with TGN-EA by Kentik), AAE-1 and EIG — are confirmed damaged off the west coast of Yemen. Transit capacity between Asia and Europe/Middle East is degraded (commonly cited at ~25%, a screening estimate not attributed to any named org in reachable sources).",
+   "source": "Kentik / TechCentral (cables confirmed); ~25% figure = screening/unattributed"
+  },
+  {
+   "t": "2024-02-24 onward",
+   "phase": "Detection",
+   "event": "Operators and downstream networks observe capacity loss and reroute affected traffic over surviving Red Sea and alternate paths; connectivity degradation is felt across East Africa and the Middle East.",
+   "source": "Times of Israel (Houthis suspected); seed brief impact framing"
+  },
+  {
+   "t": "2024-02 to 2024-03",
+   "phase": "Diagnosis",
+   "event": "Cause is attributed to the Rubymar's dropped anchor. This becomes the consensus account but is never elevated to a formal forensic root-cause report by the cable consortia.",
+   "source": "TechCentral ('It's generally accepted...'); Kentik (leading theory)"
+  },
+  {
+   "t": "2024-03 to 2024-06",
+   "phase": "Mitigation",
+   "event": "Prolonged pre-repair period: no physical repair proceeds for months. Regional security conditions and vessel/permit constraints in the conflict zone delay any cable-ship deployment while traffic runs on rerouted capacity.",
+   "source": "TechCentral (repairs 'finally' began in July, implying an extended delay)"
+  },
+  {
+   "t": "2024-07",
+   "phase": "Recovery",
+   "event": "A cable ship owned by E-Marine (a subsidiary of Abu Dhabi-based Emirates Telecommunications Group / e&) reaches the site and repairs the AAE-1 cable first.",
+   "source": "TechCentral / Remgro (verbatim)"
+  },
+  {
+   "t": "2024-07",
+   "phase": "Recovery",
+   "event": "The same E-Marine ship remains in the region and repairs the other two broken cables — Seacom and EIG.",
+   "source": "TechCentral / Remgro (verbatim); cable identity disambiguates 'other two' = Seacom + EIG"
+  },
+  {
+   "t": "2024-07",
+   "phase": "Restored",
+   "event": "All three cables (AAE-1, then Seacom + EIG) are restored within the July 2024 window; exact per-cable completion dates are not individually published.",
+   "source": "TechCentral (order confirmed; per-cable dates coarse)"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Cables severed",
+   "value": "3 confirmed systems (Seacom/TGN-EA, AAE-1, EIG)",
+   "source": "Kentik lists damaged systems as 'EIG, Seacom/TGN-EA, and AAE-1'; TechCentral names Seacom, AAE-1, EIG. TGN-EA is corroborated (grouped with Seacom) — what is unconfirmed is whether it is a distinct 4th cable or shares the Seacom system."
+  },
+  {
+   "label": "Cut location",
+   "value": "Off the west coast of Yemen, Red Sea (Bab-el-Mandeb corridor)",
+   "source": "TechCentral / Kentik. Exact cut coordinates and landing points unpublished."
+  },
+  {
+   "label": "Share of Asia-Europe/ME traffic degraded",
+   "value": "~25% (screening estimate)",
+   "source": "Commonly cited (attributed elsewhere to HGC via Reuters ~2024-03-04) but UNCONFIRMED in the dossier's reachable sources — treat as worst-case press/operator estimate."
+  },
+  {
+   "label": "BGP failure timestamps",
+   "value": "~09:46 UTC (Seacom cluster, incl. loss of Tata/TGN transit) and ~09:51 UTC (AAE-1 cluster)",
+   "source": "Kentik / Doug Madory BGP-timing deduction (analyst-reasoned, not operator-published) — timestamps verified against the Kentik article."
+  },
+  {
+   "label": "Time-to-repair",
+   "value": "Cut late Feb 2024 → physical repairs began July 2024 (~5 months / ~140 days)",
+   "source": "TechCentral (verbatim: 'Progress was finally made in July')."
+  },
+  {
+   "label": "Restoration order",
+   "value": "AAE-1 first, then Seacom + EIG",
+   "source": "TechCentral / Remgro (verbatim)."
+  },
+  {
+   "label": "Repair vessel / operator",
+   "value": "E-Marine cable ship (subsidiary of Emirates Telecommunications Group / e&, Abu Dhabi)",
+   "source": "TechCentral (verbatim)."
+  },
+  {
+   "label": "Documented financial impact",
+   "value": "Seacom→Remgro headline-earnings contribution R2M (31 Dec 2024) vs R32M prior year (~R30M / ~94% drop)",
+   "source": "TechCentral / Remgro results (verbatim). Absolute repair spend not disclosed."
+  },
+  {
+   "label": "Absolute affected-user count",
+   "value": "Not established (seed brief 'tens of millions' uncorroborated)",
+   "source": "No reachable source provides an absolute figure — country-level degradation only."
+  }
+ ],
+ "rootCause": "The generally-accepted cause is that the MV Rubymar — an abandoned cargo ship struck by Houthi forces on 18 February 2024 — dropped its anchor when fired upon, and the drifting/dragging anchor damaged the submarine cables in proximity (Seacom/TGN-EA, AAE-1 and EIG) off the west coast of Yemen. This is explicitly the consensus account ('It's generally accepted'; Kentik frames it as the 'leading theory'), NOT a forensic finding: no cable consortium published a joint root-cause report, and the physical geometry by which a single vessel's anchor severed multiple distinct cable systems, the exact cut coordinates, and landing points remain unproven in reachable sources.",
+ "contributingFactors": [
+  "Geographic concentration: multiple major Asia-Europe cable systems share the narrow Bab-el-Mandeb / Red Sea chokepoint, so a single dragging anchor could contact several distinct systems in close proximity.",
+  "Armed-conflict environment: the Houthi campaign against Red Sea shipping created the conditions (the 18 Feb strike on the Rubymar, its abandonment, and the loose drifting anchor) that led to the cuts.",
+  "Abandoned-vessel hazard: an unmanned ship left adrift with its anchor down turned a surface-shipping attack into a subsea-infrastructure failure.",
+  "Repair access denied by security risk: the conflict zone delayed cable-ship deployment for roughly five months, turning a physical fault into a prolonged capacity outage.",
+  "Cause never forensically established: reliance on a 'generally accepted' narrative rather than an operator/consortium root-cause investigation leaves the failure mechanism and precise scope partly unverified.",
+  "Weak public attribution of impact: the widely-repeated ~25% traffic figure is tied to no named organization in the dossier's reachable sources, complicating an accurate severity assessment."
+ ],
+ "coe": [
+  {
+   "action": "Publish a joint consortium forensic root-cause report (cut coordinates, geometry of a single anchor contacting multiple systems, landing points) so the cause moves from 'generally accepted' to verified.",
+   "owner": "AAE-1 / Seacom / EIG consortia",
+   "status": "Open — no joint RCA found in reachable sources",
+   "source": "Derived from ledger gap: 'ROOT CAUSE IS GENERALLY ACCEPTED, NOT FORENSIC'"
+  },
+  {
+   "action": "Diversify Asia-Europe transit away from the Bab-el-Mandeb single point of concentration (alternate subsea routes and terrestrial bypasses) to reduce shared-chokepoint exposure.",
+   "owner": "Cable consortia + regional carriers",
+   "status": "Open / industry-level",
+   "source": "Derived from contributing factor: geographic concentration at the chokepoint"
+  },
+  {
+   "action": "Pre-position cable-repair capability and secure conflict-zone repair permits/escorts in advance so time-to-repair is not driven to ~5 months by security access.",
+   "owner": "E-Marine (e&) / repair-ship operators + consortia",
+   "status": "Open",
+   "source": "TechCentral timeline: repairs 'finally' began July 2024, ~5 months after the Feb cut"
+  },
+  {
+   "action": "Establish a named, authoritative source for capacity-impact reporting (share of traffic degraded, affected-user counts) rather than relying on unattributed press estimates.",
+   "owner": "Cable operators / regional regulators",
+   "status": "Open",
+   "source": "Derived from ledger gaps: '25% metric unattributed' and 'no total-users count'"
+  },
+  {
+   "action": "Confirm and publish the full scope of affected systems — specifically whether TGN-EA (named alongside Seacom by Kentik) is a physically distinct cable or shares the Seacom system — to resolve the seed-brief scope ambiguity.",
+   "owner": "Consortia / Tata Communications",
+   "status": "Open — TGN-EA named with Seacom by Kentik, but distinct-cable status unconfirmed",
+   "source": "Ledger gap: 'TGN-EA distinct-cable status unconfirmed' (Kentik: 'Seacom/TGN-EA')"
+  }
+ ],
+ "lessonsLearnt": [
+  "A single physical hazard at a shared chokepoint can take out multiple independent backbones at once — logical diversity means little when cables are geographically co-located.",
+  "Surface-conflict risk translates directly into subsea-infrastructure risk: an abandoned, adrift vessel with a dropped anchor is a cable-cut mechanism, not just a shipping incident.",
+  "Restoration time, not the cut itself, drove the impact: security-constrained repair access stretched a fault into a ~5-month capacity loss.",
+  "Impact reporting for subsea incidents is systematically weak — the headline ~25%-traffic and 'tens of millions' figures could not be tied to any named source in reachable references, so severity is easily over- or under-stated.",
+  "Financial disclosure is opaque: only a downstream shareholder (Remgro) surfaced a hard number, and even then only an earnings delta (~R30M), never the actual repair bill.",
+  "'Generally accepted' is not 'verified' — absent a consortium forensic report, the exact failure geometry and the precise status of TGN-EA (distinct cable vs. shared with Seacom) remain open."
+ ],
+ "improvements": [
+  "Route Asia-Europe capacity across geographically diverse paths that do not all transit the Bab-el-Mandeb chokepoint.",
+  "Maintain standing conflict-zone repair readiness: pre-negotiated permits, security escorts, and staged cable-ship availability to compress time-to-repair.",
+  "Treat adrift/abandoned vessels near cable corridors as an anchor-drag hazard and factor them into cable-protection and route-planning risk models.",
+  "Adopt authoritative, named impact reporting (capacity degraded, users affected) so incidents can be assessed on verified data rather than unattributed estimates.",
+  "Publish per-cable fault and completion timelines to replace coarse month-level restoration reporting.",
+  "Commission joint forensic root-cause investigations for multi-cable events, including cut coordinates and confirmed scope of affected systems."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "Failure mechanism",
+   "body": "The event is a classic anchor-drag cable fault, but with a conflict twist. The MV Rubymar was struck by Houthi forces on 18 February 2024 and abandoned; left adrift with its anchor down, that anchor dragged across the seabed in the Bab-el-Mandeb cable corridor off Yemen's west coast and contacted three submarine systems — Seacom (which Kentik groups with TGN-EA), AAE-1 and EIG. Crucially, this is the 'generally accepted' / 'leading theory' account rather than a forensically established one: no consortium published cut coordinates or a mechanical reconstruction of how one anchor severed multiple distinct cables, so the mechanism, while plausible and widely accepted, is not proven at RCA rigor."
+  },
+  {
+   "heading": "Why it cascaded",
+   "body": "The cascade was geographic, not logical. Multiple independent Asia-Europe backbones share the narrow Red Sea chokepoint, so a single dragging anchor could sever several systems in one pass — eliminating the redundancy those separate cables were meant to provide. BGP telemetry captured the failures as tightly-spaced clusters (analyst attribution places the Seacom failure, including loss of Tata/TGN transit, near 09:46 UTC and AAE-1 near 09:51 UTC), consistent with one moving object contacting cables in sequence. The result was degradation of a large share of Asia-Europe/Middle-East transit, commonly cited at ~25% though that figure is unattributed in reachable sources."
+  },
+  {
+   "heading": "Recovery",
+   "body": "Recovery was defined by delay. The cut occurred on 24 February 2024, but physical repair did not begin until July 2024 — roughly five months — because the conflict environment constrained cable-ship access. When repair did proceed, a single E-Marine vessel (a subsidiary of Emirates Telecommunications Group / e&) restored AAE-1 first, then remained on station to repair the other two, Seacom and EIG. Traffic ran on rerouted capacity throughout the interim. Exact per-cable completion dates were never individually published, leaving the restoration timeline coarse."
+  },
+  {
+   "heading": "Organizational and systemic factors",
+   "body": "Two systemic weaknesses stand out. First, information opacity: the only hard financial figure came not from an operator but from a downstream shareholder — Remgro disclosed that Seacom's contribution to its headline earnings fell from ~R32M to ~R2M, attributed to once-off repair costs, yet the absolute repair spend and any affected-user count were never disclosed. Second, attribution weakness: the widely-repeated ~25% traffic and 'tens of millions of users' figures trace to no named organization in the dossier's reachable sources, so the incident's true magnitude cannot be independently verified. The absence of a joint consortium root-cause report compounds both problems."
+  },
+  {
+   "heading": "Cross-incident pattern",
+   "body": "This incident fits a recurring subsea-infrastructure pattern: shared maritime chokepoints (Bab-el-Mandeb here, mirrored by Luzon Strait, Suez/Egypt, and the Baltic) concentrate risk so that one accidental or hostile anchor-drag can disable multiple systems simultaneously, and the operative damage comes from repair delay rather than the cut itself. It also echoes the broader difficulty of attributing subsea faults — 'accident' versus deliberate action, and 'accepted' versus forensically proven — a recurring ambiguity in Red Sea and Baltic cable events alike."
+  }
+ ],
+ "technicalDeepDive": "The fault signature is consistent with a moving-anchor bottom contact rather than a static single-point break. Submarine cables in the Bab-el-Mandeb approach lie within a constrained corridor across the shallow continental margin off Yemen's west coast, where anchor-drag is the dominant physical threat. A vessel adrift with its anchor deployed does not sever a cable cleanly at one coordinate; it plows a track along the seabed, so contacting several separate systems (Seacom/TGN-EA, AAE-1, EIG) in a single drift is geometrically plausible if those cables cross the drift path — but the exact coordinates, the drift vector, and the cable-crossing geometry were never published, so the multi-cable severance remains an accepted inference rather than a reconstructed fact. The failure timing was inferred externally from BGP: as each cable's capacity dropped, dependent prefixes withdrew and re-advertised over surviving paths, producing discrete reconvergence clusters (Doug Madory / Kentik place the Seacom failure, marked by loss of Tata/TGN transit, near 09:46 UTC and AAE-1 near 09:51 UTC). That ~5-minute spacing is itself evidence of a moving hazard touching cables sequentially, though it is analyst-derived, not operator-timestamped. On restoration: subsea repair requires a cable ship to grapple the fault, cut out the damaged section, splice in a new length with a repeater-compatible joint, and re-lay the bight — a per-fault operation of days under normal conditions. Here the binding constraint was not splice time but access: the ~5-month gap to July 2024 reflects the security/permit barrier of operating a cable ship in an active conflict zone. Once on site, a single E-Marine (e&) vessel amortized that access cost by repairing AAE-1 first and then staying to complete Seacom and EIG, which is why the three restorations fall in one July window despite unpublished individual completion dates.",
+ "references": [
+  {
+   "title": "Red Sea cable break eats away at Seacom",
+   "url": "https://techcentral.co.za/red-sea-cable-break-eats-away-at-seacom/261286/",
+   "type": "news",
+   "quote": "It's generally accepted that the Rubymar dropped an anchor when fired upon and, as a result, it damaged cables in proximity",
+   "accessed": "2026-08-01"
+  },
+  {
+   "title": "Red Sea cable break eats away at Seacom (Remgro earnings disclosure)",
+   "url": "https://techcentral.co.za/red-sea-cable-break-eats-away-at-seacom/261286/",
+   "type": "news",
+   "quote": "The decrease in headline earnings relates mainly to once-off cable repair costs incurred as a result of cable breaks",
+   "accessed": "2026-08-01"
+  },
+  {
+   "title": "What Caused the Red Sea Submarine Cable Cuts? (Kentik / Doug Madory)",
+   "url": "https://www.kentik.com/blog/what-caused-the-red-sea-submarine-cable-cuts/",
+   "type": "other",
+   "quote": "Disruptions in East Africa, often involving the loss of Tata transit, occurred at 09:46 UTC ... that is when Seacom suffered its failure",
+   "accessed": "2026-08-01"
+  },
+  {
+   "title": "Undersea cables cut in Red Sea, disrupting internet — Houthis suspected",
+   "url": "https://www.timesofisrael.com/undersea-cables-cut-in-red-sea-disrupting-internet-in-parts-of-region-houthis-suspected/",
+   "type": "news",
+   "quote": "Undersea cables cut in Red Sea, disrupting internet ... Houthis suspected",
+   "accessed": "2026-08-01"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": false,
+  "referenceCount": 4,
+  "lastVerified": "2026-08-01",
+  "confidence": "Medium-high on cause and repair facts (named verbatim TechCentral/Remgro source, corroborated by Kentik), but the cause is explicitly a 'generally accepted' / 'leading theory' narrative, not a forensic RCA. Lower confidence on scope and magnitude: TGN-EA is named alongside Seacom by Kentik but its status as a distinct 4th cable (vs. shared with Seacom) is unconfirmed; the ~25%-traffic and 'tens of millions' figures are unattributed/uncorroborated in reachable sources; BGP timestamps are analyst-reasoned; and the absolute repair cost was never disclosed."
+ },
+ "lastUpdated": "2026-08-01"
+}

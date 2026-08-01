@@ -1,0 +1,285 @@
+{
+ "slug": "unisuper-gcp-account-deletion-2024",
+ "title": "Google Cloud Accidentally Deletes UniSuper's Entire GCVE Private Cloud",
+ "operator": "Google Cloud (customer: UniSuper)",
+ "dcName": "Google Cloud VMware Engine (GCVE) Private Cloud — UniSuper tenant",
+ "location": {
+  "country": "Australia",
+  "region": "APAC",
+  "az": "GCVE Private Cloud replicated across two copies (joint statement: 'two geographies'; Google technical detail/itnews: 'two zones')"
+ },
+ "date": "2024-05-02",
+ "durationMin": 12960,
+ "category": [
+  "human",
+  "software"
+ ],
+ "severity": {
+  "usersAffected": "647,000+ members",
+  "impactUsd": "Not quantified in accessible sources; A$135B+ funds under management exposed but no member-dollar loss or compensation figure disclosed (itnews and the 8 May joint statement are both silent on a figure)",
+  "servicesDown": [
+   "UniSuper member-facing online portal",
+   "UniSuper mobile app",
+   "Back-end estate: hundreds of VMs, databases and applications"
+  ],
+  "tier": "Tier-1 (fund-wide member-facing outage; full private-cloud loss across both surviving copies)"
+ },
+ "brief": "During the initial provisioning of UniSuper's Google Cloud VMware Engine (GCVE) Private Cloud, one input parameter was left blank in an internal Google deployment tool. Per Google's disclosure the blank value caused the system to assign a then-unknown default fixed one-year term to the Private Cloud, which silently armed an automatic-deletion action. Roughly a year later, at the end of that system-assigned term, the Private Cloud was deleted across both of its copies. The A$135B fund's 647,000+ members lost access to online services for nine days. The deletion did not reach data backups stored in Google Cloud Storage in the same region, which — together with third-party backup software — enabled a rebuild rather than permanent data loss. Members' account balances and investments were not lost, and the incident was operational, not a cyberattack.",
+ "magnitude": {
+  "usersScore": 9,
+  "financialScore": 6,
+  "durationScore": 6,
+  "blastRadiusScore": 10,
+  "note": "Blast radius maxed: both surviving copies of the GCVE Private Cloud were deleted, an outcome geographic redundancy is specifically meant to prevent. Sources vary on terminology — the 8 May joint statement says the copies spanned 'two geographies' and that deletion hit 'both of these geographies', while Google's technical write-up and itnews describe 'two zones' of one Private Cloud — but either way both copies were destroyed together and redundancy gave no protection. Users score high (fund-wide, 647k+ members locked out). Duration mid (9-day member blackout, ~12-day end-to-end window). Financial mid and uncertain — no dollar-loss or compensation figure was ever disclosed and surviving backups prevented data loss, so exposure is bounded by service disruption not asset loss."
+ },
+ "sequenceOfEvents": [
+  {
+   "t": "early-to-mid 2023 (~1 year before deletion; exact date not disclosed)",
+   "phase": "Trigger",
+   "event": "During the initial deployment of UniSuper's GCVE Private Cloud, one input parameter is left blank in an internal Google provisioning tool. The system substitutes a then-unknown default value for that parameter: a fixed one-year term. (Google's blog phrases this passively; Miles Ward's later account attributes the null value to a bug in the creation script.)",
+   "source": "Google Cloud blog (official postmortem); danielcompton.net (Miles Ward relay)"
+  },
+  {
+   "t": "early-to-mid 2023 onward (latent)",
+   "phase": "Escalation",
+   "event": "The defaulted fixed-term value silently arms an automatic-deletion action on the Private Cloud. No party is aware the subscription now carries an expiry; the misconfiguration remains dormant for the full term.",
+   "source": "Google Cloud blog (official postmortem)"
+  },
+  {
+   "t": "2024-05-02",
+   "phase": "Impact",
+   "event": "The system-assigned one-year term elapses and the automatic-deletion process deletes UniSuper's GCVE Private Cloud. Member-facing online services go dark.",
+   "source": "Google Cloud blog (official postmortem); danielcompton.net"
+  },
+  {
+   "t": "2024-05-02",
+   "phase": "Cascade",
+   "event": "The deletion propagates across both copies of the Private Cloud (the joint statement's 'two geographies'), taking down the member portal, the mobile app, and the back-end estate of hundreds of VMs, databases and applications. Geographic redundancy provides no protection because the deletion is a subscription-level action, not a regional fault.",
+   "source": "UniSuper/Google joint statement; DCD"
+  },
+  {
+   "t": "2024-05-02 (early)",
+   "phase": "Diagnosis",
+   "event": "UniSuper and Google engineers confirm data backups held in Google Cloud Storage in the same region survived the deletion; combined with third-party backup software, these become the primary basis for reconstruction rather than the destroyed Private Cloud.",
+   "source": "Google Cloud blog (official postmortem)"
+  },
+  {
+   "t": "2024-05-07",
+   "phase": "Mitigation",
+   "event": "UniSuper issues a member update attributing the disruption to a combination of rare Google Cloud issues that resulted in an inadvertent misconfiguration during provisioning, which triggered a previously unknown software bug.",
+   "source": "danielcompton.net (community analyst; medium confidence)"
+  },
+  {
+   "t": "2024-05-08",
+   "phase": "Mitigation",
+   "event": "UniSuper and Google Cloud publish a joint statement confirming the outage, the scale (A$135B / 647,000+ members), that duplication existed in two geographies but deletion occurred across both, and that surviving backups minimised data loss.",
+   "source": "UniSuper/Google joint statement"
+  },
+  {
+   "t": "2024-05-02 to ~2024-05-11 (nine-day blackout)",
+   "phase": "Recovery",
+   "event": "Customer and Google teams work 24x7 over several days to rebuild the Private Cloud from backups: restoring network and security configurations, restoring applications, and recovering data. Online services remain inaccessible for nine days.",
+   "source": "Google Cloud blog (official postmortem, '24x7 over several days'); itnews ('nine days')"
+  },
+  {
+   "t": "~2024-05-13",
+   "phase": "Restored",
+   "event": "End of the end-to-end disruption window; online services restored to members. The overall outage spanned roughly 2–13 May 2024, with the nine-day online-services blackout sitting inside it.",
+   "source": "danielcompton.net (community analyst; medium confidence)"
+  },
+  {
+   "t": "2024-05-21",
+   "phase": "Restored",
+   "event": "Google Cloud's Miles Ward publicly clarifies the root cause via an X thread (blank/null parameter defaulting the Private Cloud to a one-year subscription, not a customer action or cyberattack).",
+   "source": "danielcompton.net (Miles Ward relay; medium confidence)"
+  },
+  {
+   "t": "2024-05-25",
+   "phase": "Restored",
+   "event": "Google publishes its technical-details blog documenting the blank-parameter root cause, the defaulted one-year term mechanism, and the backup-driven recovery.",
+   "source": "Google Cloud blog (official postmortem)"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Members affected",
+   "value": "647,000+ (as of 31 Mar 2024)",
+   "source": "UniSuper/Google joint statement"
+  },
+  {
+   "label": "Funds under management exposed",
+   "value": "A$135 billion+",
+   "source": "UniSuper/Google joint statement"
+  },
+  {
+   "label": "Online services blackout",
+   "value": "9 days inaccessible / rebuilt from backups",
+   "source": "itnews (primary-confirmed)"
+  },
+  {
+   "label": "End-to-end disruption window",
+   "value": "~12 days (2 May – 13 May 2024)",
+   "source": "danielcompton.net (medium confidence)"
+  },
+  {
+   "label": "Copies destroyed",
+   "value": "Both copies deleted — joint statement: 'two geographies'; Google technical detail / itnews: 'two zones'",
+   "source": "UniSuper/Google joint statement; DCD; itnews"
+  },
+  {
+   "label": "Latent term before deletion",
+   "value": "1 year (system-assigned default fixed term)",
+   "source": "Google Cloud blog (official postmortem)"
+  },
+  {
+   "label": "Misconfigured inputs",
+   "value": "1 blank input parameter",
+   "source": "Google Cloud blog / itnews"
+  },
+  {
+   "label": "Backups lost",
+   "value": "0 — GCS same-region backups + third-party backup software survived",
+   "source": "Google Cloud blog (official postmortem)"
+  },
+  {
+   "label": "Recovery cadence",
+   "value": "24x7 over several days (network/security config, apps, data)",
+   "source": "Google Cloud blog (official postmortem)"
+  },
+  {
+   "label": "Financial loss / compensation",
+   "value": "Not disclosed in any accessible source",
+   "source": "Screening gap — itnews and the 8 May joint statement stress backups minimised data loss; no dollar figure located"
+  }
+ ],
+ "rootCause": "Operator/tooling misconfiguration via a defaulted term value. During the initial deployment of UniSuper's GCVE Private Cloud with an internal provisioning tool, one input parameter was left blank. Per Google, the system assigned a then-unknown default fixed one-year term for that parameter, and at the end of the system-assigned year the Private Cloud was automatically deleted. Google's blog phrases the blank passively while Miles Ward's later account attributes the null to a creation-script bug — either way it was an inadvertent misconfiguration, NOT a customer action, a cyberattack, or a data-integrity/hardware fault.",
+ "contributingFactors": [
+  "A blank input in the internal provisioning tool silently defaulted to a fixed one-year term instead of failing, warning, or defaulting to no-expiry — an unsafe default with a destructive terminal action (deletion) rather than an alert or hold.",
+  "The consequence of the defaulted parameter was 'then unknown' even to Google at the time: the tool offered no visibility that a deletion timer had been armed, so the misconfiguration remained latent and undetected for a full year.",
+  "The automatic-deletion action operated at the subscription/Private Cloud level and therefore propagated across BOTH copies (the joint statement's 'two geographies'), so geographic redundancy — designed for regional faults — provided no protection against a subscription-level delete.",
+  "No independent safeguard (deletion cool-off, second-person approval, or customer confirmation) stood between the expiring term and irreversible destruction of an entire production Private Cloud.",
+  "Recoverability depended on backups held OUTSIDE the deleted GCVE estate (Google Cloud Storage same-region plus third-party backup software); had those been inside the Private Cloud's deletion scope, the loss would have been permanent."
+ ],
+ "coe": [
+  {
+   "action": "Eliminate the unsafe default: internal GCVE provisioning tooling must never silently substitute a destructive fixed-term/auto-deletion value for a blank input; require an explicit value or fail closed with no expiry.",
+   "owner": "Google Cloud — GCVE provisioning/tooling engineering",
+   "status": "Implied by postmortem",
+   "source": "Google Cloud blog (official postmortem)"
+  },
+  {
+   "action": "Add guardrails against subscription-level deletion of production Private Clouds: deletion cool-off / soft-delete window, mandatory second-person approval, and customer notification before any term-driven deletion executes.",
+   "owner": "Google Cloud — GCVE platform/reliability",
+   "status": "Recommended",
+   "source": "Google Cloud blog (official postmortem)"
+  },
+  {
+   "action": "Surface term/expiry state to operators and customers: make any fixed-term or scheduled-deletion attribute visible in tooling and customer consoles so an armed deletion timer cannot remain latent and unknown for a year.",
+   "owner": "Google Cloud — GCVE product",
+   "status": "Recommended",
+   "source": "Google Cloud blog (official postmortem)"
+  },
+  {
+   "action": "Preserve and validate independent, out-of-scope backups (GCS same-region + third-party backup software) and rehearse restore-from-backup for full Private Cloud reconstruction.",
+   "owner": "UniSuper — infrastructure/DR; with Google Cloud",
+   "status": "Validated in-incident (backups were instrumental to recovery)",
+   "source": "Google Cloud blog (official postmortem)"
+  },
+  {
+   "action": "Publish a transparent joint root-cause disclosure to reassure members that the event was operational, not a cyberattack or member-data compromise, and that balances were not lost.",
+   "owner": "UniSuper + Google Cloud — communications/leadership",
+   "status": "Done (joint statement 8 May; Google technical blog 25 May)",
+   "source": "UniSuper/Google joint statement; Google Cloud blog"
+  }
+ ],
+ "lessonsLearnt": [
+  "Defaults must fail safe. A blank field defaulting to an irreversible, delayed self-destruct is the antithesis of safe design; unsafe defaults on destructive actions are as dangerous as an explicit destructive command because no human ever consciously chose them.",
+  "Redundancy is not backup. Duplicate copies protect against regional failure, not against a valid control-plane instruction to delete the resource itself — such an instruction hits every copy at once. True recoverability came only from backups held outside the deletion's blast radius.",
+  "Latent misconfigurations with long fuses are uniquely dangerous. A destructive timer that stays invisible for a year defeats normal monitoring, change review, and incident-response reflexes because nothing appears wrong until the moment of loss.",
+  "Out-of-estate backups saved the fund. GCS same-region backups plus third-party backup software turned a potential permanent-data-loss catastrophe into a nine-day service outage — the single control that most changed the outcome.",
+  "Transparent, joint vendor-customer communication limited reputational damage: clearly stating this was an operational misconfiguration, not a cyberattack or member-data breach, and that member balances were not lost, was essential for a 647,000-member fund.",
+  "Even hyperscaler-managed platforms carry residual operational risk; customers of managed private clouds should assume misconfiguration is possible and retain independent, tested recovery paths they control."
+ ],
+ "improvements": [
+  "Fail-closed provisioning: internal tools reject or halt on missing parameters that control retention/lifecycle rather than substituting a destructive default.",
+  "Soft-delete and cool-off on Private Cloud deletion, with mandatory multi-party approval and advance customer notification before any term-driven or automated deletion.",
+  "Operator- and customer-visible display of any term, expiry, or scheduled-deletion attribute so armed timers cannot remain unknown.",
+  "Independent, out-of-scope backups (separate storage domain plus third-party backup software) as a standing requirement, with periodic full-reconstruction restore drills.",
+  "Proactive alerting on approaching lifecycle/retention deadlines so an impending automated deletion generates warnings well before execution.",
+  "Post-incident joint transparency reporting as standard practice for tenant-impacting control-plane errors."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "Failure mechanism: a blank field became a one-year self-destruct",
+   "body": "The proximate cause was mundane: while standing up UniSuper's GCVE Private Cloud through an internal deployment tool, a single input parameter was left blank. What made that omission catastrophic was the system's response — instead of rejecting the blank or defaulting to a benign no-expiry state, it substituted a then-unknown default fixed one-year term. That value quietly converted a permanent production resource into a time-limited one carrying an automatic-deletion action at term end. Google's own account is explicit that this was inadvertent misconfiguration, not a customer action, cyberattack, or hardware/data-integrity fault. The defect lives at the intersection of human factors and software design: whether a person left the field empty or the internal provisioning script passed a null value (Miles Ward's later account points to a script bug), the tooling amplified an ordinary omission into a destructive, irreversible outcome with a delayed fuse."
+  },
+  {
+   "heading": "Why it hit both copies",
+   "body": "UniSuper's Private Cloud was replicated across two copies — described as 'two geographies' in the joint statement and 'two zones' in Google's technical detail — an architecture intended to survive the loss of a single copy. It provided no defense here because the failure was not a regional outage; it was a valid, subscription-level deletion instruction generated by the platform's own lifecycle machinery. A control-plane 'delete this Private Cloud' action targets the logical resource, so both copies were removed together. This is the classic distinction between fault-tolerance and blast-radius containment: redundancy multiplies copies of the data but does not multiply protection against an authoritative command to destroy the resource. The single armed timer was, in effect, a correlated-failure source sitting above the redundancy layer, which is precisely why the outcome was total rather than degraded."
+  },
+  {
+   "heading": "Recovery: backups outside the blast radius were the decisive control",
+   "body": "The incident became a recoverable outage rather than a permanent loss for one reason: the deletion's scope did not include the data backups. Backups stored in Google Cloud Storage in the same region survived, and together with third-party backup software they were the instrumental basis for the rebuild. Customer and Google teams then worked 24x7 over several days to reconstruct the Private Cloud — re-establishing network and security configurations, restoring applications, and recovering data — before full operations returned. Member-facing online services were inaccessible for nine days and had to be rebuilt from those backups. The lesson is stark: the control that most changed the outcome was not the redundancy that failed, but the independent, out-of-estate backups that fell outside the deletion's reach."
+  },
+  {
+   "heading": "Organizational and systemic factors",
+   "body": "Several systemic weaknesses lined up. The internal tool embodied an unsafe default — a blank on a lifecycle-critical field mapped to a destructive terminal action instead of failing closed. The consequence was invisible: Google described the effect as 'then unknown', meaning no operator dashboard or customer console surfaced that a deletion timer had been armed, so the fault stayed latent for a full year, immune to normal change review and monitoring. And there was no independent circuit-breaker — no cool-off, second-person approval, or customer confirmation — between an expiring term and the irreversible destruction of an entire production estate. Any one of these controls, present, would likely have prevented the loss."
+  },
+  {
+   "heading": "Cross-incident pattern: unsafe defaults and destructive automation",
+   "body": "This event sits in a well-worn category of cloud and infrastructure failures where a routine operational input, mishandled by automation, produces disproportionate destruction. The recurring signature is: a human enters (or omits) a value, or a script passes a null; a system applies a permissive or destructive default without confirmation; the action executes at a scope that redundancy cannot contain; and recovery hinges on backups that happen to survive. The durable countermeasures are equally consistent across the pattern — fail-closed defaults on destructive fields, soft-delete/cool-off windows, multi-party approval for high-blast-radius actions, visible lifecycle state, and independent tested backups outside the primary estate. UniSuper's case is a textbook illustration that in large-scale infrastructure, the dangerous failures are often not dramatic attacks but quiet defaults with long fuses."
+  }
+ ],
+ "technicalDeepDive": "The chain, per Google's disclosure, is precise and closes on the parameter's semantics even though Google never names the field itself. During initial GCVE Private Cloud provisioning through an internal tool, one input parameter was left blank. Rather than validating for a required value, the system assigned a then-unknown default: a fixed one-year term for that parameter. This is the load-bearing detail — the blank did not merely leave a setting empty; it bound the Private Cloud to a lifecycle attribute (term/expiry) that carried an automatic-deletion action at term end. The value sat latent and unmonitored for the full period. After the end of the system-assigned one-year term, the platform's lifecycle machinery executed the deletion of the Private Cloud. Because the deletion targeted the subscription-level logical resource, it removed both replicated copies simultaneously — redundancy at the data/copy layer offers no protection against an authoritative delete of the resource above it. The single surviving fault-boundary was storage scope: data backups in Google Cloud Storage in the same region were outside the deletion's target set and were untouched, and third-party backup software provided the tooling to reconstitute state. Recovery was therefore a full rebuild-from-backup rather than a failover: teams restored network and security configurations, then applications, then data, over several days of 24x7 work, yielding a nine-day member-facing blackout. Several residual technical unknowns remain in the public record: Google does not name the specific input field; sources diverge on whether the blank was a manual operator omission or a creation-script bug that passed a null value (Miles Ward's 21 May account suggests the latter); sources also describe the two deleted copies inconsistently as 'two geographies' (8 May joint statement) versus 'two zones' (Google's technical write-up and itnews); and Google does not state whether the internal-tool 'fixed term' path shares the same soft-delete/expireTime mechanism exposed by the public GCVE API, so it is unconfirmed whether a standard soft-delete grace window existed on this internal deletion path. The absence of any effective cool-off, approval gate, or expiry-visibility surface is the key engineering gap: a destructive, delayed action executed with neither a warning nor a reversible-hold window in front of it.",
+ "references": [
+  {
+   "title": "Details of the Google Cloud GCVE incident (technical blog)",
+   "url": "https://cloud.google.com/blog/products/infrastructure/details-of-google-cloud-gcve-incident",
+   "type": "official-postmortem",
+   "quote": "One input parameter was left blank when using an internal tool to provision the customer's Private Cloud. As a result of the blank parameter, the system assigned a then unknown default fixed 1 year term value for this parameter.",
+   "accessed": "2026-08-01"
+  },
+  {
+   "title": "Google Cloud blog — recovery and backups (official postmortem)",
+   "url": "https://cloud.google.com/blog/products/infrastructure/details-of-google-cloud-gcve-incident",
+   "type": "official-postmortem",
+   "quote": "Data backups that were stored in Google Cloud Storage in the same region were not impacted by the deletion, and, along with third party backup software, were instrumental in aiding the rapid restoration.",
+   "accessed": "2026-08-01"
+  },
+  {
+   "title": "UniSuper's Google Cloud deletion traced to blank parameter in setup",
+   "url": "https://www.itnews.com.au/news/unisupers-google-cloud-deletion-traced-to-blank-parameter-in-setup-608286",
+   "type": "news",
+   "quote": "UniSuper's online services being inaccessible for nine days and having to be rebuilt from backups.",
+   "accessed": "2026-08-01"
+  },
+  {
+   "title": "A joint statement from UniSuper and Google Cloud (8 May 2024)",
+   "url": "https://www.unisuper.com.au/about-us/media-centre/2024/a-joint-statement-from-unisuper-and-google-cloud",
+   "type": "official-statement",
+   "quote": "UniSuper currently invests over $135 billion on behalf of more than 647,000 members ... When the deletion of UniSuper's Private Cloud subscription occurred, it caused deletion across both of these geographies.",
+   "accessed": "2026-08-01"
+  },
+  {
+   "title": "Google Cloud accidentally deleted UniSuper's Private Cloud Subscription",
+   "url": "https://www.datacenterdynamics.com/en/news/google-cloud-accidentally-deleted-unisupers-private-cloud-subscription/",
+   "type": "news",
+   "quote": "The deletion removed UniSuper's Private Cloud across both of its geographic locations.",
+   "accessed": "2026-08-01"
+  },
+  {
+   "title": "Google Cloud & UniSuper outage timeline (community analysis)",
+   "url": "https://danielcompton.net/google-cloud-unisuper",
+   "type": "analysis",
+   "quote": "From May 2nd to 13th, UniSuper experienced a major outage.",
+   "accessed": "2026-08-01"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": true,
+  "referenceCount": 6,
+  "lastVerified": "2026-08-01",
+  "confidence": "high"
+ },
+ "lastUpdated": "2026-08-01"
+}

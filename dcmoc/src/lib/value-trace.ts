@@ -1352,6 +1352,8 @@ export interface ResolvedTrace {
     value: number | null;
     /** formula with LIVE numbers substituted, e.g. "610 = 500000 × 1.22 ÷ 1000" */
     formulaLive?: string;
+    /** raw dep-name template (carried so inline traces keep the formula-pill view) */
+    formulaTemplate?: string;
     sourceKey?: string;
     external?: { href: string; label: string };
     children: ResolvedTrace[];
@@ -1373,7 +1375,47 @@ export function resolveTrace(id: string, depth = 8): ResolvedTrace | null {
         for (const c of children) formulaLive = formulaLive.split(c.id).join(`${c.label} [${fmtV(c.value)}]`);
         formulaLive = `${fmtV(value)} = ${formulaLive}`;
     }
-    return { id, label: n.label, page: n.page, unit: n.unit, provenance: n.provenance, value, formulaLive, sourceKey: n.sourceKey, external: n.external, children };
+    return { id, label: n.label, page: n.page, unit: n.unit, provenance: n.provenance, value, formulaLive, formulaTemplate: n.formulaTemplate, sourceKey: n.sourceKey, external: n.external, children };
+}
+
+/* ── PER-ROW / INLINE TRACES ──────────────────────────────────────────────────
+ * The registry (`TRACE[id]`) is one node → one value: it cannot describe a value
+ * rendered inside a `.map()` (each row differs) or one derived from component-local
+ * `useState` (the registry can't read it). An InlineTrace lets the component that
+ * ALREADY holds the per-row value + formula pass the trace directly to <TraceValue
+ * trace={...}> — parity holds by construction (same value the cell renders). Deps
+ * may be registry ids (string, resolved live) or nested inline leaves. */
+export interface InlineTrace {
+    id?: string;
+    label: string;
+    value: number | null;
+    unit?: string;
+    provenance?: TraceProvenance;
+    page?: string;
+    formulaTemplate?: string;
+    sourceKey?: string;
+    external?: { href: string; label: string };
+    deps?: (string | InlineTrace)[];
+}
+
+let _inlineSeq = 0;
+export function resolveInline(spec: InlineTrace, depth = 8): ResolvedTrace {
+    const id = spec.id ?? `inline:${(spec.label || 'row').replace(/\s+/g, '-').toLowerCase()}:${_inlineSeq++}`;
+    const children: ResolvedTrace[] = depth > 0 && spec.deps
+        ? spec.deps.map((d) => (typeof d === 'string' ? resolveTrace(d, depth - 1) : resolveInline(d, depth - 1)))
+            .filter((x): x is ResolvedTrace => !!x)
+        : [];
+    let formulaLive: string | undefined;
+    if (spec.formulaTemplate) {
+        formulaLive = spec.formulaTemplate;
+        for (const c of children) formulaLive = formulaLive.split(c.id).join(`${c.label} [${fmtV(c.value)}]`);
+        formulaLive = `${fmtV(spec.value)} = ${formulaLive}`;
+    }
+    return {
+        id, label: spec.label, page: spec.page ?? 'requirements', unit: spec.unit,
+        provenance: spec.provenance ?? 'derived', value: spec.value, formulaLive,
+        formulaTemplate: spec.formulaTemplate, sourceKey: spec.sourceKey, external: spec.external, children,
+    };
 }
 
 /** All ids (for gates + Knowledge Base live-trace rendering). */

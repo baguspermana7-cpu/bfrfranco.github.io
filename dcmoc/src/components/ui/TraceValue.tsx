@@ -13,7 +13,7 @@
 
 import React from 'react';
 import { createPortal } from 'react-dom';
-import { resolveTrace, type ResolvedTrace } from '@/lib/value-trace';
+import { resolveTrace, resolveInline, type ResolvedTrace, type InlineTrace } from '@/lib/value-trace';
 import { useCollapsibleTree } from '@/hooks/useCollapsibleTree';
 import { CollapsibleTree } from '@/components/ui/CollapsibleTree';
 import { useSimulationStore } from '@/store/simulation';
@@ -318,22 +318,25 @@ function Panel({ root }: { root: ResolvedTrace }) {
 /* template lookup — resolveTrace strips it, so rebuild from the registry */
 import { TRACE } from '@/lib/value-trace';
 function templateOf(node: ResolvedTrace): string {
-    return TRACE[node.id]?.formulaTemplate ?? node.children.map((c) => c.id).join(' · ');
+    return node.formulaTemplate ?? TRACE[node.id]?.formulaTemplate ?? node.children.map((c) => c.label).join(' · ');
 }
 
-export function TraceValue({ traceId, children, className }: { traceId: string; children: React.ReactNode; className?: string }) {
+/** TraceValue takes EITHER a registry `traceId` (shared, one-value nodes) OR an
+ *  inline `trace` spec (per-row / component-local values the registry can't reach). */
+export function TraceValue({ traceId, trace, children, className }: { traceId?: string; trace?: InlineTrace; children: React.ReactNode; className?: string }) {
     const [anchor, setAnchor] = React.useState<{ x: number; y: number } | null>(null);
     const [tree, setTree] = React.useState<ResolvedTrace | null>(null);
+    const bindId = traceId ?? trace?.id ?? (trace ? `inline:${(trace.label || 'row').replace(/\s+/g, '-').toLowerCase()}` : '');
 
     const openAt = (e: React.MouseEvent) => {
         const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
-        setTree(resolveTrace(traceId));
+        setTree(trace ? resolveInline(trace) : traceId ? resolveTrace(traceId) : null);
         setAnchor({ x: Math.min(r.left, window.innerWidth - 420), y: r.bottom + 6 });
     };
 
     return (
         <>
-            <button onClick={openAt} data-bind={traceId} data-trace={traceId}
+            <button onClick={openAt} data-bind={bindId} data-trace={bindId}
                 className={`group relative cursor-pointer border-b border-dotted border-rz-signal/60 hover:border-rz-signal text-left ${className ?? ''}`}
                 title="Click: trace the formula & sources of this number (formula field)">
                 {children}

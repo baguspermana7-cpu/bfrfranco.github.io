@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NorthC Almere Data Center Fire: A Compartment Blaze That Took Out the Facility Power Plant and Rippled Across Dutch Public Services | ResistanceZero</title>
+    <meta name="description" content="On 7 May 2026 (around 08:45 local time) a fire broke out in a rear technical compartment of NorthC&#x27;s Almere data center (Rondebeltweg) that houses power infrastructure. No servers ">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="ai-content-declaration" content="human-curated, sourced from public post-incident reports">
+    <meta name="author" content="Bagus Dwi Permana">
+    <link rel="canonical" href="https://resistancezero.com/incident-northc-almere-fire-2026.html">
+    <meta name="theme-color" content="#0c1512">
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+    <style>
+    /* ── Governed Incident Dossier — editorial register (v2): forest-green + warm ivory,
+       serif display, evidence-class provenance. Accent vars remapped so all components
+       re-skin. AA-contrast in both themes. No gradients / glass / dot-grid (anti-slop). */
+    :root:not([data-theme="dark"]) {
+        --bg:#f4f1e7; --surface:#fffdf6; --surface-2:#efeadc; --line:rgba(26,45,36,0.16);
+        --text:#1a2d24; --text-strong:#10201a; --text-body:#3b463d; --muted:#6a7367;
+        --cyan:#2f6b4f; --amber:#87671b; --green:#2f7d54; --red:#9c3b32; --gold:#87671b;
+        --hero-ink:#f4f1e7; --hero-bg:#183329; --shadow-deep:rgba(26,45,36,0.10);
+    }
+    [data-theme="dark"] {
+        --bg:#0c1512; --surface:#11201a; --surface-2:#16281f; --line:rgba(233,229,216,0.15);
+        --text:#e9e5d8; --text-strong:#f5f2e9; --text-body:#c6ccbc; --muted:#8b9484;
+        --cyan:#7fd1a8; --amber:#d8b25c; --green:#7fd1a8; --red:#e0917f; --gold:#d8b25c;
+        --hero-ink:#e9e5d8; --hero-bg:#0f221a; --shadow-deep:rgba(0,0,0,0.5);
+    }
+    * { box-sizing:border-box; }
+    html,body { margin:0; padding:0; }
+    body { background:var(--bg); color:var(--text); font-family:'IBM Plex Sans',system-ui,sans-serif; line-height:1.62; }
+    a { color:var(--cyan); }
+    h1,h2,.serif { font-family:'Fraunces','Newsreader',Georgia,serif; font-weight:600; letter-spacing:-0.01em; }
+    .wrap { max-width:1120px; margin:0 auto; padding:1.5rem 1.1rem 3rem; }
+    .navbar { display:flex; align-items:center; justify-content:space-between; padding:0.7rem 1.1rem; border-bottom:1px solid var(--line); background:var(--surface); position:sticky; top:0; z-index:50; }
+    .nav-container { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:1120px; margin:0 auto; }
+    .nav-logo { display:flex; align-items:center; }
+    .nav-avatar { width:34px; height:34px; border-radius:50%; }
+    .nav-menu { display:flex; gap:1rem; list-style:none; margin:0; padding:0; }
+    .nav-menu a { color:var(--text-body); text-decoration:none; font-size:0.85rem; font-weight:600; }
+    .nav-menu a:hover { color:var(--cyan); }
+    .nav-right { display:flex; align-items:center; gap:0.6rem; }
+    .theme-btn { background:none; border:1px solid var(--line); color:var(--text); border-radius:8px; padding:0.35rem 0.5rem; cursor:pointer; font-size:0.8rem; }
+    .lock-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--red); border:1px solid var(--red); border-radius:999px; padding:0.12rem 0.5rem; }
+    h1 { font-size:2.4rem; color:var(--text-strong); margin:0.35rem 0 0.5rem; line-height:1.12; }
+    h2 { font-size:1.4rem; color:var(--text-strong); margin:2rem 0 0.7rem; }
+    .eyebrow { font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); }
+    .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
+    .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
+    .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:999px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    .chip.cyan { color:var(--cyan); border-color:var(--cyan); }
+    .chip.amber { color:var(--amber); border-color:var(--amber); }
+    .chip.green { color:var(--green); border-color:var(--green); }
+    .chip.red { color:var(--red); border-color:var(--red); }
+    .chip.muted { color:var(--muted); }
+    .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:1rem 1.1rem; margin-top:0.9rem; }
+    .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:12px; margin-top:0.9rem; }
+    table.inc-index { width:100%; border-collapse:collapse; font-size:0.86rem; min-width:760px; }
+    table.inc-index th { text-align:left; font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); background:var(--surface-2); }
+    table.inc-index td { padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); color:var(--text-body); vertical-align:top; }
+    table.inc-index tr:hover td { background:var(--surface-2); }
+    table.inc-index a { font-weight:700; color:var(--text-strong); text-decoration:none; }
+    table.inc-index a:hover { color:var(--cyan); text-decoration:underline; }
+    .rank-badge { font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--amber); }
+    .mag-bar { height:4px; border-radius:3px; background:var(--line); margin-top:0.35rem; overflow:hidden; }
+    .mag-bar > span { display:block; height:4px; background:var(--amber); }
+    ul.tight { margin:0.4rem 0 0; padding-left:1.15rem; }
+    ul.tight li { color:var(--text-body); margin:0.3rem 0; font-size:0.92rem; }
+    .soe { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .soe li { display:grid; grid-template-columns:170px 1fr; gap:0.7rem; padding:0.5rem 0; border-bottom:1px dashed var(--line); }
+    .soe time { font-family:'JetBrains Mono',monospace; font-size:0.76rem; color:var(--cyan); }
+    .soe .ev { color:var(--text-body); font-size:0.9rem; }
+    .phase-chip { font-family:'JetBrains Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--amber); border:1px solid var(--amber); border-radius:999px; padding:0.05rem 0.4rem; margin-right:0.4rem; white-space:nowrap; }
+    table.metrics { width:100%; border-collapse:collapse; font-size:0.88rem; }
+    table.metrics td { padding:0.5rem 0.7rem; border-bottom:1px solid var(--line); vertical-align:top; }
+    table.metrics .mlabel { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; width:38%; white-space:nowrap; }
+    table.metrics .mval { color:var(--text-body); }
+    .ca-block { background:var(--surface); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 10px 10px 0; padding:0.7rem 1rem; margin-top:0.7rem; }
+    .ca-block h3 { margin:0 0 0.3rem; font-size:0.92rem; color:var(--text-strong); }
+    .ca-block p { margin:0; color:var(--text-body); font-size:0.9rem; }
+    /* ── inline-SVG visualizations (theme-aware via vars) ── */
+    .viz { overflow-x:auto; margin-top:0.9rem; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:0.9rem 1rem; }
+    .viz svg { display:block; max-width:100%; height:auto; }
+    .viz-radar svg { max-width:280px; margin:0 auto; }
+    .vz-grid { fill:none; stroke:var(--line); stroke-width:1; }
+    .vz-accent-fill { fill:var(--cyan); fill-opacity:0.16; stroke:var(--cyan); stroke-width:1.4; }
+    .vz-accent-dot { fill:var(--cyan); }
+    .vz-accent-bar { fill:var(--cyan); }
+    .vz-cat-bar { fill:var(--amber); }
+    .vz-lbl { font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--muted); }
+    .vz-box-trigger { fill:color-mix(in srgb, var(--red) 12%, var(--surface)); stroke:var(--red); stroke-width:1.2; }
+    .vz-box-fault { fill:color-mix(in srgb, var(--amber) 12%, var(--surface)); stroke:var(--amber); stroke-width:1.2; }
+    .vz-box-down { fill:color-mix(in srgb, var(--cyan) 10%, var(--surface)); stroke:var(--cyan); stroke-width:1; }
+    .vz-box-t { font-family:'IBM Plex Sans',sans-serif; font-size:11px; font-weight:600; fill:var(--text-strong); }
+    .vz-box-s { font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--muted); }
+    .vz-flow { stroke:var(--muted); stroke-width:1.3; fill:none; }
+    .vz-arrhead { fill:var(--muted); }
+    .vz-tl-ph { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.04em; text-transform:uppercase; fill:var(--amber); }
+    .vz-tl-t { font-family:'JetBrains Mono',monospace; font-size:8.5px; fill:var(--muted); }
+    .vz-hb-lbl { font-family:'IBM Plex Sans',sans-serif; font-size:11px; fill:var(--text-body); }
+    .vz-hb-val { font-family:'JetBrains Mono',monospace; font-size:10px; fill:var(--muted); }
+    .viz-grid3 { display:grid; grid-template-columns:1fr 1fr; gap:0.9rem; }
+    @media (max-width:720px){ .viz-grid3 { grid-template-columns:1fr; } }
+    .filterbar { display:flex; flex-wrap:wrap; align-items:center; gap:0.4rem 0.6rem; margin:0.9rem 0 0.2rem; }
+    .fb-group { display:flex; flex-wrap:wrap; gap:0.35rem; }
+    .fb-chip { font-family:'JetBrains Mono',monospace; font-size:0.72rem; padding:0.28rem 0.6rem; border-radius:999px; border:1px solid var(--line); background:var(--surface); color:var(--text-body); cursor:pointer; }
+    .fb-chip:hover { border-color:var(--cyan); }
+    .fb-chip.active { background:var(--cyan); border-color:var(--cyan); color:var(--surface); font-weight:700; }
+    .fb-search { flex:1 1 200px; min-width:160px; font-family:'IBM Plex Sans',sans-serif; font-size:0.82rem; padding:0.3rem 0.6rem; border-radius:8px; border:1px solid var(--line); background:var(--surface); color:var(--text); }
+    .fb-count { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); margin-left:auto; }
+    .kv { display:grid; grid-template-columns:180px 1fr; gap:0.5rem 0.9rem; margin-top:0.5rem; font-size:0.9rem; }
+    .kv dt { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; }
+    .kv dd { margin:0; color:var(--text-body); }
+    .refs { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .refs li { padding:0.55rem 0; border-bottom:1px solid var(--line); }
+    .refs .rtitle { color:var(--text-strong); font-weight:600; font-size:0.9rem; }
+    .refs .rquote { color:var(--muted); font-size:0.84rem; font-style:italic; margin-top:0.2rem; display:block; }
+    .refs a { font-size:0.78rem; word-break:break-all; }
+    .backlink { display:inline-block; margin-bottom:0.6rem; font-size:0.82rem; color:var(--cyan); text-decoration:none; }
+    footer { border-top:1px solid var(--line); margin-top:2.5rem; padding:1.4rem 1.1rem; text-align:center; }
+    footer .ver { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .disclaimer { font-size:0.76rem; color:var(--muted); margin-top:0.8rem; max-width:80ch; }
+    .skip-link { position:absolute; top:-50px; left:0; background:#0e7490; color:#fff; padding:10px 20px; text-decoration:none; font-weight:600; z-index:10000; border-radius:0 0 8px 0; transition:top 0.2s; }
+    .skip-link:focus { top:0; }
+    .root-gate { position:fixed; inset:0; z-index:99999; display:none; align-items:center; justify-content:center; background:rgba(2,6,23,0.74); padding:1rem; backdrop-filter:blur(6px); }
+    body.locked .root-gate { display:flex; }
+    body.locked .wrap { filter:blur(4px); pointer-events:none; user-select:none; }
+    .root-card { max-width:430px; width:100%; background:var(--surface); border:1px solid var(--cyan); border-radius:14px; padding:1.3rem 1.15rem; text-align:center; box-shadow:0 18px 36px var(--shadow-deep); }
+    .root-card h2 { margin:0 0 0.4rem; font-size:1.1rem; color:var(--text-strong); }
+    .root-card p { font-size:0.86rem; color:var(--text-body); }
+    .root-actions { margin-top:0.9rem; display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; }
+    .root-actions button, .root-actions a { border-radius:9px; padding:0.5rem 0.85rem; font-size:0.8rem; font-weight:700; border:1px solid var(--line); text-decoration:none; cursor:pointer; color:var(--text); font-family:inherit; }
+    .root-actions button { background:var(--cyan); color:#04121a; border:none; }
+    .rz-nav-burger { display:none; }
+    /* v1.8.0 — mobile responsive patch */
+    @media (max-width:768px) {
+        html,body { overflow-x:hidden; max-width:100vw; }
+        img { max-width:100%; height:auto; display:block; }
+        .nav-menu, .nav-links { display:none; }
+        .navbar { padding:0.5rem 0.75rem; }
+        footer .footer-grid { grid-template-columns:1fr; gap:1.25rem; padding:1rem; }
+        button, a.btn, [role="button"] { min-height:44px; }
+        h1 { font-size:1.4rem; }
+        .soe li { grid-template-columns:1fr; gap:0.15rem; }
+        .kv { grid-template-columns:1fr; }
+        .root-card { max-width:92vw; }
+    }
+    @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
+</style>
+</head>
+<body class="locked">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <nav class="navbar"><div class="nav-container">
+        <a href="index.html" class="nav-logo"><img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dc-incidents.html">DC Incidents</a></li>
+            <li><a href="datacenter-solutions.html">DC Solutions</a></li>
+        </ul>
+        <div class="nav-right">
+            <span class="lock-tag" title="Root-only module">🔒 Root</span>
+            <button class="theme-btn" id="themeToggle" type="button" aria-label="Toggle theme">◐</button>
+        </div>
+    </div></nav>
+    <main class="wrap" id="main-content">
+        <a class="backlink" href="dc-incidents.html">← All incidents</a>
+        <div class="eyebrow">Incident dossier · Rank #18</div>
+        <h1>NorthC Almere Data Center Fire: A Compartment Blaze That Took Out the Facility Power Plant and Rippled Across Dutch Public Services</h1>
+        <div class="chips">
+            <span class="chip">NorthC Datacenters</span>
+            <span class="chip cyan">2026-05-07</span>
+            <span class="chip amber">144h 0m core impact</span>
+            <span class="chip red">Fire</span><span class="chip amber">Power</span>
+        </div>
+        <p class="lede">On 7 May 2026 (around 08:45 local time) a fire broke out in a rear technical compartment of NorthC&#x27;s Almere data center (Rondebeltweg) that houses power infrastructure. No servers or data carriers caught fire, but the blaze burned part of the facility&#x27;s power supply and the site lost power entirely — the compute survived, yet everything went dark, and NorthC ultimately had to rebuild the power plant with new transformers and UPS. (Published reporting says only that &#x27;part of the power supply burnt down&#x27;; that BOTH the normal and standby feeds were lost is an engineering inference from the total, multi-day power loss and the full rebuild, not an official finding.) Because multiple Dutch organizations host critical systems there, the outage cascaded outward: Utrecht University, Statistics Netherlands (CBS), public-transport operator Transdev, a regional water board, research-ICT provider Surf, IBM Cloud&#x27;s Amsterdam 03, and numerous GP practices all lost service. The fire was scaled down to GRIP 1 at 20:50 that evening and to GRIP 0 with the building partially released to NorthC teams at 00:35 on 8 May, kicking off a phased restoration estimated at up to 72 hours. Temporary redundant power and cooling were activated on 13 May, roughly a week after the fire. Grid power came back building-by-building over the following weeks, with Building 1&#x27;s full utility-plus-standby topology targeted for 17 July 2026. The root cause remains officially undetermined; a draft cause report was only expected at end-September 2026 because the fire-damaged structure had to be secured first.</p>
+
+        <h2>Failure cascade</h2>
+        <div class="viz viz-cascade"><svg viewBox="0 0 720 204" role="img" aria-label="Failure cascade block diagram"><title>Failure cascade: trigger → fault → downstream impact</title><defs><marker id="ic-ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path class="vz-arrhead" d="M0,0 L6,3 L0,6 Z"/></marker></defs><rect class="vz-box-trigger" x="8" y="78.0" width="168" height="50" rx="8"/><text class="vz-box-t" x="18" y="96.0">Trigger · Fire</text><text class="vz-box-s" x="18" y="108.0">2026-05-07</text><rect class="vz-box-fault" x="232" y="78.0" width="200" height="50" rx="8"/><text class="vz-box-t" x="242" y="96.0">NorthC Datacenters</text><text class="vz-box-s" x="242" y="108.0">NorthC Almere (Rondebeltweg)</text><line class="vz-flow" x1="176" y1="103.0" x2="230" y2="103.0" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="500" y="22" width="212" height="32" rx="8"/><text class="vz-box-t" x="510" y="40">Utrecht University network/appli</text><line class="vz-flow" x1="432" y1="103.0" x2="498" y2="38" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="500" y="62" width="212" height="32" rx="8"/><text class="vz-box-t" x="510" y="80">Statistics Netherlands (CBS) pla</text><line class="vz-flow" x1="432" y1="103.0" x2="498" y2="78" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="500" y="102" width="212" height="32" rx="8"/><text class="vz-box-t" x="510" y="120">Transdev bus and tram services</text><line class="vz-flow" x1="432" y1="103.0" x2="498" y2="118" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="500" y="142" width="212" height="32" rx="8"/><text class="vz-box-t" x="510" y="160">Water board Hoogheemraadschap De</text><line class="vz-flow" x1="432" y1="103.0" x2="498" y2="158" marker-end="url(#ic-ar)"/><text class="vz-box-s" x="500" y="186">+3 more downstream services</text></svg></div>
+        <p class="disclaimer">Trigger → primary fault → downstream blast radius, derived from the sourced root cause and affected-services record.</p>
+
+        <h2>Facility &amp; location</h2>
+        <dl class="kv">
+            <dt>Operator</dt><dd>NorthC Datacenters</dd>
+            <dt>Data center</dt><dd>NorthC Almere (Rondebeltweg)</dd>
+            <dt>Location</dt><dd>Almere, Netherlands</dd>
+            <dt>Date</dt><dd>2026-05-07</dd>
+        </dl>
+
+        <h2>Impact &amp; scale</h2>
+        <dl class="kv">
+            <dt>Users affected</dt><dd>Undisclosed headcount; multi-sector impact documented by named victims (Utrecht University, Statistics Netherlands/CBS, Transdev bus &amp; tram, water board De Stichtse Rijnlanden, Surf, IBM Cloud AMS03, and GP/healthcare practices)</dd>
+            <dt>Financial</dt><dd>Not published; facility owner Keppel DC REIT stated the incident was not expected to have a material impact on FY2026 distribution per unit; no damages, insurance, or customer-loss figure disclosed</dd>
+            <dt>Scope</dt><dd>Sev-1 facility-level power loss (multi-day)</dd>
+        </dl>
+        <div class="card"><strong>Services / systems down</strong><ul class="tight"><li>Utrecht University network/applications/websites and access passes</li><li>Statistics Netherlands (CBS) platforms</li><li>Transdev bus and tram services</li><li>Water board Hoogheemraadschap De Stichtse Rijnlanden network</li><li>Surf member research/education infrastructure</li><li>IBM Cloud Amsterdam 03</li><li>GP practices&#x27; patient-record, scheduling and contact systems</li></ul></div>
+        <h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Facility outage to temporary power</td><td class="mval">~6 days (7 May ~08:45 to 13 May 2026)</td></tr><tr><td class="mlabel">Phased restoration estimate at partial building release</td><td class="mval">Up to 72 hours</td></tr><tr><td class="mlabel">Time from fire start to GRIP 1 downgrade</td><td class="mval">Same evening (~08:45 to 20:50 on 7 May 2026)</td></tr><tr><td class="mlabel">Building 2 grid reconnection</td><td class="mval">Week of 25 May 2026</td></tr><tr><td class="mlabel">Building 1 full grid reconnection target</td><td class="mval">17 July 2026 (~71 days post-fire; execution unconfirmed)</td></tr><tr><td class="mlabel">Named affected organizations</td><td class="mval">At least 7 across higher education, national statistics, transport, water management, research ICT, cloud and healthcare</td></tr><tr><td class="mlabel">Affected customer/tenant count</td><td class="mval">Undisclosed (explicitly reported as unknown)</td></tr><tr><td class="mlabel">Owner financial impact</td><td class="mval">No material impact to Keppel DC REIT FY2026 distribution per unit; damages figure undisclosed</td></tr><tr><td class="mlabel">Draft root-cause report expected</td><td class="mval">End of September 2026</td></tr></tbody></table></div>
+
+        <h2>Magnitude profile</h2>
+        <div class="viz viz-radar"><svg viewBox="0 0 200 205" role="img" aria-label="Magnitude sub-scores radar chart"><title>Magnitude sub-scores (0–10)</title><polygon class="vz-grid" points="100.0,79.6 120.4,100.0 100.0,120.4 79.6,100.0"/><polygon class="vz-grid" points="100.0,59.8 140.2,100.0 100.0,140.2 59.8,100.0"/><polygon class="vz-grid" points="100.0,40.0 160.0,100.0 100.0,160.0 40.0,100.0"/><line class="vz-grid" x1="100" y1="100" x2="100.0" y2="40.0"/><line class="vz-grid" x1="100" y1="100" x2="160.0" y2="100.0"/><line class="vz-grid" x1="100" y1="100" x2="100.0" y2="160.0"/><line class="vz-grid" x1="100" y1="100" x2="40.0" y2="100.0"/><polygon class="vz-accent-fill" points="100.0,52.0 130.0,100.0 100.0,148.0 46.0,100.0"/><circle class="vz-accent-dot" cx="100.0" cy="52.0" r="2.4"/><circle class="vz-accent-dot" cx="130.0" cy="100.0" r="2.4"/><circle class="vz-accent-dot" cx="100.0" cy="148.0" r="2.4"/><circle class="vz-accent-dot" cx="46.0" cy="100.0" r="2.4"/><text class="vz-lbl" x="100.0" y="22.0" text-anchor="middle">Users 8</text><text class="vz-lbl" x="172.0" y="104.0" text-anchor="start">Financial 5</text><text class="vz-lbl" x="100.0" y="186.0" text-anchor="middle">Duration 8</text><text class="vz-lbl" x="28.0" y="104.0" text-anchor="end">Blast 9</text></svg></div>
+        <p class="disclaimer">Blast radius is high because the failure reached across sectors of Dutch public life (higher education, national statistics, public transport, water management, healthcare, cloud) from a single site. Users and duration are high (multi-day facility power loss, weeks to full grid). Financial score is a mid-band estimate held down by the absence of any published damages figure and the owner&#x27;s &#x27;no material FY2026 DPU impact&#x27; statement; the true operational and tenant cost is undisclosed.</p>
+
+        <h2>Sequence of events (SOE)</h2>
+        <div class="viz viz-timeline"><svg viewBox="0 0 1144 96" role="img" aria-label="Sequence-of-events timeline"><title>Phased sequence of events</title><line class="vz-grid" x1="30" y1="48" x2="1114" y2="48"/><circle class="vz-accent-dot" cx="30" cy="48" r="4.5"/><text class="vz-tl-ph" x="30" y="30" text-anchor="middle">Trigger</text><text class="vz-tl-t" x="30" y="68" text-anchor="middle">2026-05-07 ~08:4</text><circle class="vz-accent-dot" cx="129" cy="48" r="4.5"/><text class="vz-tl-ph" x="129" y="30" text-anchor="middle">Detection</text><text class="vz-tl-t" x="129" y="68" text-anchor="middle">2026-05-07 (duri</text><circle class="vz-accent-dot" cx="227" cy="48" r="4.5"/><text class="vz-tl-ph" x="227" y="30" text-anchor="middle">Impact</text><text class="vz-tl-t" x="227" y="68" text-anchor="middle">2026-05-07 (conc</text><circle class="vz-accent-dot" cx="326" cy="48" r="4.5"/><text class="vz-tl-ph" x="326" y="30" text-anchor="middle">Cascade</text><text class="vz-tl-t" x="326" y="68" text-anchor="middle">2026-05-07 (conc</text><circle class="vz-accent-dot" cx="424" cy="48" r="4.5"/><text class="vz-tl-ph" x="424" y="30" text-anchor="middle">Mitigation</text><text class="vz-tl-t" x="424" y="68" text-anchor="middle">2026-05-07 20:13</text><circle class="vz-accent-dot" cx="523" cy="48" r="4.5"/><text class="vz-tl-ph" x="523" y="30" text-anchor="middle">Mitigation</text><text class="vz-tl-t" x="523" y="68" text-anchor="middle">2026-05-07 20:50</text><circle class="vz-accent-dot" cx="621" cy="48" r="4.5"/><text class="vz-tl-ph" x="621" y="30" text-anchor="middle">Recovery</text><text class="vz-tl-t" x="621" y="68" text-anchor="middle">2026-05-08 00:35</text><circle class="vz-accent-dot" cx="720" cy="48" r="4.5"/><text class="vz-tl-ph" x="720" y="30" text-anchor="middle">Recovery</text><text class="vz-tl-t" x="720" y="68" text-anchor="middle">2026-05-13</text><circle class="vz-accent-dot" cx="818" cy="48" r="4.5"/><text class="vz-tl-ph" x="818" y="30" text-anchor="middle">Recovery</text><text class="vz-tl-t" x="818" y="68" text-anchor="middle">2026-05-25 (week</text><circle class="vz-accent-dot" cx="917" cy="48" r="4.5"/><text class="vz-tl-ph" x="917" y="30" text-anchor="middle">Recovery</text><text class="vz-tl-t" x="917" y="68" text-anchor="middle">2026-06-30 (end </text><circle class="vz-accent-dot" cx="1015" cy="48" r="4.5"/><text class="vz-tl-ph" x="1015" y="30" text-anchor="middle">Restored</text><text class="vz-tl-t" x="1015" y="68" text-anchor="middle">2026-07-17</text><circle class="vz-accent-dot" cx="1114" cy="48" r="4.5"/><text class="vz-tl-ph" x="1114" y="30" text-anchor="middle">Diagnosis</text><text class="vz-tl-t" x="1114" y="68" text-anchor="middle">2026-07-27 to 20</text></svg></div>
+        <ul class="soe"><li><time>2026-05-07 ~08:45 local (per NorthC log)</time><span class="ev"><span class="phase-chip">Trigger</span> A fire starts around 08:45 in a rear technical compartment of the Almere facility (Rondebeltweg) that houses power infrastructure. No IT/server hall is reported to have burned.</span></li><li><time>2026-05-07 (during response)</time><span class="ev"><span class="phase-chip">Detection</span> On-site personnel are evacuated in time; contemporaneous reporting notes it was not yet clear how many companies were experiencing technical issues.</span></li><li><time>2026-05-07 (concurrent with fire)</time><span class="ev"><span class="phase-chip">Impact</span> The fire burns part of the facility&#x27;s power supply in the rear technical compartment, causing a total loss of power at the site; no servers or data carriers caught fire. The site remained without power until temporary supply was stood up, and NorthC later rebuilt with new transformers and UPS — indicating both the normal and standby feeds were knocked out. (Press reported only that &#x27;part of the power supply burnt down&#x27;; the both-feeds/redundancy-defeat reading is an engineering inference from the recovery record.)</span></li><li><time>2026-05-07 (concurrent)</time><span class="ev"><span class="phase-chip">Cascade</span> Because power is cut, tenant organizations lose their systems: Utrecht University (closed Friday, digital systems and access passes down), Statistics Netherlands (CBS), Transdev bus and tram services, water board De Stichtse Rijnlanden, Surf members, IBM Cloud AMS03, and GP practices lose access to patient records, appointments and contact numbers.</span></li><li><time>2026-05-07 20:13</time><span class="ev"><span class="phase-chip">Mitigation</span> The Veiligheidsregio (safety region) issues an all-clear, telling residents who could no longer smell smoke they could reopen their windows, standing down the earlier shelter warning.</span></li><li><time>2026-05-07 20:50</time><span class="ev"><span class="phase-chip">Mitigation</span> The fire is scaled down to GRIP 1, indicating the incident is being brought under control.</span></li><li><time>2026-05-08 00:35</time><span class="ev"><span class="phase-chip">Recovery</span> The situation is further scaled down to GRIP 0 and the building is partially released, allowing NorthC teams to begin restoration work. In the following daytime update, phased power/cooling restoration is estimated to take up to 72 hours.</span></li><li><time>2026-05-13</time><span class="ev"><span class="phase-chip">Recovery</span> Temporary, redundant power and cooling are successfully activated, roughly a week after the fire (a ~six-day facility outage window).</span></li><li><time>2026-05-25 (week of)</time><span class="ev"><span class="phase-chip">Recovery</span> Building 2 is reconnected to grid power (its technical room was not damaged).</span></li><li><time>2026-06-30 (end of June)</time><span class="ev"><span class="phase-chip">Recovery</span> The first portion of Building 1 is projected for grid reconnection.</span></li><li><time>2026-07-17</time><span class="ev"><span class="phase-chip">Restored</span> Scheduled full reconnection of Building 1 to the regular grid with emergency generators as backup, restoring intended utility-plus-standby topology after new transformers and UPS installation. Execution on this date was not independently confirmed.</span></li><li><time>2026-07-27 to 2026-08-07</time><span class="ev"><span class="phase-chip">Diagnosis</span> Independent-expert investigation and demolition of the fire-damaged structure scheduled, with possible follow-up in early September; a draft cause report is expected by end-September 2026.</span></li></ul>
+
+        <h2>Root cause</h2>
+        <div class="card">Officially undetermined. As of the late-July 2026 update, NorthC had not established the cause of the fire. The on-site technical investigation could not safely begin until the fire-damaged structure was secured and water-supply work completed, so independent-expert investigation and demolition were scheduled for 27 July to 7 August 2026 and a draft cause report was pushed to end-September 2026. What is established is the failure&#x27;s effect rather than its origin: a fire in a rear technical compartment burned part of the facility&#x27;s power supply and produced a total facility power loss even though no servers caught fire. Published reporting states only that &#x27;part of the power supply burnt down&#x27;; that the fire knocked out both the normal and standby feeds is inferred from the total, multi-day loss of power and the subsequent rebuild with new transformers and UPS, not from an official finding.</div>
+
+        <h2>Contributing factors</h2>
+        <ul class="tight"><li>The fire originated in a rear technical compartment housing power infrastructure, placing the ignition source directly among the assets whose loss would take the whole site down.</li><li>The site suffered a total, multi-day power loss and had to be rebuilt with new transformers and UPS, which indicates the normal and standby power paths were both knocked out by the one event — an inference from the recovery record, since published press reported only that &#x27;part of the power supply burnt down.&#x27;</li><li>Multiple tenants relied on facility power without independent local generation or geographic failover, so a site-level power loss translated directly into their service outages.</li><li>The fire caused structural damage severe enough that the building had to be secured and water-supply work completed before investigators could safely enter, delaying root-cause analysis by months.</li><li>Critical public-sector workloads (national statistics, healthcare records, public transport, water management) were concentrated at a single facility, amplifying the societal blast radius of one site&#x27;s outage.</li></ul>
+
+        <h2>Correction of errors (COE)</h2>
+        <ul class="tight"><li>Complete the independent-expert technical investigation and issue the draft cause report to establish the fire&#x27;s origin and mechanism. <span class="chip muted">NorthC Datacenters · Pending — draft report expected end of September 2026</span></li><li>Secure the fire-damaged structure and complete water-supply work so the on-site investigation can proceed safely; conduct demolition and expert examination. <span class="chip muted">NorthC Datacenters · Scheduled 27 July–7 August 2026, with possible follow-up early September</span></li><li>Rebuild the power topology with new transformers and UPS and fully reconnect Building 1 to the regular grid with emergency generators as backup. <span class="chip muted">NorthC Datacenters · Targeted 17 July 2026; execution not independently confirmed</span></li><li>Restore grid power on a per-building basis to bring tenants back onto utility supply. <span class="chip muted">NorthC Datacenters · Done — Building 2 reconnected week of 25 May; Building 1 partial by end June 2026</span></li><li>Publish an impact accounting (affected tenants/customers, outage durations, damages) for transparency to affected parties and the public. <span class="chip muted">NorthC Datacenters · Open — no customer count, per-organization outage duration, or damages figure has been published</span></li></ul>
+
+        <h2>Lessons learnt</h2>
+        <ul class="tight"><li>A single compartment fire produced a total, multi-day facility power loss requiring a full power-plant rebuild — apparent evidence that co-locating primary and backup power lets one event defeat the redundancy, though the both-feeds reading is inferred from the recovery record rather than an official finding.</li><li>A facility-level power loss cascades immediately to any tenant that lacks independent local generation or an alternate site; the fire never touched the servers, yet the servers still went dark.</li><li>Concentrating critical public services — national statistics, healthcare records, public transport, water management, higher education — in one data center turns a single-site incident into a nationwide disruption.</li><li>When a fire causes structural damage, root-cause analysis can be delayed by months because investigators cannot safely enter until the building is secured, so incident communications must manage a long &#x27;cause unknown&#x27; period.</li><li>Transparency gaps compound impact: the absence of a published affected-customer count or per-organization outage figures leaves affected users and the public without a clear picture of scope.</li></ul>
+
+        <h2>Improvements &amp; remediation</h2>
+        <ul class="tight"><li>Physically separate and fire-compartmentalize the primary and backup power paths so no single fire zone can destroy both, and review detection/suppression coverage in technical/power compartments.</li><li>Encourage or require geographic redundancy and disaster-recovery failover for tenants running critical public-sector workloads, rather than single-site dependency.</li><li>Establish clearer, faster public impact reporting (tenant/customer scope, outage windows) during and after major incidents.</li><li>Harden and stage the power-restoration sequence (temporary power/cooling first, then per-building grid, then full utility-plus-standby topology) with pre-provisioned transformers and UPS to shorten recovery.</li><li>Conduct a post-incident structural/safety review so that future fire-damaged sites can be entered and investigated sooner, shortening the time to root cause.</li></ul>
+
+        <h2>Comprehensive analysis</h2><div class="ca-block"><h3>Failure mechanism: a power-plant fire, not a server fire</h3><p>The defining feature of this incident is that the IT load never burned — the fire was in a rear technical compartment that housed power infrastructure, and it burned part of the facility&#x27;s power supply, producing a total loss of power. The servers were physically intact but electrically dead. This inverts the usual mental model of a data center fire (racks ablaze) and points instead to the power plant as the single most concentrated point of failure: lose it, and a fully healthy compute estate becomes worthless. Published reporting confirms only that &#x27;part of the power supply burnt down&#x27;; that both the normal and standby feeds were lost is inferred from the total, multi-day outage and the need to rebuild with new transformers and UPS. Because the root cause is officially undetermined, the mechanism of ignition remains unknown pending the end-September 2026 draft report.</p></div><div class="ca-block"><h3>Why it cascaded across Dutch public life</h3><p>The outage propagated because of dependency concentration, not because the fire spread. Numerous organizations run production systems at the Almere site with no evident local generation or cross-site <span data-explain="failover" tabindex="0">failover</span>, so a facility power loss became their outage instantly. The victim list is unusually broad for a single building — Utrecht University (down to access passes), Statistics Netherlands, Transdev&#x27;s buses and trams, a regional water board, Surf&#x27;s research-ICT members, IBM Cloud&#x27;s Amsterdam 03, and GP practices locked out of patient records and appointment data. The societal reach came from who was hosted there, turning an infrastructure event into a public-services event.</p></div><div class="ca-block"><h3>Recovery: staged over days to weeks</h3><p>Recovery followed a deliberate ladder. The emergency was controlled the same evening — safety-region all-clear at 20:13 and GRIP 1 at 20:50 on 7 May — and the building was scaled to GRIP 0 and partially released to NorthC teams at 00:35 on 8 May with a phased restoration estimated at up to 72 hours. Temporary redundant power and cooling were activated on 13 May, roughly a week later, in what reporting framed as a six-day facility outage. Durable grid power then came back building-by-building: Building 2 in the week of 25 May, Building 1 partially by end June, with full utility-plus-standby topology (new transformers and UPS, generators as backup) targeted for 17 July 2026 — a date announced in the operator log but not independently confirmed as executed.</p></div><div class="ca-block"><h3>Organizational and systemic factors</h3><p>Two systemic issues stand out. First, redundancy appears to have been defeated by proximity: the total, multi-day power loss and full rebuild imply the primary and backup power were vulnerable to the same event, so the architecture that should have survived a single failure did not (an inference, since press reported only that &#x27;part of the power supply burnt down&#x27;). Second, critical national functions were concentrated at one facility with insufficient tenant-side resilience, so the <span data-explain="blast-radius" tabindex="0">blast radius</span> was national. The record also shows a transparency and investigation lag — no affected-customer count, per-organization outage duration, or damages figure was ever published, and the cause report was delayed to end-September 2026 because the damaged structure had to be secured before investigators could safely enter.</p></div><div class="ca-block"><h3>Cross-incident pattern: the concentrated-power single point of failure</h3><p>This event rhymes with a recurring class of data center outages in which the compute is fine but a shared upstream utility — power distribution, cooling, or a single electrical room — fails and takes everything with it. The lesson repeats across the industry: redundancy only counts if the redundant paths are independent in space and failure mode, and tenant resilience cannot be outsourced entirely to a single facility. The Almere fire is a particularly clean example because the servers demonstrably survived, isolating the failure to the power plant and the dependency graph hanging off it.</p></div>
+
+        <h2>Technical deep-dive</h2>
+        <div class="card">The Almere event is best understood as a power-domain failure with an intact IT domain. A fire in a rear technical compartment — the space carrying the facility&#x27;s power infrastructure — burned part of the power supply and collapsed the site&#x27;s usable power to zero available feeds, keeping the site dark until a temporary redundant supply was stood up on 13 May. Published reporting states only that &#x27;part of the power supply burnt down&#x27; and that no servers or data carriers caught fire; that the event removed both the normal (utility-fed) path and the standby (generator/UPS) path is an engineering inference from the total, multi-day loss of power and the subsequent rebuild — had a standby source survived intact, the site would not have gone fully dark for days. In a correctly independent N+1 or 2N design, a single fire zone should not be able to remove both the normal and the alternate source; the recovery record suggests here it did, which is the clearest engineering signal in the public record even though the ignition cause is still undetermined. The consequence is that downstream distribution (<span data-explain="switchgear" tabindex="0">switchgear</span>, PDUs, rack busways) had no source to distribute, and every tenant without independent onsite generation or a live secondary site went dark despite unburned hardware. Restoration therefore had to rebuild the source layer rather than merely reboot load: temporary power and cooling were activated first (13 May) to keep the shells conditioned, then grid feeds were reintroduced building-by-building (Building 2 in the week of 25 May, Building 1 partial by end June), and finally the intended utility-plus-standby topology was to be reinstated with new transformers and UPS and generators demoted to backup, targeted for 17 July 2026. The multi-week gap between temporary power and full grid reconnection reflects long-lead electrical apparatus (transformers, UPS) and the need to re-establish the standby chain, not a software or data-recovery problem. Two engineering takeaways follow directly: fire compartmentation must guarantee that no single zone contains both the primary and backup power paths, and detection/suppression in power compartments must be sized to prevent a technical-space fire from becoming a total-source-loss event. Definitive design conclusions await NorthC&#x27;s independent investigation and draft cause report expected end-September 2026, after the 27 July–7 August demolition and expert examination.</div>
+
+        <h2>References &amp; provenance</h2>
+        <ul class="refs"><li><span class="chip amber">news</span> <span class="rtitle">NorthC data center outside Amsterdam suffers fire</span><span class="rquote">“Transdev said its bus and tram services were also impacted ... IBM Cloud has also reported issues at the data center hosting its Amsterdam 03 facility.”</span><a href="https://www.datacenterdynamics.com/en/news/northc-data-center-outside-amsterdam-suffers-fire/" target="_blank" rel="noopener nofollow">https://www.datacenterdynamics.com/en/news/northc-data-center-outside-amsterdam-suffers-fire/</a></li><li><span class="chip amber">news</span> <span class="rtitle">Almere data center fire under control; caused outages throughout Netherlands</span><span class="rquote">“No servers or data carriers caught fire, but part of the power supply burnt down.”</span><a href="https://nltimes.nl/2026/05/08/almere-data-center-fire-control-caused-outages-throughout-netherlands" target="_blank" rel="noopener nofollow">https://nltimes.nl/2026/05/08/almere-data-center-fire-control-caused-outages-throughout-netherlands</a></li><li><span class="chip muted">operator-statement</span> <span class="rtitle">Fire in our data center in Almere (running update log)</span><span class="rquote">“On 17 July, the data center will be fully reconnected to the regular grid, with the emergency generators as back-up.”</span><a href="https://www.northcdatacenters.com/en/news/fire-in-our-data-center-in-almere/" target="_blank" rel="noopener nofollow">https://www.northcdatacenters.com/en/news/fire-in-our-data-center-in-almere/</a></li><li><span class="chip amber">news</span> <span class="rtitle">Major fire takes down NorthC data centre for six days</span><span class="rquote">“Major fire takes down NorthC data centre in the Netherlands for six days.”</span><a href="https://www.structureresearch.net/2026/05/20/major-fire-takes-down-northc-data-centre-in-the-netherlands-for-six-days/" target="_blank" rel="noopener nofollow">https://www.structureresearch.net/2026/05/20/major-fire-takes-down-northc-data-centre-in-the-netherlands-for-six-days/</a></li><li><span class="chip amber">news</span> <span class="rtitle">Fire at NorthC data center: all personnel evacuated in time</span><span class="rquote">“At the time of writing, it was unclear how many companies experienced technical issues as a result of the fire.”</span><a href="https://www.techzine.eu/news/infrastructure/141131/fire-at-northc-data-center-all-personnel-evacuated-in-time/" target="_blank" rel="noopener nofollow">https://www.techzine.eu/news/infrastructure/141131/fire-at-northc-data-center-all-personnel-evacuated-in-time/</a></li></ul>
+        <p class="disclaimer">Sourced from public post-incident reports. Quotes are short attributed excerpts for provenance only; the analysis above is original and substantially shorter than its sources. Last verified 2026-08-01.</p>
+
+    </main>
+    <footer><div class="footer-grid"></div><span class="ver" id="versionStamp"></span></footer>
+    <div class="root-gate">
+        <div class="root-card">
+            <h2>🔒 Root access required</h2>
+            <p>The DC Incidents dossier is a root-only module. Sign in with an authorized account to continue.</p>
+            <div class="root-actions">
+                <button id="rootLoginBtn" type="button">Sign In</button>
+                <a href="index.html">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/rz-version.js?v=2026-08-01-gloss"></script>
+    <script src="js/rz-feature-flags.js?v=2026-08-01-gloss" defer></script>
+    <script src="auth.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-mobile-nav.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-cookie-consent.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-explain-db.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-explain.js?v=2026-08-01-gloss" defer></script>
+    <script>
+    (function(){var t=document.getElementById('themeToggle');function a(theme){document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme);var m=document.querySelector('meta[name=\"theme-color\"]');if(m)m.setAttribute('content',theme==='dark'?'#0c1512':'#f4f1e7');}a(localStorage.getItem('theme')||'dark');if(t)t.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme');a(c==='dark'?'light':'dark');});})();
+    (function(){function ag(){if(window._rzAuth&&typeof window._rzAuth.enforceTierFeatureAccess==='function'){window._rzAuth.enforceTierFeatureAccess('dc-incidents');}else{try{var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');var r=s&&s.role,t=s&&s.tier;var passes=!!s&&(r==='root'||t==='root');document.body.classList.toggle('locked',!passes);}catch(e){document.body.classList.add('locked');}}}var b=document.getElementById('rootLoginBtn');if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showRootGatePrompt==='function'){window._rzAuth.showRootGatePrompt('Root account required for the DC Incidents dossier.');}else if(window._rzAuth&&typeof window._rzAuth.showModal==='function'){window._rzAuth.showModal();}});window.addEventListener('rz-auth-change',function(){setTimeout(ag,50);});window.addEventListener('storage',function(e){if(e.key==='rz_premium_session')ag();});ag();setTimeout(ag,60);setTimeout(ag,550);setTimeout(ag,1600);})();
+    (function(){var el=document.getElementById('versionStamp');if(!el)return;var v=window.RZ_VERSION||'1.x.x',d=window.RZ_VERSION_DATE||'',cn=window.RZ_VERSION_CODENAME||'';el.textContent='· ResistanceZero · v'+v+(d?' · '+d:'')+(cn?' · '+cn:'')+' ·';})();
+    (function(){var n=0;function sc(){if(window.RZExplain&&window.RZExplain.scanText&&window.RZ_EXPLAIN_DB){var m=document.getElementById('main-content');if(m)window.RZExplain.scanText(m,140);}else if(n++<40){setTimeout(sc,200);}}setTimeout(sc,350);})();
+    </script>
+
+</body>
+</html>

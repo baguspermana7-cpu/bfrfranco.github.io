@@ -287,7 +287,15 @@ export function AssetIntelligencePage() {
                                         <tr key={r.cls + r.label} className="border-b border-slate-100 dark:border-slate-800/60">
                                             <td className="py-1 text-slate-700 dark:text-slate-200">{r.label} <span className="text-[9px] text-slate-400">· {r.status}</span></td>
                                             <td className="text-right tabular-nums text-slate-500">{r.count.toLocaleString()}</td>
-                                            <td className="text-right"><ScoreValue value={r.health} direction="higher" /></td>
+                                            <td className="text-right"><ScoreValue value={r.health} direction="higher" trace={{
+                                                label: `${r.label} — Health`, value: r.health, unit: '/100', provenance: 'engine', page: 'asset-health',
+                                                formulaTemplate: 'Weibull remaining-life index at the set fleet age × condition — driven by the class MTBF, MTTR and failure probability',
+                                                deps: [
+                                                    { label: 'MTBF', value: r.mtbfHrs, unit: 'h', provenance: 'engine' },
+                                                    { label: 'MTTR', value: r.mttrHrs, unit: 'h', provenance: 'engine' },
+                                                    { label: 'Failure probability', value: r.fpPct, unit: '%', provenance: 'derived' },
+                                                ],
+                                            }} /></td>
                                             <td className="text-right tabular-nums text-slate-500">{r.fpPct}%</td>
                                             <td className="text-right tabular-nums text-slate-500">{r.mtbfHrs ? `${(r.mtbfHrs / 1000).toFixed(0)}k h` : '—'}</td>
                                             <td className="text-right tabular-nums text-slate-500">{r.mttrHrs ? `${r.mttrHrs} h` : '—'}</td>
