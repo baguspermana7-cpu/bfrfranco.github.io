@@ -38,7 +38,7 @@ Date: 2026-08-01 · Method: 5 Opus specialist agents, each live-rendering the ap
 | U2 | MED | Onboarding tour overlaps content + intercepts clicks on every tab | ✅ |
 | U3 | MED | Indonesian/English string mixing on "PRO" UI | ✅ |
 | U4 | MED | "AVAILABILITY 99.9980 2%" wraps mid-number (over-precision) | ✅ |
-| U5 | LOW | rank #0 fixed (+1); Risk/Strategic header ⏸ (no canonical target) | ✅/⏸ |
+| U5 | LOW | rank #0 fixed (+1); Risk/Strategic headers rebuilt to canonical dashboard header (v1.124.2) | ✅ |
 
 ### Skin/design
 | ID | Sev | Finding | Status |
