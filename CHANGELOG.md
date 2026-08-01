@@ -13,6 +13,25 @@ release sections rather than semver.
 
 ---
 
+## v1.123.2 — 2026-08-01 (DC Incidents — de-neon: editorial palette, muted timestamps)
+
+### Changed
+Owner: no neon highlights / AI-design-slop. The dark-theme accent was a bright mint
+(`#7fd1a8`) that glowed against the forest-green background — most glaringly on the SOE
+timestamps (repeated ~15× per incident page) and the timeline dots. Toned the whole accent set
+down to an editorial, desaturated palette in `tools/build-incidents.py`:
+
+- **SOE timestamps** now use `--muted` (quiet grey mono) instead of the accent colour.
+- Dark-theme accents desaturated: green `#7fd1a8 → #6aa588` (sage), gold `#d8b25c → #c9a559`,
+  red `#e0917f → #cf9384`; the map/scatter marker hexes (`_FAC_COL`/`_LOG_COL`) and the geo-map
+  popup link updated to match, so nothing glows.
+- Phase chips kept as restrained thin amber outlines (already editorial).
+
+Root-gated; all 26 pages regenerated. Gates: page-gates CLEAN, script-tags CLEAN,
+incidents-corpus 25/25.
+
+---
+
 ## v1.123.1 — 2026-08-01 (DC Incidents — targeted primary-document pass, 3 more official)
 
 ### Changed

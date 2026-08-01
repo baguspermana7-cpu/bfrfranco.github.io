@@ -97,7 +97,7 @@ CSS = r"""
     [data-theme="dark"] {
         --bg:#0c1512; --surface:#11201a; --surface-2:#16281f; --line:rgba(233,229,216,0.15);
         --text:#e9e5d8; --text-strong:#f5f2e9; --text-body:#c6ccbc; --muted:#8b9484;
-        --cyan:#7fd1a8; --amber:#d8b25c; --green:#7fd1a8; --red:#e0917f; --gold:#d8b25c;
+        --cyan:#6aa588; --amber:#c9a559; --green:#6aa588; --red:#cf9384; --gold:#c9a559;
         --hero-ink:#e9e5d8; --hero-bg:#0f221a; --shadow-deep:rgba(0,0,0,0.5);
     }
     * { box-sizing:border-box; }
@@ -142,7 +142,7 @@ CSS = r"""
     ul.tight li { color:var(--text-body); margin:0.3rem 0; font-size:0.92rem; }
     .soe { list-style:none; margin:0.6rem 0 0; padding:0; }
     .soe li { display:grid; grid-template-columns:170px 1fr; gap:0.7rem; padding:0.5rem 0; border-bottom:1px dashed var(--line); }
-    .soe time { font-family:'JetBrains Mono',monospace; font-size:0.76rem; color:var(--cyan); }
+    .soe time { font-family:'JetBrains Mono',monospace; font-size:0.76rem; color:var(--muted); }
     .soe .ev { color:var(--text-body); font-size:0.9rem; }
     .phase-chip { font-family:'JetBrains Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--amber); border:1px solid var(--amber); border-radius:999px; padding:0.05rem 0.4rem; margin-right:0.4rem; white-space:nowrap; }
     table.metrics { width:100%; border-collapse:collapse; font-size:0.88rem; }
@@ -587,8 +587,8 @@ def hub_category_svg(incidents):
     return f'<div class="viz"><svg viewBox="0 0 {W} {H}" role="img" aria-label="Incidents by category"><title>Incidents by failure category</title>{"".join(bars)}</svg></div>'
 
 
-_FAC_COL = "#d8b25c"   # facility (power/cooling/fire/flood) — gold
-_LOG_COL = "#7fd1a8"   # network / logical (software/network/human) — sage
+_FAC_COL = "#c9a559"   # facility (power/cooling/fire/flood) — gold
+_LOG_COL = "#6aa588"   # network / logical (software/network/human) — sage
 _DOMAIN_LEGEND = (
     '<div class="vz-legend">'
     f'<span class="vz-key"><i style="background:{_FAC_COL}"></i>Facility · power / cooling / fire</span>'
@@ -775,7 +775,7 @@ def hub_geo_map(incidents):
           'var html="<div style=\\"min-width:190px\\"><div style=\\"font-weight:700;font-size:0.86rem;color:#f1f5f9\\">"+esc(p.o)'
           '+"</div><div style=\\"font-size:0.7rem;color:#94a3b8;margin-bottom:5px\\">"+esc(p.d)+" &middot; "+esc(p.loc)+" &middot; "+esc(p.cat)'
           '+"</div><div style=\\"font-size:0.72rem;color:#cbd5e1;margin-bottom:7px\\">"+esc(p.b)+"&hellip;</div>"'
-          '+"<a href=\\"incident-"+p.s+".html\\" style=\\"font-size:0.72rem;color:#7fd1a8;font-weight:600;text-decoration:none\\">Open dossier &rarr;</a></div>";'
+          '+"<a href=\\"incident-"+p.s+".html\\" style=\\"font-size:0.72rem;color:#6aa588;font-weight:600;text-decoration:none\\">Open dossier &rarr;</a></div>";'
           'mk.bindPopup(html,{maxWidth:250});'
           'mk.on("mouseover",function(){this.setStyle({fillOpacity:1,weight:2.2});});'
           'mk.on("mouseout",function(){this.setStyle({fillOpacity:0.8,weight:1.2});});});'
