@@ -13,6 +13,30 @@ release sections rather than semver.
 
 ---
 
+## v1.122.8 — 2026-08-01 (DC Incidents — risk-map & semantic-map made legible)
+
+### Changed
+Owner flagged the hub's **risk map (blast radius × duration)** and **semantic map** as
+unintuitive — bare floating dots with no scale, no labels, no legend, indistinguishable on
+mobile. Rebuilt both scatter visualizations in `tools/build-incidents.py`:
+
+- **Axis scales** — 0–10 ticks + dashed gridlines on both axes; quadrant hints
+  (`worst · wide + long` top-right, `contained` bottom-left) so position reads at a glance.
+- **Labeled dots** — every point tagged with its operator abbreviation (`AWS · 2025`, `SK/Kakao`,
+  `OVHcloud`, `NIRS`, `NorthC`…) via a new `op_abbrev()` helper, instead of anonymous dots.
+- **Deterministic jitter + label de-collision** — incidents sharing an integer blast/duration
+  score (most cluster at 8–10) now fan apart; labels dodge vertically per side with thin
+  leader lines, so the crowded top-right corner is readable.
+- **Domain colour legend** — gold = Facility (power/cooling/fire), sage = Network/logical
+  (software/network/human); ties the maps to the hub filters.
+- **Clickable** — dots and the ranked magnitude bars are now links straight to each incident
+  page; the magnitude bars disambiguate repeat operators by year.
+
+Root-gated; no public-SEO surface. Gates: page-gates CLEAN (35 gated), incidents-corpus 25/25,
+script-tags CLEAN, no horizontal overflow at 360px.
+
+---
+
 ## v1.121.9 — 2026-08-01 (DCMOC — trace-parity probe extended, 116→203 verified)
 
 The ƒx trace-parity gate previously walked only ~7 dashboards, so the many traces on

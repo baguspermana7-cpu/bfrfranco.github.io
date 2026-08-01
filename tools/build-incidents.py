@@ -173,6 +173,16 @@ CSS = r"""
     .vz-tl-t { font-family:'JetBrains Mono',monospace; font-size:8.5px; fill:var(--muted); }
     .vz-hb-lbl { font-family:'IBM Plex Sans',sans-serif; font-size:11px; fill:var(--text-body); }
     .vz-hb-val { font-family:'JetBrains Mono',monospace; font-size:10px; fill:var(--muted); }
+    .vz-tick { font-family:'JetBrains Mono',monospace; font-size:8.5px; fill:var(--muted); }
+    .vz-quad { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.05em; text-transform:uppercase; fill:var(--muted); opacity:0.7; }
+    .vz-pt { font-family:'JetBrains Mono',monospace; font-size:8px; fill:var(--text-body); }
+    .viz a { text-decoration:none; }
+    .viz a:hover .vz-pt { fill:var(--cyan); font-weight:600; }
+    .viz a:hover circle { stroke:var(--text-strong); stroke-width:1.4; }
+    .vz-legend { display:flex; flex-wrap:wrap; gap:0.5rem 1.1rem; margin-top:0.7rem; padding-top:0.6rem; border-top:1px solid var(--line); }
+    .vz-key { display:inline-flex; align-items:center; gap:0.4rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .vz-key i { width:11px; height:11px; border-radius:50%; display:inline-block; }
+    .vz-key-note { font-style:italic; opacity:0.8; }
     .viz-grid3 { display:grid; grid-template-columns:1fr 1fr; gap:0.9rem; }
     @media (max-width:720px){ .viz-grid3 { grid-template-columns:1fr; } }
     .filterbar { display:flex; flex-wrap:wrap; align-items:center; gap:0.4rem 0.6rem; margin:0.9rem 0 0.2rem; }
@@ -418,6 +428,29 @@ def _dur(mins):
 # ─────────── inline-SVG visualizations (data-driven, theme-aware, no runtime lib) ───────────
 import math as _math
 
+_OP_ABBR = [
+    ("amazon", "AWS"), ("aws", "AWS"), ("azure", "Azure"), ("microsoft", "Azure"),
+    ("google", "Google"), ("gcp", "Google"), ("meta", "Meta"), ("facebook", "Meta"),
+    ("cloudflare", "Cloudflare"), ("ovh", "OVHcloud"), ("kakao", "SK/Kakao"), ("sk c", "SK/Kakao"),
+    ("delta", "Delta"), ("british airways", "BA"), ("equinix", "Equinix"), ("dyn", "Dyn"),
+    ("northc", "NorthC"), ("stt", "STT/Tata"), ("tata", "STT/Tata"), ("unisuper", "UniSuper"),
+    ("crowdstrike", "CrowdStrike"), ("nirs", "NIRS"), ("national info", "NIRS"), ("rogers", "Rogers"),
+    ("red sea", "Red Sea"), ("aae", "Red Sea"), ("alibaba", "Alibaba"), ("optus", "Optus"),
+]
+_FACILITY = {"power", "cooling", "fire", "flood"}
+
+
+def op_abbrev(operator):
+    o = (operator or "").lower()
+    for key, ab in _OP_ABBR:
+        if key in o:
+            return ab
+    return (operator or "?").split("(")[0].split(",")[0].strip()[:12]
+
+
+def _domain(cats):
+    return "facility" if any(c in _FACILITY for c in (cats or [])) else "logical"
+
 
 def _pts(vals, cx, cy, r):
     n = len(vals); out = []
@@ -510,10 +543,14 @@ def hub_magnitude_svg(incidents):
     for i, x in enumerate(top):
         y = 8 + i * rowH
         w = (x["_score"] / mx) * 380
-        lbl = (x.get("operator", "") or x.get("slug", ""))[:26]
-        bars.append(f'<text class="vz-hb-lbl" x="8" y="{y+14}">{esc(lbl)}</text>')
-        bars.append(f'<rect class="vz-accent-bar" x="230" y="{y+3}" width="{w:.0f}" height="15" rx="3"/>')
-        bars.append(f'<text class="vz-hb-val" x="{230+w+6:.0f}" y="{y+14}">{x["_score"]:.1f}</text>')
+        yr = (x.get("date", "") or "")[:4]
+        lbl = op_abbrev(x.get("operator", "") or x.get("slug", ""))
+        if yr:
+            lbl = f"{lbl} · {yr}"
+        href = f'incident-{esc(x.get("slug",""))}.html'
+        bars.append(f'<a href="{href}"><text class="vz-hb-lbl" x="8" y="{y+14}">{esc(lbl[:28])}</text>'
+                    f'<rect class="vz-accent-bar" x="230" y="{y+3}" width="{w:.0f}" height="15" rx="3"/>'
+                    f'<text class="vz-hb-val" x="{230+w+6:.0f}" y="{y+14}">{x["_score"]:.1f}</text></a>')
     return f'<div class="viz"><svg viewBox="0 0 {W} {H}" role="img" aria-label="Incidents ranked by magnitude"><title>Ranked by magnitude score</title>{"".join(bars)}</svg></div>'
 
 
@@ -538,25 +575,87 @@ def hub_category_svg(incidents):
     return f'<div class="viz"><svg viewBox="0 0 {W} {H}" role="img" aria-label="Incidents by category"><title>Incidents by failure category</title>{"".join(bars)}</svg></div>'
 
 
+_FAC_COL = "#d8b25c"   # facility (power/cooling/fire/flood) — gold
+_LOG_COL = "#7fd1a8"   # network / logical (software/network/human) — sage
+_DOMAIN_LEGEND = (
+    '<div class="vz-legend">'
+    f'<span class="vz-key"><i style="background:{_FAC_COL}"></i>Facility · power / cooling / fire</span>'
+    f'<span class="vz-key"><i style="background:{_LOG_COL}"></i>Network / logical · software / network / human</span>'
+    '<span class="vz-key vz-key-note">bigger dot = higher magnitude · tap a dot to open the incident</span>'
+    '</div>'
+)
+
+
 def hub_quadrant_svg(incidents):
     if not incidents:
         return ""
-    W = H = 320; pad = 34
-    ax = f'<line class="vz-grid" x1="{pad}" y1="{H-pad}" x2="{W-8}" y2="{H-pad}"/><line class="vz-grid" x1="{pad}" y1="8" x2="{pad}" y2="{H-pad}"/>'
-    ax += f'<text class="vz-lbl" x="{W/2:.0f}" y="{H-6}" text-anchor="middle">Blast radius →</text>'
-    ax += f'<text class="vz-lbl" x="12" y="{H/2:.0f}" text-anchor="middle" transform="rotate(-90 12 {H/2:.0f})">Duration →</text>'
-    dots = []
+    W, H = 384, 336
+    L, R, T, B = 48, 16, 18, 42
+    plotW, plotH = W - L - R, H - T - B
+
+    def px(v):
+        return L + (v / 10) * plotW
+
+    def py(v):
+        return T + plotH - (v / 10) * plotH
+
+    g = [f'<rect x="{L}" y="{T}" width="{plotW}" height="{plotH}" class="vz-grid" fill="none"/>']
+    for t in (0, 5, 10):
+        g.append(f'<line class="vz-grid" x1="{px(t):.0f}" y1="{T}" x2="{px(t):.0f}" y2="{T+plotH}" stroke-dasharray="2 3"/>')
+        g.append(f'<line class="vz-grid" x1="{L}" y1="{py(t):.0f}" x2="{L+plotW}" y2="{py(t):.0f}" stroke-dasharray="2 3"/>')
+        g.append(f'<text class="vz-tick" x="{px(t):.0f}" y="{T+plotH+13}" text-anchor="middle">{t}</text>')
+        g.append(f'<text class="vz-tick" x="{L-7}" y="{py(t)+3:.0f}" text-anchor="end">{t}</text>')
+    g.append(f'<text class="vz-lbl" x="{L+plotW/2:.0f}" y="{H-5}" text-anchor="middle">Blast radius (0–10) →</text>')
+    g.append(f'<text class="vz-lbl" x="13" y="{T+plotH/2:.0f}" text-anchor="middle" transform="rotate(-90 13 {T+plotH/2:.0f})">Outage duration (0–10) →</text>')
+    g.append(f'<text class="vz-quad" x="{L+plotW-5:.0f}" y="{T+12}" text-anchor="end">worst · wide + long</text>')
+    g.append(f'<text class="vz-quad" x="{L+5}" y="{T+plotH-6:.0f}">contained</text>')
+
+    # deterministic jitter so incidents sharing the same integer blast/duration
+    # score fan out instead of stacking on one pixel
+    import hashlib
+    recs = []
     for x in incidents:
         m = x.get("magnitude", {})
-        bx = pad + (float(m.get("blastRadiusScore", 0)) / 10) * (W - pad - 12)
-        dy = (H - pad) - (float(m.get("durationScore", 0)) / 10) * (H - pad - 8)
-        r = 3 + (x["_score"] / 10) * 4
-        dots.append(f'<circle class="vz-accent-dot" cx="{bx:.0f}" cy="{dy:.0f}" r="{r:.1f}"><title>{esc(x.get("operator",""))} — {esc(x.get("date",""))}</title></circle>')
-    return f'<div class="viz"><svg viewBox="0 0 {W} {H}" role="img" aria-label="Blast radius vs duration risk map"><title>Risk map: blast radius × duration (dot size = magnitude)</title>{ax}{"".join(dots)}</svg></div>'
+        h = int(hashlib.md5(x.get("slug", "").encode()).hexdigest(), 16)
+        jx = ((h % 1000) / 1000 - 0.5) * (plotW / 10) * 1.05
+        jy = (((h // 1000) % 1000) / 1000 - 0.5) * (plotH / 10) * 1.05
+        cx = min(L + plotW - 3, max(L + 3, px(float(m.get("blastRadiusScore", 0))) + jx))
+        cy = min(T + plotH - 3, max(T + 3, py(float(m.get("durationScore", 0))) + jy))
+        r = 3.2 + (x["_score"] / 10) * 3.6
+        side = "R" if cx > L + plotW * 0.58 else "L"
+        recs.append({
+            "cx": cx, "cy": cy, "r": r, "ly": cy + 3, "side": side,
+            "col": _FAC_COL if _domain(x.get("category")) == "facility" else _LOG_COL,
+            "ab": op_abbrev(x.get("operator", "")), "href": f'incident-{esc(x.get("slug",""))}.html',
+            "op": x.get("operator", ""), "b": m.get("blastRadiusScore", 0), "d": m.get("durationScore", 0),
+        })
+    # greedy vertical de-collision of labels within each side
+    GAP = 10.5
+    for side in ("L", "R"):
+        col_recs = sorted((d for d in recs if d["side"] == side), key=lambda d: d["ly"])
+        last = -999.0
+        for d in col_recs:
+            if d["ly"] < last + GAP:
+                d["ly"] = last + GAP
+            last = d["ly"]
 
-
-_CAT_HEX = {"power": "#d8b25c", "software": "#d8b25c", "cooling": "#7fd1a8", "network": "#7fd1a8",
-            "flood": "#7fd1a8", "human": "#e0917f", "fire": "#e0917f", "supply": "#d8b25c"}
+    dots = []
+    for d in sorted(recs, key=lambda d: -d["r"]):
+        if d["side"] == "R":
+            tx, anc = d["cx"] - d["r"] - 3, ' text-anchor="end"'
+        else:
+            tx, anc = d["cx"] + d["r"] + 3, ''
+        lead = ""
+        if abs(d["ly"] - (d["cy"] + 3)) > 6:  # label dodged away → thin leader line
+            lx = d["cx"] - d["r"] if d["side"] == "R" else d["cx"] + d["r"]
+            lead = f'<line class="vz-grid" x1="{lx:.0f}" y1="{d["cy"]:.0f}" x2="{tx:.0f}" y2="{d["ly"]-3:.0f}" opacity="0.4"/>'
+        dots.append(
+            f'<a href="{d["href"]}">{lead}<circle cx="{d["cx"]:.0f}" cy="{d["cy"]:.0f}" r="{d["r"]:.1f}" fill="{d["col"]}" fill-opacity="0.9">'
+            f'<title>{esc(d["op"])} — blast {d["b"]}/10 · duration {d["d"]}/10</title></circle>'
+            f'<text class="vz-pt" x="{tx:.0f}" y="{d["ly"]:.0f}"{anc}>{esc(d["ab"])}</text></a>'
+        )
+    return (f'<div class="viz"><svg viewBox="0 0 {W} {H}" role="img" aria-label="Blast radius vs duration risk map">'
+            f'<title>Risk map: blast radius × outage duration</title>{"".join(g)}{"".join(dots)}</svg>{_DOMAIN_LEGEND}</div>')
 
 
 def hub_cluster_svg():
@@ -570,17 +669,28 @@ def hub_cluster_svg():
         return ""
     if not pts:
         return ""
-    W = H = 340; pad = 18
+    W, H = 384, 300
+    pad = 26
     dots = []
     for p in pts:
         x = pad + p["x"] * (W - 2 * pad)
         y = pad + (1 - p["y"]) * (H - 2 * pad)
-        cat = (p.get("category") or ["software"])[0]
-        col = _CAT_HEX.get(cat, "#8b9484")
-        r = 4 + (float(p.get("score", 0)) / 10) * 4
-        dots.append(f'<circle cx="{x:.0f}" cy="{y:.0f}" r="{r:.1f}" fill="{col}" fill-opacity="0.85"><title>{esc(p.get("operator",""))} ({esc(cat)})</title></circle>')
+        col = _FAC_COL if _domain(p.get("category")) == "facility" else _LOG_COL
+        r = 3.6 + (float(p.get("score", 0)) / 10) * 3.4
+        ab = op_abbrev(p.get("operator", ""))
+        href = f'incident-{esc(p.get("slug",""))}.html'
+        if x > W * 0.62:
+            tx, anc = x - r - 3, ' text-anchor="end"'
+        else:
+            tx, anc = x + r + 3, ''
+        dots.append(
+            f'<a href="{href}"><circle cx="{x:.0f}" cy="{y:.0f}" r="{r:.1f}" fill="{col}" fill-opacity="0.88">'
+            f'<title>{esc(p.get("operator",""))} — near-by incidents share a failure signature</title></circle>'
+            f'<text class="vz-pt" x="{tx:.0f}" y="{y+3:.0f}"{anc}>{esc(ab)}</text></a>'
+        )
     return (f'<div class="viz"><svg viewBox="0 0 {W} {H}" role="img" aria-label="Semantic similarity map of incidents">'
-            f'<title>Semantic map — incidents near each other share a failure signature (from the vector index)</title>{"".join(dots)}</svg></div>')
+            f'<title>Semantic map — incidents near each other share a failure signature</title>'
+            f'<rect x="1" y="1" width="{W-2}" height="{H-2}" class="vz-grid" fill="none" rx="8"/>{"".join(dots)}</svg>{_DOMAIN_LEGEND}</div>')
 
 
 def render_incident(inc, rank):
