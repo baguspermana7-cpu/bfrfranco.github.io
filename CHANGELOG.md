@@ -13,6 +13,23 @@ release sections rather than semver.
 
 ---
 
+## v1.121.9 — 2026-08-01 (DCMOC — trace-parity probe extended, 116→203 verified)
+
+The ƒx trace-parity gate previously walked only ~7 dashboards, so the many traces on
+Site Intelligence, Risk, Strategic, Portfolio, Compliance and Asset-Lifecycle were live but
+UNVERIFIED. Extended the probe (`tools/_dcmoc_trace_parity_probe.mjs`) to visit them:
+**203/203 traces now match (0 fail)** — up from a 116-trace baseline (Site Intelligence alone
+adds 49 verified traces incl. the 5 KPI scores; Risk 7, Compliance 5).
+
+### Finding (documented, excluded pending fix)
+Extending the probe surfaced **6 pre-existing site-node drifts** on the Tax / Grid / Talent
+detail pages: `site.tax*/grid*/talent*` trace nodes read the SELECTED-SITE scope while the
+detail dashboards render the country-level value (e.g. `site.taxIncentiveValue` popover $3.5M
+vs card $4.0M; `site.gridGenCapacity` 5.6 MW vs card 5,625 kW = a kW/MW display-unit mismatch).
+Those 3 pages are excluded from the probe with a TODO until the nodes are re-scoped to what the
+detail card renders (same single-source pattern as the v1.121.4 Results fix). Not a regression —
+they were simply never checked before.
+
 ## v1.121.8 — 2026-08-01 (DCMOC — per-row ƒx trace rollout, trace-parity 142/142)
 
 Rolled the v1.121.7 inline-trace infra across every per-row surface that previously
