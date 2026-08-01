@@ -11536,10 +11536,16 @@
                  * Pulls regional salary from RZEngine.data.salaryBenchmarks and applies fully-loaded mult of 1.30.
                  */
                 staffingCostAnnual: function (headcount, region, role) {
-                    var r = (region || 'US').toUpperCase();
+                    var code = (region || 'US').toUpperCase();
                     var roleKey = role || 'dcTechMid';
                     var bench = DATA.salaryBenchmarks[roleKey];
-                    var salary = (bench && bench[r]) || (bench && bench.US) || 75100;
+                    // salaryBenchmarks is keyed by REGION (US/EU/APAC/LATAM). Callers pass
+                    // either a region key directly OR an ISO-2 country code ('ID','SG','DE'…) —
+                    // resolve the country to its region so non-US countries don't fall back to
+                    // the US salary. A direct region key still maps to itself (back-compat).
+                    var regionKey = (bench && bench[code] != null) ? code
+                                  : ((DATA.countries[code] && DATA.countries[code].region) || 'US');
+                    var salary = (bench && bench[regionKey]) || (bench && bench.US) || 75100;
                     return Math.round((headcount || 0) * salary * DATA.staffingLoadFactor);
                 },
 
@@ -11574,7 +11580,16 @@
                     var hrs = DATA.hoursPerYear;
                     var pueVal = pue || DATA.pueDefaults.airCooledTier3;
 
-                    var power = RZEngine.models.opex.powerCostAnnual(mw, pue, rdata.powerKwh, hrs, {
+                    // C5: single-source the electricity tariff with opex.fullBreakdown — both
+                    // engines price power off the country-level economy.electricityRate (the more
+                    // specific/sourced rate) so the two never disagree. Fall back to the region
+                    // rate when the country (or its rate) is unavailable (back-compat).
+                    var countryC5 = DATA.countries[code];
+                    var powerRate = (countryC5 && countryC5.economy && countryC5.economy.electricityRate != null)
+                                  ? countryC5.economy.electricityRate
+                                  : rdata.powerKwh;
+
+                    var power = RZEngine.models.opex.powerCostAnnual(mw, pue, powerRate, hrs, {
                         ppaRate: opts.ppaRate, touMultiplier: opts.touMultiplier, demandChargeAnnual: opts.demandChargeAnnual
                     });
                     // A6-56: consume cooling efficiency — better climate/ΔT trims the cooling share of power.
@@ -11715,7 +11730,7 @@
                             line('carbon', 'Carbon Levy', carbon, 'USD/yr', Math.round(carbonTonnes) + ' tCO₂ × grid price', true)
                         ]},
                         { group: 'People', lines: [
-                            line('manpower', 'In-house Manpower', manpower, 'USD/yr', fte + ' FTE × loaded local salary', true)
+                            line('manpower', 'In-house Manpower', manpower, 'USD/yr', fte + ' FTE × loaded regional salary (' + ((country && country.region) || 'US') + ')', true)
                         ]},
                         { group: 'Contracts & Maintenance', lines: [
                             line('outsourcedOm', 'Outsourced M&E O&M', outsourcedOm, 'USD/yr', strat.label + ' · ' + strat.contractSplitPct + '% contract', false),

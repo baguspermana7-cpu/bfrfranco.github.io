@@ -11,7 +11,7 @@ export interface KpiCardProps {
     value: string;
     sub?: string;
     icon: React.ElementType;
-    accent?: 'cyan' | 'emerald' | 'violet' | 'amber' | 'rose' | 'blue' | 'info' | 'data' | 'signal' | 'alert' | 'mint';
+    accent?: 'cyan' | 'emerald' | 'amber' | 'rose' | 'blue' | 'info' | 'data' | 'signal' | 'alert' | 'mint';
     series?: number[];
     onClick?: () => void;
     tip?: string;
@@ -39,7 +39,6 @@ const ACCENTS: Record<string, { text: string; iconBg: string; spark: string }> =
     emerald: { text: 'text-rz-data', iconBg: 'bg-rz-data/10', spark: '#00FF88' },
     blue: { text: 'text-rz-info', iconBg: 'bg-rz-info/10', spark: '#00DDFF' },
     amber: { text: 'text-rz-signal', iconBg: 'bg-rz-signal/10', spark: '#FFAA00' },
-    violet: { text: 'text-rz-mint', iconBg: 'bg-rz-mint/10', spark: '#7DDDB4' },
     rose: { text: 'text-rz-alert', iconBg: 'bg-rz-alert/10', spark: '#FF3030' },
 };
 

@@ -197,7 +197,7 @@ export function StaffingDashboard() {
                             </div>
                             <div className="bg-slate-50 dark:bg-slate-950/40 rounded-lg p-3 border border-slate-100 dark:border-slate-800">
                                 <div className="text-[10px] text-slate-500 uppercase font-bold flex items-center gap-1">Shift Operations <Tooltip content={`Control-room / DCO shift positions — this presence does not vendor out. Basis: ${opsModel.roles.shiftOpsBasis}. The 4.2 FTE/position factor covers rotation, leave and shrinkage (Uptime Institute).`} /></div>
-                                <div className="text-lg font-bold text-indigo-600 dark:text-indigo-400 mt-1 tabular-nums">{opsModel.roles.shiftOpsFte} FTE</div>
+                                <div className="text-lg font-bold text-rz-info mt-1 tabular-nums">{opsModel.roles.shiftOpsFte} FTE</div>
                                 <div className="text-[10px] text-slate-500 leading-tight" title={opsModel.roles.shiftOpsBasis}>{opsModel.roles.shiftOpsBasis}</div>
                             </div>
                             <div className="bg-slate-50 dark:bg-slate-950/40 rounded-lg p-3 border border-slate-100 dark:border-slate-800">
@@ -471,7 +471,7 @@ export function StaffingDashboard() {
 
                         <div className="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm dark:shadow-none flex flex-col">
                             <div className="flex justify-between items-start mb-2">
-                                <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                                <div className="p-2 rounded-lg bg-rz-info/10 text-rz-info">
                                     <TrendingUp className="w-5 h-5" />
                                 </div>
                                 <span className="text-xs text-slate-400 flex items-center gap-1">5-Year TCO <Tooltip content="Total Cost of Ownership over 5 years with labor escalation factored in" /></span>
@@ -533,7 +533,7 @@ export function StaffingDashboard() {
                                         ☁️ Afternoon
                                         <span className="block text-[9px] font-normal ml-2 opacity-70">14:00 — 22:00</span>
                                     </div>
-                                    <div className="bg-indigo-500/10 border-l-4 border-indigo-500 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-500" title="Night shift: 22:00-06:00. Skeleton crew for monitoring; attracts night-shift allowance.">
+                                    <div className="bg-rz-info/10 border-l-4 border-rz-info flex items-center justify-center text-xs font-bold text-rz-info" title="Night shift: 22:00-06:00. Skeleton crew for monitoring; attracts night-shift allowance.">
                                         🌙 Night
                                         <span className="block text-[9px] font-normal ml-2 opacity-70">22:00 — 06:00</span>
                                     </div>
@@ -544,7 +544,7 @@ export function StaffingDashboard() {
                                         ☀️ Day
                                         <span className="block text-[9px] font-normal ml-2 opacity-70">06:00 — 18:00</span>
                                     </div>
-                                    <div className="bg-indigo-500/10 border-l-4 border-indigo-500 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-500" title="Night shift: 18:00-06:00. 12-hour overnight monitoring; attracts night-shift allowance.">
+                                    <div className="bg-rz-info/10 border-l-4 border-rz-info flex items-center justify-center text-xs font-bold text-rz-info" title="Night shift: 18:00-06:00. 12-hour overnight monitoring; attracts night-shift allowance.">
                                         🌙 Night
                                         <span className="block text-[9px] font-normal ml-2 opacity-70">18:00 — 06:00</span>
                                     </div>

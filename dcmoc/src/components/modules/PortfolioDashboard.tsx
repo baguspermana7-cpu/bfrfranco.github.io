@@ -53,8 +53,8 @@ export default function PortfolioDashboard() {
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                        <div className="p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-xl">
-                            <Layers className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+                        <div className="p-2 bg-rz-info/10 rounded-xl">
+                            <Layers className="w-6 h-6 text-rz-info" />
                         </div>
                         Multi-Site Portfolio
                         <Tooltip content="Analyze and compare up to 5 data center sites across financial, staffing, risk, and carbon dimensions to optimize portfolio allocation." />
@@ -76,7 +76,7 @@ export default function PortfolioDashboard() {
                     <button
                         onClick={store.addSite}
                         disabled={store.sites.length >= 5}
-                        className="px-3 py-2 text-xs font-medium bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-400 text-white rounded-lg transition-colors flex items-center gap-1.5"
+                        className="px-3 py-2 text-xs font-medium bg-rz-signal hover:bg-rz-signal/90 disabled:bg-slate-400 text-black rounded-lg transition-colors flex items-center gap-1.5"
                         title="Add a new blank site to the portfolio (max 5 sites)"
                     >
                         <Plus className="w-3.5 h-3.5" />

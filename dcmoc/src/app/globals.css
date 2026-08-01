@@ -145,3 +145,19 @@ body {
     overflow: visible !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Reduced-motion — honour the OS "reduce motion" preference (parent-site
+   pattern). Neutralize animations/transitions so nothing spins, slides, or
+   auto-scrolls for motion-sensitive users. design.md accessibility mandate.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

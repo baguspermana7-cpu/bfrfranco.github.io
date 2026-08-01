@@ -731,7 +731,7 @@ function ScorecardTab({ result, tier, coolingType }: { result: ReturnType<typeof
                                 cx="60" cy="60" r="52" fill="none" strokeWidth="8"
                                 strokeDasharray={`${(result.overallScore / 100) * 327} 327`}
                                 strokeLinecap="round"
-                                className={result.overallGrade === 'A' ? 'text-emerald-500' : result.overallGrade === 'B' ? 'text-blue-500' : result.overallGrade === 'C' ? 'text-yellow-500' : result.overallGrade === 'D' ? 'text-orange-500' : 'text-red-500'}
+                                className={result.overallGrade === 'A' ? 'text-emerald-500' : result.overallGrade === 'B' ? 'text-rz-info' : result.overallGrade === 'C' ? 'text-yellow-500' : result.overallGrade === 'D' ? 'text-orange-500' : 'text-red-500'}
                                 stroke="currentColor"
                             />
                         </svg>
@@ -800,7 +800,7 @@ function ScorecardTab({ result, tier, coolingType }: { result: ReturnType<typeof
                             <div className="text-xs text-slate-400 dark:text-slate-500 mt-1 flex items-center justify-center gap-0.5">{catScore.score}/100 <InfoTooltip content={TOOLTIP_TEXTS.categoryScore} /></div>
                             <div className="mt-2 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                                 <div
-                                    className={clsx('h-full rounded-full transition-all', catScore.grade === 'A' ? 'bg-emerald-500' : catScore.grade === 'B' ? 'bg-blue-500' : catScore.grade === 'C' ? 'bg-yellow-500' : catScore.grade === 'D' ? 'bg-orange-500' : 'bg-red-500')}
+                                    className={clsx('h-full rounded-full transition-all', catScore.grade === 'A' ? 'bg-emerald-500' : catScore.grade === 'B' ? 'bg-rz-info' : catScore.grade === 'C' ? 'bg-yellow-500' : catScore.grade === 'D' ? 'bg-orange-500' : 'bg-red-500')}
                                     style={{ width: `${catScore.score}%` }}
                                 />
                             </div>

@@ -50,11 +50,20 @@ interface PortfolioStore {
 // ─── PERSISTENCE ────────────────────────────────────────────
 const STORAGE_KEY = 'dcmoc_portfolio';
 
+/* B1: clamp a site's IT load to the same sane band as the simulation store
+ * [100, 500000] kW. A 0/NaN/raw value would seed ÷0 → $NaN in downstream
+ * per-kW CAPEX/OPEX math. Applied on set, import, and rehydrate. */
+const clampItLoad = (v: unknown): number =>
+    Math.max(100, Math.min(500000, Number.isFinite(v as number) ? (v as number) : 100));
+
 const loadFromStorage = (): SiteConfig[] => {
     if (typeof window === 'undefined') return [];
     try {
         const raw = localStorage.getItem(STORAGE_KEY);
-        return raw ? JSON.parse(raw) : [];
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed)
+            ? parsed.map((s: SiteConfig) => ({ ...s, itLoad: clampItLoad(s?.itLoad) }))
+            : [];
     } catch { return []; }
 };
 
@@ -104,7 +113,9 @@ export const usePortfolioStore = create<PortfolioStore>((set, get) => ({
     },
 
     updateSite: (id, updates) => {
-        const updated = get().sites.map(s => s.id === id ? { ...s, ...updates, savedAt: Date.now() } : s);
+        // B1: clamp itLoad on set so a raw/0 edit can't seed ÷0 downstream.
+        const safeUpdates = updates.itLoad !== undefined ? { ...updates, itLoad: clampItLoad(updates.itLoad) } : updates;
+        const updated = get().sites.map(s => s.id === id ? { ...s, ...safeUpdates, savedAt: Date.now() } : s);
         set({ sites: updated });
         saveToStorage(updated);
     },
@@ -136,7 +147,7 @@ export const usePortfolioStore = create<PortfolioStore>((set, get) => ({
             label: `${simStore.selectedCountry?.name || 'Unknown'} DC`,
             countryId: simStore.selectedCountry?.id || 'ID',
             tierLevel: simStore.inputs.tierLevel,
-            itLoad: simStore.inputs.itLoad,
+            itLoad: clampItLoad(simStore.inputs.itLoad), // B1: clamp on import
             coolingType: simStore.inputs.coolingType,
             shiftModel: simStore.inputs.shiftModel,
             staffingModel: simStore.inputs.staffingModel,

@@ -228,7 +228,11 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
 
         if (key === 'building') multiplier *= buildMult * rackMult * rackFormFactor;
         else if (key === 'seismic') multiplier *= seismicMult * buildMult;
-        else if (key === 'electrical') multiplier *= redMult * rackMult * upsMult * powerUplift;
+        // C4 fix: upsMult belongs to the `ups` category ONLY. Applying it to
+        // `electrical` too double-counted the UPS technology premium (inflated the
+        // switchgear/distribution line +50% on top of the ups line). Reference
+        // engine scopes upsMult to `ups`. Keep the real electrical drivers.
+        else if (key === 'electrical') multiplier *= redMult * rackMult * powerUplift;
         else if (key === 'ups') multiplier *= redMult * rackMult * upsMult * powerUplift;
         else if (key === 'generator') multiplier *= redMult * fuelMult * genMult * powerUplift * gensetCapMult;
         else if (key === 'cooling') multiplier *= coolMult * rackMult;
@@ -290,6 +294,13 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
      * (engine-primary, capex-data twin fallback). */
     const qm = (map: Record<string, number>, engineMap: Record<string, number> | undefined, val: string | undefined, def: string): number =>
         ((engineMap ?? map)[val ?? def]) || 1.0;
+    // TODO(C8): power-distribution/transformer (and other FOM) multipliers are
+    // applied to `currentTotal` (all disciplines) rather than scoped to their
+    // owning category (electrical/transformer). This over-scopes non-default picks.
+    // Not fixed here: rescoping requires moving multiplier application into the
+    // per-category cost loop, which re-baselines CAPEX for non-default configs and
+    // is not safely verifiable within this defect batch. Baseline default is
+    // unaffected (all factors 1.0 → `qualityM === 1.0` → block skipped).
     const qualityM =
         qm(distributionMultipliers, cd.fomDistMult, input.powerDistribution, 'busway') *
         qm(pduMultipliers, cd.fomPduMult, input.pduType, 'monitored') *
@@ -365,7 +376,7 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
         fomTotal,
         pue,
         metrics: {
-            perKw: currentTotal / itLoad,
+            perKw: itLoad > 0 ? currentTotal / itLoad : 0, // B1: guard ÷0 → no $NaN/Infinity
             annualEnergy,
             floorSpace,
             racks,

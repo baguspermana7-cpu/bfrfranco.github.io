@@ -161,7 +161,7 @@ const CATEGORY_COLORS: Record<ComplianceCategory, string> = {
     fire: 'bg-red-500',
     electrical: 'bg-amber-500',
     environmental: 'bg-green-500',
-    building: 'bg-blue-500',
+    building: 'bg-rz-info',
     'data-protection': 'bg-rz-mint',
     telecom: 'bg-cyan-500',
 };

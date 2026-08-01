@@ -26,7 +26,7 @@ export const BENCHMARK_CATEGORIES: Record<BenchmarkCategory, { label: string; co
     energy: { label: 'Energy Efficiency', color: '#10b981', darkColor: '#34d399' },
     staffing: { label: 'Staffing', color: '#3b82f6', darkColor: '#60a5fa' },
     financial: { label: 'Financial', color: '#f59e0b', darkColor: '#fbbf24' },
-    availability: { label: 'Availability', color: '#8b5cf6', darkColor: '#a78bfa' },
+    availability: { label: 'Availability', color: '#22d3ee', darkColor: '#67e8f9' },
     carbon: { label: 'Carbon & ESG', color: '#ef4444', darkColor: '#f87171' },
 };
 

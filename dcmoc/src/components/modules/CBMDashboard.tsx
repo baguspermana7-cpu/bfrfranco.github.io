@@ -16,7 +16,7 @@ const CBM_NPV_RED_USD = 0;
 
 const SENSOR_COLORS: Record<SensorCategory, string> = {
     'temperature': 'bg-red-500',
-    'humidity': 'bg-blue-500',
+    'humidity': 'bg-rz-info',
     'power-quality': 'bg-amber-500',
     'vibration': 'bg-orange-500',
     'fluid-leak': 'bg-cyan-500',

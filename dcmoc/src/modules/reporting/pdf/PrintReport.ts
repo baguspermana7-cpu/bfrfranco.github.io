@@ -21,7 +21,7 @@ export interface StandardReport extends PillarReport {
 }
 
 const NAVY = '#1e3a5f';
-const SECTION_COLORS = ['#10b981', '#f59e0b', '#3b82f6', '#8b5cf6', '#ef4444', '#14b8a6', '#0ea5e9', '#d97706'];
+const SECTION_COLORS = ['#10b981', '#f59e0b', '#3b82f6', '#22d3ee', '#ef4444', '#14b8a6', '#0ea5e9', '#d97706'];
 const TONES = {
     info: { bg: '#eff6ff', border: '#bfdbfe', title: '#1e40af' },
     good: { bg: '#ecfdf5', border: '#a7f3d0', title: '#065f46' },

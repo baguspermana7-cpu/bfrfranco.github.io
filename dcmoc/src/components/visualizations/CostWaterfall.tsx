@@ -28,7 +28,7 @@ export function CostWaterfall({ staffing, currency, trainingCostMonthly = 0, tur
     const vendor = vendorCostMonthly;
 
     const categories = [
-        { label: 'Base Salary', value: totalBase, color: 'bg-blue-500', text: 'text-blue-400', desc: 'Core monthly salaries for all FTEs.' },
+        { label: 'Base Salary', value: totalBase, color: 'bg-rz-info', text: 'text-rz-info', desc: 'Core monthly salaries for all FTEs.' },
         { label: 'Overtime / Loading', value: totalOT, color: 'bg-amber-500', text: 'text-amber-400', desc: 'Variable costs from shift patterns & holidays.' },
         { label: 'Social Security', value: totalSocial, color: 'bg-rz-mint', text: 'text-rz-mint', desc: 'Pension, Healthcare, BPJS contributions.' },
         { label: 'Allowances', value: totalBenefits, color: 'bg-rz-data', text: 'text-rz-data', desc: 'Transport, Meal, Housing allowances.' },

@@ -229,7 +229,7 @@ export function TierDashboard() {
                     {(['power', 'cooling', 'network', 'physical', 'monitoring'] as const).map((k) => (
                         <div key={k} className="flex items-center gap-2 text-xs">
                             <span className="w-24 text-slate-600 dark:text-slate-300 capitalize flex items-center gap-1">{k}<Tooltip content={SUBSCORE_TIPS[k]} /></span>
-                            <div className="flex-1 h-2 rounded bg-slate-100 dark:bg-slate-800"><div className="h-2 rounded bg-indigo-500" style={{ width: `${scores[k]}%` }} /></div>
+                            <div className="flex-1 h-2 rounded bg-slate-100 dark:bg-slate-800"><div className="h-2 rounded bg-rz-info" style={{ width: `${scores[k]}%` }} /></div>
                             <span className="w-10 text-right tabular-nums text-slate-500">{scores[k]}</span>
                         </div>
                     ))}
@@ -1123,10 +1123,10 @@ export function SparesDashboard() {
                                     {leadHit ? (
                                         <button type="button" onClick={() => patchOv(r.classKey, { leadWeeks: leadHit.weeks })}
                                             title="Apply as this class's lead-time override (Lead wk column)"
-                                            className={`${leverBtn} group transition-colors hover:border-blue-400 dark:hover:border-blue-500`}>
+                                            className={`${leverBtn} group transition-colors hover:border-rz-info dark:hover:border-rz-info`}>
                                             <span className={leverChip}>Lead {r.leadWeeks} → {leadHit.weeks} wk</span>
                                             <span className={leverTxt}>Shorten lead time to {leadHit.weeks} wk (vendor stocking/consignment contract) → adapter re-run: fill <b className="tabular-nums">{fillPct(leadHit.row.fillAchieved)}</b> ≥ target, Q* {leadHit.row.qStar}, annual cost {money(leadHit.row.annualCost)} (vs {money(r.annualCost)}). Click to apply the override.</span>
-                                            <span className="mt-0.5 shrink-0 text-[9px] font-semibold text-slate-400 group-hover:text-blue-500">apply →</span>
+                                            <span className="mt-0.5 shrink-0 text-[9px] font-semibold text-slate-400 group-hover:text-rz-info">apply →</span>
                                         </button>
                                     ) : leadFloor ? (
                                         /* honest-unreachable: even the shortest lead option misses the target */
@@ -1142,10 +1142,10 @@ export function SparesDashboard() {
                                     )}
                                     {/* Navigation ↗ ke surface maintenance (MTTR/SLA levers hidup di sana) */}
                                     <button type="button" onClick={() => useSimulationStore.getState().actions.setActiveTab('maint')}
-                                        className={`${leverBtn} group transition-colors hover:border-blue-400 dark:hover:border-blue-500`}>
+                                        className={`${leverBtn} group transition-colors hover:border-rz-info dark:hover:border-rz-info`}>
                                         <span className={leverChip}>Maintenance ↗</span>
                                         <span className={leverTxt}>MTTR {r.mttr} h is engine data (IEEE-493) — response/SLA levers & maintenance strategy are analyzed with measured detail in Maintenance › Spares/SLA.</span>
-                                        <span className="mt-0.5 shrink-0 text-[9px] font-semibold text-slate-400 group-hover:text-blue-500">open →</span>
+                                        <span className="mt-0.5 shrink-0 text-[9px] font-semibold text-slate-400 group-hover:text-rz-info">open →</span>
                                     </button>
                                 </div>
                             </div>

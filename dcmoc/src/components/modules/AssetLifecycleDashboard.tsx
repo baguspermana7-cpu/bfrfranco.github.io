@@ -15,7 +15,7 @@ import { ExportPDFButton } from '@/components/ui/ExportPDFButton';
 
 const CATEGORY_COLORS: Record<string, string> = {
     'Critical Power': 'bg-red-500',
-    'Cooling': 'bg-blue-500',
+    'Cooling': 'bg-rz-info',
     'Fire Safety': 'bg-amber-500',
     'Fuel System': 'bg-orange-500',
     'Water Treatment': 'bg-cyan-500',
@@ -227,8 +227,8 @@ export default function AssetLifecycleDashboard() {
             <div className="flex items-center justify-between">
                 <div>
                     <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                        <div className="p-2 bg-blue-500/10 rounded-xl">
-                            <LineChartIcon className="w-6 h-6 text-blue-500" />
+                        <div className="p-2 bg-rz-info/10 rounded-xl">
+                            <LineChartIcon className="w-6 h-6 text-rz-info" />
                         </div>
                         Asset Lifecycle Curves
                     </h2>
@@ -292,14 +292,14 @@ export default function AssetLifecycleDashboard() {
             </div>
 
             {/* Narrative Summary */}
-            <div className="bg-indigo-50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-800 rounded-xl p-4">
+            <div className="bg-rz-info/5 dark:bg-rz-info/10 border border-rz-info/20 dark:border-rz-info/30 rounded-xl p-4">
                 <div className="flex gap-3">
-                    <div className="p-2 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg h-fit">
-                        <Activity className="w-5 h-5 text-indigo-700 dark:text-indigo-400" />
+                    <div className="p-2 bg-rz-info/10 dark:bg-rz-info/20 rounded-lg h-fit">
+                        <Activity className="w-5 h-5 text-rz-info" />
                     </div>
                     <div>
-                        <h4 className="font-semibold text-indigo-900 dark:text-indigo-200 mb-1 flex items-center gap-1">Portfolio Assessment <Tooltip content="AI-generated narrative summarizing the facility's asset portfolio status, upcoming replacement events, and overall lifecycle cost outlook." /></h4>
-                        <p className="text-sm text-indigo-800 dark:text-indigo-300 leading-relaxed">
+                        <h4 className="font-semibold text-rz-info mb-1 flex items-center gap-1">Portfolio Assessment <Tooltip content="AI-generated narrative summarizing the facility's asset portfolio status, upcoming replacement events, and overall lifecycle cost outlook." /></h4>
+                        <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
                             This facility manages {result.assets.length} asset types with a total portfolio value of {fmtMoney(result.totalAcquisitionCost)}.
                             {' '}The average asset age is {ps.avgAssetAge} years, with {ps.oldestAsset} being the closest to end-of-life.
                             {' '}Next scheduled replacement: {ps.nextReplacement.name} at Year {ps.nextReplacement.year} ({fmtMoney(ps.nextReplacement.cost)}).
@@ -413,7 +413,7 @@ export default function AssetLifecycleDashboard() {
                                         <span className={clsx("w-10 text-right text-xs font-mono", isPeak ? "text-red-500 font-bold" : "text-slate-500")}>Y{year}</span>
                                         <div className="flex-1 h-5 bg-slate-100 dark:bg-slate-700 rounded overflow-hidden">
                                             {total > 0 && (
-                                                <div className={clsx("h-full rounded", isPeak ? "bg-red-500" : "bg-blue-500")} style={{ width: `${pct}%` }} />
+                                                <div className={clsx("h-full rounded", isPeak ? "bg-red-500" : "bg-rz-info")} style={{ width: `${pct}%` }} />
                                             )}
                                         </div>
                                         <span className={clsx("w-16 text-right text-xs font-mono", isPeak ? "text-red-500 font-bold" : "text-slate-700 dark:text-slate-300")}>{total > 0 ? fmtMoney(total) : '—'}</span>
@@ -716,7 +716,7 @@ export default function AssetLifecycleDashboard() {
                                         <div key={p.d} className="flex items-center gap-2 text-[11px]">
                                             <span className={clsx("w-24 shrink-0 font-mono", p.d === ENGINE_DEFER_YEARS ? "font-bold text-red-600 dark:text-red-400" : "text-slate-500 dark:text-slate-400")}>+{p.d} yr ×{p.penaltyFactor.toFixed(2)}</span>
                                             <div className="flex-1 h-3 bg-slate-100 dark:bg-slate-800 rounded overflow-hidden">
-                                                <div className={clsx("h-full rounded", p.d === 0 ? "bg-blue-500" : "bg-red-500/80")} style={{ width: `${(p.npv / maxNpv) * 100}%` }} />
+                                                <div className={clsx("h-full rounded", p.d === 0 ? "bg-rz-info" : "bg-red-500/80")} style={{ width: `${(p.npv / maxNpv) * 100}%` }} />
                                             </div>
                                             <span className="w-44 shrink-0 text-right font-mono text-slate-700 dark:text-slate-300">
                                                 {fmtMoney(p.npv)}{p.d > 0 && <span className={delta > 0 ? " text-red-600 dark:text-red-400" : " text-emerald-600 dark:text-emerald-400"}> ({delta >= 0 ? '+' : '−'}{fmtMoney(Math.abs(delta))})</span>}

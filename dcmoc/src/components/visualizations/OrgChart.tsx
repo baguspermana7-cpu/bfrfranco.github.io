@@ -22,10 +22,10 @@ interface NodeProps {
 
 // Static color map — avoids dynamic Tailwind class generation issues
 const COLOR_MAP: Record<string, { card: string; icon: string }> = {
-    purple:  { card: 'bg-rz-mint/10 border-rz-mint/40',      icon: 'bg-rz-mint/20 text-rz-mint' },
+    mint:    { card: 'bg-rz-mint/10 border-rz-mint/40',      icon: 'bg-rz-mint/20 text-rz-mint' },
     slate:   { card: 'bg-slate-800/30 border-slate-700',     icon: 'bg-slate-500/20 text-slate-400' },
     cyan:    { card: 'bg-cyan-950/30 border-cyan-800',       icon: 'bg-cyan-500/20 text-cyan-400' },
-    blue:    { card: 'bg-blue-950/30 border-blue-800',       icon: 'bg-blue-500/20 text-blue-400' },
+    blue:    { card: 'bg-rz-info/10 border-rz-info/40',       icon: 'bg-rz-info/20 text-rz-info' },
     emerald: { card: 'bg-rz-data/10 border-rz-data/40',      icon: 'bg-rz-data/20 text-rz-data' },
     amber:   { card: 'bg-amber-950/30 border-amber-800',     icon: 'bg-amber-500/20 text-amber-400' },
 };
@@ -138,7 +138,7 @@ export function OrgChart({ staffing, countryName }: OrgChartProps) {
             <p className="text-xs text-slate-500 dark:text-slate-400 mb-8">Employed FTE (incl. shift relief &amp; shrinkage) — higher than the modeled base composition by design</p>
 
             <div className="flex flex-col items-center min-w-[800px]">
-                <OrgNode role="Facility Manager" count={1} color="purple" salary={getSalary('shift-lead') ? (getSalary('shift-lead')! * 1.5) : undefined} utilization={0.95}>
+                <OrgNode role="Facility Manager" count={1} color="mint" salary={getSalary('shift-lead') ? (getSalary('shift-lead')! * 1.5) : undefined} utilization={0.95}>
                     <OrgNode role={ROLE_LABELS['admin']} count={admins} color="slate" salary={getSalary('admin')} utilization={0.80}>
                         <OrgNode role={ROLE_LABELS['shift-lead']} count={shiftLeads} color="cyan" salary={getSalary('shift-lead')} turnoverRate={0.10} utilization={0.90}>
                             <OrgNode role={ROLE_LABELS['engineer']} count={engineers} color="blue" salary={getSalary('engineer')} turnoverRate={0.15} utilization={0.85} />

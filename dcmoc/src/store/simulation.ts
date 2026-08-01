@@ -247,10 +247,14 @@ export const useSimulationStore = create<SimulationState>()(persist((set) => ({
     merge: (persisted, current) => {
         const p = persisted as Partial<SimulationState> | undefined;
         const cid = (p?.selectedCountry as { id?: string } | null)?.id;
+        const mergedInputs = { ...current.inputs, ...(p?.inputs ?? {}), capacityPhasesCustomized: p?.inputs?.capacityPhasesCustomized ?? false };
+        /* B1: re-apply the setInputs clamp [100, 500000] on rehydrate — a corrupted or
+         * pre-clamp persisted itLoad (e.g. 0) would otherwise seed ÷0 → $NaN downstream. */
+        mergedInputs.itLoad = Math.max(100, Math.min(500000, Number.isFinite(mergedInputs.itLoad) ? mergedInputs.itLoad : current.inputs.itLoad));
         return {
             ...current,
             ...(p ?? {}),
-            inputs: { ...current.inputs, ...(p?.inputs ?? {}), capacityPhasesCustomized: p?.inputs?.capacityPhasesCustomized ?? false },
+            inputs: mergedInputs,
             selectedCountry: cid && COUNTRIES[cid] ? COUNTRIES[cid] : current.selectedCountry,
         };
     },

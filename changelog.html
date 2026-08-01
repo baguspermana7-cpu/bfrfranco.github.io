@@ -50,7 +50,7 @@
         "@id": "https://resistancezero.com/changelog.html",
         "url": "https://resistancezero.com/changelog.html",
         "name": "Changelog — Resistance Zero",
-        "description": "Live release notes for resistancezero.com — 668 shipped versions.",
+        "description": "Live release notes for resistancezero.com — 669 shipped versions.",
         "dateModified": "2026-08-01",
         "author": {
           "@type": "Person",
@@ -73,18 +73,18 @@
       {
         "@type": "ItemList",
         "name": "Release history",
-        "numberOfItems": 668,
+        "numberOfItems": 669,
         "itemListElement": [
         {"@type":"ListItem","position":1,"name":"v1.123.2 — 2026-08-01","url":"https://resistancezero.com/changelog.html#v1.123.2"},
         {"@type":"ListItem","position":2,"name":"v1.123.1 — 2026-08-01","url":"https://resistancezero.com/changelog.html#v1.123.1"},
         {"@type":"ListItem","position":3,"name":"v1.123.0 — 2026-08-01","url":"https://resistancezero.com/changelog.html#v1.123.0"},
         {"@type":"ListItem","position":4,"name":"v1.122.9 — 2026-08-01","url":"https://resistancezero.com/changelog.html#v1.122.9"},
         {"@type":"ListItem","position":5,"name":"v1.122.8 — 2026-08-01","url":"https://resistancezero.com/changelog.html#v1.122.8"},
-        {"@type":"ListItem","position":6,"name":"v1.121.11 — 2026-08-01","url":"https://resistancezero.com/changelog.html#v1.121.11"},
-        {"@type":"ListItem","position":7,"name":"v1.121.10 — 2026-08-01","url":"https://resistancezero.com/changelog.html#v1.121.10"},
-        {"@type":"ListItem","position":8,"name":"v1.121.9 — 2026-08-01","url":"https://resistancezero.com/changelog.html#v1.121.9"},
-        {"@type":"ListItem","position":9,"name":"v1.121.8 — 2026-08-01","url":"https://resistancezero.com/changelog.html#v1.121.8"},
-        {"@type":"ListItem","position":10,"name":"v1.121.7 — 2026-08-01","url":"https://resistancezero.com/changelog.html#v1.121.7"}
+        {"@type":"ListItem","position":6,"name":"v1.121.12 — 2026-08-01","url":"https://resistancezero.com/changelog.html#v1.121.12"},
+        {"@type":"ListItem","position":7,"name":"v1.121.11 — 2026-08-01","url":"https://resistancezero.com/changelog.html#v1.121.11"},
+        {"@type":"ListItem","position":8,"name":"v1.121.10 — 2026-08-01","url":"https://resistancezero.com/changelog.html#v1.121.10"},
+        {"@type":"ListItem","position":9,"name":"v1.121.9 — 2026-08-01","url":"https://resistancezero.com/changelog.html#v1.121.9"},
+        {"@type":"ListItem","position":10,"name":"v1.121.8 — 2026-08-01","url":"https://resistancezero.com/changelog.html#v1.121.8"}
         ]
       }
     ]
@@ -610,7 +610,7 @@
         Latest: <strong style="color:#7dd5b4;">v1.123.2</strong>
         &nbsp;&bull;&nbsp;
         <span id="rzVersionAnchor"></span>
-        <span class="cl-count-badge">668 releases</span>
+        <span class="cl-count-badge">669 releases</span>
       </p>
 
       <div class="filter-chips" role="group" aria-label="Filter by version tier">
@@ -796,6 +796,53 @@
 <p>page; the magnitude bars disambiguate repeat operators by year.</p>
 <p>Root-gated; no public-SEO surface. Gates: page-gates CLEAN (35 gated), incidents-corpus 25/25,</p>
 <p>script-tags CLEAN, no horizontal overflow at 360px.</p>
+      </div>
+    </article>
+
+    <article class="changelog-entry" data-version-tier="patch" data-version="v1.121.12">
+      <div class="changelog-meta">
+        <span class="changelog-version-badge" style="--tier-color:#10b981;">v1.121.12</span>
+        <span class="changelog-tier-pill" style="--tier-color:#10b981;background:#10b98120;color:#10b981;border:1px solid #10b98140;">PATCH</span>
+        <time class="changelog-date" datetime="2026-08-01">August 01, 2026</time>
+      </div>
+      <p class="changelog-caption">DCMOC deep-audit fixes, batch 1 — correctness + skin</p>
+      <div class="changelog-body">
+        <p>A 5-Opus-agent deep audit (algorithm · data-wiring · UI/UX · skin · bugs, live-render +</p>
+<p>code, scored) found real defects the feature-level audits missed. Batch 1 fixes the</p>
+<p>engine-correctness + skin findings (<code>dcmoc/DEEP_AUDIT.md</code> = full scored report).</p>
+<h3 class="cl-subhead">Fixed</h3>
+<ul>
+  <li><strong>Per-country labor cost was US-salary for all non-US sites</strong> (C1, HIGH). `models.opex.</li>
+</ul>
+<p>staffingCostAnnual` was keyed by REGION but callers passed an ISO-2 country code → every</p>
+<p>non-US country fell back to US salary (manpower $533k identical for US/ID/IN/SG). Now</p>
+<p>resolves country→region via <code>DATA.countries[code].region</code>; manpower varies (US/DE ~$1.07M</p>
+<p>vs APAC ~$0.49M). Basis label corrected.</p>
+<ul>
+  <li><strong>Two OPEX engines priced electricity differently</strong> (C5). <code>totalAnnual</code> now uses the same</li>
+</ul>
+<p>country <code>economy.electricityRate</code> as <code>fullBreakdown</code> — both agree per country.</p>
+<ul>
+  <li><strong>CAPEX electrical line double-counted the UPS multiplier</strong> (C4, HIGH). <code>upsMult</code> inflated</li>
+</ul>
+<p>both the <code>ups</code> and the <code>electrical</code> categories (+50% on non-modular UPS). Removed from</p>
+<p><code>electrical</code>; kept on <code>ups</code>.</p>
+<ul>
+  <li><strong>Unguarded ÷IT-load → <code>$NaN</code>/Infinity</strong> (B1). Guarded <code>perKw</code> at the engine + a finite</li>
+</ul>
+<p>fallback at the UI, and re-applied the <code>itLoad</code> clamp on persist-rehydrate + portfolio</p>
+<p>import so corrupted state can't seed 0.</p>
+<ul>
+  <li><strong>Design-system: rejected-palette purge</strong> (K1/K2 BLOCKER + K3/K5). Recolored the Maintenance</li>
+</ul>
+<p>"Hybrid" toggle + Portfolio primary button off solid indigo; remapped 45 <code>indigo-*</code>/</p>
+<p><code>blue-500</code>/<code>violet</code>/<code>#8b5cf6</code> occurrences across 14 files to the semantic instrument tokens.</p>
+<ul>
+  <li><strong><code>prefers-reduced-motion</code> support added</strong> (K4) — global override in <code>globals.css</code>.</li>
+  <li>(C8 FOM-scope + the remaining data-wiring/UI findings ship in batch 2.)</li>
+</ul>
+<p>All gates green: test-rz-engine 763/0, value-bindings 85/0, reference-parity 155/0,</p>
+<p>trace-parity 214/214.</p>
       </div>
     </article>
 

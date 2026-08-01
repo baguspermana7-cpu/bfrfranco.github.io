@@ -56,7 +56,7 @@ export function CapexEnginePage() {
     if (!results || !model) return <div className="p-8 text-center text-sm text-slate-500">Calculating CAPEX…</div>;
     const { cats, band } = model;
     // Whole-dollar $/kW for display (engine metrics.perKw carries decimals — "$9,073.341" audit fix)
-    const perKw = Math.round(results.metrics?.perKw ?? results.total / Math.max(1, inputs.itLoad));
+    const perKw = Math.round(Number.isFinite(results.metrics?.perKw) ? (results.metrics!.perKw as number) : results.total / Math.max(1, inputs.itLoad));
 
     const exportPdf = async () => {
         setBusy(true);

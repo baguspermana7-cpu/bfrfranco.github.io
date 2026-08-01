@@ -181,7 +181,7 @@ function StrategyMixEditor() {
             </span>
             {MIX_KEYS.map(k => (
                 <label key={k} className="flex items-center gap-1 text-[10px] text-slate-500 dark:text-slate-400">
-                    <span className={clsx('font-semibold', k === 'reactive' ? 'text-red-500 dark:text-red-400' : k === 'planned' ? 'text-blue-500 dark:text-blue-400' : 'text-rz-data')}>{MIX_LABELS[k]}</span>
+                    <span className={clsx('font-semibold', k === 'reactive' ? 'text-red-500 dark:text-red-400' : k === 'planned' ? 'text-rz-info' : 'text-rz-data')}>{MIX_LABELS[k]}</span>
                     <input
                         type="number" min={0} max={100} step={5}
                         value={pctOf[k]}
@@ -430,7 +430,7 @@ export function MaintenanceDashboard() {
                                 className={clsx(
                                     "px-3 py-1.5 text-xs font-medium rounded-md transition-all capitalize",
                                     inputs.maintenanceModel === model
-                                        ? "bg-indigo-600 text-white shadow-sm"
+                                        ? "bg-rz-mint text-black shadow-sm"
                                         : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-800"
                                 )}
                             >
@@ -449,11 +449,11 @@ export function MaintenanceDashboard() {
                                     min="0"
                                     max="100"
                                     step="10"
-                                    className="w-20 accent-indigo-500"
+                                    className="w-20 accent-rz-mint"
                                     value={(inputs.hybridRatio || 0.3) * 100}
                                     onChange={(e) => actions.setInputs({ hybridRatio: Number(e.target.value) / 100 })}
                                 />
-                                <span className="text-xs font-mono font-bold text-indigo-600 dark:text-indigo-400">
+                                <span className="text-xs font-mono font-bold text-rz-mint">
                                     {((inputs.hybridRatio || 0.3) * 100).toFixed(0)}%
                                 </span>
                             </div>
@@ -470,7 +470,7 @@ export function MaintenanceDashboard() {
                                 className={clsx(
                                     "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all border",
                                     isPencilMode
-                                        ? "bg-indigo-50 dark:bg-indigo-600/20 border-indigo-200 dark:border-indigo-500 text-indigo-700 dark:text-indigo-300"
+                                        ? "bg-rz-mint/10 dark:bg-rz-mint/20 border-rz-mint/40 dark:border-rz-mint/50 text-rz-mint"
                                         : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
                                 )}
                             >
@@ -849,8 +849,8 @@ function AssetsTab({ assets, assetCounts, isPencilMode, handleCountChange, selec
                 return (
                     <div key={asset.id} className="bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 rounded-xl overflow-hidden hover:border-slate-300 dark:hover:border-slate-600 transition-all group relative shadow-sm dark:shadow-none">
                         {countObj?.isManual && (
-                            <div className="absolute top-0 right-0 p-1 bg-indigo-500/10 dark:bg-indigo-500/20 rounded-bl-lg border-b border-l border-indigo-200 dark:border-indigo-500/30">
-                                <Edit3 className="w-3 h-3 text-indigo-500 dark:text-indigo-400" />
+                            <div className="absolute top-0 right-0 p-1 bg-rz-mint/10 dark:bg-rz-mint/20 rounded-bl-lg border-b border-l border-rz-mint/40 dark:border-rz-mint/30">
+                                <Edit3 className="w-3 h-3 text-rz-mint" />
                             </div>
                         )}
 
@@ -1071,7 +1071,7 @@ function ScheduleTab({ assetCounts, schedule, weeks }: {
                     </div>
                     <div className="flex gap-4 text-xs text-slate-700 dark:text-slate-300 font-medium">
                         <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-red-500 border border-red-400"></div>Statutory <Tooltip content="Legally required inspections and certifications — non-negotiable." /></div>
-                        <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-blue-500 border border-blue-400"></div>Optimal <Tooltip content="Manufacturer-recommended maintenance intervals for optimal performance and warranty compliance." /></div>
+                        <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-rz-info border border-rz-info"></div>Optimal <Tooltip content="Manufacturer-recommended maintenance intervals for optimal performance and warranty compliance." /></div>
                         <div className="flex items-center gap-1.5"><div className="w-3 h-3 rounded-full bg-slate-500 border border-slate-400"></div>Discretionary <Tooltip content="Condition-based maintenance triggered by sensor data, inspections, or degradation thresholds." /></div>
                     </div>
                 </div>
@@ -1216,7 +1216,7 @@ function StrategyTab({ data, fmt, activeStrat, onSelect }: { data: ReturnType<ty
                         onClick={() => onSelect && onSelect(s.id)}
                         className={clsx(
                             "bg-white dark:bg-slate-900/50 border rounded-xl overflow-hidden transition-all relative shadow-sm dark:shadow-none cursor-pointer",
-                            s.id === activeStrat ? `ring-2 ring-offset-2 dark:ring-offset-slate-900 ${s.id === 'reactive' ? 'ring-red-500 border-red-500/50' : s.id === 'planned' ? 'ring-blue-500 border-blue-500/50' : 'ring-rz-data border-rz-data/30'}` : s.id === data.recommended ? "border-rz-data/30 ring-1 ring-rz-data/20" : "border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
+                            s.id === activeStrat ? `ring-2 ring-offset-2 dark:ring-offset-slate-900 ${s.id === 'reactive' ? 'ring-red-500 border-red-500/50' : s.id === 'planned' ? 'ring-rz-info border-rz-info/50' : 'ring-rz-data border-rz-data/30'}` : s.id === data.recommended ? "border-rz-data/30 ring-1 ring-rz-data/20" : "border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
                         )}
                     >
                         {s.id === data.recommended && (
@@ -1574,14 +1574,14 @@ function SLATab({ data, fmt, thirdParty, onThirdParty, facilityAged, onFacilityA
                                         <span className="font-mono text-slate-500 dark:text-slate-400">{fmt(tier.netAnnualCost)}</span>
                                     </div>
                                     <div className="flex gap-0.5 h-5">
-                                        <div className="bg-blue-500/80 dark:bg-blue-500/60 rounded-l" style={{ width: `${costPct}%` }} title="SLA Cost" />
+                                        <div className="bg-rz-info/80 dark:bg-rz-info/60 rounded-l" style={{ width: `${costPct}%` }} title="SLA Cost" />
                                         <div className="bg-red-500/80 dark:bg-red-500/60 rounded-r" style={{ width: `${riskPct}%` }} title="Risk Exposure" />
                                     </div>
                                 </div>
                             );
                         })}
                         <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
-                            <div className="flex items-center gap-1.5"><div className="w-3 h-1.5 bg-blue-500/80 dark:bg-blue-500/60 rounded" />SLA Cost</div>
+                            <div className="flex items-center gap-1.5"><div className="w-3 h-1.5 bg-rz-info/80 dark:bg-rz-info/60 rounded" />SLA Cost</div>
                             <div className="flex items-center gap-1.5"><div className="w-3 h-1.5 bg-red-500/80 dark:bg-red-500/60 rounded" />Risk Exposure</div>
                         </div>
                     </div>

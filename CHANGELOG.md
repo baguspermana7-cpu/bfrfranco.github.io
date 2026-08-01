@@ -136,6 +136,35 @@ script-tags CLEAN, no horizontal overflow at 360px.
 
 ---
 
+## v1.121.12 — 2026-08-01 (DCMOC deep-audit fixes, batch 1 — correctness + skin)
+
+A 5-Opus-agent deep audit (algorithm · data-wiring · UI/UX · skin · bugs, live-render +
+code, scored) found real defects the feature-level audits missed. Batch 1 fixes the
+engine-correctness + skin findings (`dcmoc/DEEP_AUDIT.md` = full scored report).
+
+### Fixed
+- **Per-country labor cost was US-salary for all non-US sites** (C1, HIGH). `models.opex.
+  staffingCostAnnual` was keyed by REGION but callers passed an ISO-2 country code → every
+  non-US country fell back to US salary (manpower $533k identical for US/ID/IN/SG). Now
+  resolves country→region via `DATA.countries[code].region`; manpower varies (US/DE ~$1.07M
+  vs APAC ~$0.49M). Basis label corrected.
+- **Two OPEX engines priced electricity differently** (C5). `totalAnnual` now uses the same
+  country `economy.electricityRate` as `fullBreakdown` — both agree per country.
+- **CAPEX electrical line double-counted the UPS multiplier** (C4, HIGH). `upsMult` inflated
+  both the `ups` and the `electrical` categories (+50% on non-modular UPS). Removed from
+  `electrical`; kept on `ups`.
+- **Unguarded ÷IT-load → `$NaN`/Infinity** (B1). Guarded `perKw` at the engine + a finite
+  fallback at the UI, and re-applied the `itLoad` clamp on persist-rehydrate + portfolio
+  import so corrupted state can't seed 0.
+- **Design-system: rejected-palette purge** (K1/K2 BLOCKER + K3/K5). Recolored the Maintenance
+  "Hybrid" toggle + Portfolio primary button off solid indigo; remapped 45 `indigo-*`/
+  `blue-500`/`violet`/`#8b5cf6` occurrences across 14 files to the semantic instrument tokens.
+- **`prefers-reduced-motion` support added** (K4) — global override in `globals.css`.
+- (C8 FOM-scope + the remaining data-wiring/UI findings ship in batch 2.)
+
+All gates green: test-rz-engine 763/0, value-bindings 85/0, reference-parity 155/0,
+trace-parity 214/214.
+
 ## v1.121.11 — 2026-08-01 (SEO audit — apostrophe-truncation false-positive fixed)
 
 ### Fixed
