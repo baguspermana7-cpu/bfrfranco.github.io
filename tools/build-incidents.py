@@ -114,46 +114,49 @@ CSS = r"""
     .nav-menu a { color:var(--text-body); text-decoration:none; font-size:0.85rem; font-weight:600; }
     .nav-menu a:hover { color:var(--cyan); }
     .nav-right { display:flex; align-items:center; gap:0.6rem; }
-    .theme-btn { background:none; border:1px solid var(--line); color:var(--text); border-radius:8px; padding:0.35rem 0.5rem; cursor:pointer; font-size:0.8rem; }
-    .lock-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--red); border:1px solid var(--red); border-radius:999px; padding:0.12rem 0.5rem; }
+    .theme-btn { background:none; border:1px solid var(--line); color:var(--text); border-radius:4px; padding:0.35rem 0.5rem; cursor:pointer; font-size:0.8rem; }
+    .lock-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--red); border:1px solid var(--red); border-radius:2px; padding:0.12rem 0.5rem; }
     h1 { font-size:2.4rem; color:var(--text-strong); margin:0.35rem 0 0.5rem; line-height:1.12; }
     h2 { font-size:1.4rem; color:var(--text-strong); margin:2rem 0 0.7rem; }
     .eyebrow { font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); }
     .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
     .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
-    .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:999px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
-    .chip.cyan { color:var(--cyan); border-color:var(--cyan); }
-    .chip.amber { color:var(--amber); border-color:var(--amber); }
-    .chip.green { color:var(--green); border-color:var(--green); }
-    .chip.red { color:var(--red); border-color:var(--red); }
+    .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:2px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    .chip.cyan { color:var(--cyan); border-left:2px solid var(--cyan); }
+    .chip.amber { color:var(--amber); border-left:2px solid var(--amber); }
+    .chip.green { color:var(--green); border-left:2px solid var(--green); }
+    .chip.red { color:var(--red); border-left:2px solid var(--red); }
+    .metabar { font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.04em; color:var(--muted); margin:0.7rem 0; display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; font-variant-numeric:tabular-nums slashed-zero; }
+    .metabar b { color:var(--text-body); font-weight:600; }
+    .metabar .sep { color:var(--line); }
     .chip.muted { color:var(--muted); }
-    .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:1rem 1.1rem; margin-top:0.9rem; }
-    .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:12px; margin-top:0.9rem; }
-    table.inc-index { width:100%; border-collapse:collapse; font-size:0.86rem; min-width:760px; }
+    .card { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:1rem 1.1rem; margin-top:0.9rem; }
+    .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:4px; margin-top:0.9rem; }
+    table.inc-index { width:100%; border-collapse:collapse; font-size:0.86rem; min-width:760px; font-variant-numeric:tabular-nums slashed-zero; }
     table.inc-index th { text-align:left; font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); background:var(--surface-2); }
     table.inc-index td { padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); color:var(--text-body); vertical-align:top; }
     table.inc-index tr:hover td { background:var(--surface-2); }
     table.inc-index a { font-weight:700; color:var(--text-strong); text-decoration:none; }
     table.inc-index a:hover { color:var(--cyan); text-decoration:underline; }
-    .rank-badge { font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--amber); }
-    .mag-bar { height:4px; border-radius:3px; background:var(--line); margin-top:0.35rem; overflow:hidden; }
+    .rank-badge { font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--amber); font-variant-numeric:tabular-nums slashed-zero; }
+    .mag-bar { height:5px; border-radius:0; background:var(--line); margin-top:0.35rem; overflow:hidden; }
     .mag-bar > span { display:block; height:4px; background:var(--amber); }
     ul.tight { margin:0.4rem 0 0; padding-left:1.15rem; }
     ul.tight li { color:var(--text-body); margin:0.3rem 0; font-size:0.92rem; }
     .soe { list-style:none; margin:0.6rem 0 0; padding:0; }
-    .soe li { display:grid; grid-template-columns:170px 1fr; gap:0.7rem; padding:0.5rem 0; border-bottom:1px dashed var(--line); }
-    .soe time { font-family:'JetBrains Mono',monospace; font-size:0.76rem; color:var(--muted); }
+    .soe li { display:grid; grid-template-columns:170px 1fr; gap:0.7rem; padding:0.5rem 0; border-bottom:1px solid var(--line); }
+    .soe time { font-family:'JetBrains Mono',monospace; font-size:0.76rem; color:var(--muted); font-variant-numeric:tabular-nums slashed-zero; }
     .soe .ev { color:var(--text-body); font-size:0.9rem; }
-    .phase-chip { font-family:'JetBrains Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--amber); border:1px solid var(--amber); border-radius:999px; padding:0.05rem 0.4rem; margin-right:0.4rem; white-space:nowrap; }
-    table.metrics { width:100%; border-collapse:collapse; font-size:0.88rem; }
+    .phase-chip { font-family:'JetBrains Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--amber); border:1px solid var(--line); border-radius:2px; padding:0.05rem 0.4rem; margin-right:0.4rem; white-space:nowrap; font-variant-numeric:tabular-nums; }
+    table.metrics { width:100%; border-collapse:collapse; font-size:0.88rem; font-variant-numeric:tabular-nums slashed-zero; }
     table.metrics td { padding:0.5rem 0.7rem; border-bottom:1px solid var(--line); vertical-align:top; }
     table.metrics .mlabel { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; width:38%; white-space:nowrap; }
     table.metrics .mval { color:var(--text-body); }
-    .ca-block { background:var(--surface); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 10px 10px 0; padding:0.7rem 1rem; margin-top:0.7rem; }
+    .ca-block { background:var(--surface); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 2px 2px 0; padding:0.7rem 1rem; margin-top:0.7rem; }
     .ca-block h3 { margin:0 0 0.3rem; font-size:0.92rem; color:var(--text-strong); }
     .ca-block p { margin:0; color:var(--text-body); font-size:0.9rem; }
     /* ── inline-SVG visualizations (theme-aware via vars) ── */
-    .inc-map { height:410px; margin-top:0.4rem; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:#0f1a16; z-index:1; }
+    .inc-map { height:410px; margin-top:0.4rem; border:1px solid var(--line); border-radius:4px; overflow:hidden; background:#0f1a16; z-index:1; }
     .inc-map .leaflet-container { background:#0f1a16; font-family:'IBM Plex Sans',sans-serif; }
     .inc-map .leaflet-popup-content-wrapper { background:#12211b !important; color:#e6efe9 !important; border:1px solid #2c4438 !important; border-radius:10px !important; box-shadow:0 8px 24px rgba(0,0,0,0.45) !important; }
     .inc-map .leaflet-popup-tip { background:#12211b !important; border:1px solid #2c4438 !important; }
@@ -161,9 +164,13 @@ CSS = r"""
     .inc-map .leaflet-control-attribution { background:rgba(15,26,22,0.8) !important; color:#7d8f86 !important; font-size:9px !important; }
     .inc-map .leaflet-control-attribution a { color:#9fb3a8 !important; }
     .inc-map .leaflet-bar a { background:#12211b !important; color:#cfe0d7 !important; border-color:#2c4438 !important; }
-    .viz { overflow-x:auto; margin-top:0.9rem; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:0.9rem 1rem; }
+    .leaflet-tooltip.inc-tip { background:#12211b; color:#e6efe9; border:1px solid #2c4438; border-radius:3px; font-family:'JetBrains Mono',monospace; font-size:0.66rem; padding:2px 7px; box-shadow:0 6px 18px rgba(0,0,0,0.5); }
+    .leaflet-tooltip.inc-tip:before { border-top-color:#2c4438; }
+    .viz { overflow-x:auto; margin-top:0.9rem; background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0.9rem 1rem; }
     .viz svg { display:block; max-width:100%; height:auto; }
-    .viz-radar svg { max-width:280px; margin:0 auto; }
+    .viz-radar svg { max-width:320px; margin:0 auto; }
+    .vz-num { font-variant-numeric:tabular-nums slashed-zero; }
+    .vz-box-t, .vz-box-s, .vz-lbl, .vz-hb-lbl, .vz-tl-t, .vz-pt, .vz-tick { pointer-events:auto; }
     .vz-grid { fill:none; stroke:var(--line); stroke-width:1; }
     .vz-accent-fill { fill:var(--cyan); fill-opacity:0.16; stroke:var(--cyan); stroke-width:1.4; }
     .vz-accent-dot { fill:var(--cyan); }
@@ -180,7 +187,7 @@ CSS = r"""
     .vz-tl-ph { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.04em; text-transform:uppercase; fill:var(--amber); }
     .vz-tl-t { font-family:'JetBrains Mono',monospace; font-size:8.5px; fill:var(--muted); }
     .vz-hb-lbl { font-family:'IBM Plex Sans',sans-serif; font-size:11px; fill:var(--text-body); }
-    .vz-hb-val { font-family:'JetBrains Mono',monospace; font-size:10px; fill:var(--muted); }
+    .vz-hb-val { font-family:'JetBrains Mono',monospace; font-size:10px; fill:var(--muted); font-variant-numeric:tabular-nums slashed-zero; }
     .vz-tick { font-family:'JetBrains Mono',monospace; font-size:8.5px; fill:var(--muted); }
     .vz-quad { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.05em; text-transform:uppercase; fill:var(--muted); opacity:0.7; }
     .vz-pt { font-family:'JetBrains Mono',monospace; font-size:8px; fill:var(--text-body); }
@@ -195,10 +202,10 @@ CSS = r"""
     @media (max-width:720px){ .viz-grid3 { grid-template-columns:1fr; } }
     .filterbar { display:flex; flex-wrap:wrap; align-items:center; gap:0.4rem 0.6rem; margin:0.9rem 0 0.2rem; }
     .fb-group { display:flex; flex-wrap:wrap; gap:0.35rem; }
-    .fb-chip { font-family:'JetBrains Mono',monospace; font-size:0.72rem; padding:0.28rem 0.6rem; border-radius:999px; border:1px solid var(--line); background:var(--surface); color:var(--text-body); cursor:pointer; }
+    .fb-chip { font-family:'JetBrains Mono',monospace; font-size:0.72rem; padding:0.28rem 0.6rem; border-radius:2px; border:1px solid var(--line); background:var(--surface); color:var(--text-body); cursor:pointer; }
     .fb-chip:hover { border-color:var(--cyan); }
-    .fb-chip.active { background:var(--cyan); border-color:var(--cyan); color:var(--surface); font-weight:700; }
-    .fb-search { flex:1 1 200px; min-width:160px; font-family:'IBM Plex Sans',sans-serif; font-size:0.82rem; padding:0.3rem 0.6rem; border-radius:8px; border:1px solid var(--line); background:var(--surface); color:var(--text); }
+    .fb-chip.active { background:var(--surface-2); border-color:var(--line); border-bottom:2px solid var(--cyan); color:var(--text-strong); font-weight:700; }
+    .fb-search { flex:1 1 200px; min-width:160px; font-family:'IBM Plex Sans',sans-serif; font-size:0.82rem; padding:0.3rem 0.6rem; border-radius:4px; border:1px solid var(--line); background:var(--surface); color:var(--text); }
     .fb-count { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); margin-left:auto; }
     .kv { display:grid; grid-template-columns:180px 1fr; gap:0.5rem 0.9rem; margin-top:0.5rem; font-size:0.9rem; }
     .kv dt { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; }
@@ -212,17 +219,17 @@ CSS = r"""
     footer { border-top:1px solid var(--line); margin-top:2.5rem; padding:1.4rem 1.1rem; text-align:center; }
     footer .ver { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
     .disclaimer { font-size:0.76rem; color:var(--muted); margin-top:0.8rem; max-width:80ch; }
-    .skip-link { position:absolute; top:-50px; left:0; background:#0e7490; color:#fff; padding:10px 20px; text-decoration:none; font-weight:600; z-index:10000; border-radius:0 0 8px 0; transition:top 0.2s; }
+    .skip-link { position:absolute; top:-50px; left:0; background:var(--cyan); color:var(--hero-bg); padding:10px 20px; text-decoration:none; font-weight:600; z-index:10000; border-radius:0 0 4px 0; transition:top 0.2s; }
     .skip-link:focus { top:0; }
     .root-gate { position:fixed; inset:0; z-index:99999; display:none; align-items:center; justify-content:center; background:rgba(2,6,23,0.74); padding:1rem; backdrop-filter:blur(6px); }
     body.locked .root-gate { display:flex; }
     body.locked .wrap { filter:blur(4px); pointer-events:none; user-select:none; }
-    .root-card { max-width:430px; width:100%; background:var(--surface); border:1px solid var(--cyan); border-radius:14px; padding:1.3rem 1.15rem; text-align:center; box-shadow:0 18px 36px var(--shadow-deep); }
+    .root-card { max-width:430px; width:100%; background:var(--surface); border:1px solid var(--cyan); border-radius:4px; padding:1.3rem 1.15rem; text-align:center; box-shadow:0 18px 36px var(--shadow-deep); }
     .root-card h2 { margin:0 0 0.4rem; font-size:1.1rem; color:var(--text-strong); }
     .root-card p { font-size:0.86rem; color:var(--text-body); }
     .root-actions { margin-top:0.9rem; display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; }
-    .root-actions button, .root-actions a { border-radius:9px; padding:0.5rem 0.85rem; font-size:0.8rem; font-weight:700; border:1px solid var(--line); text-decoration:none; cursor:pointer; color:var(--text); font-family:inherit; }
-    .root-actions button { background:var(--cyan); color:#04121a; border:none; }
+    .root-actions button, .root-actions a { border-radius:4px; padding:0.5rem 0.85rem; font-size:0.8rem; font-weight:700; border:1px solid var(--line); text-decoration:none; cursor:pointer; color:var(--text); font-family:inherit; }
+    .root-actions button { background:var(--cyan); color:var(--hero-bg); border:none; }
     .rz-nav-burger { display:none; }
     /* v1.8.0 — mobile responsive patch */
     @media (max-width:768px) {
@@ -287,7 +294,7 @@ def page_shell(title, desc, canonical_path, body_html, base="", head_extra=""):
             <li><a href="{base}datacenter-solutions.html">DC Solutions</a></li>
         </ul>
         <div class="nav-right">
-            <span class="lock-tag" title="Root-only module">🔒 Root</span>
+            <span class="lock-tag" title="Root-only module">ROOT</span>
             <button class="theme-btn" id="themeToggle" type="button" aria-label="Toggle theme">◐</button>
         </div>
     </div></nav>
@@ -297,7 +304,7 @@ def page_shell(title, desc, canonical_path, body_html, base="", head_extra=""):
     <footer><div class="footer-grid"></div><span class="ver" id="versionStamp"></span></footer>
     <div class="root-gate">
         <div class="root-card">
-            <h2>🔒 Root access required</h2>
+            <h2>Root access required</h2>
             <p>The DC Incidents dossier is a root-only module. Sign in with an authorized account to continue.</p>
             <div class="root-actions">
                 <button id="rootLoginBtn" type="button">Sign In</button>
@@ -358,6 +365,7 @@ FILTER_JS = r"""<script>
 
 def render_hub(incidents):
     _CLUSTER_SVG = hub_cluster_svg()
+    _pm_count = sum(1 for x in incidents if (x.get('sourcing',{}) or {}).get('officialPostmortem') or x.get('officialPostmortem'))
     rows = []
     for i, inc in enumerate(incidents, 1):
         loc = inc.get("location", {})
@@ -372,18 +380,14 @@ def render_hub(incidents):
                 <td>{esc(inc.get('date',''))}</td>
                 <td>{esc(inc.get('dcName',''))}<div style="font-size:0.76rem;color:var(--muted)">{esc(loc_s)}</div></td>
                 <td><div class="chips">{cat_chips(inc.get('category',[]))}</div></td>
-                <td>{esc(_dur(inc.get('durationMin')))}<div class="mag-bar"><span style="width:{min(100,mag*10):.0f}%"></span></div></td>
+                <td>{esc(_dur(inc.get('durationMin')))}<div class="mag-bar" title="Magnitude {mag:.1f}/10"><span style="width:{min(100,mag*10):.0f}%;background:{_sevcol(mag)}"></span></div></td>
                 <td style="max-width:320px">{esc(inc.get('brief',''))[:220]}{'…' if len(inc.get('brief',''))>220 else ''}</td>
             </tr>""")
     body = f"""        <a class="backlink" href="index.html">← Home</a>
         <div class="eyebrow">Root-only · Post-incident dossier</div>
         <h1>Data-Center Incidents — Case Library</h1>
         <p class="lede">A structured, source-cited library of major data-center and cloud-infrastructure incidents worldwide — ranked by magnitude, each with a full sequence of events, root-cause analysis, correction-of-errors (COE), lessons learnt and engineering improvements. Every fact is traced to a public post-incident report.</p>
-        <div class="chips">
-            <span class="chip amber">{len(incidents)} incident{'s' if len(incidents)!=1 else ''} catalogued</span>
-            <span class="chip green">Provenance-mandatory</span>
-            <span class="chip red">Root access</span>
-        </div>
+        <div class="metabar"><b>{len(incidents)}</b> catalogued<span class="sep">·</span><b>{_pm_count}</b> with official RCA<span class="sep">·</span>provenance-mandatory<span class="sep">·</span>root access</div>
         <h2>Where these happened</h2>
         <p class="lede" style="margin-bottom:0.4rem">Every incident plotted at the data center or region where the fault began. Facility failures (power, cooling, fire) in gold; network / logical failures in green. Tap a marker for the brief and a link to the full dossier.</p>
         {hub_geo_map(incidents)}
@@ -452,6 +456,11 @@ _OP_ABBR = [
 _FACILITY = {"power", "cooling", "fire", "flood"}
 
 
+def _sevcol(score):
+    s = float(score or 0)
+    return "var(--red)" if s >= 8.5 else ("var(--amber)" if s >= 7.5 else "var(--green)")
+
+
 def op_abbrev(operator):
     o = (operator or "").lower()
     for key, ab in _OP_ABBR:
@@ -472,53 +481,101 @@ def _pts(vals, cx, cy, r):
     return " ".join(out)
 
 
+_RADAR_DESC = {
+    "usersScore": "Users affected (0–10) — breadth of the user/customer population impacted.",
+    "financialScore": "Financial impact (0–10) — direct + consequential cost.",
+    "durationScore": "Outage duration (0–10) — how long service was degraded/down.",
+    "blastRadiusScore": "Blast radius (0–10) — how wide the fault propagated across systems/regions.",
+}
+
+
 def radar_svg(mag):
     axes = [("Users", "usersScore"), ("Financial", "financialScore"), ("Duration", "durationScore"), ("Blast", "blastRadiusScore")]
-    cx = cy = 100; R = 60
+    # wide viewBox + centred origin so no axis label clips at the edges
+    cx, cy, R = 145, 105, 64
     vals = [max(0.0, min(10.0, float(mag.get(k, 0)))) / 10 for _, k in axes]
     rings = "".join(f'<polygon class="vz-grid" points="{_pts([f, f, f, f], cx, cy, R)}"/>' for f in (0.34, 0.67, 1.0))
     spokes = labels = ""
     anchors = ["middle", "start", "middle", "end"]
-    dys = [-6, 4, 14, 4]
+    dys = [-7, 4, 15, 4]
     for i, (lbl, k) in enumerate(axes):
         a = -_math.pi / 2 + i * 2 * _math.pi / 4
         ex, ey = cx + _math.cos(a) * R, cy + _math.sin(a) * R
         spokes += f'<line class="vz-grid" x1="{cx}" y1="{cy}" x2="{ex:.1f}" y2="{ey:.1f}"/>'
-        lx, ly = cx + _math.cos(a) * (R + 12), cy + _math.sin(a) * (R + 12) + dys[i]
-        labels += f'<text class="vz-lbl" x="{lx:.1f}" y="{ly:.1f}" text-anchor="{anchors[i]}">{esc(lbl)} {int(round(float(mag.get(k, 0))))}</text>'
-    poly = f'<polygon class="vz-accent-fill" points="{_pts(vals, cx, cy, R)}"/>'
+        lx, ly = cx + _math.cos(a) * (R + 14), cy + _math.sin(a) * (R + 14) + dys[i]
+        val = int(round(float(mag.get(k, 0))))
+        labels += (f'<text class="vz-lbl vz-num" x="{lx:.1f}" y="{ly:.1f}" text-anchor="{anchors[i]}">{esc(lbl)} {val}'
+                   f'<title>{esc(_RADAR_DESC.get(k, lbl))} — scored {val}/10.</title></text>')
+    poly = f'<polygon class="vz-accent-fill" points="{_pts(vals, cx, cy, R)}"><title>Magnitude sub-scores (0–10)</title></polygon>'
     dots = "".join(f'<circle class="vz-accent-dot" cx="{p.split(",")[0]}" cy="{p.split(",")[1]}" r="2.4"/>' for p in _pts(vals, cx, cy, R).split(" "))
-    return f'<div class="viz viz-radar"><svg viewBox="0 0 200 205" role="img" aria-label="Magnitude sub-scores radar chart"><title>Magnitude sub-scores (0–10)</title>{rings}{spokes}{poly}{dots}{labels}</svg></div>'
+    return f'<div class="viz viz-radar"><svg viewBox="0 0 290 215" role="img" aria-label="Magnitude sub-scores radar chart"><title>Magnitude sub-scores (0–10)</title>{rings}{spokes}{poly}{dots}{labels}</svg></div>'
+
+
+def _clean_op(operator):
+    """A short, clean node label — no parentheticals/semicolons, <=22 chars."""
+    o = (operator or "").split("(")[0].split(";")[0].split(",")[0].strip()
+    return o[:22] if o else "Operator"
+
+
+def _wrap(text, width, maxlines=2):
+    """Greedy word-wrap into <=maxlines lines of ~width chars (for SVG tspans)."""
+    words = str(text or "").split()
+    lines, cur = [], ""
+    for w in words:
+        if len(cur) + len(w) + 1 <= width or not cur:
+            cur = (cur + " " + w).strip()
+        else:
+            lines.append(cur); cur = w
+            if len(lines) == maxlines - 1:
+                break
+    rest = " ".join(words[sum(len(l.split()) for l in lines):]) if lines else cur
+    if len(lines) < maxlines:
+        lines.append((cur if not lines else rest).strip())
+    out = [l for l in lines if l][:maxlines]
+    if len("".join(out)) < len(str(text or "")):  # truncated → ellipsis on last line
+        out[-1] = out[-1][: width - 1].rstrip() + "…"
+    return out
 
 
 def cascade_svg(inc):
     cat = (inc.get("category") or ["software"])[0]
     trigger = CATEGORY_LABEL.get(cat, cat)
-    op = (inc.get("operator", "") or "")[:26]
-    dc = (inc.get("dcName", "") or "")[:30]
+    op_full = inc.get("operator", "") or ""
+    op = inc.get("operatorShort") or _clean_op(op_full)
+    dc_full = inc.get("dcName", "") or ""
     downs = ((inc.get("severity", {}) or {}).get("servicesDown", []) or [])
     shown = downs[:4]
     more = len(downs) - len(shown)
 
-    def box(x, y, w, h, cls, lines):
-        t = "".join(f'<text class="{("vz-box-t" if i == 0 else "vz-box-s")}" x="{x + 10}" y="{y + (18 if i == 0 else 16) + i * 14}">{esc(str(l)[:32])}</text>' for i, l in enumerate(lines))
-        return f'<rect class="{cls}" x="{x}" y="{y}" width="{w}" height="{h}" rx="8"/>{t}'
-    W = 720
+    def box(x, y, w, h, cls, title, head, sub=None, sub_full=None):
+        # head wraps to <=2 lines; sub is one small line; full text in <title> (hover)
+        hlines = _wrap(head, int((w - 20) / 6.6), 2)
+        ty = y + 17
+        parts = [f'<rect class="{cls}" x="{x}" y="{y}" width="{w}" height="{h}" rx="2"><title>{esc(title)}</title></rect>']
+        for j, ln in enumerate(hlines):
+            parts.append(f'<text class="vz-box-t" x="{x+10}" y="{ty + j*13}">{esc(ln)}</text>')
+        if sub:
+            sy = ty + len(hlines) * 13 + 1
+            parts.append(f'<text class="vz-box-s" x="{x+10}" y="{sy}"><title>{esc(sub_full or sub)}</title>{esc(str(sub)[:34])}</text>')
+        return "".join(parts)
+
+    W = 760
     rows = max(1, len(shown))
-    H = max(150, 44 + rows * 40)
-    midY = H / 2 - 24
+    H = max(158, 52 + rows * 44)
+    midY = H / 2 - 28
     svg = [f'<svg viewBox="0 0 {W} {H}" role="img" aria-label="Failure cascade block diagram"><title>Failure cascade: trigger → fault → downstream impact</title>']
-    # arrows defs
     svg.append('<defs><marker id="ic-ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path class="vz-arrhead" d="M0,0 L6,3 L0,6 Z"/></marker></defs>')
-    svg.append(box(8, midY, 168, 50, "vz-box-trigger", [f"Trigger · {trigger}", inc.get("date", "")]))
-    svg.append(box(232, midY, 200, 50, "vz-box-fault", [op or "Operator", dc or "Facility / system"]))
-    svg.append(f'<line class="vz-flow" x1="176" y1="{midY+25}" x2="230" y2="{midY+25}" marker-end="url(#ic-ar)"/>')
+    svg.append(f'<text class="vz-tl-ph" x="8" y="12">Trigger</text><text class="vz-tl-ph" x="248" y="12">Primary fault</text><text class="vz-tl-ph" x="516" y="12">Downstream impact</text>')
+    svg.append(box(8, midY, 176, 56, "vz-box-trigger", f"Trigger — {trigger} ({inc.get('date','')})", f"Trigger · {trigger}", inc.get("date", ""), inc.get("date", "")))
+    svg.append(box(240, midY, 224, 56, "vz-box-fault", f"Primary fault at {op_full} — {dc_full}", op, dc_full, dc_full))
+    svg.append(f'<line class="vz-flow" x1="184" y1="{midY+28}" x2="238" y2="{midY+28}" marker-end="url(#ic-ar)"/>')
     for i, d in enumerate(shown):
-        by = 22 + i * 40
-        svg.append(box(500, by, 212, 32, "vz-box-down", [d]))
-        svg.append(f'<line class="vz-flow" x1="432" y1="{midY+25}" x2="498" y2="{by+16}" marker-end="url(#ic-ar)"/>')
+        by = 26 + i * 44
+        svg.append(box(516, by, 236, 36, "vz-box-down",
+                       f"Downstream service degraded by the fault: {d}", d))
+        svg.append(f'<line class="vz-flow" x1="464" y1="{midY+28}" x2="514" y2="{by+18}" marker-end="url(#ic-ar)"/>')
     if more > 0:
-        svg.append(f'<text class="vz-box-s" x="500" y="{22 + rows * 40 + 4}">+{more} more downstream services</text>')
+        svg.append(f'<text class="vz-box-s" x="516" y="{26 + rows * 44 + 6}">+{more} more downstream services</text>')
     svg.append('</svg>')
     return f'<div class="viz viz-cascade">{"".join(svg)}</div>'
 
@@ -561,7 +618,7 @@ def hub_magnitude_svg(incidents):
             lbl = f"{lbl} · {yr}"
         href = f'incident-{esc(x.get("slug",""))}.html'
         bars.append(f'<a href="{href}"><text class="vz-hb-lbl" x="8" y="{y+14}">{esc(lbl[:28])}</text>'
-                    f'<rect class="vz-accent-bar" x="230" y="{y+3}" width="{w:.0f}" height="15" rx="3"/>'
+                    f'<rect x="230" y="{y+3}" width="{w:.0f}" height="15" rx="0" fill="{_sevcol(x["_score"])}"><title>{esc(op_abbrev(x.get("operator","")))} — magnitude {x["_score"]:.1f}/10</title></rect>'
                     f'<text class="vz-hb-val" x="{230+w+6:.0f}" y="{y+14}">{x["_score"]:.1f}</text></a>')
     return f'<div class="viz"><svg viewBox="0 0 {W} {H}" role="img" aria-label="Incidents ranked by magnitude"><title>Ranked by magnitude score</title>{"".join(bars)}</svg></div>'
 
@@ -582,7 +639,7 @@ def hub_category_svg(incidents):
         y = 8 + i * rowH
         w = (v / mx) * 260
         bars.append(f'<text class="vz-hb-lbl" x="8" y="{y+14}">{esc(CATEGORY_LABEL.get(cat, cat))}</text>')
-        bars.append(f'<rect class="vz-cat-bar" x="140" y="{y+3}" width="{w:.0f}" height="15" rx="3"/>')
+        bars.append(f'<rect class="vz-cat-bar" x="140" y="{y+3}" width="{w:.0f}" height="15" rx="0"><title>{esc(CATEGORY_LABEL.get(cat, cat))} — {v} incident(s)</title></rect>')
         bars.append(f'<text class="vz-hb-val" x="{140+w+6:.0f}" y="{y+14}">{v}</text>')
     return f'<div class="viz"><svg viewBox="0 0 {W} {H}" role="img" aria-label="Incidents by category"><title>Incidents by failure category</title>{"".join(bars)}</svg></div>'
 
@@ -601,8 +658,8 @@ _DOMAIN_LEGEND = (
 def hub_quadrant_svg(incidents):
     if not incidents:
         return ""
-    W, H = 384, 336
-    L, R, T, B = 48, 16, 18, 42
+    W, H = 444, 336
+    L, R, T, B = 48, 74, 18, 42   # wide right margin reserves the label gutter
     plotW, plotH = W - L - R, H - T - B
 
     def px(v):
@@ -622,50 +679,51 @@ def hub_quadrant_svg(incidents):
     g.append(f'<text class="vz-quad" x="{L+plotW-5:.0f}" y="{T+12}" text-anchor="end">worst · wide + long</text>')
     g.append(f'<text class="vz-quad" x="{L+5}" y="{T+plotH-6:.0f}">contained</text>')
 
-    # deterministic jitter so incidents sharing the same integer blast/duration
-    # score fan out instead of stacking on one pixel
-    import hashlib
+    # honest axes: plot at true coordinates. Only nudge EXACT ties apart by a hair
+    # (deterministic, sub-0.4-unit) so overlapping dots stay separable without lying.
+    seen = {}
     recs = []
-    for x in incidents:
+    for x in sorted(incidents, key=lambda i: -i["_score"]):
         m = x.get("magnitude", {})
-        h = int(hashlib.md5(x.get("slug", "").encode()).hexdigest(), 16)
-        jx = ((h % 1000) / 1000 - 0.5) * (plotW / 10) * 1.05
-        jy = (((h // 1000) % 1000) / 1000 - 0.5) * (plotH / 10) * 1.05
-        cx = min(L + plotW - 3, max(L + 3, px(float(m.get("blastRadiusScore", 0))) + jx))
-        cy = min(T + plotH - 3, max(T + 3, py(float(m.get("durationScore", 0))) + jy))
-        r = 3.2 + (x["_score"] / 10) * 3.6
-        side = "R" if cx > L + plotW * 0.58 else "L"
+        bs, ds = float(m.get("blastRadiusScore", 0)), float(m.get("durationScore", 0))
+        key = (round(bs), round(ds))
+        k = seen.get(key, 0); seen[key] = k + 1
+        ang = k * 2.399           # golden-angle spread for ties only
+        off = 0 if k == 0 else 3.2 + 1.4 * k
+        cx = min(L + plotW - 3, max(L + 3, px(bs) + _math.cos(ang) * off))
+        cy = min(T + plotH - 3, max(T + 3, py(ds) + _math.sin(ang) * off))
+        r = 3.0 + (x["_score"] / 10) * 3.4
         recs.append({
-            "cx": cx, "cy": cy, "r": r, "ly": cy + 3, "side": side,
+            "cx": cx, "cy": cy, "r": r,
             "col": _FAC_COL if _domain(x.get("category")) == "facility" else _LOG_COL,
             "ab": op_abbrev(x.get("operator", "")), "href": f'incident-{esc(x.get("slug",""))}.html',
             "op": x.get("operator", ""), "b": m.get("blastRadiusScore", 0), "d": m.get("durationScore", 0),
+            "sc": x["_score"],
         })
-    # greedy vertical de-collision of labels within each side
-    GAP = 10.5
-    for side in ("L", "R"):
-        col_recs = sorted((d for d in recs if d["side"] == side), key=lambda d: d["ly"])
-        last = -999.0
-        for d in col_recs:
-            if d["ly"] < last + GAP:
-                d["ly"] = last + GAP
-            last = d["ly"]
-
+    # every dot carries a hover title; only the top-6 by magnitude get a printed label,
+    # placed in a de-collided column just right of the plot with a thin leader
+    labelled = sorted(recs, key=lambda d: -d["sc"])[:6]
+    lab_ids = {id(d) for d in labelled}
+    labels_svg = []
+    lx = L + plotW + 6
+    ys = sorted((d["cy"] for d in labelled))
+    slots, last = [], -999.0
+    for yv in ys:
+        yv = max(yv, last + 12); slots.append(yv); last = yv
+    yslot = {}
+    for d, yv in zip(sorted(labelled, key=lambda d: d["cy"]), slots):
+        yslot[id(d)] = yv
+    for d in labelled:
+        yv = yslot[id(d)]
+        labels_svg.append(f'<line class="vz-grid" x1="{d["cx"]+d["r"]:.0f}" y1="{d["cy"]:.0f}" x2="{lx-2:.0f}" y2="{yv:.0f}" opacity="0.35"/>')
+        labels_svg.append(f'<text class="vz-pt" x="{lx:.0f}" y="{yv+3:.0f}">{esc(d["ab"])}</text>')
     dots = []
     for d in sorted(recs, key=lambda d: -d["r"]):
-        if d["side"] == "R":
-            tx, anc = d["cx"] - d["r"] - 3, ' text-anchor="end"'
-        else:
-            tx, anc = d["cx"] + d["r"] + 3, ''
-        lead = ""
-        if abs(d["ly"] - (d["cy"] + 3)) > 6:  # label dodged away → thin leader line
-            lx = d["cx"] - d["r"] if d["side"] == "R" else d["cx"] + d["r"]
-            lead = f'<line class="vz-grid" x1="{lx:.0f}" y1="{d["cy"]:.0f}" x2="{tx:.0f}" y2="{d["ly"]-3:.0f}" opacity="0.4"/>'
         dots.append(
-            f'<a href="{d["href"]}">{lead}<circle cx="{d["cx"]:.0f}" cy="{d["cy"]:.0f}" r="{d["r"]:.1f}" fill="{d["col"]}" fill-opacity="0.9">'
-            f'<title>{esc(d["op"])} — blast {d["b"]}/10 · duration {d["d"]}/10</title></circle>'
-            f'<text class="vz-pt" x="{tx:.0f}" y="{d["ly"]:.0f}"{anc}>{esc(d["ab"])}</text></a>'
+            f'<a href="{d["href"]}"><circle cx="{d["cx"]:.0f}" cy="{d["cy"]:.0f}" r="{d["r"]:.1f}" fill="{d["col"]}" fill-opacity="0.9" stroke="var(--bg)" stroke-width="0.8">'
+            f'<title>{esc(d["op"])} — blast {d["b"]}/10 · duration {d["d"]}/10 · magnitude {d["sc"]:.1f}</title></circle></a>'
         )
+    dots.extend(labels_svg)
     return (f'<div class="viz"><svg viewBox="0 0 {W} {H}" role="img" aria-label="Blast radius vs duration risk map">'
             f'<title>Risk map: blast radius × outage duration</title>{"".join(g)}{"".join(dots)}</svg>{_DOMAIN_LEGEND}</div>')
 
@@ -683,26 +741,32 @@ def hub_cluster_svg():
         return ""
     W, H = 384, 300
     pad = 26
-    dots = []
+    recs = []
     for p in pts:
-        x = pad + p["x"] * (W - 2 * pad)
-        y = pad + (1 - p["y"]) * (H - 2 * pad)
-        col = _FAC_COL if _domain(p.get("category")) == "facility" else _LOG_COL
-        r = 3.6 + (float(p.get("score", 0)) / 10) * 3.4
-        ab = op_abbrev(p.get("operator", ""))
-        href = f'incident-{esc(p.get("slug",""))}.html'
-        if x > W * 0.62:
-            tx, anc = x - r - 3, ' text-anchor="end"'
-        else:
-            tx, anc = x + r + 3, ''
+        recs.append({
+            "x": pad + p["x"] * (W - 2 * pad), "y": pad + (1 - p["y"]) * (H - 2 * pad),
+            "col": _FAC_COL if _domain(p.get("category")) == "facility" else _LOG_COL,
+            "r": 3.2 + (float(p.get("score", 0)) / 10) * 3.2,
+            "ab": op_abbrev(p.get("operator", "")), "op": p.get("operator", ""),
+            "href": f'incident-{esc(p.get("slug",""))}.html', "sc": float(p.get("score", 0)),
+        })
+    top_ids = {id(d) for d in sorted(recs, key=lambda d: -d["sc"])[:6]}
+    dots = []
+    for d in sorted(recs, key=lambda d: -d["r"]):
+        label = ""
+        if id(d) in top_ids:
+            if d["x"] > W * 0.62:
+                tx, anc = d["x"] - d["r"] - 3, ' text-anchor="end"'
+            else:
+                tx, anc = d["x"] + d["r"] + 3, ''
+            label = f'<text class="vz-pt" x="{tx:.0f}" y="{d["y"]+3:.0f}"{anc}>{esc(d["ab"])}</text>'
         dots.append(
-            f'<a href="{href}"><circle cx="{x:.0f}" cy="{y:.0f}" r="{r:.1f}" fill="{col}" fill-opacity="0.88">'
-            f'<title>{esc(p.get("operator",""))} — near-by incidents share a failure signature</title></circle>'
-            f'<text class="vz-pt" x="{tx:.0f}" y="{y+3:.0f}"{anc}>{esc(ab)}</text></a>'
+            f'<a href="{d["href"]}"><circle cx="{d["x"]:.0f}" cy="{d["y"]:.0f}" r="{d["r"]:.1f}" fill="{d["col"]}" fill-opacity="0.88" stroke="var(--bg)" stroke-width="0.8">'
+            f'<title>{esc(d["op"])} — near-by incidents share a failure signature (magnitude {d["sc"]:.1f})</title></circle>{label}</a>'
         )
     return (f'<div class="viz"><svg viewBox="0 0 {W} {H}" role="img" aria-label="Semantic similarity map of incidents">'
             f'<title>Semantic map — incidents near each other share a failure signature</title>'
-            f'<rect x="1" y="1" width="{W-2}" height="{H-2}" class="vz-grid" fill="none" rx="8"/>{"".join(dots)}</svg>{_DOMAIN_LEGEND}</div>')
+            f'<rect x="1" y="1" width="{W-2}" height="{H-2}" class="vz-grid" fill="none" rx="2"/>{"".join(dots)}</svg>{_DOMAIN_LEGEND}</div>')
 
 
 # Approx. incident-origin coordinates (data-center / region where the fault began).
@@ -742,27 +806,55 @@ LEAFLET_HEAD = (
 
 
 def hub_geo_map(incidents):
-    """A real Leaflet world map plotting each incident at its origin (CARTO dark tiles)."""
-    import hashlib
-    pts = []
+    """A real Leaflet world map. Co-located incidents are deterministically fanned onto a
+    small ring (spiderfied) with a connector back to the true site, so nothing overlaps."""
+    raw = []
     for inc in incidents:
         c = INCIDENT_COORDS.get(inc.get("slug"))
         if not c:
             continue
-        h = int(hashlib.md5(inc.get("slug", "").encode()).hexdigest(), 16)
-        jlat = ((h % 1000) / 1000 - 0.5) * 0.75          # jitter co-located points apart
-        jlng = (((h // 1000) % 1000) / 1000 - 0.5) * 0.75
         loc = inc.get("location", {})
-        pts.append({
+        raw.append({
             "s": inc.get("slug", ""), "o": inc.get("operator", ""), "d": inc.get("date", ""),
-            "lat": round(c[0] + jlat, 3), "lng": round(c[1] + jlng, 3),
+            "lat0": float(c[0]), "lng0": float(c[1]),
             "dom": _domain(inc.get("category")), "sc": round(float(inc.get("_score", 0)), 1),
             "loc": ", ".join(x for x in [loc.get("city"), loc.get("country")] if x),
             "cat": " · ".join(CATEGORY_LABEL.get(x, x) for x in inc.get("category", [])),
+            "ab": op_abbrev(inc.get("operator", "")), "yr": (inc.get("date", "") or "")[:4],
             "b": (inc.get("brief", "") or "")[:150],
         })
-    if not pts:
+    if not raw:
         return ""
+    # greedy proximity clustering (~1.3° threshold)
+    groups = []
+    for p in sorted(raw, key=lambda x: x["s"]):
+        for g in groups:
+            if abs(g["clat"] - p["lat0"]) < 1.3 and abs(g["clng"] - p["lng0"]) < 1.3:
+                g["members"].append(p)
+                g["clat"] = sum(m["lat0"] for m in g["members"]) / len(g["members"])
+                g["clng"] = sum(m["lng0"] for m in g["members"]) / len(g["members"])
+                break
+        else:
+            groups.append({"clat": p["lat0"], "clng": p["lng0"], "members": [p]})
+    pts = []
+    for g in groups:
+        n = len(g["members"])
+        if n == 1:
+            m = g["members"][0]
+            m.update({"lat": round(m["lat0"], 3), "lng": round(m["lng0"], 3), "cx": None, "cy": None})
+            pts.append(m)
+            continue
+        r = 1.4 + 0.28 * (n - 2)           # ring radius in degrees, grows with count
+        for i, m in enumerate(sorted(g["members"], key=lambda x: -x["sc"])):
+            a = -_math.pi / 2 + i * 2 * _math.pi / n
+            m.update({
+                "lat": round(g["clat"] + _math.sin(a) * r, 3),
+                "lng": round(g["clng"] + _math.cos(a) * r / max(0.3, _math.cos(_math.radians(g["clat"]))), 3),
+                "cx": round(g["clat"], 3), "cy": round(g["clng"], 3),
+            })
+            pts.append(m)
+    for p in pts:
+        p.pop("lat0", None); p.pop("lng0", None)
     data = json.dumps(pts, ensure_ascii=False).replace("</", "<\\/")
     js = ('<script>(function(){var PTS=' + data + ',FAC=' + json.dumps(_FAC_COL) + ',LOG=' + json.dumps(_LOG_COL) + ';'
           'function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;","\\"":"&quot;"}[c];});}'
@@ -771,14 +863,16 @@ def hub_geo_map(incidents):
           'var map=L.map("incMap",{center:[30,15],zoom:2,minZoom:2,maxZoom:8,worldCopyJump:true,scrollWheelZoom:false});'
           'L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{subdomains:"abcd",maxZoom:19,attribution:"&copy; CARTO &copy; OpenStreetMap"}).addTo(map);'
           'PTS.forEach(function(p){var col=p.dom==="facility"?FAC:LOG;'
-          'var mk=L.circleMarker([p.lat,p.lng],{radius:Math.max(6,Math.min(19,4+p.sc*1.5)),fillColor:col,color:"#ffffff",weight:1.2,opacity:0.85,fillOpacity:0.8}).addTo(map);'
+          'if(p.cx!=null){L.polyline([[p.cx,p.cy],[p.lat,p.lng]],{color:col,weight:0.8,opacity:0.4,interactive:false}).addTo(map);}'
+          'var mk=L.circleMarker([p.lat,p.lng],{radius:Math.max(4,Math.min(11,3+p.sc*0.8)),fillColor:col,color:"#0c1512",weight:1,opacity:0.9,fillOpacity:0.85}).addTo(map);'
+          'mk.bindTooltip(esc(p.ab)+" · "+esc(p.yr)+" · "+esc(p.cat),{direction:"top",opacity:0.95,className:"inc-tip"});'
           'var html="<div style=\\"min-width:190px\\"><div style=\\"font-weight:700;font-size:0.86rem;color:#f1f5f9\\">"+esc(p.o)'
           '+"</div><div style=\\"font-size:0.7rem;color:#94a3b8;margin-bottom:5px\\">"+esc(p.d)+" &middot; "+esc(p.loc)+" &middot; "+esc(p.cat)'
           '+"</div><div style=\\"font-size:0.72rem;color:#cbd5e1;margin-bottom:7px\\">"+esc(p.b)+"&hellip;</div>"'
           '+"<a href=\\"incident-"+p.s+".html\\" style=\\"font-size:0.72rem;color:#6aa588;font-weight:600;text-decoration:none\\">Open dossier &rarr;</a></div>";'
           'mk.bindPopup(html,{maxWidth:250});'
-          'mk.on("mouseover",function(){this.setStyle({fillOpacity:1,weight:2.2});});'
-          'mk.on("mouseout",function(){this.setStyle({fillOpacity:0.8,weight:1.2});});});'
+          'mk.on("mouseover",function(){this.setStyle({fillOpacity:1,weight:2});});'
+          'mk.on("mouseout",function(){this.setStyle({fillOpacity:0.85,weight:1});});});'
           'try{new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)map.invalidateSize();});}).observe(el);}catch(e){}'
           'setTimeout(function(){map.invalidateSize();},350);}'
           'if(document.readyState!=="loading")init();else document.addEventListener("DOMContentLoaded",init);})();</script>')

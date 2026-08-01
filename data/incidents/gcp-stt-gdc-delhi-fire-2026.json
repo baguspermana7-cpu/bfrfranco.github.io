@@ -36,223 +36,248 @@
  },
  "sequenceOfEvents": [
   {
-   "t": "2026-06-05 (approx., local IST)",
-   "phase": "Trigger",
-   "event": "A fire breaks out at a third-party data-center facility serving Google Cloud's Delhi metro networking. Google's record never names the facility, operator or ignition source; third-party press attributes it to lithium-battery/UPS units at the STT GDC (ST Telemedia-Tata JV) site in Greater Kailash-I, but this is not confirmed by Google.",
-   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (fire attribution); ignition source per third-party reporting only (ledger gap)"
+   "t": "2026-06-05 ~02:45 IST",
+   "phase": "TRIGGER",
+   "event": "Lithium battery units in the third-floor battery room of STT Delhi 2 fail; preliminary cause cited as a suspected short circuit, consistent with lithium-ion thermal runaway. Batteries reportedly belonged to a tenant leasing space at the site.",
+   "source": "Data Center Dynamics; People Matters (unverified at review)"
   },
   {
-   "t": "2026-06-05 (approx., local IST)",
-   "phase": "Escalation",
-   "event": "The fire forces an emergency power shutdown of networking equipment at the facility as a safety measure.",
-   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr"
+   "t": "2026-06-05 ~02:45 IST",
+   "phase": "DETECTION",
+   "event": "Emergency call logged to the Delhi Fire Service — the only documented detection event. No in-facility VESDA/aspirating or spot smoke/heat detection system or sensed-alarm time is named in any public source (disclosed gap).",
+   "source": "People Matters; forensic record"
   },
   {
-   "t": "2026-06-05 (approx., local IST)",
-   "phase": "Impact",
-   "event": "The emergency power-down isolates a non-compute local Point of Presence (POP) in Delhi, removing its networking capacity from service.",
-   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr"
+   "t": "2026-06-05 ~02:45 IST",
+   "phase": "DETECTION",
+   "event": "CRITICAL SUPPRESSION GAP: no source describes the battery room's fixed suppression (clean-agent/inert-gas/pre-action), whether it discharged, or why it failed to contain a lithium-battery fire; gaseous agents would plausibly be ineffective against thermal runaway (inference).",
+   "source": "forensic record"
   },
   {
-   "t": "2026-06-05 (approx., local IST)",
-   "phase": "Cascade",
-   "event": "Loss of the Delhi POP reduces available network capacity across the metro; surviving backbone and peering links lack sufficient headroom, producing elevated latency, intermittent packet loss and non-optimal routing into Google Cloud across Delhi, Chennai and Mumbai.",
-   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr"
+   "t": "2026-06-05 shortly after 02:45 IST",
+   "phase": "MITIGATION",
+   "event": "Delhi Fire Service personnel reportedly 'arrived within minutes' of the call.",
+   "source": "People Matters (unverified at review)"
   },
   {
-   "t": "2026-06-09 18:13 PDT",
-   "phase": "Detection",
-   "event": "First customer-facing disclosure. Google publishes update 1 of 9, attributing the disruption to a fire at a third-party facility and an emergency power shutdown; a ~4-day gap between the ~5 June onset and this first notice is never explained in Google's record.",
-   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (update 1/9)"
+   "t": "2026-06-05 early hours",
+   "phase": "MITIGATION",
+   "event": "Ten fire tenders reportedly deployed to the site; manual firefighting operation begins and continues for several hours.",
+   "source": "People Matters; Outlook Business (unverified at review)"
   },
   {
-   "t": "2026-06-10 15:25 PDT",
-   "phase": "Diagnosis",
-   "event": "Update 2 of 9 issued as Google continues to characterize impact and remediation; no workaround offered.",
-   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (update 2/9)"
+   "t": "2026-06-05 during response",
+   "phase": "CASCADE",
+   "event": "Fire required an emergency power shutdown of networking equipment in the third-party facility — the pivotal protective de-energisation, not a compute-region failure.",
+   "source": "Google Cloud Service Health 5fGQt4VbkDnr3Yp8PXPr"
   },
   {
-   "t": "2026-06-11 16:25 PDT",
-   "phase": "Diagnosis",
-   "event": "Update 3 of 9 issued; incident ongoing, still no workaround.",
-   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (update 3/9)"
+   "t": "2026-06-05 during response",
+   "phase": "CASCADE",
+   "event": "The shutdown isolated a non-compute local Point of Presence (POP) in Delhi and reduced available network capacity in the metro area.",
+   "source": "Google Cloud Service Health 5fGQt4VbkDnr3Yp8PXPr"
   },
   {
-   "t": "2026-06-12 15:50 PDT",
-   "phase": "Mitigation",
-   "event": "Update 4 of 9 gives the first concrete remediation ETAs: Delhi backbone-capacity augmentation expected complete by Mon 15 June PDT, and out-of-region Internet Edge peering augmentation in Chennai (load-balancing/redundancy for large Indian ISPs) expected done by Wed 17 June PDT.",
-   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (update 4/9)"
+   "t": "2026-06-05 during response",
+   "phase": "IMPACT",
+   "event": "Traffic into Google Cloud from the Delhi, Chennai and Mumbai metro areas experiences slightly elevated latency and non-optimal network routing as rerouted demand exceeds regional capacity.",
+   "source": "Google Cloud Service Health 5fGQt4VbkDnr3Yp8PXPr"
   },
   {
-   "t": "2026-06-15 16:11 PDT",
-   "phase": "Recovery",
-   "event": "Update 5 of 9: Google restores a portion of Internet Edge peering capacity to cut Delhi-metro latency, optimizes capacity across backbones to increase headroom, and reports augmenting Delhi backbone capacity over the weekend — partial, incremental recovery.",
-   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (update 5/9)"
+   "t": "2026-06-05",
+   "phase": "IMPACT",
+   "event": "Approximately 50 Google server racks reportedly affected; footage showed destroyed server racks, collapsed ceiling panels, scattered debris and demolished electrical infrastructure on the third floor.",
+   "source": "People Matters; NDTV Profit (unverified at review)"
   },
   {
-   "t": "2026-06-17 15:36 PDT",
-   "phase": "Recovery",
-   "event": "Update 6 of 9: additional capacity restored between the Delhi-Chennai and Delhi-Mumbai backbone links, confirming link restoration was underway by mid-June, ahead of physical site re-entry.",
-   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (update 6/9)"
+   "t": "2026-06-05",
+   "phase": "IMPACT",
+   "event": "Equipment worth hundreds of crores of rupees reportedly destroyed; routers/servers of Netflix and multiple NCR ISPs damaged; ~20 years of Matrix Cellular data placed at risk.",
+   "source": "The Hindu; Outlook Business (unverified at review)"
   },
   {
-   "t": "2026-06-22 16:51 PDT",
-   "phase": "Recovery",
-   "event": "Update 7 of 9: teams obtain access to the damaged site and plan to restore further incremental user-facing backbone capacity on Tue 23 June — confirming recovery was gated by safety-cleared physical access, not network reconvergence.",
-   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (update 7/9)"
+   "t": "2026-06-05 onward",
+   "phase": "MITIGATION",
+   "event": "Google works to restore Internet Edge peering capacity in Delhi, augment out-of-region capacity in Chennai, and optimize backbone network capacity. (A secondary account also describes 'migrating selected peering partners.')",
+   "source": "Google Cloud Service Health; Data Center Knowledge"
   },
   {
-   "t": "2026-06-23 15:52 PDT",
-   "phase": "Recovery",
-   "event": "Update 8 of 9: augmentation of Chennai peering completed and all capacity between the Delhi-Chennai and Delhi-Mumbai links restored — the last substantive remediation step.",
-   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (update 8/9)"
+   "t": "2026-06-05 (after several hours)",
+   "phase": "RECOVERY",
+   "event": "Fire brought under control and reportedly confined to the third floor; spread to other floors prevented.",
+   "source": "Outlook Business (unverified at review)"
   },
   {
-   "t": "2026-06-29 16:06 PDT",
-   "phase": "Restored",
-   "event": "Update 9 of 9: Google marks the incident resolved. No workaround had been available across any of the nine updates for the full disclosed ~20-day window.",
-   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (update 9/9)"
+   "t": "2026-06-05",
+   "phase": "IMPACT",
+   "event": "Two firefighters reportedly injured during the operation; no fatalities. (A later DCD report reportedly stated 'no injuries' — an unreconciled discrepancy.)",
+   "source": "Outlook Business; People Matters; The Hindu (unverified at review)"
+  },
+  {
+   "t": "2026-06-05 onward",
+   "phase": "RECOVERY",
+   "event": "Prolonged hazard lockout: full capacity restoration is gated on obtaining fire/structural safety clearance before Google can re-energise/re-access equipment.",
+   "source": "Google Cloud Service Health (safety-clearance gating confirmed)"
+  },
+  {
+   "t": "2026-06-15",
+   "phase": "IMPACT",
+   "event": "Tata Communications, in a letter reported by Reuters, states the fire caused 'extensive damage'; clients fear decades of data lost.",
+   "source": "Reuters (reported, unverified at review)"
+  },
+  {
+   "t": "~2026-06-22",
+   "phase": "RECOVERY",
+   "event": "Following safety clearance, Google's team reportedly accesses the damaged site and continues restoring additional capacity through the week (specific June 22 date is reported, not in the official status text).",
+   "source": "Reuters/Google-reported (unverified at review)"
+  },
+  {
+   "t": "from 2026-06-23 (+5–7 weeks)",
+   "phase": "RECOVERY",
+   "event": "STT Global reportedly commissions an independent root-cause analysis (findings due late-July to early-August 2026); Novamesh (Tata Communications) reportedly characterises the event as 'force majeure.'",
+   "source": "Outlook Business (unverified at review)"
+  },
+  {
+   "t": "2026-06-26 12:00 (US/Pacific)",
+   "phase": "RESTORED",
+   "event": "Google restores all lost capacity after safety clearance; incident 'recovered and returned to normal service as of Friday, 2026-06-26 PDT.'",
+   "source": "Google Cloud Service Health 5fGQt4VbkDnr3Yp8PXPr"
   }
  ],
  "metrics": [
   {
-   "label": "Affected Google Cloud products",
-   "value": "3 (Hybrid Connectivity, VPC, Media CDN)",
-   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr"
+   "label": "Incident window (start to resolution)",
+   "value": "2026-06-05 00:00 → 2026-06-26 12:00 US/Pacific (~21 days)",
+   "source": "Google Cloud Service Health 5fGQt4VbkDnr3Yp8PXPr (verified)"
   },
   {
-   "label": "Disclosed impact window",
-   "value": "~20 days (9 Jun 18:13 PDT to 29 Jun 16:06 PDT); true onset ~5 Jun, longer",
-   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr"
+   "label": "Metros with degraded Google Cloud ingress",
+   "value": "3 (Delhi, Chennai, Mumbai)",
+   "source": "Google Cloud Service Health 5fGQt4VbkDnr3Yp8PXPr (verified)"
   },
   {
-   "label": "Public status updates",
-   "value": "9 (byte-verified count and timestamps)",
-   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr"
+   "label": "Google Cloud services impacted",
+   "value": "Hybrid Connectivity, Media CDN, VPC",
+   "source": "Google Cloud Service Health 5fGQt4VbkDnr3Yp8PXPr (verified)"
   },
   {
-   "label": "Metros affected",
-   "value": "3 (Delhi, Mumbai, Chennai)",
-   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr"
+   "label": "Fire-service call time (only documented detection)",
+   "value": "~02:45 IST, 2026-06-05",
+   "source": "People Matters (unverified at review)"
   },
   {
-   "label": "Disclosure gap (onset to first notice)",
-   "value": "~4 days (~5 Jun to 9 Jun 18:13 PDT); reason unexplained",
-   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr + ledger gap"
+   "label": "Fire tenders deployed",
+   "value": "10",
+   "source": "People Matters; Outlook Business (unverified at review)"
   },
   {
-   "label": "Symptom profile",
-   "value": "Elevated latency + intermittent packet loss + non-optimal routing (qualitative only; no ms/%, no affected-count)",
-   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr"
+   "label": "Google server racks affected",
+   "value": "~50",
+   "source": "People Matters (unverified at review)"
   },
   {
-   "label": "Workaround availability",
-   "value": "None across all 9 updates",
-   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr"
+   "label": "Affected facility electrical capacity",
+   "value": "1.1 MW (reported, STT Delhi 2)",
+   "source": "Outlook Business (facility-identity fragment, unverified at review)"
   },
   {
-   "label": "Google-disclosed financial/SLA figure",
-   "value": "None (no credit or $ impact published)",
-   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr + ledger gap"
+   "label": "Firefighter casualties",
+   "value": "2 injured, 0 fatalities (DCD later reported 'no injuries' — discrepancy)",
+   "source": "Outlook Business; People Matters; The Hindu (unverified at review)"
   },
   {
-   "label": "Unverified third-party tenant loss claims",
-   "value": "R2 Net ~$2M; Matrix Cellular '20+ years of data' at risk (not confirmed here)",
-   "source": "Business Standard / DCD (third-party; unverified in ledger)"
+   "label": "Independent RCA timeline",
+   "value": "~5–7 weeks from 2026-06-23 (late-Jul to early-Aug 2026)",
+   "source": "Outlook Business (unverified at review)"
   }
  ],
- "rootCause": "Authoritative network-layer cause is published in Google Cloud's Service Health report (incident 5fGQt4VbkDnr3Yp8PXPr). Per Google's own wording, a fire at a third-party data center facility required an emergency power shutdown of networking equipment, isolating a non-compute local Point of Presence (POP) in Delhi and reducing the network capacity available in the Delhi metro area. The trigger was therefore not a defect in Google's compute region (asia-south2) but a physical event at a colocation facility hosting Google network/edge infrastructure.\\n\\nSourcing caveat: Google does NOT name the facility, its operator, the ignition source, or any fire-suppression/backup-power detail. Attribution of the site to an STT GDC / Tata joint venture originates only from third-party press cited in the task brief; it is not stated by Google, was not independently verified here, and must not be presented as established fact.\\n\\nMechanism: the fire forced a deliberate, protective de-energization ('emergency power shutdown') of networking equipment, consistent with standard fire response (cutting power to protect equipment and personnel and permit suppression). De-energizing that equipment removed a non-compute local POP — an edge/peering/backbone node, not a compute cluster — from service, so Google lost a portion of the metro's Internet Edge peering capacity and backbone capacity into and out of Delhi.\\n\\nWhy safeguards did not fully absorb the loss: the report frames the outage as a capacity problem. Traffic that had transited the isolated Delhi POP rerouted onto remaining paths; the resulting symptom was intermittent elevated latency and possible packet loss for traffic from Delhi, Chennai, Mumbai and surrounding areas. Google's stated remediation was entirely capacity restoration, which is consistent with the surviving network having insufficient spare headroom to carry the redistributed load without degradation. (That the redistributed demand exceeded remaining capacity is a reasonable inference from Google's 'reducing available network capacity' language plus the symptom and the capacity-only fixes; it is not quoted verbatim by Google.) Google does not describe the colocation site's UPS/generator or suppression outcomes, so no claim is made about them — its stated action was to shut power off deliberately.\\n\\nBlast radius: because Internet Edge peering and inter-metro backbone links were affected, impact was not confined to Delhi; traffic from Delhi, Chennai, Mumbai and surrounding areas saw intermittent elevated latency and possible packet loss. Affected products were Hybrid Connectivity, Media CDN, and Virtual Private Cloud (VPC); the affected region was listed as Delhi (asia-south2). (The proposal's additional 'Global' scope tag is not supported by the fetched report and is struck.) There was no workaround.\\n\\nRecovery: because a physical site was damaged and a POP isolated, restoration was not automatic. Google's actions were capacity interventions: restoring Internet Edge peering capacity in Delhi, augmenting out-of-region capacity in Chennai, optimizing backbone headroom, and restoring capacity on the Delhi-Chennai and Delhi-Mumbai routes. Further restoration was gated by regaining physical access to the damaged site, which — following safety clearance — teams obtained on 2026-06-22 (16:51 PDT). The incident began 2026-06-05 00:00 US/Pacific; the first public status update appeared 2026-06-09 18:13 PDT; full capacity restoration completed 2026-06-26 (US/Pacific); and the incident was closed with a final update on 2026-06-29 16:06 PDT. Google does not state explicit detection timing, leaving an unexplained gap between the stated begin time and the first public update.",
+ "rootCause": "SPECIFIC IGNITION SOURCE: Per third-party reporting (Data Center Dynamics; Outlook Business; NDTV Profit; People Matters), Delhi fire authorities located the origin in lithium battery units in a third-floor battery room of STT Delhi 2 (Next-Gen Tower, Greater Kailash-1, New Delhi; reported 1.1 MW; ST Telemedia / Tata Communications JV). A pivotal DCD detail is that the batteries \"belonged to a company leasing space at the site\" — i.e., a COLOCATION TENANT's own battery installation, not confirmed to be the operator's central UPS plant. This shifts ignition ownership from the operator's maintained infrastructure toward a tenant-controlled energy-storage deployment inside a shared hall. NOTE (QA): only Google's own Service Health page is independently re-verifiable at review time; the battery-origin, floor, facility-identity and tenant-ownership details rest on secondary outlets that could not be re-fetched and should be read as reported, not confirmed.\n\nEQUIPMENT DETAIL — DISCLOSED UNCERTAINTY: The cell chemistry is reported only as generic \"lithium-ion.\" Make, model, manufacturer, install date, age, rated capacity (kWh/Ah), BMS design, charger/charging regime, string voltage, and battery-room thermal conditions are ALL undisclosed in every public source as of the access date. No source establishes whether the cells were LFP, NMC, or another variant — a material distinction, since NMC chemistries have lower thermal-runaway onset temperatures and higher energy release than LFP.\n\nEXACT FAILURE MECHANISM — NOT CONCLUSIVELY ESTABLISHED: A \"short circuit\" was cited as the suspected PRELIMINARY cause, explicitly \"under investigation\" (People Matters). This is consistent with lithium-ion thermal runaway seeded in a battery string, but the official cause was reported as inconclusive pending an independent root-cause analysis commissioned by STT Global (reported due ~5–7 weeks from June 23, 2026, i.e. late-July to early-August 2026). The propagation pathway, whether cell-to-cell cascade was arrested, and whether the room had thermal barriers or cell-level isolation, are unknown.\n\nLATENT ROOT — DESIGN & PROTECTION: The more consequential root causes are architectural and detection/suppression-related, and the record is notable for its SILENCE. No public source names any in-facility fire-detection system (VESDA/aspirating, spot smoke/heat) or a sensed-alarm time; the only detection datapoint is the human emergency call to the Delhi Fire Service at ~02:45 IST. No source describes the battery room's fixed suppression (clean-agent such as FM-200/Novec-1230, inert gas, or pre-action sprinkler), whether it discharged, or why it failed. Lithium-ion thermal runaway is largely unquenchable by gaseous clean agents (which displace oxygen but do not remove runaway's self-sustaining internal heat), so any installed gas system would plausibly have been ineffective — but this is analytical inference, not confirmed fact. The documented suppression record is entirely manual: Delhi Fire Service tenders over several hours.\n\nLATENT ROOT — SEGREGATION & REDUNDANCY: A single physical hall combined a tenant lithium battery installation, Google's peering/edge POP hardware, and other tenants' equipment (reported: Matrix Cellular, Netflix, NCR ISPs) with insufficient compartmentation; damage was confined to the third floor, but that floor concentrated enough shared infrastructure to force a metro-wide capacity cut. On the Google side, the latent root of the CLOUD disruption was topological and IS officially confirmed: the emergency de-energisation \"isolat[ed] a non-compute local Point of Presence (POP) in Delhi,\" degrading ingress across THREE metros — a redundancy/blast-radius design gap in edge placement, NOT a compute-region (asia-south2) failure (Google Cloud Service Health, incident 5fGQt4VbkDnr3Yp8PXPr).\n\nLATENT ROOT — REGULATORY VACUUM: MediaNama (unverifiable at review) attributes the deeper cause to India's regulatory environment: the DPDP Draft Rules mandate data localisation but set no facility fire-safety standard, redundancy requirement, or minimum-uptime obligation; data centres are treated as ordinary buildings — a systemic latent condition amplifying a single-facility fire into a national-scale digital event.\n\nMAINTENANCE LAPSE — STATUS: No specific maintenance, inspection, BMS-calibration, charging-control, or fire-barrier-testing lapse is evidenced in any public source. That venue is the pending STT RCA, whose findings are not public. Novamesh's \"force majeure\" characterisation is a contractual disclaimer, not an investigative conclusion. Any maintenance root cause is therefore UNKNOWN pending the RCA — a gap this dossier flags rather than fills.",
  "contributingFactors": [
-  "Single-facility concentration of metro network capacity: a non-compute local POP in Delhi carried a material share of the metro's Internet Edge peering and backbone capacity, so isolating one third-party facility measurably reduced network capacity for the whole Delhi metro (per Google's report).",
-  "Insufficient reroute headroom / capacity redundancy: the report frames the outage as a capacity problem and its every remediation was capacity restoration, indicating the surviving network lacked enough spare headroom to absorb the lost POP without latency and packet loss.",
-  "Dependency on a third-party colocation facility for critical networking infrastructure: the fire, the emergency power shutdown, and the physical damage all occurred at a site Google did not own or control, placing a key part of the availability chain outside Google's direct operational management.",
-  "Physical-access dependency in the recovery path: full capacity restoration was gated by teams regaining access to the damaged site (obtained 2026-06-22 after safety clearance), so recovery was bounded by physical site conditions rather than remote remediation, extending the degraded period to roughly three weeks (2026-06-05 to 2026-06-26).",
-  "Cross-metro coupling of network paths: because the impaired capacity included inter-metro backbone links (Delhi-Chennai, Delhi-Mumbai), a localized Delhi event propagated to Chennai, Mumbai and surrounding areas rather than staying contained to Delhi."
+  "Colocation tenant-owned lithium battery installation in a shared third-floor battery room: DCD reported the igniting batteries 'belonged to a company leasing space at the site,' meaning the failed energy-storage system was under tenant control inside a hall shared with Google, Netflix and ISP equipment — a segregation/compartmentation gap (Data Center Dynamics, unverified at review).",
+  "Absent or undocumented in-facility fire detection: no public source names any VESDA/aspirating or spot smoke/heat detection or a sensed-alarm time; the only detection event is the human ~02:45 IST call to the Delhi Fire Service, implying either no effective early automated detection or undisclosed detection (People Matters; forensic record).",
+  "No evidenced fixed fire-suppression activation: the record contains no description of a clean-agent, inert-gas, or pre-action system discharging or failing in the battery room; documented suppression was entirely manual DFS firefighting — leaving open whether a system was absent, ineffective against lithium runaway, or undisclosed (forensic record; Outlook, unverified).",
+  "Single-POP edge topology with cross-metro blast radius [OFFICIALLY CONFIRMED]: the emergency shutdown isolated one 'non-compute local POP' in Delhi, and rerouting degraded Google Cloud ingress across the Delhi, Chennai and Mumbai metro areas — a network-redundancy gap distinct from any compute-region failure (Google Cloud Service Health 5fGQt4VbkDnr3Yp8PXPr).",
+  "Regulatory vacuum on data-centre safety/redundancy: India's DPDP Draft Rules reportedly mandate localisation but set no facility fire-safety standard, redundancy requirement, or minimum-uptime obligation, and data centres are regulated as general buildings — a latent condition amplifying a single-site fire (MediaNama, unverified at review).",
+  "Prolonged post-fire hazard lockout extended restoration [OFFICIALLY CONFIRMED gating]: Google could restore all lost capacity only after obtaining safety clearance, with resolution on 2026-06-26 — the restoration bottleneck was structural/fire safety, not network engineering (Google Cloud Service Health).",
+  "Unknown battery-room maintenance/BMS/charging regime: no source evidences the inspection, thermal-monitoring, BMS-calibration, or charging-control status of the failed batteries; this remains pending the STT-commissioned independent RCA (Outlook, unverified; forensic record)."
  ],
  "coe": [
   {
-   "action": "Augment Delhi backbone capacity to raise available headroom in the metro.",
-   "owner": "Google Cloud networking",
-   "status": "Completed (reported over the weekend before 15 Jun; ETA had been Mon 15 Jun PDT)",
-   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (updates 4-5/9)"
+   "action": "Complete and publish the independent root-cause analysis of the ignition source, battery chemistry/BMS, and detection/suppression performance",
+   "owner": "STT Global / STT GDC India",
+   "status": "Reported commissioned ~2026-06-23; findings due late-Jul–early-Aug 2026; not public at review"
   },
   {
-   "action": "Restore a portion of Internet Edge peering capacity to reduce Delhi-metro latency, and optimize capacity across backbones for headroom.",
-   "owner": "Google Cloud networking",
-   "status": "Completed (partial peering restored by 15 Jun; full Chennai peering augmentation completed 23 Jun)",
-   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (updates 5/9, 8/9)"
+   "action": "Restore and diversify Delhi Internet Edge peering / augment out-of-region (Chennai) capacity to remove single-POP cross-metro blast radius",
+   "owner": "Google Cloud",
+   "status": "Officially confirmed restored/augmented; incident resolved 2026-06-26 (durable topology fix not confirmed)"
   },
   {
-   "action": "Augment out-of-region Internet Edge regional peering capacity in Chennai to provide load-balancing and redundancy for large Indian ISPs.",
-   "owner": "Google Cloud networking",
-   "status": "Completed (ETA had been Wed 17 Jun PDT; completion confirmed 23 Jun)",
-   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (updates 4/9, 8/9)"
+   "action": "Review battery-room compartmentation and segregate tenant-owned energy storage from shared IT/peering halls",
+   "owner": "STT GDC (facility operator)",
+   "status": "Unknown — pending RCA"
   },
   {
-   "action": "Restore capacity between the Delhi-Chennai and Delhi-Mumbai backbone links.",
-   "owner": "Google Cloud networking",
-   "status": "Completed (additional capacity by 17 Jun; all capacity restored by 23 Jun)",
-   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (updates 6/9, 8/9)"
+   "action": "Review battery-room fire detection (VESDA/off-gas) and lithium-appropriate suppression adequacy",
+   "owner": "STT GDC (facility operator)",
+   "status": "Unknown — pending RCA"
   },
   {
-   "action": "Obtain safety-cleared access to the fire-damaged site and restore incremental user-facing backbone capacity.",
-   "owner": "Google Cloud + third-party facility operator",
-   "status": "Completed (access obtained ~22 Jun; restoration on 23 Jun; incident resolved 29 Jun)",
-   "source": "status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr (updates 7/9, 9/9)"
+   "action": "Establish colo safety SLA governing tenant-owned battery maintenance, BMS telemetry and inspection cadence",
+   "owner": "STT GDC / colocation tenants",
+   "status": "Not evidenced"
   },
   {
-   "action": "Publish a formal preventive-action / capacity-redundancy COE explaining why surviving links lacked headroom (single-homing of Delhi peering, edge N/N+1 design, failover margin).",
-   "owner": "Google Cloud (recommended; not yet published)",
-   "status": "Open / not disclosed",
-   "source": "Ledger gap: no public Google COE/PSD beyond reactive remediation"
-  },
-  {
-   "action": "Complete and publish the facility operator's independent root-cause analysis of the fire, including ignition source and equipment type.",
-   "owner": "STT GDC / Tata Communications (third-party-attributed operator)",
-   "status": "Open / pending (RCA expected ~early-to-mid Aug 2026 per third-party reporting; unverifiable here)",
-   "source": "Ledger gap: fire ignition source not confirmed"
+   "action": "Advocate/adopt data-centre-specific fire-safety, redundancy and minimum-uptime standards under DPDP framework",
+   "owner": "MeitY / regulator",
+   "status": "Not started — regulatory gap per reporting"
   }
  ],
  "lessonsLearnt": [
-  "A non-compute network POP can be a single point of regional degradation: losing one Delhi POP reduced capacity across three metros, showing that edge/peering redundancy matters as much as compute-region redundancy.",
-  "Failover headroom must be provisioned for full-node loss, not incremental load: the latency/packet-loss cascade shows surviving links were not sized to absorb the isolated POP's entire traffic share.",
-  "Third-party-facility incidents put recovery on someone else's clock: substantive restoration was gated by safety-cleared physical re-entry (~22-23 June), a timeline Google could not control, which stretched the outage beyond network-side fixes.",
-  "Out-of-region capacity is a viable but slow mitigation: augmenting Chennai peering and Delhi-Mumbai/Chennai links provided redundancy but took roughly two weeks to reach full restoration.",
-  "Disclosure discipline is a reputational risk: the ~4-day gap between onset and first notice, with no workaround for the full window, left tenants exposed and fueled third-party data-loss fears.",
-  "Provenance discipline matters in postmortems: the widely-repeated lithium/UPS ignition story is not in Google's record; conflating third-party attribution with operator-confirmed cause risks an inaccurate dossier."
+  "A physical fire in a colocation tenant's battery room can cascade into a hyperscaler edge outage via a deliberate protective de-energisation — the damage vector was a safety shutdown, not fire reaching cloud compute.",
+  "Edge blast-radius matters as much as compute redundancy: one non-compute Delhi POP carried enough peering/ingress capacity that its loss degraded three metros (Delhi, Chennai, Mumbai) — a topological single point of failure invisible in region-level SLAs.",
+  "Recovery from a physical hazard is gated by safety clearance, not engineering: the ~21-day tail to 2026-06-26 was driven by structural/fire lockout, so DR planning must model multi-week physical-access denial, not just failover time.",
+  "Lithium-ion suppression is a distinct discipline: gaseous clean agents displace oxygen but cannot remove thermal-runaway self-heating, so a 'compliant' gas system can be effectively useless against a battery-origin fire.",
+  "Shared-hall compartmentation and tenant-equipment governance are systemic risk controls: co-locating tenant energy storage with hyperscaler peering and other tenants' gear concentrates unrelated parties' fate into one floor.",
+  "Localisation mandates without safety/redundancy standards concentrate national risk: policy that forces data in-country but sets no facility resilience floor turns a single-site fire into a national digital event.",
+  "Disclosure discipline is itself a finding: the total silence on detection systems, suppression discharge, and battery specifications is a governance gap — what is not measured or reported cannot be assured."
  ],
  "improvements": [
-  "Re-home or dual-home Delhi metro peering so no single non-compute POP failure can strip regional capacity; validate with node-loss failure testing.",
-  "Provision N+1 (or better) failover headroom on Delhi-Mumbai and Delhi-Chennai backbones sized to absorb full POP loss, not just marginal load, and monitor headroom continuously.",
-  "Establish pre-arranged out-of-region peering/backbone burst capacity (e.g. standing Chennai edge capacity) that can be activated in hours rather than provisioned over days.",
-  "Formalize third-party-facility incident playbooks: contractual re-entry/inspection SLAs, joint safety-clearance procedures, and independent RCA delivery timelines with the operator.",
-  "Tighten incident-disclosure SLAs so customer-facing notice follows detection closely, with explicit guidance even when no workaround exists.",
-  "Require battery/UPS energy-storage rooms at third-party facilities to meet recognized fire-safety standards (e.g. NFPA 855 for ESS, UL 9540A thermal-runaway testing, NFPA 76/TIA-942 telecom facility protection) and audit compliance as a hosting prerequisite.",
-  "Publish a quantified impact and preventive-action COE (affected-project counts, latency deltas, capacity design) to restore tenant confidence and enable independent verification."
+  "SAFETY — Battery-room compartmentation and lithium-appropriate suppression: enforce cell/module-level thermal-runaway isolation, fire-rated barriers between energy-storage and IT/peering equipment, and suppression rated for lithium fires (water-based deluge/mist or immersion) rather than gas-only clean agents, which cannot arrest runaway self-heating.",
+  "SAFETY/DETECTION — Mandatory early multi-modal detection: aspirating (VESDA) smoke plus lithium off-gas sensing (H2/CO/electrolyte vapour) and heat, with logged sensed-alarm timestamps, so ignition is detected before open flame instead of relying on a human 02:45 call.",
+  "MAINTENANCE — Governed battery-health program for ALL batteries in shared halls, including tenant-owned: contractual colo safety SLA requiring BMS telemetry, periodic thermal-imaging of strings, charging-regime/charger audits, install-date/age tracking, and documented inspection cadence — closing the currently-undisclosed maintenance record.",
+  "MAINTENANCE/TESTING — Periodic fire-system commissioning and drills: scheduled discharge/functional testing of the fixed suppression, detection-to-suppression interlock verification, and battery-room evacuation/isolation drills, with results retained and auditable.",
+  "NETWORK REDUNDANCY — Eliminate single-POP cross-metro blast radius: distribute Delhi peering/edge capacity across physically diverse POPs so no single non-compute POP loss can degrade ingress across three metros; pre-provision out-of-region failover peering for Delhi/Chennai/Mumbai.",
+  "GOVERNANCE — Tenant energy-storage segregation policy: prohibit tenant-owned lithium storage inside shared IT halls without dedicated fire-rated rooms, standalone detection/suppression, and operator oversight of the installation and its maintenance.",
+  "REGULATORY — Adopt data-centre-specific standards: fire-safety, redundancy (N+1/2N), and minimum-uptime obligations for facilities hosting localised/critical data, closing the DPDP-rules gap that treats data centres as ordinary buildings."
  ],
  "comprehensiveAnalysis": [
   {
-   "heading": "Failure mechanism",
-   "body": "The initiating event was a fire at a third-party data-center facility hosting a non-compute Google Cloud POP in the Delhi metro. Fire response required an emergency power shutdown of the networking equipment, which is the correct safety action but instantly removed that POP's capacity from the network. Because the POP terminated metro peering and backbone ingress, its de-energization did not merely fail one device, it subtracted a whole node's worth of capacity from the region. Notably, Google's record never confirms what ignited the fire; the popular lithium-battery/UPS narrative is third-party attribution, so the mechanism is verified only from the emergency power-down onward, not at the point of ignition."
+   "heading": "A cross-domain cascade, not a cloud failure",
+   "body": "The defining feature of this incident is that the Google Cloud disruption was never a cloud failure in the conventional sense. Google's own Service Health record is explicit: a fire at a third-party facility 'required an emergency power shutdown of networking equipment, isolating a non-compute local Point of Presence (POP) in Delhi.' Cloud compute (the asia-south2 region) was not destroyed; a deliberate, safety-driven de-energisation of Google's peering/edge gear inside someone else's building was the damage vector. Root-cause analysis that stops at 'India outage' misses that the failure crossed three domains — a tenant's battery, a colocation operator's hall, and a hyperscaler's edge topology — linked by one protective action."
   },
   {
-   "heading": "Why it cascaded",
-   "body": "Losing the POP would have been contained if surviving backbone and peering links carried enough headroom to absorb its traffic. They did not. Google's own remediation, augmenting Delhi backbone capacity, restoring and adding Internet Edge peering, and building out Delhi-Mumbai and Delhi-Chennai link capacity, is the signature of a headroom shortfall: the fixes all added capacity rather than merely rerouting. The result was elevated latency, intermittent packet loss and non-optimal routing that spread across Delhi, Chennai and Mumbai, because traffic that normally ingressed via Delhi was forced onto congested or longer paths. Google states the effect (reduced available capacity) but not the design flaw (single-homing, edge redundancy tier, or provisioned margin), so the deeper cascade cause is inferred, not disclosed."
+   "heading": "The confirmed spine vs. the reported flesh",
+   "body": "At review, only Google's vendor-status page is independently re-verifiable; it confirms the non-compute POP isolation, the three affected metros (Delhi, Chennai, Mumbai), the impacted services (Hybrid Connectivity, Media CDN, VPC), the safety-clearance-gated recovery, and resolution on 2026-06-26. Everything upstream of the shutdown — battery origin, third-floor room, tenant ownership, short-circuit cause, facility identity/1.1 MW, rack counts, casualties, RCA and force-majeure framing — rests on secondary Indian outlets (DCD, People Matters, Outlook, The Hindu, Reuters, MediaNama) that could not be re-fetched due to network restrictions and an exhausted search budget. Those claims are internally consistent and plausibly real, but this dossier marks them 'reported/unverified' rather than confirmed."
   },
   {
-   "heading": "Recovery trajectory",
-   "body": "Recovery was incremental over roughly two weeks and split into two phases. The first phase (through ~17 June) was network-side and did not require the damaged building: Google optimized backbone headroom, restored a portion of Internet Edge peering to cut Delhi latency, and augmented Delhi-Mumbai and Delhi-Chennai link capacity, plus out-of-region Chennai peering for large Indian ISPs. The second, decisive phase was physical: teams obtained safety-cleared access to the fire-damaged site around 22 June and restored further user-facing backbone capacity on 23 June, with the Chennai peering augmentation completing the same day. Resolution was declared on 29 June. Crucially, the gating constraint for full recovery was site re-entry, not network reconvergence, meaning the outage duration was set by fire-safety clearance timelines outside Google's direct control."
+   "heading": "The detection and suppression silence",
+   "body": "The most damning aspect of the physical record is what is absent. No source names any in-facility detection system or a sensed-alarm time — the only detection datapoint is a human 02:45 IST call to the fire service. No source describes any fixed suppression in the battery room, whether it discharged, or why it failed. This silence is analytically loaded: lithium-ion thermal runaway is largely unquenchable by gaseous clean agents, so even a 'compliant' gas system would plausibly have been ineffective. That is inference, not fact — but the inference is precisely why the missing disclosure matters, and why the pending RCA should be judged on whether it addresses detection and suppression, not just ignition."
   },
   {
-   "heading": "Organizational and systemic factors",
-   "body": "Two organizational patterns shaped the incident. First, the facility was third-party (attributed to an STT GDC/Tata JV by external reporting), so Google owned the customer relationship and the network response but not fire suppression, power sequencing, or re-entry authority, which lengthened recovery and created an accountability seam. Second, disclosure lagged: the fire began around 5 June but the first customer notice was 9 June, a roughly four-day gap Google never explains, and no workaround was offered across any of the nine updates for the full ~20-day disclosed window. That combination, an opaque onset and prolonged no-workaround status, is what fueled tenant data-loss fears reported in the press, even though those tenant-loss figures are unverified here and asymmetric against the operator's 'majority recovered / not material' posture."
+   "heading": "Edge topology as the true amplifier",
+   "body": "On the network side, the officially confirmed root is topological: a single non-compute POP carried enough Delhi peering/ingress capacity that its loss, plus rerouting, degraded ingress across three metros with 'no available workaround' for affected traffic. This is a blast-radius/redundancy gap that region-level availability SLAs do not surface. The recovery profile reinforces the lesson — restoration was gated on physical safety clearance, producing a ~21-day tail unrelated to network engineering. Resilience planning that models failover time but not multi-week denial of physical access to a burned facility would have badly underestimated this event."
   },
   {
-   "heading": "Cross-incident pattern",
-   "body": "This incident fits a recurring class of cloud outages where a facilities-layer failure (fire, power, cooling) at a single site propagates into the network layer because edge/peering capacity lacks full-node failover headroom. The tell is the remediation shape: when the fix is 'add capacity elsewhere and wait for physical access' rather than 'reroute instantly,' the underlying system was provisioned near capacity with a single-site dependency. It also illustrates the shared-responsibility blind spot of third-party colocation: hyperscaler resilience narratives assume region-level redundancy, but a non-compute POP concentrated in one leased building can still degrade multiple metros. Finally, it is a provenance cautionary tale, the most-repeated cause (lithium/UPS fire) is not the operator-confirmed cause, underscoring that battery/ESS fire risk is real engineering context but was not a load-bearing, verified fact in this record."
+   "heading": "Systemic and regulatory latent conditions",
+   "body": "Two latent conditions turned a local fire into a national event. First, colocation shared-hall design placed a tenant's energy storage alongside a hyperscaler's peering and other tenants' equipment with insufficient compartmentation, concentrating unrelated parties' fate on one floor. Second, per MediaNama's (unverified) reading, India's DPDP draft rules mandate data localisation without any facility fire-safety, redundancy, or uptime floor — so critical data is forced in-country into buildings regulated as ordinary structures. The corrective agenda therefore spans three owners: the operator (compartmentation, detection/suppression), the hyperscaler (edge diversity), and the regulator (data-centre-specific standards)."
+  },
+  {
+   "heading": "Evidence quality and disclosed gaps",
+   "body": "This review upgraded source attribution where the official page now confirms facts (POP isolation, three metros, services, 2026-06-26 resolution, safety-clearance gating) and rescoped two items the official text refines: the mitigation wording ('migrating selected peering partners' is secondary, not official) and the '~June 22 re-access' date (reported, not in the status text). No claim was fabricated to fill a gap; disclosed uncertainties — battery chemistry, BMS/charging regime, detection/suppression presence, exact failure mechanism, and any maintenance lapse — remain flagged as unknown pending the STT RCA. The honest posture is a confirmed cascade spine wrapped in well-labelled, still-unverified forensic reporting."
   }
  ],
- "technicalDeepDive": "At the engineering level this is a physical-trigger, capacity-exhaustion cascade at the network edge and backbone layer, distinct from a compute-plane fault. A fire at a third-party data center hosting a Google non-compute local POP triggered an emergency power shutdown of networking equipment. De-energizing that equipment removed the POP from the network, losing its Internet Edge peering capacity (the interconnect where user/ISP traffic enters Google's network in the Delhi metro) and its backbone capacity toward other metros.\\n\\nThe routing layer responded as designed by redistributing traffic across remaining paths. The reported symptom was 'intermittent periods of elevated latency and possible packet loss' for traffic originating from Delhi, Chennai, Mumbai and surrounding areas. Google explicitly states the POP isolation reduced available network capacity in the metro, and every remediation it lists is a capacity action — so the consistent reading is that redistributed demand met alternate peering/backbone links that lacked enough spare headroom for the pre-incident Delhi load plus their own baseline. As link and peering utilization approaches saturation, queues build (raising round-trip latency) and buffer overflow drops packets, matching the observed symptoms. (Note: the specific statement that redistributed demand 'exceeded regional capacity' is an inference from Google's capacity framing and the symptom, not a verbatim quote from the report.)\\n\\nBecause inter-metro backbone segments (Delhi-Chennai, Delhi-Mumbai) were part of the impaired capacity, congestion was not confined to Delhi; traffic that would normally use Delhi ingress/egress traversed longer or more congested paths through other metros, spreading degradation regionally. Affected products were Hybrid Connectivity, Media CDN, and VPC. (The proposal's 'Global' scope label is not present in the fetched report and is not asserted here.)\\n\\nThe remediation confirms a capacity problem rather than a control-plane bug: Google's fixes were all capacity actions — restoring Internet Edge peering capacity in Delhi, augmenting out-of-region capacity in Chennai, optimizing backbone headroom, and restoring Delhi-Chennai and Delhi-Mumbai route capacity. These are physical/topological interventions (bringing peering and backbone capacity back online or provisioning it elsewhere), not software rollbacks, which is why recovery was incremental over roughly three weeks and gated by physically accessing the damaged site (access obtained 2026-06-22 after safety clearance; full restoration 2026-06-26). Google does not expose the colocation site's backup-power, generator, or suppression behavior, so the deep dive cannot extend into the site's electrical or fire-suppression engineering; Google's described action is the deliberate protective shutdown of its own networking equipment in response to the fire.",
+ "technicalDeepDive": "This was a cross-domain cascade in which a physical fire in a colocation tenant's battery room propagated into a hyperscaler's network-edge outage through a deliberate protective action, not through direct fire damage to cloud compute. The chain has three layers; only Layer 2 and its outcome are independently confirmed by Google's own Service Health record, while Layer 1's fire-forensics rest on secondary reporting that could not be re-fetched at review time.\n\nLAYER 1 — THE PHYSICAL FIRE. At ~02:45 IST on 2026-06-05, lithium battery units in the third-floor battery room of STT Delhi 2 entered what fire authorities preliminarily attributed to a short circuit — the classic seed of lithium-ion thermal runaway (People Matters; DCD, unverified at review). DCD reported the batteries \"belonged to a company leasing space\" — a tenant, not confirmed to be the operator's UPS plant. The only detection event in the public record is the human call to the Delhi Fire Service at ~02:45 IST; whether any in-facility aspirating/spot detection alarmed earlier is undisclosed. No fixed suppression discharge is documented — a critical gap, because a battery-origin lithium fire would likely defeat gaseous clean-agent systems, which cannot remove runaway's internal self-heating. Suppression was therefore reported as entirely manual: DFS arrived \"within minutes,\" deployed ten tenders, and fought the fire for several hours, confining it to the third floor. Reporting described destroyed server racks, collapsed ceiling panels and demolished electrical infrastructure (NDTV Profit). Two firefighters were reported injured with no fatalities (Outlook; People Matters; The Hindu) — though a later DCD report reportedly stated \"no injuries,\" an unreconciled discrepancy this dossier flags rather than resolves.\n\nLAYER 2 — THE PROTECTIVE DE-ENERGISATION (THE CASCADE TRIGGER) [OFFICIALLY CONFIRMED]. Per Google Cloud Service Health (incident 5fGQt4VbkDnr3Yp8PXPr): \"A fire at a third-party data center facility required an emergency power shutdown of networking equipment, isolating a non-compute local Point of Presence (POP) in Delhi.\" This is the hinge of the whole event: the cloud impact was caused by a deliberate, safety-driven shutdown of Google's own peering/edge gear co-located in the third-party hall — NOT by fire destroying a compute region (asia-south2 is merely the Delhi region label). \"Non-compute\" means peering/edge/ingress rather than customer VMs.\n\nLAYER 3 — THE METRO-SCALE PROPAGATION [OFFICIALLY CONFIRMED]. Removing that POP's capacity forced rerouting, producing \"slightly elevated latency and non-optimal network routing\" for traffic into Google Cloud from the Delhi, Chennai and Mumbai metro areas as demand exceeded regional capacity. One POP loss thus degraded three metros — an edge blast-radius/redundancy characteristic. Google's documented mitigations (per the status page) were: restoring Internet Edge peering capacity in Delhi, augmenting out-of-region capacity in Chennai, optimizing backbone capacity, and restoring the Delhi-Chennai and Delhi-Mumbai connections. (A secondary account (Data Center Knowledge) additionally framed the response as \"migrating selected peering partners\"; that phrasing is not in the official text.) Full restoration was gated on physical safety: Google could only restore all lost capacity after obtaining safety clearance, with the incident \"recovered and returned to normal service as of Friday, 2026-06-26 PDT\" — a ~3-week tail driven by fire/structural hazard lockout, not network engineering. Beyond Google, the same hall reportedly damaged Netflix and NCR-ISP equipment and threatened ~20 years of Matrix Cellular data, with losses in the \"hundreds of crores\" of rupees (The Hindu; Outlook, unverified at review). STT Global reportedly commissioned an independent RCA (due ~5–7 weeks from June 23); Novamesh (Tata Communications) reportedly framed it as force majeure.",
  "references": [
   {
    "title": "Google Cloud Service Health incident 5fGQt4VbkDnr3Yp8PXPr (22 June site access)",
@@ -260,6 +285,13 @@
    "type": "vendor-status",
    "accessed": "2026-07-31",
    "quote": "teams obtained access to the damaged site and will further restore additional incremental user-facing backbone capacity on Tuesday, 2026-06-23"
+  },
+  {
+   "title": "Google Cloud Service Health incident 5fGQt4VbkDnr3Yp8PXPr (12 June remediation ETAs)",
+   "url": "https://status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr",
+   "type": "vendor-status",
+   "accessed": "2026-07-31",
+   "quote": "we are further augmenting our Delhi backbone capacity (expected to be complete by Monday, 2026-06-15 PDT) ... augmenting out-of-region Internet Edge regional peering capacity in Chennai ... (expected to be done by Wednesday, 2026-06-17 PDT)"
   },
   {
    "title": "Google Cloud Service Health incident 5fGQt4VbkDnr3Yp8PXPr (primary status record)",
@@ -274,13 +306,6 @@
    "type": "official-status",
    "accessed": "2026-07-31",
    "quote": "Affected Services: Hybrid Connectivity, Virtual Private Cloud (VPC), Media CDN"
-  },
-  {
-   "title": "Google Cloud Service Health incident 5fGQt4VbkDnr3Yp8PXPr (12 June remediation ETAs)",
-   "url": "https://status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr",
-   "type": "official-status",
-   "accessed": "2026-07-31",
-   "quote": "we are further augmenting our Delhi backbone capacity (expected to be complete by Monday, 2026-06-15 PDT) ... augmenting out-of-region Internet Edge regional peering capacity in Chennai ... (expected to be done by Wednesday, 2026-06-17 PDT)"
   },
   {
    "title": "Fire at STT GDC/Tata data center in India caused 'extensive damage' (report)",
@@ -303,5 +328,6 @@
   "lastVerified": "2026-07-31",
   "confidence": "High on the network-layer mechanism, timeline and affected products (byte-verified from Google's primary status record); Low on ignition source, tenant data-loss reconciliation, and quantitative impact (unverified third-party reporting; WebSearch budget exhausted this session). Reference note: the 6 reference entries resolve to 3 unique URLs (references 1-4 all cite the same Google status incident)."
  },
- "lastUpdated": "2026-07-31"
+ "lastUpdated": "2026-07-31",
+ "operatorShort": "Google Cloud"
 }

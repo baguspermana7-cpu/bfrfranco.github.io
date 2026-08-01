@@ -13,6 +13,73 @@ release sections rather than semver.
 
 ---
 
+## v1.124.1 — 2026-08-02 (DC AI/HPC + DC Conventional → root+educator gate + lock icons)
+
+Owner: the DC AI/HPC and DC Conventional dashboards should be openable ONLY by root and
+educator accounts, with a distinct lock marker in the nav and on the DC Solutions Hub.
+
+### Changed
+- **Access → root + educator only** (was all-pro). `js/rz-feature-flags.js`: `datahall-ai`
+  and `dc-conventional` `page-access` set to root-only in the tier matrix (`pro:false`), plus
+  a scoped educator bypass (`EDUCATOR_ACCESS_PAGES`) — educators (role=educator, tier=pro) are
+  admitted, plain pro/demo/free are not. Verified with 4 sessions: PRO→blocked, EDUCATOR→allowed,
+  ROOT→allowed, FREE→blocked (root-gate shows).
+- **Lock icon in the "DC Solutions" nav dropdown** — `🔒` + "Root & Educator access only" title
+  prepended to the DC AI/HPC and DC Conventional items across 72 pages; the rejected-purple
+  `#8b5cf6` on the DC AI/HPC nav link swapped to brand cyan `#06b6d4` on 60 pages.
+- **Lock badge on the DC Solutions Hub landing cards** (`datacenter-solutions.html`) — a
+  "🔒 Root · Educator" badge on the AI/HPC and Conventional platform cards.
+
+## v1.124.0 — 2026-08-02 (DC Incidents — forensic depth + viz overhaul + permanent QA)
+
+Owner review found the dossiers "too generic" and the visualizations slop-ridden and buggy
+(clipped radar labels, truncated cascade boxes, colliding scatter labels, pill soup). This is a
+large corrective pass across content, rendering, and process.
+
+### Fixed (rendering corruption)
+- **Radar axis labels were clipped/corrupt** ("Blast"→".ast", "Financial"→"Finan", "Duration"
+  gone). Root cause: the RZExplain auto-scan (`js/rz-explain.js`) was wrapping glossary terms
+  (e.g. "Duration") in an HTML `<span>` **inside** the SVG `<text>`, which SVG can't render —
+  so the word vanished. Fixed by making `scanText` skip `svg` subtrees (was corrupting SVG
+  labels site-wide). Radar also re-laid-out with a wide viewBox so no label clips.
+- **Failure-cascade boxes truncated** operator/facility/service strings ("Google Cloud (impacted
+  ten…"). Now clean short node labels + 2-line word-wrap + a full-text `<title>` tooltip on every
+  box, plus column headers (Trigger · Primary fault · Downstream impact).
+
+### Changed (de-slop, per uiux-review)
+- **De-pilled** every chip (999px→2px), status-pill row → a single mono metadata rule, filter
+  chips hairline + bottom-rule selection, one 4px radius token, tabular-nums/slashed-zero on all
+  mono numerics, emoji locks → text.
+- **Magnitude bars** now square + **severity-ramped** (red = worst, gold/green lower), not a flat
+  rounded green lozenge.
+- **Scatter maps honest**: dropped the random jitter that displaced dots off their true axes;
+  plot at real coordinates (sub-unit nudge for exact ties only), every dot hover-titled, only the
+  top-6 by magnitude labelled in a de-collided gutter with thin leaders — no more label collision.
+- **Geo map decluttered**: co-located incidents (Ashburn ×5, London…) deterministically fanned
+  onto a small ring with a connector back to the true site; smaller markers; **hover tooltip**
+  (`bindTooltip`) on every marker.
+
+### Changed (content — deep forensic re-research, batch 1 of 5)
+Ran a multi-agent Opus Workflow (15 agents, ~816k tokens) to re-research the five facility fires
+(OVHcloud SBG2, Kakao/SK C&C Pangyo, NIRS Daejeon, NorthC Almere, STT-GDC/Google Delhi) to a
+forensic depth floor: specific ignition source / equipment / chemistry, the maintenance-and-
+monitoring latent root, and a physical **sequence of events (18–24 steps)** covering detection
+system, fire-suppression (or its absence), evacuation, emergency-services response and the
+de-energisation timeline — not just service impact. Metrics ≥ 9, improvements grouped into
+Safety / Maintenance / Design / Process. Honest disclosure of what remains unpublished/disputed.
+
+### Added (permanent QA)
+- **`standarization/DC_INCIDENTS_QA_STANDARD.md`** — the canonical, permanent WRITER prompt +
+  adversarial REVIEWER checklist (content depth **and** rendered-output correctness) + a mandatory
+  visual-QA gate, so future runs write and review correctly. Companion
+  **`DC_INCIDENTS_STANDARD.md`** documents the module.
+
+Root-gated; no public-SEO surface. Gates: incidents-corpus 25/25, page-gates CLEAN, script-tags
+CLEAN. (Remaining planned: FAQ/methodology section, reading-column + justified body, share
+buttons, magnitude score-trace tooltip, and deep re-research batches 2–5.)
+
+---
+
 ## v1.123.2 — 2026-08-01 (DC Incidents — de-neon: editorial palette, muted timestamps)
 
 ### Changed

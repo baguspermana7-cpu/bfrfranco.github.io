@@ -313,7 +313,7 @@
       acceptNode: function (n) {
         if (!n.nodeValue || n.nodeValue.length < 4) return NodeFilter.FILTER_REJECT;
         var el = n.parentElement;
-        if (!el || el.closest('code,pre,a,script,style,button,[data-explain],#' + PANEL_ID)) return NodeFilter.FILTER_REJECT;
+        if (!el || el.closest('svg,code,pre,a,script,style,button,[data-explain],#' + PANEL_ID)) return NodeFilter.FILTER_REJECT;
         return NodeFilter.FILTER_ACCEPT;
       }
     });

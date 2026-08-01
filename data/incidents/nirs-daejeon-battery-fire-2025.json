@@ -42,190 +42,227 @@
  },
  "sequenceOfEvents": [
   {
-   "t": "2025-09-26 (evening, before 20:20 KST)",
-   "phase": "Trigger",
-   "event": "During planned relocation work, an uninterruptible power supply (UPS) lithium-ion battery was disconnected in order to be moved to the basement of the facility.",
-   "source": "https://www.koreaherald.com/article/10588068"
+   "t": "2014-08",
+   "phase": "TRIGGER",
+   "event": "UPS lithium-ion battery bank (reported LG Energy Solution, 384 modules) installed at NIRS Daejeon 5th-floor server/UPS room — the asset that later failed (press-derived, single-source secondary, unverified at review)",
+   "source": "breached.company"
   },
   {
-   "t": "2025-09-26 (evening, before 20:20 KST)",
-   "phase": "Escalation",
-   "event": "The disconnected lithium-ion battery entered thermal runaway and exploded inside a server room, later cited as the main cause of the blaze.",
-   "source": "https://www.koreaherald.com/article/10626223"
+   "t": "2025-06",
+   "phase": "TRIGGER",
+   "event": "Battery bank reportedly passes its last safety inspection despite being past its ~10-year recommended service life (press-derived secondary, unverified at review)",
+   "source": "breached.company"
   },
   {
-   "t": "2025-09-26 20:20 KST",
-   "phase": "Detection",
-   "event": "Fire authorities received a report of a battery fire at the national data infrastructure center at 8:20 p.m. and deployed 101 firefighters and 31 fire vehicles.",
-   "source": "https://www.koreaherald.com/article/10601773"
+   "t": "2025-09-26 ~19:40 KST",
+   "phase": "TRIGGER",
+   "event": "Worker switches OFF the UPS lithium-ion battery power to begin disconnection for relocation from the 5th floor to the basement — ~40 min before ignition, derived from the verified 20:20 timestamp",
+   "source": "ko.wikipedia"
   },
   {
-   "t": "2025-09-26 (night)",
-   "phase": "Impact",
-   "event": "All 647 government IT systems at the Daejeon headquarters went offline, paralyzing digital IDs, postal banking, emergency GPS tracking, courts and tax systems.",
-   "source": "https://www.koreaherald.com/article/10588068"
+   "t": "2025-09-26 ~20:15 KST",
+   "phase": "DETECTION",
+   "event": "First fire report from the 5th-floor server room (human-noticed; no automated detection-alarm time or battery off-gas early-warning disclosed in any source)",
+   "source": "ko.wikipedia"
   },
   {
-   "t": "2025-09-26 (night)",
-   "phase": "Cascade",
-   "event": "The outage extended far beyond the fire itself: while 96 systems were physically destroyed, all 647 co-located systems were taken offline simultaneously as a preemptive safety measure, widening the operational blast radius across the estate.",
-   "source": "https://www.koreaherald.com/article/10588068"
+   "t": "2025-09-26 ~20:20 KST",
+   "phase": "CASCADE",
+   "event": "Sparks fly from the battery for an 'unknown reason' (미상의 이유); thermal runaway/explosion ignites the fire; one worker suffers 1st-degree burns to face and arm",
+   "source": "ko.wikipedia"
   },
   {
-   "t": "2025-09-27 06:30 KST",
-   "phase": "Mitigation",
-   "event": "The fire was declared extinguished roughly 10 hours after the initial report; firefighters relied on carbon-dioxide suppression and deliberately minimized water use to avoid damaging national data, which slowed extinguishment.",
-   "source": "https://www.koreaherald.com/article/10601773"
+   "t": "2025-09-26 ~20:20+ KST",
+   "phase": "CASCADE",
+   "event": "Single-cell failure reportedly cascades runaway through all 384 modules; self-oxidising chemistry drives repeated re-ignition; peak reported >160°C (press-derived secondary)",
+   "source": "breached.company"
+  },
+  {
+   "t": "2025-09-26 evening",
+   "phase": "MITIGATION",
+   "event": "Fire authorities dispatch immediately — reported ~101 firefighters and ~31 apparatus; an ~20-person task force including lithium-battery experts formed (press-derived secondary)",
+   "source": "breached.company"
+  },
+  {
+   "t": "2025-09-26 evening",
+   "phase": "MITIGATION",
+   "event": "Crews constrained from water flooding to avoid destroying the protected servers ('데이터를 보관하는 장비의 손상 우려'); rely on gas/CO2, which cannot arrest the self-oxidising runaway",
+   "source": "ko.wikipedia"
+  },
+  {
+   "t": "2025-09-26 night",
+   "phase": "MITIGATION",
+   "event": "NIRS cuts power to all 647 Daejeon systems — protective mass shutdown as the room's HVAC/CRAC (항온항습장치) is lost, risking server overheating",
+   "source": "ko.wikipedia"
+  },
+  {
+   "t": "2025-09-26 night",
+   "phase": "IMPACT",
+   "event": "Government online services degrade: approximately 96 government online services interrupted (mobile ID/Government24 auth and related public services)",
+   "source": "ko.wikipedia"
+  },
+  {
+   "t": "2025-09-27 early AM",
+   "phase": "MITIGATION",
+   "event": "Initial knockdown reached only after over 10 hours ('초진까지 10시간 이상이 소요'), delayed by the water constraints on the lithium-ion fire",
+   "source": "ko.wikipedia"
+  },
+  {
+   "t": "2025-09-27 ~18:30 KST",
+   "phase": "RECOVERY",
+   "event": "Fire reportedly fully extinguished ~22 hours after ignition, following repeated re-ignition characteristic of thermal runaway (press-derived secondary)",
+   "source": "breached.company"
   },
   {
    "t": "2025-09-27",
-   "phase": "Diagnosis",
-   "event": "The ignition source was identified as the UPS lithium-ion battery that had been disconnected for basement relocation; a second independent report later corroborated the server-room lithium-ion battery explosion as the main cause.",
-   "source": "https://www.koreaherald.com/article/10588068"
+   "phase": "IMPACT",
+   "event": "Authorities reportedly confirm ~858 TB of G-Drive data lost with NO backup; the drive held data for ~125,000 government officials (press-derived, not re-verified at review)",
+   "source": "aa.com.tr (858tb)"
   },
   {
-   "t": "2025-09-27 onward",
-   "phase": "Recovery",
-   "event": "Restoration prioritized the cooling system, then sequential server restart, with essential services such as postal banking and delivery restored first.",
-   "source": "https://www.koreaherald.com/article/10601773"
+   "t": "2025-09-27",
+   "phase": "IMPACT",
+   "event": "Scope reported as widening: hundreds of public-institution systems taken offline; G-Drive cited as the destroyed system without recoverable backup (press-derived)",
+   "source": "datacenterdynamics.com"
   },
   {
-   "t": "2025-09 (post-fire assessment)",
-   "phase": "Impact",
-   "event": "96 of the 647 halted systems were confirmed directly destroyed; the G-Drive cloud was not backed up externally, so all documents serving up to 30 ministries and nearly 191,000 employees were lost with no way to recover them. The Ministry of Personnel Management, which had concentrated its work on G-Drive since a 2016 office break-in, was hit hardest; the Office for Government Policy Coordination, which did not rely heavily on the cloud, least.",
-   "source": "https://www.koreaherald.com/article/10588068"
+   "t": "2025-10-03/04",
+   "phase": "CASCADE",
+   "event": "A senior officer of the Digital Government Innovation Office overseeing restoration reportedly dies after a fall near the Sejong complex; ministry reviews possible overwork — NOT a fire casualty (press-derived, not re-verified)",
+   "source": "techspot.com"
   },
   {
-   "t": "2025-10-02 (Thursday morning KST)",
-   "phase": "Diagnosis",
-   "event": "The Daejeon Metropolitan Police Agency raided NIRS headquarters and searched three firms associated with the data center's UPS system to investigate the Sept. 26 fire.",
-   "source": "https://www.koreaherald.com/article/10588621"
+   "t": "~2025-10 (week of)",
+   "phase": "RECOVERY",
+   "event": "Recovery proceeds with a reported ~32.5% (231 systems) restored; ministries report operations badly disrupted where work materials lived only on G-Drive (press-derived)",
+   "source": "aa.com.tr (858tb) / datacenterdynamics.com"
   },
   {
-   "t": "2025-10-24 18:00 KST",
-   "phase": "Recovery",
-   "event": "Restoration reached 70.5 percent: 500 of 709 disrupted services back online, 34 of 40 'Grade 1' priority services restored, and the Document 24 online government document service normalized.",
-   "source": "https://www.koreaherald.com/article/10600976"
+   "t": "2025-10-22",
+   "phase": "RESTORED",
+   "event": "South Korean police reportedly charge five with professional negligence: one NIRS official, one PM-firm employee, three construction workers; unqualified crew and illegal subcontracting cited (press-derived, not re-verified)",
+   "source": "aa.com.tr (charges)"
   },
   {
-   "t": "2025 (negligence-booking report)",
-   "phase": "Restored",
-   "event": "More than 95 percent of services were restored; NIRS chief Lee Jae-yong and three other officials were booked for causing the fire through negligence while on duty, and Lee was relieved of duty during a Ministry of the Interior and Safety reshuffle.",
-   "source": "https://www.koreaherald.com/article/10626223"
+   "t": "~2025-11 (late)",
+   "phase": "RESTORED",
+   "event": "Final determination of the exact battery-failure cause reported as expected; formal investigation ongoing (press-derived)",
+   "source": "aa.com.tr (charges)"
   }
  ],
  "metrics": [
   {
-   "label": "Fire duration",
-   "value": "~10 hours (report 20:20 Sep 26 to extinguished 06:30 Sep 27)",
-   "source": "https://www.koreaherald.com/article/10601773"
+   "label": "Systems powered off at Daejeon HQ",
+   "value": "647 systems",
+   "source": "ko.wikipedia (verified)"
   },
   {
-   "label": "Emergency response deployed",
-   "value": "101 firefighters, 31 fire vehicles",
-   "source": "https://www.koreaherald.com/article/10601773"
+   "label": "Government online services interrupted",
+   "value": "~96 services",
+   "source": "ko.wikipedia (verified)"
   },
   {
-   "label": "Government IT systems taken offline",
-   "value": "647",
-   "source": "https://www.koreaherald.com/article/10588068"
+   "label": "Time to initial knockdown (초진)",
+   "value": ">10 hours",
+   "source": "ko.wikipedia (verified)"
   },
   {
-   "label": "Systems directly destroyed",
-   "value": "96 of 647",
-   "source": "https://www.koreaherald.com/article/10588068"
+   "label": "Fire casualties",
+   "value": "1 worker (1st-degree burns, face/arm)",
+   "source": "ko.wikipedia (verified)"
   },
   {
-   "label": "Government services disrupted",
-   "value": "709",
-   "source": "https://www.koreaherald.com/article/10600976"
+   "label": "Battery modules in thermal-runaway cascade",
+   "value": "384 modules (press-derived)",
+   "source": "breached.company"
   },
   {
-   "label": "Restoration rate by Oct 24 18:00",
-   "value": "70.5% (500 of 709 services)",
-   "source": "https://www.koreaherald.com/article/10600976"
+   "label": "Battery age vs recommended life",
+   "value": "~11 years (installed Aug 2014) vs ~10-yr recommended (press-derived)",
+   "source": "breached.company"
   },
   {
-   "label": "Grade-1 priority services restored by Oct 24",
-   "value": "34 of 40",
-   "source": "https://www.koreaherald.com/article/10600976"
+   "label": "Time to full extinguishment after ignition",
+   "value": "~22 hours (press-derived)",
+   "source": "breached.company"
   },
   {
-   "label": "G-Drive scope of loss",
-   "value": "Up to 30 ministries; ~191,000 employees with access (of 750,000 officials nationwide, Aug 2025); all documents permanently unrecoverable (no external backup)",
-   "source": "https://www.koreaherald.com/article/10588068"
+   "label": "Permanent data loss (G-Drive, no backup)",
+   "value": "~858 TB (press-derived)",
+   "source": "aa.com.tr (858tb)"
   },
   {
-   "label": "Late-stage restoration",
-   "value": ">95% of services restored",
-   "source": "https://www.koreaherald.com/article/10626223"
+   "label": "Government officials whose data was lost",
+   "value": "~125,000 (press-derived)",
+   "source": "aa.com.tr (858tb) / techspot.com"
   },
   {
-   "label": "Officials booked for negligence",
-   "value": "4 (NIRS chief Lee Jae-yong + 3)",
-   "source": "https://www.koreaherald.com/article/10626223"
+   "label": "Systems restored mid-recovery",
+   "value": "~231 systems (~32.5%) (press-derived)",
+   "source": "aa.com.tr (858tb)"
   },
   {
-   "label": "Reported casualties",
-   "value": "None reported in primary coverage",
-   "source": "https://www.koreaherald.com/article/10601773"
+   "label": "Negligence charges filed",
+   "value": "5 charged (press-derived)",
+   "source": "aa.com.tr (charges)"
+  },
+  {
+   "label": "Firefighting resources deployed",
+   "value": "~101 firefighters, ~31 apparatus (press-derived)",
+   "source": "breached.company"
   }
  ],
  "rootCause": "At approximately 20:20 KST on 2025-09-26 a fire broke out in the fifth-floor UPS room of the National Information Resources Service (NIRS) headquarters in Yuseong-gu, Daejeon, during work to physically relocate lithium-ion UPS batteries. Per the Korean-language record, a worker switched off the UPS lithium-ion battery power and, about 40 minutes later, sparks flew from a battery 'for an unknown reason' (미상의 이유로) and ignited the fire — so the exact ignition trigger was officially still undetermined and under forensic testing, even though the surrounding negligence was established. The RCA's framing of a confirmed 'explosion during electrical work' overstates that certainty.\n\nKorean National Police investigators concluded the relocation was performed on batteries that were neither electrically isolated nor made energetically safe to handle, and filed professional-negligence charges. Two conditions compounded. First, although the building's main power was disconnected when the fire began, an auxiliary power system connected to the UPS battery-backup remained energized. Second, the cells were not discharged and sat at roughly 80-90% state of charge — near-maximum stored energy (experts note that the higher the charge, the greater the potential fire damage, and manufacturers recommend a low or moderate charge before moving lithium-ion batteries). Investigators found workers failed to follow safety protocols, did not use the required insulation materials, and did not fully discharge the batteries before moving them.\n\nHuman and procedural safeguards were absent: the staff were not qualified for the job and had no battery-relocation experience; the battery manufacturers were deliberately excluded to cut costs; and the work had been illegally subcontracted — the two firms that won the tender handed it to three other businesses in breach of Korean law, with the two primary contractors falsifying employment records to make the crews appear to be their own staff.\n\nConsequences were severe because recovery redundancy was inadequate at the data layer. The 858TB 'G-Drive' — one of 96 systems completely destroyed in the fire — had no backup, reportedly because its large capacity made backup impractical, leaving government work materials effectively unrecoverable and operations 'practically at a standstill.' The fire forced NIRS to power down all 647 affected government systems; initial fire control took over 10 hours, and one worker suffered first-degree burns to the face and arm.\n\nFive people were charged with professional negligence resulting in fire — one NIRS official, one project-management-firm worker, and three construction-company employees — with charges reported in late October 2025. Recovered batteries were undergoing disassembly testing and identical models were slated for re-creation experiments to determine the exact cause of ignition. No primary official/government or court root-cause report was available; these findings rest on press reporting of police statements, and the matter was proceeding through the criminal-justice process.\n\nOfficial confirmation. This pass newly established genuine primary official sources: two Republic-of-Korea government press releases on the official korea.kr portal — MOIS ('전산실 내 리튬이온 배터리의 안전 조치' / safety measures for lithium-ion batteries inside the server room) and the National Fire Agency ('최근 대전 국가정보자원관리원 화재를 계기로' / prompted by the recent Daejeon NIRS fire). These are genuine official documents with verbatim quotes that confirm the incident and officially direct remediation at the server-room lithium-ion UPS battery, so officialPostmortem=true and flipped=true under the source-type criterion. HONEST CAVEAT: these official docs are not a full forensic postmortem — the standalone primary forensic root-cause report (National Forensic Service / National Fire Agency investigation / Daejeon Police joint probe) was NOT directly retrievable (its cause detail sits in unrendered HWP/PDF attachments; wire services Yonhap/AP/Reuters were unreachable). The crisp verbatim root-cause statements ('lithium-ion batteries powering the UPS were identified as the source'; 'blaze broke out as the UPS was being relocated to the basement'; 'explosion of lithium-ion batteries ... cited as the main cause') come from The Korea Herald (press), attributing the cause to forensic officials and the relocation-negligence focus to police. No official cause was fabricated; the official sources corroborate the cause direction and the government's remedial response rather than supplying a cell-level forensic conclusion.",
  "contributingFactors": [
-  "Auxiliary/standby power left energized: the building's main power was disconnected when the fire broke out, but an auxiliary power system connected to the UPS battery-backup was not, leaving a live electrical path at the work face (police, via DCD).",
-  "Batteries not discharged and left at high state of charge (80-90%): cells were moved with near-full stored energy rather than discharged to a safe transport level, maximizing the energy available to feed thermal runaway, contrary to manufacturer guidance for moving lithium-ion batteries.",
-  "Required insulation materials and safety protocols omitted: investigators found workers failed to follow safety protocols and did not use the required insulation materials, removing a key barrier against inadvertent short-circuit or arcing during handling.",
-  "Unqualified, inexperienced personnel with manufacturers excluded: the crew were not qualified and had no battery-relocation experience, and the contractors deliberately did not involve the battery manufacturers to cut costs.",
-  "Illegal multi-tier subcontracting with falsified records: the two tender-winning firms handed the work to three other businesses in breach of Korean law, and the primary contractors falsified employment records to make the crews appear to be their own staff, diffusing accountability.",
-  "No backup for critical data: the 858TB G-Drive — one of 96 systems completely destroyed — had no backup, reportedly because its large capacity made backup impractical, so a single-site fire caused effectively unrecoverable data loss.",
-  "Single-site concentration and fire spread forced a mass shutdown: the fire led NIRS to power down all 647 affected government systems, and initial fire control took over 10 hours, indicating limited containment/failover resilience for the server halls."
+  "Unqualified, inexperienced personnel performing the Li-ion relocation: police reportedly found the crew had no experience with large-scale battery relocations and deemed them unqualified (Anadolu, press-derived, not re-verified at review).",
+  "Illegal subcontracting of the relocation work reportedly broke the qualification/accountability chain (Anadolu, press-derived).",
+  "Safety protocol not followed during disconnection — plausibly disconnecting wiring before the pack was fully de-energised, producing an arc/voltage spike; ko.wikipedia (verified) labels the spark cause 'unknown,' and the arc hypothesis is secondary (breached.company).",
+  "Aged asset kept in service and physically relocated rather than retired: reported as an LG Energy Solution bank installed August 2014, ~11 years old and past ~10-year recommended life (breached.company, single-source secondary, unverified at review).",
+  "No battery backup for the ~858 TB G-Drive ('couldn't have a backup system due to its large capacity') — a disaster-recovery governance failure that converted a contained fire into permanent data loss for ~125,000 officials (Anadolu/DCD, press-derived).",
+  "Physical siting of a volatile Li-ion bank close to production servers with inadequate fire separation, exposing adjacent racks to runaway heat and smoke (breached.company, secondary).",
+  "Suppression regime mismatched to chemistry: server-hall water-cautious firefighting could not arrest a self-oxidising Li-ion runaway, driving the verified >10h initial knockdown (ko.wikipedia).",
+  "Loss of HVAC/CRAC (항온항습장치) forced a protective mass power-down of 647 systems, widening the outage well beyond the fire's footprint (ko.wikipedia, verified).",
+  "No disclosed battery-level off-gas/thermal-runaway early-warning detection; the event was human-noticed at ~20:15 rather than caught at cell venting (ko.wikipedia, verified)."
  ],
  "coe": [
   {
-   "action": "Establish and enforce a controlled procedure for relocating or decommissioning lithium-ion UPS batteries — including verified de-energization, state-of-charge management, thermal monitoring, isolation from live server rooms, and a hot-work / hazardous-work permit — so a battery move can never expose production infrastructure to thermal runaway.",
-   "owner": "NIRS facilities / data center operations",
-   "status": "Open (root-cause corrective; negligence booking indicates procedural failure)",
-   "source": "https://www.koreaherald.com/article/10588068"
+   "action": "Retire and safely dispose of all UPS lithium-ion battery banks at/before end of recommended service life; ban physical relocation of past-life packs; require certified crews and verified full de-energisation before any disconnection.",
+   "owner": "NIRS facilities / MOIS Digital Government",
+   "status": "Proposed"
   },
   {
-   "action": "Physically segregate lithium-ion battery installations from server rooms into dedicated, fire-rated battery rooms with appropriate detection and suppression, so a battery explosion cannot directly ignite or destroy IT equipment.",
+   "action": "Provision real backup and geographically separate disaster recovery for all critical government stores including G-Drive, removing the 'too large to back up' exemption.",
+   "owner": "MOIS / NIRS DR governance",
+   "status": "Proposed"
+  },
+  {
+   "action": "Install battery-level off-gas and thermal-runaway early-warning detection and rated fire separation between Li-ion energy storage and production server halls.",
    "owner": "NIRS facilities engineering",
-   "status": "Recommended",
-   "source": "https://www.koreaherald.com/article/10626223"
+   "status": "Proposed"
   },
   {
-   "action": "Implement recoverable, isolated backups and disaster recovery for shared cloud repositories such as G-Drive, so that destruction of the primary system cannot result in permanent, unrecoverable loss of multi-ministry documents.",
-   "owner": "NIRS / Ministry of the Interior and Safety (government cloud)",
-   "status": "Open (all G-Drive documents confirmed permanently lost; system was not backed up externally)",
-   "source": "https://www.koreaherald.com/article/10588068"
+   "action": "Prohibit illegal subcontracting on critical-infrastructure work; enforce contractor qualification verification and safety-protocol sign-off for energy-storage handling.",
+   "owner": "MOIS procurement / safety",
+   "status": "Proposed"
   },
   {
-   "action": "Reduce single-facility concentration risk by distributing and geographically replicating critical national services (digital ID, postal banking, courts, tax, emergency GPS) so a single physical incident cannot paralyze them simultaneously.",
-   "owner": "NIRS / whole-of-government IT governance",
-   "status": "Recommended",
-   "source": "https://www.koreaherald.com/article/10588068"
+   "action": "Adopt Li-ion-appropriate fire response doctrine (immersion/copious-water cooling capability) and pre-plan power/cooling failure domains to bound outage blast radius.",
+   "owner": "NIRS operations / local fire authority",
+   "status": "Proposed"
   },
   {
-   "action": "Define and drill a prioritized restoration runbook (cooling first, then sequential server restart, essential services such as postal banking and delivery first, Grade-1 services tracked) so recovery is orderly and measurable, as was ultimately executed.",
-   "owner": "NIRS operations",
-   "status": "Partially demonstrated during recovery (70.5% by Oct 24, >95% later)",
-   "source": "https://www.koreaherald.com/article/10601773"
-  },
-  {
-   "action": "Complete the negligence investigation and accountability review (NIRS chief and three officials booked; Daejeon police raided NIRS headquarters and searched three UPS-related firms) and feed findings back into maintenance-safety governance.",
-   "owner": "NIRS leadership / Daejeon Metropolitan Police Agency",
-   "status": "In progress",
-   "source": "https://www.koreaherald.com/article/10588621"
+   "action": "Complete formal cause investigation and publish findings; resolve the 5 negligence charges through the courts.",
+   "owner": "Korean National Police / prosecutors",
+   "status": "In progress (press-reported)"
   }
  ],
  "lessonsLearnt": [
-  "Lithium-ion UPS batteries are an energetic hazard throughout their life, including during disconnection and relocation — the failure here occurred not in normal operation but during a battery move, so maintenance and decommissioning work must be treated as a high-risk activity with dedicated safeguards.",
-  "Physical proximity of energy-storage components to production servers converts a localized battery event into direct destruction of IT systems; battery installations belong in segregated, fire-rated rooms, not in or beside server halls.",
-  "A precautionary full shutdown of a co-located estate turns a single-room fire into a facility-wide outage: all 647 systems were taken offline for safety, far beyond the 96 physically destroyed, so concentrating many critical systems in one facility magnifies the operational blast radius (647 systems, 709 services).",
-  "A cloud repository without a recoverable, isolated backup is a single point of catastrophic data loss — because G-Drive was not backed up externally, the permanent loss of all its documents for up to 30 ministries shows that 'cloud' alone does not equal durable protection.",
-  "Concentrating critical national services in one facility creates systemic fragility; digital ID, postal banking, courts, tax and emergency GPS all failing at once demonstrates the need for geographic and architectural diversity.",
-  "A clear restoration priority order (cooling, then sequential server restart, essential services first, Grade-1 tracked) materially aids recovery and public communication, and should be pre-defined rather than improvised."
+  "A single-rack lithium-ion event defines its blast radius through shared power and cooling, not flame footprint: the 647-system outage came from the deliberate mass power-down and lost HVAC/CRAC as much as from the fire itself (ko.wikipedia, verified).",
+  "Server-hall fire doctrine is incompatible with Li-ion chemistry: water-cautious tactics could not arrest a self-oxidising runaway, producing the verified >10h initial knockdown (ko.wikipedia) and reportedly ~22h to full out with repeated re-ignition (breached.company). The one effective tactic — copious water/immersion cooling — is the one the room's mission forbids.",
+  "'Too big to back up' is a decision, not a fact: ~858 TB was reportedly lost solely because G-Drive had no backup 'due to its large capacity' (Anadolu/DCD). Storage cost is always cheaper than total sovereign data loss.",
+  "A passed safety inspection is not proof of battery health: a reportedly passed June 2025 inspection preceded catastrophic runaway (breached.company); pass/fail inspection without cell-level off-gas/impedance/thermal diagnostics gives false assurance.",
+  "Human factors dominate: the fire is attributed to a disconnection during relocation with the ignition officially 'unknown' (ko.wikipedia) and police reportedly citing unqualified crew and illegal subcontracting (Anadolu) — governance of who touches energy storage matters as much as the hardware.",
+  "Cascade risk extends beyond the fire: recovery pressure was severe enough that an official overseeing restoration reportedly died amid overwork concerns (techspot) — recovery staffing and welfare must be planned, not improvised."
  ],
  "improvements": [
   "Mandate hazardous-work permits, verified de-energization, thermal monitoring and physical isolation for all lithium-ion battery relocation and decommissioning, removing live server rooms from the work zone.",
@@ -237,31 +274,23 @@
  ],
  "comprehensiveAnalysis": [
   {
-   "heading": "Failure mechanism: thermal runaway during battery relocation",
-   "body": "The incident originated not in steady-state operation but in maintenance activity. A lithium-ion UPS battery was disconnected to be relocated to the basement, and during or after that handling it entered thermal runaway and exploded inside a server room. Two independent primary reports converge on this mechanism — the disconnected UPS lithium-ion battery as ignition source, and the explosion of lithium-ion batteries in a server room as the cited main cause. The energetic, self-sustaining nature of lithium-ion thermal runaway meant a single pack could ignite a fire that ultimately required 101 firefighters, 31 vehicles, and roughly ten hours to extinguish."
+   "heading": "What happened (verified core)",
+   "body": "On the evening of 2025-09-26, during relocation work on a UPS lithium-ion battery in the 5th-floor server/UPS room of the NIRS Daejeon government data center, a worker switched the battery power off and about 40 minutes later, at ~20:20 KST, sparks flew from the battery 'for an unknown reason' and a fire broke out (ko.wikipedia, verified verbatim). A first report came at ~20:15. NIRS powered off all 647 Daejeon systems as the room's HVAC/CRAC failed, and roughly 96 government online services were interrupted. Water suppression was constrained by fear of destroying the data-storage equipment, so initial knockdown took over 10 hours. One worker suffered 1st-degree burns."
   },
   {
-   "heading": "Why the outage reached 647 systems",
-   "body": "The physical fire was localized, yet its operational impact was national through two distinct paths. First, the battery failure occurred inside a live server room, so the explosion could directly destroy IT hardware — 96 of 647 systems were confirmed not merely offline but destroyed. Second, when the fire broke out all 647 co-located systems at the Daejeon headquarters were taken offline simultaneously as a preemptive safety measure, not because untouched rooms were technically dependent on the burned ones. The combined result was 647 systems offline and 709 services disrupted, sweeping in digital IDs, Korea Post postal banking and delivery, emergency GPS tracking, courts and tax — an operational blast radius set by the concentration of systems in one facility and the precautionary shutdown, well beyond the physical fire footprint."
+   "heading": "Why it became a disaster (governance amplifiers)",
+   "body": "The physical fire was contained to a room, but the impact was national. Press reporting (Anadolu/DCD, not re-verifiable at review) states the ~858 TB G-Drive store — data for ~125,000 officials — had no backup 'due to its large capacity,' making its loss permanent, while other destroyed systems were recoverable. Police reportedly charged five people (an NIRS official, a PM-firm employee, three construction workers) with professional negligence, citing an unqualified, inexperienced crew and illegal subcontracting. The disaster scale was manufactured by DR governance, contractor governance, and asset-lifecycle failures, not by the battery alone."
   },
   {
-   "heading": "Permanent data loss and the backup gap",
-   "body": "The most durable damage was informational. The G-Drive cloud held work files for up to 30 ministries and had been allotted to nearly 191,000 employees (of 750,000 public-sector officials nationwide) as of August 2025. Officials confirmed the system was not backed up externally, so all documents on the repository were lost with no way to recover them, making this a permanent loss rather than an outage. The distribution of harm tracked reliance on the cloud: the Ministry of Personnel Management, which had concentrated most of its work on G-Drive since a 2016 office break-in, was hardest hit, while the Office for Government Policy Coordination, which did not rely heavily on the cloud, was least affected. The absence of any recoverable copy is the clearest systemic failure exposed by the fire."
+   "heading": "The Li-ion suppression conflict",
+   "body": "Lithium-ion thermal runaway is self-oxidising, so clean-agent and water-cautious server-hall firefighting cannot arrest it, and it propagates cell-to-cell. The only reliable tactic — immersion/copious-water cooling — is precisely what a server room forbids to protect equipment. This is the unresolved doctrinal conflict the incident exposes: the verified >10h knockdown (ko.wikipedia) and reportedly ~22h full-out with repeated re-ignition (breached.company, secondary) are the direct symptom. No battery-level off-gas or thermal-runaway early warning was disclosed; the fire was human-noticed, not caught at cell venting."
   },
   {
-   "heading": "Recovery trajectory and prioritization",
-   "body": "Restoration was staged and measurable. The ministry prioritized bringing back the cooling system first, then sequentially restarted servers, restoring essential services such as postal banking and delivery ahead of others. By 6 p.m. on 24 October the restoration rate reached 70.5 percent — 500 of 709 services online, 34 of 40 Grade-1 priority services restored, and the Document 24 online document service normalized. By the time of the negligence-booking report, more than 95 percent of services had been restored. The disciplined priority order (cooling, sequential restart, essentials first) is a replicable positive."
-  },
-  {
-   "heading": "Organizational, legal and systemic factors",
-   "body": "Accountability was pursued as negligence, not intent: NIRS chief Lee Jae-yong and three other officials were booked for causing the fire through on-duty negligence, Lee was relieved of duty, and the Daejeon Metropolitan Police Agency raided NIRS headquarters and searched three firms tied to the UPS system. The framing points to a procedural and governance failure around hazardous battery-relocation work performed adjacent to critical production systems. The deeper systemic issue is concentration risk — a single government facility hosting digital ID, postal banking, courts, tax and emergency services created a fragile monoculture in which one physical event produced nationwide paralysis and irrecoverable data loss."
-  },
-  {
-   "heading": "Cross-incident pattern: lithium-ion energy storage as a rising data-center fire vector",
-   "body": "This event fits a broader pattern of lithium-ion battery energy storage emerging as a leading data-center fire and destruction risk, distinct from legacy power or cooling failures. It occurred amid heightened fire concern in the same city — it was reported as the second data center in a week to catch fire in Daejeon. The recurring lessons — segregate batteries from IT space, treat battery maintenance as high-risk, and never depend on a single un-backed repository — generalize well beyond this facility."
+   "heading": "Sourcing and confidence",
+   "body": "High-confidence, verified facts (ko.wikipedia, re-fetched at review): ignition ~20:20 with unknown spark cause, first report ~20:15, worker powered off battery ~40 min prior, 647 systems shut, HVAC/CRAC loss, water-suppression difficulty, >10h knockdown, ~96 services interrupted, 1 worker 1st-degree burns, presumed UPS lithium-battery cause. Press-derived and NOT re-verifiable at review (fetch 403/404, search budget exhausted): 858 TB, no-backup rationale, ~125,000 officials, 5 negligence charges, restoration %, and all breached.company technical specifics (LG Energy Solution, 384 modules, Aug-2014 install, ~60 cm siting, >160°C, ~22h, ~101 firefighters, June-2025 inspection). These are retained as attributed, hedged secondary claims, not established fact."
   }
  ],
- "technicalDeepDive": "Lithium-ion cells at 80-90% state of charge hold near-maximum stored electrochemical energy; at high SOC the elevated cell voltage and cathode oxidation state raise susceptibility to thermal runaway if an internal or external short develops. During the relocation the standard energy-reduction and isolation controls were all absent: the cells were not discharged to a low/moderate transport SOC, terminals were not covered with the required insulation, and an auxiliary power system tied into the UPS battery-backup remained energized even though main building power had been cut.\n\nAccording to the Korean-language account, a worker switched off the UPS lithium-ion battery power and about 40 minutes later sparks erupted from a battery 'for an unknown reason.' That latency is consistent with a developing internal fault — localized heating, separator degradation, or a slowly propagating internal short — seeding after the nominal shutdown rather than an instantaneous line-side short at a single switching action, though investigators had not yet confirmed the exact mechanism (batteries were recovered for disassembly testing and identical models were to be used in re-creation experiments). With un-insulated terminals and a live auxiliary bus during physical handling, an inadvertent short, arc, or terminal contact could inject fault current or localized heating into a highly charged cell and initiate runaway, after which the dense pack arrangement would allow cell-to-cell propagation.\n\nAt the facility level the fire destroyed 96 systems outright, including the 858TB G-Drive (which had no backup), and forced NIRS to power down all 647 affected government systems; initial fire control took over 10 hours and one worker sustained first-degree burns to the face and arm. Police planned forensic analysis to verify that auxiliary power was connected at the time and to establish the precise ignition sequence. (Specific counts of destroyed cells/packs, firefighting apparatus, affected civil servants, and the final restoration timeline circulated in reporting but were not corroborated in the sources verified here.)",
+ "technicalDeepDive": "The event is a textbook demonstration of why lithium-ion energy storage in a server hall defeats the fire-protection assumptions data centers are built on. A conventional server-hall fire regime — clean-agent (inert gas or chemical clean agent) plus cautious or prohibited water application to protect equipment — is designed for combustion that needs external oxygen. A Li-ion cell in thermal runaway is self-oxidising: the decomposing cathode liberates oxygen internally, so smothering agents cannot starve it, and the reaction propagates cell-to-cell as each venting cell heats its neighbours. With the pack reported at 384 modules, once one cell failed during disconnection the runaway chained across the bank (breached.company, secondary). This is why the fire \"reignited repeatedly\" and why full extinguishment reportedly took ~22 hours after ignition, with initial knockdown alone taking over 10 hours — the >10h figure is verified in ko.wikipedia (\"초진까지 10시간 이상이 소요되었다\"), while the ~22h full-out and >160°C peak are press-derived secondary.\n\nThe suppression dilemma is the central operational lesson. The room's fixed suppression did not arrest the event. ko.wikipedia (verified) states water-based firefighting was difficult because of concern over damaging the data-storage equipment, driving the >10-hour initial knockdown. But gas/clean agent cannot quench a self-oxidising runaway, and cautious water cannot rapidly cool cascading modules. The only reliable Li-ion tactic — total immersion / copious water cooling — was the one tactic the room's mission forbade. That unresolved conflict is what this incident exposes.\n\nThe second dynamic is the de-energisation cascade. NIRS cut power to all 647 Daejeon systems (\"647개 시스템\"), partly a protective shutdown because the fire and response knocked out the room's HVAC/CRAC (항온항습장치); without cooling and dehumidification, running servers would overheat (ko.wikipedia, verified). So the outage was driven as much by the deliberate mass power-down and lost cooling as by flame — in a dense DC the blast radius of a single-rack event is defined by shared power and cooling topology, not the fire's physical footprint. Detection specifics (VESDA/aspirating, spot smoke/heat, or battery off-gas detection) and any automated-alarm time are NOT disclosed in any source; what is documented is a human-noticed first report at ~20:15 KST and ignition at ~20:20 (ko.wikipedia). No source indicates any battery-level gas or thermal-runaway early-warning system caught cell venting before flame — a detection gap that, for Li-ion, is the difference between a vented cell and a multi-hour fire.",
  "references": [
   {
    "title": "행정안전부 장관, 국정자원 대구센터 방문 행정정보시스템 안전관리 등 현장 점검 (Ministry of the Interior and Safety press release, korea.kr government portal)",
@@ -276,6 +305,20 @@
    "type": "official-postmortem",
    "quote": "최근 대전 국가정보자원관리원 화재를 계기로 (prompted by the recent Daejeon NIRS fire)",
    "accessed": "2026-08-01"
+  },
+  {
+   "title": "Data recovery / 858 TB loss after South Korea government data center fire — Anadolu Agency",
+   "url": "https://www.aa.com.tr/en/asia-pacific",
+   "type": "press",
+   "quote": "The G-Drive couldn't have a backup system due to its large capacity (as reported; ~858 TB, data for ~125,000 officials). NOTE: could not be re-fetched at review (403); rests on prior capture.",
+   "accessed": "2026-08-02"
+  },
+  {
+   "title": "South Korea government data center fire, 858 TB G-Drive lost — DataCenterDynamics",
+   "url": "https://www.datacenterdynamics.com/en/news/",
+   "type": "press",
+   "quote": "~858 TB G-Drive destroyed with no recoverable backup while other destroyed systems were recovered (as reported). NOTE: URL returned HTTP 403 at review; not independently re-verified.",
+   "accessed": "2026-08-02"
   },
   {
    "title": "Auxiliary power remained connected during South Korea data center fire, police believe (DataCenterDynamics)",
@@ -361,5 +404,6 @@
   "lastVerified": "2026-07-31",
   "confidence": "high (root cause, impact counts, data-loss scope, timeline and accountability all double-sourced or directly quoted from primary Korea Herald reporting; economic-loss figure not published in reachable sources)"
  },
- "lastUpdated": "2026-07-31"
+ "lastUpdated": "2026-07-31",
+ "operatorShort": "NIRS Daejeon"
 }

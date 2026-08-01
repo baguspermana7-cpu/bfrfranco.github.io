@@ -212,7 +212,7 @@ window.RZ_FEATURE_FLAGS = {
      users (role=educator, tier=pro) and pro users pass; demo and free do
      not. Root always passes. Replaces the legacy ROOT_ONLY_PATHS hard block. */
   'datahall-ai': {
-    'page-access':             { free: false, demo: false, pro: true, root: true  },
+    'page-access':             { free: false, demo: false, pro: false, root: true  },
     'pro-views':               { free: false, demo: false, pro: true, root: true  },
     'pdf-export':              { free: false, demo: false, pro: true, root: true  },
     'pdf-watermark-removed':   { free: false, demo: false, pro: true, root: true  },
@@ -236,7 +236,7 @@ window.RZ_FEATURE_FLAGS = {
 
   /* ── DC Conventional ──────────────────────────────────────────────────── */
   'dc-conventional': {
-    'page-access':             { free: false, demo: false, pro: true, root: true  },
+    'page-access':             { free: false, demo: false, pro: false, root: true  },
     'pro-views':               { free: false, demo: false, pro: true, root: true  },
     'pdf-export':              { free: false, demo: false, pro: true, root: true  },
     'pdf-watermark-removed':   { free: false, demo: false, pro: true, root: true  },
@@ -472,6 +472,29 @@ window._rzFeatures = (function () {
   }
 
   /**
+   * Resolve the session ROLE ('' | 'demo' | 'pro' | 'educator' | 'root').
+   * The tier matrix maps educator→pro and can't distinguish them, so pages
+   * gated to "root + educator only" (DC AI/HPC, DC Conventional) need the role.
+   */
+  function getRole() {
+    try {
+      if (window._rzAuth && typeof window._rzAuth.getRoleFromSession === 'function') {
+        var session = (typeof window._rzAuth.getSession === 'function') ? window._rzAuth.getSession() : null;
+        return window._rzAuth.getRoleFromSession(session) || '';
+      }
+      var raw = localStorage.getItem('rz_premium_session');
+      if (!raw) return '';
+      var s = JSON.parse(raw);
+      return (s && s.role) || '';
+    } catch (e) { return ''; }
+  }
+
+  /* Pages gated to ROOT + EDUCATOR only (not plain pro). Their page-access
+   * schema is root-only via the tier matrix; educators (role=educator, tier=pro)
+   * are admitted here explicitly so a normal pro account stays locked out. */
+  var EDUCATOR_ACCESS_PAGES = { 'datahall-ai': 1, 'dc-conventional': 1 };
+
+  /**
    * Check whether a feature is available for the current tier.
    * Respects per-page admin overrides stored in rz_admin_features_by_page.
    *
@@ -495,6 +518,11 @@ window._rzFeatures = (function () {
        lockout from the admin panel writing root:false into the
        page-access override. */
     if (tier === 'root' && featureKey === 'page-access') return true;
+
+    /* Educator access: DC AI/HPC + DC Conventional are root+educator only.
+       Their page-access is root-only in the tier matrix (plain pro = false);
+       admit educators (role=educator) explicitly here. */
+    if (featureKey === 'page-access' && EDUCATOR_ACCESS_PAGES[pageKey] && getRole() === 'educator') return true;
 
     /* Check admin overrides first */
     try {
