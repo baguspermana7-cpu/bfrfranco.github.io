@@ -1,0 +1,292 @@
+{
+ "slug": "cloudflare-flexential-pdx-power-2023",
+ "title": "Cloudflare Control-Plane & Analytics Outage — Flexential PDX-04 Power Failure (Nov 2023)",
+ "operator": "Cloudflare",
+ "dcName": "Flexential PDX-04",
+ "location": {
+  "city": "Hillsboro",
+  "country": "United States",
+  "region": "AMER",
+  "az": "Portland/Hillsboro, Oregon"
+ },
+ "date": "2023-11-02",
+ "durationMin": 2441,
+ "category": [
+  "power",
+  "human"
+ ],
+ "severity": {
+  "usersAffected": "Cloudflare control-plane customers globally: dashboard and API configuration changes failed, analytics were unavailable, and raw log services were down for most customers for the entire incident. The data plane (edge proxy/CDN, WAF, DNS serving cached config) largely kept serving traffic. Exact customer counts are not stated in the primary postmortem; third-party figures (e.g. site/domain counts) are screening-only and were not re-verified.",
+  "impactUsd": "Not disclosed in primary source",
+  "servicesDown": [
+   "Cloudflare dashboard and API (configuration changes)",
+   "Analytics",
+   "Raw log services (down full duration for most customers)",
+   "Cloudflare Stream",
+   "Magic WAN",
+   "Logpush (some logs dropped unrecoverably)"
+  ],
+  "tier": "SEV-1 / Major (control-plane, not data-plane, total loss)"
+ },
+ "brief": "On 2 November 2023 a Portland General Electric (PGE) unplanned maintenance event dropped one of two independent utility feeds into Flexential's PDX-04 data center near Hillsboro, Oregon. Roughly three hours later a ground fault on a 12,470-volt PGE transformer triggered protective systems that, by design, shut down fast — but the same protective trip also shut down all ten of PDX-04's generators, which were unusually running in parallel with the surviving utility feed. UPS batteries meant to bridge to generator power began failing after only about four minutes, and the entire facility went dark. Cloudflare's control plane and analytics ran primarily across three Hillsboro-area data centers on an assumption that any one could fail, but two critical log-processing services (Kafka and ClickHouse) existed only in PDX-04 and had dependents in the supposedly highly-available cluster; PDX-04 also held more than a third of the HA cluster and Cloudflare's largest analytics cluster. That hidden single-site dependency — a failure mode Cloudflare had never tested by fully taking PDX-04 offline — broke the redundancy design. Cloudflare's non-automated failover to European disaster-recovery sites was slow, and cold-start recovery of servers and services ran into 4 November.",
+ "magnitude": {
+  "usersScore": 7,
+  "financialScore": 5,
+  "durationScore": 8,
+  "blastRadiusScore": 8,
+  "note": "Blast radius (8) and duration (8) dominate: a single-site power loss removed >1/3 of the high-availability cluster plus the largest analytics cluster and broke services meant to survive one-site loss, over a ~36-40 hour window running into a second calendar day. Users score (7) reflects a global control-plane/analytics/raw-log outage that nonetheless spared the data plane (traffic kept flowing). Financial (5) is a placeholder — no dollar impact is disclosed in the primary source; the reputational cost was high (public CEO apology). Scores are structural, not from a verified customer count, which the primary postmortem does not provide."
+ },
+ "sequenceOfEvents": [
+  {
+   "t": "2023-11-02T08:50:00Z",
+   "phase": "Trigger",
+   "event": "Portland General Electric (PGE) has an unplanned maintenance event that knocks out one of the two independent utility feeds into PDX-04, leaving the facility on a single utility feed nearly three hours before the fault.",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "t": "2023-11-02T11:40:00Z",
+   "phase": "Escalation",
+   "event": "A ground fault occurs on a 12,470-volt PGE transformer at PDX-04. Protective systems trip fast by design — but the same trip shuts down all of PDX-04's generators, which were unusually running in parallel with the remaining utility feed. Both grid and on-site generation are lost together.",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "t": "2023-11-02T11:44:00Z",
+   "phase": "Impact",
+   "event": "Cloudflare is first notified of trouble when the two routers connecting PDX-04 to the rest of the world go offline. This is the start of Cloudflare-observed impact and the beginning of the UPS-depletion window.",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "t": "2023-11-02T11:48:00Z",
+   "phase": "Escalation",
+   "event": "UPS batteries, meant to bridge to generator power, begin failing after only about four minutes — far short of their intended ~10-minute bridge — removing the buffer that should have covered the generator restart. (Timestamp ~4 min after routers dropped.)",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "t": "2023-11-02T12:01:00Z",
+   "phase": "Impact",
+   "event": "By 12:01 UTC, with generators not fully restarted, the UPS batteries are fully depleted and every customer of the data center loses power. PDX-04 is dark. (Total-power-loss window: 11:44–12:01 UTC.)",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "t": "2023-11-02T12:01:00Z",
+   "phase": "Cascade",
+   "event": "Loss of PDX-04 cascades into Cloudflare's control plane: Kafka and ClickHouse (log-processing services present only in PDX-04) go down, breaking dependents running in the high-availability cluster; >1/3 of the HA cluster and the largest analytics cluster are gone. Dashboard/API config changes, analytics, and raw logs fail.",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "t": "2023-11-02T12:28:00Z",
+   "phase": "Detection",
+   "event": "Flexential sends its first message to Cloudflare acknowledging a power issue — about 44 minutes after Cloudflare's own routers dropped, and with no prior notice that the site had failed over to generator power.",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "t": "2023-11-02T12:48:00Z",
+   "phase": "Mitigation",
+   "event": "Flexential gets the generators restarted, about one hour after the UPS began failing. Site generation is re-established, but Cloudflare's own bring-up (breakers, server rebuild, DR) has much further to run.",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "t": "2023-11-02T13:40:00Z",
+   "phase": "Mitigation",
+   "event": "Cloudflare decides to fail the control plane and analytics over to its disaster-recovery sites in Europe.",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "t": "2023-11-02T13:43:00Z",
+   "phase": "Recovery",
+   "event": "The first services come up on the European disaster-recovery site, three minutes after the failover decision.",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "t": "2023-11-02T17:57:00Z",
+   "phase": "Recovery",
+   "event": "Services successfully moved to the disaster-recovery site are stable — about 4h14m after first DR turn-up, indicating a slow, largely non-automated failover.",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "t": "2023-11-02T22:48:00Z",
+   "phase": "Recovery",
+   "event": "Flexential replaces Cloudflare's failed circuit breakers, restores both utility feeds, and confirms clean power at PDX-04. Site power is healthy, but Cloudflare's server and service rebuild continues.",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "t": "2023-11-04T04:25:00Z",
+   "phase": "Restored",
+   "event": "All Cloudflare services are fully restored — about 40h41m after Cloudflare-observed impact began at 11:44 UTC on 2 November (CEO framed customer pain as spanning roughly the last 36 hours).",
+   "source": "Cloudflare post-mortem"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Utility feed lost (precursor)",
+   "value": "1 of 2 independent PGE feeds dropped at 08:50 UTC, ~2h50m before the fault",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "label": "Ground-fault voltage",
+   "value": "12,470 V (high-voltage transformer fault forcing fast protective shutdown)",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "label": "UPS bridge performance",
+   "value": "Batteries began failing after only ~4 minutes vs their intended ~10-minute bridge",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "label": "Facility generation",
+   "value": "10 generators (inclusive of redundant units), rated to carry PDX-04 at full load — all taken offline by one protective trip",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "label": "Total-power-loss window",
+   "value": "11:44–12:01 UTC (2 Nov) — every DC customer lost power",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "label": "Generator restart delay",
+   "value": "Generators restarted 12:48 UTC — ~1h04m after routers dropped / ~1h after UPS began failing",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "label": "Operator notification lag",
+   "value": "~44 minutes (Cloudflare routers offline 11:44 → first Flexential notice 12:28 UTC)",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "label": "Single-site blast radius",
+   "value": ">1/3 of the high-availability cluster machines + Cloudflare's largest analytics cluster housed in PDX-04",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "label": "Hard single-site dependency",
+   "value": "Kafka + ClickHouse (log processing) existed ONLY in PDX-04, with dependents in the HA cluster",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "label": "Total incident duration",
+   "value": "~40h41m (11:44 UTC Nov 2 → 04:25 UTC Nov 4); CEO characterized customer pain as 'the last 36 hours'",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "label": "Raw log availability",
+   "value": "Down for most customers for the entire duration of the incident (total, not intermittent)",
+   "source": "Cloudflare post-mortem"
+  }
+ ],
+ "rootCause": "A ground fault on a 12,470-volt PGE transformer at PDX-04 triggered protective systems that, as designed for high-voltage faults, shut down fast to prevent damage — but the same protective trip took all ten of PDX-04's generators offline instead of isolating the fault, so grid and on-site generation were lost together. This was aggravated by an unusual operating mode: Flexential was running the one remaining utility feed and the generators in parallel, so the fault propagated into the paralleled generation rather than the facility riding through on generator power. UPS batteries meant to bridge to a generator restart began failing after only ~4 minutes, and PDX-04 went dark. The reason a single facility's loss became a multi-day Cloudflare outage was a systemic design flaw: the control plane and analytics assumed any one of three Hillsboro-area sites could fail, yet two critical services (Kafka and ClickHouse) lived only in PDX-04 with dependents in the high-availability cluster, and PDX-04 held more than a third of that cluster — a single-site dependency Cloudflare had never surfaced because it had never tested fully taking PDX-04 offline.",
+ "contributingFactors": [
+  "Unusual operating mode: Flexential ran the single remaining utility feed AND the generators in parallel, so the 12,470 V ground fault propagated to and tripped the generators rather than the site riding through on generator power alone.",
+  "UPS under-performance: batteries intended to bridge to generator restart began failing after only ~4 minutes (versus an intended ~10-minute bridge), eliminating the buffer that should have covered the (delayed, manual) generator restart.",
+  "Operator notification failure: counter to best practice, Flexential did not tell Cloudflare it had failed the site over to generator power, so Cloudflare had no signal it was in a degraded single-point-of-power state before the collapse; Flexential's first outage notice arrived ~44 minutes after impact.",
+  "Hidden single-site dependency: Kafka and ClickHouse existed only in PDX-04 yet had dependents in the high-availability cluster, and PDX-04 held >1/3 of that cluster plus the largest analytics cluster — concentrating critical dependencies in one 'any-one-can-fail' site.",
+  "Untested failure mode: Cloudflare had never tested fully taking the entire PDX-04 facility offline, so the single-site dependencies were never discovered before the real event.",
+  "On-site human/access factors delayed the generator restart: overnight staffing lacked an experienced operations or electrical expert (security plus a technician on the job about a week), and the access-control system was not on battery backup and went offline — complicating the manual generator restart.",
+  "Slow, largely non-automated disaster-recovery failover: DR turn-up began at 13:43 UTC but did not reach stability until 17:57 UTC (~4h14m), and full restoration ran into 4 November."
+ ],
+ "coe": [
+  {
+   "action": "Ensure the control plane running ON Cloudflare's network continues to function even if all core data centers are offline (push control-plane serving to the edge/network so it survives total core loss).",
+   "owner": "Cloudflare",
+   "status": "Committed",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "action": "Remove products' hard dependency on the availability of any single core data center — mandate that HA-cluster services (and the products depending on them) actually tolerate a full single-site loss, including relocating single-site services like Kafka and ClickHouse.",
+   "owner": "Cloudflare",
+   "status": "Committed",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "action": "Test the blast radius of system failures and minimize the number of services impacted by any one failure; adopt more rigorous chaos-style testing including fully taking an entire facility (e.g. PDX-04) offline, a scenario never previously exercised.",
+   "owner": "Cloudflare",
+   "status": "Committed",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "action": "Establish and regularly test true disaster-recovery capability for the control plane and analytics so failover is fast and automated rather than the slow manual process seen here (DR not stable until ~4h14m after first turn-up).",
+   "owner": "Cloudflare",
+   "status": "Committed",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "action": "Provide a logging/analytics disaster-recovery plan so raw logs and Logpush are not lost during a single-site outage (raw logs were down the full incident; some logs were dropped unrecoverably).",
+   "owner": "Cloudflare",
+   "status": "Committed",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "action": "Thoroughly audit all core data centers and their power/redundancy assumptions, and reassess reliance on facilities that can lose both utility and generator power via a common protective trip.",
+   "owner": "Cloudflare",
+   "status": "Committed",
+   "source": "Cloudflare post-mortem"
+  },
+  {
+   "action": "Facility-side: stop running the remaining single utility feed and generators in parallel during a degraded state, and notify tenants immediately upon failover to generator power (best-practice communications Flexential did not follow). Inferred corrective expectation, not a Cloudflare-stated commitment.",
+   "owner": "Flexential (facility operator)",
+   "status": "Corrective expectation raised by Cloudflare",
+   "source": "Cloudflare post-mortem"
+  }
+ ],
+ "lessonsLearnt": [
+  "'Redundant on paper' is not redundant if any critical service is single-homed: Cloudflare's three-site 'any-one-can-fail' assumption was silently invalidated by Kafka and ClickHouse living only in PDX-04 and by >1/3 of the HA cluster residing there. Redundancy claims must be enforced by dependency mapping, not assumed.",
+  "Untested failure modes are latent outages: because Cloudflare had never exercised a full PDX-04 blackout, the single-site dependencies stayed hidden until a real, worst-case event surfaced them all at once. Game-day / chaos testing that actually kills a whole facility is the only way to prove blast radius.",
+  "Facility power redundancy can share a common failure: ten full-load-rated generators provided no protection when one high-voltage ground fault's protective trip took them all down together — especially while generators were paralleled with the utility. Diverse feeds and generator counts do not guarantee independence if a single protection scheme can shed everything.",
+  "UPS bridge time is a safety-critical assumption that must be verified, not trusted: batteries failing after ~4 minutes (versus their intended ~10-minute bridge) turned a survivable generator-restart gap into a total blackout. Battery health and true runtime need continuous validation.",
+  "Cross-organization communication is part of the control loop: Flexential not announcing the generator failover, and taking ~44 minutes to send a first notice, left Cloudflare blind to a degraded single-point-of-power state it might otherwise have hedged against.",
+  "Disaster recovery must be fast and automated to be useful: a DR failover that takes hours to stabilize (13:43 → 17:57 UTC) and a cold start running into a second day mean the control plane's resilience was theoretical, not operational."
+ ],
+ "improvements": [
+  "Serve the control plane from Cloudflare's edge network so it keeps functioning even with all core data centers offline, eliminating the core-site single point of failure.",
+  "Enforce genuine multi-site availability for all HA-dependent services — relocate/replicate single-homed services (Kafka, ClickHouse) and forbid HA-cluster dependents from relying on a single facility.",
+  "Institutionalize blast-radius and chaos testing, including fully powering down an entire core facility, to surface hidden single-site dependencies before customers do.",
+  "Stand up and continuously exercise automated, fast disaster recovery for control plane, analytics, and the logging pipeline (so raw logs / Logpush survive a single-site loss).",
+  "Audit facility power designs and require operators to (a) avoid running a single utility feed paralleled with generators in a degraded state and (b) immediately notify Cloudflare on any failover to generator power; validate UPS battery health/runtime against spec.",
+  "Weight and distribute the three Hillsboro-area sites so no single site holds a disproportionate share (>1/3) of the HA cluster or uniquely hosts the largest analytics cluster."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "Failure mechanism: a protection scheme that shed generation instead of the fault",
+   "body": "The initiating electrical event was a ground fault on a 12,470-volt PGE transformer feeding PDX-04. High-voltage ground faults are designed to force a fast protective shutdown to prevent equipment damage, and that is what happened — but the protection acted on the wrong scope. Instead of isolating the faulted section and letting the facility ride through on its own generation, the trip took all ten of PDX-04's generators offline simultaneously. The critical aggravator was the operating mode: Flexential was running the one surviving utility feed and the generators in parallel, an unusual configuration that gave the fault a path into the paralleled generation. With grid and generators lost together, the entire electrical resilience of a site rated for full-load generator support collapsed to whatever the UPS could hold."
+  },
+  {
+   "heading": "Why a survivable gap became a blackout, then a cascade",
+   "body": "The UPS existed precisely to bridge the seconds-to-minutes gap of a generator restart. It failed that single job: batteries began failing after roughly four minutes, well short of their intended ~10-minute bridge, so between 11:44 and 12:01 UTC PDX-04 went completely dark before generation was restored. The blackout then met a software architecture that assumed the opposite. Cloudflare's control plane and analytics ran primarily across three Hillsboro-area sites on the premise that losing any one was tolerable — but PDX-04 uniquely hosted Kafka and ClickHouse (the log-processing backbone) whose dependents ran in the high-availability cluster, and PDX-04 held more than a third of that cluster and the largest analytics cluster. Losing the single facility therefore didn't degrade the system gracefully; it broke services that were explicitly supposed to survive a one-site loss, taking down dashboard/API config changes, analytics, and raw logs."
+  },
+  {
+   "heading": "Recovery: manual, serial, and slow",
+   "body": "Recovery exposed how little of the resilience was automated. Flexential restarted generators at 12:48 UTC, but that only restored site power potential; Cloudflare still had to replace failed circuit breakers, rebuild servers, and fail the control plane over to European DR sites. The DR decision came at 13:40 UTC, first services at 13:43 UTC, but stability not until 17:57 UTC — over four hours of hand-driven failover. Clean utility power at PDX-04 was confirmed at 22:48 UTC on 2 November, yet the server and service rebuild dragged on until full restoration at 04:25 UTC on 4 November. The long tail — roughly 40 hours end to end — was dominated not by the power event itself but by the absence of fast, tested, automated recovery for a control plane that had quietly become single-site-dependent."
+  },
+  {
+   "heading": "Organizational and systemic factors",
+   "body": "Two organizations contributed. On the facility side, Flexential ran a risky degraded configuration (utility paralleled with generators), its UPS underperformed, its overnight shift lacked an experienced operations or electrical expert and its access-control system was not on battery backup, and — counter to best practice — it never told Cloudflare it had gone to generator power, with its first outage notice arriving about 44 minutes after impact. On the Cloudflare side, the deeper systemic root cause was that it had never tested fully taking PDX-04 offline, so the divergence between its stated redundancy model and its actual dependency graph was never surfaced. Redundancy was assumed rather than enforced and verified; the concentration of Kafka, ClickHouse, a third of the HA cluster, and the largest analytics cluster in one site was a latent single point of failure that only a real blackout revealed."
+  },
+  {
+   "heading": "Cross-incident pattern: the redundancy-verification gap",
+   "body": "This incident is a textbook instance of a recurring failure class in large distributed systems: correlated failure of nominally independent redundancy, compounded by unverified availability claims. The facility layer showed correlated power failure (one fault taking all generators and the UPS bridge with it, despite N+ generator counts), while the software layer showed a hidden single-homed dependency inside a 'highly available' cluster. The through-line — matching many high-profile cloud outages — is that resilience was designed but never proven by deliberately destroying a whole failure domain. Cloudflare's own remediation reflects the general lesson: push the control plane to the edge so it survives total core loss, mandate real multi-site availability, and continuously test blast radius by taking entire facilities down on purpose."
+  }
+ ],
+ "technicalDeepDive": "The electrical failure is best understood as a protection-selectivity and paralleling problem. A ground fault on a 12,470 V PGE transformer at PDX-04 was cleared by protective devices that, correctly for a high-voltage fault, opened fast to prevent equipment damage — but because Flexential was operating the surviving utility feed in parallel with the generators (an unusual synchronized/paralleled source configuration the postmortem explicitly calls out), the resulting protective trip took down all ten generators rather than isolating only the faulted utility section. The exact single-line diagram, relay coordination, and bus-tie/paralleling-switchgear scheme are not disclosed in the primary source, so the precise propagation path is inferred from two stated facts: 'the protective measure also shut down all of PDX-04's generators' and that both sources were online at once. With both grid and generation gone, the design intent was for the UPS to hold load for the manual generator restart; instead the batteries began failing after ~4 minutes (versus an intended ~10-minute bridge; the postmortem gives no physical cause — age, temperature, cell/string, state-of-charge, or maintenance state are all undisclosed), so the facility blacked out between 11:44 and 12:01 UTC. Generators required a manual physical restart after the trip, which took until 12:48 UTC — a delay the postmortem attributes to on-site human/access factors: the overnight shift lacked an experienced operations or electrical expert (it consisted of security plus an unaccompanied technician who had been on the job about a week), and Flexential's access-control system was not powered by the battery backups and went offline. On the software side, the cascade mechanism is a classic single-homed critical dependency inside a supposedly multi-site HA design: Kafka and ClickHouse — the ingestion and columnar-store backbone of Cloudflare's logging and analytics pipeline — existed only in PDX-04 while their consumers ran in the high-availability cluster spread across the three Hillsboro-area sites. Because a distributed HA cluster's quorum and service health silently assumed those log-processing services were reachable, losing PDX-04 (which also held >1/3 of the HA cluster nodes and the largest analytics cluster) simultaneously removed a plurality of cluster capacity and a hard dependency, so config-plane writes (dashboard/API changes), analytics, and raw logs failed rather than degrading. The recovery path — non-automated DR failover to Europe not stable until 17:57 UTC and a cold-start rebuild running to 04:25 UTC on 4 November — confirms that the control plane's fault tolerance was declared but never validated by a full-facility blackout test, the single most important missing engineering control.",
+ "references": [
+  {
+   "title": "Post Mortem on Cloudflare Control Plane and Analytics Outage",
+   "url": "https://blog.cloudflare.com/post-mortem-on-cloudflare-control-plane-and-analytics-outage/",
+   "type": "official-postmortem",
+   "accessed": "2026-08-01",
+   "quote": "Ground faults with high voltage (12,470 volt) power lines are very bad... Unfortunately, in this case, the protective measure also shut down all of PDX-04's generators."
+  },
+  {
+   "title": "DCD: Cloudflare suffers power outage at Flexential Oregon data center",
+   "url": "https://www.datacenterdynamics.com/en/news/cloudflare-suffers-second-power-outage-at-flexential-data-center-in-oregon-in-six-months/",
+   "type": "news",
+   "accessed": "2026-07-31",
+   "quote": "(Secondary trade-press coverage of the Flexential/Hillsboro power outages; not re-verified from primary source this pass — source returned 403 and a facility-name discrepancy ('PDX01' vs Cloudflare's 'PDX-04') plus later second-outage details remain unverified. Treated as screening-only.)"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": true,
+  "referenceCount": 2,
+  "lastVerified": "2026-08-01",
+  "confidence": "high"
+ },
+ "lastUpdated": "2026-08-01"
+}

@@ -1,0 +1,288 @@
+{
+ "slug": "delta-atlanta-switchgear-2016",
+ "title": "Delta Air Lines Atlanta Data Center Power Failure Grounds the Global Fleet",
+ "operator": "Delta Air Lines",
+ "dcName": "Delta Technology Data Center, Atlanta Headquarters",
+ "location": {
+  "city": "Atlanta",
+  "country": "United States",
+  "region": "AMER"
+ },
+ "date": "2016-08-08",
+ "durationMin": 360,
+ "category": [
+  "power",
+  "fire"
+ ],
+ "severity": {
+  "usersAffected": "Tens of thousands of passengers worldwide; thousands stranded overnight and sleeping on airport floors (exact passenger count not stated by any source)",
+  "impactUsd": "~$150 million (Delta's own estimate)",
+  "servicesDown": [
+   "Flight scheduling",
+   "Passenger check-in and services",
+   "Baggage handling",
+   "Aircraft fueling",
+   "Airport video displays",
+   "Public websites",
+   "Self-service kiosks"
+  ],
+  "tier": "Critical (SEV-1 equivalent; full worldwide operational outage)"
+ },
+ "brief": "In the early hours of 8 August 2016, a routine scheduled transfer of load onto a backup generator at Delta Air Lines' Atlanta headquarters data center precipitated a fire in the power control room. The fire failed a transformer and cut a primary power path feeding the facility. Roughly 300 of Delta's 7,000 servers lacked a working alternate feed and went dark, and because surviving servers could no longer communicate with the failed nodes, the entire airline operations platform collapsed. Delta grounded its global fleet, cancelling about 2,100 flights over three days and delaying another 2,400, at an estimated cost of ~$150 million. CEO Ed Bastian took full responsibility. The event is a textbook case of a common-mode power fault upstream of server-level redundancy defeating an otherwise diverse design, compounded by a tightly-coupled system with no graceful degradation and an unmodernized legacy reservation tier.",
+ "magnitude": {
+  "usersScore": 8,
+  "financialScore": 9,
+  "durationScore": 7,
+  "blastRadiusScore": 9,
+  "note": "Financial impact (~$150M) is roughly 200x the Ponemon industry-average data-center outage cost (~$730K per the cited source), hence a 9. Blast radius is near-total: a ~4% node loss (300 of 7,000 servers) cascaded into a 100% platform outage that grounded a global fleet across 334 destinations in 64 countries. Core power/IT restoration took ~6 hours (durationScore 7 reflects this rather than the 3-day operational tail). Users score reflects tens of thousands stranded worldwide, though no exact passenger figure was published."
+ },
+ "sequenceOfEvents": [
+  {
+   "t": "2016-08-08 ~02:30 EST",
+   "phase": "Trigger",
+   "event": "A routine scheduled switch for testing purposes transferred load onto the backup generator. This control action precipitated a fire in the power control room of Delta's Atlanta data center.",
+   "source": "https://availabilitydigest.com/public_articles/1109/delta.pdf"
+  },
+  {
+   "t": "2016-08-08 ~02:30 EST",
+   "phase": "Escalation",
+   "event": "The fire caused a transformer to fail, killing one of the two power feeds serving the data center. The primary source and the switching-in backup generator both sat at the local power-control-room equipment that burned; the geographically separate second utility feed on the opposite side of the building survived.",
+   "source": "https://availabilitydigest.com/public_articles/1109/delta.pdf"
+  },
+  {
+   "t": "2016-08-08 ~02:30 EST",
+   "phase": "Impact",
+   "event": "300 of Delta's 7,000 servers were not linked to an alternate power source. Servers powered only by the failed feed went down; many could not fail over because their designated backups were also unpowered.",
+   "source": "https://availabilitydigest.com/public_articles/1109/delta.pdf"
+  },
+  {
+   "t": "2016-08-08 ~02:35 EST",
+   "phase": "Cascade",
+   "event": "Surviving and dual-fed servers stayed powered but could no longer communicate with the failed nodes. In the tightly-coupled distributed system, loss of the subset broke shared state and hard dependencies, taking down Delta's entire platform: check-in, baggage, websites, kiosks, airport displays, scheduling and fueling.",
+   "source": "https://availabilitydigest.com/public_articles/1109/delta.pdf"
+  },
+  {
+   "t": "2016-08-08 early AM EST",
+   "phase": "Diagnosis",
+   "event": "Georgia Power dispatched workers for a switch-gear problem but reported no outages in its own territory and that other customers were unaffected, confirming the fault was internal to Delta's switchgear/transformer rather than a grid outage.",
+   "source": "https://www.datacenterknowledge.com/outages/delta-data-center-outage-grounds-hundreds-of-flights"
+  },
+  {
+   "t": "2016-08-08 ~02:30-08:30 EST",
+   "phase": "Recovery",
+   "event": "Recovery required rebooting 500 servers to bring the platform back online.",
+   "source": "https://availabilitydigest.com/public_articles/1109/delta.pdf"
+  },
+  {
+   "t": "2016-08-08 ~08:30 EST",
+   "phase": "Restored",
+   "event": "Delta systems were operational again about six hours after the fire. On recovery, only the old Deltamatic green-screen interface worked, forcing most agents to check in passengers manually and hand-write boarding passes.",
+   "source": "https://availabilitydigest.com/public_articles/1109/delta.pdf"
+  },
+  {
+   "t": "2016-08-08 ~08:40 EST",
+   "phase": "Mitigation",
+   "event": "The FAA ground stop on Delta was lifted, but cancellations and delays continued as the operation recovered.",
+   "source": "https://availabilitydigest.com/public_articles/1109/delta.pdf"
+  },
+  {
+   "t": "2016-08-08 ~13:30 EST",
+   "phase": "Mitigation",
+   "event": "By 1:30 PM only 1,700 of Delta's ~6,000 scheduled flights were operating; a midday tally recorded 451 flights cancelled and 1,679 operated so far.",
+   "source": "https://www.datacenterknowledge.com/outages/delta-data-center-outage-grounds-hundreds-of-flights"
+  },
+  {
+   "t": "2016-08-08 to 2016-08-10",
+   "phase": "Impact",
+   "event": "Delta cancelled about 2,100 flights over three days (1,000 Monday, 800 Tuesday, 300 Wednesday) and delayed a further 2,400. Thousands of passengers slept on airport floors awaiting flights.",
+   "source": "https://availabilitydigest.com/public_articles/1109/delta.pdf"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Estimated total cost of outage",
+   "value": "~$150 million USD (Delta's own estimate)",
+   "source": "https://availabilitydigest.com/public_articles/1109/delta.pdf"
+  },
+  {
+   "label": "Flights cancelled over three days",
+   "value": "~2,100 (1,000 Mon / 800 Tue / 300 Wed)",
+   "source": "https://availabilitydigest.com/public_articles/1109/delta.pdf"
+  },
+  {
+   "label": "Additional flights delayed",
+   "value": "~2,400",
+   "source": "https://availabilitydigest.com/public_articles/1109/delta.pdf"
+  },
+  {
+   "label": "Servers lacking a working alternate feed",
+   "value": "300 of 7,000 (~4% of the fleet)",
+   "source": "https://availabilitydigest.com/public_articles/1109/delta.pdf"
+  },
+  {
+   "label": "Servers requiring reboot to recover",
+   "value": "500",
+   "source": "https://availabilitydigest.com/public_articles/1109/delta.pdf"
+  },
+  {
+   "label": "Core outage duration to platform restoration",
+   "value": "~6 hours (02:30 to ~08:30 EST)",
+   "source": "https://availabilitydigest.com/public_articles/1109/delta.pdf"
+  },
+  {
+   "label": "Scheduled flights operating by 1:30 PM day one",
+   "value": "1,700 of ~6,000",
+   "source": "https://availabilitydigest.com/public_articles/1109/delta.pdf"
+  },
+  {
+   "label": "Day-one midday cancellation tally",
+   "value": "451 cancelled / 1,679 operated of ~6,000",
+   "source": "https://www.datacenterknowledge.com/outages/delta-data-center-outage-grounds-hundreds-of-flights"
+  },
+  {
+   "label": "Passenger voucher offered (3+ hr delay or grounded)",
+   "value": "$200 per traveler",
+   "source": "https://availabilitydigest.com/public_articles/1109/delta.pdf"
+  },
+  {
+   "label": "Industry-average data-center outage cost (Ponemon)",
+   "value": "~$730,000 (Ponemon Institute average, per cited source) — Delta's ~$150M is roughly 200x higher",
+   "source": "https://availabilitydigest.com/public_articles/1109/delta.pdf"
+  },
+  {
+   "label": "Delta operational scale",
+   "value": "5,400+ daily flights / 334 destinations / 64 countries",
+   "source": "https://availabilitydigest.com/public_articles/1109/delta.pdf"
+  },
+  {
+   "label": "Delta IT spend (2015 alone)",
+   "value": "$150 million (hundreds of millions over three years)",
+   "source": "https://availabilitydigest.com/public_articles/1109/delta.pdf"
+  }
+ ],
+ "rootCause": "A routine scheduled transfer of load onto the backup generator (a planned control action for testing) precipitated a fire in the data center's power control room. The fire failed a transformer and cut a power feed serving the facility. Because the primary source and the switching-in backup generator both terminated at the same power-control-room equipment that burned, the fault was a common-mode failure upstream of server-level redundancy. Georgia Power confirmed no grid outage and that other customers were unaffected, locating the origin squarely in Delta's internal switchgear/transformer. The power loss then cascaded into a total platform outage because ~300 single-corded servers went dark and the surviving nodes could not operate without them.",
+ "contributingFactors": [
+  "Common-mode point of convergence: the two utility feeds provided path diversity (opposite sides of the building, guarding against a backhoe cut) but converged at a shared power-control-room / transfer node, so their separation gave no protection once that node itself failed.",
+  "Latent power-mapping defect: 300 of 7,000 servers were not linked to a working alternate power source, so their designed dual-cording redundancy did not exist in practice and they could not fail over.",
+  "Failure during a redundancy exercise: taking the normal source out of the path to test the backup generator caused the very outage the test was meant to guard against.",
+  "Tightly-coupled architecture with no graceful degradation: surviving servers could not make forward progress without the failed nodes, converting a ~4% node loss into a 100% system outage.",
+  "Unmodernized legacy tier: the reservation/passenger-service stack ran on the 52-year-old Deltamatic application, whose only surviving fallback was a green-screen interface most agents could not use, forcing manual check-in and hand-written boarding passes.",
+  "Zero maintenance window: because these systems cannot be taken offline even briefly, latent defects (single-corded servers, un-modernized legacy tiers) persisted undetected in production until a real fault exposed them."
+ ],
+ "coe": [
+  {
+   "action": "Implement immediate, reliable, automatic failover at every layer (server, data store, network component) so any single-component loss is absorbed transparently rather than cascading. NOTE: this is the source analyst's prescriptive remediation principle, not an announced Delta corrective action.",
+   "owner": "Delta Technology / Infrastructure Engineering",
+   "status": "Recommended (source prescription; no official Delta action plan published)",
+   "source": "https://availabilitydigest.com/public_articles/1109/delta.pdf"
+  },
+  {
+   "action": "Re-map and remediate the 300 single-corded servers so every server's redundant power supplies are genuinely fed from independent, separately-powered strips/feeds. INFERRED corrective from the identified latent defect; not a verified announced action.",
+   "owner": "Delta Technology / Data Center Operations",
+   "status": "Gap — no verified source confirms this was performed",
+   "source": "https://availabilitydigest.com/public_articles/1109/delta.pdf"
+  },
+  {
+   "action": "Introduce fault-domain diversity at the power transfer/control node (independent switchgear/transformer paths) so a localized power-room fire cannot take out both the primary source and the switching-in backup simultaneously. INFERRED from the common-mode analysis; not a verified announced action.",
+   "owner": "Delta Technology / Facilities & Electrical Engineering",
+   "status": "Gap — no verified equipment-level RCA or remediation published",
+   "source": "https://availabilitydigest.com/public_articles/1109/delta.pdf"
+  },
+  {
+   "action": "Modernize or retire the Deltamatic legacy reservation tier and ensure recovery/fallback paths are themselves designed to degrade gracefully rather than collapsing to a green-screen-only mode. INFERRED from the recovery outcome; not a verified announced action.",
+   "owner": "Delta Technology / Application Engineering",
+   "status": "Gap — not confirmed by any verified source",
+   "source": "https://availabilitydigest.com/public_articles/1109/delta.pdf"
+  },
+  {
+   "action": "CEO accepted accountability publicly — Ed Bastian took full responsibility for the failure, and Delta issued refunds, $200 vouchers, waived change fees, hoteled thousands of passengers, and used its private-jet fleet for top-tier customers.",
+   "owner": "Delta Air Lines (CEO Ed Bastian)",
+   "status": "Done (customer remediation executed during the event)",
+   "source": "https://availabilitydigest.com/public_articles/1109/delta.pdf"
+  }
+ ],
+ "lessonsLearnt": [
+  "Geographic path diversity is not fault-domain diversity: two feeds entering opposite sides of a building buy nothing once both converge at a shared transfer/control node, which becomes a single common-mode point of failure.",
+  "Redundancy that is not verified is not redundancy: 300 servers were 'supposed to be' dual-corded but were not, and the gap was invisible until a real power loss made it matter.",
+  "Planned maintenance and redundancy tests are among the most dangerous moments in a data center; taking the normal source out of the path to prove the backup can trigger the exact outage the test is meant to prevent.",
+  "Tight coupling without graceful degradation turns small faults into total outages: a ~4% node loss became a 100% platform failure because healthy nodes could not proceed without the failed ones.",
+  "Investment alone does not buy resilience: Delta had spent hundreds of millions on IT (including $150M in 2015) yet a single power-room fire still grounded the global fleet.",
+  "Legacy tiers with no graceful fallback become the recovery bottleneck: when only Deltamatic's green-screen mode survived, most agents were reduced to hand-writing boarding passes.",
+  "Systems that can never be taken offline accumulate hidden latent defects, which surface only during a genuine incident rather than a controlled maintenance window."
+ ],
+ "improvements": [
+  "Design for failure as the normal case, not the exception: assume components will fail and build the platform to absorb single-component loss transparently at server, data-store, and network layers.",
+  "Establish true fault-domain isolation at the electrical transfer/control node so no single power-room event can eliminate both the primary source and the switching-in backup.",
+  "Continuously audit and validate power-cord mapping and failover paths (not just at build time) to catch single-corded/mis-mapped servers before an incident does.",
+  "Engineer graceful degradation and quorum tolerance into tightly-coupled distributed systems so partial node loss does not halt the whole platform.",
+  "Modernize or wrap legacy application tiers (e.g. Deltamatic) and ensure fallback/recovery paths are themselves resilient rather than collapsing to an unusable interface.",
+  "Create safe maintenance and test procedures for redundancy exercises (staged transfers, verified backup readiness before cutover) to prevent the test itself from causing the outage."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "Failure mechanism: a common-mode power fault upstream of redundancy",
+   "body": "The trigger was a planned control action — a scheduled transfer of load onto the backup generator for testing — that precipitated a fire in the power control room. That fire failed a transformer and cut a power feed to the facility. The design intent was sound in one dimension: two utility feeds entered on opposite sides of the building to survive a localized insult such as a backhoe strike. But path diversity is not fault-domain diversity. The primary source and the switching-in backup generator both terminated at the same power-control-room equipment that burned, making the fire a common-mode failure sitting upstream of every server's dual-corded power supplies. Neither feed separation nor per-server redundancy could ride through a fault at the point where they all converged."
+  },
+  {
+   "heading": "Why a ~4% node loss became a total outage",
+   "body": "Only about 300 of 7,000 servers actually lacked a working alternate feed, so in raw terms roughly 4% of the fleet lost power. In a loosely-coupled system that would have been a contained, survivable event. Instead, the surviving and dual-fed servers stayed powered but could no longer communicate with the failed nodes. In a tightly-coupled distributed system, losing a subset of nodes breaks quorum, shared state, and hard dependencies, so the healthy majority cannot make forward progress. The absence of graceful degradation is what converted a partial power loss into the collapse of Delta's entire platform — check-in, baggage, fueling, scheduling, websites, kiosks, and airport displays all went dark together."
+  },
+  {
+   "heading": "Recovery and the legacy-tier bottleneck",
+   "body": "Recovery required rebooting 500 servers, and the core platform was operational again about six hours after the fire, at roughly 08:30 EST. The FAA ground stop lifted around 08:40, but the operational recovery lagged far behind the technical one: by 1:30 PM only 1,700 of ~6,000 scheduled flights were running, and cancellations continued for three days. A critical drag on recovery was the reservation stack's 52-year-old Deltamatic application; when systems returned, only its old green-screen interface worked, so most agents — untrained on it — had to check passengers in manually and hand-write boarding passes. A recovery path that was not itself designed to degrade gracefully became the constraint on getting the airline moving again."
+  },
+  {
+   "heading": "Organizational and systemic factors",
+   "body": "This was not a case of underinvestment: Delta had spent hundreds of millions on IT over three years, including $150 million in 2015 alone, and CEO Ed Bastian took full public responsibility. The deeper systemic driver is that these systems can never be taken offline — not even for a short maintenance window — which is precisely why latent defects such as the 300 single-corded servers and the un-modernized legacy tier persisted undetected in production and surfaced only under a real fault. The design philosophy the incident violated is that component failure should be treated as normal and expected, to be absorbed rather than handled as an exception; the outcome showed that recovery paths themselves had not been designed to that standard."
+  },
+  {
+   "heading": "Cross-incident pattern",
+   "body": "The incident fits a durable industry pattern: electrical and power-chain infrastructure is one of the most common root causes of data-center outages, consistent with this failure originating in the power control room and switchgear rather than the IT stack. Georgia Power's confirmation that there was no grid outage and that other customers were unaffected locates the fault internally, reinforcing that the vulnerability was Delta's own power topology, not the utility. The financial magnitude — about $150 million against a Ponemon industry-average outage cost near $730,000 — shows how an airline's tight coupling of operations to a single data center can amplify a routine class of failure into a business-critical, worldwide event."
+  }
+ ],
+ "technicalDeepDive": "The physical failure chain reads as a control-plane action inducing a data-plane fault. A scheduled transfer of the electrical load onto the backup generator — the kind of exercise meant to prove resilience — precipitated a fire in the power control room, which failed a transformer and severed a power feed to the data center. The building's two-feed topology delivered genuine path diversity against a distributed, localized insult (feeds entered on opposite sides specifically to survive a backhoe cut), but it offered zero fault-domain isolation at the point of convergence: the primary source and the switching-in backup generator both sat at the same power-control-room equipment that burned. That makes the fire a classic common-mode fault positioned upstream of every downstream redundancy layer, so neither the second (surviving) utility feed on the far side of the building nor the servers' dual power supplies could arrest it for the affected load. Crucially, the intended defense-in-depth had a latent hole beneath it: 300 of 7,000 servers were not actually linked to a working alternate source, so their designated backups were themselves unpowered and could not accept a failover. The blast then propagated through the logical layer. Losing roughly 4% of nodes should have been survivable, but in a tightly-coupled distributed system the powered survivors could not communicate with the failed nodes; broken quorum, shared state, and hard service dependencies meant the healthy majority could not make forward progress, and the whole platform — scheduling, check-in, baggage, fueling, displays, web, kiosks — went down together. Recovery was manual and slow: 500 servers were rebooted to restore service over about six hours, and the reservation tier returned only in Deltamatic's green-screen fallback, exposing that recovery paths were not themselves engineered to degrade gracefully. Note on evidentiary depth: the engineering-mechanism reconstruction here is analysis grounded in two secondary sources; no verified source states the transformer rating/type, switchgear make or configuration, whether an ATS/STS was present, UPS ride-through and battery autonomy at the moment of transfer, or the facility's Uptime Tier, and no official Delta engineering post-mortem is known to exist.",
+ "references": [
+  {
+   "title": "Delta Data Center Outage Grounds Hundreds of Flights — Data Center Knowledge",
+   "url": "https://www.datacenterknowledge.com/outages/delta-data-center-outage-grounds-hundreds-of-flights",
+   "type": "news",
+   "quote": "Georgia Power stated there were no power outages in its territory on Sunday evening or Monday, though it dispatched workers over a problem with switch gear early Monday morning — pointing the fault back inside Delta.",
+   "accessed": "2026-08-01"
+  },
+  {
+   "title": "Tens of thousands of Delta passengers grounded by outage — Data Center Dynamics",
+   "url": "https://www.datacenterdynamics.com/en/news/tens-of-thousands-of-delta-passengers-grounded-by-outage/",
+   "type": "news",
+   "quote": "The outage struck Delta's computer systems and operations worldwide, stranding tens of thousands of passengers.",
+   "accessed": "2026-08-01"
+  },
+  {
+   "title": "Delta Air Lines Cancels 2,100 Flights Due to Power Outage — Availability Digest",
+   "url": "https://availabilitydigest.com/public_articles/1109/delta.pdf",
+   "type": "other",
+   "quote": "At 2:30 AM EST a fire erupted in the power control room; the fire caused a transformer to fail, killing one of the two power feeds, and 300 of Delta's 7,000 servers were not linked to an alternate power source.",
+   "accessed": "2026-08-01"
+  },
+  {
+   "title": "Delta: Data Center Outage Cost Us $150M — Data Center Knowledge (follow-up)",
+   "url": "https://www.datacenterknowledge.com/outages/delta-data-center-outage-cost-us-150m",
+   "type": "news",
+   "quote": "Exact cost put at $150 million, with approximately 2,000 flights grounded over three days from an electrical equipment failure in the Atlanta data center.",
+   "accessed": "2026-08-01"
+  },
+  {
+   "title": "Thousands of Delta passengers delayed by computer outage — Hacker News discussion (links to BBC)",
+   "url": "https://news.ycombinator.com/item?id=12246490",
+   "type": "other",
+   "quote": "A routine scheduled switch to the backup generator this morning caused a fire; Georgia Power said other customers were not affected.",
+   "accessed": "2026-08-01"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": false,
+  "referenceCount": 5,
+  "lastVerified": "2026-08-01",
+  "confidence": "Medium-high on impact, timeline, and cost (corroborated across Availability Digest and Data Center Knowledge, both re-fetched and confirmed this pass, though both ultimately trace to Delta's own estimate); medium on the physical failure mechanism, which is analytic reconstruction from secondary sources with no equipment-level RCA. No official Delta engineering post-mortem exists; primary sources (BBC article body, ECN Magazine technical piece, SEC filings) were unreachable this pass. Feed-count wording ('both feeds' vs 'one of two') is reconciled at the shared transfer node and is a terminology difference, not a contradiction in the causal chain. Note: the cited Availability Digest source gives the Ponemon average as ~$730,000 only; a previously stated '$740K / $2.4M max' range was not in the cited references and has been corrected."
+ },
+ "lastUpdated": "2026-08-01"
+}

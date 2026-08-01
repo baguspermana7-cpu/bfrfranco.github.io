@@ -1,0 +1,262 @@
+{
+ "slug": "british-airways-heathrow-power-2017",
+ "title": "British Airways Boadicea House Power Surge: A 15-Minute Fault That Grounded Heathrow and Gatwick for Days",
+ "operator": "British Airways (IAG); data-centre facility management by CBRE",
+ "dcName": "Boadicea House (BoHo) data centre, West London",
+ "location": {
+  "city": "London",
+  "country": "United Kingdom",
+  "region": "EMEA"
+ },
+ "date": "2017-05-27",
+ "durationMin": 2880,
+ "category": [
+  "power",
+  "human"
+ ],
+ "severity": {
+  "usersAffected": "~75,000 passengers affected; as many as 672 flights grounded across Heathrow and Gatwick",
+  "impactUsd": "~£58m (~$74.6m), IAG-confirmed July 2017 (compensation + lost business); higher press figures ($100m, up to £150m) unreconciled",
+  "servicesDown": [
+   "Passenger check-in",
+   "Baggage handling",
+   "Operational communications / core airline systems",
+   "Online booking-data integrity (stale flight data)"
+  ],
+  "tier": "Tier-1 / critical business outage (dual-hub airline grounding)"
+ },
+ "brief": "On the morning of Saturday 27 May 2017, an engineer working inside British Airways' Boadicea House data centre in West London disconnected a power supply and then reconnected it in an uncontrolled, unplanned manner. The resulting surge physically damaged servers and bypassed the site's backup generators and batteries. Although the BoHo site itself was without power for only about 15 minutes, the physical damage plus a failed failover to the secondary data centre escalated a brief electrical fault into a multi-day service outage. British Airways grounded all flights at Heathrow and Gatwick, affecting roughly 75,000 passengers and as many as 672 flights. IAG later confirmed a loss of about £58m. No formal operator postmortem was ever published; BA sued its facilities supplier CBRE and the dispute settled in February 2019 with no admission of liability.",
+ "magnitude": {
+  "usersScore": 6,
+  "financialScore": 6,
+  "durationScore": 6,
+  "blastRadiusScore": 7,
+  "note": "Blast radius is elevated because the outage grounded two of the UK's busiest airport hubs simultaneously and defeated a designed active/active redundancy pair, even though impact was contained to a single airline. Duration and financial scores reflect a ~2-day grounding and an IAG-confirmed ~£58m loss; the striking feature is the gap between a ~15-minute physical power fault and a multi-day recovery."
+ },
+ "sequenceOfEvents": [
+  {
+   "t": "2017-05-26 (Fri, day before)",
+   "phase": "Detection",
+   "event": "Latent stress signal: BA booking-confirmation emails were already taking roughly 8 hours to arrive instead of minutes, a precursor of system strain ahead of the power event (low-confidence, single-source).",
+   "source": "The Register (theregister.com/2017/06/02)"
+  },
+  {
+   "t": "2017-05-27 (Sat) morning, ~09:30 BST (reconstructed; sources establish Saturday-morning timing, not the exact clock time)",
+   "phase": "Trigger",
+   "event": "Power was lost at the Boadicea House data centre. An engineer, authorised to be present but not to perform the action, disconnected a power supply.",
+   "source": "The Register (theregister.com/2017/06/02); IAG/Walsh via BBC (bbc.com/news/business-40159202)"
+  },
+  {
+   "t": "2017-05-27 (Sat) shortly after the disconnect (~09:30 BST, approx.)",
+   "phase": "Escalation",
+   "event": "The power was turned back on in an unplanned and uncontrolled fashion, creating a surge that physically damaged the servers and bypassed the backup generators and batteries. The equipment had functioned; the failure was human mis-operation during restoration.",
+   "source": "Leaked IAG internal email via BBC (bbc.com/news/business-40159202)"
+  },
+  {
+   "t": "2017-05-27 (Sat) ~09:45 BST (approx., reconstructed)",
+   "phase": "Cascade",
+   "event": "BoHo was physically without power for only about 15 minutes, but the uncommanded shutdown is hypothesised to have synchronised corrupted data to the failover data centre, populating it with bad data and crashing dependent systems — defeating the redundancy (single-source engineering hypothesis).",
+   "source": "The Register (theregister.com/2017/06/02)"
+  },
+  {
+   "t": "2017-05-27 (Sat, daytime)",
+   "phase": "Impact",
+   "event": "British Airways cancelled all flights, initially until 18:00 BST; check-in, baggage and communications systems were down at Heathrow and Gatwick.",
+   "source": "BBC (bbc.com/news/uk-40069865)"
+  },
+  {
+   "t": "2017-05-27 (Sat, later)",
+   "phase": "Impact",
+   "event": "The cancellation window was extended beyond 18:00 BST; an aviation expert forecast disruption lasting three to four days.",
+   "source": "BBC (bbc.com/news/uk-40069865)"
+  },
+  {
+   "t": "2017-05-28 (Sun)",
+   "phase": "Diagnosis",
+   "event": "Customers reported seeing stale/old flight-booking data in their online accounts — a persisting data-integrity symptom consistent with the corrupted-sync failover hypothesis.",
+   "source": "The Register (theregister.com/2017/06/02)"
+  },
+  {
+   "t": "2017-05-29 (Mon, ops normalised)",
+   "phase": "Recovery",
+   "event": "Service was restored over roughly two to three days from the 27th, with operations normalising around Monday 29 May; approximately 75,000 passengers were affected and as many as 672 flights grounded before recovery completed.",
+   "source": "DCD (datacenterdynamics.com); IAG/Walsh via BBC (bbc.com/news/business-40159202)"
+  },
+  {
+   "t": "2017-07 (July 2017)",
+   "phase": "Restored",
+   "event": "IAG confirmed a loss of approximately £58m (~$74.6m) covering passenger compensation and lost business.",
+   "source": "DCD (datacenterdynamics.com)"
+  },
+  {
+   "t": "2019-02-11",
+   "phase": "Restored",
+   "event": "BA's legal dispute with facilities supplier CBRE settled, with no admission of liability, an undisclosed amount, and no jointly agreed root cause.",
+   "source": "DCD (datacenterdynamics.com); Computer Weekly (computerweekly.com/news/252452976)"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "BoHo physical power-loss window",
+   "value": "~15 minutes",
+   "source": "The Register (theregister.com/2017/06/02): 'around a quarter of an hour'"
+  },
+  {
+   "label": "End-to-end service recovery",
+   "value": "~2 days (forecast 3-4 days)",
+   "source": "BBC (bbc.com/news/uk-40069865); seed brief 'grounded for two days'"
+  },
+  {
+   "label": "Passengers affected",
+   "value": "~75,000 (dual-sourced)",
+   "source": "DCD (datacenterdynamics.com) and IAG/Walsh via BBC (bbc.com/news/business-40159202)"
+  },
+  {
+   "label": "Flights grounded",
+   "value": "as many as 672 (single-outlet)",
+   "source": "DCD (datacenterdynamics.com)"
+  },
+  {
+   "label": "Confirmed financial loss",
+   "value": "~£58m (~$74.6m)",
+   "source": "IAG, July 2017, via DCD (datacenterdynamics.com)"
+  },
+  {
+   "label": "Precursor email delay (Fri 26 May)",
+   "value": "~8 hours vs. minutes",
+   "source": "The Register (theregister.com/2017/06/02) — low confidence"
+  },
+  {
+   "label": "EU261 passenger compensation schedule",
+   "value": "EUR250 short-haul / EUR400 medium-haul / up to EUR600 long-haul",
+   "source": "EU261 statutory schedule; disruption context via BBC (bbc.com/news/uk-40069865)"
+  },
+  {
+   "label": "Hypothesised over-voltage on rack bus",
+   "value": "480V vs 240V nominal (2x)",
+   "source": "The Register (theregister.com/2017/06/02) — engineering hypothesis, not confirmed"
+  }
+ ],
+ "rootCause": "Human mis-operation during power restoration, not an equipment defect. An engineer disconnected a power supply at the Boadicea House data centre and then reconnected it in an uncontrolled, unplanned manner. This produced a power surge that physically damaged servers and bypassed the site's backup generators and batteries. The mechanism is dual-sourced: a leaked internal IAG email carried by the BBC states the reconnection created physical damage to the systems, and IAG CEO Willie Walsh publicly attributed the event to human error on reconnection, noting the engineer was authorised to be in the data centre but not authorised to do what he did. BA CEO Alex Cruz's 'power supply issue' characterisation is consistent with the same surge mechanism. The earlier 'defective UPS' versus 'working perfectly' contradiction reconciles as: the equipment functioned; the failure was human error during the power event.",
+ "contributingFactors": [
+  "Inadequate change control / access governance: an engineer authorised to be present in the data centre performed an action he was not authorised to perform, with no procedural gate stopping an uncontrolled reconnection.",
+  "Fragile failover design: the secondary data centre did not save the service. The leading hypothesis is that an uncommanded shutdown synchronised corrupted data into the failover site, populating it with bad data and crashing dependent systems — a shared-fault mode that defeated the active/active redundancy.",
+  "Physical damage from over-voltage: the surge caused literal physical damage to servers, so recovery required hardware remediation rather than a simple power-up, decoupling recovery time from the ~15-minute fault window.",
+  "Latent system strain preceding the event: booking-confirmation emails were already delayed by roughly 8 hours the day before, suggesting the platform was under stress before the power fault (low confidence).",
+  "Absence of a rehearsed, integrity-safe recovery runbook, evidenced by stale booking data persisting into the Sunday of recovery."
+ ],
+ "coe": [
+  {
+   "action": "British Airways pursued legal action against its data-centre management supplier CBRE, alleging supplier fault (reported ~18 months after the outage).",
+   "owner": "British Airways / IAG (claimant)",
+   "status": "Filed/Reported (Nov 2018), subsequently settled",
+   "source": "Computer Weekly (computerweekly.com/news/252452976)"
+  },
+  {
+   "action": "The BA v CBRE dispute was settled with no admission of liability, an undisclosed amount, and no jointly agreed root cause.",
+   "owner": "British Airways and CBRE",
+   "status": "Closed (settled 11 Feb 2019)",
+   "source": "DCD (datacenterdynamics.com)"
+  },
+  {
+   "action": "IAG quantified and confirmed the financial impact publicly (~£58m), acknowledging passenger compensation and lost-business exposure and the EU261 payout schedule.",
+   "owner": "IAG / British Airways",
+   "status": "Confirmed (July 2017)",
+   "source": "DCD (datacenterdynamics.com); BBC (bbc.com/news/uk-40069865)"
+  },
+  {
+   "action": "No formal operator or regulatory postmortem (BA, IAG, CBRE, CAA or Parliamentary) was ever published; all mechanism detail rests on press attribution and a leaked internal email. This transparency gap is itself an unclosed corrective item.",
+   "owner": "BA / IAG / CBRE / CAA",
+   "status": "Open / Never published",
+   "source": "Analytical observation on the public record (absence of any published RCA)"
+  }
+ ],
+ "lessonsLearnt": [
+  "A brief physical fault can become a multi-day outage. The BoHo site lost power for only ~15 minutes, yet recovery took days because the surge caused physical hardware damage and the failover was defeated — time-to-recover is governed by damage and data integrity, not by fault duration.",
+  "Redundancy that shares a failure path is not redundancy. An active/active pair that synchronises corrupted state during an uncommanded shutdown can propagate the fault to the backup, turning a single-site incident into a total service loss.",
+  "Human error during restoration is as dangerous as during the initial fault. Walsh's own framing — that it is easy to understand a mistake in disconnecting power but hard to understand a mistake in reconnecting it — highlights that the reconnection step needs the same rigour, gating and supervision as any hazardous change.",
+  "Authorisation to be present is not authorisation to act. Physical access and permitted-action scope must be separated and enforced procedurally, not left to individual judgement.",
+  "Absence of a published, agreed root cause harms industry learning. The settlement with no admission of liability and no jointly agreed cause leaves the sector to learn from leaked emails and press reconstruction rather than a validated RCA."
+ ],
+ "improvements": [
+  "Enforce change management on power operations: any disconnect/reconnect of live UPS/generator/battery supplies should require a permit-to-work, a second-person verification, and a controlled, ramped re-energisation sequence that cannot bridge battery and generator sources onto the rack bus.",
+  "Harden failover against fault propagation: add integrity gating and quorum/health checks before synchronising state to the secondary site, so an uncommanded shutdown cannot replicate corrupted data and crash the standby.",
+  "Separate physical access from action authorisation, with technical interlocks and supervision for hazardous switching, so being authorised to enter the room never implies being authorised to operate power equipment.",
+  "Rehearse damage-mode recovery, not just power-loss recovery: run drills that assume physical hardware damage and corrupted replication, with validated data-restore and reconciliation procedures to prevent stale-data symptoms during recovery.",
+  "Commit to publishing (or independently reviewing) post-incident RCAs for critical-national-infrastructure-scale outages so root cause and corrective actions are transparent and auditable."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "Failure mechanism: a human error at the power boundary",
+   "body": "The initiating fault was not equipment failure but human mis-operation. On the Saturday morning of 27 May 2017, a power supply at Boadicea House was disconnected and then reconnected in an uncontrolled, unplanned manner. The reconnection surge physically damaged servers and bypassed the backup generators and batteries entirely. This account is dual-sourced — a leaked IAG internal email carried by the BBC and Willie Walsh on the record — and it resolves the early 'defective UPS' versus 'working perfectly' contradiction: the equipment did its job; a person operating it did not. A single technical outlet (The Register) offers a plausible physical scenario in which the restoration briefly connected battery and generator supply in series to the rack bus, feeding servers 480V instead of 240V and causing a literal meltdown. This remains a hypothesis consistent with the confirmed physical damage rather than an established fact."
+  },
+  {
+   "heading": "Why it cascaded: redundancy defeated by shared state",
+   "body": "The most consequential aspect is that BoHo itself was down for only about a quarter of an hour, yet service was lost for days. The bridge from a 15-minute fault to a multi-day outage runs through two amplifiers. First, the surge caused physical hardware damage, so recovery required hardware remediation, not a restart. Second, the failover did not save the service. The leading hypothesis is that the uncommanded shutdown synchronised corrupted data from BoHo into the secondary data centre, populating it with bad data and crashing the dependent systems — a shared-fault mode in which the backup inherited the primary's corruption. The Sunday 28 May symptom of customers seeing stale booking data offers weak independent corroboration that data integrity and replication were affected."
+  },
+  {
+   "heading": "Recovery and impact: a dual-hub grounding",
+   "body": "Because the failover could not carry the load and hardware was physically damaged, British Airways grounded all flights at Heathrow and Gatwick. On the Saturday, BA initially cancelled flights until 18:00 BST and then extended the window; an aviation expert forecast three to four days of disruption. As many as 672 flights were grounded and roughly 75,000 passengers affected — the passenger figure cross-checked across DCD's settlement reporting and the IAG/BBC account, while the specific flight count rests on a single outlet. Recovery took on the order of two to three days, with operations normalising around Monday 29 May. IAG later confirmed the financial impact at about £58m (~$74.6m), covering passenger compensation (under the EU261 schedule of EUR250/EUR400/up to EUR600) and lost business; higher press figures of $100m and up to £150m were never reconciled to an audited total."
+  },
+  {
+   "heading": "Organisational and systemic factors",
+   "body": "The incident exposed governance gaps as much as engineering ones. The engineer was authorised to be in the data centre but not authorised to do what he did, indicating that physical access and permitted-action scope were not separated or interlocked. There was no gate to stop an uncontrolled reconnection of a hazardous power source. The blame allocation was never technically settled: BA sued facilities supplier CBRE roughly 18 months later, and the dispute settled on 11 February 2019 with no admission of liability, an undisclosed amount, and no jointly agreed root cause. Critically, no formal operator or regulatory postmortem was ever published, so the entire mechanism narrative rests on press attribution and a leaked internal email — a transparency deficit for an outage of national significance."
+  },
+  {
+   "heading": "Cross-incident pattern: the small-fault, large-blast-radius archetype",
+   "body": "This event is a canonical example of a category where a minor, brief, human-triggered fault produces an outsized outage because designed protections are bypassed and redundancy shares a failure path. The signature elements — human error during a maintenance/restoration action, backup power bypassed, and a failover that inherits corruption rather than isolating it — recur across major data-centre incidents. The lesson generalises: resilience is determined less by the redundancy that exists on paper than by whether the failure modes of the primary and backup are genuinely independent, and by whether hazardous human actions at the power boundary are procedurally gated. Here, both assumptions broke at once."
+  }
+ ],
+ "technicalDeepDive": "At the physical layer, the confirmed facts are narrow but decisive: a power supply was disconnected and reconnected in an uncontrolled fashion, the reconnection produced a surge, that surge physically damaged servers, and the surge bypassed the backup generators and batteries. The most-cited technical reconstruction (The Register, presented explicitly as a hypothesis) proposes that the uncontrolled restoration briefly placed the battery supply and the generator supply in series onto the rack power bus. Two nominal 240V sources summed in series would deliver roughly 480V to equipment rated for 240V, which is consistent with the reported literal meltdown of infrastructure — a plausible, though unconfirmed, over-voltage mechanism that would explain why generators and batteries did not protect the load: they were the fault, not the mitigation, during the mis-sequenced re-energisation. What is engineering-critical is that this converts recovery from a power-restore problem into a hardware-replacement problem, which is why a ~15-minute power-loss window at BoHo produced a multi-day service outage. The second technical hypothesis addresses why redundancy failed: an uncommanded shutdown may have caused corrupted data to be synchronised from BoHo to the failover data centre as the primary died, so the standby was populated with enough bad data to crash all dependent systems. In an active/active topology, replication that is not integrity-gated and that lacks a quorum or health check before accepting synchronised state will faithfully propagate corruption, collapsing the independence that redundancy is supposed to provide. The Sunday stale-booking-data symptom is weak corroboration that replication/integrity was in fact compromised. The engineering takeaways are concrete: (1) hazardous power switching must use a controlled, ramped sequence with interlocks that make it physically impossible to bridge battery and generator sources onto the rack bus; and (2) cross-site replication must gate on source health and data integrity so that a dying primary cannot poison its backup. Both hypotheses remain single-source and unconfirmed because no formal RCA was published; they are the best available engineering explanations consistent with the dual-sourced physical-damage facts.",
+ "references": [
+  {
+   "title": "BA IT chaos caused by human error, boss says (leaked IAG email + Walsh)",
+   "url": "https://www.bbc.com/news/business-40159202",
+   "type": "news",
+   "quote": "it was turned back on in an unplanned and uncontrolled fashion, which created physical damage to the systems",
+   "accessed": "2026-07-31"
+  },
+  {
+   "title": "British Airways: What went wrong? (impact and EU261 schedule)",
+   "url": "https://www.bbc.com/news/uk-40069865",
+   "type": "news",
+   "quote": "One expert predicted disruption lasting 'three or four days.'",
+   "accessed": "2026-07-31"
+  },
+  {
+   "title": "British Airways' data centre configuration (engineering hypotheses)",
+   "url": "https://www.theregister.com/2017/06/02/british_airways_data_centre_configuration/",
+   "type": "analysis",
+   "quote": "That would result in the data centre's servers being fed 480v instead of 240v, causing a literal meltdown.",
+   "accessed": "2026-08-01"
+  },
+  {
+   "title": "BA and CBRE settle dispute over 2017 data center outage",
+   "url": "https://www.datacenterdynamics.com/en/news/ba-and-cbre-settle-dispute-over-2017-data-center-outage/",
+   "type": "news",
+   "quote": "British Airways and CBRE are pleased to have reached agreement (with no admission as to liability)",
+   "accessed": "2026-07-31"
+  },
+  {
+   "title": "BA to sue CBRE over May Bank Holiday datacentre outage",
+   "url": "https://www.computerweekly.com/news/252452976/BA-to-sue-CBRE-over-May-Bank-Holiday-datacentre-outage",
+   "type": "news",
+   "quote": "BA is understood to be taking legal action",
+   "accessed": "2026-07-31"
+  },
+  {
+   "title": "British Airways $100M Outage Caused by Worker Pulling Wrong Plug",
+   "url": "https://www.nbcnews.com/business/travel/british-airways-100m-outage-was-caused-worker-pulling-wrong-plug-n767476",
+   "type": "news",
+   "quote": "human error was to blame for the meltdown that stranded tens of thousands",
+   "accessed": "2026-07-31"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": false,
+  "referenceCount": 6,
+  "lastVerified": "2026-08-01",
+  "confidence": "High for root cause (dual-sourced: leaked IAG email + Walsh on record + Cruz), passenger count (~75,000, dual-sourced) and confirmed cost (~£58m, IAG). Medium for timeline granularity and impact scale (single-outlet clock times and 672-flight count). The ~09:30/~09:45 BST clock times are reconstructed approximations, not explicitly stated by the cited outlets. The 480V series-meltdown and corrupted-sync failover mechanisms are single-source (The Register) hypotheses consistent with confirmed physical damage, not established facts. Only The Register was live-verifiable in the latest fact-check pass (matched exactly); BBC, DCD, Computer Weekly and NBC were unfetchable (HTTP 403) that pass and rest on established public record. No formal operator/regulatory RCA exists; settlement amount and legal blame allocation permanently undisclosed."
+ },
+ "lastUpdated": "2026-08-01"
+}

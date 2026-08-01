@@ -1,0 +1,299 @@
+{
+ "slug": "azure-south-central-us-texas-cooling-2018",
+ "title": "Azure South Central US: Lightning-Induced Cooling Loss and Automated Integrity Shutdown (September 2018)",
+ "operator": "Microsoft Azure",
+ "dcName": "South Central US region (San Antonio-area datacenters)",
+ "location": {
+  "city": "San Antonio",
+  "country": "United States",
+  "region": "AMER",
+  "az": "South Central US"
+ },
+ "date": "2018-09-04",
+ "durationMin": 2300,
+ "category": [
+  "cooling",
+  "power"
+ ],
+ "severity": {
+  "usersAffected": "Undisclosed by Microsoft; region-scoped impact to South Central US customers plus global Azure DevOps (VSTS) Marketplace users. No user/customer count was published in the official postmortem.",
+  "impactUsd": "Not publicly disclosed; no financial figure appears in Microsoft's public write-up.",
+  "servicesDown": [
+   "All VSTS Scale Units in South Central US",
+   "Azure DevOps Marketplace (global)",
+   "Release Management (US users)",
+   "Git (intermittent failures)",
+   "Package Management (intermittent failures)",
+   "VS / VS Code extension acquisition",
+   "Dashboards",
+   "User profiles hosted in South Central US",
+   "Hosted macOS build/release queue",
+   "~40 broader Azure services (per contemporaneous public reporting, not enumerated in the official postmortem)"
+  ],
+  "tier": "Sev 1 / major regional outage (characterized by Microsoft as the longest VSTS outage in the service's history)"
+ },
+ "brief": "On 4 September 2018, a high-energy thunderstorm with lightning struck southern Texas near Microsoft's South Central US datacenters. Per The Register's account of Azure's RCA, a lightning strike at 08:42 UTC switched one datacenter to generator power and overloaded surge suppressors on the mechanical cooling plant, shutting it down; the official VSTS postmortem describes voltage sags and swells on the utility feed that impacted cooling. As temperatures climbed, automated datacenter integrity procedures forced a structured power-down of servers and storage to protect hardware. Utility power was restored in roughly nine hours (per Data Center Dynamics), but recovery of services took far longer: VSTS primary recovery ran about twenty-one hours, the official VSTS incident spanned 09:45 UTC on 4 September to 00:05 UTC on 6 September (the longest outage in that service's history), and broader Azure — on the order of forty services per contemporaneous reporting — was not declared fully mitigated until 08:40 UTC on 7 September. A separate ~2-hour Release Management incident (a database going offline) occurred during recovery.",
+ "magnitude": {
+  "usersScore": 7,
+  "financialScore": 6,
+  "durationScore": 8,
+  "blastRadiusScore": 7,
+  "note": "Duration and blast-radius scores dominate: a single region's cooling loss cascaded into a multi-service, multi-hour outage with global reach (Marketplace) and the longest VSTS outage on record. User and financial scores are estimated as moderate-high because Microsoft never published customer counts, damaged-hardware counts, or dollar impact; those figures are confirmed absent from the public disclosure and are not inferred here."
+ },
+ "sequenceOfEvents": [
+  {
+   "t": "2018-09-04 08:42 UTC",
+   "phase": "Trigger",
+   "event": "A lightning strike from a high-energy storm hits near the South Central US datacenters; per The Register's account of Azure's RCA it switched one datacenter to generator power and overloaded surge suppressors on the mechanical cooling system, shutting it down. The official VSTS postmortem describes the same trigger as lightning inducing voltage sags and swells across the utility feed that impacted cooling.",
+   "source": "https://www.theregister.com/2018/09/17/azure_outage_report/"
+  },
+  {
+   "t": "2018-09-04 (immediately following strike)",
+   "phase": "Escalation",
+   "event": "The lightning-induced power disturbance (voltage sags/swells and generator transfer) propagates into the facility electrical system and impairs the mechanical cooling plant, degrading the site's ability to reject heat.",
+   "source": "https://devblogs.microsoft.com/devopsservice/?p=17485"
+  },
+  {
+   "t": "2018-09-04 09:29 UTC",
+   "phase": "Impact",
+   "event": "Broader Azure problems begin in South Central US as the loss of cooling drives rising temperatures.",
+   "source": "https://www.theregister.com/2018/09/17/azure_outage_report/"
+  },
+  {
+   "t": "2018-09-04 09:45 UTC",
+   "phase": "Impact",
+   "event": "Automated datacenter integrity procedures activate and critical hardware enters a structured power-down. All VSTS Scale Units in South Central US go down as the datacenter power-down process takes effect.",
+   "source": "https://devblogs.microsoft.com/devopsservice/?p=17485"
+  },
+  {
+   "t": "2018-09-04 (during power-down)",
+   "phase": "Cascade",
+   "event": "Dependent services degrade beyond the local region: Azure DevOps Marketplace is impacted globally, Release Management for US users, Git and Package Management see intermittent failures, and Dashboards break because failed calls to Marketplace render them unavailable.",
+   "source": "https://devblogs.microsoft.com/devopsservice/?p=17485"
+  },
+  {
+   "t": "2018-09-04 (early)",
+   "phase": "Detection",
+   "event": "Automated integrity/monitoring systems detect the thermal excursion and initiate the protective shutdown; engineering and incident teams engage on the region-wide outage.",
+   "source": "https://devblogs.microsoft.com/devopsservice/?p=17485"
+  },
+  {
+   "t": "2018-09-04 (during outage)",
+   "phase": "Diagnosis",
+   "event": "Root cause traced to the lightning-driven utility/power disturbance that disabled cooling, triggering the automated hardware-integrity power-down rather than an internal software or capacity fault.",
+   "source": "https://devblogs.microsoft.com/devopsservice/?p=17485"
+  },
+  {
+   "t": "2018-09-04 (~9 hours after onset)",
+   "phase": "Mitigation",
+   "event": "Utility power is restored to the affected datacenters in roughly nine hours (per Data Center Dynamics), allowing cooling and infrastructure to be brought back and hardware to begin a controlled, integrity-checked power-up.",
+   "source": "https://www.datacenterdynamics.com/en/news/microsoft-azure-suffers-outage-after-cooling-issue/"
+  },
+  {
+   "t": "2018-09-05 11:00 UTC",
+   "phase": "Recovery",
+   "event": "VSTS primary recovery runs roughly twenty-one hours; the majority of broader Azure services are restored by 11:00 UTC on 5 September as storage and compute are validated post power-up.",
+   "source": "https://www.theregister.com/2018/09/17/azure_outage_report/"
+  },
+  {
+   "t": "2018-09-05 (during recovery)",
+   "phase": "Cascade",
+   "event": "A separate Release Management incident of roughly two hours (a database going offline in South Central US) occurs during the recovery period, briefly re-impacting affected surfaces.",
+   "source": "https://devblogs.microsoft.com/devopsservice/?p=17485"
+  },
+  {
+   "t": "2018-09-06 00:05 UTC",
+   "phase": "Restored",
+   "event": "The VSTS/Azure DevOps incident is declared ended, closing the longest VSTS outage in the service's history.",
+   "source": "https://devblogs.microsoft.com/devopsservice/?p=17485"
+  },
+  {
+   "t": "2018-09-07 08:40 UTC",
+   "phase": "Recovery",
+   "event": "Broader Azure 'full mitigation' is declared complete, nearly three days after the initial fault, as remaining services and dependencies are validated.",
+   "source": "https://www.theregister.com/2018/09/17/azure_outage_report/"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Lightning strike (per Azure RCA via The Register)",
+   "value": "2018-09-04 08:42 UTC",
+   "source": "https://www.theregister.com/2018/09/17/azure_outage_report/"
+  },
+  {
+   "label": "Incident start (VSTS window)",
+   "value": "2018-09-04 09:45 UTC",
+   "source": "https://devblogs.microsoft.com/devopsservice/?p=17485"
+  },
+  {
+   "label": "Incident end (VSTS window)",
+   "value": "2018-09-06 00:05 UTC",
+   "source": "https://devblogs.microsoft.com/devopsservice/?p=17485"
+  },
+  {
+   "label": "VSTS incident duration (official window)",
+   "value": "~38h20m (2300 min)",
+   "source": "https://devblogs.microsoft.com/devopsservice/?p=17485"
+  },
+  {
+   "label": "VSTS primary recovery",
+   "value": "~21 hours",
+   "source": "https://devblogs.microsoft.com/devopsservice/?p=17485"
+  },
+  {
+   "label": "Utility power restoration",
+   "value": "~9 hours after onset (single-source; Data Center Dynamics, not independently re-verified)",
+   "source": "https://www.datacenterdynamics.com/en/news/microsoft-azure-suffers-outage-after-cooling-issue/"
+  },
+  {
+   "label": "Broader Azure recovery",
+   "value": "Majority restored 11:00 UTC 5 Sep; full mitigation 08:40 UTC 7 Sep",
+   "source": "https://www.theregister.com/2018/09/17/azure_outage_report/"
+  },
+  {
+   "label": "Azure services affected",
+   "value": "~40 (contemporaneous public reporting; not enumerated in official postmortem)",
+   "source": "https://www.theregister.com/2018/09/17/azure_outage_report/"
+  },
+  {
+   "label": "Committed remediation (COE) items",
+   "value": "7",
+   "source": "https://devblogs.microsoft.com/devopsservice/?p=17485"
+  },
+  {
+   "label": "Severity framing",
+   "value": "Longest VSTS outage in the service's history",
+   "source": "https://devblogs.microsoft.com/devopsservice/?p=17485"
+  },
+  {
+   "label": "Secondary Release Management incident",
+   "value": "~2 hours (database offline, during recovery)",
+   "source": "https://devblogs.microsoft.com/devopsservice/?p=17485"
+  },
+  {
+   "label": "Published user-impact / damage / temperature / cost figures",
+   "value": "None (confirmed absent from official disclosure)",
+   "source": "https://devblogs.microsoft.com/devopsservice/?p=17485"
+  }
+ ],
+ "rootCause": "A high-energy storm with lightning near the South Central US datacenters disturbed the site's power: per The Register's account of Azure's RCA, a strike at 08:42 UTC forced one datacenter onto generator power and overloaded surge suppressors on the mechanical cooling plant, while the official VSTS postmortem attributes the cooling loss to lightning-induced voltage sags and swells on the utility feed. As temperatures rose, automated datacenter integrity procedures forced a structured power-down of critical hardware to protect data and equipment. The causal chain is: lightning storm -> utility voltage sags/swells and generator transfer -> mechanical cooling shut down -> automated data/hardware-integrity procedures -> structured power down.",
+ "contributingFactors": [
+  "Single-region concentration of services: critical VSTS/Azure DevOps Scale Units and user profiles were hosted in South Central US without regional isolation, so a datacenter-level failure became a service-level outage.",
+  "Tight cross-service coupling and inadequate circuit-breaker scoping: failed calls to Marketplace propagated to make Dashboards unavailable, and service-to-service calls (e.g., to the User service) were not correctly scoped to fail gracefully.",
+  "Limited cross-region redundancy for internal tooling and no exercised cross-region failover, so recovery depended on the physical region coming back rather than shifting load elsewhere.",
+  "Gaps in fault-injection testing meant several of these failure modes had not been surfaced and hardened before a real regional loss occurred.",
+  "Environmental exposure: utility power quality at the site was vulnerable to lightning-induced sags/swells and surge-suppressor overload sufficient to disable cooling and trigger the protective shutdown."
+ ],
+ "coe": [
+  {
+   "action": "In supported geographies, move services into regions that offer Azure Availability Zones so they are resilient to individual datacenter failures within a region.",
+   "owner": "Azure DevOps (VSTS) engineering / Microsoft Azure",
+   "status": "Committed (postmortem remediation item 1)",
+   "source": "https://devblogs.microsoft.com/devopsservice/?p=17485"
+  },
+  {
+   "action": "Explore asynchronous cross-region replication of service data to reduce dependence on a single region's availability.",
+   "owner": "Azure DevOps (VSTS) engineering",
+   "status": "Committed (postmortem remediation item 2)",
+   "source": "https://devblogs.microsoft.com/devopsservice/?p=17485"
+  },
+  {
+   "action": "Regularly exercise cross-region failover using Microsoft's own organization as a first-party test tenant, so failover is proven before it is needed.",
+   "owner": "Azure DevOps (VSTS) engineering",
+   "status": "Committed (postmortem remediation item 3)",
+   "source": "https://devblogs.microsoft.com/devopsservice/?p=17485"
+  },
+  {
+   "action": "Add cross-region redundancy for internal tooling used to operate and recover the service.",
+   "owner": "Azure DevOps (VSTS) engineering",
+   "status": "Committed (postmortem remediation item 4)",
+   "source": "https://devblogs.microsoft.com/devopsservice/?p=17485"
+  },
+  {
+   "action": "Fix the Dashboards regression in which failed calls to Marketplace made Dashboards unavailable.",
+   "owner": "Azure DevOps (VSTS) engineering",
+   "status": "Committed (postmortem remediation item 5)",
+   "source": "https://devblogs.microsoft.com/devopsservice/?p=17485"
+  },
+  {
+   "action": "Review circuit breakers for service-to-service calls to ensure correct scoping (gap surfaced in calls to the User service).",
+   "owner": "Azure DevOps (VSTS) engineering",
+   "status": "Committed (postmortem remediation item 6)",
+   "source": "https://devblogs.microsoft.com/devopsservice/?p=17485"
+  },
+  {
+   "action": "Review gaps in current fault-injection testing exposed by this incident and close them.",
+   "owner": "Azure DevOps (VSTS) engineering",
+   "status": "Committed (postmortem remediation item 7)",
+   "source": "https://devblogs.microsoft.com/devopsservice/?p=17485"
+  }
+ ],
+ "lessonsLearnt": [
+  "A protective, working safety mechanism can still cause a major outage: the automated hardware-integrity power-down did exactly what it was designed to do, so resilience must be engineered above the facility layer (regional isolation and failover), not by assuming the datacenter stays up.",
+  "Single-region hosting turns any datacenter-level event into a service-level outage; services and their stateful dependencies (user profiles, Scale Units) need Availability-Zone placement and cross-region replication to survive a regional loss.",
+  "Cross-service coupling amplifies blast radius. A failure in one dependency (Marketplace) cascaded into an unrelated surface (Dashboards) because circuit breakers were not correctly scoped and calls did not degrade gracefully.",
+  "Failover that is never exercised cannot be trusted in a crisis; recovery here depended on the physical region returning rather than shifting traffic, revealing untested failover paths.",
+  "Fault-injection coverage gaps hide real failure modes until a genuine regional event exposes them all at once, so chaos/fault testing must include region-loss scenarios.",
+  "Transparency has limits worth noting: Microsoft did not publish user counts, hardware-damage counts, temperature thresholds, cooling ride-through, or cost, which constrains external quantitative post-incident analysis."
+ ],
+ "improvements": [
+  "Adopt Availability-Zone-aware placement and asynchronous cross-region replication for stateful services so a single datacenter or region loss no longer maps to a customer-facing outage.",
+  "Institutionalize regularly exercised cross-region failover (using a first-party tenant) plus cross-region redundancy for the internal tooling needed to operate and recover the service.",
+  "Harden inter-service resilience by correctly scoping circuit breakers for service-to-service calls and ensuring dependency failures (e.g., Marketplace) degrade gracefully instead of taking down unrelated surfaces (e.g., Dashboards).",
+  "Expand fault-injection testing to cover datacenter- and region-loss scenarios, closing the coverage gaps this incident revealed before they recur.",
+  "Fix the specific Dashboards/Marketplace regression and treat similar hidden hard-dependencies as first-class reliability defects."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "Failure mechanism: environmental disturbance to protective shutdown",
+   "body": "The incident was initiated entirely outside the software stack. Lightning from a high-energy storm near San Antonio disturbed the utility supply: The Register's account of Azure's RCA describes a strike at 08:42 UTC that forced one datacenter onto generator power and overloaded surge suppressors on the mechanical cooling system, while the official VSTS postmortem frames the cause as voltage sags (undervoltage dips) and swells (overvoltage transients) that reached the facility electrical distribution and impaired the cooling plant. With heat rejection degraded, rack and hall temperatures rose toward limits that threaten silicon, storage media, and power electronics. At that point the datacenter's automated integrity procedures did their job: rather than let equipment cook, they orchestrated a structured power-down of critical hardware. The customer-visible outage was therefore a deliberate, designed consequence of a working protection system responding to an environmental input, not a defect in the servers themselves."
+  },
+  {
+   "heading": "Why it cascaded beyond the region",
+   "body": "A physical event in one region became a broad service outage because of where state lived and how services were coupled. VSTS Scale Units and a set of user profiles were hosted in South Central US with no zonal or cross-region escape hatch, so the power-down directly took those services down. From there, tight service-to-service coupling widened the blast radius: the Marketplace dependency reached globally, and failed Marketplace calls cascaded into Dashboards, which became unavailable even for users far from Texas. Circuit breakers on some service-to-service calls (notably to the User service) were not scoped to contain failures, so instead of degrading gracefully the system propagated errors. A localized cooling loss thus radiated into a broad set of services (on the order of forty per contemporaneous reporting) and global surfaces."
+  },
+  {
+   "heading": "Recovery trajectory and its asymmetry",
+   "body": "Recovery split into very different timescales. Restoring the physical layer, utility power and cooling, took roughly nine hours (per Data Center Dynamics). But bringing services back safely took far longer: VSTS primary recovery ran about twenty-one hours, and the official VSTS incident did not close until 00:05 UTC on 6 September, spanning the window from 09:45 UTC on 4 September (~38 hours). Broader Azure recovered more slowly still: the majority of services were back by 11:00 UTC on 5 September, but full mitigation was not declared until 08:40 UTC on 7 September. That asymmetry reflects the cost of a structured power-down: storage and compute must be powered up in a controlled, integrity-checked sequence, data consistency validated, and dependent services re-sequenced. A separate ~2-hour Release Management incident during recovery underscores how fragile the system remained mid-restoration. Because failover had not been exercised, recovery hinged on the region physically returning rather than on shifting load elsewhere."
+  },
+  {
+   "heading": "Organizational and systemic factors",
+   "body": "The postmortem's seven remediation items read as an admission that resilience was under-invested relative to the single-region design: move to Availability Zones, add asynchronous cross-region replication, regularly exercise cross-region failover using Microsoft's own organization, add cross-region redundancy for internal tooling, fix the Dashboards/Marketplace regression, correct circuit-breaker scoping, and close fault-injection gaps. Collectively they point to a systemic gap between architectural intent and tested reality, failover paths that existed on paper but were not routinely proven, and coupling that had never been stress-tested against a full regional loss. Microsoft's own framing, the longest VSTS outage in the service's history, signals the severity these gaps produced."
+  },
+  {
+   "heading": "Cross-incident pattern",
+   "body": "This event fits a recurring cloud-outage archetype: a facility-layer trigger (here, a lightning-induced power-quality disturbance disabling cooling) exposes software-layer single-region dependencies and under-tested failover, and the true outage duration is dominated by the careful, sequenced recovery rather than the initial fault. It also illustrates the double-edged nature of automated protection: the same integrity shutdown that saves hardware guarantees an outage if higher layers cannot absorb a region loss. The durable lesson, echoed across many large-provider postmortems, is that regional isolation, exercised failover, and correctly scoped fault containment, not facility perfection, are what keep an environmental event from becoming a global service outage."
+  }
+ ],
+ "technicalDeepDive": "The precipitating fault was a utility power-quality event, not an internal one. Per The Register's account of Azure's RCA, a lightning strike at 08:42 UTC forced one datacenter onto generator power and overloaded surge suppressors on the mechanical cooling plant, shutting it down; the official VSTS postmortem describes the same trigger as lightning-induced voltage sags and swells on the utility feed that impacted cooling. Such disturbances are exactly the class that trips or damages the sensitive control and motor loads of a mechanical cooling plant (chiller compressors, pumps, CRAH/CRAC units and their VFDs). Once heat rejection is lost, a dense datacenter hall has only minutes of thermal ride-through in its chilled-water and air mass before inlet temperatures approach equipment limits; Microsoft did not disclose the specific temperature thresholds or ride-through minutes, so the exact margin is unknown. What is documented is the outcome: automated datacenter integrity procedures escalated to a structured power-down of critical hardware, an ordered shutdown that prioritizes data and hardware integrity over availability. The engineering asymmetry is the crux of the incident. A structured power-down is fast relative to a safe power-up: bringing thousands of storage and compute nodes back requires restoring cooling and power quality first (~9 hours here, per Data Center Dynamics), then a controlled, integrity-checked boot sequence with consistency validation across storage before dependent services are re-enabled, which is why VSTS primary recovery ran ~21 hours, the official VSTS window extended to 00:05 UTC on 6 September, and broader Azure full mitigation was not declared until 08:40 UTC on 7 September. At the software layer, the failure surfaced classic distributed-systems anti-patterns: stateful Scale Units and user profiles pinned to a single region with no zonal or cross-region replica; a synchronous hard-dependency on Marketplace whose failure propagated into Dashboards; and circuit breakers on service-to-service calls (surfaced against the User service) that were mis-scoped and therefore failed to contain error propagation. The remediation set is correspondingly architectural rather than facility-focused, Availability-Zone placement, asynchronous cross-region replication, routinely exercised cross-region failover, cross-region redundant tooling, the Dashboards/Marketplace regression fix, circuit-breaker rescoping, and expanded fault-injection, which is the correct engineering response to a threat model in which the datacenter itself can be intentionally taken offline by its own protection systems.",
+ "references": [
+  {
+   "title": "Postmortem: VSTS 4 September 2018 — Microsoft DevBlogs (official postmortem)",
+   "url": "https://devblogs.microsoft.com/devopsservice/?p=17485",
+   "type": "official-postmortem",
+   "quote": "The incident started with a high energy storm, including lightning strikes, that hit southern Texas near the South Central US datacenters. This resulted in voltage sags and swells across the utility fields that impacted cooling systems.",
+   "accessed": "2026-08-01"
+  },
+  {
+   "title": "Microsoft reveals train of mistakes that killed Azure in the South Central US incident (The Register)",
+   "url": "https://www.theregister.com/2018/09/17/azure_outage_report/",
+   "type": "news",
+   "quote": "A lightning strike at 0842 UTC caused one data center to switch to generator power and also overloaded suppressors on the mechanical cooling system, shutting it down.",
+   "accessed": "2026-08-01"
+  },
+  {
+   "title": "Microsoft Azure suffers outage after cooling issue (Data Center Dynamics)",
+   "url": "https://www.datacenterdynamics.com/en/news/microsoft-azure-suffers-outage-after-cooling-issue/",
+   "type": "news",
+   "quote": "Microsoft Azure suffers outage after cooling issue. (Source cited for ~9-hour utility-power restoration; returned HTTP 403 on re-fetch and was not independently re-verified.)",
+   "accessed": "2026-08-01"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": true,
+  "referenceCount": 3,
+  "lastVerified": "2026-08-01",
+  "confidence": "high"
+ },
+ "lastUpdated": "2026-08-01"
+}

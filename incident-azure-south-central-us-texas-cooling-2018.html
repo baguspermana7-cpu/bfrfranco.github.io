@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azure South Central US: Lightning-Induced Cooling Loss and Automated Integrity Shutdown (September 2018) | ResistanceZero</title>
+    <meta name="description" content="On 4 September 2018, a high-energy thunderstorm with lightning struck southern Texas near Microsoft&#x27;s South Central US datacenters. Per The Register&#x27;s account of Azure&#x27;s RCA, a lig">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="ai-content-declaration" content="human-curated, sourced from public post-incident reports">
+    <meta name="author" content="Bagus Dwi Permana">
+    <link rel="canonical" href="https://resistancezero.com/incident-azure-south-central-us-texas-cooling-2018.html">
+    <meta name="theme-color" content="#0c1512">
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+    <style>
+    /* ── Governed Incident Dossier — editorial register (v2): forest-green + warm ivory,
+       serif display, evidence-class provenance. Accent vars remapped so all components
+       re-skin. AA-contrast in both themes. No gradients / glass / dot-grid (anti-slop). */
+    :root:not([data-theme="dark"]) {
+        --bg:#f4f1e7; --surface:#fffdf6; --surface-2:#efeadc; --line:rgba(26,45,36,0.16);
+        --text:#1a2d24; --text-strong:#10201a; --text-body:#3b463d; --muted:#6a7367;
+        --cyan:#2f6b4f; --amber:#87671b; --green:#2f7d54; --red:#9c3b32; --gold:#87671b;
+        --hero-ink:#f4f1e7; --hero-bg:#183329; --shadow-deep:rgba(26,45,36,0.10);
+    }
+    [data-theme="dark"] {
+        --bg:#0c1512; --surface:#11201a; --surface-2:#16281f; --line:rgba(233,229,216,0.15);
+        --text:#e9e5d8; --text-strong:#f5f2e9; --text-body:#c6ccbc; --muted:#8b9484;
+        --cyan:#7fd1a8; --amber:#d8b25c; --green:#7fd1a8; --red:#e0917f; --gold:#d8b25c;
+        --hero-ink:#e9e5d8; --hero-bg:#0f221a; --shadow-deep:rgba(0,0,0,0.5);
+    }
+    * { box-sizing:border-box; }
+    html,body { margin:0; padding:0; }
+    body { background:var(--bg); color:var(--text); font-family:'IBM Plex Sans',system-ui,sans-serif; line-height:1.62; }
+    a { color:var(--cyan); }
+    h1,h2,.serif { font-family:'Fraunces','Newsreader',Georgia,serif; font-weight:600; letter-spacing:-0.01em; }
+    .wrap { max-width:1120px; margin:0 auto; padding:1.5rem 1.1rem 3rem; }
+    .navbar { display:flex; align-items:center; justify-content:space-between; padding:0.7rem 1.1rem; border-bottom:1px solid var(--line); background:var(--surface); position:sticky; top:0; z-index:50; }
+    .nav-container { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:1120px; margin:0 auto; }
+    .nav-logo { display:flex; align-items:center; }
+    .nav-avatar { width:34px; height:34px; border-radius:50%; }
+    .nav-menu { display:flex; gap:1rem; list-style:none; margin:0; padding:0; }
+    .nav-menu a { color:var(--text-body); text-decoration:none; font-size:0.85rem; font-weight:600; }
+    .nav-menu a:hover { color:var(--cyan); }
+    .nav-right { display:flex; align-items:center; gap:0.6rem; }
+    .theme-btn { background:none; border:1px solid var(--line); color:var(--text); border-radius:8px; padding:0.35rem 0.5rem; cursor:pointer; font-size:0.8rem; }
+    .lock-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--red); border:1px solid var(--red); border-radius:999px; padding:0.12rem 0.5rem; }
+    h1 { font-size:2.4rem; color:var(--text-strong); margin:0.35rem 0 0.5rem; line-height:1.12; }
+    h2 { font-size:1.4rem; color:var(--text-strong); margin:2rem 0 0.7rem; }
+    .eyebrow { font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); }
+    .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
+    .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
+    .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:999px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    .chip.cyan { color:var(--cyan); border-color:var(--cyan); }
+    .chip.amber { color:var(--amber); border-color:var(--amber); }
+    .chip.green { color:var(--green); border-color:var(--green); }
+    .chip.red { color:var(--red); border-color:var(--red); }
+    .chip.muted { color:var(--muted); }
+    .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:1rem 1.1rem; margin-top:0.9rem; }
+    .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:12px; margin-top:0.9rem; }
+    table.inc-index { width:100%; border-collapse:collapse; font-size:0.86rem; min-width:760px; }
+    table.inc-index th { text-align:left; font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); background:var(--surface-2); }
+    table.inc-index td { padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); color:var(--text-body); vertical-align:top; }
+    table.inc-index tr:hover td { background:var(--surface-2); }
+    table.inc-index a { font-weight:700; color:var(--text-strong); text-decoration:none; }
+    table.inc-index a:hover { color:var(--cyan); text-decoration:underline; }
+    .rank-badge { font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--amber); }
+    .mag-bar { height:4px; border-radius:3px; background:var(--line); margin-top:0.35rem; overflow:hidden; }
+    .mag-bar > span { display:block; height:4px; background:var(--amber); }
+    ul.tight { margin:0.4rem 0 0; padding-left:1.15rem; }
+    ul.tight li { color:var(--text-body); margin:0.3rem 0; font-size:0.92rem; }
+    .soe { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .soe li { display:grid; grid-template-columns:170px 1fr; gap:0.7rem; padding:0.5rem 0; border-bottom:1px dashed var(--line); }
+    .soe time { font-family:'JetBrains Mono',monospace; font-size:0.76rem; color:var(--cyan); }
+    .soe .ev { color:var(--text-body); font-size:0.9rem; }
+    .phase-chip { font-family:'JetBrains Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--amber); border:1px solid var(--amber); border-radius:999px; padding:0.05rem 0.4rem; margin-right:0.4rem; white-space:nowrap; }
+    table.metrics { width:100%; border-collapse:collapse; font-size:0.88rem; }
+    table.metrics td { padding:0.5rem 0.7rem; border-bottom:1px solid var(--line); vertical-align:top; }
+    table.metrics .mlabel { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; width:38%; white-space:nowrap; }
+    table.metrics .mval { color:var(--text-body); }
+    .ca-block { background:var(--surface); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 10px 10px 0; padding:0.7rem 1rem; margin-top:0.7rem; }
+    .ca-block h3 { margin:0 0 0.3rem; font-size:0.92rem; color:var(--text-strong); }
+    .ca-block p { margin:0; color:var(--text-body); font-size:0.9rem; }
+    /* ── inline-SVG visualizations (theme-aware via vars) ── */
+    .viz { overflow-x:auto; margin-top:0.9rem; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:0.9rem 1rem; }
+    .viz svg { display:block; max-width:100%; height:auto; }
+    .viz-radar svg { max-width:280px; margin:0 auto; }
+    .vz-grid { fill:none; stroke:var(--line); stroke-width:1; }
+    .vz-accent-fill { fill:var(--cyan); fill-opacity:0.16; stroke:var(--cyan); stroke-width:1.4; }
+    .vz-accent-dot { fill:var(--cyan); }
+    .vz-accent-bar { fill:var(--cyan); }
+    .vz-cat-bar { fill:var(--amber); }
+    .vz-lbl { font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--muted); }
+    .vz-box-trigger { fill:color-mix(in srgb, var(--red) 12%, var(--surface)); stroke:var(--red); stroke-width:1.2; }
+    .vz-box-fault { fill:color-mix(in srgb, var(--amber) 12%, var(--surface)); stroke:var(--amber); stroke-width:1.2; }
+    .vz-box-down { fill:color-mix(in srgb, var(--cyan) 10%, var(--surface)); stroke:var(--cyan); stroke-width:1; }
+    .vz-box-t { font-family:'IBM Plex Sans',sans-serif; font-size:11px; font-weight:600; fill:var(--text-strong); }
+    .vz-box-s { font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--muted); }
+    .vz-flow { stroke:var(--muted); stroke-width:1.3; fill:none; }
+    .vz-arrhead { fill:var(--muted); }
+    .vz-tl-ph { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.04em; text-transform:uppercase; fill:var(--amber); }
+    .vz-tl-t { font-family:'JetBrains Mono',monospace; font-size:8.5px; fill:var(--muted); }
+    .vz-hb-lbl { font-family:'IBM Plex Sans',sans-serif; font-size:11px; fill:var(--text-body); }
+    .vz-hb-val { font-family:'JetBrains Mono',monospace; font-size:10px; fill:var(--muted); }
+    .viz-grid3 { display:grid; grid-template-columns:1fr 1fr; gap:0.9rem; }
+    @media (max-width:720px){ .viz-grid3 { grid-template-columns:1fr; } }
+    .filterbar { display:flex; flex-wrap:wrap; align-items:center; gap:0.4rem 0.6rem; margin:0.9rem 0 0.2rem; }
+    .fb-group { display:flex; flex-wrap:wrap; gap:0.35rem; }
+    .fb-chip { font-family:'JetBrains Mono',monospace; font-size:0.72rem; padding:0.28rem 0.6rem; border-radius:999px; border:1px solid var(--line); background:var(--surface); color:var(--text-body); cursor:pointer; }
+    .fb-chip:hover { border-color:var(--cyan); }
+    .fb-chip.active { background:var(--cyan); border-color:var(--cyan); color:var(--surface); font-weight:700; }
+    .fb-search { flex:1 1 200px; min-width:160px; font-family:'IBM Plex Sans',sans-serif; font-size:0.82rem; padding:0.3rem 0.6rem; border-radius:8px; border:1px solid var(--line); background:var(--surface); color:var(--text); }
+    .fb-count { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); margin-left:auto; }
+    .kv { display:grid; grid-template-columns:180px 1fr; gap:0.5rem 0.9rem; margin-top:0.5rem; font-size:0.9rem; }
+    .kv dt { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; }
+    .kv dd { margin:0; color:var(--text-body); }
+    .refs { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .refs li { padding:0.55rem 0; border-bottom:1px solid var(--line); }
+    .refs .rtitle { color:var(--text-strong); font-weight:600; font-size:0.9rem; }
+    .refs .rquote { color:var(--muted); font-size:0.84rem; font-style:italic; margin-top:0.2rem; display:block; }
+    .refs a { font-size:0.78rem; word-break:break-all; }
+    .backlink { display:inline-block; margin-bottom:0.6rem; font-size:0.82rem; color:var(--cyan); text-decoration:none; }
+    footer { border-top:1px solid var(--line); margin-top:2.5rem; padding:1.4rem 1.1rem; text-align:center; }
+    footer .ver { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .disclaimer { font-size:0.76rem; color:var(--muted); margin-top:0.8rem; max-width:80ch; }
+    .skip-link { position:absolute; top:-50px; left:0; background:#0e7490; color:#fff; padding:10px 20px; text-decoration:none; font-weight:600; z-index:10000; border-radius:0 0 8px 0; transition:top 0.2s; }
+    .skip-link:focus { top:0; }
+    .root-gate { position:fixed; inset:0; z-index:99999; display:none; align-items:center; justify-content:center; background:rgba(2,6,23,0.74); padding:1rem; backdrop-filter:blur(6px); }
+    body.locked .root-gate { display:flex; }
+    body.locked .wrap { filter:blur(4px); pointer-events:none; user-select:none; }
+    .root-card { max-width:430px; width:100%; background:var(--surface); border:1px solid var(--cyan); border-radius:14px; padding:1.3rem 1.15rem; text-align:center; box-shadow:0 18px 36px var(--shadow-deep); }
+    .root-card h2 { margin:0 0 0.4rem; font-size:1.1rem; color:var(--text-strong); }
+    .root-card p { font-size:0.86rem; color:var(--text-body); }
+    .root-actions { margin-top:0.9rem; display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; }
+    .root-actions button, .root-actions a { border-radius:9px; padding:0.5rem 0.85rem; font-size:0.8rem; font-weight:700; border:1px solid var(--line); text-decoration:none; cursor:pointer; color:var(--text); font-family:inherit; }
+    .root-actions button { background:var(--cyan); color:#04121a; border:none; }
+    .rz-nav-burger { display:none; }
+    /* v1.8.0 — mobile responsive patch */
+    @media (max-width:768px) {
+        html,body { overflow-x:hidden; max-width:100vw; }
+        img { max-width:100%; height:auto; display:block; }
+        .nav-menu, .nav-links { display:none; }
+        .navbar { padding:0.5rem 0.75rem; }
+        footer .footer-grid { grid-template-columns:1fr; gap:1.25rem; padding:1rem; }
+        button, a.btn, [role="button"] { min-height:44px; }
+        h1 { font-size:1.4rem; }
+        .soe li { grid-template-columns:1fr; gap:0.15rem; }
+        .kv { grid-template-columns:1fr; }
+        .root-card { max-width:92vw; }
+    }
+    @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
+</style>
+</head>
+<body class="locked">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <nav class="navbar"><div class="nav-container">
+        <a href="index.html" class="nav-logo"><img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dc-incidents.html">DC Incidents</a></li>
+            <li><a href="datacenter-solutions.html">DC Solutions</a></li>
+        </ul>
+        <div class="nav-right">
+            <span class="lock-tag" title="Root-only module">🔒 Root</span>
+            <button class="theme-btn" id="themeToggle" type="button" aria-label="Toggle theme">◐</button>
+        </div>
+    </div></nav>
+    <main class="wrap" id="main-content">
+        <a class="backlink" href="dc-incidents.html">← All incidents</a>
+        <div class="eyebrow">Incident dossier · Rank #19</div>
+        <h1>Azure South Central US: Lightning-Induced Cooling Loss and Automated Integrity Shutdown (September 2018)</h1>
+        <div class="chips">
+            <span class="chip">Microsoft Azure</span>
+            <span class="chip cyan">2018-09-04</span>
+            <span class="chip amber">38h 20m core impact</span>
+            <span class="chip cyan">Cooling</span><span class="chip amber">Power</span>
+        </div>
+        <p class="lede">On 4 September 2018, a high-energy thunderstorm with lightning struck southern Texas near Microsoft&#x27;s South Central US datacenters. Per The Register&#x27;s account of Azure&#x27;s RCA, a lightning strike at 08:42 UTC switched one datacenter to generator power and overloaded surge suppressors on the mechanical cooling plant, shutting it down; the official VSTS postmortem describes voltage sags and swells on the utility feed that impacted cooling. As temperatures climbed, automated datacenter integrity procedures forced a structured power-down of servers and storage to protect hardware. Utility power was restored in roughly nine hours (per Data Center Dynamics), but recovery of services took far longer: VSTS primary recovery ran about twenty-one hours, the official VSTS incident spanned 09:45 UTC on 4 September to 00:05 UTC on 6 September (the longest outage in that service&#x27;s history), and broader Azure — on the order of forty services per contemporaneous reporting — was not declared fully mitigated until 08:40 UTC on 7 September. A separate ~2-hour Release Management incident (a database going offline) occurred during recovery.</p>
+
+        <h2>Failure cascade</h2>
+        <div class="viz viz-cascade"><svg viewBox="0 0 720 204" role="img" aria-label="Failure cascade block diagram"><title>Failure cascade: trigger → fault → downstream impact</title><defs><marker id="ic-ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path class="vz-arrhead" d="M0,0 L6,3 L0,6 Z"/></marker></defs><rect class="vz-box-trigger" x="8" y="78.0" width="168" height="50" rx="8"/><text class="vz-box-t" x="18" y="96.0">Trigger · Cooling</text><text class="vz-box-s" x="18" y="108.0">2018-09-04</text><rect class="vz-box-fault" x="232" y="78.0" width="200" height="50" rx="8"/><text class="vz-box-t" x="242" y="96.0">Microsoft Azure</text><text class="vz-box-s" x="242" y="108.0">South Central US region (San A</text><line class="vz-flow" x1="176" y1="103.0" x2="230" y2="103.0" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="500" y="22" width="212" height="32" rx="8"/><text class="vz-box-t" x="510" y="40">All VSTS Scale Units in South Ce</text><line class="vz-flow" x1="432" y1="103.0" x2="498" y2="38" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="500" y="62" width="212" height="32" rx="8"/><text class="vz-box-t" x="510" y="80">Azure DevOps Marketplace (global</text><line class="vz-flow" x1="432" y1="103.0" x2="498" y2="78" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="500" y="102" width="212" height="32" rx="8"/><text class="vz-box-t" x="510" y="120">Release Management (US users)</text><line class="vz-flow" x1="432" y1="103.0" x2="498" y2="118" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="500" y="142" width="212" height="32" rx="8"/><text class="vz-box-t" x="510" y="160">Git (intermittent failures)</text><line class="vz-flow" x1="432" y1="103.0" x2="498" y2="158" marker-end="url(#ic-ar)"/><text class="vz-box-s" x="500" y="186">+6 more downstream services</text></svg></div>
+        <p class="disclaimer">Trigger → primary fault → downstream blast radius, derived from the sourced root cause and affected-services record.</p>
+
+        <h2>Facility &amp; location</h2>
+        <dl class="kv">
+            <dt>Operator</dt><dd>Microsoft Azure</dd>
+            <dt>Data center</dt><dd>South Central US region (San Antonio-area datacenters)</dd>
+            <dt>Location</dt><dd>San Antonio, United States, South Central US</dd>
+            <dt>Date</dt><dd>2018-09-04</dd>
+        </dl>
+
+        <h2>Impact &amp; scale</h2>
+        <dl class="kv">
+            <dt>Users affected</dt><dd>Undisclosed by Microsoft; region-scoped impact to South Central US customers plus global Azure DevOps (VSTS) Marketplace users. No user/customer count was published in the official postmortem.</dd>
+            <dt>Financial</dt><dd>Not publicly disclosed; no financial figure appears in Microsoft&#x27;s public write-up.</dd>
+            <dt>Scope</dt><dd>Sev 1 / major regional outage (characterized by Microsoft as the longest VSTS outage in the service&#x27;s history)</dd>
+        </dl>
+        <div class="card"><strong>Services / systems down</strong><ul class="tight"><li>All VSTS Scale Units in South Central US</li><li>Azure DevOps Marketplace (global)</li><li>Release Management (US users)</li><li>Git (intermittent failures)</li><li>Package Management (intermittent failures)</li><li>VS / VS Code extension acquisition</li><li>Dashboards</li><li>User profiles hosted in South Central US</li><li>Hosted macOS build/release queue</li><li>~40 broader Azure services (per contemporaneous public reporting, not enumerated in the official postmortem)</li></ul></div>
+        <h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Lightning strike (per Azure RCA via The Register)</td><td class="mval">2018-09-04 08:42 UTC</td></tr><tr><td class="mlabel">Incident start (VSTS window)</td><td class="mval">2018-09-04 09:45 UTC</td></tr><tr><td class="mlabel">Incident end (VSTS window)</td><td class="mval">2018-09-06 00:05 UTC</td></tr><tr><td class="mlabel">VSTS incident duration (official window)</td><td class="mval">~38h20m (2300 min)</td></tr><tr><td class="mlabel">VSTS primary recovery</td><td class="mval">~21 hours</td></tr><tr><td class="mlabel">Utility power restoration</td><td class="mval">~9 hours after onset (single-source; Data Center Dynamics, not independently re-verified)</td></tr><tr><td class="mlabel">Broader Azure recovery</td><td class="mval">Majority restored 11:00 UTC 5 Sep; full mitigation 08:40 UTC 7 Sep</td></tr><tr><td class="mlabel">Azure services affected</td><td class="mval">~40 (contemporaneous public reporting; not enumerated in official postmortem)</td></tr><tr><td class="mlabel">Committed remediation (COE) items</td><td class="mval">7</td></tr><tr><td class="mlabel">Severity framing</td><td class="mval">Longest VSTS outage in the service&#x27;s history</td></tr><tr><td class="mlabel">Secondary Release Management incident</td><td class="mval">~2 hours (database offline, during recovery)</td></tr><tr><td class="mlabel">Published user-impact / damage / temperature / cost figures</td><td class="mval">None (confirmed absent from official disclosure)</td></tr></tbody></table></div>
+
+        <h2>Magnitude profile</h2>
+        <div class="viz viz-radar"><svg viewBox="0 0 200 205" role="img" aria-label="Magnitude sub-scores radar chart"><title>Magnitude sub-scores (0–10)</title><polygon class="vz-grid" points="100.0,79.6 120.4,100.0 100.0,120.4 79.6,100.0"/><polygon class="vz-grid" points="100.0,59.8 140.2,100.0 100.0,140.2 59.8,100.0"/><polygon class="vz-grid" points="100.0,40.0 160.0,100.0 100.0,160.0 40.0,100.0"/><line class="vz-grid" x1="100" y1="100" x2="100.0" y2="40.0"/><line class="vz-grid" x1="100" y1="100" x2="160.0" y2="100.0"/><line class="vz-grid" x1="100" y1="100" x2="100.0" y2="160.0"/><line class="vz-grid" x1="100" y1="100" x2="40.0" y2="100.0"/><polygon class="vz-accent-fill" points="100.0,58.0 136.0,100.0 100.0,148.0 58.0,100.0"/><circle class="vz-accent-dot" cx="100.0" cy="58.0" r="2.4"/><circle class="vz-accent-dot" cx="136.0" cy="100.0" r="2.4"/><circle class="vz-accent-dot" cx="100.0" cy="148.0" r="2.4"/><circle class="vz-accent-dot" cx="58.0" cy="100.0" r="2.4"/><text class="vz-lbl" x="100.0" y="22.0" text-anchor="middle">Users 7</text><text class="vz-lbl" x="172.0" y="104.0" text-anchor="start">Financial 6</text><text class="vz-lbl" x="100.0" y="186.0" text-anchor="middle">Duration 8</text><text class="vz-lbl" x="28.0" y="104.0" text-anchor="end">Blast 7</text></svg></div>
+        <p class="disclaimer">Duration and blast-radius scores dominate: a single region&#x27;s cooling loss cascaded into a multi-service, multi-hour outage with global reach (Marketplace) and the longest VSTS outage on record. User and financial scores are estimated as moderate-high because Microsoft never published customer counts, damaged-hardware counts, or dollar impact; those figures are confirmed absent from the public disclosure and are not inferred here.</p>
+
+        <h2>Sequence of events (SOE)</h2>
+        <div class="viz viz-timeline"><svg viewBox="0 0 1144 96" role="img" aria-label="Sequence-of-events timeline"><title>Phased sequence of events</title><line class="vz-grid" x1="30" y1="48" x2="1114" y2="48"/><circle class="vz-accent-dot" cx="30" cy="48" r="4.5"/><text class="vz-tl-ph" x="30" y="30" text-anchor="middle">Trigger</text><text class="vz-tl-t" x="30" y="68" text-anchor="middle">2018-09-04 08:42 U</text><circle class="vz-accent-dot" cx="129" cy="48" r="4.5"/><text class="vz-tl-ph" x="129" y="30" text-anchor="middle">Escalation</text><text class="vz-tl-t" x="129" y="68" text-anchor="middle">2018-09-04 (imme</text><circle class="vz-accent-dot" cx="227" cy="48" r="4.5"/><text class="vz-tl-ph" x="227" y="30" text-anchor="middle">Impact</text><text class="vz-tl-t" x="227" y="68" text-anchor="middle">2018-09-04 09:29 U</text><circle class="vz-accent-dot" cx="326" cy="48" r="4.5"/><text class="vz-tl-ph" x="326" y="30" text-anchor="middle">Impact</text><text class="vz-tl-t" x="326" y="68" text-anchor="middle">2018-09-04 09:45 U</text><circle class="vz-accent-dot" cx="424" cy="48" r="4.5"/><text class="vz-tl-ph" x="424" y="30" text-anchor="middle">Cascade</text><text class="vz-tl-t" x="424" y="68" text-anchor="middle">2018-09-04 (duri</text><circle class="vz-accent-dot" cx="523" cy="48" r="4.5"/><text class="vz-tl-ph" x="523" y="30" text-anchor="middle">Detection</text><text class="vz-tl-t" x="523" y="68" text-anchor="middle">2018-09-04 (earl</text><circle class="vz-accent-dot" cx="621" cy="48" r="4.5"/><text class="vz-tl-ph" x="621" y="30" text-anchor="middle">Diagnosis</text><text class="vz-tl-t" x="621" y="68" text-anchor="middle">2018-09-04 (duri</text><circle class="vz-accent-dot" cx="720" cy="48" r="4.5"/><text class="vz-tl-ph" x="720" y="30" text-anchor="middle">Mitigation</text><text class="vz-tl-t" x="720" y="68" text-anchor="middle">2018-09-04 (~9 h</text><circle class="vz-accent-dot" cx="818" cy="48" r="4.5"/><text class="vz-tl-ph" x="818" y="30" text-anchor="middle">Recovery</text><text class="vz-tl-t" x="818" y="68" text-anchor="middle">2018-09-05 11:00 U</text><circle class="vz-accent-dot" cx="917" cy="48" r="4.5"/><text class="vz-tl-ph" x="917" y="30" text-anchor="middle">Cascade</text><text class="vz-tl-t" x="917" y="68" text-anchor="middle">2018-09-05 (duri</text><circle class="vz-accent-dot" cx="1015" cy="48" r="4.5"/><text class="vz-tl-ph" x="1015" y="30" text-anchor="middle">Restored</text><text class="vz-tl-t" x="1015" y="68" text-anchor="middle">2018-09-06 00:05 U</text><circle class="vz-accent-dot" cx="1114" cy="48" r="4.5"/><text class="vz-tl-ph" x="1114" y="30" text-anchor="middle">Recovery</text><text class="vz-tl-t" x="1114" y="68" text-anchor="middle">2018-09-07 08:40 U</text></svg></div>
+        <ul class="soe"><li><time>2018-09-04 08:42 UTC</time><span class="ev"><span class="phase-chip">Trigger</span> A lightning strike from a high-energy storm hits near the South Central US datacenters; per The Register&#x27;s account of Azure&#x27;s RCA it switched one datacenter to generator power and overloaded surge suppressors on the mechanical cooling system, shutting it down. The official VSTS postmortem describes the same trigger as lightning inducing voltage sags and swells across the utility feed that impacted cooling.</span></li><li><time>2018-09-04 (immediately following strike)</time><span class="ev"><span class="phase-chip">Escalation</span> The lightning-induced power disturbance (voltage sags/swells and generator transfer) propagates into the facility electrical system and impairs the mechanical cooling plant, degrading the site&#x27;s ability to reject heat.</span></li><li><time>2018-09-04 09:29 UTC</time><span class="ev"><span class="phase-chip">Impact</span> Broader Azure problems begin in South Central US as the loss of cooling drives rising temperatures.</span></li><li><time>2018-09-04 09:45 UTC</time><span class="ev"><span class="phase-chip">Impact</span> Automated datacenter integrity procedures activate and critical hardware enters a structured power-down. All VSTS Scale Units in South Central US go down as the datacenter power-down process takes effect.</span></li><li><time>2018-09-04 (during power-down)</time><span class="ev"><span class="phase-chip">Cascade</span> Dependent services degrade beyond the local region: Azure DevOps Marketplace is impacted globally, Release Management for US users, Git and Package Management see intermittent failures, and Dashboards break because failed calls to Marketplace render them unavailable.</span></li><li><time>2018-09-04 (early)</time><span class="ev"><span class="phase-chip">Detection</span> Automated integrity/monitoring systems detect the thermal excursion and initiate the protective shutdown; engineering and incident teams engage on the region-wide outage.</span></li><li><time>2018-09-04 (during outage)</time><span class="ev"><span class="phase-chip">Diagnosis</span> Root cause traced to the lightning-driven utility/power disturbance that disabled cooling, triggering the automated hardware-integrity power-down rather than an internal software or capacity fault.</span></li><li><time>2018-09-04 (~9 hours after onset)</time><span class="ev"><span class="phase-chip">Mitigation</span> Utility power is restored to the affected datacenters in roughly nine hours (per Data Center Dynamics), allowing cooling and infrastructure to be brought back and hardware to begin a controlled, integrity-checked power-up.</span></li><li><time>2018-09-05 11:00 UTC</time><span class="ev"><span class="phase-chip">Recovery</span> VSTS primary recovery runs roughly twenty-one hours; the majority of broader Azure services are restored by 11:00 UTC on 5 September as storage and compute are validated post power-up.</span></li><li><time>2018-09-05 (during recovery)</time><span class="ev"><span class="phase-chip">Cascade</span> A separate Release Management incident of roughly two hours (a database going offline in South Central US) occurs during the recovery period, briefly re-impacting affected surfaces.</span></li><li><time>2018-09-06 00:05 UTC</time><span class="ev"><span class="phase-chip">Restored</span> The VSTS/Azure DevOps incident is declared ended, closing the longest VSTS outage in the service&#x27;s history.</span></li><li><time>2018-09-07 08:40 UTC</time><span class="ev"><span class="phase-chip">Recovery</span> Broader Azure &#x27;full mitigation&#x27; is declared complete, nearly three days after the initial fault, as remaining services and dependencies are validated.</span></li></ul>
+
+        <h2>Root cause</h2>
+        <div class="card">A high-energy storm with lightning near the South Central US datacenters disturbed the site&#x27;s power: per The Register&#x27;s account of Azure&#x27;s RCA, a strike at 08:42 UTC forced one datacenter onto generator power and overloaded surge suppressors on the mechanical cooling plant, while the official VSTS postmortem attributes the cooling loss to lightning-induced voltage sags and swells on the utility feed. As temperatures rose, automated datacenter integrity procedures forced a structured power-down of critical hardware to protect data and equipment. The causal chain is: lightning storm -&gt; utility voltage sags/swells and generator transfer -&gt; mechanical cooling shut down -&gt; automated data/hardware-integrity procedures -&gt; structured power down.</div>
+
+        <h2>Contributing factors</h2>
+        <ul class="tight"><li>Single-region concentration of services: critical VSTS/Azure DevOps Scale Units and user profiles were hosted in South Central US without regional isolation, so a datacenter-level failure became a service-level outage.</li><li>Tight cross-service coupling and inadequate circuit-breaker scoping: failed calls to Marketplace propagated to make Dashboards unavailable, and service-to-service calls (e.g., to the User service) were not correctly scoped to fail gracefully.</li><li>Limited cross-region redundancy for internal tooling and no exercised cross-region failover, so recovery depended on the physical region coming back rather than shifting load elsewhere.</li><li>Gaps in fault-injection testing meant several of these failure modes had not been surfaced and hardened before a real regional loss occurred.</li><li>Environmental exposure: utility power quality at the site was vulnerable to lightning-induced sags/swells and surge-suppressor overload sufficient to disable cooling and trigger the protective shutdown.</li></ul>
+
+        <h2>Correction of errors (COE)</h2>
+        <ul class="tight"><li>In supported geographies, move services into regions that offer Azure Availability Zones so they are resilient to individual datacenter failures within a region. <span class="chip muted">Azure DevOps (VSTS) engineering / Microsoft Azure · Committed (postmortem remediation item 1)</span></li><li>Explore asynchronous cross-region replication of service data to reduce dependence on a single region&#x27;s availability. <span class="chip muted">Azure DevOps (VSTS) engineering · Committed (postmortem remediation item 2)</span></li><li>Regularly exercise cross-region failover using Microsoft&#x27;s own organization as a first-party test tenant, so failover is proven before it is needed. <span class="chip muted">Azure DevOps (VSTS) engineering · Committed (postmortem remediation item 3)</span></li><li>Add cross-region redundancy for internal tooling used to operate and recover the service. <span class="chip muted">Azure DevOps (VSTS) engineering · Committed (postmortem remediation item 4)</span></li><li>Fix the Dashboards regression in which failed calls to Marketplace made Dashboards unavailable. <span class="chip muted">Azure DevOps (VSTS) engineering · Committed (postmortem remediation item 5)</span></li><li>Review circuit breakers for service-to-service calls to ensure correct scoping (gap surfaced in calls to the User service). <span class="chip muted">Azure DevOps (VSTS) engineering · Committed (postmortem remediation item 6)</span></li><li>Review gaps in current fault-injection testing exposed by this incident and close them. <span class="chip muted">Azure DevOps (VSTS) engineering · Committed (postmortem remediation item 7)</span></li></ul>
+
+        <h2>Lessons learnt</h2>
+        <ul class="tight"><li>A protective, working safety mechanism can still cause a major outage: the automated hardware-integrity power-down did exactly what it was designed to do, so resilience must be engineered above the facility layer (regional isolation and failover), not by assuming the datacenter stays up.</li><li>Single-region hosting turns any datacenter-level event into a service-level outage; services and their stateful dependencies (user profiles, Scale Units) need Availability-Zone placement and cross-region replication to survive a regional loss.</li><li>Cross-service coupling amplifies blast radius. A failure in one dependency (Marketplace) cascaded into an unrelated surface (Dashboards) because circuit breakers were not correctly scoped and calls did not degrade gracefully.</li><li>Failover that is never exercised cannot be trusted in a crisis; recovery here depended on the physical region returning rather than shifting traffic, revealing untested failover paths.</li><li>Fault-injection coverage gaps hide real failure modes until a genuine regional event exposes them all at once, so chaos/fault testing must include region-loss scenarios.</li><li>Transparency has limits worth noting: Microsoft did not publish user counts, hardware-damage counts, temperature thresholds, cooling ride-through, or cost, which constrains external quantitative post-incident analysis.</li></ul>
+
+        <h2>Improvements &amp; remediation</h2>
+        <ul class="tight"><li>Adopt Availability-Zone-aware placement and asynchronous cross-region replication for stateful services so a single datacenter or region loss no longer maps to a customer-facing outage.</li><li>Institutionalize regularly exercised cross-region failover (using a first-party tenant) plus cross-region redundancy for the internal tooling needed to operate and recover the service.</li><li>Harden inter-service resilience by correctly scoping circuit breakers for service-to-service calls and ensuring dependency failures (e.g., Marketplace) degrade gracefully instead of taking down unrelated surfaces (e.g., Dashboards).</li><li>Expand fault-injection testing to cover datacenter- and region-loss scenarios, closing the coverage gaps this incident revealed before they recur.</li><li>Fix the specific Dashboards/Marketplace regression and treat similar hidden hard-dependencies as first-class reliability defects.</li></ul>
+
+        <h2>Comprehensive analysis</h2><div class="ca-block"><h3>Failure mechanism: environmental disturbance to protective shutdown</h3><p>The incident was initiated entirely outside the software stack. Lightning from a high-energy storm near San Antonio disturbed the utility supply: The Register&#x27;s account of Azure&#x27;s RCA describes a strike at 08:42 UTC that forced one datacenter onto generator power and overloaded surge suppressors on the mechanical cooling system, while the official VSTS <span data-explain="postmortem" tabindex="0">postmortem</span> frames the cause as voltage sags (undervoltage dips) and swells (overvoltage transients) that reached the facility electrical distribution and impaired the cooling plant. With heat rejection degraded, rack and hall temperatures rose toward limits that threaten silicon, storage media, and power electronics. At that point the datacenter&#x27;s automated integrity procedures did their job: rather than let equipment cook, they orchestrated a structured power-down of critical hardware. The customer-visible outage was therefore a deliberate, designed consequence of a working protection system responding to an environmental input, not a defect in the servers themselves.</p></div><div class="ca-block"><h3>Why it cascaded beyond the region</h3><p>A physical event in one region became a broad service outage because of where state lived and how services were coupled. VSTS Scale Units and a set of user profiles were hosted in South Central US with no zonal or cross-region escape hatch, so the power-down directly took those services down. From there, tight service-to-service coupling widened the <span data-explain="blast-radius" tabindex="0">blast radius</span>: the Marketplace dependency reached globally, and failed Marketplace calls cascaded into Dashboards, which became unavailable even for users far from Texas. Circuit breakers on some service-to-service calls (notably to the User service) were not scoped to contain failures, so instead of degrading gracefully the system propagated errors. A localized cooling loss thus radiated into a broad set of services (on the order of forty per contemporaneous reporting) and global surfaces.</p></div><div class="ca-block"><h3>Recovery trajectory and its asymmetry</h3><p>Recovery split into very different timescales. Restoring the physical layer, utility power and cooling, took roughly nine hours (per Data Center Dynamics). But bringing services back safely took far longer: VSTS primary recovery ran about twenty-one hours, and the official VSTS incident did not close until 00:05 UTC on 6 September, spanning the window from 09:45 UTC on 4 September (~38 hours). Broader Azure recovered more slowly still: the majority of services were back by 11:00 UTC on 5 September, but full mitigation was not declared until 08:40 UTC on 7 September. That asymmetry reflects the cost of a structured power-down: storage and compute must be powered up in a controlled, integrity-checked sequence, data consistency validated, and dependent services re-sequenced. A separate ~2-hour Release Management incident during recovery underscores how fragile the system remained mid-restoration. Because <span data-explain="failover" tabindex="0">failover</span> had not been exercised, recovery hinged on the region physically returning rather than on shifting load elsewhere.</p></div><div class="ca-block"><h3>Organizational and systemic factors</h3><p>The postmortem&#x27;s seven remediation items read as an admission that resilience was under-invested relative to the single-region design: move to Availability Zones, add asynchronous cross-region replication, regularly exercise cross-region failover using Microsoft&#x27;s own organization, add cross-region redundancy for internal tooling, fix the Dashboards/Marketplace regression, correct circuit-breaker scoping, and close fault-injection gaps. Collectively they point to a systemic gap between architectural intent and tested reality, failover paths that existed on paper but were not routinely proven, and coupling that had never been stress-tested against a full regional loss. Microsoft&#x27;s own framing, the longest VSTS outage in the service&#x27;s history, signals the severity these gaps produced.</p></div><div class="ca-block"><h3>Cross-incident pattern</h3><p>This event fits a recurring cloud-outage archetype: a facility-layer trigger (here, a lightning-induced power-quality disturbance disabling cooling) exposes software-layer single-region dependencies and under-tested failover, and the true outage duration is dominated by the careful, sequenced recovery rather than the initial fault. It also illustrates the double-edged nature of automated protection: the same integrity shutdown that saves hardware guarantees an outage if higher layers cannot absorb a region loss. The durable lesson, echoed across many large-provider postmortems, is that regional isolation, exercised failover, and correctly scoped fault containment, not facility perfection, are what keep an environmental event from becoming a global service outage.</p></div>
+
+        <h2>Technical deep-dive</h2>
+        <div class="card">The precipitating fault was a utility power-quality event, not an internal one. Per The Register&#x27;s account of Azure&#x27;s RCA, a lightning strike at 08:42 UTC forced one datacenter onto generator power and overloaded surge suppressors on the mechanical cooling plant, shutting it down; the official VSTS postmortem describes the same trigger as lightning-induced voltage sags and swells on the utility feed that impacted cooling. Such disturbances are exactly the class that trips or damages the sensitive control and motor loads of a mechanical cooling plant (<span data-explain="chiller" tabindex="0">chiller</span> compressors, pumps, CRAH/CRAC units and their VFDs). Once heat rejection is lost, a dense datacenter hall has only minutes of thermal ride-through in its chilled-water and air mass before inlet temperatures approach equipment limits; Microsoft did not disclose the specific temperature thresholds or ride-through minutes, so the exact margin is unknown. What is documented is the outcome: automated datacenter integrity procedures escalated to a structured power-down of critical hardware, an ordered shutdown that prioritizes data and hardware integrity over availability. The engineering asymmetry is the crux of the incident. A structured power-down is fast relative to a safe power-up: bringing thousands of storage and compute nodes back requires restoring cooling and power quality first (~9 hours here, per Data Center Dynamics), then a controlled, integrity-checked boot sequence with consistency validation across storage before dependent services are re-enabled, which is why VSTS primary recovery ran ~21 hours, the official VSTS window extended to 00:05 UTC on 6 September, and broader Azure full mitigation was not declared until 08:40 UTC on 7 September. At the software layer, the failure surfaced classic distributed-systems anti-patterns: stateful Scale Units and user profiles pinned to a single region with no zonal or cross-region replica; a synchronous hard-dependency on Marketplace whose failure propagated into Dashboards; and circuit breakers on service-to-service calls (surfaced against the User service) that were mis-scoped and therefore failed to contain error propagation. The remediation set is correspondingly architectural rather than facility-focused, Availability-Zone placement, asynchronous cross-region replication, routinely exercised cross-region failover, cross-region redundant tooling, the Dashboards/Marketplace regression fix, circuit-breaker rescoping, and expanded fault-injection, which is the correct engineering response to a threat model in which the datacenter itself can be intentionally taken offline by its own protection systems.</div>
+
+        <h2>References &amp; provenance</h2>
+        <ul class="refs"><li><span class="chip green">official-postmortem</span> <span class="rtitle">Postmortem: VSTS 4 September 2018 — Microsoft DevBlogs (official postmortem)</span><span class="rquote">“The incident started with a high energy storm, including lightning strikes, that hit southern Texas near the South Central US datacenters. This resulted in voltage sags and swells across the utility fields that impacted cooling systems.”</span><a href="https://devblogs.microsoft.com/devopsservice/?p=17485" target="_blank" rel="noopener nofollow">https://devblogs.microsoft.com/devopsservice/?p=17485</a></li><li><span class="chip amber">news</span> <span class="rtitle">Microsoft reveals train of mistakes that killed Azure in the South Central US incident (The Register)</span><span class="rquote">“A lightning strike at 0842 UTC caused one data center to switch to generator power and also overloaded suppressors on the mechanical cooling system, shutting it down.”</span><a href="https://www.theregister.com/2018/09/17/azure_outage_report/" target="_blank" rel="noopener nofollow">https://www.theregister.com/2018/09/17/azure_outage_report/</a></li><li><span class="chip amber">news</span> <span class="rtitle">Microsoft Azure suffers outage after cooling issue (Data Center Dynamics)</span><span class="rquote">“Microsoft Azure suffers outage after cooling issue. (Source cited for ~9-hour utility-power restoration; returned HTTP 403 on re-fetch and was not independently re-verified.)”</span><a href="https://www.datacenterdynamics.com/en/news/microsoft-azure-suffers-outage-after-cooling-issue/" target="_blank" rel="noopener nofollow">https://www.datacenterdynamics.com/en/news/microsoft-azure-suffers-outage-after-cooling-issue/</a></li></ul>
+        <p class="disclaimer">Sourced from public post-incident reports. Quotes are short attributed excerpts for provenance only; the analysis above is original and substantially shorter than its sources. Last verified 2026-08-01.</p>
+
+    </main>
+    <footer><div class="footer-grid"></div><span class="ver" id="versionStamp"></span></footer>
+    <div class="root-gate">
+        <div class="root-card">
+            <h2>🔒 Root access required</h2>
+            <p>The DC Incidents dossier is a root-only module. Sign in with an authorized account to continue.</p>
+            <div class="root-actions">
+                <button id="rootLoginBtn" type="button">Sign In</button>
+                <a href="index.html">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/rz-version.js?v=2026-08-01-gloss"></script>
+    <script src="js/rz-feature-flags.js?v=2026-08-01-gloss" defer></script>
+    <script src="auth.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-mobile-nav.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-cookie-consent.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-explain-db.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-explain.js?v=2026-08-01-gloss" defer></script>
+    <script>
+    (function(){var t=document.getElementById('themeToggle');function a(theme){document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme);var m=document.querySelector('meta[name=\"theme-color\"]');if(m)m.setAttribute('content',theme==='dark'?'#0c1512':'#f4f1e7');}a(localStorage.getItem('theme')||'dark');if(t)t.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme');a(c==='dark'?'light':'dark');});})();
+    (function(){function ag(){if(window._rzAuth&&typeof window._rzAuth.enforceTierFeatureAccess==='function'){window._rzAuth.enforceTierFeatureAccess('dc-incidents');}else{try{var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');var r=s&&s.role,t=s&&s.tier;var passes=!!s&&(r==='root'||t==='root');document.body.classList.toggle('locked',!passes);}catch(e){document.body.classList.add('locked');}}}var b=document.getElementById('rootLoginBtn');if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showRootGatePrompt==='function'){window._rzAuth.showRootGatePrompt('Root account required for the DC Incidents dossier.');}else if(window._rzAuth&&typeof window._rzAuth.showModal==='function'){window._rzAuth.showModal();}});window.addEventListener('rz-auth-change',function(){setTimeout(ag,50);});window.addEventListener('storage',function(e){if(e.key==='rz_premium_session')ag();});ag();setTimeout(ag,60);setTimeout(ag,550);setTimeout(ag,1600);})();
+    (function(){var el=document.getElementById('versionStamp');if(!el)return;var v=window.RZ_VERSION||'1.x.x',d=window.RZ_VERSION_DATE||'',cn=window.RZ_VERSION_CODENAME||'';el.textContent='· ResistanceZero · v'+v+(d?' · '+d:'')+(cn?' · '+cn:'')+' ·';})();
+    (function(){var n=0;function sc(){if(window.RZExplain&&window.RZExplain.scanText&&window.RZ_EXPLAIN_DB){var m=document.getElementById('main-content');if(m)window.RZExplain.scanText(m,140);}else if(n++<40){setTimeout(sc,200);}}setTimeout(sc,350);})();
+    </script>
+
+</body>
+</html>
