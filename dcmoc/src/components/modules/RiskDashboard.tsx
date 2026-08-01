@@ -287,7 +287,14 @@ export default function RiskDashboard() {
                                     </div>
                                     <div className="text-xs font-mono bg-white dark:bg-slate-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-transparent">
                                         {/* Workstream M — ScoreValue: scenario score P×I on a /20 scale, lower-better */}
-                                        <ScoreValue value={risk.score} direction="lower" max={20} />
+                                        <ScoreValue value={risk.score} direction="lower" max={20} trace={{
+                                            label: `${risk.title} — Risk Score`, value: risk.score, unit: '/20', provenance: 'derived', page: 'risk',
+                                            formulaTemplate: `Likelihood × Impact — P(${risk.probability}) × I(${risk.impact}) on a 1-4 × 1-4 scale (${risk.category} risk).`,
+                                            deps: [
+                                                { label: `Probability (${risk.probability})`, value: ({ Low: 1, Medium: 2, High: 3, Critical: 4 } as Record<string, number>)[risk.probability] ?? 2, provenance: 'screening' },
+                                                { label: `Impact (${risk.impact})`, value: ({ Low: 1, Medium: 2, High: 3, Catastrophic: 4 } as Record<string, number>)[risk.impact] ?? 2, provenance: 'screening' },
+                                            ],
+                                        }} />
                                     </div>
                                 </div>
                                 <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 ml-6">{risk.description}</p>

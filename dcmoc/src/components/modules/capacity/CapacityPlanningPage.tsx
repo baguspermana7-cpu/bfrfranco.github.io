@@ -391,7 +391,16 @@ export function CapacityPlanningPage() {
                                                 <span className="w-24 text-right tabular-nums text-slate-500">{u.used.toLocaleString()}/{u.capacity.toLocaleString()} {u.unit}</span>
                                                 {/* Workstream M — ScoreValue: utilization is LOWER-better (low util = headroom = green) */}
                                                 <span className="w-9 text-right tabular-nums font-semibold"
-                                                    title={u.forecastPct != null ? `Now ${u.pct}% · forecast peak ${u.forecastPct}%${u.exhaustYear ? ` · exhaust ~${u.exhaustYear}` : ''}` : undefined}><ScoreValue value={u.pct} direction="lower" max={100} display={`${u.pct}%`} /></span>
+                                                    title={u.forecastPct != null ? `Now ${u.pct}% · forecast peak ${u.forecastPct}%${u.exhaustYear ? ` · exhaust ~${u.exhaustYear}` : ''}` : undefined}><ScoreValue value={u.pct} direction="lower" max={100} display={`${u.pct}%`} trace={{
+                                                    label: `${u.label} — Utilization`, value: u.pct, unit: '%',
+                                                    provenance: u.basis === 'assumption' ? 'screening' : u.basis, page: 'capacity',
+                                                    formulaTemplate: `Used ÷ installed capacity × 100 (${u.used.toLocaleString()} / ${u.capacity.toLocaleString()} ${u.unit}, basis ${u.basis}). Design capacity = IT load + design margin, so current utilization sits ≈ 1/(1+margin); the status band uses the forecast growth peak.`,
+                                                    deps: [
+                                                        { label: 'Used', value: u.used, unit: u.unit, provenance: u.basis === 'assumption' ? 'screening' : u.basis },
+                                                        { label: 'Installed capacity', value: u.capacity, unit: u.unit, provenance: u.basis === 'assumption' ? 'screening' : u.basis },
+                                                        ...(u.forecastPct != null ? [{ label: 'Forecast peak', value: u.forecastPct, unit: '%', provenance: 'derived' as const }] : []),
+                                                    ],
+                                                }} /></span>
                                                 {(() => {
                                                     /* Banding forecast-aware + MARGIN-AWARE (Workstream R): without a phase
                                                      * plan utilization sits at the 1/(1+margin) structural floor, so OK
@@ -451,7 +460,11 @@ export function CapacityPlanningPage() {
                                             <tr key={r.label} className="border-b border-slate-100 dark:border-slate-800/60">
                                                 <td className="py-1.5 text-slate-700 dark:text-slate-200">{r.label}</td>
                                                 <td className="text-right tabular-nums text-slate-500">{r.config}</td>
-                                                <td className="text-right"><ScoreValue value={r.utilPct} direction="lower" max={100} display={`${r.utilPct}%`} /></td>
+                                                <td className="text-right"><ScoreValue value={r.utilPct} direction="lower" max={100} display={`${r.utilPct}%`} trace={{
+                                                    label: `${r.label} — Utilization`, value: r.utilPct, unit: '%', provenance: 'derived', page: 'capacity',
+                                                    formulaTemplate: `Current load ÷ installed capacity × 100 for this component (installed ${r.config}); driven by the IT load against the engine-sized equipment schedule. OK < 70%, Watch 70-85%, At Risk ≥ 85%.`,
+                                                    deps: ['sim.itLoad'],
+                                                }} /></td>
                                                 <td className="text-right">{r.status === 'OK'
                                                     ? <span className="rounded px-1.5 py-0.5 text-[9px] font-semibold bg-rz-data/15 text-rz-data">OK</span>
                                                     : <button onClick={() => setPowerRow(r.label)} title="Click for the diagnosis" className={`rounded px-1.5 py-0.5 text-[9px] font-semibold cursor-pointer hover:brightness-110 ${r.status === 'Watch' ? 'bg-amber-500/15 text-amber-500' : 'bg-rose-500/15 text-rose-500'}`}>{r.status} ⓘ</button>}
@@ -564,7 +577,11 @@ function DetailTable({ table, headTips, footnote, onPhase, onReq }: {
                         <tr key={r.label} className="border-b border-slate-100 dark:border-slate-800/60">
                             <td className="py-1.5 text-slate-700 dark:text-slate-200">{r.label}{r.tip && <InfoTip content={r.tip} />}</td>
                             <td className="text-right tabular-nums text-slate-500">{r.config}</td>
-                            <td className="text-right"><ScoreValue value={r.utilPct} direction="lower" max={100} display={`${r.utilPct}%`} /></td>
+                            <td className="text-right"><ScoreValue value={r.utilPct} direction="lower" max={100} display={`${r.utilPct}%`} trace={{
+                                                    label: `${r.label} — Utilization`, value: r.utilPct, unit: '%', provenance: 'derived', page: 'capacity',
+                                                    formulaTemplate: `Current load ÷ installed capacity × 100 for this component (installed ${r.config}); driven by the IT load against the engine-sized equipment schedule. OK < 70%, Watch 70-85%, At Risk ≥ 85%.`,
+                                                    deps: ['sim.itLoad'],
+                                                }} /></td>
                             <td className="text-right">{r.status === 'OK'
                                 ? <span className="rounded px-1.5 py-0.5 text-[9px] font-semibold bg-rz-data/15 text-rz-data">OK</span>
                                 : <button onClick={() => setOpenRow(r.label)} title="Click for the diagnosis" className={`rounded px-1.5 py-0.5 text-[9px] font-semibold cursor-pointer hover:brightness-110 ${r.status === 'Watch' ? 'bg-amber-500/15 text-amber-500' : 'bg-rose-500/15 text-rose-500'}`}>{r.status} ⓘ</button>}

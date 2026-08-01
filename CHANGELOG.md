@@ -13,6 +13,24 @@ release sections rather than semver.
 
 ---
 
+## v1.121.8 — 2026-08-01 (DCMOC — per-row ƒx trace rollout, trace-parity 142/142)
+
+Rolled the v1.121.7 inline-trace infra across every per-row surface that previously
+couldn't carry an ƒx trace (per-`.map()` cells + component-local `useState` values):
+- **Capacity Planning** — per-system utilization rows + per-component tables (used ÷ capacity).
+- **Risk** — per top-risk-scenario score (Likelihood × Impact, engine 1–4 maps).
+- **Strategic Planning** — per-bid IRR / MoIC + blended-portfolio IRR (from the local
+  acquisition what-if state — the exact case the registry couldn't reach).
+- **Asset Lifecycle** — per-asset health (remaining-life + failure-probability drill-down).
+- **Asset Intelligence** — criticality-ranking rows (failure-prob × MTTR × units).
+- **Site Comparison Rail** — **every candidate-site column** now traces its own score/axis
+  (Total + 5 axes + sibling-engine scores), fixing the long-standing "one node would lie on
+  the other columns" limitation.
+
+Every `trace.value` is the exact expression the cell renders, so **trace-parity rose
+125/125 → 142/142 (0 fail)** — the ƒx popover on every per-row cell matches the number shown.
+DCMOC ƒx trace coverage is now complete at KPI-card AND per-row level.
+
 ## v1.121.7 — 2026-08-01 (DCMOC — per-row ƒx trace infrastructure)
 
 Solves the structural limit flagged in v1.121.5: the trace registry is one node → one

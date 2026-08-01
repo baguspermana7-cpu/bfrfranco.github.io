@@ -343,8 +343,16 @@ export function AssetIntelligencePage() {
                                                 <td className="text-right tabular-nums text-slate-500">{r.fpPct}%</td>
                                                 <td className="text-right tabular-nums text-slate-500">{r.mttrHrs} h</td>
                                                 <td className="text-right tabular-nums text-slate-500">{r.count.toLocaleString()}</td>
-                                                {/* Workstream M — ScoreValue: criticality is lower-better, scaled to the top-ranked score (top rank reads red) */}
-                                                <td className="text-right"><ScoreValue value={r.crit} display={r.crit.toFixed(1)} direction="lower" max={model.criticality[0]?.crit || 1} /></td>
+                                                {/* Workstream M — ScoreValue: criticality is lower-better, scaled to the top-ranked score (top rank reads red) + inline ƒx trace (per-row FMEA drivers) */}
+                                                <td className="text-right"><ScoreValue value={r.crit} display={r.crit.toFixed(1)} direction="lower" max={model.criticality[0]?.crit || 1} trace={{
+                                                    label: `${r.label} — Criticality`, value: r.crit, provenance: 'derived', page: 'asset-health',
+                                                    formulaTemplate: 'Screening FMEA priority = Weibull failure probability × MTTR (h) × unit count.',
+                                                    deps: [
+                                                        { label: 'Failure probability', value: r.fpPct, unit: '%', provenance: 'derived' },
+                                                        { label: 'MTTR', value: r.mttrHrs, unit: 'h', provenance: 'engine' },
+                                                        { label: 'Units', value: r.count, provenance: 'engine' },
+                                                    ],
+                                                }} /></td>
                                             </tr>
                                         ))}
                                     </tbody>

@@ -48,10 +48,16 @@ export function SiteComparisonTable({ sites, results, selectedId, analysesById, 
                                 const vals = results.map((x) => x.engine.score);
                                 /* Score cells render through ScoreValue (semantic color);
                                  * best-of-row keeps a ★ marker (color is now the score scale).
-                                 * NO traceId here — site.* trace nodes resolve via the
-                                 * SELECTED site and would lie on the other columns. */
+                                 * INLINE trace (not traceId): the registry site.* nodes read
+                                 * the SELECTED site and would lie on the other columns — an
+                                 * inline trace embeds THIS column's own score + its top engine
+                                 * factor drivers, so every site column stays honest. */
                                 return <td key={s.id} className="px-2 py-1.5 text-right tabular-nums">
-                                    {r ? <ScoreValue value={r.engine.score} direction="higher" max={100} /> : '—'}
+                                    {r ? <ScoreValue value={r.engine.score} direction="higher" max={100} trace={{
+                                        label: `Site ${s.label} — Total Score`, value: r.engine.score, unit: '/100', provenance: 'engine', page: 'site',
+                                        formulaTemplate: 'Weight-renormalized sum of the 10 engine site factors (each 0–1 × its weight) → 0–100.',
+                                        deps: [...r.engine.breakdown].sort((a, b) => b.contribution - a.contribution).slice(0, 4).map((f) => ({ label: f.key, value: Math.round(f.value * 100), unit: '/100', provenance: 'engine' as const })),
+                                    }} /> : '—'}
                                     {r && best(vals, r.engine.score) && <span className="ml-0.5 text-[9px] text-rz-signal" aria-label="best of row">★</span>}
                                 </td>;
                             })}
@@ -68,7 +74,10 @@ export function SiteComparisonTable({ sites, results, selectedId, analysesById, 
                                     const isBad = band != null && (band.label === 'Poor' || band.label === 'Fair');
                                     const isOpen = axisExplain?.siteId === s.id && axisExplain?.axis === k;
                                     return <td key={s.id} className="px-2 py-1.5 text-right tabular-nums text-slate-600 dark:text-slate-400">
-                                        {raw != null ? <ScoreValue value={raw} direction={k === 'naturalRisks' ? 'lower' : 'higher'} max={100} /> : '—'}
+                                        {raw != null ? <ScoreValue value={raw} direction={k === 'naturalRisks' ? 'lower' : 'higher'} max={100} trace={{
+                                            label: `Site ${s.label} — ${AXIS_LABELS[k]}`, value: raw, unit: '/100', provenance: 'engine', page: 'site',
+                                            formulaTemplate: k === 'naturalRisks' ? `${AXIS_EXPLAIN[k]} (risk axis — lower is better)` : AXIS_EXPLAIN[k],
+                                        }} /> : '—'}
                                         {raw != null && r && best(goodVals, good) && <span className="ml-0.5 text-[9px] text-rz-signal" aria-label="best of row">★</span>}
                                         {band && (isBad && onExplainAxis ? (
                                             <button onClick={() => onExplainAxis(isOpen ? null : { siteId: s.id, axis: k })}
@@ -108,7 +117,10 @@ export function SiteComparisonTable({ sites, results, selectedId, analysesById, 
                                         return <td key={s.id} title={c ? `${rowDef.label}: ${c.v}` : undefined}
                                             className={`px-2 py-1.5 text-right tabular-nums ${!c || c.score == null ? (isBest ? 'text-rz-signal font-semibold' : 'text-slate-600 dark:text-slate-400') : ''}`}>
                                             {c ? (c.score != null
-                                                ? <ScoreValue value={c.score} display={c.v} direction={c.dir ?? 'higher'} max={100} />
+                                                ? <ScoreValue value={c.score} display={c.v} direction={c.dir ?? 'higher'} max={100} trace={{
+                                                    label: `Site ${s.label} — ${rowDef.label}`, value: c.score, unit: '/100', provenance: 'engine', page: 'site',
+                                                    formulaTemplate: `${rowDef.label} — computed by the sibling site engine for this site.`,
+                                                }} />
                                                 : c.v) : '—'}
                                             {c && c.score != null && isBest && <span className="ml-0.5 text-[9px] text-rz-signal" aria-label="best of row">★</span>}
                                         </td>;

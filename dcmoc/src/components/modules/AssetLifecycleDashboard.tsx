@@ -472,8 +472,15 @@ export default function AssetLifecycleDashboard() {
                                         <div className={clsx("h-full rounded-full", HEALTH_COLORS[h.riskLevel])} style={{ width: `${h.healthPct}%` }} />
                                     </div>
                                     <div className="flex justify-between text-[10px]">
-                                        {/* Workstream M — ScoreValue: gradient health color (higher-better /100) */}
-                                        <span className="text-slate-600 dark:text-slate-400"><ScoreValue value={h.healthPct} display={`${h.healthPct}%`} direction="higher" /> health</span>
+                                        {/* Workstream M — ScoreValue: gradient health color (higher-better /100) + inline ƒx trace (per-asset, engine health index) */}
+                                        <span className="text-slate-600 dark:text-slate-400"><ScoreValue value={h.healthPct} display={`${h.healthPct}%`} direction="higher" trace={{
+                                            label: `${h.name} — Health`, value: h.healthPct, unit: '%', provenance: 'engine', page: 'asset-lifecycle',
+                                            formulaTemplate: 'Engine health index at an assumed 5-yr operating age vs the asset design life — lower remaining life and higher failure probability pull health down.',
+                                            deps: [
+                                                { label: 'Remaining life', value: h.remainingLife, unit: 'yr', provenance: 'engine' },
+                                                { label: 'Failure probability', value: h.failureProbability * 100, unit: '%', provenance: 'engine' },
+                                            ],
+                                        }} /> health</span>
                                         <span className="text-slate-600 dark:text-slate-400 flex items-center gap-0.5">{h.remainingLife}yr left <Tooltip content="Estimated years of useful life remaining based on age, condition, and maintenance history." /></span>
                                     </div>
                                     <div className="text-[10px] text-slate-500 dark:text-slate-500 mt-1 flex items-center gap-0.5">
@@ -600,7 +607,15 @@ export default function AssetLifecycleDashboard() {
                                                     {health && (
                                                         <div className="flex items-center justify-center gap-1">
                                                             <div className={clsx("w-2 h-2 rounded-full", HEALTH_COLORS[health.riskLevel])} />
-                                                            <span className="text-[10px] font-mono"><ScoreValue value={health.healthPct} display={`${health.healthPct}%`} direction="higher" /></span>
+                                                            <span className="text-[10px] font-mono"><ScoreValue value={health.healthPct} display={`${health.healthPct}%`} direction="higher" trace={{
+                                                                label: `${a.name} — Health`, value: health.healthPct, unit: '%', provenance: 'engine', page: 'asset-lifecycle',
+                                                                formulaTemplate: 'Engine health index at an assumed 5-yr operating age vs the asset design life (Weibull ageing).',
+                                                                deps: [
+                                                                    { label: 'Design life', value: a.usefulLifeYears, unit: 'yr', provenance: 'engine' },
+                                                                    { label: 'Remaining life', value: health.remainingLife, unit: 'yr', provenance: 'engine' },
+                                                                    { label: 'Failure probability', value: health.failureProbability * 100, unit: '%', provenance: 'engine' },
+                                                                ],
+                                                            }} /></span>
                                                         </div>
                                                     )}
                                                 </td>

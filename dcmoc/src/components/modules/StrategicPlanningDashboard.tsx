@@ -997,6 +997,16 @@ export default function StrategicPlanningDashboard() {
                                                         display={s.econ.irrPct != null ? `${s.econ.irrPct.toFixed(1)}%` : '—'}
                                                         direction="higher" max={30}
                                                         tip={`Internal rate of return of the 10-yr screening cash flow at the ${s.label} bid — the discount rate at which NPV = 0. Committee test: must exceed the regional WACC ${waccPct.toFixed(1)}% to create value. Color scale 0–30%.`}
+                                                        trace={{
+                                                            label: `${s.label} bid — IRR`, value: s.econ.irrPct ?? 0, unit: '%', provenance: 'derived', page: 'strategic',
+                                                            formulaTemplate: '10-yr screening cash flow: −equity at t0, then annual (IT kW × revenue basis × 12 × lease-up occupancy − OPEX); IRR = discount rate where NPV = 0. Bankable when IRR > WACC.',
+                                                            deps: [
+                                                                { label: 'Bid', value: s.bid, unit: '$/MW', provenance: 'input' },
+                                                                { label: 'Equity investment', value: s.econ.investment, unit: '$', provenance: 'derived' },
+                                                                { label: 'NPV @ WACC', value: s.econ.npv, unit: '$', provenance: 'derived' },
+                                                                { label: 'WACC (hurdle)', value: waccPct, unit: '%', provenance: 'derived' },
+                                                            ],
+                                                        }}
                                                     />
                                                 </td>
                                                 <td className="text-right py-2 px-2">
@@ -1005,6 +1015,14 @@ export default function StrategicPlanningDashboard() {
                                                         display={`${s.econ.moic.toFixed(2)}x`}
                                                         direction="higher" max={4}
                                                         tip={`Multiple on invested capital — UNDISCOUNTED total 10-yr net cash flow ÷ equity at the ${s.label} bid. A time-blind sanity check alongside IRR (a 2.0x over 10 years is far weaker than 2.0x over 4). Color scale 0–4x.`}
+                                                        trace={{
+                                                            label: `${s.label} bid — MoIC`, value: s.econ.moic, unit: 'x', provenance: 'derived', page: 'strategic',
+                                                            formulaTemplate: 'Multiple on invested capital = undiscounted total 10-yr net cash flow ÷ equity investment (time-blind sanity check).',
+                                                            deps: [
+                                                                { label: 'Bid', value: s.bid, unit: '$/MW', provenance: 'input' },
+                                                                { label: 'Equity investment', value: s.econ.investment, unit: '$', provenance: 'derived' },
+                                                            ],
+                                                        }}
                                                     />
                                                 </td>
                                                 <td className="text-right py-2 px-2 tabular-nums text-slate-700 dark:text-slate-300">{s.econ.paybackYears != null ? `${s.econ.paybackYears.toFixed(1)} yr` : '>10 yr'}</td>
@@ -1059,6 +1077,16 @@ export default function StrategicPlanningDashboard() {
                                                 display={acquisitionResults.portfolio.blendedIrrPct != null ? `${acquisitionResults.portfolio.blendedIrrPct.toFixed(1)}%` : '—'}
                                                 direction="higher" max={30}
                                                 tip="Capital-weighted IRR across the current project and the fair-value acquisition — both through the identical 10-yr screening closure. Weighting by committed capital, not by asset count."
+                                                trace={{
+                                                    label: 'Blended portfolio IRR', value: acquisitionResults.portfolio.blendedIrrPct ?? 0, unit: '%', provenance: 'derived', page: 'strategic',
+                                                    formulaTemplate: 'Capital-weighted IRR = (project IRR × project CAPEX + acquisition IRR × acquisition equity) ÷ combined capital.',
+                                                    deps: [
+                                                        { label: 'Project IRR', value: acquisitionResults.portfolio.projIrrPct, unit: '%', provenance: 'derived' },
+                                                        { label: 'Project CAPEX', value: acquisitionResults.portfolio.projCapex, unit: '$', provenance: 'engine' },
+                                                        { label: 'Acquisition IRR', value: acquisitionResults.portfolio.acqIrrPct, unit: '%', provenance: 'derived' },
+                                                        { label: 'Acquisition equity', value: acquisitionResults.portfolio.acqInvestment, unit: '$', provenance: 'derived' },
+                                                    ],
+                                                }}
                                             />
                                         </div>
                                         <div className="text-[9px] text-slate-400">proj {acquisitionResults.portfolio.projIrrPct?.toFixed(1) ?? '—'}% · acq {acquisitionResults.portfolio.acqIrrPct?.toFixed(1) ?? '—'}%</div>

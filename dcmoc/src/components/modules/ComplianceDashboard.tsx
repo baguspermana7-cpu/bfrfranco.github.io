@@ -212,7 +212,14 @@ export default function ComplianceDashboard() {
               * color scale on money). */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
-                    { label: 'Total Requirements', node: <ScoreValue value={result.totalCount} direction="higher" max={SCORE_MAX_ITEMS} className="text-2xl" />, icon: ClipboardCheck, color: 'cyan', tip: 'Total number of regulatory and certification requirements applicable to this country, including fire, electrical, environmental, building, data-protection, and telecom categories.' },
+                    { label: 'Total Requirements', node: <ScoreValue value={result.totalCount} direction="higher" max={SCORE_MAX_ITEMS} className="text-2xl" trace={{
+                        label: 'Total Requirements', value: result.totalCount, unit: ' items', provenance: 'engine', page: 'compliance',
+                        formulaTemplate: 'Count of all regulatory + certification requirements applicable to this country = mandatory + optional, across fire, electrical, environmental, building, data-protection and telecom categories.',
+                        deps: [
+                            { label: 'Mandatory', value: result.mandatoryCount, unit: ' items', provenance: 'engine' },
+                            { label: 'Optional', value: result.totalCount - result.mandatoryCount, unit: ' items', provenance: 'derived' },
+                        ],
+                    }} />, icon: ClipboardCheck, color: 'cyan', tip: 'Total number of regulatory and certification requirements applicable to this country, including fire, electrical, environmental, building, data-protection, and telecom categories.' },
                     { label: 'Mandatory', node: <ScoreValue value={result.mandatoryCount} direction="higher" max={result.totalCount} traceId="site.compMandatory" className="text-2xl" />, icon: AlertTriangle, color: 'amber', tip: 'Requirements that are legally mandatory — non-compliance may result in fines, operational shutdowns, or license revocations.' },
                     { label: 'Initial Cost', node: <span className="text-2xl font-bold text-slate-900 dark:text-white"><TraceValue traceId="site.compInitialCost">{fmtMoney(result.totalInitialCost)}</TraceValue></span>, icon: DollarSign, color: 'blue', tip: 'One-time compliance cost for certifications, inspections, equipment upgrades, and initial filing fees.' },
                     { label: 'Annual Cost', node: <span className="text-2xl font-bold text-slate-900 dark:text-white"><TraceValue traceId="site.compAnnualCost">{fmtMoney(result.totalAnnualCost)}</TraceValue></span>, icon: BarChart3, color: 'green', tip: 'Recurring annual cost for license renewals, periodic inspections, audits, and ongoing compliance monitoring.' },
