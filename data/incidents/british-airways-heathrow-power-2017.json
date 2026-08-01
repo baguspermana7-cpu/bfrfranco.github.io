@@ -211,6 +211,20 @@
  "technicalDeepDive": "The failure mechanism, as described by the operator, is a two-stage electrical event centred on the facility's UPS/backup power chain, with the second stage causing the actual hardware damage. All of it is the operator (IAG/BA) account plus a leaked internal email; CBRE disputed it and no independent adjudication confirmed it.\n\nStage 1 - loss of source without failover. A UPS feeding the BoHo core data centre was \"over-ridden\" (Walsh's version: an engineer disconnected a power supply). In a properly configured N+1/2N data-centre topology, removing one source should cause an automatic transfer so the load continues on battery-backed UPS output and, for a sustained outage, on generator power. Instead the event \"resulted in the total immediate loss of power to the facility, bypassing the backup generators and batteries\" - the batteries and generators did not pick up the load and the facility de-energised immediately (The Register; leaked IAG email via Network World). Contemporary reporting placed the fault inside the facility's own distribution rather than upstream on the grid, but the specific National Grid / SSE 'customer side of the meter' statements could not be re-verified in this review and are treated as reported, not confirmed.\n\nStage 2 - uncontrolled re-energisation and surge (the damaging event). 'After a few minutes... it was turned back on in an unplanned and uncontrolled fashion, which created physical damage to the system,' and the 'uncontrolled return of power... caused a power surge taking out our IT systems.' Engineering-wise, re-applying power to a large, fully-de-energised IT load without sequencing produces a severe inrush transient - many power supplies simultaneously drawing charging/magnetising current, no staged ramp, and a potentially unstable source still stabilising. Without soft-start, staged breaker closing, inrush limiting, or an orderly transfer back onto conditioned UPS output, the resulting voltage/current transient can exceed the ratings of server PSUs and other IT hardware, producing physical rather than merely logical damage. One unattributed scenario in The Register speculated the battery and generator supplies were briefly connected in series, delivering roughly 480V instead of 240V and causing a 'literal meltdown'; this is explicitly speculation from an anonymous source, never officially confirmed.\n\nConsequence for recovery. Because the damage was physical, systems could not simply be powered back up - damaged hardware had to be repaired/replaced and systems rebuilt, consistent with the multi-day, airline-wide disruption (about 672 cancellations, roughly 75,000 passengers stranded). None of these electrical specifics were ever independently adjudicated.",
  "references": [
   {
+   "title": "British Airways IT failure caused by 'uncontrolled return of power' (The Guardian, reproducing BA's official statement verbatim)",
+   "url": "https://www.theguardian.com/business/2017/may/31/ba-it-shutdown-caused-by-uncontrolled-return-of-power-after-outage",
+   "type": "press",
+   "quote": "There was a loss of power to the UK data centre which was compounded by the uncontrolled return of power which caused a power surge taking out our IT systems.",
+   "accessed": "2026-08-01"
+  },
+  {
+   "title": "Inquiry to determine whether BA outage was human error (DatacenterDynamics)",
+   "url": "https://www.datacenterdynamics.com/en/news/inquiry-to-determine-whether-ba-outage-was-human-error/",
+   "type": "press",
+   "quote": "The IT equipment was powered up in an 'uncontrolled fashion,' causing a surge and 'catastrophic physical damage' to the airline's servers, a source told The Telegraph.",
+   "accessed": "2026-08-01"
+  },
+  {
    "title": "British Airways outage, like most data center outages, was caused by humans",
    "url": "https://www.networkworld.com/article/963711/british-airways-outage-like-most-data-center-outages-was-caused-by-humans.html",
    "type": "press",

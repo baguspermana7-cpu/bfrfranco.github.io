@@ -43,6 +43,7 @@ def main():
         print("usage: _ingest_rca.py <results.json> [--apply]")
         return
     apply = "--apply" in sys.argv
+    sources_only = "--sources-only" in sys.argv  # keep existing narrative; only merge sources + flip PM
     results = json.load(open(sys.argv[1], encoding="utf-8"))
     done, skipped = [], []
     for r in results:
@@ -59,15 +60,25 @@ def main():
             continue
         d = json.load(open(path, encoding="utf-8"))
 
-        rc = _clean(v.get("finalRootCause"))
-        td = _clean(v.get("finalTechnicalDeepDive"))
-        cf = [_clean(x) for x in (v.get("finalContributingFactors") or []) if _clean(x)]
-        if rc and len(rc) > len(d.get("rootCause", "") or "") * 0.5:
-            d["rootCause"] = rc
-        if td and len(td) > 200:
-            d["technicalDeepDive"] = td
-        if len(cf) >= 3:
-            d["contributingFactors"] = cf
+        if not sources_only:
+            rc = _clean(v.get("finalRootCause"))
+            td = _clean(v.get("finalTechnicalDeepDive"))
+            cf = [_clean(x) for x in (v.get("finalContributingFactors") or []) if _clean(x)]
+            if rc and len(rc) > len(d.get("rootCause", "") or "") * 0.5:
+                d["rootCause"] = rc
+            if td and len(td) > 200:
+                d["technicalDeepDive"] = td
+            if len(cf) >= 3:
+                d["contributingFactors"] = cf
+        else:
+            # sources-only: keep existing narrative; append a short official-confirmation
+            # paragraph only when this pass genuinely established an official source
+            note = _clean(v.get("note") or "")
+            offq = next((_clean(s.get("quote", "")) for s in (v.get("approvedSources") or [])
+                         if _maptype(s.get("type", "press")) in _ACCEPTED and (s.get("quote") or "").strip()), "")
+            if v.get("officialPostmortem") and offq and "Official confirmation" not in (d.get("rootCause", "") or ""):
+                d["rootCause"] = (d.get("rootCause", "") or "").rstrip() + \
+                    "\n\nOfficial confirmation. " + (note or f'The primary official record states: "{offq}"')
 
         # merge approved sources into references, dedup by url
         refs = d.get("references", [])

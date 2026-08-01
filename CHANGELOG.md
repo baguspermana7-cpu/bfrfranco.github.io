@@ -13,6 +13,31 @@ release sections rather than semver.
 
 ---
 
+## v1.123.1 — 2026-08-01 (DC Incidents — targeted primary-document pass, 3 more official)
+
+### Changed
+Follow-up to the RCA deep-crawl: a targeted 8-agent Workflow to retrieve the **primary official
+documents** for the four incidents still lacking one. Three were located and verified, flipping
+`officialPostmortem` **17 → 20 of 25**:
+
+- **Kakao / SK C&C Pangyo fire** — MSIT official investigation result "디지털서비스 장애 원인
+  조사결과 및 시정조치 요구" on the korea.kr government portal, plus the National Forensic
+  Service (NFS) fire-origin finding (age-related insulation breakdown → internal short in a 2015
+  Li-ion UPS cell).
+- **NIRS Daejeon fire** — Ministry of the Interior and Safety (MOIS) + National Fire Agency
+  official releases on korea.kr.
+- **Equinix LD8** — LINX (London Internet Exchange) official technical-blog post-incident notice.
+
+Each dossier keeps its existing deep narrative with an appended, attributed **"Official
+confirmation"** paragraph (merged via `_ingest_rca.py --sources-only`, so the RCA depth is
+augmented, not overwritten). **British Airways stays honestly `false`** — the UK Parliament
+correspondence / High Court filing was not retrievable this pass. Remaining 5 false are genuinely
+disputed/unpublished (Red Sea cable cuts, fires under investigation, Delta/Dyn, BA).
+
+Root-gated. Gates: incidents-corpus 25/25, page-gates CLEAN, script-tags CLEAN.
+
+---
+
 ## v1.123.0 — 2026-08-01 (DC Incidents — official-RCA deep-crawl, all 25 dossiers)
 
 ### Changed
