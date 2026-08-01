@@ -63,6 +63,22 @@ buttons, magnitude score-trace tooltip, and deep re-research batches 2–5.)
 
 ---
 
+## v1.124.3 — 2026-08-02 (DCMOC deep-audit C8 — CAPEX FOM multipliers discipline-scoped)
+
+Closes the last deep-audit item (`dcmoc/DEEP_AUDIT.md` C8). The 11 facility-quality (FOM)
+multipliers were applied GLOBALLY — picking a premium transformer, raised floor or structured
+cabling inflated cooling, fire, generator and every other discipline, not just its own.
+
+### Fixed (DCMOC — `CapexEngine.ts`)
+- **FOM multipliers now discipline-scoped** inside the per-category cost loop:
+  - **electrical** ← power distribution · PDU · transformer lead · transformer type · cabling · fiber entry
+  - **building** ← raised floor · physical security
+  - **global** (genuinely project-wide) ← site condition · market condition · delivery method
+- Every factor is **1.0 at its UI default**, so a baseline project is **byte-identical** to before —
+  only non-default picks move, and each now moves only its own discipline (previously each non-default
+  pick over-costed the whole project). Verified: trace-parity **214/214**, enum-coverage CLEAN (25),
+  model-calibration **19/0** GREEN.
+
 ## v1.124.2 — 2026-08-02 (DCMOC deep-audit — UI/skin "improve" pass)
 
 Follows the 5-Opus deep audit (`dcmoc/DEEP_AUDIT.md`). Correctness fixes C1-C7/B1 already

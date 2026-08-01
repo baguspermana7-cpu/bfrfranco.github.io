@@ -207,6 +207,28 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
     const yearMult = cd.yearEscalation?.[projYear] ?? yearEscalation[projYear]?.mult ?? 1.0;
     const globalMult = yearMult; // Simplified for now
 
+    // C8 fix: FOM (facility-quality) multipliers are DISCIPLINE-scoped, not global.
+    // Applying a premium transformer / raised floor / structured-cabling pick to the
+    // WHOLE project (cooling, fire, generator...) over-costs unrelated disciplines.
+    // Scope each to its owning category in the cost loop below; keep only the genuinely
+    // project-wide factors (site condition, market condition, delivery method) global.
+    // Every factor is 1.0 at its UI default, so a baseline project is identical either
+    // way — only non-default picks move, and now each moves only its own discipline.
+    const fomQm = (map: Record<string, number>, engineMap: Record<string, number> | undefined, val: string | undefined, def: string): number =>
+        ((engineMap ?? map)[val ?? def]) || 1.0;
+    // electrical-discipline FOM: power distribution, PDU, transformer lead+type, low-voltage/fiber entry
+    const elecFOM =
+        fomQm(distributionMultipliers, cd.fomDistMult, input.powerDistribution, 'busway') *
+        fomQm(pduMultipliers, cd.fomPduMult, input.pduType, 'monitored') *
+        fomQm(txLeadMultipliers, cd.fomTxLeadMult, input.transformerLead, 'standard') *
+        fomQm(txTypeMultipliers, cd.fomTxTypeMult, input.transformerType, 'dry') *
+        fomQm(cablingMultipliers, cd.fomCablingMult, input.cablingType, 'cat6a') *
+        fomQm(fiberEntryMultipliers, cd.fomFiberEntryMult, input.fiberEntry, 'single');
+    // building-discipline FOM: raised floor, physical security infrastructure
+    const buildFOM =
+        fomQm(floorMultipliers, cd.fomFloorMult, input.floorType, 'raised') *
+        fomQm(securityMultipliers, cd.fomSecurityMult, input.securityLevel, 'standard');
+
     // Rack form factor (42U std / 48U dense / OCP 21" open) — a REAL cost driver:
     // it scales required white-space floor area, so it multiplies the space-driven
     // `building` (shell + civil) category, not just the reported floorSpace metric.
@@ -226,13 +248,13 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
         const landedFactor = (rzModels() as any)?.supplyChain?.landedFactor ? (rzModels() as any).supplyChain.landedFactor(country ?? null, key) : 1.0;
         multiplier *= landedFactor;
 
-        if (key === 'building') multiplier *= buildMult * rackMult * rackFormFactor;
+        if (key === 'building') multiplier *= buildMult * rackMult * rackFormFactor * buildFOM;
         else if (key === 'seismic') multiplier *= seismicMult * buildMult;
         // C4 fix: upsMult belongs to the `ups` category ONLY. Applying it to
         // `electrical` too double-counted the UPS technology premium (inflated the
         // switchgear/distribution line +50% on top of the ups line). Reference
         // engine scopes upsMult to `ups`. Keep the real electrical drivers.
-        else if (key === 'electrical') multiplier *= redMult * rackMult * powerUplift;
+        else if (key === 'electrical') multiplier *= redMult * rackMult * powerUplift * elecFOM;
         else if (key === 'ups') multiplier *= redMult * rackMult * upsMult * powerUplift;
         else if (key === 'generator') multiplier *= redMult * fuelMult * genMult * powerUplift * gensetCapMult;
         else if (key === 'cooling') multiplier *= coolMult * rackMult;
@@ -292,27 +314,14 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
      * Each defaults to 1.0 at the UI default option so baseline projects are
      * unchanged; only non-default picks move CAPEX. Screening ±% per DATA.capexDetail
      * (engine-primary, capex-data twin fallback). */
-    const qm = (map: Record<string, number>, engineMap: Record<string, number> | undefined, val: string | undefined, def: string): number =>
-        ((engineMap ?? map)[val ?? def]) || 1.0;
-    // TODO(C8): power-distribution/transformer (and other FOM) multipliers are
-    // applied to `currentTotal` (all disciplines) rather than scoped to their
-    // owning category (electrical/transformer). This over-scopes non-default picks.
-    // Not fixed here: rescoping requires moving multiplier application into the
-    // per-category cost loop, which re-baselines CAPEX for non-default configs and
-    // is not safely verifiable within this defect batch. Baseline default is
-    // unaffected (all factors 1.0 → `qualityM === 1.0` → block skipped).
+    // Genuinely project-wide quality factors (affect ALL disciplines): site condition,
+    // market condition, delivery method. Discipline-specific FOM (distribution, PDU,
+    // transformer, cabling, fiber, floor, security) is scoped in the cost loop above (C8).
+    // Each defaults to 1.0, so a baseline project is unchanged.
     const qualityM =
-        qm(distributionMultipliers, cd.fomDistMult, input.powerDistribution, 'busway') *
-        qm(pduMultipliers, cd.fomPduMult, input.pduType, 'monitored') *
-        qm(cablingMultipliers, cd.fomCablingMult, input.cablingType, 'cat6a') *
-        qm(floorMultipliers, cd.fomFloorMult, input.floorType, 'raised') *
-        qm(securityMultipliers, cd.fomSecurityMult, input.securityLevel, 'standard') *
-        qm(fiberEntryMultipliers, cd.fomFiberEntryMult, input.fiberEntry, 'single') *
-        qm(siteConditionMultipliers, cd.fomSiteMult, input.siteCondition, 'greenfield') *
-        qm(marketConditionMultipliers, cd.fomMarketMult, input.marketCondition, 'normal') *
-        qm(txLeadMultipliers, cd.fomTxLeadMult, input.transformerLead, 'standard') *
-        qm(txTypeMultipliers, cd.fomTxTypeMult, input.transformerType, 'dry') *
-        qm(deliveryMethodMultipliers, cd.fomDeliveryMult, input.deliveryMethod, 'design_build');
+        fomQm(siteConditionMultipliers, cd.fomSiteMult, input.siteCondition, 'greenfield') *
+        fomQm(marketConditionMultipliers, cd.fomMarketMult, input.marketCondition, 'normal') *
+        fomQm(deliveryMethodMultipliers, cd.fomDeliveryMult, input.deliveryMethod, 'design_build');
     if (qualityM !== 1.0) {
         currentTotal *= qualityM;
     }

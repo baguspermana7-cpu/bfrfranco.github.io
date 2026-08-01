@@ -24,7 +24,7 @@ Date: 2026-08-01 · Method: 5 Opus specialist agents, each live-rendering the ap
 | C5 | MED | electricity tariff single-sourced (country rate) | rz-engine.js:11573 | ✅ |
 | C6 | MED | Dashboard/Financial OPEX use RAW headcount, ignore `staffingAutoMode` (default ON) + disagree on Janitor scope | useDashboardData:66, FinancialPage:72 | ✅ |
 | C7 | MED | Balance-sheet "✓ Balances" is a **tautology** (cash = plug); negative cash rendered as asset; interest/principal inconsistent | FinancialStatements.tsx:102 | ✅ |
-| C8 | MED | MED | `CapexEngine` FOM multipliers applied GLOBALLY (qualityM on all disciplines) instead of scoping power/transformer to electrical | CapexEngine.ts:291 | ⏸ deferred (conservative — re-baselines; TODO in code) |
+| C8 | MED | `CapexEngine` FOM multipliers applied GLOBALLY (qualityM on all disciplines) instead of scoping power/transformer to electrical | CapexEngine.ts | ✅ discipline-scoped: electrical←dist/pdu/txLead/txType/cabling/fiber · building←floor/security · global←site/market/delivery. Default all-1.0 → baseline byte-identical; non-default now scoped. trace-parity 214/214 |
 
 ### Bugs
 | ID | Sev | Finding | File | Status |
