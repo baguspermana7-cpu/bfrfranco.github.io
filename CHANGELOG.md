@@ -13,6 +13,30 @@ release sections rather than semver.
 
 ---
 
+## v1.124.4 — 2026-08-02 (DC Incidents — dossier UX: methodology, reading column, share, traces)
+
+Second UI pass on the root-gated incident library (`tools/build-incidents.py`):
+
+### Added
+- **Methodology / FAQ** — a collapsible "About this library · how to read it" panel on the hub:
+  what it is, the ranking composite, what "official RCA" means, and how to read every
+  visualization (map, bars, risk map, semantic map, radar, cascade).
+- **Magnitude score-trace** — each dossier's radar now shows the composite breakdown
+  (`blast N×0.35 + users N×0.25 + financial N×0.20 + duration N×0.20`); hub bars carry the same
+  in their hover title. Numbers are no longer unexplained.
+- **Standard RZ share bar** on each dossier (LinkedIn · X · WhatsApp · copy-link), self-contained.
+
+### Changed
+- **Reading column + justified body** — dossier prose is constrained to an ~820px measure and
+  justified with hyphenation (RZ article standard); visualizations still span the column.
+- **Grouped improvements** — Safety / Maintenance / Design / Process items now carry a mono tag.
+- **Universal tooltips** — SOE timeline nodes gained hover `<title>`s (time · phase · event),
+  completing the "tooltip on every viz element" pass.
+
+Root-gated; gates: page-gates CLEAN, incidents-corpus 25/25, script-tags CLEAN, no 360px overflow.
+
+---
+
 ## v1.124.2 — 2026-08-02 (DC Incidents — forensic depth + viz overhaul + permanent QA)
 
 Owner review found the dossiers "too generic" and the visualizations slop-ridden and buggy

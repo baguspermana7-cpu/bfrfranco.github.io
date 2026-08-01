@@ -155,6 +155,29 @@ CSS = r"""
     .ca-block { background:var(--surface); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 2px 2px 0; padding:0.7rem 1rem; margin-top:0.7rem; }
     .ca-block h3 { margin:0 0 0.3rem; font-size:0.92rem; color:var(--text-strong); }
     .ca-block p { margin:0; color:var(--text-body); font-size:0.9rem; }
+    /* reading column — constrain prose to a comfortable measure, justified like RZ articles */
+    .reading-col { max-width:820px; margin:0 auto; }
+    .reading-col p.lede, .reading-col .card p, .reading-col .ca-block p, .reading-col ul.tight li { text-align:justify; -webkit-hyphens:auto; hyphens:auto; }
+    .card p { margin:0; }
+    .card > p + p, .card p + p { margin-top:0.7rem; }
+    .mag-trace { font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--text-body); background:var(--surface-2); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 2px 2px 0; padding:0.5rem 0.7rem; margin-top:0.5rem; font-variant-numeric:tabular-nums slashed-zero; }
+    .mag-trace b { color:var(--text-strong); }
+    .imp-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.04em; text-transform:uppercase; color:var(--cyan); font-weight:700; margin-right:0.35rem; }
+    /* FAQ / methodology */
+    details.faq { border:1px solid var(--line); border-radius:4px; background:var(--surface); margin:0.8rem 0 0.4rem; }
+    details.faq > summary { cursor:pointer; padding:0.7rem 0.9rem; font-family:'JetBrains Mono',monospace; font-size:0.74rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-strong); list-style:none; }
+    details.faq > summary::-webkit-details-marker { display:none; }
+    details.faq > summary::before { content:"+ "; color:var(--cyan); }
+    details.faq[open] > summary::before { content:"– "; }
+    details.faq .faq-body { padding:0 0.9rem 0.9rem; }
+    details.faq h4 { font-family:'Fraunces',Georgia,serif; font-size:0.98rem; color:var(--text-strong); margin:0.8rem 0 0.2rem; }
+    details.faq p, details.faq li { color:var(--text-body); font-size:0.88rem; }
+    /* share bar (RZ standard) — editorial thin buttons */
+    .share-buttons { display:flex; align-items:center; gap:0.5rem; margin:1.4rem 0 0.4rem; padding-top:1rem; border-top:1px solid var(--line); }
+    .share-label { font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin-right:0.2rem; }
+    .share-btn { width:32px; height:32px; display:inline-flex; align-items:center; justify-content:center; background:var(--surface-2); border:1px solid var(--line); border-radius:4px; color:var(--text-body); cursor:pointer; padding:0; }
+    .share-btn:hover { border-color:var(--cyan); color:var(--cyan); }
+    .share-btn svg { width:15px; height:15px; }
     /* ── inline-SVG visualizations (theme-aware via vars) ── */
     .inc-map { height:410px; margin-top:0.4rem; border:1px solid var(--line); border-radius:4px; overflow:hidden; background:#0f1a16; z-index:1; }
     .inc-map .leaflet-container { background:#0f1a16; font-family:'IBM Plex Sans',sans-serif; }
@@ -388,6 +411,24 @@ def render_hub(incidents):
         <h1>Data-Center Incidents — Case Library</h1>
         <p class="lede">A structured, source-cited library of major data-center and cloud-infrastructure incidents worldwide — ranked by magnitude, each with a full sequence of events, root-cause analysis, correction-of-errors (COE), lessons learnt and engineering improvements. Every fact is traced to a public post-incident report.</p>
         <div class="metabar"><b>{len(incidents)}</b> catalogued<span class="sep">·</span><b>{_pm_count}</b> with official RCA<span class="sep">·</span>provenance-mandatory<span class="sep">·</span>root access</div>
+        <details class="faq"><summary>About this library · how to read it</summary><div class="faq-body">
+            <h4>What this is</h4>
+            <p>A root-gated, source-cited engineering reference on major data-center and cloud-infrastructure incidents worldwide — each a structured post-incident dossier (sequence of events, root-cause analysis, correction-of-errors, lessons learnt, engineering improvements). It exists for internal engineering education; every material fact is traced to a public post-incident report, and where an authoritative cause was never published the dossier says so rather than invent one.</p>
+            <h4>How incidents are ranked</h4>
+            <p>By a transparent <b>magnitude composite</b> — a weighted sum of four sourced sub-scores (each 0–10): <b>blast radius 0.35 · users 0.25 · financial 0.20 · duration 0.20</b>. Hover any magnitude bar or a dossier's radar for the exact breakdown. Ranking never uses a hidden score.</p>
+            <h4>What “official RCA” means</h4>
+            <p>The <b>official-RCA</b> filter and the count above mark incidents backed by a genuine vendor post-incident review, regulator/government report, or court record — not press reporting. The provenance gate refuses to set that flag unless such a source is actually cited.</p>
+            <h4>Reading the visualizations</h4>
+            <ul class="tight">
+            <li><b>Where these happened</b> — a real map at each incident's origin site; gold = facility failures (power/cooling/fire), green = network/logical. Co-located incidents are fanned onto a small ring; hover a marker for the brief.</li>
+            <li><b>Ranked bars</b> — magnitude, coloured by severity (red = most severe).</li>
+            <li><b>Risk map</b> — blast radius (x) × outage duration (y); top-right is the worst quadrant. Dots sit at their true scores; hover any dot for its values.</li>
+            <li><b>Semantic map</b> — a projection of the research vector-index: incidents near each other share a failure signature.</li>
+            <li><b>Per dossier</b> — a failure-cascade block diagram, a magnitude radar, and a phased SOE timeline; hover elements for detail, and hover underlined terms for definitions.</li>
+            </ul>
+            <h4>Access</h4>
+            <p>Root-only. The library is excluded from the public sitemap and search index.</p>
+        </div></details>
         <h2>Where these happened</h2>
         <p class="lede" style="margin-bottom:0.4rem">Every incident plotted at the data center or region where the fault began. Facility failures (power, cooling, fire) in gold; network / logical failures in green. Tap a marker for the brief and a link to the full dossier.</p>
         {hub_geo_map(incidents)}
@@ -459,6 +500,45 @@ _FACILITY = {"power", "cooling", "fire", "flood"}
 def _sevcol(score):
     s = float(score or 0)
     return "var(--red)" if s >= 8.5 else ("var(--amber)" if s >= 7.5 else "var(--green)")
+
+
+_MAG_W = [("Blast radius", "blastRadiusScore", 0.35), ("Users", "usersScore", 0.25),
+          ("Financial", "financialScore", 0.20), ("Duration", "durationScore", 0.20)]
+
+
+def _mag_trace(mag, score):
+    parts = " + ".join(f'{lbl.split()[0].lower()} {int(round(float(mag.get(k,0))))}×{w:.2f}' for lbl, k, w in _MAG_W)
+    return f'<div class="mag-trace">Magnitude <b>{score:.1f}</b> = {parts} <span style="opacity:0.7">(sub-scores 0–10 · weighted composite)</span></div>'
+
+
+_IMP_TAGS = ("Safety", "Maintenance", "Design", "Process", "Operational", "Governance")
+
+
+def _imp_render(imps):
+    out = []
+    for x in imps:
+        x = (x or "").strip()
+        tag = ""
+        for t in _IMP_TAGS:
+            if x.lower().startswith(t.lower() + ":"):
+                tag = f'<span class="imp-tag">{t}</span>'; x = x[len(t) + 1:].strip(); break
+        out.append(f"<li>{tag}{esc(x)}</li>")
+    return "".join(out)
+
+
+SHARE_BAR = (
+    '<aside class="share-buttons" aria-label="Share this dossier"><span class="share-label">Share</span>'
+    '<button class="share-btn" onclick="rzShare(\'li\')" aria-label="Share on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 11 0-4.124 2.062 2.062 0 010 4.124zM7.119 20.452H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg></button>'
+    '<button class="share-btn" onclick="rzShare(\'x\')" aria-label="Share on X" title="X"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></button>'
+    '<button class="share-btn" onclick="rzShare(\'wa\')" aria-label="Share on WhatsApp" title="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347M12.05 21.785h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884"/></svg></button>'
+    '<button class="share-btn" onclick="rzShare(\'copy\',this)" aria-label="Copy link" title="Copy link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>'
+    '</aside>'
+    '<script>function rzShare(k,btn){var u=encodeURIComponent(location.href),t=encodeURIComponent(document.title);'
+    'if(k==="li")open("https://www.linkedin.com/sharing/share-offsite/?url="+u,"_blank","noopener");'
+    'else if(k==="x")open("https://twitter.com/intent/tweet?url="+u+"&text="+t,"_blank","noopener");'
+    'else if(k==="wa")open("https://wa.me/?text="+t+"%20"+u,"_blank","noopener");'
+    'else if(k==="copy"){navigator.clipboard&&navigator.clipboard.writeText(location.href);if(btn){var o=btn.getAttribute("title");btn.setAttribute("title","Copied");setTimeout(function(){btn.setAttribute("title",o);},1500);}}}</script>'
+)
 
 
 def op_abbrev(operator):
@@ -593,7 +673,8 @@ def soe_timeline_svg(soe):
     for i, e in enumerate(soe):
         x = x0 + i * step
         ph = (e.get("phase", "") or "")
-        parts.append(f'<circle class="vz-accent-dot" cx="{x:.0f}" cy="48" r="4.5"/>')
+        tip = f'{e.get("t","")} · {ph} — {e.get("event","")}'.strip(" ·—")
+        parts.append(f'<circle class="vz-accent-dot" cx="{x:.0f}" cy="48" r="4.5"><title>{esc(tip)}</title></circle>')
         parts.append(f'<text class="vz-tl-ph" x="{x:.0f}" y="30" text-anchor="middle">{esc(ph[:12])}</text>')
         t = (e.get("t", "") or "")
         t = t.split("T")[0] if "T" in t else t[:16]
@@ -917,7 +998,7 @@ def render_incident(inc, rank):
     cf = "".join(f"<li>{esc(x)}</li>" for x in inc.get("contributingFactors", []))
     coe = "".join(f'<li>{esc(c.get("action",""))} <span class="chip muted">{esc(c.get("owner",""))} · {esc(c.get("status",""))}</span></li>' for c in inc.get("coe", []))
     lessons = "".join(f"<li>{esc(x)}</li>" for x in inc.get("lessonsLearnt", []))
-    imps = "".join(f"<li>{esc(x)}</li>" for x in inc.get("improvements", []))
+    imps = _imp_render(inc.get("improvements", []))
     down = "".join(f"<li>{esc(x)}</li>" for x in sev.get("servicesDown", []))
     refs = "".join(
         f'<li><span class="chip {REF_TONE.get(r.get("type"),"muted")}">{esc(r.get("type",""))}</span> '
@@ -926,7 +1007,8 @@ def render_incident(inc, rank):
         + f'<a href="{esc(r.get("url",""))}" target="_blank" rel="noopener nofollow">{esc(r.get("url",""))}</a></li>'
         for r in inc.get("references", [])
     )
-    body = f"""        <a class="backlink" href="dc-incidents.html">← All incidents</a>
+    body = f"""        <div class="reading-col">
+        <a class="backlink" href="dc-incidents.html">← All incidents</a>
         <div class="eyebrow">Incident dossier · Rank #{rank}</div>
         <h1>{esc(inc['title'])}</h1>
         <div class="chips">
@@ -960,6 +1042,7 @@ def render_incident(inc, rank):
 
         <h2>Magnitude profile</h2>
         {radar_html}
+        {_mag_trace(inc.get('magnitude',{}) or {}, inc['_score'])}
         <p class="disclaimer">{mag_note}</p>
 
         <h2>Sequence of events (SOE)</h2>
@@ -989,6 +1072,8 @@ def render_incident(inc, rank):
         <h2>References &amp; provenance</h2>
         <ul class="refs">{refs}</ul>
         <p class="disclaimer">Sourced from public post-incident reports. Quotes are short attributed excerpts for provenance only; the analysis above is original and substantially shorter than its sources. Last verified {esc(inc.get('sourcing',{}).get('lastVerified','—'))}.</p>
+        {SHARE_BAR}
+        </div>
 """
     return page_shell(inc["title"], inc.get("brief", "")[:180], f"incident-{inc['slug']}.html", body, base="")
 
