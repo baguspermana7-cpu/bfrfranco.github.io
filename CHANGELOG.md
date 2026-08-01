@@ -13,24 +13,7 @@ release sections rather than semver.
 
 ---
 
-## v1.124.1 — 2026-08-02 (DC AI/HPC + DC Conventional → root+educator gate + lock icons)
-
-Owner: the DC AI/HPC and DC Conventional dashboards should be openable ONLY by root and
-educator accounts, with a distinct lock marker in the nav and on the DC Solutions Hub.
-
-### Changed
-- **Access → root + educator only** (was all-pro). `js/rz-feature-flags.js`: `datahall-ai`
-  and `dc-conventional` `page-access` set to root-only in the tier matrix (`pro:false`), plus
-  a scoped educator bypass (`EDUCATOR_ACCESS_PAGES`) — educators (role=educator, tier=pro) are
-  admitted, plain pro/demo/free are not. Verified with 4 sessions: PRO→blocked, EDUCATOR→allowed,
-  ROOT→allowed, FREE→blocked (root-gate shows).
-- **Lock icon in the "DC Solutions" nav dropdown** — `🔒` + "Root & Educator access only" title
-  prepended to the DC AI/HPC and DC Conventional items across 72 pages; the rejected-purple
-  `#8b5cf6` on the DC AI/HPC nav link swapped to brand cyan `#06b6d4` on 60 pages.
-- **Lock badge on the DC Solutions Hub landing cards** (`datacenter-solutions.html`) — a
-  "🔒 Root · Educator" badge on the AI/HPC and Conventional platform cards.
-
-## v1.124.0 — 2026-08-02 (DC Incidents — forensic depth + viz overhaul + permanent QA)
+## v1.124.2 — 2026-08-02 (DC Incidents — forensic depth + viz overhaul + permanent QA)
 
 Owner review found the dossiers "too generic" and the visualizations slop-ridden and buggy
 (clipped radar labels, truncated cascade boxes, colliding scatter labels, pill soup). This is a
@@ -79,6 +62,23 @@ CLEAN. (Remaining planned: FAQ/methodology section, reading-column + justified b
 buttons, magnitude score-trace tooltip, and deep re-research batches 2–5.)
 
 ---
+
+## v1.124.1 — 2026-08-02 (DC AI/HPC + DC Conventional → root+educator gate + lock icons)
+
+Owner: the DC AI/HPC and DC Conventional dashboards should be openable ONLY by root and
+educator accounts, with a distinct lock marker in the nav and on the DC Solutions Hub.
+
+### Changed
+- **Access → root + educator only** (was all-pro). `js/rz-feature-flags.js`: `datahall-ai`
+  and `dc-conventional` `page-access` set to root-only in the tier matrix (`pro:false`), plus
+  a scoped educator bypass (`EDUCATOR_ACCESS_PAGES`) — educators (role=educator, tier=pro) are
+  admitted, plain pro/demo/free are not. Verified with 4 sessions: PRO→blocked, EDUCATOR→allowed,
+  ROOT→allowed, FREE→blocked (root-gate shows).
+- **Lock icon in the "DC Solutions" nav dropdown** — `🔒` + "Root & Educator access only" title
+  prepended to the DC AI/HPC and DC Conventional items across 72 pages; the rejected-purple
+  `#8b5cf6` on the DC AI/HPC nav link swapped to brand cyan `#06b6d4` on 60 pages.
+- **Lock badge on the DC Solutions Hub landing cards** (`datacenter-solutions.html`) — a
+  "🔒 Root · Educator" badge on the AI/HPC and Conventional platform cards.
 
 ## v1.123.2 — 2026-08-01 (DC Incidents — de-neon: editorial palette, muted timestamps)
 
