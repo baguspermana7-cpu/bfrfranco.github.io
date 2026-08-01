@@ -13,6 +13,20 @@ release sections rather than semver.
 
 ---
 
+## v1.121.6 — 2026-08-01 (DCMOC — tooltip stragglers closed + coverage monitor gate)
+
+### Added
+- **Last tooltip gaps closed** — 29 more explanation tooltips on ScenarioComparisonPanel
+  (KPI cells + delta-table rows + input-difference params), NodeDetailModal (spec-table rows)
+  and Requirements SummarySection (engine-metric chips). RequirementsPage correctly has none
+  (pure navigation shell). Cumulative program ≈ **520 tooltips across ~33 dashboards**.
+- **`tools/audit-dcmoc-coverage.mjs`** — a parameter-coverage monitor that scans every
+  param-dense dashboard and reports tooltip + ƒx-trace density, flagging hard gaps
+  (`--strict` fails on any ≥8-label dashboard with zero tooltips). Makes "every parameter
+  explained" measurable + regression-proof. Current: **54 dashboards · 0 hard tooltip gaps**
+  (the 3 remaining un-traced score cards are the structural per-row/local-state cases
+  documented in v1.121.5 — not omissions).
+
 ## v1.121.5 — 2026-08-01 (DCMOC — ƒx trace coverage: Risk composite + structural finding)
 
 ### Added

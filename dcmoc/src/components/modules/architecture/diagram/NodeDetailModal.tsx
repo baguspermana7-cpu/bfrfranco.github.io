@@ -15,6 +15,7 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { X, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Tooltip } from '@/components/ui/Tooltip';
 import type { DiagBlock, DiagramModel, EdgeKind } from './layout';
 import { SymbolGlyph, SYMBOL_META, type SymbolKind } from './palette';
 
@@ -195,19 +196,19 @@ export function NodeDetailModal({ block: b, model, onClose }: {
                         <div className="space-y-1">
                             {b.units != null && b.units > 0 && (
                                 <div className="flex justify-between gap-3 rounded border border-slate-200 dark:border-rz-2 bg-slate-50 dark:bg-slate-900/40 px-2.5 py-1.5">
-                                    <span className="text-slate-500">Installed units</span>
+                                    <span className="text-slate-500">Installed units <Tooltip content="Number of this subsystem's units installed, exactly as drawn in the diagram (count). Includes any redundant/standby units." /></span>
                                     <span className="font-mono font-bold text-slate-800 dark:text-slate-200">×{b.units}</span>
                                 </div>
                             )}
                             {perUnit && (
                                 <div className="flex justify-between gap-3 rounded border border-slate-200 dark:border-rz-2 bg-slate-50 dark:bg-slate-900/40 px-2.5 py-1.5">
-                                    <span className="text-slate-500">Per-unit duty</span>
+                                    <span className="text-slate-500">Per-unit duty <Tooltip content="Load or capacity carried by each single unit (MW per unit), read from the layout — not re-derived. Total subsystem duty is roughly this times the installed units." /></span>
                                     <span className="font-mono font-bold text-slate-800 dark:text-slate-200">≈ {perUnit}</span>
                                 </div>
                             )}
                             {b.badge && (
                                 <div className="flex justify-between gap-3 rounded border border-slate-200 dark:border-rz-2 bg-slate-50 dark:bg-slate-900/40 px-2.5 py-1.5">
-                                    <span className="text-slate-500">Redundancy role</span>
+                                    <span className="text-slate-500">Redundancy role <Tooltip content="This unit's role in the redundancy scheme (e.g. N+1, 2N, STANDBY) — how it contributes to concurrent maintainability and fault tolerance." /></span>
                                     <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{b.badge}</span>
                                 </div>
                             )}

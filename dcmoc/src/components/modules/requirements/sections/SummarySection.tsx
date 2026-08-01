@@ -12,6 +12,7 @@ import { generatePillarPDF } from '@/modules/reporting/pdf/PillarPdf';
 import { buildAssessment, buildActions } from '@/modules/reporting/pdf/ReportNarrative';
 import type { StandardReport } from '@/modules/reporting/pdf/PrintReport';
 import { SectionCard } from '../ui';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { FileDown } from 'lucide-react';
 import type { ReqDerived } from '../useRequirementsDerived';
 
@@ -108,9 +109,9 @@ export function SummarySection({ derived }: { derived: ReqDerived }) {
     return (
         <SectionCard num="1.7" title="Summary & Validation" caption="Engine-real intake validation (models.requirements.validate)" id="sec-summary">
             <div className="flex flex-wrap items-center gap-2 mb-3">
-                {prof && <span className="rounded-full bg-rz-mint/15 text-rz-mint px-2 py-0.5 text-[10px] font-semibold">{prof.label} · {prof.rackKw} kW/rack profile</span>}
-                {band && <span className="rounded-full bg-rz-info/15 text-rz-info px-2 py-0.5 text-[10px] font-semibold">{band.band} density band</span>}
-                {v?.recommendedTierFloor && <span className="rounded-full bg-rz-data/15 text-rz-data px-2 py-0.5 text-[10px] font-semibold">Tier floor ≥ {v.recommendedTierFloor}</span>}
+                {prof && <span className="rounded-full bg-rz-mint/15 text-rz-mint px-2 py-0.5 text-[10px] font-semibold inline-flex items-center gap-1">{prof.label} · {prof.rackKw} kW/rack profile <Tooltip content="Rack-power profile matched to the workload use case — sets the assumed kW per rack the engine uses to size capacity, power and cooling." /></span>}
+                {band && <span className="rounded-full bg-rz-info/15 text-rz-info px-2 py-0.5 text-[10px] font-semibold inline-flex items-center gap-1">{band.band} density band <Tooltip content="Rack-density classification for the average kW/rack — the band drives the cooling approach (air vs liquid) and power-distribution design." /></span>}
+                {v?.recommendedTierFloor && <span className="rounded-full bg-rz-data/15 text-rz-data px-2 py-0.5 text-[10px] font-semibold inline-flex items-center gap-1">Tier floor ≥ {v.recommendedTierFloor} <Tooltip content="Minimum Uptime Institute tier the engine recommends for these requirements; designing below it puts the availability/SLA target at risk." /></span>}
                 <button onClick={exportPdf} disabled={busy}
                     className="ml-auto inline-flex items-center gap-1.5 rounded-lg bg-slate-800 dark:bg-slate-700 hover:bg-rz-signal hover:text-rz-base px-3 py-1.5 text-xs font-medium text-white transition-colors disabled:opacity-60">
                     <FileDown className="w-3.5 h-3.5" />{busy ? 'Generating…' : 'Generate Report'}

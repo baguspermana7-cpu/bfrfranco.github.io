@@ -8,12 +8,25 @@ import { calculateFinancials, defaultOccupancyRamp } from '@/modules/analytics/F
 import { calculateStaffing } from '@/modules/staffing/ShiftEngine';
 import { DEFAULT_REVENUE_PER_KW_MONTH, DEFAULT_DEPRECIATION_YEARS } from '@/constants/finance';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, Cell } from 'recharts';
+import { Tooltip as InfoTip } from '@/components/ui/Tooltip';
 import { GitCompare, X, ArrowLeftRight } from 'lucide-react';
 import clsx from 'clsx';
 import { fmtMoney } from '@/lib/format';
 import type { SimulationState } from '@/store/simulation';
 
 const SCENARIO_COLORS = ['#00DDFF', '#7DDDB4', '#FFAA00', '#FF3030'];
+
+/* Explanation tooltips for the Input Differences parameter rows (keyed by simInputs key). */
+const PARAM_TIPS: Partial<Record<keyof SimulationState['inputs'], string>> = {
+    tierLevel: 'Uptime Institute tier (I–IV) — the redundancy and availability class targeted for the design; higher tiers cost more but tolerate more faults.',
+    shiftModel: 'Staffing shift pattern (e.g. 8h / 12h) used to size 24×7 coverage and labor cost.',
+    staffingModel: 'Staffing approach that sets headcount per role, and therefore staff OPEX.',
+    coolingType: 'Cooling technology (air / liquid / immersion) — the main driver of PUE and cooling CAPEX.',
+    powerRedundancy: 'Electrical redundancy scheme (e.g. N, N+1, 2N) for the power path — trades CAPEX against fault tolerance.',
+    itLoad: 'Design IT load in kW — the critical compute power the facility is built to support.',
+    maintenanceStrategy: 'Preventive-maintenance strategy governing maintenance labor and availability impact.',
+    maintenanceModel: 'Maintenance model/regime that sets ops manpower and uptime impact (e.g. OEM-full vs standard-annual).',
+};
 
 interface ScenarioMetrics {
     scenario: SavedScenario;
@@ -212,13 +225,13 @@ export function ScenarioComparisonPanel() {
                         </div>
                         <div className="grid grid-cols-2 gap-3 text-xs">
                             {/* Cost metrics: naik = merah (invertDelta) — konsisten dgn Delta Analysis; title merah = guidance parameter pembeda */}
-                            <KpiCell label="CAPEX" value={fmtMoney(m.capex)} delta={i > 0 ? fmtPct(delta(m.capex, baseline.capex)) : undefined} invertDelta worseTitle={i > 0 ? worseTitle(fmtMoney(Math.abs(m.capex - baseline.capex)), m.scenario) : undefined} />
-                            <KpiCell label="OPEX/yr" value={fmtMoney(m.annualOpex)} delta={i > 0 ? fmtPct(delta(m.annualOpex, baseline.annualOpex)) : undefined} invertDelta worseTitle={i > 0 ? worseTitle(`${fmtMoney(Math.abs(m.annualOpex - baseline.annualOpex))}/yr`, m.scenario) : undefined} />
-                            <KpiCell label="PUE" value={m.pue.toFixed(2)} delta={i > 0 ? fmtPct(delta(m.pue, baseline.pue)) : undefined} invertDelta worseTitle={i > 0 ? worseTitle(`${Math.abs(m.pue - baseline.pue).toFixed(2)} PUE`, m.scenario) : undefined} />
-                            <KpiCell label="Staff" value={String(m.totalStaff)} delta={i > 0 ? fmtPct(delta(m.totalStaff, baseline.totalStaff)) : undefined} invertDelta worseTitle={i > 0 ? worseTitle(`${Math.abs(m.totalStaff - baseline.totalStaff)} staff`, m.scenario) : undefined} />
-                            <KpiCell label="IRR" value={`${m.irr.toFixed(1)}%`} delta={i > 0 ? fmtPct(delta(m.irr, baseline.irr)) : undefined} worseTitle={i > 0 ? worseTitle(`${Math.abs(m.irr - baseline.irr).toFixed(1)} pp IRR`, m.scenario) : undefined} />
+                            <KpiCell label="CAPEX" tip="Total upfront capital cost to build the data center (USD), from the CAPEX Engine. Lower is cheaper to deliver." value={fmtMoney(m.capex)} delta={i > 0 ? fmtPct(delta(m.capex, baseline.capex)) : undefined} invertDelta worseTitle={i > 0 ? worseTitle(fmtMoney(Math.abs(m.capex - baseline.capex)), m.scenario) : undefined} />
+                            <KpiCell label="OPEX/yr" tip="Annual operating cost (USD/yr): staffing + energy + compliance. Lower is cheaper to run." value={fmtMoney(m.annualOpex)} delta={i > 0 ? fmtPct(delta(m.annualOpex, baseline.annualOpex)) : undefined} invertDelta worseTitle={i > 0 ? worseTitle(`${fmtMoney(Math.abs(m.annualOpex - baseline.annualOpex))}/yr`, m.scenario) : undefined} />
+                            <KpiCell label="PUE" tip="Power Usage Effectiveness — total facility power ÷ IT power. Closer to 1.0 is more energy-efficient and lowers energy OPEX." value={m.pue.toFixed(2)} delta={i > 0 ? fmtPct(delta(m.pue, baseline.pue)) : undefined} invertDelta worseTitle={i > 0 ? worseTitle(`${Math.abs(m.pue - baseline.pue).toFixed(2)} PUE`, m.scenario) : undefined} />
+                            <KpiCell label="Staff" tip="Total facility headcount across all roles (shift leads, engineers, technicians, admin, janitorial)." value={String(m.totalStaff)} delta={i > 0 ? fmtPct(delta(m.totalStaff, baseline.totalStaff)) : undefined} invertDelta worseTitle={i > 0 ? worseTitle(`${Math.abs(m.totalStaff - baseline.totalStaff)} staff`, m.scenario) : undefined} />
+                            <KpiCell label="IRR" tip="Internal Rate of Return (%) of the project cash flows over 10 years — higher means a more attractive investment." value={`${m.irr.toFixed(1)}%`} delta={i > 0 ? fmtPct(delta(m.irr, baseline.irr)) : undefined} worseTitle={i > 0 ? worseTitle(`${Math.abs(m.irr - baseline.irr).toFixed(1)} pp IRR`, m.scenario) : undefined} />
                             {/* honest: unreached payback shows "> N yr" and skips the delta (a clamped value would distort the comparison) */}
-                            <KpiCell label="Payback" value={m.paybackReached ? `${m.paybackYears.toFixed(1)} yr` : `> ${Math.round(m.paybackYears)} yr`} delta={i > 0 && m.paybackReached && baseline.paybackReached ? fmtPct(delta(m.paybackYears, baseline.paybackYears)) : undefined} invertDelta worseTitle={i > 0 && m.paybackReached && baseline.paybackReached ? worseTitle(`${Math.abs(m.paybackYears - baseline.paybackYears).toFixed(1)} yr payback`, m.scenario) : undefined} />
+                            <KpiCell label="Payback" tip="Years for cumulative cash flow to recover the initial CAPEX. '> N yr' means payback is not reached within the modeled horizon." value={m.paybackReached ? `${m.paybackYears.toFixed(1)} yr` : `> ${Math.round(m.paybackYears)} yr`} delta={i > 0 && m.paybackReached && baseline.paybackReached ? fmtPct(delta(m.paybackYears, baseline.paybackYears)) : undefined} invertDelta worseTitle={i > 0 && m.paybackReached && baseline.paybackReached ? worseTitle(`${Math.abs(m.paybackYears - baseline.paybackYears).toFixed(1)} yr payback`, m.scenario) : undefined} />
                         </div>
                     </div>
                 ))}
@@ -268,19 +281,19 @@ export function ScenarioComparisonPanel() {
                     </thead>
                     <tbody>
                         {[
-                            { label: 'Total CAPEX', get: (m: ScenarioMetrics) => m.capex, fmt: fmtMoney },
-                            { label: 'CAPEX/kW', get: (m: ScenarioMetrics) => m.capexPerKw, fmt: (n: number) => `$${Math.round(n).toLocaleString()}` },
-                            { label: 'Annual OPEX', get: (m: ScenarioMetrics) => m.annualOpex, fmt: fmtMoney },
-                            { label: 'OPEX/kW', get: (m: ScenarioMetrics) => m.opexPerKw, fmt: (n: number) => `$${Math.round(n).toLocaleString()}` },
-                            { label: 'Total Staff', get: (m: ScenarioMetrics) => m.totalStaff, fmt: (n: number) => String(n) },
-                            { label: 'PUE', get: (m: ScenarioMetrics) => m.pue, fmt: (n: number) => n.toFixed(2) },
-                            { label: 'IRR', get: (m: ScenarioMetrics) => m.irr, fmt: (n: number) => `${n.toFixed(1)}%`, higherIsBetter: true },
-                            { label: 'NPV', get: (m: ScenarioMetrics) => m.npv, fmt: fmtMoney, higherIsBetter: true },
+                            { label: 'Total CAPEX', tip: 'Total upfront capital cost to build the data center (USD). Lower is cheaper to deliver.', get: (m: ScenarioMetrics) => m.capex, fmt: fmtMoney },
+                            { label: 'CAPEX/kW', tip: 'Upfront build cost per kW of IT capacity (USD/kW) — normalizes CAPEX so scenarios of different size compare fairly.', get: (m: ScenarioMetrics) => m.capexPerKw, fmt: (n: number) => `$${Math.round(n).toLocaleString()}` },
+                            { label: 'Annual OPEX', tip: 'Annual operating cost (USD/yr): staffing + energy + compliance. Lower is cheaper to run.', get: (m: ScenarioMetrics) => m.annualOpex, fmt: fmtMoney },
+                            { label: 'OPEX/kW', tip: 'Annual operating cost per kW of IT load (USD per kW·yr) — normalizes OPEX across scenario sizes.', get: (m: ScenarioMetrics) => m.opexPerKw, fmt: (n: number) => `$${Math.round(n).toLocaleString()}` },
+                            { label: 'Total Staff', tip: 'Total facility headcount across all roles (shift leads, engineers, technicians, admin, janitorial).', get: (m: ScenarioMetrics) => m.totalStaff, fmt: (n: number) => String(n) },
+                            { label: 'PUE', tip: 'Power Usage Effectiveness — total facility power ÷ IT power. Closer to 1.0 is more energy-efficient.', get: (m: ScenarioMetrics) => m.pue, fmt: (n: number) => n.toFixed(2) },
+                            { label: 'IRR', tip: 'Internal Rate of Return (%) of the project cash flows over 10 years — higher is a more attractive investment.', get: (m: ScenarioMetrics) => m.irr, fmt: (n: number) => `${n.toFixed(1)}%`, higherIsBetter: true },
+                            { label: 'NPV', tip: 'Net Present Value (USD) of the project cash flows discounted at 10% over 10 years — higher is better.', get: (m: ScenarioMetrics) => m.npv, fmt: fmtMoney, higherIsBetter: true },
                             /* fmtM: unreached payback → "> N yr"; unreached() suppresses the delta so a clamped value never distorts the % */
-                            { label: 'Payback', get: (m: ScenarioMetrics) => m.paybackYears, fmt: (n: number) => `${n.toFixed(1)} yr`, fmtM: (m: ScenarioMetrics) => m.paybackReached ? `${m.paybackYears.toFixed(1)} yr` : `> ${Math.round(m.paybackYears)} yr`, unreached: (m: ScenarioMetrics) => !m.paybackReached },
-                        ].map((row: { label: string; get: (m: ScenarioMetrics) => number; fmt: (n: number) => string; higherIsBetter?: boolean; fmtM?: (m: ScenarioMetrics) => string; unreached?: (m: ScenarioMetrics) => boolean }) => (
+                            { label: 'Payback', tip: 'Years for cumulative cash flow to recover the initial CAPEX; "> N yr" means payback is not reached within the modeled horizon.', get: (m: ScenarioMetrics) => m.paybackYears, fmt: (n: number) => `${n.toFixed(1)} yr`, fmtM: (m: ScenarioMetrics) => m.paybackReached ? `${m.paybackYears.toFixed(1)} yr` : `> ${Math.round(m.paybackYears)} yr`, unreached: (m: ScenarioMetrics) => !m.paybackReached },
+                        ].map((row: { label: string; tip: string; get: (m: ScenarioMetrics) => number; fmt: (n: number) => string; higherIsBetter?: boolean; fmtM?: (m: ScenarioMetrics) => string; unreached?: (m: ScenarioMetrics) => boolean }) => (
                             <tr key={row.label} className="border-b border-slate-100 dark:border-slate-800">
-                                <td className="px-4 py-2 text-slate-700 dark:text-slate-300 font-medium">{row.label}</td>
+                                <td className="px-4 py-2 text-slate-700 dark:text-slate-300 font-medium">{row.label} <InfoTip content={row.tip} /></td>
                                 {metricsData.map((m, i) => {
                                     const val = row.get(m);
                                     const baseVal = row.get(baseline);
@@ -331,7 +344,7 @@ export function ScenarioComparisonPanel() {
                         <tbody>
                             {diffs.map(key => (
                                 <tr key={String(key)} className="border-b border-slate-100 dark:border-slate-800">
-                                    <td className="px-4 py-2 text-slate-700 dark:text-slate-300 font-medium capitalize">{String(key).replace(/([A-Z])/g, ' $1').trim()}</td>
+                                    <td className="px-4 py-2 text-slate-700 dark:text-slate-300 font-medium capitalize">{String(key).replace(/([A-Z])/g, ' $1').trim()}{PARAM_TIPS[key] && <> <InfoTip content={PARAM_TIPS[key]!} /></>}</td>
                                     {compared.map((sc, i) => {
                                         const val = sc.simInputs[key];
                                         const baseVal = compared[0].simInputs[key];
@@ -353,13 +366,15 @@ export function ScenarioComparisonPanel() {
     );
 }
 
-function KpiCell({ label, value, delta, invertDelta, worseTitle }: {
+function KpiCell({ label, value, delta, invertDelta, worseTitle, tip }: {
     label: string;
     value: string;
     delta?: string;
     invertDelta?: boolean;
     /** Red-cell guidance: "Worse by $X vs baseline — differentiating parameter: …" (title tooltip). */
     worseTitle?: string;
+    /** Explanation tooltip for the metric label (what it is + unit + why it matters). */
+    tip?: string;
 }) {
     const isPositive = delta?.startsWith('+');
     const isNegative = delta?.startsWith('-');
@@ -375,7 +390,7 @@ function KpiCell({ label, value, delta, invertDelta, worseTitle }: {
 
     return (
         <div>
-            <span className="text-slate-500 dark:text-slate-400 block">{label}</span>
+            <span className="text-slate-500 dark:text-slate-400 block">{label}{tip && <> <InfoTip content={tip} /></>}</span>
             <span className="text-slate-900 dark:text-white font-semibold">{value}</span>
             {delta && <span className={clsx('ml-1', colorClass)} title={isWorse ? worseTitle : undefined}>{delta}</span>}
         </div>
