@@ -153,6 +153,14 @@ CSS = r"""
     .ca-block h3 { margin:0 0 0.3rem; font-size:0.92rem; color:var(--text-strong); }
     .ca-block p { margin:0; color:var(--text-body); font-size:0.9rem; }
     /* ── inline-SVG visualizations (theme-aware via vars) ── */
+    .inc-map { height:410px; margin-top:0.4rem; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:#0f1a16; z-index:1; }
+    .inc-map .leaflet-container { background:#0f1a16; font-family:'IBM Plex Sans',sans-serif; }
+    .inc-map .leaflet-popup-content-wrapper { background:#12211b !important; color:#e6efe9 !important; border:1px solid #2c4438 !important; border-radius:10px !important; box-shadow:0 8px 24px rgba(0,0,0,0.45) !important; }
+    .inc-map .leaflet-popup-tip { background:#12211b !important; border:1px solid #2c4438 !important; }
+    .inc-map .leaflet-popup-content { margin:9px 12px !important; }
+    .inc-map .leaflet-control-attribution { background:rgba(15,26,22,0.8) !important; color:#7d8f86 !important; font-size:9px !important; }
+    .inc-map .leaflet-control-attribution a { color:#9fb3a8 !important; }
+    .inc-map .leaflet-bar a { background:#12211b !important; color:#cfe0d7 !important; border-color:#2c4438 !important; }
     .viz { overflow-x:auto; margin-top:0.9rem; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:0.9rem 1rem; }
     .viz svg { display:block; max-width:100%; height:auto; }
     .viz-radar svg { max-width:280px; margin:0 auto; }
@@ -249,7 +257,7 @@ SCRIPTS_TMPL = """
 """
 
 
-def page_shell(title, desc, canonical_path, body_html, base=""):
+def page_shell(title, desc, canonical_path, body_html, base="", head_extra=""):
     head = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -267,6 +275,7 @@ def page_shell(title, desc, canonical_path, body_html, base=""):
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
     <style>{CSS}</style>
+    {head_extra}
 </head>
 <body class="locked">
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -375,6 +384,9 @@ def render_hub(incidents):
             <span class="chip green">Provenance-mandatory</span>
             <span class="chip red">Root access</span>
         </div>
+        <h2>Where these happened</h2>
+        <p class="lede" style="margin-bottom:0.4rem">Every incident plotted at the data center or region where the fault began. Facility failures (power, cooling, fire) in gold; network / logical failures in green. Tap a marker for the brief and a link to the full dossier.</p>
+        {hub_geo_map(incidents)}
         <h2>Portfolio analytics</h2>
         {hub_magnitude_svg(incidents)}
         <div class="viz-grid3">
@@ -414,7 +426,7 @@ def render_hub(incidents):
         <p class="disclaimer">Ranking is a transparent composite of sourced sub-scores (blast radius 35% · users 25% · financial 20% · duration 20%). Summaries are original and substantially shorter than their sources; short attributed excerpts on each incident page are provenance only. This library is for engineering education and does not reproduce source material in full.</p>
         {FILTER_JS}
 """
-    return page_shell("DC Incidents — Case Library", "Root-only ranked library of major data-center and cloud incidents with full RCA, COE, SOE and lessons learnt, each source-cited.", "dc-incidents.html", body, base="")
+    return page_shell("DC Incidents — Case Library", "Root-only ranked library of major data-center and cloud incidents with full RCA, COE, SOE and lessons learnt, each source-cited.", "dc-incidents.html", body, base="", head_extra=LEAFLET_HEAD)
 
 
 def _dur(mins):
@@ -691,6 +703,87 @@ def hub_cluster_svg():
     return (f'<div class="viz"><svg viewBox="0 0 {W} {H}" role="img" aria-label="Semantic similarity map of incidents">'
             f'<title>Semantic map — incidents near each other share a failure signature</title>'
             f'<rect x="1" y="1" width="{W-2}" height="{H-2}" class="vz-grid" fill="none" rx="8"/>{"".join(dots)}</svg>{_DOMAIN_LEGEND}</div>')
+
+
+# Approx. incident-origin coordinates (data-center / region where the fault began).
+# Global logical failures are anchored to the operator's origin region.
+INCIDENT_COORDS = {
+    "aws-kinesis-thread-limit-outage-2020": [39.04, -77.49],
+    "aws-s3-us-east-1-2017": [39.04, -77.49],
+    "aws-us-east-1-dynamodb-dns-2025": [39.04, -77.49],
+    "aws-us-east-1-network-outage-2021": [39.04, -77.49],
+    "aws-us-east-1-thermal-2025": [39.04, -77.49],
+    "azure-active-directory-2020": [47.64, -122.13],
+    "azure-front-door-config-change-2025": [47.64, -122.13],
+    "azure-south-central-us-texas-cooling-2018": [29.42, -98.49],
+    "british-airways-heathrow-power-2017": [51.47, -0.45],
+    "cloudflare-bot-management-feature-file-2025": [37.77, -122.42],
+    "cloudflare-flexential-pdx-power-2023": [45.52, -122.99],
+    "crowdstrike-falcon-global-outage-2024": [30.27, -97.74],
+    "delta-atlanta-switchgear-2016": [33.64, -84.43],
+    "dyn-mirai-ddos-2016": [42.99, -71.46],
+    "equinix-ld8-london-ups-2020": [51.51, -0.02],
+    "facebook-meta-bgp-dns-2021": [37.48, -122.15],
+    "gcp-global-auth-quota-2020": [37.42, -122.08],
+    "gcp-global-service-control-2025": [37.42, -122.08],
+    "gcp-stt-gdc-delhi-fire-2026": [28.61, 77.21],
+    "kakao-sk-cc-pangyo-fire-2022": [37.40, 127.11],
+    "nirs-daejeon-battery-fire-2025": [36.35, 127.38],
+    "northc-almere-fire-2026": [52.37, 5.22],
+    "ovhcloud-sbg2-fire-2021": [48.58, 7.75],
+    "red-sea-subsea-cables-2024": [12.58, 43.33],
+    "unisuper-gcp-account-deletion-2024": [-37.81, 144.96],
+}
+
+LEAFLET_HEAD = (
+    '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" crossorigin="">'
+    '<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" crossorigin="" defer></script>'
+)
+
+
+def hub_geo_map(incidents):
+    """A real Leaflet world map plotting each incident at its origin (CARTO dark tiles)."""
+    import hashlib
+    pts = []
+    for inc in incidents:
+        c = INCIDENT_COORDS.get(inc.get("slug"))
+        if not c:
+            continue
+        h = int(hashlib.md5(inc.get("slug", "").encode()).hexdigest(), 16)
+        jlat = ((h % 1000) / 1000 - 0.5) * 0.75          # jitter co-located points apart
+        jlng = (((h // 1000) % 1000) / 1000 - 0.5) * 0.75
+        loc = inc.get("location", {})
+        pts.append({
+            "s": inc.get("slug", ""), "o": inc.get("operator", ""), "d": inc.get("date", ""),
+            "lat": round(c[0] + jlat, 3), "lng": round(c[1] + jlng, 3),
+            "dom": _domain(inc.get("category")), "sc": round(float(inc.get("_score", 0)), 1),
+            "loc": ", ".join(x for x in [loc.get("city"), loc.get("country")] if x),
+            "cat": " · ".join(CATEGORY_LABEL.get(x, x) for x in inc.get("category", [])),
+            "b": (inc.get("brief", "") or "")[:150],
+        })
+    if not pts:
+        return ""
+    data = json.dumps(pts, ensure_ascii=False).replace("</", "<\\/")
+    js = ('<script>(function(){var PTS=' + data + ',FAC=' + json.dumps(_FAC_COL) + ',LOG=' + json.dumps(_LOG_COL) + ';'
+          'function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;","\\"":"&quot;"}[c];});}'
+          'function init(){var el=document.getElementById("incMap");'
+          'if(!el||typeof L==="undefined"){return setTimeout(init,150);} if(el._leaflet_id)return;'
+          'var map=L.map("incMap",{center:[30,15],zoom:2,minZoom:2,maxZoom:8,worldCopyJump:true,scrollWheelZoom:false});'
+          'L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{subdomains:"abcd",maxZoom:19,attribution:"&copy; CARTO &copy; OpenStreetMap"}).addTo(map);'
+          'PTS.forEach(function(p){var col=p.dom==="facility"?FAC:LOG;'
+          'var mk=L.circleMarker([p.lat,p.lng],{radius:Math.max(6,Math.min(19,4+p.sc*1.5)),fillColor:col,color:"#ffffff",weight:1.2,opacity:0.85,fillOpacity:0.8}).addTo(map);'
+          'var html="<div style=\\"min-width:190px\\"><div style=\\"font-weight:700;font-size:0.86rem;color:#f1f5f9\\">"+esc(p.o)'
+          '+"</div><div style=\\"font-size:0.7rem;color:#94a3b8;margin-bottom:5px\\">"+esc(p.d)+" &middot; "+esc(p.loc)+" &middot; "+esc(p.cat)'
+          '+"</div><div style=\\"font-size:0.72rem;color:#cbd5e1;margin-bottom:7px\\">"+esc(p.b)+"&hellip;</div>"'
+          '+"<a href=\\"incident-"+p.s+".html\\" style=\\"font-size:0.72rem;color:#7fd1a8;font-weight:600;text-decoration:none\\">Open dossier &rarr;</a></div>";'
+          'mk.bindPopup(html,{maxWidth:250});'
+          'mk.on("mouseover",function(){this.setStyle({fillOpacity:1,weight:2.2});});'
+          'mk.on("mouseout",function(){this.setStyle({fillOpacity:0.8,weight:1.2});});});'
+          'try{new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)map.invalidateSize();});}).observe(el);}catch(e){}'
+          'setTimeout(function(){map.invalidateSize();},350);}'
+          'if(document.readyState!=="loading")init();else document.addEventListener("DOMContentLoaded",init);})();</script>')
+    return ('<div id="incMap" class="inc-map" role="img" aria-label="World map of data-center incident locations"></div>'
+            + _DOMAIN_LEGEND + js)
 
 
 def render_incident(inc, rank):

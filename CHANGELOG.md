@@ -13,6 +13,31 @@ release sections rather than semver.
 
 ---
 
+## v1.122.9 — 2026-08-01 (DC Incidents — real geographic incident map)
+
+### Added
+Owner wanted the hub to use a **real map** (like the Leaflet map on the DC market tracker), not
+only the abstract analytic scatters. Added a **"Where these happened"** world map to
+`dc-incidents.html`:
+
+- **Leaflet 1.9.4 + CARTO dark tiles** (same stack as `dc-market-tracker.html`), lazy-loaded via
+  a new `head_extra` slot in the generator's `page_shell` (hub only — incident pages stay
+  lib-free).
+- **25 incidents plotted** at their origin data-center / region (`INCIDENT_COORDS` table in
+  `tools/build-incidents.py`; global logical failures anchored to the operator's origin region),
+  with deterministic jitter so co-located incidents (five at Ashburn US-EAST-1) fan apart.
+- **Domain-coloured markers** — gold = Facility (power/cooling/fire), green = Network/logical;
+  radius scales with magnitude. Click a marker for a dark popup (operator · date · location ·
+  category · brief) with a link straight to the dossier.
+- Renders correctly behind the root-gate blur (container keeps its size; `invalidateSize()` on
+  reveal via IntersectionObserver).
+
+Verified headless: map initialises, 25 markers + tiles render, 0 console errors, no horizontal
+overflow at 360px. Root-gated; no public-SEO surface. Gates: page-gates CLEAN (35 gated),
+incidents-corpus 25/25, script-tags CLEAN.
+
+---
+
 ## v1.122.8 — 2026-08-01 (DC Incidents — risk-map & semantic-map made legible)
 
 ### Changed
