@@ -13,6 +13,29 @@ release sections rather than semver.
 
 ---
 
+## v1.124.9 — 2026-08-02 (DC Incidents — visual-QA gate + rendered-defect fixes)
+
+Built the mandatory **visual-QA gate** (`tools/incidents-visual-qa.mjs`, per
+DC_INCIDENTS_QA_STANDARD §4): it renders the hub + a range-covering sample of dossiers headless
+(root-unblurred), screenshots every visualization region, and flags clipped radar/scatter/axis
+labels, suspicious 1–2-char labels, and horizontal overflow — the rendered-defect class that
+text/CSS review misses. Running it immediately caught and fixed two real defects the deep
+re-research had surfaced:
+
+### Fixed
+- **Cascade downstream boxes truncated verbose `servicesDown` strings** mid-parenthetical (e.g.
+  "911 emergency call systems (Alaska, Arizona…"). Added `_clean_svc()` — strips the parenthetical
+  example-list and caps to a clean ~5-word node label; the full text stays in the hover `<title>`.
+  Applied to the primary-fault node too.
+- **Horizontal overflow on some dossiers** (e.g. CrowdStrike, Delta): the COE `owner · status`
+  rendered as a `white-space:nowrap` chip that ran ~1000px wide on verbose entries. Replaced with
+  a wrapping `.coe-meta` element.
+
+Gates: visual-QA clean across the sample, incidents-corpus 25/25, page-gates CLEAN, script-tags
+CLEAN, no 360px overflow. Root-gated.
+
+---
+
 ## v1.124.8 — 2026-08-02 (DC Incidents — deep forensic re-research COMPLETE, batch 5 of 5)
 
 Final deep-forensic batch (Opus Workflow, 15 agents, ~707k tokens): **CrowdStrike Channel-File-291

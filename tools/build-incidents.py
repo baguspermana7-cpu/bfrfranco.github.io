@@ -163,6 +163,7 @@ CSS = r"""
     .mag-trace { font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--text-body); background:var(--surface-2); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 2px 2px 0; padding:0.5rem 0.7rem; margin-top:0.5rem; font-variant-numeric:tabular-nums slashed-zero; }
     .mag-trace b { color:var(--text-strong); }
     .imp-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.04em; text-transform:uppercase; color:var(--cyan); font-weight:700; margin-right:0.35rem; }
+    .coe-meta { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); background:var(--surface-2); border:1px solid var(--line); border-radius:2px; padding:0.05rem 0.4rem; margin-left:0.2rem; white-space:normal; }
     /* FAQ / methodology */
     details.faq { border:1px solid var(--line); border-radius:4px; background:var(--surface); margin:0.8rem 0 0.4rem; }
     details.faq > summary { cursor:pointer; padding:0.7rem 0.9rem; font-family:'JetBrains Mono',monospace; font-size:0.74rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-strong); list-style:none; }
@@ -597,6 +598,19 @@ def _clean_op(operator):
     return o[:22] if o else "Operator"
 
 
+def _clean_svc(s):
+    """A clean short downstream-node label from a (possibly verbose) servicesDown string —
+    drop parenthetical example-lists, keep up to ~5 words / 34 chars; full text lives in <title>."""
+    s = str(s or "").split("(")[0].strip().rstrip(":;,")
+    words = s.split()
+    out = ""
+    for w in words:
+        if len(out) + len(w) + 1 > 34:
+            break
+        out = (out + " " + w).strip()
+    return out or s[:34]
+
+
 def _wrap(text, width, maxlines=2):
     """Greedy word-wrap into <=maxlines lines of ~width chars (for SVG tspans)."""
     words = str(text or "").split()
@@ -647,12 +661,12 @@ def cascade_svg(inc):
     svg.append('<defs><marker id="ic-ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path class="vz-arrhead" d="M0,0 L6,3 L0,6 Z"/></marker></defs>')
     svg.append(f'<text class="vz-tl-ph" x="8" y="12">Trigger</text><text class="vz-tl-ph" x="248" y="12">Primary fault</text><text class="vz-tl-ph" x="516" y="12">Downstream impact</text>')
     svg.append(box(8, midY, 176, 56, "vz-box-trigger", f"Trigger — {trigger} ({inc.get('date','')})", f"Trigger · {trigger}", inc.get("date", ""), inc.get("date", "")))
-    svg.append(box(240, midY, 224, 56, "vz-box-fault", f"Primary fault at {op_full} — {dc_full}", op, dc_full, dc_full))
+    svg.append(box(240, midY, 224, 56, "vz-box-fault", f"Primary fault at {op_full} — {dc_full}", op, _clean_svc(dc_full), dc_full))
     svg.append(f'<line class="vz-flow" x1="184" y1="{midY+28}" x2="238" y2="{midY+28}" marker-end="url(#ic-ar)"/>')
     for i, d in enumerate(shown):
         by = 26 + i * 44
         svg.append(box(516, by, 236, 36, "vz-box-down",
-                       f"Downstream service degraded by the fault: {d}", d))
+                       f"Downstream service degraded by the fault: {d}", _clean_svc(d)))
         svg.append(f'<line class="vz-flow" x1="464" y1="{midY+28}" x2="514" y2="{by+18}" marker-end="url(#ic-ar)"/>')
     if more > 0:
         svg.append(f'<text class="vz-box-s" x="516" y="{26 + rows * 44 + 6}">+{more} more downstream services</text>')
@@ -996,7 +1010,7 @@ def render_incident(inc, rank):
         analysis_html = f'<h2>Comprehensive analysis</h2>{blocks}'
 
     cf = "".join(f"<li>{esc(x)}</li>" for x in inc.get("contributingFactors", []))
-    coe = "".join(f'<li>{esc(c.get("action",""))} <span class="chip muted">{esc(c.get("owner",""))} · {esc(c.get("status",""))}</span></li>' for c in inc.get("coe", []))
+    coe = "".join(f'<li>{esc(c.get("action",""))} <span class="coe-meta">{esc(c.get("owner",""))} · {esc(c.get("status",""))}</span></li>' for c in inc.get("coe", []))
     lessons = "".join(f"<li>{esc(x)}</li>" for x in inc.get("lessonsLearnt", []))
     imps = _imp_render(inc.get("improvements", []))
     down = "".join(f"<li>{esc(x)}</li>" for x in sev.get("servicesDown", []))
