@@ -1,0 +1,278 @@
+{
+ "slug": "digital-realty-la-el-segundo-fire-2023",
+ "title": "Digital Realty Los Angeles (El Segundo) Data-Center Fire (May 2023)",
+ "operator": "Digital Realty",
+ "operatorShort": "Digital Realty",
+ "dcName": "Digital Realty LAX (El Segundo, Los Angeles)",
+ "location": {
+  "city": "El Segundo, California",
+  "country": "United States"
+ },
+ "date": "2023-05-21",
+ "durationMin": 720,
+ "category": [
+  "fire"
+ ],
+ "severity": {
+  "usersAffected": "Colocation customers at the LA facility (localized)",
+  "impactUsd": "Not published",
+  "servicesDown": [
+   "Colocation customers at Digital Realty LA (localized)"
+  ],
+  "tier": "Facility fire (localized)"
+ },
+ "brief": "A fire in server/equipment space at Digital Realty's Los Angeles (El Segundo) data center caused localized customer outages and equipment loss.",
+ "magnitude": {
+  "blastRadiusScore": 4,
+  "usersScore": 4,
+  "financialScore": 3,
+  "durationScore": 4,
+  "note": "Equipment/server fire caused localized outages and equipment loss at the LA facility — sub-scores ESTIMATED from public impact reporting, pending deep research."
+ },
+ "rootCause": "PROXIMATE IGNITION — OFFICIALLY UNDETERMINED. The only cause statement in the public record is negative: \"Despite ongoing investigations, the exact cause of the fire remains undetermined\" (Dgtl Infra). What is established is the location and load class of ignition, not the mechanism. The fire began at 1:40am on Sunday 21 May 2023 in the Colo 4 colocation suite at Digital Realty's LAX12 facility, 2260 E El Segundo Blvd — it \"originated in a specific rack\" (Dgtl Infra), on the raised-floor IT/colo load inside a customer cabinet in (or under the sprinkler zone above) row 4, NOT in a discrete UPS room, battery room, or generator plant. No public source names the make, model, age, or battery/cell chemistry of the originating equipment, and it is not confirmed whether the first item to ignite was a server power supply, a PDU or rack whip, a cable bundle, or an in-rack battery. The facility carried 7.45 MW of UPS capacity across a two-story 132,000 sq ft building (Dgtl Infra), but no source connects that UPS/battery plant to the ignition — this is a colocation-rack IT-load fire, not a documented energy-storage event.\n\nLATENT ROOT — WATER-BASED SUPPRESSION IN A LIVE COLO HALL. The forensically significant latent factor is the fire-protection design of the colo hall: it was protected by a water sprinkler that discharged onto energised IT. The sprinkler type is NOT disclosed by any source (only \"fire sprinkler system\"/\"sprinkler system\"), so a wet-pipe vs pre-action determination cannot be made from the record — but water DID reach the racks, which drove the damage profile. As a fire-STOP the sprinkler worked: activation \"above row 4... was limited to row 4 with some exposure to adjacent rows\" (Digital Realty via DCD). But water is indiscriminate: the same discharge \"result[ed] in water damage to many servers\" (Dgtl Infra) and contributed to an \"unknown number of servers\" destroyed (DCD). Whether early aspirating detection plus clean-agent suppression was present is not evidenced either way — neither is named in any source — so the mitigation gap is a documented absence of evidence, not a confirmed design defect.\n\nLATENT ROOT — CROSS-SUITE DE-ENERGISATION COUPLING. Power was cut to both Colo 3 and Colo 4 when the fire department closed the halls (DCD). Colo 3, which a tenant reported \"appears to be safe,\" still lost power (restored \"after an hour or so\"); Colo 4 stayed dark for several days. That the fire-response envelope forced de-energisation of a second, unburned suite points to electrical/zoning and life-safety-shutdown coupling between neighbouring colo spaces — a factor that widened the customer-impact blast radius beyond the room that actually burned. (Physical adjacency of the two suites is inferred, not stated.)\n\nMAINTENANCE / INSPECTION ROOT — NOT DETERMINABLE FROM THE RECORD. No public source implicates or exonerates any maintenance, inspection, or testing lapse. There is no hot-work or energised-work record, no deferred-inspection finding, and no sprinkler or detection test history in evidence. Because Digital Realty published no root-cause analysis and was described by a tenant as \"tight-lipped,\" a maintenance chain can neither be confirmed nor excluded. The honest root-cause statement is therefore two-part: proximate ignition genuinely undetermined; latent contribution traceable to water-based suppression discharging on live IT and to cross-suite power-shutdown coupling.",
+ "technicalDeepDive": "This was an IT-load rack fire on a raised-floor colocation hall, not a plant-room (UPS/battery/generator) event, and the physical story turns on the water sprinkler. At 1:40am on 21 May 2023 a specific cabinet in Colo 4 at LAX12 ignited from an undetermined cause. \"The fire sprinkler system was activated in the Colo space above row 4 and was limited to row 4 with some exposure to adjacent rows, according to a report from Digital Realty\" (via DCD). Sprinkler heads are heat-activated at the head, so visible/energetic combustion and hot smoke had already developed in the cabinet before any water flowed. The sprinkler TYPE is not disclosed in any source — the record does not establish wet-pipe versus pre-action, and any specific head-rating or fusible-link temperature would be inference, not evidence. Likewise, no aspirating/VESDA smoke detection and no gaseous clean-agent suppression is NAMED anywhere in the record; that is an absence of evidence, not a confirmed absence of the systems.\n\nOnce discharging, the sprinkler put water onto energised IT below. This is the crux of the damage mechanics: suppression stopped fire propagation but soaked the row — the discharge \"result[ed] in water damage to many servers\" (Dgtl Infra) — so the loss mode shifted from thermal to hydraulic. The fire department closed two colocation suites (Colo 3 and Colo 4) and \"Power was cut off to the Colo 3 and 4 spaces\" (DCD). Colo 3, reported by a tenant as \"safe,\" was re-energised \"after an hour or so\"; Colo 4, the fire origin, \"remained out of commission for several days\" (Dgtl Infra) and was still without power when a tenant posted \"late on Wednesday,\" roughly three days after the fire (DCD). Evocative — operating as Krypt and holding former VPLS/INAP assets — \"lost an unknown number of servers\" (DCD), with water damage \"particularly severe\" for it (Dgtl Infra).\n\nWhat the physical record does NOT contain is as important as what it does: no first-alarm time, no fire-department call/dispatch/arrival timestamps, no apparatus count, no on-scene tactics or incident-command detail, no water-flow or discharge-duration figure, no temperature reading, no confirmed server count, no dollar loss, no injury statement, and no confirmed ignition device. The El Segundo/LA County fire incident report could not be located, and the Reddit thread and any Evocative status-page report were not directly accessible. The forensic picture is firm on sequence and suppression class (a water sprinkler, activated, effective as a fire-stop, damaging as a collateral hazard) and empty on ignition mechanism, suppression sub-type, and emergency-services chronometry.",
+ "sequenceOfEvents": [
+  {
+   "t": "2023-05-21T01:40 (local PT)",
+   "phase": "TRIGGER",
+   "event": "Fire breaks out in a specific equipment rack in the Colo 4 colocation suite at Digital Realty LAX12, 2260 E El Segundo Blvd, El Segundo; ignition cause undetermined. Time per an Evocative incident report cited by DCD.",
+   "source": "https://www.datacenterdynamics.com/en/news/fire-hits-digital-realty-facility-in-el-segundo-california/"
+  },
+  {
+   "t": "2023-05-21T01:40 (local PT, approx)",
+   "phase": "DETECTION",
+   "event": "No aspirating/VESDA smoke detection or first-alarm time is documented in any source; the earliest recorded protection response is the heat-activated sprinkler, implying heat/smoke had already built up in the cabinet before any alarm on record.",
+   "source": "https://www.datacenterdynamics.com/en/news/fire-hits-digital-realty-facility-in-el-segundo-california/"
+  },
+  {
+   "t": "2023-05-21 (early AM)",
+   "phase": "MITIGATION",
+   "event": "The fire sprinkler system activates in the Colo space above row 4 (water suppression; sub-type not disclosed by sources), discharging onto the IT load below.",
+   "source": "https://www.datacenterdynamics.com/en/news/fire-hits-digital-realty-facility-in-el-segundo-california/"
+  },
+  {
+   "t": "2023-05-21 (early AM)",
+   "phase": "MITIGATION",
+   "event": "Sprinkler discharge contains the fire — 'limited to row 4 with some exposure to adjacent rows' per a Digital Realty report cited by DCD — effective as a fire-stop.",
+   "source": "https://www.datacenterdynamics.com/en/news/fire-hits-digital-realty-facility-in-el-segundo-california/"
+  },
+  {
+   "t": "2023-05-21 (early AM)",
+   "phase": "CASCADE",
+   "event": "Sprinkler water inflicts collateral damage: the discharge 'result[ed] in water damage to many servers' in the colocation space, shifting the loss mode from thermal to hydraulic.",
+   "source": "https://dgtlinfra.com/data-center-fires/"
+  },
+  {
+   "t": "2023-05-21 (early AM)",
+   "phase": "MITIGATION",
+   "event": "Fire department responds and closes two colocation suites (Colo 3 and Colo 4) — 'Two colo halls closed by fire department after a blaze in the racks.' No call/arrival time, apparatus count, or on-scene tactics are public.",
+   "source": "https://www.datacenterdynamics.com/en/news/fire-hits-digital-realty-facility-in-el-segundo-california/"
+  },
+  {
+   "t": "2023-05-21 (early AM)",
+   "phase": "MITIGATION",
+   "event": "'Power was cut off to the Colo 3 and 4 spaces' as part of the fire-response de-energisation.",
+   "source": "https://www.datacenterdynamics.com/en/news/fire-hits-digital-realty-facility-in-el-segundo-california/"
+  },
+  {
+   "t": "2023-05-21 (early AM)",
+   "phase": "CASCADE",
+   "event": "De-energisation reaches the unburned Colo 3 suite — a tenant reported it 'appears to be safe' — taking down customers whose racks were never on fire; cross-suite impact beyond the fire origin (physical adjacency inferred, not stated).",
+   "source": "https://www.datacenterdynamics.com/en/news/fire-hits-digital-realty-facility-in-el-segundo-california/"
+  },
+  {
+   "t": "2023-05-21 (~1 hour after shutdown)",
+   "phase": "RECOVERY",
+   "event": "'Power was restored to Colo 3 after an hour or so'; the unburned suite comes back while Colo 4 remains de-energised.",
+   "source": "https://www.datacenterdynamics.com/en/news/fire-hits-digital-realty-facility-in-el-segundo-california/"
+  },
+  {
+   "t": "2023-05-21 (early AM)",
+   "phase": "IMPACT",
+   "event": "No fire spread beyond the two suites; event contained to Colo 4 row 4 plus limited adjacent-row exposure. No injury statement appears in any source (record is silent, not an affirmative zero).",
+   "source": "https://www.datacenterdynamics.com/en/news/fire-hits-digital-realty-facility-in-el-segundo-california/"
+  },
+  {
+   "t": "2023-05-22 (Monday)",
+   "phase": "IMPACT",
+   "event": "Aftermath: a Colo 3 tenant reports the lobby 'absolutely packed with people waiting to get access to Colo 4,' conference rooms that 'looked like a battle zone,' and 'The smell of smoke was intense, and the cleaning chemicals too.' Some users still locked out a day later.",
+   "source": "https://www.datacenterdynamics.com/en/news/fire-hits-digital-realty-facility-in-el-segundo-california/"
+  },
+  {
+   "t": "2023-05-22 to 2023-05-24",
+   "phase": "IMPACT",
+   "event": "Evocative (operating as Krypt, holding former VPLS/INAP assets) loses an unknown number of servers; water damage was 'particularly severe' for it.",
+   "source": "https://dgtlinfra.com/data-center-fires/"
+  },
+  {
+   "t": "2023-05-24 (Wednesday, late)",
+   "phase": "IMPACT",
+   "event": "Colo 4 still without power roughly three days after the fire; a tenant reports 'I contacted Digital Reality and they were tight-lipped, only responding with empty words' — no recovery ETA communicated.",
+   "source": "https://www.datacenterdynamics.com/en/news/fire-hits-digital-realty-facility-in-el-segundo-california/"
+  },
+  {
+   "t": "2023-05 (several days after)",
+   "phase": "RECOVERY",
+   "event": "Colo 4 'remained out of commission for several days' before restoration; recovery bounded by water-damage remediation and equipment replacement rather than fire repair.",
+   "source": "https://dgtlinfra.com/data-center-fires/"
+  },
+  {
+   "t": "2023-05-25 (Thursday)",
+   "phase": "RESTORED",
+   "event": "DataCenterDynamics (Peter Judge) publishes the only primary press account and states it has contacted Digital Realty for more information; cause remains officially 'undetermined' and no operator or fire-authority root-cause analysis is subsequently published.",
+   "source": "https://www.datacenterdynamics.com/en/news/fire-hits-digital-realty-facility-in-el-segundo-california/"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Fire origin time",
+   "value": "1:40am local (PT), Sun 21 May 2023",
+   "source": "DCD (Evocative incident report)"
+  },
+  {
+   "label": "Fire origin location",
+   "value": "Colo 4 suite, row 4, a specific rack",
+   "source": "DCD / Dgtl Infra"
+  },
+  {
+   "label": "Colocation suites shut by fire dept",
+   "value": "2 (Colo 3 and Colo 4)",
+   "source": "DCD"
+  },
+  {
+   "label": "Fire spread containment",
+   "value": "Limited to row 4, some exposure to adjacent rows",
+   "source": "DCD (Digital Realty report)"
+  },
+  {
+   "label": "Colo 3 (unburned) power outage",
+   "value": "~1 hour ('after an hour or so')",
+   "source": "DCD"
+  },
+  {
+   "label": "Colo 4 (origin) power outage",
+   "value": "Several days (still down ~3 days later)",
+   "source": "Dgtl Infra / DCD"
+  },
+  {
+   "label": "Servers lost / water-damaged",
+   "value": "Unknown number ('many' water-damaged)",
+   "source": "DCD / Dgtl Infra"
+  },
+  {
+   "label": "Facility floor area",
+   "value": "132,000 sq ft (two-story)",
+   "source": "Dgtl Infra"
+  },
+  {
+   "label": "Facility UPS capacity",
+   "value": "7.45 MW",
+   "source": "Dgtl Infra"
+  },
+  {
+   "label": "Suppression type / outcome",
+   "value": "Water fire sprinkler (sub-type not disclosed); activated, contained fire, caused water damage",
+   "source": "DCD / Dgtl Infra"
+  },
+  {
+   "label": "Reported injuries",
+   "value": "None stated in any source (not an affirmative zero)",
+   "source": "DCD (forensic)"
+  },
+  {
+   "label": "Official root cause",
+   "value": "Undetermined",
+   "source": "Dgtl Infra"
+  }
+ ],
+ "contributingFactors": [
+  "Fire-protection design: the colo hall was protected by a water sprinkler that discharged onto live IT — activation contained the fire but 'result[ed] in water damage to many servers' (Dgtl Infra), converting a single-rack fire into a wet loss across the row and adjacent rows (sprinkler sub-type not disclosed by sources).",
+  "Detection design not evidenced: no smoke/VESDA aspirating detection system and no first-alarm time appear in any public source — the only mitigation element on record is the heat-activated sprinkler, which by nature acts only after significant heat has built up, and any earlier incipient-stage response is undocumented (forensic).",
+  "Cross-suite power coupling: de-energisation forced by the fire response cut power to a second suite (Colo 3) as well as the fire-origin Colo 4 — 'Power was cut off to the Colo 3 and 4 spaces' (DCD) — widening customer impact beyond the room that burned; Colo 3 was reported 'safe' yet still lost power for about an hour.",
+  "Undetermined ignition on the colo IT load: the fire 'originated in a specific rack' (Dgtl Infra) with no confirmed device, chemistry, or failure mode — the officially 'undetermined' cause (Dgtl Infra) means no corrective action could target the true initiating fault.",
+  "Operator transparency/communication gap: a tenant reported Digital Realty was 'tight-lipped, only responding with empty words' (Reddit via DCD) and the operator issued no substantive public statement or published root-cause analysis, leaving affected customers without recovery ETAs during a multi-day Colo 4 outage.",
+  "Maintenance/inspection history not evidenced either way: no sprinkler/detection test records, hot-work permits, or deferred-inspection findings are in the public record, so a maintenance lapse can neither be confirmed nor excluded (forensic) — an evidentiary gap that itself impedes prevention."
+ ],
+ "coe": [
+  {
+   "action": "Obtain the El Segundo/LA County Fire Department incident report and the Evocative and Digital Realty internal reports to establish the confirmed ignition source and suppression sub-type",
+   "owner": "Facility operator / fire authority",
+   "status": "Not evidenced as done (cause remains officially undetermined)"
+  },
+  {
+   "action": "Assess colo-hall detection/suppression: add VESDA + clean-agent or convert to double-interlock pre-action to prevent water on live IT",
+   "owner": "Data-center engineering",
+   "status": "No public evidence of remediation"
+  },
+  {
+   "action": "Re-zone life-safety power shutdown so an unburned neighbouring suite is not de-energised with the fire-origin suite",
+   "owner": "Electrical / MEP design",
+   "status": "No public evidence of remediation"
+  },
+  {
+   "action": "Publish a customer incident-communication SLA with status-page updates and recovery ETAs",
+   "owner": "Operator customer-success / comms",
+   "status": "No public evidence of remediation"
+  },
+  {
+   "action": "Commission and disclose an independent root-cause analysis for the fire",
+   "owner": "Digital Realty",
+   "status": "Not published as of the sources"
+  }
+ ],
+ "lessonsLearnt": [
+  "Water as a colo suppressant is a double-edged control: the sprinkler stopped fire spread yet 'result[ed] in water damage to many servers' (Dgtl Infra) — containment success and asset destruction came from the same discharge, so suppression choice materially shapes the loss.",
+  "Blast radius is set by shutdown zoning, not just by flame: an unburned suite (Colo 3) still went dark because 'Power was cut off to the Colo 3 and 4 spaces' (DCD) — electrical/life-safety coupling between suites can multiply customer impact.",
+  "Heat-activated suppression is inherently late: with no VESDA/first-alarm evidenced, the first recorded response was a sprinkler that only trips after significant heat, foreclosing any incipient-stage de-energisation before flame (forensic).",
+  "Silence is an incident cost: a tenant's 'tight-lipped, only responding with empty words' (Reddit via DCD) shows that absent ETAs and status updates amplify business disruption independent of the physical damage.",
+  "An 'undetermined' cause with no published RCA is a prevention gap in itself: without a named initiating fault (Dgtl Infra), neither operator nor industry can close the loop on the true failure mode.",
+  "Concentration risk is real for managed tenants: Evocative/Krypt (former VPLS/INAP assets) took 'particularly severe' damage (Dgtl Infra), a reminder that a single suite event can disproportionately hit one customer's estate."
+ ],
+ "improvements": [
+  "Safety: Add a two-stage strategy to live colo halls — very-early aspirating smoke detection (VESDA) cross-zoned to a gaseous clean-agent suppression system — so an incipient rack fire is knocked down before flashover without soaking energised IT, the exact collateral that here 'result[ed] in water damage to many servers' (Dgtl Infra). Where water sprinklers remain code-required, use double-interlock pre-action so no water sits over the racks until both heat and smoke confirm.",
+  "Maintenance: Institute and retain a documented test/inspection regime for detection and suppression — periodic sprinkler flow/trip tests, VESDA sensitivity checks, and rack-level thermal/arc-fault inspections — since the public record contains no maintenance history and a lapse could be neither confirmed nor excluded (forensic).",
+  "Design: Decouple life-safety power shutdown between colo suites so a fire-response de-energisation of the origin suite (Colo 4) does not force an outage on a neighbour reported 'safe' (Colo 3 lost ~1 hour of power for a fire it did not have) (DCD).",
+  "Process: Establish a customer incident-communication protocol with committed status-page updates and recovery ETAs; a tenant described the operator as 'tight-lipped, only responding with empty words' (Reddit via DCD) through a multi-day Colo 4 outage, compounding business impact.",
+  "Safety: Deploy in-cabinet fire detection/early suppression and rack-level current/arc monitoring so a single-cabinet ignition is isolated at the rack rather than fought at the room ceiling after heat build-up.",
+  "Process: Commission and disclose an independent root-cause investigation for undetermined-cause IT fires; leaving the cause 'undetermined' (Dgtl Infra) with no published RCA prevents the operator and the wider industry from targeting the true initiating fault."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "What burned, and what did not",
+   "body": "This was a colocation IT-load fire, not a plant event. The fire 'originated in a specific rack' (Dgtl Infra) in Colo 4 at LAX12 (2260 E El Segundo Blvd) at 1:40am on 21 May 2023. Despite the facility's 7.45 MW UPS plant across 132,000 sq ft, no source links UPS or batteries to ignition — the origin was a customer cabinet on the raised floor, and the cause remains officially 'undetermined' (Dgtl Infra)."
+  },
+  {
+   "heading": "Suppression: a fire-stop that became a water loss",
+   "body": "The sprinkler 'was activated in the Colo space above row 4 and was limited to row 4 with some exposure to adjacent rows' (Digital Realty via DCD) — an effective fire-stop. But it 'result[ed] in water damage to many servers' (Dgtl Infra), turning a thermal event into a hydraulic one. The sprinkler sub-type (wet-pipe vs pre-action) is not disclosed by any source, and no VESDA or clean-agent system is named — an absence of evidence, not a confirmed design defect."
+  },
+  {
+   "heading": "Cross-suite de-energisation widened the impact",
+   "body": "The fire department closed two suites and 'Power was cut off to the Colo 3 and 4 spaces' (DCD). Colo 3, which a tenant said 'appears to be safe,' still lost power (restored 'after an hour or so'), while Colo 4 'remained out of commission for several days' (Dgtl Infra) and was still dark ~3 days later (DCD). The shutdown envelope, not the flame, set the customer blast radius."
+  },
+  {
+   "heading": "Communication and evidentiary gaps",
+   "body": "A tenant found the operator 'tight-lipped, only responding with empty words' (Reddit via DCD); no operator statement or root-cause analysis was published. The fire-authority incident report, injury status, dollar loss, server count, water-flow figures, and emergency-response chronometry are all absent from the record. The forensic picture is firm on sequence and suppression class and empty on ignition mechanism — gaps that are disclosed, not filled by inference."
+  }
+ ],
+ "references": [
+  {
+   "title": "Fire hits Digital Realty facility in El Segundo, California — DataCenterDynamics (Peter Judge)",
+   "url": "https://www.datacenterdynamics.com/en/news/fire-hits-digital-realty-facility-in-el-segundo-california/",
+   "type": "press",
+   "quote": "The fire sprinkler system was activated in the Colo space above row 4 and was limited to row 4 with some exposure to adjacent rows... Power was cut off to the Colo 3 and 4 spaces.",
+   "accessed": "2026-08-02"
+  },
+  {
+   "title": "Data Center Fires (Digital Realty – Los Angeles, California, 2023) — Dgtl Infra",
+   "url": "https://dgtlinfra.com/data-center-fires/",
+   "type": "press",
+   "quote": "The fire, which originated in a specific rack, prompted a shutdown of two suites within the two-story, 132,000 square foot facility, which supports 7.45 megawatts of UPS power capacity.",
+   "accessed": "2026-08-02"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": false,
+  "lastVerified": "2026-08-02 (seed — pending deep research)"
+ },
+ "lastUpdated": "2026-08-02"
+}

@@ -1,0 +1,287 @@
+{
+ "slug": "azure-china-north3-regional-2024",
+ "title": "Azure China North 3 ~50-Hour Regional Outage (2024)",
+ "operator": "Microsoft Azure (operated by 21Vianet)",
+ "operatorShort": "Azure 21Vianet",
+ "dcName": "Azure China North 3 region (Hebei)",
+ "location": {
+  "city": "Hebei",
+  "country": "China"
+ },
+ "date": "2024-11-01",
+ "durationMin": 3000,
+ "category": [
+  "power",
+  "cooling"
+ ],
+ "severity": {
+  "usersAffected": "Azure China North 3 enterprise customers (regional)",
+  "impactUsd": "Not published",
+  "servicesDown": [
+   "Azure China North 3 regional services (multiple, ~50h)"
+  ],
+  "tier": "Regional facility outage (~50h)"
+ },
+ "brief": "A power/cooling failure in Azure China North 3 (operated by 21Vianet) caused a roughly 50-hour regional outage, an unusually long-duration event that disrupted enterprise customers.",
+ "magnitude": {
+  "blastRadiusScore": 4,
+  "usersScore": 4,
+  "financialScore": 4,
+  "durationScore": 7,
+  "note": "~50-hour regional power/cooling outage caused prolonged enterprise disruption — sub-scores ESTIMATED from public impact reporting, pending deep research."
+ },
+ "rootCause": "ROOT CAUSE IS UNDETERMINED AND UNDOCUMENTED, and that is the single most important, source-honest finding of this dossier. No specific ignition source, equipment make/model/age/chemistry, or failure mechanism is on any public record, and there is in fact no evidence this was a fire or ignition event at all. The event is characterised as a ~50-hour REGIONAL CLOUD OUTAGE of Azure China North 3 (Microsoft Azure operated by 21Vianet), not a data-hall fire. For a single-region cloud outage of this shape, the plausible drivers are overwhelmingly NON-fire: a facility power-chain fault (utility feed, UPS/STS/switchgear), a cooling-loss thermal shutdown, or a network/control-plane/storage scale-unit failure. Naming a battery string (VRLA vs Li-ion), a UPS/switchgear model, a transformer, or any component as the origin would be pure fabrication, so none is asserted (ignition: UNCONFIRMED).\n\nWHAT IS ACTUALLY VERIFIED about the venue: \"China North 3\" is a genuine Microsoft-Azure-operated-by-21Vianet region (learn.microsoft.com/en-us/azure/china/overview-regions lists it, paired with China East 3, with availability-zone support). Its scale-unit infrastructure is live and enumerable in the region operator's own TLS certificate served at status.azure.cn: the SAN list spans *.chinanorth3-01 through *.chinanorth3-06.chinacloudsites.cn plus *.chinanorth3.c.chinacloudsites.cn, under organisation \"Shanghai Blue Cloud Technology Co., Ltd.\" (21Vianet). That is the hardest primary evidence tying anything concrete to this venue, and it establishes only that the region and its six named scale units exist, nothing about an ignition source, a failed component, or even that an outage occurred on the claimed date. NOTE (QA correction): Microsoft's official region list gives China North 3's physical location as \"n/a\"; the earlier \"Hebei\" province attribution is NOT supported by any primary source and has been struck.\n\nLATENT ROOT (the one architecturally-sourceable finding): the durable, generalisable root that survives the evidence gap is single-region deployment dependency. Azure China regions are paired China North 3 <-> China East 3 (learn.microsoft.com/en-us/azure/china/overview-regions); a customer deployed into only one region carries the full blast radius of that region's outage with no in-country failover, and availability zones alone do not cover a whole-region event. This is a design/architecture root that stands on Azure's published region-pairing model, not on any RCA for this specific event, and is disclosed as such.\n\nNO MAINTENANCE/INSPECTION/TESTING LAPSE IS EVIDENCED, neither confirmed nor excludable. Because no Post-Incident Review (PIR) or investigation for this event is public, a maintenance-window trigger, a change/config error, an EPO or breaker mis-operation, or an impaired suppression/detection system all remain genuinely unknown. The empty forensic record is structurally explained (see contributing factors) by sovereign-cloud incident-hosting separation, short PIR retention on the Azure status page, and the absence of Chinese-regulator-published cloud RCAs.",
+ "technicalDeepDive": "This is a dossier dominated by disclosed unknowns, and the deepest technical content available is not a fire forensic chain (none exists) but the FORENSICS OF THE EMPTY RECORD: why a ~50-hour outage of a real cloud region leaves essentially no public trace, verified structurally rather than assumed.\n\n(1) SOVEREIGN-CLOUD SEPARATION (VERIFIED). Azure operated by 21Vianet is, per Microsoft Learn, \"a physically separated instance of cloud services located in China,\" independently operated by Shanghai Blue Cloud Technology Co., Ltd. (learn.microsoft.com/en-us/azure/china/overview-operations). It is a distinct sovereign cloud, not global Azure, so incident/status notices historically lived on China-only endpoints outside most Western discovery paths.\n\n(2) THE CHINA DASHBOARD HAS BEEN FOLDED INTO GLOBAL STATUS (VERIFIED live 2026-08-02). www.azure.cn/en-us/support/service-dashboard/ returns 301 Moved Permanently -> https://status.azure.com/zh-cn/status, which itself now 301-redirects to https://azure.status.microsoft/zh-cn/status. The standalone China incident feed no longer serves notices at its old address.\n\n(3) PIR RETENTION IS SHORT (VERIFIED). The global status-history page (status.azure.com/en-us/status/history/, now hosted at azure.status.microsoft) retained only recent PIRs at inspection (a July-2026 West US preliminary PIR and two May-2026 PIRs) and listed no incidents for China North 3. Any November-2024 China North 3 PIR has aged out of public hosting.\n\n(4) NO REGULATOR RCA. A 21Vianet datacentre answers to MIIT and local telecom regulators, who do not publish cloud-region root-cause analyses the way a fire authority publishes a fire investigation. No such report is web-exposed.\n\n(5) NEGATIVE PRESS EVIDENCE (VERIFIED, with caveat). A Google News index returned ZERO items for \"Azure 21Vianet outage\" and zero for \"Azure China North 3\" on re-fetch (the earlier run's \"14 items\" count could not be reproduced and has been struck). No English-language trade/press coverage of a Nov-2024 China North 3 outage was found. This is negative evidence, and it is partly a tooling artefact: WebSearch budget was exhausted (200/200), and Google/Bing/Baidu were unreachable in this environment. A researcher with open search or the login-gated 21Vianet operator portal may recover a Chinese-language PIR or a 36kr / ITHome / cnBeta report that was unreachable here.\n\n(6) PRIMARY REGION EVIDENCE (VERIFIED). The live TLS certificate served at status.azure.cn (O=Shanghai Blue Cloud Technology Co., Ltd.) enumerates *.chinanorth3-01 through *.chinanorth3-06.chinacloudsites.cn plus *.chinanorth3.c.chinacloudsites.cn, confirming the region and its six scale units are genuine 21Vianet-operated infrastructure. Region pairing (China North 3 <-> China East 3, the latter access-restricted for in-country DR) is confirmed on learn.microsoft.com/en-us/azure/china/overview-regions.\n\nNet technical conclusion: the physical forensics the schema asks for (detection, suppression, evacuation, emergency response, de-energisation, containment, MW/temperature/agent-flow figures) are GENUINELY undocumented and are reported as silent, never invented.",
+ "sequenceOfEvents": [
+  {
+   "t": "2024-11-01 (UNVERIFIED - task lead only; no public source corroborates the date)",
+   "phase": "TRIGGER",
+   "event": "Claimed onset of an Azure China North 3 regional outage. No physical trigger, alarm, or start-time is documented in any accessible source; the date, duration, and even the occurrence of the event rest solely on the task lead.",
+   "source": "https://status.azure.com/zh-cn/status"
+  },
+  {
+   "t": "At claimed onset (NO RECORD)",
+   "phase": "DETECTION",
+   "event": "No fire-detection event exists on record - no VESDA/aspirating-smoke or spot-detector activation, no smoke/heat alarm timestamp. The incident is characterised as a service/regional outage, not a fire, and no detection event of any kind is documented.",
+   "source": "https://status.azure.com/en-us/status/history/"
+  },
+  {
+   "t": "At claimed onset (NO RECORD)",
+   "phase": "DETECTION",
+   "event": "No control-room alarm, incident ticket, tracking ID, or first-alert timestamp is publicly retained. The China-only status feed that would have carried a first notice now 301-redirects into the global Azure status page and no matching entry survives.",
+   "source": "https://www.azure.cn/en-us/support/service-dashboard/"
+  },
+  {
+   "t": "During claimed outage (NO RECORD)",
+   "phase": "MITIGATION",
+   "event": "No operator/first-responder response sequence is documented - no NOC action log, no runbook step, no escalation record. Root cause (power vs cooling vs network vs storage/control-plane vs - unlikely and unevidenced - fire) is entirely unknown.",
+   "source": "https://status.azure.com/zh-cn/status"
+  },
+  {
+   "t": "During claimed outage (NO RECORD)",
+   "phase": "MITIGATION",
+   "event": "No fire-suppression event on record - no clean-agent/NOVEC/FM-200/water-mist/pre-action discharge, and no evidence any suppression was called upon or that it did or did not work. There is no evidence a fire occurred at all.",
+   "source": "https://status.azure.com/en-us/status/history/"
+  },
+  {
+   "t": "During claimed outage (NO RECORD)",
+   "phase": "MITIGATION",
+   "event": "No evacuation record (no who/when), no muster or headcount. Because the event is not evidenced as a fire, no life-safety sequence is documented.",
+   "source": "https://status.azure.com/en-us/status/history/"
+  },
+  {
+   "t": "During claimed outage (NO RECORD)",
+   "phase": "MITIGATION",
+   "event": "No emergency-services sequence exists - no fire-brigade call, no arrival time, no on-site actions. No local fire-authority or emergency-response record is web-exposed.",
+   "source": "https://status.azure.com/en-us/status/history/"
+  },
+  {
+   "t": "During claimed outage (NO RECORD)",
+   "phase": "MITIGATION",
+   "event": "No power de-energisation/isolation or EPO event is documented, and no containment/spread narrative exists. Whether any electrical isolation occurred is unknown.",
+   "source": "https://status.azure.com/zh-cn/status"
+  },
+  {
+   "t": "During claimed outage (UNKNOWN SCOPE)",
+   "phase": "CASCADE",
+   "event": "Impact scope - which services, availability zones, and customers were affected - is unknown. The region's six named scale units (chinanorth3-01..06) are confirmed to exist via the live TLS certificate, but no per-service or per-AZ degradation record is public.",
+   "source": "https://status.azure.cn/en-us/status/history/"
+  },
+  {
+   "t": "During claimed outage (VERIFIED architecture, not event timing)",
+   "phase": "CASCADE",
+   "event": "Single-region blast radius: China North 3 is paired with China East 3 (access-restricted for in-country disaster recovery) per Microsoft's official region list; a single-region deployment has no in-country failover, so whatever the trigger, a customer in only China North 3 absorbed the full outage.",
+   "source": "https://learn.microsoft.com/en-us/azure/china/overview-regions"
+  },
+  {
+   "t": "+~50 hours (UNVERIFIED - task lead only)",
+   "phase": "IMPACT",
+   "event": "Claimed ~50-hour disruption to enterprise customers in the region. The ~50h figure could not be confirmed against any operator PIR, status-history entry, or press report; it is reported as unverified.",
+   "source": "https://status.azure.com/zh-cn/status"
+  },
+  {
+   "t": "+~50 hours (UNVERIFIED - task lead only)",
+   "phase": "RECOVERY",
+   "event": "Claimed regional recovery after roughly 50 hours. No restoration steps, no phased service-return log, and no reason for the ~50h duration are documented anywhere accessible.",
+   "source": "https://status.azure.com/zh-cn/status"
+  },
+  {
+   "t": "By 2026-08-02 (VERIFIED post-incident record behaviour, not event timing)",
+   "phase": "RESTORED",
+   "event": "The Azure China (21Vianet) service dashboard returns 301 Moved Permanently -> https://status.azure.com/zh-cn/status (which itself now 301-redirects to azure.status.microsoft); the standalone China incident feed no longer serves notices at its old address.",
+   "source": "https://www.azure.cn/en-us/support/service-dashboard/"
+  },
+  {
+   "t": "By 2026-08-02 (VERIFIED)",
+   "phase": "RESTORED",
+   "event": "The global status-history page retains only recent PIRs (a July-2026 West US preliminary PIR and two May-2026 PIRs at inspection) and lists no incidents for the China North 3 region - no November-2024 China North 3 PIR is publicly hosted.",
+   "source": "https://status.azure.com/en-us/status/history/"
+  },
+  {
+   "t": "Nearest capture 2024-12-05 (VERIFIED)",
+   "phase": "RESTORED",
+   "event": "Wayback did not capture a China North 3 PIR for the window; the nearest status.azure.com/history capture to the date is a 301 stub, not archived content.",
+   "source": "https://status.azure.com/en-us/status/history/"
+  },
+  {
+   "t": "Verification pass 2026-08-02 (VERIFIED negative evidence, tooling-limited)",
+   "phase": "DETECTION",
+   "event": "Google News returned 0 items for 'Azure 21Vianet outage' and 0 for 'Azure China North 3' on re-fetch - no English-language trade/press coverage of a Nov-2024 outage was found. Disclosed as partly a tooling artefact (WebSearch budget exhausted, open engines blocked).",
+   "source": "https://news.google.com/rss/search?q=Azure%2021Vianet%20outage&hl=en-US&gl=US&ceid=US:en"
+  },
+  {
+   "t": "Verification pass 2026-08-02 (VERIFIED)",
+   "phase": "DETECTION",
+   "event": "Primary region-exists evidence: the live TLS certificate served at status.azure.cn (O=Shanghai Blue Cloud Technology Co., Ltd. = 21Vianet) enumerates *.chinanorth3-01 through *.chinanorth3-06.chinacloudsites.cn plus *.chinanorth3.c.chinacloudsites.cn - confirming the region and its six scale units are genuine 21Vianet-operated infrastructure.",
+   "source": "https://status.azure.cn/en-us/status/history/"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Claimed outage duration",
+   "value": "~50 hours (UNVERIFIED - task lead only; not confirmed by any PIR, status entry, or press report)",
+   "source": "https://status.azure.com/zh-cn/status"
+  },
+  {
+   "label": "Claimed onset date",
+   "value": "2024-11-01 (UNVERIFIED - task lead only; no public source corroborates)",
+   "source": "https://status.azure.com/zh-cn/status"
+  },
+  {
+   "label": "Named scale units confirmed in the affected region",
+   "value": "6 (chinanorth3-01 through chinanorth3-06, plus chinanorth3.c) - VERIFIED via live TLS SAN list",
+   "source": "https://status.azure.cn/en-us/status/history/"
+  },
+  {
+   "label": "Region pairing / in-country failover option",
+   "value": "China North 3 paired with China East 3 (access-restricted for in-country DR); China North 3 has availability-zone support - VERIFIED (official)",
+   "source": "https://learn.microsoft.com/en-us/azure/china/overview-regions"
+  },
+  {
+   "label": "Public PIRs retained for the region/date",
+   "value": "0 for China North 3 Nov-2024 (page shows only a July-2026 and two May-2026 PIRs) - VERIFIED",
+   "source": "https://status.azure.com/en-us/status/history/"
+  },
+  {
+   "label": "English-language press items found for the event",
+   "value": "0 (Google News 'Azure 21Vianet outage' = 0 items; 'Azure China North 3' = 0 on re-fetch) - VERIFIED negative evidence, tooling-limited",
+   "source": "https://news.google.com/rss/search?q=Azure%2021Vianet%20outage&hl=en-US&gl=US&ceid=US:en"
+  },
+  {
+   "label": "Nearest Wayback archive capture to the incident date",
+   "value": "2024-12-05, and it is a 301 stub (no content) - VERIFIED",
+   "source": "https://status.azure.com/en-us/status/history/"
+  },
+  {
+   "label": "China status dashboard redirect (record-availability)",
+   "value": "www.azure.cn service-dashboard 301 -> status.azure.com/zh-cn/status (-> azure.status.microsoft) - VERIFIED live 2026-08-02",
+   "source": "https://www.azure.cn/en-us/support/service-dashboard/"
+  }
+ ],
+ "contributingFactors": [
+  "Sovereign-cloud incident-hosting separation: Azure operated by 21Vianet is 'a physically separated instance of cloud services located in China' (learn.microsoft.com/en-us/azure/china/overview-operations) that published incident/status notices on China-only endpoints physically separate from the global Azure status page, so any China North 3 outage notice sat outside standard global-Azure and Western discovery paths.",
+  "Short Post-Incident-Review retention: the global status-history page retained only recent PIRs at inspection (a July-2026 West US preliminary PIR and two May-2026 PIRs) and listed no incidents for China North 3, so any November-2024 China North 3 PIR has aged out of public hosting (status.azure.com/en-us/status/history/, now azure.status.microsoft).",
+  "Dashboard redirection erased the old China feed's address: www.azure.cn/en-us/support/service-dashboard/ now returns 301 -> status.azure.com/zh-cn/status (VERIFIED live 2026-08-02), so the historic China-only incident channel no longer serves these notices at its original location.",
+  "Regulatory opacity: Chinese regulators (MIIT / local telecom authorities) do not publish cloud-region root-cause analyses the way a fire authority publishes a fire investigation, so no independent RCA is web-exposed and no maintenance, inspection, testing, or commissioning lapse can be confirmed or excluded (forensic note; no public PIR for the event).",
+  "Single-region deployment dependency (latent design factor): Azure China regions are paired China North 3 <-> China East 3 (learn.microsoft.com/en-us/azure/china/overview-regions), so customers deployed into only one region carry the full outage blast radius with no in-country failover, and availability zones alone do not cover a whole-region event, amplifying whatever the actual technical trigger was.",
+  "Discovery-tooling blockade in this environment (completeness caveat, not a cause of the outage): WebSearch budget exhausted (200/200) and open web search engines unreachable, leaving only live TLS/redirect inspection, Google News RSS, and Microsoft Learn, so absence of evidence here is partly a tooling artefact and disclosed as such (Google News RSS 'Azure 21Vianet outage' = 0 items)."
+ ],
+ "coe": [
+  {
+   "action": "Publish (or recover from the operator portal) a Post-Incident Review for the claimed Nov-2024 China North 3 outage, including detection/de-energisation/recovery timeline and confirmed root cause",
+   "owner": "Microsoft Azure operated by 21Vianet",
+   "status": "Not evidenced as done - no public PIR exists"
+  },
+  {
+   "action": "Retain power-chain and cooling PM/inspection/functional-test records long enough to survive post-incident forensics",
+   "owner": "21Vianet facility operations",
+   "status": "Recommended - not confirmed implemented"
+  },
+  {
+   "action": "Deploy across paired regions (China North 3 + China East 3) and validate cross-region failover for in-country resilience",
+   "owner": "Enterprise customers in Azure China",
+   "status": "Recommended - customer action"
+  },
+  {
+   "action": "Mirror sovereign-cloud incident history/PIRs to a durable long-retention public archive instead of a short-retention, redirecting status page",
+   "owner": "Microsoft / 21Vianet status engineering",
+   "status": "Recommended - not confirmed implemented"
+  },
+  {
+   "action": "Re-attempt discovery with open Google/Bing/Baidu access and the login-gated 21Vianet operator portal to recover any Chinese-language PIR or trade report",
+   "owner": "Follow-up researcher",
+   "status": "Open - blocked by tooling in this environment"
+  }
+ ],
+ "lessonsLearnt": [
+  "Absence of a public PIR is structural, not proof nothing happened: sovereign-cloud incident-hosting separation, short status-page retention, and the lack of a Chinese-regulator cloud RCA together explain why a real regional outage can leave essentially no public trace.",
+  "Never fabricate ignition source, equipment make/model, or failure mechanism when the record is empty; report detection, suppression, evacuation, emergency response, and de-energisation as SILENT/NO RECORD rather than inventing a plausible-sounding chain.",
+  "Single-region deployment carries the full regional blast radius even with availability zones; the durable, sourceable root for customer impact is the architecture choice, which stands on Azure's published China North 3 <-> China East 3 pairing independent of any event RCA.",
+  "Negative evidence must be disclosed as tooling-limited, not asserted as certainty: with WebSearch exhausted and open engines blocked, 'no coverage found' means 'not found here', and a Chinese-language PIR or trade report may exist behind channels unreachable in this environment.",
+  "Verify infrastructure claims against primary, tamper-resistant artefacts: the live TLS certificate (SAN + issuing organisation) and official region-pairing docs are stronger evidence of what exists than press aggregation, and were the only claims here that survived adversarial re-checking."
+ ],
+ "improvements": [
+  "SAFETY (facility, generalisable): because the ignition source and even whether a fire occurred are unknown, operators of sovereign-cloud datacentres should publish incident post-mortems that include a life-safety and fire-forensic timeline (detection activation, suppression discharge, de-energisation/EPO, evacuation/muster), and verify VESDA aspirating-smoke detection plus clean-agent suppression readiness on a documented schedule - closing the exact gaps that make this event unanalysable.",
+  "MAINTENANCE (generalisable): enforce and RETAIN documented preventive-maintenance, inspection, and functional-test records for the full power chain (utility feed, UPS strings/batteries, STS, switchgear) and the cooling loop, with retention long enough to survive a post-incident investigation, since here no PM/inspection/testing cadence could be confirmed or excluded.",
+  "ARCHITECTURE / RESILIENCE: deploy across the paired region (China North 3 + China East 3) or otherwise multi-region, and validate cross-region failover, so a whole-region outage does not equal total loss; availability zones within a single region are not a substitute for the paired-region failover Microsoft documents.",
+  "TRANSPARENCY / RECORD RETENTION: mirror sovereign-cloud (21Vianet) incident history and PIRs to a durable, long-retention public archive rather than a short-retention status page that 301-redirects, so a genuine ~50-hour regional outage remains auditable years later instead of aging out of public hosting.",
+  "CUSTOMER DUE DILIGENCE: enterprises relying on Azure China should contract for RTO/RPO with the operator, subscribe to the correct China status/notification channel, and independently log region-health telemetry, since the public record here is insufficient to reconstruct impact scope or duration."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "What actually happened - and what did not",
+   "body": "The single most important finding is that the root cause is UNDETERMINED and UNDOCUMENTED. The task lead characterises this as a ~50-hour regional cloud outage of Azure China North 3 (operated by 21Vianet). There is no public evidence of a fire, an ignition source, or a specific failed component, and no evidence even that an outage occurred on the claimed date beyond the task lead's assertion. For an outage of this shape the plausible drivers are overwhelmingly non-fire (power-chain fault, cooling-loss thermal shutdown, or a network/control-plane/storage failure). Naming any battery, UPS, switchgear, or transformer as origin would be fabrication and is not done here."
+  },
+  {
+   "heading": "The one hard primary evidence: the region and its six scale units are real",
+   "body": "The only concrete, tamper-resistant evidence tying anything to this venue is infrastructure, not an RCA. The live TLS certificate served at status.azure.cn (organisation 'Shanghai Blue Cloud Technology Co., Ltd.', i.e. 21Vianet) enumerates *.chinanorth3-01 through *.chinanorth3-06.chinacloudsites.cn plus *.chinanorth3.c.chinacloudsites.cn. Microsoft's official region list confirms China North 3 exists, is paired with China East 3 (access-restricted for in-country disaster recovery), and has availability-zone support. This establishes the region and its six scale units are genuine - and nothing about a trigger, component, or timeline."
+  },
+  {
+   "heading": "Forensics of the empty record: why a real regional outage leaves no trace",
+   "body": "A ~50-hour outage leaving almost no public trace is explained structurally, not assumed. Azure operated by 21Vianet is 'a physically separated instance of cloud services located in China' with China-only status channels; www.azure.cn's service dashboard now 301-redirects to the global Azure status page (verified live), which itself redirects to azure.status.microsoft; that global status-history page retains only recent PIRs (a July-2026 and two May-2026 entries at inspection) and lists none for China North 3; Wayback's nearest capture to the date is a 301 stub; and Chinese regulators do not publish cloud-region RCAs. Google News returned zero items for the event."
+  },
+  {
+   "heading": "The durable architectural root: single-region deployment dependency",
+   "body": "The one root that survives the evidence gap is a design factor, not an event forensic. Azure China regions are paired China North 3 <-> China East 3; a customer deployed into only one region absorbs the full blast radius of that region's outage with no in-country failover, and availability zones do not cover a whole-region event. This stands entirely on Azure's published region-pairing model and is disclosed as an architecture finding, not a claim about this specific incident's ignition or mechanism."
+  },
+  {
+   "heading": "Corrections applied in QA review",
+   "body": "Adversarial re-fetching corrected three specific claims. (1) The 'Hebei' province attribution was struck: Microsoft's official region list gives China North 3's physical location as 'n/a' and no primary source places it in Hebei. (2) The precise 'Google News = 14 items for Azure China North 3' count could not be reproduced (feed returned 0 on re-fetch) and was replaced with the load-bearing finding of zero items about a Nov-2024 outage. (3) Region pairing was re-sourced from the generic status page to learn.microsoft.com/en-us/azure/china/overview-regions, which actually documents it. All other verified claims (sovereign-cloud separation, dashboard redirect, short PIR retention, the TLS SAN list) held up."
+  }
+ ],
+ "references": [
+  {
+   "title": "Microsoft Azure in China - operations overview (Microsoft Learn)",
+   "url": "https://learn.microsoft.com/en-us/azure/china/overview-operations",
+   "type": "official-postmortem",
+   "quote": "Microsoft Azure operated by 21Vianet (Azure in China) is a physically separated instance of cloud services located in China. It's independently operated and transacted by Shanghai Blue Cloud Technology Co., Ltd. (\"21Vianet\").",
+   "accessed": "2026-08-02"
+  },
+  {
+   "title": "Azure in China regions (Microsoft Learn)",
+   "url": "https://learn.microsoft.com/en-us/azure/china/overview-regions",
+   "type": "official-postmortem",
+   "quote": "China North 3 | Yes | China East 3 * ... * This region is access restricted to support specific customer scenarios, such as in-country disaster recovery.",
+   "accessed": "2026-08-02"
+  },
+  {
+   "title": "Azure status history / Post Incident Reviews",
+   "url": "https://status.azure.com/en-us/status/history/",
+   "type": "vendor-status",
+   "quote": "[At inspection the page listed only recent PIRs - a July 23, 2026 West US preliminary PIR (\"connectivity failures, increased latency, or difficulty accessing Azure\") and two May 2026 PIRs - and no China North 3 incident.]",
+   "accessed": "2026-08-02"
+  },
+  {
+   "title": "Live TLS certificate served at status.azure.cn (21Vianet-operated infrastructure)",
+   "url": "https://status.azure.cn/en-us/status/history/",
+   "type": "official-postmortem",
+   "quote": "O=Shanghai Blue Cloud Technology Co., Ltd. ... DNS:*.chinanorth3-01.chinacloudsites.cn ... DNS:*.chinanorth3-06.chinacloudsites.cn ... DNS:*.chinanorth3.c.chinacloudsites.cn",
+   "accessed": "2026-08-02"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": false,
+  "lastVerified": "2026-08-02 (seed — pending deep research)"
+ },
+ "lastUpdated": "2026-08-02"
+}

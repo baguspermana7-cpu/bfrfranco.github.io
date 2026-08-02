@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyrusOne Aurora Cooling Failure Halts CME Group Trading (November 2025) | ResistanceZero</title>
+    <meta name="description" content="A human-error cooling-tower switchover during a cold-weather changeover triggered a chiller-plant failure and temperatures above 100°F at CyrusOne&#x27;s Aurora facility, halting CME Gr">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="ai-content-declaration" content="human-curated, sourced from public post-incident reports">
+    <meta name="author" content="Bagus Dwi Permana">
+    <link rel="canonical" href="https://resistancezero.com/incident-cyrusone-cme-chicago-cooling-2025.html">
+    <meta name="theme-color" content="#0c1512">
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+    <style>
+    /* ── Governed Incident Dossier — editorial register (v2): forest-green + warm ivory,
+       serif display, evidence-class provenance. Accent vars remapped so all components
+       re-skin. AA-contrast in both themes. No gradients / glass / dot-grid (anti-slop). */
+    :root:not([data-theme="dark"]) {
+        --bg:#f4f1e7; --surface:#fffdf6; --surface-2:#efeadc; --line:rgba(26,45,36,0.16);
+        --text:#1a2d24; --text-strong:#10201a; --text-body:#3b463d; --muted:#6a7367;
+        --cyan:#2f6b4f; --amber:#87671b; --green:#2f7d54; --red:#9c3b32; --gold:#87671b;
+        --hero-ink:#f4f1e7; --hero-bg:#183329; --shadow-deep:rgba(26,45,36,0.10);
+    }
+    [data-theme="dark"] {
+        --bg:#0c1512; --surface:#11201a; --surface-2:#16281f; --line:rgba(233,229,216,0.15);
+        --text:#e9e5d8; --text-strong:#f5f2e9; --text-body:#c6ccbc; --muted:#8b9484;
+        --cyan:#6aa588; --amber:#c9a559; --green:#6aa588; --red:#cf9384; --gold:#c9a559;
+        --hero-ink:#e9e5d8; --hero-bg:#0f221a; --shadow-deep:rgba(0,0,0,0.5);
+    }
+    * { box-sizing:border-box; }
+    html,body { margin:0; padding:0; }
+    body { background:var(--bg); color:var(--text); font-family:'IBM Plex Sans',system-ui,sans-serif; line-height:1.62; }
+    a { color:var(--cyan); }
+    h1,h2,.serif { font-family:'Fraunces','Newsreader',Georgia,serif; font-weight:600; letter-spacing:-0.01em; }
+    .wrap { max-width:1120px; margin:0 auto; padding:1.5rem 1.1rem 3rem; }
+    .navbar { display:flex; align-items:center; justify-content:space-between; padding:0.7rem 1.1rem; border-bottom:1px solid var(--line); background:var(--surface); position:sticky; top:0; z-index:50; }
+    .nav-container { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:1120px; margin:0 auto; }
+    .nav-logo { display:flex; align-items:center; }
+    .nav-avatar { width:34px; height:34px; border-radius:50%; }
+    .nav-menu { display:flex; gap:1rem; list-style:none; margin:0; padding:0; }
+    .nav-menu a { color:var(--text-body); text-decoration:none; font-size:0.85rem; font-weight:600; }
+    .nav-menu a:hover { color:var(--cyan); }
+    .nav-right { display:flex; align-items:center; gap:0.6rem; }
+    .theme-btn { background:none; border:1px solid var(--line); color:var(--text); border-radius:4px; padding:0.35rem 0.5rem; cursor:pointer; font-size:0.8rem; }
+    .lock-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--red); border:1px solid var(--red); border-radius:2px; padding:0.12rem 0.5rem; }
+    h1 { font-size:2.4rem; color:var(--text-strong); margin:0.35rem 0 0.5rem; line-height:1.12; }
+    h2 { font-size:1.4rem; color:var(--text-strong); margin:2rem 0 0.7rem; }
+    .eyebrow { font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); }
+    .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
+    .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
+    .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:2px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    .chip.cyan { color:var(--cyan); border-left:2px solid var(--cyan); }
+    .chip.amber { color:var(--amber); border-left:2px solid var(--amber); }
+    .chip.green { color:var(--green); border-left:2px solid var(--green); }
+    .chip.red { color:var(--red); border-left:2px solid var(--red); }
+    .metabar { font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.04em; color:var(--muted); margin:0.7rem 0; display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; font-variant-numeric:tabular-nums slashed-zero; }
+    .metabar b { color:var(--text-body); font-weight:600; }
+    .metabar .sep { color:var(--line); }
+    .chip.muted { color:var(--muted); }
+    .card { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:1rem 1.1rem; margin-top:0.9rem; }
+    .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:4px; margin-top:0.9rem; }
+    table.inc-index { width:100%; border-collapse:collapse; font-size:0.86rem; min-width:760px; font-variant-numeric:tabular-nums slashed-zero; }
+    table.inc-index th { text-align:left; font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); background:var(--surface-2); }
+    table.inc-index td { padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); color:var(--text-body); vertical-align:top; }
+    table.inc-index tr:hover td { background:var(--surface-2); }
+    table.inc-index a { font-weight:700; color:var(--text-strong); text-decoration:none; }
+    table.inc-index a:hover { color:var(--cyan); text-decoration:underline; }
+    /* rich incident table (reference-2 style) */
+    table.itbl { min-width:1120px; }
+    table.itbl td { vertical-align:middle; }
+    .itr { cursor:pointer; }
+    .itr:hover td { background:var(--surface-2); }
+    .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
+    .c-title { max-width:300px; }
+    .c-title .itt { display:block; font-weight:700; color:var(--text-strong); text-decoration:none; font-size:0.9rem; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .itr:hover .itt { color:var(--cyan); }
+    .c-title .its { color:var(--muted); font-size:0.76rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:0.1rem; }
+    .sev-chip { font-family:'JetBrains Mono',monospace; font-size:0.66rem; font-weight:600; padding:0.12rem 0.5rem; border-radius:2px; border:1px solid; white-space:nowrap; }
+    .sev-b-critical { color:var(--red); border-color:var(--red); }
+    .sev-b-high { color:var(--amber); border-color:var(--amber); }
+    .sev-b-medium { color:var(--green); border-color:var(--green); }
+    .sev-b-low { color:var(--muted); border-color:var(--line); }
+    .st-chip { font-family:'JetBrains Mono',monospace; font-size:0.64rem; padding:0.12rem 0.45rem; border-radius:2px; border:1px solid var(--line); white-space:nowrap; }
+    .st-off { color:var(--green); border-color:color-mix(in srgb, var(--green) 45%, var(--line)); }
+    .st-press { color:var(--amber); border-color:color-mix(in srgb, var(--amber) 45%, var(--line)); }
+    .c-region { min-width:170px; }
+    .c-region .iflag { font-size:1.05rem; margin-right:0.45rem; vertical-align:middle; }
+    .c-region .ireg { display:inline-flex; flex-direction:column; vertical-align:middle; }
+    .c-region .ireg b { color:var(--text-body); font-weight:600; font-size:0.82rem; }
+    .c-region .ireg i { color:var(--muted); font-style:normal; font-size:0.72rem; }
+    .c-mono { font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--text-body); white-space:nowrap; }
+    .c-blast { color:var(--text-strong); font-weight:600; } .c-blast .c-u { color:var(--muted); font-weight:400; font-size:0.68rem; }
+    .ibars { display:inline-flex; gap:2px; }
+    .ibars i { width:7px; height:9px; border-radius:1px; display:block; }
+    .itags { display:flex; gap:0.25rem; max-width:150px; flex-wrap:wrap; }
+    .c-go { color:var(--muted); font-size:1rem; text-align:center; }
+    .itr:hover .c-go { color:var(--cyan); }
+    /* incident-view tabs (List / Risk map / Semantic / Analytics) */
+    .iv-tabs { display:flex; gap:1.2rem; border-bottom:1px solid var(--line); margin:0.4rem 0 0.2rem; flex-wrap:wrap; }
+    .iv-tabs a { font-family:'JetBrains Mono',monospace; font-size:0.74rem; letter-spacing:0.03em; color:var(--muted); text-decoration:none; padding:0.5rem 0.1rem; border-bottom:2px solid transparent; }
+    .iv-tabs a:hover { color:var(--text-strong); }
+    .iv-tabs a.on { color:var(--text-strong); border-bottom-color:var(--cyan); }
+    .rank-badge { font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--amber); font-variant-numeric:tabular-nums slashed-zero; }
+    .mag-bar { height:5px; border-radius:0; background:var(--line); margin-top:0.35rem; overflow:hidden; }
+    .mag-bar > span { display:block; height:4px; background:var(--amber); }
+    ul.tight { margin:0.4rem 0 0; padding-left:1.15rem; }
+    ul.tight li { color:var(--text-body); margin:0.3rem 0; font-size:0.92rem; }
+    .soe { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .soe li { display:grid; grid-template-columns:170px 1fr; gap:0.7rem; padding:0.5rem 0; border-bottom:1px solid var(--line); }
+    .soe time { font-family:'JetBrains Mono',monospace; font-size:0.76rem; color:var(--muted); font-variant-numeric:tabular-nums slashed-zero; }
+    .soe .ev { color:var(--text-body); font-size:0.9rem; }
+    .phase-chip { font-family:'JetBrains Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--amber); border:1px solid var(--line); border-radius:2px; padding:0.05rem 0.4rem; margin-right:0.4rem; white-space:nowrap; font-variant-numeric:tabular-nums; }
+    table.metrics { width:100%; border-collapse:collapse; font-size:0.88rem; font-variant-numeric:tabular-nums slashed-zero; }
+    table.metrics td { padding:0.5rem 0.7rem; border-bottom:1px solid var(--line); vertical-align:top; }
+    table.metrics .mlabel { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; width:38%; white-space:nowrap; }
+    table.metrics .mval { color:var(--text-body); }
+    .ca-block { background:var(--surface); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 2px 2px 0; padding:0.7rem 1rem; margin-top:0.7rem; }
+    .ca-block h3 { margin:0 0 0.3rem; font-size:0.92rem; color:var(--text-strong); }
+    .ca-block p { margin:0; color:var(--text-body); font-size:0.9rem; }
+    /* reading column — constrain prose to a comfortable measure, justified like RZ articles */
+    .reading-col { max-width:820px; margin:0 auto; }
+    .reading-col p.lede, .reading-col .card p, .reading-col .ca-block p, .reading-col ul.tight li { text-align:justify; -webkit-hyphens:auto; hyphens:auto; }
+    .card p { margin:0; }
+    .card > p + p, .card p + p { margin-top:0.7rem; }
+    .mag-trace { font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--text-body); background:var(--surface-2); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 2px 2px 0; padding:0.5rem 0.7rem; margin-top:0.5rem; font-variant-numeric:tabular-nums slashed-zero; }
+    .mag-trace b { color:var(--text-strong); }
+    .imp-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.04em; text-transform:uppercase; color:var(--cyan); font-weight:700; margin-right:0.35rem; }
+    .coe-meta { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); background:var(--surface-2); border:1px solid var(--line); border-radius:2px; padding:0.05rem 0.4rem; margin-left:0.2rem; white-space:normal; }
+    /* FAQ / methodology */
+    details.faq { border:1px solid var(--line); border-radius:4px; background:var(--surface); margin:0.8rem 0 0.4rem; }
+    details.faq > summary { cursor:pointer; padding:0.7rem 0.9rem; font-family:'JetBrains Mono',monospace; font-size:0.74rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-strong); list-style:none; }
+    details.faq > summary::-webkit-details-marker { display:none; }
+    details.faq > summary::before { content:"+ "; color:var(--cyan); }
+    details.faq[open] > summary::before { content:"– "; }
+    details.faq .faq-body { padding:0 0.9rem 0.9rem; }
+    details.faq h4 { font-family:'Fraunces',Georgia,serif; font-size:0.98rem; color:var(--text-strong); margin:0.8rem 0 0.2rem; }
+    details.faq p, details.faq li { color:var(--text-body); font-size:0.88rem; }
+    /* share bar (RZ standard) — editorial thin buttons */
+    .share-buttons { display:flex; align-items:center; gap:0.5rem; margin:1.4rem 0 0.4rem; padding-top:1rem; border-top:1px solid var(--line); }
+    .share-label { font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin-right:0.2rem; }
+    .share-btn { width:32px; height:32px; display:inline-flex; align-items:center; justify-content:center; background:var(--surface-2); border:1px solid var(--line); border-radius:4px; color:var(--text-body); cursor:pointer; padding:0; }
+    .share-btn:hover { border-color:var(--cyan); color:var(--cyan); }
+    .share-btn svg { width:15px; height:15px; }
+    /* ── inline-SVG visualizations (theme-aware via vars) ── */
+    .inc-map { height:410px; margin-top:0.4rem; border:1px solid var(--line); border-radius:4px; overflow:hidden; background:#0f1a16; z-index:1; }
+    .inc-map .leaflet-container { background:#0f1a16; font-family:'IBM Plex Sans',sans-serif; }
+    .inc-map .leaflet-popup-content-wrapper { background:#12211b !important; color:#e6efe9 !important; border:1px solid #2c4438 !important; border-radius:10px !important; box-shadow:0 8px 24px rgba(0,0,0,0.45) !important; }
+    .inc-map .leaflet-popup-tip { background:#12211b !important; border:1px solid #2c4438 !important; }
+    .inc-map .leaflet-popup-content { margin:9px 12px !important; }
+    .inc-map .leaflet-control-attribution { background:rgba(15,26,22,0.8) !important; color:#7d8f86 !important; font-size:9px !important; }
+    .inc-map .leaflet-control-attribution a { color:#9fb3a8 !important; }
+    .inc-map .leaflet-bar a { background:#12211b !important; color:#cfe0d7 !important; border-color:#2c4438 !important; }
+    .leaflet-tooltip.inc-tip { background:#12211b; color:#e6efe9; border:1px solid #2c4438; border-radius:3px; font-family:'JetBrains Mono',monospace; font-size:0.66rem; padding:2px 7px; box-shadow:0 6px 18px rgba(0,0,0,0.5); }
+    .leaflet-tooltip.inc-tip:before { border-top-color:#2c4438; }
+    /* ── Incident Intelligence dashboard (editorial, no neon) ── */
+    .iid { margin:1.4rem 0 1rem; }
+    .iid-head { display:flex; align-items:flex-end; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin-bottom:0.9rem; }
+    .iid-title { font-size:1.6rem; margin:0; color:var(--text-strong); }
+    .iid-sub { margin:0.15rem 0 0; color:var(--muted); font-size:0.86rem; }
+    .iid-range { font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.05em; color:var(--muted); border:1px solid var(--line); border-radius:3px; padding:0.3rem 0.6rem; white-space:nowrap; }
+    .iid-num { font-variant-numeric:tabular-nums slashed-zero; }
+    .iid-kpis { display:grid; grid-template-columns:repeat(5,1fr); gap:0.7rem; margin-bottom:0.9rem; }
+    .iid-kpi { background:var(--surface); border:1px solid var(--line); border-top:2px solid var(--cyan); border-radius:0 0 4px 4px; padding:0.75rem 0.85rem; transition:transform 0.18s ease, box-shadow 0.18s ease; }
+    .iid-kpi:hover { transform:translateY(-2px); box-shadow:0 10px 24px var(--shadow-deep); }
+    .iid-kpi-l { font-family:'JetBrains Mono',monospace; font-size:0.62rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); }
+    .iid-kpi-v { display:flex; align-items:baseline; gap:0.3rem; margin:0.25rem 0 0.15rem; }
+    .iid-kpi-v .iid-num, .iid-kpi-v > span:first-child { font-family:'Fraunces',Georgia,serif; font-size:1.8rem; font-weight:600; color:var(--text-strong); line-height:1; }
+    .iid-kpi-u { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .iid-kpi-s { font-size:0.72rem; color:var(--muted); }
+    .iid-grid { display:grid; grid-template-columns:290px 1fr 300px; gap:0.9rem; align-items:start; }
+    .iid-col-l, .iid-col-c, .iid-col-r { display:flex; flex-direction:column; gap:0.9rem; min-width:0; }
+    .iid-panel { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0.85rem 0.95rem; }
+    .iid-panel-map { padding:0.85rem 0.95rem 0.6rem; }
+    .iid-panel-map .inc-map { height:360px; margin-top:0.5rem; }
+    .iid-ph { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin-bottom:0.5rem; }
+    .iid-note { font-size:0.74rem; color:var(--muted); margin:0 0 0.5rem; }
+    .iid-donut-wrap { display:flex; align-items:center; gap:0.9rem; }
+    .iid-donut { width:130px; height:130px; flex:0 0 auto; }
+    .iid-arc { transition:stroke-dasharray 0.9s cubic-bezier(0.22,1,0.36,1); }
+    .iid-donut-c { font-family:'Fraunces',Georgia,serif; font-size:19px; font-weight:600; fill:var(--text-strong); }
+    .iid-donut-t { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.1em; text-transform:uppercase; fill:var(--muted); }
+    .iid-legend { list-style:none; margin:0; padding:0; flex:1; min-width:0; }
+    .iid-legend li { display:flex; align-items:center; gap:0.45rem; font-size:0.82rem; color:var(--text-body); padding:0.16rem 0; }
+    .iid-legend b { margin-left:auto; color:var(--text-strong); font-family:'JetBrains Mono',monospace; font-size:0.82rem; }
+    .iid-legend .iid-pct { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.72rem; width:2.4em; text-align:right; }
+    .iid-dot { width:9px; height:9px; border-radius:50%; flex:0 0 auto; }
+    .iid-catbars, .iid-durbars, .iid-sigs { list-style:none; margin:0; padding:0; }
+    .iid-catbars li, .iid-durbars li, .iid-sigs li { display:grid; grid-template-columns:1fr 90px auto; align-items:center; gap:0.5rem; padding:0.24rem 0; font-size:0.82rem; }
+    .iid-sigs li { grid-template-columns:1fr 64px auto auto; }
+    .iid-catbars li { cursor:pointer; }
+    .iid-catbars li:hover .iid-cbl { color:var(--cyan); }
+    .iid-cbl, .iid-dbl, .iid-sig-n { color:var(--text-body); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .iid-cbar, .iid-dbar, .iid-sig-bar { height:7px; background:var(--surface-2); border-radius:0; overflow:hidden; }
+    .iid-cbar i, .iid-sig-bar i { display:block; height:100%; width:var(--w); background:var(--amber); transform:scaleX(0); transform-origin:left; transition:transform 0.9s cubic-bezier(0.22,1,0.36,1); }
+    .iid-dbar i { display:block; height:100%; width:var(--w); background:var(--cyan); transform:scaleX(0); transform-origin:left; transition:transform 0.9s cubic-bezier(0.22,1,0.36,1); }
+    .iid-in .iid-cbar i, .iid-in .iid-dbar i, .iid-in .iid-sig-bar i { transform:scaleX(1); }
+    .iid-catbars b, .iid-durbars b, .iid-sigs b { font-family:'JetBrains Mono',monospace; color:var(--text-strong); font-size:0.82rem; text-align:right; }
+    .iid-durbars b { color:var(--muted); }
+    .iid-sig-m { font-family:'JetBrains Mono',monospace; font-size:0.66rem; color:var(--muted); }
+    .iid-recent { display:flex; flex-direction:column; }
+    .iid-rec { display:flex; align-items:center; gap:0.55rem; padding:0.45rem 0; border-bottom:1px solid var(--line); text-decoration:none; }
+    .iid-rec:last-child { border-bottom:none; }
+    .iid-rec-sev { width:8px; height:8px; border-radius:50%; flex:0 0 auto; }
+    .iid-rec-b { display:flex; flex-direction:column; min-width:0; flex:1; }
+    .iid-rec-t { color:var(--text-strong); font-size:0.84rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .iid-rec:hover .iid-rec-t { color:var(--cyan); }
+    .iid-rec-m { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.68rem; }
+    .iid-rec-tag { font-family:'JetBrains Mono',monospace; font-size:0.58rem; letter-spacing:0.04em; padding:0.1rem 0.35rem; border:1px solid var(--line); border-radius:2px; flex:0 0 auto; }
+    .sev-critical { background:var(--red); } .iid-rec-tag.sev-critical { color:var(--red); background:transparent; border-color:var(--red); }
+    .sev-high { background:var(--amber); } .iid-rec-tag.sev-high { color:var(--amber); background:transparent; border-color:var(--amber); }
+    .sev-medium { background:var(--green); } .iid-rec-tag.sev-medium { color:var(--green); background:transparent; border-color:var(--green); }
+    .sev-low { background:var(--muted); } .iid-rec-tag.sev-low { color:var(--muted); background:transparent; border-color:var(--line); }
+    .iid-graph { width:100%; height:auto; display:block; }
+    .iid-edge { stroke:var(--line); stroke-width:1; opacity:0.55; transition:stroke 0.15s, opacity 0.15s; }
+    .iid-edge.on { stroke:var(--cyan); opacity:0.9; stroke-width:1.3; }
+    .iid-node circle { transition:transform 0.15s ease, opacity 0.15s; transform-origin:center; }
+    .iid-node:hover circle { stroke:var(--text-strong); stroke-width:1.4; }
+    .iid-graph.iid-focus .iid-node.dim circle { opacity:0.22; }
+    .iid-maplegend { display:flex; flex-wrap:wrap; gap:0.4rem 1rem; margin-top:0.5rem; font-family:'JetBrains Mono',monospace; font-size:0.66rem; color:var(--muted); }
+    .iid-maplegend span { display:inline-flex; align-items:center; gap:0.35rem; }
+    .iid-maplegend i { width:10px; height:10px; border-radius:50%; }
+    .iid-maplegend .iid-mln { font-style:italic; opacity:0.8; }
+    .iid-foot { display:flex; flex-wrap:wrap; gap:0.5rem 1.4rem; align-items:center; margin-top:0.9rem; padding-top:0.8rem; border-top:1px solid var(--line); font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .iid-foot b { color:var(--text-body); font-weight:600; margin-right:0.3rem; }
+    .iid-foot-link { margin-left:auto; color:var(--cyan); text-decoration:none; }
+    @media (max-width:1000px){ .iid-grid { grid-template-columns:1fr; } .iid-kpis { grid-template-columns:repeat(2,1fr); } }
+    @media (max-width:520px){ .iid-kpis { grid-template-columns:1fr 1fr; } .iid-kpi-v .iid-num, .iid-kpi-v > span:first-child { font-size:1.5rem; } }
+    @media (prefers-reduced-motion:reduce){ .iid-arc,.iid-cbar i,.iid-dbar i,.iid-sig-bar i,.iid-kpi,.iid-node circle,.iid-edge { transition:none !important; } .iid-cbar i,.iid-dbar i,.iid-sig-bar i { transform:scaleX(1); } }
+    .viz { overflow-x:auto; margin-top:0.9rem; background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0.9rem 1rem; }
+    .viz svg { display:block; max-width:100%; height:auto; }
+    .viz-radar svg { max-width:320px; margin:0 auto; }
+    .vz-num { font-variant-numeric:tabular-nums slashed-zero; }
+    .vz-box-t, .vz-box-s, .vz-lbl, .vz-hb-lbl, .vz-tl-t, .vz-pt, .vz-tick { pointer-events:auto; }
+    .vz-grid { fill:none; stroke:var(--line); stroke-width:1; }
+    .vz-accent-fill { fill:var(--cyan); fill-opacity:0.16; stroke:var(--cyan); stroke-width:1.4; }
+    .vz-accent-dot { fill:var(--cyan); }
+    .vz-accent-bar { fill:var(--cyan); }
+    .vz-cat-bar { fill:var(--amber); }
+    .vz-lbl { font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--muted); }
+    .vz-box-trigger { fill:color-mix(in srgb, var(--red) 12%, var(--surface)); stroke:var(--red); stroke-width:1.2; }
+    .vz-box-fault { fill:color-mix(in srgb, var(--amber) 12%, var(--surface)); stroke:var(--amber); stroke-width:1.2; }
+    .vz-box-down { fill:color-mix(in srgb, var(--cyan) 10%, var(--surface)); stroke:var(--cyan); stroke-width:1; }
+    .vz-box-t { font-family:'IBM Plex Sans',sans-serif; font-size:11px; font-weight:600; fill:var(--text-strong); }
+    .vz-box-s { font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--muted); }
+    .vz-flow { stroke:var(--muted); stroke-width:1.3; fill:none; }
+    .vz-arrhead { fill:var(--muted); }
+    .vz-tl-ph { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.04em; text-transform:uppercase; fill:var(--amber); }
+    .vz-tl-t { font-family:'JetBrains Mono',monospace; font-size:8.5px; fill:var(--muted); }
+    .vz-hb-lbl { font-family:'IBM Plex Sans',sans-serif; font-size:11px; fill:var(--text-body); }
+    .vz-hb-val { font-family:'JetBrains Mono',monospace; font-size:10px; fill:var(--muted); font-variant-numeric:tabular-nums slashed-zero; }
+    .vz-tick { font-family:'JetBrains Mono',monospace; font-size:8.5px; fill:var(--muted); }
+    .vz-quad { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.05em; text-transform:uppercase; fill:var(--muted); opacity:0.7; }
+    .vz-pt { font-family:'JetBrains Mono',monospace; font-size:8px; fill:var(--text-body); }
+    .viz a { text-decoration:none; }
+    .viz a:hover .vz-pt { fill:var(--cyan); font-weight:600; }
+    .viz a:hover circle { stroke:var(--text-strong); stroke-width:1.4; }
+    .vz-legend { display:flex; flex-wrap:wrap; gap:0.5rem 1.1rem; margin-top:0.7rem; padding-top:0.6rem; border-top:1px solid var(--line); }
+    .vz-key { display:inline-flex; align-items:center; gap:0.4rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .vz-key i { width:11px; height:11px; border-radius:50%; display:inline-block; }
+    .vz-key-note { font-style:italic; opacity:0.8; }
+    .viz-grid3 { display:grid; grid-template-columns:1fr 1fr; gap:0.9rem; }
+    @media (max-width:720px){ .viz-grid3 { grid-template-columns:1fr; } }
+    .filterbar { display:flex; flex-wrap:wrap; align-items:center; gap:0.4rem 0.6rem; margin:0.9rem 0 0.2rem; }
+    .fb-group { display:flex; flex-wrap:wrap; gap:0.35rem; }
+    .fb-chip { font-family:'JetBrains Mono',monospace; font-size:0.72rem; padding:0.28rem 0.6rem; border-radius:2px; border:1px solid var(--line); background:var(--surface); color:var(--text-body); cursor:pointer; }
+    .fb-chip:hover { border-color:var(--cyan); }
+    .fb-chip.active { background:var(--surface-2); border-color:var(--line); border-bottom:2px solid var(--cyan); color:var(--text-strong); font-weight:700; }
+    .fb-search { flex:1 1 200px; min-width:160px; font-family:'IBM Plex Sans',sans-serif; font-size:0.82rem; padding:0.3rem 0.6rem; border-radius:4px; border:1px solid var(--line); background:var(--surface); color:var(--text); }
+    .fb-count { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); margin-left:auto; }
+    .kv { display:grid; grid-template-columns:180px 1fr; gap:0.5rem 0.9rem; margin-top:0.5rem; font-size:0.9rem; }
+    .kv dt { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; }
+    .kv dd { margin:0; color:var(--text-body); }
+    .refs { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .refs li { padding:0.55rem 0; border-bottom:1px solid var(--line); }
+    .refs .rtitle { color:var(--text-strong); font-weight:600; font-size:0.9rem; }
+    .refs .rquote { color:var(--muted); font-size:0.84rem; font-style:italic; margin-top:0.2rem; display:block; }
+    .refs a { font-size:0.78rem; word-break:break-all; }
+    .backlink { display:inline-block; margin-bottom:0.6rem; font-size:0.82rem; color:var(--cyan); text-decoration:none; }
+    footer { border-top:1px solid var(--line); margin-top:2.5rem; padding:1.4rem 1.1rem; text-align:center; }
+    footer .ver { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .disclaimer { font-size:0.76rem; color:var(--muted); margin-top:0.8rem; max-width:80ch; }
+    .skip-link { position:absolute; top:-50px; left:0; background:var(--cyan); color:var(--hero-bg); padding:10px 20px; text-decoration:none; font-weight:600; z-index:10000; border-radius:0 0 4px 0; transition:top 0.2s; }
+    .skip-link:focus { top:0; }
+    .root-gate { position:fixed; inset:0; z-index:99999; display:none; align-items:center; justify-content:center; background:rgba(2,6,23,0.74); padding:1rem; backdrop-filter:blur(6px); }
+    body.locked .root-gate { display:flex; }
+    body.locked .wrap { filter:blur(4px); pointer-events:none; user-select:none; }
+    .root-card { max-width:430px; width:100%; background:var(--surface); border:1px solid var(--cyan); border-radius:4px; padding:1.3rem 1.15rem; text-align:center; box-shadow:0 18px 36px var(--shadow-deep); }
+    .root-card h2 { margin:0 0 0.4rem; font-size:1.1rem; color:var(--text-strong); }
+    .root-card p { font-size:0.86rem; color:var(--text-body); }
+    .root-actions { margin-top:0.9rem; display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; }
+    .root-actions button, .root-actions a { border-radius:4px; padding:0.5rem 0.85rem; font-size:0.8rem; font-weight:700; border:1px solid var(--line); text-decoration:none; cursor:pointer; color:var(--text); font-family:inherit; }
+    .root-actions button { background:var(--cyan); color:var(--hero-bg); border:none; }
+    .rz-nav-burger { display:none; }
+    /* v1.8.0 — mobile responsive patch */
+    @media (max-width:768px) {
+        html,body { overflow-x:hidden; max-width:100vw; }
+        img { max-width:100%; height:auto; display:block; }
+        .nav-menu, .nav-links { display:none; }
+        .navbar { padding:0.5rem 0.75rem; }
+        footer .footer-grid { grid-template-columns:1fr; gap:1.25rem; padding:1rem; }
+        button, a.btn, [role="button"] { min-height:44px; }
+        h1 { font-size:1.4rem; }
+        .soe li { grid-template-columns:1fr; gap:0.15rem; }
+        .kv { grid-template-columns:1fr; }
+        .root-card { max-width:92vw; }
+    }
+    @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
+</style>
+    
+</head>
+<body class="locked">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <nav class="navbar"><div class="nav-container">
+        <a href="index.html" class="nav-logo"><img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dc-incidents.html">DC Incidents</a></li>
+            <li><a href="datacenter-solutions.html">DC Solutions</a></li>
+        </ul>
+        <div class="nav-right">
+            <span class="lock-tag" title="Root-only module">ROOT</span>
+            <button class="theme-btn" id="themeToggle" type="button" aria-label="Toggle theme">◐</button>
+        </div>
+    </div></nav>
+    <main class="wrap" id="main-content">
+        <div class="reading-col">
+        <a class="backlink" href="dc-incidents.html">← All incidents</a>
+        <div class="eyebrow">Incident dossier · Rank #24</div>
+        <h1>CyrusOne Aurora Cooling Failure Halts CME Group Trading (November 2025)</h1>
+        <div class="chips">
+            <span class="chip">CyrusOne (tenant: CME Group)</span>
+            <span class="chip cyan">2025-11-01</span>
+            <span class="chip amber">11h 0m core impact</span>
+            <span class="chip cyan">Cooling</span><span class="chip red">Human error</span>
+        </div>
+        <p class="lede">A human-error cooling-tower switchover during a cold-weather changeover triggered a chiller-plant failure and temperatures above 100°F at CyrusOne&#x27;s Aurora facility, halting CME Group&#x27;s global futures and options trading for more than ten hours.</p>
+
+        <h2>Failure cascade</h2>
+        <div class="viz viz-cascade"><svg viewBox="0 0 760 158" role="img" aria-label="Failure cascade block diagram"><title>Failure cascade: trigger → fault → downstream impact</title><defs><marker id="ic-ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path class="vz-arrhead" d="M0,0 L6,3 L0,6 Z"/></marker></defs><text class="vz-tl-ph" x="8" y="12">Trigger</text><text class="vz-tl-ph" x="248" y="12">Primary fault</text><text class="vz-tl-ph" x="516" y="12">Downstream impact</text><rect class="vz-box-trigger" x="8" y="51.0" width="176" height="56" rx="2"><title>Trigger — Cooling (2025-11-01)</title></rect><text class="vz-box-t" x="18" y="68.0">Trigger · Cooling</text><text class="vz-box-s" x="18" y="82.0"><title>2025-11-01</title>2025-11-01</text><rect class="vz-box-fault" x="240" y="51.0" width="224" height="56" rx="2"><title>Primary fault at CyrusOne (tenant: CME Group) — CyrusOne Aurora (Chicago-area)</title></rect><text class="vz-box-t" x="250" y="68.0">CyrusOne</text><text class="vz-box-s" x="250" y="82.0"><title>CyrusOne Aurora (Chicago-area)</title>CyrusOne Aurora</text><line class="vz-flow" x1="184" y1="79.0" x2="238" y2="79.0" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="26" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: CME Globex futures/options trading</title></rect><text class="vz-box-t" x="526" y="43">CME Globex futures/options</text><text class="vz-box-t" x="526" y="56">trading…</text><line class="vz-flow" x1="464" y1="79.0" x2="514" y2="44" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="70" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Market data feeds</title></rect><text class="vz-box-t" x="526" y="87">Market data feeds</text><line class="vz-flow" x1="464" y1="79.0" x2="514" y2="88" marker-end="url(#ic-ar)"/></svg></div>
+        <p class="disclaimer">Trigger → primary fault → downstream blast radius, derived from the sourced root cause and affected-services record.</p>
+
+        <h2>Facility &amp; location</h2>
+        <dl class="kv">
+            <dt>Operator</dt><dd>CyrusOne (tenant: CME Group)</dd>
+            <dt>Data center</dt><dd>CyrusOne Aurora (Chicago-area)</dd>
+            <dt>Location</dt><dd>Aurora, Illinois, United States</dd>
+            <dt>Date</dt><dd>2025-11-01</dd>
+        </dl>
+
+        <h2>Impact &amp; scale</h2>
+        <dl class="kv">
+            <dt>Users affected</dt><dd>Global derivatives market participants; CME futures/options across equities, rates, FX, commodities</dd>
+            <dt>Financial</dt><dd>Market-wide trading halt; direct loss not published</dd>
+            <dt>Scope</dt><dd>Sev-1 facility cooling loss (&gt;10h trading halt)</dd>
+        </dl>
+        <div class="card"><strong>Services / systems down</strong><ul class="tight"><li>CME Globex futures/options trading</li><li>Market data feeds</li></ul></div>
+        <h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Total outage duration</td><td class="mval">~11 hours (reported &#x27;over 11 hours&#x27;)</td></tr><tr><td class="mlabel">Cooling units affected</td><td class="mval">&#x27;multiple cooling units&#x27; (common-mode; exact count not disclosed)</td></tr><tr><td class="mlabel">Aurora campus IT capacity</td><td class="mval">109 MW across 3 data centers, 450,000 sq ft</td></tr><tr><td class="mlabel">Corrective capacity added</td><td class="mval">&#x27;additional redundancy to the cooling systems&#x27; (tonnage not disclosed)</td></tr><tr><td class="mlabel">Peak data-hall temperature (reported)</td><td class="mval">&gt;100degF (UNVERIFIED - not disclosed by CyrusOne; from a secondary incident summary)</td></tr><tr><td class="mlabel">EBS markets resume time</td><td class="mval">~07:00 ET, 2025-11-28 (not independently reconfirmed)</td></tr><tr><td class="mlabel">Full market reopen time</td><td class="mval">~08:30 ET, 2025-11-28 (not independently reconfirmed)</td></tr><tr><td class="mlabel">Aurora sale-leaseback (2016)</td><td class="mval">~$130 million, 15-year term (UNVERIFIED facility-profile detail)</td></tr><tr><td class="mlabel">Financial fallout</td><td class="mval">CyrusOne reportedly postponed/halted a bond sale after the failure</td></tr></tbody></table></div>
+
+        <h2>Magnitude profile</h2>
+        <div class="viz viz-radar"><svg viewBox="0 0 290 215" role="img" aria-label="Magnitude sub-scores radar chart"><title>Magnitude sub-scores (0–10)</title><polygon class="vz-grid" points="145.0,83.2 166.8,105.0 145.0,126.8 123.2,105.0"/><polygon class="vz-grid" points="145.0,62.1 187.9,105.0 145.0,147.9 102.1,105.0"/><polygon class="vz-grid" points="145.0,41.0 209.0,105.0 145.0,169.0 81.0,105.0"/><line class="vz-grid" x1="145" y1="105" x2="145.0" y2="41.0"/><line class="vz-grid" x1="145" y1="105" x2="209.0" y2="105.0"/><line class="vz-grid" x1="145" y1="105" x2="145.0" y2="169.0"/><line class="vz-grid" x1="145" y1="105" x2="81.0" y2="105.0"/><polygon class="vz-accent-fill" points="145.0,66.6 196.2,105.0 145.0,143.4 100.2,105.0"><title>Magnitude sub-scores (0–10)</title></polygon><circle class="vz-accent-dot" cx="145.0" cy="66.6" r="2.4"/><circle class="vz-accent-dot" cx="196.2" cy="105.0" r="2.4"/><circle class="vz-accent-dot" cx="145.0" cy="143.4" r="2.4"/><circle class="vz-accent-dot" cx="100.2" cy="105.0" r="2.4"/><text class="vz-lbl vz-num" x="145.0" y="20.0" text-anchor="middle">Users 6<title>Users affected (0–10) — breadth of the user/customer population impacted. — scored 6/10.</title></text><text class="vz-lbl vz-num" x="223.0" y="109.0" text-anchor="start">Financial 8<title>Financial impact (0–10) — direct + consequential cost. — scored 8/10.</title></text><text class="vz-lbl vz-num" x="145.0" y="198.0" text-anchor="middle">Duration 6<title>Outage duration (0–10) — how long service was degraded/down. — scored 6/10.</title></text><text class="vz-lbl vz-num" x="67.0" y="109.0" text-anchor="end">Blast 7<title>Blast radius (0–10) — how wide the fault propagated across systems/regions. — scored 7/10.</title></text></svg></div>
+        <div class="mag-trace">Magnitude <b>6.8</b> = blast 7×0.35 + users 6×0.25 + financial 8×0.20 + duration 6×0.20 <span style="opacity:0.7">(sub-scores 0–10 · weighted composite)</span></div>
+        <p class="disclaimer">Global futures/options market halt &gt;10h from a cooling-plant failure — sub-scores ESTIMATED from public impact reporting, pending deep research.</p>
+
+        <h2>Sequence of events (SOE)</h2>
+        <div class="viz viz-timeline"><svg viewBox="0 0 1420 96" role="img" aria-label="Sequence-of-events timeline"><title>Phased sequence of events</title><line class="vz-grid" x1="30" y1="48" x2="1390" y2="48"/><circle class="vz-accent-dot" cx="30" cy="48" r="4.5"><title>2025-11-27 evening (CT) · TRIGGER — On the live approach to a hard freeze in the Chicago suburbs (Thanksgiving-window reopen), onsite staff and contractors began preparing/draining CHI1&#x27;s cooling towers for freezing weather but failed to follow standard procedures for the winterization changeover (CyrusOne, confirmed to Bloomberg).</title></circle><text class="vz-tl-ph" x="30" y="30" text-anchor="middle">TRIGGER</text><text class="vz-tl-t" x="30" y="68" text-anchor="middle">2025-11-27 evening (C</text><circle class="vz-accent-dot" cx="127" cy="48" r="4.5"><title>2025-11-27 evening (CT) · CASCADE — The procedural lapse induced a chiller-plant failure: CHI1 &#x27;experienced a chiller plant failure affecting multiple cooling units&#x27; - a common-mode trip taking more than one unit offline at once.</title></circle><text class="vz-tl-ph" x="127" y="30" text-anchor="middle">CASCADE</text><text class="vz-tl-t" x="127" y="68" text-anchor="middle">2025-11-27 evening (C</text><circle class="vz-accent-dot" cx="224" cy="48" r="4.5"><title>2025-11-27 evening (CT) · CASCADE — Chilled-water circulation to the data halls was lost; against ~109MW of IT capacity with low thermal mass, rack-inlet/room temperatures began climbing (a widely-cited summary reports &gt;100degF; not disclosed by CyrusOne).</title></circle><text class="vz-tl-ph" x="224" y="30" text-anchor="middle">CASCADE</text><text class="vz-tl-t" x="224" y="68" text-anchor="middle">2025-11-27 evening (C</text><circle class="vz-accent-dot" cx="321" cy="48" r="4.5"><title>2025-11-27 late evening (CT) · DETECTION — Thermal detection (not fire): plant/building monitoring (BMS/DCIM) and rising room/rack temperatures would have driven high-temperature alarms as the chiller plant failed. No accessible source states the exact minute the high-temp threshold tripped.</title></circle><text class="vz-tl-ph" x="321" y="30" text-anchor="middle">DETECTION</text><text class="vz-tl-t" x="321" y="68" text-anchor="middle">2025-11-27 late evening (C</text><circle class="vz-accent-dot" cx="419" cy="48" r="4.5"><title>2025-11-27 late evening (ET) · MITIGATION — Protective compute shutdown: to stop generating heat and protect hardware, CME&#x27;s trading systems (Globex and related markets) were halted/failed over - an &#x27;evacuation of compute&#x27; rather than any occupant evacuation (unmanned mechanical failure, no life-safety event).</title></circle><text class="vz-tl-ph" x="419" y="30" text-anchor="middle">MITIGATION</text><text class="vz-tl-t" x="419" y="68" text-anchor="middle">2025-11-27 late evening (E</text><circle class="vz-accent-dot" cx="516" cy="48" r="4.5"><title>2025-11-27/28 overnight · IMPACT — Global markets knocked out: the halt prevented traders from accessing futures prices for commodities and stocks across CME Group&#x27;s derivatives markets (specific benchmark list per trade reporting: S&amp;P 500, Nasdaq, Treasuries, WTI, gold, Nikkei, palm oil - not independently reconfirmed).</title></circle><text class="vz-tl-ph" x="516" y="30" text-anchor="middle">IMPACT</text><text class="vz-tl-t" x="516" y="68" text-anchor="middle">2025-11-27/28 ov</text><circle class="vz-accent-dot" cx="613" cy="48" r="4.5"><title>2025-11-27/28 overnight · MITIGATION — CME issued a public notice that its markets were halted due to a cooling issue at the CyrusOne data center and that it was working to resolve the issue (exact wording attributed to trade reporting, not independently reconfirmed).</title></circle><text class="vz-tl-ph" x="613" y="30" text-anchor="middle">MITIGATION</text><text class="vz-tl-t" x="613" y="68" text-anchor="middle">2025-11-27/28 ov</text><circle class="vz-accent-dot" cx="710" cy="48" r="4.5"><title>2025-11-27/28 overnight · MITIGATION — Emergency MECHANICAL response (no fire department / 911): CyrusOne mobilized engineering teams and contractors on-site to restart chillers and reconstitute chilled-water circulation.</title></circle><text class="vz-tl-ph" x="710" y="30" text-anchor="middle">MITIGATION</text><text class="vz-tl-t" x="710" y="68" text-anchor="middle">2025-11-27/28 ov</text><circle class="vz-accent-dot" cx="807" cy="48" r="4.5"><title>2025-11-27/28 overnight · MITIGATION — No suppression discharge occurred or was needed (no fire); the &#x27;suppression analogue&#x27; - the cooling plant - had failed. Redundancy/backup cooling did not carry the load, forcing an orderly thermal de-rating/shutdown of IT.</title></circle><text class="vz-tl-ph" x="807" y="30" text-anchor="middle">MITIGATION</text><text class="vz-tl-t" x="807" y="68" text-anchor="middle">2025-11-27/28 ov</text><circle class="vz-accent-dot" cx="904" cy="48" r="4.5"><title>2025-11-28 early hours · RECOVERY — Chillers restarted at limited capacity and cooling reconstituted to rebuild chilled-water circulation to a stable state (any &#x27;temporary/supplemental chillers and pipework&#x27; detail is attributed to DC Pulse and is unverified).</title></circle><text class="vz-tl-ph" x="904" y="30" text-anchor="middle">RECOVERY</text><text class="vz-tl-t" x="904" y="68" text-anchor="middle">2025-11-28 early</text><circle class="vz-accent-dot" cx="1001" cy="48" r="4.5"><title>2025-11-28 ~07:00 ET · RECOVERY — EBS markets resumed trading as chilled-water circulation stabilized enough to bring IT load back safely (resume time per CNBC; not independently reconfirmed).</title></circle><text class="vz-tl-ph" x="1001" y="30" text-anchor="middle">RECOVERY</text><text class="vz-tl-t" x="1001" y="68" text-anchor="middle">2025-11-28 ~07:00 E</text><circle class="vz-accent-dot" cx="1099" cy="48" r="4.5"><title>2025-11-28 ~08:30 ET · RESTORED — Stock futures and options trading fully reopened; CME reported all its markets were open and trading (per CNBC; not independently reconfirmed).</title></circle><text class="vz-tl-ph" x="1099" y="30" text-anchor="middle">RESTORED</text><text class="vz-tl-t" x="1099" y="68" text-anchor="middle">2025-11-28 ~08:30 E</text><circle class="vz-accent-dot" cx="1196" cy="48" r="4.5"><title>2025-11-28 by ~13:35 GMT · RESTORED — Trading in FX, stock and bond futures had resumed after being knocked out for roughly/over 11 hours; regulators (CFTC and SEC) reportedly aware and monitoring (per Reuters; not independently reconfirmed).</title></circle><text class="vz-tl-ph" x="1196" y="30" text-anchor="middle">RESTORED</text><text class="vz-tl-t" x="1196" y="68" text-anchor="middle">2025-11-28 by ~13:35 GM</text><circle class="vz-accent-dot" cx="1293" cy="48" r="4.5"><title>2025-11-28 onward · RECOVERY — CyrusOne reported it had &#x27;restored stable and secure operations at its Chicago 1 (CHI1) data center in Aurora, Illinois&#x27; and &#x27;installed additional redundancy to the cooling systems.&#x27;</title></circle><text class="vz-tl-ph" x="1293" y="30" text-anchor="middle">RECOVERY</text><text class="vz-tl-t" x="1293" y="68" text-anchor="middle">2025-11-28 onwar</text><circle class="vz-accent-dot" cx="1390" cy="48" r="4.5"><title>2025-12 (early) · IMPACT — Financial/reputational fallout: CyrusOne reportedly postponed/halted a bond sale after the data-center failure that disrupted CME, and confirmed to Bloomberg the ~11-hour outage was caused by human error.</title></circle><text class="vz-tl-ph" x="1390" y="30" text-anchor="middle">IMPACT</text><text class="vz-tl-t" x="1390" y="68" text-anchor="middle">2025-12 (early)</text></svg></div>
+        <ul class="soe"><li><time>2025-11-27 evening (CT)</time><span class="ev"><span class="phase-chip">TRIGGER</span> On the live approach to a hard freeze in the Chicago suburbs (Thanksgiving-window reopen), onsite staff and contractors began preparing/draining CHI1&#x27;s cooling towers for freezing weather but failed to follow standard procedures for the winterization changeover (CyrusOne, confirmed to Bloomberg).</span></li><li><time>2025-11-27 evening (CT)</time><span class="ev"><span class="phase-chip">CASCADE</span> The procedural lapse induced a chiller-plant failure: CHI1 &#x27;experienced a chiller plant failure affecting multiple cooling units&#x27; - a common-mode trip taking more than one unit offline at once.</span></li><li><time>2025-11-27 evening (CT)</time><span class="ev"><span class="phase-chip">CASCADE</span> Chilled-water circulation to the data halls was lost; against ~109MW of IT capacity with low thermal mass, rack-inlet/room temperatures began climbing (a widely-cited summary reports &gt;100degF; not disclosed by CyrusOne).</span></li><li><time>2025-11-27 late evening (CT)</time><span class="ev"><span class="phase-chip">DETECTION</span> Thermal detection (not fire): plant/building monitoring (BMS/DCIM) and rising room/rack temperatures would have driven high-temperature alarms as the chiller plant failed. No accessible source states the exact minute the high-temp threshold tripped.</span></li><li><time>2025-11-27 late evening (ET)</time><span class="ev"><span class="phase-chip">MITIGATION</span> Protective compute shutdown: to stop generating heat and protect hardware, CME&#x27;s trading systems (Globex and related markets) were halted/failed over - an &#x27;evacuation of compute&#x27; rather than any occupant evacuation (unmanned mechanical failure, no life-safety event).</span></li><li><time>2025-11-27/28 overnight</time><span class="ev"><span class="phase-chip">IMPACT</span> Global markets knocked out: the halt prevented traders from accessing futures prices for commodities and stocks across CME Group&#x27;s derivatives markets (specific benchmark list per trade reporting: S&amp;P 500, Nasdaq, Treasuries, WTI, gold, Nikkei, palm oil - not independently reconfirmed).</span></li><li><time>2025-11-27/28 overnight</time><span class="ev"><span class="phase-chip">MITIGATION</span> CME issued a public notice that its markets were halted due to a cooling issue at the CyrusOne data center and that it was working to resolve the issue (exact wording attributed to trade reporting, not independently reconfirmed).</span></li><li><time>2025-11-27/28 overnight</time><span class="ev"><span class="phase-chip">MITIGATION</span> Emergency MECHANICAL response (no fire department / 911): CyrusOne mobilized engineering teams and contractors on-site to restart chillers and reconstitute chilled-water circulation.</span></li><li><time>2025-11-27/28 overnight</time><span class="ev"><span class="phase-chip">MITIGATION</span> No suppression discharge occurred or was needed (no fire); the &#x27;suppression analogue&#x27; - the cooling plant - had failed. Redundancy/backup cooling did not carry the load, forcing an orderly thermal de-rating/shutdown of IT.</span></li><li><time>2025-11-28 early hours</time><span class="ev"><span class="phase-chip">RECOVERY</span> Chillers restarted at limited capacity and cooling reconstituted to rebuild chilled-water circulation to a stable state (any &#x27;temporary/supplemental chillers and pipework&#x27; detail is attributed to DC Pulse and is unverified).</span></li><li><time>2025-11-28 ~07:00 ET</time><span class="ev"><span class="phase-chip">RECOVERY</span> EBS markets resumed trading as chilled-water circulation stabilized enough to bring IT load back safely (resume time per CNBC; not independently reconfirmed).</span></li><li><time>2025-11-28 ~08:30 ET</time><span class="ev"><span class="phase-chip">RESTORED</span> Stock futures and options trading fully reopened; CME reported all its markets were open and trading (per CNBC; not independently reconfirmed).</span></li><li><time>2025-11-28 by ~13:35 GMT</time><span class="ev"><span class="phase-chip">RESTORED</span> Trading in FX, stock and bond futures had resumed after being knocked out for roughly/over 11 hours; regulators (CFTC and SEC) reportedly aware and monitoring (per Reuters; not independently reconfirmed).</span></li><li><time>2025-11-28 onward</time><span class="ev"><span class="phase-chip">RECOVERY</span> CyrusOne reported it had &#x27;restored stable and secure operations at its Chicago 1 (CHI1) data center in Aurora, Illinois&#x27; and &#x27;installed additional redundancy to the cooling systems.&#x27;</span></li><li><time>2025-12 (early)</time><span class="ev"><span class="phase-chip">IMPACT</span> Financial/reputational fallout: CyrusOne reportedly postponed/halted a bond sale after the data-center failure that disrupted CME, and confirmed to Bloomberg the ~11-hour outage was caused by human error.</span></li></ul>
+
+        <h2>Root cause</h2>
+        <div class="card">PRIMARY EQUIPMENT / FAILURE MECHANISM. This was a loss-of-cooling (thermal) event, not a fire — no ignition source, no combustion. The failed system was the primary water-cooled CHILLER PLANT serving CyrusOne&#x27;s CHI1 (Chicago 1 / &quot;CH1&quot;) data center in Aurora, Illinois. In CyrusOne&#x27;s own words the CHI1 facility &quot;experienced a chiller plant failure affecting multiple cooling units&quot; (CyrusOne statement, relayed by DatacenterDynamics). Multiple cooling units dropped offline together, chilled-water circulation to the data halls was lost, and rack-inlet/room temperatures rose until CME Group&#x27;s trading engines had to be halted to protect hardware.
+
+STATED ROOT CAUSE — HUMAN / PROCEDURAL (CONFIRMED). CyrusOne confirmed to Bloomberg that the ~11-hour outage was caused by human error: onsite staff and contractors failed to follow standard procedures when DRAINING/PREPARING the cooling towers ahead of freezing weather (CyrusOne to Bloomberg, via DatacenterDynamics). It occurred on the Thanksgiving-window reopen (evening of Nov 27, 2025, into Nov 28) as a hard freeze approached the Chicago suburbs. The confirmed mechanism is specifically the cooling-tower freeze-preparation/draining step being mishandled — which cascaded into a chiller-plant trip taking multiple cooling units offline. The fault sits in operating-procedure execution during a seasonal cold-weather changeover, not equipment age or a design defect. NOTE: the widely-repeated exact phrasing &quot;preparing the cooling towers for freezing temperatures&quot; is a paraphrase; the confirmed source wording describes staff/contractors failing to follow standard procedures when DRAINING cooling towers ahead of freezing weather.
+
+LATENT / SYSTEMIC ROOT. First, MECHANICAL REDUNDANCY DID NOT CARRY THE LOAD: a single procedural lapse during freeze-prep took &quot;multiple cooling units&quot; down at once with no effective backup cooling path — a common-mode failure that a fault-tolerant plant with procedurally diverse changeover steps should have survived. CyrusOne&#x27;s own remedy — it &quot;installed additional redundancy to the cooling systems&quot; (CyrusOne, confirmed verbatim via DCD) — is an admission that pre-incident backup cooling did not save the load. Second, CONCENTRATION RISK: CME ran globally-critical matching engines out of the single Aurora campus, so one plant&#x27;s thermal failure halted worldwide futures/options price discovery. No chiller make/model, refrigerant, unit age, or the exact hydraulic detail (frozen tower basin, condenser-water freeze, free-cooling/glycol changeover valve, or low-ambient lockout) has been publicly disclosed — the confirmed record stops at the mishandled cooling-tower freeze-preparation.</div>
+
+        <h2>Contributing factors</h2>
+        <ul class="tight"><li>PROCEDURAL EXECUTION FAILURE DURING FREEZE-PREP (root, CONFIRMED): CyrusOne confirmed to Bloomberg that onsite staff and contractors failed to follow standard procedures when draining/preparing the cooling towers ahead of freezing weather (via DatacenterDynamics) - a seasonal cold-weather changeover mishandled on the live approach to a hard freeze.</li><li>INADEQUATE / COMMON-MODE MECHANICAL REDUNDANCY: a single procedural lapse took &#x27;multiple cooling units&#x27; offline at once with no backup cooling carrying the load, evidenced by CyrusOne&#x27;s post-incident fix of having &#x27;installed additional redundancy to the cooling systems&#x27; (confirmed verbatim via DCD) - i.e. the fault-tolerant protection a resilient plant should have provided was effectively absent for this failure mode.</li><li>COLD-WEATHER / SEASONAL-TRANSITION TIMING RISK: the failure hit during a hard-freeze approach in the Chicago suburbs on the Thanksgiving-window reopen (evening of Nov 27, into Nov 28), a known high-risk winterization window for water-cooled tower plants, executed under live IT load (CyrusOne statement; DCD).</li><li>SINGLE-SITE CONCENTRATION OF CRITICAL WORKLOAD: CME&#x27;s matching engines ran from the single Aurora campus, so one plant&#x27;s thermal failure halted global futures/options price discovery - a concentration-risk / missing geographic-diversity theme raised in trade commentary (attributed to DC Pulse; that specific commentary could not be independently re-fetched).</li><li>CONTRACTOR-BOUNDARY / CHANGE-MANAGEMENT GAP: the lapse spanned both onsite personnel and contractors, implying a method-statement / supervision boundary where the freeze-prep steps were not verified - though no accessible source names the specific procedure document, the contracting firm, or which checklist step was skipped (disclosed uncertainty; CyrusOne via Bloomberg/DCD).</li></ul>
+
+        <h2>Correction of errors (COE)</h2>
+        <ul class="tight"><li>Rebuild cooling-tower freeze-prep/winterization SOP as a checklist-gated changeover with independent two-person sign-off and seasonal dry-run <span class="coe-meta">CyrusOne Critical Facilities Operations · Not publicly confirmed (implied by stated root cause; only the redundancy fix was disclosed)</span></li><li>Install additional redundancy to the CHI1 cooling systems <span class="coe-meta">CyrusOne · Done (CyrusOne confirmed it &#x27;installed additional redundancy to the cooling systems&#x27;)</span></li><li>Restore stable and secure operations at CHI1 Aurora <span class="coe-meta">CyrusOne · Done (CyrusOne confirmed restored stable and secure operations)</span></li><li>Impose change-management controls (method statements, supervision, two-person verify) at the contractor boundary for live freeze-prep <span class="coe-meta">CyrusOne / contracting firm · Not publicly confirmed</span></li><li>Pursue geographically diverse cooling/power architecture for critical matching engines and review single-site concentration <span class="coe-meta">CME Group · Open / not publicly confirmed</span></li><li>Wire thermal early-warning to automated IT load-shed thresholds (BMS/DCIM) <span class="coe-meta">CyrusOne / CME · Open / not publicly confirmed</span></li><li>Regulatory awareness and market-integrity review of the outage <span class="coe-meta">CFTC / SEC · Reported aware/monitoring per Reuters (not independently reconfirmed)</span></li></ul>
+
+        <h2>Lessons learnt</h2>
+        <ul class="tight"><li>A cooling plant is a single point of failure equal to any power system: a mishandled seasonal winterization step - not equipment age or a fire - halted a global exchange for ~11 hours, so freeze-prep is a critical, life-of-the-facility procedure, not routine maintenance.</li><li>Redundancy that shares a common human/procedural mode is not redundancy: one mis-sequenced changeover took &#x27;multiple cooling units&#x27; offline together, and the operator&#x27;s after-the-fact addition of redundancy is proof the pre-incident backup path did not carry the load.</li><li>Concentration risk is systemic risk: running globally-critical matching engines from one campus means one plant&#x27;s thermal failure becomes worldwide market downtime - geographic diversity is a resilience requirement, not a luxury.</li><li>Contractor-boundary work needs the tightest change control: because the lapse spanned staff and contractors, method statements, supervision, and independent verification must gate any live-load seasonal switchover.</li><li>Detection must be wired to protection: rising hall temperatures should auto-trigger load-shed/throttling before safe inlet limits are crossed, rather than relying on a downstream tenant (CME) to halt compute to save the hardware.</li><li>Public disclosure was partial: the operator confirmed human error and &#x27;multiple cooling units&#x27; but never released chiller counts, refrigerant, peak sensor temperatures, or mobile-cooling tonnage - post-incidents should not be reconstructed as if those undisclosed specifics are established fact.</li></ul>
+
+        <h2>Improvements &amp; remediation</h2>
+        <ul class="tight"><li><span class="imp-tag">Maintenance</span>Rebuild the cooling-tower freeze-prep / winterization procedure as a verified, checklist-gated seasonal changeover with independent two-person sign-off - CyrusOne&#x27;s own confirmed root cause is that staff and contractors failed to follow standard procedures when draining/preparing the cooling towers ahead of freezing weather, so procedure EXECUTION and verification, not just the document, must be hardened.</li><li><span class="imp-tag">Design</span>Provide genuine common-mode-resistant mechanical redundancy (N+1/N+2 with procedurally diverse changeover steps) plus pre-staged rapid-response mobile cooling - implementing the very fix CyrusOne applied after the fact (it &#x27;installed additional redundancy to the cooling systems&#x27;).</li><li><span class="imp-tag">Process</span>Institute change-management controls at the contractor boundary for any live freeze-prep switchover - approved method statements, on-site supervision, and a two-person verify step - since the lapse spanned both onsite personnel and contractors and no verification caught the mis-sequenced changeover before multiple units tripped.</li><li><span class="imp-tag">Safety</span>Tighten thermal early-warning and automated load-shed thresholds (BMS/DCIM high-temp alarms tied to protective IT throttling) so a chiller-plant trip is caught and heat load shed before halls exceed safe inlet temperatures - closing detection-to-protection latency.</li><li>Design/Resilience: For globally-critical workloads such as exchange matching engines, pursue redundant, geographically diverse cooling and power architectures so a single site&#x27;s thermal failure cannot halt worldwide price discovery.</li><li>Maintenance/Assurance: Run a pre-winter commissioning and dry-run of the full freeze-prep sequence each season, with an independent audit of tower drain-down, basin-heater energization, and free-cooling/glycol valve line-ups before the first hard freeze.</li></ul>
+
+        <h2>Comprehensive analysis</h2><div class="ca-block"><h3>What happened</h3><p>On the evening of Nov 27, 2025 (into Nov 28), CyrusOne&#x27;s CHI1 (Chicago 1 / &#x27;CH1&#x27;) data center in Aurora, Illinois &#x27;experienced a <span data-explain="chiller" tabindex="0">chiller</span> plant failure affecting multiple cooling units&#x27; (CyrusOne, confirmed via DatacenterDynamics). Chilled-water cooling to the halls was lost as a hard freeze approached the Chicago suburbs, and CME Group - a tenant whose trading engines run from the campus - halted its markets to protect hardware. Trading resumed after roughly 11 hours. This was a loss-of-cooling (thermal) event, not a fire: there was no ignition, combustion, or suppression discharge.</p></div><div class="ca-block"><h3>Why it happened (root and latent causes)</h3><p>CyrusOne confirmed to Bloomberg the outage was caused by human error - onsite staff and contractors failed to follow standard procedures when draining/preparing the cooling towers ahead of freezing weather. Beneath that sit two latent gaps: (1) common-mode redundancy failure, since one mis-sequenced changeover took &#x27;multiple cooling units&#x27; down together with no effective backup path - later confirmed by CyrusOne &#x27;installing additional redundancy to the cooling systems&#x27;; and (2) single-site concentration of globally-critical workload. No chiller make/model, refrigerant, unit age, or exact hydraulic detail was disclosed.</p></div><div class="ca-block"><h3>Why it mattered (impact and concentration risk)</h3><p>Because CME&#x27;s matching engines run from the single Aurora campus, a plant-level thermal failure became worldwide market downtime - traders lost access to futures prices for commodities and stocks across CME Group&#x27;s derivatives markets for ~11 hours. Trade reporting listed benchmarks including S&amp;P 500, Nasdaq, Treasuries, WTI, gold, Nikkei and palm oil (not independently reconfirmed here). The event also carried financial/reputational fallout: CyrusOne reportedly postponed a bond sale afterward (Bloomberg; not independently reconfirmed).</p></div><div class="ca-block"><h3>Response and recovery</h3><p>There was no suppression system to activate - the cooling plant itself was the failed &#x27;suppression analogue.&#x27; Recovery was mechanical and manual: chillers were restarted at limited capacity and chilled-water circulation reconstituted until IT - and CME&#x27;s markets - could be brought back in stages (EBS ~07:00 ET, full reopen ~08:30 ET per CNBC, not reconfirmed). CyrusOne then reported it &#x27;restored stable and secure operations at its Chicago 1 (CHI1) data center&#x27; and &#x27;installed additional redundancy to the cooling systems&#x27; (both confirmed verbatim).</p></div><div class="ca-block"><h3>Verification status and source limitations</h3><p>This review directly re-confirmed, via a reader-proxy to DatacenterDynamics relaying CyrusOne&#x27;s statements: the CHI1/Aurora location, the &#x27;chiller plant failure affecting multiple cooling units&#x27; phrasing, the human-error root cause tied to cooling-tower freeze-prep, the ~11-hour duration, the 109MW / 450,000 sq ft / 3-DC campus profile, and the two CyrusOne quotes on restored operations and added redundancy. It could NOT re-fetch Bloomberg, Reuters, CNBC or DC Pulse (bot-block/CAPTCHA) - so precise resume times, the CFTC/SEC line, the benchmark product list, the bond-sale detail, the $130M/15-year sale-leaseback, the &gt;100degF temperature, and the &#x27;temporary and supplemental chillers and pipework&#x27; phrase remain cited-but-not-independently-reconfirmed and, where noted, unverified.</p></div>
+
+        <h2>Technical deep-dive</h2>
+        <div class="card">MECHANISM OF A COLD-WEATHER CHILLER-PLANT FAILURE. Paradoxically, this data-center thermal event was triggered by COLD, not heat. Water-cooled chiller plants reject heat through cooling towers that evaporate water to open air. When ambient temperatures approach and cross freezing, exposed condenser-water in tower basins, fill, and outdoor pipework can freeze, and the plant must be transitioned for cold weather — basins drained or heated, valves switched to free-cooling/glycol loops, flows and setpoints reconfigured — following a defined freeze-prep procedure. CyrusOne&#x27;s confirmed account is that this changeover was executed incorrectly by onsite personnel and contractors who failed to follow standard procedures when preparing/draining the cooling towers ahead of freezing weather, and that this procedural lapse produced a chiller-plant failure affecting multiple cooling units (CyrusOne to Bloomberg, via DCD). The word &quot;multiple&quot; is the critical forensic signal: this was a COMMON-MODE trip, in which one mis-sequenced changeover simultaneously compromised more than one unit rather than a single random component failure that redundancy could absorb.
+
+THERMAL CASCADE INTO IT. Data halls have low thermal mass relative to their heat load; against the campus&#x27;s 109MW IT capacity, tens of megawatts of server heat with no chilled water raises room and rack-inlet temperatures within minutes. A widely-cited incident summary reports hall temperatures exceeding 100°F, but CyrusOne did NOT disclose a per-sensor peak — treat &gt;100°F as an unverified reported figure, not a confirmed measurement. As inlet air crossed safe thresholds, the correct protective response is exactly what happened: shed the heat source. CME halted its trading systems — effectively an &quot;evacuation of compute&quot; — to stop generating heat and protect hardware while cooling was reconstituted, rather than risk mass server thermal damage.
+
+RECONSTITUTION OF COOLING. There was no suppression system to activate because there was no fire; the &quot;suppression analogue&quot; — the cooling plant — was the very thing that failed. Recovery was mechanical and manual: chillers were restarted at limited capacity and cooling reconstituted until chilled-water circulation was stable enough to bring IT load — and CME&#x27;s markets — back online in stages, with all trading resumed after roughly 11 hours. CyrusOne subsequently &quot;installed additional redundancy to the cooling systems&quot; and reported it &quot;restored stable and secure operations&quot; at CHI1 (both confirmed verbatim via DCD). NOTE ON UNCERTAINTY: no accessible primary source gives the exact minute the high-temperature threshold tripped, the peak hall temperature by sensor, the number of chillers affected versus total installed, or any mobile-chiller tonnage; the phrase &quot;temporary and supplemental chillers and pipework&quot; is attributed to a secondary trade blog (DC Pulse) that could not be re-fetched and does NOT appear in CyrusOne&#x27;s DCD-relayed statement, so it is treated as unverified.</div>
+
+        <h2>References &amp; provenance</h2>
+        <ul class="refs"><li><span class="chip muted">press</span> <span class="rtitle">DatacenterDynamics - CME data-center shutdown attributable to human error (relaying CyrusOne/Bloomberg)</span><span class="rquote">“a chiller plant failure affecting multiple cooling units; staff and contractors failed to follow standard procedures when draining cooling towers ahead of freezing weather”</span><a href="https://www.datacenterdynamics.com/en/news/cme-data-center-shutdown-attributable-to-human-error-report/" target="_blank" rel="noopener nofollow">https://www.datacenterdynamics.com/en/news/cme-data-center-shutdown-attributable-to-human-error-report/</a></li><li><span class="chip muted">press</span> <span class="rtitle">DatacenterDynamics - After CME outage, CyrusOne adds backup cooling capacity (relaying CyrusOne)</span><span class="rquote">“CyrusOne has restored stable and secure operations at its Chicago 1 (CHI1) data center in Aurora, Illinois”</span><a href="https://www.datacenterdynamics.com/en/news/after-cme-outage-cyrusone-adds-backup-cooling-capacity/" target="_blank" rel="noopener nofollow">https://www.datacenterdynamics.com/en/news/after-cme-outage-cyrusone-adds-backup-cooling-capacity/</a></li></ul>
+        <p class="disclaimer">Sourced from public post-incident reports. Quotes are short attributed excerpts for provenance only; the analysis above is original and substantially shorter than its sources. Last verified 2026-08-02 (seed — pending deep research).</p>
+        <aside class="share-buttons" aria-label="Share this dossier"><span class="share-label">Share</span><button class="share-btn" onclick="rzShare('li')" aria-label="Share on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 11 0-4.124 2.062 2.062 0 010 4.124zM7.119 20.452H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg></button><button class="share-btn" onclick="rzShare('x')" aria-label="Share on X" title="X"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></button><button class="share-btn" onclick="rzShare('wa')" aria-label="Share on WhatsApp" title="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347M12.05 21.785h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884"/></svg></button><button class="share-btn" onclick="rzShare('copy',this)" aria-label="Copy link" title="Copy link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></aside><script>function rzShare(k,btn){var u=encodeURIComponent(location.href),t=encodeURIComponent(document.title);if(k==="li")open("https://www.linkedin.com/sharing/share-offsite/?url="+u,"_blank","noopener");else if(k==="x")open("https://twitter.com/intent/tweet?url="+u+"&text="+t,"_blank","noopener");else if(k==="wa")open("https://wa.me/?text="+t+"%20"+u,"_blank","noopener");else if(k==="copy"){navigator.clipboard&&navigator.clipboard.writeText(location.href);if(btn){var o=btn.getAttribute("title");btn.setAttribute("title","Copied");setTimeout(function(){btn.setAttribute("title",o);},1500);}}}</script>
+        </div>
+
+    </main>
+    <footer><div class="footer-grid"></div><span class="ver" id="versionStamp"></span></footer>
+    <div class="root-gate">
+        <div class="root-card">
+            <h2>Root access required</h2>
+            <p>The DC Incidents dossier is a root-only module. Sign in with an authorized account to continue.</p>
+            <div class="root-actions">
+                <button id="rootLoginBtn" type="button">Sign In</button>
+                <a href="index.html">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/rz-version.js?v=2026-08-01-gloss"></script>
+    <script src="js/rz-feature-flags.js?v=2026-08-01-gloss" defer></script>
+    <script src="auth.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-mobile-nav.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-cookie-consent.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-explain-db.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-explain.js?v=2026-08-01-gloss" defer></script>
+    <script>
+    (function(){var t=document.getElementById('themeToggle');function a(theme){document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme);var m=document.querySelector('meta[name=\"theme-color\"]');if(m)m.setAttribute('content',theme==='dark'?'#0c1512':'#f4f1e7');}a(localStorage.getItem('theme')||'dark');if(t)t.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme');a(c==='dark'?'light':'dark');});})();
+    (function(){function ag(){if(window._rzAuth&&typeof window._rzAuth.enforceTierFeatureAccess==='function'){window._rzAuth.enforceTierFeatureAccess('dc-incidents');}else{try{var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');var r=s&&s.role,t=s&&s.tier;var passes=!!s&&(r==='root'||t==='root');document.body.classList.toggle('locked',!passes);}catch(e){document.body.classList.add('locked');}}}var b=document.getElementById('rootLoginBtn');if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showRootGatePrompt==='function'){window._rzAuth.showRootGatePrompt('Root account required for the DC Incidents dossier.');}else if(window._rzAuth&&typeof window._rzAuth.showModal==='function'){window._rzAuth.showModal();}});window.addEventListener('rz-auth-change',function(){setTimeout(ag,50);});window.addEventListener('storage',function(e){if(e.key==='rz_premium_session')ag();});ag();setTimeout(ag,60);setTimeout(ag,550);setTimeout(ag,1600);})();
+    (function(){var el=document.getElementById('versionStamp');if(!el)return;var v=window.RZ_VERSION||'1.x.x',d=window.RZ_VERSION_DATE||'',cn=window.RZ_VERSION_CODENAME||'';el.textContent='· ResistanceZero · v'+v+(d?' · '+d:'')+(cn?' · '+cn:'')+' ·';})();
+    (function(){var n=0;function sc(){if(window.RZExplain&&window.RZExplain.scanText&&window.RZ_EXPLAIN_DB){var m=document.getElementById('main-content');if(m)window.RZExplain.scanText(m,140);}else if(n++<40){setTimeout(sc,200);}}setTimeout(sc,350);})();
+    </script>
+
+</body>
+</html>

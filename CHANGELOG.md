@@ -13,6 +13,31 @@ release sections rather than semver.
 
 ---
 
+## v1.125.1 — 2026-08-02 (DC Incidents — +11 incidents & reference-2 incident table)
+
+### Added — 11 new incidents (library 25 → 36)
+Cross-referenced the owner's ranked incident lists against the corpus and researched the
+genuinely-missing majors via the deep-forensic Workflow (Opus, 30 agents, ~1.7M tokens, public
+sources only — no intranet): **Rogers Canada nationwide 2022** (ACL-filter removal → 900k-route
+core flood, CRTC/Xona-sourced), **CyrusOne/CME Chicago cooling 2025** (>10h futures halt),
+**Cloudflare June-2022 19-DC config**, **Google Council Bluffs arc-flash 2022**, **London heatwave
+Google/Oracle 2022**, **X/Twitter Oregon power-cabinet fire 2025**, **Digital Realty LA fire
+2023**, **Digital Realty Singapore Li-ion fire 2024**, **Azure China North-3 ~50h 2024**, **Azure
+West-US-2 thermal 2026**, **Virginia Data-Center-Alley heat-dome 2022**. Each a full forensic
+dossier (14–17-step SOE, ≥8 metrics, grouped improvements); 6 official-postmortem-backed, 5 left
+honestly `false` (undetermined ignition / aggregate / press-only). The ranking, dashboard, map,
+and vector index all take them in automatically.
+
+### Changed — incident list redesigned (reference-2 style)
+The "All incidents" table is now a rich, aligned registry: **Incident ID · Title + subtitle ·
+Severity chip · Status (Official RCA / Press-sourced) · flag + data-center/region · Start ·
+Duration · Blast /10 · Impact bars · Tags**, rows click through to the dossier. Added **view tabs**
+(Overview / Risk map / Semantic map / Incident list) as scroll-anchors. Editorial theme, no neon.
+
+Root-gated. Gates: incidents-corpus 36/36, page-gates CLEAN, script-tags CLEAN, visual-QA clean.
+
+---
+
 ## v1.125.0 — 2026-08-02 (DC Incidents — "Incident Intelligence" hero dashboard)
 
 Added a full **Incident Intelligence dashboard** as the opening hero of the root-gated hub

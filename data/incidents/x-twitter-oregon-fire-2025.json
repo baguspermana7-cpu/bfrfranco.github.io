@@ -1,0 +1,290 @@
+{
+ "slug": "x-twitter-oregon-fire-2025",
+ "title": "X (Twitter) Oregon Data-Center Power-Cabinet Fire (May 2025)",
+ "operator": "X (Twitter) / Digital Realty",
+ "operatorShort": "Digital Realty",
+ "dcName": "Digital Realty Oregon facility (Hillsboro/Portland)",
+ "location": {
+  "city": "Hillsboro, Oregon",
+  "country": "United States"
+ },
+ "date": "2025-05-24",
+ "durationMin": 2880,
+ "category": [
+  "fire",
+  "power"
+ ],
+ "severity": {
+  "usersAffected": "Global X (Twitter) users, intermittent over several days",
+  "impactUsd": "Reported equipment loss ~$260k; platform/revenue impact not published",
+  "servicesDown": [
+   "X (Twitter) platform (intermittent, multi-day)"
+  ],
+  "tier": "Facility fire, platform-wide"
+ },
+ "brief": "A fire that began inside a power cabinet at a Digital Realty Oregon facility hosting X (Twitter) caused multi-day intermittent global outages of the platform; reported equipment loss was modest but the platform blast radius was large.",
+ "magnitude": {
+  "blastRadiusScore": 6,
+  "usersScore": 6,
+  "financialScore": 4,
+  "durationScore": 5,
+  "note": "Power-cabinet fire caused multi-day intermittent global X outages — sub-scores ESTIMATED from public impact reporting, pending deep research."
+ },
+ "rootCause": "The fire originated inside a single piece of equipment: a Schneider Electric Galaxy VX 250 kVA 400/480V uninterruptible-power-supply power cabinet — model GVXP250KD, designated \"240 UPSA2 Power Cabinet 1\" — standing in Room \"UPSA 240\" (57 ft x 30 ft, ~1,700 sq ft) on the SECOND FLOOR of Digital Realty's Hillsboro facility (the PDX11-area campus X leases). The cabinet was white steel, roughly 6.5 ft tall x 2 ft wide x 3 ft deep, and — critically — it was \"still energized\" when Hillsboro Fire & Rescue arrived. Deputy Fire Commissioner and investigator Mike Mahar's report (filed June 24, 2025, relayed by CRN) placed the origin unambiguously inside 240 UPSA2 Power Cabinet 1.\n\nThe exact failure mechanism is officially UNDETERMINED. Per CRN quoting the report: \"the ignition source was undetermined. The first fuel ignited was undetermined, although likely the plastic combustible components of the power cabinet.\" Mahar could not rule out electrical or mechanical failure inside the cabinet as a cause. So the physical narrative that survives verification is an internal fault (electrical or mechanical) that ignited the cabinet's own plastic internal components, which then burned — NOT a confirmed battery-cell thermal runaway. Early responder framing referenced \"a battery set\" and containment \"to the battery set there,\" but the formal report re-characterised the origin as the UPS power cabinet itself with first fuel most likely the cabinet's plastic internals. The report did not specify battery chemistry, and the cabinet's age is not stated in any public source — these are disclosed gaps, not inferences.\n\nThe latent root cause cannot honestly be pinned to a maintenance, inspection, or testing lapse, because the public record contains none. The investigation returned UNDETERMINED and did not attribute the fire to deferred service, an energized-work procedure, a thermal-scan omission, or human error; no source reports the cabinet's PM history, battery-replacement interval, infrared-inspection records, or any open work order at ignition. Maintenance culpability is therefore neither established nor excluded — it is simply absent, and this dossier will not manufacture one. What CAN be named as latent contributors are (a) a single-room UPS topology whose loss was sufficient to knock a global platform offline, indicating the blast-radius risk sat in the power/redundancy design rather than in fire size (equipment damage was only ~$250,000), and (b) the fact that the cabinet remained energized during active fire, which forced a slower manual-suppression response and points to an isolation/de-energisation design or procedure that could not quickly make the unit safe.",
+ "technicalDeepDive": "The forensic centre of this incident is a paradox: a physically small fire (~$250,000 equipment loss, contained to one room, zero injuries) that produced an outsized operational blast radius (a near-global, roughly day-long intermittent outage of X). Reconciling the two is the whole story.\n\nDETECTION. The room was protected by a facility fire-alarm system, and crews were summoned to find \"an electrical bank in the room ... on fire and still energized\" (CRN). The record is silent on aspirating/VESDA smoke detection, on any pre-alarm interval, and on exactly when the alarm tripped relative to ignition. Detection-to-ignition latency is therefore not computable — a disclosed gap.\n\nSUPPRESSION — THE KEY FORENSIC FINDING. There is NO evidence any fixed clean-agent, gaseous, or pre-action sprinkler system activated. The blaze was knocked down MANUALLY: crews \"used several CO2 and dry-chem [dry-chemical] extinguishers to keep the fire under control while waiting for the system to be de-energized\" (CRN). The working reason hand-suppression was chosen is that the cabinet was \"still energized,\" making water or agent flooding unsafe until electrical isolation — firefighters were holding, not extinguishing, and were gated on de-energisation. This is the single most operationally significant physical fact: the response was throttled by the inability to quickly kill power to a burning cabinet. The report as quoted does not name who de-energised the system or how long isolation took — another disclosed gap — but the sequencing (hold with extinguishers, then full suppression) shows the isolation delay directly extended the hazardous window.\n\nCONTAINMENT. The fire did not spread; per the operator, it \"had not spread to other parts of the building, but the room was full of smoke\" (idcnova). Origin was fixed inside the 240 UPSA2 cabinet in the 57' x 30' UPSA 240 room.\n\nTHE BLAST-RADIUS MECHANISM. Physically trivial, operationally severe. Losing this UPS room dropped protected power to X-serving load; DownDetector logged a significant spike (peaking near ~26,000 reports per hothardware, which I could not re-verify at the body level). The disruption \"began around 11:00 AM PT\" Thursday and was \"officially marked as resolved by 10:35 AM PT on Friday\" (techgolly), with degraded login performance persisting into Friday. The embedded lesson: resilience failed not because the fire was large but because a single power-room event was allowed to propagate to platform level.\n\nA minor data note: CRN quotes the official report at \"$250,000 in damage\"; some secondary Wired-derived coverage cites $260,000 (unverified here). Both trace to the same Hillsboro Fire & Rescue report.",
+ "sequenceOfEvents": [
+  {
+   "t": "2025-05-22 late morning PT",
+   "phase": "TRIGGER",
+   "event": "Fire ignites inside the Schneider Electric Galaxy VX 250 kVA 400/480V UPS power cabinet '240 UPSA2 Power Cabinet 1' (model GVXP250KD), Room UPSA 240 (57' x 30'), 2nd floor of Digital Realty Hillsboro (PDX11-area campus X leases).",
+   "source": "crn.com/news/data-center/2025/authorities-digital-realty-data-center-fire-began-in-schneider-electric-cabinet-but-cause-undetermined"
+  },
+  {
+   "t": "2025-05-22 ~10:21 AM PT",
+   "phase": "DETECTION",
+   "event": "Facility fire-alarm system summons Hillsboro Fire & Rescue; crews arrive and find the electrical bank 'on fire and still energized.' No VESDA/aspirating detection or pre-alarm interval is documented (disclosed gap).",
+   "source": "crn.com/news/data-center/2025/authorities-digital-realty-data-center-fire-began-in-schneider-electric-cabinet-but-cause-undetermined"
+  },
+  {
+   "t": "2025-05-22 ~10:21 AM PT",
+   "phase": "DETECTION",
+   "event": "Arrival time independently corroborated at 10:21 AM PT at Hillsboro Technology Park; Engine 6 named among responders (idcnova confirms only the 10:21 arrival; Engine 6 / energized detail from CRN).",
+   "source": "idcnova.com/news/fire-breaks-out-at-oregon-data-center-leased-by-elon-musks-x-2880"
+  },
+  {
+   "t": "2025-05-22 morning PT",
+   "phase": "MITIGATION",
+   "event": "All personnel already safely evacuated with no reported injuries; Digital Realty states 'All personnel were safely evacuated, with no reported injuries.'",
+   "source": "idcnova.com/news/fire-breaks-out-at-oregon-data-center-leased-by-elon-musks-x-2880"
+  },
+  {
+   "t": "2025-05-22 late morning PT",
+   "phase": "MITIGATION",
+   "event": "Crews HOLD the fire manually with 'several CO2 and dry-chem extinguishers to keep the fire under control while waiting for the system to be de-energized' — no fixed clean-agent or sprinkler discharge reported anywhere.",
+   "source": "crn.com/news/data-center/2025/authorities-digital-realty-data-center-fire-began-in-schneider-electric-cabinet-but-cause-undetermined"
+  },
+  {
+   "t": "2025-05-22 late morning PT",
+   "phase": "MITIGATION",
+   "event": "De-energisation of the cabinet awaited before full suppression; the report as quoted does not name who isolated the system or how long isolation took (disclosed gap).",
+   "source": "crn.com/news/data-center/2025/authorities-digital-realty-data-center-fire-began-in-schneider-electric-cabinet-but-cause-undetermined"
+  },
+  {
+   "t": "2025-05-22 morning PT",
+   "phase": "IMPACT",
+   "event": "Containment holds: the fire 'had not spread to other parts of the building, but the room was full of smoke.'",
+   "source": "idcnova.com/news/fire-breaks-out-at-oregon-data-center-leased-by-elon-musks-x-2880"
+  },
+  {
+   "t": "2025-05-22 (Thu)",
+   "phase": "IMPACT",
+   "event": "X engineering acknowledges the outage: 'We are experiencing a data center outage and the team is actively working to remediate the issue.'",
+   "source": "idcnova.com/news/fire-breaks-out-at-oregon-data-center-leased-by-elon-musks-x-2880"
+  },
+  {
+   "t": "2025-05-22 ~11:00 AM PT",
+   "phase": "CASCADE",
+   "event": "X platform disruption from the data-center power loss begins in earnest; the outage 'began around 11:00 AM PT' Thursday.",
+   "source": "techgolly.com/news/x-recovers-from-major-outage-tied-to-oregon-data-center-fire"
+  },
+  {
+   "t": "2025-05-22",
+   "phase": "IMPACT",
+   "event": "DownDetector logs a significant spike in X outage reports, peaking near ~26,000 (majority on the mobile app) as the facility power event propagates to platform level (hothardware; body not independently re-verified).",
+   "source": "hothardware.com/news/x-goes-down-fire-breaks-out-musks-oregon-data-center"
+  },
+  {
+   "t": "2025-05-22 afternoon PT",
+   "phase": "MITIGATION",
+   "event": "Firefighters remain on scene for an extended response well after arrival (specific on-scene duration not verified; earlier '~3 PM / ~4.5 hr' figure struck).",
+   "source": "hothardware.com/news/x-goes-down-fire-breaks-out-musks-oregon-data-center"
+  },
+  {
+   "t": "2025-05-22",
+   "phase": "RECOVERY",
+   "event": "Digital Realty reports the situation stabilising: 'The incident is under control, and the fire department has concluded its on-site response.'",
+   "source": "idcnova.com/news/fire-breaks-out-at-oregon-data-center-leased-by-elon-musks-x-2880"
+  },
+  {
+   "t": "2025-05-23 (Fri)",
+   "phase": "CASCADE",
+   "event": "Renewed/degraded performance the following day as the facility runs degraded; login services in particular 'are still experiencing degraded performance.'",
+   "source": "techgolly.com/news/x-recovers-from-major-outage-tied-to-oregon-data-center-fire"
+  },
+  {
+   "t": "2025-05-23 10:35 AM PT",
+   "phase": "RESTORED",
+   "event": "X outage 'officially marked as resolved by 10:35 AM PT on Friday' — roughly a 24-hour platform-level impact window from the ~11:00 AM PT Thursday start.",
+   "source": "techgolly.com/news/x-recovers-from-major-outage-tied-to-oregon-data-center-fire"
+  },
+  {
+   "t": "2025-06-24",
+   "phase": "RESTORED",
+   "event": "Hillsboro Fire & Rescue investigation (Deputy Fire Commissioner Mike Mahar) filed: origin inside 240 UPSA2 Power Cabinet 1, cause UNDETERMINED, first fuel 'likely the plastic combustible components,' ~$250,000 damage; could not rule out internal electrical or mechanical failure.",
+   "source": "crn.com/news/data-center/2025/authorities-digital-realty-data-center-fire-began-in-schneider-electric-cabinet-but-cause-undetermined"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Equipment/property damage (official report)",
+   "value": "~$250,000 (some secondary Wired-derived coverage cites $260,000, unverified here)",
+   "source": "CRN, quoting Hillsboro Fire & Rescue report"
+  },
+  {
+   "label": "Origin equipment",
+   "value": "Schneider Electric Galaxy VX 250 kVA 400/480V UPS power cabinet, model GVXP250KD ('240 UPSA2 Power Cabinet 1')",
+   "source": "CRN, quoting Hillsboro Fire & Rescue report"
+  },
+  {
+   "label": "Cabinet dimensions / room",
+   "value": "~6.5 ft x 2 ft x 3 ft, white steel; Room UPSA 240 is 57' x 30' (~1,700 sq ft), 2nd floor",
+   "source": "CRN, quoting Hillsboro Fire & Rescue report"
+  },
+  {
+   "label": "Cause determination",
+   "value": "UNDETERMINED; first fuel 'likely the plastic combustible components'; internal electrical or mechanical failure not ruled out",
+   "source": "CRN, quoting Hillsboro Fire & Rescue report"
+  },
+  {
+   "label": "Suppression method",
+   "value": "Manual only — 'several CO2 and dry-chem extinguishers'; no fixed clean-agent/sprinkler discharge reported",
+   "source": "CRN, quoting Hillsboro Fire & Rescue report"
+  },
+  {
+   "label": "Firefighter arrival time",
+   "value": "~10:21 AM PT at Hillsboro Technology Park (Engine 6 among responders)",
+   "source": "idcnova.com / CRN"
+  },
+  {
+   "label": "Personnel evacuated / injuries",
+   "value": "All personnel safely evacuated; 0 injuries",
+   "source": "idcnova.com (Digital Realty statement)"
+  },
+  {
+   "label": "Peak outage reports",
+   "value": "~26,000 (majority on the mobile app); body-level figure not independently re-verified",
+   "source": "hothardware.com"
+  },
+  {
+   "label": "Platform-impact window",
+   "value": "Began ~11:00 AM PT Thu; 'officially marked as resolved by 10:35 AM PT on Friday' (~24 hrs); Friday login degradation",
+   "source": "techgolly.com"
+  },
+  {
+   "label": "Investigation / report",
+   "value": "Deputy Fire Commissioner Mike Mahar; report filed June 24, 2025",
+   "source": "CRN"
+  },
+  {
+   "label": "Fire spread",
+   "value": "Contained to single UPS room; no building spread ('room was full of smoke')",
+   "source": "idcnova.com"
+  }
+ ],
+ "contributingFactors": [
+  "Energized-equipment hazard throttled the response: the cabinet was 'still energized' on arrival, so crews could only HOLD the fire with CO2/dry-chem hand extinguishers 'while waiting for the system to be de-energized' rather than fully suppress it (CRN, quoting the Hillsboro Fire & Rescue report). The delay to electrical isolation extended the hazardous window; no source names who isolated it or how long it took.",
+  "No fixed suppression engagement is evidenced: the verified record shows handheld CO2 and dry-chemical extinguishers, with NO clean-agent/gaseous or pre-action sprinkler activation reported by any source (CRN). Whether a fixed system was absent, inhibited by the energized state, or simply undocumented is a disclosed gap — but the fire was fought by hand.",
+  "Combustible cabinet internals as first fuel: investigator Mahar found the first fuel ignited was 'likely the plastic combustible components of the power cabinet' (CRN), meaning the equipment's own plastic internals sustained the fire once an internal fault started it.",
+  "Single-room power topology created disproportionate blast radius: loss of one UPS room (~$250,000 equipment damage) was sufficient to trigger a near-global, roughly day-long intermittent outage of X (techgolly; hothardware), indicating the redundancy/failover design — not the fire's size — drove the platform impact.",
+  "Maintenance/inspection posture is UNKNOWN, not clean: the investigation returned an UNDETERMINED cause and could not rule out internal electrical or mechanical failure (CRN); no source discloses the cabinet's PM history, battery-replacement interval, or thermal-scan records, so a maintenance lapse can be neither confirmed nor excluded.",
+  "Undetermined internal fault mechanism: the ignition source was formally undetermined (CRN), leaving open whether an electrical fault (arc, connection failure) or a mechanical failure inside the Galaxy VX cabinet initiated the fire — a root-cause ambiguity that itself hampers corrective targeting."
+ ],
+ "coe": [
+  {
+   "action": "Reduce combustible (plastic) internal fuel load in UPS power cabinets; specify low-combustibility construction on new/replacement units",
+   "owner": "Digital Realty facilities engineering / Schneider Electric",
+   "status": "Recommended (not confirmed adopted)"
+  },
+  {
+   "action": "Provision fast single-action de-energisation/isolation and cabinet-level suppression for energized UPS cabinets; joint energized-fire runbook with AHJ",
+   "owner": "Digital Realty operations + Hillsboro Fire & Rescue",
+   "status": "Recommended"
+  },
+  {
+   "action": "Validate N+1/2N power topology and automated failover so a single UPS-room loss cannot drop platform-serving load; run failover drill",
+   "owner": "X (Twitter) infrastructure + Digital Realty",
+   "status": "Recommended"
+  },
+  {
+   "action": "Institute and evidence UPS-cabinet PM: IR thermography, connection/torque checks, battery condition monitoring, auditable records",
+   "owner": "Digital Realty maintenance",
+   "status": "Recommended"
+  },
+  {
+   "action": "Deploy VESDA/aspirating early-warning detection in UPS rooms; log alarm-to-ignition latency",
+   "owner": "Digital Realty fire-protection",
+   "status": "Recommended"
+  },
+  {
+   "action": "Complete and publish official cause determination",
+   "owner": "Hillsboro Fire & Rescue (Deputy Fire Commissioner Mike Mahar)",
+   "status": "Done — report filed June 24, 2025; cause UNDETERMINED"
+  }
+ ],
+ "lessonsLearnt": [
+  "A small fire can cause a huge outage: ~$250,000 of equipment damage in one room produced a near-day-long, near-global X disruption. Impact was governed by power/redundancy topology, not fire size — resilience must be judged by blast radius, not by loss value.",
+  "Energized equipment is the response bottleneck: because the cabinet was 'still energized,' firefighters could only hold, not extinguish, until de-energisation (CRN). Fast, unambiguous electrical isolation is a first-class safety control, not an afterthought.",
+  "Manual suppression is a red flag for fixed-system design: the fire was fought by hand with CO2/dry-chem extinguishers, with no fixed clean-agent or sprinkler discharge in the record — signalling either a gap in fixed suppression or an interlock that inhibited it while energized.",
+  "'Undetermined' is an honest verdict, not a failure to investigate: the official report fixed the origin precisely (240 UPSA2 Power Cabinet 1) yet left ignition source undetermined. Dossiers must preserve that ambiguity rather than invent a maintenance or battery cause.",
+  "Beware early framing: initial 'battery set' reporting was superseded by the formal finding that first fuel was the cabinet's plastic internals — early operational descriptions should not harden into root-cause claims.",
+  "Absence of maintenance records is not exoneration: no PM/thermal-scan history was disclosed, so a maintenance lapse can be neither confirmed nor excluded — a reason to build auditable UPS-cabinet maintenance evidence, not to assume cleanliness."
+ ],
+ "improvements": [
+  "Safety — reduce cabinet fuel load: specify low-combustibility internal construction for UPS power cabinets. Mahar found the first fuel was 'likely the plastic combustible components of the power cabinet' (CRN), so cutting plastic fuel inside energized cabinets directly attacks what sustained this fire.",
+  "Safety — engineer for suppression on energized equipment: crews could only HOLD with CO2/dry-chem hand extinguishers 'while waiting for the system to be de-energized' (CRN). Provision cabinet-level clean-agent or in-cabinet suppression and a fast, documented single-action de-energisation/isolation path so a burning cabinet can be made safe in minutes, not held.",
+  "Resilience — remove single-room blast radius: a ~$250,000 single-UPS-room event propagated to a near-global X outage (techgolly). Validate N+1/2N power topology and automated failover so loss of one UPS room cannot drop platform-serving load; run a live failover drill for this failure mode.",
+  "Maintenance — establish and evidence a UPS-cabinet PM regimen: the record discloses no PM history, battery-replacement interval, or thermal-scan records for 240 UPSA2. Institute periodic infrared thermography, torque/connection checks, and battery-condition monitoring on all UPS cabinets, with auditable records, so an internal electrical/mechanical fault is caught before ignition.",
+  "Detection — close the detection gap: no VESDA/aspirating detection or pre-alarm interval is documented (CRN). Deploy very-early-warning aspirating smoke detection inside UPS rooms and log alarm-to-ignition latency so future events are characterisable.",
+  "Emergency response — pre-plan energized-equipment fires with the AHJ: create a joint runbook with Hillsboro Fire & Rescue defining who de-energises, expected isolation time, and the switchover from hold-with-extinguishers to full suppression, eliminating the de-energisation wait that extended the hazardous window."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "Origin and Cause: Precise Location, Undetermined Mechanism",
+   "body": "The official Hillsboro Fire & Rescue investigation (Deputy Fire Commissioner Mike Mahar, filed June 24, 2025, relayed by CRN) fixed the origin inside a specific unit — 240 UPSA2 Power Cabinet 1, a Schneider Electric Galaxy VX 250 kVA 400/480V UPS cabinet (model GVXP250KD) in Room UPSA 240 on the second floor. The mechanism, however, is formally UNDETERMINED: 'the ignition source was undetermined. The first fuel ignited was undetermined, although likely the plastic combustible components of the power cabinet' (CRN). Mahar could not rule out internal electrical or mechanical failure. Battery chemistry and cabinet age are not disclosed. This is a precise-origin / undetermined-cause finding, and the dossier preserves that distinction rather than inventing a battery thermal-runaway or maintenance narrative."
+  },
+  {
+   "heading": "Suppression and the Energized-Cabinet Problem",
+   "body": "The most operationally significant fact is that the cabinet was 'still energized' on arrival. Crews could only HOLD the fire with 'several CO2 and dry-chem extinguishers ... while waiting for the system to be de-energized' (CRN). No fixed clean-agent, gaseous, or pre-action sprinkler discharge appears anywhere in the verified record. The response was gated on electrical isolation — a design/procedure weakness that extended the hazardous window. Who de-energised the system, and how long isolation took, are disclosed gaps."
+  },
+  {
+   "heading": "Blast Radius: Small Fire, Platform-Level Outage",
+   "body": "Physically the fire was trivial — ~$250,000 equipment loss, contained to one room ('room was full of smoke,' no building spread, zero injuries). Operationally it was severe: loss of the UPS room propagated to a near-global X outage. The disruption 'began around 11:00 AM PT' Thursday and was 'officially marked as resolved by 10:35 AM PT on Friday' (techgolly), with DownDetector peaking near ~26,000 reports (hothardware) and Friday login degradation. The failure was one of redundancy/failover design, not fire size."
+  },
+  {
+   "heading": "Disclosed Gaps and Evidentiary Limits",
+   "body": "The record does NOT contain: the cabinet's PM/inspection/thermal-scan history, battery chemistry or age, VESDA/pre-alarm detection details, detection-to-ignition latency, the identity/timing of de-energisation, or any open work order at ignition. Maintenance culpability is therefore neither established nor excluded. Third-party analyst commentary (e.g. generic claims that inadequate cooling/monitoring are 'frequent culprits') is opinion, explicitly NOT a finding against this facility, and is treated as such. Several secondary figures (a $260,000 damage variant, exact app-share percentage, precise on-scene duration, early-morning outage-peak clock times) could not be independently re-verified and were struck or scoped."
+  },
+  {
+   "heading": "Timeline and Recovery",
+   "body": "Verified anchors: fire late morning May 22; Hillsboro Fire & Rescue arrival ~10:21 AM PT (idcnova/CRN); manual hold pending de-energisation; Digital Realty 'incident is under control, fire department has concluded its on-site response' (idcnova); X outage began ~11:00 AM PT Thursday and resolved 10:35 AM PT Friday, with Friday login degradation (techgolly); official report filed June 24, 2025 (CRN). Roughly a 24-hour platform-impact window from a one-room event."
+  }
+ ],
+ "references": [
+  {
+   "title": "IDC Nova — Fire breaks out at Oregon data center leased by Elon Musk's X (Digital Realty statement)",
+   "url": "https://www.idcnova.com/news/fire-breaks-out-at-oregon-data-center-leased-by-elon-musks-x-2880",
+   "type": "vendor-status",
+   "quote": "The incident is under control, and the fire department has concluded its on-site response. All personnel were safely evacuated, with no reported injuries.",
+   "accessed": "2026-08-02"
+  },
+  {
+   "title": "CRN — Authorities: Digital Realty data-center fire began in Schneider Electric cabinet, cause undetermined",
+   "url": "https://www.crn.com/news/data-center/2025/authorities-digital-realty-data-center-fire-began-in-schneider-electric-cabinet-but-cause-undetermined",
+   "type": "press",
+   "quote": "the ignition source was undetermined. The first fuel ignited was undetermined, although likely the plastic combustible components of the power cabinet",
+   "accessed": "2026-08-02"
+  },
+  {
+   "title": "TechGolly — X recovers from major outage tied to Oregon data-center fire",
+   "url": "https://techgolly.com/news/x-recovers-from-major-outage-tied-to-oregon-data-center-fire",
+   "type": "press",
+   "quote": "began around 11:00 AM PT ... officially marked as resolved by 10:35 AM PT on Friday",
+   "accessed": "2026-08-02"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": true,
+  "lastVerified": "2026-08-02 (seed — pending deep research)"
+ },
+ "lastUpdated": "2026-08-02"
+}

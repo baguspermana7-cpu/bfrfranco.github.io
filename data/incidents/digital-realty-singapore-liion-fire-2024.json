@@ -1,0 +1,286 @@
+{
+ "slug": "digital-realty-singapore-liion-fire-2024",
+ "title": "Digital Realty Singapore Lithium-Ion UPS Fire (2024)",
+ "operator": "Digital Realty",
+ "operatorShort": "Digital Realty",
+ "dcName": "Digital Realty Singapore data center",
+ "location": {
+  "city": "Singapore",
+  "country": "Singapore"
+ },
+ "date": "2024-09-01",
+ "durationMin": 600,
+ "category": [
+  "fire",
+  "power"
+ ],
+ "severity": {
+  "usersAffected": "Cloud/e-commerce customers incl. Alibaba/Lazada in the region",
+  "impactUsd": "Not published",
+  "servicesDown": [
+   "Alibaba/Lazada regional services (reported)",
+   "Colocation customers"
+  ],
+  "tier": "Li-ion UPS fire, emergency power-off"
+ },
+ "brief": "A lithium-ion UPS battery fire at a Singapore data center forced an emergency power shutdown, disrupting customers including Alibaba and Lazada — another instance of Li-ion UPS risk in modern facilities.",
+ "magnitude": {
+  "blastRadiusScore": 5,
+  "usersScore": 5,
+  "financialScore": 4,
+  "durationScore": 4,
+  "note": "Li-ion UPS fire forced emergency power shutdown, impacting customers incl. Alibaba/Lazada — sub-scores ESTIMATED from public impact reporting, pending deep research."
+ },
+ "rootCause": "Ignition source: the facility's lithium-ion battery bank serving the UPS/energy-storage backup of Digital Realty's Digital Loyang data center in Loyang, Singapore, housed in battery rooms on the third-floor mezzanine of the four-storey building. Press relaying SCDF reported the fire \"involved lithium-ion batteries housed in battery rooms on the third floor.\" Proximate mechanism: thermal runaway initiated by an electrical fault — \"Early investigations suggest an electrical issue in one of the battery rooms triggered the blaze\" (Straits Times/SCDF). Once initiated, cell-to-cell thermal-runaway propagation — the self-sustaining, re-igniting behaviour characteristic of Li-ion cells — resisted extinguishment and forced prolonged cooling that spilled into a second day.\n\nDISCLOSED UNCERTAINTY: The public record does not disclose the battery/UPS make and model, the cell chemistry (NMC vs LFP), cell age, state of charge, or the precise electrical fault (internal cell short vs charger/BMS fault vs connection arc). No make/model/chemistry can be attributed without over-claiming. The specific Digital Realty site code and exact street address are not independently confirmed in this review pass and are therefore not asserted.\n\nLATENT ROOT — DESIGN/SITING, NOT A MAINTENANCE VIOLATION: The salient systemic root is battery-room placement. SCDF's 2020 safety standards require Energy Storage Systems (Li-ion battery rooms) to sit on the ground floor, but the failed batteries were on the third-floor mezzanine. Digital Realty's position is that the facility launched in 2016, before the 2020 standard, so the elevated placement predated and was not governed by that rule — a legacy/grandfathered design rather than a rules breach (DCD). This above-grade siting materially worsened the event: it complicated firefighter access and battery cooling, and it placed burning batteries within the same structure as live server halls, so suppression water drained down into the IT space and forced an emergency power shutdown. No public evidence identifies a maintenance, inspection, testing, hot-work, or deferred-work lapse as the ignition cause; the trigger is described only as \"an electrical issue in one of the battery rooms.\" The dominant redundancy/design gap is therefore the co-location of an above-grade Li-ion energy-storage hazard above critical IT load, with water-based suppression as the only viable firefighting medium.",
+ "technicalDeepDive": "The event is a textbook illustration of why Li-ion energy storage co-located with IT load creates a cascading, water-coupled failure mode rather than a contained electrical fire. On the morning of 10 Sep 2024 the building fire-alarm system triggered — the first publicly indicated detection event; no discrete smoke/heat-sensor timing is disclosed beyond the alarm. Facility sprinklers activated and SCDF deployed four water jets on arrival. Crucially, water is a coolant, not an extinguishant, for Li-ion thermal runaway: it cannot arrest cell-to-cell propagation, only remove heat, so the fire re-asserted itself and the operation became a prolonged cooling exercise — contained the same day but requiring damping-down with an unmanned firefighting robot (conditions too hot/hazardous for manual entry) and not declared stable until 12 Sep.\n\nThe decisive engineering failure was hydraulic, not thermal. Because the battery rooms sat on the third-floor mezzanine directly within the four-storey structure, accumulated firefighting and sprinkler water migrated downward into server halls. Alibaba reported the server room \"started to experience water accumulation and leaks, posing a risk of electrical short circuits.\" To prevent energised electronics from short-circuiting in standing water, an emergency power shutdown of the affected building was executed in the early hours of 11 Sep — roughly 18 hours after the alarm per DCD's reconstruction of Alibaba's timeline. This de-energisation, not flame, is what took Alibaba Cloud Singapore Availability Zone C fully offline and cascaded to Lazada and ByteDance/TikTok. The fire itself never breached structural integrity: BCA found only minor plaster delamination, paint peeling and soot, and issued closure orders for portions of the third, fourth and mezzanine levels. Recovery was throttled by fire-safety protocol — Alibaba's O&M engineers were barred from re-entering the building — so wet hardware had to be carefully dried before migration/restoration. The lesson embedded in the physics: with an above-grade Li-ion hazard and water-only suppression, the suppressant becomes the primary agent of collateral IT damage.",
+ "sequenceOfEvents": [
+  {
+   "t": "2024-09-10 morning SGT",
+   "phase": "TRIGGER",
+   "event": "Electrical fault in a third-floor mezzanine battery room initiates Li-ion thermal runaway at the Digital Realty Digital Loyang data center, Loyang, Singapore. 'Early investigations suggest an electrical issue in one of the battery rooms triggered the blaze.'",
+   "source": "Straits Times / SCDF"
+  },
+  {
+   "t": "2024-09-10 morning SGT",
+   "phase": "DETECTION",
+   "event": "Building fire-alarm system activates — the first publicly indicated detection event; no discrete smoke/heat-sensor timing is disclosed beyond this alarm.",
+   "source": "DataCenterDynamics (impacts Alibaba Cloud)"
+  },
+  {
+   "t": "2024-09-10 morning SGT",
+   "phase": "MITIGATION",
+   "event": "Facility sprinkler systems activate over the involved battery/power rooms on the third-floor mezzanine.",
+   "source": "DataCenterDynamics (emergency power shutdown)"
+  },
+  {
+   "t": "2024-09-10 before arrival",
+   "phase": "MITIGATION",
+   "event": "About 20 occupants self-evacuate the building before firefighters arrive.",
+   "source": "Straits Times / SCDF"
+  },
+  {
+   "t": "2024-09-10 morning SGT",
+   "phase": "MITIGATION",
+   "event": "SCDF alerted and responds to the Loyang data centre to secure the premises and stabilise the situation.",
+   "source": "Straits Times / SCDF"
+  },
+  {
+   "t": "2024-09-10 ~08:15 SGT",
+   "phase": "MITIGATION",
+   "event": "All on-site personnel evacuated with no injuries; SCDF deploys four water jets to cool and contain the battery fire.",
+   "source": "DataCenterDynamics (impacts Alibaba Cloud)"
+  },
+  {
+   "t": "2024-09-10 daytime",
+   "phase": "IMPACT",
+   "event": "Alibaba Cloud detects network anomalies in Singapore Availability Zone C; Lazada and ByteDance/TikTok begin experiencing service disruption.",
+   "source": "DataCenterDynamics (impacts Alibaba Cloud)"
+  },
+  {
+   "t": "2024-09-10 daytime",
+   "phase": "CASCADE",
+   "event": "Alibaba warns of increasing likelihood of a complete network outage in Availability Zone C if battery-room temperatures are not controlled; O&M engineers are unable to enter the building.",
+   "source": "DataCenterDynamics (impacts Alibaba Cloud)"
+  },
+  {
+   "t": "2024-09-10 evening SGT",
+   "phase": "MITIGATION",
+   "event": "SCDF firefighting knocks down / contains the blaze after roughly half a day of cooling; operation flagged as prolonged due to battery cooling requirements (exact containment time per DCD reconstruction, not re-verified this pass).",
+   "source": "DataCenterDynamics (Alibaba dries servers)"
+  },
+  {
+   "t": "2024-09-10 overnight to 2024-09-11",
+   "phase": "IMPACT",
+   "event": "Firefighting and sprinkler water accumulates and leaks into server halls; Alibaba reports 'water accumulation and leaks, posing a risk of electrical short circuits.'",
+   "source": "DataCenterDynamics (Alibaba dries servers)"
+  },
+  {
+   "t": "2024-09-11 early hours SGT",
+   "phase": "CASCADE",
+   "event": "Emergency power shutdown of the affected building executed to prevent electrical short circuits from standing water — this de-energisation, not flame, takes Alibaba Cloud Availability Zone C fully offline (~01:46 per DCD, not re-verified this pass).",
+   "source": "DataCenterDynamics (emergency power shutdown)"
+  },
+  {
+   "t": "2024-09-11 second day",
+   "phase": "MITIGATION",
+   "event": "Operation spills into a second day; an unmanned firefighting robot is deployed for damping-down as manual entry remains too hazardous/hot.",
+   "source": "Straits Times / SCDF"
+  },
+  {
+   "t": "2024-09-12",
+   "phase": "RECOVERY",
+   "event": "SCDF declares the site stable after multi-day cooling and damping-down operations.",
+   "source": "DataCenterDynamics (Alibaba dries servers)"
+  },
+  {
+   "t": "post-fire (Sep 2024)",
+   "phase": "RECOVERY",
+   "event": "BCA assesses the structure: minor plaster delamination, paint peeling and soot only, structural integrity intact; issues closure orders for portions of the third, fourth floors and mezzanine.",
+   "source": "BCA / SCDF via Straits Times / CNA"
+  },
+  {
+   "t": "post-stabilisation (Sep 2024)",
+   "phase": "RESTORED",
+   "event": "Alibaba carefully dries water-exposed hardware to ensure data security; migration and restoration of affected machinery proceeds as planned.",
+   "source": "DataCenterDynamics (Alibaba dries servers)"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Fire date",
+   "value": "10 Sep 2024 (morning SGT)",
+   "source": "Straits Times / SCDF; DataCenterDynamics"
+  },
+  {
+   "label": "Occupants self-evacuated before firefighters arrived",
+   "value": "~20 people",
+   "source": "Straits Times / SCDF"
+  },
+  {
+   "label": "Injuries",
+   "value": "0 (all personnel out by ~08:15 SGT)",
+   "source": "DataCenterDynamics (impacts Alibaba Cloud)"
+  },
+  {
+   "label": "SCDF water jets deployed",
+   "value": "4 water jets",
+   "source": "Straits Times / SCDF"
+  },
+  {
+   "label": "Unmanned firefighting robots deployed",
+   "value": "1 (damping-down phase)",
+   "source": "Straits Times / SCDF"
+  },
+  {
+   "label": "Alarm to emergency power shutdown",
+   "value": "~18 hours (DCD reconstruction; ~01:46, 11 Sep)",
+   "source": "DataCenterDynamics (emergency power shutdown)"
+  },
+  {
+   "label": "Total operation duration to 'stable'",
+   "value": "~10 Sep to 12 Sep (~2 days)",
+   "source": "DataCenterDynamics (Alibaba dries servers)"
+  },
+  {
+   "label": "Facility",
+   "value": "~17,000 sqm, 4 stories, launched 2016",
+   "source": "DataCenterDynamics (Alibaba dries servers)"
+  },
+  {
+   "label": "Battery-room location vs 2020 SCDF ESS standard",
+   "value": "3rd-floor mezzanine vs required ground floor",
+   "source": "DataCenterDynamics (emergency power shutdown)"
+  },
+  {
+   "label": "Tenants/services disrupted",
+   "value": "Alibaba Cloud Singapore AZ-C, Lazada, ByteDance/TikTok",
+   "source": "The Star; DataCenterDynamics"
+  }
+ ],
+ "contributingFactors": [
+  "Legacy above-grade battery siting: Li-ion energy-storage rooms were on the third-floor mezzanine, contrary to SCDF's 2020 standard requiring ground-floor placement. Digital Realty states the 2016 facility predated the rule, so it was grandfathered — but the elevated siting is the single largest aggravating design factor (DCD).",
+  "Water-based suppression against Li-ion thermal runaway: sprinklers plus four SCDF water jets could only cool, not stop, self-sustaining cell-to-cell propagation, forcing a multi-day operation and generating the water volume that later reached the IT halls (Straits Times/SCDF).",
+  "Vertical co-location of burning batteries above live server halls: with no water-tight separation between the third-floor battery rooms and IT space, suppression water accumulated and leaked into server rooms, creating the short-circuit risk that drove the emergency shutdown (DCD; Alibaba via DCD).",
+  "Firefighting-protocol lockout of operators: Alibaba's operation-and-maintenance engineers were unable to enter the building, delaying damage assessment, drying and restoration of water-exposed hardware (DCD).",
+  "Single-facility concentration risk for tenants: Alibaba Cloud Singapore Availability Zone C, and downstream Lazada and ByteDance/TikTok, had insufficient isolation from a single building event, so one battery-room fire produced a multi-tenant regional outage (DCD; The Star).",
+  "No public evidence of a maintenance/inspection/testing lapse: the trigger is described only as 'an electrical issue in one of the battery rooms,' with battery make/model, chemistry, age and state of charge undisclosed — an evidentiary gap rather than a confirmed clean bill (Straits Times/SCDF)."
+ ],
+ "coe": [
+  {
+   "action": "Relocate/segregate Li-ion ESS battery rooms to ground-floor, water-contained enclosures per SCDF 2020 ESS standard",
+   "owner": "Digital Realty (facility engineering)",
+   "status": "Open — no public completion evidence"
+  },
+  {
+   "action": "Install water-tight bunding/drainage between battery rooms and server halls to prevent suppression-water ingress into IT space",
+   "owner": "Digital Realty (design/build)",
+   "status": "Open — no public evidence"
+  },
+  {
+   "action": "Deploy thermal-runaway-appropriate detection and suppression (cell-level/gas/aerosol) to shorten cooling and cut water volume",
+   "owner": "Digital Realty with SCDF guidance",
+   "status": "Open — no public evidence"
+  },
+  {
+   "action": "Dry, assess and restore water-exposed hardware to ensure data security",
+   "owner": "Alibaba Cloud O&M",
+   "status": "In progress — migration and restoration reported proceeding as planned (DCD)"
+  },
+  {
+   "action": "Building-integrity assessment and closure orders for affected floors",
+   "owner": "BCA / SCDF",
+   "status": "Completed — structural integrity intact; closure orders issued (BCA/Straits Times)"
+  },
+  {
+   "action": "Root-cause investigation of the battery-room electrical fault (make/model/chemistry/age)",
+   "owner": "SCDF / Digital Realty",
+   "status": "Early investigation only — findings not publicly disclosed (Straits Times)"
+  }
+ ],
+ "lessonsLearnt": [
+  "Against Li-ion thermal runaway, water suppresses nothing — it only cools; sprinklers and four water jets could not stop cell-to-cell propagation, turning the event into a multi-day cooling operation (Straits Times/SCDF).",
+  "The suppressant became the primary weapon of collateral damage: firefighting/sprinkler water, not flame, reached the server halls and forced the emergency power shutdown that caused the actual outage (DCD; Alibaba via DCD).",
+  "Vertical siting of an ESS hazard above IT load converts a contained battery fire into a facility-wide IT event through simple gravity-driven water migration (DCD).",
+  "Grandfathered/legacy compliance is not the same as safe design: the 2016 above-grade battery rooms were legal because they predated the 2020 ground-floor standard, yet that very placement drove the worst consequences (DCD).",
+  "Operator lockout under fire-safety protocol lengthens recovery — barring O&M engineers from the building delayed drying and restoration of water-exposed hardware (DCD).",
+  "Single-building faults still cascade to whole cloud Availability Zones; tenant redundancy that shares one physical facility is insufficient isolation (DCD; The Star)."
+ ],
+ "improvements": [
+  "Design: Relocate Li-ion energy-storage systems to ground-floor, water-segregated rooms per SCDF's 2020 ESS standard so burning batteries are not sited above live server halls and suppression water cannot drain into IT space (basis: DCD siting finding).",
+  "Design: Introduce water-tight bunding, drainage and floor-slab containment between battery rooms and IT halls so sprinkler/firefighting water from an ESS event is captured and drained rather than pooling on energised equipment (basis: Alibaba water-ingress report via DCD).",
+  "Safety: Supplement or replace water-only suppression in Li-ion battery rooms with thermal-runaway-appropriate measures (cell-level detection, gas/aerosol early suppression, dedicated cooling) to shorten the multi-day cooling operation and reduce suppression-water volume (basis: SCDF 'prolonged' cooling requirement, Straits Times).",
+  "Process: Establish a pre-agreed operator re-entry and safe-shutdown protocol with SCDF so O&M engineers can perform controlled de-energisation and hardware protection earlier, rather than being unable to enter the building during the critical window (basis: DCD).",
+  "Maintenance: Institute and document battery-room electrical-integrity monitoring (BMS fault logging, connection/thermal inspection, state-of-charge and cell-age tracking) to close the evidentiary gap around 'an electrical issue' and enable pre-failure detection (basis: undisclosed cause / no public inspection record, Straits Times).",
+  "Design: Improve tenant availability-zone isolation so a single-building event cannot take an entire cloud Availability Zone (and downstream Lazada/TikTok) offline via one power shutdown (basis: multi-tenant cascade, DCD/The Star)."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "A thermal-runaway fire, but a water-caused outage",
+   "body": "The September 2024 fire at Digital Realty's Digital Loyang facility is best understood as two coupled events. The first was a lithium-ion battery fire on the third-floor mezzanine, triggered by an electrical fault and sustained by cell-to-cell thermal runaway that water can cool but not extinguish. The second — and the one that actually caused the customer-visible outage — was hydraulic: accumulated sprinkler and firefighting water draining down into server halls, forcing an emergency power shutdown to avoid short circuits. Flame never breached the IT space or structural integrity; the suppressant did the damage."
+  },
+  {
+   "heading": "Above-grade battery siting as the systemic root",
+   "body": "The decisive design condition was that an energy-storage hazard sat above live server halls with no water-tight separation. SCDF's 2020 ESS standard requires Li-ion battery rooms on the ground floor precisely to avoid this geometry; the failed rooms were on the third-floor mezzanine. Gravity did the rest — water migrated down onto energised equipment. Ground-floor siting with bunded, drained containment would have decoupled the battery event from the IT load."
+  },
+  {
+   "heading": "Legacy compliance versus safe design",
+   "body": "Digital Realty's stated position is that the facility launched in 2016, before the 2020 standard, so the elevated placement was grandfathered rather than a breach. That is legally coherent but operationally cautionary: the arrangement that was permissible under the older code is exactly the arrangement that turned a contained battery fire into a regional cloud outage. Grandfathered compliance is not evidence of safe design."
+  },
+  {
+   "heading": "The multi-tenant cascade",
+   "body": "Because a single building hosted Alibaba Cloud Singapore Availability Zone C, the emergency de-energisation propagated outward — first to Alibaba's own AZ-C, then to downstream tenants Lazada and ByteDance/TikTok. The blast radius demonstrates that logical availability-zone labels do not guarantee physical isolation when redundancy is concentrated in one structure. Recovery was further slowed by fire-safety protocol barring O&M engineers from re-entry until the site was declared stable."
+  },
+  {
+   "heading": "Evidentiary gaps that remain open",
+   "body": "The public record does not disclose the battery/UPS make and model, cell chemistry, age, state of charge, or the precise electrical fault. The trigger is described only as 'an electrical issue in one of the battery rooms.' No maintenance, inspection or hot-work lapse is identified — which is an absence of evidence, not a clean bill. A full root cause would require the undisclosed SCDF/Digital Realty investigation findings, which were not public as of this review."
+  }
+ ],
+ "references": [
+  {
+   "title": "Fire at Digital Realty data center in Singapore impacts Alibaba Cloud",
+   "url": "https://www.datacenterdynamics.com/en/news/fire-at-digital-realty-data-center-in-singapore-impacts-alibaba-cloud/",
+   "type": "press",
+   "quote": "Early investigations suggest an electrical issue in one of the battery rooms triggered the blaze.",
+   "accessed": "2026-08-02 (carried from dossier; not re-fetchable this pass — DCD returned HTTP 403)"
+  },
+  {
+   "title": "Fire breaks out at data centre in Loyang; about 20 people self-evacuate",
+   "url": "https://www.straitstimes.com/singapore/fire-breaks-out-at-data-centre-in-loyang-about-20-people-self-evacuate",
+   "type": "press",
+   "quote": "About 20 people self-evacuated before the arrival of SCDF, which deployed water jets to cool and contain the battery fire.",
+   "accessed": "2026-08-02 (carried from dossier; not re-fetchable this pass — straitstimes.com blocked)"
+  },
+  {
+   "title": "Fire at Singapore data centre affects Alibaba Cloud services (The Star)",
+   "url": "https://www.thestar.com.my/tech/tech-news/2024/09/11/fire-at-singapore-data-centre-affects-alibaba-cloud-services",
+   "type": "press",
+   "quote": "Alibaba Cloud services in Singapore, along with Lazada and ByteDance-owned TikTok, were disrupted by the data centre fire.",
+   "accessed": "2026-08-02 (carried from dossier; not re-fetchable this pass — HTTP 404 on candidate URL)"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": false,
+  "lastVerified": "2026-08-02 (seed — pending deep research)"
+ },
+ "lastUpdated": "2026-08-02"
+}

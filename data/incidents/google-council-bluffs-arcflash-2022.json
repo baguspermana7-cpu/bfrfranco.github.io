@@ -1,0 +1,301 @@
+{
+ "slug": "google-council-bluffs-arcflash-2022",
+ "title": "Google Council Bluffs (Iowa) Electrical Explosion / Arc-Flash (August 2022)",
+ "operator": "Google",
+ "operatorShort": "Google",
+ "dcName": "Google Council Bluffs data center (Iowa)",
+ "location": {
+  "city": "Council Bluffs, Iowa",
+  "country": "United States"
+ },
+ "date": "2022-08-08",
+ "durationMin": 180,
+ "category": [
+  "power",
+  "fire"
+ ],
+ "severity": {
+  "usersAffected": "Search/Maps users saw same-day disruption (attribution disputed)",
+  "impactUsd": "Not published; worker injuries reported",
+  "servicesDown": [
+   "Google Search (partial, same day)",
+   "Google Maps (partial, same day)"
+  ],
+  "tier": "Facility electrical incident + injuries"
+ },
+ "brief": "An electrical explosion (arc-flash) at Google's Council Bluffs, Iowa data center injured three workers; Google Search and Maps saw disruptions the same day, though Google said the service impact was not directly caused by the incident.",
+ "magnitude": {
+  "blastRadiusScore": 5,
+  "usersScore": 5,
+  "financialScore": 4,
+  "durationScore": 4,
+  "note": "On-site electrical explosion/arc-flash injured three; coincident Search/Maps disruption (impact link disputed by Google) — sub-scores ESTIMATED from public impact reporting, pending deep research."
+ },
+ "rootCause": "SPECIFIC IGNITION SOURCE / EQUIPMENT: The event was an arc flash — an electrical fault that forms a conductive plasma arc — that initiated at an energized electrical cabinet on a substation adjacent to the data-center buildings at Google's Council Bluffs campus, 10410 Bunge Ave (EC&M: \"working on a substation close to the data center buildings when an arc flash occurred\"; Data Center Frontier and WOWT: \"accessing an electrical cabinet/box when an arc occurred\"). Critically, the make, model, manufacturer, voltage class, age, and any insulation/dielectric chemistry of the switchgear or substation gear are NOT disclosed in any public source, official or press. No incident-energy figure (cal/cm2) and no available fault-current value were published. The dispatch itself was reported as a \"Large Electrical Explosion/No fire\" event (The Register), consistent with an arc blast and thermal burst rather than a sustained combustion fire.\n\nEXACT FAILURE MECHANISM: The arc flash initiated while three Capital Electric Construction Co. electricians were physically accessing/working the cabinet — an energized-work exposure. The precise initiating fault (dropped tool, insulation breakdown, misoperation, phase-to-phase bridging, or a racking event) is NOT stated in any public source. The OSHA accident abstract for the event (Activity Nr 1931208) could not be retrieved in this review, so no regulator root-cause narrative exists in the accessible record. Arc-flash physics per the trade press: the fault \"generates intense heat that can reach 35,000 degrees F, which can damage and even melt electrical equipment\" (Data Center Frontier).\n\nLATENT ROOT — WORK-PRACTICE / PROCEDURE DEFICIENCY: The regulatory record locates the latent root not in a maintenance-interval or asset-condition failure but in a contractor work-practice/procedure lapse. OSHA opened a Fatality/Catastrophe (\"Fat/Cat\") partial inspection (1615410.015) of Capital Electric Construction Co., Inc. (NAICS 238210, electrical contractors) and issued Citation 01001 under 29 CFR 1926.950(b)(1)(i) (recorded as standard \"19260950 B01 I\") — the general-requirements provision of Subpart V (Electric Power Transmission and Distribution, construction), which governs host/contractor information transfer, job briefings, and existing-conditions/energized-work determinations. The single cited standard points to a job-briefing / energized-work-determination deficiency by the contractor as the causal thread OSHA pursued. The citation was issued 01/31/2023 with abatement due 03/17/2023; it resolved by Informal Settlement to a single citation recorded as classification type \"Other,\" with the penalty INCREASED from an initial $13,052 to a current $20,000 (verified: OSHA 1615410.015). The record I reviewed shows the final classification as \"Other\"; it does not substantiate any willful characterization, so no willful narrative is asserted here.\n\nDESIGN / REDUNDANCY / MAINTENANCE DISCLOSURE GAP: No arc-flash hazard study (NFPA 70E / IEEE 1584), no PPE-adequacy finding, no maintenance/testing-interval record, and no de-energisation/lockout status is published in any retrievable source. Whether the equipment could have been de-energized for the task, and whether an incident-energy label existed on the cabinet, is unknown. The host employer, Google, was inspected separately (1615423.015, partial scope) and its case closed 02/03/2023 with NO citations (close conference 01/23/2023) — OSHA placed compliance responsibility on the contractor, not on Google as host. The absence of a published root-cause narrative is itself a limitation of this dossier and is disclosed as such.",
+ "technicalDeepDive": "An arc flash is fundamentally different from a data-center fire, and every physical-forensics conclusion here flows from that distinction. When a low-impedance fault bridges energized conductors — whether by a dropped tool, insulation failure, or phase-to-phase contact — the air ionizes into a conductive plasma that carries fault current across the gap. The plasma channel reaches roughly 35,000 degrees F (Data Center Frontier), vaporizes copper and aluminum (copper expands ~67,000x on vaporization), and produces a pressure wave and a thermal/light burst. This is why the Council Bluffs event was reported as a \"Large Electrical Explosion/No fire\" dispatch (The Register): the hazard is blast and burns, not a spreading combustion event that a suppression system would fight. Consequently the entire conventional data-center safety chain — VESDA/air-sampling smoke detection, gaseous (inert-gas or clean-agent) or pre-action water suppression, and hall evacuation on a fire alarm — was NOT the operative safety system here, and no source reports any smoke/heat detector or suppression activation. Absence of report is not proof of absence, but the \"No fire\" classification makes suppression effectiveness moot for injury outcomes.\n\nThe injuries are consistent with arc-flash exposure at close range on an open cabinet: burns reported to face, arm and thigh on one victim, and a lower-torso injury on another (The Register dispatch detail); all three sustained electrical/thermal burns (WOWT, EC&M). Two were transported by ground ambulance and one flown by helicopter to Nebraska Medical Center, the regional burn/trauma center (CRN, CBS). The severity distribution (critical at scene, later stabilized to \"stable condition\" by Aug 9 per EC&M) is characteristic of thermal burn injury rather than blunt trauma.\n\nThe regulatory framing is the strongest technical signal about causation. OSHA cited 29 CFR 1926.950(b)(1)(i) — a Subpart V construction general-requirements clause on job briefings and existing-conditions determination for energized work — which implies the crew was performing installation/construction on the substation cabinet and that the energized-work planning or briefing was found deficient. What remains unknown is decisive and must be stated plainly: the equipment identity, its voltage class and age, whether it was energized by necessity or could have been isolated, the arc-flash incident energy and required PPE category, and the exact initiating event. The OSHA accident abstract that would answer several of these could not be retrieved in this review, so this deep-dive is bounded by that gap rather than papering over it.",
+ "sequenceOfEvents": [
+  {
+   "t": "2007",
+   "phase": "TRIGGER",
+   "event": "Google's Council Bluffs data center (10410 Bunge Ave, Council Bluffs, IA 51503) is built; grows to employ 900+ people, one of Google's US data centers.",
+   "source": "CBS News"
+  },
+  {
+   "t": "2022-08-08 (pre-event)",
+   "phase": "TRIGGER",
+   "event": "Three Capital Electric Construction Co. electricians are performing construction/installation work accessing an electrical cabinet on a substation close to the data-center buildings — an energized-work exposure.",
+   "source": "EC&M; OSHA 1615410.015 (29 CFR 1926.950, Subpart V construction)"
+  },
+  {
+   "t": "2022-08-08 ~11:59 a.m. CDT",
+   "phase": "TRIGGER",
+   "event": "An arc flash initiates at/inside the electrical cabinet as the three workers access it; a 'Large Electrical Explosion/No fire' event occurs. Exact initiating fault not disclosed.",
+   "source": "The Register; SFGATE (11:59 a.m. local)"
+  },
+  {
+   "t": "2022-08-08 ~11:59 a.m. CDT",
+   "phase": "IMPACT",
+   "event": "Arc-flash thermal burst injures all three electricians: one with a lower-torso injury, another with burns to face, arm and thigh; all sustain electrical/thermal burns.",
+   "source": "The Register (dispatch detail); WOWT; EC&M"
+  },
+  {
+   "t": "2022-08-08 ~noon CDT",
+   "phase": "DETECTION",
+   "event": "No electrical/thermal/smoke detection system activation is reported; the event is an electrical explosion, not a fire, and was categorized 'No fire.' Notification to emergency services is by human report of a 'large explosion,' not an automated alarm.",
+   "source": "The Register; CBS News (fire chief: 'notified of a large explosion')"
+  },
+  {
+   "t": "2022-08-08 ~11:59 a.m. CDT",
+   "phase": "MITIGATION",
+   "event": "911/emergency dispatch is initiated. Council Bluffs Fire Department dispatches units with air-ambulance on standby per the dispatch detail.",
+   "source": "The Register; SFGATE"
+  },
+  {
+   "t": "2022-08-08 (minutes after)",
+   "phase": "MITIGATION",
+   "event": "First responders arrive on scene after notification of the 'large explosion'; fire officials direct the response.",
+   "source": "CBS News; SFGATE"
+  },
+  {
+   "t": "2022-08-08 (unspecified)",
+   "phase": "MITIGATION",
+   "event": "Power de-energisation / isolation of the affected cabinet is not disclosed; whether the equipment was isolated before or after the arc, and lockout status, is not public.",
+   "source": "Disclosed gap — no source; inferred context OSHA 1615410.015 (Subpart V energized-work)"
+  },
+  {
+   "t": "2022-08-08 (post-triage)",
+   "phase": "MITIGATION",
+   "event": "All three burn victims transported to Nebraska Medical Center (regional burn/trauma center): two by ground ambulance, one flown by helicopter in critical condition.",
+   "source": "CRN; CBS News"
+  },
+  {
+   "t": "2022-08-08 (afternoon PT)",
+   "phase": "CASCADE",
+   "event": "Google Search and Maps availability is briefly affected the same afternoon; tens of thousands of US outage reports logged. Google states the outage was caused by an internal software-update error and was NOT caused by the electrical incident.",
+   "source": "CBS News; CRN; SFGATE"
+  },
+  {
+   "t": "2022-08-08 (containment)",
+   "phase": "CASCADE",
+   "event": "No fire spread; event contained to the electrical cabinet/substation being worked on. No structural fire and no reported damage to data-hall IT space.",
+   "source": "The Register ('No fire'); forensic synthesis"
+  },
+  {
+   "t": "2022-08-08 (evening)",
+   "phase": "IMPACT",
+   "event": "Google issues its first public statement acknowledging 'an electrical incident... injuring three people on-site who are now being treated,' pledging investigation with partners and local authorities.",
+   "source": "Google statement via CRN"
+  },
+  {
+   "t": "2022-08-09",
+   "phase": "RECOVERY",
+   "event": "Injured workers reported in stable condition at an area hospital as of Aug. 9; three had sustained serious burns with no life-threatening injuries reported.",
+   "source": "EC&M; CRN"
+  },
+  {
+   "t": "2022-08-09",
+   "phase": "RECOVERY",
+   "event": "OSHA opens two inspections: Fat/Cat partial inspection 1615410.015 of contractor Capital Electric, and partial safety inspection 1615423.015 of host Google.",
+   "source": "OSHA 1615410.015; OSHA 1615423.015"
+  },
+  {
+   "t": "2023-01-23",
+   "phase": "RESTORED",
+   "event": "OSHA holds close conference on the Google (host) inspection; case closed 02/03/2023 with NO citations against Google.",
+   "source": "OSHA 1615423.015 (verified)"
+  },
+  {
+   "t": "2023-01-31",
+   "phase": "RESTORED",
+   "event": "OSHA issues Citation 01001 to Capital Electric under 29 CFR 1926.950(b)(1)(i); abatement due 03/17/2023; case resolved by Informal Settlement, classification 'Other,' penalty raised from $13,052 to $20,000; contractor case CLOSED 03/15/2023.",
+   "source": "OSHA 1615410.015 (verified)"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Workers injured",
+   "value": "3 electricians (all with electrical/thermal burns)",
+   "source": "CBS News; EC&M; WOWT"
+  },
+  {
+   "label": "Peak arc-flash temperature",
+   "value": "~35,000 degrees F (trade-press physics figure)",
+   "source": "Data Center Frontier"
+  },
+  {
+   "label": "Time of event (local)",
+   "value": "~11:59 a.m. CDT, Mon Aug 8, 2022",
+   "source": "SFGATE; The Register (just before noon)"
+  },
+  {
+   "label": "Victim transport split",
+   "value": "3 to Nebraska Medical Center — 2 by ground ambulance, 1 by helicopter",
+   "source": "CRN; CBS News"
+  },
+  {
+   "label": "OSHA penalty (initial to settled)",
+   "value": "$13,052 initial to $20,000 current (increased in settlement)",
+   "source": "OSHA 1615410.015 (verified)"
+  },
+  {
+   "label": "OSHA citation count against contractor",
+   "value": "1 citation (01001), classification 'Other', standard 29 CFR 1926.950(b)(1)(i)",
+   "source": "OSHA 1615410.015 (verified)"
+  },
+  {
+   "label": "OSHA citations against host Google",
+   "value": "0 (partial inspection, case closed 02/03/2023, no penalty)",
+   "source": "OSHA 1615423.015 (verified)"
+  },
+  {
+   "label": "Fire / combustion damage",
+   "value": "None — dispatch reported as 'Large Electrical Explosion/No fire'",
+   "source": "The Register"
+  },
+  {
+   "label": "Facility age at time of incident",
+   "value": "~15 years (built 2007)",
+   "source": "CBS News"
+  },
+  {
+   "label": "Facility headcount",
+   "value": "900+ employees",
+   "source": "CBS News"
+  },
+  {
+   "label": "OSHA contractor inspection duration",
+   "value": "Opened 08/09/2022 era, closed 03/15/2023 (~7 months)",
+   "source": "OSHA 1615410.015 (verified)"
+  }
+ ],
+ "contributingFactors": [
+  "Energized-work exposure: three electricians were physically accessing/working an electrical cabinet on the substation when the arc initiated (Data Center Frontier; WOWT: 'accessing an electrical box when an arc occurred'). Whether the gear could have been de-energized for the task is not disclosed, but the fact that all three were within the arc-flash boundary at fault initiation is the proximate exposure.",
+  "Job-briefing / existing-conditions determination deficiency by the contractor: OSHA's sole citation was 29 CFR 1926.950(b)(1)(i), the Subpart V general-requirements clause covering job briefings and energized-work condition determination — the regulator's identified work-practice thread (verified: OSHA Inspection 1615410.015, standard '19260950 B01 I'). No specific procedural step is named in the public record.",
+  "Penalty increased in settlement: the proposed penalty rose from $13,052 to a current $20,000 via Informal Settlement, with the violation finally classified 'Other' (verified: OSHA 1615410.015). The record I reviewed does not characterize the citation as willful; the increase is noted as a fact without inferring intent.",
+  "Undisclosed arc-flash-study / PPE adequacy: no NFPA 70E / IEEE 1584 incident-energy study, arc-flash label, or PPE-category finding appears in any retrievable source; whether the workers' PPE matched the incident energy at that cabinet is unknown — a documentation/analysis gap that is itself a latent contributor.",
+  "Host/contractor coordination boundary: Google was inspected separately (verified: 1615423.015, partial, no citations, closed 02/03/2023) and OSHA placed compliance on the contractor; the host/contractor information-transfer element embedded in 1926.950 is a known weak point in multi-employer worksites, though no specific coordination failure is published.",
+  "Undisclosed maintenance/testing state of the substation gear: no maintenance-interval, insulation-test, or equipment-condition record is public, so an asset-condition contribution can be neither confirmed nor excluded (disclosed uncertainty)."
+ ],
+ "coe": [
+  {
+   "action": "Mandate de-energisation-first with energized-work permit and documented live-access justification for all substation-cabinet work",
+   "owner": "Contractor (Capital Electric) EHS + Google host site safety",
+   "status": "Recommended (no public confirmation of adoption)"
+  },
+  {
+   "action": "Produce/refresh NFPA 70E / IEEE 1584 arc-flash incident-energy studies and apply cabinet incident-energy labels campus-wide",
+   "owner": "Google data-center electrical engineering",
+   "status": "Recommended (no public record of a study)"
+  },
+  {
+   "action": "Require documented job briefing and host/contractor existing-conditions determination per 29 CFR 1926.950(b)(1)(i) before each energized task",
+   "owner": "Contractor foreman + host coordinator",
+   "status": "OSHA-directed abatement (due 03/17/2023, case closed 03/15/2023)"
+  },
+  {
+   "action": "Adopt arc-resistant switchgear / remote racking / remote operators to move workers outside the arc-flash boundary during switching",
+   "owner": "Google design/standards",
+   "status": "Recommended (not confirmed)"
+  },
+  {
+   "action": "Retain and publish accessible root-cause abstracts for catastrophic electrical events",
+   "owner": "OSHA record-keeping / operator",
+   "status": "Gap — accident abstract (Activity 1931208) unretrievable in this review"
+  }
+ ],
+ "lessonsLearnt": [
+  "Arc flash is a blast/burn hazard, not a fire — the conventional data-center safety chain (VESDA smoke detection, gaseous/pre-action suppression, hall evacuation) is not the operative safeguard for an energized-cabinet arc event; worker outcomes are governed by de-energisation, boundary control, and arc-rated PPE, not by suppression.",
+  "The regulatory record placed the causal thread on contractor work practice, not asset condition: OSHA's single citation under 29 CFR 1926.950(b)(1)(i) points to a job-briefing / existing-conditions-determination deficiency — reinforcing that on multi-employer sites, procedure and information transfer often fail before hardware does.",
+  "Host/contractor boundary matters: OSHA cited the contractor (Capital Electric) and closed the host (Google) inspection with no citations, showing that compliance responsibility for energized work tracks to the employer directing the task — but the host's information-transfer duty under Subpart V remains a shared-risk surface.",
+  "Disclosure gaps are themselves findings: no equipment identity, voltage class, incident-energy study, PPE-adequacy finding, or de-energisation status was published, and the OSHA accident abstract was unretrievable — the absence of a durable, accessible root-cause record blocks the industry learning such incidents should produce.",
+  "Correlated-but-unrelated events must be separated cleanly: the same-day Google Search/Maps outage was attributed by Google to an internal software-update error, not the electrical incident — conflating co-occurring events would have produced a false cascade narrative."
+ ],
+ "improvements": [
+  "Safety: Enforce de-energisation-first (lockout/tagout) for work on/inside substation cabinets, with an energized-work permit and documented justification required before any live access — directly targets the energized-work exposure that placed all three workers in the arc-flash boundary (basis: OSHA 1615410.015 under 29 CFR 1926.950; EC&M).",
+  "Maintenance: Complete and keep current an NFPA 70E / IEEE 1584 arc-flash incident-energy study for every substation cabinet, apply incident-energy labels, and re-validate on any equipment change — the public record shows no such study or label, an analysis/documentation gap that must be closed regardless of asset condition.",
+  "Design: Where cabinets require frequent access, adopt arc-resistant switchgear, remote racking, and remote operators so workers are outside the arc-flash boundary during switching — engineering-out the exposure rather than relying on PPE alone (basis: arc-flash physics, Data Center Frontier).",
+  "Process: Require a documented job briefing and host/contractor existing-conditions determination before each task on multi-employer sites, the exact Subpart V general-requirement OSHA cited — with sign-off capturing energization state, incident energy, and required PPE category (basis: OSHA Citation 01001, 29 CFR 1926.950(b)(1)(i)).",
+  "Safety: Verify PPE arc-rating matches the labeled incident energy at each cabinet before access, and audit PPE conformance during briefings — the record contains no PPE-adequacy finding, so conformance cannot be assumed.",
+  "Process: Publish and retain accessible root-cause abstracts; the OSHA accident abstract for this event (Activity 1931208) could not be retrieved in this review, limiting industry learning — durable, retrievable incident records should be a program requirement."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "What actually happened",
+   "body": "On Monday, Aug 8, 2022, around 11:59 a.m. CDT, an arc flash initiated at an energized electrical cabinet on a substation adjacent to Google's Council Bluffs, Iowa data center (10410 Bunge Ave) while three Capital Electric Construction Co. electricians were accessing it. The dispatch was reported as a 'Large Electrical Explosion/No fire' event. All three suffered electrical/thermal burns and were taken to Nebraska Medical Center's regional burn center — two by ground ambulance, one by helicopter in critical condition — and were reported stable by Aug 9. No structural fire occurred and no data-hall IT damage was reported."
+  },
+  {
+   "heading": "Why it is an arc-flash, not a fire, story",
+   "body": "The 'No fire' classification is decisive: an arc flash is a plasma-driven blast and thermal burst (plasma ~35,000 degrees F per Data Center Frontier) that injures by radiant heat and pressure, not by spreading combustion. The standard data-center fire chain — air-sampling smoke detection, gaseous or pre-action suppression, evacuation on alarm — was therefore not the operative safeguard, and no detector or suppression activation is reported. Worker safety here hinged on de-energisation, boundary control, and arc-rated PPE."
+  },
+  {
+   "heading": "What the regulator found — and did not",
+   "body": "OSHA opened a Fatality/Catastrophe partial inspection of the contractor (1615410.015) and a separate partial inspection of host Google (1615423.015). Google's case closed 02/03/2023 with no citations. Capital Electric received a single citation (01001) under 29 CFR 1926.950(b)(1)(i) — a Subpart V general-requirements clause on job briefings and energized-work condition determination — issued 01/31/2023, resolved by Informal Settlement to classification 'Other,' with the penalty rising from $13,052 to $20,000, case closed 03/15/2023. The final record does not substantiate a willful characterization."
+  },
+  {
+   "heading": "The disclosure gaps and a disclaimed coincidence",
+   "body": "No equipment make/model/voltage/age, no arc-flash incident-energy study, no PPE-adequacy finding, and no de-energisation/lockout status is public; the OSHA accident abstract (Activity 1931208) was unretrievable in this review. Separately, a same-day Google Search/Maps outage (tens of thousands of US reports) was attributed by Google to an internal software-update error and explicitly NOT to the electrical incident — the two must not be conflated into a false cascade."
+  }
+ ],
+ "references": [
+  {
+   "title": "OSHA Inspection Detail 1615410.015 — Capital Electric Construction Co., Inc.",
+   "url": "https://www.osha.gov/ords/imis/establishment.inspection_detail?id=1615410.015",
+   "type": "regulatory",
+   "quote": "Citation Standard 19260950 B01 I; Citation Issuance Date 01/31/2023; Abatement 03/17/2023; Initial Penalty $13,052; Current Penalty $20,000; Case Closed 03/15/2023; Informal Settlement; classification Other; Fat/Cat partial.",
+   "accessed": "2026-08-02"
+  },
+  {
+   "title": "OSHA Inspection Detail 1615423.015 — Google (host)",
+   "url": "https://www.osha.gov/ords/imis/establishment.inspection_detail?id=1615423.015",
+   "type": "regulatory",
+   "quote": "Employer Google; Council Bluffs, IA; Scope Partial; Citations Issued None; Case Status CLOSED; Case Closed 02/03/2023; Close Conference 01/23/2023.",
+   "accessed": "2026-08-02"
+  },
+  {
+   "title": "The Register — explosion at Google's Iowa data center injures three",
+   "url": "https://www.theregister.com/2022/08/",
+   "type": "press",
+   "quote": "Dispatch reported as 'Large Electrical Explosion/No fire'; three workers injured with burns; air ambulance on standby. (URL 404'd on re-fetch this session; quote per dossier attribution.)",
+   "accessed": "2026-08-02"
+  },
+  {
+   "title": "Data Center Frontier — arc flash at Google Council Bluffs",
+   "url": "https://www.datacenterfrontier.com/",
+   "type": "press",
+   "quote": "Arc flash generates intense heat that can reach 35,000 degrees F, which can damage and even melt electrical equipment; three workers accessing an electrical box. (URL 404'd on re-fetch; quote per dossier attribution.)",
+   "accessed": "2026-08-02"
+  },
+  {
+   "title": "EC&M — three injured in arc flash at Google data center",
+   "url": "https://www.ecmweb.com/",
+   "type": "press",
+   "quote": "Workers were working on a substation close to the data center buildings when an arc flash occurred; injured reported in stable condition by Aug 9. (URL 404'd on re-fetch; quote per dossier attribution.)",
+   "accessed": "2026-08-02"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": true,
+  "lastVerified": "2026-08-02 (seed — pending deep research)"
+ },
+ "lastUpdated": "2026-08-02"
+}

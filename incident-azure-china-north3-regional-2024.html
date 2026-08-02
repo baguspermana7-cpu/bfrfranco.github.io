@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azure China North 3 ~50-Hour Regional Outage (2024) | ResistanceZero</title>
+    <meta name="description" content="A power/cooling failure in Azure China North 3 (operated by 21Vianet) caused a roughly 50-hour regional outage, an unusually long-duration event that disrupted enterprise customers">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="ai-content-declaration" content="human-curated, sourced from public post-incident reports">
+    <meta name="author" content="Bagus Dwi Permana">
+    <link rel="canonical" href="https://resistancezero.com/incident-azure-china-north3-regional-2024.html">
+    <meta name="theme-color" content="#0c1512">
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+    <style>
+    /* ── Governed Incident Dossier — editorial register (v2): forest-green + warm ivory,
+       serif display, evidence-class provenance. Accent vars remapped so all components
+       re-skin. AA-contrast in both themes. No gradients / glass / dot-grid (anti-slop). */
+    :root:not([data-theme="dark"]) {
+        --bg:#f4f1e7; --surface:#fffdf6; --surface-2:#efeadc; --line:rgba(26,45,36,0.16);
+        --text:#1a2d24; --text-strong:#10201a; --text-body:#3b463d; --muted:#6a7367;
+        --cyan:#2f6b4f; --amber:#87671b; --green:#2f7d54; --red:#9c3b32; --gold:#87671b;
+        --hero-ink:#f4f1e7; --hero-bg:#183329; --shadow-deep:rgba(26,45,36,0.10);
+    }
+    [data-theme="dark"] {
+        --bg:#0c1512; --surface:#11201a; --surface-2:#16281f; --line:rgba(233,229,216,0.15);
+        --text:#e9e5d8; --text-strong:#f5f2e9; --text-body:#c6ccbc; --muted:#8b9484;
+        --cyan:#6aa588; --amber:#c9a559; --green:#6aa588; --red:#cf9384; --gold:#c9a559;
+        --hero-ink:#e9e5d8; --hero-bg:#0f221a; --shadow-deep:rgba(0,0,0,0.5);
+    }
+    * { box-sizing:border-box; }
+    html,body { margin:0; padding:0; }
+    body { background:var(--bg); color:var(--text); font-family:'IBM Plex Sans',system-ui,sans-serif; line-height:1.62; }
+    a { color:var(--cyan); }
+    h1,h2,.serif { font-family:'Fraunces','Newsreader',Georgia,serif; font-weight:600; letter-spacing:-0.01em; }
+    .wrap { max-width:1120px; margin:0 auto; padding:1.5rem 1.1rem 3rem; }
+    .navbar { display:flex; align-items:center; justify-content:space-between; padding:0.7rem 1.1rem; border-bottom:1px solid var(--line); background:var(--surface); position:sticky; top:0; z-index:50; }
+    .nav-container { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:1120px; margin:0 auto; }
+    .nav-logo { display:flex; align-items:center; }
+    .nav-avatar { width:34px; height:34px; border-radius:50%; }
+    .nav-menu { display:flex; gap:1rem; list-style:none; margin:0; padding:0; }
+    .nav-menu a { color:var(--text-body); text-decoration:none; font-size:0.85rem; font-weight:600; }
+    .nav-menu a:hover { color:var(--cyan); }
+    .nav-right { display:flex; align-items:center; gap:0.6rem; }
+    .theme-btn { background:none; border:1px solid var(--line); color:var(--text); border-radius:4px; padding:0.35rem 0.5rem; cursor:pointer; font-size:0.8rem; }
+    .lock-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--red); border:1px solid var(--red); border-radius:2px; padding:0.12rem 0.5rem; }
+    h1 { font-size:2.4rem; color:var(--text-strong); margin:0.35rem 0 0.5rem; line-height:1.12; }
+    h2 { font-size:1.4rem; color:var(--text-strong); margin:2rem 0 0.7rem; }
+    .eyebrow { font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); }
+    .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
+    .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
+    .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:2px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    .chip.cyan { color:var(--cyan); border-left:2px solid var(--cyan); }
+    .chip.amber { color:var(--amber); border-left:2px solid var(--amber); }
+    .chip.green { color:var(--green); border-left:2px solid var(--green); }
+    .chip.red { color:var(--red); border-left:2px solid var(--red); }
+    .metabar { font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.04em; color:var(--muted); margin:0.7rem 0; display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; font-variant-numeric:tabular-nums slashed-zero; }
+    .metabar b { color:var(--text-body); font-weight:600; }
+    .metabar .sep { color:var(--line); }
+    .chip.muted { color:var(--muted); }
+    .card { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:1rem 1.1rem; margin-top:0.9rem; }
+    .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:4px; margin-top:0.9rem; }
+    table.inc-index { width:100%; border-collapse:collapse; font-size:0.86rem; min-width:760px; font-variant-numeric:tabular-nums slashed-zero; }
+    table.inc-index th { text-align:left; font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); background:var(--surface-2); }
+    table.inc-index td { padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); color:var(--text-body); vertical-align:top; }
+    table.inc-index tr:hover td { background:var(--surface-2); }
+    table.inc-index a { font-weight:700; color:var(--text-strong); text-decoration:none; }
+    table.inc-index a:hover { color:var(--cyan); text-decoration:underline; }
+    /* rich incident table (reference-2 style) */
+    table.itbl { min-width:1120px; }
+    table.itbl td { vertical-align:middle; }
+    .itr { cursor:pointer; }
+    .itr:hover td { background:var(--surface-2); }
+    .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
+    .c-title { max-width:300px; }
+    .c-title .itt { display:block; font-weight:700; color:var(--text-strong); text-decoration:none; font-size:0.9rem; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .itr:hover .itt { color:var(--cyan); }
+    .c-title .its { color:var(--muted); font-size:0.76rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:0.1rem; }
+    .sev-chip { font-family:'JetBrains Mono',monospace; font-size:0.66rem; font-weight:600; padding:0.12rem 0.5rem; border-radius:2px; border:1px solid; white-space:nowrap; }
+    .sev-b-critical { color:var(--red); border-color:var(--red); }
+    .sev-b-high { color:var(--amber); border-color:var(--amber); }
+    .sev-b-medium { color:var(--green); border-color:var(--green); }
+    .sev-b-low { color:var(--muted); border-color:var(--line); }
+    .st-chip { font-family:'JetBrains Mono',monospace; font-size:0.64rem; padding:0.12rem 0.45rem; border-radius:2px; border:1px solid var(--line); white-space:nowrap; }
+    .st-off { color:var(--green); border-color:color-mix(in srgb, var(--green) 45%, var(--line)); }
+    .st-press { color:var(--amber); border-color:color-mix(in srgb, var(--amber) 45%, var(--line)); }
+    .c-region { min-width:170px; }
+    .c-region .iflag { font-size:1.05rem; margin-right:0.45rem; vertical-align:middle; }
+    .c-region .ireg { display:inline-flex; flex-direction:column; vertical-align:middle; }
+    .c-region .ireg b { color:var(--text-body); font-weight:600; font-size:0.82rem; }
+    .c-region .ireg i { color:var(--muted); font-style:normal; font-size:0.72rem; }
+    .c-mono { font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--text-body); white-space:nowrap; }
+    .c-blast { color:var(--text-strong); font-weight:600; } .c-blast .c-u { color:var(--muted); font-weight:400; font-size:0.68rem; }
+    .ibars { display:inline-flex; gap:2px; }
+    .ibars i { width:7px; height:9px; border-radius:1px; display:block; }
+    .itags { display:flex; gap:0.25rem; max-width:150px; flex-wrap:wrap; }
+    .c-go { color:var(--muted); font-size:1rem; text-align:center; }
+    .itr:hover .c-go { color:var(--cyan); }
+    /* incident-view tabs (List / Risk map / Semantic / Analytics) */
+    .iv-tabs { display:flex; gap:1.2rem; border-bottom:1px solid var(--line); margin:0.4rem 0 0.2rem; flex-wrap:wrap; }
+    .iv-tabs a { font-family:'JetBrains Mono',monospace; font-size:0.74rem; letter-spacing:0.03em; color:var(--muted); text-decoration:none; padding:0.5rem 0.1rem; border-bottom:2px solid transparent; }
+    .iv-tabs a:hover { color:var(--text-strong); }
+    .iv-tabs a.on { color:var(--text-strong); border-bottom-color:var(--cyan); }
+    .rank-badge { font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--amber); font-variant-numeric:tabular-nums slashed-zero; }
+    .mag-bar { height:5px; border-radius:0; background:var(--line); margin-top:0.35rem; overflow:hidden; }
+    .mag-bar > span { display:block; height:4px; background:var(--amber); }
+    ul.tight { margin:0.4rem 0 0; padding-left:1.15rem; }
+    ul.tight li { color:var(--text-body); margin:0.3rem 0; font-size:0.92rem; }
+    .soe { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .soe li { display:grid; grid-template-columns:170px 1fr; gap:0.7rem; padding:0.5rem 0; border-bottom:1px solid var(--line); }
+    .soe time { font-family:'JetBrains Mono',monospace; font-size:0.76rem; color:var(--muted); font-variant-numeric:tabular-nums slashed-zero; }
+    .soe .ev { color:var(--text-body); font-size:0.9rem; }
+    .phase-chip { font-family:'JetBrains Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--amber); border:1px solid var(--line); border-radius:2px; padding:0.05rem 0.4rem; margin-right:0.4rem; white-space:nowrap; font-variant-numeric:tabular-nums; }
+    table.metrics { width:100%; border-collapse:collapse; font-size:0.88rem; font-variant-numeric:tabular-nums slashed-zero; }
+    table.metrics td { padding:0.5rem 0.7rem; border-bottom:1px solid var(--line); vertical-align:top; }
+    table.metrics .mlabel { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; width:38%; white-space:nowrap; }
+    table.metrics .mval { color:var(--text-body); }
+    .ca-block { background:var(--surface); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 2px 2px 0; padding:0.7rem 1rem; margin-top:0.7rem; }
+    .ca-block h3 { margin:0 0 0.3rem; font-size:0.92rem; color:var(--text-strong); }
+    .ca-block p { margin:0; color:var(--text-body); font-size:0.9rem; }
+    /* reading column — constrain prose to a comfortable measure, justified like RZ articles */
+    .reading-col { max-width:820px; margin:0 auto; }
+    .reading-col p.lede, .reading-col .card p, .reading-col .ca-block p, .reading-col ul.tight li { text-align:justify; -webkit-hyphens:auto; hyphens:auto; }
+    .card p { margin:0; }
+    .card > p + p, .card p + p { margin-top:0.7rem; }
+    .mag-trace { font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--text-body); background:var(--surface-2); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 2px 2px 0; padding:0.5rem 0.7rem; margin-top:0.5rem; font-variant-numeric:tabular-nums slashed-zero; }
+    .mag-trace b { color:var(--text-strong); }
+    .imp-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.04em; text-transform:uppercase; color:var(--cyan); font-weight:700; margin-right:0.35rem; }
+    .coe-meta { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); background:var(--surface-2); border:1px solid var(--line); border-radius:2px; padding:0.05rem 0.4rem; margin-left:0.2rem; white-space:normal; }
+    /* FAQ / methodology */
+    details.faq { border:1px solid var(--line); border-radius:4px; background:var(--surface); margin:0.8rem 0 0.4rem; }
+    details.faq > summary { cursor:pointer; padding:0.7rem 0.9rem; font-family:'JetBrains Mono',monospace; font-size:0.74rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-strong); list-style:none; }
+    details.faq > summary::-webkit-details-marker { display:none; }
+    details.faq > summary::before { content:"+ "; color:var(--cyan); }
+    details.faq[open] > summary::before { content:"– "; }
+    details.faq .faq-body { padding:0 0.9rem 0.9rem; }
+    details.faq h4 { font-family:'Fraunces',Georgia,serif; font-size:0.98rem; color:var(--text-strong); margin:0.8rem 0 0.2rem; }
+    details.faq p, details.faq li { color:var(--text-body); font-size:0.88rem; }
+    /* share bar (RZ standard) — editorial thin buttons */
+    .share-buttons { display:flex; align-items:center; gap:0.5rem; margin:1.4rem 0 0.4rem; padding-top:1rem; border-top:1px solid var(--line); }
+    .share-label { font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin-right:0.2rem; }
+    .share-btn { width:32px; height:32px; display:inline-flex; align-items:center; justify-content:center; background:var(--surface-2); border:1px solid var(--line); border-radius:4px; color:var(--text-body); cursor:pointer; padding:0; }
+    .share-btn:hover { border-color:var(--cyan); color:var(--cyan); }
+    .share-btn svg { width:15px; height:15px; }
+    /* ── inline-SVG visualizations (theme-aware via vars) ── */
+    .inc-map { height:410px; margin-top:0.4rem; border:1px solid var(--line); border-radius:4px; overflow:hidden; background:#0f1a16; z-index:1; }
+    .inc-map .leaflet-container { background:#0f1a16; font-family:'IBM Plex Sans',sans-serif; }
+    .inc-map .leaflet-popup-content-wrapper { background:#12211b !important; color:#e6efe9 !important; border:1px solid #2c4438 !important; border-radius:10px !important; box-shadow:0 8px 24px rgba(0,0,0,0.45) !important; }
+    .inc-map .leaflet-popup-tip { background:#12211b !important; border:1px solid #2c4438 !important; }
+    .inc-map .leaflet-popup-content { margin:9px 12px !important; }
+    .inc-map .leaflet-control-attribution { background:rgba(15,26,22,0.8) !important; color:#7d8f86 !important; font-size:9px !important; }
+    .inc-map .leaflet-control-attribution a { color:#9fb3a8 !important; }
+    .inc-map .leaflet-bar a { background:#12211b !important; color:#cfe0d7 !important; border-color:#2c4438 !important; }
+    .leaflet-tooltip.inc-tip { background:#12211b; color:#e6efe9; border:1px solid #2c4438; border-radius:3px; font-family:'JetBrains Mono',monospace; font-size:0.66rem; padding:2px 7px; box-shadow:0 6px 18px rgba(0,0,0,0.5); }
+    .leaflet-tooltip.inc-tip:before { border-top-color:#2c4438; }
+    /* ── Incident Intelligence dashboard (editorial, no neon) ── */
+    .iid { margin:1.4rem 0 1rem; }
+    .iid-head { display:flex; align-items:flex-end; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin-bottom:0.9rem; }
+    .iid-title { font-size:1.6rem; margin:0; color:var(--text-strong); }
+    .iid-sub { margin:0.15rem 0 0; color:var(--muted); font-size:0.86rem; }
+    .iid-range { font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.05em; color:var(--muted); border:1px solid var(--line); border-radius:3px; padding:0.3rem 0.6rem; white-space:nowrap; }
+    .iid-num { font-variant-numeric:tabular-nums slashed-zero; }
+    .iid-kpis { display:grid; grid-template-columns:repeat(5,1fr); gap:0.7rem; margin-bottom:0.9rem; }
+    .iid-kpi { background:var(--surface); border:1px solid var(--line); border-top:2px solid var(--cyan); border-radius:0 0 4px 4px; padding:0.75rem 0.85rem; transition:transform 0.18s ease, box-shadow 0.18s ease; }
+    .iid-kpi:hover { transform:translateY(-2px); box-shadow:0 10px 24px var(--shadow-deep); }
+    .iid-kpi-l { font-family:'JetBrains Mono',monospace; font-size:0.62rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); }
+    .iid-kpi-v { display:flex; align-items:baseline; gap:0.3rem; margin:0.25rem 0 0.15rem; }
+    .iid-kpi-v .iid-num, .iid-kpi-v > span:first-child { font-family:'Fraunces',Georgia,serif; font-size:1.8rem; font-weight:600; color:var(--text-strong); line-height:1; }
+    .iid-kpi-u { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .iid-kpi-s { font-size:0.72rem; color:var(--muted); }
+    .iid-grid { display:grid; grid-template-columns:290px 1fr 300px; gap:0.9rem; align-items:start; }
+    .iid-col-l, .iid-col-c, .iid-col-r { display:flex; flex-direction:column; gap:0.9rem; min-width:0; }
+    .iid-panel { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0.85rem 0.95rem; }
+    .iid-panel-map { padding:0.85rem 0.95rem 0.6rem; }
+    .iid-panel-map .inc-map { height:360px; margin-top:0.5rem; }
+    .iid-ph { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin-bottom:0.5rem; }
+    .iid-note { font-size:0.74rem; color:var(--muted); margin:0 0 0.5rem; }
+    .iid-donut-wrap { display:flex; align-items:center; gap:0.9rem; }
+    .iid-donut { width:130px; height:130px; flex:0 0 auto; }
+    .iid-arc { transition:stroke-dasharray 0.9s cubic-bezier(0.22,1,0.36,1); }
+    .iid-donut-c { font-family:'Fraunces',Georgia,serif; font-size:19px; font-weight:600; fill:var(--text-strong); }
+    .iid-donut-t { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.1em; text-transform:uppercase; fill:var(--muted); }
+    .iid-legend { list-style:none; margin:0; padding:0; flex:1; min-width:0; }
+    .iid-legend li { display:flex; align-items:center; gap:0.45rem; font-size:0.82rem; color:var(--text-body); padding:0.16rem 0; }
+    .iid-legend b { margin-left:auto; color:var(--text-strong); font-family:'JetBrains Mono',monospace; font-size:0.82rem; }
+    .iid-legend .iid-pct { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.72rem; width:2.4em; text-align:right; }
+    .iid-dot { width:9px; height:9px; border-radius:50%; flex:0 0 auto; }
+    .iid-catbars, .iid-durbars, .iid-sigs { list-style:none; margin:0; padding:0; }
+    .iid-catbars li, .iid-durbars li, .iid-sigs li { display:grid; grid-template-columns:1fr 90px auto; align-items:center; gap:0.5rem; padding:0.24rem 0; font-size:0.82rem; }
+    .iid-sigs li { grid-template-columns:1fr 64px auto auto; }
+    .iid-catbars li { cursor:pointer; }
+    .iid-catbars li:hover .iid-cbl { color:var(--cyan); }
+    .iid-cbl, .iid-dbl, .iid-sig-n { color:var(--text-body); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .iid-cbar, .iid-dbar, .iid-sig-bar { height:7px; background:var(--surface-2); border-radius:0; overflow:hidden; }
+    .iid-cbar i, .iid-sig-bar i { display:block; height:100%; width:var(--w); background:var(--amber); transform:scaleX(0); transform-origin:left; transition:transform 0.9s cubic-bezier(0.22,1,0.36,1); }
+    .iid-dbar i { display:block; height:100%; width:var(--w); background:var(--cyan); transform:scaleX(0); transform-origin:left; transition:transform 0.9s cubic-bezier(0.22,1,0.36,1); }
+    .iid-in .iid-cbar i, .iid-in .iid-dbar i, .iid-in .iid-sig-bar i { transform:scaleX(1); }
+    .iid-catbars b, .iid-durbars b, .iid-sigs b { font-family:'JetBrains Mono',monospace; color:var(--text-strong); font-size:0.82rem; text-align:right; }
+    .iid-durbars b { color:var(--muted); }
+    .iid-sig-m { font-family:'JetBrains Mono',monospace; font-size:0.66rem; color:var(--muted); }
+    .iid-recent { display:flex; flex-direction:column; }
+    .iid-rec { display:flex; align-items:center; gap:0.55rem; padding:0.45rem 0; border-bottom:1px solid var(--line); text-decoration:none; }
+    .iid-rec:last-child { border-bottom:none; }
+    .iid-rec-sev { width:8px; height:8px; border-radius:50%; flex:0 0 auto; }
+    .iid-rec-b { display:flex; flex-direction:column; min-width:0; flex:1; }
+    .iid-rec-t { color:var(--text-strong); font-size:0.84rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .iid-rec:hover .iid-rec-t { color:var(--cyan); }
+    .iid-rec-m { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.68rem; }
+    .iid-rec-tag { font-family:'JetBrains Mono',monospace; font-size:0.58rem; letter-spacing:0.04em; padding:0.1rem 0.35rem; border:1px solid var(--line); border-radius:2px; flex:0 0 auto; }
+    .sev-critical { background:var(--red); } .iid-rec-tag.sev-critical { color:var(--red); background:transparent; border-color:var(--red); }
+    .sev-high { background:var(--amber); } .iid-rec-tag.sev-high { color:var(--amber); background:transparent; border-color:var(--amber); }
+    .sev-medium { background:var(--green); } .iid-rec-tag.sev-medium { color:var(--green); background:transparent; border-color:var(--green); }
+    .sev-low { background:var(--muted); } .iid-rec-tag.sev-low { color:var(--muted); background:transparent; border-color:var(--line); }
+    .iid-graph { width:100%; height:auto; display:block; }
+    .iid-edge { stroke:var(--line); stroke-width:1; opacity:0.55; transition:stroke 0.15s, opacity 0.15s; }
+    .iid-edge.on { stroke:var(--cyan); opacity:0.9; stroke-width:1.3; }
+    .iid-node circle { transition:transform 0.15s ease, opacity 0.15s; transform-origin:center; }
+    .iid-node:hover circle { stroke:var(--text-strong); stroke-width:1.4; }
+    .iid-graph.iid-focus .iid-node.dim circle { opacity:0.22; }
+    .iid-maplegend { display:flex; flex-wrap:wrap; gap:0.4rem 1rem; margin-top:0.5rem; font-family:'JetBrains Mono',monospace; font-size:0.66rem; color:var(--muted); }
+    .iid-maplegend span { display:inline-flex; align-items:center; gap:0.35rem; }
+    .iid-maplegend i { width:10px; height:10px; border-radius:50%; }
+    .iid-maplegend .iid-mln { font-style:italic; opacity:0.8; }
+    .iid-foot { display:flex; flex-wrap:wrap; gap:0.5rem 1.4rem; align-items:center; margin-top:0.9rem; padding-top:0.8rem; border-top:1px solid var(--line); font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .iid-foot b { color:var(--text-body); font-weight:600; margin-right:0.3rem; }
+    .iid-foot-link { margin-left:auto; color:var(--cyan); text-decoration:none; }
+    @media (max-width:1000px){ .iid-grid { grid-template-columns:1fr; } .iid-kpis { grid-template-columns:repeat(2,1fr); } }
+    @media (max-width:520px){ .iid-kpis { grid-template-columns:1fr 1fr; } .iid-kpi-v .iid-num, .iid-kpi-v > span:first-child { font-size:1.5rem; } }
+    @media (prefers-reduced-motion:reduce){ .iid-arc,.iid-cbar i,.iid-dbar i,.iid-sig-bar i,.iid-kpi,.iid-node circle,.iid-edge { transition:none !important; } .iid-cbar i,.iid-dbar i,.iid-sig-bar i { transform:scaleX(1); } }
+    .viz { overflow-x:auto; margin-top:0.9rem; background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0.9rem 1rem; }
+    .viz svg { display:block; max-width:100%; height:auto; }
+    .viz-radar svg { max-width:320px; margin:0 auto; }
+    .vz-num { font-variant-numeric:tabular-nums slashed-zero; }
+    .vz-box-t, .vz-box-s, .vz-lbl, .vz-hb-lbl, .vz-tl-t, .vz-pt, .vz-tick { pointer-events:auto; }
+    .vz-grid { fill:none; stroke:var(--line); stroke-width:1; }
+    .vz-accent-fill { fill:var(--cyan); fill-opacity:0.16; stroke:var(--cyan); stroke-width:1.4; }
+    .vz-accent-dot { fill:var(--cyan); }
+    .vz-accent-bar { fill:var(--cyan); }
+    .vz-cat-bar { fill:var(--amber); }
+    .vz-lbl { font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--muted); }
+    .vz-box-trigger { fill:color-mix(in srgb, var(--red) 12%, var(--surface)); stroke:var(--red); stroke-width:1.2; }
+    .vz-box-fault { fill:color-mix(in srgb, var(--amber) 12%, var(--surface)); stroke:var(--amber); stroke-width:1.2; }
+    .vz-box-down { fill:color-mix(in srgb, var(--cyan) 10%, var(--surface)); stroke:var(--cyan); stroke-width:1; }
+    .vz-box-t { font-family:'IBM Plex Sans',sans-serif; font-size:11px; font-weight:600; fill:var(--text-strong); }
+    .vz-box-s { font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--muted); }
+    .vz-flow { stroke:var(--muted); stroke-width:1.3; fill:none; }
+    .vz-arrhead { fill:var(--muted); }
+    .vz-tl-ph { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.04em; text-transform:uppercase; fill:var(--amber); }
+    .vz-tl-t { font-family:'JetBrains Mono',monospace; font-size:8.5px; fill:var(--muted); }
+    .vz-hb-lbl { font-family:'IBM Plex Sans',sans-serif; font-size:11px; fill:var(--text-body); }
+    .vz-hb-val { font-family:'JetBrains Mono',monospace; font-size:10px; fill:var(--muted); font-variant-numeric:tabular-nums slashed-zero; }
+    .vz-tick { font-family:'JetBrains Mono',monospace; font-size:8.5px; fill:var(--muted); }
+    .vz-quad { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.05em; text-transform:uppercase; fill:var(--muted); opacity:0.7; }
+    .vz-pt { font-family:'JetBrains Mono',monospace; font-size:8px; fill:var(--text-body); }
+    .viz a { text-decoration:none; }
+    .viz a:hover .vz-pt { fill:var(--cyan); font-weight:600; }
+    .viz a:hover circle { stroke:var(--text-strong); stroke-width:1.4; }
+    .vz-legend { display:flex; flex-wrap:wrap; gap:0.5rem 1.1rem; margin-top:0.7rem; padding-top:0.6rem; border-top:1px solid var(--line); }
+    .vz-key { display:inline-flex; align-items:center; gap:0.4rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .vz-key i { width:11px; height:11px; border-radius:50%; display:inline-block; }
+    .vz-key-note { font-style:italic; opacity:0.8; }
+    .viz-grid3 { display:grid; grid-template-columns:1fr 1fr; gap:0.9rem; }
+    @media (max-width:720px){ .viz-grid3 { grid-template-columns:1fr; } }
+    .filterbar { display:flex; flex-wrap:wrap; align-items:center; gap:0.4rem 0.6rem; margin:0.9rem 0 0.2rem; }
+    .fb-group { display:flex; flex-wrap:wrap; gap:0.35rem; }
+    .fb-chip { font-family:'JetBrains Mono',monospace; font-size:0.72rem; padding:0.28rem 0.6rem; border-radius:2px; border:1px solid var(--line); background:var(--surface); color:var(--text-body); cursor:pointer; }
+    .fb-chip:hover { border-color:var(--cyan); }
+    .fb-chip.active { background:var(--surface-2); border-color:var(--line); border-bottom:2px solid var(--cyan); color:var(--text-strong); font-weight:700; }
+    .fb-search { flex:1 1 200px; min-width:160px; font-family:'IBM Plex Sans',sans-serif; font-size:0.82rem; padding:0.3rem 0.6rem; border-radius:4px; border:1px solid var(--line); background:var(--surface); color:var(--text); }
+    .fb-count { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); margin-left:auto; }
+    .kv { display:grid; grid-template-columns:180px 1fr; gap:0.5rem 0.9rem; margin-top:0.5rem; font-size:0.9rem; }
+    .kv dt { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; }
+    .kv dd { margin:0; color:var(--text-body); }
+    .refs { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .refs li { padding:0.55rem 0; border-bottom:1px solid var(--line); }
+    .refs .rtitle { color:var(--text-strong); font-weight:600; font-size:0.9rem; }
+    .refs .rquote { color:var(--muted); font-size:0.84rem; font-style:italic; margin-top:0.2rem; display:block; }
+    .refs a { font-size:0.78rem; word-break:break-all; }
+    .backlink { display:inline-block; margin-bottom:0.6rem; font-size:0.82rem; color:var(--cyan); text-decoration:none; }
+    footer { border-top:1px solid var(--line); margin-top:2.5rem; padding:1.4rem 1.1rem; text-align:center; }
+    footer .ver { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .disclaimer { font-size:0.76rem; color:var(--muted); margin-top:0.8rem; max-width:80ch; }
+    .skip-link { position:absolute; top:-50px; left:0; background:var(--cyan); color:var(--hero-bg); padding:10px 20px; text-decoration:none; font-weight:600; z-index:10000; border-radius:0 0 4px 0; transition:top 0.2s; }
+    .skip-link:focus { top:0; }
+    .root-gate { position:fixed; inset:0; z-index:99999; display:none; align-items:center; justify-content:center; background:rgba(2,6,23,0.74); padding:1rem; backdrop-filter:blur(6px); }
+    body.locked .root-gate { display:flex; }
+    body.locked .wrap { filter:blur(4px); pointer-events:none; user-select:none; }
+    .root-card { max-width:430px; width:100%; background:var(--surface); border:1px solid var(--cyan); border-radius:4px; padding:1.3rem 1.15rem; text-align:center; box-shadow:0 18px 36px var(--shadow-deep); }
+    .root-card h2 { margin:0 0 0.4rem; font-size:1.1rem; color:var(--text-strong); }
+    .root-card p { font-size:0.86rem; color:var(--text-body); }
+    .root-actions { margin-top:0.9rem; display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; }
+    .root-actions button, .root-actions a { border-radius:4px; padding:0.5rem 0.85rem; font-size:0.8rem; font-weight:700; border:1px solid var(--line); text-decoration:none; cursor:pointer; color:var(--text); font-family:inherit; }
+    .root-actions button { background:var(--cyan); color:var(--hero-bg); border:none; }
+    .rz-nav-burger { display:none; }
+    /* v1.8.0 — mobile responsive patch */
+    @media (max-width:768px) {
+        html,body { overflow-x:hidden; max-width:100vw; }
+        img { max-width:100%; height:auto; display:block; }
+        .nav-menu, .nav-links { display:none; }
+        .navbar { padding:0.5rem 0.75rem; }
+        footer .footer-grid { grid-template-columns:1fr; gap:1.25rem; padding:1rem; }
+        button, a.btn, [role="button"] { min-height:44px; }
+        h1 { font-size:1.4rem; }
+        .soe li { grid-template-columns:1fr; gap:0.15rem; }
+        .kv { grid-template-columns:1fr; }
+        .root-card { max-width:92vw; }
+    }
+    @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
+</style>
+    
+</head>
+<body class="locked">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <nav class="navbar"><div class="nav-container">
+        <a href="index.html" class="nav-logo"><img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dc-incidents.html">DC Incidents</a></li>
+            <li><a href="datacenter-solutions.html">DC Solutions</a></li>
+        </ul>
+        <div class="nav-right">
+            <span class="lock-tag" title="Root-only module">ROOT</span>
+            <button class="theme-btn" id="themeToggle" type="button" aria-label="Toggle theme">◐</button>
+        </div>
+    </div></nav>
+    <main class="wrap" id="main-content">
+        <div class="reading-col">
+        <a class="backlink" href="dc-incidents.html">← All incidents</a>
+        <div class="eyebrow">Incident dossier · Rank #33</div>
+        <h1>Azure China North 3 ~50-Hour Regional Outage (2024)</h1>
+        <div class="chips">
+            <span class="chip">Microsoft Azure (operated by 21Vianet)</span>
+            <span class="chip cyan">2024-11-01</span>
+            <span class="chip amber">50h 0m core impact</span>
+            <span class="chip amber">Power</span><span class="chip cyan">Cooling</span>
+        </div>
+        <p class="lede">A power/cooling failure in Azure China North 3 (operated by 21Vianet) caused a roughly 50-hour regional outage, an unusually long-duration event that disrupted enterprise customers.</p>
+
+        <h2>Failure cascade</h2>
+        <div class="viz viz-cascade"><svg viewBox="0 0 760 158" role="img" aria-label="Failure cascade block diagram"><title>Failure cascade: trigger → fault → downstream impact</title><defs><marker id="ic-ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path class="vz-arrhead" d="M0,0 L6,3 L0,6 Z"/></marker></defs><text class="vz-tl-ph" x="8" y="12">Trigger</text><text class="vz-tl-ph" x="248" y="12">Primary fault</text><text class="vz-tl-ph" x="516" y="12">Downstream impact</text><rect class="vz-box-trigger" x="8" y="51.0" width="176" height="56" rx="2"><title>Trigger — Power (2024-11-01)</title></rect><text class="vz-box-t" x="18" y="68.0">Trigger · Power</text><text class="vz-box-s" x="18" y="82.0"><title>2024-11-01</title>2024-11-01</text><rect class="vz-box-fault" x="240" y="51.0" width="224" height="56" rx="2"><title>Primary fault at Microsoft Azure (operated by 21Vianet) — Azure China North 3 region (Hebei)</title></rect><text class="vz-box-t" x="250" y="68.0">Azure 21Vianet</text><text class="vz-box-s" x="250" y="82.0"><title>Azure China North 3 region (Hebei)</title>Azure China North 3 region</text><line class="vz-flow" x1="184" y1="79.0" x2="238" y2="79.0" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="26" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Azure China North 3 regional services (multiple, ~50h)</title></rect><text class="vz-box-t" x="526" y="43">Azure China North 3 regional</text><line class="vz-flow" x1="464" y1="79.0" x2="514" y2="44" marker-end="url(#ic-ar)"/></svg></div>
+        <p class="disclaimer">Trigger → primary fault → downstream blast radius, derived from the sourced root cause and affected-services record.</p>
+
+        <h2>Facility &amp; location</h2>
+        <dl class="kv">
+            <dt>Operator</dt><dd>Microsoft Azure (operated by 21Vianet)</dd>
+            <dt>Data center</dt><dd>Azure China North 3 region (Hebei)</dd>
+            <dt>Location</dt><dd>Hebei, China</dd>
+            <dt>Date</dt><dd>2024-11-01</dd>
+        </dl>
+
+        <h2>Impact &amp; scale</h2>
+        <dl class="kv">
+            <dt>Users affected</dt><dd>Azure China North 3 enterprise customers (regional)</dd>
+            <dt>Financial</dt><dd>Not published</dd>
+            <dt>Scope</dt><dd>Regional facility outage (~50h)</dd>
+        </dl>
+        <div class="card"><strong>Services / systems down</strong><ul class="tight"><li>Azure China North 3 regional services (multiple, ~50h)</li></ul></div>
+        <h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Claimed outage duration</td><td class="mval">~50 hours (UNVERIFIED - task lead only; not confirmed by any PIR, status entry, or press report)</td></tr><tr><td class="mlabel">Claimed onset date</td><td class="mval">2024-11-01 (UNVERIFIED - task lead only; no public source corroborates)</td></tr><tr><td class="mlabel">Named scale units confirmed in the affected region</td><td class="mval">6 (chinanorth3-01 through chinanorth3-06, plus chinanorth3.c) - VERIFIED via live TLS SAN list</td></tr><tr><td class="mlabel">Region pairing / in-country failover option</td><td class="mval">China North 3 paired with China East 3 (access-restricted for in-country DR); China North 3 has availability-zone support - VERIFIED (official)</td></tr><tr><td class="mlabel">Public PIRs retained for the region/date</td><td class="mval">0 for China North 3 Nov-2024 (page shows only a July-2026 and two May-2026 PIRs) - VERIFIED</td></tr><tr><td class="mlabel">English-language press items found for the event</td><td class="mval">0 (Google News &#x27;Azure 21Vianet outage&#x27; = 0 items; &#x27;Azure China North 3&#x27; = 0 on re-fetch) - VERIFIED negative evidence, tooling-limited</td></tr><tr><td class="mlabel">Nearest Wayback archive capture to the incident date</td><td class="mval">2024-12-05, and it is a 301 stub (no content) - VERIFIED</td></tr><tr><td class="mlabel">China status dashboard redirect (record-availability)</td><td class="mval">www.azure.cn service-dashboard 301 -&gt; status.azure.com/zh-cn/status (-&gt; azure.status.microsoft) - VERIFIED live 2026-08-02</td></tr></tbody></table></div>
+
+        <h2>Magnitude profile</h2>
+        <div class="viz viz-radar"><svg viewBox="0 0 290 215" role="img" aria-label="Magnitude sub-scores radar chart"><title>Magnitude sub-scores (0–10)</title><polygon class="vz-grid" points="145.0,83.2 166.8,105.0 145.0,126.8 123.2,105.0"/><polygon class="vz-grid" points="145.0,62.1 187.9,105.0 145.0,147.9 102.1,105.0"/><polygon class="vz-grid" points="145.0,41.0 209.0,105.0 145.0,169.0 81.0,105.0"/><line class="vz-grid" x1="145" y1="105" x2="145.0" y2="41.0"/><line class="vz-grid" x1="145" y1="105" x2="209.0" y2="105.0"/><line class="vz-grid" x1="145" y1="105" x2="145.0" y2="169.0"/><line class="vz-grid" x1="145" y1="105" x2="81.0" y2="105.0"/><polygon class="vz-accent-fill" points="145.0,79.4 170.6,105.0 145.0,149.8 119.4,105.0"><title>Magnitude sub-scores (0–10)</title></polygon><circle class="vz-accent-dot" cx="145.0" cy="79.4" r="2.4"/><circle class="vz-accent-dot" cx="170.6" cy="105.0" r="2.4"/><circle class="vz-accent-dot" cx="145.0" cy="149.8" r="2.4"/><circle class="vz-accent-dot" cx="119.4" cy="105.0" r="2.4"/><text class="vz-lbl vz-num" x="145.0" y="20.0" text-anchor="middle">Users 4<title>Users affected (0–10) — breadth of the user/customer population impacted. — scored 4/10.</title></text><text class="vz-lbl vz-num" x="223.0" y="109.0" text-anchor="start">Financial 4<title>Financial impact (0–10) — direct + consequential cost. — scored 4/10.</title></text><text class="vz-lbl vz-num" x="145.0" y="198.0" text-anchor="middle">Duration 7<title>Outage duration (0–10) — how long service was degraded/down. — scored 7/10.</title></text><text class="vz-lbl vz-num" x="67.0" y="109.0" text-anchor="end">Blast 4<title>Blast radius (0–10) — how wide the fault propagated across systems/regions. — scored 4/10.</title></text></svg></div>
+        <div class="mag-trace">Magnitude <b>4.6</b> = blast 4×0.35 + users 4×0.25 + financial 4×0.20 + duration 7×0.20 <span style="opacity:0.7">(sub-scores 0–10 · weighted composite)</span></div>
+        <p class="disclaimer">~50-hour regional power/cooling outage caused prolonged enterprise disruption — sub-scores ESTIMATED from public impact reporting, pending deep research.</p>
+
+        <h2>Sequence of events (SOE)</h2>
+        <div class="viz viz-timeline"><svg viewBox="0 0 1604 96" role="img" aria-label="Sequence-of-events timeline"><title>Phased sequence of events</title><line class="vz-grid" x1="30" y1="48" x2="1574" y2="48"/><circle class="vz-accent-dot" cx="30" cy="48" r="4.5"><title>2024-11-01 (UNVERIFIED - task lead only; no public source corroborates the date) · TRIGGER — Claimed onset of an Azure China North 3 regional outage. No physical trigger, alarm, or start-time is documented in any accessible source; the date, duration, and even the occurrence of the event rest solely on the task lead.</title></circle><text class="vz-tl-ph" x="30" y="30" text-anchor="middle">TRIGGER</text><text class="vz-tl-t" x="30" y="68" text-anchor="middle">2024-11-01 (UNVE</text><circle class="vz-accent-dot" cx="126" cy="48" r="4.5"><title>At claimed onset (NO RECORD) · DETECTION — No fire-detection event exists on record - no VESDA/aspirating-smoke or spot-detector activation, no smoke/heat alarm timestamp. The incident is characterised as a service/regional outage, not a fire, and no detection event of any kind is documented.</title></circle><text class="vz-tl-ph" x="126" y="30" text-anchor="middle">DETECTION</text><text class="vz-tl-t" x="126" y="68" text-anchor="middle">At claimed onset</text><circle class="vz-accent-dot" cx="223" cy="48" r="4.5"><title>At claimed onset (NO RECORD) · DETECTION — No control-room alarm, incident ticket, tracking ID, or first-alert timestamp is publicly retained. The China-only status feed that would have carried a first notice now 301-redirects into the global Azure status page and no matching entry survives.</title></circle><text class="vz-tl-ph" x="223" y="30" text-anchor="middle">DETECTION</text><text class="vz-tl-t" x="223" y="68" text-anchor="middle">At claimed onset</text><circle class="vz-accent-dot" cx="320" cy="48" r="4.5"><title>During claimed outage (NO RECORD) · MITIGATION — No operator/first-responder response sequence is documented - no NOC action log, no runbook step, no escalation record. Root cause (power vs cooling vs network vs storage/control-plane vs - unlikely and unevidenced - fire) is entirely unknown.</title></circle><text class="vz-tl-ph" x="320" y="30" text-anchor="middle">MITIGATION</text><text class="vz-tl-t" x="320" y="68" text-anchor="middle">During claimed o</text><circle class="vz-accent-dot" cx="416" cy="48" r="4.5"><title>During claimed outage (NO RECORD) · MITIGATION — No fire-suppression event on record - no clean-agent/NOVEC/FM-200/water-mist/pre-action discharge, and no evidence any suppression was called upon or that it did or did not work. There is no evidence a fire occurred at all.</title></circle><text class="vz-tl-ph" x="416" y="30" text-anchor="middle">MITIGATION</text><text class="vz-tl-t" x="416" y="68" text-anchor="middle">During claimed o</text><circle class="vz-accent-dot" cx="512" cy="48" r="4.5"><title>During claimed outage (NO RECORD) · MITIGATION — No evacuation record (no who/when), no muster or headcount. Because the event is not evidenced as a fire, no life-safety sequence is documented.</title></circle><text class="vz-tl-ph" x="512" y="30" text-anchor="middle">MITIGATION</text><text class="vz-tl-t" x="512" y="68" text-anchor="middle">During claimed o</text><circle class="vz-accent-dot" cx="609" cy="48" r="4.5"><title>During claimed outage (NO RECORD) · MITIGATION — No emergency-services sequence exists - no fire-brigade call, no arrival time, no on-site actions. No local fire-authority or emergency-response record is web-exposed.</title></circle><text class="vz-tl-ph" x="609" y="30" text-anchor="middle">MITIGATION</text><text class="vz-tl-t" x="609" y="68" text-anchor="middle">During claimed o</text><circle class="vz-accent-dot" cx="706" cy="48" r="4.5"><title>During claimed outage (NO RECORD) · MITIGATION — No power de-energisation/isolation or EPO event is documented, and no containment/spread narrative exists. Whether any electrical isolation occurred is unknown.</title></circle><text class="vz-tl-ph" x="706" y="30" text-anchor="middle">MITIGATION</text><text class="vz-tl-t" x="706" y="68" text-anchor="middle">During claimed o</text><circle class="vz-accent-dot" cx="802" cy="48" r="4.5"><title>During claimed outage (UNKNOWN SCOPE) · CASCADE — Impact scope - which services, availability zones, and customers were affected - is unknown. The region&#x27;s six named scale units (chinanorth3-01..06) are confirmed to exist via the live TLS certificate, but no per-service or per-AZ degradation record is public.</title></circle><text class="vz-tl-ph" x="802" y="30" text-anchor="middle">CASCADE</text><text class="vz-tl-t" x="802" y="68" text-anchor="middle">During claimed o</text><circle class="vz-accent-dot" cx="898" cy="48" r="4.5"><title>During claimed outage (VERIFIED architecture, not event timing) · CASCADE — Single-region blast radius: China North 3 is paired with China East 3 (access-restricted for in-country disaster recovery) per Microsoft&#x27;s official region list; a single-region deployment has no in-country failover, so whatever the trigger, a customer in only China North 3 absorbed the full outage.</title></circle><text class="vz-tl-ph" x="898" y="30" text-anchor="middle">CASCADE</text><text class="vz-tl-t" x="898" y="68" text-anchor="middle">During claimed o</text><circle class="vz-accent-dot" cx="995" cy="48" r="4.5"><title>+~50 hours (UNVERIFIED - task lead only) · IMPACT — Claimed ~50-hour disruption to enterprise customers in the region. The ~50h figure could not be confirmed against any operator PIR, status-history entry, or press report; it is reported as unverified.</title></circle><text class="vz-tl-ph" x="995" y="30" text-anchor="middle">IMPACT</text><text class="vz-tl-t" x="995" y="68" text-anchor="middle">+~50 hours (UNVE</text><circle class="vz-accent-dot" cx="1092" cy="48" r="4.5"><title>+~50 hours (UNVERIFIED - task lead only) · RECOVERY — Claimed regional recovery after roughly 50 hours. No restoration steps, no phased service-return log, and no reason for the ~50h duration are documented anywhere accessible.</title></circle><text class="vz-tl-ph" x="1092" y="30" text-anchor="middle">RECOVERY</text><text class="vz-tl-t" x="1092" y="68" text-anchor="middle">+~50 hours (UNVE</text><circle class="vz-accent-dot" cx="1188" cy="48" r="4.5"><title>By 2026-08-02 (VERIFIED post-incident record behaviour, not event timing) · RESTORED — The Azure China (21Vianet) service dashboard returns 301 Moved Permanently -&gt; https://status.azure.com/zh-cn/status (which itself now 301-redirects to azure.status.microsoft); the standalone China incident feed no longer serves notices at its old address.</title></circle><text class="vz-tl-ph" x="1188" y="30" text-anchor="middle">RESTORED</text><text class="vz-tl-t" x="1188" y="68" text-anchor="middle">By 2026-08-02 (V</text><circle class="vz-accent-dot" cx="1284" cy="48" r="4.5"><title>By 2026-08-02 (VERIFIED) · RESTORED — The global status-history page retains only recent PIRs (a July-2026 West US preliminary PIR and two May-2026 PIRs at inspection) and lists no incidents for the China North 3 region - no November-2024 China North 3 PIR is publicly hosted.</title></circle><text class="vz-tl-ph" x="1284" y="30" text-anchor="middle">RESTORED</text><text class="vz-tl-t" x="1284" y="68" text-anchor="middle">By 2026-08-02 (V</text><circle class="vz-accent-dot" cx="1381" cy="48" r="4.5"><title>Nearest capture 2024-12-05 (VERIFIED) · RESTORED — Wayback did not capture a China North 3 PIR for the window; the nearest status.azure.com/history capture to the date is a 301 stub, not archived content.</title></circle><text class="vz-tl-ph" x="1381" y="30" text-anchor="middle">RESTORED</text><text class="vz-tl-t" x="1381" y="68" text-anchor="middle">Nearest capture </text><circle class="vz-accent-dot" cx="1478" cy="48" r="4.5"><title>Verification pass 2026-08-02 (VERIFIED negative evidence, tooling-limited) · DETECTION — Google News returned 0 items for &#x27;Azure 21Vianet outage&#x27; and 0 for &#x27;Azure China North 3&#x27; on re-fetch - no English-language trade/press coverage of a Nov-2024 outage was found. Disclosed as partly a tooling artefact (WebSearch budget exhausted, open engines blocked).</title></circle><text class="vz-tl-ph" x="1478" y="30" text-anchor="middle">DETECTION</text><text class="vz-tl-t" x="1478" y="68" text-anchor="middle">Verification pas</text><circle class="vz-accent-dot" cx="1574" cy="48" r="4.5"><title>Verification pass 2026-08-02 (VERIFIED) · DETECTION — Primary region-exists evidence: the live TLS certificate served at status.azure.cn (O=Shanghai Blue Cloud Technology Co., Ltd. = 21Vianet) enumerates *.chinanorth3-01 through *.chinanorth3-06.chinacloudsites.cn plus *.chinanorth3.c.chinacloudsites.cn - confirming the region and its six scale units are genuine 21Vianet-operated infrastructure.</title></circle><text class="vz-tl-ph" x="1574" y="30" text-anchor="middle">DETECTION</text><text class="vz-tl-t" x="1574" y="68" text-anchor="middle">Verification pas</text></svg></div>
+        <ul class="soe"><li><time>2024-11-01 (UNVERIFIED - task lead only; no public source corroborates the date)</time><span class="ev"><span class="phase-chip">TRIGGER</span> Claimed onset of an Azure China North 3 regional outage. No physical trigger, alarm, or start-time is documented in any accessible source; the date, duration, and even the occurrence of the event rest solely on the task lead.</span></li><li><time>At claimed onset (NO RECORD)</time><span class="ev"><span class="phase-chip">DETECTION</span> No fire-detection event exists on record - no VESDA/aspirating-smoke or spot-detector activation, no smoke/heat alarm timestamp. The incident is characterised as a service/regional outage, not a fire, and no detection event of any kind is documented.</span></li><li><time>At claimed onset (NO RECORD)</time><span class="ev"><span class="phase-chip">DETECTION</span> No control-room alarm, incident ticket, tracking ID, or first-alert timestamp is publicly retained. The China-only status feed that would have carried a first notice now 301-redirects into the global Azure status page and no matching entry survives.</span></li><li><time>During claimed outage (NO RECORD)</time><span class="ev"><span class="phase-chip">MITIGATION</span> No operator/first-responder response sequence is documented - no NOC action log, no runbook step, no escalation record. Root cause (power vs cooling vs network vs storage/control-plane vs - unlikely and unevidenced - fire) is entirely unknown.</span></li><li><time>During claimed outage (NO RECORD)</time><span class="ev"><span class="phase-chip">MITIGATION</span> No fire-suppression event on record - no clean-agent/NOVEC/FM-200/water-mist/pre-action discharge, and no evidence any suppression was called upon or that it did or did not work. There is no evidence a fire occurred at all.</span></li><li><time>During claimed outage (NO RECORD)</time><span class="ev"><span class="phase-chip">MITIGATION</span> No evacuation record (no who/when), no muster or headcount. Because the event is not evidenced as a fire, no life-safety sequence is documented.</span></li><li><time>During claimed outage (NO RECORD)</time><span class="ev"><span class="phase-chip">MITIGATION</span> No emergency-services sequence exists - no fire-brigade call, no arrival time, no on-site actions. No local fire-authority or emergency-response record is web-exposed.</span></li><li><time>During claimed outage (NO RECORD)</time><span class="ev"><span class="phase-chip">MITIGATION</span> No power de-energisation/isolation or EPO event is documented, and no containment/spread narrative exists. Whether any electrical isolation occurred is unknown.</span></li><li><time>During claimed outage (UNKNOWN SCOPE)</time><span class="ev"><span class="phase-chip">CASCADE</span> Impact scope - which services, availability zones, and customers were affected - is unknown. The region&#x27;s six named scale units (chinanorth3-01..06) are confirmed to exist via the live TLS certificate, but no per-service or per-AZ degradation record is public.</span></li><li><time>During claimed outage (VERIFIED architecture, not event timing)</time><span class="ev"><span class="phase-chip">CASCADE</span> Single-region blast radius: China North 3 is paired with China East 3 (access-restricted for in-country disaster recovery) per Microsoft&#x27;s official region list; a single-region deployment has no in-country failover, so whatever the trigger, a customer in only China North 3 absorbed the full outage.</span></li><li><time>+~50 hours (UNVERIFIED - task lead only)</time><span class="ev"><span class="phase-chip">IMPACT</span> Claimed ~50-hour disruption to enterprise customers in the region. The ~50h figure could not be confirmed against any operator PIR, status-history entry, or press report; it is reported as unverified.</span></li><li><time>+~50 hours (UNVERIFIED - task lead only)</time><span class="ev"><span class="phase-chip">RECOVERY</span> Claimed regional recovery after roughly 50 hours. No restoration steps, no phased service-return log, and no reason for the ~50h duration are documented anywhere accessible.</span></li><li><time>By 2026-08-02 (VERIFIED post-incident record behaviour, not event timing)</time><span class="ev"><span class="phase-chip">RESTORED</span> The Azure China (21Vianet) service dashboard returns 301 Moved Permanently -&gt; https://status.azure.com/zh-cn/status (which itself now 301-redirects to azure.status.microsoft); the standalone China incident feed no longer serves notices at its old address.</span></li><li><time>By 2026-08-02 (VERIFIED)</time><span class="ev"><span class="phase-chip">RESTORED</span> The global status-history page retains only recent PIRs (a July-2026 West US preliminary PIR and two May-2026 PIRs at inspection) and lists no incidents for the China North 3 region - no November-2024 China North 3 PIR is publicly hosted.</span></li><li><time>Nearest capture 2024-12-05 (VERIFIED)</time><span class="ev"><span class="phase-chip">RESTORED</span> Wayback did not capture a China North 3 PIR for the window; the nearest status.azure.com/history capture to the date is a 301 stub, not archived content.</span></li><li><time>Verification pass 2026-08-02 (VERIFIED negative evidence, tooling-limited)</time><span class="ev"><span class="phase-chip">DETECTION</span> Google News returned 0 items for &#x27;Azure 21Vianet outage&#x27; and 0 for &#x27;Azure China North 3&#x27; on re-fetch - no English-language trade/press coverage of a Nov-2024 outage was found. Disclosed as partly a tooling artefact (WebSearch budget exhausted, open engines blocked).</span></li><li><time>Verification pass 2026-08-02 (VERIFIED)</time><span class="ev"><span class="phase-chip">DETECTION</span> Primary region-exists evidence: the live TLS certificate served at status.azure.cn (O=Shanghai Blue Cloud Technology Co., Ltd. = 21Vianet) enumerates *.chinanorth3-01 through *.chinanorth3-06.chinacloudsites.cn plus *.chinanorth3.c.chinacloudsites.cn - confirming the region and its six scale units are genuine 21Vianet-operated infrastructure.</span></li></ul>
+
+        <h2>Root cause</h2>
+        <div class="card">ROOT CAUSE IS UNDETERMINED AND UNDOCUMENTED, and that is the single most important, source-honest finding of this dossier. No specific ignition source, equipment make/model/age/chemistry, or failure mechanism is on any public record, and there is in fact no evidence this was a fire or ignition event at all. The event is characterised as a ~50-hour REGIONAL CLOUD OUTAGE of Azure China North 3 (Microsoft Azure operated by 21Vianet), not a data-hall fire. For a single-region cloud outage of this shape, the plausible drivers are overwhelmingly NON-fire: a facility power-chain fault (utility feed, UPS/STS/switchgear), a cooling-loss thermal shutdown, or a network/control-plane/storage scale-unit failure. Naming a battery string (VRLA vs Li-ion), a UPS/switchgear model, a transformer, or any component as the origin would be pure fabrication, so none is asserted (ignition: UNCONFIRMED).
+
+WHAT IS ACTUALLY VERIFIED about the venue: &quot;China North 3&quot; is a genuine Microsoft-Azure-operated-by-21Vianet region (learn.microsoft.com/en-us/azure/china/overview-regions lists it, paired with China East 3, with availability-zone support). Its scale-unit infrastructure is live and enumerable in the region operator&#x27;s own TLS certificate served at status.azure.cn: the SAN list spans *.chinanorth3-01 through *.chinanorth3-06.chinacloudsites.cn plus *.chinanorth3.c.chinacloudsites.cn, under organisation &quot;Shanghai Blue Cloud Technology Co., Ltd.&quot; (21Vianet). That is the hardest primary evidence tying anything concrete to this venue, and it establishes only that the region and its six named scale units exist, nothing about an ignition source, a failed component, or even that an outage occurred on the claimed date. NOTE (QA correction): Microsoft&#x27;s official region list gives China North 3&#x27;s physical location as &quot;n/a&quot;; the earlier &quot;Hebei&quot; province attribution is NOT supported by any primary source and has been struck.
+
+LATENT ROOT (the one architecturally-sourceable finding): the durable, generalisable root that survives the evidence gap is single-region deployment dependency. Azure China regions are paired China North 3 &lt;-&gt; China East 3 (learn.microsoft.com/en-us/azure/china/overview-regions); a customer deployed into only one region carries the full blast radius of that region&#x27;s outage with no in-country failover, and availability zones alone do not cover a whole-region event. This is a design/architecture root that stands on Azure&#x27;s published region-pairing model, not on any RCA for this specific event, and is disclosed as such.
+
+NO MAINTENANCE/INSPECTION/TESTING LAPSE IS EVIDENCED, neither confirmed nor excludable. Because no Post-Incident Review (PIR) or investigation for this event is public, a maintenance-window trigger, a change/config error, an EPO or breaker mis-operation, or an impaired suppression/detection system all remain genuinely unknown. The empty forensic record is structurally explained (see contributing factors) by sovereign-cloud incident-hosting separation, short PIR retention on the Azure status page, and the absence of Chinese-regulator-published cloud RCAs.</div>
+
+        <h2>Contributing factors</h2>
+        <ul class="tight"><li>Sovereign-cloud incident-hosting separation: Azure operated by 21Vianet is &#x27;a physically separated instance of cloud services located in China&#x27; (learn.microsoft.com/en-us/azure/china/overview-operations) that published incident/status notices on China-only endpoints physically separate from the global Azure status page, so any China North 3 outage notice sat outside standard global-Azure and Western discovery paths.</li><li>Short Post-Incident-Review retention: the global status-history page retained only recent PIRs at inspection (a July-2026 West US preliminary PIR and two May-2026 PIRs) and listed no incidents for China North 3, so any November-2024 China North 3 PIR has aged out of public hosting (status.azure.com/en-us/status/history/, now azure.status.microsoft).</li><li>Dashboard redirection erased the old China feed&#x27;s address: www.azure.cn/en-us/support/service-dashboard/ now returns 301 -&gt; status.azure.com/zh-cn/status (VERIFIED live 2026-08-02), so the historic China-only incident channel no longer serves these notices at its original location.</li><li>Regulatory opacity: Chinese regulators (MIIT / local telecom authorities) do not publish cloud-region root-cause analyses the way a fire authority publishes a fire investigation, so no independent RCA is web-exposed and no maintenance, inspection, testing, or commissioning lapse can be confirmed or excluded (forensic note; no public PIR for the event).</li><li>Single-region deployment dependency (latent design factor): Azure China regions are paired China North 3 &lt;-&gt; China East 3 (learn.microsoft.com/en-us/azure/china/overview-regions), so customers deployed into only one region carry the full outage blast radius with no in-country failover, and availability zones alone do not cover a whole-region event, amplifying whatever the actual technical trigger was.</li><li>Discovery-tooling blockade in this environment (completeness caveat, not a cause of the outage): WebSearch budget exhausted (200/200) and open web search engines unreachable, leaving only live TLS/redirect inspection, Google News RSS, and Microsoft Learn, so absence of evidence here is partly a tooling artefact and disclosed as such (Google News RSS &#x27;Azure 21Vianet outage&#x27; = 0 items).</li></ul>
+
+        <h2>Correction of errors (COE)</h2>
+        <ul class="tight"><li>Publish (or recover from the operator portal) a Post-Incident Review for the claimed Nov-2024 China North 3 outage, including detection/de-energisation/recovery timeline and confirmed root cause <span class="coe-meta">Microsoft Azure operated by 21Vianet · Not evidenced as done - no public PIR exists</span></li><li>Retain power-chain and cooling PM/inspection/functional-test records long enough to survive post-incident forensics <span class="coe-meta">21Vianet facility operations · Recommended - not confirmed implemented</span></li><li>Deploy across paired regions (China North 3 + China East 3) and validate cross-region failover for in-country resilience <span class="coe-meta">Enterprise customers in Azure China · Recommended - customer action</span></li><li>Mirror sovereign-cloud incident history/PIRs to a durable long-retention public archive instead of a short-retention, redirecting status page <span class="coe-meta">Microsoft / 21Vianet status engineering · Recommended - not confirmed implemented</span></li><li>Re-attempt discovery with open Google/Bing/Baidu access and the login-gated 21Vianet operator portal to recover any Chinese-language PIR or trade report <span class="coe-meta">Follow-up researcher · Open - blocked by tooling in this environment</span></li></ul>
+
+        <h2>Lessons learnt</h2>
+        <ul class="tight"><li>Absence of a public PIR is structural, not proof nothing happened: sovereign-cloud incident-hosting separation, short status-page retention, and the lack of a Chinese-regulator cloud RCA together explain why a real regional outage can leave essentially no public trace.</li><li>Never fabricate ignition source, equipment make/model, or failure mechanism when the record is empty; report detection, suppression, evacuation, emergency response, and de-energisation as SILENT/NO RECORD rather than inventing a plausible-sounding chain.</li><li>Single-region deployment carries the full regional blast radius even with availability zones; the durable, sourceable root for customer impact is the architecture choice, which stands on Azure&#x27;s published China North 3 &lt;-&gt; China East 3 pairing independent of any event RCA.</li><li>Negative evidence must be disclosed as tooling-limited, not asserted as certainty: with WebSearch exhausted and open engines blocked, &#x27;no coverage found&#x27; means &#x27;not found here&#x27;, and a Chinese-language PIR or trade report may exist behind channels unreachable in this environment.</li><li>Verify infrastructure claims against primary, tamper-resistant artefacts: the live TLS certificate (SAN + issuing organisation) and official region-pairing docs are stronger evidence of what exists than press aggregation, and were the only claims here that survived adversarial re-checking.</li></ul>
+
+        <h2>Improvements &amp; remediation</h2>
+        <ul class="tight"><li>SAFETY (facility, generalisable): because the ignition source and even whether a fire occurred are unknown, operators of sovereign-cloud datacentres should publish incident post-mortems that include a life-safety and fire-forensic timeline (detection activation, suppression discharge, de-energisation/EPO, evacuation/muster), and verify VESDA aspirating-smoke detection plus clean-agent suppression readiness on a documented schedule - closing the exact gaps that make this event unanalysable.</li><li>MAINTENANCE (generalisable): enforce and RETAIN documented preventive-maintenance, inspection, and functional-test records for the full power chain (utility feed, UPS strings/batteries, STS, switchgear) and the cooling loop, with retention long enough to survive a post-incident investigation, since here no PM/inspection/testing cadence could be confirmed or excluded.</li><li>ARCHITECTURE / RESILIENCE: deploy across the paired region (China North 3 + China East 3) or otherwise multi-region, and validate cross-region failover, so a whole-region outage does not equal total loss; availability zones within a single region are not a substitute for the paired-region failover Microsoft documents.</li><li>TRANSPARENCY / RECORD RETENTION: mirror sovereign-cloud (21Vianet) incident history and PIRs to a durable, long-retention public archive rather than a short-retention status page that 301-redirects, so a genuine ~50-hour regional outage remains auditable years later instead of aging out of public hosting.</li><li>CUSTOMER DUE DILIGENCE: enterprises relying on Azure China should contract for RTO/RPO with the operator, subscribe to the correct China status/notification channel, and independently log region-health telemetry, since the public record here is insufficient to reconstruct impact scope or duration.</li></ul>
+
+        <h2>Comprehensive analysis</h2><div class="ca-block"><h3>What actually happened - and what did not</h3><p>The single most important finding is that the root cause is UNDETERMINED and UNDOCUMENTED. The task lead characterises this as a ~50-hour regional cloud outage of Azure China North 3 (operated by 21Vianet). There is no public evidence of a fire, an ignition source, or a specific failed component, and no evidence even that an outage occurred on the claimed date beyond the task lead&#x27;s assertion. For an outage of this shape the plausible drivers are overwhelmingly non-fire (power-chain fault, cooling-loss thermal shutdown, or a network/control-plane/storage failure). Naming any battery, UPS, <span data-explain="switchgear" tabindex="0">switchgear</span>, or transformer as origin would be fabrication and is not done here.</p></div><div class="ca-block"><h3>The one hard primary evidence: the region and its six scale units are real</h3><p>The only concrete, tamper-resistant evidence tying anything to this venue is infrastructure, not an RCA. The live TLS certificate served at status.azure.cn (organisation &#x27;Shanghai Blue Cloud Technology Co., Ltd.&#x27;, i.e. 21Vianet) enumerates *.chinanorth3-01 through *.chinanorth3-06.chinacloudsites.cn plus *.chinanorth3.c.chinacloudsites.cn. Microsoft&#x27;s official region list confirms China North 3 exists, is paired with China East 3 (access-restricted for in-country disaster recovery), and has availability-zone support. This establishes the region and its six scale units are genuine - and nothing about a trigger, component, or timeline.</p></div><div class="ca-block"><h3>Forensics of the empty record: why a real regional outage leaves no trace</h3><p>A ~50-hour outage leaving almost no public trace is explained structurally, not assumed. Azure operated by 21Vianet is &#x27;a physically separated instance of cloud services located in China&#x27; with China-only status channels; www.azure.cn&#x27;s service dashboard now 301-redirects to the global Azure status page (verified live), which itself redirects to azure.status.microsoft; that global status-history page retains only recent PIRs (a July-2026 and two May-2026 entries at inspection) and lists none for China North 3; Wayback&#x27;s nearest capture to the date is a 301 stub; and Chinese regulators do not publish cloud-region RCAs. Google News returned zero items for the event.</p></div><div class="ca-block"><h3>The durable architectural root: single-region deployment dependency</h3><p>The one root that survives the evidence gap is a design factor, not an event forensic. Azure China regions are paired China North 3 &lt;-&gt; China East 3; a customer deployed into only one region absorbs the full <span data-explain="blast-radius" tabindex="0">blast radius</span> of that region&#x27;s outage with no in-country <span data-explain="failover" tabindex="0">failover</span>, and availability zones do not cover a whole-region event. This stands entirely on Azure&#x27;s published region-pairing model and is disclosed as an architecture finding, not a claim about this specific incident&#x27;s ignition or mechanism.</p></div><div class="ca-block"><h3>Corrections applied in QA review</h3><p>Adversarial re-fetching corrected three specific claims. (1) The &#x27;Hebei&#x27; province attribution was struck: Microsoft&#x27;s official region list gives China North 3&#x27;s physical location as &#x27;n/a&#x27; and no primary source places it in Hebei. (2) The precise &#x27;Google News = 14 items for Azure China North 3&#x27; count could not be reproduced (feed returned 0 on re-fetch) and was replaced with the load-bearing finding of zero items about a Nov-2024 outage. (3) Region pairing was re-sourced from the generic status page to learn.microsoft.com/en-us/azure/china/overview-regions, which actually documents it. All other verified claims (sovereign-cloud separation, dashboard redirect, short PIR retention, the TLS SAN list) held up.</p></div>
+
+        <h2>Technical deep-dive</h2>
+        <div class="card">This is a dossier dominated by disclosed unknowns, and the deepest technical content available is not a fire forensic chain (none exists) but the FORENSICS OF THE EMPTY RECORD: why a ~50-hour outage of a real cloud region leaves essentially no public trace, verified structurally rather than assumed.
+
+(1) SOVEREIGN-CLOUD SEPARATION (VERIFIED). Azure operated by 21Vianet is, per Microsoft Learn, &quot;a physically separated instance of cloud services located in China,&quot; independently operated by Shanghai Blue Cloud Technology Co., Ltd. (learn.microsoft.com/en-us/azure/china/overview-operations). It is a distinct sovereign cloud, not global Azure, so incident/status notices historically lived on China-only endpoints outside most Western discovery paths.
+
+(2) THE CHINA DASHBOARD HAS BEEN FOLDED INTO GLOBAL STATUS (VERIFIED live 2026-08-02). www.azure.cn/en-us/support/service-dashboard/ returns 301 Moved Permanently -&gt; https://status.azure.com/zh-cn/status, which itself now 301-redirects to https://azure.status.microsoft/zh-cn/status. The standalone China incident feed no longer serves notices at its old address.
+
+(3) PIR RETENTION IS SHORT (VERIFIED). The global status-history page (status.azure.com/en-us/status/history/, now hosted at azure.status.microsoft) retained only recent PIRs at inspection (a July-2026 West US preliminary PIR and two May-2026 PIRs) and listed no incidents for China North 3. Any November-2024 China North 3 PIR has aged out of public hosting.
+
+(4) NO REGULATOR RCA. A 21Vianet datacentre answers to MIIT and local telecom regulators, who do not publish cloud-region root-cause analyses the way a fire authority publishes a fire investigation. No such report is web-exposed.
+
+(5) NEGATIVE PRESS EVIDENCE (VERIFIED, with caveat). A Google News index returned ZERO items for &quot;Azure 21Vianet outage&quot; and zero for &quot;Azure China North 3&quot; on re-fetch (the earlier run&#x27;s &quot;14 items&quot; count could not be reproduced and has been struck). No English-language trade/press coverage of a Nov-2024 China North 3 outage was found. This is negative evidence, and it is partly a tooling artefact: WebSearch budget was exhausted (200/200), and Google/Bing/Baidu were unreachable in this environment. A researcher with open search or the login-gated 21Vianet operator portal may recover a Chinese-language PIR or a 36kr / ITHome / cnBeta report that was unreachable here.
+
+(6) PRIMARY REGION EVIDENCE (VERIFIED). The live TLS certificate served at status.azure.cn (O=Shanghai Blue Cloud Technology Co., Ltd.) enumerates *.chinanorth3-01 through *.chinanorth3-06.chinacloudsites.cn plus *.chinanorth3.c.chinacloudsites.cn, confirming the region and its six scale units are genuine 21Vianet-operated infrastructure. Region pairing (China North 3 &lt;-&gt; China East 3, the latter access-restricted for in-country DR) is confirmed on learn.microsoft.com/en-us/azure/china/overview-regions.
+
+Net technical conclusion: the physical forensics the schema asks for (detection, suppression, evacuation, emergency response, <span data-explain="de-energisation" tabindex="0">de-energisation</span>, containment, MW/temperature/agent-flow figures) are GENUINELY undocumented and are reported as silent, never invented.</div>
+
+        <h2>References &amp; provenance</h2>
+        <ul class="refs"><li><span class="chip green">official-postmortem</span> <span class="rtitle">Microsoft Azure in China - operations overview (Microsoft Learn)</span><span class="rquote">“Microsoft Azure operated by 21Vianet (Azure in China) is a physically separated instance of cloud services located in China. It&#x27;s independently operated and transacted by Shanghai Blue Cloud Technology Co., Ltd. (&quot;21Vianet&quot;).”</span><a href="https://learn.microsoft.com/en-us/azure/china/overview-operations" target="_blank" rel="noopener nofollow">https://learn.microsoft.com/en-us/azure/china/overview-operations</a></li><li><span class="chip green">official-postmortem</span> <span class="rtitle">Azure in China regions (Microsoft Learn)</span><span class="rquote">“China North 3 | Yes | China East 3 * ... * This region is access restricted to support specific customer scenarios, such as in-country disaster recovery.”</span><a href="https://learn.microsoft.com/en-us/azure/china/overview-regions" target="_blank" rel="noopener nofollow">https://learn.microsoft.com/en-us/azure/china/overview-regions</a></li><li><span class="chip cyan">vendor-status</span> <span class="rtitle">Azure status history / Post Incident Reviews</span><span class="rquote">“[At inspection the page listed only recent PIRs - a July 23, 2026 West US preliminary PIR (&quot;connectivity failures, increased latency, or difficulty accessing Azure&quot;) and two May 2026 PIRs - and no China North 3 incident.]”</span><a href="https://status.azure.com/en-us/status/history/" target="_blank" rel="noopener nofollow">https://status.azure.com/en-us/status/history/</a></li><li><span class="chip green">official-postmortem</span> <span class="rtitle">Live TLS certificate served at status.azure.cn (21Vianet-operated infrastructure)</span><span class="rquote">“O=Shanghai Blue Cloud Technology Co., Ltd. ... DNS:*.chinanorth3-01.chinacloudsites.cn ... DNS:*.chinanorth3-06.chinacloudsites.cn ... DNS:*.chinanorth3.c.chinacloudsites.cn”</span><a href="https://status.azure.cn/en-us/status/history/" target="_blank" rel="noopener nofollow">https://status.azure.cn/en-us/status/history/</a></li></ul>
+        <p class="disclaimer">Sourced from public post-incident reports. Quotes are short attributed excerpts for provenance only; the analysis above is original and substantially shorter than its sources. Last verified 2026-08-02 (seed — pending deep research).</p>
+        <aside class="share-buttons" aria-label="Share this dossier"><span class="share-label">Share</span><button class="share-btn" onclick="rzShare('li')" aria-label="Share on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 11 0-4.124 2.062 2.062 0 010 4.124zM7.119 20.452H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg></button><button class="share-btn" onclick="rzShare('x')" aria-label="Share on X" title="X"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></button><button class="share-btn" onclick="rzShare('wa')" aria-label="Share on WhatsApp" title="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347M12.05 21.785h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884"/></svg></button><button class="share-btn" onclick="rzShare('copy',this)" aria-label="Copy link" title="Copy link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></aside><script>function rzShare(k,btn){var u=encodeURIComponent(location.href),t=encodeURIComponent(document.title);if(k==="li")open("https://www.linkedin.com/sharing/share-offsite/?url="+u,"_blank","noopener");else if(k==="x")open("https://twitter.com/intent/tweet?url="+u+"&text="+t,"_blank","noopener");else if(k==="wa")open("https://wa.me/?text="+t+"%20"+u,"_blank","noopener");else if(k==="copy"){navigator.clipboard&&navigator.clipboard.writeText(location.href);if(btn){var o=btn.getAttribute("title");btn.setAttribute("title","Copied");setTimeout(function(){btn.setAttribute("title",o);},1500);}}}</script>
+        </div>
+
+    </main>
+    <footer><div class="footer-grid"></div><span class="ver" id="versionStamp"></span></footer>
+    <div class="root-gate">
+        <div class="root-card">
+            <h2>Root access required</h2>
+            <p>The DC Incidents dossier is a root-only module. Sign in with an authorized account to continue.</p>
+            <div class="root-actions">
+                <button id="rootLoginBtn" type="button">Sign In</button>
+                <a href="index.html">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/rz-version.js?v=2026-08-01-gloss"></script>
+    <script src="js/rz-feature-flags.js?v=2026-08-01-gloss" defer></script>
+    <script src="auth.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-mobile-nav.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-cookie-consent.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-explain-db.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-explain.js?v=2026-08-01-gloss" defer></script>
+    <script>
+    (function(){var t=document.getElementById('themeToggle');function a(theme){document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme);var m=document.querySelector('meta[name=\"theme-color\"]');if(m)m.setAttribute('content',theme==='dark'?'#0c1512':'#f4f1e7');}a(localStorage.getItem('theme')||'dark');if(t)t.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme');a(c==='dark'?'light':'dark');});})();
+    (function(){function ag(){if(window._rzAuth&&typeof window._rzAuth.enforceTierFeatureAccess==='function'){window._rzAuth.enforceTierFeatureAccess('dc-incidents');}else{try{var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');var r=s&&s.role,t=s&&s.tier;var passes=!!s&&(r==='root'||t==='root');document.body.classList.toggle('locked',!passes);}catch(e){document.body.classList.add('locked');}}}var b=document.getElementById('rootLoginBtn');if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showRootGatePrompt==='function'){window._rzAuth.showRootGatePrompt('Root account required for the DC Incidents dossier.');}else if(window._rzAuth&&typeof window._rzAuth.showModal==='function'){window._rzAuth.showModal();}});window.addEventListener('rz-auth-change',function(){setTimeout(ag,50);});window.addEventListener('storage',function(e){if(e.key==='rz_premium_session')ag();});ag();setTimeout(ag,60);setTimeout(ag,550);setTimeout(ag,1600);})();
+    (function(){var el=document.getElementById('versionStamp');if(!el)return;var v=window.RZ_VERSION||'1.x.x',d=window.RZ_VERSION_DATE||'',cn=window.RZ_VERSION_CODENAME||'';el.textContent='· ResistanceZero · v'+v+(d?' · '+d:'')+(cn?' · '+cn:'')+' ·';})();
+    (function(){var n=0;function sc(){if(window.RZExplain&&window.RZExplain.scanText&&window.RZ_EXPLAIN_DB){var m=document.getElementById('main-content');if(m)window.RZExplain.scanText(m,140);}else if(n++<40){setTimeout(sc,200);}}setTimeout(sc,350);})();
+    </script>
+
+</body>
+</html>

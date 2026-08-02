@@ -1,0 +1,271 @@
+{
+ "slug": "virginia-dc-alley-heatdome-2022",
+ "title": "Virginia 'Data Center Alley' Heat-Dome Cooling Stress (July 2022)",
+ "operator": "Multiple hyperscalers (Loudoun/Prince William, VA)",
+ "operatorShort": "NoVA Data Centers",
+ "dcName": "Northern Virginia data-center cluster (Loudoun/Prince William)",
+ "location": {
+  "city": "Ashburn (Loudoun), Virginia",
+  "country": "United States"
+ },
+ "date": "2022-07-24",
+ "durationMin": 360,
+ "category": [
+  "cooling"
+ ],
+ "severity": {
+  "usersAffected": "Users of services hosted in Northern Virginia (regional/global traffic)",
+  "impactUsd": "Not published",
+  "servicesDown": [
+   "Cooling-constrained load shedding across 45+ NoVA facilities"
+  ],
+  "tier": "Climate/cooling regional stress"
+ },
+ "brief": "A July 2022 heat dome pushed dozens of Northern Virginia 'Data Center Alley' facilities into cooling stress or proactive load shedding/shutdown, causing regional and global internet-traffic impact from the world's densest data-center corridor.",
+ "magnitude": {
+  "blastRadiusScore": 6,
+  "usersScore": 6,
+  "financialScore": 5,
+  "durationScore": 4,
+  "note": "A heat dome pushed 45+ Northern Virginia facilities into cooling stress or proactive shutdown, with regional/global traffic impact — sub-scores ESTIMATED from public impact reporting, pending deep research."
+ },
+ "rootCause": "NO FIRE OCCURRED. This is a fire-forensic schema applied to grid/thermal-stress and load-loss events, so there is no ignition source, no combustion, no equipment make/model/serial that \"ignited,\" and no suppression discharge. Honest attribution must separate three conflated sub-events and refuse to invent a fire mechanism.\n\nTASK-TARGET EVENT (July 2022, \"Data Center Alley\"): the genuine, best-sourced July 2022 event was NOT a cooling failure and NOT a mass generator transfer — it was Dominion Energy's public disclosure of a TRANSMISSION CAPACITY CONSTRAINT. Dominion informed major customers of a potential \"pinch point\" in eastern Loudoun County that could delay new data-center deliveries until ~2025-2026, framed as \"transmission infrastructure, not power generation\" (Route Fifty, Jul 2022 — could not be re-fetched verbatim this pass, cookie wall; facts corroborated by the historical record). Proximate cause: insufficient bulk-transmission import capability into a hyper-concentrated load pocket during record data-center growth. Latent cause: a PLANNING/interconnection-lag failure — transmission build-out fell behind explosive, geographically concentrated demand. Fix named by Dominion: two new 500 kV lines into eastern Loudoun (DCD, Aug 2022 — not re-verified verbatim this pass). No make/model/serial failed; there is no ignition source because there was no fire.\n\nNEAREST REAL EQUIPMENT FAILURE (a LATER, different event — must not be misattributed to 2022): on July 10, 2024, in Fairfax County, a lightning/surge arrestor failed on a 230 kV transmission line (NERC event analysis; DCK confirms via Reuters that \"roughly 1.5 GW of data center load disconnected during a Northern Virginia disturbance in 2024\"). The failed component was a 230 kV line arrestor; its make, model, age and chemistry are NOT disclosed in public sources. The transient caused ~1,500 MW (~60 data centers) to disconnect simultaneously to backup generation.\n\nTHE ~3 GW EVENT (July 22, 2026 — VERIFIED this pass): a Dominion transmission line fault in Northern Virginia caused ~3 GW (about 3% of PJM system demand) to island onto backup generators within seconds. Verbatim: \"more than 3 GW of load – about 3% of system demand at the time – disconnected\" (DCK, Jul 23 2026); \"About 3 GW of data center load automatically switched to backup power\" (RTO Insider, Jul 23 2026); \"a Dominion Energy transmission line fault … caused a cluster of data centers to instantaneously switch to backup power\" (Ting Labs). Voltage class and failed component of the 2026 fault are NOT publicly detailed (disclosed uncertainty).\n\nThe unifying LATENT root across the electrical variants is a DESIGN / PROTECTION-COORDINATION defect, not a maintenance-janitorial lapse: ultra-dense co-location of data centers whose protective relays and UPS ride-through settings are individually reasonable but collectively un-coordinated, producing a COMMON-MODE simultaneous trip. Analyst Neil Osnato (DCK, verified): \"Individually reasonable settings can produce a common-mode response when facilities react simultaneously to the same disturbance.\" Whether the 2024 arrestor failure reflected an asset-condition or inspection lapse is not stated in public sources (disclosed uncertainty).",
+ "technicalDeepDive": "The physical mechanism is electrical, not thermal-combustion. A single fault on the bulk transmission system (a lightning-arrestor failure on a 230 kV line in the 2024 precedent; an undisclosed Dominion line fault in the 2026 event) produces a fast voltage transient across a densely interconnected load pocket. Each affected data center's power-quality protection — protective relays, static transfer switches, and UPS ride-through logic — independently senses the transient and, per its own settings, transfers critical load from the utility feed to on-site diesel/backup generation to protect IT equipment. Verbatim (DCK, Jul 23 2026): \"the data centers' own control systems transferred them to backup power for a very short period of time.\"\n\nThe failure MODE is common-mode simultaneity. Because dozens-to-hundreds of facilities in the same pocket share similar protective philosophies, a disturbance any single facility would ride through instead trips all of them at once, converting a localized fault into a coordinated multi-gigawatt load loss visible to the RTO as an instantaneous demand collapse. On July 22, 2026, \"PJM and Yes Energy data show that about 3 GW of load suddenly dropped off the grid between 7:55 and 8 a.m.\" (RTO Insider). Ting Labs timestamps detection at \"7:56:09 a.m. EDT,\" with \"Approximately 3 gigawatts of electricity demand disappeared from the grid instantaneously,\" the strongest impacts lasting \"approximately two minutes\" and broader frequency recovery taking \"close to ten minutes.\"\n\nCritically, this is the OPPOSITE of a fire de-energisation. Facilities did NOT shut down and were NOT evacuated — they islanded onto generators and rode through, which is why the public observed only \"flickering lights in the area but no loss of power\" (RTO Insider, per Dominion), and why PJM reported \"a measurable frequency change but no reliability impacts\" (DCK). \"De-energisation\" here means the automatic transfer of the facility bus from the utility feed to on-site generation via protective transfer schemes; the transmission side was never intentionally de-energised for firefighting. The separate July-2022 target event involved no transient at all — it was a forward-looking capacity/interconnection constraint disclosure. A distinct demand-side heat-stress episode (Loudoun Now, single-source, not independently verified) reportedly brought Dominion \"minutes away from turning every data center in Ashburn to a backup generation\" during record PJM peak load — still a demand-side thermal stress, not a fire.",
+ "sequenceOfEvents": [
+  {
+   "t": "2022 summer",
+   "phase": "TRIGGER",
+   "event": "Record, geographically concentrated data-center load growth in eastern Loudoun collides with limited transmission import capacity; Dominion identifies a 'pinch point' in eastern Loudoun County. No fire, no combustion, no detection event.",
+   "source": "Route Fifty (2022) — not re-verified verbatim this pass"
+  },
+  {
+   "t": "2022-07-12",
+   "phase": "DETECTION",
+   "event": "Grid-planning detection (not fire detection): PJM planning material warns that without further transmission upgrades the area will not have sufficient transmission capability by 2024/25, expecting reliability issues as soon as 2024.",
+   "source": "Route Fifty (PJM Jul 12 2022 presentation) — not re-verified verbatim"
+  },
+  {
+   "t": "2022-07-29",
+   "phase": "IMPACT",
+   "event": "Dominion informs major customers that new data-center deliveries into eastern Loudoun could be delayed to ~2026 and may pause NEW connections; explicitly framed as 'transmission infrastructure, not power generation.'",
+   "source": "Route Fifty (2022) — not re-verified verbatim"
+  },
+  {
+   "t": "2022-08-22",
+   "phase": "MITIGATION",
+   "event": "Dominion commits to remedy: two new 500 kV transmission lines into eastern Loudoun; a spokesman signals resuming some new data-center connections within weeks.",
+   "source": "Data Center Dynamics (Aug 22 2022) — not re-verified verbatim"
+  },
+  {
+   "t": "2024-07-10 ~19:00 ET",
+   "phase": "TRIGGER",
+   "event": "PRECEDENT, DIFFERENT EVENT (do not misattribute to 2022): a lightning/surge arrestor failed on a 230 kV transmission line in Fairfax County — the one disclosed discrete hardware failure in the record.",
+   "source": "NERC event analysis (July 10 2024); 1.5 GW corroborated by DCK via Reuters"
+  },
+  {
+   "t": "2024-07-10 (seconds)",
+   "phase": "CASCADE",
+   "event": "Common-mode load loss: roughly 1,500 MW across ~60 data centers disconnected simultaneously as their protective settings responded to the transmission disturbance — facilities transferred to backup generation, did not evacuate.",
+   "source": "NERC event analysis; DCK ('roughly 1.5 GW … disconnected … in 2024', verified)"
+  },
+  {
+   "t": "2026-07-22 ~07:55",
+   "phase": "TRIGGER",
+   "event": "A Dominion Energy transmission line fault occurs in Northern Virginia (voltage class / failed component not publicly detailed); no fire, no smoke, no VESDA event.",
+   "source": "RTO Insider (Michael Brooks, Jul 23 2026, verified); Ting Labs (verified)"
+  },
+  {
+   "t": "2026-07-22 07:56:09 EDT",
+   "phase": "DETECTION",
+   "event": "Grid-telemetry detection (not fire detection): 'On July 22 at 7:56:09 a.m. EDT, a Dominion Energy transmission line fault in Northern Virginia caused a cluster of data centers to instantaneously switch to backup power.'",
+   "source": "Ting Labs (tingfire.com, verified verbatim)"
+  },
+  {
+   "t": "2026-07-22 ~07:55-08:00",
+   "phase": "MITIGATION",
+   "event": "'Suppression' analogue = automatic ride-through/transfer: 'the data centers' own control systems transferred them to backup power for a very short period of time' — protective relays/STS/UPS island critical load onto on-site generation.",
+   "source": "Data Center Knowledge (Shane Snider, Jul 23 2026, verified verbatim)"
+  },
+  {
+   "t": "2026-07-22 ~07:55-08:00",
+   "phase": "CASCADE",
+   "event": "'PJM and Yes Energy data show that about 3 GW of load suddenly dropped off the grid between 7:55 and 8 a.m.' — 'more than 3 GW … about 3% of system demand' disconnected within seconds (vs ~1.5 GW in 2024).",
+   "source": "RTO Insider (verified); Data Center Knowledge (verified)"
+  },
+  {
+   "t": "2026-07-22",
+   "phase": "IMPACT",
+   "event": "Public-visible effect limited to 'flickering lights in the area but no loss of power' per Dominion Energy — no evacuation, no 911/fire dispatch reported at any facility.",
+   "source": "RTO Insider (Jul 23 2026, verified verbatim)"
+  },
+  {
+   "t": "2026-07-22",
+   "phase": "DETECTION",
+   "event": "RTO assessment: PJM reported 'a measurable frequency change but no reliability impacts' — an operational (frequency-balancing) response, not a physical fire response.",
+   "source": "Data Center Knowledge (PJM statement, verified verbatim)"
+  },
+  {
+   "t": "2026-07-22 (~2-10 min)",
+   "phase": "RECOVERY",
+   "event": "'The strongest impacts of the disturbance lasted approximately two minutes, while the broader frequency recovery took close to ten minutes.'",
+   "source": "Ting Labs (tingfire.com, verified verbatim)"
+  },
+  {
+   "t": "heat-stress episode (date not pinned)",
+   "phase": "IMPACT",
+   "event": "Demand-driven grid stress (distinct sub-event): Dominion reportedly 'minutes away from turning every data center in Ashburn to a backup generation' at a claimed PJM record peak of 168,158 MW; heat index 114. Exact date and PJM-record figure not independently verified (disclosed uncertainty).",
+   "source": "Loudoun Now — single-source, not independently verified"
+  },
+  {
+   "t": "post-event (2024-2026)",
+   "phase": "RESTORED",
+   "event": "Regulatory follow-through: NERC documents the load-loss class and the review of the 2026 event is ongoing. NERC's John Moura: 'We expect to know more soon. We'll review once all the processes are completed to see if there is anything significantly new.' Emphasis shifts to tightening data-center ride-through/protective settings.",
+   "source": "Data Center Knowledge (John Moura, Jul 23 2026, verified verbatim)"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "2026-07-22 load dropped",
+   "value": "~3 GW (more than 3 GW; about 3% of PJM system demand), within seconds",
+   "source": "Data Center Knowledge (Jul 23 2026, verified); RTO Insider (verified)"
+  },
+  {
+   "label": "Detection timestamp (2026-07-22)",
+   "value": "7:56:09 a.m. EDT (drop between 7:55 and 8:00 a.m.)",
+   "source": "Ting Labs (verified); RTO Insider (verified)"
+  },
+  {
+   "label": "Disturbance duration / recovery (2026-07-22)",
+   "value": "~2 min strongest impact; ~10 min broader frequency recovery",
+   "source": "Ting Labs (tingfire.com, verified verbatim)"
+  },
+  {
+   "label": "Cause of 2026 event",
+   "value": "Dominion Energy transmission line fault (voltage class / failed component not disclosed)",
+   "source": "Ting Labs (verified); RTO Insider (verified)"
+  },
+  {
+   "label": "2024-07-10 load disconnected (common-mode trip)",
+   "value": "~1,500 MW across ~60 data centers",
+   "source": "NERC event analysis; ~1.5 GW corroborated by DCK via Reuters (verified)"
+  },
+  {
+   "label": "Failed component, 2024 precedent",
+   "value": "lightning/surge arrestor on a 230 kV transmission line (make/model/age not disclosed)",
+   "source": "NERC event analysis (not re-verified verbatim this pass)"
+  },
+  {
+   "label": "Data centers in Northern Virginia",
+   "value": "~250 (>20% of known hyperscale capacity)",
+   "source": "Route Fifty 2022 (not re-verified verbatim this pass)"
+  },
+  {
+   "label": "Claimed PJM record peak during heat stress",
+   "value": "168,158 MW (~3,000 MW above Aug 2006 record); heat index 114",
+   "source": "Loudoun Now — single-source, NOT independently verified"
+  },
+  {
+   "label": "Transmission remedy committed (July 2022 event)",
+   "value": "two new 500 kV lines into eastern Loudoun; connection delays warned to ~2026",
+   "source": "Data Center Dynamics (Aug 2022); Route Fifty (not re-verified verbatim)"
+  }
+ ],
+ "contributingFactors": [
+  "Extreme load concentration / density risk: Northern Virginia hosts roughly 250 data centers and more than 20% of known hyperscale capacity, concentrated in a single eastern-Loudoun pocket, so one transmission fault propagates as a coordinated multi-GW load loss (Route Fifty 2022; NERC 2024; corroborated by the 2026 ~3 GW event verified via DCK/RTO Insider/Ting Labs).",
+  "Transmission build-out lagging demand (planning/design lapse): Dominion warned in July 2022 of a 'pinch point' in eastern Loudoun that could delay new connections to ~2025-2026, framed as 'transmission infrastructure, not power generation'; PJM planning material warned the area would lack sufficient transmission capability by 2024/25 (Route Fifty — not re-verified verbatim this pass; facts corroborated by historical record).",
+  "Un-coordinated protective / ride-through settings (design lapse — the dominant real failure mode): 'Individually reasonable settings can produce a common-mode response when facilities react simultaneously to the same disturbance' (Neil Osnato, DCK, verified); the same mechanism recurred in 2024 (~1,500 MW) and 2026 (~3 GW).",
+  "A discrete hardware failure initiated the 2024 precedent: a lightning/surge arrestor failed on a 230 kV transmission line (NERC event analysis; ~1.5 GW figure corroborated by DCK via Reuters). Whether this reflects an asset-condition or inspection/testing lapse is NOT disclosed in public sources (disclosed uncertainty); the failed arrestor's make/model/age/chemistry are undisclosed.",
+  "Summer heat and record demand as an aggravator: a demand-side heat-stress episode reportedly left Dominion 'minutes away from turning every data center in Ashburn to a backup generation' at a claimed PJM record peak of 168,158 MW and a 114 heat index (Loudoun Now — single-source, not independently verified this pass; retained as disclosed uncertainty)."
+ ],
+ "coe": [
+  {
+   "action": "Complete and publish the NERC/PJM event analysis of the July 22, 2026 ~3 GW load loss, including the fault's voltage class and failed component (currently undisclosed).",
+   "owner": "NERC / PJM",
+   "status": "In progress — 'We'll review once all the processes are completed' (John Moura, DCK, verified)"
+  },
+  {
+   "action": "Coordinate and standardize data-center voltage/frequency ride-through and protective relay/UPS settings across the eastern-Loudoun load pocket to eliminate common-mode simultaneous transfers.",
+   "owner": "PJM / Dominion / NERC with data-center operators",
+   "status": "Open — dominant recurring failure mode across 2024 and 2026"
+  },
+  {
+   "action": "Accelerate transmission import capacity (two new 500 kV lines) into concentrated load pockets and disperse new hyperscale load geographically.",
+   "owner": "Dominion Energy",
+   "status": "In progress — committed August 2022 (not re-verified verbatim this pass)"
+  },
+  {
+   "action": "Establish and disclose surge-arrestor and line-protection asset-condition inspection/testing programs on the 230 kV+ network.",
+   "owner": "Dominion / transmission owners",
+   "status": "Open — disclosed uncertainty whether an inspection lapse contributed to the 2024 arrestor failure"
+  },
+  {
+   "action": "Harden PJM/Dominion frequency-balancing and mass generator-transfer playbooks for multi-GW instantaneous load swings; verify simultaneous backup starts do not create secondary safety hazards.",
+   "owner": "PJM / Dominion",
+   "status": "Open"
+  }
+ ],
+ "lessonsLearnt": [
+  "The framing must match the event class: the July 2022 'Data Center Alley' incident was a transmission capacity/planning constraint, not a fire and not a cooling failure — 'transmission infrastructure, not power generation' (Route Fifty). Applying a fire schema requires reading detection/suppression/de-energisation in GRID terms.",
+  "Load density is itself a systemic hazard: with ~250 data centers and >20% of global hyperscale capacity in one pocket, a single transmission fault becomes a coordinated multi-gigawatt load loss (Route Fifty; NERC 2024; verified 2026 event).",
+  "Common-mode protection response is the dominant real failure mode: locally optimal ride-through settings become globally destabilizing when facilities react simultaneously (DCK, verified; recurring in the 2024 ~1.5 GW and 2026 ~3 GW events).",
+  "The visible 'success' — 'flickering lights but no loss of power' — masked a bulk-system stress: ~3 GW islanding in seconds is a reliability near-miss even when customers see nothing (RTO Insider; Ting Labs, verified).",
+  "Public sources leave real gaps that must stay disclosed, not invented: the 2024 arrestor's make/model/age/chemistry and any inspection lapse are undisclosed, the 2026 fault's voltage class/failed component are undisclosed, and the heat-stress episode's exact date and PJM-record figure are single-source and unverified."
+ ],
+ "improvements": [
+  "Design: Coordinate and standardize data-center voltage/frequency ride-through and protective/relay settings across the load pocket so facilities ride through transmission transients instead of islanding en masse — directly targeting the verified common-mode mechanism ('individually reasonable settings can produce a common-mode response'; DCK).",
+  "Design: Accelerate transmission import capacity into concentrated load pockets — build the two new 500 kV lines into eastern Loudoun Dominion identified — and disperse new hyperscale load geographically to reduce single-fault exposure (DCD 2022; Route Fifty).",
+  "Process: Formalize RTO/utility/data-center coordination on interconnection sequencing and demand forecasting so transmission build-out does not lag load, avoiding repeats of the July 2022 'pinch point' constraint (Route Fifty; PJM planning material).",
+  "Maintenance: Establish and disclose surge-arrestor / line-protection asset-condition inspection and testing programs on the 230 kV+ network — the 2024 lightning-arrestor failure initiated the transient, and public sources do not confirm whether an inspection lapse contributed (NERC; disclosed uncertainty).",
+  "Safety: Since the 'safety' response here is grid-operational, not fire-physical, harden PJM/Dominion frequency-balancing and mass generator-transfer playbooks for multi-GW instantaneous load swings, and validate that simultaneous diesel/backup starts across ~60+ facilities do not create secondary fuel, emissions, or fire-loading hazards on site."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "Event classification: not a fire, not a cooling failure",
+   "body": "The record contains no fire, ignition, combustion, smoke/VESDA event, suppression discharge, or evacuation at any facility. Applying a fire-forensic schema is a category error unless every field is re-read in grid terms: 'detection' = grid telemetry (Ting Labs, 7:56:09 a.m. EDT); 'suppression/mitigation' = automatic transfer to backup generation ('the data centers' own control systems transferred them to backup power', DCK); 'de-energisation' = protective islanding of the facility bus, not utility de-energisation for firefighting. There is no make/model/serial that 'ignited' because nothing burned."
+  },
+  {
+   "heading": "What actually happened on July 22, 2026 (verified)",
+   "body": "A Dominion Energy transmission line fault in Northern Virginia caused ~3 GW — 'about 3% of system demand at the time' — to disconnect within seconds as roughly 60+ data centers islanded onto backup generation (DCK, RTO Insider, Ting Labs, all verified verbatim this pass). Public impact was limited to 'flickering lights in the area but no loss of power' per Dominion; PJM reported 'a measurable frequency change but no reliability impacts.' Strongest impacts lasted ~2 minutes; broader frequency recovery ~10 minutes (Ting Labs). The fault's voltage class and failed component are not publicly disclosed."
+  },
+  {
+   "heading": "The common-mode protection mechanism",
+   "body": "The dominant real failure mode is common-mode simultaneity: dozens-to-hundreds of co-located facilities share similar protective philosophies, so a transient any single facility would ride through instead trips them all at once, converting a localized fault into a coordinated multi-GW load loss. Verified analyst framing (Neil Osnato, DCK): 'Individually reasonable settings can produce a common-mode response when facilities react simultaneously to the same disturbance.' The same mechanism produced ~1,500 MW of loss in July 2024 and ~3 GW in July 2026 — this is a design/protection-coordination defect, not a maintenance-janitorial lapse."
+  },
+  {
+   "heading": "The 2022 transmission-capacity precedent and the 2024 hardware failure",
+   "body": "The titled July 2022 event was a forward-looking capacity/interconnection disclosure — Dominion's eastern-Loudoun 'pinch point', delivery delays to ~2026, explicitly 'transmission infrastructure, not power generation' — with the committed remedy being two new 500 kV lines (Route Fifty; DCD, neither re-fetchable verbatim this pass but corroborated by the historical record). The one disclosed discrete hardware failure is separate: a July 10, 2024 lightning/surge arrestor failure on a 230 kV line (NERC; ~1.5 GW corroborated by DCK via Reuters). These must not be collapsed into a single 2022 'cooling' incident."
+  },
+  {
+   "heading": "Source quality and disclosed gaps",
+   "body": "Fully verified verbatim this session: Data Center Knowledge (Snider), RTO Insider (Brooks), and Ting Labs — all covering the 2026 event. Not re-fetchable verbatim this pass (cookie walls, 404s, web.archive.org blocked): Route Fifty 2022, DCD Aug 2022, Loudoun Now heat-stress, and the NERC 2024 report — though the 2024 ~1.5 GW figure is independently corroborated by DCK. No responsible-operator or regulatory postmortem of the 2026 event is complete (NERC's review is explicitly ongoing). Disclosed, un-invented gaps: the 2024 arrestor's make/model/age/chemistry; the 2026 fault's voltage class and failed component; and the exact date and 168,158 MW figure of the single-source heat-stress episode."
+  }
+ ],
+ "references": [
+  {
+   "title": "What Happened When 3 Gigawatts of Data-Center Demand Disappeared from the Grid — Ting Labs",
+   "url": "https://www.tingfire.com/blog/what-happened-when-3-gigawatt-of-data-center-demand-disappeared-from-the-grid/",
+   "type": "vendor-status",
+   "quote": "On July 22 at 7:56:09 a.m. EDT, a Dominion Energy transmission line fault in Northern Virginia caused a cluster of data centers to instantaneously switch to backup power, removing roughly 3 gigawatts of demand from the grid.",
+   "accessed": "2026-08-02"
+  },
+  {
+   "title": "Fault in Data Center Alley Triggered 3 GW Load Drop on PJM — Data Center Knowledge (Shane Snider)",
+   "url": "https://www.datacenterknowledge.com/outages/fault-in-data-center-alley-triggered-3-gw-load-drop-on-pjm",
+   "type": "press",
+   "quote": "more than 3 GW of load – about 3% of system demand at the time – disconnected",
+   "accessed": "2026-08-02"
+  },
+  {
+   "title": "Line Fault Causes 3 GW in Data Center Load to Drop in Virginia — RTO Insider (Michael Brooks)",
+   "url": "https://www.rtoinsider.com/137301-line-fault-causes-3-gw-in-data-center-load-to-drop-in-virginia/",
+   "type": "press",
+   "quote": "PJM and Yes Energy data show that about 3 GW of load suddenly dropped off the grid between 7:55 and 8 a.m.",
+   "accessed": "2026-08-02"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": false,
+  "lastVerified": "2026-08-02 (seed — pending deep research)"
+ },
+ "lastUpdated": "2026-08-02"
+}

@@ -138,6 +138,41 @@ CSS = r"""
     table.inc-index tr:hover td { background:var(--surface-2); }
     table.inc-index a { font-weight:700; color:var(--text-strong); text-decoration:none; }
     table.inc-index a:hover { color:var(--cyan); text-decoration:underline; }
+    /* rich incident table (reference-2 style) */
+    table.itbl { min-width:1120px; }
+    table.itbl td { vertical-align:middle; }
+    .itr { cursor:pointer; }
+    .itr:hover td { background:var(--surface-2); }
+    .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
+    .c-title { max-width:300px; }
+    .c-title .itt { display:block; font-weight:700; color:var(--text-strong); text-decoration:none; font-size:0.9rem; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .itr:hover .itt { color:var(--cyan); }
+    .c-title .its { color:var(--muted); font-size:0.76rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:0.1rem; }
+    .sev-chip { font-family:'JetBrains Mono',monospace; font-size:0.66rem; font-weight:600; padding:0.12rem 0.5rem; border-radius:2px; border:1px solid; white-space:nowrap; }
+    .sev-b-critical { color:var(--red); border-color:var(--red); }
+    .sev-b-high { color:var(--amber); border-color:var(--amber); }
+    .sev-b-medium { color:var(--green); border-color:var(--green); }
+    .sev-b-low { color:var(--muted); border-color:var(--line); }
+    .st-chip { font-family:'JetBrains Mono',monospace; font-size:0.64rem; padding:0.12rem 0.45rem; border-radius:2px; border:1px solid var(--line); white-space:nowrap; }
+    .st-off { color:var(--green); border-color:color-mix(in srgb, var(--green) 45%, var(--line)); }
+    .st-press { color:var(--amber); border-color:color-mix(in srgb, var(--amber) 45%, var(--line)); }
+    .c-region { min-width:170px; }
+    .c-region .iflag { font-size:1.05rem; margin-right:0.45rem; vertical-align:middle; }
+    .c-region .ireg { display:inline-flex; flex-direction:column; vertical-align:middle; }
+    .c-region .ireg b { color:var(--text-body); font-weight:600; font-size:0.82rem; }
+    .c-region .ireg i { color:var(--muted); font-style:normal; font-size:0.72rem; }
+    .c-mono { font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--text-body); white-space:nowrap; }
+    .c-blast { color:var(--text-strong); font-weight:600; } .c-blast .c-u { color:var(--muted); font-weight:400; font-size:0.68rem; }
+    .ibars { display:inline-flex; gap:2px; }
+    .ibars i { width:7px; height:9px; border-radius:1px; display:block; }
+    .itags { display:flex; gap:0.25rem; max-width:150px; flex-wrap:wrap; }
+    .c-go { color:var(--muted); font-size:1rem; text-align:center; }
+    .itr:hover .c-go { color:var(--cyan); }
+    /* incident-view tabs (List / Risk map / Semantic / Analytics) */
+    .iv-tabs { display:flex; gap:1.2rem; border-bottom:1px solid var(--line); margin:0.4rem 0 0.2rem; flex-wrap:wrap; }
+    .iv-tabs a { font-family:'JetBrains Mono',monospace; font-size:0.74rem; letter-spacing:0.03em; color:var(--muted); text-decoration:none; padding:0.5rem 0.1rem; border-bottom:2px solid transparent; }
+    .iv-tabs a:hover { color:var(--text-strong); }
+    .iv-tabs a.on { color:var(--text-strong); border-bottom-color:var(--cyan); }
     .rank-badge { font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--amber); font-variant-numeric:tabular-nums slashed-zero; }
     .mag-bar { height:5px; border-radius:0; background:var(--line); margin-top:0.35rem; overflow:hidden; }
     .mag-bar > span { display:block; height:4px; background:var(--amber); }
@@ -470,17 +505,30 @@ def render_hub(incidents):
         loc_s = ", ".join(x for x in [loc.get("city"), loc.get("country")] if x)
         mag = inc["_score"]
         cats = inc.get("category", [])
+        band = _severity_band(mag)
+        pm = bool((inc.get("sourcing", {}) or {}).get("officialPostmortem") or inc.get("officialPostmortem"))
+        st_txt, st_cls = ("Official RCA", "st-off") if pm else ("Press-sourced", "st-press")
+        iid = f"INC-{(inc.get('date','') or '----')[:4]}-{i:03d}"
+        blast = float((inc.get("magnitude", {}) or {}).get("blastRadiusScore", 0))
+        brief = inc.get("brief", "") or ""
+        href = f"incident-{esc(inc['slug'])}.html"
         search = (inc.get("title", "") + " " + inc.get("operator", "") + " " + inc.get("dcName", "") + " " + (loc.get("country", "") or "")).lower().replace('"', "")
-        rows.append(f"""            <tr data-cats="{esc(' '.join(cats))}" data-score="{mag:.2f}" data-pm="{1 if (inc.get('sourcing',{}) or {}).get('officialPostmortem') or inc.get('officialPostmortem') else 0}" data-search="{esc(search)}">
-                <td><span class="rank-badge">#{i}</span></td>
-                <td><a href="incident-{esc(inc['slug'])}.html">{esc(inc['title'])}</a>
-                    <div style="font-size:0.78rem;color:var(--muted)">{esc(inc.get('operator',''))}</div></td>
-                <td>{esc(inc.get('date',''))}</td>
-                <td>{esc(inc.get('dcName',''))}<div style="font-size:0.76rem;color:var(--muted)">{esc(loc_s)}</div></td>
-                <td><div class="chips">{cat_chips(inc.get('category',[]))}</div></td>
-                <td>{esc(_dur(inc.get('durationMin')))}<div class="mag-bar" title="Magnitude {mag:.1f}/10"><span style="width:{min(100,mag*10):.0f}%;background:{_sevcol(mag)}"></span></div></td>
-                <td style="max-width:320px">{esc(inc.get('brief',''))[:220]}{'…' if len(inc.get('brief',''))>220 else ''}</td>
-            </tr>""")
+        rows.append(
+            f'<tr class="itr" data-cats="{esc(" ".join(cats))}" data-score="{mag:.2f}" data-pm="{1 if pm else 0}" data-search="{esc(search)}" onclick="location.href=\'{href}\'">'
+            f'<td class="c-id"><span class="itid">{esc(iid)}</span></td>'
+            f'<td class="c-title"><a href="{href}" class="itt" onclick="event.stopPropagation()">{esc(inc["title"])}</a>'
+            f'<div class="its">{esc(brief[:88])}{"…" if len(brief) > 88 else ""}</div></td>'
+            f'<td><span class="sev-chip sev-b-{band}">{_SEV_LABEL[band]}</span></td>'
+            f'<td><span class="st-chip {st_cls}">{st_txt}</span></td>'
+            f'<td class="c-region"><span class="iflag">{_flag(loc.get("country",""))}</span>'
+            f'<span class="ireg"><b>{esc(inc.get("dcName","")[:30])}</b><i>{esc(loc_s)}</i></span></td>'
+            f'<td class="c-mono">{esc(inc.get("date",""))}</td>'
+            f'<td class="c-mono">{esc(_dur(inc.get("durationMin")))}</td>'
+            f'<td class="c-mono c-blast">{blast:.1f}<span class="c-u">/10</span></td>'
+            f'<td>{_impact_bars(mag)}</td>'
+            f'<td><div class="itags">{cat_chips(cats)}</div></td>'
+            f'<td class="c-go" aria-hidden="true">→</td></tr>'
+        )
     body = f"""        <a class="backlink" href="index.html">← Home</a>
         <div class="eyebrow">Root-only · Post-incident dossier</div>
         <h1>Data-Center Incidents — Case Library</h1>
@@ -504,9 +552,10 @@ def render_hub(incidents):
             <h4>Access</h4>
             <p>Root-only. The library is excluded from the public sitemap and search index.</p>
         </div></details>
+        <nav class="iv-tabs"><a href="#dashboard" class="on">Overview</a><a href="#incMap">Risk map</a><a href="#semantic">Semantic map</a><a href="#all-incidents">Incident list</a></nav>
         {hero_dashboard(incidents)}
 
-        <h2>All incidents</h2>
+        <h2 id="all-incidents">All incidents</h2>
         <div class="filterbar" id="filterbar">
             <div class="fb-group" role="group" aria-label="Filter by domain">
                 <button class="fb-chip active" data-f="all">All</button>
@@ -527,8 +576,8 @@ def render_hub(incidents):
             <span class="fb-count" id="fbCount"></span>
         </div>
         <div class="table-wrap">
-            <table class="inc-index" id="incTable">
-                <thead><tr><th>Rank</th><th>Incident</th><th>Date</th><th>DC / Location</th><th>Category</th><th>Duration · Magnitude</th><th>Brief</th></tr></thead>
+            <table class="inc-index itbl" id="incTable">
+                <thead><tr><th>Incident ID</th><th>Title</th><th>Severity</th><th>Status</th><th>Data center / region</th><th>Start</th><th>Duration</th><th>Blast</th><th>Impact</th><th>Tags</th><th></th></tr></thead>
                 <tbody>
 {chr(10).join(rows)}
                 </tbody>
@@ -957,6 +1006,17 @@ INCIDENT_COORDS = {
     "ovhcloud-sbg2-fire-2021": [48.58, 7.75],
     "red-sea-subsea-cables-2024": [12.58, 43.33],
     "unisuper-gcp-account-deletion-2024": [-37.81, 144.96],
+    "rogers-canada-nationwide-2022": [43.65, -79.38],
+    "cyrusone-cme-chicago-cooling-2025": [41.76, -88.32],
+    "cloudflare-june-2022-config-19dc": [37.77, -122.42],
+    "google-council-bluffs-arcflash-2022": [41.26, -95.86],
+    "london-heatwave-cooling-2022": [51.51, -0.13],
+    "x-twitter-oregon-fire-2025": [45.52, -122.99],
+    "digital-realty-la-el-segundo-fire-2023": [33.92, -118.42],
+    "digital-realty-singapore-liion-fire-2024": [1.35, 103.82],
+    "azure-china-north3-regional-2024": [39.9, 116.4],
+    "azure-west-us2-thermal-2026": [47.23, -119.85],
+    "virginia-dc-alley-heatdome-2022": [39.04, -77.49],
 }
 
 LEAFLET_HEAD = (
@@ -1046,6 +1106,25 @@ def hub_geo_map(incidents):
 def _severity_band(score):
     s = float(score or 0)
     return "critical" if s >= 8.5 else ("high" if s >= 7.5 else ("medium" if s >= 6 else "low"))
+
+
+_SEV_LABEL = {"critical": "Critical", "high": "High", "medium": "Medium", "low": "Low"}
+_FLAG = {
+    "united states": "🇺🇸", "usa": "🇺🇸", "canada": "🇨🇦", "united kingdom": "🇬🇧", "uk": "🇬🇧",
+    "germany": "🇩🇪", "france": "🇫🇷", "netherlands": "🇳🇱", "singapore": "🇸🇬", "south korea": "🇰🇷",
+    "china": "🇨🇳", "india": "🇮🇳", "japan": "🇯🇵", "australia": "🇦🇺", "brazil": "🇧🇷", "yemen": "🇾🇪",
+}
+
+
+def _flag(country):
+    return _FLAG.get((country or "").strip().lower(), "🌐")
+
+
+def _impact_bars(score):
+    n = max(1, min(5, round(float(score or 0) / 2)))
+    col = _sevcol(score)
+    segs = "".join(f'<i style="background:{col if k < n else "var(--surface-2)"}"></i>' for k in range(5))
+    return f'<span class="ibars" title="Impact {float(score or 0):.1f} / 10">{segs}</span>'
 
 
 _SEV = [("critical", "Critical", "var(--red)"), ("high", "High", "var(--amber)"),
@@ -1253,7 +1332,7 @@ def hero_dashboard(incidents):
               f'<span><b>Official RCA</b> {stats["official"]} of {stats["total"]}</span>'
               f'<a href="#faq-methodology" class="iid-foot-link">Methodology →</a></div>')
     return (
-        '<section class="iid" aria-label="Incident intelligence dashboard">'
+        '<section class="iid" id="dashboard" aria-label="Incident intelligence dashboard">'
         '<div class="iid-head"><div><h2 class="iid-title">Incident Intelligence</h2>'
         '<p class="iid-sub">Global data-center incident landscape · risk map &amp; semantic analysis</p></div>'
         '<span class="iid-range">All-time · ' + esc(stats["span"]) + '</span></div>'
@@ -1267,7 +1346,7 @@ def hero_dashboard(incidents):
         + '<div class="iid-col-c">'
         + '<div class="iid-panel iid-panel-map"><div class="iid-ph">Risk map · blast radius × severity</div>'
         + hub_geo_map(incidents) + '</div>'
-        + '<div class="iid-panel"><div class="iid-ph">Semantic map · incident relationships</div>'
+        + '<div class="iid-panel" id="semantic"><div class="iid-ph">Semantic map · incident relationships</div>'
         + '<p class="iid-note">Incidents linked to their nearest failure-signature neighbours (from the research vector index). Hover a node to trace its cluster.</p>'
         + iid_semantic_graph() + '</div>'
         + '</div>'

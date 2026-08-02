@@ -1,0 +1,257 @@
+{
+ "slug": "azure-west-us2-thermal-2026",
+ "title": "Azure West US 2 Grid-Disturbance Cooling Loss and Thermal Shutdown (May 2026)",
+ "operator": "Microsoft Azure",
+ "operatorShort": "Microsoft Azure",
+ "dcName": "Azure West US 2 (Quincy, Washington)",
+ "location": {
+  "city": "Quincy, Washington",
+  "country": "United States"
+ },
+ "date": "2026-05-01",
+ "durationMin": 480,
+ "category": [
+  "power",
+  "cooling"
+ ],
+ "severity": {
+  "usersAffected": "Azure West US 2 customers across multiple AZs",
+  "impactUsd": "Not published",
+  "servicesDown": [
+   "Azure compute/storage in West US 2 (multi-AZ)"
+  ],
+  "tier": "Grid/cooling thermal event (multi-AZ)"
+ },
+ "brief": "A grid power-quality disturbance reduced cooling capacity across multiple Azure West US 2 availability zones, triggering automated thermal shutdowns of hardware and multi-service impact.",
+ "magnitude": {
+  "blastRadiusScore": 6,
+  "usersScore": 6,
+  "financialScore": 5,
+  "durationScore": 5,
+  "note": "Grid power-quality disturbance cut cooling across multiple AZs, triggering thermal shutdowns — sub-scores ESTIMATED from public impact reporting, pending deep research."
+ },
+ "rootCause": "There was no fire. This incident is frequently mis-shelved as a thermal/fire event, but the official Post Incident Review (tracking ID GHRP-84G, azure.status.microsoft) describes a strictly electrical-then-thermal chain: an external grid power-quality disturbance drove a protective lockout in the mechanical cooling plant, which in turn forced automated thermal shutdowns of IT infrastructure. No combustion, ignition, smoke, or fire-service involvement is reported anywhere in the record.\n\nINITIATING (external) event: A severe thunderstorm producing lightning caused \"utility power disturbances across multiple datacenter facilities\" serving Azure West US 2 (Quincy, Washington) at approximately 04:14 UTC on 29 May 2026. Crucially these were \"voltage sag/swell events\" where \"utility power remained present but was unstable\" — transient under/over-voltage rather than a clean blackout. Because the supply was technically still present, transfer thresholds were not cleanly tripped everywhere: \"Some datacenters transferred to generator power, while others did not, as utility power remained available.\" This inconsistent transfer is the first latent weakness — protection tuning that assumes a binary present/absent supply rather than a degraded/unstable one.\n\nPROXIMATE failure mechanism: The unstable voltage was seen by protection components inside the mechanical cooling systems, which \"entered a 'lockout' protective state.\" The PIR states the design \"prioritizes equipment protection and data security over operational continuity, which resulted in a full lockout rather than staged or degraded operation,\" and the lockout \"prevented parts of the cooling system from automatically returning to normal operation.\" This is the core defect: protection latched hard-off with no staged degradation and no auto-recovery, so cooling capacity collapsed and could only be restored by manual human diagnosis.\n\nSPECIFIC EQUIPMENT — NOT DISCLOSED (record silent). The PIR does not name the cooling-plant vendor, nor whether the affected components were chillers, CRAH/CRAC units, pumps, or cooling-tower VFD drives, nor the make, model, age, or firmware of the protection relay/controller that latched into lockout. There is no battery or electrolyte-chemistry element because there was no electrical/battery fire. Age, maintenance history, and inspection/testing records are not published. Every equipment-identity claim beyond \"a subset of components within the mechanical cooling systems\" would be unsupported.\n\nCASCADING (thermal) mechanism: With cooling degraded, data-hall temperatures \"rose beyond safe operating thresholds,\" and from ~04:40 UTC cloud infrastructure automatically shut down \"to prevent damage\" and \"preserve data integrity\" across two physical availability zones (named AZ-01 and AZ-03 in the PIR). This equipment-protection layer WORKED: no hardware fire or hardware damage is reported. But it converted a cooling fault into a broad multi-service outage.\n\nLATENT ROOT (design/automation, not maintenance): Azure's own remediation list frames root cause as an external environmental/grid event compounded by design and automation gaps, not a maintenance, inspection, or testing lapse — none is evidenced or alleged. The latent roots are: (1) cooling protection that chooses full lockout over staged degradation and cannot self-recover; (2) a manual, under-documented cooling recovery process; (3) storage return-to-service bottlenecked on platform limitations and manual, sequential coordination; (4) telemetry (Log Analytics) unable to self-recover from transient init failures and over-dependent on a single cluster; and (5) inconsistent generator/UPS transfer under sag/swell, implying a commissioning/threshold-tuning question that the PIR observes but neither confirms as a lapse nor explains.\n\nVERIFICATION STATUS: The account derives from a single official operator source, Azure PIR GHRP-84G. That source was re-fetched live and confirmed on 2026-08-02 — the tracking ID, the 29–30 May 2026 dates, the sag/swell and lockout wording, the AZ-01/AZ-03 naming, the ~22-hour duration, the 50%/95% VM figures, the ~14-hour storage validation, the single-cluster telemetry dependency, and the June/July/August/October 2026 remediation dates all verify verbatim or near-verbatim against the live PIR. The remaining limitation is the absence of independent, non-operator corroboration: no press, regulator, or utility (Grant County PUD / Bonneville) confirmation was obtainable, and figures are operator-reported. Separately, a date-of-record correction applies: this dossier was queued under 2026-05-01, but the official incident is 29–30 May 2026 — the 1 May date is incorrect and is struck.",
+ "technicalDeepDive": "Fault propagation, layer by layer, as disclosed in GHRP-84G (re-verified against the live PIR on 2026-08-02). Layer 0 — the grid. A lightning-producing thunderstorm injected \"voltage sag/swell events\" into the utility feeds of multiple Quincy datacenter facilities at ~04:14 UTC. The defining characteristic is that \"utility power remained present but was unstable.\" Datacenter power architecture is generally engineered around a binary decision — utility good vs. utility lost — with automatic transfer switches and UPS/generator start logic keyed to voltage/frequency windows. A sag/swell that dips and recovers repeatedly without fully dropping out can sit inside the ambiguous band: enough to disturb sensitive downstream protection, not enough to cleanly command a transfer. The observed symptom confirms this: \"Some datacenters transferred to generator power, while others did not.\" Identical disturbance, divergent responses — a signature of threshold/commissioning sensitivity rather than a single failed component.\n\nLayer 1 — cooling-plant protection. The mechanical cooling systems contain their own electrical protection (motor protection relays, VFD DC-bus/under-voltage trips, or controller interlocks — the specific device is NOT disclosed). Per the PIR, a subset of components \"entered a 'lockout' protective state.\" Two design choices compound. First, lockout is all-or-nothing: capacity was not throttled or staged; the PIR is explicit that the design \"resulted in a full lockout rather than staged or degraded operation.\" Second, lockout is latching: it \"prevented parts of the cooling system from automatically returning to normal operation.\" Once the transient passed and voltage was nominal again, the plant did not restart itself. This is precisely the behavior Azure's remediation targets — a \"holistic cooling system fail-state review\" is committed for October 2026.\n\nLayer 2 — thermal. Cooling capacity dropped while IT load — and therefore heat output — continued. Data-hall temperatures climbed until they \"rose beyond safe operating thresholds.\" The PIR gives no numeric temperature, threshold, or rate-of-rise; those figures are not disclosed. Time-to-threshold is inferable only indirectly: impact began 04:24, and automated infrastructure shutdown engaged from ~04:40 — on the order of 10–16 minutes from cooling loss to thermal-shutdown threshold, consistent with high-density halls having little thermal ride-through once cooling latches off.\n\nLayer 3 — IT self-protection. To avoid hardware damage, cloud infrastructure shut down \"to prevent damage\" and \"preserve data integrity\" across two physical availability zones (AZ-01, AZ-03). This is the point at which a mechanical fault became a customer-facing multi-service outage. The protection succeeded on its own terms — no hardware damage is reported — but a two-AZ automated shutdown is a large blast radius.\n\nLayer 4 — the recovery tail, which is where most of the ~22-hour duration lives. Cooling itself was restored and temperatures stabilized by ~05:55 UTC (~1.5 h from impact) — the physical hazard was contained quickly. But bringing infrastructure back was sequential and manual: ~50% of VMs recovered by 06:15, ~95% only by 12:00, with storage validation extending over ~14 hours. Storage must be integrity-checked before dependent compute can safely resume; the PIR attributes the slow storage-node return to \"platform limitations that constrained the speed\" and to \"dependencies on manual coordination steps\" (Networking-team remediation, July 2026). The longest tail was telemetry: by 20:18 UTC all services had recovered except Application Insights and Log Analytics, which were processing backlogs and could not self-recover from transient initialization failures; full mitigation including backlog clearance was declared 02:30 UTC on 30 May. Log Analytics' single-cluster dependency (remediation \"reducing dependence on any single cluster or resource type's availability,\" multi-cluster flexibility, August 2026) made it the slowest component. The forensic shape is an inverted pyramid: a sub-second-to-minutes grid transient at the top, a ~10–16-minute thermal excursion, a ~1.5-hour cooling restoration, and a ~22-hour service/data recovery driven almost entirely by manual, sequential, single-cluster recovery processes rather than by any physical damage.",
+ "sequenceOfEvents": [
+  {
+   "t": "2026-05-29 ~04:14 UTC",
+   "phase": "TRIGGER",
+   "event": "Severe thunderstorm with lightning drives 'voltage sag/swell events' across multiple West US 2 (Quincy, WA) datacenter facilities; utility power remains present but unstable. No fire — a grid power-quality disturbance.",
+   "source": "Azure PIR GHRP-84G, azure.status.microsoft"
+  },
+  {
+   "t": "2026-05-29 ~04:14 UTC",
+   "phase": "DETECTION",
+   "event": "Mechanical cooling protection components sense 'abnormal electrical conditions' on the plant. Detection is electrical/thermal, not smoke or flame — no fire-detection system involved.",
+   "source": "Azure PIR GHRP-84G (forensic mapping)"
+  },
+  {
+   "t": "2026-05-29 04:24 UTC",
+   "phase": "IMPACT",
+   "event": "PIR customer-impact window begins. Mechanical cooling protection components enter a 'lockout' protective state; cooling capacity drops.",
+   "source": "Azure PIR GHRP-84G"
+  },
+  {
+   "t": "2026-05-29 ~04:24 UTC",
+   "phase": "CASCADE",
+   "event": "Cooling lockout latches off — a 'full lockout rather than staged or degraded operation' — and prevents parts of the cooling system from automatically returning to normal; data-hall temperatures begin rising toward safe-operating thresholds.",
+   "source": "Azure PIR GHRP-84G"
+  },
+  {
+   "t": "2026-05-29 ~04:31 UTC",
+   "phase": "MITIGATION",
+   "event": "Azure datacenter operations begin manual cooling diagnosis and restoration. No external emergency services — there was no fire; response is Azure's own teams. No evacuation reported (lights-out mechanical/data-hall context).",
+   "source": "Azure PIR GHRP-84G (forensic mapping of 04:31 timestamp)"
+  },
+  {
+   "t": "2026-05-29 ~04:40 UTC",
+   "phase": "CASCADE",
+   "event": "Protective de-energisation: as temperatures 'rose beyond safe operating thresholds,' cloud infrastructure automatically shuts down 'to prevent damage' and 'preserve data integrity' across two physical availability zones (AZ-01, AZ-03). Equipment self-protection, no agent/water discharge.",
+   "source": "Azure PIR GHRP-84G"
+  },
+  {
+   "t": "2026-05-29 ~04:40 UTC",
+   "phase": "CASCADE",
+   "event": "Power behavior diverges: some datacenters transfer to on-site generator power while others do not, because utility power 'remained available' despite instability — generator/UPS transfer inconsistent under sag/swell.",
+   "source": "Azure PIR GHRP-84G"
+  },
+  {
+   "t": "2026-05-29 ~05:55 UTC",
+   "phase": "RECOVERY",
+   "event": "All cooling restored in impacted datacenters and temperatures stabilized (~1.5 h from impact). Physical/thermal hazard contained; the long tail is now data/service recovery, not physical risk.",
+   "source": "Azure PIR GHRP-84G"
+  },
+  {
+   "t": "2026-05-29 06:15 UTC",
+   "phase": "RECOVERY",
+   "event": "Approximately 50% of affected virtual machines recovered as infrastructure is brought back online.",
+   "source": "Azure PIR GHRP-84G"
+  },
+  {
+   "t": "2026-05-29 ~06:15-12:00 UTC",
+   "phase": "CASCADE",
+   "event": "Storage layer requires extended validation before dependent compute can resume; storage validation extended over ~14 hours, constrained by platform limitations and manual, sequential coordination.",
+   "source": "Azure PIR GHRP-84G"
+  },
+  {
+   "t": "2026-05-29 12:00 UTC",
+   "phase": "RECOVERY",
+   "event": "Approximately 95% of VMs recovered after storage largely restored.",
+   "source": "Azure PIR GHRP-84G"
+  },
+  {
+   "t": "2026-05-29 20:18 UTC",
+   "phase": "RECOVERY",
+   "event": "All services recovered except Application Insights and Log Analytics, which are processing telemetry backlogs; Log Analytics could not self-recover from transient initialization failures and over-depended on a single cluster.",
+   "source": "Azure PIR GHRP-84G"
+  },
+  {
+   "t": "2026-05-30 02:30 UTC",
+   "phase": "RESTORED",
+   "event": "Full mitigation declared, including clearing telemetry backlogs (PIR window end). Total incident duration ~22 hours.",
+   "source": "Azure PIR GHRP-84G"
+  },
+  {
+   "t": "2026-06 to 2026-10 (committed)",
+   "phase": "RESTORED",
+   "event": "Remediation program: cooling recovery processes + Log Analytics startup resiliency (June 2026); networking storage-node speed limits + protective-state tooling improvements (July/August 2026); telemetry multi-cluster architecture (August 2026); holistic cooling fail-state / staged-degradation review (October 2026).",
+   "source": "Azure PIR GHRP-84G"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Total incident duration (impact window)",
+   "value": "~22 hours (04:24 UTC 29 May to 02:30 UTC 30 May 2026)",
+   "source": "Azure PIR GHRP-84G"
+  },
+  {
+   "label": "Grid disturbance to customer impact",
+   "value": "~10 minutes (~04:14 UTC storm to 04:24 UTC impact)",
+   "source": "Azure PIR GHRP-84G (approximate)"
+  },
+  {
+   "label": "Cooling loss to automated thermal shutdown",
+   "value": "~10-16 minutes (04:24 impact to ~04:40 shutdown)",
+   "source": "Azure PIR GHRP-84G (approximate)"
+  },
+  {
+   "label": "Cooling restored / temperatures stabilized",
+   "value": "~05:55 UTC 29 May (~1.5 h after impact)",
+   "source": "Azure PIR GHRP-84G"
+  },
+  {
+   "label": "Virtual machines recovered",
+   "value": "~50% by 06:15 UTC; ~95% by 12:00 UTC 29 May",
+   "source": "Azure PIR GHRP-84G"
+  },
+  {
+   "label": "Storage validation duration",
+   "value": "~14 hours",
+   "source": "Azure PIR GHRP-84G"
+  },
+  {
+   "label": "Availability zones affected",
+   "value": "2 physical AZs (AZ-01 and AZ-03)",
+   "source": "Azure PIR GHRP-84G"
+  },
+  {
+   "label": "Full mitigation incl. telemetry backlog clearance",
+   "value": "02:30 UTC 30 May 2026",
+   "source": "Azure PIR GHRP-84G"
+  }
+ ],
+ "contributingFactors": [
+  "EXTERNAL TRIGGER: A severe thunderstorm with lightning caused 'utility power disturbances across multiple datacenter facilities' as 'voltage sag/swell events' where 'utility power remained present but was unstable' (GHRP-84G) — a degraded-but-present supply condition that is harder to protect against than a clean outage.",
+  "DESIGN — HARD LOCKOUT, NO STAGED DEGRADATION: Cooling protection 'entered a lockout protective state'; the PIR states the design 'resulted in a full lockout rather than staged or degraded operation' and a holistic cooling fail-state review is committed for October 2026, confirming the all-or-nothing design as a contributing factor.",
+  "DESIGN — NO COOLING AUTO-RECOVERY: The lockout 'prevented parts of the cooling system from automatically returning to normal operation,' so cooling could not self-restore once the transient passed and required manual human diagnosis and restoration.",
+  "COMMISSIONING/TUNING (observed, not confirmed as a lapse): 'Some datacenters transferred to generator power, while others did not, as utility power remained available' — inconsistent generator/UPS transfer under sag/swell implies threshold/transfer tuning sensitivity; the PIR reports the divergence but does not state it as a lapse.",
+  "PROCESS — MANUAL, UNDER-DOCUMENTED COOLING RECOVERY: Recovery depended on manual cooling diagnosis and restoration; Azure committed to improving cooling recovery processes and documentation (target June 2026), indicating the manual process contributed to duration.",
+  "PROCESS/PLATFORM — SLOW STORAGE RETURN-TO-SERVICE: Storage validation extended over ~14 hours; the PIR attributes this to 'platform limitations that constrained the speed at which storage nodes could be returned to service' and to 'dependencies on manual coordination steps' (Networking remediation, July 2026) — a recovery-architecture gap, not a maintenance failure.",
+  "DESIGN — TELEMETRY SINGLE-CLUSTER DEPENDENCY & NO SELF-RECOVERY: Log Analytics could not self-recover from transient initialization failures and over-depended on a single cluster; remediations add startup resiliency (June 2026) and multi-cluster flexibility 'reducing dependence on any single cluster or resource type' (August 2026), making telemetry the longest tail (backlog cleared 02:30 UTC 30 May).",
+  "TOOLING GAP: Weak tooling to 'identify which infrastructure devices have entered protective states and require manual recovery' slowed prioritized recovery across the two affected availability zones (Networking remediation, target August 2026).",
+  "NOTE — NO MAINTENANCE/INSPECTION LAPSE EVIDENCED: The PIR neither evidences nor alleges any maintenance, inspection, or testing failure; root cause is framed as an external grid event plus design/automation gaps. Absence of disclosure is not proof of absence, but none is on the record."
+ ],
+ "coe": [
+  {
+   "action": "Holistic cooling system fail-state review — evaluate staged/degraded operation vs. full lockout and enable automatic recovery once power stabilizes",
+   "owner": "Azure Cloud Operations & Innovation (Cooling)",
+   "status": "Committed, target October 2026"
+  },
+  {
+   "action": "Improve manual cooling recovery processes and documentation to shorten diagnosis/restoration",
+   "owner": "Azure Datacenter Operations",
+   "status": "Committed, target June 2026"
+  },
+  {
+   "action": "Add Log Analytics startup resiliency (self-recover from transient init failures) and multi-cluster flexibility to reduce single-cluster dependence",
+   "owner": "Azure Log Analytics team",
+   "status": "Committed, June 2026 (startup) and August 2026 (multi-cluster)"
+  },
+  {
+   "action": "Remove platform limitations constraining storage-node return-to-service speed and reduce manual coordination dependencies",
+   "owner": "Azure Networking team",
+   "status": "Committed, target July 2026"
+  },
+  {
+   "action": "Improve tooling to identify devices in protective states and prioritize foundational infrastructure, with cross-team awareness of thermal events on shared infrastructure",
+   "owner": "Azure Networking team",
+   "status": "Committed, target August 2026"
+  },
+  {
+   "action": "Review/standardize generator-UPS automatic-transfer thresholds under voltage sag/swell across Quincy facilities",
+   "owner": "Azure Datacenter Engineering",
+   "status": "Analyst-recommended; not explicitly committed in the PIR"
+  }
+ ],
+ "lessonsLearnt": [
+  "A degraded-but-present grid (sag/swell) is a distinct and harder failure mode than a clean blackout: binary present/absent transfer logic can leave protection in an ambiguous band, producing inconsistent facility responses to one disturbance.",
+  "Protective lockouts should degrade in stages and self-recover: an all-or-nothing latching trip that 'prioritizes equipment protection over operational continuity' converts a transient power-quality event into a multi-hour outage even when no hardware is damaged.",
+  "Equipment self-protection working correctly can still create a large blast radius: automated thermal shutdown across two availability zones prevented hardware damage but caused a broad multi-service outage — protection success and availability are not the same objective.",
+  "Recovery duration was dominated by manual, sequential, single-cluster processes, not physical damage: cooling was restored in ~1.5 h but full service/data recovery took ~22 h, so recovery automation (parallel storage validation, telemetry multi-cluster, protective-state tooling) is where resilience is won.",
+  "Single-source, operator-authored records need explicit confidence framing: the entire account rests on Azure's own PIR with no independent press/regulator/utility corroboration, so figures should be labeled operator-reported."
+ ],
+ "improvements": [
+  "SAFETY / COOLING FAIL-STATE (committed, October 2026): Holistic cooling system fail-state review to evaluate staged/degraded operation instead of full lockout and to enable automatic return to normal once power stabilizes — directly targeting the all-or-nothing, non-self-recovering protection that caused the thermal excursion.",
+  "PROCESS — COOLING RECOVERY (committed, June 2026): Improve manual cooling diagnosis/restoration processes and documentation so operators can restore cooling faster after a protective lockout.",
+  "MAINTENANCE / COMMISSIONING (analyst-recommended; not explicitly committed in PIR): Review and standardize generator/UPS automatic-transfer thresholds and protection settings under voltage sag/swell across all Quincy facilities, since 'some datacenters transferred to generator power, while others did not' under an identical disturbance — a commissioning/protection-tuning verification the PIR observes but does not commit to.",
+  "PLATFORM — STORAGE RETURN-TO-SERVICE (committed, July 2026): Remove networking/platform limitations that constrained the speed of returning storage nodes to service and reduce dependence on manual coordination steps.",
+  "RESILIENCE — TELEMETRY (committed, June & August 2026): Add Log Analytics startup resiliency to self-recover from transient initialization failures, and add multi-cluster flexibility to reduce dependence on any single cluster or resource type.",
+  "TOOLING — PROTECTIVE-STATE VISIBILITY (committed, August 2026): Improve tooling/processes to identify which infrastructure devices have entered protective states and require manual recovery, and improve cross-team awareness when thermal events affect shared infrastructure."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "No fire — an electrical-then-thermal chain, not combustion",
+   "body": "Despite being catalogued alongside fire/thermal events, GHRP-84G contains no combustion, ignition, smoke, or fire-service element. The verified chain is: external grid sag/swell -> cooling-plant protective lockout -> loss of cooling capacity -> data-hall temperatures beyond safe thresholds -> automated IT shutdown to prevent hardware damage. Every layer is electrical or thermal; the 'fire' framing is a mis-shelving that the record does not support."
+  },
+  {
+   "heading": "The degraded-but-present grid problem",
+   "body": "The initiating condition was 'voltage sag/swell events' in which 'utility power remained present but was unstable.' This ambiguous band defeated binary transfer logic: 'some datacenters transferred to generator power, while others did not.' One disturbance, divergent facility responses — a threshold/commissioning sensitivity rather than a single failed component, and the latent weakness that let the disturbance reach cooling-plant protection at all."
+  },
+  {
+   "heading": "Lockout as the pivotal design defect",
+   "body": "The PIR is unusually explicit that the cooling design 'resulted in a full lockout rather than staged or degraded operation' and that the lockout 'prevented parts of the cooling system from automatically returning to normal operation.' Two properties — all-or-nothing withdrawal of capacity and latching with no auto-recovery — are what turned a passing power transient into a multi-hour outage. Azure's October-2026 holistic fail-state review targets exactly this."
+  },
+  {
+   "heading": "Where the ~22 hours actually went",
+   "body": "Physical containment was fast: cooling restored and temperatures stabilized by ~05:55 UTC, roughly 1.5 hours after impact, with no hardware damage. The remaining ~20 hours were recovery overhead: VMs 50% by 06:15 and 95% by 12:00, storage validation over ~14 hours constrained by platform speed limits and manual coordination, and telemetry (Application Insights / Log Analytics) trailing to 02:30 UTC 30 May due to inability to self-recover and single-cluster dependence. The duration is a recovery-automation story, not a damage story."
+  },
+  {
+   "heading": "Sourcing and confidence",
+   "body": "The account rests on one official operator source, Azure PIR GHRP-84G, which was re-fetched live and confirmed on 2026-08-02: tracking ID, 29-30 May 2026 dates, sag/swell and full-lockout wording, AZ-01/AZ-03 naming, 50%/95% VM figures, ~14-hour storage validation, single-cluster telemetry dependency, and June/July/August/October 2026 remediation dates all verify against the live page. The material gap is the absence of independent, non-operator corroboration (press, regulator, Grant County PUD / Bonneville); all figures are operator-reported. The dossier's original 2026-05-01 date is incorrect and is corrected to 29-30 May 2026."
+  }
+ ],
+ "references": [
+  {
+   "title": "Azure Post Incident Review — Tracking ID GHRP-84G, West US 2 (May 2026)",
+   "url": "https://azure.status.microsoft/en-us/status/history/",
+   "type": "vendor-status",
+   "quote": "Some datacenters transferred to generator power, while others did not, as utility power remained available",
+   "accessed": "2026-08-02"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": true,
+  "lastVerified": "2026-08-02 (seed — pending deep research)"
+ },
+ "lastUpdated": "2026-08-02"
+}

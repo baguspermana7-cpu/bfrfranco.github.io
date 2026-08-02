@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>London Heatwave Cooling Failures — Google Cloud &amp; Oracle (July 2022) | ResistanceZero</title>
+    <meta name="description" content="During a record UK heatwave with temperatures above 40°C, cooling systems failed at Google Cloud (europe-west2) and Oracle (UK South) London data centers, forcing hardware/VM shutd">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="ai-content-declaration" content="human-curated, sourced from public post-incident reports">
+    <meta name="author" content="Bagus Dwi Permana">
+    <link rel="canonical" href="https://resistancezero.com/incident-london-heatwave-cooling-2022.html">
+    <meta name="theme-color" content="#0c1512">
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+    <style>
+    /* ── Governed Incident Dossier — editorial register (v2): forest-green + warm ivory,
+       serif display, evidence-class provenance. Accent vars remapped so all components
+       re-skin. AA-contrast in both themes. No gradients / glass / dot-grid (anti-slop). */
+    :root:not([data-theme="dark"]) {
+        --bg:#f4f1e7; --surface:#fffdf6; --surface-2:#efeadc; --line:rgba(26,45,36,0.16);
+        --text:#1a2d24; --text-strong:#10201a; --text-body:#3b463d; --muted:#6a7367;
+        --cyan:#2f6b4f; --amber:#87671b; --green:#2f7d54; --red:#9c3b32; --gold:#87671b;
+        --hero-ink:#f4f1e7; --hero-bg:#183329; --shadow-deep:rgba(26,45,36,0.10);
+    }
+    [data-theme="dark"] {
+        --bg:#0c1512; --surface:#11201a; --surface-2:#16281f; --line:rgba(233,229,216,0.15);
+        --text:#e9e5d8; --text-strong:#f5f2e9; --text-body:#c6ccbc; --muted:#8b9484;
+        --cyan:#6aa588; --amber:#c9a559; --green:#6aa588; --red:#cf9384; --gold:#c9a559;
+        --hero-ink:#e9e5d8; --hero-bg:#0f221a; --shadow-deep:rgba(0,0,0,0.5);
+    }
+    * { box-sizing:border-box; }
+    html,body { margin:0; padding:0; }
+    body { background:var(--bg); color:var(--text); font-family:'IBM Plex Sans',system-ui,sans-serif; line-height:1.62; }
+    a { color:var(--cyan); }
+    h1,h2,.serif { font-family:'Fraunces','Newsreader',Georgia,serif; font-weight:600; letter-spacing:-0.01em; }
+    .wrap { max-width:1120px; margin:0 auto; padding:1.5rem 1.1rem 3rem; }
+    .navbar { display:flex; align-items:center; justify-content:space-between; padding:0.7rem 1.1rem; border-bottom:1px solid var(--line); background:var(--surface); position:sticky; top:0; z-index:50; }
+    .nav-container { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:1120px; margin:0 auto; }
+    .nav-logo { display:flex; align-items:center; }
+    .nav-avatar { width:34px; height:34px; border-radius:50%; }
+    .nav-menu { display:flex; gap:1rem; list-style:none; margin:0; padding:0; }
+    .nav-menu a { color:var(--text-body); text-decoration:none; font-size:0.85rem; font-weight:600; }
+    .nav-menu a:hover { color:var(--cyan); }
+    .nav-right { display:flex; align-items:center; gap:0.6rem; }
+    .theme-btn { background:none; border:1px solid var(--line); color:var(--text); border-radius:4px; padding:0.35rem 0.5rem; cursor:pointer; font-size:0.8rem; }
+    .lock-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--red); border:1px solid var(--red); border-radius:2px; padding:0.12rem 0.5rem; }
+    h1 { font-size:2.4rem; color:var(--text-strong); margin:0.35rem 0 0.5rem; line-height:1.12; }
+    h2 { font-size:1.4rem; color:var(--text-strong); margin:2rem 0 0.7rem; }
+    .eyebrow { font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); }
+    .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
+    .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
+    .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:2px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    .chip.cyan { color:var(--cyan); border-left:2px solid var(--cyan); }
+    .chip.amber { color:var(--amber); border-left:2px solid var(--amber); }
+    .chip.green { color:var(--green); border-left:2px solid var(--green); }
+    .chip.red { color:var(--red); border-left:2px solid var(--red); }
+    .metabar { font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.04em; color:var(--muted); margin:0.7rem 0; display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; font-variant-numeric:tabular-nums slashed-zero; }
+    .metabar b { color:var(--text-body); font-weight:600; }
+    .metabar .sep { color:var(--line); }
+    .chip.muted { color:var(--muted); }
+    .card { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:1rem 1.1rem; margin-top:0.9rem; }
+    .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:4px; margin-top:0.9rem; }
+    table.inc-index { width:100%; border-collapse:collapse; font-size:0.86rem; min-width:760px; font-variant-numeric:tabular-nums slashed-zero; }
+    table.inc-index th { text-align:left; font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); background:var(--surface-2); }
+    table.inc-index td { padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); color:var(--text-body); vertical-align:top; }
+    table.inc-index tr:hover td { background:var(--surface-2); }
+    table.inc-index a { font-weight:700; color:var(--text-strong); text-decoration:none; }
+    table.inc-index a:hover { color:var(--cyan); text-decoration:underline; }
+    /* rich incident table (reference-2 style) */
+    table.itbl { min-width:1120px; }
+    table.itbl td { vertical-align:middle; }
+    .itr { cursor:pointer; }
+    .itr:hover td { background:var(--surface-2); }
+    .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
+    .c-title { max-width:300px; }
+    .c-title .itt { display:block; font-weight:700; color:var(--text-strong); text-decoration:none; font-size:0.9rem; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .itr:hover .itt { color:var(--cyan); }
+    .c-title .its { color:var(--muted); font-size:0.76rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:0.1rem; }
+    .sev-chip { font-family:'JetBrains Mono',monospace; font-size:0.66rem; font-weight:600; padding:0.12rem 0.5rem; border-radius:2px; border:1px solid; white-space:nowrap; }
+    .sev-b-critical { color:var(--red); border-color:var(--red); }
+    .sev-b-high { color:var(--amber); border-color:var(--amber); }
+    .sev-b-medium { color:var(--green); border-color:var(--green); }
+    .sev-b-low { color:var(--muted); border-color:var(--line); }
+    .st-chip { font-family:'JetBrains Mono',monospace; font-size:0.64rem; padding:0.12rem 0.45rem; border-radius:2px; border:1px solid var(--line); white-space:nowrap; }
+    .st-off { color:var(--green); border-color:color-mix(in srgb, var(--green) 45%, var(--line)); }
+    .st-press { color:var(--amber); border-color:color-mix(in srgb, var(--amber) 45%, var(--line)); }
+    .c-region { min-width:170px; }
+    .c-region .iflag { font-size:1.05rem; margin-right:0.45rem; vertical-align:middle; }
+    .c-region .ireg { display:inline-flex; flex-direction:column; vertical-align:middle; }
+    .c-region .ireg b { color:var(--text-body); font-weight:600; font-size:0.82rem; }
+    .c-region .ireg i { color:var(--muted); font-style:normal; font-size:0.72rem; }
+    .c-mono { font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--text-body); white-space:nowrap; }
+    .c-blast { color:var(--text-strong); font-weight:600; } .c-blast .c-u { color:var(--muted); font-weight:400; font-size:0.68rem; }
+    .ibars { display:inline-flex; gap:2px; }
+    .ibars i { width:7px; height:9px; border-radius:1px; display:block; }
+    .itags { display:flex; gap:0.25rem; max-width:150px; flex-wrap:wrap; }
+    .c-go { color:var(--muted); font-size:1rem; text-align:center; }
+    .itr:hover .c-go { color:var(--cyan); }
+    /* incident-view tabs (List / Risk map / Semantic / Analytics) */
+    .iv-tabs { display:flex; gap:1.2rem; border-bottom:1px solid var(--line); margin:0.4rem 0 0.2rem; flex-wrap:wrap; }
+    .iv-tabs a { font-family:'JetBrains Mono',monospace; font-size:0.74rem; letter-spacing:0.03em; color:var(--muted); text-decoration:none; padding:0.5rem 0.1rem; border-bottom:2px solid transparent; }
+    .iv-tabs a:hover { color:var(--text-strong); }
+    .iv-tabs a.on { color:var(--text-strong); border-bottom-color:var(--cyan); }
+    .rank-badge { font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--amber); font-variant-numeric:tabular-nums slashed-zero; }
+    .mag-bar { height:5px; border-radius:0; background:var(--line); margin-top:0.35rem; overflow:hidden; }
+    .mag-bar > span { display:block; height:4px; background:var(--amber); }
+    ul.tight { margin:0.4rem 0 0; padding-left:1.15rem; }
+    ul.tight li { color:var(--text-body); margin:0.3rem 0; font-size:0.92rem; }
+    .soe { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .soe li { display:grid; grid-template-columns:170px 1fr; gap:0.7rem; padding:0.5rem 0; border-bottom:1px solid var(--line); }
+    .soe time { font-family:'JetBrains Mono',monospace; font-size:0.76rem; color:var(--muted); font-variant-numeric:tabular-nums slashed-zero; }
+    .soe .ev { color:var(--text-body); font-size:0.9rem; }
+    .phase-chip { font-family:'JetBrains Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--amber); border:1px solid var(--line); border-radius:2px; padding:0.05rem 0.4rem; margin-right:0.4rem; white-space:nowrap; font-variant-numeric:tabular-nums; }
+    table.metrics { width:100%; border-collapse:collapse; font-size:0.88rem; font-variant-numeric:tabular-nums slashed-zero; }
+    table.metrics td { padding:0.5rem 0.7rem; border-bottom:1px solid var(--line); vertical-align:top; }
+    table.metrics .mlabel { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; width:38%; white-space:nowrap; }
+    table.metrics .mval { color:var(--text-body); }
+    .ca-block { background:var(--surface); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 2px 2px 0; padding:0.7rem 1rem; margin-top:0.7rem; }
+    .ca-block h3 { margin:0 0 0.3rem; font-size:0.92rem; color:var(--text-strong); }
+    .ca-block p { margin:0; color:var(--text-body); font-size:0.9rem; }
+    /* reading column — constrain prose to a comfortable measure, justified like RZ articles */
+    .reading-col { max-width:820px; margin:0 auto; }
+    .reading-col p.lede, .reading-col .card p, .reading-col .ca-block p, .reading-col ul.tight li { text-align:justify; -webkit-hyphens:auto; hyphens:auto; }
+    .card p { margin:0; }
+    .card > p + p, .card p + p { margin-top:0.7rem; }
+    .mag-trace { font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--text-body); background:var(--surface-2); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 2px 2px 0; padding:0.5rem 0.7rem; margin-top:0.5rem; font-variant-numeric:tabular-nums slashed-zero; }
+    .mag-trace b { color:var(--text-strong); }
+    .imp-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.04em; text-transform:uppercase; color:var(--cyan); font-weight:700; margin-right:0.35rem; }
+    .coe-meta { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); background:var(--surface-2); border:1px solid var(--line); border-radius:2px; padding:0.05rem 0.4rem; margin-left:0.2rem; white-space:normal; }
+    /* FAQ / methodology */
+    details.faq { border:1px solid var(--line); border-radius:4px; background:var(--surface); margin:0.8rem 0 0.4rem; }
+    details.faq > summary { cursor:pointer; padding:0.7rem 0.9rem; font-family:'JetBrains Mono',monospace; font-size:0.74rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-strong); list-style:none; }
+    details.faq > summary::-webkit-details-marker { display:none; }
+    details.faq > summary::before { content:"+ "; color:var(--cyan); }
+    details.faq[open] > summary::before { content:"– "; }
+    details.faq .faq-body { padding:0 0.9rem 0.9rem; }
+    details.faq h4 { font-family:'Fraunces',Georgia,serif; font-size:0.98rem; color:var(--text-strong); margin:0.8rem 0 0.2rem; }
+    details.faq p, details.faq li { color:var(--text-body); font-size:0.88rem; }
+    /* share bar (RZ standard) — editorial thin buttons */
+    .share-buttons { display:flex; align-items:center; gap:0.5rem; margin:1.4rem 0 0.4rem; padding-top:1rem; border-top:1px solid var(--line); }
+    .share-label { font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin-right:0.2rem; }
+    .share-btn { width:32px; height:32px; display:inline-flex; align-items:center; justify-content:center; background:var(--surface-2); border:1px solid var(--line); border-radius:4px; color:var(--text-body); cursor:pointer; padding:0; }
+    .share-btn:hover { border-color:var(--cyan); color:var(--cyan); }
+    .share-btn svg { width:15px; height:15px; }
+    /* ── inline-SVG visualizations (theme-aware via vars) ── */
+    .inc-map { height:410px; margin-top:0.4rem; border:1px solid var(--line); border-radius:4px; overflow:hidden; background:#0f1a16; z-index:1; }
+    .inc-map .leaflet-container { background:#0f1a16; font-family:'IBM Plex Sans',sans-serif; }
+    .inc-map .leaflet-popup-content-wrapper { background:#12211b !important; color:#e6efe9 !important; border:1px solid #2c4438 !important; border-radius:10px !important; box-shadow:0 8px 24px rgba(0,0,0,0.45) !important; }
+    .inc-map .leaflet-popup-tip { background:#12211b !important; border:1px solid #2c4438 !important; }
+    .inc-map .leaflet-popup-content { margin:9px 12px !important; }
+    .inc-map .leaflet-control-attribution { background:rgba(15,26,22,0.8) !important; color:#7d8f86 !important; font-size:9px !important; }
+    .inc-map .leaflet-control-attribution a { color:#9fb3a8 !important; }
+    .inc-map .leaflet-bar a { background:#12211b !important; color:#cfe0d7 !important; border-color:#2c4438 !important; }
+    .leaflet-tooltip.inc-tip { background:#12211b; color:#e6efe9; border:1px solid #2c4438; border-radius:3px; font-family:'JetBrains Mono',monospace; font-size:0.66rem; padding:2px 7px; box-shadow:0 6px 18px rgba(0,0,0,0.5); }
+    .leaflet-tooltip.inc-tip:before { border-top-color:#2c4438; }
+    /* ── Incident Intelligence dashboard (editorial, no neon) ── */
+    .iid { margin:1.4rem 0 1rem; }
+    .iid-head { display:flex; align-items:flex-end; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin-bottom:0.9rem; }
+    .iid-title { font-size:1.6rem; margin:0; color:var(--text-strong); }
+    .iid-sub { margin:0.15rem 0 0; color:var(--muted); font-size:0.86rem; }
+    .iid-range { font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.05em; color:var(--muted); border:1px solid var(--line); border-radius:3px; padding:0.3rem 0.6rem; white-space:nowrap; }
+    .iid-num { font-variant-numeric:tabular-nums slashed-zero; }
+    .iid-kpis { display:grid; grid-template-columns:repeat(5,1fr); gap:0.7rem; margin-bottom:0.9rem; }
+    .iid-kpi { background:var(--surface); border:1px solid var(--line); border-top:2px solid var(--cyan); border-radius:0 0 4px 4px; padding:0.75rem 0.85rem; transition:transform 0.18s ease, box-shadow 0.18s ease; }
+    .iid-kpi:hover { transform:translateY(-2px); box-shadow:0 10px 24px var(--shadow-deep); }
+    .iid-kpi-l { font-family:'JetBrains Mono',monospace; font-size:0.62rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); }
+    .iid-kpi-v { display:flex; align-items:baseline; gap:0.3rem; margin:0.25rem 0 0.15rem; }
+    .iid-kpi-v .iid-num, .iid-kpi-v > span:first-child { font-family:'Fraunces',Georgia,serif; font-size:1.8rem; font-weight:600; color:var(--text-strong); line-height:1; }
+    .iid-kpi-u { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .iid-kpi-s { font-size:0.72rem; color:var(--muted); }
+    .iid-grid { display:grid; grid-template-columns:290px 1fr 300px; gap:0.9rem; align-items:start; }
+    .iid-col-l, .iid-col-c, .iid-col-r { display:flex; flex-direction:column; gap:0.9rem; min-width:0; }
+    .iid-panel { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0.85rem 0.95rem; }
+    .iid-panel-map { padding:0.85rem 0.95rem 0.6rem; }
+    .iid-panel-map .inc-map { height:360px; margin-top:0.5rem; }
+    .iid-ph { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin-bottom:0.5rem; }
+    .iid-note { font-size:0.74rem; color:var(--muted); margin:0 0 0.5rem; }
+    .iid-donut-wrap { display:flex; align-items:center; gap:0.9rem; }
+    .iid-donut { width:130px; height:130px; flex:0 0 auto; }
+    .iid-arc { transition:stroke-dasharray 0.9s cubic-bezier(0.22,1,0.36,1); }
+    .iid-donut-c { font-family:'Fraunces',Georgia,serif; font-size:19px; font-weight:600; fill:var(--text-strong); }
+    .iid-donut-t { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.1em; text-transform:uppercase; fill:var(--muted); }
+    .iid-legend { list-style:none; margin:0; padding:0; flex:1; min-width:0; }
+    .iid-legend li { display:flex; align-items:center; gap:0.45rem; font-size:0.82rem; color:var(--text-body); padding:0.16rem 0; }
+    .iid-legend b { margin-left:auto; color:var(--text-strong); font-family:'JetBrains Mono',monospace; font-size:0.82rem; }
+    .iid-legend .iid-pct { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.72rem; width:2.4em; text-align:right; }
+    .iid-dot { width:9px; height:9px; border-radius:50%; flex:0 0 auto; }
+    .iid-catbars, .iid-durbars, .iid-sigs { list-style:none; margin:0; padding:0; }
+    .iid-catbars li, .iid-durbars li, .iid-sigs li { display:grid; grid-template-columns:1fr 90px auto; align-items:center; gap:0.5rem; padding:0.24rem 0; font-size:0.82rem; }
+    .iid-sigs li { grid-template-columns:1fr 64px auto auto; }
+    .iid-catbars li { cursor:pointer; }
+    .iid-catbars li:hover .iid-cbl { color:var(--cyan); }
+    .iid-cbl, .iid-dbl, .iid-sig-n { color:var(--text-body); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .iid-cbar, .iid-dbar, .iid-sig-bar { height:7px; background:var(--surface-2); border-radius:0; overflow:hidden; }
+    .iid-cbar i, .iid-sig-bar i { display:block; height:100%; width:var(--w); background:var(--amber); transform:scaleX(0); transform-origin:left; transition:transform 0.9s cubic-bezier(0.22,1,0.36,1); }
+    .iid-dbar i { display:block; height:100%; width:var(--w); background:var(--cyan); transform:scaleX(0); transform-origin:left; transition:transform 0.9s cubic-bezier(0.22,1,0.36,1); }
+    .iid-in .iid-cbar i, .iid-in .iid-dbar i, .iid-in .iid-sig-bar i { transform:scaleX(1); }
+    .iid-catbars b, .iid-durbars b, .iid-sigs b { font-family:'JetBrains Mono',monospace; color:var(--text-strong); font-size:0.82rem; text-align:right; }
+    .iid-durbars b { color:var(--muted); }
+    .iid-sig-m { font-family:'JetBrains Mono',monospace; font-size:0.66rem; color:var(--muted); }
+    .iid-recent { display:flex; flex-direction:column; }
+    .iid-rec { display:flex; align-items:center; gap:0.55rem; padding:0.45rem 0; border-bottom:1px solid var(--line); text-decoration:none; }
+    .iid-rec:last-child { border-bottom:none; }
+    .iid-rec-sev { width:8px; height:8px; border-radius:50%; flex:0 0 auto; }
+    .iid-rec-b { display:flex; flex-direction:column; min-width:0; flex:1; }
+    .iid-rec-t { color:var(--text-strong); font-size:0.84rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .iid-rec:hover .iid-rec-t { color:var(--cyan); }
+    .iid-rec-m { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.68rem; }
+    .iid-rec-tag { font-family:'JetBrains Mono',monospace; font-size:0.58rem; letter-spacing:0.04em; padding:0.1rem 0.35rem; border:1px solid var(--line); border-radius:2px; flex:0 0 auto; }
+    .sev-critical { background:var(--red); } .iid-rec-tag.sev-critical { color:var(--red); background:transparent; border-color:var(--red); }
+    .sev-high { background:var(--amber); } .iid-rec-tag.sev-high { color:var(--amber); background:transparent; border-color:var(--amber); }
+    .sev-medium { background:var(--green); } .iid-rec-tag.sev-medium { color:var(--green); background:transparent; border-color:var(--green); }
+    .sev-low { background:var(--muted); } .iid-rec-tag.sev-low { color:var(--muted); background:transparent; border-color:var(--line); }
+    .iid-graph { width:100%; height:auto; display:block; }
+    .iid-edge { stroke:var(--line); stroke-width:1; opacity:0.55; transition:stroke 0.15s, opacity 0.15s; }
+    .iid-edge.on { stroke:var(--cyan); opacity:0.9; stroke-width:1.3; }
+    .iid-node circle { transition:transform 0.15s ease, opacity 0.15s; transform-origin:center; }
+    .iid-node:hover circle { stroke:var(--text-strong); stroke-width:1.4; }
+    .iid-graph.iid-focus .iid-node.dim circle { opacity:0.22; }
+    .iid-maplegend { display:flex; flex-wrap:wrap; gap:0.4rem 1rem; margin-top:0.5rem; font-family:'JetBrains Mono',monospace; font-size:0.66rem; color:var(--muted); }
+    .iid-maplegend span { display:inline-flex; align-items:center; gap:0.35rem; }
+    .iid-maplegend i { width:10px; height:10px; border-radius:50%; }
+    .iid-maplegend .iid-mln { font-style:italic; opacity:0.8; }
+    .iid-foot { display:flex; flex-wrap:wrap; gap:0.5rem 1.4rem; align-items:center; margin-top:0.9rem; padding-top:0.8rem; border-top:1px solid var(--line); font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .iid-foot b { color:var(--text-body); font-weight:600; margin-right:0.3rem; }
+    .iid-foot-link { margin-left:auto; color:var(--cyan); text-decoration:none; }
+    @media (max-width:1000px){ .iid-grid { grid-template-columns:1fr; } .iid-kpis { grid-template-columns:repeat(2,1fr); } }
+    @media (max-width:520px){ .iid-kpis { grid-template-columns:1fr 1fr; } .iid-kpi-v .iid-num, .iid-kpi-v > span:first-child { font-size:1.5rem; } }
+    @media (prefers-reduced-motion:reduce){ .iid-arc,.iid-cbar i,.iid-dbar i,.iid-sig-bar i,.iid-kpi,.iid-node circle,.iid-edge { transition:none !important; } .iid-cbar i,.iid-dbar i,.iid-sig-bar i { transform:scaleX(1); } }
+    .viz { overflow-x:auto; margin-top:0.9rem; background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0.9rem 1rem; }
+    .viz svg { display:block; max-width:100%; height:auto; }
+    .viz-radar svg { max-width:320px; margin:0 auto; }
+    .vz-num { font-variant-numeric:tabular-nums slashed-zero; }
+    .vz-box-t, .vz-box-s, .vz-lbl, .vz-hb-lbl, .vz-tl-t, .vz-pt, .vz-tick { pointer-events:auto; }
+    .vz-grid { fill:none; stroke:var(--line); stroke-width:1; }
+    .vz-accent-fill { fill:var(--cyan); fill-opacity:0.16; stroke:var(--cyan); stroke-width:1.4; }
+    .vz-accent-dot { fill:var(--cyan); }
+    .vz-accent-bar { fill:var(--cyan); }
+    .vz-cat-bar { fill:var(--amber); }
+    .vz-lbl { font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--muted); }
+    .vz-box-trigger { fill:color-mix(in srgb, var(--red) 12%, var(--surface)); stroke:var(--red); stroke-width:1.2; }
+    .vz-box-fault { fill:color-mix(in srgb, var(--amber) 12%, var(--surface)); stroke:var(--amber); stroke-width:1.2; }
+    .vz-box-down { fill:color-mix(in srgb, var(--cyan) 10%, var(--surface)); stroke:var(--cyan); stroke-width:1; }
+    .vz-box-t { font-family:'IBM Plex Sans',sans-serif; font-size:11px; font-weight:600; fill:var(--text-strong); }
+    .vz-box-s { font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--muted); }
+    .vz-flow { stroke:var(--muted); stroke-width:1.3; fill:none; }
+    .vz-arrhead { fill:var(--muted); }
+    .vz-tl-ph { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.04em; text-transform:uppercase; fill:var(--amber); }
+    .vz-tl-t { font-family:'JetBrains Mono',monospace; font-size:8.5px; fill:var(--muted); }
+    .vz-hb-lbl { font-family:'IBM Plex Sans',sans-serif; font-size:11px; fill:var(--text-body); }
+    .vz-hb-val { font-family:'JetBrains Mono',monospace; font-size:10px; fill:var(--muted); font-variant-numeric:tabular-nums slashed-zero; }
+    .vz-tick { font-family:'JetBrains Mono',monospace; font-size:8.5px; fill:var(--muted); }
+    .vz-quad { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.05em; text-transform:uppercase; fill:var(--muted); opacity:0.7; }
+    .vz-pt { font-family:'JetBrains Mono',monospace; font-size:8px; fill:var(--text-body); }
+    .viz a { text-decoration:none; }
+    .viz a:hover .vz-pt { fill:var(--cyan); font-weight:600; }
+    .viz a:hover circle { stroke:var(--text-strong); stroke-width:1.4; }
+    .vz-legend { display:flex; flex-wrap:wrap; gap:0.5rem 1.1rem; margin-top:0.7rem; padding-top:0.6rem; border-top:1px solid var(--line); }
+    .vz-key { display:inline-flex; align-items:center; gap:0.4rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .vz-key i { width:11px; height:11px; border-radius:50%; display:inline-block; }
+    .vz-key-note { font-style:italic; opacity:0.8; }
+    .viz-grid3 { display:grid; grid-template-columns:1fr 1fr; gap:0.9rem; }
+    @media (max-width:720px){ .viz-grid3 { grid-template-columns:1fr; } }
+    .filterbar { display:flex; flex-wrap:wrap; align-items:center; gap:0.4rem 0.6rem; margin:0.9rem 0 0.2rem; }
+    .fb-group { display:flex; flex-wrap:wrap; gap:0.35rem; }
+    .fb-chip { font-family:'JetBrains Mono',monospace; font-size:0.72rem; padding:0.28rem 0.6rem; border-radius:2px; border:1px solid var(--line); background:var(--surface); color:var(--text-body); cursor:pointer; }
+    .fb-chip:hover { border-color:var(--cyan); }
+    .fb-chip.active { background:var(--surface-2); border-color:var(--line); border-bottom:2px solid var(--cyan); color:var(--text-strong); font-weight:700; }
+    .fb-search { flex:1 1 200px; min-width:160px; font-family:'IBM Plex Sans',sans-serif; font-size:0.82rem; padding:0.3rem 0.6rem; border-radius:4px; border:1px solid var(--line); background:var(--surface); color:var(--text); }
+    .fb-count { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); margin-left:auto; }
+    .kv { display:grid; grid-template-columns:180px 1fr; gap:0.5rem 0.9rem; margin-top:0.5rem; font-size:0.9rem; }
+    .kv dt { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; }
+    .kv dd { margin:0; color:var(--text-body); }
+    .refs { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .refs li { padding:0.55rem 0; border-bottom:1px solid var(--line); }
+    .refs .rtitle { color:var(--text-strong); font-weight:600; font-size:0.9rem; }
+    .refs .rquote { color:var(--muted); font-size:0.84rem; font-style:italic; margin-top:0.2rem; display:block; }
+    .refs a { font-size:0.78rem; word-break:break-all; }
+    .backlink { display:inline-block; margin-bottom:0.6rem; font-size:0.82rem; color:var(--cyan); text-decoration:none; }
+    footer { border-top:1px solid var(--line); margin-top:2.5rem; padding:1.4rem 1.1rem; text-align:center; }
+    footer .ver { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .disclaimer { font-size:0.76rem; color:var(--muted); margin-top:0.8rem; max-width:80ch; }
+    .skip-link { position:absolute; top:-50px; left:0; background:var(--cyan); color:var(--hero-bg); padding:10px 20px; text-decoration:none; font-weight:600; z-index:10000; border-radius:0 0 4px 0; transition:top 0.2s; }
+    .skip-link:focus { top:0; }
+    .root-gate { position:fixed; inset:0; z-index:99999; display:none; align-items:center; justify-content:center; background:rgba(2,6,23,0.74); padding:1rem; backdrop-filter:blur(6px); }
+    body.locked .root-gate { display:flex; }
+    body.locked .wrap { filter:blur(4px); pointer-events:none; user-select:none; }
+    .root-card { max-width:430px; width:100%; background:var(--surface); border:1px solid var(--cyan); border-radius:4px; padding:1.3rem 1.15rem; text-align:center; box-shadow:0 18px 36px var(--shadow-deep); }
+    .root-card h2 { margin:0 0 0.4rem; font-size:1.1rem; color:var(--text-strong); }
+    .root-card p { font-size:0.86rem; color:var(--text-body); }
+    .root-actions { margin-top:0.9rem; display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; }
+    .root-actions button, .root-actions a { border-radius:4px; padding:0.5rem 0.85rem; font-size:0.8rem; font-weight:700; border:1px solid var(--line); text-decoration:none; cursor:pointer; color:var(--text); font-family:inherit; }
+    .root-actions button { background:var(--cyan); color:var(--hero-bg); border:none; }
+    .rz-nav-burger { display:none; }
+    /* v1.8.0 — mobile responsive patch */
+    @media (max-width:768px) {
+        html,body { overflow-x:hidden; max-width:100vw; }
+        img { max-width:100%; height:auto; display:block; }
+        .nav-menu, .nav-links { display:none; }
+        .navbar { padding:0.5rem 0.75rem; }
+        footer .footer-grid { grid-template-columns:1fr; gap:1.25rem; padding:1rem; }
+        button, a.btn, [role="button"] { min-height:44px; }
+        h1 { font-size:1.4rem; }
+        .soe li { grid-template-columns:1fr; gap:0.15rem; }
+        .kv { grid-template-columns:1fr; }
+        .root-card { max-width:92vw; }
+    }
+    @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
+</style>
+    
+</head>
+<body class="locked">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <nav class="navbar"><div class="nav-container">
+        <a href="index.html" class="nav-logo"><img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dc-incidents.html">DC Incidents</a></li>
+            <li><a href="datacenter-solutions.html">DC Solutions</a></li>
+        </ul>
+        <div class="nav-right">
+            <span class="lock-tag" title="Root-only module">ROOT</span>
+            <button class="theme-btn" id="themeToggle" type="button" aria-label="Toggle theme">◐</button>
+        </div>
+    </div></nav>
+    <main class="wrap" id="main-content">
+        <div class="reading-col">
+        <a class="backlink" href="dc-incidents.html">← All incidents</a>
+        <div class="eyebrow">Incident dossier · Rank #32</div>
+        <h1>London Heatwave Cooling Failures — Google Cloud &amp; Oracle (July 2022)</h1>
+        <div class="chips">
+            <span class="chip">Google Cloud &amp; Oracle</span>
+            <span class="chip cyan">2022-07-19</span>
+            <span class="chip amber">24h 0m core impact</span>
+            <span class="chip cyan">Cooling</span>
+        </div>
+        <p class="lede">During a record UK heatwave with temperatures above 40°C, cooling systems failed at Google Cloud (europe-west2) and Oracle (UK South) London data centers, forcing hardware/VM shutdowns and regional service loss — an early climate-driven thermal event.</p>
+
+        <h2>Failure cascade</h2>
+        <div class="viz viz-cascade"><svg viewBox="0 0 760 158" role="img" aria-label="Failure cascade block diagram"><title>Failure cascade: trigger → fault → downstream impact</title><defs><marker id="ic-ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path class="vz-arrhead" d="M0,0 L6,3 L0,6 Z"/></marker></defs><text class="vz-tl-ph" x="8" y="12">Trigger</text><text class="vz-tl-ph" x="248" y="12">Primary fault</text><text class="vz-tl-ph" x="516" y="12">Downstream impact</text><rect class="vz-box-trigger" x="8" y="51.0" width="176" height="56" rx="2"><title>Trigger — Cooling (2022-07-19)</title></rect><text class="vz-box-t" x="18" y="68.0">Trigger · Cooling</text><text class="vz-box-s" x="18" y="82.0"><title>2022-07-19</title>2022-07-19</text><rect class="vz-box-fault" x="240" y="51.0" width="224" height="56" rx="2"><title>Primary fault at Google Cloud &amp; Oracle — Google Cloud europe-west2 &amp; Oracle UK South (London)</title></rect><text class="vz-box-t" x="250" y="68.0">Google &amp; Oracle</text><text class="vz-box-s" x="250" y="82.0"><title>Google Cloud europe-west2 &amp; Oracle UK South (London)</title>Google Cloud europe-west2 &amp; Oracle</text><line class="vz-flow" x1="184" y1="79.0" x2="238" y2="79.0" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="26" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Google Cloud europe-west2 (partial)</title></rect><text class="vz-box-t" x="526" y="43">Google Cloud europe-west2</text><line class="vz-flow" x1="464" y1="79.0" x2="514" y2="44" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="70" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Oracle Cloud UK South (partial)</title></rect><text class="vz-box-t" x="526" y="87">Oracle Cloud UK South</text><line class="vz-flow" x1="464" y1="79.0" x2="514" y2="88" marker-end="url(#ic-ar)"/></svg></div>
+        <p class="disclaimer">Trigger → primary fault → downstream blast radius, derived from the sourced root cause and affected-services record.</p>
+
+        <h2>Facility &amp; location</h2>
+        <dl class="kv">
+            <dt>Operator</dt><dd>Google Cloud &amp; Oracle</dd>
+            <dt>Data center</dt><dd>Google Cloud europe-west2 &amp; Oracle UK South (London)</dd>
+            <dt>Location</dt><dd>London, United Kingdom</dd>
+            <dt>Date</dt><dd>2022-07-19</dd>
+        </dl>
+
+        <h2>Impact &amp; scale</h2>
+        <dl class="kv">
+            <dt>Users affected</dt><dd>Google Cloud europe-west2 and Oracle UK South customers</dd>
+            <dt>Financial</dt><dd>Not published</dd>
+            <dt>Scope</dt><dd>Climate-driven cooling loss (regional)</dd>
+        </dl>
+        <div class="card"><strong>Services / systems down</strong><ul class="tight"><li>Google Cloud europe-west2 (partial)</li><li>Oracle Cloud UK South (partial)</li></ul></div>
+        <h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Record ambient outside-air temperature (UK national record)</td><td class="mval">40.3C (104.5F) - highest ever recorded in the UK</td></tr><tr><td class="mlabel">Google zone affected</td><td class="mval">europe-west2-a (europe-west2-b and -c not impacted for VMs)</td></tr><tr><td class="mlabel">Google VMs terminated in europe-west2-a</td><td class="mval">&#x27;a small set&#x27; (public status page); ~35% of the zone&#x27;s VMs per The Register&#x27;s report of Google&#x27;s fuller incident report</td></tr><tr><td class="mlabel">Google time to &#x27;resolved for all affected users&#x27;</td><td class="mval">~14h10m (06:33 -&gt; 20:43 US/Pacific, 2022-07-19)</td></tr><tr><td class="mlabel">Google official incident window (US/Pacific)</td><td class="mval">Began 2022-07-19 06:33, ended 2022-07-20 21:20 (~38h47m to full closure, storage tail)</td></tr><tr><td class="mlabel">Oracle site affected</td><td class="mval">UK South (London) - subset of cooling infrastructure</td></tr><tr><td class="mlabel">Fire-suppression agent discharged (gaseous/water-mist/sprinkler)</td><td class="mval">0 - none activated (no fire occurred)</td></tr><tr><td class="mlabel">Personnel evacuated</td><td class="mval">0 - no evacuation reported (equipment-protection shutdown, not life-safety)</td></tr><tr><td class="mlabel">Emergency-services / fire-brigade calls and arrivals</td><td class="mval">0 - none reported</td></tr><tr><td class="mlabel">Lingering storage damage (Google)</td><td class="mval">Small percentage of replicated Persistent Disks in single-redundant mode; small number of HDD-backed PD volumes exhibiting IO errors</td></tr><tr><td class="mlabel">Operators impacted by the same heat event (same day)</td><td class="mval">2 - Google (europe-west2-a) and Oracle (UK South)</td></tr></tbody></table></div>
+
+        <h2>Magnitude profile</h2>
+        <div class="viz viz-radar"><svg viewBox="0 0 290 215" role="img" aria-label="Magnitude sub-scores radar chart"><title>Magnitude sub-scores (0–10)</title><polygon class="vz-grid" points="145.0,83.2 166.8,105.0 145.0,126.8 123.2,105.0"/><polygon class="vz-grid" points="145.0,62.1 187.9,105.0 145.0,147.9 102.1,105.0"/><polygon class="vz-grid" points="145.0,41.0 209.0,105.0 145.0,169.0 81.0,105.0"/><line class="vz-grid" x1="145" y1="105" x2="145.0" y2="41.0"/><line class="vz-grid" x1="145" y1="105" x2="209.0" y2="105.0"/><line class="vz-grid" x1="145" y1="105" x2="145.0" y2="169.0"/><line class="vz-grid" x1="145" y1="105" x2="81.0" y2="105.0"/><polygon class="vz-accent-fill" points="145.0,73.0 170.6,105.0 145.0,137.0 106.6,105.0"><title>Magnitude sub-scores (0–10)</title></polygon><circle class="vz-accent-dot" cx="145.0" cy="73.0" r="2.4"/><circle class="vz-accent-dot" cx="170.6" cy="105.0" r="2.4"/><circle class="vz-accent-dot" cx="145.0" cy="137.0" r="2.4"/><circle class="vz-accent-dot" cx="106.6" cy="105.0" r="2.4"/><text class="vz-lbl vz-num" x="145.0" y="20.0" text-anchor="middle">Users 5<title>Users affected (0–10) — breadth of the user/customer population impacted. — scored 5/10.</title></text><text class="vz-lbl vz-num" x="223.0" y="109.0" text-anchor="start">Financial 4<title>Financial impact (0–10) — direct + consequential cost. — scored 4/10.</title></text><text class="vz-lbl vz-num" x="145.0" y="198.0" text-anchor="middle">Duration 5<title>Outage duration (0–10) — how long service was degraded/down. — scored 5/10.</title></text><text class="vz-lbl vz-num" x="67.0" y="109.0" text-anchor="end">Blast 6<title>Blast radius (0–10) — how wide the fault propagated across systems/regions. — scored 6/10.</title></text></svg></div>
+        <div class="mag-trace">Magnitude <b>5.2</b> = blast 6×0.35 + users 5×0.25 + financial 4×0.20 + duration 5×0.20 <span style="opacity:0.7">(sub-scores 0–10 · weighted composite)</span></div>
+        <p class="disclaimer">Record &gt;40C UK heat overwhelmed cooling, forcing shutdowns at Google Cloud and Oracle London DCs — sub-scores ESTIMATED from public impact reporting, pending deep research.</p>
+
+        <h2>Sequence of events (SOE)</h2>
+        <div class="viz viz-timeline"><svg viewBox="0 0 1512 96" role="img" aria-label="Sequence-of-events timeline"><title>Phased sequence of events</title><line class="vz-grid" x1="30" y1="48" x2="1482" y2="48"/><circle class="vz-accent-dot" cx="30" cy="48" r="4.5"><title>2022-07-19 (daytime, UK) · TRIGGER — UK ambient air reaches an all-time national record of 40.3C (104.5F); London experiences its first-ever day above 40C, driving cooling units toward their design limits.</title></circle><text class="vz-tl-ph" x="30" y="30" text-anchor="middle">TRIGGER</text><text class="vz-tl-t" x="30" y="68" text-anchor="middle">2022-07-19 (dayt</text><circle class="vz-accent-dot" cx="127" cy="48" r="4.5"><title>2022-07-19 06:33 US/Pacific (13:33 UTC) · TRIGGER — Google incident begins: a cooling-related failure in one building hosting zone europe-west2-a; The Register (2022-08-01) reported this as a simultaneous failure of multiple redundant cooling systems under record ambient.</title></circle><text class="vz-tl-ph" x="127" y="30" text-anchor="middle">TRIGGER</text><text class="vz-tl-t" x="127" y="68" text-anchor="middle">2022-07-19 06:33 US/Pacific (13:33 U</text><circle class="vz-accent-dot" cx="224" cy="48" r="4.5"><title>2022-07-19 (post-06:33 PDT) · DETECTION — Data-centre environmental/BMS temperature monitoring (NOT fire/smoke detection - no combustion) registers loss of cooling; the building could not maintain a safe operating temperature. No fire alarm - a thermal, not fire, condition.</title></circle><text class="vz-tl-ph" x="224" y="30" text-anchor="middle">DETECTION</text><text class="vz-tl-t" x="224" y="68" text-anchor="middle">2022-07-19 (post-06:33 PD</text><circle class="vz-accent-dot" cx="320" cy="48" r="4.5"><title>2022-07-19 (immediately after detection) · MITIGATION — Protective thermal load-shed (de-energisation analogue): Google powers down part of the zone and limits preemptible launches to prevent machine damage. NO fire suppression discharged - no gaseous/water-mist/sprinkler activation, because there was no fire.</title></circle><text class="vz-tl-ph" x="320" y="30" text-anchor="middle">MITIGATION</text><text class="vz-tl-t" x="320" y="68" text-anchor="middle">2022-07-19 (imme</text><circle class="vz-accent-dot" cx="417" cy="48" r="4.5"><title>2022-07-19 · IMPACT — Compute Engine terminates VMs in the impacted datacenter - a small set per the public status page; ~35% of europe-west2-a VMs per The Register&#x27;s report of Google&#x27;s fuller incident report.</title></circle><text class="vz-tl-ph" x="417" y="30" text-anchor="middle">IMPACT</text><text class="vz-tl-t" x="417" y="68" text-anchor="middle">2022-07-19</text><circle class="vz-accent-dot" cx="514" cy="48" r="4.5"><title>2022-07-19 · CASCADE — Recovery-procedure error widens blast radius: engineers inadvertently modify traffic routing for internal services to avoid all three europe-west2 zones rather than just the impacted europe-west2-a.</title></circle><text class="vz-tl-ph" x="514" y="30" text-anchor="middle">CASCADE</text><text class="vz-tl-t" x="514" y="68" text-anchor="middle">2022-07-19</text><circle class="vz-accent-dot" cx="611" cy="48" r="4.5"><title>2022-07-19 ~16:15 UTC (~09:15 US/Pacific) · DETECTION — Google publicly acknowledges the fault: &#x27;There has been a cooling-related failure in one of our buildings that hosts zone europe-west2-a for region europe-west2.&#x27;</title></circle><text class="vz-tl-ph" x="611" y="30" text-anchor="middle">DETECTION</text><text class="vz-tl-t" x="611" y="68" text-anchor="middle">2022-07-19 ~16:15 U</text><circle class="vz-accent-dot" cx="708" cy="48" r="4.5"><title>2022-07-19 (UK afternoon) · TRIGGER — Oracle UK South (London): a subset of cooling infrastructure experiences an issue as a result of unseasonal temperatures - a second, independent London campus hit by the same heat event.</title></circle><text class="vz-tl-ph" x="708" y="30" text-anchor="middle">TRIGGER</text><text class="vz-tl-t" x="708" y="68" text-anchor="middle">2022-07-19 (UK a</text><circle class="vz-accent-dot" cx="804" cy="48" r="4.5"><title>2022-07-19 16:38 UTC · DETECTION — Oracle acknowledges the cooling problem at its UK South (London) data centre.</title></circle><text class="vz-tl-ph" x="804" y="30" text-anchor="middle">DETECTION</text><text class="vz-tl-t" x="804" y="68" text-anchor="middle">2022-07-19 16:38 U</text><circle class="vz-accent-dot" cx="901" cy="48" r="4.5"><title>2022-07-19 (after acknowledgement) · MITIGATION — Oracle protective power-down: identifying &#x27;service infrastructure that can be safely powered down to prevent additional hardware failures&#x27; - thermal load-shed, not fire response.</title></circle><text class="vz-tl-ph" x="901" y="30" text-anchor="middle">MITIGATION</text><text class="vz-tl-t" x="901" y="68" text-anchor="middle">2022-07-19 (afte</text><circle class="vz-accent-dot" cx="998" cy="48" r="4.5"><title>2022-07-19 (throughout) · IMPACT — NEGATIVE FORENSICS - no personnel evacuation reported (equipment-protection shutdown, not a life-safety event) and no emergency-services / fire-brigade call or arrival is reported; response was operator engineering teams restoring cooling and rebuilding capacity.</title></circle><text class="vz-tl-ph" x="998" y="30" text-anchor="middle">IMPACT</text><text class="vz-tl-t" x="998" y="68" text-anchor="middle">2022-07-19 (thro</text><circle class="vz-accent-dot" cx="1095" cy="48" r="4.5"><title>2022-07-19 (afternoon, per The Register) · RECOVERY — Google cooling reported restored (~14:13 US/Pacific per The Register 2022-08-01) and capacity rebuild begins in europe-west2-a.</title></circle><text class="vz-tl-ph" x="1095" y="30" text-anchor="middle">RECOVERY</text><text class="vz-tl-t" x="1095" y="68" text-anchor="middle">2022-07-19 (afternoon, per </text><circle class="vz-accent-dot" cx="1192" cy="48" r="4.5"><title>2022-07-19 20:43 US/Pacific (03:43 UTC 20 Jul) · RESTORED — Google: &#x27;the issue has been resolved for all affected users as of Tuesday, 2022-07-19 20:43 US/Pacific&#x27; (~14h10m from 06:33 start), though some storage issues persist requiring support contact.</title></circle><text class="vz-tl-ph" x="1192" y="30" text-anchor="middle">RESTORED</text><text class="vz-tl-t" x="1192" y="68" text-anchor="middle">2022-07-19 20:43 US/Pacific (03:43 U</text><circle class="vz-accent-dot" cx="1288" cy="48" r="4.5"><title>2022-07-20 (recovery update) · IMPACT — Storage long-tail: a small number of HDD-backed Persistent Disk volumes still exhibit IO errors, with a small percentage of replicated PDs running in single-redundant mode - genuine media damage from the thermal event/abrupt power-down.</title></circle><text class="vz-tl-ph" x="1288" y="30" text-anchor="middle">IMPACT</text><text class="vz-tl-t" x="1288" y="68" text-anchor="middle">2022-07-20 (reco</text><circle class="vz-accent-dot" cx="1385" cy="48" r="4.5"><title>2022-07-20 ~03:57 UTC (per The Register follow-up) · RECOVERY — Oracle data-centre cooling infrastructure reported restored and temperatures returned to normal operating levels.</title></circle><text class="vz-tl-ph" x="1385" y="30" text-anchor="middle">RECOVERY</text><text class="vz-tl-t" x="1385" y="68" text-anchor="middle">2022-07-20 ~03:57 U</text><circle class="vz-accent-dot" cx="1482" cy="48" r="4.5"><title>2022-07-20 21:20 US/Pacific · RESTORED — Google official incident window closes. Status-page window: began 2022-07-19 06:33, ended 2022-07-20 21:20 US/Pacific (~38h47m to full closure); the extra tail beyond the 20:43 Jul 19 &#x27;resolved for all users&#x27; mark was storage remediation.</title></circle><text class="vz-tl-ph" x="1482" y="30" text-anchor="middle">RESTORED</text><text class="vz-tl-t" x="1482" y="68" text-anchor="middle">2022-07-20 21:20</text></svg></div>
+        <ul class="soe"><li><time>2022-07-19 (daytime, UK)</time><span class="ev"><span class="phase-chip">TRIGGER</span> UK ambient air reaches an all-time national record of 40.3C (104.5F); London experiences its first-ever day above 40C, driving cooling units toward their design limits.</span></li><li><time>2022-07-19 06:33 US/Pacific (13:33 UTC)</time><span class="ev"><span class="phase-chip">TRIGGER</span> Google incident begins: a cooling-related failure in one building hosting zone europe-west2-a; The Register (2022-08-01) reported this as a simultaneous failure of multiple redundant cooling systems under record ambient.</span></li><li><time>2022-07-19 (post-06:33 PDT)</time><span class="ev"><span class="phase-chip">DETECTION</span> Data-centre environmental/BMS temperature monitoring (NOT fire/smoke detection - no combustion) registers loss of cooling; the building could not maintain a safe operating temperature. No fire alarm - a thermal, not fire, condition.</span></li><li><time>2022-07-19 (immediately after detection)</time><span class="ev"><span class="phase-chip">MITIGATION</span> Protective thermal load-shed (de-energisation analogue): Google powers down part of the zone and limits preemptible launches to prevent machine damage. NO fire suppression discharged - no gaseous/water-mist/sprinkler activation, because there was no fire.</span></li><li><time>2022-07-19</time><span class="ev"><span class="phase-chip">IMPACT</span> Compute Engine terminates VMs in the impacted datacenter - a small set per the public status page; ~35% of europe-west2-a VMs per The Register&#x27;s report of Google&#x27;s fuller incident report.</span></li><li><time>2022-07-19</time><span class="ev"><span class="phase-chip">CASCADE</span> Recovery-procedure error widens blast radius: engineers inadvertently modify traffic routing for internal services to avoid all three europe-west2 zones rather than just the impacted europe-west2-a.</span></li><li><time>2022-07-19 ~16:15 UTC (~09:15 US/Pacific)</time><span class="ev"><span class="phase-chip">DETECTION</span> Google publicly acknowledges the fault: &#x27;There has been a cooling-related failure in one of our buildings that hosts zone europe-west2-a for region europe-west2.&#x27;</span></li><li><time>2022-07-19 (UK afternoon)</time><span class="ev"><span class="phase-chip">TRIGGER</span> Oracle UK South (London): a subset of cooling infrastructure experiences an issue as a result of unseasonal temperatures - a second, independent London campus hit by the same heat event.</span></li><li><time>2022-07-19 16:38 UTC</time><span class="ev"><span class="phase-chip">DETECTION</span> Oracle acknowledges the cooling problem at its UK South (London) data centre.</span></li><li><time>2022-07-19 (after acknowledgement)</time><span class="ev"><span class="phase-chip">MITIGATION</span> Oracle protective power-down: identifying &#x27;service infrastructure that can be safely powered down to prevent additional hardware failures&#x27; - thermal load-shed, not fire response.</span></li><li><time>2022-07-19 (throughout)</time><span class="ev"><span class="phase-chip">IMPACT</span> NEGATIVE FORENSICS - no personnel evacuation reported (equipment-protection shutdown, not a life-safety event) and no emergency-services / fire-brigade call or arrival is reported; response was operator engineering teams restoring cooling and rebuilding capacity.</span></li><li><time>2022-07-19 (afternoon, per The Register)</time><span class="ev"><span class="phase-chip">RECOVERY</span> Google cooling reported restored (~14:13 US/Pacific per The Register 2022-08-01) and capacity rebuild begins in europe-west2-a.</span></li><li><time>2022-07-19 20:43 US/Pacific (03:43 UTC 20 Jul)</time><span class="ev"><span class="phase-chip">RESTORED</span> Google: &#x27;the issue has been resolved for all affected users as of Tuesday, 2022-07-19 20:43 US/Pacific&#x27; (~14h10m from 06:33 start), though some storage issues persist requiring support contact.</span></li><li><time>2022-07-20 (recovery update)</time><span class="ev"><span class="phase-chip">IMPACT</span> Storage long-tail: a small number of HDD-backed Persistent Disk volumes still exhibit IO errors, with a small percentage of replicated PDs running in single-redundant mode - genuine media damage from the thermal event/abrupt power-down.</span></li><li><time>2022-07-20 ~03:57 UTC (per The Register follow-up)</time><span class="ev"><span class="phase-chip">RECOVERY</span> Oracle data-centre cooling infrastructure reported restored and temperatures returned to normal operating levels.</span></li><li><time>2022-07-20 21:20 US/Pacific</time><span class="ev"><span class="phase-chip">RESTORED</span> Google official incident window closes. Status-page window: began 2022-07-19 06:33, ended 2022-07-20 21:20 US/Pacific (~38h47m to full closure); the extra tail beyond the 20:43 Jul 19 &#x27;resolved for all users&#x27; mark was storage remediation.</span></li></ul>
+
+        <h2>Root cause</h2>
+        <div class="card">SPECIFIC MECHANISM (Google, europe-west2-a, London): The proximate cause was a cooling-capacity collapse in one building hosting zone europe-west2-a on the UK&#x27;s hottest day on record. Google&#x27;s PUBLIC incident report (status.cloud.google.com, incident XVq5om2XEDSqLtJZUvcH) states there was &quot;a cooling related failure in one of our buildings that hosts zone europe-west2-a for region europe-west2.&quot; The Register&#x27;s 2022-08-01 reporting of Google&#x27;s fuller (customer-facing) incident report characterised the mechanism more sharply — a simultaneous failure of multiple, redundant cooling systems combined with the extraordinarily high outside temperature such that the building &quot;could not maintain a safe operating temperature.&quot; NOTE (verification): this stronger &quot;simultaneous / multiple redundant systems&quot; wording appears in The Register&#x27;s 2022-08-01 write-up and NOT in the public status page (which says only &quot;a cooling related failure&quot;); it is retained as attributed reporting, not re-verified verbatim in this pass. When cooling capacity collapsed, Compute Engine executed a protective thermal load-shed and Google &quot;powered down part of the zone&quot; to prevent machine damage (The Register, 2022-07-19). The Register (2022-08-01) reported ~35% of europe-west2-a&#x27;s VMs were terminated; the public status page confirms only &quot;abnormal VM terminations for a small set.&quot;
+
+LATENT ROOT — DESIGN / REDUNDANCY MARGIN: The pairing &quot;simultaneous&quot; + &quot;redundant&quot; is the tell of a latent design defect — genuine N+1/N+2 redundancy should not permit two backup-capable units to fail at effectively the same moment, which points to a common-mode driver (shared record ambient) or a single point of failure. Trade analysis (The Register, 2022-08-22, citing Tech Monitor) framed the units as failing when &quot;required to operate above their design limits,&quot; i.e. a climate-resilience / design-margin gap: the plant lacked head-room for a 40°C day. The UK reached an all-time record 40.3°C (104.5°F) on 2022-07-19 (The Register, 2022-07-19). CAVEAT: the &quot;two cooler units above design limits,&quot; &quot;single point of failure,&quot; and Equinix worst-case-factory-test contrast originate in trade reporting (Tech Monitor / The Register Aug 22) that could not be independently re-fetched this pass; they are inference/analysis, not operator-disclosed fact.
+
+MAINTENANCE / INSPECTION / TESTING LAPSE: NONE EVIDENCED in any public source. Neither Google&#x27;s report nor Oracle&#x27;s status notes attribute the failure to deferred maintenance, a botched service, an untested standby <span data-explain="chiller" tabindex="0">chiller</span>, or a work-procedure error. The disclosed cause is environmental (record ambient) plus a cooling-system failure. Disclosed-uncertainty point: the record is silent on whether the redundant units had ever been function-tested under near-design ambient, and equipment specifics (chiller/CRAC/CRAH make, model, age, refrigerant chemistry; whether free-cooling economisers or mechanical DX/chilled-water plant failed) were NOT disclosed by either operator for either site.
+
+ORACLE (UK South, London): Same climate trigger, less detail. &quot;As a result of unseasonal temperatures in the region, a subset of cooling infrastructure within the UK South (London) Data Centre has experienced an issue&quot; (Oracle status, via The Register 2022-07-19), forcing a protective power-down of &quot;service infrastructure that can be safely powered down to prevent additional hardware failures.&quot; Oracle named no equipment, age, refrigerant, or maintenance history.</div>
+
+        <h2>Contributing factors</h2>
+        <ul class="tight"><li>RECORD AMBIENT / CLIMATE FORCING: The UK hit an all-time record 40.3C (104.5F) on 2022-07-19 - London&#x27;s first day ever above 40C - pushing cooling units to and beyond their rated design envelope (The Register, 2022-07-19; design-limit framing via Tech Monitor/The Register, 2022-08-22, attributed-not-re-verified).</li><li>DESIGN-MARGIN / WORST-CASE ENVELOPE SET TOO LOW: The plant appears to have lacked head-room for a 40C day; trade analysis contrasts operators that design and factory-test cooling &#x27;for worst-case conditions&#x27; with the failed London plant, implying its worst-case design temperature trailed the emerging climate reality (The Register, 2022-08-22, trade analysis - not operator-confirmed).</li><li>REDUNDANCY THAT DID NOT DELIVER (suspected common-mode / single point of failure): Google&#x27;s fuller report (via The Register, 2022-08-01) described a simultaneous failure of multiple redundant cooling systems; simultaneity of &#x27;redundant&#x27; units implies a shared driver (record ambient) or single point of failure rather than independent random failure.</li><li>SELF-ADMITTED OPERATIONAL / RECOVERY-PROCEDURE ERROR: Engineers inadvertently modified traffic routing for internal services to avoid all three europe-west2 zones rather than just the impacted europe-west2-a, enlarging the blast radius beyond the physically affected zone (The Register, 2022-08-01; not on public status page).</li><li>NO MAINTENANCE/INSPECTION LAPSE EVIDENCED, BUT TEST-UNDER-LOAD UNVERIFIED: No source attributes the failure to deferred maintenance or a botched service; however, the record is silent on whether the redundant units had ever been function-tested under near-design high ambient - an unverified resilience gap (disclosed uncertainty).</li><li>SIMULTANEOUS TWO-OPERATOR EXPOSURE: Both Google (europe-west2-a) and Oracle (UK South) cooling plant failed the same day under the same heat event, indicating a regional/industry design-assumption gap rather than a single-site defect (The Register, 2022-07-19).</li><li>ABRUPT DE-ENERGISATION AS A DAMAGE SOURCE: The protective emergency power-down itself contributed to lasting harm - replicated Persistent Disks left in single-redundant mode and HDD-backed volumes exhibiting IO errors (Google status page, 2022-07-19/20).</li></ul>
+
+        <h2>Correction of errors (COE)</h2>
+        <ul class="tight"><li>Raise cooling-plant worst-case design ambient and factory-test to it (climate-resilience uplift for UK/comparable sites) <span class="coe-meta">Google DC facilities / engineering · Inferred remediation - not publicly confirmed by operator</span></li><li>Add guardrails so zone-scoped traffic-routing mitigations cannot be applied region-wide (blast-radius containment) <span class="coe-meta">Google SRE / networking · Improvement identified in incident report per The Register - public commitment not independently confirmed</span></li><li>Function-test redundant cooling units under near-design high ambient; verify economiser/chiller changeover at design-max <span class="coe-meta">Google &amp; Oracle facilities · Not evidenced in any public source (recommended)</span></li><li>Restore Persistent Disk redundancy and remediate HDD-backed volumes exhibiting IO errors <span class="coe-meta">Google storage / Compute Engine · In progress at report time per public status page</span></li><li>Publish equipment/plant type and maintenance-test history to enable independent post-incident learning <span class="coe-meta">Google &amp; Oracle · Not done - disclosure gap</span></li></ul>
+
+        <h2>Lessons learnt</h2>
+        <ul class="tight"><li>CLIMATE HAS MOVED THE DESIGN TAIL: &#x27;Once-in-a-lifetime&#x27; ambient is now design-relevant; cooling worst-case envelopes calibrated on historical UK climate under-provision for 40C+ days and must be revised upward.</li><li>&#x27;REDUNDANT&#x27; IS NOT &#x27;INDEPENDENT&#x27;: N+1/N+2 duplication provides no protection when all units share the same failure driver (record ambient); redundancy must be diverse and common-mode-analysed, not merely duplicated.</li><li>BLAST RADIUS IS OFTEN OPERATIONAL, NOT PHYSICAL: The largest widening of customer impact came from a human failover-tooling error (region-wide reroute), not the cooling failure itself - recovery-tooling discipline matters as much as the plant.</li><li>EMERGENCY DE-ENERGISATION HAS ITS OWN COST: Protective thermal shutdown left HDD-backed Persistent Disks with IO errors and replicated PDs single-redundant - the &#x27;safe&#x27; action still damaged data durability.</li><li>MULTI-OPERATOR SAME-DAY FAILURE IS AN INDUSTRY SIGNAL: Two independent London operators failing on the same heat event points to a shared design-assumption gap across the sector, not an isolated site defect.</li><li>DISCLOSURE WAS PARTIAL: Neither operator released equipment make/model/age, refrigerant, plant type, or maintenance/test history - limiting external learning and independent verification.</li></ul>
+
+        <h2>Improvements &amp; remediation</h2>
+        <ul class="tight"><li>DESIGN HEAD-ROOM: Raise the cooling-plant worst-case design ambient and factory-test plant to it, so cooling retains capacity on 40C+ days rather than being &#x27;required to operate above design limits&#x27;; UK worst-case envelopes set on historical climate are now obsolete.</li><li>REDUNDANCY DIVERSITY (Safety-critical): Audit London (and comparable) plant for common-mode failure paths and single points of failure so that nominally &#x27;redundant&#x27; units cannot be defeated simultaneously by a shared driver such as record ambient; add independent/diverse cooling paths, not just duplicated identical units.</li><li>MAINTENANCE / FUNCTION-TESTING: Institute periodic function-testing of standby and redundant cooling units under near-design HIGH-ambient load (not only cool-day proof runs); verify chiller/economiser changeover and setpoints hold at design-max wet-bulb, and log test-under-load results.</li><li>THERMAL-PROTECTION SAFETY RUNBOOK: Formalise a graceful, staged thermal load-shed runbook (migrate/drain workloads before hard VM termination where time permits) and validate BMS high-temperature alarm thresholds and shutdown setpoints to buy migration time and reduce abrupt-power-down data damage.</li><li>RECOVERY-TOOLING GUARDRAILS: Add blast-radius containment to traffic-routing/failover tooling so a zone-scoped mitigation cannot be inadvertently applied region-wide (the europe-west2 all-three-zone reroute error).</li><li>STORAGE DURABILITY: Harden Persistent Disk against abrupt de-energisation so emergency shutdown does not leave replicated volumes single-redundant or HDD-backed volumes with IO errors; prioritise redundancy-restore automation post-event.</li><li>CUSTOMER RESILIENCE GUIDANCE: Reinforce multi-zone/multi-region architecture guidance, treating a single zone/building as a failure domain that can be lost to a facility-level thermal event.</li></ul>
+
+        <h2>Comprehensive analysis</h2><div class="ca-block"><h3>What actually happened - and what did not</h3><p>On 2022-07-19, the UK&#x27;s hottest day on record (40.3C), cooling failed at two independent London cloud campuses - Google&#x27;s europe-west2-a and Oracle&#x27;s UK South. This was a thermal cooling-capacity collapse, not a fire. There was no ignition, no combustion, no smoke/heat detection, no suppression discharge, no evacuation, and no emergency-services response reported by any source. The correct analogues are environmental/BMS temperature monitoring in place of fire detection, and deliberate thermal load-shedding / <span data-explain="de-energisation" tabindex="0">de-energisation</span> in place of fire suppression. Google confirmed &#x27;a cooling related failure in one of our buildings that hosts zone europe-west2-a&#x27;, and &#x27;powered down part of the zone&#x27; to prevent machine damage.</p></div><div class="ca-block"><h3>The latent root: design margin versus a changing climate</h3><p>The units were, per trade reporting, &#x27;required to operate above their design limits&#x27; - a design-margin gap rather than a maintenance failure. The plant&#x27;s worst-case ambient envelope appears to have been set below the emerging UK climate reality; London had never before exceeded 40C. This reframes the event from an equipment fault to a climate-resilience shortfall: cooling designed and factory-tested for historical worst-case conditions is now under-provisioned. (The &#x27;above design limits&#x27; framing is trade analysis via Tech Monitor/The Register and was not operator-confirmed or re-verified this pass.)</p></div><div class="ca-block"><h3>Redundancy that did not deliver</h3><p>Google&#x27;s fuller report (via The Register, 2022-08-01) described a simultaneous failure of multiple redundant cooling systems. Simultaneity among &#x27;redundant&#x27; units is the tell of a common-mode driver - here the shared record ambient - or a <span data-explain="single-point-of-failure" tabindex="0">single point of failure</span>. Genuine N+1/N+2 redundancy should not permit backup-capable units to fail together; that they did indicates the redundancy was duplicated rather than diverse and independent. This is the single most important engineering lesson of the event.</p></div><div class="ca-block"><h3>Self-inflicted blast radius: the failover-tooling error</h3><p>The physical impact was confined to one building/hall of europe-west2-a (europe-west2-b and -c were explicitly unaffected for VMs). The damaging secondary spread was operational: engineers inadvertently rerouted internal-service traffic away from all three europe-west2 zones rather than just the impacted one, widening customer impact. This procedural error - not the cooling failure - drove much of the customer-visible <span data-explain="blast-radius" tabindex="0">blast radius</span>, underscoring recovery-tooling discipline. (Reported by The Register; not on the public status page.)</p></div><div class="ca-block"><h3>Storage long-tail and the cost of emergency shutdown</h3><p>Protective de-energisation is not free. Google&#x27;s status page confirms &#x27;a small percentage of replicated Persistent Disk devices are now running in single redundant mode&#x27; and &#x27;a small number of HDD backed Persistent Disk volumes are still experiencing impact and will exhibit IO errors.&#x27; The abrupt power-down inflicted genuine storage-media damage and left durability degraded, extending the official incident window (06:33 Jul 19 to 21:20 Jul 20 US/Pacific) well past the &#x27;resolved for all users&#x27; mark at 20:43 Jul 19.</p></div><div class="ca-block"><h3>Two operators, one heat event, and the disclosure gap</h3><p>Both Google and Oracle cooling plant failed the same day under the same heat - a sector-level design-assumption signal, not a one-off. Yet disclosure was thin: neither operator released equipment make/model/age, refrigerant chemistry, plant type (free-cooling economiser vs mechanical DX/chilled-water), maintenance/test history, MW lost, rack counts, or cost. No maintenance or inspection lapse is evidenced anywhere; equally, whether the redundant units had ever been function-tested under near-design ambient is unknown. These remain disclosed-uncertainty points, not findings.</p></div>
+
+        <h2>Technical deep-dive</h2>
+        <div class="card">This was a thermal-overload / cooling-capacity-collapse event at two independent London cloud campuses on the UK&#x27;s hottest day on record — NOT a fire. Every fire-forensic axis (ignition, detection-of-combustion, suppression discharge, evacuation, emergency-services response) is therefore a documented NEGATIVE, and the correct analogues are environmental/BMS temperature monitoring in place of smoke/heat detection, and deliberate thermal load-shedding / de-energisation in place of fire suppression.
+
+FAILURE CHAIN (Google europe-west2-a): (1) Ambient forcing — record 40.3°C outside air (The Register, 2022-07-19) pushed mechanical cooling toward/above rated design limits. (2) Cooling failure — a cooling-related failure in the building hosting europe-west2-a (public status page); The Register (2022-08-01) reported this as a simultaneous failure of multiple redundant cooling systems, implying a common-mode driver or single point of failure so that intended redundancy did not deliver. (3) Sensed condition — data-centre environmental/BMS temperature monitoring registered rising hall temperature (NOT fire/smoke detection; no combustion). (4) Protective action — Google &quot;powered down part of the zone&quot; and limited preemptible launches &quot;to prevent machine damage&quot; (status page / The Register). This is thermal load-shedding to prevent uncontrolled hardware/thermal damage — the physical analogue of de-energisation, NOT fire suppression. No gaseous, water-mist, or sprinkler system was discharged, because there was no fire.
+
+BLAST-RADIUS AMPLIFICATION (reported operational error): The physical &quot;spread&quot; was purely thermal and confined to the affected building/hall of europe-west2-a (europe-west2-b and -c were explicitly not impacted for VMs — status page). The Register (2022-08-01) reported the damaging SECONDARY spread was operational: engineers inadvertently modified traffic routing for internal services to avoid all three europe-west2 zones rather than just europe-west2-a, widening customer impact. This traffic-routing detail is not on the public status page and is retained as attributed reporting; it is a procedural (not maintenance) fault and a key recovery-tooling lesson.
+
+RECOVERY &amp; LONG-TAIL DAMAGE: Google confirmed &quot;the issue has been resolved for all affected users as of Tuesday, 2022-07-19 20:43 US/Pacific,&quot; ~14h10m after the 06:33 US/Pacific start; the official incident window on the status page runs 2022-07-19 06:33 to 2022-07-20 21:20 US/Pacific (~38h47m to full closure), the extra tail driven by storage. NOTE: The Register&#x27;s precise &quot;18h23m primary / 35h15m long-tail&quot; figures could not be verified and do not reconcile with the public window, so status-page-derived figures are used instead. Genuine media damage is confirmed on the status page: &quot;A small percentage of replicated Persistent Disk devices are now running in single redundant mode,&quot; and later &quot;a small number of HDD backed Persistent Disk volumes are still experiencing impact and will exhibit IO errors&quot; — attributable to the thermal event and abrupt power-down. Oracle reported (per The Register follow-up, not re-verified this pass) cooling restored and temperatures normal by ~03:57 UTC 20 Jul, with a subset of Oracle Integration Cloud still impacted afterward.
+
+EVIDENCE GAPS (disclosed uncertainty): No equipment make/model/age/refrigerant chemistry was released for either operator; neither stated whether economiser/free-cooling or mechanical DX/chilled-water plant failed; no maintenance/test history was published; no MW-lost, rack-count, coolant-flow, or dollar-cost figures were disclosed. No fire, no evacuation, no emergency-services response was reported by any source.</div>
+
+        <h2>References &amp; provenance</h2>
+        <ul class="refs"><li><span class="chip cyan">vendor-status</span> <span class="rtitle">Google Cloud Service Health - Incident XVq5om2XEDSqLtJZUvcH (Compute Engine cooling failure, europe-west2-a)</span><span class="rquote">“A small percentage of replicated Persistent Disk devices are now running in single redundant mode.”</span><a href="https://status.cloud.google.com/incidents/XVq5om2XEDSqLtJZUvcH" target="_blank" rel="noopener nofollow">https://status.cloud.google.com/incidents/XVq5om2XEDSqLtJZUvcH</a></li><li><span class="chip muted">press</span> <span class="rtitle">The Register - &#x27;Heat wave knocks out Google, Oracle clouds in London&#x27; (2022-07-19)</span><span class="rquote">“As a result of unseasonal temperatures in the region, a subset of cooling infrastructure within the UK South (London) Data Centre has experienced an issue.”</span><a href="https://www.theregister.com/2022/07/19/google_oracle_cloud/" target="_blank" rel="noopener nofollow">https://www.theregister.com/2022/07/19/google_oracle_cloud/</a></li></ul>
+        <p class="disclaimer">Sourced from public post-incident reports. Quotes are short attributed excerpts for provenance only; the analysis above is original and substantially shorter than its sources. Last verified 2026-08-02 (seed — pending deep research).</p>
+        <aside class="share-buttons" aria-label="Share this dossier"><span class="share-label">Share</span><button class="share-btn" onclick="rzShare('li')" aria-label="Share on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 11 0-4.124 2.062 2.062 0 010 4.124zM7.119 20.452H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg></button><button class="share-btn" onclick="rzShare('x')" aria-label="Share on X" title="X"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></button><button class="share-btn" onclick="rzShare('wa')" aria-label="Share on WhatsApp" title="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347M12.05 21.785h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884"/></svg></button><button class="share-btn" onclick="rzShare('copy',this)" aria-label="Copy link" title="Copy link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></aside><script>function rzShare(k,btn){var u=encodeURIComponent(location.href),t=encodeURIComponent(document.title);if(k==="li")open("https://www.linkedin.com/sharing/share-offsite/?url="+u,"_blank","noopener");else if(k==="x")open("https://twitter.com/intent/tweet?url="+u+"&text="+t,"_blank","noopener");else if(k==="wa")open("https://wa.me/?text="+t+"%20"+u,"_blank","noopener");else if(k==="copy"){navigator.clipboard&&navigator.clipboard.writeText(location.href);if(btn){var o=btn.getAttribute("title");btn.setAttribute("title","Copied");setTimeout(function(){btn.setAttribute("title",o);},1500);}}}</script>
+        </div>
+
+    </main>
+    <footer><div class="footer-grid"></div><span class="ver" id="versionStamp"></span></footer>
+    <div class="root-gate">
+        <div class="root-card">
+            <h2>Root access required</h2>
+            <p>The DC Incidents dossier is a root-only module. Sign in with an authorized account to continue.</p>
+            <div class="root-actions">
+                <button id="rootLoginBtn" type="button">Sign In</button>
+                <a href="index.html">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/rz-version.js?v=2026-08-01-gloss"></script>
+    <script src="js/rz-feature-flags.js?v=2026-08-01-gloss" defer></script>
+    <script src="auth.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-mobile-nav.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-cookie-consent.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-explain-db.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-explain.js?v=2026-08-01-gloss" defer></script>
+    <script>
+    (function(){var t=document.getElementById('themeToggle');function a(theme){document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme);var m=document.querySelector('meta[name=\"theme-color\"]');if(m)m.setAttribute('content',theme==='dark'?'#0c1512':'#f4f1e7');}a(localStorage.getItem('theme')||'dark');if(t)t.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme');a(c==='dark'?'light':'dark');});})();
+    (function(){function ag(){if(window._rzAuth&&typeof window._rzAuth.enforceTierFeatureAccess==='function'){window._rzAuth.enforceTierFeatureAccess('dc-incidents');}else{try{var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');var r=s&&s.role,t=s&&s.tier;var passes=!!s&&(r==='root'||t==='root');document.body.classList.toggle('locked',!passes);}catch(e){document.body.classList.add('locked');}}}var b=document.getElementById('rootLoginBtn');if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showRootGatePrompt==='function'){window._rzAuth.showRootGatePrompt('Root account required for the DC Incidents dossier.');}else if(window._rzAuth&&typeof window._rzAuth.showModal==='function'){window._rzAuth.showModal();}});window.addEventListener('rz-auth-change',function(){setTimeout(ag,50);});window.addEventListener('storage',function(e){if(e.key==='rz_premium_session')ag();});ag();setTimeout(ag,60);setTimeout(ag,550);setTimeout(ag,1600);})();
+    (function(){var el=document.getElementById('versionStamp');if(!el)return;var v=window.RZ_VERSION||'1.x.x',d=window.RZ_VERSION_DATE||'',cn=window.RZ_VERSION_CODENAME||'';el.textContent='· ResistanceZero · v'+v+(d?' · '+d:'')+(cn?' · '+cn:'')+' ·';})();
+    (function(){var n=0;function sc(){if(window.RZExplain&&window.RZExplain.scanText&&window.RZ_EXPLAIN_DB){var m=document.getElementById('main-content');if(m)window.RZExplain.scanText(m,140);}else if(n++<40){setTimeout(sc,200);}}setTimeout(sc,350);})();
+    </script>
+
+</body>
+</html>

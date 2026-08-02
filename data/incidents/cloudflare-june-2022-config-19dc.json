@@ -1,0 +1,258 @@
+{
+ "slug": "cloudflare-june-2022-config-19dc",
+ "title": "Cloudflare June 2022 Outage — Config Change Withdraws 19 Core Data Centers",
+ "operator": "Cloudflare",
+ "operatorShort": "Cloudflare",
+ "dcName": "Cloudflare 19 busiest core data centers (MCP)",
+ "location": {
+  "city": "Global",
+  "country": "Global"
+ },
+ "date": "2022-06-21",
+ "durationMin": 75,
+ "category": [
+  "network",
+  "software"
+ ],
+ "severity": {
+  "usersAffected": "~50% of Cloudflare requests worldwide; large share of major internet sites",
+  "impactUsd": "Not published",
+  "servicesDown": [
+   "Cloudflare CDN/proxy at 19 core locations",
+   "Dependent customer sites"
+  ],
+  "tier": "Sev-1 global edge (config)"
+ },
+ "brief": "A network-configuration change during a resilience upgrade to Cloudflare's Multi-Colo PoP architecture withdrew BGP routes at the company's 19 busiest core data centers, dropping roughly half of all Cloudflare requests globally for about 75 minutes.",
+ "magnitude": {
+  "blastRadiusScore": 8,
+  "usersScore": 7,
+  "financialScore": 5,
+  "durationScore": 4,
+  "note": "~50% of global requests dropped for ~75 min from a routing/config change at the 19 busiest core DCs — sub-scores ESTIMATED from public impact reporting, pending deep research."
+ },
+ "rootCause": "SPECIFIC TRIGGER (ignition equivalent): The outage was ignited by a single BGP route-export-policy change pushed to the spine routers of Cloudflare's 19 MCP (Multi-Colo PoP) data centers during a resilience upgrade. The change reordered the terms of the export policy named AGGREGATES-OUT, relocating the two site-local advertisement terms — 4-ADV-SITE-LOCALS and 6-ADV-SITE-LOCALS — from the top of the policy to the bottom, i.e. beneath the catch-all term REJECT-THE-REST { then reject; }. Cloudflare states plainly: \"the 4-ADV-SITE-LOCALS and 6-ADV-SITE-LOCALS terms moved from the top to the bottom.\"\n\nFAILURE MECHANISM: BGP export policies are evaluated first-match, top-to-bottom, and the first matching term is final. With the two site-local terms now sitting below REJECT-THE-REST, every site-local prefix matched \"then reject;\" first and was discarded before it could be advertised. The spine routers therefore withdrew the site-local prefixes for the affected MCP locations the instant the change committed: \"we immediately stopped advertising our site-local prefixes.\" Per Cloudflare, this \"removed our direct access to all the impacted locations, as well as removing the ability of our servers to reach origin servers.\" Two failures happened in the same stroke — the network lost its route INTO those data centers, and the servers inside them lost their route OUT to origins.\n\nDEVICE (make/model equivalent): The affected equipment is the MCP \"spine\" router tier forming a Clos-network mesh — \"an added layer of routing that creates a mesh of connections.\" Cloudflare does not name the vendor. The post-mortem's configuration dialect (policy-statement terms, \"then reject\", \"community add\", and the recommended \"commit-confirm\" rollback) is consistent with Juniper Junos syntax, so the devices are INFERRED to be Juniper routers running Junos — this is an inference from the config vocabulary, NOT a stated fact in the source. There is no age/chemistry analogue; the salient hazardous property is architectural: the newer, centralized MCP tier ran a single shared export policy across the affected sites' spines, so one bad edit propagated identically. The companion change made on the older-architecture routers (adding BGP communities STATIC-ROUTE, SITE-LOCAL-ROUTE, TLL01, EUROPE) was harmless; the destructive effect came solely from the term-reordering on the MCP spines.\n\nLATENT ROOT (design / redundancy / change-management lapse): The proximate config error was allowed to reach global blast radius by latent weaknesses Cloudflare itself admits. (1) Fragile policy design — AGGREGATES-OUT depended on implicit term ordering plus an explicit REJECT-THE-REST catch-all, so a mere reorder silently inverted its behavior; the policy statement \"will be redesigned to prevent an unintentional incorrect ordering.\" (2) Inadequate stagger scoping — although the change used a stagger procedure, \"the stagger policy did not include an MCP data center until the final step,\" so no MCP spine was exercised until the change hit the MCP tier. (3) Steps too coarse and review blind to the hazard — \"the steps weren't small enough to catch the error before it hit all of our spines.\" (4) No automated rollback safety-net — there was no \"commit-confirm\" auto-revert; its absence forced slow manual recovery and, per Cloudflare, \"would have greatly reduced the Time-to-Resolve.\" The root cause is therefore not merely \"an engineer reordered a policy\" but a change-management and architecture design in which a single unvalidated edit to a shared policy could withdraw the busiest half of the network with no automatic backstop.",
+ "technicalDeepDive": "Cloudflare had been migrating its busiest data centers to a Multi-Colo PoP (MCP) architecture — a Clos network described as \"an added layer of routing that creates a mesh of connections,\" intended to be a more flexible and resilient architecture. Ironically the outage occurred during work on that very architecture. On 21 June 2022 a network change was rolled out that, among benign edits, altered the BGP export policy AGGREGATES-OUT on the MCP spine routers.\n\nBGP export policies in this Junos-style syntax are ordered lists of terms evaluated top-to-bottom with first-match-wins semantics. AGGREGATES-OUT contained terms that advertised the site-local prefixes (4-ADV-SITE-LOCALS for IPv4, 6-ADV-SITE-LOCALS for IPv6) and a catch-all term REJECT-THE-REST { then reject; } intended to drop everything else. The change moved the two advertisement terms below REJECT-THE-REST. Because first match is final, the site-local prefixes now matched \"then reject;\" before ever reaching their advertisement terms, and the spines withdrew those prefixes.\n\nTwo consequences fired at once. Externally, withdrawing the site-locals \"removed our direct access to all the impacted locations, as well as removing the ability of our servers to reach origin servers\" — north-south connectivity collapsed. Internally, the removal of these site-local prefixes also caused Cloudflare's internal load-balancing system Multimog \"to stop working, as it could no longer forward requests between the servers\" in the MCPs — east-west connectivity inside each MCP collapsed too. So even reaching a surviving server inside a data center could not help, because Multimog could no longer distribute the request.\n\nThe blast radius was defined by architecture, not geography: only MCP-converted sites were affected. The earlier deploy stages at 03:56 UTC (first location) and 06:17 UTC (non-MCP locations) caused zero impact — evidence the change was destructive only on the MCP spines. Yet those 19 sites, though \"only 4% of our total network,\" carried the traffic such that \"the outage impacted 50% of total requests,\" so half of global request volume could no longer be served.\n\nRecovery was crippled by the outage's own mechanism. Having withdrawn the site-locals, engineers had lost direct access to the exact locations they needed to fix, and there was no automated commit-confirm rollback to self-heal. Manual reversion then collided with itself: \"network engineers walked over each other's changes, reverting the previous reverts,\" which is why the final reverts slipped to 07:42 UTC despite the root cause being found at 06:58 UTC.",
+ "sequenceOfEvents": [
+  {
+   "t": "2022-06-21 03:56 UTC",
+   "phase": "TRIGGER",
+   "event": "Change deployed to the first location. No impact — this site runs the older, non-MCP architecture, confirming the edit is inert outside the MCP spine tier.",
+   "source": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/"
+  },
+  {
+   "t": "2022-06-21 06:17 UTC",
+   "phase": "TRIGGER",
+   "event": "Change deployed to the busiest, non-MCP locations. Still no impact — the destructive path has not been touched.",
+   "source": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/"
+  },
+  {
+   "t": "2022-06-21 06:27 UTC",
+   "phase": "TRIGGER",
+   "event": "Rollout reaches MCP-enabled locations and the reordered AGGREGATES-OUT policy commits to the spines: this is when the incident started. Site-local terms now sit below REJECT-THE-REST and match 'then reject;' first.",
+   "source": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/"
+  },
+  {
+   "t": "2022-06-21 06:27 UTC",
+   "phase": "IMPACT",
+   "event": "All 19 MCP data centers taken offline — the change withdrew the site-local prefixes across the MCP spines (no sub-staggering within the MCP tier).",
+   "source": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/"
+  },
+  {
+   "t": "2022-06-21 06:27 UTC",
+   "phase": "CASCADE",
+   "event": "Withdrawal of site-local prefixes severs direct reachability to the 19 locations AND the servers' reachability to origin servers: it 'removed our direct access to all the impacted locations, as well as removing the ability of our servers to reach origin servers.'",
+   "source": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/"
+  },
+  {
+   "t": "2022-06-21 06:27 UTC",
+   "phase": "CASCADE",
+   "event": "Internal load balancer Multimog collapses: it 'could no longer forward requests between the servers' in the MCPs, so even surviving servers inside a data center cannot be reached east-west.",
+   "source": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/"
+  },
+  {
+   "t": "2022-06-21 06:27 UTC",
+   "phase": "IMPACT",
+   "event": "Half of global request volume can no longer be served: the affected locations are 'only 4% of our total network' yet 'the outage impacted 50% of total requests.'",
+   "source": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/"
+  },
+  {
+   "t": "2022-06-21 06:32 UTC",
+   "phase": "DETECTION",
+   "event": "Internal Cloudflare incident formally declared — ~5 minutes after onset. (Source does not name a specific monitoring alarm; detection was via the deploy's own impact and internal incident processes.)",
+   "source": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/"
+  },
+  {
+   "t": "2022-06-21 06:51 UTC",
+   "phase": "MITIGATION",
+   "event": "First change made on a router to verify the root cause — engineers begin confirming the policy-ordering hypothesis on a live device.",
+   "source": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/"
+  },
+  {
+   "t": "2022-06-21 06:58 UTC",
+   "phase": "DETECTION",
+   "event": "Root cause found — the term-reordering of AGGREGATES-OUT is confirmed as the cause; ~31 minutes from onset. Revert work begins.",
+   "source": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/"
+  },
+  {
+   "t": "2022-06-21 06:58 UTC",
+   "phase": "MITIGATION",
+   "event": "Reversion of the problematic change begins. Because direct access was withdrawn, engineers fall back to backup take-control procedures — no automated commit-confirm rollback exists.",
+   "source": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/"
+  },
+  {
+   "t": "2022-06-21 07:00-07:40 UTC",
+   "phase": "CASCADE",
+   "event": "Recovery self-inflicts delay: 'network engineers walked over each other's changes, reverting the previous reverts,' causing the problem to re-appear intermittently during manual reversion.",
+   "source": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/"
+  },
+  {
+   "t": "2022-06-21 07:42 UTC",
+   "phase": "RECOVERY",
+   "event": "Final reverts completed; core routing restored ~75 minutes after the 06:27 onset. AGGREGATES-OUT is back to correct term ordering and site-locals re-advertised.",
+   "source": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/"
+  },
+  {
+   "t": "2022-06-21 08:00 UTC",
+   "phase": "RESTORED",
+   "event": "Incident closed — ~1h33m from onset at 06:27; core recovery achieved by 07:42 (~75 min).",
+   "source": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Core data centers taken offline",
+   "value": "19 (MCP-architecture spine locations)",
+   "source": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/"
+  },
+  {
+   "label": "Affected sites as share of total network",
+   "value": "~4% (Cloudflare's phrasing: 'only 4% of our total network')",
+   "source": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/"
+  },
+  {
+   "label": "Global request volume affected",
+   "value": "~50% of total requests impacted",
+   "source": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/"
+  },
+  {
+   "label": "Detection-to-incident-declaration",
+   "value": "~5 min (06:27 onset to 06:32 declaration)",
+   "source": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/"
+  },
+  {
+   "label": "Onset-to-root-cause-found",
+   "value": "~31 min (06:27 to 06:58)",
+   "source": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/"
+  },
+  {
+   "label": "Core recovery duration",
+   "value": "~75 min (06:27 onset to 07:42 final revert)",
+   "source": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/"
+  },
+  {
+   "label": "Total incident duration (to closure)",
+   "value": "~1h33m (06:27 to 08:00)",
+   "source": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/"
+  },
+  {
+   "label": "Automated rollback available at time of incident",
+   "value": "0 (no commit-confirm; recovery fully manual)",
+   "source": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/"
+  },
+  {
+   "label": "Benign pre-MCP deploy stages before impact",
+   "value": "2 (03:56 UTC and 06:17 UTC, zero impact)",
+   "source": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/"
+  }
+ ],
+ "contributingFactors": [
+  "Change-management / stagger scoping gap (admitted): 'the stagger policy did not include an MCP data center until the final step' — no MCP spine was exercised until the change reached the MCP tier, converting a catchable local error into a broad one.",
+  "Stagger granularity too coarse (admitted): despite a stagger procedure, 'the steps weren't small enough to catch the error before it hit all of our spines.'",
+  "No MCP-specific validation in the change pipeline (admitted remediation): procedures 'need to include MCP-specific test and deploy procedures to ensure there are no unintended consequences' — the existing process had no MCP-aware safeguard even though MCP spines ran a shared policy across the busiest half of the network.",
+  "Absence of an automated rollback safety-net: no 'commit-confirm' auto-revert existed, so recovery was fully manual; Cloudflare states such automation 'would have greatly reduced the Time-to-Resolve.'",
+  "Fragile policy design relying on implicit term ordering plus an explicit REJECT-THE-REST catch-all, so a simple reorder silently inverted advertisement behavior — the policy statement 'will be redesigned to prevent an unintentional incorrect ordering.'",
+  "Uncoordinated manual recovery: 'network engineers walked over each other's changes, reverting the previous reverts,' extending time-to-resolve.",
+  "Recovery-access dependency on the failed path itself: withdrawing the site-locals 'removed our direct access to all the impacted locations,' forcing engineers to fall back to backup take-control procedures.",
+  "Concentration risk: the 19 MCP sites were 'only 4% of our total network' yet the outage 'impacted 50% of total requests,' so a single-tier fault produced disproportionate global impact."
+ ],
+ "coe": [
+  {
+   "action": "Redesign the AGGREGATES-OUT export policy so advertisement of site-local prefixes no longer depends on implicit term order relative to REJECT-THE-REST (eliminate the reorder-inverts-behavior failure mode).",
+   "owner": "Cloudflare Network Engineering",
+   "status": "Committed (post-mortem 'Architecture' item)"
+  },
+  {
+   "action": "Update change procedures and automation to include MCP-specific test and deploy procedures so MCP-tier consequences are validated before broad rollout.",
+   "owner": "Cloudflare Network Engineering / Change Management",
+   "status": "Committed (post-mortem 'Process' item)"
+  },
+  {
+   "action": "Automate an improved stagger policy for network-config rollouts that exercises an MCP data center early rather than only in the final step.",
+   "owner": "Cloudflare Network Automation",
+   "status": "Committed (post-mortem 'Automation' item)"
+  },
+  {
+   "action": "Implement automated 'commit-confirm' rollback for network configuration changes to bound Time-to-Resolve without requiring engineer access to affected sites.",
+   "owner": "Cloudflare Network Automation",
+   "status": "Committed (post-mortem 'Automation' item)"
+  },
+  {
+   "action": "Establish single-controller coordination for emergency reversions to prevent engineers overwriting each other's reverts.",
+   "owner": "Cloudflare Incident Response",
+   "status": "Inferred remediation (implied by post-mortem; not itemized as a formal commitment)"
+  }
+ ],
+ "lessonsLearnt": [
+  "A resilience upgrade is itself a change and can cause the very outage it aims to prevent — the MCP Clos architecture was designed for resilience, yet its shared spine policy became a single point of failure across the busiest half of the network.",
+  "First-match BGP policy ordering makes term SEQUENCE load-bearing: moving 4-ADV-SITE-LOCALS and 6-ADV-SITE-LOCALS below REJECT-THE-REST silently inverted the policy from 'advertise' to 'reject', so policies must be designed so behavior does not hinge on implicit ordering.",
+  "Stagger/canary rollouts only protect you if the canary exercises the risky configuration class — because 'the stagger policy did not include an MCP data center until the final step,' two benign stages gave false confidence before the destructive stage hit.",
+  "Recovery paths must not depend on the system being recovered: withdrawing the site-local prefixes removed engineers' own direct access, so out-of-band control is essential when the failure mode is loss of reachability.",
+  "Automated commit-confirm (timed auto-revert) turns a config-induced blackout into a self-healing event; its absence made recovery fully manual and slower.",
+  "Manual multi-engineer recovery without a single controller can regress itself — 'reverting the previous reverts' re-introduced the fault and extended time-to-resolve; emergency changes need one coordinator."
+ ],
+ "improvements": [
+  "Process: Enforce an improved stagger policy for network-config rollouts that includes at least one MCP data center EARLY, not only in the final step, so a fault surfaces at minimal blast radius instead of hitting all the MCP spines at once — Cloudflare's stated automation improvement that 'would have significantly lessened the overall impact.'",
+  "Process: Add MCP-specific test and deploy procedures to change management and automation — 'Change procedures and automation need to include MCP-specific test and deploy procedures to ensure there are no unintended consequences.'",
+  "Design: Redesign the AGGREGATES-OUT policy statement 'to prevent an unintentional incorrect ordering' so advertisement behavior no longer depends on implicit term ordering relative to a catch-all REJECT-THE-REST term.",
+  "Maintenance: Provide an automated 'commit-confirm' rollback for network configuration changes so a bad commit self-reverts on a timer without requiring engineer access — Cloudflare notes it 'would have greatly reduced the Time-to-Resolve.'",
+  "Safety: Preserve an out-of-band management/recovery path that does not depend on the site-local prefixes being advertised, so withdrawing routes cannot also lock engineers out of the very locations they must fix (the failure that forced fallback to backup take-control procedures).",
+  "Process: Coordinate emergency reversion through a single change-controller to prevent engineers 'walking over each other's changes' and re-introducing the fault mid-recovery."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "What actually broke",
+   "body": "A BGP export-policy change on the spine routers of Cloudflare's 19 MCP data centers reordered policy terms in AGGREGATES-OUT, moving the site-local advertisement terms (4-ADV-SITE-LOCALS, 6-ADV-SITE-LOCALS) below the catch-all REJECT-THE-REST. Because BGP policies match first-term-wins top-to-bottom, the site-local prefixes matched 'then reject;' first and were withdrawn. That single stroke removed both inbound reachability to the affected data centers and the servers' outbound reachability to origins, and additionally broke the internal Multimog load balancer so requests could not be forwarded between servers inside an MCP."
+  },
+  {
+   "heading": "Why it spread so far so fast",
+   "body": "The impact was bounded by architecture, not geography: only MCP-converted sites failed, proven by the two earlier non-MCP deploy stages (03:56 and 06:17 UTC) causing zero impact. But the MCP tier ran a shared export policy, so once the rollout reached it at 06:27 UTC the fault applied across all 19 spines effectively at once. Those sites were 'only 4% of our total network' yet the outage 'impacted 50% of total requests' — a concentration of traffic that turned a single-tier config error into a global event."
+  },
+  {
+   "heading": "Why recovery took ~75 minutes",
+   "body": "Detection was fast (incident declared 06:32, ~5 min after onset) and root cause was found by 06:58 (~31 min). But recovery was slow because the failure removed engineers' own direct access to the sites they had to fix, forcing fallback to backup take-control procedures, and because there was no automated commit-confirm rollback. Manual reversion then regressed itself — 'network engineers walked over each other's changes, reverting the previous reverts' — pushing final restoration to 07:42 and closure to 08:00 UTC."
+  },
+  {
+   "heading": "Systemic lessons and remediation",
+   "body": "Cloudflare's own post-mortem attributes the blast radius to a procedural gap (stagger policy excluded MCP until the final step; steps too coarse to catch the error) and fragile policy design (order-dependent advertisement plus a catch-all reject). Committed fixes span Process (MCP-specific test/deploy procedures), Architecture (redesign the policy statement to prevent unintentional incorrect ordering), and Automation (improved stagger that exercises an MCP site early, plus automated commit-confirm rollback that 'would have greatly reduced the Time-to-Resolve'). The broader lesson is that a resilience upgrade is itself a change whose recovery path must not depend on the reachability it can remove."
+  },
+  {
+   "heading": "Evidence quality and open gaps",
+   "body": "All load-bearing facts are drawn from Cloudflare's first-party detailed post-mortem, which names the policy, the terms, the timeline, the metrics, and the remediation. The router vendor is not stated by Cloudflare; the Juniper/Junos identification is an inference from the config vocabulary (policy-statement terms, 'then reject', 'commit-confirm') and is disclosed as such. The specific monitoring signal that first flagged impact is not named in the source; detection is described via the deploy's own impact and internal incident processes."
+  }
+ ],
+ "references": [
+  {
+   "title": "Cloudflare outage on June 21, 2022 (official Cloudflare post-mortem)",
+   "url": "https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/",
+   "type": "official-postmortem",
+   "quote": "the 4-ADV-SITE-LOCALS and 6-ADV-SITE-LOCALS terms moved from the top to the bottom",
+   "accessed": "2026-08-02"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": true,
+  "lastVerified": "2026-08-02 (seed — pending deep research)"
+ },
+ "lastUpdated": "2026-08-02"
+}

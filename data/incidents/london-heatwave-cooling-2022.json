@@ -1,0 +1,290 @@
+{
+ "slug": "london-heatwave-cooling-2022",
+ "title": "London Heatwave Cooling Failures — Google Cloud & Oracle (July 2022)",
+ "operator": "Google Cloud & Oracle",
+ "operatorShort": "Google & Oracle",
+ "dcName": "Google Cloud europe-west2 & Oracle UK South (London)",
+ "location": {
+  "city": "London",
+  "country": "United Kingdom"
+ },
+ "date": "2022-07-19",
+ "durationMin": 1440,
+ "category": [
+  "cooling"
+ ],
+ "severity": {
+  "usersAffected": "Google Cloud europe-west2 and Oracle UK South customers",
+  "impactUsd": "Not published",
+  "servicesDown": [
+   "Google Cloud europe-west2 (partial)",
+   "Oracle Cloud UK South (partial)"
+  ],
+  "tier": "Climate-driven cooling loss (regional)"
+ },
+ "brief": "During a record UK heatwave with temperatures above 40°C, cooling systems failed at Google Cloud (europe-west2) and Oracle (UK South) London data centers, forcing hardware/VM shutdowns and regional service loss — an early climate-driven thermal event.",
+ "magnitude": {
+  "blastRadiusScore": 6,
+  "usersScore": 5,
+  "financialScore": 4,
+  "durationScore": 5,
+  "note": "Record >40C UK heat overwhelmed cooling, forcing shutdowns at Google Cloud and Oracle London DCs — sub-scores ESTIMATED from public impact reporting, pending deep research."
+ },
+ "rootCause": "SPECIFIC MECHANISM (Google, europe-west2-a, London): The proximate cause was a cooling-capacity collapse in one building hosting zone europe-west2-a on the UK's hottest day on record. Google's PUBLIC incident report (status.cloud.google.com, incident XVq5om2XEDSqLtJZUvcH) states there was \"a cooling related failure in one of our buildings that hosts zone europe-west2-a for region europe-west2.\" The Register's 2022-08-01 reporting of Google's fuller (customer-facing) incident report characterised the mechanism more sharply — a simultaneous failure of multiple, redundant cooling systems combined with the extraordinarily high outside temperature such that the building \"could not maintain a safe operating temperature.\" NOTE (verification): this stronger \"simultaneous / multiple redundant systems\" wording appears in The Register's 2022-08-01 write-up and NOT in the public status page (which says only \"a cooling related failure\"); it is retained as attributed reporting, not re-verified verbatim in this pass. When cooling capacity collapsed, Compute Engine executed a protective thermal load-shed and Google \"powered down part of the zone\" to prevent machine damage (The Register, 2022-07-19). The Register (2022-08-01) reported ~35% of europe-west2-a's VMs were terminated; the public status page confirms only \"abnormal VM terminations for a small set.\"\n\nLATENT ROOT — DESIGN / REDUNDANCY MARGIN: The pairing \"simultaneous\" + \"redundant\" is the tell of a latent design defect — genuine N+1/N+2 redundancy should not permit two backup-capable units to fail at effectively the same moment, which points to a common-mode driver (shared record ambient) or a single point of failure. Trade analysis (The Register, 2022-08-22, citing Tech Monitor) framed the units as failing when \"required to operate above their design limits,\" i.e. a climate-resilience / design-margin gap: the plant lacked head-room for a 40°C day. The UK reached an all-time record 40.3°C (104.5°F) on 2022-07-19 (The Register, 2022-07-19). CAVEAT: the \"two cooler units above design limits,\" \"single point of failure,\" and Equinix worst-case-factory-test contrast originate in trade reporting (Tech Monitor / The Register Aug 22) that could not be independently re-fetched this pass; they are inference/analysis, not operator-disclosed fact.\n\nMAINTENANCE / INSPECTION / TESTING LAPSE: NONE EVIDENCED in any public source. Neither Google's report nor Oracle's status notes attribute the failure to deferred maintenance, a botched service, an untested standby chiller, or a work-procedure error. The disclosed cause is environmental (record ambient) plus a cooling-system failure. Disclosed-uncertainty point: the record is silent on whether the redundant units had ever been function-tested under near-design ambient, and equipment specifics (chiller/CRAC/CRAH make, model, age, refrigerant chemistry; whether free-cooling economisers or mechanical DX/chilled-water plant failed) were NOT disclosed by either operator for either site.\n\nORACLE (UK South, London): Same climate trigger, less detail. \"As a result of unseasonal temperatures in the region, a subset of cooling infrastructure within the UK South (London) Data Centre has experienced an issue\" (Oracle status, via The Register 2022-07-19), forcing a protective power-down of \"service infrastructure that can be safely powered down to prevent additional hardware failures.\" Oracle named no equipment, age, refrigerant, or maintenance history.",
+ "technicalDeepDive": "This was a thermal-overload / cooling-capacity-collapse event at two independent London cloud campuses on the UK's hottest day on record — NOT a fire. Every fire-forensic axis (ignition, detection-of-combustion, suppression discharge, evacuation, emergency-services response) is therefore a documented NEGATIVE, and the correct analogues are environmental/BMS temperature monitoring in place of smoke/heat detection, and deliberate thermal load-shedding / de-energisation in place of fire suppression.\n\nFAILURE CHAIN (Google europe-west2-a): (1) Ambient forcing — record 40.3°C outside air (The Register, 2022-07-19) pushed mechanical cooling toward/above rated design limits. (2) Cooling failure — a cooling-related failure in the building hosting europe-west2-a (public status page); The Register (2022-08-01) reported this as a simultaneous failure of multiple redundant cooling systems, implying a common-mode driver or single point of failure so that intended redundancy did not deliver. (3) Sensed condition — data-centre environmental/BMS temperature monitoring registered rising hall temperature (NOT fire/smoke detection; no combustion). (4) Protective action — Google \"powered down part of the zone\" and limited preemptible launches \"to prevent machine damage\" (status page / The Register). This is thermal load-shedding to prevent uncontrolled hardware/thermal damage — the physical analogue of de-energisation, NOT fire suppression. No gaseous, water-mist, or sprinkler system was discharged, because there was no fire.\n\nBLAST-RADIUS AMPLIFICATION (reported operational error): The physical \"spread\" was purely thermal and confined to the affected building/hall of europe-west2-a (europe-west2-b and -c were explicitly not impacted for VMs — status page). The Register (2022-08-01) reported the damaging SECONDARY spread was operational: engineers inadvertently modified traffic routing for internal services to avoid all three europe-west2 zones rather than just europe-west2-a, widening customer impact. This traffic-routing detail is not on the public status page and is retained as attributed reporting; it is a procedural (not maintenance) fault and a key recovery-tooling lesson.\n\nRECOVERY & LONG-TAIL DAMAGE: Google confirmed \"the issue has been resolved for all affected users as of Tuesday, 2022-07-19 20:43 US/Pacific,\" ~14h10m after the 06:33 US/Pacific start; the official incident window on the status page runs 2022-07-19 06:33 to 2022-07-20 21:20 US/Pacific (~38h47m to full closure), the extra tail driven by storage. NOTE: The Register's precise \"18h23m primary / 35h15m long-tail\" figures could not be verified and do not reconcile with the public window, so status-page-derived figures are used instead. Genuine media damage is confirmed on the status page: \"A small percentage of replicated Persistent Disk devices are now running in single redundant mode,\" and later \"a small number of HDD backed Persistent Disk volumes are still experiencing impact and will exhibit IO errors\" — attributable to the thermal event and abrupt power-down. Oracle reported (per The Register follow-up, not re-verified this pass) cooling restored and temperatures normal by ~03:57 UTC 20 Jul, with a subset of Oracle Integration Cloud still impacted afterward.\n\nEVIDENCE GAPS (disclosed uncertainty): No equipment make/model/age/refrigerant chemistry was released for either operator; neither stated whether economiser/free-cooling or mechanical DX/chilled-water plant failed; no maintenance/test history was published; no MW-lost, rack-count, coolant-flow, or dollar-cost figures were disclosed. No fire, no evacuation, no emergency-services response was reported by any source.",
+ "sequenceOfEvents": [
+  {
+   "t": "2022-07-19 (daytime, UK)",
+   "phase": "TRIGGER",
+   "event": "UK ambient air reaches an all-time national record of 40.3C (104.5F); London experiences its first-ever day above 40C, driving cooling units toward their design limits.",
+   "source": "The Register, 2022-07-19 (theregister.com/2022/07/19/google_oracle_cloud/) [VERIFIED]"
+  },
+  {
+   "t": "2022-07-19 06:33 US/Pacific (13:33 UTC)",
+   "phase": "TRIGGER",
+   "event": "Google incident begins: a cooling-related failure in one building hosting zone europe-west2-a; The Register (2022-08-01) reported this as a simultaneous failure of multiple redundant cooling systems under record ambient.",
+   "source": "Google Cloud Service Health incident XVq5om2XEDSqLtJZUvcH [VERIFIED window]; simultaneity via The Register 2022-08-01 [attributed]"
+  },
+  {
+   "t": "2022-07-19 (post-06:33 PDT)",
+   "phase": "DETECTION",
+   "event": "Data-centre environmental/BMS temperature monitoring (NOT fire/smoke detection - no combustion) registers loss of cooling; the building could not maintain a safe operating temperature. No fire alarm - a thermal, not fire, condition.",
+   "source": "Forensic framing; cause per Google status page + The Register 2022-08-01"
+  },
+  {
+   "t": "2022-07-19 (immediately after detection)",
+   "phase": "MITIGATION",
+   "event": "Protective thermal load-shed (de-energisation analogue): Google powers down part of the zone and limits preemptible launches to prevent machine damage. NO fire suppression discharged - no gaseous/water-mist/sprinkler activation, because there was no fire.",
+   "source": "The Register, 2022-07-19 [VERIFIED power-down]; suppression-negative is forensic"
+  },
+  {
+   "t": "2022-07-19",
+   "phase": "IMPACT",
+   "event": "Compute Engine terminates VMs in the impacted datacenter - a small set per the public status page; ~35% of europe-west2-a VMs per The Register's report of Google's fuller incident report.",
+   "source": "Google status page [VERIFIED 'small set']; ~35% via The Register 2022-08-01 [attributed]"
+  },
+  {
+   "t": "2022-07-19",
+   "phase": "CASCADE",
+   "event": "Recovery-procedure error widens blast radius: engineers inadvertently modify traffic routing for internal services to avoid all three europe-west2 zones rather than just the impacted europe-west2-a.",
+   "source": "The Register, 2022-08-01 [attributed; not on public status page]"
+  },
+  {
+   "t": "2022-07-19 ~16:15 UTC (~09:15 US/Pacific)",
+   "phase": "DETECTION",
+   "event": "Google publicly acknowledges the fault: 'There has been a cooling-related failure in one of our buildings that hosts zone europe-west2-a for region europe-west2.'",
+   "source": "The Register, 2022-07-19 (Google statement, 1615 UTC) [VERIFIED]"
+  },
+  {
+   "t": "2022-07-19 (UK afternoon)",
+   "phase": "TRIGGER",
+   "event": "Oracle UK South (London): a subset of cooling infrastructure experiences an issue as a result of unseasonal temperatures - a second, independent London campus hit by the same heat event.",
+   "source": "The Register, 2022-07-19 (Oracle status) [VERIFIED]"
+  },
+  {
+   "t": "2022-07-19 16:38 UTC",
+   "phase": "DETECTION",
+   "event": "Oracle acknowledges the cooling problem at its UK South (London) data centre.",
+   "source": "The Register, 2022-07-19 (Oracle statement, 1638 UTC) [VERIFIED]"
+  },
+  {
+   "t": "2022-07-19 (after acknowledgement)",
+   "phase": "MITIGATION",
+   "event": "Oracle protective power-down: identifying 'service infrastructure that can be safely powered down to prevent additional hardware failures' - thermal load-shed, not fire response.",
+   "source": "The Register, 2022-07-19 (Oracle statement) [VERIFIED]"
+  },
+  {
+   "t": "2022-07-19 (throughout)",
+   "phase": "IMPACT",
+   "event": "NEGATIVE FORENSICS - no personnel evacuation reported (equipment-protection shutdown, not a life-safety event) and no emergency-services / fire-brigade call or arrival is reported; response was operator engineering teams restoring cooling and rebuilding capacity.",
+   "source": "Forensic summary (all fire/evacuation/emergency angles reported NEGATIVE across sources)"
+  },
+  {
+   "t": "2022-07-19 (afternoon, per The Register)",
+   "phase": "RECOVERY",
+   "event": "Google cooling reported restored (~14:13 US/Pacific per The Register 2022-08-01) and capacity rebuild begins in europe-west2-a.",
+   "source": "The Register, 2022-08-01 [attributed; specific 14:13 time not on public status page]"
+  },
+  {
+   "t": "2022-07-19 20:43 US/Pacific (03:43 UTC 20 Jul)",
+   "phase": "RESTORED",
+   "event": "Google: 'the issue has been resolved for all affected users as of Tuesday, 2022-07-19 20:43 US/Pacific' (~14h10m from 06:33 start), though some storage issues persist requiring support contact.",
+   "source": "Google Cloud Service Health incident XVq5om2XEDSqLtJZUvcH [VERIFIED]"
+  },
+  {
+   "t": "2022-07-20 (recovery update)",
+   "phase": "IMPACT",
+   "event": "Storage long-tail: a small number of HDD-backed Persistent Disk volumes still exhibit IO errors, with a small percentage of replicated PDs running in single-redundant mode - genuine media damage from the thermal event/abrupt power-down.",
+   "source": "Google Cloud Service Health incident XVq5om2XEDSqLtJZUvcH [VERIFIED]"
+  },
+  {
+   "t": "2022-07-20 ~03:57 UTC (per The Register follow-up)",
+   "phase": "RECOVERY",
+   "event": "Oracle data-centre cooling infrastructure reported restored and temperatures returned to normal operating levels.",
+   "source": "The Register (Oracle follow-up) [attributed; not re-verified this pass]"
+  },
+  {
+   "t": "2022-07-20 21:20 US/Pacific",
+   "phase": "RESTORED",
+   "event": "Google official incident window closes. Status-page window: began 2022-07-19 06:33, ended 2022-07-20 21:20 US/Pacific (~38h47m to full closure); the extra tail beyond the 20:43 Jul 19 'resolved for all users' mark was storage remediation.",
+   "source": "Google Cloud Service Health incident XVq5om2XEDSqLtJZUvcH [VERIFIED]"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Record ambient outside-air temperature (UK national record)",
+   "value": "40.3C (104.5F) - highest ever recorded in the UK",
+   "source": "The Register, 2022-07-19 [VERIFIED]"
+  },
+  {
+   "label": "Google zone affected",
+   "value": "europe-west2-a (europe-west2-b and -c not impacted for VMs)",
+   "source": "Google Cloud Service Health incident XVq5om2XEDSqLtJZUvcH [VERIFIED]"
+  },
+  {
+   "label": "Google VMs terminated in europe-west2-a",
+   "value": "'a small set' (public status page); ~35% of the zone's VMs per The Register's report of Google's fuller incident report",
+   "source": "Google status page [VERIFIED 'small set']; ~35% via The Register 2022-08-01 [attributed, not re-verified]"
+  },
+  {
+   "label": "Google time to 'resolved for all affected users'",
+   "value": "~14h10m (06:33 -> 20:43 US/Pacific, 2022-07-19)",
+   "source": "Google Cloud Service Health incident XVq5om2XEDSqLtJZUvcH [VERIFIED, derived]"
+  },
+  {
+   "label": "Google official incident window (US/Pacific)",
+   "value": "Began 2022-07-19 06:33, ended 2022-07-20 21:20 (~38h47m to full closure, storage tail)",
+   "source": "Google Cloud Service Health incident XVq5om2XEDSqLtJZUvcH [VERIFIED]"
+  },
+  {
+   "label": "Oracle site affected",
+   "value": "UK South (London) - subset of cooling infrastructure",
+   "source": "The Register, 2022-07-19 (Oracle status) [VERIFIED]"
+  },
+  {
+   "label": "Fire-suppression agent discharged (gaseous/water-mist/sprinkler)",
+   "value": "0 - none activated (no fire occurred)",
+   "source": "Forensic summary (suppression N/A; no fire reported by any source)"
+  },
+  {
+   "label": "Personnel evacuated",
+   "value": "0 - no evacuation reported (equipment-protection shutdown, not life-safety)",
+   "source": "Forensic summary (no source reports evacuation)"
+  },
+  {
+   "label": "Emergency-services / fire-brigade calls and arrivals",
+   "value": "0 - none reported",
+   "source": "Forensic summary (no source reports emergency-services response)"
+  },
+  {
+   "label": "Lingering storage damage (Google)",
+   "value": "Small percentage of replicated Persistent Disks in single-redundant mode; small number of HDD-backed PD volumes exhibiting IO errors",
+   "source": "Google Cloud Service Health incident XVq5om2XEDSqLtJZUvcH [VERIFIED]"
+  },
+  {
+   "label": "Operators impacted by the same heat event (same day)",
+   "value": "2 - Google (europe-west2-a) and Oracle (UK South)",
+   "source": "The Register, 2022-07-19 [VERIFIED]"
+  }
+ ],
+ "contributingFactors": [
+  "RECORD AMBIENT / CLIMATE FORCING: The UK hit an all-time record 40.3C (104.5F) on 2022-07-19 - London's first day ever above 40C - pushing cooling units to and beyond their rated design envelope (The Register, 2022-07-19; design-limit framing via Tech Monitor/The Register, 2022-08-22, attributed-not-re-verified).",
+  "DESIGN-MARGIN / WORST-CASE ENVELOPE SET TOO LOW: The plant appears to have lacked head-room for a 40C day; trade analysis contrasts operators that design and factory-test cooling 'for worst-case conditions' with the failed London plant, implying its worst-case design temperature trailed the emerging climate reality (The Register, 2022-08-22, trade analysis - not operator-confirmed).",
+  "REDUNDANCY THAT DID NOT DELIVER (suspected common-mode / single point of failure): Google's fuller report (via The Register, 2022-08-01) described a simultaneous failure of multiple redundant cooling systems; simultaneity of 'redundant' units implies a shared driver (record ambient) or single point of failure rather than independent random failure.",
+  "SELF-ADMITTED OPERATIONAL / RECOVERY-PROCEDURE ERROR: Engineers inadvertently modified traffic routing for internal services to avoid all three europe-west2 zones rather than just the impacted europe-west2-a, enlarging the blast radius beyond the physically affected zone (The Register, 2022-08-01; not on public status page).",
+  "NO MAINTENANCE/INSPECTION LAPSE EVIDENCED, BUT TEST-UNDER-LOAD UNVERIFIED: No source attributes the failure to deferred maintenance or a botched service; however, the record is silent on whether the redundant units had ever been function-tested under near-design high ambient - an unverified resilience gap (disclosed uncertainty).",
+  "SIMULTANEOUS TWO-OPERATOR EXPOSURE: Both Google (europe-west2-a) and Oracle (UK South) cooling plant failed the same day under the same heat event, indicating a regional/industry design-assumption gap rather than a single-site defect (The Register, 2022-07-19).",
+  "ABRUPT DE-ENERGISATION AS A DAMAGE SOURCE: The protective emergency power-down itself contributed to lasting harm - replicated Persistent Disks left in single-redundant mode and HDD-backed volumes exhibiting IO errors (Google status page, 2022-07-19/20)."
+ ],
+ "coe": [
+  {
+   "action": "Raise cooling-plant worst-case design ambient and factory-test to it (climate-resilience uplift for UK/comparable sites)",
+   "owner": "Google DC facilities / engineering",
+   "status": "Inferred remediation - not publicly confirmed by operator"
+  },
+  {
+   "action": "Add guardrails so zone-scoped traffic-routing mitigations cannot be applied region-wide (blast-radius containment)",
+   "owner": "Google SRE / networking",
+   "status": "Improvement identified in incident report per The Register - public commitment not independently confirmed"
+  },
+  {
+   "action": "Function-test redundant cooling units under near-design high ambient; verify economiser/chiller changeover at design-max",
+   "owner": "Google & Oracle facilities",
+   "status": "Not evidenced in any public source (recommended)"
+  },
+  {
+   "action": "Restore Persistent Disk redundancy and remediate HDD-backed volumes exhibiting IO errors",
+   "owner": "Google storage / Compute Engine",
+   "status": "In progress at report time per public status page"
+  },
+  {
+   "action": "Publish equipment/plant type and maintenance-test history to enable independent post-incident learning",
+   "owner": "Google & Oracle",
+   "status": "Not done - disclosure gap"
+  }
+ ],
+ "lessonsLearnt": [
+  "CLIMATE HAS MOVED THE DESIGN TAIL: 'Once-in-a-lifetime' ambient is now design-relevant; cooling worst-case envelopes calibrated on historical UK climate under-provision for 40C+ days and must be revised upward.",
+  "'REDUNDANT' IS NOT 'INDEPENDENT': N+1/N+2 duplication provides no protection when all units share the same failure driver (record ambient); redundancy must be diverse and common-mode-analysed, not merely duplicated.",
+  "BLAST RADIUS IS OFTEN OPERATIONAL, NOT PHYSICAL: The largest widening of customer impact came from a human failover-tooling error (region-wide reroute), not the cooling failure itself - recovery-tooling discipline matters as much as the plant.",
+  "EMERGENCY DE-ENERGISATION HAS ITS OWN COST: Protective thermal shutdown left HDD-backed Persistent Disks with IO errors and replicated PDs single-redundant - the 'safe' action still damaged data durability.",
+  "MULTI-OPERATOR SAME-DAY FAILURE IS AN INDUSTRY SIGNAL: Two independent London operators failing on the same heat event points to a shared design-assumption gap across the sector, not an isolated site defect.",
+  "DISCLOSURE WAS PARTIAL: Neither operator released equipment make/model/age, refrigerant, plant type, or maintenance/test history - limiting external learning and independent verification."
+ ],
+ "improvements": [
+  "DESIGN HEAD-ROOM: Raise the cooling-plant worst-case design ambient and factory-test plant to it, so cooling retains capacity on 40C+ days rather than being 'required to operate above design limits'; UK worst-case envelopes set on historical climate are now obsolete.",
+  "REDUNDANCY DIVERSITY (Safety-critical): Audit London (and comparable) plant for common-mode failure paths and single points of failure so that nominally 'redundant' units cannot be defeated simultaneously by a shared driver such as record ambient; add independent/diverse cooling paths, not just duplicated identical units.",
+  "MAINTENANCE / FUNCTION-TESTING: Institute periodic function-testing of standby and redundant cooling units under near-design HIGH-ambient load (not only cool-day proof runs); verify chiller/economiser changeover and setpoints hold at design-max wet-bulb, and log test-under-load results.",
+  "THERMAL-PROTECTION SAFETY RUNBOOK: Formalise a graceful, staged thermal load-shed runbook (migrate/drain workloads before hard VM termination where time permits) and validate BMS high-temperature alarm thresholds and shutdown setpoints to buy migration time and reduce abrupt-power-down data damage.",
+  "RECOVERY-TOOLING GUARDRAILS: Add blast-radius containment to traffic-routing/failover tooling so a zone-scoped mitigation cannot be inadvertently applied region-wide (the europe-west2 all-three-zone reroute error).",
+  "STORAGE DURABILITY: Harden Persistent Disk against abrupt de-energisation so emergency shutdown does not leave replicated volumes single-redundant or HDD-backed volumes with IO errors; prioritise redundancy-restore automation post-event.",
+  "CUSTOMER RESILIENCE GUIDANCE: Reinforce multi-zone/multi-region architecture guidance, treating a single zone/building as a failure domain that can be lost to a facility-level thermal event."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "What actually happened - and what did not",
+   "body": "On 2022-07-19, the UK's hottest day on record (40.3C), cooling failed at two independent London cloud campuses - Google's europe-west2-a and Oracle's UK South. This was a thermal cooling-capacity collapse, not a fire. There was no ignition, no combustion, no smoke/heat detection, no suppression discharge, no evacuation, and no emergency-services response reported by any source. The correct analogues are environmental/BMS temperature monitoring in place of fire detection, and deliberate thermal load-shedding / de-energisation in place of fire suppression. Google confirmed 'a cooling related failure in one of our buildings that hosts zone europe-west2-a', and 'powered down part of the zone' to prevent machine damage."
+  },
+  {
+   "heading": "The latent root: design margin versus a changing climate",
+   "body": "The units were, per trade reporting, 'required to operate above their design limits' - a design-margin gap rather than a maintenance failure. The plant's worst-case ambient envelope appears to have been set below the emerging UK climate reality; London had never before exceeded 40C. This reframes the event from an equipment fault to a climate-resilience shortfall: cooling designed and factory-tested for historical worst-case conditions is now under-provisioned. (The 'above design limits' framing is trade analysis via Tech Monitor/The Register and was not operator-confirmed or re-verified this pass.)"
+  },
+  {
+   "heading": "Redundancy that did not deliver",
+   "body": "Google's fuller report (via The Register, 2022-08-01) described a simultaneous failure of multiple redundant cooling systems. Simultaneity among 'redundant' units is the tell of a common-mode driver - here the shared record ambient - or a single point of failure. Genuine N+1/N+2 redundancy should not permit backup-capable units to fail together; that they did indicates the redundancy was duplicated rather than diverse and independent. This is the single most important engineering lesson of the event."
+  },
+  {
+   "heading": "Self-inflicted blast radius: the failover-tooling error",
+   "body": "The physical impact was confined to one building/hall of europe-west2-a (europe-west2-b and -c were explicitly unaffected for VMs). The damaging secondary spread was operational: engineers inadvertently rerouted internal-service traffic away from all three europe-west2 zones rather than just the impacted one, widening customer impact. This procedural error - not the cooling failure - drove much of the customer-visible blast radius, underscoring recovery-tooling discipline. (Reported by The Register; not on the public status page.)"
+  },
+  {
+   "heading": "Storage long-tail and the cost of emergency shutdown",
+   "body": "Protective de-energisation is not free. Google's status page confirms 'a small percentage of replicated Persistent Disk devices are now running in single redundant mode' and 'a small number of HDD backed Persistent Disk volumes are still experiencing impact and will exhibit IO errors.' The abrupt power-down inflicted genuine storage-media damage and left durability degraded, extending the official incident window (06:33 Jul 19 to 21:20 Jul 20 US/Pacific) well past the 'resolved for all users' mark at 20:43 Jul 19."
+  },
+  {
+   "heading": "Two operators, one heat event, and the disclosure gap",
+   "body": "Both Google and Oracle cooling plant failed the same day under the same heat - a sector-level design-assumption signal, not a one-off. Yet disclosure was thin: neither operator released equipment make/model/age, refrigerant chemistry, plant type (free-cooling economiser vs mechanical DX/chilled-water), maintenance/test history, MW lost, rack counts, or cost. No maintenance or inspection lapse is evidenced anywhere; equally, whether the redundant units had ever been function-tested under near-design ambient is unknown. These remain disclosed-uncertainty points, not findings."
+  }
+ ],
+ "references": [
+  {
+   "title": "Google Cloud Service Health - Incident XVq5om2XEDSqLtJZUvcH (Compute Engine cooling failure, europe-west2-a)",
+   "url": "https://status.cloud.google.com/incidents/XVq5om2XEDSqLtJZUvcH",
+   "type": "vendor-status",
+   "quote": "A small percentage of replicated Persistent Disk devices are now running in single redundant mode.",
+   "accessed": "2026-08-02"
+  },
+  {
+   "title": "The Register - 'Heat wave knocks out Google, Oracle clouds in London' (2022-07-19)",
+   "url": "https://www.theregister.com/2022/07/19/google_oracle_cloud/",
+   "type": "press",
+   "quote": "As a result of unseasonal temperatures in the region, a subset of cooling infrastructure within the UK South (London) Data Centre has experienced an issue.",
+   "accessed": "2026-08-02"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": true,
+  "lastVerified": "2026-08-02 (seed — pending deep research)"
+ },
+ "lastUpdated": "2026-08-02"
+}

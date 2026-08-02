@@ -1,0 +1,295 @@
+{
+ "slug": "rogers-canada-nationwide-2022",
+ "title": "Rogers Communications Canada Nationwide Network Outage (July 2022)",
+ "operator": "Rogers Communications",
+ "operatorShort": "Rogers",
+ "dcName": "Rogers national IP core network",
+ "location": {
+  "city": "Toronto",
+  "country": "Canada"
+ },
+ "date": "2022-07-08",
+ "durationMin": 900,
+ "category": [
+  "network",
+  "software",
+  "human"
+ ],
+ "severity": {
+  "usersAffected": "~12 million subscribers nationwide; 911 and Interac payment networks down",
+  "impactUsd": "Regulator-ordered credits + reputational cost; exact figure not consolidated",
+  "servicesDown": [
+   "Mobile voice/data",
+   "Home internet",
+   "911 emergency calling",
+   "Interac debit/e-transfer payments"
+  ],
+  "tier": "Sev-1 national network core (multi-hour)"
+ },
+ "brief": "A maintenance change to Rogers' core IP network removed a routing filter, flooding the routers and collapsing the entire national network — taking mobile, internet, 911 emergency calling and Interac payments offline across Canada for roughly 15 hours and affecting about 12 million subscribers.",
+ "magnitude": {
+  "blastRadiusScore": 9,
+  "usersScore": 9,
+  "financialScore": 7,
+  "durationScore": 7,
+  "note": "National telecom/IP core collapse: mobile, internet, 911, and Interac payments down ~15h for ~12M subscribers — sub-scores ESTIMATED from public impact reporting, pending deep research."
+ },
+ "rootCause": "The direct trigger was a change-management action, not a physical ignition: during the sixth phase of a seven-phase upgrade to Rogers' core IP network, staff removed the Access Control List (ACL) policy filter from the configuration of the distribution routers. The CRTC-commissioned independent (Xona) assessment states \"Rogers staff removed the Access Control List policy filter from the configuration of the distribution routers,\" and quantifies the result: about 10,000 routes are advertised into the core with the filter present, but \"when this policy filter was removed, a single distribution router released over 900,000 route data into the core routers.\" That flood exceeded processing capacity and \"the core network routers crashed within minutes from the time the policy filter was removed\" — a control-plane/route-table congestive collapse. No fire, combustion, or chemistry was involved; the \"ignition source\" analog is the ACL deletion and the \"fuel\" is the uncontrolled route-table injection that saturated the core routers.\n\nThe specific equipment implicated was the Rogers IP-core routing tier — distribution routers feeding the core network routers. Critically, the router vendor, model, firmware version, and hardware age are NOT publicly disclosed; they were not identified in the public CRTC/Xona assessment or Rogers' CRTC filings, so make/model/age cannot be traced to a source and are recorded here as unknown.\n\nThe latent root causes are design, redundancy, and maintenance/testing lapses that turned a single foreseeable misconfiguration into a national collapse. Design: the converged architecture ran wireless and wireline over one shared IP core, so per the CRTC \"the scope of the outage was extreme in that it resulted in a catastrophic loss of all services.\" Overload protection: \"the Rogers core network routers were not configured with such overload protection mechanisms,\" so nothing rejected the flood. Management redundancy: Rogers \"did not provision its network operation centre and other critical remote infrastructure sites with redundant connectivity from alternative service providers,\" and the outage severed internal access including \"the company's VPN to its core network nodes,\" blinding responders. Maintenance/testing: the change was pushed to production without adequate staged lab validation — the CRTC recommended Rogers \"ensure wide coverage and rigor in testing configuration changes\" — with no rollback containment, fault isolation, or inter-operator emergency-roaming failover for 9-1-1.",
+ "technicalDeepDive": "The failure was a route-table congestive collapse propagating through a converged IP core. In normal operation Rogers' distribution routers passed a filtered, bounded set of routes into the core — the CRTC/Xona assessment states \"about 10,000 routes are advertised into the core router when the Access Control List policy filter is present on the distribution router\" — with the ACL filter acting as the guardrail that constrained what routing information could enter the core. Phase six of a seven-phase core upgrade removed that ACL filter from the distribution-router configuration. Rogers told the CRTC that \"the deletion of a routing filter on its distribution routers caused all possible routes to the internet to pass through the routers, exceeding the capacity of the routers on its core network.\" The assessment quantifies one distribution router alone injecting \"over 900,000 route data into the core routers,\" and \"the core network routers crashed within minutes from the time the policy filter was removed.\"\n\nBecause the crashed core carried Rogers' external reachability, the ASN's global advertisements collapsed with it. Cloudflare's external BGP telemetry captured the signature from outside the network: \"there was a clear spike in BGP (Border Gateway Protocol) updates after 08:15, reaching its peak at 08:45,\" and \"at 08:45 there was a withdrawal of prefixes from Rogers ASN\" (times UTC; 08:45 UTC = 04:45 EDT). That prefix withdrawal is why the outage was total and instantaneous from the public Internet's perspective — Rogers effectively disappeared from the global routing table. Cloudflare assessed the pattern as \"likely to be an internal error, not a cyber attack.\"\n\nTwo architectural facts made a control-plane bug catastrophic rather than contained. First, convergence: wireless and wireline shared one IP core, so there was no partition to absorb the fault — mobile, home Internet, enterprise, 9-1-1, and Interac dropped simultaneously (\"a catastrophic loss of all services\"). Second, no independent management path: once the core crashed, Rogers employees lost \"internal access to systems such as the company's VPN to its core network nodes, hampering the ability of the company's employees to mobilize a team and identify the issue.\" Recovery therefore could not be a simple rollback; responders first had to regain management reach, isolate the flooding distribution routers, purge the injected routing state, and rebuild the core route tables and services in stages. Cloudflare's telemetry shows the halting recovery: an advertisement attempt \"at 14:30,\" \"another round of withdraws at around 15:45\" (a setback), \"partial recovery of traffic from the Rogers network, mostly after 00:15 UTC\" on 9 July, and \"around 76% of the previous day traffic at the same time\" by 08:40 UTC on 9 July — with Cloudflare still seeing \"frequent BGP announcement and withdrawals\" (core \"flapping\" not fully resolved), consistent with the CRTC dating full restoration to 07:00 EDT on 9 July.",
+ "sequenceOfEvents": [
+  {
+   "t": "2022-07-08 pre-onset (approx)",
+   "phase": "TRIGGER",
+   "event": "During phase six of a seven-phase core IP-network upgrade, Rogers staff remove the Access Control List (ACL) policy filter from the distribution routers' configuration.",
+   "source": "Rogers' CRTC letter (via Wikipedia); CRTC/Xona"
+  },
+  {
+   "t": "immediately after removal",
+   "phase": "CASCADE",
+   "event": "With the filter gone, all possible Internet routes pass into the core; a single distribution router releases over 900,000 route entries into the core routers versus ~10,000 normally.",
+   "source": "CRTC/Xona (crtc.gc.ca/eng/publications/reports/xona2024.htm)"
+  },
+  {
+   "t": "within minutes of removal",
+   "phase": "CASCADE",
+   "event": "The route flood exceeds the core routers' processing capacity; the core network routers crash within minutes of the filter's removal.",
+   "source": "CRTC/Xona"
+  },
+  {
+   "t": "08:15-08:45 UTC (04:15-04:45 EDT)",
+   "phase": "DETECTION",
+   "event": "External BGP telemetry (Cloudflare) records a spike in BGP updates after 08:15 UTC, peaking at 08:45 UTC, with a withdrawal of prefixes from the Rogers ASN — Rogers vanishes from the global routing table.",
+   "source": "Cloudflare BGP telemetry"
+  },
+  {
+   "t": "during onset",
+   "phase": "DETECTION",
+   "event": "Rogers is internally blind: the outage severs internal access to systems including the VPN to core network nodes, hampering employees' ability to mobilize a team and identify the issue.",
+   "source": "Rogers' CRTC letter (via Wikipedia)"
+  },
+  {
+   "t": "04:58 EDT",
+   "phase": "IMPACT",
+   "event": "Nationwide outage onset — more than 12 million customers lose wireless and wireline services (mobile, home Internet, corporate and institutional).",
+   "source": "CRTC/Xona"
+  },
+  {
+   "t": "08 Jul, morning",
+   "phase": "IMPACT",
+   "event": "9-1-1 access from Rogers mobile phones is unavailable; a Hamilton man reportedly could not call 911 as his sister was dying, though it is unclear whether the death could have been avoided had 911 contact been possible.",
+   "source": "Wikipedia (citing CBC Hamilton)"
+  },
+  {
+   "t": "08 Jul, daytime",
+   "phase": "CASCADE",
+   "event": "Interac is taken offline by the outage, preventing businesses nationwide from accepting debit-card transactions even on other ISPs; some stores temporarily close.",
+   "source": "Wikipedia"
+  },
+  {
+   "t": "08 Jul",
+   "phase": "MITIGATION",
+   "event": "No suppression analog activates: core routers had no overload protection and the converged architecture had no automatic partition, so nothing contained the flood — a catastrophic loss of all services.",
+   "source": "CRTC/Xona"
+  },
+  {
+   "t": "08 Jul",
+   "phase": "MITIGATION",
+   "event": "Recovery cannot be a simple rollback; because the VPN to core nodes is lost, responders must regain management reach, then isolate the flooding distribution routers, purge bad routing state, and rebuild core route tables in stages.",
+   "source": "CRTC/Xona; Rogers' CRTC letter (via Wikipedia)"
+  },
+  {
+   "t": "08 Jul 14:30 UTC",
+   "phase": "RECOVERY",
+   "event": "Cloudflare observes a first attempt to re-advertise Rogers prefixes as the staged rebuild begins.",
+   "source": "Cloudflare BGP telemetry"
+  },
+  {
+   "t": "08 Jul ~15:45 UTC",
+   "phase": "RECOVERY",
+   "event": "'Another round of withdraws at around 15:45' — Rogers prefixes are withdrawn again, a recovery setback amid core-network flapping.",
+   "source": "Cloudflare BGP telemetry"
+  },
+  {
+   "t": "09 Jul after 00:15 UTC",
+   "phase": "RECOVERY",
+   "event": "Partial recovery of traffic from the Rogers network, mostly after 00:15 UTC, as services are rebuilt in stages.",
+   "source": "Cloudflare BGP telemetry"
+  },
+  {
+   "t": "09 Jul 08:40 UTC",
+   "phase": "RECOVERY",
+   "event": "Traffic reaches around 76% of the previous day's level at the same time, though frequent BGP announcements/withdrawals show the core flapping issue is not yet fully resolved.",
+   "source": "Cloudflare BGP telemetry"
+  },
+  {
+   "t": "09 Jul 07:00 EDT",
+   "phase": "RESTORED",
+   "event": "CRTC dates full restoration; the outage window runs 04:58 EDT 8 July to 07:00 EDT 9 July (approximately 26 hours).",
+   "source": "CRTC/Xona"
+  },
+  {
+   "t": "Post-incident (2022)",
+   "phase": "RESTORED",
+   "event": "Minister Champagne sets a 60-day deadline for carriers to agree mutual assistance and emergency roaming; Rogers pledges $261 million to physically separate its wireless and wireline networks.",
+   "source": "Wikipedia (Champagne undertakings; Rogers commitment)"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Route flood magnitude (one distribution router)",
+   "value": "Over 900,000 routes injected vs ~10,000 normally",
+   "source": "CRTC/Xona"
+  },
+  {
+   "label": "Customers affected",
+   "value": "More than 12 million (wireless + wireline)",
+   "source": "CRTC/Xona"
+  },
+  {
+   "label": "Core router crash time after filter removal",
+   "value": "Within minutes",
+   "source": "CRTC/Xona"
+  },
+  {
+   "label": "Outage window (onset to full restoration)",
+   "value": "04:58 EDT 8 Jul → 07:00 EDT 9 Jul (~26 hours)",
+   "source": "CRTC/Xona"
+  },
+  {
+   "label": "BGP update spike / peak (external detection)",
+   "value": "Spike after 08:15 UTC, peak 08:45 UTC; prefix withdrawal from Rogers ASN",
+   "source": "Cloudflare BGP telemetry"
+  },
+  {
+   "label": "Traffic recovery by 09 Jul 08:40 UTC",
+   "value": "~76% of prior-day level at same time",
+   "source": "Cloudflare BGP telemetry"
+  },
+  {
+   "label": "Upgrade phase at failure",
+   "value": "Phase 6 of a 7-phase core IP-network update",
+   "source": "Rogers' CRTC letter (via Wikipedia)"
+  },
+  {
+   "label": "Reported deaths (911 unavailable)",
+   "value": "At least one reported (avoidability unclear)",
+   "source": "Wikipedia (CBC Hamilton)"
+  },
+  {
+   "label": "Wireless/wireline core separation investment",
+   "value": "$261 million (CAD) pledged",
+   "source": "Wikipedia (Rogers commitment)"
+  },
+  {
+   "label": "Regulatory MOU deadline",
+   "value": "60 days (mutual assistance / emergency roaming)",
+   "source": "Wikipedia (Champagne undertakings)"
+  }
+ ],
+ "contributingFactors": [
+  "Maintenance/change-control lapse: the ACL policy filter was removed from distribution-router configuration during phase six of a seven-phase core upgrade, with no safeguard against the resulting route flood (CRTC/Xona; Rogers' CRTC letter via Wikipedia).",
+  "Inadequate pre-deployment testing: the change reached production without adequate staged lab validation; the CRTC recommended Rogers 'ensure wide coverage and rigor in testing configuration changes' (CRTC/Xona).",
+  "No overload protection on core routers: 'the Rogers core network routers were not configured with such overload protection mechanisms,' so >900,000 routes (vs ~10,000 normal) crashed the core within minutes (CRTC/Xona).",
+  "Converged single-core architecture: wireless and wireline shared one IP core, so the outage 'resulted in a catastrophic loss of all services' — one change felled mobile, wireline, and 9-1-1 together (CRTC/Xona).",
+  "No independent management path: Rogers lacked redundant NOC/site connectivity from alternative providers, and the outage severed internal access including 'the company's VPN to its core network nodes,' delaying responders (CRTC/Xona; Rogers' CRTC letter via Wikipedia).",
+  "No inter-carrier emergency-roaming failover: Rogers mobile users had no 9-1-1 fallback during the outage, prompting the post-incident emergency-roaming mandate (CRTC/Xona; Champagne undertakings via Wikipedia)."
+ ],
+ "coe": [
+  {
+   "action": "Physically separate wireless and wireline core networks ($261M pledge) so one fault cannot collapse all services",
+   "owner": "Rogers Communications (network engineering)",
+   "status": "Committed (post-incident)"
+  },
+  {
+   "action": "Implement router overload protection (max-prefix / route limits / control-plane policing) on core routers",
+   "owner": "Rogers Communications",
+   "status": "Directed by CRTC/Xona findings"
+  },
+  {
+   "action": "Provision independent/out-of-band management and redundant NOC connectivity from alternative providers",
+   "owner": "Rogers Communications",
+   "status": "Directed by CRTC/Xona findings"
+  },
+  {
+   "action": "Strengthen configuration-change control with wide-coverage, rigorous pre-deployment lab testing and staged validation",
+   "owner": "Rogers Communications (change management), per CRTC recommendation",
+   "status": "Recommended by CRTC/Xona"
+  },
+  {
+   "action": "Agree inter-carrier mutual-assistance and emergency-roaming arrangements within 60 days",
+   "owner": "All Canadian telecom providers, mandated by Minister Champagne / ISED",
+   "status": "Mandated (60-day deadline)"
+  },
+  {
+   "action": "Establish and regularly test 9-1-1 emergency-roaming failover across carriers",
+   "owner": "Canadian carriers / CRTC oversight",
+   "status": "Directed following the outage"
+  }
+ ],
+ "lessonsLearnt": [
+  "A single removed guardrail in a converged core is a national single point of failure: removing one ACL filter injected over 900,000 routes and crashed the core within minutes, taking mobile, wireline, 9-1-1, and Interac down together (CRTC/Xona).",
+  "The management plane must survive the data plane it manages: because the VPN to core nodes rode the failed network, Rogers was blinded and could not quickly mobilize or roll back — independent, out-of-band access is not optional (CRTC/Xona; Rogers' CRTC letter).",
+  "Overload protection must be assumed-on, not assumed-safe: core routers with no route-limit safeguard forwarded themselves to death when a foreseeable misconfiguration occurred (CRTC/Xona).",
+  "Change control needs rigorous staged lab validation and tested rollback: pushing an unfiltered configuration into production during phase six of a live seven-phase upgrade converted a routine change into a ~26-hour national outage (CRTC/Xona; Rogers' CRTC letter).",
+  "Critical-infrastructure dependencies are systemic: Interac and 9-1-1 riding on one carrier pushed the failure into nationwide debit payments and emergency calling, well beyond Rogers' own subscribers (Wikipedia).",
+  "Vendor detail can be a documented gap: the failed routers' make, model, firmware, and age were never publicly disclosed, so this analysis records them as unknown rather than inventing them (CRTC/Xona; public filings)."
+ ],
+ "improvements": [
+  "Design: Physically separate the wireless and wireline core networks so a single fault cannot collapse all services simultaneously — Rogers pledged $261 million toward this separation (Wikipedia; CRTC/Xona rationale).",
+  "Design: Implement router overload-protection mechanisms (max-prefix / route limits / control-plane policing) on core routers so a route flood is rejected rather than allowed to crash the control plane (CRTC/Xona).",
+  "Design: Provide a management path physically independent of the data network, plus redundant NOC/site connectivity from alternative service providers, so responders retain access even when the core fails (CRTC/Xona).",
+  "Maintenance: Strengthen configuration-change control with rigorous, wide-coverage pre-deployment lab testing and staged validation of every core-router change, with tested rollback before production rollout (CRTC/Xona).",
+  "Process: Establish an inter-carrier framework for mutual assistance, emergency roaming for rivals' affected customers, and coordinated public communication, on the 60-day deadline set by Minister Champagne (Wikipedia; CRTC/Xona).",
+  "Safety: Guarantee 9-1-1 continuity via inter-operator emergency-roaming failover, tested regularly, so mobile emergency calling survives a single carrier's core outage (CRTC/Xona; Wikipedia)."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "No fire — a congestive control-plane collapse",
+   "body": "This was not a physical or thermal event; it was a routing/control-plane failure. The 'ignition' analog is the deletion of the ACL policy filter on the distribution routers, and the 'fuel' is the uncontrolled injection of routing state into the core. With the filter present, roughly 10,000 routes reached the core; with it gone, a single distribution router pushed 'over 900,000 route data into the core routers,' exceeding processing capacity and crashing the core 'within minutes.' The mechanism is specific and vendor-agnostic: route-table saturation of the control plane, not any hardware defect."
+  },
+  {
+   "heading": "Latent causes: convergence, no overload protection, no independent management",
+   "body": "Three latent conditions turned a foreseeable misconfiguration into a national outage. Convergence put wireless and wireline on one IP core, so the CRTC found the fault 'resulted in a catastrophic loss of all services' with no partition to contain it. Core routers had no overload protection ('were not configured with such overload protection mechanisms'), so nothing rejected the flood. And the management path was not independent — Rogers lacked redundant NOC connectivity and lost 'the company's VPN to its core network nodes,' blinding responders and preventing a quick rollback."
+  },
+  {
+   "heading": "External signature and staged recovery",
+   "body": "Cloudflare's BGP telemetry provides an independent, timestamped view: a spike in BGP updates 'after 08:15, reaching its peak at 08:45,' then 'a withdrawal of prefixes from Rogers ASN' (UTC) — Rogers vanishing from the global table. Recovery was halting: a re-advertisement attempt at 14:30 UTC, 'another round of withdraws at around 15:45,' partial traffic 'mostly after 00:15 UTC,' and about 76% of prior-day traffic by 08:40 UTC on 9 July, with continued flapping. This matches the CRTC's ~26-hour window (04:58 EDT 8 Jul to 07:00 EDT 9 Jul) and the need to isolate routers, purge state, and rebuild in stages."
+  },
+  {
+   "heading": "Systemic impact and regulatory response",
+   "body": "Because critical services rode Rogers' single core, the blast radius exceeded its own subscribers: more than 12 million customers lost service, Interac debit went offline 'nationwide,' and 9-1-1 was unavailable from Rogers mobile — with a reported Hamilton death whose avoidability is unclear. The response was structural: Rogers pledged $261 million to physically separate wireless and wireline, and Minister Champagne gave carriers 60 days to agree mutual assistance and emergency roaming, with the CRTC/Xona assessment recommending overload protection, independent management, and rigorous change testing."
+  },
+  {
+   "heading": "Disclosed gaps",
+   "body": "The router vendor, model, firmware version, and hardware age are not established by any public source and are recorded as unknown rather than inferred. The exact wall-clock time of the ACL removal is not published; it is bounded only as shortly before the 04:58 EDT onset and consistent with Cloudflare's ~08:15-08:45 UTC BGP activity. The 'substantial restoration within ~15-19 hours' figure from the source draft is unsupported and was removed; the defensible measure is the ~26-hour outage window and the 76%-by-08:40-UTC recovery point."
+  }
+ ],
+ "references": [
+  {
+   "title": "CRTC — Independent (Xona) assessment of the July 2022 Rogers outage",
+   "url": "https://crtc.gc.ca/eng/publications/reports/xona2024.htm",
+   "type": "regulatory",
+   "quote": "When this policy filter was removed, a single distribution router released over 900,000 route data into the core routers.",
+   "accessed": "2026-08-02"
+  },
+  {
+   "title": "Cloudflare — Cloudflare's view of the Rogers Communications outage in Canada",
+   "url": "https://blog.cloudflare.com/cloudflares-view-of-the-rogers-communications-outage-in-canada/",
+   "type": "vendor-status",
+   "quote": "there was a clear spike in BGP (Border Gateway Protocol) updates after 08:15, reaching its peak at 08:45 ... at 08:45 there was a withdrawal of prefixes from Rogers ASN.",
+   "accessed": "2026-08-02"
+  },
+  {
+   "title": "Wikipedia — 2022 Rogers Communications outage (aggregating Rogers' CRTC letter, CBC, government response)",
+   "url": "https://en.wikipedia.org/wiki/2022_Rogers_Communications_outage",
+   "type": "press",
+   "quote": "the deletion of a routing filter on its distribution routers caused all possible routes to the internet to pass through the routers, exceeding the capacity of the routers on its core network ... during the sixth phase in a seven-phase update.",
+   "accessed": "2026-08-02"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": true,
+  "lastVerified": "2026-08-02 (seed — pending deep research)"
+ },
+ "lastUpdated": "2026-08-02"
+}

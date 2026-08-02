@@ -1,0 +1,278 @@
+{
+ "slug": "cyrusone-cme-chicago-cooling-2025",
+ "title": "CyrusOne Aurora Cooling Failure Halts CME Group Trading (November 2025)",
+ "operator": "CyrusOne (tenant: CME Group)",
+ "operatorShort": "CyrusOne",
+ "dcName": "CyrusOne Aurora (Chicago-area)",
+ "location": {
+  "city": "Aurora, Illinois",
+  "country": "United States"
+ },
+ "date": "2025-11-01",
+ "durationMin": 660,
+ "category": [
+  "cooling",
+  "human"
+ ],
+ "severity": {
+  "usersAffected": "Global derivatives market participants; CME futures/options across equities, rates, FX, commodities",
+  "impactUsd": "Market-wide trading halt; direct loss not published",
+  "servicesDown": [
+   "CME Globex futures/options trading",
+   "Market data feeds"
+  ],
+  "tier": "Sev-1 facility cooling loss (>10h trading halt)"
+ },
+ "brief": "A human-error cooling-tower switchover during a cold-weather changeover triggered a chiller-plant failure and temperatures above 100°F at CyrusOne's Aurora facility, halting CME Group's global futures and options trading for more than ten hours.",
+ "magnitude": {
+  "blastRadiusScore": 7,
+  "usersScore": 6,
+  "financialScore": 8,
+  "durationScore": 6,
+  "note": "Global futures/options market halt >10h from a cooling-plant failure — sub-scores ESTIMATED from public impact reporting, pending deep research."
+ },
+ "rootCause": "PRIMARY EQUIPMENT / FAILURE MECHANISM. This was a loss-of-cooling (thermal) event, not a fire — no ignition source, no combustion. The failed system was the primary water-cooled CHILLER PLANT serving CyrusOne's CHI1 (Chicago 1 / \"CH1\") data center in Aurora, Illinois. In CyrusOne's own words the CHI1 facility \"experienced a chiller plant failure affecting multiple cooling units\" (CyrusOne statement, relayed by DatacenterDynamics). Multiple cooling units dropped offline together, chilled-water circulation to the data halls was lost, and rack-inlet/room temperatures rose until CME Group's trading engines had to be halted to protect hardware.\n\nSTATED ROOT CAUSE — HUMAN / PROCEDURAL (CONFIRMED). CyrusOne confirmed to Bloomberg that the ~11-hour outage was caused by human error: onsite staff and contractors failed to follow standard procedures when DRAINING/PREPARING the cooling towers ahead of freezing weather (CyrusOne to Bloomberg, via DatacenterDynamics). It occurred on the Thanksgiving-window reopen (evening of Nov 27, 2025, into Nov 28) as a hard freeze approached the Chicago suburbs. The confirmed mechanism is specifically the cooling-tower freeze-preparation/draining step being mishandled — which cascaded into a chiller-plant trip taking multiple cooling units offline. The fault sits in operating-procedure execution during a seasonal cold-weather changeover, not equipment age or a design defect. NOTE: the widely-repeated exact phrasing \"preparing the cooling towers for freezing temperatures\" is a paraphrase; the confirmed source wording describes staff/contractors failing to follow standard procedures when DRAINING cooling towers ahead of freezing weather.\n\nLATENT / SYSTEMIC ROOT. First, MECHANICAL REDUNDANCY DID NOT CARRY THE LOAD: a single procedural lapse during freeze-prep took \"multiple cooling units\" down at once with no effective backup cooling path — a common-mode failure that a fault-tolerant plant with procedurally diverse changeover steps should have survived. CyrusOne's own remedy — it \"installed additional redundancy to the cooling systems\" (CyrusOne, confirmed verbatim via DCD) — is an admission that pre-incident backup cooling did not save the load. Second, CONCENTRATION RISK: CME ran globally-critical matching engines out of the single Aurora campus, so one plant's thermal failure halted worldwide futures/options price discovery. No chiller make/model, refrigerant, unit age, or the exact hydraulic detail (frozen tower basin, condenser-water freeze, free-cooling/glycol changeover valve, or low-ambient lockout) has been publicly disclosed — the confirmed record stops at the mishandled cooling-tower freeze-preparation.",
+ "technicalDeepDive": "MECHANISM OF A COLD-WEATHER CHILLER-PLANT FAILURE. Paradoxically, this data-center thermal event was triggered by COLD, not heat. Water-cooled chiller plants reject heat through cooling towers that evaporate water to open air. When ambient temperatures approach and cross freezing, exposed condenser-water in tower basins, fill, and outdoor pipework can freeze, and the plant must be transitioned for cold weather — basins drained or heated, valves switched to free-cooling/glycol loops, flows and setpoints reconfigured — following a defined freeze-prep procedure. CyrusOne's confirmed account is that this changeover was executed incorrectly by onsite personnel and contractors who failed to follow standard procedures when preparing/draining the cooling towers ahead of freezing weather, and that this procedural lapse produced a chiller-plant failure affecting multiple cooling units (CyrusOne to Bloomberg, via DCD). The word \"multiple\" is the critical forensic signal: this was a COMMON-MODE trip, in which one mis-sequenced changeover simultaneously compromised more than one unit rather than a single random component failure that redundancy could absorb.\n\nTHERMAL CASCADE INTO IT. Data halls have low thermal mass relative to their heat load; against the campus's 109MW IT capacity, tens of megawatts of server heat with no chilled water raises room and rack-inlet temperatures within minutes. A widely-cited incident summary reports hall temperatures exceeding 100°F, but CyrusOne did NOT disclose a per-sensor peak — treat >100°F as an unverified reported figure, not a confirmed measurement. As inlet air crossed safe thresholds, the correct protective response is exactly what happened: shed the heat source. CME halted its trading systems — effectively an \"evacuation of compute\" — to stop generating heat and protect hardware while cooling was reconstituted, rather than risk mass server thermal damage.\n\nRECONSTITUTION OF COOLING. There was no suppression system to activate because there was no fire; the \"suppression analogue\" — the cooling plant — was the very thing that failed. Recovery was mechanical and manual: chillers were restarted at limited capacity and cooling reconstituted until chilled-water circulation was stable enough to bring IT load — and CME's markets — back online in stages, with all trading resumed after roughly 11 hours. CyrusOne subsequently \"installed additional redundancy to the cooling systems\" and reported it \"restored stable and secure operations\" at CHI1 (both confirmed verbatim via DCD). NOTE ON UNCERTAINTY: no accessible primary source gives the exact minute the high-temperature threshold tripped, the peak hall temperature by sensor, the number of chillers affected versus total installed, or any mobile-chiller tonnage; the phrase \"temporary and supplemental chillers and pipework\" is attributed to a secondary trade blog (DC Pulse) that could not be re-fetched and does NOT appear in CyrusOne's DCD-relayed statement, so it is treated as unverified.",
+ "sequenceOfEvents": [
+  {
+   "t": "2025-11-27 evening (CT)",
+   "phase": "TRIGGER",
+   "event": "On the live approach to a hard freeze in the Chicago suburbs (Thanksgiving-window reopen), onsite staff and contractors began preparing/draining CHI1's cooling towers for freezing weather but failed to follow standard procedures for the winterization changeover (CyrusOne, confirmed to Bloomberg).",
+   "source": "CyrusOne via Bloomberg, relayed by DatacenterDynamics (CME data-center shutdown attributable to human error)"
+  },
+  {
+   "t": "2025-11-27 evening (CT)",
+   "phase": "CASCADE",
+   "event": "The procedural lapse induced a chiller-plant failure: CHI1 'experienced a chiller plant failure affecting multiple cooling units' - a common-mode trip taking more than one unit offline at once.",
+   "source": "CyrusOne statement via DatacenterDynamics (CONFIRMED quoted phrase)"
+  },
+  {
+   "t": "2025-11-27 evening (CT)",
+   "phase": "CASCADE",
+   "event": "Chilled-water circulation to the data halls was lost; against ~109MW of IT capacity with low thermal mass, rack-inlet/room temperatures began climbing (a widely-cited summary reports >100degF; not disclosed by CyrusOne).",
+   "source": "Forensic reconstruction from CyrusOne 'multiple cooling units' + unverified incident-summary temperature figure"
+  },
+  {
+   "t": "2025-11-27 late evening (CT)",
+   "phase": "DETECTION",
+   "event": "Thermal detection (not fire): plant/building monitoring (BMS/DCIM) and rising room/rack temperatures would have driven high-temperature alarms as the chiller plant failed. No accessible source states the exact minute the high-temp threshold tripped.",
+   "source": "Forensic note (disclosed uncertainty); CyrusOne chiller-plant-failure statement via DCD"
+  },
+  {
+   "t": "2025-11-27 late evening (ET)",
+   "phase": "MITIGATION",
+   "event": "Protective compute shutdown: to stop generating heat and protect hardware, CME's trading systems (Globex and related markets) were halted/failed over - an 'evacuation of compute' rather than any occupant evacuation (unmanned mechanical failure, no life-safety event).",
+   "source": "Forensic framing note; CME/CyrusOne cooling-halt reporting via DCD"
+  },
+  {
+   "t": "2025-11-27/28 overnight",
+   "phase": "IMPACT",
+   "event": "Global markets knocked out: the halt prevented traders from accessing futures prices for commodities and stocks across CME Group's derivatives markets (specific benchmark list per trade reporting: S&P 500, Nasdaq, Treasuries, WTI, gold, Nikkei, palm oil - not independently reconfirmed).",
+   "source": "CyrusOne via DCD (halt prevented access to futures prices for commodities and stocks); benchmark list attributed to trade reporting"
+  },
+  {
+   "t": "2025-11-27/28 overnight",
+   "phase": "MITIGATION",
+   "event": "CME issued a public notice that its markets were halted due to a cooling issue at the CyrusOne data center and that it was working to resolve the issue (exact wording attributed to trade reporting, not independently reconfirmed).",
+   "source": "CME notice via trade reporting (DC Pulse; not re-fetched)"
+  },
+  {
+   "t": "2025-11-27/28 overnight",
+   "phase": "MITIGATION",
+   "event": "Emergency MECHANICAL response (no fire department / 911): CyrusOne mobilized engineering teams and contractors on-site to restart chillers and reconstitute chilled-water circulation.",
+   "source": "Forensic framing from CyrusOne restored-operations statement; contractor-callout detail attributed to DC Pulse (not re-fetched)"
+  },
+  {
+   "t": "2025-11-27/28 overnight",
+   "phase": "MITIGATION",
+   "event": "No suppression discharge occurred or was needed (no fire); the 'suppression analogue' - the cooling plant - had failed. Redundancy/backup cooling did not carry the load, forcing an orderly thermal de-rating/shutdown of IT.",
+   "source": "Forensic framing note (suppression N/A); corroborated by CyrusOne later adding redundancy"
+  },
+  {
+   "t": "2025-11-28 early hours",
+   "phase": "RECOVERY",
+   "event": "Chillers restarted at limited capacity and cooling reconstituted to rebuild chilled-water circulation to a stable state (any 'temporary/supplemental chillers and pipework' detail is attributed to DC Pulse and is unverified).",
+   "source": "Forensic reconstruction; supplemental-cooling wording attributed to DC Pulse (not re-fetched)"
+  },
+  {
+   "t": "2025-11-28 ~07:00 ET",
+   "phase": "RECOVERY",
+   "event": "EBS markets resumed trading as chilled-water circulation stabilized enough to bring IT load back safely (resume time per CNBC; not independently reconfirmed).",
+   "source": "CNBC (CME halts FX/commodities/futures trading) - cited, not re-fetched"
+  },
+  {
+   "t": "2025-11-28 ~08:30 ET",
+   "phase": "RESTORED",
+   "event": "Stock futures and options trading fully reopened; CME reported all its markets were open and trading (per CNBC; not independently reconfirmed).",
+   "source": "CNBC - cited, not re-fetched"
+  },
+  {
+   "t": "2025-11-28 by ~13:35 GMT",
+   "phase": "RESTORED",
+   "event": "Trading in FX, stock and bond futures had resumed after being knocked out for roughly/over 11 hours; regulators (CFTC and SEC) reportedly aware and monitoring (per Reuters; not independently reconfirmed).",
+   "source": "Reuters via SRN News - cited, not re-fetched; ~11h duration corroborated by Bloomberg/DCD"
+  },
+  {
+   "t": "2025-11-28 onward",
+   "phase": "RECOVERY",
+   "event": "CyrusOne reported it had 'restored stable and secure operations at its Chicago 1 (CHI1) data center in Aurora, Illinois' and 'installed additional redundancy to the cooling systems.'",
+   "source": "CyrusOne via DatacenterDynamics (both quotes CONFIRMED verbatim)"
+  },
+  {
+   "t": "2025-12 (early)",
+   "phase": "IMPACT",
+   "event": "Financial/reputational fallout: CyrusOne reportedly postponed/halted a bond sale after the data-center failure that disrupted CME, and confirmed to Bloomberg the ~11-hour outage was caused by human error.",
+   "source": "Bloomberg (human-error confirmation corroborated via DCD; bond-sale report cited but not independently reconfirmed)"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Total outage duration",
+   "value": "~11 hours (reported 'over 11 hours')",
+   "source": "Bloomberg/CyrusOne via DatacenterDynamics (CONFIRMED ~11h); 'over 11 hours' wording per Reuters (not re-fetched)"
+  },
+  {
+   "label": "Cooling units affected",
+   "value": "'multiple cooling units' (common-mode; exact count not disclosed)",
+   "source": "CyrusOne via DatacenterDynamics (CONFIRMED quoted phrase)"
+  },
+  {
+   "label": "Aurora campus IT capacity",
+   "value": "109 MW across 3 data centers, 450,000 sq ft",
+   "source": "CyrusOne facility profile via DatacenterDynamics (CONFIRMED)"
+  },
+  {
+   "label": "Corrective capacity added",
+   "value": "'additional redundancy to the cooling systems' (tonnage not disclosed)",
+   "source": "CyrusOne via DatacenterDynamics (CONFIRMED verbatim)"
+  },
+  {
+   "label": "Peak data-hall temperature (reported)",
+   "value": ">100degF (UNVERIFIED - not disclosed by CyrusOne; from a secondary incident summary)",
+   "source": "Incident-summary framing; no per-sensor peak disclosed by CyrusOne (disclosed uncertainty)"
+  },
+  {
+   "label": "EBS markets resume time",
+   "value": "~07:00 ET, 2025-11-28 (not independently reconfirmed)",
+   "source": "CNBC - cited, not re-fetched"
+  },
+  {
+   "label": "Full market reopen time",
+   "value": "~08:30 ET, 2025-11-28 (not independently reconfirmed)",
+   "source": "CNBC - cited, not re-fetched"
+  },
+  {
+   "label": "Aurora sale-leaseback (2016)",
+   "value": "~$130 million, 15-year term (UNVERIFIED facility-profile detail)",
+   "source": "DatacenterDynamics facility profile - cited, not independently reconfirmed"
+  },
+  {
+   "label": "Financial fallout",
+   "value": "CyrusOne reportedly postponed/halted a bond sale after the failure",
+   "source": "Bloomberg - cited, not independently reconfirmed"
+  }
+ ],
+ "contributingFactors": [
+  "PROCEDURAL EXECUTION FAILURE DURING FREEZE-PREP (root, CONFIRMED): CyrusOne confirmed to Bloomberg that onsite staff and contractors failed to follow standard procedures when draining/preparing the cooling towers ahead of freezing weather (via DatacenterDynamics) - a seasonal cold-weather changeover mishandled on the live approach to a hard freeze.",
+  "INADEQUATE / COMMON-MODE MECHANICAL REDUNDANCY: a single procedural lapse took 'multiple cooling units' offline at once with no backup cooling carrying the load, evidenced by CyrusOne's post-incident fix of having 'installed additional redundancy to the cooling systems' (confirmed verbatim via DCD) - i.e. the fault-tolerant protection a resilient plant should have provided was effectively absent for this failure mode.",
+  "COLD-WEATHER / SEASONAL-TRANSITION TIMING RISK: the failure hit during a hard-freeze approach in the Chicago suburbs on the Thanksgiving-window reopen (evening of Nov 27, into Nov 28), a known high-risk winterization window for water-cooled tower plants, executed under live IT load (CyrusOne statement; DCD).",
+  "SINGLE-SITE CONCENTRATION OF CRITICAL WORKLOAD: CME's matching engines ran from the single Aurora campus, so one plant's thermal failure halted global futures/options price discovery - a concentration-risk / missing geographic-diversity theme raised in trade commentary (attributed to DC Pulse; that specific commentary could not be independently re-fetched).",
+  "CONTRACTOR-BOUNDARY / CHANGE-MANAGEMENT GAP: the lapse spanned both onsite personnel and contractors, implying a method-statement / supervision boundary where the freeze-prep steps were not verified - though no accessible source names the specific procedure document, the contracting firm, or which checklist step was skipped (disclosed uncertainty; CyrusOne via Bloomberg/DCD)."
+ ],
+ "coe": [
+  {
+   "action": "Rebuild cooling-tower freeze-prep/winterization SOP as a checklist-gated changeover with independent two-person sign-off and seasonal dry-run",
+   "owner": "CyrusOne Critical Facilities Operations",
+   "status": "Not publicly confirmed (implied by stated root cause; only the redundancy fix was disclosed)"
+  },
+  {
+   "action": "Install additional redundancy to the CHI1 cooling systems",
+   "owner": "CyrusOne",
+   "status": "Done (CyrusOne confirmed it 'installed additional redundancy to the cooling systems')"
+  },
+  {
+   "action": "Restore stable and secure operations at CHI1 Aurora",
+   "owner": "CyrusOne",
+   "status": "Done (CyrusOne confirmed restored stable and secure operations)"
+  },
+  {
+   "action": "Impose change-management controls (method statements, supervision, two-person verify) at the contractor boundary for live freeze-prep",
+   "owner": "CyrusOne / contracting firm",
+   "status": "Not publicly confirmed"
+  },
+  {
+   "action": "Pursue geographically diverse cooling/power architecture for critical matching engines and review single-site concentration",
+   "owner": "CME Group",
+   "status": "Open / not publicly confirmed"
+  },
+  {
+   "action": "Wire thermal early-warning to automated IT load-shed thresholds (BMS/DCIM)",
+   "owner": "CyrusOne / CME",
+   "status": "Open / not publicly confirmed"
+  },
+  {
+   "action": "Regulatory awareness and market-integrity review of the outage",
+   "owner": "CFTC / SEC",
+   "status": "Reported aware/monitoring per Reuters (not independently reconfirmed)"
+  }
+ ],
+ "lessonsLearnt": [
+  "A cooling plant is a single point of failure equal to any power system: a mishandled seasonal winterization step - not equipment age or a fire - halted a global exchange for ~11 hours, so freeze-prep is a critical, life-of-the-facility procedure, not routine maintenance.",
+  "Redundancy that shares a common human/procedural mode is not redundancy: one mis-sequenced changeover took 'multiple cooling units' offline together, and the operator's after-the-fact addition of redundancy is proof the pre-incident backup path did not carry the load.",
+  "Concentration risk is systemic risk: running globally-critical matching engines from one campus means one plant's thermal failure becomes worldwide market downtime - geographic diversity is a resilience requirement, not a luxury.",
+  "Contractor-boundary work needs the tightest change control: because the lapse spanned staff and contractors, method statements, supervision, and independent verification must gate any live-load seasonal switchover.",
+  "Detection must be wired to protection: rising hall temperatures should auto-trigger load-shed/throttling before safe inlet limits are crossed, rather than relying on a downstream tenant (CME) to halt compute to save the hardware.",
+  "Public disclosure was partial: the operator confirmed human error and 'multiple cooling units' but never released chiller counts, refrigerant, peak sensor temperatures, or mobile-cooling tonnage - post-incidents should not be reconstructed as if those undisclosed specifics are established fact."
+ ],
+ "improvements": [
+  "Maintenance: Rebuild the cooling-tower freeze-prep / winterization procedure as a verified, checklist-gated seasonal changeover with independent two-person sign-off - CyrusOne's own confirmed root cause is that staff and contractors failed to follow standard procedures when draining/preparing the cooling towers ahead of freezing weather, so procedure EXECUTION and verification, not just the document, must be hardened.",
+  "Design: Provide genuine common-mode-resistant mechanical redundancy (N+1/N+2 with procedurally diverse changeover steps) plus pre-staged rapid-response mobile cooling - implementing the very fix CyrusOne applied after the fact (it 'installed additional redundancy to the cooling systems').",
+  "Process: Institute change-management controls at the contractor boundary for any live freeze-prep switchover - approved method statements, on-site supervision, and a two-person verify step - since the lapse spanned both onsite personnel and contractors and no verification caught the mis-sequenced changeover before multiple units tripped.",
+  "Safety: Tighten thermal early-warning and automated load-shed thresholds (BMS/DCIM high-temp alarms tied to protective IT throttling) so a chiller-plant trip is caught and heat load shed before halls exceed safe inlet temperatures - closing detection-to-protection latency.",
+  "Design/Resilience: For globally-critical workloads such as exchange matching engines, pursue redundant, geographically diverse cooling and power architectures so a single site's thermal failure cannot halt worldwide price discovery.",
+  "Maintenance/Assurance: Run a pre-winter commissioning and dry-run of the full freeze-prep sequence each season, with an independent audit of tower drain-down, basin-heater energization, and free-cooling/glycol valve line-ups before the first hard freeze."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "What happened",
+   "body": "On the evening of Nov 27, 2025 (into Nov 28), CyrusOne's CHI1 (Chicago 1 / 'CH1') data center in Aurora, Illinois 'experienced a chiller plant failure affecting multiple cooling units' (CyrusOne, confirmed via DatacenterDynamics). Chilled-water cooling to the halls was lost as a hard freeze approached the Chicago suburbs, and CME Group - a tenant whose trading engines run from the campus - halted its markets to protect hardware. Trading resumed after roughly 11 hours. This was a loss-of-cooling (thermal) event, not a fire: there was no ignition, combustion, or suppression discharge."
+  },
+  {
+   "heading": "Why it happened (root and latent causes)",
+   "body": "CyrusOne confirmed to Bloomberg the outage was caused by human error - onsite staff and contractors failed to follow standard procedures when draining/preparing the cooling towers ahead of freezing weather. Beneath that sit two latent gaps: (1) common-mode redundancy failure, since one mis-sequenced changeover took 'multiple cooling units' down together with no effective backup path - later confirmed by CyrusOne 'installing additional redundancy to the cooling systems'; and (2) single-site concentration of globally-critical workload. No chiller make/model, refrigerant, unit age, or exact hydraulic detail was disclosed."
+  },
+  {
+   "heading": "Why it mattered (impact and concentration risk)",
+   "body": "Because CME's matching engines run from the single Aurora campus, a plant-level thermal failure became worldwide market downtime - traders lost access to futures prices for commodities and stocks across CME Group's derivatives markets for ~11 hours. Trade reporting listed benchmarks including S&P 500, Nasdaq, Treasuries, WTI, gold, Nikkei and palm oil (not independently reconfirmed here). The event also carried financial/reputational fallout: CyrusOne reportedly postponed a bond sale afterward (Bloomberg; not independently reconfirmed)."
+  },
+  {
+   "heading": "Response and recovery",
+   "body": "There was no suppression system to activate - the cooling plant itself was the failed 'suppression analogue.' Recovery was mechanical and manual: chillers were restarted at limited capacity and chilled-water circulation reconstituted until IT - and CME's markets - could be brought back in stages (EBS ~07:00 ET, full reopen ~08:30 ET per CNBC, not reconfirmed). CyrusOne then reported it 'restored stable and secure operations at its Chicago 1 (CHI1) data center' and 'installed additional redundancy to the cooling systems' (both confirmed verbatim)."
+  },
+  {
+   "heading": "Verification status and source limitations",
+   "body": "This review directly re-confirmed, via a reader-proxy to DatacenterDynamics relaying CyrusOne's statements: the CHI1/Aurora location, the 'chiller plant failure affecting multiple cooling units' phrasing, the human-error root cause tied to cooling-tower freeze-prep, the ~11-hour duration, the 109MW / 450,000 sq ft / 3-DC campus profile, and the two CyrusOne quotes on restored operations and added redundancy. It could NOT re-fetch Bloomberg, Reuters, CNBC or DC Pulse (bot-block/CAPTCHA) - so precise resume times, the CFTC/SEC line, the benchmark product list, the bond-sale detail, the $130M/15-year sale-leaseback, the >100degF temperature, and the 'temporary and supplemental chillers and pipework' phrase remain cited-but-not-independently-reconfirmed and, where noted, unverified."
+  }
+ ],
+ "references": [
+  {
+   "title": "DatacenterDynamics - CME data-center shutdown attributable to human error (relaying CyrusOne/Bloomberg)",
+   "url": "https://www.datacenterdynamics.com/en/news/cme-data-center-shutdown-attributable-to-human-error-report/",
+   "type": "press",
+   "quote": "a chiller plant failure affecting multiple cooling units; staff and contractors failed to follow standard procedures when draining cooling towers ahead of freezing weather",
+   "accessed": "2026-08-02"
+  },
+  {
+   "title": "DatacenterDynamics - After CME outage, CyrusOne adds backup cooling capacity (relaying CyrusOne)",
+   "url": "https://www.datacenterdynamics.com/en/news/after-cme-outage-cyrusone-adds-backup-cooling-capacity/",
+   "type": "press",
+   "quote": "CyrusOne has restored stable and secure operations at its Chicago 1 (CHI1) data center in Aurora, Illinois",
+   "accessed": "2026-08-02"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": false,
+  "lastVerified": "2026-08-02 (seed — pending deep research)"
+ },
+ "lastUpdated": "2026-08-02"
+}
