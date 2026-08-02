@@ -86,10 +86,9 @@ async function run(file, prefix, regions, vp) {
 }
 
 await run('dc-incidents.html', 'hub', [
-  ['faq', 'details.faq'], ['geomap', '#incMap'],
-  ['bars', 'svg[aria-label*="magnitude"]'], ['riskmap', 'svg[aria-label*="Blast radius"]'],
-  ['semanticmap', 'svg[aria-label*="Semantic"]'],
-], { width: 1100, height: 900, deviceScaleFactor: 1.5 });
+  ['kpis', '.iid-kpis'], ['donut', '.iid-donut'], ['geomap', '#incMap'],
+  ['graph', '.iid-graph'], ['signatures', '.iid-sigs'], ['faq', 'details.faq'],
+], { width: 1400, height: 900, deviceScaleFactor: 1.3 });
 
 for (const slug of SAMPLE) {
   await run(`incident-${slug}.html`, slug, [

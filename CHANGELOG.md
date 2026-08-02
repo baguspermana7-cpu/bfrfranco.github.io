@@ -13,6 +13,32 @@ release sections rather than semver.
 
 ---
 
+## v1.125.0 — 2026-08-02 (DC Incidents — "Incident Intelligence" hero dashboard)
+
+Added a full **Incident Intelligence dashboard** as the opening hero of the root-gated hub
+(`dc-incidents.html`), consolidating the previously-scattered analytics into one cohesive,
+animated, source-honest panel grid — modelled on a reference analytics dashboard but rebuilt in
+the site's **editorial forest-green theme with no neon / glow** (owner: "kecuali skin hijaunya
+tetap … hilangkan neon2 AI-design-slop"):
+
+- **KPI strip** — incidents catalogued · Critical (magnitude ≥ 8.5) · countries affected · avg
+  blast radius · avg outage duration, with count-up animation on scroll-in. Real 25-incident
+  data, not fabricated totals.
+- **Severity donut** (animated arc draw-in), **top categories** (bars, click → filter),
+  **most-recent incidents** list, a framed **Leaflet risk map** (severity-coloured magnitude
+  bubbles, fitBounds to the whole world), a **semantic relationship graph** (nodes linked to
+  nearest failure-signature neighbours from the vector index, hover → trace cluster),
+  **failure-signature** ranking (derived from real corpus text), **duration distribution**, and a
+  stats footer.
+- All motion respects `prefers-reduced-motion`; SVG + vanilla JS + the existing Leaflet map, no
+  external chart library.
+
+Built in a new `hero_dashboard()` in `build-incidents.py`; the old scattered magnitude/quadrant
+SVGs are retired in favour of it. Gates: visual-QA clean, incidents-corpus 25/25, page-gates
+CLEAN, script-tags CLEAN, no 360px overflow. Root-gated.
+
+---
+
 ## v1.124.9 — 2026-08-02 (DC Incidents — visual-QA gate + rendered-defect fixes)
 
 Built the mandatory **visual-QA gate** (`tools/incidents-visual-qa.mjs`, per

@@ -190,6 +190,80 @@ CSS = r"""
     .inc-map .leaflet-bar a { background:#12211b !important; color:#cfe0d7 !important; border-color:#2c4438 !important; }
     .leaflet-tooltip.inc-tip { background:#12211b; color:#e6efe9; border:1px solid #2c4438; border-radius:3px; font-family:'JetBrains Mono',monospace; font-size:0.66rem; padding:2px 7px; box-shadow:0 6px 18px rgba(0,0,0,0.5); }
     .leaflet-tooltip.inc-tip:before { border-top-color:#2c4438; }
+    /* ── Incident Intelligence dashboard (editorial, no neon) ── */
+    .iid { margin:1.4rem 0 1rem; }
+    .iid-head { display:flex; align-items:flex-end; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin-bottom:0.9rem; }
+    .iid-title { font-size:1.6rem; margin:0; color:var(--text-strong); }
+    .iid-sub { margin:0.15rem 0 0; color:var(--muted); font-size:0.86rem; }
+    .iid-range { font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.05em; color:var(--muted); border:1px solid var(--line); border-radius:3px; padding:0.3rem 0.6rem; white-space:nowrap; }
+    .iid-num { font-variant-numeric:tabular-nums slashed-zero; }
+    .iid-kpis { display:grid; grid-template-columns:repeat(5,1fr); gap:0.7rem; margin-bottom:0.9rem; }
+    .iid-kpi { background:var(--surface); border:1px solid var(--line); border-top:2px solid var(--cyan); border-radius:0 0 4px 4px; padding:0.75rem 0.85rem; transition:transform 0.18s ease, box-shadow 0.18s ease; }
+    .iid-kpi:hover { transform:translateY(-2px); box-shadow:0 10px 24px var(--shadow-deep); }
+    .iid-kpi-l { font-family:'JetBrains Mono',monospace; font-size:0.62rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); }
+    .iid-kpi-v { display:flex; align-items:baseline; gap:0.3rem; margin:0.25rem 0 0.15rem; }
+    .iid-kpi-v .iid-num, .iid-kpi-v > span:first-child { font-family:'Fraunces',Georgia,serif; font-size:1.8rem; font-weight:600; color:var(--text-strong); line-height:1; }
+    .iid-kpi-u { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .iid-kpi-s { font-size:0.72rem; color:var(--muted); }
+    .iid-grid { display:grid; grid-template-columns:290px 1fr 300px; gap:0.9rem; align-items:start; }
+    .iid-col-l, .iid-col-c, .iid-col-r { display:flex; flex-direction:column; gap:0.9rem; min-width:0; }
+    .iid-panel { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0.85rem 0.95rem; }
+    .iid-panel-map { padding:0.85rem 0.95rem 0.6rem; }
+    .iid-panel-map .inc-map { height:360px; margin-top:0.5rem; }
+    .iid-ph { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin-bottom:0.5rem; }
+    .iid-note { font-size:0.74rem; color:var(--muted); margin:0 0 0.5rem; }
+    .iid-donut-wrap { display:flex; align-items:center; gap:0.9rem; }
+    .iid-donut { width:130px; height:130px; flex:0 0 auto; }
+    .iid-arc { transition:stroke-dasharray 0.9s cubic-bezier(0.22,1,0.36,1); }
+    .iid-donut-c { font-family:'Fraunces',Georgia,serif; font-size:19px; font-weight:600; fill:var(--text-strong); }
+    .iid-donut-t { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.1em; text-transform:uppercase; fill:var(--muted); }
+    .iid-legend { list-style:none; margin:0; padding:0; flex:1; min-width:0; }
+    .iid-legend li { display:flex; align-items:center; gap:0.45rem; font-size:0.82rem; color:var(--text-body); padding:0.16rem 0; }
+    .iid-legend b { margin-left:auto; color:var(--text-strong); font-family:'JetBrains Mono',monospace; font-size:0.82rem; }
+    .iid-legend .iid-pct { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.72rem; width:2.4em; text-align:right; }
+    .iid-dot { width:9px; height:9px; border-radius:50%; flex:0 0 auto; }
+    .iid-catbars, .iid-durbars, .iid-sigs { list-style:none; margin:0; padding:0; }
+    .iid-catbars li, .iid-durbars li, .iid-sigs li { display:grid; grid-template-columns:1fr 90px auto; align-items:center; gap:0.5rem; padding:0.24rem 0; font-size:0.82rem; }
+    .iid-sigs li { grid-template-columns:1fr 64px auto auto; }
+    .iid-catbars li { cursor:pointer; }
+    .iid-catbars li:hover .iid-cbl { color:var(--cyan); }
+    .iid-cbl, .iid-dbl, .iid-sig-n { color:var(--text-body); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .iid-cbar, .iid-dbar, .iid-sig-bar { height:7px; background:var(--surface-2); border-radius:0; overflow:hidden; }
+    .iid-cbar i, .iid-sig-bar i { display:block; height:100%; width:var(--w); background:var(--amber); transform:scaleX(0); transform-origin:left; transition:transform 0.9s cubic-bezier(0.22,1,0.36,1); }
+    .iid-dbar i { display:block; height:100%; width:var(--w); background:var(--cyan); transform:scaleX(0); transform-origin:left; transition:transform 0.9s cubic-bezier(0.22,1,0.36,1); }
+    .iid-in .iid-cbar i, .iid-in .iid-dbar i, .iid-in .iid-sig-bar i { transform:scaleX(1); }
+    .iid-catbars b, .iid-durbars b, .iid-sigs b { font-family:'JetBrains Mono',monospace; color:var(--text-strong); font-size:0.82rem; text-align:right; }
+    .iid-durbars b { color:var(--muted); }
+    .iid-sig-m { font-family:'JetBrains Mono',monospace; font-size:0.66rem; color:var(--muted); }
+    .iid-recent { display:flex; flex-direction:column; }
+    .iid-rec { display:flex; align-items:center; gap:0.55rem; padding:0.45rem 0; border-bottom:1px solid var(--line); text-decoration:none; }
+    .iid-rec:last-child { border-bottom:none; }
+    .iid-rec-sev { width:8px; height:8px; border-radius:50%; flex:0 0 auto; }
+    .iid-rec-b { display:flex; flex-direction:column; min-width:0; flex:1; }
+    .iid-rec-t { color:var(--text-strong); font-size:0.84rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .iid-rec:hover .iid-rec-t { color:var(--cyan); }
+    .iid-rec-m { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.68rem; }
+    .iid-rec-tag { font-family:'JetBrains Mono',monospace; font-size:0.58rem; letter-spacing:0.04em; padding:0.1rem 0.35rem; border:1px solid var(--line); border-radius:2px; flex:0 0 auto; }
+    .sev-critical { background:var(--red); } .iid-rec-tag.sev-critical { color:var(--red); background:transparent; border-color:var(--red); }
+    .sev-high { background:var(--amber); } .iid-rec-tag.sev-high { color:var(--amber); background:transparent; border-color:var(--amber); }
+    .sev-medium { background:var(--green); } .iid-rec-tag.sev-medium { color:var(--green); background:transparent; border-color:var(--green); }
+    .sev-low { background:var(--muted); } .iid-rec-tag.sev-low { color:var(--muted); background:transparent; border-color:var(--line); }
+    .iid-graph { width:100%; height:auto; display:block; }
+    .iid-edge { stroke:var(--line); stroke-width:1; opacity:0.55; transition:stroke 0.15s, opacity 0.15s; }
+    .iid-edge.on { stroke:var(--cyan); opacity:0.9; stroke-width:1.3; }
+    .iid-node circle { transition:transform 0.15s ease, opacity 0.15s; transform-origin:center; }
+    .iid-node:hover circle { stroke:var(--text-strong); stroke-width:1.4; }
+    .iid-graph.iid-focus .iid-node.dim circle { opacity:0.22; }
+    .iid-maplegend { display:flex; flex-wrap:wrap; gap:0.4rem 1rem; margin-top:0.5rem; font-family:'JetBrains Mono',monospace; font-size:0.66rem; color:var(--muted); }
+    .iid-maplegend span { display:inline-flex; align-items:center; gap:0.35rem; }
+    .iid-maplegend i { width:10px; height:10px; border-radius:50%; }
+    .iid-maplegend .iid-mln { font-style:italic; opacity:0.8; }
+    .iid-foot { display:flex; flex-wrap:wrap; gap:0.5rem 1.4rem; align-items:center; margin-top:0.9rem; padding-top:0.8rem; border-top:1px solid var(--line); font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .iid-foot b { color:var(--text-body); font-weight:600; margin-right:0.3rem; }
+    .iid-foot-link { margin-left:auto; color:var(--cyan); text-decoration:none; }
+    @media (max-width:1000px){ .iid-grid { grid-template-columns:1fr; } .iid-kpis { grid-template-columns:repeat(2,1fr); } }
+    @media (max-width:520px){ .iid-kpis { grid-template-columns:1fr 1fr; } .iid-kpi-v .iid-num, .iid-kpi-v > span:first-child { font-size:1.5rem; } }
+    @media (prefers-reduced-motion:reduce){ .iid-arc,.iid-cbar i,.iid-dbar i,.iid-sig-bar i,.iid-kpi,.iid-node circle,.iid-edge { transition:none !important; } .iid-cbar i,.iid-dbar i,.iid-sig-bar i { transform:scaleX(1); } }
     .viz { overflow-x:auto; margin-top:0.9rem; background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0.9rem 1rem; }
     .viz svg { display:block; max-width:100%; height:auto; }
     .viz-radar svg { max-width:320px; margin:0 auto; }
@@ -412,7 +486,7 @@ def render_hub(incidents):
         <h1>Data-Center Incidents — Case Library</h1>
         <p class="lede">A structured, source-cited library of major data-center and cloud-infrastructure incidents worldwide — ranked by magnitude, each with a full sequence of events, root-cause analysis, correction-of-errors (COE), lessons learnt and engineering improvements. Every fact is traced to a public post-incident report.</p>
         <div class="metabar"><b>{len(incidents)}</b> catalogued<span class="sep">·</span><b>{_pm_count}</b> with official RCA<span class="sep">·</span>provenance-mandatory<span class="sep">·</span>root access</div>
-        <details class="faq"><summary>About this library · how to read it</summary><div class="faq-body">
+        <details class="faq" id="faq-methodology"><summary>About this library · how to read it</summary><div class="faq-body">
             <h4>What this is</h4>
             <p>A root-gated, source-cited engineering reference on major data-center and cloud-infrastructure incidents worldwide — each a structured post-incident dossier (sequence of events, root-cause analysis, correction-of-errors, lessons learnt, engineering improvements). It exists for internal engineering education; every material fact is traced to a public post-incident report, and where an authoritative cause was never published the dossier says so rather than invent one.</p>
             <h4>How incidents are ranked</h4>
@@ -430,16 +504,7 @@ def render_hub(incidents):
             <h4>Access</h4>
             <p>Root-only. The library is excluded from the public sitemap and search index.</p>
         </div></details>
-        <h2>Where these happened</h2>
-        <p class="lede" style="margin-bottom:0.4rem">Every incident plotted at the data center or region where the fault began. Facility failures (power, cooling, fire) in gold; network / logical failures in green. Tap a marker for the brief and a link to the full dossier.</p>
-        {hub_geo_map(incidents)}
-        <h2>Portfolio analytics</h2>
-        {hub_magnitude_svg(incidents)}
-        <div class="viz-grid3">
-            <div><div class="eyebrow" style="margin-bottom:0.3rem">By category</div>{hub_category_svg(incidents)}</div>
-            <div><div class="eyebrow" style="margin-bottom:0.3rem">Risk map · blast radius × duration</div>{hub_quadrant_svg(incidents)}</div>
-        </div>
-        {('<div class="eyebrow" style="margin:0.6rem 0 0.3rem">Semantic map · incidents near each other share a failure signature</div>' + _CLUSTER_SVG) if _CLUSTER_SVG else ''}
+        {hero_dashboard(incidents)}
 
         <h2>All incidents</h2>
         <div class="filterbar" id="filterbar">
@@ -955,7 +1020,7 @@ def hub_geo_map(incidents):
           'function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;","\\"":"&quot;"}[c];});}'
           'function init(){var el=document.getElementById("incMap");'
           'if(!el||typeof L==="undefined"){return setTimeout(init,150);} if(el._leaflet_id)return;'
-          'var map=L.map("incMap",{center:[30,15],zoom:2,minZoom:2,maxZoom:8,worldCopyJump:true,scrollWheelZoom:false});'
+          'var map=L.map("incMap",{center:[25,0],zoom:1,minZoom:1,maxZoom:8,worldCopyJump:true,scrollWheelZoom:false});'
           'L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{subdomains:"abcd",maxZoom:19,attribution:"&copy; CARTO &copy; OpenStreetMap"}).addTo(map);'
           'PTS.forEach(function(p){var col=p.dom==="facility"?FAC:LOG;'
           'if(p.cx!=null){L.polyline([[p.cx,p.cy],[p.lat,p.lng]],{color:col,weight:0.8,opacity:0.4,interactive:false}).addTo(map);}'
@@ -968,11 +1033,279 @@ def hub_geo_map(incidents):
           'mk.bindPopup(html,{maxWidth:250});'
           'mk.on("mouseover",function(){this.setStyle({fillOpacity:1,weight:2});});'
           'mk.on("mouseout",function(){this.setStyle({fillOpacity:0.85,weight:1});});});'
-          'try{new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)map.invalidateSize();});}).observe(el);}catch(e){}'
-          'setTimeout(function(){map.invalidateSize();},350);}'
+          'var bb=null;try{bb=L.latLngBounds(PTS.map(function(p){return [p.lat,p.lng];}));}catch(e){}'
+          'function frame(){map.invalidateSize();if(bb){try{map.fitBounds(bb,{padding:[22,22],maxZoom:4});}catch(e){}}}'
+          'try{new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)frame();});}).observe(el);}catch(e){}'
+          'setTimeout(frame,400);setTimeout(frame,1000);}'
           'if(document.readyState!=="loading")init();else document.addEventListener("DOMContentLoaded",init);})();</script>')
     return ('<div id="incMap" class="inc-map" role="img" aria-label="World map of data-center incident locations"></div>'
             + _DOMAIN_LEGEND + js)
+
+
+# ─────────── "Incident Intelligence" hero dashboard (editorial, no neon) ───────────
+def _severity_band(score):
+    s = float(score or 0)
+    return "critical" if s >= 8.5 else ("high" if s >= 7.5 else ("medium" if s >= 6 else "low"))
+
+
+_SEV = [("critical", "Critical", "var(--red)"), ("high", "High", "var(--amber)"),
+        ("medium", "Medium", "var(--green)"), ("low", "Low", "var(--muted)")]
+
+_THEMES = [
+    ("Power / electrical", ["power", "switchgear", " ups", "electrical", "transformer", "generator", "static switch", "de-energis"]),
+    ("Cooling / thermal", ["cooling", "thermal", "chiller", "overheat", "temperature", "hvac"]),
+    ("Fire / battery", ["fire", "ignition", "lithium", "battery", "combust", "thermal runaway"]),
+    ("Network / BGP / DNS", ["bgp", " dns", "routing", "peering", "backbone", "subsea", "cable"]),
+    ("Software / config / deploy", ["config", "deployment", "deploy", "software", "code defect", "feature file", "channel file", "content"]),
+    ("Human error / procedure", ["human error", "typo", "mistyped", "uncontrolled", "operator", "misconfigur", "blank parameter", "wrong"]),
+    ("Capacity / scaling / quota", ["capacity", "thread", "scaling", "quota", "exhaust", "limit", "congest", "ddos", "overwhelm"]),
+]
+
+
+def _dash_stats(incidents):
+    from collections import Counter
+    bands = Counter(_severity_band(x["_score"]) for x in incidents)
+    countries = {(x.get("location", {}) or {}).get("country", "").strip() for x in incidents}
+    countries.discard("")
+    countries.discard("Global")
+    blasts = [float((x.get("magnitude", {}) or {}).get("blastRadiusScore", 0)) for x in incidents]
+    durs = [int(x.get("durationMin") or 0) for x in incidents if x.get("durationMin")]
+    pm = sum(1 for x in incidents if (x.get("sourcing", {}) or {}).get("officialPostmortem") or x.get("officialPostmortem"))
+    years = sorted({(x.get("date", "") or "")[:4] for x in incidents if x.get("date")})
+    return {
+        "total": len(incidents), "bands": bands,
+        "critical": bands.get("critical", 0), "high": bands.get("high", 0),
+        "countries": len(countries), "official": pm,
+        "avg_blast": (sum(blasts) / len(blasts)) if blasts else 0,
+        "avg_dur": (sum(durs) / len(durs)) if durs else 0,
+        "span": f"{years[0]}–{years[-1]}" if years else "—",
+    }
+
+
+def iid_kpis(stats):
+    def card(label, to, unit, sub, fmt="int"):
+        return (f'<div class="iid-kpi"><div class="iid-kpi-l">{esc(label)}</div>'
+                f'<div class="iid-kpi-v"><span class="iid-num" data-to="{to}" data-fmt="{fmt}">0</span>'
+                f'<span class="iid-kpi-u">{esc(unit)}</span></div>'
+                f'<div class="iid-kpi-s">{esc(sub)}</div></div>')
+    h, m = divmod(int(stats["avg_dur"]), 60)
+    dur = f"{h}h {m}m" if h else f"{m}m"
+    return ('<div class="iid-kpis">'
+            + card("Incidents catalogued", stats["total"], "", f"deep dossiers · span {stats['span']}")
+            + card("Critical (magnitude ≥ 8.5)", stats["critical"], "", f"{stats['high']} more rated High")
+            + card("Countries affected", stats["countries"], "", "distinct national jurisdictions")
+            + card("Avg blast radius", round(stats["avg_blast"], 1), "/ 10", "weighted spread of impact", "dec")
+            + f'<div class="iid-kpi"><div class="iid-kpi-l">Avg outage duration</div>'
+              f'<div class="iid-kpi-v"><span class="iid-durval">{esc(dur)}</span></div>'
+              f'<div class="iid-kpi-s">core-impact window (mean)</div></div>'
+            + '</div>')
+
+
+def iid_donut(stats):
+    total = max(1, stats["total"])
+    R, cx, cy, W = 52, 70, 70, 16
+    C = 2 * _math.pi * R
+    segs, legend, off = [], [], 0.0
+    for key, label, col in _SEV:
+        n = stats["bands"].get(key, 0)
+        frac = n / total
+        arc = frac * C
+        segs.append(f'<circle class="iid-arc" cx="{cx}" cy="{cy}" r="{R}" fill="none" stroke="{col}" stroke-width="{W}" '
+                    f'stroke-dasharray="0 {C:.1f}" data-arc="{arc:.1f} {C-arc:.1f}" stroke-dashoffset="{-off:.1f}" '
+                    f'transform="rotate(-90 {cx} {cy})"><title>{esc(label)}: {n} ({frac*100:.0f}%)</title></circle>')
+        off += arc
+        legend.append(f'<li><span class="iid-dot" style="background:{col}"></span>{esc(label)}'
+                      f'<b class="iid-num" data-to="{n}">0</b><span class="iid-pct">{frac*100:.0f}%</span></li>')
+    return ('<div class="iid-donut-wrap"><svg class="iid-donut" viewBox="0 0 140 140" role="img" aria-label="Severity breakdown">'
+            f'<circle cx="{cx}" cy="{cy}" r="{R}" fill="none" stroke="var(--line)" stroke-width="{W}"/>'
+            + "".join(segs)
+            + f'<text x="{cx}" y="{cy-3}" text-anchor="middle" class="iid-donut-c iid-num" data-to="{stats["total"]}">0</text>'
+            + f'<text x="{cx}" y="{cy+13}" text-anchor="middle" class="iid-donut-t">total</text></svg>'
+            + f'<ul class="iid-legend">{"".join(legend)}</ul></div>')
+
+
+def iid_catbars(incidents):
+    from collections import Counter
+    c = Counter()
+    for x in incidents:
+        for cat in x.get("category", []):
+            c[cat] += 1
+    items = c.most_common()
+    mx = max((v for _, v in items), default=1)
+    tot = sum(v for _, v in items) or 1
+    rows = "".join(
+        f'<li data-cat="{esc(cat)}"><span class="iid-cbl">{esc(CATEGORY_LABEL.get(cat, cat))}</span>'
+        f'<span class="iid-cbar"><i style="--w:{v/mx*100:.0f}%"></i></span>'
+        f'<b class="iid-num" data-to="{v}">0</b></li>'
+        for cat, v in items
+    )
+    return f'<ul class="iid-catbars" role="list">{rows}</ul>'
+
+
+def iid_durbars(incidents):
+    bins = [("< 15m", 0, 15), ("15–60m", 15, 60), ("1–6h", 60, 360), ("6–24h", 360, 1440),
+            ("1–3d", 1440, 4320), ("> 3d", 4320, 10**9)]
+    counts = [0] * len(bins)
+    tot = 0
+    for x in incidents:
+        d = int(x.get("durationMin") or 0)
+        if not d:
+            continue
+        tot += 1
+        for i, (_, lo, hi) in enumerate(bins):
+            if lo <= d < hi:
+                counts[i] += 1
+                break
+    mx = max(counts) or 1
+    rows = "".join(
+        f'<li><span class="iid-dbl">{esc(lbl)}</span><span class="iid-dbar"><i style="--w:{counts[i]/mx*100:.0f}%"></i></span>'
+        f'<b>{(counts[i]/tot*100 if tot else 0):.0f}%</b></li>'
+        for i, (lbl, _, _) in enumerate(bins)
+    )
+    return f'<ul class="iid-durbars" role="list">{rows}</ul>'
+
+
+def iid_signatures(incidents):
+    rows = []
+    for name, kws in _THEMES:
+        hits = []
+        for x in incidents:
+            blob = (x.get("title", "") + " " + x.get("rootCause", "") + " " + x.get("technicalDeepDive", "")
+                    + " " + " ".join(x.get("category", []))).lower()
+            if any(k in blob for k in kws):
+                hits.append(x)
+        if hits:
+            avg = sum(h["_score"] for h in hits) / len(hits)
+            rows.append((len(hits), name, avg))
+    rows.sort(reverse=True)
+    tot = max(1, len(incidents))
+    body = "".join(
+        f'<li><span class="iid-sig-n">{esc(name)}</span>'
+        f'<span class="iid-sig-bar"><i style="--w:{n/tot*100:.0f}%"></i></span>'
+        f'<b class="iid-num" data-to="{n}">0</b><span class="iid-sig-m">mag {avg:.1f}</span></li>'
+        for n, name, avg in rows[:7]
+    )
+    return f'<ul class="iid-sigs" role="list">{body}</ul>'
+
+
+def iid_recent(incidents):
+    recent = sorted(incidents, key=lambda x: x.get("date", ""), reverse=True)[:5]
+    rows = ""
+    for x in recent:
+        band = _severity_band(x["_score"])
+        loc = (x.get("location", {}) or {})
+        where = ", ".join(v for v in [loc.get("city"), loc.get("country")] if v) or "Global"
+        rows += (f'<a class="iid-rec" href="incident-{esc(x["slug"])}.html">'
+                 f'<span class="iid-rec-sev sev-{band}"></span>'
+                 f'<span class="iid-rec-b"><span class="iid-rec-t">{esc(x.get("title","")[:52])}</span>'
+                 f'<span class="iid-rec-m">{esc(x.get("date",""))} · {esc(where)}</span></span>'
+                 f'<span class="iid-rec-tag sev-{band}">{band.upper()}</span></a>')
+    return f'<div class="iid-recent">{rows}</div>'
+
+
+def iid_semantic_graph():
+    path = os.path.join(DATA_DIR, "_cluster.json")
+    if not os.path.exists(path):
+        return ""
+    try:
+        pts = json.load(open(path)).get("incidents", [])
+    except Exception:
+        return ""
+    if len(pts) < 3:
+        return ""
+    W, H, pad = 460, 300, 24
+    nodes = []
+    for p in pts:
+        nodes.append({
+            "x": pad + p["x"] * (W - 2 * pad), "y": pad + (1 - p["y"]) * (H - 2 * pad),
+            "col": _FAC_COL if _domain(p.get("category")) == "facility" else _LOG_COL,
+            "r": 3.5 + (float(p.get("score", 0)) / 10) * 3.5, "ab": op_abbrev(p.get("operator", "")),
+            "op": p.get("operator", ""), "slug": p.get("slug", ""),
+        })
+    # nearest-2 edges
+    edges = []
+    for i, a in enumerate(nodes):
+        d = sorted(((( a["x"]-b["x"])**2+(a["y"]-b["y"])**2, j) for j, b in enumerate(nodes) if j != i))
+        for _, j in d[:2]:
+            key = tuple(sorted((i, j)))
+            if key not in edges:
+                edges.append(key)
+    eg = "".join(f'<line class="iid-edge" data-a="{i}" data-b="{j}" x1="{nodes[i]["x"]:.0f}" y1="{nodes[i]["y"]:.0f}" '
+                 f'x2="{nodes[j]["x"]:.0f}" y2="{nodes[j]["y"]:.0f}"/>' for i, j in edges)
+    nd = "".join(
+        f'<a class="iid-node" href="incident-{esc(n["slug"])}.html" data-i="{i}">'
+        f'<circle cx="{n["x"]:.0f}" cy="{n["y"]:.0f}" r="{n["r"]:.1f}" fill="{n["col"]}" stroke="var(--bg)" stroke-width="0.8">'
+        f'<title>{esc(n["op"])}</title></circle></a>'
+        for i, n in enumerate(nodes)
+    )
+    return (f'<svg class="iid-graph" viewBox="0 0 {W} {H}" role="img" aria-label="Semantic incident-relationship graph">'
+            f'<g class="iid-edges">{eg}</g><g class="iid-nodes">{nd}</g></svg>')
+
+
+def hero_dashboard(incidents):
+    stats = _dash_stats(incidents)
+    legend = ('<div class="iid-maplegend"><span><i style="background:' + _FAC_COL + '"></i>Facility</span>'
+              '<span><i style="background:' + _LOG_COL + '"></i>Network / logical</span>'
+              '<span class="iid-mln">bubble size = magnitude · tap for the dossier</span></div>')
+    footer = (f'<div class="iid-foot"><span><b>Source</b> public post-incident reports</span>'
+              f'<span><b>Coverage</b> {esc(stats["span"])}</span>'
+              f'<span><b>Catalogued</b> {stats["total"]} incidents</span>'
+              f'<span><b>Official RCA</b> {stats["official"]} of {stats["total"]}</span>'
+              f'<a href="#faq-methodology" class="iid-foot-link">Methodology →</a></div>')
+    return (
+        '<section class="iid" aria-label="Incident intelligence dashboard">'
+        '<div class="iid-head"><div><h2 class="iid-title">Incident Intelligence</h2>'
+        '<p class="iid-sub">Global data-center incident landscape · risk map &amp; semantic analysis</p></div>'
+        '<span class="iid-range">All-time · ' + esc(stats["span"]) + '</span></div>'
+        + iid_kpis(stats)
+        + '<div class="iid-grid">'
+        + '<div class="iid-col-l">'
+        + '<div class="iid-panel"><div class="iid-ph">Severity overview</div>' + iid_donut(stats) + '</div>'
+        + '<div class="iid-panel"><div class="iid-ph">Top categories</div>' + iid_catbars(incidents) + '</div>'
+        + '<div class="iid-panel"><div class="iid-ph">Most recent incidents</div>' + iid_recent(incidents) + '</div>'
+        + '</div>'
+        + '<div class="iid-col-c">'
+        + '<div class="iid-panel iid-panel-map"><div class="iid-ph">Risk map · blast radius × severity</div>'
+        + hub_geo_map(incidents) + '</div>'
+        + '<div class="iid-panel"><div class="iid-ph">Semantic map · incident relationships</div>'
+        + '<p class="iid-note">Incidents linked to their nearest failure-signature neighbours (from the research vector index). Hover a node to trace its cluster.</p>'
+        + iid_semantic_graph() + '</div>'
+        + '</div>'
+        + '<div class="iid-col-r">'
+        + '<div class="iid-panel"><div class="iid-ph">Failure signatures</div>' + iid_signatures(incidents) + '</div>'
+        + '<div class="iid-panel"><div class="iid-ph">Duration distribution</div>' + iid_durbars(incidents) + '</div>'
+        + '</div>'
+        + '</div>'
+        + footer
+        + IID_SCRIPT
+        + '</section>'
+    )
+
+
+IID_SCRIPT = ('<script>(function(){'
+              'var rm=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;'
+              'function num(el){var to=parseFloat(el.getAttribute("data-to"))||0,dec=el.getAttribute("data-fmt")==="dec";'
+              'if(rm){el.textContent=dec?to.toFixed(1):to;return;}var t0=null,dur=900;'
+              'function step(ts){if(!t0)t0=ts;var k=Math.min(1,(ts-t0)/dur),v=to*(1-Math.pow(1-k,3));'
+              'el.textContent=dec?v.toFixed(1):Math.round(v);if(k<1)requestAnimationFrame(step);}requestAnimationFrame(step);}'
+              'function reveal(root){root.querySelectorAll(".iid-num").forEach(num);'
+              'root.querySelectorAll(".iid-arc").forEach(function(a){a.style.strokeDasharray=rm?a.getAttribute("data-arc"):"0 9999";'
+              'if(!rm)setTimeout(function(){a.style.strokeDasharray=a.getAttribute("data-arc");},60);});'
+              'root.querySelectorAll("[style*=--w]").forEach(function(b){var i=b.querySelector?b.querySelector("i"):null;});'
+              'root.classList.add("iid-in");}'
+              'var sec=document.querySelector(".iid");if(!sec)return;'
+              'if("IntersectionObserver" in window){var io=new IntersectionObserver(function(es){es.forEach(function(e){'
+              'if(e.isIntersecting){reveal(sec);io.disconnect();}});},{threshold:0.12});io.observe(sec);}else{reveal(sec);}'
+              'var g=sec.querySelector(".iid-graph");if(g){var nodes=[].slice.call(g.querySelectorAll(".iid-node")),'
+              'edges=[].slice.call(g.querySelectorAll(".iid-edge"));'
+              'nodes.forEach(function(n){n.addEventListener("mouseenter",function(){var i=n.getAttribute("data-i");'
+              'g.classList.add("iid-focus");var keep={};keep[i]=1;'
+              'edges.forEach(function( e){if(e.getAttribute("data-a")===i||e.getAttribute("data-b")===i){e.classList.add("on");'
+              'keep[e.getAttribute("data-a")]=1;keep[e.getAttribute("data-b")]=1;}});'
+              'nodes.forEach(function(m){m.classList.toggle("dim",!keep[m.getAttribute("data-i")]);});});'
+              'n.addEventListener("mouseleave",function(){g.classList.remove("iid-focus");'
+              'edges.forEach(function(e){e.classList.remove("on");});nodes.forEach(function(m){m.classList.remove("dim");});});});}'
+              '})();</script>')
 
 
 def render_incident(inc, rank):
