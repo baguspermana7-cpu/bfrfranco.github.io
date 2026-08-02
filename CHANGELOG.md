@@ -13,6 +13,25 @@ release sections rather than semver.
 
 ---
 
+## v1.124.5 — 2026-08-02 (DC Incidents — deep forensic re-research, batch 2 of 5: facility power/cooling)
+
+Second deep-forensic batch (Opus Workflow, 15 agents, ~762k tokens) re-researching the five
+facility power/cooling incidents to the QA-standard depth floor: **Delta Atlanta switchgear**,
+**Equinix LD8 UPS static-switch**, **British Airways Boadicea House power-surge**, **Azure South
+Central US lightning/cooling**, **Cloudflare/Flexential PDX-04 power**. Each now carries a
+specific mechanism (test-transfer-triggered transformer fire and an undetected A+B wiring defect
+on 300/7000 Delta servers; Galaxy UPS output-static-switch → fire-alarm safety-off; uncontrolled
+UPS reconnection surge; chiller protective lock-out and failed cooling redundancy; PGE feed loss
++ generator-handling + hidden HA dependencies), a **16–19-step forensic SOE**, ≥8 metrics, and
+grouped Safety/Maintenance/Design/Process improvements — with explicit disclosure of what is
+reported vs. independently verified (e.g. Delta's "power control module" wording, no public
+component/model, BA's unadjudicated cause). Merged via `tools/_ingest_deep.py`.
+
+Root-gated; gates: incidents-corpus 25/25, page-gates CLEAN, script-tags CLEAN. (Vector index +
+semantic-map cluster refresh deferred to a single pass after batch 5.)
+
+---
+
 ## v1.124.4 — 2026-08-02 (DC Incidents — dossier UX: methodology, reading column, share, traces)
 
 Second UI pass on the root-gated incident library (`tools/build-incidents.py`):

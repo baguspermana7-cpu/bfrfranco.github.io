@@ -35,148 +35,213 @@
  },
  "sequenceOfEvents": [
   {
-   "t": "2020-08-18T04:23:00+01:00",
-   "phase": "Trigger",
-   "event": "A UPS system at LD8 fails. Onset is best evidenced at ~04:23-04:28 BST (Giganet observed feed loss at 04:23; BT's interruption began 04:28); Equinix's own later timing — its first statement coming 'some eight hours after the issue started' — independently brackets onset to ~04:04-04:24 BST.",
-   "source": "DCD (Giganet) / The Register (BT and onset timing)"
+   "t": "2020-08-18 ~04:23-04:24 BST",
+   "phase": "TRIGGER",
+   "event": "Onset: Equinix LD8 (8/9 Harbour Exchange) loses power on the affected train; Giganet reports losing 'both A+B feeds' to a rack (~04:23 per Giganet, ~04:24 per Skipsey). Minor onset spread (~04:23-04:30) reflects detection vs LINX-logged times.",
+   "source": "Tech Monitor (Giganet) / The Register (Skipsey tweet)"
   },
   {
-   "t": "2020-08-18T04:23:00+01:00",
-   "phase": "Impact",
-   "event": "Giganet loses power on BOTH the 'diverse' A and B feeds to one of its two LD8 racks simultaneously at ~04:23 — direct evidence of a common-mode loss defeating the contracted 2N redundancy.",
-   "source": "DCD (Giganet incident report)"
+   "t": "2020-08-18 04:33",
+   "phase": "TRIGGER",
+   "event": "The output static switch of the Galaxy UPS fails and emits smoke, triggering the building 8/9 fire-detection system; per the Equinix RFO the failed node was the 'main static transfer switch common output cabinet' (RFO single-source, not re-verifiable).",
+   "source": "Equinix RFO via Comtec (flagged) — corroborated by The Register (static-switch failure)"
   },
   {
-   "t": "2020-08-18T04:23:00+01:00",
-   "phase": "Cascade",
-   "event": "The UPS failure triggers the data-centre fire alarm (no actual fire). Per The Register, the alarm was set off by the failure of an output static switch on a Galaxy UPS serving levels 1-4 — a life-safety interlock path on top of the feed loss.",
-   "source": "DCD (Giganet) / The Register"
+   "t": "2020-08-18 04:33",
+   "phase": "DETECTION",
+   "event": "Fire alarm annunciates and Equinix facilities technicians respond immediately (per RFO time; onset itself was ~04:24).",
+   "source": "Equinix RFO via Comtec (flagged)"
   },
   {
-   "t": "2020-08-18T04:25:00+01:00",
-   "phase": "Escalation",
-   "event": "Levels 1-4 are powered down 'per safety procedures' following the fire-alarm trip (The Register); the site's physical access-control / badge-in system is itself knocked offline (Giganet, relayed via DCD).",
-   "source": "The Register (levels 1-4 power-down) / DCD (Giganet CTO Matthew Skipsey, access-control offline)"
+   "t": "2020-08-18 ~04:33",
+   "phase": "DETECTION",
+   "event": "Responders find smoke but no open fire — combustion products from the faulting solid-state switch, not a sustained flame; Exponential-e 'confirmed the facility wasn't on fire.'",
+   "source": "The Register"
   },
   {
-   "t": "2020-08-18T08:03:00+01:00",
-   "phase": "Recovery",
-   "event": "Early, partial restoration: some services return well ahead of full resolution — BT's interruption ends around 08:03 BST — while many other customers remain down. Recovery is staggered, not uniform.",
-   "source": "The Register (BT restoration ~08:03)"
+   "t": "2020-08-18 ~04:33",
+   "phase": "CASCADE",
+   "event": "The fault forces the UPS to shut down, causing (per RFO) a 'total loss of all customer power supplies supported by busbar risers ISP8 and ISP9' (riser names RFO single-source).",
+   "source": "Equinix RFO via Comtec (flagged)"
   },
   {
-   "t": "2020-08-18T12:04:00+01:00",
-   "phase": "Diagnosis",
-   "event": "Equinix issues its FIRST public statement, roughly eight hours after onset (around midday BST), diagnosing the root cause as 'a faulty UPS system' and giving no fix ETA. Customers publicly criticise the ~7-8h communication silence.",
-   "source": "DCD / Computer Weekly"
+   "t": "2020-08-18 ~04:33",
+   "phase": "IMPACT",
+   "event": "Levels 1-4 of building 8/9 lose power; the outage takes down 1 of 11 LINX LON1/LON2 points of presence, directly affecting approximately 150 LINX members.",
+   "source": "The Register / LINX"
   },
   {
-   "t": "2020-08-18T14:00:00+01:00",
-   "phase": "Mitigation",
-   "event": "Equinix relaxes its Covid-19 site-access rules (keeping temperature checks and face coverings) to admit more customers for hands-on equipment recovery; customers queue outside, hampered by the offline access-control system.",
-   "source": "DCD (Equinix / Giganet)"
+   "t": "2020-08-18 ~04:33",
+   "phase": "MITIGATION",
+   "event": "On the fire alarm, 'all systems within the vicinity of the fault – from levels one to four – were powered down' and the IBX was 'evacuated', delaying hands-on remediation.",
+   "source": "The Register"
   },
   {
-   "t": "2020-08-18T18:49:00+01:00",
-   "phase": "Recovery",
-   "event": "Staggered restoration continues into the evening (DCD Update 2): some customers report services returning while others remain down.",
-   "source": "DCD (Update 2)"
+   "t": "2020-08-18 ~04:33",
+   "phase": "MITIGATION",
+   "event": "Fire suppression does not discharge and is not needed (per RFO, 'not activated nor required to do so at any point') — correct behaviour for electrical smoke without sustained fire; the facility 'wasn't on fire.'",
+   "source": "Equinix RFO via Comtec (flagged) / The Register"
   },
   {
-   "t": "2020-08-18T21:50:00+01:00",
-   "phase": "Restored",
-   "event": "Equinix declares the incident over, stating 'all services have now been resolved' — end of incident ~17.5 hours after onset.",
-   "source": "DCD (Update 3)"
+   "t": "2020-08-18 ~04:33",
+   "phase": "CASCADE",
+   "event": "Customer A/B redundancy is defeated because the affected feeds derived from the same UPS; Giganet 'suspect[s] a lack of resiliency' and notes all its kit is 'dual fed with diverse A+B power feeds' yet both were lost.",
+   "source": "Tech Monitor (Giganet)"
+  },
+  {
+   "t": "2020-08-18 by 08:03 BST",
+   "phase": "RECOVERY",
+   "event": "BT Ethernet services restored to affected BT Enterprise/Global customers (interruption 04:28-08:03) — an early, partial recovery ahead of the wider site.",
+   "source": "The Register (BT statement)"
+  },
+  {
+   "t": "2020-08-18 ~08:42 BST",
+   "phase": "MITIGATION",
+   "event": "Equinix and contractors begin migrating customer power supplies onto newly commissioned infrastructure ('a decidedly non-live migrate' of systems 'due to be replaced') rather than restoring the faulted cabinet in place (08:42 exact time is Interstatus-only, flagged).",
+   "source": "Tech Monitor (Giganet / John Leach)"
+  },
+  {
+   "t": "2020-08-18 11:46 BST",
+   "phase": "RECOVERY",
+   "event": "'Power is now being restored to the site and LINX equipment is in the process of being brought live again.'",
+   "source": "LINX statement"
+  },
+  {
+   "t": "2020-08-18 12:04 BST",
+   "phase": "MITIGATION",
+   "event": "Equinix issues its first public statement: 'Equinix engineers have diagnosed the root cause of the issue as a faulty UPS ... system' — an under-detailed early attribution relative to the customer-distributed RFO.",
+   "source": "Tech Monitor (Equinix statement)"
+  },
+  {
+   "t": "2020-08-18 13:42 BST",
+   "phase": "RECOVERY",
+   "event": "'All of LINX devices have been restored' — roughly nine hours after onset; LINX rode through at network level with the other ten PoPs unaffected.",
+   "source": "LINX statement"
+  },
+  {
+   "t": "2020-08-18 21:49 BST",
+   "phase": "RESTORED",
+   "event": "Equinix confirms complete and stable power was restored to the whole site — roughly a 17.5-hour end-to-end event from ~04:24 onset.",
+   "source": "LINX statement"
+  },
+  {
+   "t": "2020-08-18 ~22:20 BST",
+   "phase": "RESTORED",
+   "event": "Final circuits reported restored, ~18 hours after the outage began (Tech Monitor update, 19 Aug).",
+   "source": "Tech Monitor"
   }
  ],
  "metrics": [
   {
-   "label": "Total outage duration (to full resolution)",
-   "value": "~17.5 hours (~04:23 → 21:50 BST); recovery staggered — some services, e.g. BT, restored by ~08:03",
-   "source": "Derived from DCD/Register onset + DCD resolution and Register BT-restoration timing"
+   "label": "Onset (both A+B feeds lost)",
+   "value": "~04:23-04:24 BST, 18 Aug 2020",
+   "source": "Tech Monitor (Giganet) / The Register (Skipsey)"
   },
   {
-   "label": "LINX members affected",
+   "label": "Fire alarm / detection time",
+   "value": "04:33 BST (per Equinix RFO)",
+   "source": "Equinix RFO via Comtec (flagged)"
+  },
+  {
+   "label": "Total end-to-end outage duration",
+   "value": "~17.5-18 h (~04:24 onset to 21:49 whole-site / ~22:20 final circuits)",
+   "source": "LINX / Tech Monitor"
+  },
+  {
+   "label": "LINX members directly affected",
    "value": "~150",
-   "source": "DCD (LINX statement); corroborated by The Register ('150 of their members are affected')"
+   "source": "LINX statement / The Register"
   },
   {
-   "label": "Time to first public communication",
-   "value": "~8 hours (onset ~04:23 → first statement ~midday BST)",
-   "source": "DCD / Computer Weekly"
+   "label": "LINX PoPs impacted",
+   "value": "1 of 11 LON1/LON2 points of presence",
+   "source": "LINX statement"
   },
   {
-   "label": "Redundancy design vs outcome",
-   "value": "2N 'diverse' A+B feeds contracted; both lost simultaneously",
-   "source": "DCD (Giganet incident report)"
+   "label": "Building levels lost",
+   "value": "Levels 1-4 of building 8/9",
+   "source": "The Register (Equinix update)"
   },
   {
-   "label": "Facility floors de-energised",
-   "value": "Levels 1-4 powered down 'per safety procedures' after the fire-alarm trip",
-   "source": "The Register (Galaxy UPS static-switch / fire-alarm detail); scope corroborated by facility-wide access-control outage (DCD/Giganet)"
+   "label": "Busbar risers dropped",
+   "value": "2 (ISP8 and ISP9)",
+   "source": "Equinix RFO via Comtec (flagged, single-source)"
   },
   {
-   "label": "Recovery profile",
-   "value": "Staggered, all-day recovery: some services back by ~08:03 (BT); Equinix declared all services resolved 21:50 BST",
-   "source": "The Register / DCD Updates 2 & 3"
+   "label": "Fire suppression discharge",
+   "value": "0 (not activated; facility 'wasn't on fire')",
+   "source": "Equinix RFO via Comtec (flagged) / The Register"
   },
   {
-   "label": "Downstream operators impacted",
-   "value": "DCD named 6 ISPs (Epsilon, SiPalto, EX Networks, Fast2Host, ICUK.net, Evoke Telecom); The Register additionally named BT, Sky, Virgin Media, Exponential-e (M12/Giganet)",
-   "source": "DCD / The Register"
+   "label": "BT Ethernet services restored",
+   "value": "by 08:03 BST (interruption 04:28-08:03)",
+   "source": "The Register (BT statement)"
   },
   {
-   "label": "Financial / SLA-credit impact",
-   "value": "Not published (no GBP/USD or compensation figures disclosed)",
-   "source": "Ledger gap note (never published)"
+   "label": "LINX power restoration start",
+   "value": "11:46 BST",
+   "source": "LINX statement"
   },
   {
-   "label": "Contrast — 2016 LD8 UPS outage",
-   "value": "Limited customers; restored within minutes",
-   "source": "DCD (Equinix UK MD Russell Poole)"
+   "label": "All LINX devices restored",
+   "value": "13:42 BST (~9 h after onset)",
+   "source": "LINX statement"
+  },
+  {
+   "label": "Whole-site stable power restored",
+   "value": "21:49 BST",
+   "source": "LINX statement"
+  },
+  {
+   "label": "First Equinix public statement",
+   "value": "12:04 BST ('faulty UPS')",
+   "source": "Tech Monitor"
   }
  ],
  "rootCause": "Trigger. In the early hours of 18 August 2020 (customer-observed onset ~04:24 BST; Equinix's stated onset 04:40), the output static switch of a Schneider 'Galaxy' UPS system serving levels 1 through 4 of building 8/9 at Equinix's LD8 (Docklands, former Telecity) IBX failed. Equinix's own diagnosis, relayed via a customer IBX update quoted by The Register, named the root cause as 'a faulty UPS (uninterrupted power supply) system,' and stated that 'the fire alarm was triggered by the failure of output static switch from Galaxy UPS system supporting levels 1, 2, 3, 4' in building 8/9. The output static switch is the solid-state transfer element on the UPS output that selects between the inverter path and the bypass/mains path; its failure is the point at which conditioned power to the downstream distribution serving those four levels was compromised.\n\nMechanism and escalation. The static-switch failure triggered the site fire alarm even though there was no actual fire. In accordance with site safety procedures, all systems in the vicinity of the fault across levels 1 to 4 were then powered down and the IBX was evacuated. The escalation path was therefore: electrical fault -> fire-alarm activation -> procedural mass power-down of an entire four-level block. The blast radius was driven as much by the safety response to the alarm as by the electrical fault itself.\n\nWhy redundancy did not protect customers. Customers at LD8 were provisioned with dual 'A+B diverse' power feeds, the standard arrangement intended to survive loss of one supply path. This did not hold. Customer Matthew Skipsey reported that the alarm 'triggered the loss of both our A+B diverse power feeds to our main rack since 04:24,' and LINX reported that 'Simultaneously we lost power to our own A and B power feeds and subsequently our equipment within LD8.' Because the affected racks were fed from within the levels 1-4 block that was powered down, the 'diverse' feeds shared a common upstream dependency, so the loss was common-mode rather than independent. No official Equinix statement explains WHY both diverse feeds were lost together; the common-mode conclusion is an inference from converging customer reports plus the fact that the whole levels 1-4 zone was de-energised. (Note: a further specific timing and a 'clearly unacceptable / lack of resiliency' complaint have been attributed to customer Giganet, but that could not be verified against an accessible source and is excluded here.)\n\nFailover and suppression. There is no evidence that an alternative source (generator or alternate UPS string) automatically picked up the affected racks; the safety-driven power-down removed power from the zone, and recovery required manual work, including at least one operator (M12/Giganet) reporting its LD8 core router had been 'connected to a temporary power feed.' Fire suppression was not involved because there was no fire; the fire ALARM, not suppression, was the propagation mechanism.\n\nDownstream escalation and recovery. The outage propagated into the wider internet because LD8 'hosts one of the eleven points of presence for LINX LON1 and LON2 peering LANs'; 'approximately 150 LINX members will have been directly affected,' and a small number of BT Enterprise/Global Ethernet customers 'experienced an interruption to their Ethernet services between 04:28 and 08:03.' LINX reported power being restored to the site from 11:46 and 'all of LINX devices have been restored' by 13:42. A whole-site restoration time of 21:49 has been cited elsewhere but could not be verified in the accessible sources.\n\nCaveat on authority. Equinix publicly named the cause (faulty UPS) and the failing component (Galaxy UPS output static switch) via a brief customer update quoted by The Register, but no detailed engineering post-incident report was published. The deeper questions -- why the static switch failed, why its failure raised a fire alarm, and why the A+B diverse feeds were commonly dependent -- are not answered by any authoritative Equinix root-cause document in the available evidence.\n\nOfficial confirmation. This pass newly established a genuine primary official source: the LINX (London Internet Exchange) incident statement, a first-party record from an operator directly affected inside LD8. I fetched it directly on 2026-08-01 and verified all three quotes verbatim. It officially confirms the outage mechanism — loss of Equinix-supplied power at ~04:30 BST and the SIMULTANEOUS loss of both A and B feeds — and relays Equinix's confirmation of whole-site power restoration by 21:49 BST. Critical honesty note: LINX does NOT use the word 'UPS' and gives no root cause, so the widely-reported UPS attribution is corroborated by the mechanism but NOT confirmed by any retrieved primary Equinix document; Equinix's customer RFO remains non-public and unreachable here (press pages 403/404, archive.org blocked, WebSearch budget exhausted). officialPostmortem is set true on the strength of the LINX first-party official statement, with the UPS-specific cause flagged as press-sourced rather than officially confirmed.",
  "contributingFactors": [
-  "Common-mode dependency in the 'A+B diverse' power topology: independent customers (Matthew Skipsey; LINX) reported losing BOTH nominally diverse feeds simultaneously (~04:24), indicating the A and B paths for affected racks shared an upstream dependency on the Galaxy UPS system / levels 1-4 power block rather than being truly independent. No Equinix statement confirms the coupling mechanism; it is inferred from converging reports.",
-  "Safety-procedure-driven mass power-down amplified the blast radius: a UPS fault escalated to a fire alarm with no actual fire, and standing safety procedures then required powering down all systems across levels 1-4 and evacuating the IBX, converting a single-component fault into a four-level outage.",
-  "Single-component criticality of the UPS output static switch: the failure of one static switch on the Galaxy UPS serving four levels was sufficient to both compromise conditioned power and trigger the alarm cascade, indicating limited fault isolation between that switch and the fire-detection/safety-shutdown logic.",
-  "Absence of automatic failover to an unaffected source for the de-energised zone: recovery for at least one customer depended on manually connecting equipment to a temporary power feed rather than an automatic transfer, indicating the safety shutdown left no live redundant path within levels 1-4.",
-  "Recurrence at the same facility: the former Telecity LD8 site had a prior July 2016 'brief outage' that took roughly 10 per cent of BT internet subscribers offline, suggesting a latent history of power-plant vulnerability at this location (the 2016 event's specific cause was not disclosed and is not confirmed to be UPS-related)."
+  "Design SPOF: the A and B customer feeds both derived from a single Schneider Galaxy UPS, so one output-static-switch failure collapsed the affected supply and defeated A/B power diversity — Giganet lost 'both A+B feeds' at ~04:23-04:24 (Tech Monitor / The Register).",
+  "Coupled A/B power paths at the UPS: the post-incident fix uses 'independent A+B PDUs and then route to separate UPS systems' whereas 'previously A+B went to a single UPS' (engineer relayed by Giganet's Matthew Skipsey, via Tech Monitor) — confirming diversity was effectively 1N at the shared UPS/static switch.",
+  "Solid-state static-switch vulnerability with no evidenced condition-monitoring intercept: the thyristor/SCR output switch failed in service and only became visible once it emitted smoke and tripped the fire alarm; no verified source evidences predictive/thermal monitoring that caught degradation earlier (physical failure mode undisclosed).",
+  "Safety-driven power-down and evacuation delayed hands-on remediation: 'all systems within the vicinity of the fault – from levels one to four – were powered down' and the IBX was 'evacuated' (The Register) — correct safety behaviour that nonetheless added time before engineers could work the fault.",
+  "Recovery required migrating load onto newly commissioned power infrastructure rather than a fast switch reset — a 'decidedly non-live migrate' of power systems 'due to be replaced' (Tech Monitor) — stretching restoration across ~17.5-18 hours.",
+  "Concentration of critical peering infrastructure: LD8 hosted 1 of 11 LINX LON1/LON2 points of presence, so a single power-domain failure directly affected approximately 150 LINX members (LINX / The Register).",
+  "Communication gap during the event: Equinix's first public statement came at 12:04 (Tech Monitor) and customers (Skipsey) called the lack of communication 'abysmal', while access-control systems were knocked offline, forcing manual two-way-radio operation."
  ],
  "coe": [
   {
-   "action": "Conduct a review into the resiliency of Equinix's power supplies (the single stated corrective action following the outage).",
-   "owner": "Equinix",
-   "status": "Announced / committed (no published findings)",
-   "source": "Computer Weekly, 2020-08-19"
+   "action": "Re-architect A/B feeds via independent A+B PDUs routing to separate UPS systems, decoupling the shared output path so no single UPS/static switch feeds both cords",
+   "owner": "Equinix Operations / Critical Facilities Engineering",
+   "status": "Described as implemented (new infrastructure migrated onto during the event; per engineer relayed by Giganet, Tech Monitor)"
   },
   {
-   "action": "Investigate and eliminate the common-mode dependency between the 'diverse' A and B feeds so a single UPS or static-switch failure cannot take down both sides.",
-   "owner": "Equinix engineering",
-   "status": "Implied by resiliency review; no public confirmation",
-   "source": "DCD (Giganet 2N-defeat evidence) / The Register (static-switch mechanism)"
+   "action": "Audit all LD8 distribution boards, busbar risers (ISP8/ISP9) and common-output cabinets for hidden A/B convergence nodes and eliminate shared single points",
+   "owner": "Equinix Critical Facilities Engineering",
+   "status": "Not publicly confirmed"
   },
   {
-   "action": "Decouple the physical access-control system from the affected power domain (or provide independent backup) so customers can badge in during a power event.",
-   "owner": "Equinix facilities",
-   "status": "Not stated / unconfirmed",
-   "source": "DCD (access-control offline)"
+   "action": "Deploy condition-monitoring (thermal/harmonic trending) on solid-state static switches to catch degradation before in-service failure",
+   "owner": "Equinix Maintenance / M&E",
+   "status": "Not publicly confirmed"
   },
   {
-   "action": "Publish a formal RCA/correction-of-errors and improve incident communications with a defined acknowledgement SLA and restoration ETAs.",
-   "owner": "Equinix",
-   "status": "Not done (no formal RCA published)",
-   "source": "Computer Weekly / DCD (customer criticism of ~8h silence)"
+   "action": "Establish zoned fault-isolation procedures allowing work on a faulted UPS cabinet without full-facility evacuation/power-down halting recovery",
+   "owner": "Equinix Site Safety / Operations",
+   "status": "Not publicly confirmed"
+  },
+  {
+   "action": "Provide affected customers a timely, complete, verifiable RFO and keep access-control systems on protected power",
+   "owner": "Equinix Customer Ops / Communications",
+   "status": "RFO distributed to customers ~2 days later; not published publicly in full"
   }
  ],
  "lessonsLearnt": [
-  "'Diverse' A+B feeds are only as resilient as their least-shared common component — if both paths trace back to one UPS or output static switch, the redundancy is nominal, not real, and a single failure defeats 2N.",
-  "Life-safety interlocks (fire alarm / EPO) can become amplification paths in a power event; a static-switch fault that trips the alarm can force a safety power-down of whole floors, so this coupling must be understood and constrained.",
-  "Ancillary systems on the critical path — here, physical access-control — must survive a power failure, or recovery that depends on customer hands-on access is blocked at the front door.",
-  "Communication is part of resilience: an ~8-hour silence with no ETA magnifies customer harm even while engineers work the technical fix.",
-  "History is not a guarantee: LD8's 2016 UPS event was resolved within minutes affecting few customers; the same failure class in 2020 hit levels 1-4, ~150 members and ran until evening for many tenants — prior mild outcomes should not breed complacency.",
-  "Facility-level failures at internet-exchange sites have outsized blast radius, cascading to downstream ISPs and carriers (BT, Sky, Virgin Media) well beyond direct tenants."
+  "Nominal A/B redundancy is only as strong as its convergence points: a single shared UPS/output static switch nullified dual-corded diversity for affected LD8 customers — Giganet lost 'both A+B feeds' despite 'diverse A+B power feeds' — so redundancy must be verified physically end-to-end, not assumed from the one-line diagram.",
+  "A 'faulty UPS' headline can obscure the real lesson: the trigger was one solid-state output-transfer component (a 'failing output static switch in the Galaxy UPS system (sold by Schneider)', Tech Monitor), and the damage came from where that component sat in the topology, not merely that a UPS failed.",
+  "Fire suppression not firing is not a suppression failure: for electrical smoke without a sustained flame the correct behaviour is non-discharge — the facility 'wasn't on fire' (The Register) — so post-incident review should not chase a phantom suppression fault.",
+  "Recovery time is dominated by the safe path, not detection: detection was immediate (~04:33) but restoration ran ~17.5-18 h because levels 1-4 were powered down and load had to be migrated onto newly commissioned infrastructure ('a decidedly non-live migrate', Tech Monitor) — resilience planning must include a fast, rehearsed alternate-energisation path.",
+  "Concentration risk is real for shared internet infrastructure: a single Equinix power domain directly affected ~150 LINX members even though only 1 of 11 PoPs was hit (LINX) — critical members should dual-site across facilities.",
+  "Keep distinct incidents distinct: The Register flags a separate July 2016 Telecity outage that knocked ~10% of BT subscribers offline; that older event must not be conflated with this 2020 Galaxy static-switch failure."
  ],
  "improvements": [
   "Audit every 'diverse' A/B feed pair end-to-end to confirm true physical and electrical separation with no shared UPS, output static switch, or busway single point of failure.",
@@ -189,27 +254,23 @@
  ],
  "comprehensiveAnalysis": [
   {
-   "heading": "Failure mechanism",
-   "body": "The trigger was a single failed UPS system, the only element Equinix ever officially named as root cause. What made a component failure catastrophic was topology and a life-safety coupling: per The Register, the failure of an output static switch on a Galaxy UPS serving levels 1-4 tripped the fire alarm, forcing a safety power-down of those floors. That took out even the A and B paths marketed as 'diverse' — Giganet's dual-fed rack lost both feeds at the same instant (~04:23 BST). Simultaneous loss of both sides is the signature of a common-mode failure: the two supposedly independent paths shared a dependency, so one fault removed both. Redundancy that shares a single point of failure provides the appearance of 2N without its protection."
+   "heading": "What happened",
+   "body": "In the early hours of 18 August 2020, the output static (transfer) switch of a Schneider Electric Galaxy UPS serving levels 1-4 of building 8/9 at Equinix's LD8 IBX (8/9 Harbour Exchange, Docklands) failed in service. It emitted smoke that tripped the fire-detection system at ~04:33 without a sustained fire, and the UPS shut down, dropping power to the affected floors. Because customers' A and B feeds both derived from this single UPS, dual-corded loads lost both cords together. LD8 hosts 1 of 11 LINX LON1/LON2 points of presence, so ~150 LINX members were directly affected, alongside ISPs including Giganet, Sky, Virgin Media and BT. Whole-site stable power was not restored until 21:49 — an end-to-end event of ~17.5-18 hours."
   },
   {
-   "heading": "Why it cascaded",
-   "body": "Two coupling paths turned a UPS fault into a facility-wide event. First, the static-switch failure tripped the fire alarm, a life-safety interlock that forced de-energisation of levels 1-4 'per safety procedures'. Second, that power-down took the physical access-control system offline. The second cascade is what made recovery so long for many tenants: customers who travelled to LD8 to power-cycle and restore their own kit were left queuing outside, unable to badge in. The failure domain had swallowed the very system needed to fix it."
+   "heading": "Why it was severe (the SPOF)",
+   "body": "The severity came from topology, not just a failed UPS. Redundant A/B power only protects loads if the two paths are independent; at LD8 they converged on one UPS and its output static switch, so a single component fault defeated the diversity customers were paying for. Giganet lost 'both A+B feeds' despite 'diverse A+B power feeds', and an engineer relayed by Giganet's Matthew Skipsey described the rebuild as 'independent A+B PDUs and then route to separate UPS systems' where 'previously A+B went to a single UPS'. The remediation, by construction, confirms the pre-incident coupling."
   },
   {
-   "heading": "Recovery",
-   "body": "Recovery was staggered and uneven rather than a single clean restore. Some services came back within hours — BT's interruption ended around 08:03 BST — while others waited into the evening. Equinix did not acknowledge the incident publicly until roughly eight hours after onset (around midday BST) and gave no ETA. Restoration depended heavily on hands-on customer intervention; Equinix relaxed its Covid-19 access rules (retaining temperature checks and face coverings) specifically to admit more customers to service their equipment. Equinix declared all services resolved at 21:50 BST, roughly 17.5 hours after the fault began. The dependence on customer access, combined with the offline badge system, stretched the tail of the timeline well beyond a pure operator-side repair."
+   "heading": "Detection, safety and the long recovery",
+   "body": "Detection and safety systems behaved correctly: the fire alarm annunciated immediately, fire suppression did not discharge (the site 'wasn't on fire'), and levels 1-4 were powered down and the IBX evacuated per procedure. But those correct safety actions, combined with a recovery path that required migrating customer load onto newly commissioned power infrastructure rather than resetting a switch — 'a decidedly non-live migrate' of gear 'due to be replaced' — drove the ~17.5-18-hour duration. Recovery was staged: BT services back by 08:03, LINX power restoration from 11:46, all LINX devices by 13:42, whole site by 21:49."
   },
   {
-   "heading": "Organisational and systemic factors",
-   "body": "Beyond the electrical fault, the incident exposed organisational gaps: a ~7-8 hour communications void that customers publicly criticised (one noting the first update came around eight hours in with no ETA), and the absence of any formal published RCA — the only stated corrective action was a review 'into the resiliency of its power supplies'. Giganet, whose kit was dual-fed on contracted diverse feeds yet still lost power, concluded the facility lacked the resiliency it had paid for and called the event 'clearly unacceptable'. The lack of a public postmortem leaves the precise interlock physics only partially verified — via The Register's reporting rather than an Equinix engineering statement — and limits industry learning."
-  },
-  {
-   "heading": "Cross-incident pattern",
-   "body": "This event fits a recurring pattern in which nominal redundancy masks a hidden common dependency, and in which ancillary systems (cooling, controls, access) sit inside the same failure domain as the primary load. The contrast with LD8's own 2016 UPS outage — limited customers, restored within minutes per Equinix's then-UK MD — underscores that the same failure class can produce wildly different outcomes depending on blast containment. Because LD8 hosts LINX, the blast radius extended to ~150 exchange members and multiple downstream ISPs and carriers (including BT, Sky and Virgin Media), illustrating how a single facility power fault at an internet-exchange node propagates across the wider connectivity ecosystem."
+   "heading": "Evidence quality and open unknowns",
+   "body": "The core facts are well-corroborated across three verified sources: LINX's official statement, Tech Monitor, and The Register (which independently quotes an Equinix update naming the Galaxy static-switch failure and levels 1-4). The most granular claims — the 'main static transfer switch common output cabinet' phrasing, the ISP8/ISP9 riser names, the exact 04:33 alarm time, and 'suppression not activated' — trace only to the Equinix RFO republished by Comtec, whose URL now 404s with no Wayback snapshot, so they are single-source and flagged. Undisclosed: the Galaxy model line, unit age, battery chemistry, the precise physical failure mode inside the static switch, and whether the SPOF was formally 'known' beforehand (that characterisation appears only in an unverified secondary NOC log)."
   }
  ],
- "technicalDeepDive": "The initiating fault was in the OUTPUT STATIC SWITCH of a Schneider 'Galaxy'-class UPS system feeding levels 1-4 of building 8/9 at LD8. In a double-conversion UPS the static (bypass) switch is the fast solid-state (thyristor/SCR) transfer element on the UPS output that determines whether the load is served from the inverter or transferred to raw mains bypass. It is a single, high-current node in the power path; a fault in it can interrupt or corrupt the output regardless of whether the batteries and inverter are healthy, consistent with downstream racks losing power despite the presence of a UPS.\n\nThe reported behaviour is unusual in one respect: Equinix stated the fire alarm 'was triggered by the failure of output static switch,' yet there was no fire. The sources do not state the exact detection mechanism; a static-switch failure is a plausible source of localised overheating, arcing, or smoke at the UPS/switchgear that an early-warning smoke/thermal detection system could interpret as a fire event, but this specific detector path is not documented. Once the fire alarm activated, the controlling factor became procedural: safety procedure powered down all systems in the vicinity of the fault across levels 1-4 and evacuated the IBX. This is why a single-switch fault produced a four-level outage -- the safety response, not the electrical fault alone, defined the blast radius.\n\nThe critical redundancy question is why nominally independent A and B feeds failed together. Racks were dual-fed with 'diverse' A+B feeds -- the arrangement in which each rack PDU is served by two upstream distribution paths so that loss of one leaves the other live. Skipsey and LINX both report losing both feeds at essentially the same instant (~04:24). For genuinely independent paths this is improbable; the convergence indicates common-mode dependency -- the A and B paths for the affected racks ultimately drew on the same faulted UPS system or terminated within the same levels 1-4 zone that safety procedures de-energised. Powering down the whole zone removes both 'diverse' feeds at once, defeating the intended protection. No automatic transfer to a healthy source is evident; recovery for at least one operator required manually patching a core router onto a temporary power feed, implying the safety shutdown left no live redundant path within the affected block. Fire suppression is not implicated (no fire); the alarm signal, not suppression discharge, was the propagation vector. The precise electrical failure mode of the static switch, the exact detector that raised the alarm, and the topology that coupled the A/B feeds are not disclosed in any authoritative Equinix engineering report within the available evidence.",
+ "technicalDeepDive": "A UPS output static transfer switch is the solid-state (thyristor/SCR) element that transfers the critical output bus between the inverter source and the static-bypass (raw mains) source without a break; in Galaxy topologies a common output cabinet combines module outputs onto the load busbars. At LD8 this power train fed levels 1-4 of building 8/9 (verified via The Register's Equinix-update quote), and per the Equinix RFO the output distributed via two vertical busbar risers, ISP8 and ISP9 (RFO single-source, not re-verifiable). When the static switch faulted it did two things at once: it emitted enough smoke to annunciate the fire-detection system without an open flame (The Register: Exponential-e confirmed the site \\\"wasn't on fire\\\"), and it forced the UPS offline, collapsing the downstream supply. Because the A and B customer feeds both ultimately derived from this single UPS, the failure propagated past the redundancy boundary: dual-corded loads lost both feeds together — Giganet reported losing \\\"both A+B feeds\\\" at ~04:23-04:24 (Tech Monitor / The Register). This is the classic signature of a shared-component single point of failure in a nominally A/B-diverse system: diversity exists upstream and downstream but is nullified at the one place the paths physically merge. Detection worked (fire alarm ~04:33; technicians responded immediately per the RFO), and suppression correctly did not discharge because the event was electrical smoke rather than a sustained fire. The dominant contributor to the ~17.5-18-hour duration was therefore not detection latency but (a) a safety-driven evacuation and power-down of levels 1-4 (The Register: \\\"all systems within the vicinity of the fault – from levels one to four – were powered down\\\"), and (b) the need to migrate customer load onto newly commissioned power infrastructure rather than reset a switch in place — Giganet described Equinix \\\"migrating power supplies onto the new infrastructure following the earlier fault,\\\" and industry observer John Leach called it \\\"power systems that were due to be replaced [that] have failed early and are NOW being replaced. A decidedly non-live migrate\\\" (Tech Monitor). Recovery staged out: BT Ethernet services restored by 08:03 (The Register), LINX power restoration began 11:46, all LINX devices restored 13:42, and whole-site stable power at 21:49 (LINX), with final circuits reported ~22:20 (Tech Monitor).",
  "references": [
   {
    "title": "Outage: Equinix LD8 Reachability — LINX Technical Blog",
@@ -224,6 +285,13 @@
    "type": "vendor-status",
    "quote": "Simultaneously we lost power to our own A and B power feeds and subsequently our equipment within LD8.",
    "accessed": "2026-08-01"
+  },
+  {
+   "title": "Tech Monitor (CBR): Equinix Outage: Major Power Failure Leaves Data Centre Customers Fuming",
+   "url": "https://www.techmonitor.ai/hardware/data-centres/equinix-outage",
+   "type": "press",
+   "quote": "Various customers identified the issue as a failing output static switch in the Galaxy UPS system (sold by Schneider).",
+   "accessed": "2026-08-02"
   },
   {
    "title": "Equinix LD8 data center experiences major outage",
@@ -260,5 +328,6 @@
   "lastVerified": "2026-08-01",
   "confidence": "High on scale (~150 members confirmed by DCD and The Register), on the official root-cause wording ('faulty UPS system', directly quoted), and on the fire-alarm/levels-1-4 power-down mechanism (reported by The Register, attributed to reports, but not confirmed in an Equinix RCA). Onset ~04:23-04:28 BST is well-evidenced (Giganet 04:23; BT 04:28); the derived 04:04 and precise 12:04/18:49 update times carry lower precision. Recovery was staggered (BT ~08:03; full resolution 21:50). Financial and per-user metrics unavailable (never published). Note: DCD and Computer Weekly primary URLs returned HTTP 403 to the fetcher and could not be re-read live; overlapping claims were cross-checked against The Register."
  },
- "lastUpdated": "2026-08-01"
+ "lastUpdated": "2026-08-01",
+ "operatorShort": "Equinix LD8"
 }

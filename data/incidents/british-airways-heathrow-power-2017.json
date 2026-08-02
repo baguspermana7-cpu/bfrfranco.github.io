@@ -35,180 +35,224 @@
  },
  "sequenceOfEvents": [
   {
-   "t": "2017-05-26 (Fri, day before)",
-   "phase": "Detection",
-   "event": "Latent stress signal: BA booking-confirmation emails were already taking roughly 8 hours to arrive instead of minutes, a precursor of system strain ahead of the power event (low-confidence, single-source).",
-   "source": "The Register (theregister.com/2017/06/02)"
+   "t": "c. 2014 (~3 years prior)",
+   "phase": "TRIGGER",
+   "event": "BA replaces Boadicea House UPSes with Socomec 'Smart Powerport' equipment specifiable up to 2.4 MW of backup, backed by battery strings and standby generators; two data centres run active:active, ~500 cabinets across six halls, within ~1 mile of Heathrow's eastern-end runways.",
+   "source": "The Register 2017-06-02, quoting leaked IAG email"
   },
   {
-   "t": "2017-05-27 (Sat) morning, ~09:30 BST (reconstructed; sources establish Saturday-morning timing, not the exact clock time)",
-   "phase": "Trigger",
-   "event": "Power was lost at the Boadicea House data centre. An engineer, authorised to be present but not to perform the action, disconnected a power supply.",
-   "source": "The Register (theregister.com/2017/06/02); IAG/Walsh via BBC (bbc.com/news/business-40159202)"
+   "t": "2017-05-27, ~09:30 (Saturday)",
+   "phase": "TRIGGER",
+   "event": "The UPS feeding the core Boadicea House data centre is manually 'over-ridden' during on-site work at the CBRE-managed facility.",
+   "source": "Leaked IAG email (Bill Francis) via The Register 2017-06-02"
   },
   {
-   "t": "2017-05-27 (Sat) shortly after the disconnect (~09:30 BST, approx.)",
-   "phase": "Escalation",
-   "event": "The power was turned back on in an unplanned and uncontrolled fashion, creating a surge that physically damaged the servers and bypassed the backup generators and batteries. The equipment had functioned; the failure was human mis-operation during restoration.",
-   "source": "Leaked IAG internal email via BBC (bbc.com/news/business-40159202)"
+   "t": "2017-05-27, ~09:30",
+   "phase": "CASCADE",
+   "event": "The override causes 'the total immediate loss of power to the facility, bypassing the backup generators and batteries' — the redundant supply path is stranded rather than picking up the load.",
+   "source": "Leaked IAG email via The Register"
   },
   {
-   "t": "2017-05-27 (Sat) ~09:45 BST (approx., reconstructed)",
-   "phase": "Cascade",
-   "event": "BoHo was physically without power for only about 15 minutes, but the uncommanded shutdown is hypothesised to have synchronised corrupted data to the failover data centre, populating it with bad data and crashing dependent systems — defeating the redundancy (single-source engineering hypothesis).",
-   "source": "The Register (theregister.com/2017/06/02)"
+   "t": "2017-05-27, ~09:30",
+   "phase": "DETECTION",
+   "event": "NOT APPLICABLE / no fire: no smoke, heat, VESDA or aspirating detection activated because no combustion occurred; the event was electrical over-voltage, detected operationally as total loss of the data hall, not by fire sensors.",
+   "source": "Forensic note (public record silent — no fire reported)"
   },
   {
-   "t": "2017-05-27 (Sat, daytime)",
-   "phase": "Impact",
-   "event": "British Airways cancelled all flights, initially until 18:00 BST; check-in, baggage and communications systems were down at Heathrow and Gatwick.",
-   "source": "BBC (bbc.com/news/uk-40069865)"
+   "t": "2017-05-27, ~a few minutes after 09:30",
+   "phase": "TRIGGER",
+   "event": "Power is 'turned back on in an unplanned and uncontrolled fashion' — an unsequenced re-energisation with no staged load ramp or downstream verification.",
+   "source": "Leaked IAG email via The Register"
   },
   {
-   "t": "2017-05-27 (Sat, later)",
-   "phase": "Impact",
-   "event": "The cancellation window was extended beyond 18:00 BST; an aviation expert forecast disruption lasting three to four days.",
-   "source": "BBC (bbc.com/news/uk-40069865)"
+   "t": "2017-05-27, ~a few minutes after 09:30",
+   "phase": "IMPACT",
+   "event": "The uncontrolled re-energisation produces a damaging over-voltage surge (hypothesised battery+generator briefly in series, ~480 V vs ~240 V nominal) that physically damages servers and infrastructure.",
+   "source": "The Register (expert hypothesis, unconfirmed)"
   },
   {
-   "t": "2017-05-28 (Sun)",
-   "phase": "Diagnosis",
-   "event": "Customers reported seeing stale/old flight-booking data in their online accounts — a persisting data-integrity symptom consistent with the corrupted-sync failover hypothesis.",
-   "source": "The Register (theregister.com/2017/06/02)"
+   "t": "2017-05-27, morning",
+   "phase": "MITIGATION",
+   "event": "No gaseous or water-mist SUPPRESSION activated — NOT APPLICABLE: there was no fire to suppress; the damage vector was electrical, so suppression systems had no role and none is reported.",
+   "source": "Forensic note (no fire; record silent)"
   },
   {
-   "t": "2017-05-29 (Mon, ops normalised)",
-   "phase": "Recovery",
-   "event": "Service was restored over roughly two to three days from the 27th, with operations normalising around Monday 29 May; approximately 75,000 passengers were affected and as many as 672 flights grounded before recovery completed.",
-   "source": "DCD (datacenterdynamics.com); IAG/Walsh via BBC (bbc.com/news/business-40159202)"
+   "t": "2017-05-27, morning",
+   "phase": "CASCADE",
+   "event": "Active:active redundancy fails to contain the event; the peer data centre also collapses — reported (unconfirmed) mechanism is that corrupted synchronised data left the failover DC 'populated with enough bad data to crash all the systems depending on it.'",
+   "source": "The Register (source-attributed theory, unconfirmed)"
   },
   {
-   "t": "2017-07 (July 2017)",
-   "phase": "Restored",
-   "event": "IAG confirmed a loss of approximately £58m (~$74.6m) covering passenger compensation and lost business.",
-   "source": "DCD (datacenterdynamics.com)"
+   "t": "2017-05-27, morning",
+   "phase": "IMPACT",
+   "event": "BA's global operations go down; flights cancelled and passengers stranded at Heathrow Terminal 5 and Gatwick on a bank-holiday Saturday. No occupant evacuation of Boadicea House occurred (operational, not life-safety, impact).",
+   "source": "The Register / press-reported"
   },
   {
-   "t": "2019-02-11",
-   "phase": "Restored",
-   "event": "BA's legal dispute with facilities supplier CBRE settled, with no admission of liability, an undisclosed amount, and no jointly agreed root cause.",
-   "source": "DCD (datacenterdynamics.com); Computer Weekly (computerweekly.com/news/252452976)"
+   "t": "2017-05-27, morning",
+   "phase": "MITIGATION",
+   "event": "No London Fire Brigade or ambulance dispatch to Boadicea House — NOT APPLICABLE: no fire or medical emergency at the facility; the emergency-services layer has no entries in the public record.",
+   "source": "Forensic note (no fire)"
+  },
+  {
+   "t": "2017-05-27, day",
+   "phase": "MITIGATION",
+   "event": "De-energisation/isolation and recovery: because hardware was physically damaged (not merely powered down), recovery requires rebuild/restore of damaged infrastructure rather than a clean seconds-long failover.",
+   "source": "Leaked IAG email ('physical damage to the system') via The Register"
+  },
+  {
+   "t": "2017-05-27 / 28",
+   "phase": "DETECTION",
+   "event": "BA chief executive Alex Cruz publicly attributes the outage to a major 'power surge' at 09:30 on Saturday 27 May that caused systems to 'collapse.'",
+   "source": "The Register 2017-06-02"
+  },
+  {
+   "t": "2017-05-27 / 28",
+   "phase": "DETECTION",
+   "event": "National Grid states there was no transmission-network problem in the Heathrow area that weekend; SSE states any surge 'could have taken place at the customer side of the meter' — locating the fault inside BA's facility.",
+   "source": "National Grid & SSE statements via The Register"
+  },
+  {
+   "t": "2017-05-28 onward",
+   "phase": "RECOVERY",
+   "event": "BA progressively restores IT systems and flight operations over the following days as damaged infrastructure is rebuilt/restored; service normalises after the bank-holiday weekend disruption.",
+   "source": "The Register / press-reported timeline"
+  },
+  {
+   "t": "2017-06-02",
+   "phase": "RESTORED",
+   "event": "Leaked internal IAG email from Bill Francis (Head of Group IT) detailing the UPS override and uncontrolled reconnection is reported; CBRE confirms it manages the site, 'fully support[s]' the investigation and says 'no determination has been made yet regarding the cause'; the Daily Mail names a CBRE Global Workplace Solutions contractor.",
+   "source": "Leaked IAG email + CBRE statement + Daily Mail, via The Register 2017-06-02"
+  },
+  {
+   "t": "After 2017",
+   "phase": "RESTORED",
+   "event": "No adjudicated root cause is ever published: the BA/IAG-commissioned independent investigation report is not publicly released and the BA/CBRE civil claim is reportedly settled privately (not verified this pass).",
+   "source": "Public record / The Register (litigation status reportedly settled, unverified this pass)"
   }
  ],
  "metrics": [
   {
-   "label": "BoHo physical power-loss window",
-   "value": "~15 minutes",
-   "source": "The Register (theregister.com/2017/06/02): 'around a quarter of an hour'"
+   "label": "UPS backup rating",
+   "value": "Up to 2.4 MW (Socomec Smart Powerport)",
+   "source": "The Register 2017-06-02 (leaked IAG email)"
   },
   {
-   "label": "End-to-end service recovery",
-   "value": "~2 days (forecast 3-4 days)",
-   "source": "BBC (bbc.com/news/uk-40069865); seed brief 'grounded for two days'"
+   "label": "IT footprint",
+   "value": "~500 cabinets across six halls",
+   "source": "The Register 2017-06-02"
+  },
+  {
+   "label": "Data centres",
+   "value": "2, running active:active",
+   "source": "The Register 2017-06-02"
+  },
+  {
+   "label": "UPS age at incident",
+   "value": "~3 years (replaced c.2014)",
+   "source": "The Register 2017-06-02"
+  },
+  {
+   "label": "Incident start",
+   "value": "09:30, Saturday 27 May 2017",
+   "source": "Alex Cruz / The Register 2017-06-02"
+  },
+  {
+   "label": "Distance to Heathrow runways",
+   "value": "No more than ~1 mile",
+   "source": "The Register 2017-06-02"
+  },
+  {
+   "label": "Hypothesised surge voltage",
+   "value": "~480 V vs ~240 V nominal (conjecture, unconfirmed)",
+   "source": "The Register 2017-06-02 (expert hypothesis)"
   },
   {
    "label": "Passengers affected",
-   "value": "~75,000 (dual-sourced)",
-   "source": "DCD (datacenterdynamics.com) and IAG/Walsh via BBC (bbc.com/news/business-40159202)"
+   "value": "~75,000 (press-reported)",
+   "source": "Press (BBC/Reuters), widely reported — not re-verified this pass"
   },
   {
-   "label": "Flights grounded",
-   "value": "as many as 672 (single-outlet)",
-   "source": "DCD (datacenterdynamics.com)"
-  },
-  {
-   "label": "Confirmed financial loss",
-   "value": "~£58m (~$74.6m)",
-   "source": "IAG, July 2017, via DCD (datacenterdynamics.com)"
-  },
-  {
-   "label": "Precursor email delay (Fri 26 May)",
-   "value": "~8 hours vs. minutes",
-   "source": "The Register (theregister.com/2017/06/02) — low confidence"
-  },
-  {
-   "label": "EU261 passenger compensation schedule",
-   "value": "EUR250 short-haul / EUR400 medium-haul / up to EUR600 long-haul",
-   "source": "EU261 statutory schedule; disruption context via BBC (bbc.com/news/uk-40069865)"
-  },
-  {
-   "label": "Hypothesised over-voltage on rack bus",
-   "value": "480V vs 240V nominal (2x)",
-   "source": "The Register (theregister.com/2017/06/02) — engineering hypothesis, not confirmed"
+   "label": "Estimated cost to IAG",
+   "value": "~£80m (press-reported)",
+   "source": "Press (IAG/Willie Walsh statements), widely reported — not re-verified this pass"
   }
  ],
- "rootCause": "No authoritative or adjudicated root cause was ever published for the 27 May 2017 British Airways outage at the Boadicea House (BoHo) core data centre near London Heathrow. Every root-cause account on record originates from the operator side (IAG/BA), was disputed by the facilities manager (CBRE), and the litigation that would have tested the competing accounts was resolved without any published judicial finding on cause. The reconstruction below reflects the best-corroborated operator account, with disputed and unverified points flagged.\n\nTRIGGER (human/operational). Per the leaked internal explanation attributed to IAG Group IT head Bill Francis, an Uninterruptible Power Supply (UPS) feeding the BoHo core data centre was \"over-ridden\" on the Saturday morning, which \"resulted in the total immediate loss of power to the facility, bypassing the backup generators and batteries\" (The Register; the same \"bypassing the backup generators and batteries\" line appears in the leaked IAG email reported by Network World). IAG CEO Willie Walsh framed the same trigger in human terms - an engineer disconnected a power supply - which BA later characterised in its High Court claim as an \"unauthorised reconnection of servers after they had been accidentally unplugged from the power supply by an engineer\" (ch-aviation). The two operator descriptions are consistent in outcome: an immediate, total loss of power to the facility.\n\nWHY THE SAFEGUARDS DID NOT CARRY THE LOAD. The defining feature is that the redundant power infrastructure did not carry the load: the internal account states the loss occurred while \"bypassing the backup generators and batteries.\" Rather than transferring seamlessly to battery-backed UPS output and generator power, the facility went fully dark. Contemporary reporting indicated the external grid supply was not the cause and the fault lay inside the facility's own power chain; however, the specific National Grid / SSE statements sometimes cited for this point could not be independently re-verified in this review and should be treated as reported, not confirmed.\n\nPROPAGATION - THE DAMAGE-CAUSING EVENT. The outage itself did not destroy the hardware; the uncontrolled RESTORATION did. \"After a few minutes of this shutdown of power, it was turned back on in an unplanned and uncontrolled fashion, which created physical damage to the system\" (The Register). A BA spokesperson restated the mechanism: \"There was a loss of power to the U.K. data center, which was compounded by the uncontrolled return of power, which caused a power surge taking out our IT systems\" (Network World). The causal weight sits on \"uncontrolled\": restoring power to a large IT load without proper sequencing produced a surge that physically damaged servers and IT hardware. One unattributed technical scenario in The Register speculated that the battery and generator supplies were briefly connected in series, yielding roughly 480V instead of 240V and causing a \"literal meltdown\" - but this is explicitly speculation from an anonymous source and is NOT officially confirmed.\n\nESCALATION AND RECOVERY. Because the failure physically damaged hardware rather than merely interrupting it, recovery required repair and rebuild, extending the event into a multi-day, airline-wide disruption. The impact stranded roughly 75,000 passengers and forced about 672 flight cancellations; IAG put the cost at around EUR65 million (about USD74 million) per ch-aviation (higher £80m-plus figures cited elsewhere could not be verified here).\n\nDISPUTED / UNRESOLVED STATUS. CBRE, the facilities manager, disputed the engineer-error account, stating at the time that \"no determination has been made yet regarding the causes of the incident on May 27\" (Network World). BA commissioned an independent audit whose findings were never published, and filed a claim against CBRE in the London High Court (ch-aviation). The suit was subsequently resolved; the specific settlement date and any \"no admission of liability\" wording could not be verified from approved sources, but no judicial ruling on cause was ever published. Accordingly, the human/operational trigger and the uncontrolled-restoration damage mechanism are the operator's account - corroborated across multiple operator statements and a leaked internal email - but never independently adjudicated.",
+ "rootCause": "SPECIFIC MECHANISM (not fire — electrical over-voltage). There was no ignition, no combustion, no flame. The damaging agent was an uncontrolled electrical over-voltage transient — a power surge generated inside British Airways' own facility (Boadicea House / \"BoHo\", a core data centre within ~1 mile of Heathrow's eastern-end runways). The central equipment was the site Uninterruptible Power Supply: reported by The Register (2017-06-02) as Socomec \"Smart Powerport\" units, replaced ~3 years before the 27 May 2017 incident (i.e. c.2014), rated to supply up to 2.4 MW of backup, backed by battery strings and standby generators. Battery chemistry was NEVER stated in the record; era-typical UPS strings are VRLA lead-acid, but that is inference, not sourced fact. Crucially the batteries were BYPASSED, not thermally involved — so there is NO battery thermal-runaway or fire mechanism here, and any framing of this as a \"battery fire\" would be false.\n\nPROXIMATE FAILURE MECHANISM (sourced). Per the leaked internal IAG email from Bill Francis (Head of Group IT), an Uninterruptible Power Supply to a core data centre at Heathrow \"was over-ridden on Saturday morning.\" The email states this \"resulted in the total immediate loss of power to the facility, bypassing the backup generators and batteries.\" Then \"after a few minutes of this shutdown of power, it was turned back on in an unplanned and uncontrolled fashion, which created physical damage to the system.\" Sequence: (1) manual override/bypass of the UPS that dropped the entire critical load and defeated — rather than transferred onto — the generator+battery redundancy; then (2) an uncontrolled, unsequenced re-energisation that produced a damaging over-voltage which physically destroyed IT hardware. The leading hypothesis, reported by The Register, is that improper switching \"could have briefly connected both [battery and generator] in series, delivering 480 volts instead of the normal 240 volts to server racks.\" This ~480 V vs ~240 V figure is conjecture reported in the press, NOT a confirmed measured engineering finding; BA never published fault data. External corroboration that the fault originated inside BA's fence: National Grid confirmed no transmission-network problem in the Heathrow area that weekend, and Scottish and Southern (SSE) stated \"the power surge that BA is referring to could have taken place at the customer side of the meter.\"\n\nLATENT ROOT — design + redundancy. Design intent was full resilience: two data centres running active:active, ~500 cabinets across six halls, with UPS+battery+generator backup rated to 2.4 MW. That redundancy did not contain the event; it propagated it. The reported (unconfirmed, attributed to The Register's \"source\") mechanism is that an uncommanded shutdown caused corrupted data to be synchronised between the two sites as BoHo died, so the failover DC \"could have been populated with enough bad data to crash all the systems depending on it\" — i.e. tight active:active coupling let a fault at one site contaminate its twin, converting redundancy from a safety margin into a shared failure path. The physical over-voltage also meant recovery was not a clean failover but a hardware rebuild/restore, which is why the outage ran for days rather than seconds.\n\nLATENT ROOT — maintenance / method-of-procedure. The implicated (never adjudicated) lapse is a work-procedure / method-of-procedure (MOP) failure. The proximate human act — over-riding the UPS and then restoring power \"in an unplanned and uncontrolled fashion\" — is the antithesis of a controlled, staged, load-verified re-energisation. It implies either no valid MOP for the Saturday work, or a MOP that was breached, plus an operation that bypassed generators AND batteries instead of transferring load onto them. The facility was managed by CBRE Global Workplace Solutions under contract to BA; the Daily Mail (reported via The Register) \"fingered a contractor from CBRE Global Workplace Solutions as the culprit,\" but CBRE publicly said only that it is \"the manager of the facility\" and \"fully support[s]\" BA's investigation and that \"no determination has been made yet regarding the cause.\" No maintenance log, testing record or work permit for that Saturday has ever been made public. BA/IAG commissioned an independent investigation that was never publicly released, and the BA/CBRE civil claim was reportedly settled privately (not verified this pass), so the official root cause remains legally unresolved and largely non-public.",
  "contributingFactors": [
-  "Power-chain design / failover weakness: overriding a single UPS produced a 'total immediate loss of power to the facility, bypassing the backup generators and batteries' - the redundant generator and battery infrastructure did not automatically carry the load, turning one action into a full facility blackout (The Register; leaked IAG email via Network World).",
-  "Lack of a controlled power-restoration procedure: power was 'turned back on in an unplanned and uncontrolled fashion,' with no enforced staged / sequenced re-energisation to limit inrush and surge - which converted a recoverable outage into physical hardware destruction (The Register; Network World).",
-  "Human/operational error and change-control gap: the trigger is attributed to an engineer disconnecting a power supply and an 'unauthorised reconnection,' pointing to weaknesses in authorisation, procedure and supervision around live power work in a core data centre (ch-aviation; Network World).",
-  "Split operational responsibility between BA (IAG) and outsourced facilities manager CBRE: the two parties gave conflicting accounts and disputed responsibility, and the cause was never jointly determined - an organisational/governance factor that left root cause unresolved (Network World).",
-  "No power-side protection preventing an internal transient from destroying IT hardware: because servers could be physically damaged by a single surge event, recovery required rebuilding damaged systems rather than a simple failover or restart (Network World; The Register).",
-  "Absence of a published, authoritative post-incident investigation: BA's commissioned independent audit was never published and the High Court litigation produced no published ruling on cause, so no corrective root cause was ever formally established or shared (ch-aviation)."
+  "MAINTENANCE / MOP FAILURE (proximate): the UPS was manually 'over-ridden' and then power was restored 'in an unplanned and uncontrolled fashion' — the opposite of a controlled, sequenced, load-verified re-energisation. No authorised method-of-procedure or work permit for the Saturday work has ever been made public, so whether a valid MOP existed or was breached is unestablished (leaked IAG email via The Register, 2017-06-02).",
+  "REDUNDANCY BYPASSED RATHER THAN TRANSFERRED: the override caused 'the total immediate loss of power to the facility, bypassing the backup generators and batteries.' The N+ backup path (generators + battery strings) that should have carried the critical load was stranded instead of picking it up (leaked IAG email via The Register).",
+  "TIGHTLY-COUPLED ACTIVE:ACTIVE DESIGN: two data centres synchronised live state, so a fault at Boadicea House was not isolated — the reported (unconfirmed) mechanism is that corrupted synchronised data left the failover site 'populated with enough bad data to crash all the systems depending on it,' turning redundancy into a shared failure path (The Register, source-attributed theory).",
+  "UNCONTROLLED RE-ENERGISATION WITH NO STAGED RAMP: reconnecting power without sequencing sources or verifying downstream state produced a damaging over-voltage (hypothesised battery+generator briefly in series, ~480 V vs ~240 V nominal) that physically destroyed hardware, forcing rebuild/restore rather than clean failover (The Register, expert hypothesis — unconfirmed).",
+  "SPLIT OPERATIONAL ACCOUNTABILITY BA/CBRE: the facility was managed by CBRE Global Workplace Solutions under contract to BA; the contractor allegedly involved was named only by the Daily Mail (via The Register) while CBRE said 'no determination has been made yet regarding the cause,' indicating unclear ownership of the switching operation and its controls.",
+  "PHYSICAL HARDWARE DAMAGE (not just outage): the surge 'created physical damage to the system,' meaning recovery required replacing/rebuilding damaged infrastructure rather than a seconds-long failover — a major driver of the multi-day operational impact (leaked IAG email via The Register).",
+  "TIMING / CHANGE-CONTROL EXPOSURE: live critical-power switching was performed on a bank-holiday Saturday at the start of a peak travel weekend, maximising passenger impact when a change-freeze on peak windows would have reduced exposure (Alex Cruz confirmed 09:30 Sat 27 May start, via The Register)."
  ],
  "coe": [
   {
-   "action": "British Airways pursued legal action against its data-centre management supplier CBRE, alleging supplier fault (reported ~18 months after the outage).",
-   "owner": "British Airways / IAG (claimant)",
-   "status": "Filed/Reported (Nov 2018), subsequently settled",
-   "source": "Computer Weekly (computerweekly.com/news/252452976)"
+   "action": "Publish and enforce an approved MOP/SOP/EOP for all UPS bypass and re-energisation operations on critical power",
+   "owner": "BA Group IT + CBRE Global Workplace Solutions",
+   "status": "Not publicly confirmed"
   },
   {
-   "action": "The BA v CBRE dispute was settled with no admission of liability, an undisclosed amount, and no jointly agreed root cause.",
-   "owner": "British Airways and CBRE",
-   "status": "Closed (settled 11 Feb 2019)",
-   "source": "DCD (datacenterdynamics.com)"
+   "action": "Independent investigation to establish adjudicated root cause",
+   "owner": "BA / IAG",
+   "status": "Commissioned; report never publicly released"
   },
   {
-   "action": "IAG quantified and confirmed the financial impact publicly (~£58m), acknowledging passenger compensation and lost-business exposure and the EU261 payout schedule.",
-   "owner": "IAG / British Airways",
-   "status": "Confirmed (July 2017)",
-   "source": "DCD (datacenterdynamics.com); BBC (bbc.com/news/uk-40069865)"
+   "action": "Re-architect active:active replication to gate on data integrity and prevent corrupt-state propagation to the failover site",
+   "owner": "BA Group IT",
+   "status": "Unknown / not disclosed"
   },
   {
-   "action": "No formal operator or regulatory postmortem (BA, IAG, CBRE, CAA or Parliamentary) was ever published; all mechanism detail rests on press attribution and a leaked internal email. This transparency gap is itself an unclosed corrective item.",
-   "owner": "BA / IAG / CBRE / CAA",
-   "status": "Open / Never published",
-   "source": "Analytical observation on the public record (absence of any published RCA)"
+   "action": "Clarify BA/CBRE RACI for critical-power switching and its interlock/protection controls",
+   "owner": "BA + CBRE",
+   "status": "Unknown / not disclosed"
+  },
+  {
+   "action": "Civil claim BA/IAG vs CBRE over the outage",
+   "owner": "BA/IAG legal",
+   "status": "Reportedly settled privately (not verified this pass)"
   }
  ],
  "lessonsLearnt": [
-  "A brief physical fault can become a multi-day outage. The BoHo site lost power for only ~15 minutes, yet recovery took days because the surge caused physical hardware damage and the failover was defeated — time-to-recover is governed by damage and data integrity, not by fault duration.",
-  "Redundancy that shares a failure path is not redundancy. An active/active pair that synchronises corrupted state during an uncommanded shutdown can propagate the fault to the backup, turning a single-site incident into a total service loss.",
-  "Human error during restoration is as dangerous as during the initial fault. Walsh's own framing — that it is easy to understand a mistake in disconnecting power but hard to understand a mistake in reconnecting it — highlights that the reconnection step needs the same rigour, gating and supervision as any hazardous change.",
-  "Authorisation to be present is not authorisation to act. Physical access and permitted-action scope must be separated and enforced procedurally, not left to individual judgement.",
-  "Absence of a published, agreed root cause harms industry learning. The settlement with no admission of liability and no jointly agreed cause leaves the sector to learn from leaked emails and press reconstruction rather than a validated RCA."
+  "Redundancy is only as good as the switching procedure around it: a single uncontrolled human switching action defeated the generators, batteries and a twin active:active data centre all at once.",
+  "Tight active:active coupling can convert a local fault into a shared-mode failure — synchronisation that spreads good state will just as faithfully spread corrupted state to the site meant to be your safety net.",
+  "The lasting damage came from RE-ENERGISATION, not the outage: the most dangerous moment in critical-power work is turning power back on, which must be staged, phase-synchronised and downstream-verified — never 'unplanned and uncontrolled.'",
+  "Split operational accountability between an asset owner (BA) and a facilities-management contractor (CBRE) blurs who owns critical switching and its interlocks; that ambiguity is itself a latent hazard.",
+  "Relying on external forensics to learn from your own incident is fragile: with the investigation report unreleased and the claim reportedly settled privately, the public lessons here rest almost entirely on one leaked email and press reporting."
  ],
  "improvements": [
-  "Enforce change management on power operations: any disconnect/reconnect of live UPS/generator/battery supplies should require a permit-to-work, a second-person verification, and a controlled, ramped re-energisation sequence that cannot bridge battery and generator sources onto the rack bus.",
-  "Harden failover against fault propagation: add integrity gating and quorum/health checks before synchronising state to the secondary site, so an uncommanded shutdown cannot replicate corrupted data and crash the standby.",
-  "Separate physical access from action authorisation, with technical interlocks and supervision for hazardous switching, so being authorised to enter the room never implies being authorised to operate power equipment.",
-  "Rehearse damage-mode recovery, not just power-loss recovery: run drills that assume physical hardware damage and corrupted replication, with validated data-restore and reconciliation procedures to prevent stale-data symptoms during recovery.",
-  "Commit to publishing (or independently reviewing) post-incident RCAs for critical-national-infrastructure-scale outages so root cause and corrective actions are transparent and auditable."
+  "MAINTENANCE / MOP: Mandate a written, peer-reviewed Method-of-Procedure (with matching SOP/EOP) for every UPS bypass and re-energisation on critical power. No live switching without an approved, staged, load-verified sequence and a second competent person independently verifying each step and downstream breaker/PDU state before the next.",
+  "MAINTENANCE / ELECTRICAL: Enforce true make-before-break maintenance bypass so the critical load transfers to raw mains or generator BEFORE any UPS module work — never a break-before-make operation that drops the load and simultaneously strands generators and batteries as happened here.",
+  "SAFETY / PROTECTION: Fit and routinely test source-transfer interlocks and sync-check relays that physically prevent paralleling battery and generator supplies out-of-phase or in series; add rack/PDU-level over-voltage protection and monitoring so an operator switching error cannot deliver double voltage to server PSUs.",
+  "RESILIENCE / ARCHITECTURE: Loosen active:active coupling with data-integrity gating on replication so an uncommanded shutdown at one site cannot propagate corrupted state to its twin; validate failover with regular full-scale DR tests that deliberately include dirty-shutdown and hardware-damage scenarios, not just clean cutovers.",
+  "GOVERNANCE / ACCOUNTABILITY: Publish a clear BA/CBRE RACI for critical-power switching; require BA change-authority sign-off, and impose change-freeze windows over peak/bank-holiday travel periods before any live critical-power work.",
+  "RECOVERY / RUNBOOKS: Maintain out-of-band, geographically-independent recovery capability and rehearsed rebuild/restore runbooks that assume physical hardware destruction can make failover impossible and force a multi-day rebuild."
  ],
  "comprehensiveAnalysis": [
   {
-   "heading": "Failure mechanism: a human error at the power boundary",
-   "body": "The initiating fault was not equipment failure but human mis-operation. On the Saturday morning of 27 May 2017, a power supply at Boadicea House was disconnected and then reconnected in an uncontrolled, unplanned manner. The reconnection surge physically damaged servers and bypassed the backup generators and batteries entirely. This account is dual-sourced — a leaked IAG internal email carried by the BBC and Willie Walsh on the record — and it resolves the early 'defective UPS' versus 'working perfectly' contradiction: the equipment did its job; a person operating it did not. A single technical outlet (The Register) offers a plausible physical scenario in which the restoration briefly connected battery and generator supply in series to the rack bus, feeding servers 480V instead of 240V and causing a literal meltdown. This remains a hypothesis consistent with the confirmed physical damage rather than an established fact."
+   "heading": "Not a fire — an electrical over-voltage event",
+   "body": "The single most important forensic correction: this was NOT a fire and must never be framed as a 'battery fire.' There was no ignition, smoke, heat, VESDA/aspirating detection, gaseous or water-mist suppression, evacuation, or emergency-services response, because none occurred and none was applicable. The batteries were bypassed, not thermally involved. The damaging agent was an uncontrolled electrical over-voltage transient generated inside BA's own switchgear. The classic fire-forensic layers are genuinely absent from the record — that is the correct physics, not a data gap to be filled."
   },
   {
-   "heading": "Why it cascaded: redundancy defeated by shared state",
-   "body": "The most consequential aspect is that BoHo itself was down for only about a quarter of an hour, yet service was lost for days. The bridge from a 15-minute fault to a multi-day outage runs through two amplifiers. First, the surge caused physical hardware damage, so recovery required hardware remediation, not a restart. Second, the failover did not save the service. The leading hypothesis is that the uncommanded shutdown synchronised corrupted data from BoHo into the secondary data centre, populating it with bad data and crashing the dependent systems — a shared-fault mode in which the backup inherited the primary's corruption. The Sunday 28 May symptom of customers seeing stale booking data offers weak independent corroboration that data integrity and replication were affected."
+   "heading": "Proximate mechanism: override then uncontrolled re-energisation",
+   "body": "Per the leaked IAG email (Bill Francis, via The Register), a UPS to a core Heathrow data centre 'was over-ridden,' causing 'the total immediate loss of power to the facility, bypassing the backup generators and batteries.' Minutes later it 'was turned back on in an unplanned and uncontrolled fashion, which created physical damage to the system.' The damage came from the restoration, not the outage: a hypothesised momentary series connection of battery and generator delivering ~480 V versus ~240 V nominal — a figure that is press-reported conjecture, not measured fact."
   },
   {
-   "heading": "Recovery and impact: a dual-hub grounding",
-   "body": "Because the failover could not carry the load and hardware was physically damaged, British Airways grounded all flights at Heathrow and Gatwick. On the Saturday, BA initially cancelled flights until 18:00 BST and then extended the window; an aviation expert forecast three to four days of disruption. As many as 672 flights were grounded and roughly 75,000 passengers affected — the passenger figure cross-checked across DCD's settlement reporting and the IAG/BBC account, while the specific flight count rests on a single outlet. Recovery took on the order of two to three days, with operations normalising around Monday 29 May. IAG later confirmed the financial impact at about £58m (~$74.6m), covering passenger compensation (under the EU261 schedule of EUR250/EUR400/up to EUR600) and lost business; higher press figures of $100m and up to £150m were never reconciled to an audited total."
+   "heading": "How redundancy propagated instead of contained",
+   "body": "Two data centres ran active:active, ~500 cabinets across six halls, both within ~1 mile of Heathrow. Continuous state synchronisation means either site can take the whole load — and that corrupt state can replicate. The Register's source suggested the uncommanded shutdown synchronised corrupted data across, leaving the failover DC 'populated with enough bad data to crash all the systems.' Because BoHo hardware was physically destroyed, recovery was a multi-day rebuild/restore, not a seconds-long cutover — turning a few-minutes electrical event into a bank-holiday operational collapse."
   },
   {
-   "heading": "Organisational and systemic factors",
-   "body": "The incident exposed governance gaps as much as engineering ones. The engineer was authorised to be in the data centre but not authorised to do what he did, indicating that physical access and permitted-action scope were not separated or interlocked. There was no gate to stop an uncontrolled reconnection of a hazardous power source. The blame allocation was never technically settled: BA sued facilities supplier CBRE roughly 18 months later, and the dispute settled on 11 February 2019 with no admission of liability, an undisclosed amount, and no jointly agreed root cause. Critically, no formal operator or regulatory postmortem was ever published, so the entire mechanism narrative rests on press attribution and a leaked internal email — a transparency deficit for an outage of national significance."
+   "heading": "Origin located inside BA's fence",
+   "body": "Two independent utility data points bound the origin. National Grid confirmed no transmission-network problem in the Heathrow area that weekend. SSE stated any 'power surge that BA is referring to could have taken place at the customer side of the meter.' Together they place the transient inside BA's own infrastructure — consistent with an operator-induced switching event under CBRE facilities management rather than a utility disturbance."
   },
   {
-   "heading": "Cross-incident pattern: the small-fault, large-blast-radius archetype",
-   "body": "This event is a canonical example of a category where a minor, brief, human-triggered fault produces an outsized outage because designed protections are bypassed and redundancy shares a failure path. The signature elements — human error during a maintenance/restoration action, backup power bypassed, and a failover that inherits corruption rather than isolating it — recur across major data-centre incidents. The lesson generalises: resilience is determined less by the redundancy that exists on paper than by whether the failure modes of the primary and backup are genuinely independent, and by whether hazardous human actions at the power boundary are procedurally gated. Here, both assumptions broke at once."
+   "heading": "What remains unproven and non-public",
+   "body": "Every deep claim traces to one primary chain: the leaked IAG email as reported by The Register, plus attributed CBRE/SSE/National Grid statements. No adjudicated root cause was ever published — the independent report was not released and the BA/CBRE claim was reportedly settled privately. Unknown/disputed: who physically switched (a CBRE contractor named only by the Daily Mail); the true surge magnitude (480 V series theory is conjecture); why the peer site failed (data-corruption theory unverified); battery chemistry and exact equipment age; and whether a valid MOP existed."
   }
  ],
- "technicalDeepDive": "The failure mechanism, as described by the operator, is a two-stage electrical event centred on the facility's UPS/backup power chain, with the second stage causing the actual hardware damage. All of it is the operator (IAG/BA) account plus a leaked internal email; CBRE disputed it and no independent adjudication confirmed it.\n\nStage 1 - loss of source without failover. A UPS feeding the BoHo core data centre was \"over-ridden\" (Walsh's version: an engineer disconnected a power supply). In a properly configured N+1/2N data-centre topology, removing one source should cause an automatic transfer so the load continues on battery-backed UPS output and, for a sustained outage, on generator power. Instead the event \"resulted in the total immediate loss of power to the facility, bypassing the backup generators and batteries\" - the batteries and generators did not pick up the load and the facility de-energised immediately (The Register; leaked IAG email via Network World). Contemporary reporting placed the fault inside the facility's own distribution rather than upstream on the grid, but the specific National Grid / SSE 'customer side of the meter' statements could not be re-verified in this review and are treated as reported, not confirmed.\n\nStage 2 - uncontrolled re-energisation and surge (the damaging event). 'After a few minutes... it was turned back on in an unplanned and uncontrolled fashion, which created physical damage to the system,' and the 'uncontrolled return of power... caused a power surge taking out our IT systems.' Engineering-wise, re-applying power to a large, fully-de-energised IT load without sequencing produces a severe inrush transient - many power supplies simultaneously drawing charging/magnetising current, no staged ramp, and a potentially unstable source still stabilising. Without soft-start, staged breaker closing, inrush limiting, or an orderly transfer back onto conditioned UPS output, the resulting voltage/current transient can exceed the ratings of server PSUs and other IT hardware, producing physical rather than merely logical damage. One unattributed scenario in The Register speculated the battery and generator supplies were briefly connected in series, delivering roughly 480V instead of 240V and causing a 'literal meltdown'; this is explicitly speculation from an anonymous source, never officially confirmed.\n\nConsequence for recovery. Because the damage was physical, systems could not simply be powered back up - damaged hardware had to be repaired/replaced and systems rebuilt, consistent with the multi-day, airline-wide disruption (about 672 cancellations, roughly 75,000 passengers stranded). None of these electrical specifics were ever independently adjudicated.",
+ "technicalDeepDive": "This incident is a textbook case of redundancy defeating itself, and it is important to state up front — with critical honesty — what it was NOT. It was not a fire. No smoke, heat, VESDA/aspirating detection, gaseous suppression (inert gas / FM-200 / Novec), water mist, evacuation or emergency-services response is reported, because none occurred and none was applicable. The classic fire-forensic layers simply do not exist in the public record for this event; treating them as \"missing data\" would misrepresent the physics. The damage vector was electrical over-voltage, not combustion.\n\nThe electrical architecture (The Register, 2017-06-02, quoting the leaked IAG email from Bill Francis). Boadicea House was fed through a site UPS reported as Socomec \"Smart Powerport,\" replaced ~3 years prior and specifiable up to 2.4 MW of backup, with battery strings for ride-through and standby generators for extended outages. This is a conventional double-conversion topology: mains normally feeds the load through the UPS while charging batteries; on mains loss the batteries carry the load for the seconds/minutes it takes generators to start and assume it. Correctly operated, a maintenance bypass transfers the critical load to raw mains (or generator) so the UPS module can be worked on WITHOUT dropping the racks. What the record describes is the opposite: the UPS was \"over-ridden,\" and the result was \"the total immediate loss of power to the facility, bypassing the backup generators and batteries.\" A bypass that drops the load and simultaneously strands both backup sources is not a make-before-break maintenance bypass functioning as designed — it is a break-before-anything event.\n\nThe surge mechanism. The physical damage came not from the power loss but from the restoration: \"after a few minutes of this shutdown of power, it was turned back on in an unplanned and uncontrolled fashion, which created physical damage to the system.\" A controlled re-energisation ramps load in stages, verifies downstream breaker/PDU state, and synchronises sources before paralleling them. The reported hypothesis is that improper switching momentarily paralleled battery and generator supplies in series, roughly doubling rack voltage to ~480 V versus a nominal ~240 V — enough to destroy server power-supply units outright. This series-connection / 480 V figure must be flagged as conjecture reported by The Register, not a measured, published finding; BA never released fault waveforms or metering. Two external data points bound the origin: National Grid reported no transmission-network fault near Heathrow, and SSE stated any surge \"could have taken place at the customer side of the meter.\" Together they place the transient inside BA's own switchgear — consistent with an operator-induced event rather than a utility disturbance.\n\nWhy redundancy propagated the fault. The two data centres ran active:active, ~500 cabinets across six halls, both within ~1 mile of Heathrow's eastern-end runways. Active:active means both sites carry live production and continuously synchronise state. The intended benefit — either site can take the whole load — is also the intended hazard: a corrupt state can replicate. The Register's source suggested the uncommanded shutdown \"may have caused corrupted data to be synchronised between the two as BoHo died,\" populating the failover DC \"with enough bad data to crash all the systems depending on it.\" Combined with the fact that Boadicea House hardware was physically damaged (not merely powered down), recovery could not be a clean cutover; it required rebuilding/restoring damaged infrastructure, which is why a few-minutes electrical event became a multi-day operational collapse cancelling flights at Heathrow Terminal 5 and Gatwick on a bank-holiday Saturday.\n\nWhat remains unproven. Every deep claim above traces to a single primary chain — the leaked IAG email as reported by The Register, plus attributed CBRE/SSE/National Grid statements. No adjudicated root cause was ever published: the independent investigation report was not released and the BA/CBRE claim was reportedly settled privately. Disputed or unknown: who physically performed the override/reconnection (a CBRE contractor named only by the Daily Mail, never officially confirmed); the true surge magnitude and mechanism (the 480 V series theory is conjecture); why the peer site failed (data-corruption theory attributed to an unnamed source, unverified); exact battery chemistry, UPS variant, and true equipment age beyond \"replaced three years ago\"; whether a valid MOP existed and how it was breached; and the precise minute-by-minute internal timeline beyond the 09:30 start and \"a few minutes later\" reconnection.",
  "references": [
   {
    "title": "British Airways IT failure caused by 'uncontrolled return of power' (The Guardian, reproducing BA's official statement verbatim)",
@@ -287,5 +331,6 @@
   "lastVerified": "2026-08-01",
   "confidence": "High for root cause (dual-sourced: leaked IAG email + Walsh on record + Cruz), passenger count (~75,000, dual-sourced) and confirmed cost (~£58m, IAG). Medium for timeline granularity and impact scale (single-outlet clock times and 672-flight count). The ~09:30/~09:45 BST clock times are reconstructed approximations, not explicitly stated by the cited outlets. The 480V series-meltdown and corrupted-sync failover mechanisms are single-source (The Register) hypotheses consistent with confirmed physical damage, not established facts. Only The Register was live-verifiable in the latest fact-check pass (matched exactly); BBC, DCD, Computer Weekly and NBC were unfetchable (HTTP 403) that pass and rest on established public record. No formal operator/regulatory RCA exists; settlement amount and legal blame allocation permanently undisclosed."
  },
- "lastUpdated": "2026-08-01"
+ "lastUpdated": "2026-08-01",
+ "operatorShort": "British Airways"
 }
