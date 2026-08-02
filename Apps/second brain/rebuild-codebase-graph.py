@@ -25,9 +25,11 @@ GRAPH_JSON = os.path.join(OUT, "graphify-out", "graph.json")
 GRAPH_HTML = os.path.join(OUT, "graphify-out", "graph.html")
 VAULT = os.path.join(SB, "obsidian-knowledge-vault", "09-Codebase")
 
-# Code dirs to graph. The heavy site-wide similarity pass on 1000+ files can OOM here,
-# so we scope to the real source. Add dirs as needed (each is scanned recursively).
-SCOPE = os.environ.get("CBG_SCOPE", "js")  # e.g. "js" or "js dcmoc/src supabase"
+# Code dirs to graph, extracted SEPARATELY then merged (a single site-wide extract with the
+# similarity pass on 1000+ files OOMs here, and `extract a b c` only scans the first root).
+# Add dirs as needed — each is scanned recursively into its own graph, then merge-graphs unions them.
+SCOPE = os.environ.get("CBG_SCOPE", "js dcmoc/src").split()
+MERGED = os.path.expanduser("~/.graphify/rz-merged")
 
 
 def run(cmd, **kw):
@@ -82,11 +84,24 @@ def inject_gate(graph_html, out_path):
 def main():
     if not os.path.exists(GRAPHIFY):
         sys.exit("graphify not found at " + GRAPHIFY + " — pip install graphifyy in ~/.venvs/graphify")
-    dirs = SCOPE.split()
-    run([GRAPHIFY, "extract", *dirs, "--code-only", "--out", OUT], check=True)
-    run([GRAPHIFY, "cluster-only", OUT])
-    run([GRAPHIFY, "export", "obsidian", "--graph", GRAPH_JSON, "--dir", VAULT])
-    inject_gate(GRAPH_HTML, os.path.join(SB, "codebase-graph.html"))
+    # 1. extract each scope dir into its own graph
+    graphs = []
+    for d in SCOPE:
+        out = os.path.expanduser("~/.graphify/rz-" + d.replace("/", "-"))
+        run([GRAPHIFY, "extract", d, "--code-only", "--out", out], check=True)
+        graphs.append(os.path.join(out, "graphify-out", "graph.json"))
+    # 2. merge into one code graph (single dir → no merge needed)
+    os.makedirs(os.path.join(MERGED, "graphify-out"), exist_ok=True)
+    merged_json = os.path.join(MERGED, "graphify-out", "graph.json")
+    if len(graphs) == 1:
+        import shutil
+        shutil.copy(graphs[0], merged_json)
+    else:
+        run([GRAPHIFY, "merge-graphs", *graphs, "--out", merged_json], check=True)
+    # 3. cluster (names communities + builds graph.html), export Obsidian, inject the root gate
+    run([GRAPHIFY, "cluster-only", MERGED])
+    run([GRAPHIFY, "export", "obsidian", "--graph", merged_json, "--dir", VAULT])
+    inject_gate(os.path.join(MERGED, "graphify-out", "graph.html"), os.path.join(SB, "codebase-graph.html"))
     if os.path.exists(CODEMEM):
         run([CODEMEM, "cli", "index_repository", "--repo-path", RZ, "--mode", "moderate", "--persistence", "true"])
     print("\n✓ Codebase Graph rebuilt. Open Second Brain → Codebase Graph (root only), or the vault's 09-Codebase in Obsidian.")

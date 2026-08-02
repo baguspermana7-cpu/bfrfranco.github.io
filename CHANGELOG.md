@@ -13,6 +13,19 @@ release sections rather than semver.
 
 ---
 
+## v1.126.1 — 2026-08-02 (Second Brain — codebase graph expanded to the app source)
+
+Broadened the Second Brain Codebase Graph beyond `js/` to the real application source. Since
+Graphify's `extract` scans a single root (and a full-repo similarity pass OOMs on this box), the
+pipeline now extracts each scope dir separately and **merge-graphs** them: `js/` (site engines,
+1,136 nodes) + `dcmoc/src` (the DCMOC TypeScript app, 2,042 nodes) → **3,178 nodes / 9,355 edges,
+176 named communities**. `rebuild-codebase-graph.py` updated to the extract-each → merge → cluster
+→ Obsidian export → gate-inject flow (`CBG_SCOPE` sets the dirs; default `js dcmoc/src`). The
+root-gated `codebase-graph.html` + the `09-Codebase` Obsidian vault regenerate from the merged
+graph. Page-gates CLEAN.
+
+---
+
 ## v1.126.0 — 2026-08-02 (Second Brain — codebase knowledge-graph layer: codebase-memory-mcp + Graphify + Obsidian)
 
 Installed and integrated a **codebase knowledge-graph** stack, and upgraded Second Brain to
