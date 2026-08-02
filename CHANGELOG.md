@@ -13,6 +13,32 @@ release sections rather than semver.
 
 ---
 
+## v1.126.0 — 2026-08-02 (Second Brain — codebase knowledge-graph layer: codebase-memory-mcp + Graphify + Obsidian)
+
+Installed and integrated a **codebase knowledge-graph** stack, and upgraded Second Brain to
+surface it:
+
+- **codebase-memory-mcp** (DeusData v0.9.0) — installed the checksum-verified binary to
+  `~/.local/bin`, registered as an MCP server for Claude Code (alongside `rzmemory`), and indexed
+  rz-work (**16,585 nodes / 33,659 edges**; heavy dirs auto-excluded). Gives Claude structural
+  code-graph queries (`search_graph`, `trace_path`, `get_architecture`…) via MCP instead of
+  re-reading files. Artifact under `.codebase-memory/` (gitignored).
+- **Graphify** (graphifyy) — installed in `~/.venvs/graphify`; extracts the code into a graph +
+  **exports an Obsidian vault** (markdown + wikilinks + a `graph.canvas`) into
+  `Apps/second brain/obsidian-knowledge-vault/09-Codebase/` (1,254 notes, 118 named communities;
+  generated → gitignored, Syncthing-synced).
+- **Second Brain** — new **"Codebase Graph"** CTA on the hub → a root-gated `codebase-graph.html`
+  (interactive graph viz) sitting beside the Vector Index. The gate is hardened (independent
+  force-lock for any non-root + a watchdog against the viz resetting `body`) — verified: anon →
+  locked, root → open.
+- **`rebuild-codebase-graph.py`** — one command re-runs the whole pipeline (extract → cluster →
+  Obsidian export → gate-inject → codebase-memory reindex).
+
+Data flow: **Claude Code ↔ codebase-memory-mcp (live MCP graph) + Graphify (Obsidian export) ↔
+Second Brain vault + viz**. Local, no telemetry. Page-gates CLEAN.
+
+---
+
 ## v1.125.2 — 2026-08-02 (DC Incidents — +4 landmark outages, library → 40)
 
 Closed out the "all the majors" ambition with four landmark outages the library still lacked
