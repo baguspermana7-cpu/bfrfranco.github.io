@@ -13,6 +13,26 @@ release sections rather than semver.
 
 ---
 
+## v1.124.8 — 2026-08-02 (DC Incidents — deep forensic re-research COMPLETE, batch 5 of 5)
+
+Final deep-forensic batch (Opus Workflow, 15 agents, ~707k tokens): **CrowdStrike Channel-File-291
+2024** (kernel-dump-level: `PAGE_FAULT_IN_NONPAGED_AREA` in `csagent.sys`, the 21-vs-20 parameter
+mismatch read one slot past a 20-pointer array, Content Validator logic error, 12-test-case gap —
+every fix traced to code), **Dyn/Mirai 2016** (IoT-botnet DDoS), **Meta 2021** (backbone command →
+BGP + DNS self-withdrawal + internal-tooling lockout), **UniSuper 2024** (blank-parameter default
+1-year term → cross-region GCVE deletion, backup-driven recovery), **Red Sea cables 2024** (Rubymar
+anchor-drag, attribution honestly disputed, no single official RCA).
+
+**Program complete — all 25 dossiers re-researched to the QA-standard depth floor:** average
+rootCause ~3,700 chars, **average SOE 17 steps**, average 11 sourced metrics, grouped
+Safety/Maintenance/Design/Process improvements, 20/25 with a verified official post-mortem and the
+other 5 honestly marked (disputed/unpublished). Merged via `_ingest_deep.py`; vector index +
+semantic-map cluster refreshed across all 25.
+
+Root-gated; gates: incidents-corpus 25/25, page-gates CLEAN, script-tags CLEAN.
+
+---
+
 ## v1.124.7 — 2026-08-02 (DC Incidents — deep forensic re-research, batch 4 of 5: Azure / GCP / Cloudflare)
 
 Fourth deep-forensic batch (Opus Workflow, 15 agents, ~641k tokens): **Azure AD 2020** (SDP
