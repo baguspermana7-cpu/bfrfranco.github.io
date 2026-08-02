@@ -13,6 +13,25 @@ release sections rather than semver.
 
 ---
 
+## v1.125.2 — 2026-08-02 (DC Incidents — +4 landmark outages, library → 40)
+
+Closed out the "all the majors" ambition with four landmark outages the library still lacked
+(deep-forensic Workflow, 12 Opus agents, public sources only): **Fastly global CDN 2021**
+(latent bug + valid customer config → ~85% of the network erroring for ~49 min; official
+post-mortem), **AT&T nationwide 2024** (misconfiguration during a capacity expansion → ~125M
+devices, 92k+ blocked 911 calls; FCC report), **Optus Australia 2023** (Singtel-upgrade routing
+flood → self-protective router isolation, ~10M users, triple-zero affected), **PlayStation
+Network 2025** (~24h global sign-in/store/multiplayer outage; Sony published no detailed cause —
+left honestly `false`). Each a full forensic dossier (15–18-step SOE, 8–12 metrics). Skipped the
+vague QTS/Cyxtera/Global-Switch/Proximus "cluster" — no distinct sourced incident meets the
+provenance bar.
+
+**Library now 40 incidents · 28 official-postmortem-backed.** The dashboard, risk map, ranking,
+40-node semantic graph, and rich table all take them in automatically. Gates: incidents-corpus
+40/40, page-gates CLEAN, script-tags CLEAN, visual-QA clean. Root-gated.
+
+---
+
 ## v1.125.1 — 2026-08-02 (DC Incidents — +11 incidents & reference-2 incident table)
 
 ### Added — 11 new incidents (library 25 → 36)

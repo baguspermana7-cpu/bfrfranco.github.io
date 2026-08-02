@@ -1,0 +1,288 @@
+{
+ "slug": "att-nationwide-outage-2024",
+ "title": "AT&T Nationwide Wireless Outage — Network Misconfiguration (February 22, 2024)",
+ "operator": "AT&T",
+ "operatorShort": "AT&T Mobility",
+ "dcName": "AT&T national wireless core network",
+ "location": {
+  "city": "Dallas, Texas",
+  "country": "United States"
+ },
+ "date": "2024-02-22",
+ "durationMin": 720,
+ "category": [
+  "network",
+  "software",
+  "human"
+ ],
+ "severity": {
+  "usersAffected": "~125 million devices nationwide; 92,000+ blocked 911 calls",
+  "impactUsd": "FCC penalties + customer credits",
+  "servicesDown": [
+   "AT&T wireless voice/data nationwide",
+   "911 emergency calling (partial)"
+  ],
+  "tier": "Sev-1 national wireless core (config)"
+ },
+ "brief": "During a network expansion, an AT&T engineer used an incorrect process that introduced a misconfiguration into the wireless network, causing a roughly 12-hour nationwide outage affecting an estimated 125 million devices and blocking more than 92,000 emergency 911 calls.",
+ "magnitude": {
+  "blastRadiusScore": 8,
+  "usersScore": 8,
+  "financialScore": 5,
+  "durationScore": 5,
+  "note": "A network misconfiguration during a capacity expansion caused a ~12h nationwide wireless outage, ~125M devices, tens of thousands of blocked 911 calls — sub-scores ESTIMATED from public impact reporting, pending deep research."
+ },
+ "rootCause": "The proximate trigger was not combustion but a NEW NETWORK ELEMENT placed into AT&T Mobility's production wireless core at 2:42 AM CT on February 22, 2024, during a routine night maintenance window to expand network capacity (FCC DOC-404150A1, para 6). That element was misconfigured. Its configuration \"did not conform to AT&T's established network element design and installment procedures, which require peer review\" (para 6). MAKE / MODEL / VENDOR / ELEMENT-TYPE / AGE ARE NOT DISCLOSED: the FCC report deliberately describes only a generic \"network element\" and \"downstream network elements,\" names no vendor, hardware/software make or model, or core function, and — being a software/configuration fault, not a physical one — there is no \"chemistry.\" AT&T's own public account attributed the event to \"the application and execution of an incorrect process\" during a capacity expansion, and explicitly \"not a cyberattack\" (AT&T 6:46 PM statement quoted at para 11); AT&T's separate public wording of a \"coding error\" is consistent paraphrase, not the FCC's language.\n\nThe failure mechanism (the ignition-to-fire chain) is a four-step cascade: (1) the non-conforming configuration was loaded without the required peer review; (2) \"As a result of the error in configuration, downstream network elements propagated the error further into the network\" (para 6); (3) this \"triggered an automated response that shut down all network connections to prevent the traffic from propagating further\" — the designed \"Protection Mode\" trip; and (4) that shutdown \"isolated all voice and 5G data processing elements from the wireless towers and switching elements,\" disconnecting registered devices nationwide at 2:45 AM, \"just three minutes after the misconfigured network element was placed into production\" (para 6). Critically, \"the downstream network element lacked controls specific to mitigating this error and therefore was unable to mitigate the effects\" (para 25) — there was no granular quarantine, so the only available containment was a nationwide disconnect.\n\nThe LATENT ROOT is a stack of design, testing and process (maintenance) failures. Design: Protection Mode was engineered as all-or-nothing containment with no ability to isolate a single bad element (para 25), and the network had no plan for the device re-registration storm that a Protection-Mode recovery guarantees (para 27). Testing/maintenance: \"Lab testing by AT&T did not discover the improper configuration of the network element that caused the outage and did not identify the potential impact\" (para 22), and post-installation testing on the night of Feb 22 was inadequate to identify the incorrect behavior, contrary to CSRIC Best Practice 13-10-0615 (para 21). Process: the mandatory peer review did not take place, and \"Adequate peer review should have prevented the network change from being approved, and, in turn, from being loaded onto the network\" (para 20). The single latent root that most directly caused the event is therefore the failure to perform — and to enforce as a gate — the required peer review of a production change to the wireless core.",
+ "technicalDeepDive": "This was a \"sunny day\" outage — no weather, no attack, no hardware fire — in which an automated protective mechanism, functioning exactly as designed, converted a single misconfigured element into a nationwide loss of service. At 2:42 AM CT an AT&T Mobility employee placed a new, misconfigured network element into the production core during a routine night maintenance window (DOC-404150A1, para 6). The misconfiguration violated AT&T's design-and-installment procedures, which require peer review, and that peer review was never performed (para 6, 20). Within moments the error propagated to downstream elements, which \"lacked controls specific to mitigating this error\" (para 25) and instead invoked \"Protection Mode\" — an automated total shutdown that isolates processing elements to stop error propagation. Protection Mode is the network analogue of a fire-suppression system: it activated as designed and DID contain the fault (no wider corruption), but it was catastrophically over-broad, \"isolat[ing] all voice and 5G data processing elements from the wireless towers and switching elements\" and disconnecting every device — including FirstNet public-safety devices — across all 50 states, DC, Puerto Rico and the US Virgin Islands at 2:45 AM, three minutes after insertion (para 1, 6). Detection was automated and effectively instantaneous, indistinguishable from the protective trip itself; the report describes no separate alarm/telemetry step and gives no human-detection time. Recovery required a manual rollback that \"took close to two hours\" (para 2); FirstNet infrastructure was prioritized and restored by 5:00 AM (para 8). Lifting Protection Mode then produced a second-order failure: \"once the misconfigured network element was backed out, all user devices automatically tried to simultaneously re-register,\" and \"The influx of device registration attempts far exceeded what AT&T Mobility's network management systems could handle, resulting in widespread congestion\" that \"caused devices to be delayed in registering to the network, thereby prolonging the outage\" (para 26). AT&T \"failed to prepare for the registration congestion associated with the network recovering from Protection Mode, or to sufficiently mitigate that congestion after the fact,\" and it took \"more than 10 hours once the network was restored to fully remediate the network congestion\" (para 27). The regulatory record is emphatic on public-safety impact: more than 25,000 calls to PSAPs/911 were blocked (para 1), no 911 call from an AT&T-served device could be routed to its PSAP while voice was down (para 14), and Wireless Priority Service volume ran at \"less than two thirds of the typical volume,\" implying some priority public-safety calls also failed (para 17). The FCC's Public Safety and Homeland Security Bureau referred the matter to the Enforcement Bureau for potential violations of Parts 4 and 9 of the Commission's rules (para 29).",
+ "sequenceOfEvents": [
+  {
+   "t": "2024-02-22 02:42 AM CT",
+   "phase": "TRIGGER",
+   "event": "An AT&T Mobility employee places a new, misconfigured network element into the production wireless core during a routine night maintenance window to expand capacity; the configuration does not conform to procedures requiring peer review, and that peer review was never performed.",
+   "source": "https://docs.fcc.gov/public/attachments/DOC-404150A1.txt"
+  },
+  {
+   "t": "~02:42-02:45 AM CT",
+   "phase": "CASCADE",
+   "event": "'As a result of the error in configuration, downstream network elements propagated the error further into the network' — the fault spreads from the single new element to downstream elements within ~3 minutes.",
+   "source": "https://docs.fcc.gov/public/attachments/DOC-404150A1.txt"
+  },
+  {
+   "t": "~02:42-02:45 AM CT",
+   "phase": "DETECTION",
+   "event": "Detection is AUTOMATED and effectively instantaneous, indistinguishable from the protective response: the propagating error 'triggered an automated response that shut down all network connections.' The report describes no separate alarm/telemetry step and states no human-detection time.",
+   "source": "https://docs.fcc.gov/public/attachments/DOC-404150A1.txt"
+  },
+  {
+   "t": "2024-02-22 02:45 AM CT",
+   "phase": "MITIGATION",
+   "event": "Automated 'Protection Mode' trip fires 'just three minutes after the misconfigured network element was placed into production' — the designed containment (fire-suppression analogue) activates as intended to stop error propagation.",
+   "source": "https://docs.fcc.gov/public/attachments/DOC-404150A1.txt"
+  },
+  {
+   "t": "2024-02-22 02:45 AM CT",
+   "phase": "IMPACT",
+   "event": "Protection Mode is over-broad: the shutdown 'isolated all voice and 5G data processing elements from the wireless towers and switching elements,' disconnecting all registered devices — including FirstNet — from voice and 5G data, beginning a nationwide outage.",
+   "source": "https://docs.fcc.gov/public/attachments/DOC-404150A1.txt"
+  },
+  {
+   "t": "2024-02-22 from 02:45 AM CT",
+   "phase": "IMPACT",
+   "event": "Outage affects more than 125 million registered devices across all 50 states, DC, Puerto Rico and the US Virgin Islands, including AT&T MVNO and roaming subscribers on AT&T's network.",
+   "source": "https://docs.fcc.gov/public/attachments/DOC-404150A1.txt"
+  },
+  {
+   "t": "2024-02-22 during outage",
+   "phase": "IMPACT",
+   "event": "Emergency services crippled: no 911 calls from AT&T Mobility-served wireless devices could be routed to the destination PSAP while voice services were disconnected; more than 25,000 calls to PSAPs/911 were blocked.",
+   "source": "https://docs.fcc.gov/public/attachments/DOC-404150A1.txt"
+  },
+  {
+   "t": "2024-02-22 during outage",
+   "phase": "IMPACT",
+   "event": "Priority public-safety calling degraded: Wireless Priority Service (WPS) call volume ran at 'less than two thirds of the typical volume,' indicating some priority calls also failed.",
+   "source": "https://docs.fcc.gov/public/attachments/DOC-404150A1.txt"
+  },
+  {
+   "t": "2024-02-22 (starts ~03:xx AM CT)",
+   "phase": "RECOVERY",
+   "event": "AT&T performs a rollback that backs out / removes the misconfigured network element and begins restoration of the network — the corrective isolation step (removing the faulty element).",
+   "source": "https://docs.fcc.gov/public/attachments/DOC-404150A1.txt"
+  },
+  {
+   "t": "~2 hours",
+   "phase": "RECOVERY",
+   "event": "'It took close to two hours to roll back the network change' before normal-operations restoration could proceed.",
+   "source": "https://docs.fcc.gov/public/attachments/DOC-404150A1.txt"
+  },
+  {
+   "t": "2024-02-22 05:00 AM CT",
+   "phase": "RECOVERY",
+   "event": "'By 5:00 AM on February 22, 2024, FirstNet infrastructure was restored' — public-safety infrastructure prioritized.",
+   "source": "https://docs.fcc.gov/public/attachments/DOC-404150A1.txt"
+  },
+  {
+   "t": "2024-02-22 after rollback",
+   "phase": "CASCADE",
+   "event": "Re-registration STORM (second-order failure): once the element was backed out, 'all user devices automatically tried to simultaneously re-register'; 'The influx of device registration attempts far exceeded what AT&T Mobility's network management systems could handle, resulting in widespread congestion,' prolonging the outage.",
+   "source": "https://docs.fcc.gov/public/attachments/DOC-404150A1.txt"
+  },
+  {
+   "t": "2024-02-22 05:53 AM CT",
+   "phase": "MITIGATION",
+   "event": "FirstNet-customer notification begins, 'more than three hours after the outage began' and nearly one hour after FirstNet service was restored — the evacuation/notification analogue, sent late.",
+   "source": "https://docs.fcc.gov/public/attachments/DOC-404150A1.txt"
+  },
+  {
+   "t": "2024-02-22 07:05 AM CT",
+   "phase": "MITIGATION",
+   "event": "AT&T Mobility issues its first public statement about the outage.",
+   "source": "https://docs.fcc.gov/public/attachments/DOC-404150A1.txt"
+  },
+  {
+   "t": "2024-02-22 06:46 PM CT",
+   "phase": "RESTORED",
+   "event": "AT&T Mobility publicly states initial findings: the outage 'was caused by the application and execution of an incorrect process' during a capacity expansion, and was 'not a cyberattack.'",
+   "source": "https://docs.fcc.gov/public/attachments/DOC-404150A1.txt"
+  },
+  {
+   "t": "2024-02-22 (~12h+ from 02:45 AM)",
+   "phase": "RESTORED",
+   "event": "Full voice and 5G data service restored after an outage lasting at least twelve hours; the FCC PSHSB later referred the matter to the Enforcement Bureau for potential violations of Parts 4 and 9 of the Commission's rules.",
+   "source": "https://docs.fcc.gov/public/attachments/DOC-404150A1.txt"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Time from misconfigured element insertion to nationwide protective shutdown",
+   "value": "3 minutes (02:42 AM to 02:45 AM CT)",
+   "source": "FCC DOC-404150A1, para 6"
+  },
+  {
+   "label": "Total outage duration",
+   "value": "At least twelve hours",
+   "source": "FCC DOC-404150A1, para 1"
+  },
+  {
+   "label": "Registered devices affected",
+   "value": "More than 125 million",
+   "source": "FCC DOC-404150A1, para 1"
+  },
+  {
+   "label": "Voice calls blocked",
+   "value": "More than 92 million",
+   "source": "FCC DOC-404150A1, para 1"
+  },
+  {
+   "label": "911/PSAP call attempts blocked",
+   "value": "More than 25,000",
+   "source": "FCC DOC-404150A1, para 1"
+  },
+  {
+   "label": "Time to roll back the network change",
+   "value": "Close to 2 hours",
+   "source": "FCC DOC-404150A1, para 2"
+  },
+  {
+   "label": "FirstNet infrastructure restoration completed",
+   "value": "By 05:00 AM CT",
+   "source": "FCC DOC-404150A1, para 8"
+  },
+  {
+   "label": "Delay before FirstNet customers were notified",
+   "value": "Notification began 05:53 AM, more than 3 hours after outage began",
+   "source": "FCC DOC-404150A1, para 9"
+  },
+  {
+   "label": "Geographic scope",
+   "value": "All 50 states, DC, Puerto Rico, and US Virgin Islands",
+   "source": "FCC DOC-404150A1, para 1"
+  },
+  {
+   "label": "Wireless Priority Service call volume during outage",
+   "value": "Less than two-thirds of typical volume",
+   "source": "FCC DOC-404150A1, para 17"
+  },
+  {
+   "label": "Time to fully remediate registration congestion after restoration",
+   "value": "More than 10 hours",
+   "source": "FCC DOC-404150A1, para 27"
+  },
+  {
+   "label": "Post-outage window to scan network and add missing mitigating controls",
+   "value": "Within 48 hours",
+   "source": "FCC DOC-404150A1, para 28"
+  }
+ ],
+ "contributingFactors": [
+  "PROCESS / peer-review gap (central lapse): the change violated procedures that require peer review and that peer review did not take place; 'Adequate peer review should have prevented the network change from being approved, and, in turn, from being loaded onto the network' (DOC-404150A1, para 6, 20).",
+  "MAINTENANCE / inadequate lab pre-deployment testing: 'Lab testing by AT&T did not discover the improper configuration of the network element that caused the outage and did not identify the potential impact to the network of that or similar misconfigurations' (para 22).",
+  "MAINTENANCE / inadequate post-installation testing during the maintenance window: post-installation testing is described as a well-established best practice (CSRIC Best Practice 13-10-0615) to verify complex changes and test after committing, and testing performed that night was inadequate to identify the incorrect behavior (para 21).",
+  "DESIGN / missing granular mitigating controls: 'The downstream network element lacked controls specific to mitigating this error and therefore was unable to mitigate the effects' — forcing a nationwide protective shutdown instead of a quarantine (para 25).",
+  "DESIGN + PROCESS / no recovery-capacity planning for the re-registration storm: 'AT&T failed to prepare for the registration congestion associated with the network recovering from Protection Mode, or to sufficiently mitigate that congestion after the fact'; remediation took more than 10 hours after restoration (para 26, 27).",
+  "PROCESS / weak change-approval controls allowed the change onto the production network without confirmation that required reviews were completed, later remediated by procedures ensuring maintenance cannot proceed without confirmed peer review (para 20, 28)."
+ ],
+ "coe": [
+  {
+   "action": "Implement additional peer-review steps and procedures ensuring maintenance cannot proceed without confirmation that required peer reviews are completed",
+   "owner": "AT&T Mobility Network Operations",
+   "status": "Done — implemented post-outage (DOC-404150A1, para 28)"
+  },
+  {
+   "action": "Scan the production network for elements lacking mitigating controls and add element-specific controls to enable quarantine instead of nationwide shutdown",
+   "owner": "AT&T Mobility Core Engineering",
+   "status": "Done — completed within 48 hours of the outage (para 25, 28)"
+  },
+  {
+   "action": "Strengthen lab and post-installation testing to detect misconfigurations and model network-wide impact per CSRIC Best Practice 13-10-0615",
+   "owner": "AT&T Mobility Change/Test Governance",
+   "status": "Recommended — deficiency identified by FCC (para 21, 22)"
+  },
+  {
+   "action": "Build higher-capacity, controlled device re-registration/recovery systems to survive a Protection-Mode recovery storm",
+   "owner": "AT&T Mobility Network Design",
+   "status": "Recommended — deficiency identified by FCC (para 27)"
+  },
+  {
+   "action": "Prioritize 911/PSAP routing restoration and accelerate FirstNet/public-safety outage notification",
+   "owner": "AT&T Mobility Public Safety / FirstNet",
+   "status": "Recommended — 3-hour notification delay flagged (para 9, 14)"
+  },
+  {
+   "action": "Enforcement Bureau review of potential Part 4 and Part 9 rule violations",
+   "owner": "FCC Enforcement Bureau",
+   "status": "Referred by PSHSB (para 29)"
+  }
+ ],
+ "lessonsLearnt": [
+  "A single unreviewed configuration change to a shared core can become a nationwide outage in minutes — process controls (peer review) are not paperwork, they are the primary safety barrier, and they must be an enforced gate, not an advisory step (para 6, 20).",
+  "Automated protective mechanisms must be scoped to the smallest blast radius that still contains the fault; an all-or-nothing 'Protection Mode' that isolates every processing element trades a local error for a national one (para 25).",
+  "Design for the recovery, not just the failure: a protective shutdown guarantees a synchronized device re-registration storm, and without pre-planned capacity that storm becomes the dominant driver of outage duration (over 10 hours of remediation) (para 26, 27).",
+  "Testing that does not reproduce production topology and does not model network-wide impact provides false assurance — lab and post-installation testing must be able to catch a misconfiguration and its downstream propagation (para 21, 22).",
+  "Public-safety resilience is a distinct design requirement: 911/PSAP routing and FirstNet must be prioritized in restoration and public-safety users must be notified fast — a 3-hour notification lag is itself a failure (para 9, 14)."
+ ],
+ "improvements": [
+  "Process: Enforce mandatory peer review as a hard gate on all production wireless-core changes — post-outage AT&T 'implemented additional steps for peer review' and 'adopted procedures to ensure that maintenance work cannot take place without confirmation that required peer reviews have been completed' (DOC-404150A1, para 28).",
+  "Maintenance: Strengthen lab and post-installation testing to detect misconfigurations and model their network-wide impact before and immediately after a change, per CSRIC Best Practice 13-10-0615 — verify complex configuration changes before committing and test after, closing the gap where 'Lab testing by AT&T did not discover the improper configuration' (para 21-22).",
+  "Design: Add element-specific mitigating controls so a single misconfigured element can be quarantined rather than triggering a nationwide Protection-Mode shutdown; within 48 hours AT&T scanned the network for elements lacking the controls and put those controls in place (para 25, 28).",
+  "Design: Engineer for the recovery, not just the failure — build re-registration congestion controls and greater registration capacity so devices re-attach in a controlled sequence after Protection Mode lifts, since 'More robust registration systems with greater capacity would have enabled AT&T Mobility to more quickly and efficiently recover' (para 27).",
+  "Safety: Guarantee 911/FirstNet resilience and rapid public-safety notification — prioritize PSAP-routing restoration and notify FirstNet/public-safety users promptly (the 3-hour notification delay must be closed), given 'no 911 calls from AT&T Mobility-served wireless devices could be routed to the destination PSAP' while voice was down (para 9, 14).",
+  "Process: Tighten change-approval controls so a production change cannot be loaded without recorded confirmation that all required reviews and pre-checks were completed, since 'Adequate peer review should have prevented the network change from being approved' (para 20, 28)."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "What happened: an unreviewed change, a three-minute cascade",
+   "body": "At 2:42 AM CT on February 22, 2024, an AT&T Mobility employee inserted a new, misconfigured network element into the production wireless core during a routine maintenance window intended to expand capacity. The configuration violated AT&T's design-and-installment procedures, which require peer review — a review that never occurred. The error propagated to downstream elements and, at 2:45 AM, triggered an automated shutdown, three minutes after insertion. No vendor, make, model, or element function is disclosed by the FCC; the fault was software/configuration, not physical, so there is no hardware chemistry to describe (DOC-404150A1, para 6, 20)."
+  },
+  {
+   "heading": "Why one bad element became a nationwide outage: Protection Mode",
+   "body": "The decisive design factor is that the downstream element 'lacked controls specific to mitigating this error,' so the network had no way to quarantine a single misconfigured element. Instead it invoked 'Protection Mode,' an automated total shutdown that 'isolated all voice and 5G data processing elements from the wireless towers and switching elements.' Protection Mode worked as designed — it stopped error propagation — but its blast radius was the entire network: every registered device across all 50 states, DC, Puerto Rico and the US Virgin Islands lost voice and 5G data at once (para 25, 6, 1)."
+  },
+  {
+   "heading": "Public-safety impact: 911, PSAPs, FirstNet and WPS",
+   "body": "The outage disconnected public-safety users along with everyone else. No 911 call from an AT&T Mobility device could be routed to its PSAP while voice was down, and more than 25,000 calls to PSAPs/911 were blocked. FirstNet devices were affected; FirstNet infrastructure was prioritized and restored by 5:00 AM, but FirstNet customers were not notified until 5:53 AM — more than three hours after the outage began. Wireless Priority Service volume ran at less than two-thirds of typical, indicating some priority public-safety calls also failed (para 1, 8, 9, 14, 17)."
+  },
+  {
+   "heading": "The recovery storm: a second failure designed in",
+   "body": "Removing the misconfigured element was necessary but insufficient. Once it was backed out, all user devices simultaneously tried to re-register, and 'the influx of device registration attempts far exceeded what AT&T Mobility's network management systems could handle,' causing widespread congestion that prolonged the outage. AT&T 'failed to prepare for the registration congestion associated with the network recovering from Protection Mode,' and it took more than 10 hours after restoration to fully remediate the congestion — making the recovery, not the initial trip, the dominant contributor to the roughly twelve-hour total (para 26, 27)."
+  },
+  {
+   "heading": "Regulatory response and remedies",
+   "body": "The FCC Public Safety and Homeland Security Bureau opened its investigation and produced this report, referring the matter to the Enforcement Bureau for potential violations of Parts 4 and 9 of the Commission's rules. AT&T's own remedies were concrete: within 48 hours it scanned the network for elements lacking mitigating controls and added them, and it implemented additional peer-review steps plus procedures ensuring maintenance cannot proceed without confirmation that required peer reviews are complete. The report also faults inadequate lab and post-installation testing against CSRIC Best Practice 13-10-0615 (para 21, 22, 28, 29)."
+  }
+ ],
+ "references": [
+  {
+   "title": "FCC Public Safety and Homeland Security Bureau — Report on the February 22, 2024 AT&T Mobility Network Outage (DOC-404150A1)",
+   "url": "https://docs.fcc.gov/public/attachments/DOC-404150A1.txt",
+   "type": "regulatory",
+   "quote": "an AT&T Mobility employee placed a new network element into its production network during a routine night maintenance window ... The configuration of the network element did not conform to AT&T's established network element design and installment procedures, which require peer review.",
+   "accessed": "2026-08-02"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": true,
+  "lastVerified": "2026-08-02 (seed — pending deep research)"
+ },
+ "lastUpdated": "2026-08-02"
+}

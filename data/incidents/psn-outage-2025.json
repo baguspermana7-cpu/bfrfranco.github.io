@@ -1,0 +1,287 @@
+{
+ "slug": "psn-outage-2025",
+ "title": "PlayStation Network ~24-Hour Global Outage (February 2025)",
+ "operator": "Sony Interactive Entertainment",
+ "operatorShort": "Sony PSN",
+ "dcName": "PlayStation Network backend services",
+ "location": {
+  "city": "San Mateo, California",
+  "country": "United States"
+ },
+ "date": "2025-02-07",
+ "durationMin": 1440,
+ "category": [
+  "network",
+  "software"
+ ],
+ "severity": {
+  "usersAffected": "Millions of PlayStation Network / PS Plus users worldwide",
+  "impactUsd": "PS Plus compensation to members; direct loss not published",
+  "servicesDown": [
+   "Online multiplayer",
+   "PlayStation Store",
+   "Account management / authentication",
+   "Game/app launch requiring sign-in"
+  ],
+  "tier": "Sev-1 global platform backend (~24h)"
+ },
+ "brief": "An approximately 24-hour global PlayStation Network outage on 7–8 February 2025 locked millions of players out of online multiplayer, the PlayStation Store, and account/authentication services; Sony attributed it to an operational issue and issued affected members five days of PS Plus as compensation.",
+ "magnitude": {
+  "blastRadiusScore": 6,
+  "usersScore": 7,
+  "financialScore": 4,
+  "durationScore": 6,
+  "note": "A ~24-hour global PSN outage locked millions of players out of online play, store and account services — sub-scores ESTIMATED from public impact reporting, pending deep research."
+ },
+ "rootCause": "SCHEMA-MISMATCH DISCLOSURE (load-bearing): This was a global network/authentication SERVICE OUTAGE of PlayStation Network backend services operated by Sony Interactive Entertainment (SIE) — NOT a facility fire. There was no ignition source, no combustion, no smoke/heat detection, no fire-suppression discharge, no building evacuation, no fire-brigade dispatch, and no electrical de-energisation of a burning space. All physical-fire root-cause fields (equipment make/model, age, chemistry, ignition mechanism) are therefore Not Applicable — no such data exists, and none is invented here. (No cited source establishes the physical location of the failed backend; the earlier \"operated out of San Mateo\" specificity has been removed as unsupported — SIE is headquartered in San Mateo, CA, but no source ties this outage to that site.)\n\nNO SPECIFIC ROOT CAUSE WAS EVER PUBLISHED. The entirety of Sony's official root-cause disclosure is a single verbatim phrase: \"Network services have fully recovered from an operational issue\" (Sony statement via @AskPlayStation, reproduced independently by Analytics Insight, analyticsinsight.net, and OpenCritic, opencritic.com). Sony explicitly did not attribute the failure to any named subsystem, hardware unit, deployment, configuration change, capacity event, or vendor. Multiple outlets independently characterised the explanation as vague and noted the deliberate absence of detail: Sony's statement carried \"no mention of a hack, a DDoS (Distributed Denial of Service) attack, or something else\" (OpenCritic, syndicating DualShockers).\n\nANALYST-LEVEL INFERENCE (not confirmed by Sony): The externally observed failure signature — simultaneous, global loss of sign-in/authentication, PlayStation Store, and multiplayer across effectively all service categories at once — is consistent with a fault in a shared backend authentication/identity or core-services layer rather than a localised, single-service failure (GameSpew scope, gamespew.com). This is inference from symptom pattern only; Sony never confirmed which layer failed. The framing \"operational issue\" is suggestive of an internal operations/configuration/change-management fault rather than an external attack, but Sony never confirmed a maintenance action, deployment, or config change as the trigger.\n\nLATENT ROOT (the durable failure, and the part that IS evidenced): The record shows a transparency and incident-communication failure layered on top of an undisclosed technical fault. Sony posted only about two messages via the official PlayStation Twitter/X account during the entire multi-hour outage (GameSpew), gave no live technical detail, published no exact restoration timestamp, and issued no post-incident engineering report or RCA — Forbes called it \"nothing more than a two-word explanation about its most significant outage since 2014\" (forbes.com). There is NO public evidence of a redundancy/DR/failover trigger working or failing — the shared-backend failure signature suggests a single point of failure in the authentication/core-services path, but this cannot be confirmed. Explicitly disclosed uncertainty: the actual root cause, the failed layer, the true duration, and whether the Monster Hunter Wilds open-beta load window was causal all remain genuinely non-public. This was NOT reported as a security breach, hack, or DDoS, and no data-compromise notification was issued — distinguishing it from the 2011 PSN intrusion (OpenCritic/DualShockers; Forbes; forensic disclosure).",
+ "technicalDeepDive": "The failure presented as a near-simultaneous, worldwide collapse of PlayStation Network backend services beginning Friday evening, 7 February 2025 (Pacific), with onset coinciding with the Monster Hunter Wilds second open-beta window — a coincidence reported by Fextralife (fextralife.com) and OpenCritic (opencritic.com), the latter noting Capcom rescheduled the beta in response (NOTE: the Analytics Insight article does NOT mention Monster Hunter Wilds and has been removed as a source for this coincidence). Detection was entirely digital, not physical: Sony's own PlayStation Network Service Status page flipped affected categories to degraded/unavailable, and third-party crowd telemetry (Downdetector) climbed to a peak of \"nearly 8,000 reports... from US users and over 7,300 from the UK at its peak on Saturday afternoon,\" 8 February (Analytics Insight, analyticsinsight.net). Because there was no fire, all physical-forensics stages — smoke/heat detection, alarm activation, suppression discharge (type/flow/effectiveness), evacuation headcount, emergency-services call-to-arrival, and electrical de-energisation — did not occur and return no data (forensic disclosure).\n\nThe affected scope spanned essentially all PSN service categories at once: Account Management/sign-in and authentication, Gaming and Social/multiplayer (with named impact to titles including Helldivers 2 and Diablo 4), the PlayStation Store (purchases and downloads), and PS5 disc-drive registration — which required online verification even for physical media (GameSpew). This all-categories-at-once signature is the single most diagnostic external observation, and it is consistent with a shared authentication/identity or core-services fault rather than a per-service failure — but Sony never confirmed the failed layer, so this remains inference (forensic disclosure; unknowns).\n\nSony's remediation was internal and undocumented publicly. During the event the company posted only about two @AskPlayStation messages — an initial acknowledgement of difficulty using games, apps, or network features, then a recovery notice (GameSpew). Services were restored Saturday evening, 8 February, with the verbatim closure \"Network services have fully recovered from an operational issue\" and an automatic 5-day PS Plus extension for all members (Analytics Insight; OpenCritic; Forbes). Total duration is reported inconsistently across outlets — from \"nearly 18 hours\" (Analytics Insight) to \"over 24 hours\" (Fextralife; GameSpew) and \"exactly 24 hours\" (Forbes) — because Sony published no precise start or restore clock times. There is no evidence of any regulator, utility authority, or fire authority involvement; PSN outages of this class are not subject to such oversight, and none was reported (unknowns).",
+ "sequenceOfEvents": [
+  {
+   "t": "2025-02-07 evening (PT)",
+   "phase": "TRIGGER",
+   "event": "PSN backend services begin failing globally; onset coincides with the Monster Hunter Wilds second open-beta window. NOT a fire — no ignition, combustion, smoke, or heat; trigger is an undisclosed backend fault Sony would later call only 'an operational issue.'",
+   "source": "https://fextralife.com/playstation-begins-5-day-compensation-for-psn-outage/"
+  },
+  {
+   "t": "2025-02-07 evening (PT)",
+   "phase": "DETECTION",
+   "event": "Detection is entirely digital, not physical: Sony's PlayStation Network Service Status page flips affected categories to degraded/unavailable. No smoke/heat detector, no fire alarm — none exist for this event.",
+   "source": "https://www.analyticsinsight.net/news/playstation-network-outage-sony-gives-5-days-of-ps-plus-free"
+  },
+  {
+   "t": "2025-02-07 evening (PT)",
+   "phase": "DETECTION",
+   "event": "Third-party crowd telemetry (Downdetector) begins climbing as users worldwide report failures — the external corroboration of onset in the absence of any Sony technical bulletin.",
+   "source": "https://www.analyticsinsight.net/news/playstation-network-outage-sony-gives-5-days-of-ps-plus-free"
+  },
+  {
+   "t": "2025-02-07 evening (PT)",
+   "phase": "IMPACT",
+   "event": "Account Management / sign-in and authentication go down globally — users cannot log in to PSN.",
+   "source": "https://www.gamespew.com/2025/02/sony-offers-compensation-for-the-playstation-network-outage-but-is-vague-about-the-cause/"
+  },
+  {
+   "t": "2025-02-07 evening (PT)",
+   "phase": "IMPACT",
+   "event": "PlayStation Store, game purchases and downloads become unavailable.",
+   "source": "https://www.gamespew.com/2025/02/sony-offers-compensation-for-the-playstation-network-outage-but-is-vague-about-the-cause/"
+  },
+  {
+   "t": "2025-02-07 evening (PT)",
+   "phase": "CASCADE",
+   "event": "Failure cascades across service categories simultaneously: multiplayer titles (Helldivers 2, Diablo 4) and PS5 disc-drive registration (online verification required even for physical media) — signature of a shared auth/core-services fault (inference, not Sony-confirmed).",
+   "source": "https://www.gamespew.com/2025/02/sony-offers-compensation-for-the-playstation-network-outage-but-is-vague-about-the-cause/"
+  },
+  {
+   "t": "2025-02-07 to 02-08",
+   "phase": "MITIGATION",
+   "event": "Sony's only live response is an internal, undocumented remediation plus an initial @AskPlayStation acknowledgement of difficulty launching games, apps, or network features. No redundancy/failover trigger is evidenced (analogue of suppression — none discharged, none confirmed working or failing).",
+   "source": "https://www.gamespew.com/2025/02/sony-offers-compensation-for-the-playstation-network-outage-but-is-vague-about-the-cause/"
+  },
+  {
+   "t": "2025-02-07 to 02-08",
+   "phase": "MITIGATION",
+   "event": "Communications near-blackout: Sony posts only about two messages via the official PlayStation Twitter/X account for the entire event, with no technical detail, cause, or ETA.",
+   "source": "https://www.gamespew.com/2025/02/sony-offers-compensation-for-the-playstation-network-outage-but-is-vague-about-the-cause/"
+  },
+  {
+   "t": "2025-02-08 afternoon (Sat)",
+   "phase": "IMPACT",
+   "event": "Impact peaks: Downdetector reaches nearly 8,000 US reports and over 7,300 UK reports at its Saturday-afternoon peak — the quantified height of user-facing disruption.",
+   "source": "https://www.analyticsinsight.net/news/playstation-network-outage-sony-gives-5-days-of-ps-plus-free"
+  },
+  {
+   "t": "N/A (no physical incident)",
+   "phase": "IMPACT",
+   "event": "NOT APPLICABLE by disclosure: no evacuation, no emergency-services call/arrival, no fire-brigade actions, and no electrical de-energisation occurred — this was a cloud service outage, not a facility event; these stages return no data.",
+   "source": "https://opencritic.com/news/11887/psn-outage-due-to-operational-issue-sony-grants-extra-5-days-to-all-ps-plus-members"
+  },
+  {
+   "t": "2025-02-08 evening (Sat)",
+   "phase": "RECOVERY",
+   "event": "Backend services are restored globally after internal remediation of the unspecified fault.",
+   "source": "https://www.analyticsinsight.net/news/playstation-network-outage-sony-gives-5-days-of-ps-plus-free"
+  },
+  {
+   "t": "2025-02-08 evening (Sat)",
+   "phase": "RESTORED",
+   "event": "Sony declares closure verbatim: 'Network services have fully recovered from an operational issue' — the entirety of its official root-cause disclosure.",
+   "source": "https://www.analyticsinsight.net/news/playstation-network-outage-sony-gives-5-days-of-ps-plus-free"
+  },
+  {
+   "t": "2025-02-08 evening (Sat)",
+   "phase": "RECOVERY",
+   "event": "Sony announces automatic compensation: all PlayStation Plus members (Essential, Extra, Premium) receive an additional 5 days of service added to renewal dates.",
+   "source": "https://www.gamespew.com/2025/02/sony-offers-compensation-for-the-playstation-network-outage-but-is-vague-about-the-cause/"
+  },
+  {
+   "t": "2025-02-08 (post-restore)",
+   "phase": "RESTORED",
+   "event": "Duration remains disputed: reported inconsistently from 'nearly 18 hours' (Analytics Insight) to 'over 24 hours' (Fextralife) and 'exactly 24 hours' (Forbes); Sony publishes no exact start or restore timestamp, so true duration is not verifiable.",
+   "source": "https://fextralife.com/playstation-begins-5-day-compensation-for-psn-outage/"
+  },
+  {
+   "t": "2025-02-10 onward",
+   "phase": "RESTORED",
+   "event": "Post-incident coverage (Forbes) criticises the 5-day extension as inadequate ('pretty lame') versus the free-games response after the 2011 hack, and faults Sony's 'two-word explanation'; no root-cause report, regulator filing, or named component is ever produced.",
+   "source": "https://www.forbes.com/sites/paultassi/2025/02/10/sony-reveals-compensation-for-all-ps-plus-players-after-psn-outage/"
+  },
+  {
+   "t": "~2025-03 (rollout)",
+   "phase": "RESTORED",
+   "event": "The 5-day PS Plus extension is applied automatically to all members' renewal dates, with rollout occurring roughly a month after the incident; members can verify via Subscription Management on the PlayStation Store.",
+   "source": "https://opencritic.com/news/11887/psn-outage-due-to-operational-issue-sony-grants-extra-5-days-to-all-ps-plus-members"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Peak US outage reports (Downdetector)",
+   "value": "~8,000 at peak (Sat afternoon, 8 Feb)",
+   "source": "https://www.analyticsinsight.net/news/playstation-network-outage-sony-gives-5-days-of-ps-plus-free"
+  },
+  {
+   "label": "Peak UK outage reports (Downdetector)",
+   "value": ">7,300 at peak (Sat afternoon, 8 Feb)",
+   "source": "https://www.analyticsinsight.net/news/playstation-network-outage-sony-gives-5-days-of-ps-plus-free"
+  },
+  {
+   "label": "Outage duration (disputed / not verifiable)",
+   "value": "'nearly 18 hrs' to 'over 24 hrs'; no exact Sony timestamp",
+   "source": "https://fextralife.com/playstation-begins-5-day-compensation-for-psn-outage/"
+  },
+  {
+   "label": "Sony communications during event",
+   "value": "~2 posts via official PlayStation X/Twitter for the entire outage",
+   "source": "https://www.gamespew.com/2025/02/sony-offers-compensation-for-the-playstation-network-outage-but-is-vague-about-the-cause/"
+  },
+  {
+   "label": "Official root-cause detail published",
+   "value": "0 — only the phrase 'an operational issue'",
+   "source": "https://opencritic.com/news/11887/psn-outage-due-to-operational-issue-sony-grants-extra-5-days-to-all-ps-plus-members"
+  },
+  {
+   "label": "Compensation granted",
+   "value": "5 additional PS Plus days, automatic, all members",
+   "source": "https://www.analyticsinsight.net/news/playstation-network-outage-sony-gives-5-days-of-ps-plus-free"
+  },
+  {
+   "label": "PS Plus tiers covered by compensation",
+   "value": "3 (Essential, Extra, Premium)",
+   "source": "https://www.gamespew.com/2025/02/sony-offers-compensation-for-the-playstation-network-outage-but-is-vague-about-the-cause/"
+  },
+  {
+   "label": "PSN service categories down simultaneously",
+   "value": "4+ (Account/sign-in, Store, multiplayer/Social, PS5 disc registration)",
+   "source": "https://www.gamespew.com/2025/02/sony-offers-compensation-for-the-playstation-network-outage-but-is-vague-about-the-cause/"
+  }
+ ],
+ "contributingFactors": [
+  "Undisclosed technical fault with zero public root-cause detail: Sony's only stated cause was 'an operational issue' (Analytics Insight; OpenCritic), with 'no mention of a hack, a DDoS (Distributed Denial of Service) attack, or something else' (OpenCritic) — no named subsystem, config change, or failure mechanism was ever produced, and no post-incident RCA was published (unknowns).",
+  "Shared-backend single point of failure (inferred, not confirmed): the simultaneous global loss of sign-in/authentication, Store, and multiplayer across all categories at once is consistent with a fault in a shared auth/identity or core-services layer, with NO public evidence of any redundancy/failover/DR trigger working or failing (GameSpew; forensic disclosure; unknowns).",
+  "Change-management / operations discipline unverified: the phrase 'operational issue' is suggestive of an internal operations, configuration, or change-management fault rather than an external attack, but Sony never confirmed whether a deployment, config change, or work-procedure lapse triggered it — no change-window error or vendor advisory was disclosed (maintenance disclosure; unknowns).",
+  "Possible capacity/load coincidence left unaddressed: onset coincided with the Monster Hunter Wilds second open-beta window (Fextralife; OpenCritic, which notes Capcom rescheduled the beta), raising an unconfirmed capacity/load hypothesis that Sony never confirmed or ruled out (unknowns).",
+  "Incident-communication failure: Sony posted only about two messages via the official PlayStation Twitter/X account for the entire multi-hour outage (GameSpew), leaving millions of users without status, cause, or ETA during the event.",
+  "No published restoration timestamp: Sony gave no precise start or end clock times, producing a duration reported inconsistently from 'nearly 18 hours' to 'over 24 hours'/'exactly 24 hours' (Analytics Insight; Fextralife; Forbes) and preventing independent verification of true impact duration."
+ ],
+ "coe": [
+  {
+   "action": "Publish a post-incident root-cause summary / RCA identifying the failed subsystem, trigger, and corrective actions",
+   "owner": "Sony Interactive Entertainment",
+   "status": "Not done — no public RCA ever issued (recommended)"
+  },
+  {
+   "action": "Engineer and drill automated failover/redundancy for the shared authentication and core-services layer",
+   "owner": "Sony Interactive Entertainment (PSN backend engineering)",
+   "status": "Not disclosed (recommended)"
+  },
+  {
+   "action": "Adopt timestamped status-page cadence and a live incident-communication protocol during outages",
+   "owner": "Sony Interactive Entertainment (PlayStation Ops/Comms)",
+   "status": "Not disclosed (recommended)"
+  },
+  {
+   "action": "Formalise capacity/load gating and go/no-go coupling with partner beta/launch windows (e.g. Monster Hunter Wilds)",
+   "owner": "Sony Interactive Entertainment + partner publishers",
+   "status": "Not disclosed (recommended)"
+  },
+  {
+   "action": "Deliver automatic 5-day PS Plus extension to all members (Essential/Extra/Premium)",
+   "owner": "Sony Interactive Entertainment",
+   "status": "Done — applied automatically, rolled out ~1 month post-incident (Analytics Insight; OpenCritic)"
+  }
+ ],
+ "lessonsLearnt": [
+  "A shared identity/authentication layer is the highest-blast-radius component in a consumer platform: when it fails, sign-in, Store, multiplayer, and device registration fail together (GameSpew) — resilience investment must be concentrated there, not spread evenly.",
+  "Silence is itself an incident cost: ~2 posts across a ~24-hour global outage (GameSpew) converted a technical fault into a trust and reputation event, drawing sustained criticism (Forbes; OpenCritic).",
+  "Absence of a published start/restore timestamp makes impact unquantifiable and unfalsifiable — outlets disagreed between 'nearly 18 hours' and 'over 24 hours' (Analytics Insight; Fextralife) purely because Sony released no authoritative clock.",
+  "Vague root-cause disclosure ('an operational issue') without an RCA leaves users unable to distinguish an operational fault from a security incident — OpenCritic explicitly notes readers feared a hack/data exposure absent any ruling-out (OpenCritic).",
+  "Compensation without transparency underwhelms: an automatic 5-day PS Plus extension was judged 'pretty lame' relative to the 2011 free-games response, because it substituted for, rather than accompanied, an explanation (Forbes)."
+ ],
+ "improvements": [
+  "Safety (availability-critical): Treat authentication/sign-in as an availability-safety-critical single point of failure — the outage's all-categories-at-once signature shows a shared auth/core-services fault takes down Store, multiplayer, and check-in together (GameSpew; forensic disclosure); its resilience must be engineered, load-tested, and continuously game-day-exercised as a top-tier reliability control.",
+  "Maintenance / change-management: Institute and disclose rigorous change-management and configuration discipline for backend deployments — the 'operational issue' framing (Analytics Insight; OpenCritic) points to an internal operations or config fault, and Sony evidenced no change-window or rollback controls; documented pre-deploy verification, staged rollout, and one-click rollback would reduce recurrence risk.",
+  "Design / redundancy: Build and prove redundancy and automated failover for the shared authentication and core-services layer — there is NO public evidence any DR/failover trigger worked or existed (forensic disclosure), and a global single-point collapse is the exact failure such redundancy is meant to survive; validate with regular regional-failover drills.",
+  "Process / capacity: Formalise load and capacity gating around known demand spikes (e.g. the concurrent Monster Hunter Wilds open beta; Fextralife; OpenCritic) — pre-event headroom checks, surge capacity, and go/no-go coupling between partner beta windows and PSN readiness would remove an unaddressed capacity hypothesis.",
+  "Communication / transparency: Adopt a public incident-status discipline — timestamped status-page updates, regular cadence during the event (versus ~2 posts for a 24-hour outage; GameSpew), and a published post-incident summary/RCA; Forbes and OpenCritic show the 'two-word explanation' materially damaged user trust."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "What actually happened (and what did not)",
+   "body": "On the evening of Friday 7 February 2025 (PT), PlayStation Network backend services failed globally in a near-simultaneous collapse spanning sign-in/authentication, the PlayStation Store, multiplayer (Helldivers 2, Diablo 4), and PS5 disc-drive registration (GameSpew). This was a cloud/network service outage, not a facility fire: there was no ignition, smoke/heat detection, suppression discharge, evacuation, emergency-services dispatch, or electrical de-energisation, so all physical-forensics fields are Not Applicable and return no data. Services were restored the following evening, 8 February, and Sony's total public root-cause disclosure amounted to a single phrase: 'Network services have fully recovered from an operational issue' (Analytics Insight; OpenCritic)."
+  },
+  {
+   "heading": "Diagnostic signature and the limits of inference",
+   "body": "The most diagnostic external observation is that all service categories failed at once, which is consistent with a fault in a shared authentication/identity or core-services layer rather than a per-service failure (GameSpew). This is inference from symptom pattern only — Sony never named the failed layer, never confirmed a deployment or config change, and never ruled a capacity event in or out. The concurrent Monster Hunter Wilds second open beta (Fextralife; OpenCritic, which notes Capcom rescheduled it) raises an unconfirmed load hypothesis. Correcting the proposed draft: the Analytics Insight article does NOT mention Monster Hunter Wilds, so it cannot support that coincidence and has been removed as a source for it."
+  },
+  {
+   "heading": "The transparency failure is the evidenced latent root",
+   "body": "While the technical fault stays non-public, the communication failure is well-documented and durable: Sony posted only about two messages via the official PlayStation X/Twitter account across a ~24-hour global outage (GameSpew), issued no timestamped status updates, and published no RCA. Forbes characterised this as 'nothing more than a two-word explanation about its most significant outage since 2014' and judged the compensation 'pretty lame' versus the 2011 free-games response. OpenCritic records genuine user fear of a hack/data breach precisely because Sony did not rule one out — even though the incident was not reported as a security breach or DDoS."
+  },
+  {
+   "heading": "Quantified impact and disclosed uncertainty",
+   "body": "User-facing impact peaked Saturday afternoon at nearly 8,000 US and over 7,300 UK Downdetector reports (Analytics Insight). Duration is genuinely non-verifiable: outlets range from 'nearly 18 hours' (Analytics Insight) through 'over 24 hours' (Fextralife; GameSpew) to 'exactly 24 hours' (Forbes) because Sony published no start/restore clock. Compensation — an automatic 5-day PS Plus extension across Essential, Extra, and Premium — is the one fully corroborated remediation (five sources). Disclosed unknowns that remain open: the true root cause, the failed layer, the exact duration, whether the beta load window was causal, and whether any redundancy/failover existed or fired. No regulator, utility, or fire authority was involved, and none would be for an outage of this class."
+  }
+ ],
+ "references": [
+  {
+   "title": "PlayStation Network outage: Sony gives 5 days of PS Plus free — Analytics Insight",
+   "url": "https://www.analyticsinsight.net/news/playstation-network-outage-sony-gives-5-days-of-ps-plus-free",
+   "type": "press",
+   "quote": "Network services have fully recovered from an operational issue. ... nearly 8,000 reports came from US users and over 7,300 from the UK at its peak on Saturday afternoon.",
+   "accessed": "2026-08-02"
+  },
+  {
+   "title": "Sony offers compensation for the PlayStation Network outage, but is vague about the cause — GameSpew",
+   "url": "https://www.gamespew.com/2025/02/sony-offers-compensation-for-the-playstation-network-outage-but-is-vague-about-the-cause/",
+   "type": "press",
+   "quote": "Sony made two posts on X during the outage; affected services included Helldivers 2 and Diablo 4 multiplayer, game purchases and downloads, and PS5 disc-drive registration; all PS Plus tiers (Essential, Extra, Premium) received five additional days.",
+   "accessed": "2026-08-02"
+  },
+  {
+   "title": "PSN outage due to 'operational issue'; Sony grants extra 5 days to all PS Plus members — OpenCritic (syndicating DualShockers)",
+   "url": "https://opencritic.com/news/11887/psn-outage-due-to-operational-issue-sony-grants-extra-5-days-to-all-ps-plus-members",
+   "type": "press",
+   "quote": "There wasn't a mention of a hack, a DDoS (Distributed Denial of Service) attack, or something else.",
+   "accessed": "2026-08-02"
+  },
+  {
+   "title": "PlayStation begins 5-day compensation for PSN outage — Fextralife",
+   "url": "https://fextralife.com/playstation-begins-5-day-compensation-for-psn-outage/",
+   "type": "press",
+   "quote": "The roughly 'over 24 hours' outage coincided with the launch of the Monster Hunter Wilds second open beta, which Capcom rescheduled in response; all PS Plus members received five additional days automatically.",
+   "accessed": "2026-08-02"
+  },
+  {
+   "title": "Sony Reveals Compensation For All PS Plus Players After PSN Outage — Forbes (Paul Tassi)",
+   "url": "https://www.forbes.com/sites/paultassi/2025/02/10/sony-reveals-compensation-for-all-ps-plus-players-after-psn-outage/",
+   "type": "press",
+   "quote": "It is odd that Sony is giving nothing more than a two-word explanation about its most significant outage since 2014.",
+   "accessed": "2026-08-02"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": false,
+  "lastVerified": "2026-08-02 (seed — pending deep research)"
+ },
+ "lastUpdated": "2026-08-02"
+}

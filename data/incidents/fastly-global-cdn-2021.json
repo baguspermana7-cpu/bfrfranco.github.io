@@ -1,0 +1,271 @@
+{
+ "slug": "fastly-global-cdn-2021",
+ "title": "Fastly Global CDN Outage — Latent Software Bug (June 8, 2021)",
+ "operator": "Fastly",
+ "operatorShort": "Fastly",
+ "dcName": "Fastly global edge CDN network",
+ "location": {
+  "city": "Global",
+  "country": "Global"
+ },
+ "date": "2021-06-08",
+ "durationMin": 60,
+ "category": [
+  "software",
+  "network"
+ ],
+ "severity": {
+  "usersAffected": "Global users of major sites (Amazon, Reddit, gov.uk, NYT, Twitch, Spotify, Shopify)",
+  "impactUsd": "Not published",
+  "servicesDown": [
+   "~85% of Fastly CDN globally",
+   "Major customer sites (Amazon, Reddit, gov.uk, NYT, Twitch)"
+  ],
+  "tier": "Sev-1 global CDN (software)"
+ },
+ "brief": "An undiscovered software bug introduced in a mid-May Fastly software deployment lay dormant until a single customer configuration change triggered it on 8 June 2021, disabling roughly 85% of Fastly's global CDN and taking major sites (Amazon, Reddit, gov.uk, The New York Times, Twitch) offline worldwide for about an hour.",
+ "magnitude": {
+  "blastRadiusScore": 8,
+  "usersScore": 7,
+  "financialScore": 5,
+  "durationScore": 3,
+  "note": "A single customer config change triggered a latent bug that disabled ~85% of Fastly's CDN, taking major sites offline globally for ~1h — sub-scores ESTIMATED from public impact reporting, pending deep research."
+ },
+ "rootCause": "This was a global software control-plane failure of Fastly's edge CDN, with no physical ignition source, equipment, or chemistry; mapped to the incident schema, the \"ignition source\" analogue is a single defective code change. Per Fastly's official post-mortem (Nick Rockwell, fastly.com/blog/summary-of-june-8-outage): \"On May 12, we began a software deployment that introduced a bug that could be triggered by a specific customer configuration under specific circumstances.\" That deployment is the proximate defect origin. The bug lay dormant — latent across essentially the entire global edge fleet — for roughly 27 days before any input exercised it.\n\nThe failure-mechanism analogue is a latent, globally-distributed logic defect gated on an input condition: it required a particular customer configuration state to activate, so until that state existed the defective code path was never reached and the fault was invisible in normal operation. Fastly never publicly disclosed the specific module, function, service, or code path; the post-mortem names only \"a bug\" triggered by \"a specific customer configuration under specific circumstances.\" Fastly's edge is Varnish/VCL-derived, but the official record does not name the language or component, so the precise mechanism is marked disclosed-unknown.\n\nThe trigger — the match-strike analogue — was a legitimate customer action, not an error: \"a customer pushed a valid configuration change that included the specific circumstances that triggered the bug, which caused 85% of our network to return errors.\" Fastly stressed the change was \"valid,\" locating fault in its own software rather than the customer. Neither the customer nor the specific config was ever identified.\n\nThe latent root cause — the design/inspection-lapse analogue — is a gap in Fastly's software quality-assurance and deploy-validation regime: the defect passed pre-deployment QA on May 12 and survived nearly a month undetected in production. Fastly conceded it would \"figure out why we didn't detect the bug during our software quality assurance and testing processes.\" A second latent root is the absence of a rollout/blast-radius guardrail: a single valid config edit propagated the error condition to ~85% of the global network almost simultaneously, with no canary, staged rollout, or automated circuit-breaker catching it before worldwide impact — Fastly separately committed to \"evaluate ways to improve our remediation time.\" No physical maintenance, inspection, detection, or suppression hardware is implicated because none was involved.",
+ "technicalDeepDive": "This was a software/CDN control-plane failure with no fire, facility, detection hardware, suppression system, evacuation, or emergency-services response; the incident-forensic schema is mapped to its software analogues, each grounded in Fastly's official post-mortem (fastly.com/blog/summary-of-june-8-outage) and Wikipedia.\n\nLatent defect and trigger: A May 12, 2021 software deployment \"introduced a bug that could be triggered by a specific customer configuration under specific circumstances.\" The defect was globally distributed but dormant, gated on a particular configuration state. On June 8, \"a customer pushed a valid configuration change that included the specific circumstances that triggered the bug, which caused 85% of our network to return errors.\" Because the defective code was already resident on nearly the entire edge fleet, the triggering config propagated the error condition network-wide almost immediately — the software analogue of near-instantaneous global spread rather than a localized, propagating burn. Blast radius: ~85% of Fastly's global network returned errors instead of serving content. (Contemporaneous press widely reported HTTP 503 responses in the request path; the specific status code is press-attributed and is NOT stated in Fastly's post-mortem, so it is not asserted here as official fact.)\n\nDetection (= fire-detection system analogue): automated monitoring/observability, not smoke or heat sensors. \"We detected the disruption within one minute\" — onset 09:47 UTC, monitoring flagged the global disruption 09:48 UTC. A public status post followed at 09:58 UTC. Detection was fast and effective; the gaps were upstream (pre-production QA never caught the latent defect) and downstream (no automated containment before global impact).\n\nSuppression / mitigation (= suppression system analogue): no automatic suppression halted the fault. Mitigation was manual engineering intervention — Fastly Engineering \"identified the customer configuration\" at 10:27 UTC (~40 min after onset), then isolated and disabled it. Recovery followed fast: per Fastly's own summary, \"Within 49 minutes, 95% of our network was operating as normal\" (by ~10:36 UTC, where impacted services \"began to recover\"); the majority of services had recovered by ~11:00 UTC. The incident was declared mitigated at 12:35 UTC and the status post resolved at 12:44 UTC. The permanent \"suppression\" — the actual bug fix — was a separate, later action: \"We created a permanent fix for the bug and began deploying it at 17:25.\"\n\nIsolation / de-energisation (= electrical-isolation analogue): not applicable as physical de-energisation. Functionally, ~85% of Fastly's edge PoPs stayed powered and running but failed the request path; recovery came by disabling the offending configuration and forcing healthy state, not by cutting power.\n\nEvacuation and emergency services: not applicable — no personnel or physical site were endangered; \"impact\" was to traffic and customers, not people, and there was no fire brigade or 911/999 dispatch. The analogue is Fastly's internal incident-response engineering, which self-detected (no external call), engaged within one minute, and drove isolation → recovery → mitigation → permanent fix across the 09:47–17:25 UTC window.\n\nDownstream impact: per Wikipedia, the outage caused \"Reddit, gov.uk, and Amazon, along with major news sources such as The New York Times, The Guardian, and the BBC, to become unavailable.\" Press cited many more sites (Twitch, PayPal, Spotify, GitHub, Stripe, HBO Max, CNN, FT, Pinterest, Kickstarter, Vimeo, Shopify, Hulu), but only the Wikipedia-confirmed subset is grounded verbatim. Economic/market-impact figures and Fastly's share-price move that day were reported by press but not quantified in the official post-mortem, and are excluded as unsourced-official. Fastly closed: \"This outage was broad and severe, and we're truly sorry for the impact to our customers,\" and committed to investigating the QA/testing gap and improving remediation time.",
+ "sequenceOfEvents": [
+  {
+   "t": "2021-05-12",
+   "phase": "TRIGGER",
+   "event": "Fastly begins a software deployment that introduces the latent bug 'that could be triggered by a specific customer configuration under specific circumstances'; the defect lies dormant across the global edge fleet for ~27 days, having passed pre-deployment QA and testing.",
+   "source": "fastly.com/blog/summary-of-june-8-outage"
+  },
+  {
+   "t": "2021-06-08 09:47 UTC",
+   "phase": "TRIGGER",
+   "event": "Onset — a customer pushes a valid configuration change meeting the 'specific circumstances,' activating the dormant bug (the ignition analogue: a legitimate action strikes the latent defect).",
+   "source": "fastly.com/blog/summary-of-june-8-outage"
+  },
+  {
+   "t": "2021-06-08 09:47 UTC",
+   "phase": "CASCADE",
+   "event": "~85% of Fastly's global edge network begins returning errors instead of serving content; because the defective code was already resident fleet-wide, the fault propagates network-wide almost immediately — the software analogue of near-instant global spread.",
+   "source": "fastly.com/blog/summary-of-june-8-outage"
+  },
+  {
+   "t": "2021-06-08 09:48 UTC",
+   "phase": "DETECTION",
+   "event": "Fastly monitoring identifies the global disruption 'within one minute' (the fire-detection-system analogue) — no smoke/heat sensors; observability tooling flags the network-wide error surge.",
+   "source": "fastly.com/blog/summary-of-june-8-outage"
+  },
+  {
+   "t": "2021-06-08 09:48 UTC",
+   "phase": "IMPACT",
+   "event": "Major downstream sites go dark globally — Reddit, gov.uk, Amazon, The New York Times, The Guardian and the BBC 'become unavailable' (press also cited Twitch, Spotify, GitHub and others).",
+   "source": "en.wikipedia.org/wiki/Fastly"
+  },
+  {
+   "t": "2021-06-08 09:58 UTC",
+   "phase": "DETECTION",
+   "event": "Fastly publishes a public status post acknowledging the incident (~11 min after onset) — the external-alarm analogue; self-reported, no emergency-services call.",
+   "source": "fastly.com/blog/summary-of-june-8-outage"
+  },
+  {
+   "t": "2021-06-08 09:48–10:27 UTC",
+   "phase": "MITIGATION",
+   "event": "Fastly internal incident-response engineering (the 'emergency services' analogue) works the network-wide error condition between detection and root-cause identification; no external brigade dispatched — self-detected and self-driven.",
+   "source": "fastly.com/blog/summary-of-june-8-outage"
+  },
+  {
+   "t": "2021-06-08 10:27 UTC",
+   "phase": "MITIGATION",
+   "event": "Fastly Engineering identifies the customer configuration as the cause (~40 min after onset) — the root-cause-identification step preceding suppression — then moves to isolate and disable it.",
+   "source": "fastly.com/blog/summary-of-june-8-outage"
+  },
+  {
+   "t": "2021-06-08 10:36 UTC",
+   "phase": "MITIGATION",
+   "event": "Impacted services begin to recover as the triggering configuration is disabled and healthy state is forced across the fleet (the manual 'suppression' analogue — no automatic suppression existed to halt the fault).",
+   "source": "fastly.com/blog/summary-of-june-8-outage"
+  },
+  {
+   "t": "2021-06-08 10:36 UTC",
+   "phase": "RECOVERY",
+   "event": "Per Fastly's own summary, 'Within 49 minutes, 95% of our network was operating as normal' — restoration by config-disable, not de-energisation: edge PoPs stayed powered and were returned to the healthy request path (the electrical-isolation analogue was logical, not physical).",
+   "source": "fastly.com/blog/summary-of-june-8-outage"
+  },
+  {
+   "t": "2021-06-08 11:00 UTC",
+   "phase": "RECOVERY",
+   "event": "Majority of services recovered — global end-user disruption lasted roughly 49 minutes for most affected sites and up to ~73 minutes for the tail.",
+   "source": "fastly.com/blog/summary-of-june-8-outage"
+  },
+  {
+   "t": "2021-06-08 12:35 UTC",
+   "phase": "RECOVERY",
+   "event": "Incident declared mitigated (~2h48m after onset) — containment complete, error rates normalized across the network.",
+   "source": "fastly.com/blog/summary-of-june-8-outage"
+  },
+  {
+   "t": "2021-06-08 12:44 UTC",
+   "phase": "RECOVERY",
+   "event": "Fastly's public status post is marked resolved — end of the customer-facing incident window.",
+   "source": "fastly.com/blog/summary-of-june-8-outage"
+  },
+  {
+   "t": "2021-06-08 17:25 UTC",
+   "phase": "RESTORED",
+   "event": "Deployment of the permanent bug fix begins across the network — 'We created a permanent fix for the bug and began deploying it at 17:25' — the true permanent 'suppression,' separate from the earlier config-disable mitigation.",
+   "source": "fastly.com/blog/summary-of-june-8-outage"
+  },
+  {
+   "t": "2021-06-08 (post-incident)",
+   "phase": "RESTORED",
+   "event": "Fastly apologizes — 'This outage was broad and severe, and we're truly sorry for the impact to our customers' — and commits to investigating why QA/testing missed the bug and to 'evaluate ways to improve our remediation time.'",
+   "source": "fastly.com/blog/summary-of-june-8-outage"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Share of global network returning errors",
+   "value": "~85%",
+   "source": "fastly.com/blog/summary-of-june-8-outage"
+  },
+  {
+   "label": "Network operating normally within 49 minutes",
+   "value": "95%",
+   "source": "fastly.com/blog/summary-of-june-8-outage"
+  },
+  {
+   "label": "Latent-defect dwell time (deploy to trigger)",
+   "value": "~27 days (May 12 to June 8)",
+   "source": "fastly.com/blog/summary-of-june-8-outage"
+  },
+  {
+   "label": "Detection latency (onset to monitoring alert)",
+   "value": "~1 minute (09:47 to 09:48 UTC)",
+   "source": "fastly.com/blog/summary-of-june-8-outage"
+  },
+  {
+   "label": "Onset to public status post",
+   "value": "~11 minutes (09:47 to 09:58 UTC)",
+   "source": "fastly.com/blog/summary-of-june-8-outage"
+  },
+  {
+   "label": "Onset to root cause identified",
+   "value": "~40 minutes (09:47 to 10:27 UTC)",
+   "source": "fastly.com/blog/summary-of-june-8-outage"
+  },
+  {
+   "label": "Onset to services begin recovering / 95% normal",
+   "value": "~49 minutes (09:47 to 10:36 UTC)",
+   "source": "fastly.com/blog/summary-of-june-8-outage"
+  },
+  {
+   "label": "Onset to majority of services recovered",
+   "value": "~73 minutes (09:47 to 11:00 UTC)",
+   "source": "fastly.com/blog/summary-of-june-8-outage"
+  },
+  {
+   "label": "Onset to incident fully mitigated",
+   "value": "~2h48m (09:47 to 12:35 UTC)",
+   "source": "fastly.com/blog/summary-of-june-8-outage"
+  },
+  {
+   "label": "Onset to permanent bug-fix deployment start",
+   "value": "~7h38m (09:47 to 17:25 UTC)",
+   "source": "fastly.com/blog/summary-of-june-8-outage"
+  },
+  {
+   "label": "Confirmed major sites taken offline (verbatim subset)",
+   "value": "6 (Amazon, Reddit, gov.uk, NYT, Guardian, BBC)",
+   "source": "en.wikipedia.org/wiki/Fastly"
+  }
+ ],
+ "contributingFactors": [
+  "Software QA / testing gap (the 'inspection/testing lapse' analogue): the May 12 deployment's bug 'could be triggered by a specific customer configuration' yet passed pre-deployment QA and testing; Fastly conceded it would 'figure out why we didn't detect the bug during our software quality assurance and testing processes' (fastly.com/blog/summary-of-june-8-outage).",
+  "Latent-defect dwell time: the bug lay dormant in production for ~27 days (May 12 to June 8) with no monitoring, linting, or fuzzing catching the un-exercised code path before a customer input finally activated it (fastly.com/blog/summary-of-june-8-outage).",
+  "Absence of blast-radius guardrails: a single 'valid configuration change' propagated the error to '85% of our network' almost simultaneously with no canary, staged rollout, or automated circuit-breaker containing it before global impact; Fastly committed to 'evaluate ways to improve our remediation time' (fastly.com/blog/summary-of-june-8-outage).",
+  "Input-validation / trust-boundary weakness: a legitimate, 'valid' customer config edit — not malformed or malicious — was sufficient to trigger a network-wide failure, indicating the config path lacked defensive handling of the specific triggering state (fastly.com/blog/summary-of-june-8-outage).",
+  "Concentration risk in a single CDN provider: because major sites (Amazon, Reddit, gov.uk, The New York Times, The Guardian, the BBC) depended on Fastly's edge, one control-plane fault made them 'become unavailable' worldwide simultaneously (en.wikipedia.org/wiki/Fastly)."
+ ],
+ "coe": [
+  {
+   "action": "Post-mortem the QA/testing processes to determine why the config-triggerable bug was not detected before the May 12 deployment",
+   "owner": "Fastly Engineering",
+   "status": "Committed (per official post-mortem)"
+  },
+  {
+   "action": "Evaluate ways to improve remediation time (detection-to-recovery)",
+   "owner": "Fastly Engineering",
+   "status": "Committed (per official post-mortem)"
+  },
+  {
+   "action": "Deploy the permanent bug fix across the global network",
+   "owner": "Fastly Engineering",
+   "status": "Done (deployment began 17:25 UTC June 8, 2021)"
+  },
+  {
+   "action": "Add blast-radius guardrails (canary/staged rollout, circuit-breakers) for config propagation",
+   "owner": "Fastly Engineering",
+   "status": "Inferred lesson (not explicitly committed in the official post-mortem)"
+  }
+ ],
+ "lessonsLearnt": [
+  "Latent defects gated on rare input can survive QA and dwell in production for weeks: this bug shipped May 12 and only manifested June 8 when a customer supplied the triggering config — 'a bug that could be triggered by a specific customer configuration under specific circumstances' (fastly.com/blog/summary-of-june-8-outage).",
+  "Fast detection does not equal fast containment: Fastly detected within one minute, yet ~85% of the network was already returning errors; without automated blast-radius guardrails, detection speed alone could not prevent global impact (fastly.com/blog/summary-of-june-8-outage).",
+  "A single valid, legitimate input can be a catastrophic trigger: the config change was 'valid,' so defenses must not assume only malformed or malicious inputs are dangerous (fastly.com/blog/summary-of-june-8-outage).",
+  "Concentration on a single CDN is systemic risk: one control-plane fault simultaneously took down Amazon, Reddit, gov.uk, the NYT, the Guardian and the BBC, showing how provider-level failures cascade across otherwise unrelated services (en.wikipedia.org/wiki/Fastly).",
+  "Mitigation and permanent fix are distinct milestones: services were largely restored by ~10:36–11:00 UTC via config-disable, but the permanent bug fix did not begin deploying until 17:25 UTC — recovery time and root-cause-remediation time must be tracked separately (fastly.com/blog/summary-of-june-8-outage)."
+ ],
+ "improvements": [
+  "Process: Fastly committed to determine 'why we didn't detect the bug during our software quality assurance and testing processes' — closing the pre-deployment QA/testing gap that let a config-triggerable bug ship on May 12 (fastly.com/blog/summary-of-june-8-outage).",
+  "Design: add automated blast-radius guardrails (canary/staged rollout, circuit-breakers) so a single valid customer config edit cannot propagate a latent fault to ~85% of the global network simultaneously — the absence of such containment is the core design lesson (fastly.com/blog/summary-of-june-8-outage).",
+  "Maintenance (continuous-validation analogue): strengthen validation of latent/un-exercised code paths (fuzzing, config-permutation testing) so defects gated on rare input states are caught before ~27 days of production dwell rather than by a live customer trigger (fastly.com/blog/summary-of-june-8-outage).",
+  "Process: Fastly committed to 'evaluate ways to improve our remediation time' — shortening detection-to-recovery beyond the ~49-minute manual isolation window observed on June 8 (fastly.com/blog/summary-of-june-8-outage).",
+  "Safety (trust-boundary hardening analogue): defensively handle 'valid' customer configuration changes so a legitimate edit cannot reach a fatal code path, adding input-state validation at the edge before global propagation (fastly.com/blog/summary-of-june-8-outage)."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "Nature of the incident: a software control-plane failure, not a physical event",
+   "body": "There was no fire, facility damage, detection or suppression hardware, evacuation, or emergency-services response. Mapped to the incident-forensic schema, this was a global failure of Fastly's edge CDN control plane in which the 'ignition source' analogue is a single defective code change. Every schema element (ignition, detection, suppression, isolation, evacuation) is expressed here as its software analogue, grounded verbatim in Fastly's official post-mortem and Wikipedia; where an analogue does not exist (physical de-energisation, brigade dispatch), it is marked not-applicable rather than fabricated."
+  },
+  {
+   "heading": "The latent defect and its ~27-day dwell",
+   "body": "The proximate defect origin is the May 12, 2021 deployment that 'introduced a bug that could be triggered by a specific customer configuration under specific circumstances.' The defect was distributed fleet-wide but dormant, gated on an input state, so it passed pre-deployment QA and survived nearly a month in production undetected. On June 8 at 09:47 UTC a customer pushed a 'valid configuration change' meeting those circumstances, activating the bug and causing ~85% of the network to return errors. Fastly never disclosed the specific module, function, language, or code path — that remains disclosed-unknown."
+  },
+  {
+   "heading": "Detection strong, containment weak",
+   "body": "Automated monitoring flagged the disruption 'within one minute' (onset 09:47, alert 09:48 UTC), a public status post followed at 09:58, root cause was identified at 10:27, and per Fastly '95% of our network was operating as normal' within 49 minutes (~10:36 UTC), with the majority recovered by ~11:00 and full mitigation at 12:35. The lesson is that fast detection did not prevent near-instant global impact: absent canary/staged rollout or an automated circuit-breaker, a single valid config propagated the fault to ~85% of the fleet before any human could intervene."
+  },
+  {
+   "heading": "Downstream blast radius and concentration risk",
+   "body": "Wikipedia confirms Reddit, gov.uk, Amazon, The New York Times, The Guardian and the BBC 'become unavailable'; press cited many more (Twitch, Spotify, GitHub, Stripe, PayPal and others), grounded only where verbatim. One provider-level control-plane fault simultaneously darkened otherwise unrelated global services — a concrete demonstration of single-CDN concentration risk. Market-impact and share-price figures reported by press are excluded as unsourced against the official record."
+  },
+  {
+   "heading": "What Fastly committed to fix",
+   "body": "Fastly deployed a permanent bug fix beginning 17:25 UTC the same day, apologized ('This outage was broad and severe, and we're truly sorry for the impact to our customers'), and committed to investigating why QA/testing missed the bug and to 'evaluate ways to improve our remediation time.' The unstated-but-clear design lesson — blast-radius guardrails so one valid config edit cannot reach ~85% of the network — is flagged as inferred rather than an explicit Fastly commitment."
+  }
+ ],
+ "references": [
+  {
+   "title": "Summary of June 8 outage — Fastly (Nick Rockwell)",
+   "url": "https://www.fastly.com/blog/summary-of-june-8-outage",
+   "type": "official-postmortem",
+   "quote": "On May 12, we began a software deployment that introduced a bug that could be triggered by a specific customer configuration under specific circumstances.",
+   "accessed": "2026-08-02"
+  },
+  {
+   "title": "Fastly — Wikipedia (June 8 2021 outage)",
+   "url": "https://en.wikipedia.org/wiki/Fastly",
+   "type": "press",
+   "quote": "Fastly reported problems with its CDN service which caused many major websites, such as Reddit, gov.uk, and Amazon, along with major news sources such as The New York Times, The Guardian, and the BBC, to become unavailable.",
+   "accessed": "2026-08-02"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": true,
+  "lastVerified": "2026-08-02 (seed — pending deep research)"
+ },
+ "lastUpdated": "2026-08-02"
+}

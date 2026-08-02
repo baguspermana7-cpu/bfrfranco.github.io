@@ -1017,6 +1017,10 @@ INCIDENT_COORDS = {
     "azure-china-north3-regional-2024": [39.9, 116.4],
     "azure-west-us2-thermal-2026": [47.23, -119.85],
     "virginia-dc-alley-heatdome-2022": [39.04, -77.49],
+    "fastly-global-cdn-2021": [37.77, -122.42],
+    "att-nationwide-outage-2024": [32.78, -96.8],
+    "optus-australia-nationwide-2023": [-33.87, 151.21],
+    "psn-outage-2025": [37.56, -122.32],
 }
 
 LEAFLET_HEAD = (

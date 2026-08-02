@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlayStation Network ~24-Hour Global Outage (February 2025) | ResistanceZero</title>
+    <meta name="description" content="An approximately 24-hour global PlayStation Network outage on 7–8 February 2025 locked millions of players out of online multiplayer, the PlayStation Store, and account/authenticat">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="ai-content-declaration" content="human-curated, sourced from public post-incident reports">
+    <meta name="author" content="Bagus Dwi Permana">
+    <link rel="canonical" href="https://resistancezero.com/incident-psn-outage-2025.html">
+    <meta name="theme-color" content="#0c1512">
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+    <style>
+    /* ── Governed Incident Dossier — editorial register (v2): forest-green + warm ivory,
+       serif display, evidence-class provenance. Accent vars remapped so all components
+       re-skin. AA-contrast in both themes. No gradients / glass / dot-grid (anti-slop). */
+    :root:not([data-theme="dark"]) {
+        --bg:#f4f1e7; --surface:#fffdf6; --surface-2:#efeadc; --line:rgba(26,45,36,0.16);
+        --text:#1a2d24; --text-strong:#10201a; --text-body:#3b463d; --muted:#6a7367;
+        --cyan:#2f6b4f; --amber:#87671b; --green:#2f7d54; --red:#9c3b32; --gold:#87671b;
+        --hero-ink:#f4f1e7; --hero-bg:#183329; --shadow-deep:rgba(26,45,36,0.10);
+    }
+    [data-theme="dark"] {
+        --bg:#0c1512; --surface:#11201a; --surface-2:#16281f; --line:rgba(233,229,216,0.15);
+        --text:#e9e5d8; --text-strong:#f5f2e9; --text-body:#c6ccbc; --muted:#8b9484;
+        --cyan:#6aa588; --amber:#c9a559; --green:#6aa588; --red:#cf9384; --gold:#c9a559;
+        --hero-ink:#e9e5d8; --hero-bg:#0f221a; --shadow-deep:rgba(0,0,0,0.5);
+    }
+    * { box-sizing:border-box; }
+    html,body { margin:0; padding:0; }
+    body { background:var(--bg); color:var(--text); font-family:'IBM Plex Sans',system-ui,sans-serif; line-height:1.62; }
+    a { color:var(--cyan); }
+    h1,h2,.serif { font-family:'Fraunces','Newsreader',Georgia,serif; font-weight:600; letter-spacing:-0.01em; }
+    .wrap { max-width:1120px; margin:0 auto; padding:1.5rem 1.1rem 3rem; }
+    .navbar { display:flex; align-items:center; justify-content:space-between; padding:0.7rem 1.1rem; border-bottom:1px solid var(--line); background:var(--surface); position:sticky; top:0; z-index:50; }
+    .nav-container { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:1120px; margin:0 auto; }
+    .nav-logo { display:flex; align-items:center; }
+    .nav-avatar { width:34px; height:34px; border-radius:50%; }
+    .nav-menu { display:flex; gap:1rem; list-style:none; margin:0; padding:0; }
+    .nav-menu a { color:var(--text-body); text-decoration:none; font-size:0.85rem; font-weight:600; }
+    .nav-menu a:hover { color:var(--cyan); }
+    .nav-right { display:flex; align-items:center; gap:0.6rem; }
+    .theme-btn { background:none; border:1px solid var(--line); color:var(--text); border-radius:4px; padding:0.35rem 0.5rem; cursor:pointer; font-size:0.8rem; }
+    .lock-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--red); border:1px solid var(--red); border-radius:2px; padding:0.12rem 0.5rem; }
+    h1 { font-size:2.4rem; color:var(--text-strong); margin:0.35rem 0 0.5rem; line-height:1.12; }
+    h2 { font-size:1.4rem; color:var(--text-strong); margin:2rem 0 0.7rem; }
+    .eyebrow { font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); }
+    .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
+    .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
+    .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:2px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    .chip.cyan { color:var(--cyan); border-left:2px solid var(--cyan); }
+    .chip.amber { color:var(--amber); border-left:2px solid var(--amber); }
+    .chip.green { color:var(--green); border-left:2px solid var(--green); }
+    .chip.red { color:var(--red); border-left:2px solid var(--red); }
+    .metabar { font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.04em; color:var(--muted); margin:0.7rem 0; display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; font-variant-numeric:tabular-nums slashed-zero; }
+    .metabar b { color:var(--text-body); font-weight:600; }
+    .metabar .sep { color:var(--line); }
+    .chip.muted { color:var(--muted); }
+    .card { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:1rem 1.1rem; margin-top:0.9rem; }
+    .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:4px; margin-top:0.9rem; }
+    table.inc-index { width:100%; border-collapse:collapse; font-size:0.86rem; min-width:760px; font-variant-numeric:tabular-nums slashed-zero; }
+    table.inc-index th { text-align:left; font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); background:var(--surface-2); }
+    table.inc-index td { padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); color:var(--text-body); vertical-align:top; }
+    table.inc-index tr:hover td { background:var(--surface-2); }
+    table.inc-index a { font-weight:700; color:var(--text-strong); text-decoration:none; }
+    table.inc-index a:hover { color:var(--cyan); text-decoration:underline; }
+    /* rich incident table (reference-2 style) */
+    table.itbl { min-width:1120px; }
+    table.itbl td { vertical-align:middle; }
+    .itr { cursor:pointer; }
+    .itr:hover td { background:var(--surface-2); }
+    .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
+    .c-title { max-width:300px; }
+    .c-title .itt { display:block; font-weight:700; color:var(--text-strong); text-decoration:none; font-size:0.9rem; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .itr:hover .itt { color:var(--cyan); }
+    .c-title .its { color:var(--muted); font-size:0.76rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:0.1rem; }
+    .sev-chip { font-family:'JetBrains Mono',monospace; font-size:0.66rem; font-weight:600; padding:0.12rem 0.5rem; border-radius:2px; border:1px solid; white-space:nowrap; }
+    .sev-b-critical { color:var(--red); border-color:var(--red); }
+    .sev-b-high { color:var(--amber); border-color:var(--amber); }
+    .sev-b-medium { color:var(--green); border-color:var(--green); }
+    .sev-b-low { color:var(--muted); border-color:var(--line); }
+    .st-chip { font-family:'JetBrains Mono',monospace; font-size:0.64rem; padding:0.12rem 0.45rem; border-radius:2px; border:1px solid var(--line); white-space:nowrap; }
+    .st-off { color:var(--green); border-color:color-mix(in srgb, var(--green) 45%, var(--line)); }
+    .st-press { color:var(--amber); border-color:color-mix(in srgb, var(--amber) 45%, var(--line)); }
+    .c-region { min-width:170px; }
+    .c-region .iflag { font-size:1.05rem; margin-right:0.45rem; vertical-align:middle; }
+    .c-region .ireg { display:inline-flex; flex-direction:column; vertical-align:middle; }
+    .c-region .ireg b { color:var(--text-body); font-weight:600; font-size:0.82rem; }
+    .c-region .ireg i { color:var(--muted); font-style:normal; font-size:0.72rem; }
+    .c-mono { font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--text-body); white-space:nowrap; }
+    .c-blast { color:var(--text-strong); font-weight:600; } .c-blast .c-u { color:var(--muted); font-weight:400; font-size:0.68rem; }
+    .ibars { display:inline-flex; gap:2px; }
+    .ibars i { width:7px; height:9px; border-radius:1px; display:block; }
+    .itags { display:flex; gap:0.25rem; max-width:150px; flex-wrap:wrap; }
+    .c-go { color:var(--muted); font-size:1rem; text-align:center; }
+    .itr:hover .c-go { color:var(--cyan); }
+    /* incident-view tabs (List / Risk map / Semantic / Analytics) */
+    .iv-tabs { display:flex; gap:1.2rem; border-bottom:1px solid var(--line); margin:0.4rem 0 0.2rem; flex-wrap:wrap; }
+    .iv-tabs a { font-family:'JetBrains Mono',monospace; font-size:0.74rem; letter-spacing:0.03em; color:var(--muted); text-decoration:none; padding:0.5rem 0.1rem; border-bottom:2px solid transparent; }
+    .iv-tabs a:hover { color:var(--text-strong); }
+    .iv-tabs a.on { color:var(--text-strong); border-bottom-color:var(--cyan); }
+    .rank-badge { font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--amber); font-variant-numeric:tabular-nums slashed-zero; }
+    .mag-bar { height:5px; border-radius:0; background:var(--line); margin-top:0.35rem; overflow:hidden; }
+    .mag-bar > span { display:block; height:4px; background:var(--amber); }
+    ul.tight { margin:0.4rem 0 0; padding-left:1.15rem; }
+    ul.tight li { color:var(--text-body); margin:0.3rem 0; font-size:0.92rem; }
+    .soe { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .soe li { display:grid; grid-template-columns:170px 1fr; gap:0.7rem; padding:0.5rem 0; border-bottom:1px solid var(--line); }
+    .soe time { font-family:'JetBrains Mono',monospace; font-size:0.76rem; color:var(--muted); font-variant-numeric:tabular-nums slashed-zero; }
+    .soe .ev { color:var(--text-body); font-size:0.9rem; }
+    .phase-chip { font-family:'JetBrains Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--amber); border:1px solid var(--line); border-radius:2px; padding:0.05rem 0.4rem; margin-right:0.4rem; white-space:nowrap; font-variant-numeric:tabular-nums; }
+    table.metrics { width:100%; border-collapse:collapse; font-size:0.88rem; font-variant-numeric:tabular-nums slashed-zero; }
+    table.metrics td { padding:0.5rem 0.7rem; border-bottom:1px solid var(--line); vertical-align:top; }
+    table.metrics .mlabel { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; width:38%; white-space:nowrap; }
+    table.metrics .mval { color:var(--text-body); }
+    .ca-block { background:var(--surface); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 2px 2px 0; padding:0.7rem 1rem; margin-top:0.7rem; }
+    .ca-block h3 { margin:0 0 0.3rem; font-size:0.92rem; color:var(--text-strong); }
+    .ca-block p { margin:0; color:var(--text-body); font-size:0.9rem; }
+    /* reading column — constrain prose to a comfortable measure, justified like RZ articles */
+    .reading-col { max-width:820px; margin:0 auto; }
+    .reading-col p.lede, .reading-col .card p, .reading-col .ca-block p, .reading-col ul.tight li { text-align:justify; -webkit-hyphens:auto; hyphens:auto; }
+    .card p { margin:0; }
+    .card > p + p, .card p + p { margin-top:0.7rem; }
+    .mag-trace { font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--text-body); background:var(--surface-2); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 2px 2px 0; padding:0.5rem 0.7rem; margin-top:0.5rem; font-variant-numeric:tabular-nums slashed-zero; }
+    .mag-trace b { color:var(--text-strong); }
+    .imp-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.04em; text-transform:uppercase; color:var(--cyan); font-weight:700; margin-right:0.35rem; }
+    .coe-meta { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); background:var(--surface-2); border:1px solid var(--line); border-radius:2px; padding:0.05rem 0.4rem; margin-left:0.2rem; white-space:normal; }
+    /* FAQ / methodology */
+    details.faq { border:1px solid var(--line); border-radius:4px; background:var(--surface); margin:0.8rem 0 0.4rem; }
+    details.faq > summary { cursor:pointer; padding:0.7rem 0.9rem; font-family:'JetBrains Mono',monospace; font-size:0.74rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-strong); list-style:none; }
+    details.faq > summary::-webkit-details-marker { display:none; }
+    details.faq > summary::before { content:"+ "; color:var(--cyan); }
+    details.faq[open] > summary::before { content:"– "; }
+    details.faq .faq-body { padding:0 0.9rem 0.9rem; }
+    details.faq h4 { font-family:'Fraunces',Georgia,serif; font-size:0.98rem; color:var(--text-strong); margin:0.8rem 0 0.2rem; }
+    details.faq p, details.faq li { color:var(--text-body); font-size:0.88rem; }
+    /* share bar (RZ standard) — editorial thin buttons */
+    .share-buttons { display:flex; align-items:center; gap:0.5rem; margin:1.4rem 0 0.4rem; padding-top:1rem; border-top:1px solid var(--line); }
+    .share-label { font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin-right:0.2rem; }
+    .share-btn { width:32px; height:32px; display:inline-flex; align-items:center; justify-content:center; background:var(--surface-2); border:1px solid var(--line); border-radius:4px; color:var(--text-body); cursor:pointer; padding:0; }
+    .share-btn:hover { border-color:var(--cyan); color:var(--cyan); }
+    .share-btn svg { width:15px; height:15px; }
+    /* ── inline-SVG visualizations (theme-aware via vars) ── */
+    .inc-map { height:410px; margin-top:0.4rem; border:1px solid var(--line); border-radius:4px; overflow:hidden; background:#0f1a16; z-index:1; }
+    .inc-map .leaflet-container { background:#0f1a16; font-family:'IBM Plex Sans',sans-serif; }
+    .inc-map .leaflet-popup-content-wrapper { background:#12211b !important; color:#e6efe9 !important; border:1px solid #2c4438 !important; border-radius:10px !important; box-shadow:0 8px 24px rgba(0,0,0,0.45) !important; }
+    .inc-map .leaflet-popup-tip { background:#12211b !important; border:1px solid #2c4438 !important; }
+    .inc-map .leaflet-popup-content { margin:9px 12px !important; }
+    .inc-map .leaflet-control-attribution { background:rgba(15,26,22,0.8) !important; color:#7d8f86 !important; font-size:9px !important; }
+    .inc-map .leaflet-control-attribution a { color:#9fb3a8 !important; }
+    .inc-map .leaflet-bar a { background:#12211b !important; color:#cfe0d7 !important; border-color:#2c4438 !important; }
+    .leaflet-tooltip.inc-tip { background:#12211b; color:#e6efe9; border:1px solid #2c4438; border-radius:3px; font-family:'JetBrains Mono',monospace; font-size:0.66rem; padding:2px 7px; box-shadow:0 6px 18px rgba(0,0,0,0.5); }
+    .leaflet-tooltip.inc-tip:before { border-top-color:#2c4438; }
+    /* ── Incident Intelligence dashboard (editorial, no neon) ── */
+    .iid { margin:1.4rem 0 1rem; }
+    .iid-head { display:flex; align-items:flex-end; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin-bottom:0.9rem; }
+    .iid-title { font-size:1.6rem; margin:0; color:var(--text-strong); }
+    .iid-sub { margin:0.15rem 0 0; color:var(--muted); font-size:0.86rem; }
+    .iid-range { font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.05em; color:var(--muted); border:1px solid var(--line); border-radius:3px; padding:0.3rem 0.6rem; white-space:nowrap; }
+    .iid-num { font-variant-numeric:tabular-nums slashed-zero; }
+    .iid-kpis { display:grid; grid-template-columns:repeat(5,1fr); gap:0.7rem; margin-bottom:0.9rem; }
+    .iid-kpi { background:var(--surface); border:1px solid var(--line); border-top:2px solid var(--cyan); border-radius:0 0 4px 4px; padding:0.75rem 0.85rem; transition:transform 0.18s ease, box-shadow 0.18s ease; }
+    .iid-kpi:hover { transform:translateY(-2px); box-shadow:0 10px 24px var(--shadow-deep); }
+    .iid-kpi-l { font-family:'JetBrains Mono',monospace; font-size:0.62rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); }
+    .iid-kpi-v { display:flex; align-items:baseline; gap:0.3rem; margin:0.25rem 0 0.15rem; }
+    .iid-kpi-v .iid-num, .iid-kpi-v > span:first-child { font-family:'Fraunces',Georgia,serif; font-size:1.8rem; font-weight:600; color:var(--text-strong); line-height:1; }
+    .iid-kpi-u { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .iid-kpi-s { font-size:0.72rem; color:var(--muted); }
+    .iid-grid { display:grid; grid-template-columns:290px 1fr 300px; gap:0.9rem; align-items:start; }
+    .iid-col-l, .iid-col-c, .iid-col-r { display:flex; flex-direction:column; gap:0.9rem; min-width:0; }
+    .iid-panel { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0.85rem 0.95rem; }
+    .iid-panel-map { padding:0.85rem 0.95rem 0.6rem; }
+    .iid-panel-map .inc-map { height:360px; margin-top:0.5rem; }
+    .iid-ph { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin-bottom:0.5rem; }
+    .iid-note { font-size:0.74rem; color:var(--muted); margin:0 0 0.5rem; }
+    .iid-donut-wrap { display:flex; align-items:center; gap:0.9rem; }
+    .iid-donut { width:130px; height:130px; flex:0 0 auto; }
+    .iid-arc { transition:stroke-dasharray 0.9s cubic-bezier(0.22,1,0.36,1); }
+    .iid-donut-c { font-family:'Fraunces',Georgia,serif; font-size:19px; font-weight:600; fill:var(--text-strong); }
+    .iid-donut-t { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.1em; text-transform:uppercase; fill:var(--muted); }
+    .iid-legend { list-style:none; margin:0; padding:0; flex:1; min-width:0; }
+    .iid-legend li { display:flex; align-items:center; gap:0.45rem; font-size:0.82rem; color:var(--text-body); padding:0.16rem 0; }
+    .iid-legend b { margin-left:auto; color:var(--text-strong); font-family:'JetBrains Mono',monospace; font-size:0.82rem; }
+    .iid-legend .iid-pct { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.72rem; width:2.4em; text-align:right; }
+    .iid-dot { width:9px; height:9px; border-radius:50%; flex:0 0 auto; }
+    .iid-catbars, .iid-durbars, .iid-sigs { list-style:none; margin:0; padding:0; }
+    .iid-catbars li, .iid-durbars li, .iid-sigs li { display:grid; grid-template-columns:1fr 90px auto; align-items:center; gap:0.5rem; padding:0.24rem 0; font-size:0.82rem; }
+    .iid-sigs li { grid-template-columns:1fr 64px auto auto; }
+    .iid-catbars li { cursor:pointer; }
+    .iid-catbars li:hover .iid-cbl { color:var(--cyan); }
+    .iid-cbl, .iid-dbl, .iid-sig-n { color:var(--text-body); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .iid-cbar, .iid-dbar, .iid-sig-bar { height:7px; background:var(--surface-2); border-radius:0; overflow:hidden; }
+    .iid-cbar i, .iid-sig-bar i { display:block; height:100%; width:var(--w); background:var(--amber); transform:scaleX(0); transform-origin:left; transition:transform 0.9s cubic-bezier(0.22,1,0.36,1); }
+    .iid-dbar i { display:block; height:100%; width:var(--w); background:var(--cyan); transform:scaleX(0); transform-origin:left; transition:transform 0.9s cubic-bezier(0.22,1,0.36,1); }
+    .iid-in .iid-cbar i, .iid-in .iid-dbar i, .iid-in .iid-sig-bar i { transform:scaleX(1); }
+    .iid-catbars b, .iid-durbars b, .iid-sigs b { font-family:'JetBrains Mono',monospace; color:var(--text-strong); font-size:0.82rem; text-align:right; }
+    .iid-durbars b { color:var(--muted); }
+    .iid-sig-m { font-family:'JetBrains Mono',monospace; font-size:0.66rem; color:var(--muted); }
+    .iid-recent { display:flex; flex-direction:column; }
+    .iid-rec { display:flex; align-items:center; gap:0.55rem; padding:0.45rem 0; border-bottom:1px solid var(--line); text-decoration:none; }
+    .iid-rec:last-child { border-bottom:none; }
+    .iid-rec-sev { width:8px; height:8px; border-radius:50%; flex:0 0 auto; }
+    .iid-rec-b { display:flex; flex-direction:column; min-width:0; flex:1; }
+    .iid-rec-t { color:var(--text-strong); font-size:0.84rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .iid-rec:hover .iid-rec-t { color:var(--cyan); }
+    .iid-rec-m { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.68rem; }
+    .iid-rec-tag { font-family:'JetBrains Mono',monospace; font-size:0.58rem; letter-spacing:0.04em; padding:0.1rem 0.35rem; border:1px solid var(--line); border-radius:2px; flex:0 0 auto; }
+    .sev-critical { background:var(--red); } .iid-rec-tag.sev-critical { color:var(--red); background:transparent; border-color:var(--red); }
+    .sev-high { background:var(--amber); } .iid-rec-tag.sev-high { color:var(--amber); background:transparent; border-color:var(--amber); }
+    .sev-medium { background:var(--green); } .iid-rec-tag.sev-medium { color:var(--green); background:transparent; border-color:var(--green); }
+    .sev-low { background:var(--muted); } .iid-rec-tag.sev-low { color:var(--muted); background:transparent; border-color:var(--line); }
+    .iid-graph { width:100%; height:auto; display:block; }
+    .iid-edge { stroke:var(--line); stroke-width:1; opacity:0.55; transition:stroke 0.15s, opacity 0.15s; }
+    .iid-edge.on { stroke:var(--cyan); opacity:0.9; stroke-width:1.3; }
+    .iid-node circle { transition:transform 0.15s ease, opacity 0.15s; transform-origin:center; }
+    .iid-node:hover circle { stroke:var(--text-strong); stroke-width:1.4; }
+    .iid-graph.iid-focus .iid-node.dim circle { opacity:0.22; }
+    .iid-maplegend { display:flex; flex-wrap:wrap; gap:0.4rem 1rem; margin-top:0.5rem; font-family:'JetBrains Mono',monospace; font-size:0.66rem; color:var(--muted); }
+    .iid-maplegend span { display:inline-flex; align-items:center; gap:0.35rem; }
+    .iid-maplegend i { width:10px; height:10px; border-radius:50%; }
+    .iid-maplegend .iid-mln { font-style:italic; opacity:0.8; }
+    .iid-foot { display:flex; flex-wrap:wrap; gap:0.5rem 1.4rem; align-items:center; margin-top:0.9rem; padding-top:0.8rem; border-top:1px solid var(--line); font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .iid-foot b { color:var(--text-body); font-weight:600; margin-right:0.3rem; }
+    .iid-foot-link { margin-left:auto; color:var(--cyan); text-decoration:none; }
+    @media (max-width:1000px){ .iid-grid { grid-template-columns:1fr; } .iid-kpis { grid-template-columns:repeat(2,1fr); } }
+    @media (max-width:520px){ .iid-kpis { grid-template-columns:1fr 1fr; } .iid-kpi-v .iid-num, .iid-kpi-v > span:first-child { font-size:1.5rem; } }
+    @media (prefers-reduced-motion:reduce){ .iid-arc,.iid-cbar i,.iid-dbar i,.iid-sig-bar i,.iid-kpi,.iid-node circle,.iid-edge { transition:none !important; } .iid-cbar i,.iid-dbar i,.iid-sig-bar i { transform:scaleX(1); } }
+    .viz { overflow-x:auto; margin-top:0.9rem; background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0.9rem 1rem; }
+    .viz svg { display:block; max-width:100%; height:auto; }
+    .viz-radar svg { max-width:320px; margin:0 auto; }
+    .vz-num { font-variant-numeric:tabular-nums slashed-zero; }
+    .vz-box-t, .vz-box-s, .vz-lbl, .vz-hb-lbl, .vz-tl-t, .vz-pt, .vz-tick { pointer-events:auto; }
+    .vz-grid { fill:none; stroke:var(--line); stroke-width:1; }
+    .vz-accent-fill { fill:var(--cyan); fill-opacity:0.16; stroke:var(--cyan); stroke-width:1.4; }
+    .vz-accent-dot { fill:var(--cyan); }
+    .vz-accent-bar { fill:var(--cyan); }
+    .vz-cat-bar { fill:var(--amber); }
+    .vz-lbl { font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--muted); }
+    .vz-box-trigger { fill:color-mix(in srgb, var(--red) 12%, var(--surface)); stroke:var(--red); stroke-width:1.2; }
+    .vz-box-fault { fill:color-mix(in srgb, var(--amber) 12%, var(--surface)); stroke:var(--amber); stroke-width:1.2; }
+    .vz-box-down { fill:color-mix(in srgb, var(--cyan) 10%, var(--surface)); stroke:var(--cyan); stroke-width:1; }
+    .vz-box-t { font-family:'IBM Plex Sans',sans-serif; font-size:11px; font-weight:600; fill:var(--text-strong); }
+    .vz-box-s { font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--muted); }
+    .vz-flow { stroke:var(--muted); stroke-width:1.3; fill:none; }
+    .vz-arrhead { fill:var(--muted); }
+    .vz-tl-ph { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.04em; text-transform:uppercase; fill:var(--amber); }
+    .vz-tl-t { font-family:'JetBrains Mono',monospace; font-size:8.5px; fill:var(--muted); }
+    .vz-hb-lbl { font-family:'IBM Plex Sans',sans-serif; font-size:11px; fill:var(--text-body); }
+    .vz-hb-val { font-family:'JetBrains Mono',monospace; font-size:10px; fill:var(--muted); font-variant-numeric:tabular-nums slashed-zero; }
+    .vz-tick { font-family:'JetBrains Mono',monospace; font-size:8.5px; fill:var(--muted); }
+    .vz-quad { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.05em; text-transform:uppercase; fill:var(--muted); opacity:0.7; }
+    .vz-pt { font-family:'JetBrains Mono',monospace; font-size:8px; fill:var(--text-body); }
+    .viz a { text-decoration:none; }
+    .viz a:hover .vz-pt { fill:var(--cyan); font-weight:600; }
+    .viz a:hover circle { stroke:var(--text-strong); stroke-width:1.4; }
+    .vz-legend { display:flex; flex-wrap:wrap; gap:0.5rem 1.1rem; margin-top:0.7rem; padding-top:0.6rem; border-top:1px solid var(--line); }
+    .vz-key { display:inline-flex; align-items:center; gap:0.4rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .vz-key i { width:11px; height:11px; border-radius:50%; display:inline-block; }
+    .vz-key-note { font-style:italic; opacity:0.8; }
+    .viz-grid3 { display:grid; grid-template-columns:1fr 1fr; gap:0.9rem; }
+    @media (max-width:720px){ .viz-grid3 { grid-template-columns:1fr; } }
+    .filterbar { display:flex; flex-wrap:wrap; align-items:center; gap:0.4rem 0.6rem; margin:0.9rem 0 0.2rem; }
+    .fb-group { display:flex; flex-wrap:wrap; gap:0.35rem; }
+    .fb-chip { font-family:'JetBrains Mono',monospace; font-size:0.72rem; padding:0.28rem 0.6rem; border-radius:2px; border:1px solid var(--line); background:var(--surface); color:var(--text-body); cursor:pointer; }
+    .fb-chip:hover { border-color:var(--cyan); }
+    .fb-chip.active { background:var(--surface-2); border-color:var(--line); border-bottom:2px solid var(--cyan); color:var(--text-strong); font-weight:700; }
+    .fb-search { flex:1 1 200px; min-width:160px; font-family:'IBM Plex Sans',sans-serif; font-size:0.82rem; padding:0.3rem 0.6rem; border-radius:4px; border:1px solid var(--line); background:var(--surface); color:var(--text); }
+    .fb-count { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); margin-left:auto; }
+    .kv { display:grid; grid-template-columns:180px 1fr; gap:0.5rem 0.9rem; margin-top:0.5rem; font-size:0.9rem; }
+    .kv dt { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; }
+    .kv dd { margin:0; color:var(--text-body); }
+    .refs { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .refs li { padding:0.55rem 0; border-bottom:1px solid var(--line); }
+    .refs .rtitle { color:var(--text-strong); font-weight:600; font-size:0.9rem; }
+    .refs .rquote { color:var(--muted); font-size:0.84rem; font-style:italic; margin-top:0.2rem; display:block; }
+    .refs a { font-size:0.78rem; word-break:break-all; }
+    .backlink { display:inline-block; margin-bottom:0.6rem; font-size:0.82rem; color:var(--cyan); text-decoration:none; }
+    footer { border-top:1px solid var(--line); margin-top:2.5rem; padding:1.4rem 1.1rem; text-align:center; }
+    footer .ver { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .disclaimer { font-size:0.76rem; color:var(--muted); margin-top:0.8rem; max-width:80ch; }
+    .skip-link { position:absolute; top:-50px; left:0; background:var(--cyan); color:var(--hero-bg); padding:10px 20px; text-decoration:none; font-weight:600; z-index:10000; border-radius:0 0 4px 0; transition:top 0.2s; }
+    .skip-link:focus { top:0; }
+    .root-gate { position:fixed; inset:0; z-index:99999; display:none; align-items:center; justify-content:center; background:rgba(2,6,23,0.74); padding:1rem; backdrop-filter:blur(6px); }
+    body.locked .root-gate { display:flex; }
+    body.locked .wrap { filter:blur(4px); pointer-events:none; user-select:none; }
+    .root-card { max-width:430px; width:100%; background:var(--surface); border:1px solid var(--cyan); border-radius:4px; padding:1.3rem 1.15rem; text-align:center; box-shadow:0 18px 36px var(--shadow-deep); }
+    .root-card h2 { margin:0 0 0.4rem; font-size:1.1rem; color:var(--text-strong); }
+    .root-card p { font-size:0.86rem; color:var(--text-body); }
+    .root-actions { margin-top:0.9rem; display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; }
+    .root-actions button, .root-actions a { border-radius:4px; padding:0.5rem 0.85rem; font-size:0.8rem; font-weight:700; border:1px solid var(--line); text-decoration:none; cursor:pointer; color:var(--text); font-family:inherit; }
+    .root-actions button { background:var(--cyan); color:var(--hero-bg); border:none; }
+    .rz-nav-burger { display:none; }
+    /* v1.8.0 — mobile responsive patch */
+    @media (max-width:768px) {
+        html,body { overflow-x:hidden; max-width:100vw; }
+        img { max-width:100%; height:auto; display:block; }
+        .nav-menu, .nav-links { display:none; }
+        .navbar { padding:0.5rem 0.75rem; }
+        footer .footer-grid { grid-template-columns:1fr; gap:1.25rem; padding:1rem; }
+        button, a.btn, [role="button"] { min-height:44px; }
+        h1 { font-size:1.4rem; }
+        .soe li { grid-template-columns:1fr; gap:0.15rem; }
+        .kv { grid-template-columns:1fr; }
+        .root-card { max-width:92vw; }
+    }
+    @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
+</style>
+    
+</head>
+<body class="locked">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <nav class="navbar"><div class="nav-container">
+        <a href="index.html" class="nav-logo"><img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dc-incidents.html">DC Incidents</a></li>
+            <li><a href="datacenter-solutions.html">DC Solutions</a></li>
+        </ul>
+        <div class="nav-right">
+            <span class="lock-tag" title="Root-only module">ROOT</span>
+            <button class="theme-btn" id="themeToggle" type="button" aria-label="Toggle theme">◐</button>
+        </div>
+    </div></nav>
+    <main class="wrap" id="main-content">
+        <div class="reading-col">
+        <a class="backlink" href="dc-incidents.html">← All incidents</a>
+        <div class="eyebrow">Incident dossier · Rank #32</div>
+        <h1>PlayStation Network ~24-Hour Global Outage (February 2025)</h1>
+        <div class="chips">
+            <span class="chip">Sony Interactive Entertainment</span>
+            <span class="chip cyan">2025-02-07</span>
+            <span class="chip amber">24h 0m core impact</span>
+            <span class="chip cyan">Network</span><span class="chip amber">Software</span>
+        </div>
+        <p class="lede">An approximately 24-hour global PlayStation Network outage on 7–8 February 2025 locked millions of players out of online multiplayer, the PlayStation Store, and account/authentication services; Sony attributed it to an operational issue and issued affected members five days of PS Plus as compensation.</p>
+
+        <h2>Failure cascade</h2>
+        <div class="viz viz-cascade"><svg viewBox="0 0 760 228" role="img" aria-label="Failure cascade block diagram"><title>Failure cascade: trigger → fault → downstream impact</title><defs><marker id="ic-ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path class="vz-arrhead" d="M0,0 L6,3 L0,6 Z"/></marker></defs><text class="vz-tl-ph" x="8" y="12">Trigger</text><text class="vz-tl-ph" x="248" y="12">Primary fault</text><text class="vz-tl-ph" x="516" y="12">Downstream impact</text><rect class="vz-box-trigger" x="8" y="86.0" width="176" height="56" rx="2"><title>Trigger — Network (2025-02-07)</title></rect><text class="vz-box-t" x="18" y="103.0">Trigger · Network</text><text class="vz-box-s" x="18" y="117.0"><title>2025-02-07</title>2025-02-07</text><rect class="vz-box-fault" x="240" y="86.0" width="224" height="56" rx="2"><title>Primary fault at Sony Interactive Entertainment — PlayStation Network backend services</title></rect><text class="vz-box-t" x="250" y="103.0">Sony PSN</text><text class="vz-box-s" x="250" y="117.0"><title>PlayStation Network backend services</title>PlayStation Network backend</text><line class="vz-flow" x1="184" y1="114.0" x2="238" y2="114.0" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="26" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Online multiplayer</title></rect><text class="vz-box-t" x="526" y="43">Online multiplayer</text><line class="vz-flow" x1="464" y1="114.0" x2="514" y2="44" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="70" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: PlayStation Store</title></rect><text class="vz-box-t" x="526" y="87">PlayStation Store</text><line class="vz-flow" x1="464" y1="114.0" x2="514" y2="88" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="114" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Account management / authentication</title></rect><text class="vz-box-t" x="526" y="131">Account management /</text><line class="vz-flow" x1="464" y1="114.0" x2="514" y2="132" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="158" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Game/app launch requiring sign-in</title></rect><text class="vz-box-t" x="526" y="175">Game/app launch requiring</text><text class="vz-box-t" x="526" y="188">sign-in…</text><line class="vz-flow" x1="464" y1="114.0" x2="514" y2="176" marker-end="url(#ic-ar)"/></svg></div>
+        <p class="disclaimer">Trigger → primary fault → downstream blast radius, derived from the sourced root cause and affected-services record.</p>
+
+        <h2>Facility &amp; location</h2>
+        <dl class="kv">
+            <dt>Operator</dt><dd>Sony Interactive Entertainment</dd>
+            <dt>Data center</dt><dd>PlayStation Network backend services</dd>
+            <dt>Location</dt><dd>San Mateo, California, United States</dd>
+            <dt>Date</dt><dd>2025-02-07</dd>
+        </dl>
+
+        <h2>Impact &amp; scale</h2>
+        <dl class="kv">
+            <dt>Users affected</dt><dd>Millions of PlayStation Network / PS Plus users worldwide</dd>
+            <dt>Financial</dt><dd>PS Plus compensation to members; direct loss not published</dd>
+            <dt>Scope</dt><dd>Sev-1 global platform backend (~24h)</dd>
+        </dl>
+        <div class="card"><strong>Services / systems down</strong><ul class="tight"><li>Online multiplayer</li><li>PlayStation Store</li><li>Account management / authentication</li><li>Game/app launch requiring sign-in</li></ul></div>
+        <h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Peak US outage reports (Downdetector)</td><td class="mval">~8,000 at peak (Sat afternoon, 8 Feb)</td></tr><tr><td class="mlabel">Peak UK outage reports (Downdetector)</td><td class="mval">&gt;7,300 at peak (Sat afternoon, 8 Feb)</td></tr><tr><td class="mlabel">Outage duration (disputed / not verifiable)</td><td class="mval">&#x27;nearly 18 hrs&#x27; to &#x27;over 24 hrs&#x27;; no exact Sony timestamp</td></tr><tr><td class="mlabel">Sony communications during event</td><td class="mval">~2 posts via official PlayStation X/Twitter for the entire outage</td></tr><tr><td class="mlabel">Official root-cause detail published</td><td class="mval">0 — only the phrase &#x27;an operational issue&#x27;</td></tr><tr><td class="mlabel">Compensation granted</td><td class="mval">5 additional PS Plus days, automatic, all members</td></tr><tr><td class="mlabel">PS Plus tiers covered by compensation</td><td class="mval">3 (Essential, Extra, Premium)</td></tr><tr><td class="mlabel">PSN service categories down simultaneously</td><td class="mval">4+ (Account/sign-in, Store, multiplayer/Social, PS5 disc registration)</td></tr></tbody></table></div>
+
+        <h2>Magnitude profile</h2>
+        <div class="viz viz-radar"><svg viewBox="0 0 290 215" role="img" aria-label="Magnitude sub-scores radar chart"><title>Magnitude sub-scores (0–10)</title><polygon class="vz-grid" points="145.0,83.2 166.8,105.0 145.0,126.8 123.2,105.0"/><polygon class="vz-grid" points="145.0,62.1 187.9,105.0 145.0,147.9 102.1,105.0"/><polygon class="vz-grid" points="145.0,41.0 209.0,105.0 145.0,169.0 81.0,105.0"/><line class="vz-grid" x1="145" y1="105" x2="145.0" y2="41.0"/><line class="vz-grid" x1="145" y1="105" x2="209.0" y2="105.0"/><line class="vz-grid" x1="145" y1="105" x2="145.0" y2="169.0"/><line class="vz-grid" x1="145" y1="105" x2="81.0" y2="105.0"/><polygon class="vz-accent-fill" points="145.0,60.2 170.6,105.0 145.0,143.4 106.6,105.0"><title>Magnitude sub-scores (0–10)</title></polygon><circle class="vz-accent-dot" cx="145.0" cy="60.2" r="2.4"/><circle class="vz-accent-dot" cx="170.6" cy="105.0" r="2.4"/><circle class="vz-accent-dot" cx="145.0" cy="143.4" r="2.4"/><circle class="vz-accent-dot" cx="106.6" cy="105.0" r="2.4"/><text class="vz-lbl vz-num" x="145.0" y="20.0" text-anchor="middle">Users 7<title>Users affected (0–10) — breadth of the user/customer population impacted. — scored 7/10.</title></text><text class="vz-lbl vz-num" x="223.0" y="109.0" text-anchor="start">Financial 4<title>Financial impact (0–10) — direct + consequential cost. — scored 4/10.</title></text><text class="vz-lbl vz-num" x="145.0" y="198.0" text-anchor="middle">Duration 6<title>Outage duration (0–10) — how long service was degraded/down. — scored 6/10.</title></text><text class="vz-lbl vz-num" x="67.0" y="109.0" text-anchor="end">Blast 6<title>Blast radius (0–10) — how wide the fault propagated across systems/regions. — scored 6/10.</title></text></svg></div>
+        <div class="mag-trace">Magnitude <b>5.8</b> = blast 6×0.35 + users 7×0.25 + financial 4×0.20 + duration 6×0.20 <span style="opacity:0.7">(sub-scores 0–10 · weighted composite)</span></div>
+        <p class="disclaimer">A ~24-hour global PSN outage locked millions of players out of online play, store and account services — sub-scores ESTIMATED from public impact reporting, pending deep research.</p>
+
+        <h2>Sequence of events (SOE)</h2>
+        <div class="viz viz-timeline"><svg viewBox="0 0 1512 96" role="img" aria-label="Sequence-of-events timeline"><title>Phased sequence of events</title><line class="vz-grid" x1="30" y1="48" x2="1482" y2="48"/><circle class="vz-accent-dot" cx="30" cy="48" r="4.5"><title>2025-02-07 evening (PT) · TRIGGER — PSN backend services begin failing globally; onset coincides with the Monster Hunter Wilds second open-beta window. NOT a fire — no ignition, combustion, smoke, or heat; trigger is an undisclosed backend fault Sony would later call only &#x27;an operational issue.&#x27;</title></circle><text class="vz-tl-ph" x="30" y="30" text-anchor="middle">TRIGGER</text><text class="vz-tl-t" x="30" y="68" text-anchor="middle">2025-02-07 evening (P</text><circle class="vz-accent-dot" cx="127" cy="48" r="4.5"><title>2025-02-07 evening (PT) · DETECTION — Detection is entirely digital, not physical: Sony&#x27;s PlayStation Network Service Status page flips affected categories to degraded/unavailable. No smoke/heat detector, no fire alarm — none exist for this event.</title></circle><text class="vz-tl-ph" x="127" y="30" text-anchor="middle">DETECTION</text><text class="vz-tl-t" x="127" y="68" text-anchor="middle">2025-02-07 evening (P</text><circle class="vz-accent-dot" cx="224" cy="48" r="4.5"><title>2025-02-07 evening (PT) · DETECTION — Third-party crowd telemetry (Downdetector) begins climbing as users worldwide report failures — the external corroboration of onset in the absence of any Sony technical bulletin.</title></circle><text class="vz-tl-ph" x="224" y="30" text-anchor="middle">DETECTION</text><text class="vz-tl-t" x="224" y="68" text-anchor="middle">2025-02-07 evening (P</text><circle class="vz-accent-dot" cx="320" cy="48" r="4.5"><title>2025-02-07 evening (PT) · IMPACT — Account Management / sign-in and authentication go down globally — users cannot log in to PSN.</title></circle><text class="vz-tl-ph" x="320" y="30" text-anchor="middle">IMPACT</text><text class="vz-tl-t" x="320" y="68" text-anchor="middle">2025-02-07 evening (P</text><circle class="vz-accent-dot" cx="417" cy="48" r="4.5"><title>2025-02-07 evening (PT) · IMPACT — PlayStation Store, game purchases and downloads become unavailable.</title></circle><text class="vz-tl-ph" x="417" y="30" text-anchor="middle">IMPACT</text><text class="vz-tl-t" x="417" y="68" text-anchor="middle">2025-02-07 evening (P</text><circle class="vz-accent-dot" cx="514" cy="48" r="4.5"><title>2025-02-07 evening (PT) · CASCADE — Failure cascades across service categories simultaneously: multiplayer titles (Helldivers 2, Diablo 4) and PS5 disc-drive registration (online verification required even for physical media) — signature of a shared auth/core-services fault (inference, not Sony-confirmed).</title></circle><text class="vz-tl-ph" x="514" y="30" text-anchor="middle">CASCADE</text><text class="vz-tl-t" x="514" y="68" text-anchor="middle">2025-02-07 evening (P</text><circle class="vz-accent-dot" cx="611" cy="48" r="4.5"><title>2025-02-07 to 02-08 · MITIGATION — Sony&#x27;s only live response is an internal, undocumented remediation plus an initial @AskPlayStation acknowledgement of difficulty launching games, apps, or network features. No redundancy/failover trigger is evidenced (analogue of suppression — none discharged, none confirmed working or failing).</title></circle><text class="vz-tl-ph" x="611" y="30" text-anchor="middle">MITIGATION</text><text class="vz-tl-t" x="611" y="68" text-anchor="middle">2025-02-07 to 02</text><circle class="vz-accent-dot" cx="708" cy="48" r="4.5"><title>2025-02-07 to 02-08 · MITIGATION — Communications near-blackout: Sony posts only about two messages via the official PlayStation Twitter/X account for the entire event, with no technical detail, cause, or ETA.</title></circle><text class="vz-tl-ph" x="708" y="30" text-anchor="middle">MITIGATION</text><text class="vz-tl-t" x="708" y="68" text-anchor="middle">2025-02-07 to 02</text><circle class="vz-accent-dot" cx="804" cy="48" r="4.5"><title>2025-02-08 afternoon (Sat) · IMPACT — Impact peaks: Downdetector reaches nearly 8,000 US reports and over 7,300 UK reports at its Saturday-afternoon peak — the quantified height of user-facing disruption.</title></circle><text class="vz-tl-ph" x="804" y="30" text-anchor="middle">IMPACT</text><text class="vz-tl-t" x="804" y="68" text-anchor="middle">2025-02-08 after</text><circle class="vz-accent-dot" cx="901" cy="48" r="4.5"><title>N/A (no physical incident) · IMPACT — NOT APPLICABLE by disclosure: no evacuation, no emergency-services call/arrival, no fire-brigade actions, and no electrical de-energisation occurred — this was a cloud service outage, not a facility event; these stages return no data.</title></circle><text class="vz-tl-ph" x="901" y="30" text-anchor="middle">IMPACT</text><text class="vz-tl-t" x="901" y="68" text-anchor="middle">N/A (no physical</text><circle class="vz-accent-dot" cx="998" cy="48" r="4.5"><title>2025-02-08 evening (Sat) · RECOVERY — Backend services are restored globally after internal remediation of the unspecified fault.</title></circle><text class="vz-tl-ph" x="998" y="30" text-anchor="middle">RECOVERY</text><text class="vz-tl-t" x="998" y="68" text-anchor="middle">2025-02-08 eveni</text><circle class="vz-accent-dot" cx="1095" cy="48" r="4.5"><title>2025-02-08 evening (Sat) · RESTORED — Sony declares closure verbatim: &#x27;Network services have fully recovered from an operational issue&#x27; — the entirety of its official root-cause disclosure.</title></circle><text class="vz-tl-ph" x="1095" y="30" text-anchor="middle">RESTORED</text><text class="vz-tl-t" x="1095" y="68" text-anchor="middle">2025-02-08 eveni</text><circle class="vz-accent-dot" cx="1192" cy="48" r="4.5"><title>2025-02-08 evening (Sat) · RECOVERY — Sony announces automatic compensation: all PlayStation Plus members (Essential, Extra, Premium) receive an additional 5 days of service added to renewal dates.</title></circle><text class="vz-tl-ph" x="1192" y="30" text-anchor="middle">RECOVERY</text><text class="vz-tl-t" x="1192" y="68" text-anchor="middle">2025-02-08 eveni</text><circle class="vz-accent-dot" cx="1288" cy="48" r="4.5"><title>2025-02-08 (post-restore) · RESTORED — Duration remains disputed: reported inconsistently from &#x27;nearly 18 hours&#x27; (Analytics Insight) to &#x27;over 24 hours&#x27; (Fextralife) and &#x27;exactly 24 hours&#x27; (Forbes); Sony publishes no exact start or restore timestamp, so true duration is not verifiable.</title></circle><text class="vz-tl-ph" x="1288" y="30" text-anchor="middle">RESTORED</text><text class="vz-tl-t" x="1288" y="68" text-anchor="middle">2025-02-08 (post</text><circle class="vz-accent-dot" cx="1385" cy="48" r="4.5"><title>2025-02-10 onward · RESTORED — Post-incident coverage (Forbes) criticises the 5-day extension as inadequate (&#x27;pretty lame&#x27;) versus the free-games response after the 2011 hack, and faults Sony&#x27;s &#x27;two-word explanation&#x27;; no root-cause report, regulator filing, or named component is ever produced.</title></circle><text class="vz-tl-ph" x="1385" y="30" text-anchor="middle">RESTORED</text><text class="vz-tl-t" x="1385" y="68" text-anchor="middle">2025-02-10 onwar</text><circle class="vz-accent-dot" cx="1482" cy="48" r="4.5"><title>~2025-03 (rollout) · RESTORED — The 5-day PS Plus extension is applied automatically to all members&#x27; renewal dates, with rollout occurring roughly a month after the incident; members can verify via Subscription Management on the PlayStation Store.</title></circle><text class="vz-tl-ph" x="1482" y="30" text-anchor="middle">RESTORED</text><text class="vz-tl-t" x="1482" y="68" text-anchor="middle">~2025-03 (rollou</text></svg></div>
+        <ul class="soe"><li><time>2025-02-07 evening (PT)</time><span class="ev"><span class="phase-chip">TRIGGER</span> PSN backend services begin failing globally; onset coincides with the Monster Hunter Wilds second open-beta window. NOT a fire — no ignition, combustion, smoke, or heat; trigger is an undisclosed backend fault Sony would later call only &#x27;an operational issue.&#x27;</span></li><li><time>2025-02-07 evening (PT)</time><span class="ev"><span class="phase-chip">DETECTION</span> Detection is entirely digital, not physical: Sony&#x27;s PlayStation Network Service Status page flips affected categories to degraded/unavailable. No smoke/heat detector, no fire alarm — none exist for this event.</span></li><li><time>2025-02-07 evening (PT)</time><span class="ev"><span class="phase-chip">DETECTION</span> Third-party crowd telemetry (Downdetector) begins climbing as users worldwide report failures — the external corroboration of onset in the absence of any Sony technical bulletin.</span></li><li><time>2025-02-07 evening (PT)</time><span class="ev"><span class="phase-chip">IMPACT</span> Account Management / sign-in and authentication go down globally — users cannot log in to PSN.</span></li><li><time>2025-02-07 evening (PT)</time><span class="ev"><span class="phase-chip">IMPACT</span> PlayStation Store, game purchases and downloads become unavailable.</span></li><li><time>2025-02-07 evening (PT)</time><span class="ev"><span class="phase-chip">CASCADE</span> Failure cascades across service categories simultaneously: multiplayer titles (Helldivers 2, Diablo 4) and PS5 disc-drive registration (online verification required even for physical media) — signature of a shared auth/core-services fault (inference, not Sony-confirmed).</span></li><li><time>2025-02-07 to 02-08</time><span class="ev"><span class="phase-chip">MITIGATION</span> Sony&#x27;s only live response is an internal, undocumented remediation plus an initial @AskPlayStation acknowledgement of difficulty launching games, apps, or network features. No redundancy/failover trigger is evidenced (analogue of suppression — none discharged, none confirmed working or failing).</span></li><li><time>2025-02-07 to 02-08</time><span class="ev"><span class="phase-chip">MITIGATION</span> Communications near-blackout: Sony posts only about two messages via the official PlayStation Twitter/X account for the entire event, with no technical detail, cause, or ETA.</span></li><li><time>2025-02-08 afternoon (Sat)</time><span class="ev"><span class="phase-chip">IMPACT</span> Impact peaks: Downdetector reaches nearly 8,000 US reports and over 7,300 UK reports at its Saturday-afternoon peak — the quantified height of user-facing disruption.</span></li><li><time>N/A (no physical incident)</time><span class="ev"><span class="phase-chip">IMPACT</span> NOT APPLICABLE by disclosure: no evacuation, no emergency-services call/arrival, no fire-brigade actions, and no electrical de-energisation occurred — this was a cloud service outage, not a facility event; these stages return no data.</span></li><li><time>2025-02-08 evening (Sat)</time><span class="ev"><span class="phase-chip">RECOVERY</span> Backend services are restored globally after internal remediation of the unspecified fault.</span></li><li><time>2025-02-08 evening (Sat)</time><span class="ev"><span class="phase-chip">RESTORED</span> Sony declares closure verbatim: &#x27;Network services have fully recovered from an operational issue&#x27; — the entirety of its official root-cause disclosure.</span></li><li><time>2025-02-08 evening (Sat)</time><span class="ev"><span class="phase-chip">RECOVERY</span> Sony announces automatic compensation: all PlayStation Plus members (Essential, Extra, Premium) receive an additional 5 days of service added to renewal dates.</span></li><li><time>2025-02-08 (post-restore)</time><span class="ev"><span class="phase-chip">RESTORED</span> Duration remains disputed: reported inconsistently from &#x27;nearly 18 hours&#x27; (Analytics Insight) to &#x27;over 24 hours&#x27; (Fextralife) and &#x27;exactly 24 hours&#x27; (Forbes); Sony publishes no exact start or restore timestamp, so true duration is not verifiable.</span></li><li><time>2025-02-10 onward</time><span class="ev"><span class="phase-chip">RESTORED</span> Post-incident coverage (Forbes) criticises the 5-day extension as inadequate (&#x27;pretty lame&#x27;) versus the free-games response after the 2011 hack, and faults Sony&#x27;s &#x27;two-word explanation&#x27;; no root-cause report, regulator filing, or named component is ever produced.</span></li><li><time>~2025-03 (rollout)</time><span class="ev"><span class="phase-chip">RESTORED</span> The 5-day PS Plus extension is applied automatically to all members&#x27; renewal dates, with rollout occurring roughly a month after the incident; members can verify via Subscription Management on the PlayStation Store.</span></li></ul>
+
+        <h2>Root cause</h2>
+        <div class="card">SCHEMA-MISMATCH DISCLOSURE (load-bearing): This was a global network/authentication SERVICE OUTAGE of PlayStation Network backend services operated by Sony Interactive Entertainment (SIE) — NOT a facility fire. There was no ignition source, no combustion, no smoke/heat detection, no fire-suppression discharge, no building evacuation, no fire-brigade dispatch, and no electrical de-energisation of a burning space. All physical-fire root-cause fields (equipment make/model, age, chemistry, ignition mechanism) are therefore Not Applicable — no such data exists, and none is invented here. (No cited source establishes the physical location of the failed backend; the earlier &quot;operated out of San Mateo&quot; specificity has been removed as unsupported — SIE is headquartered in San Mateo, CA, but no source ties this outage to that site.)
+
+NO SPECIFIC ROOT CAUSE WAS EVER PUBLISHED. The entirety of Sony&#x27;s official root-cause disclosure is a single verbatim phrase: &quot;Network services have fully recovered from an operational issue&quot; (Sony statement via @AskPlayStation, reproduced independently by Analytics Insight, analyticsinsight.net, and OpenCritic, opencritic.com). Sony explicitly did not attribute the failure to any named subsystem, hardware unit, deployment, configuration change, capacity event, or vendor. Multiple outlets independently characterised the explanation as vague and noted the deliberate absence of detail: Sony&#x27;s statement carried &quot;no mention of a hack, a DDoS (Distributed Denial of Service) attack, or something else&quot; (OpenCritic, syndicating DualShockers).
+
+ANALYST-LEVEL INFERENCE (not confirmed by Sony): The externally observed failure signature — simultaneous, global loss of sign-in/authentication, PlayStation Store, and multiplayer across effectively all service categories at once — is consistent with a fault in a shared backend authentication/identity or core-services layer rather than a localised, single-service failure (GameSpew scope, gamespew.com). This is inference from symptom pattern only; Sony never confirmed which layer failed. The framing &quot;operational issue&quot; is suggestive of an internal operations/configuration/change-management fault rather than an external attack, but Sony never confirmed a maintenance action, deployment, or config change as the trigger.
+
+LATENT ROOT (the durable failure, and the part that IS evidenced): The record shows a transparency and incident-communication failure layered on top of an undisclosed technical fault. Sony posted only about two messages via the official PlayStation Twitter/X account during the entire multi-hour outage (GameSpew), gave no live technical detail, published no exact restoration timestamp, and issued no post-incident engineering report or RCA — Forbes called it &quot;nothing more than a two-word explanation about its most significant outage since 2014&quot; (forbes.com). There is NO public evidence of a redundancy/DR/failover trigger working or failing — the shared-backend failure signature suggests a <span data-explain="single-point-of-failure" tabindex="0">single point of failure</span> in the authentication/core-services path, but this cannot be confirmed. Explicitly disclosed uncertainty: the actual root cause, the failed layer, the true duration, and whether the Monster Hunter Wilds open-beta load window was causal all remain genuinely non-public. This was NOT reported as a security breach, hack, or DDoS, and no data-compromise notification was issued — distinguishing it from the 2011 PSN intrusion (OpenCritic/DualShockers; Forbes; forensic disclosure).</div>
+
+        <h2>Contributing factors</h2>
+        <ul class="tight"><li>Undisclosed technical fault with zero public root-cause detail: Sony&#x27;s only stated cause was &#x27;an operational issue&#x27; (Analytics Insight; OpenCritic), with &#x27;no mention of a hack, a DDoS (Distributed Denial of Service) attack, or something else&#x27; (OpenCritic) — no named subsystem, config change, or failure mechanism was ever produced, and no post-incident RCA was published (unknowns).</li><li>Shared-backend single point of failure (inferred, not confirmed): the simultaneous global loss of sign-in/authentication, Store, and multiplayer across all categories at once is consistent with a fault in a shared auth/identity or core-services layer, with NO public evidence of any redundancy/failover/DR trigger working or failing (GameSpew; forensic disclosure; unknowns).</li><li>Change-management / operations discipline unverified: the phrase &#x27;operational issue&#x27; is suggestive of an internal operations, configuration, or change-management fault rather than an external attack, but Sony never confirmed whether a deployment, config change, or work-procedure lapse triggered it — no change-window error or vendor advisory was disclosed (maintenance disclosure; unknowns).</li><li>Possible capacity/load coincidence left unaddressed: onset coincided with the Monster Hunter Wilds second open-beta window (Fextralife; OpenCritic, which notes Capcom rescheduled the beta), raising an unconfirmed capacity/load hypothesis that Sony never confirmed or ruled out (unknowns).</li><li>Incident-communication failure: Sony posted only about two messages via the official PlayStation Twitter/X account for the entire multi-hour outage (GameSpew), leaving millions of users without status, cause, or ETA during the event.</li><li>No published restoration timestamp: Sony gave no precise start or end clock times, producing a duration reported inconsistently from &#x27;nearly 18 hours&#x27; to &#x27;over 24 hours&#x27;/&#x27;exactly 24 hours&#x27; (Analytics Insight; Fextralife; Forbes) and preventing independent verification of true impact duration.</li></ul>
+
+        <h2>Correction of errors (COE)</h2>
+        <ul class="tight"><li>Publish a post-incident root-cause summary / RCA identifying the failed subsystem, trigger, and corrective actions <span class="coe-meta">Sony Interactive Entertainment · Not done — no public RCA ever issued (recommended)</span></li><li>Engineer and drill automated failover/redundancy for the shared authentication and core-services layer <span class="coe-meta">Sony Interactive Entertainment (PSN backend engineering) · Not disclosed (recommended)</span></li><li>Adopt timestamped status-page cadence and a live incident-communication protocol during outages <span class="coe-meta">Sony Interactive Entertainment (PlayStation Ops/Comms) · Not disclosed (recommended)</span></li><li>Formalise capacity/load gating and go/no-go coupling with partner beta/launch windows (e.g. Monster Hunter Wilds) <span class="coe-meta">Sony Interactive Entertainment + partner publishers · Not disclosed (recommended)</span></li><li>Deliver automatic 5-day PS Plus extension to all members (Essential/Extra/Premium) <span class="coe-meta">Sony Interactive Entertainment · Done — applied automatically, rolled out ~1 month post-incident (Analytics Insight; OpenCritic)</span></li></ul>
+
+        <h2>Lessons learnt</h2>
+        <ul class="tight"><li>A shared identity/authentication layer is the highest-blast-radius component in a consumer platform: when it fails, sign-in, Store, multiplayer, and device registration fail together (GameSpew) — resilience investment must be concentrated there, not spread evenly.</li><li>Silence is itself an incident cost: ~2 posts across a ~24-hour global outage (GameSpew) converted a technical fault into a trust and reputation event, drawing sustained criticism (Forbes; OpenCritic).</li><li>Absence of a published start/restore timestamp makes impact unquantifiable and unfalsifiable — outlets disagreed between &#x27;nearly 18 hours&#x27; and &#x27;over 24 hours&#x27; (Analytics Insight; Fextralife) purely because Sony released no authoritative clock.</li><li>Vague root-cause disclosure (&#x27;an operational issue&#x27;) without an RCA leaves users unable to distinguish an operational fault from a security incident — OpenCritic explicitly notes readers feared a hack/data exposure absent any ruling-out (OpenCritic).</li><li>Compensation without transparency underwhelms: an automatic 5-day PS Plus extension was judged &#x27;pretty lame&#x27; relative to the 2011 free-games response, because it substituted for, rather than accompanied, an explanation (Forbes).</li></ul>
+
+        <h2>Improvements &amp; remediation</h2>
+        <ul class="tight"><li>Safety (availability-critical): Treat authentication/sign-in as an availability-safety-critical single point of failure — the outage&#x27;s all-categories-at-once signature shows a shared auth/core-services fault takes down Store, multiplayer, and check-in together (GameSpew; forensic disclosure); its resilience must be engineered, load-tested, and continuously game-day-exercised as a top-tier reliability control.</li><li>Maintenance / change-management: Institute and disclose rigorous change-management and configuration discipline for backend deployments — the &#x27;operational issue&#x27; framing (Analytics Insight; OpenCritic) points to an internal operations or config fault, and Sony evidenced no change-window or rollback controls; documented pre-deploy verification, staged rollout, and one-click rollback would reduce recurrence risk.</li><li>Design / redundancy: Build and prove redundancy and automated failover for the shared authentication and core-services layer — there is NO public evidence any DR/failover trigger worked or existed (forensic disclosure), and a global single-point collapse is the exact failure such redundancy is meant to survive; validate with regular regional-failover drills.</li><li>Process / capacity: Formalise load and capacity gating around known demand spikes (e.g. the concurrent Monster Hunter Wilds open beta; Fextralife; OpenCritic) — pre-event headroom checks, surge capacity, and go/no-go coupling between partner beta windows and PSN readiness would remove an unaddressed capacity hypothesis.</li><li>Communication / transparency: Adopt a public incident-status discipline — timestamped status-page updates, regular cadence during the event (versus ~2 posts for a 24-hour outage; GameSpew), and a published post-incident summary/RCA; Forbes and OpenCritic show the &#x27;two-word explanation&#x27; materially damaged user trust.</li></ul>
+
+        <h2>Comprehensive analysis</h2><div class="ca-block"><h3>What actually happened (and what did not)</h3><p>On the evening of Friday 7 February 2025 (PT), PlayStation Network backend services failed globally in a near-simultaneous collapse spanning sign-in/authentication, the PlayStation Store, multiplayer (Helldivers 2, Diablo 4), and PS5 disc-drive registration (GameSpew). This was a cloud/network service outage, not a facility fire: there was no ignition, smoke/heat detection, suppression discharge, evacuation, emergency-services dispatch, or electrical <span data-explain="de-energisation" tabindex="0">de-energisation</span>, so all physical-forensics fields are Not Applicable and return no data. Services were restored the following evening, 8 February, and Sony&#x27;s total public root-cause disclosure amounted to a single phrase: &#x27;Network services have fully recovered from an operational issue&#x27; (Analytics Insight; OpenCritic).</p></div><div class="ca-block"><h3>Diagnostic signature and the limits of inference</h3><p>The most diagnostic external observation is that all service categories failed at once, which is consistent with a fault in a shared authentication/identity or core-services layer rather than a per-service failure (GameSpew). This is inference from symptom pattern only — Sony never named the failed layer, never confirmed a deployment or config change, and never ruled a capacity event in or out. The concurrent Monster Hunter Wilds second open beta (Fextralife; OpenCritic, which notes Capcom rescheduled it) raises an unconfirmed load hypothesis. Correcting the proposed draft: the Analytics Insight article does NOT mention Monster Hunter Wilds, so it cannot support that coincidence and has been removed as a source for it.</p></div><div class="ca-block"><h3>The transparency failure is the evidenced latent root</h3><p>While the technical fault stays non-public, the communication failure is well-documented and durable: Sony posted only about two messages via the official PlayStation X/Twitter account across a ~24-hour global outage (GameSpew), issued no timestamped status updates, and published no RCA. Forbes characterised this as &#x27;nothing more than a two-word explanation about its most significant outage since 2014&#x27; and judged the compensation &#x27;pretty lame&#x27; versus the 2011 free-games response. OpenCritic records genuine user fear of a hack/data breach precisely because Sony did not rule one out — even though the incident was not reported as a security breach or <span data-explain="ddos" tabindex="0">DDoS</span>.</p></div><div class="ca-block"><h3>Quantified impact and disclosed uncertainty</h3><p>User-facing impact peaked Saturday afternoon at nearly 8,000 US and over 7,300 UK Downdetector reports (Analytics Insight). Duration is genuinely non-verifiable: outlets range from &#x27;nearly 18 hours&#x27; (Analytics Insight) through &#x27;over 24 hours&#x27; (Fextralife; GameSpew) to &#x27;exactly 24 hours&#x27; (Forbes) because Sony published no start/restore clock. Compensation — an automatic 5-day PS Plus extension across Essential, Extra, and Premium — is the one fully corroborated remediation (five sources). Disclosed unknowns that remain open: the true root cause, the failed layer, the exact duration, whether the beta load window was causal, and whether any redundancy/<span data-explain="failover" tabindex="0">failover</span> existed or fired. No regulator, utility, or fire authority was involved, and none would be for an outage of this class.</p></div>
+
+        <h2>Technical deep-dive</h2>
+        <div class="card">The failure presented as a near-simultaneous, worldwide collapse of PlayStation Network backend services beginning Friday evening, 7 February 2025 (Pacific), with onset coinciding with the Monster Hunter Wilds second open-beta window — a coincidence reported by Fextralife (fextralife.com) and OpenCritic (opencritic.com), the latter noting Capcom rescheduled the beta in response (NOTE: the Analytics Insight article does NOT mention Monster Hunter Wilds and has been removed as a source for this coincidence). Detection was entirely digital, not physical: Sony&#x27;s own PlayStation Network Service Status page flipped affected categories to degraded/unavailable, and third-party crowd telemetry (Downdetector) climbed to a peak of &quot;nearly 8,000 reports... from US users and over 7,300 from the UK at its peak on Saturday afternoon,&quot; 8 February (Analytics Insight, analyticsinsight.net). Because there was no fire, all physical-forensics stages — smoke/heat detection, alarm activation, suppression discharge (type/flow/effectiveness), evacuation headcount, emergency-services call-to-arrival, and electrical de-energisation — did not occur and return no data (forensic disclosure).
+
+The affected scope spanned essentially all PSN service categories at once: Account Management/sign-in and authentication, Gaming and Social/multiplayer (with named impact to titles including Helldivers 2 and Diablo 4), the PlayStation Store (purchases and downloads), and PS5 disc-drive registration — which required online verification even for physical media (GameSpew). This all-categories-at-once signature is the single most diagnostic external observation, and it is consistent with a shared authentication/identity or core-services fault rather than a per-service failure — but Sony never confirmed the failed layer, so this remains inference (forensic disclosure; unknowns).
+
+Sony&#x27;s remediation was internal and undocumented publicly. During the event the company posted only about two @AskPlayStation messages — an initial acknowledgement of difficulty using games, apps, or network features, then a recovery notice (GameSpew). Services were restored Saturday evening, 8 February, with the verbatim closure &quot;Network services have fully recovered from an operational issue&quot; and an automatic 5-day PS Plus extension for all members (Analytics Insight; OpenCritic; Forbes). Total duration is reported inconsistently across outlets — from &quot;nearly 18 hours&quot; (Analytics Insight) to &quot;over 24 hours&quot; (Fextralife; GameSpew) and &quot;exactly 24 hours&quot; (Forbes) — because Sony published no precise start or restore clock times. There is no evidence of any regulator, utility authority, or fire authority involvement; PSN outages of this class are not subject to such oversight, and none was reported (unknowns).</div>
+
+        <h2>References &amp; provenance</h2>
+        <ul class="refs"><li><span class="chip muted">press</span> <span class="rtitle">PlayStation Network outage: Sony gives 5 days of PS Plus free — Analytics Insight</span><span class="rquote">“Network services have fully recovered from an operational issue. ... nearly 8,000 reports came from US users and over 7,300 from the UK at its peak on Saturday afternoon.”</span><a href="https://www.analyticsinsight.net/news/playstation-network-outage-sony-gives-5-days-of-ps-plus-free" target="_blank" rel="noopener nofollow">https://www.analyticsinsight.net/news/playstation-network-outage-sony-gives-5-days-of-ps-plus-free</a></li><li><span class="chip muted">press</span> <span class="rtitle">Sony offers compensation for the PlayStation Network outage, but is vague about the cause — GameSpew</span><span class="rquote">“Sony made two posts on X during the outage; affected services included Helldivers 2 and Diablo 4 multiplayer, game purchases and downloads, and PS5 disc-drive registration; all PS Plus tiers (Essential, Extra, Premium) received five additional days.”</span><a href="https://www.gamespew.com/2025/02/sony-offers-compensation-for-the-playstation-network-outage-but-is-vague-about-the-cause/" target="_blank" rel="noopener nofollow">https://www.gamespew.com/2025/02/sony-offers-compensation-for-the-playstation-network-outage-but-is-vague-about-the-cause/</a></li><li><span class="chip muted">press</span> <span class="rtitle">PSN outage due to &#x27;operational issue&#x27;; Sony grants extra 5 days to all PS Plus members — OpenCritic (syndicating DualShockers)</span><span class="rquote">“There wasn&#x27;t a mention of a hack, a DDoS (Distributed Denial of Service) attack, or something else.”</span><a href="https://opencritic.com/news/11887/psn-outage-due-to-operational-issue-sony-grants-extra-5-days-to-all-ps-plus-members" target="_blank" rel="noopener nofollow">https://opencritic.com/news/11887/psn-outage-due-to-operational-issue-sony-grants-extra-5-days-to-all-ps-plus-members</a></li><li><span class="chip muted">press</span> <span class="rtitle">PlayStation begins 5-day compensation for PSN outage — Fextralife</span><span class="rquote">“The roughly &#x27;over 24 hours&#x27; outage coincided with the launch of the Monster Hunter Wilds second open beta, which Capcom rescheduled in response; all PS Plus members received five additional days automatically.”</span><a href="https://fextralife.com/playstation-begins-5-day-compensation-for-psn-outage/" target="_blank" rel="noopener nofollow">https://fextralife.com/playstation-begins-5-day-compensation-for-psn-outage/</a></li><li><span class="chip muted">press</span> <span class="rtitle">Sony Reveals Compensation For All PS Plus Players After PSN Outage — Forbes (Paul Tassi)</span><span class="rquote">“It is odd that Sony is giving nothing more than a two-word explanation about its most significant outage since 2014.”</span><a href="https://www.forbes.com/sites/paultassi/2025/02/10/sony-reveals-compensation-for-all-ps-plus-players-after-psn-outage/" target="_blank" rel="noopener nofollow">https://www.forbes.com/sites/paultassi/2025/02/10/sony-reveals-compensation-for-all-ps-plus-players-after-psn-outage/</a></li></ul>
+        <p class="disclaimer">Sourced from public post-incident reports. Quotes are short attributed excerpts for provenance only; the analysis above is original and substantially shorter than its sources. Last verified 2026-08-02 (seed — pending deep research).</p>
+        <aside class="share-buttons" aria-label="Share this dossier"><span class="share-label">Share</span><button class="share-btn" onclick="rzShare('li')" aria-label="Share on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 11 0-4.124 2.062 2.062 0 010 4.124zM7.119 20.452H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg></button><button class="share-btn" onclick="rzShare('x')" aria-label="Share on X" title="X"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></button><button class="share-btn" onclick="rzShare('wa')" aria-label="Share on WhatsApp" title="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347M12.05 21.785h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884"/></svg></button><button class="share-btn" onclick="rzShare('copy',this)" aria-label="Copy link" title="Copy link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></aside><script>function rzShare(k,btn){var u=encodeURIComponent(location.href),t=encodeURIComponent(document.title);if(k==="li")open("https://www.linkedin.com/sharing/share-offsite/?url="+u,"_blank","noopener");else if(k==="x")open("https://twitter.com/intent/tweet?url="+u+"&text="+t,"_blank","noopener");else if(k==="wa")open("https://wa.me/?text="+t+"%20"+u,"_blank","noopener");else if(k==="copy"){navigator.clipboard&&navigator.clipboard.writeText(location.href);if(btn){var o=btn.getAttribute("title");btn.setAttribute("title","Copied");setTimeout(function(){btn.setAttribute("title",o);},1500);}}}</script>
+        </div>
+
+    </main>
+    <footer><div class="footer-grid"></div><span class="ver" id="versionStamp"></span></footer>
+    <div class="root-gate">
+        <div class="root-card">
+            <h2>Root access required</h2>
+            <p>The DC Incidents dossier is a root-only module. Sign in with an authorized account to continue.</p>
+            <div class="root-actions">
+                <button id="rootLoginBtn" type="button">Sign In</button>
+                <a href="index.html">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/rz-version.js?v=2026-08-01-gloss"></script>
+    <script src="js/rz-feature-flags.js?v=2026-08-01-gloss" defer></script>
+    <script src="auth.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-mobile-nav.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-cookie-consent.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-explain-db.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-explain.js?v=2026-08-01-gloss" defer></script>
+    <script>
+    (function(){var t=document.getElementById('themeToggle');function a(theme){document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme);var m=document.querySelector('meta[name=\"theme-color\"]');if(m)m.setAttribute('content',theme==='dark'?'#0c1512':'#f4f1e7');}a(localStorage.getItem('theme')||'dark');if(t)t.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme');a(c==='dark'?'light':'dark');});})();
+    (function(){function ag(){if(window._rzAuth&&typeof window._rzAuth.enforceTierFeatureAccess==='function'){window._rzAuth.enforceTierFeatureAccess('dc-incidents');}else{try{var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');var r=s&&s.role,t=s&&s.tier;var passes=!!s&&(r==='root'||t==='root');document.body.classList.toggle('locked',!passes);}catch(e){document.body.classList.add('locked');}}}var b=document.getElementById('rootLoginBtn');if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showRootGatePrompt==='function'){window._rzAuth.showRootGatePrompt('Root account required for the DC Incidents dossier.');}else if(window._rzAuth&&typeof window._rzAuth.showModal==='function'){window._rzAuth.showModal();}});window.addEventListener('rz-auth-change',function(){setTimeout(ag,50);});window.addEventListener('storage',function(e){if(e.key==='rz_premium_session')ag();});ag();setTimeout(ag,60);setTimeout(ag,550);setTimeout(ag,1600);})();
+    (function(){var el=document.getElementById('versionStamp');if(!el)return;var v=window.RZ_VERSION||'1.x.x',d=window.RZ_VERSION_DATE||'',cn=window.RZ_VERSION_CODENAME||'';el.textContent='· ResistanceZero · v'+v+(d?' · '+d:'')+(cn?' · '+cn:'')+' ·';})();
+    (function(){var n=0;function sc(){if(window.RZExplain&&window.RZExplain.scanText&&window.RZ_EXPLAIN_DB){var m=document.getElementById('main-content');if(m)window.RZExplain.scanText(m,140);}else if(n++<40){setTimeout(sc,200);}}setTimeout(sc,350);})();
+    </script>
+
+</body>
+</html>

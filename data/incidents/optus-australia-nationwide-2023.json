@@ -1,0 +1,293 @@
+{
+ "slug": "optus-australia-nationwide-2023",
+ "title": "Optus Australia Nationwide Outage — Routing Change Cascade (November 8, 2023)",
+ "operator": "Optus (Singtel)",
+ "operatorShort": "Optus",
+ "dcName": "Optus national network core",
+ "location": {
+  "city": "Sydney",
+  "country": "Australia"
+ },
+ "date": "2023-11-08",
+ "durationMin": 840,
+ "category": [
+  "network",
+  "software"
+ ],
+ "severity": {
+  "usersAffected": "~10 million Optus customers nationwide; triple-zero (000) calls affected",
+  "impactUsd": "Regulatory scrutiny; CEO resignation; customer compensation",
+  "servicesDown": [
+   "Optus mobile voice/data nationwide",
+   "Home internet",
+   "Triple-zero (000) emergency calling (partial)",
+   "Transport/payment dependencies"
+  ],
+  "tier": "Sev-1 national network core (routing)"
+ },
+ "brief": "Following a routine Singtel-network software upgrade, a large, unexpected flood of routing information exceeded preset safety limits on Optus routers, which self-isolated and cascaded into a roughly 14-hour nationwide outage of Optus mobile and internet for about 10 million Australians — disrupting triple-zero (000) emergency calls, hospitals, transport and payments.",
+ "magnitude": {
+  "blastRadiusScore": 8,
+  "usersScore": 8,
+  "financialScore": 6,
+  "durationScore": 6,
+  "note": "A routing change after a network-software upgrade cascaded into a ~14h nationwide outage for ~10M Australians, disrupting triple-zero (000) — sub-scores ESTIMATED from public impact reporting, pending deep research."
+ },
+ "rootCause": "The proximate ignition was a scheduled software upgrade on a router at a North American node of Singtel's international peering network — the upstream infrastructure Optus's IP core depends on as a Singtel subsidiary. Per the retrievable record, \"a software upgrade at a North American Singtel exchange caused one router to disconnect,\" and that disconnection acted as the spark: it emitted an abnormal flood of BGP routing advertisements toward Optus's autonomous system AS4804. Cloudflare telemetry (as cited by Wikipedia) recorded \"over 940,000 announcements in an hour from a node that normally makes less than 3,000 announcements per hour\" — roughly a 300-fold surge. (Note: some enriched sourcing named this the \"STiX/Singtel Internet Exchange\" fabric; the retrievable record confirms only \"a North American Singtel exchange,\" so the specific fabric name is not established here.)\n\nThe specific vulnerable equipment was Optus's fleet of Provider Edge (PE) routers, confirmed to be Cisco Systems devices. The failure mechanism was a BGP route-limit self-protection trip: the flood caused Optus routers to \"rapidly update routing tables and exceed the pre-configured default threshold limits set by Cisco Systems,\" and each router responded by executing the standard protective action of tearing down its BGP session to avoid CPU/memory exhaustion. \"Approximately 90 edge provider routers disconnected as an automated protective measure against routing update overload.\" The safety mechanism performed exactly as engineered — but its activation IS the outage: by isolating themselves, the ~90 PE routers severed Optus customers from the network. The exact Cisco model, firmware and hardware age are not disclosed in the retrievable record.\n\nThe latent root causes are two change-management/configuration design lapses evidenced by the technical description. First, an upstream peering-hygiene gap: a Singtel exchange upgrade was permitted to leak a ~940,000-route flood downstream into Optus with no apparent prefix-filtering or rate-limiting to contain it — a foreseeable containment gap at the peering boundary (inferred from the mechanism, not a verbatim finding). Second, an Optus-side configuration lapse: its PE routers were left on Cisco's DEFAULT threshold ceilings rather than thresholds tuned to Optus's real route counts and headroom, so a foreseeable flood tripped a hard fail-safe (session teardown) rather than degrading gracefully. Because the identical default limit tripped near-simultaneously across ~90 PE routers, the \"containment\" produced a synchronized disconnection cascade rather than a firebreak. Attribution of change ownership was reportedly disputed (Singtel was reported to have refuted early causation claims; not re-verified this session). Optus expressly ruled out a cyberattack. The independent government (Bean) review and the Senate/ACMA processes were established to examine these change-management, Triple-Zero failover and recovery shortcomings; their verbatim findings were NOT directly retrievable this session (government servers returned HTTP 403 / timed out).",
+ "technicalDeepDive": "This was a routing-layer cascade, not a physical fire, so the forensics map onto network primitives, and the deepest technical layer is presented as informed analysis grounded in the one confirmed fact — Cisco \"pre-configured default threshold limits\" — rather than as verbatim sourcing. IGNITION: a Singtel exchange software upgrade in North America caused a router to disconnect, which in BGP terms generates a mass re-advertisement/withdrawal event. Cloudflare (via Wikipedia) observed AS4804 emitting \"over 940,000 announcements in an hour\" against a baseline \"less than 3,000 announcements per hour.\" PROPAGATION (spread): BGP re-advertises reachability hop-by-hop, so the flood propagated automatically and near-instantly across Optus's IP core, with no effective firebreak. SUPPRESSION (self-protection): each Cisco PE router enforces a configured maximum-received-prefix ceiling; when incoming prefixes exceed it, the standard, RFC-aligned protective response is to tear down the offending BGP session to prevent CPU/RIB/FIB exhaustion. Here the ceilings were left at or near Cisco's DEFAULT value, so the flood breached them fleet-wide and \"approximately 90 edge provider routers disconnected.\" DE-ENERGISATION analogue: the ~90 PE routers withdrew their sessions and routes, so Optus's IP core effectively vanished from the internet for its customers — a self-isolation rather than an electrical trip. NON-AUTO-RESTORE: tripped max-prefix sessions typically do not silently re-establish when the flood subsides; standard behaviour holds the session down until an operator re-enables it (often a clear/reset or reboot). This is consistent with restoration requiring manual intervention and taking the better part of a day rather than minutes (the manual, sometimes on-site, reconnection detail is a reasonable inference from the recovery profile, not a verbatim source quote). The mechanism is distinct from the 2022 Rogers outage, where a maintenance change removed a route filter and flooded the core from within; here the trigger originated upstream at Singtel and the failing safeguard was a preset route-count limit firing synchronously across the fleet. Exact router model/firmware, the precise count of failed 000 calls, and welfare-check tallies reside in the Senate report / ACMA / Bean findings, which were NOT directly retrievable this session.",
+ "sequenceOfEvents": [
+  {
+   "t": "7-8 Nov 2023 (pre-onset)",
+   "phase": "TRIGGER",
+   "event": "Scheduled software upgrade performed on a router at a North American node of Singtel's international peering network, the upstream infrastructure Optus's IP core depends on.",
+   "source": "Wikipedia (2023_Optus_outage)"
+  },
+  {
+   "t": "8 Nov 2023, ~04:05 AEDT",
+   "phase": "TRIGGER",
+   "event": "The Singtel exchange upgrade caused one router to disconnect, initiating an abnormal BGP route-advertisement event toward Optus's AS4804.",
+   "source": "Wikipedia (2023_Optus_outage)"
+  },
+  {
+   "t": "8 Nov 2023, ~04:05 AEDT",
+   "phase": "DETECTION",
+   "event": "Cloudflare telemetry for AS4804 registered the anomaly as a mass BGP spike — 'over 940,000 announcements in an hour from a node that normally makes less than 3,000 announcements per hour.'",
+   "source": "Cloudflare figure, as cited by Wikipedia"
+  },
+  {
+   "t": "8 Nov 2023, ~04:05 AEDT",
+   "phase": "DETECTION",
+   "event": "Optus's Cisco PE routers registered the flood as incoming route updates crossed 'the pre-configured default threshold limits set by Cisco Systems.'",
+   "source": "Wikipedia (2023_Optus_outage)"
+  },
+  {
+   "t": "8 Nov 2023, ~04:05 AEDT",
+   "phase": "MITIGATION",
+   "event": "Built-in threshold self-protection activated as designed: routers began tearing down BGP sessions to prevent CPU/memory exhaustion.",
+   "source": "Wikipedia (2023_Optus_outage)"
+  },
+  {
+   "t": "8 Nov 2023, ~04:05-04:10 AEDT",
+   "phase": "CASCADE",
+   "event": "'Approximately 90 edge provider routers disconnected as an automated protective measure against routing update overload' — a synchronized self-isolation across the PE fleet.",
+   "source": "Wikipedia (2023_Optus_outage)"
+  },
+  {
+   "t": "8 Nov 2023, ~04:10 AEDT",
+   "phase": "CASCADE",
+   "event": "With ~90 PE routers withdrawn from BGP, Optus's IP core effectively vanished from the internet for its customers (network-layer 'de-energisation').",
+   "source": "Analysis grounded in Wikipedia account"
+  },
+  {
+   "t": "8 Nov 2023, morning",
+   "phase": "IMPACT",
+   "event": "Nationwide loss of mobile and fixed service affecting 'more than 10 million people' and '400,000 businesses.'",
+   "source": "Wikipedia (2023_Optus_outage)"
+  },
+  {
+   "t": "8 Nov 2023, morning",
+   "phase": "IMPACT",
+   "event": "Emergency Triple-Zero (000) calls failed for affected customers; exact count of failed calls not in retrievable record.",
+   "source": "Wikipedia (2023_Optus_outage)"
+  },
+  {
+   "t": "8 Nov 2023, 05:00-06:00 AEDT",
+   "phase": "IMPACT",
+   "event": "Physical-world cascade: Melbourne's train network experienced a shutdown from 05:00 to 06:00 and about 500 train services were cancelled; hospital phone lines and EFTPOS/payment terminals were disrupted.",
+   "source": "Wikipedia (2023_Optus_outage)"
+  },
+  {
+   "t": "8 Nov 2023, daytime",
+   "phase": "CASCADE",
+   "event": "Customers diverted to rivals: TPG/Vodafone reported a roughly four-fold activity increase and Kogan Mobile a ~400% rise in eSIM sales (press figures, not re-verified this session).",
+   "source": "Motley Fool Australia (2023-11-10)"
+  },
+  {
+   "t": "8 Nov 2023, daytime",
+   "phase": "MITIGATION",
+   "event": "Optus publicly confirmed the outage was 'not due to a cyberattack,' focusing recovery on the routing fault.",
+   "source": "Wikipedia (2023_Optus_outage)"
+  },
+  {
+   "t": "8 Nov 2023, morning-afternoon",
+   "phase": "RECOVERY",
+   "event": "Because tripped BGP sessions do not self-heal, engineers manually reconnected/rebooted affected routers (manual/on-site detail inferred from the recovery profile).",
+   "source": "Analysis grounded in Wikipedia account"
+  },
+  {
+   "t": "8 Nov 2023, ~11:30 AEDT",
+   "phase": "RECOVERY",
+   "event": "Partial restoration reached approximately 11% of the network.",
+   "source": "Wikipedia (2023_Optus_outage)"
+  },
+  {
+   "t": "8 Nov 2023, ~13:00 AEDT",
+   "phase": "RECOVERY",
+   "event": "Restoration advanced to approximately 88% of the network.",
+   "source": "Wikipedia (2023_Optus_outage)"
+  },
+  {
+   "t": "8 Nov 2023, ~evening",
+   "phase": "RESTORED",
+   "event": "Full service restored after approximately 12-13 hours (some media reported up to a 14-hour outage).",
+   "source": "Wikipedia (2023_Optus_outage)"
+  },
+  {
+   "t": "Nov 2023 (aftermath)",
+   "phase": "IMPACT",
+   "event": "Singtel lost over AU$2 billion in value, a 4.8% share-price drop attributed to the outage.",
+   "source": "Wikipedia (2023_Optus_outage)"
+  },
+  {
+   "t": "20 Nov 2023",
+   "phase": "IMPACT",
+   "event": "Optus CEO Kelly Bayer Rosmarin resigned; a Senate public inquiry and an independent government (Bean) review were established.",
+   "source": "Wikipedia (2023_Optus_outage)"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "BGP route-announcement flood",
+   "value": "~940,000 announcements in one hour vs <3,000/hr normal (~300x)",
+   "source": "Cloudflare figure, as cited by Wikipedia"
+  },
+  {
+   "label": "Provider Edge routers self-disconnected",
+   "value": "~90 edge/PE routers",
+   "source": "Wikipedia (2023_Optus_outage)"
+  },
+  {
+   "label": "People affected",
+   "value": ">10 million people and 400,000 businesses",
+   "source": "Wikipedia (2023_Optus_outage)"
+  },
+  {
+   "label": "Outage duration",
+   "value": "~12-13 hours (some media reported up to 14)",
+   "source": "Wikipedia (2023_Optus_outage)"
+  },
+  {
+   "label": "Restoration progress",
+   "value": "~11% by 11:30 AEDT; ~88% by 13:00 AEDT",
+   "source": "Wikipedia (2023_Optus_outage)"
+  },
+  {
+   "label": "Onset time",
+   "value": "8 Nov 2023, ~04:05 AEDT",
+   "source": "Wikipedia (2023_Optus_outage)"
+  },
+  {
+   "label": "Singtel market-value loss",
+   "value": ">AU$2 billion (4.8% share-price drop)",
+   "source": "Wikipedia (2023_Optus_outage)"
+  },
+  {
+   "label": "Physical-world cascade",
+   "value": "~500 Melbourne train services cancelled; network shutdown 05:00-06:00 AEDT",
+   "source": "Wikipedia (2023_Optus_outage)"
+  },
+  {
+   "label": "Customer compensation",
+   "value": "200 GB extra data (post-paid); unlimited weekend data (prepaid, rest of 2023)",
+   "source": "Wikipedia (2023_Optus_outage)"
+  },
+  {
+   "label": "Emergency-services impact",
+   "value": "Triple-Zero (000) calls failed (exact count not in retrievable record)",
+   "source": "Wikipedia (2023_Optus_outage)"
+  },
+  {
+   "label": "Competitor diversion (press, unverified)",
+   "value": "TPG/Vodafone ~4x activity; Kogan Mobile +400% eSIM sales",
+   "source": "Motley Fool Australia (2023-11-10)"
+  },
+  {
+   "label": "Optus market position (press, unverified)",
+   "value": "~10 million customers, ~31% market share",
+   "source": "Motley Fool Australia (2023-11-10)"
+  }
+ ],
+ "contributingFactors": [
+  "Configuration/maintenance lapse on Optus PE routers: they were left on 'the pre-configured default threshold limits set by Cisco Systems' rather than thresholds tuned to Optus's real route counts, so a foreseeable flood tripped a hard fail-safe instead of degrading gracefully (Wikipedia, citing the outage account).",
+  "Synchronized fail-safe design flaw: because the identical default limit tripped across ~90 PE routers near-simultaneously, the protective mechanism produced a fleet-wide disconnection cascade rather than isolating a single fault — the 'containment' had no firebreak (Wikipedia).",
+  "Upstream peering-hygiene gap (inferred from mechanism): a North American Singtel exchange upgrade was allowed to propagate a ~940,000-route BGP event downstream toward AS4804 (normal <3,000/hr) with no apparent upstream prefix-filtering or rate-limiting to contain it (Cloudflare figure via Wikipedia).",
+  "No automatic recovery / manual-only restoration: tripped BGP sessions did not self-heal, so restoration proceeded gradually (11% by 11:30, 88% by 13:00) and the outage ran ~12-13 hours (Wikipedia).",
+  "Triple-Zero (000) failover inadequacy: emergency 000 calls failed with no effective resilient fallback during the IP-core loss, later a central regulatory concern of ACMA / the Senate inquiry (Wikipedia).",
+  "Disputed / unclear change ownership at the Singtel-Optus boundary: Singtel was reported to have refuted early claims that its upgrade caused the outage (ZDNet, not re-verified this session), indicating unclear accountability and coordination."
+ ],
+ "coe": [
+  {
+   "action": "Tune all Provider Edge router route-limit thresholds off Cisco defaults to operator-specific values with graceful-degradation (warn/restart) behaviour instead of synchronized hard teardown",
+   "owner": "Optus Network Engineering",
+   "status": "Directed by Bean review / Senate inquiry (verbatim status not retrievable this session)"
+  },
+  {
+   "action": "Implement inbound prefix-filtering and route rate-limiting at the Singtel peering boundary to Optus",
+   "owner": "Singtel / Optus peering teams",
+   "status": "Under review (change ownership reportedly disputed; ZDNet, not re-verified)"
+  },
+  {
+   "action": "Establish a resilient Triple-Zero (000) failover independent of the Optus IP core plus mandated welfare-check procedures",
+   "owner": "Optus / ACMA",
+   "status": "Regulatory focus of ACMA and Senate inquiry (verbatim status not retrievable this session)"
+  },
+  {
+   "action": "Institute joint Singtel-Optus staged change-management with blast-radius review and coordinated rollback",
+   "owner": "Optus / Singtel change-management",
+   "status": "Recommended (not verified this session)"
+  }
+ ],
+ "lessonsLearnt": [
+  "A safety mechanism that fires fleet-wide simultaneously is not containment but a cascade generator: leaving ~90 PE routers on identical Cisco default thresholds turned a protective feature into the outage itself (Wikipedia).",
+  "Default vendor configuration is a latent hazard — thresholds must be tuned to the operator's real traffic, because a foreseeable ~300x route event tripped ceilings never sized for Optus's network (Cloudflare figure via Wikipedia).",
+  "Blast radius crosses corporate boundaries: an upstream Singtel exchange upgrade in North America took down 10M+ Australians, making peering-boundary filtering and joint change-control essential, not optional (Wikipedia).",
+  "Emergency-services resilience must be decoupled from the commercial IP core: 000 call failure, not the commercial outage alone, drove the regulatory and parliamentary response (Wikipedia).",
+  "Recovery design matters as much as failure design: because tripped BGP sessions do not self-heal, a minutes-long trigger became a ~12-13-hour restoration — automated/remote recovery would have sharply cut the impact (Wikipedia)."
+ ],
+ "improvements": [
+  "Design: Replace Cisco DEFAULT threshold ceilings on all Provider Edge routers with operator-tuned limits sized to real route counts plus headroom, and prefer soft/warning-then-restart behaviour over synchronized hard session-teardown so a flood degrades gracefully instead of self-isolating ~90 routers at once (grounded in the 'pre-configured default threshold limits' failure, Wikipedia).",
+  "Maintenance: Enforce peering-boundary hygiene — inbound prefix-filtering, route-count rate-limiting and AS-path sanity checks at the Singtel ingress — so an upstream exchange upgrade cannot propagate a ~940,000-route event downstream to Optus (Cloudflare figure via Wikipedia).",
+  "Process/Maintenance: Institute joint Singtel-Optus change-management with staged rollout, pre-change blast-radius review and coordinated rollback, closing the disputed accountability gap at the peering boundary (reported Singtel refutation, ZDNet).",
+  "Safety: Build a resilient Triple-Zero (000) failover path independent of the Optus IP core (e.g. mandated camp-on/roaming to other carriers' networks) plus automated welfare-check procedures, the central concern of ACMA and the Senate inquiry (Wikipedia).",
+  "Process: Add automated router-session recovery and pre-staged remote reboot capability so restoration does not depend on gradual manual reconnection that stretched the outage to ~12-13 hours (Wikipedia recovery profile)."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "What actually failed",
+   "body": "A scheduled software upgrade on a router at a North American Singtel exchange caused that router to disconnect, generating an abnormal BGP re-advertisement event toward Optus's AS4804 — Cloudflare-cited telemetry recorded over 940,000 announcements in one hour versus a normal baseline below 3,000. Optus's Cisco Provider Edge routers hit 'the pre-configured default threshold limits set by Cisco Systems' and, as designed, tore down their BGP sessions; approximately 90 edge routers disconnected, effectively removing Optus's IP core from the internet. The protective mechanism working correctly was the outage."
+  },
+  {
+   "heading": "Why a protective feature became the disaster",
+   "body": "Two latent design lapses turned a foreseeable event into a national outage. The PE fleet ran on Cisco DEFAULT thresholds rather than limits tuned to Optus's real route counts, so a ~300x flood breached a hard fail-safe instead of degrading gracefully. Because the identical default limit tripped across ~90 routers at once, the 'containment' produced a synchronized cascade with no firebreak. Upstream, the Singtel exchange upgrade propagated the route event downstream with no evident prefix-filtering or rate-limiting at the peering boundary. Both are inferences from the confirmed mechanism, not verbatim official findings."
+  },
+  {
+   "heading": "Impact and physical-world cascade",
+   "body": "Service loss hit more than 10 million people and 400,000 businesses. Triple-Zero (000) emergency calls failed — the issue that dominated the regulatory response. Melbourne's train network shut down between 05:00 and 06:00 with about 500 services cancelled; hospital phone lines and EFTPOS terminals were disrupted. Restoration was gradual (11% by 11:30, 88% by 13:00 AEDT) over roughly 12-13 hours, consistent with BGP sessions that do not self-heal and require manual re-enablement. Singtel lost over AU$2 billion in value (4.8% share drop) and CEO Kelly Bayer Rosmarin resigned on 20 November 2023."
+  },
+  {
+   "heading": "Evidence quality and open gaps",
+   "body": "Only Wikipedia was directly re-fetched this session; the Cloudflare blog (404), ABC, ZDNet, web.archive and Australian government servers (Bean review / ACMA / Senate report) were blocked or timed out. So the Cisco-default-threshold mechanism, ~90 routers, 940,000/3,000 figures, timings, scale, market loss and CEO resignation are confirmed via Wikipedia; competitor-diversion and market-share figures (Motley Fool) and the Singtel causation refutation (ZDNet) remain single-sourced and unverified this session. The verbatim official findings and the exact number of failed 000 calls and Cisco router model/firmware were not retrievable. officialPostmortem is therefore set false: no official/regulatory document was directly obtained with a quotable passage."
+  }
+ ],
+ "references": [
+  {
+   "title": "2023 Optus outage — Wikipedia (root cause and router mechanism)",
+   "url": "https://en.wikipedia.org/wiki/2023_Optus_outage",
+   "type": "press",
+   "quote": "Approximately 90 edge provider routers disconnected as an automated protective measure against routing update overload ... exceed the pre-configured default threshold limits set by Cisco Systems.",
+   "accessed": "2026-08-02"
+  },
+  {
+   "title": "2023 Optus outage — overview (Wikipedia, secondary summary of Optus's stated cause)",
+   "url": "https://en.wikipedia.org/wiki/2023_Optus_outage",
+   "type": "press",
+   "quote": "changes to routing information from an international peering network ... exceeded preset safety levels on key routers, which disconnected from the Optus IP Core network to protect themselves.",
+   "accessed": "2026-08-02"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": false,
+  "lastVerified": "2026-08-02 (seed — pending deep research)"
+ },
+ "lastUpdated": "2026-08-02"
+}
