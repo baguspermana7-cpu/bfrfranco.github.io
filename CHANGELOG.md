@@ -13,6 +13,21 @@ release sections rather than semver.
 
 ---
 
+## v1.124.7 — 2026-08-02 (DC Incidents — deep forensic re-research, batch 4 of 5: Azure / GCP / Cloudflare)
+
+Fourth deep-forensic batch (Opus Workflow, 15 agents, ~641k tokens): **Azure AD 2020** (SDP
+metadata defect defeated both ring-isolation and rollback), **Azure Front Door 2025** (cross-build
+config-metadata trips a latent data-plane bug), **GCP User-ID quota 2020** (incomplete migration
+mis-accounts usage as 0), **GCP Service Control 2025** (unguarded, non-flagged quota-check → global
+null-pointer crash-loop), **Cloudflare Bot-file 2025** (ClickHouse permission change doubles the
+feature file past a hard limit → FL2 panic). All five carry a specific software mechanism, a
+**15–18-step sourced SOE**, ≥10 metrics, grouped improvements, and all remain official-postmortem-
+backed. Merged via `_ingest_deep.py`.
+
+Root-gated; gates: incidents-corpus 25/25, page-gates CLEAN, script-tags CLEAN.
+
+---
+
 ## v1.124.6 — 2026-08-02 (DC Incidents — deep forensic re-research, batch 3 of 5: AWS)
 
 Third deep-forensic batch (Opus Workflow, 15 agents, ~679k tokens) for the five AWS incidents:
