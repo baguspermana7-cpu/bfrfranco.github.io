@@ -13,6 +13,21 @@ release sections rather than semver.
 
 ---
 
+## v1.126.2 — 2026-08-02 (Second Brain — full app-source code graph + local docs-layer opt-in)
+
+Expanded the Codebase Graph to the **full application source** — 7 dirs extracted and merged:
+`js` · `dcmoc/src` · `supabase` · `worker` · `worker-auth` · `cf-worker` · `Apps/dca-app/src` →
+**3,634 nodes / 10,528 edges / 180 named communities**. `codebase-graph.html` (root-gated) + the
+`09-Codebase` Obsidian vault (3,814 notes + canvas) regenerated from the merged graph;
+`CBG_SCOPE` default updated to the full set.
+
+Added an **opt-in docs/PDF/SQL semantic layer that runs LOCALLY via ollama** (no cloud API key, no
+cost, nothing leaves the box): `CBG_DOCS=1 python3 rebuild-codebase-graph.py` extracts
+`standarization`/`documentation` (configurable) with `--backend ollama` and merges them into the
+graph. Left opt-in because a local-LLM pass over ~1k docs is slow. Page-gates CLEAN.
+
+---
+
 ## v1.126.1 — 2026-08-02 (Second Brain — codebase graph expanded to the app source)
 
 Broadened the Second Brain Codebase Graph beyond `js/` to the real application source. Since

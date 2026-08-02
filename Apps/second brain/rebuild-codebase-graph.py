@@ -28,7 +28,7 @@ VAULT = os.path.join(SB, "obsidian-knowledge-vault", "09-Codebase")
 # Code dirs to graph, extracted SEPARATELY then merged (a single site-wide extract with the
 # similarity pass on 1000+ files OOMs here, and `extract a b c` only scans the first root).
 # Add dirs as needed — each is scanned recursively into its own graph, then merge-graphs unions them.
-SCOPE = os.environ.get("CBG_SCOPE", "js dcmoc/src").split()
+SCOPE = os.environ.get("CBG_SCOPE", "js dcmoc/src supabase worker worker-auth cf-worker Apps/dca-app/src").split()
 MERGED = os.path.expanduser("~/.graphify/rz-merged")
 
 
@@ -98,6 +98,19 @@ def main():
         shutil.copy(graphs[0], merged_json)
     else:
         run([GRAPHIFY, "merge-graphs", *graphs, "--out", merged_json], check=True)
+    # 2b. OPTIONAL docs/PDF/SQL semantic layer — LOCAL via ollama (no cloud key, no cost).
+    #     Slow (one local-LLM call per doc), so opt-in: CBG_DOCS=1 [CBG_DOCS_DIRS="standarization documentation"].
+    #     Requires a chat model in ollama (qwen2.5 / llama3.2 / deepseek-r1). Merged into the graph.
+    if os.environ.get("CBG_DOCS") == "1":
+        backend = os.environ.get("CBG_BACKEND", "ollama")
+        for d in os.environ.get("CBG_DOCS_DIRS", "standarization documentation").split():
+            if not os.path.isdir(os.path.join(RZ, d)):
+                continue
+            out = os.path.expanduser("~/.graphify/rz-docs-" + d.replace("/", "-"))
+            run([GRAPHIFY, "extract", d, "--backend", backend, "--out", out])
+            dj = os.path.join(out, "graphify-out", "graph.json")
+            if os.path.exists(dj):
+                run([GRAPHIFY, "merge-graphs", merged_json, dj, "--out", merged_json])
     # 3. cluster (names communities + builds graph.html), export Obsidian, inject the root gate
     run([GRAPHIFY, "cluster-only", MERGED])
     run([GRAPHIFY, "export", "obsidian", "--graph", merged_json, "--dir", VAULT])
