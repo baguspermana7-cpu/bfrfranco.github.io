@@ -13,6 +13,21 @@ release sections rather than semver.
 
 ---
 
+## v1.124.6 — 2026-08-02 (DC Incidents — deep forensic re-research, batch 3 of 5: AWS)
+
+Third deep-forensic batch (Opus Workflow, 15 agents, ~679k tokens) for the five AWS incidents:
+**S3 US-EAST-1 2017** (playbook-command typo), **Kinesis 2020** (OS thread-limit), **US-EAST-1
+network 2021** (internal-network congestive collapse), **DynamoDB DNS 2025** (Planner/Enactor race
+→ empty record), **use1-az4 thermal 2025**. For these logical/technical incidents the SOE captures
+the failure/recovery timeline (each event sourced to the AWS post-event message), with the guardrail/
+tooling/recovery-rehearsal and cross-service-dependency root causes made explicit and honestly
+scoped (e.g. S3's status-dashboard-depends-on-S3 containment failure; thermal record stops at
+"cooling failure"). **15–19-step SOE**, ≥10 metrics, grouped improvements. Merged via `_ingest_deep.py`.
+
+Root-gated; gates: incidents-corpus 25/25, page-gates CLEAN, script-tags CLEAN.
+
+---
+
 ## v1.124.5 — 2026-08-02 (DC Incidents — deep forensic re-research, batch 2 of 5: facility power/cooling)
 
 Second deep-forensic batch (Opus Workflow, 15 agents, ~762k tokens) re-researching the five

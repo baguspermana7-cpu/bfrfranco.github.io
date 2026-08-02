@@ -38,221 +38,243 @@
  },
  "sequenceOfEvents": [
   {
-   "t": "2026-05-07, on or before 17:25 PDT (onset)",
-   "phase": "Trigger",
-   "event": "Cooling systems fail in the affected availability zone (use1-az4). Coinbase's later postmortem states that multiple cooling units failed simultaneously, though AWS did not disclose a rack- or unit-level count.",
-   "source": "Network World (root cause); Coinbase via InfoQ ('multiple cooling units failed simultaneously')"
+   "t": "2026-05-07 ~16:20 PDT (23:20 UTC; Axis separately cites 23:50 UTC)",
+   "phase": "TRIGGER",
+   "event": "Multiple cooling/chiller units in a single data hall of Availability Zone use1-az4 (Ashburn) reportedly fail near-simultaneously; hall cooling capacity drops sharply.",
+   "source": "SingleStore ('Multiple cooling units in availability zone use1-az4 failed'); Axis Intelligence ('multiple chiller units failed simultaneously in a single data hall') - secondary, unverified this session"
   },
   {
-   "t": "2026-05-07 (following cooling loss)",
-   "phase": "Escalation",
-   "event": "Data-hall temperatures cross operating thresholds; servers automatically shut down to protect the hardware, cutting power to the EC2 instances and EBS volumes on that hardware.",
-   "source": "Network World; The Register"
+   "t": "2026-05-07 ~16:20 PDT",
+   "phase": "DETECTION",
+   "event": "Rack- and hall-level temperature sensors register temperatures exceeding safe operating thresholds; detection was thermal/environmental, NOT smoke/fire (no VESDA, no fire alarm reported).",
+   "source": "Reported AWS Builder Center wording ('temperatures ... exceeded safe operating thresholds') - reproduction, unverified"
   },
   {
-   "t": "2026-05-07 (immediately after shutdown)",
-   "phase": "Impact",
-   "event": "EC2 instances and EBS volumes hosted on the impacted hardware lose power and become impaired within use1-az4.",
-   "source": "The Register; Network World"
+   "t": "2026-05-07 ~16:20 PDT",
+   "phase": "MITIGATION",
+   "event": "Servers execute their built-in automatic over-temperature protective shutdown to protect silicon; no fire-suppression system involved.",
+   "source": "Reported AWS Health Dashboard root-cause message ('servers automatically shut down when the temperatures exceeded the operating thresholds') - reproduction, unverified"
   },
   {
-   "t": "2026-05-07 17:25 PDT (2026-05-08 00:25 UTC)",
-   "phase": "Detection",
-   "event": "AWS confirms problems in the use1-az4 availability zone in US-EAST-1 and time-stamps its first incident report. This is the first public onset marker for the thermal event.",
-   "source": "Network World; The Register (00:25 UTC corroboration)"
+   "t": "2026-05-07 ~16:20 PDT",
+   "phase": "IMPACT",
+   "event": "The protective shutdown de-energises the affected racks; EC2 instances and EBS volumes lose power, some physically damaged.",
+   "source": "Reported AWS Builder Center; SingleStore ('a power loss that physically damaged EC2 instances and EBS volumes on affected racks') - unverified"
+  },
+  {
+   "t": "2026-05-07 ~17:06 PDT",
+   "phase": "MITIGATION",
+   "event": "AWS reportedly shifts customer traffic away from use1-az4 to contain the blast radius to the single affected zone.",
+   "source": "Reported AWS Builder Center timeline - unverified"
+  },
+  {
+   "t": "2026-05-07 17:25 PDT",
+   "phase": "DETECTION",
+   "event": "AWS Health Dashboard reportedly posts first status message: 'EC2 instances and EBS volumes hosted on impacted hardware are affected by the loss of power during the thermal event.'",
+   "source": "AWS Health Dashboard, quoted by Network World - reproduction, unverified this session"
+  },
+  {
+   "t": "2026-05-07 evening PDT",
+   "phase": "IMPACT",
+   "event": "Downstream customers begin outages; Coinbase and other services on affected racks reportedly go dark.",
+   "source": "Yahoo Finance ('AWS data center outage knocks out Coinbase for 7 hours'); SingleStore - unverified"
   },
   {
    "t": "2026-05-07 18:47 PDT",
-   "phase": "Cascade",
-   "event": "AWS warns of cascading service impairments: dependent AWS services — IoT Core, ELB, NAT Gateway and Redshift — see longer provisioning times and elevated error rates and latencies for dependent workflows.",
-   "source": "Network World"
+   "phase": "CASCADE",
+   "event": "AWS Health Dashboard reportedly warns dependent services will be hit: other AWS services depending on affected EC2/EBS in the AZ 'may also experience impairments.'",
+   "source": "AWS Health Dashboard, quoted by Network World - reproduction, unverified"
   },
   {
-   "t": "2026-05-07 evening",
-   "phase": "Cascade",
-   "event": "Downstream customer Coinbase is disrupted: its Raft-based matching engine (all five nodes co-located in a single AWS cluster placement group), Kafka event-streaming infrastructure and order-routing services are affected; users are unable to buy, sell, deposit, withdraw or transfer assets.",
-   "source": "InfoQ (Coinbase postmortem)"
-  },
-  {
-   "t": "2026-05-07 (during event)",
-   "phase": "Mitigation",
-   "event": "AWS works to bring the elevated temperatures back to normal, shifts traffic away from the impacted availability zone, and recommends customers redistribute or relaunch workloads in other US-EAST-1 availability zones.",
-   "source": "The Register; Network World"
-  },
-  {
-   "t": "2026-05-07 20:06 PDT",
-   "phase": "Recovery",
-   "event": "AWS acknowledges that cooling restoration is progressing 'slower than anticipated'.",
-   "source": "Network World"
+   "t": "2026-05-07 evening PDT",
+   "phase": "CASCADE",
+   "event": "Software-orchestration recovery proves impossible for physically damaged hardware: 'Software orchestration cannot automatically reroute around physical hardware damage.'",
+   "source": "SingleStore - unverified"
   },
   {
    "t": "2026-05-07 22:11 PDT",
-   "phase": "Recovery",
-   "event": "AWS brings additional cooling capacity online; some racks and affected infrastructure recover as cooling is partially re-established in the affected hall.",
-   "source": "Network World; The Register"
+   "phase": "RECOVERY",
+   "event": "AWS reports staged cooling-restoration underway ('incremental progress to restore cooling systems'); recovery deliberately paced to avoid damaging thermally-stressed equipment.",
+   "source": "Reported AWS Health Dashboard (via Network World); AWS Builder Center - unverified"
   },
   {
    "t": "2026-05-08 06:51 PDT",
-   "phase": "Diagnosis",
-   "event": "AWS publishes a more detailed explanation of the thermal event and its effect on the availability zone.",
-   "source": "Network World"
+   "phase": "DETECTION",
+   "event": "AWS reportedly posts root-cause status message confirming the thermal->shutdown->power-loss chain ('servers automatically shut down ... to protect the hardware').",
+   "source": "AWS Health Dashboard, quoted by Network World - reproduction, unverified"
+  },
+  {
+   "t": "2026-05-08 (during recovery)",
+   "phase": "RECOVERY",
+   "event": "AWS advises customers to restore from EBS snapshots or launch resources in unaffected zones, acknowledging some hardware will not come back in place.",
+   "source": "Crawled forensic summary of AWS guidance - unverified"
   },
   {
    "t": "2026-05-08 13:50 PDT",
-   "phase": "Restored",
-   "event": "Cooling system capacity is restored to the same levels as before the incident; elapsed onset-to-restoration is ~20 hours 25 minutes (derived from the two stamped endpoints).",
-   "source": "Network World"
+   "phase": "RESTORED",
+   "event": "Cooling reportedly restored to pre-incident capacity in the affected hall.",
+   "source": "Reported AWS Builder Center timeline - unverified"
   },
   {
-   "t": "2026-05-08 (much of the day)",
-   "phase": "Restored",
-   "event": "Coinbase recovery takes much of the following day, using a staged cancel-only, then auction, then normal re-enable sequence (individual steps not timestamped).",
-   "source": "InfoQ (Coinbase postmortem)"
+   "t": "2026-05-08 (Coinbase)",
+   "phase": "RESTORED",
+   "event": "Coinbase service reportedly restored after roughly 7 hours of downtime.",
+   "source": "Yahoo Finance - unverified"
+  },
+  {
+   "t": "2026-05-08 ~20:04 PDT",
+   "phase": "RESTORED",
+   "event": "Incident marked resolved (~28 hours after onset); however some EC2 instances/EBS volumes reportedly remained impaired due to physical damage.",
+   "source": "Crawled forensic summary; AWS Builder Center headline 'The 28-Hour Meltdown' - unverified"
+  },
+  {
+   "t": "2026-08-02",
+   "phase": "RESTORED",
+   "event": "VERIFIED: AWS Post-Event Summaries archive checked; most recent entry is the Oct 19 2025 DynamoDB disruption. No formal post-event summary for this May 2026 thermal event was ever published.",
+   "source": "AWS Post-Event Summaries archive, accessed 2026-08-02 (independently verified)"
   }
  ],
  "metrics": [
   {
-   "label": "Onset to cooling restored (elapsed)",
-   "value": "~20h 25m (5:25 PM PDT May 7 → 1:50 PM PDT May 8)",
-   "source": "Derived from Network World stamped endpoints"
+   "label": "Total incident duration (onset to resolved)",
+   "value": "~28 hours (reported)",
+   "source": "AWS Builder Center headline 'The 28-Hour Meltdown'; onset ~16:20 PDT May 7 to resolved ~20:04 PDT May 8 - secondary, unverified"
   },
   {
-   "label": "Onset timestamp (UTC)",
-   "value": "00:25 UTC, 8 May 2026 (5:25 PM PDT, 7 May)",
-   "source": "The Register"
+   "label": "Cooling-restoration duration (onset to pre-incident capacity)",
+   "value": "~21.5 hours (4:20 PM PDT May 7 -> 1:50 PM PDT May 8)",
+   "source": "Reported AWS Builder Center timeline - unverified"
   },
   {
-   "label": "Availability zone affected",
-   "value": "1 (use1-az4, US-EAST-1)",
-   "source": "Network World; The Register"
+   "label": "Threshold-exceedance / trigger time",
+   "value": "4:20 PM PDT May 7 (23:20 UTC; Axis separately cites 23:50 UTC - internal inconsistency)",
+   "source": "Reported AWS Builder Center; Axis Intelligence - unverified"
   },
   {
-   "label": "Directly impaired AWS services",
-   "value": "2 (EC2, EBS)",
-   "source": "Network World; The Register"
+   "label": "Coinbase customer downtime",
+   "value": "~7 hours (reported)",
+   "source": "Yahoo Finance ('AWS data center outage knocks out Coinbase for 7 hours') - unverified"
   },
   {
-   "label": "Cascaded AWS services",
-   "value": "4 (IoT Core, ELB, NAT Gateway, Redshift)",
-   "source": "Network World"
+   "label": "Blast radius",
+   "value": "1 data hall / 1 Availability Zone (use1-az4), described as a very heavily used AWS zone",
+   "source": "Axis Intelligence; SingleStore - unverified"
   },
   {
-   "label": "Coinbase internal subsystems disrupted",
-   "value": "3 (Raft matching engine, Kafka streaming, order routing)",
-   "source": "InfoQ (Coinbase postmortem)"
+   "label": "Cooling units failed",
+   "value": "'Multiple' / 'multiple chiller units' near-simultaneously (exact count not disclosed)",
+   "source": "SingleStore; Axis Intelligence - unverified"
   },
   {
-   "label": "Coinbase Raft quorum nodes lost",
-   "value": "3 of 5 (stated in Coinbase postmortem; AWS disclosed no rack-level detail)",
-   "source": "InfoQ (Coinbase postmortem)"
+   "label": "Official AWS post-event summary published",
+   "value": "0 (none for May 2026; latest PES entry is the Oct 19, 2025 DynamoDB disruption)",
+   "source": "AWS Post-Event Summaries archive, accessed 2026-08-02 - INDEPENDENTLY VERIFIED"
   },
   {
-   "label": "Coinbase customer outage",
-   "value": "Multi-hour; recovery took much of the following day (no minute-precise duration published)",
-   "source": "InfoQ (Coinbase postmortem)"
+   "label": "Temperature detail disclosed (deg / setpoint / threshold value)",
+   "value": "Not disclosed - only 'exceeded safe operating thresholds', no numeric value",
+   "source": "Reported AWS wording (disclosed gap)"
   },
   {
-   "label": "Prior US-EAST-1 outage (context, Oct 19-20 2025)",
-   "value": "~15 hours, 70+ AWS services affected (DynamoDB DNS race condition)",
-   "source": "Network World"
+   "label": "Chiller/CRAH make, model, age, refrigerant",
+   "value": "Not disclosed in any source",
+   "source": "Explicit negative finding (disclosed gap)"
   },
   {
-   "label": "Quantified financial / user-count impact",
-   "value": "None published (confirmed absent across all sources)",
-   "source": "Ledger gap note"
+   "label": "Recency ranking of the outage",
+   "value": "Reported as 4th significant us-east-1 outage since October 2025 (single-source, unverified)",
+   "source": "Axis Intelligence - unverified"
   }
  ],
- "rootCause": "On the evening of Thursday, 2026-05-07 (PDT), a cooling-system failure occurred in a single AWS data center serving the use1-az4 Availability Zone of the US-EAST-1 region (Northern Virginia). Per press coverage of AWS's own Health Dashboard, \"AWS confirmed the outage was due to overheating caused by a cooling failure at its North Virginia data center, US-East-1, which is a heavily used region\" (CRN). This \"cooling failure\" is the highest-level cause AWS disclosed; the specific reason the cooling plant failed (mechanical, controls/BMS, coolant-loop, or power-to-cooling) was never publicly explained, so the authoritative causal record stops at \"cooling failure.\"\n\nThe mechanism that turned lost cooling into a service outage was thermal-protection automation. As temperatures climbed past design limits, \"servers automatically shut down when the temperatures exceeded the operating thresholds in order to protect the hardware\" (Network World). That automated shutdown is the most likely source of the \"loss of power\" AWS reported: \"EC2 instances and EBS volumes hosted on impacted hardware are affected by the loss of power during the thermal event\" in the use1-az4 Availability Zone (Network World). AWS's wording ties the power loss to the thermal event rather than to a utility, UPS, or generator fault; on that basis this incident is best read as a thermal event whose \"power loss\" was a protective de-energization of servers, not a primary electrical-supply failure. AWS did not, however, explicitly rule out an electrical fault, so the \"protective shutdown, not electrical\" reading is a well-supported interpretation, not an AWS-stated fact.\n\nImpact then propagated along AWS's service dependency graph. AWS's first post came at 5:25 PM PDT; by 6:47 PM PDT it warned that \"Other AWS services that depend on the affected EC2 instances and EBS volumes in this Availability Zone may also experience impairments\" (Network World). Network World names IoT Core, ELB, NAT Gateway, and Redshift as affected; CRN additionally reports SageMaker, ElastiCache, and Amazon EKS. Recovery was protracted: at 8:06 PM PDT AWS said \"progress is slower than originally anticipated,\" and at 10:11 PM PDT it reported only \"incremental progress to restore cooling systems,\" with services \"experiencing elevated error rates and latencies for some workflows.\" Power was restored to the AZ \"several hours after the thermal event occurred\" (CRN), but full cooling capacity was not restored to pre-incident levels until 1:50 PM PDT Friday 2026-05-08 — roughly 20 hours after the first report. Coinbase was disrupted for about seven hours (CRN).\n\nImportant caveat: no AWS official post-incident review (PIR/RFO/aws.amazon.com/message) was located. The entire causal record rests on two press summaries of Health Dashboard updates, so the disclosed cause is \"cooling failure\" with the underlying failure mode and the state of cooling redundancy both undisclosed.",
+ "rootCause": "SPECIFIC PRECIPITATING FAILURE (a cooling/thermal-management failure, NOT a fire). No source reports fire, smoke, flame, fire-alarm activation, suppression discharge, evacuation, or fire-department response. The precipitating failure was the near-simultaneous loss of multiple cooling/chiller units in a SINGLE data hall of Availability Zone use1-az4 (Ashburn / Northern Virginia, us-east-1) at approximately 4:20 PM PDT (23:20 UTC) on 2026-05-07. This attribution rests on secondary trade reporting (SingleStore: \"Multiple cooling units in availability zone use1-az4 failed\"; Axis Intelligence: \"multiple chiller units failed simultaneously in a single data hall\") that COULD NOT be re-fetched this review session (search budget exhausted, no URLs supplied), so it is UNVERIFIED here.\\n\\nFAILURE MECHANISM (physical chain, as reported): loss of cooling capacity -> rapid rise of rack-inlet temperature -> temperatures crossed safe operating thresholds -> servers executed their built-in automatic over-temperature protective shutdown to protect silicon -> that protective shutdown removed power from the affected racks -> EC2 instances and EBS volumes lost power, with some hardware physically damaged. This chain is attributed to AWS Health Dashboard / AWS Builder Center wording (\"servers automatically shut down when the temperatures exceeded the operating thresholds in order to protect the hardware\") reproduced by third parties; the primary AWS text was NOT independently accessible this session.\\n\\nCRITICAL UNKNOWNS — the record stops short of component-level root cause. No source discloses the chiller/CRAH/CDU make, model, age, refrigerant chemistry, or the specific mechanical/electrical fault that caused the units to fail together. \"Simultaneously\" implies a COMMON-CAUSE failure (shared chilled-water loop, shared electrical feed to the cooling plant, or a shared BMS/controls fault) but none is confirmed. VERIFIED FACT: AWS published no formal Post-Event Summary for this incident — the official AWS Post-Event Summaries archive's most recent entry, accessed 2026-08-02, is the October 19, 2025 DynamoDB disruption; there is NO May 2026 cooling/thermal summary. The authoritative record therefore stops at (unverified reproductions of) AWS Health Dashboard status messages.\\n\\nLATENT ROOT (design/redundancy, inferred not disclosed). The evidenced forensics point to a redundancy-and-concentration latent root, not a maintenance record: cooling redundancy within the hall was insufficient to survive the loss of multiple units at once, and use1-az4 is described as a very heavily used zone, concentrating load behind a single physical hall. MAINTENANCE/INSPECTION/TESTING: NOT DISCLOSED (state as \"not disclosed,\" never as \"no lapse occurred\"). Because AWS published no PES, no maintenance record, work-order, preventive-maintenance status, or BMS-configuration history was released. Whether the simultaneous failure stemmed from deferred maintenance, a failed PM action, a controls misconfiguration, a common utility/coolant fault, or unmaintainable load growth is genuinely unknown.",
  "contributingFactors": [
-  "Undisclosed underlying cooling-plant failure mode: AWS attributed the event to a 'cooling failure' but never published the physical root cause beneath it (mechanical, controls/BMS, coolant, or power-to-cooling). The true first cause is uncharacterized in the public record.",
-  "Cooling redundancy did not arrest the temperature rise: rack temperatures exceeded operating thresholds, so whatever cooling capacity existed did not hold the envelope. Note this is inference — the sources contain no positive detail on use1-az4 cooling-redundancy design or why it did not engage; AWS disclosed nothing on this point.",
-  "Concentration of load on a single AZ within a heavily used region: CRN describes US-EAST-1 as 'a heavily used region,' so a single-AZ thermal fault translated into broad, high-visibility impact across many customers and dependent services.",
-  "Deep service-dependency chains on the affected EC2/EBS hardware: building-block services (IoT Core, ELB, NAT Gateway, Redshift per Network World; SageMaker, ElastiCache, EKS per CRN) inherited the failure once the underlying compute/storage lost power, amplifying a localized hardware outage into a multi-service impairment.",
-  "Slow, difficult recovery: AWS signaled recovery was harder than expected ('progress is slower than originally anticipated'; only 'incremental progress to restore cooling systems'), and full cooling capacity took roughly 20 hours to restore, extending impact well past the earlier power restoration.",
-  "Absence of a formal post-incident review: no PIR/RFO/aws.amazon.com/message document was found, leaving the causal record dependent on brief Health Dashboard status updates relayed by press rather than an AWS engineering analysis — a transparency/learning gap."
+  "Insufficient cooling redundancy within the affected hall: multiple cooling/chiller units reportedly failed near-simultaneously and remaining capacity could not hold the thermal load before thresholds were breached (SingleStore; Axis Intelligence) - secondary sourcing, unverified this session.",
+  "Probable common-cause failure implied but unconfirmed: 'simultaneously' points to a shared dependency (chilled-water loop, shared power feed to the cooling plant, or a BMS/controls fault), yet no source identifies the shared element - a single-point-of-failure contributor AWS never disclosed.",
+  "Extreme load concentration in a single zone: use1-az4 is described as one of the most heavily used AWS zones, so one physical hall's cooling loss translated into an outsized customer blast radius (Axis - unverified).",
+  "Maintenance/inspection/testing status NOT DISCLOSED: AWS published no post-event summary (VERIFIED via the PES archive, latest entry Oct 19 2025 DynamoDB), so whether deferred maintenance, a failed PM action, or a controls misconfiguration contributed is genuinely unknown - not a finding of 'no lapse'.",
+  "Protective-shutdown design coupling: the servers' over-temperature protective shutdown, while correct, de-energised racks and physically damaged some hardware, converting a thermal event into a power-loss-plus-hardware-damage event (reported AWS Builder Center wording).",
+  "Analyst-hypothesized load growth outpacing legacy cooling: trade commentary raised concern that dense AI/HPC racks strain legacy cooling infrastructure (Axis) - explicitly analyst speculation, not an AWS finding.",
+  "Customer-side single-AZ dependency: despite designs meant to tolerate one-AZ failure, at least one major customer (Coinbase) did not survive the loss of use1-az4 (SingleStore - unverified)."
  ],
  "coe": [
   {
-   "action": "Shift traffic away from the impaired use1-az4 availability zone to reduce load on affected hardware during recovery.",
+   "action": "Publish a formal Post-Event Summary identifying the failed cooling component, the common-cause mechanism, temperatures reached, and corrective actions",
    "owner": "AWS",
-   "status": "Completed (real-time mitigation during the event)",
-   "source": "The Register; Network World"
+   "status": "Not done / not disclosed (no PES published as of 2026-08-02 - verified)"
   },
   {
-   "action": "Advise customers to recover by redistributing/relaunching workloads in unaffected US-EAST-1 availability zones.",
-   "owner": "AWS",
-   "status": "Completed (advisory issued during the event)",
-   "source": "The Register; Network World"
+   "action": "Increase in-hall cooling redundancy to survive simultaneous loss of multiple units",
+   "owner": "AWS Data Center Engineering",
+   "status": "Not disclosed"
   },
   {
-   "action": "Restore cooling capacity to pre-incident levels, re-enabling powered operation of the affected racks.",
-   "owner": "AWS",
-   "status": "Completed 1:50 PM PDT, 8 May 2026",
-   "source": "Network World"
+   "action": "Eliminate shared single points of failure (chilled-water loop, cooling-plant power feed, BMS/controls) enabling common-cause failure",
+   "owner": "AWS Data Center Engineering",
+   "status": "Not disclosed"
   },
   {
-   "action": "Implement automated cross-zone recovery for the matching engine so a single-AZ loss cannot halt trading.",
-   "owner": "Coinbase",
-   "status": "Committed action item in Coinbase postmortem (owner/deadline/completion not stated in source)",
-   "source": "InfoQ (Coinbase postmortem)"
+   "action": "Disclose and strengthen preventive-maintenance / inspection regime for cooling units with concurrent maintainability",
+   "owner": "AWS Facilities / Operations",
+   "status": "Not disclosed"
   },
   {
-   "action": "Improve quorum-restoration procedures for the Raft-based matching engine after quorum loss.",
-   "owner": "Coinbase",
-   "status": "Committed action item in Coinbase postmortem (owner/deadline/completion not stated in source)",
-   "source": "InfoQ (Coinbase postmortem)"
+   "action": "Formalize staged thermal-recovery runbook and pre-stage spare hardware to shorten physical-damage recovery",
+   "owner": "AWS Operations",
+   "status": "Not disclosed"
   },
   {
-   "action": "Make Kafka event-streaming/messaging infrastructure more resilient across multiple availability zones.",
-   "owner": "Coinbase",
-   "status": "Committed action item in Coinbase postmortem (owner/deadline/completion not stated in source)",
-   "source": "InfoQ (Coinbase postmortem)"
-  },
-  {
-   "action": "Expand disaster-recovery testing to cover single-AZ power/thermal-loss scenarios.",
-   "owner": "Coinbase",
-   "status": "Committed action item in Coinbase postmortem (owner/deadline/completion not stated in source)",
-   "source": "InfoQ (Coinbase postmortem)"
+   "action": "Validate genuine multi-AZ/region failover via regular game-days",
+   "owner": "Affected customers (e.g. Coinbase)",
+   "status": "Customer-dependent; single-AZ dependency exposed"
   }
  ],
  "lessonsLearnt": [
-  "A hardware-safety feature can be an availability failure mode: thermal auto-shutdown correctly protects servers, but when it fires hall-wide it turns a cooling fault into simultaneous power loss for every instance on that gear.",
-  "Foundational-service blast radius is real: because EC2 and EBS underpin higher-level services, their impairment cascaded to IoT Core, ELB, NAT Gateway and Redshift instead of remaining a localized power event.",
-  "Single-AZ concentration breaks quorum systems: Coinbase's report of losing 3 of 5 quorum nodes — all in one cluster placement group — shows that placing a majority of a consensus group where one AZ's failure can take them out defeats the point of the quorum.",
-  "Recovery is serialized behind cooling: racks could not safely return until temperatures were restored, so the environmental fault set the floor on total downtime (~20 hours).",
-  "Disclosure gaps hamper learning: with no formal AWS COE and only qualitative Coinbase impact, neither plant-level fault detail nor quantified customer impact is available to drive precise remediation."
+  "A cooling/thermal event can be as destructive as a power event: loss of cooling triggered protective server shutdowns that de-energised racks AND physically damaged hardware - thermal risk must be modelled as a power-and-hardware-loss risk, not just an availability blip.",
+  "A correctly functioning safety mechanism can manufacture the outage: the over-temperature protective shutdown did its job (saved silicon) but its side effect (removing rack power) was the customer-visible failure - safety-shutdown blast radius must be designed for.",
+  "Software resilience cannot reroute around physically dead hardware: stateful EBS volumes on damaged racks did not migrate; snapshot/restore and cross-zone launch were the only paths - stateful recovery design is essential.",
+  "Paper single-AZ tolerance is not production single-AZ tolerance: a major customer went dark despite designs meant to survive one-AZ loss - failover must be tested, not assumed.",
+  "Load concentration amplifies single-hall failures: concentrating enormous customer load behind one heavily used zone/hall turns a localized mechanical fault into a broad outage.",
+  "Absence of an official post-event summary limits forensic certainty: with no AWS PES, component-level root cause, temperatures, and maintenance history remain unknown - the industry cannot fully learn from the event."
  ],
  "improvements": [
-  "Distribute quorum-critical and consensus nodes across multiple availability zones so no single AZ — or single cluster placement group — holds a voting majority.",
-  "Architect stateful services (matching engine, event streaming, order routing) for cross-zone failover and rapid quorum re-establishment.",
-  "Pre-stage multi-AZ relaunch runbooks (and, where applicable, snapshot-based restore) so customers can execute the zone-redistribution recovery path within minutes, not hours.",
-  "Expand disaster-recovery testing to explicitly include single-AZ thermal/power-loss scenarios rather than only instance- or service-level failures.",
-  "Improve environmental resilience and redundancy in the cooling plant and instrument restoration progress at rack granularity to shorten the cooling-first recovery serialization."
+  "DESIGN / REDUNDANCY: Increase cooling redundancy within each data hall (true N+ concurrent-maintainable capacity) so the loss of multiple units cannot breach thermal thresholds before make-up cooling engages.",
+  "DESIGN / COMMON-CAUSE ELIMINATION: Audit for and remove shared single points of failure across the cooling plant (chilled-water loop segmentation, independent per-unit power feeds, diverse BMS/controls) so multiple units cannot fail together from one root.",
+  "MAINTENANCE: Establish and disclose a preventive-maintenance and inspection regime for chillers/CRAH/CDU units (vibration, refrigerant, controls-firmware, coolant chemistry) with concurrent-maintainability so PM work never reduces redundancy below survivable levels.",
+  "SAFETY / THERMAL RUNBOOK: Formalize a staged thermal-recovery runbook (controlled re-cooling and phased re-energisation) to prevent thermal-cycling damage to stressed hardware, and pre-stage spare hardware to shorten physical-damage recovery.",
+  "TRANSPARENCY: Publish a formal Post-Event Summary (root cause, failed component, timeline, corrective actions) - none was issued for this event, limiting industry learning and customer trust.",
+  "CUSTOMER ARCHITECTURE: Guide and validate genuine multi-AZ / multi-region failover with regular game-day testing, since paper single-AZ tolerance (e.g. Coinbase) failed in production."
  ],
  "comprehensiveAnalysis": [
   {
-   "heading": "Failure mechanism",
-   "body": "The incident began as an environmental fault: cooling systems failed in use1-az4. As the data hall heated past operating thresholds, servers executed their designed thermal-protection response and powered themselves off to avoid heat damage. That autonomous shutdown is the pivot point of the whole event — it converted a cooling problem into a simultaneous, correlated power loss across the EC2 instances and EBS volumes hosted on the affected hardware. Both Network World and The Register independently describe this power-loss-during-thermal-event mechanism, giving the root cause two-source corroboration."
+   "heading": "What actually failed - and what did not",
+   "body": "This was a cooling/thermal-management failure in a single data hall of use1-az4, NOT a fire. No ignition, smoke detection, suppression discharge, evacuation, or fire-department response is reported anywhere. Multiple cooling/chiller units reportedly failed near-simultaneously; the mechanical component, make, model, age, refrigerant, and specific fault were never disclosed. 'Simultaneously' implies a common-cause failure (shared coolant loop, shared power feed, or a controls fault) but none is confirmed. All component-level detail remains a disclosed gap."
   },
   {
-   "heading": "Why it cascaded",
-   "body": "EC2 and EBS are not leaf services; they are the compute and block-storage substrate on which much of AWS is built. When they lost power, the impairment radiated outward to IoT Core, ELB, NAT Gateway and Redshift, and surfaced to customers as slower provisioning, elevated error rates and higher latencies. The cascade continued beyond AWS: Coinbase's Raft-based matching engine, Kafka streaming and order-routing services were disrupted, and — by Coinbase's own account — three of five quorum nodes were lost, enough to break consensus and halt trading. The event is therefore a textbook demonstration of how a single-hall physical fault propagates up a dependency stack into a customer-facing financial outage."
+   "heading": "Why a safety mechanism manufactured the outage",
+   "body": "When cooling collapsed, rack-inlet temperatures crossed safe operating thresholds and servers executed their built-in over-temperature protective shutdown to protect silicon. That shutdown, working exactly as designed, de-energised the affected racks - and the power loss physically damaged some EC2 instances and EBS volumes. The customer-visible outage was therefore produced by protection succeeding, not failing. This is the pivotal, counter-intuitive forensic point and is the correct frame for the whole incident."
   },
   {
-   "heading": "Recovery",
-   "body": "Recovery was gated by the environment. AWS confirmed the use1-az4 problem at 5:25 PM PDT on 7 May, warned of cascading service impairments at 6:47 PM, reported cooling restoration progressing 'slower than anticipated' by ~8:06 PM, brought additional cooling capacity online with some racks recovering by 10:11 PM, published a fuller explanation at 6:51 AM PDT on 8 May, and restored cooling to pre-incident capacity at 1:50 PM PDT — about 20 hours 25 minutes after onset. Racks could only return once temperatures were safe again, so cooling restoration was the critical path. In parallel, AWS shifted traffic off the impaired zone and steered customers toward other US-EAST-1 zones. Coinbase's own recovery took much of the following day via a staged cancel-only, then auction, then normal re-enable sequence."
+   "heading": "The physical-damage recovery tail",
+   "body": "Recovery was an engineering cooling-restoration effort, deliberately staged because a rushed re-energisation could thermally cycle and damage already-stressed hardware. Cooling was reportedly restored to pre-incident capacity ~21.5 hours after onset, with the incident resolved ~28 hours after onset. Crucially, software orchestration could not reroute around physically dead hardware: stateful volumes on damaged racks required snapshot-restore or launching in unaffected zones, and some resources stayed impaired past resolution."
   },
   {
-   "heading": "Organizational and systemic factors",
-   "body": "Two structural choices shaped the impact. On the AWS side, the concentration of workload in US-EAST-1 means any hall-level fault there has amplified consequences — this is the same region behind a ~15-hour, 70-plus-service outage in October 2025. On the customer side, Coinbase's loss of a quorum majority within the affected zone, with all five Raft nodes in a single cluster placement group, indicates consensus-critical components were not spread widely enough across availability zones to survive a single-AZ loss. Coinbase's four remediation items — cross-zone recovery, better quorum restoration, multi-AZ messaging and expanded DR testing — are all aimed at that gap, though the source reports them as committed action items without owners, deadlines or verification."
+   "heading": "Blast radius and the single-AZ lesson",
+   "body": "Containment held at the AZ boundary by design - impact stayed within one hall of use1-az4 and traffic was shifted away from the zone. Yet load concentration behind a single heavily used zone produced an outsized customer impact, and at least one major customer (Coinbase, ~7h down) failed despite architecture meant to tolerate a single-AZ loss. The lesson is architectural on both sides: operators must not concentrate load behind one hall, and customers must test - not assume - multi-AZ failover."
   },
   {
-   "heading": "Cross-incident pattern",
-   "body": "The May 2026 thermal event extends a recurring 'notorious US-EAST-1' pattern. The immediately preceding major outage (19-20 October 2025) ran roughly 15 hours and cascaded across more than 70 AWS services after a DynamoDB DNS race condition; the May event is shorter in service breadth but comparable in duration and again triggered by an infrastructure fault localized to the region. The through-line is not a single repeated root cause but a repeated topology: heavy dependence on one region, foundational services with wide blast radius, and downstream customers whose own architectures assume more isolation than a correlated AZ-level failure actually provides."
+   "heading": "Sourcing, disclosure gaps, and verification status",
+   "body": "AWS published NO formal Post-Event Summary for this event - independently VERIFIED against the AWS PES archive on 2026-08-02 (latest entry: Oct 19 2025 DynamoDB). Consequently there is no disclosed component root cause, no numeric temperature, and no maintenance/inspection history; these must be stated as 'not disclosed', never as 'no lapse occurred'. Equally important: nearly all narrative detail here derives from secondary reporting (SingleStore, Axis Intelligence, AWS Builder Center, Yahoo Finance, Network World) that could NOT be re-fetched during this review (search budget exhausted, no source URLs supplied, guessed URLs 404'd). Those quotations and timestamps are reported-not-confirmed and should be re-verified before publication."
   }
  ],
- "technicalDeepDive": "The failure chain is a thermal-loss-to-protective-shutdown sequence in a data hall. Under normal operation the use1-az4 cooling system removes heat dissipated by dense racks of EC2/EBS host hardware, holding component temperatures within a design envelope. When cooling failed on 2026-05-07, heat removal fell below heat generation and rack temperatures rose. Server firmware/BMC thermal-protection logic continuously compares inlet, CPU, and component sensors against configured operating thresholds; once those thresholds were crossed the logic triggered automatic shutdown: per AWS, \"servers automatically shut down when the temperatures exceeded the operating thresholds in order to protect the hardware\" (Network World). This is a deliberate hardware-preserving trade — the platform sheds its own power rather than risk sustained over-temperature damage.\n\nBecause the compute/storage substrate lost power, AWS characterized the customer-facing effect as a \"loss of power during the thermal event\" affecting hosted EC2 instances and EBS volumes in use1-az4 (Network World). Read against AWS's wording, this \"power loss\" is best interpreted as a protective de-energization of servers tied to the thermal event rather than a failure of the electrical distribution (utility, UPS, generators); AWS did not explicitly confirm or exclude an electrical fault, so this remains an interpretation rather than a disclosed fact. The blast radius then propagated along AWS's dependency graph: managed services running data or control paths on EC2/EBS in that AZ — IoT Core, ELB, NAT Gateway, and Redshift (Network World), plus SageMaker, ElastiCache, and EKS (CRN) — began \"experiencing elevated error rates and latencies for some workflows\" (Network World).\n\nRecovery required restoring physical cooling capacity before shut-down hardware could be safely brought back and kept online, which is why power returned to the AZ \"several hours after the thermal event\" (CRN) while full cooling capacity was not restored to pre-incident levels until 1:50 PM PDT the next day (~20 hours from the first 5:25 PM PDT report, an approximate elapsed-time inference). The public technical record does not resolve the mechanism beneath the cooling failure, nor whether/why cooling redundancy failed to prevent the threshold breach — both remain undisclosed by AWS, and no official post-incident review was published.",
+ "technicalDeepDive": "Forensically this incident inverts the classic data-center fire chain and must not be narrated as a fire. No ignition, no aspirating/VESDA smoke detection, no pre-action or clean-agent suppression discharge, no evacuation, and no fire-department arrival are reported anywhere. The detection that mattered was THERMAL/ENVIRONMENTAL: rack- and hall-level temperature sensors registering temperatures crossing safe operating thresholds once cooling capacity collapsed. The reported AWS wording (\"temperatures inside a single data center within availability zone use1-az4 exceeded safe operating thresholds\") never itemizes the failed mechanical component; the plant is described only generically (chilled-water systems, cooling towers, thermal-management infrastructure).\\n\\nThe \"suppression\" analogue was not a fire-suppression system at all; it was the servers' own firmware-level over-temperature protective shutdown. This is the pivotal forensic point: the protection worked as designed and saved silicon, yet its unavoidable side effect was to DE-ENERGISE the affected racks. The reported Health Dashboard line (\"EC2 instances and EBS volumes hosted on impacted hardware are affected by the loss of power during the thermal event\") makes clear the customer-visible outage was manufactured by a safety mechanism doing its job, not by a mechanism failing.\\n\\nContainment held at the Availability-Zone boundary by design: impact was confined to a single data hall within use1-az4, and traffic was reportedly shifted away from that zone. The emergency response was an ENGINEERING cooling-restoration effort, not an emergency-services one, and it was deliberately STAGED because a rushed restart could thermally cycle and damage already-stressed equipment - a subtle but correct procedure after a thermal excursion.\\n\\nThe recovery tail exposes the hard limit of software resilience against physical damage. Because the power loss physically damaged some hardware, software orchestration could not automatically reroute around it - a stateful EBS volume on a dead rack does not migrate itself. Customers were reportedly advised to restore from EBS snapshots or launch in unaffected zones, and some instances/volumes remained impaired even after the incident was marked resolved. The architectural lesson: at least one major customer (Coinbase) went dark despite designs meant to tolerate a single-AZ failure - single-AZ tolerance on paper is not single-AZ tolerance in production. IMPORTANT CAVEAT: every AWS/vendor and press quotation in this deep dive is drawn from secondary reporting that could not be independently re-fetched this review session; treat the specific wording and timestamps as reported-not-confirmed.",
  "references": [
+  {
+   "title": "AWS Post-Event Summaries (official archive)",
+   "url": "https://aws.amazon.com/premiumsupport/technology/pes/",
+   "type": "official-postmortem",
+   "quote": "Summary of the Amazon DynamoDB Service Disruption in the Northern Virginia (US-EAST-1) Region - October 19, 2025 (most recent entry; no May 2026 thermal-event summary listed).",
+   "accessed": "2026-08-02"
+  },
   {
    "title": "The 10 Biggest Cloud Outages Of 2026 (So Far) (CRN)",
    "url": "https://www.crn.com/news/cloud/2026/the-10-biggest-cloud-outages-of-2026-so-far",
@@ -295,5 +317,6 @@
   "lastVerified": "2026-08-01",
   "confidence": "High on the AWS root-cause mechanism and onset/restoration timeline (two-source corroborated, endpoints verified against Network World and The Register); medium on downstream Coinbase impact and remediation (single-source InfoQ summary of Coinbase's own postmortem — the 3-of-5 quorum and cooling-unit figures and the four action items are Coinbase's, reported as commitments rather than verified-complete); low/absent on quantified user and financial impact and on cooling-plant fault specifics (confirmed absent, no formal AWS COE)."
  },
- "lastUpdated": "2026-08-01"
+ "lastUpdated": "2026-08-01",
+ "operatorShort": "AWS"
 }

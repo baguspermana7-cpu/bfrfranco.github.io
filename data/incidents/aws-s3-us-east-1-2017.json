@@ -39,175 +39,214 @@
  "sequenceOfEvents": [
   {
    "t": "2017-02-28 09:37 PST",
-   "phase": "Trigger",
-   "event": "Authorized S3 team member executes an established playbook command to remove a small number of billing-subsystem servers; one input is entered incorrectly, removing a larger server set than intended.",
-   "source": "aws-official"
+   "phase": "TRIGGER",
+   "event": "An authorized S3 team member, using an established playbook, executes a command intended to remove a small number of servers from the S3 subsystem used by the S3 billing process.",
+   "source": "aws.amazon.com/message/41926/"
+  },
+  {
+   "t": "2017-02-28 09:37 PST",
+   "phase": "TRIGGER",
+   "event": "One input to the command is entered incorrectly; a far larger set of servers is removed than intended.",
+   "source": "aws.amazon.com/message/41926/"
   },
   {
    "t": "2017-02-28 ~09:37 PST",
-   "phase": "Escalation",
-   "event": "The removed capacity crosses a threshold that forces a FULL restart of two core S3 subsystems: the index subsystem (metadata/location of every US-EAST-1 object, on the read path) and the placement subsystem (allocates storage for new objects, on the write path).",
-   "source": "aws-official"
+   "phase": "DETECTION",
+   "event": "The inadvertently removed servers are found to have supported two other S3 subsystems — the index subsystem (metadata/location for all objects) and the placement subsystem (new-storage allocation, dependent on index). The fault is internal and effectively immediate; no external alarm.",
+   "source": "aws.amazon.com/message/41926/"
   },
   {
-   "t": "2017-02-28 ~09:44 PST",
-   "phase": "Impact",
-   "event": "S3 GET/LIST/HEAD/PUT/DELETE/POST APIs return elevated errors region-wide; because the index subsystem serves every request, reads fail even though object data is intact.",
-   "source": "aws-official"
+   "t": "2017-02-28 ~09:38 PST",
+   "phase": "IMPACT",
+   "event": "Index and placement capacity drop below operational minimum; each subsystem now requires a full restart. There was no guardrail to stop removal below the minimum required level.",
+   "source": "aws.amazon.com/message/41926/"
   },
   {
-   "t": "2017-02-28 ~10:00 PST",
-   "phase": "Cascade",
-   "event": "Downstream AWS services that depend on S3 in US-EAST-1 degrade: new EC2 instance launches, EBS volumes, and AWS Lambda; thousands of third-party sites/services relying on S3 fail or slow.",
-   "source": "aws-official"
+   "t": "2017-02-28 ~09:38 PST",
+   "phase": "IMPACT",
+   "event": "With the subsystems restarting, S3 in US-EAST-1 is unable to service GET, LIST, PUT and DELETE requests.",
+   "source": "aws.amazon.com/message/41926/"
   },
   {
-   "t": "2017-02-28 ~10:00 PST",
-   "phase": "Comms failure",
-   "event": "The AWS Service Health Dashboard cannot render red status — its own control plane depends on S3 US-EAST-1 — so AWS posts status via the dashboard banner text and @AWSCloud on Twitter.",
-   "source": "aws-official"
+   "t": "2017-02-28 morning PST",
+   "phase": "CASCADE",
+   "event": "S3-dependent AWS services degrade: the S3 console, new EC2 instance launches, EBS operations relying on S3 snapshots, and AWS Lambda are impaired.",
+   "source": "aws.amazon.com/message/41926/"
+  },
+  {
+   "t": "2017-02-28 morning PST",
+   "phase": "CASCADE",
+   "event": "External sites go down, including Docker Registry Hub, Trello, Travis CI, GitHub, GitLab, Quora, Medium, Signal, Slack, Imgur and Twitch.tv.",
+   "source": "theregister.com/2017/03/01/aws_s3_outage/"
+  },
+  {
+   "t": "2017-02-28 morning PST",
+   "phase": "CASCADE",
+   "event": "The Service Health Dashboard admin console, itself dependent on S3, cannot update per-service status; status icons are 'stuck on green lights' because the red warning icons were hosted in the downed systems.",
+   "source": "aws.amazon.com/message/41926/ ; theregister.com/2017/03/01/aws_s3_outage/"
+  },
+  {
+   "t": "2017-02-28 ~09:40 PST",
+   "phase": "MITIGATION",
+   "event": "Recovery begins with a full restart of the index subsystem first, because the placement subsystem depends on it functioning.",
+   "source": "aws.amazon.com/message/41926/"
+  },
+  {
+   "t": "2017-02-28 ongoing PST",
+   "phase": "MITIGATION",
+   "event": "Metadata-integrity safety checks are run during restart and deliberately not shortcut; at S3's grown scale the restart-plus-validation 'took longer than expected.'",
+   "source": "aws.amazon.com/message/41926/"
+  },
+  {
+   "t": "2017-02-28 until 11:37 PST",
+   "phase": "CASCADE",
+   "event": "AWS remains unable to update individual service status on the SHD; it communicates via the @AWSCloud Twitter feed and SHD banner text until the dashboard can be updated (regained around noon PST).",
+   "source": "aws.amazon.com/message/41926/ ; theregister.com/2017/03/01/aws_s3_outage/"
   },
   {
    "t": "2017-02-28 12:26 PST",
-   "phase": "Recovery",
-   "event": "Placement subsystem recovers; PUT/write path begins to restore for new objects as the index subsystem catches up.",
-   "source": "aws-official"
+   "phase": "RECOVERY",
+   "event": "Index subsystem has activated enough capacity to begin servicing S3 GET, LIST and DELETE requests.",
+   "source": "aws.amazon.com/message/41926/"
   },
   {
    "t": "2017-02-28 13:18 PST",
-   "phase": "Recovery",
-   "event": "Index subsystem restart + metadata integrity checks complete enough to resume; retrieval operations start returning to normal.",
-   "source": "aws-official"
+   "phase": "RECOVERY",
+   "event": "Index subsystem fully recovered; GET, LIST and DELETE APIs functioning normally.",
+   "source": "aws.amazon.com/message/41926/"
   },
   {
    "t": "2017-02-28 13:54 PST",
-   "phase": "Restored",
-   "event": "S3 GET/LIST/HEAD (read) operations fully recovered — 4h17m after onset.",
-   "source": "aws-official"
+   "phase": "RECOVERY",
+   "event": "Placement subsystem recovery completes, restoring PUT and new-object storage.",
+   "source": "aws.amazon.com/message/41926/"
   },
   {
-   "t": "2017-02-28 14:12 PST",
-   "phase": "Restored",
-   "event": "S3 PUT/DELETE/POST (write) operations fully recovered — 4h35m after onset; region operating normally.",
-   "source": "aws-official"
+   "t": "2017-02-28 13:54 PST",
+   "phase": "RESTORED",
+   "event": "All S3 APIs operate normally in US-EAST-1; full service restored roughly 4 hours 17 minutes after the mistyped command.",
+   "source": "aws.amazon.com/message/41926/"
   }
  ],
  "metrics": [
   {
-   "label": "Onset",
-   "value": "09:37 PST, 28 Feb 2017",
-   "source": "aws-official"
+   "label": "Trigger to first partial recovery (index serving GET/LIST/DELETE)",
+   "value": "~2 h 49 min (09:37 to 12:26 PST)",
+   "source": "aws.amazon.com/message/41926/"
   },
   {
-   "label": "Read (GET/LIST/HEAD) restored",
-   "value": "13:54 PST — 4h 17m",
-   "source": "aws-official"
+   "label": "Trigger to index subsystem full recovery",
+   "value": "~3 h 41 min (09:37 to 13:18 PST)",
+   "source": "aws.amazon.com/message/41926/"
   },
   {
-   "label": "Write (PUT/DELETE/POST) restored",
-   "value": "14:12 PST — 4h 35m",
-   "source": "aws-official"
+   "label": "Trigger to full S3 restoration (placement/PUT restored)",
+   "value": "~4 h 17 min (09:37 to 13:54 PST)",
+   "source": "aws.amazon.com/message/41926/"
   },
   {
-   "label": "Geographic scope",
-   "value": "Single region — US-EAST-1 (N. Virginia); other AWS regions unaffected",
-   "source": "aws-official"
+   "label": "Duration status could not be updated on the Service Health Dashboard",
+   "value": "~2 h (09:37 event start to 11:37 PST); icons 'stuck on green'",
+   "source": "aws.amazon.com/message/41926/ ; theregister.com/2017/03/01/aws_s3_outage/"
   },
   {
-   "label": "Trigger",
-   "value": "One mistyped argument in an authorized capacity-removal command",
-   "source": "aws-official"
+   "label": "S3 subsystems requiring a full restart",
+   "value": "2 (index + placement)",
+   "source": "aws.amazon.com/message/41926/"
   },
   {
-   "label": "Downstream AWS services hit",
-   "value": "EC2 new launches, EBS, Lambda, S3 console, AWS Service Health Dashboard",
-   "source": "aws-official"
+   "label": "Time since the index/placement subsystems were last fully restarted in larger regions",
+   "value": "'many years' (exact interval not disclosed)",
+   "source": "aws.amazon.com/message/41926/"
   },
   {
-   "label": "Third-party blast radius",
-   "value": "Thousands of websites/apps dependent on S3 US-EAST-1 (a foundational internet dependency)",
-   "source": "news"
+   "label": "Named major external sites/services reported down",
+   "value": "11+ (Docker Registry Hub, Trello, Travis CI, GitHub, GitLab, Quora, Medium, Signal, Slack, Imgur, Twitch.tv)",
+   "source": "theregister.com/2017/03/01/aws_s3_outage/"
   },
   {
-   "label": "Estimated financial impact",
-   "value": "≈ US$150M to S&P-500 companies (Cyence); broader estimates ranged higher",
-   "source": "news"
+   "label": "AWS regions affected",
+   "value": "1 (US-EAST-1, Northern Virginia)",
+   "source": "aws.amazon.com/message/41926/"
   },
   {
-   "label": "Root-cause class",
-   "value": "Human input error on a routine, well-practised operational command",
-   "source": "aws-official"
+   "label": "Servers intended vs. actually removed / capacity thresholds",
+   "value": "Not published — AWS states only that 'a larger set of servers was removed than intended'",
+   "source": "aws.amazon.com/message/41926/ (undisclosed)"
+  },
+  {
+   "label": "Authoritative dollar-loss figure",
+   "value": "Not disclosed in the primary source; only third-party estimates exist (uncertain)",
+   "source": "aws.amazon.com/message/41926/ (silent)"
   }
  ],
- "rootCause": "Trigger. On 2017-02-28 at 9:37 AM PST, an authorized Amazon S3 team member, working from an established operational playbook, executed a command intended to remove a small number of servers from an S3 subsystem used by the S3 billing process. One of the inputs to that command was entered incorrectly, and as a result a far larger set of servers was removed than intended. This single mistyped input during a routine maintenance action was the proximate ignition of the disruption in the US-EAST-1 (Northern Virginia) Region.\n\nMechanism. The servers that were inadvertently removed did not belong solely to the billing subsystem; they also supported two other, far more critical S3 subsystems. The first was the index subsystem, which manages the metadata and location information of all S3 objects in the region and is necessary to serve all GET, LIST, PUT, and DELETE requests. The second was the placement subsystem, which manages allocation of new storage during PUT requests and itself requires the index subsystem to be functioning properly to operate correctly. Removing a significant portion of the capacity supporting these subsystems caused each of them to require a full restart, and while they were restarting S3 was unable to service requests. The failure therefore propagated from a peripheral billing-maintenance task into the region-wide object-storage data path.\n\nWhy safeguards and redundancy did not prevent a prolonged outage. This was not a data-loss or durability event; it was a capacity-loss and cold-start problem. Because so much capacity was removed at once, the subsystems required a complete restart rather than graceful degradation. Recovery was slow for a structural reason: AWS had not completely restarted the index subsystem or the placement subsystem in its larger regions for many years, and S3 had experienced massive growth over that period, so restarting these services and running the necessary safety checks to validate the integrity of the metadata took longer than expected.\n\nEscalation and blast radius. The outage extended beyond S3. Other US-EAST-1 services that rely on S3 for storage were impaired while the S3 APIs were unavailable, including the S3 console, EC2 new-instance launches, EBS volumes (when data was needed from an S3 snapshot), and AWS Lambda. A compounding communication failure worsened visibility: from the beginning of the event until 11:37 AM PST, AWS could not update individual service status on the Service Health Dashboard because the SHD administration console itself had a dependency on S3 in the affected region. Recovery then proceeded in dependency order: by 12:26 PM PST the index subsystem had activated enough capacity to begin servicing GET, LIST, and DELETE requests; it was fully recovered by 1:18 PM PST; and the placement subsystem, which could only recover once the index subsystem was functional, finished recovery at 1:54 PM PST, at which point S3 was operating normally.",
+ "rootCause": "There was no physical ignition source in this incident — no equipment make, model, chemistry, or combustion, and therefore no detection panel, suppression system, evacuation, or emergency-services response. The \"ignition\" was a human operational error. At 9:37AM PST on 2017-02-28, an authorized S3 team member, following an established debugging playbook, executed a capacity-removal command intended to take a small number of servers out of the S3 subsystem used by the S3 billing process. Per AWS: \"one of the inputs to the command was entered incorrectly and a larger set of servers was removed than intended.\" That single mistyped input is the proximate cause.\n\nThe failure mechanism is a cross-subsystem blast radius the operator did not anticipate. The inadvertently removed servers also supported two other S3 subsystems — the index subsystem, which \"manages the metadata and location information of all S3 objects in the region\" and is necessary to serve GET, LIST, PUT and DELETE requests, and the placement subsystem, which \"manages allocation of new storage and requires the index subsystem to be functioning properly to correctly operate.\" Dropping their capacity below the operational minimum required each subsystem to be fully restarted, and \"while these subsystems were being restarted, S3 was unable to service requests.\" Recovery was ordered by dependency: index first, then placement.\n\nThe latent root is procedural/tooling rather than physical, and three-fold. First, a GUARDRAIL gap: the capacity-removal tool accepted an over-broad input with no safeguard against taking any subsystem below its minimum required capacity — AWS's own remediation adding exactly that safeguard is the admission it did not previously exist. Second, an UNTESTED-AT-SCALE recovery procedure: AWS had \"not completely restarted the index subsystem or the placement subsystem in our larger regions for many years,\" and after massive growth the restart plus metadata-integrity validation \"took longer than expected\" — a cold-start path effectively unrehearsed at current scale. Third, a DEPENDENCY lapse in the status-reporting plane: the Service Health Dashboard admin console itself depended on S3 in the same region, so operators could not update per-service status during the very event it was meant to report.",
  "contributingFactors": [
-  "Insufficient tooling guardrails: the capacity-removal tool accepted an operator input that removed a much larger set of servers than intended and had no safeguard to block removals that would take a subsystem below its minimum required capacity. AWS's committed fix was to modify the tool to remove capacity more slowly and to add safeguards preventing removals below a subsystem's minimum required capacity level.",
-  "Hidden/shared infrastructure coupling: servers being removed for the peripheral billing subsystem also underpinned the critical index and placement subsystems, so a low-risk maintenance action had a high-blast-radius effect. The placement subsystem's hard dependency on the index subsystem further serialized and lengthened recovery.",
-  "Untested cold-start at scale: the index and placement subsystems had not been completely restarted in the larger regions for many years while S3 grew massively, so the restart plus metadata-integrity safety checks took far longer than expected. AWS reprioritized work to further partition the index subsystem into smaller 'cells' to reduce blast radius and restart time.",
-  "Monitoring/communication single point of failure: the Service Health Dashboard administration console depended on S3 in the same failed region, preventing per-service status updates until 11:37 AM PST and obscuring the incident's visibility. AWS's fix was to run the SHD administration console across multiple AWS regions.",
-  "Concentration of dependent services in one region: EC2 new-instance launches, EBS snapshot-dependent volumes, Lambda, and the S3 console all relied on US-EAST-1 S3, so a single-region S3 failure cascaded into multiple AWS services."
+  "Tooling guardrail absence (Design): the capacity-removal tool accepted an over-broad input and removed capacity too fast with no safeguard against dropping a subsystem below its minimum required capacity — AWS's remediation adding exactly that safeguard confirms it did not previously exist (aws.amazon.com/message/41926/).",
+  "Recovery procedure untested at current scale (Maintenance/inspection analog): AWS states it had 'not completely restarted the index subsystem or the placement subsystem in our larger regions for many years'; after massive growth the restart and metadata validation 'took longer than expected,' indicating the recovery path was not rehearsed at production scale (aws.amazon.com/message/41926/).",
+  "Tight, undocumented cross-subsystem coupling: the removed billing-process servers also supported two other S3 subsystems (index and placement), so a command scoped to billing silently starved the request-serving and storage-allocation paths (aws.amazon.com/message/41926/).",
+  "Status-reporting plane depended on the failed service: the Service Health Dashboard admin console has a dependency on Amazon S3, so per-service status could not be updated until 11:37AM PST and icons stayed green, delaying accurate customer communication (aws.amazon.com/message/41926/ ; theregister.com/2017/03/01/aws_s3_outage/).",
+  "Blast-radius concentration in a single subsystem: the index subsystem was one monolithic unit per region, so its restart stalled all GET/LIST/PUT/DELETE at once; AWS committed to partitioning it into cells specifically to bound this (aws.amazon.com/message/41926/)."
  ],
  "coe": [
   {
-   "action": "Modify the capacity-removal tool to remove capacity more slowly and to prevent it from taking any subsystem below its minimum required capacity level.",
-   "owner": "AWS S3",
-   "status": "Committed (per official message)",
-   "source": "aws-official"
+   "action": "Modify the capacity-removal tool to remove capacity more slowly and add safeguards preventing removal below any subsystem's minimum required capacity level",
+   "owner": "AWS S3 team",
+   "status": "Stated done in the post-mortem (aws.amazon.com/message/41926/)"
   },
   {
-   "action": "Audit other operational tools for the same class of fast/unsafe capacity actions and add equivalent safety guards.",
+   "action": "Partition the index subsystem into smaller cells to reduce blast radius and speed recovery",
+   "owner": "AWS S3 team",
+   "status": "Committed / reprioritized to begin immediately (aws.amazon.com/message/41926/)"
+  },
+  {
+   "action": "Re-architect the Service Health Dashboard administration console to run across multiple regions so status can be updated during a single-region S3 impairment",
    "owner": "AWS",
-   "status": "Committed",
-   "source": "aws-official"
+   "status": "Committed (aws.amazon.com/message/41926/)"
   },
   {
-   "action": "Partition the S3 index subsystem into smaller cells so recovery is faster and blast radius is smaller; improve restart time of index/placement subsystems.",
-   "owner": "AWS S3",
-   "status": "Committed",
-   "source": "aws-official"
-  },
-  {
-   "action": "Change the AWS Service Health Dashboard to run across multiple regions so it can report status even when one region is impaired.",
-   "owner": "AWS",
-   "status": "Committed",
-   "source": "aws-official"
+   "action": "Audit and rehearse full restart plus metadata-integrity validation for index and placement subsystems at current production scale",
+   "owner": "AWS S3 team",
+   "status": "Implied by the post-mortem; specific completion status not disclosed"
   }
  ],
  "lessonsLearnt": [
-  "Routine, well-practised operational commands are still high-consequence: guard destructive/scaling actions with rate limits and hard minimum-capacity floors, not just runbooks.",
-  "Subsystems that are never restarted accumulate hidden restart risk; exercise cold-start/recovery paths deliberately so real recovery time is known.",
-  "Single-region dependency concentration converts a component fault into a systemic one; understand and reduce cross-service blast radius.",
-  "Status/observability control planes must not depend on the very system whose health they report."
+  "Destructive operational tooling must enforce hard floors: a single mistyped input should never be able to take a subsystem below its minimum required capacity — guardrails, not operator care, are the control (aws.amazon.com/message/41926/).",
+  "Recovery procedures decay silently: a restart path unexercised 'for many years' becomes untrustworthy as scale grows, so cold-start and validation must be periodically rehearsed at production scale (aws.amazon.com/message/41926/).",
+  "Never let a monitoring/status plane depend on the system it monitors — the SHD's dependency on S3 blinded operators and customers during the exact window they needed visibility (aws.amazon.com/message/41926/ ; theregister.com/2017/03/01/aws_s3_outage/).",
+  "Hidden cross-subsystem coupling turns a scoped command into a systemic outage: servers labeled for 'billing' also underpinned index and placement, so scoping by intent is not scoping by effect (aws.amazon.com/message/41926/).",
+  "Blast-radius reduction via partitioning is a design discipline, not an afterthought — a monolithic per-region index subsystem meant one restart froze every S3 request type simultaneously (aws.amazon.com/message/41926/)."
  ],
  "improvements": [
-  "Rate-limited capacity operations with enforced minimum-capacity guardrails on the S3 tooling.",
-  "Cellularization of the S3 index subsystem to shrink blast radius and speed recovery.",
-  "Multi-region AWS Service Health Dashboard so status reporting survives a regional impairment.",
-  "Broader operational-tool audit for unsafe fast-acting capacity actions."
+  "Design: Modify the capacity-removal tool to remove capacity more slowly and add safeguards that prevent capacity from being taken below any subsystem's minimum required level — AWS: 'We have modified this tool to remove capacity more slowly and added safeguards to prevent capacity from being removed when it will take any subsystem below its minimum required capacity level.' (aws.amazon.com/message/41926/)",
+  "Design: Partition the index subsystem into smaller cells to bound blast radius and speed recovery, so a single subsystem's restart no longer stalls all GET/LIST/PUT/DELETE at once; AWS reprioritized this partitioning work to begin immediately (aws.amazon.com/message/41926/).",
+  "Process: Remove the status-reporting plane's dependency on the service it reports on — AWS committed to running Service Health Dashboard administration across multiple regions so status can be updated even when one region's S3 is impaired (aws.amazon.com/message/41926/).",
+  "Maintenance: Rehearse and validate the full restart-and-metadata-validation path at current production scale, since the procedure had not been fully exercised in larger regions 'for many years' and ran slower than expected after massive growth (aws.amazon.com/message/41926/).",
+  "Safety: Preserve mandatory metadata-integrity safety checks during recovery rather than shortcutting them for speed — the incident affirmed that trading validation for a faster restart would risk metadata corruption (aws.amazon.com/message/41926/)."
  ],
  "comprehensiveAnalysis": [
   {
-   "heading": "Failure mechanism — why a capacity change became an outage",
-   "body": "The command was a routine, authorized capacity-removal action, but the tooling had no floor on how much it could remove and no rate limit. Once removal crossed a threshold, the index and placement subsystems could not continue on the surviving fleet and had to cold-restart. The index subsystem is on the critical path of every S3 request — it resolves the physical location of each object — so its unavailability failed reads even though every byte of object data remained safely stored. The write path failed in parallel because the placement subsystem, which allocates new storage, both went down and itself depends on the index subsystem."
+   "heading": "Nature of the incident: operational error, not a physical fire",
+   "body": "This is a cloud-service disruption with no ignition, equipment, chemistry, or combustion — the standard fire-incident lenses (detection panel, suppression, evacuation, de-energisation, emergency-services response) do not apply and are honestly marked N/A. The proximate cause is a single mistyped input to an established capacity-removal playbook at 9:37AM PST on 2017-02-28. AWS states plainly: 'one of the inputs to the command was entered incorrectly and a larger set of servers was removed than intended.' The fault was self-inflicted and detected internally and immediately, so there is no alarm latency to analyse — the analysis instead centres on why a scoped command produced a regional outage and why recovery took over four hours."
   },
   {
-   "heading": "Why recovery took ~4.5 hours, not minutes",
-   "body": "These subsystems had scaled to a very large footprint and had not been fully restarted for years. A cold start therefore had to load and integrity-check an enormous volume of metadata before it could safely serve traffic. The recovery time was dominated not by restarting processes but by the safety/consistency validation those processes must complete first — a latent, untested cost that only surfaced under a full restart. This is the classic 'we never exercise the recovery path, so we don't know its real duration' failure mode."
+   "heading": "The blast radius: hidden cross-subsystem coupling",
+   "body": "The command targeted a low-privilege pool serving the S3 billing process, but the removed servers also supported two request-critical subsystems. The index subsystem 'manages the metadata and location information of all S3 objects in the region' and is required for every GET, LIST, PUT and DELETE; the placement subsystem allocates new storage and 'requires the index subsystem to be functioning properly to correctly operate.' Over-removal pushed both below their operational minimum with no floor to stop it, forcing full restarts during which 'S3 was unable to service requests.' Scoping by operator intent ('billing') was not scoping by effect."
   },
   {
-   "heading": "Blast radius — concentration risk",
-   "body": "S3 US-EAST-1 is a foundational dependency: many other AWS services (EC2 launch, EBS, Lambda) and a large fraction of the public internet rely on it, often without the dependency being visible to the end operator. A fault in one storage subsystem in one region therefore propagated into a systemic, cross-service event. Critically, AWS's own Service Health Dashboard depended on S3 in the same region, so the primary status channel failed exactly when it was needed — an observability control plane must never share a failure domain with the system it observes."
+   "heading": "Why recovery was slow: an unrehearsed cold start at scale",
+   "body": "AWS had 'not completely restarted the index subsystem or the placement subsystem in our larger regions for many years.' After massive growth, the cold start plus mandatory metadata-integrity validation 'took longer than expected.' AWS made the correct call to NOT shortcut the safety checks, trading recovery speed for metadata integrity. Recovery followed the dependency chain: index began serving GET/LIST/DELETE at 12:26PM, index fully recovered at 1:18PM, and placement restored PUT/new-object storage at 1:54PM — full restoration roughly 4h17m after the trigger."
   },
   {
-   "heading": "Organizational / systemic factors",
-   "body": "The proximate cause was human input error, but the incident is better read as a systems-design gap: safe, well-practised operations were allowed to take an irreversible, unbounded action with no guardrail, on subsystems whose recovery characteristics were unknown because they were never exercised. The durable fixes were structural (rate limits, minimum-capacity floors, cellularization, multi-region status) rather than 'be more careful' — the correct engineering response to human-error incidents."
+   "heading": "The visibility failure: monitoring that depended on the monitored",
+   "body": "The most instructive secondary failure was reflexive. The Service Health Dashboard admin console itself depended on S3 in the same region, so 'from the beginning of this event until 11:37AM PST, we were unable to update the individual services' status.' The Register adds that the icons 'were stuck on green lights because the red icons warning of failures were hosted in the downed systems.' AWS fell back to the @AWSCloud Twitter feed and dashboard banner text, and regained dashboard control around noon PST. A status plane must never share a failure domain with the service it reports on."
   },
   {
-   "heading": "Comparison & pattern",
-   "body": "This sits in the same family as later large cloud events (e.g. the 2020 Kinesis thread-limit event and the 2025 DynamoDB DNS race, both also US-EAST-1 control-plane faults with wide cascades): a single-region control-plane component reaches an untested limit and takes down a shared dependency. The recurring lesson across all of them is blast-radius reduction (cells, regional isolation) and exercising recovery paths, not merely tightening runbooks."
+   "heading": "Systemic lessons and AWS's remediation",
+   "body": "AWS committed to concrete, sourced fixes: the capacity-removal tool now removes capacity more slowly and enforces a minimum-capacity safeguard (the admission that no such guardrail existed); the monolithic index subsystem is being partitioned into cells to bound blast radius; and SHD administration was moved to run across multiple regions. The durable lessons generalise beyond AWS: destructive tooling needs hard floors rather than operator care, recovery paths decay silently and must be rehearsed at production scale, and blast-radius partitioning is a design discipline. External casualties (GitHub, Slack, Trello, Docker Registry Hub, Twitch and more) underscore how concentrated a dependency US-EAST-1 S3 had become."
   }
  ],
- "technicalDeepDive": "At an engineering level the failure was a capacity-loss-induced cold restart of stateful metadata subsystems, not a corruption or durability failure. S3 in a region is decomposed into subsystems; the index subsystem is the authoritative store of object metadata and location and sits on the critical path of every GET, LIST, PUT, and DELETE request, while the placement subsystem allocates storage for new objects on PUTs and requires the index subsystem to be functioning properly. The mistyped command input removed a set of servers spanning the billing subsystem plus these two subsystems. Because the removal took capacity below what the running subsystems could tolerate, they could not simply shed the lost nodes and continue; each required a full restart, and during that restart interval S3 was unable to service requests.\n\nThe dominant factor in recovery time was the restart of the index subsystem. Restarting it required not just re-provisioning capacity but running safety checks to validate the integrity of the object metadata across the region before it could resume serving traffic. Because S3 had grown massively since the index and placement subsystems had last been fully restarted in the large regions (many years prior), the actual restart-and-validate time far exceeded expectations. The placement subsystem could not begin meaningful recovery until the index subsystem was functional, so the two recoveries were necessarily serialized: the index subsystem reached partial service (GET, LIST, DELETE) at 12:26 PM PST and full recovery at 1:18 PM PST, after which the placement subsystem (PUT path) finished recovery at 1:54 PM PST.\n\nThe corrective engineering direction confirms the mechanism. AWS was already partitioning the index subsystem into smaller units it calls 'cells' — which reduces the blast radius and per-unit restart time of any single failure — and reprioritized that work to begin immediately. It also hardened the operational tool to remove capacity more slowly and to refuse removals that would drop any subsystem below its minimum required capacity level, and it changed the Service Health Dashboard administration console to run across multiple AWS regions so status reporting no longer shares fate with the region it reports on.",
+ "technicalDeepDive": "S3 in US-EAST-1 is decomposed into subsystems; two are load-bearing for this incident. The index subsystem is the metadata/location store — it \"manages the metadata and location information of all S3 objects in the region\" and is necessary to serve all GET, LIST, PUT and DELETE requests. The placement subsystem allocates storage for new objects and \"requires the index subsystem to be functioning properly to correctly operate\" — a hard directional dependency that dictated recovery order. A third, lower-privilege capacity pool served the S3 billing process; that pool was the intended target of the 9:37AM PST playbook command.\n\nThe over-removal drove both index and placement below their operational minimum, and there was no floor to stop it. Removing a significant portion of the capacity caused each subsystem to require a full restart, and \"while these subsystems were being restarted, S3 was unable to service requests.\" Because the two subsystems had not been completely restarted \"in our larger regions for many years,\" and S3 had grown massively, the cold-start plus metadata-integrity validation ran far longer than a rehearsed procedure would predict. AWS deliberately did NOT shortcut the safety checks — a correct call trading recovery speed for metadata integrity — which is why the restart and validation \"took longer than expected.\"\n\nThe cascade radiated across everything treating S3 as a storage primitive: the S3 console, new EC2 instance launches, EBS operations relying on S3 snapshots, and AWS Lambda were impaired. Per The Register, external casualties included Docker Registry Hub, Trello, Travis CI, GitHub, GitLab, Quora, Medium, Signal, Slack, Imgur and Twitch.tv. The most instructive containment failure was reflexive: the AWS Service Health Dashboard admin console itself depended on S3, so \"from the beginning of this event until 11:37AM PST, we were unable to update the individual services' status,\" and per The Register the icons \"were stuck on green lights because the red icons warning of failures were hosted in the downed systems.\" AWS fell back to the @AWSCloud Twitter feed and SHD banner text. Recovery then proceeded along the dependency chain: index began servicing GET/LIST/DELETE at 12:26PM PST, index fully recovered at 1:18PM PST, and placement (restoring PUT/new-object storage) completed at 1:54PM PST, at which point S3 operated normally. The record is explicit that this was a self-inflicted fault detected internally and immediately — no alarm latency, no external responders.",
  "references": [
   {
    "title": "Summary of the Amazon S3 Service Disruption in the Northern Virginia (US-EAST-1) Region",
@@ -215,6 +254,13 @@
    "type": "official-postmortem",
    "quote": "an authorized S3 team member using an established playbook executed a command which was intended to remove a small number of servers ... one of the inputs to the command was entered incorrectly and a larger set of servers was removed than intended.",
    "accessed": "2026-07-31"
+  },
+  {
+   "title": "The Register — Amazon S3-izure blamed on innocent typo that snowballed horribly",
+   "url": "https://www.theregister.com/2017/03/01/aws_s3_outage/",
+   "type": "press",
+   "quote": "the icons were stuck on green lights because the red icons warning of failures were hosted in the downed systems",
+   "accessed": "2026-08-02"
   },
   {
    "title": "Amazon's massive AWS outage was caused by a typo (The Verge)",
@@ -237,5 +283,6 @@
   "lastVerified": "2026-07-31",
   "confidence": "high"
  },
- "lastUpdated": "2026-07-31"
+ "lastUpdated": "2026-07-31",
+ "operatorShort": "AWS S3"
 }

@@ -39,206 +39,192 @@
  "sequenceOfEvents": [
   {
    "t": "2020-11-25 02:44 AM PST",
-   "phase": "Trigger",
-   "event": "AWS begins adding a relatively small amount of capacity to the Kinesis front-end fleet.",
-   "source": "https://aws.amazon.com/message/11201"
+   "phase": "TRIGGER",
+   "event": "A 'relatively small addition of capacity' begins to be added to the Kinesis front-end fleet — the trigger, explicitly not the root cause.",
+   "source": "aws.amazon.com/message/11201"
   },
   {
    "t": "2020-11-25 03:47 AM PST",
-   "phase": "Escalation",
-   "event": "Capacity addition finishes. The larger fleet means each front-end server now creates OS threads for more peers, driving per-server thread count past the OS maximum-thread ceiling; shard-map cache construction begins failing.",
-   "source": "https://aws.amazon.com/message/11201"
+   "phase": "TRIGGER",
+   "event": "Capacity addition finishes; the larger fleet pushes every server past the OS max-thread limit — 'the new capacity had caused all of the servers in the fleet to exceed the maximum number of threads allowed by an operating system configuration.'",
+   "source": "aws.amazon.com/message/11201"
+  },
+  {
+   "t": "2020-11-25 ~03:47 AM PST",
+   "phase": "CASCADE",
+   "event": "Failure mechanism engages fleet-wide: 'cache construction was failing to complete and front-end servers were ending up with useless shard-maps,' disabling authentication, throttling and request-routing.",
+   "source": "aws.amazon.com/message/11201"
   },
   {
    "t": "2020-11-25 05:15 AM PST",
-   "phase": "Detection",
-   "event": "First alarms fire for errors putting and getting Kinesis records — roughly 1.5 hours after the capacity add completed.",
-   "source": "https://aws.amazon.com/message/11201"
-  },
-  {
-   "t": "2020-11-25 05:15 AM PST",
-   "phase": "Impact",
-   "event": "Front-end servers end up with useless shard-maps and cannot route requests; Kinesis experiences elevated errors and latency, and dependent services begin to degrade.",
-   "source": "https://aws.amazon.com/message/11201"
+   "phase": "DETECTION",
+   "event": "Automated monitoring raises the first alarms for elevated Kinesis error rates — the sensor detects the symptom, not the underlying thread-limit breach, roughly 90 minutes after the breach. CloudWatch Events/EventBridge errors also begin at 5:15 AM.",
+   "source": "aws.amazon.com/message/11201"
   },
   {
    "t": "2020-11-25 07:51 AM PST",
-   "phase": "Diagnosis",
-   "event": "AWS narrows the root cause to a couple of candidate hypotheses (memory pressure among them) and determines a full fleet restart will be required.",
-   "source": "https://aws.amazon.com/message/11201"
+   "phase": "MITIGATION",
+   "event": "Engineers narrow the root cause to candidate failures that would require a full front-end fleet restart.",
+   "source": "aws.amazon.com/message/11201"
   },
   {
    "t": "2020-11-25 09:39 AM PST",
-   "phase": "Diagnosis",
-   "event": "AWS confirms the root cause and rules out memory pressure — the earlier leading hypothesis — identifying the OS thread-limit breach.",
-   "source": "https://aws.amazon.com/message/11201"
+   "phase": "DETECTION",
+   "event": "Root cause confirmed: the new capacity caused all servers to exceed the OS-configured maximum thread count — the 'confirmation of the fire's origin.'",
+   "source": "aws.amazon.com/message/11201"
   },
   {
    "t": "2020-11-25 10:07 AM PST",
-   "phase": "Recovery",
-   "event": "AWS begins bringing front-end servers back online; the first group starts taking Kinesis traffic.",
-   "source": "https://aws.amazon.com/message/11201"
+   "phase": "RECOVERY",
+   "event": "Controlled, throttled restart of the front-end fleet begins; first servers take traffic again. Restart deliberately slow because too-fast recovery would overwhelm shard-map/metadata retrieval and re-trigger failure.",
+   "source": "aws.amazon.com/message/11201"
   },
   {
    "t": "2020-11-25 10:15 AM PST",
-   "phase": "Mitigation",
-   "event": "AWS begins deploying a short-term Cognito mitigation to reduce its Kinesis dependency; Cognito User Pools error rates begin falling.",
-   "source": "https://aws.amazon.com/message/11201"
+   "phase": "MITIGATION",
+   "event": "Cognito remediation deployment begins to reduce reliance on the backlogged Kinesis Data Stream buffers that were blocking Cognito webservers.",
+   "source": "aws.amazon.com/message/11201"
   },
   {
    "t": "2020-11-25 10:36 AM PST",
-   "phase": "Mitigation",
-   "event": "Engineers take action to mitigate Lambda memory contention caused by buffered metric data growing on the underlying invocation-service hosts.",
-   "source": "https://aws.amazon.com/message/11201"
+   "phase": "MITIGATION",
+   "event": "Engineers act to mitigate Lambda memory contention — metric buffering that could not drain to Kinesis had 'caused memory contention on the underlying service hosts used for Lambda function invocations' — resolving the increased error rates.",
+   "source": "aws.amazon.com/message/11201"
   },
   {
-   "t": "2020-11-25 12:15 PM PST",
-   "phase": "Recovery",
-   "event": "Cognito error rates significantly reduced.",
-   "source": "https://aws.amazon.com/message/11201"
+   "t": "2020-11-25 (daytime)",
+   "phase": "IMPACT",
+   "event": "CloudWatch shows 'increased error rates and latencies for the PutMetricData and PutLogEvents APIs'; ECS and EKS, which use EventBridge for internal workflows, see delays provisioning new clusters and scaling existing ones.",
+   "source": "aws.amazon.com/message/11201"
   },
   {
    "t": "2020-11-25 02:18 PM PST",
-   "phase": "Restored",
-   "event": "Cognito operating normally again.",
-   "source": "https://aws.amazon.com/message/11201"
+   "phase": "RECOVERY",
+   "event": "'By 2:18 PM PST Cognito was operating normally' after authentication failures clear.",
+   "source": "aws.amazon.com/message/11201"
   },
   {
    "t": "2020-11-25 04:15 PM PST",
-   "phase": "Recovery",
-   "event": "Majority of EventBridge / CloudWatch Events issues (and the dependent ECS/EKS provisioning and scaling delays) resolved.",
-   "source": "https://aws.amazon.com/message/11201"
+   "phase": "RECOVERY",
+   "event": "Majority of EventBridge, ECS and EKS event-processing and cluster-provisioning issues resolved.",
+   "source": "aws.amazon.com/message/11201"
   },
   {
-   "t": "2020-11-25 05:47 PM PST",
-   "phase": "Recovery",
-   "event": "CloudWatch shows early signs of recovery as Kinesis availability improves.",
-   "source": "https://aws.amazon.com/message/11201"
+   "t": "2020-11-25 (throughout)",
+   "phase": "MITIGATION",
+   "event": "De-energisation/isolation analogue: the added capacity is removed and the fleet restarted under the existing OS limit; AWS deliberately defers raising the limit 'without further testing,' adding only 'a few hundred per hour.'",
+   "source": "aws.amazon.com/message/11201"
   },
   {
    "t": "2020-11-25 10:23 PM PST",
-   "phase": "Restored",
-   "event": "Kinesis fully returns to normal — roughly 17 hours after the first alarms and about 12 hours after the restart began.",
-   "source": "https://aws.amazon.com/message/11201"
+   "phase": "RESTORED",
+   "event": "Amazon Kinesis fully recovered — end of the ~18.5-hour 'burn' from the 3:47 AM breach.",
+   "source": "aws.amazon.com/message/11201"
   },
   {
    "t": "2020-11-25 10:31 PM PST",
-   "phase": "Restored",
-   "event": "CloudWatch metrics and alarms fully recovered.",
-   "source": "https://aws.amazon.com/message/11201"
+   "phase": "RESTORED",
+   "event": "CloudWatch metrics and alarms (PutMetricData / PutLogEvents) fully recovered.",
+   "source": "aws.amazon.com/message/11201"
+  },
+  {
+   "t": "Post-incident",
+   "phase": "RECOVERY",
+   "event": "Structural remediation committed: greatly accelerate cellularization of the front-end fleet 'to match what we've done with the back-end,' move to 'larger CPU and memory servers, reducing the total number of servers,' add thread-consumption alarming, radically improve cold-start time, and raise OS thread limits after testing.",
+   "source": "aws.amazon.com/message/11201"
   }
  ],
  "metrics": [
   {
-   "label": "Time to full Kinesis recovery (from first alarms)",
-   "value": "~17 hours (05:15 AM → 10:23 PM PST)",
-   "source": "https://aws.amazon.com/message/11201"
+   "label": "Capacity-addition (trigger) window",
+   "value": "63 min (02:44–03:47 AM PST)",
+   "source": "aws.amazon.com/message/11201"
   },
   {
-   "label": "Detection lag (capacity-add finish → first alarms)",
-   "value": "~1.5 hours (03:47 AM → 05:15 AM PST)",
-   "source": "https://aws.amazon.com/message/11201"
+   "label": "Detection lag (breach to first alarm)",
+   "value": "~1h28m (03:47 to 05:15 AM PST)",
+   "source": "aws.amazon.com/message/11201"
   },
   {
-   "label": "Diagnosis time (first alarms → root cause confirmed)",
-   "value": "~4h24m (05:15 AM → 09:39 AM PST)",
-   "source": "https://aws.amazon.com/message/11201"
+   "label": "Time to confirmed root cause",
+   "value": "~5h52m after breach (03:47 to 09:39 AM PST)",
+   "source": "aws.amazon.com/message/11201"
   },
   {
-   "label": "Restart-to-full-recovery span",
-   "value": "~12 hours (10:07 AM → 10:23 PM PST)",
-   "source": "https://aws.amazon.com/message/11201"
+   "label": "Constrained restart rate",
+   "value": "a few hundred servers per hour",
+   "source": "aws.amazon.com/message/11201"
   },
   {
-   "label": "Front-end restart rate ceiling",
-   "value": "A few hundred servers per hour (limited by contention)",
-   "source": "https://aws.amazon.com/message/11201"
+   "label": "Recovery span (restart start to full recovery)",
+   "value": "12h16m (10:07 AM to 10:23 PM PST)",
+   "source": "aws.amazon.com/message/11201"
   },
   {
-   "label": "Membership-propagation delay",
-   "value": "Up to 1 hour for any existing fleet member to learn of a new participant",
-   "source": "https://aws.amazon.com/message/11201"
+   "label": "Total Kinesis outage duration",
+   "value": "~18h36m from breach (03:47 AM to 10:23 PM PST)",
+   "source": "aws.amazon.com/message/11201"
   },
   {
-   "label": "Cognito recovery duration",
-   "value": "~4h03m (mitigation 10:15 AM → normal 02:18 PM PST)",
-   "source": "https://aws.amazon.com/message/11201"
+   "label": "Thread scaling relationship",
+   "value": "O(N): threads per server proportional to fleet size",
+   "source": "aws.amazon.com/message/11201"
   },
   {
-   "label": "CloudWatch local-metric persistence added (remediation)",
-   "value": "3 hours of metric data buffered locally",
-   "source": "https://aws.amazon.com/message/11201"
+   "label": "Downstream services impacted",
+   "value": "6+ (Cognito, CloudWatch, Lambda, EventBridge, ECS, EKS)",
+   "source": "aws.amazon.com/message/11201"
+  },
+  {
+   "label": "Cognito recovery time",
+   "value": "02:18 PM PST",
+   "source": "aws.amazon.com/message/11201"
+  },
+  {
+   "label": "CloudWatch full recovery",
+   "value": "10:31 PM PST",
+   "source": "aws.amazon.com/message/11201"
   }
  ],
- "rootCause": "The trigger — explicitly labeled by AWS as the trigger and NOT the root cause — was a small capacity addition to the Amazon Kinesis Data Streams front-end fleet in US-EAST-1, which 'began to be added to the service at 2:44 AM PST, finishing at 3:47 AM PST.' The front-end's role is narrow but foundational: 'It handles authentication, throttling, and request-routing to the correct stream-shards on the back-end clusters.' The actual root cause was an architectural coupling in the front-end's peer-coordination design: 'each front-end server creates operating system threads for each of the other servers in the front-end fleet,' so 'the total threads each server must maintain is directly proportional to the number of servers in the fleet' — thread consumption scales with fleet size N, not with traffic. Adding servers therefore raised the per-server thread count on every existing server as well as the new ones. Once the enlarged fleet was fully in service, 'the new capacity had caused all of the servers in the fleet to exceed the maximum number of threads allowed by an operating system configuration.' Crossing that OS-configured per-process ceiling did not cleanly crash the servers; it broke their routing state: 'As this limit was being exceeded, cache construction was failing to complete and front-end servers were ending up with useless shard-maps that left them unable to route requests to back-end clusters.' Because every server crossed the same shared limit at nearly the same time, and because the front-end (unlike the already-cellularized back-end) was not yet cellularized, the failure hit the whole fleet at once. First alarms fired at 5:15 AM PST; AWS narrowed the cause and determined a full front-end restart was required at 7:51 AM PST, confirmed root cause at 9:39 AM PST, took first traffic on recovered servers at 10:07 AM PST, and fully restored Kinesis at 10:23 PM PST. Recovery was slow because the same coordination design throttled it: 'It takes up to an hour for any existing front-end fleet member to learn of new participants,' and 'bringing front-end servers back online too quickly would create contention... [so] we could only add servers at the rate of a few hundred per hour.' Numerous AWS services that depend on Kinesis for telemetry and eventing — Cognito, CloudWatch, Lambda, and ECS/EKS (via EventBridge) — were degraded as a downstream cascade.",
+ "rootCause": "The specific \"ignition source\" was not a physical component but an operating-system configuration limit: the maximum number of threads permitted per process on every server in the Amazon Kinesis front-end fleet in US-EAST-1. AWS states plainly that \"the new capacity had caused all of the servers in the fleet to exceed the maximum number of threads allowed by an operating system configuration\" (aws.amazon.com/message/11201). The precise failure mechanism is architectural: each front-end server maintains a cache called a \"shard-map\" (\"a cache of information, including membership details and shard ownership for the back-end clusters\"), and it populates that cache by opening OS threads to its peers — \"each front-end server creates operating system threads for each of the other servers in the front-end fleet.\" Because \"the total threads each server must maintain is directly proportional to the number of servers in the fleet,\" the design is O(N) thread-per-peer. When capacity was added, N grew, and every server's required thread count crossed the OS ceiling. Cache construction could no longer complete, so \"cache construction was failing to complete and front-end servers were ending up with useless shard-maps.\" A front-end server with a useless shard-map cannot perform its core job — it \"handles authentication, throttling, and request-routing to the correct stream-shards on the back-end clusters\" — so the entire front end lost the ability to route records.\n\nThe trigger and the root cause are explicitly separated by AWS: the event was triggered by \"a relatively small addition of capacity that began to be added to the service at 2:44 AM PST, finishing at 3:47 AM PST.\" The capacity add was routine and small; it merely exposed the latent defect. The latent root cause is the design decision to scale coordination threads linearly with fleet size, combined with an OS thread limit that had never been dimensioned against the fleet's growth trajectory, and — critically — the absence of any instrumentation that would have caught the fleet approaching that ceiling. AWS concedes this maintenance/observability gap in its remediation, committing to add \"fine-grained alarming for thread consumption\": such alarming did not exist beforehand, so operators had no early-warning telemetry on the single resource that failed. There was also no failure-isolation barrier — the front-end fleet was not cellularized, so a limit breach hit \"all of the servers in the fleet\" at once rather than being contained to a cell.\n\nIn physical-forensic terms mapped to this software incident: there was no combustion, no maintenance-worn part, and no aged equipment with a make/model/chemistry. The equivalent \"latent defect left uninspected\" is the un-alarmed, un-load-tested proximity of thread consumption to the OS limit as the fleet scaled — a capacity/observability lapse rather than a mechanical wear lapse.",
  "contributingFactors": [
-  "Architectural coupling of thread count to fleet size: each front-end server spawns one OS thread per other server in the fleet ('each front-end server creates operating system threads for each of the other servers in the front-end fleet'), so per-server thread consumption grows O(N) with fleet size rather than with load. Scaling the fleet up — normally a capacity/safety action — was itself the destabilizing force that pushed every server past the OS thread limit.",
-  "A hard OS-level maximum-threads-per-process configuration with insufficient headroom: 'the new capacity had caused all of the servers in the fleet to exceed the maximum number of threads allowed by an operating system configuration.' A modest capacity addition was enough to exceed it fleet-wide, and AWS's remediation to 'finish testing an increase in thread count limits' indicates the limit had not been raised ahead of fleet growth.",
-  "Absence of cellularization on the front-end fleet (unlike the back-end, which AWS had already cellularized — 'accelerate the cellularization of the front-end fleet to match what we've done with the back-end'): there was no bulkhead to isolate the failure, so every front-end server hit the same shared OS limit simultaneously and failed together, giving the fault region-wide front-end blast radius.",
-  "Fragile recovery dynamics baked into the same coordination design: 'It takes up to an hour for any existing front-end fleet member to learn of new participants,' and 'bringing front-end servers back online too quickly would create contention... [so] we could only add servers at the rate of a few hundred per hour,' turning restoration into a multi-hour process (first traffic 10:07 AM PST, full recovery 10:23 PM PST).",
-  "Wide blast radius via service dependencies on Kinesis for telemetry and eventing — 'Amazon Cognito uses Kinesis Data Streams to collect and analyze API access patterns,' 'CloudWatch uses Kinesis Data Streams for the processing of metric and log data,' 'Lambda function invocations currently require publishing metric data to CloudWatch as part of invocation,' and 'Elastic Container Service (ECS) and Elastic Kubernetes Service (EKS) both make use of EventBridge to drive internal workflows' — so a single-fleet fault cascaded into broad multi-service impairment.",
-  "Delayed diagnosis: first alarms at 5:15 AM PST, but the team did not narrow to a couple of candidate causes and determine that a full front-end restart was required until 7:51 AM PST, and did not confirm root cause until 9:39 AM PST, extending time-to-mitigate."
+  "Architectural design fault: coordination threads scale O(N) with fleet size — AWS confirms 'each front-end server creates operating system threads for each of the other servers in the front-end fleet' and 'the total threads each server must maintain is directly proportional to the number of servers in the fleet' — so routine horizontal scaling raised every server's thread count toward the OS ceiling simultaneously (aws.amazon.com/message/11201).",
+  "Observability/maintenance gap: no fine-grained alarming existed for thread consumption; AWS commits to add 'fine-grained alarming for thread consumption' only as a post-incident action, meaning operators had no early warning as the fleet approached the OS thread limit (aws.amazon.com/message/11201).",
+  "No failure-isolation barrier: the front-end fleet was not cellularized, so the limit breach hit 'all of the servers in the fleet' at once instead of being confined to a cell — accelerating cellularization is named as the medium-term fix, confirming it was absent (aws.amazon.com/message/11201).",
+  "Detection sensed the symptom, not the cause: alarms fired at 5:15 AM for elevated Kinesis error rates — roughly 90 minutes after the 3:47 AM breach — and the thread-limit root cause was not confirmed until 9:39 AM, a slow path from alarm to diagnosis (aws.amazon.com/message/11201).",
+  "Fragile, expensive recovery path: because shard-map construction is metadata-heavy at fleet scale, servers could only be restored 'at the rate of a few hundred per hour,' and the OS limit could not be safely raised mid-incident 'without further testing,' extending the outage (aws.amazon.com/message/11201).",
+  "Unbounded downstream buffers: dependent services (Cognito, Lambda, CloudWatch) buffered data toward Kinesis with no back-pressure ceiling, so Cognito webservers 'begin to block on the backlogged Kinesis Data Stream buffers' and Lambda metric buffering 'caused memory contention on the underlying service hosts used for Lambda function invocations' — turning one service's outage into a multi-service cascade (aws.amazon.com/message/11201)."
  ],
  "coe": [
   {
-   "action": "Modify Cognito webservers so they can sustain Kinesis API errors without exhausting buffers, decoupling Cognito availability from the Kinesis data plane.",
-   "owner": "AWS Cognito team",
-   "status": "Completed as a post-incident remediation ('we have modified...'); a separate short-term Cognito mitigation was deployed at 10:15 AM PST during the event.",
-   "source": "https://aws.amazon.com/message/11201"
+   "action": "Greatly accelerate cellularization of the front-end fleet 'to match what we've done with the back-end' so a limit breach is contained to a single cell rather than the whole fleet.",
+   "owner": "AWS Kinesis service team",
+   "status": "Committed (medium-term)"
   },
   {
-   "action": "Persist 3 hours of metric data in the CloudWatch local metrics data store so metrics and alarms survive a Kinesis outage.",
-   "owner": "AWS CloudWatch team",
-   "status": "Completed in US-EAST-1; global rollout planned",
-   "source": "https://aws.amazon.com/message/11201"
+   "action": "Move the front-end fleet to 'larger CPU and memory servers, reducing the total number of servers,' which cuts fleet size N and the per-server thread count directly.",
+   "owner": "AWS Kinesis service team",
+   "status": "Committed"
   },
   {
-   "action": "Move the Kinesis front-end fleet to larger CPU/memory servers to reduce the total number of servers (and thus the peer-thread count per host).",
-   "owner": "AWS Kinesis team",
-   "status": "Planned near-term fix",
-   "source": "https://aws.amazon.com/message/11201"
+   "action": "Add 'fine-grained alarming for thread consumption' so operators get early warning before the OS thread ceiling is approached.",
+   "owner": "AWS Kinesis service team",
+   "status": "Committed"
   },
   {
-   "action": "Add fine-grained alarming for thread consumption on the front-end fleet.",
-   "owner": "AWS Kinesis team",
-   "status": "Planned near-term fix",
-   "source": "https://aws.amazon.com/message/11201"
+   "action": "Raise the operating-system thread-count limit after further load testing, removing the specific ceiling that failed once validated.",
+   "owner": "AWS Kinesis service team",
+   "status": "Committed"
   },
   {
-   "action": "Finish testing an increase in the OS thread-count limit.",
-   "owner": "AWS Kinesis team",
-   "status": "In progress (testing)",
-   "source": "https://aws.amazon.com/message/11201"
+   "action": "Radically improve the cold-start time for the front-end fleet so recovery is not constrained to 'a few hundred per hour.'",
+   "owner": "AWS Kinesis service team",
+   "status": "Committed"
   },
   {
-   "action": "Radically improve front-end server cold-start time to speed future recovery.",
-   "owner": "AWS Kinesis team",
-   "status": "Planned",
-   "source": "https://aws.amazon.com/message/11201"
-  },
-  {
-   "action": "Move the front-end server cache to a dedicated fleet.",
-   "owner": "AWS Kinesis team",
-   "status": "Planned",
-   "source": "https://aws.amazon.com/message/11201"
-  },
-  {
-   "action": "Move a few large AWS services, such as CloudWatch, to a separate, partitioned front-end fleet.",
-   "owner": "AWS Kinesis team",
-   "status": "Planned",
-   "source": "https://aws.amazon.com/message/11201"
-  },
-  {
-   "action": "Greatly accelerate the cellularization of the front-end fleet to match what was already done for the back-end, bounding per-server thread growth to a cell.",
-   "owner": "AWS Kinesis team",
-   "status": "Planned (acceleration of existing effort)",
-   "source": "https://aws.amazon.com/message/11201"
-  },
-  {
-   "action": "Change support training so support engineers are regularly trained on the backup status-communication tool (the primary Service Health Dashboard depended on the impaired Cognito).",
-   "owner": "AWS Support",
-   "status": "Completed (process change)",
-   "source": "https://aws.amazon.com/message/11201"
+   "action": "Reduce Cognito, CloudWatch, and Lambda coupling to Kinesis by adding back-pressure/graceful degradation so a Kinesis backlog no longer blocks webservers or exhausts host memory.",
+   "owner": "AWS dependent-service teams",
+   "status": "Committed / implied by remediation"
   }
  ],
  "lessonsLearnt": [
@@ -260,27 +246,23 @@
  ],
  "comprehensiveAnalysis": [
   {
-   "heading": "Failure mechanism: a fleet-size-coupled resource limit",
-   "body": "The front-end fleet used a design in which every server maintains OS threads for every other server in the fleet, so the per-server thread count is a function of fleet size. Adding even a small amount of capacity therefore raised the thread count on all existing hosts simultaneously. When that count crossed the operating-system's configured maximum thread ceiling, the servers could no longer complete construction of their shard-map cache. The result was not a clean crash but a corrupt operating state: front-end servers came up holding useless shard-maps and could not route requests, so the whole fleet degraded in unison rather than losing a subset of hosts."
+   "heading": "Trigger vs. Root Cause",
+   "body": "AWS is unusually explicit in separating the two. The trigger was 'a relatively small addition of capacity' (02:44–03:47 AM PST) — routine, small, and by itself harmless. The root cause was a latent design defect: each front-end server 'creates operating system threads for each of the other servers in the front-end fleet,' so thread count scales O(N) with fleet size and had crept toward a fixed OS maximum. The capacity add simply pushed every server across that ceiling at once. Treating the capacity change as 'the cause' would miss the real hazard, which had been building silently as the fleet grew."
   },
   {
-   "heading": "Why it cascaded across AWS",
-   "body": "Kinesis Data Streams sits beneath a wide set of AWS control- and data-plane services, so its degradation propagated by dependency. CloudWatch buffered metric data it could not flush, and that buffering grew until it caused memory contention on downstream hosts — which in turn raised AWS Lambda function-invocation error rates. Cognito User Pools suffered elevated API failures and latency because a latent buffering bug meant its webservers could not survive sustained Kinesis errors, exhausting buffers and blocking authentication and credential access. EventBridge / CloudWatch Events processing was delayed, which in turn slowed dependent Amazon ECS/EKS provisioning and scaling and AWS Auto Scaling policies. One fleet's internal limit thus became a regional, multi-service event."
+   "heading": "Failure Mechanism: The Shard-Map Cache",
+   "body": "The front-end tier 'handles authentication, throttling, and request-routing to the correct stream-shards on the back-end clusters,' and depends on a local 'shard-map' cache of 'membership details and shard ownership.' Building that cache requires a thread per peer. Once the OS thread limit was exceeded, 'cache construction was failing to complete and front-end servers were ending up with useless shard-maps' — a server that cannot build its shard-map cannot route, so the failure was fleet-wide and synchronized rather than a gradual degradation."
   },
   {
-   "heading": "Recovery: why it took ~17 hours",
-   "body": "Restoration could not be rushed. AWS first had to carefully reduce thread counts and remove the added capacity, then bring servers back gradually. Two properties throttled this: it takes up to an hour for any existing fleet member to learn of new participants, and restarting too quickly creates contention between membership propagation and handling incoming requests, starving request-handling and re-inducing errors. Consequently AWS could only add servers at a few hundred per hour. Restart began at 10:07 AM PST but Kinesis did not fully normalize until 10:23 PM PST — roughly 12 hours later. Dependent services recovered on their own tracks: Cognito normal by 2:18 PM, EventBridge largely resolved by 4:15 PM, CloudWatch fully recovered by 10:31 PM PST."
+   "heading": "Cascade Through Dependent Services",
+   "body": "The blast radius followed data dependencies on Kinesis. Cognito webservers began to 'block on the backlogged Kinesis Data Stream buffers,' failing authentication until 2:18 PM. Lambda metric buffering that could not drain 'caused memory contention on the underlying service hosts used for Lambda function invocations.' CloudWatch degraded on PutMetricData/PutLogEvents; EventBridge errors from 5:15 AM propagated to ECS and EKS, which 'make use of EventBridge to drive internal workflows,' delaying cluster provisioning and scaling. Each was the same anti-pattern: an unbounded buffer backing up behind a stalled dependency with no back-pressure."
   },
   {
-   "heading": "Organizational and systemic factors",
-   "body": "Several systemic gaps amplified the event. There was no fine-grained alarm on thread consumption, so the first indication was indirect (put/get errors) about 1.5 hours after the breach. The front-end fleet had not yet been cellularized the way the back-end had, so there was no bulkhead to contain the thread growth to a subset. Downstream services embedded fragile assumptions (Cognito buffer exhaustion; CloudWatch unbounded metric buffering) that turned an upstream fault into independent secondary failures. And operational communication was itself in the blast radius: the primary Service Health Dashboard depended on the impaired Cognito, and support engineers were not routinely trained on the backup tool."
-  },
-  {
-   "heading": "Cross-incident pattern",
-   "body": "This event exemplifies a recurring class of large-scale outages: a routine, low-risk operational change (a small capacity add) interacts with a resource limit that scales with system size, and the fault then propagates along a hidden dependency web from a foundational service outward. The remediations — cellularization to bound fault domains, alarming on the true limiting resource, hardening dependents to degrade rather than fail, isolating high-fan-in tenants, and decoupling status tooling from the services it monitors — are the same structural defenses that recur across major cloud incidents. Notably, no dollar cost or affected-user count was published for this specific event, and the widely cited ~$34M Parametrix figure pertains to the separate December 7, 2021 US-EAST-1 outage, not this one."
+   "heading": "Recovery Constraints and Remediation",
+   "body": "Recovery was slow by necessity: shard-map rebuild is metadata-heavy, so servers could be added only 'a few hundred per hour,' and AWS declined to raise the OS limit mid-incident 'without further testing,' instead removing the added capacity so thread count fell below the limit. Full Kinesis recovery came at 10:23 PM — about 18.5 hours after the breach. Structural fixes named by AWS attack every layer: cellularization for isolation, larger/fewer servers to cut N, thread-consumption alarming for early warning, faster cold-start for quicker recovery, and a tested higher thread limit."
   }
  ],
- "technicalDeepDive": "The Kinesis Data Streams front-end is a thin routing/authentication tier: 'It handles authentication, throttling, and request-routing to the correct stream-shards on the back-end clusters.' To route requests it maintains a shard-map cache. Critically, front-end servers must stay coordinated about fleet membership, and the implementation does this per-peer: 'each front-end server creates operating system threads for each of the other servers in the front-end fleet.' This makes per-server thread usage O(N) in fleet size N — 'the total threads each server must maintain is directly proportional to the number of servers in the fleet' — and independent of request volume. As long as N stayed low enough that O(N) coordination threads (plus the server's other threads) fit under the OS-configured per-process ceiling, the fleet was stable. The November 25 capacity addition (2:44 AM to 3:47 AM PST), which AWS calls the 'trigger, though not root cause,' increased N. Because the thread cost is borne by every server, not just the new ones, the addition raised thread counts fleet-wide at once, and 'the new capacity had caused all of the servers in the fleet to exceed the maximum number of threads allowed by an operating system configuration.' The failure mode was not a clean crash: when a server could not create the threads it needed, its shard-map build did not finish — 'cache construction was failing to complete and front-end servers were ending up with useless shard-maps that left them unable to route requests to back-end clusters.' Because every server crossed the threshold at nearly the same time, the fleet degraded coherently rather than partially, which is why customer errors were broad once alarms fired at 5:15 AM PST. Recovery was constrained by the same coordination design that caused the fault: 'It takes up to an hour for any existing front-end fleet member to learn of new participants,' and 'bringing front-end servers back online too quickly would create contention between these two needs and result in very few resources being available to handle incoming requests,' so servers could be re-added only 'at the rate of a few hundred per hour.' This is why, despite root-cause confirmation at 9:39 AM PST and first servers taking traffic at 10:07 AM PST, full restoration took until 10:23 PM PST. AWS's stated remediations attack the mechanism from three angles: 'moving to larger CPU and memory servers, reducing the total number of servers and, hence, threads required by each server to communicate across the fleet' (smaller N); 'finish testing an increase in thread count limits in our operating system configuration' (more headroom under the ceiling); and 'accelerate the cellularization of the front-end fleet to match what we've done with the back-end' (bounding N per cell and containing blast radius).",
+ "technicalDeepDive": "Kinesis's front-end fleet is a stateless-request tier fronting stateful back-end shard clusters. Its role is small but important: it \"handles authentication, throttling, and request-routing to the correct stream-shards on the back-end clusters.\" To route correctly, each front-end server must know which back-end cluster owns which shard, held locally in a \"shard-map\" cache built from \"membership details and shard ownership for the back-end clusters.\" The cache is populated via a coordination mechanism in which \"each front-end server creates operating system threads for each of the other servers in the front-end fleet,\" and \"it takes up to an hour for any existing front-end fleet member to learn of new participants.\" AWS confirms \"the total threads each server must maintain is directly proportional to the number of servers in the fleet.\" This linear coupling is the structural fault: horizontal scaling, normally a mitigation, here increases per-server load, so the fleet becomes less stable as it grows.\n\nThe failure was therefore synchronized rather than progressive. A \"relatively small addition of capacity\" (02:44–03:47 PST) raised N enough that every server's thread requirement crossed the fixed OS limit at essentially the same moment. Past the limit, thread creation for cache construction fails, and \"cache construction was failing to complete and front-end servers were ending up with useless shard-maps.\" With no valid shard-map, routing collapses fleet-wide. Recovery could not be a simple rollback because the shard-map build is itself expensive and metadata-intensive at fleet scale: bringing many servers back at once would hammer the metadata/shard-map retrieval path and re-trigger failure. Hence the throttled restart — \"we could only add servers at the rate of a few hundred per hour\" — and the deliberate choice not to raise the OS limit mid-incident: \"We didn't want to increase the operating system limit without further testing,\" after which, having removed the added capacity, AWS \"determined that the thread count would no longer exceed the operating system limit and proceeded with the restart.\" That conservatism traded recovery speed for safety, producing the multi-hour tail from first restart (10:07 AM) to full recovery (10:23 PM).\n\nThe blast radius was defined by which services buffer data through Kinesis. Amazon Cognito used Kinesis Data Streams for analytics, and the backlog caused \"Cognito webservers to begin to block on the backlogged Kinesis Data Stream buffers,\" producing authentication failures until 2:18 PM. CloudWatch \"experienced increased error rates and latencies for the PutMetricData and PutLogEvents APIs\" (recovered 10:31 PM). Lambda's own metric buffering, unable to drain to Kinesis, grew until \"it caused memory contention on the underlying service hosts used for Lambda function invocations, resulting in increased error rates,\" mitigated at 10:36 AM. CloudWatch Events and EventBridge \"experienced increased API errors and delays in event processing starting at 5:15 AM PST\"; because \"ECS and EKS both make use of EventBridge to drive internal workflows used to manage customer clusters and tasks,\" they saw delays provisioning new clusters, scaling existing ones, and deprovisioning tasks, mostly resolved by 4:15 PM. Every downstream failure was the same pattern — an unbounded buffer backing up behind a stalled Kinesis — which is why the structural fix AWS names is cellularization \"to isolate the effects of failure within a service,\" plus moving to \"larger CPU and memory servers, reducing the total number of servers\" to shrink N and thus the thread count directly.",
  "references": [
   {
    "title": "Summary of the Amazon Kinesis Event in the Northern Virginia (US-EAST-1) Region",
@@ -303,5 +285,6 @@
   "lastVerified": "2026-07-31",
   "confidence": "High for root cause, timeline anchors, and action items (all single-sourced and directly quoted from the official AWS post-event summary). Lower / unknown for magnitude: AWS publishes no per-service failed-request counts, dollar cost, or affected-user figures for this event, and no independent third-party monitoring timeline was retrievable to corroborate AWS's start/end times."
  },
- "lastUpdated": "2026-07-31"
+ "lastUpdated": "2026-07-31",
+ "operatorShort": "AWS"
 }

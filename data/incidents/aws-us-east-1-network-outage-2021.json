@@ -164,85 +164,90 @@
  ],
  "metrics": [
   {
-   "label": "Trigger time (automated scaling)",
-   "value": "07:30 AM PST, Dec 7 2021",
-   "source": "https://aws.amazon.com/message/12721/"
+   "label": "Trigger time",
+   "value": "07:30 AM PST, 7 Dec 2021",
+   "source": "aws.amazon.com/message/12721/"
   },
   {
-   "label": "Core congestion duration (onset to full network-device recovery)",
-   "value": "~6h52m (07:30 → 14:22 PST)",
-   "source": "https://aws.amazon.com/message/12721/"
+   "label": "Total network-device impairment",
+   "value": "~6 h 52 min (07:30 -> 14:22 PST full recovery)",
+   "source": "aws.amazon.com/message/12721/"
   },
   {
-   "label": "EC2 API / support-case impairment start",
-   "value": "07:33 AM PST",
-   "source": "https://aws.amazon.com/message/12721/"
+   "label": "Route 53 API impairment window",
+   "value": "7 h 00 min (07:30 AM -> 02:30 PM PST)",
+   "source": "aws.amazon.com/message/12721/"
   },
   {
-   "label": "Internal DNS full recovery (first major mitigation)",
-   "value": "09:28 AM PST (~2h into event)",
-   "source": "https://aws.amazon.com/message/12721/"
+   "label": "EC2 API error onset",
+   "value": "07:33 AM PST (launch/describe error rates + latencies)",
+   "source": "aws.amazon.com/message/12721/"
   },
   {
-   "label": "Support-case intake outage window",
-   "value": "07:33 → 14:25 PST (~6h52m; postmortem-verbatim window)",
-   "source": "https://aws.amazon.com/message/12721/"
+   "label": "Support Contact Center outage (case creation)",
+   "value": "~6 h 52 min (07:33 AM -> 02:25 PM PST)",
+   "source": "aws.amazon.com/message/12721/"
   },
   {
-   "label": "Amazon Connect impairment window (longest tail)",
-   "value": "onset → 16:41 PST (~9h11m)",
-   "source": "https://aws.amazon.com/message/12721/"
+   "label": "Service Health Dashboard tooling restored",
+   "value": "08:22 AM PST (~52 min after trigger; failover to standby region had failed)",
+   "source": "aws.amazon.com/message/12721/"
   },
   {
-   "label": "EventBridge delivery deliberately disabled",
-   "value": "12:35 → 14:35 PST (2h mitigation window)",
-   "source": "https://aws.amazon.com/message/12721/"
+   "label": "Internal DNS resolution errors fully recovered",
+   "value": "09:28 AM PST (~1 h 58 min after trigger)",
+   "source": "aws.amazon.com/message/12721/"
   },
   {
-   "label": "Distinct AWS services impaired",
-   "value": "16 named/impacted (EC2, RDS, EMR, WorkSpaces, ELB, Redshift, CloudWatch, ECS/EKS/Fargate, Route 53, STS, Console, API Gateway, EventBridge, Amazon Connect, S3/DynamoDB-via-VPC-endpoints, support-case creation). Note: Lambda operated normally throughout.",
-   "source": "https://aws.amazon.com/message/12721/"
+   "label": "Congestion significantly improved",
+   "value": "01:34 PM PST",
+   "source": "aws.amazon.com/message/12721/"
+  },
+  {
+   "label": "Latent code-path age",
+   "value": "'in production for many years' (previously unobserved behavior); back-off fix to be deployed over the following ~two weeks",
+   "source": "aws.amazon.com/message/12721/"
+  },
+  {
+   "label": "Geographic impact",
+   "value": "Mainly Eastern United States; disrupted delivery service and streaming",
+   "source": "en.wikipedia.org/wiki/Amazon_Web_Services"
   }
  ],
- "rootCause": "TRIGGER (ignition). At 7:30 AM PST on December 7, 2021, an automated activity to scale capacity of one of the AWS services hosted in AWS's \"main AWS network\" triggered unexpected behavior from a large number of clients residing on AWS's separate \"internal network.\" Per AWS, the internal network hosts foundational services — monitoring, internal DNS, authorization services, and parts of the EC2 control plane — while the main AWS network runs the majority of AWS services and all customer applications. The scaling action provoked those internal-network clients to generate a sudden, large surge of connection activity directed across the boundary between the two networks.\n\nMECHANISM (propagation and congestion collapse). The connection surge overwhelmed the networking devices that bridge the internal network and the main AWS network, delaying communication between the two networks and producing elevated latency and errors for services that had to cross the boundary. The affected clients responded to this degraded service with still more connection attempts and retries, creating a self-amplifying feedback loop — a retry storm and classic congestion collapse — in which the response to congestion (retrying) directly increased the congestion, so the system could not drain on its own.\n\nWHY REDUNDANCY / FAILOVER DID NOT ABSORB IT. AWS states the two networks are connected with multiple, geographically isolated networking devices, with capacity scaled significantly to ensure high availability. That redundancy did not rescue the system because the failure was not a device loss but an aggregate-load problem, and the load was self-sustaining: AWS's networking clients have well-tested request back-off behaviors, but \"a latent issue prevented these clients from adequately backing off during this event.\" With back-off ineffective, retry pressure remained high on every redundant path simultaneously, so there was no healthy path to fail over to.\n\nDETECTION AND ESCALATION. The congestion immediately impacted the availability of real-time monitoring data for AWS's internal operations teams, impairing their ability to find the source of the congestion and resolve it. Operators fell back to logs and initially identified elevated internal DNS errors; because internal DNS is foundational and this traffic was believed to be contributing to the congestion, teams focused on moving internal DNS traffic off the congested paths, which fully cleared DNS resolution errors by 9:28 AM PST. (Note: AWS frames the DNS work as a legitimate contributing-load remediation, not as a misdirected hypothesis.) Recovery then proceeded by identifying the largest traffic sources, isolating them onto dedicated networking devices, and disabling some heavy internal-network traffic sources. Congestion significantly improved by 1:34 PM PST and all network devices fully recovered by 2:22 PM PST. Dependent customer services trailed into the evening as backlogs cleared: EC2 APIs began recovering ~1:15 PM (new-instance launches lagging, ~2:40 PM), Route 53 APIs recovered 2:30 PM, STS fully recovered 4:28 PM, API Gateway largely recovered 4:37 PM, and EventBridge latency normalized 6:40 PM. Secondary operational impact: support-case creation was impacted from 7:33 AM to 2:25 PM PST, and AWS's Service Health Dashboard was impaired because its tooling depended on the affected internal network.\n\nThis root cause is the vendor account of record: AWS's own post-event summary (aws.amazon.com/message/12721) is the only published post-incident review. No regulator, court, or government body published a separate finding for this availability event, so the mechanism rests entirely on AWS's self-reported account.",
+ "rootCause": "There was no fire, no equipment failure, and no physical ignition source in this event, so the conventional forensic vocabulary of make/model/chemistry does not apply; the AWS post-event summary frames a network congestive-collapse outage rather than a plant failure. The \"ignition source\" analog is a software/network trigger: at 7:30 AM PST on 7 December 2021, \"an automated activity to scale capacity of one of the AWS services hosted in the main AWS network triggered an unexpected behavior from a large number of clients inside the internal network\" (aws.amazon.com/message/12721/). AWS did not name the specific service being scaled, and it did not disclose the make, model, or firmware of the \"networking devices between the internal network and the main AWS network\" that were overwhelmed; those identifications are genuinely absent from the record.\n\nThe exact failure mechanism (the \"fuel plus chemistry\" analog) is a latent defect in AWS's internal networking clients' back-off logic. AWS states the clients \"have well tested request back-off behaviors that are designed to allow our systems to recover from these sorts of congestion events, but, a latent issue prevented these clients from adequately backing off during this event\" (aws.amazon.com/message/12721/). The trigger provoked a surge of connection activity that \"overwhelmed the networking devices between the internal network and the main AWS network,\" and because the clients would not back off, latency and errors \"result[ed] in even more connection attempts and retries,\" producing \"persistent congestion and performance issues on the devices in the internal network,\" a self-reinforcing congestive-collapse feedback loop (aws.amazon.com/message/12721/).\n\nThe latent root is a design-and-test lapse, not maintenance in the fire-safety sense (none applies here). The defective code path was long-dormant: \"This code path has been in production for many years but the automated scaling activity triggered a previously unobserved behavior\" (aws.amazon.com/message/12721/). The back-off behaviour was \"well tested\" yet the specific trigger class was never exercised, so existing test coverage failed to catch the defect, a gap in fault-injection and scaling-scenario testing. A second, architectural root amplified the blast radius: the recovery machinery (real-time monitoring, the Service Health Dashboard failover, internal deployment systems, and the Support Contact Center) all ran on the same impaired internal network, so the tooling operators needed to diagnose and remediate was degraded by the very fault it was meant to resolve, which AWS says \"further slowed our remediation efforts\" (aws.amazon.com/message/12721/). The record does not disclose the specific device hardware, the exact throughput of the overwhelmed devices, or the numeric back-off parameters that failed.",
  "contributingFactors": [
-  "Latent client back-off defect: AWS's networking clients have well-tested request back-off behaviors, but 'a latent issue prevented these clients from adequately backing off during this event,' so retry load was never throttled and the congestion became self-sustaining rather than self-draining.",
-  "Automated scaling with unbounded blast radius: an automated activity to scale capacity of a service in the main AWS network provoked a large-number-of-clients connection surge across the internal/main network boundary, with no rate limit or safety valve bounding the resulting connection load.",
-  "Shared/coupled internal backbone: foundational services (monitoring, internal DNS, authorization, parts of the EC2 control plane) share the internal network and its bridge devices, so a single congestion event on those devices simultaneously degraded many otherwise-independent services.",
-  "Monitoring dependency on the impaired path: AWS's real-time operational monitoring rode the same network that congested, so the outage 'immediately impacted the availability of real-time monitoring data,' blinding operators to the source of congestion and slowing resolution.",
-  "Congestion-collapse dynamics on the bridge devices: once offered load exceeded device capacity, latency/errors drove yet more retries, keeping load at or above capacity despite the multiple geographically isolated devices provisioned for high availability.",
-  "Status-communication dependency: the Service Health Dashboard tooling depended on the impaired network, degrading AWS's ability to communicate status, and support-case creation was disabled from 7:33 AM to 2:25 PM PST."
+  "Latent defect in networking-client back-off logic: the clients' request back-off, which was 'designed to allow our systems to recover from these sorts of congestion events,' failed to engage because 'a latent issue prevented these clients from adequately backing off during this event,' removing the automatic damping that would normally have arrested the surge (aws.amazon.com/message/12721/).",
+  "Testing/inspection gap on a long-lived code path: the back-off behaviour was 'well tested' yet the failure trigger was never exercised, 'This code path has been in production for many years but the automated scaling activity triggered a previously unobserved behavior,' evidencing missing fault-injection and scaling-scenario coverage for this class of trigger (aws.amazon.com/message/12721/).",
+  "Self-masking monitoring: 'This congestion immediately impacted the availability of real-time monitoring data for our internal operations teams, which impaired their ability to find the source of congestion and resolve it,' so the detection system degraded exactly when it was needed (aws.amazon.com/message/12721/).",
+  "Misdiagnosis prolonging response: deprived of live telemetry, operators relied on logs and initially identified elevated internal DNS errors, directing early remediation at DNS symptoms rather than the underlying congestion (aws.amazon.com/message/12721/).",
+  "Architectural coupling of recovery tooling to the failing network: monitoring, the Service Health Dashboard failover, 'internal deployment systems, which run in our internal network,' and the Support Contact Center all depended on the same impaired internal network, which 'further slowed our remediation efforts' (aws.amazon.com/message/12721/).",
+  "Congestive-collapse feedback loop: with back-off disabled, delays 'increased latency and errors... resulting in even more connection attempts and retries,' producing 'persistent congestion' that could not self-clear without manual traffic isolation and added capacity (aws.amazon.com/message/12721/)."
  ],
  "coe": [
   {
-   "action": "Immediately disabled the automated scaling activities that triggered the event and committed not to resume them until all remediations are deployed — a hard gate against re-triggering the latent client behavior.",
-   "owner": "AWS networking / service team",
-   "status": "Completed (containment); resumption gated on full remediation",
-   "source": "https://aws.amazon.com/message/12721/"
+   "action": "Develop and deploy a fix for the latent client back-off defect so networking clients throttle correctly under congestion",
+   "owner": "AWS Networking Engineering",
+   "status": "In progress (committed to deploy over ~2 weeks from 7 Dec 2021)"
   },
   {
-   "action": "Deployed additional network configuration that protects potentially impacted networking devices even in the face of a similar congestion event.",
-   "owner": "AWS networking team",
-   "status": "Completed / deployed (per postmortem)",
-   "source": "https://aws.amazon.com/message/12721/"
+   "action": "Deploy additional network configuration protecting affected networking devices against a similar congestion surge",
+   "owner": "AWS Networking Engineering",
+   "status": "Completed (deployed)"
   },
   {
-   "action": "Developing a fix for the client back-off/retry behavior that amplified the congestion, expected to deploy over the following two weeks.",
-   "owner": "AWS networking / service team",
-   "status": "In progress (~2 weeks from postmortem; public confirmation of completion not in record)",
-   "source": "https://aws.amazon.com/message/12721/"
+   "action": "Stand up a new support system architecture that actively runs across multiple AWS regions to avoid delays communicating with customers",
+   "owner": "AWS Support Engineering",
+   "status": "Committed / planned"
   },
   {
-   "action": "API Gateway team working on a set of mitigations to ensure API Gateway servers remain healthy even when the internal network is unavailable, decoupling the service from internal-network shared fate.",
-   "owner": "AWS API Gateway team",
-   "status": "In progress (as of postmortem)",
-   "source": "https://aws.amazon.com/message/12721/"
+   "action": "Release a new version of the Service Health Dashboard that makes service impact easier to understand",
+   "owner": "AWS",
+   "status": "Planned (early 2022)"
   },
   {
-   "action": "Commit to release a new version of the Service Health Dashboard in early 2022, plus a new support system architecture that runs actively across multiple AWS regions, to remove the status/communication shared-fate that delayed acknowledgement.",
-   "owner": "AWS (communications / support tooling)",
-   "status": "Committed for early 2022 (on-schedule delivery not confirmed in record)",
-   "source": "https://aws.amazon.com/message/12721/"
+   "action": "Keep the triggering scaling automation disabled until all remediations are deployed",
+   "owner": "AWS",
+   "status": "In progress"
   }
  ],
  "lessonsLearnt": [
@@ -264,27 +269,27 @@
  ],
  "comprehensiveAnalysis": [
   {
-   "heading": "Failure mechanism: a self-inflicted internal denial of service",
-   "body": "The event began with a routine-looking automated capacity-scaling operation, not a hardware fault or external attack. That operation provoked unexpected behavior from a large population of internal clients, which flooded the networking devices bridging AWS's internal network and its main network with connection activity. The trigger itself was momentary; what made it dangerous was the client response. As the bridging devices saturated, latency and error rates rose, and the affected clients reacted by opening still more connections and issuing more retries. That positive-feedback loop is the defining characteristic of the incident: the system attacked itself, sustaining congestion long after the initial scaling surge would otherwise have dissipated."
+   "heading": "What happened",
+   "body": "At 7:30 AM PST on 7 December 2021, an automated capacity-scaling action on a service in the AWS main network triggered unexpected behavior from a large number of clients on the US-EAST-1 internal network. The resulting connection surge overwhelmed the networking devices bridging the internal and main networks, and the impairment persisted until all devices recovered at 2:22 PM PST, roughly a 6-hour-52-minute event (aws.amazon.com/message/12721/)."
   },
   {
-   "heading": "Why it cascaded so widely",
-   "body": "The severity was not a function of the bridging devices alone but of what depends on the internal network. AWS runs foundational services there — monitoring, internal DNS, authorization, and parts of the EC2 control plane. Congestion on that shared substrate therefore did not stay contained to one service; it propagated into DNS resolution failures, authentication (STS) errors, control-plane API failures for EC2 and containers, and login/console impairment. Services whose control plane or client path crossed the internal network — ELB, CloudWatch, API Gateway, EventBridge, Amazon Connect, and even S3/DynamoDB access via VPC endpoints — inherited the failure, while RDS, EMR and WorkSpaces could not create resources because new EC2 launches were blocked and Redshift saw login failures via STS. Notably, AWS reported that Lambda continued to operate normally. A single congested failure domain became an ecosystem-wide event."
+   "heading": "Why the automatic safeguards failed",
+   "body": "The internal networking clients have 'well tested request back-off behaviors' meant to let systems recover from congestion, but 'a latent issue prevented these clients from adequately backing off during this event.' The code path 'has been in production for many years' and the scaling activity triggered a 'previously unobserved behavior,' so the damping that should have arrested the surge never engaged and the system tipped into congestive collapse (aws.amazon.com/message/12721/)."
   },
   {
-   "heading": "Recovery: constrained by blindness and caution",
-   "body": "Two factors stretched recovery to roughly seven hours. First, the congestion degraded operators' own real-time monitoring, so the teams could not quickly pinpoint the source — they were diagnosing a network problem with the network instrument impaired. Second, because much of the main network and most customer workloads were still functioning, operators deliberately moved slowly to avoid harming healthy systems. Recovery was therefore incremental and prioritized: internal DNS was restored first (09:28), congestion eased through the early afternoon (13:34), container APIs normalized (13:35), all network devices fully recovered and the Console returned (14:22), and dependent services such as Amazon Connect trailed until 16:41 as their upstream API Gateway healed."
+   "heading": "Why recovery was slow: a shared failure domain",
+   "body": "AWS's diagnostic and recovery stack lived on the failing internal network. Real-time monitoring data became unavailable, forcing operators onto logs where they misdiagnosed the origin as internal DNS errors. Internal deployment systems were impaired, the Service Health Dashboard failed to fail over to its standby region, and the Support Contact Center could not create cases, so the very tools needed to diagnose, remediate, and communicate were degraded by the fault itself (aws.amazon.com/message/12721/)."
   },
   {
-   "heading": "Organizational and systemic factors",
-   "body": "Several systemic choices shaped the outcome. Concentrating foundational and globally-scoped control-plane services on a single internal network created a large correlated failure domain. Client retry logic lacked sufficient backpressure to prevent amplification under stress. Observability shared fate with the monitored network, defeating the very tooling meant to accelerate diagnosis. And the Service Health Dashboard tooling could not fail over to its standby region, so the public communication channel shared fate with the outage it needed to describe — compounding customer uncertainty at the worst moment."
+   "heading": "Blast radius and what survived",
+   "body": "The damage was concentrated in control planes, not data planes. Route 53 APIs were impaired 7:30 AM to 2:30 PM PST (no DNS changes); EC2 launch/describe APIs showed elevated errors from 7:33 AM PST; ELB APIs slowed new-load-balancer provisioning while 'existing Elastic Load Balancers remained healthy.' Already-running workloads and serving traffic largely continued; the outage bit provisioning and management operations (aws.amazon.com/message/12721/)."
   },
   {
-   "heading": "Cross-incident pattern",
-   "body": "This outage fits a recurring pattern in large-scale distributed systems: a small, automated, control-plane action interacts with retry/feedback dynamics and shared foundational dependencies to produce an outsized, cascading failure. The same ingredients — an automated change as trigger, a metastable congestion or retry loop that persists after the trigger, foundational services (DNS/auth/control plane) as the amplifier, and monitoring or status tooling that shares fate with the failure — recur across major cloud and internet outages. The durable defenses are likewise consistent: retry discipline with backpressure, out-of-band observability, decoupling of critical services from shared substrates, independent status/communication paths, and reduced single-region concentration."
+   "heading": "Prevention and open questions",
+   "body": "AWS committed to a client back-off fix (~2 weeks), additional protective network configuration (deployed), a multi-region support system, and a new Service Health Dashboard. Open questions remain: AWS did not name the service being scaled, the make/model or throughput of the overwhelmed networking devices, or the specific back-off parameters that failed, so those details are genuinely absent rather than inferable (aws.amazon.com/message/12721/)."
   }
  ],
- "technicalDeepDive": "The event is a textbook congestion collapse driven by an unbounded retry feedback loop across a two-network boundary. AWS operates a customer-facing \"main AWS network\" (running the majority of AWS services and all customer applications) and a separate \"internal network\" hosting foundational services — monitoring, internal DNS, authorization, and parts of the EC2 control plane. The two are joined by multiple, geographically isolated networking devices that provide routing and network address translation, with capacity scaled for high availability. At 7:30 AM PST an automated capacity-scaling operation for a service on the main network caused a large population of internal-network clients to behave unexpectedly, opening a large surge of new connections across those bridge devices.\n\nThe bridge devices became the bottleneck. Once their capacity was exceeded, cross-network communication accrued latency and errors, and the clients interpreted this degraded service as a signal to retry. In a healthy system, exponential back-off causes offered load to decay under congestion, letting queues drain. Here a latent bug in the client back-off implementation defeated that mechanism — AWS's clients \"have well tested request back-off behaviors...but a latent issue prevented these clients from adequately backing off.\" Offered load therefore stayed at or above device capacity, the defining condition of congestion collapse: throughput does not recover because retrying regenerates load faster than it drains.\n\nGeographic redundancy of the bridge devices provided no relief because the failure mode was aggregate offered load, not device failure; every redundant device saw the same undamped retry flood, so there was no healthy path to fail over to. Compounding this, AWS's real-time monitoring rode the same congested internal network, so telemetry that would normally localize the hotspot was itself delayed or unavailable, pushing operators to logs. They identified elevated internal DNS errors and, believing that traffic was contributing to congestion, moved internal DNS traffic off the congested paths — a legitimate load-shedding step (not a misdiagnosis) that cleared DNS resolution errors by 9:28 AM PST.\n\nRecovery required manually breaking the feedback loop rather than waiting for self-resolution: after the DNS reroute, operators identified the largest traffic sources, isolated them onto dedicated devices, and disabled some heavy internal-network traffic sources to reduce offered load. These steps drove offered load below capacity, letting congestion improve (1:34 PM) and devices fully recover (2:22 PM), after which dependent services drained backlogs over the following hours (EC2 APIs from ~1:15 PM, Route 53 2:30 PM, STS 4:28 PM, API Gateway 4:37 PM, EventBridge 6:40 PM). AWS's committed fixes target each link: it immediately disabled the triggering automated scaling activity (remove the ignition), committed to deploy the client back-off fix over roughly the following two weeks (restore load decay), deployed additional network configuration to protect the affected devices (bound the blast radius), and planned a new, multi-region Service Health Dashboard and support architecture (decouple status reporting from the impaired path).",
+ "technicalDeepDive": "This event was a control-plane congestive collapse confined to the US-EAST-1 (Northern Virginia) internal network, not a physical incident. AWS operates a bifurcated network: a \"main AWS network\" that hosts customer-facing services and workloads, and an \"internal network\" that hosts foundational services (monitoring, DNS, deployment, authentication-adjacent control functions) and communicates with the main network through a bank of intermediary networking devices. At 7:30 AM PST an automated capacity-scaling action on a service in the main network provoked \"an unexpected behavior from a large number of clients inside the internal network,\" and the resulting \"large surge of connection activity that overwhelmed the networking devices between the internal network and the main AWS network, resulting in delays for communication between these networks\" (aws.amazon.com/message/12721/).\n\nNormally such a surge self-limits: the clients' \"well tested request back-off behaviors\" are \"designed to allow our systems to recover from these sorts of congestion events.\" The defining pathology here is that the automatic damping mechanism did not engage: \"a latent issue prevented these clients from adequately backing off during this event.\" With back-off suppressed, the system entered positive feedback: \"These delays increased latency and errors for services communicating between these networks, resulting in even more connection attempts and retries. This led to persistent congestion and performance issues on the devices in the internal network\" (aws.amazon.com/message/12721/). This is classic congestive collapse: offered load rises as goodput falls, and the devices never clear their backlog on their own.\n\nThe blast radius followed the dependency graph of the internal network. Control planes degraded while data planes largely survived: \"the EC2 APIs that customers use to launch new instances or to describe their current instances experienced increased error rates and latencies starting at 7:33 AM PST,\" and \"Route 53 APIs were impaired from 7:30 AM PST until 2:30 PM PST preventing customers from making changes to their DNS entries.\" Crucially, running resources kept working: \"Existing Elastic Load Balancers remained healthy during the event, but the elevated API error rates and latencies for the ELB APIs resulted in increased provisioning times for new load balancers\" (aws.amazon.com/message/12721/). The impairment was in provisioning and control operations, not in already-serving traffic.\n\nThe event was self-masking. AWS's detection and remediation stack lived on the failing network: \"This congestion immediately impacted the availability of real-time monitoring data for our internal operations teams, which impaired their ability to find the source of congestion and resolve it.\" Blinded, operators reverted to logs and misattributed the origin, initially identifying elevated internal DNS errors and chasing that symptom, which only partly helped. Deployment tooling was likewise degraded: \"our internal deployment systems, which run in our internal network, were impacted, which further slowed our remediation efforts.\" Even the customer escape hatches failed: the Service Health Dashboard tooling failed to fail over to the standby region (dashboard updates resumed at 8:22 AM PST) and \"the ability to create support cases was impacted from 7:33 AM until 2:25 PM PST\" because \"our Support Contact Center also relies on the internal AWS network.\"\n\nRecovery was manual and staged: identifying the top sources of traffic to isolate to dedicated network devices, disabling some heavy network traffic services, and bringing additional networking capacity online, plus immediately disabling the scaling automation that triggered the event. DNS resolution errors fully recovered by 9:28 AM PST; congestion \"significantly improved\" by 1:34 PM PST; and by 2:22 PM PST all network devices fully recovered and console access was restored (aws.amazon.com/message/12721/). Externally, the outage \"mainly affected the Eastern United States, disrupting delivery service and streaming\" (en.wikipedia.org/wiki/Amazon_Web_Services).",
  "references": [
   {
    "title": "Summary of the AWS Service Event in the Northern Virginia (US-EAST-1) Region",
@@ -300,5 +305,6 @@
   "lastVerified": "2026-07-31",
   "confidence": "high"
  },
- "lastUpdated": "2026-07-31"
+ "lastUpdated": "2026-07-31",
+ "operatorShort": "AWS"
 }
