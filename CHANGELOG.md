@@ -13,6 +13,22 @@ release sections rather than semver.
 
 ---
 
+## v1.126.3 — 2026-08-03 (Second Brain — codebase-graph load optimization)
+
+### Changed
+- **Codebase Graph in-page viz optimized ~21×** — `Apps/second brain/codebase-graph.html`
+  dropped from **4.1 MB to 196 KB**. The page now renders the aggregated
+  community-level view (~180 named communities) instead of the full 3,634-node
+  render, for a fast first paint and a cleaner architecture overview. Full
+  node-level detail remains in the Obsidian `09-Codebase` vault (unchanged).
+- **`rebuild-codebase-graph.py`** now bakes this in: the page-build step runs
+  `graphify export html --node-limit` (default 1200, `CBG_NODE_LIMIT` override) so
+  every refresh stays light. Root-gate injection + `codebase-memory-mcp` reindex unchanged.
+- Verified: anon → locked (root-gate + watchdog intact), `audit-page-gates.mjs` CLEAN,
+  Second Brain site graph `sync-graph.py` clean (115 nodes / 278 edges, 0 dead/isolated/missing).
+
+---
+
 ## v1.126.2 — 2026-08-02 (Second Brain — full app-source code graph + local docs-layer opt-in)
 
 Expanded the Codebase Graph to the **full application source** — 7 dirs extracted and merged:

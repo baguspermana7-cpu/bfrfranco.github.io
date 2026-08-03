@@ -114,6 +114,11 @@ def main():
     # 3. cluster (names communities + builds graph.html), export Obsidian, inject the root gate
     run([GRAPHIFY, "cluster-only", MERGED])
     run([GRAPHIFY, "export", "obsidian", "--graph", merged_json, "--dir", VAULT])
+    # Optimized in-page viz: above the node limit graphify aggregates to a community-level view
+    # (~180 nodes, ~200 KB) instead of a multi-MB full-node render — fast load + a cleaner
+    # architecture overview. Full node-level detail lives in the Obsidian 09-Codebase vault.
+    node_limit = os.environ.get("CBG_NODE_LIMIT", "1200")
+    run([GRAPHIFY, "export", "html", "--graph", merged_json, "--node-limit", node_limit])
     inject_gate(os.path.join(MERGED, "graphify-out", "graph.html"), os.path.join(SB, "codebase-graph.html"))
     if os.path.exists(CODEMEM):
         run([CODEMEM, "cli", "index_repository", "--repo-path", RZ, "--mode", "moderate", "--persistence", "true"])
