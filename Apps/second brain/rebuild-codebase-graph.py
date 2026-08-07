@@ -98,11 +98,16 @@ def main():
         shutil.copy(graphs[0], merged_json)
     else:
         run([GRAPHIFY, "merge-graphs", *graphs, "--out", merged_json], check=True)
-    # 2b. OPTIONAL docs/PDF/SQL semantic layer — LOCAL via ollama (no cloud key, no cost).
-    #     Slow (one local-LLM call per doc), so opt-in: CBG_DOCS=1 [CBG_DOCS_DIRS="standarization documentation"].
-    #     Requires a chat model in ollama (qwen2.5 / llama3.2 / deepseek-r1). Merged into the graph.
+    # 2b. OPTIONAL docs/PDF/SQL semantic layer — opt-in: CBG_DOCS=1 [CBG_DOCS_DIRS="standarization documentation"].
+    #     DEFAULT BACKEND = omniroute (the local OmniRoute gateway's OpenAI-compat endpoint, keyless + free,
+    #     routed to a fast non-reasoning model) — ~14 s/doc vs ~16 min/doc on the local CPU ollama path.
+    #     Register once: graphify provider add omniroute --base-url http://localhost:20128/v1
+    #       --default-model oc/deepseek-v4-flash-free --env-key OMNIROUTE_KEY
+    #     Falls back to whatever CBG_BACKEND names (e.g. ollama) if OmniRoute is down.
     if os.environ.get("CBG_DOCS") == "1":
-        backend = os.environ.get("CBG_BACKEND", "ollama")
+        backend = os.environ.get("CBG_BACKEND", "omniroute")
+        os.environ.setdefault("OMNIROUTE_KEY", "local-keyless")
+        os.environ.setdefault("OMNIROUTE_BASE_URL", "http://localhost:20128/v1")
         for d in os.environ.get("CBG_DOCS_DIRS", "standarization documentation").split():
             if not os.path.isdir(os.path.join(RZ, d)):
                 continue

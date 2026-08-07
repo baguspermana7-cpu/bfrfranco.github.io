@@ -13,6 +13,31 @@ release sections rather than semver.
 
 ---
 
+## v1.126.4 — 2026-08-07 (Second Brain — docs/standards semantic layer, free cloud extraction)
+
+### Added
+- **Codebase Graph now spans docs + code.** Extracted the `standarization/` corpus
+  (77 standards docs) into a semantic graph — **1,315 doc-nodes / 1,661 edges** — and
+  merged it with the code graph → **4,949 nodes / 12,189 edges / 308 named communities**.
+  The graph now links standards documents to the code they govern, not just code-to-code.
+- Obsidian `09-Codebase` vault regenerated from the combined graph (generated → gitignored).
+
+### Changed
+- **Docs extraction backend flipped to free cloud.** Registered the local OmniRoute
+  gateway's keyless OpenAI-compat endpoint as a graphify provider (non-reasoning flash
+  model for clean JSON) → **~14 s/doc at $0.00**, vs ~16 min/doc on the local CPU ollama
+  path (~68× faster). `rebuild-codebase-graph.py` defaults `CBG_DOCS=1` to this backend
+  (ollama fallback via `CBG_BACKEND`); the docs step packs ~1 doc/chunk (`--token-budget`).
+- `codebase-graph.html` stays light (**225 KB**) despite the larger graph — the aggregated
+  community view (node-limit) absorbs the growth. Root-gate + watchdog intact; page-gates CLEAN.
+
+### Known gap
+- 45 of the largest standards docs exceed the flash model's per-response output cap and
+  produced no nodes this pass (deterministic truncation); the 1,315 nodes cover the rest.
+  A larger-output model or per-section chunking would close the remainder.
+
+---
+
 ## v1.126.3 — 2026-08-03 (Second Brain — codebase-graph load optimization)
 
 ### Changed
