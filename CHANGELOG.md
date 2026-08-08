@@ -13,6 +13,18 @@ release sections rather than semver.
 
 ---
 
+## v1.126.7 — 2026-08-08 (Finance Terminal — technical gauge on the Futures tab, R-003 complete)
+
+Completes R-003 coverage: the buy/sell gauge + technical analytics panel now appears on the
+**Futures** tab too (was on stock/forex/crypto/commodities). All symbol-bearing tabs are consistent.
+
+### Added (`Apps/finance-terminal/`)
+- `#futAnalyticsPanel` container + `loadFuturesChart` now fires `loadAnalyticsPanel('futAnalyticsPanel',
+  S.futSym, tf)` via the deployed gateway `/analyze` (ETF-proxy symbol, e.g. SPY). Called at the top of
+  the function so a chart-data hiccup never hides the gauge (different data source). V2-gated; graceful
+  "unavailable · retry" fallback. No worker deploy needed. Verified: gates CLEAN, panel shows + wires
+  (puppeteer).
+
 ## v1.126.6 — 2026-08-08 (Finance Terminal — technical buy/sell gauge perfected, R-003)
 
 Enhances the per-tab technical analysis gauge (already wired on stock/forex/crypto/commodities via

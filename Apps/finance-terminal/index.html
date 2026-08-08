@@ -630,6 +630,8 @@ table.dtbl tr:hover td{background:rgba(139,92,246,.04)}
 <div style="position:relative;height:280px"><canvas id="futuresChart"></canvas></div>
 </div>
 <div class="card" style="margin-top:1rem"><div class="card-title"><i class="fas fa-chart-bar"></i>Day Performance</div><div style="position:relative;height:200px"><canvas id="futuresPerfChart"></canvas></div></div>
+<!-- FT R-003 — technical buy/sell gauge for the selected future (V2-gated; populated by loadAnalyticsPanel) -->
+<div class="card" id="futAnalyticsPanel" style="margin-top:1rem;display:none"></div>
 </div>
 </div>
 </div>
@@ -3742,6 +3744,9 @@ async function loadFutures(){
 async function loadFuturesChart(tf){
   S.futTf=tf;
   document.querySelectorAll('#futuresTfBar .tf-btn').forEach(b=>b.classList.toggle('active',b.textContent===({M:'1M','3M':'3M','6M':'6M',Y:'1Y'}[tf]||tf)));
+  // R-003: technical buy/sell gauge for the selected future (ETF proxy) via the gateway /analyze —
+  // fired here (before the chart) so a chart-data hiccup never hides the gauge (different source).
+  if(CFG.V2){const ap=$('futAnalyticsPanel');if(ap){ap.style.display='';loadAnalyticsPanel('futAnalyticsPanel',S.futSym,({M:'1M','3M':'3M','6M':'6M',Y:'1Y'}[tf]||'3M'));}}
   const rangeMap={M:'1mo','3M':'3mo','6M':'6mo',Y:'1y'};
   const range=rangeMap[tf]||'1mo';
   try{
