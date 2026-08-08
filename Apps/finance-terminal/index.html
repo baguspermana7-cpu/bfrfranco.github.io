@@ -2906,12 +2906,9 @@ async function loadNewsFeed(){
 
 async function loadEarnings(){
   const el=$('earningsList');
-  if(!S.fhKey){el.innerHTML='<div class="empty"><i class="fas fa-key"></i><p>Enter API key for earnings calendar</p></div>';return}
-  try{
-    const now=new Date();const from=now.toISOString().split('T')[0];
-    const to=new Date(now.getTime()+14*86400000).toISOString().split('T')[0];
-    const data=await fh('/calendar/earnings',{from,to});
-    S.earnings=(data.earningsCalendar||[]).slice(0,30);
+  const now=new Date();const from=now.toISOString().split('T')[0];
+  const to=new Date(now.getTime()+14*86400000).toISOString().split('T')[0];
+  const render=()=>{
     if(!S.earnings.length){el.innerHTML='<div class="empty"><p>No upcoming earnings</p></div>';return}
     el.innerHTML=S.earnings.map(e=>`
     <div class="cal-item">
@@ -2920,17 +2917,24 @@ async function loadEarnings(){
       <span class="cal-detail">EPS Est: $${fmtP(e.epsEstimate||0)} | Rev Est: $${fmt(e.revenueEstimate||0)}</span>
       <span class="badge badge-b">${e.hour==='bmo'?'Pre-Market':e.hour==='amc'?'After-Hours':'--'}</span>
     </div>`).join('');
-  }catch(e){el.innerHTML='<div class="loading-text">Error loading earnings</div>'}
+  };
+  const unavailable='<div class="empty"><i class="fas fa-calendar-xmark"></i><p>Earnings unavailable</p><button class="btn btn-o btn-sm" style="margin-top:8px" onclick="loadEarnings()">Retry</button></div>';
+  if(CFG.V2){  // keyless via the gateway Worker (no Finnhub key needed on the client)
+    el.innerHTML='<div class="loading-text"><span class="spinner"></span>Loading earnings...</div>';
+    try{const data=await gw('/calendar/earnings',{from,to});S.earnings=((data&&data.earningsCalendar)||[]).slice(0,30);render();}
+    catch(e){el.innerHTML=unavailable}
+    return;
+  }
+  if(!S.fhKey){el.innerHTML='<div class="empty"><i class="fas fa-key"></i><p>Enter API key for earnings calendar</p></div>';return}
+  try{const data=await fh('/calendar/earnings',{from,to});S.earnings=(data.earningsCalendar||[]).slice(0,30);render();}
+  catch(e){el.innerHTML='<div class="loading-text">Error loading earnings</div>'}
 }
 
 async function loadIpos(){
   const el=$('ipoList');
-  if(!S.fhKey){el.innerHTML='<div class="empty"><i class="fas fa-key"></i><p>Enter API key for IPO calendar</p></div>';return}
-  try{
-    const now=new Date();const from=now.toISOString().split('T')[0];
-    const to=new Date(now.getTime()+30*86400000).toISOString().split('T')[0];
-    const data=await fh('/calendar/ipo',{from,to});
-    S.ipos=(data.ipoCalendar||[]).slice(0,20);
+  const now=new Date();const from=now.toISOString().split('T')[0];
+  const to=new Date(now.getTime()+30*86400000).toISOString().split('T')[0];
+  const render=()=>{
     if(!S.ipos.length){el.innerHTML='<div class="empty"><p>No upcoming IPOs</p></div>';return}
     el.innerHTML=S.ipos.map(i=>`
     <div class="cal-item">
@@ -2939,7 +2943,17 @@ async function loadIpos(){
       <span class="cal-detail">${i.symbol||'--'} | Shares: ${fmt(i.numberOfShares||0)} | Price: $${fmtP(i.price||0)}</span>
       <span class="badge badge-a">${esc(i.status||'--')}</span>
     </div>`).join('');
-  }catch(e){el.innerHTML='<div class="loading-text">Error loading IPOs</div>'}
+  };
+  const unavailable='<div class="empty"><i class="fas fa-calendar-xmark"></i><p>IPO calendar unavailable</p><button class="btn btn-o btn-sm" style="margin-top:8px" onclick="loadIpos()">Retry</button></div>';
+  if(CFG.V2){  // keyless via the gateway Worker
+    el.innerHTML='<div class="loading-text"><span class="spinner"></span>Loading IPOs...</div>';
+    try{const data=await gw('/calendar/ipo',{from,to});S.ipos=((data&&data.ipoCalendar)||[]).slice(0,20);render();}
+    catch(e){el.innerHTML=unavailable}
+    return;
+  }
+  if(!S.fhKey){el.innerHTML='<div class="empty"><i class="fas fa-key"></i><p>Enter API key for IPO calendar</p></div>';return}
+  try{const data=await fh('/calendar/ipo',{from,to});S.ipos=(data.ipoCalendar||[]).slice(0,20);render();}
+  catch(e){el.innerHTML='<div class="loading-text">Error loading IPOs</div>'}
 }
 
 /* ═══════════════════════════════════════════════════════════════

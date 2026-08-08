@@ -70,6 +70,19 @@ export default {
         return okData(request, env, r.data, { source: r.source, ageMs: r.ageMs });
       }
 
+      // ── Calendars (earnings / IPO) — gateway-served so the client needs no Finnhub key ──
+      if (p === "/calendar/earnings" || p === "/calendar/ipo") {
+        const isIpo = p.endsWith("/ipo");
+        const today = new Date().toISOString().slice(0, 10);
+        const from = url.searchParams.get("from") || today;
+        const to = url.searchParams.get("to") ||
+          new Date(Date.now() + (isIpo ? 30 : 14) * 86400000).toISOString().slice(0, 10);
+        const key = `${isIpo ? "ipo" : "earn"}:${from}:${to}`;
+        const fetcher = isIpo ? () => finnhub.ipo(from, to, env) : () => finnhub.earnings(from, to, env);
+        const r = await getOrFetch(env.META_CACHE, key, +env.CALENDAR_TTL_SEC || 3600, fetcher);
+        return okData(request, env, r.data, { source: r.source, ageMs: r.ageMs });
+      }
+
       // ── Phase 2 stub ──
       if (p === "/finnhub-webhook" && request.method === "POST") {
         return await handleFinnhubWebhook(request, env, ctx);

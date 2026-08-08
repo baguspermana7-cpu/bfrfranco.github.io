@@ -13,6 +13,21 @@ release sections rather than semver.
 
 ---
 
+## v1.126.5 — 2026-08-08 (Finance Terminal — Earnings/IPO keyless via gateway Worker)
+
+Closes the "Also Earnings/IPO sub-tabs" half of bug B-008. News/quotes already ran through the
+deployed gateway Worker; Earnings + IPO were still hard-gated behind a client Finnhub key modal.
+
+### Fixed
+- **Earnings + IPO calendars now keyless** — `loadEarnings`/`loadIpos` (`Apps/finance-terminal/`)
+  route through the V2 gateway (`gw('/calendar/earnings'|'/calendar/ipo')`) first, with a graceful
+  "unavailable · Retry" empty-state; the `fh()` key-gated path stays as a fallback. Verified: the tabs
+  no longer demand an API key (puppeteer).
+- **Gateway Worker** (`cf-worker/src/index.js`): added `/calendar/earnings` + `/calendar/ipo` routes
+  → `finnhub.earnings/ipo` (handlers already existed) with server-side from/to defaults + META_CACHE
+  (1h TTL). **Requires `wrangler deploy` to activate** — until deployed, the tabs show the graceful
+  empty-state instead of live data (frontend is deploy-ready).
+
 ## v1.126.4 — 2026-08-07 (Second Brain — docs/standards semantic layer, free cloud extraction)
 
 ### Added
