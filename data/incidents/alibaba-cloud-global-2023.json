@@ -1,0 +1,298 @@
+{
+ "id": "inc-alibaba-cloud-global-2023-11-12",
+ "slug": "alibaba-cloud-global-2023",
+ "title": "Alibaba Cloud Global All-Region Outage — Auth Control-Plane Failure",
+ "operator": "Alibaba Cloud",
+ "operatorShort": "Alibaba Cloud",
+ "date": "2023-11-12",
+ "durationMin": 207,
+ "dcName": "Global control plane (Auth/IAM) — all regions",
+ "location": {
+  "city": "Hangzhou",
+  "country": "China",
+  "region": "All global regions (simultaneous)",
+  "az": "Multiple AZs worldwide; East China 1 (Hangzhou) and North China 2 (Beijing) recovered first"
+ },
+ "category": [
+  "software",
+  "config-error",
+  "control-plane",
+  "authentication"
+ ],
+ "severity": {
+  "usersAffected": "Not quantified by Alibaba; consumer apps Taobao, Xianyu and DingTalk crashed (each with hundreds of millions of users) but no user figure was disclosed",
+  "impactUsd": "Not disclosed; only SLA voucher compensation of 25-30% of monthly service fees was offered",
+  "servicesDown": [
+   "Object Storage Service (OSS)",
+   "Table Store (OTS)",
+   "Log Service (SLS)",
+   "Message Notification Service (MNS)",
+   "Cloud consoles / management console",
+   "Management APIs (OpenAPI)"
+  ],
+  "tier": "Tier 1 — global multi-region control-plane outage"
+ },
+ "brief": "On 12 November 2023 Alibaba Cloud's shared global authentication/authorization (Auth) control plane failed, and from 17:44 to 21:11 China Standard Time every global region simultaneously lost console and API access. Auth-dependent services (OSS, OTS, SLS, MNS) went down, crashing consumer apps such as Taobao and DingTalk, while compute/network data planes (ECS, RDS instances) that use their own credentials kept running. Alibaba officially acknowledged only an 'anomaly' in console and API access and published no root-cause post-mortem; the Auth-control-plane mechanism is an independent inference corroborated by the service-failure pattern.",
+ "magnitude": {
+  "usersScore": 8,
+  "financialScore": 5,
+  "durationScore": 5,
+  "blastRadiusScore": 9,
+  "note": "Blast radius scored 9 because all global regions failed simultaneously (East Asia, Southeast Asia, Middle East, North America) — the signature of a single shared control-plane component, per Vonng. Users score 8: flagship apps Taobao/Xianyu/DingTalk crashed but Alibaba disclosed no user count. Financial 5: only SLA vouchers (25-30% of monthly fees) disclosed, no dollar impact. Duration 5: 3.5 hours (207 min); East China 1 and North China 2 recovered in ~1 hour, other AZs ~3 hours (Vonng)."
+ },
+ "sequenceOfEvents": [
+  {
+   "t": "2023-11-12 17:44 CST (UTC+8)",
+   "phase": "TRIGGER",
+   "event": "The shared global Auth/permission control plane begins returning errors; console and OpenAPI calls start failing simultaneously across every Alibaba Cloud region. Vonng (Feng Ruohang) fixes the outage window start at 17:44.",
+   "source": "https://blog.vonng.com/en/cloud/aliyun/"
+  },
+  {
+   "t": "2023-11-12 ~17:44 CST",
+   "phase": "DETECTION",
+   "event": "Alibaba Cloud monitoring detects an 'anomaly' in cloud product console access and API calls across regions — the only cause Alibaba publicly acknowledged.",
+   "source": "https://technode.com/2023/11/13/alibaba-cloud-suffers-second-outage-in-a-year-causing-major-apps-to-crash/"
+  },
+  {
+   "t": "2023-11-12 ~17:45 CST",
+   "phase": "IMPACT",
+   "event": "Object Storage Service (OSS) HTTP API calls fail: OSS requires AK/SK/IAM signature verification against the Auth component, which is now unavailable. Exact minute not individually disclosed (interpolated).",
+   "source": "https://blog.vonng.com/en/cloud/aliyun/"
+  },
+  {
+   "t": "2023-11-12 ~17:50 CST",
+   "phase": "CASCADE",
+   "event": "Table Store (OTS), Log Service (SLS) and Message Notification Service (MNS) fail because they share the same Auth dependency; ECS, RDS running instances and networking keep operating on their own built-in credentials.",
+   "source": "https://blog.vonng.com/en/cloud/aliyun/"
+  },
+  {
+   "t": "2023-11-12 ~17:50 CST",
+   "phase": "IMPACT",
+   "event": "Cloud consoles and management APIs (OpenAPI) become unusable worldwide; customers cannot log in, view, or manage their resources even where data planes still run.",
+   "source": "https://finance.yahoo.com/news/alibaba-cloud-suffers-second-outage-071836116.html"
+  },
+  {
+   "t": "2023-11-12 ~18:00 CST",
+   "phase": "CASCADE",
+   "event": "Downstream consumer applications break as they lose object storage and auth: Taobao (shopping), Xianyu/Idle Fish (resale) and DingTalk (work collaboration) briefly crash for users.",
+   "source": "https://technode.com/2023/11/13/alibaba-cloud-suffers-second-outage-in-a-year-causing-major-apps-to-crash/"
+  },
+  {
+   "t": "2023-11-12 ~18:00 CST",
+   "phase": "CASCADE",
+   "event": "Dependent payment, messaging and delivery/logistics systems degrade as their storage and notification back-ends stay unreachable.",
+   "source": "https://blog.vonng.com/en/cloud/aliyun/"
+  },
+  {
+   "t": "2023-11-12 ~18:10 CST",
+   "phase": "IMPACT",
+   "event": "Blast radius confirmed to span all major geographies — East Asia, Southeast Asia, the Middle East and North America — simultaneously, indicating a cross-regional shared component rather than a local fault.",
+   "source": "https://finance.yahoo.com/news/alibaba-cloud-suffers-second-outage-071836116.html"
+  },
+  {
+   "t": "2023-11-12 ~18:20 CST",
+   "phase": "MITIGATION",
+   "event": "Engineers work to restore the Auth/permission service; Alibaba published no play-by-play, so the specific remediation steps (e.g. rolling back the permission/blacklist change) are not officially disclosed (timestamp interpolated).",
+   "source": "https://blog.vonng.com/en/cloud/aliyun/"
+  },
+  {
+   "t": "2023-11-12 ~18:44 CST",
+   "phase": "RECOVERY",
+   "event": "Hangzhou (East China 1, HQ region) and Beijing (North China 2) recover first — in roughly one hour — well ahead of other regions, per Vonng's regional-recovery analysis.",
+   "source": "https://blog.vonng.com/en/cloud/aliyun/"
+  },
+  {
+   "t": "2023-11-12 ~19:30 CST",
+   "phase": "RECOVERY",
+   "event": "Remaining availability zones stay impaired; Vonng notes other AZs took about three hours (versus one hour for the two headquarters regions) to come back (timestamp interpolated).",
+   "source": "https://blog.vonng.com/en/cloud/aliyun/"
+  },
+  {
+   "t": "2023-11-12 ~20:30 CST",
+   "phase": "RECOVERY",
+   "event": "OSS/OTS/SLS/MNS progressively restored across the remaining global regions as Auth stabilises; exact per-region timestamps not published (interpolated).",
+   "source": "https://blog.vonng.com/en/cloud/aliyun/"
+  },
+  {
+   "t": "2023-11-12 21:11 CST",
+   "phase": "RESTORED",
+   "event": "All global regions restored; total outage window 17:44-21:11, about 3.5 hours (207 minutes).",
+   "source": "https://blog.vonng.com/en/cloud/aliyun/"
+  },
+  {
+   "t": "2023-11-13",
+   "phase": "RESTORED",
+   "event": "Alibaba Cloud publicly attributes the incident only to a console/API 'anomaly' and issues no detailed root-cause post-mortem; Vonng states Alibaba 'refuses to publish a post-mortem report.'",
+   "source": "https://blog.vonng.com/en/cloud/aliyun/"
+  },
+  {
+   "t": "2023-11-13",
+   "phase": "IMPACT",
+   "event": "Aftermath: the 3.5-hour outage pulls affected products' monthly availability down to 99.5%, triggering SLA compensation of 25-30% of monthly service fees in vouchers.",
+   "source": "https://blog.vonng.com/en/cloud/aliyun/"
+  },
+  {
+   "t": "2023-11-27 09:16-10:58 CST",
+   "phase": "CASCADE",
+   "event": "Follow-on outage 15 days later: console and OpenAPI access to database products (PostgreSQL, Redis, MySQL) fails for ~1 hour 42 minutes across eight regions incl. Beijing, Shanghai, Hong Kong and Virginia — a second console/API control-plane failure in a month.",
+   "source": "https://finance.yahoo.com/news/alibaba-cloud-suffers-second-outage-071836116.html"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Outage duration",
+   "value": "~3.5 hours (207 min), 17:44-21:11 CST",
+   "source": "https://blog.vonng.com/en/cloud/aliyun/"
+  },
+  {
+   "label": "Regions affected",
+   "value": "All global regions simultaneously (East Asia, SE Asia, Middle East, North America)",
+   "source": "https://finance.yahoo.com/news/alibaba-cloud-suffers-second-outage-071836116.html"
+  },
+  {
+   "label": "Fast vs slow recovery",
+   "value": "East China 1 & North China 2 ~1 hour; other AZs ~3 hours",
+   "source": "https://blog.vonng.com/en/cloud/aliyun/"
+  },
+  {
+   "label": "Monthly availability impact",
+   "value": "Dropped to 99.5% for affected products",
+   "source": "https://blog.vonng.com/en/cloud/aliyun/"
+  },
+  {
+   "label": "SLA compensation",
+   "value": "25-30% of monthly service fees in vouchers",
+   "source": "https://blog.vonng.com/en/cloud/aliyun/"
+  },
+  {
+   "label": "Core services down",
+   "value": "OSS, OTS, SLS, MNS + consoles & OpenAPI",
+   "source": "https://blog.vonng.com/en/cloud/aliyun/"
+  },
+  {
+   "label": "Follow-on outage (27 Nov 2023)",
+   "value": "~1 hour 42 min (09:16-10:58 Beijing time), database OpenAPI, 8 regions",
+   "source": "https://finance.yahoo.com/news/alibaba-cloud-suffers-second-outage-071836116.html"
+  },
+  {
+   "label": "Financial impact (USD)",
+   "value": "Not disclosed",
+   "source": "https://blog.vonng.com/en/cloud/aliyun/"
+  },
+  {
+   "label": "Users affected (count)",
+   "value": "Not disclosed by Alibaba",
+   "source": "https://technode.com/2023/11/13/alibaba-cloud-suffers-second-outage-in-a-year-causing-major-apps-to-crash/"
+  }
+ ],
+ "rootCause": "Immediate mechanism (officially acknowledged, thinly): Alibaba Cloud attributed the outage to an \"anomaly\" in cloud-product console access and API (OpenAPI) calls. It published no detailed root-cause report, so the precise triggering config or command is not officially confirmed. What is verifiable is the blast-radius signature: every global region failed at the same instant, which can only be caused by a single cross-regional shared component. Independent analysis by Feng Ruohang (Vonng), corroborated by which services died and which survived, points to the shared global authentication/authorization (Auth/IAM) control plane as that component.\n\nFailure pattern by dependency: services that call Alibaba's HTTP APIs and must present an AK/SK/IAM signature for every request — OSS (object storage), OTS (Table Store), SLS (Log Service), MNS — all failed, because signature verification depends on Auth. Services with their own built-in credentials that do not round-trip through the cloud Auth layer on the data path — ECS instances, RDS instances, networking — kept running. The consoles and management APIs, which authenticate every operator action through the same Auth layer, were globally unusable. This clean split is the strongest evidence that Auth, not power, network or storage hardware, was the failed component.\n\nReconstructed circular-dependency (unconfirmed, flagged as rumor by Vonng): the permission system pushed a blacklist rule; the blacklist was stored on OSS; reading OSS required a permission check; the permission system in turn needed to read OSS — a deadlock in which the control plane could not recover because it depended on the very service it gates. Alibaba never confirmed this, so it must be treated as a plausible reconstruction, not fact.\n\nLatent / organisational root: (1) a single globally-shared Auth control plane with no regional isolation or blast-radius containment, so one bad change or deadlock took down every region at once; (2) a circular dependency between the control plane and the object store it protects, with no break-glass path independent of that store; (3) change management around a high-risk shared component the day after the Double 11 peak; and (4) the absence of a published post-mortem, itself an organisational failure that leaves customers unable to assess residual risk. A safeguard that should have caught it: staged/regional rollout of Auth changes with automatic blast-radius limits, plus a bootstrap path for the permission service that does not require the gated storage.",
+ "contributingFactors": [
+  "Single globally-shared Auth/IAM control plane with no regional isolation — one fault propagated to every region simultaneously",
+  "Circular dependency: the permission/Auth service depended on OSS, while OSS access required a permission check (reconstructed deadlock, unconfirmed by Alibaba)",
+  "Every management-plane operation (console + OpenAPI) authenticated through the same failed component, so operators lost the tools needed to diagnose and remediate",
+  "Change occurred immediately after the Double 11 peak — a high-risk change window with holiday staffing",
+  "No published root-cause post-mortem, leaving the exact triggering change and safeguards unverified",
+  "A recurring pattern: a near-identical console/OpenAPI control-plane failure hit database products 15 days later (27 Nov 2023)"
+ ],
+ "coe": [
+  {
+   "action": "Publish a detailed root-cause post-mortem for the 12 Nov global outage",
+   "owner": "Alibaba Cloud",
+   "status": "Not done — no official post-mortem released (per Vonng)"
+  },
+  {
+   "action": "Regionally isolate the Auth/IAM control plane so a single change cannot fail all regions at once",
+   "owner": "Alibaba Cloud (recommended, independently derived)",
+   "status": "Not disclosed"
+  },
+  {
+   "action": "Remove the circular dependency between the permission service and OSS; add a bootstrap/break-glass path independent of gated storage",
+   "owner": "Alibaba Cloud (recommended)",
+   "status": "Not disclosed"
+  },
+  {
+   "action": "Enforce staged/canary rollout with automatic blast-radius limits for shared control-plane changes",
+   "owner": "Alibaba Cloud (recommended)",
+   "status": "Not disclosed"
+  },
+  {
+   "action": "Freeze high-risk shared-component changes during and immediately after peak events (Double 11)",
+   "owner": "Alibaba Cloud (recommended)",
+   "status": "Not disclosed"
+  },
+  {
+   "action": "Provide SLA voucher compensation (25-30% of monthly fees) to affected customers",
+   "owner": "Alibaba Cloud",
+   "status": "Done"
+  }
+ ],
+ "lessonsLearnt": [
+  "A shared global control plane is a single point of failure for the whole cloud — Auth failing simultaneously across all regions is the defining symptom of missing regional isolation",
+  "Circular dependencies between the control plane and the storage it protects can create unrecoverable deadlocks; control-plane bootstrap must never depend on a gated data service",
+  "Data plane and control plane fail independently: ECS/RDS instances kept serving while consoles and Auth-dependent services died — resilience must be reasoned about per plane",
+  "Losing the management console and OpenAPI globally removes the operators' own tooling, lengthening time-to-recover",
+  "Silence is a cost: refusing to publish a post-mortem damages customer trust and repeats within weeks (the 27 Nov database-API outage)",
+  "Peak-adjacent change windows (day after Double 11) concentrate risk when staffing and attention are stretched"
+ ],
+ "improvements": [
+  "Partition the Auth/IAM control plane per region (or per cell) so no single change or deadlock can affect all regions simultaneously",
+  "Break the Auth-to-OSS circular dependency; give the permission service a self-contained bootstrap store and an out-of-band break-glass access path",
+  "Adopt staged/canary rollouts for all shared control-plane changes, with automated blast-radius caps and fast automatic rollback",
+  "Provide an out-of-band management path (console + OpenAPI emergency access) that does not authenticate through the same Auth layer, so operators retain tooling during an Auth outage",
+  "Institutionalise transparent public post-mortems for major incidents so customers can assess residual risk",
+  "Freeze high-risk shared-component changes during and immediately after peak events such as Double 11"
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "Simultaneous all-region failure",
+   "body": "every global region degraded at 17:44 CST, which is only physically possible if a single cross-regional shared dependency failed. That rules out localised power, network or storage-hardware faults and points to a globally-shared control-plane service."
+  },
+  {
+   "heading": "Service-survival split",
+   "body": "Auth-gated request-path services (OSS, OTS, SLS, MNS) and all management-plane operations (console, OpenAPI) failed, while data-plane workloads holding their own credentials (running ECS and RDS instances, networking) continued. This is the signature of an authentication/authorization component failure, not a data-plane failure."
+  },
+  {
+   "heading": "Minimal official disclosure",
+   "body": "an 'anomaly' in console and API access — and no post-mortem followed, so the exact trigger (a config push, a certificate/permission change, or the rumored blacklist deadlock) remains unconfirmed. The dossier therefore separates verified facts (window, service split, recovery order, compensation) from the inferred mechanism (Auth) and the rumored deadlock (blacklist-on-OSS)."
+  },
+  {
+   "heading": "Near-identical follow-on outage",
+   "body": "The near-identical follow-on outage on 27 Nov 2023 (database console/OpenAPI across eight regions for ~1h42m) shows the control-plane fragility was systemic rather than a one-off, reinforcing the regional-isolation and change-management findings."
+  },
+  {
+   "heading": "Timing amplified reputational cost",
+   "body": "the failure landed the day after the Double 11 peak and took down consumer flagships (Taobao, Xianyu, DingTalk), making an internal cloud fault immediately visible to hundreds of millions of end users."
+  }
+ ],
+ "technicalDeepDive": "Alibaba Cloud's request path for HTTP-API services (OSS, OTS, SLS, MNS) requires every call to carry an AK/SK-derived signature that is validated against a central authentication/authorization (Auth/IAM) service before the request is served. When that Auth service began returning errors at 17:44 CST on 12 Nov 2023, signature verification failed everywhere at once, so all Auth-gated services returned errors globally while the console and OpenAPI — which authenticate each operator action through the same layer — became unusable. Crucially, already-running compute and database instances (ECS, RDS) and the network data plane hold their own credentials and do not re-validate against cloud Auth on the data path, which is why they kept serving traffic throughout. Because the Auth control plane was a single globally-shared component with no regional isolation, there was no blast-radius boundary to contain the fault. The unconfirmed but widely-circulated deadlock theory (Vonng flags it as rumor) explains why recovery was slow rather than instantaneous: a newly-pushed permission/blacklist rule was persisted in OSS, but reading that rule required a permission check, and the permission service in turn needed OSS — a circular dependency with no bootstrap path independent of the gated store. The observed recovery order (Hangzhou/East China 1 and Beijing/North China 2 back in ~1 hour, other AZs ~3 hours) is consistent with the two headquarters regions holding a more direct or manually-restorable path to the Auth/OSS bootstrap. The correct architectural fixes are regional/cell partitioning of Auth, a self-contained bootstrap store plus out-of-band break-glass access for the permission service, and staged rollouts with automated blast-radius caps.",
+ "references": [
+  {
+   "title": "Learning from Alibaba Cloud's Global Outage (阿里云史诗级大翻车) — analysis by Feng Ruohang (Vonng)",
+   "url": "https://blog.vonng.com/en/cloud/aliyun/",
+   "type": "analysis",
+   "quote": "OSS, OTS, SLS, MNS and other products' services were affected, while most products like ECS, RDS, networking etc. were not affected... Alibaba Cloud refuses to publish a post-mortem report... compensation of 25% ~ 30% of monthly service fees in vouchers; availability dropped to 99.5%. Hangzhou (East China 1) and Beijing (North China 2) recovered in one hour while other AZs took three hours. The most likely cross-regional shared component is Auth.",
+   "accessed": "2026-08-08"
+  },
+  {
+   "title": "Alibaba Cloud suffers second outage in a year, causing major apps to crash",
+   "url": "https://technode.com/2023/11/13/alibaba-cloud-suffers-second-outage-in-a-year-causing-major-apps-to-crash/",
+   "type": "news",
+   "quote": "Alibaba Cloud attributed the incident to an \"anomaly\" in the cloud product console access and API calls. Affected apps included Taobao, DingTalk, and Xianyu (Idle Fish); the outage lasted over three hours, one day after the Singles Day shopping event concluded.",
+   "accessed": "2026-08-08"
+  },
+  {
+   "title": "Alibaba Cloud suffers second outage in weeks (Reuters, via Yahoo Finance)",
+   "url": "https://finance.yahoo.com/news/alibaba-cloud-suffers-second-outage-071836116.html",
+   "type": "news",
+   "quote": "On Nov 27 2023, database products (PostgreSQL, Redis, MySQL editions) had console and OpenAPI access fail from 09:16 to 10:58 Beijing time across eight regions including Beijing, Shanghai, Hong Kong and Virginia. The Nov 12 outage spanned East Asia, Southeast Asia, the Middle East and North America.",
+   "accessed": "2026-08-08"
+  }
+ ],
+ "sourcing": {
+  "confidence": "medium",
+  "lastVerified": "2026-08-08",
+  "officialPostmortem": false,
+  "referenceCount": 3
+ },
+ "lastUpdated": "2026-08-08"
+}

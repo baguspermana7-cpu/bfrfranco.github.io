@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS EBS Re-Mirroring Storm and Stuck Volumes in US-East-1 | ResistanceZero</title>
+    <meta name="description" content="A routine network-capacity upgrade in one US-East-1 Availability Zone was executed incorrectly, shifting EBS traffic onto a low-capacity redundant network and isolating a large blo">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="ai-content-declaration" content="human-curated, sourced from public post-incident reports">
+    <meta name="author" content="Bagus Dwi Permana">
+    <link rel="canonical" href="https://resistancezero.com/incident-aws-ebs-ec2-rds-us-east-1-2011.html">
+    <meta name="theme-color" content="#0c1512">
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..600&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+    <style>
+    /* ── Governed Incident Dossier — editorial register (v2): forest-green + warm ivory,
+       serif display, evidence-class provenance. Accent vars remapped so all components
+       re-skin. AA-contrast in both themes. No gradients / glass / dot-grid (anti-slop). */
+    :root:not([data-theme="dark"]) {
+        --bg:#f4f1e7; --surface:#fffdf6; --surface-2:#efeadc; --line:rgba(26,45,36,0.16);
+        --text:#1a2d24; --text-strong:#10201a; --text-body:#3b463d; --muted:#6a7367;
+        --cyan:#2f6b4f; --amber:#87671b; --green:#2f7d54; --red:#9c3b32; --gold:#87671b;
+        --hero-ink:#f4f1e7; --hero-bg:#183329; --shadow-deep:rgba(26,45,36,0.10);
+    }
+    [data-theme="dark"] {
+        --bg:#0c1512; --surface:#11201a; --surface-2:#16281f; --line:rgba(233,229,216,0.15);
+        --text:#e9e5d8; --text-strong:#f5f2e9; --text-body:#c6ccbc; --muted:#8b9484;
+        --cyan:#6aa588; --amber:#c9a559; --green:#6aa588; --red:#cf9384; --gold:#c9a559;
+        --hero-ink:#e9e5d8; --hero-bg:#0f221a; --shadow-deep:rgba(0,0,0,0.5);
+    }
+    * { box-sizing:border-box; }
+    html,body { margin:0; padding:0; }
+    body { background:var(--bg); color:var(--text); font-family:'IBM Plex Sans',system-ui,sans-serif; line-height:1.62; }
+    a { color:var(--cyan); }
+    h1,h2,.serif { font-family:'Fraunces','Newsreader',Georgia,serif; font-weight:600; letter-spacing:-0.01em; }
+    .wrap { max-width:1120px; margin:0 auto; padding:1.5rem 1.1rem 3rem; }
+    .navbar { display:flex; align-items:center; justify-content:space-between; padding:0.7rem 1.1rem; border-bottom:1px solid var(--line); background:var(--surface); position:sticky; top:0; z-index:50; }
+    .nav-container { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:1120px; margin:0 auto; }
+    .nav-logo { display:flex; align-items:center; }
+    .nav-avatar { width:34px; height:34px; border-radius:50%; }
+    .nav-menu { display:flex; gap:1rem; list-style:none; margin:0; padding:0; }
+    .nav-menu a { color:var(--text-body); text-decoration:none; font-size:0.85rem; font-weight:600; }
+    .nav-menu a:hover { color:var(--cyan); }
+    .nav-right { display:flex; align-items:center; gap:0.6rem; }
+    .theme-btn { background:none; border:1px solid var(--line); color:var(--text); border-radius:4px; padding:0.35rem 0.5rem; cursor:pointer; font-size:0.8rem; }
+    .lock-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--red); border:1px solid var(--red); border-radius:2px; padding:0.12rem 0.5rem; }
+    h1 { font-size:2.4rem; color:var(--text-strong); margin:0.35rem 0 0.5rem; line-height:1.12; }
+    h2 { font-size:1.4rem; color:var(--text-strong); margin:2rem 0 0.7rem; }
+    .eyebrow { font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); }
+    .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
+    .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
+    .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:2px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    .chip.cyan { color:var(--cyan); border-left:2px solid var(--cyan); }
+    .chip.amber { color:var(--amber); border-left:2px solid var(--amber); }
+    .chip.green { color:var(--green); border-left:2px solid var(--green); }
+    .chip.red { color:var(--red); border-left:2px solid var(--red); }
+    .metabar { font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.04em; color:var(--muted); margin:0.7rem 0; display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; font-variant-numeric:tabular-nums slashed-zero; }
+    .metabar b { color:var(--text-body); font-weight:600; }
+    .metabar .sep { color:var(--line); }
+    .chip.muted { color:var(--muted); }
+    .card { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:1rem 1.1rem; margin-top:0.9rem; }
+    .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:4px; margin-top:0.9rem; }
+    table.inc-index { width:100%; border-collapse:collapse; font-size:0.86rem; min-width:760px; font-variant-numeric:tabular-nums slashed-zero; }
+    table.inc-index th { text-align:left; font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); background:var(--surface-2); }
+    table.inc-index td { padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); color:var(--text-body); vertical-align:top; }
+    table.inc-index tr:hover td { background:var(--surface-2); }
+    table.inc-index a { font-weight:700; color:var(--text-strong); text-decoration:none; }
+    table.inc-index a:hover { color:var(--cyan); text-decoration:underline; }
+    /* rich incident table (reference-2 style) */
+    table.itbl { min-width:1120px; }
+    table.itbl td { vertical-align:middle; }
+    .itr { cursor:pointer; }
+    .itr:hover td { background:var(--surface-2); }
+    .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
+    .c-title { max-width:300px; }
+    .c-title .itt { display:block; font-weight:700; color:var(--text-strong); text-decoration:none; font-size:0.9rem; line-height:1.2; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .itr:hover .itt { color:var(--cyan); }
+    .c-title .its { color:var(--muted); font-size:0.76rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:0.1rem; }
+    .sev-chip { font-family:'JetBrains Mono',monospace; font-size:0.66rem; font-weight:600; padding:0.12rem 0.5rem; border-radius:2px; border:1px solid; white-space:nowrap; }
+    .sev-b-critical { color:var(--red); border-color:var(--red); }
+    .sev-b-high { color:var(--amber); border-color:var(--amber); }
+    .sev-b-medium { color:var(--green); border-color:var(--green); }
+    .sev-b-low { color:var(--muted); border-color:var(--line); }
+    .st-chip { font-family:'JetBrains Mono',monospace; font-size:0.64rem; padding:0.12rem 0.45rem; border-radius:2px; border:1px solid var(--line); white-space:nowrap; }
+    .st-off { color:var(--green); border-color:color-mix(in srgb, var(--green) 45%, var(--line)); }
+    .st-press { color:var(--amber); border-color:color-mix(in srgb, var(--amber) 45%, var(--line)); }
+    .c-region { min-width:170px; }
+    .c-region .iflag { font-size:1.05rem; margin-right:0.45rem; vertical-align:middle; }
+    .c-region .ireg { display:inline-flex; flex-direction:column; vertical-align:middle; }
+    .c-region .ireg b { color:var(--text-body); font-weight:600; font-size:0.82rem; }
+    .c-region .ireg i { color:var(--muted); font-style:normal; font-size:0.72rem; }
+    .c-mono { font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--text-body); white-space:nowrap; }
+    .c-blast { color:var(--text-strong); font-weight:600; } .c-blast .c-u { color:var(--muted); font-weight:400; font-size:0.68rem; }
+    .ibars { display:inline-flex; gap:2px; }
+    .ibars i { width:7px; height:9px; border-radius:1px; display:block; }
+    .itags { display:flex; gap:0.25rem; max-width:150px; flex-wrap:wrap; }
+    .c-go { color:var(--muted); font-size:1rem; text-align:center; }
+    .itr:hover .c-go { color:var(--cyan); }
+    /* incident-view tabs (List / Risk map / Semantic / Analytics) */
+    .iv-tabs { display:flex; gap:1.2rem; border-bottom:1px solid var(--line); margin:0.4rem 0 0.2rem; flex-wrap:wrap; }
+    .iv-tabs a { font-family:'JetBrains Mono',monospace; font-size:0.74rem; letter-spacing:0.03em; color:var(--muted); text-decoration:none; padding:0.5rem 0.1rem; border-bottom:2px solid transparent; }
+    .iv-tabs a:hover { color:var(--text-strong); }
+    .iv-tabs a.on { color:var(--text-strong); border-bottom-color:var(--cyan); }
+    .rank-badge { font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--amber); font-variant-numeric:tabular-nums slashed-zero; }
+    .mag-bar { height:5px; border-radius:0; background:var(--line); margin-top:0.35rem; overflow:hidden; }
+    .mag-bar > span { display:block; height:4px; background:var(--amber); }
+    ul.tight { margin:0.4rem 0 0; padding-left:1.15rem; }
+    ul.tight li { color:var(--text-body); margin:0.3rem 0; font-size:0.92rem; }
+    .soe { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .soe li { display:grid; grid-template-columns:170px 1fr; gap:0.7rem; padding:0.5rem 0; border-bottom:1px solid var(--line); }
+    .soe time { font-family:'JetBrains Mono',monospace; font-size:0.76rem; color:var(--muted); font-variant-numeric:tabular-nums slashed-zero; }
+    .soe .ev { color:var(--text-body); font-size:0.9rem; }
+    .phase-chip { font-family:'JetBrains Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--amber); border:1px solid var(--line); border-radius:2px; padding:0.05rem 0.4rem; margin-right:0.4rem; white-space:nowrap; font-variant-numeric:tabular-nums; }
+    table.metrics { width:100%; border-collapse:collapse; font-size:0.88rem; font-variant-numeric:tabular-nums slashed-zero; }
+    table.metrics td { padding:0.5rem 0.7rem; border-bottom:1px solid var(--line); vertical-align:top; }
+    table.metrics .mlabel { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; width:38%; white-space:nowrap; }
+    table.metrics .mval { color:var(--text-body); }
+    .ca-block { background:var(--surface); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 2px 2px 0; padding:0.7rem 1rem; margin-top:0.7rem; }
+    .ca-block h3 { margin:0 0 0.3rem; font-size:0.92rem; color:var(--text-strong); }
+    .ca-block p { margin:0; color:var(--text-body); font-size:0.9rem; }
+    /* reading column — constrain prose to a comfortable measure, justified like RZ articles */
+    .reading-col { max-width:820px; margin:0 auto; }
+    .reading-col p.lede, .reading-col .card p, .reading-col .ca-block p, .reading-col ul.tight li { text-align:justify; -webkit-hyphens:auto; hyphens:auto; }
+    .card p { margin:0; }
+    .card > p + p, .card p + p { margin-top:0.7rem; }
+    .mag-trace { font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--text-body); background:var(--surface-2); border:1px solid var(--line); border-left:2px solid var(--cyan); border-radius:0 2px 2px 0; padding:0.5rem 0.7rem; margin-top:0.5rem; font-variant-numeric:tabular-nums slashed-zero; }
+    .mag-trace b { color:var(--text-strong); }
+    .imp-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.04em; text-transform:uppercase; color:var(--cyan); font-weight:700; margin-right:0.35rem; }
+    .coe-meta { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); background:var(--surface-2); border:1px solid var(--line); border-radius:2px; padding:0.05rem 0.4rem; margin-left:0.2rem; white-space:normal; }
+    /* FAQ / methodology */
+    details.faq { border:1px solid var(--line); border-radius:4px; background:var(--surface); margin:0.8rem 0 0.4rem; }
+    details.faq > summary { cursor:pointer; padding:0.7rem 0.9rem; font-family:'JetBrains Mono',monospace; font-size:0.74rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-strong); list-style:none; }
+    details.faq > summary::-webkit-details-marker { display:none; }
+    details.faq > summary::before { content:"+ "; color:var(--cyan); }
+    details.faq[open] > summary::before { content:"– "; }
+    details.faq .faq-body { padding:0 0.9rem 0.9rem; }
+    details.faq h4 { font-family:'Fraunces',Georgia,serif; font-size:0.98rem; color:var(--text-strong); margin:0.8rem 0 0.2rem; }
+    details.faq p, details.faq li { color:var(--text-body); font-size:0.88rem; }
+    /* share bar (RZ standard) — editorial thin buttons */
+    .share-buttons { display:flex; align-items:center; gap:0.5rem; margin:1.4rem 0 0.4rem; padding-top:1rem; border-top:1px solid var(--line); }
+    .share-label { font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin-right:0.2rem; }
+    .share-btn { width:32px; height:32px; display:inline-flex; align-items:center; justify-content:center; background:var(--surface-2); border:1px solid var(--line); border-radius:4px; color:var(--text-body); cursor:pointer; padding:0; }
+    .share-btn:hover { border-color:var(--cyan); color:var(--cyan); }
+    .share-btn svg { width:15px; height:15px; }
+    /* ── inline-SVG visualizations (theme-aware via vars) ── */
+    .inc-map { height:410px; margin-top:0.4rem; border:1px solid var(--line); border-radius:4px; overflow:hidden; background:#0f1a16; z-index:1; }
+    .inc-map .leaflet-container { background:#0f1a16; font-family:'IBM Plex Sans',sans-serif; }
+    .inc-map .leaflet-popup-content-wrapper { background:#12211b !important; color:#e6efe9 !important; border:1px solid #2c4438 !important; border-radius:10px !important; box-shadow:0 8px 24px rgba(0,0,0,0.45) !important; }
+    .inc-map .leaflet-popup-tip { background:#12211b !important; border:1px solid #2c4438 !important; }
+    .inc-map .leaflet-popup-content { margin:9px 12px !important; }
+    .inc-map .leaflet-control-attribution { background:rgba(15,26,22,0.8) !important; color:#7d8f86 !important; font-size:9px !important; }
+    .inc-map .leaflet-control-attribution a { color:#9fb3a8 !important; }
+    .inc-map .leaflet-bar a { background:#12211b !important; color:#cfe0d7 !important; border-color:#2c4438 !important; }
+    .leaflet-tooltip.inc-tip { background:#12211b; color:#e6efe9; border:1px solid #2c4438; border-radius:3px; font-family:'JetBrains Mono',monospace; font-size:0.66rem; padding:2px 7px; box-shadow:0 6px 18px rgba(0,0,0,0.5); }
+    .leaflet-tooltip.inc-tip:before { border-top-color:#2c4438; }
+    /* ── Incident Intelligence dashboard (editorial, no neon) ── */
+    .iid { margin:1.4rem 0 1rem; }
+    .iid-head { display:flex; align-items:flex-end; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin-bottom:0.9rem; }
+    .iid-title { font-size:1.6rem; margin:0; color:var(--text-strong); }
+    .iid-sub { margin:0.15rem 0 0; color:var(--muted); font-size:0.86rem; }
+    .iid-range { font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.05em; color:var(--muted); border:1px solid var(--line); border-radius:3px; padding:0.3rem 0.6rem; white-space:nowrap; }
+    .iid-num { font-variant-numeric:tabular-nums slashed-zero; }
+    .iid-kpis { display:grid; grid-template-columns:repeat(5,1fr); gap:0.7rem; margin-bottom:0.9rem; }
+    .iid-kpi { background:var(--surface); border:1px solid var(--line); border-top:2px solid var(--cyan); border-radius:0 0 4px 4px; padding:0.75rem 0.85rem; transition:transform 0.18s ease, box-shadow 0.18s ease; }
+    .iid-kpi:hover { transform:translateY(-2px); box-shadow:0 10px 24px var(--shadow-deep); }
+    .iid-kpi-l { font-family:'JetBrains Mono',monospace; font-size:0.62rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); }
+    .iid-kpi-v { display:flex; align-items:baseline; gap:0.3rem; margin:0.25rem 0 0.15rem; }
+    .iid-kpi-v .iid-num, .iid-kpi-v > span:first-child { font-family:'Fraunces',Georgia,serif; font-size:1.8rem; font-weight:600; color:var(--text-strong); line-height:1; }
+    .iid-kpi-u { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .iid-kpi-s { font-size:0.72rem; color:var(--muted); }
+    .iid-grid { display:grid; grid-template-columns:290px 1fr 300px; gap:0.9rem; align-items:start; }
+    .iid-col-l, .iid-col-c, .iid-col-r { display:flex; flex-direction:column; gap:0.9rem; min-width:0; }
+    .iid-panel { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0.85rem 0.95rem; }
+    .iid-panel-map { padding:0.85rem 0.95rem 0.6rem; }
+    .iid-panel-map .inc-map { height:360px; margin-top:0.5rem; }
+    .iid-ph { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin-bottom:0.5rem; }
+    .iid-note { font-size:0.74rem; color:var(--muted); margin:0 0 0.5rem; }
+    .iid-donut-wrap { display:flex; align-items:center; gap:0.9rem; }
+    .iid-donut { width:130px; height:130px; flex:0 0 auto; }
+    .iid-arc { transition:stroke-dasharray 0.9s cubic-bezier(0.22,1,0.36,1); }
+    .iid-donut-c { font-family:'Fraunces',Georgia,serif; font-size:19px; font-weight:600; fill:var(--text-strong); }
+    .iid-donut-t { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.1em; text-transform:uppercase; fill:var(--muted); }
+    .iid-legend { list-style:none; margin:0; padding:0; flex:1; min-width:0; }
+    .iid-legend li { display:flex; align-items:center; gap:0.45rem; font-size:0.82rem; color:var(--text-body); padding:0.16rem 0; }
+    .iid-legend b { margin-left:auto; color:var(--text-strong); font-family:'JetBrains Mono',monospace; font-size:0.82rem; }
+    .iid-legend .iid-pct { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.72rem; width:2.4em; text-align:right; }
+    .iid-dot { width:9px; height:9px; border-radius:50%; flex:0 0 auto; }
+    .iid-catbars, .iid-durbars, .iid-sigs { list-style:none; margin:0; padding:0; }
+    .iid-catbars li, .iid-durbars li, .iid-sigs li { display:grid; grid-template-columns:1fr 90px auto; align-items:center; gap:0.5rem; padding:0.24rem 0; font-size:0.82rem; }
+    .iid-sigs li { grid-template-columns:1fr 64px auto auto; }
+    .iid-catbars li { cursor:pointer; }
+    .iid-catbars li:hover .iid-cbl { color:var(--cyan); }
+    .iid-cbl, .iid-dbl, .iid-sig-n { color:var(--text-body); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .iid-cbar, .iid-dbar, .iid-sig-bar { height:7px; background:var(--surface-2); border-radius:0; overflow:hidden; }
+    .iid-cbar i, .iid-sig-bar i { display:block; height:100%; width:var(--w); background:var(--amber); transform:scaleX(0); transform-origin:left; transition:transform 0.9s cubic-bezier(0.22,1,0.36,1); }
+    .iid-dbar i { display:block; height:100%; width:var(--w); background:var(--cyan); transform:scaleX(0); transform-origin:left; transition:transform 0.9s cubic-bezier(0.22,1,0.36,1); }
+    .iid-in .iid-cbar i, .iid-in .iid-dbar i, .iid-in .iid-sig-bar i { transform:scaleX(1); }
+    .iid-catbars b, .iid-durbars b, .iid-sigs b { font-family:'JetBrains Mono',monospace; color:var(--text-strong); font-size:0.82rem; text-align:right; }
+    .iid-durbars b { color:var(--muted); }
+    .iid-sig-m { font-family:'JetBrains Mono',monospace; font-size:0.66rem; color:var(--muted); }
+    .iid-recent { display:flex; flex-direction:column; }
+    .iid-rec { display:flex; align-items:center; gap:0.55rem; padding:0.45rem 0; border-bottom:1px solid var(--line); text-decoration:none; }
+    .iid-rec:last-child { border-bottom:none; }
+    .iid-rec-sev { width:8px; height:8px; border-radius:50%; flex:0 0 auto; }
+    .iid-rec-b { display:flex; flex-direction:column; min-width:0; flex:1; }
+    .iid-rec-t { color:var(--text-strong); font-size:0.84rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .iid-rec:hover .iid-rec-t { color:var(--cyan); }
+    .iid-rec-m { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.68rem; }
+    .iid-rec-tag { font-family:'JetBrains Mono',monospace; font-size:0.58rem; letter-spacing:0.04em; padding:0.1rem 0.35rem; border:1px solid var(--line); border-radius:2px; flex:0 0 auto; }
+    .sev-critical { background:var(--red); } .iid-rec-tag.sev-critical { color:var(--red); background:transparent; border-color:var(--red); }
+    .sev-high { background:var(--amber); } .iid-rec-tag.sev-high { color:var(--amber); background:transparent; border-color:var(--amber); }
+    .sev-medium { background:var(--green); } .iid-rec-tag.sev-medium { color:var(--green); background:transparent; border-color:var(--green); }
+    .sev-low { background:var(--muted); } .iid-rec-tag.sev-low { color:var(--muted); background:transparent; border-color:var(--line); }
+    .iid-graph { width:100%; height:auto; display:block; }
+    .iid-edge { stroke:var(--line); stroke-width:1; opacity:0.55; transition:stroke 0.15s, opacity 0.15s; }
+    .iid-edge.on { stroke:var(--cyan); opacity:0.9; stroke-width:1.3; }
+    .iid-node circle { transition:transform 0.15s ease, opacity 0.15s; transform-origin:center; }
+    .iid-node:hover circle { stroke:var(--text-strong); stroke-width:1.4; }
+    .iid-graph.iid-focus .iid-node.dim circle { opacity:0.22; }
+    .iid-maplegend { display:flex; flex-wrap:wrap; gap:0.4rem 1rem; margin-top:0.5rem; font-family:'JetBrains Mono',monospace; font-size:0.66rem; color:var(--muted); }
+    .iid-maplegend span { display:inline-flex; align-items:center; gap:0.35rem; }
+    .iid-maplegend i { width:10px; height:10px; border-radius:50%; }
+    .iid-maplegend .iid-mln { font-style:italic; opacity:0.8; }
+    .iid-foot { display:flex; flex-wrap:wrap; gap:0.5rem 1.4rem; align-items:center; margin-top:0.9rem; padding-top:0.8rem; border-top:1px solid var(--line); font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .iid-foot b { color:var(--text-body); font-weight:600; margin-right:0.3rem; }
+    .iid-foot-link { margin-left:auto; color:var(--cyan); text-decoration:none; }
+    @media (max-width:1000px){ .iid-grid { grid-template-columns:1fr; } .iid-kpis { grid-template-columns:repeat(2,1fr); } }
+    @media (max-width:520px){ .iid-kpis { grid-template-columns:1fr 1fr; } .iid-kpi-v .iid-num, .iid-kpi-v > span:first-child { font-size:1.5rem; } }
+    @media (prefers-reduced-motion:reduce){ .iid-arc,.iid-cbar i,.iid-dbar i,.iid-sig-bar i,.iid-kpi,.iid-node circle,.iid-edge { transition:none !important; } .iid-cbar i,.iid-dbar i,.iid-sig-bar i { transform:scaleX(1); } }
+    .viz { overflow-x:auto; margin-top:0.9rem; background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0.9rem 1rem; }
+    .viz svg { display:block; max-width:100%; height:auto; }
+    .viz-radar svg { max-width:320px; margin:0 auto; }
+    .vz-num { font-variant-numeric:tabular-nums slashed-zero; }
+    .vz-box-t, .vz-box-s, .vz-lbl, .vz-hb-lbl, .vz-tl-t, .vz-pt, .vz-tick { pointer-events:auto; }
+    .vz-grid { fill:none; stroke:var(--line); stroke-width:1; }
+    .vz-accent-fill { fill:var(--cyan); fill-opacity:0.16; stroke:var(--cyan); stroke-width:1.4; }
+    .vz-accent-dot { fill:var(--cyan); }
+    .vz-accent-bar { fill:var(--cyan); }
+    .vz-cat-bar { fill:var(--amber); }
+    .vz-lbl { font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--muted); }
+    .vz-box-trigger { fill:color-mix(in srgb, var(--red) 12%, var(--surface)); stroke:var(--red); stroke-width:1.2; }
+    .vz-box-fault { fill:color-mix(in srgb, var(--amber) 12%, var(--surface)); stroke:var(--amber); stroke-width:1.2; }
+    .vz-box-down { fill:color-mix(in srgb, var(--cyan) 10%, var(--surface)); stroke:var(--cyan); stroke-width:1; }
+    .vz-box-t { font-family:'IBM Plex Sans',sans-serif; font-size:11px; font-weight:600; fill:var(--text-strong); }
+    .vz-box-s { font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--muted); }
+    .vz-flow { stroke:var(--muted); stroke-width:1.3; fill:none; }
+    .vz-arrhead { fill:var(--muted); }
+    .vz-tl-ph { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.04em; text-transform:uppercase; fill:var(--amber); }
+    .vz-tl-t { font-family:'JetBrains Mono',monospace; font-size:8.5px; fill:var(--muted); }
+    .vz-hb-lbl { font-family:'IBM Plex Sans',sans-serif; font-size:11px; fill:var(--text-body); }
+    .vz-hb-val { font-family:'JetBrains Mono',monospace; font-size:10px; fill:var(--muted); font-variant-numeric:tabular-nums slashed-zero; }
+    .vz-tick { font-family:'JetBrains Mono',monospace; font-size:8.5px; fill:var(--muted); }
+    .vz-quad { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.05em; text-transform:uppercase; fill:var(--muted); opacity:0.7; }
+    .vz-pt { font-family:'JetBrains Mono',monospace; font-size:8px; fill:var(--text-body); }
+    .viz a { text-decoration:none; }
+    .viz a:hover .vz-pt { fill:var(--cyan); font-weight:600; }
+    .viz a:hover circle { stroke:var(--text-strong); stroke-width:1.4; }
+    .vz-legend { display:flex; flex-wrap:wrap; gap:0.5rem 1.1rem; margin-top:0.7rem; padding-top:0.6rem; border-top:1px solid var(--line); }
+    .vz-key { display:inline-flex; align-items:center; gap:0.4rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .vz-key i { width:11px; height:11px; border-radius:50%; display:inline-block; }
+    .vz-key-note { font-style:italic; opacity:0.8; }
+    .viz-grid3 { display:grid; grid-template-columns:1fr 1fr; gap:0.9rem; }
+    @media (max-width:720px){ .viz-grid3 { grid-template-columns:1fr; } }
+    .filterbar { display:flex; flex-wrap:wrap; align-items:center; gap:0.4rem 0.6rem; margin:0.9rem 0 0.2rem; }
+    .fb-group { display:flex; flex-wrap:wrap; gap:0.35rem; }
+    .fb-chip { font-family:'JetBrains Mono',monospace; font-size:0.72rem; padding:0.28rem 0.6rem; border-radius:2px; border:1px solid var(--line); background:var(--surface); color:var(--text-body); cursor:pointer; }
+    .fb-chip:hover { border-color:var(--cyan); }
+    .fb-chip.active { background:var(--surface-2); border-color:var(--line); border-bottom:2px solid var(--cyan); color:var(--text-strong); font-weight:700; }
+    .fb-search { flex:1 1 200px; min-width:160px; font-family:'IBM Plex Sans',sans-serif; font-size:0.82rem; padding:0.3rem 0.6rem; border-radius:4px; border:1px solid var(--line); background:var(--surface); color:var(--text); }
+    .fb-count { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); margin-left:auto; }
+    .kv { display:grid; grid-template-columns:180px 1fr; gap:0.5rem 0.9rem; margin-top:0.5rem; font-size:0.9rem; }
+    .kv dt { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; }
+    .kv dd { margin:0; color:var(--text-body); }
+    .refs { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .refs li { padding:0.55rem 0; border-bottom:1px solid var(--line); }
+    .refs .rtitle { color:var(--text-strong); font-weight:600; font-size:0.9rem; }
+    .refs .rquote { color:var(--muted); font-size:0.84rem; font-style:italic; margin-top:0.2rem; display:block; }
+    .refs a { font-size:0.78rem; word-break:break-all; }
+    .backlink { display:inline-block; margin-bottom:0.6rem; font-size:0.82rem; color:var(--cyan); text-decoration:none; }
+    footer { border-top:1px solid var(--line); margin-top:2.5rem; padding:1.4rem 1.1rem; text-align:center; }
+    footer .ver { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .disclaimer { font-size:0.76rem; color:var(--muted); margin-top:0.8rem; max-width:80ch; }
+    .skip-link { position:absolute; top:-50px; left:0; background:var(--cyan); color:var(--hero-bg); padding:10px 20px; text-decoration:none; font-weight:600; z-index:10000; border-radius:0 0 4px 0; transition:top 0.2s; }
+    .skip-link:focus { top:0; }
+    .root-gate { position:fixed; inset:0; z-index:99999; display:none; align-items:center; justify-content:center; background:rgba(2,6,23,0.74); padding:1rem; backdrop-filter:blur(6px); }
+    body.locked .root-gate { display:flex; }
+    body.locked .wrap { filter:blur(4px); pointer-events:none; user-select:none; }
+    .root-card { max-width:430px; width:100%; background:var(--surface); border:1px solid var(--cyan); border-radius:4px; padding:1.3rem 1.15rem; text-align:center; box-shadow:0 18px 36px var(--shadow-deep); }
+    .root-card h2 { margin:0 0 0.4rem; font-size:1.1rem; color:var(--text-strong); }
+    .root-card p { font-size:0.86rem; color:var(--text-body); }
+    .root-actions { margin-top:0.9rem; display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; }
+    .root-actions button, .root-actions a { border-radius:4px; padding:0.5rem 0.85rem; font-size:0.8rem; font-weight:700; border:1px solid var(--line); text-decoration:none; cursor:pointer; color:var(--text); font-family:inherit; }
+    .root-actions button { background:var(--cyan); color:var(--hero-bg); border:none; }
+    .rz-nav-burger { display:none; }
+    /* v1.8.0 — mobile responsive patch */
+    @media (max-width:768px) {
+        html,body { overflow-x:hidden; max-width:100vw; }
+        img { max-width:100%; height:auto; display:block; }
+        .nav-menu, .nav-links { display:none; }
+        .navbar { padding:0.5rem 0.75rem; }
+        footer .footer-grid { grid-template-columns:1fr; gap:1.25rem; padding:1rem; }
+        button, a.btn, [role="button"] { min-height:44px; }
+        h1 { font-size:1.4rem; }
+        .soe li { grid-template-columns:1fr; gap:0.15rem; }
+        .kv { grid-template-columns:1fr; }
+        .root-card { max-width:92vw; }
+    }
+    @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
+</style>
+    
+</head>
+<body class="locked">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <nav class="navbar"><div class="nav-container">
+        <a href="index.html" class="nav-logo"><img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dc-incidents.html">DC Incidents</a></li>
+            <li><a href="datacenter-solutions.html">DC Solutions</a></li>
+        </ul>
+        <div class="nav-right">
+            <span class="lock-tag" title="Root-only module">ROOT</span>
+            <button class="theme-btn" id="themeToggle" type="button" aria-label="Toggle theme">◐</button>
+        </div>
+    </div></nav>
+    <main class="wrap" id="main-content">
+        <div class="reading-col">
+        <a class="backlink" href="dc-incidents.html">← All incidents</a>
+        <div class="eyebrow">Incident dossier · Rank #22</div>
+        <h1>AWS EBS Re-Mirroring Storm and Stuck Volumes in US-East-1</h1>
+        <div class="chips">
+            <span class="chip">Amazon Web Services</span>
+            <span class="chip cyan">2011-04-21</span>
+            <span class="chip amber">90h 43m core impact</span>
+            <span class="chip cyan">Network</span><span class="chip muted">config-error</span><span class="chip amber">Software</span><span class="chip muted">storage</span>
+        </div>
+        <p class="lede">A routine network-capacity upgrade in one US-East-1 Availability Zone was executed incorrectly, shifting EBS traffic onto a low-capacity redundant network and isolating a large block of storage nodes. When connectivity returned, the nodes launched a self-reinforcing &quot;re-mirroring storm&quot; that exhausted spare capacity, left ~13% of the zone&#x27;s volumes &quot;stuck&quot;, and starved the region-wide EBS control plane — degrading EC2 and RDS for nearly four days and permanently losing 0.07% of the affected zone&#x27;s volumes.</p>
+
+        <h2>Failure cascade</h2>
+        <div class="viz viz-cascade"><svg viewBox="0 0 760 184" role="img" aria-label="Failure cascade block diagram"><title>Failure cascade: trigger → fault → downstream impact</title><defs><marker id="ic-ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path class="vz-arrhead" d="M0,0 L6,3 L0,6 Z"/></marker></defs><text class="vz-tl-ph" x="8" y="12">Trigger</text><text class="vz-tl-ph" x="248" y="12">Primary fault</text><text class="vz-tl-ph" x="516" y="12">Downstream impact</text><rect class="vz-box-trigger" x="8" y="64.0" width="176" height="56" rx="2"><title>Trigger — Network (2011-04-21)</title></rect><text class="vz-box-t" x="18" y="81.0">Trigger · Network</text><text class="vz-box-s" x="18" y="95.0"><title>2011-04-21</title>2011-04-21</text><rect class="vz-box-fault" x="240" y="64.0" width="224" height="56" rx="2"><title>Primary fault at Amazon Web Services — US-East-1 (Northern Virginia)</title></rect><text class="vz-box-t" x="250" y="81.0">AWS</text><text class="vz-box-s" x="250" y="95.0"><title>US-East-1 (Northern Virginia)</title>US-East-1</text><line class="vz-flow" x1="184" y1="92.0" x2="238" y2="92.0" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="26" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Amazon EBS (Elastic Block Store)</title></rect><text class="vz-box-t" x="526" y="43">Amazon EBS</text><line class="vz-flow" x1="464" y1="92.0" x2="514" y2="44" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="70" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Amazon EC2 (EBS-backed instance launch/attach)</title></rect><text class="vz-box-t" x="526" y="87">Amazon EC2</text><line class="vz-flow" x1="464" y1="92.0" x2="514" y2="88" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="114" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Amazon RDS (single-AZ and some multi-AZ)</title></rect><text class="vz-box-t" x="526" y="131">Amazon RDS</text><line class="vz-flow" x1="464" y1="92.0" x2="514" y2="132" marker-end="url(#ic-ar)"/></svg></div>
+        <p class="disclaimer">Trigger → primary fault → downstream blast radius, derived from the sourced root cause and affected-services record.</p>
+
+        <h2>Facility &amp; location</h2>
+        <dl class="kv">
+            <dt>Operator</dt><dd>Amazon Web Services</dd>
+            <dt>Data center</dt><dd>US-East-1 (Northern Virginia)</dd>
+            <dt>Location</dt><dd>Ashburn area, Northern Virginia, USA, single affected Availability Zone (of the US East Region)</dd>
+            <dt>Date</dt><dd>2011-04-21</dd>
+        </dl>
+
+        <h2>Impact &amp; scale</h2>
+        <dl class="kv">
+            <dt>Users affected</dt><dd>Not disclosed as a user count; blast radius covered one AZ directly plus region-wide EBS/EC2/RDS control-plane degradation. Consumer sites knocked offline included Reddit, Quora, Foursquare, Hootsuite and Heroku (also Engine Yard), per CNN Money and GovTech.</dd>
+            <dt>Financial</dt><dd>Not disclosed by AWS. Direct remedy was a 10-day service credit equal to 100% of affected customers&#x27; EBS, EC2 and RDS usage in the affected AZ; aggregate dollar figure never published.</dd>
+            <dt>Scope</dt><dd>Major multi-day regional service disruption (single AZ hard-down, region-wide control-plane impact)</dd>
+        </dl>
+        <div class="card"><strong>Services / systems down</strong><ul class="tight"><li>Amazon EBS (Elastic Block Store)</li><li>Amazon EC2 (EBS-backed instance launch/attach)</li><li>Amazon RDS (single-AZ and some multi-AZ)</li></ul></div>
+        <h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Total disruption duration</td><td class="mval">~90 hours (approx; 12:47 AM PDT Apr 21 to effective end over the weekend of Apr 24; AWS gives no precise closing time)</td></tr><tr><td class="mlabel">Peak stuck EBS volumes (affected AZ)</td><td class="mval">~13% initial, +5% in second wave (~18% cumulative touched)</td></tr><tr><td class="mlabel">Volumes not yet restored by Apr 22 12:30 PDT</td><td class="mval">2.2%</td></tr><tr><td class="mlabel">Volumes not yet restored by Apr 24 12:30 PDT</td><td class="mval">1.04%</td></tr><tr><td class="mlabel">Permanent EBS data loss (affected AZ)</td><td class="mval">0.07% of volumes unrecoverable</td></tr><tr><td class="mlabel">RDS single-AZ instances with stuck I/O (peak)</td><td class="mval">45% at peak; 0.4% suffered unrecoverable storage</td></tr><tr><td class="mlabel">RDS single-AZ recovery pace</td><td class="mval">41.0% still stuck after 24h, 23.5% after 36h, 14.6% after 48h; the rest recovered over the weekend</td></tr><tr><td class="mlabel">RDS multi-AZ failover failures</td><td class="mval">2.5% failed to auto-failover due to a previously un-encountered bug</td></tr><tr><td class="mlabel">Stuck-volume spillover into healthy AZs (peak)</td><td class="mval">less than 0.07%</td></tr><tr><td class="mlabel">Customer remedy</td><td class="mval">10-day service credit = 100% of affected EBS, EC2 and RDS usage in the affected AZ</td></tr></tbody></table></div>
+
+        <h2>Magnitude profile</h2>
+        <div class="viz viz-radar"><svg viewBox="0 0 290 215" role="img" aria-label="Magnitude sub-scores radar chart"><title>Magnitude sub-scores (0–10)</title><polygon class="vz-grid" points="145.0,83.2 166.8,105.0 145.0,126.8 123.2,105.0"/><polygon class="vz-grid" points="145.0,62.1 187.9,105.0 145.0,147.9 102.1,105.0"/><polygon class="vz-grid" points="145.0,41.0 209.0,105.0 145.0,169.0 81.0,105.0"/><line class="vz-grid" x1="145" y1="105" x2="145.0" y2="41.0"/><line class="vz-grid" x1="145" y1="105" x2="209.0" y2="105.0"/><line class="vz-grid" x1="145" y1="105" x2="145.0" y2="169.0"/><line class="vz-grid" x1="145" y1="105" x2="81.0" y2="105.0"/><polygon class="vz-accent-fill" points="145.0,53.8 183.4,105.0 145.0,162.6 100.2,105.0"><title>Magnitude sub-scores (0–10)</title></polygon><circle class="vz-accent-dot" cx="145.0" cy="53.8" r="2.4"/><circle class="vz-accent-dot" cx="183.4" cy="105.0" r="2.4"/><circle class="vz-accent-dot" cx="145.0" cy="162.6" r="2.4"/><circle class="vz-accent-dot" cx="100.2" cy="105.0" r="2.4"/><text class="vz-lbl vz-num" x="145.0" y="20.0" text-anchor="middle">Users 8<title>Users affected (0–10) — breadth of the user/customer population impacted. — scored 8/10.</title></text><text class="vz-lbl vz-num" x="223.0" y="109.0" text-anchor="start">Financial 6<title>Financial impact (0–10) — direct + consequential cost. — scored 6/10.</title></text><text class="vz-lbl vz-num" x="145.0" y="198.0" text-anchor="middle">Duration 9<title>Outage duration (0–10) — how long service was degraded/down. — scored 9/10.</title></text><text class="vz-lbl vz-num" x="67.0" y="109.0" text-anchor="end">Blast 7<title>Blast radius (0–10) — how wide the fault propagated across systems/regions. — scored 7/10.</title></text></svg></div>
+        <div class="mag-trace">Magnitude <b>7.5</b> = blast 7×0.35 + users 8×0.25 + financial 6×0.20 + duration 9×0.20 <span style="opacity:0.7">(sub-scores 0–10 · weighted composite)</span></div>
+        <p class="disclaimer">Duration score high: ~90 hours (approx) from trigger (12:47 AM PDT Apr 21) to effective end over the weekend of Apr 24. AWS&#x27;s own post-mortem states RDS databases &#x27;recovered throughout the weekend&#x27; without a precise closing time; third-party summaries cite ~7:30 PM PDT Apr 24. Blast radius: one AZ hard-down with region-wide EBS control-plane thread starvation touching all AZs; peak stuck-volume spillover to healthy zones stayed &lt;0.07%. Financial mid: real remedy was a 10-day 100% EBS/EC2/RDS credit in the affected AZ but AWS never published a dollar total.</p>
+
+        <h2>Sequence of events (SOE)</h2>
+        <div class="viz viz-timeline"><svg viewBox="0 0 1788 96" role="img" aria-label="Sequence-of-events timeline"><title>Phased sequence of events</title><line class="vz-grid" x1="30" y1="48" x2="1758" y2="48"/><circle class="vz-accent-dot" cx="30" cy="48" r="4.5"><title>2011-04-21 00:47 PDT · TRIGGER — During a planned network-capacity upgrade in one US-East-1 AZ, engineers shifted traffic off a primary EBS router; instead of moving it to another router in the primary high-capacity network, the change routed it onto the lower-capacity redundant EBS network, which could not carry the load.</title></circle><text class="vz-tl-ph" x="30" y="30" text-anchor="middle">TRIGGER</text><text class="vz-tl-t" x="30" y="68" text-anchor="middle">2011-04-21 00:47 PD</text><circle class="vz-accent-dot" cx="126" cy="48" r="4.5"><title>2011-04-21 00:47 PDT · TRIGGER — Because the redundant network also became overwhelmed/isolated, affected EBS nodes lost BOTH their primary and secondary network paths at once, cutting them off from their replica peers.</title></circle><text class="vz-tl-ph" x="126" y="30" text-anchor="middle">TRIGGER</text><text class="vz-tl-t" x="126" y="68" text-anchor="middle">2011-04-21 00:47 PD</text><circle class="vz-accent-dot" cx="222" cy="48" r="4.5"><title>2011-04-21 ~00:50 PDT · CASCADE — The incorrect traffic shift was rolled back; reconnected nodes immediately began searching the cluster for free space to re-establish lost data replicas, all at once. This concurrent scramble became a self-reinforcing &#x27;re-mirroring storm&#x27;.</title></circle><text class="vz-tl-ph" x="222" y="30" text-anchor="middle">CASCADE</text><text class="vz-tl-t" x="222" y="68" text-anchor="middle">2011-04-21 ~00:50 PD</text><circle class="vz-accent-dot" cx="318" cy="48" r="4.5"><title>2011-04-21 ~01:00 PDT · CASCADE — Free capacity in the affected cluster was rapidly exhausted; nodes that could not find space entered a retry loop. About 13% of the volumes in the affected AZ became &#x27;stuck&#x27; searching for storage.</title></circle><text class="vz-tl-ph" x="318" y="30" text-anchor="middle">CASCADE</text><text class="vz-tl-t" x="318" y="68" text-anchor="middle">2011-04-21 ~01:00 PD</text><circle class="vz-accent-dot" cx="414" cy="48" r="4.5"><title>2011-04-21 ~01:15 PDT · CASCADE — The flood of Create Volume / re-mirror API calls caused thread starvation in the EBS control plane. Because the control plane spans the whole region, elevated error rates and latencies appeared across ALL Availability Zones, not just the failed one.</title></circle><text class="vz-tl-ph" x="414" y="30" text-anchor="middle">CASCADE</text><text class="vz-tl-t" x="414" y="68" text-anchor="middle">2011-04-21 ~01:15 PD</text><circle class="vz-accent-dot" cx="510" cy="48" r="4.5"><title>2011-04-21 ~02:00 PDT (just before 5 a.m. ET) · IMPACT — Consumer-facing sites hosted on EC2 in the region went down or degraded, including Reddit, Quora, Foursquare, Hootsuite and Heroku (also Engine Yard); the outage was public and widely reported. Press reports place the onset just before 5 a.m. ET, i.e. roughly 2 a.m. PDT.</title></circle><text class="vz-tl-ph" x="510" y="30" text-anchor="middle">IMPACT</text><text class="vz-tl-t" x="510" y="68" text-anchor="middle">2011-04-21 ~02:00 PD</text><circle class="vz-accent-dot" cx="606" cy="48" r="4.5"><title>2011-04-21 02:40 PDT · MITIGATION — AWS disabled all Create Volume API requests in the affected AZ to relieve the control-plane thread starvation.</title></circle><text class="vz-tl-ph" x="606" y="30" text-anchor="middle">MITIGATION</text><text class="vz-tl-t" x="606" y="68" text-anchor="middle">2011-04-21 02:40 PD</text><circle class="vz-accent-dot" cx="702" cy="48" r="4.5"><title>2011-04-21 02:50 PDT · MITIGATION — With Create Volume calls blocked, EBS control-plane latencies and error rates for all other EBS-related APIs in the OTHER (healthy) Availability Zones recovered to normal.</title></circle><text class="vz-tl-ph" x="702" y="30" text-anchor="middle">MITIGATION</text><text class="vz-tl-t" x="702" y="68" text-anchor="middle">2011-04-21 02:50 PD</text><circle class="vz-accent-dot" cx="798" cy="48" r="4.5"><title>2011-04-21 05:30-08:20 PDT · CASCADE — A second wave hit: a low-probability race condition caused EBS nodes to fail when concurrently closing large numbers of replication requests, and failed re-mirror retries generated heavy control-plane negotiation, pushing an ADDITIONAL ~5% of the AZ&#x27;s volumes into the stuck state.</title></circle><text class="vz-tl-ph" x="798" y="30" text-anchor="middle">CASCADE</text><text class="vz-tl-t" x="798" y="68" text-anchor="middle">2011-04-21 05:30-08:20 PD</text><circle class="vz-accent-dot" cx="894" cy="48" r="4.5"><title>2011-04-21 08:20 PDT · MITIGATION — AWS began disabling all communication between the degraded EBS cluster and the EBS control plane, quarantining the failure so it could no longer poison other zones.</title></circle><text class="vz-tl-ph" x="894" y="30" text-anchor="middle">MITIGATION</text><text class="vz-tl-t" x="894" y="68" text-anchor="middle">2011-04-21 08:20 PD</text><circle class="vz-accent-dot" cx="990" cy="48" r="4.5"><title>2011-04-21 11:30 PDT · RECOVERY — A change to the EBS control plane fixed the elevated errors/latencies when launching EBS-backed EC2 instances in the healthy zones; new-instance error rates declined rapidly and returned to near-normal by Noon PDT.</title></circle><text class="vz-tl-ph" x="990" y="30" text-anchor="middle">RECOVERY</text><text class="vz-tl-t" x="990" y="68" text-anchor="middle">2011-04-21 11:30 PD</text><circle class="vz-accent-dot" cx="1086" cy="48" r="4.5"><title>2011-04-21 12:04 PDT · RECOVERY — The event was contained to the single affected AZ: stabilization complete, ~13% of the AZ&#x27;s volumes still stuck, and EBS APIs disabled in the affected zone while recovery proceeded.</title></circle><text class="vz-tl-ph" x="1086" y="30" text-anchor="middle">RECOVERY</text><text class="vz-tl-t" x="1086" y="68" text-anchor="middle">2011-04-21 12:04 PD</text><circle class="vz-accent-dot" cx="1182" cy="48" r="4.5"><title>2011-04-22 02:00 PDT · RECOVERY — Installation of new physical storage capacity began. Recovery was slow because the EBS cluster will not reuse a failed node until every replica on it is successfully re-mirrored, and capacity had to be physically relocated from across the US East Region.</title></circle><text class="vz-tl-ph" x="1182" y="30" text-anchor="middle">RECOVERY</text><text class="vz-tl-t" x="1182" y="68" text-anchor="middle">2011-04-22 02:00 PD</text><circle class="vz-accent-dot" cx="1278" cy="48" r="4.5"><title>2011-04-22 12:30 PDT · RECOVERY — All but about 2.2% of the volumes in the affected AZ had been restored to normal operation.</title></circle><text class="vz-tl-ph" x="1278" y="30" text-anchor="middle">RECOVERY</text><text class="vz-tl-t" x="1278" y="68" text-anchor="middle">2011-04-22 12:30 PD</text><circle class="vz-accent-dot" cx="1374" cy="48" r="4.5"><title>2011-04-23 15:35 PDT · RECOVERY — EBS control-plane API access was re-enabled (finished enabling access) for the affected AZ.</title></circle><text class="vz-tl-ph" x="1374" y="30" text-anchor="middle">RECOVERY</text><text class="vz-tl-t" x="1374" y="68" text-anchor="middle">2011-04-23 15:35 PD</text><circle class="vz-accent-dot" cx="1470" cy="48" r="4.5"><title>2011-04-23 18:15 PDT · RECOVERY — Full EBS API access to EBS resources was restored to the affected Availability Zone.</title></circle><text class="vz-tl-ph" x="1470" y="30" text-anchor="middle">RECOVERY</text><text class="vz-tl-t" x="1470" y="68" text-anchor="middle">2011-04-23 18:15 PD</text><circle class="vz-accent-dot" cx="1566" cy="48" r="4.5"><title>2011-04-24 12:30 PDT · RECOVERY — All but 1.04% of the affected volumes had been recovered, largely by restoring from snapshots.</title></circle><text class="vz-tl-ph" x="1566" y="30" text-anchor="middle">RECOVERY</text><text class="vz-tl-t" x="1566" y="68" text-anchor="middle">2011-04-24 12:30 PD</text><circle class="vz-accent-dot" cx="1662" cy="48" r="4.5"><title>2011-04-24 15:00 PDT · RECOVERY — Manual recovery began on the remaining volumes that had not been snapshotted / were tied to hardware failures.</title></circle><text class="vz-tl-ph" x="1662" y="30" text-anchor="middle">RECOVERY</text><text class="vz-tl-t" x="1662" y="68" text-anchor="middle">2011-04-24 15:00 PD</text><circle class="vz-accent-dot" cx="1758" cy="48" r="4.5"><title>2011-04-24 (evening, over the weekend) · RESTORED — Remaining RDS databases were brought back online over the weekend, effectively ending the multi-day disruption; a final 0.07% of the affected AZ&#x27;s EBS volumes could not be recovered. AWS&#x27;s post-mortem describes RDS recovery as completing &#x27;throughout the weekend&#x27; without a precise time; third-party summaries cite ~7:30 PM PDT Apr 24.</title></circle><text class="vz-tl-ph" x="1758" y="30" text-anchor="middle">RESTORED</text><text class="vz-tl-t" x="1758" y="68" text-anchor="middle">2011-04-24 (even</text></svg></div>
+        <ul class="soe"><li><time>2011-04-21 00:47 PDT</time><span class="ev"><span class="phase-chip">TRIGGER</span> During a planned network-capacity upgrade in one US-East-1 AZ, engineers shifted traffic off a primary EBS router; instead of moving it to another router in the primary high-capacity network, the change routed it onto the lower-capacity redundant EBS network, which could not carry the load.</span></li><li><time>2011-04-21 00:47 PDT</time><span class="ev"><span class="phase-chip">TRIGGER</span> Because the redundant network also became overwhelmed/isolated, affected EBS nodes lost BOTH their primary and secondary network paths at once, cutting them off from their replica peers.</span></li><li><time>2011-04-21 ~00:50 PDT</time><span class="ev"><span class="phase-chip">CASCADE</span> The incorrect traffic shift was rolled back; reconnected nodes immediately began searching the cluster for free space to re-establish lost data replicas, all at once. This concurrent scramble became a self-reinforcing &#x27;re-mirroring storm&#x27;.</span></li><li><time>2011-04-21 ~01:00 PDT</time><span class="ev"><span class="phase-chip">CASCADE</span> Free capacity in the affected cluster was rapidly exhausted; nodes that could not find space entered a retry loop. About 13% of the volumes in the affected AZ became &#x27;stuck&#x27; searching for storage.</span></li><li><time>2011-04-21 ~01:15 PDT</time><span class="ev"><span class="phase-chip">CASCADE</span> The flood of Create Volume / re-mirror API calls caused thread starvation in the EBS control plane. Because the control plane spans the whole region, elevated error rates and latencies appeared across ALL Availability Zones, not just the failed one.</span></li><li><time>2011-04-21 ~02:00 PDT (just before 5 a.m. ET)</time><span class="ev"><span class="phase-chip">IMPACT</span> Consumer-facing sites hosted on EC2 in the region went down or degraded, including Reddit, Quora, Foursquare, Hootsuite and Heroku (also Engine Yard); the outage was public and widely reported. Press reports place the onset just before 5 a.m. ET, i.e. roughly 2 a.m. PDT.</span></li><li><time>2011-04-21 02:40 PDT</time><span class="ev"><span class="phase-chip">MITIGATION</span> AWS disabled all Create Volume API requests in the affected AZ to relieve the control-plane thread starvation.</span></li><li><time>2011-04-21 02:50 PDT</time><span class="ev"><span class="phase-chip">MITIGATION</span> With Create Volume calls blocked, EBS control-plane latencies and error rates for all other EBS-related APIs in the OTHER (healthy) Availability Zones recovered to normal.</span></li><li><time>2011-04-21 05:30-08:20 PDT</time><span class="ev"><span class="phase-chip">CASCADE</span> A second wave hit: a low-probability race condition caused EBS nodes to fail when concurrently closing large numbers of replication requests, and failed re-mirror retries generated heavy control-plane negotiation, pushing an ADDITIONAL ~5% of the AZ&#x27;s volumes into the stuck state.</span></li><li><time>2011-04-21 08:20 PDT</time><span class="ev"><span class="phase-chip">MITIGATION</span> AWS began disabling all communication between the degraded EBS cluster and the EBS control plane, quarantining the failure so it could no longer poison other zones.</span></li><li><time>2011-04-21 11:30 PDT</time><span class="ev"><span class="phase-chip">RECOVERY</span> A change to the EBS control plane fixed the elevated errors/latencies when launching EBS-backed EC2 instances in the healthy zones; new-instance error rates declined rapidly and returned to near-normal by Noon PDT.</span></li><li><time>2011-04-21 12:04 PDT</time><span class="ev"><span class="phase-chip">RECOVERY</span> The event was contained to the single affected AZ: stabilization complete, ~13% of the AZ&#x27;s volumes still stuck, and EBS APIs disabled in the affected zone while recovery proceeded.</span></li><li><time>2011-04-22 02:00 PDT</time><span class="ev"><span class="phase-chip">RECOVERY</span> Installation of new physical storage capacity began. Recovery was slow because the EBS cluster will not reuse a failed node until every replica on it is successfully re-mirrored, and capacity had to be physically relocated from across the US East Region.</span></li><li><time>2011-04-22 12:30 PDT</time><span class="ev"><span class="phase-chip">RECOVERY</span> All but about 2.2% of the volumes in the affected AZ had been restored to normal operation.</span></li><li><time>2011-04-23 15:35 PDT</time><span class="ev"><span class="phase-chip">RECOVERY</span> EBS control-plane API access was re-enabled (finished enabling access) for the affected AZ.</span></li><li><time>2011-04-23 18:15 PDT</time><span class="ev"><span class="phase-chip">RECOVERY</span> Full EBS API access to EBS resources was restored to the affected Availability Zone.</span></li><li><time>2011-04-24 12:30 PDT</time><span class="ev"><span class="phase-chip">RECOVERY</span> All but 1.04% of the affected volumes had been recovered, largely by restoring from snapshots.</span></li><li><time>2011-04-24 15:00 PDT</time><span class="ev"><span class="phase-chip">RECOVERY</span> Manual recovery began on the remaining volumes that had not been snapshotted / were tied to hardware failures.</span></li><li><time>2011-04-24 (evening, over the weekend)</time><span class="ev"><span class="phase-chip">RESTORED</span> Remaining RDS databases were brought back online over the weekend, effectively ending the multi-day disruption; a final 0.07% of the affected AZ&#x27;s EBS volumes could not be recovered. AWS&#x27;s post-mortem describes RDS recovery as completing &#x27;throughout the weekend&#x27; without a precise time; third-party summaries cite ~7:30 PM PDT Apr 24.</span></li></ul>
+
+        <h2>Root cause</h2>
+        <div class="card">Immediate mechanism: At 12:47 AM PDT on 21 April 2011, AWS engineers ran a planned capacity upgrade on the primary EBS network in one US-East-1 Availability Zone. The procedure required shifting traffic off one router in the primary (high-capacity) EBS network onto another router in that same primary network. Instead, the change was executed so that traffic was routed onto the LOWER-CAPACITY redundant EBS network. That secondary network was never sized to carry primary load, so it too saturated/failed — and because the shift removed the primary path at the same moment, a large group of EBS storage nodes lost BOTH their primary and secondary network connectivity simultaneously. EBS nodes depend on continuous peer-to-peer connectivity to keep each volume&#x27;s two replicas in sync; losing all connectivity made them believe their replicas had failed.
+
+The specific failure that turned a network blip into a four-day outage was the EBS re-mirroring design. When connectivity was restored, every isolated node concurrently and aggressively began scanning the cluster for free space to rebuild a fresh second replica. Because so many volumes re-mirrored at once, the cluster&#x27;s free capacity was exhausted almost instantly, and nodes that could not find space fell into a tight retry loop — the &quot;re-mirroring storm&quot;. Roughly 13% of the AZ&#x27;s volumes ended up &quot;stuck&quot;, unable to serve I/O while hunting for storage. The storm then attacked a second, shared component: the region-wide EBS control plane. The torrent of Create Volume and re-mirror negotiation calls caused thread starvation in the control plane, and because that control plane is a single regional service, its degradation leaked EC2 launch/attach errors and elevated latencies into ALL Availability Zones — converting a single-AZ hardware event into a regional one. A latent, low-probability race condition (nodes failing while concurrently closing large batches of replication requests) added a second wave of ~5% more stuck volumes.
+
+Latent / organisational root causes: (1) A change-management gap — a manual, error-prone network migration step with no automated guardrail to detect or block routing production EBS traffic onto a network known to lack the required capacity; the safeguard that should have caught it (capacity-aware validation or a peer-review/dry-run of the traffic-shift target) was absent or bypassed. (2) A design flaw in re-mirroring: it had no back-pressure, jitter, or admission control, so a correlated failure produced a stampede that consumed the very spare capacity meant to absorb failures — a classic positive-feedback loop. (3) A blast-radius / isolation flaw: the EBS control plane was a shared, region-scoped dependency with no per-AZ fault isolation, so one AZ&#x27;s storm starved the whole region. (4) A hidden defect in the multi-AZ RDS failover path (a &quot;previously un-encountered bug&quot;) meant 2.5% of the very databases customers had paid extra to make resilient did not fail over automatically.</div>
+
+        <h2>Contributing factors</h2>
+        <ul class="tight"><li>The redundant EBS network was lower-capacity than the primary and unable to sustain primary traffic, so routing to it was equivalent to removing redundancy rather than preserving it.</li><li>Re-mirroring had no rate-limiting, jitter, or back-pressure, allowing large numbers of nodes to stampede for free space simultaneously and exhaust cluster capacity.</li><li>The EBS control plane was a single region-wide service with no AZ-level isolation, so control-plane thread starvation propagated to healthy Availability Zones.</li><li>A latent, low-probability race condition caused EBS nodes to fail when concurrently closing large numbers of replication requests, generating a damaging second wave of stuck volumes.</li><li>A previously un-encountered bug in RDS multi-AZ failover prevented automatic failover for 2.5% of multi-AZ instances, undermining the paid resilience feature.</li><li>Recovery was structurally slow: a failed node cannot be reused until every replica on it is re-mirrored, and fresh capacity had to be physically relocated from elsewhere in the US East Region.</li><li>Slow, vague customer communications (imprecise &#x27;small percentage&#x27;/&#x27;multiple availability zones&#x27; wording; AWS itself later conceded it wanted communications &#x27;more frequent and containing more information&#x27;) left customers unable to make informed failover decisions.</li><li>Many customers had architected for a single AZ, so a single-AZ event took their whole application down.</li></ul>
+
+        <h2>Correction of errors (COE)</h2>
+        <ul class="tight"><li>Audit and automate the network change-management process so production EBS traffic can never be shifted onto an under-capacity network; add capacity-aware validation and reviewed dry-runs before executing traffic shifts. <span class="coe-meta">AWS EBS / Network Engineering · committed in post-mortem</span></li><li>Add back-pressure, rate-limiting and randomized retry (jitter) to EBS re-mirroring so a correlated failure cannot trigger a capacity-exhausting stampede, and make nodes more conservative about declaring a replica failed on transient network loss. <span class="coe-meta">AWS EBS Engineering · committed in post-mortem</span></li><li>Improve EBS control-plane fault isolation so per-AZ failures cannot starve the region-wide control plane&#x27;s threads/resources; reduce the shared, region-scoped blast radius. <span class="coe-meta">AWS EBS Engineering · committed in post-mortem</span></li><li>Fix the previously un-encountered RDS multi-AZ failover bug so paid multi-AZ databases reliably auto-failover on stuck I/O. <span class="coe-meta">AWS RDS Engineering · committed in post-mortem</span></li><li>Improve customer communications during large-scale events: more frequent, more specific status updates with actionable detail and clearer identification of affected AZs. <span class="coe-meta">AWS Support / Communications · committed in post-mortem</span></li><li>Provide better guidance and tooling for multi-AZ architecture so customers can build applications resilient to a single-AZ failure; issue the 10-day 100% service credit to affected customers. <span class="coe-meta">AWS · credit issued; guidance committed</span></li></ul>
+
+        <h2>Lessons learnt</h2>
+        <ul class="tight"><li>A recovery mechanism (re-mirroring) without admission control can become the outage: a correlated fault turns self-healing into a stampede that consumes the spare capacity meant to absorb failures.</li><li>Shared, region-scoped control planes are a hidden single point of failure — a per-AZ data-plane fault leaked region-wide because the control plane had no AZ isolation.</li><li>&#x27;Redundant&#x27; capacity that is lower-capacity than primary is not redundancy for full load; failing onto it can remove protection rather than preserve it.</li><li>Paid resilience features must be tested against the exact rare failure modes they exist for — the RDS multi-AZ failover bug surfaced only under real stress.</li><li>Single-AZ architectures inherit the AZ&#x27;s fate; customers who spanned AZs and had snapshots recovered far better.</li><li>During large incidents, vague/slow status communications actively harm customers who could otherwise trigger their own failover.</li></ul>
+
+        <h2>Improvements &amp; remediation</h2>
+        <ul class="tight"><li>Automated, capacity-aware guardrails in the network change process that block shifting production traffic onto an under-capacity path, plus mandatory peer-review/dry-run of the traffic-shift target.</li><li>Back-pressure, jitter and admission control in EBS re-mirroring to prevent stampedes.</li><li>Per-AZ isolation of the EBS control plane to bound blast radius.</li><li>Regression coverage and chaos/failure testing for the RDS multi-AZ failover path.</li><li>More frequent, more specific incident communications with clear affected-AZ identification.</li><li>Customer-facing multi-AZ architecture guidance and tooling to reduce single-AZ dependency.</li></ul>
+
+        <h2>Comprehensive analysis</h2><div class="ca-block"><h3>Canonical control-plane cascade</h3><p>a localized data-plane network misconfiguration in one AZ propagated region-wide because the EBS <span data-explain="control-plane" tabindex="0">control plane</span> was a single shared regional service subject to thread starvation.</p></div><div class="ca-block"><h3>Positive-feedback re-mirroring loop</h3><p>reconnected nodes all re-mirrored at once, exhausting the free space that re-mirroring itself needed, so the more the system tried to heal the worse it got.</p></div><div class="ca-block"><h3>Two stacked amplifiers</h3><p>(a) the re-mirroring stampede (~13%) and (b) a low-probability <span data-explain="race-condition" tabindex="0">race condition</span> on concurrent replication-request closure (~5%).</p></div><div class="ca-block"><h3>Blast-radius containment held</h3><p>Blast-radius containment worked once AWS quarantined the degraded cluster from the control plane (08:20 PDT) and blocked Create Volume (02:40 PDT), restoring healthy AZs while the affected AZ was worked through the weekend.</p></div><div class="ca-block"><h3>Data durability held</h3><p>only 0.07% of the affected AZ&#x27;s volumes were permanently lost, and most recovery came from customer/EBS snapshots — reinforcing the snapshot discipline lesson.</p></div><div class="ca-block"><h3>RDS single-AZ dependency exposed</h3><p>The RDS impact showed that a dependency on EBS turns an EBS event into a database event, and that the multi-AZ <span data-explain="failover" tabindex="0">failover</span> safeguard itself had an untested failure mode (2.5% did not fail over).</p></div>
+
+        <h2>Technical deep-dive</h2>
+        <div class="card">EBS stores each volume as two replicas on separate storage nodes kept in sync over a peer-to-peer network. Normal operation uses a high-capacity primary network with a lower-capacity redundant network intended only for inter-node control/backup traffic. At 12:47 AM PDT on Apr 21, a capacity-upgrade step meant to move traffic between two routers on the primary network instead routed a large volume of traffic onto the low-capacity redundant network. That network saturated, and because the primary path had been withdrawn simultaneously, a large set of nodes lost all connectivity to their replica peers. Each node, unable to reach its replica, concluded the replica had failed and — upon reconnection — tried to establish a new replica by scanning the cluster for free space. With a large fraction of the cluster doing this at once, free capacity was consumed almost immediately; nodes that could not find space entered a continuous retry loop, leaving ~13% of the AZ&#x27;s volumes &#x27;stuck&#x27; (unable to serve I/O). The re-mirror negotiation and a flood of Create Volume calls then exhausted worker threads in the region-wide EBS control plane, so elevated latency/errors appeared across all AZs. AWS disabled Create Volume in the affected AZ (02:40), which recovered other AZs&#x27; EBS APIs by 02:50; but a low-probability race condition — nodes failing while concurrently closing large numbers of replication requests — drove a second wave (~5% more stuck) between 05:30 and 08:20, prompting AWS to sever the degraded cluster from the control plane (08:20). A control-plane fix at 11:30 restored EBS-backed EC2 launches to near-normal by noon; the event was contained to the single AZ by 12:04 PM. Recovery was slow because a failed node cannot be reused until all its replicas are re-mirrored and physical capacity had to be relocated across the region: 2.2% still down by Apr 22 12:30, 1.04% by Apr 24 12:30, with 0.07% permanently lost. RDS, which is layered on EBS, saw a peak 45% of single-AZ instances with stuck I/O (0.4% unrecoverable) and 2.5% of multi-AZ instances failing to auto-failover due to a previously un-encountered bug; RDS recovered over the following weekend.</div>
+
+        <h2>References &amp; provenance</h2>
+        <ul class="refs"><li><span class="chip green">official-postmortem</span> <span class="rtitle">Summary of the Amazon EC2 and Amazon RDS Service Disruption in the US East Region</span><span class="rquote">“At 12:47 AM PDT on April 21st ... the traffic was routed onto the lower capacity redundant EBS network ... about 13% of the volumes in the affected Availability Zone were in this &#x27;stuck&#x27; state ... 0.07% of the volumes in the affected Availability Zone could not be restored ... a 10 day credit equal to 100% of their usage of EBS Volumes, EC2 Instances and RDS database instances that were running in the affected Availability Zone.”</span><a href="https://aws.amazon.com/message/65648/" target="_blank" rel="noopener nofollow">https://aws.amazon.com/message/65648/</a></li><li><span class="chip amber">news</span> <span class="rtitle">Amazon EC2 cloud outage downs Reddit, Quora</span><span class="rquote">“A rare and major outage of Amazon&#x27;s cloud-based Web service took down a plethora of online sites, including Reddit, HootSuite, Foursquare and Quora.”</span><a href="https://money.cnn.com/2011/04/21/technology/amazon_server_outage/index.htm" target="_blank" rel="noopener nofollow">https://money.cnn.com/2011/04/21/technology/amazon_server_outage/index.htm</a></li><li><span class="chip amber">news</span> <span class="rtitle">Amazon EC2 Outage Brings Down Numerous Websites</span><span class="rquote">“The outages began Thursday morning just before 5 a.m. ET; affected sites included Reddit, HootSuite, Foursquare, Quora, Heroku and Engine Yard.”</span><a href="https://www.govtech.com/archive/amazon-ec2-outage.html" target="_blank" rel="noopener nofollow">https://www.govtech.com/archive/amazon-ec2-outage.html</a></li><li><span class="chip amber">news</span> <span class="rtitle">Amazon EC2 outage post-mortem (analysis and criticism)</span><span class="rquote">“AWS acknowledged: &#x27;We would like our communications to be more frequent and contain more information.&#x27; A customer described the post-mortem as &#x27;a Catholic penance, yet it contains surprisingly little actionable information.&#x27;”</span><a href="https://www.theregister.com/2011/04/29/amazon_ec2_outage_post_mortem/" target="_blank" rel="noopener nofollow">https://www.theregister.com/2011/04/29/amazon_ec2_outage_post_mortem/</a></li><li><span class="chip muted">reference</span> <span class="rtitle">A History of AWS Cloud and Data Center Outages</span><span class="rquote">“AWS suffered an extended outage in one of its northern Virginia data centers, which took down popular sites including Reddit and Quora.”</span><a href="https://www.datacenterknowledge.com/outages/a-history-of-aws-cloud-and-data-center-outages" target="_blank" rel="noopener nofollow">https://www.datacenterknowledge.com/outages/a-history-of-aws-cloud-and-data-center-outages</a></li></ul>
+        <p class="disclaimer">Sourced from public post-incident reports. Quotes are short attributed excerpts for provenance only; the analysis above is original and substantially shorter than its sources. Last verified 2026-08-08.</p>
+        <aside class="share-buttons" aria-label="Share this dossier"><span class="share-label">Share</span><button class="share-btn" onclick="rzShare('li')" aria-label="Share on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 11 0-4.124 2.062 2.062 0 010 4.124zM7.119 20.452H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg></button><button class="share-btn" onclick="rzShare('x')" aria-label="Share on X" title="X"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></button><button class="share-btn" onclick="rzShare('wa')" aria-label="Share on WhatsApp" title="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347M12.05 21.785h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884"/></svg></button><button class="share-btn" onclick="rzShare('copy',this)" aria-label="Copy link" title="Copy link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></aside><script>function rzShare(k,btn){var u=encodeURIComponent(location.href),t=encodeURIComponent(document.title);if(k==="li")open("https://www.linkedin.com/sharing/share-offsite/?url="+u,"_blank","noopener");else if(k==="x")open("https://twitter.com/intent/tweet?url="+u+"&text="+t,"_blank","noopener");else if(k==="wa")open("https://wa.me/?text="+t+"%20"+u,"_blank","noopener");else if(k==="copy"){navigator.clipboard&&navigator.clipboard.writeText(location.href);if(btn){var o=btn.getAttribute("title");btn.setAttribute("title","Copied");setTimeout(function(){btn.setAttribute("title",o);},1500);}}}</script>
+        </div>
+
+    </main>
+    <footer><div class="footer-grid"></div><span class="ver" id="versionStamp"></span></footer>
+    <div class="root-gate">
+        <div class="root-card">
+            <h2>Root access required</h2>
+            <p>The DC Incidents dossier is a root-only module. Sign in with an authorized account to continue.</p>
+            <div class="root-actions">
+                <button id="rootLoginBtn" type="button">Sign In</button>
+                <a href="index.html">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/rz-version.js?v=2026-08-01-gloss"></script>
+    <script src="js/rz-feature-flags.js?v=2026-08-01-gloss" defer></script>
+    <script src="auth.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-mobile-nav.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-cookie-consent.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-explain-db.js?v=2026-08-01-gloss" defer></script>
+    <script src="js/rz-explain.js?v=2026-08-01-gloss" defer></script>
+    <script>
+    (function(){var t=document.getElementById('themeToggle');function a(theme){document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme);var m=document.querySelector('meta[name=\"theme-color\"]');if(m)m.setAttribute('content',theme==='dark'?'#0c1512':'#f4f1e7');}a(localStorage.getItem('theme')||'dark');if(t)t.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme');a(c==='dark'?'light':'dark');});})();
+    (function(){function ag(){if(window._rzAuth&&typeof window._rzAuth.enforceTierFeatureAccess==='function'){window._rzAuth.enforceTierFeatureAccess('dc-incidents');}else{try{var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');var r=s&&s.role,t=s&&s.tier;var passes=!!s&&(r==='root'||t==='root');document.body.classList.toggle('locked',!passes);}catch(e){document.body.classList.add('locked');}}}var b=document.getElementById('rootLoginBtn');if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showRootGatePrompt==='function'){window._rzAuth.showRootGatePrompt('Root account required for the DC Incidents dossier.');}else if(window._rzAuth&&typeof window._rzAuth.showModal==='function'){window._rzAuth.showModal();}});window.addEventListener('rz-auth-change',function(){setTimeout(ag,50);});window.addEventListener('storage',function(e){if(e.key==='rz_premium_session')ag();});ag();setTimeout(ag,60);setTimeout(ag,550);setTimeout(ag,1600);})();
+    (function(){var el=document.getElementById('versionStamp');if(!el)return;var v=window.RZ_VERSION||'1.x.x',d=window.RZ_VERSION_DATE||'',cn=window.RZ_VERSION_CODENAME||'';el.textContent='· ResistanceZero · v'+v+(d?' · '+d:'')+(cn?' · '+cn:'')+' ·';})();
+    (function(){var n=0;function sc(){if(window.RZExplain&&window.RZExplain.scanText&&window.RZ_EXPLAIN_DB){var m=document.getElementById('main-content');if(m)window.RZExplain.scanText(m,140);}else if(n++<40){setTimeout(sc,200);}}setTimeout(sc,350);})();
+    </script>
+
+</body>
+</html>

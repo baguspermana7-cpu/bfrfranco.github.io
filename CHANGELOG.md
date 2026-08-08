@@ -13,6 +13,27 @@ release sections rather than semver.
 
 ---
 
+## v1.126.8 — 2026-08-08 (DC Incidents — +3 forensic dossiers, multi-agent research batch)
+
+### Added
+- **DC Incidents library 40 → 43** — three new source-cited engineering dossiers, each
+  produced by a multi-agent research workflow (research → adversarial fact-check) against
+  **public post-incident reports / regulators only**, then passed the visual-QA gate:
+  - **Azure global WAN outage (Jan 25 2023)** — an IGP-database-purge command defaulting to
+    global scope on one router vendor forced the whole AS 8075 backbone to reconverge; verified
+    against Microsoft PIR MO502273. ~5.5 h, most of Microsoft 365 offline worldwide.
+  - **Alibaba Cloud global all-region outage (Nov 12 2023)** — simultaneous multi-region control
+    failure; official disclosure minimal (stated honestly), near-identical follow-on Nov 27.
+  - **AWS EBS/EC2/RDS US-East-1 (Apr 21 2011)** — the canonical control-plane "re-mirroring storm"
+    positive-feedback cascade; verified against the AWS post-mortem (aws.amazon.com/message/65648/).
+- Each dossier carries ≥14 phased sequence-of-events, ≥6 sourced metrics, specific root cause +
+  latent/organisational root, correction-of-errors, and per-fact source provenance; gaps and
+  undisclosed figures are stated plainly, never invented.
+
+### Changed
+- Incident vector index + 2D semantic map regenerated (2,559 chunks · 43 incidents).
+- `sitemap.xml` lastmod + `llms.txt` refreshed (were ~2.5 weeks stale).
+
 ## v1.126.7 — 2026-08-08 (Finance Terminal — technical gauge on the Futures tab, R-003 complete)
 
 Completes R-003 coverage: the buy/sell gauge + technical analytics panel now appears on the

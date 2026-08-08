@@ -1,0 +1,338 @@
+{
+ "id": "aws-ebs-ec2-rds-us-east-1-2011",
+ "slug": "aws-ebs-ec2-rds-us-east-1-2011",
+ "title": "AWS EBS Re-Mirroring Storm and Stuck Volumes in US-East-1",
+ "operator": "Amazon Web Services",
+ "operatorShort": "AWS",
+ "date": "2011-04-21",
+ "durationMin": 5443,
+ "category": [
+  "network",
+  "config-error",
+  "software",
+  "storage"
+ ],
+ "dcName": "US-East-1 (Northern Virginia)",
+ "location": {
+  "city": "Ashburn area, Northern Virginia",
+  "country": "USA",
+  "region": "us-east-1",
+  "az": "single affected Availability Zone (of the US East Region)"
+ },
+ "severity": {
+  "usersAffected": "Not disclosed as a user count; blast radius covered one AZ directly plus region-wide EBS/EC2/RDS control-plane degradation. Consumer sites knocked offline included Reddit, Quora, Foursquare, Hootsuite and Heroku (also Engine Yard), per CNN Money and GovTech.",
+  "impactUsd": "Not disclosed by AWS. Direct remedy was a 10-day service credit equal to 100% of affected customers' EBS, EC2 and RDS usage in the affected AZ; aggregate dollar figure never published.",
+  "servicesDown": [
+   "Amazon EBS (Elastic Block Store)",
+   "Amazon EC2 (EBS-backed instance launch/attach)",
+   "Amazon RDS (single-AZ and some multi-AZ)"
+  ],
+  "tier": "Major multi-day regional service disruption (single AZ hard-down, region-wide control-plane impact)"
+ },
+ "brief": "A routine network-capacity upgrade in one US-East-1 Availability Zone was executed incorrectly, shifting EBS traffic onto a low-capacity redundant network and isolating a large block of storage nodes. When connectivity returned, the nodes launched a self-reinforcing \"re-mirroring storm\" that exhausted spare capacity, left ~13% of the zone's volumes \"stuck\", and starved the region-wide EBS control plane — degrading EC2 and RDS for nearly four days and permanently losing 0.07% of the affected zone's volumes.",
+ "magnitude": {
+  "usersScore": 8,
+  "financialScore": 6,
+  "durationScore": 9,
+  "blastRadiusScore": 7,
+  "note": "Duration score high: ~90 hours (approx) from trigger (12:47 AM PDT Apr 21) to effective end over the weekend of Apr 24. AWS's own post-mortem states RDS databases 'recovered throughout the weekend' without a precise closing time; third-party summaries cite ~7:30 PM PDT Apr 24. Blast radius: one AZ hard-down with region-wide EBS control-plane thread starvation touching all AZs; peak stuck-volume spillover to healthy zones stayed <0.07%. Financial mid: real remedy was a 10-day 100% EBS/EC2/RDS credit in the affected AZ but AWS never published a dollar total."
+ },
+ "sequenceOfEvents": [
+  {
+   "t": "2011-04-21 00:47 PDT",
+   "phase": "TRIGGER",
+   "event": "During a planned network-capacity upgrade in one US-East-1 AZ, engineers shifted traffic off a primary EBS router; instead of moving it to another router in the primary high-capacity network, the change routed it onto the lower-capacity redundant EBS network, which could not carry the load.",
+   "source": "https://aws.amazon.com/message/65648/"
+  },
+  {
+   "t": "2011-04-21 00:47 PDT",
+   "phase": "TRIGGER",
+   "event": "Because the redundant network also became overwhelmed/isolated, affected EBS nodes lost BOTH their primary and secondary network paths at once, cutting them off from their replica peers.",
+   "source": "https://aws.amazon.com/message/65648/"
+  },
+  {
+   "t": "2011-04-21 ~00:50 PDT",
+   "phase": "CASCADE",
+   "event": "The incorrect traffic shift was rolled back; reconnected nodes immediately began searching the cluster for free space to re-establish lost data replicas, all at once. This concurrent scramble became a self-reinforcing 're-mirroring storm'.",
+   "source": "https://aws.amazon.com/message/65648/"
+  },
+  {
+   "t": "2011-04-21 ~01:00 PDT",
+   "phase": "CASCADE",
+   "event": "Free capacity in the affected cluster was rapidly exhausted; nodes that could not find space entered a retry loop. About 13% of the volumes in the affected AZ became 'stuck' searching for storage.",
+   "source": "https://aws.amazon.com/message/65648/"
+  },
+  {
+   "t": "2011-04-21 ~01:15 PDT",
+   "phase": "CASCADE",
+   "event": "The flood of Create Volume / re-mirror API calls caused thread starvation in the EBS control plane. Because the control plane spans the whole region, elevated error rates and latencies appeared across ALL Availability Zones, not just the failed one.",
+   "source": "https://aws.amazon.com/message/65648/"
+  },
+  {
+   "t": "2011-04-21 ~02:00 PDT (just before 5 a.m. ET)",
+   "phase": "IMPACT",
+   "event": "Consumer-facing sites hosted on EC2 in the region went down or degraded, including Reddit, Quora, Foursquare, Hootsuite and Heroku (also Engine Yard); the outage was public and widely reported. Press reports place the onset just before 5 a.m. ET, i.e. roughly 2 a.m. PDT.",
+   "source": "https://money.cnn.com/2011/04/21/technology/amazon_server_outage/index.htm + https://www.govtech.com/archive/amazon-ec2-outage.html"
+  },
+  {
+   "t": "2011-04-21 02:40 PDT",
+   "phase": "MITIGATION",
+   "event": "AWS disabled all Create Volume API requests in the affected AZ to relieve the control-plane thread starvation.",
+   "source": "https://aws.amazon.com/message/65648/"
+  },
+  {
+   "t": "2011-04-21 02:50 PDT",
+   "phase": "MITIGATION",
+   "event": "With Create Volume calls blocked, EBS control-plane latencies and error rates for all other EBS-related APIs in the OTHER (healthy) Availability Zones recovered to normal.",
+   "source": "https://aws.amazon.com/message/65648/"
+  },
+  {
+   "t": "2011-04-21 05:30-08:20 PDT",
+   "phase": "CASCADE",
+   "event": "A second wave hit: a low-probability race condition caused EBS nodes to fail when concurrently closing large numbers of replication requests, and failed re-mirror retries generated heavy control-plane negotiation, pushing an ADDITIONAL ~5% of the AZ's volumes into the stuck state.",
+   "source": "https://aws.amazon.com/message/65648/"
+  },
+  {
+   "t": "2011-04-21 08:20 PDT",
+   "phase": "MITIGATION",
+   "event": "AWS began disabling all communication between the degraded EBS cluster and the EBS control plane, quarantining the failure so it could no longer poison other zones.",
+   "source": "https://aws.amazon.com/message/65648/"
+  },
+  {
+   "t": "2011-04-21 11:30 PDT",
+   "phase": "RECOVERY",
+   "event": "A change to the EBS control plane fixed the elevated errors/latencies when launching EBS-backed EC2 instances in the healthy zones; new-instance error rates declined rapidly and returned to near-normal by Noon PDT.",
+   "source": "https://aws.amazon.com/message/65648/"
+  },
+  {
+   "t": "2011-04-21 12:04 PDT",
+   "phase": "RECOVERY",
+   "event": "The event was contained to the single affected AZ: stabilization complete, ~13% of the AZ's volumes still stuck, and EBS APIs disabled in the affected zone while recovery proceeded.",
+   "source": "https://aws.amazon.com/message/65648/"
+  },
+  {
+   "t": "2011-04-22 02:00 PDT",
+   "phase": "RECOVERY",
+   "event": "Installation of new physical storage capacity began. Recovery was slow because the EBS cluster will not reuse a failed node until every replica on it is successfully re-mirrored, and capacity had to be physically relocated from across the US East Region.",
+   "source": "https://aws.amazon.com/message/65648/"
+  },
+  {
+   "t": "2011-04-22 12:30 PDT",
+   "phase": "RECOVERY",
+   "event": "All but about 2.2% of the volumes in the affected AZ had been restored to normal operation.",
+   "source": "https://aws.amazon.com/message/65648/"
+  },
+  {
+   "t": "2011-04-23 15:35 PDT",
+   "phase": "RECOVERY",
+   "event": "EBS control-plane API access was re-enabled (finished enabling access) for the affected AZ.",
+   "source": "https://aws.amazon.com/message/65648/"
+  },
+  {
+   "t": "2011-04-23 18:15 PDT",
+   "phase": "RECOVERY",
+   "event": "Full EBS API access to EBS resources was restored to the affected Availability Zone.",
+   "source": "https://aws.amazon.com/message/65648/"
+  },
+  {
+   "t": "2011-04-24 12:30 PDT",
+   "phase": "RECOVERY",
+   "event": "All but 1.04% of the affected volumes had been recovered, largely by restoring from snapshots.",
+   "source": "https://aws.amazon.com/message/65648/"
+  },
+  {
+   "t": "2011-04-24 15:00 PDT",
+   "phase": "RECOVERY",
+   "event": "Manual recovery began on the remaining volumes that had not been snapshotted / were tied to hardware failures.",
+   "source": "https://aws.amazon.com/message/65648/"
+  },
+  {
+   "t": "2011-04-24 (evening, over the weekend)",
+   "phase": "RESTORED",
+   "event": "Remaining RDS databases were brought back online over the weekend, effectively ending the multi-day disruption; a final 0.07% of the affected AZ's EBS volumes could not be recovered. AWS's post-mortem describes RDS recovery as completing 'throughout the weekend' without a precise time; third-party summaries cite ~7:30 PM PDT Apr 24.",
+   "source": "https://aws.amazon.com/message/65648/ (RDS 'recovered throughout the weekend'); ~7:30 PM PDT figure per third-party summaries e.g. https://www.datacenterknowledge.com/outages/a-history-of-aws-cloud-and-data-center-outages"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Total disruption duration",
+   "value": "~90 hours (approx; 12:47 AM PDT Apr 21 to effective end over the weekend of Apr 24; AWS gives no precise closing time)",
+   "source": "https://aws.amazon.com/message/65648/ (weekend recovery); ~7:30 PM PDT Apr 24 per third-party summaries"
+  },
+  {
+   "label": "Peak stuck EBS volumes (affected AZ)",
+   "value": "~13% initial, +5% in second wave (~18% cumulative touched)",
+   "source": "https://aws.amazon.com/message/65648/"
+  },
+  {
+   "label": "Volumes not yet restored by Apr 22 12:30 PDT",
+   "value": "2.2%",
+   "source": "https://aws.amazon.com/message/65648/"
+  },
+  {
+   "label": "Volumes not yet restored by Apr 24 12:30 PDT",
+   "value": "1.04%",
+   "source": "https://aws.amazon.com/message/65648/"
+  },
+  {
+   "label": "Permanent EBS data loss (affected AZ)",
+   "value": "0.07% of volumes unrecoverable",
+   "source": "https://aws.amazon.com/message/65648/"
+  },
+  {
+   "label": "RDS single-AZ instances with stuck I/O (peak)",
+   "value": "45% at peak; 0.4% suffered unrecoverable storage",
+   "source": "https://aws.amazon.com/message/65648/"
+  },
+  {
+   "label": "RDS single-AZ recovery pace",
+   "value": "41.0% still stuck after 24h, 23.5% after 36h, 14.6% after 48h; the rest recovered over the weekend",
+   "source": "https://aws.amazon.com/message/65648/"
+  },
+  {
+   "label": "RDS multi-AZ failover failures",
+   "value": "2.5% failed to auto-failover due to a previously un-encountered bug",
+   "source": "https://aws.amazon.com/message/65648/"
+  },
+  {
+   "label": "Stuck-volume spillover into healthy AZs (peak)",
+   "value": "less than 0.07%",
+   "source": "https://aws.amazon.com/message/65648/"
+  },
+  {
+   "label": "Customer remedy",
+   "value": "10-day service credit = 100% of affected EBS, EC2 and RDS usage in the affected AZ",
+   "source": "https://aws.amazon.com/message/65648/"
+  }
+ ],
+ "rootCause": "Immediate mechanism: At 12:47 AM PDT on 21 April 2011, AWS engineers ran a planned capacity upgrade on the primary EBS network in one US-East-1 Availability Zone. The procedure required shifting traffic off one router in the primary (high-capacity) EBS network onto another router in that same primary network. Instead, the change was executed so that traffic was routed onto the LOWER-CAPACITY redundant EBS network. That secondary network was never sized to carry primary load, so it too saturated/failed — and because the shift removed the primary path at the same moment, a large group of EBS storage nodes lost BOTH their primary and secondary network connectivity simultaneously. EBS nodes depend on continuous peer-to-peer connectivity to keep each volume's two replicas in sync; losing all connectivity made them believe their replicas had failed.\n\nThe specific failure that turned a network blip into a four-day outage was the EBS re-mirroring design. When connectivity was restored, every isolated node concurrently and aggressively began scanning the cluster for free space to rebuild a fresh second replica. Because so many volumes re-mirrored at once, the cluster's free capacity was exhausted almost instantly, and nodes that could not find space fell into a tight retry loop — the \"re-mirroring storm\". Roughly 13% of the AZ's volumes ended up \"stuck\", unable to serve I/O while hunting for storage. The storm then attacked a second, shared component: the region-wide EBS control plane. The torrent of Create Volume and re-mirror negotiation calls caused thread starvation in the control plane, and because that control plane is a single regional service, its degradation leaked EC2 launch/attach errors and elevated latencies into ALL Availability Zones — converting a single-AZ hardware event into a regional one. A latent, low-probability race condition (nodes failing while concurrently closing large batches of replication requests) added a second wave of ~5% more stuck volumes.\n\nLatent / organisational root causes: (1) A change-management gap — a manual, error-prone network migration step with no automated guardrail to detect or block routing production EBS traffic onto a network known to lack the required capacity; the safeguard that should have caught it (capacity-aware validation or a peer-review/dry-run of the traffic-shift target) was absent or bypassed. (2) A design flaw in re-mirroring: it had no back-pressure, jitter, or admission control, so a correlated failure produced a stampede that consumed the very spare capacity meant to absorb failures — a classic positive-feedback loop. (3) A blast-radius / isolation flaw: the EBS control plane was a shared, region-scoped dependency with no per-AZ fault isolation, so one AZ's storm starved the whole region. (4) A hidden defect in the multi-AZ RDS failover path (a \"previously un-encountered bug\") meant 2.5% of the very databases customers had paid extra to make resilient did not fail over automatically.",
+ "contributingFactors": [
+  "The redundant EBS network was lower-capacity than the primary and unable to sustain primary traffic, so routing to it was equivalent to removing redundancy rather than preserving it.",
+  "Re-mirroring had no rate-limiting, jitter, or back-pressure, allowing large numbers of nodes to stampede for free space simultaneously and exhaust cluster capacity.",
+  "The EBS control plane was a single region-wide service with no AZ-level isolation, so control-plane thread starvation propagated to healthy Availability Zones.",
+  "A latent, low-probability race condition caused EBS nodes to fail when concurrently closing large numbers of replication requests, generating a damaging second wave of stuck volumes.",
+  "A previously un-encountered bug in RDS multi-AZ failover prevented automatic failover for 2.5% of multi-AZ instances, undermining the paid resilience feature.",
+  "Recovery was structurally slow: a failed node cannot be reused until every replica on it is re-mirrored, and fresh capacity had to be physically relocated from elsewhere in the US East Region.",
+  "Slow, vague customer communications (imprecise 'small percentage'/'multiple availability zones' wording; AWS itself later conceded it wanted communications 'more frequent and containing more information') left customers unable to make informed failover decisions.",
+  "Many customers had architected for a single AZ, so a single-AZ event took their whole application down."
+ ],
+ "coe": [
+  {
+   "action": "Audit and automate the network change-management process so production EBS traffic can never be shifted onto an under-capacity network; add capacity-aware validation and reviewed dry-runs before executing traffic shifts.",
+   "owner": "AWS EBS / Network Engineering",
+   "status": "committed in post-mortem"
+  },
+  {
+   "action": "Add back-pressure, rate-limiting and randomized retry (jitter) to EBS re-mirroring so a correlated failure cannot trigger a capacity-exhausting stampede, and make nodes more conservative about declaring a replica failed on transient network loss.",
+   "owner": "AWS EBS Engineering",
+   "status": "committed in post-mortem"
+  },
+  {
+   "action": "Improve EBS control-plane fault isolation so per-AZ failures cannot starve the region-wide control plane's threads/resources; reduce the shared, region-scoped blast radius.",
+   "owner": "AWS EBS Engineering",
+   "status": "committed in post-mortem"
+  },
+  {
+   "action": "Fix the previously un-encountered RDS multi-AZ failover bug so paid multi-AZ databases reliably auto-failover on stuck I/O.",
+   "owner": "AWS RDS Engineering",
+   "status": "committed in post-mortem"
+  },
+  {
+   "action": "Improve customer communications during large-scale events: more frequent, more specific status updates with actionable detail and clearer identification of affected AZs.",
+   "owner": "AWS Support / Communications",
+   "status": "committed in post-mortem"
+  },
+  {
+   "action": "Provide better guidance and tooling for multi-AZ architecture so customers can build applications resilient to a single-AZ failure; issue the 10-day 100% service credit to affected customers.",
+   "owner": "AWS",
+   "status": "credit issued; guidance committed"
+  }
+ ],
+ "lessonsLearnt": [
+  "A recovery mechanism (re-mirroring) without admission control can become the outage: a correlated fault turns self-healing into a stampede that consumes the spare capacity meant to absorb failures.",
+  "Shared, region-scoped control planes are a hidden single point of failure — a per-AZ data-plane fault leaked region-wide because the control plane had no AZ isolation.",
+  "'Redundant' capacity that is lower-capacity than primary is not redundancy for full load; failing onto it can remove protection rather than preserve it.",
+  "Paid resilience features must be tested against the exact rare failure modes they exist for — the RDS multi-AZ failover bug surfaced only under real stress.",
+  "Single-AZ architectures inherit the AZ's fate; customers who spanned AZs and had snapshots recovered far better.",
+  "During large incidents, vague/slow status communications actively harm customers who could otherwise trigger their own failover."
+ ],
+ "improvements": [
+  "Automated, capacity-aware guardrails in the network change process that block shifting production traffic onto an under-capacity path, plus mandatory peer-review/dry-run of the traffic-shift target.",
+  "Back-pressure, jitter and admission control in EBS re-mirroring to prevent stampedes.",
+  "Per-AZ isolation of the EBS control plane to bound blast radius.",
+  "Regression coverage and chaos/failure testing for the RDS multi-AZ failover path.",
+  "More frequent, more specific incident communications with clear affected-AZ identification.",
+  "Customer-facing multi-AZ architecture guidance and tooling to reduce single-AZ dependency."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "Canonical control-plane cascade",
+   "body": "a localized data-plane network misconfiguration in one AZ propagated region-wide because the EBS control plane was a single shared regional service subject to thread starvation."
+  },
+  {
+   "heading": "Positive-feedback re-mirroring loop",
+   "body": "reconnected nodes all re-mirrored at once, exhausting the free space that re-mirroring itself needed, so the more the system tried to heal the worse it got."
+  },
+  {
+   "heading": "Two stacked amplifiers",
+   "body": "(a) the re-mirroring stampede (~13%) and (b) a low-probability race condition on concurrent replication-request closure (~5%)."
+  },
+  {
+   "heading": "Blast-radius containment held",
+   "body": "Blast-radius containment worked once AWS quarantined the degraded cluster from the control plane (08:20 PDT) and blocked Create Volume (02:40 PDT), restoring healthy AZs while the affected AZ was worked through the weekend."
+  },
+  {
+   "heading": "Data durability held",
+   "body": "only 0.07% of the affected AZ's volumes were permanently lost, and most recovery came from customer/EBS snapshots — reinforcing the snapshot discipline lesson."
+  },
+  {
+   "heading": "RDS single-AZ dependency exposed",
+   "body": "The RDS impact showed that a dependency on EBS turns an EBS event into a database event, and that the multi-AZ failover safeguard itself had an untested failure mode (2.5% did not fail over)."
+  }
+ ],
+ "technicalDeepDive": "EBS stores each volume as two replicas on separate storage nodes kept in sync over a peer-to-peer network. Normal operation uses a high-capacity primary network with a lower-capacity redundant network intended only for inter-node control/backup traffic. At 12:47 AM PDT on Apr 21, a capacity-upgrade step meant to move traffic between two routers on the primary network instead routed a large volume of traffic onto the low-capacity redundant network. That network saturated, and because the primary path had been withdrawn simultaneously, a large set of nodes lost all connectivity to their replica peers. Each node, unable to reach its replica, concluded the replica had failed and — upon reconnection — tried to establish a new replica by scanning the cluster for free space. With a large fraction of the cluster doing this at once, free capacity was consumed almost immediately; nodes that could not find space entered a continuous retry loop, leaving ~13% of the AZ's volumes 'stuck' (unable to serve I/O). The re-mirror negotiation and a flood of Create Volume calls then exhausted worker threads in the region-wide EBS control plane, so elevated latency/errors appeared across all AZs. AWS disabled Create Volume in the affected AZ (02:40), which recovered other AZs' EBS APIs by 02:50; but a low-probability race condition — nodes failing while concurrently closing large numbers of replication requests — drove a second wave (~5% more stuck) between 05:30 and 08:20, prompting AWS to sever the degraded cluster from the control plane (08:20). A control-plane fix at 11:30 restored EBS-backed EC2 launches to near-normal by noon; the event was contained to the single AZ by 12:04 PM. Recovery was slow because a failed node cannot be reused until all its replicas are re-mirrored and physical capacity had to be relocated across the region: 2.2% still down by Apr 22 12:30, 1.04% by Apr 24 12:30, with 0.07% permanently lost. RDS, which is layered on EBS, saw a peak 45% of single-AZ instances with stuck I/O (0.4% unrecoverable) and 2.5% of multi-AZ instances failing to auto-failover due to a previously un-encountered bug; RDS recovered over the following weekend.",
+ "references": [
+  {
+   "title": "Summary of the Amazon EC2 and Amazon RDS Service Disruption in the US East Region",
+   "url": "https://aws.amazon.com/message/65648/",
+   "type": "official-postmortem",
+   "quote": "At 12:47 AM PDT on April 21st ... the traffic was routed onto the lower capacity redundant EBS network ... about 13% of the volumes in the affected Availability Zone were in this 'stuck' state ... 0.07% of the volumes in the affected Availability Zone could not be restored ... a 10 day credit equal to 100% of their usage of EBS Volumes, EC2 Instances and RDS database instances that were running in the affected Availability Zone.",
+   "accessed": "2026-08-08"
+  },
+  {
+   "title": "Amazon EC2 cloud outage downs Reddit, Quora",
+   "url": "https://money.cnn.com/2011/04/21/technology/amazon_server_outage/index.htm",
+   "type": "news",
+   "quote": "A rare and major outage of Amazon's cloud-based Web service took down a plethora of online sites, including Reddit, HootSuite, Foursquare and Quora.",
+   "accessed": "2026-08-08"
+  },
+  {
+   "title": "Amazon EC2 Outage Brings Down Numerous Websites",
+   "url": "https://www.govtech.com/archive/amazon-ec2-outage.html",
+   "type": "news",
+   "quote": "The outages began Thursday morning just before 5 a.m. ET; affected sites included Reddit, HootSuite, Foursquare, Quora, Heroku and Engine Yard.",
+   "accessed": "2026-08-08"
+  },
+  {
+   "title": "Amazon EC2 outage post-mortem (analysis and criticism)",
+   "url": "https://www.theregister.com/2011/04/29/amazon_ec2_outage_post_mortem/",
+   "type": "news",
+   "quote": "AWS acknowledged: 'We would like our communications to be more frequent and contain more information.' A customer described the post-mortem as 'a Catholic penance, yet it contains surprisingly little actionable information.'",
+   "accessed": "2026-08-08"
+  },
+  {
+   "title": "A History of AWS Cloud and Data Center Outages",
+   "url": "https://www.datacenterknowledge.com/outages/a-history-of-aws-cloud-and-data-center-outages",
+   "type": "reference",
+   "quote": "AWS suffered an extended outage in one of its northern Virginia data centers, which took down popular sites including Reddit and Quora.",
+   "accessed": "2026-08-08"
+  }
+ ],
+ "sourcing": {
+  "confidence": "high",
+  "lastVerified": "2026-08-08",
+  "officialPostmortem": true,
+  "referenceCount": 5
+ },
+ "lastUpdated": "2026-08-08"
+}

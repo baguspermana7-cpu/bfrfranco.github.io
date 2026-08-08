@@ -1,0 +1,369 @@
+{
+ "id": "azure-wan-router-global-2023",
+ "slug": "azure-wan-router-global-2023",
+ "title": "Microsoft Azure / Microsoft 365 Global WAN Outage — IGP-Purge Command Cascade (Jan 25 2023)",
+ "operator": "Microsoft Azure",
+ "operatorShort": "Microsoft Azure",
+ "date": "2023-01-25",
+ "durationMin": 335,
+ "dcName": "Global WAN backbone (Madrid capacity-expansion node, AS 8075)",
+ "location": {
+  "city": "Madrid",
+  "country": "Spain",
+  "region": "Global WAN (AS 8075); impact worldwide, majority Asia-Pacific + EMEA",
+  "az": "n/a — backbone WAN, not a single AZ"
+ },
+ "category": [
+  "network",
+  "config-error",
+  "change-management"
+ ],
+ "severity": {
+  "usersAffected": "Not precisely disclosed by Microsoft. Any user served by the affected infrastructure worldwide; majority in Asia-Pacific and EMEA as it hit core business hours. Third-party Downdetector logged thousands of reports — more than 3,900 in India and over 900 in Japan (NPR).",
+  "impactUsd": "Not disclosed by Microsoft or any regulator.",
+  "servicesDown": [
+   "Microsoft Teams",
+   "Exchange Online / Outlook",
+   "SharePoint Online",
+   "OneDrive for Business",
+   "Microsoft Graph",
+   "Power BI / Power Platform",
+   "Microsoft 365 admin center",
+   "Microsoft Intune",
+   "Microsoft Defender for Cloud Apps / Identity / Endpoint",
+   "Azure client connectivity",
+   "Azure ExpressRoute",
+   "Azure Government (reported by news coverage; not itemised in the M365 PIR)"
+  ],
+  "tier": "Sev-A global multi-service outage"
+ },
+ "brief": "A single IGP-database-purge command, added to a WAN change procedure that was never re-tested, executed network-wide on one router vendor's platform in Madrid — forcing every IGP-joined router in Microsoft's global backbone (AS 8075) to recompute adjacency and forwarding tables and BGP to re-validate all internet prefixes. The resulting packet loss took Azure and most of Microsoft 365 offline worldwide for roughly 5.5 hours, with a second wave triggered 33 minutes later when the same command was run on a second Madrid router.",
+ "magnitude": {
+  "usersScore": 8,
+  "financialScore": 6,
+  "durationScore": 6,
+  "blastRadiusScore": 9,
+  "note": "Blast radius maximal: the fault was in the global WAN itself (AS 8075), so it degraded client-to-Azure, datacenter-to-datacenter and ExpressRoute paths simultaneously (all three named in Microsoft PIR MO502273), taking down essentially the whole Microsoft 365 suite. Azure Government impact was reported by news coverage but is not itemised in the M365 PIR. Duration 5h35m core (07:08–12:43 UTC) with residual Outlook-on-the-web impact tracked separately (EX502694) into Jan 26 03:50 UTC. Financial score inferred from global productivity impact — no USD figure was disclosed by Microsoft or any regulator, so this is an estimate, not a sourced number."
+ },
+ "sequenceOfEvents": [
+  {
+   "t": "2023-01-25 07:08 UTC",
+   "phase": "TRIGGER",
+   "event": "A network engineer performing a planned task to add WAN capacity in Madrid modifies the IP address on a new router and runs a command to purge the IGP database. On this router vendor's platform the command's default action is global, not local, so it executes across every IGP-joined router.",
+   "source": "Microsoft PIR MO502273"
+  },
+  {
+   "t": "2023-01-25 07:08 UTC",
+   "phase": "CASCADE",
+   "event": "All IGP-joined routers in Microsoft's global WAN are ordered to recompute their IGP topology (adjacency and forwarding) databases; during the recomputation the routers cannot correctly forward packets.",
+   "source": "Microsoft PIR MO502273"
+  },
+  {
+   "t": "2023-01-25 ~07:10 UTC",
+   "phase": "CASCADE",
+   "event": "BGP routers (AS 8075) begin readvertising and re-validating internet prefixes as a second-order effect; ThousandEyes observes multiple Microsoft prefixes withdrawn completely then almost immediately readvertised, precipitating global route-table instability and packet loss.",
+   "source": "ThousandEyes / Network World"
+  },
+  {
+   "t": "2023-01-25 07:09–07:22 UTC",
+   "phase": "IMPACT",
+   "event": "First wave of SharePoint Online / OneDrive availability loss (of three waves: 07:09–07:22, 07:42–07:47, 08:27–08:29) as User Front End components lose internal connectivity to backend SQL infrastructure.",
+   "source": "Microsoft PIR MO502273"
+  },
+  {
+   "t": "2023-01-25 07:11 UTC",
+   "phase": "DETECTION",
+   "event": "Microsoft monitoring alerts on-call engineers of a networking issue (within ~3–5 minutes of the command); the team initially begins reviewing DNS configurations.",
+   "source": "Microsoft PIR MO502273"
+  },
+  {
+   "t": "2023-01-25 07:27 UTC",
+   "phase": "DETECTION",
+   "event": "Microsoft publishes incident MO502273 to the Service Health Dashboard and status.office.com after the admin center is affected.",
+   "source": "Microsoft PIR MO502273"
+  },
+  {
+   "t": "2023-01-25 07:38 UTC",
+   "phase": "MITIGATION",
+   "event": "SPO and ODB are failed off Azure Front Door routing to test for relief; this does not correct the problem.",
+   "source": "Microsoft PIR MO502273"
+  },
+  {
+   "t": "2023-01-25 07:40 UTC",
+   "phase": "DETECTION",
+   "event": "Monitoring confirms the fault is inside the Microsoft WAN, not DNS — redirecting the investigation to the backbone.",
+   "source": "Microsoft PIR MO502273"
+  },
+  {
+   "t": "2023-01-25 ~07:41 UTC",
+   "phase": "CASCADE",
+   "event": "Because the engineer was never informed of the alerts (the modified SOP omitted the checks), the same command is run on a second Madrid router ~33 minutes after the first, creating a second wave of connectivity failures across the network.",
+   "source": "Microsoft PIR MO502273"
+  },
+  {
+   "t": "2023-01-25 07:44 UTC",
+   "phase": "MITIGATION",
+   "event": "Reports confirm multiple services impacted; out of caution Azure reverts a recently deployed IPv6 change suspected as the cause — later confirmed unrelated.",
+   "source": "Microsoft PIR MO502273"
+  },
+  {
+   "t": "2023-01-25 08:10–08:20 UTC",
+   "phase": "RECOVERY",
+   "event": "Automated WAN recovery features begin restoring the network just after 08:10; at 08:20 Microsoft identifies the WAN change as the source of the incident.",
+   "source": "Microsoft PIR MO502273"
+  },
+  {
+   "t": "2023-01-25 09:00 UTC",
+   "phase": "RECOVERY",
+   "event": "Telemetry shows the majority of network devices recovered; Outlook desktop-client connectivity recovers around this time.",
+   "source": "Microsoft PIR MO502273"
+  },
+  {
+   "t": "2023-01-25 09:35 UTC",
+   "phase": "RECOVERY",
+   "event": "WAN self-recovers and equipment stabilizes; full prefix reconvergence took roughly 1 hour 40 minutes. Two routers fail to recover automatically, leaving residual intermittent packet loss.",
+   "source": "Microsoft PIR MO502273"
+  },
+  {
+   "t": "2023-01-25 09:40–09:50 UTC",
+   "phase": "RECOVERY",
+   "event": "Microsoft Teams recovers at 09:40; SharePoint Online and OneDrive for Business recover by 09:50; some customers begin reporting recovery at 09:51.",
+   "source": "Microsoft PIR MO502273"
+  },
+  {
+   "t": "2023-01-25 10:11 UTC",
+   "phase": "IMPACT",
+   "event": "Engineers identify additional region-specific packet loss in the India region during the tail of recovery.",
+   "source": "Microsoft PIR MO502273"
+  },
+  {
+   "t": "2023-01-25 11:04–11:30 UTC",
+   "phase": "MITIGATION",
+   "event": "Microsoft begins reviewing options to restart affected application pools to clear residual downstream M365 impact; by 11:30 telemetry shows impact no longer occurring for most customers (mailbox application-pool restarts were executed later, ~13:30 UTC).",
+   "source": "Microsoft PIR MO502273"
+  },
+  {
+   "t": "2023-01-25 12:43 UTC",
+   "phase": "RESTORED",
+   "event": "Majority of Microsoft 365 services recovered, overall service stable, and packet loss returned to normal levels; only a small residual for Outlook on the web remains.",
+   "source": "Microsoft PIR MO502273"
+  },
+  {
+   "t": "2023-01-25 14:10 UTC",
+   "phase": "RESTORED",
+   "event": "MO502273 closed as resolved after extended monitoring; the residual Outlook-on-the-web impact is tracked separately under EX502694.",
+   "source": "Microsoft PIR MO502273"
+  },
+  {
+   "t": "2023-01-26 03:50 UTC",
+   "phase": "RESTORED",
+   "event": "Residual Exchange Online impact (a BitLocker / Shared Cache race condition on CAFE components after machine restarts) is fully resolved under EX502694.",
+   "source": "Microsoft PIR MO502273"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Core incident duration",
+   "value": "5h 35m (07:08–12:43 UTC)",
+   "source": "Microsoft PIR MO502273"
+  },
+  {
+   "label": "Bulk / peak impact window",
+   "value": "~90 minutes",
+   "source": "ThousandEyes / Network World"
+  },
+  {
+   "label": "Full WAN prefix reconvergence time",
+   "value": "~1 hour 40 minutes",
+   "source": "Microsoft PIR MO502273"
+  },
+  {
+   "label": "Detection latency",
+   "value": "Alerts to on-call within ~5 min (07:08 → 07:11 UTC)",
+   "source": "Microsoft PIR MO502273"
+  },
+  {
+   "label": "Delay to second (repeat) wave",
+   "value": "33 minutes after first command",
+   "source": "Microsoft PIR MO502273"
+  },
+  {
+   "label": "SharePoint/OneDrive request drop",
+   "value": "~10% reduction in worldwide RPS, 07:08–09:50 UTC vs prior week",
+   "source": "Microsoft PIR MO502273"
+  },
+  {
+   "label": "Routers that failed automatic recovery",
+   "value": "2",
+   "source": "Microsoft PIR MO502273"
+  },
+  {
+   "label": "Autonomous System affected",
+   "value": "AS 8075 — multiple prefixes (/24 and summary /12) withdrawn then readvertised",
+   "source": "ThousandEyes / Network World"
+  },
+  {
+   "label": "Residual Outlook-on-web full resolution",
+   "value": "2023-01-26 03:50 UTC (EX502694)",
+   "source": "Microsoft PIR MO502273"
+  },
+  {
+   "label": "Third-party outage reports (Downdetector)",
+   "value": ">3,900 reports in India, >900 in Japan; thousands worldwide",
+   "source": "NPR / Downdetector"
+  }
+ ],
+ "rootCause": "Immediate mechanism: At 07:08 UTC on 25 January 2023, a network engineer was adding capacity to Microsoft's global WAN in Madrid. As part of integrating the new routers into the IGP (Interior Gateway Protocol, which connects all routers inside Microsoft's WAN) and BGP (Border Gateway Protocol, which distributes internet routing) domains, the modified procedure included a command to purge the IGP database. That command is not vendor-neutral: on routers from two of Microsoft's manufacturers it acts only on the local device, but on the third manufacturer's platform — the one being changed — its default action is global, ordering every IGP-joined router in the entire backbone to recompute its IGP topology database. While the routers recomputed adjacency and forwarding tables they could not forward packets correctly, so this single command silently detonated across the whole global WAN, degrading client-to-Azure connectivity, datacenter-to-datacenter connectivity, and ExpressRoute simultaneously. The IGP storm then forced BGP (AS 8075) to withdraw and re-validate internet prefixes; ThousandEyes observed Microsoft prefixes being withdrawn and near-immediately readvertised, producing global route instability and heavy packet loss.\n\nLatent / organisational root: This was fundamentally a change-management and safeguard failure, not merely \"human error.\" Microsoft's standard operating procedure for this class of change is a four-step gate — validation in the Open Network Emulator (ONE), lab testing, a documented Safe-Fly Review with roll-out/roll-back plans, and Safe-Deployment limiting access to one device at a time. The SOP had been edited shortly before the event to fix problems seen in previous runs, but the edited procedure was never re-tested and shipped without proper pre- and post-checks. Two defences that should have caught the command both had gaps: (1) the real-time Authentication, Authorization and Accounting (AAA) system maintains a block-list of globally-impactful commands, but this command's global default behaviour on that specific router model had never been discovered during the high-impact-command evaluation for that platform, so it was never added to the block-list; and (2) the \"one device at a time\" Safe-Deployment isolation was rendered useless because the single accessible router was still IGP-connected to the whole backbone — device-level isolation gives no protection against a command that propagates through the routing protocol itself. Finally, although monitoring alerted on-call engineers within five minutes, the engineer making the change was never notified (again a consequence of the unqualified SOP edit), so the identical command was executed on a second Madrid router 33 minutes later, causing an avoidable second wave.",
+ "contributingFactors": [
+  "An SOP was edited to fix prior-run problems but was never re-validated in ONE/lab and shipped without proper pre- and post-checks, leaving an error in the live procedure.",
+  "The IGP-purge command has different behaviour across the three router vendors — local on two, global on the third — and that global default was never characterised in the high-impact-command review for the changed platform.",
+  "The AAA command block-list did not include this command for this router model, so the real-time guardrail let a globally-impactful command run.",
+  "Device-level Safe-Deployment isolation (one router at a time) provided no protection because the isolated router was still joined to the backbone via IGP — the blast propagated through the protocol, not through device access.",
+  "On-call alerting fired within ~5 minutes but the executing engineer was never informed, so the same destructive command was run on a second router 33 minutes later, creating a second wave.",
+  "Timing amplified impact: the change hit during core business hours across Asia-Pacific and EMEA.",
+  "Two routers could not auto-recover, and downstream M365 services (SPO/ODB, EXO) needed the WAN restored before they could recover, extending user-visible impact well past the WAN's ~09:35 self-recovery.",
+  "Monitoring generated high-volume per-farm/per-feature alerts (SPO/ODB and Teams) rather than quickly detecting a single wider service-wide event, slowing incident triage."
+ ],
+ "coe": [
+  {
+   "action": "Audit and block similar commands that can have widespread impact across all three router vendors for all WAN router roles.",
+   "owner": "Azure Networking",
+   "status": "Committed — target February 2023"
+  },
+  {
+   "action": "Publish real-time visibility of approved-automated, approved-break-glass, and unqualified device activity so on-call engineers can see who is changing what on network devices.",
+   "owner": "Azure Networking",
+   "status": "Committed — target February 2023"
+  },
+  {
+   "action": "Implement regular, ongoing mandatory operational training and attestation of following all SOPs.",
+   "owner": "Azure Networking Operations",
+   "status": "Committed — target February 2023"
+  },
+  {
+   "action": "Prioritise a Change Advisory Board (CAB) review of all SOPs still pending qualification within 30 days, including engineer feedback on SOP viability and usability.",
+   "owner": "Change Advisory Board",
+   "status": "Committed — target April 2023"
+  },
+  {
+   "action": "Deploy a fix for the BitLocker / Shared Cache race condition on Exchange CAFE components after restart (residual EX502694 impact).",
+   "owner": "Exchange Online",
+   "status": "Committed — target February 2023 (99.48% deployed as of Feb 6, 2023)"
+  },
+  {
+   "action": "Change detection and routing logic so components in a known-unhealthy state (e.g. degraded Shared Cache) stop receiving production traffic.",
+   "owner": "Exchange Online",
+   "status": "Committed — target March 2023"
+  },
+  {
+   "action": "Fix an additional low-memory bug that caused unexpected machine reboots (the reboots that surfaced the Shared Cache race condition).",
+   "owner": "Exchange Online",
+   "status": "Committed — target February 2023"
+  },
+  {
+   "action": "Improve SPO/ODB monitoring logic and alerting thresholds to detect unexpected regional Request-Per-Second changes rather than per-farm noise.",
+   "owner": "SharePoint Online / OneDrive",
+   "status": "Committed — target March 2023"
+  },
+  {
+   "action": "Reduce Teams alerting noise during wide outages and improve incident-management efficiency; improve Teams anomaly-detection latency.",
+   "owner": "Microsoft Teams",
+   "status": "Committed — targets March 2023 and May 2023"
+  }
+ ],
+ "lessonsLearnt": [
+  "Device-level change isolation is not blast-radius isolation: a command that propagates via the routing protocol (IGP) defeats 'one device at a time' safety because the isolated device is still logically joined to the fabric.",
+  "A destructive command's behaviour must be characterised per vendor/platform; assuming a command is local-scope because it is local on two of three vendors is a fatal generalisation.",
+  "Any edit to a qualified SOP invalidates its qualification — an un-re-tested SOP change is an untested change and must not fly.",
+  "Real-time command guardrails (AAA block-lists) are only as good as their coverage; the high-impact-command evaluation missed this platform's global default, so the guardrail silently allowed it.",
+  "Operators executing changes must receive the same alerts as on-call, or they will repeat a destructive action (here, a second router 33 minutes later) before anyone reaches them.",
+  "Monitoring that alerts on many narrow symptoms (per-farm/per-feature) instead of the wider event slows detection of a single systemic cause.",
+  "Downstream services that depend on the network cannot recover ahead of it; WAN-level faults set a hard floor on M365 recovery time regardless of app-tier health."
+ ],
+ "improvements": [
+  "Extend the AAA high-impact-command block-list to cover globally-scoped commands across all three router vendors and all WAN router roles (committed Feb 2023).",
+  "Give on-call engineers real-time visibility of automated, break-glass, and unqualified device activity so repeat destructive actions are caught before re-execution (committed Feb 2023).",
+  "Mandatory recurring operational training plus attestation of SOP adherence, and a 30-day CAB re-qualification sweep of all SOPs still pending qualification (committed Feb–Apr 2023).",
+  "Treat any SOP edit as de-qualifying: force ONE/lab re-validation and pre/post-checks before the procedure can be scheduled.",
+  "Resiliency fixes in Exchange Online: fix the BitLocker/Shared Cache race on CAFE, stop routing production traffic to known-unhealthy components, and fix the low-memory reboot bug (committed Feb–Mar 2023).",
+  "Tune SPO/ODB and Teams monitoring to detect wide regional/service-wide events quickly and cut alert noise during large outages (committed Mar–May 2023)."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "Textbook change-management failure",
+   "body": "This is a textbook change-management failure in which the technical trigger (one CLI command) was trivial but the organisational controls that should have contained it all failed in series: an un-re-tested SOP edit, an incomplete AAA block-list, a device-isolation model blind to protocol-level propagation, and an alerting path that excluded the operator."
+  },
+  {
+   "heading": "Maximal WAN blast radius",
+   "body": "The blast radius was maximal because the fault lived in the shared global backbone (AS 8075) rather than in any single service or region — it simultaneously degraded internet-to-Azure, DC-to-DC, and ExpressRoute paths, so essentially every network-dependent Microsoft 365 and Azure service saw impact at once."
+  },
+  {
+   "heading": "Two distinct outage waves",
+   "body": "the first at 07:08 UTC and an avoidable second ~33 minutes later when the same command ran on the second Madrid router — a direct consequence of the operator not being wired into the alerting the modified SOP dropped."
+  },
+  {
+   "heading": "Recovery gated by scale",
+   "body": "automated WAN recovery began just after 08:10 UTC but full prefix reconvergence took ~1h40m, and downstream services could only recover after the WAN stabilised (~09:35 UTC), which is why user-visible M365 recovery stretched to 12:43 UTC."
+  },
+  {
+   "heading": "Long-tail Exchange Online residual",
+   "body": "A long-tail Exchange Online residual (Outlook on the web / EAS) was a separate, secondary failure mode — a BitLocker/Shared Cache race on CAFE components triggered by mass machine restarts — tracked under EX502694 and resolved 2023-01-26 03:50 UTC."
+  },
+  {
+   "heading": "Impact figures undisclosed",
+   "body": "No USD or precise user-count figure was disclosed by Microsoft or any regulator; third-party Downdetector data (thousands of reports, >3,900 India / >900 Japan) is the only quantified external gauge of user impact."
+  }
+ ],
+ "technicalDeepDive": "The trigger was a command to purge the IGP (Interior Gateway Protocol) link-state database, added to the WAN capacity-expansion SOP for integrating new Madrid routers into Microsoft's IGP and BGP domains. On two of Microsoft's three router vendors this purge is scoped to the local device; on the third vendor's platform — the one being provisioned — the command's default action is global, instructing every IGP-adjacent router in AS 8075 to flush and recompute its link-state/topology database. During that network-wide SPF recomputation the routers could not correctly forward transit traffic, producing immediate, backbone-wide packet loss across client-to-Azure, datacenter-to-datacenter, and ExpressRoute paths.\n\nThe IGP event then cascaded into BGP. Because interior reachability changed underneath it, Microsoft's BGP speakers (AS 8075) began re-advertising and re-validating the internet prefixes they carry. ThousandEyes observed Microsoft prefixes — both specific /24s and summary prefixes up to /12 — being withdrawn completely and then almost immediately re-advertised, which destabilised global routing to Microsoft's ranges and drove significant external packet loss for roughly a 90-minute bulk window. Given the size of the network, restoring reachability to every prefix took about 1 hour 40 minutes.\n\nTwo safeguards failed to contain it. The real-time AAA system enforces a per-command block-list of globally-impactful operations, but this command's global default on the changed router model had never been surfaced during that platform's high-impact-command evaluation, so it was absent from the list and executed. Separately, Safe-Deployment restricts access to one device at a time; that model assumes damage is bounded by device access, but this command's effect propagated through the IGP adjacency graph rather than through device-to-device access, so single-device access provided zero containment. Compounding it, on-call was alerted within ~5 minutes but the executing engineer was not — a gap introduced by the un-re-tested SOP edit — so the same command was run on the second Madrid router ~33 minutes later, producing a second wave. Automated WAN recovery began just after 08:10 UTC; the WAN self-stabilised by ~09:35 UTC with two routers requiring manual recovery. Downstream, SharePoint/OneDrive front-ends lost connectivity to backend SQL (three sub-waves), Exchange Online connections failed to reach the service, and a separate BitLocker vs Shared Cache race on Exchange CAFE components after machine restarts caused a degraded-cache long tail for Outlook-on-the-web/EAS, resolved under EX502694 at 2023-01-26 03:50 UTC.",
+ "references": [
+  {
+   "title": "Microsoft 365 Customer-Ready Post Incident Report — MO502273 (Report Date Feb 6, 2023)",
+   "url": "https://www.msxfaq.de/cloud/marketing/mo502273_postincidentreport.pdf",
+   "type": "official-postmortem",
+   "accessed": "2026-08-08",
+   "quote": "At 7:08 AM UTC a network engineer was performing an operational task to add network capacity to the global Wide Area Network (WAN) in Madrid... This change added a command to purge the IGP database – however, the command operates differently based on router manufacturer. Routers from two of our manufacturers limit execution to the local router, while those from a third manufacturer execute across all IGP joined routers."
+  },
+  {
+   "title": "Azure Status History — related Azure DNS/WAN PIR, Tracking ID VSG1-B90",
+   "url": "https://status.azure.com/en-us/status/history/",
+   "type": "official",
+   "accessed": "2026-08-08",
+   "quote": "For further information, the Azure PIR can be found at status.azure.com with Tracking ID VSG1-B90 (referenced within MO502273)."
+  },
+  {
+   "title": "Microsoft Outage Analysis: January 25, 2023 — ThousandEyes",
+   "url": "https://www.thousandeyes.com/blog/microsoft-outage-analysis-january-25-2023",
+   "type": "analysis",
+   "accessed": "2026-08-08",
+   "quote": "ThousandEyes observed a significant number of BGP route changes for prefixes advertised by Microsoft's AS 8075 beginning at just after 07:10 AM UTC... The bulk of the incident lasted approximately 90 minutes."
+  },
+  {
+   "title": "Global Microsoft cloud-service outage traced to rapid BGP router updates — Network World",
+   "url": "https://www.networkworld.com/article/971873/global-microsoft-cloud-service-outage-traced-to-rapid-bgp-router-updates.html",
+   "type": "news-analysis",
+   "accessed": "2026-08-08",
+   "quote": "Multiple Microsoft BGP prefixes were withdrawn completely and then almost immediately readvertised... The bulk of the service disruptions lasted approximately 90 minutes, although ThousandEyes said it spotted residual connectivity issues the following day."
+  },
+  {
+   "title": "Microsoft applications like Outlook and Teams were down for thousands of users — NPR",
+   "url": "https://www.npr.org/2023/01/25/1151279866/outlook-teams-sharepoint-outage-microsoft-365",
+   "type": "news",
+   "accessed": "2026-08-08",
+   "quote": "Data from Downdetector showed more than 3,900 incidents in India and over 900 in Japan... Microsoft confirmed in a statement to NPR that the outage was a result of a network change and not outside actors."
+  },
+  {
+   "title": "Massive Microsoft 365 outage caused by WAN router IP change — BleepingComputer",
+   "url": "https://www.bleepingcomputer.com/news/microsoft/massive-microsoft-365-outage-caused-by-wan-router-ip-change/",
+   "type": "news",
+   "accessed": "2026-08-08",
+   "quote": "The outage was caused by a WAN (wide area network) router IP address change that led to packet-forwarding issues between all other WAN routers."
+  }
+ ],
+ "sourcing": {
+  "confidence": "high",
+  "lastVerified": "2026-08-08",
+  "officialPostmortem": true,
+  "referenceCount": 6
+ },
+ "lastUpdated": "2026-08-08"
+}
