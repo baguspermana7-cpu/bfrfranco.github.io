@@ -13,6 +13,21 @@ release sections rather than semver.
 
 ---
 
+## v1.126.6 — 2026-08-08 (Finance Terminal — technical buy/sell gauge perfected, R-003)
+
+Enhances the per-tab technical analysis gauge (already wired on stock/forex/crypto/commodities via
+the deployed gateway `/analyze` endpoint — no deploy needed) to a Bloomberg-grade meter.
+
+### Changed (`Apps/finance-terminal/`)
+- **Gauge** (`renderGaugeSvg`): single arc → **5-band coloured meter** (Strong Sell→Sell→Neutral→Buy
+  →Strong Buy, palette-matched) with a **marker on the rim at the score** + SELL/BUY end labels and a
+  large score + label. Reads as a proper TradingView-style buy/sell gauge.
+- **Signal chips** (`signalChipClass`): now colour momentum (Rising/Falling), volatility
+  (Expanding/Contracting/High/Low) and strength — not just trend/MA. Substring-matched so gateway
+  wording variants map correctly.
+- **Indicators**: RSI(14) + Stoch %K coloured by regime (oversold=green buy-zone / overbought=red),
+  and a **MACD Hist** row added, coloured by sign. All four analytics-panel tabs benefit at once.
+
 ## v1.126.5 — 2026-08-08 (Finance Terminal — Earnings/IPO keyless via gateway Worker)
 
 Closes the "Also Earnings/IPO sub-tabs" half of bug B-008. News/quotes already ran through the

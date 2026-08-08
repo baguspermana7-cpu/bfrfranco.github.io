@@ -757,29 +757,39 @@ async function gw(path,params){
    gauge — no external lib.
    ═══════════════════════════════════════════════════════════════ */
 function renderGaugeSvg(score,label){
+  // Bloomberg-grade buy/sell meter: a 5-band coloured arc (Strong Sell→Strong Buy) with a
+  // marker on the rim at the score, plus SELL/BUY end labels. Bands match the chip palette so
+  // colour never drifts (red<30 / amber30-45 / grey45-55 / mint55-70 / green>70).
   var s=Math.max(0,Math.min(100,+score||0));
-  var angle=(s/100)*180;
-  var r=40;
-  var t=(180-angle)*Math.PI/180;
-  var endX=50+r*Math.cos(t);
-  var endY=50-r*Math.sin(t);
-  // 7-band color (routed through the shared tokens so it never drifts from the chip palette):
-  // red <30 / amber 30-45 / grey 45-55 / mint 55-70 / green >70
+  var R=40,cx=50,cy=50;
+  function pt(v,rad){var a=(180-(v/100)*180)*Math.PI/180;var rr=(rad==null?R:rad);return [cx+rr*Math.cos(a),cy-rr*Math.sin(a)];}
+  function seg(a,b,col){var p1=pt(a),p2=pt(b);return '<path d="M'+p1[0].toFixed(2)+' '+p1[1].toFixed(2)+' A'+R+' '+R+' 0 0 1 '+p2[0].toFixed(2)+' '+p2[1].toFixed(2)+'" fill="none" stroke="'+col+'" stroke-width="7" stroke-linecap="butt" />';}
   var color=s<30?'var(--red)':s<45?'var(--amb)':s<55?'var(--t3)':s<70?'#7DDDB4':'var(--grn)';
-  return '<svg viewBox="0 0 100 60" class="rz-ap-gauge-svg" aria-label="Buy/Sell gauge">'+
-    '<path d="M10 50 A40 40 0 0 1 90 50" fill="none" stroke="rgba(148,163,184,.15)" stroke-width="6" stroke-linecap="round" />'+
-    '<path d="M10 50 A40 40 0 0 1 '+endX.toFixed(2)+' '+endY.toFixed(2)+'" fill="none" stroke="'+color+'" stroke-width="6" stroke-linecap="round" />'+
-    '<text x="50" y="42" text-anchor="middle" class="rz-ap-gauge-score" fill="'+color+'">'+s.toFixed(0)+'</text>'+
-    '<text x="50" y="55" text-anchor="middle" fill="var(--t3)" font-size="6" font-weight="600" letter-spacing="0.5">'+esc(String(label||'').toUpperCase())+'</text>'+
+  var track=seg(0.5,30,'var(--red)')+seg(30,45,'var(--amb)')+seg(45,55,'var(--t3)')+seg(55,70,'#7DDDB4')+seg(70,99.5,'var(--grn)');
+  var m=pt(s,R);
+  var marker='<circle cx="'+m[0].toFixed(2)+'" cy="'+m[1].toFixed(2)+'" r="4" fill="'+color+'" /><circle cx="'+m[0].toFixed(2)+'" cy="'+m[1].toFixed(2)+'" r="1.7" fill="#fff" opacity=".92" />';
+  return '<svg viewBox="0 0 100 56" class="rz-ap-gauge-svg" role="img" aria-label="Buy/Sell gauge '+s.toFixed(0)+' of 100, '+esc(String(label||''))+'">'+
+    track+marker+
+    '<text x="9" y="55" text-anchor="middle" fill="var(--red)" font-size="4.6" font-weight="800" letter-spacing=".3">SELL</text>'+
+    '<text x="91" y="55" text-anchor="middle" fill="var(--grn)" font-size="4.6" font-weight="800" letter-spacing=".3">BUY</text>'+
+    '<text x="50" y="41" text-anchor="middle" class="rz-ap-gauge-score" fill="'+color+'">'+s.toFixed(0)+'</text>'+
+    '<text x="50" y="50" text-anchor="middle" fill="var(--t3)" font-size="5.2" font-weight="700" letter-spacing=".5">'+esc(String(label||'').toUpperCase())+'</text>'+
     '<\/svg>';
 }
 function signalChipClass(value){
   var v=String(value||'').toLowerCase();
-  if(v==='bullish'||v==='expanding'||v==='golden')return 'rz-ap-chip ok';
-  if(v==='bearish'||v==='death')return 'rz-ap-chip bad';
-  if(v==='overbought')return 'rz-ap-chip warn';
-  if(v==='oversold')return 'rz-ap-chip info';
-  return 'rz-ap-chip';
+  if(v.indexOf('bull')>=0||v.indexOf('golden')>=0||v.indexOf('rising')>=0||v.indexOf('strong')>=0)return 'rz-ap-chip ok';
+  if(v.indexOf('bear')>=0||v.indexOf('death')>=0||v.indexOf('falling')>=0||v.indexOf('weak')>=0)return 'rz-ap-chip bad';
+  if(v.indexOf('overbought')>=0||v.indexOf('high')>=0||v.indexOf('expand')>=0)return 'rz-ap-chip warn';
+  if(v.indexOf('oversold')>=0||v.indexOf('low')>=0||v.indexOf('contract')>=0)return 'rz-ap-chip info';
+  return 'rz-ap-chip';   // Neutral / Normal / Flat
+}
+// colour an oscillator value by its regime (oversold=green buy-zone / overbought=red sell-zone)
+function indColor(name,v){
+  if(v==null||isNaN(+v))return '';
+  if(name==='rsi'||name==='stoch')return (+v)<=30?'color:var(--grn)':(+v)>=70?'color:var(--red)':'';
+  if(name==='hist')return (+v)>0?'color:var(--grn)':(+v)<0?'color:var(--red)':'';
+  return '';
 }
 function fmtInd(v,decimals){
   if(v==null||(typeof v==='number'&&!isFinite(v))||isNaN(v))return '—';
@@ -829,8 +839,9 @@ function renderAnalyticsPanel(containerId,analyze,news){
       '<div class="rz-ap-right">'+
         '<h4>Indicators<\/h4>'+
         '<div class="rz-ap-grid">'+
-          '<div class="rz-ap-ind"><span>RSI(14)<\/span><span class="mono">'+fmtInd(ind.rsi14,1)+'<\/span><\/div>'+
+          '<div class="rz-ap-ind"><span>RSI(14)<\/span><span class="mono" style="'+indColor('rsi',ind.rsi14)+'">'+fmtInd(ind.rsi14,1)+'<\/span><\/div>'+
           '<div class="rz-ap-ind"><span>MACD<\/span><span class="mono">'+fmtInd(macd.macd,2)+'<\/span><\/div>'+
+          '<div class="rz-ap-ind"><span>MACD Hist<\/span><span class="mono" style="'+indColor('hist',macd.hist)+'">'+fmtInd(macd.hist,2)+'<\/span><\/div>'+
           '<div class="rz-ap-ind"><span>SMA 20<\/span><span class="mono">'+fmtInd(ind.sma20)+'<\/span><\/div>'+
           '<div class="rz-ap-ind"><span>SMA 50<\/span><span class="mono">'+fmtInd(ind.sma50)+'<\/span><\/div>'+
           '<div class="rz-ap-ind"><span>SMA 200<\/span><span class="mono">'+fmtInd(ind.sma200)+'<\/span><\/div>'+
@@ -838,7 +849,7 @@ function renderAnalyticsPanel(containerId,analyze,news){
           '<div class="rz-ap-ind"><span>BB Upper<\/span><span class="mono">'+fmtInd(boll.upper)+'<\/span><\/div>'+
           '<div class="rz-ap-ind"><span>BB Lower<\/span><span class="mono">'+fmtInd(boll.lower)+'<\/span><\/div>'+
           '<div class="rz-ap-ind"><span>ATR(14)<\/span><span class="mono">'+fmtInd(ind.atr14)+'<\/span><\/div>'+
-          '<div class="rz-ap-ind"><span>Stoch K<\/span><span class="mono">'+fmtInd(stoch.k,1)+'<\/span><\/div>'+
+          '<div class="rz-ap-ind"><span>Stoch K<\/span><span class="mono" style="'+indColor('stoch',stoch.k)+'">'+fmtInd(stoch.k,1)+'<\/span><\/div>'+
         '<\/div>'+
         newsHtml+
       '<\/div>'+
