@@ -13,6 +13,58 @@ release sections rather than semver.
 
 ---
 
+## v1.127.1 — 2026-08-22 (Login resilience — transient-network retry + clearer auth error)
+
+### Fixed
+- **Login "NetworkError when attempting to fetch resource" on flaky DNS/NAT64 networks.**
+  A single transient resolver/connection blip (e.g. a flaky router DNS) made the Supabase
+  `fetch` reject and surfaced the raw browser error, blocking sign-in even though the auth
+  backend was healthy. `js/rz-supabase.js` now injects a retrying `fetch` into the Supabase
+  client (`createClient(..., { global: { fetch } })`): it retries **only** on a thrown network
+  rejection or a transient `502/503/504` (3 attempts, ~200–500 ms backoff), and returns every
+  real answer immediately — any `2xx` and every `4xx` incl. `400 invalid_credentials` is never
+  retried, so a POST is not double-applied. Covers every Supabase call (sign-in, profile,
+  hydrate, saved scenarios).
+- **Clearer message** for network failures: `friendly()` now maps `NetworkError/failed to fetch`
+  to an actionable string ("Koneksi ke server auth gagal sesaat (jaringan/DNS). Coba lagi — atau
+  setel DNS perangkat ke 1.1.1.1.") instead of the raw fetch error.
+- Cache-bust: `rz-supabase.js?v=` bumped to `2026-08-22-netretry` across all page loaders + `auth.js`/`auth.min.js`.
+
+---
+
+## v1.127.0 — 2026-08-17 (Seamless ship-gate automation)
+
+Implements the owner request: **“kenapa failed, perbaiki semuanya, buat semua
+auto dan seamless.”** Investigation proved the website gates were healthy; the
+observed failure was Chromium being denied a socket by the restricted execution
+sandbox. It also exposed a separate process defect: the legacy ship runner could
+report “safe to push” while omitting seven current strict gates.
+
+### Added
+- **One-command verification** — `task check` runs fast static + engine feedback;
+  `task verify` runs the complete release suite, including all Chromium audits.
+  Both commands automatically validate the runner contract before starting.
+- **Behavioral runner tests** (`tools/test-ship-gate.mjs`) cover quick/full gate
+  selection, default-full safety, continued aggregation after a failure,
+  environment-blocked classification, and invalid CLI usage.
+- **Serialized browser execution** via a bounded shared lock prevents known
+  false findings when multiple headless Chrome sessions overlap.
+
+### Fixed
+- `tools/ship-gate.sh` now includes chart provenance, page-gate, hero-image,
+  responsive-layout, dark-coverage, accessibility, and interaction audits.
+- Dynamic numbering removes the duplicate `[7]` label; every gate writes to an
+  isolated temporary log instead of sharing `/tmp/_probe.log`.
+- Product regressions exit `1`; execution-environment blocks exit `2` with an
+  actionable rerun message. A blocked audit is never presented as a pass.
+
+### Changed
+- The command named “ship gate” defaults to the complete suite. `--quick` is an
+  explicit iteration-only mode; legacy `--probe` and `--probe-http` remain
+  supported and add the accuracy probe to a full run.
+- Release documentation now points to the canonical Taskfile commands instead
+  of maintaining partial gate lists.
+
 ## v1.126.8 — 2026-08-08 (DC Incidents — +3 forensic dossiers, multi-agent research batch)
 
 ### Added

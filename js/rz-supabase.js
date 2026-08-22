@@ -23,10 +23,41 @@ const cfg = (typeof window !== 'undefined' && window.RZ_CONFIG) || {};
 const URL = cfg.SUPABASE_URL || '';
 const ANON = cfg.SUPABASE_ANON || '';
 
+// Transient-network resilience (v1.127.x): a flaky resolver / NAT64 path can make a
+// single fetch REJECT (TypeError — DNS/connection blip) or return a transient
+// 502/503/504 from the edge. Retry just those, a few times with short backoff, so one
+// blip does not surface as a hard login failure ("NetworkError when attempting to fetch
+// resource"). Real answers — any 2xx and every 4xx incl. 400 invalid_credentials — return
+// immediately and are NEVER retried. We only retry when no response reached the origin
+// (thrown reject) or the gateway itself failed (502/503/504), so a POST is not double-applied.
+let _rzFetchN = 0;
+function _rzDelay(i) {
+  var base = 200 * (i + 1);            // 200ms, 400ms
+  var jitter = (_rzFetchN++ % 5) * 30; // 0..120ms, deterministic (no Math.random)
+  return new Promise(function (r) { setTimeout(r, base + jitter); });
+}
+async function rzFetch(input, init) {
+  var attempts = 3, lastErr = null;
+  for (var i = 0; i < attempts; i++) {
+    try {
+      var res = await fetch(input, init);
+      if (i < attempts - 1 && (res.status === 502 || res.status === 503 || res.status === 504)) {
+        await _rzDelay(i); continue;
+      }
+      return res;
+    } catch (e) {
+      lastErr = e;                     // network reject — origin almost certainly never saw it
+      if (i < attempts - 1) { await _rzDelay(i); continue; }
+      throw e;
+    }
+  }
+  throw lastErr;
+}
+
 let client = null;
 let initError = null;
 try {
-  if (URL && ANON) client = createClient(URL, ANON);
+  if (URL && ANON) client = createClient(URL, ANON, { global: { fetch: rzFetch } });
   else initError = 'RZ_CONFIG missing SUPABASE_URL / SUPABASE_ANON (load js/rz-config.js first)';
 } catch (e) {
   initError = 'Supabase init failed: ' + (e && e.message || e);
@@ -38,6 +69,8 @@ function friendly(error) {
   const msg = error.message || String(error);
   if (/relation .* does not exist|Could not find the table|schema cache/i.test(msg))
     return 'Database not set up yet — run supabase/schema.sql in the Supabase SQL Editor.';
+  if (/networkerror|failed to fetch|load failed|network request failed|fetch failed/i.test(msg))
+    return 'Koneksi ke server auth gagal sesaat (jaringan/DNS). Coba lagi — atau setel DNS perangkat ke 1.1.1.1.';
   return msg;
 }
 

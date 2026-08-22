@@ -321,7 +321,7 @@
             function loadModule() {
                 var m = document.createElement('script');
                 m.type = 'module';
-                m.src = '/js/rz-supabase.js?v=2026-07-13';
+                m.src = '/js/rz-supabase.js?v=2026-08-22-netretry';
                 m.onload = function () {
                     var r = (window.rzSupa && window.rzSupa.ready) ? window.rzSupa.ready : Promise.resolve(window.rzSupa || null);
                     r.then(resolve).catch(function () { resolve(window.rzSupa || null); });
