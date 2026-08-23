@@ -2079,13 +2079,13 @@ function wfcCalculate() {
     var ctx = document.getElementById('wfcContext');
     var ctxHTML = '';
     if (annualL >= 1000) {
-        ctxHTML += '<div class="wc-context-card"><span class="ctx-icon">&#x1F3D9;</span>Your annual AI water footprint equals <strong>' + (annualL / 1135).toFixed(1) + ' days</strong> of water for an average US household.</div>';
+        ctxHTML += '<div class="wc-context-card"><span class="ctx-icon"><i class="fas fa-city"></i></span>Your annual AI water footprint equals <strong>' + (annualL / 1135).toFixed(1) + ' days</strong> of water for an average US household.</div>';
     }
     if (users > 1) {
-        ctxHTML += '<div class="wc-context-card"><span class="ctx-icon">&#x1F465;</span>With <strong>' + users.toLocaleString() + ' users</strong>, total daily water is <strong>' + wcFmtVol(dailyL) + ' L</strong> — equivalent to <strong>' + (dailyL / 1135).toFixed(1) + '</strong> household-days.</div>';
+        ctxHTML += '<div class="wc-context-card"><span class="ctx-icon"><i class="fas fa-users"></i></span>With <strong>' + users.toLocaleString() + ' users</strong>, total daily water is <strong>' + wcFmtVol(dailyL) + ' L</strong> — equivalent to <strong>' + (dailyL / 1135).toFixed(1) + '</strong> household-days.</div>';
     }
     var perQueryML = baseML;
-    ctxHTML += '<div class="wc-context-card"><span class="ctx-icon">&#x1F4A7;</span>Each ' + (wcModelData[model] ? wcModelData[model].name : model) + ' query uses <strong>' + perQueryML.toFixed(2) + ' mL</strong>' + (upstream === 'yes' ? ' (incl. upstream)' : ' (direct only)') + '. That is <strong>' + (perQueryML / 250 * 100).toFixed(2) + '%</strong> of a glass of water.</div>';
+    ctxHTML += '<div class="wc-context-card"><span class="ctx-icon"><i class="fas fa-droplet"></i></span>Each ' + (wcModelData[model] ? wcModelData[model].name : model) + ' query uses <strong>' + perQueryML.toFixed(2) + ' mL</strong>' + (upstream === 'yes' ? ' (incl. upstream)' : ' (direct only)') + '. That is <strong>' + (perQueryML / 250 * 100).toFixed(2) + '%</strong> of a glass of water.</div>';
     ctx.innerHTML = ctxHTML;
     if (wcMode === 'pro') wfcUpdatePro();
 }

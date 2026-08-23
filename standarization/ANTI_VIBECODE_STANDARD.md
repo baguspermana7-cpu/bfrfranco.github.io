@@ -76,6 +76,11 @@ on any hard-banned finding. Detectors + precision rules (all learned from real f
   `<option>` — strip the emoji there rather than swapping. Where a page lacks Font Awesome (e.g. cdu-hub),
   add the cdnjs FA stylesheet (already a site dependency) before swapping.
 - **dot-grid-bg**, **anthropic-purple** (`#8b5cf6`), **lucide-icons**, plus REQUIRED terms.html/privacy.html.
+- **HTML-entity decoding**: numeric entities (`&#128214;` / `&#x1F4D6;` = 📖) are decoded before scanning
+  so an emoji authored as an entity is caught by the same char rules as a literal one. This gap was real —
+  the `📖 Technical Manual` pill shipped as `&#128214;` on ~40 pages and a literal-only scan missed every
+  one; a headless render (`document.body.innerText`) caught it. Verify emoji work with a real render, not
+  just a static grep.
 - **Documentation exemption**: `<code>`/`<pre>` prose is stripped before scanning (a changelog entry that
   quotes `#8b5cf6` while DESCRIBING its purge is not committing it). `changelog.html` (generated archive
   that quotes historical CSS as before/after illustration) is excluded from scope entirely — the ban is

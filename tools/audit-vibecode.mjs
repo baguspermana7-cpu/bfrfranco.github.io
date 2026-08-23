@@ -46,7 +46,7 @@ const RULES = [
     // arrows/checks/math (typographic, handled by their own idioms). Everything else in the pictograph
     // ranges = slop → use a Font Awesome / thin-line icon instead. `u` flag is mandatory (surrogate pairs).
     test: (t) => {
-      const WHITELIST = new Set(["🔒","🔓","⚠","⚡","★","☆","⭐","✅","✓","✔","✗","✘","❌","➜","🌐","⚑"]);
+      const WHITELIST = new Set(["🔒","🔓","⚠","⚡","★","☆","⭐","✅","✓","✔","✗","✘","❌","➜","🌐","⚑","☀","☽","☾","☼"]);
       const PICTO = /[\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F900}-\u{1FAFF}\u{2600}-\u{26FF}\u{2728}]/gu;
       const FLAG = /[\u{1F1E6}-\u{1F1FF}]/u;   // regional-indicator halves → country flags (data, kept)
       let m;
@@ -100,8 +100,14 @@ const findings = [];
 function stripDocProse(t) {
   return t.replace(/<code[\s\S]*?<\/code>/gi, "").replace(/<pre[\s\S]*?<\/pre>/gi, "");
 }
+// Decode NUMERIC HTML entities (&#128214; / &#x1F4D6;) so an emoji written as an entity is caught by the
+// same char-based rules as a literal one — a book pill authored as `&#128214;` renders 📖 all the same.
+function decodeEntities(t) {
+  return t.replace(/&#(\d+);/g, (_, d) => { try { return String.fromCodePoint(+d); } catch { return _; } })
+          .replace(/&#x([0-9a-fA-F]+);/g, (_, h) => { try { return String.fromCodePoint(parseInt(h, 16)); } catch { return _; } });
+}
 for (const f of files) {
-  let t; try { t = stripDocProse(readFileSync(f, "utf8")); } catch { continue; }
+  let t; try { t = decodeEntities(stripDocProse(readFileSync(f, "utf8"))); } catch { continue; }
   for (const r of RULES) {
     const m = r.test(t, f);
     if (m) findings.push({ file: f.replace(ROOT + "/", ""), rule: r.id, msg: m });
