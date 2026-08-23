@@ -57,6 +57,20 @@ An over-eager de-slop pass must not remove these; they are the site's identity, 
 
 ## Enforcement
 `tools/audit-vibecode.mjs --strict` — static scan of HTML/CSS for the hard-banned tells with
-context-awareness (Inter-as-primary, dot-grid-as-bg, #8B5CF6-as-pill, sparkle, glass-as-decoration,
-pure-#fff body, Lucide, missing terms/privacy). Whitelists the aurora hero + article editorial fonts.
-Wired into `tools/ship-gate.sh`. Exit 1 on any hard-banned finding.
+context-awareness. **Wired into `tools/ship-gate.sh`** (product gate `audit-vibecode --strict`); exit 1
+on any hard-banned finding. Detectors + precision rules (all learned from real false-positives during the
+2026-08-23 sweep):
+- **inter-primary-font** — `font-family: Inter|Geist|Space Grotesk` or a `family=` Google-Fonts link.
+  Base font is now **IBM Plex Sans** everywhere (was Inter; datahallAI was Space Grotesk).
+- **glass-decoration** — SELECTOR-AWARE: only DECORATIVE surfaces (card/panel/tile/bento/hero/badge/chip/
+  widget) count; functional blur on nav/modal/overlay/gate/search/palette/sticky-header is standard UI and
+  is NOT flagged. Resolves `backdrop-filter: var(--glass-blur)` indirection to its `blur(...)` definition
+  so token-glass can't hide. Flags at ≥3 decorative surfaces. Fix = drop blur + opaque `--glass-bg` + keep
+  the 1px `--glass-border` hairline (the prescribed "opaque instrument surface").
+- **sparkle-emoji** — `✨🪄` (regex carries the `u` flag — WITHOUT it the surrogate pair 🪄 decays and the
+  char-class false-matches the `\uD83E` high-surrogate shared by 🧪🧠🧬) or `fa-magic`/`fa-wand-magic`/`fa-sparkles`.
+- **dot-grid-bg**, **anthropic-purple** (`#8b5cf6`), **lucide-icons**, plus REQUIRED terms.html/privacy.html.
+- **Documentation exemption**: `<code>`/`<pre>` prose is stripped before scanning (a changelog entry that
+  quotes `#8b5cf6` while DESCRIBING its purge is not committing it). `changelog.html` (generated archive
+  that quotes historical CSS as before/after illustration) is excluded from scope entirely — the ban is
+  enforced on live-design surfaces, not the historical log.

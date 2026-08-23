@@ -33,7 +33,7 @@
     <meta name="keywords" content="Tier Advisor, Uptime Institute, Tier Classification, TIA-942, EN 50600, Data Center, Redundancy, BICSI 002, Infrastructure, Compliance">
     <meta name="author" content="Bagus Dwi Permana">
     <meta name="robots" content="index, follow">
-    <meta name="theme-color" content="#8b5cf6">
+    <meta name="theme-color" content="#64748b">
     <link rel="canonical" href="https://resistancezero.com/tier-advisor.html">
     <link rel="alternate" hreflang="en" href="https://resistancezero.com/tier-advisor.html">
     <link rel="alternate" hreflang="x-default" href="https://resistancezero.com/tier-advisor.html">
@@ -90,12 +90,12 @@
 
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #5b21b6 0%, #8b5cf6 50%, #a78bfa 100%);
-            --secondary-gradient: linear-gradient(135deg, #8b5cf6 0%, #5b21b6 100%);
+            --primary-gradient: linear-gradient(135deg, #5b21b6 0%, #64748b 50%, #a78bfa 100%);
+            --secondary-gradient: linear-gradient(135deg, #64748b 0%, #5b21b6 100%);
             --dark-purple: #5b21b6;
-            --medium-purple: #8b5cf6;
+            --medium-purple: #64748b;
             --light-purple: #a78bfa;
-            --accent-purple: #8b5cf6;
+            --accent-purple: #64748b;
             --accent-gold: #f59e0b;
             --accent-emerald: #10b981;
             --accent-red: #ef4444;
@@ -108,7 +108,7 @@
             --text-muted: #6c757d;
             --glass-bg: rgba(255,255,255,0.85);
             --glass-bg-dark: rgba(91,33,182,0.95);
-            --glass-border: rgba(139,92,246,0.1);
+            --glass-border: rgba(100, 116, 139,0.1);
             --glass-blur: blur(20px);
             --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
             --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
@@ -117,14 +117,14 @@
         [data-theme="dark"] {
             --bg-primary: #0f172a; --bg-secondary: #1e293b; --bg-tertiary: #334155;
             --text-primary: #f1f5f9; --text-secondary: #94a3b8; --text-muted: #94a3b8;
-            --glass-bg: rgba(30,41,59,0.85); --glass-border: rgba(139,92,246,0.15);
+            --glass-bg: rgba(30,41,59,0.85); --glass-border: rgba(100, 116, 139,0.15);
         }
         [data-theme="dark"] .navbar { background: rgba(15,23,42,0.9); }
         [data-theme="dark"] .input-field { background: #1e293b; border-color: #334155; color: #f1f5f9; }
-        [data-theme="dark"] .input-field:focus { border-color: #8b5cf6; box-shadow: 0 0 0 3px rgba(139,92,246,0.15); }
+        [data-theme="dark"] .input-field:focus { border-color: #64748b; box-shadow: 0 0 0 3px rgba(100, 116, 139,0.15); }
         [data-theme="dark"] .pue-mode-bar { background: #1e293b; border-color: #334155; }
         [data-theme="dark"] .pue-btn-reset { background: #1e293b; border-color: #334155; color: #94a3b8; }
-        [data-theme="dark"] .preset-btn { background: rgba(139,92,246,0.08); border-color: rgba(139,92,246,0.2); }
+        [data-theme="dark"] .preset-btn { background: rgba(100, 116, 139,0.08); border-color: rgba(100, 116, 139,0.2); }
         [data-theme="dark"] .nav-user-dropdown { background: #1e293b; border-color: #334155; }
         [data-theme="dark"] .nav-dd-header { border-color: #334155; }
         [data-theme="dark"] .nav-dd-logout:hover { background: rgba(239,68,68,0.1); }
@@ -137,23 +137,23 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
         body { font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; line-height: 1.6; }
-        .page-background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background: radial-gradient(ellipse at top right, rgba(139,92,246,0.08) 0%, transparent 50%), radial-gradient(ellipse at bottom left, rgba(91,33,182,0.05) 0%, transparent 50%), linear-gradient(rgba(139,92,246,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,0.02) 1px, transparent 1px); background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px; }
+        .page-background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background: radial-gradient(ellipse at top right, rgba(100, 116, 139,0.08) 0%, transparent 50%), radial-gradient(ellipse at bottom left, rgba(91,33,182,0.05) 0%, transparent 50%), linear-gradient(rgba(100, 116, 139,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(100, 116, 139,0.02) 1px, transparent 1px); background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px; }
         .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: var(--glass-bg); backdrop-filter: var(--glass-blur); border-bottom: 1px solid var(--glass-border); box-shadow: var(--shadow-md); }
         .nav-container { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; max-width: 1400px; margin: 0 auto; }
         .nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--dark-purple); }
-        .nav-logo { width: 44px; height: 44px; background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; color: white; box-shadow: 0 4px 12px rgba(139,92,246,0.3); letter-spacing: -0.5px; }
+        .nav-logo { width: 44px; height: 44px; background: linear-gradient(135deg, #64748b 0%, #a78bfa 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; color: white; box-shadow: 0 4px 12px rgba(100, 116, 139,0.3); letter-spacing: -0.5px; }
         .nav-title { font-weight: 700; font-size: 1.1rem; color: var(--text-primary); }
         .nav-subtitle { font-size: 0.75rem; color: var(--text-muted); }
         .nav-links { display: flex; gap: 1.5rem; align-items: center; }
         .nav-link { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; font-weight: 500; padding: 8px 0; transition: color 0.3s; }
         .nav-link:hover { color: var(--dark-purple); }
-        .nav-back { display: flex; align-items: center; gap: 8px; padding: 10px 20px; background: var(--primary-gradient); border: none; border-radius: 8px; color: white; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 12px rgba(139,92,246,0.25); }
+        .nav-back { display: flex; align-items: center; gap: 8px; padding: 10px 20px; background: var(--primary-gradient); border: none; border-radius: 8px; color: white; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 12px rgba(100, 116, 139,0.25); }
         .nav-back:hover { transform: translateY(-2px); }
         .nav-auth-wrap { position: relative; margin-left: 0.5rem; }
-        .nav-login-btn { display: flex; align-items: center; gap: 6px; padding: 8px 18px; background: linear-gradient(135deg, #7c3aed, #a855f7); border: none; border-radius: 8px; color: white; font-size: 0.82rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.3s; box-shadow: 0 3px 10px rgba(139,92,246,0.3); white-space: nowrap; }
-        .nav-login-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(139,92,246,0.4); }
-        .nav-user-btn { display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; background: rgba(139,92,246,0.08); border: 1px solid rgba(139,92,246,0.25); border-radius: 50px; cursor: pointer; transition: all 0.3s; font-family: inherit; color: var(--text-primary); }
-        .nav-user-btn:hover { background: rgba(139,92,246,0.14); }
+        .nav-login-btn { display: flex; align-items: center; gap: 6px; padding: 8px 18px; background: linear-gradient(135deg, #7c3aed, #a855f7); border: none; border-radius: 8px; color: white; font-size: 0.82rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.3s; box-shadow: 0 3px 10px rgba(100, 116, 139,0.3); white-space: nowrap; }
+        .nav-login-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(100, 116, 139,0.4); }
+        .nav-user-btn { display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; background: rgba(100, 116, 139,0.08); border: 1px solid rgba(100, 116, 139,0.25); border-radius: 50px; cursor: pointer; transition: all 0.3s; font-family: inherit; color: var(--text-primary); }
+        .nav-user-btn:hover { background: rgba(100, 116, 139,0.14); }
         .nav-user-avatar { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #a855f7); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem; font-weight: 700; }
         .nav-user-email { font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .nav-user-chevron { font-size: 0.6rem; color: var(--text-muted); transition: transform 0.3s; }
@@ -162,7 +162,7 @@
         .nav-user-dropdown.show { display: block; }
         .nav-dd-header { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; }
         .nav-dd-tier-badge { display: inline-flex; padding: 3px 10px; border-radius: 50px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 6px; }
-        .nav-dd-tier-badge.pro { background: linear-gradient(135deg,#8b5cf6,#a855f7); color: white; }
+        .nav-dd-tier-badge.pro { background: linear-gradient(135deg,#64748b,#a855f7); color: white; }
         .nav-dd-email { font-size: 0.78rem; color: #64748b; word-break: break-all; }
         .nav-dd-logout { display: flex; align-items: center; gap: 8px; width: 100%; padding: 12px 16px; border: none; background: none; font-size: 0.82rem; font-weight: 500; color: #ef4444; cursor: pointer; font-family: inherit; transition: background 0.2s; }
         .nav-dd-logout:hover { background: #fef2f2; }
@@ -172,8 +172,8 @@
         .hamburger span { width: 24px; height: 2px; background: var(--text-primary); border-radius: 2px; transition: all 0.3s; }
         .main-content { position: relative; z-index: 10; padding-top: 80px; }
         .hero { padding: 3rem 2rem 2rem; text-align: center; max-width: 900px; margin: 0 auto; }
-        .hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: linear-gradient(135deg, rgba(139,92,246,0.1), rgba(139,92,246,0.05)); border: 1px solid rgba(139,92,246,0.3); border-radius: 50px; font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; margin-bottom: 1.5rem; }
-        .hero h1 { font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 800; background: linear-gradient(135deg, #8b5cf6 0%, #5b21b6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 1rem; }
+        .hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: linear-gradient(135deg, rgba(100, 116, 139,0.1), rgba(100, 116, 139,0.05)); border: 1px solid rgba(100, 116, 139,0.3); border-radius: 50px; font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; margin-bottom: 1.5rem; }
+        .hero h1 { font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 800; background: linear-gradient(135deg, #64748b 0%, #5b21b6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 1rem; }
         .hero p { font-size: 1.05rem; color: var(--text-secondary); max-width: 700px; margin: 0 auto; }
         .quick-stats { display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem; flex-wrap: wrap; }
         .quick-stat { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--text-muted); }
@@ -190,10 +190,10 @@
         .input-group:last-child { margin-bottom: 0; }
         .input-label { display: flex; align-items: center; gap: 6px; font-size: 0.78rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
         .input-field { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.9rem; font-family: inherit; color: var(--text-primary); background: white; outline: none; transition: border-color 0.3s; }
-        .input-field:focus { border-color: var(--accent-purple); box-shadow: 0 0 0 3px rgba(139,92,246,0.1); }
+        .input-field:focus { border-color: var(--accent-purple); box-shadow: 0 0 0 3px rgba(100, 116, 139,0.1); }
         select.input-field { cursor: pointer; }
         .preset-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
-        .preset-btn { padding: 5px 12px; border: 1px solid rgba(139,92,246,0.3); border-radius: 50px; background: rgba(139,92,246,0.05); color: var(--accent-purple); font-size: 0.72rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; white-space: nowrap; }
+        .preset-btn { padding: 5px 12px; border: 1px solid rgba(100, 116, 139,0.3); border-radius: 50px; background: rgba(100, 116, 139,0.05); color: var(--accent-purple); font-size: 0.72rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.2s; white-space: nowrap; }
         .preset-btn:hover, .preset-btn.active { background: var(--accent-purple); color: white; border-color: var(--accent-purple); }
         .results-panel { position: sticky; top: 100px; }
         .results-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem; }
@@ -206,7 +206,7 @@
         .score-item .val { font-size: 1.4rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
         .score-item .lbl { font-size: 0.68rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
         .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 1.25rem; }
-        .metric-box { background: rgba(139,92,246,0.04); border: 1px solid rgba(139,92,246,0.1); border-radius: 10px; padding: 0.75rem; text-align: center; }
+        .metric-box { background: rgba(100, 116, 139,0.04); border: 1px solid rgba(100, 116, 139,0.1); border-radius: 10px; padding: 0.75rem; text-align: center; }
         .metric-label { font-size: 0.68rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
         .metric-value { font-size: 1.05rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--text-primary); margin-top: 2px; }
         .subsystem-scores { margin-top: 1.25rem; }
@@ -215,14 +215,14 @@
         .subsystem-bar-bg { flex: 1; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; }
         .subsystem-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s ease; }
         .subsystem-val { font-size: 0.72rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; min-width: 30px; text-align: right; }
-        .gap-section { margin-top: 1.25rem; padding: 1rem; background: rgba(139,92,246,0.04); border: 1px solid rgba(139,92,246,0.1); border-radius: 10px; }
+        .gap-section { margin-top: 1.25rem; padding: 1rem; background: rgba(100, 116, 139,0.04); border: 1px solid rgba(100, 116, 139,0.1); border-radius: 10px; }
         .gap-title { font-size: 0.82rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 6px; }
         .gap-list { list-style: none; padding: 0; }
         .gap-list li { font-size: 0.78rem; color: var(--text-secondary); padding: 4px 0; padding-left: 16px; position: relative; }
         .gap-list li::before { content: ''; position: absolute; left: 0; top: 10px; width: 6px; height: 6px; border-radius: 50%; background: var(--accent-purple); }
         .rec-section { margin-top: 1.25rem; }
         .rec-title { font-size: 0.78rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 6px; }
-        .rec-card { display: flex; gap: 10px; padding: 0.75rem; background: rgba(139,92,246,0.04); border: 1px solid rgba(139,92,246,0.1); border-radius: 10px; margin-bottom: 0.5rem; }
+        .rec-card { display: flex; gap: 10px; padding: 0.75rem; background: rgba(100, 116, 139,0.04); border: 1px solid rgba(100, 116, 139,0.1); border-radius: 10px; margin-bottom: 0.5rem; }
         .rec-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; flex-shrink: 0; }
         .rec-text h4 { font-size: 0.78rem; font-weight: 600; color: var(--text-primary); }
         .rec-text p { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
@@ -239,21 +239,21 @@
         .pue-mode-bar { display: flex; gap: 0; background: #f1f5f9; border-radius: 10px; padding: 3px; border: 1px solid #e2e8f0; }
         .pue-toolbar-btn { padding: 0.55rem 1.2rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 700; font-size: 0.82rem; font-family: inherit; transition: all 0.25s; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
         .pue-btn-free { background: transparent; color: #64748b; }
-        .pue-btn-free.active { background: linear-gradient(135deg, #8b5cf6, #a78bfa); color: white; box-shadow: 0 2px 8px rgba(139,92,246,0.3); }
-        .pue-btn-free:not(.active):hover { background: rgba(139,92,246,0.08); color: #8b5cf6; }
+        .pue-btn-free.active { background: linear-gradient(135deg, #64748b, #a78bfa); color: white; box-shadow: 0 2px 8px rgba(100, 116, 139,0.3); }
+        .pue-btn-free:not(.active):hover { background: rgba(100, 116, 139,0.08); color: #64748b; }
         .pue-btn-pro { background: transparent; color: #64748b; }
-        .pue-btn-pro.active { background: linear-gradient(135deg, #7c3aed, #a855f7); color: white; box-shadow: 0 2px 8px rgba(139,92,246,0.3); }
-        .pue-btn-pro:not(.active):hover { background: rgba(139,92,246,0.08); color: #8b5cf6; }
+        .pue-btn-pro.active { background: linear-gradient(135deg, #7c3aed, #a855f7); color: white; box-shadow: 0 2px 8px rgba(100, 116, 139,0.3); }
+        .pue-btn-pro:not(.active):hover { background: rgba(100, 116, 139,0.08); color: #64748b; }
         .pue-btn-pro.locked-hint { position: relative; }
         .pue-btn-pro.locked-hint::after { content: ''; position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background: #f59e0b; border-radius: 50%; border: 2px solid #f1f5f9; }
         .pue-toolbar-actions { display: flex; gap: 0.5rem; align-items: center; }
         .pue-btn-reset { padding: 0.55rem 1rem; border-radius: 10px; border: 1px solid #e2e8f0; background: white; color: #64748b; cursor: pointer; font-weight: 600; font-size: 0.82rem; font-family: inherit; transition: all 0.3s; display: flex; align-items: center; gap: 6px; }
-        .pue-btn-reset:hover { border-color: #8b5cf6; color: #8b5cf6; background: rgba(139,92,246,0.04); }
+        .pue-btn-reset:hover { border-color: #64748b; color: #64748b; background: rgba(100, 116, 139,0.04); }
         .pue-btn-pdf { padding: 0.55rem 1rem; border-radius: 10px; border: 1px solid rgba(239,68,68,0.3); background: rgba(239,68,68,0.04); color: #ef4444; cursor: pointer; font-weight: 600; font-size: 0.82rem; font-family: inherit; transition: all 0.3s; display: flex; align-items: center; gap: 6px; }
         .pue-btn-pdf:hover { border-color: #ef4444; background: rgba(239,68,68,0.1); }
         .pue-btn-pdf.disabled { opacity: 0.45; pointer-events: none; }
         .pue-mode-indicator { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; padding: 3px 10px; border-radius: 50px; display: none; }
-        .pue-mode-indicator.free-active { display: inline-flex; background: rgba(139,92,246,0.1); color: #8b5cf6; }
+        .pue-mode-indicator.free-active { display: inline-flex; background: rgba(100, 116, 139,0.1); color: #64748b; }
         .pue-mode-indicator.pro-active { display: inline-flex; background: rgba(124,58,237,0.1); color: #7c3aed; }
         .pro-section { position: relative; }
         .pro-section.locked > *:not(.pro-overlay) { filter: blur(6px); user-select: none; pointer-events: none; }
@@ -264,7 +264,7 @@
         .pro-overlay-desc { font-size: 0.8rem; color: var(--text-muted); text-align: center; max-width: 260px; }
         .pro-overlay-btn { padding: 8px 20px; background: linear-gradient(135deg, #7c3aed, #a855f7); border: none; border-radius: 8px; color: white; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.3s; }
         .pro-overlay-btn:hover { transform: translateY(-1px); }
-        .pro-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; background: linear-gradient(135deg, #8b5cf6, #a855f7); color: white; font-size: 0.6rem; font-weight: 700; border-radius: 50px; letter-spacing: 0.5px; vertical-align: middle; }
+        .pro-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; background: linear-gradient(135deg, #64748b, #a855f7); color: white; font-size: 0.6rem; font-weight: 700; border-radius: 50px; letter-spacing: 0.5px; vertical-align: middle; }
         @keyframes modalSlideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
         @media print {
             body { background: white !important; }
@@ -408,15 +408,15 @@ button[onclick="setPreset(2000,'colocation')"] { background:#6d28d9 !important; 
             <div class="hero-badge"><i class="fas fa-layer-group"></i> Infrastructure Classification</div>
             <h1>Tier Advisor</h1>
             <p>Map your data center's power, cooling, network, and site infrastructure to Uptime Institute Tier I-IV, TIA-942 Ratings 1-4, and EN 50600 Availability Classes — with regional compliance overlays for 12+ jurisdictions.</p>
-            <div style="max-width:800px;margin:1.5rem auto;border-radius:16px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.12);border:1px solid rgba(139,92,246,0.15);">
+            <div style="max-width:800px;margin:1.5rem auto;border-radius:16px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.12);border:1px solid rgba(100, 116, 139,0.15);">
                 <picture>
                     <source type="image/webp" srcset="assets/tier-advisor-hero-600.webp 600w, assets/tier-advisor-hero.webp 1200w" sizes="(max-width:800px) 100vw, 800px">
                     <source type="image/jpeg" srcset="assets/tier-advisor-hero-600.jpg 600w, assets/tier-advisor-hero.jpg 1200w" sizes="(max-width:800px) 100vw, 800px">
                     <img data-rz-hero src="assets/tier-advisor-hero.jpg" alt="Tier Advisor — Data Center Tier Classification Calculator" width="1200" height="509" style="width:100%;height:auto;display:block;" fetchpriority="high">
                 </picture>
             </div>
-            <div style="max-width:800px;margin:0 auto 1.5rem;text-align:left;padding:1.25rem 1.5rem;background:rgba(139,92,246,0.04);border:1px solid rgba(139,92,246,0.12);border-radius:12px;">
-                <h3 style="font-size:0.95rem;font-weight:700;color:var(--text-primary);margin-bottom:0.5rem;display:flex;align-items:center;gap:8px;"><i class="fas fa-info-circle" style="color:#8b5cf6;"></i> What is Tier Classification?</h3>
+            <div style="max-width:800px;margin:0 auto 1.5rem;text-align:left;padding:1.25rem 1.5rem;background:rgba(100, 116, 139,0.04);border:1px solid rgba(100, 116, 139,0.12);border-radius:12px;">
+                <h3 style="font-size:0.95rem;font-weight:700;color:var(--text-primary);margin-bottom:0.5rem;display:flex;align-items:center;gap:8px;"><i class="fas fa-info-circle" style="color:#64748b;"></i> What is Tier Classification?</h3>
                 <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin:0 0 0.75rem 0;">The <strong>Uptime Institute Tier Standard</strong> classifies data centers from Tier I (basic, 99.67% availability) to Tier IV (fault tolerant, 99.995% availability) based on infrastructure topology and redundancy. <strong>TIA-942-B</strong> uses "Rated" levels 1-4 with additional telecom and security requirements. <strong>EN 50600</strong> defines Availability Classes VK1-VK4 aligned with European standards.</p>
                 <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;margin:0;">This calculator maps your actual infrastructure against all four major frameworks simultaneously, identifies which subsystem limits your classification, and shows exactly what upgrades are needed to reach the next level.</p>
             </div>
@@ -445,7 +445,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#6d28d9 !important; 
                     <!-- Section 1: Facility Profile -->
                     <div class="input-section">
                         <div class="section-header">
-                            <div class="section-icon" style="background:rgba(139,92,246,0.1);color:#8b5cf6;"><i class="fas fa-building"></i></div>
+                            <div class="section-icon" style="background:rgba(100, 116, 139,0.1);color:#64748b;"><i class="fas fa-building"></i></div>
                             <div><div class="section-title">Facility Profile</div><div class="section-subtitle">Type, capacity, and building characteristics</div></div>
                         </div>
                         <div class="input-group">
@@ -705,7 +705,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#6d28d9 !important; 
                                 <i class="fas fa-check-circle"></i> <span id="tierBadgeText">Concurrently Maintainable</span>
                             </div>
                             <div class="score-row">
-                                <div class="score-item"><div class="val" id="scoreValue" style="color:#8b5cf6;">72</div><div class="lbl">Score</div></div>
+                                <div class="score-item"><div class="val" id="scoreValue" style="color:#64748b;">72</div><div class="lbl">Score</div></div>
                                 <div class="score-item"><div class="val" id="gradeValue" style="color:#3b82f6;">B</div><div class="lbl">Grade</div></div>
                                 <div class="score-item"><div class="val" id="confidenceValue" style="color:#10b981;">88%</div><div class="lbl">Confidence</div></div>
                             </div>
@@ -717,7 +717,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#6d28d9 !important; 
                             <div class="metric-box"><div class="metric-label">BICSI 002</div><div class="metric-value" id="bicsiClass">Class F3</div></div>
                         </div>
                         <div class="subsystem-scores">
-                            <div style="font-size:0.78rem;font-weight:700;color:var(--text-primary);margin-bottom:0.5rem;"><i class="fas fa-chart-bar" style="color:#8b5cf6;margin-right:4px;"></i>Subsystem Scores</div>
+                            <div style="font-size:0.78rem;font-weight:700;color:var(--text-primary);margin-bottom:0.5rem;"><i class="fas fa-chart-bar" style="color:#64748b;margin-right:4px;"></i>Subsystem Scores</div>
                             <div class="subsystem-row"><span class="subsystem-label">Power</span><div class="subsystem-bar-bg"><div class="subsystem-bar-fill" id="powerBar" style="width:70%;background:#f59e0b;"></div></div><span class="subsystem-val" id="powerVal">70</span></div>
                             <div class="subsystem-row"><span class="subsystem-label">Cooling</span><div class="subsystem-bar-bg"><div class="subsystem-bar-fill" id="coolingBar" style="width:65%;background:#3b82f6;"></div></div><span class="subsystem-val" id="coolingVal">65</span></div>
                             <div class="subsystem-row"><span class="subsystem-label">Network</span><div class="subsystem-bar-bg"><div class="subsystem-bar-fill" id="networkBar" style="width:72%;background:#10b981;"></div></div><span class="subsystem-val" id="networkVal">72</span></div>
@@ -725,7 +725,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#6d28d9 !important; 
                             <div class="subsystem-row"><span class="subsystem-label">Monitoring</span><div class="subsystem-bar-bg"><div class="subsystem-bar-fill" id="monitorBar" style="width:65%;background:#6366f1;"></div></div><span class="subsystem-val" id="monitorVal">65</span></div>
                         </div>
                         <div class="gap-section" id="gapSection">
-                            <div class="gap-title"><i class="fas fa-arrow-up" style="color:#8b5cf6;"></i> Gap Analysis</div>
+                            <div class="gap-title"><i class="fas fa-arrow-up" style="color:#64748b;"></i> Gap Analysis</div>
                             <div id="gapContent"><p style="font-size:0.78rem;color:var(--text-secondary);">Calculating...</p></div>
                         </div>
                         <div class="rec-section">
@@ -741,7 +741,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#6d28d9 !important; 
                             <div class="pro-overlay-desc">Regional compliance, cost estimates, Monte Carlo confidence</div>
                             <button class="pro-overlay-btn"><i class="fas fa-crown" style="margin-right:6px;"></i>Unlock PRO</button>
                         </div>
-                        <div style="font-size:0.82rem;font-weight:700;color:var(--text-primary);margin-bottom:0.75rem;"><i class="fas fa-crown" style="color:#8b5cf6;margin-right:4px;"></i>Pro Analysis <span class="pro-badge"><i class="fas fa-crown"></i> PRO</span></div>
+                        <div style="font-size:0.82rem;font-weight:700;color:var(--text-primary);margin-bottom:0.75rem;"><i class="fas fa-crown" style="color:#64748b;margin-right:4px;"></i>Pro Analysis <span class="pro-badge"><i class="fas fa-crown"></i> PRO</span></div>
                         <div class="metric-grid">
                             <div class="metric-box"><div class="metric-label">Regional Score</div><div class="metric-value" id="regionalScoreVal">—</div></div>
                             <div class="metric-box"><div class="metric-label">Upgrade Cost Est.</div><div class="metric-value" id="upgradeCostVal">—</div></div>
@@ -757,7 +757,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#6d28d9 !important; 
         <section class="charts-section">
             <div class="charts-grid">
                 <div class="chart-card">
-                    <div class="chart-title"><i class="fas fa-spider" style="color:#8b5cf6;"></i> Subsystem Radar</div>
+                    <div class="chart-title"><i class="fas fa-spider" style="color:#64748b;"></i> Subsystem Radar</div>
                     <div class="chart-container"><canvas id="radarChart"></canvas></div>
                 </div>
                 <div class="chart-card">
@@ -817,7 +817,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#6d28d9 !important; 
 
         <!-- Independence Disclaimer -->
         <div style="max-width:900px;margin:2rem auto 0;padding:1rem 1.5rem;text-align:center;">
-            <p style="font-size:0.72rem;color:#64748b;font-style:italic;line-height:1.6;margin:0;">All content on ResistanceZero is independent personal research derived from publicly available sources. This site does not represent any current or former employer. <a href="terms.html" style="color:#8b5cf6;">Terms &amp; Disclaimer</a></p>
+            <p style="font-size:0.72rem;color:#64748b;font-style:italic;line-height:1.6;margin:0;">All content on ResistanceZero is independent personal research derived from publicly available sources. This site does not represent any current or former employer. <a href="terms.html" style="color:#64748b;">Terms &amp; Disclaimer</a></p>
         </div>
 
 
@@ -1060,7 +1060,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#6d28d9 !important; 
                 data: {
                     labels: labels,
                     datasets: [
-                        { label: 'Your Facility', data: data, backgroundColor: 'rgba(139,92,246,0.2)', borderColor: '#8b5cf6', borderWidth: 2, pointBackgroundColor: '#8b5cf6', pointRadius: 4 },
+                        { label: 'Your Facility', data: data, backgroundColor: 'rgba(100, 116, 139,0.2)', borderColor: '#64748b', borderWidth: 2, pointBackgroundColor: '#64748b', pointRadius: 4 },
                         { label: 'Tier III Benchmark', data: t3Bench, backgroundColor: 'rgba(59,130,246,0.08)', borderColor: '#3b82f6', borderWidth: 1.5, borderDash: [5,5], pointRadius: 0 }
                     ]
                 },
@@ -1219,7 +1219,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#6d28d9 !important; 
         var isDark = document.documentElement.getAttribute('data-theme')==='dark';
         var annots = {
             p5: {type:'line',xMin:p5/5,xMax:p5/5,borderColor:'#ef4444',borderWidth:1.5,borderDash:[4,4],label:{content:'P5: '+p5,display:true,position:'start',font:{size:9},color:'#ef4444'}},
-            p50: {type:'line',xMin:p50/5,xMax:p50/5,borderColor:'#8b5cf6',borderWidth:2,label:{content:'P50: '+p50,display:true,position:'start',font:{size:9},color:'#8b5cf6'}},
+            p50: {type:'line',xMin:p50/5,xMax:p50/5,borderColor:'#64748b',borderWidth:2,label:{content:'P50: '+p50,display:true,position:'start',font:{size:9},color:'#64748b'}},
             p95: {type:'line',xMin:p95/5,xMax:p95/5,borderColor:'#10b981',borderWidth:1.5,borderDash:[4,4],label:{content:'P95: '+p95,display:true,position:'start',font:{size:9},color:'#10b981'}}
         };
         if (histogramChart) {
@@ -1272,7 +1272,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#6d28d9 !important; 
                 type: 'bar',
                 data: {
                     labels: newLabels,
-                    datasets: [{label:'Weighted Impact',data:newData,backgroundColor:['#8b5cf6','#7c3aed','#6d28d9','#5b21b6','#4c1d95','#3b0764'],borderRadius:4,barThickness:22}]
+                    datasets: [{label:'Weighted Impact',data:newData,backgroundColor:['#64748b','#7c3aed','#6d28d9','#5b21b6','#4c1d95','#3b0764'],borderRadius:4,barThickness:22}]
                 },
                 options: {
                     indexAxis:'y',responsive:true,interaction:{mode:'index',intersect:false},maintainAspectRatio:false,
@@ -1357,7 +1357,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#6d28d9 !important; 
         });
         // P-lines
         var p5 = results[499], p50 = results[4999], p95 = results[9499];
-        [{v:p5,c:'#ef4444',l:'P5'},{v:p50,c:'#8b5cf6',l:'P50'},{v:p95,c:'#10b981',l:'P95'}].forEach(function(p) {
+        [{v:p5,c:'#ef4444',l:'P5'},{v:p50,c:'#64748b',l:'P50'},{v:p95,c:'#10b981',l:'P95'}].forEach(function(p) {
             var px = 20 + (p.v/5)*16 + 7;
             svg += '<line x1="'+px+'" y1="20" x2="'+px+'" y2="155" stroke="'+p.c+'" stroke-width="1.5" stroke-dasharray="3,3"/>';
             svg += '<text x="'+px+'" y="178" text-anchor="middle" font-size="7" fill="'+p.c+'" font-weight="700">'+p.l+': '+Math.round(p.v)+'</text>';
@@ -1372,11 +1372,11 @@ button[onclick="setPreset(2000,'colocation')"] { background:#6d28d9 !important; 
         var h = top.length * 28 + 30;
         var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 '+h+'" style="width:100%;height:auto;">';
         svg += '<text x="180" y="12" text-anchor="middle" font-size="10" fill="#1e3a5f" font-weight="700">Sensitivity Analysis (Weighted Impact)</text>';
-        var purples = ['#8b5cf6','#7c3aed','#6d28d9','#5b21b6','#4c1d95','#3b0764','#2e1065','#1e0a3e'];
+        var purples = ['#64748b','#7c3aed','#6d28d9','#5b21b6','#4c1d95','#3b0764','#2e1065','#1e0a3e'];
         top.forEach(function(f,i) {
             var y = 24 + i*28, bw = Math.max(4,(f.impact/maxImpact)*180);
             svg += '<text x="110" y="'+(y+15)+'" text-anchor="end" font-size="9" fill="#374151" font-weight="600">'+f.label+'</text>';
-            svg += '<rect x="115" y="'+y+'" width="'+bw+'" height="20" rx="3" fill="'+(purples[i]||'#8b5cf6')+'"/>';
+            svg += '<rect x="115" y="'+y+'" width="'+bw+'" height="20" rx="3" fill="'+(purples[i]||'#64748b')+'"/>';
             svg += '<text x="'+(120+bw)+'" y="'+(y+14)+'" font-size="9" fill="#1f2937" font-weight="600">'+(Math.round(f.impact*10)/10)+'</text>';
         });
         return svg + '</svg>';
@@ -1469,8 +1469,8 @@ button[onclick="setPreset(2000,'colocation')"] { background:#6d28d9 !important; 
         var dataPts=[],benchPts=[];
         for(var i=0;i<6;i++){var a=Math.PI*2*i/6-Math.PI/2;dataPts.push((cx+r*vals[i]/100*Math.cos(a))+','+(rcy+r*vals[i]/100*Math.sin(a)));benchPts.push((cx+r*0.75*Math.cos(a))+','+(rcy+r*0.75*Math.sin(a)));}
         svgR+='<polygon points="'+benchPts.join(' ')+'" fill="rgba(59,130,246,0.08)" stroke="#3b82f6" stroke-width="1" stroke-dasharray="4,4"/>';
-        svgR+='<polygon points="'+dataPts.join(' ')+'" fill="rgba(139,92,246,0.15)" stroke="#8b5cf6" stroke-width="2"/>';
-        for(var i=0;i<6;i++){var a=Math.PI*2*i/6-Math.PI/2;var dx=cx+r*vals[i]/100*Math.cos(a),dy=rcy+r*vals[i]/100*Math.sin(a);svgR+='<circle cx="'+dx+'" cy="'+dy+'" r="3" fill="#8b5cf6"/>';}
+        svgR+='<polygon points="'+dataPts.join(' ')+'" fill="rgba(100, 116, 139,0.15)" stroke="#64748b" stroke-width="2"/>';
+        for(var i=0;i<6;i++){var a=Math.PI*2*i/6-Math.PI/2;var dx=cx+r*vals[i]/100*Math.cos(a),dy=rcy+r*vals[i]/100*Math.sin(a);svgR+='<circle cx="'+dx+'" cy="'+dy+'" r="3" fill="#64748b"/>';}
         svgR+='</svg>';
 
         // Bar chart with pass/fail
@@ -1480,7 +1480,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#6d28d9 !important; 
             {label:'Network (15%)',score:net,color:'#10b981'},
             {label:'Physical (10%)',score:phys,color:'#ef4444'},
             {label:'Monitoring (5%)',score:mon,color:'#6366f1'},
-            {label:'Compliance (15%)',score:reg,color:'#8b5cf6'}
+            {label:'Compliance (15%)',score:reg,color:'#64748b'}
         ];
         var svgDetail = pdfSubsystemDetailSVG(barItems);
 
@@ -1583,16 +1583,16 @@ button[onclick="setPreset(2000,'colocation')"] { background:#6d28d9 !important; 
         html+='@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}@page{margin:12mm;}}';
         html+='body{font-family:"IBM Plex Sans",Arial,sans-serif;max-width:820px;margin:0 auto;padding:20px 30px;color:#1f2937;font-size:11px;line-height:1.6;}';
         html+='h1{color:#1e3a5f;font-size:20px;margin:0;} h2{color:#1e3a5f;margin:16px 0 8px;font-size:13px;border-bottom:1px solid #e5e7eb;padding-bottom:4px;} h3{margin:10px 0 4px;color:#374151;font-size:11px;}';
-        html+='.hdr{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #8b5cf6;padding-bottom:12px;margin-bottom:12px;}';
+        html+='.hdr{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #64748b;padding-bottom:12px;margin-bottom:12px;}';
         html+='.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0;}';
         html+='.kpi-card{background:#f8fafc;border:1px solid #e5e7eb;border-radius:6px;padding:8px;text-align:center;}';
         html+='.kpi-val{font-size:16px;font-weight:700;color:#1e3a5f;} .kpi-lbl{font-size:8px;color:#94a3b8;margin-top:2px;text-transform:uppercase;letter-spacing:0.5px;}';
         html+='.chart-row{display:flex;gap:12px;margin:10px 0;} .chart-row>div{flex:1;min-width:0;}';
-        html+='.narr{font-size:10.5px;color:#1f2937;line-height:1.65;padding:8px 10px;background:#f8fafc;border-left:3px solid #8b5cf6;border-radius:0 6px 6px 0;margin:6px 0;}';
+        html+='.narr{font-size:10.5px;color:#1f2937;line-height:1.65;padding:8px 10px;background:#f8fafc;border-left:3px solid #64748b;border-radius:0 6px 6px 0;margin:6px 0;}';
         html+='.sub-narr{font-size:10px;color:#1f2937;line-height:1.6;padding:6px 10px;background:#fafbfc;border-left:3px solid VAR_COLOR;border-radius:0 4px 4px 0;margin:4px 0;}';
         html+='table{width:100%;border-collapse:collapse;margin:6px 0;}';
         html+='.section-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:8px;font-weight:700;letter-spacing:0.5px;margin-bottom:4px;}';
-        html+='.gap-list{list-style:none;padding:0;} .gap-list li{font-size:10px;padding:3px 0 3px 14px;position:relative;color:#374151;} .gap-list li::before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;border-radius:50%;background:#8b5cf6;}';
+        html+='.gap-list{list-style:none;padding:0;} .gap-list li{font-size:10px;padding:3px 0 3px 14px;position:relative;color:#374151;} .gap-list li::before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;border-radius:50%;background:#64748b;}';
         html+=`
 /* v1.8.0 — mobile utility responsive patch */
 @media (max-width: 768px) {
@@ -1713,7 +1713,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#6d28d9 !important; 
     </style></head><body>`;
 
         // Header
-        html+='<div class="hdr"><div><h1>Tier Classification Report</h1><p style="color:#94a3b8;margin:2px 0 0;font-size:10px;">Generated '+dateStr+' | Pro Analysis | Facility: '+fl(facilityType)+' '+itLoad+' kW</p></div><div style="text-align:right;"><span style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:#8b5cf6;">RESISTANCEZERO</span><br><span style="font-size:8px;color:#94a3b8;">Tier Advisor v1.0</span></div></div>';
+        html+='<div class="hdr"><div><h1>Tier Classification Report</h1><p style="color:#94a3b8;margin:2px 0 0;font-size:10px;">Generated '+dateStr+' | Pro Analysis | Facility: '+fl(facilityType)+' '+itLoad+' kW</p></div><div style="text-align:right;"><span style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:#64748b;">RESISTANCEZERO</span><br><span style="font-size:8px;color:#94a3b8;">Tier Advisor v1.0</span></div></div>';
 
         // Executive Score: Gauge + KPIs side by side
         html+='<div class="chart-row"><div style="flex:0 0 280px;">'+svgGauge+'</div><div style="display:flex;flex-direction:column;justify-content:center;">';
@@ -1775,7 +1775,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#6d28d9 !important; 
         html+='<p style="font-size:9px;color:#94a3b8;line-height:1.6;">This report uses a 6-dimension weighted scorecard model: Power (35%), Cooling (20%), Network (15%), Physical Security (10%), Monitoring (5%), and Regional Compliance (15%). Each subsystem is scored 0-100 based on component-level inputs mapped to industry benchmarks. Floor constraints prevent over-classification: Tier III requires dual utility feeds and N+1 redundancy in power; Tier IV requires 2N/2(N+1) across all critical systems. Monte Carlo analysis runs 10,000 iterations with &plusmn;12.5% uniform random variation on the composite score. Framework mappings (Uptime Institute, TIA-942-B, EN 50600, BICSI 002) are based on published standard requirements as of 2026. Regional compliance overlays reference jurisdiction-specific regulatory frameworks including MAS TRM, EU DORA, FISC, APRA CPS 234, and others. Cost estimates are indicative ranges based on industry averages and should be validated with local contractors.</p>';
 
         // Footer
-        html+='<div style="text-align:center;margin-top:20px;padding-top:12px;border-top:2px solid #8b5cf6;font-size:8px;color:#94a3b8;">resistancezero.com &middot; Generated '+dateStr+' &middot; All calculations performed client-side &middot; Tier Advisor v1.0 &middot; &copy; 2026 Bagus Dwi Permana</div>';
+        html+='<div style="text-align:center;margin-top:20px;padding-top:12px;border-top:2px solid #64748b;font-size:8px;color:#94a3b8;">resistancezero.com &middot; Generated '+dateStr+' &middot; All calculations performed client-side &middot; Tier Advisor v1.0 &middot; &copy; 2026 Bagus Dwi Permana</div>';
         html+='<script src="auth.js?v=2026-07-24a" defer><\/script>';
         html+='<script src="rz-engine.min.js?v=2026-07-27-maint" defer><\/script>';
         html+='</body></html>';

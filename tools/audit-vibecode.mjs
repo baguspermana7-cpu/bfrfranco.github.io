@@ -15,7 +15,12 @@ const STRICT = process.argv.includes("--strict");
 // tools/dc-corpus/raw), and non-shipped dirs.
 const SKIP = ["node_modules", ".git", "dcmoc", ".next", "games", "Dunia-Emosi", "obsidian-knowledge-vault",
   ".claude", "review", "Documents", "cf-worker", "result", "Article", "02.02.26",
-  "Apps", "Automation", "dc-corpus", "my-video", "TestEA", "worktrees", "backups", ".qa-screens"];
+  "Apps", "Automation", "dc-corpus", "my-video", "TestEA", "worktrees", "backups", ".qa-screens",
+  // changelog.html is a GENERATED archive (build-changelog-html.py) that quotes historical site CSS +
+  // tokens (`#8b5cf6`, old tier colors) as before/after illustration of the very purges it documents.
+  // It is not a live-design surface; its real styling is governed by CHANGELOG.md + the generator, so
+  // the ban is enforced there, not on the rendered archive. Excluded to avoid documentary false-positives.
+  "changelog.html"];
 
 function walk(dir, out = []) {
   for (const name of readdirSync(dir)) {
@@ -36,7 +41,9 @@ const RULES = [
   { id: "anthropic-purple",
     test: (t) => /#8b5cf6/i.test(t) ? "#8B5CF6 (rejected Anthropic-purple) — use a semantic token/mint" : null },
   { id: "sparkle-emoji",
-    test: (t) => /[✨🪄]/.test(t) || /fa-(magic|wand-magic|sparkles?)/.test(t) ? "sparkle/wand icon (AI tell)" : null },
+    // NB: the char-class MUST carry the `u` flag — without it, 🪄 (a surrogate pair) decays to two
+    // lone surrogates and the class matches the \uD83E high-surrogate shared by 🧪🧠🧬 etc. (false hits).
+    test: (t) => /[✨🪄]/u.test(t) || /fa-(magic|wand-magic|sparkles?)/.test(t) ? "sparkle/wand icon (AI tell)" : null },
   { id: "dot-grid-bg",
     // real dot-grid background: radial-gradient(...) with background-size (tiled dots), not a comment
     test: (t) => {
@@ -47,14 +54,37 @@ const RULES = [
   { id: "lucide-icons",
     test: (t) => /lucide(-|\.|\/)/i.test(t) ? "Lucide icon library (use the site's Font Awesome idiom)" : null },
   { id: "glass-decoration",
-    // backdrop-filter blur used many times = glassmorphism slop (a couple is tolerated)
-    test: (t) => { const n = (t.match(/backdrop-filter:\s*blur/gi) || []).length; return n >= 6 ? `glassmorphism blur used ${n}× (decorative)` : null; } },
+    // Selector-aware: backdrop-blur on nav/modal/overlay/palette/sticky-header is standard FUNCTIONAL UI
+    // (not slop). Only DECORATIVE surfaces (card/panel/tile/bento/hero/badge/chip/widget) count as
+    // glassmorphism. Flag when ≥3 decorative surfaces carry blur.
+    test: (t) => {
+      const DECOR = /(card|panel|tile|bento|hero|badge|chip|widget|glass-(?!bg|blur))/i;
+      const FUNC = /(nav|navbar|modal|overlay|gate|search|palette|ticker|dropdown|tooltip|sticky|header|drawer|sheet|toast|banner|menu)/i;
+      // Resolve `backdrop-filter: var(--glass-blur)` indirection: if --glass-blur is DEFINED as a real
+      // blur(...) anywhere in the file, substitute so token-glass can't hide from the blur( scan below.
+      const def = t.match(/--glass-blur:\s*(blur\([^;]*\))/i);
+      if (def) t = t.replace(/backdrop-filter:\s*var\(--glass-blur\)/gi, "backdrop-filter: " + def[1]);
+      let decor = 0;
+      const re = /([.#][^{}]{1,120}?)\{[^{}]*backdrop-filter:\s*[^;}]*blur\([^{}]*\}/gi;
+      let m;
+      while ((m = re.exec(t))) {
+        const sel = m[1];
+        if (DECOR.test(sel) && !FUNC.test(sel)) decor++;
+      }
+      return decor >= 3 ? `glassmorphism blur on ${decor} decorative surface(s)` : null;
+    } },
 ];
 
 const files = walk(ROOT);
 const findings = [];
+// Strip DOCUMENTATION prose before scanning: <code>/<pre> blocks (e.g. the public changelog quotes
+// historical CSS like `<code>#8b5cf6</code>` while DESCRIBING the purge — documenting a tell is not
+// committing it). Real usage lives in style="" / class="" / CSS rules, which survive this strip.
+function stripDocProse(t) {
+  return t.replace(/<code[\s\S]*?<\/code>/gi, "").replace(/<pre[\s\S]*?<\/pre>/gi, "");
+}
 for (const f of files) {
-  let t; try { t = readFileSync(f, "utf8"); } catch { continue; }
+  let t; try { t = stripDocProse(readFileSync(f, "utf8")); } catch { continue; }
   for (const r of RULES) {
     const m = r.test(t, f);
     if (m) findings.push({ file: f.replace(ROOT + "/", ""), rule: r.id, msg: m });

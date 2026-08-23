@@ -90,7 +90,7 @@
     --rfs-amber: #f59e0b;
     --rfs-red: #ef4444;
     --rfs-blue: #3b82f6;
-    --rfs-purple: #8b5cf6;
+    --rfs-purple: #64748b;
     --rfs-emerald: #10b981;
     --rfs-cyan: #06b6d4;
     --rfs-bg: #ffffff;
@@ -246,9 +246,9 @@ body {
 .rfs-btn-free.active { background: var(--rfs-teal); color: #fff; border-color: var(--rfs-teal); }
 .rfs-btn-pro {
     background: linear-gradient(135deg, var(--rfs-purple), #a855f7);
-    color: #fff; border: 1px solid rgba(139,92,246,0.3);
+    color: #fff; border: 1px solid rgba(100, 116, 139,0.3);
 }
-.rfs-btn-pro.active { box-shadow: 0 0 16px rgba(139,92,246,0.3); }
+.rfs-btn-pro.active { box-shadow: 0 0 16px rgba(100, 116, 139,0.3); }
 .rfs-btn-export, .rfs-btn-import, .rfs-btn-reset {
     padding: 6px 10px; border-radius: 6px; font-size: 0.75rem;
     cursor: pointer; border: 1px solid var(--rfs-border);
@@ -544,7 +544,7 @@ body {
 .rfs-level-l1 { background:rgba(59,130,246,0.12);color:#3b82f6; }
 .rfs-level-l2 { background:rgba(6,182,212,0.12);color:#06b6d4; }
 .rfs-level-l3 { background:rgba(16,185,129,0.12);color:#10b981; }
-.rfs-level-l4 { background:rgba(139,92,246,0.12);color:#8b5cf6; }
+.rfs-level-l4 { background:rgba(100, 116, 139,0.12);color:#64748b; }
 .rfs-level-l5 { background:rgba(245,158,11,0.12);color:#f59e0b; }
 .rfs-level-l6 { background:rgba(236,72,153,0.12);color:#ec4899; }
 
@@ -553,14 +553,14 @@ body {
 .rfs-test-draft { background:var(--rfs-bg3);color:var(--rfs-text3); }
 .rfs-test-scheduled { background:rgba(59,130,246,0.12);color:#3b82f6; }
 .rfs-test-in-progress { background:rgba(245,158,11,0.12);color:#f59e0b; }
-.rfs-test-witness-pending { background:rgba(139,92,246,0.12);color:#8b5cf6; }
+.rfs-test-witness-pending { background:rgba(100, 116, 139,0.12);color:#64748b; }
 .rfs-test-passed { background:rgba(16,185,129,0.12);color:#10b981; }
 .rfs-test-failed { background:rgba(239,68,68,0.12);color:#ef4444; }
 .rfs-test-retest { background:rgba(245,158,11,0.15);color:#d97706; }
 
 /* ── Witness Badge ── */
 .rfs-witness { display:inline-flex;align-items:center;gap:4px;padding:2px 6px;border-radius:4px;font-size:0.65rem;font-weight:600; }
-.rfs-witness-required { background:rgba(139,92,246,0.12);color:#8b5cf6; }
+.rfs-witness-required { background:rgba(100, 116, 139,0.12);color:#64748b; }
 .rfs-witness-completed { background:rgba(16,185,129,0.12);color:#10b981; }
 .rfs-witness-waived { background:var(--rfs-bg3);color:var(--rfs-text3);text-decoration:line-through; }
 
@@ -1304,7 +1304,7 @@ html:not([data-theme="dark"]) .rfs-mode-btn.active {
 
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
                 <button class="rfs-btn rfs-btn-primary" onclick="RfsUI.saveSetup()"><i class="fas fa-save"></i> Save Baseline <span class="rfs-tip">?<div class="rfs-tip-data" data-title="Save Baseline" data-desc="Creates or updates the project with current settings. Required before adding units or tracking gates."></div></span></button>
-                <button class="rfs-btn rfs-btn-secondary" onclick="RfsUI.generateDefaultUnits()"><i class="fas fa-magic"></i> Generate Units <span class="rfs-tip">?<div class="rfs-tip-data" data-title="Generate Default Units" data-desc="Auto-creates delivery units based on the selected archetype template. Free tier: max 3 units."></div></span></button>
+                <button class="rfs-btn rfs-btn-secondary" onclick="RfsUI.generateDefaultUnits()"><i class="fas fa-bolt"></i> Generate Units <span class="rfs-tip">?<div class="rfs-tip-data" data-title="Generate Default Units" data-desc="Auto-creates delivery units based on the selected archetype template. Free tier: max 3 units."></div></span></button>
                 <button class="rfs-btn rfs-btn-secondary" onclick="RfsUI.resetSetup()"><i class="fas fa-undo"></i> Reset</button>
             </div>
         </div>
@@ -1349,7 +1349,7 @@ html:not([data-theme="dark"]) .rfs-mode-btn.active {
     <div class="rfs-toolbar">
         <span class="rfs-toolbar-title"><i class="fas fa-cubes" style="color:var(--rfs-teal);margin-right:8px;"></i>Delivery Units</span>
         <button class="rfs-btn rfs-btn-primary rfs-btn-sm" onclick="RfsUI.addUnit()"><i class="fas fa-plus"></i> Add Unit</button>
-        <button class="rfs-btn rfs-btn-secondary rfs-btn-sm" onclick="RfsUI.generateDefaultUnits()"><i class="fas fa-magic"></i> Generate Set</button>
+        <button class="rfs-btn rfs-btn-secondary rfs-btn-sm" onclick="RfsUI.generateDefaultUnits()"><i class="fas fa-bolt"></i> Generate Set</button>
     </div>
     <div class="rfs-layout-wide">
         <div>
@@ -1476,7 +1476,7 @@ html:not([data-theme="dark"]) .rfs-mode-btn.active {
                 <option value="failed">Failed</option>
                 <option value="retest">Retest</option>
             </select>
-            <button class="rfs-btn rfs-btn-secondary rfs-btn-sm" onclick="RfsUI.generateDefaultTests()"><i class="fas fa-magic"></i> Generate Defaults</button>
+            <button class="rfs-btn rfs-btn-secondary rfs-btn-sm" onclick="RfsUI.generateDefaultTests()"><i class="fas fa-bolt"></i> Generate Defaults</button>
             <button class="rfs-btn rfs-btn-primary rfs-btn-sm" onclick="RfsUI.addTestPackage()"><i class="fas fa-plus"></i> Add Package</button>
             <span style="border-left:1px solid var(--rfs-border);height:20px;margin:0 4px;"></span>
             <button class="rfs-btn rfs-btn-sm" onclick="RfsUI.toggleTestView('table')" title="Table view"><i class="fas fa-table"></i></button>
@@ -1508,7 +1508,7 @@ html:not([data-theme="dark"]) .rfs-mode-btn.active {
         <div class="rfs-empty-title">No test packages</div>
         <div class="rfs-empty-desc">Test packages track L0-L6 commissioning campaigns correlated with the CX Calculator activity map. Generate defaults for a comprehensive test register or add manually.</div>
         <div style="display:flex;gap:8px;justify-content:center;margin-top:8px;">
-            <button class="rfs-btn rfs-btn-primary" onclick="RfsUI.generateDefaultTests()"><i class="fas fa-magic"></i> Generate Default Tests</button>
+            <button class="rfs-btn rfs-btn-primary" onclick="RfsUI.generateDefaultTests()"><i class="fas fa-bolt"></i> Generate Default Tests</button>
             <button class="rfs-btn rfs-btn-secondary" onclick="RfsUI.addTestPackage()"><i class="fas fa-plus"></i> Add Manually</button>
         </div>
     </div>
@@ -1651,7 +1651,7 @@ html:not([data-theme="dark"]) .rfs-mode-btn.active {
                     <option value="G6">G6</option><option value="G7">G7</option>
                 </select>
             </div>
-            <button class="rfs-btn rfs-btn-secondary rfs-btn-sm" onclick="RfsUI.generateDefaultProcedures()"><i class="fas fa-magic"></i> Generate Defaults</button>
+            <button class="rfs-btn rfs-btn-secondary rfs-btn-sm" onclick="RfsUI.generateDefaultProcedures()"><i class="fas fa-bolt"></i> Generate Defaults</button>
             <button class="rfs-btn rfs-btn-primary rfs-btn-sm" onclick="RfsUI.addProcedure()"><i class="fas fa-plus"></i> Add Procedure</button>
             <span style="border-left:1px solid var(--rfs-border);height:20px;margin:0 4px;"></span>
             <button class="rfs-btn rfs-btn-sm" onclick="RfsUI.downloadProcedureTemplate('MOP')" title="Download MOP template"><i class="fas fa-download"></i> MOP</button>
@@ -1682,7 +1682,7 @@ html:not([data-theme="dark"]) .rfs-mode-btn.active {
         <div class="rfs-empty-icon"><i class="fas fa-clipboard-list"></i></div>
         <div class="rfs-empty-title">No procedures registered</div>
         <div class="rfs-empty-desc">MOP (Method of Procedure), SOP (Standard Operating Procedure), and EOP (Emergency Operating Procedure) documents are essential for commissioning. Generate defaults or add manually.</div>
-        <button class="rfs-btn rfs-btn-primary" onclick="RfsUI.generateDefaultProcedures()"><i class="fas fa-magic"></i> Generate Default Procedures</button>
+        <button class="rfs-btn rfs-btn-primary" onclick="RfsUI.generateDefaultProcedures()"><i class="fas fa-bolt"></i> Generate Default Procedures</button>
     </div>
 </section>
 
@@ -2979,7 +2979,7 @@ var RfsReportEngine = {
             html += self._td('+'+(f.evidenceDrag||0)+'d',{color:f.evidenceDrag>0?'#d97706':undefined});
             html += self._td('+'+(f.signoffDrag||0)+'d',{color:f.signoffDrag>0?'#d97706':undefined});
             html += self._td('+'+(f.retestDrag||0)+'d',{color:f.retestDrag>0?'#d97706':undefined});
-            html += self._td('+'+(f.witnessDrag||0)+'d',{color:f.witnessDrag>0?'#8b5cf6':undefined});
+            html += self._td('+'+(f.witnessDrag||0)+'d',{color:f.witnessDrag>0?'#64748b':undefined});
             html += self._td(f.totalDays+'d',{bold:true});
             html += self._td(f.forecastDate||'—');
             html += '</tr>';
@@ -4177,7 +4177,7 @@ var RfsUI = {
         }
 
         var units = projectData.units || [];
-        var discColors = {Electrical:'#3b82f6',Mechanical:'#10b981',Fire:'#ef4444',Controls:'#8b5cf6',Security:'#f59e0b',Operations:'#06b6d4',Planning:'#94a3b8'};
+        var discColors = {Electrical:'#3b82f6',Mechanical:'#10b981',Fire:'#ef4444',Controls:'#64748b',Security:'#f59e0b',Operations:'#06b6d4',Planning:'#94a3b8'};
         document.getElementById('rfsTestsBody').innerHTML = filtered.map(function(t) {
             var unit = units.find(function(u){return u.id===t.unitId;});
             var dc = discColors[t.discipline] || 'var(--rfs-text3)';
