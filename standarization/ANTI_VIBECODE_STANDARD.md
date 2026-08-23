@@ -69,6 +69,12 @@ on any hard-banned finding. Detectors + precision rules (all learned from real f
   the 1px `--glass-border` hairline (the prescribed "opaque instrument surface").
 - **sparkle-emoji** — `✨🪄` (regex carries the `u` flag — WITHOUT it the surrogate pair 🪄 decays and the
   char-class false-matches the `\uD83E` high-surrogate shared by 🧪🧠🧬) or `fa-magic`/`fa-wand-magic`/`fa-sparkles`.
+- **emoji-ui-icon** — decorative PICTOGRAPH emoji as UI icons/headings/badges → use a Font Awesome /
+  thin-line icon. WHITELIST (kept, functional/data — not slop): 🔒🔓 lock (gated-feature affordance),
+  ⚠ warn, ⚡ energy, ★☆⭐ rating, ✓✔✗✘✅❌ status, 🌐 global + regional-indicator FLAGS (country data),
+  ⚑ flag marker, arrows (typographic). `u` flag mandatory. NB: `<i>` icons do NOT render inside
+  `<option>` — strip the emoji there rather than swapping. Where a page lacks Font Awesome (e.g. cdu-hub),
+  add the cdnjs FA stylesheet (already a site dependency) before swapping.
 - **dot-grid-bg**, **anthropic-purple** (`#8b5cf6`), **lucide-icons**, plus REQUIRED terms.html/privacy.html.
 - **Documentation exemption**: `<code>`/`<pre>` prose is stripped before scanning (a changelog entry that
   quotes `#8b5cf6` while DESCRIBING its purge is not committing it). `changelog.html` (generated archive

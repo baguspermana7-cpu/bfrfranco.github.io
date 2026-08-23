@@ -40,6 +40,23 @@ const RULES = [
       ? "Inter/Geist/Space-Grotesk as a PRIMARY font (use 'IBM Plex Sans')" : null },
   { id: "anthropic-purple",
     test: (t) => /#8b5cf6/i.test(t) ? "#8B5CF6 (rejected Anthropic-purple) — use a semantic token/mint" : null },
+  { id: "emoji-ui-icon",
+    // Decorative PICTOGRAPH emoji as UI icons/headings/badges (sign #5). Whitelisted (kept): 🔒/🔓 lock
+    // (gated-feature affordance), ⚠ warn, ⚡ energy, ★☆⭐ rating, regional-indicator FLAGS (country data),
+    // arrows/checks/math (typographic, handled by their own idioms). Everything else in the pictograph
+    // ranges = slop → use a Font Awesome / thin-line icon instead. `u` flag is mandatory (surrogate pairs).
+    test: (t) => {
+      const WHITELIST = new Set(["🔒","🔓","⚠","⚡","★","☆","⭐","✅","✓","✔","✗","✘","❌","➜","🌐","⚑"]);
+      const PICTO = /[\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F900}-\u{1FAFF}\u{2600}-\u{26FF}\u{2728}]/gu;
+      const FLAG = /[\u{1F1E6}-\u{1F1FF}]/u;   // regional-indicator halves → country flags (data, kept)
+      let m;
+      while ((m = PICTO.exec(t))) {
+        const c = m[0];
+        if (WHITELIST.has(c) || FLAG.test(c)) continue;
+        return `decorative emoji ${c} as UI (use a Font Awesome / thin-line icon)`;
+      }
+      return null;
+    } },
   { id: "sparkle-emoji",
     // NB: the char-class MUST carry the `u` flag — without it, 🪄 (a surrogate pair) decays to two
     // lone surrogates and the class matches the \uD83E high-surrogate shared by 🧪🧠🧬 etc. (false hits).

@@ -151,7 +151,7 @@
         <h2>Preferences</h2>
         <div class="kv">
           <span class="k">Theme</span>
-          <span class="v"><button id="btnTheme" class="link" aria-label="Toggle color theme">🌙 Dark</button></span>
+          <span class="v"><button id="btnTheme" class="link" aria-label="Toggle color theme">Dark</button></span>
         </div>
       </div>
 
@@ -184,7 +184,7 @@
     function applyTheme(t) {
       document.documentElement.setAttribute('data-theme', t);
       try { localStorage.setItem('theme', t); } catch (e) {}
-      $('btnTheme').textContent = t === 'dark' ? '🌙 Dark' : '☀️ Light';
+      $('btnTheme').textContent = t === 'dark' ? 'Dark' : 'Light';
     }
     applyTheme((() => { try { return localStorage.getItem('theme') || 'dark'; } catch (e) { return 'dark'; } })());
     $('btnTheme').onclick = () => applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
@@ -216,7 +216,7 @@
       const { data: rows, error: sErr } = await S.listScenarios();
       if (sErr) { list.innerHTML = '<p class="err status">'+escapeHtml(String(sErr))+'</p>'; return; }
       $('scnCount').textContent = rows.length;
-      if (!rows.length) { list.innerHTML = '<p class="muted" style="font-size:0.85rem;">No saved scenarios yet. Open a calculator and click <b>☁ Save scenario</b>.</p>'; return; }
+      if (!rows.length) { list.innerHTML = '<p class="muted" style="font-size:0.85rem;">No saved scenarios yet. Open a calculator and click <b>Save scenario</b>.</p>'; return; }
       list.innerHTML = '';
       rows.forEach(r => {
         const el = document.createElement('div');
@@ -251,7 +251,7 @@
     $('btnSignup').onclick = async () => {
       const { data, error } = await S.signUp($('email').value.trim(), $('password').value);
       if (error) return setStatus($('authStatus'), '❌ ' + error, 'err');
-      if (data.user && !data.session) setStatus($('authStatus'), '📧 Account created — check your email to confirm, then log in.', 'ok');
+      if (data.user && !data.session) setStatus($('authStatus'), 'Account created — check your email to confirm, then log in.', 'ok');
       else { setStatus($('authStatus'), '✅ Signed up.', 'ok'); render(); }
     };
     $('btnLogin').onclick = async () => {

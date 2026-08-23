@@ -3015,7 +3015,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
             let html = '';
             const ds = result.deepSea;
             if (ds) {
-                html += '<h3 style="font-size:13px;margin:14px 0 6px;color:#0e7490;">🌊 Deep Sea Water Cooling System — Engineering Design</h3>' +
+                html += '<h3 style="font-size:13px;margin:14px 0 6px;color:#0e7490;"><i class="fas fa-water"></i> Deep Sea Water Cooling System — Engineering Design</h3>' +
                 '<table style="width:100%;border-collapse:collapse;font-size:11px;">' +
                 '<tr style="background:#0e7490;color:white;"><th style="' + hdrS + '" colspan="2" scope="col">Input Parameters</th></tr>' +
                 '<tr><td style="' + cellS + 'font-weight:600;">Intake Depth</td><td style="' + cellS + '">' + ds.depthM + ' m (intake ' + ds.intakeTempC + ' °C, NOAA WOA profile)</td></tr>' +
@@ -3047,7 +3047,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
             }
             const sp = result.space;
             if (sp) {
-                html += '<h3 style="font-size:13px;margin:14px 0 6px;color:#6d28d9;">📐 Rack Density & White Space Program</h3>' +
+                html += '<h3 style="font-size:13px;margin:14px 0 6px;color:#6d28d9;"><i class="fas fa-ruler-combined"></i> Rack Density & White Space Program</h3>' +
                 '<table style="width:100%;border-collapse:collapse;font-size:11px;">' +
                 '<tr style="background:#4c1d95;color:white;"><th style="' + hdrS + '" scope="col">Parameter</th><th style="' + hdrS + '" scope="col">Value</th></tr>' +
                 '<tr><td style="' + cellS + '">Racks / density</td><td style="' + cellS + '">' + sp.racks.toLocaleString() + ' racks × ' + sp.rackDensityKw + ' kW (' + sp.rackRows + ' rows, ' + sp.rackFootprintM2 + ' m²/rack incl. aisles)</td></tr>' +
@@ -3060,7 +3060,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
             }
             const rf = result.refrigerant;
             if (rf) {
-                html += '<h3 style="font-size:13px;margin:14px 0 6px;color:#0f766e;">🧪 Selected Refrigerant Impact</h3>' +
+                html += '<h3 style="font-size:13px;margin:14px 0 6px;color:#0f766e;"><i class="fas fa-flask"></i> Selected Refrigerant Impact</h3>' +
                 '<table style="width:100%;border-collapse:collapse;font-size:11px;">' +
                 '<tr style="background:#134e4a;color:white;"><th style="' + hdrS + '" scope="col">Parameter</th><th style="' + hdrS + '" scope="col">Value</th></tr>' +
                 '<tr><td style="' + cellS + '">Refrigerant</td><td style="' + cellS + '">' + rf.label + ' — ASHRAE 34 class ' + rf.safety + ', GWP₁₀₀ ' + rf.gwp.toLocaleString() + ' (AR4)</td></tr>' +
@@ -3081,7 +3081,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
                         solarMwp: parseFloat((document.getElementById('renewSolarMwp') || {}).value) || 0,
                         bessMwh: parseFloat((document.getElementById('renewBessMwh') || {}).value) || 0
                     });
-                    html += '<h3 style="font-size:13px;margin:14px 0 6px;color:#c2410c;">☀️ On-Site Renewables Screen</h3>' +
+                    html += '<h3 style="font-size:13px;margin:14px 0 6px;color:#c2410c;"><i class="fas fa-sun"></i> On-Site Renewables Screen</h3>' +
                     '<table style="width:100%;border-collapse:collapse;font-size:11px;">' +
                     '<tr style="background:#7c2d12;color:white;"><th style="' + hdrS + '" scope="col">Parameter</th><th style="' + hdrS + '" scope="col">Value</th></tr>' +
                     '<tr><td style="' + cellS + '">Coverage of IT energy</td><td style="' + cellS + '">' + (h.coverageFraction * 100).toFixed(1) + '% (' + h.coveredMwhYr.toLocaleString() + ' MWh/yr covered, ' + h.gridResidualMwhYr.toLocaleString() + ' MWh/yr grid residual)</td></tr>' +
@@ -4644,7 +4644,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#6d28d9 !important; 
       var payload = { summary: summary, inputs: inputs };
       var res = await window.rzSupa.saveScenario('capex', name, payload);
       if (res.error) { show('Save failed: ' + res.error, false); return; }
-      show('☁ Saved to your account — see it in My Account.', true);
+      show('Saved to your account — see it in My Account.', true);
     } catch (e) { show('Save failed: ' + (e && e.message || e), false); }
   }
 </script>
