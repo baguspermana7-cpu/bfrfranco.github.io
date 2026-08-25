@@ -36,7 +36,17 @@ function _rzDelay(i) {
   var jitter = (_rzFetchN++ % 5) * 30; // 0..120ms, deterministic (no Math.random)
   return new Promise(function (r) { setTimeout(r, base + jitter); });
 }
+/* Only retry IDEMPOTENT calls: safe methods (GET/HEAD) and auth endpoints (/auth/v1/* token/otp — a
+   re-run just returns the same session). NEVER retry a data write (POST/PATCH/PUT/DELETE to /rest/v1/*):
+   a connection reset AFTER the body was sent could otherwise double-apply an insert (review HIGH). */
+function _rzRetryable(input, init) {
+  var m = ((init && init.method) || (input && input.method) || 'GET').toString().toUpperCase();
+  if (m === 'GET' || m === 'HEAD') return true;
+  var url = (typeof input === 'string' ? input : (input && input.url) || '');
+  return url.indexOf('/auth/v1/') !== -1;
+}
 async function rzFetch(input, init) {
+  if (!_rzRetryable(input, init)) return fetch(input, init);   // non-idempotent write → single attempt, no retry
   var attempts = 3, lastErr = null;
   for (var i = 0; i < attempts; i++) {
     try {

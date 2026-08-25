@@ -43,9 +43,12 @@ jobs:
               000|5??) fail=1 ;;
             esac
           }
+          # A real table SELECT executes an actual Postgres query — this is what resets the free-tier
+          # inactivity clock (health/settings/rest-root may not touch the DB). profiles exists; even if RLS
+          # returns 401/empty, the query still runs against Postgres = genuine activity.
+          hit "rest/profiles" "$SB/rest/v1/profiles?select=id&limit=1"
           hit "auth/health"   "$SB/auth/v1/health"
           hit "auth/settings" "$SB/auth/v1/settings"
-          hit "rest/root"     "$SB/rest/v1/?apikey=$AK"
           if [ "$fail" = "1" ]; then
             echo "::warning::Supabase did not answer on at least one endpoint — it may be paused/restoring."
             # Do not fail the run for a transient blip; the next scheduled ping retries.

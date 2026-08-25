@@ -1770,7 +1770,7 @@ setTimeout(()=>document.getElementById('ldr').classList.add('gone'),850);
 </script>
 
 <script src="../../js/rz-feature-flags.js?v=2026-07-21" defer></script>
-<script src="../../auth.js?v=2026-08-25-rootgate" defer></script>
+<script src="../../auth.js?v=2026-08-25-secfix" defer></script>
 <script>
   /* ===== Root-only access gate ===== */
   (function(){
@@ -1782,6 +1782,7 @@ setTimeout(()=>document.getElementById('ldr').classList.add('gone'),850);
          used to return true for root without removing 'locked', trapping root behind the gate). */
       try{
         var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');
+        if(s&&s.expires&&new Date(s.expires)<new Date())s=null; /* honor session expiry (parity with auth.js getSession) */
         var r=s&&s.role, e=(s&&s.email||'').toLowerCase();
         var isRoot=!!s&&(r==='root'||e==='bagus@resistancezero.com'||e==='admin@resistancezero.com');
         if(isRoot)document.body.classList.remove('locked');

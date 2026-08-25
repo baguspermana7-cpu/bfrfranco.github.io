@@ -11,6 +11,22 @@ release sections rather than semver.
 
 ---
 
+## v1.128.2 — 2026-08-25 (Security review fixes: offline-root hardening + retry scoping + keep-alive)
+
+### Security / Fixed
+- **Offline-root recovery no longer ships a crackable live credential** (review CRITICAL). The client-side
+  recovery hash was a single unsalted SHA-256 of the legacy Supabase root password — public + brute-forceable
+  into a real account-takeover. Now an OFFLINE-ONLY passphrase (decoupled from any Supabase password) stored
+  as **PBKDF2-SHA256 (100k iters, per-deploy salt)**; cracking it grants only client-side root (already
+  localStorage-settable), never Supabase access. New default offline passphrase — owner notified separately.
+- **Retry no longer double-applies data writes** (review HIGH). `rz-supabase.js` `rzFetch` retried every call
+  incl. non-idempotent `/rest/v1/*` POST/PATCH inserts — a connection-reset-after-send could duplicate a
+  `saved_scenarios`/`dcmoc_projects` row. Retry is now scoped to idempotent calls only (GET/HEAD + `/auth/v1/*`).
+- **Keep-alive now runs a real DB query** (review MEDIUM) — added `GET /rest/v1/profiles?select=id&limit=1`
+  so an actual Postgres SELECT executes on schedule (health/settings alone may not reset the pause timer).
+- **Second Brain gate honors session expiry** (review LOW) — the raw-localStorage root check now drops an
+  expired session instead of unlocking for ~60ms before deferred auth.js re-checks.
+
 ## v1.128.1 — 2026-08-25 (Fix: root login didn't unlock the Second Brain gate + offline-root recovery)
 
 ### Fixed

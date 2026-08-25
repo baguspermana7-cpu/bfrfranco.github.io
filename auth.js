@@ -304,27 +304,29 @@
         { email: 'demo@resistancezero.com', password: 'demo2026', tier: 'demo', role: 'demo' }
     ];
 
-    /* OFFLINE ROOT RECOVERY (v1.127.2) — so a flaky/unreachable/errored Supabase can NEVER lock the
-       owner out. When Supabase errors (network blip, unreachable, or the account is not there), a root
-       email may sign in offline with a recovery passphrase. The passphrase is NOT stored — only its
-       SHA-256 — so reading this file never reveals it. Grants root CLIENT-SIDE, the same trust model as
-       ROOT_EMAILS/detectRole (root here unlocks gated educational content, not secrets; and root is
-       already client-settable via localStorage, so this lowers no real security floor).
-       CHANGE THE PASSPHRASE (keep it DIFFERENT from the live Supabase password so this PUBLIC hash is
-       never the live credential):
-         node -e 'console.log(require("crypto").createHash("sha256").update("YOUR NEW PASSPHRASE").digest("hex"))'
-       then replace the hash(es) below. Default hash = the legacy root passphrase. */
+    /* OFFLINE ROOT RECOVERY (v1.128.2) — so a flaky/unreachable/errored Supabase can NEVER lock the owner
+       out. When Supabase errors, a root email may sign in offline with a recovery passphrase.
+       SECURITY (addresses review CRITICAL): the passphrase is an OFFLINE-ONLY string, DECOUPLED from any
+       Supabase password — so the public hash below is NEVER a live credential, and cracking it grants only
+       CLIENT-SIDE root (already localStorage-settable), never Supabase access. Stored as PBKDF2-SHA256
+       (100k iters, per-deploy salt), so offline brute-force is expensive, not a single SHA-256 round.
+       Default offline passphrase: RZ-Offline-Recovery-Aug2026 (change it — keep it distinct from Supabase):
+         node -e 'const c=require("crypto"),s=c.randomBytes(16);console.log("salt",s.toString("hex"),"hash",c.pbkdf2Sync("NEW PASSPHRASE",s,100000,32,"sha256").toString("hex"))'
+       then replace OFFLINE_ROOT_SALT + the hash(es). */
+    var OFFLINE_ROOT_SALT = 'b934fcf3b409defa718b8dce98c7261c';
+    var OFFLINE_ROOT_ITERS = 100000;
     var OFFLINE_ROOT = {
-        'bagus@resistancezero.com': 'e54b1313a65acb2066866ff5e945a2285fc36000cdde111d299f927eaea8998f',
-        'admin@resistancezero.com': 'e54b1313a65acb2066866ff5e945a2285fc36000cdde111d299f927eaea8998f'
+        'bagus@resistancezero.com': '6168da9b1ac4d4d9b9ffc762d7ab6ac54d7709ded07e2462e473b6301fa4d5a8',
+        'admin@resistancezero.com': '6168da9b1ac4d4d9b9ffc762d7ab6ac54d7709ded07e2462e473b6301fa4d5a8'
     };
-    function _sha256Hex(str) {
+    function _hexBytes(h) { var a = new Uint8Array(h.length / 2); for (var i = 0; i < a.length; i++) a[i] = parseInt(h.substr(i * 2, 2), 16); return a; }
+    function _pbkdf2Hex(str) {
         try {
             var enc = new TextEncoder().encode(String(str || ''));
-            return crypto.subtle.digest('SHA-256', enc).then(function (buf) {
-                var b = new Uint8Array(buf), h = '';
-                for (var i = 0; i < b.length; i++) h += b[i].toString(16).padStart(2, '0');
-                return h;
+            return crypto.subtle.importKey('raw', enc, 'PBKDF2', false, ['deriveBits']).then(function (km) {
+                return crypto.subtle.deriveBits({ name: 'PBKDF2', salt: _hexBytes(OFFLINE_ROOT_SALT), iterations: OFFLINE_ROOT_ITERS, hash: 'SHA-256' }, km, 256);
+            }).then(function (buf) {
+                var b = new Uint8Array(buf), h = ''; for (var i = 0; i < b.length; i++) h += b[i].toString(16).padStart(2, '0'); return h;
             });
         } catch (e) { return Promise.resolve(null); } /* crypto.subtle needs https/localhost — graceful null on file:// */
     }
@@ -332,7 +334,7 @@
     function offlineRoot(email, password) {
         var e = String(email || '').toLowerCase().trim();
         if (!OFFLINE_ROOT[e]) return Promise.resolve(null);
-        return _sha256Hex(password).then(function (h) {
+        return _pbkdf2Hex(password).then(function (h) {
             return (h && h === OFFLINE_ROOT[e]) ? { email: e, tier: 'pro', role: 'root' } : null;
         });
     }
@@ -354,7 +356,7 @@
             function loadModule() {
                 var m = document.createElement('script');
                 m.type = 'module';
-                m.src = '/js/rz-supabase.js?v=2026-08-22-netretry';
+                m.src = '/js/rz-supabase.js?v=2026-08-25-secfix';
                 m.onload = function () {
                     var r = (window.rzSupa && window.rzSupa.ready) ? window.rzSupa.ready : Promise.resolve(window.rzSupa || null);
                     r.then(resolve).catch(function () { resolve(window.rzSupa || null); });
