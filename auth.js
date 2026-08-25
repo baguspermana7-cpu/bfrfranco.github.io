@@ -304,6 +304,39 @@
         { email: 'demo@resistancezero.com', password: 'demo2026', tier: 'demo', role: 'demo' }
     ];
 
+    /* OFFLINE ROOT RECOVERY (v1.127.2) — so a flaky/unreachable/errored Supabase can NEVER lock the
+       owner out. When Supabase errors (network blip, unreachable, or the account is not there), a root
+       email may sign in offline with a recovery passphrase. The passphrase is NOT stored — only its
+       SHA-256 — so reading this file never reveals it. Grants root CLIENT-SIDE, the same trust model as
+       ROOT_EMAILS/detectRole (root here unlocks gated educational content, not secrets; and root is
+       already client-settable via localStorage, so this lowers no real security floor).
+       CHANGE THE PASSPHRASE (keep it DIFFERENT from the live Supabase password so this PUBLIC hash is
+       never the live credential):
+         node -e 'console.log(require("crypto").createHash("sha256").update("YOUR NEW PASSPHRASE").digest("hex"))'
+       then replace the hash(es) below. Default hash = the legacy root passphrase. */
+    var OFFLINE_ROOT = {
+        'bagus@resistancezero.com': 'e54b1313a65acb2066866ff5e945a2285fc36000cdde111d299f927eaea8998f',
+        'admin@resistancezero.com': 'e54b1313a65acb2066866ff5e945a2285fc36000cdde111d299f927eaea8998f'
+    };
+    function _sha256Hex(str) {
+        try {
+            var enc = new TextEncoder().encode(String(str || ''));
+            return crypto.subtle.digest('SHA-256', enc).then(function (buf) {
+                var b = new Uint8Array(buf), h = '';
+                for (var i = 0; i < b.length; i++) h += b[i].toString(16).padStart(2, '0');
+                return h;
+            });
+        } catch (e) { return Promise.resolve(null); } /* crypto.subtle needs https/localhost — graceful null on file:// */
+    }
+    /* Resolves to a root user object when the recovery passphrase hash matches, else null. */
+    function offlineRoot(email, password) {
+        var e = String(email || '').toLowerCase().trim();
+        if (!OFFLINE_ROOT[e]) return Promise.resolve(null);
+        return _sha256Hex(password).then(function (h) {
+            return (h && h === OFFLINE_ROOT[e]) ? { email: e, tier: 'pro', role: 'root' } : null;
+        });
+    }
+
     /* Also check manually-created accounts stored in localStorage by admin */
     function getManualAccounts() {
         try {
@@ -822,17 +855,21 @@
                             var known = VALID_USERS.some(function (u) { return u.email === eN; })
                                 || getManualAccounts().some(function (u) { return String(u.email || '').toLowerCase() === eN; });
                             if (known) { var demoA = findUser(email, password); if (demoA) { _finish(demoA); return; } }
-                            /* Surface WHAT Supabase actually rejected so the fix is obvious, instead of a
-                               generic "invalid". Supabase gives the same message for wrong-pw and no-such-user. */
-                            var em = String((res.error && res.error.message) || res.error || '').toLowerCase();
-                            if (/not confirmed|confirm/.test(em)) {
-                                _showErr('Email belum dikonfirmasi. Cek inbox untuk link konfirmasi, atau konfirmasi lewat setup-supabase.html.');
-                            } else if (/invalid login|invalid credentials/.test(em)) {
-                                _showErr('Email/password salah — atau akun ini belum ada di Supabase. Reset password-nya di Supabase → Authentication → Users, atau daftar di account.html.');
-                            } else {
-                                _showErr('Login gagal: ' + (em || 'invalid email or password') + '.');
-                            }
-                            return;
+                            /* Offline root recovery — Supabase errored (network blip, unreachable, or no
+                               such account); let the owner in with the recovery passphrase so Supabase
+                               state can never lock root out. Falls through to the real error otherwise. */
+                            return offlineRoot(email, password).then(function (ru) {
+                                if (ru) { _finish(ru); return; }
+                                /* Surface WHAT Supabase actually rejected so the fix is obvious. */
+                                var em = String((res.error && res.error.message) || res.error || '').toLowerCase();
+                                if (/not confirmed|confirm/.test(em)) {
+                                    _showErr('Email belum dikonfirmasi. Cek inbox untuk link konfirmasi, atau konfirmasi lewat setup-supabase.html.');
+                                } else if (/invalid login|invalid credentials/.test(em)) {
+                                    _showErr('Email/password salah — atau akun ini belum ada di Supabase. Reset password-nya di Supabase → Authentication → Users, atau daftar di account.html.');
+                                } else {
+                                    _showErr('Login gagal: ' + (em || 'invalid email or password') + '.');
+                                }
+                            });
                         }
                         return supa.getProfile().then(function (pr) {
                             var tier = (pr && pr.data && pr.data.tier) || 'pro';
@@ -842,13 +879,19 @@
                         });
                     });
                 }
-                /* Supabase unreachable/unconfigured → offline demo/manual fallback */
+                /* Supabase unreachable/unconfigured → offline demo/manual + root-recovery fallback */
                 var demoB = findUser(email, password);
                 if (demoB) { _finish(demoB); return; }
-                _showErr('Auth service unavailable — please retry.');
+                return offlineRoot(email, password).then(function (ru) {
+                    if (ru) { _finish(ru); return; }
+                    _showErr('Server auth sedang tidak tersedia (mungkin Supabase paused/restoring). Coba lagi, atau masuk offline dengan passphrase recovery root.');
+                });
             }).catch(function () {
                 var demoC = findUser(email, password);
-                if (demoC) { _finish(demoC); } else { _showErr('Auth service unavailable — please retry.'); }
+                if (demoC) { _finish(demoC); return; }
+                offlineRoot(email, password).then(function (ru) {
+                    if (ru) { _finish(ru); } else { _showErr('Server auth sedang tidak tersedia (mungkin Supabase paused/restoring). Coba lagi, atau masuk offline dengan passphrase recovery root.'); }
+                });
             });
         },
 
@@ -946,7 +989,13 @@
         enforceTierFeatureAccess: function (pageKey) {
             var session = getSession();
             var role = getRoleFromSession(session);
-            if (role === 'root') return true;
+            if (role === 'root') {
+                /* v1.127.x fix: root is authorized — actually UNLOCK the page. Previously this returned
+                   true without removing 'locked', so a root user who logged in via the modal stayed behind
+                   the "Root access required" gate (the SB gate's ag() relies solely on this call). */
+                if (typeof document !== 'undefined' && document.body) document.body.classList.remove('locked');
+                return true;
+            }
 
             var allowed = false;
             try {

@@ -11,6 +11,136 @@ release sections rather than semver.
 
 ---
 
+## v1.128.1 — 2026-08-25 (Fix: root login didn't unlock the Second Brain gate + offline-root recovery)
+
+### Fixed
+- **Root users stayed behind the "Root access required" gate after a successful login** on the Second
+  Brain pages. `auth.js` `enforceTierFeatureAccess()` returned `true` for a root role but never removed
+  `body.locked` (it only unlocked in the non-root `allowed` branch), and the Second Brain hub's gate relied
+  solely on that call. Now the root early-return also `document.body.classList.remove('locked')`, and the
+  hub gate (`Apps/second brain/index.html`) always re-checks root and unlocks directly — so a root login
+  clears the gate immediately. Verified via puppeteer (login-event → unlock; logout → re-lock).
+
+### Added
+- **Offline root recovery** (`auth.js`): when Supabase errors/unreachable (e.g. a paused free project), a
+  root email may sign in offline with a SHA-256-hashed recovery passphrase (never plaintext in the repo),
+  so backend state can't lock the owner out. Client-side gating only (root here unlocks content, not secrets).
+
+## v1.128.0 — 2026-08-24 (Durable long-running agent harness)
+
+Implements the owner requests: **“buat harness agent itu selalu On di semua CLI
+session”**, **“harus ada indikasi checkpoint di CLI”**, and **“terlalu banyak
+minta approval … embed”** while retaining the host/platform security boundary.
+
+### Added
+- Always-on, user-scoped singleton controller with private atomic state,
+  immutable contract hashes, validated lifecycle transitions, durable handoffs,
+  bounded attempts, and one shared `RZ-HARNESS` checkpoint for Codex, Claude,
+  and the local chat CLI.
+- Structured Session Manager manual/FAQ generated from the owner-supplied
+  production harness specification, including search, deep links, canonical
+  source download, SHA integrity metadata, keyboard focus containment, and a
+  375 px responsive reading flow.
+- Public-safe `AGENT_HARNESS_STANDARD.md` and a blocking privacy gate that rejects
+  tracked private state, runtime databases, context bridges, absolute home paths,
+  and real provider-session identifiers.
+
+### Fixed
+- Session discovery now deduplicates provider/session pairs deterministically;
+  ambiguous raw IDs cannot resume the wrong provider session.
+- Session Manager supports healthy `HEAD` probes, strict loopback Host checks,
+  same-origin Origin + double-submit CSRF validation, JSON/body limits, mutation
+  rate limits, generic client errors, and detailed private server logging.
+- Legacy Session Manager and orchestrator screens use the same CSRF wrapper and
+  namespaced session keys, preserving their existing UI while keeping mutations
+  functional.
+- Orchestrator worktree containment, literal-path staging, reviewer quorum,
+  process-group timeout/cancellation, hard purge, and audit scaffold boundaries
+  now fail closed.
+- Executor workers now claim renewable owner leases plus a separate monotonic
+  progress deadline; heartbeat liveness cannot indefinitely conceal a worker
+  that stopped producing observable progress.
+- Progress deadlines now follow the enforced setup, builder, gate, and reviewer
+  timeout, refresh before every gate, suspend during an explicit pause, and
+  reset on resume; valid 600-second silent gates are no longer aborted by the
+  default 180-second stall budget.
+- Every executor start now freezes a complete assignment digest (exact base
+  revision, identities, gates, constraints, budgets, options, permissions, and
+  setup); recovery re-derives it and evaluation binds the same digest.
+- Startup status remains available while a mutation barrier blocks new run
+  ownership until persisted-run recovery completes; owner epochs fence every
+  worker store write so expired workers cannot append later evidence.
+- Normal pending/running startup recovery now keeps the watchdog live while the
+  writer, executor, and authenticated IPC remain responsive, without opening
+  the mutation barrier. Failed recovery and real health stalls remain errors
+  and fail closed.
+- Reviewer child threads and lease monitors now carry exact owner epochs;
+  restart recovery waits for an unexpired orphan lease, and partially started
+  executor threads remain registered until joined.
+- Partial executor startup now joins only actually started threads and releases
+  the exact owner lease after a delayed worker exit, avoiding registry/lease
+  leaks when the companion heartbeat thread fails to start.
+- Federated memory drains now hold exact-owner authority across each bounded
+  RZMemory/OmniRoute side effect, ledger write, and intent transition, so a
+  replaced worker cannot perform an external write after ownership takeover.
+- Dependency setup freezes the complete command input set (including companion
+  manifests), revalidates it at execution, and overlays existing inputs
+  read-only inside the no-network repository sandbox.
+- Audit templates, wizard checkbox state, saved templates, default reviewer
+  settings, and help text now agree on the capable Codex + Claude audit mode.
+- Cascade/RDCST builder selection is disabled in runtime and UI until it can
+  satisfy the same frozen-assignment and OS-confinement contract; the legacy
+  adapter is a fail-closed compatibility shim.
+- Hard purge is unavailable without durable action-specific destructive
+  authorization, refuses a live worker, and preserves run metadata when
+  workspace cleanup fails.
+- Closed local-chat file and HTTP response handles that emitted
+  `ResourceWarning` during strict test runs.
+
+### Security
+- Removed provider credential, user-config, plugin, and rule mounts from builder
+  and reviewer subprocesses; provider calls use the loopback broker and reviewer
+  worktrees are read-only.
+- The provider broker now accepts one bounded messages, count-tokens, or Codex
+  Responses request, caps concurrent broker/proxy connections at eight, and
+  denies OmniRoute memory/settings paths, absolute-form targets, request
+  smuggling, and chunked request bodies.
+- Git commits now use a private temporary index and no-follow raw blobs while
+  repository clean filters, external diff drivers, signing programs, hooks,
+  global/system config, fsmonitor, replacement objects, and credential prompts
+  are neutralized. Unrelated staged changes remain intact.
+- Events, turns, gate output, verdicts, and errors redact common credential
+  formats before persistence/SSE. Vector indexing rejects symlink escapes and
+  memory sync no longer reads or forwards ambient cookie files.
+- Candidate diffs and federated memory are redacted before persistence/prompts
+  while a separate raw SHA-256 binds exact evidence; retrieved memory is marked
+  untrusted data-only. Access tokens and evidence are read through owner-checked,
+  component-wise no-follow descriptors to close symlink-swap races.
+- Token, evidence, exact-worktree, and federated-memory paths now reject
+  symlinks in every ancestor; memory append also fails closed if its exclusive
+  lock cannot be acquired.
+
+### Changed
+- Routine in-scope local reads, edits, tests, controller monitoring, service
+  restart, and daemon reload are automatic inside the harness. Approval prompts
+  are batched and reuse narrow trusted prefixes; destructive, credential,
+  external-write, deployment, production, purchase, secret, and scope-expansion
+  actions remain explicit human/platform boundaries.
+- Executor launch now requires the complete frozen read/edit/test/commit action
+  set; a read-only or partial action policy cannot reach the builder or commit.
+- `task check` and `task verify` now include the harness privacy tests and the
+  tracked-file privacy audit.
+- The structured Session Manager FAQ now documents progress leases, frozen
+  setup inputs, the execution assignment digest, recovery mutation barrier,
+  provider HTTP allowlist, Cascade disablement, credential isolation, and
+  pre-persistence redaction.
+- Session Manager Manual panels now use opaque instrument surfaces aligned with
+  the adjacent Claude anti–AI-slop removal; its established shell and responsive
+  interaction model remain unchanged.
+- The canonical telemetry documentation standard now mirrors the worktree lesson
+  ledger, including review defects, anti-slop decisions, responsive evidence, and
+  the 14-surface hairline regression gate.
+
 ---
 
 ## v1.127.1 — 2026-08-22 (Login resilience — transient-network retry + clearer auth error)

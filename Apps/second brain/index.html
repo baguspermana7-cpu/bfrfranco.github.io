@@ -1770,21 +1770,23 @@ setTimeout(()=>document.getElementById('ldr').classList.add('gone'),850);
 </script>
 
 <script src="../../js/rz-feature-flags.js?v=2026-07-21" defer></script>
-<script src="../../auth.js?v=2026-07-24a" defer></script>
+<script src="../../auth.js?v=2026-08-25-rootgate" defer></script>
 <script>
   /* ===== Root-only access gate ===== */
   (function(){
     function ag(){
       if(window._rzAuth&&typeof window._rzAuth.enforceTierFeatureAccess==='function'){
         window._rzAuth.enforceTierFeatureAccess('second-brain');
-      }else{
-        try{
-          var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');
-          var r=s&&s.role, e=(s&&s.email||'').toLowerCase();
-          var isRoot=!!s&&(r==='root'||e==='bagus@resistancezero.com'||e==='admin@resistancezero.com');
-          document.body.classList.toggle('locked',!isRoot);
-        }catch(x){document.body.classList.add('locked');}
       }
+      /* Always re-check root directly and UNLOCK — never depend solely on enforce() (a cached auth.js
+         used to return true for root without removing 'locked', trapping root behind the gate). */
+      try{
+        var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');
+        var r=s&&s.role, e=(s&&s.email||'').toLowerCase();
+        var isRoot=!!s&&(r==='root'||e==='bagus@resistancezero.com'||e==='admin@resistancezero.com');
+        if(isRoot)document.body.classList.remove('locked');
+        else if(!window._rzAuth)document.body.classList.add('locked');
+      }catch(x){if(!window._rzAuth)document.body.classList.add('locked');}
     }
     var b=document.getElementById('rootLoginBtn');
     if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showModal==='function')window._rzAuth.showModal();});
