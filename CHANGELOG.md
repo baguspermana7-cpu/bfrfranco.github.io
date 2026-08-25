@@ -11,6 +11,33 @@ release sections rather than semver.
 
 ---
 
+## v1.129.1 — 2026-08-26 (Governed agent harness standard)
+
+### Added
+- **Public long-running agent harness standard:** `standarization/AGENT_HARNESS_STANDARD.md` now defines the frozen work-item contract, lifecycle, exact-revision evidence, independent acceptance, bounded autonomy, private-state containment, compact CLI checkpoint, Session Manager manual, and required change-and-lesson ledger.
+- **Automatic cross-CLI handoff contract:** Claude and Codex exchanges use watched, idempotent inbox envelopes with acknowledgements and exact component revision references, eliminating manual task-file drag-and-drop from the normal review loop.
+
+### Changed
+- Machine-checkable instructions now name the actual Session Manager test/manual gates and the canonical RZ ship gate. The standard no longer references proposed privacy scripts as if they already existed.
+- Provider unavailability is recorded independently from technical rejection: it cannot consume an implementation iteration or silently shrink the required reviewer quorum.
+- Candidate and accepted revisions are now explicitly separate in the durable checkpoint and owner-visible CLI indicator; `PASSED` remains unavailable until independent evaluation pins the exact accepted revision.
+
+### Fixed
+- Local agent-gateway authorization now gives the middleware-signed direct-peer verdict precedence over framework-synthesized forwarding headers, while forged client locality remains rejected. This preserves passwordless loopback operation without weakening reverse-proxy authentication.
+- Node 24 CJS/ESM export drift could make the CLI emit no machine token while the server derived a predictable credential from an empty identifier. Empty identifiers now fail closed, Linux uses a dependency-free machine ID source, other platforms accept the package default-export shape, and a validated random explicit token disables legacy machine-derived acceptance.
+- Turbopack could eliminate a direct runtime-secret property read from the packaged server, causing the current explicit token to fail despite being present in the child environment. The server now uses a fixed-name runtime-dynamic lookup, with a source regression guard and installed-package authorization probes.
+- A package could pass structural artifact policy yet fail to boot when a temporary Next.js output directory was baked into the server and pruned by the canonical allowlist. Release verification now requires a clean `.build/next` artifact and an installed-package `/healthz` probe in addition to pack validation.
+- A fresh Oh My Pi credential database existed as an empty file, so the OmniRoute adapter failed on its first write. Runtime setup now boots the official local auth-broker lifecycle before adapter configuration and verifies the provider record without exposing credential values.
+- The OmniRoute postinstall check used the legacy unsuffixed `wreq-js` native filename and warned even while the shipped GNU-libc binary loaded correctly. Candidate resolution now recognizes GNU, musl, MSVC, and legacy package names, with cross-platform regression coverage.
+- Documentation parity is restored across the public standard, RZ changelog/version/cache artifacts, Session Manager manual, private cross-CLI handoff, and owner knowledge vault.
+
+### Verification
+- Session Manager: 375 unit/integration tests pass, including lifecycle, authorization, bridge, redaction, manual parity, and recovery contracts; the 375 px manual view and desktop shell remain intact.
+- OmniRoute: 41 focused authorization/CLI tests plus 10 postinstall regression tests pass; the production service binds to `127.0.0.1:20128`, and health, dashboard, landing, and root-follow probes return HTTP 200.
+- OmniRoute credential boundary: the installed package accepts the current explicit token; four former machine/empty-ID variants return 401 and a forged-locality request returns 403. Oh My Pi and Letta setup/status return 200 with OmniRoute present; model discovery returns 123 entries and an inference probe returns 200.
+- OmniRoute artifact: the canonical package contains 21,017 policy-approved entries (166,276,290 bytes packed; 767 MB unpacked), installs successfully, boots from `.build/next`, and exposes the required runtime manifests.
+- RZ website: the complete `task verify` ship gate passes all 13 blocking groups for this release.
+
 ## v1.129.0 — 2026-08-25 (Telemetry cockpit PRDs and operator manuals)
 
 ### Added

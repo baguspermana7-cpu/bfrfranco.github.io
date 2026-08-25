@@ -50,6 +50,9 @@ gate "telemetry docs — structure and frozen cockpit diffs" node tools/test-tel
 gate "telemetry docs — generated discovery parity" node tools/test-telemetry-discovery.mjs
 gate "telemetry docs — browser, a11y, mobile, and gate safety" node tools/test-telemetry-e2e.mjs
 
+# Harness documentation is release state: public-safety and generated links must not drift.
+gate "agent harness standard — privacy and release parity" node tools/test-agent-harness-standard.mjs
+
 # Engine-files byte-identical guard (locked since v1.32.x accuracy review)
 echo
 runs=$((runs+1))

@@ -164,7 +164,7 @@ async function assertDocSurface(page, path, mobile, theme) {
     `${path}: main content overlaps fixed navbar (${result.mainTop}px < ${result.navBottom}px)`,
   );
   assert.ok(result.overflow <= 1, `${path}: ${mobile ? 'mobile' : 'desktop'} overflow ${result.overflow}px`);
-  assert.equal(result.version, '1.129.0', `${path}: version stamp must load`);
+  assert.equal(result.version, '1.129.1', `${path}: version stamp must load`);
   assert.match(result.fontFamily, /IBM Plex Sans/i, `${path}: canonical font must be active`);
   assert.ok(result.tableAffordance, `${path}: wide tables need keyboard scroll hint and sticky identity`);
   const invalidFormulas = result.formulaStates.filter((formula) => formula.scrollable

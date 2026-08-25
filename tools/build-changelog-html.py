@@ -265,6 +265,19 @@ TIER_LABEL = {
     'patch': 'PATCH',
 }
 
+def with_unique_anchors(entries):
+    """Return copied entries with stable, unique fragment identifiers."""
+    counts = {}
+    anchored = []
+    for entry in entries:
+        version = entry['version']
+        occurrence = counts.get(version, 0) + 1
+        counts = {**counts, version: occurrence}
+        anchor = version if occurrence == 1 else f'{version}-{occurrence}'
+        anchored.append({**entry, 'anchor': anchor})
+    return anchored
+
+
 def render_entry(entry, is_current=False):
     tier   = entry['tier']
     color  = TIER_COLOR[tier]
@@ -272,6 +285,7 @@ def render_entry(entry, is_current=False):
     ver    = html_mod.escape(entry['version'])
     date   = html_mod.escape(entry['date'])
     cap    = html_mod.escape(entry['caption'])
+    anchor = html_mod.escape(entry['anchor'])
     cls    = 'changelog-entry is-current' if is_current else 'changelog-entry'
 
     caption_html = f'<p class="changelog-caption">{cap}</p>' if cap else ''
@@ -284,7 +298,7 @@ def render_entry(entry, is_current=False):
         date_friendly = date
 
     return f'''
-    <article class="{cls}" data-version-tier="{tier}" data-version="{ver}">
+    <article class="{cls}" id="{anchor}" data-version-tier="{tier}" data-version="{ver}">
       <div class="changelog-meta">
         <span class="changelog-version-badge" style="--tier-color:{color};">{ver}</span>
         <span class="changelog-tier-pill" style="--tier-color:{color};background:{color}20;color:{color};border:1px solid {color}40;">{label}</span>
@@ -335,19 +349,20 @@ FILTER_JS = """\
 
 
 def build_html(entries):
-    latest     = entries[0]['version'] if entries else '1.x.x'
-    count      = len(entries)
-    cards      = '\n'.join(render_entry(e, is_current=(i == 0)) for i, e in enumerate(entries))
+    anchored_entries = with_unique_anchors(entries)
+    latest     = anchored_entries[0]['version'] if anchored_entries else '1.x.x'
+    count      = len(anchored_entries)
+    cards      = '\n'.join(render_entry(e, is_current=(i == 0)) for i, e in enumerate(anchored_entries))
     today      = datetime.now().strftime('%Y-%m-%d')
     filter_js  = FILTER_JS
 
     # JSON-LD structured data
     jsonld_items = []
-    for i, e in enumerate(entries[:10]):   # First 10 for schema brevity
+    for i, e in enumerate(anchored_entries[:10]):   # First 10 for schema brevity
         jsonld_items.append(
             f'        {{"@type":"ListItem","position":{i+1},'
             f'"name":"{e["version"]} — {e["date"]}",'
-            f'"url":"https://resistancezero.com/changelog.html#{e["version"]}"}}'
+            f'"url":"https://resistancezero.com/changelog.html#{e["anchor"]}"}}'
         )
     jsonld_list = ',\n'.join(jsonld_items)
 
@@ -1019,8 +1034,31 @@ def build_html(entries):
 
 
 # ── CLI entry point ────────────────────────────────────────────────────────────
+def verify_generated_output(html_out):
+    """Fail unless the checked-in generated artifact is byte-identical."""
+    try:
+        with open(OUTPUT, encoding='utf-8') as fh:
+            existing = fh.read()
+    except OSError as exc:
+        print(f'CHECK FAILED — cannot read {OUTPUT}: {exc}', file=sys.stderr)
+        return False
+
+    if existing != html_out:
+        print('CHECK FAILED — changelog.html is stale; run '
+              '`python3 tools/build-changelog-html.py --apply`', file=sys.stderr)
+        return False
+
+    print('[OK] Generated changelog matches CHANGELOG.md byte-for-byte')
+    return True
+
+
 def main():
     apply = '--apply' in sys.argv
+    check = '--check' in sys.argv
+
+    if apply and check:
+        print('ERROR: choose either --apply or --check', file=sys.stderr)
+        sys.exit(2)
 
     if not os.path.isfile(CHANGELOG):
         print(f'ERROR: CHANGELOG.md not found at {CHANGELOG}', file=sys.stderr)
@@ -1050,7 +1088,10 @@ def main():
             print('  ' + ln.strip()[:140], file=sys.stderr)
         sys.exit(1)
 
-    if apply:
+    if check:
+        if not verify_generated_output(html_out):
+            sys.exit(1)
+    elif apply:
         with open(OUTPUT, 'w', encoding='utf-8') as fh:
             fh.write(html_out)
         size_kb = os.path.getsize(OUTPUT) / 1024
