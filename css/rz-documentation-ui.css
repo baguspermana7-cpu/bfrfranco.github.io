@@ -1,0 +1,163 @@
+/* RZ documentation interaction layer — industrial, flat, and keyboard-visible. */
+:root:not([data-theme="dark"]) {
+  --cyan: #075c70;
+  --amber: #7a4800;
+  --green: #065f46;
+  --mn-accent: #075c70;
+  --mn-accent-rgb: 7, 92, 112;
+  --mn-cyan: #075c70;
+  --mn-cta: #7a4800;
+  --mn-green: #065f46;
+}
+
+:root:not([data-theme="dark"]) body .theme-toggle {
+  background: #fff;
+  border-color: rgba(7, 92, 112, .28);
+  color: #075c70;
+}
+
+:root:not([data-theme="dark"]) body .theme-toggle:hover {
+  background: #edf4f5;
+  color: #054958;
+}
+
+.mn-crumb a,
+.mn-where a,
+.mn-card p a,
+.mn-card li a,
+.mn-note a,
+a.mn-inline {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: .18em;
+}
+
+:root:not([data-theme="dark"]) a.mn-link.primary,
+:root:not([data-theme="dark"]) a.mn-action.primary,
+:root:not([data-theme="dark"]) a.mn-toollink {
+  background: var(--mn-cta, var(--amber, #7a4800));
+  color: #fff;
+}
+
+:root:not([data-theme="dark"]) .mn-card a.mn-manual {
+  background: var(--mn-accent, #075c70);
+  color: #fff;
+}
+
+.mn-tablewrap {
+  position: relative;
+  overscroll-behavior-inline: contain;
+  scrollbar-color: var(--mn-cyan, var(--cyan, #087f99)) var(--mn-surface-2, var(--surface-2, #edf2f5));
+  scrollbar-width: auto;
+}
+
+.mn-tablewrap:focus-visible {
+  outline: 2px solid var(--mn-cyan, var(--cyan, #087f99));
+  outline-offset: 3px;
+}
+
+.mn-formula:focus-visible {
+  outline: 2px solid var(--mn-cyan, var(--cyan, #087f99));
+  outline-offset: 3px;
+}
+
+.mn-table-hint {
+  display: none;
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  width: max-content;
+  padding: .35rem .55rem;
+  border-right: 1px solid var(--mn-border, var(--line, rgba(21, 32, 42, .2)));
+  border-bottom: 1px solid var(--mn-border, var(--line, rgba(21, 32, 42, .2)));
+  background: var(--mn-surface-2, var(--surface-2, #edf2f5));
+  color: var(--mn-muted, var(--muted, #4b5b68));
+  font: 600 .66rem/1.35 var(--mn-mono, var(--mono, 'JetBrains Mono', monospace));
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.mn-tablewrap.rz-table-scrollable .mn-table-hint {
+  display: block;
+}
+
+.mn-tablewrap.rz-table-scrollable th:first-child,
+.mn-tablewrap.rz-table-scrollable td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--mn-surface, var(--surface, #fff));
+  box-shadow: 1px 0 0 var(--mn-border, var(--line, rgba(21, 32, 42, .2)));
+}
+
+.mn-tablewrap.rz-table-scrollable th:first-child {
+  z-index: 3;
+  background: var(--mn-surface-2, var(--surface-2, #edf2f5));
+}
+
+html body .rz-login-btn,
+html body .rz-user-btn {
+  border: 1px solid rgba(0, 221, 255, .42) !important;
+  border-radius: 3px !important;
+  background: #101820 !important;
+  background-image: none !important;
+  color: #67e8f9 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+html body .rz-login-btn:hover,
+html body .rz-user-btn:hover {
+  border-color: #00ddff !important;
+  background: #14232c !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+html body .rz-user-avatar,
+html body .rz-dd-badge,
+html body .rz-dd-logout,
+html body .rz-modal,
+html body .rz-modal-close,
+html body .rz-modal input,
+html body .rz-modal .rz-submit-btn,
+html body .rz-modal .rz-error {
+  border-radius: 3px !important;
+  background-image: none !important;
+}
+
+html body .rz-user-avatar,
+html body .rz-dd-badge.pro,
+html body .rz-modal .rz-submit-btn {
+  background: #ffaa00 !important;
+  color: #151006 !important;
+}
+
+html body .rz-user-dropdown,
+html body .rz-modal-overlay {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html body .rz-user-dropdown,
+html body .rz-modal {
+  border-color: rgba(0, 221, 255, .35) !important;
+  border-radius: 4px !important;
+  background: #0b1118 !important;
+}
+
+:root:not([data-theme="dark"]) body .rz-login-btn,
+:root:not([data-theme="dark"]) body .rz-user-btn {
+  border-color: #087f99 !important;
+  background: #fff !important;
+  color: #075c70 !important;
+}
+
+@media (max-width: 768px) {
+  .mn-table-hint { display: none; }
+  .mn-tablewrap.rz-table-scrollable .mn-table-hint { display: block; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mn-tablewrap { scroll-behavior: auto; }
+}

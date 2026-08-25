@@ -50,7 +50,7 @@
     if (d.getElementById('rzManualFabStyle')) { return; }
     var css =
       '.rz-manual-fab{position:fixed;right:20px;bottom:140px;z-index:600;display:inline-flex;' +
-      'align-items:center;gap:6px;padding:8px 12px;border-radius:10px;text-decoration:none;' +
+      'align-items:center;gap:6px;min-height:44px;box-sizing:border-box;padding:8px 12px;border-radius:10px;text-decoration:none;' +
       "font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;font-size:0.72rem;" +
       'font-weight:600;letter-spacing:0.04em;line-height:1;color:#0b0f14;background:#00DDFF;' +
       'border:1px solid #00DDFF;box-shadow:0 4px 14px rgba(0,221,255,0.28);' +
@@ -61,6 +61,7 @@
       '[data-theme="dark"] .rz-manual-fab{color:#031016;background:#00DDFF;border-color:#00DDFF;' +
       'box-shadow:0 4px 14px rgba(0,221,255,0.22);}' +
       '[data-theme="dark"] .rz-manual-fab:hover{background:#22e6ff;}' +
+      'body.locked .rz-manual-fab{z-index:90001;}' +
       '@media (max-width:768px){.rz-manual-fab{right:14px;bottom:150px;padding:7px 10px;font-size:0.68rem;}}' +
       '@media (prefers-reduced-motion:reduce){.rz-manual-fab{transition:none;}.rz-manual-fab:hover{transform:none;}}' +
       '@media print{.rz-manual-fab{display:none !important;}}';
@@ -94,7 +95,12 @@
       '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>' +
       '<path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>' +
       '<span class="rz-mf-label">manual</span>';
-    d.body.appendChild(link);
+    // Use a neutral element: several gated pages intentionally style body.locked > nav.
+    var landmark = d.createElement('div');
+    landmark.setAttribute('role', 'navigation');
+    landmark.setAttribute('aria-label', 'Technical manual');
+    landmark.appendChild(link);
+    d.body.appendChild(landmark);
   }
 
   if (d.readyState === 'loading') {

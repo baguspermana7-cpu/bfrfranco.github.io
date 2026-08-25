@@ -27,7 +27,7 @@
 
     <!-- SEO Meta Tags -->
     <title>AI/HPC Data Hall — NVL72 Cockpit — Technical Manual &amp; Methodology | ResistanceZero</title>
-    <meta name="description" content="Full engineering methodology for the AI/HPC Data Hall NVL72 Cockpit: GB200 NVL72 basis-of-design, direct liquid cooling formulas, PUE derivation, hydronic flow, CDU sizing, and worked examples from the locked Scenario A baseline.">
+    <meta name="description" content="Engineering manual for the AI Data Hall NVL72 cockpit: locked power and cooling formulas, telemetry controls, alarm quality, worked examples, and standards.">
     <meta name="ai-content-declaration" content="human-authored">
     <meta name="keywords" content="GB200 NVL72, AI data hall, direct liquid cooling, PUE methodology, hydronic flow, CDU sizing, ASHRAE, ISO IEC 30134, data hall cockpit, NVIDIA Blackwell">
     <meta name="author" content="Bagus Dwi Permana">
@@ -129,7 +129,7 @@
     <link rel="apple-touch-icon" href="../assets/Favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../styles.min.css?v=20260225">
 
     <style>
@@ -149,35 +149,35 @@
             --mn-text: #e7edf3;
             --mn-muted: #93a1b0;
             --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-            --mn-sans: 'IBM Plex Sans', 'IBM Plex Sans', system-ui, sans-serif;
+            --mn-sans: 'IBM Plex Sans', system-ui, sans-serif;
             --mn-cyan: #00DDFF;
             --mn-amber: #FFAA00;
             --mn-green: #00FF88;
         }
         :root:not([data-theme="dark"]) {
-            --mn-accent: #0891b2;
-            --mn-accent-rgb: 8,145,178;
-            --mn-cta: #b45309;
+            --mn-accent: #00677d;
+            --mn-accent-rgb: 0,103,125;
+            --mn-cta: #e08b00;
             --mn-bg: #f5f7fa;
             --mn-surface: #ffffff;
             --mn-surface-2: #eef2f6;
             --mn-border: rgba(15,23,42,0.12);
             --mn-text: #10161d;
             --mn-muted: #4a5763;
-            --mn-cyan: #0891b2;
-            --mn-green: #059669;
+            --mn-cyan: #00677d;
+            --mn-green: #006e45;
         }
         @media (prefers-reduced-motion: reduce) {
             * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
         }
         body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
-        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 5.5rem 1.25rem 5rem; }
 
         /* Hero */
         .mn-hero {
             border: 1px solid var(--mn-border);
-            border-left: 3px solid var(--mn-accent);
-            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-left:1px solid var(--mn-accent);
+            background: var(--mn-surface);
             border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
         }
         .mn-hero .mn-eyebrow {
@@ -189,14 +189,14 @@
         .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
         .mn-chip {
             font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
-            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            border: 1px solid var(--mn-border); border-radius: 3px; color: var(--mn-muted);
             background: rgba(var(--mn-accent-rgb),0.05);
         }
         .mn-chip strong { color: var(--mn-text); font-weight: 600; }
 
         /* Breadcrumb + tool link */
         .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
-        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
         .mn-crumb a:hover { text-decoration: underline; }
         .mn-toollink {
             display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
@@ -234,7 +234,7 @@
         /* Formula card */
         .mn-formula {
             font-family: var(--mn-mono); background: var(--mn-surface-2);
-            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border: 1px solid var(--mn-border); border-left:1px solid var(--mn-cyan);
             border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
             font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
         }
@@ -248,7 +248,7 @@
 
         /* Callout */
         .mn-note {
-            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            border: 1px solid var(--mn-border); border-left:1px solid var(--mn-amber);
             background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
             color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
         }
@@ -276,10 +276,12 @@
             .nav-menu, .nav-links { display: none; }
             .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
             button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
-            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-wrap { padding: 5rem 0.9rem 4rem; }
             .mn-hero { padding: 1.5rem 1.2rem; }
         }
     </style>
+    <link rel="stylesheet" href="../css/rz-documentation-ui.css?v=1.129.0">
+    <script src="../js/rz-documentation-ui.js?v=1.129.0" defer></script>
 </head>
 <body>
     <nav class="navbar">
@@ -304,7 +306,7 @@
         </div>
     </nav>
 
-    <main class="mn-wrap">
+    <main class="mn-wrap" data-explain-scan>
         <div class="mn-crumb">
             <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / AI Data Hall Cockpit
         </div>
@@ -576,6 +578,91 @@
             </ul>
         </section>
 
+        <!-- 9. COCKPIT CONTROL MAP — additive telemetry-docs enhancement -->
+        <section class="mn-section" id="control-map">
+            <h2><span class="mn-num">09</span> Cockpit controls &amp; view map</h2>
+            <p class="mn-lead">This operating map is additive to the locked methodology above. It identifies every visible control family in <code class="mn-mono">datahallAI.html</code> and the state it is allowed to change. None of these controls writes to field equipment.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Control / view</th><th>Hook</th><th>Expected behavior</th><th>Engineering boundary</th></tr></thead>
+                <tbody>
+                    <tr><td>Portfolio / DC Solutions / PRD / Manual</td><td><code>.bbtn</code></td><td>Navigate without changing the locked scenario.</td><td>Documentation is public; the cockpit keeps its existing tier gate.</td></tr>
+                    <tr><td>Basis of Design</td><td><code>bodTrig</code>, <code>bodDrawer</code></td><td>Open the calculation-audit drawer populated from <code>DATAHALL_CALC</code>; export its printable PDF.</td><td>It is an auditable design basis, not a field test certificate.</td></tr>
+                    <tr><td>Generate Design</td><td><code>genDesignTrig</code></td><td>Capture one engine snapshot and build the multi-discipline Tech Spec print view.</td><td>Popup failure must be reported; report content remains educational/non-procurement.</td></tr>
+                    <tr><td>FAQ / Theme</td><td><code>faqTrig</code>, <code>themeToggle</code></td><td>Open the FAQ dialog; switch/persist the light/dark palette.</td><td>Neither action changes model values.</td></tr>
+                    <tr><td>Primary tabs</td><td><code>button[data-t]</code></td><td>Select Dashboard, Data Hall, Room Layout, Rack, Cooling, Electrical, Network, Fire or BMS; one <code>.pn</code> remains active.</td><td>Tab changes presentation only.</td></tr>
+                    <tr><td>Sidebar collapse / reopen</td><td><code>sideTog</code>, <code>sideReopen</code></td><td>Widen the active diagram on desktop and remember the preference.</td><td>Does not hide alarm meaning or alter data.</td></tr>
+                    <tr><td>Floor selection / Overview</td><td>generated floor targets, <code>floorBack</code></td><td>Open a tagged floor plan and return to the building view.</td><td>Geometry is a design visualization, not a surveyed as-built.</td></tr>
+                    <tr><td>Hall selection</td><td><code>button[data-dh="1…4"]</code></td><td>Select DH-1 through DH-4 and update active hall context.</td><td>All halls share Scenario A unless a future model declares a variance.</td></tr>
+                    <tr><td>Electrical sub-tabs</td><td><code>button[data-ep]</code></td><td>Select facility Overview or DH-01…DH-04 SLD.</td><td>Only one <code>.ep</code> panel is active.</td></tr>
+                    <tr><td>SLD equipment</td><td><code>data-sld-click</code>, <code>data-rz-line</code>, <code>data-rz-breaker</code></td><td>Open the appropriate SLD mimic or right inspector for MV, RMU, transformer, MSB, UPS, busway, rack PSU or cooling feed.</td><td>Selection is read-only; no breaker command leaves the browser.</td></tr>
+                    <tr><td>SLD presentation</td><td><code>sldZoomIn</code>, <code>sldZoomOut</code>, <code>sldZoomFit</code>, <code>sldPrint</code>, <code>sldResultsToggle</code>, <code>sldMimicClose</code></td><td>Zoom, fit, print, show/hide results or close the selected mimic.</td><td>Results are modeled annotations, not IEC 60909/IEEE 1584 studies unless explicitly sourced.</td></tr>
+                    <tr><td>Rack / component detail</td><td>generated rack/tray/component targets, <code>rackModal</code></td><td>Open the selected tag, type and component diagram.</td><td>Component inventory follows the locked reference architecture.</td></tr>
+                    <tr><td>CDU / chiller / cooling tower</td><td><code>data-cdu</code>, <code>data-ch</code>, cooling-tower targets</td><td>Open a tag-specific process HMI with status and values.</td><td>Local pressure/flow/temperature movement is simulated sensor-class data.</td></tr>
+                    <tr><td>Pump / TCS / chemistry equipment</td><td>generated equipment targets, <code>eqHmi</code></td><td>Open the type-specific equipment HMI.</td><td>Displayed setpoints/nameplates require tag-level source records before field use.</td></tr>
+                    <tr><td>In-rack CDU / CRAH</td><td><code>data-ircdu</code>, generated CRAH targets</td><td>Open rack hydronic or air-side detail.</td><td>Heat/flow basis remains Scenario A; jitter is not a sizing input.</td></tr>
+                    <tr><td>Corridor services</td><td>FWS, leak, cable-tray targets</td><td>Open corridor-service HMI for the selected family.</td><td>No service-isolation or safety command is implemented.</td></tr>
+                    <tr><td>Battery ESS</td><td><code>data-bat</code>, <code>batHmi</code></td><td>Open the 480 VDC system/unit view for the selected hall and unit.</td><td>Runtime/SOC/thermal values are simulation unless identified as engine basis.</td></tr>
+                    <tr><td>KPI basis cards</td><td><code>.k[data-basis]</code></td><td>Click, Enter or Space opens formula, inputs, output, scope, denominator, source, mode and timestamp.</td><td>Uptime and alarm drawers explicitly identify design placeholders.</td></tr>
+                    <tr><td>Close controls / Escape / scrim</td><td>modal-specific close IDs + shared modal controller</td><td>Dismiss the active surface and return focus to its trigger.</td><td>Focus must never fall silently to <code>body</code>.</td></tr>
+                    <tr><td>Scroll to top</td><td><code>scrollTopBtn</code></td><td>Return to the header without altering current scenario.</td><td>Reduced-motion preference removes nonessential smooth animation.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 10. TELEMETRY QUALITY + ALARMS — additive telemetry-docs enhancement -->
+        <section class="mn-section" id="telemetry-operation">
+            <h2><span class="mn-num">10</span> Telemetry, alarm &amp; modal operating map</h2>
+            <p class="mn-lead">The cockpit deliberately contains three point classes. <strong>Basis/derived</strong> values are repeatable engine outputs, <strong>sensor-class</strong> values may jitter within declared ranges, and <strong>placeholder</strong> values require a future event or field source. Read the data-mode and quality label before acting on any number.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Point family</th><th>Representative hook</th><th>Class / cadence</th><th>Alarm or quality reading</th></tr></thead>
+                <tbody>
+                    <tr><td>Facility inventory and IT</td><td><code>DHE.halls</code>, <code>dkIt</code>, <code>sPit</code></td><td>BOD locked; immutable.</td><td>4 halls, 27 NVL72/hall, 3,564 kW/hall, 14.256 MW facility.</td></tr>
+                    <tr><td>Heat split / flow / CDU / CRAH</td><td><code>sDLC</code>, <code>sAir</code>, <code>sCDU</code>, <code>sCRAH</code></td><td>Derived; immutable.</td><td>3,029/535 kW, 4,342 L/min, 9/12 CDU and five active CRAHs per hall.</td></tr>
+                    <tr><td>Electrical capacity</td><td><code>reqCurrentA</code>, transformer/UPS/busway fields</td><td>Derived; immutable.</td><td>5,359 A, 3,713 kVA, 74.3% TX, 79.2% UPS failover, 6,300 A selected busway.</td></tr>
+                    <tr><td>PUE / WUE / CUE / IT / GPU / domains</td><td><code>dkPue</code>, <code>dkWue</code>, <code>dkCue</code>, <code>dkIt</code>, <code>dkGpu</code>, <code>dkDom</code></td><td>Derived or BOD locked; 4 s reassertion for dashboard fields.</td><td>Final text is deterministic; source/denominator lives in the basis drawer and tooltip.</td></tr>
+                    <tr><td>Uptime / active alarms KPI</td><td>Uptime card, <code>dkAlm</code></td><td>Design placeholder.</td><td>99.99% and zero active are not a persisted outage/event history.</td></tr>
+                    <tr><td>TCS and room sensors</td><td><code>sTS</code>, <code>sTR</code>, hot/cold temperature/RH IDs</td><td>Sensor-class jitter; 4 s cadence.</td><td>Jitter is allowed only around 35/45°C or declared room bands; it must not alter locked ΔT sizing.</td></tr>
+                    <tr><td>Occupancy/access</td><td><code>pplCount</code>, <code>lastEntry</code>, <code>dkPpl</code>, <code>dkEntry</code></td><td>Sensor/browser-time simulation.</td><td>Not a physical access-control record.</td></tr>
+                    <tr><td>Fire/leak/maintenance counts</td><td><code>sbSmoke</code>, <code>sbHeat</code>, <code>sbVesda</code>, <code>sbRope</code>, <code>sbDisabled</code>, <code>sbMaint</code></td><td>Mixed static and sensor-class simulation.</td><td>Do not infer code compliance or maintenance work orders.</td></tr>
+                    <tr><td>FWS instruments</td><td><code>fwsPI</code>, <code>fwsTI</code>, <code>fwsFM</code></td><td>Sensor-class jitter.</td><td>Ranges are illustrative; every HMI reading needs a simulated/quality chip.</td></tr>
+                    <tr><td>Alarm strips</td><td><code>.dh-alarmbar</code></td><td>Rule evaluation every 4 s.</td><td>Critical/warning checks cover inlet temperature, CDU margin, UPS loading, TCS ΔT and stale percentage; maintenance is two scheduled items.</td></tr>
+                    <tr><td>Equipment modal summary</td><td><code>.dh-modal-alarmline</code></td><td>Same alarm rule result at open.</td><td>Summary-first state must match the active panel strip.</td></tr>
+                    <tr><td>BMS service health</td><td><code>bmsGwOnline</code>, <code>bmsAlmActive</code>, <code>bmsAlmAck</code>, <code>bmsAlmCleared</code></td><td>Static service baseline plus shared rules.</td><td>16/16 gateways is modeled; “cleared” currently reuses the maintenance count and is not a true event lifecycle.</td></tr>
+                    <tr><td>Line / breaker quality</td><td><code>data-rz-line</code>, <code>data-rz-breaker</code>, inspector Live tab</td><td>Local rendered state.</td><td>Seven breaker states and data-quality chip must remain distinguishable without color alone.</td></tr>
+                    <tr><td>Global data mode</td><td><code>body[data-rz-data-mode="simulated"]</code></td><td>Persistent provenance.</td><td>The word <strong>Simulated</strong> must remain visible even when values animate.</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="mn-note"><strong>Threshold source:</strong> the current alarm rules use rack inlet &gt;27°C warning / &gt;30°C critical, CDU margin &lt;15% / &lt;5%, UPS load &gt;80% / &gt;95%, TCS ΔT &gt;13 K / &gt;15 K, and stale points &gt;1% / &gt;5%. These are review fixtures, not approved field setpoints.</div>
+        </section>
+
+        <!-- 11. GLOSSARY — additive telemetry-docs enhancement -->
+        <section class="mn-section" id="glossary">
+            <h2><span class="mn-num">11</span> Glossary &amp; RZExplain</h2>
+            <p class="mn-lead">The shared RZExplain scanner attaches contextual definitions to marked engineering terms. The table also records the exact meaning used by this cockpit.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Term</th><th>Cockpit meaning</th><th>Do not confuse with</th></tr></thead>
+                <tbody>
+                    <tr><td><span data-explain="NVL72">NVL72 domain</span></td><td>Logical 72-GPU / 36-Grace domain at 132 kW in Scenario A, represented by two 66 kW physical rack positions.</td><td>A single 66 kW physical rack position.</td></tr>
+                    <tr><td><span data-explain="DLC">Direct liquid cooling</span></td><td>Cold-plate path capturing 85% of IT heat.</td><td>Total facility cooling electrical power.</td></tr>
+                    <tr><td><span data-explain="TCS">TCS</span></td><td>Technology Cooling System at 35/45°C, ΔT 10 K.</td><td>Facility-water/chilled-water loop.</td></tr>
+                    <tr><td><span data-explain="FWS">FWS</span></td><td>Facility Water System coupled through CDU heat exchangers.</td><td>Rack-side coolant circuit.</td></tr>
+                    <tr><td><span data-explain="CDU">CDU</span></td><td>Coolant Distribution Unit, 350 kW design rating, nine running per hall.</td><td>Chiller or CRAH.</td></tr>
+                    <tr><td><span data-explain="CRAH">CRAH</span></td><td>Air-side unit serving the 15% residual heat.</td><td>Liquid-cooling primary path.</td></tr>
+                    <tr><td><span data-explain="PUE">PUE</span></td><td>Facility power divided by IT power; ≈1.30 is derived, 1.12–1.25 is a target band.</td><td>A marketing target presented as measured output.</td></tr>
+                    <tr><td><span data-explain="WUE">WUE</span></td><td>Water per IT energy; 0.00 only for the declared dry-only baseline.</td><td>Domestic/process water or an adiabatic configuration.</td></tr>
+                    <tr><td><span data-explain="CUE">CUE</span></td><td>Carbon per IT energy; grid factor × PUE in the current calculation.</td><td>Raw facility-kWh grid emission factor.</td></tr>
+                    <tr><td><span data-explain="2N">2N</span></td><td>Each UPS feed can carry the protected load; normal display assumes equal sharing.</td><td>N+1 parallel capacity.</td></tr>
+                    <tr><td>Basis / sensor / placeholder</td><td>Immutable engine fact / bounded simulated reading / value awaiting authoritative source.</td><td>Three interchangeable meanings of “live”.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
         <a class="mn-toollink" href="../datahallAI.html">&#9654; Open the AI Data Hall Cockpit</a>
     </main>
 
@@ -588,7 +675,7 @@
                     <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
                 </div>
                 <div class="footer-nav">
-                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <h3 class="footer-heading">NAVIGATION</h3>
                     <ul class="footer-links">
                         <li><a href="../index.html">Home Dashboard</a></li>
                         <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
@@ -597,7 +684,7 @@
                     </ul>
                 </div>
                 <div class="footer-connect">
-                    <h4 class="footer-heading">CONNECT</h4>
+                    <h3 class="footer-heading">CONNECT</h3>
                     <ul class="footer-links">
                         <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
                         <li><a href="../articles.html">Technical Journal</a></li>
@@ -611,7 +698,7 @@
     <script>
     (function(){
         var toggle = document.getElementById('themeToggle');
-        var theme = localStorage.getItem('theme') || localStorage.getItem('rz_theme') || 'dark';
+        var theme = localStorage.getItem('theme') || localStorage.getItem('rz_theme') || 'light';
         document.documentElement.setAttribute('data-theme', theme);
         if (toggle) toggle.addEventListener('click', function(){
             var current = document.documentElement.getAttribute('data-theme');
@@ -619,6 +706,8 @@
             document.documentElement.setAttribute('data-theme', next);
             localStorage.setItem('theme', next); localStorage.setItem('rz_theme', next);
         });
+        var scrollables = document.querySelectorAll('.mn-tablewrap,.mn-formula');
+        for (var i = 0; i < scrollables.length; i++) scrollables[i].setAttribute('tabindex', '0');
         var hamburger = document.querySelector('.hamburger');
         var navMenu = document.querySelector('.nav-menu');
         if (hamburger && navMenu) hamburger.addEventListener('click', function(){
@@ -629,8 +718,10 @@
     })();
     </script>
     <script src="../js/rz-version.js?v=2026-07-20" defer></script>
-    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
-    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=1.129.0" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=1.129.0" defer></script>
+    <script src="../js/rz-explain-db.js?v=2026-07-27" defer></script>
+    <script src="../js/rz-explain.js?v=2026-07-27" defer></script>
     <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
     <script src="../auth.js?v=2026-08-25-secfix" defer></script>
 </body>

@@ -71,7 +71,7 @@
     <link rel="apple-touch-icon" href="../assets/Favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../styles.min.css?v=20260225">
 
     <style>
@@ -80,7 +80,7 @@
             --mn-bg: #0b0f14; --mn-surface: #121820; --mn-surface-2: #0e141b;
             --mn-border: rgba(255,255,255,0.09); --mn-text: #e7edf3; --mn-muted: #93a1b0;
             --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-            --mn-sans: 'IBM Plex Sans', 'IBM Plex Sans', system-ui, sans-serif;
+            --mn-sans: 'IBM Plex Sans', system-ui, sans-serif;
             --mn-green: #00FF88;
         }
         :root:not([data-theme="dark"]) {
@@ -91,11 +91,11 @@
         }
         @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
         body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
-        .mn-wrap { max-width: 1080px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+        .mn-wrap { max-width: 1080px; margin: 0 auto; padding: 5.5rem 1.25rem 5rem; }
         .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
         .mn-crumb a { color: var(--mn-accent); text-decoration: none; }
-        .mn-hero { border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-accent);
-            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+        .mn-hero { border: 1px solid var(--mn-border); border-left: 1px solid var(--mn-accent);
+            background: var(--mn-surface);
             border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem; }
         .mn-hero .mn-eyebrow { font-family: var(--mn-mono); font-size: 0.72rem; letter-spacing: 0.18em;
             text-transform: uppercase; color: var(--mn-accent); margin: 0 0 0.6rem; }
@@ -103,7 +103,7 @@
         .mn-hero p { color: var(--mn-muted); max-width: 68ch; margin: 0; line-height: 1.6; }
         .mn-hero .mn-meta { display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:1.1rem; }
         .mn-chip { font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
-            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            border: 1px solid var(--mn-border); border-radius: 3px; color: var(--mn-muted);
             background: rgba(var(--mn-accent-rgb),0.05); }
         .mn-chip strong { color: var(--mn-text); }
 
@@ -126,7 +126,7 @@
             border: 1px solid var(--mn-border); padding: 0.4rem 0.7rem; border-radius: 6px; text-decoration: none;
             min-height: 34px; display: inline-flex; align-items: center; }
         .mn-card a.mn-tool:hover, .mn-card a.mn-manual:hover { filter: brightness(1.08); }
-        .mn-note { border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cta);
+        .mn-note { border: 1px solid var(--mn-border); border-left: 1px solid var(--mn-cta);
             background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem; color: var(--mn-muted);
             font-size: 0.85rem; line-height: 1.55; margin: 1.6rem 0 0; }
         .mn-note strong { color: var(--mn-text); }
@@ -138,10 +138,12 @@
             .nav-menu, .nav-links { display: none; }
             .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
             button, a.btn, [role="button"], .mn-manual, .mn-tool { min-height: 44px; }
-            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-wrap { padding: 5rem 0.9rem 4rem; }
             .mn-grid { grid-template-columns: 1fr; }
         }
     </style>
+    <link rel="stylesheet" href="../css/rz-documentation-ui.css?v=1.129.0">
+    <script src="../js/rz-documentation-ui.js?v=1.129.0" defer></script>
 </head>
 <body>
     <nav class="navbar">
@@ -173,7 +175,7 @@
             <h1>DC Hub Technical Manuals</h1>
             <p>Super-detailed methodology for every calculator, cockpit, lab and tracker on the DC Solutions hub — the inputs, the exact formulas and where they live in the engine, the sourced constants, the output equations, an engine-verified worked example, and the governing standards. Each manual is the audit trail behind a live tool.</p>
             <div class="mn-meta">
-                <span class="mn-chip">Manuals <strong>33</strong></span>
+                <span class="mn-chip">Manuals <strong>42</strong></span>
                 <span class="mn-chip">Reference hubs <strong>7</strong></span>
                 <span class="mn-chip">Structure <strong>8 blocks each</strong></span>
                 <span class="mn-chip">Basis <strong>NFPA · ASHRAE · ISO · Uptime · TIA-942</strong></span>
@@ -268,6 +270,19 @@
             </div>
         </section>
 
+        <section class="mn-group" id="telemetry-contracts">
+            <h2><span class="mn-num">08</span> Telemetry Cockpit Contracts</h2>
+            <p class="mn-sub">Public operator manuals paired with deterministic product requirements, provenance and acceptance criteria.</p>
+            <div class="mn-grid">
+                <div class="mn-card"><div class="mn-ct">EPMS Telemetry Cockpit</div><div class="mn-cd">Electrical single-line telemetry, power quality, breaker state, alarms and deterministic acceptance.</div><div class="mn-links"><a class="mn-manual" href="epms-telemetry.html">Manual</a><a class="mn-tool" href="../prd/epms-telemetry.html">PRD</a><a class="mn-tool" href="../EPMS_Telemetry.html">Cockpit</a></div></div>
+                <div class="mn-card"><div class="mn-ct">AI / HPC Data Hall</div><div class="mn-cd">GB200 rack, CDU, power, cooling and alarm contract with the existing methodology preserved.</div><div class="mn-links"><a class="mn-manual" href="datahallai.html">Manual</a><a class="mn-tool" href="../prd/datahallai.html">PRD</a><a class="mn-tool" href="../datahallAI.html">Cockpit</a></div></div>
+                <div class="mn-card"><div class="mn-ct">Conventional Data Center</div><div class="mn-cd">EPMS/BMS reconciliation, redundancy, utility and operational-state product contract.</div><div class="mn-links"><a class="mn-manual" href="dc-conventional.html">Manual</a><a class="mn-tool" href="../prd/dc-conventional.html">PRD</a><a class="mn-tool" href="../dc-conventional.html">Cockpit</a></div></div>
+                <div class="mn-card"><div class="mn-ct">Data Hall SCADA Console</div><div class="mn-cd">Rack distribution, CRAH capacity, cooling margin and alarm-threshold traceability.</div><div class="mn-links"><a class="mn-manual" href="datahall.html">Manual</a><a class="mn-tool" href="../prd/datahall.html">PRD</a><a class="mn-tool" href="../datahall.html">Cockpit</a></div></div>
+                <div class="mn-card"><div class="mn-ct">CDU Mini-BMS</div><div class="mn-cd">Five CDU architectures, thirteen instrument points and six coherent training scenarios.</div><div class="mn-links"><a class="mn-manual" href="cdu-mini-bms.html">Manual</a><a class="mn-tool" href="../prd/cdu-mini-bms.html">PRD</a><a class="mn-tool" href="../cdu-mini-bms.html">Cockpit</a></div></div>
+                <div class="mn-card"><div class="mn-ct">RZ Cockpit Re-skin Mockup</div><div class="mn-cd">Honest visual prototype contract: seeded fixtures, preserved semantic colors and documented gaps.</div><div class="mn-links"><a class="mn-manual" href="rz-cockpit-mockup.html">Manual</a><a class="mn-tool" href="../prd/rz-cockpit-mockup.html">PRD</a><a class="mn-tool" href="../rz-cockpit-mockup.html">Prototype</a></div></div>
+            </div>
+        </section>
+
         <div class="mn-note"><strong>How to read a manual.</strong> Each page follows the same eight blocks: purpose &amp; basis · inputs · calculation methodology (every formula, with the engine function it lives in) · constants &amp; data sources · outputs · a worked example verified against the live engine · references &amp; standards · assumptions &amp; limitations. Where a page uses live published data (PLN grids) or editorial ranges (comparisons), the manual documents the basis honestly rather than presenting invented equations. These manuals are engineering education and pre-design aids — final design must be sealed by a qualified engineer to the authority having jurisdiction.</div>
     </main>
 
@@ -320,8 +335,8 @@
     })();
     </script>
     <script src="../js/rz-version.js?v=2026-07-20" defer></script>
-    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
-    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=1.129.0" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=1.129.0" defer></script>
     <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
     <script src="../auth.js?v=2026-08-25-secfix" defer></script>
 </body>

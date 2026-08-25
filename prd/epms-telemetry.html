@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPMS Telemetry Dashboard — Product Requirements | ResistanceZero</title>
+    <meta name="description" content="Product requirements for the EPMS telemetry one-line: source transfer, breakers, electrical measurements, exports, alarms, and audit criteria.">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://resistancezero.com/prd/epms-telemetry.html">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="EPMS Telemetry Dashboard — Product Requirements">
+    <meta property="og:description" content="Traceable product contract for the simulated electrical one-line, breaker state, transfer logic, telemetry and report workflow.">
+    <meta property="og:url" content="https://resistancezero.com/prd/epms-telemetry.html">
+    <meta property="og:image" content="https://resistancezero.com/assets/og/EPMS_Telemetry.webp">
+    <link rel="icon" href="../assets/Favicon.png" type="image/png">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"Product Requirements","item":"https://resistancezero.com/prd/"},{"@type":"ListItem","position":3,"name":"EPMS Telemetry Dashboard"}]}
+    </script>
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"TechArticle","headline":"EPMS Telemetry Dashboard — Product Requirements","author":{"@type":"Person","name":"Bagus Dwi Permana"},"publisher":{"@type":"Organization","name":"ResistanceZero"},"about":"Electrical power monitoring one-line, source transfer, breaker simulation and telemetry product contract","proficiencyLevel":"Expert"}
+    </script>
+    <style>
+        :root {
+            --bg:#081016; --surface:#0d171e; --surface-2:#101d25; --text:#e7edf3;
+            --muted:#9ba8b5; --line:rgba(231,237,243,.12); --cyan:#2be8ff;
+            --amber:#ffaa00; --green:#00e68a; --red:#ff5c68;
+            --mono:'JetBrains Mono','IBM Plex Mono',ui-monospace,monospace;
+            --sans:'IBM Plex Sans',system-ui,sans-serif;
+        }
+        [data-theme="dark"] { --bg:#081016; --surface:#0d171e; --surface-2:#101d25; --text:#e7edf3; --muted:#9ba8b5; --line:rgba(231,237,243,.12); }
+        :root:not([data-theme="dark"]) { --bg:#f4f7f9; --surface:#fff; --surface-2:#edf2f5; --text:#15202a; --muted:#4b5b68; --line:rgba(21,32,42,.17); --cyan:#00677d; --amber:#9a5b00; --green:#087d55; --red:#b52c3a; }
+        html,body { overflow-x:hidden; max-width:100%; }
+        body { background:var(--bg); color:var(--text); font-family:var(--sans); }
+        .skip-link { position:absolute; left:.75rem; top:-5rem; z-index:9999; background:var(--amber); color:#151006; padding:.65rem .9rem; }
+        .skip-link:focus { top:.75rem; }
+        :focus-visible { outline:2px solid var(--amber); outline-offset:2px; }
+        .mn-wrap { width:min(1120px,calc(100% - 2rem)); margin:0 auto; padding:5.5rem 0 5rem; }
+        .mn-crumb { font:500 .74rem/1.5 var(--mono); color:var(--muted); margin-bottom:1rem; }
+        .mn-crumb a,.mn-inline { color:var(--cyan); } .mn-crumb a { text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:2px; } .mn-inline { text-decoration:none; }
+        .mn-hero { background:var(--surface); border:1px solid var(--line); border-left:1px solid var(--cyan); border-radius:5px; padding:1.65rem; }
+        .mn-eyebrow { color:var(--cyan); font:600 .7rem/1.4 var(--mono); letter-spacing:.14em; text-transform:uppercase; }
+        .mn-hero h1 { margin:.45rem 0 .7rem; font-size:clamp(1.65rem,4vw,2.7rem); line-height:1.1; }
+        .mn-hero p { color:var(--muted); max-width:70ch; line-height:1.65; }
+        .mn-meta { display:flex; flex-wrap:wrap; gap:.45rem; margin-top:1rem; }
+        .mn-chip { border:1px solid var(--line); border-radius:3px; padding:.28rem .5rem; color:var(--muted); font:500 .69rem/1.3 var(--mono); }
+        .mn-section { margin:2.2rem 0; scroll-margin-top:5rem; }
+        .mn-section h2 { display:flex; gap:.65rem; align-items:baseline; margin:0 0 .45rem; font-size:1.32rem; }
+        .mn-num { color:var(--cyan); border:1px solid var(--line); border-radius:3px; padding:.06rem .38rem; font:600 .75rem/1.4 var(--mono); }
+        .mn-lead { color:var(--muted); max-width:70ch; line-height:1.65; }
+        .mn-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.75rem; margin-top:1rem; }
+        .mn-card,.mn-note { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:1rem; }
+        .mn-card h3 { margin:0 0 .35rem; font:600 .86rem/1.4 var(--mono); }
+        .mn-card p,.mn-card li,.mn-note { color:var(--muted); font-size:.86rem; line-height:1.55; }
+        .mn-card ul,.mn-card ol { margin:.45rem 0 0; padding-left:1.15rem; }
+        .mn-note { border-left:1px solid var(--amber); margin:.9rem 0; }
+        .mn-tablewrap { overflow-x:auto; border:1px solid var(--line); border-radius:4px; margin-top:1rem; }
+        .mn-table { width:100%; min-width:820px; border-collapse:collapse; font-size:.81rem; font-variant-numeric:tabular-nums; }
+        .mn-table th,.mn-table td { padding:.58rem .65rem; text-align:left; vertical-align:top; border-bottom:1px solid var(--line); line-height:1.48; }
+        .mn-table th { background:var(--surface-2); color:var(--muted); font:600 .67rem/1.35 var(--mono); letter-spacing:.06em; text-transform:uppercase; }
+        .mn-table tbody tr:last-child td { border-bottom:0; }
+        code,.mn-mono { font-family:var(--mono); color:var(--cyan); font-size:.92em; font-feature-settings:'zero' 1,'tnum' 1; }
+        .mn-formula { background:var(--surface-2); border:1px solid var(--line); border-left:1px solid var(--cyan); border-radius:4px; padding:.9rem 1rem; margin:.75rem 0; overflow-x:auto; font:500 .82rem/1.65 var(--mono); font-feature-settings:'zero' 1,'tnum' 1; }
+        .mn-eq { display:block; white-space:nowrap; }
+        .mn-where { display:block; color:var(--muted); white-space:normal; margin-top:.4rem; }
+        .mn-actions { display:flex; flex-wrap:wrap; gap:.65rem; margin-top:1.2rem; }
+        .mn-action { min-height:44px; display:inline-flex; align-items:center; padding:.55rem .85rem; border:1px solid var(--amber); border-radius:4px; color:var(--amber); text-decoration:none; font:600 .76rem/1.2 var(--mono); }
+        .mn-action.primary { background:#f0a300; color:#151006; }
+        @media (max-width:768px) {
+            html,body { overflow-x:hidden; max-width:100vw; }
+            img,svg,video { max-width:100%; height:auto; }
+            .mn-wrap { width:min(100% - 1rem,1120px); padding:5rem 0 4rem; }
+            .mn-hero { padding:1.2rem; }
+            .mn-grid { grid-template-columns:1fr; }
+            .nav-menu,.nav-links { display:none; }
+            button,a.btn,[role="button"],.mn-action { min-height:44px; }
+        }
+        @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; animation:none!important; transition:none!important; } }
+        @media print { .navbar,.mn-actions { display:none!important; } body { background:#fff; color:#111; } .mn-section { break-inside:avoid; } }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/rz-documentation-ui.css?v=1.129.0">
+    <script src="../js/rz-documentation-ui.js?v=1.129.0" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo"><img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Product Requirements</a></li>
+                <li><a href="../manual/epms-telemetry.html" class="nav-link">Manual</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">Theme</button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap" id="main-content" data-explain-scan>
+        <div class="mn-crumb"><a href="../index.html">Home</a> / <a href="index.html">PRD</a> / EPMS Telemetry</div>
+        <header class="mn-hero">
+            <div class="mn-eyebrow">Product requirements · electrical one-line simulator</div>
+            <h1>EPMS Telemetry Dashboard</h1>
+            <p>A testable contract for the source-transfer, breaker, power-flow, telemetry and export behavior in <code>EPMS_Telemetry.html</code>. The page is a simulated teaching cockpit. It is not a live EPMS, protection relay, switching authority or approved operating procedure.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Cockpit <strong>EPMS_Telemetry.html</strong></span>
+                <span class="mn-chip">Shared basis <strong>CONV_CALC.snapshot</strong></span>
+                <span class="mn-chip">Diagram <strong>3 streams / 2 utility sources</strong></span>
+                <span class="mn-chip">Data mode <strong>SIMULATED</strong></span>
+            </div>
+        </header>
+
+        <section class="mn-section" id="purpose">
+            <h2><span class="mn-num">01</span> Purpose &amp; problem</h2>
+            <p class="mn-lead">An electrical operator needs a fast read of source availability, transfer state, breaker position, energized paths, load and alarm count without reconstructing topology from a raw point list. A reviewer also needs to know which numbers are engine-bound and which are illustrative simulator values.</p>
+            <div class="mn-grid">
+                <article class="mn-card"><h3>Operational question</h3><p>Which utility or generator path is feeding each stream, which breakers are closed/open/tripped, and what downstream equipment is affected?</p></article>
+                <article class="mn-card"><h3>Trust question</h3><p>Can the displayed voltage, current, power and site aggregate be reproduced from declared formulas and sources, with simulation clearly separated from metered telemetry?</p></article>
+            </div>
+        </section>
+
+        <section class="mn-section" id="users">
+            <h2><span class="mn-num">02</span> Users &amp; personas</h2>
+            <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Persona</th><th>Goal</th><th>Primary read</th><th>Success condition</th></tr></thead><tbody>
+                <tr><td>Facilities operator</td><td>Triage a source loss or breaker trip.</td><td>Status strip → one-line → event log.</td><td>Names active source, affected stream and breaker state within one scan.</td></tr>
+                <tr><td>Electrical engineer</td><td>Review topology, ratings and calculated current.</td><td>Source/MV/RMU/TX/LVSB/ATS/UPS/PDU branches and telemetry labels.</td><td>Can identify voltage basis, power factor and capacity gaps.</td></tr>
+                <tr><td>Commissioning engineer</td><td>Exercise transfer and breaker-state sequences.</td><td>Utility/tie controls, breaker gestures, generator state and alarms.</td><td>Every action has a deterministic expected state and visible feedback.</td></tr>
+                <tr><td>Design reviewer</td><td>Reconcile EPMS totals with the conventional facility basis.</td><td>Facility/IT/PUE strip and representative rack-row scope.</td><td>Mismatch is visible rather than hidden by display rounding.</td></tr>
+                <tr><td>Educator / learner</td><td>Understand a three-stream protected electrical one-line.</td><td>Legend, labels, manual formulas and exports.</td><td>Can distinguish a simulated state from an approved switching instruction.</td></tr>
+            </tbody></table></div>
+        </section>
+
+        <section class="mn-section" id="scope">
+            <h2><span class="mn-num">03</span> Scope &amp; non-goals</h2>
+            <div class="mn-grid">
+                <article class="mn-card"><h3>In scope</h3><ul><li>Utility A/B, MV tie, A/B/C streams and generator transfer simulation.</li><li>MV/RMU/transformer/LVSB/ATSDB/UPS/PDU/rack and mechanical-load topology.</li><li>Open, closed and trip breaker presentation.</li><li>Voltage/current/kW labels, site roll-up, alarm count and timestamps.</li><li>Zoom, pan, fit, reset and PDF/CSV/JSON report actions.</li></ul></article>
+                <article class="mn-card"><h3>Non-goals</h3><ul><li>No field meters, IEC 61850, Modbus, SCADA historian or relay connection.</li><li>No remote switching, lockout/tagout, synchronization or protection study.</li><li>No validated short-circuit, arc-flash, coordination or load-flow result.</li><li>No claim that the ten visible racks represent the full 1.85 MW IT estate.</li><li>No procurement, safety or operations authorization.</li></ul></article>
+            </div>
+        </section>
+
+        <section class="mn-section" id="functional">
+            <h2><span class="mn-num">04</span> Functional requirements</h2>
+            <p class="mn-lead">Every visible control, status family and diagram family is mapped below. Generated equipment instances are covered by their stable ID ranges.</p>
+            <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>ID</th><th>Visible element / requirement</th><th>Acceptance</th></tr></thead><tbody>
+                <tr><td>FR-01</td><td>Show an engine-bound top strip for Facility Load, IT Load and PUE.</td><td><code>epms-fac</code>, <code>epms-it</code> and <code>epms-pue</code> read <code>CONV_CALC.snapshot</code> when available.</td></tr>
+                <tr><td>FR-02</td><td>Show Utility, UPS A/B, generator, trip, data-quality and scenario labels.</td><td>Labels remain visible above the one-line and say Simulated rather than Live.</td></tr>
+                <tr><td>FR-03</td><td>Show a five-state line legend: energized, standby, open, alarm/trip and maintenance bypass.</td><td>Each state has text plus line sample; meaning is not color-only.</td></tr>
+                <tr><td>FR-04</td><td>Provide Back, Portfolio, PRD and Manual navigation.</td><td>All links are keyboard reachable and resolve without changing simulator state.</td></tr>
+                <tr><td>FR-05</td><td>Provide 50%, 75%, 120% and Fit zoom controls.</td><td>Each control updates the transform and <code>zoomIndicator</code>.</td></tr>
+                <tr><td>FR-06</td><td>Allow wheel zoom bounded from 15% to 200% and mouse drag pan.</td><td>Pointer-centred zoom and pan preserve the selected breaker state.</td></tr>
+                <tr><td>FR-07</td><td>Provide Reset View.</td><td>Reset invokes fit-to-screen and records the action in the local log.</td></tr>
+                <tr><td>FR-08</td><td>Provide Export PDF Report, Export CSV Data and Export JSON.</td><td>Each action emits current source, generator, breaker and summary state and logs completion.</td></tr>
+                <tr><td>FR-09</td><td>Allow Utility A and Utility B source toggles.</td><td><code>btn-u-a</code>/<code>btn-u-b</code> state, flow and ATS response agree.</td></tr>
+                <tr><td>FR-10</td><td>Allow the MV bus-coupler toggle.</td><td><code>btn-tie</code> and <code>br_mv_tie</code> change together.</td></tr>
+                <tr><td>FR-11</td><td>Show GEN A/B/C status indicators.</td><td>Indicators change from standby to running during the associated ATS sequence; they are not presented as manual start controls.</td></tr>
+                <tr><td>FR-12</td><td>Render Utility A/B, streams A/B/C and the A–B MV tie.</td><td>Source reachability follows <code>SIM.sources</code>, breaker state and ring/tie logic.</td></tr>
+                <tr><td>FR-13</td><td>Render MV, RMU and transformer groups.</td><td><code>MV_A/B</code>, <code>RMU_A/B/C</code> and <code>TX_A/B/C</code> retain tags, voltage levels and transformer nameplates.</td></tr>
+                <tr><td>FR-14</td><td>Render LVSB, generator and ATS distribution groups.</td><td><code>LVSB_A/B/C</code>, <code>GEN_A/B/C</code>, <code>ATSDB_IT_*</code> and <code>ATSDB_M_*</code> remain connected.</td></tr>
+                <tr><td>FR-15</td><td>Render UPS IT A/B/C and UPS mechanical A/B.</td><td>Incoming and downstream paths remain distinct; status labels do not imply metered load.</td></tr>
+                <tr><td>FR-16</td><td>Render ATS panel ties, CDP and mechanical branches.</td><td><code>ATS_PNL1/2</code>, <code>CDP</code>, CH-1…4 and AHU-1/2 appear at stable locations.</td></tr>
+                <tr><td>FR-17</td><td>Render ten DAHU branches.</td><td><code>DAHU_A_0…4</code> and <code>DAHU_B_0…4</code> each have breaker, path and telemetry.</td></tr>
+                <tr><td>FR-18</td><td>Render ten representative rack paths.</td><td>Each <code>RACK_0…9</code> has main/catcher PDU, rack ATS and final protected branch.</td></tr>
+                <tr><td>FR-19</td><td>Initialize every wire breaker to closed unless its model declares open.</td><td>Generator incomers, tie and catcher-panel alternatives start open; all other modeled defaults match <code>WIRES</code>.</td></tr>
+                <tr><td>FR-20</td><td>Support breaker closed/open/trip simulation.</td><td>Click toggles open/closed, Alt sets open and Shift sets trip; state is visible in symbol and alarm count.</td></tr>
+                <tr><td>FR-21</td><td>Run ATS transfer logic for streams A, B and C.</td><td>Utility loss opens utility breaker, starts the generator and closes generator breaker after the declared simulated delay; restoration reverses the sequence.</td></tr>
+                <tr><td>FR-22</td><td>Animate only energized paths and preserve source identity.</td><td>Flow class is derived from reachable source; final rack leg uses the protected downstream color.</td></tr>
+                <tr><td>FR-23</td><td>Show voltage, current and power on every wire not marked <code>noTele</code>.</td><td><code>tele-&lt;wire-id&gt;</code> labels update to zero when de-energized and calculated/assigned values when energized.</td></tr>
+                <tr><td>FR-24</td><td>Show bottom System, Total Load, Power Factor, Frequency, Breakers, Alarms and timestamp.</td><td>Seven groups update without shifting layout; units remain visible.</td></tr>
+                <tr><td>FR-25</td><td>Count closed and total breakers.</td><td><code>val-breakers</code> equals a direct roll-up of <code>SIM.breakers</code>.</td></tr>
+                <tr><td>FR-26</td><td>Count tripped breakers as active alarms.</td><td><code>val-alarms</code> and its fault presentation agree with the number of <code>trip</code> states.</td></tr>
+                <tr><td>FR-27</td><td>Show utility-online or generator-mode system state.</td><td>Loss of both utility booleans changes <code>val-system</code> to GEN MODE with warning semantics.</td></tr>
+                <tr><td>FR-28</td><td>Maintain a newest-first local event log.</td><td>Source, tie, view and export actions prepend readable entries.</td></tr>
+                <tr><td>FR-29</td><td>Keep simulator scope explicit in reports.</td><td>Exported data carries a timestamp and current modeled state; product copy never calls it field telemetry.</td></tr>
+                <tr><td>FR-30</td><td>Preserve the public site shell on documentation pages and the existing cockpit gate/state.</td><td>Docs remain public; adding links changes no cockpit control or script.</td></tr>
+            </tbody></table></div>
+        </section>
+
+        <section class="mn-section" id="data-model">
+            <h2><span class="mn-num">05</span> Data model &amp; telemetry points</h2>
+            <p class="mn-lead">Rows enumerate every displayed point family. Wildcards identify generated instances and are the canonical point namespace, not an omission of individual equipment.</p>
+            <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Signal</th><th>Symbol / ID</th><th>Unit</th><th>Nominal / semantics</th><th>Source binding</th></tr></thead><tbody>
+                <tr><td>Facility load</td><td><code>epms-fac</code></td><td>MW</td><td>2.68; engine-bound aggregate.</td><td><code>CONV_CALC.snapshot.site.facility_kw / 1000</code>.</td></tr>
+                <tr><td>IT load</td><td><code>epms-it</code></td><td>MW</td><td>1.85; engine-bound protected IT aggregate.</td><td><code>snapshot.site.it_kw / 1000</code>.</td></tr>
+                <tr><td>PUE</td><td><code>epms-pue</code></td><td>ratio</td><td>1.45; facility/IT basis.</td><td><code>snapshot.site.pue</code>.</td></tr>
+                <tr><td>Utility summary</td><td>top-strip Utility</td><td>state</td><td>OK presentation; green normal.</td><td>Static label; not bound to <code>SIM.sources</code>.</td></tr>
+                <tr><td>UPS summary</td><td>top-strip UPS A/B</td><td>state</td><td>Online presentation.</td><td>Static label; not a live UPS register.</td></tr>
+                <tr><td>Generator / trip summary</td><td>top-strip Gen / Trips</td><td>state / count</td><td>Standby / 0 presentation.</td><td>Static top strip; dynamic equivalents exist below.</td></tr>
+                <tr><td>Data quality / scenario</td><td>top-strip Data / Scenario</td><td>quality / mode</td><td>GOOD / Simulated.</td><td>Static provenance declaration.</td></tr>
+                <tr><td>Utility source availability</td><td><code>SIM.sources.A/B</code>, <code>btn-u-a/b</code></td><td>boolean</td><td>Active or off.</td><td>User toggle in local simulator.</td></tr>
+                <tr><td>Generator running</td><td><code>SIM.genRunning.A/B/C</code>, <code>btn-gen-a/b/c</code></td><td>boolean</td><td>Standby or running.</td><td><code>runATSLogic()</code>.</td></tr>
+                <tr><td>Breaker state</td><td><code>SIM.breakers[br_*]</code></td><td>enum</td><td>closed / open / trip; trip is fault-red.</td><td><code>WIRES[].br</code> plus user gesture/ATS.</td></tr>
+                <tr><td>Line energized state</td><td><code>flow-w_*</code></td><td>state</td><td>Energized by A/B/C utility or generator; de-energized is muted.</td><td><code>calcPowerFlow()</code> graph traversal.</td></tr>
+                <tr><td>MV feeders</td><td><code>tele-w_mv_a/b</code>, <code>tele-w_rmu_a/b</code>, <code>tele-w_mv_tie</code></td><td>V / A / kW</td><td>20,000 V; illustrative power assignment.</td><td><code>WIRES</code> voltage + <code>calcPowerFlow()</code>.</td></tr>
+                <tr><td>Ring / transformer feeders</td><td><code>tele-w_ring_ac/bc</code>, <code>tele-w_tx_a/b/c</code></td><td>V / A / kW</td><td>20 kV upstream; current from assigned kW/PF.</td><td><code>WIRES</code> and 3-phase current formula.</td></tr>
+                <tr><td>LVSB / generator feeders</td><td><code>tele-w_lvsb_*</code>, <code>tele-w_gen_*</code></td><td>V / A / kW</td><td>400 V; utility or generator source path.</td><td><code>WIRES</code>, breaker state and source reachability.</td></tr>
+                <tr><td>IT distribution feeders</td><td><code>tele-w_db_a/b/c</code>, <code>tele-w_ups_a/b/c</code></td><td>V / A / kW</td><td>400 V; assigned 1,000/300 kW based on destination type.</td><td><code>calcPowerFlow()</code> destination-name mapping.</td></tr>
+                <tr><td>Mechanical distribution</td><td><code>tele-w_db_m_*</code>, <code>tele-w_ups_m_*_in</code>, <code>tele-w_ats*</code></td><td>V / A / kW</td><td>400 V; illustrative feeder values.</td><td><code>WIRES</code> and destination-name mapping.</td></tr>
+                <tr><td>Chiller/AHU branches</td><td><code>tele-w_ch1…4</code>, <code>tele-w_ahu1/2</code></td><td>V / A / kW</td><td>400 V; energized state and assigned load.</td><td><code>WIRES</code>.</td></tr>
+                <tr><td>DAHU branches</td><td><code>tele-w_dahu_a_0…4</code>, <code>tele-w_dahu_b_0…4</code></td><td>V / A / kW</td><td>400 V; 30 kW assignment per destination rule.</td><td>Generated <code>WIRES</code> loops.</td></tr>
+                <tr><td>Rack PDU incoming</td><td><code>w_ups_pdu_m_0…9</code>, <code>w_ups_pdu_c_0…9</code></td><td>state</td><td>No telemetry label; topology/energization only.</td><td><code>WIRES[].noTele=true</code>.</td></tr>
+                <tr><td>Rack ATS feeders</td><td><code>tele-w_pdu_ats_m_0…9</code>, <code>tele-w_pdu_ats_c_0…9</code></td><td>V / A / kW</td><td>230 V; 60 kW assignment because destination contains PDU upstream only; branch mapping is illustrative.</td><td>Generated <code>WIRES</code>.</td></tr>
+                <tr><td>Final rack branch</td><td><code>tele-w_ats_rack_0…9</code></td><td>V / A / kW</td><td>230 V; 6 kW per representative rack.</td><td><code>calcPowerFlow()</code> rack destination rule.</td></tr>
+                <tr><td>CDP feeder</td><td><code>tele-w_cdp</code></td><td>V / A / kW</td><td>230 V; controls load presentation.</td><td><code>WIRES</code>.</td></tr>
+                <tr><td>Total load</td><td><code>val-total-load</code></td><td>kW</td><td>2,400–2,499 while either utility is on; illustrative jitter.</td><td><code>updateStatusBar()</code> with <code>Math.random()</code>.</td></tr>
+                <tr><td>Power factor</td><td><code>val-pf</code></td><td>ratio</td><td>0.92–0.95 jitter.</td><td><code>updateStatusBar()</code>.</td></tr>
+                <tr><td>Frequency</td><td><code>val-freq</code></td><td>Hz</td><td>Approximately 49.95–50.05, shown to 0.1 Hz.</td><td><code>updateStatusBar()</code>.</td></tr>
+                <tr><td>Breaker roll-up</td><td><code>val-breakers</code></td><td>closed / total</td><td>Direct state count.</td><td><code>SIM.breakers</code>.</td></tr>
+                <tr><td>Alarm roll-up</td><td><code>val-alarms</code></td><td>count</td><td>Number of breakers in trip.</td><td><code>SIM.breakers</code> filter.</td></tr>
+                <tr><td>System mode</td><td><code>val-system</code></td><td>state</td><td>ONLINE if either utility boolean is true; otherwise GEN MODE.</td><td><code>updateStatusBar()</code>.</td></tr>
+                <tr><td>Last update</td><td><code>val-timestamp</code></td><td>local time</td><td>Browser time, 1 s cadence.</td><td><code>Date().toLocaleTimeString()</code>.</td></tr>
+            </tbody></table></div>
+        </section>
+
+        <section class="mn-section" id="formulas">
+            <h2><span class="mn-num">06</span> Formulas &amp; derivations</h2>
+            <div class="mn-formula"><span class="mn-eq">Facility_kW = IT_kW × PUE = 1,850 × 1.45 = 2,682.5 kW</span><span class="mn-eq">NonIT_kW = Facility_kW − IT_kW = 832.5 kW</span><span class="mn-where">Source: <code>CONV_CALC.snapshot.site</code> and the Conventional manual. These values drive the top strip, not the jittered bottom Total Load.</span></div>
+            <div class="mn-formula"><span class="mn-eq">I_3φ = P_kW × 1,000 / (√3 × V_LL × PF)</span><span class="mn-eq">Example: 2,400 kW at 20,000 V and PF 0.90 → 76.98 A → 76 A after floor()</span><span class="mn-where">The cockpit applies this three-phase formula to every displayed wire, including 230 V rack branches. The latter is an acknowledged modeling shortcut; a single-phase branch would use <code>I=P/V/PF</code>.</span></div>
+            <div class="mn-formula"><span class="mn-eq">closedBreakers = count(SIM.breakers[state = closed])</span><span class="mn-eq">activeAlarms = count(SIM.breakers[state = trip])</span><span class="mn-where">These roll-ups are deterministic for a given interaction sequence.</span></div>
+            <div class="mn-formula"><span class="mn-eq">TotalLoad_kW = utilityAvailable ? 2,400 + floor(random × 100) : 0</span><span class="mn-eq">PF = round2(0.92 + random × 0.03)</span><span class="mn-eq">f_Hz = round1(50.0 + (random − 0.5) × 0.1)</span><span class="mn-where">These are simulator display functions, not engineering calculations or meter models. The manual marks them as illustrative until replaced by one reconciled scenario source.</span></div>
+        </section>
+
+        <section class="mn-section" id="ux">
+            <h2><span class="mn-num">07</span> UX &amp; interaction specification</h2>
+            <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Interaction</th><th>Required behavior</th><th>Accessibility / failure behavior</th></tr></thead><tbody>
+                <tr><td>Source / tie selection</td><td>State, LED, ATS sequence, flow and log update together.</td><td>Controls require button semantics and an accessible pressed/state label; color alone is insufficient.</td></tr>
+                <tr><td>Breaker selection</td><td>Click toggles; Alt opens; Shift trips.</td><td>Hidden modifier gestures must be documented in-context before production use; focus/keyboard parity is required.</td></tr>
+                <tr><td>Zoom / pan / fit</td><td>Viewport remains bounded and fit excludes the fixed sidebar/topbar.</td><td>Buttons expose names; reduced motion disables flow animation without hiding energized state.</td></tr>
+                <tr><td>Export</td><td>PDF preview and CSV/JSON downloads reflect current simulator state.</td><td>Popup/download failure returns visible feedback; exports state that data is simulated.</td></tr>
+                <tr><td>Alarm presentation</td><td>A trip changes symbol, count and fault state.</td><td>Text and symbol supplement red; unexpected open and trip must remain distinct.</td></tr>
+                <tr><td>Mobile</td><td>Toolbar scrolls internally and the document does not overflow horizontally.</td><td>Core status and doc links remain reachable at 360 px; desktop diagram scope is disclosed.</td></tr>
+                <tr><td>Reports / log</td><td>New actions appear newest first with timestamps where applicable.</td><td>No report or log is described as a persistent historian.</td></tr>
+            </tbody></table></div>
+        </section>
+
+        <section class="mn-section" id="acceptance">
+            <h2><span class="mn-num">08</span> Acceptance criteria</h2>
+            <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>ID</th><th>Given / when / then</th><th>Evidence</th></tr></thead><tbody>
+                <tr><td>AC-01</td><td>Given <code>CONV_CALC.snapshot</code>, when the page loads, then top-strip values are 2.68 MW, 1.85 MW and 1.45.</td><td>DOM assertion against engine output.</td></tr>
+                <tr><td>AC-02</td><td>Given Utility A on, when it is toggled off, then its button and reachable flow become off and an event is logged.</td><td>Puppeteer interaction.</td></tr>
+                <tr><td>AC-03</td><td>Given both utilities unavailable, when ATS delays settle, then system mode is GEN MODE and required generator paths close.</td><td>Fake-clock state sequence.</td></tr>
+                <tr><td>AC-04</td><td>Given utility restoration, then generator breaker opens before utility breaker closes for that stream.</td><td>Fake-clock state sequence.</td></tr>
+                <tr><td>AC-05</td><td>Given an open MV tie, when Tie is selected, then <code>br_mv_tie</code> closes and the control reads active.</td><td>State/DOM assertion.</td></tr>
+                <tr><td>AC-06</td><td>Given any breaker, when Shift-clicked, then its state is trip and alarm count increases by one.</td><td>Pointer modifier E2E.</td></tr>
+                <tr><td>AC-07</td><td>Given a tripped breaker, when returned to closed/open, then alarm count decreases and symbol leaves trip state.</td><td>DOM/state assertion.</td></tr>
+                <tr><td>AC-08</td><td>Given an energized modeled wire, then its flow class is present and its telemetry label is non-zero.</td><td>DOM class/text assertion.</td></tr>
+                <tr><td>AC-09</td><td>Given a de-energized wire, then its label reads <code>0V 0A 0kW</code>.</td><td>DOM assertion.</td></tr>
+                <tr><td>AC-10</td><td>Given each zoom preset and Fit, then the indicator and transform change without losing breaker state.</td><td>Interaction plus state snapshot.</td></tr>
+                <tr><td>AC-11</td><td>Given a drag and wheel input, then pan/scale stay finite and scale remains 0.15–2.0.</td><td>Transform parse assertion.</td></tr>
+                <tr><td>AC-12</td><td>Given each export action, then a report/download is created with current sources, generators and breakers.</td><td>Popup/download capture.</td></tr>
+                <tr><td>AC-13</td><td>Given the default simulator, then breaker roll-up equals the model count and alarm count is zero.</td><td>Direct JavaScript/DOM comparison.</td></tr>
+                <tr><td>AC-14</td><td>Given 360 px width, then page scroll width does not exceed viewport width and PRD/Manual links remain reachable.</td><td>Responsive render measurement.</td></tr>
+                <tr><td>AC-15</td><td>Given reduced-motion preference, then energized state remains legible without animated dash flow.</td><td>Computed-style screenshot.</td></tr>
+                <tr><td>AC-16</td><td>Given PRD and Manual pages, then neither is access-gated and both load shared shell/RZExplain scripts.</td><td>Static contract and browser load.</td></tr>
+                <tr><td>AC-17</td><td>Given cockpit link injection, then the diff contains exactly two added anchor lines and no deleted cockpit line.</td><td><code>git diff --unified=0</code>.</td></tr>
+                <tr><td>AC-18</td><td>Given the full interaction journey, then no uncaught console error occurs.</td><td>Captured console/page error stream.</td></tr>
+            </tbody></table></div>
+        </section>
+
+        <section class="mn-section" id="non-functional">
+            <h2><span class="mn-num">09</span> Non-functional requirements</h2>
+            <div class="mn-grid">
+                <article class="mn-card"><h3>Performance</h3><ul><li>Initial interactive state within 2.5 s on a mid-tier mobile CPU when served locally.</li><li>The 500 ms power-flow and 1 s status intervals must not overlap or grow DOM nodes except bounded log entries.</li><li>Pan/zoom should sustain 30 fps on the full SVG.</li></ul></article>
+                <article class="mn-card"><h3>Accessibility</h3><ul><li>WCAG 2.2 AA contrast and 44 px mobile targets.</li><li>Every click control needs keyboard parity, name, role and state.</li><li>Line/breaker meaning must combine text, geometry and color.</li></ul></article>
+                <article class="mn-card"><h3>Resilience</h3><ul><li>If <code>CONV_CALC</code> is unavailable, show an explicit unavailable quality state rather than silently trusting fallback numerals.</li><li>Blocked popup/download returns actionable feedback.</li><li>No external service is required for the simulator core.</li></ul></article>
+                <article class="mn-card"><h3>Compatibility</h3><ul><li>Current Chromium, Firefox and Safari desktop; current mobile Safari/Chrome for navigation and overview.</li><li>SVG geometry and exports remain standards-based.</li><li>No access-gate is added to docs.</li></ul></article>
+            </div>
+        </section>
+
+        <section class="mn-section" id="provenance">
+            <h2><span class="mn-num">10</span> Provenance &amp; sources</h2>
+            <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Source</th><th>Governs</th><th>Binding / use</th></tr></thead><tbody>
+                <tr><td><code>EPMS_Telemetry.html</code></td><td>Visible topology, controls, state machine, telemetry assignment and exports.</td><td>Primary implementation source.</td></tr>
+                <tr><td><code>js/conv-engine.js</code></td><td>1,850 kW IT, 2,682.5 kW facility and PUE 1.45 shared basis.</td><td>Top status strip through <code>CONV_CALC.snapshot</code>.</td></tr>
+                <tr><td><a class="mn-inline" href="../manual/epms-telemetry.html">EPMS Technical Manual</a></td><td>Electrical formulas, transfer sequence, point interpretation and worked examples.</td><td>Human-readable methodology.</td></tr>
+                <tr><td>IEC 60364</td><td>Low-voltage installation principles and conductor/protection context.</td><td>Design reference only; simulator is not a compliance calculation.</td></tr>
+                <tr><td>IEC 60909</td><td>Short-circuit current calculation framework.</td><td>Future study boundary; no fault level is currently calculated.</td></tr>
+                <tr><td>IEC 61850 / IEC 60870-5-104</td><td>Substation communication and telemetry concepts.</td><td>Future integration context; no live protocol client exists.</td></tr>
+                <tr><td>IEEE C37.2</td><td>Device function numbering for protection/control nomenclature.</td><td>Recommended detail for future breaker inspector.</td></tr>
+                <tr><td>NFPA 70E / IEEE 1584</td><td>Electrical safety and arc-flash study context.</td><td>Explicit non-goal until project-specific study data exists.</td></tr>
+                <tr><td>Conventional review docs 00, 02, 09 and 12</td><td>Cross-page reconciliation, EPMS gaps, engineering basis and acceptance criteria.</td><td>Risk and target-state source.</td></tr>
+            </tbody></table></div>
+        </section>
+
+        <section class="mn-section" id="risks">
+            <h2><span class="mn-num">11</span> Open questions &amp; risks</h2>
+            <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Risk / open question</th><th>Current evidence</th><th>Required resolution</th></tr></thead><tbody>
+                <tr><td>Site total is internally inconsistent.</td><td>Top strip is 2.6825 MW from <code>CONV_CALC</code>; bottom Total Load jitters at 2.4–2.499 MW.</td><td>Bind both to one scenario with an explicit metering tolerance, or label bottom value as a separate sample meter.</td></tr>
+                <tr><td>Ten visible racks do not reconcile to 1.85 MW IT.</td><td>Ten × 6 kW = 60 kW; the page does not label the row as representative.</td><td>Declare representative scope or render aggregate PDU rows whose sum matches IT.</td></tr>
+                <tr><td>Wire kW is destination-name based.</td><td>Values 2,400/1,000/300/60/30/6 kW are assignments, not a conserved load-flow model.</td><td>Replace with a topology-aware allocation that balances at each bus.</td></tr>
+                <tr><td>230 V rack current uses the three-phase formula.</td><td>One formula is applied to all wires.</td><td>Declare phase model per branch and use single- or three-phase calculation accordingly.</td></tr>
+                <tr><td>Source colors conflict with alarm semantics.</td><td>Stream A is fault-red and stream C is purple even when normal.</td><td>Move source identity to labels/markers; reserve red for trip and avoid purple as primary operational chrome.</td></tr>
+                <tr><td>Top status fields can become stale.</td><td>Utility/UPS/Gen/Trips/Data are static while lower simulator state changes.</td><td>Bind to the same state object and expose timestamp/quality per point.</td></tr>
+                <tr><td>Breaker gestures are undiscoverable and lack confirmation.</td><td>Alt/Shift behavior exists only in code; any diagram click changes state.</td><td>Add explicit training controls, keyboard semantics and confirmation for destructive/safety-like actions.</td></tr>
+                <tr><td>ATS timing is illustrative.</td><td>1 s restoration and 2 s generator start are browser timers, not equipment curves/interlocks.</td><td>Label simulated timing and model sync/check permissives before any operational claim.</td></tr>
+                <tr><td>Generator/capacity duty is not reconciled.</td><td>Three 2.5 MW sets are shown without required-running/N+1 or fuel coupling.</td><td>Derive duty and autonomy from facility load and documented generator curve.</td></tr>
+                <tr><td>Data quality says GOOD without point freshness.</td><td>No acquisition timestamp, stale threshold or bad-quality state per wire.</td><td>Adopt <code>RZTelemetryQuality</code> or equivalent point-level quality contract.</td></tr>
+                <tr><td>Export omits simulation provenance.</td><td>Files contain current values but not a formal data-mode field.</td><td>Add schema/version/data-mode and units without changing existing behavior until separately approved.</td></tr>
+            </tbody></table></div>
+            <div class="mn-actions"><a class="mn-action primary" href="../EPMS_Telemetry.html">Open cockpit</a><a class="mn-action" href="../manual/epms-telemetry.html">Read technical manual</a></div>
+        </section>
+    </main>
+
+    <script>
+    (function(){
+        var toggle=document.getElementById('themeToggle');
+        var saved=localStorage.getItem('theme')||localStorage.getItem('rz_theme')||'light';
+        document.documentElement.setAttribute('data-theme',saved);
+        if(toggle)toggle.addEventListener('click',function(){
+            var next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+            document.documentElement.setAttribute('data-theme',next);
+            localStorage.setItem('theme',next);localStorage.setItem('rz_theme',next);
+        });
+        var scrollables=document.querySelectorAll('.mn-tablewrap,.mn-formula');
+        for(var i=0;i<scrollables.length;i++)scrollables[i].setAttribute('tabindex','0');
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=1.129.0" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=1.129.0" defer></script>
+    <script src="../js/rz-explain-db.js?v=2026-07-27" defer></script>
+    <script src="../js/rz-explain.js?v=2026-07-27" defer></script>
+</body>
+</html>

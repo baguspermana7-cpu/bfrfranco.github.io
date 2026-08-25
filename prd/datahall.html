@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Hall SCADA Console — Product Requirements | ResistanceZero</title>
+    <meta name="description" content="Product requirements for the deterministic Data Hall SCADA Console: rack telemetry, cooling balance, alarm thresholds, workflows and acceptance criteria.">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://resistancezero.com/prd/datahall.html">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Data Hall SCADA Console — Product Requirements">
+    <meta property="og:description" content="Traceable product contract for the rack, cooling and alarm cockpit behind the Data Hall SCADA Console.">
+    <meta property="og:url" content="https://resistancezero.com/prd/datahall.html">
+    <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
+    <link rel="icon" href="../assets/Favicon.png" type="image/png">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"Product Requirements","item":"https://resistancezero.com/prd/"},{"@type":"ListItem","position":3,"name":"Data Hall SCADA Console"}]}
+    </script>
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"TechArticle","headline":"Data Hall SCADA Console — Product Requirements","author":{"@type":"Person","name":"Bagus Dwi Permana"},"publisher":{"@type":"Organization","name":"ResistanceZero"},"about":"Deterministic data hall rack, cooling, alarm and telemetry cockpit product contract","proficiencyLevel":"Expert"}
+    </script>
+    <style>
+        :root {
+            --bg:#081016; --surface:#0d171e; --surface-2:#101d25; --text:#e7edf3;
+            --muted:#9ba8b5; --line:rgba(231,237,243,.12); --cyan:#2be8ff;
+            --amber:#ffaa00; --green:#00e68a; --red:#ff5c68;
+            --mono:'JetBrains Mono','IBM Plex Mono',ui-monospace,monospace;
+            --sans:'IBM Plex Sans',system-ui,sans-serif;
+        }
+        [data-theme="dark"] { --bg:#081016; --surface:#0d171e; --surface-2:#101d25; --text:#e7edf3; --muted:#9ba8b5; --line:rgba(231,237,243,.12); }
+        :root:not([data-theme="dark"]) { --bg:#f4f7f9; --surface:#fff; --surface-2:#edf2f5; --text:#15202a; --muted:#4b5b68; --line:rgba(21,32,42,.17); --cyan:#087f99; --amber:#9a5b00; --green:#087d55; --red:#b52c3a; }
+        html,body { overflow-x:hidden; max-width:100%; }
+        body { background:var(--bg); color:var(--text); font-family:var(--sans); }
+        .mn-wrap { width:min(1120px,calc(100% - 2rem)); margin:0 auto; padding:5.5rem 0 5rem; }
+        .mn-crumb { font:500 .74rem/1.5 var(--mono); color:var(--muted); margin-bottom:1rem; }
+        .mn-crumb a,.mn-inline { color:var(--cyan); text-decoration:none; }
+        .mn-hero { background:var(--surface); border:1px solid var(--line); border-left:1px solid var(--cyan); border-radius:5px; padding:1.65rem; }
+        .mn-eyebrow { color:var(--cyan); font:600 .7rem/1.4 var(--mono); letter-spacing:.14em; text-transform:uppercase; }
+        .mn-hero h1 { margin:.45rem 0 .7rem; font-size:clamp(1.65rem,4vw,2.7rem); line-height:1.1; }
+        .mn-hero p { color:var(--muted); max-width:76ch; line-height:1.65; }
+        .mn-meta { display:flex; flex-wrap:wrap; gap:.45rem; margin-top:1rem; }
+        .mn-chip { border:1px solid var(--line); border-radius:3px; padding:.28rem .5rem; color:var(--muted); font:500 .69rem/1.3 var(--mono); }
+        .mn-section { margin:2.2rem 0; scroll-margin-top:5rem; }
+        .mn-section h2 { display:flex; gap:.65rem; align-items:baseline; margin:0 0 .45rem; font-size:1.32rem; }
+        .mn-num { color:var(--cyan); border:1px solid var(--line); border-radius:3px; padding:.06rem .38rem; font:600 .75rem/1.4 var(--mono); }
+        .mn-lead { color:var(--muted); max-width:78ch; line-height:1.65; }
+        .mn-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.75rem; margin-top:1rem; }
+        .mn-card,.mn-note { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:1rem; }
+        .mn-card h3 { margin:0 0 .35rem; font:600 .86rem/1.4 var(--mono); color:var(--text); }
+        .mn-card p,.mn-card li,.mn-note { color:var(--muted); font-size:.86rem; line-height:1.55; }
+        .mn-card ul,.mn-card ol { margin:.45rem 0 0; padding-left:1.15rem; }
+        .mn-note { border-left:1px solid var(--amber); margin:.9rem 0; }
+        .mn-tablewrap { overflow-x:auto; border:1px solid var(--line); border-radius:4px; margin-top:1rem; }
+        .mn-table { width:100%; min-width:760px; border-collapse:collapse; font-size:.81rem; }
+        .mn-table th,.mn-table td { padding:.58rem .65rem; text-align:left; vertical-align:top; border-bottom:1px solid var(--line); line-height:1.48; }
+        .mn-table th { background:var(--surface-2); color:var(--muted); font:600 .67rem/1.35 var(--mono); letter-spacing:.06em; text-transform:uppercase; }
+        .mn-table tbody tr:last-child td { border-bottom:0; }
+        code,.mn-mono { font-family:var(--mono); color:var(--cyan); font-size:.92em; font-feature-settings:'zero' 1,'tnum' 1; }
+        .mn-formula { background:var(--surface-2); border:1px solid var(--line); border-left:1px solid var(--cyan); border-radius:4px; padding:.9rem 1rem; margin:.75rem 0; overflow-x:auto; font:500 .82rem/1.65 var(--mono); }
+        .mn-eq { display:block; white-space:nowrap; }
+        .mn-where { display:block; color:var(--muted); white-space:normal; margin-top:.4rem; }
+        .mn-actions { display:flex; flex-wrap:wrap; gap:.65rem; margin-top:1.2rem; }
+        .mn-action { min-height:44px; display:inline-flex; align-items:center; padding:.55rem .85rem; border:1px solid var(--amber); border-radius:4px; color:var(--amber); text-decoration:none; font:600 .76rem/1.2 var(--mono); }
+        .mn-action.primary { background:var(--amber); color:#151006; }
+        @media (max-width:768px) {
+            html,body { overflow-x:hidden; max-width:100vw; }
+            img,svg,video { max-width:100%; height:auto; }
+            .mn-wrap { width:min(100% - 1rem,1120px); padding:5rem 0 4rem; }
+            .mn-hero { padding:1.2rem; }
+            .mn-grid { grid-template-columns:1fr; }
+            .nav-menu,.nav-links { display:none; }
+            button,a.btn,[role="button"],.mn-action { min-height:44px; }
+        }
+        @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; animation:none!important; transition:none!important; } }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/rz-documentation-ui.css?v=1.129.0">
+    <script src="../js/rz-documentation-ui.js?v=1.129.0" defer></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo"><img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Product Requirements</a></li>
+                <li><a href="../manual/datahall.html" class="nav-link">Manual</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode"><span aria-hidden="true">◐</span></button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap" data-explain-scan>
+        <div class="mn-crumb"><a href="../index.html">Home</a> / <a href="index.html">PRD</a> / Data Hall SCADA Console</div>
+        <header class="mn-hero">
+            <div class="mn-eyebrow">Product requirements · deterministic operations cockpit</div>
+            <h1>Data Hall SCADA Console</h1>
+            <p>A traceable product contract for the conventional Hall A rack heat-map, alarm strip, cooling balance and equipment inspection workflow. The cockpit consumes one frozen <code>CONV_CALC.snapshot</code>; it is a simulated engineering/education surface, not a live SCADA endpoint.</p>
+            <div class="mn-meta">
+                <span class="mn-chip">Cockpit <strong>datahall.html</strong></span>
+                <span class="mn-chip">Engine <strong>js/conv-engine.js</strong></span>
+                <span class="mn-chip">Basis <strong>1,850 kW IT</strong></span>
+                <span class="mn-chip">Scope <strong>Hall A / 200 cells</strong></span>
+                <span class="mn-chip">Data mode <strong>SIMULATED</strong></span>
+            </div>
+        </header>
+
+        <section class="mn-section" id="purpose">
+            <h2><span class="mn-num">01</span> Purpose &amp; problem</h2>
+            <p class="mn-lead">Operators need to move from a facility-level alarm to the affected row, rack or CRAH without losing the power/cooling reconciliation basis. Static rack plans do not show loading, redundancy or data provenance; raw BMS point lists do not show spatial consequence.</p>
+            <div class="mn-grid">
+                <article class="mn-card"><h3>Product outcome</h3><p>Present alarm severity, rack distribution, cold-aisle condition, cooling headroom and N+1 status in one ordered workflow, with every basis KPI traceable to code or the technical manual.</p></article>
+                <article class="mn-card"><h3>Decision supported</h3><p>Identify where attention is required, whether the electrical and rack totals reconcile, whether cooling capacity survives one CRAH loss, and which equipment record to inspect next.</p></article>
+            </div>
+        </section>
+
+        <section class="mn-section" id="users">
+            <h2><span class="mn-num">02</span> Users &amp; personas</h2>
+            <p class="mn-lead">The same surface serves different readers; the product must not force a commissioning engineer and a learner to infer the provenance of a number differently.</p>
+            <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Persona</th><th>Goal</th><th>Primary read</th><th>Success condition</th></tr></thead><tbody>
+                <tr><td>Data-center operator</td><td>Triage a rack/cooling alarm quickly.</td><td>Alarm strip → active semantic layer → equipment inspector.</td><td>Can name severity, source tag and next inspection step without opening documentation.</td></tr>
+                <tr><td>Facilities engineer</td><td>Check cooling capacity and redundancy.</td><td>CHW plant, cooling margin, CRAH states and N+1 calculation.</td><td>Can reproduce 2,210 kW running and 2,080 kW post-failure capacity.</td></tr>
+                <tr><td>Electrical/EPMS reviewer</td><td>Reconcile rack total to protected IT output.</td><td>Balance band and rack load roll-up.</td><td>Any difference between rack sum and EPMS snapshot is explicit.</td></tr>
+                <tr><td>Commissioning engineer</td><td>Review point naming, thresholds and interaction sequence.</td><td>Tagged racks/CRAHs, alarm list, modes, event log.</td><td>Can turn every visible behavior into a deterministic test.</td></tr>
+                <tr><td>Educator / learner</td><td>Understand why color and capacity states change.</td><td>Basis drawers, Manual and formula references.</td><td>Can distinguish measured, derived, target and simulated values.</td></tr>
+            </tbody></table></div>
+        </section>
+
+        <section class="mn-section" id="scope">
+            <h2><span class="mn-num">03</span> Scope &amp; non-goals</h2>
+            <div class="mn-grid">
+                <article class="mn-card"><h3>In scope</h3><ul><li>Hall A rack field: 10 zones × 20 cells.</li><li>Rack power, utilization, space and temperature views.</li><li>Twenty CRAHs with 17 running and three standby.</li><li>Cooling/EPMS reconciliation, alarm counts, quality and timestamp.</li><li>Rack/CRAH inspection, training excursion and event log.</li></ul></article>
+                <article class="mn-card"><h3>Non-goals</h3><ul><li>No field BMS, EPMS, DCIM or historian connection.</li><li>No command write-back, alarm acknowledgement or maintenance dispatch.</li><li>No CFD, transient thermal model or vendor selection.</li><li>No guarantee that the illustrative thresholds are approved site set-points.</li><li>No production safety or procurement decision.</li></ul></article>
+            </div>
+        </section>
+
+        <section class="mn-section" id="functional">
+            <h2><span class="mn-num">04</span> Functional requirements</h2>
+            <p class="mn-lead">Each requirement maps a visible cockpit element or interaction. IDs reference <code>datahall.html</code>.</p>
+            <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>ID</th><th>Requirement</th><th>Acceptance</th></tr></thead><tbody>
+                <tr><td>FR-01</td><td>Show a top alarm strip with overall state, critical, warning, maintenance, communications, last update, data quality and scenario.</td><td>All eight groups render above the engineering roll-up and update without page reload.</td></tr>
+                <tr><td>FR-02</td><td>Declare the source mode as simulated.</td><td><code>data-rz-data-mode="simulated"</code> and the visible Scenario chip agree.</td></tr>
+                <tr><td>FR-03</td><td>Show Hall state, rack load, cooling margin, PUE and power density in the engineering roll-up.</td><td>Each item has a stable ID and keyboard-accessible basis trigger.</td></tr>
+                <tr><td>FR-04</td><td>Bind critical roll-up values to one <code>CONV_CALC.snapshot</code>.</td><td>Reloading does not change IT, PUE, rack count or the derived density.</td></tr>
+                <tr><td>FR-05</td><td>Render CH-01/02 RUN and CH-03 STBY plus CHWS, CHWR, ΔT and CHW flow.</td><td>Plant panel reads engine cooling fields; labels retain units.</td></tr>
+                <tr><td>FR-06</td><td>Render 20 CRAH units with stable <code>CRAH-Axx</code> tags.</td><td>17 units are RUN and three STBY in the locked scenario.</td></tr>
+                <tr><td>FR-07</td><td>Show IT load, rack count/average, utilization, EPMS balance, cooling headroom and N+1 in the balance band.</td><td>Displayed arithmetic matches §06 exactly.</td></tr>
+                <tr><td>FR-08</td><td>Render 200 rack cells across ten zones with deterministic occupancy and load weights.</td><td>Rack layout and values are identical over repeated reloads.</td></tr>
+                <tr><td>FR-09</td><td>Normalize occupied rack values so their sum equals 1,850 kW.</td><td>Balance to the engine/EPMS IT point is zero within display rounding.</td></tr>
+                <tr><td>FR-10</td><td>Expose Power Density mode.</td><td>Each rack shows the utilization tier against its 15 kW rating.</td></tr>
+                <tr><td>FR-11</td><td>Expose Cold-Aisle Temperature mode.</td><td>Zone temperature uses the declared normal baseline and semantic thresholds.</td></tr>
+                <tr><td>FR-12</td><td>Expose Cooling Margin mode.</td><td>Rack/zone display communicates capacity headroom without changing the basis.</td></tr>
+                <tr><td>FR-13</td><td>Expose Alarms mode.</td><td>Warning/critical sources correspond to the alarm list and top counts.</td></tr>
+                <tr><td>FR-14</td><td>Expose Space mode.</td><td>Unoccupied cells are visually distinct from zero-load faults.</td></tr>
+                <tr><td>FR-15</td><td>Keep the two layer selectors synchronized.</td><td><code>mode-btn</code> and <code>data-bms-layer</code> pressed states name the same semantic layer.</td></tr>
+                <tr><td>FR-16</td><td>Provide a visible legend for the selected layer.</td><td>Legend text and colors change with <code>setMode()</code>.</td></tr>
+                <tr><td>FR-17</td><td>Show rack detail on hover and persist it on click.</td><td>Tag, kW, utilization, zone and tier are available without relying on color alone.</td></tr>
+                <tr><td>FR-18</td><td>Show a CRAH popover on unit selection.</td><td>Tag, RUN/STBY, SAT, RAT, fan, valve and assigned capacity are displayed.</td></tr>
+                <tr><td>FR-19</td><td>Evaluate rack warning above 85% and critical above 95% of rating.</td><td>Counts, rack styling and alarm list share one evaluation result.</td></tr>
+                <tr><td>FR-20</td><td>Evaluate cold-aisle warning above 26°C and critical above 30°C.</td><td>Zone styling and alarm list use the same thresholds.</td></tr>
+                <tr><td>FR-21</td><td>Report maintenance count as installed CRAHs minus running CRAHs.</td><td>Locked result is 3, not an unrelated alarm count.</td></tr>
+                <tr><td>FR-22</td><td>Provide a bounded training excursion.</td><td>Explicit simulator changes one zone/CRAH for 10–15 seconds and restores the deterministic baseline.</td></tr>
+                <tr><td>FR-23</td><td>Maintain a time-stamped local event log.</td><td>State changes append readable entries and do not claim historian persistence.</td></tr>
+                <tr><td>FR-24</td><td>Provide basis drawers for State, Rack Load, Cooling Margin, PUE and Density.</td><td>Click and keyboard activation show formula, inputs, output and source.</td></tr>
+                <tr><td>FR-25</td><td>Provide Back, Portfolio, PRD and Manual navigation.</td><td>All four links are visible, keyboard reachable and resolve correctly.</td></tr>
+                <tr><td>FR-26</td><td>Preserve theme, mobile navigation and cookie controls.</td><td>Shared shell scripts load without console errors.</td></tr>
+            </tbody></table></div>
+        </section>
+
+        <section class="mn-section" id="data-model">
+            <h2><span class="mn-num">05</span> Data model &amp; telemetry points</h2>
+            <p class="mn-lead">Nominal values are the locked simulated basis. Alarm semantics are training rules, not field-approved trip settings.</p>
+            <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Signal</th><th>Symbol / ID</th><th>Unit / nominal range</th><th>Color / alarm semantics</th><th>Source binding</th></tr></thead><tbody>
+                <tr><td>Overall hall state</td><td><code>as-state</code></td><td>NORMAL / WARN / CRITICAL</td><td>Green / amber / red from worst active alarm.</td><td><code>alarms[]</code> roll-up.</td></tr>
+                <tr><td>Critical count</td><td><code>as-crit</code></td><td>count; 0 normal</td><td>Red when non-zero.</td><td>Rack &gt;95% plus aisle &gt;30°C filters.</td></tr>
+                <tr><td>Warning count</td><td><code>as-warn</code></td><td>count; 0 normal</td><td>Amber when non-zero.</td><td>Rack &gt;85% plus aisle &gt;26°C filters.</td></tr>
+                <tr><td>Maintenance count</td><td><code>as-maint</code></td><td>3 locked</td><td>Maintenance/standby, not failure.</td><td>20 CRAH − 17 running.</td></tr>
+                <tr><td>Communications</td><td><code>as-comms</code></td><td>OK</td><td>GOOD presentation only; no live transport.</td><td>Local page state.</td></tr>
+                <tr><td>Last update</td><td><code>as-update</code></td><td>HH:MM:SS</td><td>Muted timestamp.</td><td>Browser clock tick.</td></tr>
+                <tr><td>Data quality</td><td><code>as-dq</code></td><td>GOOD</td><td>Green quality chip.</td><td>Simulated local model declaration.</td></tr>
+                <tr><td>Scenario</td><td><code>as-scn</code></td><td>Simulated</td><td>Cyan provenance chip.</td><td><code>body[data-rz-data-mode]</code>.</td></tr>
+                <tr><td>IT / rack load</td><td><code>dh-rack-load</code></td><td>1.85 MW</td><td>Neutral numeric; basis-enabled.</td><td><code>snapshot.site.it_load_kw</code>.</td></tr>
+                <tr><td>PUE</td><td><code>dh-pue</code></td><td>1.45 ratio</td><td>Derived/measured basis, separate from target.</td><td><code>snapshot.site.pue</code>.</td></tr>
+                <tr><td>Power density</td><td><code>dh-pd</code></td><td>9.25 kW/rack average</td><td>Neutral aggregate.</td><td>1,850 kW ÷ 200 racks.</td></tr>
+                <tr><td>Cooling headroom</td><td><code>bb-cool</code></td><td>360 kW; 19.5% of demand</td><td>Green while positive and N+1 passes.</td><td>2,210 − 1,850 kW.</td></tr>
+                <tr><td>Cooling N+1</td><td><code>bb-np1</code></td><td>PASS</td><td>Green PASS; red FAIL.</td><td>2,080 kW post-failure vs 1,850 kW demand.</td></tr>
+                <tr><td>EPMS balance</td><td><code>bb-balance</code></td><td>kW / %; target 0</td><td>Pass only within declared rounding tolerance.</td><td>Σ rack kW − <code>epms_ups_output_kw</code>.</td></tr>
+                <tr><td>Rack power</td><td><code>rack[data-idx]</code></td><td>0–15+ kW; sum 1,850 kW</td><td>Muted spare; green &lt;70%; amber 70–95%; red &gt;95%.</td><td>Fixed hash weights normalized to site IT.</td></tr>
+                <tr><td>Rack utilization</td><td><code>rack.util</code></td><td>fraction of 15 kW</td><td>Same tier table as rack power.</td><td><code>rack.kw / RACK_RATING_KW</code>.</td></tr>
+                <tr><td>Cold-aisle temperature</td><td><code>zone.coldAisleC</code></td><td>≈21.7–22.3°C normal</td><td>Warn &gt;26°C; critical &gt;30°C.</td><td>Deterministic zone baseline; explicit excursion may override temporarily.</td></tr>
+                <tr><td>Zone airflow</td><td><code>zone.airflow</code></td><td>m³/s</td><td>Engineering numeric, no standalone alarm.</td><td><code>zoneHeatDesign/(ρcp×11 K)</code>.</td></tr>
+                <tr><td>CRAH state</td><td><code>CRAH-A01..A20</code></td><td>17 RUN / 3 STBY</td><td>Green RUN; muted standby.</td><td><code>crahUnits[].running</code>.</td></tr>
+                <tr><td>CRAH supply air</td><td><code>crahUnits[].sat</code></td><td>°C</td><td>Detail-only numeric.</td><td>CHWS + 8°C coil approach in page model.</td></tr>
+                <tr><td>CRAH return air</td><td><code>crahUnits[].rat</code></td><td>°C</td><td>Detail-only numeric.</td><td>SAT + 11 K design air rise.</td></tr>
+                <tr><td>CRAH fan / valve</td><td><code>fan</code>, <code>valve</code></td><td>72% / 64% when running</td><td>Zero for standby.</td><td>Locked illustrative unit state.</td></tr>
+                <tr><td>CHWS / CHWR / ΔT</td><td><code>chws</code>, <code>chwr</code>, <code>chdt</code></td><td>7.2°C / 14.8°C / 7.6 K</td><td>Basis numeric.</td><td><code>snapshot.cooling</code>.</td></tr>
+                <tr><td>CHW flow</td><td><code>chflow</code></td><td>58.1 L/s</td><td>Derived numeric.</td><td><code>1,850/(4.186×7.6)</code>.</td></tr>
+            </tbody></table></div>
+        </section>
+
+        <section class="mn-section" id="formulas">
+            <h2><span class="mn-num">06</span> Formulas &amp; derivations</h2>
+            <div class="mn-formula"><span class="mn-eq">averageRack_kW = IT_kW / rackCount = 1,850 / 200 = 9.25 kW/rack</span><span class="mn-eq">rackUtilization = rack_kW / 15 kW</span><span class="mn-where">Rack weights are normalized so <code>Σ rack_kW = 1,850 kW</code>; a residual rounding correction is applied to the highest occupied rack. Manual §09–10.</span></div>
+            <div class="mn-formula"><span class="mn-eq">coolingAvailable = CRAH_running × CRAH_unit = 17 × 130 = 2,210 kW</span><span class="mn-eq">headroom = 2,210 − 1,850 = 360 kW</span><span class="mn-eq">N+1 = (17 − 1) × 130 = 2,080 kW ≥ 1,850 kW</span><span class="mn-where">Capacity comparison from the page constants; this is not a CFD airflow-distribution proof.</span></div>
+            <div class="mn-formula"><span class="mn-eq">CHW ΔT = 14.8 − 7.2 = 7.6 K</span><span class="mn-eq">CHW flow = Q / (Cp × ΔT) = 1,850 / (4.186 × 7.6) = 58.1 L/s</span><span class="mn-where">Water density convention is embedded in the L/s formulation. Source: <a class="mn-inline" href="../manual/datahall.html">Data Hall Manual calculation methodology</a> and <code>CONV_CALC</code>.</span></div>
+            <div class="mn-formula"><span class="mn-eq">zoneAirflow = (1,850 / 10) / ((1.2 × 1.006) × 11) m³/s</span><span class="mn-eq">physicsReturn = supplyAir + zoneHeat / (ρCp × airflow)</span><span class="mn-where">The cockpit computes the physics value as an excursion ceiling but deliberately displays a calm deterministic ≈22°C normal inlet baseline. This limitation must remain visible.</span></div>
+        </section>
+
+        <section class="mn-section" id="ux">
+            <h2><span class="mn-num">07</span> UX &amp; interaction specification</h2>
+            <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Interaction</th><th>Required behavior</th><th>Accessibility / failure behavior</th></tr></thead><tbody>
+                <tr><td>Mode selection</td><td>Power, temperature, cooling margin, alarms and space update racks and legend together.</td><td>Pressed/current state is available beyond color; keyboard controls remain operable.</td></tr>
+                <tr><td>Rack hover/click</td><td>Hover gives transient tooltip; click persists detail and selection.</td><td>Detail text names tag, value and tier; no color-only meaning.</td></tr>
+                <tr><td>CRAH selection</td><td>Open tagged equipment popover anchored near the selected unit.</td><td>Dialog has a readable title and must remain within the viewport.</td></tr>
+                <tr><td>Basis cards</td><td>Click/Enter/Space opens formula, inputs, result and source.</td><td>Escape closes; focus returns to the trigger.</td></tr>
+                <tr><td>Mobile 360 px</td><td>Alarm, toolbar and rack content wrap or scroll internally without widening the document.</td><td>No hidden doc links; targets are at least 44 px.</td></tr>
+                <tr><td>Theme</td><td>Dark and light palettes preserve semantic states and readable surfaces.</td><td>No white body/block in dark mode; AA contrast target.</td></tr>
+                <tr><td>Training excursion</td><td>Clearly label simulated transient, log it, restore baseline automatically.</td><td>Reduced-motion preference disables nonessential animation; state text remains.</td></tr>
+            </tbody></table></div>
+        </section>
+
+        <section class="mn-section" id="acceptance">
+            <h2><span class="mn-num">08</span> Acceptance criteria</h2>
+            <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>ID</th><th>Given / when / then</th><th>Evidence</th></tr></thead><tbody>
+                <tr><td>AC-01</td><td>Given a fresh load, when the engine initializes, then rack sum, roll-up IT and EPMS IT are 1,850 kW within display rounding.</td><td>DOM values plus engine snapshot assertion.</td></tr>
+                <tr><td>AC-02</td><td>Given 200 cells, when density is derived, then the average is 9.25 kW/rack.</td><td>Deterministic unit test and rendered basis drawer.</td></tr>
+                <tr><td>AC-03</td><td>Given 17 × 130 kW running CRAHs, when one is removed, then 2,080 kW still covers 1,850 kW and N+1 reads PASS.</td><td>Formula assertion and DOM chip.</td></tr>
+                <tr><td>AC-04</td><td>Given repeated reloads, then rack occupancy, rack load and normal zone temperatures remain identical.</td><td>Multi-reload browser comparison.</td></tr>
+                <tr><td>AC-05</td><td>Given a rack above 85% but not 95%, then it and the alarm list are warning, not critical.</td><td>Boundary fixture at 85%, 85.1%, 95%.</td></tr>
+                <tr><td>AC-06</td><td>Given a rack above 95%, then critical count, alarm row and rack state agree.</td><td>Injected deterministic fixture.</td></tr>
+                <tr><td>AC-07</td><td>Given aisle temperature above 26°C / 30°C, then warning / critical states use the documented strict comparisons.</td><td>Boundary fixture.</td></tr>
+                <tr><td>AC-08</td><td>Given each view button, when activated, then pressed state, legend and rack rendering select the same mode.</td><td>Puppeteer interaction loop.</td></tr>
+                <tr><td>AC-09</td><td>Given a rack and CRAH selection, then their detail surfaces show a stable tag and source-backed values.</td><td>Browser click assertions.</td></tr>
+                <tr><td>AC-10</td><td>Given keyboard focus on a basis KPI, when Enter or Space is pressed, then the basis dialog opens and Escape closes it.</td><td>Keyboard E2E.</td></tr>
+                <tr><td>AC-11</td><td>Given a training excursion, then the Simulated label stays visible and the deterministic baseline returns after the bounded interval.</td><td>Fake-clock E2E.</td></tr>
+                <tr><td>AC-12</td><td>Given 360 px width, then document scroll width does not exceed viewport width.</td><td>Puppeteer measurement.</td></tr>
+                <tr><td>AC-13</td><td>Given dark mode, then no body or major content surface is white.</td><td>Computed-style/render gate.</td></tr>
+                <tr><td>AC-14</td><td>Given the cockpit toolbar, PRD and Manual links are visible and navigate to public pages.</td><td>Navigation E2E.</td></tr>
+                <tr><td>AC-15</td><td>Given the full interaction journey, then no uncaught console or page errors occur.</td><td>Captured browser error stream.</td></tr>
+            </tbody></table></div>
+        </section>
+
+        <section class="mn-section" id="non-functional">
+            <h2><span class="mn-num">09</span> Non-functional requirements</h2>
+            <div class="mn-grid">
+                <article class="mn-card"><h3>Performance</h3><p>First meaningful operator state must render from local assets without a network API. Interaction work should remain responsive with 200 rack cells and 20 CRAHs; no unbounded timers or DOM growth.</p></article>
+                <article class="mn-card"><h3>Accessibility</h3><p>Target WCAG 2.2 AA: keyboard modes/dialogs, visible focus, semantic labels, 44 px mobile targets, non-color state text and reduced-motion handling.</p></article>
+                <article class="mn-card"><h3>Compatibility</h3><p>Current evergreen Chromium, Firefox and Safari; vanilla JavaScript, no build step. Failure of optional analytics/auth must not break this public documentation.</p></article>
+                <article class="mn-card"><h3>Integrity &amp; privacy</h3><p>No credentials, external write or live-site identifier. Simulated provenance is visible. HTML insertion uses controlled internal strings; user/external data requires text-safe rendering.</p></article>
+            </div>
+        </section>
+
+        <section class="mn-section" id="provenance">
+            <h2><span class="mn-num">10</span> Provenance &amp; sources</h2>
+            <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Source</th><th>What it governs</th><th>Trace</th></tr></thead><tbody>
+                <tr><td><code>datahall.html</code></td><td>Visible elements, rack spatial model, semantic tiers, CRAH availability and interaction logic.</td><td>Source of truth for FR-01–FR-26.</td></tr>
+                <tr><td><code>js/conv-engine.js</code></td><td>Frozen 1,850 kW IT, 1.45 PUE, EPMS reconciliation and cooling values.</td><td><code>window.CONV_CALC.snapshot</code>.</td></tr>
+                <tr><td><a class="mn-inline" href="../manual/datahall.html">Data Hall Technical Manual</a></td><td>Formula definitions, worked 1,850 kW example, assumptions and operating sequence.</td><td>Manual §§01–11.</td></tr>
+                <tr><td><code>standarization/ACCURACY_VALIDATION.md</code></td><td>One source of truth, denominator, deterministic KPI, target-versus-derived and provenance rules.</td><td>Accuracy gate and probes.</td></tr>
+                <tr><td>ISO/IEC 30134-2</td><td><span data-explain="PUE">PUE</span> definition and facility/IT boundary.</td><td>Applied through the manual and frozen engine.</td></tr>
+                <tr><td>ASHRAE TC 9.9 thermal guidance</td><td>Recommended inlet envelope context; cockpit warning/critical limits remain explicit training choices.</td><td>Manual references and risk R-03.</td></tr>
+                <tr><td>IEC 62040-3</td><td>UPS performance context for the 96% efficiency assumption in the conventional model.</td><td>Manual calculation basis.</td></tr>
+            </tbody></table></div>
+        </section>
+
+        <section class="mn-section" id="risks">
+            <h2><span class="mn-num">11</span> Open questions &amp; risks</h2>
+            <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Risk</th><th>Current decision</th><th>Required follow-up</th></tr></thead><tbody>
+                <tr><td>R-01 · Site scope</td><td>The engine site total is intentionally modelled as one Hall A so rack sum equals 1,850 kW.</td><td>If multiple halls are introduced, add explicit site/hall allocation before changing any denominator.</td></tr>
+                <tr><td>R-02 · Simulated fidelity</td><td>Normal rack/zone states are deterministic; excursions are educational.</td><td>Do not relabel as live without authenticated point transport, freshness and quality semantics.</td></tr>
+                <tr><td>R-03 · Alarm thresholds</td><td>85%/95% rack and 26°C/30°C aisle thresholds are visible cockpit rules.</td><td>Validate and version against site cause/effect and approved set-point schedule before operations use.</td></tr>
+                <tr><td>R-04 · Airflow model</td><td>The page computes a simple sensible balance but normalizes displayed inlet temperature near 22°C.</td><td>Use commissioned sensor data or CFD for distribution/recirculation claims.</td></tr>
+                <tr><td>R-05 · Cooling redundancy</td><td>Capacity arithmetic proves N+1 nameplate coverage only.</td><td>Add hydraulic/electrical dependency and common-mode analysis for design approval.</td></tr>
+                <tr><td>R-06 · Accessibility</td><td>Automated AA checks and keyboard journeys are release gates.</td><td>Retain manual screen-reader/usability review for modal and dense heat-map semantics.</td></tr>
+            </tbody></table></div>
+            <div class="mn-note"><strong>Acceptance boundary:</strong> this PRD documents what the current simulated cockpit must do. It does not promote illustrative constants into commissioned site requirements.</div>
+        </section>
+
+        <div class="mn-actions">
+            <a class="mn-action primary" href="../datahall.html">Open cockpit</a>
+            <a class="mn-action" href="../manual/datahall.html">Read methodology manual</a>
+            <a class="mn-action" href="index.html">All PRDs</a>
+        </div>
+    </main>
+
+    <script>
+    (function(){
+        var toggle=document.getElementById('themeToggle');
+        var theme=localStorage.getItem('theme')||localStorage.getItem('rz_theme')||'dark';
+        document.documentElement.setAttribute('data-theme',theme);
+        if(toggle)toggle.addEventListener('click',function(){var current=document.documentElement.getAttribute('data-theme');var next=current==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',next);localStorage.setItem('theme',next);localStorage.setItem('rz_theme',next);});
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-08-23" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=1.129.0" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=1.129.0" defer></script>
+    <script src="../js/rz-explain.js?v=2026-08-23" defer></script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conventional DC Dashboard — Product Requirements | ResistanceZero</title>
+    <meta name="description" content="Product requirements for the Conventional DC dashboard: locked facility KPIs, alarms, subsystem telemetry, basis drawers, reports, and acceptance tests.">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://resistancezero.com/prd/dc-conventional.html">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Conventional DC Dashboard — Product Requirements">
+    <meta property="og:description" content="Traceable product contract for the conventional facility power, cooling, environment, resilience and alarm overview.">
+    <meta property="og:url" content="https://resistancezero.com/prd/dc-conventional.html">
+    <meta property="og:image" content="https://resistancezero.com/assets/DC_Conventional.jpg">
+    <link rel="icon" href="../assets/Favicon.png" type="image/png">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"Product Requirements","item":"https://resistancezero.com/prd/"},{"@type":"ListItem","position":3,"name":"Conventional DC Dashboard"}]}
+    </script>
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"TechArticle","headline":"Conventional DC Dashboard — Product Requirements","author":{"@type":"Person","name":"Bagus Dwi Permana"},"publisher":{"@type":"Organization","name":"ResistanceZero"},"about":"Conventional data-center facility power, cooling, sustainability, resilience and alarm overview product contract","proficiencyLevel":"Expert"}
+    </script>
+    <style>
+        :root{--bg:#081016;--surface:#0d171e;--surface-2:#101d25;--text:#e7edf3;--muted:#9ba8b5;--line:rgba(231,237,243,.12);--cyan:#2be8ff;--amber:#ffaa00;--green:#00e68a;--red:#ff5c68;--mono:'JetBrains Mono','IBM Plex Mono',ui-monospace,monospace;--sans:'IBM Plex Sans',system-ui,sans-serif}
+        [data-theme="dark"]{--bg:#081016;--surface:#0d171e;--surface-2:#101d25;--text:#e7edf3;--muted:#9ba8b5;--line:rgba(231,237,243,.12)}:root:not([data-theme="dark"]){--bg:#f4f7f9;--surface:#fff;--surface-2:#edf2f5;--text:#15202a;--muted:#4b5b68;--line:rgba(21,32,42,.17);--cyan:#00677d;--amber:#9a5b00;--green:#087d55;--red:#b52c3a}
+        html,body{overflow-x:hidden;max-width:100%}body{background:var(--bg);color:var(--text);font-family:var(--sans)}.skip-link{position:absolute;left:.75rem;top:-5rem;z-index:9999;background:var(--amber);color:#151006;padding:.65rem .9rem}.skip-link:focus{top:.75rem}:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+        .mn-wrap{width:min(1120px,calc(100% - 2rem));margin:0 auto;padding:5.5rem 0 5rem}.mn-crumb{font:500 .74rem/1.5 var(--mono);color:var(--muted);margin-bottom:1rem}.mn-crumb a,.mn-inline{color:var(--cyan)}.mn-crumb a{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px}.mn-inline{text-decoration:none}.mn-hero{background:var(--surface);border:1px solid var(--line);border-left:1px solid var(--cyan);border-radius:5px;padding:1.65rem}.mn-eyebrow{color:var(--cyan);font:600 .7rem/1.4 var(--mono);letter-spacing:.14em;text-transform:uppercase}.mn-hero h1{margin:.45rem 0 .7rem;font-size:clamp(1.65rem,4vw,2.7rem);line-height:1.1}.mn-hero p{color:var(--muted);max-width:70ch;line-height:1.65}.mn-meta{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:1rem}.mn-chip{border:1px solid var(--line);border-radius:3px;padding:.28rem .5rem;color:var(--muted);font:500 .69rem/1.3 var(--mono)}
+        .mn-section{margin:2.2rem 0;scroll-margin-top:5rem}.mn-section h2{display:flex;gap:.65rem;align-items:baseline;margin:0 0 .45rem;font-size:1.32rem}.mn-num{color:var(--cyan);border:1px solid var(--line);border-radius:3px;padding:.06rem .38rem;font:600 .75rem/1.4 var(--mono)}.mn-lead{color:var(--muted);max-width:70ch;line-height:1.65}.mn-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem;margin-top:1rem}.mn-card,.mn-note{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:1rem}.mn-card h3{margin:0 0 .35rem;font:600 .86rem/1.4 var(--mono)}.mn-card p,.mn-card li,.mn-note{color:var(--muted);font-size:.86rem;line-height:1.55}.mn-card ul,.mn-card ol{margin:.45rem 0 0;padding-left:1.15rem}.mn-note{border-left:1px solid var(--amber);margin:.9rem 0}
+        .mn-tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:4px;margin-top:1rem}.mn-table{width:100%;min-width:820px;border-collapse:collapse;font-size:.81rem;font-variant-numeric:tabular-nums}.mn-table th,.mn-table td{padding:.58rem .65rem;text-align:left;vertical-align:top;border-bottom:1px solid var(--line);line-height:1.48}.mn-table th{background:var(--surface-2);color:var(--muted);font:600 .67rem/1.35 var(--mono);letter-spacing:.06em;text-transform:uppercase}.mn-table tbody tr:last-child td{border-bottom:0}code,.mn-mono{font-family:var(--mono);color:var(--cyan);font-size:.92em;font-feature-settings:'zero' 1,'tnum' 1}.mn-formula{background:var(--surface-2);border:1px solid var(--line);border-left:1px solid var(--cyan);border-radius:4px;padding:.9rem 1rem;margin:.75rem 0;overflow-x:auto;font:500 .82rem/1.65 var(--mono);font-feature-settings:'zero' 1,'tnum' 1}.mn-eq{display:block;white-space:nowrap}.mn-where{display:block;color:var(--muted);white-space:normal;margin-top:.4rem}.mn-actions{display:flex;flex-wrap:wrap;gap:.65rem;margin-top:1.2rem}.mn-action{min-height:44px;display:inline-flex;align-items:center;padding:.55rem .85rem;border:1px solid var(--amber);border-radius:4px;color:var(--amber);text-decoration:none;font:600 .76rem/1.2 var(--mono)}.mn-action.primary{background:#f0a300;color:#151006}
+        @media(max-width:768px){html,body{overflow-x:hidden;max-width:100vw}img,svg,video{max-width:100%;height:auto}.mn-wrap{width:min(100% - 1rem,1120px);padding:5rem 0 4rem}.mn-hero{padding:1.2rem}.mn-grid{grid-template-columns:1fr}.nav-menu,.nav-links{display:none}button,a.btn,[role="button"],.mn-action{min-height:44px}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation:none!important;transition:none!important}}@media print{.navbar,.mn-actions{display:none!important}body{background:#fff;color:#111}.mn-section{break-inside:avoid}}
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/rz-documentation-ui.css?v=1.129.0">
+    <script src="../js/rz-documentation-ui.js?v=1.129.0" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <nav class="navbar"><div class="nav-container"><a href="../index.html" class="nav-logo"><img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a><ul class="nav-menu"><li><a href="../index.html" class="nav-link">Home</a></li><li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li><li><a href="index.html" class="nav-link">Product Requirements</a></li><li><a href="../manual/dc-conventional.html" class="nav-link">Manual</a></li></ul><button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">Theme</button><button class="hamburger" aria-label="Open navigation menu" aria-expanded="false"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button></div></nav>
+
+    <main class="mn-wrap" id="main-content" data-explain-scan>
+        <div class="mn-crumb"><a href="../index.html">Home</a> / <a href="index.html">PRD</a> / Conventional DC Dashboard</div>
+        <header class="mn-hero"><div class="mn-eyebrow">Product requirements · locked conventional facility overview</div><h1>Conventional DC Dashboard</h1><p>A deterministic product contract for the facility alarm strip, power/cooling/environment/sustainability KPIs, contextual image, subsystem routes, basis drawers, generated design and FAQ in <code>dc-conventional.html</code>. The cockpit is a modeled teaching aid, not live BMS telemetry.</p><div class="mn-meta"><span class="mn-chip">Engine <strong>CONV_CALC v1.0.0</strong></span><span class="mn-chip">IT <strong>1,850 kW</strong></span><span class="mn-chip">Facility <strong>2,682.5 kW</strong></span><span class="mn-chip">Mode <strong>SIMULATED</strong></span></div></header>
+
+        <section class="mn-section" id="purpose"><h2><span class="mn-num">01</span> Purpose &amp; problem</h2><p class="mn-lead">A conventional facility overview must reconcile electrical demand, cooling duty, environment, resilience and alarm state before routing a user to subsystem pages. Static marketing callouts cannot provide that trust; every primary result needs a denominator, source class and repeatable calculation.</p><div class="mn-grid"><article class="mn-card"><h3>Operational outcome</h3><p>Expose abnormal state first, then the minimum site-level values needed to decide which subsystem to inspect.</p></article><article class="mn-card"><h3>Engineering outcome</h3><p>Keep PUE, facility/IT load, CHW, WUE, carbon and fuel arithmetic on one immutable scenario and surface placeholders honestly.</p></article></div></section>
+
+        <section class="mn-section" id="users"><h2><span class="mn-num">02</span> Users &amp; personas</h2><div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Persona</th><th>Goal</th><th>Primary read</th><th>Success condition</th></tr></thead><tbody>
+            <tr><td>Facilities operator</td><td>Determine whether the site is normal and where to drill next.</td><td>Alarm strip → KPI strip → subsystem rail.</td><td>Can name alarm count, comms/quality, active capacity and next subsystem.</td></tr>
+            <tr><td>Electrical engineer</td><td>Reconcile protected IT, facility input and UPS sharing.</td><td>IT/Total/PUE, UPS A/B and EPMS route.</td><td>Can reproduce facility load and normal/failover UPS percentages.</td></tr>
+            <tr><td>Mechanical engineer</td><td>Check CHW temperatures, flow basis and heat rejection.</td><td>Cooling stats, Chiller Plant route and basis drawer.</td><td>Can reproduce 7.6 K, 58.1 L/s and 1,927.1 kW.</td></tr>
+            <tr><td>Sustainability analyst</td><td>Interpret PUE, WUE, grid factor and CUE denominators.</td><td>Efficiency panel and basis drawers.</td><td>Can distinguish 0.42 facility-kWh grid factor from 0.609 IT-kWh CUE.</td></tr>
+            <tr><td>Commissioning / design reviewer</td><td>Turn each value/control into a deterministic check.</td><td>BoD, generated design, FAQ, PRD/manual and engine snapshot.</td><td>No displayed fact lacks source class or known limitation.</td></tr>
+            <tr><td>Educator / learner</td><td>Understand the energy/water/fuel balance of a conventional DC.</td><td>Photo context, formulas, glossary and subsystem pages.</td><td>Can reproduce the worked scenario without treating it as site advice.</td></tr>
+        </tbody></table></div></section>
+
+        <section class="mn-section" id="scope"><h2><span class="mn-num">03</span> Scope &amp; non-goals</h2><div class="mn-grid"><article class="mn-card"><h3>In scope</h3><ul><li>Facility alarm/quality summary.</li><li>Site power, cooling, water, carbon, environment, safety, network and fuel overview.</li><li>Locked <code>CONV_MODEL</code> and derived <code>CONV_CALC.snapshot</code>.</li><li>Seven subsystem navigation routes, KPI basis drawers, generated design, FAQ and theme.</li><li>Tier-gated cockpit with separate public documentation.</li></ul></article><article class="mn-card"><h3>Non-goals</h3><ul><li>No live BMS/EPMS/DCIM acquisition or control.</li><li>No configurable design calculator or field setpoint editor.</li><li>No outage historian, grid API, calibrated water meter or generator fuel curve.</li><li>No stamped engineering, procurement, safety or regulatory conclusion.</li><li>No claim that static “Normal/Online” rows are measured values.</li></ul></article></div></section>
+
+        <section class="mn-section" id="functional"><h2><span class="mn-num">04</span> Functional requirements</h2><div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>ID</th><th>Visible element / requirement</th><th>Acceptance</th></tr></thead><tbody>
+            <tr><td>FR-01</td><td>Preserve the cockpit tier gate while PRD and Manual remain public.</td><td>Pro/Educator/Root policy remains owned by shared auth; docs contain no gate.</td></tr>
+            <tr><td>FR-02</td><td>Provide Portfolio, DC Solutions, PRD and Manual links.</td><td>All are visible in <code>.header-left</code> and keyboard reachable.</td></tr>
+            <tr><td>FR-03</td><td>Show title, modeled status indicator and WIB clock.</td><td>Clock changes only time; “LIVE” styling does not override simulated disclosure.</td></tr>
+            <tr><td>FR-04</td><td>Provide Generate Design, FAQ and Theme controls.</td><td>Each control opens/toggles the intended surface without changing the locked model.</td></tr>
+            <tr><td>FR-05</td><td>Provide subsystem routes to EPMS, Data Hall, Chiller Plant, Fire, Fuel, Water and ICT.</td><td>All seven links resolve and retain tooltip description.</td></tr>
+            <tr><td>FR-06</td><td>Show alarm state, Critical, Warning, Maintenance/Bypass, Comms, Stale, Last Update, Data Quality and Scenario.</td><td>Nine groups render before KPI content and use one snapshot/rule evaluation.</td></tr>
+            <tr><td>FR-07</td><td>Evaluate overall state from critical/warning counts.</td><td>CRITICAL outranks WARNING; NORMAL appears only when both are zero.</td></tr>
+            <tr><td>FR-08</td><td>Evaluate PUE, chiller redundancy, environment and fuel thresholds deterministically.</td><td><code>paintAlarmStrip(snapshot)</code> returns identical counts over reloads.</td></tr>
+            <tr><td>FR-09</td><td>Show maintenance count as installed minus running chillers.</td><td>Locked scenario reads 1 (3 installed − 2 running).</td></tr>
+            <tr><td>FR-10</td><td>Show PUE KPI and basis drawer.</td><td>Value 1.45 and target ≤1.5 are distinct; drawer shows facility/IT inputs.</td></tr>
+            <tr><td>FR-11</td><td>Show WUE KPI and basis drawer.</td><td>1.20 L/kWh IT and 37.0 L/min equivalent makeup are traceable.</td></tr>
+            <tr><td>FR-12</td><td>Show grid-factor KPI and basis drawer.</td><td>0.42 kgCO₂/kWh facility is not labeled as CUE.</td></tr>
+            <tr><td>FR-13</td><td>Show IT Load KPI and basis drawer.</td><td>1,850 kW out of 2,000 kW design and utilization are shown.</td></tr>
+            <tr><td>FR-14</td><td>Show Uptime KPI and basis drawer.</td><td>99.98% remains labeled a design placeholder until event-bound.</td></tr>
+            <tr><td>FR-15</td><td>Show Temperature KPI and basis drawer.</td><td>22.4°C is labeled simulated and placed against the stated band.</td></tr>
+            <tr><td>FR-16</td><td>Show Chillers KPI and basis drawer.</td><td>2/3 and one spare reconcile to the snapshot.</td></tr>
+            <tr><td>FR-17</td><td>Show Alarms KPI.</td><td>Count and Normal text agree with the alarm strip.</td></tr>
+            <tr><td>FR-18</td><td>Show six operational image callouts.</td><td>PUE, IT, CHW, temperature, fuel and RH values retain units and engine binding where available.</td></tr>
+            <tr><td>FR-19</td><td>Show Efficiency stats.</td><td>PUE, WUE, Grid factor and CUE_IT remain separate rows with denominator tooltips.</td></tr>
+            <tr><td>FR-20</td><td>Show Power stats.</td><td>Total, IT and UPS A/B normal/failover values reconcile to the snapshot/display rule.</td></tr>
+            <tr><td>FR-21</td><td>Show Cooling stats.</td><td>CH-1/2, 2/3 chillers, 12/14 CRAHs, CHWS and CHWR remain visible; static vs engine-bound is disclosed.</td></tr>
+            <tr><td>FR-22</td><td>Show Network &amp; Reliability stats.</td><td>Network, UPS topology and uptime rows retain state/source class.</td></tr>
+            <tr><td>FR-23</td><td>Show Environment stats.</td><td>Temperature, RH and differential pressure remain visible with units/source class.</td></tr>
+            <tr><td>FR-24</td><td>Show Safety stats.</td><td>FACP and VESDA rows remain labeled static modeled states.</td></tr>
+            <tr><td>FR-25</td><td>Show Fuel stats.</td><td>Main/day tank levels and 48 h bulk-tank autonomy retain scope.</td></tr>
+            <tr><td>FR-26</td><td>Bind all primary derivations to one snapshot.</td><td>No <code>Math.random()</code> affects PUE, WUE, grid factor, IT, total, CHW, temperature, RH or fuel.</td></tr>
+            <tr><td>FR-27</td><td>Provide keyboard basis-drawer activation.</td><td>Click/Enter/Space open formula/input/output/source; Escape/scrim/close dismiss.</td></tr>
+            <tr><td>FR-28</td><td>Generate a full technical design report from the snapshot.</td><td>Power, cooling, water, fire, fuel, ICT/BMS, carbon and cost sections use one captured basis.</td></tr>
+            <tr><td>FR-29</td><td>Provide FAQ dialog.</td><td>Ten questions disclose locked scenario, standards, arithmetic and educational scope.</td></tr>
+            <tr><td>FR-30</td><td>Provide scroll-to-top, theme and responsive behavior.</td><td>Controls remain named, reachable and do not cause horizontal overflow.</td></tr>
+        </tbody></table></div></section>
+
+        <section class="mn-section" id="data-model"><h2><span class="mn-num">05</span> Data model &amp; telemetry points</h2><div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Signal</th><th>Symbol / ID</th><th>Unit</th><th>Nominal / semantics</th><th>Source binding</th></tr></thead><tbody>
+            <tr><td>Overall alarm state</td><td><code>as-state</code>, <code>as-state-txt</code></td><td>state</td><td>NORMAL/WARNING/ALARM from worst count.</td><td><code>paintAlarmStrip(snapshot)</code>.</td></tr>
+            <tr><td>Critical / warning</td><td><code>as-crit</code>, <code>as-warn</code></td><td>count</td><td>0 nominal; red/amber only when non-zero.</td><td>Threshold rules.</td></tr>
+            <tr><td>Maintenance / bypass</td><td><code>as-maint</code></td><td>count</td><td>1 locked standby chiller.</td><td><code>chillers_total − chillers_running</code>.</td></tr>
+            <tr><td>Comms / stale</td><td><code>as-comms</code>, <code>as-stale</code></td><td>state / count</td><td>OK / 0 if versioned snapshot exists.</td><td><code>snapshot.meta</code>; no live transport.</td></tr>
+            <tr><td>Last update</td><td><code>as-update</code>, <code>clock</code></td><td>local time</td><td>Browser clock.</td><td><code>rzTick()</code>.</td></tr>
+            <tr><td>Data quality / scenario</td><td><code>as-dq</code>, <code>as-scn</code></td><td>quality / mode</td><td>GOOD / Simulated.</td><td><code>snapshot.meta</code>.</td></tr>
+            <tr><td>PUE</td><td><code>kpiPue</code>, <code>cPue</code>, <code>sPue</code></td><td>ratio</td><td>1.45; warn above 1.5.</td><td><code>snapshot.site.pue</code>.</td></tr>
+            <tr><td>WUE</td><td><code>kpiWue</code>, <code>sWue</code></td><td>L/kWh IT</td><td>1.20.</td><td><code>snapshot.environment.wue_l_per_kwh</code>.</td></tr>
+            <tr><td>Grid factor</td><td><code>kpiCarbon</code>, <code>sCue</code></td><td>kgCO₂/kWh facility</td><td>0.42; not CUE.</td><td><code>snapshot.environment.carbon_kg_per_facility_kwh</code>.</td></tr>
+            <tr><td>CUE IT-basis</td><td><code>sCueIt</code></td><td>kgCO₂/kWh IT</td><td>0.609, displayed 0.61.</td><td>grid factor × PUE.</td></tr>
+            <tr><td>IT load</td><td><code>kpiIt</code>, <code>cIt</code>, <code>sItLoad</code></td><td>kW / MW</td><td>1,850 kW / 1.85 MW.</td><td><code>snapshot.site.it_load_kw</code>.</td></tr>
+            <tr><td>Facility load</td><td><code>sTotalLoad</code></td><td>kW</td><td>2,682.5, shown 2,683.</td><td><code>snapshot.site.facility_load_kw</code>.</td></tr>
+            <tr><td>Non-IT load</td><td>basis/report</td><td>kW</td><td>832.5.</td><td><code>snapshot.site.non_it_load_kw</code>.</td></tr>
+            <tr><td>UPS A/B load</td><td><code>sUpsA</code>, <code>sUpsB</code></td><td>%</td><td>46% normal / 92% failover, based on 2,000 kW/module display assumption.</td><td><code>updateData()</code>.</td></tr>
+            <tr><td>CHWS / CHWR</td><td><code>cChw</code>, <code>sChwSup</code>, <code>sChwRet</code></td><td>°C</td><td>7.2 / 14.8; primary chilled-water loop.</td><td><code>snapshot.cooling</code>.</td></tr>
+            <tr><td>CHW ΔT / flow</td><td>basis/report</td><td>K / L/s</td><td>7.6 / 58.1.</td><td><code>chwDeltaT()</code>, <code>chwFlowLps()</code>.</td></tr>
+            <tr><td>Heat rejection</td><td>basis/report</td><td>kW</td><td>1,927.1.</td><td><code>heatRejectionKw()</code>.</td></tr>
+            <tr><td>Chiller count</td><td>KPI / Cooling row</td><td>count</td><td>2/3 running; one maintenance/spare.</td><td><code>snapshot.cooling.chillers_*</code>.</td></tr>
+            <tr><td>Chiller unit state</td><td>CH-1 / CH-2 rows</td><td>% / state</td><td>85% / 78% static presentation.</td><td>Static markup, not snapshot point.</td></tr>
+            <tr><td>CRAH count</td><td>Cooling row</td><td>count</td><td>12/14 static presentation.</td><td>Static markup.</td></tr>
+            <tr><td>Temperature / RH</td><td><code>kpiTemp</code>, <code>cTemp</code>, <code>cRh</code>, <code>sTempAvg</code>, <code>sRhAvg</code></td><td>°C / %</td><td>22.4 / 48; warn outside 18–27°C or 20–80% RH; critical temp &gt;32°C.</td><td><code>snapshot.environment</code>.</td></tr>
+            <tr><td>Differential pressure</td><td>Environment DP</td><td>Pa</td><td>+2.1 static presentation.</td><td>Static markup.</td></tr>
+            <tr><td>Fuel level</td><td><code>cFuel</code>, <code>sFuelMain</code></td><td>%</td><td>85; source model.</td><td><code>snapshot.fuel.level_pct</code>.</td></tr>
+            <tr><td>Day tank</td><td>Fuel Day Tank row</td><td>%</td><td>92 static presentation.</td><td>Static markup.</td></tr>
+            <tr><td>Usable fuel / autonomy</td><td>Fuel Autonomy row / basis</td><td>L / h</td><td>45,900 L / 48.0 h; warn below 24 h, critical below 12 h.</td><td><code>fuelUsableL()</code>, <code>fuelAutonomyHr()</code>.</td></tr>
+            <tr><td>Water equivalent flow</td><td>basis/report</td><td>L/min</td><td>37.0.</td><td><code>waterFlowLpmForWue()</code>.</td></tr>
+            <tr><td>Carbon rate</td><td>basis/report</td><td>kgCO₂/h</td><td>1,126.7.</td><td><code>carbonKgPerHr()</code>.</td></tr>
+            <tr><td>Network / topology / uptime</td><td>Network, UPS Topology, Uptime rows</td><td>state / %</td><td>Online / 2N OK / 99.98% placeholder.</td><td>Static presentation and basis drawer disclosure.</td></tr>
+            <tr><td>Safety</td><td>FACP, VESDA rows</td><td>state</td><td>Normal static presentation.</td><td>Static markup.</td></tr>
+            <tr><td>Active racks</td><td>basis/report</td><td>count</td><td>308 @6, 231 @8, 185 @10 kW/rack.</td><td><code>activeRacks()</code>.</td></tr>
+        </tbody></table></div></section>
+
+        <section class="mn-section" id="formulas"><h2><span class="mn-num">06</span> Formulas &amp; derivations</h2>
+            <div class="mn-formula"><span class="mn-eq">Facility = IT × PUE = 1,850 × 1.45 = 2,682.5 kW</span><span class="mn-eq">NonIT = Facility − IT = 832.5 kW</span><span class="mn-where"><code>facilityLoadKw()</code>, <code>nonItLoadKw()</code>; Manual §03/06.</span></div>
+            <div class="mn-formula"><span class="mn-eq">UPS loss = IT × (1/η − 1) = 1,850 × (1/0.96 − 1) = 77.1 kW</span><span class="mn-eq">Shared module output = IT / 2 = 925 kW</span><span class="mn-where"><code>upsLossKw()</code>, <code>upsModuleKw()</code>. Page percentage uses a separate 2,000 kW/module display rating.</span></div>
+            <div class="mn-formula"><span class="mn-eq">ΔT = 14.8 − 7.2 = 7.6 K</span><span class="mn-eq">CHW flow = 1,850 / (4.186 × 7.6) = 58.1 L/s</span><span class="mn-eq">Heat rejection = IT + UPS loss = 1,927.1 kW</span><span class="mn-where"><code>chwDeltaT()</code>, <code>chwFlowLps()</code>, <code>heatRejectionKw()</code>.</span></div>
+            <div class="mn-formula"><span class="mn-eq">Water flow = WUE × IT / 60 = 1.20 × 1,850 / 60 = 37.0 L/min</span><span class="mn-where">Annual WUE definition expressed as steady-state equivalent makeup; actual instantaneous tower demand varies.</span></div>
+            <div class="mn-formula"><span class="mn-eq">Carbon rate = Facility × grid factor = 2,682.5 × 0.42 = 1,126.7 kgCO₂/h</span><span class="mn-eq">CUE_IT = grid factor × PUE = 0.42 × 1.45 = 0.609 kgCO₂/kWh IT</span><span class="mn-where">Denominators remain explicit.</span></div>
+            <div class="mn-formula"><span class="mn-eq">Usable fuel = 60,000 × 0.90 × 0.85 = 45,900 L</span><span class="mn-eq">Autonomy = 45,900 / 956 = 48.0 h</span><span class="mn-where"><code>fuelUsableL()</code>, <code>fuelAutonomyHr()</code>; consumption is an engineering basis, not a live curve.</span></div>
+        </section>
+
+        <section class="mn-section" id="ux"><h2><span class="mn-num">07</span> UX &amp; interaction specification</h2><div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Interaction</th><th>Required behavior</th><th>Accessibility / failure behavior</th></tr></thead><tbody>
+            <tr><td>Alarm strip</td><td>First read stays above disclaimer/KPIs and updates from one snapshot.</td><td>State text/counts supplement color; no pulse-only meaning.</td></tr>
+            <tr><td>Subsystem rail</td><td>Seven routes disclose target subsystem.</td><td>Keyboard links and tooltip text; decorative icons are not the only label.</td></tr>
+            <tr><td>KPI basis</td><td>Click/Enter/Space opens formula, inputs, output, scope, denominator, source, mode and timestamp.</td><td>Escape/scrim/close work and focus returns.</td></tr>
+            <tr><td>Generate Design</td><td>Capture one snapshot and generate a print-ready technical report.</td><td>Popup block produces visible instruction; generated document remains printable and sourced.</td></tr>
+            <tr><td>FAQ</td><td>Open ten expandable questions without changing data.</td><td>Dialog has title, close button, Escape behavior and readable focus order.</td></tr>
+            <tr><td>Theme</td><td>Switch light/dark and persist choice.</td><td>Semantic states retain contrast; no white major surface in dark mode.</td></tr>
+            <tr><td>Mobile</td><td>Header, KPI and panels wrap/stack without document overflow.</td><td>Primary status and PRD/Manual remain reachable at 360 px.</td></tr>
+            <tr><td>Restricted access</td><td>Unauthorized user receives the shared upgrade/sign-in flow.</td><td>Overlay is an alert dialog; public docs never inherit it.</td></tr>
+        </tbody></table></div></section>
+
+        <section class="mn-section" id="acceptance"><h2><span class="mn-num">08</span> Acceptance criteria</h2><div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>ID</th><th>Given / when / then</th><th>Evidence</th></tr></thead><tbody>
+            <tr><td>AC-01</td><td>Given the locked snapshot, then 1,850×1.45=2,682.5 kW and all three visible representations agree after rounding.</td><td>Engine/DOM assertion.</td></tr>
+            <tr><td>AC-02</td><td>Given repeated reloads, then all engine-bound KPI/callout/stat values are identical.</td><td>Multi-reload comparison.</td></tr>
+            <tr><td>AC-03</td><td>Given normal snapshot, then Critical=0, Warning=0, Maintenance=1, Comms=OK, Stale=0 and state=NORMAL.</td><td>Direct rule/DOM assertion.</td></tr>
+            <tr><td>AC-04</td><td>Given PUE &gt;1.5, then warning count increments and overall state is WARNING unless critical exists.</td><td>Injected snapshot fixture.</td></tr>
+            <tr><td>AC-05</td><td>Given temperature &gt;32°C or fuel autonomy &lt;12 h, then critical count/state agree.</td><td>Boundary fixtures.</td></tr>
+            <tr><td>AC-06</td><td>Given 7.2/14.8°C, then ΔT=7.6 K and flow=58.1 L/s.</td><td>Unit calculation.</td></tr>
+            <tr><td>AC-07</td><td>Given WUE 1.20 and IT 1,850 kW, then equivalent flow=37.0 L/min.</td><td>Unit calculation and basis drawer.</td></tr>
+            <tr><td>AC-08</td><td>Given grid factor 0.42, then rate=1,126.7 kgCO₂/h and CUE_IT=0.609.</td><td>Unit calculation and rendered stats.</td></tr>
+            <tr><td>AC-09</td><td>Given fuel basis, then usable fuel=45,900 L and autonomy=48.0 h.</td><td>Unit calculation and row.</td></tr>
+            <tr><td>AC-10</td><td>Given each seven subsystem link, then destination resolves.</td><td>Puppeteer navigation checks.</td></tr>
+            <tr><td>AC-11</td><td>Given each basis-enabled KPI, then click/Enter/Space opens matching content and Escape closes.</td><td>Keyboard interaction loop.</td></tr>
+            <tr><td>AC-12</td><td>Given Generate Design, then the report contains the same snapshot values and no literal script closer breaks parsing.</td><td>Popup capture, text checks, script audit.</td></tr>
+            <tr><td>AC-13</td><td>Given FAQ, then all ten questions render and the dialog closes from button, Escape and scrim.</td><td>Dialog E2E.</td></tr>
+            <tr><td>AC-14</td><td>Given supported tiers, then cockpit unlocks; given free/demo, then gate remains.</td><td>Tier fixtures.</td></tr>
+            <tr><td>AC-15</td><td>Given 360 px width, then no horizontal document overflow occurs.</td><td>Responsive measurement.</td></tr>
+            <tr><td>AC-16</td><td>Given dark mode, then no major white content surface appears and status contrast remains legible.</td><td>Computed-style screenshot.</td></tr>
+            <tr><td>AC-17</td><td>Given PRD/Manual link injection, then exactly two anchors are added and no cockpit line is deleted.</td><td>Git diff assertion.</td></tr>
+            <tr><td>AC-18</td><td>Given a representative full journey, then no uncaught console/page error occurs.</td><td>Captured browser error stream.</td></tr>
+        </tbody></table></div></section>
+
+        <section class="mn-section" id="non-functional"><h2><span class="mn-num">09</span> Non-functional requirements</h2><div class="mn-grid"><article class="mn-card"><h3>Performance</h3><ul><li>First meaningful overview within 2.5 s on a mid-tier mobile CPU with local assets.</li><li>One-second clock and five-second rebind remain idempotent and leak-free.</li><li>Generated report opens within 1 s after snapshot capture.</li></ul></article><article class="mn-card"><h3>Accessibility</h3><ul><li>WCAG 2.2 AA, 44 px mobile actions and visible amber focus.</li><li>Basis cards and dialogs have full keyboard path.</li><li>Units, source and state remain available beyond color.</li></ul></article><article class="mn-card"><h3>Reliability</h3><ul><li>Missing snapshot becomes FAULT/unavailable, never a silently trusted fallback.</li><li>All calculations stay pure and deterministic.</li><li>Static/placeholder rows remain explicitly classified.</li></ul></article><article class="mn-card"><h3>Security</h3><ul><li>Shared auth owns the tier decision; no secret in markup.</li><li>Docs remain public and carry no auth bypass.</li><li>No dashboard interaction sends a control command.</li></ul></article></div></section>
+
+        <section class="mn-section" id="provenance"><h2><span class="mn-num">10</span> Provenance &amp; sources</h2><div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Source</th><th>Governs</th><th>Binding / use</th></tr></thead><tbody>
+            <tr><td><code>dc-conventional.html</code></td><td>Visible controls, KPI cards, alarm rules, report, FAQ and gate.</td><td>Primary implementation source.</td></tr>
+            <tr><td><code>js/conv-engine.js</code></td><td>Immutable constants and all primary derived values.</td><td><code>CONV_MODEL</code>, <code>CONV_CALC.snapshot</code>.</td></tr>
+            <tr><td><a class="mn-inline" href="../manual/dc-conventional.html">Conventional DC Manual</a></td><td>Formula definitions, worked scenario, standards and limitations.</td><td>Public methodology companion.</td></tr>
+            <tr><td>Conventional review docs 00, 01, 09 and 12</td><td>Single capacity basis, dashboard direction, engineering calculations and QA criteria.</td><td>Requirements/risk authority.</td></tr>
+            <tr><td>ISO/IEC 30134-2</td><td>PUE/WUE definitions and denominator discipline.</td><td>Efficiency KPIs.</td></tr>
+            <tr><td>ISO/IEC 30134-8</td><td>CUE definition.</td><td>0.609 kgCO₂/kWh IT derivation.</td></tr>
+            <tr><td>ASHRAE TC 9.9</td><td>Thermal envelope context.</td><td>22.4°C/48% interpretation; site setpoints still require approval.</td></tr>
+            <tr><td>ASHRAE 90.1 / CIBSE Guide F / EN 50600</td><td>Facility energy and infrastructure design context.</td><td>Design/report background, not automatic compliance.</td></tr>
+            <tr><td>Uptime Institute Tier Standard</td><td>Resilience/topology intent.</td><td>Tier-III intent and fuel-resilience context; certification not claimed.</td></tr>
+            <tr><td>IEC 60364 / IEC 60909 / IEEE 1100</td><td>Power installation, fault and power-quality context.</td><td>Generated-design references; detailed studies out of scope.</td></tr>
+            <tr><td>NFPA 75/76</td><td>IT fire-protection context.</td><td>Safety subsystem reference; static Normal state is not compliance evidence.</td></tr>
+        </tbody></table></div></section>
+
+        <section class="mn-section" id="risks"><h2><span class="mn-num">11</span> Open questions &amp; risks</h2><div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Risk / open question</th><th>Current evidence</th><th>Required resolution</th></tr></thead><tbody>
+            <tr><td>“LIVE” label conflicts with modeled data.</td><td>Header says LIVE while scenario/FAQ says Simulated/BOD locked.</td><td>Replace or qualify the label in a separately authorized cockpit change.</td></tr>
+            <tr><td>Uptime is not measured.</td><td>99.98% is a design placeholder with no event-log binding.</td><td>Bind to dated downtime events or relabel as intent.</td></tr>
+            <tr><td>Several subsystem rows are static.</td><td>CH-1/2 %, CRAH count, network, FACP, VESDA, DP and day tank are markup literals.</td><td>Give each a model/source/quality/timestamp or label illustrative.</td></tr>
+            <tr><td>UPS percentage uses an unstored 2 MW/module rating.</td><td><code>updateData()</code> declares 2,000 kW locally while engine snapshot exposes shared output only.</td><td>Move the rating into the immutable model and document topology precisely.</td></tr>
+            <tr><td>Alarm freshness is synthetic.</td><td>Stale=0 because snapshot is frozen; Last Update is browser time.</td><td>Distinguish model evaluation time from acquisition/sample time.</td></tr>
+            <tr><td>Maintenance semantics are overloaded.</td><td>Standby chiller count is shown as Maint/Bypass.</td><td>Separate planned maintenance, bypass and available standby capacity.</td></tr>
+            <tr><td>WUE flow is an annual-equivalent rate.</td><td>37 L/min is not an instantaneous cooling-tower measurement.</td><td>Keep scope label visible and bind actual makeup/blowdown if introduced.</td></tr>
+            <tr><td>Grid factor is fixed.</td><td>0.42 has no displayed geography/date/version in the dashboard.</td><td>Add source vintage and location/market basis before sustainability reporting.</td></tr>
+            <tr><td>Fuel consumption is a fixed design assumption.</td><td>956 L/h is not coupled to a generator efficiency/load curve.</td><td>Use vendor curve and running-set allocation for operational autonomy.</td></tr>
+            <tr><td>Generated design breadth exceeds validated snapshot.</td><td>Report includes fire, water chemistry and cost assumptions beyond primary dashboard points.</td><td>Maintain section-level source/assumption tags and independent calculation tests.</td></tr>
+            <tr><td>Access policy wording may drift.</td><td>Comments, overlay and shared feature flags have changed historically between Pro/Educator/Root descriptions.</td><td>Test the canonical policy; docs must not become an alternate access path.</td></tr>
+        </tbody></table></div><div class="mn-actions"><a class="mn-action primary" href="../dc-conventional.html">Open cockpit</a><a class="mn-action" href="../manual/dc-conventional.html">Read technical manual</a></div></section>
+    </main>
+
+    <script>(function(){var t=document.getElementById('themeToggle');var s=localStorage.getItem('theme')||localStorage.getItem('rz_theme')||'light';document.documentElement.setAttribute('data-theme',s);if(t)t.addEventListener('click',function(){var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('theme',n);localStorage.setItem('rz_theme',n);});var a=document.querySelectorAll('.mn-tablewrap,.mn-formula');for(var i=0;i<a.length;i++)a[i].setAttribute('tabindex','0');})();</script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script><script src="../js/rz-mobile-nav.js?v=1.129.0" defer></script><script src="../js/rz-cookie-consent.js?v=1.129.0" defer></script><script src="../js/rz-explain-db.js?v=2026-07-27" defer></script><script src="../js/rz-explain.js?v=2026-07-27" defer></script>
+</body>
+</html>

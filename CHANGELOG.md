@@ -11,6 +11,70 @@ release sections rather than semver.
 
 ---
 
+## v1.129.0 — 2026-08-25 (Telemetry cockpit PRDs and operator manuals)
+
+### Added
+- **Twelve public engineering documents for six telemetry cockpits:** separate, implementation-traceable
+  PRDs and technical Manuals for EPMS Telemetry, AI/HPC Data Hall, Conventional Data Center, Data Hall
+  SCADA, CDU Mini-BMS, and the RZ cockpit visual prototype. Every PRD follows the mandatory 11-section
+  contract; every Manual records engineering basis, inputs, formulas or explicit fixture provenance,
+  worked examples, standards, glossary, assumptions, and limitations.
+- **Two additive documentation routes on every cockpit:** visible `PRD` and `Manual` links use each
+  cockpit's existing control style without changing its authorization gate, scripts, or operating flow.
+- **Public documentation hubs and discovery coverage:** a new `prd/` hub, six paired entries in the
+  Manual hub, twelve search records, and generator support for PRDs in `sitemap.xml`, `llms.txt`, and
+  `llms-full.txt`.
+- **Machine-checkable documentation gates:** `tools/test-telemetry-docs.mjs` validates structure,
+  source preservation, public shell, metadata, and additive cockpit diffs; `tools/test-telemetry-discovery.mjs`
+  asserts every paired route in search, sitemap, `llms.txt`, and `llms-full.txt` against generated artifacts.
+
+### Changed
+- The existing AI/HPC, Conventional, and Data Hall Manuals were deepened non-destructively with control,
+  telemetry, glossary, provenance, and limitation detail while preserving their sourced formulas,
+  worked results, and references.
+- All new telemetry documentation surfaces now share the Claude-aligned anti–AI-slop register: opaque flat
+  surfaces, thin borders, restrained square radii, IBM Plex Sans + JetBrains Mono, and semantic
+  amber/green/red/cyan signals. The doc-specific stylesheet rejects glass blur, translucent card washes,
+  decorative gradients, full-round pills, and thick callout stripes without modifying cockpit styling.
+- Wide engineering tables expose a mobile scroll affordance and sticky first column on documentation pages.
+- Wide formula regions now expose labelled keyboard scrolling only when needed, and the browser contract
+  runs vendored axe against all fourteen documentation surfaces in both light and dark themes. The gate
+  proves both overflowing and non-overflowing formula behavior instead of accepting an empty subset.
+- Public documentation links on restricted cockpits remain reachable through a dedicated public-link layer
+  while the underlying cockpit header stays inert and its gate stays locked; the required two-anchor-only
+  cockpit diffs remain preserved.
+- `standarization/TELEMETRY_DOCS_STANDARD.md` now carries the durable change-and-lesson ledger, including
+  reviewer findings, root causes, prevention gates, and reusable documentation rules.
+- Telemetry structure, discovery parity, and full browser contracts now run from the canonical ship gate
+  and are exposed through `task verify`.
+
+### Fixed
+- Product requirements were previously absent from generated discovery indexes, and the Manual hub count
+  had drifted. PRDs are now first-class public content in the builders, while the hub inventory is reconciled
+  to the filesystem and regression-tested.
+- Cross-page fragment assumptions and oversized legacy meta descriptions were corrected without weakening
+  the underlying engineering evidence.
+- The full-content LLM builder now includes public `manual/` and `prd/` pages instead of scanning root HTML only.
+- The RZ cockpit prototype documentation now correctly identifies one CDU fixture per comparison column;
+  it no longer misreports the intended Before/After parity as a duplicate tile.
+- Light-theme documentation colors, theme controls, and link cues now meet the zero-serious axe gate; nested cookie notices
+  resolve `/privacy.html` correctly; fixed telemetry banners no longer intercept mobile links; and CDU/prototype
+  documentation controls retain 44 px touch targets.
+- The browser evaluator now exercises logged-out gated navigation, mobile hit-testing, formula focusability,
+  deterministic scroll restoration, and a bounded, explicitly documented 50 px pre-existing prototype overflow.
+- Changed documentation, navigation, cookie, telemetry-banner, and instrument assets now use release cache
+  keys where cockpit source is mutable and a Service Worker network-first upgrade path everywhere else,
+  preventing stale cached behavior after deployment.
+- Restricted-cockpit public links now bootstrap from the already network-first authentication bundle, so
+  the first navigation controlled by a pre-release Service Worker cannot combine fresh anchors with stale
+  navigation code. The browser gate reproduces that mixed-cache upgrade before accepting the release.
+- The shared Manual FAB now keeps navigation landmark semantics without matching legacy `body.locked > nav`
+  blur rules, and only the public FAB is elevated above restricted overlays. Desktop and 375 px browser
+  checks require a 44 px target, center-point hit-testing, authentication-modal precedence, and a real
+  logged-out click to the public Manual.
+
+---
+
 ## v1.128.2 — 2026-08-25 (Security review fixes: offline-root hardening + retry scoping + keep-alive)
 
 ### Security / Fixed

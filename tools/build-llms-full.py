@@ -18,6 +18,7 @@ SITE_URL = "https://resistancezero.com"
 OUTPUT = os.path.join(SITE_ROOT, "llms-full.txt")
 ARCHIVE_OUTPUT = os.path.join(SITE_ROOT, "llms-archive.txt")
 MAX_BYTES = 20 * 1024 * 1024  # 20 MB
+DOCUMENTATION_DIRS = ("manual", "prd")
 
 EXCLUDE_FILES = {
     "article-9-paper.html", "rz-ops-p7x3k9m.html",
@@ -56,6 +57,19 @@ def get_article_files():
         if m and fname not in EXCLUDE_FILES:
             files.append((int(m.group(1)), fname))
     return [f for _, f in sorted(files)]
+
+
+def get_documentation_files():
+    """Return public documentation paths in deterministic directory order."""
+    files = []
+    for directory in DOCUMENTATION_DIRS:
+        root = os.path.join(SITE_ROOT, directory)
+        if not os.path.isdir(root):
+            continue
+        for fname in sorted(os.listdir(root)):
+            if fname.endswith(".html") and fname not in EXCLUDE_FILES:
+                files.append(f"{directory}/{fname}")
+    return files
 
 
 def strip_block_tags(content, *tags):
@@ -127,6 +141,7 @@ def html_to_markdown(content):
     # Clean up whitespace
     content = re.sub(r'[ \t]+', ' ', content)
     content = re.sub(r'\n{4,}', '\n\n\n', content)
+    content = '\n'.join(line.rstrip() for line in content.splitlines())
     content = content.strip()
 
     return content
@@ -135,7 +150,8 @@ def html_to_markdown(content):
 def extract_page(filepath):
     """Extract title + body content from HTML file as Markdown."""
     fname = os.path.basename(filepath)
-    url = f"{SITE_URL}/{fname}"
+    relative_path = os.path.relpath(filepath, SITE_ROOT).replace(os.sep, "/")
+    url = f"{SITE_URL}/{relative_path}"
 
     with open(filepath, encoding="utf-8", errors="ignore") as fh:
         raw = fh.read()
@@ -193,6 +209,7 @@ def main():
     for fname in sorted(os.listdir(SITE_ROOT)):
         if fname.endswith(".html") and fname not in EXCLUDE_FILES and fname not in all_files:
             all_files.append(fname)
+    all_files.extend(get_documentation_files())
 
     header = (
         "# resistancezero.com — Full Content Dump\n"

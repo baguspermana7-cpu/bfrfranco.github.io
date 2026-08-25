@@ -27,7 +27,7 @@
 
     <!-- SEO Meta Tags -->
     <title>Conventional DC — EPMS &amp; BMS Cockpit — Technical Manual &amp; Methodology | ResistanceZero</title>
-    <meta name="description" content="Full engineering methodology for the Conventional DC EPMS/BMS cockpit: locked basis-of-design, CONV_CALC derivations, PUE/WUE/CUE formulas, CHW loop, UPS 2N sizing, fuel autonomy, and worked example.">
+    <meta name="description" content="Engineering manual for the Conventional DC cockpit: locked power, cooling, water, carbon and fuel formulas, telemetry controls, worked examples, and standards.">
     <meta name="ai-content-declaration" content="human-authored">
     <meta name="keywords" content="conventional data center, EPMS, BMS, PUE, WUE, CUE, chilled water, UPS 2N, fuel autonomy, ASHRAE 90.1, Uptime Institute, ISO/IEC 30134-8, dc-conventional methodology">
     <meta name="author" content="Bagus Dwi Permana">
@@ -128,7 +128,7 @@
     <link rel="apple-touch-icon" href="../assets/Favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../styles.min.css?v=20260225">
 
     <style>
@@ -148,35 +148,35 @@
             --mn-text: #e7edf3;
             --mn-muted: #93a1b0;
             --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-            --mn-sans: 'IBM Plex Sans', 'IBM Plex Sans', system-ui, sans-serif;
+            --mn-sans: 'IBM Plex Sans', system-ui, sans-serif;
             --mn-cyan: #00DDFF;
             --mn-amber: #FFAA00;
             --mn-green: #00FF88;
         }
         :root:not([data-theme="dark"]) {
-            --mn-accent: #0891b2;
-            --mn-accent-rgb: 8,145,178;
-            --mn-cta: #b45309;
+            --mn-accent: #00677d;
+            --mn-accent-rgb: 0,103,125;
+            --mn-cta: #e08b00;
             --mn-bg: #f5f7fa;
             --mn-surface: #ffffff;
             --mn-surface-2: #eef2f6;
             --mn-border: rgba(15,23,42,0.12);
             --mn-text: #10161d;
             --mn-muted: #4a5763;
-            --mn-cyan: #0891b2;
-            --mn-green: #059669;
+            --mn-cyan: #00677d;
+            --mn-green: #006e45;
         }
         @media (prefers-reduced-motion: reduce) {
             * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
         }
         body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
-        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 5.5rem 1.25rem 5rem; }
 
         /* Hero */
         .mn-hero {
             border: 1px solid var(--mn-border);
-            border-left: 3px solid var(--mn-accent);
-            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-left:1px solid var(--mn-accent);
+            background: var(--mn-surface);
             border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
         }
         .mn-hero .mn-eyebrow {
@@ -188,14 +188,14 @@
         .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
         .mn-chip {
             font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
-            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            border: 1px solid var(--mn-border); border-radius: 3px; color: var(--mn-muted);
             background: rgba(var(--mn-accent-rgb),0.05);
         }
         .mn-chip strong { color: var(--mn-text); font-weight: 600; }
 
         /* Breadcrumb + tool link */
         .mn-crumb { font-family: var(--mn-mono); font-size: 0.75rem; color: var(--mn-muted); margin-bottom: 1rem; }
-        .mn-crumb a { color: var(--mn-cyan); text-decoration: none; }
+        .mn-crumb a { color: var(--mn-cyan); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
         .mn-crumb a:hover { text-decoration: underline; }
         .mn-toollink {
             display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 1.1rem;
@@ -233,7 +233,7 @@
         /* Formula card */
         .mn-formula {
             font-family: var(--mn-mono); background: var(--mn-surface-2);
-            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border: 1px solid var(--mn-border); border-left:1px solid var(--mn-cyan);
             border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
             font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
         }
@@ -247,7 +247,7 @@
 
         /* Callout */
         .mn-note {
-            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            border: 1px solid var(--mn-border); border-left:1px solid var(--mn-amber);
             background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
             color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
         }
@@ -275,10 +275,12 @@
             .nav-menu, .nav-links { display: none; }
             .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
             button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
-            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-wrap { padding: 5rem 0.9rem 4rem; }
             .mn-hero { padding: 1.5rem 1.2rem; }
         }
     </style>
+    <link rel="stylesheet" href="../css/rz-documentation-ui.css?v=1.129.0">
+    <script src="../js/rz-documentation-ui.js?v=1.129.0" defer></script>
 </head>
 <body>
     <nav class="navbar">
@@ -303,7 +305,7 @@
         </div>
     </nav>
 
-    <main class="mn-wrap">
+    <main class="mn-wrap" data-explain-scan>
         <div class="mn-crumb">
             <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / Conventional DC Cockpit
         </div>
@@ -540,6 +542,86 @@
             <p class="mn-lead">This manual and the cockpit are an <strong>engineering education and operational reference aid</strong>. They do not substitute for a live DCIM/EPMS/BMS with calibrated sensors, metered telemetry, and alarm setpoints set by a qualified controls engineer to the site authority having jurisdiction.</p>
         </section>
 
+        <!-- 9. COCKPIT CONTROL MAP — additive telemetry-docs enhancement -->
+        <section class="mn-section" id="control-map">
+            <h2><span class="mn-num">09</span> Cockpit controls &amp; telemetry map</h2>
+            <p class="mn-lead">The dashboard is a facility overview rather than a command HMI. Its controls navigate, explain or report the locked scenario; none writes to BMS/EPMS equipment.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Control / surface</th><th>Hook</th><th>Expected behavior</th><th>Data or safety boundary</th></tr></thead>
+                <tbody>
+                    <tr><td>Portfolio / DC Solutions / PRD / Manual</td><td><code>.back-btn</code></td><td>Navigate without changing <code>CONV_CALC.snapshot</code>.</td><td>PRD and Manual are public; cockpit access remains tier-controlled.</td></tr>
+                    <tr><td>Generate Design</td><td><code>genDesignTrigConv</code></td><td>Build a printable multi-discipline Tech Spec from one captured snapshot.</td><td>It is educational/reference output, not an issued-for-construction package.</td></tr>
+                    <tr><td>FAQ</td><td><code>faqTrigConv</code></td><td>Open ten explanatory questions; close by button, scrim or Escape.</td><td>Answers disclose locked, simulated and non-procurement scope.</td></tr>
+                    <tr><td>Theme</td><td><code>themeToggle</code></td><td>Switch/persist light or dark theme.</td><td>Never changes values or threshold results.</td></tr>
+                    <tr><td>Subsystem routes</td><td><code>.nav-menu-item</code></td><td>Open EPMS, Data Hall, Chiller, Fire, Fuel, Water or ICT pages.</td><td>Status copy in this overview is not a substitute for subsystem detail.</td></tr>
+                    <tr><td>Alarm strip</td><td><code>alarmStrip</code></td><td>Show overall state, critical, warning, maintenance/bypass, comms, stale, last update, quality and scenario first.</td><td>Counts are evaluated from a frozen model; Last Update is browser time.</td></tr>
+                    <tr><td>PUE basis</td><td><code>.kpi-card[data-basis="pue"]</code></td><td>Open formula, IT/facility/non-IT inputs, output, scope, denominator and source.</td><td>1.45 is derived from the model; ≤1.5 is a target.</td></tr>
+                    <tr><td>WUE basis</td><td><code>data-basis="wue"</code></td><td>Explain annual definition, IT denominator and 37.0 L/min equivalent makeup.</td><td>Equivalent steady-state rate is not an instantaneous tower meter.</td></tr>
+                    <tr><td>Grid-factor basis</td><td><code>data-basis="grid"</code></td><td>Separate 0.42 kgCO₂/kWh facility from CUE_IT.</td><td>Factor needs geography/date/version before reporting.</td></tr>
+                    <tr><td>IT-load basis</td><td><code>data-basis="it"</code></td><td>Show 1,850/2,000 kW and 92.5% utilization.</td><td>Locked BOD, not a meter stream.</td></tr>
+                    <tr><td>Uptime basis</td><td><code>data-basis="uptime"</code></td><td>Explain 99.98% and Tier intent.</td><td>Explicit design placeholder; no outage ledger is bound.</td></tr>
+                    <tr><td>Temperature basis</td><td><code>data-basis="temp"</code></td><td>Explain 22.4°C against the referenced thermal band.</td><td>Simulated aggregate, not a sensor roll-up.</td></tr>
+                    <tr><td>Chiller basis</td><td><code>data-basis="chillers"</code></td><td>Explain 2/3 operation and one spare.</td><td>Standby capacity is not automatically a maintenance/bypass event.</td></tr>
+                    <tr><td>KPI keyboard path</td><td><code>.kpi-card[data-basis]</code></td><td>Enter/Space opens; Escape, scrim and Close dismiss; focus returns.</td><td>All meaning remains textual, not color-only.</td></tr>
+                    <tr><td>Facility image callouts</td><td><code>cPue</code>, <code>cIt</code>, <code>cChw</code>, <code>cTemp</code>, <code>cFuel</code>, <code>cRh</code></td><td>Show the six operational values on their physical context image.</td><td>Image is contextual; right panel and basis drawers are authoritative for scope.</td></tr>
+                    <tr><td>Right statistics panel</td><td><code>s*</code> IDs plus static rows</td><td>Group Efficiency, Power, Cooling, Reliability, Environment, Safety and Fuel.</td><td>Engine-bound and static presentation rows must remain visibly distinguishable.</td></tr>
+                    <tr><td>Scroll to top</td><td><code>scrollTopBtn</code></td><td>Return to header without changing the scenario.</td><td>Respect reduced-motion preference.</td></tr>
+                    <tr><td>Sign in</td><td><code>rootLoginBtn</code> / shared gate</td><td>Open the shared authentication/upgrade flow for an unauthorized cockpit user.</td><td>It grants no access to public docs because they are already public.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 10. OPERATIONAL INTERPRETATION — additive telemetry-docs enhancement -->
+        <section class="mn-section" id="telemetry-operation">
+            <h2><span class="mn-num">10</span> Alarm, quality &amp; operating interpretation</h2>
+            <p class="mn-lead">Primary arithmetic is deterministic. Several context rows remain static placeholders. The following map prevents a reader from assigning the same trust level to both classes.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Point family</th><th>Representative hook</th><th>Source class</th><th>Interpretation / threshold</th></tr></thead>
+                <tbody>
+                    <tr><td>PUE / WUE / grid / IT / facility</td><td><code>kpiPue</code>, <code>kpiWue</code>, <code>kpiCarbon</code>, <code>kpiIt</code>, <code>sTotalLoad</code></td><td>Locked or derived from <code>CONV_CALC.snapshot</code>.</td><td>Stable on reload; PUE warns above 1.5.</td></tr>
+                    <tr><td>CHWS / CHWR / environment / fuel</td><td><code>sChwSup</code>, <code>sChwRet</code>, <code>sTempAvg</code>, <code>sRhAvg</code>, <code>sFuelMain</code></td><td>Locked BOD/simulated aggregate.</td><td>Temperature warns outside 18–27°C and critical above 32°C; RH warns outside 20–80%; fuel warns below 24 h and critical below 12 h autonomy.</td></tr>
+                    <tr><td>Maintenance / bypass</td><td><code>as-maint</code></td><td>Derived as 3 installed − 2 running chillers.</td><td>Current value 1 means available standby in this model, not proven maintenance activity.</td></tr>
+                    <tr><td>Comms / stale</td><td><code>as-comms</code>, <code>as-stale</code></td><td>Model-integrity check.</td><td>Comms OK means a versioned local snapshot exists; stale 0 means the frozen scenario has no acquisition-age concept.</td></tr>
+                    <tr><td>Last Update</td><td><code>as-update</code></td><td>Browser clock.</td><td>Display time, not field sample time.</td></tr>
+                    <tr><td>UPS A/B</td><td><code>sUpsA</code>, <code>sUpsB</code></td><td>Derived load with local 2,000 kW/module display rating.</td><td>46% normal shared / 92% failover; move the rating to the immutable model before design reliance.</td></tr>
+                    <tr><td>Chillers / CRAHs</td><td>CH-1, CH-2, Chillers, CRAHs rows</td><td>Mixed: count from snapshot; unit percentages and CRAH 12/14 are static.</td><td>Do not treat static percentages as trended sensor values.</td></tr>
+                    <tr><td>Network / topology / uptime</td><td>Network, UPS Topology, Uptime rows</td><td>Static modeled state / placeholder.</td><td>Online and 2N OK are overview claims; 99.98% is not event-derived.</td></tr>
+                    <tr><td>Environment DP</td><td>DP +2.1 Pa row</td><td>Static presentation.</td><td>No pressure-sensor source, timestamp or alarm threshold is currently bound.</td></tr>
+                    <tr><td>FACP / VESDA</td><td>Safety rows</td><td>Static presentation.</td><td>Normal state is not proof of detector, panel, cause-effect or suppression compliance.</td></tr>
+                    <tr><td>Day tank</td><td>Day Tank 92% row</td><td>Static presentation.</td><td>Bulk-tank 85%/48 h arithmetic does not validate this separate buffer value.</td></tr>
+                    <tr><td>Data Quality / Scenario</td><td><code>as-dq</code>, <code>as-scn</code></td><td>Snapshot metadata.</td><td>GOOD describes internal model availability; Simulated is the governing provenance.</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="mn-note"><strong>Alarm sequence:</strong> critical count has priority over warning. The current model does not implement acknowledgement, shelving, suppression, cause/effect or an event historian. A future live implementation should follow an ISA-18.2 lifecycle and apply point-level freshness/quality.</div>
+        </section>
+
+        <!-- 11. GLOSSARY — additive telemetry-docs enhancement -->
+        <section class="mn-section" id="glossary">
+            <h2><span class="mn-num">11</span> Glossary &amp; RZExplain</h2>
+            <p class="mn-lead">Marked terms are discoverable through the shared RZExplain scanner. Definitions below use the exact denominator and scope implemented by this cockpit.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Term</th><th>Cockpit meaning</th><th>Common misread</th></tr></thead>
+                <tbody>
+                    <tr><td><span data-explain="PUE">PUE</span></td><td>Facility power / IT power = 2,682.5 / 1,850 = 1.45.</td><td>Target efficiency or cooling-only ratio.</td></tr>
+                    <tr><td><span data-explain="WUE">WUE</span></td><td>Annual cooling makeup water litres / annual IT kWh = 1.20 L/kWh.</td><td>All site water or instantaneous tower flow.</td></tr>
+                    <tr><td><span data-explain="CUE">CUE</span></td><td>Carbon per IT energy = grid factor × PUE = 0.609 kgCO₂/kWh IT.</td><td>The raw 0.42 facility-kWh grid factor.</td></tr>
+                    <tr><td><span data-explain="CHWS">CHWS</span> / <span data-explain="CHWR">CHWR</span></td><td>Primary chilled-water supply/return at 7.2/14.8°C.</td><td>The separate ~19/23°C condenser/warm-water loop.</td></tr>
+                    <tr><td><span data-explain="EPMS">EPMS</span></td><td>Electrical Power Monitoring System; route from the subsystem rail.</td><td>A control authorization or protection study.</td></tr>
+                    <tr><td><span data-explain="BMS">BMS</span></td><td>Building Management System context for cooling/environment/safety integration.</td><td>A live field connection in this page.</td></tr>
+                    <tr><td><span data-explain="2N">2N</span></td><td>Two independent UPS paths, each able to carry the protected load.</td><td>Two modules whose combined capacity alone meets load.</td></tr>
+                    <tr><td>Facility load</td><td>All site input power inside the PUE boundary.</td><td>IT output alone.</td></tr>
+                    <tr><td>Non-IT load</td><td>Facility − IT = cooling, losses and auxiliary demand.</td><td>Only chiller compressor power.</td></tr>
+                    <tr><td>Locked / derived / placeholder</td><td>Immutable assumption / formula output / value awaiting authoritative history or sensor source.</td><td>Equivalent forms of live telemetry.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
         <a class="mn-toollink" href="../dc-conventional.html">&#9654; Open the live Conventional DC EPMS/BMS Cockpit</a>
     </main>
 
@@ -552,7 +634,7 @@
                     <p class="footer-copyright">&copy; 2026 Bagus Dwi Permana. All rights reserved.</p>
                 </div>
                 <div class="footer-nav">
-                    <h4 class="footer-heading">NAVIGATION</h4>
+                    <h3 class="footer-heading">NAVIGATION</h3>
                     <ul class="footer-links">
                         <li><a href="../index.html">Home Dashboard</a></li>
                         <li><a href="../datacenter-solutions.html">DC Solutions</a></li>
@@ -561,7 +643,7 @@
                     </ul>
                 </div>
                 <div class="footer-connect">
-                    <h4 class="footer-heading">CONNECT</h4>
+                    <h3 class="footer-heading">CONNECT</h3>
                     <ul class="footer-links">
                         <li><a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">LinkedIn Profile</a></li>
                         <li><a href="../articles.html">Technical Journal</a></li>
@@ -575,7 +657,7 @@
     <script>
     (function(){
         var toggle = document.getElementById('themeToggle');
-        var theme = localStorage.getItem('theme') || localStorage.getItem('rz_theme') || 'dark';
+        var theme = localStorage.getItem('theme') || localStorage.getItem('rz_theme') || 'light';
         document.documentElement.setAttribute('data-theme', theme);
         if (toggle) toggle.addEventListener('click', function(){
             var current = document.documentElement.getAttribute('data-theme');
@@ -583,6 +665,8 @@
             document.documentElement.setAttribute('data-theme', next);
             localStorage.setItem('theme', next); localStorage.setItem('rz_theme', next);
         });
+        var scrollables = document.querySelectorAll('.mn-tablewrap,.mn-formula');
+        for (var i = 0; i < scrollables.length; i++) scrollables[i].setAttribute('tabindex', '0');
         var hamburger = document.querySelector('.hamburger');
         var navMenu = document.querySelector('.nav-menu');
         if (hamburger && navMenu) hamburger.addEventListener('click', function(){
@@ -593,8 +677,10 @@
     })();
     </script>
     <script src="../js/rz-version.js?v=2026-07-20" defer></script>
-    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
-    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=1.129.0" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=1.129.0" defer></script>
+    <script src="../js/rz-explain-db.js?v=2026-07-27" defer></script>
+    <script src="../js/rz-explain.js?v=2026-07-27" defer></script>
     <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
     <script src="../auth.js?v=2026-08-25-secfix" defer></script>
 </body>

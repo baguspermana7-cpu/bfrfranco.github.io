@@ -157,6 +157,20 @@ def main():
             # sort key "manual/<fname>" keeps the index first (empty stem sorts before names)
             files.append(("Technical Manuals", f"manual/{fname}", title, desc, url))
 
+    # Collect public product requirements. Restricted cockpit access never
+    # makes its engineering contract private.
+    prd_dir = os.path.join(SITE_ROOT, "prd")
+    if os.path.isdir(prd_dir):
+        for fname in os.listdir(prd_dir):
+            if not fname.endswith(".html") or fname in EXCLUDE_FILES:
+                continue
+            filepath = os.path.join(prd_dir, fname)
+            if not os.path.isfile(filepath):
+                continue
+            title, desc = extract_meta(filepath)
+            url = f"{SITE_URL}/prd/" if fname == "index.html" else f"{SITE_URL}/prd/{fname}"
+            files.append(("Product Requirements", f"prd/{fname}", title, desc, url))
+
     # Group by category
     categories = {}
     for cat, fname, title, desc, url in files:
@@ -181,7 +195,7 @@ def main():
     ]
 
     CATEGORY_ORDER = [
-        "About", "Calculators", "Technical Manuals", "Technical Articles", "Comparisons",
+        "About", "Calculators", "Product Requirements", "Technical Manuals", "Technical Articles", "Comparisons",
         "Tools", "Simulations", "Insight Series", "Reports",
         "Pillar Pages", "Hubs", "Legal", "Other",
     ]
@@ -190,6 +204,7 @@ def main():
         "About": "Profile and background",
         "Calculators": "Decision support tools — free, no signup required",
         "Technical Manuals": "Per-calculator methodology — inputs, formulas, constants, worked examples, references",
+        "Product Requirements": "Deterministic cockpit scope, telemetry provenance, functional requirements, and acceptance evidence",
         "Technical Articles": "27 deep-dive engineering articles (Operations Journal series)",
         "Comparisons": "Side-by-side infrastructure technology analysis",
         "Tools": "Interactive monitors, checklists, and labs",

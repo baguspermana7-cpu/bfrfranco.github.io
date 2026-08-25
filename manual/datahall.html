@@ -27,7 +27,7 @@
 
     <!-- SEO Meta Tags -->
     <title>Data Hall SCADA Console — Technical Manual &amp; Methodology | ResistanceZero</title>
-    <meta name="description" content="Full engineering methodology for the Data Hall SCADA Console: locked conventional basis, derivation formulas, KPI outputs, worked example (1,850 kW scenario), and standards references.">
+    <meta name="description" content="Engineering manual for the Data Hall SCADA Console: deterministic rack power, cooling margin, alarm logic, CHW flow, PUE and a sourced 1.85 MW example.">
     <meta name="ai-content-declaration" content="human-authored">
     <meta name="keywords" content="data hall SCADA, conventional data center basis, PUE derivation, CHW flow calculation, WUE methodology, CRAH cooling, UPS losses, fuel autonomy, ASHRAE TC9.9, Uptime Institute tier">
     <meta name="author" content="Bagus Dwi Permana">
@@ -128,7 +128,7 @@
     <link rel="apple-touch-icon" href="../assets/Favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../styles.min.css?v=20260225">
 
     <style>
@@ -148,7 +148,7 @@
             --mn-text: #e7edf3;
             --mn-muted: #93a1b0;
             --mn-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-            --mn-sans: 'IBM Plex Sans', 'IBM Plex Sans', system-ui, sans-serif;
+            --mn-sans: 'IBM Plex Sans', system-ui, sans-serif;
             --mn-cyan: #00DDFF;
             --mn-amber: #FFAA00;
             --mn-green: #00FF88;
@@ -170,13 +170,13 @@
             * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
         }
         body { background: var(--mn-bg); color: var(--mn-text); font-family: var(--mn-sans); }
-        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+        .mn-wrap { max-width: 960px; margin: 0 auto; padding: 5.5rem 1.25rem 5rem; }
 
         /* Hero */
         .mn-hero {
             border: 1px solid var(--mn-border);
-            border-left: 3px solid var(--mn-accent);
-            background: linear-gradient(180deg, var(--mn-surface) 0%, var(--mn-surface-2) 100%);
+            border-left:1px solid var(--mn-accent);
+            background: var(--mn-surface);
             border-radius: 10px; padding: 2rem 1.75rem; margin-bottom: 1.75rem;
         }
         .mn-hero .mn-eyebrow {
@@ -188,7 +188,7 @@
         .mn-meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.1rem; }
         .mn-chip {
             font-family: var(--mn-mono); font-size: 0.72rem; padding: 0.28rem 0.6rem;
-            border: 1px solid var(--mn-border); border-radius: 999px; color: var(--mn-muted);
+            border: 1px solid var(--mn-border); border-radius: 3px; color: var(--mn-muted);
             background: rgba(var(--mn-accent-rgb),0.05);
         }
         .mn-chip strong { color: var(--mn-text); font-weight: 600; }
@@ -233,7 +233,7 @@
         /* Formula card */
         .mn-formula {
             font-family: var(--mn-mono); background: var(--mn-surface-2);
-            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-cyan);
+            border: 1px solid var(--mn-border); border-left:1px solid var(--mn-cyan);
             border-radius: 8px; padding: 0.95rem 1.1rem; margin: 0.9rem 0; overflow-x: auto;
             font-size: 0.9rem; line-height: 1.55; color: var(--mn-text);
         }
@@ -247,7 +247,7 @@
 
         /* Callout */
         .mn-note {
-            border: 1px solid var(--mn-border); border-left: 3px solid var(--mn-amber);
+            border: 1px solid var(--mn-border); border-left:1px solid var(--mn-amber);
             background: var(--mn-surface); border-radius: 8px; padding: 0.9rem 1.1rem;
             color: var(--mn-muted); font-size: 0.86rem; line-height: 1.55; margin: 1.1rem 0;
         }
@@ -275,10 +275,12 @@
             .nav-menu, .nav-links { display: none; }
             .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
             button, a.btn, [role="button"], .mn-toollink { min-height: 44px; }
-            .mn-wrap { padding: 1.25rem 0.9rem 4rem; }
+            .mn-wrap { padding: 5rem 0.9rem 4rem; }
             .mn-hero { padding: 1.5rem 1.2rem; }
         }
     </style>
+    <link rel="stylesheet" href="../css/rz-documentation-ui.css?v=1.129.0">
+    <script src="../js/rz-documentation-ui.js?v=1.129.0" defer></script>
 </head>
 <body>
     <nav class="navbar">
@@ -542,6 +544,82 @@
             <div class="mn-note"><strong>Disclaimer:</strong> This cockpit and its methodology are an <strong>engineering education and pre-design reference</strong>. All values are derived from a representative simulated scenario, not from live telemetry. Final facility design, commissioning, and operational decisions must be validated by a qualified data-center engineering team against actual site measurements and authority-having-jurisdiction requirements.</div>
         </section>
 
+        <!-- 9. OPERATOR WORKFLOW AND TELEMETRY -->
+        <section class="mn-section" data-explain-scan>
+            <h2><span class="mn-num">09</span> Cockpit workflow &amp; telemetry-point map</h2>
+            <p class="mn-lead">The console is a deterministic teaching SCADA, not a live BMS endpoint. Read it top-down: alarm strip, engineering roll-up, balance band, selected heat-map layer, equipment inspector, then event log. Every value below maps to a concrete DOM binding or <code class="mn-mono">CONV_CALC.snapshot</code> field.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Signal / control</th><th>ID or binding</th><th>Unit / state</th><th>Normal interpretation</th><th>Source binding</th></tr></thead>
+                <tbody>
+                    <tr><td>Hall state</td><td><code>dh-hall-state</code></td><td>NORMAL / WARNING / CRITICAL</td><td>Worst active alarm severity.</td><td>Deterministic <code>alarms[]</code> aggregation in <code>datahall.html</code>.</td></tr>
+                    <tr><td>Rack IT load</td><td><code>dh-rack-load</code>, <code>bb-itload</code></td><td>MW</td><td>1.850 MW at the locked site/hall scope.</td><td><code>CONV_CALC.snapshot.site.it_load_kw</code>.</td></tr>
+                    <tr><td>Rack count / average</td><td><code>bb-racks</code>, <code>bb-avg</code></td><td>count, kW/rack</td><td>200 displayed cells; average 9.25 kW/rack.</td><td><code>TOTAL_RACKS</code>; IT kW ÷ rack count.</td></tr>
+                    <tr><td>Power density</td><td><code>dh-pd</code></td><td>kW/rack</td><td>Same denominator as average rack load.</td><td><code>site.it_kw / datahall.racks_total</code>.</td></tr>
+                    <tr><td>PUE</td><td><code>dh-pue</code></td><td>ratio</td><td>1.45 measured-basis value; not a target.</td><td><code>CONV_CALC.snapshot.site.pue</code>.</td></tr>
+                    <tr><td>Cooling margin</td><td><code>dh-cooling-margin</code>, <code>bb-cool</code></td><td>%, kW</td><td>Available running CRAH capacity minus IT sensible demand.</td><td>17 running × 130 kW − 1,850 kW.</td></tr>
+                    <tr><td>Cooling N+1</td><td><code>bb-np1</code></td><td>PASS / FAIL</td><td>One running CRAH may be lost and capacity still covers demand.</td><td>16 × 130 kW ≥ 1,850 kW.</td></tr>
+                    <tr><td>CHW plant</td><td><code>ch1..ch3</code>, <code>chws</code>, <code>chwr</code>, <code>chdt</code>, <code>chflow</code></td><td>state, °C, L/s</td><td>Two chillers run, one standby; temperatures and flow come from the frozen conventional scenario.</td><td><code>CONV_CALC.snapshot.cooling</code>.</td></tr>
+                    <tr><td>Alarm roll-up</td><td><code>as-crit</code>, <code>as-warn</code>, <code>as-maint</code></td><td>count</td><td>Rack and cold-aisle threshold breaches; maintenance equals standby CRAHs.</td><td><code>alarms[]</code>; 20 total − 17 running.</td></tr>
+                    <tr><td>Data health</td><td><code>as-comms</code>, <code>as-update</code>, <code>as-dq</code>, <code>as-scn</code></td><td>OK / timestamp / GOOD / Simulated</td><td>Declares freshness and provenance; does not imply a field connection.</td><td>Page clock plus static simulated-mode declaration.</td></tr>
+                    <tr><td>Heat-map modes</td><td><code>mode-btn[data-mode]</code></td><td>power / temp / cooling-margin / alarms / space</td><td>One semantic layer at a time; selection is mirrored to the BMS layer toolbar.</td><td><code>setMode()</code> and <code>rackFill()</code>.</td></tr>
+                    <tr><td>Rack / CRAH inspector</td><td><code>sel-detail</code>, <code>crahPop</code></td><td>tagged detail</td><td>Hover/click exposes source, utilization, zone, temperatures and unit state.</td><td>Stable rack hash, zone aggregates and <code>crahUnits[]</code>.</td></tr>
+                </tbody>
+            </table>
+            </div>
+        </section>
+
+        <!-- 10. DETERMINISTIC SPATIAL AND ALARM LOGIC -->
+        <section class="mn-section">
+            <h2><span class="mn-num">10</span> Spatial model, cooling balance &amp; alarm logic</h2>
+            <p class="mn-lead">The rack field deliberately separates deterministic basis data from the temporary excursion simulator. Reloading produces the same occupancy, rack loads and normal cold-aisle temperatures; only an explicit excursion may introduce bounded short-lived variation.</p>
+            <div class="mn-formula">
+                <span class="mn-eq">rackTotal = Σ occupiedRackWeight × (1,850 kW / Σ occupiedRackWeight) = 1,850 kW</span>
+                <span class="mn-eq">rackUtilization = rack_kW / 15 kW rating</span>
+                <span class="mn-eq">coolingAvailable = 17 × 130 = 2,210 kW</span>
+                <span class="mn-eq">coolingHeadroom = 2,210 − 1,850 = 360 kW</span>
+                <span class="mn-eq">N+1 available = (17 − 1) × 130 = 2,080 kW ≥ 1,850 kW → PASS</span>
+                <span class="mn-eq">zoneAirflow = (1,850 / 10) / ((1.2 × 1.006) × 11) m³/s</span>
+                <span class="mn-where">The fixed integer hash chooses roughly 8% spare cells and bounded occupied weights, then a normalization and residual correction force the exact EPMS reconciliation total. <span class="mn-src">datahall.html rack model · CONV_CALC.snapshot</span></span>
+            </div>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Condition</th><th>Normal</th><th>Warning</th><th>Critical / alarm</th><th>Visual meaning</th></tr></thead>
+                <tbody>
+                    <tr><td>Rack utilization</td><td>&lt;70%</td><td>70–85%; 85–95% elevated tiers</td><td>&gt;95% rating</td><td>Green → amber/orange → fault red; spare is muted.</td></tr>
+                    <tr><td>Cold-aisle temperature</td><td>&lt;26°C; displayed normal baseline ≈22.0°C ±0.3°C deterministic</td><td>&gt;26°C</td><td>&gt;30°C</td><td>Temperature layer and alarm list share the same thresholds.</td></tr>
+                    <tr><td>CRAH availability</td><td>17 RUN / 3 STBY</td><td>Loss of redundancy</td><td>Post-failure capacity below 1,850 kW</td><td>N+1 chip reports the capacity comparison, not a decorative state.</td></tr>
+                    <tr><td>Communications / quality</td><td>OK / GOOD</td><td>Stale or degraded when implemented</td><td>Unavailable when implemented</td><td>Current page is simulated and does not poll a live transport.</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="mn-note"><strong>Excursion boundary:</strong> <code>fireExcursion()</code> uses bounded <code>Math.random()</code> only for an explicitly simulated 10–15 second zone/CRAH excursion. It does not alter the locked 1,850 kW, PUE, rack-reconciliation, plant basis or normal deterministic layout. Evidence must distinguish this training transient from measured telemetry.</div>
+        </section>
+
+        <!-- 11. GLOSSARY AND OPERATING LIMITS -->
+        <section class="mn-section" data-explain-scan>
+            <h2><span class="mn-num">11</span> Glossary, operating sequence &amp; limitations</h2>
+            <p class="mn-lead"><span data-explain="CRAH">CRAH</span>, <span data-explain="PUE">PUE</span>, <span data-explain="WUE">WUE</span>, N+1 and EPMS terms are exposed to RZExplain. These definitions describe the cockpit model and must not be mistaken for site commissioning set-points.</p>
+            <div class="mn-tablewrap">
+            <table class="mn-table">
+                <thead><tr><th>Term</th><th>Meaning in this cockpit</th><th>Operator action</th></tr></thead>
+                <tbody>
+                    <tr><td>EPMS reconciliation</td><td>Rack-field sum compared with UPS-output IT kW from the same frozen engine snapshot.</td><td>Investigate any non-zero balance before trusting downstream density or cooling calculations.</td></tr>
+                    <tr><td>Cold aisle</td><td>Rack inlet-side air zone; normal training baseline is approximately 22°C.</td><td>Select Temperature, locate the hottest zone, then inspect assigned CRAHs and rack load.</td></tr>
+                    <tr><td>Cooling margin</td><td>Running sensible cooling capacity minus modelled hall IT heat.</td><td>Confirm N+1 remains positive; margin alone is not proof of correct airflow distribution.</td></tr>
+                    <tr><td>Standby / maintenance</td><td>Three installed CRAHs outside the 17-unit running set.</td><td>Verify availability before taking another unit out of service.</td></tr>
+                    <tr><td>Simulated data</td><td>Local deterministic model plus explicit training excursions; no BMS/SCADA transport.</td><td>Use for education and pre-design review only; validate against field sensors and approved sequences.</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <ol>
+                <li>Read the alarm strip and data-quality/scenario chips before interpreting numbers.</li>
+                <li>Confirm rack-field total balances to EPMS IT load and cooling N+1 passes.</li>
+                <li>Select one semantic mode, locate the affected zone, then inspect its rack or CRAH.</li>
+                <li>Use the event log as a training trace; use an actual alarm historian for operational diagnosis.</li>
+            </ol>
+        </section>
+
         <a class="mn-toollink" href="../datahall.html">&#9654; Open the live Data Hall SCADA Console</a>
     </main>
 
@@ -595,9 +673,10 @@
     })();
     </script>
     <script src="../js/rz-version.js?v=2026-07-20" defer></script>
-    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
-    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=1.129.0" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=1.129.0" defer></script>
     <script src="../js/rz-command-palette.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-explain.js?v=2026-07-20" defer></script>
     <script src="../auth.js?v=2026-08-25-secfix" defer></script>
 </body>
 </html>

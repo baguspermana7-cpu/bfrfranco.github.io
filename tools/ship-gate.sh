@@ -45,11 +45,16 @@ gate "conv engine — 22/22 DoD identities"      node tools/test-conv-calc.mjs
 gate "CDU engine — worked examples"            node tools/test-cdu-calc.mjs
 gate "Fire engine — worked examples"           node tools/test-fire-calc.mjs
 
-# 7: engine-files byte-identical guard (locked since v1.32.x accuracy review)
+# Public telemetry documentation is a shipped cockpit contract, not an optional audit.
+gate "telemetry docs — structure and frozen cockpit diffs" node tools/test-telemetry-docs.mjs
+gate "telemetry docs — generated discovery parity" node tools/test-telemetry-discovery.mjs
+gate "telemetry docs — browser, a11y, mobile, and gate safety" node tools/test-telemetry-e2e.mjs
+
+# Engine-files byte-identical guard (locked since v1.32.x accuracy review)
 echo
-echo "── [7] engine files byte-identical guard ──"
-engine_diff=$(git diff HEAD -- js/datahall-model.js js/datahall-calculations.js js/conv-engine.js | wc -l)
 runs=$((runs+1))
+echo "── [$runs] engine files byte-identical guard ──"
+engine_diff=$(git diff HEAD -- js/datahall-model.js js/datahall-calculations.js js/conv-engine.js | wc -l)
 if [ "$engine_diff" -eq 0 ]; then
   echo "   ✓ PASS — engine files unchanged"
 else

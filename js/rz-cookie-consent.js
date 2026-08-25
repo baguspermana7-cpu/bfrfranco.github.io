@@ -32,7 +32,7 @@
     more: T.more || 'Learn more',
     accept: T.accept || 'Accept',
     decline: T.decline || 'Decline',
-    policyHref: T.policyHref || 'privacy.html'
+    policyHref: T.policyHref || '/privacy.html'
   };
 
   function getConsent() {

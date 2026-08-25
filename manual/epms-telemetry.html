@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EPMS Telemetry Dashboard — Technical Manual | ResistanceZero</title>
+    <meta name="description" content="Engineering manual for the EPMS one-line simulator: electrical formulas, breaker states, ATS transfer logic, telemetry mapping, exports, and limitations.">
+    <meta name="author" content="Bagus Dwi Permana">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="https://resistancezero.com/manual/epms-telemetry.html">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="EPMS Telemetry Dashboard — Technical Manual">
+    <meta property="og:description" content="Formula-led operating guide for the simulated utility, generator, breaker, one-line telemetry and report workflow.">
+    <meta property="og:url" content="https://resistancezero.com/manual/epms-telemetry.html">
+    <meta property="og:image" content="https://resistancezero.com/assets/og/EPMS_Telemetry.webp">
+    <link rel="icon" href="../assets/Favicon.png" type="image/png">
+    <link rel="stylesheet" href="../styles.min.css?v=20260225">
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"Technical Manuals","item":"https://resistancezero.com/manual/"},{"@type":"ListItem","position":3,"name":"EPMS Telemetry Dashboard"}]}
+    </script>
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@type":"TechArticle","headline":"EPMS Telemetry Dashboard — Technical Manual","author":{"@type":"Person","name":"Bagus Dwi Permana"},"publisher":{"@type":"Organization","name":"ResistanceZero"},"about":"Electrical power monitoring one-line formulas, transfer logic and simulated telemetry methodology","proficiencyLevel":"Expert"}
+    </script>
+    <style>
+        :root {
+            --bg:#081016; --surface:#0d171e; --surface-2:#101d25; --text:#e7edf3;
+            --muted:#9ba8b5; --line:rgba(231,237,243,.12); --cyan:#2be8ff;
+            --amber:#ffaa00; --green:#00e68a; --red:#ff5c68;
+            --mono:'JetBrains Mono','IBM Plex Mono',ui-monospace,monospace;
+            --sans:'IBM Plex Sans',system-ui,sans-serif;
+        }
+        [data-theme="dark"] { --bg:#081016; --surface:#0d171e; --surface-2:#101d25; --text:#e7edf3; --muted:#9ba8b5; --line:rgba(231,237,243,.12); }
+        :root:not([data-theme="dark"]) { --bg:#f4f7f9; --surface:#fff; --surface-2:#edf2f5; --text:#15202a; --muted:#4b5b68; --line:rgba(21,32,42,.17); --cyan:#00677d; --amber:#9a5b00; --green:#087d55; --red:#b52c3a; }
+        html,body { overflow-x:hidden; max-width:100%; }
+        body { background:var(--bg); color:var(--text); font-family:var(--sans); }
+        .skip-link { position:absolute; left:.75rem; top:-5rem; z-index:9999; background:var(--amber); color:#151006; padding:.65rem .9rem; }
+        .skip-link:focus { top:.75rem; }
+        :focus-visible { outline:2px solid var(--amber); outline-offset:2px; }
+        .mn-wrap { width:min(1060px,calc(100% - 2rem)); margin:0 auto; padding:5.5rem 0 5rem; }
+        .mn-crumb { font:500 .74rem/1.5 var(--mono); color:var(--muted); margin-bottom:1rem; }
+        .mn-crumb a,.mn-inline { color:var(--cyan); } .mn-crumb a { text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:2px; } .mn-inline { text-decoration:none; }
+        .mn-hero { background:var(--surface); border:1px solid var(--line); border-left:1px solid var(--cyan); border-radius:5px; padding:1.65rem; }
+        .mn-eyebrow { color:var(--cyan); font:600 .7rem/1.4 var(--mono); letter-spacing:.14em; text-transform:uppercase; }
+        .mn-hero h1 { margin:.45rem 0 .7rem; font-size:clamp(1.65rem,4vw,2.7rem); line-height:1.1; }
+        .mn-hero p { color:var(--muted); max-width:70ch; line-height:1.65; }
+        .mn-meta { display:flex; flex-wrap:wrap; gap:.45rem; margin-top:1rem; }
+        .mn-chip { border:1px solid var(--line); border-radius:3px; padding:.28rem .5rem; color:var(--muted); font:500 .69rem/1.3 var(--mono); }
+        .mn-section { margin:2.2rem 0; scroll-margin-top:5rem; }
+        .mn-section h2 { display:flex; gap:.65rem; align-items:baseline; margin:0 0 .45rem; font-size:1.32rem; }
+        .mn-section h3 { margin:1.2rem 0 .35rem; font-size:1rem; }
+        .mn-num { color:var(--cyan); border:1px solid var(--line); border-radius:3px; padding:.06rem .38rem; font:600 .75rem/1.4 var(--mono); }
+        .mn-lead { color:var(--muted); max-width:70ch; line-height:1.65; }
+        .mn-note { background:var(--surface); border:1px solid var(--line); border-left:1px solid var(--amber); border-radius:4px; padding:1rem; margin:.9rem 0; color:var(--muted); font-size:.86rem; line-height:1.55; }
+        .mn-tablewrap { overflow-x:auto; border:1px solid var(--line); border-radius:4px; margin-top:1rem; }
+        .mn-table { width:100%; min-width:780px; border-collapse:collapse; font-size:.81rem; font-variant-numeric:tabular-nums; }
+        .mn-table th,.mn-table td { padding:.58rem .65rem; text-align:left; vertical-align:top; border-bottom:1px solid var(--line); line-height:1.48; }
+        .mn-table th { background:var(--surface-2); color:var(--muted); font:600 .67rem/1.35 var(--mono); letter-spacing:.06em; text-transform:uppercase; }
+        .mn-table tbody tr:last-child td { border-bottom:0; }
+        code,.mn-mono { font-family:var(--mono); color:var(--cyan); font-size:.92em; font-feature-settings:'zero' 1,'tnum' 1; }
+        .mn-formula { background:var(--surface-2); border:1px solid var(--line); border-left:1px solid var(--cyan); border-radius:4px; padding:.9rem 1rem; margin:.75rem 0; overflow-x:auto; font:500 .82rem/1.65 var(--mono); font-feature-settings:'zero' 1,'tnum' 1; }
+        .mn-eq,.mn-result,.mn-src { display:block; }
+        .mn-eq { white-space:nowrap; }
+        .mn-result { color:var(--green); margin-top:.3rem; }
+        .mn-src { color:var(--muted); white-space:normal; margin-top:.35rem; }
+        .mn-worked { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:1rem 1.2rem; }
+        .mn-worked li { margin:.45rem 0; color:var(--muted); line-height:1.55; }
+        .mn-actions { display:flex; flex-wrap:wrap; gap:.65rem; margin-top:1.2rem; }
+        .mn-action { min-height:44px; display:inline-flex; align-items:center; padding:.55rem .85rem; border:1px solid var(--amber); border-radius:4px; color:var(--amber); text-decoration:none; font:600 .76rem/1.2 var(--mono); }
+        .mn-action.primary { background:#f0a300; color:#151006; }
+        @media (max-width:768px) {
+            html,body { overflow-x:hidden; max-width:100vw; }
+            img,svg,video { max-width:100%; height:auto; }
+            .mn-wrap { width:min(100% - 1rem,1060px); padding:5rem 0 4rem; }
+            .mn-hero { padding:1.2rem; }
+            .nav-menu,.nav-links { display:none; }
+            button,a.btn,[role="button"],.mn-action { min-height:44px; }
+        }
+        @media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important; animation:none!important; transition:none!important; } }
+        @media print { .navbar,.mn-actions { display:none!important; } body { background:#fff; color:#111; } .mn-section { break-inside:avoid; } }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/rz-documentation-ui.css?v=1.129.0">
+    <script src="../js/rz-documentation-ui.js?v=1.129.0" defer></script>
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo"><img src="../assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
+            <ul class="nav-menu">
+                <li><a href="../index.html" class="nav-link">Home</a></li>
+                <li><a href="../datacenter-solutions.html" class="nav-link">DC Solutions</a></li>
+                <li><a href="index.html" class="nav-link">Technical Manuals</a></li>
+                <li><a href="../prd/epms-telemetry.html" class="nav-link">PRD</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">Theme</button>
+            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
+        </div>
+    </nav>
+
+    <main class="mn-wrap" id="main-content" data-explain-scan>
+        <div class="mn-crumb"><a href="../index.html">Home</a> / <a href="index.html">Manuals</a> / EPMS Telemetry</div>
+        <header class="mn-hero">
+            <div class="mn-eyebrow">Technical manual · simulated electrical power monitoring</div>
+            <h1>EPMS Telemetry Dashboard</h1>
+            <p>This manual explains the one-line topology, state machine, electrical calculations, telemetry labels and report actions behind <code>EPMS_Telemetry.html</code>. Values are browser-simulated unless explicitly bound to <code>CONV_CALC.snapshot</code>.</p>
+            <div class="mn-meta"><span class="mn-chip">Site basis <strong>1,850 kW IT</strong></span><span class="mn-chip">Facility <strong>2,682.5 kW</strong></span><span class="mn-chip">PUE <strong>1.45</strong></span><span class="mn-chip">Mode <strong>SIMULATED</strong></span></div>
+        </header>
+
+        <section class="mn-section" id="engineering-basis">
+            <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
+            <p class="mn-lead">The cockpit is an educational EPMS one-line for exploring electrical reachability and source-transfer behavior. Its shared site KPIs use the Conventional DC locked model; its wire and bottom-bar values remain an illustrative simulator layer.</p>
+            <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Basis item</th><th>Value</th><th>Unit</th><th>Authority</th></tr></thead><tbody>
+                <tr><td>Current IT load</td><td>1,850</td><td>kW</td><td><code>CONV_MODEL.site.it_load_kw</code>.</td></tr>
+                <tr><td>Power usage effectiveness</td><td>1.45</td><td>ratio</td><td><code>CONV_MODEL.site.pue</code>.</td></tr>
+                <tr><td>Facility load</td><td>2,682.5</td><td>kW</td><td><code>CONV_CALC.facilityLoadKw()</code>.</td></tr>
+                <tr><td>Non-IT load</td><td>832.5</td><td>kW</td><td><code>CONV_CALC.nonItLoadKw()</code>.</td></tr>
+                <tr><td>UPS efficiency</td><td>0.96</td><td>ratio</td><td>Conventional engineering basis doc 09.</td></tr>
+                <tr><td>EPMS aggregate tolerance</td><td>±2</td><td>%</td><td>Conventional QA acceptance doc 12.</td></tr>
+                <tr><td>Utility / MV level</td><td>20,000</td><td>V line-to-line</td><td><code>WIRES[].v</code>.</td></tr>
+                <tr><td>LV distribution</td><td>400</td><td>V line-to-line</td><td><code>WIRES[].v</code>.</td></tr>
+                <tr><td>Rack branch label</td><td>230</td><td>V</td><td><code>WIRES[].v</code>; phase interpretation remains unresolved.</td></tr>
+                <tr><td>Current-calculation PF</td><td>0.90</td><td>ratio</td><td>Local <code>calcPowerFlow()</code> constant.</td></tr>
+            </tbody></table></div>
+            <div class="mn-note"><strong>Data-mode rule:</strong> the top Facility/IT/PUE values are deterministic engine outputs. The bottom Total Load, PF and Frequency are jittered demonstrations, and the wire kW values are destination-class assignments. Do not treat the latter as calibrated meters.</div>
+        </section>
+
+        <section class="mn-section" id="topology">
+            <h2><span class="mn-num">02</span> Topology &amp; interface map</h2>
+            <p class="mn-lead">The page uses a three-stream topology. Streams A and B have direct utility incomers; stream C is a catcher path reached through the MV ring. Equipment is generated from <code>DEVICES</code> and connections from <code>WIRES</code>.</p>
+            <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Layer</th><th>Tags / controls</th><th>Meaning</th><th>Operator action</th></tr></thead><tbody>
+                <tr><td>Header</td><td>Back, Portfolio, PRD, Manual</td><td>Navigation only.</td><td>Open related public documentation without changing simulation state.</td></tr>
+                <tr><td>View controls</td><td>50%, 75%, 120%, Fit, Reset View</td><td>Transform <code>#scene</code>.</td><td>Use Fit after resize; drag the canvas to pan; wheel to zoom.</td></tr>
+                <tr><td>Report controls</td><td>PDF, CSV, JSON</td><td>Snapshot of local simulator state.</td><td>Allow popups/downloads; verify the report timestamp and simulation scope.</td></tr>
+                <tr><td>Source controls</td><td>Utility A, Utility B, MV Bus Coupler</td><td>Source availability and tie position.</td><td>Select only as a training input; watch ATS/log response.</td></tr>
+                <tr><td>Generator indicators</td><td>GEN A/B/C</td><td>ATS-commanded running state.</td><td>Read only; these are not manual start buttons.</td></tr>
+                <tr><td>MV</td><td><code>MV_A/B</code>, <code>RMU_A/B/C</code>, <code>TX_A/B/C</code></td><td>20 kV incoming, ring and transformation.</td><td>Select associated breaker symbol to exercise state.</td></tr>
+                <tr><td>LV / distribution</td><td><code>LVSB_*</code>, <code>ATSDB_IT_*</code>, <code>ATSDB_M_*</code>, <code>ATS_PNL1/2</code></td><td>400 V boards and catcher ties.</td><td>Trace energized line and breaker state.</td></tr>
+                <tr><td>Protected IT</td><td><code>UPS_A/B/C</code>, <code>PDU_*</code>, <code>rATS_0…9</code>, <code>RACK_0…9</code></td><td>UPS-to-representative-rack distribution.</td><td>Do not interpret ten racks as the full site.</td></tr>
+                <tr><td>Mechanical</td><td>UPS-M A/B, CH-1…4, AHU-1/2, DAHU A/B 1…5</td><td>Critical cooling support loads.</td><td>Inspect path and telemetry label.</td></tr>
+                <tr><td>Breaker gesture</td><td>Click / Alt-click / Shift-click</td><td>Toggle / force open / trip.</td><td>Use only in simulation; trip increments alarms.</td></tr>
+                <tr><td>Status</td><td>System, Total Load, PF, Frequency, Breakers, Alarms, clock</td><td>Bottom roll-up.</td><td>Reconcile only state counts; recognize jittered measurements.</td></tr>
+            </tbody></table></div>
+        </section>
+
+        <section class="mn-section" id="inputs">
+            <h2><span class="mn-num">03</span> Inputs, point classes &amp; state</h2>
+            <p class="mn-lead">There are three input classes: engine basis, user-driven simulator state and browser-generated display jitter. Keeping these classes separate prevents a simulated label from being mistaken for a meter.</p>
+            <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Class</th><th>Input / state</th><th>Consumers</th><th>Quality rule</th></tr></thead><tbody>
+                <tr><td>Locked engineering basis</td><td><code>CONV_CALC.snapshot.site</code></td><td>Top Facility, IT and PUE strip.</td><td>Deterministic; missing engine must become unavailable, not silently GOOD.</td></tr>
+                <tr><td>Source state</td><td><code>SIM.sources.A/B</code></td><td>Source buttons, ATS logic, flow reachability, System mode.</td><td>Local simulated state.</td></tr>
+                <tr><td>Generator state</td><td><code>SIM.genRunning.A/B/C</code></td><td>Generator indicators and generator-fed path.</td><td>Local ATS outcome.</td></tr>
+                <tr><td>Breaker state</td><td><code>SIM.breakers[br_*]</code></td><td>Symbols, flow, breaker/alarm counts, exports.</td><td>Local simulated state; enum must be closed/open/trip.</td></tr>
+                <tr><td>Reachability</td><td><code>SIM.energizedNodes</code></td><td>Animated flow and downstream recursion guard.</td><td>Derived every 500 ms; not persisted.</td></tr>
+                <tr><td>Wire configuration</td><td><code>WIRES</code></td><td>Topology, nominal voltage, breaker tag, default state.</td><td>Static source code.</td></tr>
+                <tr><td>Equipment configuration</td><td><code>DEVICES</code></td><td>Tags, location, type and nameplate text.</td><td>Static source code.</td></tr>
+                <tr><td>Display jitter</td><td><code>Math.random()</code></td><td>Total Load, PF, Frequency.</td><td>Illustrative/estimated; must never be exported as metered without a provenance field.</td></tr>
+                <tr><td>Browser clock</td><td><code>Date</code></td><td>Bottom timestamp and report timestamp.</td><td>Display time only; not acquisition time.</td></tr>
+            </tbody></table></div>
+        </section>
+
+        <section class="mn-section" id="calculation">
+            <h2><span class="mn-num">04</span> Calculation methodology</h2>
+            <h3>Facility balance</h3>
+            <div class="mn-formula"><span class="mn-eq">P_facility = P_IT × PUE</span><span class="mn-eq">P_facility = 1,850 kW × 1.45 = 2,682.5 kW</span><span class="mn-result">Top strip display: 2.68 MW facility · 1.85 MW IT · PUE 1.45</span><span class="mn-src">Source: <code>CONV_CALC.snapshot.site</code>; conventional review doc 09.</span></div>
+            <h3>Three-phase current</h3>
+            <div class="mn-formula"><span class="mn-eq">P_3φ = √3 × V_LL × I × PF / 1,000</span><span class="mn-eq">I = P_kW × 1,000 / (√3 × V_LL × PF)</span><span class="mn-src">Symbols: <code>P_kW</code> active power, <code>V_LL</code> line-to-line voltage, <code>I</code> line current, <code>PF</code> power factor. The simulator uses PF 0.90 and applies <code>floor()</code>.</span></div>
+            <h3>Single-phase branch boundary</h3>
+            <div class="mn-formula"><span class="mn-eq">P_1φ = V_LN × I × PF / 1,000</span><span class="mn-eq">I_1φ = P_kW × 1,000 / (V_LN × PF)</span><span class="mn-src">The current cockpit does not branch on phase type; its 230 V rack labels still use the three-phase expression. This formula is the required correction if those branches are truly single phase.</span></div>
+            <h3>State roll-ups</h3>
+            <div class="mn-formula"><span class="mn-eq">closed = Σ [breaker.state = "closed"]</span><span class="mn-eq">alarms = Σ [breaker.state = "trip"]</span><span class="mn-eq">system = (utilityA ∨ utilityB) ? "ONLINE" : "GEN MODE"</span><span class="mn-src">Source: <code>updateStatusBar()</code>. An open breaker is not counted as an alarm in the current implementation.</span></div>
+            <h3>Illustrative meter jitter</h3>
+            <div class="mn-formula"><span class="mn-eq">P_display = 2,400 + floor(U[0,1) × 100) kW</span><span class="mn-eq">PF_display = round(0.92 + U[0,1) × 0.03, 2)</span><span class="mn-eq">f_display = round(50.0 + (U[0,1) − 0.5) × 0.1, 1) Hz</span><span class="mn-src">These are display ranges, not sourced facility equations. They intentionally remain labeled as a limitation.</span></div>
+        </section>
+
+        <section class="mn-section" id="state-machine">
+            <h2><span class="mn-num">05</span> ATS, breaker &amp; power-flow state machine</h2>
+            <p class="mn-lead">The state machine is reachability-based, not an AC load-flow solver. It evaluates source health, manipulates utility/generator incomer breakers and recursively marks downstream nodes energized through closed breakers.</p>
+            <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>State / transition</th><th>Condition</th><th>Action</th><th>Visible result</th></tr></thead><tbody>
+                <tr><td>A utility healthy</td><td>Utility A direct, or Utility B through closed MV tie.</td><td>Generator A incomer opens; after 1 s utility A incomer closes and generator stops.</td><td>A path energized from utility; GEN A standby.</td></tr>
+                <tr><td>B utility healthy</td><td>Utility B direct, or Utility A through closed MV tie.</td><td>Generator B incomer opens; after 1 s utility B incomer closes and generator stops.</td><td>B path energized from utility; GEN B standby.</td></tr>
+                <tr><td>C utility healthy</td><td>Reachable A ring or B ring through its breaker chain.</td><td>Generator C transfer follows the same restore/loss sequence.</td><td>C catcher path energized by the reachable ring source.</td></tr>
+                <tr><td>Utility lost</td><td>Stream health false while utility incomer is closed.</td><td>Open utility incomer, mark generator running, then close generator breaker after 2 s.</td><td>Log entries, generator indicator and generator-styled flow.</td></tr>
+                <tr><td>Manual breaker toggle</td><td>Click a breaker group.</td><td>closed ↔ open.</td><td>Symbol class and downstream reachability update.</td></tr>
+                <tr><td>Manual trip</td><td>Shift-click a breaker group.</td><td>Set state to trip.</td><td>Trip X, fault-red state and alarm count.</td></tr>
+                <tr><td>Manual open</td><td>Alt-click a breaker group.</td><td>Set state to open.</td><td>Open symbol and downstream de-energization.</td></tr>
+                <tr><td>Power-flow refresh</td><td>500 ms interval.</td><td>Clear flows/labels, traverse from available sources through closed breakers.</td><td>Current reachable paths animate; all others read zero.</td></tr>
+            </tbody></table></div>
+            <div class="mn-note"><strong>Safety boundary:</strong> this sequence omits synchronism check, voltage/frequency permissives, dead-bus logic, protection coordination, breaker travel time, lockout, retry limits and operator confirmation. It must never be copied into field control code.</div>
+        </section>
+
+        <section class="mn-section" id="worked-example">
+            <h2><span class="mn-num">06</span> Worked example</h2>
+            <p class="mn-lead">The example separates the shared site aggregate from one wire-label calculation and from the representative rack row.</p>
+            <div class="mn-worked"><ol>
+                <li><strong>Facility aggregate:</strong> <code>1,850 × 1.45</code> = <span class="mn-result">2,682.5 kW</span>.</li>
+                <li><strong>Top-strip rounding:</strong> <code>2,682.5 / 1,000</code> to two decimals = <span class="mn-result">2.68 MW</span>.</li>
+                <li><strong>Example MV wire:</strong> assigned <code>P=2,400 kW</code>, <code>V_LL=20,000 V</code>, <code>PF=0.90</code>.</li>
+                <li><strong>Calculated current:</strong> <code>2,400,000 / (1.732 × 20,000 × 0.90)</code> = <span class="mn-result">76.98 A</span>; the cockpit floors this to <span class="mn-result">76 A</span>.</li>
+                <li><strong>Representative rack row:</strong> ten branches × 6 kW = <span class="mn-result">60 kW</span>.</li>
+                <li><strong>Scope gap:</strong> <code>1,850 − 60</code> = <span class="mn-result">1,790 kW not represented by the ten rack symbols</span>.</li>
+                <li><strong>Interpretation:</strong> the diagram must be read as a representative protected row unless a future model allocates the entire site load across aggregate PDU groups.</li>
+            </ol></div>
+            <div class="mn-note">The bottom bar may simultaneously show a random 2.4–2.499 MW total. That is not a second facility-balance calculation; it is an unresolved simulator display and should not be used to validate PUE.</div>
+        </section>
+
+        <section class="mn-section" id="quality-export">
+            <h2><span class="mn-num">07</span> Telemetry quality, alarms &amp; exports</h2>
+            <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Surface</th><th>What it currently means</th><th>What it does not prove</th><th>Required operator reading</th></tr></thead><tbody>
+                <tr><td>Data GOOD</td><td>Static page declaration.</td><td>No acquisition health, stale-age or per-point quality check.</td><td>Read together with Scenario Simulated.</td></tr>
+                <tr><td>Timestamp</td><td>Browser clock refreshed each second.</td><td>Not a meter sample time.</td><td>Use as UI time only.</td></tr>
+                <tr><td>Alarm count</td><td>Count of breaker states equal to <code>trip</code>.</td><td>No ISA-18.2 lifecycle, acknowledgement, shelving or priority.</td><td>Use to locate simulated trips in the one-line.</td></tr>
+                <tr><td>Open breaker</td><td>User/ATS state that interrupts reachability.</td><td>Not automatically abnormal.</td><td>Interpret with expected topology and log.</td></tr>
+                <tr><td>PDF report</td><td>Printable HTML with summary and source/generator states.</td><td>Not a signed commissioning record.</td><td>Confirm timestamp and current state before printing.</td></tr>
+                <tr><td>CSV</td><td>Metrics, sources, generators and every breaker state.</td><td>No schema version, units column for all rows or quality flag.</td><td>Treat as local simulator export.</td></tr>
+                <tr><td>JSON</td><td>Timestamp plus source/generator/breaker state and summary strings.</td><td>No persistent historian identity.</td><td>Use for teaching/test fixtures only.</td></tr>
+            </tbody></table></div>
+        </section>
+
+        <section class="mn-section" id="standards">
+            <h2><span class="mn-num">08</span> Standards mapping</h2>
+            <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Standard / source</th><th>Relevant subject</th><th>Current implementation status</th></tr></thead><tbody>
+                <tr><td>IEC 60364</td><td>Low-voltage electrical installations.</td><td>Context only; conductor sizing and protection are not calculated.</td></tr>
+                <tr><td>IEC 60909</td><td>Short-circuit currents.</td><td>Not implemented; no fault-level output should be inferred.</td></tr>
+                <tr><td>IEC 61850</td><td>Substation object models and communications.</td><td>Not implemented; point IDs are local DOM/model names.</td></tr>
+                <tr><td>IEC 60870-5-104</td><td>Telecontrol exchange.</td><td>Not implemented.</td></tr>
+                <tr><td>IEEE C37.2</td><td>Protection/control device-function numbers.</td><td>Recommended for a future breaker inspector.</td></tr>
+                <tr><td>IEEE 1584 / NFPA 70E</td><td>Arc-flash calculation and electrical safe work.</td><td>Explicitly outside simulator scope.</td></tr>
+                <tr><td>ISO/IEC 30134-2</td><td>PUE definition.</td><td>Shared Conventional model provides PUE 1.45; EPMS page does not independently calculate it.</td></tr>
+                <tr><td>Conventional review docs 00/02/09/12</td><td>Single site basis, EPMS gaps, formulas and acceptance.</td><td>Primary internal engineering review source.</td></tr>
+            </tbody></table></div>
+        </section>
+
+        <section class="mn-section" id="glossary">
+            <h2><span class="mn-num">09</span> Glossary &amp; RZExplain</h2>
+            <p class="mn-lead">Terms below are marked for the shared RZExplain scanner so a reader can inspect definitions without leaving the manual.</p>
+            <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Term</th><th>Meaning in this cockpit</th></tr></thead><tbody>
+                <tr><td><span data-explain="EPMS">EPMS</span></td><td>Electrical Power Monitoring System; the cockpit models display and state, not a field acquisition server.</td></tr>
+                <tr><td><span data-explain="ATS">ATS</span></td><td>Automatic Transfer Switch or transfer function between normal and alternate source.</td></tr>
+                <tr><td><span data-explain="RMU">RMU</span></td><td>Ring Main Unit in the 20 kV distribution path.</td></tr>
+                <tr><td><span data-explain="LVSB">LVSB</span></td><td>Low-Voltage Switchboard downstream of a transformer.</td></tr>
+                <tr><td><span data-explain="UPS">UPS</span></td><td>Uninterruptible Power Supply protecting IT or critical mechanical load.</td></tr>
+                <tr><td><span data-explain="PDU">PDU</span></td><td>Power Distribution Unit between UPS/catcher feed and rack ATS.</td></tr>
+                <tr><td><span data-explain="power factor">Power factor</span></td><td>Active power divided by apparent power; the wire calculation assumes 0.90.</td></tr>
+                <tr><td><span data-explain="PUE">PUE</span></td><td>Facility energy divided by IT energy; the shared scenario is 1.45.</td></tr>
+                <tr><td>Open / trip</td><td>Open is a position; trip is a simulated fault state counted as an alarm.</td></tr>
+                <tr><td>Representative row</td><td>The ten 6 kW rack symbols, which do not represent the full site IT load.</td></tr>
+            </tbody></table></div>
+        </section>
+
+        <section class="mn-section" id="limitations">
+            <h2><span class="mn-num">10</span> Limitations &amp; validation checklist</h2>
+            <p class="mn-lead">Use the cockpit only inside its declared simulation boundary. The following checks are mandatory before accepting a future revision.</p>
+            <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Check</th><th>Expected result</th><th>Known present limitation</th></tr></thead><tbody>
+                <tr><td>Facility balance</td><td>EPMS aggregate within ±2% of 2,682.5 kW.</td><td>Bottom Total Load is 2.4–2.499 MW jitter and does not reconcile.</td></tr>
+                <tr><td>IT roll-up</td><td>Sum of protected IT outputs equals 1,850 kW or scope is labeled.</td><td>Ten racks total only 60 kW.</td></tr>
+                <tr><td>Phase/current model</td><td>Formula matches branch phase and voltage definition.</td><td>230 V branch uses three-phase formula.</td></tr>
+                <tr><td>Data quality</td><td>Every point has source, sample timestamp, quality and stale threshold.</td><td>Only a static GOOD label exists.</td></tr>
+                <tr><td>Alarm lifecycle</td><td>Severity, timestamp, cause, acknowledgement and clear state.</td><td>Only trip count exists.</td></tr>
+                <tr><td>Transfer safety</td><td>Permissives, timeouts, interlocks and failure states are explicit.</td><td>Browser timers implement a simplified success path.</td></tr>
+                <tr><td>Color semantics</td><td>Red reserved for fault/trip.</td><td>Normal source A flow is red.</td></tr>
+                <tr><td>Accessibility</td><td>All source/breaker controls work from keyboard with state announcement.</td><td>Several controls are divs and breaker state uses pointer modifiers.</td></tr>
+                <tr><td>Responsive behavior</td><td>No page overflow at 360 px; key controls reachable.</td><td>Diagram remains a desktop-scale engineering canvas.</td></tr>
+            </tbody></table></div>
+            <div class="mn-actions"><a class="mn-action primary" href="../EPMS_Telemetry.html">Open cockpit</a><a class="mn-action" href="../prd/epms-telemetry.html">Read product requirements</a></div>
+        </section>
+    </main>
+
+    <script>
+    (function(){
+        var toggle=document.getElementById('themeToggle');
+        var saved=localStorage.getItem('theme')||localStorage.getItem('rz_theme')||'light';
+        document.documentElement.setAttribute('data-theme',saved);
+        if(toggle)toggle.addEventListener('click',function(){
+            var next=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';
+            document.documentElement.setAttribute('data-theme',next);
+            localStorage.setItem('theme',next);localStorage.setItem('rz_theme',next);
+        });
+        var scrollables=document.querySelectorAll('.mn-tablewrap,.mn-formula');
+        for(var i=0;i<scrollables.length;i++)scrollables[i].setAttribute('tabindex','0');
+    })();
+    </script>
+    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=1.129.0" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=1.129.0" defer></script>
+    <script src="../js/rz-explain-db.js?v=2026-07-27" defer></script>
+    <script src="../js/rz-explain.js?v=2026-07-27" defer></script>
+</body>
+</html>

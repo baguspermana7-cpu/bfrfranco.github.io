@@ -41,6 +41,32 @@ html[data-rz-register="instrument"]:not([data-theme="light"]) .tabs,
 html[data-rz-register="instrument"]:not([data-theme="light"]) .mn,
 html[data-rz-register="instrument"]:not([data-theme="light"]) .sb{position:relative;z-index:1;}
 
+/* Only the two public contract links pierce a restricted cockpit overlay. */
+.rz-public-contract-layer{
+  position:fixed;inset:0;z-index:100002;pointer-events:none;
+}
+.rz-public-contract-layer a{
+  position:fixed;z-index:1;pointer-events:auto;
+}
+.rz-public-contract-slot{
+  visibility:hidden;pointer-events:none;
+}
+
+@media(max-width:600px){
+  html[data-rz-register="instrument"] .hdr:has(.rz-public-contract-slot){
+    height:auto;min-height:44px;padding:8px 10px;flex-wrap:wrap;gap:6px;
+  }
+  html[data-rz-register="instrument"] .hdr:has(.rz-public-contract-slot) > div:first-child{
+    width:100%;min-width:0;flex-wrap:wrap;
+  }
+  html[data-rz-register="instrument"] .hdr:has(.rz-public-contract-slot) h1{
+    font-size:11px;flex:1 0 100%;
+  }
+  html[data-rz-register="instrument"] .hdr:has(.rz-public-contract-slot) .hdr-r{
+    width:100%;flex-wrap:wrap;
+  }
+}
+
 /* ---- display type → JetBrains Mono (heading chrome only, not data text) ---- */
 html[data-rz-register="instrument"]:not([data-theme="light"]) .hdr h1,
 html[data-rz-register="instrument"]:not([data-theme="light"]) .bx h3,
