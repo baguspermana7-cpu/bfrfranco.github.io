@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v1.129.3 — 2026-08-26 (De-slop index hero cards + fix stale dark-mode dot-grid cache)
+
+### Fixed
+- **Dark-mode "dot-grid" on the index hero was a STALE CSS CACHE.** The hero dot-grid was removed from
+  `styles-index.css` earlier, but `index.html` still loaded `styles-index.min.css?v=2026-07-13-contact` — the
+  cache-bust token was never bumped, so browsers kept serving the old CSS with the grid. Bumped the token to
+  `2026-08-26-deslop` (rebuilt the min) so every browser refetches the grid-free CSS. A fresh render was
+  already clean; this makes it clean for cached clients too.
+- **De-slopped the index hero metric-cards** (uiux review HIGH): `.gradient-border` 16px radius → 4px
+  instrument radius and dropped the animated rainbow gradient border; `.glow-border:hover` neon triple-glow
+  → border-color only (design.md anti-pattern #18); `.icon-bounce:hover` bounce/spring motion removed
+  (anti-pattern #7/#19). Rebuilt `styles-index.min.css`.
+
 ## v1.129.2 — 2026-08-26 (Auth security: remove offline-root from public bundle + narrow retry — Codex review H-1/H-2)
 
 ### Security / Fixed

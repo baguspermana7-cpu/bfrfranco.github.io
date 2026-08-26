@@ -3149,11 +3149,7 @@ section {
 }
 
 .glow-border:hover {
-    border-color: rgba(245, 158, 11, 0.6);
-    box-shadow:
-        0 0 10px rgba(245, 158, 11, 0.35),
-        0 0 20px rgba(255, 107, 53, 0.25),
-        0 0 30px rgba(245, 158, 11, 0.15);
+    border-color: rgba(245, 158, 11, 0.6); /* de-slop: border-color only, no neon glow (design.md anti-pattern #18) */
 }
 
 /* Button Glow Effects */
@@ -3461,7 +3457,7 @@ section {
    ========================================== */
 .gradient-border {
     position: relative;
-    border-radius: 16px;
+    border-radius: 4px; /* de-slop: instrument radius, not 16px consumer-app (design.md) */
     background: var(--white);
 }
 
@@ -3476,13 +3472,13 @@ section {
     background-size: 400% 400%;
     border-radius: 18px;
     z-index: -1;
-    animation: gradientBorder 3s ease infinite;
+    /* de-slop: no animated rainbow gradient border */
     opacity: 0;
     transition: opacity 0.3s ease;
 }
 
 .gradient-border:hover::before {
-    opacity: 1;
+    opacity: 0; /* de-slop: gradient border stays off; hover uses border-color via .glow-border */
 }
 
 @keyframes gradientBorder {
@@ -3511,7 +3507,7 @@ section {
    ========================================== */
 .icon-bounce:hover svg,
 .icon-bounce:hover .metric-icon {
-    animation: iconBounce 0.6s ease;
+    /* de-slop: no bounce/spring motion (design.md anti-pattern #7/#19) */
 }
 
 @keyframes iconBounce {
