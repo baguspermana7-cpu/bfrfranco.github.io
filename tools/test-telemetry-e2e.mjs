@@ -8,6 +8,10 @@ const ROOT = process.cwd();
 const VIEW_DESKTOP = { width: 1440, height: 900 };
 const VIEW_MOBILE = { width: 375, height: 812, isMobile: true };
 const AXE_SOURCE = await readFile(resolve(ROOT, 'tools/vendor/axe.min.js'), 'utf8');
+const VERSION_SOURCE = await readFile(resolve(ROOT, 'js/rz-version.js'), 'utf8');
+const VERSION_MATCH = VERSION_SOURCE.match(/window\.RZ_VERSION\s*=\s*['"]([^'"]+)['"]/);
+assert.ok(VERSION_MATCH, 'js/rz-version.js must expose window.RZ_VERSION');
+const EXPECTED_VERSION = VERSION_MATCH[1];
 const TEST_SCOPE = process.env.RZ_TELEMETRY_E2E_SCOPE || 'all';
 const PRESERVED_MOCKUP_OVERFLOW_PX = 50;
 let formulaCoverage = Object.freeze({ total: 0, scrollable: 0, static: 0 });
@@ -164,7 +168,7 @@ async function assertDocSurface(page, path, mobile, theme) {
     `${path}: main content overlaps fixed navbar (${result.mainTop}px < ${result.navBottom}px)`,
   );
   assert.ok(result.overflow <= 1, `${path}: ${mobile ? 'mobile' : 'desktop'} overflow ${result.overflow}px`);
-  assert.equal(result.version, '1.129.1', `${path}: version stamp must load`);
+  assert.equal(result.version, EXPECTED_VERSION, `${path}: version stamp must match js/rz-version.js`);
   assert.match(result.fontFamily, /IBM Plex Sans/i, `${path}: canonical font must be active`);
   assert.ok(result.tableAffordance, `${path}: wide tables need keyboard scroll hint and sticky identity`);
   const invalidFormulas = result.formulaStates.filter((formula) => formula.scrollable

@@ -9,10 +9,11 @@
 ---
 
 ## 0 · What we produce, per cockpit
-Two SEPARATE public pages + two additive buttons on the cockpit:
+Two SEPARATE public pages + two contract buttons on the cockpit:
 - **PRD** → `prd/<slug>.html` — the product-requirements document.
 - **Manual** → `manual/<slug>.html` — the engineering methodology/formulas manual (existing editorial pattern).
-- **Buttons** on the cockpit's own toolbar: `PRD` + `Manual` (additive only — never alter existing controls/scripts).
+- **Buttons** on the cockpit's own toolbar: `PRD` + `Manual`. Their initial introduction is additive;
+  later owner-approved cockpit work may evolve the page while both unique routes remain intact.
 
 Slugs: `epms-telemetry` · `datahallai` · `dc-conventional` · `datahall` · `cdu-mini-bms` · `rz-cockpit-mockup`.
 
@@ -55,7 +56,7 @@ Every PRD/Manual page MUST:
 - Editorial/instrument register — NO AI-slop (no full-round pills, neon/glow, uniform undifferentiated bars, decorative emoji); thin hairlines, mono tabular numerics, square-ish radii. Match the site brand (`documentation/design.md`).
 - Paths from `prd/` and `manual/` are one level deep → assets/js use `../` prefix.
 
-## 4 · Cockpit button pattern (additive, non-destructive — INV-09)
+## 4 · Cockpit button pattern (non-destructive contract — INV-09)
 Inject exactly two links into the cockpit's OWN toolbar, styled with that page's existing button class:
 ```html
 <a class="<page-btn-class>" href="prd/<slug>.html">PRD</a>
@@ -63,9 +64,12 @@ Inject exactly two links into the cockpit's OWN toolbar, styled with that page's
 ```
 Per-page hook + class: EPMS_Telemetry `.topbar` → `.btn`; datahallAI Back/Portfolio row → its nav-btn class;
 dc-conventional `.header-left`; datahall `.nav-btn`; cdu-mini-bms `.nav-container`; rz-cockpit-mockup (inspect).
-RULES: additive markup ONLY; do not touch existing controls, event handlers, or scripts; `git diff` on the
-cockpit MUST show inserted `<a>` lines and nothing else changed. Verify with puppeteer the cockpit still
-renders + a representative control still works after injection.
+RULES: the documentation-link migration itself adds only the two anchors. Do not alter unrelated controls,
+event handlers, or scripts while wiring those routes. Later product changes use their own frozen work-item
+contract; the durable telemetry-doc gate then requires exactly one PRD link and one Manual link per cockpit,
+semantic preservation of sourced formulas/results/references (with explicit replacement contracts for
+corrections), and a representative browser control flow. Do not use the original migration revision as a
+permanent whole-page freeze.
 
 ## 5 · Acceptance checklist (evaluator — INDEPENDENT, adversarial, two-dimensional)
 A page ships only if the evaluator (NOT the builder) confirms ALL:
@@ -98,6 +102,9 @@ unverified limitation into a completion claim.
 |---|---|---|---|
 | Existing manuals contained 184–229 character meta descriptions. | Earlier manual depth work had no 120–160 character SEO gate. | Correct metadata without rewriting sourced engineering content; `tools/test-telemetry-docs.mjs` enforces the range on all 12 pages. | Non-destructive does not mean immutable metadata; preserve evidence-bearing facts, formulas, results and references, while fixing objectively invalid shell metadata. |
 | A blanket “no deleted manual lines” rule would reject legitimate metadata corrections and structured additions. | The original requirement did not distinguish evidence from presentation markup. | Snapshot and compare sourced `.mn-eq`, `.mn-result`, `.mn-src` and reference-list fragments instead of forbidding every changed line. | Source preservation must target semantic evidence, not byte-for-byte page stagnation. |
+| The telemetry-doc gate rejected an approved EPMS fix and richer PRD TOCs because it permanently required zero cockpit deletions, exactly two additions, and counted the TOC as a numbered PRD section. | A migration-time additive invariant was treated as a lifetime source freeze; section counting matched a CSS substring instead of document semantics. | Require one unique PRD/Manual route, exclude `.mn-toc` from the 11-section count, and retain exact semantic evidence checks plus explicit correction mappings. | Freeze the work-item boundary, not future product evolution; structural tests must select semantic roles rather than incidental class substrings. |
+| The offline-root security cleanup also deleted the unrelated network-first public-contract bridge, stranding PRD/Manual links behind restricted cockpit overlays. | A security patch removed a broad contiguous block instead of proving which symbols belonged to the credential feature. | Restore only `PUBLIC_CONTRACTS`/`exposePublicContractLinks`, keep offline recovery as a no-op, and gate both the source symbol and logged-out cached-navigation flow. | Security deletion scopes require a dependency-aware diff; adjacent code is not automatically part of the vulnerable feature. |
+| Telemetry browser tests hardcoded release `1.129.1` and failed every legitimate site version bump. | The test duplicated the version source of truth. | Parse `window.RZ_VERSION` from `js/rz-version.js` and assert every rendered document matches it. | Version parity should be compared to the canonical artifact, never another literal. |
 | The sitemap, `llms.txt`, and full-content LLM inventory ignored some public documentation routes. | Their directory collectors predated public product requirements; `build-llms-full.py` scanned root HTML only. | Add `prd/` to the sitemap and compact LLM builders, add `manual/` + `prd/` to the full-content builder, and assert all 12 paired routes across search, sitemap, `llms.txt`, and `llms-full.txt`. | A page linked from a hub is still undiscoverable when generated indexes omit its directory. |
 | A PRD initially linked a Manual fragment that did not exist. | Cross-page prose and anchor IDs were authored independently. | Link to a verified page URL unless a fragment is proven; browser/link gates must resolve every final target. | Never infer a fragment from a section name—validate the literal destination. |
 | The RZ cockpit mockup is a small visual prototype; its Before and After columns intentionally repeat the same four fixtures, and it has no standard shell/reduced-motion behavior. | It was built to compare surface character, not as a production cockpit. | Document the prototype boundary and verified gaps; keep this task's cockpit diff to exactly the two authorized links. Resolve implementation defects only under a separate frozen contract. | Honest documentation is preferable to silently broadening scope or presenting a prototype as operational telemetry. |

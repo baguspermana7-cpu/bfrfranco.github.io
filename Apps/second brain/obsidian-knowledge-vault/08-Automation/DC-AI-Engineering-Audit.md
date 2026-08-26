@@ -4,7 +4,7 @@ title: DC AI BMS — Engineering Audit & Improvement Roadmap
 file: /home/baguspermana7/rz-work/Automation/DC AI/Engineering-Audit-2026-05-01.md
 group: automation
 tags: [bms, scada, dcai, audit, p&id, sld, ldc, iec-62443]
-last_updated: 2026-05-01
+last_updated: 2026-08-26
 status: private
 gitignored: true
 parent: [[DataHall-AI]]
@@ -37,7 +37,7 @@ A 547-line engineering audit + improvement roadmap for `datahallAI.html` (the DC
 - **Lines**: 0.6–1.4 px tier-graded — never the 3-4 px slabs
 - **Colour**: pull back saturated greens/cyans for *decoration*; reserve for *state* (running/alarm/locked-out)
 - **Animation**: restrained — slow alarm pulse 1 Hz, smooth 200-300 ms cross-fade, parallel-stroke laser flow only on energised lines. Forbidden: bounce, spring, decorative particles, rainbow.
-- **Typography**: JetBrains Mono for numerics, Inter for labels.
+- **Typography**: JetBrains Mono for numeric instrumentation; IBM Plex Sans/Mono for labels and operator text. Inter is retired from this cockpit contract.
 
 ## Standards referenced (22 codes)
 
@@ -72,3 +72,14 @@ All LDC traffic transits through unidirectional gateway (data diode) to L3 histo
 - This vault entry is safe to push (no sensitive content).
 - Re-read the audit MD before any iteration on `datahallAI.html`.
 - Per [[../00-Hub/README#Graphify Protocol]]: when querying via Graphify, the audit MD is the single-source-of-truth for what to fix on the BMS page. Don't re-crawl the source HTML.
+
+## v1.130.0 evidence milestone
+
+- Alarm query/first-out, evaluated electrical scenarios, zoned FACP cause-and-effect, and rack-density reference comparisons now have pure data contracts plus regression tests.
+- The approved monolithic diagrams were preserved; new semantic state is projected onto them instead of using CSS color as operational truth.
+- The four-second electrical renderer is now isolated in `electrical-live.js`: post-tick IT/facility/PUE values remain 3.564 MW / 4.638 MW / 1.30 per hall, and per-unit generator state follows the selected semantic scenario instead of random telemetry. Successful transfer is explicitly 7 RUNNING + 1 STANDBY; normal is 0 RUNNING + 8 STANDBY; failed start reports 8 FAILED. Renderer errors invalidate every owned field rather than leaving stale live-looking values.
+- Current cooling inventory is reconciled to 9 running / 12 installed 350 kW CDUs per hall (48 installed facility-wide); selected-hall heat and TCS flow bind to 3,029 kW and 4,342 LPM. Legacy 24-CDU and 22-pump operational labels are regression-forbidden.
+- GB200 Scenario A remains adopted. GB300 142 kW/rack remains a comparison study only.
+- New follow-on UI work must preserve the module/test boundary in `js/datahall-ai/` and the no-global-shutdown/FACP-authority rules.
+- Full-site dark verification keeps strict product semantics: a sweep candidate needs two normal-timing clean confirmations in separate fresh Chromium processes; reproduced findings, incomplete confirmation, or render errors fail closed.
+- Theme sampling forces style recalculation and waits for two rendered frames before the transition interval; host wall-clock time cannot substitute for proof that the palette was actually painted.

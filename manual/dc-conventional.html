@@ -108,7 +108,7 @@
             {
                 "@type": "Question",
                 "name": "Why is the cockpit locked — no user inputs?",
-                "acceptedAnswer": { "@type": "Answer", "text": "The EPMS/BMS cockpit is a real-time monitoring and anomaly-detection aid, not a design calculator. Its numbers represent a single authenticated engineering scenario (IT load 1,850 kW, PUE 1.45) anchored in conv review doc 09. Allowing arbitrary inputs would break the ACCURACY_VALIDATION 6-rule contract and produce engineering-indefensible output. All KPIs are derived deterministically from CONV_CALC." }
+                "acceptedAnswer": { "@type": "Answer", "text": "The EPMS/BMS cockpit is a simulated monitoring and anomaly-detection aid, not a design calculator or live field-control system. Its numbers represent a single authenticated engineering scenario (IT load 1,850 kW, PUE 1.45) anchored in conv review doc 09. Allowing arbitrary inputs would break the ACCURACY_VALIDATION 6-rule contract and produce engineering-indefensible output. All KPIs are derived deterministically from CONV_CALC." }
             },
             {
                 "@type": "Question",
@@ -206,7 +206,7 @@
         .mn-toollink:hover { filter: brightness(1.08); }
 
         /* Section blocks */
-        .mn-section { margin: 2.25rem 0; }
+        .mn-section { margin: 2.25rem 0; scroll-margin-top: 5rem; }
         .mn-section > h2 {
             font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
             display: flex; align-items: baseline; gap: 0.6rem;
@@ -267,6 +267,7 @@
 
         a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
         a.mn-inline:hover { text-decoration: underline; }
+        .mn-section[aria-labelledby="contents-title"] a { display: inline-flex; align-items: center; min-height: 24px; }
 
         /* v1.8.0 — mobile responsive patch */
         @media (max-width: 768px) {
@@ -305,7 +306,7 @@
         </div>
     </nav>
 
-    <main class="mn-wrap" data-explain-scan>
+    <main class="mn-wrap" id="main-content" data-explain-scan>
         <div class="mn-crumb">
             <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / Conventional DC Cockpit
         </div>
@@ -321,18 +322,35 @@
                 <span class="mn-chip">Outputs <strong>20+</strong></span>
                 <span class="mn-chip">Accuracy rules <strong>6</strong></span>
             </div>
-            <a class="mn-toollink" href="../dc-conventional.html">&#9654; Open the live Conventional DC Cockpit</a>
+            <a class="mn-toollink" href="../dc-conventional.html">&#9654; Open the simulated Conventional DC Cockpit</a>
         </header>
 
+        <nav class="mn-section mn-note" aria-labelledby="contents-title">
+            <h2 id="contents-title">Table of contents</h2>
+            <ol>
+                <li><a class="mn-inline" href="#purpose">Purpose &amp; engineering basis</a></li>
+                <li><a class="mn-inline" href="#inputs">Inputs — locked basis of design</a></li>
+                <li><a class="mn-inline" href="#methodology">Calculation methodology</a></li>
+                <li><a class="mn-inline" href="#constants">Constants &amp; data sources</a></li>
+                <li><a class="mn-inline" href="#outputs">Outputs &amp; cockpit panels</a></li>
+                <li><a class="mn-inline" href="#worked-example">Worked example</a></li>
+                <li><a class="mn-inline" href="#references">References &amp; standards</a></li>
+                <li><a class="mn-inline" href="#limitations">Assumptions &amp; limitations</a></li>
+                <li><a class="mn-inline" href="#control-map">Cockpit controls &amp; telemetry map</a></li>
+                <li><a class="mn-inline" href="#telemetry-operation">Alarm, quality &amp; operating interpretation</a></li>
+                <li><a class="mn-inline" href="#glossary">Glossary &amp; RZExplain</a></li>
+            </ol>
+        </nav>
+
         <!-- 1. PURPOSE -->
-        <section class="mn-section">
+        <section class="mn-section" id="purpose">
             <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
-            <p class="mn-lead">The Conventional DC cockpit is an EPMS/BMS monitoring and anomaly-detection aid for a chilled-water, UPS-backed, generator-protected data centre. It answers five operational questions in real time: <em>what is the current energy balance</em>, <em>is cooling performing within design</em>, <em>how are the UPS modules loaded</em>, <em>how much fuel autonomy remains</em>, and <em>how do site sustainability metrics (PUE/WUE/CUE) compare to design targets</em>.</p>
+            <p class="mn-lead">The Conventional DC cockpit is a simulated EPMS/BMS monitoring and anomaly-detection aid for a chilled-water, UPS-backed, generator-protected data centre. It answers five questions within one deterministic scenario: <em>what is the modeled energy balance</em>, <em>is cooling performing within design</em>, <em>how are the UPS modules loaded</em>, <em>how much fuel autonomy remains</em>, and <em>how do site sustainability metrics (PUE/WUE/CUE) compare to design targets</em>. It neither connects to nor controls field equipment.</p>
             <p class="mn-lead">This page is a <strong>cockpit</strong>, not a calculator. Its basis of design is <strong>fixed</strong>: the scenario constants in <code class="mn-mono">CONV_MODEL</code> (locked, deep-frozen) drive every displayed number. The governing accuracy contract is the <strong>ACCURACY_VALIDATION 6 rules</strong> (one source of truth · no <code>Math.random</code> on basis KPIs · explicit denominator on every metric · marketing target ≠ derived value · terminology must match engineering basis · basis chip on every critical KPI), plus the 23 acceptance tests in <code class="mn-mono">tools/probe-accuracy-validation.mjs</code>. Basis document: <strong>conv/review/09-engineering-basis-and-calculations.md</strong>.</p>
         </section>
 
         <!-- 2. INPUTS (LOCKED BASIS) -->
-        <section class="mn-section">
+        <section class="mn-section" id="inputs">
             <h2><span class="mn-num">02</span> Inputs — locked basis-of-design</h2>
             <p class="mn-lead">There are no user inputs. The table below is the complete set of authored constants in <code class="mn-mono">CONV_MODEL</code>. Every other number on every cockpit page is derived from these. Source citations map to conv review doc 09 line numbers.</p>
             <div class="mn-tablewrap">
@@ -363,7 +381,7 @@
         </section>
 
         <!-- 3. METHODOLOGY -->
-        <section class="mn-section">
+        <section class="mn-section" id="methodology">
             <h2><span class="mn-num">03</span> Calculation methodology</h2>
             <p class="mn-lead">All derivations are pure functions inside <code class="mn-mono">CONV_CALC</code>. Function names below map one-to-one to <code class="mn-mono">js/conv-engine.js</code>. No formula exists outside the engine.</p>
 
@@ -434,10 +452,16 @@
                 <span class="mn-eq">EPMS UPS output = IT load = 1 850 kW     (mechanical on gen-backed board)</span>
                 <span class="mn-where">In <code>epmsTotalKw(m)</code>, <code>epmsUpsOutputKw(m)</code>. Metering tolerance ±2% is a quality flag, not an applied offset — the cockpit shows nominal values. EPMS = Electrical Power Monitoring System.<span class="mn-src">doc-00 line 77; doc-12 line 9</span></span>
             </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Four-hall capacity study</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">Planning IT = 4 halls × 10 MW IT/hall = 40 MW IT</span>
+                <span class="mn-where">This is a document-only planning scope. It is not passed to <code>CONV_CALC</code>, does not replace the current 1,850 kW snapshot, and is not multiplied by the current PUE to assert a facility design. Electrical, cooling, structural, fuel, water and network sizing require separate approved studies.</span>
+            </div>
         </section>
 
         <!-- 4. CONSTANTS -->
-        <section class="mn-section">
+        <section class="mn-section" id="constants">
             <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
             <p class="mn-lead">Every constant lives in the deep-frozen <code class="mn-mono">CONV_MODEL</code> object with a <code>// source:</code> tag pointing to conv review doc line numbers. The snapshot table confirms all computed intermediates at the locked basis point.</p>
             <div class="mn-tablewrap">
@@ -462,7 +486,7 @@
         </section>
 
         <!-- 5. OUTPUTS -->
-        <section class="mn-section">
+        <section class="mn-section" id="outputs">
             <h2><span class="mn-num">05</span> Outputs &amp; cockpit panels</h2>
             <p class="mn-lead">The cockpit surfaces these derived quantities across its dashboard, EPMS, cooling, water, fuel, and sustainability panels. Each KPI carries a basis chip citing its source.</p>
             <div class="mn-tablewrap">
@@ -489,15 +513,28 @@
                     <tr><td>Active racks (3 densities)</td><td><code>activeRacks(m, kW)</code></td><td>count</td><td>IT capacity panel</td></tr>
                     <tr><td>Avg temperature / RH</td><td><code>model.environment.avg_temp_c / avg_rh_pct</code></td><td>°C / %</td><td>Environment panel</td></tr>
                     <tr><td>EPMS metering tolerance</td><td><code>model.electrical.metering_tolerance_pct</code></td><td>%</td><td>EPMS quality chip</td></tr>
+                    <tr><td>Current Design Studio snapshot</td><td><code>CONV_CALC.snapshot</code></td><td>kW</td><td>Current scope: locked 1,850 kW IT basis only</td></tr>
+                    <tr><td>Four-hall capacity appendix</td><td>4 × 10 MW IT</td><td>MW IT</td><td>Current-plus-study scope: 40 MW planning reference, non-adopted</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="mn-tablewrap" style="margin-top:0.9rem;">
+            <table class="mn-table">
+                <thead><tr><th>Release acceptance</th><th>Executable evidence</th><th>Required invariant</th></tr></thead>
+                <tbody>
+                    <tr><td>Locked calculation chain</td><td><code>tools/test-conv-calc.mjs</code></td><td>The current snapshot retains the 1,850 kW IT basis and all documented identities.</td></tr>
+                    <tr><td>Design Studio scopes</td><td><code>tools/test-rz-design-studio.mjs</code> plus browser/PDF journey</td><td>Current excludes 40 MW; current-plus-study adds a non-adopted appendix without mutating <code>CONV_CALC.snapshot</code>.</td></tr>
+                    <tr><td>EPMS source truth</td><td><code>tools/test-epms-ats-rack-color.mjs</code></td><td>Normal, tie and generator scenarios derive the final ATS-to-rack conductor from its actual energizing source.</td></tr>
+                    <tr><td>Accessible document flow</td><td>Keyboard and dialog browser journey</td><td>Labeled controls, focus trap, Escape/scrim/close and trigger-focus return remain intact; failures are visible.</td></tr>
                 </tbody>
             </table>
             </div>
         </section>
 
         <!-- 6. WORKED EXAMPLE -->
-        <section class="mn-section">
+        <section class="mn-section" id="worked-example">
             <h2><span class="mn-num">06</span> Worked example — 1 850 kW scenario</h2>
-            <p class="mn-lead">Full derivation chain reproducing every primary KPI on the live cockpit exactly. All figures match <code class="mn-mono">CONV_CALC.snapshot</code>.</p>
+            <p class="mn-lead">Full derivation chain reproducing every primary KPI on the simulated cockpit exactly. All figures match <code class="mn-mono">CONV_CALC.snapshot</code>.</p>
             <div class="mn-worked">
                 <ol>
                     <li><strong>Facility load:</strong> <code>1 850 × 1.45 =</code> <span class="mn-result">2 682.5 kW</span></li>
@@ -516,7 +553,7 @@
         </section>
 
         <!-- 7. REFERENCES -->
-        <section class="mn-section">
+        <section class="mn-section" id="references">
             <h2><span class="mn-num">07</span> References &amp; standards</h2>
             <ul class="mn-refs">
                 <li><b>conv review doc 09</b> — 09-engineering-basis-and-calculations.md: primary source for all scenario constants (IT load, PUE, WUE, CHW loop, UPS efficiency, fuel system). Line numbers cited throughout.</li>
@@ -527,11 +564,15 @@
                 <li><b>ISO/IEC 30134-8</b> — Key Performance Indicators for Data Centres — Part 8: Carbon Usage Effectiveness (CUE). Denominator = IT energy; grid carbon factor applied at facility-energy basis per doc-09 line 14.</li>
                 <li><b>Engine source</b> — <code class="mn-mono">js/conv-engine.js</code> (CONV_CALC v1.0.0 + CONV_MODEL, deep-frozen). Gate: <code class="mn-mono">tools/test-conv-calc.mjs</code> (22/22 DoD identities).</li>
                 <li><b>Accuracy gate</b> — <code class="mn-mono">tools/probe-accuracy-validation.mjs</code> (40/40 acceptance tests, 6 accuracy rules). Must pass before any cockpit change ships.</li>
+                <li><b>Design-document source</b> — <code class="mn-mono">js/rz-design-studio.js</code> governs shared document type/scope validation and accessible dialog state; <code class="mn-mono">dc-conventional.html</code> supplies the current snapshot and non-adopted 4 × 10 MW study appendix.</li>
+                <li><b>Electrical topology source</b> — <code class="mn-mono">EPMS_Telemetry.html</code> owns modeled source selection and the final ATS-to-rack conductor class; regression evidence is <code class="mn-mono">tools/test-epms-ats-rack-color.mjs</code>.</li>
+                <li><a class="mn-inline" href="https://www.isa.org/standards-and-publications/isa-standards/isa-18-series-of-standards"><b>ISA-18 alarm-management series</b></a> — lifecycle, operator response and rationalization context for future alarm-management work.</li>
+                <li><a class="mn-inline" href="https://webstore.iec.ch/en/publication/65543"><b>IEC 62682:2022</b></a> — alarm-management terminology and acceptance context; inclusion is not a conformance claim.</li>
             </ul>
         </section>
 
         <!-- 8. ASSUMPTIONS & LIMITATIONS -->
-        <section class="mn-section">
+        <section class="mn-section" id="limitations">
             <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
             <p class="mn-lead">The cockpit models a <strong>single fixed engineering scenario</strong>. It is not a design calculator and cannot be parameterised. Key assumptions and scope boundaries:</p>
             <p class="mn-lead"><strong>CHW loop:</strong> Only the primary (secondary) chilled-water loop at 7.2/14.8 °C is surfaced. The condenser-side loop operating at ~19–23 °C is out of scope for this cockpit and is never labelled CHWS/CHWR (conv-engine.js CHW basis decision). Secondary pump losses and free-cooling economiser modes are not modelled.</p>
@@ -539,6 +580,8 @@
             <p class="mn-lead"><strong>Fuel consumption:</strong> 956 L/hr is the generator consumption at approximately 2.7 MW facility load (generator output ≈ non-IT + IT generation, accounting for prime-move fuel burn curve). It is an engineering estimate for sizing, not a live meter reading.</p>
             <p class="mn-lead"><strong>WUE and water flow:</strong> The 37 L/min figure is the steady-state equivalent evaporative makeup rate derived from the annual WUE target. Actual instantaneous cooling-tower blowdown, drift loss, and basin makeup vary with ambient wet-bulb temperature. This cockpit displays the design-point equivalent only.</p>
             <p class="mn-lead"><strong>Carbon intensity:</strong> 0.42 kgCO₂/kWh is a fixed grid-average factor from the engineering basis. Real-time grid decarbonisation, marginal emissions, and Scope 2 market-based accounting are out of scope.</p>
+            <p class="mn-lead"><strong>Capacity planning:</strong> Four halls at 10 MW IT each is a <em>40 MW IT planning brief only</em>. It is not installed, energized, commissioned, measured or represented by the current 1,850 kW telemetry snapshot. No facility-input, cooling, generator, fuel, water or network capacity is inferred from that study without an approved discipline model.</p>
+            <p class="mn-lead"><strong>Design Studio:</strong> The <em>current</em> scope is generated only from the captured <code class="mn-mono">CONV_CALC.snapshot</code>. The <em>current-plus-study</em> scope appends the 4 × 10 MW planning brief with explicit non-adoption language; changing scope does not change cockpit data.</p>
             <p class="mn-lead">This manual and the cockpit are an <strong>engineering education and operational reference aid</strong>. They do not substitute for a live DCIM/EPMS/BMS with calibrated sensors, metered telemetry, and alarm setpoints set by a qualified controls engineer to the site authority having jurisdiction.</p>
         </section>
 
@@ -551,10 +594,11 @@
                 <thead><tr><th>Control / surface</th><th>Hook</th><th>Expected behavior</th><th>Data or safety boundary</th></tr></thead>
                 <tbody>
                     <tr><td>Portfolio / DC Solutions / PRD / Manual</td><td><code>.back-btn</code></td><td>Navigate without changing <code>CONV_CALC.snapshot</code>.</td><td>PRD and Manual are public; cockpit access remains tier-controlled.</td></tr>
-                    <tr><td>Generate Design</td><td><code>genDesignTrigConv</code></td><td>Build a printable multi-discipline Tech Spec from one captured snapshot.</td><td>It is educational/reference output, not an issued-for-construction package.</td></tr>
+                    <tr><td>Generate Design / Design Studio</td><td><code>genDesignTrigConv</code>, <code>RZDesignStudio</code></td><td>Open the shared dialog, show captured snapshot/provenance, and select current or current-plus-study before generating the approved document type.</td><td>The appendix is non-adopted and cannot mutate current values; focus is trapped and returned, and generation failure remains visible.</td></tr>
                     <tr><td>FAQ</td><td><code>faqTrigConv</code></td><td>Open ten explanatory questions; close by button, scrim or Escape.</td><td>Answers disclose locked, simulated and non-procurement scope.</td></tr>
                     <tr><td>Theme</td><td><code>themeToggle</code></td><td>Switch/persist light or dark theme.</td><td>Never changes values or threshold results.</td></tr>
                     <tr><td>Subsystem routes</td><td><code>.nav-menu-item</code></td><td>Open EPMS, Data Hall, Chiller, Fire, Fuel, Water or ICT pages.</td><td>Status copy in this overview is not a substitute for subsystem detail.</td></tr>
+                    <tr><td>EPMS source-truth path</td><td><code>w_ats_rack_*</code> in <code>EPMS_Telemetry.html</code></td><td>Carry the actual selected source state through the ATS and its final rack conductor in normal, tie and generator scenarios.</td><td>Feed A is red/A and Feed B is green/B; source/state text supplements color, and no click issues a field command.</td></tr>
                     <tr><td>Alarm strip</td><td><code>alarmStrip</code></td><td>Show overall state, critical, warning, maintenance/bypass, comms, stale, last update, quality and scenario first.</td><td>Counts are evaluated from a frozen model; Last Update is browser time.</td></tr>
                     <tr><td>PUE basis</td><td><code>.kpi-card[data-basis="pue"]</code></td><td>Open formula, IT/facility/non-IT inputs, output, scope, denominator and source.</td><td>1.45 is derived from the model; ≤1.5 is a target.</td></tr>
                     <tr><td>WUE basis</td><td><code>data-basis="wue"</code></td><td>Explain annual definition, IT denominator and 37.0 L/min equivalent makeup.</td><td>Equivalent steady-state rate is not an instantaneous tower meter.</td></tr>
@@ -593,10 +637,12 @@
                     <tr><td>FACP / VESDA</td><td>Safety rows</td><td>Static presentation.</td><td>Normal state is not proof of detector, panel, cause-effect or suppression compliance.</td></tr>
                     <tr><td>Day tank</td><td>Day Tank 92% row</td><td>Static presentation.</td><td>Bulk-tank 85%/48 h arithmetic does not validate this separate buffer value.</td></tr>
                     <tr><td>Data Quality / Scenario</td><td><code>as-dq</code>, <code>as-scn</code></td><td>Snapshot metadata.</td><td>GOOD describes internal model availability; Simulated is the governing provenance.</td></tr>
+                    <tr><td>EPMS final rack path</td><td><code>w_ats_rack_*</code></td><td>Modeled topology state in <code>EPMS_Telemetry.html</code>.</td><td>The conductor inherits its actual energizing source; red/green never replaces source and energized-state text.</td></tr>
+                    <tr><td>Four-hall planning appendix</td><td>Design Studio current-plus-study</td><td>Document-only assumption.</td><td>4 × 10 MW = 40 MW IT remains outside current telemetry and outside <code>CONV_CALC.snapshot</code>.</td></tr>
                 </tbody>
             </table>
             </div>
-            <div class="mn-note"><strong>Alarm sequence:</strong> critical count has priority over warning. The current model does not implement acknowledgement, shelving, suppression, cause/effect or an event historian. A future live implementation should follow an ISA-18.2 lifecycle and apply point-level freshness/quality.</div>
+            <div class="mn-note"><strong>Alarm sequence:</strong> critical count has priority over warning. The current model does not implement acknowledgement, shelving, suppression, cause/effect or an event historian. A future field implementation should follow the <a class="mn-inline" href="https://www.isa.org/standards-and-publications/isa-standards/isa-18-series-of-standards">ISA-18 series</a> and <a class="mn-inline" href="https://webstore.iec.ch/en/publication/65543">IEC 62682:2022</a>, with point-level freshness and quality. These references define direction and terminology, not current conformance.</div>
         </section>
 
         <!-- 11. GLOSSARY — additive telemetry-docs enhancement -->
@@ -622,7 +668,7 @@
             </div>
         </section>
 
-        <a class="mn-toollink" href="../dc-conventional.html">&#9654; Open the live Conventional DC EPMS/BMS Cockpit</a>
+        <a class="mn-toollink" href="../dc-conventional.html">&#9654; Open the simulated Conventional DC EPMS/BMS Cockpit</a>
     </main>
 
     <footer class="footer footer-enhanced">

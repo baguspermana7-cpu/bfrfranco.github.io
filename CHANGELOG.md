@@ -11,6 +11,69 @@ release sections rather than semver.
 
 ---
 
+## v1.130.0 — 2026-08-27 (Semantic DC operations + governed design studies)
+
+> Owner direction: “most advance uiux and datacenter” while keeping Conventional DC and AI/HPC DC as
+> separate projects, preserving current calculations, and treating capacity upgrades as studies until adopted.
+
+### Added
+- **AI/HPC alarm historian workspace:** inclusive date range, point/tag/location/system, severity,
+  lifecycle, quality, analog/discrete state, event/action/operator/scenario, and nested AND/OR filters;
+  source-provenance FIRST view; deterministic grouping; detail action; and formula-safe CSV export.
+- **Semantic 2N electrical visualization:** pure topology evaluation now drives exact SVG edges and rack
+  feeds. Overview reconciles 216 physical positions; DH-01…04 each reconcile 54. Active, partial, open,
+  inactive, and out-of-scope states are explicit; only electrically active paths animate.
+- **FACP-owned fire cause-and-effect matrix:** zoned detection, command, feedback, inhibition, reset
+  authority, elevator/door/HVAC/smoke-control/CCTV outputs, and monitor-only BMS/DCIM integration.
+- **Shared Design Studio for both DC types:** validated document/scope allowlists, immutable current
+  snapshot, separately labelled planning-study appendix, escaped revision notes, accessible focus lifecycle,
+  and print-ready provenance output.
+
+### Changed
+- **AI rack-density truth:** the current project-specific GB200 split-domain basis remains locked at
+  27 logical domains / 54 physical positions / 3.564 MW per hall. GB300 NVL72 at up to 142 kW/rack is
+  available only as a non-adopted 27-rack planning study (3.834 MW/hall); it cannot mutate current KPIs.
+- **Conventional capacity boundary:** current telemetry stays on `CONV_CALC` (1.850 MW IT,
+  2.6825 MW facility, PUE 1.45). Four halls × 10 MW IT is documented and generated only as a study.
+- AI and Conventional PRDs/Manuals now carry accessible TOCs, stable anchors, operator workflows,
+  calculations, acceptance evidence, methodology limitations, and primary engineering references.
+- Dense operator tables, alarms, fire matrices, Design Studio, and header controls now reflow at
+  1920/1280/768/390 px with tabular numerics, keyboard scroll cues, amber focus, and reduced-motion rules.
+
+### Fixed
+- **EPMS source-colour defect:** ATS-to-rack conductors now inherit the evaluated live source instead of
+  being forced green; normal, tie, and generator scenarios are regression-tested.
+- Alarm-history filters no longer overwrite live BMS KPIs; invalid time ranges clear stale results and
+  disable export; FIRST badges/exports retain source incident provenance; CSV cells neutralize spreadsheet
+  formula prefixes.
+- Electrical UI no longer applies role-wide fallback colour to unmapped lines. Unknown conductors fail
+  closed, known ties remain open, and every rendered rack feed carries source and topology-edge provenance.
+- The AI/HPC electrical 4-second refresh no longer overwrites the locked 3.564 MW/hall basis with a
+  legacy random 7.1 MW value or randomizes generator state. `electrical-live.js` now renders current IT,
+  facility, PUE, auxiliary/cooling basis and all eight gensets from `DHE` plus the selected semantic
+  scenario. Generator transfer is reconciled per unit as 7 RUNNING + 1 STANDBY (not eight running),
+  while normal operation reports 0 RUNNING + 8 STANDBY; a fake-clock DOM integration test exercises
+  the post-tick state. Failed starts now report all eight failed units in the pool summary, and a
+  subsequent renderer fault invalidates every owned KPI instead of leaving stale operational values.
+- Cooling current state is reconciled to 9 running / 12 installed 350 kW CDUs per hall (48 installed
+  facility-wide). Legacy 24-CDU and 22-pump labels, 8.4 MW heat transfer and 9,600 LPM flow were removed;
+  selected-hall heat/flow now bind to 3,029 kW and 4,342 LPM engine values, with explicit standby units.
+- Restored the network-first public PRD/Manual bridge accidentally removed with the offline-root security
+  cleanup. The credential/recovery code remains removed; restricted cockpit controls remain inert.
+- Telemetry gates now validate unique cockpit contract links and derive the expected release from
+  `js/rz-version.js`, instead of permanently freezing cockpit source or hardcoding an obsolete version.
+- The full-site dark-coverage gate now requires two independent clean confirmations at the normal sampling
+  timing, each in its own fresh Chromium process, before clearing a sweep-only candidate. Reproduced defects,
+  incomplete confirmation, and render exceptions fail closed; renderer-pressure default-white/stale-frame
+  artifacts no longer masquerade as product regressions during the 161-page, two-theme sweep. Theme sampling
+  explicitly forces style recalculation, then synchronizes to two rendered animation frames before the standard
+  transition-settle interval, preventing a wall-clock wait from expiring before a throttled renderer begins.
+
+### Standardization
+- Updated `DATAHALL_AI_STANDARD.md`, `BMS_SHELL.md`, `RESPONSIVE_STANDARD.md`, and
+  `TELEMETRY_DOCS_STANDARD.md`; added the fresh-browser confirmation rule to `DARK_MODE_STANDARD.md`;
+  mirrored the adopted basis and findings into the Obsidian engineering vault.
+
 ## v1.129.3 — 2026-08-26 (De-slop index hero cards + fix stale dark-mode dot-grid cache)
 
 ### Fixed

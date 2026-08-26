@@ -7,6 +7,98 @@
 (function () {
     'use strict';
 
+    /* Public documentation links must stay reachable even when a legacy
+       cache-first Service Worker serves an older navigation bundle. auth.js
+       is network-first, so it owns this upgrade-safe bridge for the two
+       restricted engineering cockpits. */
+    var PUBLIC_CONTRACTS = [
+        {
+            gate: '.root-gate',
+            header: '.hdr',
+            hrefs: ['prd/datahallai.html', 'manual/datahallai.html']
+        },
+        {
+            gate: '.rz-restricted-overlay',
+            header: '.header',
+            hrefs: ['prd/dc-conventional.html', 'manual/dc-conventional.html']
+        }
+    ];
+
+    function publicContractConfig() {
+        for (var i = 0; i < PUBLIC_CONTRACTS.length; i++) {
+            var candidate = PUBLIC_CONTRACTS[i];
+            var header = document.querySelector(candidate.header);
+            var links = candidate.hrefs.map(function (href) {
+                return document.querySelector('.rz-public-contract-link[href="' + href + '"]');
+            });
+            if (document.querySelector(candidate.gate) && header && links.every(Boolean)) {
+                return { header: header, links: links };
+            }
+        }
+        return null;
+    }
+
+    function publicContractSlot(link) {
+        var slot = document.createElement('span');
+        slot.className = link.className + ' rz-public-contract-slot';
+        slot.setAttribute('aria-hidden', 'true');
+        slot.style.cssText = link.getAttribute('style') || '';
+        slot.style.visibility = 'hidden';
+        slot.style.pointerEvents = 'none';
+        slot.textContent = link.textContent;
+        link.parentNode.insertBefore(slot, link);
+        return slot;
+    }
+
+    function exposePublicContractLinks() {
+        var config = publicContractConfig();
+        if (!config || document.querySelector('.rz-public-contract-layer')) return;
+        var layer = document.createElement('nav');
+        layer.className = 'rz-public-contract-layer';
+        layer.setAttribute('aria-label', 'Public cockpit documentation');
+        layer.style.cssText = 'position:fixed;inset:0;z-index:100002;pointer-events:none';
+        var bindings = config.links.map(function (link) {
+            var slot = publicContractSlot(link);
+            link.style.position = 'fixed';
+            link.style.zIndex = '1';
+            link.style.pointerEvents = 'auto';
+            link.style.minWidth = '44px';
+            link.style.minHeight = '44px';
+            link.style.display = 'inline-flex';
+            link.style.alignItems = 'center';
+            link.style.justifyContent = 'center';
+            layer.appendChild(link);
+            return { link: link, slot: slot };
+        });
+        document.body.appendChild(layer);
+
+        function placeLinks() {
+            bindings.forEach(function (binding) {
+                var rect = binding.slot.getBoundingClientRect();
+                binding.link.style.left = rect.left + 'px';
+                binding.link.style.top = rect.top + 'px';
+            });
+        }
+
+        function syncGateState() {
+            if (document.body.classList.contains('locked')) config.header.setAttribute('inert', '');
+            else config.header.removeAttribute('inert');
+        }
+
+        new MutationObserver(syncGateState).observe(document.body, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
+        window.addEventListener('resize', placeLinks, { passive: true });
+        window.addEventListener('scroll', placeLinks, { passive: true });
+        if (typeof ResizeObserver === 'function') {
+            var observer = new ResizeObserver(placeLinks);
+            bindings.forEach(function (binding) { observer.observe(binding.slot); });
+        }
+        syncGateState();
+        requestAnimationFrame(function () { requestAnimationFrame(placeLinks); });
+    }
+
     /* ───────── Load FontAwesome if not present (async via print/onload pattern) ───────── */
     if (!document.querySelector('link[href*="font-awesome"], link[href*="fontawesome"]')) {
         var fa = document.createElement('link');
@@ -1071,6 +1163,7 @@
 
     /* ───────── Init ───────── */
     function init() {
+        exposePublicContractLinks();
         injectCSS();
         injectAuthButton();
         injectLoginModal();

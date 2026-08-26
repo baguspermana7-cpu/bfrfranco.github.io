@@ -1,28 +1,163 @@
 # DataHall AI Dashboard Standard
 
-<!-- v1.18.8-freshness-stamp -->
-> **Last reviewed: 2026-05-14** · Status: `NEEDS-REVIEW`
-> 
-> datahallAI page renamed to datahall-ai canonical key in v1.18.1 feature-flag schema. References to "datahallAI.html" still valid (filename unchanged) but feature-flag page-key is now "datahall-ai". Update Section 1 references when actively editing the page.
-> 
-> Per mandate `feedback_standarization_freshness.md`. To remove this stamp, replace it with a real content refresh.
+> **Last reviewed: 2026-08-26** · Status: `ACTIVE` · Release: `v1.130.0`
+>
+> Canonical feature key remains `datahall-ai`; the implementation filename remains
+> `datahallAI.html`. Access is root plus the explicit educator-role exception. A plain
+> Pro session does not satisfy `page-access`.
 
 > Patterns, conventions, and lessons learned for `datahallAI.html`
 
-Last updated: 2026-03-01 (Phase 5/6 update)
+Last updated: 2026-08-26 (operator workflows and platform-study update)
 
 ---
 
+## v1.130.0 Operator-workspace contract
+
+This release adds evidence-oriented operator workspaces without replacing the established
+P&IDs, SLD, rack diagrams, engineering model, or Scenario A calculations.
+
+### Capacity boundaries (never merge these projects)
+
+| Scope | Current/adopted basis | Study-only basis |
+|---|---|---|
+| DC AI/HPC | 4 halls × 3.564 MW IT; 27 logical GB200 NVL72 domains/hall in the project-specific split form; 2 physical positions/domain; 54 positions/hall; 66 kW/position; 14.256 MW facility IT | GB300 reference at 142 kW per integrated rack/domain: 27 racks/hall, 3.834 MW/hall, 15.336 MW/facility, 5.990625 kW/m² gross hall IT density. Never mutates Scenario A. |
+| DC Conventional | `CONV_CALC` current snapshot: 1.850 MW IT and PUE 1.45 | Campus capacity plan: 4 halls × 10 MW IT = 40 MW. It is not current telemetry and requires Engineer-of-Record validation. |
+
+Density means `IT load per hall / gross hall floor area`. The public field is
+`hallItDensityKWPerM2`; the ambiguous `densityKWPerM2` name is retired.
+
+### Alarm & Events workspace
+
+- Source of truth: `js/datahall-ai/alarm-query.js`; presentation:
+  `js/datahall-ai/operator-ui.js`.
+- Composable filters: From/To, tag or point, system, severity, lifecycle, quality,
+  analog comparator/value, previous/current discrete state, event, action, free text,
+  plus validated nested AND/OR groups.
+- Saved views and first-out are deterministic. First-out is grouped by stable incident
+  identity, never by a collision-prone display string or a newly filtered subset. The UI
+  intersects visible records with source `firstOutIds` provenance.
+- Invalid filters clear stale rows, all local counters and stale detail, mark the form
+  invalid, and disable export until a valid query succeeds. Query-result counters never
+  write into the independently refreshed live BMS health KPIs.
+- Export includes filter metadata, source first-out provenance, requested-by, and capture
+  time. CSV output is a local browser download; it does not imply a historian connection.
+  Formula-leading spreadsheet cells (`=`, `+`, `-`, `@`) are neutralized before download.
+- Operational terminology follows the lifecycle direction of ISA-18.2 / IEC 62682.
+  All shipped records are labelled simulated fixtures.
+
+### Electrical semantic-state rule
+
+- Source of truth: `js/datahall-ai/electrical-topology.js`; visual projection contract:
+  `js/datahall-ai/electrical-visual-map.js`; four-second basis renderer:
+  `js/datahall-ai/electrical-live.js`.
+- Animation is a projection of evaluated edge state. CSS color or a legacy SVG class is
+  never allowed to decide whether a conductor is energized.
+- Every animated conductor binds to an exact topology edge or an explicit rack-edge prefix.
+  Unknown conductors fail closed; known normally-open ties render `open`, not `energized`.
+- Overview is a declared four-hall projection (216 physical positions). A DH tab is a
+  one-hall projection (54 positions); hidden halls are `out-of-scope`, not silently painted.
+- Each rendered segment exposes semantic state, evaluated source IDs, and topology edge IDs.
+  Utility/generator transfer, busway trip, and rack-feed loss must be visibly traceable all
+  the way through the selected hall to the rack-bank boundary.
+- Scenarios must report rack service, redundancy (`2N`, `DEGRADED`, `LOST`, or
+  `COMMON_SOURCE`) and a sequence-of-events timeline.
+- De-energized conductors are quiet gray and non-animated. Feed A/B/generator colors are
+  secondary cues; summary text and topology state remain authoritative.
+- The live timer may jitter instrument readings such as voltage, current, SOC, temperature,
+  or efficiency inside their stated simulation bands. It must never randomize IT/facility
+  load, PUE, cooling/auxiliary basis, equipment count, or generator state. Those fields bind
+  to `DHE` and the selected semantic scenario on initial render and every 4-second tick.
+- Generator-pool state must be projected per unit, not copied from one aggregate flag. On a
+  successful source-loss transfer the adopted N+1 basis is 7 RUNNING + 1 STANDBY; normal is
+  0 RUNNING + 8 STANDBY, and a failed/unavailable pool fails closed at every installed unit.
+  The reconciled heading must include the failed-unit count whenever it is non-zero.
+- A live-render exception must invalidate every field owned by the renderer (hall IT/facility,
+  auxiliary, cooling, generator units, pool summary and facility summary). Showing stale values
+  beside only one error message is forbidden.
+
+### CDU current-state rule
+
+- Selected-hall current basis is **9 running / 12 installed**, 350 kW nameplate each,
+  derived from `ceil(3,029.4 / 350) = 9`. Facility inventory is 48 installed across four halls.
+- A current-state view must use `DHE.cduRunning`, `DHE.cduInstalled`, `DHE.liquidHeat`, and
+  `DHE.tcsFlowTotal`; legacy 24-CDU / 22-pump labels are forbidden unless explicitly isolated
+  and labelled as a separate study.
+- Standby units remain visible and non-animated. A running CDU shows the engine-derived
+  per-unit duty; plant-header flow cannot be multiplied into a selected-hall heat KPI.
+
+### Fire cause-and-effect rule
+
+- Source of truth: `js/datahall-ai/fire-cause-effect.js`.
+- The FACP owns control authority. BMS/DCIM records and annunciates; it never becomes the
+  releasing controller.
+- Effects are zoned and can include notification, elevator recall, egress-door release,
+  AHU/CRAH and smoke-control sequence, clean-agent preparation/release, zoned EPO, PA,
+  fire-brigade/NOC notification, CCTV focus, and generator protection interactions.
+- Clean-agent release fails closed: elapsed time alone is insufficient. Required proofs,
+  permissives, abort/inhibit state, and reset authority are explicit data.
+- A generic global building shutdown is forbidden; the engineered event/zone matrix decides.
+
+### Shared Design Studio
+
+- `js/rz-design-studio.js` and `css/rz-design-studio.css` provide one accessible modal
+  contract for both DC types: labelled dialog, keyboard trap, Escape, overlay close, and
+  focus return.
+- Default scope is always the locked current design. Study appendices require an explicit
+  operator selection.
+- A generated document captures one immutable engine snapshot and records document type,
+  scope, revision note, capture time, and provenance. Study data is appended; it cannot
+  write into either calculation engine.
+
+### Required regression gates
+
+```text
+node tools/test-datahall-ai-alarm-query.mjs
+node tools/test-datahall-ai-rack-density.mjs
+node tools/test-datahall-ai-cdu-basis.mjs
+node tools/test-datahall-ai-electrical-topology.mjs
+node tools/test-datahall-ai-electrical-live.mjs
+node tools/test-datahall-ai-fire-cause-effect.mjs
+node tools/test-datahall-ai-operator-ui.mjs
+node tools/test-datahall-ai-operator-runtime.mjs
+node tools/test-datahall-ai-electrical-visual-map.mjs
+node tools/test-datahall-calc.mjs
+```
+
+Browser evidence must cover desktop, tablet, and 390 px; normal pointer navigation; modal
+focus return; internal table scrolling; zero document overflow; and no uncaught page error.
+
+### Lessons learned
+
+1. A data-model field rename can silently render `NaN`; integration tests must assert the
+   public property name and a real rendered number.
+2. Monolithic SVG pages can contain duplicate DOM IDs across unrelated panels. New
+   workspaces must reserve unique prefixes (`alarm*`, `electrical*`, `fireCauseEffect*`).
+3. A sticky header can cover a non-sticky tab rail after the page scrolls. Desktop stacks
+   header + rail; narrow layouts keep a bounded horizontally scrollable rail.
+4. Hardware-generation comparisons are reference studies until the owner/EoR adopts a new
+   baseline. Newer does not mean current.
+5. A vendor-style `72×1` label cannot be attached to a project-specific two-position split
+   baseline. Keep the adopted project basis and vendor reference studies visibly distinct.
+6. Role-wide animation fallback can make dead conductors look live. Exact edge mapping plus
+   scenario parity tests are required before a topology animation is accepted.
+7. A visually correct initial SVG can regress four seconds later when an old telemetry timer
+   rewrites engine values. Exercise the scheduled callback and assert the post-tick DOM, not
+   only first paint.
+8. Mixing facility plant inventory, selected-hall terminal equipment, and a discarded legacy
+   design produced a false 24-CDU current state. Every equipment count must carry its scope and
+   derive from one adopted basis.
+
 ## File Structure
 
-- **Single HTML file**: `datahallAI.html` (~6800+ lines)
+- **Primary HTML shell**: `datahallAI.html` (legacy monolith; new pure data modules live in `js/datahall-ai/`)
 - **3 script blocks**: 1 main (bulk), 1 auth/root-gate, 1 cookie/scroll
 - All SVG rendering is done via IIFEs that build SVG string and assign to `el.innerHTML`
-- Tab-based navigation: `p-bldg`, `p-hvac`, `p-rack`, `p-cool`, `p-elec`, `p-net`, `p-fire`, `p-bms`
-- **Auth gating**: Root OR Pro access (body.locked + .root-gate overlay), auth.js loaded externally
-  - Gate checks `s.role === 'root' || s.role === 'pro'` — demo account (pro role) CAN access
+- Tab-based navigation includes dedicated `p-alarms` alongside the existing dashboard, hall, room, rack, cooling, electrical, network, fire and BMS panels.
+- **Auth gating**: Root OR educator-role exception (body.locked + .root-gate overlay), shared auth/feature flags loaded externally
+  - `page-access` is root-only; `role=educator` is admitted explicitly. Plain Pro, demo and free remain locked.
   - `ag()` called at 60ms, 550ms, 1600ms timeouts + on `rz-auth-change` event
-  - Gate message must reflect "root or pro" not "root only"
+  - Gate message must reflect the canonical root-or-educator policy.
 - **Building tab sub-navigation**: Isometric 3D overview → click floor → 2D floor plan detail (back button)
 
 ## SVG Rendering Pattern (IIFE)
@@ -90,12 +225,12 @@ When building complex SVGs with multiple columns (like the 4-DH electrical SLD):
 ### Hierarchy (11 Levels, L0-L10)
 1. **L0 MV Switchgear**: PLN 20kV dual feed → SM6 24kV 11-panel (2 Inc + 1 Tie + 8 Fdr) + GenSet APS
 2. **L1 RMU**: Per-DH Schneider RM6 3-panel (Feed A VCB + Bus Tie + Feed B VCB)
-3. **L2 Transformers**: 8× ABB RESIBLOC 10MVA cast-resin dry Dyn11, 2 per DH
+3. **L2 Transformers**: 8× 5 MVA cast-resin dry Dyn11, 2 per DH
 4. **L3 LV Distribution**: 8× MSB 6300A Form 4b + LV Tie N.O. + outgoing feeders
 5. **L4 ATS**: CB-Normal (CLOSED) + CB-Emergency (OPEN/STANDBY) + Interlock
-6. **L5 UPS & Battery**: 8× Vertiv EXL S1 8MW + 8× Li-Ion NMC 1,333 kWh (no STS, dual-corded)
-7. **L6 Busway & RPP**: 8× Canalis KTA 12,000A Cu → 88× RPP 800A MCCB tap-off
-8. **L7 Rack Power**: 22 racks dual-corded PSU 400V→50VDC η>97%
+6. **L5 UPS & Battery**: 8× 4.5 MW modular UPS + 8× Li-Ion NMC 1,333 kWh (no STS, dual-corded)
+7. **L6 Busway & RPP**: 8× Canalis KTA 6,300A Cu → 88× RPP 800A MCCB tap-off
+8. **L7 Rack Power**: 4 halls × 54 physical rack positions / 27 logical NVL72 domains; dual-corded PSU 400V→50VDC η>97%
 9. **L8 Mech/NC/Cooling**: ATS-backed non-critical + cooling loads
 10. **L9 Protection**: SPD, earthing, arc flash, metering, standards
 11. **L10 KPI Dashboard**: Per-DH live values, 4-sec refresh
@@ -103,8 +238,8 @@ When building complex SVGs with multiple columns (like the 4-DH electrical SLD):
 ### Color-Coded Flow System (v5)
 | Path | Color | CSS Var | Animation | Usage |
 |------|-------|---------|-----------|-------|
-| Feed A | Red | `var(--r)` | `.fD` 4s downward | All Source A power path elements |
-| Feed B | Green | `var(--g)` | `.fD` 4s downward | All Source B power path elements |
+| Feed A | Blue | `var(--b)` | semantic `.rz-flow-active` only | All Source A power path elements; red remains alarm/trip only |
+| Feed B | Green | `var(--g)` | semantic `.rz-flow-active` only | All Source B power path elements |
 | Dead/Standby | Gray | `rgba(107,114,128,.35)` | NONE, dashed `4 3` | GenSet, open breakers, standby circuits |
 | Bus Tie N.O. | Purple | `var(--p)` | NONE, dashed `6 4` | MV/RMU/LV tie breakers |
 | ATS Mech | Orange | `var(--o)` | `.fD` downward | Mechanical load path via ATS |
@@ -144,30 +279,25 @@ kW | V | A | PF
 | `eMSB1..4` | 4 | MSB voltage/amps/PF per DH |
 | `eBw1a..8b` | 8 | Busway voltage/amps/load% (a=Feed A, b=Feed B) |
 | `eBat1a..8b` | 8 | Battery SOC% |
-| `eGen1..4` | 4 | GenSet status (RUN/STBY) |
-| `eNC` | 1 | Non-critical total kW |
-| `eCool` | 1 | Cooling total kW |
-| `eLive` | 1 | Facility summary (IT MW, Total MW, PUE, Grid A) |
+| `eOvGen1..8` | 8 | Per-unit facility generator state; selected scenario plus 7+1 N+1 basis |
+| `eOvGenPoolTitle` | 1 | Reconciled running/standby count for the facility generator pool |
+| `eNC1..4` | 4 | PUE auxiliary basis, 75 kW/hall |
+| `eCool1..4` | 4 | PUE cooling basis, 849 kW/hall |
+| `eLive` | 1 | Facility summary: 14.26 MW IT, 18.55 MW total, PUE 1.30 |
 
-### Non-Critical Loads (DB-NC: 695 kW)
-| Load | Rating | CB | Amps | PF |
-|------|--------|-----|------|-----|
-| AHU 1+2 | 2×150kW | 400A | 220A | 0.85 |
-| VRV | 4×25kW | 200A | 145A | 0.92 |
-| Lighting | 80kW | 200A | 116A | 0.95 |
-| Fire | 30kW | 100A | 44A | 0.90 |
-| Security | 20kW | 63A | 29A | 0.95 |
-| BMS/EPMS | 40kW | 100A | 58A | 0.95 |
-| Elevators | 60kW | 100A | 87A | 0.85 |
-| WTP | 50kW | 160A | 72A | 0.92 |
+### Engine-bound per-hall power basis
 
-### Cooling Loads (DB-COOL: 2,170 kW)
-| Load | Rating | CB | Amps | PF |
-|------|--------|-----|------|-----|
-| Chillers | 4×350kW | 800A | 507A | 0.90 |
-| CW Pumps | 4×75kW | 200A | 109A | 0.92 |
-| DC Fans | 8×45kW | 100A | 65A | 0.85 |
-| CDU Pumps | 22×5kW/hall | From UPS | Per rack | 0.95 |
+| Basis component | Current value | Authority |
+|---|---:|---|
+| IT load | 3,564 kW | `DHE.itHall` |
+| Chiller input | 524 kW | `DHE.pb_chiller` |
+| Pumps, fans, CDU and CRAH | 325 kW | `DHE.pb_cooling - DHE.pb_chiller` |
+| Cooling total | 849 kW | `DHE.pb_cooling` |
+| UPS/distribution loss | 150 kW | `DHE.pb_upsDist` |
+| Auxiliary | 75 kW | `DHE.pb_aux` |
+| Non-IT total | 1,074 kW | `DHE.pb_nonIT` |
+| Facility total | 4,638 kW | `DHE.pb_facility` |
+| CDU pump connected / running | 12×5 / 9×5 kW | installed / active current basis |
 
 ## In-Rack CDU HMI (Vertiv CoolChip CDU 121)
 

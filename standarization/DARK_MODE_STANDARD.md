@@ -22,6 +22,18 @@ The recurring failure — pages that render **white body in dark mode** (only th
 
 The gate fails any page with a white body / large light content block in dark, and statically flags the `:root,` pattern. Don't ship a page that fails it. (See the [implement-applicable-standards] memory mandate — different sessions diverging is the root cause this prevents.)
 
+### Full-sweep reliability (v1.130.0)
+
+The 161-page, two-theme render sweep can exhaust a long-lived Chromium renderer and briefly sample the
+browser's default white canvas or a stale pre-transition frame. A sweep-only candidate clears only after
+two independent clean confirmations at the normal sampling timing, with each confirmation launched in its
+own fresh Chromium process. The confirmation is not suppression: any reproduced white-in-dark or
+stuck-dark-in-light result, incomplete confirmation, or render exception fails strict mode. A passing
+one-off probe does not replace the full sweep—the hardened full gate must still finish. “Normal sampling”
+means the requested theme forces a style recalculation, commits through two animation frames, and then waits
+the declared transition settle interval; a host-side wall-clock delay alone is not proof that Chromium has
+rendered the new palette.
+
 ## Core principle — two registers, one token system
 
 RZ has two page families. Each gets a **register** of the same system — identical structure + motion + semantics, different surface character. Swap a page between registers by changing one `data-rz-register` attribute.

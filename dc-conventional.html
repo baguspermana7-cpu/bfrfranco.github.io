@@ -876,6 +876,7 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
          Loaded NON-deferred so window.CONV_CALC exists before the inline
          dashboard script runs. Basis: conv/review/09-engineering-basis-and-calculations.md -->
     <script src="js/conv-engine.js?v=1.22.0"></script>
+    <script src="js/rz-design-studio.js?v=1.130.0"></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
          Loaded for cross-page consistency; body does NOT carry rz-bms-shell class
          this ship (preserves page palette). Selective component adoption in
@@ -889,6 +890,7 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
 </style>
     <!-- v1.43.20 — instrument register (RZ Dark System v1). Chrome-only, dark-only, scoped. -->
     <link rel="stylesheet" href="css/rz-cockpit-instrument.css?v=1.43.19">
+    <link rel="stylesheet" href="css/rz-design-studio.css?v=1.130.0">
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -909,7 +911,7 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
         </h1>
     </div>
     <div class="header-right">
-        <button class="back-btn" id="genDesignTrigConv" type="button" title="Generate full Tech Spec PDF (rack counts · dimensions · math derivations)" style="background:rgba(245,158,11,.10);border-color:rgba(245,158,11,.32);color:#fbbf24"><i class="fas fa-file-lines"></i>Generate Design</button>
+        <button class="back-btn" id="genDesignTrigConv" type="button" aria-haspopup="dialog" title="Configure and generate an engine-bound engineering document" style="background:rgba(245,158,11,.10);border-color:rgba(245,158,11,.32);color:#fbbf24"><i class="fas fa-file-lines" aria-hidden="true"></i>Generate Design</button>
         <button class="back-btn" id="faqTrigConv" type="button" aria-haspopup="dialog" title="Frequently asked questions" style="background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.28);color:#67e8f9">&#10067; FAQ</button>
         <button class="theme-toggle" id="themeToggle" title="Toggle theme">&#9790;</button>
         <span class="status-dot"></span>
@@ -2138,16 +2140,46 @@ function buildTechSpecHtml(){
     CSS+head+'<body>'+H+'</body></html>';
 }
 
-function exportTechSpecPdf(){
+function convIssueEsc(value){ return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function convIssuePage(issue){
+  if(!issue) return '';
+  var snapshot=issue.snapshot&&typeof issue.snapshot==='object'?issue.snapshot:{};
+  var rows='';
+  Object.keys(snapshot).forEach(function(key){ rows+='<tr><td>'+convIssueEsc(key)+'</td><td class="v">'+convIssueEsc(snapshot[key])+'</td></tr>'; });
+  var study=issue.scope==='current-plus-study'?'<h3>Four-hall capacity plan</h3><p>Planning target only — not the current CONV_CALC operating basis.</p><table class="t"><tbody><tr><td>Data halls</td><td class="v">4</td></tr><tr><td>Planned IT per hall</td><td class="v">10.000 MW</td></tr><tr><td>Planned facility IT</td><td class="v">40.000 MW</td></tr><tr><td>Adoption state</td><td class="v">CAPACITY STUDY — EOR validation required</td></tr></tbody></table>':'';
+  return '<section class="page"><h2>Document control &amp; issue record</h2><p>Engine snapshot captured '+convIssueEsc(issue.capturedAt)+'. Scope: '+convIssueEsc(issue.scope)+'.</p><table class="t"><tbody>'+rows+'</tbody></table>'+
+    (issue.revisionNote?'<h3>Revision note</h3><p>'+convIssueEsc(issue.revisionNote)+'</p>':'')+study+'</section>';
+}
+function convInjectIssue(html,issue){ return issue?html.replace('</body>',convIssuePage(issue)+'</body>'):html; }
+function exportTechSpecPdf(issue){
   var html=buildTechSpecHtml();
+  if(html) html=convInjectIssue(html,issue);
   if(!html){ try{ window.alert('The CONV_CALC engine is not bound &mdash; reload the page.'); }catch(e){} return; }
   var win; try{ win=window.open('','_blank'); }catch(e){ win=null; }
   if(!win){ try{ window.alert('Pop-up blocked &mdash; allow pop-ups to export Tech Spec PDF.'); }catch(e){} return; }
   win.document.open(); win.document.write(html); win.document.close(); win.focus();
   setTimeout(function(){ try{ win.print(); }catch(e){} },600);
 }
-var genBtn=gid('genDesignTrigConv');
-if(genBtn){ genBtn.addEventListener('click',exportTechSpecPdf); }
+function convDesignStudioSnapshot(){
+  var s=snap();
+  return {
+    'Authority':'CONV_CALC locked operating snapshot',
+    'Current IT':s?(s.site.it_load_kw/1000).toFixed(3)+' MW':'Unavailable',
+    'Current facility load':s?(s.site.facility_load_kw/1000).toFixed(3)+' MW':'Unavailable',
+    'Current PUE':s?s.site.pue.toFixed(2):'Unavailable',
+    'Installed rack plan':'200 positions · page design assumption; not emitted by CONV_CALC',
+    'Data mode':'Simulated · engine-derived'
+  };
+}
+if(window.RZDesignStudio){
+  window.RZDesignStudio.register({
+    id:'dc-conventional-design',triggerId:'genDesignTrigConv',title:'Conventional Data Centre Design Studio',
+    subtitle:'Issue an engine-bound document and optionally append the non-adopted four-hall capacity plan.',
+    provenance:'Current values come from CONV_CALC.snapshot. The 4 × 10 MW campus target is planning scope and never overwrites current telemetry.',
+    documentTypes:['technical-specification'],scopes:['current','current-plus-study'],studyAvailable:true,
+    snapshot:convDesignStudioSnapshot,generate:function(issue){ exportTechSpecPdf(issue); }
+  });
+}
 
 /* FAQ dialog */
 function openFaqDialog(){

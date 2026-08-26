@@ -1,5 +1,35 @@
 # BMS Shell — Shared Operations-Console Standard (v1.23.0+)
 
+## v1.130.0 — semantic operator workflows (2026-08-26)
+
+- **DC AI/HPC:** added a dedicated Alarm & Events query workspace, rack-density/platform
+  comparison, evaluated electrical-state toolbar/timeline, and FACP-authoritative fire
+  cause-and-effect matrix. Existing P&IDs, SLD geometry, simulation bindings and dashboard
+  remain in place.
+- **Shared Generate Design:** AI and Conventional cockpits now use one keyboard-accessible
+  Design Studio. The locked current basis is the default; GB300 and 4 × 10 MW conventional
+  capacity content is study-only and cannot mutate live calculations.
+- **EPMS source-color truth:** the final ATS-to-rack conductor inherits its actual evaluated
+  source. A rack on Feed A/generator-A is red, a rack on Feed B is green, and a de-energized
+  path is quiet gray; a hard-coded green tail is forbidden.
+- **State before decoration:** energized animation, alarm emphasis and cause/effect selection
+  are derived from validated semantic state. Color and animation supplement text, equipment
+  identity, sequence and redundancy status; they never create operational truth.
+- **Explicit conductor projection:** AI SLD lines bind to an evaluated topology edge or
+  rack-edge prefix through `electrical-visual-map.js`. Role-wide fallback is prohibited.
+  Overview declares four halls/216 positions; a selected hall declares 54 positions; unknown
+  lines fail closed and normally-open ties stay non-animated.
+- **Alarm authority separation:** historical query counters belong to the query workspace;
+  live BMS KPI chips retain their independent engine writer. First-out always comes from the
+  unfiltered incident provenance, invalid queries clear stale results, and CSV values are
+  hardened against spreadsheet formulas.
+- **Release evidence:** targeted model tests, full locked calculation regressions, responsive
+  pointer/render checks, modal keyboard checks, and the canonical RZ ship gates are required.
+
+Reusable lesson: legacy diagrams often encode visual state directly in CSS classes. When
+adding simulation, introduce a pure evaluated topology first, then project that state onto
+the preserved SVG. This prevents contradictory animation without redrawing an approved SLD.
+
 ## Adoption status table (closing v1.23 → v1.24 phase, 2026-05-22)
 
 | Page | Adoption ship | Shell library loaded | `body.rz-bms-shell` | Doc-14/24 fixes applied | Engine binding |

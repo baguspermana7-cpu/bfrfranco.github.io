@@ -45,8 +45,22 @@ gate "conv engine — 22/22 DoD identities"      node tools/test-conv-calc.mjs
 gate "CDU engine — worked examples"            node tools/test-cdu-calc.mjs
 gate "Fire engine — worked examples"           node tools/test-fire-calc.mjs
 
+# DC operator workspaces: semantic state, current/study separation, and post-tick parity.
+gate "DC AI alarms — query and first-out" node tools/test-datahall-ai-alarm-query.mjs
+gate "DC AI rack density — current and study" node tools/test-datahall-ai-rack-density.mjs
+gate "DC AI CDU — 9 running / 12 installed" node tools/test-datahall-ai-cdu-basis.mjs
+gate "DC AI electrical — topology" node tools/test-datahall-ai-electrical-topology.mjs
+gate "DC AI electrical — visual projection" node tools/test-datahall-ai-electrical-visual-map.mjs
+gate "DC AI electrical — four-second live parity" node tools/test-datahall-ai-electrical-live.mjs
+gate "DC AI fire — FACP cause and effect" node tools/test-datahall-ai-fire-cause-effect.mjs
+gate "DC AI operator UI — markup contract" node tools/test-datahall-ai-operator-ui.mjs
+gate "DC AI operator UI — runtime contract" node tools/test-datahall-ai-operator-runtime.mjs
+gate "EPMS — ATS-to-rack source colour" node tools/test-epms-ats-rack-color.mjs
+gate "DC Design Studio — shared workflow" node tools/test-rz-design-studio.mjs
+gate "Dark coverage — fail-closed confirmation verdict" node --test tools/test-dark-coverage-verdict.mjs
+
 # Public telemetry documentation is a shipped cockpit contract, not an optional audit.
-gate "telemetry docs — structure and frozen cockpit diffs" node tools/test-telemetry-docs.mjs
+gate "telemetry docs — structure, contract links, and sourced-manual preservation" node tools/test-telemetry-docs.mjs
 gate "telemetry docs — generated discovery parity" node tools/test-telemetry-discovery.mjs
 gate "telemetry docs — browser, a11y, mobile, and gate safety" node tools/test-telemetry-e2e.mjs
 

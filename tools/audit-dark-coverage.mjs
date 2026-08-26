@@ -18,6 +18,7 @@
 import puppeteer from 'puppeteer';
 import { readdirSync, readFileSync } from 'fs';
 import { resolve } from 'path';
+import { resolveRenderCandidate } from './lib/dark-coverage-verdict.mjs';
 
 const STRICT = process.argv.includes('--strict');
 const ROOT = process.cwd();
@@ -51,16 +52,36 @@ async function newPageSafe() {
 }
 const renderBroken = [];
 const lightStuck = [];
+const renderErrors = [];
 const bodyLum = async (pg) => pg.evaluate(() => { const m = getComputedStyle(document.body).backgroundColor.match(/[\d.]+/g); return m ? Math.round(0.299*+m[0] + 0.587*+m[1] + 0.114*+m[2]) : -1; });
-for (const f of pages) {
-  const pg = await newPageSafe();
-  try {
+const cleanResult = () => ({ darkFailure: null, lightFailure: null, renderError: null });
+const errorResult = (f, error) => ({
+  ...cleanResult(),
+  renderError: `${f}  render-error=${error && error.name ? error.name : 'UnknownError'}`
+});
+const hasFinding = result => Boolean(result.darkFailure || result.lightFailure || result.renderError);
+async function applyThemeAndSettle(pg, theme, transitionMs) {
+  await pg.evaluate(async nextTheme => {
+    try { localStorage.setItem('theme', nextTheme); } catch (e) {}
+    document.documentElement.setAttribute('data-theme', nextTheme);
+    void getComputedStyle(document.body).backgroundColor;
+    await new Promise(resolveFrame => {
+      const fallback = setTimeout(resolveFrame, 1000);
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        clearTimeout(fallback);
+        resolveFrame();
+      }));
+    });
+  }, theme);
+  await new Promise(resolveTransition => setTimeout(resolveTransition, transitionMs));
+}
+
+async function auditRenderedThemes(pg, f) {
     await pg.goto('file://' + resolve(ROOT, f), { waitUntil: 'domcontentloaded', timeout: 30000 });
     // --- DARK ---
     // write localStorage too — pages that re-apply theme from storage on window.load
     // (e.g. index.html rainbow-mode init) would otherwise undo a bare attribute flip
-    await pg.evaluate(() => { try { localStorage.setItem('theme', 'dark'); } catch (e) {} document.documentElement.setAttribute('data-theme', 'dark'); });
-    await new Promise(r => setTimeout(r, 700));  // settle past FOUC guard + theme transitions (350ms sampled mid-transition → flaky false-positives)
+    await applyThemeAndSettle(pg, 'dark', 700); // force style recalc, render two frames, then settle past the 300–350 ms transitions
     const res = await pg.evaluate(() => {
       const L = c => { const m = c && c.match(/[\d.]+/g); if (!m) return null; return { a: m[3] !== undefined ? +m[3] : 1, lum: 0.299*+m[0] + 0.587*+m[1] + 0.114*+m[2] }; };
       const bbg = L(getComputedStyle(document.body).backgroundColor);
@@ -74,20 +95,61 @@ for (const f of pages) {
       });
       return { bbgLum: bbg ? Math.round(bbg.lum) : -1, maxLight: Math.round(maxLight), cls };
     });
-    if (res.bbgLum > 195 || res.maxLight > 60000) {
-      renderBroken.push(`${f}  body-lum=${res.bbgLum}  light-block=${res.cls}(${res.maxLight}px²)`);
-    }
+    const darkFailure = res.bbgLum > 195 || res.maxLight > 60000
+      ? `${f}  body-lum=${res.bbgLum}  light-block=${res.cls}(${res.maxLight}px²)`
+      : null;
     // --- LIGHT --- (only for pages that declare a light palette; dark-only pages are skipped)
+    let lightFailure = null;
     if (hasLightPalette[f]) {
-      await pg.evaluate(() => { try { localStorage.setItem('theme', 'light'); } catch (e) {} document.documentElement.setAttribute('data-theme', 'light'); });
-      await new Promise(r => setTimeout(r, 500));
+      await applyThemeAndSettle(pg, 'light', 500);
       const ll = await bodyLum(pg);
-      if (ll >= 0 && ll < 90) lightStuck.push(`${f}  body-lum=${ll} (stuck dark in light mode)`);
+      if (ll >= 0 && ll < 90) lightFailure = `${f}  body-lum=${ll} (stuck dark in light mode)`;
     }
-  } catch (e) { /* heavy/auth pages may time out on file://; not counted as a skin failure */ }
-  try { await pg.close(); } catch (e) { /* page/browser may have crashed; ignore */ }
+    return { darkFailure, lightFailure, renderError: null };
+}
+
+const initialFindings = new Map();
+for (const f of pages) {
+  let pg;
+  let result;
+  try {
+    pg = await newPageSafe();
+    result = await auditRenderedThemes(pg, f);
+  } catch (e) {
+    result = errorResult(f, e);
+  } finally {
+    if (pg) try { await pg.close(); } catch (e) { /* browser may already be closed */ }
+  }
+  if (hasFinding(result)) initialFindings.set(f, result);
 }
 try { await browser.close(); } catch (e) {}
+
+// A long full-site sweep can exhaust Chromium renderer resources and briefly
+// return the browser default white canvas (or a stale pre-transition frame).
+// An initial candidate clears only after two independent, normal-timing passes;
+// each pass gets its own Chromium process. Any reproduced finding or render
+// exception remains blocking.
+for (const [f, initialResult] of initialFindings) {
+  const confirmations = [];
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    let confirmationBrowser;
+    let pg;
+    try {
+      confirmationBrowser = await puppeteer.launch(LAUNCH_ARGS);
+      pg = await confirmationBrowser.newPage();
+      confirmations.push(await auditRenderedThemes(pg, f));
+    } catch (e) {
+      confirmations.push(errorResult(f, e));
+    } finally {
+      if (pg) try { await pg.close(); } catch (e) { /* browser may already be closed */ }
+      if (confirmationBrowser) try { await confirmationBrowser.close(); } catch (e) { /* already closed */ }
+    }
+  }
+  const verdict = resolveRenderCandidate(f, initialResult, confirmations);
+  if (verdict.darkFailure) renderBroken.push(verdict.darkFailure);
+  if (verdict.lightFailure) lightStuck.push(verdict.lightFailure);
+  if (verdict.renderError) renderErrors.push(verdict.renderError);
+}
 
 let failed = false;
 if (cascadeBug.length) {
@@ -105,10 +167,16 @@ if (lightStuck.length) {
   console.log(`\n✗ STUCK-DARK-IN-LIGHT — page declares a light palette but body stays dark in light mode (add [data-theme="light"] body):`);
   lightStuck.forEach(f => console.log('   ' + f));
 }
+if (renderErrors.length) {
+  failed = true;
+  console.log(`\n✗ RENDER ERROR — a page could not complete the required theme audit:`);
+  renderErrors.forEach(f => console.log('   ' + f));
+}
 if (!failed) {
-  console.log(`\nDARK-COVERAGE AUDIT — CLEAN (both modes). ${pages.length} content pages: dark renders dark (no white body/content), light renders light.`);
+  const confirmationNote = initialFindings.size ? ` ${initialFindings.size} sweep candidate(s) cleared by two fresh-process confirmations.` : '';
+  console.log(`\nDARK-COVERAGE AUDIT — CLEAN (both modes). ${pages.length} content pages: dark renders dark (no white body/content), light renders light.${confirmationNote}`);
 } else {
-  console.log(`\nDARK-COVERAGE AUDIT — ${cascadeBug.length} cascade-bug + ${renderBroken.length} white-in-dark + ${lightStuck.length} stuck-dark-in-light, of ${pages.length} pages.`);
+  console.log(`\nDARK-COVERAGE AUDIT — ${cascadeBug.length} cascade-bug + ${renderBroken.length} white-in-dark + ${lightStuck.length} stuck-dark-in-light + ${renderErrors.length} render-error, of ${pages.length} pages.`);
   console.log('Fix: every content page must define a dark palette ([data-theme="dark"]{ --bg/--text/... }) AND switch cleanly in both modes, or be dark-only (no light palette), and pass this audit.');
 }
 process.exit(STRICT && failed ? 1 : 0);

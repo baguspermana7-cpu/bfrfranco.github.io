@@ -6,6 +6,28 @@
 
 ---
 
+## Dense operations-console addendum (v1.130.0, 2026-08-26)
+
+For BMS/SCADA cockpits, "no document overflow" does not mean shrinking a P&ID, SLD, or
+alarm table until it becomes unreadable. Use two levels of containment:
+
+1. `documentElement.scrollWidth === documentElement.clientWidth` at 390, 768, 1280 and
+   1920 CSS px.
+2. Wide engineering diagrams/tables keep their minimum legible width inside a labelled,
+   keyboard-focusable local scroll wrapper.
+
+Header and tab rails must remain operable after scrolling. On fixed-height desktop
+cockpits, stack the sticky tab rail immediately below the known-height sticky header. If
+the narrow header becomes content-sized, keep it in normal flow and make only the tab rail
+sticky at `top:0`. Action groups and tab rails use bounded horizontal scrolling instead of
+creating body overflow. Verify with real pointer hit-testing; width arithmetic alone will
+not detect one sticky layer intercepting another.
+
+Dense filter forms collapse from multi-column to one column; result tables scroll inside
+their own wrapper; modal width uses `min()`/viewport caps; all critical actions remain at
+least 44 px on touch viewports. `prefers-reduced-motion` removes animated flow/pulse while
+preserving state labels and line semantics.
+
 ## Required breakpoints
 
 ```

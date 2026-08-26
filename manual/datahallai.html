@@ -207,7 +207,7 @@
         .mn-toollink:hover { filter: brightness(1.08); }
 
         /* Section blocks */
-        .mn-section { margin: 2.25rem 0; }
+        .mn-section { margin: 2.25rem 0; scroll-margin-top: 5rem; }
         .mn-section > h2 {
             font-size: 1.28rem; font-weight: 700; margin: 0 0 0.35rem;
             display: flex; align-items: baseline; gap: 0.6rem;
@@ -268,6 +268,7 @@
 
         a.mn-inline { color: var(--mn-cyan); text-decoration: none; }
         a.mn-inline:hover { text-decoration: underline; }
+        .mn-section[aria-labelledby="contents-title"] a { display: inline-flex; align-items: center; min-height: 24px; }
 
         /* v1.8.0 — mobile responsive patch */
         @media (max-width: 768px) {
@@ -306,7 +307,7 @@
         </div>
     </nav>
 
-    <main class="mn-wrap" data-explain-scan>
+    <main class="mn-wrap" id="main-content" data-explain-scan>
         <div class="mn-crumb">
             <a href="../index.html">Home</a> / <a href="../datacenter-solutions.html">DC Solutions</a> / <a href="index.html">Technical Manuals</a> / AI Data Hall Cockpit
         </div>
@@ -325,15 +326,32 @@
             <a class="mn-toollink" href="../datahallAI.html">&#9654; Open the AI Data Hall Cockpit</a>
         </header>
 
+        <nav class="mn-section mn-note" aria-labelledby="contents-title">
+            <h2 id="contents-title">Table of contents</h2>
+            <ol>
+                <li><a class="mn-inline" href="#purpose">Purpose &amp; engineering basis</a></li>
+                <li><a class="mn-inline" href="#inputs">Inputs — locked basis and selection</a></li>
+                <li><a class="mn-inline" href="#DATAHALL_CALC">Calculation methodology</a></li>
+                <li><a class="mn-inline" href="#constants">Constants &amp; data sources</a></li>
+                <li><a class="mn-inline" href="#outputs">Outputs</a></li>
+                <li><a class="mn-inline" href="#worked-example">Worked example</a></li>
+                <li><a class="mn-inline" href="#accuracy">Accuracy validation</a></li>
+                <li><a class="mn-inline" href="#references">References &amp; standards</a></li>
+                <li><a class="mn-inline" href="#control-map">Cockpit controls &amp; view map</a></li>
+                <li><a class="mn-inline" href="#telemetry-operation">Telemetry, alarms &amp; modal operation</a></li>
+                <li><a class="mn-inline" href="#glossary">Glossary &amp; RZExplain</a></li>
+            </ol>
+        </nav>
+
         <!-- 1. PURPOSE -->
-        <section class="mn-section">
+        <section class="mn-section" id="purpose">
             <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
             <p class="mn-lead">The AI Data Hall Cockpit is a deterministic digital-twin dashboard for a GB200 NVL72 HPC facility operating direct liquid cooling. It answers five engineering questions: <em>what is the IT load per hall and per facility</em>, <em>how is heat split between liquid and air paths</em>, <em>what hydronic flow and how many CDUs are required</em>, <em>what is the honest bottom-up PUE</em>, and <em>what does the electrical distribution look like under the locked load</em>.</p>
             <p class="mn-lead">Basis of design is <strong>locked</strong>: the <code class="mn-mono">DATAHALL_MODEL</code> object is deep-frozen at page load. No tab can mutate it. Every KPI on every tab reads from the same <code class="mn-mono">DATAHALL_CALC.lockedState()</code> and <code class="mn-mono">DATAHALL_CALC.pueBasis()</code> call — Rule 1 (one source of truth) of <code class="mn-mono">standarization/ACCURACY_VALIDATION.md</code>. The governing hardware reference is the <strong>NVIDIA GB200 NVL72</strong> specification; thermal and facility methodology follows <strong>ASHRAE A2</strong> and <strong>ISO/IEC 30134-2</strong> (PUE) and <strong>ISO/IEC 30134-8</strong> (CUE<sub>IT</sub>).</p>
         </section>
 
         <!-- 2. INPUTS / LOCKED BASIS -->
-        <section class="mn-section">
+        <section class="mn-section" id="inputs">
             <h2><span class="mn-num">02</span> Inputs — LOCKED basis + tab selection</h2>
             <p class="mn-lead">The primary input block is the immutable <code class="mn-mono">DATAHALL_MODEL</code> (Scenario A, locked 2026-05-17). Tab-selection controls (scenario toggle, view mode) change which derived quantities are <em>displayed</em> but do not alter the underlying constants. All values below are from <code class="mn-mono">BASELINE-DECISION.md</code> and verified in doc-21 worked examples.</p>
             <div class="mn-tablewrap">
@@ -368,6 +386,7 @@
             </table>
             </div>
             <div class="mn-note"><strong>Scenario A vs B:</strong> Scenario A (LOCKED) treats 132 kW as per NVL72 pair → 3,564 kW/hall. Scenario B (variant, NOT adopted) treats 132 kW as per physical rack → 7,128 kW/hall, which overloads the 4,500 kW 2N UPS (158% loading — impossible per doc-21 Ex2) and requires 12,000 A busway. The cockpit labels every KPI with its basis scenario and locks the derived panel to Scenario A.</div>
+            <div class="mn-note"><strong>GB300 reference study — not adopted:</strong> the platform selector may compare the locked GB200 footprint with one GB300 NVL72 rack per logical domain at the official <strong>up-to-142 kW/rack</strong> reference. With the same 27-domain planning count, that is 27 physical racks and 3,834 kW IT per hall (15.336 MW across four halls). It does not replace Scenario A, alter <code class="mn-mono">DATAHALL_MODEL</code>, or prove that the existing electrical, liquid-cooling, structural or network design can support GB300.</div>
         </section>
 
         <!-- 3. METHODOLOGY -->
@@ -462,7 +481,7 @@
         </section>
 
         <!-- 4. CONSTANTS -->
-        <section class="mn-section">
+        <section class="mn-section" id="constants">
             <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
             <p class="mn-lead">Every constant lives in the deep-frozen <code class="mn-mono">DATAHALL_MODEL</code> with a <code>// source:</code> comment. No economically-material literal lives inside a function body. Key hardware constants:</p>
             <div class="mn-tablewrap">
@@ -476,6 +495,7 @@
                     <tr><td>CDU</td><td>350 kW end-of-row CDU</td><td>350 kW thermal</td><td>doc-21 Ex7</td></tr>
                     <tr><td>Chiller</td><td>Carrier 19DV water-cooled centrifugal</td><td>1,231–4,044 kW; COP 6.8</td><td>doc-21 Ex9; Carrier 19DV nameplate</td></tr>
                     <tr><td>CRAH</td><td>Active units per hall</td><td>5 active; ΔT 5 K</td><td>doc-21 Ex8</td></tr>
+                    <tr><td>GB300 study reference</td><td>GB300 NVL72 full-rack system</td><td>Up to 142 kW/rack; 72 GPU + 36 CPU</td><td>NVIDIA Enterprise Reference Architecture components; non-adopted comparison only</td></tr>
                 </tbody>
             </table>
             </div>
@@ -497,7 +517,7 @@
         </section>
 
         <!-- 5. OUTPUTS -->
-        <section class="mn-section">
+        <section class="mn-section" id="outputs">
             <h2><span class="mn-num">05</span> Outputs</h2>
             <div class="mn-tablewrap">
             <table class="mn-table">
@@ -516,13 +536,28 @@
                     <tr><td>PUE (bottom-up)</td><td><code>pueBasis().pue</code></td><td>—</td><td>DERIVED</td><td>Facility / IT. Shows the honest derived value, never the target.</td></tr>
                     <tr><td>PUE 5-part basis</td><td><code>pueBasis().basis</code></td><td>kW</td><td>DERIVED</td><td>IT / cooling / UPS-loss / dist-loss / aux — human-auditable breakdown.</td></tr>
                     <tr><td>Data hall volume</td><td><code>dataHallVolume()</code></td><td>m³</td><td>BOD LOCKED</td><td>32 × 20 × 4.2 = 2,688 m³ per hall.</td></tr>
+                    <tr><td>Gross IT floor density — locked</td><td><code>RZDataHallRackDensity.getBaseline()</code></td><td>kW/m²</td><td>BOD LOCKED</td><td>3,564 kW / 640 m² = 5.56875 kW/m²; 54 physical positions at 66 kW each.</td></tr>
+                    <tr><td>GB300 capacity reference</td><td><code>RZDataHallRackDensity.studyReference('gb300-nvl72-142kw-study')</code></td><td>rack / kW / MW / kW/m²</td><td>REFERENCE STUDY</td><td>27 racks × 142 kW = 3.834 MW/hall = 5.990625 kW/m². No adoption or current telemetry claim.</td></tr>
+                </tbody>
+            </table>
+            </div>
+            <div class="mn-tablewrap" style="margin-top:0.9rem;">
+            <table class="mn-table">
+                <thead><tr><th>Release acceptance</th><th>Executable evidence</th><th>Required invariant</th></tr></thead>
+                <tbody>
+                    <tr><td>Alarm query and first-out</td><td><code>tools/test-datahall-ai-alarm-query.mjs</code></td><td>All filter families compose; first-out is earliest per incident; export follows the filtered set.</td></tr>
+                    <tr><td>Rack-density profiles</td><td><code>tools/test-datahall-ai-rack-density.mjs</code></td><td>Locked GB200 values remain immutable; GB300 is calculated and labeled reference-only.</td></tr>
+                    <tr><td>Electrical semantic truth</td><td><code>tools/test-datahall-ai-electrical-topology.mjs</code></td><td>Normal/fault scenarios reconcile all 54 racks and animation consumes semantic state.</td></tr>
+                    <tr><td>Fire cause/effect</td><td><code>tools/test-datahall-ai-fire-cause-effect.mjs</code></td><td>Zoned commands, feedback, inhibition and reset authority validate; BMS/DCIM is monitor-only.</td></tr>
+                    <tr><td>Shared Design Studio</td><td><code>tools/test-rz-design-studio.mjs</code></td><td>Current/current-plus-study registration, validated issue metadata and accessible dialog lifecycle remain intact.</td></tr>
+                    <tr><td>Operator UI integration</td><td><code>tools/test-datahall-ai-operator-ui.mjs</code> plus browser journey</td><td>Controls bind to the pure modules, dialogs remain accessible, and no document overflow or console error is introduced.</td></tr>
                 </tbody>
             </table>
             </div>
         </section>
 
         <!-- 6. WORKED EXAMPLE -->
-        <section class="mn-section">
+        <section class="mn-section" id="worked-example">
             <h2><span class="mn-num">06</span> Worked example — Scenario A (LOCKED basis)</h2>
             <p class="mn-lead">Numbers reproduce the engine output exactly for Scenario A (132 kW / NVL72). Examples 1–10 are the acceptance tests in <code class="mn-mono">tools/test-datahall-calc.mjs</code> (57/57 assertions). Below is a compressed trace of the ten examples.</p>
             <div class="mn-worked">
@@ -543,7 +578,7 @@
         </section>
 
         <!-- 7. ACCURACY VALIDATION -->
-        <section class="mn-section">
+        <section class="mn-section" id="accuracy">
             <h2><span class="mn-num">07</span> Accuracy validation — 6 rules</h2>
             <p class="mn-lead">Codified in <code class="mn-mono">standarization/ACCURACY_VALIDATION.md</code> and enforced by <code class="mn-mono">tools/probe-accuracy-validation.mjs</code> (40/40 acceptance tests). Gate any change that touches the cockpit pages.</p>
             <div class="mn-tablewrap">
@@ -562,10 +597,11 @@
         </section>
 
         <!-- 8. REFERENCES -->
-        <section class="mn-section">
+        <section class="mn-section" id="references">
             <h2><span class="mn-num">08</span> References &amp; standards</h2>
             <ul class="mn-refs">
-                <li><b>NVIDIA GB200 NVL72</b> — Blackwell GPU rack-scale specification: 72 GPU + 36 Grace CPU per NVL72, direct liquid cooling, ~120–140 kW per NVL72 domain (adopted design value 132 kW).</li>
+                <li><a class="mn-inline" href="https://docs.nvidia.com/dgx/dgxgb200-user-guide/hardware.html"><b>NVIDIA DGX GB200 hardware documentation</b></a> — governing hardware context for the locked 72-GPU / 36-Grace-CPU, direct-liquid-cooled GB200 baseline.</li>
+                <li><a class="mn-inline" href="https://docs.nvidia.com/enterprise-reference-architectures/nvl72-ai-factory/latest/components.html"><b>NVIDIA Enterprise Reference Architecture — components</b></a> — official GB300 full-rack and up-to-142 kW/rack reference used only in the non-adopted comparison.</li>
                 <li><b>BASELINE-DECISION.md (locked 2026-05-17)</b> — Single immutable source of truth for the whole cockpit: 4 halls, 27 NVL72/hall, 132 kW/NVL72 (Scenario A), 85% liquid capture, TCS 35/45 °C, PUE design band 1.12–1.25.</li>
                 <li><b>21-calculation-worked-examples.md (doc-21)</b> — 10 fully-traced examples (Ex1–Ex10) that are the acceptance test cases for <code class="mn-mono">tools/test-datahall-calc.mjs</code> (57/57 assertions).</li>
                 <li><b>00-overview-audit.md (doc-00)</b> — Core Calculation Engine definition (lines 104-125), Source Sanity References, equipment corrections (Cat 3516E ≈ 2.5–2.75 MW).</li>
@@ -575,6 +611,8 @@
                 <li><b>Carrier 19DV centrifugal chiller</b> — Nameplate COP 6.8 used in doc-21 Ex9 (not calibrated to hit a target PUE).</li>
                 <li><b>Engine sources</b> — <code class="mn-mono">js/datahall-calculations.js</code> (DATAHALL_CALC, pure derivation engine) + <code class="mn-mono">js/datahall-model.js</code> (DATAHALL_MODEL, deep-frozen basis).</li>
                 <li><b>standarization/ACCURACY_VALIDATION.md</b> — 6 accuracy rules + 40 acceptance tests enforced by <code class="mn-mono">tools/probe-accuracy-validation.mjs</code>.</li>
+                <li><a class="mn-inline" href="https://www.isa.org/standards-and-publications/isa-standards/isa-18-series-of-standards"><b>ISA-18 alarm-management series</b></a> — lifecycle, operator response, rationalization and first-out context for the simulated alarm workspace.</li>
+                <li><a class="mn-inline" href="https://webstore.iec.ch/en/publication/65543"><b>IEC 62682:2022</b></a> — management of alarms for process industries; terminology and acceptance reference, not a conformance claim.</li>
             </ul>
         </section>
 
@@ -588,13 +626,15 @@
                 <tbody>
                     <tr><td>Portfolio / DC Solutions / PRD / Manual</td><td><code>.bbtn</code></td><td>Navigate without changing the locked scenario.</td><td>Documentation is public; the cockpit keeps its existing tier gate.</td></tr>
                     <tr><td>Basis of Design</td><td><code>bodTrig</code>, <code>bodDrawer</code></td><td>Open the calculation-audit drawer populated from <code>DATAHALL_CALC</code>; export its printable PDF.</td><td>It is an auditable design basis, not a field test certificate.</td></tr>
-                    <tr><td>Generate Design</td><td><code>genDesignTrig</code></td><td>Capture one engine snapshot and build the multi-discipline Tech Spec print view.</td><td>Popup failure must be reported; report content remains educational/non-procurement.</td></tr>
+                    <tr><td>Generate Design / Design Studio</td><td><code>genDesignTrig</code>, <code>RZDesignStudio</code></td><td>Open the shared dialog, display one current engine snapshot and provenance, then allow only the registered document types and current/current-plus-study scopes.</td><td>The study appendix is labeled non-adopted; it never mutates the snapshot. Focus is trapped and returned; failure is visible.</td></tr>
                     <tr><td>FAQ / Theme</td><td><code>faqTrig</code>, <code>themeToggle</code></td><td>Open the FAQ dialog; switch/persist the light/dark palette.</td><td>Neither action changes model values.</td></tr>
-                    <tr><td>Primary tabs</td><td><code>button[data-t]</code></td><td>Select Dashboard, Data Hall, Room Layout, Rack, Cooling, Electrical, Network, Fire or BMS; one <code>.pn</code> remains active.</td><td>Tab changes presentation only.</td></tr>
+                    <tr><td>Primary tabs</td><td><code>button[data-t]</code></td><td>Select Dashboard, Data Hall, Room Layout, Rack, Cooling, Electrical, Network, Fire, BMS, or Alarms &amp; Events; one <code>.pn</code> remains active.</td><td>Tab changes presentation only.</td></tr>
+                    <tr><td>Rack-density platform study</td><td><code>platformProfile</code>, <code>platformComparisonBody</code></td><td>Keep locked GB200 values visible and optionally show the GB300 planning reference.</td><td>Selection is read-only presentation; GB300 is not adopted and does not alter any operating KPI.</td></tr>
                     <tr><td>Sidebar collapse / reopen</td><td><code>sideTog</code>, <code>sideReopen</code></td><td>Widen the active diagram on desktop and remember the preference.</td><td>Does not hide alarm meaning or alter data.</td></tr>
                     <tr><td>Floor selection / Overview</td><td>generated floor targets, <code>floorBack</code></td><td>Open a tagged floor plan and return to the building view.</td><td>Geometry is a design visualization, not a surveyed as-built.</td></tr>
                     <tr><td>Hall selection</td><td><code>button[data-dh="1…4"]</code></td><td>Select DH-1 through DH-4 and update active hall context.</td><td>All halls share Scenario A unless a future model declares a variance.</td></tr>
                     <tr><td>Electrical sub-tabs</td><td><code>button[data-ep]</code></td><td>Select facility Overview or DH-01…DH-04 SLD.</td><td>Only one <code>.ep</code> panel is active.</td></tr>
+                    <tr><td>Electrical operating scenario</td><td><code>electricalScenario</code>, <code>electricalPathSummary</code>, <code>electricalTimeline</code></td><td>Evaluate normal, utility/source, busway and rack-feed events; render served/2N/degraded/lost totals, path state and ordered event timeline.</td><td>Semantic topology determines animation. De-energized paths never remain visually active; all meaning survives reduced motion.</td></tr>
                     <tr><td>SLD equipment</td><td><code>data-sld-click</code>, <code>data-rz-line</code>, <code>data-rz-breaker</code></td><td>Open the appropriate SLD mimic or right inspector for MV, RMU, transformer, MSB, UPS, busway, rack PSU or cooling feed.</td><td>Selection is read-only; no breaker command leaves the browser.</td></tr>
                     <tr><td>SLD presentation</td><td><code>sldZoomIn</code>, <code>sldZoomOut</code>, <code>sldZoomFit</code>, <code>sldPrint</code>, <code>sldResultsToggle</code>, <code>sldMimicClose</code></td><td>Zoom, fit, print, show/hide results or close the selected mimic.</td><td>Results are modeled annotations, not IEC 60909/IEEE 1584 studies unless explicitly sourced.</td></tr>
                     <tr><td>Rack / component detail</td><td>generated rack/tray/component targets, <code>rackModal</code></td><td>Open the selected tag, type and component diagram.</td><td>Component inventory follows the locked reference architecture.</td></tr>
@@ -603,6 +643,9 @@
                     <tr><td>In-rack CDU / CRAH</td><td><code>data-ircdu</code>, generated CRAH targets</td><td>Open rack hydronic or air-side detail.</td><td>Heat/flow basis remains Scenario A; jitter is not a sizing input.</td></tr>
                     <tr><td>Corridor services</td><td>FWS, leak, cable-tray targets</td><td>Open corridor-service HMI for the selected family.</td><td>No service-isolation or safety command is implemented.</td></tr>
                     <tr><td>Battery ESS</td><td><code>data-bat</code>, <code>batHmi</code></td><td>Open the 480 VDC system/unit view for the selected hall and unit.</td><td>Runtime/SOC/thermal values are simulation unless identified as engine basis.</td></tr>
+                    <tr><td>Fire cause-and-effect matrix</td><td><code>fireScenario</code>, <code>fireZone</code>, <code>fireCauseEffectBody</code></td><td>Select an initiating event/zone and inspect affected notification, lift, access, AHU/CRAH, smoke-control, suppression, EPO, generator, CCTV and BMS/DCIM outputs with required feedback.</td><td>FACP is command authority. BMS/DCIM only publishes/monitors the event; the browser sends no command.</td></tr>
+                    <tr><td>Alarm query workspace</td><td><code>alarmFilterForm</code>, <code>alarmResultsBody</code>, <code>alarmDetail</code></td><td>Filter by date/time, point/tag, system, severity, lifecycle, quality, value comparator, state transition, event/action/text or saved view; select a row for evidence.</td><td>Records are immutable simulated fixtures, not a field historian.</td></tr>
+                    <tr><td>First-out / CSV</td><td><code>alarmFirstOut</code>, <code>alarmExportCsv</code></td><td>Show the earliest event per incident and export the current filtered record set with provenance fields.</td><td>Export is evidence from the simulation only; it is not an acknowledged site log.</td></tr>
                     <tr><td>KPI basis cards</td><td><code>.k[data-basis]</code></td><td>Click, Enter or Space opens formula, inputs, output, scope, denominator, source, mode and timestamp.</td><td>Uptime and alarm drawers explicitly identify design placeholders.</td></tr>
                     <tr><td>Close controls / Escape / scrim</td><td>modal-specific close IDs + shared modal controller</td><td>Dismiss the active surface and return focus to its trigger.</td><td>Focus must never fall silently to <code>body</code>.</td></tr>
                     <tr><td>Scroll to top</td><td><code>scrollTopBtn</code></td><td>Return to the header without altering current scenario.</td><td>Reduced-motion preference removes nonessential smooth animation.</td></tr>
@@ -633,10 +676,14 @@
                     <tr><td>BMS service health</td><td><code>bmsGwOnline</code>, <code>bmsAlmActive</code>, <code>bmsAlmAck</code>, <code>bmsAlmCleared</code></td><td>Static service baseline plus shared rules.</td><td>16/16 gateways is modeled; “cleared” currently reuses the maintenance count and is not a true event lifecycle.</td></tr>
                     <tr><td>Line / breaker quality</td><td><code>data-rz-line</code>, <code>data-rz-breaker</code>, inspector Live tab</td><td>Local rendered state.</td><td>Seven breaker states and data-quality chip must remain distinguishable without color alone.</td></tr>
                     <tr><td>Global data mode</td><td><code>body[data-rz-data-mode="simulated"]</code></td><td>Persistent provenance.</td><td>The word <strong>Simulated</strong> must remain visible even when values animate.</td></tr>
+                    <tr><td>Alarm-query records</td><td><code>RZDataHallAlarmQuery</code></td><td>Immutable simulated event fixtures.</td><td>Date/point/system/severity/lifecycle/quality/value/state/event/action/text filters compose; first-out selects earliest per incident and CSV exports the filtered set.</td></tr>
+                    <tr><td>Electrical scenario truth</td><td><code>RZDatahallAIElectrical.evaluateScenario()</code></td><td>Pure semantic topology evaluation.</td><td>Served + lost = 54; 2N/degraded are mutually interpretable availability classes; CSS animation is a consumer, never the source of truth.</td></tr>
+                    <tr><td>Fire cause/effect</td><td><code>RZDatahallAIFireCauseEffect.evaluateEvent()</code></td><td>Immutable zoned training matrix.</td><td>Rows expose command authority, expected feedback, inhibition and reset authority. FACP controls; BMS/DCIM monitor-only.</td></tr>
+                    <tr><td>Rack-density comparison</td><td><code>RZDataHallRackDensity</code></td><td>Locked baseline plus reference-only study.</td><td>GB200 = 54 positions × 66 kW; GB300 study = 27 racks × up to 142 kW. Neither value is field telemetry.</td></tr>
                 </tbody>
             </table>
             </div>
-            <div class="mn-note"><strong>Threshold source:</strong> the current alarm rules use rack inlet &gt;27°C warning / &gt;30°C critical, CDU margin &lt;15% / &lt;5%, UPS load &gt;80% / &gt;95%, TCS ΔT &gt;13 K / &gt;15 K, and stale points &gt;1% / &gt;5%. These are review fixtures, not approved field setpoints.</div>
+            <div class="mn-note"><strong>Threshold and lifecycle source:</strong> the panel alarm rules use rack inlet &gt;27°C warning / &gt;30°C critical, CDU margin &lt;15% / &lt;5%, UPS load &gt;80% / &gt;95%, TCS ΔT &gt;13 K / &gt;15 K, and stale points &gt;1% / &gt;5%. The query workspace adopts ISA-18/IEC 62682 lifecycle and first-out terminology, but its records and thresholds remain deterministic review fixtures—not approved field setpoints, historian evidence or alarm-system conformance.</div>
         </section>
 
         <!-- 11. GLOSSARY — additive telemetry-docs enhancement -->
