@@ -7,98 +7,6 @@
 (function () {
     'use strict';
 
-    /* Public documentation links must stay reachable even when a legacy
-       cache-first Service Worker serves an older navigation bundle. auth.js
-       has been network-first since v1.29.0, so it owns this upgrade-safe,
-       fail-closed bridge for the two restricted engineering cockpits. */
-    var PUBLIC_CONTRACTS = [
-        {
-            gate: '.root-gate',
-            header: '.hdr',
-            hrefs: ['prd/datahallai.html', 'manual/datahallai.html']
-        },
-        {
-            gate: '.rz-restricted-overlay',
-            header: '.header',
-            hrefs: ['prd/dc-conventional.html', 'manual/dc-conventional.html']
-        }
-    ];
-
-    function publicContractConfig() {
-        for (var i = 0; i < PUBLIC_CONTRACTS.length; i++) {
-            var candidate = PUBLIC_CONTRACTS[i];
-            var header = document.querySelector(candidate.header);
-            var links = candidate.hrefs.map(function (href) {
-                return document.querySelector('.rz-public-contract-link[href="' + href + '"]');
-            });
-            if (document.querySelector(candidate.gate) && header && links.every(Boolean)) {
-                return { header: header, links: links };
-            }
-        }
-        return null;
-    }
-
-    function publicContractSlot(link) {
-        var slot = document.createElement('span');
-        slot.className = link.className + ' rz-public-contract-slot';
-        slot.setAttribute('aria-hidden', 'true');
-        slot.style.cssText = link.getAttribute('style') || '';
-        slot.style.visibility = 'hidden';
-        slot.style.pointerEvents = 'none';
-        slot.textContent = link.textContent;
-        link.parentNode.insertBefore(slot, link);
-        return slot;
-    }
-
-    function exposePublicContractLinks() {
-        var config = publicContractConfig();
-        if (!config || document.querySelector('.rz-public-contract-layer')) return;
-        var layer = document.createElement('nav');
-        layer.className = 'rz-public-contract-layer';
-        layer.setAttribute('aria-label', 'Public cockpit documentation');
-        layer.style.cssText = 'position:fixed;inset:0;z-index:100002;pointer-events:none';
-        var bindings = config.links.map(function (link) {
-            var slot = publicContractSlot(link);
-            link.style.position = 'fixed';
-            link.style.zIndex = '1';
-            link.style.pointerEvents = 'auto';
-            link.style.minWidth = '44px';
-            link.style.minHeight = '44px';
-            link.style.display = 'inline-flex';
-            link.style.alignItems = 'center';
-            link.style.justifyContent = 'center';
-            layer.appendChild(link);
-            return { link: link, slot: slot };
-        });
-        document.body.appendChild(layer);
-
-        function placeLinks() {
-            bindings.forEach(function (binding) {
-                var rect = binding.slot.getBoundingClientRect();
-                binding.link.style.left = rect.left + 'px';
-                binding.link.style.top = rect.top + 'px';
-            });
-        }
-
-        function syncGateState() {
-            if (document.body.classList.contains('locked')) config.header.setAttribute('inert', '');
-            else config.header.removeAttribute('inert');
-        }
-
-        new MutationObserver(syncGateState).observe(document.body, {
-            attributes: true,
-            attributeFilter: ['class']
-        });
-        window.addEventListener('resize', placeLinks, { passive: true });
-        window.addEventListener('scroll', placeLinks, { passive: true });
-        if (typeof ResizeObserver === 'function') {
-            var observer = new ResizeObserver(placeLinks);
-            bindings.forEach(function (binding) { observer.observe(binding.slot); });
-        }
-        syncGateState();
-        requestAnimationFrame(function () { requestAnimationFrame(placeLinks); });
-    }
-
     /* ───────── Load FontAwesome if not present (async via print/onload pattern) ───────── */
     if (!document.querySelector('link[href*="font-awesome"], link[href*="fontawesome"]')) {
         var fa = document.createElement('link');
@@ -396,40 +304,14 @@
         { email: 'demo@resistancezero.com', password: 'demo2026', tier: 'demo', role: 'demo' }
     ];
 
-    /* OFFLINE ROOT RECOVERY (v1.128.2) — so a flaky/unreachable/errored Supabase can NEVER lock the owner
-       out. When Supabase errors, a root email may sign in offline with a recovery passphrase.
-       SECURITY (addresses review CRITICAL): the passphrase is an OFFLINE-ONLY string, DECOUPLED from any
-       Supabase password — so the public hash below is NEVER a live credential, and cracking it grants only
-       CLIENT-SIDE root (already localStorage-settable), never Supabase access. Stored as PBKDF2-SHA256
-       (100k iters, per-deploy salt), so offline brute-force is expensive, not a single SHA-256 round.
-       Default offline passphrase: RZ-Offline-Recovery-Aug2026 (change it — keep it distinct from Supabase):
-         node -e 'const c=require("crypto"),s=c.randomBytes(16);console.log("salt",s.toString("hex"),"hash",c.pbkdf2Sync("NEW PASSPHRASE",s,100000,32,"sha256").toString("hex"))'
-       then replace OFFLINE_ROOT_SALT + the hash(es). */
-    var OFFLINE_ROOT_SALT = 'b934fcf3b409defa718b8dce98c7261c';
-    var OFFLINE_ROOT_ITERS = 100000;
-    var OFFLINE_ROOT = {
-        'bagus@resistancezero.com': '6168da9b1ac4d4d9b9ffc762d7ab6ac54d7709ded07e2462e473b6301fa4d5a8',
-        'admin@resistancezero.com': '6168da9b1ac4d4d9b9ffc762d7ab6ac54d7709ded07e2462e473b6301fa4d5a8'
-    };
-    function _hexBytes(h) { var a = new Uint8Array(h.length / 2); for (var i = 0; i < a.length; i++) a[i] = parseInt(h.substr(i * 2, 2), 16); return a; }
-    function _pbkdf2Hex(str) {
-        try {
-            var enc = new TextEncoder().encode(String(str || ''));
-            return crypto.subtle.importKey('raw', enc, 'PBKDF2', false, ['deriveBits']).then(function (km) {
-                return crypto.subtle.deriveBits({ name: 'PBKDF2', salt: _hexBytes(OFFLINE_ROOT_SALT), iterations: OFFLINE_ROOT_ITERS, hash: 'SHA-256' }, km, 256);
-            }).then(function (buf) {
-                var b = new Uint8Array(buf), h = ''; for (var i = 0; i < b.length; i++) h += b[i].toString(16).padStart(2, '0'); return h;
-            });
-        } catch (e) { return Promise.resolve(null); } /* crypto.subtle needs https/localhost — graceful null on file:// */
-    }
-    /* Resolves to a root user object when the recovery passphrase hash matches, else null. */
-    function offlineRoot(email, password) {
-        var e = String(email || '').toLowerCase().trim();
-        if (!OFFLINE_ROOT[e]) return Promise.resolve(null);
-        return _pbkdf2Hex(password).then(function (h) {
-            return (h && h === OFFLINE_ROOT[e]) ? { email: e, tier: 'pro', role: 'root' } : null;
-        });
-    }
+    /* OFFLINE ROOT RECOVERY — REMOVED (v1.129.2, review H-1). Shipping ANY recovery passphrase/hash in the
+       PUBLIC client bundle is a published credential: readable + guessable/crackable, and it unlocked
+       client-side root with no outage (and fired on ordinary invalid_credentials too). The real need — a
+       paused/blipping Supabase locking out login — is covered by the keep-alive workflow (project won't
+       pause) + the network retry in rz-supabase.js. Any TRUE offline recovery must live in a host-local
+       service/secret store, never the public site. Stub always no-ops so existing callers fall through to
+       the real Supabase error. NEVER present client-side role as a server authorization boundary. */
+    function offlineRoot() { return Promise.resolve(null); }
 
     /* Also check manually-created accounts stored in localStorage by admin */
     function getManualAccounts() {
@@ -448,7 +330,7 @@
             function loadModule() {
                 var m = document.createElement('script');
                 m.type = 'module';
-                m.src = '/js/rz-supabase.js?v=2026-08-25-secfix';
+                m.src = '/js/rz-supabase.js?v=2026-08-26-h1h2';
                 m.onload = function () {
                     var r = (window.rzSupa && window.rzSupa.ready) ? window.rzSupa.ready : Promise.resolve(window.rzSupa || null);
                     r.then(resolve).catch(function () { resolve(window.rzSupa || null); });
@@ -1189,7 +1071,6 @@
 
     /* ───────── Init ───────── */
     function init() {
-        exposePublicContractLinks();
         injectCSS();
         injectAuthButton();
         injectLoginModal();

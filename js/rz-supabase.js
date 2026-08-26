@@ -36,14 +36,18 @@ function _rzDelay(i) {
   var jitter = (_rzFetchN++ % 5) * 30; // 0..120ms, deterministic (no Math.random)
   return new Promise(function (r) { setTimeout(r, base + jitter); });
 }
-/* Only retry IDEMPOTENT calls: safe methods (GET/HEAD) and auth endpoints (/auth/v1/* token/otp — a
-   re-run just returns the same session). NEVER retry a data write (POST/PATCH/PUT/DELETE to /rest/v1/*):
-   a connection reset AFTER the body was sent could otherwise double-apply an insert (review HIGH). */
+/* Only retry IDEMPOTENT calls (review H-2 — do NOT allowlist the whole /auth/v1/* namespace: that includes
+   stateful writes like signup, OTP/recover, and user updates that must never be re-sent). Retry:
+   - safe methods GET/HEAD; and
+   - ONLY the password-grant login token POST (/auth/v1/token?...grant_type=password) — a re-run returns the
+     same session with no new side effect.
+   Everything else (REST /rest/v1/* writes, signup, otp, recover, user updates) is single-attempt. */
 function _rzRetryable(input, init) {
   var m = ((init && init.method) || (input && input.method) || 'GET').toString().toUpperCase();
   if (m === 'GET' || m === 'HEAD') return true;
+  if (m !== 'POST') return false;
   var url = (typeof input === 'string' ? input : (input && input.url) || '');
-  return url.indexOf('/auth/v1/') !== -1;
+  return /\/auth\/v1\/token(\?|$)/.test(url) && /grant_type=password/.test(url);
 }
 async function rzFetch(input, init) {
   if (!_rzRetryable(input, init)) return fetch(input, init);   // non-idempotent write → single attempt, no retry

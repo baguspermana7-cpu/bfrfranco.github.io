@@ -11,6 +11,21 @@ release sections rather than semver.
 
 ---
 
+## v1.129.2 — 2026-08-26 (Auth security: remove offline-root from public bundle + narrow retry — Codex review H-1/H-2)
+
+### Security / Fixed
+- **Removed offline-root recovery from the public bundle** (Codex review H-1). Shipping any recovery
+  passphrase/hash in client JS is a published credential — it was readable (the passphrase was even in a
+  code comment), guessable/crackable, and unlocked client-side root with no outage (it also fired on ordinary
+  `invalid_credentials`). `offlineRoot()` is now a no-op stub; no passphrase/hash/salt remain in `auth.js`.
+  The need it addressed (a paused/blipping Supabase locking out login) is covered by the keep-alive workflow
+  (project won't pause) + the network retry in `rz-supabase.js`. Client-side role is presentation-gating only,
+  never a server authorization boundary.
+- **Narrowed the Supabase fetch retry** (Codex review H-2). `rzFetch` no longer allowlists the whole
+  `/auth/v1/*` namespace (which includes stateful writes: signup, OTP/recover, user updates). It now retries
+  only GET/HEAD and the password-grant login token POST (`/auth/v1/token?...grant_type=password`); everything
+  else is single-attempt, preventing double-submit of stateful Auth/REST writes. Verified unit 8/8.
+
 ## v1.129.1 — 2026-08-26 (Governed agent harness standard)
 
 ### Added
