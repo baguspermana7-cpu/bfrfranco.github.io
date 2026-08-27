@@ -57,6 +57,13 @@ gate "DC AI operator UI — markup contract" node tools/test-datahall-ai-operato
 gate "DC AI operator UI — runtime contract" node tools/test-datahall-ai-operator-runtime.mjs
 gate "EPMS — ATS-to-rack source colour" node tools/test-epms-ats-rack-color.mjs
 gate "Conventional snapshot binding — no phantom keys, strips follow the engine" node tools/test-conv-snapshot-binding.mjs
+# MONITOR (advisory, exit 0 by design): measures diagram geometry — label collisions, clipped elements,
+# degenerate labels, phone overflow — across 4 diagrams x 4 viewports x 2 themes. It runs in --measure mode
+# because the current pages carry a real, already-measured debt (~484 findings: chiller-plant 27-48 collisions
+# + 16-18 clipped, EPMS 12-13 collisions, fire 2 clipped + 46px tablet overflow, water 336px tablet overflow).
+# FLIP TO STRICT (drop --measure) once the chiller/fire/water/EPMS layout work lands — a gate that fails from
+# day one gets muted, so the debt is reported every run until it is actually paid.
+gate "Conventional geometry MONITOR — collisions, clipping, arrangement" node tools/test-conv-geometry.mjs --measure
 gate "Conventional study — reconciled four-hall basis" node --test tools/test-conv-design-basis.mjs
 gate "Conventional alarms — common historian workspace" node --test tools/test-conv-alarm-workspace.mjs
 gate "Conventional alarms — modal runtime and accessibility" node tools/test-conv-alarm-runtime.mjs

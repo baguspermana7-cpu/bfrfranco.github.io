@@ -425,10 +425,13 @@ console.log('\n=== Cross-page headline consistency (Rule 1) ===');
   assert(wueOk, 'X-Test-2: WUE = 1.20 identical across dc-conv (2 surfaces) + water-system (2 surfaces)', JSON.stringify({dashboard:wueDashboard, side:wueSide, water:wueWater, statusBar:wueStatusBar}));
 
   /* IT load — dc-conv shows 1,850 kW; datahall shows 1.85 MW (same value, different unit) */
-  const itDcConv = dcConv.kpiIt;                       /* "1,850" */
-  const itDatahall = datahall['dh-rack-load'];         /* "1.85" */
-  const itOk = itDcConv === '1,850' && itDatahall === '1.85';
-  assert(itOk, 'X-Test-3: IT load reconciles — dc-conv "1,850 kW" = datahall "1.85 MW"', JSON.stringify({dcConv:itDcConv, datahall:itDatahall}));
+  /* REBASELINED for the v2.0.0 campus basis (4 halls x 10,000 kW design; adopted normal scenario
+     4 x 7,500 = 30,000 kW actual IT). The assertion is unchanged in KIND — the two pages must still
+     reconcile to the same IT load — only the expected value moved with the engine. */
+  const itDcConv = dcConv.kpiIt;                       /* "30,000" kW */
+  const itDatahall = datahall['dh-rack-load'];         /* "30.00" MW */
+  const itOk = itDcConv === '30,000' && itDatahall === '30.00';
+  assert(itOk, 'X-Test-3: IT load reconciles — dc-conv "30,000 kW" = datahall "30.00 MW"', JSON.stringify({dcConv:itDcConv, datahall:itDatahall}));
 }
 
 /* ========================================================================

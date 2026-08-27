@@ -11,6 +11,58 @@ release sections rather than semver.
 
 ---
 
+## v1.133.0 — 2026-08-28 (Conventional live basis is now a four-hall 40 MW campus)
+
+> The owner's target — "4 Hall A–D, masing-masing 10 MW, semua align" — becomes the LIVE operating basis.
+> The four-hall study shipped in v1.131.0 was governed but separate; it is now ADOPTED, and every dependent
+> number was re-derived rather than multiplied.
+
+### Changed
+- **Engine v2 (`js/conv-engine.js`)**: the model is a campus of four halls (A–D, 10,000 kW IT design and 500
+  racks each) with deterministic scenarios as data (`day1-low`, **`normal` — adopted, 4 × 7,500 = 30,000 kW**,
+  `peak`, `one-hall-excursion`, `capacity-test-100`). `site.it_design_kw` / `site.it_load_kw` are now DERIVED
+  from the halls and the active scenario, so the campus total can never drift from the sum of its halls.
+  New pure selectors `getHallSnapshot()` / `getCampusSnapshot()` / `listHalls()` / `listScenarios()`.
+  `snapshot.site.*` keeps its exact key names as the campus roll-up, so existing consumers keep working.
+- **Derived values at the adopted scenario**: facility 43,500 kW · non-IT 13,500 kW · UPS loss 1,250 kW ·
+  heat rejection 31,250 kW · CHW ΔT 7.6 K · CHW flow 943.0 L/s · WUE-equivalent makeup 600.0 L/min ·
+  carbon 18,270 kg/h · active racks 5,000 / 3,750 / 3,000 at 6 / 8 / 10 kW.
+- **Fuel re-derived, not multiplied.** The sourced pair (956 L/h at 2,682.5 kW) implies 0.356384 L/kWh; that
+  rate is kept and the inventory re-sized to preserve the sourced 48 h autonomy target: consumption
+  15,503 L/h, tank 972,737 L → `fuelAutonomyHr()` still evaluates to 48.0 h.
+- **Plant nameplates re-derived from duty + the declared redundancy**, never by scaling a label: chillers
+  (5,000 kW_th units, N+1 on the 41,666.67 kW design duty → 10 total, 7 running at the active duty) and UPS
+  (1,250 kW modules, 2N → 64). Each carries its duty, unit capacity, arithmetic and redundancy rule in a
+  source comment with `evidenceClass: ASSUMED` — a project design decision pending Basis-of-Design
+  confirmation, never presented as measured or vendor-approved. Per-hall chiller allocation is left
+  `null` with a reason: a central N+1 plant cannot be split into hall shares without a hydronic design.
+- **`js/conv-design-basis.js`**: `adoptionState` `'study' → 'adopted'` with a dated decision record. The
+  `studySeparatedFromCurrent` check is REPLACED — not deleted — by `adoptedBasisMatchesEngine`, so the
+  separation gate becomes a reconciliation gate that fails closed if the study and the engine disagree.
+
+### Fixed
+- **Three more basis cards that were never engine-bound** and kept asserting the retired basis after the
+  migration: `water-system.html` ("1.850 MW IT · 37.0 L/min") and `chiller-plant.html` ("1.850 MW IT ·
+  1.927 MW cooling") are now written from `CONV_CALC` at runtime. Same defect class as v1.132.0 — text that
+  NAMES the basis must move with the basis.
+
+### Rebaselined (deliberately, nothing deleted or weakened)
+- `tools/test-conv-calc.mjs`: all 22 Definition-of-Done identities re-derived at the campus basis with the
+  producing formula recorded inline. **Assertion count unchanged: 22 → 22.**
+- `tools/probe-accuracy-validation.mjs` X-Test-3 (cross-page IT reconciliation) — the pages were already
+  correct at 30,000 kW; the probe's expectation was the stale part. **75/75.**
+- `tools/test-conv-snapshot-binding.mjs` perturbation retargeted to `NORMAL_IT_KW_PER_HALL`, since
+  `site.it_load_kw` is no longer an authored literal.
+- `tools/test-conv-cooling-water-ui.mjs` and `tools/test-conv-fire-fuel-operator.mjs` basis expectations.
+
+### Added
+- `tools/test-conv-geometry.mjs` — geometry MONITOR (advisory) for the owner's "coordinate, position,
+  arrangement must be accurate" requirement: label collisions, clipped elements, degenerate labels and phone
+  overflow across 4 diagrams × 4 viewports × 2 themes. It reports a real, already-measured debt
+  (~484 findings: chiller-plant 27–48 collisions + 16–18 clipped, EPMS 12–13 collisions, fire 2 clipped +
+  46 px tablet overflow, water 336 px tablet overflow). It runs advisory ON PURPOSE — a gate that fails from
+  day one gets muted — and flips to strict when the layout work lands.
+
 ## v1.132.0 — 2026-08-27 (Conventional cockpits are actually engine-bound — five phantom-key repairs + a binding gate)
 
 > Prerequisite for the four-hall campus migration: a basis change cannot propagate through a page that only

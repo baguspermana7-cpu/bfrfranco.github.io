@@ -106,7 +106,11 @@ const base = `http://127.0.0.1:${server.address().port}`;
 const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
 
 try {
-  const perturbedEngine = engineSource.replace(/it_load_kw:\s*\d+(?:\.\d+)?/, `it_load_kw: ${PERTURBED_IT_KW}`);
+  /* v2.0.0: site.it_load_kw is DERIVED from the campus halls + active scenario, so it is no longer an
+     authored literal. Perturb the adopted normal per-hall load instead — the campus roll-up, and therefore
+     every bound strip, must follow it. */
+  const perturbedEngine = engineSource.replace(
+    /NORMAL_IT_KW_PER_HALL\s*=\s*\d+(?:\.\d+)?/, `NORMAL_IT_KW_PER_HALL = ${PERTURBED_IT_KW / 4}`);
   assert.ok(perturbedEngine !== engineSource, 'perturbation must actually modify the engine source');
 
   const pue = snapshot.site.pue;

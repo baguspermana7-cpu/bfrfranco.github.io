@@ -452,7 +452,11 @@
         </div>
         <div class="basis-card current" data-basis="current">
             <div class="basis-title" id="waterHallLabel">Current engine basis · Hall A</div>
-            <div class="basis-value">Representative view · 1.850 MW IT · 37.0 L/min WUE-included makeup</div>
+            <!-- v2.0.0 BINDING REPAIR — this card stated the operating basis as static text and was never
+                 bound to the engine, so it kept claiming 1.850 MW / 37.0 L/min after the campus migration.
+                 Now written from CONV_CALC at runtime (see bindWaterBasis below); the literal here is only
+                 the pre-script placeholder. -->
+            <div class="basis-value" id="water-current-basis-value">Representative view · engine basis loading…</div>
         </div>
         <div class="basis-card study" data-basis="study">
             <div class="basis-title">Capacity study · 4 × 10 MW IT</div>
@@ -960,6 +964,11 @@
                 set('alloc-treatment', f1(totalLpm) + ' L/min');
                 set('alloc-makeup', f1(makeupLpm) + ' L/min');
                 set('alloc-domestic', f1(DOMESTIC_LPM) + ' L/min');
+                /* v2.0.0 — the current-basis card is engine-written, never static text (it previously
+                   claimed 1.850 MW / 37.0 L/min forever). Same source as every figure above it. */
+                set('water-current-basis-value',
+                    'Representative view · ' + (S.site.it_load_kw / 1000).toFixed(3) + ' MW IT · ' +
+                    f1(makeupLpm) + ' L/min WUE-included makeup');
 
                 // Alarm list (live state vs threshold)
                 renderAlarmList(th);

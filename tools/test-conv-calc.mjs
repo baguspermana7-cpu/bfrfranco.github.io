@@ -58,19 +58,19 @@ const m = CONV_MODEL;
  * source: 00 line 135 ; 09 lines 25-28 ; 12 line 7 */
 approx(s.site.facility_load_kw_exact, m.site.it_load_kw * m.site.pue, 1e-9,
     'Facility = IT x PUE  (exact identity)');
-approx(s.site.facility_load_kw, 2682.5, 0.05,
+approx(s.site.facility_load_kw, 43500, 0.05,   // 30,000 x 1.45  [REBASELINED v2.0.0 campus: 4 x 10,000 kW design, normal scenario 4 x 7,500 = 30,000 kW actual]
     'Facility load displays 2,682.5 kW (~2,683)  [09 line 27]');
 
 /* ---- Identity 2: Non-IT = Facility - IT ------------------------------------
  * source: 00 line 75 ; 09 lines 32-34 ; 12 line 8 */
 approx(s.site.non_it_load_kw_exact, s.site.facility_load_kw_exact - m.site.it_load_kw, 1e-9,
     'Non-IT = Facility - IT  (exact identity)');
-approx(s.site.non_it_load_kw, 833, 0.5,
-    'Non-IT load ~= 833 kW  [09 line 34]');
+approx(s.site.non_it_load_kw, 13500, 0.5,      // 43,500 - 30,000  [REBASELINED v2.0.0 campus: 4 x 10,000 kW design, normal scenario 4 x 7,500 = 30,000 kW actual]
+    'Non-IT load = facility - IT = 13,500 kW');
 
 /* ---- Identity 3: UPS losses @ 96% ~= 77 kW ---------------------------------
  * source: 09 line 39 */
-approx(s.electrical.ups_loss_kw, 77, 1.0,
+approx(s.electrical.ups_loss_kw, 1250, 1.0,    // 30,000 x (1/0.96 - 1)  [REBASELINED v2.0.0 campus: 4 x 10,000 kW design, normal scenario 4 x 7,500 = 30,000 kW actual]
     'UPS loss @ 96% eff ~= 77 kW  [09 line 39]');
 
 /* ---- Identity 4: CHW delta-T & flow from cooling kW / (4.186*dT) ------------
@@ -83,18 +83,18 @@ approx(s.cooling.flow_lps, Math.round(expectFlow * 10) / 10, 0.05,
 // doc-09 line 84 prints "58.1" (its own 1-dp rounding of 1850/(4.186*7.6)=58.184);
 // engine rounds to 58.2. Both encode the same identity — accept the doc's
 // rounding discrepancy with a 0.15 tolerance (still rejects any real drift).
-approx(s.cooling.flow_lps, 58.18, 0.15,
-    'CHW flow = 1850/(4.186*7.6) = 58.18 L/s (~58.1-58.2)  [09 line 84]');
+approx(s.cooling.flow_lps, 943.0, 0.15,        // 30,000 / (4.186 x 7.6)  [REBASELINED v2.0.0 campus: 4 x 10,000 kW design, normal scenario 4 x 7,500 = 30,000 kW actual]
+    'CHW flow = 30000/(4.186*7.6) = 943.0 L/s');
 
 /* ---- Identity 5: Heat rejection ~= IT + UPS losses (1850-1950 band) --------
  * source: 00 line 81 ; 09 lines 73-77 */
-assert(s.cooling.heat_rejection_kw >= 1850 && s.cooling.heat_rejection_kw <= 1950,
+assert(s.cooling.heat_rejection_kw >= 31250 && s.cooling.heat_rejection_kw <= 31300,  // IT 30,000 + UPS loss 1,250
     'Heat rejection within 1,850-1,950 kW band  [09 line 77]',
     s.cooling.heat_rejection_kw + ' kW');
 
 /* ---- Identity 6: Fuel autonomy = usable L / generator L/hr ------------------
  * source: 00 line 86 ; 09 lines 132-147 ; 12 line 15 */
-approx(s.fuel.usable_l, 45900, 1,
+approx(s.fuel.usable_l, 744143.8, 1,           // 972,737 x 0.90 x 0.85  [REBASELINED v2.0.0 campus: 4 x 10,000 kW design, normal scenario 4 x 7,500 = 30,000 kW actual]
     'Usable fuel = 60000 * 0.90 * 0.85 = 45,900 L  [09 line 143]');
 approx(s.fuel.autonomy_hr, 48.0, 0.1,
     'Fuel autonomy = 45,900 / 956 = 48.0 hr  [09 lines 144-147]');
@@ -104,8 +104,8 @@ approx(s.fuel.autonomy_hr, Math.round(expectAutonomy * 10) / 10, 0.05,
 
 /* ---- Identity 7: WUE from water volume & IT energy -------------------------
  * source: 00 line 85 ; 09 lines 99-109 ; 12 line 14 */
-approx(s.water.flow_lpm_for_wue, 37.0, 0.1,
-    'WUE-equiv water flow = (1.20 * 1850)/60 = 37.0 L/min  [09 lines 99-104]');
+approx(s.water.flow_lpm_for_wue, 600.0, 0.1,   // (1.20 x 30,000)/60  [REBASELINED v2.0.0 campus: 4 x 10,000 kW design, normal scenario 4 x 7,500 = 30,000 kW actual]
+    'WUE-equiv water flow = (1.20 * 30000)/60 = 600.0 L/min');
 approx(CONV_CALC.wueFromFlowLpm(s.water.flow_lpm_for_wue), m.environment.wue_l_per_kwh, 1e-3,
     'WUE round-trips from flow: (Lpm*60)/IT_kW = 1.20 L/kWh  [09 line 109]');
 
@@ -125,9 +125,9 @@ approx(s.environment.carbon_kg_per_hr,
 
 /* ---- Identity 10: rack-count basis ----------------------------------------
  * source: 09 lines 51-63 */
-approx(s.racks.at_6kw, 308, 1, 'Racks at 6 kW ~= 308  [09 line 55]');
-approx(s.racks.at_8kw, 231, 1, 'Racks at 8 kW ~= 231  [09 line 56]');
-approx(s.racks.at_10kw, 185, 1, 'Racks at 10 kW ~= 185  [09 line 57]');
+approx(s.racks.at_6kw, 5000, 1, 'Racks at 6 kW = 30000/6 = 5000');
+approx(s.racks.at_8kw, 3750, 1, 'Racks at 8 kW = 30000/8 = 3750');
+approx(s.racks.at_10kw, 3000, 1, 'Racks at 10 kW = 30000/10 = 3000');
 
 /* ---- Stability / immutability ---------------------------------------------
  * source: 00 §"Data Quality Rule" — values must be stable, no Math.random */

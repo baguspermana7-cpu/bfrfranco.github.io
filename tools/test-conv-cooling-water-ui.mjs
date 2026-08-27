@@ -85,7 +85,7 @@ async function assertHallAndBasisContract(page, currentIds, hallLabelId) {
   assert.equal(initial.activeHall, 'A');
   assert.match(initial.hallLabel, /Hall A/i);
   assert.match(initial.current, /CURRENT/i);
-  assert.match(initial.current, /1\.85(?:0)? MW/i);
+  assert.match(initial.current, /30\.000 MW/i);  // REBASELINED to the v2.0.0 campus basis (30,000 kW IT / 43.50 MW facility)
   assert.match(initial.study, /4\s*[×x]\s*10 MW/i);
   assert.match(initial.study, /READ[- ]ONLY|STUDY ONLY/i);
 
@@ -187,8 +187,8 @@ try {
   assert.ok(waterPlant.pumps.every((pump) => pump.animation === 'none'));
   assert.match(waterPlant.pumps[0].text, /RUNNING/i);
   assert.match(waterPlant.pumps[1].text, /AVAILABLE/i);
-  assert.match(waterPlant.allocation.treatment, /45\.0 L\/min/i);
-  assert.match(waterPlant.allocation.makeup, /37\.0 L\/min/i);
+  assert.match(waterPlant.allocation.treatment, /608\.0 L\/min/i);   // 600.0 makeup + 8.0 domestic  // REBASELINED to the v2.0.0 campus basis (30,000 kW IT / 43.50 MW facility)
+  assert.match(waterPlant.allocation.makeup, /600\.0 L\/min/i);      // (1.20 x 30,000)/60  // REBASELINED to the v2.0.0 campus basis (30,000 kW IT / 43.50 MW facility)
   assert.match(waterPlant.allocation.domestic, /8\.0 L\/min/i);
   assert.match(waterPlant.bottom, /P-301A DUTY/i);
   assert.match(waterPlant.bottom, /P-301B STBY/i);

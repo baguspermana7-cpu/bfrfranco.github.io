@@ -179,8 +179,8 @@ try {
   assert.equal(fuelState.polishStatus, 'RUNNING');
   assert.match(fuelState.polishMode, /SIMULATED/i);
   assert.ok(fuelState.leakRows >= 4, 'fuel containment chain must expose sensors and permissives');
-  assert.match(fuelState.currentBasis, /60,000 L/i);
-  assert.match(fuelState.currentBasis, /1\.85 MW IT/i);
+  assert.match(fuelState.currentBasis, /972,737 L/i);  // REBASELINED to the v2.0.0 campus basis (30,000 kW IT / 43.50 MW facility) — tank re-sized to hold the sourced 48 h autonomy at 43.5 MW
+  assert.match(fuelState.currentBasis, /30\.00 MW IT/i);  // REBASELINED to the v2.0.0 campus basis (30,000 kW IT / 43.50 MW facility)
   assert.match(fuelState.studyBasis, /4 × 10 MW/i);
   assert.match(fuelState.studyBasis, /STUDY ONLY/i);
   assert.deepEqual(fuelState.normal, {

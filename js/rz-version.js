@@ -1,4 +1,4 @@
 /* Single source of truth for site version. Bump on every release per VERSIONING_STANDARD.md. */
-window.RZ_VERSION = '1.132.0';
-window.RZ_VERSION_DATE = '2026-08-27';
+window.RZ_VERSION = '1.133.0';
+window.RZ_VERSION_DATE = '2026-08-28';
 window.RZ_VERSION_CODENAME = 'Conventional Operations Hardening';

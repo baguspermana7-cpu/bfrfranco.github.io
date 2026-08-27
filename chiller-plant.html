@@ -605,7 +605,10 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
     </div>
     <div class="basis-card current" data-basis="current">
       <div class="basis-title" id="chillerHallLabel">Current engine basis · Hall A</div>
-      <div class="basis-value">Representative view · 1.850 MW IT · 1.927 MW cooling · deterministic telemetry</div>
+      <!-- v2.0.0 BINDING REPAIR — static basis text that was never engine-bound; it kept claiming
+           1.850 MW IT / 1.927 MW cooling after the campus migration. Written from CONV_CALC at runtime
+           (see the basis binder below); this literal is only the pre-script placeholder. -->
+      <div class="basis-value" id="chiller-current-basis-value">Representative view · engine basis loading…</div>
     </div>
     <div class="basis-card study" data-basis="study">
       <div class="basis-title">Capacity study · 4 × 10 MW IT</div>
@@ -824,6 +827,22 @@ function chwBasis(){
   return { chws:7.2, chwr:14.8, dt:7.6, flow:58.2, coolingKw:1927.1, scenario:"Simulated" };
 }
 const CHW = chwBasis();
+
+/* v2.0.0 — write the current-basis card from the engine. It used to be static text and therefore kept
+   claiming the retired 1.850 MW / 1.927 MW basis; every other figure on this page moves with CONV_CALC,
+   so the card that NAMES the basis must move with it too. */
+(function bindChillerBasisCard(){
+  function paint(){
+    var el = document.getElementById('chiller-current-basis-value');
+    var s = engineSnap();
+    if(!el) return;
+    if(!s || !s.site || !s.cooling){ el.textContent = 'Representative view · engine unavailable'; return; }
+    el.textContent = 'Representative view · ' + (s.site.it_load_kw / 1000).toFixed(3) + ' MW IT · ' +
+      (s.cooling.heat_rejection_kw / 1000).toFixed(3) + ' MW cooling · deterministic telemetry';
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', paint);
+  else paint();
+})();
 
 const st = {
   sp:{ chws:18.8, dp:90, flow:18.0 },
