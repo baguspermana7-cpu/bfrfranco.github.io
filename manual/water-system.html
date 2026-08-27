@@ -321,16 +321,22 @@
             <a class="mn-toollink" href="../water-system.html">&#9654; Open the live Water System cockpit</a>
         </header>
 
+        <nav class="mn-section mn-note" aria-labelledby="contents-title">
+            <h2 id="contents-title">Table of contents</h2>
+            <ol><li><a class="mn-inline" href="#purpose">Purpose &amp; basis</a></li><li><a class="mn-inline" href="#inputs">Inputs</a></li><li><a class="mn-inline" href="#methodology">Calculations</a></li><li><a class="mn-inline" href="#constants">Constants</a></li><li><a class="mn-inline" href="#outputs">Outputs</a></li><li><a class="mn-inline" href="#worked-example">Worked example</a></li><li><a class="mn-inline" href="#references">References</a></li><li><a class="mn-inline" href="#limitations">Limitations</a></li></ol>
+        </nav>
+
         <!-- 1. PURPOSE -->
-        <section class="mn-section">
+        <section class="mn-section" id="purpose">
             <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
             <p class="mn-lead">The cockpit monitors three interlocked water subsystems in a conventional data-centre facility: (1) <strong>cooling-tower makeup water</strong> — quantified by WUE; (2) <strong>water treatment</strong> — chemical dosing, TDS control, blowdown scheduling, and ASHRAE 188 / ISO 11731-2 Legionella management; and (3) <strong>filtration</strong> — multimedia pre-treatment with differential-pressure alarming at the 2.0 bar threshold. Its primary KPI, WUE, is derived from a single frozen scenario basis and then continuously refined by live sensor reads.</p>
+            <p class="mn-lead"><strong>Truth boundary:</strong> the displayed 37.0 L/min cooling-makeup equivalent and 1.20 L/kWh ratio belong to the current 1.850 MW IT scenario. A four-hall study water balance applies only to its declared evaporative heat rejection and remains unavailable until ambient design conditions, cycles of concentration, drift, blowdown and water-quality inputs are approved.</p>
             <p class="mn-lead">Engineering basis: <strong>conv review document 09</strong> ("09-engineering-basis-and-calculations.md") lines 99–104 and 189–190, cross-referenced against the Uptime Institute WUE metric definition. The single-scenario IT load is <strong>1,850 kW</strong> (current) against a design capacity of 2,000 kW. Every water-volume number on every page of the Conventional BMS suite is derived from the same <code class="mn-mono">CONV_MODEL</code> object so the suite is internally consistent.</p>
             <div class="mn-note"><strong>Rule 3 — WUE denominator:</strong> WUE = annual site water consumption (L) ÷ annual IT energy (kWh). The denominator is <em>IT energy only</em>, not facility (total) energy. Using facility energy (PUE × IT) deflates WUE by ~PUE (1.45×) and understates the cooling-system water intensity. This rule is accuracy-gate-enforced in <code class="mn-mono">CONV_CALC</code>.</div>
         </section>
 
         <!-- 2. INPUTS -->
-        <section class="mn-section">
+        <section class="mn-section" id="inputs">
             <h2><span class="mn-num">02</span> Inputs — water-quality probe reads &amp; valve controls</h2>
             <p class="mn-lead">The cockpit receives two classes of input: (a) basis constants from <code class="mn-mono">CONV_MODEL</code> (fixed scenario values) and (b) live sensor reads from water-quality probes and valve position feedback. The table below distinguishes them.</p>
             <div class="mn-tablewrap">
@@ -351,7 +357,7 @@
         </section>
 
         <!-- 3. METHODOLOGY -->
-        <section class="mn-section">
+        <section class="mn-section" id="methodology">
             <h2><span class="mn-num">03</span> Calculation methodology</h2>
             <p class="mn-lead">All formulas below are implemented in <code class="mn-mono">js/conv-engine.js</code>. Function names are exact. The engine is ES5-safe, deterministic, and zero-build.</p>
 
@@ -399,7 +405,7 @@
         </section>
 
         <!-- 4. CONSTANTS -->
-        <section class="mn-section">
+        <section class="mn-section" id="constants">
             <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
             <p class="mn-lead">Every constant lives in the deep-frozen <code class="mn-mono">CONV_MODEL</code> with a <code>// source:</code> comment citing the review document and line number. Water-relevant constants:</p>
             <div class="mn-tablewrap">
@@ -420,7 +426,7 @@
         </section>
 
         <!-- 5. OUTPUTS -->
-        <section class="mn-section">
+        <section class="mn-section" id="outputs">
             <h2><span class="mn-num">05</span> Outputs</h2>
             <div class="mn-tablewrap">
             <table class="mn-table">
@@ -441,7 +447,7 @@
         </section>
 
         <!-- 6. WORKED EXAMPLE -->
-        <section class="mn-section">
+        <section class="mn-section" id="worked-example">
             <h2><span class="mn-num">06</span> Worked example</h2>
             <p class="mn-lead">Scenario: basis IT load 1,850 kW, WUE 1.20 L/kWh, TDS<sub>feed</sub> = 150 ppm, TDS<sub>basin</sub> = 600 ppm (CoC = 4), filtration ΔP = 1.1 bar. All numbers reproduce <code class="mn-mono">CONV_CALC</code> output exactly.</p>
             <div class="mn-worked">
@@ -459,7 +465,7 @@
         </section>
 
         <!-- 7. REFERENCES -->
-        <section class="mn-section">
+        <section class="mn-section" id="references">
             <h2><span class="mn-num">07</span> References &amp; standards</h2>
             <ul class="mn-refs">
                 <li><b>ASHRAE 188 (2021)</b> — Legionellosis: Risk Management for Building Water Systems. Mandates a Water Management Plan for cooling towers including control targets, sampling schedules, corrective actions, and record retention. The cockpit's biocide dosing and Legionella status indicators are ASHRAE 188 WMP deliverables.</li>
@@ -471,7 +477,7 @@
         </section>
 
         <!-- 8. ASSUMPTIONS -->
-        <section class="mn-section">
+        <section class="mn-section" id="limitations">
             <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
             <p class="mn-lead">The WUE basis (1.20 L/kWh) is a <strong>site target</strong> from the engineering review — it assumes steady-state operation at 1,850 kW IT load with the cooling tower operating at design cycles of concentration and no abnormal evaporative losses. Actual WUE varies with ambient wet-bulb temperature (higher in summer), partial-load operation, and tower maintenance state; the cockpit surfaces these deviations by continuously back-computing live WUE from the flow meter. The annual 19.4 ML figure assumes 8,760 hr/yr at the stated IT load — seasonality and planned downtime will reduce the actual total. Blowdown volume estimates use the steady-state CoC formula; transient startup, chemical slug dosing, and emergency drain events are metered separately. Filtration ΔP thresholds are from site commissioning data and must be re-validated after any media replacement or hydraulic modification. This manual is an <strong>engineering education and operational reference</strong>; a licensed water-treatment engineer and microbiologist must author the site's formal ASHRAE 188 Water Management Plan.</p>
         </section>

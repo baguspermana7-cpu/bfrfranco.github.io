@@ -231,6 +231,20 @@ console.log('\n=== Generate Design Tech Spec PDF probes ===');
       const btn = document.querySelector(sel);
       if (btn) btn.click();
     }, triggerSel);
+    /* v1.130+ uses the shared Design Studio: the toolbar trigger opens a
+       configuration dialog, then the explicit Generate document action owns
+       the export. Keep compatibility with older direct-export buttons. */
+    await page.waitForFunction(() => (
+      window.__capturedTechSpec !== null
+      || document.querySelector('#rzDesignStudio[data-open="true"] .rz-design-studio__button--primary')
+    ), { timeout: 5000 });
+    await page.evaluate(() => {
+      if (window.__capturedTechSpec !== null) return;
+      const generate = document.querySelector(
+        '#rzDesignStudio[data-open="true"] .rz-design-studio__button--primary'
+      );
+      if (generate) generate.click();
+    });
     await new Promise(r => setTimeout(r, 800));
     const html = await page.evaluate(() => window.__capturedTechSpec);
     await page.close();

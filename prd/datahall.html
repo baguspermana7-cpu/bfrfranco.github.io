@@ -101,12 +101,13 @@
         <header class="mn-hero">
             <div class="mn-eyebrow">Product requirements · deterministic operations cockpit</div>
             <h1>Data Hall SCADA Console</h1>
-            <p>A traceable product contract for the conventional Hall A rack heat-map, alarm strip, cooling balance and equipment inspection workflow. The cockpit consumes one frozen <code>CONV_CALC.snapshot</code>; it is a simulated engineering/education surface, not a live SCADA endpoint.</p>
+            <p>A traceable product contract for the conventional rack heat-map, alarm strip, cooling balance and equipment inspection workflow. Current operation consumes one frozen <code>CONV_CALC.snapshot</code>; Hall A–D planning context consumes the separate frozen <code>RZConvDesignBasis.STUDY</code>. It is a simulated engineering/education surface, not a live SCADA endpoint.</p>
             <div class="mn-meta">
                 <span class="mn-chip">Cockpit <strong>datahall.html</strong></span>
                 <span class="mn-chip">Engine <strong>js/conv-engine.js</strong></span>
                 <span class="mn-chip">Basis <strong>1,850 kW IT</strong></span>
-                <span class="mn-chip">Scope <strong>Hall A / 200 cells</strong></span>
+                <span class="mn-chip">Current <strong>Hall A / 200 cells</strong></span>
+                <span class="mn-chip">Study <strong>4 × 10 MW / 500 racks each</strong></span>
                 <span class="mn-chip">Data mode <strong>SIMULATED</strong></span>
             </div>
         </header>
@@ -135,7 +136,7 @@
         <section class="mn-section" id="scope">
             <h2><span class="mn-num">03</span> Scope &amp; non-goals</h2>
             <div class="mn-grid">
-                <article class="mn-card"><h3>In scope</h3><ul><li>Hall A rack field: 10 zones × 20 cells.</li><li>Rack power, utilization, space and temperature views.</li><li>Twenty CRAHs with 17 running and three standby.</li><li>Cooling/EPMS reconciliation, alarm counts, quality and timestamp.</li><li>Rack/CRAH inspection, training excursion and event log.</li></ul></article>
+                <article class="mn-card"><h3>In scope</h3><ul><li>Current Hall A rack field: 10 zones × 20 cells.</li><li>View-only Hall A–D study context: 10 MW IT and 500 racks/hall.</li><li>Rack power, utilization, space and temperature views.</li><li>Twenty CRAHs with 17 running and three standby.</li><li>Cooling/EPMS reconciliation, alarm counts, quality and timestamp.</li><li>Rack/CRAH inspection, training excursion, historian query and event log.</li></ul></article>
                 <article class="mn-card"><h3>Non-goals</h3><ul><li>No field BMS, EPMS, DCIM or historian connection.</li><li>No command write-back, alarm acknowledgement or maintenance dispatch.</li><li>No CFD, transient thermal model or vendor selection.</li><li>No guarantee that the illustrative thresholds are approved site set-points.</li><li>No production safety or procurement decision.</li></ul></article>
             </div>
         </section>
@@ -170,6 +171,11 @@
                 <tr><td>FR-24</td><td>Provide basis drawers for State, Rack Load, Cooling Margin, PUE and Density.</td><td>Click and keyboard activation show formula, inputs, output and source.</td></tr>
                 <tr><td>FR-25</td><td>Provide Back, Portfolio, PRD and Manual navigation.</td><td>All four links are visible, keyboard reachable and resolve correctly.</td></tr>
                 <tr><td>FR-26</td><td>Preserve theme, mobile navigation and cookie controls.</td><td>Shared shell scripts load without console errors.</td></tr>
+                <tr><td>FR-27</td><td>Expose Hall A–D context without changing the current model.</td><td>Selector updates visible hall/study labels only; <code>CONV_CALC.snapshot</code> stays byte-equivalent.</td></tr>
+                <tr><td>FR-28</td><td>Distinguish rack inlet/cold aisle, rack outlet/hot aisle and CRAH supply/return.</td><td>Inspector exposes both inlet and hot-aisle/return values with unambiguous labels.</td></tr>
+                <tr><td>FR-29</td><td>Use 25.4 °C only as the project study rack-inlet target.</td><td>18–27 °C recommended envelope remains visible; no universal-optimum claim and no substitution for current 22.4 °C.</td></tr>
+                <tr><td>FR-30</td><td>Expose heat load, air-side heat removal and cooling-efficiency basis.</td><td>kW thermal, airflow, density, c<sub>p</sub> and ΔT are named; unavailable data fails closed.</td></tr>
+                <tr><td>FR-31</td><td>Provide read-only alarm history filters.</td><td>Date, point/tag, severity, lifecycle/state, quality, value and text filters compose without overwriting live counts.</td></tr>
             </tbody></table></div>
         </section>
 
@@ -243,6 +249,8 @@
                 <tr><td>AC-13</td><td>Given dark mode, then no body or major content surface is white.</td><td>Computed-style/render gate.</td></tr>
                 <tr><td>AC-14</td><td>Given the cockpit toolbar, PRD and Manual links are visible and navigate to public pages.</td><td>Navigation E2E.</td></tr>
                 <tr><td>AC-15</td><td>Given the full interaction journey, then no uncaught console or page errors occur.</td><td>Captured browser error stream.</td></tr>
+                <tr><td>AC-16</td><td>Given Hall A–D selection, then each selection declares 10 MW IT, 500 racks and 20 kW/rack average while current telemetry stays 1,850 kW.</td><td><code>tools/test-datahall-operator-engineering.mjs</code>.</td></tr>
+                <tr><td>AC-17</td><td>Given Alarm History, then system/date/point/state/value filtering and CSV export retain source timestamp and quality.</td><td><code>tools/test-conv-alarm-workspace.mjs</code> plus browser E2E.</td></tr>
             </tbody></table></div>
         </section>
 
@@ -272,7 +280,7 @@
         <section class="mn-section" id="risks">
             <h2><span class="mn-num">11</span> Open questions &amp; risks</h2>
             <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Risk</th><th>Current decision</th><th>Required follow-up</th></tr></thead><tbody>
-                <tr><td>R-01 · Site scope</td><td>The engine site total is intentionally modelled as one Hall A so rack sum equals 1,850 kW.</td><td>If multiple halls are introduced, add explicit site/hall allocation before changing any denominator.</td></tr>
+                <tr><td>R-01 · Site scope</td><td>The current engine total is intentionally modelled as one Hall A so rack sum equals 1,850 kW; the four-hall study is separate.</td><td>Never allocate the current snapshot across Hall B–D or replace its denominator from the study selector.</td></tr>
                 <tr><td>R-02 · Simulated fidelity</td><td>Normal rack/zone states are deterministic; excursions are educational.</td><td>Do not relabel as live without authenticated point transport, freshness and quality semantics.</td></tr>
                 <tr><td>R-03 · Alarm thresholds</td><td>85%/95% rack and 26°C/30°C aisle thresholds are visible cockpit rules.</td><td>Validate and version against site cause/effect and approved set-point schedule before operations use.</td></tr>
                 <tr><td>R-04 · Airflow model</td><td>The page computes a simple sensible balance but normalizes displayed inlet temperature near 22°C.</td><td>Use commissioned sensor data or CFD for distribution/recirculation claims.</td></tr>

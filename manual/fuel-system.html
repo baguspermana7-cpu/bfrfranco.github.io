@@ -94,7 +94,7 @@
             { "@type": "HowToStep", "name": "Identify tank parameters", "text": "Record bulk-tank capacity (60,000 L), usable fraction (90%), and current level (85%) from the site basis document." },
             { "@type": "HowToStep", "name": "Compute usable reserve", "text": "Usable fuel = 60,000 × 0.90 × 0.85 = 45,900 L. This is the fuel volume actually available to the gensets at the measured level." },
             { "@type": "HowToStep", "name": "Determine burn rate", "text": "Generator consumption = 956 L/hr at the site facility load of 2,683 kW (1,850 kW IT × 1.45 PUE). Denominator is always the bulk-tank at site load (Rule 3)." },
-            { "@type": "HowToStep", "name": "Calculate autonomy", "text": "Autonomy = 45,900 L ÷ 956 L/hr = 48 hr (2 days). Verify against the 24 hr SLA minimum for N+1 operation." }
+            { "@type": "HowToStep", "name": "Calculate autonomy", "text": "Autonomy = 45,900 L ÷ 956 L/hr = 48 hr (2 days). Compare against the approved site risk, refuelling and generator-loading policy; no universal Tier duration is inferred." }
         ]
     }
     </script>
@@ -321,15 +321,21 @@
             <a class="mn-toollink" href="../fuel-system.html">▶ Open the live Fuel System Cockpit</a>
         </header>
 
+        <nav class="mn-section mn-note" aria-labelledby="contents-title">
+            <h2 id="contents-title">Table of contents</h2>
+            <ol><li><a class="mn-inline" href="#purpose">Purpose &amp; basis</a></li><li><a class="mn-inline" href="#inputs">Inputs</a></li><li><a class="mn-inline" href="#methodology">Calculations</a></li><li><a class="mn-inline" href="#constants">Constants</a></li><li><a class="mn-inline" href="#outputs">Outputs</a></li><li><a class="mn-inline" href="#worked-example">Worked example</a></li><li><a class="mn-inline" href="#references">References</a></li><li><a class="mn-inline" href="#limitations">Limitations</a></li></ol>
+        </nav>
+
         <!-- 1. PURPOSE -->
-        <section class="mn-section">
+        <section class="mn-section" id="purpose">
             <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
             <p class="mn-lead">The fuel autonomy cockpit answers one operational question: <em>how many hours of backup power does the on-site fuel inventory provide at current facility load?</em> It is a <strong>locked scenario</strong> — all parameters are sourced from the site engineering basis document (<code class="mn-mono">conv/review/09</code>) and frozen in <code class="mn-mono">CONV_MODEL</code>. There are no user-adjustable inputs; the cockpit reads live state from the <code class="mn-mono">CONV_CALC.snapshot</code> and renders deterministic outputs.</p>
+            <p class="mn-lead"><strong>Truth boundary:</strong> 45,900 L usable ÷ 956 L/h = 48.0 h belongs only to the current 2.6825 MW facility scenario. The four-hall capacity study must not scale this rate or autonomy; it remains unavailable until approved generator count, loading/dispatch curves, fuel-return basis, storage policy and N+1 transfer arrangement are supplied.</p>
             <p class="mn-lead">The governing accuracy rule is <strong>Rule 3 (ACCURACY_VALIDATION.md)</strong>: the denominator of every derived metric must be stated explicitly. For fuel autonomy the denominator is the bulk underground storage tank (UST-01) consumption rate at the <em>full site facility load</em> — 956 L/hr at 2,683 kW. Partial-load scenarios are labelled as such; the headline figure always uses the site-load denominator.</p>
         </section>
 
         <!-- 2. INPUTS -->
-        <section class="mn-section">
+        <section class="mn-section" id="inputs">
             <h2><span class="mn-num">02</span> Inputs — locked tank &amp; genset parameters</h2>
             <p class="mn-lead">All inputs are locked site-basis constants. The cockpit does not expose user input fields — it reads the deterministic snapshot from <code class="mn-mono">CONV_CALC</code> or falls back to the hard-coded basis values below.</p>
             <div class="mn-tablewrap">
@@ -352,7 +358,7 @@
         </section>
 
         <!-- 3. METHODOLOGY -->
-        <section class="mn-section">
+        <section class="mn-section" id="methodology">
             <h2><span class="mn-num">03</span> Calculation methodology</h2>
             <p class="mn-lead">Two pure functions in <code class="mn-mono">js/conv-engine.js</code> compute usable reserve and autonomy. Function names below map one-to-one to the engine source.</p>
 
@@ -397,7 +403,7 @@
         </section>
 
         <!-- 4. CONSTANTS -->
-        <section class="mn-section">
+        <section class="mn-section" id="constants">
             <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
             <p class="mn-lead">Every constant lives in the deep-frozen <code class="mn-mono">CONV_MODEL.fuel</code> block with a <code>// source:</code> tag pointing to the review document and line number. No economically-material literal may exist inside a function body — all are in <code>DATA</code> or <code>CONV_MODEL</code>.</p>
             <div class="mn-tablewrap">
@@ -420,7 +426,7 @@
         </section>
 
         <!-- 5. OUTPUTS -->
-        <section class="mn-section">
+        <section class="mn-section" id="outputs">
             <h2><span class="mn-num">05</span> Outputs</h2>
             <div class="mn-tablewrap">
             <table class="mn-table">
@@ -439,7 +445,7 @@
         </section>
 
         <!-- 6. WORKED EXAMPLE -->
-        <section class="mn-section">
+        <section class="mn-section" id="worked-example">
             <h2><span class="mn-num">06</span> Worked example</h2>
             <p class="mn-lead">Basis scenario: UST-01 at 85% level, full site facility load 2,682.5 kW. Numbers reproduce the live engine output exactly at the basis snapshot.</p>
             <div class="mn-worked">
@@ -457,7 +463,7 @@
         </section>
 
         <!-- 7. REFERENCES -->
-        <section class="mn-section">
+        <section class="mn-section" id="references">
             <h2><span class="mn-num">07</span> References &amp; standards</h2>
             <ul class="mn-refs">
                 <li><b>conv/review/09</b> — <code>09-engineering-basis-and-calculations.md</code>: primary site basis document. Tank capacity (line 140), usable fraction (141), level (16), burn rate (144–147), IT load (10), PUE (11).</li>
@@ -471,7 +477,7 @@
         </section>
 
         <!-- 8. ASSUMPTIONS -->
-        <section class="mn-section">
+        <section class="mn-section" id="limitations">
             <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
             <p class="mn-lead">The 956 L/hr burn rate is a site-basis figure derived from the Cat 3516E at the full 2,682.5 kW facility load. Real genset consumption varies with actual electrical load, ambient temperature, engine age, and fuel specification; the basis figure is used as the conservative (highest normal load) planning denominator. Usable-fraction (90%) is a fixed engineering margin — actual pumpable volume depends on sump-pump depth and UST geometry and should be validated at commissioning. Day-tank draw rates in the SCADA simulation are deterministic approximations for the operator console and do not replace a fuel-flow meter calibration. This manual and the cockpit are an <strong>engineering education and operational pre-planning aid</strong>; site-specific autonomy planning must be validated by a qualified power-systems engineer against actual fuel analysis and genset load-profile data.</p>
         </section>

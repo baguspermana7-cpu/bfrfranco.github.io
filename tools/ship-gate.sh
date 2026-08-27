@@ -56,6 +56,14 @@ gate "DC AI fire — FACP cause and effect" node tools/test-datahall-ai-fire-cau
 gate "DC AI operator UI — markup contract" node tools/test-datahall-ai-operator-ui.mjs
 gate "DC AI operator UI — runtime contract" node tools/test-datahall-ai-operator-runtime.mjs
 gate "EPMS — ATS-to-rack source colour" node tools/test-epms-ats-rack-color.mjs
+gate "Conventional study — reconciled four-hall basis" node --test tools/test-conv-design-basis.mjs
+gate "Conventional alarms — common historian workspace" node --test tools/test-conv-alarm-workspace.mjs
+gate "Conventional alarms — modal runtime and accessibility" node tools/test-conv-alarm-runtime.mjs
+gate "Conventional cooling/water — operator UI" node --test tools/test-conv-cooling-water-ui.mjs
+gate "Conventional fire/fuel — operator consequences" node --test tools/test-conv-fire-fuel-operator.mjs
+gate "Conventional data hall — operator engineering" node --test tools/test-datahall-operator-engineering.mjs
+gate "Conventional data hall/ICT — runtime state" node --test tools/test-ict-datahall-operator-runtime.mjs
+gate "Conventional ICT — operator architecture" node --test tools/test-ict-operator-architecture.mjs
 gate "DC Design Studio — shared workflow" node tools/test-rz-design-studio.mjs
 gate "Dark coverage — fail-closed confirmation verdict" node --test tools/test-dark-coverage-verdict.mjs
 

@@ -11,6 +11,72 @@ release sections rather than semver.
 
 ---
 
+## v1.131.0 — 2026-08-27 (Conventional DC operations hardening)
+
+> Completes the Conventional DC operator pass while preserving the already-shipped AI/HPC DC cockpit,
+> the locked simulation engines, and the current 1.850 MW operating scenario.
+
+### Added
+- **Governed four-hall capacity study:** one immutable reconciler now owns Hall A–D, 10 MW IT/hall,
+  500 racks/hall, 20 kW average / 30 kW selected peak, the 25.4 °C project rack-inlet target,
+  air properties, evaporative heat-rejection selection, design-point dPUE and resilience intent.
+- **Common Conventional alarm historian:** all eight Conventional surfaces now expose inclusive date,
+  system, point/tag, severity, lifecycle-at-capture, quality, event/action, analog comparator,
+  discrete transition and text filters plus deterministic, formula-safe CSV export.
+- **Operator consequence views:** Chiller/Water add current-versus-study context, Hall A–D selection,
+  duty/standby equipment and responsive diagnostics; Fire adds FACP-owned command/feedback interlocks;
+  Fuel adds polishing, water-in-fuel, leak/bund/permissive consequences; Data Hall and ICT add thermal,
+  capacity, topology, selected-object and alarm workflows.
+- **Release evidence:** seven Conventional subsystem suites plus a real-browser alarm-modal test are now
+  mandatory in `tools/ship-gate.sh`.
+
+### Changed
+- Conventional subsystem pages now link both their technical Manual and the applicable master PRD
+  contract. Manuals carry accessible tables of contents and an explicit current-versus-study boundary.
+- ICT power context, physical inventory and network telemetry are independent authorities: 231 at
+  8 kW is labelled a rack-equivalent, not physical inventory; current traffic is authored telemetry,
+  not derived from IT kW. The 500-rack study yields 42 logical access groups/hall while physical
+  switch topology remains explicitly pending an approved network brief.
+- The deterministic alarm dataset is explicitly a historian training snapshot. `active_*` means active
+  at capture time and cannot be interpreted as the live page alarm state.
+- The canonical Conventional operating contract, BMS Shell standard, telemetry-doc lesson ledger and
+  Obsidian Standards Hub mirror are synchronized.
+
+### Fixed
+- A 200-rack / 10 MW air-cooled study can no longer emit a facility-load result after failing the
+  density contract. Invalid hall identifiers, fractional rack counts, thermal targets/envelopes,
+  air specific heat and incomplete resilience contracts now fail closed.
+- Rack thermal excursions now refresh and clear the live Data Hall alarm strip/list; rack inlet,
+  hot aisle, contained return, heat-load and duty-utilization terminology no longer conflict.
+- Fire Stage 2 sounder request and Stage 3 voice evacuation are distinct; Fuel severity has one
+  authority across alarm strip, cards and containment logic.
+- Alarm modal opening now makes background surfaces inert and hidden from assistive technology, then
+  restores prior state and trigger focus exactly on close.
+- Alarm History now stays in each cockpit header flow with a 44 px mobile target. The mobile historian
+  scrolls through filters, results and export footer; auth controls cannot be injected into its title row;
+  EPMS and the overview keep the launcher inside the first viewport. The historian table now exposes an
+  assistive caption, scoped headers and tabular/slashed-zero numerics using RZ severity tokens.
+- Non-live telemetry provenance now mounts in a dedicated in-flow strip on every adopting Conventional
+  and AI/HPC cockpit instead of overlaying live controls. Its dismiss action is 44 px with signal-amber
+  focus, motion stops under reduced-motion preference, and light-theme state colors retain contrast.
+  EPMS phones default the control sidebar to an accessible drawer while reserving the full viewport for
+  the fitted SLD and keeping PRD/Manual routes initially visible; the overview keeps its identity through
+  768 px above a scrollable rail containing Alarm History, Generate Design, FAQ and documentation.
+- EPMS and Conventional overview mobile action rails now keep DOM, visual and keyboard order identical;
+  focused controls scroll fully into view and every EPMS navigation/documentation target is a contained
+  44 px control. The public PRD/Manual auth layer is inserted before protected header controls so its
+  extracted links no longer jump to the end of the tab sequence.
+- The master Conventional PRD retains the canonical 11-section contract by nesting subsystem operator
+  requirements under provenance, with explicit preservation mappings for corrected ASHRAE, ISO WUE and
+  Uptime claims in existing manuals.
+- The accuracy probe now follows the shared two-step Design Studio workflow. AI and Conventional
+  Generate Design exports again produce and validate their full engineering documents (75/75 probes).
+
+### Documentation
+- Added `standarization/CONVENTIONAL_DC_OPERATIONS_STANDARD.md` and its Obsidian mirror, including
+  two truth domains, thermal terminology, subsystem minimums, historian semantics, gates, official
+  reference direction and a durable bug/lesson ledger.
+
 ## v1.130.0 — 2026-08-27 (Semantic DC operations + governed design studies)
 
 > Owner direction: “most advance uiux and datacenter” while keeping Conventional DC and AI/HPC DC as

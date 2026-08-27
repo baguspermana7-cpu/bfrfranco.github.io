@@ -84,11 +84,15 @@
     <script src="js/rz-alarm-state.js?v=1.43.4" defer></script>
     <script src="js/rz-inspector.js?v=1.43.4" defer></script>
     <!-- v1.43.2 — Data-quality service: top-banner + per-element chip. -->
-    <script src="js/rz-telemetry-quality.js?v=1.43.2" defer></script>
+    <script src="js/rz-telemetry-quality.js?v=1.131.0" defer></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
          Loaded for cross-page consistency; body does NOT carry rz-bms-shell
          class. Spec: standarization/BMS_SHELL.md ; conv/review/14 §7. -->
     <link rel="stylesheet" href="css/rz-bms-shell.css?v=1.23.4-ck">
+    <link rel="stylesheet" href="css/rz-conv-alarm-workspace.css?v=1.131.0">
+    <script src="js/datahall-ai/alarm-query.js?v=1.0.0" defer></script>
+    <script src="js/conv-alarm-events.js?v=1.0.0" defer></script>
+    <script src="js/conv-alarm-workspace.js?v=1.131.0" defer></script>
     <script src="js/rz-bms-shell.js?v=1.23.4" defer></script>
     <style>
         /* Grounded operator-console palette (matches EPMS_Telemetry exemplar).
@@ -143,6 +147,28 @@
         .alarm-chip b { color: var(--text-main); font-weight: 700; }
         .alarm-chip .crit { color: var(--st-bad); }
         .alarm-chip .warnv { color: var(--st-warn); }
+
+        .ops-context { display: grid; grid-template-columns: minmax(250px,.8fr) minmax(260px,1fr) minmax(280px,1.2fr);
+            gap: 8px; margin-bottom: 12px; min-width: 0; }
+        .hall-selector, .basis-card { min-width: 0; border: 1px solid var(--panel-line);
+            border-radius: 8px; background: var(--panel-bg); padding: 9px 11px; }
+        .context-label { display: block; margin-bottom: 6px; color: var(--text-dim);
+            font: 700 9px/1.3 'Consolas', monospace; letter-spacing: .08em; text-transform: uppercase; }
+        .hall-controls { display: grid; grid-template-columns: repeat(4,minmax(42px,1fr)); gap: 5px; }
+        .hall-btn { min-height: 32px; border: 1px solid #42536d; border-radius: 5px;
+            background: #111c2d; color: #aab9cc; font: 700 10px 'Consolas', monospace; cursor: pointer; }
+        .hall-btn[aria-pressed="true"] { border-color: #4c9abc; background: #172c40; color: #f0f7fb;
+            box-shadow: inset 0 -2px 0 var(--medium-water); }
+        .hall-btn:focus-visible, .btn:focus-visible, .zoom-btn:focus-visible, .nav-btn:focus-visible {
+            outline: 2px solid #8bd8f4; outline-offset: 2px; }
+        .basis-card { display: flex; flex-direction: column; justify-content: center; }
+        .basis-card.current { border-left: 3px solid var(--medium-water); }
+        .basis-card.study { border-left: 3px solid var(--st-warn); }
+        .basis-title { color: #dce7f2; font: 700 10px/1.3 'Consolas', monospace;
+            letter-spacing: .04em; text-transform: uppercase; }
+        .basis-value { margin-top: 3px; color: var(--text-dim); font: 10px/1.4 'Consolas', monospace; }
+        .basis-card.study .basis-title, .basis-guard { color: #e7c96f; }
+        .basis-guard { font-weight: 700; }
 
         /* KPI strip — value + unit + threshold/target (doc-07, doc-10) */
         /* v1.23.4 doc-14 §7: "Keep top KPIs, but visually rank: WUE / cooling makeup /
@@ -200,6 +226,8 @@
         @keyframes flowmove { to { stroke-dashoffset: -23; } }
         @media (prefers-reduced-motion: reduce) { .flow { animation: none; } }
         .junction { fill: #33415a; }
+        .pump-symbol { animation: none !important; }
+        .pump-branch { fill: none; stroke: #33415a; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
         /* v1.29.3 — EcoStruxure-grade solid panel treatment: bump fill from .04 alpha
            wash up to an opaque dark slate so equipment blocks read as discrete cells.
            Owner: "agak solid seperti tampilan BMS pada umumnya di platform professional". */
@@ -288,6 +316,33 @@
         .status-item .vv { color: #fff; font-weight: 700; font-family: 'Consolas', monospace; }
         .status-spacer { flex: 1; }
 
+        .plant-summary-grid { display: grid; grid-template-columns: minmax(0,1.15fr) minmax(0,.85fr);
+            gap: 10px; margin-top: 12px; }
+        .plant-summary { border: 1px solid var(--panel-line); border-radius: 7px; background: #09111f; padding: 10px; }
+        .summary-title { margin-bottom: 8px; color: var(--text-dim); font: 700 10px 'Consolas', monospace;
+            letter-spacing: .08em; text-transform: uppercase; }
+        .pump-pair { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+        .pump-unit { display: grid; grid-template-columns: 36px minmax(0,1fr) auto; gap: 9px; align-items: center;
+            min-width: 0; border: 1px solid #34465f; border-radius: 6px; padding: 8px; background: #101b2c; }
+        .pump-unit[data-state="running"] { border-left: 3px solid var(--st-ok); }
+        .pump-unit[data-state="available"] { border-left: 3px solid #64748b; }
+        .pump-icon { position: relative; width: 32px; height: 32px; border: 1.5px solid #7c92ad; border-radius: 50%; }
+        .pump-icon::after { content: ""; position: absolute; left: 9px; top: 7px; border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent; border-left: 14px solid #7c92ad; }
+        .pump-unit[data-state="running"] .pump-icon { border-color: var(--medium-treated); }
+        .pump-unit[data-state="running"] .pump-icon::after { border-left-color: var(--medium-treated); }
+        .pump-name { color: #f0f5fa; font: 700 11px 'Consolas', monospace; }
+        .pump-meta { margin-top: 2px; color: var(--text-faint); font: 9px/1.35 'Consolas', monospace; }
+        .pump-state { color: #c4d1df; font: 700 9px 'Consolas', monospace; text-align: right; }
+        .pump-unit[data-state="running"] .pump-state { color: var(--st-ok); }
+        .allocation-list { display: grid; gap: 5px; }
+        .allocation-row { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px; align-items: baseline;
+            padding: 5px 0; border-bottom: 1px dashed rgba(148,163,184,.22); font: 10px 'Consolas', monospace; }
+        .allocation-row:last-child { border-bottom: 0; }
+        .allocation-row span { color: var(--text-dim); }
+        .allocation-row strong { color: #f3f7fb; }
+        .scope-note { margin-top: 7px; color: var(--text-faint); font: 9px/1.4 'Consolas', monospace; }
+
         body.fullscreen .no-print { display: none; }
 
         @media print { .no-print, .status-bar { display: none !important; } }
@@ -296,6 +351,8 @@
         @media (max-width: 1100px) {
             .layout { grid-template-columns: 1fr; }
             .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+            .ops-context { grid-template-columns: 1fr 1fr; }
+            .hall-selector { grid-column: 1 / -1; }
         }
         @media (max-width: 1024px) {
             /* v1.29.3 — EcoStruxure-grade responsive treatment.
@@ -318,6 +375,10 @@
             .kpi .v { font-size: 19px; }
             .status-bar { gap: 12px; padding: 8px 10px; }
             .topbar, .alarm-strip { padding: 10px 12px; }
+            .ops-context { grid-template-columns: 1fr; }
+            .hall-selector { grid-column: auto; }
+            .hall-btn { min-height: 44px; }
+            .plant-summary-grid, .pump-pair { grid-template-columns: 1fr; }
             button, a.btn, [role="button"], .nav-btn, .btn, .zoom-btn { min-height: 44px; }
             .nav-menu, .nav-links { display: none !important; }
             .footer-grid { grid-template-columns: 1fr !important; gap: 1.25rem !important;
@@ -339,7 +400,7 @@
     <!-- v1.43.20 — instrument register (RZ Dark System v1). Chrome-only, dark-only, scoped. -->
     <link rel="stylesheet" href="css/rz-cockpit-instrument.css?v=1.43.19">
 </head>
-<body data-rz-data-mode="simulated">
+<body data-rz-data-mode="simulated" data-active-hall="A">
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <div class="wrap">
 
@@ -355,7 +416,7 @@
         </a>
         <div class="brand">Water Treatment &amp; Service<small>Conventional BMS &middot; Facility Operations</small></div>
         <div class="status-spacer"></div>
-        <div class="ctrl-row">
+        <div class="ctrl-row" data-rz-alarm-launch-slot>
             <span style="font-size:10px;color:var(--text-faint);font-weight:600;">ZOOM</span>
             <button class="zoom-btn" onclick="setZoom(0.75)" id="z-75">75%</button>
             <button class="zoom-btn active" onclick="setZoom(1)" id="z-100">100%</button>
@@ -364,6 +425,7 @@
             <button class="zoom-btn" onclick="window.print()">Export PDF</button>
         </div>
     </div>
+    <div data-rz-telemetry-banner-slot></div>
 
     <a id="main-content" tabindex="-1" aria-hidden="true"></a>
 
@@ -377,6 +439,26 @@
         <span class="alarm-chip">Scenario <b id="scenarioName">Simulated</b></span>
         <span class="alarm-chip">Data Quality <b id="dataQuality">GOOD</b></span>
     </div>
+
+    <section class="ops-context" aria-label="Hall view and engineering basis">
+        <div class="hall-selector">
+            <span class="context-label">View context · water balance unchanged</span>
+            <div class="hall-controls" role="group" aria-label="Select data hall view">
+                <button class="hall-btn" type="button" data-hall="A" aria-pressed="true">Hall A</button>
+                <button class="hall-btn" type="button" data-hall="B" aria-pressed="false">Hall B</button>
+                <button class="hall-btn" type="button" data-hall="C" aria-pressed="false">Hall C</button>
+                <button class="hall-btn" type="button" data-hall="D" aria-pressed="false">Hall D</button>
+            </div>
+        </div>
+        <div class="basis-card current" data-basis="current">
+            <div class="basis-title" id="waterHallLabel">Current engine basis · Hall A</div>
+            <div class="basis-value">Representative view · 1.850 MW IT · 37.0 L/min WUE-included makeup</div>
+        </div>
+        <div class="basis-card study" data-basis="study">
+            <div class="basis-title">Capacity study · 4 × 10 MW IT</div>
+            <div class="basis-value"><span class="basis-guard">READ-ONLY PLANNING BASIS</span> · no effect on current pumps, flow, or WUE</div>
+        </div>
+    </section>
 
     <!-- KPI strip — value | unit | threshold (doc-07 §"KPI Cards")
          v1.23.4 doc-14 §7: WUE is the visual hero (page-purpose KPI). -->
@@ -428,9 +510,13 @@
                 <!-- Raw tank -> filter -->
                 <path class="pipe" d="M250 130 H300" data-rz-line="1" data-id="ws-raw-to-filter" data-from="TK-101-RAW" data-to="FLT-201" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN50" data-current="2.4 bar in" data-redundancy="duty"/>
                 <!-- Filter -> booster pump -->
-                <path class="pipe" d="M400 130 H470" data-rz-line="1" data-id="ws-filter-to-pump" data-from="FLT-201" data-to="P-301-BOOSTER" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN50" data-current="2.0 bar / DP 0.40 bar" data-redundancy="duty"/>
+                <path class="pipe" d="M400 130 H470" data-rz-line="1" data-id="ws-filter-to-pump" data-from="FLT-201" data-to="P-301-BOOSTER" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN50" data-current="2.0 bar / DP 0.40 bar" data-redundancy="duty/standby"/>
                 <!-- Pump -> dosing tee -> UV -->
-                <path class="pipe" d="M540 130 H660" data-rz-line="1" data-id="ws-pump-to-uv" data-from="P-301-BOOSTER" data-to="UV-401" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN50 / 7.5 kW pump" data-current="0.85 L/h Cl2 / 0.6 ppm residual" data-redundancy="duty" data-sensor="DOS-302"/>
+                <path class="pipe" d="M540 130 H660" data-rz-line="1" data-id="ws-pump-to-uv" data-from="P-301-BOOSTER" data-to="UV-401" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN50 / 2 × 7.5 kW" data-current="P-301A running / P-301B available" data-redundancy="duty/standby" data-sensor="DOS-302"/>
+                <!-- P-301B standby branch. Untagged because the semantic line model
+                     represents the booster station as one duty/standby train. -->
+                <path class="pump-branch" d="M440 130 V225 H470"/>
+                <path class="pump-branch" d="M540 225 H600 V130"/>
                 <!-- UV -> treated header tee -->
                 <path class="pipe" d="M760 130 H850 V210" data-rz-line="1" data-id="ws-uv-to-treated-header" data-from="UV-401" data-to="TREATED-HEADER-TEE" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN50" data-current="99.8% UV efficacy" data-redundancy="duty" data-sensor="UV-401"/>
                 <!-- Treated header split: -> domestic tank (v1.41.5 — straight down, no Z-routing that visually appeared as 2 pipes) -->
@@ -504,15 +590,22 @@
                     <text class="lbl" x="200" y="308" id="m-bw-st">Backwash INHIBIT</text>
                 </g>
 
-                <!-- Booster pump -->
-                <g class="eq-grp" data-eq="pump">
+                <!-- Booster pump pair — static ISA-style centrifugal symbols. -->
+                <g class="eq-grp" data-eq="pump-duty" aria-label="P-301A duty pump running">
                     <circle class="eq" cx="505" cy="130" r="35"/>
-                    <path id="pumpVane" d="M505 105 V155 M480 130 H530"
-                          stroke="#5eead4" stroke-width="3" stroke-linecap="round"/>
-                    <text class="tag" x="475" y="80">P-301</text>
-                    <text class="lbl" x="552" y="118">Booster Pump</text>
+                    <path class="pump-symbol" d="M491 112 L526 130 L491 148 Z" fill="#5eead4" stroke="#5eead4" stroke-width="1.5"/>
+                    <text class="tag" x="466" y="80">P-301A · DUTY</text>
+                    <text class="lbl" x="552" y="118">Booster Pump A</text>
                     <text class="val ok" id="m-pump-st" x="552" y="136">RUNNING</text>
                     <text class="val" id="m-pump-kw" x="552" y="154">7.5 kW</text>
+                </g>
+                <g class="eq-grp" data-eq="pump-standby" aria-label="P-301B standby pump available">
+                    <circle class="eq" cx="505" cy="225" r="35"/>
+                    <path class="pump-symbol" d="M491 207 L526 225 L491 243 Z" fill="#718096" stroke="#8ca0b8" stroke-width="1.5"/>
+                    <text class="tag" x="448" y="276">P-301B · STANDBY</text>
+                    <text class="lbl" x="552" y="213">Booster Pump B</text>
+                    <text class="val" id="m-pump-b-st" x="552" y="231">AVAILABLE</text>
+                    <text class="val" id="m-pump-b-kw" x="552" y="249">0.0 kW</text>
                 </g>
 
                 <!-- Cl2 dosing -->
@@ -562,6 +655,33 @@
                 <!-- Drain / blowdown label -->
                 <text class="lbl" x="430" y="404">Blowdown &amp; Backwash &rarr; Drain</text>
             </svg>
+            </div>
+
+            <div class="plant-summary-grid" aria-label="Booster redundancy and water allocation">
+                <section class="plant-summary">
+                    <div class="summary-title">Booster Station · Automatic Lead/Lag</div>
+                    <div class="pump-pair">
+                        <div class="pump-unit" data-pump-id="P-301A" data-role="duty" data-state="running">
+                            <span class="pump-icon pump-symbol" aria-hidden="true"></span>
+                            <div><div class="pump-name">P-301A · Duty</div><div class="pump-meta">Run feedback proven · 7.5 kW · lead selected</div></div>
+                            <div class="pump-state">RUNNING</div>
+                        </div>
+                        <div class="pump-unit" data-pump-id="P-301B" data-role="standby" data-state="available">
+                            <span class="pump-icon pump-symbol" aria-hidden="true"></span>
+                            <div><div class="pump-name">P-301B · Standby</div><div class="pump-meta">Auto available · 0.0 kW · starts on fail/low pressure</div></div>
+                            <div class="pump-state">AVAILABLE</div>
+                        </div>
+                    </div>
+                </section>
+                <section class="plant-summary">
+                    <div class="summary-title">Treatment Header Allocation</div>
+                    <div class="allocation-list">
+                        <div class="allocation-row"><span>Total treated flow</span><strong id="alloc-treatment">45.0 L/min</strong></div>
+                        <div class="allocation-row"><span>Cooling makeup · WUE included</span><strong id="alloc-makeup">37.0 L/min</strong></div>
+                        <div class="allocation-row"><span>Domestic/process · WUE excluded</span><strong id="alloc-domestic">8.0 L/min</strong></div>
+                    </div>
+                    <div class="scope-note">Current engine balance: treatment = cooling makeup + domestic/process. Study capacity remains read-only.</div>
+                </section>
             </div>
 
             <!-- Demo / simulation controls (state-explicit per doc-10) -->
@@ -655,7 +775,7 @@
         </div>
         <div class="status-item">
             <div class="status-led led-ok" id="led-pump"></div>
-            <span class="k">PUMP P-301</span><span class="vv" id="status-pump">RUNNING</span>
+            <span class="k">BOOSTER PAIR</span><span class="vv" id="status-pump">P-301A DUTY · P-301B STBY</span>
         </div>
         <div class="status-item">
             <span class="k">MAKEUP</span><span class="vv" id="status-flow">37.0 L/min</span>
@@ -728,6 +848,27 @@
             function set(id, v) { var e = document.getElementById(id); if (e) e.textContent = v; }
             function nfmt(n) { return Math.round(n).toLocaleString('en-US'); }
 
+            var HALL_VIEWS = ['A', 'B', 'C', 'D'];
+            function selectHallView(hall) {
+                var selected = String(hall || '').toUpperCase();
+                if (HALL_VIEWS.indexOf(selected) < 0) return;
+                document.body.setAttribute('data-active-hall', selected);
+                var buttons = document.querySelectorAll('[data-hall]');
+                for (var i = 0; i < buttons.length; i++) {
+                    buttons[i].setAttribute('aria-pressed', buttons[i].getAttribute('data-hall') === selected ? 'true' : 'false');
+                }
+                set('waterHallLabel', 'Current engine basis · Hall ' + selected);
+            }
+            function bindHallViews() {
+                var buttons = document.querySelectorAll('[data-hall]');
+                for (var i = 0; i < buttons.length; i++) {
+                    buttons[i].addEventListener('click', function () {
+                        selectHallView(this.getAttribute('data-hall'));
+                    });
+                }
+                selectHallView(document.body.getAttribute('data-active-hall') || 'A');
+            }
+
             // ---- Threshold evaluation (doc-07 §"Alarm Rules") --------------
             function evalThresholds() {
                 var crit = 0, warn = 0;
@@ -780,6 +921,8 @@
                 set('m-flt-dp', 'DP ' + f2(filterDp) + ' bar');
                 set('m-pump-st', 'RUNNING');
                 set('m-pump-kw', pumpKw + ' kW');
+                set('m-pump-b-st', 'AVAILABLE');
+                set('m-pump-b-kw', '0.0 kW');
                 set('m-cl2', cl2 + ' L/h');
                 set('m-cl2-res', cl2Res + ' ppm');
                 set('m-uv', uvInt + '% INT');
@@ -814,13 +957,16 @@
                 set('iWhyDom', f1(DOMESTIC_LPM));
                 set('iWhyMk', f1(makeupLpm));
                 set('iWhyAll', f2(wueAllFlow));
+                set('alloc-treatment', f1(totalLpm) + ' L/min');
+                set('alloc-makeup', f1(makeupLpm) + ' L/min');
+                set('alloc-domestic', f1(DOMESTIC_LPM) + ' L/min');
 
                 // Alarm list (live state vs threshold)
                 renderAlarmList(th);
 
                 // Bottom status bar
                 set('status-tank', rawPct + '%');
-                set('status-pump', 'RUNNING');
+                set('status-pump', 'P-301A DUTY · P-301B STBY');
                 set('status-flow', f1(makeupLpm) + ' L/min');
                 set('status-wue', f2(wueComputed) + ' L/kWh');
                 set('status-system', state);
@@ -849,6 +995,7 @@
                 document.getElementById('alarmList').innerHTML = rows;
             }
 
+            bindHallViews();
             render();
 
             // ---- Chart: Filter DP + makeup flow, with threshold bands -----
@@ -1123,6 +1270,6 @@
     </style>
 
 
-    <div class="rz-manual-link" style="text-align:center; padding:0.9rem 1rem 1.3rem;"><style>.rz-manual-link a{display:inline-block;font-family:'JetBrains Mono','Courier New',monospace;font-size:0.72rem;letter-spacing:0.04em;text-decoration:none;border:1px solid;border-radius:6px;padding:0.45rem 0.85rem;color:#94a3b8;border-color:rgba(148,163,184,0.35)}.rz-manual-link a:hover{color:#67e8f9;border-color:rgba(103,232,249,0.45)}</style><a href="manual/water-system.html">Technical Manual &amp; Methodology &#8599;</a></div>
+    <div class="rz-manual-link" style="display:flex;justify-content:center;gap:.5rem;flex-wrap:wrap;padding:0.9rem 1rem 1.3rem;"><style>.rz-manual-link a{display:inline-block;font-family:'JetBrains Mono','Courier New',monospace;font-size:0.72rem;letter-spacing:0.04em;text-decoration:none;border:1px solid;border-radius:6px;padding:0.45rem 0.85rem;color:#94a3b8;border-color:rgba(148,163,184,0.35)}.rz-manual-link a:hover{color:#67e8f9;border-color:rgba(103,232,249,0.45)}</style><a href="prd/dc-conventional.html#water-contract">Master PRD &#8599;</a><a href="manual/water-system.html">Technical Manual &amp; Methodology &#8599;</a></div>
 </body>
 </html>

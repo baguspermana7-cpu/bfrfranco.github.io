@@ -1,5 +1,31 @@
 # BMS Shell — Shared Operations-Console Standard (v1.23.0+)
 
+## v1.131.0 — Conventional DC operator hardening (2026-08-27)
+
+- **Two truth domains:** the 1.850 MW current simulation remains owned by `CONV_CALC`;
+  the four-hall, 40 MW IT capacity study is immutable, separately labelled and fails closed
+  when rack density, thermal envelope, resilience or dPUE scope does not reconcile.
+- **Operator consequence before decoration:** Data Hall, Chiller, Fire, Fuel, Water and ICT
+  now expose selected-object basis, current/study context, command versus feedback, consequence,
+  redundancy and responsive diagnostics without changing the underlying process engines.
+- **Common historian vocabulary:** all eight Conventional surfaces share one read-only alarm/event
+  query for date, point, severity, lifecycle-at-capture, value/state, quality, event/action and safe CSV.
+  Its deterministic fixture is explicitly independent from current live alarm counts.
+- **Accessibility boundary:** modal background content becomes inert and is restored exactly on
+  close; alarm filters remain keyboard reachable and responsive without granting command authority.
+  At phone widths the dialog itself scrolls through filters, results and footer, and every launcher
+  remains a 44 px in-flow header control rather than a fixed overlay. Historian tables provide a
+  hidden caption, scoped headers and tabular/slashed-zero numerics.
+- **Mobile control-plane boundary:** non-live provenance banners mount in dedicated document-flow
+  slots; they never cover page identity or live controls. Their dismiss action is 44 px, visibly focused,
+  contrast-safe in light themes and motionless under reduced-motion preference. EPMS uses an accessible
+  overlay drawer for control panels below 768 px while its fitted SLD retains the full area between top
+  and status bars. The overview separates page identity from a rail that retains design/help/doc actions.
+  Responsive rails preserve DOM/visual/tab order, scroll the focused control fully into view and use
+  contained 44 px targets; extracted public-contract links precede the protected header in DOM order.
+- **Release gate:** Conventional basis, historian, cooling/water, fire/fuel, data-hall and ICT
+  regressions are mandatory entries in `tools/ship-gate.sh`.
+
 ## v1.130.0 — semantic operator workflows (2026-08-26)
 
 - **DC AI/HPC:** added a dedicated Alarm & Events query workspace, rack-density/platform

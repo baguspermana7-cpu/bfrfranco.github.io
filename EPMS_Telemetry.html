@@ -103,6 +103,7 @@
         width: 320px; background: var(--panel-bg); border-right: 1px solid #333;
         display: flex; flex-direction: column; padding: 15px; gap: 10px; height: 100%;
     }
+    .epms-sidebar-toggle { display: none; }
 
     .ctrl-box {
         background: rgba(255,255,255,0.03); border: 1px solid #333;
@@ -353,6 +354,53 @@
         #viewport { width: 100% !important; height: auto !important; }
     }
 
+    @media (max-width: 768px) {
+        .topbar {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 0 8px;
+            gap: 6px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: thin;
+        }
+        .topbar .brand { display: none; }
+        .topbar .epms-back-link,
+        .topbar .epms-portfolio-link,
+        .topbar .epms-prd-link,
+        .topbar .epms-manual-link {
+            box-sizing: border-box !important;
+            min-height: 44px;
+            height: 44px;
+            margin: 0 !important;
+            flex: 0 0 auto;
+        }
+        .topbar .epms-sidebar-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 72px;
+            min-height: 44px;
+            flex: 0 0 auto;
+        }
+        .sidebar { display: none; }
+        body.epms-sidebar-open .sidebar {
+            display: flex;
+            position: absolute;
+            top: 50px;
+            bottom: 50px;
+            left: 0;
+            width: min(320px, calc(100vw - 44px));
+            height: auto;
+            box-sizing: border-box;
+            overflow-y: auto;
+            z-index: 160;
+            box-shadow: 12px 0 28px rgba(0, 0, 0, 0.52);
+        }
+        .status-bar { left: 0; overflow-x: auto; }
+        #viewport { width: 100vw !important; height: 100dvh !important; max-width: none !important; }
+    }
+
 #cookieAccept { background:#1d4ed8 !important; }
 #zoomIndicator { color:#9aa3af !important; }
 </style>
@@ -364,6 +412,10 @@
          Spec: conv/review/14 §2 ; standarization/BMS_SHELL.md -->
     <script src="js/conv-engine.js?v=1.22.0"></script>
     <link rel="stylesheet" href="css/rz-bms-shell.css?v=1.24.0">
+    <link rel="stylesheet" href="css/rz-conv-alarm-workspace.css?v=1.131.0">
+    <script src="js/datahall-ai/alarm-query.js?v=1.0.0" defer></script>
+    <script src="js/conv-alarm-events.js?v=1.0.0" defer></script>
+    <script src="js/conv-alarm-workspace.js?v=1.131.0" defer></script>
     <script src="js/rz-bms-shell.js?v=1.24.0" defer></script>
 <style id="rz-skiplink-v1">
 .skip-link{position:absolute;top:-50px;left:0;background:#1e3a5f;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 8px 0;transition:top .2s ease}
@@ -440,16 +492,18 @@
 
 <div class="ui">
     <div class="topbar pointer">
-        <a href="dc-conventional.html" style="display:flex; align-items:center; gap:8px; text-decoration:none; color:#94a3b8; font-size:12px; padding:6px 12px; border:1px solid #444; border-radius:4px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#94a3b8'">
+        <a href="dc-conventional.html" class="epms-back-link" style="display:flex; align-items:center; gap:8px; text-decoration:none; color:#94a3b8; font-size:12px; padding:6px 12px; border:1px solid #444; border-radius:4px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#94a3b8'">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
             Back
         </a>
-        <a href="index.html" style="display:flex; align-items:center; gap:8px; text-decoration:none; color:#94a3b8; font-size:12px; padding:6px 12px; border:1px solid #444; border-radius:4px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#94a3b8'">
+        <a class="btn epms-prd-link" href="prd/epms-telemetry.html" style="min-width:44px">PRD</a>
+        <a class="btn epms-manual-link" href="manual/epms-telemetry.html" style="min-width:44px">Manual</a>
+        <span class="rz-conv-alarm-slot" data-rz-alarm-launch-slot></span>
+        <button class="zoom-btn epms-sidebar-toggle" id="epmsSidebarToggle" type="button" aria-expanded="false" aria-controls="epmsSidebar">Panels</button>
+        <a href="index.html" class="epms-portfolio-link" style="display:flex; align-items:center; gap:8px; text-decoration:none; color:#94a3b8; font-size:12px; padding:6px 12px; border:1px solid #444; border-radius:4px; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#94a3b8'">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
             Portfolio
         </a>
-        <a class="btn" href="prd/epms-telemetry.html" style="min-width:44px">PRD</a>
-        <a class="btn" href="manual/epms-telemetry.html" style="min-width:44px">Manual</a>
         <div class="brand">EPMS V1.0 - Telemetry</div>
         <div style="flex:1"></div>
         <div style="display:flex; gap:8px; align-items:center;">
@@ -487,7 +541,7 @@
         </div>
     </div>
     <div style="flex:1; display:flex;">
-        <div class="sidebar pointer">
+        <div class="sidebar pointer" id="epmsSidebar">
             
             <div class="ctrl-box">
                 <div class="ctrl-title">Utility Sources (20kV)</div>
@@ -1036,8 +1090,41 @@ const scene = document.getElementById('scene');
 const viewportEl = document.getElementById('viewport');
 
 // Layout constants (screen pixels)
-const SIDEBAR_WIDTH_PX = 320;
 const TOPBAR_HEIGHT_PX = 50;
+const STATUSBAR_HEIGHT_PX = 50;
+
+function visibleSidebarWidth() {
+    const sidebar = document.getElementById('epmsSidebar');
+    if (window.innerWidth <= 768 || !sidebar || getComputedStyle(sidebar).display === 'none') return 0;
+    return sidebar.getBoundingClientRect().width;
+}
+
+function setEpmsSidebar(open) {
+    const toggle = document.getElementById('epmsSidebarToggle');
+    document.body.classList.toggle('epms-sidebar-open', open);
+    if (toggle) toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+
+const sidebarToggle = document.getElementById('epmsSidebarToggle');
+if (sidebarToggle) {
+    sidebarToggle.addEventListener('click', () => {
+        setEpmsSidebar(!document.body.classList.contains('epms-sidebar-open'));
+    });
+}
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && document.body.classList.contains('epms-sidebar-open')) {
+        setEpmsSidebar(false);
+        if (sidebarToggle) sidebarToggle.focus();
+    }
+});
+const epmsTopbar = document.querySelector('.topbar');
+if (epmsTopbar) {
+    epmsTopbar.addEventListener('focusin', (event) => {
+        if (window.matchMedia('(max-width: 768px)').matches && event.target instanceof HTMLElement) {
+            event.target.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        }
+    });
+}
 
 // Content bounds in SVG units (based on GRID configuration)
 const CONTENT_MIN_X = 80;
@@ -1076,14 +1163,15 @@ function fitScreen() {
     const screenHeight = window.innerHeight;
 
     // Visible area (excluding sidebar and topbar)
-    const visibleLeft = SIDEBAR_WIDTH_PX;
+    const visibleLeft = visibleSidebarWidth();
     const visibleTop = TOPBAR_HEIGHT_PX;
-    const visibleWidth = screenWidth - SIDEBAR_WIDTH_PX;
-    const visibleHeight = screenHeight - TOPBAR_HEIGHT_PX;
+    const visibleWidth = screenWidth - visibleLeft;
+    const visibleBottom = screenHeight - STATUSBAR_HEIGHT_PX;
+    const visibleHeight = visibleBottom - TOPBAR_HEIGHT_PX;
 
     // Convert visible area corners to SVG coordinates
     const topLeft = screenToSVG(visibleLeft, visibleTop);
-    const bottomRight = screenToSVG(screenWidth, screenHeight);
+    const bottomRight = screenToSVG(screenWidth, visibleBottom);
 
     // Available space in SVG units
     const availableSvgWidth = bottomRight.x - topLeft.x;
@@ -1110,8 +1198,10 @@ function fitScreen() {
 
 function setZoom(newScale) {
     // Get center of visible area in screen coords
-    const visibleCenterX = SIDEBAR_WIDTH_PX + (window.innerWidth - SIDEBAR_WIDTH_PX) / 2;
-    const visibleCenterY = TOPBAR_HEIGHT_PX + (window.innerHeight - TOPBAR_HEIGHT_PX) / 2;
+    const sidebarWidth = visibleSidebarWidth();
+    const visibleCenterX = sidebarWidth + (window.innerWidth - sidebarWidth) / 2;
+    const visibleCenterY = TOPBAR_HEIGHT_PX
+        + (window.innerHeight - TOPBAR_HEIGHT_PX - STATUSBAR_HEIGHT_PX) / 2;
 
     // Convert to SVG coords
     const centerSvg = screenToSVG(visibleCenterX, visibleCenterY);

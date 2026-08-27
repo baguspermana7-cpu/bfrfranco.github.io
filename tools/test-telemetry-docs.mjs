@@ -19,6 +19,22 @@ const INTENTIONAL_MANUAL_REPLACEMENTS = Object.freeze({
     '<li><b>NVIDIA GB200 NVL72</b> — Blackwell GPU rack-scale specification: 72 GPU + 36 Grace CPU per NVL72, direct liquid cooling, ~120–140 kW per NVL72 domain (adopted design value 132 kW).</li>':
       'governing hardware context for the locked 72-GPU / 36-Grace-CPU, direct-liquid-cooled GB200 baseline.',
   }),
+  'dc-conventional': Object.freeze({
+    '<span class="mn-src">doc-09 lines 99–104; ISO/IEC 30134-2</span>':
+      '<span class="mn-src">doc-09 lines 99–104; ISO/IEC 30134-9:2022</span>',
+    '<span class="mn-src">doc-09 lines 132–147; Uptime Institute Tier Standard</span>':
+      '<span class="mn-src">doc-09 lines 132–147; project basis</span>',
+    '<li><b>Uptime Institute Tier Standard</b> — Operational Sustainability (2021): 48 hr fuel autonomy requirement for Tier III/IV maintained availability.</li>':
+      '<li><b>Uptime Institute Tier Standard</b> — topology and concurrently-maintainable design intent; the cockpit does not claim certification or infer a universal fuel duration.</li>',
+    '<li><b>ISO/IEC 30134-2</b> — Key Performance Indicators for Data Centres — Part 2: Power Usage Effectiveness (PUE) and Water Usage Effectiveness (WUE) definitions.</li>':
+      '<li><b>ISO/IEC 30134-2:2026</b> — Data-centre Power Usage Effectiveness (PUE) definition and reporting boundary.</li>',
+  }),
+  datahall: Object.freeze({
+    '<li><b>ASHRAE TC9.9 (2021)</b> — Thermal Guidelines for Data Processing Environments: cold-aisle temperature band (18–27 °C recommended), humidity 40–60 %RH, PUE/WUE benchmarks.</li>':
+      '<li><b>ASHRAE Handbook — Data Centers and Telecommunication Facilities</b> — rack-inlet recommended dry-bulb envelope (18–27 °C for the applicable A classes) and class/dew-point-dependent humidity guidance. The project 25.4 °C target and 48% RH basis remain site decisions.</li>',
+    '<li><b>Uptime Institute Tier Standard (2022)</b> — Tier III: N+1 redundancy, 72 hr fuel autonomy target; WUE benchmark scale (good: 1.0–1.4 L/kWh).</li>':
+      '<li><b>Uptime Institute Tier Standard</b> — topology and concurrently-maintainable intent. No certification, universal fuel-duration target or WUE grading band is inferred by this cockpit.</li>',
+  }),
 });
 const COCKPITS = Object.freeze([
   { file: 'EPMS_Telemetry.html', slug: 'epms-telemetry', buttonClass: 'btn' },

@@ -29,7 +29,9 @@ Companion to [`LINE_MODEL.md`](LINE_MODEL.md), [`BREAKER_SYMBOLS.md`](BREAKER_SY
 Set `<body data-rz-data-mode="...">` to declare what the page is showing. The service:
 
 1. Reads the attribute on `DOMContentLoaded`
-2. Injects a fixed top-of-viewport banner (dismissible) with the matching colour + label
+2. Injects a dismissible banner with the matching colour + label into the explicit
+   `[data-rz-telemetry-banner-slot]` immediately after the page header. A fixed fallback is retained
+   only for legacy adopters and is not acceptable for a gated cockpit.
 3. Skips the banner when mode = `live` (operators don't need a label when telemetry is genuine)
 
 All four BMS cockpit pages currently declare `data-rz-data-mode="simulated"`. Reviewer mandate (doc-28): "Jika menggunakan sample data, beri label sample/simulated agar tidak terlihat seperti live."
@@ -63,6 +65,12 @@ window.RZTelemetryQuality.audit(document);     /* { mode, bannerVisible, points,
 | v1.43.2 | `chiller-plant.html` | `simulated` | ✓ | Live tab shows chip |
 | v1.43.2 | `water-system.html` | `simulated` | ✓ | Live tab shows chip |
 | v1.43.2 | `fire-system.html` | `simulated` | ✓ | Live tab shows chip |
+| v1.131.0 | `datahall.html` | `simulated` | ✓ in-flow | N/A |
+| v1.131.0 | `ict.html` | `simulated` | ✓ in-flow | N/A |
+
+At v1.131.0 all six current adopting cockpits (`datahallAI`, Data Hall, Chiller, Water, Fire and
+ICT) provide an in-flow banner slot. A 390 px browser gate verifies the banner is not fixed and its
+rectangle starts below the page header.
 
 EPMS_Telemetry.html is untouched per the owner mandate.
 
@@ -73,6 +81,12 @@ EPMS_Telemetry.html is untouched per the owner mandate.
 3. **`comms_lost` is alarm-class.** A point in this state should also push to the alarm pipeline; the chip is the visual cue, not the alarm itself.
 4. **`stale` threshold is page-dependent.** Set it appropriately for the medium being shown (chiller water: minutes; electrical: seconds).
 5. **Banner is dismissible** — once an operator acks the simulated banner it stays dismissed until reload. Don't auto-redraw it during a session.
+6. **Reserve layout space.** Every gated cockpit provides an explicit banner slot immediately after
+   its header; moving a fixed banner from the top to the bottom is not a responsive fix.
+7. **Dismissal is an accessible control.** It is at least 44 × 44 px, exposes a 2 px signal-amber
+   `:focus-visible` outline, and remains keyboard reachable.
+8. **Respect motion and theme.** Stop banner pulse/transition for `prefers-reduced-motion: reduce`;
+   use semantic light-theme foreground/background pairs rather than reusing luminous dark-theme text.
 
 ## Out of scope this standard
 

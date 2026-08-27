@@ -1,0 +1,336 @@
+/* Conventional DC alarm historian — opaque industrial operator surface. */
+.rz-conv-alarm-launch {
+  min-height: 36px;
+  padding: 7px 12px;
+  border: 1px solid var(--rz-accent-signal-dim, #CC8800);
+  border-radius: 4px;
+  background: #111827;
+  color: var(--rz-accent-signal, #FFAA00);
+  font: 700 11px/1.2 "JetBrains Mono", "Courier New", monospace;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.rz-conv-alarm-launch:hover,
+.rz-conv-alarm-launch:focus-visible {
+  border-color: var(--rz-accent-signal, #FFAA00);
+  background: #172033;
+  outline: 2px solid var(--rz-accent-signal, #FFAA00);
+  outline-offset: 2px;
+}
+
+.rz-conv-alarm-launch--fallback {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 1100;
+}
+
+.rz-conv-alarm-slot {
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 0;
+}
+
+.rz-conv-alarm-scrim[hidden] { display: none !important; }
+
+.rz-conv-alarm-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 12000;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  overflow: auto;
+  background: rgba(2, 6, 13, 0.82);
+  color: #dbe7f4;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  user-select: text;
+}
+
+.rz-conv-alarm-dialog {
+  width: min(1480px, 100%);
+  max-height: calc(100vh - 36px);
+  display: grid;
+  grid-template-rows: auto auto minmax(220px, 1fr) auto;
+  overflow: hidden;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  background: #07101d;
+  box-shadow: 0 20px 64px rgba(0, 0, 0, 0.48);
+}
+
+.rz-conv-alarm-head,
+.rz-conv-alarm-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 14px;
+  border-bottom: 1px solid #233149;
+  background: #0b1525;
+}
+
+.rz-conv-alarm-foot {
+  border-top: 1px solid #233149;
+  border-bottom: 0;
+  color: #8fa2b8;
+  font: 500 11px/1.45 "JetBrains Mono", "Courier New", monospace;
+}
+
+.rz-conv-alarm-title {
+  margin: 0;
+  color: #eef6ff;
+  font: 700 15px/1.25 "JetBrains Mono", "Courier New", monospace;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+.rz-conv-alarm-subtitle {
+  margin: 4px 0 0;
+  color: #8fa2b8;
+  font-size: 12px;
+}
+
+.rz-conv-alarm-close,
+.rz-conv-alarm-button {
+  min-height: 36px;
+  border: 1px solid #40516d;
+  border-radius: 4px;
+  background: #111d2f;
+  color: #dbe7f4;
+  padding: 7px 11px;
+  font: 700 11px/1.2 "JetBrains Mono", "Courier New", monospace;
+  cursor: pointer;
+}
+
+.rz-conv-alarm-close:hover,
+.rz-conv-alarm-button:hover {
+  border-color: var(--rz-accent-info, #00DDFF);
+  color: var(--rz-accent-info, #00DDFF);
+}
+
+.rz-conv-alarm-close:focus-visible,
+.rz-conv-alarm-button:focus-visible {
+  border-color: var(--rz-accent-signal, #FFAA00);
+  color: var(--rz-accent-signal, #FFAA00);
+  outline: 2px solid var(--rz-accent-signal, #FFAA00);
+  outline-offset: 2px;
+}
+
+.rz-conv-alarm-button--primary {
+  border-color: #0e7490;
+  background: #083344;
+  color: var(--rz-accent-info, #00DDFF);
+}
+
+.rz-conv-alarm-filter {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(128px, 1fr));
+  gap: 9px;
+  padding: 12px 14px;
+  border-bottom: 1px solid #233149;
+  background: #091321;
+}
+
+.rz-conv-alarm-field {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  min-width: 0;
+}
+
+.rz-conv-alarm-field--wide { grid-column: span 2; }
+
+.rz-conv-alarm-field label {
+  color: #91a5bb;
+  font: 700 10px/1.2 "JetBrains Mono", "Courier New", monospace;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.rz-conv-alarm-field input,
+.rz-conv-alarm-field select {
+  width: 100%;
+  min-width: 0;
+  min-height: 36px;
+  box-sizing: border-box;
+  border: 1px solid #33445f;
+  border-radius: 3px;
+  background: #07101d;
+  color: #e5edf7;
+  padding: 6px 8px;
+  font: 500 12px/1.25 "JetBrains Mono", "Courier New", monospace;
+}
+
+.rz-conv-alarm-field input:focus,
+.rz-conv-alarm-field select:focus {
+  border-color: var(--rz-accent-signal, #FFAA00);
+  outline: 2px solid var(--rz-accent-signal, #FFAA00);
+  outline-offset: 1px;
+}
+
+.rz-conv-alarm-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 2px;
+}
+
+.rz-conv-alarm-status {
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 9px;
+  border-left: 2px solid var(--rz-accent-data, #00FF88);
+  background: #0d1a24;
+  color: var(--rz-accent-data, #00FF88);
+  font: 700 11px/1.25 "JetBrains Mono", "Courier New", monospace;
+}
+
+.rz-conv-alarm-status[data-state="invalid"] {
+  border-left-color: var(--rz-accent-alert, #FF3030);
+  color: var(--rz-accent-alert, #FF3030);
+}
+
+.rz-conv-alarm-result {
+  min-height: 0;
+  overflow: auto;
+  background: #050c16;
+}
+
+.rz-conv-alarm-table {
+  width: 100%;
+  min-width: 1120px;
+  border-collapse: collapse;
+  color: #cdd9e7;
+  font: 500 11px/1.35 "JetBrains Mono", "Courier New", monospace;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "zero" 1;
+}
+
+.rz-conv-alarm-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.rz-conv-alarm-table th,
+.rz-conv-alarm-table td {
+  padding: 8px 9px;
+  border-right: 1px solid #17243a;
+  border-bottom: 1px solid #17243a;
+  text-align: left;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.rz-conv-alarm-table th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #0e1929;
+  color: #9eb2c8;
+  font-weight: 700;
+  letter-spacing: 0.045em;
+  text-transform: uppercase;
+}
+
+.rz-conv-alarm-table tbody tr:hover,
+.rz-conv-alarm-table tbody tr:focus-within { background: #0b1727; }
+
+.rz-conv-alarm-severity {
+  display: inline-block;
+  min-width: 62px;
+  padding: 2px 6px;
+  border: 1px solid #41516a;
+  border-radius: 3px;
+  color: var(--rz-text-secondary, #A0AEC0);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.rz-conv-alarm-severity[data-severity="critical"],
+.rz-conv-alarm-severity[data-severity="high"] {
+  border-color: var(--rz-accent-alert, #FF3030);
+  background: var(--rz-alert-bg, rgba(255, 48, 48, 0.10));
+  color: var(--rz-accent-alert, #FF3030);
+}
+
+.rz-conv-alarm-severity[data-severity="medium"],
+.rz-conv-alarm-severity[data-severity="low"] {
+  border-color: var(--rz-accent-signal, #FFB000);
+  background: var(--rz-signal-bg, rgba(255, 176, 0, 0.10));
+  color: var(--rz-accent-signal, #FFB000);
+}
+
+.rz-conv-alarm-empty {
+  padding: 28px;
+  color: #9db0c5;
+  text-align: center;
+  font: 500 12px/1.5 "JetBrains Mono", "Courier New", monospace;
+}
+
+.rz-conv-alarm-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.rz-conv-alarm-summary strong { color: #e5edf7; }
+
+@media (max-width: 1100px) {
+  .rz-conv-alarm-filter { grid-template-columns: repeat(3, minmax(140px, 1fr)); }
+}
+
+@media (max-width: 700px) {
+  .rz-conv-alarm-scrim { padding: 0; place-items: stretch; }
+  .rz-conv-alarm-dialog {
+    width: 100%;
+    min-height: 0;
+    max-height: 100dvh;
+    display: block;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border: 0;
+    border-radius: 0;
+  }
+  .rz-conv-alarm-head { align-items: flex-start; }
+  .rz-conv-alarm-filter { grid-template-columns: 1fr 1fr; }
+  .rz-conv-alarm-field--wide { grid-column: 1 / -1; }
+  .rz-conv-alarm-result { min-height: 220px; }
+  .rz-conv-alarm-launch,
+  .rz-conv-alarm-close,
+  .rz-conv-alarm-button,
+  .rz-conv-alarm-field input,
+  .rz-conv-alarm-field select { min-height: 44px; }
+  .rz-conv-alarm-foot { align-items: flex-start; flex-direction: column; }
+}
+
+@media (max-width: 440px) {
+  .rz-conv-alarm-filter { grid-template-columns: 1fr; }
+  .rz-conv-alarm-field--wide { grid-column: auto; }
+  .rz-conv-alarm-actions { align-items: stretch; flex-direction: column; }
+  .rz-conv-alarm-actions .rz-conv-alarm-button { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rz-conv-alarm-scrim *,
+  .rz-conv-alarm-launch { scroll-behavior: auto !important; transition: none !important; animation: none !important; }
+}
+
+@media print {
+  .rz-conv-alarm-launch,
+  .rz-conv-alarm-scrim { display: none !important; }
+}

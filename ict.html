@@ -262,6 +262,42 @@
     .cap-card.ok { border-left: 3px solid var(--st-ok); }
     .cap-card.warn { border-left: 3px solid var(--st-warn); }
 
+    /* Operator architecture: functional layers, not a decorative network map. */
+    .network-topology {
+        display: grid; grid-template-columns: repeat(4, minmax(150px, 1fr));
+        gap: 18px; align-items: stretch;
+    }
+    .topology-layer {
+        position: relative; min-width: 0; padding: 10px;
+        background: rgba(2,6,23,.42); border: 1px solid var(--line-soft);
+    }
+    .topology-layer:not(:last-child)::after {
+        content: ''; position: absolute; width: 18px; height: 1px;
+        right: -19px; top: 50%; background: var(--st-sel);
+    }
+    .topology-layer:not(:last-child)::before {
+        content: ''; position: absolute; right: -19px; top: calc(50% - 3px);
+        border-left: 5px solid var(--st-sel); border-top: 3px solid transparent;
+        border-bottom: 3px solid transparent;
+    }
+    .topology-layer h5 {
+        margin: 0 0 8px; color: var(--text-mute); font-size: 9px;
+        letter-spacing: .65px; text-transform: uppercase;
+    }
+    .topology-node {
+        display: flex; align-items: center; justify-content: space-between; gap: 8px;
+        min-height: 36px; margin-top: 5px; padding: 6px 8px;
+        border: 1px solid var(--line); background: var(--panel-2);
+        font: 10px/1.25 'Consolas','Share Tech Mono',monospace;
+    }
+    .topology-node .node-state { color: var(--st-ok); font-weight: 700; white-space: nowrap; }
+    .topology-node.stby .node-state { color: var(--st-stby); }
+    .topology-node.warn .node-state { color: var(--st-warn); }
+    .capacity-basis-note {
+        margin-top: 8px; color: var(--text-dim); font-size: 10px; line-height: 1.45;
+    }
+    .capacity-basis-note b { color: var(--text-main); }
+
     /* === HMI WIDGETS (v1.41.6 — block/chart/widget visuals for Security tab) === */
     .hmi-grid {
         display: grid;
@@ -459,6 +495,30 @@
     .alm-ack { font-weight: 700; }
     .alm-ack.no { color: var(--st-warn); } .alm-ack.yes { color: var(--st-ok); }
     .no-alarms { text-align: center; color: var(--text-mute); font-size: 12px; padding: 18px 0; }
+    .alarm-tools { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+    .alarm-tools button, .alarm-filter-actions button {
+        border: 1px solid var(--line); background: rgba(255,255,255,.035);
+        color: var(--text-main); min-height: 32px; padding: 5px 9px;
+        font: 600 10px/1.2 inherit; cursor: pointer;
+    }
+    .alarm-tools button:hover, .alarm-filter-actions button:hover { border-color: var(--st-sel); }
+    .alarm-result-count { color: var(--text-mute); font: 10px/1.2 'Consolas',monospace; }
+    .alarm-filter-panel {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 7px;
+        padding: 9px; margin-bottom: 9px; border: 1px solid var(--line-soft);
+        background: rgba(2,6,23,.55);
+    }
+    .alarm-filter-panel[hidden] { display: none; }
+    .alarm-field { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+    .alarm-field.wide { grid-column: 1 / -1; }
+    .alarm-field label { color: var(--text-mute); font-size: 9px; text-transform: uppercase; letter-spacing: .45px; }
+    .alarm-field input, .alarm-field select {
+        width: 100%; min-width: 0; height: 30px; padding: 4px 6px;
+        color: var(--text-main); background: #070d18; border: 1px solid var(--line);
+        font: 10px/1.2 'Consolas',monospace; color-scheme: dark;
+    }
+    .alarm-filter-actions { grid-column: 1 / -1; display: flex; gap: 6px; }
+    .alarm-filter-actions button:first-child { border-color: rgba(56,189,248,.55); color: var(--st-sel); }
 
     .calc-note {
         font-size: 10.5px; color: var(--text-mute); line-height: 1.5;
@@ -492,7 +552,12 @@
         .inspector { width: 300px; flex-basis: 300px; }
     }
     @media (max-width: 1200px) {
-        .inspector { display: none; }
+        .nav-rail { width: 72px; flex-basis: 72px; padding: 10px 6px; }
+        .nav-title, .nav-item .nlabel, .nav-item .ncount, .nav-back span { display: none; }
+        .nav-item, .nav-back { justify-content: center; }
+        .inspector { display: block; width: 270px; flex-basis: 270px; padding: 10px; }
+        .network-topology { grid-template-columns: repeat(2, minmax(160px, 1fr)); }
+        .topology-layer:nth-child(2)::after, .topology-layer:nth-child(2)::before { display: none; }
     }
     @media (max-width: 900px) {
         .nav-rail { width: 64px; flex-basis: 64px; padding: 10px 6px; }
@@ -519,6 +584,8 @@
         .nav-back { margin-top: 0; }
         .canvas { overflow-y: visible; padding: 10px; }
         .inspector { display: block; width: 100%; flex-basis: auto; border-left: none; border-top: 1px solid var(--line); }
+        .network-topology { grid-template-columns: 1fr; gap: 8px; }
+        .topology-layer::after, .topology-layer::before { display: none !important; }
         .status-bar { flex-wrap: wrap; height: auto; padding: 8px; }
         table.lt { font-size: 11px; }
         th, td { padding: 7px 8px !important; }
@@ -535,6 +602,7 @@
     }
 </style>
     <script src="js/conv-engine.js?v=1.22.0"></script>
+    <script src="js/conv-design-basis.js?v=1.0.0"></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
          Loaded for cross-page consistency; body does NOT carry rz-bms-shell
          class. Spec: standarization/BMS_SHELL.md ; conv/review/14 §8. -->
@@ -546,12 +614,16 @@
     <script src="js/rz-line-model.js?v=1.42.0"></script>
     <script src="js/rz-alarm-state.js?v=1.43.4" defer></script>
     <script src="js/rz-inspector.js?v=1.43.4" defer></script>
-    <script src="js/rz-telemetry-quality.js?v=1.43.2" defer></script>
+    <script src="js/rz-telemetry-quality.js?v=1.131.0" defer></script>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-07-22-navfix" defer></script>
     <script src="js/rz-cookie-consent.js?v=2026-07-14" defer></script>
     <!-- v1.43.20 — instrument register (RZ Dark System v1). Chrome-only, dark-only, scoped. -->
     <link rel="stylesheet" href="css/rz-cockpit-instrument.css?v=1.43.19">
+    <link rel="stylesheet" href="css/rz-conv-alarm-workspace.css?v=1.131.0">
+    <script src="js/datahall-ai/alarm-query.js?v=1.0.0" defer></script>
+    <script src="js/conv-alarm-events.js?v=1.0.0" defer></script>
+    <script src="js/conv-alarm-workspace.js?v=1.131.0" defer></script>
 </head>
 <body data-rz-data-mode="simulated">
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -568,6 +640,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
                 Portfolio
             </a>
+            <span class="rz-conv-alarm-slot" data-rz-alarm-launch-slot></span>
             <div class="brand">ICT Network Operations <span class="sub">— BKS01 Conventional DC</span></div>
             <div class="top-spacer"></div>
             <div class="meta-chip" title="Single engineering basis: conv-engine.js">Basis <b id="m-basis">IT 1.85 MW</b></div>
@@ -581,6 +654,7 @@
                 Export (n/a)
             </button>
         </div>
+        <div data-rz-telemetry-banner-slot></div>
 
         <!-- Top alarm strip (information hierarchy #1) -->
         <div class="alarm-strip" id="alarmStrip">
@@ -676,7 +750,20 @@
                 <div class="insp-block" id="insp-detail"></div>
 
                 <div class="insp-block">
-                    <h4>Active Network Alarms</h4>
+                    <div class="alarm-tools">
+                        <h4 style="margin:0;">Active Network Alarms</h4>
+                        <button type="button" id="alarm-filter-toggle" aria-expanded="false" aria-controls="alarm-filter-panel">Filter</button>
+                    </div>
+                    <div class="alarm-filter-panel" id="alarm-filter-panel" hidden>
+                        <div class="alarm-field"><label for="alarm-filter-from">From</label><input type="date" id="alarm-filter-from"></div>
+                        <div class="alarm-field"><label for="alarm-filter-to">To</label><input type="date" id="alarm-filter-to"></div>
+                        <div class="alarm-field"><label for="alarm-filter-severity">Severity</label><select id="alarm-filter-severity"><option value="all">All</option><option value="crit">Critical</option><option value="warn">Warning</option></select></div>
+                        <div class="alarm-field"><label for="alarm-filter-segment">Segment</label><select id="alarm-filter-segment"><option value="all">All</option><option value="it">IT / Data</option><option value="bms">BMS / OT</option><option value="sec">Security</option><option value="mgmt">Management</option><option value="wan">WAN / DCI</option><option value="mon">Monitoring</option></select></div>
+                        <div class="alarm-field wide"><label for="alarm-filter-state">Lifecycle</label><select id="alarm-filter-state"><option value="all">All states</option><option value="unack">Unacknowledged</option><option value="ack">Acknowledged</option></select></div>
+                        <div class="alarm-field wide"><label for="alarm-filter-search">Point / message</label><input type="search" id="alarm-filter-search" placeholder="Device, service, impact"></div>
+                        <div class="alarm-filter-actions"><button type="button" id="alarm-filter-apply">Apply</button><button type="button" id="alarm-filter-reset">Reset</button></div>
+                    </div>
+                    <div class="alarm-result-count" id="alarm-result-count" aria-live="polite">0 results</div>
                     <div id="alarm-list"></div>
                 </div>
 
@@ -710,7 +797,7 @@
     /* ============================================================================
      * ICT Network Operations Console — logic
      * All engineering / capacity values DERIVE from window.CONV_CALC.snapshot
-     * (single basis: IT 1.85 MW, PUE 1.45, ~231 active racks @ 8 kW/rack).
+     * (power context: IT 1.85 MW, PUE 1.45, 231 rack-equivalents @ 8 kW).
      * No Math.random for engineering values — every link metric is a deterministic
      * function of the basis or a fixed authored constant, stable across reloads.
      * Refs: 08-ict-network-review.md, 10-uiux-design-system.md,
@@ -725,37 +812,48 @@
         // Defensive fallback (engine must load first; this only guards a hard 404)
         var IT_KW   = SNAP ? SNAP.site.it_load_kw : 1850;
         var FAC_KW  = SNAP ? SNAP.site.facility_load_kw : 2682.5;
-        var RACKS   = SNAP ? SNAP.racks.at_8kw : 231;          // active racks @ 8 kW/rack
+        var RACK_EQ_8KW = SNAP ? SNAP.racks.at_8kw : 231;      // planning equivalence, not physical inventory
         var SCN     = SNAP ? SNAP.meta.scenario : 'Simulated';
         var DQ      = SNAP ? SNAP.meta.data_quality : 'GOOD';
+        var DESIGN_STUDY = window.RZConvDesignBasis && window.RZConvDesignBasis.STUDY
+            ? window.RZConvDesignBasis.STUDY : null;
+        var STUDY_ACCESS_GROUPS = DESIGN_STUDY
+            ? Math.ceil(DESIGN_STUDY.racksPerHall / 12) : null;
 
-        /* Derived network capacity, tied to the rack/IT basis (deterministic):
-         *  - IT/data fabric north-south offered load scales with IT power.
-         *    Empirical DC heuristic ~7.7 Mbps per IT kW of steady mixed workload
-         *    -> 1850 kW * 0.00768 = 14.2 Gbps offered on a 40 G core uplink pair.
-         *  - One Top-of-Rack access switch per ~12 active racks.
-         *  - BMS/OT poll gateways = one per monitored facility subsystem (6:
-         *    EPMS, Chiller, Datahall, Fire, Fuel, Water).
+        /* Network design capacity and traffic are independent authored bases.
+         * IT kW remains context only; it must never be converted into bandwidth.
+         * "Usable" honours the protection policy. "Survivable" is the capacity
+         * remaining after the named single failure, not another utilization KPI.
          */
-        var GBPS_PER_KW   = 0.00768;
-        var CORE_OFFERED  = round1(IT_KW * GBPS_PER_KW);        // ~14.2 Gbps
-        var CORE_CAPACITY = 40;                                 // 2x 40G LAG, authored
+        var NETWORK_CAPACITY_BASIS = {
+            core: { installedGbps: 80, usableGbps: 40, survivableGbps: 40, scope: '2 x 40G edge paths; one duty, one hot standby' },
+            fabric: { installedGbps: 400, usableGbps: 300, survivableGbps: 300, scope: '4 x 100G trunks; one path reserved for N+1' },
+            access: { installedSwitches: 20, usableSwitches: 20, survivableSwitches: 19, scope: 'single ToR loss is a local rack failure domain' }
+        };
+        var TRAFFIC_SCENARIO = {
+            aggregateOfferedGbps: 14.2,
+            eastWestGbps: 25.6,
+            customerEdgeGbps: 7.8,
+            wanEgressGbps: 8.5
+        };
+        var CORE_OFFERED  = TRAFFIC_SCENARIO.aggregateOfferedGbps;
+        var CORE_CAPACITY = NETWORK_CAPACITY_BASIS.core.usableGbps;
         var CORE_UTIL     = round1((CORE_OFFERED / CORE_CAPACITY) * 100); // ~35.5%
-        var TOR_COUNT     = Math.ceil(RACKS / 12);              // ~20 access switches
+        var TOR_COUNT     = NETWORK_CAPACITY_BASIS.access.usableSwitches;
         var BMS_GATEWAYS  = 6;
 
         function round1(n) { return Math.round(n * 10) / 10; }
         function pad(n) { return n < 10 ? '0' + n : '' + n; }
 
         /* ---- Link model (per doc-08 "Link Model") --------------------------
-         * Capacity/traffic are deterministic: IT segment scales from the basis;
-         * other segments use fixed engineering constants. status/redundancy are
+         * Capacity/traffic are deterministic authored network values. IT power is
+         * context only and never converted to bandwidth. status/redundancy are
          * authored. NO random — values identical on every reload.
          */
         var SEGMENTS = {
             it: {
                 title: 'IT / Data Fabric',
-                desc: 'Customer + east-west compute fabric. Capacity scales from the IT power basis.',
+                desc: 'Customer and compute fabric. Inventory capacity and traffic telemetry use separate authored bases.',
                 services: [
                     { n: 'Core Switching (SW-CORE-A/B)', s: 'ok',   v: 'Active/Active' },
                     { n: 'Spine-Leaf Fabric',            s: 'ok',   v: TOR_COUNT + ' ToR UP' },
@@ -763,10 +861,18 @@
                     { n: 'DDoS Scrubbing',               s: 'ok',   v: 'Armed' }
                 ],
                 caps: [
-                    { v: CORE_OFFERED, u: 'Gbps', l: 'Aggregate Offered', note: 'IT ' + (IT_KW/1000).toFixed(2) + ' MW x ' + GBPS_PER_KW + ' Gbps/kW', cls: 'ok' },
-                    { v: CORE_CAPACITY, u: 'Gbps', l: 'Core Uplink Cap', note: '2 x 40G LAG (SW-CORE-A/B)', cls: 'ok' },
-                    { v: CORE_UTIL, u: '%', l: 'Core Utilization', note: 'warn >80% per alarm rule', cls: CORE_UTIL > 80 ? 'warn' : 'ok' },
-                    { v: TOR_COUNT, u: '', l: 'Access Switches', note: RACKS + ' racks / 12 per ToR', cls: 'ok' }
+                    { v: NETWORK_CAPACITY_BASIS.core.installedGbps, u: 'Gbps', l: 'Installed Core', note: 'physical aggregate · 2 x 40G', cls: 'ok' },
+                    { v: NETWORK_CAPACITY_BASIS.core.usableGbps, u: 'Gbps', l: 'Usable Core', note: 'protected operating capacity', cls: 'ok' },
+                    { v: NETWORK_CAPACITY_BASIS.core.survivableGbps, u: 'Gbps', l: 'N+1 Survivable', note: 'after loss of one edge path', cls: 'ok' },
+                    { v: CORE_OFFERED, u: 'Gbps', l: 'Observed Traffic', note: 'authored traffic scenario · independent of IT kW', cls: 'ok' },
+                    { v: CORE_UTIL, u: '%', l: 'Usable Utilization', note: 'observed / usable · warn >80%', cls: CORE_UTIL > 80 ? 'warn' : 'ok' },
+                    { v: TOR_COUNT, u: '', l: 'Access Switches', note: 'installed inventory · local failure domains', cls: 'ok' },
+                    { v: STUDY_ACCESS_GROUPS === null ? 'UNAVAILABLE' : STUDY_ACCESS_GROUPS,
+                      u: STUDY_ACCESS_GROUPS === null ? '' : 'groups/hall', l: '4-Hall Study Access',
+                      note: STUDY_ACCESS_GROUPS === null
+                        ? 'governed rack study unavailable'
+                        : DESIGN_STUDY.racksPerHall + ' racks/hall · max 12 racks/group · physical switch topology pending',
+                      cls: 'warn' }
                 ],
                 links: [
                     ['RTR-BKS01 → SW-CORE-A', 'Primary',  40, CORE_OFFERED, 2.4, 0.01, 0.4, 'up',  'N+1 redundant'],
@@ -906,9 +1012,9 @@
                     { n: 'NTP Sync (Stratum-1)',s: 'ok',   v: 'Locked' }
                 ],
                 caps: [
-                    { v: round1(CORE_OFFERED * 0.6), u: 'Gbps', l: 'WAN Egress', note: 'subset of fabric offered', cls: 'ok' },
+                    { v: TRAFFIC_SCENARIO.wanEgressGbps, u: 'Gbps', l: 'WAN Egress', note: 'independent authored traffic scenario', cls: 'ok' },
                     { v: 20, u: 'Gbps', l: 'Transit Cap', note: 'ISP-1 + DCI', cls: 'ok' },
-                    { v: round1((CORE_OFFERED * 0.6 / 20) * 100), u: '%', l: 'Transit Util', note: 'warn >80%', cls: 'ok' },
+                    { v: round1((TRAFFIC_SCENARIO.wanEgressGbps / 20) * 100), u: '%', l: 'Transit Util', note: 'observed / installed transit', cls: 'ok' },
                     { v: 2.4, u: 'ms', l: 'BKS01↔SBY01', note: 'inter-DC RTT', cls: 'ok' }
                 ],
                 links: [
@@ -945,17 +1051,17 @@
             sec: [{
                 sev: 'warn', dev: 'VMS-01', svc: 'Security / CCTV',
                 msg: 'Video retention 14 d below 30 d policy target.',
-                started: '02:11', impact: 'No live monitoring loss', ack: false
+                occurred: '2026-08-27', started: '02:11', impact: 'No live monitoring loss', ack: false
             }],
             wan: [{
                 sev: 'warn', dev: 'DCI BKS01→MKS', svc: 'WAN / OT-impacting',
                 msg: 'Tertiary inter-DC path in standby; N+1 only (no N+2).',
-                started: '06:48', impact: 'Reduced WAN redundancy', ack: true
+                occurred: '2026-08-26', started: '06:48', impact: 'Reduced WAN redundancy', ack: true
             }],
             mon: [{
                 sev: 'warn', dev: 'Probe-Sensors', svc: 'Monitoring',
                 msg: '2 sensors WARNING, 1 sensor stale (>60 s) — UPS-B input bank.',
-                started: '07:02', impact: 'Telemetry quality degraded', ack: false
+                occurred: '2026-08-27', started: '07:02', impact: 'Telemetry quality degraded', ack: false
             }]
         };
 
@@ -1077,6 +1183,68 @@
             return h;
         }
 
+        var NETWORK_TOPOLOGY = {
+            it: [
+                { label: 'External / DCI', nodes: [['ISP-1 / ISP-2', 'UP'], ['DCI BKS01-MKS', 'DEGRADED', 'warn']] },
+                { label: 'Edge / Core', nodes: [['RTR-BKS01', 'UP'], ['SW-CORE-A', 'DUTY'], ['SW-CORE-B', 'STANDBY', 'stby']] },
+                { label: 'Fabric / Access', nodes: [['SPINE 1-4', '4 / 4 UP'], ['ToR 01-20', '20 / 20 UP']] },
+                { label: 'Racks / Services', nodes: [['8 kW rack-equivalent', RACK_EQ_8KW + ' eq.'], ['Customer edge', 'BGP UP']] }
+            ],
+            bms: [
+                { label: 'External / DCI', nodes: [['NTP / Historian', 'UP']] },
+                { label: 'Edge / Core', nodes: [['BMS-GW-01', 'UP'], ['OT firewall pair', 'UP']] },
+                { label: 'Fabric / Access', nodes: [['OT access pair', 'UP']] },
+                { label: 'Racks / Services', nodes: [['EPMS / CHW / Fire', '6 GW UP']] }
+            ],
+            sec: [
+                { label: 'External / DCI', nodes: [['SOC off-site', 'UP']] },
+                { label: 'Edge / Core', nodes: [['Security firewall', 'UP'], ['VMS core', 'WARN', 'warn']] },
+                { label: 'Fabric / Access', nodes: [['Camera access', 'UP']] },
+                { label: 'Racks / Services', nodes: [['96 cameras', 'UP'], ['48 doors', 'UP']] }
+            ],
+            mgmt: [
+                { label: 'External / DCI', nodes: [['Secure remote access', 'UP']] },
+                { label: 'Edge / Core', nodes: [['OOB firewall', 'UP']] },
+                { label: 'Fabric / Access', nodes: [['Console switches', 'UP']] },
+                { label: 'Racks / Services', nodes: [['BMC / iLO / iDRAC', 'UP']] }
+            ],
+            wan: [
+                { label: 'External / DCI', nodes: [['ISP-1 / ISP-2', 'UP'], ['DCI tertiary', 'STANDBY', 'stby']] },
+                { label: 'Edge / Core', nodes: [['WAN routers A/B', 'UP']] },
+                { label: 'Fabric / Access', nodes: [['Transit VRF', 'UP']] },
+                { label: 'Racks / Services', nodes: [['Customer / OT routes', 'UP']] }
+            ],
+            mon: [
+                { label: 'External / DCI', nodes: [['Notification relay', 'UP']] },
+                { label: 'Edge / Core', nodes: [['Probe core', 'UP']] },
+                { label: 'Fabric / Access', nodes: [['Polling collectors', '2 UP']] },
+                { label: 'Racks / Services', nodes: [['Sensors', '2 WARN', 'warn'], ['Historian', 'UP']] }
+            ]
+        };
+
+        function renderNetworkTopology(key) {
+            var layers = NETWORK_TOPOLOGY[key] || NETWORK_TOPOLOGY.it;
+            var html = '<div class="panel"><div class="panel-head">Architecture / Topology'
+                + '<span class="ph-meta">operational path and failure domains</span></div>'
+                + '<div class="panel-body"><div class="network-topology">';
+            for (var i = 0; i < layers.length; i++) {
+                html += '<section class="topology-layer"><h5>' + layers[i].label + '</h5>';
+                for (var n = 0; n < layers[i].nodes.length; n++) {
+                    var node = layers[i].nodes[n];
+                    html += '<div class="topology-node ' + (node[2] || '') + '"><span>'
+                        + node[0] + '</span><span class="node-state">' + node[1] + '</span></div>';
+                }
+                html += '</section>';
+            }
+            html += '</div>';
+            if (key === 'it') {
+                html += '<div class="capacity-basis-note"><b>Capacity states:</b> installed 80 Gbps physical; '
+                    + 'usable 40 Gbps under protected policy; N+1 survivable 40 Gbps after one edge-path loss. '
+                    + 'Access-switch loss is a local rack failure domain.</div>';
+            }
+            return html + '</div></div>';
+        }
+
         function renderSegment(key) {
             var seg = SEGMENTS[key];
             var html = '';
@@ -1091,6 +1259,7 @@
                       + sv.n + '</span><span class="sval">' + sv.v + '</span></div>';
             }
             html += '</div>';
+            html += renderNetworkTopology(key);
 
             if (key === 'mon') {
                 // Operationalised PRTG panel
@@ -1115,7 +1284,7 @@
 
                 // Capacity summary cards
                 html += '<div class="panel"><div class="panel-head">Capacity Summary'
-                      + '<span class="ph-meta">derived from single basis</span></div>'
+                      + '<span class="ph-meta">authored design inventory + deterministic telemetry</span></div>'
                       + '<div class="panel-body"><div class="cap-grid">';
                 for (var c = 0; c < seg.caps.length; c++) {
                     var cc = seg.caps[c];
@@ -1221,16 +1390,18 @@
                  + (cls ? ' ' + cls : '') + '">' + v + '</span></div>';
         }
 
-        function renderAlarmList() {
-            var list = allAlarms();
+        function renderAlarmList(list) {
+            list = list || allAlarms();
             var box = document.getElementById('alarm-list');
-            if (!list.length) { box.innerHTML = '<div class="no-alarms">No active network alarms</div>'; return; }
+            var count = document.getElementById('alarm-result-count');
+            if (count) count.textContent = list.length + (list.length === 1 ? ' result' : ' results');
+            if (!list.length) { box.innerHTML = '<div class="no-alarms">No alarms match the current query.</div>'; return; }
             var html = '';
             for (var i = 0; i < list.length; i++) {
                 var a = list[i];
                 html += '<div class="alm ' + a.sev + '">'
                       + '<div class="alm-top"><span class="alm-sev">' + a.sev + '</span>'
-                      + '<span class="alm-time">' + a.started + '</span></div>'
+                      + '<span class="alm-time">' + a.occurred + ' ' + a.started + '</span></div>'
                       + '<div class="alm-dev">' + a.dev + ' · ' + a.svc + '</div>'
                       + '<div class="alm-msg">' + a.msg + '</div>'
                       + '<div class="alm-foot"><span class="alm-impact">Impact: '
@@ -1238,6 +1409,58 @@
                       + (a.ack ? 'yes">ACK' : 'no">UNACK') + '</span></div></div>';
             }
             box.innerHTML = html;
+        }
+
+        function filterValue(id) {
+            var node = document.getElementById(id);
+            return node ? String(node.value || '').trim() : '';
+        }
+
+        function applyAlarmFilters() {
+            var from = filterValue('alarm-filter-from');
+            var to = filterValue('alarm-filter-to');
+            var severity = filterValue('alarm-filter-severity');
+            var segment = filterValue('alarm-filter-segment');
+            var state = filterValue('alarm-filter-state');
+            var query = filterValue('alarm-filter-search').toLowerCase();
+            var list = allAlarms().filter(function (alarm) {
+                if (from && alarm.occurred < from) return false;
+                if (to && alarm.occurred > to) return false;
+                if (severity && severity !== 'all' && alarm.sev !== severity) return false;
+                if (segment && segment !== 'all' && alarm.seg !== segment) return false;
+                if (state === 'ack' && !alarm.ack) return false;
+                if (state === 'unack' && alarm.ack) return false;
+                if (!query) return true;
+                var haystack = [alarm.dev, alarm.svc, alarm.msg, alarm.impact].join(' ').toLowerCase();
+                return haystack.indexOf(query) !== -1;
+            });
+            renderAlarmList(list);
+            return list;
+        }
+
+        function resetAlarmFilters() {
+            ['alarm-filter-from', 'alarm-filter-to', 'alarm-filter-search'].forEach(function (id) {
+                document.getElementById(id).value = '';
+            });
+            ['alarm-filter-severity', 'alarm-filter-segment', 'alarm-filter-state'].forEach(function (id) {
+                document.getElementById(id).value = 'all';
+            });
+            applyAlarmFilters();
+        }
+
+        function bindAlarmFilters() {
+            var toggle = document.getElementById('alarm-filter-toggle');
+            var panel = document.getElementById('alarm-filter-panel');
+            toggle.addEventListener('click', function () {
+                var opening = panel.hidden;
+                panel.hidden = !opening;
+                toggle.setAttribute('aria-expanded', opening ? 'true' : 'false');
+            });
+            document.getElementById('alarm-filter-apply').addEventListener('click', applyAlarmFilters);
+            document.getElementById('alarm-filter-reset').addEventListener('click', resetAlarmFilters);
+            document.getElementById('alarm-filter-search').addEventListener('keydown', function (event) {
+                if (event.key === 'Enter') applyAlarmFilters();
+            });
         }
 
         function updateNavCounts() {
@@ -1307,14 +1530,14 @@
             document.getElementById('m-quality').textContent = DQ;
             var note = document.getElementById('calc-note');
             note.innerHTML =
-                '<b>Engineering basis (conv-engine.js):</b> IT load '
+                '<b>Independent engineering bases:</b> Power context from conv-engine.js: IT load '
               + IT_KW + ' kW, facility ' + FAC_KW.toFixed(1) + ' kW (PUE 1.45), '
-              + RACKS + ' active racks @ 8 kW/rack. '
-              + 'IT fabric aggregate offered = ' + IT_KW + ' kW &times; '
-              + GBPS_PER_KW + ' Gbps/kW = <b>' + CORE_OFFERED.toFixed(1)
-              + ' Gbps</b> on a ' + CORE_CAPACITY + ' Gbps core ('
-              + CORE_UTIL.toFixed(1) + '% util). Access switches = ceil('
-              + RACKS + '/12) = ' + TOR_COUNT + '. All deterministic &mdash; '
+              + RACK_EQ_8KW + ' rack-equivalents @ 8 kW (not physical inventory). Network inventory: '
+              + NETWORK_CAPACITY_BASIS.core.installedGbps + ' Gbps installed / '
+              + NETWORK_CAPACITY_BASIS.core.usableGbps + ' Gbps usable / '
+              + NETWORK_CAPACITY_BASIS.core.survivableGbps + ' Gbps N+1 survivable. '
+              + '<b>' + CORE_OFFERED.toFixed(1) + ' Gbps traffic scenario independent of IT power</b> ('
+              + CORE_UTIL.toFixed(1) + '% of usable). All deterministic &mdash; '
               + 'identical on reload, no random for engineering values.';
         }
 
@@ -1357,6 +1580,7 @@
             updateNavCounts();
             updateAlarmStrip();
             renderBottomBar();
+            bindAlarmFilters();
             renderSegment('it');
             window.selectSegment('it', document.getElementById('nav-it'));
             renderAlarmList();
@@ -1406,6 +1630,6 @@
     </style>
 
 
-    <div class="rz-manual-link" style="text-align:center; padding:0.9rem 1rem 1.3rem;"><style>.rz-manual-link a{display:inline-block;font-family:'JetBrains Mono','Courier New',monospace;font-size:0.72rem;letter-spacing:0.04em;text-decoration:none;border:1px solid;border-radius:6px;padding:0.45rem 0.85rem;color:#94a3b8;border-color:rgba(148,163,184,0.35)}.rz-manual-link a:hover{color:#67e8f9;border-color:rgba(103,232,249,0.45)}</style><a href="manual/ict.html">Technical Manual &amp; Methodology &#8599;</a></div>
+    <div class="rz-manual-link" style="display:flex;justify-content:center;gap:.5rem;flex-wrap:wrap;padding:0.9rem 1rem 1.3rem;"><style>.rz-manual-link a{display:inline-block;font-family:'JetBrains Mono','Courier New',monospace;font-size:0.72rem;letter-spacing:0.04em;text-decoration:none;border:1px solid;border-radius:6px;padding:0.45rem 0.85rem;color:#94a3b8;border-color:rgba(148,163,184,0.35)}.rz-manual-link a:hover{color:#67e8f9;border-color:rgba(103,232,249,0.45)}</style><a href="prd/dc-conventional.html#ict-contract">Master PRD &#8599;</a><a href="manual/ict.html">Technical Manual &amp; Methodology &#8599;</a></div>
 </body>
 </html>

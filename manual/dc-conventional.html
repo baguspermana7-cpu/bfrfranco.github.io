@@ -118,7 +118,7 @@
             {
                 "@type": "Question",
                 "name": "How is WUE derived and what does 37 L/min mean?",
-                "acceptedAnswer": { "@type": "Answer", "text": "WUE = 1.20 L/kWh is the site water-usage effectiveness target (ISO/IEC 30134-2 definition: annual cooling-makeup water / annual IT energy). The cockpit converts it to an instant equivalent makeup flow: 1.20 × 1,850 / 60 = 37.0 L/min, which is the steady-state evaporative loss rate a cooling tower operator would monitor." }
+                "acceptedAnswer": { "@type": "Answer", "text": "WUE = 1.20 L/kWh is the site water-usage effectiveness target under ISO/IEC 30134-9. The cockpit converts it to an equivalent average flow: 1.20 × 1,850 / 60 = 37.0 L/min. It is not relabeled as a measured instantaneous cooling-tower flow." }
             }
         ]
     }
@@ -417,7 +417,7 @@
             <div class="mn-formula">
                 <span class="mn-eq">WUE = annual cooling makeup water [L] / annual IT energy [kWh]   = 1.20 L/kWh</span>
                 <span class="mn-eq">Instant equivalent flow = (WUE × IT) / 60  → (1.20 × 1 850) / 60 = 37.0 L/min</span>
-                <span class="mn-where">In <code>waterFlowLpmForWue(m)</code>. WUE definition per ISO/IEC 30134-2. The cockpit shows the steady-state equivalent makeup-water flow rate a cooling-tower operator monitors. The display value is 37 L/min — not "37 × 60 = 2 220 L/hr" on the raw basis chip; the fraction /60 converts kWh×L/kWh to L/min.<span class="mn-src">doc-09 lines 99–104; ISO/IEC 30134-2</span></span>
+                <span class="mn-where">In <code>waterFlowLpmForWue(m)</code>. WUE definition and reporting context follow ISO/IEC 30134-9. The cockpit shows a steady-state equivalent makeup-water rate, not a measured instantaneous flow. The display value is 37 L/min; the factor /60 converts kWh×L/kWh to L/min.<span class="mn-src">doc-09 lines 99–104; ISO/IEC 30134-9:2022</span></span>
             </div>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Carbon usage effectiveness (CUE)</h3>
@@ -434,7 +434,7 @@
                 <span class="mn-eq">             = 60 000 × 0.90 × 0.85 = 45 900 L</span>
                 <span class="mn-eq">Autonomy     = usable fuel / generator consumption rate</span>
                 <span class="mn-eq">             = 45 900 / 956 = 48.0 hr</span>
-                <span class="mn-where">In <code>fuelUsableL(m)</code>, <code>fuelAutonomyHr(m)</code>. The 48 hr design target is a Uptime Institute requirement for Tier III/IV continuous operations — validated against doc-09 lines 132–147.<span class="mn-src">doc-09 lines 132–147; Uptime Institute Tier Standard</span></span>
+                <span class="mn-where">In <code>fuelUsableL(m)</code>, <code>fuelAutonomyHr(m)</code>. The 48 hr value is this project model's autonomy result. It does not by itself prove an Uptime Tier or universal minimum; site risk policy, refuelling logistics, generator loading and certification authority govern the required duration.<span class="mn-src">doc-09 lines 132–147; project basis</span></span>
             </div>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Active-rack estimates</h3>
@@ -453,10 +453,12 @@
                 <span class="mn-where">In <code>epmsTotalKw(m)</code>, <code>epmsUpsOutputKw(m)</code>. Metering tolerance ±2% is a quality flag, not an applied offset — the cockpit shows nominal values. EPMS = Electrical Power Monitoring System.<span class="mn-src">doc-00 line 77; doc-12 line 9</span></span>
             </div>
 
-            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Four-hall capacity study</h3>
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Governed four-hall capacity study</h3>
             <div class="mn-formula">
                 <span class="mn-eq">Planning IT = 4 halls × 10 MW IT/hall = 40 MW IT</span>
-                <span class="mn-where">This is a document-only planning scope. It is not passed to <code>CONV_CALC</code>, does not replace the current 1,850 kW snapshot, and is not multiplied by the current PUE to assert a facility design. Electrical, cooling, structural, fuel, water and network sizing require separate approved studies.</span>
+                <span class="mn-eq">Rack basis = 500 racks/hall × 20 kW/rack average = 10 MW IT/hall</span>
+                <span class="mn-eq">Design facility input = 40 MW IT × dPUE 1.45 = 58 MW at the declared 100% design point</span>
+                <span class="mn-where">The separately frozen <code>RZConvDesignBasis.STUDY</code> owns this document-only planning scope. Its thermal contract is chilled-water CRAH / air cooling with a project rack-inlet target of 25.4 °C, inside the ASHRAE recommended 18–27 °C envelope. Air properties are evaluated at 25.4 °C, 101.325 kPa and 50% RH with c<sub>p</sub> = 1.006 kJ/(kg·K); heat rejection is an evaporative cooling-tower study. A 200-rack/hall option implies 50 kW/rack and therefore fails this air-cooling contract. The study never replaces the current 1,850 kW snapshot. dPUE 1.45 is valid only at the declared design point; off-design facility power remains unavailable until an approved monotonic part-load curve exists.</span>
             </div>
         </section>
 
@@ -509,12 +511,12 @@
                     <tr><td>Chillers running / total</td><td><code>model.cooling.chillers_*</code></td><td>—</td><td>Cooling panel status</td></tr>
                     <tr><td>Water makeup flow</td><td><code>waterFlowLpmForWue()</code></td><td>L/min</td><td>Water panel</td></tr>
                     <tr><td>Fuel level / usable</td><td><code>model.fuel.level_pct / fuelUsableL()</code></td><td>% / L</td><td>Fuel panel gauge</td></tr>
-                    <tr><td>Fuel autonomy</td><td><code>fuelAutonomyHr()</code></td><td>hr</td><td>Fuel panel — 48 hr design target</td></tr>
+                    <tr><td>Fuel autonomy</td><td><code>fuelAutonomyHr()</code></td><td>hr</td><td>Fuel panel — 48 hr project/model result</td></tr>
                     <tr><td>Active racks (3 densities)</td><td><code>activeRacks(m, kW)</code></td><td>count</td><td>IT capacity panel</td></tr>
                     <tr><td>Avg temperature / RH</td><td><code>model.environment.avg_temp_c / avg_rh_pct</code></td><td>°C / %</td><td>Environment panel</td></tr>
                     <tr><td>EPMS metering tolerance</td><td><code>model.electrical.metering_tolerance_pct</code></td><td>%</td><td>EPMS quality chip</td></tr>
                     <tr><td>Current Design Studio snapshot</td><td><code>CONV_CALC.snapshot</code></td><td>kW</td><td>Current scope: locked 1,850 kW IT basis only</td></tr>
-                    <tr><td>Four-hall capacity appendix</td><td>4 × 10 MW IT</td><td>MW IT</td><td>Current-plus-study scope: 40 MW planning reference, non-adopted</td></tr>
+                    <tr><td>Four-hall capacity appendix</td><td>4 × 10 MW IT; 500 racks/hall; 20 kW/rack average</td><td>MW IT / rack / kW·rack⁻¹</td><td>Current-plus-study scope: governed 40 MW planning reference, non-adopted</td></tr>
                 </tbody>
             </table>
             </div>
@@ -545,11 +547,11 @@
                     <li><strong>Heat rejection:</strong> <code>1 850 + 77.1 =</code> <span class="mn-result">1 927.1 kW</span> — within design band 1 850–1 950 kW ✓</li>
                     <li><strong>WUE check:</strong> 1.20 L/kWh (basis) · instant makeup flow: <code>(1.20 × 1 850) / 60 =</code> <span class="mn-result">37.0 L/min</span></li>
                     <li><strong>Carbon rate:</strong> <code>2 682.5 × 0.42 =</code> <span class="mn-result">1 126.7 kgCO₂/hr</span> · CUE (IT-basis): <code>0.42 × 1.45 =</code> <span class="mn-result">0.609 kgCO₂/kWh-IT</span></li>
-                    <li><strong>Usable fuel:</strong> <code>60 000 × 0.90 × 0.85 =</code> <span class="mn-result">45 900 L</span> · Autonomy: <code>45 900 / 956 =</code> <span class="mn-result">48.0 hr</span> ✓ (Uptime Tier III/IV target)</li>
+                    <li><strong>Usable fuel:</strong> <code>60 000 × 0.90 × 0.85 =</code> <span class="mn-result">45 900 L</span> · Autonomy: <code>45 900 / 956 =</code> <span class="mn-result">48.0 hr</span> (project/model result; no certification inference)</li>
                     <li><strong>Active racks at 8 kW/rack:</strong> <code>1 850 / 8 =</code> <span class="mn-result">231 racks</span></li>
                 </ol>
             </div>
-            <div class="mn-note"><strong>Engineering reading:</strong> the cockpit operates at 92.5% of design IT capacity (1 850/2 000 kW). PUE 1.45 is consistent with a mid-efficiency conventional chilled-water site (ASHRAE 90.1 baseline for the climate zone). The 48 hr fuel autonomy is the Uptime Institute minimum for uninterrupted Tier III/IV operations without refuelling.</div>
+            <div class="mn-note"><strong>Engineering reading:</strong> the cockpit operates at 92.5% of its current modeled IT design capacity (1 850/2 000 kW). PUE 1.45 and 48 hr autonomy are declared scenario values, not universal quality grades, code baselines or Tier evidence. Operational targets require an approved metering boundary, load profile, climate basis, risk policy and certification review.</div>
         </section>
 
         <!-- 7. REFERENCES -->
@@ -559,8 +561,9 @@
                 <li><b>conv review doc 09</b> — 09-engineering-basis-and-calculations.md: primary source for all scenario constants (IT load, PUE, WUE, CHW loop, UPS efficiency, fuel system). Line numbers cited throughout.</li>
                 <li><b>ASHRAE 90.1</b> — Energy Standard for Buildings: PUE benchmarks and baseline cooling-system design parameters for conventional chilled-water data centres.</li>
                 <li><b>ASHRAE TC9.9</b> — Thermal Guidelines for Data Processing Environments: cold-aisle temperature and RH recommended bands (A1/A2 class).</li>
-                <li><b>Uptime Institute Tier Standard</b> — Operational Sustainability (2021): 48 hr fuel autonomy requirement for Tier III/IV maintained availability.</li>
-                <li><b>ISO/IEC 30134-2</b> — Key Performance Indicators for Data Centres — Part 2: Power Usage Effectiveness (PUE) and Water Usage Effectiveness (WUE) definitions.</li>
+                <li><b>Uptime Institute Tier Standard</b> — topology and concurrently-maintainable design intent; the cockpit does not claim certification or infer a universal fuel duration.</li>
+                <li><b>ISO/IEC 30134-2:2026</b> — Data-centre Power Usage Effectiveness (PUE) definition and reporting boundary.</li>
+                <li><b>ISO/IEC 30134-9:2022</b> — Water Usage Effectiveness (WUE) definition, measurement categories, calculation and reporting interpretation.</li>
                 <li><b>ISO/IEC 30134-8</b> — Key Performance Indicators for Data Centres — Part 8: Carbon Usage Effectiveness (CUE). Denominator = IT energy; grid carbon factor applied at facility-energy basis per doc-09 line 14.</li>
                 <li><b>Engine source</b> — <code class="mn-mono">js/conv-engine.js</code> (CONV_CALC v1.0.0 + CONV_MODEL, deep-frozen). Gate: <code class="mn-mono">tools/test-conv-calc.mjs</code> (22/22 DoD identities).</li>
                 <li><b>Accuracy gate</b> — <code class="mn-mono">tools/probe-accuracy-validation.mjs</code> (40/40 acceptance tests, 6 accuracy rules). Must pass before any cockpit change ships.</li>
@@ -580,8 +583,9 @@
             <p class="mn-lead"><strong>Fuel consumption:</strong> 956 L/hr is the generator consumption at approximately 2.7 MW facility load (generator output ≈ non-IT + IT generation, accounting for prime-move fuel burn curve). It is an engineering estimate for sizing, not a live meter reading.</p>
             <p class="mn-lead"><strong>WUE and water flow:</strong> The 37 L/min figure is the steady-state equivalent evaporative makeup rate derived from the annual WUE target. Actual instantaneous cooling-tower blowdown, drift loss, and basin makeup vary with ambient wet-bulb temperature. This cockpit displays the design-point equivalent only.</p>
             <p class="mn-lead"><strong>Carbon intensity:</strong> 0.42 kgCO₂/kWh is a fixed grid-average factor from the engineering basis. Real-time grid decarbonisation, marginal emissions, and Scope 2 market-based accounting are out of scope.</p>
-            <p class="mn-lead"><strong>Capacity planning:</strong> Four halls at 10 MW IT each is a <em>40 MW IT planning brief only</em>. It is not installed, energized, commissioned, measured or represented by the current 1,850 kW telemetry snapshot. No facility-input, cooling, generator, fuel, water or network capacity is inferred from that study without an approved discipline model.</p>
-            <p class="mn-lead"><strong>Design Studio:</strong> The <em>current</em> scope is generated only from the captured <code class="mn-mono">CONV_CALC.snapshot</code>. The <em>current-plus-study</em> scope appends the 4 × 10 MW planning brief with explicit non-adoption language; changing scope does not change cockpit data.</p>
+            <p class="mn-lead"><strong>Capacity planning:</strong> Four halls at 10 MW IT each is a <em>40 MW IT planning brief only</em>, governed by <code class="mn-mono">js/conv-design-basis.js</code>. It assumes 500 air-cooled racks per hall at 20 kW average (30 kW selected peak), chilled-water CRAH cooling, evaporative cooling-tower heat rejection and the declared subsystem resilience intent. It is not installed, energized, commissioned, measured or represented by the current 1,850 kW telemetry snapshot.</p>
+            <p class="mn-lead"><strong>Design-point efficiency:</strong> 1.45 is a dPUE input at 100% study load, not a part-load performance curve and not a claim of annual measured PUE. Off-design study facility power fails closed until an approved monotonic curve is supplied. The current cockpit PUE remains the independent 1.45 modeled snapshot ratio.</p>
+            <p class="mn-lead"><strong>Design Studio:</strong> The <em>current</em> scope is generated only from the captured <code class="mn-mono">CONV_CALC.snapshot</code>. The <em>current-plus-study</em> scope appends the reconciled design basis from <code class="mn-mono">RZConvDesignBasis.STUDY</code>; changing scope does not change cockpit data.</p>
             <p class="mn-lead">This manual and the cockpit are an <strong>engineering education and operational reference aid</strong>. They do not substitute for a live DCIM/EPMS/BMS with calibrated sensors, metered telemetry, and alarm setpoints set by a qualified controls engineer to the site authority having jurisdiction.</p>
         </section>
 
@@ -638,7 +642,7 @@
                     <tr><td>Day tank</td><td>Day Tank 92% row</td><td>Static presentation.</td><td>Bulk-tank 85%/48 h arithmetic does not validate this separate buffer value.</td></tr>
                     <tr><td>Data Quality / Scenario</td><td><code>as-dq</code>, <code>as-scn</code></td><td>Snapshot metadata.</td><td>GOOD describes internal model availability; Simulated is the governing provenance.</td></tr>
                     <tr><td>EPMS final rack path</td><td><code>w_ats_rack_*</code></td><td>Modeled topology state in <code>EPMS_Telemetry.html</code>.</td><td>The conductor inherits its actual energizing source; red/green never replaces source and energized-state text.</td></tr>
-                    <tr><td>Four-hall planning appendix</td><td>Design Studio current-plus-study</td><td>Document-only assumption.</td><td>4 × 10 MW = 40 MW IT remains outside current telemetry and outside <code>CONV_CALC.snapshot</code>.</td></tr>
+                    <tr><td>Four-hall planning appendix</td><td>Design Studio current-plus-study</td><td>Frozen document-only study.</td><td>4 × 10 MW = 40 MW IT, 500 racks/hall and design-point dPUE remain outside current telemetry and outside <code>CONV_CALC.snapshot</code>.</td></tr>
                 </tbody>
             </table>
             </div>

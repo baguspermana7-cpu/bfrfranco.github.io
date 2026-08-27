@@ -313,7 +313,7 @@
         <header class="mn-hero">
             <p class="mn-eyebrow">Technical Manual · Cockpit Basis</p>
             <h1>Data Hall SCADA Console — Methodology &amp; Formulas</h1>
-            <p>Every basis parameter, derivation, constant, KPI output, and reference behind the conventional single-hall SCADA cockpit. All values derive deterministically from the deep-frozen <code class="mn-mono">CONV_CALC</code> snapshot in <code class="mn-mono">js/conv-engine.js</code> — one engineering scenario, one source of truth, no user inputs on this page.</p>
+            <p>Every basis parameter, derivation, constant, KPI output, and reference behind the conventional SCADA cockpit. Current operation derives from the deep-frozen <code class="mn-mono">CONV_CALC</code> snapshot; the separate Hall A–D capacity context derives from <code class="mn-mono">RZConvDesignBasis.STUDY</code>. Neither authority is mutated by the selector.</p>
             <div class="mn-meta">
                 <span class="mn-chip">Engine <strong>CONV_CALC v1.0.0</strong></span>
                 <span class="mn-chip">Basis <strong>Locked snapshot</strong></span>
@@ -343,6 +343,7 @@
             </table>
             </div>
             <div class="mn-note"><strong>No user inputs:</strong> this is a SCADA display cockpit, not a parametric calculator. The scenario is fixed to a real-world-representative conventional data hall. If you need to explore alternate PUE or CHW parameters, use the <a class="mn-inline" href="../dc-conventional.html">DC Conventional Calculator</a>.</div>
+            <div class="mn-note"><strong>Current versus study:</strong> the current rack field remains the frozen 1,850 kW / 200-cell Hall A training snapshot (9.25 kW/cell average). The governed planning study is four 10 MW IT halls with 500 racks/hall at 20 kW/rack average. Its Hall selector is view-only. The study uses 25.4 °C as a project rack-inlet target inside the ASHRAE recommended 18–27 °C envelope; it does not relabel CRAH discharge air, current cold-aisle temperature or CHW temperature.</div>
         </section>
 
         <!-- 2. LOCKED BASIS PARAMETERS -->
@@ -359,7 +360,7 @@
                     <tr><td>WUE</td><td><code>environment.wue_l_per_kwh</code></td><td>1.20</td><td>L/kWh</td><td>09 line 13 ("WUE 1.20 L/kWh")</td></tr>
                     <tr><td>Grid carbon intensity</td><td><code>environment.carbon_kg_per_facility_kwh</code></td><td>0.42</td><td>kgCO₂/kWh</td><td>09 line 14 (denominator = facility kWh)</td></tr>
                     <tr><td>Cold-aisle avg temperature</td><td><code>environment.avg_temp_c</code></td><td>22.4</td><td>°C</td><td>01-dashboard-review.md §"Right-Side Stats Panel"; ASHRAE TC9.9 recommended band</td></tr>
-                    <tr><td>Relative humidity</td><td><code>environment.avg_rh_pct</code></td><td>48</td><td>%RH</td><td>09/01 environment row; ASHRAE recommended 40–60 % band midpoint</td></tr>
+                    <tr><td>Relative humidity</td><td><code>environment.avg_rh_pct</code></td><td>48</td><td>%RH</td><td>Project operating basis. ASHRAE equipment guidance is class/dew-point dependent; 40–60% is not presented as a universal standard.</td></tr>
                     <tr><td>CHW supply temperature</td><td><code>cooling.chws_c</code></td><td>7.2</td><td>°C</td><td>09 line 15 ("CHW supply 7.2 C") — canonical CHW basis decision</td></tr>
                     <tr><td>CHW return temperature</td><td><code>cooling.chwr_c</code></td><td>14.8</td><td>°C</td><td>09 line 15 ("CHW return 14.8 C") — canonical CHW basis decision</td></tr>
                     <tr><td>Chillers running / total</td><td><code>cooling.chillers_running/total</code></td><td>2 / 3</td><td>—</td><td>01-dashboard-review.md §2 ("Chillers 2/3")</td></tr>
@@ -450,7 +451,7 @@
                     <tr><td>CHW supply / return</td><td><code>7.2 / 14.8 °C</code></td><td>doc-09 lines 15, 81–84; doc-00 §"Single Capacity Basis" line 62</td><td>Canonical basis locked to conventional chilled-water loop (not condenser side).</td></tr>
                     <tr><td>UPS efficiency η</td><td><code>0.96 (96%)</code></td><td>doc-09 line 39; IEC 62040-3 typical transformer-free double-conversion</td><td>Gives 77 kW loss at 1,850 kW IT (check: 1,850×(1/0.96−1) = 77.1 kW).</td></tr>
                     <tr><td>Grid carbon factor</td><td><code>0.42 kgCO₂/kWh</code></td><td>doc-09 line 14</td><td>Facility-energy denominator per R3. Facility = IT × PUE.</td></tr>
-                    <tr><td>WUE</td><td><code>1.20 L/kWh</code></td><td>doc-09 line 13; Uptime Institute WUE benchmark (good: 1.0–1.4 L/kWh)</td><td>IT-energy denominator. Consistent with ASHRAE cooling-tower makeup at this PUE.</td></tr>
+                    <tr><td>WUE</td><td><code>1.20 L/kWh</code></td><td>doc-09 line 13; ISO/IEC 30134-9:2022 reporting context</td><td>Project/model value with IT-energy denominator; no universal “good” grade is asserted.</td></tr>
                     <tr><td>Metering tolerance</td><td><code>±2%</code></td><td>doc-12 line 9 ("within 2%")</td><td>Applies to EPMS total kW display; nominal = facility load without offset.</td></tr>
                     <tr><td>Generator consumption</td><td><code>956 L/hr</code></td><td>doc-09 lines 144–147</td><td>At ~2.7 MW facility load. Used only for fuel autonomy; cockpit does not display load-dependent fuel burn.</td></tr>
                     <tr><td>Tank usable fraction</td><td><code>90%</code></td><td>doc-09 line 141; typical heel volume for above-ground diesel storage</td><td>Bottom 10% of tank volume is typically inaccessible sludge / unusable heel.</td></tr>
@@ -503,15 +504,15 @@
                     <li>Active racks at 10 kW/rack: <code>floor(1,850 / 10) =</code> <span class="mn-result">185 racks</span></li>
                 </ol>
             </div>
-            <div class="mn-note"><strong>Engineering reading:</strong> at PUE 1.45 and WUE 1.20 L/kWh this hall sits in the Uptime Institute "good" band for both metrics. The 48-hour fuel autonomy at full facility load provides one full-day runtime margin against the Uptime Tier III 72-hour N+1 generation target; extending to 72 hr would require ~60 % more usable fuel or a second supply route.</div>
+            <div class="mn-note"><strong>Engineering reading:</strong> PUE 1.45, WUE 1.20 L/kWh and 48-hour fuel autonomy are declared project/model values. This cockpit does not assign them a universal “good” grade or claim that a particular fuel duration proves an Uptime Tier. The owner’s risk policy, utility reliability, delivery contract, load-dependent generator curve and certification authority govern any operational target.</div>
         </section>
 
         <!-- 7. REFERENCES -->
         <section class="mn-section">
             <h2><span class="mn-num">07</span> References &amp; standards</h2>
             <ul class="mn-refs">
-                <li><b>ASHRAE TC9.9 (2021)</b> — Thermal Guidelines for Data Processing Environments: cold-aisle temperature band (18–27 °C recommended), humidity 40–60 %RH, PUE/WUE benchmarks.</li>
-                <li><b>Uptime Institute Tier Standard (2022)</b> — Tier III: N+1 redundancy, 72 hr fuel autonomy target; WUE benchmark scale (good: 1.0–1.4 L/kWh).</li>
+                <li><b>ASHRAE Handbook — Data Centers and Telecommunication Facilities</b> — rack-inlet recommended dry-bulb envelope (18–27 °C for the applicable A classes) and class/dew-point-dependent humidity guidance. The project 25.4 °C target and 48% RH basis remain site decisions.</li>
+                <li><b>Uptime Institute Tier Standard</b> — topology and concurrently-maintainable intent. No certification, universal fuel-duration target or WUE grading band is inferred by this cockpit.</li>
                 <li><b>ISO/IEC 30134-2</b> — Data centre key performance indicators — Part 2: Power Usage Effectiveness (PUE). Defines PUE = total facility power / IT equipment power.</li>
                 <li><b>ISO/IEC 30134-3</b> — Data centre key performance indicators — Part 3: Renewable Energy Factor (REF). Referenced for carbon intensity context.</li>
                 <li><b>IEC 62040-3</b> — UPS performance and test methods: double-conversion (VFI) typical efficiency 94–97 % at full load; basis uses 96 %.</li>

@@ -64,19 +64,32 @@
         'box-shadow:0 4px 12px rgba(0,0,0,0.32);transition:transform .2s,opacity .2s;' +
         'pointer-events:none}' +
       '.rz-tq-banner.dismissed{transform:translateX(-50%) translateY(-110%);opacity:0;pointer-events:none}' +
+      '.rz-tq-banner--in-flow{position:static;top:auto;left:auto;transform:none;width:100%;max-width:none;' +
+        'box-sizing:border-box;justify-content:center;border-radius:0;box-shadow:none}' +
+      '.rz-tq-banner--in-flow.dismissed{display:none;transform:none}' +
+      '[data-theme="light"] .rz-tq-banner[data-rz-tq-state="live"]{color:#0B5D31!important;background:#E6F7ED!important;border-color:#167A45!important}' +
+      '[data-theme="light"] .rz-tq-banner[data-rz-tq-state="simulated"]{color:#3F1D8F!important;background:#F0ECFF!important;border-color:#6B4DB8!important}' +
+      '[data-theme="light"] .rz-tq-banner[data-rz-tq-state="stale"]{color:#6B4500!important;background:#FFF4D6!important;border-color:#946400!important}' +
+      '[data-theme="light"] .rz-tq-banner[data-rz-tq-state="manual"]{color:#07546A!important;background:#E3F8FC!important;border-color:#087D9A!important}' +
+      '[data-theme="light"] .rz-tq-banner[data-rz-tq-state="comms_lost"]{color:#8B1515!important;background:#FFEAEA!important;border-color:#B52222!important}' +
+      '[data-theme="light"] .rz-tq-banner[data-rz-tq-state="inhibited"]{color:#344254!important;background:#EEF2F6!important;border-color:#5A6C80!important}' +
+      '[data-theme="light"] .rz-tq-banner[data-rz-tq-state="demo"]{color:#684F00!important;background:#FFF8D6!important;border-color:#8B6A00!important}' +
       '.rz-tq-banner-dot{width:8px;height:8px;border-radius:50%;background:currentColor;' +
         'animation:rzTqPulse 1.8s ease-in-out infinite}' +
       '@keyframes rzTqPulse{0%,100%{opacity:.45}50%{opacity:1}}' +
       '.rz-tq-banner-close{background:transparent;border:none;color:inherit;cursor:pointer;' +
-        'font-size:14px;line-height:1;padding:0 0 0 4px;opacity:.65;pointer-events:auto}' +
+        'font-size:14px;line-height:1;padding:0;opacity:.65;pointer-events:auto;min-width:44px;' +
+        'min-height:44px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 44px}' +
       '.rz-tq-banner-close:hover{opacity:1}' +
+      '.rz-tq-banner-close:focus-visible{outline:2px solid var(--rz-accent-signal,#FFAA00);outline-offset:2px}' +
       '.rz-tq-chip{display:inline-block;padding:1px 6px;border-radius:3px;' +
         'font-family:JetBrains Mono,monospace;font-size:9px;font-weight:700;' +
         'letter-spacing:.05em;text-transform:uppercase;line-height:1.4;' +
         'vertical-align:baseline;margin-left:6px}' +
-      '@media(max-width:768px){.rz-tq-banner{top:auto;bottom:0;max-width:calc(100vw - 16px);' +
-        'border-radius:4px 4px 0 0;white-space:normal}.rz-tq-banner.dismissed{' +
-        'transform:translateX(-50%) translateY(110%)}}';
+      '@media(prefers-reduced-motion:reduce){.rz-tq-banner-dot{animation:none}.rz-tq-banner{transition:none}}' +
+      '@media(max-width:768px){.rz-tq-banner:not(.rz-tq-banner--in-flow){top:0;bottom:auto;max-width:calc(100vw - 16px);' +
+        'border-radius:0 0 4px 4px;white-space:normal}.rz-tq-banner:not(.rz-tq-banner--in-flow).dismissed{' +
+        'transform:translateX(-50%) translateY(-110%)}}';
     (doc.head || doc.documentElement).appendChild(st);
   }
 
@@ -105,15 +118,19 @@
       return;
     }
     var st = getState(pageMode);
+    var slot = doc.querySelector('[data-rz-telemetry-banner-slot]');
     if (!bannerEl) {
       bannerEl = doc.createElement('div');
       bannerEl.className = 'rz-tq-banner';
       bannerEl.setAttribute('role', 'status');
       bannerEl.setAttribute('data-rz-tq-banner', '1');
-      doc.body.appendChild(bannerEl);
     }
+    if (slot) { bannerEl.classList.add('rz-tq-banner--in-flow'); }
+    else { bannerEl.classList.remove('rz-tq-banner--in-flow'); }
+    if (bannerEl.parentElement !== (slot || doc.body)) { (slot || doc.body).appendChild(bannerEl); }
     bannerEl.style.cssText = 'background:' + st.bg + ';color:' + st.color +
                              ';border:1px solid ' + st.bd + ';border-top:0';
+    bannerEl.setAttribute('data-rz-tq-state', pageMode);
     var label = pageMode === 'simulated' ? 'Simulated telemetry — engine-derived basis' :
                 pageMode === 'demo'      ? 'Demo mode — training values only' :
                                             st.label + ' — ' + esc(pageMode);

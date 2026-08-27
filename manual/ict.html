@@ -114,7 +114,7 @@
             {
                 "@type": "Question",
                 "name": "How is uptime% calculated?",
-                "acceptedAnswer": { "@type": "Answer", "text": "Uptime% = available_hr / 8760 * 100, where available_hr = 8760 - downtime_hr per year. Tier 3 (TIA-942) targets 99.982% = 1.6 hr/yr downtime. Tier 4 targets 99.995% = 0.4 hr/yr. Values above 99.9% indicate the cockpit is in a healthy state." }
+                "acceptedAnswer": { "@type": "Answer", "text": "The selected availability scenario is available_hr / 8760 * 100, where available_hr = 8760 - downtime_hr. It is a project ratio only and does not establish a TIA-942 rating or Uptime Institute Tier certification." }
             },
             {
                 "@type": "Question",
@@ -322,18 +322,24 @@
             <a class="mn-toollink" href="../ict.html">&#9654; Open the live ICT Cockpit</a>
         </header>
 
+        <nav class="mn-section mn-note" aria-labelledby="contents-title">
+            <h2 id="contents-title">Table of contents</h2>
+            <ol><li><a class="mn-inline" href="#purpose">Purpose &amp; scope</a></li><li><a class="mn-inline" href="#inputs">Inputs</a></li><li><a class="mn-inline" href="#methodology">Calculations</a></li><li><a class="mn-inline" href="#constants">Constants</a></li><li><a class="mn-inline" href="#outputs">Outputs</a></li><li><a class="mn-inline" href="#worked-example">Worked example</a></li><li><a class="mn-inline" href="#references">References</a></li><li><a class="mn-inline" href="#limitations">Limitations</a></li></ol>
+        </nav>
+
         <!-- 1. PURPOSE -->
-        <section class="mn-section">
+        <section class="mn-section" id="purpose">
             <h2><span class="mn-num">01</span> Purpose &amp; scope</h2>
             <p class="mn-lead">The ICT &amp; Network cockpit is a <strong>network operations monitoring view</strong> for the BKS01 conventional data centre. It answers five operational questions: <em>how many devices are active in each network segment</em>, <em>is the facility still operable over its BMS/OT network</em>, <em>what is the uptime percentage against annual availability targets</em>, <em>how full are the rack cabinets</em>, and <em>how much bandwidth headroom remains on core uplinks</em>.</p>
-            <p class="mn-lead">Unlike the fire-suppression, chiller, or power calculators, the ICT cockpit does <strong>not</strong> solve physics equations. Its outputs are <em>counts</em> (integer device totals), <em>ratios</em> (percentage utilisations), and <em>authored alarm states</em>. The engineering basis — IT load, rack count, and PUE — is inherited from <code class="mn-mono">conv-engine.js</code> to ensure a single source of truth across all BKS01 cockpit pages.</p>
+            <p class="mn-lead">Unlike the fire-suppression, chiller, or power calculators, the ICT cockpit does <strong>not</strong> solve physics equations. Its outputs are <em>counts</em> (integer device totals), <em>ratios</em> (percentage utilisations), and <em>authored alarm states</em>. IT load and PUE from <code class="mn-mono">conv-engine.js</code> are power context only; network inventory and observed traffic have independent authored authorities.</p>
+            <p class="mn-lead"><strong>Truth boundary:</strong> the current page shows 80 Gbps installed / 40 Gbps protected usable core capacity, 20 access switches and a 14.2 Gbps authored traffic scenario. The separate four-hall study uses 500 racks per hall and derives <code>ceil(500/12) = 42</code> logical access groups per hall. Physical switch count, port speed, uplink ratio and dual-ToR policy remain unavailable until an approved network architecture is supplied.</p>
             <div class="mn-note"><strong>Accuracy scope:</strong> ICT is informational and is NOT under the physics-accuracy gates (<code class="mn-mono">probe-accuracy-validation.mjs</code>) that cover the power, cooling, and fire pages. Values are anchored to the conv-engine.js basis and to authored engineering constants; no <code>Math.random</code> is used for any displayed metric.</div>
         </section>
 
         <!-- 2. INPUTS -->
-        <section class="mn-section">
+        <section class="mn-section" id="inputs">
             <h2><span class="mn-num">02</span> Inputs</h2>
-            <p class="mn-lead">Two input groups: the <strong>device inventory</strong> (counts per device category, used to derive active-device totals and segment badge counts) and <strong>uptime / bandwidth controls</strong> (annual downtime hours and link capacity used to compute percentage ratios). Capacity values are authored engineering constants tied to the conv-engine.js IT-power basis.</p>
+            <p class="mn-lead">Three input groups are kept separate: <strong>device inventory</strong>, <strong>network capacity and observed traffic</strong>, and <strong>power context</strong>. The current network values are authored independently of IT kW; the governed study contributes rack count only and cannot manufacture port speeds or bandwidth.</p>
             <div class="mn-tablewrap">
             <table class="mn-table">
                 <thead><tr><th>Input</th><th>Symbol</th><th>Unit</th><th>Default / source</th><th>Meaning</th></tr></thead>
@@ -342,10 +348,11 @@
                     <tr><td>Switch count <code>nSwitches</code></td><td><code>N<sub>sw</sub></code></td><td>count</td><td>From asset register / SNMP</td><td>Core + distribution + ToR access switches across all segments.</td></tr>
                     <tr><td>Firewall count <code>nFirewalls</code></td><td><code>N<sub>fw</sub></code></td><td>count</td><td>From asset register</td><td>Perimeter and segment firewalls (active + standby pair counted separately).</td></tr>
                     <tr><td>Access-point count <code>nAPs</code></td><td><code>N<sub>ap</sub></code></td><td>count</td><td>From asset register</td><td>Wi-Fi APs in NOC, common areas, and secure wireless zones.</td></tr>
-                    <tr><td>Annual downtime <code>downtime_hr</code></td><td><code>D</code></td><td>hr/yr</td><td>Authored per Tier target</td><td>Total unplanned + planned downtime hours per year used for uptime% calculation.</td></tr>
+                    <tr><td>Annual downtime <code>downtime_hr</code></td><td><code>D</code></td><td>hr/yr</td><td>Authored project scenario</td><td>Total unplanned + planned downtime hours used for a generic availability ratio; it is not a Tier certification result.</td></tr>
                     <tr><td>Used rack-U <code>used_U</code></td><td><code>U<sub>used</sub></code></td><td>U</td><td>From DCIM / physical audit</td><td>Occupied U positions across all active cabinets.</td></tr>
-                    <tr><td>Core link capacity <code>cap_Gbps</code></td><td><code>C</code></td><td>Gbps</td><td>40 Gbps (2 × 40G LAG)</td><td>Aggregate core-uplink capacity from which bandwidth headroom is derived.</td></tr>
-                    <tr><td>Core link usage <code>usage_Gbps</code></td><td><code>U<sub>bw</sub></code></td><td>Gbps</td><td>Derived: IT_kW × 0.00768 Gbps/kW</td><td>Offered aggregate traffic on the core uplink pair, derived from the IT power basis.</td></tr>
+                    <tr><td>Core installed / usable capacity</td><td><code>C<sub>inst</sub></code> / <code>C<sub>use</sub></code></td><td>Gbps</td><td>80 / 40 (authored)</td><td>Two 40 Gbps edge paths; protected operating capacity is 40 Gbps after reserving the alternate path.</td></tr>
+                    <tr><td>Observed traffic <code>usage_Gbps</code></td><td><code>U<sub>bw</sub></code></td><td>Gbps</td><td>14.2 (authored scenario)</td><td>Deterministic traffic telemetry independent of IT power; replace with measured counters in production.</td></tr>
+                    <tr><td>Study racks / grouping policy</td><td><code>R<sub>study</sub></code> / <code>R<sub>group</sub></code></td><td>racks</td><td>500 / 12 per hall</td><td>Planning input only; yields 42 logical access groups per hall, not a physical switch design.</td></tr>
                     <tr><td>OT gateway count <code>nGateways</code></td><td><code>G</code></td><td>count</td><td>6 (authored)</td><td>BMS/OT polling gateways: EPMS, Chiller, Datahall, Fire, Fuel, Water.</td></tr>
                 </tbody>
             </table>
@@ -353,7 +360,7 @@
         </section>
 
         <!-- 3. METHODOLOGY -->
-        <section class="mn-section">
+        <section class="mn-section" id="methodology">
             <h2><span class="mn-num">03</span> Calculation methodology</h2>
             <p class="mn-lead">All formulas are simple arithmetic — sums, ratios, and ceiling divisions. There are no differential equations or thermodynamic constants. Function names below map directly to the inline JavaScript in <code class="mn-mono">ict.html</code>.</p>
 
@@ -363,17 +370,18 @@
                 <span class="mn-where">Integer sum of all device categories from the asset register. Drives the segment navigation badge counts. No physics — pure inventory arithmetic.<span class="mn-src">Asset register · SNMP</span></span>
             </div>
 
-            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Access-switch count (derived from rack basis)</h3>
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Study access-group count</h3>
             <div class="mn-formula">
-                <span class="mn-eq">TOR_count = ceil( RACKS / 12 )        [switches]</span>
-                <span class="mn-where">One Top-of-Rack switch per 12 active racks. RACKS = ceil(IT_kW / 8) from <code>conv-engine.js</code> (231 racks @ IT 1.85 MW). Ceiling division rounds up to the next whole switch.<span class="mn-src">conv-engine.js basis · Engineering constant</span></span>
+                <span class="mn-eq">access_groups_per_hall = ceil( study_racks_per_hall / 12 ) = ceil(500 / 12) = 42</span>
+                <span class="mn-eq">campus_access_groups = 4 × 42 = 168</span>
+                <span class="mn-where">This is a logical grouping assumption for study visibility. It does not assert one physical switch per group; port count, dual-ToR policy, optics and oversubscription require an approved network brief.<span class="mn-src">RZConvDesignBasis.STUDY · project grouping assumption</span></span>
             </div>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Annual uptime percentage</h3>
             <div class="mn-formula">
                 <span class="mn-eq">uptime_pct = available_hr / 8760 × 100        [%]</span>
                 <span class="mn-eq">available_hr = 8760 − downtime_hr</span>
-                <span class="mn-where">8760 = hours in a non-leap year. downtime_hr is the sum of all unplanned + planned outage hours. <strong>Tier 3 (TIA-942):</strong> 99.982% = 1.57 hr/yr. <strong>Tier 4:</strong> 99.995% = 0.44 hr/yr. Legacy "Tier 3 = 99.9% = 8.76 hr/yr" is the older Uptime Institute classification; TIA-942-B uses 99.982%.<span class="mn-src">TIA-942-B · Uptime Institute</span></span>
+                <span class="mn-where">8760 is the number of hours in a non-leap year. The ratio reports the selected project scenario only. Uptime Institute Tier is a topology and operational-sustainability certification process; this arithmetic does not establish a Tier rating or certified availability.<span class="mn-src">Project scenario · Uptime Institute Tier Certification</span></span>
             </div>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Rack-U utilisation</h3>
@@ -384,10 +392,9 @@
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Bandwidth utilisation &amp; headroom</h3>
             <div class="mn-formula">
-                <span class="mn-eq">core_util_pct    = usage_Gbps / cap_Gbps × 100        [%]</span>
-                <span class="mn-eq">bw_headroom_pct  = ( cap_Gbps − usage_Gbps ) / cap_Gbps × 100        [%]</span>
-                <span class="mn-eq">usage_Gbps       = IT_kW × 0.00768        (empirical DC heuristic: ~7.7 Mbps/kW mixed workload)</span>
-                <span class="mn-where">Core uplink capacity is 40 Gbps (2 × 40G LAG, authored). Usage is a deterministic function of IT power — not polled live. Warn if core_util_pct &gt; 80% (headroom &lt; 20%).<span class="mn-src">conv-engine.js basis · Engineering constant 0.00768 Gbps/kW</span></span>
+                <span class="mn-eq">core_util_pct    = observed_Gbps / usable_Gbps × 100        [%]</span>
+                <span class="mn-eq">bw_headroom_pct  = ( usable_Gbps − observed_Gbps ) / usable_Gbps × 100        [%]</span>
+                <span class="mn-where">Observed traffic is the authored 14.2 Gbps scenario; usable capacity is 40 Gbps. Neither value is derived from IT kW. Warn if utilisation exceeds the declared 80% operating threshold.<span class="mn-src">ict.html NETWORK_CAPACITY_BASIS · TRAFFIC_SCENARIO</span></span>
             </div>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">OT gateway reachability</h3>
@@ -409,12 +416,12 @@
             <div class="mn-formula">
                 <span class="mn-eq">link_util_pct = ( traffic_Gbps / cap_Gbps ) × 100        if link status = 'up'</span>
                 <span class="mn-eq">link_util_pct = 0                                          if status = 'stby' or 'down'</span>
-                <span class="mn-where">Per-row calculation for the Links table. Traffic values for the IT segment scale from IT_kW × 0.00768; BMS/OT and security links use authored fixed values reflecting Modbus/BACnet and H.265 CCTV traffic profiles.<span class="mn-src">conv-engine.js basis · Per-link authored constants</span></span>
+                <span class="mn-where">Per-row calculation for the Links table. IT, BMS/OT and security traffic values are deterministic authored telemetry scenarios, independent of the power model.<span class="mn-src">ict.html SEGMENTS · authored network telemetry</span></span>
             </div>
         </section>
 
         <!-- 4. CONSTANTS -->
-        <section class="mn-section">
+        <section class="mn-section" id="constants">
             <h2><span class="mn-num">04</span> Constants &amp; engineering basis</h2>
             <p class="mn-lead">All authored constants have a comment-tag in the source indicating their origin. Key values:</p>
             <div class="mn-tablewrap">
@@ -422,16 +429,16 @@
                 <thead><tr><th>Constant</th><th>Value</th><th>Source / rationale</th></tr></thead>
                 <tbody>
                     <tr><td>IT load basis</td><td><code>IT_kW = 1850 kW</code></td><td>conv-engine.js <code>SNAP.site.it_load_kw</code></td></tr>
-                    <tr><td>Rack count</td><td><code>RACKS = ceil(1850 / 8) = 232</code> → authored 231</td><td>conv-engine.js <code>SNAP.racks.at_8kw</code></td></tr>
-                    <tr><td>ToR ratio</td><td><code>1 switch per 12 racks</code></td><td>Engineering constant — typical spine-leaf ToR density</td></tr>
-                    <tr><td>Traffic heuristic</td><td><code>0.00768 Gbps/kW</code> (~7.7 Mbps/kW)</td><td>Empirical DC heuristic for mixed north-south + east-west workload</td></tr>
-                    <tr><td>Core uplink capacity</td><td><code>40 Gbps</code> (2 × 40G LAG)</td><td>Authored — SW-CORE-A/B active/active LAG</td></tr>
+                    <tr><td>8 kW rack-equivalent</td><td><code>round(1850 / 8) = 231</code></td><td>Power-planning equivalence from <code>SNAP.racks.at_8kw</code>; not physical rack inventory</td></tr>
+                    <tr><td>Current access inventory</td><td><code>20 switches</code></td><td>Authored installed inventory; not back-solved from rack-equivalent power</td></tr>
+                    <tr><td>Study grouping</td><td><code>max 12 racks/group</code></td><td>Project planning assumption; 42 logical groups/hall at 500 racks/hall</td></tr>
+                    <tr><td>Observed traffic</td><td><code>14.2 Gbps</code></td><td>Authored deterministic telemetry scenario independent of IT kW</td></tr>
+                    <tr><td>Core capacity</td><td><code>80 installed / 40 usable / 40 survivable Gbps</code></td><td>Authored protected-capacity contract</td></tr>
                     <tr><td>Standard cabinet height</td><td><code>42U</code></td><td>EIA-310-D full-height cabinet</td></tr>
                     <tr><td>Core util warn threshold</td><td><code>80 %</code></td><td>Standard NOC headroom rule — action before saturation</td></tr>
                     <tr><td>Stale-telemetry warn</td><td><code>&gt; 60 s</code></td><td>SNMP polling interval threshold — authored per PRTG best practice</td></tr>
                     <tr><td>Uptime hours/year</td><td><code>8760 hr</code></td><td>Non-leap year (365 × 24)</td></tr>
-                    <tr><td>Tier 3 downtime budget</td><td><code>1.57 hr/yr = 99.982%</code></td><td>TIA-942-B Rated-3</td></tr>
-                    <tr><td>Tier 4 downtime budget</td><td><code>0.44 hr/yr = 99.995%</code></td><td>TIA-942-B Rated-4</td></tr>
+                    <tr><td>Availability objective</td><td><code>project input</code></td><td>Not a Tier certification or guaranteed uptime value</td></tr>
                     <tr><td>OT gateway count</td><td><code>6</code> (EPMS, Chiller, Datahall, Fire, Fuel, Water)</td><td>BKS01 BMS architecture — authored</td></tr>
                     <tr><td>CCTV camera count</td><td><code>96</code> (64 ext + 32 int)</td><td>Authored from physical security design</td></tr>
                     <tr><td>Access door count</td><td><code>48</code></td><td>Authored — biometric + card reader doors</td></tr>
@@ -443,18 +450,18 @@
         </section>
 
         <!-- 5. OUTPUTS -->
-        <section class="mn-section">
+        <section class="mn-section" id="outputs">
             <h2><span class="mn-num">05</span> Outputs</h2>
             <div class="mn-tablewrap">
             <table class="mn-table">
                 <thead><tr><th>Output</th><th>Formula</th><th>Unit</th><th>Interpretation</th></tr></thead>
                 <tbody>
                     <tr><td>Active devices</td><td><code>N<sub>srv</sub>+N<sub>sw</sub>+N<sub>fw</sub>+N<sub>ap</sub></code></td><td>count</td><td>Total monitored devices in the fleet.</td></tr>
-                    <tr><td>ToR switch count</td><td><code>ceil(RACKS/12)</code></td><td>count</td><td>Access switches required for current rack count.</td></tr>
-                    <tr><td>Core aggregate offered</td><td><code>IT_kW × 0.00768</code></td><td>Gbps</td><td>Estimated north-south + east-west traffic.</td></tr>
+                    <tr><td>Study access groups</td><td><code>ceil(500/12)</code></td><td>groups/hall</td><td>Logical grouping only; physical switch design remains pending.</td></tr>
+                    <tr><td>Core observed traffic</td><td>authored scenario</td><td>Gbps</td><td>Deterministic network telemetry independent of IT power.</td></tr>
                     <tr><td>Core utilisation</td><td><code>offered/cap × 100</code></td><td>%</td><td>Warn if &gt; 80% (headroom &lt; 20%).</td></tr>
                     <tr><td>Bandwidth headroom</td><td><code>(cap−offered)/cap × 100</code></td><td>%</td><td>Available capacity before congestion alarm.</td></tr>
-                    <tr><td>Annual uptime %</td><td><code>available_hr/8760 × 100</code></td><td>%</td><td>Compare to Tier 3 (99.982%) or Tier 4 (99.995%) target.</td></tr>
+                    <tr><td>Annual availability scenario</td><td><code>available_hr/8760 × 100</code></td><td>%</td><td>Project ratio only; not a Tier certification result.</td></tr>
                     <tr><td>Rack-U utilisation</td><td><code>used_U/42 × 100</code></td><td>%</td><td>Space pressure; warn above 80%.</td></tr>
                     <tr><td>OT gateways online</td><td><code>Σ(online)</code></td><td>count / %</td><td>Facility controllability — all 6 must be online for full ops.</td></tr>
                     <tr><td>Segment alarm badges</td><td><code>Σ(crit+warn)</code> per segment</td><td>count</td><td>Nav-rail badge; red = critical, amber = warning.</td></tr>
@@ -467,46 +474,49 @@
         </section>
 
         <!-- 6. WORKED EXAMPLE -->
-        <section class="mn-section">
+        <section class="mn-section" id="worked-example">
             <h2><span class="mn-num">06</span> Worked example</h2>
-            <p class="mn-lead">BKS01 default state: IT 1.85 MW, 231 active racks @ 8 kW, 40 Gbps core LAG. Numbers reproduce the live cockpit display exactly.</p>
+            <p class="mn-lead">BKS01 default state: IT 1.85 MW power context, 231 rack-equivalents at 8 kW, 80 Gbps installed / 40 Gbps usable core capacity and 14.2 Gbps observed traffic. Rack-equivalent is not physical inventory.</p>
             <div class="mn-worked">
                 <ol>
                     <li>Active device inventory: <code>servers + switches + firewalls + APs</code> — example: <code>450 + 22 + 4 + 8 =</code> <span class="mn-result">484 active devices</span></li>
-                    <li>ToR switch count: <code>ceil(231 / 12) =</code> <span class="mn-result">20 access switches</span></li>
-                    <li>Core aggregate offered: <code>1850 kW × 0.00768 Gbps/kW =</code> <span class="mn-result">14.2 Gbps</span></li>
+                    <li>Current access inventory: <span class="mn-result">20 switches</span> (authored installed state, not calculated from IT power).</li>
+                    <li>Four-hall study grouping: <code>ceil(500 / 12) =</code> <span class="mn-result">42 logical access groups per hall</span>; physical switch topology remains pending.</li>
+                    <li>Observed traffic: <span class="mn-result">14.2 Gbps</span> from the authored traffic scenario, independent of the 1.85 MW power context.</li>
                     <li>Core utilisation: <code>14.2 / 40 × 100 =</code> <span class="mn-result">35.5 %</span> → well under 80% warn threshold ✓</li>
                     <li>Bandwidth headroom: <code>(40 − 14.2) / 40 × 100 =</code> <span class="mn-result">64.5 %</span> → healthy ✓</li>
-                    <li>Annual uptime (Tier 3): downtime budget 1.57 hr/yr → <code>(8760 − 1.57) / 8760 × 100 =</code> <span class="mn-result">99.982 %</span></li>
+                    <li>Availability example: a selected 1.57 hr/yr downtime scenario gives <code>(8760 − 1.57) / 8760 × 100 =</code> <span class="mn-result">99.982 %</span>; this does not confer a Tier rating.</li>
                     <li>Rack-U utilisation example: 168 used-U across 4 racks = 4 × 42 = 168 total → <code>168 / 168 × 100 =</code> <span class="mn-result">100 %</span> (all U occupied — triggered warn); single 42U cabinet at 32 used-U: <code>32 / 42 × 100 =</code> <span class="mn-result">76.2 %</span> → below 80% ✓</li>
                     <li>OT gateways: all 6 online → <code>6 / 6 × 100 =</code> <span class="mn-result">100 %</span> → facility controllability nominal ✓</li>
                     <li>Alarm strip: 0 critical, 3 warning (VMS retention, tertiary DCI standby, stale sensor) → <span class="mn-result">ATTENTION</span> state</li>
                 </ol>
             </div>
-            <div class="mn-note"><strong>Engineering reading:</strong> the ICT cockpit is healthy when core utilisation is below 80%, all 6 OT gateways are online, uptime% meets the Tier target, and no critical alarms are active. The three current warnings (VMS retention shortfall, tertiary WAN redundancy, 1 stale sensor) are non-impacting to facility operations.</div>
+            <div class="mn-note"><strong>Engineering reading:</strong> the ICT cockpit is healthy when core utilisation is below the declared threshold, all 6 OT gateways are online, the selected availability objective is met, and no critical alarms are active. The three current warnings require operator review even when the authored scenario labels them non-service-impacting.</div>
         </section>
 
         <!-- 7. REFERENCES -->
-        <section class="mn-section">
+        <section class="mn-section" id="references">
             <h2><span class="mn-num">07</span> References &amp; standards</h2>
             <ul class="mn-refs">
-                <li><b>TIA-942-B</b> — Telecommunications Infrastructure Standard for Data Centers: Tier availability targets (Rated-3: 99.982%, Rated-4: 99.995%), cabling and redundancy requirements.</li>
+                <li><b>TIA-942</b> — Telecommunications infrastructure requirements for data centres; apply the licensed edition and project conformity scope rather than copied uptime percentages.</li>
                 <li><b>ISO/IEC 27001:2022</b> — Information security management systems: asset inventory requirements, access control, network segmentation, and monitoring obligations.</li>
-                <li><b>Uptime Institute Tier Standard</b> — Topology classification (Tier I–IV) and the legacy 99.9% Tier 3 / 99.99% Tier 4 uptime targets.</li>
+                <li><a href="https://connect.uptimeinstitute.com/tier-certification"><b>Uptime Institute Tier Certification</b></a> — independent certification of design documents, constructed facility and operational sustainability; this cockpit makes no certification claim.</li>
                 <li><b>ANSI/EIA-310-D</b> — Cabinets, Racks, Panels, and Associated Equipment: 42U standard full-height cabinet definition.</li>
                 <li><b>SNMP v2c/v3 (RFC 1157 / RFC 3411)</b> — Simple Network Management Protocol: device polling, sensor freshness, and trap-based alarm sourcing used in live deployments.</li>
                 <li><b>NFPA 75</b> — Standard for the Fire Protection of Information Technology Equipment: network and IT room requirements informing physical security and segmentation design.</li>
-                <li><b>conv-engine.js</b> — single engineering basis (IT 1.85 MW, PUE 1.45, 231 racks @ 8 kW/rack) inherited by the ICT cockpit.</li>
+                <li><b>conv-engine.js</b> — power context (IT 1.85 MW, PUE 1.45, 231 rack-equivalents at 8 kW); not the network-inventory or traffic authority.</li>
+                <li><b>conv-design-basis.js</b> — separate four-hall study authority (500 racks/hall); contributes rack grouping context only.</li>
                 <li><b>rz-line-model.js · rz-alarm-state.js · rz-inspector.js</b> — shared BMS cockpit modules providing semantic line metadata, alarm state management, and inspector panel wiring.</li>
             </ul>
         </section>
 
         <!-- 8. ASSUMPTIONS -->
-        <section class="mn-section">
+        <section class="mn-section" id="limitations">
             <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
-            <p class="mn-lead">The cockpit is a <strong>demonstration and engineering-education tool</strong>, not a live SNMP/SIEM feed. Device counts, alarm states, and link traffic values are authored engineering constants derived from the conv-engine.js basis. In a production deployment, these would be replaced by SNMP polling, PRTG sensor readings, and DCIM data exports. Key limitations:</p>
+            <p class="mn-lead">The cockpit is a <strong>demonstration and engineering-education tool</strong>, not a live SNMP/SIEM feed. Device counts, alarm states, capacity and link traffic are authored network values; IT load is context only. In production these would be replaced by SNMP/streaming telemetry, CMDB and DCIM sources. Key limitations:</p>
             <ul style="color:var(--mn-muted);font-size:0.88rem;line-height:1.7;padding-left:1.2rem;margin:0;">
-                <li>Traffic values are heuristic estimates (<code>IT_kW × 0.00768 Gbps/kW</code>) — not measured counters. Actual traffic depends on workload mix.</li>
+                <li>Traffic values are authored deterministic scenarios, not measured counters and not derived from IT power. Actual traffic depends on workload mix.</li>
+                <li>The 42 access groups per study hall do not define physical switch count, port speed, uplink oversubscription, optics or dual-ToR policy.</li>
                 <li>Uptime% is a ratio of authored downtime hours to 8760 — not computed from a real event log or CMDB.</li>
                 <li>Rack-U utilisation requires a physical audit or DCIM sync; it is not derivable from IT power alone.</li>
                 <li>BMS/OT gateway reachability is authored (all online) in the demo; a live system would use ICMP or protocol-level heartbeats.</li>

@@ -70,7 +70,11 @@
             layer.appendChild(link);
             return { link: link, slot: slot };
         });
-        document.body.appendChild(layer);
+        if (config.header.parentNode === document.body) {
+            document.body.insertBefore(layer, config.header);
+        } else {
+            document.body.appendChild(layer);
+        }
 
         function placeLinks() {
             bindings.forEach(function (binding) {

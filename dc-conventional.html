@@ -96,6 +96,15 @@ a { color: inherit; text-decoration: none; }
     display: flex;
     align-items: center;
     gap: 16px;
+    min-width: 0;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    order: -1;
+    min-width: 0;
 }
 
 .back-btn {
@@ -543,12 +552,19 @@ a { color: inherit; text-decoration: none; }
 
 /* Tablet Portrait */
 @media (max-width: 768px) {
-    .header { padding: 8px 12px; height: 52px; }
-    .header-left { gap: 8px; }
+    .header { padding: 8px 12px; height: auto; min-height: 0; align-items: stretch; }
+    .header-left { width: 100%; flex-direction: column; align-items: stretch; gap: 6px; }
+    .header-actions {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding-bottom: 2px;
+        scrollbar-width: thin;
+    }
     .back-btn { padding: 10px 12px; font-size: 13px; min-height: 44px; }
-    .header-title { font-size: 14px; }
+    .header-title { order: -1; width: 100%; font-size: 14px; line-height: 1.3; }
     .live-badge { font-size: 10px; padding: 4px 8px; }
-    .header-right { font-size: 10px; }
+    .header-right { display: none; }
 
     .kpi-strip { grid-template-columns: repeat(2, 1fr); gap: 6px; }
     .kpi-card { padding: 12px; }
@@ -577,10 +593,18 @@ a { color: inherit; text-decoration: none; }
 
 /* Mobile Phones */
 @media (max-width: 480px) {
-    .header { padding: 6px 10px; height: 56px; flex-wrap: wrap; }
-    .header-left { width: 100%; justify-content: flex-start; gap: 6px; }
+    .header { padding: 8px 10px; height: auto; min-height: 0; align-items: stretch; }
+    .header-left { width: 100%; flex-direction: column; align-items: stretch; gap: 6px; }
+    .header-actions {
+        order: 0;
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding-bottom: 2px;
+        scrollbar-width: thin;
+    }
     .back-btn { padding: 10px 10px; font-size: 12px; min-height: 44px; }
-    .header-title { font-size: 13px; }
+    .header-title { order: -1; width: 100%; font-size: 13px; line-height: 1.3; }
     .header-right { display: none; }
 
     .kpi-strip { grid-template-columns: 1fr 1fr; gap: 4px; }
@@ -876,12 +900,17 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
          Loaded NON-deferred so window.CONV_CALC exists before the inline
          dashboard script runs. Basis: conv/review/09-engineering-basis-and-calculations.md -->
     <script src="js/conv-engine.js?v=1.22.0"></script>
+    <script src="js/conv-design-basis.js?v=1.0.0"></script>
     <script src="js/rz-design-studio.js?v=1.130.0"></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
          Loaded for cross-page consistency; body does NOT carry rz-bms-shell class
          this ship (preserves page palette). Selective component adoption in
          later ships. Spec: standarization/BMS_SHELL.md ; conv/review/14 §1. -->
     <link rel="stylesheet" href="css/rz-bms-shell.css?v=1.23.2-ck">
+    <link rel="stylesheet" href="css/rz-conv-alarm-workspace.css?v=1.131.0">
+    <script src="js/datahall-ai/alarm-query.js?v=1.0.0" defer></script>
+    <script src="js/conv-alarm-events.js?v=1.0.0" defer></script>
+    <script src="js/conv-alarm-workspace.js?v=1.131.0" defer></script>
     <script src="js/rz-bms-shell.js?v=1.23.2" defer></script>
 <style id="rz-skiplink-v1">
 .skip-link{position:absolute;top:-50px;left:0;background:#1e3a5f;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 8px 0;transition:top .2s ease}
@@ -897,22 +926,25 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
 
 <header class="header">
     <div class="header-left">
-        <a href="index.html" class="back-btn" style="background:linear-gradient(135deg, rgba(100, 116, 139, 0.1), rgba(100, 116, 139, 0.05));border-color:rgba(100, 116, 139, 0.3);color:var(--accent-purple)">
-            <span>←</span> Portfolio
-        </a>
-        <a href="datacenter-solutions.html" class="back-btn">
-            <span>←</span> DC Solutions
-        </a>
-        <a class="back-btn rz-public-contract-link" href="prd/dc-conventional.html" style="min-width:44px">PRD</a>
-        <a class="back-btn rz-public-contract-link" href="manual/dc-conventional.html" style="min-width:44px">Manual</a>
         <h1 class="header-title">
             Conventional DC Dashboard
             <span class="live-badge">● LIVE</span>
         </h1>
+        <nav class="header-actions" aria-label="Dashboard actions">
+            <a class="back-btn rz-public-contract-link rz-prd-contract" href="prd/dc-conventional.html" style="min-width:44px">PRD</a>
+            <a class="back-btn rz-public-contract-link rz-manual-contract" href="manual/dc-conventional.html" style="min-width:44px">Manual</a>
+            <span class="rz-conv-alarm-slot" data-rz-alarm-launch-slot></span>
+            <button class="back-btn" id="genDesignTrigConv" type="button" aria-haspopup="dialog" title="Configure and generate an engine-bound engineering document" style="background:rgba(245,158,11,.10);border-color:rgba(245,158,11,.32);color:#fbbf24"><i class="fas fa-file-lines" aria-hidden="true"></i>Generate Design</button>
+            <button class="back-btn" id="faqTrigConv" type="button" aria-haspopup="dialog" title="Frequently asked questions" style="background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.28);color:#67e8f9">&#10067; FAQ</button>
+            <a href="index.html" class="back-btn" style="background:linear-gradient(135deg, rgba(100, 116, 139, 0.1), rgba(100, 116, 139, 0.05));border-color:rgba(100, 116, 139, 0.3);color:var(--accent-purple)">
+                <span>←</span> Portfolio
+            </a>
+            <a href="datacenter-solutions.html" class="back-btn">
+                <span>←</span> DC Solutions
+            </a>
+        </nav>
     </div>
     <div class="header-right">
-        <button class="back-btn" id="genDesignTrigConv" type="button" aria-haspopup="dialog" title="Configure and generate an engine-bound engineering document" style="background:rgba(245,158,11,.10);border-color:rgba(245,158,11,.32);color:#fbbf24"><i class="fas fa-file-lines" aria-hidden="true"></i>Generate Design</button>
-        <button class="back-btn" id="faqTrigConv" type="button" aria-haspopup="dialog" title="Frequently asked questions" style="background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.28);color:#67e8f9">&#10067; FAQ</button>
         <button class="theme-toggle" id="themeToggle" title="Toggle theme">&#9790;</button>
         <span class="status-dot"></span>
         <span id="clock">--:--:--</span> WIB
@@ -1367,7 +1399,7 @@ prefersDark.addEventListener('change',e=>{if(!localStorage.getItem('theme'))appl
 </script>
 
 <script src="js/rz-feature-flags.js?v=2026-05-14" defer></script>
-<script src="auth.js?v=2026-08-26-h1h2" defer></script>
+<script src="auth.js?v=2026-08-27-contract-tab-order" defer></script>
 <script src="rz-engine.min.js?v=2026-07-27-maint" defer></script>
 <script src="rz-tracker.js" defer></script>
 
@@ -2141,12 +2173,52 @@ function buildTechSpecHtml(){
 }
 
 function convIssueEsc(value){ return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function convStudyContext(){
+  var api=window.RZConvDesignBasis;
+  var study=window.RZConvDesignBasis&&window.RZConvDesignBasis.STUDY;
+  var designLoad;
+  if(!api||!study||typeof api.evaluateLoad!=='function'){
+    throw new Error('Governed four-hall study basis is unavailable. Reload before generating the study appendix.');
+  }
+  if(!study.readyForDisciplineSizing){
+    throw new Error('Four-hall study is blocked by an unresolved density, cooling, resilience, or PUE gate.');
+  }
+  designLoad=api.evaluateLoad(api.STUDY_INPUT,1);
+  if(!designLoad||designLoad.status!=='available'){
+    throw new Error('Four-hall design-point load could not be reconciled.');
+  }
+  return {api:api,study:study,designLoad:designLoad};
+}
+function convStudyIssuePage(){
+  var context=convStudyContext();
+  var study=context.study;
+  var load=context.designLoad;
+  var rows=[
+    ['Data halls',study.halls.join(', ')+' ('+study.hallCount+')'],
+    ['IT capacity per hall',(study.itKwPerHall/1000).toFixed(3)+' MW'],
+    ['Campus IT capacity',(study.totalItKw/1000).toFixed(3)+' MW'],
+    ['Air-cooled rack plan',study.racksPerHall+' racks per hall · '+study.totalRacks+' campus'],
+    ['Rack density',study.averageRackKw.toFixed(2)+' kW average · '+study.peakRackKw.toFixed(2)+' kW selected peak'],
+    ['Cooling contract',study.coolingTechnology+' · inspector mode '+study.thermalInspectorMode],
+    ['Rack-inlet target',study.rackInletTargetC.toFixed(1)+' °C project target · ASHRAE recommended 18–27 °C'],
+    ['Air calculation reference',study.airDensityKgM3.toFixed(4)+' kg/m³ · cp '+study.airCpKjKgK.toFixed(3)+' kJ/kg·K'],
+    ['Heat rejection',study.heatRejectionType+' · evaporative water balance required'],
+    ['Resilience intent',study.resilienceIntent+' · no certification claim'],
+    ['Design-point '+study.pueMetric,load.pue.toFixed(2)+' at 100% study load'],
+    ['Design-point facility input',(load.facilityKw/1000).toFixed(3)+' MW'],
+    ['Part-load policy','Off-design facility load unavailable without an approved curve'],
+    ['Adoption state','CAPACITY STUDY — EOR validation required']
+  ];
+  var html='<h3>Four-hall governed capacity study</h3><p>Planning target only — not the current CONV_CALC operating basis. Rack density, cooling technology, resilience, air properties, heat rejection and dPUE are locked as one reviewable contract.</p><table class="t"><tbody>';
+  rows.forEach(function(row){ html+='<tr><td>'+convIssueEsc(row[0])+'</td><td class="v">'+convIssueEsc(row[1])+'</td></tr>'; });
+  return html+'</tbody></table>';
+}
 function convIssuePage(issue){
   if(!issue) return '';
   var snapshot=issue.snapshot&&typeof issue.snapshot==='object'?issue.snapshot:{};
   var rows='';
   Object.keys(snapshot).forEach(function(key){ rows+='<tr><td>'+convIssueEsc(key)+'</td><td class="v">'+convIssueEsc(snapshot[key])+'</td></tr>'; });
-  var study=issue.scope==='current-plus-study'?'<h3>Four-hall capacity plan</h3><p>Planning target only — not the current CONV_CALC operating basis.</p><table class="t"><tbody><tr><td>Data halls</td><td class="v">4</td></tr><tr><td>Planned IT per hall</td><td class="v">10.000 MW</td></tr><tr><td>Planned facility IT</td><td class="v">40.000 MW</td></tr><tr><td>Adoption state</td><td class="v">CAPACITY STUDY — EOR validation required</td></tr></tbody></table>':'';
+  var study=issue.scope==='current-plus-study'?convStudyIssuePage():'';
   return '<section class="page"><h2>Document control &amp; issue record</h2><p>Engine snapshot captured '+convIssueEsc(issue.capturedAt)+'. Scope: '+convIssueEsc(issue.scope)+'.</p><table class="t"><tbody>'+rows+'</tbody></table>'+
     (issue.revisionNote?'<h3>Revision note</h3><p>'+convIssueEsc(issue.revisionNote)+'</p>':'')+study+'</section>';
 }
@@ -2162,12 +2234,15 @@ function exportTechSpecPdf(issue){
 }
 function convDesignStudioSnapshot(){
   var s=snap();
+  var study;
+  try{ study=convStudyContext().study; }catch(error){ study=null; }
   return {
     'Authority':'CONV_CALC locked operating snapshot',
     'Current IT':s?(s.site.it_load_kw/1000).toFixed(3)+' MW':'Unavailable',
     'Current facility load':s?(s.site.facility_load_kw/1000).toFixed(3)+' MW':'Unavailable',
     'Current PUE':s?s.site.pue.toFixed(2):'Unavailable',
-    'Installed rack plan':'200 positions · page design assumption; not emitted by CONV_CALC',
+    'Installed rack plan':'200 positions · current page design assumption; not emitted by CONV_CALC',
+    'Study boundary':study?study.hallCount+' halls · '+study.racksPerHall+' air-cooled racks/hall · '+study.averageRackKw.toFixed(2)+' kW average/rack':'Unavailable — governed study module not bound',
     'Data mode':'Simulated · engine-derived'
   };
 }
@@ -2233,6 +2308,14 @@ function openFaqDialog(){
 }
 var faqBtn=gid('faqTrigConv');
 if(faqBtn){ faqBtn.addEventListener('click',openFaqDialog); }
+var mobileActionRail=d.querySelector('.header-actions');
+if(mobileActionRail){
+  mobileActionRail.addEventListener('focusin',function(e){
+    if(window.matchMedia('(max-width: 768px)').matches&&e.target instanceof HTMLElement){
+      e.target.scrollIntoView({block:'nearest',inline:'nearest'});
+    }
+  });
+}
 
 /* =========================================================================
  * v1.32.7 — KPI Basis Drawer (ACCURACY_VALIDATION.md Rule 6). DC Conv version.

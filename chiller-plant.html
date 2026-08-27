@@ -88,6 +88,50 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
 .as-seg#asChw{color:#bcd0e2}
 .as-meta{margin-left:auto;color:#7f93ab}
 @media (max-width:760px){.alarm-strip{gap:5px 12px;font-size:10px}.as-meta{margin-left:0}}
+.ops-context{
+  display:grid;
+  grid-template-columns:minmax(250px,.8fr) minmax(260px,1fr) minmax(280px,1.2fr);
+  gap:8px;
+  min-width:0;
+}
+.hall-selector,.basis-card{
+  min-width:0;
+  border:1px solid var(--bd);
+  border-radius:8px;
+  background:#16202c;
+  padding:8px 10px;
+}
+.context-label{
+  display:block;
+  margin-bottom:6px;
+  color:#8fa0b4;
+  font-family:"JetBrains Mono",monospace;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.hall-controls{display:grid;grid-template-columns:repeat(4,minmax(42px,1fr));gap:5px}
+.hall-btn{
+  min-height:32px;
+  border:1px solid #465a72;
+  border-radius:5px;
+  background:#1b2736;
+  color:#aebed0;
+  font-family:"JetBrains Mono",monospace;
+  font-size:10px;
+  font-weight:700;
+  cursor:pointer;
+}
+.hall-btn[aria-pressed="true"]{border-color:#7f9dbe;background:#24364a;color:#f0f5fb;box-shadow:inset 0 -2px 0 #628cb7}
+.hall-btn:focus-visible,.btn:focus-visible,.close:focus-visible{outline:2px solid #9fc6ed;outline-offset:2px}
+.basis-card{display:flex;flex-direction:column;justify-content:center}
+.basis-card.current{border-left:3px solid #628cb7}
+.basis-card.study{border-left:3px solid var(--warn)}
+.basis-title{color:#dce6f1;font-family:"JetBrains Mono",monospace;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.basis-value{margin-top:3px;color:#9fb0c4;font-family:"JetBrains Mono",monospace;font-size:9px;line-height:1.4}
+.basis-card.study .basis-title{color:#e1c58c}
+.basis-guard{color:#d8b66c;font-weight:700}
 .bar-left .title{font-family:"JetBrains Mono",monospace;font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
 .bar-left .sub{margin-top:4px;font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--muted)}
 .bar-right{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;align-items:center}
@@ -269,7 +313,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
 
 .modal{
   position:fixed;
-  z-index:100;
+  z-index:301;
   display:none;
   width:min(900px,94vw);
   max-height:88vh;
@@ -281,6 +325,8 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
   top:50%;left:50%;transform:translate(-50%,-50%);
 }
 .modal.show{display:block}
+.modal-scrim{position:fixed;inset:0;z-index:300;display:none;background:rgba(2,6,12,.78)}
+.modal-scrim.show{display:block}
 .modal-hd{display:flex;align-items:center;gap:8px;padding:9px 12px;background:#223247;border-bottom:1px solid #60738d}
 .modal-hd h3{font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:#e0e8f2}
 .modal-hd .mode{margin-left:auto;font-family:"JetBrains Mono",monospace;font-size:9px;padding:2px 8px;border-radius:4px;border:1px solid #6f849f;background:#2b3d55;color:#d7e1ee}
@@ -303,6 +349,8 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
 @media (max-width:1280px){.stage{grid-template-columns:1fr 300px}}
 @media (max-width:1080px){
   .shell{height:auto;min-height:100vh}
+  .ops-context{grid-template-columns:1fr 1fr}
+  .hall-selector{grid-column:1/-1}
   .stage{display:flex;flex-direction:column}
   .pid-panel{min-height:760px}
   .side{max-height:430px}
@@ -310,10 +358,16 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
 @media (max-width:760px){
   .bar{flex-direction:column;align-items:stretch}
   .bar-right{justify-content:flex-start}
+  .ops-context{grid-template-columns:1fr}
+  .hall-selector{grid-column:auto}
+  .hall-btn{min-height:44px}
   .controls{grid-template-columns:1fr}
   .status-strip{flex-direction:column;align-items:flex-start}
   .mstats{grid-template-columns:1fr 1fr}
   .mgrid{grid-template-columns:1fr}
+  .modal{width:calc(100vw - 16px);max-height:calc(100dvh - 16px);border-radius:7px}
+  .modal-bd{max-height:calc(100dvh - 64px);padding:9px}
+  .modal-hd .close{width:44px;height:44px;font-size:20px}
 }
 
 /* v1.8.0 — mobile utility responsive patch */
@@ -482,12 +536,16 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
     <script src="js/rz-alarm-state.js?v=1.43.4" defer></script>
     <script src="js/rz-inspector.js?v=1.43.4" defer></script>
     <!-- v1.43.2 — Data-quality service: top-banner + per-element chip integration. -->
-    <script src="js/rz-telemetry-quality.js?v=1.43.2" defer></script>
+    <script src="js/rz-telemetry-quality.js?v=1.131.0" defer></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
          Page-scoped (no body.rz-bms-shell class) so it adds the inspector + mode toggle
          additively without overriding chiller-plant's own typography/palette.
          Spec: standarization/BMS_SHELL.md ; conv/review/14 §4 ; -->
     <link rel="stylesheet" href="css/rz-bms-shell.css?v=1.25.2">
+    <link rel="stylesheet" href="css/rz-conv-alarm-workspace.css?v=1.131.0">
+    <script src="js/datahall-ai/alarm-query.js?v=1.0.0" defer></script>
+    <script src="js/conv-alarm-events.js?v=1.0.0" defer></script>
+    <script src="js/conv-alarm-workspace.js?v=1.131.0" defer></script>
     <script src="js/rz-bms-shell.js?v=1.25.2" defer></script>
     <!-- v1.25.2 doc-14 §4 mode show/hide rules — Overview = clean view (no tuning controls),
          Performance = system metrics visible, Maintenance = alarms + history visible. -->
@@ -506,7 +564,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
     <!-- v1.43.20 — instrument register (RZ Dark System v1). Chrome-only, dark-only, scoped. -->
     <link rel="stylesheet" href="css/rz-cockpit-instrument.css?v=1.43.19">
 </head>
-<body data-rz-data-mode="simulated">
+<body data-rz-data-mode="simulated" data-active-hall="A">
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <a id="main-content" tabindex="-1" aria-hidden="true"></a>
 <div class="shell">
@@ -515,7 +573,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
       <div class="title">CHILLER PLANT SCADA HMI</div>
       <div class="sub">ISA-style industrial P&amp;ID • primary CHW header engine-bound • click CH module for diagnostics</div>
     </div>
-    <div class="bar-right">
+    <div class="bar-right" data-rz-alarm-launch-slot>
       <a class="btn" href="dc-conventional.html">Back</a>
       <a class="btn" href="index.html">Portfolio</a>
       <div class="tgl on" id="simTgl">SIM <div class="knob"></div></div>
@@ -523,6 +581,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
       <button class="btn ghost" id="ackBtn">Ack Alarm</button>
     </div>
   </header>
+  <div data-rz-telemetry-banner-slot></div>
 
   <!-- Top alarm strip — operator-first: state, counts, redundancy, basis (doc-10/13) -->
   <div class="alarm-strip" id="alarmStrip">
@@ -533,6 +592,26 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
     <div class="as-seg" id="asLoad">Cooling Demand 1.93 MW</div>
     <div class="as-seg as-meta" id="asMeta">Scenario: Simulated • Updated 0s</div>
   </div>
+
+  <section class="ops-context" aria-label="Hall view and engineering basis">
+    <div class="hall-selector">
+      <span class="context-label">View context · telemetry basis unchanged</span>
+      <div class="hall-controls" role="group" aria-label="Select data hall view">
+        <button class="hall-btn" type="button" data-hall="A" aria-pressed="true">Hall A</button>
+        <button class="hall-btn" type="button" data-hall="B" aria-pressed="false">Hall B</button>
+        <button class="hall-btn" type="button" data-hall="C" aria-pressed="false">Hall C</button>
+        <button class="hall-btn" type="button" data-hall="D" aria-pressed="false">Hall D</button>
+      </div>
+    </div>
+    <div class="basis-card current" data-basis="current">
+      <div class="basis-title" id="chillerHallLabel">Current engine basis · Hall A</div>
+      <div class="basis-value">Representative view · 1.850 MW IT · 1.927 MW cooling · deterministic telemetry</div>
+    </div>
+    <div class="basis-card study" data-basis="study">
+      <div class="basis-title">Capacity study · 4 × 10 MW IT</div>
+      <div class="basis-value"><span class="basis-guard">READ-ONLY PLANNING BASIS</span> · not connected to current controls or telemetry</div>
+    </div>
+  </section>
 
   <div class="stage">
     <section tabindex="0" class="pid-panel">
@@ -663,11 +742,12 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
 </div>
 
 <div class="svg-tooltip" id="svgTip"></div>
-<div class="modal" id="loopModal" aria-hidden="true">
+<div class="modal-scrim" id="modalScrim" aria-hidden="true"></div>
+<div class="modal" id="loopModal" role="dialog" aria-modal="true" aria-labelledby="mTitle" aria-hidden="true" tabindex="-1">
   <div class="modal-hd">
     <h3 id="mTitle">Loop Diagnostics</h3>
     <span class="mode" id="mMode">NORMAL</span>
-    <button class="close" id="mClose">&times;</button>
+    <button class="close" id="mClose" type="button" aria-label="Close loop diagnostics">&times;</button>
   </div>
   <div class="modal-bd">
     <div class="mhint" id="mHint"></div>
@@ -701,6 +781,18 @@ const conv = {
 };
 
 const ui = { sim:true, maint:false, unit:"si", selected:1, forced:new Set(), scenario:"custom", startTs:Date.now(), ambient:35.0 };
+const HALL_VIEWS = Object.freeze(["A","B","C","D"]);
+let modalReturnFocus = null;
+
+function selectHallView(hall){
+  const selected = String(hall || "").toUpperCase();
+  if(!HALL_VIEWS.includes(selected)) return;
+  document.body.dataset.activeHall = selected;
+  document.querySelectorAll("[data-hall]").forEach(button=>{
+    button.setAttribute("aria-pressed", button.dataset.hall === selected ? "true" : "false");
+  });
+  $("chillerHallLabel").textContent = `Current engine basis · Hall ${selected}`;
+}
 
 /* --- Canonical CHW basis from the single scenario engine ---------------------
  * window.CONV_CALC.snapshot is the single source of truth (js/conv-engine.js).
@@ -1534,15 +1626,29 @@ function ackLoop(id){
 }
 
 function openModal(loopId){
+  modalReturnFocus = document.activeElement;
   ui.selected = loopId;
   renderModal(loopId);
-  $("loopModal").classList.add("show");
-  $("loopModal").setAttribute("aria-hidden","false");
+  const modal = $("loopModal");
+  modal.classList.add("show");
+  modal.setAttribute("aria-hidden","false");
+  $("modalScrim").classList.add("show");
+  $("modalScrim").setAttribute("aria-hidden","false");
+  requestAnimationFrame(()=>$("mClose").focus({preventScroll:true}));
 }
 
 function closeModal(){
-  $("loopModal").classList.remove("show");
-  $("loopModal").setAttribute("aria-hidden","true");
+  const modal = $("loopModal");
+  const wasOpen = modal.classList.contains("show");
+  modal.classList.remove("show");
+  modal.setAttribute("aria-hidden","true");
+  $("modalScrim").classList.remove("show");
+  $("modalScrim").setAttribute("aria-hidden","true");
+  const returnTarget = modalReturnFocus;
+  modalReturnFocus = null;
+  if(wasOpen && returnTarget && typeof returnTarget.focus === "function"){
+    returnTarget.focus({preventScroll:true});
+  }
 }
 
 function stepProcess(){
@@ -1660,6 +1766,11 @@ function syncToggles(){
 }
 
 function bind(){
+  document.querySelectorAll("[data-hall]").forEach(button=>{
+    button.addEventListener("click", ()=>selectHallView(button.dataset.hall));
+  });
+  selectHallView(document.body.dataset.activeHall || "A");
+
   $("simTgl").addEventListener("click", ()=>{ ui.sim = !ui.sim; syncToggles(); renderAll(); });
   $("maintTgl").addEventListener("click", ()=>{ ui.maint = !ui.maint; syncToggles(); renderAll(); });
 
@@ -1691,6 +1802,7 @@ function bind(){
   });
 
   $("mClose").addEventListener("click", closeModal);
+  $("modalScrim").addEventListener("click", closeModal);
   document.addEventListener("click", e=>{
     const m = $("loopModal");
     if(!m.classList.contains("show")) return;
@@ -1699,7 +1811,23 @@ function bind(){
     closeModal();
   });
   document.addEventListener("keydown", e=>{
-    if(e.key === "Escape") closeModal();
+    const modal = $("loopModal");
+    const modalOpen = modal.classList.contains("show");
+    if(e.key === "Escape" && modalOpen){
+      e.preventDefault();
+      closeModal();
+      return;
+    }
+    if(e.key === "Tab" && modalOpen){
+      const focusable = Array.from(modal.querySelectorAll("button,[href],input,select,textarea,[tabindex]:not([tabindex='-1'])"))
+        .filter(element=>!element.disabled && element.getAttribute("aria-hidden") !== "true");
+      if(focusable.length){
+        const first = focusable[0];
+        const last = focusable[focusable.length-1];
+        if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+        else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+      }
+    }
     // Keyboard nav: 1-4 opens loop diagnostics
     if(e.key >= "1" && e.key <= "4" && !e.ctrlKey && !e.altKey && !e.metaKey){
       const id = parseInt(e.key);
@@ -1834,6 +1962,6 @@ init();
 </script>
 <script src="auth.js?v=2026-08-26-h1h2" defer></script>
 <script src="rz-tracker.js" defer></script>
-    <div class="rz-manual-link" style="text-align:center; padding:0.9rem 1rem 1.3rem;"><style>.rz-manual-link a{display:inline-block;font-family:'JetBrains Mono','Courier New',monospace;font-size:0.72rem;letter-spacing:0.04em;text-decoration:none;border:1px solid;border-radius:6px;padding:0.45rem 0.85rem;color:#94a3b8;border-color:rgba(148,163,184,0.35)}.rz-manual-link a:hover{color:#67e8f9;border-color:rgba(103,232,249,0.45)}</style><a href="manual/chiller-plant.html">Technical Manual &amp; Methodology &#8599;</a></div>
+    <div class="rz-manual-link" style="display:flex;justify-content:center;gap:.5rem;flex-wrap:wrap;padding:0.9rem 1rem 1.3rem;"><style>.rz-manual-link a{display:inline-block;font-family:'JetBrains Mono','Courier New',monospace;font-size:0.72rem;letter-spacing:0.04em;text-decoration:none;border:1px solid;border-radius:6px;padding:0.45rem 0.85rem;color:#94a3b8;border-color:rgba(148,163,184,0.35)}.rz-manual-link a:hover{color:#67e8f9;border-color:rgba(103,232,249,0.45)}</style><a href="prd/dc-conventional.html#chiller-contract">Master PRD &#8599;</a><a href="manual/chiller-plant.html">Technical Manual &amp; Methodology &#8599;</a></div>
 </body>
 </html>

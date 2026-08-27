@@ -321,16 +321,22 @@
             <a class="mn-toollink" href="../chiller-plant.html">&#9654; Open the live Chiller Plant HMI</a>
         </header>
 
+        <nav class="mn-section mn-note" aria-labelledby="contents-title">
+            <h2 id="contents-title">Table of contents</h2>
+            <ol><li><a class="mn-inline" href="#purpose">Purpose &amp; basis</a></li><li><a class="mn-inline" href="#inputs">Inputs</a></li><li><a class="mn-inline" href="#methodology">Calculations &amp; sequencing</a></li><li><a class="mn-inline" href="#symbols">P&amp;ID symbols</a></li><li><a class="mn-inline" href="#outputs">Outputs</a></li><li><a class="mn-inline" href="#worked-example">Worked example</a></li><li><a class="mn-inline" href="#references">References</a></li><li><a class="mn-inline" href="#limitations">Limitations</a></li></ol>
+        </nav>
+
         <!-- 1. PURPOSE -->
-        <section class="mn-section">
+        <section class="mn-section" id="purpose">
             <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
             <p class="mn-lead">The chiller-plant page is an operator-grade SCADA HMI mimic — an ISA-style P&amp;ID rendered in the browser. Its job is to show <em>plant topology</em> (primary/secondary loops, chiller train positions, pump duty/standby), <em>real-time status</em> (run/fault, lead-lag state, flow animation), and <em>setpoint annotations</em> (CHWS supply temperature, differential-pressure setpoints, N+1 headroom).</p>
+            <p class="mn-lead"><strong>Truth boundary:</strong> current telemetry remains the locked 1.850 MW cooling-demand scenario from <code class="mn-mono">CONV_CALC</code>. The separate four-hall × 10 MW IT study is capacity-planning context only; chiller quantity, tower capacity, pump duty and pipe sizing are unavailable until discipline load, diversity and redundancy selections are approved.</p>
             <p class="mn-lead">What the page is <strong>not</strong>: it is not a thermo-hydraulic simulator. Equipment-level values (pump speed %, valve %, per-loop flow splits) are display/status fields from the conv-engine CHW basis, not back-calculated from independent hydraulic models. The one heavy derivation is <strong>total plant CHW flow</strong>, which is computed from the IT load and the canonical delta-T — all other displayed numbers are consistent descendants of that single basis.</p>
             <p class="mn-lead">Governing standard for P&amp;ID symbology is <strong>ISA 5.1 Instrumentation Symbols and Identification</strong>. Chiller envelope is bounded by <strong>ASHRAE 90.4 / ASHRAE TC9.9 recommended CHW supply range 6–9 °C</strong>. Single-source engineering basis is locked in <code class="mn-mono">js/conv-engine.js</code> (see §3 below).</p>
         </section>
 
         <!-- 2. INPUTS -->
-        <section class="mn-section">
+        <section class="mn-section" id="inputs">
             <h2><span class="mn-num">02</span> Inputs — mode toggles &amp; locked CHW basis</h2>
             <p class="mn-lead">The page has no free-form calculator inputs. Instead it exposes mode toggles and reads a locked CHW basis from conv-engine.js. All displayed numbers descend deterministically from these inputs — no random values, no per-page hardcoded constants that contradict the basis.</p>
             <div class="mn-tablewrap">
@@ -351,7 +357,7 @@
         </section>
 
         <!-- 3. METHODOLOGY -->
-        <section class="mn-section">
+        <section class="mn-section" id="methodology">
             <h2><span class="mn-num">03</span> Calculation methodology</h2>
             <p class="mn-lead">Three real derivations power the page: CHW delta-T, total plant CHW flow, and chiller input power. Everything else is status/display logic driven by those three numbers. Function names map one-to-one to <code class="mn-mono">js/conv-engine.js</code>.</p>
 
@@ -401,7 +407,7 @@
         </section>
 
         <!-- 4. P&ID CONVENTIONS -->
-        <section class="mn-section">
+        <section class="mn-section" id="symbols">
             <h2><span class="mn-num">04</span> ISA P&amp;ID symbol conventions</h2>
             <p class="mn-lead">The HMI follows ISA 5.1 tagging and symbol conventions. Equipment tags visible on the page map to the table below. Alarm colour hierarchy is strictly enforced — see the note on colour discipline.</p>
             <div class="mn-tablewrap">
@@ -423,7 +429,7 @@
         </section>
 
         <!-- 5. PRIMARY / SECONDARY LOOP ARCHITECTURE -->
-        <section class="mn-section">
+        <section class="mn-section" id="outputs">
             <h2><span class="mn-num">05</span> Primary / secondary loop architecture</h2>
             <p class="mn-lead">The chiller plant uses a decoupled primary/secondary (P/S) design. The primary loop circulates through the chiller bundles at a constant low flow; the secondary loop modulates to match the data-hall cooling demand. A hydraulic decoupling bridge (bypass header) absorbs any flow mismatch.</p>
             <div class="mn-tablewrap">
@@ -444,7 +450,7 @@
         </section>
 
         <!-- 6. WORKED EXAMPLE -->
-        <section class="mn-section">
+        <section class="mn-section" id="worked-example">
             <h2><span class="mn-num">06</span> Worked example — 58.1 L/s derivation</h2>
             <p class="mn-lead">This is the canonical CHW flow derivation that the page's Plant Capacity Panel and flow annotations are anchored to. Numbers reproduce conv-engine.js output exactly.</p>
             <div class="mn-worked">
@@ -462,7 +468,7 @@
         </section>
 
         <!-- 7. REFERENCES -->
-        <section class="mn-section">
+        <section class="mn-section" id="references">
             <h2><span class="mn-num">07</span> References &amp; standards</h2>
             <ul class="mn-refs">
                 <li><b>ISA 5.1 (2022)</b> — Instrumentation Symbols and Identification: P&amp;ID tag prefixes (TT, FT, PT, MV, CV), loop bubble conventions, equipment symbol styles used on the chiller-plant HMI.</li>
@@ -475,7 +481,7 @@
         </section>
 
         <!-- 8. ASSUMPTIONS & LIMITATIONS -->
-        <section class="mn-section">
+        <section class="mn-section" id="limitations">
             <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
             <p class="mn-lead">The HMI assumes a well-balanced, decoupled primary/secondary plant operating at steady-state design load. Transient effects (chiller pull-down time, pump start-up inrush, glycol correction to c_p) are not modelled. COP 4.5 is a reference benchmark — actual COP depends on condenser water temperature, part-load ratio, and compressor staging; the live HMI does not update COP from a transient model.</p>
             <p class="mn-lead">Flow-velocity animation on the P&amp;ID is a visual cue proportional to the displayed flow value; it is not derived from a hydraulic resistance network. Pipe diameters and friction factors are not modelled. Equipment-level display values (valve %, VFD speed %, run hours) are status-field annotations consistent with the engineering basis — they are not back-calculated from independent models and must be treated as <strong>illustrative display parameters</strong> in any off-page engineering analysis.</p>

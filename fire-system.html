@@ -86,12 +86,16 @@
     <script src="js/rz-alarm-state.js?v=1.43.4" defer></script>
     <script src="js/rz-inspector.js?v=1.43.4" defer></script>
     <!-- v1.43.2 — Data-quality service: top-banner + per-element chip. -->
-    <script src="js/rz-telemetry-quality.js?v=1.43.2" defer></script>
+    <script src="js/rz-telemetry-quality.js?v=1.131.0" defer></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
          Loaded for cross-page consistency; body does NOT carry rz-bms-shell
          class. Spec: standarization/BMS_SHELL.md ; conv/review/14 §5. -->
     <link rel="stylesheet" href="css/rz-bms-shell.css?v=1.23.5-ck">
     <script src="js/rz-bms-shell.js?v=1.23.5" defer></script>
+    <link rel="stylesheet" href="css/rz-conv-alarm-workspace.css?v=1.131.0">
+    <script src="js/datahall-ai/alarm-query.js?v=1.0.0" defer></script>
+    <script src="js/conv-alarm-events.js?v=1.0.0" defer></script>
+    <script src="js/conv-alarm-workspace.js?v=1.131.0" defer></script>
     <style>
         /* ===== Grounded mission-critical operations palette (doc-10 §Color) =====
            Red is RESERVED strictly for active alarm / trip / fire / leak / discharge.
@@ -204,6 +208,56 @@
         .ce-effect { font-size: 10px; color: var(--text-faint); margin-top: 2px; line-height: 1.4; }
         .ce-row.is-active .ce-name, .ce-row.is-normal .ce-name { color: #fff; }
 
+        /* Operator cause/effect trace — command and field feedback stay separate. */
+        .fire-authority {
+            display: flex; align-items: center; justify-content: space-between; gap: 10px;
+            margin: 12px 0 8px; padding: 8px 10px; border: 1px solid rgba(56,189,248,.32);
+            background: #0c1724; color: var(--text-dim); font: 700 9px/1.4 'JetBrains Mono', monospace;
+            letter-spacing: .05em; text-transform: uppercase;
+        }
+        .fire-authority strong { color: var(--st-select); }
+        .fire-interlock-head,
+        .fire-interlock-row {
+            display: grid; grid-template-columns: minmax(0,.8fr) minmax(0,1fr) minmax(0,1.2fr);
+            gap: 8px; align-items: start;
+        }
+        .fire-interlock-head {
+            padding: 5px 8px; color: var(--text-faint); border-bottom: 1px solid var(--panel-line);
+            font: 700 8px/1.3 'JetBrains Mono', monospace; letter-spacing: .06em; text-transform: uppercase;
+        }
+        .fire-interlock-row {
+            padding: 8px; border-bottom: 1px solid rgba(148,163,184,.08);
+            font: 600 9px/1.45 'JetBrains Mono', monospace;
+        }
+        .fire-interlock-row:last-child { border-bottom: 0; }
+        .fire-interlock-row .il-system { color: var(--text-main); font-family: 'IBM Plex Sans', sans-serif; font-weight: 700; }
+        .fire-interlock-row .il-command { color: var(--st-warn); }
+        .fire-interlock-row .il-feedback { color: var(--text-faint); }
+        .fire-interlock-row > span { min-width: 0; overflow-wrap: anywhere; }
+        .fire-interlock-row.is-requested { background: rgba(245,158,11,.05); }
+        .fire-interlock-row.is-manual .il-command { color: var(--st-select); }
+
+        /* Current operating basis is visually locked away from expansion studies. */
+        .fire-scope-strip {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;
+        }
+        .fire-scope-card {
+            display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: center;
+            min-width: 0; padding: 9px 11px; border: 1px solid var(--panel-line); background: #0c131f;
+        }
+        .fire-scope-card .scope-tag {
+            padding: 3px 6px; border: 1px solid rgba(52,211,153,.42); color: var(--st-normal);
+            font: 800 8px/1.2 'JetBrains Mono', monospace; letter-spacing: .06em; white-space: nowrap;
+        }
+        .fire-scope-card.study .scope-tag { border-color: rgba(56,189,248,.42); color: var(--st-select); }
+        .fire-scope-card strong { display: block; color: var(--text-main); font: 700 10px/1.35 'JetBrains Mono', monospace; }
+        .fire-scope-card small { display: block; margin-top: 2px; color: var(--text-faint); font-size: 9px; line-height: 1.35; }
+
+        .main-svg { padding: 14px !important; overflow: auto !important; border-radius: 8px !important; }
+        #fire-svg { display: block; width: 100%; min-width: 0; }
+        .layout-grid { grid-template-columns: minmax(720px,1fr) minmax(340px,380px) !important; align-items: start; }
+        button:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--st-select); outline-offset: 3px; }
+
         /* Pump status chips */
         .pump-card { border: 1px solid var(--panel-line); border-radius: 9px; padding: 10px 12px; background: rgba(255,255,255,0.02); }
         .pump-card .pc-tag { font-size: 10px; color: var(--text-faint); font-weight: 700; }
@@ -239,7 +293,7 @@
         .zoom-btn.active { background: rgba(56,189,248,0.12); border-color: var(--st-select); color: var(--st-select); }
 
         /* Mobile responsive */
-        @media (max-width: 1024px) {
+        @media (max-width: 1180px) {
             body { padding: 12px !important; }
             .main-svg { padding: 16px !important; border-radius: 18px !important; }
             .layout-grid { grid-template-columns: 1fr !important; }
@@ -249,6 +303,17 @@
             .main-svg { padding: 12px !important; border-radius: 14px !important; overflow-x: auto !important; }
             .alarm-strip { padding: 8px 12px; }
             .as-banner { font-size: 12px; }
+            .fire-scope-strip { grid-template-columns: 1fr; }
+            .fire-interlock-head { display: none; }
+            .fire-interlock-row { grid-template-columns: 1fr; gap: 3px; }
+            .fire-interlock-row .il-command::before { content: 'Command · '; color: var(--text-faint); }
+            .fire-interlock-row .il-feedback::before { content: 'Feedback · '; color: var(--text-faint); }
+        }
+        @media (max-width: 900px) {
+            #fire-svg { min-width: 900px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .flow-fire, .flow-supply, .flow-n2, .spinning, .as-dot.alarm { animation: none !important; }
         }
     /* a11y (v1.52.2): dark-only cockpit — dim tailwind-ish grays brightened (unscoped on purpose) */
 .text-slate-500 { color:#9aa3af !important; }
@@ -284,13 +349,14 @@
             <h1 class="text-base font-bold text-white tracking-wide">Fire Protection &amp; Suppression — BMS</h1>
             <span class="text-[10px] text-slate-500 font-tech" id="basis-tag">Basis: IT 1.85 MW</span>
         </div>
-        <div class="flex flex-wrap gap-2 items-center">
+        <div class="flex flex-wrap gap-2 items-center" data-rz-alarm-launch-slot>
             <button onclick="location.href='dc-conventional.html'" class="ctrl-btn"><i class="fas fa-arrow-left mr-1"></i> BACK</button>
             <button onclick="location.href='index.html'" class="ctrl-btn"><i class="fas fa-home mr-1"></i> PORTFOLIO</button>
             <button onclick="toggleFullscreen()" class="ctrl-btn" id="btn-fullscreen"><i class="fas fa-expand mr-1"></i> FULLSCREEN <span class="kbd-hint">F11</span></button>
             <button onclick="window.print()" class="ctrl-btn"><i class="fas fa-file-pdf mr-1"></i> EXPORT PDF</button>
         </div>
     </div>
+    <div data-rz-telemetry-banner-slot></div>
 
     <!-- ===== Top Alarm Strip (alarm-first, doc-13 / doc-10) ===== -->
     <div id="alarm-strip" class="alarm-strip state-normal mb-3" role="status" aria-live="polite">
@@ -321,6 +387,17 @@
         <span data-stage="6" class="fs-chip" style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;border:1px solid rgba(71,85,105,0.4);background:rgba(15,23,42,0.4);color:#94a3b8;font-weight:600;"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span>6 · Discharged / Lockout</span>
     </div>
 
+    <section class="fire-scope-strip" aria-label="Current and study capacity basis">
+        <div class="fire-scope-card" id="fire-current-basis">
+            <span class="scope-tag">CURRENT · ENGINE BOUND</span>
+            <span><strong id="fire-current-basis-value">1.85 MW IT · 114 m³ fire reserve · 5 pre-action zones</strong><small>Live mimic and staged scenario use this locked Conventional DC basis.</small></span>
+        </div>
+        <div class="fire-scope-card study" id="fire-study-basis">
+            <span class="scope-tag">STUDY ONLY</span>
+            <span><strong>4 × 10 MW halls · separate hydraulic design required</strong><small>Expansion does not resize the live tank, pumps, zoning or cause/effect model.</small></span>
+        </div>
+    </section>
+
     <div class="layout-grid" style="display:grid; grid-template-columns: minmax(0,1fr) 360px; gap: 14px;">
       <!-- ===== Main process canvas ===== -->
       <div>
@@ -335,7 +412,7 @@
             </div>
         </div>
 
-        <div class="glass-panel main-svg rounded-2xl p-6 relative overflow-hidden mb-3">
+        <div class="glass-panel main-svg rounded-2xl p-6 relative overflow-hidden mb-3" tabindex="0" role="region" aria-label="Fire water and inert gas process mimic; scroll horizontally on narrow screens">
             <div id="equipment-tooltip" class="equipment-tooltip">
                 <div class="tooltip-title" id="tooltip-title">Equipment</div>
                 <div id="tooltip-content"></div>
@@ -490,6 +567,10 @@
         <div class="panel">
             <div class="panel-title">Fire Cause &amp; Effect Matrix</div>
             <div id="ce-matrix"></div>
+            <div class="fire-authority"><strong id="fire-authority">FACP AUTHORITATIVE · NORMAL</strong><span>Commands ≠ field proof</span></div>
+            <div id="fire-interlock-list" aria-label="FACP cause and effect outputs">
+                <div class="fire-interlock-head"><span>Subsystem</span><span>FACP command</span><span>Downstream feedback</span></div>
+            </div>
         </div>
 
         <!-- Fire pump status -->
@@ -593,10 +674,57 @@
             { s: 0, name: 'Stage 0 — Normal',                  fx: 'All quiescent. Jockey holds 12.5 bar. FACP & VESDA supervised.' },
             { s: 1, name: 'Stage 1 — VESDA Alert',             fx: 'Aspirating smoke alert. Warning only. Operator investigate, no output.' },
             { s: 2, name: 'Stage 2 — VESDA Action / Smoke',    fx: 'Smoke detector alarm. 1st-stage sounder. Pre-alarm to BMS.' },
-            { s: 3, name: 'Stage 3 — Confirmed Fire (2 zones)',fx: 'Cross-zone confirmed → AHU/CRAH shutdown + fire damper close + pre-action valve charge.' },
+            { s: 3, name: 'Stage 3 — Confirmed Fire (2 zones)',fx: 'Cross-zone confirmed → FACP issues HVAC stop, damper close, lift recall and egress-release requests. Field proof is not modeled.' },
             { s: 4, name: 'Stage 4 — Suppression Armed',       fx: 'Release circuit armed. Countdown active. Manual ABORT station live. Fire pumps to AUTO-run on pressure drop.' },
             { s: 5, name: 'Stage 5 — Discharge / Lockout',     fx: 'Inert gas / pre-action discharge. Hold time. Post-discharge lockout until manual reset.' }
         ];
+
+        var FIRE_INTERLOCKS = [
+            { system: 'AHU / CRAH', minStage: 3, command: 'STOP REQUEST', feedback: 'FIELD FEEDBACK NOT MODELED' },
+            { system: 'Fire / smoke dampers', minStage: 3, command: 'CLOSE REQUEST', feedback: 'END-SWITCH NOT MODELED' },
+            { system: 'Lift recall', minStage: 3, command: 'FIRE RECALL REQUEST', feedback: 'LIFT FEEDBACK NOT MODELED' },
+            { system: 'Access / egress', minStage: 3, command: 'EGRESS RELEASE REQUEST', feedback: 'ACS FEEDBACK NOT MODELED' },
+            { system: 'Fire alert sounder', minStage: 2, command: '1ST-STAGE SOUNDER REQUEST', feedback: 'FIELD FEEDBACK NOT MODELED' },
+            { system: 'Voice evacuation', minStage: 3, command: 'EVACUATION SIGNAL REQUEST', feedback: 'FIELD FEEDBACK NOT MODELED' },
+            { system: 'BMS / DCIM / historian', minStage: 1, command: 'EVENT FORWARD REQUEST', feedback: 'SIMULATED EVENT ONLY' },
+            { system: 'Suppression release', minStage: 5, command: 'RELEASE REQUEST', feedback: 'SIMULATED DISCHARGE ONLY' },
+            { system: 'Electrical / EPO', manualOnly: true, command: 'NO AUTOMATIC EPO', feedback: 'MANUAL / AHJ-APPROVED SEQUENCE' }
+        ];
+
+        function interlocksForStage(stage) {
+            var output = [];
+            var safeStage = Math.max(0, Math.min(5, Number(stage) || 0));
+            for (var i = 0; i < FIRE_INTERLOCKS.length; i++) {
+                var item = FIRE_INTERLOCKS[i];
+                var requested = !item.manualOnly && safeStage >= item.minStage;
+                output.push({
+                    system: item.system,
+                    command: item.manualOnly ? item.command : (requested ? item.command : 'STANDBY'),
+                    feedback: item.manualOnly ? item.feedback : (requested ? item.feedback : 'SUPERVISED — NO OUTPUT'),
+                    requested: requested,
+                    manualOnly: !!item.manualOnly
+                });
+            }
+            return output;
+        }
+
+        function renderFireInterlocks() {
+            var list = $('fire-interlock-list');
+            var effects = interlocksForStage(state.stage);
+            var html = '<div class="fire-interlock-head"><span>Subsystem</span><span>FACP command</span><span>Downstream feedback</span></div>';
+            for (var i = 0; i < effects.length; i++) {
+                var effect = effects[i];
+                var cls = 'fire-interlock-row' + (effect.requested ? ' is-requested' : '') + (effect.manualOnly ? ' is-manual' : '');
+                html += '<div class="' + cls + '" data-interlock="' + effect.system + '">' +
+                    '<span class="il-system">' + effect.system + '</span>' +
+                    '<span class="il-command">' + effect.command + '</span>' +
+                    '<span class="il-feedback">' + effect.feedback + '</span></div>';
+            }
+            list.innerHTML = html;
+            $('fire-authority').textContent = 'FACP AUTHORITATIVE · STAGE ' + state.stage + (state.armed ? ' · SIM ARMED' : ' · SIM OFF');
+        }
+
+        window.RZFireOperator = Object.freeze({ interlocksForStage: interlocksForStage });
 
         function renderCE() {
             var html = '';
@@ -840,10 +968,13 @@
 
         // ---- Full repaint from state ----
         function repaint() {
+            $('fire-current-basis-value').textContent = IT_LOAD_MW.toFixed(2) + ' MW IT · ' +
+                TANK_CAP_M3 + ' m³ fire reserve · ' + ZONE_COUNT + ' pre-action zones';
             updateTankUI();
             updateGauge();
             applyStageVisuals();
             renderCE();
+            renderFireInterlocks();
             renderPumps();
             updateAlarmStrip();
             $('as-updated').textContent = new Date().toLocaleTimeString('en-GB');
@@ -906,7 +1037,7 @@
 
             var seq = [
                 { ms: 2600, run: function () { state.stage = 2; addLog('Stage 2 — Smoke detector ALARM. 1st-stage sounder.', 'warn'); } },
-                { ms: 5200, run: function () { state.stage = 3; addLog('Stage 3 — CONFIRMED (2-zone). AHU/CRAH shutdown + fire damper close + pre-action charge.', 'alarm'); } },
+                { ms: 5200, run: function () { state.stage = 3; addLog('Stage 3 — CONFIRMED (2-zone). FACP output requests issued; downstream field feedback is not modeled.', 'alarm'); } },
                 { ms: 8200, run: function () { state.stage = 4; state.countdown = 30; addLog('Stage 4 — Suppression ARMED. 30 s countdown. ABORT station live.', 'alarm'); } }
             ];
             var i = 0;
@@ -1188,6 +1319,6 @@
     </style>
 
 
-    <div class="rz-manual-link" style="text-align:center; padding:0.9rem 1rem 1.3rem;"><style>.rz-manual-link a{display:inline-block;font-family:'JetBrains Mono','Courier New',monospace;font-size:0.72rem;letter-spacing:0.04em;text-decoration:none;border:1px solid;border-radius:6px;padding:0.45rem 0.85rem;color:#94a3b8;border-color:rgba(148,163,184,0.35)}.rz-manual-link a:hover{color:#67e8f9;border-color:rgba(103,232,249,0.45)}</style><a href="manual/fire-system.html">Technical Manual &amp; Methodology &#8599;</a></div>
+    <div class="rz-manual-link" style="display:flex;justify-content:center;gap:.5rem;flex-wrap:wrap;padding:0.9rem 1rem 1.3rem;"><style>.rz-manual-link a{display:inline-block;font-family:'JetBrains Mono','Courier New',monospace;font-size:0.72rem;letter-spacing:0.04em;text-decoration:none;border:1px solid;border-radius:6px;padding:0.45rem 0.85rem;color:#94a3b8;border-color:rgba(148,163,184,0.35)}.rz-manual-link a:hover{color:#67e8f9;border-color:rgba(103,232,249,0.45)}</style><a href="prd/dc-conventional.html#fire-contract">Master PRD &#8599;</a><a href="manual/fire-system.html">Technical Manual &amp; Methodology &#8599;</a></div>
 </body>
 </html>

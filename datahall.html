@@ -9,7 +9,7 @@
     <link rel="icon" type="image/png" href="assets/Favicon.png">
 <link rel="apple-touch-icon" href="assets/Favicon.png">
 <title>Data Hall SCADA | Rack Power & Cooling Monitoring</title>
-    <meta name="description" content="Data hall SCADA console. Deterministic rack power heatmap, cooling headroom, CRAH air-side status and cold-aisle temperature for one IT hall.">
+    <meta name="description" content="Data hall SCADA console with selectable Hall A-D scope, deterministic rack power, rack-inlet and hot-aisle temperatures, cooling headroom and CRAH air-side status.">
     <meta name="ai-content-declaration" content="human-authored">
     <meta name="keywords" content="SCADA Dashboard, Data Hall Monitoring, Rack Power Density, CRAH, Cooling Headroom, NOC Dashboard, Environmental Monitoring, CDFOM">
     <meta name="author" content="Bagus Dwi Permana">
@@ -132,6 +132,23 @@
         .brand-sub { font-size: 0.65rem; color: var(--txt-faint); font-weight: 600; letter-spacing: 1px; margin-left: 4px; }
         .spacer { flex: 1; }
         .clock { font-size: 0.78rem; color: var(--txt-faint); padding: 5px 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 4px; }
+        .hall-scope-bar {
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+            flex-shrink: 0; padding: 6px 14px; background: rgba(8,14,26,.88);
+            border-bottom: 1px solid var(--border); color: var(--txt-dim); font-size: 11px;
+        }
+        .hall-scope-copy { min-width: 0; line-height: 1.35; }
+        .hall-scope-copy strong { color: var(--txt-main); }
+        .hall-selector { display: flex; gap: 4px; flex-shrink: 0; }
+        .hall-selector button {
+            min-width: 42px; min-height: 30px; padding: 4px 9px; border: 1px solid var(--border);
+            background: rgba(255,255,255,.025); color: var(--txt-dim); cursor: pointer;
+            font: 700 10px/1 'Consolas','SF Mono',monospace;
+        }
+        .hall-selector button:hover { border-color: var(--sel); color: var(--txt-main); }
+        .hall-selector button[aria-pressed="true"] {
+            border-color: var(--sel); color: var(--sel); background: rgba(56,189,248,.12);
+        }
 
         /* --- ALARM STRIP (operator-first, top of hierarchy) --- */
         .alarm-strip {
@@ -190,6 +207,11 @@
         .kv .v { font-weight: 700; }
         .kv-sub { font-size: 10px; color: var(--txt-faint); margin-top: 2px; }
         .formula { font-size: 9.5px; color: var(--txt-faint); margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--border-soft); line-height: 1.45; }
+        .basis-split { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .basis-cell { border: 1px solid var(--border-soft); padding: 7px; background: rgba(2,4,10,.25); }
+        .basis-cell .basis-label { color: var(--txt-faint); font-size: 8.5px; letter-spacing: .45px; text-transform: uppercase; }
+        .basis-cell .basis-value { color: var(--txt-main); margin-top: 3px; font: 700 12px/1.2 'Consolas','SF Mono',monospace; }
+        .basis-cell .basis-note { color: var(--txt-faint); margin-top: 3px; font-size: 9px; line-height: 1.35; }
 
         .bar-track { height: 6px; width: 100%; background: rgba(255,255,255,0.06); border-radius: 3px; margin-top: 6px; overflow: hidden; }
         .bar-fill { height: 100%; border-radius: 3px; transition: width .4s ease; }
@@ -406,6 +428,9 @@
             .brand-sub { display: none; }
             .clock { font-size: 0.72rem; }
             .nav-btn { padding: 8px 11px; font-size: 11px; min-height: 44px; }
+            .hall-scope-bar { align-items: flex-start; flex-direction: column; }
+            .hall-selector { width: 100%; }
+            .hall-selector button { flex: 1; min-height: 44px; }
             .alarm-strip { flex-wrap: wrap; }
             .as-cell { min-width: 33%; }
             .as-spacer { display: none; }
@@ -436,7 +461,7 @@
     <script src="js/rz-bms-shell.js?v=1.24.1" defer></script>
     <!-- v1.43.21 — data-quality service (SIM banner + chip). Additive; the rack/
          CRAH grid + all displayed values are unchanged. P1 datahall metadata. -->
-    <script src="js/rz-telemetry-quality.js?v=1.43.2" defer></script>
+    <script src="js/rz-telemetry-quality.js?v=1.131.0" defer></script>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-07-22-navfix" defer></script>
     <script src="js/rz-cookie-consent.js?v=2026-07-14" defer></script>
@@ -447,6 +472,10 @@
 </style>
     <!-- v1.43.20 — instrument register (RZ Dark System v1). Chrome-only, dark-only, scoped. -->
     <link rel="stylesheet" href="css/rz-cockpit-instrument.css?v=1.43.19">
+    <link rel="stylesheet" href="css/rz-conv-alarm-workspace.css?v=1.131.0">
+    <script src="js/datahall-ai/alarm-query.js?v=1.0.0" defer></script>
+    <script src="js/conv-alarm-events.js?v=1.0.0" defer></script>
+    <script src="js/conv-alarm-workspace.js?v=1.131.0" defer></script>
 </head>
 <body data-rz-data-mode="simulated">
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -491,10 +520,12 @@
         </a>
         <a class="nav-btn" href="prd/datahall.html" style="min-width:44px">PRD</a>
         <a class="nav-btn" href="manual/datahall.html" style="min-width:44px">Manual</a>
-        <div class="brand">DATA HALL <span>A</span><span class="brand-sub">SCADA CONSOLE</span></div>
+        <span class="rz-conv-alarm-slot" data-rz-alarm-launch-slot></span>
+        <div class="brand">DATA HALL <span id="brand-hall">A</span><span class="brand-sub">SCADA CONSOLE</span></div>
         <div class="spacer"></div>
         <div class="clock num" id="clock">--:--:--</div>
     </div>
+    <div data-rz-telemetry-banner-slot></div>
 
     <!-- ALARM STRIP — operator-first, top of information hierarchy -->
     <div class="alarm-strip" id="alarmStrip">
@@ -543,6 +574,16 @@
         <span data-basis="density" tabindex="0" role="button" aria-label="Power Density — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Power Density <b id="dh-pd" style="color:#fff;">9.3</b><span style="color:#94a3b8;font-weight:400;"> kW/rack</span></span>
         <span style="flex:1"></span>
         <span style="color:#94a3b8;font-size:11px;">Click any KPI for basis · Mode toggles below</span>
+    </div>
+
+    <div class="hall-scope-bar">
+        <div class="hall-scope-copy"><strong id="hall-scope-label">Data Hall A</strong> · one locked reference scenario per selected hall; changing scope updates tags and inspection context without altering the deterministic engine input.</div>
+        <div class="hall-selector" id="hall-selector" role="group" aria-label="Select data hall operational scope">
+            <button type="button" data-hall="A" aria-pressed="true" onclick="selectHall('A')">Hall A</button>
+            <button type="button" data-hall="B" aria-pressed="false" onclick="selectHall('B')">Hall B</button>
+            <button type="button" data-hall="C" aria-pressed="false" onclick="selectHall('C')">Hall C</button>
+            <button type="button" data-hall="D" aria-pressed="false" onclick="selectHall('D')">Hall D</button>
+        </div>
     </div>
 
     <!-- v1.24.1 doc-14 §3: View Mode selector (Power / Temperature / Cooling Margin / Space / Alarms).
@@ -623,6 +664,7 @@
             <div class="panel">
                 <div class="panel-title">CRAH Air-Side Status</div>
                 <div id="crah-list"></div>
+                <div class="formula" id="crah-air-note">LA&rarr;RA = CRAH leaving air to CRAH return air. Return-path basis assumes contained hot-aisle return with 0 K mixing adjustment; rack-inlet setpoint is separate.</div>
             </div>
         </div>
 
@@ -630,7 +672,7 @@
         <div class="center-stage">
             <div class="balance-band" id="balanceBand">
                 <div class="bb-cell">
-                    <div class="bb-lbl">Hall A IT Load</div>
+                    <div class="bb-lbl" id="bb-hall-label">Hall A IT Load</div>
                     <div class="bb-val num"><span id="bb-itload">--</span> <span class="bb-unit">MW</span></div>
                     <div class="bb-sub" id="bb-itsub">&mdash;</div>
                 </div>
@@ -663,7 +705,7 @@
 
             <div class="mode-bar">
                 <button class="mode-btn active" data-mode="power"  onclick="setMode('power')">Power Density</button>
-                <button class="mode-btn"        data-mode="temp"   onclick="setMode('temp')">Cold-Aisle Temp</button>
+                <button class="mode-btn"        data-mode="temp"   onclick="setMode('temp')">Rack-Inlet Temp</button>
                 <button class="mode-btn"        data-mode="cooling-margin" onclick="setMode('cooling-margin')">Cooling Margin</button>
                 <button class="mode-btn"        data-mode="alarms" onclick="setMode('alarms')">Alarms</button>
                 <button class="mode-btn"        data-mode="space"  onclick="setMode('space')">Space</button>
@@ -671,9 +713,9 @@
             </div>
 
             <div class="floor" id="main-content" tabindex="-1">
-                <div class="crah-rail" id="crah-top" aria-label="CRAH supply units (north)"></div>
+                <div class="crah-rail" id="crah-top" aria-label="CRAH air-side units (north)"></div>
                 <div class="zone-field" id="zone-field"></div>
-                <div class="crah-rail" id="crah-bottom" aria-label="CRAH supply units (south)"></div>
+                <div class="crah-rail" id="crah-bottom" aria-label="CRAH air-side units (south)"></div>
             </div>
         </div>
 
@@ -684,11 +726,22 @@
                 <div id="alarm-list" style="font-size:11px; color:var(--txt-faint);">No active alarms</div>
             </div>
             <div class="panel">
-                <div class="panel-title">Environment (Hall A)</div>
-                <div class="kv"><span class="k">Avg Cold-Aisle</span><span class="v num" id="env-temp">--</span></div>
+                <div class="panel-title" id="env-hall-title">Environment (Hall A)</div>
+                <div class="kv"><span class="k">Rack-inlet / cold-aisle</span><span class="v num" id="env-temp">--</span></div>
+                <div class="kv"><span class="k">Avg Hot-Aisle</span><span class="v num" id="env-hot-aisle">--</span></div>
+                <div class="kv"><span class="k">CRAH Return</span><span class="v num" id="env-return">--</span></div>
                 <div class="kv"><span class="k">Avg RH</span><span class="v num" id="env-rh">--</span></div>
-                <div class="kv"><span class="k">Hottest Zone</span><span class="v num" id="env-hot">--</span></div>
-                <div class="kv-sub">ASHRAE TC9.9 recommended cold-aisle 18&ndash;27&deg;C</div>
+                <div class="kv"><span class="k">Dew Point</span><span class="v num" id="env-dewpoint">--</span></div>
+                <div class="kv"><span class="k">Hottest Rack-Inlet</span><span class="v num" id="env-hot">--</span></div>
+                <div class="kv-sub">Rack-inlet design 25.4&deg;C · recommended envelope 18&ndash;27&deg;C · humidity interpreted with dew point / non-condensing constraints · CRAH return assumes contained hot-aisle path (0 K mixing adjustment).</div>
+            </div>
+            <div class="panel">
+                <div class="panel-title">Rack Density Basis</div>
+                <div class="basis-split">
+                    <div class="basis-cell"><div class="basis-label">Current operating density</div><div class="basis-value" id="density-current">--</div><div class="basis-note">IT kW / active rack</div></div>
+                    <div class="basis-cell"><div class="basis-label">Installed rack study</div><div class="basis-value" id="density-study">--</div><div class="basis-note">positions × cabinet design rating</div></div>
+                </div>
+                <div class="formula">Current telemetry is not the same as the installed design study; both remain visible and separately labelled.</div>
             </div>
             <div class="panel" style="flex:1;">
                 <div class="panel-title">Selected</div>
@@ -726,12 +779,11 @@
         var S = CALC.snapshot;
 
         /* --- Hall scope ---------------------------------------------------
-         * The engine IT load (1.85 MW) is the SITE total. This page renders
-         * ONE data hall. We model the site as a single hall ("Hall A") so
-         * the rack field sums EXACTLY to the engine IT load — the label
-         * states the scope explicitly (doc-03 §"Chart/Widget Hierarchy":
-         * "Hall A IT Load" if one hall, plus "Balance to EPMS").
+         * CONV_CALC exposes one locked reference-hall snapshot. A-D are
+         * operational scopes over that deterministic reference, not four
+         * values that may be added into a synthetic site total.
          */
+        var SELECTED_HALL = 'A';
         var SITE_IT_KW   = S.site.it_load_kw;          // 1850 kW (engine)
         var EPMS_IT_KW    = S.electrical.epms_ups_output_kw; // EPMS IT reconciliation point
         var ZONES         = 10;                          // rows of cabinets
@@ -740,8 +792,21 @@
         var RACK_RATING_KW = 15;                          // per-cabinet design rating (kW)
         // doc-03 / doc-09: avg rack load = IT load / displayed racks
         var AVG_RACK_KW   = SITE_IT_KW / TOTAL_RACKS;    // 1850 / 200 = 9.25 kW
+        var RACK_INLET_DESIGN_C = 25.4;
+        var RACK_INLET_RECOMMENDED_MIN_C = 18;
+        var RACK_INLET_RECOMMENDED_MAX_C = 27;
+        var DESIGN_AIRSIDE_DELTA_T_C = 11;
+        var RETURN_PATH_MIXING_ADJUSTMENT_C = 0;
         // ASHRAE air-balance constant: rho*cp ~= 1.2 * 1.006 kJ/(m3.K)
         var AIR_RHO_CP    = 1.2 * 1.006;
+
+        function dewPointC(tempC, rhPct) {
+            var a = 17.62;
+            var b = 243.12;
+            var boundedRh = Math.max(1, Math.min(100, rhPct));
+            var gamma = Math.log(boundedRh / 100) + (a * tempC) / (b + tempC);
+            return b * gamma / (a - gamma);
+        }
 
         /* --- Deterministic spatial generator (NO Math.random) ------------
          * A fixed-seed hash gives every rack a stable position-derived
@@ -808,7 +873,7 @@
             for (var t = 1; t < TIER.length; t++) { if (util < TIER[t].max) return TIER[t]; }
             return TIER[TIER.length - 1];
         }
-        // Temperature tier (cold-aisle), deterministic from zone heat.
+        // Temperature tier for rack inlet / cold aisle.
         function tempFill(c) {
             if (c < 22) return '#2f5e46';
             if (c < 25) return '#3f6f4e';
@@ -830,11 +895,12 @@
         var COOL_HEADROOM = COOL_AVAIL_KW - COOL_DEMAND_KW;
         var N1_PASS = COOL_AVAIL_N1_KW >= COOL_DEMAND_KW;
 
-        /* --- Per-zone aggregates + deterministic cold-aisle temp ---------
-         * return_air = supply + zone_heat / (rho*cp * airflow)
-         * airflow sized so the design zone holds ~24 C at AVG load.
+        /* --- Per-zone deterministic thermal chain -------------------------
+         * CRAH leaving air is not the rack-inlet setpoint. The displayed
+         * rack-inlet design target is 25.4C; hot aisle follows sensible load:
+         * deltaT_air = zone_heat / (rho*cp*airflow).
          */
-        var SUPPLY_C = S.cooling.chws_c + 8.0;  // CRAH leaving-air ~ CHWS + coil approach
+        var CRAH_LEAVING_AIR_C = S.cooling.chws_c + 8.0;
         var zones = [];
         for (var z = 0; z < ZONES; z++) {
             var zHeat = 0, zRacks = 0, zOcc = 0, zMaxUtil = 0;
@@ -848,18 +914,23 @@
             }
             // design airflow per zone (m3/s): sized for AVG zone heat @ dT 11C
             var designZoneHeat = (SITE_IT_KW / ZONES);
-            var airflow = designZoneHeat / (AIR_RHO_CP * 11);
-            // v1.41.4 — Cold-aisle NORMALIZATION (ASHRAE recommended band, all zones ~22°C in normal state).
-            // The physics-derived value is still computed but used only as the excursion ceiling.
-            // Normal state: uniform 22.0°C ± 0.3°C tiny variance (sensor noise simulation).
-            var physicsTempC = SUPPLY_C + zHeat / (AIR_RHO_CP * airflow);
-            var baseTempC = 22.0 + ((z * 7919) % 7 - 3) * 0.1;  // deterministic ±0.3°C per row
-            var coldAisleC = Math.round(baseTempC * 10) / 10;
+            var airflow = designZoneHeat / (AIR_RHO_CP * DESIGN_AIRSIDE_DELTA_T_C);
+            var baseRackInletC = RACK_INLET_DESIGN_C + ((z * 7919) % 7 - 3) * 0.1;
+            var rackInletC = Math.round(baseRackInletC * 10) / 10;
+            var airsideDeltaTC = zHeat / (AIR_RHO_CP * airflow);
+            var hotAisleC = Math.round((rackInletC + airsideDeltaTC) * 10) / 10;
+            var returnAirC = Math.round((hotAisleC + RETURN_PATH_MIXING_ADJUSTMENT_C) * 10) / 10;
+            var rhPct = Math.round((S.environment.avg_rh_pct + ((z * 3571) % 5 - 2)) * 10) / 10;
             zones.push({
                 z: z, heat: Math.round(zHeat * 10) / 10, occ: zOcc, racks: zRacks,
                 maxUtil: zMaxUtil,
-                coldAisleC: coldAisleC,         // current displayed temp (excursion-mutable)
-                baseTempC: coldAisleC,           // stable normal-state baseline (for restore)
+                rackInletC: rackInletC,
+                baseRackInletC: rackInletC,
+                hotAisleC: hotAisleC,
+                returnAirC: returnAirC,
+                airsideDeltaTC: Math.round(airsideDeltaTC * 10) / 10,
+                rhPct: rhPct,
+                dewPointC: Math.round(dewPointC(rackInletC, rhPct) * 10) / 10,
                 excursionUntil: 0,               // ms epoch — when > now, this zone is excursing
                 airflow: Math.round(airflow * 100) / 100
             });
@@ -867,21 +938,31 @@
 
         /* --- Alarm evaluation (deterministic thresholds) ----------------
          * doc-03 §"Alarm Rules": warn rack >85% rating, crit >95%;
-         * warn cold-aisle >26C, crit >30C.
+         * warn rack-inlet >27C, crit >30C.
          */
-        var alarms = [];
-        racks.forEach(function (rk) {
-            if (!rk.occupied) return;
-            if (rk.util > 0.95) alarms.push({ sev: 'crit', src: rackTag(rk.idx), msg: 'Rack load ' + Math.round(rk.util * 100) + '% > 95% rating' });
-            else if (rk.util > 0.85) alarms.push({ sev: 'warn', src: rackTag(rk.idx), msg: 'Rack load ' + Math.round(rk.util * 100) + '% > 85% rating' });
-        });
-        zones.forEach(function (zn) {
-            if (zn.coldAisleC > 30) alarms.push({ sev: 'crit', src: zoneAisleTag(zn.z), msg: 'Cold aisle ' + zn.coldAisleC + '°C > 30°C' });
-            else if (zn.coldAisleC > 26) alarms.push({ sev: 'warn', src: zoneAisleTag(zn.z), msg: 'Cold aisle ' + zn.coldAisleC + '°C > 26°C' });
-        });
+        function evaluateAlarms() {
+            var result = [];
+            racks.forEach(function (rk) {
+                if (!rk.occupied) return;
+                if (rk.util > 0.95) result.push({ sev: 'crit', src: rackTag(rk.idx), msg: 'Rack load ' + Math.round(rk.util * 100) + '% > 95% rating' });
+                else if (rk.util > 0.85) result.push({ sev: 'warn', src: rackTag(rk.idx), msg: 'Rack load ' + Math.round(rk.util * 100) + '% > 85% rating' });
+            });
+            zones.forEach(function (zn) {
+                if (zn.rackInletC > 30) result.push({ sev: 'crit', src: zoneAisleTag(zn.z), msg: 'Rack inlet ' + zn.rackInletC + '°C > 30°C' });
+                else if (zn.rackInletC > RACK_INLET_RECOMMENDED_MAX_C) result.push({ sev: 'warn', src: zoneAisleTag(zn.z), msg: 'Rack inlet ' + zn.rackInletC + '°C > ' + RACK_INLET_RECOMMENDED_MAX_C + '°C recommended maximum' });
+            });
+            return result;
+        }
+        var alarms = evaluateAlarms();
         var critCount = alarms.filter(function (a) { return a.sev === 'crit'; }).length;
         var warnCount = alarms.filter(function (a) { return a.sev === 'warn'; }).length;
         var maintCount = CRAH_TOTAL - CRAH_RUNNING; // standby/maintenance spares
+
+        function refreshAlarmState() {
+            alarms = evaluateAlarms();
+            critCount = alarms.filter(function (a) { return a.sev === 'crit'; }).length;
+            warnCount = alarms.filter(function (a) { return a.sev === 'warn'; }).length;
+        }
 
         /* --- Tag helpers ------------------------------------------------- */
         function rackTag(idx) {
@@ -890,10 +971,10 @@
             var rowChar = String.fromCharCode(65 + z);          // A..J
             var pos = (inZone % 10) + 1;
             var side = inZone < 10 ? 'L' : 'R';
-            return 'R-' + rowChar + side + (pos < 10 ? '0' + pos : pos);
+            return 'R-' + SELECTED_HALL + '-' + rowChar + side + (pos < 10 ? '0' + pos : pos);
         }
-        function zoneAisleTag(z) { return 'CA-' + (z < 9 ? '0' + (z + 1) : (z + 1)); }
-        function crahTag(n) { return 'CRAH-A' + (n < 10 ? '0' + n : n); }
+        function zoneAisleTag(z) { return 'CA-' + SELECTED_HALL + (z < 9 ? '0' + (z + 1) : (z + 1)); }
+        function crahTag(n) { return 'CRAH-' + SELECTED_HALL + (n < 10 ? '0' + n : n); }
 
         /* --- CRAH air-side units (deterministic state) ------------------- */
         var crahUnits = [];
@@ -901,11 +982,11 @@
             var running = c <= CRAH_RUNNING;
             // supply/return tied to engine CHW + assigned zone heat share
             var zoneShare = COOL_DEMAND_KW / CRAH_RUNNING;
-            var sat = Math.round(SUPPLY_C * 10) / 10;
-            var rat = running ? Math.round((SUPPLY_C + zoneShare / (AIR_RHO_CP * (zoneShare / (AIR_RHO_CP * 11)))) * 10) / 10 : sat;
+            var leavingAirC = Math.round(CRAH_LEAVING_AIR_C * 10) / 10;
+            var returnAirC = running ? zones.reduce(function (sum, zone) { return sum + zone.returnAirC; }, 0) / zones.length : leavingAirC;
             crahUnits.push({
                 n: c, tag: crahTag(c), running: running,
-                sat: sat, rat: rat,
+                leavingAirC: leavingAirC, returnAirC: Math.round(returnAirC * 10) / 10,
                 fan: running ? 72 : 0,
                 valve: running ? 64 : 0,
                 capKw: running ? Math.round(zoneShare) : 0,
@@ -921,6 +1002,19 @@
         var selectedRackIdx = null;
 
         function fmtMW(kw) { return (kw / 1000).toFixed(3); }
+        function averageZoneField(field) {
+            var total = zones.reduce(function (sum, zone) { return sum + zone[field]; }, 0);
+            return total / zones.length;
+        }
+        function zoneWithRackInlet(zone, rackInletC) {
+            var next = {};
+            for (var key in zone) if (zone.hasOwnProperty(key)) next[key] = zone[key];
+            next.rackInletC = Math.round(rackInletC * 10) / 10;
+            next.hotAisleC = Math.round((next.rackInletC + next.airsideDeltaTC) * 10) / 10;
+            next.returnAirC = Math.round((next.hotAisleC + RETURN_PATH_MIXING_ADJUSTMENT_C) * 10) / 10;
+            next.dewPointC = Math.round(dewPointC(next.rackInletC, next.rhPct) * 10) / 10;
+            return next;
+        }
 
         function paintBalanceBand() {
             document.getElementById('bb-itload').textContent = fmtMW(rackTotal);
@@ -928,11 +1022,15 @@
                 Math.round(rackTotal) + ' kW summed from ' + occupiedCount + ' active racks';
             document.getElementById('bb-racks').textContent = occupiedCount + ' / ' + TOTAL_RACKS;
             document.getElementById('bb-avg').textContent =
-                'Avg ' + (rackTotal / occupiedCount).toFixed(2) + ' kW/rack · rating ' + RACK_RATING_KW + ' kW';
+                'Current active avg ' + (rackTotal / occupiedCount).toFixed(2) + ' kW/rack';
             var utilPct = (rackTotal / (TOTAL_RACKS * RACK_RATING_KW)) * 100;
             document.getElementById('bb-util').textContent = utilPct.toFixed(1);
             document.getElementById('bb-design').textContent =
-                'vs ' + (TOTAL_RACKS * RACK_RATING_KW / 1000).toFixed(1) + ' MW installed rack capacity';
+                'Current vs installed study ' + (TOTAL_RACKS * RACK_RATING_KW / 1000).toFixed(1) + ' MW';
+            document.getElementById('density-current').textContent =
+                (rackTotal / occupiedCount).toFixed(2) + ' kW/rack';
+            document.getElementById('density-study').textContent =
+                TOTAL_RACKS + ' × ' + RACK_RATING_KW + ' kW';
 
             // Balance vs EPMS IT reconciliation point
             var balKw = rackTotal - EPMS_IT_KW;
@@ -969,12 +1067,15 @@
         }
 
         function paintEnvironment() {
-            document.getElementById('env-temp').textContent = S.environment.avg_temp_c.toFixed(1) + ' °C';
-            document.getElementById('env-rh').textContent = S.environment.avg_rh_pct + ' %';
-            var hot = zones.slice().sort(function (a, b) { return b.coldAisleC - a.coldAisleC; })[0];
+            document.getElementById('env-temp').textContent = averageZoneField('rackInletC').toFixed(1) + ' °C';
+            document.getElementById('env-hot-aisle').textContent = averageZoneField('hotAisleC').toFixed(1) + ' °C';
+            document.getElementById('env-return').textContent = averageZoneField('returnAirC').toFixed(1) + ' °C';
+            document.getElementById('env-rh').textContent = averageZoneField('rhPct').toFixed(1) + ' % RH';
+            document.getElementById('env-dewpoint').textContent = averageZoneField('dewPointC').toFixed(1) + ' °Cdp';
+            var hot = zones.slice().sort(function (a, b) { return b.rackInletC - a.rackInletC; })[0];
             var hotEl = document.getElementById('env-hot');
-            hotEl.textContent = zoneAisleTag(hot.z) + ' ' + hot.coldAisleC.toFixed(1) + ' °C';
-            hotEl.className = 'v num ' + (hot.coldAisleC > 26 ? 'v-warn' : 'v-ok');
+            hotEl.textContent = zoneAisleTag(hot.z) + ' ' + hot.rackInletC.toFixed(1) + ' °C';
+            hotEl.className = 'v num ' + (hot.rackInletC > RACK_INLET_RECOMMENDED_MAX_C ? 'v-warn' : 'v-ok');
         }
 
         function paintCrahList() {
@@ -985,7 +1086,7 @@
                     '<span class="u-led ' + ledCls + '"></span>' +
                     '<span class="u-tag">' + u.tag + '</span>' +
                     '<span>' + u.state + '</span>' +
-                    '<span class="u-meta num">' + (u.running ? u.sat.toFixed(1) + '→' + u.rat.toFixed(1) + '°C' : 'off') + '</span>' +
+                    '<span class="u-meta num">' + (u.running ? u.leavingAirC.toFixed(1) + '→' + u.returnAirC.toFixed(1) + '°C' : 'off') + '</span>' +
                     '</div>';
             });
             document.getElementById('crah-list').innerHTML = html;
@@ -994,7 +1095,7 @@
         function paintAlarmList() {
             var el = document.getElementById('alarm-list');
             if (!alarms.length) {
-                el.innerHTML = '<span style="color:var(--st-normal)">No active alarms — all racks &lt;85% rating, cold aisles &lt;26 °C.</span>';
+                el.innerHTML = '<span style="color:var(--st-normal)">No active alarms — racks &lt;85% rating and rack inlets within the recommended upper limit.</span>';
                 return;
             }
             var html = '';
@@ -1062,12 +1163,11 @@
 
         function rackFill(rk, zone) {
             if (currentMode === 'space') return rk.occupied ? '#2f5e46' : '#1b2436';
-            if (currentMode === 'temp')  return rk.occupied ? tempFill(zone.coldAisleC) : '#1b2436';
+            if (currentMode === 'temp')  return rk.occupied ? tempFill(zone.rackInletC) : '#1b2436';
             if (currentMode === 'cooling-margin') {
-                /* v1.29.3: tint by cold-aisle margin to ASHRAE A1 recommended high (27°C).
-                   margin = 27 - coldAisleC. >5°C ok, 3-5 tight, 1-3 warn, ≤1 crit, <0 over. */
+                /* Tint by rack-inlet margin to the declared 27C recommended maximum. */
                 if (!rk.occupied) return '#1b2436';
-                var m = 27 - zone.coldAisleC;
+                var m = RACK_INLET_RECOMMENDED_MAX_C - zone.rackInletC;
                 if (m > 5)  return '#2f5e46';
                 if (m > 3)  return '#3f6f4e';
                 if (m > 1)  return '#7a5a1f';
@@ -1091,10 +1191,10 @@
                 for (var n = start; n <= end; n++) {
                     var u = crahUnits[n - 1];
                     var cls = u.running ? '' : 'stby';
-                    var satTxt = u.running ? u.sat.toFixed(1) + '°C' : 'OFF';
+                    var satTxt = u.running ? u.leavingAirC.toFixed(1) + '°C' : 'OFF';
                     h += '<div class="crah-cell ' + cls + '" data-crah="' + u.n + '" ' +
                         'onclick="window.__inspectCrah(' + u.n + ', event)" ' +
-                        'title="' + u.tag + ' — ' + u.state + ' — SAT ' + (u.running ? u.sat.toFixed(1) + '°C' : 'off') + '">' +
+                        'title="' + u.tag + ' — ' + u.state + ' — leaving air ' + (u.running ? u.leavingAirC.toFixed(1) + '°C' : 'off') + '">' +
                         '<span class="cc-dot"></span>' + u.tag.replace('CRAH-', '') +
                         '<span class="cc-sat">' + satTxt + '</span></div>';
                 }
@@ -1111,8 +1211,8 @@
                 fh += '<div class="zone">' +
                     '<div class="zone-head">Row ' + rowChar + ' · ' + zoneAisleTag(z) + '</div>' +
                     '<div class="zone-racks" id="zr-' + z + '"></div>' +
-                    '<div class="zone-foot num">' + zn.heat.toFixed(0) + ' kW · ' +
-                    zn.coldAisleC.toFixed(1) + '°C</div>' +
+                    '<div class="zone-foot num">' + zn.heat.toFixed(0) + ' kW · IN ' +
+                    zn.rackInletC.toFixed(1) + '°C · HOT ' + zn.hotAisleC.toFixed(1) + '°C</div>' +
                     '</div>';
             }
             field.innerHTML = fh;
@@ -1148,8 +1248,8 @@
                     var valTxt = '';
                     if (rk.occupied) {
                         if (currentMode === 'power') valTxt = rk.kw.toFixed(1) + ' kW';
-                        else if (currentMode === 'temp') valTxt = zn.coldAisleC.toFixed(1) + '°C';
-                        else if (currentMode === 'cooling-margin') valTxt = (27 - zn.coldAisleC).toFixed(1) + '°C';
+                        else if (currentMode === 'temp') valTxt = zn.rackInletC.toFixed(1) + '°C';
+                        else if (currentMode === 'cooling-margin') valTxt = (RACK_INLET_RECOMMENDED_MAX_C - zn.rackInletC).toFixed(1) + '°C';
                         else if (currentMode === 'alarms') valTxt = Math.round(rk.util * 100) + '%';
                         else valTxt = 'IT';
                     } else {
@@ -1184,7 +1284,8 @@
                     ? '<div class="tt-row"><span class="tt-k">Load</span><span class="num">' + rk.kw.toFixed(2) + ' kW</span></div>' +
                       '<div class="tt-row"><span class="tt-k">Utilization</span><span class="num">' + Math.round(rk.util * 100) + '% of ' + RACK_RATING_KW + ' kW</span></div>' +
                       '<div class="tt-row"><span class="tt-k">State</span><span>' + t.name + '</span></div>' +
-                      '<div class="tt-row"><span class="tt-k">Cold aisle</span><span class="num">' + zn.coldAisleC.toFixed(1) + ' °C</span></div>'
+                      '<div class="tt-row"><span class="tt-k">Rack inlet</span><span class="num">' + zn.rackInletC.toFixed(1) + ' °C</span></div>' +
+                      '<div class="tt-row"><span class="tt-k">Hot aisle</span><span class="num">' + zn.hotAisleC.toFixed(1) + ' °C</span></div>'
                     : '<div class="tt-row"><span class="tt-k">State</span><span>Spare / unoccupied</span></div>');
             TT.style.display = 'block';
             moveTip(e);
@@ -1207,18 +1308,32 @@
             var rk = racks[idx];
             var zn = zones[Math.floor(idx / RACKS_PER_ZONE)];
             var t = tierOf(rk.util, rk.occupied);
+            var coolingCoverage = COOL_AVAIL_KW / COOL_DEMAND_KW;
+            var allocatedCoolingKw = rk.kw * coolingCoverage;
+            var coolingDutyUtilization = allocatedCoolingKw > 0 ? (rk.kw / allocatedCoolingKw) * 100 : 0;
             document.getElementById('sel-detail').innerHTML =
                 '<div style="font-weight:800;color:var(--sel);margin-bottom:6px;">' + rackTag(idx) + '</div>' +
                 row('Status', rk.occupied ? t.name : 'Spare / unoccupied') +
                 (rk.occupied ? (
-                    row('Load', rk.kw.toFixed(2) + ' kW') +
+                    row('Electrical load', rk.kw.toFixed(2) + ' kW') +
                     row('Rating', RACK_RATING_KW + ' kW') +
                     row('Utilization', Math.round(rk.util * 100) + ' %') +
                     row('Row / Aisle', String.fromCharCode(65 + zn.z) + ' / ' + zoneAisleTag(zn.z)) +
-                    row('Cold-aisle temp', zn.coldAisleC.toFixed(1) + ' °C')
+                    row('Rack-inlet / cold-aisle', zn.rackInletC.toFixed(1) + ' °C') +
+                    row('Hot-aisle temperature', zn.hotAisleC.toFixed(1) + ' °C') +
+                    row('Air-side ΔT', zn.airsideDeltaTC.toFixed(1) + ' K') +
+                    row('Relative humidity', zn.rhPct.toFixed(1) + ' % RH') +
+                    row('Dew point', zn.dewPointC.toFixed(1) + ' °Cdp') +
+                    row('Actual heat load', rk.kw.toFixed(2) + ' kWth') +
+                    row('Allocated cooling', allocatedCoolingKw.toFixed(2) + ' kWth') +
+                    row('Cooling coverage', (coolingCoverage * 100).toFixed(1) + ' %') +
+                    row('Cooling duty utilization', coolingDutyUtilization.toFixed(1) + ' %') +
+                    row('Plant cooling efficiency', 'Not rack-derived')
                 ) : '') +
-                '<div class="formula">Source: calculated · conv-engine snapshot · ' +
-                S.meta.scenario + ' · v' + S.meta.version + '</div>';
+                '<div class="formula"><b>Sensible heat equivalence:</b> rack electrical kW ≈ rack sensible kWth. '
+                + 'Cooling coverage = allocated cooling / actual heat load; duty utilization = actual heat / allocated duty. '
+                + 'Plant COP/efficiency requires chiller input power and is intentionally not inferred from this rack snapshot. '
+                + 'Source: calculated · conv-engine snapshot · ' + S.meta.scenario + ' · v' + S.meta.version + '</div>';
         }
         function row(k, v) {
             return '<div class="kv" style="font-size:11px;"><span class="k">' + k +
@@ -1237,8 +1352,10 @@
             stEl.textContent = u.state;
             stEl.className = 'cp-state ' + (u.running ? 'run' : 'stby');
             document.getElementById('cp-grid').innerHTML =
-                cprow('Supply air', u.running ? u.sat.toFixed(1) + ' °C' : '—') +
-                cprow('Return air', u.running ? u.rat.toFixed(1) + ' °C' : '—') +
+                cprow('CRAH leaving air', u.running ? u.leavingAirC.toFixed(1) + ' °C' : '—') +
+                cprow('CRAH return air', u.running ? u.returnAirC.toFixed(1) + ' °C' : '—') +
+                cprow('Rack-inlet design SP', RACK_INLET_DESIGN_C.toFixed(1) + ' °C') +
+                cprow('Air-side ΔT', u.running ? (u.returnAirC - u.leavingAirC).toFixed(1) + ' K' : '—') +
                 cprow('Fan speed', u.running ? u.fan + ' %' : '0 %') +
                 cprow('CHW valve', u.running ? u.valve + ' %' : '0 %') +
                 cprow('Cooling duty', u.running ? u.capKw + ' kW' : '0 kW') +
@@ -1285,7 +1402,7 @@
 
         /* --- Excursion simulator (v1.41.4) --------------------------------
          * Every 2 min, pick a random zone (row) + CRAH. For 10-15 s the zone's
-         * cold-aisle temp jumps to 27-30°C and the corresponding CRAH cell + all
+         * rack-inlet temp jumps to 27.5-30°C and the corresponding CRAH cell + all
          * racks in the row flash red. Then it normalises back to baseline.
          */
         var excursionState = null;  // { zoneZ, crahN, expiresAt }
@@ -1298,31 +1415,46 @@
             var durMs = dhRandInt(10000, 15000);
             var excursTemp = Math.round(dhRand(27.5, 30.0) * 10) / 10;
             var endAt = Date.now() + durMs;
-            zones[zoneZ].coldAisleC = excursTemp;
-            zones[zoneZ].excursionUntil = endAt;
+            zones = zones.map(function (zone, index) {
+                if (index !== zoneZ) return zone;
+                var next = zoneWithRackInlet(zone, excursTemp);
+                next.excursionUntil = endAt;
+                return next;
+            });
             excursionState = { zoneZ: zoneZ, crahN: crahN, expiresAt: endAt };
+            refreshAlarmState();
+            paintAlarmList();
+            paintAlarmStrip();
             // Update banner
             var banner = document.getElementById('excursionBanner');
-            banner.textContent = '⚠ EXCURSION SIMULATED — ' + zoneAisleTag(zoneZ) + ' (Row ' + String.fromCharCode(65 + zoneZ) + ') · CRAH-A' + (crahN < 10 ? '0' + crahN : crahN) + ' affected · cold-aisle ' + excursTemp.toFixed(1) + '°C (target 22°C) · ' + Math.round(durMs/1000) + 's';
+            banner.textContent = '⚠ EXCURSION SIMULATED — ' + zoneAisleTag(zoneZ) + ' (Row ' + String.fromCharCode(65 + zoneZ) + ') · ' + crahTag(crahN) + ' affected · rack inlet ' + excursTemp.toFixed(1) + '°C (design ' + RACK_INLET_DESIGN_C.toFixed(1) + '°C) · ' + Math.round(durMs/1000) + 's';
             banner.classList.add('on');
             // Mark CRAH cell affected
             var crahCell = document.querySelector('.crah-cell[data-crah="' + crahN + '"]');
             if (crahCell) crahCell.classList.add('cc-affected');
-            log('Excursion event: ' + zoneAisleTag(zoneZ) + ' rose to ' + excursTemp.toFixed(1) + '°C — CRAH-A' + (crahN < 10 ? '0' + crahN : crahN) + ' under-cooling.', 'warn');
+            log('Excursion event: ' + zoneAisleTag(zoneZ) + ' rack inlet rose to ' + excursTemp.toFixed(1) + '°C — ' + crahTag(crahN) + ' under-cooling.', 'warn');
             repaintRacks();
             paintEnvironment();
             // Auto-clear
             setTimeout(function () {
-                zones[zoneZ].coldAisleC = zones[zoneZ].baseTempC;
-                zones[zoneZ].excursionUntil = 0;
+                zones = zones.map(function (zone, index) {
+                    if (index !== zoneZ) return zone;
+                    var next = zoneWithRackInlet(zone, zone.baseRackInletC);
+                    next.excursionUntil = 0;
+                    return next;
+                });
                 banner.classList.remove('on');
                 if (crahCell) crahCell.classList.remove('cc-affected');
-                log('Excursion cleared: ' + zoneAisleTag(zoneZ) + ' returned to baseline ' + zones[zoneZ].baseTempC.toFixed(1) + '°C.', 'info');
+                log('Excursion cleared: ' + zoneAisleTag(zoneZ) + ' returned to rack-inlet baseline ' + zones[zoneZ].baseRackInletC.toFixed(1) + '°C.', 'info');
                 excursionState = null;
+                refreshAlarmState();
+                paintAlarmList();
+                paintAlarmStrip();
                 repaintRacks();
                 paintEnvironment();
             }, durMs);
         }
+        window.__fireDatahallExcursion = fireExcursion;
         // Fire first excursion 30 s after load, then every 2 min
         setTimeout(function () { fireExcursion(); setInterval(fireExcursion, 120000); }, 30000);
 
@@ -1365,6 +1497,37 @@
                 '<span class="' + cls + '">' + msg + '</span></div>');
         }
 
+        function selectHall(hall) {
+            if (typeof hall !== 'string' || !/^[ABCD]$/.test(hall)) return;
+            SELECTED_HALL = hall;
+            var buttons = document.querySelectorAll('#hall-selector button[data-hall]');
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].setAttribute('aria-pressed', buttons[i].getAttribute('data-hall') === hall ? 'true' : 'false');
+            }
+            document.getElementById('brand-hall').textContent = hall;
+            document.getElementById('hall-scope-label').textContent = 'Data Hall ' + hall;
+            document.getElementById('bb-hall-label').textContent = 'Hall ' + hall + ' IT Load';
+            document.getElementById('env-hall-title').textContent = 'Environment (Hall ' + hall + ')';
+            crahUnits = crahUnits.map(function (unit) {
+                var next = {};
+                for (var key in unit) if (unit.hasOwnProperty(key)) next[key] = unit[key];
+                next.tag = crahTag(unit.n);
+                return next;
+            });
+            refreshAlarmState();
+            paintBalanceBand();
+            paintEnvironment();
+            paintCrahList();
+            paintAlarmList();
+            paintAlarmStrip();
+            renderFloor();
+            if (selectedRackIdx !== null) selectRack(selectedRackIdx);
+            else document.getElementById('sel-detail').textContent = 'Hall ' + hall + ' selected. Hover or click a rack / CRAH unit to inspect.';
+            window.__closeCrahPop();
+            log('Operational scope changed to Data Hall ' + hall + '; locked reference scenario retained.', 'info');
+        }
+        window.selectHall = selectHall;
+
         /* --- Boot -------------------------------------------------------- */
         paintBalanceBand();
         paintCoolingPanel();
@@ -1377,14 +1540,14 @@
         tick();
         setInterval(tick, 1000);
 
-        log('Data Hall A SCADA bound to single scenario basis (conv-engine v' + S.meta.version + ').', 'info');
+        log('Data Hall ' + SELECTED_HALL + ' SCADA bound to one locked reference scenario (conv-engine v' + S.meta.version + ').', 'info');
         log('Rack field reconciled: ' + Math.round(rackTotal) + ' kW summed = engine IT load ' +
             SITE_IT_KW + ' kW across ' + occupiedCount + ' active / ' + TOTAL_RACKS + ' cabinets.', 'info');
         log('Cooling: demand ' + Math.round(COOL_DEMAND_KW) + ' kW, available ' +
             Math.round(COOL_AVAIL_KW) + ' kW, N+1 ' + (N1_PASS ? 'PASS' : 'FAIL') + '.', N1_PASS ? 'info' : 'crit');
         if (critCount > 0) log(critCount + ' critical alarm(s) active — see Active Alarms panel.', 'crit');
         else if (warnCount > 0) log(warnCount + ' warning(s) active — see Active Alarms panel.', 'warn');
-        else log('All racks within rating, all cold aisles within ASHRAE band. State NORMAL.', 'info');
+        else log('All racks within rating; rack-inlet temperatures remain inside the recommended envelope. State NORMAL.', 'info');
     })();
     </script>
 <script src="auth.js?v=2026-08-26-h1h2" defer></script>
