@@ -11,6 +11,25 @@ release sections rather than semver.
 
 ---
 
+## v1.131.2 — 2026-08-27 (Ship-gate integrity: service-worker parity + corrected ATS acceptance criterion)
+
+### Fixed
+- **Service-worker cache version was left behind at v1.131.0** while the site shipped v1.131.1, so the
+  agent-harness release-parity gate failed and cached clients could keep a stale bundle. `sw.js` now tracks
+  the site version (`rz-cache-v1.131.2`). This was my miss when shipping v1.131.1 — the version bump must
+  always carry `sw.js` with it.
+
+### Changed
+- **Corrected (not weakened) the EPMS ATS acceptance criterion.** `tools/test-epms-ats-rack-color.mjs`
+  asserted that in NORMAL operation both sampled legs render Feed A — requiring rack 5, whose main feed is
+  `PDU_B_5`, to display Feed A. That expectation encoded the first-come-first-served traversal artefact the
+  v1.131.1 fix removed: source A is energized first and reaches the CATCHER (`PDU_C_5`) before the B
+  propagation arrives, so the catcher claimed a rack ATS whose main feed was healthy. A rack ATS rests on
+  its PREFERRED main source and transfers to the catcher only when main is dead — which the file's own other
+  assertions already require (`generatorC` expects catcher provenance on both racks once the mains are dead;
+  `utilityBViaTie` requires the leg to follow the resolved feed). The normal-operation expectation is now
+  rack 0 = Feed A, rack 5 = Feed B, with the reasoning recorded inline in the test.
+
 ## v1.131.1 — 2026-08-27 (EPMS: rack ATS transfers to a selected source)
 
 ### Fixed

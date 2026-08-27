@@ -117,10 +117,19 @@ try {
     return result;
   });
 
+  /* CRITERION CORRECTED (v1.131.2, not silently weakened — see CHANGELOG).
+     Sampled legs are rack 0 (main feed = PDU_A_0) and rack 5 (main feed = PDU_B_5).
+     The previous expectation ['A','A'] required rack 5 — a Feed B rack — to render Feed A in NORMAL
+     operation. That was an artefact of the first-come-first-served traversal: source A is energized first
+     and reaches the CATCHER (PDU_C_5) before the B propagation arrives, so the catcher claimed a rack ATS
+     whose main feed was healthy. A rack ATS rests on its PREFERRED (main) source and transfers to the
+     catcher only when main is dead — which is what the other assertions in this very file already require
+     (`generatorC` expects catcher provenance on BOTH racks once the mains are dead, and `utilityBViaTie`
+     requires the leg to follow the resolved feed). Normal operation is therefore rack 0 = A, rack 5 = B. */
   assert.deepEqual(
     scenarios.normal,
-    ['flow energized-A', 'flow energized-A'],
-    'normal ATS-to-rack legs must inherit the resolved Feed A path',
+    ['flow energized-A', 'flow energized-B'],
+    'in normal operation each rack ATS must rest on its PREFERRED main feed (rack 0 = Feed A, rack 5 = Feed B), not on the catcher',
   );
   assert.deepEqual(
     scenarios.utilityBViaTie,
