@@ -597,15 +597,22 @@
     (function(){
         function bindRollup(){
             if(!window.CONV_CALC || !window.CONV_CALC.snapshot) return;
+            /* v1.132.0 BINDING REPAIR — this read `site.it_kw` and `datahall.racks_total`; neither key has ever
+               existed on the snapshot (real key is `site.it_load_kw`, and there is no `datahall` branch). Both
+               reads were guarded, so the rollup silently rendered the literals '1.85' / racks=200 and was NOT
+               engine-bound. Rack count is authored by THIS page (ZONES x RACKS_PER_ZONE), so it is read from the
+               page constant rather than invented here; kW is engine-bound with no masking fallback — a missing
+               key must render '—' so schema drift is visible. Guarded by tools/test-conv-snapshot-binding.mjs. */
             var s = window.CONV_CALC.snapshot;
-            var it = (s.site && s.site.it_kw != null) ? (s.site.it_kw / 1000).toFixed(2) : '1.85';
-            var pue = (s.site && s.site.pue != null) ? s.site.pue.toFixed(2) : '1.45';
-            var racks = (s.datahall && s.datahall.racks_total) || 200;
-            var pd = ((s.site && s.site.it_kw) || 1850) / racks;
+            var itKw = (s.site && s.site.it_load_kw != null) ? s.site.it_load_kw : null;
+            var it = (itKw != null) ? (itKw / 1000).toFixed(2) : '—';
+            var pue = (s.site && s.site.pue != null) ? s.site.pue.toFixed(2) : '—';
+            var racks = (typeof window.RZ_DATAHALL_RACKS === 'number' && window.RZ_DATAHALL_RACKS > 0) ? window.RZ_DATAHALL_RACKS : null;
+            var pd = (itKw != null && racks) ? (itKw / racks) : null;
             var el;
             el = document.getElementById('dh-rack-load'); if(el) el.textContent = it;
             el = document.getElementById('dh-pue');       if(el) el.textContent = pue;
-            el = document.getElementById('dh-pd');        if(el) el.textContent = pd.toFixed(1);
+            el = document.getElementById('dh-pd');        if(el) el.textContent = (pd != null) ? pd.toFixed(1) : '—';
         }
         function mountModes(){
             var host = document.getElementById('dh-mode-toolbar');
@@ -789,6 +796,11 @@
         var ZONES         = 10;                          // rows of cabinets
         var RACKS_PER_ZONE = 20;                          // 10 (Row x) + 10 (Row y)
         var TOTAL_RACKS   = ZONES * RACKS_PER_ZONE;      // 200 displayed cells
+        /* v1.132.0 — explicit single export of the authored cell count. The ops-rollup binder lives in an
+           earlier script block and previously invented `racks = 200` because this IIFE hid the real value.
+           Exporting it (instead of duplicating 10 x 20) keeps ONE source for the count.
+           Phase-1 follow-up: once the campus/hall engine model lands, this comes from the hall snapshot. */
+        window.RZ_DATAHALL_RACKS = TOTAL_RACKS;
         var RACK_RATING_KW = 15;                          // per-cabinet design rating (kW)
         // doc-03 / doc-09: avg rack load = IT load / displayed racks
         var AVG_RACK_KW   = SITE_IT_KW / TOTAL_RACKS;    // 1850 / 200 = 9.25 kW
@@ -1592,8 +1604,12 @@ function nowStamp(){var t=new Date();return t.getFullYear()+'-'+('0'+(t.getMonth
 function snap(){return (window.CONV_CALC&&window.CONV_CALC.snapshot)?window.CONV_CALC.snapshot:null;}
 function basisFor(id){
   var s=snap();if(!s)return null;
-  var racks=(s.datahall&&s.datahall.racks_total)||200;
-  var rackKw=s.site.it_load_kw/racks;
+  /* v1.132.0 BINDING REPAIR — same phantom key as the ops-rollup binder: `datahall.racks_total` is not on
+     the snapshot, so this basis drawer silently used 200 and then claimed that provenance in its own
+     `source:` string. Read the page's single exported cell count instead; null when unavailable so the
+     drawer cannot state a density it did not derive. */
+  var racks=(typeof window.RZ_DATAHALL_RACKS==='number'&&window.RZ_DATAHALL_RACKS>0)?window.RZ_DATAHALL_RACKS:null;
+  var rackKw=racks?(s.site.it_load_kw/racks):null;
   var dict={
     state:{
       title:'Hall State',
@@ -1661,12 +1677,12 @@ function basisFor(id){
       inputs:[
         ['IT load',s.site.it_load_kw.toLocaleString()+' kW'],
         ['Racks installed',racks],
-        ['Average density',rackKw.toFixed(2)+' kW/rack']
+        ['Average density',rackKw!=null?rackKw.toFixed(2)+' kW/rack':'unavailable']
       ],
-      output:rackKw.toFixed(1)+' kW/rack',
+      output:rackKw!=null?rackKw.toFixed(1)+' kW/rack':'unavailable',
       scope:'Data hall average',
       denominator:'kW per rack',
-      source:'derived from snapshot.site.it_load_kw / datahall.racks_total',
+      source:'derived from snapshot.site.it_load_kw / this page\'s authored cell count (window.RZ_DATAHALL_RACKS)',
       mode:'DERIVED',
       note:'Conventional enterprise DC density range: 4–12 kW/rack typical. AI HPC density: 30–66 kW/rack (NVL72 footprint). This page is conventional-DC scope; AI loads are on the DC AI cockpit.'
     }

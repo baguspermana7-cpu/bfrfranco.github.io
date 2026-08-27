@@ -56,6 +56,7 @@ gate "DC AI fire — FACP cause and effect" node tools/test-datahall-ai-fire-cau
 gate "DC AI operator UI — markup contract" node tools/test-datahall-ai-operator-ui.mjs
 gate "DC AI operator UI — runtime contract" node tools/test-datahall-ai-operator-runtime.mjs
 gate "EPMS — ATS-to-rack source colour" node tools/test-epms-ats-rack-color.mjs
+gate "Conventional snapshot binding — no phantom keys, strips follow the engine" node tools/test-conv-snapshot-binding.mjs
 gate "Conventional study — reconciled four-hall basis" node --test tools/test-conv-design-basis.mjs
 gate "Conventional alarms — common historian workspace" node --test tools/test-conv-alarm-workspace.mjs
 gate "Conventional alarms — modal runtime and accessibility" node tools/test-conv-alarm-runtime.mjs

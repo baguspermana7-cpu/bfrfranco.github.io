@@ -11,6 +11,32 @@ release sections rather than semver.
 
 ---
 
+## v1.132.0 — 2026-08-27 (Conventional cockpits are actually engine-bound — five phantom-key repairs + a binding gate)
+
+> Prerequisite for the four-hall campus migration: a basis change cannot propagate through a page that only
+> looks bound. Every repair below was proven by perturbing the engine and watching the DOM follow.
+
+### Fixed
+- **Five reads bound to snapshot keys that have never existed**, each `!= null`-guarded so the page silently
+  rendered a hardcoded literal that happened to equal the live basis — no test failed, and the strips were not
+  engine-bound despite comments claiming they "can never diverge from the dashboard":
+  `EPMS_Telemetry.html` `site.facility_kw` / `site.it_kw` (real keys: `facility_load_kw` / `it_load_kw`);
+  `datahall.html` ops rollup `site.it_kw` and `datahall.racks_total` (there is no `datahall` branch);
+  `datahall.html` basis drawer `datahall.racks_total` — found by the new gate, not by inspection — which then
+  claimed that non-existent path in its own `source:` provenance string.
+- **Masking fallbacks removed on purpose.** A missing key now renders `—` (and the density basis reads
+  `unavailable`) so schema drift is visible instead of being hidden behind a plausible constant.
+- `datahall.html` exports its authored cell count once (`window.RZ_DATAHALL_RACKS`) instead of two call sites
+  inventing `200`; the basis drawer's provenance now names the real derivation.
+
+### Added
+- `tools/test-conv-snapshot-binding.mjs` (ship gate, now 34 gates) kills this bug class two ways:
+  **static** — every snapshot path a Conventional cockpit reads must exist on the frozen `CONV_CALC.snapshot`,
+  and the three phantom keys may never reappear in executable code (comments that document the defect are
+  ignored); **dynamic** — the engine is served with a perturbed IT load and the rendered strips must follow it,
+  so a literal-pinned value cannot pass however plausible it looks. Verified by negative control: reintroducing
+  either defect fails the gate immediately.
+
 ## v1.131.2 — 2026-08-27 (Ship-gate integrity: service-worker parity + corrected ATS acceptance criterion)
 
 ### Fixed

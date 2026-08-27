@@ -461,10 +461,16 @@
 (function(){
     function bindEpmsStatus(){
         if(!window.CONV_CALC || !window.CONV_CALC.snapshot) return;
+        /* v1.132.0 BINDING REPAIR — these read `site.facility_kw` / `site.it_kw`, which have NEVER existed on
+           the snapshot (the real keys are `facility_load_kw` / `it_load_kw`). Every read was `!= null`-guarded,
+           so the strip silently rendered the hardcoded literals and was NOT engine-bound despite the comment
+           above claiming it could "never diverge from the dashboard". Fallbacks are removed deliberately: if the
+           engine is present but a key is missing the value must read `—`, so a schema drift is VISIBLE instead
+           of being masked by a plausible-looking constant. Guarded by tools/test-conv-snapshot-binding.mjs. */
         var s = window.CONV_CALC.snapshot;
-        var fac = (s.site && s.site.facility_kw != null) ? (s.site.facility_kw / 1000).toFixed(2) : '2.68';
-        var it  = (s.site && s.site.it_kw       != null) ? (s.site.it_kw / 1000).toFixed(2)       : '1.85';
-        var pue = (s.site && s.site.pue         != null) ? s.site.pue.toFixed(2)                 : '1.45';
+        var fac = (s.site && s.site.facility_load_kw != null) ? (s.site.facility_load_kw / 1000).toFixed(2) : '—';
+        var it  = (s.site && s.site.it_load_kw       != null) ? (s.site.it_load_kw / 1000).toFixed(2)       : '—';
+        var pue = (s.site && s.site.pue              != null) ? s.site.pue.toFixed(2)                       : '—';
         var fEl = document.getElementById('epms-fac'); if(fEl) fEl.textContent = fac;
         var iEl = document.getElementById('epms-it');  if(iEl) iEl.textContent = it;
         var pEl = document.getElementById('epms-pue'); if(pEl) pEl.textContent = pue;
