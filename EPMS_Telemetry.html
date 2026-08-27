@@ -896,12 +896,14 @@ function runATSLogic(){
 
 function calcPowerFlow(){
     SIM.energizedNodes = {};
+    SIM.energizedType = {};
     document.querySelectorAll('.flow').forEach(el => el.setAttribute('class', 'flow'));
     document.querySelectorAll('.tele-txt').forEach(el => el.textContent = '0V 0A 0kW');
 
     const energize = (nodeId, color, sourceType) => {
         if(SIM.energizedNodes[nodeId]) return;
         SIM.energizedNodes[nodeId] = color;
+        SIM.energizedType[nodeId] = sourceType;
 
         const wires = WIRES.filter(w => {
             if(w.from === nodeId) return true;
@@ -945,6 +947,46 @@ function calcPowerFlow(){
     if(SIM.genRunning.A && SIM.breakers['br_gen_a'] === 'closed') energize('GEN_A', 'A', 'GEN');
     if(SIM.genRunning.B && SIM.breakers['br_gen_b'] === 'closed') energize('GEN_B', 'B', 'GEN');
     if(SIM.genRunning.C && SIM.breakers['br_gen_c'] === 'closed') energize('GEN_C', 'C', 'GEN');
+
+    /* Rack ATS source selection (v1.131.1) — a rack ATS has TWO live inputs: its MAIN PDU feed and the
+       CATCHER (PDU_C) feed. The traversal above is first-come-first-served, so the catcher branch (reached
+       from source A) could claim a B-side rack ATS first and the ATS->rack leg then rendered A while its
+       main feed was clearly B — the colour-inheritance defect the owner reported.
+       An ATS transfers to exactly ONE source: prefer MAIN, fall back to CATCHER only when main is dead.
+       Both INPUT wires stay energized (they are genuinely live up to the ATS); only the OUTPUT leg and the
+       rack follow the SELECTED source. */
+    for(let i = 0; i < 10; i++){
+        const srcCol   = i < 5 ? 'A' : 'B';
+        const mainPdu  = `PDU_${srcCol}_${i}`;
+        const catchPdu = `PDU_C_${i}`;
+        const mainLive  = SIM.breakers[`br_ats_m_${i}`] === 'closed' && SIM.energizedNodes[mainPdu];
+        const catchLive = SIM.breakers[`br_ats_c_${i}`] === 'closed' && SIM.energizedNodes[catchPdu];
+        const selNode = mainLive ? mainPdu : (catchLive ? catchPdu : null);
+        const legEl = document.getElementById(`flow-w_ats_rack_${i}`);
+        const tele  = document.getElementById(`tele-w_ats_rack_${i}`);
+
+        if(selNode){
+            SIM.energizedNodes[`rATS_${i}`] = SIM.energizedNodes[selNode];
+            SIM.energizedType[`rATS_${i}`]  = SIM.energizedType[selNode];
+        } else {
+            delete SIM.energizedNodes[`rATS_${i}`];
+            delete SIM.energizedType[`rATS_${i}`];
+        }
+
+        if(selNode && SIM.breakers[`br_rack_${i}`] === 'closed'){
+            const col = SIM.energizedNodes[selNode];
+            const gen = SIM.energizedType[selNode] === 'GEN' ? '-gen' : '';
+            SIM.energizedNodes[`RACK_${i}`] = col;
+            SIM.energizedType[`RACK_${i}`]  = SIM.energizedType[selNode];
+            if(legEl) legEl.setAttribute('class', `flow energized-${col}${gen}`);
+            if(tele) tele.textContent = `230V ${Math.floor((6 * 1000) / (1.732 * 230 * 0.9))}A 6kW`;
+        } else {
+            delete SIM.energizedNodes[`RACK_${i}`];
+            delete SIM.energizedType[`RACK_${i}`];
+            if(legEl) legEl.setAttribute('class', 'flow');
+            if(tele) tele.textContent = '0V 0A 0kW';
+        }
+    }
 }
 
 /* ==============================================

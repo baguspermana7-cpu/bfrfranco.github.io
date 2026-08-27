@@ -11,6 +11,21 @@ release sections rather than semver.
 
 ---
 
+## v1.131.1 — 2026-08-27 (EPMS: rack ATS transfers to a selected source)
+
+### Fixed
+- **ATS → rack legs no longer contradict their upstream feed.** The owner reported downstream `ATS → rack`
+  legs rendering a different colour from the contiguous energized upstream path. The earlier hard-coded
+  green force was already removed, but the underlying defect remained: a rack ATS has TWO live inputs
+  (its MAIN PDU feed and the CATCHER `PDU_C` feed) and the traversal in `calcPowerFlow()` was
+  first-come-first-served — the catcher branch (reached from source A) claimed the B-side rack ATS before
+  the B propagation arrived, so racks 5–9 rendered `A` while their main feed was plainly `B`.
+  `calcPowerFlow()` now resolves each rack ATS like a real transfer switch: **prefer MAIN, fall back to
+  CATCHER only when main is dead**, and the OUTPUT leg + rack follow the selected source (both input wires
+  stay energized, because they genuinely are live up to the ATS). Generator-fed sources keep their `-gen`
+  visual, and an open rack breaker de-energizes the leg without de-energizing the ATS.
+  Verified headless: default → racks 5–9 follow main `B`; Utility-B loss → racks 5–9 fall back to catcher; 0 console errors.
+
 ## v1.131.0 — 2026-08-27 (Conventional DC operations hardening)
 
 > Completes the Conventional DC operator pass while preserving the already-shipped AI/HPC DC cockpit,
