@@ -892,42 +892,59 @@
             return (x % 100000) / 100000;
         }
 
+        /* v1.134.4 — HALL SEED. Selecting a hall used to relabel headings and leave the
+           cabinet field untouched, so all four halls drew the identical floor. The seed makes
+           each hall a distinct deterministic distribution while the TOTALS stay invariant:
+           every hall carries the same adopted 7,500 kW, because the governed study gives the
+           four halls identical capacity. Different floor, same basis — which is the truth. */
+        var HALL_SEED = 0;
+        function setHallSeed(code) { HALL_SEED = (code.charCodeAt(0) - 65) * 100003; }
+        setHallSeed(SELECTED_HALL);
         // Decide occupancy: ~8% of cabinets are empty/spare (deterministic).
+        /* v1.134.4 — the cabinet field is now REBUILDABLE. Hall selection used to relabel
+           headings and leave this field untouched, so every hall drew the identical floor.
+           Extracted into a builder the selector can re-run, rather than duplicated. */
         var racks = [];
         var occupiedCount = 0;
-        for (var i = 0; i < TOTAL_RACKS; i++) {
-            var h = hash01(i);
-            var occupied = h > 0.08;          // ~8% spare slots
-            // Deterministic per-rack demand weight. Spread is bounded so the
-            // hall reads calm by default (doc-10: normal must be calm) while a
-            // small deterministic upper tail produces a few genuine hotspots
-            // vs the cabinet rating. Mean weight ≈ 1.0 → after rescale the
-            // occupied total reconciles exactly to the engine IT load.
-            var weight = occupied ? (0.70 + hash01(i + 7777) * 0.62) : 0;
-            racks.push({ idx: i, occupied: occupied, weight: weight, kw: 0 });
-            if (occupied) occupiedCount++;
-        }
-        // Normalise occupied weights so the occupied total == SITE_IT_KW.
-        var weightSum = 0;
-        racks.forEach(function (r) { weightSum += r.weight; });
-        var scale = SITE_IT_KW / weightSum;
         var rackTotal = 0;
-        racks.forEach(function (r) {
-            r.kw = r.occupied ? Math.round(r.weight * scale * 100) / 100 : 0;
-            r.util = r.kw / RACK_RATING_KW;   // utilization vs rating
-            rackTotal += r.kw;
-        });
-        // residual rounding correction onto the single highest-load rack so
-        // the displayed sum reconciles to the engine IT load to the kW.
-        var residual = Math.round((SITE_IT_KW - rackTotal) * 100) / 100;
-        if (Math.abs(residual) > 0.001) {
-            var top = null;
-            racks.forEach(function (r) { if (r.occupied && (!top || r.kw > top.kw)) top = r; });
-            if (top) { top.kw = Math.round((top.kw + residual) * 100) / 100; top.util = top.kw / RACK_RATING_KW; }
+        function buildRackField() {
+            racks = [];
+            occupiedCount = 0;
+            for (var i = 0; i < TOTAL_RACKS; i++) {
+                var h = hash01(i + HALL_SEED);
+                var occupied = h > 0.08;          // ~8% spare slots
+                // Deterministic per-rack demand weight. Spread is bounded so the
+                // hall reads calm by default (doc-10: normal must be calm) while a
+                // small deterministic upper tail produces a few genuine hotspots
+                // vs the cabinet rating. Mean weight ≈ 1.0 → after rescale the
+                // occupied total reconciles exactly to the engine IT load.
+                var weight = occupied ? (0.70 + hash01(i + 7777 + HALL_SEED) * 0.62) : 0;
+                racks.push({ idx: i, occupied: occupied, weight: weight, kw: 0 });
+                if (occupied) occupiedCount++;
+            }
+            // Normalise occupied weights so the occupied total == SITE_IT_KW.
+            var weightSum = 0;
+            racks.forEach(function (r) { weightSum += r.weight; });
+            var scale = SITE_IT_KW / weightSum;
+            rackTotal = 0;
+            racks.forEach(function (r) {
+                r.kw = r.occupied ? Math.round(r.weight * scale * 100) / 100 : 0;
+                r.util = r.kw / RACK_RATING_KW;   // utilization vs rating
+                rackTotal += r.kw;
+            });
+            // residual rounding correction onto the single highest-load rack so
+            // the displayed sum reconciles to the engine IT load to the kW.
+            var residual = Math.round((SITE_IT_KW - rackTotal) * 100) / 100;
+            if (Math.abs(residual) > 0.001) {
+                var top = null;
+                racks.forEach(function (r) { if (r.occupied && (!top || r.kw > top.kw)) top = r; });
+                if (top) { top.kw = Math.round((top.kw + residual) * 100) / 100; top.util = top.kw / RACK_RATING_KW; }
+            }
+            rackTotal = 0;
+            racks.forEach(function (r) { rackTotal += r.kw; });
+            rackTotal = Math.round(rackTotal * 100) / 100;
         }
-        rackTotal = 0;
-        racks.forEach(function (r) { rackTotal += r.kw; });
-        rackTotal = Math.round(rackTotal * 100) / 100;
+        buildRackField();
 
         /* --- Utilization -> semantic colour (NOT random class) -----------
          * doc-03 §2 + doc-10 colour semantics. Red = breach ONLY.
@@ -992,39 +1009,44 @@
            read, never recomputed. */
         var CRAH_LEAVING_AIR_C = S.cooling.crah_supply_air_c;
         var zones = [];
-        for (var z = 0; z < ZONES; z++) {
-            var zHeat = 0, zRacks = 0, zOcc = 0, zMaxUtil = 0;
-            for (var r = 0; r < RACKS_PER_ZONE; r++) {
-                var gi = z * RACKS_PER_ZONE + r;
-                var rk = racks[gi];
-                zHeat += rk.kw;
-                zRacks++;
-                if (rk.occupied) zOcc++;
-                if (rk.util > zMaxUtil) zMaxUtil = rk.util;
+        function buildZoneField() {
+            zones = [];
+            for (var z = 0; z < ZONES; z++) {
+                var zHeat = 0, zRacks = 0, zOcc = 0, zMaxUtil = 0;
+                for (var r = 0; r < RACKS_PER_ZONE; r++) {
+                    var gi = z * RACKS_PER_ZONE + r;
+                    var rk = racks[gi];
+                    zHeat += rk.kw;
+                    zRacks++;
+                    if (rk.occupied) zOcc++;
+                    if (rk.util > zMaxUtil) zMaxUtil = rk.util;
+                }
+                // design airflow per zone (m3/s): sized for AVG zone heat @ dT 11C
+                var designZoneHeat = (SITE_IT_KW / ZONES);
+                var airflow = designZoneHeat / (AIR_RHO_CP * DESIGN_AIRSIDE_DELTA_T_C);
+                var baseRackInletC = RACK_INLET_DESIGN_C + ((z * 7919) % 7 - 3) * 0.1;
+                var rackInletC = Math.round(baseRackInletC * 10) / 10;
+                var airsideDeltaTC = zHeat / (AIR_RHO_CP * airflow);
+                var hotAisleC = Math.round((rackInletC + airsideDeltaTC) * 10) / 10;
+                var returnAirC = Math.round((hotAisleC + RETURN_PATH_MIXING_ADJUSTMENT_C) * 10) / 10;
+                var rhPct = Math.round((S.environment.avg_rh_pct + ((z * 3571) % 5 - 2)) * 10) / 10;
+                zones.push({
+                    z: z, heat: Math.round(zHeat * 10) / 10, occ: zOcc, racks: zRacks,
+                    maxUtil: zMaxUtil,
+                    rackInletC: rackInletC,
+                    baseRackInletC: rackInletC,
+                    hotAisleC: hotAisleC,
+                    returnAirC: returnAirC,
+                    airsideDeltaTC: Math.round(airsideDeltaTC * 10) / 10,
+                    rhPct: rhPct,
+                    dewPointC: Math.round(dewPointC(rackInletC, rhPct) * 10) / 10,
+                    excursionUntil: 0,               // ms epoch — when > now, this zone is excursing
+                    airflow: Math.round(airflow * 100) / 100
+                });
             }
-            // design airflow per zone (m3/s): sized for AVG zone heat @ dT 11C
-            var designZoneHeat = (SITE_IT_KW / ZONES);
-            var airflow = designZoneHeat / (AIR_RHO_CP * DESIGN_AIRSIDE_DELTA_T_C);
-            var baseRackInletC = RACK_INLET_DESIGN_C + ((z * 7919) % 7 - 3) * 0.1;
-            var rackInletC = Math.round(baseRackInletC * 10) / 10;
-            var airsideDeltaTC = zHeat / (AIR_RHO_CP * airflow);
-            var hotAisleC = Math.round((rackInletC + airsideDeltaTC) * 10) / 10;
-            var returnAirC = Math.round((hotAisleC + RETURN_PATH_MIXING_ADJUSTMENT_C) * 10) / 10;
-            var rhPct = Math.round((S.environment.avg_rh_pct + ((z * 3571) % 5 - 2)) * 10) / 10;
-            zones.push({
-                z: z, heat: Math.round(zHeat * 10) / 10, occ: zOcc, racks: zRacks,
-                maxUtil: zMaxUtil,
-                rackInletC: rackInletC,
-                baseRackInletC: rackInletC,
-                hotAisleC: hotAisleC,
-                returnAirC: returnAirC,
-                airsideDeltaTC: Math.round(airsideDeltaTC * 10) / 10,
-                rhPct: rhPct,
-                dewPointC: Math.round(dewPointC(rackInletC, rhPct) * 10) / 10,
-                excursionUntil: 0,               // ms epoch — when > now, this zone is excursing
-                airflow: Math.round(airflow * 100) / 100
-            });
         }
+        buildZoneField();
+
 
         /* --- Alarm evaluation (deterministic thresholds) ----------------
          * doc-03 §"Alarm Rules": warn rack >85% rating, crit >95%;
@@ -1616,6 +1638,24 @@
             document.getElementById('hall-scope-label').textContent = 'Data Hall ' + hall;
             document.getElementById('bb-hall-label').textContent = 'Hall ' + hall + ' IT Load';
             document.getElementById('env-hall-title').textContent = 'Environment (Hall ' + hall + ')';
+            /* v1.134.4 — REAL SCOPE SWAP. This handler used to change headings and leave the
+               cabinet field, the zone thermals and the alarm set exactly as they were, so all
+               four halls drew the identical floor and the selector was decoration. Re-read the
+               hall snapshot, re-seed, and rebuild.
+
+               The campus totals do NOT move, and that is correct rather than a shortcut: the
+               governed four-hall study gives every hall the same 10,000 kW design and 7,500 kW
+               adopted load, so a hall swap changes WHICH cabinets carry the load, not how much
+               there is. If a future study differentiates the halls, this reads the difference
+               automatically — the registry generator asserts that assumption and would fail
+               the build first. */
+            HALL = CALC.getHallSnapshot(hall) || HALL;
+            SITE_IT_KW = HALL.it_load_kw;
+            TOTAL_RACKS = HALL.racks;
+            setHallSeed(hall);
+            buildRackField();
+            buildZoneField();
+            selectedRackIdx = null;
             crahUnits = crahUnits.map(function (unit) {
                 var next = {};
                 for (var key in unit) if (unit.hasOwnProperty(key)) next[key] = unit[key];

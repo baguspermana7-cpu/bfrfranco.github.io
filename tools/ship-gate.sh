@@ -73,6 +73,10 @@ gate "Conventional coverage MONITOR — rendered numbers traced to the registry"
 # asserts every data-basis-param resolves, the modules actually load, the hooks are keyboard
 # controls, and the drawer's number agrees with the number in the row it explains.
 gate "Conventional basis drawer — hooks resolve, explanations match their KPI" node tools/test-conv-basis-drawer.mjs
+# Hall selection: a REAL scope swap on the page that draws one hall, and an honest view label on
+# the pages whose plant is central. Both directions are asserted — a cosmetic selector and an
+# invented per-hall split are both failures.
+gate "Conventional hall scope — datahall re-scopes, central plants do not" node tools/test-conv-hall-scope.mjs
 # MONITOR (advisory, exit 0 by design): measures diagram geometry — label collisions, clipped elements,
 # degenerate labels, phone overflow — across 4 diagrams x 4 viewports x 2 themes. It runs in --measure mode
 # because the current pages carry a real, already-measured debt (~484 findings: chiller-plant 27-48 collisions

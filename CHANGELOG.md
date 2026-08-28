@@ -11,6 +11,42 @@ release sections rather than semver.
 
 ---
 
+## v1.134.4 — 2026-08-28 (Hall selection actually selects a hall — and stays a view label where a data swap would be fabrication)
+
+Three cockpits shipped a `Campus | A | B | C | D` selector. All three were cosmetic: they
+changed headings and left the data untouched. A dead control dressed as an operator tool is
+the same class of defect as a hooked element nothing ever assigns.
+
+The correct behaviour is **not the same on every page**, and this release encodes the
+difference rather than applying one rule everywhere.
+
+**`datahall.html` — a real scope swap.** The page draws one hall's cabinet field, so the
+selector rebuilds it. The rack and zone construction is extracted into builders the handler
+re-runs (extracted, not duplicated), and a per-hall deterministic seed makes each hall a
+distinct distribution. Selecting Hall C now redraws 500 cabinets, their zone thermals and the
+alarm set.
+
+**The totals deliberately do not move.** Every hall carries the same 10,000 kW design and
+7,500 kW adopted load in the governed study, so a hall swap changes WHICH cabinets carry the
+load, not how much there is. A page that changed rack load or power density with the hall
+would be inventing a difference the study does not have — the opposite failure, and just as
+wrong. If a future study differentiates the halls this reads it automatically; the registry
+generator asserts that assumption and would fail the build first.
+
+**`chiller-plant.html` and `water-system.html` keep their view-context labels, and that is
+correct.** The chilled-water plant and the water treatment train are central: one plant serves
+all four halls. Re-scoping their telemetry per hall would fabricate a split that no hydronic
+distribution design exists to justify — the engine already says so explicitly, publishing
+`hall.chillers_allocated` as null with the reason attached rather than a plausible quarter.
+The earlier plan for this work assumed all three selectors needed the same treatment; that was
+wrong, and the gate now encodes why.
+
+**`tools/test-conv-hall-scope.mjs`** (ship gate) asserts both directions: the data hall's
+cabinet field must change on a hall swap, its cabinet count and totals must not, the rebuilt
+field must still sum to the registered hall load (a rebuild that loses the reconciliation is
+worse than no rebuild), and the two central-plant pages must NOT move their telemetry while
+still naming the hall in view.
+
 ## v1.134.3 — 2026-08-28 (All eight cockpits on one basis drawer; the hand-written provenance dictionaries are gone)
 
 The shared drawer now covers every Conventional cockpit: **62 hooks across 8 pages, and the
