@@ -57,6 +57,18 @@ gate "DC AI operator UI — markup contract" node tools/test-datahall-ai-operato
 gate "DC AI operator UI — runtime contract" node tools/test-datahall-ai-operator-runtime.mjs
 gate "EPMS — ATS-to-rack source colour" node tools/test-epms-ats-rack-color.mjs
 gate "Conventional snapshot binding — no phantom keys, strips follow the engine" node tools/test-conv-snapshot-binding.mjs
+# The parameter registry is the single source of truth for what every Conventional number IS,
+# where it came from, and what moves it. Dependency edges are MEASURED (the engine is recomputed
+# once per authored input) rather than declared, so "everything is wired" is a fact, not a claim.
+gate "Conventional parameter registry — schema, staleness, provenance, measured wiring" node tools/test-conv-parameter-registry.mjs
+# MONITOR (advisory, exit 0 by design): walks the RENDERED DOM of all 8 cockpits and asks of every
+# number a human can read whether any registry parameter accounts for it. The denominator is rendered
+# text, NOT element ids, because ~390 of the ~945 numbers on these pages carry no id at all (chiller
+# P&ID text nodes, ict link-table cells, hand-written KPI cells) — an id-keyed gate would report 100 %
+# while missing two thirds of the screen. Today's honest figure is ~24 %.
+# FLIP TO STRICT (add --strict) once page-level derived displays are registered and the P&ID/table
+# text nodes are bound; a gate that fails from day one gets muted instead of paid down.
+gate "Conventional coverage MONITOR — rendered numbers traced to the registry" node tools/test-conv-coverage.mjs
 # MONITOR (advisory, exit 0 by design): measures diagram geometry — label collisions, clipped elements,
 # degenerate labels, phone overflow — across 4 diagrams x 4 viewports x 2 themes. It runs in --measure mode
 # because the current pages carry a real, already-measured debt (~484 findings: chiller-plant 27-48 collisions

@@ -1,0 +1,1027 @@
+{
+  "note": "CURATED — hand-maintained. Machine-derivable fields (kind, value, consumers, tests) live in data/conv-parameters.json and are generated from this plus the engine.",
+  "parameters": [
+    {
+      "id": "campus.hall_count",
+      "label": "Halls in the campus",
+      "unit": null,
+      "scope": "campus",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)",
+        "section": "halls",
+        "asOf": "2026-08-28",
+        "method": "Structural: the number of halls is the length of the authored hall list, so no numeric input can move it."
+      },
+      "formula": "halls.length"
+    },
+    {
+      "id": "campus.halls",
+      "label": "Per-hall snapshots",
+      "unit": null,
+      "scope": "campus",
+      "evidenceClass": "DERIVED",
+      "formula": "projection of the authored per-hall inputs",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "section": "buildHalls()",
+        "method": "Projection of the per-hall inputs; no hall authors its own capacity."
+      }
+    },
+    {
+      "id": "campus.it_design_kw",
+      "label": "Campus IT design capacity",
+      "unit": "kW",
+      "scope": "campus",
+      "evidenceClass": "DERIVED",
+      "formula": "hall_count x it_design_kw_per_hall",
+      "deps": [
+        "campus.hall_count"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "method": "4 x 10,000 kW."
+      }
+    },
+    {
+      "id": "campus.it_load_kw",
+      "label": "Campus IT load",
+      "unit": "kW",
+      "scope": "campus",
+      "evidenceClass": "DERIVED",
+      "formula": "hall_count x active scenario it_kw_per_hall",
+      "deps": [
+        "campus.hall_count",
+        "campus.scenario_id"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "method": "4 x 7,500 kW at the adopted normal scenario."
+      }
+    },
+    {
+      "id": "campus.rack_design_avg_kw",
+      "label": "Cabinet design average",
+      "unit": "kW/rack",
+      "scope": "campus",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)",
+        "asOf": "2026-08-28",
+        "section": "rack.selectedAverageKw"
+      }
+    },
+    {
+      "id": "campus.rack_selected_peak_kw",
+      "label": "Cabinet selected peak",
+      "unit": "kW/rack",
+      "scope": "campus",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)",
+        "asOf": "2026-08-28",
+        "section": "rack.selectedPeakKw"
+      }
+    },
+    {
+      "id": "campus.racks_total",
+      "label": "Campus cabinet count",
+      "unit": null,
+      "scope": "campus",
+      "evidenceClass": "DERIVED",
+      "formula": "hall_count x racks_per_hall",
+      "deps": [
+        "campus.hall_count"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "method": "4 x 500 cabinets."
+      }
+    },
+    {
+      "id": "campus.scenario_evidence_class",
+      "label": "Active scenario evidence class",
+      "unit": null,
+      "scope": "meta",
+      "evidenceClass": "DERIVED",
+      "deps": [
+        "campus.scenario_id"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "campus.scenario_id",
+      "label": "Active scenario id",
+      "unit": null,
+      "scope": "meta",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "section": "ACTIVE_SCENARIO_ID"
+      }
+    },
+    {
+      "id": "campus.scenario_label",
+      "label": "Active scenario label",
+      "unit": null,
+      "scope": "meta",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "section": "SCENARIOS"
+      }
+    },
+    {
+      "id": "campus.study_id",
+      "label": "Governing study id",
+      "unit": null,
+      "scope": "meta",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)",
+        "asOf": "2026-08-28",
+        "section": "id"
+      }
+    },
+    {
+      "id": "campus.utilisation_pct",
+      "label": "Campus utilisation",
+      "unit": "%",
+      "scope": "campus",
+      "evidenceClass": "DERIVED",
+      "formula": "it_load_kw / it_design_kw x 100",
+      "deps": [
+        "campus.it_load_kw",
+        "campus.it_design_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "cooling.chiller_design_duty_kw_th",
+      "label": "Chiller plant design duty",
+      "unit": "kW_th",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "campus design heat rejection at the design point",
+      "deps": [
+        "campus.it_design_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "section": "chillerDesignDutyKwTh()"
+      }
+    },
+    {
+      "id": "cooling.chiller_redundancy",
+      "label": "Chiller redundancy rule",
+      "unit": null,
+      "scope": "plant",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)",
+        "asOf": "2026-08-28",
+        "section": "resilience.subsystems.cooling"
+      }
+    },
+    {
+      "id": "cooling.chiller_unit_kw_th",
+      "label": "Chiller unit capacity",
+      "unit": "kW_th",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "section": "CHILLER_UNIT_KW_TH",
+        "method": "Water-cooled centrifugal, ~1,422 RT. No vendor selection has been made; pending Basis-of-Design confirmation."
+      }
+    },
+    {
+      "id": "cooling.chillers_running",
+      "label": "Chillers running",
+      "unit": null,
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "ceil(duty / unit capacity)",
+      "deps": [
+        "cooling.heat_rejection_kw",
+        "cooling.chiller_unit_kw_th"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "section": "chillersRunning()"
+      }
+    },
+    {
+      "id": "cooling.chillers_total",
+      "label": "Chillers installed",
+      "unit": null,
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "chillers_running + 1 (N+1)",
+      "deps": [
+        "cooling.chillers_running",
+        "cooling.chiller_redundancy"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "section": "chillersTotal()"
+      }
+    },
+    {
+      "id": "cooling.chw_coil_approach_k",
+      "label": "CHW coil approach",
+      "unit": "K",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "formula": "authored",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "section": "THERMAL CHAIN",
+        "method": "Sensible-duty CHW coil. No coil selection has been made — this is the one number a vendor submittal should replace."
+      },
+      "explainKey": "chw-approach"
+    },
+    {
+      "id": "cooling.chw_delta_t",
+      "label": "CHW delta-T",
+      "unit": "K",
+      "scope": "plant",
+      "evidenceClass": "ADOPTED",
+      "formula": "authored (chw_delta_t_k)",
+      "source": {
+        "ref": "conv/review/09-engineering-basis-and-calculations.md",
+        "asOf": "2026-08-28",
+        "section": "line 83",
+        "method": "Carried unchanged from the prior basis so plant flow and duty arithmetic are unchanged."
+      },
+      "explainKey": "chw-delta-t"
+    },
+    {
+      "id": "cooling.chwr_c",
+      "label": "CHW return temperature",
+      "unit": "degC",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "chws_c + chw_delta_t",
+      "deps": [
+        "cooling.chws_c",
+        "cooling.chw_delta_t"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "section": "THERMAL CHAIN"
+      },
+      "explainKey": "chwr"
+    },
+    {
+      "id": "cooling.chws_c",
+      "label": "CHW supply temperature",
+      "unit": "degC",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "crah_supply_air_c - chw_coil_approach_k",
+      "deps": [
+        "cooling.crah_supply_air_c",
+        "cooling.chw_coil_approach_k"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "section": "THERMAL CHAIN",
+        "method": "Re-derived in v1.134.0 from the adopted rack-inlet target; the retired 7.2 C belonged to the 1.85 MW basis."
+      },
+      "explainKey": "chws"
+    },
+    {
+      "id": "cooling.crah_supply_air_c",
+      "label": "CRAH supply (discharge) air",
+      "unit": "degC",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "rack_inlet_target_c - supply_path_mixing_k",
+      "deps": [
+        "cooling.rack_inlet_target_c",
+        "cooling.supply_path_mixing_k"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "section": "THERMAL CHAIN",
+        "method": "This plane is NOT the rack inlet and NOT the CRAH return."
+      },
+      "explainKey": "crah-supply-air"
+    },
+    {
+      "id": "cooling.flow_lps",
+      "label": "CHW flow",
+      "unit": "L/s",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "IT load / (4.186 x chw_delta_t)",
+      "deps": [
+        "campus.it_load_kw",
+        "cooling.chw_delta_t"
+      ],
+      "source": {
+        "ref": "conv/review/09-engineering-basis-and-calculations.md",
+        "asOf": "2026-08-28",
+        "section": "lines 81-85"
+      }
+    },
+    {
+      "id": "cooling.heat_rejection_kw",
+      "label": "Heat rejection",
+      "unit": "kW",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "it_load_kw + ups_loss_kw",
+      "deps": [
+        "site.it_load_kw",
+        "electrical.ups_loss_kw"
+      ],
+      "source": {
+        "ref": "conv/review/09-engineering-basis-and-calculations.md",
+        "asOf": "2026-08-28",
+        "section": "line 81"
+      }
+    },
+    {
+      "id": "cooling.nameplate_evidence_class",
+      "label": "Cooling nameplate evidence class",
+      "unit": null,
+      "scope": "meta",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "cooling.rack_inlet_target_c",
+      "label": "Rack-inlet design target",
+      "unit": "degC",
+      "scope": "hall",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)",
+        "asOf": "2026-08-28",
+        "section": "cooling.rackInletTargetC",
+        "method": "Owner-adopted equipment-inlet target. ASHRAE 18-27 C is the recommended envelope, not this target."
+      },
+      "explainKey": "rack-inlet-target"
+    },
+    {
+      "id": "cooling.supply_path_mixing_k",
+      "label": "Supply-path mixing",
+      "unit": "K",
+      "scope": "hall",
+      "evidenceClass": "ADOPTED",
+      "formula": "authored",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "section": "THERMAL CHAIN",
+        "method": "Contained cold aisle: the same 0 K assumption the return path uses. Applying it in one direction only produced the 15.2 C supply-air defect."
+      }
+    },
+    {
+      "id": "electrical.epms_total_kw",
+      "label": "EPMS metered total",
+      "unit": "kW",
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "formula": "facility load at the EPMS metering point",
+      "deps": [
+        "site.facility_load_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "electrical.epms_ups_output_kw",
+      "label": "EPMS UPS output",
+      "unit": "kW",
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "formula": "IT load at the UPS output metering point",
+      "deps": [
+        "site.it_load_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "electrical.metering_tolerance_pct",
+      "label": "Metering tolerance",
+      "unit": "%",
+      "scope": "site",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "method": "Class tolerance assumed; no meter calibration certificate has been supplied."
+      }
+    },
+    {
+      "id": "electrical.nameplate_evidence_class",
+      "label": "Electrical nameplate evidence class",
+      "unit": null,
+      "scope": "meta",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "electrical.ups_loss_kw",
+      "label": "UPS losses",
+      "unit": "kW",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "it_load_kw x (1/eff - 1)",
+      "deps": [
+        "site.it_load_kw"
+      ],
+      "source": {
+        "ref": "conv/review/09-engineering-basis-and-calculations.md",
+        "asOf": "2026-08-28",
+        "section": "line 39"
+      }
+    },
+    {
+      "id": "electrical.ups_module_count",
+      "label": "UPS modules installed",
+      "unit": null,
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "ups_system_count x ups_modules_per_system",
+      "deps": [
+        "electrical.ups_system_count",
+        "electrical.ups_modules_per_system"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "electrical.ups_module_kw",
+      "label": "UPS module load",
+      "unit": "kW",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "ups output / module count",
+      "deps": [
+        "electrical.epms_ups_output_kw",
+        "electrical.ups_module_count"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "electrical.ups_module_kw_rated",
+      "label": "UPS module rating",
+      "unit": "kW",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "method": "Modular UPS frame rating assumed; no vendor selection has been made."
+      }
+    },
+    {
+      "id": "electrical.ups_modules_per_system",
+      "label": "Modules per UPS system",
+      "unit": null,
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "electrical.ups_redundancy",
+      "label": "UPS redundancy rule",
+      "unit": null,
+      "scope": "plant",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)",
+        "asOf": "2026-08-28",
+        "section": "resilience.subsystems.electrical"
+      }
+    },
+    {
+      "id": "electrical.ups_system_count",
+      "label": "UPS systems",
+      "unit": null,
+      "scope": "plant",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)",
+        "asOf": "2026-08-28",
+        "section": "resilience.subsystems.electrical",
+        "method": "2N implies two independent systems."
+      }
+    },
+    {
+      "id": "electrical.ups_system_kw",
+      "label": "UPS system load",
+      "unit": "kW",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "ups output / system count",
+      "deps": [
+        "electrical.epms_ups_output_kw",
+        "electrical.ups_system_count"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "electrical.ups_system_rated_kw",
+      "label": "UPS system rating",
+      "unit": "kW",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "modules_per_system x module rating",
+      "deps": [
+        "electrical.ups_modules_per_system",
+        "electrical.ups_module_kw_rated"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "environment.avg_rh_pct",
+      "label": "Average relative humidity",
+      "unit": "%",
+      "scope": "hall",
+      "evidenceClass": "SIMULATED",
+      "source": {
+        "ref": "conv/review/09-engineering-basis-and-calculations.md",
+        "asOf": "2026-08-28",
+        "section": "environment row",
+        "method": "ASHRAE recommended 40-60 % band midpoint; not measured."
+      }
+    },
+    {
+      "id": "environment.avg_temp_c",
+      "label": "Average cold-aisle temperature",
+      "unit": "degC",
+      "scope": "hall",
+      "evidenceClass": "SIMULATED",
+      "source": {
+        "ref": "conv/review/09-engineering-basis-and-calculations.md",
+        "asOf": "2026-08-28",
+        "method": "Conventional cold-aisle setpoint band; not measured."
+      }
+    },
+    {
+      "id": "environment.carbon_kg_per_facility_kwh",
+      "label": "Grid carbon factor",
+      "unit": "kgCO2/kWh",
+      "scope": "site",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "conv/review/09-engineering-basis-and-calculations.md",
+        "asOf": "2026-08-28",
+        "section": "line 14",
+        "method": "Denominator is FACILITY kWh, not IT kWh."
+      }
+    },
+    {
+      "id": "environment.carbon_kg_per_hr",
+      "label": "Carbon rate",
+      "unit": "kgCO2/h",
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "formula": "facility_load_kw x carbon factor",
+      "deps": [
+        "site.facility_load_kw",
+        "environment.carbon_kg_per_facility_kwh"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "environment.wue_l_per_kwh",
+      "label": "WUE",
+      "unit": "L/kWh",
+      "scope": "site",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "conv/review/09-engineering-basis-and-calculations.md",
+        "asOf": "2026-08-28",
+        "section": "line 13"
+      },
+      "explainKey": "wue"
+    },
+    {
+      "id": "fuel.autonomy_hr",
+      "label": "Generator autonomy",
+      "unit": "h",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "usable_l / generator_consumption_lph",
+      "deps": [
+        "fuel.usable_l",
+        "fuel.generator_consumption_lph"
+      ],
+      "source": {
+        "ref": "conv/review/09-engineering-basis-and-calculations.md",
+        "asOf": "2026-08-28",
+        "section": "lines 133-147"
+      }
+    },
+    {
+      "id": "fuel.generator_consumption_lph",
+      "label": "Generator consumption",
+      "unit": "L/h",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "facility_load_kw x specific consumption",
+      "deps": [
+        "site.facility_load_kw",
+        "fuel.specific_consumption_l_per_kwh"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "fuel.level_pct",
+      "label": "UST level",
+      "unit": "%",
+      "scope": "plant",
+      "evidenceClass": "SIMULATED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "method": "Deterministic operating state; not a live tank gauge."
+      }
+    },
+    {
+      "id": "fuel.nameplate_evidence_class",
+      "label": "Fuel nameplate evidence class",
+      "unit": null,
+      "scope": "meta",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "fuel.specific_consumption_l_per_kwh",
+      "label": "Specific fuel consumption",
+      "unit": "L/kWh",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "method": "Diesel genset specific consumption assumed; no engine data sheet has been supplied."
+      }
+    },
+    {
+      "id": "fuel.tank_capacity_l",
+      "label": "UST capacity",
+      "unit": "L",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "method": "Sized to hold the autonomy target at the campus load. Not a surveyed tank."
+      }
+    },
+    {
+      "id": "fuel.usable_l",
+      "label": "Usable fuel",
+      "unit": "L",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "tank_capacity_l x level_pct x usable fraction",
+      "deps": [
+        "fuel.tank_capacity_l",
+        "fuel.level_pct"
+      ],
+      "source": {
+        "ref": "conv/review/09-engineering-basis-and-calculations.md",
+        "asOf": "2026-08-28",
+        "section": "lines 133-147"
+      }
+    },
+    {
+      "id": "meta.basis",
+      "label": "Basis statement",
+      "unit": null,
+      "scope": "meta",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "meta.basis_doc",
+      "label": "Basis document",
+      "unit": null,
+      "scope": "meta",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "meta.data_quality",
+      "label": "Data quality",
+      "unit": null,
+      "scope": "meta",
+      "evidenceClass": "SIMULATED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "meta.evidence_class",
+      "label": "Snapshot evidence class",
+      "unit": null,
+      "scope": "meta",
+      "evidenceClass": "SIMULATED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "meta.nameplate_evidence_class",
+      "label": "Nameplate evidence class",
+      "unit": null,
+      "scope": "meta",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "meta.scenario",
+      "label": "Scenario name",
+      "unit": null,
+      "scope": "meta",
+      "evidenceClass": "SIMULATED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "meta.study_doc",
+      "label": "Governing study document",
+      "unit": null,
+      "scope": "meta",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "meta.version",
+      "label": "Engine version",
+      "unit": null,
+      "scope": "meta",
+      "evidenceClass": "DERIVED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "racks.at_10kw",
+      "label": "Cabinets at 10 kW",
+      "unit": null,
+      "scope": "campus",
+      "evidenceClass": "DERIVED",
+      "formula": "it_load_kw / 10",
+      "deps": [
+        "campus.it_load_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "racks.at_6kw",
+      "label": "Cabinets at 6 kW",
+      "unit": null,
+      "scope": "campus",
+      "evidenceClass": "DERIVED",
+      "formula": "it_load_kw / 6",
+      "deps": [
+        "campus.it_load_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "racks.at_8kw",
+      "label": "Cabinets at 8 kW",
+      "unit": null,
+      "scope": "campus",
+      "evidenceClass": "DERIVED",
+      "formula": "it_load_kw / 8",
+      "deps": [
+        "campus.it_load_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "site.facility_load_kw",
+      "label": "Facility load",
+      "unit": "kW",
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "formula": "it_load_kw x pue",
+      "deps": [
+        "site.it_load_kw",
+        "site.pue"
+      ],
+      "source": {
+        "ref": "conv/review/09-engineering-basis-and-calculations.md",
+        "asOf": "2026-08-28",
+        "section": "line 167"
+      }
+    },
+    {
+      "id": "site.facility_load_kw_exact",
+      "label": "Facility load (unrounded)",
+      "unit": "kW",
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "formula": "it_load_kw x pue",
+      "deps": [
+        "site.it_load_kw",
+        "site.pue"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "site.it_design_kw",
+      "label": "Site IT design capacity",
+      "unit": "kW",
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "formula": "campus.it_design_kw",
+      "deps": [
+        "campus.it_design_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "site.it_load_kw",
+      "label": "Site IT load",
+      "unit": "kW",
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "formula": "campus.it_load_kw",
+      "deps": [
+        "campus.it_load_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "method": "CAMPUS scope. A page depicting one hall must use the hall snapshot, not this."
+      },
+      "explainKey": "it-load"
+    },
+    {
+      "id": "site.non_it_load_kw",
+      "label": "Non-IT load",
+      "unit": "kW",
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "formula": "facility_load_kw - it_load_kw",
+      "deps": [
+        "site.facility_load_kw",
+        "site.it_load_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "site.non_it_load_kw_exact",
+      "label": "Non-IT load (unrounded)",
+      "unit": "kW",
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "formula": "facility_load_kw - it_load_kw",
+      "deps": [
+        "site.facility_load_kw",
+        "site.it_load_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "site.pue",
+      "label": "Design PUE",
+      "unit": null,
+      "scope": "site",
+      "evidenceClass": "ADOPTED",
+      "formula": "authored design point",
+      "source": {
+        "ref": "js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)",
+        "asOf": "2026-08-28",
+        "section": "pue.designPoint",
+        "method": "dPUE per ISO/IEC 30134-2. Off-design values are UNAVAILABLE without an approved curve."
+      },
+      "explainKey": "pue"
+    },
+    {
+      "id": "water.flow_lpm_for_wue",
+      "label": "WUE makeup flow",
+      "unit": "L/min",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "wue x it_load_kw / 60",
+      "deps": [
+        "environment.wue_l_per_kwh",
+        "site.it_load_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "water.wue_l_per_kwh",
+      "label": "WUE (water branch)",
+      "unit": "L/kWh",
+      "scope": "site",
+      "evidenceClass": "ADOPTED",
+      "deps": [
+        "environment.wue_l_per_kwh"
+      ],
+      "source": {
+        "ref": "conv/review/09-engineering-basis-and-calculations.md",
+        "asOf": "2026-08-28",
+        "section": "line 13"
+      }
+    }
+  ]
+}

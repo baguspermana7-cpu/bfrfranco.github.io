@@ -1186,11 +1186,11 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
             <div class="stat-row"><span class="stat-label">IT Load</span><span class="stat-value orange" id="sItLoad">1,850 kW</span></div>
             <div class="stat-row" title="UPS Feed A 2N. Normal sharing: 50/50 (~46% of 2 MW rated). Failover: surviving path carries full protected 1,850 kW (~92% of rated). Source: snapshot.electrical.ups_module_kw">
                 <span class="stat-label">UPS A</span>
-                <span class="stat-value green" id="sUpsA">46% nrm / 92% fail</span>
+                <span class="stat-value green" id="sUpsA">&mdash;</span>
             </div>
             <div class="stat-row" title="UPS Feed B 2N. Normal sharing: 50/50 (~46% of 2 MW rated). Failover: surviving path carries full protected 1,850 kW (~92% of rated).">
                 <span class="stat-label">UPS B</span>
-                <span class="stat-value green" id="sUpsB">46% nrm / 92% fail</span>
+                <span class="stat-value green" id="sUpsB">&mdash;</span>
             </div>
         </div>
 
@@ -1399,9 +1399,16 @@ function updateData() {
     setText('sCueIt', (s.environment.carbon_kg_per_facility_kwh * s.site.pue).toFixed(2) + ' kg/kWh IT');
     // v1.32.2 (CONV-ACC-05) UPS 2N normal-sharing + failover loading.
     // UPS per-module rated 2 MW (each); normal=load/2/rated, failover=load/rated.
-    var upsRatedPerModuleKw = 2000;
-    var nrmPct = Math.round((s.site.it_load_kw / 2) / upsRatedPerModuleKw * 100);
-    var failPct = Math.round(s.site.it_load_kw / upsRatedPerModuleKw * 100);
+    /* v1.134.1 — `upsRatedPerModuleKw = 2000` was a page literal from the retired 1.85 MW
+       basis. Against the campus load it rendered "750% nrm / 1500% fail", i.e. UPS systems
+       loaded to fifteen times their rating, sitting in the stats panel as though it were
+       telemetry. The coverage gate found it: no registry parameter could account for 750.
+       The engine publishes the system rating and the system count, so derive from those. */
+    var upsSystems = s.electrical.ups_system_count;
+    var upsRatedPerSystemKw = s.electrical.ups_system_rated_kw;
+    var nrmPct = Math.round((s.site.it_load_kw / upsSystems) / upsRatedPerSystemKw * 100);
+    /* 2N failover: the surviving system carries the whole IT load. */
+    var failPct = Math.round(s.site.it_load_kw / upsRatedPerSystemKw * 100);
     setText('sUpsA', nrmPct + '% nrm / ' + failPct + '% fail');
     setText('sUpsB', nrmPct + '% nrm / ' + failPct + '% fail');
     setText('sTotalLoad', facilityKw.toLocaleString() + ' kW');

@@ -254,7 +254,19 @@
      * source: 00-overview-audit.md line 82 ; 09 line 83 ("DeltaT = 14.8 - 7.2 = 7.6 C")
      */
     function chwDeltaT(m) {
-        return m.cooling.chwr_c - m.cooling.chws_c;
+        return m.cooling.chw_delta_t_k;
+    }
+
+    /* THERMAL CHAIN, derived backwards from the adopted rack-inlet target. See the
+       THERMAL CHAIN block above for the evidence class of each authored input. */
+    function crahSupplyAirC(m) {
+        return m.cooling.rack_inlet_target_c - m.cooling.supply_path_mixing_k;
+    }
+    function chwsC(m) {
+        return crahSupplyAirC(m) - m.cooling.chw_coil_approach_k;
+    }
+    function chwrC(m) {
+        return chwsC(m) + m.cooling.chw_delta_t_k;
     }
 
     /* Heat rejection ~= IT load + UPS losses.
@@ -399,7 +411,10 @@
      *   check: 744,143.805 / 15,503 = 47.99999 -> 48.0 hr
      */
     function fuelAutonomyHr(m) {
-        return fuelUsableL(m) / m.fuel.generator_consumption_lph;
+        /* v1.134.1 — was `m.fuel.generator_consumption_lph`, the AUTHORED snapshot of the
+           burn rate. Autonomy therefore did not move when the facility load moved. Use the
+           computed burn so the whole fuel chain follows the basis. */
+        return fuelUsableL(m) / generatorConsumptionLph(m);
     }
 
     /* Instant equivalent cooling-makeup water flow from WUE.
@@ -482,12 +497,13 @@
              * calculations.md line 15, which documents the RETIRED 1.85 MW basis.
              * Its delta-T (7.6 K) is retained, so plant flow and duty arithmetic
              * are unchanged — only the temperature level moves. */
+            /* Only the AUTHORED inputs live on the model. crah_supply_air_c, chws_c and
+               chwr_c are derived in compute() so the chain cannot be reopened by editing a
+               downstream temperature here. */
             rack_inlet_target_c: RACK_INLET_TARGET_C,
             supply_path_mixing_k: SUPPLY_PATH_MIXING_K,
-            crah_supply_air_c: CRAH_SUPPLY_AIR_C,
             chw_coil_approach_k: CHW_COIL_APPROACH_K,
-            chws_c: CHWS_C,
-            chwr_c: CHWR_C,
+            chw_delta_t_k: CHW_DELTA_T_K,
             /* Chiller unit capacity — ASSUMED (project design decision pending
              * Basis-of-Design confirmation). 5,000 kW_th (~1,422 RT) water-cooled
              * centrifugal. chillers_running / chillers_total are DERIVED from this
@@ -533,10 +549,12 @@
              * does not and is never multiplied.
              * source: 09-engineering-basis-and-calculations.md lines 144-147 */
             specific_consumption_l_per_kwh: 0.356384,
-            /* Generator burn at the campus facility load — re-derived, ASSUMED:
-             *   43,500 kW x 0.356384 L/kWh = 15,502.70 -> 15,503 L/hr
-             * evidenceClass: 'ASSUMED' (derived from the sourced rate). */
-            generator_consumption_lph: 15503,
+            /* v1.134.1 — the authored 15,503 L/hr is GONE. It was a frozen snapshot of
+             *   facility_load_kw x specific_consumption_l_per_kwh
+             * that the model republished instead of computing, so generator burn and
+             * therefore autonomy did not follow a change of load. generatorConsumptionLph()
+             * had existed and gone unused. Removing the literal makes the break impossible
+             * rather than merely fixed. */
             /* Bulk fuel inventory re-sized to PRESERVE the sourced 48 hr autonomy
              * target at the campus burn rate — ASSUMED:
              *   usable litres needed = 15,503 L/hr x 48 hr = 744,144 L
@@ -601,7 +619,38 @@
         return out;
     }
 
-    function compute(m) {
+    /* v1.134.1 — the campus roll-up used to be computed ONCE at module scope and stored on
+     * the model as `site.it_design_kw` / `site.it_load_kw` / `campus.racks_total`. The
+     * parameter registry measured the consequence: perturbing a hall's load did not move
+     * the site totals, because the totals were authored inputs that merely LOOKED derived.
+     * Deriving them here, at the top of every compute(), closes the loop — every downstream
+     * function reads the derived values, so a change to any hall propagates through the
+     * whole snapshot. The model is deep-frozen, so this returns a copy and mutates nothing.
+     */
+    function withDerivedRollup(m) {
+        var halls = m.campus.halls;
+        var itDesign = 0, itLoad = 0, racks = 0;
+        for (var i = 0; i < halls.length; i++) {
+            itDesign += halls[i].it_design_kw;
+            itLoad += halls[i].it_load_kw;
+            racks += halls[i].racks;
+        }
+        var site = {}, campus = {}, key;
+        for (key in m.site) { if (Object.prototype.hasOwnProperty.call(m.site, key)) site[key] = m.site[key]; }
+        for (key in m.campus) { if (Object.prototype.hasOwnProperty.call(m.campus, key)) campus[key] = m.campus[key]; }
+        site.it_design_kw = itDesign;
+        site.it_load_kw = itLoad;
+        campus.racks_total = racks;
+        campus.hall_count = halls.length;
+        var out = {};
+        for (key in m) { if (Object.prototype.hasOwnProperty.call(m, key)) out[key] = m[key]; }
+        out.site = site;
+        out.campus = campus;
+        return out;
+    }
+
+    function compute(model) {
+        var m = withDerivedRollup(model);
         var facility = facilityLoadKw(m);
         var nonIt = nonItLoadKw(m);
         var upsLoss = upsLossKw(m);
@@ -663,12 +712,19 @@
                    end, so a page can render any plane without re-deriving one
                    from another with a private constant (that is how the 15.2 C
                    supply air became an orphan). */
+                /* v1.134.1 — the four AUTHORED inputs of the chain, then every dependent
+                   plane DERIVED here at compute time. They used to be pre-computed into
+                   module constants and stored on the model, which closed the chain once at
+                   load and then reopened it: editing `chws_c` on the model would have
+                   silently broken the derivation, and recompute() could not restore it.
+                   The parameter registry measured exactly that — it reported chws_c and
+                   crah_supply_air_c as authored inputs, not as derived values. */
                 rack_inlet_target_c: m.cooling.rack_inlet_target_c,
                 supply_path_mixing_k: m.cooling.supply_path_mixing_k,
-                crah_supply_air_c: m.cooling.crah_supply_air_c,
                 chw_coil_approach_k: m.cooling.chw_coil_approach_k,
-                chws_c: m.cooling.chws_c,
-                chwr_c: m.cooling.chwr_c,
+                crah_supply_air_c: round2(crahSupplyAirC(m)),
+                chws_c: round2(chwsC(m)),
+                chwr_c: round2(chwrC(m)),
                 chw_delta_t: round2(dT),
                 heat_rejection_kw: round1(heatRej),
                 flow_lps: round1(flowLps),
@@ -691,7 +747,11 @@
                 tank_capacity_l: m.fuel.tank_capacity_l,
                 usable_l: Math.round(fuelUsable),
                 specific_consumption_l_per_kwh: m.fuel.specific_consumption_l_per_kwh,
-                generator_consumption_lph: m.fuel.generator_consumption_lph,
+                /* v1.134.1 — this republished an authored 15,503 L/hr while
+                   generatorConsumptionLph() sat unused two hundred lines above. Fuel burn
+                   therefore did NOT follow facility load: change the scenario and autonomy
+                   stayed put. The registry caught it (the path depended only on itself). */
+                generator_consumption_lph: Math.round(generatorConsumptionLph(m)),
                 autonomy_hr: round1(autonomy),
                 nameplate_evidence_class: m.meta.nameplate_evidence_class
             },

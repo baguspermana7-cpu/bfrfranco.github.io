@@ -98,7 +98,12 @@ approx(s.cooling.chwr_c, s.cooling.chws_c + s.cooling.chw_delta_t, 1e-9,
 if (!(s.cooling.crah_supply_air_c <= s.cooling.rack_inlet_target_c)) {
     throw new Error('CRAH supply air must not exceed the rack-inlet target');
 }
-const expectFlow = m.site.it_load_kw / (4.186 * (m.cooling.chwr_c - m.cooling.chws_c));
+/* v1.134.1 — these expectations read CONV_MODEL keys that no longer exist: chws_c/chwr_c
+   and generator_consumption_lph are DERIVED in compute() now rather than stored as authored
+   inputs (the registry measured them as unwired constants and the engine was corrected).
+   Re-express them against the published snapshot, which is the actual contract — an
+   identity should be checked on what consumers read, not on the engine's internals. */
+const expectFlow = s.site.it_load_kw / (4.186 * (s.cooling.chwr_c - s.cooling.chws_c));
 approx(s.cooling.flow_lps, Math.round(expectFlow * 10) / 10, 0.05,
     'CHW flow = cooling kW / (4.186 * dT)  (identity)');
 // doc-09 line 84 prints "58.1" (its own 1-dp rounding of 1850/(4.186*7.6)=58.184);
@@ -119,7 +124,7 @@ approx(s.fuel.usable_l, 744143.8, 1,           // 972,737 x 0.90 x 0.85  [REBASE
     'Usable fuel = 60000 * 0.90 * 0.85 = 45,900 L  [09 line 143]');
 approx(s.fuel.autonomy_hr, 48.0, 0.1,
     'Fuel autonomy = 45,900 / 956 = 48.0 hr  [09 lines 144-147]');
-const expectAutonomy = CONV_CALC.fuelUsableL() / m.fuel.generator_consumption_lph;
+const expectAutonomy = CONV_CALC.fuelUsableL() / s.fuel.generator_consumption_lph;
 approx(s.fuel.autonomy_hr, Math.round(expectAutonomy * 10) / 10, 0.05,
     'Fuel autonomy = usable L / consumption L/hr  (identity)');
 

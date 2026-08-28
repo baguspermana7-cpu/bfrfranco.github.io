@@ -11,6 +11,71 @@ release sections rather than semver.
 
 ---
 
+## v1.134.1 — 2026-08-28 (A parameter registry that MEASURES the wiring — and finds three things that were not wired)
+
+Owner requirement: every variable and parameter wired to every other one, 100 %, traceable,
+and held in a schema or database rather than hardcoded in three places.
+
+**`data/conv-parameters.json` + `.curated.json` + `.schema.json`.** One record per engine
+parameter (72). Machine-derivable fields are generated; only what a machine cannot know —
+label, unit, scope, evidence class, source, formula — is curated by hand.
+
+**Dependency edges are measured, not declared.** `tools/build-conv-parameter-registry.mjs`
+recomputes the whole engine once per authored input with only that input perturbed, and
+records which snapshot paths moved. Nothing trusts a comment or a naming convention. A first
+attempt scanned the source for SCREAMING_CASE constants and found only 11 of them, because
+most authored values live as model properties — it reported fuel autonomy as having no
+dependencies at all, which was an artefact of the detector. Perturbing model leaves through
+`recompute()` is the honest instrument.
+
+**That instrument immediately found three parameters that only looked derived:**
+- **Fuel burn did not follow load.** `generator_consumption_lph` republished an authored
+  15,503 L/hr while `generatorConsumptionLph()` sat unused two hundred lines above. Change
+  the scenario and autonomy stayed at 48 h regardless. The literal is deleted, not corrected,
+  so the break cannot come back.
+- **The thermal chain closed once at load and then reopened.** CHWS, CHWR and CRAH supply
+  air were computed into module constants and stored on the model as if they were inputs, so
+  editing a downstream temperature would silently break the derivation and `recompute()`
+  could not restore it. They derive inside `compute()` now, from the four authored inputs.
+- **The campus roll-up was authored.** `site.it_design_kw`, `site.it_load_kw` and
+  `campus.racks_total` were computed at module scope and frozen onto the model. Perturbing a
+  hall's load did not move the site totals. They derive at the top of every `compute()`, so a
+  change to any hall propagates through the whole snapshot.
+Every published value is unchanged. What changed is that they are now reachable.
+
+**`tools/test-conv-parameter-registry.mjs`** (ship gate) asserts schema conformance,
+byte-identical regeneration, provenance on every authored constant, that nothing anywhere
+claims MEASURED, an acyclic graph, scope-vs-branch agreement, and — the part that makes
+"wired" a measurement — that every declared dependency shares at least one measured input
+with its dependent. A subset rule was tried first and produced false failures on
+integer-quantised outputs (perturbing one hall moves heat rejection, but
+ceil(duty / unit capacity) still lands on 7 chillers), so the rule is a non-empty
+intersection and the reasoning is recorded at the assertion.
+
+**`tools/test-conv-coverage.mjs`** (monitor) walks the rendered DOM of all eight cockpits and
+asks of every number a human can read whether any registry parameter accounts for it. The
+denominator is rendered text, not element ids: ~390 of the ~945 numbers on these pages carry
+no id at all, so an id-keyed gate would have reported 100 % while missing two thirds of the
+screen. The honest figure today is **23.7 %**, printed per page with the untraced list.
+
+**It found a live wrong number on its first run.** `dc-conventional.html` computed UPS
+loading against a page literal `upsRatedPerModuleKw = 2000` from the retired 1.85 MW basis
+and rendered "750 % nrm / 1500 % fail" in the stats panel — UPS systems at fifteen times
+their rating, presented as telemetry. It now derives from `electrical.ups_system_rated_kw`
+and `ups_system_count`: 38 % normal, 75 % on 2N failover.
+
+**The consumer detector under-reported, and that was fixed before shipping.** Matching only
+`.<parent>.<leaf>` missed `fuel-system.html`, which destructures one level further
+(`var FUEL = SNAP.fuel; ... FUEL.level_pct`) and so contains no `.fuel.` token at all — the
+registry reported that page as reading ZERO parameters while it plainly reads the whole fuel
+branch. A bare `.<leaf>` now counts too, but only when that leaf is unique across the
+registry; ambiguous leaves (`wue_l_per_kwh` is on both environment and water, `it_load_kw` on
+site, campus and every hall) keep the strict token, because crediting the wrong branch would
+be a different lie. All eight cockpits now report real consumers.
+
+Two `test-conv-calc.mjs` identities were re-expressed against the published snapshot instead
+of engine internals that no longer exist. Assertion count is unchanged at 26.
+
 ## v1.134.0 — 2026-08-28 (Every cockpit number is the RIGHT number: scope, thermal chain, and 17 dead bindings)
 
 v1.133.0 made the Conventional site a four-hall 40 MW campus. That exposed a class of
