@@ -454,6 +454,12 @@
          Plain external script in <head>, BEFORE the page's inline script.
          Never inline this into a JS string literal. -->
     <script src="js/conv-engine.js?v=1.22.0"></script>
+    <!-- v1.134.2 — the GENERATED parameter registry plus the ONE shared basis drawer. This
+         page used to carry its own hand-written basisFor dictionary; a drawer that restates
+         provenance by hand is how v1.132.0 shipped a drawer explaining a density it had not
+         derived. The drawer renders the registry now, so it cannot claim what is not there. -->
+    <script src="js/conv-parameters.js?v=1.134.2"></script>
+    <script src="js/rz-basis-drawer.js?v=1.134.2"></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
          Loaded for cross-page consistency; body does NOT carry rz-bms-shell
          class. Spec: standarization/BMS_SHELL.md ; conv/review/14 §3. -->
@@ -662,15 +668,31 @@
         <div class="sidebar" tabindex="0">
             <div class="panel">
                 <div class="panel-title">Chiller Plant Feed</div>
-                <div class="kv"><span class="k">CH-01</span><span class="v v-ok" id="ch1">RUN</span></div>
-                <div class="kv"><span class="k">CH-02</span><span class="v v-ok" id="ch2">RUN</span></div>
-                <div class="kv"><span class="k">CH-03</span><span class="v v-zero" id="ch3">STBY</span></div>
-                <div class="kv" style="margin-top:7px; padding-top:7px; border-top:1px solid var(--border-soft);">
-                    <span class="k">CHWS</span><span class="v num" id="chws">--</span>
+                <!-- v1.134.2 — CH-01/02/03 were the fixed strings RUN/RUN/STBY, a 3-chiller
+                     plant that no longer exists (the engine runs 7 of 10). Replaced by the
+                     engine's own counts. -->
+                <div class="kv" data-basis-param="cooling.chillers_running" tabindex="0" role="button"
+                     title="Chillers running — click for basis"><span class="k">Chillers</span><span class="v num" id="ch-count">--</span></div>
+                <div class="kv" style="margin-top:7px; padding-top:7px; border-top:1px solid var(--border-soft);"
+                     data-basis-param="cooling.rack_inlet_target_c" tabindex="0" role="button"
+                     title="Rack-inlet design target — click for basis">
+                    <span class="k">Rack inlet (target)</span><span class="v num" id="th-inlet">--</span>
                 </div>
-                <div class="kv"><span class="k">CHWR</span><span class="v num" id="chwr">--</span></div>
-                <div class="kv"><span class="k">&Delta;T</span><span class="v num" id="chdt">--</span></div>
-                <div class="kv"><span class="k">CHW Flow</span><span class="v num" id="chflow">--</span></div>
+                <!-- The supply-air plane and the two assumptions that place it. These were the
+                     invisible half of the 15.2 C question: the temperature was shown, the coil
+                     approach and the containment assumption behind it were not. -->
+                <div class="kv" data-basis-param="cooling.crah_supply_air_c" tabindex="0" role="button"
+                     title="CRAH supply air — click for basis"><span class="k">CRAH supply air</span><span class="v num" id="th-supply">--</span></div>
+                <div class="kv" data-basis-param="cooling.chw_coil_approach_k" tabindex="0" role="button"
+                     title="Coil approach (ASSUMED) — click for basis"><span class="k">Coil approach</span><span class="v num" id="th-approach">--</span></div>
+                <div class="kv" data-basis-param="cooling.chws_c" tabindex="0" role="button"
+                     title="CHWS — click for basis"><span class="k">CHWS</span><span class="v num" id="chws">--</span></div>
+                <div class="kv" data-basis-param="cooling.chwr_c" tabindex="0" role="button"
+                     title="CHWR — click for basis"><span class="k">CHWR</span><span class="v num" id="chwr">--</span></div>
+                <div class="kv" data-basis-param="cooling.chw_delta_t" tabindex="0" role="button"
+                     title="CHW delta-T — click for basis"><span class="k">&Delta;T</span><span class="v num" id="chdt">--</span></div>
+                <div class="kv" data-basis-param="cooling.flow_lps" tabindex="0" role="button"
+                     title="CHW flow — click for basis"><span class="k">CHW Flow</span><span class="v num" id="chflow">--</span></div>
                 <div class="formula" id="f-flow">flow = cooling kW / (4.186 &middot; &Delta;T)</div>
             </div>
 
@@ -1112,16 +1134,24 @@
         }
 
         function paintCoolingPanel() {
+            /* SCOPE — the chilled-water plant is CENTRAL: one plant serves all four halls, so
+               every value in this panel is campus/plant scope even though the page is one
+               hall. The formula line used to divide the HALL load by the plant delta-T and
+               print the CAMPUS flow as the answer, which was arithmetic that did not close.
+               It uses the campus load now, and the panel says which scope it is in. */
+            var campusItKw = S.site.it_load_kw;
+            document.getElementById('th-inlet').textContent = S.cooling.rack_inlet_target_c.toFixed(1) + ' °C';
+            document.getElementById('th-supply').textContent = S.cooling.crah_supply_air_c.toFixed(1) + ' °C';
+            document.getElementById('th-approach').textContent = S.cooling.chw_coil_approach_k.toFixed(1) + ' K';
             document.getElementById('chws').textContent = S.cooling.chws_c.toFixed(1) + ' °C';
             document.getElementById('chwr').textContent = S.cooling.chwr_c.toFixed(1) + ' °C';
-            document.getElementById('chdt').textContent = S.cooling.chw_delta_t.toFixed(1) + ' °C';
+            document.getElementById('chdt').textContent = S.cooling.chw_delta_t.toFixed(1) + ' K';
             document.getElementById('chflow').textContent = S.cooling.flow_lps.toFixed(1) + ' L/s';
             document.getElementById('f-flow').textContent =
-                'flow = ' + SITE_IT_KW + ' / (4.186 · ' + S.cooling.chw_delta_t.toFixed(1) +
-                ') = ' + S.cooling.flow_lps.toFixed(1) + ' L/s';
-            document.getElementById('ch1').textContent = 'RUN';
-            document.getElementById('ch2').textContent = 'RUN';
-            document.getElementById('ch3').textContent = 'STBY';
+                'central plant · flow = ' + campusItKw.toLocaleString() + ' kW / (4.186 · ' +
+                S.cooling.chw_delta_t.toFixed(1) + ') = ' + S.cooling.flow_lps.toFixed(1) + ' L/s';
+            document.getElementById('ch-count').textContent =
+                S.cooling.chillers_running + ' / ' + S.cooling.chillers_total + ' running';
         }
 
         function paintEnvironment() {

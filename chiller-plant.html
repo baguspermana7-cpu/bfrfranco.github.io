@@ -523,6 +523,9 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
          Basis: conv/review/09-engineering-basis-and-calculations.md ;
          CHW-relabel decision: conv/review/04-chiller-plant-review.md -->
     <script src="js/conv-engine.js?v=1.22.0"></script>
+    <!-- v1.134.2 — generated parameter registry + the shared basis drawer. -->
+    <script src="js/conv-parameters.js?v=1.134.2"></script>
+    <script src="js/rz-basis-drawer.js?v=1.134.2"></script>
     <!-- v1.42.4 — Semantic line + breaker model libraries. Foundation for
          review docs 27/28 §3.1 + 17/18 §3.2 cross-page adoption. Non-deferred
          so drawPid() can call RZLineModel.line() at parse time. Additive —
@@ -660,11 +663,11 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
 
         <div class="card">
           <h4>Primary CHW Header <span style="float:right;font-weight:400;color:#7f93ab">engine-bound</span></h4>
-          <div class="kv"><div class="k">CHWS</div><div class="v" id="kChws">&mdash;</div></div>
-          <div class="kv"><div class="k">CHWR</div><div class="v" id="kChwr">&mdash;</div></div>
-          <div class="kv"><div class="k">ΔT</div><div class="v" id="kDt">7.6 C</div></div>
-          <div class="kv" title="Design flow basis: IT load 1,850 kW (canonical doc-09 substitution). Engine: 1,850 / (4.186 × 7.6) = 58.1 L/s."><div class="k">CHW Flow</div><div class="v" id="kFlow">58.2 L/s</div></div>
-          <div class="kv"><div class="k">Cooling Demand</div><div class="v" id="kCool">1.93 MW</div></div>
+          <div class="kv" data-basis-param="cooling.chws_c" tabindex="0" role="button" title="CHWS — click for basis"><div class="k">CHWS</div><div class="v" id="kChws">&mdash;</div></div>
+          <div class="kv" data-basis-param="cooling.chwr_c" tabindex="0" role="button" title="CHWR — click for basis"><div class="k">CHWR</div><div class="v" id="kChwr">&mdash;</div></div>
+          <div class="kv" data-basis-param="cooling.chw_delta_t" tabindex="0" role="button" title="CHW delta-T — click for basis"><div class="k">ΔT</div><div class="v" id="kDt">7.6 C</div></div>
+          <div class="kv" data-basis-param="cooling.flow_lps" tabindex="0" role="button" title="CHW flow — click for basis"><div class="k">CHW Flow</div><div class="v" id="kFlow">&mdash;</div></div>
+          <div class="kv" data-basis-param="cooling.heat_rejection_kw" tabindex="0" role="button" title="Cooling demand — click for basis"><div class="k">Cooling Demand</div><div class="v" id="kCool">1.93 MW</div></div>
           <div class="kv"><div class="k">Header DP</div><div class="v" id="kDp">86 kPa</div></div>
         </div>
 

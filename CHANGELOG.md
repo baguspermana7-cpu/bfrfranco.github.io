@@ -11,6 +11,53 @@ release sections rather than semver.
 
 ---
 
+## v1.134.2 — 2026-08-28 (One basis drawer, rendered from the registry — and the assumptions behind the supply air are finally visible)
+
+Three cockpits each carried a hand-written `basisFor` dictionary restating a formula, an
+input list and a `source:` string by hand. Copying provenance by hand IS the defect: it is
+how v1.132.0 shipped a drawer explaining a density it had not derived, citing a snapshot key
+that has never existed.
+
+**`js/rz-basis-drawer.js`** is one shared module that renders the generated parameter
+registry. It cannot claim a provenance the registry does not hold, a formula the engine does
+not implement, or an input that does not move the output — the dependency edges it shows were
+measured by perturbing the engine, not declared. Any element carrying
+`data-basis-param="cooling.chws_c"` opens it, by click or by keyboard. Declared dependencies
+are clickable, so an operator can walk CHWR back to the adopted rack-inlet target in four
+steps without leaving the page.
+
+**`js/conv-parameters.js`** is a generated browser-loadable twin of the registry. This site is
+zero-build and ES5, and some gates open these cockpits over `file://` where `fetch()` of a
+JSON file fails; a plain `<script>` that assigns a global always loads. Both files come from
+the same object and the staleness gate covers both, so there is no second source of truth.
+
+**The invisible half of the supply-air question is now on screen.** The data hall showed CHWS
+and CHWR but never the two assumptions that place them: the coil approach (6.0 K, ASSUMED, no
+coil selection has been made) and the supply-path mixing (0 K, the containment assumption).
+The cooling panel now renders the whole chain — rack-inlet target, CRAH supply air, coil
+approach, CHWS, CHWR, delta-T, flow — each one a basis hook, each carrying its evidence class
+in the drawer. `ASSUMED` renders amber and says in words that it is not measured and not
+vendor-approved.
+
+**Two more stale displays fixed while wiring it:**
+- The data hall's chiller rows were the fixed strings `RUN / RUN / STBY` — a three-chiller
+  plant that no longer exists. They render the engine's 7 of 10 now.
+- The CHW flow formula line divided the HALL load by the plant delta-T and printed the CAMPUS
+  flow as the answer: arithmetic that did not close. The chilled-water plant is central and
+  serves all four halls, so the line uses the campus load and says which scope it is in.
+- `chiller-plant.html`'s CHW Flow row still carried a tooltip citing "IT load 1,850 kW …
+  = 58.1 L/s" from the retired basis.
+
+**`tools/test-conv-basis-drawer.mjs`** (ship gate) asserts every `data-basis-param` resolves
+to a registered parameter, that adopting pages actually load both modules (a hook with no
+module is a dead control), that every hook is keyboard reachable and announces itself as a
+control, and that the drawer's number agrees with the number in the row it explains. That
+last check accepts the metric scalings these cockpits use — "31.3 MW" beside a registered
+31,250 kW is correct, not drift — and still rejects a different number at every scale.
+
+13 hooks across two pages. The remaining six cockpits keep their existing drawers until their
+page-derived displays have a registry concept of their own; that gap is reported, not hidden.
+
 ## v1.134.1 — 2026-08-28 (A parameter registry that MEASURES the wiring — and finds three things that were not wired)
 
 Owner requirement: every variable and parameter wired to every other one, 100 %, traceable,

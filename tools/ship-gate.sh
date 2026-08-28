@@ -69,6 +69,10 @@ gate "Conventional parameter registry — schema, staleness, provenance, measure
 # FLIP TO STRICT (add --strict) once page-level derived displays are registered and the P&ID/table
 # text nodes are bound; a gate that fails from day one gets muted instead of paid down.
 gate "Conventional coverage MONITOR — rendered numbers traced to the registry" node tools/test-conv-coverage.mjs
+# The shared basis drawer renders the registry rather than restating provenance by hand. This
+# asserts every data-basis-param resolves, the modules actually load, the hooks are keyboard
+# controls, and the drawer's number agrees with the number in the row it explains.
+gate "Conventional basis drawer — hooks resolve, explanations match their KPI" node tools/test-conv-basis-drawer.mjs
 # MONITOR (advisory, exit 0 by design): measures diagram geometry — label collisions, clipped elements,
 # degenerate labels, phone overflow — across 4 diagrams x 4 viewports x 2 themes. It runs in --measure mode
 # because the current pages carry a real, already-measured debt (~484 findings: chiller-plant 27-48 collisions
