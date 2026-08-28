@@ -11,6 +11,38 @@ release sections rather than semver.
 
 ---
 
+## v1.134.5 — 2026-08-28 (The design basis is on the screen, not just in the engine)
+
+The registry reported the **entire `campus.*` branch as read by zero cockpits**. The engine
+published the campus geometry, the resilience rules and an evidence class for every re-derived
+nameplate, and not one of them was rendered anywhere. An operator could read every number on
+the dashboard and never see what those numbers rest on.
+
+**`dc-conventional.html` gains a Design basis panel** — governing study id, operating scenario
+with its evidence class, hall count, campus IT design and adopted load, utilisation, cabinet
+count, cabinet design/peak kW, the electrical (2N) and cooling (N+1) resilience rules, and the
+ASSUMED evidence class every re-derived nameplate carries. Every row is a basis hook: click it
+for the source, the method and the evidence class.
+
+**Two more stale rows fixed in the same panel.** "Autonomy 48 hrs" was an un-hooked literal
+whose tooltip cited "45,900 L ÷ 956 L/hr" — the retired 1.85 MW basis. It is engine-bound with
+its drawer now. "Day Tank 92%" was an un-hooked literal with no source at all: the engine
+models the bulk UST level, not per-genset day tanks. It renders UNAVAILABLE with the reason
+rather than a comforting number.
+
+**The consumer detector under-reported again, and the report was fixed rather than the number
+massaged.** A basis-drawer hook IS a consumption — the page displays that parameter and offers
+its provenance — but only property access was counted. Every `hall.*` parameter was therefore
+reported unread, because `datahall.html` reads them through an alias (`HALL.racks`) and the
+ambiguous-leaf rule keeps the strict `.hall.<leaf>` token, which never appears in the source.
+Reporting a parameter as unread while a page renders a drawer for it would make the backlog
+figure a fiction.
+
+Adoption: **73 hooks across 8 pages**, and parameters rendered by no cockpit fall from 38 to
+**24**. What remains is largely internal: the `*_exact` unrounded twins, per-hall duplicates of
+values already shown at campus scope, and the branch-level evidence-class strings. Those are
+reported every run, not hidden.
+
 ## v1.134.4 — 2026-08-28 (Hall selection actually selects a hall — and stays a view label where a data swap would be fabrication)
 
 Three cockpits shipped a `Campus | A | B | C | D` selector. All three were cosmetic: they

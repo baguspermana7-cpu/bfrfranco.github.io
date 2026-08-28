@@ -1164,6 +1164,54 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
 
     <!-- Right Panel - Live Stats -->
     <aside class="stats-panel">
+        <!-- v1.134.5 — DESIGN BASIS. The engine publishes the campus geometry, the resilience
+             rules and an evidence class for every nameplate, and not one of them was rendered
+             anywhere: the parameter registry reported the whole campus.* branch as read by
+             zero cockpits. An operator could see the numbers and never what they rest on.
+             Every row here is a basis hook — click it for the source and the evidence class. -->
+        <div class="stats-section">
+            <div class="stats-title"><span class="dot" style="background: var(--accent-green)"></span> Design basis</div>
+            <div class="stat-row" title="Governing study — click for source">
+                <span class="stat-label">Study</span>
+                <span class="stat-value" id="sbStudy" data-basis-param="campus.study_id" tabindex="0" role="button">&mdash;</span>
+            </div>
+            <div class="stat-row" title="Operating scenario — SIMULATED/ADOPTED, never measured telemetry">
+                <span class="stat-label">Scenario</span>
+                <span class="stat-value" id="sbScenario" data-basis-param="campus.scenario_label" tabindex="0" role="button">&mdash;</span>
+            </div>
+            <div class="stat-row" title="Halls in the campus">
+                <span class="stat-label">Halls</span>
+                <span class="stat-value cyan" id="sbHalls" data-basis-param="campus.hall_count" tabindex="0" role="button">&mdash;</span>
+            </div>
+            <div class="stat-row" title="Campus IT design capacity">
+                <span class="stat-label">IT design</span>
+                <span class="stat-value cyan" id="sbDesign" data-basis-param="campus.it_design_kw" tabindex="0" role="button">&mdash;</span>
+            </div>
+            <div class="stat-row" title="Campus utilisation = IT load / IT design">
+                <span class="stat-label">Utilisation</span>
+                <span class="stat-value cyan" id="sbUtil" data-basis-param="campus.utilisation_pct" tabindex="0" role="button">&mdash;</span>
+            </div>
+            <div class="stat-row" title="Cabinets across all four halls">
+                <span class="stat-label">Cabinets</span>
+                <span class="stat-value" id="sbRacks" data-basis-param="campus.racks_total" tabindex="0" role="button">&mdash;</span>
+            </div>
+            <div class="stat-row" title="Cabinet design average / selected peak">
+                <span class="stat-label">Cabinet kW</span>
+                <span class="stat-value" id="sbRackKw" data-basis-param="campus.rack_design_avg_kw" tabindex="0" role="button">&mdash;</span>
+            </div>
+            <div class="stat-row" title="Electrical resilience rule">
+                <span class="stat-label">Electrical</span>
+                <span class="stat-value" id="sbUpsRed" data-basis-param="electrical.ups_redundancy" tabindex="0" role="button">&mdash;</span>
+            </div>
+            <div class="stat-row" title="Cooling resilience rule">
+                <span class="stat-label">Cooling</span>
+                <span class="stat-value" id="sbChRed" data-basis-param="cooling.chiller_redundancy" tabindex="0" role="button">&mdash;</span>
+            </div>
+            <div class="stat-row" title="Evidence class carried by every re-derived equipment nameplate on this site">
+                <span class="stat-label">Nameplates</span>
+                <span class="stat-value" id="sbNameplate" data-basis-param="meta.nameplate_evidence_class" tabindex="0" role="button">&mdash;</span>
+            </div>
+        </div>
         <div class="stats-section">
             <div class="stats-title"><span class="dot" style="background: var(--accent-cyan)"></span> Efficiency</div>
             <div class="stat-row" title="Power Usage Effectiveness — facility kW / IT kW. Engine-derived.">
@@ -1245,10 +1293,15 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
         <div class="stats-section">
             <div class="stats-title"><span class="dot" style="background: var(--accent-purple)"></span> Fuel</div>
             <div class="stat-row"><span class="stat-label">Main</span><span class="stat-value green" id="sFuelMain" data-basis-param="fuel.level_pct" tabindex="0" role="button">85%</span></div>
-            <div class="stat-row"><span class="stat-label">Day Tank</span><span class="stat-value green">92%</span></div>
-            <div class="stat-row" title="Bulk-tank autonomy at current site load. 45,900 L usable ÷ 956 L/hr (site total) = 48 hrs. Per-genset day-tank inventory is separate buffer.">
+            <!-- v1.134.5 — "Day Tank 92%" was an un-hooked literal with no source: the engine
+                 models the bulk UST level, not per-genset day tanks. Rendered UNAVAILABLE
+                 rather than as a comforting number. -->
+            <div class="stat-row"><span class="stat-label">Day Tank</span><span class="stat-value" style="color:var(--text-secondary)" title="UNAVAILABLE — per-genset day-tank level is not modelled in the current basis">&mdash;</span></div>
+            <!-- v1.134.5 — the tooltip cited 45,900 L / 956 L/hr, the retired 1.85 MW basis,
+                 and the value was an un-hooked literal. Engine-bound with its basis drawer. -->
+            <div class="stat-row" title="Bulk-tank autonomy at the campus facility load. Per-genset day-tank inventory is a separate buffer.">
                 <span class="stat-label">Autonomy</span>
-                <span class="stat-value cyan">48 hrs · bulk-tank @ site load</span>
+                <span class="stat-value cyan" id="sAutonomy" data-basis-param="fuel.autonomy_hr" tabindex="0" role="button">&mdash;</span>
             </div>
         </div>
     </aside>
@@ -1422,6 +1475,23 @@ function updateData() {
     setText('sTempAvg', temp + '°C');
     setText('sRhAvg', rh + '%');
     setText('sFuelMain', fuel + '%');
+    setText('sAutonomy', s.fuel.autonomy_hr.toFixed(0) + ' hrs · bulk tank @ campus load');
+
+    /* v1.134.5 — DESIGN BASIS panel. Every value here was published by the engine and rendered
+       by no cockpit; the registry reported the whole campus.* branch as read by zero pages. */
+    setText('sbStudy', s.campus.study_id);
+    setText('sbScenario', s.campus.scenario_label + ' · ' + s.campus.scenario_evidence_class);
+    setText('sbHalls', s.campus.hall_count + ' halls (A–D)');
+    setText('sbDesign', (s.campus.it_design_kw / 1000).toFixed(0) + ' MW · '
+        + (s.campus.it_load_kw / 1000).toFixed(0) + ' MW adopted');
+    setText('sbUtil', s.campus.utilisation_pct.toFixed(0) + '%');
+    /* `grp` lives in a later <script> block and is not defined when this first runs. */
+    setText('sbRacks', s.campus.racks_total.toLocaleString() + ' cabinets');
+    setText('sbRackKw', s.campus.rack_design_avg_kw + ' avg / '
+        + s.campus.rack_selected_peak_kw + ' peak');
+    setText('sbUpsRed', s.electrical.ups_redundancy);
+    setText('sbChRed', s.cooling.chiller_redundancy);
+    setText('sbNameplate', s.meta.nameplate_evidence_class);
 
     /* v1.134.0 — chiller cells. The markup carried "2/3" and per-unit "Run 85% / 78%"
        from the retired 1.85 MW basis, contradicting the engine on the same screen. The

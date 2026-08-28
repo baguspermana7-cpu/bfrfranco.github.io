@@ -256,7 +256,14 @@ export function buildRegistry() {
 
         const consumers = [];
         for (const { page, text } of pageSources) {
-            const reads = tokens.reduce((sum, t) => sum + grepCount(text, t), 0);
+            let reads = tokens.reduce((sum, t) => sum + grepCount(text, t), 0);
+            /* A basis-drawer hook IS a consumption: the page displays that parameter and
+               offers its provenance. Counting only property access under-reported every
+               hall.* parameter, because datahall reads them through an alias (`HALL.racks`)
+               and the ambiguous-leaf rule keeps the strict `.hall.<leaf>` token — which never
+               appears in the source. Reporting a parameter as unread while a page renders a
+               drawer for it would make the backlog figure a fiction. */
+            reads += grepCount(text, `data-basis-param="${id}"`);
             if (reads > 0) consumers.push({ page, reads });
         }
         const tests = gateSources
