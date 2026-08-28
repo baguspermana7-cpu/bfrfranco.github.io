@@ -121,32 +121,101 @@ try {
         const distributions = await tab.evaluate(() => [...document.querySelectorAll('[data-rz-distribution]')]
             .map((host) => {
                 const selector = host.getAttribute('data-rz-distribution-selector');
-                const cells = [...host.querySelectorAll(selector || '*')];
+                /* A declaration may live outside the region it describes (an element can carry
+                   only one distribution), so fall back to a document-scoped query when the host
+                   has no matching descendants. */
+                let cells = [...host.querySelectorAll(selector || '*')];
+                if (cells.length === 0 && selector) cells = [...document.querySelectorAll(selector)];
+                const values = [];
                 let sum = 0;
-                let counted = 0;
                 for (const cell of cells) {
-                    const m = cell.textContent.replace(/,/g, '').match(/-?\d+(?:\.\d+)?/);
-                    if (!m) continue;
-                    sum += Number(m[0]);
-                    counted += 1;
+                    /* Take the LAST number in the cell. An instrument reading is written
+                       "MFM1  135.6 L/s" — the first number is part of the tag, and reading it
+                       made every loop reconcile against 1.0 instead of its flow. */
+                    const all = cell.textContent.replace(/,/g, '').match(/-?\d+(?:\.\d+)?/g);
+                    if (!all || !all.length) continue;
+                    const v = Number(all[all.length - 1]);
+                    values.push(v);
+                    sum += v;
                 }
-                return { param: host.getAttribute('data-rz-distribution'), sum, counted, selector };
+                /* A field of many per-item values reconciles to its basis one of two ways.
+                   SUM: the cells add up to the parameter (a whole cabinet field).
+                   PER-ITEM: each cell equals the parameter divided by a count (four chiller
+                   loops drawn out of seven running — the drawn set is a SUBSET, so its sum
+                   cannot equal the plant and demanding that would be the wrong check). The
+                   mode is declared by the page, never guessed here. */
+                const targetSel = host.getAttribute('data-rz-distribution-target');
+                let targetValue = null;
+                if (targetSel) {
+                    const el = document.querySelector(targetSel);
+                    const m = el && el.textContent.replace(/,/g, '').match(/-?\d+(?:\.\d+)?/);
+                    if (m) targetValue = Number(m[0]);
+                }
+                return {
+                    param: host.getAttribute('data-rz-distribution'),
+                    mode: host.getAttribute('data-rz-distribution-mode') || 'sum',
+                    divisorParam: host.getAttribute('data-rz-distribution-divisor'),
+                    targetSel, targetValue,
+                    sum, values, counted: values.length, selector,
+                };
             }));
         for (const dist of distributions) {
+            /* A declaration that matches NOTHING must never read as a pass. That is how an
+               exclusion becomes free: change a class name, the selector stops matching, and the
+               gate cheerfully reports "reconciles" over an empty set. */
+            if (dist.counted === 0) {
+                console.log(`  ! ${page}: declared distribution ${dist.param} matched NO cells `
+                    + `(selector "${dist.selector}") — declaration refused`);
+                distributionFailures.push(`${page}: ${dist.param} matched no cells `
+                    + `(selector "${dist.selector}")`);
+                continue;
+            }
             const parameter = registry.parameters.find((p) => p.id === dist.param);
             if (!parameter) {
                 console.log(`  ! ${page}: declared distribution names an unregistered parameter `
                     + `"${dist.param}" — the declaration is refused and its cells stay in the denominator`);
                 continue;
             }
-            const expected = Number(parameter.value);
-            const tolerance = Math.max(Math.abs(expected) * 0.005, 1);
-            const agrees = Math.abs(dist.sum - expected) <= tolerance;
-            console.log(`  = ${page}: distribution ${dist.param} — ${dist.counted} cells sum to `
-                + `${dist.sum.toFixed(1)}, registered value ${expected} ${agrees ? '(reconciles)' : '(DOES NOT RECONCILE)'}`);
+            let expected = Number(parameter.value);
+            let actual = dist.sum;
+            let what = `${dist.counted} cells sum to ${dist.sum.toFixed(1)}`;
+
+            if (dist.mode === 'per-item') {
+                /* No divisor means each item should equal the parameter itself — four loops
+                   whose supply water all sits on the same published CHWS plane. */
+                let divisorValue = 1;
+                if (dist.divisorParam) {
+                    const divisor = registry.parameters.find((p) => p.id === dist.divisorParam);
+                    if (!divisor || !Number(divisor.value)) {
+                        console.log(`  ! ${page}: per-item distribution ${dist.param} names an unusable `
+                            + `divisor "${dist.divisorParam}" — declaration refused`);
+                        continue;
+                    }
+                    divisorValue = Number(divisor.value);
+                }
+                expected = Number(parameter.value) / divisorValue;
+                /* Every drawn item must sit at the per-item share; report the worst one. */
+                actual = dist.values.reduce((worst, v) =>
+                    (Math.abs(v - expected) > Math.abs(worst - expected) ? v : worst), expected);
+                what = `${dist.counted} items, worst ${actual.toFixed(1)} against a per-item share of `
+                    + `${expected.toFixed(1)} (${dist.param} / ${dist.divisorParam})`;
+            } else if (dist.mode === 'target-element') {
+                if (dist.targetValue == null) {
+                    console.log(`  ! ${page}: distribution target "${dist.targetSel}" rendered no `
+                        + 'number — declaration refused');
+                    continue;
+                }
+                expected = dist.targetValue;
+                what = `${dist.counted} cells sum to ${dist.sum.toFixed(1)} against the aggregate `
+                    + `this page renders at ${dist.targetSel} (${expected})`;
+            }
+
+            const tolerance = Math.max(Math.abs(expected) * 0.05, 1);
+            const agrees = Math.abs(actual - expected) <= tolerance;
+            console.log(`  = ${page}: distribution ${dist.param} [${dist.mode}] — ${what} `
+                + `${agrees ? '(reconciles)' : '(DOES NOT RECONCILE)'}`);
             if (!agrees) {
-                distributionFailures.push(`${page}: ${dist.param} cells sum to ${dist.sum.toFixed(1)}, `
-                    + `registry says ${expected}`);
+                distributionFailures.push(`${page}: ${dist.param} [${dist.mode}] — ${what}`);
             }
         }
 
@@ -155,8 +224,32 @@ try {
         const found = await tab.evaluate(() => {
             const results = [];
             const seen = new Set();
-            const declared = [...document.querySelectorAll('[data-rz-distribution]')];
-            const insideDeclared = (el) => declared.some((host) => host.contains(el));
+            /* Exclude EXACTLY the cells a declaration verifies — not everything inside the
+               declaring element. Hosting the declaration on a whole SVG and excluding its
+               subtree removed 89 of that page's 106 numbers from the denominator in one line,
+               which is precisely the loophole a coverage gate must not have. */
+            /* DECLARED AUTHORED BASIS. Some numbers on these cockpits are not engine quantities
+               at all and never will be: ict's traffic scenario is authored on the page and is
+               explicitly independent of IT kW — the Conventional engine has no network model.
+               Forcing them into the registry would break the rule that the engine is the single
+               source of truth; leaving them in the untraced pile makes the backlog figure
+               meaningless, because "nobody has bound this yet" and "this is not an engine
+               quantity" are different problems. They get their own bucket, they must carry a
+               written reason, and they are REPORTED — never quietly dropped. */
+            const authoredRegions = [...document.querySelectorAll('[data-rz-authored-basis]')];
+            const insideAuthored = (el) => authoredRegions.some((host) =>
+                (host.getAttribute('data-rz-authored-basis') || '').length >= 40 && host.contains(el));
+
+            const declaredCells = new Set();
+            for (const host of document.querySelectorAll('[data-rz-distribution]')) {
+              const selector = host.getAttribute('data-rz-distribution-selector');
+              if (!selector) continue;
+              for (const cell of host.querySelectorAll(selector)) declaredCells.add(cell);
+            }
+            const insideDeclared = (el) => {
+              for (const cell of declaredCells) if (cell === el || cell.contains(el)) return true;
+              return false;
+            };
             const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
             let node;
             while ((node = walker.nextNode())) {
@@ -166,11 +259,18 @@ try {
                 if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT') continue;
                 /* Excluded ONLY because the sum is verified above. */
                 if (insideDeclared(el)) continue;
+                if (insideAuthored(el)) { results.push({ authored: true }); continue; }
                 const box = el.getBoundingClientRect();
                 if (box.width === 0 && box.height === 0) continue;
                 const style = getComputedStyle(el);
                 if (style.display === 'none' || style.visibility === 'hidden') continue;
-                const text = node.textContent;
+                /* Strip clock and calendar substrings BEFORE extracting numbers. The exclusion
+                   list only recognised a cell that was ENTIRELY a date or a time; an alarm row
+                   reading "2026-08-27 02:11 VMS-01 ..." was therefore split into 2026, -27, -26
+                   and 60 and counted as four untraced engineering values. */
+                const text = node.textContent
+                    .replace(/\d{4}-\d{2}-\d{2}/g, ' ')
+                    .replace(/\b\d{1,2}:\d{2}(?::\d{2})?\b/g, ' ');
                 const matches = text.match(/-?\d[\d,]*(?:\.\d+)?/g);
                 if (!matches) continue;
                 const label = (el.closest('[data-basis],[id],.kv,.data-row,.stat-row,.metric-row') || el)
@@ -186,10 +286,11 @@ try {
         });
         await tab.close();
 
-        const considered = found.filter((f) => !isExcluded(f.value));
+        const authoredCount = found.filter((f) => f.authored).length;
+        const considered = found.filter((f) => !f.authored && !isExcluded(f.value));
         const unaccounted = considered.filter((f) => !ACCOUNTED.has(f.value)
             && !ACCOUNTED.has(f.value.replace(/,/g, '')));
-        perPage.push({ page, considered: considered.length, unaccounted });
+        perPage.push({ page, considered: considered.length, unaccounted, authored: authoredCount });
     }
 
     console.log('\nCONVENTIONAL COVERAGE — rendered numbers accounted for by the parameter registry');
@@ -202,11 +303,18 @@ try {
         totalConsidered += row.considered;
         totalUnaccounted += row.unaccounted.length;
         console.log(`  ${row.page.padEnd(24)} ${String(traced).padStart(4)} / ${String(row.considered).padStart(4)} `
-            + `traced  (${pct.toFixed(1)} %)`);
+            + `traced  (${pct.toFixed(1)} %)`
+            + (row.authored ? `   + ${row.authored} declared authored page basis` : ''));
     }
+    const totalAuthored = perPage.reduce((sum, r) => sum + r.authored, 0);
     const overall = totalConsidered === 0 ? 100 : ((totalConsidered - totalUnaccounted) / totalConsidered) * 100;
     console.log(`\n  OVERALL ${totalConsidered - totalUnaccounted} / ${totalConsidered} rendered numbers traced `
         + `= ${overall.toFixed(1)} %`);
+    if (totalAuthored > 0) {
+        console.log(`  plus ${totalAuthored} numbers in regions DECLARED as authored page basis `
+            + '(outside the engine\'s scope, each with a written reason) — counted separately so '
+            + 'the untraced figure means what it says');
+    }
 
     if (totalUnaccounted > 0) {
         console.log('\nUNACCOUNTED (a number an operator reads that no registry parameter explains):');

@@ -744,7 +744,18 @@
             </nav>
 
             <!-- Canvas -->
-            <main class="canvas" id="canvas" tabindex="0" aria-label="Network topology canvas" aria-live="polite"></main>
+            <!-- v1.134.7 — DECLARED AUTHORED PAGE BASIS. Everything this canvas renders — link
+                 capacities, offered traffic, utilisation, latency, loss, jitter, service health,
+                 PRTG counters — comes from TRAFFIC_SCENARIO and NETWORK_CAPACITY_BASIS, authored
+                 on this page and explicitly independent of IT kW. conv-engine.js models power,
+                 cooling, water and fuel; it has NO network model, so these numbers have no
+                 registry parameter to trace to and inventing one would break the rule that the
+                 engine is the single source of truth. They are declared, counted and reported in
+                 their own bucket rather than sitting in the untraced pile, because "nobody has
+                 bound this yet" and "this is not an engine quantity" are different problems and
+                 a backlog figure that mixes them is not worth reading. The IT-load basis strip
+                 above (#m-basis) IS engine-bound and stays in the denominator. -->
+            <main class="canvas" id="canvas" data-rz-authored-basis="Network traffic and capacity are authored on this page (TRAFFIC_SCENARIO, NETWORK_CAPACITY_BASIS) and are explicitly independent of IT kW; conv-engine.js has no network model, so these values have no engine parameter to trace to." tabindex="0" aria-label="Network topology canvas" aria-live="polite"></main>
 
             <!-- Right inspector (selected segment / alarms) -->
             <aside class="inspector">
@@ -771,7 +782,7 @@
                     <div id="alarm-list"></div>
                 </div>
 
-                <div class="calc-note" id="calc-note"></div>
+                <div class="calc-note" id="calc-note" data-rz-authored-basis="Aggregate traffic, core utilisation and the monitoring calc note restate the authored TRAFFIC_SCENARIO / NETWORK_CAPACITY_BASIS on this page; conv-engine.js has no network model."></div>
             </aside>
         </div>
 
@@ -781,10 +792,10 @@
                 <div><div class="sb-lbl">Fabric</div><div class="sb-val ok" id="sb-sys-v">OPERATIONAL</div></div>
             </div>
             <div class="sb-box">
-                <div><div class="sb-lbl">Aggregate Traffic</div><div class="sb-val" id="sb-traffic">--</div></div>
+                <div data-rz-authored-basis="Aggregate traffic, core utilisation and the monitoring calc note restate the authored TRAFFIC_SCENARIO / NETWORK_CAPACITY_BASIS on this page; conv-engine.js has no network model."><div class="sb-lbl">Aggregate Traffic</div><div class="sb-val" id="sb-traffic">--</div></div>
             </div>
             <div class="sb-box">
-                <div><div class="sb-lbl">Core Util</div><div class="sb-val" id="sb-util">--</div></div>
+                <div><div class="sb-lbl">Core Util</div><div class="sb-val" id="sb-util" data-rz-authored-basis="Aggregate traffic, core utilisation and the monitoring calc note restate the authored TRAFFIC_SCENARIO / NETWORK_CAPACITY_BASIS on this page; conv-engine.js has no network model.">--</div></div>
             </div>
             <div class="sb-box">
                 <div><div class="sb-lbl">Links Up</div><div class="sb-val" id="sb-links">--</div></div>

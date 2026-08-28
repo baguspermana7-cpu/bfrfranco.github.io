@@ -613,6 +613,20 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
            (see the basis binder below); this literal is only the pre-script placeholder. -->
       <div class="basis-value" id="chiller-current-basis-value">Representative view · engine basis loading…</div>
     </div>
+    <!-- v1.134.7 — an OPEN BASIS-OF-DESIGN CONFLICT, stated rather than resolved by whichever
+         page was edited last. The governed study specifies evaporative cooling-tower heat
+         rejection (water-cooled machines); this mimic depicts air-cooled chillers with fan
+         stages and no condenser-water loop. Specific power differs by roughly 2x between them
+         (water-cooled centrifugal ~0.55-0.62 kW/RT, air-cooled ~1.0-1.2), which is why plant
+         COP and kW/RT read UNAVAILABLE on this page instead of carrying an invented figure. -->
+    <div class="basis-card" data-basis="conflict"
+         style="border-color:#d99a2b">
+      <div class="basis-title" style="color:#d99a2b">Open decision · heat-rejection type</div>
+      <div class="basis-value">The governed study specifies an <b>evaporative cooling tower</b>
+        (water-cooled machines); this mimic depicts <b>air-cooled</b> chillers. Specific power
+        differs by about 2&times; between them, so plant <b>COP</b> and <b>kW/RT</b> are reported
+        UNAVAILABLE rather than assumed. Thermal duty, which the engine publishes, is shown.</div>
+    </div>
     <div class="basis-card study" data-basis="study">
       <div class="basis-title">Capacity study · 4 × 10 MW IT</div>
       <div class="basis-value"><span class="basis-guard">READ-ONLY PLANNING BASIS</span> · not connected to current controls or telemetry</div>
@@ -630,7 +644,24 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
         <span class="warn">Warning</span>
         <span class="alarm">Alarm / Trip</span>
       </div>
-      <svg id="pidSvg" viewBox="0 0 2300 1400" aria-label="Chiller P&ID mimic"></svg>
+      <!-- v1.134.7 — DECLARED PER-ITEM DISTRIBUTION. The mimic draws four machines out of the
+           engine's running set, so the drawn flows CANNOT sum to the plant header and demanding
+           that would be the wrong check. Each drawn machine must instead carry the plant's
+           per-machine share: cooling.flow_lps / cooling.chillers_running. The coverage gate
+           verifies that every drawn loop sits at the share before excluding these readouts from
+           its denominator — the exclusion is bought with a check, not asserted. -->
+      <svg id="pidSvg" viewBox="0 0 2300 1400" aria-label="Chiller P&ID mimic"
+           data-rz-distribution="cooling.flow_lps"
+           data-rz-distribution-mode="per-item"
+           data-rz-distribution-divisor="cooling.chillers_running"
+           data-rz-distribution-selector="[data-rz-loop-flow] text"></svg>
+      <!-- v1.134.7 — a first attempt declared these loop temperatures against cooling.chws_c and
+           cooling.chwr_c. That was wrong, and the gate caught it: t1/t2 are the SECONDARY loop's
+           supply and return (this file has said so since v2.0.0), a different plane from the
+           primary header. Attaching a parameter to the wrong quantity is the exact defect this
+           programme exists to remove, so the declaration is withdrawn rather than retuned until
+           it passed. The secondary loop, the refrigeration cycle and the pump mechanicals are
+           declared authored page basis below, with the reason stated. -->
       <div class="status-strip">
         <div class="status-left">
           <div class="dot" id="sDot"></div>
@@ -716,7 +747,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
             </div>
             <div class="field">
               <label>Flow SP <span id="spFlowTxt">18.0 L/s</span></label>
-              <input id="spFlow" type="range" min="10" max="24" step="0.1" value="18" aria-label="Sp Flow" />
+              <input id="spFlow" type="range" step="0.1" aria-label="Per-loop flow setpoint" />
             </div>
             <div class="field">
               <label>Fault Loop</label>
@@ -843,6 +874,45 @@ function chwBasis(){
 }
 const CHW = chwBasis();
 
+/* v1.134.7 — the drawn loops are a SUBSET of the plant. The engine runs
+   cooling.chillers_running machines out of chillers_total; this mimic draws four of them.
+   Each running machine carries an equal share of the plant flow, and its water sits on the
+   published CHWS/CHWR planes with a small deterministic per-loop spread so the mimic still
+   reads as four distinct machines rather than four identical ones. Nothing here is authored
+   at a scale of its own any more — that is what produced 4 x 18 L/s against a 943 L/s header. */
+const ENGINE_CHILLERS_RUNNING = (function () {
+  const s = engineSnap();
+  return (s && s.cooling && s.cooling.chillers_running) ? s.cooling.chillers_running : null;
+}());
+const ENGINE_CHILLERS_TOTAL = (function () {
+  const s = engineSnap();
+  return (s && s.cooling && s.cooling.chillers_total) ? s.cooling.chillers_total : null;
+}());
+/* Engine-derived operating bands for one machine. The simulation tick used to clamp flow to
+   0-24 L/s and loop water to 16-22.5 / 20.8-25 C — all retired-basis ranges, which dragged the
+   loops back to the old scale on the first tick no matter what they were initialised to. */
+const LOOP_FLOW_DESIGN = (CHW.flow != null && ENGINE_CHILLERS_RUNNING)
+  ? CHW.flow / ENGINE_CHILLERS_RUNNING : null;
+const LOOP_FLOW_MIN = LOOP_FLOW_DESIGN != null ? r1(LOOP_FLOW_DESIGN * 0.55) : 0;
+const LOOP_FLOW_MAX = LOOP_FLOW_DESIGN != null ? r1(LOOP_FLOW_DESIGN * 1.15) : 24;
+const LOOP_T1_MIN = CHW.chws != null ? r1(CHW.chws - 1.6) : 16;
+const LOOP_T1_MAX = CHW.chws != null ? r1(CHW.chws + 1.6) : 22.5;
+const LOOP_T2_MIN = (CHW.chws != null && CHW.dt != null) ? r1(CHW.chws + CHW.dt - 1.8) : 20.8;
+const LOOP_T2_MAX = (CHW.chws != null && CHW.dt != null) ? r1(CHW.chws + CHW.dt + 1.8) : 25.0;
+
+function rescaleLoopsToEngine(loops) {
+  if (CHW.flow == null || CHW.chws == null || CHW.dt == null || !ENGINE_CHILLERS_RUNNING) return loops;
+  const perLoopFlow = CHW.flow / ENGINE_CHILLERS_RUNNING;
+  return loops.map(function (lp, i) {
+    const spread = (i - 1.5) * 0.4;           // deterministic, symmetric about the design point
+    return Object.assign({}, lp, {
+      flow: r1(perLoopFlow + spread * 2),
+      t1: r1(CHW.chws + spread * 0.25),
+      t2: r1(CHW.chws + CHW.dt + spread * 0.35),
+    });
+  });
+}
+
 /* v2.0.0 — write the current-basis card from the engine. It used to be static text and therefore kept
    claiming the retired 1.850 MW / 1.927 MW basis; every other figure on this page moves with CONV_CALC,
    so the card that NAMES the basis must move with it too. */
@@ -868,21 +938,33 @@ const st = {
      design point the decoupler carries no bypass, so secondary supply = CHWS;
      the operator may raise it (warmer secondary = more bypass, more economiser
      hours) up to +4 K. */
-  sp:{ chws:(CHW.chws != null ? CHW.chws : null), dp:90, flow:18.0 },
+  sp:{ chws:(CHW.chws != null ? CHW.chws : null), dp:90, flow:(LOOP_FLOW_DESIGN != null ? r1(LOOP_FLOW_DESIGN) : null) },
   // header = PRIMARY chilled-water loop (engine-bound, deterministic).
   header:{ chws:CHW.chws, chwr:CHW.chwr, flow:CHW.flow, dp:86, dt:CHW.dt, coolingKw:CHW.coolingKw },
   // loops = SECONDARY / CONDENSER-side circuits of the 4 air-cooled chillers
   // (t1 = secondary supply, t2 = secondary return — NOT CHWS/CHWR).
+  /* v1.134.7 — the four loops were authored at the RETIRED 1.85 MW scale: 4 x ~18 L/s = 72 L/s
+     against a plant header of 943 L/s, and per-loop temperatures from a 7.2/14.8 C chilled-water
+     design. The coverage gate could not account for any of them, and the reason turned out not
+     to be missing registry entries but wrong numbers.
+     Flow and temperatures are DERIVED from the engine now (see rescaleLoopsToEngine below):
+     each running machine carries plant flow / chillers_running, and the loop temperatures sit
+     on the published CHWS/CHWR planes. The authored part that survives is the per-loop
+     OPERATING STATE — which pump is duty, drive speed, compressor staging, DP split — because
+     that is what the mimic exists to show and no engine publishes it. */
   loops:[
-    {id:1, flow:19.1, dp1:97, dp2:73, t1:19.2, t2:22.4, pumpA:true, spdA:85, spdB:0, comps:[1,1,1]},
-    {id:2, flow:19.1, dp1:87, dp2:68, t1:18.4, t2:23.3, pumpA:false,spdA:0, spdB:57, comps:[1,0,1]},
-    {id:3, flow:17.3, dp1:65, dp2:90, t1:18.7, t2:22.7, pumpA:true, spdA:77, spdB:0, comps:[1,1,1]},
-    {id:4, flow:16.9, dp1:87, dp2:75, t1:19.1, t2:23.2, pumpA:false,spdA:0, spdB:78, comps:[1,0,1]}
+    {id:1, flow:0, dp1:97, dp2:73, t1:0, t2:0, pumpA:true, spdA:85, spdB:0, comps:[1,1,1]},
+    {id:2, flow:0, dp1:87, dp2:68, t1:0, t2:0, pumpA:false,spdA:0, spdB:57, comps:[1,0,1]},
+    {id:3, flow:0, dp1:65, dp2:90, t1:0, t2:0, pumpA:true, spdA:77, spdB:0, comps:[1,1,1]},
+    {id:4, flow:0, dp1:87, dp2:75, t1:0, t2:0, pumpA:false,spdA:0, spdB:78, comps:[1,0,1]}
   ],
   alarm:{ level:"NORMAL", issues:[], firstOut:"", firstTs:0, ack:false, ackTs:0, sig:"" },
   hist:[],
   spark:{ cop:[], kwRt:[], flow:[], dt:[], dp:[] }
 };
+/* Apply the engine scale to the authored operating state. Done once, immediately after the
+   state is declared, so nothing downstream ever sees the un-rescaled figures. */
+st.loops = rescaleLoopsToEngine(st.loops);
 
 function evalLoop(loop){
   const dpAvg = (loop.dp1+loop.dp2)/2;
@@ -1032,7 +1114,16 @@ function loopMetrics(loop){
   let discharge = Math.round(690 + loop.flow*14.1);
   let superheat = r1(4.8 + Math.max(0,18-loop.flow)*0.08);
   let subcool = r1(3.6 + Math.max(0,loop.flow-14)*0.06);
-  let compKw = Math.round(42 + activeSpd*2.3 + loop.flow*2.2);
+  /* v1.134.7 — compressor input power was `42 + spd*2.3 + flow*2.2`, an authored curve fitted
+     to the retired basis. Summed over four loops it gave ~960 kW_e against 8,885 RT of duty:
+     0.11 kW/RT, which no chiller can do (water-cooled centrifugal ~0.55-0.62, air-cooled
+     ~1.0-1.2). Deriving it needs a specific power, and that number is NOT settled: the governed
+     study specifies EVAPORATIVE COOLING-TOWER heat rejection, i.e. water-cooled machines, while
+     this P&ID depicts AIR-COOLED chillers with fan stages and no condenser-water loop. The two
+     differ by roughly 2x. Picking one silently is exactly the fabrication this programme exists
+     to remove, so electrical input is UNAVAILABLE until the Basis of Design settles the
+     technology. Thermal duty, which IS published, continues to be shown. */
+  let compKw = null;
   let oil = Math.round(46 + activeSpd*0.31);
 
   if(e.disconnected){
@@ -1042,7 +1133,6 @@ function loopMetrics(loop){
     discharge = Math.round(clamp(discharge*0.52, 120, 490));
     superheat = 0;
     subcool = 0;
-    compKw = 0;
     oil = Math.round(clamp(oil*0.7, 28, 44));
   }
 
@@ -1105,7 +1195,7 @@ function loopSvg(loop, pos){
     <rect x="${x+w-130}" y="${y+12}" width="112" height="28" rx="7" fill="${lvlBg}" stroke="${lvlBd}" />
     ${text(x+w-74,y+31,"value",e.level,"middle")}
 
-    <rect x="${acc.x}" y="${y+56}" width="${acc.w}" height="156" rx="10" class="equip-shell"><title>ACC-${String(loop.id).padStart(2,"0")} Air Cooled Chiller • ${loop.comps.reduce((a,b)=>a+b,0)}/3 comp • ${m.compKw} kW</title></rect>
+    <rect x="${acc.x}" y="${y+56}" width="${acc.w}" height="156" rx="10" class="equip-shell"><title>ACC-${String(loop.id).padStart(2,"0")} Air Cooled Chiller • ${loop.comps.reduce((a,b)=>a+b,0)}/3 comp • input power UNAVAILABLE (chiller technology unresolved)</title></rect>
     ${text(acc.x+14,y+80,"value",`ACC / CH-${String(loop.id).padStart(2,"0")}`)}
     <text x="${acc.x+14}" y="${y+104}" class="label">App: <tspan fill="${appColor}">${approachTxt}</tspan>  \u2022  Oil: ${m.oil}\u00b0C</text>
     ${text(acc.x+14,y+128,"label","Comp")}
@@ -1117,7 +1207,7 @@ function loopSvg(loop, pos){
     <text x="${acc.x+110}" y="${y+131}" class="isa-bubble-txt">C3</text>
     ${text(acc.x+134,y+132,"unit",`${loop.comps.reduce((a,b)=>a+b,0)}/3`)}
     <text x="${acc.x+14}" y="${y+158}" class="label">Fans ${m.fanStage}/6 <tspan fill="${dis?"#6e6460":"var(--run)"}">\u25CF</tspan></text>
-    ${text(acc.x+14,y+180,"unit",`${m.compKw} kW`)}
+    ${text(acc.x+14,y+180,"unit",m.compKw != null ? `${m.compKw} kW` : "\u2014 kW")}
 
     <line x1="${acc.x+acc.w}" y1="${supY}" x2="${portX}" y2="${supY}" class="pipe" stroke="rgba(98,140,183,.25)" />
     <line x1="${acc.x+acc.w}" y1="${supY}" x2="${portX}" y2="${supY}" class="${fClsS}" style="animation-duration:${flowDur}s" />
@@ -1125,14 +1215,14 @@ function loopSvg(loop, pos){
     <line x1="${portX}" y1="${retY}" x2="${acc.x+acc.w}" y2="${retY}" class="${fClsR}" style="animation-duration:${flowDur*1.05}s" />
 
     <rect x="${ref.x}" y="${y+56}" width="${ref.w}" height="156" rx="10" class="equip-shell" />
-    ${text(ref.x+14,y+68,"unit","REFRIGERANT CYCLE  R-1234ze(E)")}  <!-- v1.134.6: was y+76, colliding with COND -->
+    <g data-rz-authored-basis="The refrigeration cycle, the secondary loop and the pump mechanicals are simulated operating state: conv-engine.js models the primary chilled-water side (CHWS, CHWR, delta-T, flow, heat rejection, chiller count) and publishes no compressor, refrigerant, secondary-loop or pump-vibration quantity, so these readings have no engine parameter to trace to. The primary-side values on this drawing are engine-derived and remain in the denominator.">${text(ref.x+14,y+68,"unit","REFRIGERANT CYCLE  R-1234ze(E)")}  <!-- v1.134.6: was y+76, colliding with COND -->
     <circle cx="${ref.x+46}" cy="${y+114}" r="18" class="${dis?"comp-off":"comp-on"}" />
     <polygon points="${ref.x+38},${y+104} ${ref.x+58},${y+114} ${ref.x+38},${y+124}" class="${dis?"comp-off":"comp-on"}" />
     ${text(ref.x+46,y+141,"unit","COMP","middle")}
     <rect x="${ref.x+96}" y="${y+68}" width="130" height="26" rx="5" class="field-box" />
     ${text(ref.x+104,y+86,"label",`COND ${cSatTxt}`)}
     <rect x="${ref.x+96}" y="${y+136}" width="130" height="26" rx="5" class="field-box" />
-    ${text(ref.x+104,y+154,"label",`EVAP ${eSatTxt}`)}
+    ${text(ref.x+104,y+154,"label",`EVAP ${eSatTxt}`)}</g>
     ${valveSym(ref.x+216, y+114, 7, "h")}
     <g data-rz-text-group="stacked-label">
     ${text(ref.x+228,y+112,"unit","EXV")}
@@ -1168,19 +1258,19 @@ function loopSvg(loop, pos){
     <rect x="${ins.x}" y="${y+56}" width="${ins.w}" height="156" rx="10" class="equip-shell"><title>Process Instruments CH-${loop.id} • Flow: ${flowTxt} • T1: ${t1Txt} • T2: ${t2Txt}</title></rect>
     ${text(ins.x+12,y+72,"unit","PROCESS INSTRUMENTS")}  <!-- v1.134.6: header had the MFM1 box drawn over it -->
     <rect x="${ins.x+8}" y="${y+82}" width="${ins.w-16}" height="24" rx="6" class="field-box" />
-    ${text(ins.x+16,y+98,"label",`MFM1  ${flowTxt}`)}
+    <g data-rz-loop-flow="1">${text(ins.x+16,y+98,"label",`MFM1  ${flowTxt}`)}</g>
     <rect x="${ins.x+4}" y="${y+112}" width="94" height="30" rx="6" class="field-box" />
-    ${text(ins.x+10,y+131,"unit","DPS1")}
+    <g data-rz-authored-basis="The refrigeration cycle, the secondary loop and the pump mechanicals are simulated operating state: conv-engine.js models the primary chilled-water side (CHWS, CHWR, delta-T, flow, heat rejection, chiller count) and publishes no compressor, refrigerant, secondary-loop or pump-vibration quantity, so these readings have no engine parameter to trace to. The primary-side values on this drawing are engine-derived and remain in the denominator.">${text(ins.x+10,y+131,"unit","DPS1")}
     ${text(ins.x+66,y+131,"value",dp1Txt,"middle")}
     <rect x="${ins.x+102}" y="${y+112}" width="94" height="30" rx="6" class="field-box" />
     ${text(ins.x+108,y+131,"unit","DPS2")}
-    ${text(ins.x+164,y+131,"value",dp2Txt,"middle")}
+    ${text(ins.x+164,y+131,"value",dp2Txt,"middle")}</g>
     <rect x="${ins.x+8}" y="${y+146}" width="92" height="24" rx="6" class="field-box" />
-    ${text(ins.x+14,y+162,"label",`T1 ${t1Txt}`)}
+    <g data-rz-loop-t1="1">${text(ins.x+14,y+162,"label",`T1 ${t1Txt}`)}</g>
     <rect x="${ins.x+106}" y="${y+146}" width="92" height="24" rx="6" class="field-box" />
-    ${text(ins.x+112,y+148,"label",`T2 ${t2Txt}`)}
+    <g data-rz-loop-t2="1">${text(ins.x+112,y+148,"label",`T2 ${t2Txt}`)}</g>
     <rect x="${ins.x+8}" y="${y+160}" width="${ins.w-16}" height="22" rx="6" class="field-box" />
-    ${text(ins.x+14,y+176,"unit",`COMP ${m.compKw} kW \u2022 OIL ${m.oil} C`)}
+    ${text(ins.x+14,y+176,"unit",`COMP ${m.compKw != null ? m.compKw + " kW" : "\u2014"} \u2022 OIL ${m.oil} C`)}
 
     <rect x="${x+w-118}" y="${supY-12}" width="96" height="20" rx="6" class="field-box" />
     ${text(x+w-108,supY+3,"unit","SEC OUT")}
@@ -1279,10 +1369,17 @@ function drawPid(){
   const ackTxt = st.alarm.issues.length ? (st.alarm.ack ? "ACKED" : "REQUIRED") : "N/A";
   const firstOut = st.alarm.firstOut || "None";
 
-  const totalKw = st.loops.reduce((s,lp)=>s+loopMetrics(lp).compKw,0);
+  /* Plant electrical input has no source in this basis — see loopMetrics(). Null propagates
+     to an em-dash rather than summing four nulls into a confident 0. */
+  const totalKw = st.loops.every(lp => loopMetrics(lp).compKw != null)
+    ? st.loops.reduce((s,lp)=>s+loopMetrics(lp).compKw,0) : null;
   const totalTons = r1(st.header.flow * deltaT * 4.186 / 3.517);
-  const plantCop = totalKw > 0 ? r1(totalTons * 3.517 / totalKw) : 0;
-  const kwPerRt = totalKw > 0 ? r1(totalKw / Math.max(totalTons, 0.1)) : 0;
+  /* COP and kW/RT are ratios of electrical input to thermal duty. The duty is published; the
+     input is not, and cannot be assumed while the heat-rejection technology is unresolved
+     (see loopMetrics). Rendering 0 would read as "perfect efficiency"; rendering the old
+     figure read as 0.11 kW/RT, which is impossible. Both say UNAVAILABLE. */
+  const plantCop = (totalKw != null && totalKw > 0) ? r1(totalTons * 3.517 / totalKw) : null;
+  const kwPerRt = (totalKw != null && totalKw > 0) ? r1(totalKw / Math.max(totalTons, 0.1)) : null;
   const loopsOnline = st.loops.filter(lp=>!evalLoop(lp).disconnected).length;
   // Plant capacity context — engine-derived (deterministic). Cooling demand =
   // engine heat rejection; per-chiller rating sized so N chillers cover demand
@@ -1343,7 +1440,15 @@ function drawPid(){
     ${text(44,87,"label","ISA-5.1 P&ID  \u2022  Continuous pipe routing  \u2022  Click loop module for diagnostics")}
 
     <rect x="${PZ_X}" y="${PZ_Y}" width="${PZ_W}" height="${VH-136}" rx="10" class="frame" />
-    ${text(PZ_X+16,PZ_Y+24,"zone-label","PROCESS TRAINS  \u2014  4\u00d7 AIR-COOLED CHILLER LOOPS")}
+    <!-- v1.134.7 — this said "4x AIR-COOLED CHILLER LOOPS" as though it were the whole plant.
+         Two things were wrong with that. The engine runs 7 of 10 machines, so four loops are a
+         SUBSET and the mimic must say so rather than let an operator read four as the total.
+         And "air-cooled" contradicts the governed study, which specifies evaporative
+         cooling-tower heat rejection — i.e. water-cooled machines. That conflict is stated on
+         the drawing instead of being resolved by whichever page was edited last; it is a Basis
+         of Design decision, and the ~2x difference in specific power is why this page reports
+         plant COP and kW/RT as UNAVAILABLE. -->
+    ${text(PZ_X+16,PZ_Y+24,"zone-label",`PROCESS TRAINS  \u2014  4 OF ${ENGINE_CHILLERS_RUNNING != null ? ENGINE_CHILLERS_RUNNING : "\u2014"} RUNNING (${ENGINE_CHILLERS_TOTAL != null ? ENGINE_CHILLERS_TOTAL : "\u2014"} INSTALLED)`)}
 
     <rect x="${SUP_X}" y="${PZ_Y}" width="${SUP_W}" height="${VH-136}" rx="10" class="frame" />
     ${text(SUP_X+16,PZ_Y+24,"zone-label","SUPERVISORY METRICS & PLANT STATUS")}
@@ -1422,18 +1527,18 @@ function drawPid(){
     <rect x="${CX+C2W+10}" y="${R2Y}" width="${CW-C2W-10}" height="22" rx="8" class="sup-card-hdr" />
     <line x1="${CX+C2W+10}" y1="${R2Y+22}" x2="${CX+CW}" y2="${R2Y+22}" class="sup-divider" />
     ${text(CX+C2W+22,R2Y+16,"sup-title","PLANT EFFICIENCY")}
-    ${copGauge(CX+C2W+60, R2Y+68, 36, plantCop, 6)}
+    ${copGauge(CX+C2W+60, R2Y+68, 36, plantCop != null ? plantCop : 0, 6)}
     <g data-rz-text-group="stacked-label">
-    ${text(CX+C2W+60,R2Y+66,"sup-val",String(plantCop))}
+    ${text(CX+C2W+60,R2Y+66,"sup-val",plantCop != null ? String(plantCop) : "\u2014")}
     ${text(CX+C2W+60,R2Y+78,"isa-tag","COP")}
     </g>
     ${text(CX+C2W+140,R2Y+40,"label","kW")}
-    ${text(CX+C2W+168,R2Y+40,"sup-val",String(totalKw))}
+    ${text(CX+C2W+168,R2Y+40,"sup-val",totalKw != null ? String(totalKw) : "\u2014")}
     ${text(CX+C2W+140,R2Y+72,"label","kW/RT")}
-    ${text(CX+C2W+210,R2Y+72,"sup-val",String(kwPerRt))}
+    ${text(CX+C2W+210,R2Y+72,"sup-val",kwPerRt != null ? String(kwPerRt) : "\u2014")}
     ${sparkline(CX+C2W+260, R2Y+30, 150, 50, st.spark.cop, "#38b56d")}
     ${text(CX+C2W+335,R2Y+92,"pipe-label","COP TREND (30s)")}
-    ${text(CX+C2W+22,R2Y+96,"sup-unit-sm",`${totalTons} RT  \u2022  $${r1(totalKw*0.12)}/hr  \u2022  ${compRun}/12 comp`)}
+    ${text(CX+C2W+22,R2Y+96,"sup-unit-sm",`${totalTons} RT  \u2022  $${totalKw != null ? r1(totalKw*0.12) : "\u2014"}/hr  \u2022  ${compRun}/12 comp`)}
 
     <!-- Row 3: Plant Status -->
     <rect x="${CX}" y="${R3Y}" width="${CW}" height="86" rx="8" fill="${alarmBg}" stroke="${alarmBd}" stroke-width="1.2" />
@@ -1478,13 +1583,17 @@ function drawPid(){
         <rect x="${CX+6}" y="${ly-14}" width="${CW-12}" height="23" rx="3" fill="${rowBg}" />
         ${text(CX+16,ly,"metric-row",`CH-${lp.id}`)}
         ${text(CX+92,ly,"metric-val-inline",`${conv.f(lp.flow,ui.unit)} ${conv.fu(ui.unit)}`)}
-        ${text(CX+196,ly,"metric-row",`${conv.t(lp.t1,ui.unit)}${conv.tu(ui.unit)}`)}
+        <g data-rz-authored-basis="The refrigeration cycle, the secondary loop and the pump mechanicals are simulated operating state: conv-engine.js models the primary chilled-water side and publishes no compressor, refrigerant, secondary-loop or pump-vibration quantity, so these readings have no engine parameter to trace to.">${text(CX+196,ly,"metric-row",`${conv.t(lp.t1,ui.unit)}${conv.tu(ui.unit)}`)}
         ${text(CX+286,ly,"metric-row",`${conv.t(lp.t2,ui.unit)}${conv.tu(ui.unit)}`)}
         ${text(CX+376,ly,"metric-row",`${conv.p(dpA,ui.unit)} ${conv.pu(ui.unit)}`)}
-        ${text(CX+466,ly,"metric-row",lp.pumpA?"A":"B")}
+        ${text(CX+466,ly,"metric-row",lp.pumpA?"A":"B")}</g>
         ${text(CX+512,ly,"metric-row",`${ui.unit==="ip"?r1(dtLoop*9/5):dtLoop} ${ui.unit==="ip"?"F":"C"}`)}
         <rect x="${CX+590}" y="${ly-10}" width="50" height="12" rx="3" fill="#1a2534" stroke="#3a4f66" stroke-width=".6" />
-        <rect x="${CX+590}" y="${ly-10}" width="${Math.round(50*(lp.flow/24))}" height="12" rx="3" fill="${sC}" opacity=".7" />
+        <!-- v1.134.7 — the load bar was scaled against a hardcoded 24 L/s maximum from the retired
+             basis. Once one machine carried plant-flow/running (~135 L/s) the bar drew 5.6x its
+             track and ran 100 px outside the viewBox. Scaled against the engine-derived band;
+             the strict geometry gate is what caught it. -->
+        <rect x="${CX+590}" y="${ly-10}" width="${Math.round(50*clamp(lp.flow/LOOP_FLOW_MAX,0,1))}" height="12" rx="3" fill="${sC}" opacity=".7" />
         <circle cx="${CX+658}" cy="${ly-4}" r="4" fill="${sC}" />
         ${text(CX+668,ly,"metric-row",ev.level)}
         ${i<3?`<line x1="${CX+10}" y1="${ly+10}" x2="${CX+CW-10}" y2="${ly+10}" stroke="#2e3e52" stroke-width=".6" />`:''}
@@ -1667,7 +1776,7 @@ function renderModal(loopId){
     ["Suction / Discharge", `${conv.p(mtx.suction,ui.unit)} / ${conv.p(mtx.discharge,ui.unit)} ${conv.pu(ui.unit)}`],
     ["Superheat / Subcool", `${sh} / ${sc} ${tU}`],
     ["Cond Sat / Evap Sat", `${conv.t(mtx.condSat,ui.unit)} / ${conv.t(mtx.evapSat,ui.unit)} ${conv.tu(ui.unit)}`],
-    ["Comp Load / Oil Temp", `${mtx.compKw} kW / ${mtx.oil} C`],
+    ["Comp Load / Oil Temp", `${mtx.compKw != null ? mtx.compKw + " kW" : "\u2014 (technology unresolved)"} / ${mtx.oil} C`],
     ["Compressor State", lp.comps.map((c,i)=>`C${i+1}:${c?"ON":"OFF"}`).join(" | ")],
     ["Forced Fault", ui.forced.has(lp.id)?"YES":"NO"]
   ];
@@ -1728,7 +1837,7 @@ function stepProcess(){
 
   st.loops.forEach(lp=>{
     if(ui.forced.has(lp.id)){
-      lp.flow = r1(r(0,0.8));
+      lp.flow = r1(r(0, LOOP_FLOW_MIN * 0.04));
       lp.spdA = 0; lp.spdB = 0;
       lp.comps = [0,0,0];
       lp.dp1 = Math.round(clamp(lp.dp1*0.72, 20, 92));
@@ -1745,16 +1854,16 @@ function stepProcess(){
 
     if(ui.maint){
       const tf = st.sp.flow + r(-0.4,0.4);
-      lp.flow = r1(clamp(lp.flow + (tf-lp.flow)*0.28 + r(-0.2,0.2), 0, 24));
-      const sv = clamp((lp.flow/24)*100 + r(-4,4), 0, 100);
+      lp.flow = r1(clamp(lp.flow + (tf-lp.flow)*0.28 + r(-0.2,0.2), 0, LOOP_FLOW_MAX));
+      const sv = clamp((lp.flow/LOOP_FLOW_MAX)*100 + r(-4,4), 0, 100);
       if(lp.pumpA){ lp.spdA = sv; lp.spdB = 0; } else { lp.spdB = sv; lp.spdA = 0; }
       lp.dp1 = Math.round(clamp(lp.dp1 + (st.sp.dp-lp.dp1)*0.22 + r(-2,2), 45, 150));
       lp.dp2 = Math.round(clamp(lp.dp2 + (st.sp.dp-lp.dp2)*0.22 + r(-2,2), 45, 150));
-      lp.t1 = r1(clamp(lp.t1 + (st.sp.chws-lp.t1)*0.24 + r(-0.06,0.06), 16, 22.5));
-      const t2t = lp.t1 + 3.3 + r(-0.45,0.45);
-      lp.t2 = r1(clamp(lp.t2 + (t2t-lp.t2)*0.22 + r(-0.06,0.06), 20.8, 25.0));
+      lp.t1 = r1(clamp(lp.t1 + (st.sp.chws-lp.t1)*0.24 + r(-0.06,0.06), LOOP_T1_MIN, LOOP_T1_MAX));
+      const t2t = lp.t1 + (CHW.dt != null ? CHW.dt : 3.3) + r(-0.45,0.45);
+      lp.t2 = r1(clamp(lp.t2 + (t2t-lp.t2)*0.22 + r(-0.06,0.06), LOOP_T2_MIN, LOOP_T2_MAX));
     } else {
-      lp.flow = r1(clamp(lp.flow + r(-0.9,0.9), 12, 24));
+      lp.flow = r1(clamp(lp.flow + r(-0.9,0.9), LOOP_FLOW_MIN, LOOP_FLOW_MAX));
       if(lp.pumpA){ lp.spdA = clamp(lp.spdA + r(-8,8), 42, 92); lp.spdB = 0; }
       else { lp.spdB = clamp(lp.spdB + r(-8,8), 42, 92); lp.spdA = 0; }
       lp.dp1 = Math.round(clamp(lp.dp1 + r(-6,6), 54, 145));
@@ -1792,7 +1901,8 @@ function stepProcess(){
 
   // Record sparkline data (max 30 points) — COP/RT from engine-true header.
   const dt = st.header.dt;
-  const tkw = st.loops.reduce((s,lp)=>s+loopMetrics(lp).compKw,0);
+  const tkw = st.loops.every(lp => loopMetrics(lp).compKw != null)
+    ? st.loops.reduce((s,lp)=>s+loopMetrics(lp).compKw,0) : null;
   const trt = r1(st.header.flow * dt * 4.186 / 3.517);
   const cop = tkw > 0 ? r1(trt * 3.517 / tkw) : 0;
   const kwrt = tkw > 0 ? r1(tkw / Math.max(trt, 0.1)) : 0;
@@ -1819,15 +1929,15 @@ function applyScenario(v){
   ui.scenario = v;
   $("scLbl").textContent = v === "custom" ? "Custom" : (v === "balanced" ? "Balanced" : (v === "high" ? "High Load" : "Degraded"));
   if(v === "balanced"){
-    st.sp.chws = (CHW.chws != null ? CHW.chws : null); st.sp.dp = 90; st.sp.flow = 18.0; ui.maint = true; ui.forced.clear();
+    st.sp.chws = (CHW.chws != null ? CHW.chws : null); st.sp.dp = 90; st.sp.flow = LOOP_FLOW_DESIGN != null ? r1(LOOP_FLOW_DESIGN) : null; ui.maint = true; ui.forced.clear();
   }else if(v === "high"){
     /* High load: operator holds the secondary at the primary header (no bypass)
        to maximise coil capacity. Authored 17.4 C was below the primary. */
-    st.sp.chws = (CHW.chws != null ? CHW.chws : null); st.sp.dp = 112; st.sp.flow = 21.3; ui.maint = true; ui.forced.clear();
+    st.sp.chws = (CHW.chws != null ? CHW.chws : null); st.sp.dp = 112; st.sp.flow = LOOP_FLOW_DESIGN != null ? r1(LOOP_FLOW_DESIGN * 1.1) : null; ui.maint = true; ui.forced.clear();
   }else if(v === "degraded"){
     /* Degraded: reduced primary flow forces decoupler bypass, so the secondary
        supply drifts ABOVE the header. Expressed as an offset, not a literal. */
-    st.sp.chws = (CHW.chws != null ? r1(CHW.chws + 1.2) : null); st.sp.dp = 120; st.sp.flow = 14.5; ui.maint = false; ui.forced.clear(); ui.forced.add(2);
+    st.sp.chws = (CHW.chws != null ? r1(CHW.chws + 1.2) : null); st.sp.dp = 120; st.sp.flow = LOOP_FLOW_DESIGN != null ? r1(LOOP_FLOW_DESIGN * 0.75) : null; ui.maint = false; ui.forced.clear(); ui.forced.add(2);
   }
   /* v1.134.0 — the slider's min/max were authored 16-22 °C, a window that sat
      BELOW the re-derived 19.4 °C primary CHWS. Bind the range to the primary so
@@ -1837,6 +1947,13 @@ function applyScenario(v){
     $("spChws").min = r1(CHW.chws);
     $("spChws").max = r1(CHW.chws + 4);
     if (st.sp.chws == null || st.sp.chws < CHW.chws) st.sp.chws = CHW.chws;
+  }
+  /* v1.134.7 — the per-loop flow slider was authored 10-24 L/s for the retired basis; one
+     machine now carries plant flow / running chillers. Bind the range to that. */
+  if (LOOP_FLOW_DESIGN != null) {
+    $("spFlow").min = r1(LOOP_FLOW_MIN);
+    $("spFlow").max = r1(LOOP_FLOW_MAX);
+    if (st.sp.flow == null) st.sp.flow = r1(LOOP_FLOW_DESIGN);
   }
   $("spChws").value = st.sp.chws;
   $("spDp").value = st.sp.dp;

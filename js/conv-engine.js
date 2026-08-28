@@ -733,6 +733,14 @@
                 chiller_unit_kw_th: m.cooling.chiller_unit_kw_th,
                 chiller_design_duty_kw_th: round1(chillerDesignDutyKwTh(m)),
                 chiller_redundancy: m.cooling.chiller_redundancy,
+                /* v1.134.7 — plant capacity, its N+1 figure and the duty in refrigeration tons
+                   were computed on the chiller page from engine terms but published nowhere, so
+                   three of the most prominent numbers on that screen had no registry parameter
+                   to trace to. They are arithmetic over values already here; publishing them
+                   removes the page's private copy of the arithmetic. */
+                chiller_capacity_kw_th: round1(chillersRunning(m) * m.cooling.chiller_unit_kw_th),
+                chiller_n1_capacity_kw_th: round1((chillersTotal(m) - 1) * m.cooling.chiller_unit_kw_th),
+                duty_rt: round1(heatRej / 3.517),
                 nameplate_evidence_class: m.meta.nameplate_evidence_class
             },
             environment: {

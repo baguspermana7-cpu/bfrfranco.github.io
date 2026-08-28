@@ -11,6 +11,64 @@ release sections rather than semver.
 
 ---
 
+## v1.134.7 — 2026-08-29 (The chiller P&ID was not untraced — it was wrong. And an open Basis-of-Design conflict, stated rather than resolved)
+
+Finishing the coverage backlog on the chiller P&ID and the ICT link table turned up something
+larger than missing registry entries.
+
+**The chiller mimic was still running the retired 1.85 MW plant.** Four loops were authored at
+~18 L/s each — 72 L/s against a 943 L/s header. Their water sat on the retired 7.2 / 14.8 °C
+design. Worse, compressor input power came from a curve fitted to that basis: summed over four
+loops it gave ~960 kW against 8,885 RT of duty, i.e. **0.11 kW/RT**, which no chiller can do
+(water-cooled centrifugal ~0.55–0.62, air-cooled ~1.0–1.2). The simulation tick then clamped
+flow to 0–24 L/s and loop water to 16–22.5 °C, dragging everything back to the old scale on the
+first tick regardless of what it was initialised to.
+
+Flow and loop temperatures derive from the engine now — each running machine carries plant flow
+divided by the running count — and the tick's bands, the flow setpoint and its slider derive
+from the same place. The authored part that survives is the per-loop operating state (which
+pump is duty, drive speed, compressor staging), because that is what a mimic exists to show and
+no engine publishes it.
+
+**An open Basis-of-Design conflict, surfaced instead of settled.** The governed study specifies
+**evaporative cooling-tower** heat rejection — water-cooled machines. This P&ID depicts
+**air-cooled** chillers with fan stages and no condenser-water loop. Specific power differs by
+roughly 2× between them. Picking one silently is the fabrication this programme exists to
+remove, so plant **COP** and **kW/RT** now read UNAVAILABLE, the conflict is stated on the page
+as an open decision, and the drawing says "4 OF 7 RUNNING (10 INSTALLED)" instead of presenting
+four loops as the whole plant.
+
+**Three plant KPIs had no registry home and now do:** plant capacity (running × unit), the N+1
+capacity (installed − 1 × unit) and duty in refrigeration tons were computed on the page from
+engine terms but published nowhere. The engine publishes them; the page's private copy of the
+arithmetic is gone.
+
+**A third bucket for numbers that are not engine quantities.** ICT traffic is authored on that
+page and explicitly independent of IT kW — `conv-engine.js` has no network model. Forcing it
+into the registry would break the rule that the engine is the single source of truth; leaving it
+untraced makes the backlog figure meaningless, because "nobody has bound this yet" and "this is
+not an engine quantity" are different problems. Regions may now declare
+`data-rz-authored-basis` **with a written reason of at least 40 characters**, and their numbers
+are counted and reported separately. 242 numbers are declared this way; ict rises from 48 % to
+75 % traced on what remains.
+
+**The coverage gate got three corrections, each found by using it:**
+- A declaration hosted on a whole SVG excluded that element's entire subtree — 89 of 106 numbers
+  gone in one attribute. Exclusions now cover exactly the cells a declaration verifies.
+- A declaration matching **no** cells reported "reconciles". An empty set is now refused and
+  reported: rename a class and the gate must fail, not congratulate itself.
+- `"MFM1  135.6 L/s"` was read as **1**, and `"2026-08-27 02:11"` as four engineering values.
+  The extractor takes the last number in a cell and strips clock/calendar substrings first.
+
+**And one wrong declaration of my own, withdrawn rather than retuned.** A first pass declared the
+loop temperatures against `cooling.chws_c` / `cooling.chwr_c`. They are the SECONDARY loop's
+supply and return — a different plane, as this file has said since v2.0.0. The gate caught it;
+the declaration is withdrawn, not adjusted until it passed.
+
+The strict geometry gate also earned its place immediately: rescaling the loops made the LOAD
+bar, still scaled against a hardcoded 24 L/s maximum, draw 5.6× its track and run 100 px outside
+the viewBox.
+
 ## v1.134.6 — 2026-08-28 (Geometry debt paid in full: 484 findings to zero, and the gate is armed)
 
 Owner requirement: "coordinate, position, arrangement dll semuanya harus sangat super accurate,

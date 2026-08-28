@@ -169,6 +169,23 @@
       }
     },
     {
+      "id": "cooling.chiller_capacity_kw_th",
+      "label": "Chiller plant capacity (running)",
+      "unit": "kW_th",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "chillers_running x chiller_unit_kw_th",
+      "deps": [
+        "cooling.chillers_running",
+        "cooling.chiller_unit_kw_th"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29",
+        "method": "Nameplate arithmetic; the unit capacity it multiplies is ASSUMED."
+      }
+    },
+    {
       "id": "cooling.chiller_design_duty_kw_th",
       "label": "Chiller plant design duty",
       "unit": "kW_th",
@@ -182,6 +199,23 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28",
         "section": "chillerDesignDutyKwTh()"
+      }
+    },
+    {
+      "id": "cooling.chiller_n1_capacity_kw_th",
+      "label": "Chiller capacity with one machine out",
+      "unit": "kW_th",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "(chillers_total - 1) x chiller_unit_kw_th",
+      "deps": [
+        "cooling.chillers_total",
+        "cooling.chiller_unit_kw_th"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29",
+        "method": "Worst single-machine outage against the INSTALLED set, so the standby is counted."
       }
     },
     {
@@ -328,6 +362,22 @@
         "method": "This plane is NOT the rack inlet and NOT the CRAH return."
       },
       "explainKey": "crah-supply-air"
+    },
+    {
+      "id": "cooling.duty_rt",
+      "label": "Plant duty",
+      "unit": "RT",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "heat_rejection_kw / 3.517",
+      "deps": [
+        "cooling.heat_rejection_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29",
+        "method": "1 refrigeration ton = 3.517 kW_th."
+      }
     },
     {
       "id": "cooling.flow_lps",

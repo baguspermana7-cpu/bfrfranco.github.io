@@ -371,6 +371,32 @@
       }
     },
     {
+      "id": "cooling.chiller_capacity_kw_th",
+      "label": "Chiller plant capacity (running)",
+      "unit": "kW_th",
+      "kind": "derived",
+      "value": 35000,
+      "formula": "chillers_running x chiller_unit_kw_th",
+      "deps": [
+        "cooling.chillers_running",
+        "cooling.chiller_unit_kw_th"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "cooling.chiller_unit_kw_th",
+        "electrical.ups_efficiency"
+      ],
+      "consumers": [],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29",
+        "method": "Nameplate arithmetic; the unit capacity it multiplies is ASSUMED."
+      }
+    },
+    {
       "id": "cooling.chiller_design_duty_kw_th",
       "label": "Chiller plant design duty",
       "unit": "kW_th",
@@ -396,6 +422,36 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28",
         "section": "chillerDesignDutyKwTh()"
+      }
+    },
+    {
+      "id": "cooling.chiller_n1_capacity_kw_th",
+      "label": "Chiller capacity with one machine out",
+      "unit": "kW_th",
+      "kind": "derived",
+      "value": 45000,
+      "formula": "(chillers_total - 1) x chiller_unit_kw_th",
+      "deps": [
+        "cooling.chillers_total",
+        "cooling.chiller_unit_kw_th"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "cooling.chiller_unit_kw_th",
+        "electrical.ups_efficiency"
+      ],
+      "consumers": [],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29",
+        "method": "Worst single-machine outage against the INSTALLED set, so the standby is counted."
       }
     },
     {
@@ -480,7 +536,7 @@
         },
         {
           "page": "chiller-plant.html",
-          "reads": 2
+          "reads": 9
         }
       ],
       "tests": [],
@@ -523,7 +579,7 @@
         },
         {
           "page": "chiller-plant.html",
-          "reads": 2
+          "reads": 6
         }
       ],
       "tests": [],
@@ -633,7 +689,7 @@
         },
         {
           "page": "chiller-plant.html",
-          "reads": 4
+          "reads": 5
         }
       ],
       "tests": [
@@ -675,7 +731,7 @@
         },
         {
           "page": "chiller-plant.html",
-          "reads": 4
+          "reads": 5
         }
       ],
       "tests": [
@@ -726,6 +782,34 @@
       }
     },
     {
+      "id": "cooling.duty_rt",
+      "label": "Plant duty",
+      "unit": "RT",
+      "kind": "derived",
+      "value": 8885.4,
+      "formula": "heat_rejection_kw / 3.517",
+      "deps": [
+        "cooling.heat_rejection_kw"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_load_kw",
+        "campus.halls.1.it_load_kw",
+        "campus.halls.2.it_load_kw",
+        "campus.halls.3.it_load_kw",
+        "electrical.ups_efficiency"
+      ],
+      "consumers": [],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29",
+        "method": "1 refrigeration ton = 3.517 kW_th."
+      }
+    },
+    {
       "id": "cooling.flow_lps",
       "label": "CHW flow",
       "unit": "L/s",
@@ -757,7 +841,7 @@
         },
         {
           "page": "chiller-plant.html",
-          "reads": 4
+          "reads": 6
         }
       ],
       "tests": [
