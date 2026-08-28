@@ -11,6 +11,49 @@ release sections rather than semver.
 
 ---
 
+## v1.134.6 — 2026-08-28 (Geometry debt paid in full: 484 findings to zero, and the gate is armed)
+
+Owner requirement: "coordinate, position, arrangement dll semuanya harus sangat super accurate,
+no mistake." The geometry gate has measured that since v1.133.0 and reported **~484 findings**
+while running advisory, because a gate that fails from day one gets muted rather than paid down.
+
+**It is zero now — 4 diagrams × 4 viewports × 2 themes — and the gate is armed strict.**
+
+**Document-level horizontal scroll (3 pages).** Each diagram keeps a `min-width` so its labels
+stay at their design separation, and each has an inner scroller. But no ancestor carried
+`min-width: 0`, so the panel grew to its content and dragged the whole document sideways: water
+1236 px, EPMS 1271 px, fire 946 px at a 900 px viewport. The page scrolled instead of the
+diagram. Constrained; EPMS's toolbar now scrolls inside itself from 1024 px down rather than
+from 768 px, which is where it actually starts to overflow.
+
+**chiller-plant P&ID — 27 to 48 collisions and 16 clipped, now zero.** Four section headers
+("REFRIGERANT CYCLE", "PRIMARY PUMP PACKAGE", "PROCESS INSTRUMENTS", "SUPERVISORY METRICS")
+were drawn in the same band as the first value row beneath them — the instruments header had
+its own MFM1 field box painted straight over it. Row 3 placed its last label at CX+660 inside a
+728-wide card, so "N+1 Margin" ran 13 px past the viewBox and into the redundancy chip. The
+loop-summary table was laid out for a wider card: LOAD, the status dot and the status text sat
+at x 2346 against a 2300 viewBox — drawn outside the drawing entirely.
+
+**A stacked label is not a collision, and the gate now knows the difference by declaration.**
+An ISA instrument balloon is one label on two lines — function letters over loop number — and
+their boxes touch by design. Rather than widen the tolerance (which would also have swallowed
+the real 30 px overlap on the same page), the markup declares them: `data-rz-text-group` marks
+texts that are one label. Anything outside the group still collides normally.
+
+**EPMS single-line.** "CDP PANEL" sat at x 1900, which is rack 6's PDU B position, so the two
+labels were drawn on top of each other. Telemetry readings were pinned to their breaker, so
+breakers close together stacked into an unreadable smear of real values; they now step down
+until their box is clear of every label already placed — deterministic, identical on every
+reload. A first attempt keyed on the anchor point, which fixed exact stacking and left the real
+case untouched: these labels are 106 px wide, so anchors 20 px apart still overlapped. Testing
+the rectangle instead of the point is what actually closed it.
+
+**fire-system.** The pre-action valve bank was translated to x 1200 and its fifth valve ended
+at 1412 against a 1400 viewBox, so PACV-05 and its label were outside the mimic.
+
+**One more retired-basis literal found while in there:** the chiller P&ID printed
+"Basis: IT 1.85 MW × PUE" beside engine-bound values. Now bound to the campus load.
+
 ## v1.134.5 — 2026-08-28 (The design basis is on the screen, not just in the engine)
 
 The registry reported the **entire `campus.*` branch as read by zero cockpits**. The engine

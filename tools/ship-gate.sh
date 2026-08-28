@@ -77,13 +77,13 @@ gate "Conventional basis drawer — hooks resolve, explanations match their KPI"
 # the pages whose plant is central. Both directions are asserted — a cosmetic selector and an
 # invented per-hall split are both failures.
 gate "Conventional hall scope — datahall re-scopes, central plants do not" node tools/test-conv-hall-scope.mjs
-# MONITOR (advisory, exit 0 by design): measures diagram geometry — label collisions, clipped elements,
-# degenerate labels, phone overflow — across 4 diagrams x 4 viewports x 2 themes. It runs in --measure mode
-# because the current pages carry a real, already-measured debt (~484 findings: chiller-plant 27-48 collisions
-# + 16-18 clipped, EPMS 12-13 collisions, fire 2 clipped + 46px tablet overflow, water 336px tablet overflow).
-# FLIP TO STRICT (drop --measure) once the chiller/fire/water/EPMS layout work lands — a gate that fails from
-# day one gets muted, so the debt is reported every run until it is actually paid.
-gate "Conventional geometry MONITOR — collisions, clipping, arrangement" node tools/test-conv-geometry.mjs --measure
+# STRICT since v1.134.6. This ran advisory while the pages carried ~484 measured findings
+# (chiller-plant 27-48 label collisions + 16-18 clipped, EPMS 12-13 collisions, fire 2 clipped
+# + 46px tablet overflow, water 336px tablet overflow). Every one of those is now paid:
+# collisions 0, clipped 0, degenerate 0, document overflow 0, across 4 diagrams x 4 viewports
+# x 2 themes. The flip condition documented here has been met, so the gate is armed — a new
+# label that lands on another one, or an element drawn outside its viewBox, now fails the ship.
+gate "Conventional geometry — collisions, clipping, arrangement" node tools/test-conv-geometry.mjs
 gate "Conventional study — reconciled four-hall basis" node --test tools/test-conv-design-basis.mjs
 gate "Conventional alarms — common historian workspace" node --test tools/test-conv-alarm-workspace.mjs
 gate "Conventional alarms — modal runtime and accessibility" node tools/test-conv-alarm-runtime.mjs

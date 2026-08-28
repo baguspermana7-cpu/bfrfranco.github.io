@@ -314,7 +314,13 @@
             .fire-interlock-row .il-feedback::before { content: 'Feedback · '; color: var(--text-faint); }
         }
         @media (max-width: 900px) {
-            #fire-svg { min-width: 900px; }
+            /* v1.134.6 — the mimic keeps its 900 px design width so the node labels stay
+               separated, but its panel adds 24 px of padding each side, so the panel measured
+               948 px at a 900 px viewport and the DOCUMENT scrolled sideways rather than the
+               diagram. Let the panel shrink and scroll its own content. */
+            #fire-svg { min-width: 852px; }
+            .main-svg { min-width: 0; max-width: 100%; overflow-x: auto;
+                -webkit-overflow-scrolling: touch; padding-left: 12px; padding-right: 12px; }
         }
         @media (prefers-reduced-motion: reduce) {
             .flow-fire, .flow-supply, .flow-n2, .spinning, .as-dot.alarm { animation: none !important; }
@@ -540,7 +546,10 @@
                 <path id="path-n2-pv4" d="M 1350 348 L 1350 480" class="pipe-base" data-rz-line="1" data-id="fs-n2-pv4" data-from="PV-N2-MANIFOLD" data-to="PACV-04" data-medium="fire" data-direction="forward" data-state="standby" data-capacity="N2 zone branch" data-redundancy="duty"/>
                 <path id="path-n2-pv5" d="M 1394 348 L 1394 480" class="pipe-base" data-rz-line="1" data-id="fs-n2-pv5" data-from="PV-N2-MANIFOLD" data-to="PACV-05" data-medium="fire" data-direction="forward" data-state="standby" data-capacity="N2 zone branch" data-redundancy="duty"/>
 
-                <g transform="translate(1200, 480)">
+                <!-- v1.134.6 — the valve bank was translated to x=1200 and its fifth valve
+                     (x=176, width 36) ended at 1412 against a 1400 viewBox, so PACV-05 and its
+                     label were drawn outside the mimic entirely. Shifted left to fit. -->
+                <g transform="translate(1176, 480)">
                     <text x="100" y="-12" text-anchor="middle" class="eq-tag">Pre-Action Zone Valves (data hall)</text>
                     <rect id="pv-1" x="0"   y="0" width="36" height="60" fill="#16203a" stroke="#475569" rx="4" />
                     <text x="18"  y="34" text-anchor="middle" class="valve-label">PACV-01</text>

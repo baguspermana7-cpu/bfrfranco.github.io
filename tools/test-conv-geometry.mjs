@@ -126,9 +126,20 @@ try {
               return true;
             };
 
+            /* A DECLARED TEXT GROUP is one label drawn on several lines — an ISA instrument
+               balloon is function letters over loop number, and their boxes touch by design.
+               The page declares those with data-rz-text-group; texts inside the SAME group do
+               not collide with each other, and everything else still does. This is deliberately
+               a declaration and not a wider tolerance: raising the tolerance to swallow a 2 px
+               stacked pair would also have swallowed the 30 px overlap this page really had. */
+            const groupOf = (el) => {
+              const host = el.closest('[data-rz-text-group]');
+              return host ? host : null;
+            };
             const texts = [...svg.querySelectorAll('text')].filter(visible).map((el, index) => ({
               index,
               text: (el.textContent || '').trim().slice(0, 40),
+              group: groupOf(el),
               box: el.getBoundingClientRect(),
             })).filter((t) => t.text.length > 0);
 
@@ -141,6 +152,7 @@ try {
             const collisions = [];
             for (let i = 0; i < texts.length; i += 1) {
               for (let j = i + 1; j < texts.length; j += 1) {
+                if (texts[i].group && texts[i].group === texts[j].group) continue;
                 const a = texts[i].box;
                 const b = texts[j].box;
                 const overlapX = Math.min(a.right, b.right) - Math.max(a.left, b.left);

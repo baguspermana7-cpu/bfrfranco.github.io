@@ -354,6 +354,24 @@
         #viewport { width: 100% !important; height: auto !important; }
     }
 
+    /* v1.134.6 — the topbar's shrink handling started at 768 px, but the row of links plus
+       the zoom group is already wider than a 900 px tablet: the DOCUMENT scrolled sideways by
+       371 px there. Let the toolbar scroll inside itself from 1024 px down, so the page never
+       does. */
+    @media (max-width: 1024px) {
+        .topbar {
+            box-sizing: border-box;
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            gap: 10px;
+            padding: 0 10px;
+        }
+        .topbar > * { flex: 0 0 auto; }
+    }
+
     @media (max-width: 768px) {
         .topbar {
             box-sizing: border-box;
@@ -710,7 +728,9 @@ const DEVICES = [
     { id:'ATS_PNL2', lbl:'ATS PNL 2', sub:'Tie B-C', x:GRID.B-380, y:GRID.ATSDB+50, w:100, type:'BOX' },
     
     // CDP
-    { id:'CDP', lbl:'CDP PANEL', sub:'Controls', x:GRID.C+100, y:GRID.PDU, w:100, type:'BOX' },
+    /* v1.134.6 — was x: GRID.C+100 (=1900), which is rack 6's PDU B position, so "CDP PANEL"
+       and "PDU B" were drawn over one another. Placed left of the rack block instead. */
+    { id:'CDP', lbl:'CDP PANEL', sub:'Controls', x:950, y:GRID.PDU, w:100, type:'BOX' },
 
     // --- MECHANICAL LOADS ZONE A (FAR LEFT) ---
     { id:'CH_1', lbl:'CHILLER 1', sub:'Mech Load', x:150, y:GRID.MECH_ROW, w:100, type:'BOX' },
@@ -1060,6 +1080,9 @@ function drawLayout(){
         layers.d.appendChild(g);
     });
 
+    /* Occupied telemetry-label slots for this render pass. Cleared each time the single-line
+       is rebuilt so the layout is a pure function of the wire list. */
+    const TELE_SLOTS = [];
     WIRES.forEach(w => {
         const src = getCoords(w.from); const dst = getCoords(w.to);
         let path = ''; let midY = (src.y + dst.y) / 2; let brX = src.x, brY = midY;
@@ -1093,7 +1116,23 @@ function drawLayout(){
         drawBreaker(w.br, brX, brY);
 
         if(!w.noTele){
-            const tx = brX + 20; const ty = brY - 12;
+            const tx = brX + 20;
+            /* v1.134.6 — the label was pinned to the breaker, so breakers close together
+               stacked their readings into an unreadable smear (both were real values). Step
+               the label down until its BOX is clear of every label already placed. A first
+               attempt keyed on the anchor point only, which fixed exact stacking and left the
+               real case untouched: these labels are 95 px wide, so two anchors 20 px apart
+               still overlap. Test the rectangle, not the point. Deterministic — no randomness,
+               so the layout is identical on every reload. */
+            let ty = brY - 12;
+            /* The reserved box is a little larger than the background rect: the rendered text
+               runs slightly past it, and reserving only the rect left ~6 px of real overlap. */
+            const W = 106, ABOVE = 11, BELOW = 5;
+            const overlaps = (y) => TELE_SLOTS.some((r) =>
+                tx - 4 < r.x2 && tx + W > r.x1 && y - ABOVE < r.y2 && y + BELOW > r.y1);
+            let guard = 0;
+            while (overlaps(ty) && guard < 10) { ty += 14; guard += 1; }
+            TELE_SLOTS.push({ x1: tx - 4, x2: tx + W, y1: ty - ABOVE, y2: ty + BELOW });
             const teleG = createSVG('g', {transform:`translate(${tx}, ${ty})`});
             const bg = createSVG('rect', {x:-2, y:-8, width:95, height:10, class:'tele-bg'});
             const teleTxt = createSVG('text', {class:'tele-txt', id:`tele-${w.id}`});
