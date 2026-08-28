@@ -602,6 +602,10 @@
     }
 </style>
     <script src="js/conv-engine.js?v=1.22.0"></script>
+    <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
+         Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
+    <script src="js/conv-parameters.js?v=1.134.3"></script>
+    <script src="js/rz-basis-drawer.js?v=1.134.3"></script>
     <script src="js/conv-design-basis.js?v=1.0.0"></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
          Loaded for cross-page consistency; body does NOT carry rz-bms-shell
@@ -643,7 +647,7 @@
             <span class="rz-conv-alarm-slot" data-rz-alarm-launch-slot></span>
             <div class="brand">ICT Network Operations <span class="sub">— BKS01 Conventional DC</span></div>
             <div class="top-spacer"></div>
-            <div class="meta-chip" title="Single engineering basis: conv-engine.js">Basis <b id="m-basis">IT 1.85 MW</b></div>
+            <div class="meta-chip" title="Single engineering basis: conv-engine.js">Basis <b id="m-basis" data-basis-param="site.it_load_kw" tabindex="0" role="button">IT 1.85 MW</b></div>
             <div class="meta-chip">Quality <b id="m-quality">GOOD</b></div>
             <button class="top-btn" id="btn-print" onclick="window.print()" title="Print this view">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg>
@@ -810,9 +814,13 @@
         var SNAP = (window.CONV_CALC && window.CONV_CALC.snapshot) ? window.CONV_CALC.snapshot : null;
 
         // Defensive fallback (engine must load first; this only guards a hard 404)
-        var IT_KW   = SNAP ? SNAP.site.it_load_kw : 1850;
-        var FAC_KW  = SNAP ? SNAP.site.facility_load_kw : 2682.5;
-        var RACK_EQ_8KW = SNAP ? SNAP.racks.at_8kw : 231;      // planning equivalence, not physical inventory
+        /* v1.134.3 — the fallbacks were 1850 / 2682.5 / 231, the retired 1.85 MW basis.
+           A plausible fallback standing in for a dead binding renders a page that looks
+           correct and is not; that is the defect class repaired site-wide in v1.132.0.
+           Null propagates to an em-dash instead. */
+        var IT_KW   = SNAP ? SNAP.site.it_load_kw : null;
+        var FAC_KW  = SNAP ? SNAP.site.facility_load_kw : null;
+        var RACK_EQ_8KW = SNAP ? SNAP.racks.at_8kw : null;     // planning equivalence, not physical inventory
         var SCN     = SNAP ? SNAP.meta.scenario : 'Simulated';
         var DQ      = SNAP ? SNAP.meta.data_quality : 'GOOD';
         var DESIGN_STUDY = window.RZConvDesignBasis && window.RZConvDesignBasis.STUDY

@@ -29,7 +29,10 @@ const registry = JSON.parse(await readFile(join(ROOT, 'data', 'conv-parameters.j
 const REGISTERED = new Set(registry.parameters.map((p) => p.id));
 
 /* Pages that have adopted the shared drawer. Adding a page here is deliberate. */
-const ADOPTERS = Object.freeze(['datahall.html', 'chiller-plant.html']);
+const ADOPTERS = Object.freeze([
+    'dc-conventional.html', 'datahall.html', 'chiller-plant.html', 'water-system.html',
+    'fire-system.html', 'fuel-system.html', 'ict.html', 'EPMS_Telemetry.html',
+]);
 
 /* ── D1 + D2, statically ───────────────────────────────────────────────────── */
 const HOOK_RE = /data-basis-param="([^"]+)"/g;

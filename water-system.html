@@ -74,6 +74,10 @@
          Loaded NON-deferred + external so window.CONV_CALC exists before the
          inline binding script. NEVER inline this in a JS string literal. -->
     <script src="js/conv-engine.js?v=1.22.0"></script>
+    <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
+         Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
+    <script src="js/conv-parameters.js?v=1.134.3"></script>
+    <script src="js/rz-basis-drawer.js?v=1.134.3"></script>
     <!-- v1.42.5 — Semantic line model. Allows probe-line-model.mjs to audit
          the static SVG pipes tagged with data-rz-line / data-from / data-to
          / data-medium / data-state / etc. Loaded for validator parity. -->
@@ -469,12 +473,12 @@
     <div class="kpi-grid">
         <div class="kpi hero">
             <h3>Instant WUE</h3>
-            <div class="v"><span id="kWue">1.20</span> <small>L/kWh</small></div>
+            <div class="v"><span id="kWue" data-basis-param="water.wue_l_per_kwh" tabindex="0" role="button">1.20</span> <small>L/kWh</small></div>
             <div class="th" id="kWueTh">Target &le; 1.30 &middot; computed</div>
         </div>
         <div class="kpi">
             <h3>Cooling Makeup Flow</h3>
-            <div class="v"><span id="kMakeup">37.0</span> <small>L/min</small></div>
+            <div class="v"><span id="kMakeup" data-basis-param="water.flow_lpm_for_wue" tabindex="0" role="button">37.0</span> <small>L/min</small></div>
             <div class="th" id="kMakeupTh">Normal 30&ndash;55 &middot; WUE-incl</div>
         </div>
         <div class="kpi">
@@ -701,10 +705,10 @@
         <div>
             <div class="panel">
                 <div class="panel-title">WUE Reconciliation</div>
-                <div class="insp-row"><span class="k">IT Load</span><span class="vv" id="iIt">1,850 kW</span></div>
+                <div class="insp-row"><span class="k">IT Load</span><span class="vv" id="iIt" data-basis-param="site.it_load_kw" tabindex="0" role="button">1,850 kW</span></div>
                 <div class="insp-row"><span class="k">IT Energy (1 h)</span><span class="vv" id="iItE">1,850 kWh</span></div>
                 <div class="insp-row"><span class="k">WUE-incl water (1 h)</span><span class="vv" id="iWaterHr">2,220 L</span></div>
-                <div class="insp-row"><span class="k">Instant WUE</span><span class="vv ok" id="iWue">1.20 L/kWh</span></div>
+                <div class="insp-row"><span class="k">Instant WUE</span><span class="vv ok" id="iWue" data-basis-param="water.wue_l_per_kwh" tabindex="0" role="button">1.20 L/kWh</span></div>
                 <div class="insp-row"><span class="k">24 h WUE</span><span class="vv ok" id="iWue24">1.18 L/kWh</span></div>
                 <div class="balance-note" id="balanceNote">
                     WUE = WUE-included water volume &divide; IT energy
@@ -716,7 +720,7 @@
                 <div class="panel-title">Water Scope Split</div>
                 <div class="insp-row">
                     <span class="k">Cooling makeup <span class="scope-tag incl">WUE</span></span>
-                    <span class="vv" id="iScMk">37.0 L/min</span>
+                    <span class="vv" id="iScMk" data-basis-param="water.flow_lpm_for_wue" tabindex="0" role="button">37.0 L/min</span>
                 </div>
                 <div class="insp-row" style="padding-left:14px;">
                     <span class="k">&boxur; Evaporation</span><span class="vv" id="iScEv">27.6 L/min</span>
@@ -742,7 +746,7 @@
                     <!-- v1.134.0 — this one figure was a bare <b> while its three siblings
                          above and the all-flow value beside it are engine-bound, so a change
                          to the engine WUE left this sentence contradicting itself. Hooked. -->
-                    WUE <b id="iWhyWue">&mdash;</b> vs all-flow <b id="iWhyAll">1.46</b> L/kWh.
+                    WUE <b id="iWhyWue" data-basis-param="environment.wue_l_per_kwh" tabindex="0" role="button">&mdash;</b> vs all-flow <b id="iWhyAll">1.46</b> L/kWh.
                 </div>
             </div>
 

@@ -574,10 +574,10 @@
     <div id="dh-ops-rollup" role="status" aria-live="polite" style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:8px 14px;background:rgba(12,20,35,0.65);border-bottom:1px solid #2b3a52;font-family:'JetBrains Mono','IBM Plex Sans',sans-serif;font-size:12px;color:#cbd5e1;font-variant-numeric:tabular-nums;">
         <span style="color:#9aa3af;font-weight:700;letter-spacing:.06em;text-transform:uppercase;">Operations Rollup</span>
         <span data-basis="state" tabindex="0" role="button" aria-label="Hall state — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Hall <b id="dh-hall-state" style="color:#22c55e;">NORMAL</b></span>
-        <span data-basis="rackload" tabindex="0" role="button" aria-label="Rack Load — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Rack Load <b id="dh-rack-load" style="color:#fff;">&mdash;</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
+        <span data-basis-param="hall.it_load_kw" tabindex="0" role="button" aria-label="Rack Load — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Rack Load <b id="dh-rack-load" style="color:#fff;">&mdash;</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
         <span data-basis="margin" tabindex="0" role="button" aria-label="Cooling Margin — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Cooling Margin <b id="dh-cooling-margin" style="color:#22c55e;">18</b><span style="color:#94a3b8;font-weight:400;">%</span></span>
-        <span data-basis="pue" tabindex="0" role="button" aria-label="PUE — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">PUE <b id="dh-pue" style="color:#fff;">1.45</b></span>
-        <span data-basis="density" tabindex="0" role="button" aria-label="Power Density — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Power Density <b id="dh-pd" style="color:#fff;">&mdash;</b><span style="color:#94a3b8;font-weight:400;"> kW/rack</span></span>
+        <span data-basis-param="site.pue" tabindex="0" role="button" aria-label="PUE — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">PUE <b id="dh-pue" style="color:#fff;">1.45</b></span>
+        <span data-basis-param="hall.rack_actual_avg_kw" tabindex="0" role="button" aria-label="Power Density — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Power Density <b id="dh-pd" style="color:#fff;">&mdash;</b><span style="color:#94a3b8;font-weight:400;"> kW/rack</span></span>
         <span style="flex:1"></span>
         <span style="color:#94a3b8;font-size:11px;">Click any KPI for basis · Mode toggles below</span>
     </div>
@@ -749,7 +749,17 @@
 
             <div class="floor" id="main-content" tabindex="-1">
                 <div class="crah-rail" id="crah-top" aria-label="CRAH air-side units (north)"></div>
-                <div class="zone-field" id="zone-field"></div>
+                <!-- v1.134.3 — DECLARED DISTRIBUTION. This field renders 500 per-cabinet values plus 25
+                     per-row footers. Registering 500 parameters would be noise, and leaving them in
+                     the coverage denominator drowned every other page (datahall alone is 579 of the
+                     966 numbers on the whole suite). The honest treatment is to register the WHOLE
+                     FIELD against the quantity it must reconcile to: the coverage gate excludes these
+                     cells from the denominator only because it verifies their SUM equals
+                     hall.it_load_kw. A field that stops reconciling fails the gate. -->
+                <div class="zone-field" id="zone-field"
+                     data-rz-distribution="hall.it_load_kw"
+                     data-rz-distribution-selector=".rack .rk-val"
+                     data-rz-distribution-mode="power"></div>
                 <div class="crah-rail" id="crah-bottom" aria-label="CRAH air-side units (south)"></div>
             </div>
         </div>
@@ -1703,6 +1713,9 @@ function basisFor(id){
   var hallItKw=(hall&&hall.it_load_kw!=null)?hall.it_load_kw:null;
   var rackKw=(racks&&hallItKw!=null)?(hallItKw/racks):null;
   var dict={
+    /* v1.134.3 — every other entry moved to the registry-rendered shared drawer
+       (js/rz-basis-drawer.js). Only these remain, and each for a stated reason:
+       state = a design placeholder (no alarm source in this basis); margin = a page-derived percentage, not an engine parameter. */
     state:{
       title:'Hall State',
       formula:'state = worst(alarms in scope)',
@@ -1718,22 +1731,6 @@ function basisFor(id){
       mode:'DESIGN PLACEHOLDER',
       note:'A live BMS aggregates the highest-severity active alarm per zone. Current display is illustrative of normal state.'
     },
-    rackload:{
-      title:'Rack Load — Total IT in this hall',
-      formula:'IT_hall (MW) = hall.it_load_kw / 1000',
-      inputs:[
-        ['IT load (kW)',hallItKw!=null?hallItKw.toLocaleString()+' kW':'unavailable'],
-        ['IT design (kW)',(hall&&hall.it_design_kw!=null)?hall.it_design_kw.toLocaleString()+' kW':'unavailable'],
-        ['Campus IT load (all halls)',(s.site.it_load_kw).toLocaleString()+' kW'],
-        ['Utilisation',(s.site.it_load_kw/s.site.it_design_kw*100).toFixed(1)+' %']
-      ],
-      output:(s.site.it_load_kw/1000).toFixed(2)+' MW',
-      scope:'Data hall',
-      denominator:'MW',
-      source:'CONV_CALC.snapshot.site.it_load_kw',
-      mode:'BOD LOCKED',
-      note:'1,850 kW current load against 2,000 kW design = 92.5 % utilisation. Headroom 150 kW for short-term spikes; sustained growth requires design re-baseline.'
-    },
     margin:{
       title:'Cooling Margin',
       formula:'margin (%) = (cooling_capacity − heat_rejection) / cooling_capacity × 100',
@@ -1748,36 +1745,6 @@ function basisFor(id){
       source:'derived from snapshot.cooling.heat_rejection_kw + plant capacity',
       mode:'DERIVED',
       note:'Drop below 10 % triggers operator review (potential N+1 erosion). Below 5 % is a CRITICAL trip — schedule load shed or activate spare chiller.'
-    },
-    pue:{
-      title:'PUE — Power Usage Effectiveness',
-      formula:'PUE = facility_kW / IT_kW',
-      inputs:[
-        ['IT load',s.site.it_load_kw.toLocaleString()+' kW'],
-        ['Facility load',Math.round(s.site.facility_load_kw).toLocaleString()+' kW'],
-        ['Non-IT (cooling + UPS + aux)',Math.round(s.site.non_it_load_kw).toLocaleString()+' kW']
-      ],
-      output:s.site.pue.toFixed(2)+' (BOD locked)',
-      scope:'Facility-wide',
-      denominator:'IT kW',
-      source:'CONV_CALC.snapshot.site.pue',
-      mode:'BOD LOCKED',
-      note:'1.45 reflects conventional air-cooled DC in tropical climate without seasonal economisation. Target ≤1.5 met; further reduction requires free-cooling or chiller-side upgrades.'
-    },
-    density:{
-      title:'Power Density — Per-rack average',
-      formula:'density (kW/rack) = hall.it_load_kw / hall.racks',
-      inputs:[
-        ['IT load (this hall)',hallItKw!=null?hallItKw.toLocaleString()+' kW':'unavailable'],
-        ['Racks installed (this hall)',racks!=null?racks:'unavailable'],
-        ['Average density',rackKw!=null?rackKw.toFixed(2)+' kW/rack':'unavailable']
-      ],
-      output:rackKw!=null?rackKw.toFixed(1)+' kW/rack':'unavailable',
-      scope:'Data hall average',
-      denominator:'kW per rack',
-      source:'derived from snapshot.site.it_load_kw / this page\'s authored cell count (window.RZ_DATAHALL_RACKS)',
-      mode:'DERIVED',
-      note:'Conventional enterprise DC density range: 4–12 kW/rack typical. AI HPC density: 30–66 kW/rack (NVL72 footprint). This page is conventional-DC scope; AI loads are on the DC AI cockpit.'
     }
   };
   return dict[id]||null;

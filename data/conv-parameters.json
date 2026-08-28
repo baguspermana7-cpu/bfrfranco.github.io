@@ -145,12 +145,7 @@
       "dependsOnInputs": [
         "campus.rack_design_avg_kw"
       ],
-      "consumers": [
-        {
-          "page": "datahall.html",
-          "reads": 1
-        }
-      ],
+      "consumers": [],
       "tests": [],
       "source": {
         "ref": "js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)",
@@ -427,7 +422,7 @@
       "consumers": [
         {
           "page": "dc-conventional.html",
-          "reads": 15
+          "reads": 10
         },
         {
           "page": "datahall.html",
@@ -470,7 +465,7 @@
       "consumers": [
         {
           "page": "dc-conventional.html",
-          "reads": 12
+          "reads": 6
         },
         {
           "page": "datahall.html",
@@ -580,7 +575,7 @@
       "consumers": [
         {
           "page": "dc-conventional.html",
-          "reads": 6
+          "reads": 7
         },
         {
           "page": "datahall.html",
@@ -622,7 +617,7 @@
       "consumers": [
         {
           "page": "dc-conventional.html",
-          "reads": 7
+          "reads": 9
         },
         {
           "page": "datahall.html",
@@ -875,7 +870,7 @@
         },
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 4
+          "reads": 5
         }
       ],
       "tests": [
@@ -1255,7 +1250,7 @@
       "consumers": [
         {
           "page": "dc-conventional.html",
-          "reads": 9
+          "reads": 11
         },
         {
           "page": "datahall.html",
@@ -1287,7 +1282,7 @@
       "consumers": [
         {
           "page": "dc-conventional.html",
-          "reads": 15
+          "reads": 13
         }
       ],
       "tests": [],
@@ -1314,7 +1309,7 @@
       "consumers": [
         {
           "page": "dc-conventional.html",
-          "reads": 17
+          "reads": 12
         }
       ],
       "tests": [
@@ -1380,7 +1375,7 @@
       "consumers": [
         {
           "page": "dc-conventional.html",
-          "reads": 7
+          "reads": 4
         },
         {
           "page": "water-system.html",
@@ -1425,6 +1420,10 @@
         {
           "page": "dc-conventional.html",
           "reads": 4
+        },
+        {
+          "page": "fuel-system.html",
+          "reads": 1
         }
       ],
       "tests": [
@@ -1465,7 +1464,7 @@
         },
         {
           "page": "fuel-system.html",
-          "reads": 2
+          "reads": 3
         }
       ],
       "tests": [
@@ -1493,11 +1492,11 @@
       "consumers": [
         {
           "page": "dc-conventional.html",
-          "reads": 9
+          "reads": 11
         },
         {
           "page": "fuel-system.html",
-          "reads": 7
+          "reads": 8
         }
       ],
       "tests": [],
@@ -1605,7 +1604,7 @@
         },
         {
           "page": "fuel-system.html",
-          "reads": 2
+          "reads": 3
         }
       ],
       "tests": [
@@ -1615,6 +1614,268 @@
         "ref": "conv/review/09-engineering-basis-and-calculations.md",
         "asOf": "2026-08-28",
         "section": "lines 133-147"
+      }
+    },
+    {
+      "id": "hall.chillers_allocated",
+      "label": "Chillers allocated to this hall",
+      "unit": null,
+      "kind": "authored",
+      "value": null,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "UNAVAILABLE",
+      "explainKey": null,
+      "dependsOnInputs": [],
+      "consumers": [],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "method": "Central N+1 plant; a per-hall allocation requires a hydronic distribution design that has not been produced. Deliberately null rather than a plausible share."
+      }
+    },
+    {
+      "id": "hall.chillers_allocated_reason",
+      "label": "Why no per-hall chiller allocation",
+      "unit": null,
+      "kind": "authored",
+      "value": "UNAVAILABLE — central N+1 plant; per-hall allocation requires a hydronic distribution design that has not been produced.",
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "UNAVAILABLE",
+      "explainKey": null,
+      "dependsOnInputs": [],
+      "consumers": [],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "hall.facility_load_kw",
+      "label": "Hall facility load",
+      "unit": "kW",
+      "kind": "derived",
+      "value": 10875,
+      "formula": "hall.it_load_kw x site.pue",
+      "deps": [
+        "hall.it_load_kw",
+        "site.pue"
+      ],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_load_kw",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "method": "Registered once from the first hall. The generator ASSERTS all four halls are identical under the current study, so this genuinely represents any of them; if a future study differentiates them the build throws rather than letting one stand for all."
+      }
+    },
+    {
+      "id": "hall.it_design_kw",
+      "label": "Hall IT design capacity",
+      "unit": "kW",
+      "kind": "authored",
+      "value": 10000,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw"
+      ],
+      "consumers": [],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)",
+        "section": "capacity.itKwPerHall",
+        "asOf": "2026-08-28",
+        "method": "Registered once from the first hall. The generator ASSERTS all four halls are identical under the current study, so this genuinely represents any of them; if a future study differentiates them the build throws rather than letting one stand for all."
+      }
+    },
+    {
+      "id": "hall.it_load_kw",
+      "label": "Hall IT load",
+      "unit": "kW",
+      "kind": "authored",
+      "value": 7500,
+      "formula": "active scenario it_kw_per_hall",
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "ADOPTED",
+      "explainKey": "hall-it-load",
+      "dependsOnInputs": [
+        "campus.halls.0.it_load_kw"
+      ],
+      "consumers": [],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "SCENARIOS",
+        "asOf": "2026-08-28",
+        "method": "Adopted normal scenario, SIMULATED/ADOPTED. Registered once from the first hall. The generator ASSERTS all four halls are identical under the current study, so this genuinely represents any of them; if a future study differentiates them the build throws rather than letting one stand for all."
+      }
+    },
+    {
+      "id": "hall.rack_actual_avg_kw",
+      "label": "Cabinet actual average (power density)",
+      "unit": "kW/rack",
+      "kind": "derived",
+      "value": 15,
+      "formula": "hall.it_load_kw / hall.racks",
+      "deps": [
+        "hall.it_load_kw",
+        "hall.racks"
+      ],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": "power-density",
+      "dependsOnInputs": [
+        "campus.halls.0.it_load_kw",
+        "campus.halls.0.racks"
+      ],
+      "consumers": [
+        {
+          "page": "datahall.html",
+          "reads": 1
+        }
+      ],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "method": "Both ends of this ratio are HALL scope. Dividing the campus load by a hall's cabinet count was the v1.134.0 defect."
+      }
+    },
+    {
+      "id": "hall.rack_design_avg_kw",
+      "label": "Cabinet design average",
+      "unit": "kW/rack",
+      "kind": "authored",
+      "value": 20,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.rack_design_avg_kw"
+      ],
+      "consumers": [],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)",
+        "section": "rack.selectedAverageKw",
+        "asOf": "2026-08-28",
+        "method": "500 cabinets x 20 kW = 10,000 kW closes against the hall design. Registered once from the first hall. The generator ASSERTS all four halls are identical under the current study, so this genuinely represents any of them; if a future study differentiates them the build throws rather than letting one stand for all."
+      }
+    },
+    {
+      "id": "hall.rack_selected_peak_kw",
+      "label": "Cabinet selected peak",
+      "unit": "kW/rack",
+      "kind": "authored",
+      "value": 30,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.rack_selected_peak_kw"
+      ],
+      "consumers": [],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)",
+        "section": "rack.selectedPeakKw",
+        "asOf": "2026-08-28",
+        "method": "Registered once from the first hall. The generator ASSERTS all four halls are identical under the current study, so this genuinely represents any of them; if a future study differentiates them the build throws rather than letting one stand for all."
+      }
+    },
+    {
+      "id": "hall.racks",
+      "label": "Hall cabinet count",
+      "unit": null,
+      "kind": "authored",
+      "value": 500,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.racks"
+      ],
+      "consumers": [
+        {
+          "page": "dc-conventional.html",
+          "reads": 11
+        },
+        {
+          "page": "datahall.html",
+          "reads": 7
+        },
+        {
+          "page": "fire-system.html",
+          "reads": 1
+        },
+        {
+          "page": "ict.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-conv-calc.mjs",
+        "test-conv-design-basis.mjs",
+        "test-conv-snapshot-binding.mjs",
+        "test-datahall-ai-electrical-topology.mjs",
+        "test-datahall-ai-electrical-visual-map.mjs",
+        "test-datahall-ai-rack-density.mjs",
+        "test-datahall-calc.mjs"
+      ],
+      "source": {
+        "ref": "js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)",
+        "section": "rack.countPerHall",
+        "asOf": "2026-08-28",
+        "method": "Registered once from the first hall. The generator ASSERTS all four halls are identical under the current study, so this genuinely represents any of them; if a future study differentiates them the build throws rather than letting one stand for all."
+      }
+    },
+    {
+      "id": "hall.utilisation_pct",
+      "label": "Hall utilisation",
+      "unit": "%",
+      "kind": "derived",
+      "value": 75,
+      "formula": "hall.it_load_kw / hall.it_design_kw x 100",
+      "deps": [
+        "hall.it_load_kw",
+        "hall.it_design_kw"
+      ],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.0.it_load_kw"
+      ],
+      "consumers": [],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "method": "Registered once from the first hall. The generator ASSERTS all four halls are identical under the current study, so this genuinely represents any of them; if a future study differentiates them the build throws rather than letting one stand for all."
       }
     },
     {
@@ -1955,7 +2216,7 @@
       "consumers": [
         {
           "page": "dc-conventional.html",
-          "reads": 4
+          "reads": 2
         },
         {
           "page": "fire-system.html",
@@ -1999,28 +2260,19 @@
       "consumers": [
         {
           "page": "dc-conventional.html",
-          "reads": 11
-        },
-        {
-          "page": "datahall.html",
-          "reads": 2
-        },
-        {
-          "page": "fuel-system.html",
-          "reads": 3
+          "reads": 4
         },
         {
           "page": "ict.html",
-          "reads": 2
+          "reads": 1
         },
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 4
+          "reads": 2
         }
       ],
       "tests": [
-        "test-conv-calc.mjs",
-        "test-conv-snapshot-binding.mjs"
+        "test-conv-calc.mjs"
       ],
       "source": {
         "ref": "conv/review/09-engineering-basis-and-calculations.md",
@@ -2077,16 +2329,7 @@
         "campus.halls.2.it_design_kw",
         "campus.halls.3.it_design_kw"
       ],
-      "consumers": [
-        {
-          "page": "dc-conventional.html",
-          "reads": 2
-        },
-        {
-          "page": "datahall.html",
-          "reads": 1
-        }
-      ],
+      "consumers": [],
       "tests": [],
       "source": {
         "ref": "js/conv-engine.js",
@@ -2115,11 +2358,11 @@
       "consumers": [
         {
           "page": "dc-conventional.html",
-          "reads": 19
+          "reads": 11
         },
         {
           "page": "datahall.html",
-          "reads": 7
+          "reads": 1
         },
         {
           "page": "chiller-plant.html",
@@ -2172,16 +2415,7 @@
         "campus.halls.3.it_load_kw",
         "site.pue"
       ],
-      "consumers": [
-        {
-          "page": "dc-conventional.html",
-          "reads": 2
-        },
-        {
-          "page": "datahall.html",
-          "reads": 2
-        }
-      ],
+      "consumers": [],
       "tests": [
         "test-conv-calc.mjs",
         "test-conv-snapshot-binding.mjs"
@@ -2238,15 +2472,15 @@
       "consumers": [
         {
           "page": "dc-conventional.html",
-          "reads": 21
+          "reads": 19
         },
         {
           "page": "datahall.html",
-          "reads": 8
+          "reads": 5
         },
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 4
+          "reads": 5
         }
       ],
       "tests": [
@@ -2287,11 +2521,11 @@
       "consumers": [
         {
           "page": "dc-conventional.html",
-          "reads": 4
+          "reads": 2
         },
         {
           "page": "water-system.html",
-          "reads": 2
+          "reads": 4
         }
       ],
       "tests": [

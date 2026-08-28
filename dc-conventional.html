@@ -900,6 +900,10 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
          Loaded NON-deferred so window.CONV_CALC exists before the inline
          dashboard script runs. Basis: conv/review/09-engineering-basis-and-calculations.md -->
     <script src="js/conv-engine.js?v=1.22.0"></script>
+    <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
+         Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
+    <script src="js/conv-parameters.js?v=1.134.3"></script>
+    <script src="js/rz-basis-drawer.js?v=1.134.3"></script>
     <script src="js/conv-design-basis.js?v=1.0.0"></script>
     <script src="js/rz-design-studio.js?v=1.130.0"></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
@@ -1053,24 +1057,24 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
 
         <!-- KPI Strip — v1.32.7: each card clickable for basis drawer (Rule 6) -->
         <div class="kpi-strip">
-            <div class="kpi-card" data-basis="pue" tabindex="0" role="button" aria-label="PUE — click for basis" style="cursor:pointer">
+            <div class="kpi-card" data-basis-param="site.pue" tabindex="0" role="button" aria-label="PUE — click for basis" style="cursor:pointer">
                 <div class="kpi-label">PUE</div>
-                <div class="kpi-value" style="color: var(--accent-cyan)" id="kpiPue">1.45</div>
+                <div class="kpi-value" style="color: var(--accent-cyan)" id="kpiPue" data-basis-param="site.pue" tabindex="0" role="button">1.45</div>
                 <div class="kpi-unit">Target ≤1.5</div>
             </div>
-            <div class="kpi-card" data-basis="wue" tabindex="0" role="button" aria-label="WUE — click for basis" style="cursor:pointer">
+            <div class="kpi-card" data-basis-param="environment.wue_l_per_kwh" tabindex="0" role="button" aria-label="WUE — click for basis" style="cursor:pointer">
                 <div class="kpi-label">WUE</div>
-                <div class="kpi-value" style="color: var(--accent-blue)" id="kpiWue">1.20</div>
+                <div class="kpi-value" style="color: var(--accent-blue)" id="kpiWue" data-basis-param="environment.wue_l_per_kwh" tabindex="0" role="button">1.20</div>
                 <div class="kpi-unit">L/kWh</div>
             </div>
-            <div class="kpi-card" data-basis="grid" tabindex="0" role="button" aria-label="Grid factor — click for basis" style="cursor:pointer">
+            <div class="kpi-card" data-basis-param="environment.carbon_kg_per_facility_kwh" tabindex="0" role="button" aria-label="Grid factor — click for basis" style="cursor:pointer">
                 <div class="kpi-label">Grid factor</div>
-                <div class="kpi-value" style="color: var(--accent-green)" id="kpiCarbon">0.42</div>
+                <div class="kpi-value" style="color: var(--accent-green)" id="kpiCarbon" data-basis-param="environment.carbon_kg_per_facility_kwh" tabindex="0" role="button">0.42</div>
                 <div class="kpi-unit">kgCO₂/kWh facility</div>
             </div>
-            <div class="kpi-card" data-basis="it" tabindex="0" role="button" aria-label="IT Load — click for basis" style="cursor:pointer">
+            <div class="kpi-card" data-basis-param="site.it_load_kw" tabindex="0" role="button" aria-label="IT Load — click for basis" style="cursor:pointer">
                 <div class="kpi-label">IT Load</div>
-                <div class="kpi-value" style="color: var(--accent-orange)" id="kpiIt">1,850</div>
+                <div class="kpi-value" style="color: var(--accent-orange)" id="kpiIt" data-basis-param="site.it_load_kw" tabindex="0" role="button">1,850</div>
                 <div class="kpi-unit">kW</div>
             </div>
             <div class="kpi-card" data-basis="uptime" tabindex="0" role="button" aria-label="Uptime — click for basis" style="cursor:pointer">
@@ -1084,19 +1088,19 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
                      title="UNAVAILABLE — no source in the current basis">&mdash;</div>
                 <div class="kpi-unit">% YTD</div>
             </div>
-            <div class="kpi-card" data-basis="temp" tabindex="0" role="button" aria-label="Temperature — click for basis" style="cursor:pointer">
+            <div class="kpi-card" data-basis-param="environment.avg_temp_c" tabindex="0" role="button" aria-label="Temperature — click for basis" style="cursor:pointer">
                 <div class="kpi-label">Temp</div>
-                <div class="kpi-value" style="color: var(--accent-green)" id="kpiTemp">22.4</div>
+                <div class="kpi-value" style="color: var(--accent-green)" id="kpiTemp" data-basis-param="environment.avg_temp_c" tabindex="0" role="button">22.4</div>
                 <div class="kpi-unit">°C Avg</div>
             </div>
-            <div class="kpi-card" data-basis="chillers" tabindex="0" role="button" aria-label="Chillers — click for basis" style="cursor:pointer">
+            <div class="kpi-card" data-basis-param="cooling.chillers_running" tabindex="0" role="button" aria-label="Chillers — click for basis" style="cursor:pointer">
                 <div class="kpi-label">Chillers</div>
                 <!-- DEFECT (fixed): un-hooked literal "2/3" from the retired 1.85 MW
                      basis, contradicting the engine (7/10) on the same screen. Now id'd
                      and written from cooling.chillers_running / chillers_total in
                      updateData(); the markup ships a dash, never a number, so a paint
                      failure reads as unavailable instead of as stale telemetry. -->
-                <div class="kpi-value" style="color: var(--accent-cyan)" id="kpiChillers">&mdash;</div>
+                <div class="kpi-value" style="color: var(--accent-cyan)" id="kpiChillers" data-basis-param="cooling.chillers_running" tabindex="0" role="button">&mdash;</div>
                 <div class="kpi-unit">Running</div>
             </div>
             <div class="kpi-card">
@@ -1127,32 +1131,32 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
             <!-- Operational callouts kept on the facility image -->
             <div class="callout cyan" style="top: 3%; left: 2%;">
                 <div class="callout-label">PUE</div>
-                <div class="callout-value" id="cPue">1.45</div>
+                <div class="callout-value" id="cPue" data-basis-param="site.pue" tabindex="0" role="button">1.45</div>
             </div>
 
             <div class="callout orange" style="top: 3%; right: 26%;">
                 <div class="callout-label">IT Load</div>
-                <div class="callout-value" id="cIt">1.85 MW</div>
+                <div class="callout-value" id="cIt" data-basis-param="site.it_load_kw" tabindex="0" role="button">1.85 MW</div>
             </div>
 
             <div class="callout cyan" style="top: 3%; right: 2%;">
                 <div class="callout-label">CHW</div>
-                <div class="callout-value" id="cChw">7.2°C</div>
+                <div class="callout-value" id="cChw" data-basis-param="cooling.chws_c" tabindex="0" role="button">7.2°C</div>
             </div>
 
             <div class="callout green" style="top: 40%; right: 2%;">
                 <div class="callout-label">Temp</div>
-                <div class="callout-value" id="cTemp">22.4°C</div>
+                <div class="callout-value" id="cTemp" data-basis-param="environment.avg_temp_c" tabindex="0" role="button">22.4°C</div>
             </div>
 
             <div class="callout purple" style="top: 60%; right: 2%;">
                 <div class="callout-label">Fuel</div>
-                <div class="callout-value" id="cFuel">85%</div>
+                <div class="callout-value" id="cFuel" data-basis-param="fuel.level_pct" tabindex="0" role="button">85%</div>
             </div>
 
             <div class="callout blue" style="bottom: 3%; right: 20%;">
                 <div class="callout-label">RH (outdoor)</div>
-                <div class="callout-value" id="cRh">48%</div>
+                <div class="callout-value" id="cRh" data-basis-param="environment.avg_rh_pct" tabindex="0" role="button">48%</div>
             </div>
         </div>
 
@@ -1164,15 +1168,15 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
             <div class="stats-title"><span class="dot" style="background: var(--accent-cyan)"></span> Efficiency</div>
             <div class="stat-row" title="Power Usage Effectiveness — facility kW / IT kW. Engine-derived.">
                 <span class="stat-label">PUE</span>
-                <span class="stat-value cyan" id="sPue">1.45</span>
+                <span class="stat-value cyan" id="sPue" data-basis-param="site.pue" tabindex="0" role="button">1.45</span>
             </div>
             <div class="stat-row" title="Water Usage Effectiveness — L of make-up water per IT kWh. Cooling-tower scope only; domestic/process water excluded.">
                 <span class="stat-label">WUE</span>
-                <span class="stat-value blue" id="sWue">1.20 L/kWh</span>
+                <span class="stat-value blue" id="sWue" data-basis-param="environment.wue_l_per_kwh" tabindex="0" role="button">1.20 L/kWh</span>
             </div>
             <div class="stat-row" title="Grid emission factor with facility-kWh denominator. ISO/IEC 30134-8 CUE uses IT-kWh; see CUE_IT below.">
                 <span class="stat-label">Grid factor</span>
-                <span class="stat-value green" id="sCue">0.42 kg/kWh facility</span>
+                <span class="stat-value green" id="sCue" data-basis-param="environment.carbon_kg_per_facility_kwh" tabindex="0" role="button">0.42 kg/kWh facility</span>
             </div>
             <div class="stat-row" title="CUE per ISO/IEC 30134-8: grid factor × PUE = 0.42 × 1.45 = 0.609 kg/kWh IT energy.">
                 <span class="stat-label">CUE_IT</span>
@@ -1182,8 +1186,8 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
 
         <div class="stats-section">
             <div class="stats-title"><span class="dot" style="background: var(--accent-orange)"></span> Power</div>
-            <div class="stat-row"><span class="stat-label">Total</span><span class="stat-value orange" id="sTotalLoad">2,683 kW</span></div>
-            <div class="stat-row"><span class="stat-label">IT Load</span><span class="stat-value orange" id="sItLoad">1,850 kW</span></div>
+            <div class="stat-row"><span class="stat-label">Total</span><span class="stat-value orange" id="sTotalLoad" data-basis-param="site.facility_load_kw" tabindex="0" role="button">2,683 kW</span></div>
+            <div class="stat-row"><span class="stat-label">IT Load</span><span class="stat-value orange" id="sItLoad" data-basis-param="site.it_load_kw" tabindex="0" role="button">1,850 kW</span></div>
             <div class="stat-row" title="UPS Feed A 2N. Normal sharing: 50/50 (~46% of 2 MW rated). Failover: surviving path carries full protected 1,850 kW (~92% of rated). Source: snapshot.electrical.ups_module_kw">
                 <span class="stat-label">UPS A</span>
                 <span class="stat-value green" id="sUpsA">&mdash;</span>
@@ -1208,14 +1212,14 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
                 <span class="stat-value green" id="sChillerLoad">&mdash;</span>
             </div>
             <!-- DEFECT (fixed): un-hooked "2 / 3" from the retired basis. Engine-bound. -->
-            <div class="stat-row"><span class="stat-label">Chillers</span><span class="stat-value cyan" id="sChillers">&mdash;</span></div>
+            <div class="stat-row"><span class="stat-label">Chillers</span><span class="stat-value cyan" id="sChillers" data-basis-param="cooling.chillers_running" tabindex="0" role="button">&mdash;</span></div>
             <!-- DEFECT (fixed): un-hooked "12 / 14". CONV_CALC models the CRAH plane only
                  as an air-side temperature chain — it publishes no CRAH inventory or
                  running count, so no count can be derived without inventing one. Row kept
                  (operators expect the line) but rendered UNAVAILABLE; nothing writes it. -->
             <div class="stat-row"><span class="stat-label">CRAHs</span><span class="stat-value" id="sCrahs" style="color:var(--text-secondary)" title="UNAVAILABLE — no source in the current basis">&mdash;</span></div>
-            <div class="stat-row"><span class="stat-label">CHW Sup</span><span class="stat-value cyan" id="sChwSup">7.2°C</span></div>
-            <div class="stat-row"><span class="stat-label">CHW Ret</span><span class="stat-value orange" id="sChwRet">14.8°C</span></div>
+            <div class="stat-row"><span class="stat-label">CHW Sup</span><span class="stat-value cyan" id="sChwSup" data-basis-param="cooling.chws_c" tabindex="0" role="button">7.2°C</span></div>
+            <div class="stat-row"><span class="stat-label">CHW Ret</span><span class="stat-value orange" id="sChwRet" data-basis-param="cooling.chwr_c" tabindex="0" role="button">14.8°C</span></div>
         </div>
 
         <div class="stats-section">
@@ -1227,8 +1231,8 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
 
         <div class="stats-section">
             <div class="stats-title"><span class="dot" style="background: var(--accent-green)"></span> Environment</div>
-            <div class="stat-row"><span class="stat-label">Temp</span><span class="stat-value green" id="sTempAvg">22.4°C</span></div>
-            <div class="stat-row"><span class="stat-label">RH</span><span class="stat-value green" id="sRhAvg">48%</span></div>
+            <div class="stat-row"><span class="stat-label">Temp</span><span class="stat-value green" id="sTempAvg" data-basis-param="environment.avg_temp_c" tabindex="0" role="button">22.4°C</span></div>
+            <div class="stat-row"><span class="stat-label">RH</span><span class="stat-value green" id="sRhAvg" data-basis-param="environment.avg_rh_pct" tabindex="0" role="button">48%</span></div>
             <div class="stat-row"><span class="stat-label">DP</span><span class="stat-value green">+2.1 Pa</span></div>
         </div>
 
@@ -1240,7 +1244,7 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
 
         <div class="stats-section">
             <div class="stats-title"><span class="dot" style="background: var(--accent-purple)"></span> Fuel</div>
-            <div class="stat-row"><span class="stat-label">Main</span><span class="stat-value green" id="sFuelMain">85%</span></div>
+            <div class="stat-row"><span class="stat-label">Main</span><span class="stat-value green" id="sFuelMain" data-basis-param="fuel.level_pct" tabindex="0" role="button">85%</span></div>
             <div class="stat-row"><span class="stat-label">Day Tank</span><span class="stat-value green">92%</span></div>
             <div class="stat-row" title="Bulk-tank autonomy at current site load. 45,900 L usable ÷ 956 L/hr (site total) = 48 hrs. Per-genset day-tank inventory is separate buffer.">
                 <span class="stat-label">Autonomy</span>
@@ -2389,67 +2393,9 @@ function nowStamp(){var t=new Date();return t.getFullYear()+'-'+('0'+(t.getMonth
 function basisFor(id){
   var s=snap();if(!s)return null;
   var dict={
-    pue:{
-      title:'PUE — Power Usage Effectiveness',
-      formula:'PUE = Facility kW / IT kW',
-      inputs:[
-        ['IT load',grp(Math.round(s.site.it_load_kw))+' kW'],
-        ['Facility load',grp(Math.round(s.site.facility_load_kw))+' kW'],
-        ['Non-IT (cooling + UPS loss + aux)',grp(Math.round(s.site.non_it_load_kw))+' kW'],
-        ['UPS efficiency assumed','96 %']
-      ],
-      output:s.site.pue.toFixed(2)+' (BOD locked)',
-      scope:'Facility-wide',
-      denominator:'IT kW',
-      source:'CONV_CALC.snapshot.site.pue',
-      mode:'BOD LOCKED',
-      note:'Conventional enterprise DC. Target ≤1.5 reflects air-cooled tropical climate without seasonal economisation. 1.20-class PUE requires free-cooling and is not achievable here.'
-    },
-    wue:{
-      title:'WUE — Water Usage Effectiveness',
-      formula:'WUE = L water / IT kWh',
-      inputs:[
-        ['WUE-included scope','cooling-tower make-up only'],
-        ['IT load',grp(Math.round(s.site.it_load_kw))+' kW'],
-        ['Instant equivalent flow',s.water.flow_lpm_for_wue.toFixed(1)+' L/min'],
-        ['Excluded','domestic / process water']
-      ],
-      output:s.environment.wue_l_per_kwh.toFixed(2)+' L/kWh IT',
-      scope:'Cooling-tower make-up (Green Grid WP #35)',
-      denominator:'IT kWh',
-      source:'CONV_CALC.snapshot.environment.wue_l_per_kwh',
-      mode:'BOD LOCKED',
-      note:'Annual equivalent: WUE × IT × 8,760 hr = '+(s.environment.wue_l_per_kwh*s.site.it_load_kw*8760/1e6).toFixed(1)+' ML/yr at constant load.'
-    },
-    grid:{
-      title:'Grid Factor (Carbon Intensity)',
-      formula:'kgCO₂ / facility kWh (regional grid emission factor)',
-      inputs:[
-        ['Grid emission factor (regional)',s.environment.carbon_kg_per_facility_kwh.toFixed(2)+' kgCO₂/kWh facility'],
-        ['Note','This is NOT CUE. Standard CUE uses IT-kWh denominator.']
-      ],
-      output:s.environment.carbon_kg_per_facility_kwh.toFixed(2)+' kgCO₂/kWh facility',
-      scope:'Facility-wide',
-      denominator:'facility kWh (NOT IT kWh)',
-      source:'CONV_CALC.snapshot.environment.carbon_kg_per_facility_kwh',
-      mode:'DERIVED',
-      note:'For ISO/IEC 30134-8 CUE: CUE_IT = grid_factor × PUE = '+(s.environment.carbon_kg_per_facility_kwh*s.site.pue).toFixed(2)+' kgCO₂/kWh IT. See side-panel CUE_IT tile.'
-    },
-    it:{
-      title:'IT Load',
-      formula:'IT = site.it_load_kw (BOD basis)',
-      inputs:[
-        ['Design capacity',grp(s.site.it_design_kw)+' kW'],
-        ['Current load',grp(Math.round(s.site.it_load_kw))+' kW'],
-        ['Utilisation',(s.site.it_load_kw/s.site.it_design_kw*100).toFixed(1)+' %']
-      ],
-      output:grp(Math.round(s.site.it_load_kw))+' kW ('+(s.site.it_load_kw/1000).toFixed(2)+' MW)',
-      scope:'Whole facility',
-      denominator:'kW',
-      source:'CONV_CALC.snapshot.site.it_load_kw',
-      mode:'BOD LOCKED',
-      note:'Current 1,850 kW out of 2,000 kW design = 92.5 % utilisation. Average density at 8 kW/rack ≈ '+s.racks.at_8kw+' rack-equivalents.'
-    },
+    /* v1.134.3 — every other entry moved to the registry-rendered shared drawer
+       (js/rz-basis-drawer.js). Only these remain, and each for a stated reason:
+       uptime = no downtime event log exists, so the card renders UNAVAILABLE. */
     uptime:{
       title:'Uptime (YTD)',
       formula:'(8760 hr − downtime hr) / 8760 × 100',
@@ -2464,35 +2410,6 @@ function basisFor(id){
       source:'design placeholder — not yet bound to event log',
       mode:'DESIGN PLACEHOLDER',
       note:'A live BMS would compute this from logged downtime events. The 99.98 % shown is illustrative of Tier-III intent.'
-    },
-    temp:{
-      title:'Cold-Aisle Temperature (Avg)',
-      formula:'avg(TT-* in cold aisles)',
-      inputs:[
-        ['Setpoint',s.environment.avg_temp_c.toFixed(1)+' °C'],
-        ['ASHRAE TC 9.9 recommended','18–27 °C (Class A1)']
-      ],
-      output:s.environment.avg_temp_c.toFixed(1)+' °C',
-      scope:'Cold aisles, all racks',
-      denominator:'°C',
-      source:'CONV_CALC.snapshot.environment.avg_temp_c',
-      mode:'SIM SENSOR',
-      note:'Simulated cold-aisle setpoint in the ASHRAE A1 recommended band. A live BMS would aggregate cold-aisle TT-* readings.'
-    },
-    chillers:{
-      title:'Chillers Running',
-      formula:'count(running) / count(installed)',
-      inputs:[
-        ['Running',s.cooling.chillers_running],
-        ['Installed total',s.cooling.chillers_total],
-        ['N+1 spare',s.cooling.chillers_total-s.cooling.chillers_running]
-      ],
-      output:s.cooling.chillers_running+'/'+s.cooling.chillers_total,
-      scope:'Primary chiller plant',
-      denominator:'count',
-      source:'CONV_CALC.snapshot.cooling.chillers_running',
-      mode:'BOD LOCKED',
-      note:'N+1 redundancy: 2 carry the cooling load (~1,927 kW heat rejection); 1 idles as spare. Sequencer rotates lead duty on schedule.'
     }
   };
   return dict[id]||null;

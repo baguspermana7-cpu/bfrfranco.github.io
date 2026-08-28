@@ -569,6 +569,10 @@
 #cookieAccept{background:#1d4ed8 !important}
 </style>
     <script src="js/conv-engine.js?v=1.22.0"></script>
+    <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
+         Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
+    <script src="js/conv-parameters.js?v=1.134.3"></script>
+    <script src="js/rz-basis-drawer.js?v=1.134.3"></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
          Loaded for cross-page consistency; body does NOT carry rz-bms-shell
          class. Spec: standarization/BMS_SHELL.md ; conv/review/14 §6. -->
@@ -639,22 +643,22 @@
         <div class="kpi hero">
             <div class="k-tag calc">CALC</div>
             <div class="k-lbl"><i class="fas fa-hourglass-half"></i> Generator Autonomy</div>
-            <div><span class="k-val" id="kpi-autonomy">--</span><span class="k-unit">hr</span></div>
+            <div><span class="k-val" id="kpi-autonomy" data-basis-param="fuel.autonomy_hr" tabindex="0" role="button">--</span><span class="k-unit">hr</span></div>
             <div class="k-sub" id="kpi-autonomy-sub">usable L &divide; consumption L/hr</div>
         </div>
         <div class="kpi">
             <div class="k-lbl"><i class="fas fa-oil-can"></i> Usable Fuel</div>
-            <div><span class="k-val" id="kpi-usable">--</span><span class="k-unit">L</span></div>
+            <div><span class="k-val" id="kpi-usable" data-basis-param="fuel.usable_l" tabindex="0" role="button">--</span><span class="k-unit">L</span></div>
             <div class="k-sub" id="kpi-usable-sub">of 60,000 L &times; 0.90</div>
         </div>
         <div class="kpi">
             <div class="k-lbl"><i class="fas fa-tint"></i> Consumption</div>
-            <div><span class="k-val" id="kpi-consumption">--</span><span class="k-unit">L/hr</span></div>
+            <div><span class="k-val" id="kpi-consumption" data-basis-param="fuel.generator_consumption_lph" tabindex="0" role="button">--</span><span class="k-unit">L/hr</span></div>
             <div class="k-sub">at current generator load</div>
         </div>
         <div class="kpi">
             <div class="k-lbl"><i class="fas fa-bolt"></i> Generator Load</div>
-            <div><span class="k-val" id="kpi-genload">--</span><span class="k-unit">MW</span></div>
+            <div><span class="k-val" id="kpi-genload" data-basis-param="site.facility_load_kw" tabindex="0" role="button">--</span><span class="k-unit">MW</span></div>
             <div class="k-sub" id="kpi-genload-sub">facility load on gensets</div>
         </div>
         <div class="kpi">
@@ -691,7 +695,7 @@
                         <div class="ust-liquid" id="liq-ust" style="height:85%;"></div>
                     </div>
                     <div class="ust-meta">
-                        <div class="data-row"><span class="data-lbl">Level (LIT-101)</span><span><span class="data-val" id="val-ust-lvl">85.0</span><span class="data-unit">%</span></span></div>
+                        <div class="data-row"><span class="data-lbl">Level (LIT-101)</span><span><span class="data-val" id="val-ust-lvl" data-basis-param="fuel.level_pct" tabindex="0" role="button">85.0</span><span class="data-unit">%</span></span></div>
                         <div class="data-row"><span class="data-lbl">Gross Volume</span><span><span class="data-val" id="val-ust-gross">51,000</span><span class="data-unit">L</span></span></div>
                         <div class="data-row"><span class="data-lbl">Usable Reserve</span><span><span class="data-val" id="val-ust-usable" style="color:var(--diesel-bright)">45,900</span><span class="data-unit">L</span></span></div>
                         <div class="data-row"><span class="data-lbl">Tank Temp (TIT-101)</span><span><span class="data-val" id="val-ust-tmp">&mdash;</span><span class="data-unit">&deg;C</span></span></div>

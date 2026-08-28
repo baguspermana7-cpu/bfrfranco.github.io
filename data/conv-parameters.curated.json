@@ -748,6 +748,148 @@
       }
     },
     {
+      "id": "hall.chillers_allocated",
+      "label": "Chillers allocated to this hall",
+      "unit": null,
+      "scope": "hall",
+      "evidenceClass": "UNAVAILABLE",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "method": "Central N+1 plant; a per-hall allocation requires a hydronic distribution design that has not been produced. Deliberately null rather than a plausible share."
+      }
+    },
+    {
+      "id": "hall.chillers_allocated_reason",
+      "label": "Why no per-hall chiller allocation",
+      "unit": null,
+      "scope": "hall",
+      "evidenceClass": "UNAVAILABLE",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "hall.facility_load_kw",
+      "label": "Hall facility load",
+      "unit": "kW",
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "formula": "hall.it_load_kw x site.pue",
+      "deps": [
+        "hall.it_load_kw",
+        "site.pue"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "method": "Registered once from the first hall. The generator ASSERTS all four halls are identical under the current study, so this genuinely represents any of them; if a future study differentiates them the build throws rather than letting one stand for all."
+      }
+    },
+    {
+      "id": "hall.it_design_kw",
+      "label": "Hall IT design capacity",
+      "unit": "kW",
+      "scope": "hall",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)",
+        "section": "capacity.itKwPerHall",
+        "asOf": "2026-08-28",
+        "method": "Registered once from the first hall. The generator ASSERTS all four halls are identical under the current study, so this genuinely represents any of them; if a future study differentiates them the build throws rather than letting one stand for all."
+      }
+    },
+    {
+      "id": "hall.it_load_kw",
+      "label": "Hall IT load",
+      "unit": "kW",
+      "scope": "hall",
+      "evidenceClass": "ADOPTED",
+      "formula": "active scenario it_kw_per_hall",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "SCENARIOS",
+        "asOf": "2026-08-28",
+        "method": "Adopted normal scenario, SIMULATED/ADOPTED. Registered once from the first hall. The generator ASSERTS all four halls are identical under the current study, so this genuinely represents any of them; if a future study differentiates them the build throws rather than letting one stand for all."
+      },
+      "explainKey": "hall-it-load"
+    },
+    {
+      "id": "hall.rack_actual_avg_kw",
+      "label": "Cabinet actual average (power density)",
+      "unit": "kW/rack",
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "formula": "hall.it_load_kw / hall.racks",
+      "deps": [
+        "hall.it_load_kw",
+        "hall.racks"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "method": "Both ends of this ratio are HALL scope. Dividing the campus load by a hall's cabinet count was the v1.134.0 defect."
+      },
+      "explainKey": "power-density"
+    },
+    {
+      "id": "hall.rack_design_avg_kw",
+      "label": "Cabinet design average",
+      "unit": "kW/rack",
+      "scope": "hall",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)",
+        "section": "rack.selectedAverageKw",
+        "asOf": "2026-08-28",
+        "method": "500 cabinets x 20 kW = 10,000 kW closes against the hall design. Registered once from the first hall. The generator ASSERTS all four halls are identical under the current study, so this genuinely represents any of them; if a future study differentiates them the build throws rather than letting one stand for all."
+      }
+    },
+    {
+      "id": "hall.rack_selected_peak_kw",
+      "label": "Cabinet selected peak",
+      "unit": "kW/rack",
+      "scope": "hall",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)",
+        "section": "rack.selectedPeakKw",
+        "asOf": "2026-08-28",
+        "method": "Registered once from the first hall. The generator ASSERTS all four halls are identical under the current study, so this genuinely represents any of them; if a future study differentiates them the build throws rather than letting one stand for all."
+      }
+    },
+    {
+      "id": "hall.racks",
+      "label": "Hall cabinet count",
+      "unit": null,
+      "scope": "hall",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)",
+        "section": "rack.countPerHall",
+        "asOf": "2026-08-28",
+        "method": "Registered once from the first hall. The generator ASSERTS all four halls are identical under the current study, so this genuinely represents any of them; if a future study differentiates them the build throws rather than letting one stand for all."
+      }
+    },
+    {
+      "id": "hall.utilisation_pct",
+      "label": "Hall utilisation",
+      "unit": "%",
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "formula": "hall.it_load_kw / hall.it_design_kw x 100",
+      "deps": [
+        "hall.it_load_kw",
+        "hall.it_design_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-28",
+        "method": "Registered once from the first hall. The generator ASSERTS all four halls are identical under the current study, so this genuinely represents any of them; if a future study differentiates them the build throws rather than letting one stand for all."
+      }
+    },
+    {
       "id": "meta.basis",
       "label": "Basis statement",
       "unit": null,

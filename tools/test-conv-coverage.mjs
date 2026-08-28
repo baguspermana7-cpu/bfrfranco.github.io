@@ -104,6 +104,7 @@ const base = `http://127.0.0.1:${server.address().port}`;
 const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
 
 const perPage = [];
+const distributionFailures = [];
 try {
     for (const page of COCKPITS.filter((p) => !ONLY || p === ONLY)) {
         const tab = await browser.newPage();
@@ -111,11 +112,51 @@ try {
         await tab.goto(`${base}/${page}`, { waitUntil: 'domcontentloaded', timeout: 45000 });
         await new Promise((accept) => setTimeout(accept, 2600));
 
+        /* DECLARED DISTRIBUTIONS. A field of many per-item values (the data hall renders 500
+           cabinet cells) cannot honestly be registered one parameter per cell, and leaving the
+           cells in the denominator drowns every other page. A page may instead declare the
+           field against the quantity it must reconcile to. Those cells leave the denominator
+           ONLY because their SUM is verified here against that registry parameter — a field
+           that stops reconciling fails, which is a stronger check than tracing each cell. */
+        const distributions = await tab.evaluate(() => [...document.querySelectorAll('[data-rz-distribution]')]
+            .map((host) => {
+                const selector = host.getAttribute('data-rz-distribution-selector');
+                const cells = [...host.querySelectorAll(selector || '*')];
+                let sum = 0;
+                let counted = 0;
+                for (const cell of cells) {
+                    const m = cell.textContent.replace(/,/g, '').match(/-?\d+(?:\.\d+)?/);
+                    if (!m) continue;
+                    sum += Number(m[0]);
+                    counted += 1;
+                }
+                return { param: host.getAttribute('data-rz-distribution'), sum, counted, selector };
+            }));
+        for (const dist of distributions) {
+            const parameter = registry.parameters.find((p) => p.id === dist.param);
+            if (!parameter) {
+                console.log(`  ! ${page}: declared distribution names an unregistered parameter `
+                    + `"${dist.param}" — the declaration is refused and its cells stay in the denominator`);
+                continue;
+            }
+            const expected = Number(parameter.value);
+            const tolerance = Math.max(Math.abs(expected) * 0.005, 1);
+            const agrees = Math.abs(dist.sum - expected) <= tolerance;
+            console.log(`  = ${page}: distribution ${dist.param} — ${dist.counted} cells sum to `
+                + `${dist.sum.toFixed(1)}, registered value ${expected} ${agrees ? '(reconciles)' : '(DOES NOT RECONCILE)'}`);
+            if (!agrees) {
+                distributionFailures.push(`${page}: ${dist.param} cells sum to ${dist.sum.toFixed(1)}, `
+                    + `registry says ${expected}`);
+            }
+        }
+
         /* Collect every rendered number together with the nearest text that labels it, so an
            unaccounted finding is actionable rather than a bare figure. */
         const found = await tab.evaluate(() => {
             const results = [];
             const seen = new Set();
+            const declared = [...document.querySelectorAll('[data-rz-distribution]')];
+            const insideDeclared = (el) => declared.some((host) => host.contains(el));
             const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
             let node;
             while ((node = walker.nextNode())) {
@@ -123,6 +164,8 @@ try {
                 if (!el) continue;
                 const tag = el.tagName;
                 if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT') continue;
+                /* Excluded ONLY because the sum is verified above. */
+                if (insideDeclared(el)) continue;
                 const box = el.getBoundingClientRect();
                 if (box.width === 0 && box.height === 0) continue;
                 const style = getComputedStyle(el);
@@ -175,6 +218,13 @@ try {
             }
             if (row.unaccounted.length > 14) console.log(`    ... and ${row.unaccounted.length - 14} more`);
         }
+    }
+    if (distributionFailures.length > 0) {
+        /* A declared distribution that does not reconcile is a FAILURE in both modes: the page
+           bought its exclusion from the denominator with a promise, and the promise is broken. */
+        console.log('\nFAIL — declared distributions that do not reconcile:');
+        for (const f of distributionFailures) console.log(`    ${f}`);
+        process.exitCode = 1;
     }
     if (STRICT && totalUnaccounted > 0) {
         console.log(`\nFAIL — ${totalUnaccounted} rendered numbers are untraceable.`);

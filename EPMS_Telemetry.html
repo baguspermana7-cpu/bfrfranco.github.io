@@ -411,6 +411,10 @@
          non-deferred so window.CONV_CALC exists when the status strip renders.
          Spec: conv/review/14 §2 ; standarization/BMS_SHELL.md -->
     <script src="js/conv-engine.js?v=1.22.0"></script>
+    <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
+         Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
+    <script src="js/conv-parameters.js?v=1.134.3"></script>
+    <script src="js/rz-basis-drawer.js?v=1.134.3"></script>
     <link rel="stylesheet" href="css/rz-bms-shell.css?v=1.24.0">
     <link rel="stylesheet" href="css/rz-conv-alarm-workspace.css?v=1.131.0">
     <script src="js/datahall-ai/alarm-query.js?v=1.0.0" defer></script>
@@ -433,9 +437,9 @@
      Sits ABOVE the SVG so it's the first read every time the page loads. -->
 <div id="epms-status-strip" role="status" aria-live="polite" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:8px 14px;background:#0c1423;border-bottom:1px solid #2b3a52;font-family:'JetBrains Mono','IBM Plex Sans',sans-serif;font-size:12px;color:#e2e8f0;font-variant-numeric:tabular-nums;">
     <span style="font-weight:800;letter-spacing:.08em;color:#22c55e;text-transform:uppercase;">EPMS NORMAL</span>
-    <span style="color:#94a3b8;">Facility Load <b id="epms-fac" style="color:#fff;">2.68</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
-    <span style="color:#94a3b8;">IT Load <b id="epms-it" style="color:#fff;">1.85</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
-    <span style="color:#94a3b8;">PUE <b id="epms-pue" style="color:#fff;">1.45</b></span>
+    <span style="color:#94a3b8;">Facility Load <b id="epms-fac" data-basis-param="site.facility_load_kw" tabindex="0" role="button" style="color:#fff;">2.68</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
+    <span style="color:#94a3b8;">IT Load <b id="epms-it" data-basis-param="site.it_load_kw" tabindex="0" role="button" style="color:#fff;">1.85</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
+    <span style="color:#94a3b8;">PUE <b id="epms-pue" data-basis-param="site.pue" tabindex="0" role="button" style="color:#fff;">1.45</b></span>
     <!-- v1.132.1 STATIC-CLAIM REPAIR — these six cells were hardcoded words ("OK" / "Online" / "Standby" /
          "0" / "GOOD" / "Simulated") sitting beside three engine-bound numbers. They asserted a healthy plant
          no matter what the simulation was actually doing: trip every breaker and kill both utilities and the
@@ -599,7 +603,7 @@
         <div class="status-box">
             <div>
                 <div class="status-label">Total Load</div>
-                <div class="status-value" id="val-total-load">0 kW</div>
+                <div class="status-value" id="val-total-load" data-basis-param="electrical.epms_total_kw" tabindex="0" role="button">0 kW</div>
             </div>
         </div>
         <!-- v1.132.1 RULE-2 REPAIR — Power Factor and Frequency were random walks

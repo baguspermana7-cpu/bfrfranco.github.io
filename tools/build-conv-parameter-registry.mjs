@@ -166,6 +166,29 @@ export function buildRegistry() {
     const live = loadEngine(source);
     const liveFlat = flatten(live.snapshot, '', new Map());
 
+    /* HALL-SCOPED parameters. A cockpit that depicts one hall (datahall.html) needs its
+       numbers registered too, and campus.halls is summarised as a digest rather than
+       enumerated — four near-identical copies of every field would be noise. Register the
+       hall fields ONCE under a `hall.` prefix, taking the first hall as representative.
+       That is only honest while the halls are identical, so it is ASSERTED: if a future
+       study gives the halls different capacities, this throws instead of quietly letting one
+       hall stand for all four. */
+    const halls = live.snapshot.campus.halls;
+    const shape = (h) => JSON.stringify(Object.keys(h).sort().map((k) => [k, h[k]])
+        .filter(([k]) => k !== 'id' && k !== 'code'));
+    for (let i = 1; i < halls.length; i += 1) {
+        if (shape(halls[i]) !== shape(halls[0])) {
+            throw new Error(`hall ${halls[i].code} differs from hall ${halls[0].code}; the `
+                + 'registry can no longer register one hall as representative — enumerate them');
+        }
+    }
+    for (const key of Object.keys(halls[0])) {
+        if (key === 'id' || key === 'code') continue;
+        const value = halls[0][key];
+        if (value !== null && typeof value === 'object') continue;
+        liveFlat.set(`hall.${key}`, value);
+    }
+
     /* Dependency edges, MEASURED. For every authored model input, recompute the whole engine
        with only that input changed and record which snapshot paths moved. A path that moves
        under input I depends on I. Nothing here trusts a comment, a catalogue or a naming
@@ -181,7 +204,16 @@ export function buildRegistry() {
         setAt(probeModel, inputPath, probeValue);
         let probeFlat;
         try {
-            probeFlat = flatten(live.recompute(probeModel), '', new Map());
+            const probeSnapshot = live.recompute(probeModel);
+            probeFlat = flatten(probeSnapshot, '', new Map());
+            /* Mirror the hall expansion so hall.* paths get measured edges too. */
+            const probeHall = probeSnapshot.campus.halls[0];
+            for (const key of Object.keys(probeHall)) {
+                if (key === 'id' || key === 'code') continue;
+                const v = probeHall[key];
+                if (v !== null && typeof v === 'object') continue;
+                probeFlat.set(`hall.${key}`, v);
+            }
         } catch {
             /* A fail-closed guard rejecting an off-design input is correct behaviour, not a
                missing edge — skip it rather than recording a false independence. */

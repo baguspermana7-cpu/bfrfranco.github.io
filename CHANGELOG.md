@@ -11,6 +11,48 @@ release sections rather than semver.
 
 ---
 
+## v1.134.3 — 2026-08-28 (All eight cockpits on one basis drawer; the hand-written provenance dictionaries are gone)
+
+The shared drawer now covers every Conventional cockpit: **62 hooks across 8 pages, and the
+gate verifies all 62 explanations against the number in the row they explain.**
+
+**The two remaining `basisFor` dictionaries are deleted, not left to rot.** Their entries were
+migrated to registry ids and the hand-written copies removed, because an unreachable duplicate
+of a provenance string is exactly the drift this work exists to end. Three entries survive,
+each for a stated reason written at the code: `state` is a design placeholder (no alarm source
+exists in this basis), `margin` is a page-derived percentage rather than an engine parameter,
+and `uptime` has no downtime event log — its card already renders UNAVAILABLE.
+
+**Ten hall-scoped parameters registered.** `datahall.html` depicts one hall, so its rack load
+and power density had no registry home. `hall.*` now carries the hall's IT design and load,
+facility load, cabinet count, design/peak/actual per-cabinet kW, utilisation, and the null
+per-hall chiller allocation with its reason. They are registered once from the first hall, and
+the generator **asserts all four halls are identical** under the current study — if a future
+study differentiates them, the build throws rather than letting one hall silently stand for
+four. `hall.rack_actual_avg_kw` takes both ends of its ratio from hall scope, which is the
+v1.134.0 defect made structurally impossible.
+
+**Declared distributions — coverage 24.0 % → 37.8 %.** The data hall renders 500 per-cabinet
+values; registering 500 parameters would be noise, and leaving them in the denominator drowned
+every other page (datahall alone was 579 of the suite's 966 numbers). A page may now declare a
+field against the quantity it must reconcile to. Those cells leave the denominator **only
+because the gate verifies their sum**: 463 occupied cabinets sum to 7,500.2 kW against a
+registered 7,500 kW. That is a stronger check than tracing each cell, and a field that stops
+reconciling fails the gate in both strict and monitor mode — the page bought its exclusion with
+a promise, and a broken promise is a failure.
+
+Per page now: dc-conventional 67 % · datahall 40 % · chiller-plant 26 % · water 38 % · fire
+28 % · fuel 40 % · ict 49 % · EPMS 44 %.
+
+**`ict.html`'s engine fallbacks were the retired basis** (1850 / 2682.5 / 231). Nulled, like
+the others.
+
+**A note on how the hooks were placed.** The first chiller-plant pass attached parameters to
+the nearest enclosing row and mislabelled two of them. Every hook in this release is attached
+to the element that carries the id, never an ancestor, and the gate re-checks each one against
+its rendered value — a drawer pointing at the wrong parameter is the failure this whole
+programme is about.
+
 ## v1.134.2 — 2026-08-28 (One basis drawer, rendered from the registry — and the assumptions behind the supply air are finally visible)
 
 Three cockpits each carried a hand-written `basisFor` dictionary restating a formula, an
