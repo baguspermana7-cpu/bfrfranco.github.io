@@ -76,7 +76,28 @@ approx(s.electrical.ups_loss_kw, 1250, 1.0,    // 30,000 x (1/0.96 - 1)  [REBASE
 /* ---- Identity 4: CHW delta-T & flow from cooling kW / (4.186*dT) ------------
  * source: 00 lines 82-83 ; 09 lines 81-85 ; 12 lines 12-13 */
 approx(s.cooling.chw_delta_t, 7.6, 1e-6,
-    'CHW delta-T = 14.8 - 7.2 = 7.6 C  [09 line 83]');
+    'CHW delta-T = CHWR - CHWS = 7.6 C  (carried from [09 line 83]; the temperature '
+    + 'LEVEL was re-derived in v1.134.0 but the delta-T was deliberately kept, so '
+    + 'plant flow and duty arithmetic are unchanged)');
+
+/* ---- Identity 4b: the thermal chain must close, backwards from the inlet target
+ * The 15.2 C supply-air defect existed because the air planes and the water planes
+ * were authored independently. These assertions make that impossible: every plane
+ * has to be reachable from the adopted rack-inlet target by the stated deltas, so
+ * editing one temperature without the others fails here. */
+approx(s.cooling.rack_inlet_target_c, 25.4, 1e-9,
+    'rack-inlet target = 25.4 C  (study cooling.rackInletTargetC, ADOPTED)');
+approx(s.cooling.crah_supply_air_c,
+    s.cooling.rack_inlet_target_c - s.cooling.supply_path_mixing_k, 1e-9,
+    'CRAH supply air = rack inlet - supply-path mixing  (identity)');
+approx(s.cooling.chws_c,
+    s.cooling.crah_supply_air_c - s.cooling.chw_coil_approach_k, 1e-9,
+    'CHWS = CRAH supply air - coil approach  (identity)');
+approx(s.cooling.chwr_c, s.cooling.chws_c + s.cooling.chw_delta_t, 1e-9,
+    'CHWR = CHWS + delta-T  (identity)');
+if (!(s.cooling.crah_supply_air_c <= s.cooling.rack_inlet_target_c)) {
+    throw new Error('CRAH supply air must not exceed the rack-inlet target');
+}
 const expectFlow = m.site.it_load_kw / (4.186 * (m.cooling.chwr_c - m.cooling.chws_c));
 approx(s.cooling.flow_lps, Math.round(expectFlow * 10) / 10, 0.05,
     'CHW flow = cooling kW / (4.186 * dT)  (identity)');

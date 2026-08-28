@@ -11,6 +11,73 @@ release sections rather than semver.
 
 ---
 
+## v1.134.0 — 2026-08-28 (Every cockpit number is the RIGHT number: scope, thermal chain, and 17 dead bindings)
+
+v1.133.0 made the Conventional site a four-hall 40 MW campus. That exposed a class of
+defect the v1.132.0 binding gate could not catch — a page can follow the engine perfectly
+and still take the WRONG SCOPE — plus a long tail of values that were never bound at all.
+
+**Scope (`datahall.html`).** The page draws ONE hall but read the campus roll-up, putting
+30 MW of heat on a 500-cabinet floor plan: 150 kW per cabinet, cooling demand 30,000 kW
+against the installed CRAH capacity. It binds to the hall snapshot now, the row count is
+derived from the engine's rack count (25 rows x 20 cabinets = 500) instead of being
+authored, and the per-cabinet rating comes from the study's selected average so
+500 x 20 kW = 10,000 kW closes against the hall design by construction. The CRAH fleet is
+derived (N = ceil(hall heat / unit capacity), N+1 installed) rather than the literal 20/17
+sized for the retired 1.85 MW hall. The basis drawer took the same fix: it had a hall
+denominator under a campus numerator. The snapshot-binding gate's criterion was corrected
+to hall scope — both ends of a ratio must come from the same scope.
+
+**Thermal chain — the supply-air question.** The hall showed 15.2 C supply air after
+25.4 C was adopted. Both numbers were real, and that was the defect: 25.4 C was applied at
+the RACK INLET while the supply plane was still computed as `chws_c + 8.0` from a
+7.2 / 14.8 C chilled-water design belonging to the retired basis. A 15.2 C supply reaching
+a 25.4 C inlet implies ~10 K of bypass, contradicting the containment the same page
+asserts. The chain is now derived BACKWARDS from the adopted target and published whole:
+rack inlet 25.4 C (ADOPTED) -> supply-path mixing 0 K (the containment assumption, applied
+in both directions instead of one) -> CRAH supply 25.4 C -> coil approach 6.0 K (ASSUMED,
+no coil selection made) -> CHWS 19.4 C -> delta-T 7.6 K (kept, so plant flow and duty
+arithmetic are unchanged) -> CHWR 27.0 C. Four new identities in `test-conv-calc.mjs` make
+every plane reachable from the target, so no temperature can be edited in isolation again.
+
+**Seventeen dead bindings and a false all-clear.** Hooked elements that nothing ever
+assigned, each rendering a plausible constant from the retired basis:
+- `chiller-plant.html` — the entire CHW Flow Reconciliation card (58.2 / 60.6 L/s, off by
+  16x), the P&ID legend's "Primary CHWS 7.2 / CHWR 14.8", and an engine fallback that
+  returned the retired basis. The secondary loop setpoint was authored at 18.8 C on a
+  16-22 C slider, which became physically impossible once the primary was re-derived to
+  19.4 C — a decoupled secondary has no cooling source of its own, so its floor is now the
+  primary header.
+- `fuel-system.html` — tank temperature, pump run-hours and the two polisher instruments
+  (hardcoded in three places) have no instrument source and now say so; the basis chip
+  claimed engine v1.22.0 against 2.0.0; the inventory note claimed a 60,000 L tank against
+  972,737 L. Fallbacks are null, not plausible.
+- `dc-conventional.html` — "Chillers 2/3" and per-unit "Run 85% / 78%" contradicted the
+  engine's 7/10 on the same screen; the Alarms KPI read "0 / Normal" no matter what the
+  alarm strip counted; two callout writes targeted ids that do not exist; the rack count
+  read a `datahall.racks_total` key that has never existed.
+- `EPMS_Telemetry.html` — Power Factor and Frequency were `Math.random` walks refreshed
+  every second (ACCURACY_VALIDATION Rule 2), and "Total Load" drifted around 2,400 kW
+  three inches below an engine-bound 43.50 MW. The status strip's "Utility OK / UPS Online
+  / Trips 0" were hardcoded words that stayed green with every breaker open.
+- `fire-system.html` — three pump-setpoint rows were hand-typed copies of the constants the
+  simulation acts on, so a setpoint change left the panel lying; "Disabled Pts 0" and
+  "Controller power Healthy" were unearned all-clears on a fire panel.
+- `ict.html` — all six nav-rail alarm badges were literal "0" (the stylesheet shipped
+  crit/warn variants no code could reach) and fabric health asserted OPERATIONAL. Both now
+  follow the alarm register; fabric currently reads ATTENTION, which is the truth.
+- `water-system.html` — one WUE figure was a bare `<b>` among engine-bound siblings, and
+  the per-key fallbacks were the retired 1850 / 1.20 / 37.0 / 1927.1.
+
+Where no source exists, values render as unavailable with a reason instead of a comforting
+default. Nothing was replaced with a new invented number.
+
+**Also:** `ict.html` described the facility control network as "Air-gapped" while the same
+architecture renders an OT gateway and WAN interconnect. An air gap means no connection;
+the claim is replaced with what the design actually shows — segmented, firewalled OT
+boundary. `test-conv-cooling-water-ui.mjs` pinned CHWS to the literal 7.2, which would have
+failed a correct thermal-chain change; it now asserts the DOM follows the engine.
+
 ## v1.133.0 — 2026-08-28 (Conventional live basis is now a four-hall 40 MW campus)
 
 > The owner's target — "4 Hall A–D, masing-masing 10 MW, semua align" — becomes the LIVE operating basis.

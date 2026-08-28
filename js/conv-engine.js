@@ -107,6 +107,49 @@
     ];
     var ACTIVE_SCENARIO_ID = 'normal';
 
+    /* ==================================================================
+     * THERMAL CHAIN — derived BACKWARDS from the adopted rack-inlet target
+     * ==================================================================
+     * The owner asked why the data hall still showed 15.2 C supply air after
+     * 25.4 C was adopted. Both numbers were real, and that was the defect:
+     * 25.4 C was applied at the RACK INLET plane while the supply plane was
+     * still computed as `chws_c + 8.0` from a 7.2 / 14.8 C chilled-water
+     * design belonging to the RETIRED 1.85 MW basis. A 15.2 C supply air
+     * reaching a 25.4 C inlet implies ~10 K of bypass/recirculation, which
+     * contradicts the containment the same page asserts (return-path mixing
+     * adjustment = 0 K). Two sourced values, mutually inconsistent.
+     *
+     * The four-hall study is the LIVE basis and its rack-inlet target is
+     * adopted, so the chilled-water design is re-derived from it instead of
+     * being carried over:
+     *
+     *   rack inlet target        25.4 C   ADOPTED  (study cooling.rackInletTargetC)
+     *   supply-path mixing       0.0 K    ADOPTED  (same containment assumption
+     *                                     the return path already uses; applying
+     *                                     it in one direction only was the bug)
+     *   CRAH supply (discharge)  = inlet - mixing            = 25.4 C   DERIVED
+     *   CHW coil approach        6.0 K    ASSUMED  (sensible-duty CHW coil; no
+     *                                     vendor coil selection has been made)
+     *   CHWS                     = supply - approach         = 19.4 C   DERIVED
+     *   CHW delta-T              7.6 K    ADOPTED  (unchanged from the previous
+     *                                     basis, so plant flow and duty keep
+     *                                     their existing arithmetic)
+     *   CHWR                     = CHWS + delta-T            = 27.0 C   DERIVED
+     *
+     * evidenceClass: ASSUMED for the coil approach and therefore for CHWS/CHWR.
+     * This is a warm-water plant design decision that is pending Basis-of-Design
+     * confirmation; it is NOT a measured or vendor-approved value. What it is
+     * NOT any more is an orphaned constant: every plane below is reachable from
+     * the adopted inlet target, so a change to that target moves the whole chain.
+     */
+    var RACK_INLET_TARGET_C = 25.4;      // study cooling.rackInletTargetC — ADOPTED
+    var SUPPLY_PATH_MIXING_K = 0.0;      // contained cold aisle — ADOPTED
+    var CHW_COIL_APPROACH_K = 6.0;       // ASSUMED — pending coil selection
+    var CHW_DELTA_T_K = 7.6;             // ADOPTED — carried from the prior basis
+    var CRAH_SUPPLY_AIR_C = RACK_INLET_TARGET_C - SUPPLY_PATH_MIXING_K;
+    var CHWS_C = CRAH_SUPPLY_AIR_C - CHW_COIL_APPROACH_K;
+    var CHWR_C = CHWS_C + CHW_DELTA_T_K;
+
     function findScenario(id) {
         for (var i = 0; i < SCENARIOS.length; i++) {
             if (SCENARIOS[i].id === id) return SCENARIOS[i];
@@ -433,10 +476,18 @@
             avg_rh_pct: 48
         },
         cooling: {
-            // source: 09-engineering-basis-and-calculations.md line 15
-            //         ("CHW supply/return 7.2 / 14.8 C") — see CHW basis decision above
-            chws_c: 7.2,
-            chwr_c: 14.8,
+            /* v2.1.0 — DERIVED from the adopted rack-inlet target; see the THERMAL
+             * CHAIN block above for the full derivation and evidence classes. The
+             * previous 7.2 / 14.8 C pair came from 09-engineering-basis-and-
+             * calculations.md line 15, which documents the RETIRED 1.85 MW basis.
+             * Its delta-T (7.6 K) is retained, so plant flow and duty arithmetic
+             * are unchanged — only the temperature level moves. */
+            rack_inlet_target_c: RACK_INLET_TARGET_C,
+            supply_path_mixing_k: SUPPLY_PATH_MIXING_K,
+            crah_supply_air_c: CRAH_SUPPLY_AIR_C,
+            chw_coil_approach_k: CHW_COIL_APPROACH_K,
+            chws_c: CHWS_C,
+            chwr_c: CHWR_C,
             /* Chiller unit capacity — ASSUMED (project design decision pending
              * Basis-of-Design confirmation). 5,000 kW_th (~1,422 RT) water-cooled
              * centrifugal. chillers_running / chillers_total are DERIVED from this
@@ -608,6 +659,14 @@
                 metering_tolerance_pct: m.electrical.metering_tolerance_pct
             },
             cooling: {
+                /* The whole air-to-water chain is published, not just the water
+                   end, so a page can render any plane without re-deriving one
+                   from another with a private constant (that is how the 15.2 C
+                   supply air became an orphan). */
+                rack_inlet_target_c: m.cooling.rack_inlet_target_c,
+                supply_path_mixing_k: m.cooling.supply_path_mixing_k,
+                crah_supply_air_c: m.cooling.crah_supply_air_c,
+                chw_coil_approach_k: m.cooling.chw_coil_approach_k,
                 chws_c: m.cooling.chws_c,
                 chwr_c: m.cooling.chwr_c,
                 chw_delta_t: round2(dT),

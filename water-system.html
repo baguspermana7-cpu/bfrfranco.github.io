@@ -739,7 +739,10 @@
                     Total treatment <b id="iWhyTot">45.0</b> L/min &minus; domestic
                     <b id="iWhyDom">8.0</b> L/min = WUE-included makeup
                     <b id="iWhyMk">37.0</b> L/min &rarr; reconciles dashboard
-                    WUE <b>1.20</b> vs all-flow <b id="iWhyAll">1.46</b> L/kWh.
+                    <!-- v1.134.0 — this one figure was a bare <b> while its three siblings
+                         above and the all-flow value beside it are engine-bound, so a change
+                         to the engine WUE left this sentence contradicting itself. Hooked. -->
+                    WUE <b id="iWhyWue">&mdash;</b> vs all-flow <b id="iWhyAll">1.46</b> L/kWh.
                 </div>
             </div>
 
@@ -819,10 +822,15 @@
             var COC = 4;                       // cycles of concentration (typical)
             var DOMESTIC_LPM = 8.0;            // WUE-excluded domestic/process (doc-13 line 357)
 
-            var itLoadKw    = S ? S.site.it_load_kw : 1850;
-            var wueEngine   = S ? S.environment.wue_l_per_kwh : 1.20;
-            var makeupLpm   = S ? S.water.flow_lpm_for_wue : 37.0;   // computed numerator
-            var heatRejKw   = S ? S.cooling.heat_rejection_kw : 1927.1;
+            /* v1.134.0 — every fallback here was a plausible literal from the retired
+               1.85 MW basis (1850 / 1.20 / 37.0 / 1927.1). A dead engine binding therefore
+               rendered a complete, correct-looking water balance: the exact defect class
+               repaired site-wide in v1.132.0. Fallbacks are null now, and the renderer
+               prints the unavailable marker for null, so a missing engine is visible. */
+            var itLoadKw    = S ? S.site.it_load_kw : null;
+            var wueEngine   = S ? S.environment.wue_l_per_kwh : null;
+            var makeupLpm   = S ? S.water.flow_lpm_for_wue : null;   // computed numerator
+            var heatRejKw   = S ? S.cooling.heat_rejection_kw : null;
 
             var driftLpm    = 0.005 * makeupLpm;
             var evapPlusBd  = makeupLpm - driftLpm;
@@ -847,10 +855,14 @@
             var filterDp = 0.40, tds = 140, cl2 = 0.85, cl2Res = 0.6, uvInt = 99.8;
             var pumpKw = 7.5;
 
-            function f1(n) { return (Math.round(n * 10) / 10).toFixed(1); }
-            function f2(n) { return (Math.round(n * 100) / 100).toFixed(2); }
+            /* v1.134.0 — null propagates to the unavailable marker instead of NaN or 0.
+               A rendered 0 on a water balance reads as "no consumption", which is a
+               stronger and more wrong claim than "we do not know". */
+            function ok(n) { return typeof n === 'number' && isFinite(n); }
+            function f1(n) { return ok(n) ? (Math.round(n * 10) / 10).toFixed(1) : '\u2014'; }
+            function f2(n) { return ok(n) ? (Math.round(n * 100) / 100).toFixed(2) : '\u2014'; }
             function set(id, v) { var e = document.getElementById(id); if (e) e.textContent = v; }
-            function nfmt(n) { return Math.round(n).toLocaleString('en-US'); }
+            function nfmt(n) { return ok(n) ? Math.round(n).toLocaleString('en-US') : '\u2014'; }
 
             var HALL_VIEWS = ['A', 'B', 'C', 'D'];
             function selectHallView(hall) {
@@ -961,6 +973,7 @@
                 set('iWhyDom', f1(DOMESTIC_LPM));
                 set('iWhyMk', f1(makeupLpm));
                 set('iWhyAll', f2(wueAllFlow));
+                set('iWhyWue', f2(wueEngine));
                 set('alloc-treatment', f1(totalLpm) + ' L/min');
                 set('alloc-makeup', f1(makeupLpm) + ' L/min');
                 set('alloc-domestic', f1(DOMESTIC_LPM) + ' L/min');

@@ -114,12 +114,20 @@ try {
   assert.ok(perturbedEngine !== engineSource, 'perturbation must actually modify the engine source');
 
   const pue = snapshot.site.pue;
+  const hallCount = CALC.listHalls().length;
   const expectIt = (PERTURBED_IT_KW / 1000).toFixed(2);
   const expectFacility = ((PERTURBED_IT_KW * pue) / 1000).toFixed(2);
+  /* SCOPE — v1.134.0. EPMS is a CAMPUS single-line, so its strips follow the campus roll-up.
+     datahall.html draws ONE hall, so its rack load follows the HALL, i.e. campus / hall count.
+     Asserting the campus figure there is what let a 30 MW load render on a 500-cabinet floor
+     plan while this gate stayed green: the number followed the engine, but the page had taken
+     the wrong SCOPE. The criterion is corrected, not relaxed — both values are still required
+     to move with a perturbed engine, and neither may be a literal. */
+  const expectHallIt = (PERTURBED_IT_KW / hallCount / 1000).toFixed(2);
 
   const checks = [
     { page: 'EPMS_Telemetry.html', expected: { 'epms-it': expectIt, 'epms-fac': expectFacility } },
-    { page: 'datahall.html', expected: { 'dh-rack-load': expectIt } },
+    { page: 'datahall.html', expected: { 'dh-rack-load': expectHallIt } },
   ];
 
   for (const { page, expected } of checks) {
@@ -168,10 +176,11 @@ try {
     shown: document.getElementById('dh-pd')?.textContent.trim() ?? null,
     racks: window.RZ_DATAHALL_RACKS ?? null,
   }));
-  assert.ok(typeof density.racks === 'number' && density.racks > 0, 'datahall must export its authored rack count');
+  assert.ok(typeof density.racks === 'number' && density.racks > 0, 'datahall must export its hall rack count');
   assert.equal(
-    density.shown, (PERTURBED_IT_KW / density.racks).toFixed(1),
-    'datahall power density must derive from engine kW / exported rack count',
+    density.shown, (PERTURBED_IT_KW / hallCount / density.racks).toFixed(1),
+    'datahall power density must derive from HALL kW / that hall\'s rack count — mixing a campus '
+    + 'numerator with a hall denominator is the defect this line now guards against',
   );
   await tab.close();
 

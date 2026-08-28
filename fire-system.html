@@ -366,7 +366,10 @@
         <span class="as-item"><span class="as-dot" id="as-dot-crit"></span>Critical <b id="as-crit">0</b></span>
         <span class="as-item"><span class="as-dot" id="as-dot-sup"></span>Supervisory <b id="as-sup">0</b></span>
         <span class="as-item"><span class="as-dot" id="as-dot-trbl"></span>Trouble <b id="as-trbl">0</b></span>
-        <span class="as-item">Disabled Pts <b id="as-disabled">0</b></span>
+        <!-- v2.0.1 DEAD-BINDING FIX: "0" was a hooked literal nothing ever assigned — the page holds no
+             point-disablement/isolation register, so a rendered "0 disabled points" was an unearned all-clear
+             on a fire panel. Rendered as the unavailable marker by bindBasis() until a real source exists. -->
+        <span class="as-item">Disabled Pts <b id="as-disabled">—</b></span>
         <span class="as-item">Tank <b id="as-tank">92% / 105 m³</b></span>
         <span class="as-item">Static <b id="as-press">12.5 bar</b></span>
         <span class="as-item">Quality <b id="as-quality">GOOD</b></span>
@@ -579,10 +582,17 @@
             <div class="grid grid-cols-1 gap-2" id="pump-cards"></div>
             <div class="mt-3" style="border-top:1px solid var(--panel-line); padding-top:8px;">
                 <div class="metric-row"><span class="metric-label">Static pressure (actual)</span><span class="metric-val" id="m-static">12.5 bar</span></div>
-                <div class="metric-row"><span class="metric-label">Jockey start / stop</span><span class="metric-val">11.5 / 12.8 bar</span></div>
-                <div class="metric-row"><span class="metric-label">FP-01 start / FP-02 start</span><span class="metric-val">10.5 / 9.5 bar</span></div>
-                <div class="metric-row"><span class="metric-label">Low-pressure alarm</span><span class="metric-val">8.5 bar</span></div>
-                <div class="metric-row"><span class="metric-label">Controller power / supervisory</span><span class="metric-val" id="m-ctrl-pwr">Healthy</span></div>
+                <!-- v2.0.1 DEAD-BINDING FIX: these three rows were hand-typed copies of P_JOCKEY_ON/OFF,
+                     P_FP1_ON/P_FP2_ON and P_LOW_ALM. The simulation acts on the constants, so a change to a
+                     setpoint silently left the panel lying. Now rendered from the same constants in
+                     bindBasis() — the displayed setpoint and the acted-on setpoint cannot diverge. -->
+                <div class="metric-row"><span class="metric-label">Jockey start / stop</span><span class="metric-val" id="m-sp-jockey">— bar</span></div>
+                <div class="metric-row"><span class="metric-label">FP-01 start / FP-02 start</span><span class="metric-val" id="m-sp-fp">— bar</span></div>
+                <div class="metric-row"><span class="metric-label">Low-pressure alarm</span><span class="metric-val" id="m-sp-lowalm">— bar</span></div>
+                <!-- v2.0.1 DEAD-BINDING FIX: "Healthy" was a hooked literal nothing ever assigned. The page
+                     models no controller-power/supervisory input, and a comforting default on a fire panel is
+                     the worst possible failure mode — render the unavailable marker instead (set in bindBasis). -->
+                <div class="metric-row"><span class="metric-label">Controller power / supervisory</span><span class="metric-val" id="m-ctrl-pwr">—</span></div>
             </div>
         </div>
 
@@ -988,6 +998,17 @@
             }
             $('m-hall-vol').textContent = HALL_VOL_M3.toLocaleString() + ' m³';
             $('m-zones').textContent = ZONE_COUNT + ' zones · all Normal';
+            /* Pump setpoints render from the SAME constants the pressure state machine
+               acts on (see jSt / fire-pump staging below), so the panel cannot display a
+               setpoint the simulation is not using. */
+            $('m-sp-jockey').textContent = P_JOCKEY_ON.toFixed(1) + ' / ' + P_JOCKEY_OFF.toFixed(1) + ' bar';
+            $('m-sp-fp').textContent     = P_FP1_ON.toFixed(1) + ' / ' + P_FP2_ON.toFixed(1) + ' bar';
+            $('m-sp-lowalm').textContent = P_LOW_ALM.toFixed(1) + ' bar';
+            /* No point-disablement register and no controller-power input exist in this
+               basis. Both stay at the unavailable marker with an explicit reason rather
+               than reading as an all-clear — on a fire panel that distinction matters. */
+            $('as-disabled').title  = 'UNAVAILABLE — no point-disablement register in the current basis';
+            $('m-ctrl-pwr').title   = 'UNAVAILABLE — controller power / supervisory input is not modelled in the current basis';
         }
 
         /* ====================== Simulation control ======================

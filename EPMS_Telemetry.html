@@ -436,13 +436,20 @@
     <span style="color:#94a3b8;">Facility Load <b id="epms-fac" style="color:#fff;">2.68</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
     <span style="color:#94a3b8;">IT Load <b id="epms-it" style="color:#fff;">1.85</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
     <span style="color:#94a3b8;">PUE <b id="epms-pue" style="color:#fff;">1.45</b></span>
-    <span style="color:#94a3b8;">Utility <b style="color:#22c55e;">OK</b></span>
-    <span style="color:#94a3b8;">UPS A/B <b style="color:#22c55e;">Online</b></span>
-    <span style="color:#94a3b8;">Gen <b style="color:#94a3b8;">Standby</b></span>
-    <span style="color:#94a3b8;">Trips <b style="color:#22c55e;">0</b></span>
+    <!-- v1.132.1 STATIC-CLAIM REPAIR — these six cells were hardcoded words ("OK" / "Online" / "Standby" /
+         "0" / "GOOD" / "Simulated") sitting beside three engine-bound numbers. They asserted a healthy plant
+         no matter what the simulation was actually doing: trip every breaker and kill both utilities and the
+         strip still read "Utility OK / UPS A/B Online / Trips 0". Each now renders from a real source —
+         breaker + energisation state in SIM for utility/UPS/gen/trips, snapshot.meta for data quality and
+         scenario — and renders "—" (grey) when that source is missing, never a comforting default.
+         Written by updateEpmsStatusStrip(); initial markup is deliberately "—", not a plausible value. -->
+    <span style="color:#94a3b8;">Utility <b id="epms-utility" style="color:#94a3b8;" title="Awaiting simulation state">—</b></span>
+    <span style="color:#94a3b8;">UPS A/B <b id="epms-ups" style="color:#94a3b8;" title="Awaiting simulation state">—</b></span>
+    <span style="color:#94a3b8;">Gen <b id="epms-gen" style="color:#94a3b8;" title="Awaiting simulation state">—</b></span>
+    <span style="color:#94a3b8;">Breakers <b id="epms-trips" style="color:#94a3b8;" title="Awaiting simulation state">—</b></span>
     <span style="flex:1"></span>
-    <span style="color:#94a3b8;font-size:11px;">Data <b style="color:#22c55e;">GOOD</b></span>
-    <span style="color:#94a3b8;font-size:11px;">Scenario <b style="color:#22d3ee;">Simulated</b></span>
+    <span style="color:#94a3b8;font-size:11px;">Data <b id="epms-dq" style="color:#94a3b8;" title="Awaiting engine snapshot">—</b></span>
+    <span style="color:#94a3b8;font-size:11px;">Scenario <b id="epms-scn" style="color:#94a3b8;" title="Awaiting engine snapshot">—</b></span>
 </div>
 
 <!-- v1.24.0 doc-14 §2: Visible legend for line/breaker state (operator-facing, no doc lookup needed). -->
@@ -595,16 +602,21 @@
                 <div class="status-value" id="val-total-load">0 kW</div>
             </div>
         </div>
+        <!-- v1.132.1 RULE-2 REPAIR — Power Factor and Frequency were random walks
+             (0.92 + Math.random()*0.03 / 50.0 + (Math.random()-0.5)*0.1) refreshed every second, i.e.
+             invented electrical telemetry. conv-engine.js publishes NO power-factor and NO frequency:
+             there is nothing to bind to and nothing legitimate to substitute, so both read "—" (grey =
+             source missing, per the ACCURACY_VALIDATION colour grammar). No JS writes these cells. -->
         <div class="status-box">
             <div>
                 <div class="status-label">Power Factor</div>
-                <div class="status-value" id="val-pf">0.92</div>
+                <div class="status-value" id="val-pf" style="color:#94a3b8;" title="UNAVAILABLE — not metered in the current basis">—</div>
             </div>
         </div>
         <div class="status-box">
             <div>
                 <div class="status-label">Frequency</div>
-                <div class="status-value" id="val-freq">50.0 Hz</div>
+                <div class="status-value" id="val-freq" style="color:#94a3b8;" title="UNAVAILABLE — not metered in the current basis">—</div>
             </div>
         </div>
         <div class="status-box">
@@ -1325,6 +1337,58 @@ window.addEventListener('resize', () => {
 // =============================================
 // STATUS BAR UPDATES
 // =============================================
+/* v1.134.0 — the header strip's six right-hand cells were hardcoded words sitting beside
+   three engine-bound numbers, so they asserted a healthy plant regardless of what the
+   simulation was doing: open every breaker and kill both utilities and it still read
+   "Utility OK / UPS A/B Online / Trips 0". Each cell now derives from a real source, and
+   anything without one renders the unavailable marker instead of a comforting default. */
+function updateEpmsStatusStrip(snapshot) {
+    function put(id, text, colour, why) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = text;
+        el.style.color = colour;
+        if (why) el.title = why; else el.removeAttribute('title');
+    }
+    var OK = '#22c55e', WARN = '#f59e0b', DIM = '#94a3b8', CYAN = '#22d3ee';
+
+    var utilA = !!SIM.sources.A, utilB = !!SIM.sources.B;
+    if (utilA && utilB)       put('epms-utility', 'A+B', OK, 'Both utility sources energised');
+    else if (utilA || utilB)  put('epms-utility', utilA ? 'A only' : 'B only', WARN, 'One utility source lost');
+    else                      put('epms-utility', 'LOST', '#ef4444', 'No utility source energised');
+
+    /* UPS availability is read from the same energisation map the single-line draws from,
+       so the words cannot disagree with the picture directly above them. */
+    var upsA = !!SIM.energizedNodes['UPS_A'], upsB = !!SIM.energizedNodes['UPS_B'];
+    if (upsA && upsB)         put('epms-ups', 'Online', OK, 'Both UPS systems energised');
+    else if (upsA || upsB)    put('epms-ups', upsA ? 'A only' : 'B only', WARN, 'One UPS system not energised');
+    else                      put('epms-ups', 'Offline', '#ef4444', 'Neither UPS system is energised');
+
+    var genLive = !!SIM.energizedNodes['GEN_A'] || !!SIM.energizedNodes['GEN_B'] || !!SIM.energizedNodes['GEN_C'];
+    put('epms-gen', genLive ? 'Running' : 'Standby', genLive ? WARN : DIM,
+        genLive ? 'At least one generator is carrying load' : 'No generator energised');
+
+    /* This model has no protective-trip state: SIM.breakers only ever holds 'closed' or
+       'open', and an open breaker is an operator action, not a trip. Counting them as
+       trips would invent protection events; reporting 0 would be an unearned all-clear.
+       Report what IS known — how many breakers are open — and label it as that. */
+    var openCount = 0;
+    for (var bid in SIM.breakers) {
+        if (SIM.breakers[bid] !== 'closed') openCount++;
+    }
+    put('epms-trips', openCount + ' open', openCount > 0 ? WARN : OK,
+        'Protective trips are not modelled in this basis. Showing open breakers instead: '
+        + openCount + ' of ' + Object.keys(SIM.breakers).length);
+
+    if (snapshot && snapshot.meta) {
+        put('epms-dq', String(snapshot.meta.data_quality || '—'), OK, 'snapshot.meta.data_quality');
+        put('epms-scn', String(snapshot.meta.scenario || '—'), CYAN, 'snapshot.meta.scenario');
+    } else {
+        put('epms-dq', '—', DIM, 'UNAVAILABLE — engine snapshot not loaded');
+        put('epms-scn', '—', DIM, 'UNAVAILABLE — engine snapshot not loaded');
+    }
+}
+
 function updateStatusBar() {
     var closedCount = 0;
     var totalCount = 0;
@@ -1334,17 +1398,25 @@ function updateStatusBar() {
     }
     document.getElementById('val-breakers').textContent = closedCount + ' / ' + totalCount;
 
-    var totalLoad = 0;
-    if (SIM.sources.A || SIM.sources.B) {
-        totalLoad = 2400 + Math.floor(Math.random() * 100);
+    /* v1.134.0 RULE-2 REPAIR — "Total Load" was `2400 + Math.random()*100`, i.e. the
+       retired 1.85 MW basis wandering by the second, three inches below #epms-fac which
+       renders the engine's facility load. It is an EPMS total, so bind it to the engine's
+       own metered total. If no source is energised the site is dark and the total is 0;
+       if the engine is absent the cell says so rather than inventing a number.
+       Power factor and frequency are NOT published by conv-engine.js and are not metered
+       in this basis — their random walks are deleted, and the markup renders "—" with a
+       reason. Nothing writes those two cells on purpose. */
+    var epmsSnap = (window.CONV_CALC && window.CONV_CALC.snapshot) ? window.CONV_CALC.snapshot : null;
+    var totalLoadEl = document.getElementById('val-total-load');
+    if (!SIM.sources.A && !SIM.sources.B) {
+        totalLoadEl.textContent = '0 kW';
+    } else if (epmsSnap && epmsSnap.electrical && epmsSnap.electrical.epms_total_kw != null) {
+        totalLoadEl.textContent = Math.round(epmsSnap.electrical.epms_total_kw).toLocaleString() + ' kW';
+    } else {
+        totalLoadEl.textContent = '\u2014';
+        totalLoadEl.title = 'UNAVAILABLE \u2014 engine snapshot not loaded';
     }
-    document.getElementById('val-total-load').textContent = totalLoad.toLocaleString() + ' kW';
-
-    var pf = (0.92 + Math.random() * 0.03).toFixed(2);
-    document.getElementById('val-pf').textContent = pf;
-
-    var freq = (50.0 + (Math.random() - 0.5) * 0.1).toFixed(1);
-    document.getElementById('val-freq').textContent = freq + ' Hz';
+    updateEpmsStatusStrip(epmsSnap);
 
     var sysBox = document.getElementById('box-system');
     var sysLed = document.getElementById('ind-system');

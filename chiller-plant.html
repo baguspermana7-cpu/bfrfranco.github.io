@@ -588,7 +588,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
     <div class="as-state" id="asState"><span class="as-dot" id="asDot"></span><span id="asLevel">NORMAL</span></div>
     <div class="as-seg" id="asCounts">0 Critical • 0 Warning</div>
     <div class="as-seg" id="asRedund">Loops 4/4 • N+1</div>
-    <div class="as-seg" id="asChw">CHWS 7.2°C • CHWR 14.8°C • ΔT 7.6 • 58 L/s</div>
+    <div class="as-seg" id="asChw">CHWS &mdash; • CHWR &mdash; • &Delta;T &mdash; • &mdash; L/s</div>
     <div class="as-seg" id="asLoad">Cooling Demand 1.93 MW</div>
     <div class="as-seg as-meta" id="asMeta">Scenario: Simulated • Updated 0s</div>
   </div>
@@ -619,8 +619,8 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
   <div class="stage">
     <section tabindex="0" class="pid-panel">
       <div class="legend">
-        <span class="chws">Primary CHWS 7.2°C</span>
-        <span class="chwr">Primary CHWR 14.8°C</span>
+        <span class="chws" id="lgChws">Primary CHWS &mdash;</span>
+        <span class="chwr" id="lgChwr">Primary CHWR &mdash;</span>
         <span class="sec">Secondary / Condenser loop</span>
         <span class="run">Run</span>
         <span>Standby</span>
@@ -660,8 +660,8 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
 
         <div class="card">
           <h4>Primary CHW Header <span style="float:right;font-weight:400;color:#7f93ab">engine-bound</span></h4>
-          <div class="kv"><div class="k">CHWS</div><div class="v" id="kChws">7.2 C</div></div>
-          <div class="kv"><div class="k">CHWR</div><div class="v" id="kChwr">14.8 C</div></div>
+          <div class="kv"><div class="k">CHWS</div><div class="v" id="kChws">&mdash;</div></div>
+          <div class="kv"><div class="k">CHWR</div><div class="v" id="kChwr">&mdash;</div></div>
           <div class="kv"><div class="k">ΔT</div><div class="v" id="kDt">7.6 C</div></div>
           <div class="kv" title="Design flow basis: IT load 1,850 kW (canonical doc-09 substitution). Engine: 1,850 / (4.186 × 7.6) = 58.1 L/s."><div class="k">CHW Flow</div><div class="v" id="kFlow">58.2 L/s</div></div>
           <div class="kv"><div class="k">Cooling Demand</div><div class="v" id="kCool">1.93 MW</div></div>
@@ -669,14 +669,18 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
         </div>
 
         <!-- v1.32.2 (CONV-ACC-03) — Design vs sanity flow reconciliation: doc-09
-             uses IT load (1,850 kW) for canonical 58.1 L/s; a heat-rejection
-             sanity (IT + UPS loss = 1,927 kW) gives 60.6 L/s. Surface the
-             4.1 % gap so it does not read as a hidden mismatch. -->
+             uses IT load for the canonical flow; a heat-rejection sanity
+             (IT + UPS loss) gives a slightly larger one. Surface the gap so it
+             does not read as a hidden mismatch.
+             v1.134.0 — all three cells were STATIC markup carrying the retired
+             1.85 MW basis (58.2 / 60.6 L/s / +4.1 %). Nothing ever assigned them,
+             so the card sat beside an engine-bound header showing ~943 L/s and was
+             wrong by 16x. They are computed from the engine now. -->
         <div class="card">
           <h4>CHW Flow Reconciliation <span style="float:right;font-weight:400;color:#7f93ab">engine</span></h4>
-          <div class="kv" title="Engine basis flow uses IT load (canonical doc-09)"><div class="k">Design (IT load)</div><div class="v" id="kFlowIt">58.2 L/s</div></div>
-          <div class="kv" title="Sanity check using full heat-rejection (IT + UPS loss)"><div class="k">Sanity (heat rej)</div><div class="v" id="kFlowHr">60.6 L/s</div></div>
-          <div class="kv" title="Gap absorbed by pump sizing margin"><div class="k">Δ (sanity − design)</div><div class="v" id="kFlowGap">+4.1 %</div></div>
+          <div class="kv" title="Engine basis flow uses IT load (canonical doc-09)"><div class="k">Design (IT load)</div><div class="v" id="kFlowIt">&mdash;</div></div>
+          <div class="kv" title="Sanity check using full heat-rejection (IT + UPS loss)"><div class="k">Sanity (heat rej)</div><div class="v" id="kFlowHr">&mdash;</div></div>
+          <div class="kv" title="Gap absorbed by pump sizing margin"><div class="k">Δ (sanity − design)</div><div class="v" id="kFlowGap">&mdash;</div></div>
           <div class="meta">Pumps sized to the larger flow; chiller-plant ΔT setpoint references the design value.</div>
         </div>
 
@@ -700,8 +704,8 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
               </select>
             </div>
             <div class="field">
-              <label title="Secondary load-loop supply setpoint (CRAH/AHU side, 18-23 °C band). NOT the primary CHWS, which is locked at 7.2 °C upstream of the chillers.">Secondary loop SP <span id="spChwsTxt">18.8C</span></label>
-              <input id="spChws" type="range" min="16" max="22" step="0.1" value="18.8" aria-label="Sp Chws" />
+              <label title="Secondary load-loop supply setpoint (CRAH/AHU side). It cannot go below the primary CHWS — a decoupled secondary loop has no cooling source of its own, so its floor is the primary header temperature and raising it adds decoupler bypass.">Secondary loop SP <span id="spChwsTxt">&mdash;</span></label>
+              <input id="spChws" type="range" step="0.1" aria-label="Secondary loop supply setpoint" />
             </div>
             <div class="field">
               <label>DP SP <span id="spDpTxt">90 kPa</span></label>
@@ -800,7 +804,11 @@ function selectHallView(hall){
 /* --- Canonical CHW basis from the single scenario engine ---------------------
  * window.CONV_CALC.snapshot is the single source of truth (js/conv-engine.js).
  * The PRIMARY chilled-water header that feeds the building / AHU load is the
- * canonical CHW loop: CHWS 7.2 °C, CHWR 14.8 °C, ΔT 7.6, flow ≈58 L/s. These
+ * canonical CHW loop. v1.134.0: the temperature level is re-derived backwards
+ * from the adopted 25.4 °C rack-inlet target (CHWS 19.4 / CHWR 27.0 °C, ΔT 7.6,
+ * flow ≈943 L/s at the four-hall campus load). The retired 7.2 / 14.8 °C pair
+ * belonged to the 1.85 MW basis; see the THERMAL CHAIN block in conv-engine.js.
+ * ΔT is unchanged, so this loop's flow and duty arithmetic are unchanged. These
  * are bound directly to the engine and are DETERMINISTIC (stable on reload —
  * no Math.random touches engine-derived engineering values). The per-chiller
  * water circuits shown in the P&ID are the SECONDARY / CONDENSER side of the
@@ -815,16 +823,20 @@ function chwBasis(){
   var s = engineSnap();
   if(s && s.cooling){
     return {
-      chws: s.cooling.chws_c,                 // 7.2
-      chwr: s.cooling.chwr_c,                 // 14.8
-      dt: s.cooling.chw_delta_t,              // 7.6
-      flow: r1(s.cooling.flow_lps),           // ≈58.2 L/s
-      coolingKw: s.cooling.heat_rejection_kw, // ≈1927 kW (IT + UPS loss)
+      chws: s.cooling.chws_c,                 // derived from the rack-inlet target
+      chwr: s.cooling.chwr_c,                 // CHWS + ΔT
+      dt: s.cooling.chw_delta_t,              // 7.6 K
+      flow: r1(s.cooling.flow_lps),           // L/s at the campus cooling load
+      coolingKw: s.cooling.heat_rejection_kw, // kW (IT + UPS loss)
+      itKw: (s.site && s.site.it_load_kw != null) ? s.site.it_load_kw : null,
       scenario: (s.meta && s.meta.scenario) || "Simulated"
     };
   }
-  // Defensive fallback only if engine failed to load — keep basis self-consistent.
-  return { chws:7.2, chwr:14.8, dt:7.6, flow:58.2, coolingKw:1927.1, scenario:"Simulated" };
+  /* v1.134.0 — the fallback used to return the retired 7.2 / 14.8 / 58.2 basis.
+   * That is the exact failure mode repaired across these cockpits in v1.132.0:
+   * a plausible constant standing in for a dead binding renders a page that
+   * looks correct and is not. If the engine is missing, say so. */
+  return { chws:null, chwr:null, dt:null, flow:null, coolingKw:null, itKw:null, scenario:"UNAVAILABLE — engine not loaded" };
 }
 const CHW = chwBasis();
 
@@ -845,7 +857,15 @@ const CHW = chwBasis();
 })();
 
 const st = {
-  sp:{ chws:18.8, dp:90, flow:18.0 },
+  /* v1.134.0 — the secondary load-loop setpoint was authored at 18.8 °C with a
+     16-22 °C slider. Once the primary CHWS was re-derived to 19.4 °C that became
+     physically impossible: in a decoupled primary/secondary arrangement the
+     secondary supply can never be COLDER than the primary header — there is no
+     source of cooling between them. Derive it from the primary instead. At the
+     design point the decoupler carries no bypass, so secondary supply = CHWS;
+     the operator may raise it (warmer secondary = more bypass, more economiser
+     hours) up to +4 K. */
+  sp:{ chws:(CHW.chws != null ? CHW.chws : null), dp:90, flow:18.0 },
   // header = PRIMARY chilled-water loop (engine-bound, deterministic).
   header:{ chws:CHW.chws, chwr:CHW.chwr, flow:CHW.flow, dp:86, dt:CHW.dt, coolingKw:CHW.coolingKw },
   // loops = SECONDARY / CONDENSER-side circuits of the 4 air-cooled chillers
@@ -1485,9 +1505,23 @@ function drawPid(){
 function renderKpi(){
   // Primary CHW header — engine-true (deterministic, stable on reload).
   $("kChws").textContent = `${conv.t(st.header.chws,ui.unit)} ${conv.tu(ui.unit)}`;
+  /* v1.134.0 — the P&ID legend used to carry "Primary CHWS 7.2°C" / "CHWR 14.8°C"
+     as static markup that nothing ever overwrote, so the drawing kept showing the
+     retired basis while the panels beside it showed the live one. Bind them. */
+  $("lgChws").textContent = `Primary CHWS ${conv.t(st.header.chws,ui.unit)}${conv.tu(ui.unit)}`;
+  $("lgChwr").textContent = `Primary CHWR ${conv.t(st.header.chwr,ui.unit)}${conv.tu(ui.unit)}`;
   $("kChwr").textContent = `${conv.t(st.header.chwr,ui.unit)} ${conv.tu(ui.unit)}`;
   $("kDt").textContent = `${ui.unit==="ip"?r1(st.header.dt*9/5):r1(st.header.dt)} ${conv.tu(ui.unit)}`;
   $("kFlow").textContent = `${conv.f(st.header.flow,ui.unit)} ${conv.fu(ui.unit)}`;
+  /* CHW Flow Reconciliation — both flows and their gap derive from the same engine
+     basis as the header above, so the card can never state a different plant.
+     design flow  = IT load        / (4.186 * dT)
+     sanity flow  = heat rejection / (4.186 * dT)   (IT + UPS loss)  */
+  const flowIt = (CHW.itKw != null && CHW.dt) ? (CHW.itKw / (4.186 * CHW.dt)) : null;
+  const flowHr = (CHW.coolingKw != null && CHW.dt) ? (CHW.coolingKw / (4.186 * CHW.dt)) : null;
+  $("kFlowIt").textContent  = flowIt != null ? `${conv.f(r1(flowIt),ui.unit)} ${conv.fu(ui.unit)}` : "—";
+  $("kFlowHr").textContent  = flowHr != null ? `${conv.f(r1(flowHr),ui.unit)} ${conv.fu(ui.unit)}` : "—";
+  $("kFlowGap").textContent = (flowIt && flowHr) ? `${(((flowHr/flowIt)-1)*100).toFixed(1)} %` : "—";
   $("kCool").textContent = `${r1(st.header.coolingKw/1000)} MW`;
   $("kDp").textContent = `${conv.p(st.header.dp,ui.unit)} ${conv.pu(ui.unit)}`;
 
@@ -1766,11 +1800,24 @@ function applyScenario(v){
   ui.scenario = v;
   $("scLbl").textContent = v === "custom" ? "Custom" : (v === "balanced" ? "Balanced" : (v === "high" ? "High Load" : "Degraded"));
   if(v === "balanced"){
-    st.sp.chws = 18.8; st.sp.dp = 90; st.sp.flow = 18.0; ui.maint = true; ui.forced.clear();
+    st.sp.chws = (CHW.chws != null ? CHW.chws : null); st.sp.dp = 90; st.sp.flow = 18.0; ui.maint = true; ui.forced.clear();
   }else if(v === "high"){
-    st.sp.chws = 17.4; st.sp.dp = 112; st.sp.flow = 21.3; ui.maint = true; ui.forced.clear();
+    /* High load: operator holds the secondary at the primary header (no bypass)
+       to maximise coil capacity. Authored 17.4 C was below the primary. */
+    st.sp.chws = (CHW.chws != null ? CHW.chws : null); st.sp.dp = 112; st.sp.flow = 21.3; ui.maint = true; ui.forced.clear();
   }else if(v === "degraded"){
-    st.sp.chws = 19.6; st.sp.dp = 120; st.sp.flow = 14.5; ui.maint = false; ui.forced.clear(); ui.forced.add(2);
+    /* Degraded: reduced primary flow forces decoupler bypass, so the secondary
+       supply drifts ABOVE the header. Expressed as an offset, not a literal. */
+    st.sp.chws = (CHW.chws != null ? r1(CHW.chws + 1.2) : null); st.sp.dp = 120; st.sp.flow = 14.5; ui.maint = false; ui.forced.clear(); ui.forced.add(2);
+  }
+  /* v1.134.0 — the slider's min/max were authored 16-22 °C, a window that sat
+     BELOW the re-derived 19.4 °C primary CHWS. Bind the range to the primary so
+     an impossible setpoint cannot be dialled in: floor = primary CHWS (no
+     decoupler bypass), ceiling = +4 K (progressively more bypass). */
+  if (CHW.chws != null) {
+    $("spChws").min = r1(CHW.chws);
+    $("spChws").max = r1(CHW.chws + 4);
+    if (st.sp.chws == null || st.sp.chws < CHW.chws) st.sp.chws = CHW.chws;
   }
   $("spChws").value = st.sp.chws;
   $("spDp").value = st.sp.dp;

@@ -2,7 +2,21 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { extname, resolve, sep } from 'node:path';
+import vm from 'node:vm';
 import puppeteer from 'puppeteer';
+
+/* v1.134.0 — this file used to assert the literal '7.2' for CHWS. That pinned the page to
+   the RETIRED 1.85 MW chilled-water basis: when the thermal chain was re-derived backwards
+   from the adopted 25.4 °C rack-inlet target (CHWS 19.4 °C), a correct page failed a test
+   that had memorised a constant. Load the engine and assert the DOM matches IT, so the gate
+   proves binding instead of memorising a number — it can never again fail a correct change,
+   and it now catches a page that stops following the engine, which the literal could not. */
+const engineSandbox = { window: {}, module: { exports: {} }, console };
+vm.createContext(engineSandbox);
+vm.runInContext(await readFile('js/conv-engine.js', 'utf8'), engineSandbox);
+const ENGINE = engineSandbox.window.CONV_CALC;
+assert.ok(ENGINE && ENGINE.snapshot, 'conv-engine.js must expose CONV_CALC.snapshot');
+const ENGINE_CHWS_TXT = String(ENGINE.snapshot.cooling.chws_c);
 
 const ROOT = process.cwd();
 const MIME = Object.freeze({
@@ -111,7 +125,9 @@ const browser = await puppeteer.launch({
 
 try {
   const chiller = await openPage(browser, origin, 'chiller-plant.html');
-  await chiller.waitForFunction(() => document.getElementById('kChws')?.textContent.includes('7.2'));
+  await chiller.waitForFunction(
+    (want) => document.getElementById('kChws')?.textContent.includes(want),
+    { timeout: 30000 }, ENGINE_CHWS_TXT);
   await assertHallAndBasisContract(chiller, ['kChws', 'kFlow', 'kCool'], 'chillerHallLabel');
 
   await chiller.focus('[data-hall="C"]');

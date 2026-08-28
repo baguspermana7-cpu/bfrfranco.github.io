@@ -1075,7 +1075,13 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
             </div>
             <div class="kpi-card" data-basis="uptime" tabindex="0" role="button" aria-label="Uptime — click for basis" style="cursor:pointer">
                 <div class="kpi-label">Uptime</div>
-                <div class="kpi-value" style="color: var(--accent-green)">99.98</div>
+                <!-- DEFECT (fixed): un-hooked literal "99.98" — a plausible constant
+                     standing where a derived value belongs. CONV_CALC has NO downtime
+                     event log, so uptime YTD cannot be derived at all. Rendered as an
+                     explicit UNAVAILABLE dash; no JS writes it, so it cannot drift back
+                     into looking like a measurement. -->
+                <div class="kpi-value" style="color: var(--text-secondary)" id="kpiUptime"
+                     title="UNAVAILABLE — no source in the current basis">&mdash;</div>
                 <div class="kpi-unit">% YTD</div>
             </div>
             <div class="kpi-card" data-basis="temp" tabindex="0" role="button" aria-label="Temperature — click for basis" style="cursor:pointer">
@@ -1085,13 +1091,24 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
             </div>
             <div class="kpi-card" data-basis="chillers" tabindex="0" role="button" aria-label="Chillers — click for basis" style="cursor:pointer">
                 <div class="kpi-label">Chillers</div>
-                <div class="kpi-value" style="color: var(--accent-cyan)">2/3</div>
+                <!-- DEFECT (fixed): un-hooked literal "2/3" from the retired 1.85 MW
+                     basis, contradicting the engine (7/10) on the same screen. Now id'd
+                     and written from cooling.chillers_running / chillers_total in
+                     updateData(); the markup ships a dash, never a number, so a paint
+                     failure reads as unavailable instead of as stale telemetry. -->
+                <div class="kpi-value" style="color: var(--accent-cyan)" id="kpiChillers">&mdash;</div>
                 <div class="kpi-unit">Running</div>
             </div>
             <div class="kpi-card">
                 <div class="kpi-label">Alarms</div>
-                <div class="kpi-value" style="color: var(--accent-green)" id="kpiAlarms">0</div>
-                <div class="kpi-unit">Normal</div>
+                <!-- DEFECT (fixed): #kpiAlarms was a hooked literal "0" that nothing
+                     assigned — it read "Normal" even if the strip counted faults. Now
+                     painted from the SAME deterministic counts as #as-crit / #as-warn
+                     inside paintAlarmStrip(), so the card and the strip cannot disagree
+                     (one computation, two sinks). The unit text is bound too, otherwise
+                     a non-zero count would still be captioned "Normal". -->
+                <div class="kpi-value" style="color: var(--accent-green)" id="kpiAlarms">&mdash;</div>
+                <div class="kpi-unit" id="kpiAlarmsState">&mdash;</div>
             </div>
         </div>
 
@@ -1179,10 +1196,24 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
 
         <div class="stats-section">
             <div class="stats-title"><span class="dot" style="background: var(--accent-cyan)"></span> Cooling</div>
-            <div class="stat-row"><span class="stat-label">CH-1</span><span class="stat-value green">Run 85%</span></div>
-            <div class="stat-row"><span class="stat-label">CH-2</span><span class="stat-value green">Run 78%</span></div>
-            <div class="stat-row"><span class="stat-label">Chillers</span><span class="stat-value cyan">2 / 3</span></div>
-            <div class="stat-row"><span class="stat-label">CRAHs</span><span class="stat-value cyan">12 / 14</span></div>
+            <!-- DEFECT (fixed): "CH-1 Run 85%" / "CH-2 Run 78%" were two un-hooked
+                 literals naming units 1-2 of a 3-chiller plant that no longer exists
+                 (7 of 10 now run), and per-unit part-load has NO source in CONV_CALC at
+                 all. The one quantity the engine does publish is the plant aggregate, so
+                 the two invented per-unit rows are replaced by one derived row:
+                 heat_rejection_kw / (chillers_running x chiller_unit_kw_th). It cannot
+                 drift because every term is read from the snapshot. -->
+            <div class="stat-row" title="Plant-average chiller part load = cooling.heat_rejection_kw ÷ (chillers_running × chiller_unit_kw_th). Per-unit loading is not published by CONV_CALC, so no per-machine figure is shown.">
+                <span class="stat-label">Chiller load</span>
+                <span class="stat-value green" id="sChillerLoad">&mdash;</span>
+            </div>
+            <!-- DEFECT (fixed): un-hooked "2 / 3" from the retired basis. Engine-bound. -->
+            <div class="stat-row"><span class="stat-label">Chillers</span><span class="stat-value cyan" id="sChillers">&mdash;</span></div>
+            <!-- DEFECT (fixed): un-hooked "12 / 14". CONV_CALC models the CRAH plane only
+                 as an air-side temperature chain — it publishes no CRAH inventory or
+                 running count, so no count can be derived without inventing one. Row kept
+                 (operators expect the line) but rendered UNAVAILABLE; nothing writes it. -->
+            <div class="stat-row"><span class="stat-label">CRAHs</span><span class="stat-value" id="sCrahs" style="color:var(--text-secondary)" title="UNAVAILABLE — no source in the current basis">&mdash;</span></div>
             <div class="stat-row"><span class="stat-label">CHW Sup</span><span class="stat-value cyan" id="sChwSup">7.2°C</span></div>
             <div class="stat-row"><span class="stat-label">CHW Ret</span><span class="stat-value orange" id="sChwRet">14.8°C</span></div>
         </div>
@@ -1293,6 +1324,14 @@ function paintAlarmStrip(s) {
     }
     setVal('as-crit', crit, 'crit');
     setVal('as-warn', warn, 'warn');
+    /* v1.134.0 — the "Alarms" KPI card was a hooked literal "0" captioned "Normal" that
+       nothing ever assigned, so it could read all-clear while this same strip counted
+       faults. One computation, two sinks: the card is painted from the counts computed
+       right here, caption included. */
+    var kA = document.getElementById('kpiAlarms');
+    if (kA) kA.textContent = String(crit + warn);
+    var kAS = document.getElementById('kpiAlarmsState');
+    if (kAS) kAS.textContent = crit > 0 ? 'Critical' : (warn > 0 ? 'Warning' : 'Normal');
     setVal('as-maint', maint, 'maint');
     setVal('as-stale', stale, 'warn');
 
@@ -1340,8 +1379,11 @@ function updateData() {
 
     // Photo Callouts
     setText('cPue', pue);
-    setText('cWue', wue);
-    setText('cCarbon', carbon);
+    /* v1.134.0 — `setText('cWue')` / `setText('cCarbon')` targeted ids that do not exist
+       in the markup, so both were silent no-ops that read as live bindings. The callouts
+       are absolutely positioned over the site diagram and adding two more would collide;
+       WUE and grid factor are already rendered engine-bound in the stats panel as #sWue
+       and #sCue. Dead calls removed rather than given fake destinations. */
     setText('cIt', (itLoadKw / 1000).toFixed(2) + ' MW');
     setText('cChw', chwSup + '°C');
     setText('cTemp', temp + '°C');
@@ -1369,6 +1411,17 @@ function updateData() {
     setText('sTempAvg', temp + '°C');
     setText('sRhAvg', rh + '%');
     setText('sFuelMain', fuel + '%');
+
+    /* v1.134.0 — chiller cells. The markup carried "2/3" and per-unit "Run 85% / 78%"
+       from the retired 1.85 MW basis, contradicting the engine on the same screen. The
+       counts are engine-published; the plant-average part load is derived from published
+       terms. Per-UNIT loading is not published, so no per-machine figure is shown. */
+    var chRun = s.cooling.chillers_running, chTot = s.cooling.chillers_total;
+    setText('kpiChillers', chRun + '/' + chTot);
+    setText('sChillers', chRun + ' / ' + chTot);
+    var unitKw = s.cooling.chiller_unit_kw_th;
+    var partLoad = (chRun > 0 && unitKw > 0) ? (s.cooling.heat_rejection_kw / (chRun * unitKw)) * 100 : null;
+    setText('sChillerLoad', partLoad != null ? Math.round(partLoad) + '% avg' : '—');
 
     // Operator-first alarm strip — same snapshot, deterministic counts.
     paintAlarmStrip(s);
@@ -1525,7 +1578,10 @@ function buildTechSpecHtml(){
   var cue = s.environment.carbon_kg_per_facility_kwh;
   var chws = s.cooling.chws_c;
   var chwr = s.cooling.chwr_c;
-  var racks = (s.datahall&&s.datahall.racks_total)||200;
+  /* v1.134.0 — `s.datahall.racks_total` has never existed on the snapshot, so this
+     silently fell back to the literal 200 and then cited a provenance it did not have.
+     The campus rack count IS published: 4 halls x 500 = 2,000. */
+  var racks = (s.campus && s.campus.racks_total != null) ? s.campus.racks_total : null;
   var rackKW = (itKw/racks);
 
   var H='';
@@ -1575,7 +1631,7 @@ function buildTechSpecHtml(){
       ['Grid factor',cue.toFixed(2)+' kgCO₂/kWh facility','environment.carbon_kg_per_facility_kwh'],
       ['CUE_IT (ISO/IEC 30134-8)',(cue*pue).toFixed(2)+' kgCO₂/kWh IT','grid factor × PUE'],
       ['CHW supply / return',chws.toFixed(1)+' / '+chwr.toFixed(1)+' &deg;C','cooling.chws_c / chwr_c'],
-      ['Rack count (data hall)',grp(racks),'datahall.racks_total'],
+      ['Rack count (campus, 4 halls)',racks!=null?grp(racks):'unavailable','campus.racks_total'],
       ['Per-rack power',rackKW.toFixed(2)+' kW','it_load_kw &divide; racks_total']
     ])+
     '</section>';
@@ -1585,7 +1641,7 @@ function buildTechSpecHtml(){
     '<p>Conventional air-cooled topology with a chilled-water plant (CHW supply '+chws.toFixed(1)+' &deg;C / return '+chwr.toFixed(1)+' &deg;C, &Delta;T '+(chwr-chws).toFixed(1)+' &deg;C), 2N UPS, dual-fuel generators, and structured cable plant supporting '+grp(racks)+' racks at '+rackKW.toFixed(2)+' kW per rack average density. The basis is the LOCKED engine snapshot; per-section values are bound to that snapshot and update only when the engine is re-loaded.</p>'+
     TC('Facility envelope')+
     R([
-      ['Total racks (data hall)',grp(racks),'snapshot.datahall.racks_total'],
+      ['Total racks (campus, 4 halls)',racks!=null?grp(racks):'unavailable','snapshot.campus.racks_total'],
       ['Per-rack design power',rackKW.toFixed(2)+' kW','derived'],
       ['Hall average temperature',s.environment.avg_temp_c.toFixed(1)+' &deg;C','environment.avg_temp_c'],
       ['Hall average RH',Math.round(s.environment.avg_rh_pct)+' %','environment.avg_rh_pct'],

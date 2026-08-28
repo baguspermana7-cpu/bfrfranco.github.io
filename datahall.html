@@ -568,10 +568,10 @@
     <div id="dh-ops-rollup" role="status" aria-live="polite" style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:8px 14px;background:rgba(12,20,35,0.65);border-bottom:1px solid #2b3a52;font-family:'JetBrains Mono','IBM Plex Sans',sans-serif;font-size:12px;color:#cbd5e1;font-variant-numeric:tabular-nums;">
         <span style="color:#9aa3af;font-weight:700;letter-spacing:.06em;text-transform:uppercase;">Operations Rollup</span>
         <span data-basis="state" tabindex="0" role="button" aria-label="Hall state — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Hall <b id="dh-hall-state" style="color:#22c55e;">NORMAL</b></span>
-        <span data-basis="rackload" tabindex="0" role="button" aria-label="Rack Load — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Rack Load <b id="dh-rack-load" style="color:#fff;">1.85</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
+        <span data-basis="rackload" tabindex="0" role="button" aria-label="Rack Load — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Rack Load <b id="dh-rack-load" style="color:#fff;">&mdash;</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
         <span data-basis="margin" tabindex="0" role="button" aria-label="Cooling Margin — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Cooling Margin <b id="dh-cooling-margin" style="color:#22c55e;">18</b><span style="color:#94a3b8;font-weight:400;">%</span></span>
         <span data-basis="pue" tabindex="0" role="button" aria-label="PUE — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">PUE <b id="dh-pue" style="color:#fff;">1.45</b></span>
-        <span data-basis="density" tabindex="0" role="button" aria-label="Power Density — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Power Density <b id="dh-pd" style="color:#fff;">9.3</b><span style="color:#94a3b8;font-weight:400;"> kW/rack</span></span>
+        <span data-basis="density" tabindex="0" role="button" aria-label="Power Density — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Power Density <b id="dh-pd" style="color:#fff;">&mdash;</b><span style="color:#94a3b8;font-weight:400;"> kW/rack</span></span>
         <span style="flex:1"></span>
         <span style="color:#94a3b8;font-size:11px;">Click any KPI for basis · Mode toggles below</span>
     </div>
@@ -602,12 +602,18 @@
                reads were guarded, so the rollup silently rendered the literals '1.85' / racks=200 and was NOT
                engine-bound. Rack count is authored by THIS page (ZONES x RACKS_PER_ZONE), so it is read from the
                page constant rather than invented here; kW is engine-bound with no masking fallback — a missing
-               key must render '—' so schema drift is visible. Guarded by tools/test-conv-snapshot-binding.mjs. */
+               key must render '—' so schema drift is visible. Guarded by tools/test-conv-snapshot-binding.mjs.
+
+               v1.134.0 SCOPE FIX — `site.it_load_kw` became a CAMPUS roll-up (4 x 7,500 kW). Dividing it by
+               this hall's cabinet count gave 60 kW/rack for a hall that runs at 15. Rack load and power
+               density are HALL quantities, so both now come from the hall snapshot. PUE stays campus-scoped:
+               it is a site metric and there is no per-hall PUE in the study. */
             var s = window.CONV_CALC.snapshot;
-            var itKw = (s.site && s.site.it_load_kw != null) ? s.site.it_load_kw : null;
+            var hall = window.CONV_CALC.getHallSnapshot ? window.CONV_CALC.getHallSnapshot('A') : null;
+            var itKw = (hall && hall.it_load_kw != null) ? hall.it_load_kw : null;
             var it = (itKw != null) ? (itKw / 1000).toFixed(2) : '—';
             var pue = (s.site && s.site.pue != null) ? s.site.pue.toFixed(2) : '—';
-            var racks = (typeof window.RZ_DATAHALL_RACKS === 'number' && window.RZ_DATAHALL_RACKS > 0) ? window.RZ_DATAHALL_RACKS : null;
+            var racks = (hall && hall.racks > 0) ? hall.racks : null;
             var pd = (itKw != null && racks) ? (itKw / racks) : null;
             var el;
             el = document.getElementById('dh-rack-load'); if(el) el.textContent = it;
@@ -791,20 +797,41 @@
          * values that may be added into a synthetic site total.
          */
         var SELECTED_HALL = 'A';
-        var SITE_IT_KW   = S.site.it_load_kw;          // 1850 kW (engine)
-        var EPMS_IT_KW    = S.electrical.epms_ups_output_kw; // EPMS IT reconciliation point
-        var ZONES         = 10;                          // rows of cabinets
-        var RACKS_PER_ZONE = 20;                          // 10 (Row x) + 10 (Row y)
-        var TOTAL_RACKS   = ZONES * RACKS_PER_ZONE;      // 200 displayed cells
+        /* v1.134.0 — SCOPE FIX. This page draws ONE data hall, never the campus.
+         * v1.133.0 turned `site.it_load_kw` into a CAMPUS roll-up (4 halls x 7,500 kW
+         * = 30,000 kW). Reading it here put 30 MW of heat onto a single-hall floor
+         * plan: 150 kW per cabinet, and a cooling demand of 30,000 kW against the
+         * installed CRAH capacity. The v1.132.0 binding gate could not catch it —
+         * it proves a number FOLLOWS the engine, not that the page picked the right
+         * SCOPE. Bind to the hall snapshot, which is what the floor plan depicts. */
+        var HALL = CALC.getHallSnapshot(SELECTED_HALL);
+        if (!HALL) throw new Error('datahall: no hall snapshot for ' + SELECTED_HALL);
+        var SITE_IT_KW   = HALL.it_load_kw;              // hall IT load (engine, kW)
+        var EPMS_IT_KW    = S.electrical.epms_ups_output_kw; // EPMS IT reconciliation point (campus)
+        /* Cabinets per row is the authored floor layout; the ROW COUNT is derived from
+         * the engine's rack count so the plan can never draw a different hall than the
+         * one the numbers describe. */
+        var RACKS_PER_ZONE = 20;                          // cabinets per row
+        var TOTAL_RACKS   = HALL.racks;                   // engine — 500 cabinets per hall
+        if (TOTAL_RACKS % RACKS_PER_ZONE !== 0) {
+            throw new Error('datahall: hall rack count ' + TOTAL_RACKS +
+                ' does not divide into rows of ' + RACKS_PER_ZONE);
+        }
+        var ZONES         = TOTAL_RACKS / RACKS_PER_ZONE; // rows of cabinets (derived)
         /* v1.132.0 — explicit single export of the authored cell count. The ops-rollup binder lives in an
            earlier script block and previously invented `racks = 200` because this IIFE hid the real value.
            Exporting it (instead of duplicating 10 x 20) keeps ONE source for the count.
-           Phase-1 follow-up: once the campus/hall engine model lands, this comes from the hall snapshot. */
+           v1.134.0 — that Phase-1 follow-up is now done: the count comes from the hall snapshot. */
         window.RZ_DATAHALL_RACKS = TOTAL_RACKS;
-        var RACK_RATING_KW = 15;                          // per-cabinet design rating (kW)
+        /* Per-cabinet design rating: the study's SELECTED AVERAGE, not a page literal.
+         * It was authored as 15 kW, which made "installed study" read 500 x 15 = 7.5 MW
+         * against a 10 MW hall design. Binding it closes that gap by construction:
+         * 500 x 20 kW = 10,000 kW = HALL.it_design_kw. */
+        var RACK_RATING_KW = HALL.rack_design_avg_kw;     // per-cabinet design rating (kW, engine)
         // doc-03 / doc-09: avg rack load = IT load / displayed racks
-        var AVG_RACK_KW   = SITE_IT_KW / TOTAL_RACKS;    // 1850 / 200 = 9.25 kW
-        var RACK_INLET_DESIGN_C = 25.4;
+        var AVG_RACK_KW   = SITE_IT_KW / TOTAL_RACKS;    // 7500 / 500 = 15.0 kW
+        // Adopted rack-inlet target — engine-published, no longer re-typed here.
+        var RACK_INLET_DESIGN_C = S.cooling.rack_inlet_target_c;
         var RACK_INLET_RECOMMENDED_MIN_C = 18;
         var RACK_INLET_RECOMMENDED_MAX_C = 27;
         var DESIGN_AIRSIDE_DELTA_T_C = 11;
@@ -895,15 +922,27 @@
         }
 
         /* --- Cooling balance (derived from engine) ----------------------- */
-        var HEAT_KW   = S.cooling.heat_rejection_kw;        // IT + UPS loss
-        var COOL_DEMAND_KW = SITE_IT_KW;                     // sensible hall heat ~= IT
-        // available cooling: running CRAH capacity. 20 CRAH @ 130 kW sensible,
-        // N config keeps spares; available = running units * unit capacity.
-        var CRAH_TOTAL   = 20;
-        var CRAH_RUNNING = 17;                                // 3 standby spares
-        var CRAH_UNIT_KW = 130;
-        var COOL_AVAIL_KW = CRAH_RUNNING * CRAH_UNIT_KW;      // 2210 kW
-        var COOL_AVAIL_N1_KW = (CRAH_RUNNING - 1) * CRAH_UNIT_KW; // worst-CRAH-trip
+        var HEAT_KW   = S.cooling.heat_rejection_kw;        // IT + UPS loss (campus)
+        var COOL_DEMAND_KW = SITE_IT_KW;                     // sensible hall heat ~= hall IT
+        /* CRAH fleet — DERIVED, not authored. The counts were literals (20 installed /
+         * 17 running) sized for the retired 1.85 MW hall; against a 10 MW hall they
+         * would have shown 2,210 kW of cooling for 7,500 kW of heat.
+         *
+         * Unit sensible capacity stays an authored ASSUMPTION (no vendor selection has
+         * been made). Everything above it is arithmetic:
+         *   N required = ceil(hall sensible heat / unit capacity)
+         *   installed  = N + 1   (study resilience contract: cooling = 'N+1')
+         *   running    = N       (the +1 is a standby that auto-starts on a trip) */
+        var CRAH_UNIT_KW = 130;                               // kW sensible per unit — ASSUMED
+        var CRAH_REQUIRED = Math.ceil(COOL_DEMAND_KW / CRAH_UNIT_KW);
+        var CRAH_TOTAL   = CRAH_REQUIRED + 1;                 // N+1 installed
+        var CRAH_RUNNING = CRAH_REQUIRED;                     // one unit on standby
+        var COOL_AVAIL_KW = CRAH_RUNNING * CRAH_UNIT_KW;
+        /* Worst single-unit outage measured against the INSTALLED fleet: the standby
+         * starts, so the surviving capacity is (installed - 1) units. The old form
+         * used (running - 1) and silently ignored the standby — with 17/20 it still
+         * passed, so the modelling error never surfaced. */
+        var COOL_AVAIL_N1_KW = (CRAH_TOTAL - 1) * CRAH_UNIT_KW;
         var COOL_HEADROOM = COOL_AVAIL_KW - COOL_DEMAND_KW;
         var N1_PASS = COOL_AVAIL_N1_KW >= COOL_DEMAND_KW;
 
@@ -912,7 +951,14 @@
          * rack-inlet design target is 25.4C; hot aisle follows sensible load:
          * deltaT_air = zone_heat / (rho*cp*airflow).
          */
-        var CRAH_LEAVING_AIR_C = S.cooling.chws_c + 8.0;
+        /* v1.134.0 — was `S.cooling.chws_c + 8.0`, i.e. a private +8 K coil approach
+           applied to a chilled-water design that belonged to the retired 1.85 MW
+           basis. It produced 15.2 C supply air feeding a 25.4 C rack inlet, which
+           only works with ~10 K of bypass — contradicting the 0 K containment this
+           same page asserts on the return path. The engine now publishes the whole
+           chain derived backwards from the adopted inlet target, so this plane is
+           read, never recomputed. */
+        var CRAH_LEAVING_AIR_C = S.cooling.crah_supply_air_c;
         var zones = [];
         for (var z = 0; z < ZONES; z++) {
             var zHeat = 0, zRacks = 0, zOcc = 0, zMaxUtil = 0;
@@ -1212,10 +1258,20 @@
                 }
                 return h;
             }
-            document.getElementById('crah-top').innerHTML = rail(1, 10);
-            document.getElementById('crah-bottom').innerHTML = rail(11, 20);
+            /* v1.134.0 — the rail split was hardcoded to the retired 20-unit fleet.
+               Split the DERIVED fleet in half instead: north rail takes the first
+               half, south rail the remainder, whatever the count. */
+            var railSplit = Math.ceil(CRAH_TOTAL / 2);
+            var railTop = document.getElementById('crah-top');
+            var railBottom = document.getElementById('crah-bottom');
+            railTop.style.gridTemplateColumns = 'repeat(' + railSplit + ', 1fr)';
+            railBottom.style.gridTemplateColumns = 'repeat(' + (CRAH_TOTAL - railSplit) + ', 1fr)';
+            railTop.innerHTML = rail(1, railSplit);
+            railBottom.innerHTML = rail(railSplit + 1, CRAH_TOTAL);
 
             var field = document.getElementById('zone-field');
+            // Row count is derived from the hall's rack count — the grid must follow it.
+            field.style.gridTemplateColumns = 'repeat(' + ZONES + ', 1fr)';
             var fh = '';
             for (var z = 0; z < ZONES; z++) {
                 var zn = zones[z];
@@ -1608,8 +1664,14 @@ function basisFor(id){
      the snapshot, so this basis drawer silently used 200 and then claimed that provenance in its own
      `source:` string. Read the page's single exported cell count instead; null when unavailable so the
      drawer cannot state a density it did not derive. */
-  var racks=(typeof window.RZ_DATAHALL_RACKS==='number'&&window.RZ_DATAHALL_RACKS>0)?window.RZ_DATAHALL_RACKS:null;
-  var rackKw=racks?(s.site.it_load_kw/racks):null;
+  /* v1.134.0 SCOPE FIX — the repair above bound the DENOMINATOR to the hall while the
+     NUMERATOR stayed `site.it_load_kw`, which v1.133.0 turned into a campus roll-up. The
+     drawer then explained 30,000 kW over 500 cabinets = 60 kW/rack for a hall that runs at
+     15. Both ends of every ratio must come from the same scope; take both from the hall. */
+  var hall=(window.CONV_CALC&&window.CONV_CALC.getHallSnapshot)?window.CONV_CALC.getHallSnapshot('A'):null;
+  var racks=(hall&&hall.racks>0)?hall.racks:null;
+  var hallItKw=(hall&&hall.it_load_kw!=null)?hall.it_load_kw:null;
+  var rackKw=(racks&&hallItKw!=null)?(hallItKw/racks):null;
   var dict={
     state:{
       title:'Hall State',
@@ -1628,10 +1690,11 @@ function basisFor(id){
     },
     rackload:{
       title:'Rack Load — Total IT in this hall',
-      formula:'IT_hall (MW) = site.it_load_kw / 1000',
+      formula:'IT_hall (MW) = hall.it_load_kw / 1000',
       inputs:[
-        ['IT load (kW)',(s.site.it_load_kw).toLocaleString()+' kW'],
-        ['IT design (kW)',(s.site.it_design_kw).toLocaleString()+' kW'],
+        ['IT load (kW)',hallItKw!=null?hallItKw.toLocaleString()+' kW':'unavailable'],
+        ['IT design (kW)',(hall&&hall.it_design_kw!=null)?hall.it_design_kw.toLocaleString()+' kW':'unavailable'],
+        ['Campus IT load (all halls)',(s.site.it_load_kw).toLocaleString()+' kW'],
         ['Utilisation',(s.site.it_load_kw/s.site.it_design_kw*100).toFixed(1)+' %']
       ],
       output:(s.site.it_load_kw/1000).toFixed(2)+' MW',
@@ -1673,10 +1736,10 @@ function basisFor(id){
     },
     density:{
       title:'Power Density — Per-rack average',
-      formula:'density (kW/rack) = IT_load_kW / racks_total',
+      formula:'density (kW/rack) = hall.it_load_kw / hall.racks',
       inputs:[
-        ['IT load',s.site.it_load_kw.toLocaleString()+' kW'],
-        ['Racks installed',racks],
+        ['IT load (this hall)',hallItKw!=null?hallItKw.toLocaleString()+' kW':'unavailable'],
+        ['Racks installed (this hall)',racks!=null?racks:'unavailable'],
         ['Average density',rackKw!=null?rackKw.toFixed(2)+' kW/rack':'unavailable']
       ],
       output:rackKw!=null?rackKw.toFixed(1)+' kW/rack':'unavailable',

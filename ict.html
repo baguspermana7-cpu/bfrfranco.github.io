@@ -884,7 +884,11 @@
             },
             bms: {
                 title: 'BMS / OT Network',
-                desc: 'Air-gapped facility control network — SEPARATE from IT. Carries EPMS/cooling/fire/fuel/water gateways.',
+                /* v1.134.0 — this said "Air-gapped". Nothing on this page demonstrates an air gap, and
+   the same architecture renders an OT gateway plus WAN/DCI interconnect: an air gap means
+   NO connection, which is a security property the design does not have. Describe what is
+   actually drawn. */
+                desc: 'Segmented facility control network — physically separate switching from IT, reaching it only through a firewalled OT gateway. Carries EPMS/cooling/fire/fuel/water gateways.',
                 services: [
                     { n: 'BMS Polling (BMS-GW-01)', s: 'ok', v: 'Poll OK' },
                     { n: 'EPMS Gateway',            s: 'ok', v: 'Online' },
@@ -1390,7 +1394,38 @@
                  + (cls ? ' ' + cls : '') + '">' + v + '</span></div>';
         }
 
+        /* v1.134.0 — the six nav-rail badges were hooked literals "0" that nothing ever
+           assigned, and the stylesheet even shipped .ncount.crit / .ncount.warn variants
+           that no code path could reach. A permanent "0" beside a segment that holds a
+           live warning is a false all-clear. Derive each badge from the same ALARMS
+           register the list renders from, so the rail and the list cannot disagree. */
+        function paintSegmentBadges() {
+            var keys = ['it', 'bms', 'sec', 'mgmt', 'wan', 'mon'];
+            for (var i = 0; i < keys.length; i++) {
+                var el = document.getElementById('cnt-' + keys[i]);
+                if (!el) continue;
+                var rows = ALARMS[keys[i]] || [];
+                var crit = 0, warn = 0;
+                for (var j = 0; j < rows.length; j++) {
+                    if (rows[j].sev === 'crit') crit++;
+                    else if (rows[j].sev === 'warn') warn++;
+                }
+                el.textContent = String(crit + warn);
+                el.className = 'ncount' + (crit > 0 ? ' crit' : (warn > 0 ? ' warn' : ''));
+            }
+            /* Fabric health follows the same register rather than asserting OPERATIONAL. */
+            var sys = document.getElementById('sb-sys-v');
+            if (sys) {
+                var all = allAlarms(), c = 0, w = 0;
+                for (var k = 0; k < all.length; k++) {
+                    if (all[k].sev === 'crit') c++; else if (all[k].sev === 'warn') w++;
+                }
+                sys.textContent = c > 0 ? 'DEGRADED' : (w > 0 ? 'ATTENTION' : 'OPERATIONAL');
+            }
+        }
+
         function renderAlarmList(list) {
+            paintSegmentBadges();
             list = list || allAlarms();
             var box = document.getElementById('alarm-list');
             var count = document.getElementById('alarm-result-count');
@@ -1553,7 +1588,7 @@
             document.getElementById('insp-detail').innerHTML =
                 '<h4>Segment</h4>'
               + kv('Network', SEGMENTS[key].title)
-              + kv('Isolation', key === 'bms' ? 'Air-gapped from IT'
+              + kv('Isolation', key === 'bms' ? 'Segmented from IT (firewalled OT gateway, not an air gap)'
                     : (key === 'it' ? 'Customer + compute' : 'Dedicated VLAN'))
               + kv('Scenario', SCN)
               + kv('Data Quality', DQ, DQ === 'GOOD' ? 'ok' : 'warn');

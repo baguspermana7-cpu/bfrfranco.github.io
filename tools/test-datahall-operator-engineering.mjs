@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import vm from 'node:vm';
 
 const html = await readFile(new URL('../datahall.html', import.meta.url), 'utf8');
 
@@ -12,7 +13,29 @@ for (const hall of ['A', 'B', 'C', 'D']) {
   includes(`data-hall="${hall}"`, `hall selector is missing Hall ${hall}`);
 }
 includes('function selectHall(hall)', 'hall selector must update the operational scope');
-includes('var RACK_INLET_DESIGN_C = 25.4', 'rack-inlet design setpoint must be explicitly modelled at 25.4C');
+/* v1.134.0 — this asserted the page source contained the LITERAL
+   `var RACK_INLET_DESIGN_C = 25.4`. That is the pattern this codebase spent v1.132.0
+   removing: it required the target to be re-typed on the page, so the page and the engine
+   could disagree and the test would still pass. Assert the two halves that actually
+   matter instead — the ENGINE publishes 25.4 C, and the PAGE reads it rather than
+   restating it. Strictly stronger: it now catches a drifted page, which the literal
+   could not, and it stops failing a correct one. */
+const engineSandbox = { window: {}, module: { exports: {} }, console };
+vm.createContext(engineSandbox);
+vm.runInContext(await readFile(new URL('../js/conv-engine.js', import.meta.url), 'utf8'), engineSandbox);
+const cooling = engineSandbox.window.CONV_CALC.snapshot.cooling;
+assert.equal(cooling.rack_inlet_target_c, 25.4,
+  'engine must publish the adopted 25.4 C rack-inlet target');
+includes('S.cooling.rack_inlet_target_c',
+  'data hall must READ the adopted rack-inlet target from the engine, not re-type it');
+/* The whole air-to-water chain must close from that target — the 15.2 C supply-air defect
+   existed precisely because the air planes and the water planes were authored apart. */
+assert.equal(cooling.crah_supply_air_c, cooling.rack_inlet_target_c - cooling.supply_path_mixing_k,
+  'CRAH supply air must derive from the rack-inlet target and the supply-path mixing');
+assert.equal(cooling.chws_c, cooling.crah_supply_air_c - cooling.chw_coil_approach_k,
+  'CHWS must derive from the CRAH supply air and the coil approach');
+includes('S.cooling.crah_supply_air_c',
+  'data hall must read the published CRAH supply-air plane, never recompute it from CHWS');
 includes('var RACK_INLET_RECOMMENDED_MIN_C = 18', 'rack-inlet recommended lower bound must be explicit');
 includes('var RACK_INLET_RECOMMENDED_MAX_C = 27', 'rack-inlet recommended upper bound must be explicit');
 includes('function dewPointC(tempC, rhPct)', 'humidity display must include a deterministic dew-point calculation');
