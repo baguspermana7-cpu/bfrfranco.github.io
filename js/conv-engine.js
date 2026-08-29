@@ -511,7 +511,34 @@
              * the duty, arithmetic and redundancy rule.
              * evidenceClass: 'ASSUMED' — never measured, never vendor-approved. */
             chiller_unit_kw_th: CHILLER_UNIT_KW_TH,
-            chiller_redundancy: COOLING_REDUNDANCY
+            chiller_redundancy: COOLING_REDUNDANCY,
+            /* v1.134.8 — heat-rejection technology, ADOPTED. The governed study fixes
+             * water.heatRejectionType = 'evaporative-cooling-tower', which means WATER-COOLED
+             * machines. The chiller mimic had depicted air-cooled ones, and the two differ by
+             * roughly 2x in specific power, so plant COP and kW/RT were reported UNAVAILABLE
+             * rather than assumed. The owner has now adopted the study's basis, so the
+             * technology is settled and the efficiency figures become derivable.
+             * source: js/conv-design-basis.js STUDY_INPUT.water.heatRejectionType
+             */
+            chiller_type: 'water-cooled-centrifugal',
+            /* Specific power at the design point, kW electrical per kW thermal.
+             * 0.58 kW/RT is the middle of the 0.55-0.62 band a water-cooled centrifugal holds
+             * at design; 1 RT = 3.517 kW_th, so 0.58 / 3.517 = 0.16491 kW_e/kW_th (COP ~6.06).
+             * evidenceClass: 'ASSUMED' — a design-point figure for the adopted machine type,
+             * NOT a vendor selection. A submittal replaces exactly this number and everything
+             * downstream re-derives.
+             */
+            chiller_specific_power_kw_e_per_kw_th: 0.16491,
+            /* CONDENSER WATER — the loop a water-cooled machine has and an air-cooled one does
+             * not. The study's evaporative cooling tower rejects to wet-bulb; no site wet-bulb
+             * design figure has been supplied, so the supply temperature and the tower range are
+             * ASSUMED at values typical for a tropical design and carry that label. They are
+             * authored inputs; the return temperature derives from them.
+             * source: js/conv-design-basis.js STUDY_INPUT.water.heatRejectionType
+             * evidenceClass: 'ASSUMED' — replace with the site wet-bulb basis when it exists.
+             */
+            cdw_supply_c: 32.0,
+            cdw_range_k: 5.0
             // (no authored chillers_running / chillers_total — both are derived)
         },
         electrical: {
@@ -567,7 +594,36 @@
              * Basis-of-Design confirmation. NOT measured, NOT vendor-approved. */
             tank_capacity_l: 972737
         },
+            /* ==================================================================
+         * FIRE PROTECTION — added v1.134.8
+         * ==================================================================
+         * The fire mimic carried its whole basis as page constants: tank capacity,
+         * pump demand, zone count, level and static pressure. None of it was
+         * traceable, and the one figure that matters most — how long the reserve
+         * actually lasts — was never computed anywhere. It is computed here, and
+         * the answer does not meet the page's own stated requirement. That is
+         * surfaced rather than smoothed: see fire.duration_shortfall_min.
+         */
+        fire: {
+            /* Stored fire-water reserve. ASSUMED — no hydraulic calculation or
+             * authority submission has been supplied for this site. */
+            reserve_capacity_m3: 114,
+            /* Operating level. SIMULATED deterministic state, not a live gauge. */
+            level_pct: 92,
+            /* Fire pump design demand. ASSUMED — a hazard classification and a
+             * sprinkler density would fix it; neither has been supplied. */
+            pump_demand_lpm: 2500,
+            /* Required autonomy the page itself states on the drawing. ADOPTED. */
+            required_duration_min: 60,
+            /* Pre-action zones (PACV-01..05). ASSUMED, matches the mimic. */
+            zone_count: 5,
+            /* Static header pressure. SIMULATED. */
+            static_pressure_bar: 12.5
+        },
         water: {
+            /* Domestic / process draw, EXCLUDED from WUE (WUE counts cooling makeup only).
+             * ASSUMED — no metered domestic demand has been supplied. */
+            domestic_lpm: 8.0,
             // source: 09-engineering-basis-and-calculations.md line 99-104
             //         (instant equivalent water flow derived from WUE * IT load)
             // (no authored constant — flow is derived from WUE and IT load)
@@ -738,6 +794,19 @@
                    three of the most prominent numbers on that screen had no registry parameter
                    to trace to. They are arithmetic over values already here; publishing them
                    removes the page's private copy of the arithmetic. */
+                chiller_type: m.cooling.chiller_type,
+                chiller_specific_power_kw_e_per_kw_th: m.cooling.chiller_specific_power_kw_e_per_kw_th,
+                /* Plant electrical input, and the two efficiency figures every chiller-plant
+                   operator reads. Derived from the adopted machine type — never authored on a
+                   page, which is where the impossible 0.11 kW/RT came from. */
+                chiller_input_kw_e: round1(heatRej * m.cooling.chiller_specific_power_kw_e_per_kw_th),
+                cdw_supply_c: m.cooling.cdw_supply_c,
+                cdw_range_k: m.cooling.cdw_range_k,
+                cdw_return_c: round2(m.cooling.cdw_supply_c + m.cooling.cdw_range_k),
+                /* Tower heat rejection = chiller duty + the work the compressors put in. */
+                tower_rejection_kw_th: round1(heatRej * (1 + m.cooling.chiller_specific_power_kw_e_per_kw_th)),
+                plant_cop: round2(1 / m.cooling.chiller_specific_power_kw_e_per_kw_th),
+                plant_kw_per_rt: round2(m.cooling.chiller_specific_power_kw_e_per_kw_th * 3.517),
                 chiller_capacity_kw_th: round1(chillersRunning(m) * m.cooling.chiller_unit_kw_th),
                 chiller_n1_capacity_kw_th: round1((chillersTotal(m) - 1) * m.cooling.chiller_unit_kw_th),
                 duty_rt: round1(heatRej / 3.517),
@@ -763,9 +832,32 @@
                 autonomy_hr: round1(autonomy),
                 nameplate_evidence_class: m.meta.nameplate_evidence_class
             },
-            water: {
+            fire: (function () {
+                var storedL = m.fire.reserve_capacity_m3 * 1000;
+                var usableL = storedL * (m.fire.level_pct / 100);
+                var requiredL = m.fire.required_duration_min * m.fire.pump_demand_lpm;
+                return {
+                    reserve_capacity_m3: m.fire.reserve_capacity_m3,
+                    level_pct: m.fire.level_pct,
+                    stored_m3: round1(usableL / 1000),
+                    pump_demand_lpm: m.fire.pump_demand_lpm,
+                    required_duration_min: m.fire.required_duration_min,
+                    duration_min: round1(usableL / m.fire.pump_demand_lpm),
+                    duration_at_full_min: round1(storedL / m.fire.pump_demand_lpm),
+                    required_capacity_m3: round1(requiredL / 1000),
+                    capacity_shortfall_m3: round1((requiredL - storedL) / 1000),
+                    zone_count: m.fire.zone_count,
+                    static_pressure_bar: m.fire.static_pressure_bar
+                };
+            }()),
+        water: {
                 wue_l_per_kwh: m.environment.wue_l_per_kwh,
-                flow_lpm_for_wue: round1(waterLpm)
+                flow_lpm_for_wue: round1(waterLpm),
+                /* v1.134.8 — domestic/process draw was a page constant (DOMESTIC_LPM = 8.0) and
+                   the treated total was computed on the page from it. Both belong here: the
+                   treated total is what the treatment train is sized for. */
+                domestic_lpm: m.water.domestic_lpm,
+                total_treated_lpm: round1(waterLpm + m.water.domestic_lpm)
             },
             racks: {
                 at_6kw: Math.round(activeRacks(m, 6)),

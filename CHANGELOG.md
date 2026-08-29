@@ -11,6 +11,49 @@ release sections rather than semver.
 
 ---
 
+## v1.134.8 — 2026-08-29 (Water-cooled adopted, the P&ID redrawn to match — and the fire reserve does not meet its own requirement)
+
+**The owner adopted the governed study's basis: evaporative cooling tower, i.e. water-cooled
+centrifugal machines.** The open conflict card is gone and the mimic follows the decision.
+
+- Equipment tags **ACC → WCC**; the "Fans n/6" row, which belongs to an air-cooled machine,
+  is replaced by the **condenser-water circuit** the adopted type actually has (CDWS/CDWR
+  32.0 / 37.0 °C, tower range 5.0 K — ASSUMED, pending a site wet-bulb design figure).
+- Chiller **specific power 0.58 kW/RT** (0.16491 kW_e/kW_th) enters the engine as ASSUMED:
+  mid-band for a water-cooled centrifugal at design, and the single number a vendor submittal
+  replaces with everything downstream re-deriving. Plant **COP 6.06** and **0.58 kW/RT** are
+  DERIVED again rather than UNAVAILABLE, and plant electrical input (5,153 kW) is an engine
+  quantity — not the sum of four drawn machines, which would under-report a 7-machine plant
+  by 3/7. The tower's own duty (chiller load plus compressor work, 36,403 kW_th) is published.
+
+**A quantified finding on the fire system, published rather than left to be noticed.** The
+fire basis lived entirely in page constants and nothing ever checked the two facts printed on
+the same drawing against each other. The engine carries it now and does the arithmetic:
+
+> Reserve **114 m³**, pump demand **2,500 L/min**, stated requirement **≥ 60 min**.
+> That is **45.6 min when full** and **42 min at the current 92 % level**.
+> Meeting 60 min needs **150 m³** — the installed tank is **36 m³ short**, and cannot meet its
+> own stated duration even full.
+
+Both durations are published because they answer different questions: what an operator has
+right now, and the most the installed tank can ever deliver. The shortfall is rendered on the
+fire page as an open finding in fault red.
+
+**Water balance.** Domestic/process draw (8.0 L/min, ASSUMED, excluded from WUE) and the total
+treated flow it feeds were page constants; both are engine parameters now, so the treatment
+train's design flow has one source.
+
+**Coverage 36.9 % → 47.4 %**, with the denominator still honest:
+dc-conventional 79 % · datahall 40 % · chiller 37 % · water 49 % · **fire 27 % → 68 %** ·
+fuel 50 % · **ict 100 %** · EPMS 52 %. 421 numbers sit in declared authored-page-basis regions,
+each with a written reason: the water treatment train and the refrigeration cycle are simulated
+plant state that `conv-engine.js` does not model, and saying so is more useful than a backlog
+figure that mixes "not bound yet" with "not an engine quantity".
+
+**Two more measurement bugs in the coverage gate, both found by using it:** equipment tags like
+`FM-101` were being read as the value **−101** and counted as untraced engineering numbers, and
+`TK-101` likewise. Identifiers are stripped before extraction now.
+
 ## v1.134.7 — 2026-08-29 (The chiller P&ID was not untraced — it was wrong. And an open Basis-of-Design conflict, stated rather than resolved)
 
 Finishing the coverage backlog on the chiller P&ID and the ICT link table turned up something

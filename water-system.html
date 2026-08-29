@@ -516,7 +516,7 @@
                 <span class="sub">— raw &rarr; filtration &rarr; treatment &rarr; cooling makeup / domestic / blowdown</span>
             </div>
             <div class="diagram-wrap">
-            <svg class="pid" id="water-svg" viewBox="0 0 1180 460" width="100%"
+            <svg class="pid" id="water-svg" data-rz-authored-basis="The water treatment train — raw and domestic tank levels, filter differential pressure, chlorine dosing and residual, UV intensity, treated TDS and the line pressures — is simulated plant state. conv-engine.js models the site water BALANCE (WUE, cooling makeup, domestic draw, treated total) and publishes no treatment-process quantity, so these readings have no engine parameter to trace to. The balance figures on this page are engine-bound and stay in the denominator." viewBox="0 0 1180 460" width="100%"
                  preserveAspectRatio="xMidYMid meet" role="img"
                  aria-label="Water treatment process and instrumentation diagram"
                  style="transition:transform .25s; transform-origin:top left;">
@@ -834,7 +834,9 @@
             // WUE-derived flow (the canonical WUE numerator); evaporation /
             // blowdown / drift split uses a typical cooling-tower COC = 4.
             var COC = 4;                       // cycles of concentration (typical)
-            var DOMESTIC_LPM = 8.0;            // WUE-excluded domestic/process (doc-13 line 357)
+            /* v1.134.8 — was a page constant. The engine publishes it, and the treated total
+               with it, so the treatment train's design flow has one source. */
+            var DOMESTIC_LPM = S ? S.water.domestic_lpm : null;
 
             /* v1.134.0 — every fallback here was a plausible literal from the retired
                1.85 MW basis (1850 / 1.20 / 37.0 / 1927.1). A dead engine binding therefore
@@ -850,7 +852,8 @@
             var evapPlusBd  = makeupLpm - driftLpm;
             var evapLpm     = evapPlusBd * (COC - 1) / COC;
             var blowdownLpm = evapPlusBd / COC;
-            var totalLpm    = makeupLpm + DOMESTIC_LPM;
+            var totalLpm    = (S && S.water.total_treated_lpm != null)
+                ? S.water.total_treated_lpm : (makeupLpm + DOMESTIC_LPM);
 
             // WUE computed (not the literal): water volume / IT energy.
             var wueComputed = window.CONV_CALC

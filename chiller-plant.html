@@ -613,20 +613,10 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
            (see the basis binder below); this literal is only the pre-script placeholder. -->
       <div class="basis-value" id="chiller-current-basis-value">Representative view · engine basis loading…</div>
     </div>
-    <!-- v1.134.7 — an OPEN BASIS-OF-DESIGN CONFLICT, stated rather than resolved by whichever
-         page was edited last. The governed study specifies evaporative cooling-tower heat
-         rejection (water-cooled machines); this mimic depicts air-cooled chillers with fan
-         stages and no condenser-water loop. Specific power differs by roughly 2x between them
-         (water-cooled centrifugal ~0.55-0.62 kW/RT, air-cooled ~1.0-1.2), which is why plant
-         COP and kW/RT read UNAVAILABLE on this page instead of carrying an invented figure. -->
-    <div class="basis-card" data-basis="conflict"
-         style="border-color:#d99a2b">
-      <div class="basis-title" style="color:#d99a2b">Open decision · heat-rejection type</div>
-      <div class="basis-value">The governed study specifies an <b>evaporative cooling tower</b>
-        (water-cooled machines); this mimic depicts <b>air-cooled</b> chillers. Specific power
-        differs by about 2&times; between them, so plant <b>COP</b> and <b>kW/RT</b> are reported
-        UNAVAILABLE rather than assumed. Thermal duty, which the engine publishes, is shown.</div>
-    </div>
+    <!-- v1.134.8 — the open heat-rejection conflict card is removed: the owner adopted the
+         governed study's basis (evaporative cooling tower, i.e. water-cooled centrifugal
+         machines), so the mimic, the equipment tags and the efficiency figures all follow it.
+         Plant COP and kW/RT are derived again rather than UNAVAILABLE. -->
     <div class="basis-card study" data-basis="study">
       <div class="basis-title">Capacity study · 4 × 10 MW IT</div>
       <div class="basis-value"><span class="basis-guard">READ-ONLY PLANNING BASIS</span> · not connected to current controls or telemetry</div>
@@ -638,7 +628,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
       <div class="legend">
         <span class="chws" id="lgChws">Primary CHWS &mdash;</span>
         <span class="chwr" id="lgChwr">Primary CHWR &mdash;</span>
-        <span class="sec">Secondary / Condenser loop</span>
+        <span class="sec">Secondary / condenser-water loop</span>
         <span class="run">Run</span>
         <span>Standby</span>
         <span class="warn">Warning</span>
@@ -846,7 +836,7 @@ function selectHallView(hall){
  * are bound directly to the engine and are DETERMINISTIC (stable on reload —
  * no Math.random touches engine-derived engineering values). The per-chiller
  * water circuits shown in the P&ID are the SECONDARY / CONDENSER side of the
- * air-cooled chillers (~18-23 °C) and are deliberately NOT labelled CHWS/CHWR.
+ * water-cooled chillers (~18-23 °C secondary side) and are deliberately NOT labelled CHWS/CHWR.
  * CHW-relabel decision: conv/review/04-chiller-plant-review.md (Recommended
  * Decision → Option A) ; basis: conv/review/09-engineering-basis-and-calculations.md
  */
@@ -873,6 +863,32 @@ function chwBasis(){
   return { chws:null, chwr:null, dt:null, flow:null, coolingKw:null, itKw:null, scenario:"UNAVAILABLE — engine not loaded" };
 }
 const CHW = chwBasis();
+
+/* v1.134.8 — the plant's ELECTRICAL side, now that the machine type is adopted. Every one of
+   these was previously either authored on this page (the impossible 0.11 kW/RT) or reported
+   UNAVAILABLE while the technology was unresolved. All are engine-published. */
+const PLANT = (function () {
+  const s = engineSnap();
+  const c = (s && s.cooling) ? s.cooling : null;
+  if (!c) return { type:null, inputKw:null, cop:null, kwPerRt:null, cdws:null, cdwr:null,
+                   towerKw:null, dutyRt:null, capacityKw:null, n1CapacityKw:null,
+                   inputPerMachineKw:null };
+  const running = c.chillers_running || null;
+  return {
+    type: c.chiller_type || null,
+    inputKw: c.chiller_input_kw_e != null ? c.chiller_input_kw_e : null,
+    inputPerMachineKw: (c.chiller_input_kw_e != null && running)
+      ? Math.round(c.chiller_input_kw_e / running) : null,
+    cop: c.plant_cop != null ? c.plant_cop : null,
+    kwPerRt: c.plant_kw_per_rt != null ? c.plant_kw_per_rt : null,
+    cdws: c.cdw_supply_c != null ? c.cdw_supply_c : null,
+    cdwr: c.cdw_return_c != null ? c.cdw_return_c : null,
+    towerKw: c.tower_rejection_kw_th != null ? c.tower_rejection_kw_th : null,
+    dutyRt: c.duty_rt != null ? c.duty_rt : null,
+    capacityKw: c.chiller_capacity_kw_th != null ? c.chiller_capacity_kw_th : null,
+    n1CapacityKw: c.chiller_n1_capacity_kw_th != null ? c.chiller_n1_capacity_kw_th : null,
+  };
+}());
 
 /* v1.134.7 — the drawn loops are a SUBSET of the plant. The engine runs
    cooling.chillers_running machines out of chillers_total; this mimic draws four of them.
@@ -1114,16 +1130,9 @@ function loopMetrics(loop){
   let discharge = Math.round(690 + loop.flow*14.1);
   let superheat = r1(4.8 + Math.max(0,18-loop.flow)*0.08);
   let subcool = r1(3.6 + Math.max(0,loop.flow-14)*0.06);
-  /* v1.134.7 — compressor input power was `42 + spd*2.3 + flow*2.2`, an authored curve fitted
-     to the retired basis. Summed over four loops it gave ~960 kW_e against 8,885 RT of duty:
-     0.11 kW/RT, which no chiller can do (water-cooled centrifugal ~0.55-0.62, air-cooled
-     ~1.0-1.2). Deriving it needs a specific power, and that number is NOT settled: the governed
-     study specifies EVAPORATIVE COOLING-TOWER heat rejection, i.e. water-cooled machines, while
-     this P&ID depicts AIR-COOLED chillers with fan stages and no condenser-water loop. The two
-     differ by roughly 2x. Picking one silently is exactly the fabrication this programme exists
-     to remove, so electrical input is UNAVAILABLE until the Basis of Design settles the
-     technology. Thermal duty, which IS published, continues to be shown. */
-  let compKw = null;
+  /* v1.134.8 — derivable again now the machine type is adopted: plant electrical input shared
+     across the running machines. The old authored curve (42 + spd*2.3 + flow*2.2) is gone. */
+  let compKw = PLANT.inputPerMachineKw;
   let oil = Math.round(46 + activeSpd*0.31);
 
   if(e.disconnected){
@@ -1136,12 +1145,13 @@ function loopMetrics(loop){
     oil = Math.round(clamp(oil*0.7, 28, 44));
   }
 
-  // Fan staging: 2, 4, or 6 fans based on ambient and compressor load
-  const fanStage = e.disconnected ? 0 : (ui.ambient > 38 || loop.flow > 20 ? 6 : (ui.ambient > 33 ? 4 : 2));
+  /* v1.134.8 — condenser-fan staging retired with the air-cooled depiction. A water-cooled
+     machine rejects through the condenser-water circuit to the tower; there are no condenser
+     fans on the chiller. */
 
   return {
     runA, runB, ampA, ampB, headA, headB, vibA, vibB,
-    evapSat, condSat, suction, discharge, superheat, subcool, compKw, oil, fanStage
+    evapSat, condSat, suction, discharge, superheat, subcool, compKw, oil
   };
 }
 
@@ -1191,11 +1201,11 @@ function loopSvg(loop, pos){
     <rect x="${x}" y="${y}" width="${w}" height="240" rx="12" class="panel ${panelCls}" filter="url(#fShadow)" />
 
     <rect x="${x+14}" y="${y+12}" width="${w-160}" height="28" rx="7" class="field-box" />
-    ${text(x+28,y+31,"section-title",`CH-${String(loop.id).padStart(2,"0")}  \u2022  ACC-${String(loop.id).padStart(2,"0")}  \u2022  CHWP-${String(loop.id).padStart(2,"0")}A/B  \u2022  DPS  \u2022  MFM`)}
+    ${text(x+28,y+31,"section-title",`CH-${String(loop.id).padStart(2,"0")}  \u2022  WCC-${String(loop.id).padStart(2,"0")}  \u2022  CHWP-${String(loop.id).padStart(2,"0")}A/B  \u2022  DPS  \u2022  MFM`)}
     <rect x="${x+w-130}" y="${y+12}" width="112" height="28" rx="7" fill="${lvlBg}" stroke="${lvlBd}" />
     ${text(x+w-74,y+31,"value",e.level,"middle")}
 
-    <rect x="${acc.x}" y="${y+56}" width="${acc.w}" height="156" rx="10" class="equip-shell"><title>ACC-${String(loop.id).padStart(2,"0")} Air Cooled Chiller • ${loop.comps.reduce((a,b)=>a+b,0)}/3 comp • input power UNAVAILABLE (chiller technology unresolved)</title></rect>
+    <rect x="${acc.x}" y="${y+56}" width="${acc.w}" height="156" rx="10" class="equip-shell"><title>WCC-${String(loop.id).padStart(2,"0")} Water-Cooled Centrifugal Chiller • ${loop.comps.reduce((a,b)=>a+b,0)}/3 comp • ${PLANT.inputPerMachineKw != null ? PLANT.inputPerMachineKw + " kW electrical" : "—"}</title></rect>
     ${text(acc.x+14,y+80,"value",`ACC / CH-${String(loop.id).padStart(2,"0")}`)}
     <text x="${acc.x+14}" y="${y+104}" class="label">App: <tspan fill="${appColor}">${approachTxt}</tspan>  \u2022  Oil: ${m.oil}\u00b0C</text>
     ${text(acc.x+14,y+128,"label","Comp")}
@@ -1206,8 +1216,11 @@ function loopSvg(loop, pos){
     <circle cx="${acc.x+110}" cy="${y+128}" r="9" class="${loop.comps[2]?"comp-on":"comp-off"}" />
     <text x="${acc.x+110}" y="${y+131}" class="isa-bubble-txt">C3</text>
     ${text(acc.x+134,y+132,"unit",`${loop.comps.reduce((a,b)=>a+b,0)}/3`)}
-    <text x="${acc.x+14}" y="${y+158}" class="label">Fans ${m.fanStage}/6 <tspan fill="${dis?"#6e6460":"var(--run)"}">\u25CF</tspan></text>
-    ${text(acc.x+14,y+180,"unit",m.compKw != null ? `${m.compKw} kW` : "\u2014 kW")}
+    <!-- v1.134.8 — this was "Fans n/6", the condenser fans of an AIR-COOLED machine. The owner
+         adopted the study's basis (evaporative cooling tower = water-cooled), so the machine
+         rejects to a condenser-water circuit, not to ambient air. Engine-published CDWS/CDWR. -->
+    <text x="${acc.x+14}" y="${y+158}" class="label">CDW ${PLANT.cdws != null ? PLANT.cdws.toFixed(1) : "\u2014"}/${PLANT.cdwr != null ? PLANT.cdwr.toFixed(1) : "\u2014"}&#176;C <tspan fill="${dis?"#6e6460":"var(--run)"}">\u25CF</tspan></text>
+    ${text(acc.x+14,y+180,"unit",PLANT.inputPerMachineKw != null ? `${PLANT.inputPerMachineKw} kW` : "\u2014 kW")}
 
     <line x1="${acc.x+acc.w}" y1="${supY}" x2="${portX}" y2="${supY}" class="pipe" stroke="rgba(98,140,183,.25)" />
     <line x1="${acc.x+acc.w}" y1="${supY}" x2="${portX}" y2="${supY}" class="${fClsS}" style="animation-duration:${flowDur}s" />
@@ -1371,15 +1384,17 @@ function drawPid(){
 
   /* Plant electrical input has no source in this basis — see loopMetrics(). Null propagates
      to an em-dash rather than summing four nulls into a confident 0. */
-  const totalKw = st.loops.every(lp => loopMetrics(lp).compKw != null)
-    ? st.loops.reduce((s,lp)=>s+loopMetrics(lp).compKw,0) : null;
-  const totalTons = r1(st.header.flow * deltaT * 4.186 / 3.517);
-  /* COP and kW/RT are ratios of electrical input to thermal duty. The duty is published; the
-     input is not, and cannot be assumed while the heat-rejection technology is unresolved
-     (see loopMetrics). Rendering 0 would read as "perfect efficiency"; rendering the old
-     figure read as 0.11 kW/RT, which is impossible. Both say UNAVAILABLE. */
-  const plantCop = (totalKw != null && totalKw > 0) ? r1(totalTons * 3.517 / totalKw) : null;
-  const kwPerRt = (totalKw != null && totalKw > 0) ? r1(totalKw / Math.max(totalTons, 0.1)) : null;
+  /* v1.134.8 — the plant's electrical input is an ENGINE quantity now (duty x specific power
+     for the adopted machine type), not the sum of four drawn machines: this mimic draws 4 of 7
+     running, so summing what is drawn would under-report the plant by 3/7. */
+  const totalKw = PLANT.inputKw;
+  const totalTons = PLANT.dutyRt != null ? PLANT.dutyRt : r1(st.header.flow * deltaT * 4.186 / 3.517);
+  /* COP and kW/RT come straight from the engine's adopted specific power. They were reported
+     UNAVAILABLE while the heat-rejection technology was unresolved; the owner adopted the
+     study's basis (evaporative cooling tower = water-cooled centrifugal), so they are derived
+     and traceable. */
+  const plantCop = PLANT.cop;
+  const kwPerRt = PLANT.kwPerRt;
   const loopsOnline = st.loops.filter(lp=>!evalLoop(lp).disconnected).length;
   // Plant capacity context — engine-derived (deterministic). Cooling demand =
   // engine heat rejection; per-chiller rating sized so N chillers cover demand
@@ -1448,7 +1463,7 @@ function drawPid(){
          the drawing instead of being resolved by whichever page was edited last; it is a Basis
          of Design decision, and the ~2x difference in specific power is why this page reports
          plant COP and kW/RT as UNAVAILABLE. -->
-    ${text(PZ_X+16,PZ_Y+24,"zone-label",`PROCESS TRAINS  \u2014  4 OF ${ENGINE_CHILLERS_RUNNING != null ? ENGINE_CHILLERS_RUNNING : "\u2014"} RUNNING (${ENGINE_CHILLERS_TOTAL != null ? ENGINE_CHILLERS_TOTAL : "\u2014"} INSTALLED)`)}
+    ${text(PZ_X+16,PZ_Y+24,"zone-label",`PROCESS TRAINS  \u2014  WATER-COOLED CENTRIFUGAL  \u2014  4 OF ${ENGINE_CHILLERS_RUNNING != null ? ENGINE_CHILLERS_RUNNING : "\u2014"} RUNNING (${ENGINE_CHILLERS_TOTAL != null ? ENGINE_CHILLERS_TOTAL : "\u2014"} INSTALLED)`)}
 
     <rect x="${SUP_X}" y="${PZ_Y}" width="${SUP_W}" height="${VH-136}" rx="10" class="frame" />
     ${text(SUP_X+16,PZ_Y+24,"zone-label","SUPERVISORY METRICS & PLANT STATUS")}
@@ -1901,8 +1916,7 @@ function stepProcess(){
 
   // Record sparkline data (max 30 points) — COP/RT from engine-true header.
   const dt = st.header.dt;
-  const tkw = st.loops.every(lp => loopMetrics(lp).compKw != null)
-    ? st.loops.reduce((s,lp)=>s+loopMetrics(lp).compKw,0) : null;
+  const tkw = PLANT.inputKw;
   const trt = r1(st.header.flow * dt * 4.186 / 3.517);
   const cop = tkw > 0 ? r1(trt * 3.517 / tkw) : 0;
   const kwrt = tkw > 0 ? r1(tkw / Math.max(trt, 0.1)) : 0;

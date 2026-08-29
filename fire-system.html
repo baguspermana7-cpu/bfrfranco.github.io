@@ -401,6 +401,14 @@
     </div>
 
     <section class="fire-scope-strip" aria-label="Current and study capacity basis">
+        <!-- v1.134.8 — an open, quantified finding: the installed fire-water reserve cannot
+             meet the duration this drawing itself requires. Rendered from the engine so it
+             cannot be forgotten or edited away on one page. -->
+        <div class="fire-scope-card" id="fire-reserve-finding"
+             style="border-color:#e4564a">
+          <span><strong style="color:#e4564a">Fire-water reserve vs stated duration</strong>
+            <small id="fire-duration-shortfall">&mdash;</small></span>
+        </div>
         <div class="fire-scope-card" id="fire-current-basis">
             <span class="scope-tag">CURRENT · ENGINE BOUND</span>
             <span><strong id="fire-current-basis-value">1.85 MW IT · 114 m³ fire reserve · 5 pre-action zones</strong><small>Live mimic and staged scenario use this locked Conventional DC basis.</small></span>
@@ -459,7 +467,7 @@
                     <line x1="0" y1="198" x2="300" y2="198" stroke="#fb923c" stroke-width="1.5" stroke-dasharray="6 5" opacity="0.55" />
                     <text x="296" y="193" text-anchor="end" fill="#fb923c" font-size="8" font-weight="bold">LOW-LOW 60%</text>
                     <text x="150" y="-30" text-anchor="middle" class="eq-name" font-size="11">TK-FW-01 · Fire Reserve Tank</text>
-                    <text x="150" y="-15" text-anchor="middle" class="eq-tag">Capacity 114 m³ · Required duration ≥ 60 min</text>
+                    <text id="tank-cap-tag" x="150" y="-15" text-anchor="middle" class="eq-tag">&mdash;</text>
                     <text id="tank-level-txt" x="150" y="225" text-anchor="middle" fill="#cbd5e1" font-size="40" font-weight="800" class="font-tech">92%</text>
                     <text id="tank-vol-txt" x="150" y="252" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="700" class="font-tech">105 m³ / 114 m³</text>
                     <text id="tank-dur-txt" x="150" y="274" text-anchor="middle" fill="#64748b" font-size="11" class="font-tech">Duration ≈ 0 min</text>
@@ -614,7 +622,7 @@
             <div class="panel-title">Water Reserve &amp; Demand</div>
             <div class="metric-row"><span class="metric-label">Tank level</span><span class="metric-val" id="m-tank-pct">92%</span></div>
             <div class="metric-row"><span class="metric-label">Available volume</span><span class="metric-val" id="m-tank-vol">105 m³ / 114 m³</span></div>
-            <div class="metric-row"><span class="metric-label">Fire pump demand</span><span class="metric-val">2,500 L/min</span></div>
+            <div class="metric-row"><span class="metric-label">Fire pump demand</span><span class="metric-val" id="m-pump-demand" data-basis-param="fire.pump_demand_lpm" tabindex="0" role="button">&mdash;</span></div>
             <div class="metric-row"><span class="metric-label">Available duration</span><span class="metric-val" id="m-duration">— min</span></div>
             <div class="metric-row"><span class="metric-label">Protected IT load (basis)</span><span class="metric-val" id="m-it-basis" data-basis-param="site.it_load_kw" tabindex="0" role="button">1.85 MW</span></div>
             <div class="metric-row"><span class="metric-label">Protected hall volume</span><span class="metric-val" id="m-hall-vol">— m³</span></div>
@@ -658,16 +666,20 @@
         var RACKS        = S ? S.racks.at_8kw : 231;              // 231 racks @ 8 kW/rack basis
         // Protected white-space volume: racks * footprint(1.2 m2) * 3.0 m clear height
         var HALL_VOL_M3  = Math.round(RACKS * 1.2 * 3.0);         // deterministic from basis
-        var ZONE_COUNT   = 5;                                     // 5 pre-action zones (PACV-01..05)
+        /* v1.134.8 — the fire basis lived entirely in page constants and nothing computed the
+           one number that matters: how long the reserve actually lasts. conv-engine.js carries
+           it now and does the arithmetic. */
+        var FIRE = (S && S.fire) ? S.fire : null;
+        var ZONE_COUNT   = FIRE ? FIRE.zone_count : 5;                                     // 5 pre-action zones (PACV-01..05)
 
         // Fire reserve tank (fixed civil capacity) + thresholds
-        var TANK_CAP_M3   = 114;
+        var TANK_CAP_M3   = FIRE ? FIRE.reserve_capacity_m3 : null;
         var TANK_LOW_PCT  = 80;   // low alarm
         var TANK_LL_PCT   = 60;   // low-low alarm
-        var PUMP_DEMAND_LPM = 2500;
+        var PUMP_DEMAND_LPM = FIRE ? FIRE.pump_demand_lpm : null;
 
         // Pressure setpoints (bar) — shown explicitly per doc-05 §Pressure Thresholds
-        var P_STATIC   = 12.5;
+        var P_STATIC   = FIRE ? FIRE.static_pressure_bar : 12.5;
         var P_JOCKEY_ON = 11.5, P_JOCKEY_OFF = 12.8;
         var P_FP1_ON   = 10.5,  P_FP2_ON = 9.5;
         var P_LOW_ALM  = 8.5;
@@ -1011,6 +1023,30 @@
             }
             $('m-hall-vol').textContent = HALL_VOL_M3.toLocaleString() + ' m³';
             $('m-zones').textContent = ZONE_COUNT + ' zones · all Normal';
+            /* v1.134.8 — the drawing stated "Capacity 114 m3 · Required duration >= 60 min" as
+               two hand-typed facts and never checked one against the other. The engine does:
+               at the design pump demand this reserve lasts 42 min at the current level and
+               45.6 min even FULL, against a stated 60 min. The installed tank cannot meet its
+               own requirement, short by 36 m3. Stating that is the whole point of a basis. */
+            if (FIRE) {
+                $('tank-cap-tag').textContent = 'Capacity ' + FIRE.reserve_capacity_m3 + ' m\u00b3 · '
+                    + 'required \u2265 ' + FIRE.required_duration_min + ' min · delivers '
+                    + FIRE.duration_at_full_min + ' min when full';
+                $('m-pump-demand').textContent = FIRE.pump_demand_lpm.toLocaleString() + ' L/min';
+                var shortfall = $('fire-duration-shortfall');
+                if (shortfall) {
+                    shortfall.textContent = FIRE.capacity_shortfall_m3 > 0
+                        ? ('Reserve is ' + FIRE.capacity_shortfall_m3 + ' m\u00b3 short of the '
+                           + FIRE.required_duration_min + ' min requirement: '
+                           + FIRE.required_capacity_m3 + ' m\u00b3 would be needed at '
+                           + FIRE.pump_demand_lpm.toLocaleString() + ' L/min. Installed '
+                           + FIRE.reserve_capacity_m3 + ' m\u00b3 delivers '
+                           + FIRE.duration_at_full_min + ' min full, '
+                           + FIRE.duration_min + ' min at the current ' + FIRE.level_pct + '% level.')
+                        : ('Reserve meets the ' + FIRE.required_duration_min + ' min requirement.');
+                    shortfall.style.color = FIRE.capacity_shortfall_m3 > 0 ? '#e4564a' : '';
+                }
+            }
             /* Pump setpoints render from the SAME constants the pressure state machine
                acts on (see jSt / fire-pump staging below), so the panel cannot display a
                setpoint the simulation is not using. */

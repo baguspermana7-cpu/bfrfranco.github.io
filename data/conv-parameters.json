@@ -371,6 +371,85 @@
       }
     },
     {
+      "id": "cooling.cdw_range_k",
+      "label": "Cooling tower range",
+      "unit": "K",
+      "kind": "authored",
+      "value": 5,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "cooling.cdw_range_k"
+      ],
+      "consumers": [],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29",
+        "method": "Typical tower range; pending the site wet-bulb basis."
+      }
+    },
+    {
+      "id": "cooling.cdw_return_c",
+      "label": "Condenser water return",
+      "unit": "degC",
+      "kind": "derived",
+      "value": 37,
+      "formula": "cdw_supply_c + cdw_range_k",
+      "deps": [
+        "cooling.cdw_supply_c",
+        "cooling.cdw_range_k"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "cooling.cdw_range_k",
+        "cooling.cdw_supply_c"
+      ],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 2
+        }
+      ],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29"
+      }
+    },
+    {
+      "id": "cooling.cdw_supply_c",
+      "label": "Condenser water supply",
+      "unit": "degC",
+      "kind": "authored",
+      "value": 32,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "cooling.cdw_supply_c"
+      ],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 2
+        }
+      ],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29",
+        "method": "Typical tropical design value; no site wet-bulb design figure has been supplied. Replace with the site wet-bulb basis when it exists."
+      }
+    },
+    {
       "id": "cooling.chiller_capacity_kw_th",
       "label": "Chiller plant capacity (running)",
       "unit": "kW_th",
@@ -388,7 +467,12 @@
         "cooling.chiller_unit_kw_th",
         "electrical.ups_efficiency"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 2
+        }
+      ],
       "tests": [],
       "source": {
         "ref": "js/conv-engine.js",
@@ -425,6 +509,41 @@
       }
     },
     {
+      "id": "cooling.chiller_input_kw_e",
+      "label": "Chiller plant electrical input",
+      "unit": "kW",
+      "kind": "derived",
+      "value": 5153.4,
+      "formula": "heat_rejection_kw x chiller_specific_power_kw_e_per_kw_th",
+      "deps": [
+        "cooling.heat_rejection_kw",
+        "cooling.chiller_specific_power_kw_e_per_kw_th"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_load_kw",
+        "campus.halls.1.it_load_kw",
+        "campus.halls.2.it_load_kw",
+        "campus.halls.3.it_load_kw",
+        "cooling.chiller_specific_power_kw_e_per_kw_th",
+        "electrical.ups_efficiency"
+      ],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 4
+        }
+      ],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29",
+        "method": "Replaces an authored page curve that produced 0.11 kW/RT."
+      }
+    },
+    {
       "id": "cooling.chiller_n1_capacity_kw_th",
       "label": "Chiller capacity with one machine out",
       "unit": "kW_th",
@@ -446,7 +565,12 @@
         "cooling.chiller_unit_kw_th",
         "electrical.ups_efficiency"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 2
+        }
+      ],
       "tests": [],
       "source": {
         "ref": "js/conv-engine.js",
@@ -477,6 +601,55 @@
         "ref": "js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)",
         "asOf": "2026-08-28",
         "section": "resilience.subsystems.cooling"
+      }
+    },
+    {
+      "id": "cooling.chiller_specific_power_kw_e_per_kw_th",
+      "label": "Chiller specific power",
+      "unit": "kW_e/kW_th",
+      "kind": "authored",
+      "value": 0.16491,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": "chiller-specific-power",
+      "dependsOnInputs": [
+        "cooling.chiller_specific_power_kw_e_per_kw_th"
+      ],
+      "consumers": [],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "cooling",
+        "asOf": "2026-08-29",
+        "method": "0.58 kW/RT is mid-band for a water-cooled centrifugal at design; 1 RT = 3.517 kW_th. A vendor submittal replaces exactly this number and everything downstream re-derives."
+      }
+    },
+    {
+      "id": "cooling.chiller_type",
+      "label": "Chiller machine type",
+      "unit": null,
+      "kind": "authored",
+      "value": "water-cooled-centrifugal",
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 1
+        }
+      ],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)",
+        "section": "water.heatRejectionType",
+        "asOf": "2026-08-29",
+        "method": "The study fixes evaporative cooling-tower heat rejection, which means water-cooled machines. Adopted by the owner 2026-08-29, replacing the air-cooled depiction the P&ID had carried."
       }
     },
     {
@@ -536,7 +709,7 @@
         },
         {
           "page": "chiller-plant.html",
-          "reads": 9
+          "reads": 10
         }
       ],
       "tests": [],
@@ -801,7 +974,12 @@
         "campus.halls.3.it_load_kw",
         "electrical.ups_efficiency"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 2
+        }
+      ],
       "tests": [],
       "source": {
         "ref": "js/conv-engine.js",
@@ -921,6 +1099,62 @@
       }
     },
     {
+      "id": "cooling.plant_cop",
+      "label": "Plant COP",
+      "unit": null,
+      "kind": "derived",
+      "value": 6.06,
+      "formula": "1 / chiller_specific_power_kw_e_per_kw_th",
+      "deps": [
+        "cooling.chiller_specific_power_kw_e_per_kw_th"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": "plant-cop",
+      "dependsOnInputs": [
+        "cooling.chiller_specific_power_kw_e_per_kw_th"
+      ],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 2
+        }
+      ],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29"
+      }
+    },
+    {
+      "id": "cooling.plant_kw_per_rt",
+      "label": "Plant kW per refrigeration ton",
+      "unit": "kW/RT",
+      "kind": "derived",
+      "value": 0.58,
+      "formula": "chiller_specific_power_kw_e_per_kw_th x 3.517",
+      "deps": [
+        "cooling.chiller_specific_power_kw_e_per_kw_th"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "cooling.chiller_specific_power_kw_e_per_kw_th"
+      ],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 2
+        }
+      ],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29"
+      }
+    },
+    {
       "id": "cooling.rack_inlet_target_c",
       "label": "Rack-inlet design target",
       "unit": "degC",
@@ -975,6 +1209,41 @@
         "asOf": "2026-08-28",
         "section": "THERMAL CHAIN",
         "method": "Contained cold aisle: the same 0 K assumption the return path uses. Applying it in one direction only produced the 15.2 C supply-air defect."
+      }
+    },
+    {
+      "id": "cooling.tower_rejection_kw_th",
+      "label": "Cooling tower heat rejection",
+      "unit": "kW_th",
+      "kind": "derived",
+      "value": 36403.4,
+      "formula": "heat_rejection_kw x (1 + chiller_specific_power_kw_e_per_kw_th)",
+      "deps": [
+        "cooling.heat_rejection_kw",
+        "cooling.chiller_specific_power_kw_e_per_kw_th"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_load_kw",
+        "campus.halls.1.it_load_kw",
+        "campus.halls.2.it_load_kw",
+        "campus.halls.3.it_load_kw",
+        "cooling.chiller_specific_power_kw_e_per_kw_th",
+        "electrical.ups_efficiency"
+      ],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 2
+        }
+      ],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29",
+        "method": "The tower rejects the chiller duty plus the compressor work."
       }
     },
     {
@@ -1531,6 +1800,312 @@
       }
     },
     {
+      "id": "fire.capacity_shortfall_m3",
+      "label": "Reserve shortfall against the requirement",
+      "unit": "m3",
+      "kind": "derived",
+      "value": 36,
+      "formula": "required_capacity_m3 - reserve_capacity_m3",
+      "deps": [
+        "fire.required_capacity_m3",
+        "fire.reserve_capacity_m3"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": "fire-shortfall",
+      "dependsOnInputs": [
+        "fire.pump_demand_lpm",
+        "fire.required_duration_min",
+        "fire.reserve_capacity_m3"
+      ],
+      "consumers": [
+        {
+          "page": "fire-system.html",
+          "reads": 3
+        }
+      ],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29",
+        "method": "Positive means the installed tank cannot meet its stated duration even when full. It is +36 m3 today; the figure is published rather than left to a reader to notice."
+      }
+    },
+    {
+      "id": "fire.duration_at_full_min",
+      "label": "Duration with a full tank",
+      "unit": "min",
+      "kind": "derived",
+      "value": 45.6,
+      "formula": "reserve_capacity_m3 x 1000 / pump_demand_lpm",
+      "deps": [
+        "fire.reserve_capacity_m3",
+        "fire.pump_demand_lpm"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "fire.pump_demand_lpm",
+        "fire.reserve_capacity_m3"
+      ],
+      "consumers": [
+        {
+          "page": "fire-system.html",
+          "reads": 2
+        }
+      ],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29",
+        "method": "The most the INSTALLED tank can ever deliver."
+      }
+    },
+    {
+      "id": "fire.duration_min",
+      "label": "Duration at the current level",
+      "unit": "min",
+      "kind": "derived",
+      "value": 42,
+      "formula": "stored_m3 x 1000 / pump_demand_lpm",
+      "deps": [
+        "fire.stored_m3",
+        "fire.pump_demand_lpm"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": "fire-duration",
+      "dependsOnInputs": [
+        "fire.level_pct",
+        "fire.pump_demand_lpm",
+        "fire.reserve_capacity_m3"
+      ],
+      "consumers": [
+        {
+          "page": "fire-system.html",
+          "reads": 1
+        }
+      ],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29",
+        "method": "What an operator actually has right now."
+      }
+    },
+    {
+      "id": "fire.level_pct",
+      "label": "Fire-water tank level",
+      "unit": "%",
+      "kind": "authored",
+      "value": 92,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "SIMULATED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "fire.level_pct"
+      ],
+      "consumers": [],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29",
+        "method": "Deterministic operating state, not a live gauge."
+      }
+    },
+    {
+      "id": "fire.pump_demand_lpm",
+      "label": "Fire pump design demand",
+      "unit": "L/min",
+      "kind": "authored",
+      "value": 2500,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "fire.pump_demand_lpm"
+      ],
+      "consumers": [
+        {
+          "page": "fire-system.html",
+          "reads": 5
+        }
+      ],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29",
+        "method": "A hazard classification and a sprinkler density would fix this; neither has been supplied."
+      }
+    },
+    {
+      "id": "fire.required_capacity_m3",
+      "label": "Capacity the requirement demands",
+      "unit": "m3",
+      "kind": "derived",
+      "value": 150,
+      "formula": "required_duration_min x pump_demand_lpm / 1000",
+      "deps": [
+        "fire.required_duration_min",
+        "fire.pump_demand_lpm"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "fire.pump_demand_lpm",
+        "fire.required_duration_min"
+      ],
+      "consumers": [
+        {
+          "page": "fire-system.html",
+          "reads": 1
+        }
+      ],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29"
+      }
+    },
+    {
+      "id": "fire.required_duration_min",
+      "label": "Required fire-water duration",
+      "unit": "min",
+      "kind": "authored",
+      "value": 60,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "fire.required_duration_min"
+      ],
+      "consumers": [
+        {
+          "page": "fire-system.html",
+          "reads": 3
+        }
+      ],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29",
+        "method": "Stated on the fire mimic itself as the design requirement."
+      }
+    },
+    {
+      "id": "fire.reserve_capacity_m3",
+      "label": "Fire-water reserve capacity",
+      "unit": "m3",
+      "kind": "authored",
+      "value": 114,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "fire.reserve_capacity_m3"
+      ],
+      "consumers": [
+        {
+          "page": "fire-system.html",
+          "reads": 3
+        }
+      ],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29",
+        "method": "No hydraulic calculation or authority submission has been supplied for this site."
+      }
+    },
+    {
+      "id": "fire.static_pressure_bar",
+      "label": "Static header pressure",
+      "unit": "bar",
+      "kind": "authored",
+      "value": 12.5,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "SIMULATED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "fire.static_pressure_bar"
+      ],
+      "consumers": [
+        {
+          "page": "fire-system.html",
+          "reads": 1
+        }
+      ],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29"
+      }
+    },
+    {
+      "id": "fire.stored_m3",
+      "label": "Fire water stored now",
+      "unit": "m3",
+      "kind": "derived",
+      "value": 104.9,
+      "formula": "reserve_capacity_m3 x level_pct",
+      "deps": [
+        "fire.reserve_capacity_m3",
+        "fire.level_pct"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "fire.level_pct",
+        "fire.reserve_capacity_m3"
+      ],
+      "consumers": [],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29"
+      }
+    },
+    {
+      "id": "fire.zone_count",
+      "label": "Pre-action zones",
+      "unit": null,
+      "kind": "authored",
+      "value": 5,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "fire.zone_count"
+      ],
+      "consumers": [
+        {
+          "page": "fire-system.html",
+          "reads": 1
+        }
+      ],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29",
+        "method": "Matches the mimic (PACV-01..05)."
+      }
+    },
+    {
       "id": "fuel.autonomy_hr",
       "label": "Generator autonomy",
       "unit": "h",
@@ -1631,11 +2206,11 @@
       "consumers": [
         {
           "page": "dc-conventional.html",
-          "reads": 13
+          "reads": 6
         },
         {
           "page": "fuel-system.html",
-          "reads": 9
+          "reads": 1
         }
       ],
       "tests": [],
@@ -2653,6 +3228,33 @@
       }
     },
     {
+      "id": "water.domestic_lpm",
+      "label": "Domestic / process draw",
+      "unit": "L/min",
+      "kind": "authored",
+      "value": 8,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "water.domestic_lpm"
+      ],
+      "consumers": [
+        {
+          "page": "water-system.html",
+          "reads": 2
+        }
+      ],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29",
+        "method": "Excluded from WUE, which counts cooling makeup only. No metered domestic demand has been supplied."
+      }
+    },
+    {
       "id": "water.flow_lpm_for_wue",
       "label": "WUE makeup flow",
       "unit": "L/min",
@@ -2689,6 +3291,41 @@
       "source": {
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "water.total_treated_lpm",
+      "label": "Total treated flow",
+      "unit": "L/min",
+      "kind": "derived",
+      "value": 608,
+      "formula": "flow_lpm_for_wue + domestic_lpm",
+      "deps": [
+        "water.flow_lpm_for_wue",
+        "water.domestic_lpm"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_load_kw",
+        "campus.halls.1.it_load_kw",
+        "campus.halls.2.it_load_kw",
+        "campus.halls.3.it_load_kw",
+        "environment.wue_l_per_kwh",
+        "water.domestic_lpm"
+      ],
+      "consumers": [
+        {
+          "page": "water-system.html",
+          "reads": 4
+        }
+      ],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29",
+        "method": "What the treatment train is sized for."
       }
     },
     {

@@ -139,6 +139,7 @@ const BRANCH_SCOPE = Object.freeze({
     water: ['plant', 'site'],
     meta: ['meta'],
     hall: ['hall'],
+    fire: ['plant'],
 });
 for (const p of registry.parameters) {
     const branch = p.id.split('.')[0];
