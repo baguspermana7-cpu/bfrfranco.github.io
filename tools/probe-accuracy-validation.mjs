@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* v1.32.9 — Accuracy validation probes for the team-review acceptance tests.
+/* v1.134.12 — Accuracy validation probes for the team-review acceptance tests.
    Source: Documents/screenshot bms rz/dc ai/review/26-accuracy-validation-and-correction-list.md
          + Documents/screenshot bms rz/conv/review/16-accuracy-validation-and-correction-list.md
    Codified: standarization/ACCURACY_VALIDATION.md (6 rules + 7+8 acceptance tests).
@@ -15,6 +15,7 @@
 */
 import puppeteer from 'puppeteer';
 import path from 'node:path';
+import { readFile } from 'node:fs/promises';
 
 const BASE = (process.env.RZ_BASE === 'file')
   ? 'file://' + path.resolve(process.cwd())
@@ -27,6 +28,59 @@ const failures = [];
 function assert(cond, label, detail) {
   if (cond) { pass++; console.log(`  ✓ ${label}`); }
   else { fail++; failures.push({label, detail}); console.log(`  ✗ ${label}${detail?'\n     '+detail:''}`); }
+}
+
+function htmlText(html) {
+  return String(html || '')
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;|&#160;/gi, ' ')
+    .replace(/&times;/gi, '×')
+    .replace(/&divide;/gi, '÷')
+    .replace(/&minus;/gi, '−')
+    .replace(/&mdash;/gi, '—')
+    .replace(/&middot;/gi, '·')
+    .replace(/&deg;/gi, '°')
+    .replace(/&amp;/gi, '&')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function rawElementText(html, id) {
+  const safeId = String(id).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const match = String(html || '').match(new RegExp(
+    `<([a-z][\\w:-]*)\\b[^>]*\\bid=["']${safeId}["'][^>]*>([\\s\\S]*?)<\\/\\1>`,
+    'i'
+  ));
+  return match ? htmlText(match[2]) : null;
+}
+
+const RETIRED_CONVENTIONAL_CLAIMS = Object.freeze([
+  /(?:current|locked|snapshot|IT load)[^.]{0,100}1[ ,]?850|1[ ,]?850[^.]{0,100}(?:current|locked|snapshot)/i,
+  /\b58(?:[.,][12])?\s*L\/s\b/i,
+  /\b45[ ,]900\s*L\b/i,
+  /\b37(?:[.,]0)?\s*L\/min\b/i,
+  /\b99[.,]98\s*%/i,
+  /\bcurrent-plus-design\b/i
+]);
+
+function retiredConventionalClaims(text) {
+  return RETIRED_CONVENTIONAL_CLAIMS.filter((pattern) => pattern.test(String(text || '')));
+}
+
+function conventionalDocumentAligned(text) {
+  const labeledCurrentValues = [
+    /(?:IT load|Current IT).{0,220}30[ ,]000\s*kW/i,
+    /(?:Facility load|Facility).{0,220}43[ ,]500\s*kW/i,
+    /CHW(?:\s+ΔT\s*\/)?\s*flow.{0,240}943(?:[.,]0)?\s*L\/s/i,
+    /(?:Usable fuel|Usable volume).{0,240}744[ ,]144\s*L/i,
+    /(?:Equivalent cooling makeup|Water equivalent flow).{0,240}600(?:[.,]0)?\s*L\/min/i,
+    /Uptime.{0,240}UNAVAILABLE/i,
+    /current-plus-study/i
+  ];
+  return labeledCurrentValues.every((pattern) => pattern.test(text))
+    && retiredConventionalClaims(text).length === 0;
 }
 
 const browser = await puppeteer.launch({headless:'new',args:['--no-sandbox']});
@@ -134,6 +188,23 @@ console.log('\n=== DC AI accuracy probes (datahallAI.html) ===');
  * ====================================================================== */
 console.log('\n=== DC Conv accuracy probes (dc-conventional.html) ===');
 {
+  const expectedSurfaces = {
+    kpiPue:'1.45', cPue:'1.45', sPue:'1.45', kpiWue:'1.20', sWue:'1.20 L/kWh',
+    kpiCarbon:'0.42', sCue:'0.42 kg/kWh facility', sCueIt:'0.61 kg/kWh IT',
+    kpiIt:'30,000', cIt:'30.00 MW', sItLoad:'30,000 kW', sTotalLoad:'43,500 kW',
+    cChw:'19.4°C', sChwSup:'19.4°C', sChwRet:'27.0°C',
+    kpiTemp:'22.4', cTemp:'22.4°C', sTempAvg:'22.4°C', cRh:'48%', sRhAvg:'48%',
+    cFuel:'85%', sFuelMain:'85%', sAutonomy:'48 hrs · bulk tank @ campus load'
+  };
+  const rawExpectedSurfaces = {...expectedSurfaces, sAutonomy:'—', kpiUptime:'—'};
+  const rawHtml = await readFile(path.resolve(process.cwd(), 'dc-conventional.html'), 'utf8');
+  const rawSurfaceMismatches = Object.entries(rawExpectedSurfaces)
+    .map(([id, expected]) => ({id, expected, actual:rawElementText(rawHtml, id)}))
+    .filter(({expected, actual}) => actual !== expected);
+  assert(rawSurfaceMismatches.length === 0,
+    'CONV-Test-0: raw first-paint fallbacks are current or explicitly unavailable',
+    JSON.stringify(rawSurfaceMismatches));
+
   const page = await browser.newPage();
   await page.goto(`${BASE}/dc-conventional.html`, {waitUntil:'networkidle2', timeout:30000});
   await new Promise(r => setTimeout(r, 1200));
@@ -160,6 +231,23 @@ console.log('\n=== DC Conv accuracy probes (dc-conventional.html) ===');
   const wue = await page.evaluate(() => document.getElementById('kpiWue')?.textContent);
   assert(wue === '1.20', 'CONV-Test-4: WUE = 1.20 L/kWh IT', `got ${wue}`);
 
+  /* Every duplicated runtime surface must reconcile after the engine write. Raw
+     first-paint markup is asserted independently before the browser is opened. */
+  const currentSurfaces = await page.evaluate(() => {
+    const ids = [
+      'kpiPue','cPue','sPue','kpiWue','sWue','kpiCarbon','sCue','sCueIt',
+      'kpiIt','cIt','sItLoad','sTotalLoad','cChw','sChwSup','sChwRet',
+      'kpiTemp','cTemp','sTempAvg','cRh','sRhAvg','cFuel','sFuelMain','sAutonomy'
+    ];
+    return Object.fromEntries(ids.map((id) => [id, document.getElementById(id)?.textContent?.trim() || null]));
+  });
+  const surfaceMismatches = Object.entries(expectedSurfaces)
+    .filter(([id, expected]) => currentSurfaces[id] !== expected)
+    .map(([id, expected]) => ({id, expected, actual:currentSurfaces[id]}));
+  assert(surfaceMismatches.length === 0,
+    'CONV-Test-4b: every duplicated current-value surface matches the governed snapshot',
+    JSON.stringify(surfaceMismatches));
+
   /* ---- Test 5: Fuel autonomy with explicit scope label ---- */
   const fuelScope = /48\s*hrs.*bulk[- ]tank/.test(html);
   assert(fuelScope, 'CONV-Test-5: fuel autonomy labelled "bulk-tank @ site load"', '');
@@ -182,27 +270,59 @@ console.log('\n=== DC Conv accuracy probes (dc-conventional.html) ===');
   const stable = samples.every(s => s.pueDash === samples[0].pueDash && s.wue === samples[0].wue);
   assert(stable, `CONV-Test-7: dashboard basis KPIs identical across ${ROUND_TRIPS} reloads`, JSON.stringify(samples));
 
-  /* ---- Test 8: Basis drawer on conv (DOM-API click for headless reliability) ---- */
+  /* ---- Test 8: Registry basis drawer on conv (DOM-API click for headless reliability) ----
+     Grid factor is an AUTHORED parameter, so its truthful contract is
+     Value/Scope/Source/Evidence rather than a fabricated arithmetic formula. */
   await page.evaluate(() => {
-    const card = document.querySelector('.kpi-card[data-basis="grid"]');
+    const card = document.querySelector('.kpi-card[data-basis-param="environment.carbon_kg_per_facility_kwh"]');
     if (card) card.click();
   });
   await new Promise(r => setTimeout(r, 500));
   const drawerOk = await page.evaluate(() => {
-    const dlg = document.getElementById('kpiBasisDrawer');
+    const dlg = document.getElementById('rz-basis-drawer');
     if (!dlg) return null;
     const txt = dlg.textContent;
+    const parameters = window.RZ_CONV_PARAMETERS?.parameters || [];
+    const grid = parameters.find(p => p.id === 'environment.carbon_kg_per_facility_kwh')?.value;
+    const pue = window.CONV_CALC?.snapshot?.site?.pue;
+    const cue = Number.parseFloat(document.getElementById('sCueIt')?.textContent || '');
     return {
-      hasFormula: txt.includes('Formula'),
+      isOpen: dlg.getAttribute('aria-hidden') === 'false',
+      hasValueAndScope: txt.includes('Value') && txt.includes('Scope'),
       hasSource: txt.includes('Source'),
-      hasMode: /DERIVED|BOD LOCKED|SIM SENSOR|DESIGN PLACEHOLDER/.test(txt),
-      hasCueIt: /CUE_IT|CUE\.IT/i.test(txt)
+      hasEvidence: /ADOPTED|DERIVED|SIMULATED|ASSUMED|UNAVAILABLE/.test(txt),
+      hasFacilityDenominator: /facility\s+kwh|denominator is facility/i.test(txt),
+      cueMatchesGridTimesPue: Number.isFinite(grid) && Number.isFinite(pue) && Number.isFinite(cue)
+        && Math.abs(cue - (grid * pue)) < 0.005
     };
   });
-  assert(drawerOk?.hasFormula, 'CONV-Test-8a: Grid-factor drawer shows Formula', '');
+  assert(drawerOk?.isOpen && drawerOk?.hasValueAndScope, 'CONV-Test-8a: Grid-factor registry drawer shows Value and Scope', '');
   assert(drawerOk?.hasSource, 'CONV-Test-8b: drawer shows Source object', '');
-  assert(drawerOk?.hasMode, 'CONV-Test-8c: drawer carries data-mode chip', '');
-  assert(drawerOk?.hasCueIt, 'CONV-Test-8d: drawer explains CUE_IT relationship', '');
+  assert(drawerOk?.hasEvidence, 'CONV-Test-8c: drawer carries an evidence-class chip', '');
+  assert(drawerOk?.hasFacilityDenominator && drawerOk?.cueMatchesGridTimesPue,
+    'CONV-Test-8d: facility-denominator grid factor reconciles to CUE_IT = grid factor x PUE',
+    drawerOk ? JSON.stringify(drawerOk) : 'drawer not created');
+
+  /* Uptime has no source ledger. Its custom drawer must remain unavailable and
+     must not reuse the healthy-green output treatment. */
+  await page.evaluate(() => {
+    document.getElementById('rz-basis-drawer')?.remove();
+    document.querySelector('.kpi-card[data-basis="uptime"]')?.click();
+  });
+  await new Promise(r => setTimeout(r, 250));
+  const uptimeDrawer = await page.evaluate(() => {
+    const output = document.querySelector('#kpiBasisDrawer [data-output-state="UNAVAILABLE"]');
+    if (!output) return null;
+    const style = getComputedStyle(output);
+    return {
+      text: output.textContent?.trim() || '',
+      background: style.backgroundColor,
+      isHealthyGreen: style.backgroundColor === 'rgb(10, 125, 40)'
+    };
+  });
+  assert(uptimeDrawer?.text.includes('UNAVAILABLE') && !uptimeDrawer?.isHealthyGreen,
+    'CONV-Test-9: unavailable uptime drawer is explicit and not painted healthy green',
+    JSON.stringify(uptimeDrawer));
 
   await page.close();
 }
@@ -310,16 +430,48 @@ console.log('\n=== Generate Design Tech Spec PDF probes ===');
   const okConv = dcConvPdf && dcConvPdf.length > 5000;
   assert(okConv, `TS-CONV-1: Generate Design returns non-trivial HTML (~${dcConvPdf?.length||0} chars)`, '');
   if (okConv) {
+    const convPdfText = htmlText(dcConvPdf);
     assert(/Conventional Data Centre/i.test(dcConvPdf), 'TS-CONV-2: PDF title carries facility name', '');
-    assert(/1[,.]?850/.test(dcConvPdf), 'TS-CONV-3: PDF carries engine value 1,850 kW (IT)', '');
+    assert(/\bIT load\b.{0,240}\b30[ ,]000\s*kW/i.test(convPdfText), 'TS-CONV-3: labeled IT-load output carries 30,000 kW', '');
     assert(/1\.45/.test(dcConvPdf), 'TS-CONV-4: PDF carries PUE 1.45', '');
     assert(/Grid factor|grid_factor/i.test(dcConvPdf), 'TS-CONV-5: PDF uses "Grid factor" terminology (not CUE alone)', '');
     assert(/0\.6[01]\s*kg/i.test(dcConvPdf), 'TS-CONV-6: PDF derives CUE_IT 0.61 kg/kWh IT', '');
-    assert(/58[.,]?[12]/.test(dcConvPdf), 'TS-CONV-7: PDF carries CHW flow 58.2 L/s', '');
-    assert(/45[,.]?900/.test(dcConvPdf), 'TS-CONV-8: PDF carries fuel usable 45,900 L', '');
-    assert(/CAPEX|OPEX|TCO/i.test(dcConvPdf), 'TS-CONV-9: PDF includes Cost Annex', '');
-    assert(/ISO\/IEC 30134/i.test(dcConvPdf), 'TS-CONV-10: PDF cites ISO/IEC 30134 (CUE standard)', '');
+    assert(/\bCHW flow rate\b.{0,360}\b943(?:[.,]0)?\s*L\/s/i.test(convPdfText), 'TS-CONV-7: labeled CHW-flow output carries 943.0 L/s', '');
+    assert(/\bUsable fuel volume now\b.{0,360}\b744[ ,]144\s*L/i.test(convPdfText), 'TS-CONV-8: labeled usable-fuel output carries 744,144 L', '');
+    assert(/\bInstant make-up water flow\b.{0,360}\b600(?:[.,]0)?\s*L\/min/i.test(convPdfText), 'TS-CONV-9a: labeled WUE-equivalent flow carries 600.0 L/min', '');
+    assert(/\bInstant make-up water flow\b.{0,520}\bCONV_CALC\.snapshot\.water\.flow_lpm_for_wue\b/i.test(convPdfText), 'TS-CONV-9b: WUE-equivalent flow cites the current engine snapshot identity', '');
+    assert(/CAPEX|OPEX|TCO/i.test(dcConvPdf), 'TS-CONV-10: PDF includes Cost Annex', '');
+    assert(/ISO\/IEC 30134/i.test(dcConvPdf), 'TS-CONV-11: PDF cites ISO/IEC 30134 (CUE standard)', '');
   }
+}
+
+/* --- Conventional public-document parity: current basis must not lag runtime. --- */
+const retirementFixtures = [
+  'Current IT load is 1,850 kW',
+  'CHW flow is 58.1 L/s',
+  'CHW flow is 58.2 L/s',
+  'Usable fuel is 45,900 L',
+  'Equivalent cooling makeup is 37.0 L/min',
+  'Uptime is 99.98%',
+  'Design Studio scope is current-plus-design'
+];
+const missedRetirementFixtures = retirementFixtures
+  .filter((fixture) => retiredConventionalClaims(fixture).length === 0);
+assert(missedRetirementFixtures.length === 0,
+  'DOC-CONV-Guard: adversarial retired-value fixtures are all rejected',
+  JSON.stringify(missedRetirementFixtures));
+
+for (const doc of [
+  {route:'manual/dc-conventional.html', label:'Manual'},
+  {route:'prd/dc-conventional.html', label:'PRD'}
+]) {
+  const page = await browser.newPage();
+  await page.goto(`${BASE}/${doc.route}`, {waitUntil:'networkidle2', timeout:30000});
+  const text = await page.evaluate(() => document.body?.innerText.replace(/\s+/g, ' ').trim() || '');
+  await page.close();
+  assert(conventionalDocumentAligned(text),
+    `DOC-CONV-${doc.label}: current 30 MW basis and dependent values stay synchronized`,
+    'requires labeled 30,000 kW; 43,500 kW; 943.0 L/s; 600.0 L/min; 744,144 L; UNAVAILABLE uptime; current-plus-study; and no retired current claim');
 }
 
 /* ========================================================================
@@ -397,6 +549,12 @@ console.log('\n=== Cross-page headline consistency (Rule 1) ===');
         const el = document.getElementById(id);
         r[id] = el ? el.textContent.trim() : null;
       }
+      const snapshot = window.CONV_CALC?.snapshot;
+      r.__scope = {
+        hallCount: snapshot?.campus?.hall_count ?? null,
+        campusItKw: snapshot?.campus?.it_load_kw ?? snapshot?.site?.it_load_kw ?? null,
+        hallItKw: snapshot?.campus?.halls?.[0]?.it_load_kw ?? null
+      };
       return r;
     }, ids);
     await p.close();
@@ -424,14 +582,23 @@ console.log('\n=== Cross-page headline consistency (Rule 1) ===');
               && /^1\.20/.test(wueStatusBar||'');
   assert(wueOk, 'X-Test-2: WUE = 1.20 identical across dc-conv (2 surfaces) + water-system (2 surfaces)', JSON.stringify({dashboard:wueDashboard, side:wueSide, water:wueWater, statusBar:wueStatusBar}));
 
-  /* IT load — dc-conv shows 1,850 kW; datahall shows 1.85 MW (same value, different unit) */
-  /* REBASELINED for the v2.0.0 campus basis (4 halls x 10,000 kW design; adopted normal scenario
-     4 x 7,500 = 30,000 kW actual IT). The assertion is unchanged in KIND — the two pages must still
-     reconcile to the same IT load — only the expected value moved with the engine. */
-  const itDcConv = dcConv.kpiIt;                       /* "30,000" kW */
-  const itDatahall = datahall['dh-rack-load'];         /* "30.00" MW */
-  const itOk = itDcConv === '30,000' && itDatahall === '30.00';
-  assert(itOk, 'X-Test-3: IT load reconciles — dc-conv "30,000 kW" = datahall "30.00 MW"', JSON.stringify({dcConv:itDcConv, datahall:itDatahall}));
+  /* IT load uses two intentional scopes: dc-conv is the campus roll-up while
+     datahall is the currently selected hall. Reconcile through the engine's
+     hall count instead of comparing unlike scopes or freezing another literal. */
+  const campusDisplayedKw = Number(String(dcConv.kpiIt || '').replace(/,/g, ''));
+  const hallDisplayedMw = Number(datahall['dh-rack-load']);
+  const hallCount = Number(datahall.__scope?.hallCount);
+  const campusEngineKw = Number(datahall.__scope?.campusItKw);
+  const hallEngineKw = Number(datahall.__scope?.hallItKw);
+  const itOk = Number.isFinite(campusDisplayedKw)
+    && Number.isFinite(hallDisplayedMw)
+    && Number.isFinite(hallCount)
+    && hallCount > 0
+    && Math.abs(campusDisplayedKw - campusEngineKw) < 0.01
+    && Math.abs((hallDisplayedMw * 1000) - hallEngineKw) < 0.01
+    && Math.abs(campusDisplayedKw - (hallDisplayedMw * 1000 * hallCount)) < 0.01;
+  assert(itOk, 'X-Test-3: IT load reconciles across campus and selected-hall scopes',
+    JSON.stringify({campusDisplayedKw, hallDisplayedMw, hallCount, campusEngineKw, hallEngineKw}));
 }
 
 /* ========================================================================
@@ -443,31 +610,42 @@ console.log('\n=== datahall.html ops-rollup basis drawers ===');
   await page.goto(`${BASE}/datahall.html`, {waitUntil:'networkidle2', timeout:30000});
   await new Promise(r => setTimeout(r, 1500));
 
-  /* Test all 5 ops-rollup KPIs open a basis drawer */
-  for (const id of ['state','rackload','margin','pue','density']) {
-    await page.evaluate((i) => {
-      const card = document.querySelector(`#dh-ops-rollup [data-basis="${i}"]`);
+  /* State/margin remain explicit page-local operational drawers. The three
+     engine-backed KPIs use the canonical registry drawer. Both variants must
+     expose the same semantic provenance contract. */
+  const drawerCases = [
+    {id:'state', selector:'#dh-ops-rollup [data-basis="state"]', dialogId:'kpiBasisDrawer'},
+    {id:'rackload', selector:'#dh-ops-rollup [data-basis-param="hall.it_load_kw"]', dialogId:'rz-basis-drawer'},
+    {id:'margin', selector:'#dh-ops-rollup [data-basis="margin"]', dialogId:'kpiBasisDrawer'},
+    {id:'pue', selector:'#dh-ops-rollup [data-basis-param="site.pue"]', dialogId:'rz-basis-drawer'},
+    {id:'density', selector:'#dh-ops-rollup [data-basis-param="hall.rack_actual_avg_kw"]', dialogId:'rz-basis-drawer'}
+  ];
+  for (const drawerCase of drawerCases) {
+    await page.evaluate((selector) => {
+      const card = document.querySelector(selector);
       if (card) card.click();
-    }, id);
+    }, drawerCase.selector);
     await new Promise(r => setTimeout(r, 350));
-    const drawerOk = await page.evaluate(() => {
-      const dlg = document.getElementById('kpiBasisDrawer');
+    const drawerOk = await page.evaluate((dialogId) => {
+      const dlg = document.getElementById(dialogId);
       if (!dlg) return null;
       const txt = dlg.textContent;
       return {
+        isOpen: dialogId !== 'rz-basis-drawer' || dlg.getAttribute('aria-hidden') === 'false',
         hasFormula: txt.includes('Formula'),
-        hasOutput: txt.includes('Output'),
+        hasResult: txt.includes('Output') || txt.includes('Value'),
         hasSource: txt.includes('Source'),
-        hasMode: /DERIVED|BOD LOCKED|SIM SENSOR|DESIGN PLACEHOLDER/.test(txt)
+        hasEvidence: /ADOPTED|DERIVED|SIMULATED|ASSUMED|UNAVAILABLE|BOD LOCKED|SIM SENSOR|DESIGN PLACEHOLDER/.test(txt)
       };
-    });
-    assert(drawerOk?.hasFormula && drawerOk?.hasOutput && drawerOk?.hasSource && drawerOk?.hasMode,
-      `DH-Test-drawer-${id}: ops-rollup [${id}] drawer carries Formula/Output/Source/Mode`,
+    }, drawerCase.dialogId);
+    assert(drawerOk?.isOpen && drawerOk?.hasFormula && drawerOk?.hasResult && drawerOk?.hasSource && drawerOk?.hasEvidence,
+      `DH-Test-drawer-${drawerCase.id}: ops-rollup drawer carries Formula/Result/Source/Evidence`,
       drawerOk ? JSON.stringify(drawerOk) : 'drawer not created');
     /* Close before next */
     await page.evaluate(() => {
-      const dlg = document.getElementById('kpiBasisDrawer');
-      if (dlg) dlg.remove();
+      const legacy = document.getElementById('kpiBasisDrawer');
+      if (legacy) legacy.remove();
+      if (window.RZBasisDrawer?.close) window.RZBasisDrawer.close();
     });
   }
 

@@ -14,6 +14,10 @@
 Changing a hall selector changes view context only. It MUST NOT mutate either frozen authority.
 A missing or invalid authority fails closed with an explicit unavailable state.
 
+The adopted normal operating scenario is 7,500 kW per hall: 30,000 kW campus IT and
+43,500 kW facility input at PUE 1.45. This is simulated/adopted current operation, not measured
+telemetry and not the 40,000 kW campus design point.
+
 ## 2. Governed four-hall study
 
 - Four halls: A, B, C and D.
@@ -160,11 +164,32 @@ Before release:
 2. Subsystem operator regression tests for cooling/water, fire/fuel, datahall/ICT and EPMS.
 3. Script-tag, JS syntax, version, mobile, dark, accessibility and interaction strict audits.
 4. Browser screenshots at 390, 768, 1280 and 1920 px with zero non-asset console errors.
-5. Verify current values remain the locked 1,850 kW scenario while study outputs reconcile to
-   40 MW IT and 58 MW design-point facility input.
-6. Update `CHANGELOG.md`, BMS standard, Obsidian mirror and cross-CLI handoff.
+5. Run `node tools/probe-accuracy-validation.mjs`; browser probes must target the canonical
+   `data-basis-param` / `#rz-basis-drawer` contract for registered parameters.
+6. Reconcile like-for-like scope: selected-hall 7,500 kW × engine hall count 4 = campus
+   30,000 kW current IT; keep the separate 40,000 kW / 58,000 kW design point explicit.
+7. Assert labeled generated-document outputs and public PRD/Manual parity for the current
+   30,000 kW / 43,500 kW / 943.0 L/s / 600.0 L/min / 744,144 L basis. Reject retired
+   1,850 kW, 58.1/58.2 L/s, 37 L/min, 45,900 L and 99.98% claims. A global search hit is not evidence.
+8. Gate every duplicated current-value KPI, callout and sidebar surface, including fallback markup.
+   Missing evidence renders `UNAVAILABLE` in neutral/amber, never healthy green.
+9. Use the shared Design Studio scope identifiers exactly: `current` and `current-plus-study`.
+   The latter is a governed planning-study comparison, not an adopted current operating state.
+10. Update `CHANGELOG.md`, BMS standard, Obsidian mirror and cross-CLI handoff.
 
 ## 10. Change and lesson ledger
+
+### 2026-08-29 — canonical drawer and scope-aware accuracy probes
+
+| Symptom | Root cause | Decision / prevention | Reusable lesson |
+|---|---|---|---|
+| The release gate reported missing basis drawers after all registry coverage gates passed. | The browser probe still queried the retired `data-basis` selectors and page-local `#kpiBasisDrawer`, while engine-backed KPIs had moved to `data-basis-param` and `#rz-basis-drawer`. | Map each KPI to its owning drawer contract and assert the shared semantic fields: Formula where declared, Result, Source and Evidence. | A test selector is part of a component contract; migrate it with the component and do not restore duplicate legacy markup merely to satisfy a stale probe. |
+| Cross-page IT reconciliation expected 30 MW on both the campus overview and a selected hall. | The test compared unlike scopes and froze a retired display literal. | Read campus IT, per-hall IT and hall count from `CONV_CALC.snapshot`; assert `campus = hall × hall_count`. | Cross-page equality is valid only after unit and scope normalization. |
+| The runtime cockpit was correct while fallback HTML, Tech Spec, PRD and Manual still described the retired 1.85 MW scenario; the PDF gate remained green. | Generated-document assertions searched the entire HTML for old numbers, so stale narrative text satisfied them. Documentation parity was not part of the gate. | Verify labeled output rows against current engine values and gate both public documents for the same dependent-value set. | Runtime binding, fallback markup and generated/public documentation are separate consumers; every one needs a scope-aware parity assertion. |
+| The generated WUE calculation returned 600.0 L/min but its source note still said it matched 37 L/min. | The result was engine-derived while the explanatory string survived from the retired scenario. | Assert the labeled WUE output and reject every retired dependent value in Manual/PRD parity checks. | Correct arithmetic is not sufficient when its provenance text describes another scope. |
+| A browser-only surface assertion passed after `updateData()` even when raw HTML still carried a stale fallback. | The engine overwrote first-paint markup before the probe read it. | Parse raw HTML before script execution, then independently assert initialized runtime surfaces; include adversarial retirement fixtures for both 58.1 and 58.2 L/s rounding variants. | First paint and runtime are separate observable states and need separate gates. |
+| Uptime correctly failed closed but its drawer output retained the healthy-green result style. | Evidence state and visual state were built independently. | Bind output treatment to evidence mode; `UNAVAILABLE` uses amber/neutral and cannot reuse success green. | Color is part of the evidence contract in an operator interface. |
+| Documentation called the comparison scope `current-plus-design` while the shared controller accepted only `current-plus-study`. | Narrative terminology drifted from the executable enum. | Standardize code, PRD, Manual and generated document control on the shared identifier and describe it as a planning study. | A public scope name is an API contract and must be tested literally. |
 
 ### 2026-08-27 — four-hall study and subsystem operator hardening
 

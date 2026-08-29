@@ -20,14 +20,94 @@ const INTENTIONAL_MANUAL_REPLACEMENTS = Object.freeze({
       'governing hardware context for the locked 72-GPU / 36-Grace-CPU, direct-liquid-cooled GB200 baseline.',
   }),
   'dc-conventional': Object.freeze({
+    '<span class="mn-eq">Facility = IT × PUE → 1 850 × 1.45 = 2 682.5 kW</span>':
+      '<span class="mn-eq">Facility = IT × PUE → 30 000 × 1.45 = 43 500 kW</span>',
+    '<span class="mn-eq">Non-IT = Facility − IT → 2 682.5 − 1 850 = 832.5 kW</span>':
+      '<span class="mn-eq">Non-IT = Facility − IT → 43 500 − 30 000 = 13 500 kW</span>',
+    '<span class="mn-eq">PUE = Facility / IT = 2 682.5 / 1 850 = 1.45 (identity check)</span>':
+      '<span class="mn-eq">PUE = Facility / IT = 43 500 / 30 000 = 1.45 (identity check)</span>',
+    '<span class="mn-eq">UPS loss = IT × (1/η − 1) → 1 850 × (1/0.96 − 1) = 77.1 kW</span>':
+      '<span class="mn-eq">UPS loss = IT × (1/η − 1) → 30 000 × (1/0.96 − 1) = 1 250 kW</span>',
+    '<span class="mn-eq">Per module (2N) = UPS output / count → 1 850 / 2 = 925 kW per module</span>':
+      '<span class="mn-eq">Normal module load = IT / 64 → 30 000 / 64 = 468.75 kW/module</span>',
+    '<span class="mn-src">doc-09 line 39; doc-01 §UPS A / UPS B</span>':
+      '<span class="mn-src">governed 2N resilience contract; engine v2.0.0</span>',
+    '<span class="mn-eq">ΔT = CHWR − CHWS = 14.8 − 7.2 = 7.6 K</span>':
+      '<span class="mn-eq">ΔT = CHWR − CHWS → 27.0 − 19.4 = 7.6 K</span>',
+    '<span class="mn-eq">CHW flow = IT load / (Cp × ΔT) → 1 850 / (4.186 × 7.6) = 58.1 L/s</span>':
+      '<span class="mn-eq">CHW flow = IT load / (Cp × ΔT) → 30 000 / (4.186 × 7.6) = 943.0 L/s</span>',
+    '<span class="mn-eq">Heat rejection = IT + UPS loss → 1 850 + 77.1 = 1 927.1 kW (sanity band 1 850–1 950)</span>':
+      '<span class="mn-eq">Heat rejection = IT + UPS loss → 30 000 + 1 250 = 31 250 kW</span>',
+    '<span class="mn-src">doc-09 lines 81–85; doc-00 line 83</span>':
+      '<span class="mn-src">governed rack-inlet target; engine v2 thermal chain</span>',
+    '<span class="mn-eq">Instant equivalent flow = (WUE × IT) / 60 → (1.20 × 1 850) / 60 = 37.0 L/min</span>':
+      '<span class="mn-eq">Equivalent cooling makeup = (WUE × IT) / 60 → (1.20 × 30 000) / 60 = 600.0 L/min</span>',
     '<span class="mn-src">doc-09 lines 99–104; ISO/IEC 30134-2</span>':
-      '<span class="mn-src">doc-09 lines 99–104; ISO/IEC 30134-9:2022</span>',
+      '<span class="mn-src">CONV_CALC.snapshot.water.flow_lpm_for_wue; engine v2.0.0; ISO/IEC 30134-9:2022</span>',
+    '<span class="mn-eq">Carbon rate = Facility × grid factor → 2 682.5 × 0.42 = 1 126.7 kgCO₂/hr</span>':
+      '<span class="mn-eq">Carbon rate = Facility × grid factor → 43 500 × 0.42 = 18 270 kgCO₂/hr</span>',
+    '<span class="mn-eq"> = 60 000 × 0.90 × 0.85 = 45 900 L</span>':
+      '<span class="mn-eq"> = 972 737 × 0.90 × 0.85 = 744 144 L</span>',
+    '<span class="mn-eq"> = 45 900 / 956 = 48.0 hr</span>':
+      '<span class="mn-eq"> = 744 144 / 15 503 = 48.0 hr</span>',
     '<span class="mn-src">doc-09 lines 132–147; Uptime Institute Tier Standard</span>':
-      '<span class="mn-src">doc-09 lines 132–147; project basis</span>',
+      '<span class="mn-src">sourced specific-consumption rate; adopted campus basis</span>',
+    '<span class="mn-eq">Active racks = IT load / rack density (illustrative cross-sections)</span>':
+      '<span class="mn-eq">Campus rack inventory = 4 halls × 500 racks/hall = 2 000 racks</span>',
+    '<span class="mn-eq"> At 6 kW/rack: 1 850 / 6 = 308 racks</span>':
+      '<span class="mn-eq">Current average density = 30 000 kW / 2 000 racks = 15 kW/rack</span>',
+    '<span class="mn-eq"> At 8 kW/rack: 1 850 / 8 = 231 racks</span>':
+      '<span class="mn-eq">Design average density = 40 000 kW / 2 000 racks = 20 kW/rack</span>',
+    '<span class="mn-eq"> At 10 kW/rack: 1 850 / 10 = 185 racks</span>':
+      '<span class="mn-eq">Current average density = 30 000 kW / 2 000 racks = 15 kW/rack</span>',
+    '<span class="mn-src">doc-09 lines 51–63</span>':
+      '<span class="mn-src">governed four-hall rack basis; engine v2.0.0</span>',
+    '<span class="mn-eq">EPMS total = Facility load = 2 682.5 kW (nominal; tolerance band ±2%)</span>':
+      '<span class="mn-eq">EPMS total = Facility load = 43 500 kW (nominal; tolerance band ±2%)</span>',
+    '<span class="mn-eq">EPMS UPS output = IT load = 1 850 kW (mechanical on gen-backed board)</span>':
+      '<span class="mn-eq">EPMS UPS output = IT load = 30 000 kW (mechanical on gen-backed board)</span>',
+    '<span class="mn-result">2 682.5 kW</span>':
+      '<span class="mn-result">43 500 kW</span>',
+    '<span class="mn-result">832.5 kW</span>':
+      '<span class="mn-result">13 500 kW</span>',
+    '<span class="mn-result">77.1 kW</span>':
+      '<span class="mn-result">1 250 kW</span>',
+    '<span class="mn-result">925.0 kW</span>':
+      '<span class="mn-result">468.75 kW</span>',
+    '<span class="mn-result">58.1 L/s</span>':
+      '<span class="mn-result">943.0 L/s</span>',
+    '<span class="mn-result">1 927.1 kW</span>':
+      '<span class="mn-result">31 250 kW</span>',
+    '<span class="mn-result">37.0 L/min</span>':
+      '<span class="mn-result">600.0 L/min</span>',
+    '<span class="mn-result">1 126.7 kgCO₂/hr</span>':
+      '<span class="mn-result">18 270 kgCO₂/hr</span>',
+    '<span class="mn-result">45 900 L</span>':
+      '<span class="mn-result">744 144 L</span>',
+    '<span class="mn-result">231 racks</span>':
+      '<span class="mn-result">2 000 racks</span>',
     '<li><b>Uptime Institute Tier Standard</b> — Operational Sustainability (2021): 48 hr fuel autonomy requirement for Tier III/IV maintained availability.</li>':
       '<li><b>Uptime Institute Tier Standard</b> — topology and concurrently-maintainable design intent; the cockpit does not claim certification or infer a universal fuel duration.</li>',
     '<li><b>ISO/IEC 30134-2</b> — Key Performance Indicators for Data Centres — Part 2: Power Usage Effectiveness (PUE) and Water Usage Effectiveness (WUE) definitions.</li>':
       '<li><b>ISO/IEC 30134-2:2026</b> — Data-centre Power Usage Effectiveness (PUE) definition and reporting boundary.</li>',
+    '<li><b>Engine source</b> — <code class="mn-mono">js/conv-engine.js</code> (CONV_CALC v1.0.0 + CONV_MODEL, deep-frozen). Gate: <code class="mn-mono">tools/test-conv-calc.mjs</code> (22/22 DoD identities).</li>':
+      '<li><b>Engine source</b> — <code class="mn-mono">js/conv-engine.js</code> (CONV_CALC v2.0.0 + CONV_MODEL, deep-frozen). Gates: <code class="mn-mono">tools/test-conv-calc.mjs</code> and <code class="mn-mono">tools/test-conv-campus-model.mjs</code>.</li>',
+    '<li><b>Accuracy gate</b> — <code class="mn-mono">tools/probe-accuracy-validation.mjs</code> (40/40 acceptance tests, 6 accuracy rules). Must pass before any cockpit change ships.</li>':
+      '<li><b>Accuracy gate</b> — <code class="mn-mono">tools/probe-accuracy-validation.mjs</code> plus the strict ship gate. Every required assertion must pass before any cockpit change ships.</li>',
+    '<tr><td>Design Studio scopes</td><td><code>tools/test-rz-design-studio.mjs</code> plus browser/PDF journey</td><td>Current renders the adopted 30 MW operating point; current-plus-design adds the 40 MW/58 MW design point without mutating <code>CONV_CALC.snapshot</code>.</td></tr>':
+      '<tr><td>Design Studio scopes</td><td><code>tools/test-rz-design-studio.mjs</code> plus browser/PDF journey</td><td>Current renders the adopted 30 MW operating point; current-plus-study adds the governed 40 MW/58 MW design-point study without mutating <code>CONV_CALC.snapshot</code>.</td></tr>',
+    '<p class="mn-lead"><strong>Design Studio:</strong> The <em>current</em> scope is generated from the captured 30 MW <code class="mn-mono">CONV_CALC.snapshot</code>. The <em>current-plus-design</em> scope appends the 40 MW/58 MW design point; changing scope does not change cockpit data.</p>':
+      '<p class="mn-lead"><strong>Design Studio:</strong> The <em>current</em> scope is generated from the captured 30 MW <code class="mn-mono">CONV_CALC.snapshot</code>. The <em>current-plus-study</em> scope appends the governed 40 MW/58 MW design-point study; changing scope does not change cockpit data.</p>',
+    '<tr><td>Generate Design / Design Studio</td><td><code>genDesignTrigConv</code>, <code>RZDesignStudio</code></td><td>Open the shared dialog, show captured snapshot/provenance, and select current or current-plus-design before generating the approved document type.</td><td>The design-point appendix cannot mutate current values; focus is trapped and returned, and generation failure remains visible.</td></tr>':
+      '<tr><td>Generate Design / Design Studio</td><td><code>genDesignTrigConv</code>, <code>RZDesignStudio</code></td><td>Open the shared dialog, show captured snapshot/provenance, and select current or current-plus-study before generating the approved document type.</td><td>The design-point study appendix cannot mutate current values; focus is trapped and returned, and generation failure remains visible.</td></tr>',
+    '<tr><td>Uptime basis</td><td><code>data-basis="uptime"</code></td><td>Explain 99.98% and Tier intent.</td><td>Explicit design placeholder; no outage ledger is bound.</td></tr>':
+      '<tr><td>Uptime basis</td><td><code>data-basis="uptime"</code></td><td>Explain &mdash; / UNAVAILABLE and the required downtime event log.</td><td>No numeric or healthy-state placeholder is allowed until an authenticated outage ledger is bound.</td></tr>',
+    '<tr><td>Network / topology / uptime</td><td>Network, UPS Topology, Uptime rows</td><td>Static modeled state / placeholder.</td><td>Online and 2N OK are overview claims; 99.98% is not event-derived.</td></tr>':
+      '<tr><td>Network / topology / uptime</td><td>Network, UPS Topology, Uptime rows</td><td>Static modeled state / unavailable evidence.</td><td>Online and 2N OK are overview claims; uptime fails closed as UNAVAILABLE because it is not event-derived.</td></tr>',
+    '<tr><td>Four-hall design-point appendix</td><td>Design Studio current-plus-design</td><td>Governed capacity envelope paired with the adopted operating snapshot.</td><td>4 × 10 MW = 40 MW IT and 58 MW facility are the design point; current remains 4 × 7.5 MW = 30 MW IT.</td></tr>':
+      '<tr><td>Four-hall design-point appendix</td><td>Design Studio current-plus-study</td><td>Governed planning-study envelope paired with the adopted operating snapshot.</td><td>4 × 10 MW = 40 MW IT and 58 MW facility are the design-point study; current remains 4 × 7.5 MW = 30 MW IT.</td></tr>',
+    '<tr><td>Four-hall design-point appendix</td><td>4 × 10 MW IT; 500 racks/hall; 20 kW/rack design average</td><td>MW IT / rack / kW·rack⁻¹</td><td>Current-plus-design scope: 40 MW IT / 58 MW facility design point</td></tr>':
+      '<tr><td>Four-hall design-point appendix</td><td>4 × 10 MW IT; 500 racks/hall; 20 kW/rack design average</td><td>MW IT / rack / kW·rack⁻¹</td><td>Current-plus-study scope: governed 40 MW IT / 58 MW facility design-point study</td></tr>',
   }),
   datahall: Object.freeze({
     '<li><b>ASHRAE TC9.9 (2021)</b> — Thermal Guidelines for Data Processing Environments: cold-aisle temperature band (18–27 °C recommended), humidity 40–60 %RH, PUE/WUE benchmarks.</li>':

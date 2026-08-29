@@ -2,7 +2,7 @@
 title: Conventional DC Operations Standard
 type: standard-mirror
 source: standarization/CONVENTIONAL_DC_OPERATIONS_STANDARD.md
-updated: 2026-08-27
+updated: 2026-08-29
 ---
 
 # Conventional DC Operations
@@ -11,7 +11,8 @@ Canonical source: [[../../../../standarization/CONVENTIONAL_DC_OPERATIONS_STANDA
 
 ## Locked decisions
 
-- Current simulated operation remains the 1,850 kW `CONV_CALC.snapshot`.
+- Current simulated operation is the adopted 4 × 7,500 kW scenario: 30,000 kW campus IT,
+  43,500 kW facility input at PUE 1.45. It remains simulated/adopted, never measured.
 - Capacity study is independent: four 10 MW IT halls, 500 racks/hall, 20 kW/rack average.
 - Cooling contract is chilled-water CRAH / air cooling with 25.4 °C as a project rack-inlet
   target inside the ASHRAE recommended 18–27 °C envelope.
@@ -37,6 +38,20 @@ Canonical source: [[../../../../standarization/CONVENTIONAL_DC_OPERATIONS_STANDA
   header controls in DOM order.
 - Historian tables require a caption, scoped column headers, RZ severity tokens and
   tabular/slashed-zero numerics.
+- Accuracy probes follow the canonical `data-basis-param` / `#rz-basis-drawer` component contract;
+  page-local operational drawers remain only where explicitly documented.
+- Cross-page calculations compare equal engineering scopes: selected-hall IT multiplied by the
+  engine hall count must reconcile to the campus roll-up.
+- Generated Tech Spec checks target labeled output rows, and public PRD/Manual pages must carry the
+  same 30,000 kW / 43,500 kW / 943.0 L/s / 600.0 L/min / 744,144 L current basis. Retired
+  1,850 kW, 58.1/58.2 L/s, 37 L/min, 45,900 L and 99.98% claims are release blockers; arbitrary global
+  string hits cannot satisfy an accuracy gate.
+- All duplicated KPI, callout, sidebar and fallback surfaces are gated against the current snapshot.
+  Missing evidence is UNAVAILABLE in neutral/amber, never healthy green.
+- Raw first-paint markup is validated before scripts run, then initialized runtime surfaces are
+  validated separately; a post-engine DOM check cannot prove that fallbacks are current.
+- Design Studio scope identifiers are `current` and `current-plus-study`; the latter is a governed
+  planning-study comparison, not the adopted current operating state.
 - SCADA motion and color project evaluated state; they never create operational truth.
 
 Read the canonical standard for subsystem minimums, engineering formulas, UI/UX constraints,

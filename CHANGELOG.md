@@ -11,6 +11,33 @@ release sections rather than semver.
 
 ---
 
+## v1.134.12 — 2026-08-29 (Accuracy gate follows the canonical basis drawer and reconciles equal scopes)
+
+### Fixed
+
+- Migrated the Conventional and Data Hall accuracy probes from retired page-local drawer selectors to the canonical `data-basis-param` / `#rz-basis-drawer` contract; authored parameters are checked for value, scope, source and evidence without inventing a formula they do not have.
+- Corrected cross-page IT reconciliation to compare the 30,000 kW campus roll-up with four selected halls at 7.50 MW each; the gate reads hall count and both scope values from `CONV_CALC.snapshot`, so a future scenario change cannot silently reintroduce a hard-coded 30 MW assertion.
+- Preserved the two intentional page-local operational drawers (`state` and `margin`) while proving the three engine-backed Data Hall KPIs use the shared registry drawer.
+- Removed the retired 1,850 kW scenario and dependent 2,682.5 kW, 58.1 L/s and 45,900 L values from active Conventional overview fallbacks, generated Tech Spec narrative, PRD and Manual. Current operation now remains 30,000 kW IT / 43,500 kW facility / 943.0 L/s CHW / 744,144 L usable fuel everywhere.
+- Replaced global PDF string searches with labeled output-row assertions and added PRD/Manual parity checks, closing the false-green path in which stale narrative text could satisfy the accuracy gate.
+- Removed the remaining 99.98% uptime placeholder from the overview sidebar and basis drawer; YTD uptime now fails closed as UNAVAILABLE until an authenticated downtime event log exists.
+- Corrected the last CHWS first-paint fallback from 7.2°C to 19.4°C and gated all 23 duplicated current-value KPI, callout and sidebar surfaces against the governed snapshot.
+- Corrected the generated WUE worked-calculation source from the retired 37 L/min note to the labeled 600.0 L/min campus equivalent, bound its provenance to `CONV_CALC.snapshot.water.flow_lpm_for_wue`, and added dedicated output and source assertions.
+- Standardized the Design Studio scope contract on the implemented `current-plus-study` identifier; the 40 MW IT / 58 MW facility case is a governed planning-study comparison, while the adopted current snapshot remains 30 MW IT / 43.5 MW facility.
+- Changed the UNAVAILABLE uptime drawer output from healthy green to an explicit amber unavailable state and strengthened Manual/PRD retirement checks for 1,850 kW, both 58.1/58.2 L/s rounding variants, 37 L/min, 45,900 L and 99.98% through adversarial fixtures.
+- Split first-paint and runtime validation: the accuracy gate now parses raw cockpit markup before any script runs, then independently verifies all 23 engine-updated duplicate surfaces after initialization.
+- Regenerated the Conventional parameter registry after the consumer inventory changed and recorded every protected Manual rebaseline as an explicit old-to-new telemetry-document replacement contract.
+
+### Documentation
+
+- Updated the Conventional operations standard and Obsidian mirror to the adopted 4 × 7,500 kW operating scenario and recorded that browser probes must follow canonical component IDs, compare like-for-like engineering scopes, use the exact `current-plus-study` contract and independently gate runtime, fallback, generated and public-document consumers.
+
+### Verification
+
+- Accuracy validation: **83 passed, 0 failed**.
+- Release ship gate: **41/41 passed**.
+- Canonical browser audits: responsive layout, light/dark coverage, WCAG critical/serious, interactions, chart provenance, page access gates and hero-fit all clean.
+
 ## v1.134.11 — 2026-08-29 (Both reported backlogs closed and gated: 77 unasserted → 0, 27 unrendered → 0)
 
 Two figures had been sitting in the registry gate's REPORTED line for five releases. Chasing

@@ -59,7 +59,7 @@ const m = CONV_MODEL;
 approx(s.site.facility_load_kw_exact, m.site.it_load_kw * m.site.pue, 1e-9,
     'Facility = IT x PUE  (exact identity)');
 approx(s.site.facility_load_kw, 43500, 0.05,   // 30,000 x 1.45  [REBASELINED v2.0.0 campus: 4 x 10,000 kW design, normal scenario 4 x 7,500 = 30,000 kW actual]
-    'Facility load displays 2,682.5 kW (~2,683)  [09 line 27]');
+    'Facility load = 30,000 x 1.45 = 43,500 kW');
 
 /* ---- Identity 2: Non-IT = Facility - IT ------------------------------------
  * source: 00 line 75 ; 09 lines 32-34 ; 12 line 8 */
@@ -68,10 +68,9 @@ approx(s.site.non_it_load_kw_exact, s.site.facility_load_kw_exact - m.site.it_lo
 approx(s.site.non_it_load_kw, 13500, 0.5,      // 43,500 - 30,000  [REBASELINED v2.0.0 campus: 4 x 10,000 kW design, normal scenario 4 x 7,500 = 30,000 kW actual]
     'Non-IT load = facility - IT = 13,500 kW');
 
-/* ---- Identity 3: UPS losses @ 96% ~= 77 kW ---------------------------------
- * source: 09 line 39 */
+/* ---- Identity 3: UPS losses at 96% = 1,250 kW ------------------------------- */
 approx(s.electrical.ups_loss_kw, 1250, 1.0,    // 30,000 x (1/0.96 - 1)  [REBASELINED v2.0.0 campus: 4 x 10,000 kW design, normal scenario 4 x 7,500 = 30,000 kW actual]
-    'UPS loss @ 96% eff ~= 77 kW  [09 line 39]');
+    'UPS loss at 96% efficiency = 1,250 kW');
 
 /* ---- Identity 4: CHW delta-T & flow from cooling kW / (4.186*dT) ------------
  * source: 00 lines 82-83 ; 09 lines 81-85 ; 12 lines 12-13 */
@@ -106,24 +105,20 @@ if (!(s.cooling.crah_supply_air_c <= s.cooling.rack_inlet_target_c)) {
 const expectFlow = s.site.it_load_kw / (4.186 * (s.cooling.chwr_c - s.cooling.chws_c));
 approx(s.cooling.flow_lps, Math.round(expectFlow * 10) / 10, 0.05,
     'CHW flow = cooling kW / (4.186 * dT)  (identity)');
-// doc-09 line 84 prints "58.1" (its own 1-dp rounding of 1850/(4.186*7.6)=58.184);
-// engine rounds to 58.2. Both encode the same identity — accept the doc's
-// rounding discrepancy with a 0.15 tolerance (still rejects any real drift).
 approx(s.cooling.flow_lps, 943.0, 0.15,        // 30,000 / (4.186 x 7.6)  [REBASELINED v2.0.0 campus: 4 x 10,000 kW design, normal scenario 4 x 7,500 = 30,000 kW actual]
     'CHW flow = 30000/(4.186*7.6) = 943.0 L/s');
 
-/* ---- Identity 5: Heat rejection ~= IT + UPS losses (1850-1950 band) --------
- * source: 00 line 81 ; 09 lines 73-77 */
+/* ---- Identity 5: Heat rejection = IT + UPS losses -------------------------- */
 assert(s.cooling.heat_rejection_kw >= 31250 && s.cooling.heat_rejection_kw <= 31300,  // IT 30,000 + UPS loss 1,250
-    'Heat rejection within 1,850-1,950 kW band  [09 line 77]',
+    'Heat rejection is within the 31,250-31,300 kW current band',
     s.cooling.heat_rejection_kw + ' kW');
 
 /* ---- Identity 6: Fuel autonomy = usable L / generator L/hr ------------------
  * source: 00 line 86 ; 09 lines 132-147 ; 12 line 15 */
 approx(s.fuel.usable_l, 744143.8, 1,           // 972,737 x 0.90 x 0.85  [REBASELINED v2.0.0 campus: 4 x 10,000 kW design, normal scenario 4 x 7,500 = 30,000 kW actual]
-    'Usable fuel = 60000 * 0.90 * 0.85 = 45,900 L  [09 line 143]');
+    'Usable fuel = 972,737 * 0.90 * 0.85 = 744,144 L');
 approx(s.fuel.autonomy_hr, 48.0, 0.1,
-    'Fuel autonomy = 45,900 / 956 = 48.0 hr  [09 lines 144-147]');
+    'Fuel autonomy = 744,144 / 15,503 = 48.0 hr');
 const expectAutonomy = CONV_CALC.fuelUsableL() / s.fuel.generator_consumption_lph;
 approx(s.fuel.autonomy_hr, Math.round(expectAutonomy * 10) / 10, 0.05,
     'Fuel autonomy = usable L / consumption L/hr  (identity)');

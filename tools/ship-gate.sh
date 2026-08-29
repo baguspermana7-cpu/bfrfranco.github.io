@@ -41,7 +41,7 @@ gate "audit-mobile-responsive --strict" python3 tools/audit-mobile-responsive.py
 
 # 5-6: engine acceptance suites
 gate "datahall engine — 57/57 doc-21 examples" node tools/test-datahall-calc.mjs
-gate "conv engine — 22/22 DoD identities"      node tools/test-conv-calc.mjs
+gate "conv engine — 26/26 DoD identities"      node tools/test-conv-calc.mjs
 gate "CDU engine — worked examples"            node tools/test-cdu-calc.mjs
 gate "Fire engine — worked examples"           node tools/test-fire-calc.mjs
 
@@ -125,7 +125,7 @@ fi
 # 8: optional accuracy probe (file:// or http://)
 case "${1:-}" in
   --probe)
-    gate "probe-accuracy-validation — 75/75 (file://)" \
+    gate "probe-accuracy-validation — 83/83 (file://)" \
       bash -c "RZ_BASE=file timeout 180 node tools/probe-accuracy-validation.mjs > /tmp/_probe.log 2>&1 || (cat /tmp/_probe.log; exit 1)"
     ;;
   --probe-http)
@@ -139,7 +139,7 @@ case "${1:-}" in
       echo "   Start one first:  python3 -m http.server 8090 --directory \$(pwd)"
       fail=$((fail+1))
     else
-      gate "probe-accuracy-validation — 75/75 (HTTP ${base})" \
+      gate "probe-accuracy-validation — 83/83 (HTTP ${base})" \
         bash -c "RZ_BASE='${base}' timeout 180 node tools/probe-accuracy-validation.mjs > /tmp/_probe.log 2>&1 || (cat /tmp/_probe.log; exit 1)"
     fi
     ;;
