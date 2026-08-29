@@ -11,6 +11,43 @@ release sections rather than semver.
 
 ---
 
+## v1.134.9 — 2026-08-29 (The single-line was still drawing a 2.4 MW site, and "normal" was raising a hundred critical alarms)
+
+**`EPMS_Telemetry.html` reported a plant sixteen times smaller than the one beside it.** Every
+wire label came off an authored ladder — 2,400 kW on the MV incomer, 1,000 kW at an ATS board,
+300 kW per UPS, 6 kW per rack — written for the retired 1.85 MW basis. Three inches away,
+`#epms-fac` rendered the engine's 43.50 MW. The ladder derives from the engine now, each rung
+carrying what the topology below it actually carries: the incomer takes the facility load, an
+ATS board and an LV board half of it (2N), a UPS the IT load per system, a PDU its share of
+that, a rack its share of a PDU. MV incomer now reads 43,500 kW / 1,395 A at 20 kV.
+
+One consequence is left visible rather than divided away: a single 400 V board carrying half a
+43.5 MW facility reads ~34.9 kA. A real site of this size splits LV distribution across several
+transformers and boards; this single-line draws one per stream. That is the drawing's topology
+showing through honestly — the alternative would be to divide by a transformer count the
+drawing does not have.
+
+**A calm hall was raising 101 critical and 194 warning alarms.** The per-cabinet load scatter
+(±31 % of the mean) was tuned when the occupied-cabinet average sat at 62 % of the cabinet
+rating. Under the adopted campus basis it sits at **81 %** — 7,500 kW over ~463 occupied
+cabinets against a 20 kW design average — so the same relative scatter pushed a fifth of the
+hall past the 95 % critical threshold. The scatter is now DERIVED from the headroom that
+actually exists between the adopted average and the warn threshold, so it cannot breach it by
+construction and it re-sizes itself if the basis moves again. Normal reads 0 critical, 0
+warning; the cabinet field still reconciles to 7,500 kW.
+
+**More page constants moved into the engine:** the fuel usable fraction and the three tank level
+thresholds (95 / 60 / 30 %), which had been typed onto the tank graphic and repeated in the
+alarm copy — the annotation and the alarm logic can no longer disagree.
+
+**Two more regions declared authored page basis, with reasons:** the per-CRAH leaving-air and
+saturation readings (the engine models the hall's thermal *planes* and the plant's flow, not
+individual units) and the water treatment train.
+
+**Coverage 47.4 % → 53.4 %** — dc-conventional 83 % · datahall 43 % · chiller 37 % · water 58 % ·
+fire 68 % · fuel 56 % · ict 100 % · EPMS 52 %. And one more measurement bug: single-letter
+equipment tags like `P-101` were still being read as the value −101.
+
 ## v1.134.8 — 2026-08-29 (Water-cooled adopted, the P&ID redrawn to match — and the fire reserve does not meet its own requirement)
 
 **The owner adopted the governed study's basis: evaporative cooling tower, i.e. water-cooled

@@ -1570,6 +1570,10 @@
         {
           "page": "dc-conventional.html",
           "reads": 2
+        },
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 2
         }
       ],
       "tests": [],
@@ -2190,6 +2194,85 @@
       }
     },
     {
+      "id": "fuel.level_low_low_pct",
+      "label": "Low-low level threshold",
+      "unit": "%",
+      "kind": "authored",
+      "value": 30,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "fuel.level_low_low_pct"
+      ],
+      "consumers": [
+        {
+          "page": "fuel-system.html",
+          "reads": 1
+        }
+      ],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29"
+      }
+    },
+    {
+      "id": "fuel.level_low_pct",
+      "label": "Low-level threshold",
+      "unit": "%",
+      "kind": "authored",
+      "value": 60,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "fuel.level_low_pct"
+      ],
+      "consumers": [
+        {
+          "page": "fuel-system.html",
+          "reads": 1
+        }
+      ],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29"
+      }
+    },
+    {
+      "id": "fuel.level_overfill_pct",
+      "label": "Overfill threshold",
+      "unit": "%",
+      "kind": "authored",
+      "value": 95,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "fuel.level_overfill_pct"
+      ],
+      "consumers": [
+        {
+          "page": "fuel-system.html",
+          "reads": 2
+        }
+      ],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29",
+        "method": "Matches the fuel mimic's own annotation; no overfill-prevention specification has been supplied."
+      }
+    },
+    {
       "id": "fuel.level_pct",
       "label": "UST level",
       "unit": "%",
@@ -2290,6 +2373,33 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28",
         "method": "Sized to hold the autonomy target at the campus load. Not a surveyed tank."
+      }
+    },
+    {
+      "id": "fuel.usable_fraction",
+      "label": "Usable fuel fraction",
+      "unit": null,
+      "kind": "authored",
+      "value": 0.9,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "fuel.usable_fraction"
+      ],
+      "consumers": [
+        {
+          "page": "dc-conventional.html",
+          "reads": 2
+        }
+      ],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29",
+        "method": "Fraction of stored volume drawable above the suction point. No tank drawing has been supplied."
       }
     },
     {
@@ -2998,7 +3108,7 @@
         },
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 3
+          "reads": 4
         }
       ],
       "tests": [
@@ -3112,7 +3222,7 @@
         },
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 3
+          "reads": 4
         }
       ],
       "tests": [
@@ -3145,7 +3255,12 @@
         "campus.halls.3.it_load_kw",
         "site.pue"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 2
+        }
+      ],
       "tests": [
         "test-conv-calc.mjs",
         "test-conv-snapshot-binding.mjs"

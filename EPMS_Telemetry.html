@@ -664,6 +664,39 @@
 /* ==============================================
    1. CONFIGURATION
    ============================================== */
+/* v1.134.9 — the single-line's telemetry ladder, DERIVED. Each rung is the load the topology
+   below it actually carries: the incomer carries the facility, an ATSDB half of it (2N), a UPS
+   the IT load per system, a PDU its share of that, a rack its share of a PDU. The old ladder
+   was seven authored constants at the retired 1.85 MW scale. */
+const EPMS_LADDER = (function () {
+  const s = (window.CONV_CALC && window.CONV_CALC.snapshot) ? window.CONV_CALC.snapshot : null;
+  if (!s) return { incomerKw:null, tieKw:null, atsdbKw:null, upsKw:null, pduKw:null, rackKw:null, dahuKw:null };
+  const facility = Math.round(s.site.facility_load_kw);
+  const itKw = Math.round(s.site.it_load_kw);
+  const systems = s.electrical.ups_system_count || 2;
+  const RACKS = 10, PDUS_PER_RACK = 2;      // this mimic draws 10 rack columns, main + catch
+  const upsKw = Math.round(itKw / systems);
+  const pduKw = Math.round(itKw / (RACKS * PDUS_PER_RACK));
+  return {
+    incomerKw: facility,
+    /* The tie carries what one side would pick up, so it is sized on the incomer. */
+    tieKw: facility,
+    atsdbKw: Math.round(facility / systems),
+    /* Each LV switchboard serves one stream. NOTE a real 43.5 MW site splits LV distribution
+       across several transformers and boards; this single-line draws one per stream, so the
+       per-board current it reports is correspondingly large. That is the drawing's topology
+       showing through honestly, not a calculation error — the alternative would be to divide
+       by a transformer count the drawing does not have. */
+    lvsbKw: Math.round(facility / systems),
+    dbKw: Math.round(itKw / systems),
+    upsKw: upsKw,
+    pduKw: pduKw,
+    rackKw: Math.round(itKw / RACKS),
+    /* Mechanical AHU branch: the non-IT load shared over the drawn DAHU feeders. */
+    dahuKw: Math.round(s.site.non_it_load_kw / 10),
+  };
+}());
+
 const GRID = {
     SRC: 50, MV: 150, RMU: 300, TX: 450, LVSB: 650, ATSDB: 850, UPS: 1050, 
     PDU: 1250,  
@@ -968,13 +1001,21 @@ function calcPowerFlow(){
                 
                 const tele = document.getElementById(`tele-${w.id}`);
                 if(tele){
-                    let kw = 2400; 
-                    if(w.to.includes('RACK')) kw = 6;
-                    else if(w.to.includes('PDU')) kw = 60;
-                    else if(w.to.includes('UPS')) kw = 300;
-                    else if(w.to.includes('ATSDB')) kw = 1000;
-                    else if(w.to.includes('DAHU')) kw = 30;
-                    if(w.id === 'w_mv_tie') kw = 2450; 
+                    /* v1.134.9 — this ladder was authored at the RETIRED 1.85 MW scale: 2,400 kW
+                       on the MV incomer, 6 kW per rack, 300 kW per UPS. The campus facility load
+                       is 43,500 kW, so the single-line was reporting a plant sixteen times
+                       smaller than the one every other strip on the same screen describes.
+                       Derived from the engine now and shared out by the topology's own counts,
+                       so a change of scenario moves the whole ladder. */
+                    let kw = EPMS_LADDER.incomerKw;
+                    if(w.to.includes('RACK')) kw = EPMS_LADDER.rackKw;
+                    else if(w.to.includes('LVSB')) kw = EPMS_LADDER.lvsbKw;
+                    else if(w.to.includes('DB')) kw = EPMS_LADDER.dbKw;
+                    else if(w.to.includes('PDU')) kw = EPMS_LADDER.pduKw;
+                    else if(w.to.includes('UPS')) kw = EPMS_LADDER.upsKw;
+                    else if(w.to.includes('ATSDB')) kw = EPMS_LADDER.atsdbKw;
+                    else if(w.to.includes('DAHU')) kw = EPMS_LADDER.dahuKw;
+                    if(w.id === 'w_mv_tie') kw = EPMS_LADDER.tieKw; 
 
                     let amps = Math.floor((kw * 1000) / (1.732 * w.v * 0.9));
                     tele.textContent = `${w.v}V ${amps}A ${kw}kW`;

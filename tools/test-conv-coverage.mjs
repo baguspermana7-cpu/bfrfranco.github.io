@@ -273,7 +273,7 @@ try {
                     .replace(/\b\d{1,2}:\d{2}(?::\d{2})?\b/g, ' ')
                     /* Equipment tags are identifiers, not measurements. "FM-101" was being read
                        as the value -101 and counted as an untraced engineering number. */
-                    .replace(/\b[A-Z]{2,}[-\u2011]?\d+[A-Z]?\b/g, ' ');
+                    .replace(/\b[A-Z]{1,}[-\u2011]\d+[A-Z]?\b/g, ' ');
                 const matches = text.match(/-?\d[\d,]*(?:\.\d+)?/g);
                 if (!matches) continue;
                 const label = (el.closest('[data-basis],[id],.kv,.data-row,.stat-row,.metric-row') || el)

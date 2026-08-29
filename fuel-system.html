@@ -689,9 +689,9 @@
                 <div class="panel-header"><span>Bulk Storage &mdash; UST-01</span><i class="fas fa-database ph-ic"></i></div>
                 <div class="ust-block">
                     <div class="ust-tank" id="tank-ust" tabindex="0" role="img" aria-label="Underground storage tank UST-01 level">
-                        <div class="ust-mark" style="top:10%;">95% overfill</div>
-                        <div class="ust-mark" style="top:40%;">60% low</div>
-                        <div class="ust-mark" style="top:70%;">30% low-low</div>
+                        <div class="ust-mark" style="top:10%;" id="ust-mark-overfill">&mdash;</div>
+                        <div class="ust-mark" style="top:40%;" id="ust-mark-low">&mdash;</div>
+                        <div class="ust-mark" style="top:70%;" id="ust-mark-lowlow">&mdash;</div>
                         <div class="ust-liquid" id="liq-ust" style="height:85%;"></div>
                     </div>
                     <div class="ust-meta">
@@ -1212,6 +1212,17 @@
            engine reports 2.0.0, and the inventory note hardcoded "60,000 L tank x 0.90"
            against a 972,737 L tank. Both are written from the snapshot so neither can
            state a basis the page is not running on. */
+        /* v1.134.9 — the tank level thresholds were typed onto the graphic and repeated in the
+           alarm copy. Engine-published now, so the annotation and the alarm logic cannot
+           disagree with each other. */
+        function bindThresholds() {
+            var set = function (id, txt) { var e = $(id); if (e) e.textContent = txt; };
+            if (!isNum(FUEL.level_overfill_pct)) return;
+            set('ust-mark-overfill', FUEL.level_overfill_pct + '% overfill');
+            set('ust-mark-low', FUEL.level_low_pct + '% low');
+            set('ust-mark-lowlow', FUEL.level_low_low_pct + '% low-low');
+        }
+
         function bindBasisChip() {
             var chip = $('cb-basis');
             if (chip) {
@@ -1229,6 +1240,7 @@
 
         function render() {
             bindBasisChip();
+            bindThresholds();
             $('val-ust-lvl').textContent = fmt1(state.ustPct);
             $('val-ust-gross').textContent = grp(TANK_CAP * state.ustPct / 100);
             $('val-ust-usable').textContent = grp(usableL(state.ustPct));

@@ -592,7 +592,12 @@
              *         (48 hr autonomy target preserved; inventory re-derived).
              * evidenceClass: 'ASSUMED' — project design decision pending
              * Basis-of-Design confirmation. NOT measured, NOT vendor-approved. */
-            tank_capacity_l: 972737
+            tank_capacity_l: 972737,
+            /* Tank level alarm thresholds. ASSUMED — no overfill-prevention or level-alarm
+             * specification has been supplied; these match the fuel mimic's own annotations. */
+            level_overfill_pct: 95,
+            level_low_pct: 60,
+            level_low_low_pct: 30
         },
             /* ==================================================================
          * FIRE PROTECTION — added v1.134.8
@@ -824,6 +829,12 @@
                 tank_capacity_l: m.fuel.tank_capacity_l,
                 usable_l: Math.round(fuelUsable),
                 specific_consumption_l_per_kwh: m.fuel.specific_consumption_l_per_kwh,
+                /* v1.134.9 — the usable fraction and the tank level thresholds were page
+                   constants restated in three places on the fuel cockpit. */
+                usable_fraction: m.fuel.usable_fraction,
+                level_overfill_pct: m.fuel.level_overfill_pct,
+                level_low_pct: m.fuel.level_low_pct,
+                level_low_low_pct: m.fuel.level_low_low_pct,
                 /* v1.134.1 — this republished an authored 15,503 L/hr while
                    generatorConsumptionLph() sat unused two hundred lines above. Fuel burn
                    therefore did NOT follow facility load: change the scenario and autonomy

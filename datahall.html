@@ -698,7 +698,8 @@
 
             <div class="panel">
                 <div class="panel-title">CRAH Air-Side Status</div>
-                <div id="crah-list"></div>
+                <!-- v1.134.9 — declared authored page basis; see the reason on the element. -->
+                <div id="crah-list" data-rz-authored-basis="Per-CRAH leaving-air, return-air and saturation readings are simulated unit state. conv-engine.js models the hall's thermal PLANES (rack inlet, CRAH supply, CHWS, CHWR, delta-T) and the plant's chilled-water flow; it publishes no per-CRAH quantity, so these readings have no engine parameter to trace to. The hall's cooling demand, its available capacity and every thermal plane on this page are engine-bound and stay in the denominator."></div>
                 <div class="formula" id="crah-air-note">LA&rarr;RA = CRAH leaving air to CRAH return air. Return-path basis assumes contained hot-aisle return with 0 K mixing adjustment; rack-inlet setpoint is separate.</div>
             </div>
         </div>
@@ -907,6 +908,18 @@
         var racks = [];
         var occupiedCount = 0;
         var rackTotal = 0;
+        /* Half-width of the per-cabinet scatter, as a fraction of the mean. Bounded by the gap
+           between the adopted average utilisation and the WARN threshold, and capped so a very
+           lightly loaded hall still reads varied rather than flat. */
+        var RACK_WARN_UTIL = 0.85;
+        function rackSpread() {
+            var occupiedGuess = TOTAL_RACKS * 0.92;          // ~8% spare slots, see below
+            var avgUtil = (SITE_IT_KW / occupiedGuess) / RACK_RATING_KW;
+            if (!isFinite(avgUtil) || avgUtil <= 0) return 0.25;
+            return Math.max(0.04, Math.min(0.25, (RACK_WARN_UTIL / avgUtil) - 1));
+        }
+        var RACK_SPREAD = rackSpread();
+
         function buildRackField() {
             racks = [];
             occupiedCount = 0;
@@ -918,7 +931,16 @@
                 // small deterministic upper tail produces a few genuine hotspots
                 // vs the cabinet rating. Mean weight ≈ 1.0 → after rescale the
                 // occupied total reconciles exactly to the engine IT load.
-                var weight = occupied ? (0.70 + hash01(i + 7777 + HALL_SEED) * 0.62) : 0;
+                /* v1.134.9 — the +/-31% weight scatter was tuned when the occupied-cabinet average
+               sat at 62% of the cabinet rating. Under the adopted campus basis it sits at 81%
+               (7,500 kW over ~463 occupied cabinets against a 20 kW design average), so the same
+               relative scatter pushed ~101 cabinets past the 95% critical threshold and ~194
+               past 85%: a "normal" hall raising a hundred critical alarms, which is not a
+               calm normal and is not what a uniformly provisioned hall looks like.
+               The scatter is DERIVED from the headroom that actually exists between the adopted
+               average and the warn threshold, so it can never breach it by construction and it
+               re-sizes itself if the basis moves again. */
+            var weight = occupied ? (1 - RACK_SPREAD + hash01(i + 7777 + HALL_SEED) * RACK_SPREAD * 2) : 0;
                 racks.push({ idx: i, occupied: occupied, weight: weight, kw: 0 });
                 if (occupied) occupiedCount++;
             }
