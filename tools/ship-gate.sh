@@ -77,6 +77,11 @@ gate "Conventional basis drawer — hooks resolve, explanations match their KPI"
 # the pages whose plant is central. Both directions are asserted — a cosmetic selector and an
 # invented per-hall split are both failures.
 gate "Conventional hall scope — datahall re-scopes, central plants do not" node tools/test-conv-hall-scope.mjs
+# Every declared formula is EVALUATED against the engine's published values. The registry has
+# carried a `formula` field since v1.134.1 and it was prose — a formula could describe a
+# calculation the code had stopped performing and nothing would notice. Dependency EDGES are
+# measured by perturbing the engine; the ARITHMETIC on those edges is verified here.
+gate "Conventional formulas — declared arithmetic actually holds" node tools/test-conv-formula.mjs
 # STRICT since v1.134.6. This ran advisory while the pages carried ~484 measured findings
 # (chiller-plant 27-48 label collisions + 16-18 clipped, EPMS 12-13 collisions, fire 2 clipped
 # + 46px tablet overflow, water 336px tablet overflow). Every one of those is now paid:

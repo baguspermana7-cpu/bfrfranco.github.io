@@ -11,6 +11,38 @@ release sections rather than semver.
 
 ---
 
+## v1.134.10 — 2026-08-29 (Every declared formula is now evaluated — and it caught two of mine)
+
+The registry has carried a `formula` field since v1.134.1. It was **prose**. Nobody checked that
+`heat_rejection_kw = it_load_kw + ups_loss_kw` was what the engine actually did, so a formula
+could describe a calculation the code had stopped performing and nothing would notice — the same
+defect as a basis drawer restating provenance by hand, one level down.
+
+**`formulaExpr` is the machine-checkable twin**: an arithmetic expression over registry ids.
+`tools/test-conv-formula.mjs` evaluates each one against the registry's own published values and
+requires the result to match. That closes the loop the registry was built for — the dependency
+**edges** are measured by perturbing the engine, and the **arithmetic** on those edges is
+verified here. **51 formulas evaluated.** The evaluator accepts numbers, ids, `+ - * / ( )` and
+`ceil()` and nothing else: no `eval()`, no property access, so a registry entry cannot run code.
+
+The gate also requires that a formula's referenced ids appear in its declared `deps` (a formula
+and a dependency list that disagree cannot both be right — deps are derived from the expression
+now), that no formula references the parameter it defines, and that every derived parameter
+either carries an expression **or states why it cannot**. Five do: a structural projection, a
+design-point duty that cannot be re-derived from live values, a republished model input, a text
+label and a version string.
+
+**It immediately caught two errors, both mine, both in the curation rather than the engine:**
+- `chillers_total` was curated as `chillers_running + 1`, which evaluates to 8 against the
+  engine's 10. The engine is right: the **installed** count is sized on the DESIGN duty
+  (`ceil(41,666.7 / 5,000) + 1 = 10`) while the **running** count follows the current load
+  (`ceil(31,250 / 5,000) = 7`). Two different questions, and the shorthand conflated them.
+- `ups_modules_per_system` was curated as ASSUMED. It is derived: each 2N system alone must
+  carry the full IT **design** load, so it is `ceil(site.it_design_kw / ups_module_kw_rated)`.
+
+`electrical.ups_efficiency` was an authored model input the snapshot never published, so
+`ups_loss_kw` could not be checked against its own formula. It is published now.
+
 ## v1.134.9 — 2026-08-29 (The single-line was still drawing a 2.4 MW site, and "normal" was raising a hundred critical alarms)
 
 **`EPMS_Telemetry.html` reported a plant sixteen times smaller than the one beside it.** Every

@@ -754,6 +754,10 @@
                 halls: computeHalls(m)
             },
             electrical: {
+                /* v1.134.10 — the UPS efficiency was an authored model input that the snapshot
+                   never published, so ups_loss_kw could not be checked against its own formula.
+                   Publishing it makes that arithmetic verifiable. */
+                ups_efficiency: m.electrical.ups_efficiency,
                 ups_loss_kw: round1(upsLoss),
                 epms_total_kw: round1(epmsTotalKw(m)),
                 epms_ups_output_kw: round1(epmsUpsOutputKw(m)),

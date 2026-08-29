@@ -36,6 +36,7 @@
       "kind": "derived",
       "value": "[4 items] sha1:041e61fce75f",
       "formula": "projection of the authored per-hall inputs",
+      "formulaNotExpressible": "A structural projection of the per-hall inputs, not an arithmetic expression over registered scalars.",
       "deps": [],
       "scope": "campus",
       "evidenceClass": "DERIVED",
@@ -88,8 +89,10 @@
       "kind": "derived",
       "value": 40000,
       "formula": "hall_count x it_design_kw_per_hall",
+      "formulaExpr": "campus.hall_count * hall.it_design_kw",
       "deps": [
-        "campus.hall_count"
+        "campus.hall_count",
+        "hall.it_design_kw"
       ],
       "scope": "campus",
       "evidenceClass": "DERIVED",
@@ -120,9 +123,10 @@
       "kind": "derived",
       "value": 30000,
       "formula": "hall_count x active scenario it_kw_per_hall",
+      "formulaExpr": "campus.hall_count * hall.it_load_kw",
       "deps": [
         "campus.hall_count",
-        "campus.scenario_id"
+        "hall.it_load_kw"
       ],
       "scope": "campus",
       "evidenceClass": "DERIVED",
@@ -207,8 +211,10 @@
       "kind": "derived",
       "value": 2000,
       "formula": "hall_count x racks_per_hall",
+      "formulaExpr": "campus.hall_count * hall.racks",
       "deps": [
-        "campus.hall_count"
+        "campus.hall_count",
+        "hall.racks"
       ],
       "scope": "campus",
       "evidenceClass": "DERIVED",
@@ -245,6 +251,7 @@
       "kind": "authored",
       "value": "SIMULATED/ADOPTED",
       "formula": null,
+      "formulaNotExpressible": "A text label carried from the active scenario row.",
       "deps": [
         "campus.scenario_id"
       ],
@@ -341,9 +348,10 @@
       "kind": "derived",
       "value": 75,
       "formula": "it_load_kw / it_design_kw x 100",
+      "formulaExpr": "campus.it_load_kw / campus.it_design_kw * 100",
       "deps": [
-        "campus.it_load_kw",
-        "campus.it_design_kw"
+        "campus.it_design_kw",
+        "campus.it_load_kw"
       ],
       "scope": "campus",
       "evidenceClass": "DERIVED",
@@ -399,9 +407,10 @@
       "kind": "derived",
       "value": 37,
       "formula": "cdw_supply_c + cdw_range_k",
+      "formulaExpr": "cooling.cdw_supply_c + cooling.cdw_range_k",
       "deps": [
-        "cooling.cdw_supply_c",
-        "cooling.cdw_range_k"
+        "cooling.cdw_range_k",
+        "cooling.cdw_supply_c"
       ],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -456,9 +465,10 @@
       "kind": "derived",
       "value": 35000,
       "formula": "chillers_running x chiller_unit_kw_th",
+      "formulaExpr": "cooling.chillers_running * cooling.chiller_unit_kw_th",
       "deps": [
-        "cooling.chillers_running",
-        "cooling.chiller_unit_kw_th"
+        "cooling.chiller_unit_kw_th",
+        "cooling.chillers_running"
       ],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -487,6 +497,7 @@
       "kind": "derived",
       "value": 41666.7,
       "formula": "campus design heat rejection at the design point",
+      "formulaNotExpressible": "Computed at the DESIGN point, not from the live snapshot values, so it cannot be re-derived from published parameters.",
       "deps": [
         "campus.it_design_kw"
       ],
@@ -515,9 +526,10 @@
       "kind": "derived",
       "value": 5153.4,
       "formula": "heat_rejection_kw x chiller_specific_power_kw_e_per_kw_th",
+      "formulaExpr": "cooling.heat_rejection_kw * cooling.chiller_specific_power_kw_e_per_kw_th",
       "deps": [
-        "cooling.heat_rejection_kw",
-        "cooling.chiller_specific_power_kw_e_per_kw_th"
+        "cooling.chiller_specific_power_kw_e_per_kw_th",
+        "cooling.heat_rejection_kw"
       ],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -550,9 +562,10 @@
       "kind": "derived",
       "value": 45000,
       "formula": "(chillers_total - 1) x chiller_unit_kw_th",
+      "formulaExpr": "( cooling.chillers_total - 1 ) * cooling.chiller_unit_kw_th",
       "deps": [
-        "cooling.chillers_total",
-        "cooling.chiller_unit_kw_th"
+        "cooling.chiller_unit_kw_th",
+        "cooling.chillers_total"
       ],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -687,9 +700,10 @@
       "kind": "derived",
       "value": 7,
       "formula": "ceil(duty / unit capacity)",
+      "formulaExpr": "ceil( cooling.heat_rejection_kw / cooling.chiller_unit_kw_th )",
       "deps": [
-        "cooling.heat_rejection_kw",
-        "cooling.chiller_unit_kw_th"
+        "cooling.chiller_unit_kw_th",
+        "cooling.heat_rejection_kw"
       ],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -725,10 +739,11 @@
       "unit": null,
       "kind": "derived",
       "value": 10,
-      "formula": "chillers_running + 1 (N+1)",
+      "formula": "ceil(chiller_design_duty_kw_th / chiller_unit_kw_th) + 1 (N+1 on the DESIGN duty)",
+      "formulaExpr": "ceil( cooling.chiller_design_duty_kw_th / cooling.chiller_unit_kw_th ) + 1",
       "deps": [
-        "cooling.chillers_running",
-        "cooling.chiller_redundancy"
+        "cooling.chiller_design_duty_kw_th",
+        "cooling.chiller_unit_kw_th"
       ],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -759,7 +774,8 @@
       "source": {
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28",
-        "section": "chillersTotal()"
+        "section": "chillersTotal()",
+        "method": "Installed count is sized on the DESIGN duty, not the current load: running counts duty units at the adopted load, installed carries the design point plus the N+1 spare. A first curated formula said running + 1 and the formula gate rejected it — the engine was right."
       }
     },
     {
@@ -800,6 +816,7 @@
       "kind": "derived",
       "value": 7.6,
       "formula": "authored (chw_delta_t_k)",
+      "formulaNotExpressible": "Republishes the authored model input chw_delta_t_k, which has no registry id of its own.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ADOPTED",
@@ -838,9 +855,10 @@
       "kind": "derived",
       "value": 27,
       "formula": "chws_c + chw_delta_t",
+      "formulaExpr": "cooling.chws_c + cooling.chw_delta_t",
       "deps": [
-        "cooling.chws_c",
-        "cooling.chw_delta_t"
+        "cooling.chw_delta_t",
+        "cooling.chws_c"
       ],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -881,9 +899,10 @@
       "kind": "derived",
       "value": 19.4,
       "formula": "crah_supply_air_c - chw_coil_approach_k",
+      "formulaExpr": "cooling.crah_supply_air_c - cooling.chw_coil_approach_k",
       "deps": [
-        "cooling.crah_supply_air_c",
-        "cooling.chw_coil_approach_k"
+        "cooling.chw_coil_approach_k",
+        "cooling.crah_supply_air_c"
       ],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -926,6 +945,7 @@
       "kind": "derived",
       "value": 25.4,
       "formula": "rack_inlet_target_c - supply_path_mixing_k",
+      "formulaExpr": "cooling.rack_inlet_target_c - cooling.supply_path_mixing_k",
       "deps": [
         "cooling.rack_inlet_target_c",
         "cooling.supply_path_mixing_k"
@@ -961,6 +981,7 @@
       "kind": "derived",
       "value": 8885.4,
       "formula": "heat_rejection_kw / 3.517",
+      "formulaExpr": "cooling.heat_rejection_kw / 3.517",
       "deps": [
         "cooling.heat_rejection_kw"
       ],
@@ -994,9 +1015,10 @@
       "kind": "derived",
       "value": 943,
       "formula": "IT load / (4.186 x chw_delta_t)",
+      "formulaExpr": "site.it_load_kw / ( 4.186 * cooling.chw_delta_t )",
       "deps": [
-        "campus.it_load_kw",
-        "cooling.chw_delta_t"
+        "cooling.chw_delta_t",
+        "site.it_load_kw"
       ],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -1038,9 +1060,10 @@
       "kind": "derived",
       "value": 31250,
       "formula": "it_load_kw + ups_loss_kw",
+      "formulaExpr": "site.it_load_kw + electrical.ups_loss_kw",
       "deps": [
-        "site.it_load_kw",
-        "electrical.ups_loss_kw"
+        "electrical.ups_loss_kw",
+        "site.it_load_kw"
       ],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -1105,6 +1128,7 @@
       "kind": "derived",
       "value": 6.06,
       "formula": "1 / chiller_specific_power_kw_e_per_kw_th",
+      "formulaExpr": "1 / cooling.chiller_specific_power_kw_e_per_kw_th",
       "deps": [
         "cooling.chiller_specific_power_kw_e_per_kw_th"
       ],
@@ -1133,6 +1157,7 @@
       "kind": "derived",
       "value": 0.58,
       "formula": "chiller_specific_power_kw_e_per_kw_th x 3.517",
+      "formulaExpr": "cooling.chiller_specific_power_kw_e_per_kw_th * 3.517",
       "deps": [
         "cooling.chiller_specific_power_kw_e_per_kw_th"
       ],
@@ -1218,9 +1243,10 @@
       "kind": "derived",
       "value": 36403.4,
       "formula": "heat_rejection_kw x (1 + chiller_specific_power_kw_e_per_kw_th)",
+      "formulaExpr": "cooling.heat_rejection_kw * ( 1 + cooling.chiller_specific_power_kw_e_per_kw_th )",
       "deps": [
-        "cooling.heat_rejection_kw",
-        "cooling.chiller_specific_power_kw_e_per_kw_th"
+        "cooling.chiller_specific_power_kw_e_per_kw_th",
+        "cooling.heat_rejection_kw"
       ],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -1253,6 +1279,7 @@
       "kind": "derived",
       "value": 43500,
       "formula": "facility load at the EPMS metering point",
+      "formulaExpr": "site.facility_load_kw",
       "deps": [
         "site.facility_load_kw"
       ],
@@ -1291,6 +1318,7 @@
       "kind": "derived",
       "value": 30000,
       "formula": "IT load at the UPS output metering point",
+      "formulaExpr": "site.it_load_kw",
       "deps": [
         "site.it_load_kw"
       ],
@@ -1374,13 +1402,42 @@
       }
     },
     {
+      "id": "electrical.ups_efficiency",
+      "label": "UPS efficiency",
+      "unit": null,
+      "kind": "authored",
+      "value": 0.96,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.ups_efficiency"
+      ],
+      "consumers": [
+        {
+          "page": "dc-conventional.html",
+          "reads": 2
+        }
+      ],
+      "tests": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-08-29",
+        "method": "Double-conversion efficiency at the operating point. No vendor curve has been supplied."
+      }
+    },
+    {
       "id": "electrical.ups_loss_kw",
       "label": "UPS losses",
       "unit": "kW",
       "kind": "derived",
       "value": 1250,
       "formula": "it_load_kw x (1/eff - 1)",
+      "formulaExpr": "site.it_load_kw * ( 1 / electrical.ups_efficiency - 1 )",
       "deps": [
+        "electrical.ups_efficiency",
         "site.it_load_kw"
       ],
       "scope": "plant",
@@ -1415,9 +1472,10 @@
       "kind": "derived",
       "value": 64,
       "formula": "ups_system_count x ups_modules_per_system",
+      "formulaExpr": "electrical.ups_system_count * electrical.ups_modules_per_system",
       "deps": [
-        "electrical.ups_system_count",
-        "electrical.ups_modules_per_system"
+        "electrical.ups_modules_per_system",
+        "electrical.ups_system_count"
       ],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -1449,6 +1507,7 @@
       "kind": "derived",
       "value": 468.8,
       "formula": "ups output / module count",
+      "formulaExpr": "electrical.epms_ups_output_kw / electrical.ups_module_count",
       "deps": [
         "electrical.epms_ups_output_kw",
         "electrical.ups_module_count"
@@ -1508,10 +1567,14 @@
       "unit": null,
       "kind": "derived",
       "value": 32,
-      "formula": null,
-      "deps": [],
+      "formula": "ceil(site.it_design_kw / ups_module_kw_rated)",
+      "formulaExpr": "ceil( site.it_design_kw / electrical.ups_module_kw_rated )",
+      "deps": [
+        "site.it_design_kw",
+        "electrical.ups_module_kw_rated"
+      ],
       "scope": "plant",
-      "evidenceClass": "ASSUMED",
+      "evidenceClass": "DERIVED",
       "explainKey": null,
       "dependsOnInputs": [
         "campus.halls.0.it_design_kw",
@@ -1524,7 +1587,8 @@
       "tests": [],
       "source": {
         "ref": "js/conv-engine.js",
-        "asOf": "2026-08-28"
+        "asOf": "2026-08-28",
+        "method": "Each 2N system alone must carry the full IT DESIGN load, so the module count is sized on design capacity, not on the current load. It was curated as ASSUMED; the formula gate showed it is derived."
       }
     },
     {
@@ -1591,6 +1655,7 @@
       "kind": "derived",
       "value": 15000,
       "formula": "ups output / system count",
+      "formulaExpr": "electrical.epms_ups_output_kw / electrical.ups_system_count",
       "deps": [
         "electrical.epms_ups_output_kw",
         "electrical.ups_system_count"
@@ -1619,9 +1684,10 @@
       "kind": "derived",
       "value": 40000,
       "formula": "modules_per_system x module rating",
+      "formulaExpr": "electrical.ups_modules_per_system * electrical.ups_module_kw_rated",
       "deps": [
-        "electrical.ups_modules_per_system",
-        "electrical.ups_module_kw_rated"
+        "electrical.ups_module_kw_rated",
+        "electrical.ups_modules_per_system"
       ],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -1741,9 +1807,10 @@
       "kind": "derived",
       "value": 18270,
       "formula": "facility_load_kw x carbon factor",
+      "formulaExpr": "site.facility_load_kw * environment.carbon_kg_per_facility_kwh",
       "deps": [
-        "site.facility_load_kw",
-        "environment.carbon_kg_per_facility_kwh"
+        "environment.carbon_kg_per_facility_kwh",
+        "site.facility_load_kw"
       ],
       "scope": "site",
       "evidenceClass": "DERIVED",
@@ -1810,6 +1877,7 @@
       "kind": "derived",
       "value": 36,
       "formula": "required_capacity_m3 - reserve_capacity_m3",
+      "formulaExpr": "fire.required_capacity_m3 - fire.reserve_capacity_m3",
       "deps": [
         "fire.required_capacity_m3",
         "fire.reserve_capacity_m3"
@@ -1842,9 +1910,10 @@
       "kind": "derived",
       "value": 45.6,
       "formula": "reserve_capacity_m3 x 1000 / pump_demand_lpm",
+      "formulaExpr": "fire.reserve_capacity_m3 * 1000 / fire.pump_demand_lpm",
       "deps": [
-        "fire.reserve_capacity_m3",
-        "fire.pump_demand_lpm"
+        "fire.pump_demand_lpm",
+        "fire.reserve_capacity_m3"
       ],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -1873,9 +1942,10 @@
       "kind": "derived",
       "value": 42,
       "formula": "stored_m3 x 1000 / pump_demand_lpm",
+      "formulaExpr": "fire.stored_m3 * 1000 / fire.pump_demand_lpm",
       "deps": [
-        "fire.stored_m3",
-        "fire.pump_demand_lpm"
+        "fire.pump_demand_lpm",
+        "fire.stored_m3"
       ],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -1954,9 +2024,10 @@
       "kind": "derived",
       "value": 150,
       "formula": "required_duration_min x pump_demand_lpm / 1000",
+      "formulaExpr": "fire.required_duration_min * fire.pump_demand_lpm / 1000",
       "deps": [
-        "fire.required_duration_min",
-        "fire.pump_demand_lpm"
+        "fire.pump_demand_lpm",
+        "fire.required_duration_min"
       ],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -2064,9 +2135,10 @@
       "kind": "derived",
       "value": 104.9,
       "formula": "reserve_capacity_m3 x level_pct",
+      "formulaExpr": "fire.reserve_capacity_m3 * fire.level_pct / 100",
       "deps": [
-        "fire.reserve_capacity_m3",
-        "fire.level_pct"
+        "fire.level_pct",
+        "fire.reserve_capacity_m3"
       ],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -2116,9 +2188,10 @@
       "kind": "derived",
       "value": 48,
       "formula": "usable_l / generator_consumption_lph",
+      "formulaExpr": "fuel.usable_l / fuel.generator_consumption_lph",
       "deps": [
-        "fuel.usable_l",
-        "fuel.generator_consumption_lph"
+        "fuel.generator_consumption_lph",
+        "fuel.usable_l"
       ],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -2160,9 +2233,10 @@
       "kind": "derived",
       "value": 15503,
       "formula": "facility_load_kw x specific consumption",
+      "formulaExpr": "site.facility_load_kw * fuel.specific_consumption_l_per_kwh",
       "deps": [
-        "site.facility_load_kw",
-        "fuel.specific_consumption_l_per_kwh"
+        "fuel.specific_consumption_l_per_kwh",
+        "site.facility_load_kw"
       ],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -2409,9 +2483,11 @@
       "kind": "derived",
       "value": 744144,
       "formula": "tank_capacity_l x level_pct x usable fraction",
+      "formulaExpr": "fuel.tank_capacity_l * fuel.usable_fraction * fuel.level_pct / 100",
       "deps": [
+        "fuel.level_pct",
         "fuel.tank_capacity_l",
-        "fuel.level_pct"
+        "fuel.usable_fraction"
       ],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -2488,6 +2564,7 @@
       "kind": "derived",
       "value": 10875,
       "formula": "hall.it_load_kw x site.pue",
+      "formulaExpr": "hall.it_load_kw * site.pue",
       "deps": [
         "hall.it_load_kw",
         "site.pue"
@@ -2565,6 +2642,7 @@
       "kind": "derived",
       "value": 15,
       "formula": "hall.it_load_kw / hall.racks",
+      "formulaExpr": "hall.it_load_kw / hall.racks",
       "deps": [
         "hall.it_load_kw",
         "hall.racks"
@@ -2690,9 +2768,10 @@
       "kind": "derived",
       "value": 75,
       "formula": "hall.it_load_kw / hall.it_design_kw x 100",
+      "formulaExpr": "hall.it_load_kw / hall.it_design_kw * 100",
       "deps": [
-        "hall.it_load_kw",
-        "hall.it_design_kw"
+        "hall.it_design_kw",
+        "hall.it_load_kw"
       ],
       "scope": "hall",
       "evidenceClass": "DERIVED",
@@ -2937,6 +3016,7 @@
       "kind": "authored",
       "value": "2.0.0",
       "formula": null,
+      "formulaNotExpressible": "The engine's own version string.",
       "deps": [],
       "scope": "meta",
       "evidenceClass": "DERIVED",
@@ -2969,8 +3049,9 @@
       "kind": "derived",
       "value": 3000,
       "formula": "it_load_kw / 10",
+      "formulaExpr": "site.it_load_kw / 10",
       "deps": [
-        "campus.it_load_kw"
+        "site.it_load_kw"
       ],
       "scope": "campus",
       "evidenceClass": "DERIVED",
@@ -3003,8 +3084,9 @@
       "kind": "derived",
       "value": 5000,
       "formula": "it_load_kw / 6",
+      "formulaExpr": "site.it_load_kw / 6",
       "deps": [
-        "campus.it_load_kw"
+        "site.it_load_kw"
       ],
       "scope": "campus",
       "evidenceClass": "DERIVED",
@@ -3037,8 +3119,9 @@
       "kind": "derived",
       "value": 3750,
       "formula": "it_load_kw / 8",
+      "formulaExpr": "site.it_load_kw / 8",
       "deps": [
-        "campus.it_load_kw"
+        "site.it_load_kw"
       ],
       "scope": "campus",
       "evidenceClass": "DERIVED",
@@ -3079,6 +3162,7 @@
       "kind": "derived",
       "value": 43500,
       "formula": "it_load_kw x pue",
+      "formulaExpr": "site.it_load_kw * site.pue",
       "deps": [
         "site.it_load_kw",
         "site.pue"
@@ -3127,6 +3211,7 @@
       "kind": "derived",
       "value": 43500,
       "formula": "it_load_kw x pue",
+      "formulaExpr": "site.it_load_kw * site.pue",
       "deps": [
         "site.it_load_kw",
         "site.pue"
@@ -3157,6 +3242,7 @@
       "kind": "derived",
       "value": 40000,
       "formula": "campus.it_design_kw",
+      "formulaExpr": "campus.it_design_kw",
       "deps": [
         "campus.it_design_kw"
       ],
@@ -3183,6 +3269,7 @@
       "kind": "derived",
       "value": 30000,
       "formula": "campus.it_load_kw",
+      "formulaExpr": "campus.it_load_kw",
       "deps": [
         "campus.it_load_kw"
       ],
@@ -3241,6 +3328,7 @@
       "kind": "derived",
       "value": 13500,
       "formula": "facility_load_kw - it_load_kw",
+      "formulaExpr": "site.facility_load_kw - site.it_load_kw",
       "deps": [
         "site.facility_load_kw",
         "site.it_load_kw"
@@ -3277,6 +3365,7 @@
       "kind": "derived",
       "value": 13500,
       "formula": "facility_load_kw - it_load_kw",
+      "formulaExpr": "site.facility_load_kw - site.it_load_kw",
       "deps": [
         "site.facility_load_kw",
         "site.it_load_kw"
@@ -3376,6 +3465,7 @@
       "kind": "derived",
       "value": 600,
       "formula": "wue x it_load_kw / 60",
+      "formulaExpr": "environment.wue_l_per_kwh * site.it_load_kw / 60",
       "deps": [
         "environment.wue_l_per_kwh",
         "site.it_load_kw"
@@ -3415,9 +3505,10 @@
       "kind": "derived",
       "value": 608,
       "formula": "flow_lpm_for_wue + domestic_lpm",
+      "formulaExpr": "water.flow_lpm_for_wue + water.domestic_lpm",
       "deps": [
-        "water.flow_lpm_for_wue",
-        "water.domestic_lpm"
+        "water.domestic_lpm",
+        "water.flow_lpm_for_wue"
       ],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -3450,6 +3541,7 @@
       "kind": "authored",
       "value": 1.2,
       "formula": null,
+      "formulaExpr": "environment.wue_l_per_kwh",
       "deps": [
         "environment.wue_l_per_kwh"
       ],

@@ -282,6 +282,12 @@ export function buildRegistry() {
                 ? `${value.slice(0, value.indexOf('] ') + 1)} sha1:${createHash('sha1').update(value).digest('hex').slice(0, 12)}`
                 : value,
             formula: meta.formula ?? null,
+            /* The machine-checkable twin of `formula`, and the stated reason when a derived
+               value has none. tools/test-conv-formula.mjs evaluates the first and requires the
+               second, so a formula can no longer be prose that describes a calculation the
+               engine has stopped performing. */
+            ...(meta.formulaExpr ? { formulaExpr: meta.formulaExpr } : {}),
+            ...(meta.formulaNotExpressible ? { formulaNotExpressible: meta.formulaNotExpressible } : {}),
             deps: meta.deps ?? [],
             scope: meta.scope ?? 'site',
             evidenceClass: meta.evidenceClass ?? 'UNAVAILABLE',
