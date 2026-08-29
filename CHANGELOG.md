@@ -11,6 +11,56 @@ release sections rather than semver.
 
 ---
 
+## v1.134.11 — 2026-08-29 (Both reported backlogs closed and gated: 77 unasserted → 0, 27 unrendered → 0)
+
+Two figures had been sitting in the registry gate's REPORTED line for five releases. Chasing
+them found that **one was a bad measurement and the other was two different problems counted
+together.**
+
+**"77 parameters with no gate asserting them" was mostly the measurement.** The `tests` field
+only grepped gate source for the path token, so it could not see the formula gate evaluating 51
+of them, or the provenance rule covering every authored constant, or a drawer hook, or a
+declared distribution. An assertion is an assertion whether it names the path in source or
+reaches it through the registry. Corrected, the figure fell from 77 to **13** — and all thirteen
+were TEXT parameters the numeric provenance rule could never reach.
+
+So they got real assertions: evidence-class values must be terms from the taxonomy (a first
+regex `/_evidence_class$/` missed `meta.evidence_class`, whose leaf is dot-separated — the one
+label the check did not cover); `meta.version` must be semver and agree with the registry
+header; the basis and study document pointers must name files that **exist**; the active
+scenario must be one the engine declares, and its label must be that scenario's own label; the
+adopted chiller type must follow the study's heat-rejection type — the conflict that took two
+releases to settle is an assertion now; `hall.chillers_allocated` must stay null and its reason
+must be a real sentence; and the design duty must not be below the load being carried.
+
+**Now 0, and gated (R7).** A new parameter with nothing asserting it does not ship.
+
+**"27 parameters no cockpit renders" was two problems in one number.** Some were genuinely
+missing from the screens, and they were the ones that matter most: the **coil approach** and the
+**supply-path mixing** that decide whether a 25.4 °C supply is credible, the **chiller specific
+power** the entire COP figure rests on, the **cooling-tower range**, the **plant design duty**,
+the **UPS module rating and modules per system** the loading percentages are measured against,
+the hall's design capacity, utilisation and cabinet ratings, the fire tank level and stored
+volume, the fuel specific consumption. All sixteen are on the cockpits now, each a basis hook.
+
+The other thirteen were never meant to be rendered — unrounded `*_exact` twins kept so identity
+tests compare without rounding noise, a legacy `site.it_design_kw` alias that predates the
+campus model, document pointers, and branch-level evidence labels that each parameter already
+carries more specifically. They carry `display: internal` **with a written reason of at least 40
+characters**.
+
+**Now 0, and gated (R8).** A parameter that is neither rendered nor declared internal does not
+ship — and "internal" without a reason is refused.
+
+**The drawer gate rejected four of these hooks before they shipped**, each the same defect in
+miniature — a parameter attached to an element that renders something else. The hall facility
+load was hooked to a line reading the hall's IT load; the selected cabinet peak to the wrapper
+of the design-average cell; the cabinet design average to a cell reading "500 × 20 kW", two
+numbers where a check can only guess which one is meant; the fuel specific consumption to a line
+reading "744,144 L ÷ 15,503 L/hr", neither of them the rate. Each got its own element rather
+than a looser check. **A hook must point at the element that renders exactly the value it
+explains** — 91 hooks, 88 value/explanation pairs verified.
+
 ## v1.134.10 — 2026-08-29 (Every declared formula is now evaluated — and it caught two of mine)
 
 The registry has carried a `formula` field since v1.134.1. It was **prose**. Nobody checked that

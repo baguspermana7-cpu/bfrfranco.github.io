@@ -174,6 +174,17 @@
         "formulaNotExpressible": {
           "description": "Stated reason a derived parameter has no formulaExpr. Required when one is absent, so a missing expression is a documented decision rather than an omission.",
           "type": "string"
+        },
+        "display": {
+          "description": "'internal' marks a parameter that deliberately has no cockpit rendering — an unrounded twin, a legacy alias, a document pointer or a branch-level label. Requires displayReason.",
+          "enum": [
+            "internal"
+          ]
+        },
+        "displayReason": {
+          "description": "Why this parameter is not rendered. Required whenever display is 'internal', so an unrendered parameter is a stated decision rather than an oversight.",
+          "type": "string",
+          "minLength": 40
         }
       }
     }

@@ -161,6 +161,15 @@ window.RZ_CONV_PARAMETERS = ${JSON.stringify(built)};
 `;
 }
 
+/* Ids the registry gate asserts by name in its semantic section. Kept beside the generator so
+   the two cannot drift apart silently. */
+const SEMANTIC_IDS = new Set([
+    'meta.version', 'meta.basis_doc', 'meta.study_doc', 'meta.data_quality',
+    'campus.scenario_id', 'campus.scenario_label', 'cooling.chiller_type',
+    'hall.chillers_allocated', 'hall.chillers_allocated_reason',
+    'cooling.chiller_design_duty_kw_th',
+]);
+
 export function buildRegistry() {
     const source = readFileSync(ENGINE, 'utf8');
     const live = loadEngine(source);
@@ -266,9 +275,35 @@ export function buildRegistry() {
             reads += grepCount(text, `data-basis-param="${id}"`);
             if (reads > 0) consumers.push({ page, reads });
         }
+        /* What actually ASSERTS this parameter. A grep for the path token alone under-reported
+           badly: it reported 77 parameters as untested while the formula gate was evaluating 51
+           of them and the registry gate was checking provenance on every authored constant.
+           An assertion is an assertion whether it names the path in source or reaches it
+           through the registry. */
         const tests = gateSources
             .filter(({ text }) => tokens.some((t) => text.includes(t)))
             .map(({ file }) => file);
+        if (meta.formulaExpr) tests.push('test-conv-formula.mjs (formula evaluated)');
+        /* The registry gate's semantic section checks the text parameters the numeric
+           provenance rule could not reach: evidence-class values against the taxonomy, the
+           engine version, the document pointers, the active scenario, the adopted machine type
+           and the null-with-a-reason. */
+        if (/(^|[._])evidence_class$/.test(id) || SEMANTIC_IDS.has(id)) {
+            tests.push('test-conv-parameter-registry.mjs (semantic check)');
+        }
+        if (!moved && typeof value === 'number') {
+            tests.push('test-conv-parameter-registry.mjs (provenance + evidence class)');
+        }
+        for (const { page, text } of pageSources) {
+            if (text.includes(`data-basis-param="${id}"`)) {
+                tests.push(`test-conv-basis-drawer.mjs (drawer value vs ${page})`);
+                break;
+            }
+            if (text.includes(`data-rz-distribution="${id}"`)) {
+                tests.push(`test-conv-coverage.mjs (declared distribution on ${page})`);
+                break;
+            }
+        }
 
         const record = {
             id,
@@ -288,6 +323,7 @@ export function buildRegistry() {
                engine has stopped performing. */
             ...(meta.formulaExpr ? { formulaExpr: meta.formulaExpr } : {}),
             ...(meta.formulaNotExpressible ? { formulaNotExpressible: meta.formulaNotExpressible } : {}),
+            ...(meta.display ? { display: meta.display, displayReason: meta.displayReason } : {}),
             deps: meta.deps ?? [],
             scope: meta.scope ?? 'site',
             evidenceClass: meta.evidenceClass ?? 'UNAVAILABLE',

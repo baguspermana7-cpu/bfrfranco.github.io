@@ -653,8 +653,12 @@
         </div>
         <div class="kpi">
             <div class="k-lbl"><i class="fas fa-tint"></i> Consumption</div>
+            <!-- v1.134.11 — the specific consumption was briefly hooked to the autonomy sub-line, which
+                 reads "744,144 L / 15,503 L/hr": two numbers, neither of them the rate. The drawer
+                 gate rejected it. It gets its own line under the consumption KPI. -->
             <div><span class="k-val" id="kpi-consumption" data-basis-param="fuel.generator_consumption_lph" tabindex="0" role="button">--</span><span class="k-unit">L/hr</span></div>
             <div class="k-sub">at current generator load</div>
+            <div class="k-sub" id="kpi-consumption-rate" data-basis-param="fuel.specific_consumption_l_per_kwh" tabindex="0" role="button" title="Specific fuel consumption — click for basis">&mdash;</div>
         </div>
         <div class="kpi">
             <div class="k-lbl"><i class="fas fa-bolt"></i> Generator Load</div>
@@ -1056,6 +1060,10 @@
             $('kpi-usable').textContent = grp(usableL(state.ustPct));
             $('kpi-usable-sub').textContent = 'of ' + grp(TANK_CAP) + ' L × ' + fmt1(USABLE_FRACTION * 100) + '%';
             $('kpi-consumption').textContent = grp(GEN_LPH);
+            var rateEl = $('kpi-consumption-rate');
+            if (rateEl && isNum(FUEL.specific_consumption_l_per_kwh)) {
+                rateEl.textContent = FUEL.specific_consumption_l_per_kwh.toFixed(3) + ' L/kWh';
+            }
             $('kpi-genload').textContent = (Math.round(FACILITY_MW * 100) / 100).toFixed(2);
             $('kpi-genload-sub').textContent = grp(SITE.facility_load_kw) + ' kW on gensets';
             $('fuel-current-basis-value').textContent = IT_MW.toFixed(2) + ' MW IT · ' +

@@ -683,6 +683,11 @@
                      approach and the containment assumption behind it were not. -->
                 <div class="kv" data-basis-param="cooling.crah_supply_air_c" tabindex="0" role="button"
                      title="CRAH supply air — click for basis"><span class="k">CRAH supply air</span><span class="v num" id="th-supply">--</span></div>
+                <!-- v1.134.11 — the containment assumption that places the supply plane. It was
+                     engine-published and shown nowhere, so the one number that decides whether
+                     25.4 C supply is credible was invisible. -->
+                <div class="kv" data-basis-param="cooling.supply_path_mixing_k" tabindex="0" role="button"
+                     title="Supply-path mixing (containment assumption) — click for basis"><span class="k">Supply-path mixing</span><span class="v num" id="th-mixing">--</span></div>
                 <div class="kv" data-basis-param="cooling.chw_coil_approach_k" tabindex="0" role="button"
                      title="Coil approach (ASSUMED) — click for basis"><span class="k">Coil approach</span><span class="v num" id="th-approach">--</span></div>
                 <div class="kv" data-basis-param="cooling.chws_c" tabindex="0" role="button"
@@ -710,7 +715,12 @@
                 <div class="bb-cell">
                     <div class="bb-lbl" id="bb-hall-label">Hall A IT Load</div>
                     <div class="bb-val num"><span id="bb-itload">--</span> <span class="bb-unit">MW</span></div>
-                    <div class="bb-sub" id="bb-itsub">&mdash;</div>
+                    <!-- v1.134.11 — this sub-line was briefly hooked to hall.facility_load_kw. It shows the
+                         hall's IT load summed from the cabinet field, not the facility load, and the
+                         drawer gate rejected the mismatch. Corrected, and the facility figure given
+                         its own cell below rather than borrowed from a line that means something else. -->
+                    <div class="bb-sub" id="bb-itsub" data-basis-param="hall.it_load_kw" tabindex="0" role="button" title="Hall IT load — click for basis">&mdash;</div>
+                    <div class="bb-sub" id="bb-facsub" data-basis-param="hall.facility_load_kw" tabindex="0" role="button" title="Hall facility load — click for basis">&mdash;</div>
                 </div>
                 <div class="bb-cell">
                     <div class="bb-lbl">Rack Count / Avg</div>
@@ -719,8 +729,8 @@
                 </div>
                 <div class="bb-cell">
                     <div class="bb-lbl">Hall Utilization</div>
-                    <div class="bb-val num"><span id="bb-util">--</span> <span class="bb-unit">%</span></div>
-                    <div class="bb-sub" id="bb-design">&mdash;</div>
+                    <div class="bb-val num"><span id="bb-util" data-basis-param="hall.utilisation_pct" tabindex="0" role="button" title="Hall utilisation — click for basis">--</span> <span class="bb-unit">%</span></div>
+                    <div class="bb-sub" id="bb-design" data-basis-param="hall.it_design_kw" tabindex="0" role="button" title="Hall IT design capacity — click for basis">&mdash;</div>
                 </div>
                 <div class="bb-cell">
                     <div class="bb-lbl">Balance vs EPMS</div>
@@ -786,6 +796,10 @@
                 <div class="basis-split">
                     <div class="basis-cell"><div class="basis-label">Current operating density</div><div class="basis-value" id="density-current">--</div><div class="basis-note">IT kW / active rack</div></div>
                     <div class="basis-cell"><div class="basis-label">Installed rack study</div><div class="basis-value" id="density-study">--</div><div class="basis-note">positions × cabinet design rating</div></div>
+                    <!-- v1.134.11 — the selected peak was briefly hooked to the wrapper of the
+                         design-average cell, so its drawer explained 30 kW/rack beside a line reading
+                         "500 x 20 kW". The drawer gate rejected it; the peak has its own cell now. -->
+                    <div class="basis-cell" data-basis-param="hall.rack_selected_peak_kw" tabindex="0" role="button" title="Cabinet selected peak — click for basis"><div class="basis-label">Selected cabinet peak</div><div class="basis-value" id="density-peak">&mdash;</div></div>
                 </div>
                 <div class="formula">Current telemetry is not the same as the installed design study; both remain visible and separately labelled.</div>
             </div>
@@ -1152,6 +1166,11 @@
 
         function paintBalanceBand() {
             document.getElementById('bb-itload').textContent = fmtMW(rackTotal);
+            var facCell = document.getElementById('bb-facsub');
+            if (facCell && HALL && HALL.facility_load_kw != null) {
+                facCell.textContent = 'facility ' + Math.round(HALL.facility_load_kw).toLocaleString()
+                    + ' kW at PUE ' + S.site.pue.toFixed(2);
+            }
             document.getElementById('bb-itsub').textContent =
                 Math.round(rackTotal) + ' kW summed from ' + occupiedCount + ' active racks';
             document.getElementById('bb-racks').textContent = occupiedCount + ' / ' + TOTAL_RACKS;
@@ -1161,10 +1180,20 @@
             document.getElementById('bb-util').textContent = utilPct.toFixed(1);
             document.getElementById('bb-design').textContent =
                 'Current vs installed study ' + (TOTAL_RACKS * RACK_RATING_KW / 1000).toFixed(1) + ' MW';
+            var peakCell = document.getElementById('density-peak');
+            if (peakCell && HALL && HALL.rack_selected_peak_kw != null) {
+                peakCell.textContent = HALL.rack_selected_peak_kw + ' kW/rack';
+            }
             document.getElementById('density-current').textContent =
                 (rackTotal / occupiedCount).toFixed(2) + ' kW/rack';
-            document.getElementById('density-study').textContent =
-                TOTAL_RACKS + ' × ' + RACK_RATING_KW + ' kW';
+            /* v1.134.11 — this cell reads "500 x 20 kW": two numbers, so a drawer hook on it
+               could only be checked by guessing which one it explained. The design average gets
+               its own span; the hook goes there. A hook must point at the element that renders
+               exactly the value it explains. */
+            document.getElementById('density-study').innerHTML =
+                TOTAL_RACKS + ' \u00d7 <span id="density-study-avg" data-basis-param="hall.rack_design_avg_kw"'
+                + ' tabindex="0" role="button" title="Cabinet design average — click for basis">'
+                + RACK_RATING_KW + '</span> kW';
 
             // Balance vs EPMS IT reconciliation point
             var balKw = rackTotal - EPMS_IT_KW;
@@ -1197,6 +1226,7 @@
             document.getElementById('th-inlet').textContent = S.cooling.rack_inlet_target_c.toFixed(1) + ' °C';
             document.getElementById('th-supply').textContent = S.cooling.crah_supply_air_c.toFixed(1) + ' °C';
             document.getElementById('th-approach').textContent = S.cooling.chw_coil_approach_k.toFixed(1) + ' K';
+            document.getElementById('th-mixing').textContent = S.cooling.supply_path_mixing_k.toFixed(1) + ' K';
             document.getElementById('chws').textContent = S.cooling.chws_c.toFixed(1) + ' °C';
             document.getElementById('chwr').textContent = S.cooling.chwr_c.toFixed(1) + ' °C';
             document.getElementById('chdt').textContent = S.cooling.chw_delta_t.toFixed(1) + ' K';

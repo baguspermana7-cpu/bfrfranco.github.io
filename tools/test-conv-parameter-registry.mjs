@@ -22,14 +22,25 @@
  * Run: node tools/test-conv-parameter-registry.mjs
  */
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import vm from 'node:vm';
 import { buildRegistry } from './build-conv-parameter-registry.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const registry = JSON.parse(readFileSync(join(ROOT, 'data', 'conv-parameters.json'), 'utf8'));
 const schema = JSON.parse(readFileSync(join(ROOT, 'data', 'conv-parameters.schema.json'), 'utf8'));
+
+/* The engine and the governed study, loaded once for the semantic checks below. */
+const engineBox = { window: {}, module: { exports: {} }, console };
+vm.createContext(engineBox);
+vm.runInContext(readFileSync(join(ROOT, 'js', 'conv-engine.js'), 'utf8'), engineBox);
+const ENGINE_SCENARIOS = engineBox.window.CONV_CALC.listScenarios();
+const basisBox = { window: {}, module: { exports: {} }, console };
+vm.createContext(basisBox);
+vm.runInContext(readFileSync(join(ROOT, 'js', 'conv-design-basis.js'), 'utf8'), basisBox);
+const STUDY = (basisBox.window.RZConvDesignBasis && basisBox.window.RZConvDesignBasis.STUDY) || {};
 
 /* ── R1 schema ─────────────────────────────────────────────────────────────── */
 function typeOf(value) {
@@ -149,10 +160,115 @@ for (const p of registry.parameters) {
         `${p.id}: scope "${p.scope}" is not valid for the ${branch} branch (allowed: ${allowed.join(', ')})`);
 }
 
+/* ── R6 semantics of the NON-NUMERIC parameters ─────────────────────────────
+   The provenance rule above only reached authored NUMBERS, which left thirteen text
+   parameters — evidence classes, scenario ids, document pointers, the engine version — with
+   nothing asserting them at all. A label that silently changes to something outside the
+   taxonomy, or a basis document that no longer exists, is exactly the kind of quiet drift the
+   registry is here to stop. */
+const EVIDENCE = new Set(['MEASURED', 'DERIVED', 'SIMULATED', 'ADOPTED', 'ASSUMED', 'VENDOR',
+    'STANDARD', 'UNAVAILABLE']);
+const valueOf = (id) => byId.get(id) && byId.get(id).value;
+
+for (const p of registry.parameters) {
+    /* The leaf may be separated by a dot or an underscore — an earlier `/_evidence_class$/`
+       missed meta.evidence_class entirely, so the snapshot's own evidence label was the one
+       thing this check did not cover. */
+    if (!/(^|[._])evidence_class$/.test(p.id)) continue;
+    /* An evidence-class VALUE must itself be a term from the taxonomy — compound forms like
+       "SIMULATED/ADOPTED" are allowed because a scenario can be both. */
+    const parts = String(p.value).split('/');
+    for (const part of parts) {
+        assert.ok(EVIDENCE.has(part.trim()),
+            `${p.id}: publishes "${p.value}", which is not in the evidence taxonomy`);
+    }
+}
+
+/* The engine version must be semver, and must not silently disagree with itself. */
+assert.match(String(valueOf('meta.version')), /^\d+\.\d+\.\d+$/,
+    'meta.version must be a semantic version');
+assert.equal(String(valueOf('meta.version')), registry.engineVersion,
+    'meta.version and the registry header disagree about the engine version');
+
+/* Document pointers must point at something that exists. A basis citing a deleted file is a
+   dead citation, which reads exactly like a live one. */
+for (const id of ['meta.basis_doc', 'meta.study_doc']) {
+    const raw = String(valueOf(id));
+    const path = raw.split(' ')[0];
+    if (path.startsWith('conv/review/')) continue;   // owner review corpus, outside this repo
+    assert.ok(existsSync(join(ROOT, path)),
+        `${id} cites "${path}", which does not exist in this repository`);
+}
+
+/* The active scenario must be one the engine actually declares. */
+const scenarioIds = new Set(ENGINE_SCENARIOS.map((s) => s.id));
+assert.ok(scenarioIds.has(String(valueOf('campus.scenario_id'))),
+    `campus.scenario_id "${valueOf('campus.scenario_id')}" is not a declared scenario`);
+/* The label an operator reads must be the label of the scenario actually active — the two are
+   published separately and could drift apart. */
+const activeScenario = ENGINE_SCENARIOS.find((s) => s.id === String(valueOf('campus.scenario_id')));
+assert.equal(String(valueOf('campus.scenario_label')), String(activeScenario.label),
+    'campus.scenario_label does not match the active scenario\'s own label');
+
+/* The adopted machine type must follow the study's heat-rejection type rather than drifting
+   back to whatever a page happens to draw. This is the conflict that took v1.134.7-.8 to
+   settle; it is now an assertion. */
+const heatRejection = String(STUDY.heatRejectionType || '');
+if (heatRejection.includes('cooling-tower')) {
+    assert.equal(String(valueOf('cooling.chiller_type')), 'water-cooled-centrifugal',
+        'the study specifies cooling-tower heat rejection, so the chillers must be water-cooled');
+}
+
+/* A null with a reason is a legitimate answer; a null without one is an omission. */
+assert.equal(valueOf('hall.chillers_allocated'), null,
+    'per-hall chiller allocation must stay null until a hydronic distribution design exists');
+assert.ok(String(valueOf('hall.chillers_allocated_reason')).length > 40,
+    'hall.chillers_allocated is null and must carry a written reason');
+
+/* Design duty must not be below the duty actually being carried. */
+assert.ok(Number(valueOf('cooling.chiller_design_duty_kw_th'))
+    >= Number(valueOf('cooling.heat_rejection_kw')),
+    'the chiller plant design duty is below the load it is currently carrying');
+
+assert.ok(String(valueOf('meta.data_quality')).length > 0, 'meta.data_quality must not be empty');
+
+/* ── R8 every parameter is either rendered or declared internal ─────────────
+   "27 parameters no cockpit renders" sat in the reported line for five releases. Some were
+   genuinely missing from the screens — the coil approach and the containment assumption that
+   decide whether a 25.4 C supply is credible, the chiller specific power the whole efficiency
+   figure rests on, the UPS nameplate the loading percentages are measured against. Others were
+   never meant to be rendered: unrounded twins, a legacy alias, document pointers, branch-level
+   labels. Those two cases needed separating, not counting together. The first group is now on
+   the screens; the second carries `display: internal` WITH a written reason. A parameter that
+   is neither does not ship. */
+const invisible = registry.parameters.filter((p) => p.consumers.length === 0 && p.display !== 'internal');
+assert.equal(invisible.length, 0,
+    'parameters no cockpit renders and which are not declared internal: '
+    + invisible.map((p) => p.id).join(', ')
+    + '. Render it, or mark display: internal with a reason saying why an operator should not see it.');
+for (const p of registry.parameters) {
+    if (p.display !== 'internal') continue;
+    assert.ok(p.displayReason && p.displayReason.length >= 40,
+        `${p.id}: declared internal but the reason is missing or too short to be one`);
+}
+
+/* ── R7 every parameter is asserted by something ────────────────────────────
+   This was a REPORTED figure for four releases (77 unasserted at its worst) while the real
+   coverage was much better than the measurement: `tests` only grepped gate source for the path
+   token, so it could not see the formula gate evaluating 51 of them or the provenance rule
+   covering every authored constant. With the measurement corrected the true number reached
+   zero, so it is gated: a new parameter with nothing asserting it does not ship. */
 const derived = registry.parameters.filter((p) => p.kind === 'derived').length;
-const untested = registry.parameters.filter((p) => p.tests.length === 0).length;
+const untested = registry.parameters.filter((p) => p.tests.length === 0);
+assert.equal(untested.length, 0,
+    'parameters with no gate asserting them: ' + untested.map((p) => p.id).join(', ')
+    + '. Give it a formulaExpr, a source and evidence class, a drawer hook, a declared '
+    + 'distribution, or a named semantic check — not an exemption.');
 const unread = registry.parameters.filter((p) => p.consumers.length === 0).length;
 console.log(`PASS Conventional parameter registry — ${registry.parameters.length} parameters `
     + `(${derived} derived, ${registry.parameters.length - derived} authored), engine v${registry.engineVersion}`);
 console.log(`     schema OK · current · provenance complete · ${byId.size} ids, dependency graph acyclic and measured`);
-console.log(`     REPORTED (not yet gated): ${unread} parameters no cockpit reads, ${untested} no gate asserts`);
+console.log(`     every parameter is asserted by at least one gate (R7)`);
+const internal = registry.parameters.filter((p) => p.display === 'internal').length;
+console.log(`     every parameter is rendered by a cockpit or declared internal with a reason `
+    + `(R8) — ${internal} internal, ${registry.parameters.length - internal} rendered`);

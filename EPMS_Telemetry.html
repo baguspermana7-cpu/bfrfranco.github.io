@@ -470,6 +470,12 @@
     <span style="color:#94a3b8;">Gen <b id="epms-gen" style="color:#94a3b8;" title="Awaiting simulation state">—</b></span>
     <span style="color:#94a3b8;">Breakers <b id="epms-trips" style="color:#94a3b8;" title="Awaiting simulation state">—</b></span>
     <span style="flex:1"></span>
+    <!-- v1.134.11 — the UPS nameplate basis: module rating, modules per system and the load one
+         system carries. All engine-published and rendered nowhere, so the single-line showed UPS
+         loading with nothing saying what it was loaded against. -->
+    <span style="color:#94a3b8;font-size:11px;">UPS <b id="epms-ups-basis" data-basis-param="electrical.ups_module_kw_rated" tabindex="0" role="button" title="UPS module rating — click for basis" style="color:#94a3b8;">&mdash;</b></span>
+    <span style="color:#94a3b8;font-size:11px;">Modules <b id="epms-ups-modules" data-basis-param="electrical.ups_modules_per_system" tabindex="0" role="button" title="Modules per system — click for basis" style="color:#94a3b8;">&mdash;</b></span>
+    <span style="color:#94a3b8;font-size:11px;">Per system <b id="epms-ups-sys" data-basis-param="electrical.ups_system_kw" tabindex="0" role="button" title="Load per UPS system — click for basis" style="color:#94a3b8;">&mdash;</b></span>
     <span style="color:#94a3b8;font-size:11px;">Data <b id="epms-dq" style="color:#94a3b8;" title="Awaiting engine snapshot">—</b></span>
     <span style="color:#94a3b8;font-size:11px;">Scenario <b id="epms-scn" style="color:#94a3b8;" title="Awaiting engine snapshot">—</b></span>
 </div>
@@ -1464,6 +1470,17 @@ function updateEpmsStatusStrip(snapshot) {
         'Protective trips are not modelled in this basis. Showing open breakers instead: '
         + openCount + ' of ' + Object.keys(SIM.breakers).length);
 
+    if (snapshot && snapshot.electrical) {
+        var e = snapshot.electrical;
+        put('epms-ups-basis', e.ups_module_kw_rated != null ? (e.ups_module_kw_rated + ' kW/module') : '—',
+            DIM, 'electrical.ups_module_kw_rated');
+        put('epms-ups-modules', e.ups_modules_per_system != null
+            ? (e.ups_modules_per_system + ' x ' + e.ups_system_count) : '—',
+            DIM, 'electrical.ups_modules_per_system x ups_system_count');
+        put('epms-ups-sys', e.ups_system_kw != null
+            ? (Math.round(e.ups_system_kw).toLocaleString() + ' kW') : '—',
+            DIM, 'electrical.ups_system_kw');
+    }
     if (snapshot && snapshot.meta) {
         put('epms-dq', String(snapshot.meta.data_quality || '—'), OK, 'snapshot.meta.data_quality');
         put('epms-scn', String(snapshot.meta.scenario || '—'), CYAN, 'snapshot.meta.scenario');

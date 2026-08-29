@@ -121,7 +121,9 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28"
       },
-      "formulaNotExpressible": "A text label carried from the active scenario row."
+      "formulaNotExpressible": "A text label carried from the active scenario row.",
+      "display": "internal",
+      "displayReason": "Rendered as part of the scenario line on the dc-conventional design-basis panel rather than as a separate figure."
     },
     {
       "id": "campus.scenario_id",
@@ -529,7 +531,9 @@
       "source": {
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28"
-      }
+      },
+      "display": "internal",
+      "displayReason": "Branch-level label; the individual cooling nameplates carry their own class."
     },
     {
       "id": "cooling.plant_cop",
@@ -663,7 +667,9 @@
       "source": {
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28"
-      }
+      },
+      "display": "internal",
+      "displayReason": "Branch-level label; the individual electrical nameplates carry their own class."
     },
     {
       "id": "electrical.ups_efficiency",
@@ -1137,7 +1143,9 @@
       "source": {
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28"
-      }
+      },
+      "display": "internal",
+      "displayReason": "Branch-level label; the individual fuel nameplates carry their own class."
     },
     {
       "id": "fuel.specific_consumption_l_per_kwh",
@@ -1204,7 +1212,9 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28",
         "method": "Central N+1 plant; a per-hall allocation requires a hydronic distribution design that has not been produced. Deliberately null rather than a plausible share."
-      }
+      },
+      "display": "internal",
+      "displayReason": "Deliberately null: no hydronic distribution design exists to split the central plant per hall. Rendering a null as a KPI would invite a reader to treat the absence as a zero; the reason is what matters and it is carried in the next parameter."
     },
     {
       "id": "hall.chillers_allocated_reason",
@@ -1215,7 +1225,9 @@
       "source": {
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28"
-      }
+      },
+      "display": "internal",
+      "displayReason": "The written reason for the null above. It is a sentence, not a number, and belongs in the basis drawer."
     },
     {
       "id": "hall.facility_load_kw",
@@ -1359,7 +1371,9 @@
       "source": {
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28"
-      }
+      },
+      "display": "internal",
+      "displayReason": "A document pointer for provenance, surfaced through the basis drawer's Source line rather than as a number on a cockpit."
     },
     {
       "id": "meta.data_quality",
@@ -1381,7 +1395,9 @@
       "source": {
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28"
-      }
+      },
+      "display": "internal",
+      "displayReason": "The snapshot-wide evidence label. It reaches the operator through each parameter's own evidence class in the basis drawer, which is more specific than a single site-wide badge."
     },
     {
       "id": "meta.nameplate_evidence_class",
@@ -1392,7 +1408,9 @@
       "source": {
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28"
-      }
+      },
+      "display": "internal",
+      "displayReason": "Site-wide nameplate label; each nameplate parameter carries its own class in the drawer."
     },
     {
       "id": "meta.scenario",
@@ -1414,7 +1432,9 @@
       "source": {
         "ref": "js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)",
         "asOf": "2026-08-28"
-      }
+      },
+      "display": "internal",
+      "displayReason": "A document pointer, same as meta.basis_doc."
     },
     {
       "id": "meta.version",
@@ -1509,7 +1529,9 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28"
       },
-      "formulaExpr": "site.it_load_kw * site.pue"
+      "formulaExpr": "site.it_load_kw * site.pue",
+      "display": "internal",
+      "displayReason": "Unrounded twin of site.facility_load_kw, kept so identity tests can compare without rounding noise. Rendering both would show an operator the same quantity twice."
     },
     {
       "id": "site.it_design_kw",
@@ -1525,7 +1547,9 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28"
       },
-      "formulaExpr": "campus.it_design_kw"
+      "formulaExpr": "campus.it_design_kw",
+      "display": "internal",
+      "displayReason": "Republishes campus.it_design_kw under the legacy site.* key that predates the campus model. The campus value is what the cockpits render."
     },
     {
       "id": "site.it_load_kw",
@@ -1577,7 +1601,9 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28"
       },
-      "formulaExpr": "site.facility_load_kw - site.it_load_kw"
+      "formulaExpr": "site.facility_load_kw - site.it_load_kw",
+      "display": "internal",
+      "displayReason": "Unrounded twin of site.non_it_load_kw, for the same reason."
     },
     {
       "id": "site.pue",
