@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 
 const html = await readFile(new URL('../datahallAI.html', import.meta.url), 'utf8');
+const operatorCss = await readFile(new URL('../css/datahall-ai-operator.css', import.meta.url), 'utf8');
 const conventional = await readFile(new URL('../dc-conventional.html', import.meta.url), 'utf8');
 const operatorUi = await readFile(new URL('../js/datahall-ai/operator-ui.js', import.meta.url), 'utf8');
 const designStudio = await readFile(new URL('../js/rz-design-studio.js', import.meta.url), 'utf8');
@@ -16,11 +17,18 @@ includes(html, 'js/datahall-ai/rack-density.js', 'AI cockpit must load the rack-
 includes(html, 'js/datahall-ai/electrical-topology.js', 'AI cockpit must load the electrical topology model');
 includes(html, 'js/datahall-ai/fire-cause-effect.js', 'AI cockpit must load the fire cause-and-effect model');
 includes(html, 'js/datahall-ai/operator-ui.js', 'AI cockpit must load the operator UI controller');
+assert.match(html, /<title>[^<]*Simulated Operations[^<]*<\/title>/,
+  'AI search title must disclose simulated operations');
+assert.match(html, /document\.title='AI Data Hall '\+dh\+' Dashboard \| GB200 NVL72 Simulated Operations'/,
+  'AI hall navigation must preserve simulated provenance in the dynamic title');
+assert.doesNotMatch(html, /(?:<title>|og:title[^>]*content=|"name":)[^\n<]*(?:Live Operations|Real-time)/i,
+  'AI search, social, and structured-data titles must not claim live authority');
 
 includes(html, 'data-t="alarms"', 'AI cockpit must expose Alarms & Events as a first-class tab');
 includes(html, 'id="p-alarms"', 'AI cockpit must expose the alarm workspace panel');
-includes(html, '.tabs{display:flex;gap:2px;padding:4px 12px;background:var(--bg1);border-bottom:1px solid var(--bd);overflow-x:auto;height:36px;position:sticky;top:44px;z-index:55}', 'desktop tab rail must remain operable below the sticky header');
-includes(html, '.hdr>div:first-child{width:100%;min-width:0;max-width:100%;flex-wrap:wrap}', 'mobile header controls must wrap instead of clipping off-screen');
+includes(html, '.tabs{display:flex;gap:2px;padding:4px 12px;background:var(--bg1);border-bottom:1px solid var(--bd);overflow-x:auto;height:36px;position:sticky;top:44px;z-index:55;flex:none}', 'desktop tab rail must remain operable below the sticky header');
+includes(html, '.hdr>div:first-child{width:100%;min-width:0;max-width:100%;flex-wrap:nowrap;overflow-x:auto', 'mobile header controls must use a dedicated horizontal rail instead of overlapping');
+includes(operatorCss, '.wrap { min-height: 0; }', 'mobile cockpit must not retain the retired 80px chrome height assumption');
 for (const id of [
   'alarmFrom', 'alarmTo', 'alarmPoint', 'alarmSystem', 'alarmSeverity',
   'alarmLifecycle', 'alarmQuality', 'alarmComparator', 'alarmValue',

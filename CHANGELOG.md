@@ -11,6 +11,110 @@ release sections rather than semver.
 
 ---
 
+## v1.134.14 — 2026-08-30 (SCADA operator cockpit integrity and evidence closure)
+
+Owner direction: *“audit total dan perbaiki … do autonomous sampai proper, no mistake … gunakan
+Puppeteer untuk evaluasi”* and *“saya tidak mau ada AI design slop.”*
+
+### Added
+
+- Added an industrial SCADA/BMS cockpit design contract and a generated visual reference under
+  `docs/design/`, defining flat HMI hierarchy, state-color semantics, line discipline, responsive
+  reachability and no-slop acceptance criteria.
+- Added adversarial Puppeteer gates for thermal color semantics, hall-metering evidence, timed
+  chiller updates, AI header reachability, selectable Design Studio documents and Fire authority
+  loss across every process path.
+
+### Fixed
+
+- Corrected the Conventional Data Hall default to rack-inlet temperature and rendered the adopted
+  18–27 °C envelope green; the 25.4 °C project setpoint no longer inherits amber power-density bands.
+- Replaced the invalid −22.5 MW campus-versus-hall comparison and the circular green +0 kW equal
+  allocation with neutral `UNAVAILABLE`. The 30 MW ÷ 4 planning reference remains explicitly labeled
+  as non-metered and is never presented as hall telemetry.
+- Rebased every chiller simulation branch on the governed 19.4/27.0 °C water planes, preventing the
+  first scheduled tick from collapsing healthy values into the retired fixed range. The 943.0 L/s
+  IT sensible-load reference and 982.3 L/s evaporator-duty reference are now explicitly calculated,
+  while measured header flow fails closed as `UNAVAILABLE`; COP and kW/RT no longer derive from a
+  non-metered flow surrogate.
+- Removed the invented 5.25 MW chiller unit rating, 52.5 MW capacity and 21.25 MW margin. The plant
+  mimic now uses the governed 35 MW running capacity, 45 MW N+1 capacity and 13.75 MW N+1 margin.
+- Removed Hall A–D context from the centralized municipal water-treatment plant, reconciled the
+  current site basis to 30 MW IT / 600 L/min WUE-equivalent makeup, and made legacy authority fail closed.
+- Rebound Fire to 30 MW IT / 2,000 racks and 104.9/114 m³ reserve. Missing or legacy authority now
+  invalidates FACP/VESDA, alarms, tank/pump states, logs, tooltips, interlocks and all 13 fire-water,
+  N₂, wet-pipe and pre-action paths instead of leaving plausible healthy labels.
+- Replaced the AI cockpit's fixed 80 px chrome assumption with a flex-owned remaining viewport and
+  dedicated horizontal action rails. Header, simulated-provenance instrument, tabs, main content and
+  sidebar no longer overlap or become unreachable at 1440 or 390 px.
+- Made all three Conventional Design Studio document types selectable and generated with the chosen
+  identity while preserving the strict current versus `current-plus-study` scope contract.
+- Cache-busted the governed Conventional engine and shared telemetry component on every adopting
+  cockpit; simulated provenance now uses instrument cyan rather than an unrelated purple state.
+- Default-denied the shared basis drawer and required an explicit validated host handshake. Missing,
+  mismatched-version, matched-legacy and same-version-incomplete authority fixtures now keep every
+  visible, hidden and programmatic consumer neutral across all eight adopting operator pages.
+- Closed the last ICT and EPMS fail-open paths: neutral first paint, complete v2 schema validation,
+  withheld topology/single-line state, disabled commands and exports, and no GOOD/NORMAL/ONLINE or
+  invalid numeric fragments when the governed engine is missing, legacy or incomplete.
+- Made authority loss override the shared simulated-data banner. Conventional and AI cockpits now
+  show `COMMS LOST — AUTHORITY UNAVAILABLE` instead of claiming an engine-derived basis when their
+  governing model fails validation; healthy simulated pages retain their cyan provenance state.
+- Reconciled generated Technical Specification, Basis of Design and Operator Handover documents with
+  the same current authority and separated evaporator duty, chiller input and condenser/tower heat
+  rejection rather than presenting them as one measured quantity.
+- Required non-empty scenario and data-quality provenance before ICT, EPMS, Fuel or Fire can advance
+  timestamps or render a healthy state; blank same-version metadata now fails closed like a missing
+  or incomplete authority bundle.
+- Corrected the Water KPI threshold captions so filter differential pressure reads
+  `Backwash > 0.80 bar` and treated-water quality reads `Limit < 500 ppm`, from first paint through
+  runtime, instead of swapping the two engineering limits.
+- Reworked EPMS chrome around the actual rendered context-strip height, separated Feed A/Feed B
+  identity from energized/open/tripped state in the legend, and documented the last ten symbols as
+  3 MW / 200-position aggregate rack groups rather than invented individual rack measurements.
+- Separated the Fire reserve design deficit from FACP health: the current stage remains explicitly
+  FACP normal while an amber reserve-deficit banner, proper centrifugal-pump symbols and aligned
+  process labels expose the independent hydraulic shortfall without inventing a supervisory alarm.
+- Removed mobile implicit-grid overflow from Fuel KPI cards and the Data Hall alarm strip, stopped
+  process/decorative motion under `prefers-reduced-motion`, and standardized operator typography on
+  IBM Plex Sans with JetBrains Mono tabular/slashed-zero numerics.
+- Corrected the Chiller detail modal to evaluate loop delta-T against the governed 7.6 K design plane
+  rather than retired absolute thresholds, and clarified that PUE 1.45 is an adopted simulated
+  design-point input—not a measured or observed operating PUE.
+- Made Chiller scenario evolution reproducible and removed random healthy duty-pump swaps that could
+  create a false vibration diagnostic/first-out depending on reload timing.
+- Relabeled Fire's 7,200 m³ value as a site rack-footprint proxy that is explicitly non-sizing, and
+  rebound the jockey-pump semantic line to the governed 12.5 bar simulated header state instead of
+  an unsupported 7.5 bar literal.
+- Corrected the Water Manual authority boundary: site balance and WUE are engine-derived, while tank,
+  filter, quality, dosing, UV and booster states are authority-gated deterministic page simulations
+  because `CONV_CALC` does not expose treatment-train telemetry.
+- Bounded the desktop Fire inspector in a sticky internal scrollport, removed the final Fuel mobile
+  column clipping, and enforced JetBrains Mono tabular/slashed-zero numerics across all seven SCADA
+  operator surfaces.
+- Synchronized the governed Agent Harness Standard date with the v1.134.14 release date so the
+  release-parity gate cannot reject a current standard as stale.
+- Regenerated the Conventional parameter registry after the cockpit consumer fan-out changed, and
+  corrected the final accuracy probe to require neutral first paint plus the precise 943.0 L/s
+  `IT sensible-load CHW reference` label rather than a plausible pre-authority value or a false
+  measured-flow claim.
+
+### Documentation
+
+- Updated the Conventional operations, telemetry-quality, accuracy-validation and content-linkage
+  standards plus both Obsidian mirrors with the new scope, fail-closed, thermal-plane, capacity,
+  timed-runtime and responsive-reachability lessons. Linked subsystem PRDs and Manuals are parity
+  checked as independent current-value consumers.
+
+### Verification
+
+- Focused engine, formula, scope, Design Studio, alarm, Water, Fire, Data Hall, Chiller, EPMS and AI
+  cockpit regressions pass; authority coverage includes responsive 390/768/1180 px probes and hostile
+  missing/legacy/incomplete/version-mismatch fixtures.
+- The ship workflow now invokes the full browser Design Studio regression so all three document
+  selections, distinct bodies/TOCs, current-versus-study scope and export flow remain release-blocking.
+- Final strict site gates and release evidence are recorded by the ship workflow for this revision.
+
 ## v1.134.12 — 2026-08-29 (Accuracy gate follows the canonical basis drawer and reconciles equal scopes)
 
 ### Fixed

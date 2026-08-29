@@ -71,6 +71,7 @@
     </script>
 <style>
     :root {
+        --epms-context-height: 55px;
         --bg-core: #02040a;
         --panel-bg: rgba(12, 20, 35, 0.95);
         --text-main: #e2e8f0;
@@ -87,10 +88,14 @@
         --st-warn: #eab308;
     }
 
-    body { margin: 0; background: var(--bg-core); color: var(--text-main); font-family: 'Segoe UI', monospace; overflow: hidden; user-select: none; }
+    body { margin: 0; background: var(--bg-core); color: var(--text-main);
+        font-family: 'IBM Plex Sans', system-ui, sans-serif; overflow: hidden; user-select: none;
+        font-variant-numeric: tabular-nums slashed-zero;
+        font-feature-settings: "tnum" 1, "zero" 1; }
 
     /* UI Overlay */
-    .ui { position: absolute; inset: 0; pointer-events: none; display: flex; flex-direction: column; z-index: 100; }
+    .ui { position: absolute; top: var(--epms-context-height); right: 0; bottom: 0; left: 0;
+        pointer-events: none; display: flex; flex-direction: column; z-index: 100; }
     .pointer { pointer-events: auto; }
 
     .topbar {
@@ -101,8 +106,10 @@
     
     .sidebar {
         width: 320px; background: var(--panel-bg); border-right: 1px solid #333;
-        display: flex; flex-direction: column; padding: 15px; gap: 10px; height: 100%;
+        display: flex; flex-direction: column; padding: 15px; gap: 10px; height: auto;
+        min-height: 0; overflow-y: auto; box-sizing: border-box;
     }
+    .epms-main { flex: 1; display: flex; min-height: 0; padding-bottom: 50px; box-sizing: border-box; }
     .epms-sidebar-toggle { display: none; }
 
     .ctrl-box {
@@ -127,7 +134,9 @@
     @keyframes pulse { 0% { opacity:0.5; } 50% { opacity:1; } 100% { opacity:0.5; } }
 
     /* SVG Canvas */
-    #viewport { width: 100%; height: 100%; cursor: grab; background-image: linear-gradient(rgba(148,163,184,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.08) 1px, transparent 1px); background-size: 40px 40px; }
+    #viewport { position: absolute; top: var(--epms-context-height); right: 0; bottom: 0; left: 0;
+        width: 100%; height: calc(100dvh - var(--epms-context-height)); cursor: grab;
+        background-image: linear-gradient(rgba(148,163,184,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.08) 1px, transparent 1px); background-size: 40px 40px; }
     #viewport:active { cursor: grabbing; }
 
     /* Wires */
@@ -151,16 +160,24 @@
     .energized-A-gen { stroke: var(--col-A); opacity: 1; animation: laser 0.3s linear infinite; filter: drop-shadow(0 0 6px var(--col-G)); }
     .energized-B-gen { stroke: var(--col-B); opacity: 1; animation: laser 0.3s linear infinite; filter: drop-shadow(0 0 6px var(--col-G)); }
     .energized-C-gen { stroke: var(--col-C); opacity: 1; animation: laser 0.3s linear infinite; filter: drop-shadow(0 0 6px var(--col-G)); }
+
+    @media (prefers-reduced-motion: reduce) {
+        .energized-A, .energized-B, .energized-C,
+        .energized-A-gen, .energized-B-gen, .energized-C-gen,
+        .gen-run .led, .status-box.error, .status-led.error {
+            animation: none !important;
+        }
+    }
     
     /* Devices */
     .dev-rect { fill: #0f172a; stroke: #64748b; stroke-width: 1.5; }
     .dev-lbl { fill: #fff; font-size: 11px; font-weight: bold; text-anchor: middle; pointer-events: none; }
     .dev-sub { fill: #94a3b8; font-size: 8px; text-anchor: middle; pointer-events: none; }
-    .dev-spec { fill: #fbbf24; font-size: 10px; font-family: monospace; font-weight: bold; }
+    .dev-spec { fill: #fbbf24; font-size: 10px; font-family: 'JetBrains Mono', monospace; font-weight: bold; font-feature-settings: "zero" 1; }
 
     /* Telemetry */
     .tele-bg { fill: rgba(0,0,0,0.85); stroke: #444; stroke-width: 0.5; }
-    .tele-txt { fill: #fff; font-family: 'Consolas', monospace; font-size: 10px; font-weight: bold; pointer-events: none; }
+    .tele-txt { fill: #fff; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: bold; pointer-events: none; font-feature-settings: "zero" 1; }
 
     /* IEC Breaker */
     .br-group { cursor: pointer; }
@@ -210,7 +227,8 @@
     .zoom-indicator {
         font-size: 11px;
         color: #9aa3af;
-        font-family: monospace;
+        font-family: 'JetBrains Mono', monospace;
+        font-feature-settings: "zero" 1;
         min-width: 50px;
         text-align: center;
     }
@@ -318,7 +336,8 @@
         letter-spacing: 0.5px;
     }
     .status-value {
-        font-family: 'Consolas', monospace;
+        font-family: 'JetBrains Mono', monospace;
+        font-feature-settings: "zero" 1;
         font-size: 12px;
         font-weight: bold;
         color: #fff;
@@ -338,7 +357,8 @@
     .status-led.error { background: var(--st-bad); box-shadow: 0 0 6px var(--st-bad); animation: blink 0.5s infinite; }
     .status-spacer { flex: 1; }
     .status-clock {
-        font-family: 'Consolas', monospace;
+        font-family: 'JetBrains Mono', monospace;
+        font-feature-settings: "zero" 1;
         font-size: 11px;
         color: #9aa3af;
         padding: 4px 10px;
@@ -381,7 +401,9 @@
             overflow-x: auto;
             overflow-y: hidden;
             scrollbar-width: thin;
+            scroll-padding-inline: 8px;
         }
+        .topbar > * { scroll-margin-inline: 8px; }
         .topbar .brand { display: none; }
         .topbar .epms-back-link,
         .topbar .epms-portfolio-link,
@@ -416,11 +438,16 @@
             box-shadow: 12px 0 28px rgba(0, 0, 0, 0.52);
         }
         .status-bar { left: 0; overflow-x: auto; }
-        #viewport { width: 100vw !important; height: 100dvh !important; max-width: none !important; }
+        #viewport { width: 100vw !important; height: calc(100dvh - var(--epms-context-height)) !important; max-width: none !important; }
     }
 
 #cookieAccept { background:#1d4ed8 !important; }
 #zoomIndicator { color:#9aa3af !important; }
+.dev-spec, .tele-txt, .zoom-indicator, .status-value, .status-clock, [data-basis-param] {
+    font-family: 'JetBrains Mono', monospace;
+    font-feature-settings: "tnum" 1, "zero" 1;
+    font-variant-numeric: tabular-nums slashed-zero;
+}
 </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-07-22-navfix" defer></script>
@@ -428,11 +455,11 @@
     <!-- v1.24.0: bring EPMS onto the engine + BMS Shell. conv-engine.js loads
          non-deferred so window.CONV_CALC exists when the status strip renders.
          Spec: conv/review/14 §2 ; standarization/BMS_SHELL.md -->
-    <script src="js/conv-engine.js?v=1.22.0"></script>
+    <script src="js/conv-engine.js?v=2.0.0"></script>
     <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
          Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
     <script src="js/conv-parameters.js?v=1.134.3"></script>
-    <script src="js/rz-basis-drawer.js?v=1.134.3"></script>
+    <script src="js/rz-basis-drawer.js?v=1.134.14"></script>
     <link rel="stylesheet" href="css/rz-bms-shell.css?v=1.24.0">
     <link rel="stylesheet" href="css/rz-conv-alarm-workspace.css?v=1.131.0">
     <script src="js/datahall-ai/alarm-query.js?v=1.0.0" defer></script>
@@ -447,17 +474,17 @@
     <!-- v1.43.20 — instrument register (RZ Dark System v1). Chrome-only, dark-only, scoped. -->
     <link rel="stylesheet" href="css/rz-cockpit-instrument.css?v=1.43.19">
 </head>
-<body>
+<body data-rz-basis-authority="unavailable">
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <a id="main-content" tabindex="-1" aria-hidden="true"></a>
 
 <!-- v1.24.0 doc-14 §2: Top engineering status strip (engine-bound) + visible line-status legend.
      Sits ABOVE the SVG so it's the first read every time the page loads. -->
 <div id="epms-status-strip" role="status" aria-live="polite" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:8px 14px;background:#0c1423;border-bottom:1px solid #2b3a52;font-family:'JetBrains Mono','IBM Plex Sans',sans-serif;font-size:12px;color:#e2e8f0;font-variant-numeric:tabular-nums;">
-    <span style="font-weight:800;letter-spacing:.08em;color:#22c55e;text-transform:uppercase;">EPMS NORMAL</span>
-    <span style="color:#94a3b8;">Facility Load <b id="epms-fac" data-basis-param="site.facility_load_kw" tabindex="0" role="button" style="color:#fff;">2.68</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
-    <span style="color:#94a3b8;">IT Load <b id="epms-it" data-basis-param="site.it_load_kw" tabindex="0" role="button" style="color:#fff;">1.85</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
-    <span style="color:#94a3b8;">PUE <b id="epms-pue" data-basis-param="site.pue" tabindex="0" role="button" style="color:#fff;">1.45</b></span>
+    <span id="epms-state" style="font-weight:800;letter-spacing:.08em;color:#94a3b8;text-transform:uppercase;">EPMS AUTHORITY UNAVAILABLE</span>
+    <span style="color:#94a3b8;">Facility Load <b id="epms-fac" data-basis-param="site.facility_load_kw" tabindex="0" role="button" style="color:#94a3b8;">—</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
+    <span style="color:#94a3b8;">IT Load <b id="epms-it" data-basis-param="site.it_load_kw" tabindex="0" role="button" style="color:#94a3b8;">—</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
+    <span style="color:#94a3b8;">PUE <b id="epms-pue" data-basis-param="site.pue" tabindex="0" role="button" style="color:#94a3b8;">—</b></span>
     <!-- v1.132.1 STATIC-CLAIM REPAIR — these six cells were hardcoded words ("OK" / "Online" / "Standby" /
          "0" / "GOOD" / "Simulated") sitting beside three engine-bound numbers. They asserted a healthy plant
          no matter what the simulation was actually doing: trip every breaker and kill both utilities and the
@@ -482,11 +509,12 @@
 
 <!-- v1.24.0 doc-14 §2: Visible legend for line/breaker state (operator-facing, no doc lookup needed). -->
 <div id="epms-legend" aria-label="EPMS line and breaker status legend" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:6px 14px;background:#0a1322;border-bottom:1px solid #2b3a52;font-family:'JetBrains Mono','IBM Plex Sans',sans-serif;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:#94a3b8;">
-    <span style="font-weight:700;color:#9aa3af;">LINE STATUS:</span>
-    <span style="display:inline-flex;align-items:center;gap:5px;"><span style="display:inline-block;width:24px;height:2px;background:#22c55e;"></span><span style="color:#22c55e;font-weight:700;">Energized</span></span>
-    <span style="display:inline-flex;align-items:center;gap:5px;"><span style="display:inline-block;width:24px;height:2px;background:#94a3b8;border-top:1px dashed #94a3b8;"></span><span style="color:#94a3b8;font-weight:700;">Standby</span></span>
-    <span style="display:inline-flex;align-items:center;gap:5px;"><span style="display:inline-block;width:24px;height:1px;background:#475569;"></span><span style="color:#94a3b8;font-weight:700;">Open</span></span>
-    <span style="display:inline-flex;align-items:center;gap:5px;"><span style="display:inline-block;width:24px;height:2px;background:#ef4444;"></span><span style="color:#ef4444;font-weight:700;">Alarm / Trip</span></span>
+    <span style="font-weight:700;color:#9aa3af;">FEED / STATE:</span>
+    <span style="display:inline-flex;align-items:center;gap:5px;"><span style="display:inline-block;width:24px;height:2px;background:#ff3333;"></span><span style="color:#ff7777;font-weight:700;">Feed A identity</span></span>
+    <span style="display:inline-flex;align-items:center;gap:5px;"><span style="display:inline-block;width:24px;height:2px;background:#22c55e;"></span><span style="color:#22c55e;font-weight:700;">Feed B identity</span></span>
+    <span style="display:inline-flex;align-items:center;gap:5px;"><span style="display:inline-block;width:24px;height:2px;border-top:2px dashed #e2e8f0;"></span><span style="color:#e2e8f0;font-weight:700;">Moving dash = energized</span></span>
+    <span style="display:inline-flex;align-items:center;gap:5px;"><span style="display:inline-block;width:24px;height:1px;background:#475569;"></span><span style="color:#94a3b8;font-weight:700;">Grey = open / standby</span></span>
+    <span style="display:inline-flex;align-items:center;gap:5px;"><span style="display:inline-grid;place-items:center;width:14px;height:14px;border:1px solid #ef4444;color:#ef4444;font-weight:800;line-height:1;">×</span><span style="color:#ef4444;font-weight:700;">Breaker trip</span></span>
     <span style="display:inline-flex;align-items:center;gap:5px;"><span style="display:inline-block;width:24px;height:2px;background:#eab308;"></span><span style="color:#eab308;font-weight:700;">Maintenance Bypass</span></span>
 </div>
 
@@ -495,7 +523,15 @@
    never diverge from the dashboard. Idempotent; safe to re-run. */
 (function(){
     function bindEpmsStatus(){
-        if(!window.CONV_CALC || !window.CONV_CALC.snapshot) return;
+        if(typeof EPMS_RUNTIME_AUTHORITY_AVAILABLE === 'undefined'
+            || !EPMS_RUNTIME_AUTHORITY_AVAILABLE
+            || !window.CONV_CALC || !window.CONV_CALC.snapshot) {
+            ['epms-fac', 'epms-it', 'epms-pue'].forEach(function (id) {
+                var node = document.getElementById(id);
+                if (node) node.textContent = '—';
+            });
+            return;
+        }
         /* v1.132.0 BINDING REPAIR — these read `site.facility_kw` / `site.it_kw`, which have NEVER existed on
            the snapshot (the real keys are `facility_load_kw` / `it_load_kw`). Every read was `!= null`-guarded,
            so the strip silently rendered the hardcoded literals and was NOT engine-bound despite the comment
@@ -559,7 +595,7 @@
             </button>
             <div style="width:1px; height:20px; background:#334155; margin:0 8px;"></div>
             <div class="export-dropdown">
-                <button class="export-btn">
+                <button class="export-btn" aria-disabled="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     EXPORT
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="10" height="10"><polyline points="6 9 12 15 18 9"/></svg>
@@ -581,33 +617,33 @@
             </div>
         </div>
     </div>
-    <div style="flex:1; display:flex;">
+    <div class="epms-main">
         <div class="sidebar pointer" id="epmsSidebar">
             
             <div class="ctrl-box">
                 <div class="ctrl-title">Utility Sources (20kV)</div>
-                <div class="btn active" id="btn-u-a" onclick="toggleSource('A')">
+                <div class="btn" id="btn-u-a" onclick="toggleSource('A')" aria-disabled="true">
                     <span>Utility A</span><div class="led"></div>
                 </div>
-                <div class="btn active" id="btn-u-b" onclick="toggleSource('B')">
+                <div class="btn" id="btn-u-b" onclick="toggleSource('B')" aria-disabled="true">
                     <span>Utility B</span><div class="led"></div>
                 </div>
-                <div class="btn off" id="btn-tie" onclick="toggleTie()">
+                <div class="btn" id="btn-tie" onclick="toggleTie()" aria-disabled="true">
                     <span>MV Bus Coupler (Tie)</span><div class="led"></div>
                 </div>
             </div>
 
             <div class="ctrl-box">
                 <div class="ctrl-title">Generators</div>
-                <div class="btn off" id="btn-gen-a"><span>GEN A</span><div class="led"></div></div>
-                <div class="btn off" id="btn-gen-b"><span>GEN B</span><div class="led"></div></div>
-                <div class="btn off" id="btn-gen-c"><span>GEN C</span><div class="led"></div></div>
+                <div class="btn" id="btn-gen-a" aria-disabled="true"><span>GEN A</span><div class="led"></div></div>
+                <div class="btn" id="btn-gen-b" aria-disabled="true"><span>GEN B</span><div class="led"></div></div>
+                <div class="btn" id="btn-gen-c" aria-disabled="true"><span>GEN C</span><div class="led"></div></div>
             </div>
 
             <div class="ctrl-box">
                 <div class="ctrl-title">Status</div>
-                <div id="logs" style="height: 250px; overflow-y: auto; font-size: 10px; color: #94a3b8; font-family: monospace; padding-right:5px;">
-                    <div>> System Init V15.</div>
+                <div id="logs" style="height: 250px; overflow-y: auto; font-size: 10px; color: #94a3b8; font-family:'JetBrains Mono',monospace;font-feature-settings:'zero' 1;padding-right:5px;">
+                    <div>&gt; EPMS authority check pending.</div>
                 </div>
             </div>
 
@@ -617,17 +653,17 @@
 
     <!-- Bottom Status Bar -->
     <div class="status-bar">
-        <div class="status-box active" id="box-system">
-            <div class="status-led" id="ind-system"></div>
+        <div class="status-box" id="box-system">
+            <div class="status-led off" id="ind-system"></div>
             <div>
                 <div class="status-label">System</div>
-                <div class="status-value ok" id="val-system">ONLINE</div>
+                <div class="status-value" id="val-system">UNAVAILABLE</div>
             </div>
         </div>
         <div class="status-box">
             <div>
                 <div class="status-label">Total Load</div>
-                <div class="status-value" id="val-total-load" data-basis-param="electrical.epms_total_kw" tabindex="0" role="button">0 kW</div>
+                <div class="status-value" id="val-total-load" data-basis-param="electrical.epms_total_kw" tabindex="0" role="button">—</div>
             </div>
         </div>
         <!-- v1.132.1 RULE-2 REPAIR — Power Factor and Frequency were random walks
@@ -650,13 +686,13 @@
         <div class="status-box">
             <div>
                 <div class="status-label">Breakers</div>
-                <div class="status-value" id="val-breakers">0 / 0</div>
+                <div class="status-value" id="val-breakers">—</div>
             </div>
         </div>
         <div class="status-box" id="box-alarms">
             <div>
                 <div class="status-label">Alarms</div>
-                <div class="status-value ok" id="val-alarms">0</div>
+                <div class="status-value" id="val-alarms">—</div>
             </div>
         </div>
         <div class="status-spacer"></div>
@@ -674,13 +710,45 @@
    below it actually carries: the incomer carries the facility, an ATSDB half of it (2N), a UPS
    the IT load per system, a PDU its share of that, a rack its share of a PDU. The old ladder
    was seven authored constants at the retired 1.85 MW scale. */
+function epmsRuntimeAuthorityAvailable() {
+  const currentEngineVersion = '2.0.0';
+  const engineScript = document.querySelector('script[src^="js/conv-engine.js"]');
+  const versionMatch = engineScript && engineScript.getAttribute('src').match(/[?&]v=([^&]+)/);
+  const requestedVersion = versionMatch ? decodeURIComponent(versionMatch[1]) : null;
+  const snapshot = window.CONV_CALC && window.CONV_CALC.snapshot;
+  const site = snapshot && snapshot.site;
+  const electrical = snapshot && snapshot.electrical;
+  const meta = snapshot && snapshot.meta;
+  const halls = snapshot && snapshot.campus && snapshot.campus.halls;
+  const values = site && electrical && snapshot.campus ? [
+    site.it_load_kw, site.facility_load_kw, site.non_it_load_kw, site.pue,
+    electrical.epms_total_kw, electrical.ups_system_count,
+    electrical.ups_module_kw_rated, electrical.ups_modules_per_system,
+    electrical.ups_system_kw, snapshot.campus.racks_total
+  ] : [];
+  return !!(requestedVersion === currentEngineVersion && meta && meta.version === currentEngineVersion
+    && typeof window.CONV_CALC.getHallSnapshot === 'function'
+    && typeof window.CONV_CALC.wueFromFlowLpm === 'function'
+    && Array.isArray(halls) && halls.length === 4
+    && values.length === 10
+    && values.every(Number.isFinite)
+    && site.it_load_kw > 0 && site.facility_load_kw >= site.it_load_kw
+    && typeof meta.scenario === 'string' && meta.scenario.trim().length > 0
+    && typeof meta.data_quality === 'string' && meta.data_quality.trim().length > 0);
+}
+const EPMS_RUNTIME_AUTHORITY_AVAILABLE = epmsRuntimeAuthorityAvailable();
+document.body.setAttribute('data-rz-basis-authority',
+  EPMS_RUNTIME_AUTHORITY_AVAILABLE ? 'current' : 'unavailable');
 const EPMS_LADDER = (function () {
-  const s = (window.CONV_CALC && window.CONV_CALC.snapshot) ? window.CONV_CALC.snapshot : null;
-  if (!s) return { incomerKw:null, tieKw:null, atsdbKw:null, upsKw:null, pduKw:null, rackKw:null, dahuKw:null };
+  const s = EPMS_RUNTIME_AUTHORITY_AVAILABLE ? window.CONV_CALC.snapshot : null;
+  if (!s) return {
+    incomerKw:null, tieKw:null, atsdbKw:null, lvsbKw:null, dbKw:null,
+    upsKw:null, pduKw:null, rackKw:null, dahuKw:null
+  };
   const facility = Math.round(s.site.facility_load_kw);
   const itKw = Math.round(s.site.it_load_kw);
   const systems = s.electrical.ups_system_count || 2;
-  const RACKS = 10, PDUS_PER_RACK = 2;      // this mimic draws 10 rack columns, main + catch
+  const RACKS = 10, PDUS_PER_RACK = 2;      // ten aggregate rack columns, main + catcher PDU
   const upsKw = Math.round(itKw / systems);
   const pduKw = Math.round(itKw / (RACKS * PDUS_PER_RACK));
   return {
@@ -698,6 +766,7 @@ const EPMS_LADDER = (function () {
     upsKw: upsKw,
     pduKw: pduKw,
     rackKw: Math.round(itKw / RACKS),
+    rackPositionsPerColumn: Math.round(s.campus.racks_total / RACKS),
     /* Mechanical AHU branch: the non-IT load shared over the drawn DAHU feeders. */
     dahuKw: Math.round(s.site.non_it_load_kw / 10),
   };
@@ -796,15 +865,18 @@ for(let i=0; i<5; i++){
     });
 }
 
-// RACKS (CENTERED: 1100 to 2500)
-// 10 Racks
+// AGGREGATE RACK COLUMNS (CENTERED: 1100 to 2500)
+// Ten columns reconcile the full governed IT estate; they are not ten physical cabinets.
 const RACK_START_X = 1100;
 const RACK_GAP = 140;
 
 for(let i=0; i<10; i++){
     let rx = RACK_START_X + (i * RACK_GAP);
     DEVICES.push({ id:`rATS_${i}`, lbl:`ATS`, sub:``, x:rx, y:GRID.RACK_ATS, w:50, type:'ATS_BOX' });
-    DEVICES.push({ id:`RACK_${i}`, lbl:`RACK ${i+1}`, sub:`6kW`, x:rx, y:GRID.RACK, w:100, type:'BOX' });
+    DEVICES.push({
+        id:`RACK_${i}`, lbl:`RACK GROUP ${i+1}`,
+        sub:`${EPMS_LADDER.rackPositionsPerColumn} racks`, x:rx, y:GRID.RACK, w:100, type:'BOX'
+    });
     
     let isStreamA = i < 5;
     let pduMainId = `PDU_${isStreamA?'A':'B'}_${i}`;
@@ -910,6 +982,23 @@ for(let i=0; i<10; i++){
    LOGIC & RENDER
    ============================================== */
 function init(){
+    if (!EPMS_RUNTIME_AUTHORITY_AVAILABLE) {
+        paintEpmsAuthorityUnavailable();
+        return;
+    }
+    document.body.setAttribute('data-rz-basis-authority', 'current');
+    var state = document.getElementById('epms-state');
+    state.textContent = 'EPMS NORMAL';
+    state.style.color = '#22c55e';
+    document.querySelectorAll('#btn-u-a,#btn-u-b,#btn-tie').forEach((node) => {
+        node.removeAttribute('aria-disabled');
+        node.style.pointerEvents = '';
+    });
+    document.querySelectorAll('.export-btn,.export-item').forEach((node) => {
+        node.removeAttribute('aria-disabled');
+        node.style.pointerEvents = '';
+        node.style.opacity = '';
+    });
     WIRES.forEach(w => SIM.breakers[w.br] = w.def || 'closed');
     drawLayout();
 
@@ -926,6 +1015,7 @@ function init(){
             updateUI();
         } catch(e) { console.error(e); }
     }, 500);
+    setInterval(updateStatusBar, 1000);
 }
 
 function runATSLogic(){
@@ -1068,7 +1158,7 @@ function calcPowerFlow(){
             SIM.energizedNodes[`RACK_${i}`] = col;
             SIM.energizedType[`RACK_${i}`]  = SIM.energizedType[selNode];
             if(legEl) legEl.setAttribute('class', `flow energized-${col}${gen}`);
-            if(tele) tele.textContent = `230V ${Math.floor((6 * 1000) / (1.732 * 230 * 0.9))}A 6kW`;
+            if(tele) tele.textContent = `AGG ${EPMS_LADDER.rackKw.toLocaleString()}kW · ${EPMS_LADDER.rackPositionsPerColumn} racks`;
         } else {
             delete SIM.energizedNodes[`RACK_${i}`];
             delete SIM.energizedType[`RACK_${i}`];
@@ -1197,9 +1287,16 @@ function drawBreaker(id, x, y){
     g.append(box, trip, hit); layers.b.appendChild(g);
 }
 
-function toggleSource(s){ SIM.sources[s] = !SIM.sources[s]; log(`Source ${s} Toggled`); }
-function toggleTie(){ SIM.breakers['br_mv_tie'] = (SIM.breakers['br_mv_tie']==='closed'?'open':'closed'); log('Tie Toggled'); }
+function toggleSource(s){
+    if (!EPMS_RUNTIME_AUTHORITY_AVAILABLE) return false;
+    SIM.sources[s] = !SIM.sources[s]; log(`Source ${s} Toggled`); return true;
+}
+function toggleTie(){
+    if (!EPMS_RUNTIME_AUTHORITY_AVAILABLE) return false;
+    SIM.breakers['br_mv_tie'] = (SIM.breakers['br_mv_tie']==='closed'?'open':'closed'); log('Tie Toggled'); return true;
+}
 function handleBreakerClick(e, id){
+    if (!EPMS_RUNTIME_AUTHORITY_AVAILABLE) return false;
     e.stopPropagation(); 
     if(e.shiftKey) SIM.breakers[id] = 'trip';
     else if(e.altKey) SIM.breakers[id] = 'open';
@@ -1242,6 +1339,31 @@ const viewportEl = document.getElementById('viewport');
 // Layout constants (screen pixels)
 const TOPBAR_HEIGHT_PX = 50;
 const STATUSBAR_HEIGHT_PX = 50;
+
+function syncEpmsContextHeight() {
+    const statusStrip = document.getElementById('epms-status-strip');
+    const legend = document.getElementById('epms-legend');
+    const contextHeight = Math.ceil(
+        (statusStrip ? statusStrip.getBoundingClientRect().height : 0)
+        + (legend ? legend.getBoundingClientRect().height : 0)
+    );
+    document.documentElement.style.setProperty('--epms-context-height', contextHeight + 'px');
+    return contextHeight;
+}
+
+function epmsContextHeight() {
+    const raw = getComputedStyle(document.documentElement).getPropertyValue('--epms-context-height');
+    return Number.parseFloat(raw) || syncEpmsContextHeight();
+}
+
+syncEpmsContextHeight();
+if (typeof ResizeObserver === 'function') {
+    const epmsChromeObserver = new ResizeObserver(syncEpmsContextHeight);
+    epmsChromeObserver.observe(document.getElementById('epms-status-strip'));
+    epmsChromeObserver.observe(document.getElementById('epms-legend'));
+} else {
+    window.addEventListener('resize', syncEpmsContextHeight);
+}
 
 function visibleSidebarWidth() {
     const sidebar = document.getElementById('epmsSidebar');
@@ -1314,10 +1436,10 @@ function fitScreen() {
 
     // Visible area (excluding sidebar and topbar)
     const visibleLeft = visibleSidebarWidth();
-    const visibleTop = TOPBAR_HEIGHT_PX;
+    const visibleTop = epmsContextHeight() + TOPBAR_HEIGHT_PX;
     const visibleWidth = screenWidth - visibleLeft;
     const visibleBottom = screenHeight - STATUSBAR_HEIGHT_PX;
-    const visibleHeight = visibleBottom - TOPBAR_HEIGHT_PX;
+    const visibleHeight = visibleBottom - visibleTop;
 
     // Convert visible area corners to SVG coordinates
     const topLeft = screenToSVG(visibleLeft, visibleTop);
@@ -1350,8 +1472,9 @@ function setZoom(newScale) {
     // Get center of visible area in screen coords
     const sidebarWidth = visibleSidebarWidth();
     const visibleCenterX = sidebarWidth + (window.innerWidth - sidebarWidth) / 2;
-    const visibleCenterY = TOPBAR_HEIGHT_PX
-        + (window.innerHeight - TOPBAR_HEIGHT_PX - STATUSBAR_HEIGHT_PX) / 2;
+    const visibleTop = epmsContextHeight() + TOPBAR_HEIGHT_PX;
+    const visibleCenterY = visibleTop
+        + (window.innerHeight - visibleTop - STATUSBAR_HEIGHT_PX) / 2;
 
     // Convert to SVG coords
     const centerSvg = screenToSVG(visibleCenterX, visibleCenterY);
@@ -1442,6 +1565,16 @@ function updateEpmsStatusStrip(snapshot) {
     }
     var OK = '#22c55e', WARN = '#f59e0b', DIM = '#94a3b8', CYAN = '#22d3ee';
 
+    if (!EPMS_RUNTIME_AUTHORITY_AVAILABLE) {
+        put('epms-state', 'EPMS AUTHORITY UNAVAILABLE', DIM, 'Governed EPMS basis unavailable');
+        ['epms-fac', 'epms-it', 'epms-pue', 'epms-utility', 'epms-ups', 'epms-gen',
+            'epms-trips', 'epms-ups-basis', 'epms-ups-modules', 'epms-ups-sys',
+            'epms-dq', 'epms-scn'].forEach(function (id) {
+            put(id, '—', DIM, 'UNAVAILABLE — governed EPMS basis did not validate');
+        });
+        return;
+    }
+
     var utilA = !!SIM.sources.A, utilB = !!SIM.sources.B;
     if (utilA && utilB)       put('epms-utility', 'A+B', OK, 'Both utility sources energised');
     else if (utilA || utilB)  put('epms-utility', utilA ? 'A only' : 'B only', WARN, 'One utility source lost');
@@ -1491,6 +1624,10 @@ function updateEpmsStatusStrip(snapshot) {
 }
 
 function updateStatusBar() {
+    if (!EPMS_RUNTIME_AUTHORITY_AVAILABLE) {
+        paintEpmsAuthorityUnavailable();
+        return;
+    }
     var closedCount = 0;
     var totalCount = 0;
     for (var id in SIM.breakers) {
@@ -1552,12 +1689,48 @@ function updateStatusBar() {
     document.getElementById('val-timestamp').textContent = new Date().toLocaleTimeString();
 }
 
-setInterval(updateStatusBar, 1000);
+function paintEpmsAuthorityUnavailable() {
+    document.body.setAttribute('data-rz-basis-authority', 'unavailable');
+    updateEpmsStatusStrip(null);
+    var neutral = function (id, value) {
+        var node = document.getElementById(id);
+        if (!node) return;
+        node.textContent = value;
+        node.className = node.className.replace(/\b(?:ok|warning|error|active)\b/g, '').replace(/\s+/g, ' ').trim();
+    };
+    neutral('val-system', 'UNAVAILABLE');
+    neutral('val-total-load', '—');
+    neutral('val-breakers', '—');
+    neutral('val-alarms', '—');
+    document.getElementById('box-system').className = 'status-box';
+    document.getElementById('ind-system').className = 'status-led off';
+    document.getElementById('box-alarms').className = 'status-box';
+    document.querySelectorAll('#btn-u-a,#btn-u-b,#btn-tie,#btn-gen-a,#btn-gen-b,#btn-gen-c').forEach(function (node) {
+        node.className = 'btn';
+        node.setAttribute('aria-disabled', 'true');
+        node.style.pointerEvents = 'none';
+    });
+    document.querySelectorAll('.export-btn,.export-item').forEach(function (node) {
+        node.setAttribute('aria-disabled', 'true');
+        node.style.pointerEvents = 'none';
+        node.style.opacity = '0.45';
+    });
+    document.getElementById('logs').innerHTML = '<div>&gt; EPMS authority UNAVAILABLE. Simulation withheld.</div>';
+    ['l-wires', 'l-flow', 'l-devices', 'l-breakers', 'l-tele'].forEach(function (id) {
+        document.getElementById(id).replaceChildren();
+    });
+    var notice = createSVG('text', {
+        x:1800, y:1250, class:'dev-lbl', 'font-size':'42px', 'text-anchor':'middle'
+    });
+    notice.textContent = 'EPMS AUTHORITY UNAVAILABLE';
+    document.getElementById('l-devices').appendChild(notice);
+}
 
 // =============================================
 // EXPORT FUNCTIONS
 // =============================================
 function getSystemData() {
+    if (!EPMS_RUNTIME_AUTHORITY_AVAILABLE) return null;
     var data = {
         timestamp: new Date().toISOString(),
         sources: {A: SIM.sources.A, B: SIM.sources.B},
@@ -1575,6 +1748,7 @@ function getSystemData() {
 
 function exportPDF() {
     var data = getSystemData();
+    if (!data) return false;
     var html = '<!DOCTYPE html><html><head><title>EPMS Report</title>';
     html += '<style>body{font-family:Arial;padding:40px}h1{color:#1e3a5f;border-bottom:3px solid #1e3a5f}';
     html += 'h2{color:#475569;margin-top:30px}table{width:100%;border-collapse:collapse;margin:15px 0}';
@@ -1604,6 +1778,7 @@ function exportPDF() {
 
 function exportCSV() {
     var data = getSystemData();
+    if (!data) return false;
     var csv = 'Category,Item,Value,Status\n';
     csv += 'Metrics,Total Load,' + data.totalLoad + ',\n';
     csv += 'Metrics,Power Factor,' + data.powerFactor + ',\n';
@@ -1626,6 +1801,7 @@ function exportCSV() {
 
 function exportJSON() {
     var data = getSystemData();
+    if (!data) return false;
     var blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);

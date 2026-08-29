@@ -72,6 +72,17 @@ right column in the SAME change. Verify, then tick it in the CHANGELOG entry.
 | Interactive charts | Number-driven maintenance pages carry ≥1 `data-rz-chart` (rz-article-chart.js) with `source`+`basisTag`; dataset in `data/<slug>/` with `source`/`basis_tag` columns; **must pass `node tools/audit-article-charts.mjs --strict`** (`ARTICLE_DATAVIZ_STANDARD.md`). |
 | Obsidian second-brain | Add/refresh the suite note in `Apps/second brain/obsidian-knowledge-vault/` + the web-graph nodes/edges in `Apps/second brain/index.html`. |
 
+## 2.7 New / updated SCADA, BMS or DCIM operator cockpit
+
+| Touch | Update (same release) |
+|---|---|
+| Current KPI, state, topology or threshold | Canonical engine/model authority, raw first paint, timed runtime update and every duplicated callout/sidebar/tooltip/path consumer. Missing authority fails closed. |
+| Hall/site selector or reconciliation | Physical ownership and meter scope; an allocation or planning study is never labeled measured/current telemetry. |
+| Shared JS/CSS cockpit component | Cache token on every adopting page, owning standard, adversarial browser regression and reduced-motion/light/dark behavior. |
+| PRD, Manual or Generate Design | Public document parity, selectable document type, table of contents/references and current-versus-study naming. |
+| UI/UX or responsive layout | `docs/design/` intent/reference, Puppeteer screenshots at 390/768/1440/1920, zero overlap, no document horizontal overflow and proof that the last control is reachable. |
+| Durable handoff | `CONVENTIONAL_DC_OPERATIONS_STANDARD.md`, `CHANGELOG.md`, Obsidian mirror, bug tracker and cross-CLI path+revision note. |
+
 ## 3. EVERY shipped change (always — no exceptions)
 
 1. `js/rz-version.js` — bump semver **and** `RZ_VERSION_DATE` (today's date).

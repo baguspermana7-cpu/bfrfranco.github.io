@@ -47,16 +47,17 @@
   --ref:#ad8f63;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Plex Sans",sans-serif;overflow:hidden}
+html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Plex Sans",sans-serif;overflow-x:hidden;overflow-y:auto;font-variant-numeric:tabular-nums slashed-zero;font-feature-settings:"tnum" 1,"zero" 1}
+.value,.sup-val,.metric-val-inline,.kv .v,.tag,[data-basis-param]{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums slashed-zero;font-feature-settings:"tnum" 1,"zero" 1}
 ::-webkit-scrollbar{width:8px;height:8px}
 ::-webkit-scrollbar-thumb{background:#3d4d61;border-radius:8px}
 
-.shell{height:100%;display:flex;flex-direction:column;padding:10px;gap:10px}
+.shell{min-height:100vh;display:flex;flex-direction:column;padding:10px;gap:8px}
 .bar{
   min-height:58px;
   border:1px solid var(--bd);
-  border-radius:10px;
-  background:linear-gradient(180deg,#1a2330,#151e2a);
+  border-radius:4px;
+  background:#151e2a;
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -155,12 +156,12 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
 .tgl.on .knob{background:#4d5f77}
 .tgl.on .knob::after{left:18px}
 
-.stage{flex:1;min-height:0;display:grid;grid-template-columns:1fr 340px;gap:10px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr) 360px;align-items:start;gap:8px}
 .pid-panel{
   min-width:0;
   border:1px solid var(--bd);
-  border-radius:10px;
-  background:linear-gradient(180deg,#141d29,#101922);
+  border-radius:4px;
+  background:#111a24;
   display:flex;
   flex-direction:column;
   padding:8px;
@@ -223,11 +224,14 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
 .side{
   min-width:0;
   border:1px solid var(--bd);
-  border-radius:10px;
-  background:linear-gradient(180deg,#182230,#131c28);
+  border-radius:4px;
+  background:#151f2a;
   display:flex;
   flex-direction:column;
   overflow:hidden;
+  position:sticky;
+  top:8px;
+  max-height:calc(100vh - 16px);
 }
 .side-body{flex:1;overflow:auto;padding:8px;display:flex;flex-direction:column;gap:8px}
 .card{border:1px solid #41526a;border-radius:8px;background:#1b2635;padding:8px}
@@ -276,6 +280,9 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
 .pump-off{fill:#73839a;stroke:#66788f;opacity:.72}
 .comp-on{fill:rgba(56,181,109,.25);stroke:var(--run);stroke-width:1;animation:comp-pulse 2s ease-in-out infinite}
 .comp-off{fill:#56667d;stroke:#6f8095;stroke-width:1}
+@media (prefers-reduced-motion: reduce) {
+  .flow, .comp-on { animation: none !important; }
+}
 .branch{fill:#1f2b3d;stroke:#5d708a;stroke-width:1}
 .tee{fill:url(#gShell);stroke:#8097b0;stroke-width:1.2}
 .status-run{fill:var(--run);stroke:rgba(56,181,109,.5);stroke-width:1.2}
@@ -318,7 +325,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
   width:min(900px,94vw);
   max-height:88vh;
   overflow:hidden;
-  background:linear-gradient(180deg,#1a2534,#152131);
+  background:#172231;
   border:1px solid #60738d;
   border-radius:10px;
   box-shadow:0 10px 40px rgba(0,0,0,.6);
@@ -351,9 +358,9 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
   .shell{height:auto;min-height:100vh}
   .ops-context{grid-template-columns:1fr 1fr}
   .hall-selector{grid-column:1/-1}
-  .stage{display:flex;flex-direction:column}
-  .pid-panel{min-height:760px}
-  .side{max-height:430px}
+  .stage{display:flex;flex-direction:column;align-items:stretch;min-width:0;width:100%}
+  .pid-panel{align-self:stretch;width:100%;max-width:100%;min-width:0;min-height:760px;overflow-x:auto}
+  .side{position:static;max-height:430px}
 }
 @media (max-width:760px){
   .bar{flex-direction:column;align-items:stretch}
@@ -517,15 +524,16 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
     <script src="js/rz-mobile-nav.js?v=2026-07-22-navfix" defer></script>
     <script src="js/rz-cookie-consent.js?v=2026-07-14" defer></script>
     <!-- Conventional BMS single scenario engine — single source of truth for the
-         canonical chilled-water basis (CHWS 7.2 / CHWR 14.8 °C, ΔT 7.6, flow ≈58 L/s)
-         and plant cooling load (engine heat rejection). Loaded NON-deferred so
+         current 30 MW chilled-water basis (CHWS 19.4 / CHWR 27.0 °C, ΔT 7.6,
+         IT sensible-load reference flow ≈943 L/s) and current evaporator duty.
+         Loaded NON-deferred so
          window.CONV_CALC exists before the inline SCADA script runs.
          Basis: conv/review/09-engineering-basis-and-calculations.md ;
          CHW-relabel decision: conv/review/04-chiller-plant-review.md -->
-    <script src="js/conv-engine.js?v=1.22.0"></script>
+    <script src="js/conv-engine.js?v=2.0.0"></script>
     <!-- v1.134.2 — generated parameter registry + the shared basis drawer. -->
     <script src="js/conv-parameters.js?v=1.134.2"></script>
-    <script src="js/rz-basis-drawer.js?v=1.134.2"></script>
+    <script src="js/rz-basis-drawer.js?v=1.134.14"></script>
     <!-- v1.42.4 — Semantic line + breaker model libraries. Foundation for
          review docs 27/28 §3.1 + 17/18 §3.2 cross-page adoption. Non-deferred
          so drawPid() can call RZLineModel.line() at parse time. Additive —
@@ -539,7 +547,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
     <script src="js/rz-alarm-state.js?v=1.43.4" defer></script>
     <script src="js/rz-inspector.js?v=1.43.4" defer></script>
     <!-- v1.43.2 — Data-quality service: top-banner + per-element chip integration. -->
-    <script src="js/rz-telemetry-quality.js?v=1.131.0" defer></script>
+    <script src="js/rz-telemetry-quality.js?v=1.134.14" defer></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
          Page-scoped (no body.rz-bms-shell class) so it adds the inspector + mode toggle
          additively without overriding chiller-plant's own typography/palette.
@@ -588,17 +596,17 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
 
   <!-- Top alarm strip — operator-first: state, counts, redundancy, basis (doc-10/13) -->
   <div class="alarm-strip" id="alarmStrip">
-    <div class="as-state" id="asState"><span class="as-dot" id="asDot"></span><span id="asLevel">NORMAL</span></div>
-    <div class="as-seg" id="asCounts">0 Critical • 0 Warning</div>
-    <div class="as-seg" id="asRedund">Loops 4/4 • N+1</div>
+    <div class="as-state" id="asState"><span class="as-dot" id="asDot"></span><span id="asLevel">UNAVAILABLE</span></div>
+    <div class="as-seg" id="asCounts">Authority UNAVAILABLE</div>
+    <div class="as-seg" id="asRedund">Redundancy UNAVAILABLE</div>
     <div class="as-seg" id="asChw">CHWS &mdash; • CHWR &mdash; • &Delta;T &mdash; • &mdash; L/s</div>
-    <div class="as-seg" id="asLoad">Cooling Demand 1.93 MW</div>
-    <div class="as-seg as-meta" id="asMeta">Scenario: Simulated • Updated 0s</div>
+    <div class="as-seg" id="asLoad">Evaporator Duty UNAVAILABLE</div>
+    <div class="as-seg as-meta" id="asMeta">Scenario: UNAVAILABLE</div>
   </div>
 
-  <section class="ops-context" aria-label="Hall view and engineering basis">
+  <section class="ops-context" aria-label="Selected hall demand context and site plant engineering basis">
     <div class="hall-selector">
-      <span class="context-label">View context · telemetry basis unchanged</span>
+      <span class="context-label">Selected downstream demand · site telemetry unchanged</span>
       <div class="hall-controls" role="group" aria-label="Select data hall view">
         <button class="hall-btn" type="button" data-hall="A" aria-pressed="true">Hall A</button>
         <button class="hall-btn" type="button" data-hall="B" aria-pressed="false">Hall B</button>
@@ -607,7 +615,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
       </div>
     </div>
     <div class="basis-card current" data-basis="current">
-      <div class="basis-title" id="chillerHallLabel">Current engine basis · Hall A</div>
+      <div class="basis-title" id="chillerHallLabel">Current site plant authority · selected Hall A demand</div>
       <!-- v2.0.0 BINDING REPAIR — static basis text that was never engine-bound; it kept claiming
            1.850 MW IT / 1.927 MW cooling after the campus migration. Written from CONV_CALC at runtime
            (see the basis binder below); this literal is only the pre-script placeholder. -->
@@ -656,8 +664,8 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
         <div class="status-left">
           <div class="dot" id="sDot"></div>
           <div>
-            <div class="s-title" id="sTitle">NORMAL</div>
-            <div class="s-msg" id="sMsg">All loops inside expected operating envelope.</div>
+            <div class="s-title" id="sTitle">UNAVAILABLE</div>
+            <div class="s-msg" id="sMsg">Plant authority has not been established.</div>
           </div>
         </div>
         <div class="status-right" id="sChips"></div>
@@ -686,10 +694,10 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
           <h4>Primary CHW Header <span style="float:right;font-weight:400;color:#7f93ab">engine-bound</span></h4>
           <div class="kv" data-basis-param="cooling.chws_c" tabindex="0" role="button" title="CHWS — click for basis"><div class="k">CHWS</div><div class="v" id="kChws">&mdash;</div></div>
           <div class="kv" data-basis-param="cooling.chwr_c" tabindex="0" role="button" title="CHWR — click for basis"><div class="k">CHWR</div><div class="v" id="kChwr">&mdash;</div></div>
-          <div class="kv" data-basis-param="cooling.chw_delta_t" tabindex="0" role="button" title="CHW delta-T — click for basis"><div class="k">ΔT</div><div class="v" id="kDt">7.6 C</div></div>
-          <div class="kv" data-basis-param="cooling.flow_lps" tabindex="0" role="button" title="CHW flow — click for basis"><div class="k">CHW Flow</div><div class="v" id="kFlow">&mdash;</div></div>
-          <div class="kv" data-basis-param="cooling.heat_rejection_kw" tabindex="0" role="button" title="Cooling demand — click for basis"><div class="k">Cooling Demand</div><div class="v" id="kCool">1.93 MW</div></div>
-          <div class="kv"><div class="k">Header DP</div><div class="v" id="kDp">86 kPa</div></div>
+          <div class="kv" data-basis-param="cooling.chw_delta_t" tabindex="0" role="button" title="CHW delta-T — click for basis"><div class="k">ΔT</div><div class="v" id="kDt">UNAVAILABLE</div></div>
+          <div class="kv" data-basis-param="cooling.flow_lps" tabindex="0" role="button" title="IT sensible-load CHW reference flow — click for basis"><div class="k">IT-reference Flow</div><div class="v" id="kFlow">&mdash;</div></div>
+          <div class="kv" data-basis-param="cooling.heat_rejection_kw" tabindex="0" role="button" title="Current evaporator duty — click for basis"><div class="k">Evaporator Duty</div><div class="v" id="kCool">UNAVAILABLE</div></div>
+          <div class="kv"><div class="k">Header DP</div><div class="v" id="kDp">UNAVAILABLE</div></div>
           <!-- v1.134.11 — the adopted machine type and the two assumptions that set the plant's
                efficiency and its heat rejection were engine-published and rendered nowhere. An
                operator could read COP 6.06 and never see what it rests on. -->
@@ -709,10 +717,10 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
              wrong by 16x. They are computed from the engine now. -->
         <div class="card">
           <h4>CHW Flow Reconciliation <span style="float:right;font-weight:400;color:#7f93ab">engine</span></h4>
-          <div class="kv" title="Engine basis flow uses IT load (canonical doc-09)"><div class="k">Design (IT load)</div><div class="v" id="kFlowIt">&mdash;</div></div>
-          <div class="kv" title="Sanity check using full heat-rejection (IT + UPS loss)"><div class="k">Sanity (heat rej)</div><div class="v" id="kFlowHr">&mdash;</div></div>
-          <div class="kv" title="Gap absorbed by pump sizing margin"><div class="k">Δ (sanity − design)</div><div class="v" id="kFlowGap">&mdash;</div></div>
-          <div class="meta">Pumps sized to the larger flow; chiller-plant ΔT setpoint references the design value.</div>
+          <div class="kv" title="Reference flow using the IT sensible load only"><div class="k">IT sensible reference</div><div class="v" id="kFlowIt">&mdash;</div></div>
+          <div class="kv" title="Current plant-duty flow using IT plus UPS loss"><div class="k">Plant-duty reference</div><div class="v" id="kFlowHr">&mdash;</div></div>
+          <div class="kv" title="Plant-duty uplift above the IT-only reference"><div class="k">Δ (plant − IT ref)</div><div class="v" id="kFlowGap">&mdash;</div></div>
+          <div class="meta">943.0 L/s is the engine's IT sensible-load reference. Current evaporator duty requires 982.3 L/s at the same ΔT; measured header flow remains unavailable.</div>
         </div>
 
         <div class="card" data-bms-mode-hide="overview">
@@ -739,12 +747,12 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
               <input id="spChws" type="range" step="0.1" aria-label="Secondary loop supply setpoint" />
             </div>
             <div class="field">
-              <label>DP SP <span id="spDpTxt">90 kPa</span></label>
+              <label>DP SP <span id="spDpTxt">UNAVAILABLE</span></label>
               <input id="spDp" type="range" min="60" max="140" step="1" value="90" aria-label="Sp Dp" />
             </div>
             <div class="field">
-              <label>Flow SP <span id="spFlowTxt">18.0 L/s</span></label>
-              <input id="spFlow" type="range" step="0.1" aria-label="Per-loop flow setpoint" />
+              <label>Branch Ref SP (sim) <span id="spFlowTxt">UNAVAILABLE</span></label>
+              <input id="spFlow" type="range" step="0.1" aria-label="Simulated per-loop reference-flow setpoint" />
             </div>
             <div class="field">
               <label>Fault Loop</label>
@@ -760,14 +768,14 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
             <button class="btn ghost" id="faultBtn">Inject Disconnect</button>
             <button class="btn ghost" id="clearBtn">Clear Faults</button>
           </div>
-          <div class="meta" id="forcedMeta" style="margin-top:6px">No forced fault active.</div>
+          <div class="meta" id="forcedMeta" style="margin-top:6px">Authority UNAVAILABLE</div>
         </div>
 
         <div class="card">
           <h4>Alarm Summary</h4>
-          <div class="meta" id="alarmMeta">Status NORMAL • Issues 0</div>
-          <div class="meta" id="firstMeta">First-out: None</div>
-          <div class="meta" id="ackMeta">Ack: N/A</div>
+          <div class="meta" id="alarmMeta">Status UNAVAILABLE</div>
+          <div class="meta" id="firstMeta">First-out: UNAVAILABLE</div>
+          <div class="meta" id="ackMeta">Ack: UNAVAILABLE</div>
         </div>
 
         <div class="card" data-bms-mode-hide="overview performance">
@@ -784,7 +792,7 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
 <div class="modal" id="loopModal" role="dialog" aria-modal="true" aria-labelledby="mTitle" aria-hidden="true" tabindex="-1">
   <div class="modal-hd">
     <h3 id="mTitle">Loop Diagnostics</h3>
-    <span class="mode" id="mMode">NORMAL</span>
+    <span class="mode" id="mMode">UNAVAILABLE</span>
     <button class="close" id="mClose" type="button" aria-label="Close loop diagnostics">&times;</button>
   </div>
   <div class="modal-bd">
@@ -806,7 +814,14 @@ html,body{height:100%;background:var(--bg);color:var(--txt);font-family:"IBM Ple
 <script>
 const $ = (id)=>document.getElementById(id);
 const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
-const r = (a,b)=>a+Math.random()*(b-a);
+/* Reproducible simulation PRNG. Operator state must evolve identically for the same
+   scenario so alarms, first-out and diagnostics do not change merely on reload. */
+let simSeed = 0x6d2b79f5;
+const nextSimUnit = ()=>{
+  simSeed = (Math.imul(simSeed,1664525) + 1013904223) >>> 0;
+  return simSeed / 4294967296;
+};
+const r = (a,b)=>a+nextSimUnit()*(b-a);
 const r1 = (v)=>Math.round(v*10)/10;
 const r2 = (v)=>Math.round(v*100)/100;
 
@@ -830,7 +845,8 @@ function selectHallView(hall){
   document.querySelectorAll("[data-hall]").forEach(button=>{
     button.setAttribute("aria-pressed", button.dataset.hall === selected ? "true" : "false");
   });
-  $("chillerHallLabel").textContent = `Current engine basis · Hall ${selected}`;
+  $("chillerHallLabel").textContent = `Current site plant authority · selected Hall ${selected} demand`;
+  paintChillerBasisCard();
 }
 
 /* --- Canonical CHW basis from the single scenario engine ---------------------
@@ -848,8 +864,18 @@ function selectHallView(hall){
  * CHW-relabel decision: conv/review/04-chiller-plant-review.md (Recommended
  * Decision → Option A) ; basis: conv/review/09-engineering-basis-and-calculations.md
  */
+const CONV_CURRENT_ENGINE_VERSION = '2.0.0';
+const EXPECTED_CONV_ENGINE_VERSION = (function(){
+  const engineScript = document.querySelector('script[src*="conv-engine.js"]');
+  const match = engineScript ? engineScript.getAttribute('src').match(/[?&]v=([^&]+)/) : null;
+  const requested = match ? decodeURIComponent(match[1]) : null;
+  return requested === CONV_CURRENT_ENGINE_VERSION ? CONV_CURRENT_ENGINE_VERSION : null;
+}());
 function engineSnap(){
-  return (window.CONV_CALC && window.CONV_CALC.snapshot) ? window.CONV_CALC.snapshot : null;
+  const snapshot = (window.CONV_CALC && window.CONV_CALC.snapshot)
+    ? window.CONV_CALC.snapshot : null;
+  if(!snapshot || !snapshot.meta || !EXPECTED_CONV_ENGINE_VERSION) return null;
+  return snapshot.meta.version === EXPECTED_CONV_ENGINE_VERSION ? snapshot : null;
 }
 function chwBasis(){
   var s = engineSnap();
@@ -858,10 +884,10 @@ function chwBasis(){
       chws: s.cooling.chws_c,                 // derived from the rack-inlet target
       chwr: s.cooling.chwr_c,                 // CHWS + ΔT
       dt: s.cooling.chw_delta_t,              // 7.6 K
-      flow: r1(s.cooling.flow_lps),           // L/s at the campus cooling load
-      coolingKw: s.cooling.heat_rejection_kw, // kW (IT + UPS loss)
+      flow: r1(s.cooling.flow_lps),           // L/s, IT sensible-load reference only
+      coolingKw: s.cooling.heat_rejection_kw, // kW, current evaporator duty (IT + UPS loss)
       itKw: (s.site && s.site.it_load_kw != null) ? s.site.it_load_kw : null,
-      scenario: (s.meta && s.meta.scenario) || "Simulated"
+      scenario: s.meta && s.meta.scenario
     };
   }
   /* v1.134.0 — the fallback used to return the retired 7.2 / 14.8 / 58.2 basis.
@@ -871,6 +897,64 @@ function chwBasis(){
   return { chws:null, chwr:null, dt:null, flow:null, coolingKw:null, itKw:null, scenario:"UNAVAILABLE — engine not loaded" };
 }
 const CHW = chwBasis();
+function isPositiveFinite(value){
+  return typeof value === "number" && Number.isFinite(value) && value > 0;
+}
+function hasCompleteChillerAuthority(snapshot){
+  const cooling = snapshot && snapshot.cooling;
+  const site = snapshot && snapshot.site;
+  const meta = snapshot && snapshot.meta;
+  const provenanceIsValid = meta
+    && typeof meta.scenario === "string" && meta.scenario.trim().length > 0
+    && typeof meta.data_quality === "string" && meta.data_quality.trim().length > 0;
+  if(!cooling || !site || !provenanceIsValid || !isPositiveFinite(site.it_load_kw)) return false;
+  const requiredPlantValues = [
+    cooling.chws_c,
+    cooling.chwr_c,
+    cooling.chw_delta_t,
+    cooling.flow_lps,
+    cooling.heat_rejection_kw,
+    cooling.chiller_input_kw_e,
+    cooling.plant_cop,
+    cooling.plant_kw_per_rt,
+    cooling.cdw_supply_c,
+    cooling.cdw_return_c,
+    cooling.tower_rejection_kw_th,
+    cooling.duty_rt,
+    cooling.chiller_capacity_kw_th,
+    cooling.chiller_n1_capacity_kw_th,
+    cooling.chiller_specific_power_kw_e_per_kw_th,
+    cooling.cdw_range_k,
+    cooling.chiller_design_duty_kw_th
+  ];
+  const countsAreValid = Number.isInteger(cooling.chillers_running)
+    && Number.isInteger(cooling.chillers_total)
+    && cooling.chillers_running > 0
+    && cooling.chillers_total >= cooling.chillers_running;
+  const typeIsValid = typeof cooling.chiller_type === "string"
+    && cooling.chiller_type.trim().length > 0;
+  return requiredPlantValues.every(isPositiveFinite)
+    && countsAreValid
+    && typeIsValid
+    && cooling.chwr_c > cooling.chws_c
+    && cooling.cdw_return_c > cooling.cdw_supply_c;
+}
+const CHW_AUTHORITY_AVAILABLE = hasCompleteChillerAuthority(engineSnap());
+document.body.setAttribute('data-rz-basis-authority', CHW_AUTHORITY_AVAILABLE ? 'current' : 'unavailable');
+function lineTemperature(value){
+  return CHW_AUTHORITY_AVAILABLE ? `${conv.t(value,ui.unit)}${conv.tu(ui.unit)}` : "UNAVAILABLE";
+}
+function lineFlow(){
+  return CHW_AUTHORITY_AVAILABLE ? `${conv.f(CHW.flow,ui.unit)} ${conv.fu(ui.unit)}` : "UNAVAILABLE";
+}
+function lineTemperatureFlow(value){
+  return CHW_AUTHORITY_AVAILABLE ? `${lineTemperature(value)} / IT-ref ${lineFlow()}` : "UNAVAILABLE";
+}
+function lineSupplyCurrent(){
+  return CHW_AUTHORITY_AVAILABLE
+    ? `Evap ${r1(CHW.coolingKw/1000)} MW @ ${lineTemperature(CHW.chws)} / IT-ref ${lineFlow()}`
+    : "UNAVAILABLE";
+}
 
 /* v1.134.8 — the plant's ELECTRICAL side, now that the machine type is adopted. Every one of
    these was previously either authored on this page (the impossible 0.11 kW/RT) or reported
@@ -900,7 +984,7 @@ const PLANT = (function () {
 
 /* v1.134.7 — the drawn loops are a SUBSET of the plant. The engine runs
    cooling.chillers_running machines out of chillers_total; this mimic draws four of them.
-   Each running machine carries an equal share of the plant flow, and its water sits on the
+   Each running machine carries an equal share of the calculated IT-reference flow, and its water sits on the
    published CHWS/CHWR planes with a small deterministic per-loop spread so the mimic still
    reads as four distinct machines rather than four identical ones. Nothing here is authored
    at a scale of its own any more — that is what produced 4 x 18 L/s against a 943 L/s header. */
@@ -923,6 +1007,19 @@ const LOOP_T1_MIN = CHW.chws != null ? r1(CHW.chws - 1.6) : 16;
 const LOOP_T1_MAX = CHW.chws != null ? r1(CHW.chws + 1.6) : 22.5;
 const LOOP_T2_MIN = (CHW.chws != null && CHW.dt != null) ? r1(CHW.chws + CHW.dt - 1.8) : 20.8;
 const LOOP_T2_MAX = (CHW.chws != null && CHW.dt != null) ? r1(CHW.chws + CHW.dt + 1.8) : 25.0;
+/* Modal diagnostic dT guidance follows the governed CHW design point. A ±1.8 K
+   band matches the deterministic per-loop temperature envelope above; the retired
+   fixed 2.5/4.8 K rules falsely diagnosed every healthy 7.6 K loop as starved. */
+const LOOP_DT_TOLERANCE_K = 1.8;
+const LOOP_DT_GUIDE_MIN = CHW.dt != null ? Math.max(0, CHW.dt - LOOP_DT_TOLERANCE_K) : null;
+const LOOP_DT_GUIDE_MAX = CHW.dt != null ? CHW.dt + LOOP_DT_TOLERANCE_K : null;
+/* Alarm envelopes follow the current per-machine design point. The retired fixed limits
+   (10/14 L/s and 23.2/24 C) declared every 30 MW engine-bound loop unhealthy even while
+   it sat exactly on CHWR. These bands stay deterministic and scale with the adopted basis. */
+const LOOP_FLOW_ALARM_MIN = LOOP_FLOW_DESIGN != null ? LOOP_FLOW_DESIGN * 0.60 : 10;
+const LOOP_FLOW_WARNING_MIN = LOOP_FLOW_DESIGN != null ? LOOP_FLOW_DESIGN * 0.80 : 14;
+const LOOP_T2_WARNING_MAX = CHW.chwr != null ? CHW.chwr + 0.8 : 23.2;
+const LOOP_T2_ALARM_MAX = CHW.chwr != null ? CHW.chwr + 1.5 : 24.0;
 
 function rescaleLoopsToEngine(loops) {
   if (CHW.flow == null || CHW.chws == null || CHW.dt == null || !ENGINE_CHILLERS_RUNNING) return loops;
@@ -940,18 +1037,26 @@ function rescaleLoopsToEngine(loops) {
 /* v2.0.0 — write the current-basis card from the engine. It used to be static text and therefore kept
    claiming the retired 1.850 MW / 1.927 MW basis; every other figure on this page moves with CONV_CALC,
    so the card that NAMES the basis must move with it too. */
-(function bindChillerBasisCard(){
-  function paint(){
-    var el = document.getElementById('chiller-current-basis-value');
-    var s = engineSnap();
-    if(!el) return;
-    if(!s || !s.site || !s.cooling){ el.textContent = 'Representative view · engine unavailable'; return; }
-    el.textContent = 'Representative view · ' + (s.site.it_load_kw / 1000).toFixed(3) + ' MW IT · ' +
-      (s.cooling.heat_rejection_kw / 1000).toFixed(3) + ' MW cooling · deterministic telemetry';
+function paintChillerBasisCard(){
+  var el = document.getElementById('chiller-current-basis-value');
+  var s = engineSnap();
+  var selected = document.body.dataset.activeHall || 'A';
+  var hall = window.CONV_CALC && typeof window.CONV_CALC.getHallSnapshot === 'function'
+    ? window.CONV_CALC.getHallSnapshot(selected)
+    : null;
+  if(!el) return;
+  if(!CHW_AUTHORITY_AVAILABLE || !s || !s.site || !s.cooling || !hall){
+    el.textContent = 'Site plant authority UNAVAILABLE · selected demand context withheld';
+    return;
   }
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', paint);
-  else paint();
-})();
+  el.textContent = 'Site plant · ' + (s.site.it_load_kw / 1000).toFixed(3) + ' MW IT · ' +
+    (s.cooling.heat_rejection_kw / 1000).toFixed(3) + ' MW evaporator duty · selected Hall ' +
+    selected + ' · ' + (hall.it_load_kw / 1000).toFixed(3) + ' MW IT / ' + hall.racks +
+    ' racks · deterministic simulated telemetry';
+}
+
+if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', paintChillerBasisCard);
+else paintChillerBasisCard();
 
 const st = {
   /* v1.134.0 — the secondary load-loop setpoint was authored at 18.8 °C with a
@@ -997,10 +1102,10 @@ function evalLoop(loop){
   if(disconnected){
     return { level:"ALARM", msg:forced?"forced disconnect":"no flow / disconnected", disconnected:true, dpAvg };
   }
-  if(loop.flow < 10 || dpAvg > 135 || loop.t2 > 24.0){
+  if(loop.flow < LOOP_FLOW_ALARM_MIN || dpAvg > 135 || loop.t2 > LOOP_T2_ALARM_MAX){
     return { level:"ALARM", msg:"envelope breach", disconnected:false, dpAvg };
   }
-  if(loop.flow < 14 || dpAvg > 120 || loop.t2 > 23.2){
+  if(loop.flow < LOOP_FLOW_WARNING_MIN || dpAvg > 120 || loop.t2 > LOOP_T2_WARNING_MAX){
     return { level:"WARNING", msg:"approaching limit", disconnected:false, dpAvg };
   }
   return { level:"NORMAL", msg:"stable", disconnected:false, dpAvg };
@@ -1132,12 +1237,23 @@ function loopMetrics(loop){
   const vibA = runA ? r1(1.2 + (100-loop.spdA)*0.028) : r1(0.6);
   const vibB = runB ? r1(1.2 + (100-loop.spdB)*0.028) : r1(0.6);
 
+  /* Refrigeration diagnostics are an authored, bounded equipment-state model because
+     conv-engine does not publish refrigerant pressures or EXV position. The retired
+     implementation fed absolute CHW flow into curves calibrated around 18 L/s; after
+     the 30 MW rebase each machine carries about 135 L/s and the same formulas falsely
+     saturated the EXV and pressure readings. Normalise against the current per-machine
+     design flow, then map 100% load back to the original dimensionless 18-point index. */
+  const refrigerantLoadIndex = 18 * clamp(
+    LOOP_FLOW_DESIGN > 0 ? loop.flow / LOOP_FLOW_DESIGN : 0,
+    0,
+    1.2
+  );
   let evapSat = r1(loop.t1 - 1.3);
   let condSat = r1(loop.t2 + 10.4);
-  let suction = Math.round(245 + loop.flow*7.2);
-  let discharge = Math.round(690 + loop.flow*14.1);
-  let superheat = r1(4.8 + Math.max(0,18-loop.flow)*0.08);
-  let subcool = r1(3.6 + Math.max(0,loop.flow-14)*0.06);
+  let suction = Math.round(245 + refrigerantLoadIndex*7.2);
+  let discharge = Math.round(690 + refrigerantLoadIndex*14.1);
+  let superheat = r1(4.8 + Math.max(0,18-refrigerantLoadIndex)*0.08);
+  let subcool = r1(3.6 + Math.max(0,refrigerantLoadIndex-14)*0.06);
   /* v1.134.8 — derivable again now the machine type is adopted: plant electrical input shared
      across the running machines. The old authored curve (42 + spd*2.3 + flow*2.2) is gone. */
   let compKw = PLANT.inputPerMachineKw;
@@ -1161,6 +1277,16 @@ function loopMetrics(loop){
     runA, runB, ampA, ampB, headA, headB, vibA, vibB,
     evapSat, condSat, suction, discharge, superheat, subcool, compKw, oil
   };
+}
+
+function exvPositionPct(loop){
+  if(evalLoop(loop).disconnected) return 0;
+  const refrigerantLoadIndex = 18 * clamp(
+    LOOP_FLOW_DESIGN > 0 ? loop.flow / LOOP_FLOW_DESIGN : 0,
+    0,
+    1.2
+  );
+  return Math.round(clamp(40 + refrigerantLoadIndex*2.5, 20, 95));
 }
 
 function loopSvg(loop, pos){
@@ -1209,7 +1335,7 @@ function loopSvg(loop, pos){
     <rect x="${x}" y="${y}" width="${w}" height="240" rx="12" class="panel ${panelCls}" filter="url(#fShadow)" />
 
     <rect x="${x+14}" y="${y+12}" width="${w-160}" height="28" rx="7" class="field-box" />
-    ${text(x+28,y+31,"section-title",`CH-${String(loop.id).padStart(2,"0")}  \u2022  WCC-${String(loop.id).padStart(2,"0")}  \u2022  CHWP-${String(loop.id).padStart(2,"0")}A/B  \u2022  DPS  \u2022  MFM`)}
+    ${text(x+28,y+31,"section-title",`CH-${String(loop.id).padStart(2,"0")}  \u2022  WCC-${String(loop.id).padStart(2,"0")}  \u2022  CHWP-${String(loop.id).padStart(2,"0")}A/B  \u2022  DPS  \u2022  FLOW-REF`)}
     <rect x="${x+w-130}" y="${y+12}" width="112" height="28" rx="7" fill="${lvlBg}" stroke="${lvlBd}" />
     ${text(x+w-74,y+31,"value",e.level,"middle")}
 
@@ -1247,7 +1373,7 @@ function loopSvg(loop, pos){
     ${valveSym(ref.x+216, y+114, 7, "h")}
     <g data-rz-text-group="stacked-label">
     ${text(ref.x+228,y+112,"unit","EXV")}
-    ${text(ref.x+228,y+124,"unit",`${dis?0:Math.round(clamp(40+loop.flow*2.5,20,95))}%`)}
+    ${text(ref.x+228,y+124,"unit",`${exvPositionPct(loop)}%`)}
     </g>
     <path d="M${ref.x+64},${y+104} L${ref.x+96},${y+80} L${ref.x+210},${y+80} L${ref.x+216},${y+114} L${ref.x+210},${y+148} L${ref.x+96},${y+148} L${ref.x+64},${y+124}" class="ref-cycle ${dis?"off":""}" />
     <rect x="${ref.x+4}" y="${y+168}" width="112" height="34" rx="5" class="field-box" />
@@ -1276,10 +1402,10 @@ function loopSvg(loop, pos){
     <rect x="${pmp.x+80}" y="${y+152}" width="124" height="22" rx="5" class="field-box" />
     ${text(pmp.x+86,y+167,"unit",`HEAD ${headBU}  VIB ${m.vibB}`)}
 
-    <rect x="${ins.x}" y="${y+56}" width="${ins.w}" height="156" rx="10" class="equip-shell"><title>Process Instruments CH-${loop.id} • Flow: ${flowTxt} • T1: ${t1Txt} • T2: ${t2Txt}</title></rect>
-    ${text(ins.x+12,y+72,"unit","PROCESS INSTRUMENTS")}  <!-- v1.134.6: header had the MFM1 box drawn over it -->
+    <rect x="${ins.x}" y="${y+56}" width="${ins.w}" height="156" rx="10" class="equip-shell"><title>Simulated loop state CH-${loop.id} • calculated branch reference: ${flowTxt} • T1: ${t1Txt} • T2: ${t2Txt}</title></rect>
+    ${text(ins.x+12,y+72,"unit","SIMULATED LOOP STATE")}
     <rect x="${ins.x+8}" y="${y+82}" width="${ins.w-16}" height="24" rx="6" class="field-box" />
-    <g data-rz-loop-flow="1">${text(ins.x+16,y+98,"label",`MFM1  ${flowTxt}`)}</g>
+    <g data-rz-loop-flow="1">${text(ins.x+16,y+98,"label",`CALC BRANCH REF  ${flowTxt}`)}</g>
     <rect x="${ins.x+4}" y="${y+112}" width="94" height="30" rx="6" class="field-box" />
     <g data-rz-authored-basis="The refrigeration cycle, the secondary loop and the pump mechanicals are simulated operating state: conv-engine.js models the primary chilled-water side (CHWS, CHWR, delta-T, flow, heat rejection, chiller count) and publishes no compressor, refrigerant, secondary-loop or pump-vibration quantity, so these readings have no engine parameter to trace to. The primary-side values on this drawing are engine-derived and remain in the denominator.">${text(ins.x+10,y+131,"unit","DPS1")}
     ${text(ins.x+66,y+131,"value",dp1Txt,"middle")}
@@ -1320,7 +1446,47 @@ function loopSvg(loop, pos){
 }
 
 
+function drawUnavailablePid(){
+  const svg = $("pidSvg");
+  svg.setAttribute("aria-label", "Chiller plant authority unavailable");
+  svg.innerHTML = `
+    <g class="grid">
+      ${Array.from({length:58}).map((_,i)=>`<line x1="${i*40}" y1="0" x2="${i*40}" y2="1400" />`).join("")}
+      ${Array.from({length:35}).map((_,i)=>`<line x1="0" y1="${i*40}" x2="2300" y2="${i*40}" />`).join("")}
+    </g>
+    <rect x="90" y="120" width="2120" height="1160" rx="8" class="frame" />
+    ${text(150,220,"section-title","CHILLER PLANT AUTHORITY UNAVAILABLE")}
+    ${text(150,270,"label","The requested conv-engine revision did not establish a current governed snapshot.")}
+    ${text(150,310,"label","All plant values, commands, alarms, redundancy and flow animation are suppressed.")}
+    <rect x="220" y="430" width="520" height="250" rx="6" class="sup-card" />
+    ${text(260,490,"sup-title","ENGINE AUTHORITY")}
+    ${text(260,565,"sup-val","UNAVAILABLE")}
+    ${text(260,620,"sup-unit-sm","Reload the governed revision before operation")}
+    <rect x="890" y="430" width="520" height="250" rx="6" class="sup-card" />
+    ${text(930,490,"sup-title","PRIMARY CHW HEADER")}
+    ${text(930,565,"sup-val","UNAVAILABLE")}
+    ${text(930,620,"sup-unit-sm","No zero-value substitution")}
+    <rect x="1560" y="430" width="520" height="250" rx="6" class="sup-card" />
+    ${text(1600,490,"sup-title","PLANT STATUS")}
+    ${text(1600,565,"sup-val","UNAVAILABLE")}
+    ${text(1600,620,"sup-unit-sm","Commands disabled; escalation required")}
+    <line x1="420" y1="860" x2="1880" y2="860" class="pipe"
+      data-rz-line="chw-header-supply" data-from="CHILLER-PLANT" data-to="BUILDING-AHU"
+      data-state="unavailable" data-current="UNAVAILABLE" />
+    <line x1="1880" y1="980" x2="420" y2="980" class="pipe"
+      data-rz-line="chw-header-return" data-from="BUILDING-AHU" data-to="CHILLER-PLANT"
+      data-state="unavailable" data-current="UNAVAILABLE" />
+    ${text(420,835,"hdr-pipe-label supply","PRIMARY CHWS — UNAVAILABLE")}
+    ${text(420,955,"hdr-pipe-label return","PRIMARY CHWR — UNAVAILABLE")}
+  `;
+}
+
 function drawPid(){
+  if(!CHW_AUTHORITY_AVAILABLE){
+    drawUnavailablePid();
+    return;
+  }
+  $("pidSvg").setAttribute("aria-label", "Chiller P&ID mimic");
   // v1.42.4 — bind line-model for cross-page semantic adoption (review docs 27/28 + 17/18).
   const RZL = window.RZLineModel;
   const VW = 2300, VH = 1400;
@@ -1351,13 +1517,14 @@ function drawPid(){
     const fr = e.disconnected?"flow chwr broken":"flow chwr";
     const sC = e.level==="ALARM"?"#c25a5a":(e.level==="WARNING"?"#c08f46":"#38b56d");
     const loopId = lp.id || ('LOOP-'+(i+1));
-    const loopState = e.disconnected ? 'fault' : (e.level === 'ALARM' ? 'fault' : 'energized');
+    const loopState = !CHW_AUTHORITY_AVAILABLE ? 'unavailable'
+      : (e.disconnected ? 'fault' : (e.level === 'ALARM' ? 'fault' : 'energized'));
     // v1.42.4 — semantic line-model port (review doc-17 §3.2 + §5.3 line metadata).
     // Pipe lines tagged with from/to/medium/state; animation overlay (`flow` class) unchanged.
-    const supDrop = RZL ? RZL.line({id:'chw-sup-drop-'+loopId,from:'CHWS-HEADER',to:loopId+'-SUP-TEE',medium:'chws',direction:'forward',state:loopState,capacity:'DN100',current:'7.2°C / 58 L/s plant',redundancy:'duty',sensor:'TT-CHWS-'+(i+1),geometry:{x1:bxS,y1:HDR_CHWS_Y,x2:bxS,y2:supY},style:{stroke:'currentColor',strokeWidth:1.5,cssClass:'pipe'}}) : `<line x1="${bxS}" y1="${HDR_CHWS_Y}" x2="${bxS}" y2="${supY}" class="pipe" />`;
-    const supLeg = RZL ? RZL.line({id:'chw-sup-leg-'+loopId,from:loopId+'-SUP-TEE',to:loopId+'-EVAP',medium:'chws',direction:'forward',state:loopState,capacity:'DN100',current:'7.2°C',redundancy:'duty',geometry:{x1:portX,y1:supY,x2:bxS,y2:supY},style:{stroke:'currentColor',strokeWidth:1.5,cssClass:'pipe'}}) : `<line x1="${portX}" y1="${supY}" x2="${bxS}" y2="${supY}" class="pipe" />`;
-    const retDrop = RZL ? RZL.line({id:'chw-ret-drop-'+loopId,from:'CHWR-HEADER',to:loopId+'-RET-TEE',medium:'chwr',direction:'reverse',state:loopState,capacity:'DN100',current:'14.8°C / 58 L/s plant',redundancy:'duty',sensor:'TT-CHWR-'+(i+1),geometry:{x1:bxR,y1:HDR_CHWR_Y,x2:bxR,y2:retY},style:{stroke:'currentColor',strokeWidth:1.5,cssClass:'pipe'}}) : `<line x1="${bxR}" y1="${HDR_CHWR_Y}" x2="${bxR}" y2="${retY}" class="pipe" />`;
-    const retLeg = RZL ? RZL.line({id:'chw-ret-leg-'+loopId,from:loopId+'-EVAP',to:loopId+'-RET-TEE',medium:'chwr',direction:'reverse',state:loopState,capacity:'DN100',current:'14.8°C',redundancy:'duty',geometry:{x1:portX,y1:retY,x2:bxR,y2:retY},style:{stroke:'currentColor',strokeWidth:1.5,cssClass:'pipe'}}) : `<line x1="${portX}" y1="${retY}" x2="${bxR}" y2="${retY}" class="pipe" />`;
+    const supDrop = RZL ? RZL.line({id:'chw-sup-drop-'+loopId,from:'CHWS-HEADER',to:loopId+'-SUP-TEE',medium:'chws',direction:'forward',state:loopState,capacity:'DN100',current:CHW_AUTHORITY_AVAILABLE ? `${lineTemperatureFlow(st.header.chws)} plant` : 'UNAVAILABLE',redundancy:'duty',sensor:'TT-CHWS-'+(i+1),geometry:{x1:bxS,y1:HDR_CHWS_Y,x2:bxS,y2:supY},style:{stroke:'currentColor',strokeWidth:1.5,cssClass:'pipe'}}) : `<line x1="${bxS}" y1="${HDR_CHWS_Y}" x2="${bxS}" y2="${supY}" class="pipe" />`;
+    const supLeg = RZL ? RZL.line({id:'chw-sup-leg-'+loopId,from:loopId+'-SUP-TEE',to:loopId+'-EVAP',medium:'chws',direction:'forward',state:loopState,capacity:'DN100',current:lineTemperature(st.header.chws),redundancy:'duty',geometry:{x1:portX,y1:supY,x2:bxS,y2:supY},style:{stroke:'currentColor',strokeWidth:1.5,cssClass:'pipe'}}) : `<line x1="${portX}" y1="${supY}" x2="${bxS}" y2="${supY}" class="pipe" />`;
+    const retDrop = RZL ? RZL.line({id:'chw-ret-drop-'+loopId,from:'CHWR-HEADER',to:loopId+'-RET-TEE',medium:'chwr',direction:'reverse',state:loopState,capacity:'DN100',current:CHW_AUTHORITY_AVAILABLE ? `${lineTemperatureFlow(st.header.chwr)} plant` : 'UNAVAILABLE',redundancy:'duty',sensor:'TT-CHWR-'+(i+1),geometry:{x1:bxR,y1:HDR_CHWR_Y,x2:bxR,y2:retY},style:{stroke:'currentColor',strokeWidth:1.5,cssClass:'pipe'}}) : `<line x1="${bxR}" y1="${HDR_CHWR_Y}" x2="${bxR}" y2="${retY}" class="pipe" />`;
+    const retLeg = RZL ? RZL.line({id:'chw-ret-leg-'+loopId,from:loopId+'-EVAP',to:loopId+'-RET-TEE',medium:'chwr',direction:'reverse',state:loopState,capacity:'DN100',current:lineTemperature(st.header.chwr),redundancy:'duty',geometry:{x1:portX,y1:retY,x2:bxR,y2:retY},style:{stroke:'currentColor',strokeWidth:1.5,cssClass:'pipe'}}) : `<line x1="${portX}" y1="${retY}" x2="${bxR}" y2="${retY}" class="pipe" />`;
     return `
       ${supDrop}
       <line x1="${bxS}" y1="${HDR_CHWS_Y}" x2="${bxS}" y2="${supY}" class="${fs}" />
@@ -1379,7 +1546,7 @@ function drawPid(){
   }).join("");
 
   const loops = st.loops.map((lp,i)=>loopSvg(lp,pos[i])).join("");
-  const hFlow = `${conv.f(st.header.flow,ui.unit)} ${conv.fu(ui.unit)}`;
+  const itRefFlow = `${conv.f(st.header.flow,ui.unit)} ${conv.fu(ui.unit)}`;
   const hDp = `${conv.p(st.header.dp,ui.unit)} ${conv.pu(ui.unit)}`;
   const hChws = `${conv.t(st.header.chws,ui.unit)}${conv.tu(ui.unit)}`;
   const hChwr = `${conv.t(st.header.chwr,ui.unit)}${conv.tu(ui.unit)}`;
@@ -1396,7 +1563,7 @@ function drawPid(){
      for the adopted machine type), not the sum of four drawn machines: this mimic draws 4 of 7
      running, so summing what is drawn would under-report the plant by 3/7. */
   const totalKw = PLANT.inputKw;
-  const totalTons = PLANT.dutyRt != null ? PLANT.dutyRt : r1(st.header.flow * deltaT * 4.186 / 3.517);
+  const totalTons = PLANT.dutyRt;
   /* COP and kW/RT come straight from the engine's adopted specific power. They were reported
      UNAVAILABLE while the heat-rejection technology was unresolved; the owner adopted the
      study's basis (evaporative cooling tower = water-cooled centrifugal), so they are derived
@@ -1404,18 +1571,18 @@ function drawPid(){
   const plantCop = PLANT.cop;
   const kwPerRt = PLANT.kwPerRt;
   const loopsOnline = st.loops.filter(lp=>!evalLoop(lp).disconnected).length;
-  // Plant capacity context — engine-derived (deterministic). Cooling demand =
-  // engine heat rejection; per-chiller rating sized so N chillers cover demand
-  // with one as N+1 spare. Source: 04-chiller-plant-review.md "Plant Capacity Panel".
+  // Plant capacity context — use only validated engine fields. The previous P&ID
+  // invented a 5.25 MW unit rating from an authored 85% loading assumption, which
+  // contradicted the governed 5 MW/unit schedule and overstated N+1 margin.
   const _es = engineSnap();
   const chRun = _es ? _es.cooling.chillers_running : 2;
   const chTot = _es ? _es.cooling.chillers_total : 3;
   const coolDemandKw = st.header.coolingKw;
-  // Per-chiller rating: demand met by chRun units at ~85% loading.
-  const chRatingKw = Math.round((coolDemandKw / chRun) / 0.85 / 50) * 50;
-  const availKw = chRatingKw * chTot;
-  const nPlus1MarginKw = availKw - coolDemandKw;
-  const redundancy = (availKw - chRatingKw) >= coolDemandKw ? "N+1" : (availKw >= coolDemandKw ? "N" : "DEGRADED");
+  const runningCapacityKw = PLANT.capacityKw;
+  const postOneFailureCapacityKw = PLANT.n1CapacityKw;
+  const nPlus1MarginKw = postOneFailureCapacityKw - coolDemandKw;
+  const redundancy = postOneFailureCapacityKw >= coolDemandKw
+    ? "N+1" : (runningCapacityKw >= coolDemandKw ? "N" : "DEGRADED");
   const redColor = redundancy==="N+1"?"#38b56d":(redundancy==="N"?"#c08f46":"#c25a5a");
 
   const alarmBg = st.alarm.level==="ALARM"?"rgba(194,90,90,.15)":(st.alarm.level==="WARNING"?"rgba(192,143,70,.12)":"rgba(56,181,109,.08)");
@@ -1478,8 +1645,8 @@ function drawPid(){
 
     <line x1="${PZ_X+PZ_W+8}" y1="${PZ_Y+4}" x2="${PZ_X+PZ_W+8}" y2="${VH-140}" class="sup-divider" stroke-dasharray="6 4" />
 
-    <!-- PRIMARY chilled-water distribution header (engine-bound: CHWS 7.2 /
-         CHWR 14.8 °C). Building / AHU load is the served conventional CRAH
+    <!-- PRIMARY chilled-water distribution header (engine-bound current basis).
+         Building / AHU load is the served conventional CRAH
          plant. Label boxes sit in a RESERVED LANE (HDR_X1..LABEL_LANE_END)
          containing NO branch tees — orthogonal routing, ≥8px clearance. -->
     <rect x="${HDR_X2+10}" y="${HDR_CHWS_Y-44}" width="106" height="${HDR_CHWR_Y-HDR_CHWS_Y+88}" rx="8" fill="rgba(98,140,183,.08)" stroke="rgba(98,140,183,.4)" stroke-width="1.2" stroke-dasharray="4 3" />
@@ -1492,15 +1659,15 @@ function drawPid(){
     <!-- CHWS supply header pipe (label box bounded inside reserved lane;
          text is short so its bbox never reaches the first branch tee).
          v1.42.4 — pipe tagged via RZL; flow overlay unchanged. -->
-    ${RZL ? RZL.line({id:'chw-header-supply',from:'CHILLER-PLANT',to:'BUILDING-AHU',medium:'chws',direction:'forward',state:'energized',capacity:'DN300 distribution header',current:`${r1(st.header.coolingKw/1000)} MW @ ${conv.t(st.header.chws,ui.unit)}${conv.tu(ui.unit)} / ${conv.f(st.header.flow,ui.unit)}${conv.fu(ui.unit)}`,redundancy:'duty',sensor:'TT-CHWS-MAIN',geometry:{x1:HDR_X1,y1:HDR_CHWS_Y,x2:HDR_X2,y2:HDR_CHWS_Y},style:{stroke:'currentColor',strokeWidth:1.5,cssClass:'pipe'}}) : `<line x1="${HDR_X1}" y1="${HDR_CHWS_Y}" x2="${HDR_X2}" y2="${HDR_CHWS_Y}" class="pipe" />`}
+    ${RZL ? RZL.line({id:'chw-header-supply',from:'CHILLER-PLANT',to:'BUILDING-AHU',medium:'chws',direction:'forward',state:CHW_AUTHORITY_AVAILABLE?'energized':'unavailable',capacity:'DN300 distribution header',current:lineSupplyCurrent(),redundancy:'duty',sensor:'TT-CHWS-MAIN',geometry:{x1:HDR_X1,y1:HDR_CHWS_Y,x2:HDR_X2,y2:HDR_CHWS_Y},style:{stroke:'currentColor',strokeWidth:1.5,cssClass:'pipe'}}) : `<line x1="${HDR_X1}" y1="${HDR_CHWS_Y}" x2="${HDR_X2}" y2="${HDR_CHWS_Y}" class="pipe" />`}
     <line x1="${HDR_X1}" y1="${HDR_CHWS_Y}" x2="${HDR_X2}" y2="${HDR_CHWS_Y}" class="flow chws" />
     <rect x="${HDR_X1}" y="${HDR_CHWS_Y-42}" width="138" height="32" rx="6" fill="rgba(98,140,183,.14)" stroke="rgba(98,140,183,.45)" />
     ${text(HDR_X1+8,HDR_CHWS_Y-28,"hdr-pipe-label supply","PRIMARY CHWS")}
-    ${text(HDR_X1+8,HDR_CHWS_Y-15,"hdr-pipe-label supply",`${conv.t(st.header.chws,ui.unit)}${conv.tu(ui.unit)} ${conv.f(st.header.flow,ui.unit)}${conv.fu(ui.unit)}`)}
+    ${text(HDR_X1+8,HDR_CHWS_Y-15,"hdr-pipe-label supply",`${conv.t(st.header.chws,ui.unit)}${conv.tu(ui.unit)}  IT-ref ${itRefFlow}`)}
     ${flowArrow(LABEL_LANE_END+6, HDR_CHWS_Y, "right", "supply")}
 
     <!-- CHWR return header pipe. v1.42.4 — pipe tagged via RZL. -->
-    ${RZL ? RZL.line({id:'chw-header-return',from:'BUILDING-AHU',to:'CHILLER-PLANT',medium:'chwr',direction:'reverse',state:'energized',capacity:'DN300 return header',current:`${conv.t(st.header.chwr,ui.unit)}${conv.tu(ui.unit)} / ${conv.f(st.header.flow,ui.unit)}${conv.fu(ui.unit)}`,redundancy:'duty',sensor:'TT-CHWR-MAIN',geometry:{x1:HDR_X1,y1:HDR_CHWR_Y,x2:HDR_X2,y2:HDR_CHWR_Y},style:{stroke:'currentColor',strokeWidth:1.5,cssClass:'pipe'}}) : `<line x1="${HDR_X1}" y1="${HDR_CHWR_Y}" x2="${HDR_X2}" y2="${HDR_CHWR_Y}" class="pipe" />`}
+    ${RZL ? RZL.line({id:'chw-header-return',from:'BUILDING-AHU',to:'CHILLER-PLANT',medium:'chwr',direction:'reverse',state:CHW_AUTHORITY_AVAILABLE?'energized':'unavailable',capacity:'DN300 return header',current:lineTemperatureFlow(st.header.chwr),redundancy:'duty',sensor:'TT-CHWR-MAIN',geometry:{x1:HDR_X1,y1:HDR_CHWR_Y,x2:HDR_X2,y2:HDR_CHWR_Y},style:{stroke:'currentColor',strokeWidth:1.5,cssClass:'pipe'}}) : `<line x1="${HDR_X1}" y1="${HDR_CHWR_Y}" x2="${HDR_X2}" y2="${HDR_CHWR_Y}" class="pipe" />`}
     <line x1="${HDR_X1}" y1="${HDR_CHWR_Y}" x2="${HDR_X2}" y2="${HDR_CHWR_Y}" class="flow chwr" />
     <rect x="${HDR_X1}" y="${HDR_CHWR_Y+10}" width="138" height="32" rx="6" fill="rgba(93,160,149,.14)" stroke="rgba(93,160,149,.45)" />
     ${text(HDR_X1+8,HDR_CHWR_Y+24,"hdr-pipe-label return","PRIMARY CHWR")}
@@ -1511,10 +1678,10 @@ function drawPid(){
     <rect x="${CX}" y="${R1Y}" width="${C3W}" height="104" rx="8" class="sup-card" />
     <rect x="${CX}" y="${R1Y}" width="${C3W}" height="22" rx="8" class="sup-card-hdr" />
     <line x1="${CX}" y1="${R1Y+22}" x2="${CX+C3W}" y2="${R1Y+22}" class="sup-divider" />
-    ${text(CX+12,R1Y+16,"sup-title","HEADER FLOW")}
-    ${text(CX+12,R1Y+52,"sup-val",hFlow)}
+    ${text(CX+12,R1Y+16,"sup-title","IT REFERENCE FLOW")}
+    ${text(CX+12,R1Y+52,"sup-val",itRefFlow)}
     ${sparkline(CX+12, R1Y+60, C3W-24, 30, st.spark.flow, "var(--chws)")}
-    ${text(CX+12,R1Y+96,"sup-unit-sm","MFM \u2022 Header")}
+    ${text(CX+12,R1Y+96,"sup-unit-sm","CALCULATED \u2022 NOT METERED")}
 
     <rect x="${CX+C3W+10}" y="${R1Y}" width="${C3W}" height="104" rx="8" class="sup-card" />
     <rect x="${CX+C3W+10}" y="${R1Y}" width="${C3W}" height="22" rx="8" class="sup-card-hdr" />
@@ -1541,10 +1708,10 @@ function drawPid(){
     ${text(CX+56,R2Y+52,"sup-val",hChws)}
     ${text(CX+180,R2Y+52,"label","CHWR")}
     ${text(CX+224,R2Y+52,"sup-val",hChwr)}
-    ${text(CX+12,R2Y+76,"sup-unit-sm",`Flow ${conv.f(st.header.flow,ui.unit)} ${conv.fu(ui.unit)}  \u2022  Cooling ${r1(st.header.coolingKw/1000)} MW`)}
+    ${text(CX+12,R2Y+76,"sup-unit-sm",`IT-ref flow ${conv.f(st.header.flow,ui.unit)} ${conv.fu(ui.unit)}  \u2022  Evap duty ${r1(st.header.coolingKw/1000)} MW`)}
     <!-- v1.134.6 — this read "Basis: IT 1.85 MW x PUE", the retired single-hall basis, printed
          on the P&ID beside engine-bound values. Bound to the campus load. -->
-    ${text(CX+12,R2Y+92,"sup-unit-sm",`Basis: IT ${r1((CHW.itKw||0)/1000)} MW \u00D7 PUE \u2022 deterministic`)}
+    ${text(CX+12,R2Y+92,"sup-unit-sm",`Basis: IT ${r1(CHW.itKw/1000)} MW \u00D7 PUE \u2022 deterministic`)}
 
     <rect x="${CX+C2W+10}" y="${R2Y}" width="${CW-C2W-10}" height="104" rx="8" class="sup-card" />
     <rect x="${CX+C2W+10}" y="${R2Y}" width="${CW-C2W-10}" height="22" rx="8" class="sup-card-hdr" />
@@ -1572,11 +1739,11 @@ function drawPid(){
     ${text(CX+34,R3Y+52,"value",st.alarm.level)}
     ${text(CX+150,R3Y+52,"label",`Chillers ${chRun}/${chTot}`)}
     ${text(CX+266,R3Y+52,"label",`Demand ${r1(coolDemandKw/1000)} MW`)}
-    ${text(CX+382,R3Y+52,"label",`Avail ${r1(availKw/1000)} MW`)}
-    ${text(CX+492,R3Y+52,"label",`N+1 Margin ${r1(nPlus1MarginKw/1000)} MW`)}  <!-- v1.134.6: was CX+660, running 13px past the viewBox and into the redundancy chip -->
+    ${text(CX+374,R3Y+52,"label",`Run cap ${r1(runningCapacityKw/1000)} MW`)}
+    ${text(CX+490,R3Y+52,"label",`N+1 cap ${r1(postOneFailureCapacityKw/1000)} MW`)}
     <rect x="${CX+CW-100}" y="${R3Y+38}" width="80" height="22" rx="5" fill="none" stroke="${redColor}" />
     ${text(CX+CW-88,R3Y+53,"value",redundancy)}
-    ${text(CX+12,R3Y+74,"sup-unit-sm",`First-out: ${firstOut}  \u2022  Loops online ${loopsOnline}/4  \u2022  Ack: ${ackTxt}  \u2022  Forced: ${forced}`)}
+    ${text(CX+12,R3Y+74,"sup-unit-sm",`N+1 margin ${r2(nPlus1MarginKw/1000)} MW  \u2022  First-out: ${firstOut}  \u2022  Loops ${loopsOnline}/4  \u2022  Ack: ${ackTxt}  \u2022  Forced: ${forced}`)}
 
     <!-- Row 4: Loop Summary Table -->
     <rect x="${CX}" y="${R4Y}" width="${CW}" height="152" rx="8" class="sup-card" />
@@ -1653,6 +1820,53 @@ function drawPid(){
 }
 
 
+function renderAuthorityUnavailable(){
+  closeModal();
+  $("mMode").textContent = "UNAVAILABLE";
+  $("mHint").textContent = "Loop diagnostics unavailable — restore governed engine authority.";
+  $("mStats").innerHTML = '<div class="mstat"><div class="k">Authority</div><div class="v">UNAVAILABLE</div></div>';
+  $("mKv").innerHTML = '<div class="mkvs"><div class="k">Equipment values</div><div class="v">UNAVAILABLE</div></div>';
+  $("mGuide").innerHTML = '<li>Restore the requested governed engine revision before opening diagnostics.</li>';
+  const unavailableIds = [
+    "kChws","kChwr","kDt","kFlow","kCool","kDp","kMachine","kSpecPwr",
+    "kCdwRange","kDesignDuty","kFlowIt","kFlowHr","kFlowGap","spChwsTxt",
+    "spDpTxt","spFlowTxt"
+  ];
+  unavailableIds.forEach(id=>{ const node=$(id); if(node) node.textContent="UNAVAILABLE"; });
+  $("lgChws").textContent = "Primary CHWS — UNAVAILABLE";
+  $("lgChwr").textContent = "Primary CHWR — UNAVAILABLE";
+  $("asLevel").textContent = "UNAVAILABLE";
+  $("asCounts").textContent = "Authority UNAVAILABLE";
+  $("asRedund").textContent = "Redundancy UNAVAILABLE";
+  $("asChw").textContent = "CHWS UNAVAILABLE • CHWR UNAVAILABLE • ΔT UNAVAILABLE • Flow UNAVAILABLE";
+  $("asLoad").textContent = "Evaporator Duty UNAVAILABLE";
+  $("asMeta").textContent = "Scenario: UNAVAILABLE • governed engine mismatch or absence";
+  $("alarmStrip").className = "alarm-strip";
+  $("asDot").style.cssText = "background:#7f93ab;animation:none";
+  $("sDot").className = "dot";
+  $("sDot").style.cssText = "background:#7f93ab;animation:none";
+  $("sTitle").textContent = "UNAVAILABLE";
+  $("sMsg").textContent = "Plant authority UNAVAILABLE — values and commands are suppressed.";
+  $("sChips").innerHTML = '<span class="tag">Authority UNAVAILABLE</span>';
+  $("alarmMeta").textContent = "Status UNAVAILABLE";
+  $("firstMeta").textContent = "First-out: UNAVAILABLE";
+  $("ackMeta").textContent = "Ack: UNAVAILABLE";
+  $("forcedMeta").textContent = "Forced-fault state UNAVAILABLE";
+  $("chiller-current-basis-value").textContent = "Site plant authority UNAVAILABLE · selected demand context withheld";
+  $("scLbl").textContent = "UNAVAILABLE";
+  $("unitLbl").textContent = "UNAVAILABLE";
+  const inspector = $("chillerInspector");
+  if(inspector) inspector.innerHTML = '<div class="meta">Selected-equipment detail UNAVAILABLE — restore governed engine authority.</div>';
+  const history = $("hist");
+  if(history) history.innerHTML = '<div class="hist-item"><span class="lvl">UNAVAILABLE</span>Alarm history authority is unavailable.</div>';
+  ["ackBtn","unitSel","scSel","spChws","spDp","spFlow","faultBtn","clearBtn"].forEach(id=>{
+    const control=$(id); if(control) control.disabled=true;
+  });
+  ["simTgl","maintTgl"].forEach(id=>{
+    const control=$(id); if(control){ control.setAttribute("aria-disabled","true"); control.style.pointerEvents="none"; }
+  });
+}
+
 function renderKpi(){
   // Primary CHW header — engine-true (deterministic, stable on reload).
   $("kChws").textContent = `${conv.t(st.header.chws,ui.unit)} ${conv.tu(ui.unit)}`;
@@ -1666,8 +1880,8 @@ function renderKpi(){
   $("kFlow").textContent = `${conv.f(st.header.flow,ui.unit)} ${conv.fu(ui.unit)}`;
   /* CHW Flow Reconciliation — both flows and their gap derive from the same engine
      basis as the header above, so the card can never state a different plant.
-     design flow  = IT load        / (4.186 * dT)
-     sanity flow  = heat rejection / (4.186 * dT)   (IT + UPS loss)  */
+     IT reference = IT load / (4.186 * dT)
+     plant duty   = evaporator duty / (4.186 * dT)   (IT + UPS loss)  */
   const flowIt = (CHW.itKw != null && CHW.dt) ? (CHW.itKw / (4.186 * CHW.dt)) : null;
   const flowHr = (CHW.coolingKw != null && CHW.dt) ? (CHW.coolingKw / (4.186 * CHW.dt)) : null;
   $("kFlowIt").textContent  = flowIt != null ? `${conv.f(r1(flowIt),ui.unit)} ${conv.fu(ui.unit)}` : "—";
@@ -1706,8 +1920,8 @@ function renderAlarmStrip(){
   $("asRedund").textContent = `Loops ${online}/4 • ${red}`;
   // Primary CHW basis — engine-true figures (doc-04 acceptance criteria).
   const dtTxt = ui.unit==="ip"?r1(st.header.dt*9/5):r1(st.header.dt);
-  $("asChw").textContent = `CHWS ${conv.t(st.header.chws,ui.unit)}${conv.tu(ui.unit)} • CHWR ${conv.t(st.header.chwr,ui.unit)}${conv.tu(ui.unit)} • ΔT ${dtTxt} • ${conv.f(st.header.flow,ui.unit)} ${conv.fu(ui.unit)}`;
-  $("asLoad").textContent = `Cooling Demand ${r1(st.header.coolingKw/1000)} MW`;
+  $("asChw").textContent = `CHWS ${conv.t(st.header.chws,ui.unit)}${conv.tu(ui.unit)} • CHWR ${conv.t(st.header.chwr,ui.unit)}${conv.tu(ui.unit)} • ΔT ${dtTxt} • IT-ref ${conv.f(st.header.flow,ui.unit)} ${conv.fu(ui.unit)}`;
+  $("asLoad").textContent = `Evaporator Duty ${r1(st.header.coolingKw/1000)} MW`;
   const upS = Math.floor((Date.now()-ui.startTs)/1000);
   $("asMeta").textContent = `Scenario: ${CHW.scenario} • Updated ${upS%60}s`;
 }
@@ -1751,8 +1965,12 @@ function renderHistory(){
 }
 
 function renderModal(loopId){
+  if(!CHW_AUTHORITY_AVAILABLE){
+    closeModal();
+    return false;
+  }
   const lp = st.loops.find(x=>x.id===loopId);
-  if(!lp) return;
+  if(!lp) return false;
   const e = evalLoop(lp);
   const mtx = loopMetrics(lp);
 
@@ -1789,7 +2007,7 @@ function renderModal(loopId){
   const hB = ui.unit === "ip" ? `${r1(mtx.headB*3.28084)} ft` : `${mtx.headB} m`;
 
   $("mStats").innerHTML = `
-    <div class="mstat"><div class="k">Flow</div><div class="v">${conv.f(lp.flow,ui.unit)} <small>${conv.fu(ui.unit)}</small></div></div>
+    <div class="mstat"><div class="k">Branch ref (sim)</div><div class="v">${conv.f(lp.flow,ui.unit)} <small>${conv.fu(ui.unit)}</small></div></div>
     <div class="mstat"><div class="k">dT</div><div class="v">${dt} <small>${dtU}</small></div></div>
     <div class="mstat"><div class="k">DP Avg</div><div class="v">${conv.p(dpA,ui.unit)} <small>${conv.pu(ui.unit)}</small></div></div>
     <div class="mstat"><div class="k">Comp Run</div><div class="v">${comp} <small>/3</small></div></div>
@@ -1799,7 +2017,7 @@ function renderModal(loopId){
     ["Secondary Supply (T1)", `${conv.t(lp.t1,ui.unit)}${conv.tu(ui.unit)}`],
     ["Secondary Return (T2)", `${conv.t(lp.t2,ui.unit)}${conv.tu(ui.unit)}`],
     ["Primary CHWS / CHWR", `${conv.t(st.header.chws,ui.unit)} / ${conv.t(st.header.chwr,ui.unit)} ${conv.tu(ui.unit)} (engine)`],
-    ["MFM1 Flow", `${conv.f(lp.flow,ui.unit)} ${conv.fu(ui.unit)}`],
+    ["Branch flow ref (calculated)", `${conv.f(lp.flow,ui.unit)} ${conv.fu(ui.unit)}`],
     ["DPS1", `${conv.p(lp.dp1,ui.unit)} ${conv.pu(ui.unit)}`],
     ["DPS2", `${conv.p(lp.dp2,ui.unit)} ${conv.pu(ui.unit)}`],
     ["Pump Active", lp.pumpA?"A (RUN)":"B (RUN)"],
@@ -1818,19 +2036,21 @@ function renderModal(loopId){
 
   const g = [];
   if(ui.forced.has(lp.id)) g.push("Loop is currently under forced disconnect test.");
-  if(lp.flow < 14) g.push("Flow is low. Raise DP setpoint or inspect active pump path.");
+  if(lp.flow < LOOP_FLOW_WARNING_MIN) g.push("Flow is low. Raise DP setpoint or inspect active pump path.");
   if(dpA > 120) g.push("High differential pressure. Verify strainer and valve losses.");
   if(mtx.vibA > 2.2 || mtx.vibB > 2.2) g.push("Pump vibration is elevated. Check alignment, impeller, and bearing condition.");
   if(mtx.superheat > 8.0) g.push("High superheat indicates potential evaporator starvation or EXV under-feed.");
   if(mtx.subcool < 2.5 && !e.disconnected) g.push("Low subcool indicates weak condenser performance or low refrigerant charge.");
-  if(dtRaw < 2.5) g.push("Low dT indicates high bypass or weak heat pickup.");
-  if(dtRaw > 4.8) g.push("High dT indicates potential flow starvation.");
+  if(LOOP_DT_GUIDE_MIN != null && dtRaw < LOOP_DT_GUIDE_MIN) g.push("Low dT relative to the governed design point indicates high bypass or weak heat pickup.");
+  if(LOOP_DT_GUIDE_MAX != null && dtRaw > LOOP_DT_GUIDE_MAX) g.push("High dT relative to the governed design point indicates potential flow starvation.");
   if(g.length===0) g.push("Loop is stable. Continue normal monitoring.");
   $("mGuide").innerHTML = g.map(x=>`<li>${x}</li>`).join("")
     + (e.level !== "NORMAL" ? `<li style="margin-top:8px"><button class="btn ghost" onclick="ackLoop(${lp.id})">ACK CH-${lp.id}</button></li>` : '');
+  return true;
 }
 
 function ackLoop(id){
+  if(!CHW_AUTHORITY_AVAILABLE) return;
   st.alarm.ack = true;
   st.alarm.ackTs = Date.now();
   const now = new Date().toLocaleTimeString();
@@ -1841,15 +2061,20 @@ function ackLoop(id){
 }
 
 function openModal(loopId){
+  if(!CHW_AUTHORITY_AVAILABLE){
+    closeModal();
+    return false;
+  }
   modalReturnFocus = document.activeElement;
   ui.selected = loopId;
-  renderModal(loopId);
+  if(!renderModal(loopId)) return false;
   const modal = $("loopModal");
   modal.classList.add("show");
   modal.setAttribute("aria-hidden","false");
   $("modalScrim").classList.add("show");
   $("modalScrim").setAttribute("aria-hidden","false");
   requestAnimationFrame(()=>$("mClose").focus({preventScroll:true}));
+  return true;
 }
 
 function closeModal(){
@@ -1867,7 +2092,7 @@ function closeModal(){
 }
 
 function stepProcess(){
-  if(!ui.sim) return;
+  if(!ui.sim || !CHW_AUTHORITY_AVAILABLE) return;
 
   st.loops.forEach(lp=>{
     if(ui.forced.has(lp.id)){
@@ -1876,15 +2101,15 @@ function stepProcess(){
       lp.comps = [0,0,0];
       lp.dp1 = Math.round(clamp(lp.dp1*0.72, 20, 92));
       lp.dp2 = Math.round(clamp(lp.dp2*0.70, 20, 92));
-      lp.t2 = r1(clamp(lp.t2 + r(0.0,0.2), 22.5, 25.0));
+      lp.t2 = r1(clamp(lp.t2 + r(0.0,0.2), LOOP_T2_MIN, LOOP_T2_MAX));
       return;
     }
 
-    // Auto-changeover: swap pump if vibration exceeds 2.5 mm/s
+    // Auto-changeover occurs only on the modeled vibration threshold. A healthy
+    // duty pump must not swap at random because that creates false first-out events.
     const mtxL = loopMetrics(lp);
     if(lp.pumpA && mtxL.vibA > 2.5){ lp.pumpA = false; }
     else if(!lp.pumpA && mtxL.vibB > 2.5){ lp.pumpA = true; }
-    else if(Math.random() < 0.04) lp.pumpA = !lp.pumpA;
 
     if(ui.maint){
       const tf = st.sp.flow + r(-0.4,0.4);
@@ -1902,17 +2127,18 @@ function stepProcess(){
       else { lp.spdB = clamp(lp.spdB + r(-8,8), 42, 92); lp.spdA = 0; }
       lp.dp1 = Math.round(clamp(lp.dp1 + r(-6,6), 54, 145));
       lp.dp2 = Math.round(clamp(lp.dp2 + r(-6,6), 54, 145));
-      lp.t1 = r1(clamp(lp.t1 + r(-0.24,0.24), 17.5, 21.2));
-      lp.t2 = r1(clamp(lp.t2 + r(-0.28,0.28), 21.4, 24.2));
+      lp.t1 = r1(clamp(lp.t1 + r(-0.24,0.24), LOOP_T1_MIN, LOOP_T1_MAX));
+      lp.t2 = r1(clamp(lp.t2 + r(-0.28,0.28), LOOP_T2_MIN, LOOP_T2_MAX));
     }
 
     // Compressor staging: stage up on high load, stage down on low
     const currentComps = lp.comps.reduce((a,b)=>a+b,0);
-    const targetComps = lp.flow > 19 ? 3 : (lp.flow > 15 ? 2 : 1);
-    if(targetComps > currentComps && Math.random() < 0.3){
+    const stageBasis = LOOP_FLOW_DESIGN != null ? LOOP_FLOW_DESIGN : 24;
+    const targetComps = lp.flow > stageBasis * 0.75 ? 3 : (lp.flow > stageBasis * 0.50 ? 2 : 1);
+    if(targetComps > currentComps && nextSimUnit() < 0.3){
       // Stage up: turn on first OFF compressor
       for(let ci=0;ci<3;ci++){ if(!lp.comps[ci]){lp.comps[ci]=1; break;} }
-    } else if(targetComps < currentComps && Math.random() < 0.2){
+    } else if(targetComps < currentComps && nextSimUnit() < 0.2){
       // Stage down: turn off last ON compressor
       for(let ci=2;ci>=0;ci--){ if(lp.comps[ci]){lp.comps[ci]=0; break;} }
     }
@@ -1921,10 +2147,10 @@ function stepProcess(){
   // PRIMARY CHW header is engine-bound and DETERMINISTIC — re-assert canonical
   // basis every tick (never overwrite with secondary-loop averages or PRNG).
   const B = chwBasis();
-  st.header.chws = B.chws;       // 7.2 °C  (engine-true, stable on reload)
-  st.header.chwr = B.chwr;       // 14.8 °C
+  st.header.chws = B.chws;       // current engine value, stable on reload
+  st.header.chwr = B.chwr;       // CHWS + governed delta-T
   st.header.dt = B.dt;           // 7.6 K
-  st.header.flow = B.flow;       // ≈58 L/s = coolingKw / (4.186·ΔT)
+  st.header.flow = B.flow;       // IT sensible-load reference; not measured header flow
   st.header.coolingKw = B.coolingKw;
   // Header DP is a hydraulic reading (not an engine engineering value) — it may
   // track the secondary-side pump duty for realism, but stays a plant DP figure.
@@ -1933,12 +2159,11 @@ function stepProcess(){
   // Ambient temp drift (condenser-side environment, not an engine value)
   ui.ambient = r1(clamp(ui.ambient + r(-0.15, 0.15), 28, 42));
 
-  // Record sparkline data (max 30 points) — COP/RT from engine-true header.
+  // Record sparkline data (max 30 points). COP and kW/RT are validated engine
+  // efficiencies; the IT-reference flow must never be treated as a meter.
   const dt = st.header.dt;
-  const tkw = PLANT.inputKw;
-  const trt = r1(st.header.flow * dt * 4.186 / 3.517);
-  const cop = tkw > 0 ? r1(trt * 3.517 / tkw) : 0;
-  const kwrt = tkw > 0 ? r1(tkw / Math.max(trt, 0.1)) : 0;
+  const cop = PLANT.cop;
+  const kwrt = PLANT.kwPerRt;
   [st.spark.cop, st.spark.kwRt, st.spark.flow, st.spark.dt, st.spark.dp].forEach(a=>{ if(a.length>=30) a.shift(); });
   st.spark.cop.push(cop);
   st.spark.kwRt.push(kwrt);
@@ -1949,6 +2174,11 @@ function stepProcess(){
 
 let staticDrawn = false;
 function renderAll(){
+  if(!CHW_AUTHORITY_AVAILABLE){
+    renderAuthorityUnavailable();
+    drawUnavailablePid();
+    return;
+  }
   alarmStep();
   renderKpi();
   renderAlarmStrip();
@@ -2064,7 +2294,7 @@ function bind(){
       }
     }
     // Keyboard nav: 1-4 opens loop diagnostics
-    if(e.key >= "1" && e.key <= "4" && !e.ctrlKey && !e.altKey && !e.metaKey){
+    if(CHW_AUTHORITY_AVAILABLE && e.key >= "1" && e.key <= "4" && !e.ctrlKey && !e.altKey && !e.metaKey){
       const id = parseInt(e.key);
       openModal(id);
     }
@@ -2100,6 +2330,7 @@ function bind(){
  * v1.23.2; sections gain a [data-bms-mode] hook now but stay visible.
  * ==========================================================================*/
 function loopInspectorPayload(id){
+  if(!CHW_AUTHORITY_AVAILABLE) return null;
   if(typeof st === "undefined" || !st || !Array.isArray(st.loops)) return null;
   const lp = st.loops[id-1];
   if(!lp) return null;
@@ -2113,9 +2344,9 @@ function loopInspectorPayload(id){
     title: "CH-" + String(id).padStart(2,"0"),
     statusChip: {label: (trip ? "TRIP" : ev.level || "NORMAL"), state: trip ? "is-critical" : sev},
     critical: [
-      {k:"Primary CHWS",  v:(st.header && st.header.chws != null) ? st.header.chws.toFixed(1) : "7.2",  unit:"°C"},
-      {k:"Primary CHWR",  v:(st.header && st.header.chwr != null) ? st.header.chwr.toFixed(1) : "14.8", unit:"°C"},
-      {k:"Primary ΔT",    v:(st.header && st.header.dt   != null) ? st.header.dt.toFixed(1)   : "7.6",  unit:"°C"},
+      {k:"Primary CHWS",  v:(st.header && st.header.chws != null) ? st.header.chws.toFixed(1) : "UNAVAILABLE", unit:"°C"},
+      {k:"Primary CHWR",  v:(st.header && st.header.chwr != null) ? st.header.chwr.toFixed(1) : "UNAVAILABLE", unit:"°C"},
+      {k:"Primary ΔT",    v:(st.header && st.header.dt   != null) ? st.header.dt.toFixed(1)   : "UNAVAILABLE", unit:"°C"},
       {k:"Loop Flow",     v:(lp.flow != null ? lp.flow.toFixed(1) : "—"), unit:"L/s"},
       {k:"Sec Supply T1", v:(lp.t1 != null ? lp.t1.toFixed(1) : "—"), unit:"°C"},
       {k:"Sec Return T2", v:(lp.t2 != null ? lp.t2.toFixed(1) : "—"), unit:"°C"},
@@ -2125,9 +2356,9 @@ function loopInspectorPayload(id){
       {k:"DP Avg",        v:(ev.dpAvg != null ? ev.dpAvg.toFixed(0) : Math.round(((lp.dp1||0)+(lp.dp2||0))/2)), unit:"kPa"}
     ],
     thresholds: [
-      {k:"Primary CHWS", v:"Locked 7.2 °C (engine)"},
-      {k:"Loop ΔT",      v:"Warn outside 6.0–9.0 °C"},
-      {k:"Loop Flow",    v:"Disconnect < 1.5 L/s"}
+      {k:"Primary CHWS", v:(st.header && st.header.chws != null) ? `Locked ${st.header.chws.toFixed(1)} °C (engine)` : "UNAVAILABLE"},
+      {k:"Loop Return",   v:(CHW.chwr != null) ? `Warn > ${(CHW.chwr + 0.8).toFixed(1)} °C` : "UNAVAILABLE"},
+      {k:"Loop Flow",     v:(LOOP_FLOW_DESIGN != null) ? `Warn < ${LOOP_FLOW_WARNING_MIN.toFixed(1)} L/s · disconnect < 1.5 L/s` : "UNAVAILABLE"}
     ],
     trend: "Loop flow, DP, secondary T1/T2, pump speed, compressor staging — last 15 min trail",
     alarms: (ev.level && ev.level !== "NORMAL")
@@ -2146,7 +2377,12 @@ function updateLoopInspector(id){
   if(!window.RZBMSShell || !window.RZBMSShell.inspector) return;
   const host = document.getElementById("chillerInspector");
   if(!host) return;
-  window.RZBMSShell.inspector.select(host, loopInspectorPayload(id));
+  const payload = loopInspectorPayload(id);
+  if(!payload){
+    host.innerHTML = '<div class="meta">Selected-equipment detail UNAVAILABLE — restore governed engine authority.</div>';
+    return;
+  }
+  window.RZBMSShell.inspector.select(host, payload);
 }
 
 function initBmsShellShim(){
@@ -2180,7 +2416,10 @@ function initBmsShellShim(){
   }
   /* Default inspector content — placeholder until first selection. */
   const host = document.getElementById("chillerInspector");
-  if(host) window.RZBMSShell.inspector.clear(host);
+  if(host){
+    if(CHW_AUTHORITY_AVAILABLE) window.RZBMSShell.inspector.clear(host);
+    else host.innerHTML = '<div class="meta">Selected-equipment detail UNAVAILABLE — restore governed engine authority.</div>';
+  }
 }
 
 function init(){

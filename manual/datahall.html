@@ -27,7 +27,7 @@
 
     <!-- SEO Meta Tags -->
     <title>Data Hall SCADA Console — Technical Manual &amp; Methodology | ResistanceZero</title>
-    <meta name="description" content="Engineering manual for the Data Hall SCADA Console: deterministic rack power, cooling margin, alarm logic, CHW flow, PUE and a sourced 1.85 MW example.">
+    <meta name="description" content="Engineering manual for the four-hall Conventional Data Centre SCADA: governed 30 MW IT basis, rack loading, cooling, alarms, PUE, WUE, and CHW flow.">
     <meta name="ai-content-declaration" content="human-authored">
     <meta name="keywords" content="data hall SCADA, conventional data center basis, PUE derivation, CHW flow calculation, WUE methodology, CRAH cooling, UPS losses, fuel autonomy, ASHRAE TC9.9, Uptime Institute tier">
     <meta name="author" content="Bagus Dwi Permana">
@@ -41,7 +41,7 @@
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://resistancezero.com/manual/datahall.html">
     <meta property="og:title" content="Data Hall SCADA Console — Technical Manual &amp; Methodology">
-    <meta property="og:description" content="Locked conventional basis, KPI derivations, and worked example (1,850 kW) behind the Data Hall SCADA cockpit.">
+    <meta property="og:description" content="Governed four-hall conventional basis and current 30 MW operating derivations behind the Data Hall SCADA cockpit.">
     <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
     <meta property="og:image:alt" content="Data Hall SCADA Console Methodology">
     <meta property="og:locale" content="en_US">
@@ -91,10 +91,10 @@
         "@type": "HowTo",
         "name": "How to read the Data Hall SCADA cockpit KPI strip",
         "step": [
-            { "@type": "HowToStep", "name": "Identify the locked basis", "text": "The cockpit derives every KPI from CONV_CALC, the deep-frozen conventional scenario object in js/conv-engine.js. IT load = 1,850 kW, PUE = 1.45. No user inputs modify these values." },
-            { "@type": "HowToStep", "name": "Interpret Facility Load", "text": "Facility Load = IT Load x PUE = 1,850 x 1.45 = 2,682.5 kW. This is the total power drawn at the point of utility metering." },
-            { "@type": "HowToStep", "name": "Read CHW flow", "text": "CHW flow = IT Load / (4.186 x delta-T) = 1,850 / (4.186 x 7.6) = 58.1 L/s, where delta-T = CHWR (14.8 C) minus CHWS (7.2 C)." },
-            { "@type": "HowToStep", "name": "Verify fuel autonomy", "text": "Autonomy = (60,000 L x 0.90 x 0.85) / 956 L/hr = 48.0 hr. This is the runtime at current facility load before the tank reaches the unusable heel." }
+            { "@type": "HowToStep", "name": "Identify the governed basis", "text": "The cockpit derives every KPI from CONV_CALC v2.0.0. Current operation is 30,000 kW IT across four equal 7,500 kW halls; governed design capacity is 40,000 kW." },
+            { "@type": "HowToStep", "name": "Interpret Facility Load", "text": "Facility Load = IT Load x PUE = 30,000 x 1.45 = 43,500 kW at the site utility boundary." },
+            { "@type": "HowToStep", "name": "Read CHW reference flow", "text": "The published 943.0 L/s is the IT sensible-load reference: 30,000 / (4.186 x 7.6). The 31,250 kW evaporator-duty reference is 982.3 L/s; actual header flow is unavailable without a meter." },
+            { "@type": "HowToStep", "name": "Verify water intensity", "text": "Cooling-makeup equivalent = WUE x IT Load / 60 = 1.20 x 30,000 / 60 = 600 L/min. WUE uses site water divided by IT energy." }
         ]
     }
     </script>
@@ -108,17 +108,17 @@
             {
                 "@type": "Question",
                 "name": "Why does the Data Hall cockpit show fixed numbers instead of accepting user input?",
-                "acceptedAnswer": { "@type": "Answer", "text": "The cockpit is a locked-basis SCADA simulator, not a parametric calculator. All KPIs derive from CONV_CALC, a single deep-frozen conventional scenario object (IT load 1,850 kW, PUE 1.45, CHW 7.2/14.8 C). Immutability guarantees that every derived number is engineering-defensible and consistent across all pages of the conventional BMS suite." }
+                "acceptedAnswer": { "@type": "Answer", "text": "The cockpit is a governed SCADA simulator, not a parametric calculator. All KPIs derive from the immutable CONV_CALC v2.0.0 snapshot: 30,000 kW current IT, 40,000 kW design IT, PUE 1.45, and CHW 19.4/27.0 C." }
             },
             {
                 "@type": "Question",
                 "name": "How is PUE derived for the cockpit?",
-                "acceptedAnswer": { "@type": "Answer", "text": "PUE = Facility Load / IT Load = 2,682.5 / 1,850 = 1.45. The 1.45 value is the locked basis constant from conv-engine.js (sourced from 09-engineering-basis-and-calculations.md line 11). Facility Load is then IT x PUE, not the other way around; PUE is the input, Facility Load is the derived quantity." }
+                "acceptedAnswer": { "@type": "Answer", "text": "PUE = Facility Load / IT Load = 43,500 / 30,000 = 1.45. PUE is the adopted project input; facility load is the derived quantity." }
             },
             {
                 "@type": "Question",
                 "name": "What is WUE and how is it computed?",
-                "acceptedAnswer": { "@type": "Answer", "text": "WUE (Water Usage Effectiveness) = annual water consumption / annual IT energy (L/kWh). The instant equivalent is (water flow L/min x 60) / IT load kW. At basis: (37.0 L/min x 60) / 1,850 = 1.20 L/kWh, matching the basis constant in CONV_CALC." }
+                "acceptedAnswer": { "@type": "Answer", "text": "WUE is annual site water divided by annual IT energy in L/kWh. The steady-state equivalent is (600 L/min x 60) / 30,000 kW = 1.20 L/kWh. The water plant is site-wide; Hall A-D selection does not divide the municipal treatment train." }
             }
         ]
     }
@@ -315,9 +315,9 @@
             <h1>Data Hall SCADA Console — Methodology &amp; Formulas</h1>
             <p>Every basis parameter, derivation, constant, KPI output, and reference behind the conventional SCADA cockpit. Current operation derives from the deep-frozen <code class="mn-mono">CONV_CALC</code> snapshot; the separate Hall A–D capacity context derives from <code class="mn-mono">RZConvDesignBasis.STUDY</code>. Neither authority is mutated by the selector.</p>
             <div class="mn-meta">
-                <span class="mn-chip">Engine <strong>CONV_CALC v1.0.0</strong></span>
-                <span class="mn-chip">Basis <strong>Locked snapshot</strong></span>
-                <span class="mn-chip">IT Load <strong>1,850 kW</strong></span>
+                <span class="mn-chip">Engine <strong>CONV_CALC v2.0.0</strong></span>
+                <span class="mn-chip">Basis <strong>Simulated / adopted</strong></span>
+                <span class="mn-chip">Site IT <strong>30,000 kW</strong></span>
                 <span class="mn-chip">PUE <strong>1.45</strong></span>
                 <span class="mn-chip">KPIs <strong>9</strong></span>
             </div>
@@ -327,7 +327,7 @@
         <!-- 1. PURPOSE & ENGINEERING BASIS -->
         <section class="mn-section">
             <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
-            <p class="mn-lead">The Data Hall SCADA Console is a <strong>locked-basis cockpit simulator</strong> for a single conventional IT hall. It does not accept user inputs. Instead, every KPI on the instrument strip is derived from a single deep-frozen conventional scenario object — <code class="mn-mono">CONV_CALC</code> — which holds the only authored inputs for the entire conventional BMS suite (dc-conventional, EPMS, datahall, chiller-plant, fire-system, fuel-system, water-system, ict). Immutability guarantees engineering consistency: a value displayed on this page will always reconcile with the same value on any other page in the suite.</p>
+            <p class="mn-lead">The Data Hall SCADA Console is a <strong>governed-basis cockpit simulator</strong> for a four-hall conventional data centre. It does not accept arbitrary operating inputs. Every KPI derives from the deep-frozen <code class="mn-mono">CONV_CALC v2.0.0</code> snapshot shared by the Conventional BMS suite. Current operation is 30 MW IT across four equal 7.5 MW halls; 4 × 10 MW is the governed design boundary, not a second live operating value.</p>
             <p class="mn-lead">The basis is documented in <code class="mn-mono">Documents/screenshot bms rz/conv/review/09-engineering-basis-and-calculations.md</code> and codified in <code class="mn-mono">js/conv-engine.js</code>. The governing accuracy rules (ACCURACY_VALIDATION 6 rules) are:</p>
             <div class="mn-tablewrap">
             <table class="mn-table">
@@ -336,14 +336,14 @@
                     <tr><td><code>R1</code></td><td><strong>Single source of truth</strong> — every page reads from <code>CONV_CALC</code>; no page duplicates or hardcodes a value that conv-engine already computes.</td></tr>
                     <tr><td><code>R2</code></td><td><strong>No Math.random() on basis KPIs</strong> — all KPIs are deterministic; values must be stable on reload.</td></tr>
                     <tr><td><code>R3</code></td><td><strong>Explicit denominator on every metric</strong> — PUE = facility/IT; WUE denominator = IT kWh; carbon denominator = facility kWh (not IT).</td></tr>
-                    <tr><td><code>R4</code></td><td><strong>Marketing target ≠ derived value</strong> — design capacity (2,000 kW) and current load (1,850 kW) are separate constants; never conflate them.</td></tr>
+                    <tr><td><code>R4</code></td><td><strong>Design ≠ operation</strong> — 40,000 kW design and 30,000 kW current IT are separate fields; never relabel one as the other.</td></tr>
                     <tr><td><code>R5</code></td><td><strong>Terminology must match engineering basis</strong> — CHWS/CHWR labels, UPS loss formula, heat rejection path must match doc-09 exactly.</td></tr>
                     <tr><td><code>R6</code></td><td><strong>Basis chip on every critical KPI</strong> — every displayed derived number carries a source annotation traceable to a line in the review docs.</td></tr>
                 </tbody>
             </table>
             </div>
             <div class="mn-note"><strong>No user inputs:</strong> this is a SCADA display cockpit, not a parametric calculator. The scenario is fixed to a real-world-representative conventional data hall. If you need to explore alternate PUE or CHW parameters, use the <a class="mn-inline" href="../dc-conventional.html">DC Conventional Calculator</a>.</div>
-            <div class="mn-note"><strong>Current versus study:</strong> the current rack field remains the frozen 1,850 kW / 200-cell Hall A training snapshot (9.25 kW/cell average). The governed planning study is four 10 MW IT halls with 500 racks/hall at 20 kW/rack average. Its Hall selector is view-only. The study uses 25.4 °C as a project rack-inlet target inside the ASHRAE recommended 18–27 °C envelope; it does not relabel CRAH discharge air, current cold-aisle temperature or CHW temperature.</div>
+            <div class="mn-note"><strong>Current versus design:</strong> each hall carries 7,500 kW current IT over 500 installed rack positions (15.0 kW per installed position; approximately 16.2 kW per active rack in the current deterministic field). Design is 10,000 kW per hall at 20 kW/rack average, with a selected study peak of 30 kW/rack. Hall selection changes inspection context only. The 25.4 °C rack-inlet target remains normal inside the ASHRAE A-class 18–27 °C recommended envelope.</div>
         </section>
 
         <!-- 2. LOCKED BASIS PARAMETERS -->
@@ -354,23 +354,23 @@
             <table class="mn-table">
                 <thead><tr><th>Parameter</th><th>Key in CONV_MODEL</th><th>Value</th><th>Unit</th><th>Source (doc-09 line)</th></tr></thead>
                 <tbody>
-                    <tr><td>IT design capacity</td><td><code>site.it_design_kw</code></td><td>2,000</td><td>kW</td><td>09 line 9 ("IT design capacity 2,000 kW")</td></tr>
-                    <tr><td>Current IT load</td><td><code>site.it_load_kw</code></td><td>1,850</td><td>kW</td><td>09 line 10 ("Current IT load 1,850 kW")</td></tr>
+                    <tr><td>Site IT design capacity</td><td><code>site.it_design_kw</code></td><td>40,000</td><td>kW</td><td>Governed four-hall design boundary</td></tr>
+                    <tr><td>Current site IT load</td><td><code>site.it_load_kw</code></td><td>30,000</td><td>kW</td><td>Adopted current operating snapshot</td></tr>
                     <tr><td>PUE</td><td><code>site.pue</code></td><td>1.45</td><td>—</td><td>09 line 11 ("PUE 1.45")</td></tr>
                     <tr><td>WUE</td><td><code>environment.wue_l_per_kwh</code></td><td>1.20</td><td>L/kWh</td><td>09 line 13 ("WUE 1.20 L/kWh")</td></tr>
                     <tr><td>Grid carbon intensity</td><td><code>environment.carbon_kg_per_facility_kwh</code></td><td>0.42</td><td>kgCO₂/kWh</td><td>09 line 14 (denominator = facility kWh)</td></tr>
-                    <tr><td>Cold-aisle avg temperature</td><td><code>environment.avg_temp_c</code></td><td>22.4</td><td>°C</td><td>01-dashboard-review.md §"Right-Side Stats Panel"; ASHRAE TC9.9 recommended band</td></tr>
+                    <tr><td>Rack-inlet target</td><td><code>cooling.rack_inlet_target_c</code></td><td>25.4</td><td>°C</td><td>Project target within the ASHRAE A-class 18–27 °C recommended envelope</td></tr>
                     <tr><td>Relative humidity</td><td><code>environment.avg_rh_pct</code></td><td>48</td><td>%RH</td><td>Project operating basis. ASHRAE equipment guidance is class/dew-point dependent; 40–60% is not presented as a universal standard.</td></tr>
-                    <tr><td>CHW supply temperature</td><td><code>cooling.chws_c</code></td><td>7.2</td><td>°C</td><td>09 line 15 ("CHW supply 7.2 C") — canonical CHW basis decision</td></tr>
-                    <tr><td>CHW return temperature</td><td><code>cooling.chwr_c</code></td><td>14.8</td><td>°C</td><td>09 line 15 ("CHW return 14.8 C") — canonical CHW basis decision</td></tr>
-                    <tr><td>Chillers running / total</td><td><code>cooling.chillers_running/total</code></td><td>2 / 3</td><td>—</td><td>01-dashboard-review.md §2 ("Chillers 2/3")</td></tr>
+                    <tr><td>CHW supply temperature</td><td><code>cooling.chws_c</code></td><td>19.4</td><td>°C</td><td>Adopted warm-water conventional loop</td></tr>
+                    <tr><td>CHW return temperature</td><td><code>cooling.chwr_c</code></td><td>27.0</td><td>°C</td><td>Adopted warm-water conventional loop</td></tr>
+                    <tr><td>Chillers running / installed</td><td><code>cooling.chillers_running/total</code></td><td>7 / 10</td><td>—</td><td>Central water-cooled centrifugal plant</td></tr>
                     <tr><td>UPS efficiency</td><td><code>electrical.ups_efficiency</code></td><td>0.96</td><td>fraction</td><td>09 line 39 ("UPS losses @ 96% efficiency 77 kW")</td></tr>
-                    <tr><td>UPS modules (2N)</td><td><code>electrical.ups_module_count</code></td><td>2</td><td>—</td><td>01-dashboard §"UPS A / UPS B", 2N topology</td></tr>
+                    <tr><td>UPS modules (2N)</td><td><code>electrical.ups_module_count</code></td><td>64</td><td>—</td><td>Two 32-module systems; 2N topology</td></tr>
                     <tr><td>Metering tolerance</td><td><code>electrical.metering_tolerance_pct</code></td><td>±2</td><td>%</td><td>12-qa-acceptance-criteria.md line 9 ("within 2%")</td></tr>
-                    <tr><td>Fuel tank capacity</td><td><code>fuel.tank_capacity_l</code></td><td>60,000</td><td>L</td><td>09 line 140 ("Tank capacity = 60,000 L")</td></tr>
+                    <tr><td>Fuel tank capacity</td><td><code>fuel.tank_capacity_l</code></td><td>972,737</td><td>L</td><td>Scaled current site authority; nameplate evidence class ASSUMED</td></tr>
                     <tr><td>Usable fuel fraction</td><td><code>fuel.usable_fraction</code></td><td>0.90</td><td>fraction</td><td>09 line 141 ("Usable fraction = 90%")</td></tr>
                     <tr><td>Fuel level (current)</td><td><code>fuel.level_pct</code></td><td>85</td><td>%</td><td>09 lines 16, 126 ("Fuel level 85%")</td></tr>
-                    <tr><td>Generator consumption</td><td><code>fuel.generator_consumption_lph</code></td><td>956</td><td>L/hr</td><td>09 lines 144–147 (~956 L/hr at ~2.7 MW gives 48 hr)</td></tr>
+                    <tr><td>Generator consumption</td><td><code>fuel.generator_consumption_lph</code></td><td>15,503</td><td>L/hr</td><td>Current facility-load basis; fixed-rate simulation</td></tr>
                 </tbody>
             </table>
             </div>
@@ -384,58 +384,61 @@
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Facility Load</h3>
             <div class="mn-formula">
                 <span class="mn-eq">Facility Load [kW] = IT Load × PUE</span>
-                <span class="mn-eq">= 1,850 × 1.45 = 2,682.5 kW</span>
+                <span class="mn-eq">= 30,000 × 1.45 = 43,500 kW</span>
                 <span class="mn-where">In <code>facilityLoadKw(m)</code>. Total power at the utility meter, including IT + all overhead (cooling, UPS losses, lighting, BMS). PUE is the input constant; facility load is derived.<span class="mn-src">CONV_CALC · facilityLoadKw · doc-09 lines 25–28</span></span>
             </div>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Non-IT Overhead Load</h3>
             <div class="mn-formula">
                 <span class="mn-eq">Non-IT Load [kW] = Facility Load − IT Load</span>
-                <span class="mn-eq">= 2,682.5 − 1,850 = 832.5 kW</span>
+                <span class="mn-eq">= 43,500 − 30,000 = 13,500 kW</span>
                 <span class="mn-where">In <code>nonItLoadKw(m)</code>. The overhead power consumed by cooling, electrical distribution, and support systems.<span class="mn-src">CONV_CALC · nonItLoadKw · doc-09 lines 32–34</span></span>
             </div>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">UPS Losses</h3>
             <div class="mn-formula">
                 <span class="mn-eq">UPS Loss [kW] = IT Load × (1 / η − 1)</span>
-                <span class="mn-eq">= 1,850 × (1/0.96 − 1) = 77.1 kW</span>
-                <span class="mn-where">In <code>upsLossKw(m)</code>. Input power above output at the stated UPS efficiency η = 0.96. Matches doc-09 line 39 ("UPS losses @ 96% efficiency 77 kW").<span class="mn-src">CONV_CALC · upsLossKw · doc-09 line 39</span></span>
+                <span class="mn-eq">= 30,000 × (1/0.96 − 1) = 1,250 kW</span>
+                <span class="mn-where">In <code>upsLossKw(m)</code>. Input power above output at the adopted UPS efficiency η = 0.96. This loss is a component of non-IT overhead, not the complete PUE overhead.<span class="mn-src">CONV_CALC v2.0.0 · upsLossKw</span></span>
             </div>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">CHW Delta-T</h3>
             <div class="mn-formula">
-                <span class="mn-eq">ΔT [°C] = CHWR − CHWS = 14.8 − 7.2 = 7.6 °C</span>
-                <span class="mn-where">In <code>chwDeltaT(m)</code>. Conventional chilled-water loop temperature rise across the CRAH coil. Basis locked at 7.2/14.8 °C per CHW basis decision (resolves the earlier 19.1/22.6 °C condenser-side confusion).<span class="mn-src">CONV_CALC · chwDeltaT · doc-09 line 83</span></span>
+                <span class="mn-eq">ΔT [°C] = CHWR − CHWS = 27.0 − 19.4 = 7.6 °C</span>
+                <span class="mn-where">In <code>chwDeltaT(m)</code>. This is the adopted warm-water CHW temperature rise across the CRAH coil; it is distinct from the condenser-water circuit at 32/37 °C.<span class="mn-src">CONV_CALC v2.0.0 · chwDeltaT</span></span>
             </div>
 
-            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">CHW Flow</h3>
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">CHW reference flow</h3>
             <div class="mn-formula">
                 <span class="mn-eq">Flow [L/s] = IT Load / (4.186 × ΔT)</span>
-                <span class="mn-eq">= 1,850 / (4.186 × 7.6) = 58.1 L/s</span>
-                <span class="mn-where">In <code>chwFlowLps(m)</code>. Sensible heat removal from the IT space. Constant 4.186 = specific heat of water kJ/(kg·K). The numerator is IT load (not heat rejection) matching the doc-09 canonical worked example (09 lines 81–85). Heat rejection (IT + UPS losses) is available as a sanity-check band.<span class="mn-src">CONV_CALC · chwFlowLps · doc-09 lines 81–85</span></span>
+                <span class="mn-eq">= 30,000 / (4.186 × 7.6) = 943.0 L/s</span>
+                <span class="mn-eq">Evaporator duty = IT + UPS loss = 30,000 + 1,250 = 31,250 kW</span>
+                <span class="mn-eq">Plant-duty CHW reference = 31,250 / (4.186 × 7.6) = 982.3 L/s</span>
+                <span class="mn-eq">Condenser/tower rejection = 31,250 + 5,153.4 = 36,403.4 kW</span>
+                <span class="mn-where">In <code>chwFlowLps(m)</code>. This is the IT sensible-load reference, not a measured header flow. Current evaporator duty is 31,250 kW and its same-ΔT reference is 982.3 L/s; condenser/tower rejection is 36,403.4 kW.<span class="mn-src">CONV_CALC v2.0.0 · chwFlowLps</span></span>
             </div>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Water Flow / WUE</h3>
             <div class="mn-formula">
                 <span class="mn-eq">Water Flow [L/min] = (WUE × IT Load) / 60</span>
-                <span class="mn-eq">= (1.20 × 1,850) / 60 = 37.0 L/min</span>
-                <span class="mn-eq">WUE check = (Flow × 60) / IT Load = (37.0 × 60) / 1,850 = 1.20 L/kWh ✓</span>
-                <span class="mn-where">In <code>waterFlowLpmForWue(m)</code> and <code>wueFromFlowLpm(m, lpm)</code>. Instant-equivalent cooling-makeup water flow derived from WUE. WUE denominator is IT energy (kWh), <em>not</em> facility energy.<span class="mn-src">CONV_CALC · waterFlowLpmForWue · doc-09 lines 99–104</span></span>
+                <span class="mn-eq">= (1.20 × 30,000) / 60 = 600 L/min</span>
+                <span class="mn-eq">WUE check = (600 × 60) / 30,000 = 1.20 L/kWh ✓</span>
+                <span class="mn-where">In <code>waterFlowLpmForWue(m)</code> and <code>wueFromFlowLpm(m, lpm)</code>. This is the site-wide steady-state cooling-makeup equivalent. WUE denominator is IT energy, never facility energy or a selected Hall view.<span class="mn-src">CONV_CALC v2.0.0 · waterFlowLpmForWue</span></span>
             </div>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Carbon Emissions</h3>
             <div class="mn-formula">
                 <span class="mn-eq">Carbon [kgCO₂/hr] = Facility Load × Grid Factor</span>
-                <span class="mn-eq">= 2,682.5 × 0.42 = 1,126.7 kgCO₂/hr</span>
+                <span class="mn-eq">= 43,500 × 0.42 = 18,270 kgCO₂/hr</span>
                 <span class="mn-where">In <code>carbonKgPerHr(m)</code>. Denominator is <em>facility</em> kWh per Rule R3 (carbon is a facility-level metric, not IT-level). Grid factor 0.42 kgCO₂/kWh sourced from doc-09 line 14.<span class="mn-src">CONV_CALC · carbonKgPerHr · doc-09 lines 155–158, 167</span></span>
             </div>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Fuel Autonomy</h3>
             <div class="mn-formula">
                 <span class="mn-eq">Usable Fuel [L] = Tank × Usable Fraction × Level%</span>
-                <span class="mn-eq">= 60,000 × 0.90 × 0.85 = 45,900 L</span>
-                <span class="mn-eq">Autonomy [hr] = Usable Fuel / Consumption = 45,900 / 956 = 48.0 hr</span>
-                <span class="mn-where">In <code>fuelUsableL(m)</code> and <code>fuelAutonomyHr(m)</code>. Usable fraction accounts for the tank heel (unusable bottom layer). Generator consumption 956 L/hr at facility load ~2.7 MW gives exactly 48 hr.<span class="mn-src">CONV_CALC · fuelAutonomyHr · doc-09 lines 133–147</span></span>
+                <span class="mn-eq">= 972,737 × 0.90 × 0.85 = 744,144 L (rounded)</span>
+                <span class="mn-eq">Autonomy [hr] = Usable Fuel / Consumption = 744,144 / 15,503 = 48.0 hr</span>
+                <span class="mn-where">In <code>fuelUsableL(m)</code> and <code>fuelAutonomyHr(m)</code>. The current tank and consumption are scaled site assumptions; the fuel cockpit labels their nameplate evidence class separately.<span class="mn-src">CONV_CALC v2.0.0 · fuelAutonomyHr</span></span>
             </div>
         </section>
 
@@ -448,12 +451,12 @@
                 <thead><tr><th>Constant</th><th>Value</th><th>Authority</th><th>Notes</th></tr></thead>
                 <tbody>
                     <tr><td>Specific heat of water</td><td><code>4.186 kJ/(kg·K)</code></td><td>ASHRAE Fundamentals 2021 §Thermodynamics</td><td>Used in CHW flow and heat rejection calculations.</td></tr>
-                    <tr><td>CHW supply / return</td><td><code>7.2 / 14.8 °C</code></td><td>doc-09 lines 15, 81–84; doc-00 §"Single Capacity Basis" line 62</td><td>Canonical basis locked to conventional chilled-water loop (not condenser side).</td></tr>
-                    <tr><td>UPS efficiency η</td><td><code>0.96 (96%)</code></td><td>doc-09 line 39; IEC 62040-3 typical transformer-free double-conversion</td><td>Gives 77 kW loss at 1,850 kW IT (check: 1,850×(1/0.96−1) = 77.1 kW).</td></tr>
+                    <tr><td>CHW supply / return</td><td><code>19.4 / 27.0 °C</code></td><td>Adopted project scenario</td><td>Warm-water CHW circuit; condenser water is separately 32/37 °C.</td></tr>
+                    <tr><td>UPS efficiency η</td><td><code>0.96 (96%)</code></td><td>Project assumption; IEC 62040-3 reporting context</td><td>Gives 1,250 kW conversion loss at 30,000 kW IT.</td></tr>
                     <tr><td>Grid carbon factor</td><td><code>0.42 kgCO₂/kWh</code></td><td>doc-09 line 14</td><td>Facility-energy denominator per R3. Facility = IT × PUE.</td></tr>
                     <tr><td>WUE</td><td><code>1.20 L/kWh</code></td><td>doc-09 line 13; ISO/IEC 30134-9:2022 reporting context</td><td>Project/model value with IT-energy denominator; no universal “good” grade is asserted.</td></tr>
                     <tr><td>Metering tolerance</td><td><code>±2%</code></td><td>doc-12 line 9 ("within 2%")</td><td>Applies to EPMS total kW display; nominal = facility load without offset.</td></tr>
-                    <tr><td>Generator consumption</td><td><code>956 L/hr</code></td><td>doc-09 lines 144–147</td><td>At ~2.7 MW facility load. Used only for fuel autonomy; cockpit does not display load-dependent fuel burn.</td></tr>
+                    <tr><td>Generator consumption</td><td><code>15,503 L/hr</code></td><td>CONV_CALC v2.0.0 adopted scenario</td><td>At 43.5 MW facility load. Used for the deterministic autonomy study, not a manufacturer fuel curve.</td></tr>
                     <tr><td>Tank usable fraction</td><td><code>90%</code></td><td>doc-09 line 141; typical heel volume for above-ground diesel storage</td><td>Bottom 10% of tank volume is typically inaccessible sludge / unusable heel.</td></tr>
                 </tbody>
             </table>
@@ -468,40 +471,44 @@
             <table class="mn-table">
                 <thead><tr><th>KPI</th><th>Snapshot path</th><th>Value at basis</th><th>Unit</th><th>Derivation function</th></tr></thead>
                 <tbody>
-                    <tr><td>IT Load</td><td><code>snapshot.site.it_load_kw</code></td><td>1,850.0</td><td>kW</td><td>Authored constant (basis input)</td></tr>
-                    <tr><td>Facility Load</td><td><code>snapshot.site.facility_load_kw</code></td><td>2,682.5</td><td>kW</td><td><code>facilityLoadKw</code> — IT × PUE</td></tr>
+                    <tr><td>IT Load</td><td><code>snapshot.site.it_load_kw</code></td><td>30,000</td><td>kW</td><td>Adopted current operating input</td></tr>
+                    <tr><td>Facility Load</td><td><code>snapshot.site.facility_load_kw</code></td><td>43,500</td><td>kW</td><td><code>facilityLoadKw</code> — IT × PUE</td></tr>
                     <tr><td>PUE</td><td><code>snapshot.site.pue</code></td><td>1.45</td><td>—</td><td>Authored constant (basis input)</td></tr>
-                    <tr><td>CHW Flow</td><td><code>snapshot.cooling.flow_lps</code></td><td>58.1</td><td>L/s</td><td><code>chwFlowLps</code> — IT/(4.186×ΔT)</td></tr>
+                    <tr><td>IT sensible CHW reference</td><td><code>snapshot.cooling.flow_lps</code></td><td>943.0</td><td>L/s</td><td><code>chwFlowLps</code> — IT/(4.186×ΔT); not measured flow</td></tr>
+                    <tr><td>Evaporator duty</td><td><code>snapshot.cooling.heat_rejection_kw</code></td><td>31,250</td><td>kW</td><td>Historical compatibility key; IT plus UPS loss</td></tr>
+                    <tr><td>Plant-duty CHW reference</td><td><code>snapshot.cooling.heat_rejection_kw/(4.186×ΔT)</code></td><td>982.3</td><td>L/s</td><td>Current evaporator-duty reference; not measured flow</td></tr>
+                    <tr><td>Condenser/tower rejection</td><td><code>snapshot.cooling.tower_rejection_kw_th</code></td><td>36,403.4</td><td>kW</td><td>Evaporator duty plus chiller electrical input</td></tr>
                     <tr><td>WUE</td><td><code>snapshot.environment.wue_l_per_kwh</code></td><td>1.20</td><td>L/kWh</td><td>Authored constant; verified by <code>wueFromFlowLpm</code></td></tr>
-                    <tr><td>Water Flow</td><td><code>snapshot.water.flow_lpm_for_wue</code></td><td>37.0</td><td>L/min</td><td><code>waterFlowLpmForWue</code> — (WUE×IT)/60</td></tr>
-                    <tr><td>Carbon Rate</td><td><code>snapshot.environment.carbon_kg_per_hr</code></td><td>1,126.7</td><td>kgCO₂/hr</td><td><code>carbonKgPerHr</code> — Facility×GridFactor</td></tr>
+                    <tr><td>Water Flow</td><td><code>snapshot.water.flow_lpm_for_wue</code></td><td>600</td><td>L/min</td><td><code>waterFlowLpmForWue</code> — (WUE×IT)/60</td></tr>
+                    <tr><td>Carbon Rate</td><td><code>snapshot.environment.carbon_kg_per_hr</code></td><td>18,270</td><td>kgCO₂/hr</td><td><code>carbonKgPerHr</code> — Facility×GridFactor</td></tr>
                     <tr><td>Fuel Autonomy</td><td><code>snapshot.fuel.autonomy_hr</code></td><td>48.0</td><td>hr</td><td><code>fuelAutonomyHr</code> — UsableL/ConsumptionLph</td></tr>
-                    <tr><td>UPS Loss</td><td><code>snapshot.electrical.ups_loss_kw</code></td><td>77.1</td><td>kW</td><td><code>upsLossKw</code> — IT×(1/η−1)</td></tr>
+                    <tr><td>UPS Loss</td><td><code>snapshot.electrical.ups_loss_kw</code></td><td>1,250</td><td>kW</td><td><code>upsLossKw</code> — IT×(1/η−1)</td></tr>
                 </tbody>
             </table>
             </div>
-            <div class="mn-note"><strong>EPMS cross-check:</strong> <code>snapshot.electrical.epms_total_kw</code> = 2,682.5 kW (= facility load, within the ±2% metering tolerance per doc-12 line 9). The probe <code>tools/probe-accuracy-validation.mjs</code> asserts this reconciliation on every CI run.</div>
+            <div class="mn-note"><strong>EPMS cross-check:</strong> <code>snapshot.electrical.epms_total_kw</code> = 43,500 kW, equal to site facility load. Hall-level EPMS reconciliation is <strong>UNAVAILABLE</strong> until a hall submeter authority exists; an equal 7,500 kW share is planning context only and must never render as a measured balance.</div>
         </section>
 
         <!-- 6. WORKED EXAMPLE -->
         <section class="mn-section">
-            <h2><span class="mn-num">06</span> Worked example — 1,850 kW scenario</h2>
+            <h2><span class="mn-num">06</span> Worked example — current 30 MW site</h2>
             <p class="mn-lead">The exact scenario displayed on the live cockpit. Each number is reproduced from <code class="mn-mono">CONV_CALC.snapshot</code> and must match the live page within ±0.1 (one decimal place rounding).</p>
             <div class="mn-worked">
                 <ol>
-                    <li>IT Load (authored basis): <span class="mn-result">1,850.0 kW</span></li>
-                    <li>Facility Load: <code>1,850 × 1.45 =</code> <span class="mn-result">2,682.5 kW</span></li>
-                    <li>Non-IT Overhead: <code>2,682.5 − 1,850 =</code> <span class="mn-result">832.5 kW</span></li>
-                    <li>UPS Losses: <code>1,850 × (1/0.96 − 1) =</code> <span class="mn-result">77.1 kW</span> (rounds to 77.1 kW; doc-09 states "77 kW" — within tolerance)</li>
-                    <li>CHW delta-T: <code>14.8 − 7.2 =</code> <span class="mn-result">7.6 °C</span></li>
-                    <li>CHW Flow: <code>1,850 / (4.186 × 7.6) =</code> <span class="mn-result">58.1 L/s</span></li>
-                    <li>Water Flow: <code>(1.20 × 1,850) / 60 =</code> <span class="mn-result">37.0 L/min</span></li>
-                    <li>WUE check: <code>(37.0 × 60) / 1,850 =</code> <span class="mn-result">1.20 L/kWh ✓</span></li>
-                    <li>Carbon rate: <code>2,682.5 × 0.42 =</code> <span class="mn-result">1,126.7 kgCO₂/hr</span></li>
-                    <li>Usable fuel: <code>60,000 × 0.90 × 0.85 =</code> <span class="mn-result">45,900 L</span></li>
-                    <li>Fuel autonomy: <code>45,900 / 956 =</code> <span class="mn-result">48.0 hr</span></li>
-                    <li>Active racks at 6 kW/rack: <code>floor(1,850 / 6) =</code> <span class="mn-result">308 racks</span></li>
-                    <li>Active racks at 10 kW/rack: <code>floor(1,850 / 10) =</code> <span class="mn-result">185 racks</span></li>
+                    <li>Current site IT: <span class="mn-result">30,000 kW</span>; design boundary: <span class="mn-result">40,000 kW</span>.</li>
+                    <li>Facility Load: <code>30,000 × 1.45 =</code> <span class="mn-result">43,500 kW</span>.</li>
+                    <li>Non-IT Overhead: <code>43,500 − 30,000 =</code> <span class="mn-result">13,500 kW</span>.</li>
+                    <li>UPS Losses: <code>30,000 × (1/0.96 − 1) =</code> <span class="mn-result">1,250 kW</span>.</li>
+                    <li>CHW delta-T: <code>27.0 − 19.4 =</code> <span class="mn-result">7.6 °C</span>.</li>
+                    <li>IT sensible CHW reference: <code>30,000 / (4.186 × 7.6) =</code> <span class="mn-result">943.0 L/s</span>; plant-duty reference: <span class="mn-result">982.3 L/s</span>; actual header flow is unavailable.</li>
+                    <li>Water Flow: <code>(1.20 × 30,000) / 60 =</code> <span class="mn-result">600 L/min</span>.</li>
+                    <li>WUE check: <code>(600 × 60) / 30,000 =</code> <span class="mn-result">1.20 L/kWh ✓</span>.</li>
+                    <li>Carbon rate: <code>43,500 × 0.42 =</code> <span class="mn-result">18,270 kgCO₂/hr</span>.</li>
+                    <li>Per hall: <code>30,000 / 4 =</code> <span class="mn-result">7,500 kW IT</span> over 500 positions.</li>
+                    <li>Installed-position density: <code>7,500 / 500 =</code> <span class="mn-result">15.0 kW/rack</span>; design average is 20 kW/rack.</li>
+                    <li>Campus rack inventory: <code>4 × 500 =</code> <span class="mn-result">2,000 racks</span>.</li>
+                    <li>Usable fuel study: <code>972,737 × 0.90 × 0.85 =</code> <span class="mn-result">744,144 L</span>.</li>
+                    <li>Fuel autonomy study: <code>744,144 / 15,503 =</code> <span class="mn-result">48.0 hr</span>.</li>
                 </ol>
             </div>
             <div class="mn-note"><strong>Engineering reading:</strong> PUE 1.45, WUE 1.20 L/kWh and 48-hour fuel autonomy are declared project/model values. This cockpit does not assign them a universal “good” grade or claim that a particular fuel duration proves an Uptime Tier. The owner’s risk policy, utility reliability, delivery contract, load-dependent generator curve and certification authority govern any operational target.</div>
@@ -519,24 +526,24 @@
                 <li><b>ASHRAE Fundamentals 2021 §Thermodynamics</b> — Specific heat of water 4.186 kJ/(kg·K) at 10 °C (CHW regime).</li>
                 <li><b>conv/review/09-engineering-basis-and-calculations.md</b> — Primary authority for all basis constants (IT load, PUE, CHW temperatures, WUE, carbon factor, fuel system parameters).</li>
                 <li><b>conv/review/00-overview-audit.md</b> — Six data-quality rules and cross-page consistency contract for the conventional BMS suite.</li>
-                <li><b>Engine source</b> — <code class="mn-mono">js/conv-engine.js</code> (CONV_CALC v1.0.0) — deep-frozen scenario object + pure derivation functions.</li>
-                <li><b>Accuracy gate</b> — <code class="mn-mono">tools/probe-accuracy-validation.mjs</code> (40/40 assertions) + <code class="mn-mono">tools/test-conv-calc.mjs</code> (22/22 DoD identities).</li>
+                <li><b>Engine source</b> — <code class="mn-mono">js/conv-engine.js</code> (CONV_CALC v2.0.0) — deep-frozen current-operation and design-boundary snapshot.</li>
+                <li><b>Accuracy gates</b> — <code class="mn-mono">tools/test-conv-calc.mjs</code>, <code class="mn-mono">tools/test-conv-coverage.mjs</code>, and <code class="mn-mono">tools/test-conv-document-parity.mjs</code>.</li>
             </ul>
         </section>
 
         <!-- 8. ASSUMPTIONS & LIMITS -->
         <section class="mn-section">
             <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
-            <p class="mn-lead">The cockpit models a <strong>single-hall, steady-state</strong> conventional data center at the stated load point. Key assumptions and their engineering justification:</p>
+            <p class="mn-lead">The cockpit models a <strong>four-hall, steady-state</strong> conventional data centre at the adopted load point. Hall A-D are equal operating views; central plant and site utilities remain site authorities.</p>
             <div class="mn-tablewrap">
             <table class="mn-table">
                 <thead><tr><th>Assumption</th><th>Basis</th><th>Impact if violated</th></tr></thead>
                 <tbody>
-                    <tr><td>IT load is stable at 1,850 kW</td><td>Locked basis; represents the current operating point per doc-09 line 10.</td><td>PUE, CHW flow, WUE, and carbon all scale linearly with IT load — if load changes, all derived KPIs shift proportionally.</td></tr>
-                    <tr><td>CHW loop is conventional (7.2/14.8 °C)</td><td>CHW basis decision (conv-engine.js header); resolves the earlier 7.2/14.8 vs 19.1/22.6 °C conflict by assigning the higher temperatures to the condenser/secondary loop.</td><td>If the cockpit is adapted to a warm-water loop, ΔT increases and CHW flow drops; the chwFlowLps function must receive a different model object.</td></tr>
-                    <tr><td>PUE is measured (not design target)</td><td>Basis is the observed operating PUE = 1.45, not the design-target 1.4 or nameplate. Rule R4: marketing target ≠ derived value.</td><td>Using design-target PUE would understate facility load and carbon by ~3–5 %.</td></tr>
+                    <tr><td>IT load is stable at 30,000 kW</td><td>Adopted simulated operating point; four halls at 7,500 kW each.</td><td>PUE, CHW flow, WUE, carbon and fuel assumptions must all be regenerated if the current authority changes.</td></tr>
+                    <tr><td>CHW loop is 19.4/27.0 °C</td><td>Adopted warm-water CHW basis; condenser water is a distinct 32/37 °C circuit.</td><td>Changing either temperature changes ΔT and site CHW flow; all duplicate consumers must update together.</td></tr>
+                    <tr><td>PUE is an adopted simulated input (not live telemetry)</td><td>The governed model adopts PUE = 1.45 as its current design-point ratio; it is separate from a marketing target and is not claimed as a measured value. Rule R4: target ≠ adopted model input ≠ field measurement.</td><td>Substituting a lower target PUE would understate modeled facility load and carbon by ~3–5 %.</td></tr>
                     <tr><td>Carbon factor is grid-average (not marginal)</td><td>0.42 kgCO₂/kWh is an annual grid-average intensity. Marginal intensity varies hour-to-hour.</td><td>Carbon rate should be interpreted as an annual average indicator, not a real-time dispatch signal.</td></tr>
-                    <tr><td>Generator consumption is fixed-rate</td><td>956 L/hr at the full facility load ~2.7 MW. Actual consumption varies with generator loading.</td><td>Autonomy will be slightly optimistic at partial load (lower consumption) and pessimistic at above-design load.</td></tr>
+                    <tr><td>Generator consumption is fixed-rate</td><td>15,503 L/hr at the adopted 43.5 MW facility basis. Actual manufacturer curves vary with loading and ambient conditions.</td><td>The 48-hour result is a planning scenario, not a procurement guarantee.</td></tr>
                     <tr><td>Water flow is instant-equivalent</td><td><code>waterFlowLpmForWue</code> converts the annual WUE to an instantaneous flow rate. Actual cooling-tower makeup is intermittent.</td><td>Displayed as a steady-state equivalent; suitable for capacity sizing, not for variable-flow metering design.</td></tr>
                     <tr><td>UPS is transformer-free double-conversion (VFI)</td><td>η = 0.96 corresponds to modern transformer-free double-conversion UPS at full load per IEC 62040-3.</td><td>Legacy transformer-based UPS (η ≈ 0.90–0.94) would increase UPS losses by 35–75 kW and raise PUE slightly.</td></tr>
                 </tbody>
@@ -554,14 +561,14 @@
                 <thead><tr><th>Signal / control</th><th>ID or binding</th><th>Unit / state</th><th>Normal interpretation</th><th>Source binding</th></tr></thead>
                 <tbody>
                     <tr><td>Hall state</td><td><code>dh-hall-state</code></td><td>NORMAL / WARNING / CRITICAL</td><td>Worst active alarm severity.</td><td>Deterministic <code>alarms[]</code> aggregation in <code>datahall.html</code>.</td></tr>
-                    <tr><td>Rack IT load</td><td><code>dh-rack-load</code>, <code>bb-itload</code></td><td>MW</td><td>1.850 MW at the locked site/hall scope.</td><td><code>CONV_CALC.snapshot.site.it_load_kw</code>.</td></tr>
-                    <tr><td>Rack count / average</td><td><code>bb-racks</code>, <code>bb-avg</code></td><td>count, kW/rack</td><td>200 displayed cells; average 9.25 kW/rack.</td><td><code>TOTAL_RACKS</code>; IT kW ÷ rack count.</td></tr>
-                    <tr><td>Power density</td><td><code>dh-pd</code></td><td>kW/rack</td><td>Same denominator as average rack load.</td><td><code>site.it_kw / datahall.racks_total</code>.</td></tr>
-                    <tr><td>PUE</td><td><code>dh-pue</code></td><td>ratio</td><td>1.45 measured-basis value; not a target.</td><td><code>CONV_CALC.snapshot.site.pue</code>.</td></tr>
-                    <tr><td>Cooling margin</td><td><code>dh-cooling-margin</code>, <code>bb-cool</code></td><td>%, kW</td><td>Available running CRAH capacity minus IT sensible demand.</td><td>17 running × 130 kW − 1,850 kW.</td></tr>
-                    <tr><td>Cooling N+1</td><td><code>bb-np1</code></td><td>PASS / FAIL</td><td>One running CRAH may be lost and capacity still covers demand.</td><td>16 × 130 kW ≥ 1,850 kW.</td></tr>
-                    <tr><td>CHW plant</td><td><code>ch1..ch3</code>, <code>chws</code>, <code>chwr</code>, <code>chdt</code>, <code>chflow</code></td><td>state, °C, L/s</td><td>Two chillers run, one standby; temperatures and flow come from the frozen conventional scenario.</td><td><code>CONV_CALC.snapshot.cooling</code>.</td></tr>
-                    <tr><td>Alarm roll-up</td><td><code>as-crit</code>, <code>as-warn</code>, <code>as-maint</code></td><td>count</td><td>Rack and cold-aisle threshold breaches; maintenance equals standby CRAHs.</td><td><code>alarms[]</code>; 20 total − 17 running.</td></tr>
+                    <tr><td>Hall IT load</td><td><code>dh-rack-load</code>, <code>bb-itload</code></td><td>MW</td><td>7.500 MW for the selected equal-share Hall view.</td><td><code>CONV_CALC.snapshot.campus.halls[n].it_load_kw</code>.</td></tr>
+                    <tr><td>Rack count / average</td><td><code>bb-racks</code>, <code>bb-avg</code></td><td>count, kW/rack</td><td>500 installed positions; 15.0 kW per installed position and approximately 16.2 kW per active rack.</td><td>Selected hall authority plus deterministic occupancy.</td></tr>
+                    <tr><td>Power density</td><td><code>dh-pd</code></td><td>kW/rack</td><td>Same denominator as average rack load for the selected hall.</td><td><code>CONV_CALC.getHallSnapshot(selectedHall).it_load_kw / .racks</code>.</td></tr>
+                    <tr><td>PUE</td><td><code>dh-pue</code></td><td>ratio</td><td>1.45 adopted simulated design-point ratio; neither live telemetry nor a target.</td><td><code>CONV_CALC.snapshot.site.pue</code>.</td></tr>
+                    <tr><td>Cooling margin</td><td><code>dh-cooling-margin</code>, <code>bb-cool</code></td><td>%, kW</td><td>Available CRAH capacity minus selected Hall IT sensible demand.</td><td>58 required × 130 kW = 7,540 kW; 40 kW headroom.</td></tr>
+                    <tr><td>Cooling N+1</td><td><code>bb-np1</code></td><td>PASS / FAIL</td><td>The installed standby unit replaces one failed running unit and preserves 7,540 kW available.</td><td>59 installed; 58 required/running at the current hall load.</td></tr>
+                    <tr><td>CHW plant</td><td><code>chws</code>, <code>chwr</code>, <code>chdt</code>, <code>chflow</code></td><td>state, °C, L/s</td><td>Central plant 7/10; 943.0 L/s is the governed IT sensible-load reference, not a measured header-flow value.</td><td><code>CONV_CALC.snapshot.cooling</code>.</td></tr>
+                    <tr><td>Alarm roll-up</td><td><code>as-crit</code>, <code>as-warn</code>, <code>as-maint</code></td><td>count</td><td>Rack-inlet and rack-density threshold breaches; maintenance is explicit equipment state.</td><td><code>alarms[]</code> and current CRAH model.</td></tr>
                     <tr><td>Data health</td><td><code>as-comms</code>, <code>as-update</code>, <code>as-dq</code>, <code>as-scn</code></td><td>OK / timestamp / GOOD / Simulated</td><td>Declares freshness and provenance; does not imply a field connection.</td><td>Page clock plus static simulated-mode declaration.</td></tr>
                     <tr><td>Heat-map modes</td><td><code>mode-btn[data-mode]</code></td><td>power / temp / cooling-margin / alarms / space</td><td>One semantic layer at a time; selection is mirrored to the BMS layer toolbar.</td><td><code>setMode()</code> and <code>rackFill()</code>.</td></tr>
                     <tr><td>Rack / CRAH inspector</td><td><code>sel-detail</code>, <code>crahPop</code></td><td>tagged detail</td><td>Hover/click exposes source, utilization, zone, temperatures and unit state.</td><td>Stable rack hash, zone aggregates and <code>crahUnits[]</code>.</td></tr>
@@ -575,12 +582,12 @@
             <h2><span class="mn-num">10</span> Spatial model, cooling balance &amp; alarm logic</h2>
             <p class="mn-lead">The rack field deliberately separates deterministic basis data from the temporary excursion simulator. Reloading produces the same occupancy, rack loads and normal cold-aisle temperatures; only an explicit excursion may introduce bounded short-lived variation.</p>
             <div class="mn-formula">
-                <span class="mn-eq">rackTotal = Σ occupiedRackWeight × (1,850 kW / Σ occupiedRackWeight) = 1,850 kW</span>
-                <span class="mn-eq">rackUtilization = rack_kW / 15 kW rating</span>
-                <span class="mn-eq">coolingAvailable = 17 × 130 = 2,210 kW</span>
-                <span class="mn-eq">coolingHeadroom = 2,210 − 1,850 = 360 kW</span>
-                <span class="mn-eq">N+1 available = (17 − 1) × 130 = 2,080 kW ≥ 1,850 kW → PASS</span>
-                <span class="mn-eq">zoneAirflow = (1,850 / 10) / ((1.2 × 1.006) × 11) m³/s</span>
+                <span class="mn-eq">rackTotal = Σ occupiedRackWeight × (7,500 kW / Σ occupiedRackWeight) = 7,500 kW per hall</span>
+                <span class="mn-eq">installedPositionAverage = 7,500 / 500 = 15.0 kW/rack</span>
+                <span class="mn-eq">currentActiveAverage ≈ 7,500 / 463 = 16.2 kW/active rack</span>
+                <span class="mn-eq">coolingAvailable = 58 × 130 = 7,540 kW</span>
+                <span class="mn-eq">coolingHeadroom = 7,540 − 7,500 = 40 kW</span>
+                <span class="mn-eq">N+1 replacement = 59 installed − 1 failed = 58 available → 7,540 kW ≥ 7,500 kW → PASS</span>
                 <span class="mn-where">The fixed integer hash chooses roughly 8% spare cells and bounded occupied weights, then a normalization and residual correction force the exact EPMS reconciliation total. <span class="mn-src">datahall.html rack model · CONV_CALC.snapshot</span></span>
             </div>
             <div class="mn-tablewrap">
@@ -588,13 +595,13 @@
                 <thead><tr><th>Condition</th><th>Normal</th><th>Warning</th><th>Critical / alarm</th><th>Visual meaning</th></tr></thead>
                 <tbody>
                     <tr><td>Rack utilization</td><td>&lt;70%</td><td>70–85%; 85–95% elevated tiers</td><td>&gt;95% rating</td><td>Green → amber/orange → fault red; spare is muted.</td></tr>
-                    <tr><td>Cold-aisle temperature</td><td>&lt;26°C; displayed normal baseline ≈22.0°C ±0.3°C deterministic</td><td>&gt;26°C</td><td>&gt;30°C</td><td>Temperature layer and alarm list share the same thresholds.</td></tr>
-                    <tr><td>CRAH availability</td><td>17 RUN / 3 STBY</td><td>Loss of redundancy</td><td>Post-failure capacity below 1,850 kW</td><td>N+1 chip reports the capacity comparison, not a decorative state.</td></tr>
+                    <tr><td>Rack-inlet temperature</td><td>18–27 °C recommended envelope; project target 25.4 °C</td><td>Outside the recommended envelope</td><td>&gt;30 °C project critical threshold</td><td>18–27 °C remains green; below 18 °C is amber, 27–30 °C is elevated, and above 30 °C is red.</td></tr>
+                    <tr><td>CRAH availability</td><td>58 required/running + 1 available standby</td><td>Loss of standby redundancy</td><td>Available capacity below 7,500 kW</td><td>N+1 chip reports the capacity comparison, not a decorative state.</td></tr>
                     <tr><td>Communications / quality</td><td>OK / GOOD</td><td>Stale or degraded when implemented</td><td>Unavailable when implemented</td><td>Current page is simulated and does not poll a live transport.</td></tr>
                 </tbody>
             </table>
             </div>
-            <div class="mn-note"><strong>Excursion boundary:</strong> <code>fireExcursion()</code> uses bounded <code>Math.random()</code> only for an explicitly simulated 10–15 second zone/CRAH excursion. It does not alter the locked 1,850 kW, PUE, rack-reconciliation, plant basis or normal deterministic layout. Evidence must distinguish this training transient from measured telemetry.</div>
+            <div class="mn-note"><strong>Excursion boundary:</strong> <code>fireExcursion()</code> may use bounded variation only for an explicitly simulated short training excursion. It does not alter the governed 30,000 kW site IT, 7,500 kW selected-hall IT, PUE, plant authority, or normal deterministic layout. Evidence must distinguish this training transient from measured telemetry.</div>
         </section>
 
         <!-- 11. GLOSSARY AND OPERATING LIMITS -->
@@ -606,9 +613,9 @@
                 <thead><tr><th>Term</th><th>Meaning in this cockpit</th><th>Operator action</th></tr></thead>
                 <tbody>
                     <tr><td>EPMS reconciliation</td><td>Rack-field sum compared with UPS-output IT kW from the same frozen engine snapshot.</td><td>Investigate any non-zero balance before trusting downstream density or cooling calculations.</td></tr>
-                    <tr><td>Cold aisle</td><td>Rack inlet-side air zone; normal training baseline is approximately 22°C.</td><td>Select Temperature, locate the hottest zone, then inspect assigned CRAHs and rack load.</td></tr>
+                    <tr><td>Rack inlet / cold aisle</td><td>Rack inlet-side air zone; project target is 25.4 °C inside the 18–27 °C recommended A-class envelope.</td><td>Select Rack-Inlet Temp, locate the hottest zone, then inspect assigned CRAHs and rack load.</td></tr>
                     <tr><td>Cooling margin</td><td>Running sensible cooling capacity minus modelled hall IT heat.</td><td>Confirm N+1 remains positive; margin alone is not proof of correct airflow distribution.</td></tr>
-                    <tr><td>Standby / maintenance</td><td>Three installed CRAHs outside the 17-unit running set.</td><td>Verify availability before taking another unit out of service.</td></tr>
+                    <tr><td>Standby / maintenance</td><td>At least one available unit supports the current 58-unit requirement.</td><td>Verify the standby can auto-start before removing a running unit.</td></tr>
                     <tr><td>Simulated data</td><td>Local deterministic model plus explicit training excursions; no BMS/SCADA transport.</td><td>Use for education and pre-design review only; validate against field sensors and approved sequences.</td></tr>
                 </tbody>
             </table>

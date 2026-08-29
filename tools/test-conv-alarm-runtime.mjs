@@ -218,7 +218,7 @@ try {
     const bannerLayout = await page.evaluate(() => {
       const slot = document.querySelector('[data-rz-telemetry-banner-slot]');
       const banner = document.querySelector('.rz-tq-banner');
-      const header = slot?.previousElementSibling;
+      const header = slot?.closest('header') || slot?.previousElementSibling;
       const close = banner?.querySelector('.rz-tq-banner-close');
       const bannerRect = banner?.getBoundingClientRect();
       const headerRect = header?.getBoundingClientRect();
@@ -226,9 +226,14 @@ try {
       close?.focus();
       return {
         inDedicatedSlot: Boolean(slot && banner && banner.parentElement === slot),
+        compact: Boolean(slot?.hasAttribute('data-rz-telemetry-compact')),
         position: banner ? getComputedStyle(banner).position : '',
         withinViewport: Boolean(bannerRect && bannerRect.left >= 0 && bannerRect.right <= window.innerWidth),
-        clearsHeader: Boolean(bannerRect && headerRect && bannerRect.top >= headerRect.bottom - 1),
+        clearsHeader: Boolean(bannerRect && headerRect && (
+          slot?.hasAttribute('data-rz-telemetry-compact')
+            ? bannerRect.top >= headerRect.top - 1 && bannerRect.bottom <= headerRect.bottom + 1
+            : bannerRect.top >= headerRect.bottom - 1
+        )),
         closeTarget: Boolean(closeRect && closeRect.width >= 44 && closeRect.height >= 44),
         closeFocusOutline: close ? parseFloat(getComputedStyle(close).outlineWidth) : 0,
       };
@@ -264,9 +269,9 @@ try {
     return { color: style.color, background: style.backgroundColor };
   });
   assert.deepEqual(lightBanner, {
-    color: 'rgb(63, 29, 143)',
-    background: 'rgb(240, 236, 255)',
-  }, 'light-theme simulated provenance must retain readable contrast');
+    color: 'rgb(7, 84, 106)',
+    background: 'rgb(227, 248, 252)',
+  }, 'light-theme simulated provenance must retain readable instrument-cyan contrast');
 
   await page.goto(`${origin}/EPMS_Telemetry.html`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
   await page.waitForSelector('#epmsSidebarToggle', { timeout: 10_000 });
@@ -301,6 +306,7 @@ try {
       toggleHeight: toggle.getBoundingClientRect().height,
       viewportWidth: viewport.getBoundingClientRect().width,
       viewportHeight: viewport.getBoundingClientRect().height,
+      availableViewportHeight: window.innerHeight - viewport.getBoundingClientRect().top,
       sceneClearsControls: sceneRect.top >= topbarRect.bottom - 4
         && sceneRect.bottom <= statusbarRect.top + 4,
       contractLinks,
@@ -311,7 +317,10 @@ try {
   assert.equal(epmsClosed.sidebarHidden, true, 'EPMS mobile sidebar must default closed');
   assert.ok(epmsClosed.toggleHeight >= 44, `EPMS sidebar toggle was ${epmsClosed.toggleHeight}px high`);
   assert.ok(epmsClosed.viewportWidth >= 380, `EPMS SLD had only ${epmsClosed.viewportWidth}px of mobile width`);
-  assert.ok(epmsClosed.viewportHeight >= 840, `EPMS SLD viewport was only ${epmsClosed.viewportHeight}px high`);
+  assert.ok(epmsClosed.viewportHeight >= epmsClosed.availableViewportHeight - 2,
+    `EPMS SLD did not own the remaining viewport (${epmsClosed.viewportHeight}px of ${epmsClosed.availableViewportHeight}px)`);
+  assert.ok(epmsClosed.viewportHeight >= 590,
+    `EPMS context chrome left only ${epmsClosed.viewportHeight}px for the mobile SLD`);
   assert.equal(epmsClosed.sceneClearsControls, true, 'EPMS fitted scene must clear top and status controls');
   assert.deepEqual(epmsClosed.contractLinks, [true, true], 'EPMS PRD and Manual must stay in the initial mobile viewport');
   assert.deepEqual(epmsClosed.headerTargets, [true, true, true, true], 'EPMS mobile header targets must be 44px and contained by the rail');

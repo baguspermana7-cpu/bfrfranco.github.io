@@ -35,9 +35,9 @@ const INTENTIONAL_MANUAL_REPLACEMENTS = Object.freeze({
     '<span class="mn-eq">ΔT = CHWR − CHWS = 14.8 − 7.2 = 7.6 K</span>':
       '<span class="mn-eq">ΔT = CHWR − CHWS → 27.0 − 19.4 = 7.6 K</span>',
     '<span class="mn-eq">CHW flow = IT load / (Cp × ΔT) → 1 850 / (4.186 × 7.6) = 58.1 L/s</span>':
-      '<span class="mn-eq">CHW flow = IT load / (Cp × ΔT) → 30 000 / (4.186 × 7.6) = 943.0 L/s</span>',
+      '<span class="mn-eq">IT sensible-load CHW reference = IT / (Cp × ΔT) → 30 000 / (4.186 × 7.6) = 943.0 L/s</span>',
     '<span class="mn-eq">Heat rejection = IT + UPS loss → 1 850 + 77.1 = 1 927.1 kW (sanity band 1 850–1 950)</span>':
-      '<span class="mn-eq">Heat rejection = IT + UPS loss → 30 000 + 1 250 = 31 250 kW</span>',
+      '<span class="mn-eq">Evaporator duty = IT + UPS loss → 30 000 + 1 250 = 31 250 kW</span>',
     '<span class="mn-src">doc-09 lines 81–85; doc-00 line 83</span>':
       '<span class="mn-src">governed rack-inlet target; engine v2 thermal chain</span>',
     '<span class="mn-eq">Instant equivalent flow = (WUE × IT) / 60 → (1.20 × 1 850) / 60 = 37.0 L/min</span>':
@@ -110,6 +110,55 @@ const INTENTIONAL_MANUAL_REPLACEMENTS = Object.freeze({
       '<tr><td>Four-hall design-point appendix</td><td>4 × 10 MW IT; 500 racks/hall; 20 kW/rack design average</td><td>MW IT / rack / kW·rack⁻¹</td><td>Current-plus-study scope: governed 40 MW IT / 58 MW facility design-point study</td></tr>',
   }),
   datahall: Object.freeze({
+    '<span class="mn-eq">= 1,850 × 1.45 = 2,682.5 kW</span>':
+      '<span class="mn-eq">= 30,000 × 1.45 = 43,500 kW</span>',
+    '<span class="mn-eq">= 2,682.5 − 1,850 = 832.5 kW</span>':
+      '<span class="mn-eq">= 43,500 − 30,000 = 13,500 kW</span>',
+    '<span class="mn-eq">= 1,850 × (1/0.96 − 1) = 77.1 kW</span>':
+      '<span class="mn-eq">= 30,000 × (1/0.96 − 1) = 1,250 kW</span>',
+    '<span class="mn-src">CONV_CALC · upsLossKw · doc-09 line 39</span>':
+      '<span class="mn-src">CONV_CALC v2.0.0 · upsLossKw</span>',
+    '<span class="mn-eq">ΔT [°C] = CHWR − CHWS = 14.8 − 7.2 = 7.6 °C</span>':
+      '<span class="mn-eq">ΔT [°C] = CHWR − CHWS = 27.0 − 19.4 = 7.6 °C</span>',
+    '<span class="mn-src">CONV_CALC · chwDeltaT · doc-09 line 83</span>':
+      '<span class="mn-src">CONV_CALC v2.0.0 · chwDeltaT</span>',
+    '<span class="mn-eq">= 1,850 / (4.186 × 7.6) = 58.1 L/s</span>':
+      '<span class="mn-eq">= 30,000 / (4.186 × 7.6) = 943.0 L/s</span>',
+    '<span class="mn-src">CONV_CALC · chwFlowLps · doc-09 lines 81–85</span>':
+      '<span class="mn-src">CONV_CALC v2.0.0 · chwFlowLps</span>',
+    '<span class="mn-eq">CHW flow = IT load / (Cp × ΔT) → 1 850 / (4.186 × 7.6) = 58.1 L/s</span>':
+      '<span class="mn-eq">= 30,000 / (4.186 × 7.6) = 943.0 L/s</span>',
+    '<span class="mn-eq">Heat rejection = IT + UPS loss → 1 850 + 77.1 = 1 927.1 kW (sanity band 1 850–1 950)</span>':
+      '<span class="mn-eq">Evaporator duty = IT + UPS loss = 30,000 + 1,250 = 31,250 kW</span>',
+    '<span class="mn-eq">= (1.20 × 1,850) / 60 = 37.0 L/min</span>':
+      '<span class="mn-eq">= (1.20 × 30,000) / 60 = 600 L/min</span>',
+    '<span class="mn-eq">WUE check = (Flow × 60) / IT Load = (37.0 × 60) / 1,850 = 1.20 L/kWh ✓</span>':
+      '<span class="mn-eq">WUE check = (600 × 60) / 30,000 = 1.20 L/kWh ✓</span>',
+    '<span class="mn-src">CONV_CALC · waterFlowLpmForWue · doc-09 lines 99–104</span>':
+      '<span class="mn-src">CONV_CALC v2.0.0 · waterFlowLpmForWue</span>',
+    '<span class="mn-eq">= 2,682.5 × 0.42 = 1,126.7 kgCO₂/hr</span>':
+      '<span class="mn-eq">= 43,500 × 0.42 = 18,270 kgCO₂/hr</span>',
+    '<span class="mn-eq">= 60,000 × 0.90 × 0.85 = 45,900 L</span>':
+      '<span class="mn-eq">= 972,737 × 0.90 × 0.85 = 744,144 L (rounded)</span>',
+    '<span class="mn-eq">Autonomy [hr] = Usable Fuel / Consumption = 45,900 / 956 = 48.0 hr</span>':
+      '<span class="mn-eq">Autonomy [hr] = Usable Fuel / Consumption = 744,144 / 15,503 = 48.0 hr</span>',
+    '<span class="mn-src">CONV_CALC · fuelAutonomyHr · doc-09 lines 133–147</span>':
+      '<span class="mn-src">CONV_CALC v2.0.0 · fuelAutonomyHr</span>',
+    '<span class="mn-result">1,850.0 kW</span>': '<span class="mn-result">30,000 kW</span>',
+    '<span class="mn-result">2,682.5 kW</span>': '<span class="mn-result">43,500 kW</span>',
+    '<span class="mn-result">832.5 kW</span>': '<span class="mn-result">13,500 kW</span>',
+    '<span class="mn-result">77.1 kW</span>': '<span class="mn-result">1,250 kW</span>',
+    '<span class="mn-result">58.1 L/s</span>': '<span class="mn-result">943.0 L/s</span>',
+    '<span class="mn-result">37.0 L/min</span>': '<span class="mn-result">600 L/min</span>',
+    '<span class="mn-result">1,126.7 kgCO₂/hr</span>': '<span class="mn-result">18,270 kgCO₂/hr</span>',
+    '<span class="mn-result">45,900 L</span>': '<span class="mn-result">744,144 L</span>',
+    '<span class="mn-result">48.0 hr</span>': '<span class="mn-result">48.0 hr</span>',
+    '<span class="mn-result">308 racks</span>': '<span class="mn-result">2,000 racks</span>',
+    '<span class="mn-result">185 racks</span>': '<span class="mn-result">2,000 racks</span>',
+    '<li><b>Engine source</b> — <code class="mn-mono">js/conv-engine.js</code> (CONV_CALC v1.0.0) — deep-frozen scenario object + pure derivation functions.</li>':
+      '<li><b>Engine source</b> — <code class="mn-mono">js/conv-engine.js</code> (CONV_CALC v2.0.0) — deep-frozen current-operation and design-boundary snapshot.</li>',
+    '<li><b>Accuracy gate</b> — <code class="mn-mono">tools/probe-accuracy-validation.mjs</code> (40/40 assertions) + <code class="mn-mono">tools/test-conv-calc.mjs</code> (22/22 DoD identities).</li>':
+      '<li><b>Accuracy gates</b> — <code class="mn-mono">tools/test-conv-calc.mjs</code>, <code class="mn-mono">tools/test-conv-coverage.mjs</code>, and <code class="mn-mono">tools/test-conv-document-parity.mjs</code>.</li>',
     '<li><b>ASHRAE TC9.9 (2021)</b> — Thermal Guidelines for Data Processing Environments: cold-aisle temperature band (18–27 °C recommended), humidity 40–60 %RH, PUE/WUE benchmarks.</li>':
       '<li><b>ASHRAE Handbook — Data Centers and Telecommunication Facilities</b> — rack-inlet recommended dry-bulb envelope (18–27 °C for the applicable A classes) and class/dew-point-dependent humidity guidance. The project 25.4 °C target and 48% RH basis remain site decisions.</li>',
     '<li><b>Uptime Institute Tier Standard (2022)</b> — Tier III: N+1 redundancy, 72 hr fuel autonomy target; WUE benchmark scale (good: 1.0–1.4 L/kWh).</li>':
@@ -249,13 +298,15 @@ function assertExistingManualPreserved(cockpit) {
   const protectedFragments = protectedManualFragments(baseline(relativePath));
   const replacements = INTENTIONAL_MANUAL_REPLACEMENTS[cockpit.slug] || Object.freeze({});
   assert.ok(protectedFragments.length > 0, `${relativePath} baseline needs protected sourced fragments`);
-  for (const fragment of protectedFragments) {
+  const missingFragments = protectedFragments.filter((fragment) => {
     const acceptedReplacement = replacements[fragment];
-    assert.ok(
-      current.includes(fragment) || (acceptedReplacement && current.includes(acceptedReplacement)),
-      `${relativePath} removed or rewrote a sourced formula/result/reference without an explicit replacement contract`,
-    );
-  }
+    return !current.includes(fragment) && !(acceptedReplacement && current.includes(acceptedReplacement));
+  });
+  assert.deepEqual(
+    missingFragments,
+    [],
+    `${relativePath} removed or rewrote sourced formula/result/reference fragments without explicit replacement contracts`,
+  );
 }
 
 function assertHubs() {

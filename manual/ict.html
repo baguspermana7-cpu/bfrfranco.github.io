@@ -314,12 +314,12 @@
             <h1>ICT &amp; Network — Cockpit Methodology &amp; Formulas</h1>
             <p>Every input, count formula, ratio, threshold, and reference behind the ICT &amp; Network cockpit. This page is <strong>primarily informational</strong> — it presents discrete device counts and simple percentage ratios, not thermodynamic or electrical physics. All formulas are documented inline and are deterministic functions of the device inventory and capacity inputs.</p>
             <div class="mn-meta">
-                <span class="mn-chip">Engine <strong>conv-engine.js (basis)</strong></span>
+                <span class="mn-chip">Engine <strong>CONV_CALC v2.0.0</strong></span>
                 <span class="mn-chip">Basis <strong>TIA-942 · ISO/IEC 27001</strong></span>
                 <span class="mn-chip">Inputs <strong>Device inventory + uptime/bandwidth controls</strong></span>
                 <span class="mn-chip">Outputs <strong>Counts &amp; ratios</strong></span>
             </div>
-            <a class="mn-toollink" href="../ict.html">&#9654; Open the live ICT Cockpit</a>
+            <a class="mn-toollink" href="../ict.html">&#9654; Open the simulated ICT Cockpit</a>
         </header>
 
         <nav class="mn-section mn-note" aria-labelledby="contents-title">
@@ -332,14 +332,14 @@
             <h2><span class="mn-num">01</span> Purpose &amp; scope</h2>
             <p class="mn-lead">The ICT &amp; Network cockpit is a <strong>network operations monitoring view</strong> for the BKS01 conventional data centre. It answers five operational questions: <em>how many devices are active in each network segment</em>, <em>is the facility still operable over its BMS/OT network</em>, <em>what is the uptime percentage against annual availability targets</em>, <em>how full are the rack cabinets</em>, and <em>how much bandwidth headroom remains on core uplinks</em>.</p>
             <p class="mn-lead">Unlike the fire-suppression, chiller, or power calculators, the ICT cockpit does <strong>not</strong> solve physics equations. Its outputs are <em>counts</em> (integer device totals), <em>ratios</em> (percentage utilisations), and <em>authored alarm states</em>. IT load and PUE from <code class="mn-mono">conv-engine.js</code> are power context only; network inventory and observed traffic have independent authored authorities.</p>
-            <p class="mn-lead"><strong>Truth boundary:</strong> the current page shows 80 Gbps installed / 40 Gbps protected usable core capacity, 20 access switches and a 14.2 Gbps authored traffic scenario. The separate four-hall study uses 500 racks per hall and derives <code>ceil(500/12) = 42</code> logical access groups per hall. Physical switch count, port speed, uplink ratio and dual-ToR policy remain unavailable until an approved network architecture is supplied.</p>
-            <div class="mn-note"><strong>Accuracy scope:</strong> ICT is informational and is NOT under the physics-accuracy gates (<code class="mn-mono">probe-accuracy-validation.mjs</code>) that cover the power, cooling, and fire pages. Values are anchored to the conv-engine.js basis and to authored engineering constants; no <code>Math.random</code> is used for any displayed metric.</div>
+            <p class="mn-lead"><strong>Truth boundary:</strong> the governed Conventional authority is <code>CONV_CALC v2.0.0</code>: four current halls, 30,000 kW IT, 43,500 kW facility load and 2,000 installed rack positions (500 per hall). The 40 MW IT figure is planning/design capacity only. Network-specific values remain a separate authored scenario: 80 Gbps installed / 40 Gbps protected usable core capacity, 20 access switches and 14.2 Gbps traffic. <code>ceil(500/12) = 42</code> is a logical grouping aid per hall, not physical switch design.</p>
+            <div class="mn-note"><strong>Accuracy scope:</strong> ICT is informational and is not a physics solver. Governed power/campus context requires a schema-complete CONV_CALC v2.0.0 snapshot and fails closed when authority is missing, legacy or incomplete. Network values retain separate authored provenance; no <code>Math.random</code> is used for a displayed metric.</div>
         </section>
 
         <!-- 2. INPUTS -->
         <section class="mn-section" id="inputs">
             <h2><span class="mn-num">02</span> Inputs</h2>
-            <p class="mn-lead">Three input groups are kept separate: <strong>device inventory</strong>, <strong>network capacity and observed traffic</strong>, and <strong>power context</strong>. The current network values are authored independently of IT kW; the governed study contributes rack count only and cannot manufacture port speeds or bandwidth.</p>
+            <p class="mn-lead">Three input groups are kept separate: <strong>device inventory</strong>, <strong>network capacity and observed traffic</strong>, and <strong>power context</strong>. The current network values are authored independently of IT kW; the governed current campus contributes rack-position context only and cannot manufacture port speeds or bandwidth.</p>
             <div class="mn-tablewrap">
             <table class="mn-table">
                 <thead><tr><th>Input</th><th>Symbol</th><th>Unit</th><th>Default / source</th><th>Meaning</th></tr></thead>
@@ -352,7 +352,7 @@
                     <tr><td>Used rack-U <code>used_U</code></td><td><code>U<sub>used</sub></code></td><td>U</td><td>From DCIM / physical audit</td><td>Occupied U positions across all active cabinets.</td></tr>
                     <tr><td>Core installed / usable capacity</td><td><code>C<sub>inst</sub></code> / <code>C<sub>use</sub></code></td><td>Gbps</td><td>80 / 40 (authored)</td><td>Two 40 Gbps edge paths; protected operating capacity is 40 Gbps after reserving the alternate path.</td></tr>
                     <tr><td>Observed traffic <code>usage_Gbps</code></td><td><code>U<sub>bw</sub></code></td><td>Gbps</td><td>14.2 (authored scenario)</td><td>Deterministic traffic telemetry independent of IT power; replace with measured counters in production.</td></tr>
-                    <tr><td>Study racks / grouping policy</td><td><code>R<sub>study</sub></code> / <code>R<sub>group</sub></code></td><td>racks</td><td>500 / 12 per hall</td><td>Planning input only; yields 42 logical access groups per hall, not a physical switch design.</td></tr>
+                    <tr><td>Installed positions / grouping policy</td><td><code>R<sub>hall</sub></code> / <code>R<sub>group</sub></code></td><td>racks</td><td>500 / 12 per hall</td><td>Governed position count plus planning grouping rule; yields 42 logical groups per hall, not a physical switch design.</td></tr>
                     <tr><td>OT gateway count <code>nGateways</code></td><td><code>G</code></td><td>count</td><td>6 (authored)</td><td>BMS/OT polling gateways: EPMS, Chiller, Datahall, Fire, Fuel, Water.</td></tr>
                 </tbody>
             </table>
@@ -428,10 +428,12 @@
             <table class="mn-table">
                 <thead><tr><th>Constant</th><th>Value</th><th>Source / rationale</th></tr></thead>
                 <tbody>
-                    <tr><td>IT load basis</td><td><code>IT_kW = 1850 kW</code></td><td>conv-engine.js <code>SNAP.site.it_load_kw</code></td></tr>
-                    <tr><td>8 kW rack-equivalent</td><td><code>round(1850 / 8) = 231</code></td><td>Power-planning equivalence from <code>SNAP.racks.at_8kw</code>; not physical rack inventory</td></tr>
+                    <tr><td>Current IT load basis</td><td><code>IT_kW = 30,000 kW</code></td><td>CONV_CALC v2.0.0 <code>snapshot.site.it_load_kw</code></td></tr>
+                    <tr><td>Current facility load</td><td><code>43,500 kW</code></td><td><code>30,000 × 1.45</code>; deterministic simulated authority</td></tr>
+                    <tr><td>Installed rack positions</td><td><code>2,000 = 4 × 500</code></td><td><code>snapshot.campus.racks_total</code>; current position inventory</td></tr>
+                    <tr><td>8 kW rack-equivalent</td><td><code>round(30,000 / 8) = 3,750</code></td><td>Power-planning equivalence from <code>snapshot.racks.at_8kw</code>; explicitly not physical rack inventory</td></tr>
                     <tr><td>Current access inventory</td><td><code>20 switches</code></td><td>Authored installed inventory; not back-solved from rack-equivalent power</td></tr>
-                    <tr><td>Study grouping</td><td><code>max 12 racks/group</code></td><td>Project planning assumption; 42 logical groups/hall at 500 racks/hall</td></tr>
+                    <tr><td>Logical grouping</td><td><code>max 12 racks/group</code></td><td>Project planning assumption; 42 logical groups/hall at 500 installed positions/hall</td></tr>
                     <tr><td>Observed traffic</td><td><code>14.2 Gbps</code></td><td>Authored deterministic telemetry scenario independent of IT kW</td></tr>
                     <tr><td>Core capacity</td><td><code>80 installed / 40 usable / 40 survivable Gbps</code></td><td>Authored protected-capacity contract</td></tr>
                     <tr><td>Standard cabinet height</td><td><code>42U</code></td><td>EIA-310-D full-height cabinet</td></tr>
@@ -476,13 +478,13 @@
         <!-- 6. WORKED EXAMPLE -->
         <section class="mn-section" id="worked-example">
             <h2><span class="mn-num">06</span> Worked example</h2>
-            <p class="mn-lead">BKS01 default state: IT 1.85 MW power context, 231 rack-equivalents at 8 kW, 80 Gbps installed / 40 Gbps usable core capacity and 14.2 Gbps observed traffic. Rack-equivalent is not physical inventory.</p>
+            <p class="mn-lead">BKS01 governed power context: 30.00 MW current IT, 43.50 MW facility, 2,000 installed rack positions and 3,750 rack-equivalents at 8 kW. The authored network scenario remains 80 Gbps installed / 40 Gbps usable and 14.2 Gbps traffic. Rack-equivalent is not physical inventory.</p>
             <div class="mn-worked">
                 <ol>
                     <li>Active device inventory: <code>servers + switches + firewalls + APs</code> — example: <code>450 + 22 + 4 + 8 =</code> <span class="mn-result">484 active devices</span></li>
                     <li>Current access inventory: <span class="mn-result">20 switches</span> (authored installed state, not calculated from IT power).</li>
-                    <li>Four-hall study grouping: <code>ceil(500 / 12) =</code> <span class="mn-result">42 logical access groups per hall</span>; physical switch topology remains pending.</li>
-                    <li>Observed traffic: <span class="mn-result">14.2 Gbps</span> from the authored traffic scenario, independent of the 1.85 MW power context.</li>
+                    <li>Four-hall logical grouping: <code>ceil(500 / 12) =</code> <span class="mn-result">42 logical access groups per hall</span>; physical switch topology remains pending.</li>
+                    <li>Observed traffic: <span class="mn-result">14.2 Gbps</span> from the authored traffic scenario, independent of the 30.00 MW power context.</li>
                     <li>Core utilisation: <code>14.2 / 40 × 100 =</code> <span class="mn-result">35.5 %</span> → well under 80% warn threshold ✓</li>
                     <li>Bandwidth headroom: <code>(40 − 14.2) / 40 × 100 =</code> <span class="mn-result">64.5 %</span> → healthy ✓</li>
                     <li>Availability example: a selected 1.57 hr/yr downtime scenario gives <code>(8760 − 1.57) / 8760 × 100 =</code> <span class="mn-result">99.982 %</span>; this does not confer a Tier rating.</li>
@@ -504,8 +506,8 @@
                 <li><b>ANSI/EIA-310-D</b> — Cabinets, Racks, Panels, and Associated Equipment: 42U standard full-height cabinet definition.</li>
                 <li><b>SNMP v2c/v3 (RFC 1157 / RFC 3411)</b> — Simple Network Management Protocol: device polling, sensor freshness, and trap-based alarm sourcing used in live deployments.</li>
                 <li><b>NFPA 75</b> — Standard for the Fire Protection of Information Technology Equipment: network and IT room requirements informing physical security and segmentation design.</li>
-                <li><b>conv-engine.js</b> — power context (IT 1.85 MW, PUE 1.45, 231 rack-equivalents at 8 kW); not the network-inventory or traffic authority.</li>
-                <li><b>conv-design-basis.js</b> — separate four-hall study authority (500 racks/hall); contributes rack grouping context only.</li>
+                <li><b>conv-engine.js</b> — CONV_CALC v2.0.0 power/campus context (30,000 kW current IT, 43,500 kW facility, 2,000 installed positions, 3,750 power-equivalents at 8 kW); not the network-inventory or traffic authority.</li>
+                <li><b>conv-design-basis.js</b> — four-hall design envelope (10 MW and 500 positions per hall); 40 MW is planning/design capacity, while current load comes from CONV_CALC.</li>
                 <li><b>rz-line-model.js · rz-alarm-state.js · rz-inspector.js</b> — shared BMS cockpit modules providing semantic line metadata, alarm state management, and inspector panel wiring.</li>
             </ul>
         </section>
@@ -516,7 +518,7 @@
             <p class="mn-lead">The cockpit is a <strong>demonstration and engineering-education tool</strong>, not a live SNMP/SIEM feed. Device counts, alarm states, capacity and link traffic are authored network values; IT load is context only. In production these would be replaced by SNMP/streaming telemetry, CMDB and DCIM sources. Key limitations:</p>
             <ul style="color:var(--mn-muted);font-size:0.88rem;line-height:1.7;padding-left:1.2rem;margin:0;">
                 <li>Traffic values are authored deterministic scenarios, not measured counters and not derived from IT power. Actual traffic depends on workload mix.</li>
-                <li>The 42 access groups per study hall do not define physical switch count, port speed, uplink oversubscription, optics or dual-ToR policy.</li>
+                <li>The 42 logical access groups per hall do not define physical switch count, port speed, uplink oversubscription, optics or dual-ToR policy.</li>
                 <li>Uptime% is a ratio of authored downtime hours to 8760 — not computed from a real event log or CMDB.</li>
                 <li>Rack-U utilisation requires a physical audit or DCIM sync; it is not derivable from IT power alone.</li>
                 <li>BMS/OT gateway reachability is authored (all online) in the demo; a live system would use ICMP or protocol-level heartbeats.</li>
@@ -525,7 +527,7 @@
             </ul>
         </section>
 
-        <a class="mn-toollink" href="../ict.html">&#9654; Open the live ICT &amp; Network Cockpit</a>
+        <a class="mn-toollink" href="../ict.html">&#9654; Open the simulated ICT &amp; Network Cockpit</a>
     </main>
 
     <footer class="footer footer-enhanced">

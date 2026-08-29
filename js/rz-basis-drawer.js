@@ -49,6 +49,22 @@
         return root.RZ_CONV_PARAMETERS || null;
     }
 
+    /* A generated registry is design evidence, not proof that the host cockpit
+       successfully loaded the same current runtime authority. Every adopting
+       cockpit must opt in after its requested version and required schema pass.
+       Default-deny prevents a forced API call from bypassing disabled triggers. */
+    function runtimeAuthorityAvailable() {
+        try {
+            if (typeof root.RZBasisDrawerAuthority === 'function') {
+                return root.RZBasisDrawerAuthority() === true;
+            }
+        } catch (error) {
+            return false;
+        }
+        var body = document.body;
+        return !!(body && body.getAttribute('data-rz-basis-authority') === 'current');
+    }
+
     function byId(id) {
         var reg = registry();
         if (!reg) return null;
@@ -141,9 +157,21 @@
     }
 
     function render(id) {
-        var p = byId(id);
         var panel = document.getElementById('rz-basis-drawer-panel');
         if (!panel) return;
+        if (!runtimeAuthorityAvailable()) {
+            panel.innerHTML = '<h2 id="rz-basis-drawer-title" style="margin:0 0 8px;font-size:16px">'
+                + 'Runtime basis unavailable</h2><p style="font-size:13px;color:#c9d4e2">'
+                + 'UNAVAILABLE &mdash; the generated registry is a design snapshot, not current runtime '
+                + 'authority. Restore the host cockpit&apos;s requested engine version and complete schema '
+                + 'before opening <code>' + esc(id) + '</code>.</p>'
+                + '<div style="margin-top:14px;display:flex;justify-content:flex-end">'
+                + '<button type="button" data-basis-close style="background:#1c2838;color:#dbe5f0;'
+                + 'border:1px solid #2b3a52;border-radius:4px;padding:7px 14px;cursor:pointer;'
+                + 'font:inherit;font-size:12.5px">Close</button></div>';
+            return;
+        }
+        var p = byId(id);
         if (!p) {
             /* Fail loudly. A drawer that shrugs is how an unbound KPI stayed invisible. */
             panel.innerHTML = '<h2 id="rz-basis-drawer-title" style="margin:0 0 8px;font-size:16px">'
@@ -248,6 +276,7 @@
         open: open,
         close: close,
         get: byId,
+        authorityAvailable: runtimeAuthorityAvailable,
         /* Exposed so a gate can assert the page's markup and the registry agree. */
         ids: function () {
             var reg = registry();

@@ -101,13 +101,13 @@
         <header class="mn-hero">
             <div class="mn-eyebrow">Product requirements · deterministic operations cockpit</div>
             <h1>Data Hall SCADA Console</h1>
-            <p>A traceable product contract for the conventional rack heat-map, alarm strip, cooling balance and equipment inspection workflow. Current operation consumes one frozen <code>CONV_CALC.snapshot</code>; Hall A–D planning context consumes the separate frozen <code>RZConvDesignBasis.STUDY</code>. It is a simulated engineering/education surface, not a live SCADA endpoint.</p>
+            <p>A traceable product contract for the conventional rack heat-map, alarm strip, cooling balance and equipment inspection workflow. Current operation consumes the frozen <code>CONV_CALC v2.0.0</code> authority: 30 MW site IT across four equal 7.5 MW Hall views. The governed design boundary is 4 × 10 MW. It is a simulated engineering/education surface, not a live SCADA endpoint.</p>
             <div class="mn-meta">
                 <span class="mn-chip">Cockpit <strong>datahall.html</strong></span>
                 <span class="mn-chip">Engine <strong>js/conv-engine.js</strong></span>
-                <span class="mn-chip">Basis <strong>1,850 kW IT</strong></span>
-                <span class="mn-chip">Current <strong>Hall A / 200 cells</strong></span>
-                <span class="mn-chip">Study <strong>4 × 10 MW / 500 racks each</strong></span>
+                <span class="mn-chip">Current <strong>30 MW site IT</strong></span>
+                <span class="mn-chip">Hall view <strong>7.5 MW / 500 positions</strong></span>
+                <span class="mn-chip">Design <strong>4 × 10 MW / 500 racks each</strong></span>
                 <span class="mn-chip">Data mode <strong>SIMULATED</strong></span>
             </div>
         </header>
@@ -126,7 +126,7 @@
             <p class="mn-lead">The same surface serves different readers; the product must not force a commissioning engineer and a learner to infer the provenance of a number differently.</p>
             <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Persona</th><th>Goal</th><th>Primary read</th><th>Success condition</th></tr></thead><tbody>
                 <tr><td>Data-center operator</td><td>Triage a rack/cooling alarm quickly.</td><td>Alarm strip → active semantic layer → equipment inspector.</td><td>Can name severity, source tag and next inspection step without opening documentation.</td></tr>
-                <tr><td>Facilities engineer</td><td>Check cooling capacity and redundancy.</td><td>CHW plant, cooling margin, CRAH states and N+1 calculation.</td><td>Can reproduce 2,210 kW running and 2,080 kW post-failure capacity.</td></tr>
+                <tr><td>Facilities engineer</td><td>Check cooling capacity and redundancy.</td><td>CHW plant, cooling margin, CRAH states and N+1 calculation.</td><td>Can reproduce 7,670 kW installed and 7,540 kW post-failure capacity.</td></tr>
                 <tr><td>Electrical/EPMS reviewer</td><td>Reconcile rack total to protected IT output.</td><td>Balance band and rack load roll-up.</td><td>Any difference between rack sum and EPMS snapshot is explicit.</td></tr>
                 <tr><td>Commissioning engineer</td><td>Review point naming, thresholds and interaction sequence.</td><td>Tagged racks/CRAHs, alarm list, modes, event log.</td><td>Can turn every visible behavior into a deterministic test.</td></tr>
                 <tr><td>Educator / learner</td><td>Understand why color and capacity states change.</td><td>Basis drawers, Manual and formula references.</td><td>Can distinguish measured, derived, target and simulated values.</td></tr>
@@ -136,7 +136,7 @@
         <section class="mn-section" id="scope">
             <h2><span class="mn-num">03</span> Scope &amp; non-goals</h2>
             <div class="mn-grid">
-                <article class="mn-card"><h3>In scope</h3><ul><li>Current Hall A rack field: 10 zones × 20 cells.</li><li>View-only Hall A–D study context: 10 MW IT and 500 racks/hall.</li><li>Rack power, utilization, space and temperature views.</li><li>Twenty CRAHs with 17 running and three standby.</li><li>Cooling/EPMS reconciliation, alarm counts, quality and timestamp.</li><li>Rack/CRAH inspection, training excursion, historian query and event log.</li></ul></article>
+                <article class="mn-card"><h3>In scope</h3><ul><li>Hall A–D current rack fields: 500 positions each; 7.5 MW IT per selected Hall.</li><li>Governed design context: 10 MW IT and 20 kW/rack average per Hall.</li><li>Rack power, utilization, space and rack-inlet temperature views.</li><li>Fifty-nine CRAHs installed per Hall view: 58 required/running plus one available standby.</li><li>Central cooling context, alarm counts, quality and timestamp.</li><li>Rack/CRAH inspection, training excursion, historian query and event log.</li></ul></article>
                 <article class="mn-card"><h3>Non-goals</h3><ul><li>No field BMS, EPMS, DCIM or historian connection.</li><li>No command write-back, alarm acknowledgement or maintenance dispatch.</li><li>No CFD, transient thermal model or vendor selection.</li><li>No guarantee that the illustrative thresholds are approved site set-points.</li><li>No production safety or procurement decision.</li></ul></article>
             </div>
         </section>
@@ -149,11 +149,11 @@
                 <tr><td>FR-02</td><td>Declare the source mode as simulated.</td><td><code>data-rz-data-mode="simulated"</code> and the visible Scenario chip agree.</td></tr>
                 <tr><td>FR-03</td><td>Show Hall state, rack load, cooling margin, PUE and power density in the engineering roll-up.</td><td>Each item has a stable ID and keyboard-accessible basis trigger.</td></tr>
                 <tr><td>FR-04</td><td>Bind critical roll-up values to one <code>CONV_CALC.snapshot</code>.</td><td>Reloading does not change IT, PUE, rack count or the derived density.</td></tr>
-                <tr><td>FR-05</td><td>Render CH-01/02 RUN and CH-03 STBY plus CHWS, CHWR, ΔT and CHW flow.</td><td>Plant panel reads engine cooling fields; labels retain units.</td></tr>
-                <tr><td>FR-06</td><td>Render 20 CRAH units with stable <code>CRAH-Axx</code> tags.</td><td>17 units are RUN and three STBY in the locked scenario.</td></tr>
+                <tr><td>FR-05</td><td>Render the central 7/10 chiller state plus CHWS, CHWR, ΔT and site CHW flow.</td><td>Plant panel reads engine cooling fields; labels retain units and site scope.</td></tr>
+                <tr><td>FR-06</td><td>Render the derived Hall CRAH fleet with stable tags.</td><td>58 units satisfy 7,500 kW at 130 kW/unit and one additional unit is available for N+1 replacement.</td></tr>
                 <tr><td>FR-07</td><td>Show IT load, rack count/average, utilization, EPMS balance, cooling headroom and N+1 in the balance band.</td><td>Displayed arithmetic matches §06 exactly.</td></tr>
-                <tr><td>FR-08</td><td>Render 200 rack cells across ten zones with deterministic occupancy and load weights.</td><td>Rack layout and values are identical over repeated reloads.</td></tr>
-                <tr><td>FR-09</td><td>Normalize occupied rack values so their sum equals 1,850 kW.</td><td>Balance to the engine/EPMS IT point is zero within display rounding.</td></tr>
+                <tr><td>FR-08</td><td>Render 500 rack positions across deterministic rows with stable occupancy and load weights.</td><td>Rack layout and values are identical over repeated reloads.</td></tr>
+                <tr><td>FR-09</td><td>Normalize occupied rack values so their sum equals the selected Hall authority of 7,500 kW.</td><td>Rack-field sum equals Hall IT within display rounding; Hall EPMS balance remains UNAVAILABLE until a Hall submeter exists.</td></tr>
                 <tr><td>FR-10</td><td>Expose Power Density mode.</td><td>Each rack shows the utilization tier against its 15 kW rating.</td></tr>
                 <tr><td>FR-11</td><td>Expose Cold-Aisle Temperature mode.</td><td>Zone temperature uses the declared normal baseline and semantic thresholds.</td></tr>
                 <tr><td>FR-12</td><td>Expose Cooling Margin mode.</td><td>Rack/zone display communicates capacity headroom without changing the basis.</td></tr>
@@ -171,9 +171,9 @@
                 <tr><td>FR-24</td><td>Provide basis drawers for State, Rack Load, Cooling Margin, PUE and Density.</td><td>Click and keyboard activation show formula, inputs, output and source.</td></tr>
                 <tr><td>FR-25</td><td>Provide Back, Portfolio, PRD and Manual navigation.</td><td>All four links are visible, keyboard reachable and resolve correctly.</td></tr>
                 <tr><td>FR-26</td><td>Preserve theme, mobile navigation and cookie controls.</td><td>Shared shell scripts load without console errors.</td></tr>
-                <tr><td>FR-27</td><td>Expose Hall A–D context without changing the current model.</td><td>Selector updates visible hall/study labels only; <code>CONV_CALC.snapshot</code> stays byte-equivalent.</td></tr>
+                <tr><td>FR-27</td><td>Expose Hall A–D operating context without mutating the model.</td><td>Selector updates the selected equal-authority Hall view only; <code>CONV_CALC.snapshot</code> stays byte-equivalent.</td></tr>
                 <tr><td>FR-28</td><td>Distinguish rack inlet/cold aisle, rack outlet/hot aisle and CRAH supply/return.</td><td>Inspector exposes both inlet and hot-aisle/return values with unambiguous labels.</td></tr>
-                <tr><td>FR-29</td><td>Use 25.4 °C only as the project study rack-inlet target.</td><td>18–27 °C recommended envelope remains visible; no universal-optimum claim and no substitution for current 22.4 °C.</td></tr>
+                <tr><td>FR-29</td><td>Use 25.4 °C as the project rack-inlet target.</td><td>18–27 °C recommended envelope remains green and visible; below 18 °C is not normal and no universal-optimum claim is made.</td></tr>
                 <tr><td>FR-30</td><td>Expose heat load, air-side heat removal and cooling-efficiency basis.</td><td>kW thermal, airflow, density, c<sub>p</sub> and ΔT are named; unavailable data fails closed.</td></tr>
                 <tr><td>FR-31</td><td>Provide read-only alarm history filters.</td><td>Date, point/tag, severity, lifecycle/state, quality, value and text filters compose without overwriting live counts.</td></tr>
             </tbody></table></div>
@@ -186,36 +186,35 @@
                 <tr><td>Overall hall state</td><td><code>as-state</code></td><td>NORMAL / WARN / CRITICAL</td><td>Green / amber / red from worst active alarm.</td><td><code>alarms[]</code> roll-up.</td></tr>
                 <tr><td>Critical count</td><td><code>as-crit</code></td><td>count; 0 normal</td><td>Red when non-zero.</td><td>Rack &gt;95% plus aisle &gt;30°C filters.</td></tr>
                 <tr><td>Warning count</td><td><code>as-warn</code></td><td>count; 0 normal</td><td>Amber when non-zero.</td><td>Rack &gt;85% plus aisle &gt;26°C filters.</td></tr>
-                <tr><td>Maintenance count</td><td><code>as-maint</code></td><td>3 locked</td><td>Maintenance/standby, not failure.</td><td>20 CRAH − 17 running.</td></tr>
+                <tr><td>Maintenance count</td><td><code>as-maint</code></td><td>Derived equipment state</td><td>Maintenance/standby, not failure.</td><td>Installed CRAHs minus required/running units.</td></tr>
                 <tr><td>Communications</td><td><code>as-comms</code></td><td>OK</td><td>GOOD presentation only; no live transport.</td><td>Local page state.</td></tr>
                 <tr><td>Last update</td><td><code>as-update</code></td><td>HH:MM:SS</td><td>Muted timestamp.</td><td>Browser clock tick.</td></tr>
                 <tr><td>Data quality</td><td><code>as-dq</code></td><td>GOOD</td><td>Green quality chip.</td><td>Simulated local model declaration.</td></tr>
                 <tr><td>Scenario</td><td><code>as-scn</code></td><td>Simulated</td><td>Cyan provenance chip.</td><td><code>body[data-rz-data-mode]</code>.</td></tr>
-                <tr><td>IT / rack load</td><td><code>dh-rack-load</code></td><td>1.85 MW</td><td>Neutral numeric; basis-enabled.</td><td><code>snapshot.site.it_load_kw</code>.</td></tr>
-                <tr><td>PUE</td><td><code>dh-pue</code></td><td>1.45 ratio</td><td>Derived/measured basis, separate from target.</td><td><code>snapshot.site.pue</code>.</td></tr>
-                <tr><td>Power density</td><td><code>dh-pd</code></td><td>9.25 kW/rack average</td><td>Neutral aggregate.</td><td>1,850 kW ÷ 200 racks.</td></tr>
-                <tr><td>Cooling headroom</td><td><code>bb-cool</code></td><td>360 kW; 19.5% of demand</td><td>Green while positive and N+1 passes.</td><td>2,210 − 1,850 kW.</td></tr>
-                <tr><td>Cooling N+1</td><td><code>bb-np1</code></td><td>PASS</td><td>Green PASS; red FAIL.</td><td>2,080 kW post-failure vs 1,850 kW demand.</td></tr>
-                <tr><td>EPMS balance</td><td><code>bb-balance</code></td><td>kW / %; target 0</td><td>Pass only within declared rounding tolerance.</td><td>Σ rack kW − <code>epms_ups_output_kw</code>.</td></tr>
-                <tr><td>Rack power</td><td><code>rack[data-idx]</code></td><td>0–15+ kW; sum 1,850 kW</td><td>Muted spare; green &lt;70%; amber 70–95%; red &gt;95%.</td><td>Fixed hash weights normalized to site IT.</td></tr>
-                <tr><td>Rack utilization</td><td><code>rack.util</code></td><td>fraction of 15 kW</td><td>Same tier table as rack power.</td><td><code>rack.kw / RACK_RATING_KW</code>.</td></tr>
+                <tr><td>Selected-Hall rack load</td><td><code>dh-rack-load</code></td><td>7.50 MW</td><td>Neutral numeric; basis-enabled.</td><td><code>snapshot.campus.halls[n].it_load_kw</code>.</td></tr>
+                <tr><td>PUE</td><td><code>dh-pue</code></td><td>1.45 ratio</td><td>Adopted simulated design-point input; not live telemetry and separate from target.</td><td><code>snapshot.site.pue</code>.</td></tr>
+                <tr><td>Power density</td><td><code>dh-pd</code></td><td>15.0 kW/installed position; ≈16.2 kW/active rack</td><td>Neutral aggregate with explicit denominator.</td><td>7,500 kW ÷ 500 installed positions; active denominator is separate.</td></tr>
+                <tr><td>Cooling headroom</td><td><code>bb-cool</code></td><td>40 kW</td><td>Green while positive and N+1 passes.</td><td>7,540 − 7,500 kW.</td></tr>
+                <tr><td>Cooling N+1</td><td><code>bb-np1</code></td><td>PASS</td><td>Green PASS; red FAIL.</td><td>59 installed minus one failed leaves 58 × 130 = 7,540 kW.</td></tr>
+                <tr><td>Hall IT reconciliation</td><td><code>bb-balance</code></td><td>UNAVAILABLE without Hall submeter</td><td>Neutral unavailable, never green or negative arithmetic.</td><td>Rack sum is known; authoritative Hall EPMS kW is not.</td></tr>
+                <tr><td>Rack power</td><td><code>rack[data-idx]</code></td><td>0–30 kW; sum 7,500 kW</td><td>Muted spare; tier colors follow rack rating.</td><td>Fixed hash weights normalized to selected-Hall IT.</td></tr>
+                <tr><td>Rack utilization</td><td><code>rack.util</code></td><td>fraction of 20 kW design average</td><td>Same tier table as rack power.</td><td><code>rack.kw / RACK_RATING_KW</code>.</td></tr>
                 <tr><td>Cold-aisle temperature</td><td><code>zone.coldAisleC</code></td><td>≈21.7–22.3°C normal</td><td>Warn &gt;26°C; critical &gt;30°C.</td><td>Deterministic zone baseline; explicit excursion may override temporarily.</td></tr>
                 <tr><td>Zone airflow</td><td><code>zone.airflow</code></td><td>m³/s</td><td>Engineering numeric, no standalone alarm.</td><td><code>zoneHeatDesign/(ρcp×11 K)</code>.</td></tr>
-                <tr><td>CRAH state</td><td><code>CRAH-A01..A20</code></td><td>17 RUN / 3 STBY</td><td>Green RUN; muted standby.</td><td><code>crahUnits[].running</code>.</td></tr>
+                <tr><td>CRAH state</td><td><code>CRAH-A01..A59</code></td><td>58 RUN / 1 STBY</td><td>Green RUN; muted available standby.</td><td><code>crahUnits[].running</code>.</td></tr>
                 <tr><td>CRAH supply air</td><td><code>crahUnits[].sat</code></td><td>°C</td><td>Detail-only numeric.</td><td>CHWS + 8°C coil approach in page model.</td></tr>
                 <tr><td>CRAH return air</td><td><code>crahUnits[].rat</code></td><td>°C</td><td>Detail-only numeric.</td><td>SAT + 11 K design air rise.</td></tr>
                 <tr><td>CRAH fan / valve</td><td><code>fan</code>, <code>valve</code></td><td>72% / 64% when running</td><td>Zero for standby.</td><td>Locked illustrative unit state.</td></tr>
-                <tr><td>CHWS / CHWR / ΔT</td><td><code>chws</code>, <code>chwr</code>, <code>chdt</code></td><td>7.2°C / 14.8°C / 7.6 K</td><td>Basis numeric.</td><td><code>snapshot.cooling</code>.</td></tr>
-                <tr><td>CHW flow</td><td><code>chflow</code></td><td>58.1 L/s</td><td>Derived numeric.</td><td><code>1,850/(4.186×7.6)</code>.</td></tr>
+                <tr><td>CHWS / CHWR / ΔT</td><td><code>chws</code>, <code>chwr</code>, <code>chdt</code></td><td>19.4°C / 27.0°C / 7.6 K</td><td>Site basis numeric.</td><td><code>snapshot.cooling</code>.</td></tr>
+                <tr><td>CHW flow</td><td><code>chflow</code></td><td>943.0 L/s site</td><td>Derived numeric; site scope labelled.</td><td><code>30,000/(4.186×7.6)</code>.</td></tr>
             </tbody></table></div>
         </section>
 
         <section class="mn-section" id="formulas">
             <h2><span class="mn-num">06</span> Formulas &amp; derivations</h2>
-            <div class="mn-formula"><span class="mn-eq">averageRack_kW = IT_kW / rackCount = 1,850 / 200 = 9.25 kW/rack</span><span class="mn-eq">rackUtilization = rack_kW / 15 kW</span><span class="mn-where">Rack weights are normalized so <code>Σ rack_kW = 1,850 kW</code>; a residual rounding correction is applied to the highest occupied rack. Manual §09–10.</span></div>
-            <div class="mn-formula"><span class="mn-eq">coolingAvailable = CRAH_running × CRAH_unit = 17 × 130 = 2,210 kW</span><span class="mn-eq">headroom = 2,210 − 1,850 = 360 kW</span><span class="mn-eq">N+1 = (17 − 1) × 130 = 2,080 kW ≥ 1,850 kW</span><span class="mn-where">Capacity comparison from the page constants; this is not a CFD airflow-distribution proof.</span></div>
-            <div class="mn-formula"><span class="mn-eq">CHW ΔT = 14.8 − 7.2 = 7.6 K</span><span class="mn-eq">CHW flow = Q / (Cp × ΔT) = 1,850 / (4.186 × 7.6) = 58.1 L/s</span><span class="mn-where">Water density convention is embedded in the L/s formulation. Source: <a class="mn-inline" href="../manual/datahall.html">Data Hall Manual calculation methodology</a> and <code>CONV_CALC</code>.</span></div>
-            <div class="mn-formula"><span class="mn-eq">zoneAirflow = (1,850 / 10) / ((1.2 × 1.006) × 11) m³/s</span><span class="mn-eq">physicsReturn = supplyAir + zoneHeat / (ρCp × airflow)</span><span class="mn-where">The cockpit computes the physics value as an excursion ceiling but deliberately displays a calm deterministic ≈22°C normal inlet baseline. This limitation must remain visible.</span></div>
+            <div class="mn-formula"><span class="mn-eq">installedAverage = 7,500 / 500 = 15.0 kW/rack</span><span class="mn-eq">currentActiveAverage ≈ 7,500 / 463 = 16.2 kW/active rack</span><span class="mn-where">Rack weights are normalized so <code>Σ rack_kW = 7,500 kW</code>; the denominator is always named.</span></div>
+            <div class="mn-formula"><span class="mn-eq">coolingAvailable = 58 × 130 = 7,540 kW</span><span class="mn-eq">headroom = 7,540 − 7,500 = 40 kW</span><span class="mn-eq">N+1 = (59 − 1) × 130 = 7,540 kW ≥ 7,500 kW</span><span class="mn-where">Capacity comparison from the governed Hall load; this is not a CFD airflow-distribution proof.</span></div>
+            <div class="mn-formula"><span class="mn-eq">CHW ΔT = 27.0 − 19.4 = 7.6 K</span><span class="mn-eq">site CHW flow = 30,000 / (4.186 × 7.6) = 943.0 L/s</span><span class="mn-where">Water density convention is embedded in the L/s formulation. The flow is site scope and does not change with Hall view selection.</span></div>
         </section>
 
         <section class="mn-section" id="ux">
@@ -234,9 +233,9 @@
         <section class="mn-section" id="acceptance">
             <h2><span class="mn-num">08</span> Acceptance criteria</h2>
             <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>ID</th><th>Given / when / then</th><th>Evidence</th></tr></thead><tbody>
-                <tr><td>AC-01</td><td>Given a fresh load, when the engine initializes, then rack sum, roll-up IT and EPMS IT are 1,850 kW within display rounding.</td><td>DOM values plus engine snapshot assertion.</td></tr>
-                <tr><td>AC-02</td><td>Given 200 cells, when density is derived, then the average is 9.25 kW/rack.</td><td>Deterministic unit test and rendered basis drawer.</td></tr>
-                <tr><td>AC-03</td><td>Given 17 × 130 kW running CRAHs, when one is removed, then 2,080 kW still covers 1,850 kW and N+1 reads PASS.</td><td>Formula assertion and DOM chip.</td></tr>
+                <tr><td>AC-01</td><td>Given a fresh load, when the engine initializes, then rack sum and selected-Hall IT are 7,500 kW within display rounding; Hall EPMS reconciliation is UNAVAILABLE without a submeter.</td><td>DOM values plus engine snapshot assertion.</td></tr>
+                <tr><td>AC-02</td><td>Given 500 installed positions, when density is derived, then the installed average is 15.0 kW/rack and the active-rack denominator is separately labelled.</td><td>Deterministic unit test and rendered basis drawer.</td></tr>
+                <tr><td>AC-03</td><td>Given 59 × 130 kW installed CRAHs and one failed unit, then 58 available units still cover 7,500 kW and N+1 reads PASS.</td><td>Formula assertion and DOM chip.</td></tr>
                 <tr><td>AC-04</td><td>Given repeated reloads, then rack occupancy, rack load and normal zone temperatures remain identical.</td><td>Multi-reload browser comparison.</td></tr>
                 <tr><td>AC-05</td><td>Given a rack above 85% but not 95%, then it and the alarm list are warning, not critical.</td><td>Boundary fixture at 85%, 85.1%, 95%.</td></tr>
                 <tr><td>AC-06</td><td>Given a rack above 95%, then critical count, alarm row and rack state agree.</td><td>Injected deterministic fixture.</td></tr>
@@ -249,7 +248,7 @@
                 <tr><td>AC-13</td><td>Given dark mode, then no body or major content surface is white.</td><td>Computed-style/render gate.</td></tr>
                 <tr><td>AC-14</td><td>Given the cockpit toolbar, PRD and Manual links are visible and navigate to public pages.</td><td>Navigation E2E.</td></tr>
                 <tr><td>AC-15</td><td>Given the full interaction journey, then no uncaught console or page errors occur.</td><td>Captured browser error stream.</td></tr>
-                <tr><td>AC-16</td><td>Given Hall A–D selection, then each selection declares 10 MW IT, 500 racks and 20 kW/rack average while current telemetry stays 1,850 kW.</td><td><code>tools/test-datahall-operator-engineering.mjs</code>.</td></tr>
+                <tr><td>AC-16</td><td>Given Hall A–D selection, then each selected current Hall declares 7.5 MW IT and 500 positions while the separate design context remains 10 MW and 20 kW/rack.</td><td><code>tools/test-datahall-operator-engineering.mjs</code>.</td></tr>
                 <tr><td>AC-17</td><td>Given Alarm History, then system/date/point/state/value filtering and CSV export retain source timestamp and quality.</td><td><code>tools/test-conv-alarm-workspace.mjs</code> plus browser E2E.</td></tr>
             </tbody></table></div>
         </section>
@@ -257,7 +256,7 @@
         <section class="mn-section" id="non-functional">
             <h2><span class="mn-num">09</span> Non-functional requirements</h2>
             <div class="mn-grid">
-                <article class="mn-card"><h3>Performance</h3><p>First meaningful operator state must render from local assets without a network API. Interaction work should remain responsive with 200 rack cells and 20 CRAHs; no unbounded timers or DOM growth.</p></article>
+                <article class="mn-card"><h3>Performance</h3><p>First meaningful operator state must render from local assets without a network API. Interaction work must remain responsive with 500 rack positions and 59 CRAHs; no unbounded timers or DOM growth.</p></article>
                 <article class="mn-card"><h3>Accessibility</h3><p>Target WCAG 2.2 AA: keyboard modes/dialogs, visible focus, semantic labels, 44 px mobile targets, non-color state text and reduced-motion handling.</p></article>
                 <article class="mn-card"><h3>Compatibility</h3><p>Current evergreen Chromium, Firefox and Safari; vanilla JavaScript, no build step. Failure of optional analytics/auth must not break this public documentation.</p></article>
                 <article class="mn-card"><h3>Integrity &amp; privacy</h3><p>No credentials, external write or live-site identifier. Simulated provenance is visible. HTML insertion uses controlled internal strings; user/external data requires text-safe rendering.</p></article>
@@ -268,8 +267,8 @@
             <h2><span class="mn-num">10</span> Provenance &amp; sources</h2>
             <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Source</th><th>What it governs</th><th>Trace</th></tr></thead><tbody>
                 <tr><td><code>datahall.html</code></td><td>Visible elements, rack spatial model, semantic tiers, CRAH availability and interaction logic.</td><td>Source of truth for FR-01–FR-26.</td></tr>
-                <tr><td><code>js/conv-engine.js</code></td><td>Frozen 1,850 kW IT, 1.45 PUE, EPMS reconciliation and cooling values.</td><td><code>window.CONV_CALC.snapshot</code>.</td></tr>
-                <tr><td><a class="mn-inline" href="../manual/datahall.html">Data Hall Technical Manual</a></td><td>Formula definitions, worked 1,850 kW example, assumptions and operating sequence.</td><td>Manual §§01–11.</td></tr>
+                <tr><td><code>js/conv-engine.js</code></td><td>Frozen current 30,000 kW site IT, 40,000 kW design boundary, 1.45 PUE, central cooling and site utility values.</td><td><code>window.CONV_CALC.snapshot</code>.</td></tr>
+                <tr><td><a class="mn-inline" href="../manual/datahall.html">Data Hall Technical Manual</a></td><td>Formula definitions, current 30 MW worked example, assumptions and operating sequence.</td><td>Manual §§01–11.</td></tr>
                 <tr><td><code>standarization/ACCURACY_VALIDATION.md</code></td><td>One source of truth, denominator, deterministic KPI, target-versus-derived and provenance rules.</td><td>Accuracy gate and probes.</td></tr>
                 <tr><td>ISO/IEC 30134-2</td><td><span data-explain="PUE">PUE</span> definition and facility/IT boundary.</td><td>Applied through the manual and frozen engine.</td></tr>
                 <tr><td>ASHRAE TC 9.9 thermal guidance</td><td>Recommended inlet envelope context; cockpit warning/critical limits remain explicit training choices.</td><td>Manual references and risk R-03.</td></tr>
@@ -280,7 +279,7 @@
         <section class="mn-section" id="risks">
             <h2><span class="mn-num">11</span> Open questions &amp; risks</h2>
             <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Risk</th><th>Current decision</th><th>Required follow-up</th></tr></thead><tbody>
-                <tr><td>R-01 · Site scope</td><td>The current engine total is intentionally modelled as one Hall A so rack sum equals 1,850 kW; the four-hall study is separate.</td><td>Never allocate the current snapshot across Hall B–D or replace its denominator from the study selector.</td></tr>
+                <tr><td>R-01 · Scope confusion</td><td>Site IT is 30 MW and each equal current Hall view is 7.5 MW; central plant and utilities remain site scope.</td><td>Every value must label site, Hall, installed-position, or active-rack denominator. Never infer Hall EPMS kW from an equal planning share.</td></tr>
                 <tr><td>R-02 · Simulated fidelity</td><td>Normal rack/zone states are deterministic; excursions are educational.</td><td>Do not relabel as live without authenticated point transport, freshness and quality semantics.</td></tr>
                 <tr><td>R-03 · Alarm thresholds</td><td>85%/95% rack and 26°C/30°C aisle thresholds are visible cockpit rules.</td><td>Validate and version against site cause/effect and approved set-point schedule before operations use.</td></tr>
                 <tr><td>R-04 · Airflow model</td><td>The page computes a simple sensible balance but normalizes displayed inlet temperature near 22°C.</td><td>Use commissioned sensor data or CFD for distribution/recirculation claims.</td></tr>

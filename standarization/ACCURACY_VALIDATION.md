@@ -92,9 +92,9 @@ says ~120 kW per NVL72 rack-scale system.
 
 For DC Conv, separate:
 
-- `Primary CHWS / CHWR` (7.2 / 14.8 °C — chiller-plant side)
-- `Secondary loop SP` (18.8 °C — CRAH/AHU side, NEVER labelled
-  "CHWS SP")
+- `Primary CHWS / CHWR` (19.4 / 27.0 °C at the current governed point)
+- `Secondary loop SP` (follows the primary CHWS floor: 19.4 °C at the
+  current governed point and may be raised for bypass; NEVER labelled "CHWS SP")
 
 ### Rule 6 — Basis chip on every critical KPI (v1.32.2+)
 
@@ -164,17 +164,29 @@ alongside the four audit scripts (`audit-script-tags`,
 1. **Carbon metric denominator** — if value = 0.42, label = "Grid
    factor" with facility-kWh denominator. If label = "CUE_IT", value
    = 0.61 (× PUE).
-2. **Chiller loop label** — 18.8 °C never appears as "CHWS SP";
-   always "Secondary loop SP".
+2. **Chiller loop label** — the load-loop setpoint never appears as "CHWS SP";
+   always "Secondary loop SP", with the current primary CHWS as its lower bound.
 3. **PUE reconciliation** — 1.45 on every page.
-4. **WUE reconciliation** — 37 L/min × 60 ÷ 1850 = 1.20 L/kWh IT.
-5. **Fuel autonomy** — 60,000 × 0.90 × 0.85 ÷ 956 = 48 hr; label =
+4. **WUE reconciliation** — 600.0 L/min × 60 ÷ 30,000 kW = 1.20 L/kWh IT.
+5. **Fuel autonomy** — 972,737 × 0.90 × 0.85 ÷ 15,503 = 48 hr; label =
    "bulk-tank at site load".
 6. **UPS 2N** — normal sharing + failover percentages both visible.
 7. **Rack basis** — physical count and rack-equivalent count never
    mixed without explicit label.
 8. **Data mode** — simulated / derived / measured / target chips
    propagated consistently.
+9. **Thermal semantics** — 25.4 °C rack inlet is normal green inside the
+   adopted 18–27 °C envelope; power-density bands are not reused for temperature.
+10. **Hall metering** — rack sum versus hall EPMS is `UNAVAILABLE` until a
+    governed hall submeter exists; equal-share planning arithmetic is neutral evidence.
+11. **Continuous state** — chiller temperatures and flow remain within the
+    current engine-derived bands after at least one scheduled simulation update.
+12. **Authority fan-out** — missing, request-mismatch, matched-legacy or same-version-incomplete
+    authority makes every duplicated KPI, path, tooltip, hidden drawer and status consumer
+    unavailable, never plausibly healthy. The governed Conventional engine is pinned to v2.0.0.
+13. **Thermal-plane naming** — 943.0 L/s is the IT sensible-load CHW reference; 982.3 L/s is
+    the current evaporator-duty reference; measured header flow is unavailable. The 31,250 kW
+    compatibility field is evaporator duty, while 36,403.4 kW is condenser/tower rejection.
 
 ## Owner exclusions (status as of 2026-05-24)
 
@@ -188,6 +200,13 @@ alongside the four audit scripts (`audit-script-tags`,
 | `tools/test-conv-calc.mjs` 22/22 must pass | STILL LOCKED |
 
 ## Implementation history
+
+- **v1.134.14** (2026-08-30): Operator-cockpit continuity and complete-authority gates added. Data Hall thermal
+  colors and hall-metering scope, post-tick chiller envelopes, site-wide municipal water,
+  all-path Fire fail-closed behavior, Design Studio selection and responsive AI header
+  reachability, shared-drawer provenance and linked-document parity are now exercised by
+  adversarial Puppeteer probes. CHW reference flow, evaporator duty and tower rejection are
+  labeled as distinct thermodynamic quantities.
 
 - **v1.32.1** (2026-05-24): Critical fixes shipped — AI-ACC-01/02/05/06/07/08
   + CONV-ACC-01/02/04/08. Dashboard randomisation stripped; CUE
@@ -220,8 +239,9 @@ alongside the four audit scripts (`audit-script-tags`,
   PASS**.
 - **v1.33.3** (2026-05-24): Rule 1 (one source of truth) verified
   CROSS-PAGE. Probe asserts PUE 1.45 identical on 3 surfaces, WUE
-  1.20 identical on 4 surfaces, IT load reconciles dc-conv "1,850 kW"
-  = datahall "1.85 MW". The reviewer's chief concern — "deeper tabs
+  1.20 identical on 4 surfaces; at that historical release, IT load reconciled
+  the then-governed dc-conv "1,850 kW" = datahall "1.85 MW" basis. Those values
+  are historical evidence, not the current 30 MW authority. The reviewer's chief concern — "deeper tabs
   can be correct while the first screen tells a different story" —
   is now demonstrably ruled out for these metrics. **40/40 PASS**.
 - **v1.36.1** (2026-05-24): Probe wired into per-ship gate

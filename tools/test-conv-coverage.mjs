@@ -112,6 +112,15 @@ try {
         await tab.goto(`${base}/${page}`, { waitUntil: 'domcontentloaded', timeout: 45000 });
         await new Promise((accept) => setTimeout(accept, 2600));
 
+        /* The data-hall cockpit deliberately defaults to the thermal operator layer. Its
+           declared distribution, however, reconciles rack POWER against hall IT kW. Select
+           that explicit layer before reading the shared rack-value cells; summing 25.4 C
+           values would be a test error, not an electrical reconciliation. */
+        if (page === 'datahall.html') {
+            await tab.click('.mode-btn[data-mode="power"]');
+            await new Promise((accept) => setTimeout(accept, 100));
+        }
+
         /* DECLARED DISTRIBUTIONS. A field of many per-item values (the data hall renders 500
            cabinet cells) cannot honestly be registered one parameter per cell, and leaving the
            cells in the denominator drowns every other page. A page may instead declare the

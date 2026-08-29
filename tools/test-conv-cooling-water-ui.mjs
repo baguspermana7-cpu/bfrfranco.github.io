@@ -17,6 +17,29 @@ vm.runInContext(await readFile('js/conv-engine.js', 'utf8'), engineSandbox);
 const ENGINE = engineSandbox.window.CONV_CALC;
 assert.ok(ENGINE && ENGINE.snapshot, 'conv-engine.js must expose CONV_CALC.snapshot');
 const ENGINE_CHWS_TXT = String(ENGINE.snapshot.cooling.chws_c);
+const ENGINE_CACHE_TOKEN = String(ENGINE.snapshot.meta.version);
+const WATER_SOURCE = await readFile('water-system.html', 'utf8');
+assert.doesNotMatch(
+  WATER_SOURCE,
+  /(?:1[,.]850|2[,.]220)/,
+  'water page source must not retain retired current-basis values',
+);
+assert.doesNotMatch(
+  WATER_SOURCE,
+  /bindHallViews|data-active-hall|data-hall=/,
+  'site-wide water plant must not expose a cosmetic Hall A-D selector',
+);
+assert.match(
+  WATER_SOURCE,
+  new RegExp(`js/conv-engine\\.js\\?v=${ENGINE_CACHE_TOKEN.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`),
+  'water page must request the governed engine version so a retired cached snapshot cannot look current',
+);
+assert.doesNotMatch(WATER_SOURCE, /id="kDp">0\.40|id="kTds">140|id="status-tank">82%/,
+  'water first paint must not publish plausible process telemetry before authority');
+assert.match(WATER_SOURCE, /id="alarmList">\s*<li><span class="sev unavailable">UNAVAILABLE<\/span>/,
+  'water first-paint alarm state must be unavailable');
+assert.match(WATER_SOURCE, /data-id="ws-mains-in"[^>]+data-state="unavailable"[^>]+data-current="UNAVAILABLE"/,
+  'water first-paint process line must fail closed');
 
 const ROOT = process.cwd();
 const MIME = Object.freeze({
@@ -99,7 +122,10 @@ async function assertHallAndBasisContract(page, currentIds, hallLabelId) {
   assert.equal(initial.activeHall, 'A');
   assert.match(initial.hallLabel, /Hall A/i);
   assert.match(initial.current, /CURRENT/i);
-  assert.match(initial.current, /30\.000 MW/i);  // REBASELINED to the v2.0.0 campus basis (30,000 kW IT / 43.50 MW facility)
+  assert.match(initial.current, /site plant/i);
+  assert.match(initial.current, /30\.000 MW/i);
+  assert.match(initial.current, /selected Hall A/i);
+  assert.match(initial.current, /7\.500 MW IT \/ 500 racks/i);
   assert.match(initial.study, /4\s*[×x]\s*10 MW/i);
   assert.match(initial.study, /READ[- ]ONLY|STUDY ONLY/i);
 
@@ -108,13 +134,44 @@ async function assertHallAndBasisContract(page, currentIds, hallLabelId) {
     activeHall: document.body.dataset.activeHall,
     hallLabel: document.getElementById(labelId)?.textContent.trim(),
     pressed: document.querySelector('[data-hall="C"]')?.getAttribute('aria-pressed'),
+    current: document.querySelector('[data-basis="current"]')?.textContent || '',
     values: Object.fromEntries(ids.map((id) => [id, document.getElementById(id)?.textContent.trim()])),
   }), currentIds, hallLabelId);
 
   assert.equal(selected.activeHall, 'C');
   assert.equal(selected.pressed, 'true');
   assert.match(selected.hallLabel, /Hall C/i);
+  assert.match(selected.current, /site plant/i);
+  assert.match(selected.current, /30\.000 MW/i);
+  assert.match(selected.current, /selected Hall C/i);
+  assert.match(selected.current, /7\.500 MW IT \/ 500 racks/i);
   assert.deepEqual(selected.values, before, 'view-only hall change must not mutate deterministic telemetry');
+}
+
+async function assertSiteWaterContract(page) {
+  const state = await page.evaluate(() => ({
+    hallControls: document.querySelectorAll('[data-hall]').length,
+    activeHall: document.body.dataset.activeHall,
+    siteLabel: document.getElementById('waterSiteLabel')?.textContent.trim(),
+    current: document.querySelector('[data-basis="current"]')?.textContent || '',
+    study: document.querySelector('[data-basis="study"]')?.textContent || '',
+    hallAllocation: document.getElementById('alloc-hall')?.textContent.trim(),
+    scopeNote: document.getElementById('water-scope-note')?.textContent.replace(/\s+/g, ' ').trim(),
+    bodyText: document.body.textContent.replace(/\s+/g, ' '),
+  }));
+
+  assert.equal(state.hallControls, 0);
+  assert.equal(state.activeHall, undefined);
+  assert.match(state.siteLabel, /site-wide/i);
+  assert.match(state.current, /site scope/i);
+  assert.match(state.current, /30\.000 MW IT/i);
+  assert.match(state.current, /600\.0 L\/min/i);
+  assert.match(state.study, /site capacity study/i);
+  assert.match(state.study, /40 MW IT/i);
+  assert.match(state.study, /READ[- ]ONLY|STUDY ONLY/i);
+  assert.match(state.hallAllocation, /UNAVAILABLE/i);
+  assert.match(state.scopeNote, /submeter/i);
+  assert.doesNotMatch(state.bodyText, /(?:1,850|2,220)/);
 }
 
 const { server, origin } = await startServer();
@@ -179,7 +236,7 @@ try {
 
   const water = await openPage(browser, origin, 'water-system.html');
   await water.waitForFunction(() => document.getElementById('kWue')?.textContent.includes('1.20'));
-  await assertHallAndBasisContract(water, ['kWue', 'kMakeup', 'kTotal'], 'waterHallLabel');
+  await assertSiteWaterContract(water);
 
   const waterPlant = await water.evaluate(() => ({
     pumps: Array.from(document.querySelectorAll('[data-pump-id]')).map((pump) => ({
@@ -193,6 +250,11 @@ try {
       treatment: document.getElementById('alloc-treatment')?.textContent.trim(),
       makeup: document.getElementById('alloc-makeup')?.textContent.trim(),
       domestic: document.getElementById('alloc-domestic')?.textContent.trim(),
+      hall: document.getElementById('alloc-hall')?.textContent.trim(),
+    },
+    thresholds: {
+      filterDp: document.getElementById('kDpTh')?.textContent.trim(),
+      treatedTds: document.getElementById('kTdsTh')?.textContent.trim(),
     },
     bottom: document.getElementById('status-pump')?.textContent.trim(),
   }));
@@ -206,6 +268,9 @@ try {
   assert.match(waterPlant.allocation.treatment, /608\.0 L\/min/i);   // 600.0 makeup + 8.0 domestic  // REBASELINED to the v2.0.0 campus basis (30,000 kW IT / 43.50 MW facility)
   assert.match(waterPlant.allocation.makeup, /600\.0 L\/min/i);      // (1.20 x 30,000)/60  // REBASELINED to the v2.0.0 campus basis (30,000 kW IT / 43.50 MW facility)
   assert.match(waterPlant.allocation.domestic, /8\.0 L\/min/i);
+  assert.match(waterPlant.allocation.hall, /UNAVAILABLE/i);
+  assert.match(waterPlant.thresholds.filterDp, /Backwash > 0\.80 bar/i);
+  assert.match(waterPlant.thresholds.treatedTds, /Limit < 500 ppm/i);
   assert.match(waterPlant.bottom, /P-301A DUTY/i);
   assert.match(waterPlant.bottom, /P-301B STBY/i);
 
@@ -217,7 +282,249 @@ try {
   assert.ok(waterOverflow <= 2, `water page overflowed mobile viewport by ${waterOverflow}px`);
   await water.close();
 
-  console.log('PASS Conventional chiller/water hall context, current-study truth, modal UX, pump redundancy, and responsive layout');
+  const waterWithoutEngine = await browser.newPage();
+  await waterWithoutEngine.setRequestInterception(true);
+  waterWithoutEngine.on('request', (request) => {
+    const url = request.url();
+    if (url.includes('/chart.js@4.4.1/')) {
+      request.respond({
+        status: 200,
+        contentType: 'text/javascript',
+        body: 'window.__waterChartConfigs=[];window.Chart=function(c,x){window.__waterChartConfigs.push(x);this.data=x.data;this.update=function(){};};',
+      });
+    } else if (new URL(url).pathname.endsWith('/js/conv-engine.js')) request.abort();
+    else if (url.startsWith(origin) || url.startsWith('data:')) request.continue();
+    else request.abort();
+  });
+  await waterWithoutEngine.goto(`${origin}/water-system.html`, {
+    waitUntil: 'domcontentloaded', timeout: 30_000,
+  });
+  const unavailable = await waterWithoutEngine.evaluate(() => ({
+    dataQuality: document.getElementById('dataQuality')?.textContent.trim(),
+    lastUpdate: document.getElementById('lastUpdate')?.textContent.trim(),
+    statusTime: document.getElementById('status-time')?.textContent.trim(),
+    system: document.getElementById('status-system')?.textContent.trim(),
+    makeup: document.getElementById('alloc-makeup')?.textContent.trim(),
+    total: document.getElementById('alloc-treatment')?.textContent.trim(),
+    reconciliation: document.getElementById('scope-reconciliation-note')?.innerText.replace(/\s+/g, ' ').trim(),
+    systemLed: document.getElementById('led-system')?.className,
+    tankLed: document.getElementById('led-tank')?.className,
+    pumpLed: document.getElementById('led-pump')?.className,
+    tankStatus: document.getElementById('status-tank')?.textContent.trim(),
+    pumpStatus: document.getElementById('status-pump')?.textContent.trim(),
+    pumpAState: document.getElementById('m-pump-st')?.textContent.trim(),
+    pumpBState: document.getElementById('m-pump-b-st')?.textContent.trim(),
+    alarmText: document.getElementById('alarmList')?.innerText.replace(/\s+/g, ' ').trim(),
+    processStates: Array.from(document.querySelectorAll('#water-svg [data-rz-line]'))
+      .map((node) => node.getAttribute('data-state')),
+    chartCount: window.__waterChartConfigs?.length || 0,
+    trendState: document.getElementById('pressureTrendUnavailable')?.textContent.trim(),
+    controlsDisabled: Array.from(document.querySelectorAll('#btn-sim,#btn-bw,#btn-reset'))
+      .every((node) => node.disabled),
+  }));
+  assert.equal(unavailable.dataQuality, 'UNAVAILABLE');
+  assert.equal(unavailable.lastUpdate, 'UNAVAILABLE');
+  assert.equal(unavailable.statusTime, 'UNAVAILABLE');
+  assert.equal(unavailable.system, 'UNAVAILABLE');
+  assert.match(unavailable.makeup, /UNAVAILABLE/i);
+  assert.match(unavailable.total, /UNAVAILABLE/i);
+  assert.match(unavailable.reconciliation, /UNAVAILABLE/i);
+  assert.doesNotMatch(unavailable.reconciliation, /[—-]\s*L\/min.*=/);
+  assert.doesNotMatch(unavailable.systemLed, /led-ok/);
+  assert.doesNotMatch(unavailable.tankLed, /led-ok/);
+  assert.doesNotMatch(unavailable.pumpLed, /led-ok/);
+  assert.match(unavailable.tankStatus, /UNAVAILABLE/i);
+  assert.match(unavailable.pumpStatus, /UNAVAILABLE/i);
+  assert.match(unavailable.pumpAState, /UNAVAILABLE/i);
+  assert.match(unavailable.pumpBState, /UNAVAILABLE/i);
+  assert.match(unavailable.alarmText, /UNAVAILABLE/i);
+  assert.doesNotMatch(unavailable.alarmText, /\bOK\b|healthy|feedback OK/i);
+  assert.ok(unavailable.processStates.every((state) => state === 'unavailable'),
+    `water process lines must fail closed: ${unavailable.processStates.join(', ')}`);
+  assert.equal(unavailable.chartCount, 0, 'unavailable process authority must not instantiate a plausible DP chart');
+  assert.match(unavailable.trendState, /UNAVAILABLE/i);
+  assert.equal(unavailable.controlsDisabled, true, 'process simulation controls must disable without authority');
+  await waterWithoutEngine.close();
+
+  /* A structurally complete legacy engine is more dangerous than a missing script: without
+     an authority check it renders plausible retired values as GOOD. The page must reject it
+     just as firmly as a failed load. */
+  const legacyEngineSource = `
+    window.CONV_CALC = {
+      snapshot: {
+        site: { it_load_kw: 1850 },
+        water: {
+          wue_l_per_kwh: 1.20,
+          flow_lpm_for_wue: 37.0,
+          domestic_lpm: 8.0,
+          total_treated_lpm: 45.0
+        },
+        meta: { version: '1.22.0', scenario: 'Simulated', data_quality: 'GOOD' }
+      },
+      wueFromFlowLpm: function (flowLpm) { return flowLpm * 60 / 1850; }
+    };
+  `;
+  const waterWithLegacyEngine = await browser.newPage();
+  await waterWithLegacyEngine.setRequestInterception(true);
+  waterWithLegacyEngine.on('request', (request) => {
+    const url = request.url();
+    const pathname = new URL(url).pathname;
+    if (pathname.endsWith('/js/conv-engine.js')) {
+      void request.respond({ status: 200, contentType: 'text/javascript', body: legacyEngineSource });
+    } else if (url.startsWith(origin) || url.startsWith('data:')) {
+      void request.continue();
+    } else {
+      void request.abort();
+    }
+  });
+  await waterWithLegacyEngine.goto(`${origin}/water-system.html`, {
+    waitUntil: 'domcontentloaded', timeout: 30_000,
+  });
+  const legacy = await waterWithLegacyEngine.evaluate(() => ({
+    dataQuality: document.getElementById('dataQuality')?.textContent.trim(),
+    system: document.getElementById('status-system')?.textContent.trim(),
+    makeup: document.getElementById('alloc-makeup')?.textContent.trim(),
+    total: document.getElementById('alloc-treatment')?.textContent.trim(),
+    basis: document.getElementById('water-current-basis-value')?.textContent.trim(),
+    bodyText: document.body.innerText.replace(/\s+/g, ' '),
+    systemLed: document.getElementById('led-system')?.className,
+  }));
+  assert.equal(legacy.dataQuality, 'UNAVAILABLE');
+  assert.equal(legacy.system, 'UNAVAILABLE');
+  assert.match(legacy.makeup, /UNAVAILABLE/i);
+  assert.match(legacy.total, /UNAVAILABLE/i);
+  assert.match(legacy.basis, /UNAVAILABLE/i);
+  assert.doesNotMatch(legacy.bodyText, /(?:1\.850 MW|37\.0 L\/min|45\.0 L\/min)/);
+  assert.doesNotMatch(legacy.systemLed, /led-ok/);
+  await waterWithLegacyEngine.close();
+
+  /* Same-version is necessary but not sufficient authority. A partial current bundle
+     without the API consumed by the page used to throw after the numeric checks passed,
+     preserving healthy first paint. It must now render a complete neutral state. */
+  const incompleteCurrentEngineSource = `
+    window.CONV_CALC = {
+      snapshot: {
+        site: { it_load_kw: 30000 },
+        water: {
+          wue_l_per_kwh: 1.20,
+          flow_lpm_for_wue: 600.0,
+          domestic_lpm: 8.0,
+          total_treated_lpm: 608.0
+        },
+        meta: { version: '${ENGINE_CACHE_TOKEN}', scenario: 'Simulated', data_quality: 'GOOD' }
+      }
+    };
+  `;
+  const waterWithIncompleteEngine = await browser.newPage();
+  const incompletePageErrors = [];
+  waterWithIncompleteEngine.on('pageerror', (error) => incompletePageErrors.push(error.message));
+  await waterWithIncompleteEngine.setRequestInterception(true);
+  waterWithIncompleteEngine.on('request', (request) => {
+    const url = request.url();
+    const pathname = new URL(url).pathname;
+    if (pathname.endsWith('/js/conv-engine.js')) {
+      void request.respond({
+        status: 200,
+        contentType: 'text/javascript',
+        body: incompleteCurrentEngineSource,
+      });
+    } else if (url.startsWith(origin) || url.startsWith('data:')) {
+      void request.continue();
+    } else {
+      void request.abort();
+    }
+  });
+  await waterWithIncompleteEngine.goto(`${origin}/water-system.html`, {
+    waitUntil: 'domcontentloaded', timeout: 30_000,
+  });
+  const incomplete = await waterWithIncompleteEngine.evaluate(() => ({
+    dataQuality: document.getElementById('dataQuality')?.textContent.trim(),
+    system: document.getElementById('status-system')?.textContent.trim(),
+    makeup: document.getElementById('alloc-makeup')?.textContent.trim(),
+    total: document.getElementById('alloc-treatment')?.textContent.trim(),
+    basis: document.getElementById('water-current-basis-value')?.textContent.trim(),
+    systemLed: document.getElementById('led-system')?.className,
+    processStates: Array.from(document.querySelectorAll('#water-svg [data-rz-line]'))
+      .map((node) => node.getAttribute('data-state')),
+    controlsDisabled: Array.from(document.querySelectorAll('#btn-sim,#btn-bw,#btn-reset'))
+      .every((node) => node.disabled),
+  }));
+  assert.deepEqual(incompletePageErrors, [], `partial current water authority threw: ${incompletePageErrors.join('; ')}`);
+  assert.equal(incomplete.dataQuality, 'UNAVAILABLE');
+  assert.equal(incomplete.system, 'UNAVAILABLE');
+  assert.match(incomplete.makeup, /UNAVAILABLE/i);
+  assert.match(incomplete.total, /UNAVAILABLE/i);
+  assert.match(incomplete.basis, /UNAVAILABLE/i);
+  assert.doesNotMatch(incomplete.systemLed, /led-ok/);
+  assert.ok(incomplete.processStates.every((state) => state === 'unavailable'));
+  assert.equal(incomplete.controlsDisabled, true);
+  await waterWithIncompleteEngine.close();
+
+  /* Numeric completeness without provenance is still unavailable. Scenario and quality
+     are part of the authority contract, not decorative labels. */
+  const missingMetaCurrentEngineSource = `
+    window.CONV_CALC = {
+      snapshot: {
+        site: { it_load_kw: 30000 },
+        water: {
+          wue_l_per_kwh: 1.20,
+          flow_lpm_for_wue: 600.0,
+          domestic_lpm: 8.0,
+          total_treated_lpm: 608.0
+        },
+        meta: { version: '${ENGINE_CACHE_TOKEN}' }
+      },
+      wueFromFlowLpm: function (flowLpm) { return flowLpm * 60 / 30000; }
+    };
+  `;
+  const waterWithMissingMeta = await browser.newPage();
+  const missingMetaErrors = [];
+  waterWithMissingMeta.on('pageerror', (error) => missingMetaErrors.push(error.message));
+  await waterWithMissingMeta.setRequestInterception(true);
+  waterWithMissingMeta.on('request', (request) => {
+    const url = request.url();
+    const pathname = new URL(url).pathname;
+    if (pathname.endsWith('/js/conv-engine.js')) {
+      void request.respond({
+        status: 200,
+        contentType: 'text/javascript',
+        body: missingMetaCurrentEngineSource,
+      });
+    } else if (url.startsWith(origin) || url.startsWith('data:')) {
+      void request.continue();
+    } else {
+      void request.abort();
+    }
+  });
+  await waterWithMissingMeta.goto(`${origin}/water-system.html`, {
+    waitUntil: 'domcontentloaded', timeout: 30_000,
+  });
+  const missingMeta = await waterWithMissingMeta.evaluate(() => ({
+    dataQuality: document.getElementById('dataQuality')?.textContent.trim(),
+    scenario: document.getElementById('scenarioName')?.textContent.trim(),
+    lastUpdate: document.getElementById('lastUpdate')?.textContent.trim(),
+    statusTime: document.getElementById('status-time')?.textContent.trim(),
+    system: document.getElementById('status-system')?.textContent.trim(),
+    basis: document.getElementById('water-current-basis-value')?.textContent.trim(),
+    systemLed: document.getElementById('led-system')?.className,
+    processStates: Array.from(document.querySelectorAll('#water-svg [data-rz-line]'))
+      .map((node) => node.getAttribute('data-state')),
+    controlsDisabled: Array.from(document.querySelectorAll('#btn-sim,#btn-bw,#btn-reset'))
+      .every((node) => node.disabled),
+  }));
+  assert.deepEqual(missingMetaErrors, [], `missing-meta water authority threw: ${missingMetaErrors.join('; ')}`);
+  assert.equal(missingMeta.dataQuality, 'UNAVAILABLE');
+  assert.equal(missingMeta.scenario, 'UNAVAILABLE');
+  assert.equal(missingMeta.lastUpdate, 'UNAVAILABLE');
+  assert.equal(missingMeta.statusTime, 'UNAVAILABLE');
+  assert.equal(missingMeta.system, 'UNAVAILABLE');
+  assert.match(missingMeta.basis, /UNAVAILABLE/i);
+  assert.doesNotMatch(missingMeta.systemLed, /led-ok/);
+  assert.ok(missingMeta.processStates.every((state) => state === 'unavailable'));
+  assert.equal(missingMeta.controlsDisabled, true);
+  await waterWithMissingMeta.close();
+
+  console.log('PASS Conventional chiller hall context plus site-wide water scope, fail-closed basis, pump redundancy, and responsive layout');
 } finally {
   await browser.close();
   await new Promise((accept) => server.close(accept));

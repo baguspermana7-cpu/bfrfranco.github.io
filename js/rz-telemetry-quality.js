@@ -29,7 +29,7 @@
   /* ------------------------------------------------------------------ */
   var STATES = {
     'live':       { label: 'Live',        chip: 'LIVE',       color: '#86efac', bg: 'rgba(34,197,94,0.16)',  bd: 'rgba(34,197,94,0.45)' },
-    'simulated':  { label: 'Simulated',   chip: 'SIM',        color: '#c4b5fd', bg: 'rgba(167,139,250,0.16)', bd: 'rgba(167,139,250,0.45)' },
+    'simulated':  { label: 'Simulated',   chip: 'SIM',        color: '#67e8f9', bg: 'rgba(6,182,212,0.12)', bd: 'rgba(6,182,212,0.42)' },
     'stale':      { label: 'Stale',       chip: 'STALE',      color: '#fbbf24', bg: 'rgba(245,158,11,0.16)',  bd: 'rgba(245,158,11,0.45)' },
     'manual':     { label: 'Manual',      chip: 'MANUAL',     color: '#7dd3fc', bg: 'rgba(56,189,248,0.16)',  bd: 'rgba(56,189,248,0.45)' },
     'comms_lost': { label: 'Comms lost',  chip: 'NO COMMS',   color: '#fca5a5', bg: 'rgba(239,68,68,0.16)',   bd: 'rgba(239,68,68,0.55)' },
@@ -67,8 +67,11 @@
       '.rz-tq-banner--in-flow{position:static;top:auto;left:auto;transform:none;width:100%;max-width:none;' +
         'box-sizing:border-box;justify-content:center;border-radius:0;box-shadow:none}' +
       '.rz-tq-banner--in-flow.dismissed{display:none;transform:none}' +
+      '.rz-tq-banner--compact{width:auto;max-width:280px;min-width:0;height:44px;padding:0 0 0 9px;' +
+        'justify-content:flex-start;border-radius:3px;box-shadow:none;white-space:nowrap;flex:0 1 auto}' +
+      '.rz-tq-banner--compact .rz-tq-banner-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
       '[data-theme="light"] .rz-tq-banner[data-rz-tq-state="live"]{color:#0B5D31!important;background:#E6F7ED!important;border-color:#167A45!important}' +
-      '[data-theme="light"] .rz-tq-banner[data-rz-tq-state="simulated"]{color:#3F1D8F!important;background:#F0ECFF!important;border-color:#6B4DB8!important}' +
+      '[data-theme="light"] .rz-tq-banner[data-rz-tq-state="simulated"]{color:#07546A!important;background:#E3F8FC!important;border-color:#087D9A!important}' +
       '[data-theme="light"] .rz-tq-banner[data-rz-tq-state="stale"]{color:#6B4500!important;background:#FFF4D6!important;border-color:#946400!important}' +
       '[data-theme="light"] .rz-tq-banner[data-rz-tq-state="manual"]{color:#07546A!important;background:#E3F8FC!important;border-color:#087D9A!important}' +
       '[data-theme="light"] .rz-tq-banner[data-rz-tq-state="comms_lost"]{color:#8B1515!important;background:#FFEAEA!important;border-color:#B52222!important}' +
@@ -96,6 +99,12 @@
   var pageMode = null;
   var bannerEl = null;
 
+  function authorityUnavailable() {
+    if (!doc.body) { return false; }
+    return doc.body.getAttribute('data-rz-basis-authority') === 'unavailable' ||
+      doc.body.getAttribute('data-datahall-authority') === 'unavailable';
+  }
+
   function setPageMode(mode) {
     pageMode = mode;
     if (!doc.body) { return; }
@@ -111,13 +120,14 @@
       bannerEl = null;
       return;
     }
+    var effectiveMode = authorityUnavailable() ? 'comms_lost' : pageMode;
     /* Skip the banner for 'live' mode — operators don't need a label when
      * everything is genuine telemetry. Only surface non-live modes. */
-    if (pageMode === 'live') {
+    if (effectiveMode === 'live') {
       if (bannerEl) { bannerEl.remove(); bannerEl = null; }
       return;
     }
-    var st = getState(pageMode);
+    var st = getState(effectiveMode);
     var slot = doc.querySelector('[data-rz-telemetry-banner-slot]');
     if (!bannerEl) {
       bannerEl = doc.createElement('div');
@@ -125,18 +135,27 @@
       bannerEl.setAttribute('role', 'status');
       bannerEl.setAttribute('data-rz-tq-banner', '1');
     }
+    var compact = !!(slot && slot.hasAttribute('data-rz-telemetry-compact'));
     if (slot) { bannerEl.classList.add('rz-tq-banner--in-flow'); }
     else { bannerEl.classList.remove('rz-tq-banner--in-flow'); }
+    bannerEl.classList.toggle('rz-tq-banner--compact', compact);
     if (bannerEl.parentElement !== (slot || doc.body)) { (slot || doc.body).appendChild(bannerEl); }
     bannerEl.style.cssText = 'background:' + st.bg + ';color:' + st.color +
                              ';border:1px solid ' + st.bd + ';border-top:0';
-    bannerEl.setAttribute('data-rz-tq-state', pageMode);
-    var label = pageMode === 'simulated' ? 'Simulated telemetry — engine-derived basis' :
-                pageMode === 'demo'      ? 'Demo mode — training values only' :
-                                            st.label + ' — ' + esc(pageMode);
+    bannerEl.setAttribute('data-rz-tq-state', effectiveMode);
+    var customLabel = slot && slot.getAttribute('data-rz-telemetry-label');
+    var label = effectiveMode === 'comms_lost' ? 'COMMS LOST — AUTHORITY UNAVAILABLE' :
+                customLabel ? customLabel : effectiveMode === 'simulated' ? 'Simulated telemetry — engine-derived basis' :
+                effectiveMode === 'demo'      ? 'Demo mode — training values only' :
+                                                st.label + ' — ' + esc(effectiveMode);
+    bannerEl.title = effectiveMode === 'comms_lost'
+      ? 'Governed engineering authority did not validate. Telemetry and controls are unavailable.'
+      : effectiveMode === 'simulated'
+      ? 'Non-live deterministic telemetry generated from the governed engineering basis.'
+      : label;
     bannerEl.innerHTML =
       '<span class="rz-tq-banner-dot"></span>' +
-      '<span>' + esc(label) + '</span>' +
+      '<span class="rz-tq-banner-label">' + esc(label) + '</span>' +
       '<button class="rz-tq-banner-close" aria-label="Dismiss banner" type="button">×</button>';
     var closeBtn = bannerEl.querySelector('.rz-tq-banner-close');
     if (closeBtn) {
@@ -157,6 +176,7 @@
 
   function getPointState(el) {
     if (!el || !el.getAttribute) { return 'live'; }
+    if (authorityUnavailable()) { return 'comms_lost'; }
     var explicit = el.getAttribute('data-quality-state');
     if (explicit && STATES[explicit]) { return explicit; }
     /* Inherit from page mode if no explicit attribute. */
@@ -205,6 +225,13 @@
     if (doc.body) {
       var bodyMode = doc.body.getAttribute('data-rz-data-mode');
       if (bodyMode) { setPageMode(bodyMode); }
+      if (root && root.MutationObserver) {
+        var observer = new root.MutationObserver(function () { renderBanner(); });
+        observer.observe(doc.body, {
+          attributes: true,
+          attributeFilter: ['data-rz-basis-authority', 'data-datahall-authority', 'data-rz-data-mode']
+        });
+      }
     }
   }
 
@@ -224,7 +251,7 @@
     getPointState: getPointState,
     chipHtml: chipHtml,
     audit: audit,
-    version: '1.43.2'
+    version: '1.43.4'
   };
   if (root) { root.RZTelemetryQuality = API; }
 

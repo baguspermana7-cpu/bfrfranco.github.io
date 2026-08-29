@@ -106,6 +106,8 @@
 
         body {
             font-family: IBM Plex Sans, system-ui, sans-serif;
+            font-variant-numeric: tabular-nums slashed-zero;
+            font-feature-settings: "tnum" 1, "zero" 1;
             background-color: var(--bg-color);
             color: var(--text-primary);
             margin: 0; padding: 0;
@@ -150,7 +152,12 @@
         }
         .as-cell:last-child { border-right: none; }
         .as-cell .lbl { color: var(--text-dim); }
-        .as-cell .num { font-family: 'JetBrains Mono', monospace; font-weight: 700; }
+        .as-cell .num, .data-val, .k-val, .metric-val, [data-basis-param] {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums slashed-zero;
+            font-feature-settings: "tnum" 1, "zero" 1;
+        }
         .as-state {
             font-weight: 700; letter-spacing: 0.5px;
             padding: 3px 9px; border-radius: 4px; font-size: 0.7rem;
@@ -161,6 +168,8 @@
             border: 1px solid rgba(217,154,43,0.5); }
         .as-state.alarm { background: rgba(224,82,79,0.18); color: var(--crit);
             border: 1px solid rgba(224,82,79,0.55); animation: blink 1.1s steps(1) infinite; }
+        .as-state.unavailable { background: rgba(127,147,171,.10); color: var(--text-dim);
+            border: 1px solid rgba(127,147,171,.35); }
         .as-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
         .as-dot.g { background: var(--ok); box-shadow: 0 0 5px rgba(86,176,126,0.6); }
         .as-dot.y { background: var(--warn); box-shadow: 0 0 5px rgba(217,154,43,0.6); }
@@ -235,10 +244,11 @@
             display: grid; grid-template-columns: 1.05fr 1.35fr 0.95fr;
             gap: 13px; padding: 13px 18px 18px 18px; flex: 1; align-items: start;
         }
-        .col { display: flex; flex-direction: column; gap: 13px; }
+        .col { display: flex; flex-direction: column; gap: 13px; min-width: 0; width: 100%; }
         .panel {
             background: var(--panel-bg); border: 1px solid var(--border-color);
             border-radius: 7px; padding: 13px;
+            min-width: 0; max-width: 100%;
         }
         .panel-header {
             font-size: 0.74rem; font-weight: 700; color: var(--text-secondary);
@@ -337,6 +347,9 @@
         .ilk .ilk-stat { color: var(--text-primary); font-weight: 700; font-size: 0.76rem; }
         .ilk.warning .ilk-stat { color: var(--warn); }
         .ilk.alarm .ilk-stat { color: var(--crit); }
+        .ilk.unavailable { border-color: rgba(127,147,171,.28); background: rgba(127,147,171,.04); }
+        .ilk.unavailable .ilk-dot { background: transparent; border-color: var(--text-dim); box-shadow:none; }
+        .ilk.unavailable .ilk-stat { color: var(--text-dim); }
 
         /* ---- PUMP UNIT ---- */
         .pump-unit { border: 1px solid var(--border-soft); border-radius: 6px;
@@ -367,6 +380,8 @@
         .conditioning-mimic.is-running .conditioning-state::before { background: var(--ok); box-shadow: 0 0 5px rgba(86,176,126,.48); }
         .conditioning-mimic.is-fault .conditioning-state { color: var(--crit); }
         .conditioning-mimic.is-fault .conditioning-state::before { background: var(--crit); }
+        .conditioning-mimic.is-unavailable .conditioning-state { color: var(--text-dim); }
+        .conditioning-mimic.is-unavailable .conditioning-state::before { background:transparent;border:1px solid var(--text-dim); }
         .conditioning-path { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 6px; align-items: center; }
         .conditioning-node {
             min-width: 0; padding: 7px 5px; border: 1px solid var(--border-color); text-align: center;
@@ -393,6 +408,7 @@
         .containment-value { color: var(--ok); font: 800 .61rem/1.2 'JetBrains Mono', monospace; }
         .containment-row.is-critical .containment-value { color: var(--crit); }
         .containment-row.is-warning .containment-value { color: var(--warn); }
+        .containment-row.is-unavailable .containment-value { color: var(--text-dim); }
         .containment-action {
             margin-top: 8px; padding: 7px 8px; border: 1px solid var(--border-soft); color: var(--text-secondary);
             background: #0b131d; font: 700 .58rem/1.45 'JetBrains Mono', monospace;
@@ -518,7 +534,7 @@
         @media (max-width: 1280px) {
             /* Hero falls back to equal-column at smaller widths so the layout doesn't break.
                Sub-1500 still keeps the hero pop via the bigger value font. */
-            .kpi-strip { grid-template-columns: repeat(3, 1fr) !important; }
+            .kpi-strip { grid-template-columns: repeat(3, 1fr); }
             .kpi.hero { grid-column: span 3; }
             .kpi.hero .k-val { font-size: 2.5rem; }
         }
@@ -530,6 +546,7 @@
         @media (max-width: 900px) {
             .main-grid { grid-template-columns: 1fr; }
             .kpi-strip { grid-template-columns: repeat(2, 1fr); }
+            .kpi.hero { grid-column: 1 / -1; }
             .col-events { grid-column: auto; }
             .fuel-scope-strip { grid-template-columns: 1fr; }
         }
@@ -541,7 +558,8 @@
             .as-cell { flex: 1 1 auto; }
             .tb-actions { justify-content: space-between; flex-wrap: wrap; }
             .kpi-strip { grid-template-columns: 1fr; padding: 12px 12px 0 12px; }
-            .main-grid { padding: 12px; }
+            .main-grid { padding: 12px; min-width: 0; width: 100%; }
+            .main-grid > .col, .main-grid > .panel { min-width: 0; width: 100%; max-width: 100%; }
             .control-bar { padding: 0 12px; }
             .ilk-grid { grid-template-columns: 1fr; }
             .ust-block { flex-direction: column; }
@@ -568,11 +586,11 @@
     [data-theme="dark"] #cookieAccept{background:#1d4ed8 !important}
 #cookieAccept{background:#1d4ed8 !important}
 </style>
-    <script src="js/conv-engine.js?v=1.22.0"></script>
+    <script src="js/conv-engine.js?v=2.0.0"></script>
     <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
          Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
     <script src="js/conv-parameters.js?v=1.134.3"></script>
-    <script src="js/rz-basis-drawer.js?v=1.134.3"></script>
+    <script src="js/rz-basis-drawer.js?v=1.134.14"></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
          Loaded for cross-page consistency; body does NOT carry rz-bms-shell
          class. Spec: standarization/BMS_SHELL.md ; conv/review/14 §6. -->
@@ -604,7 +622,7 @@
 
     <!-- Fullscreen Navigation Controls -->
     <div class="fullscreen-nav">
-        <button class="fs-nav-btn" onclick="resetSimulation()" type="button"><i class="fas fa-redo"></i> RESET</button>
+        <button class="fs-nav-btn" id="fs-reset" onclick="resetSimulation()" type="button" disabled><i class="fas fa-redo"></i> RESET</button>
         <button class="fs-nav-btn" onclick="toggleFullscreen()" type="button"><i class="fas fa-compress"></i> EXIT</button>
         <a href="dc-conventional.html" class="fs-nav-btn"><i class="fas fa-arrow-left"></i> BACK</a>
     </div>
@@ -621,13 +639,13 @@
 
         <div class="alarm-strip" id="alarm-strip" aria-live="polite">
             <div class="as-cell">
-                <span class="as-state normal" id="as-state">NORMAL</span>
+                <span class="as-state unavailable" id="as-state">UNAVAILABLE</span>
             </div>
-            <div class="as-cell"><span class="as-dot r" id="as-dot-c"></span><span class="lbl">Critical</span><span class="num" id="as-crit">0</span></div>
-            <div class="as-cell"><span class="as-dot y" id="as-dot-w"></span><span class="lbl">Warning</span><span class="num" id="as-warn">0</span></div>
-            <div class="as-cell"><span class="lbl">Stale Pts</span><span class="num" id="as-stale">0</span></div>
+            <div class="as-cell"><span class="as-dot r" id="as-dot-c"></span><span class="lbl">Critical</span><span class="num" id="as-crit">&mdash;</span></div>
+            <div class="as-cell"><span class="as-dot y" id="as-dot-w"></span><span class="lbl">Warning</span><span class="num" id="as-warn">&mdash;</span></div>
+            <div class="as-cell"><span class="lbl">Stale Pts</span><span class="num" id="as-stale">&mdash;</span></div>
             <div class="as-cell"><span class="lbl">Updated</span><span class="num" id="as-upd">0s</span></div>
-            <div class="as-cell"><span class="lbl">Scenario</span><span class="num" id="as-scn">Simulated</span></div>
+            <div class="as-cell"><span class="lbl">Scenario</span><span class="num" id="as-scn">UNAVAILABLE</span></div>
         </div>
 
         <div class="tb-actions" data-rz-alarm-launch-slot>
@@ -649,7 +667,7 @@
         <div class="kpi">
             <div class="k-lbl"><i class="fas fa-oil-can"></i> Usable Fuel</div>
             <div><span class="k-val" id="kpi-usable" data-basis-param="fuel.usable_l" tabindex="0" role="button">--</span><span class="k-unit">L</span></div>
-            <div class="k-sub" id="kpi-usable-sub">of 60,000 L &times; 0.90</div>
+            <div class="k-sub" id="kpi-usable-sub">UNAVAILABLE &mdash; engine authority required</div>
         </div>
         <div class="kpi">
             <div class="k-lbl"><i class="fas fa-tint"></i> Consumption</div>
@@ -666,7 +684,7 @@
             <div class="k-sub" id="kpi-genload-sub">facility load on gensets</div>
         </div>
         <div class="kpi">
-            <div class="k-tag pass" id="kpi-np1-tag">PASS</div>
+            <div class="k-tag" id="kpi-np1-tag">UNAVAILABLE</div>
             <div class="k-lbl"><i class="fas fa-shield-alt"></i> N+1 Scenario</div>
             <div><span class="k-val" id="kpi-np1">--</span><span class="k-unit">hr</span></div>
             <div class="k-sub">autonomy with 1 genset down</div>
@@ -676,7 +694,7 @@
     <section class="fuel-scope-strip" aria-label="Current and study fuel capacity basis">
         <div class="fuel-scope-card" id="fuel-current-basis">
             <span class="scope-tag">CURRENT · ENGINE BOUND</span>
-            <span><strong id="fuel-current-basis-value">1.85 MW IT · 2.68 MW facility · 60,000 L UST</strong><small>Autonomy, consumption and day-tank transfer remain bound to the live Conventional scenario.</small></span>
+            <span><strong id="fuel-current-basis-value">UNAVAILABLE &mdash; governed engine authority required</strong><small>Autonomy, consumption and transfer state remain suppressed until the complete current Conventional snapshot is available.</small></span>
         </div>
         <div class="fuel-scope-card study" id="fuel-study-basis">
             <span class="scope-tag">STUDY ONLY</span>
@@ -696,14 +714,14 @@
                         <div class="ust-mark" style="top:10%;" id="ust-mark-overfill">&mdash;</div>
                         <div class="ust-mark" style="top:40%;" id="ust-mark-low">&mdash;</div>
                         <div class="ust-mark" style="top:70%;" id="ust-mark-lowlow">&mdash;</div>
-                        <div class="ust-liquid" id="liq-ust" style="height:85%;"></div>
+                        <div class="ust-liquid" id="liq-ust" style="height:0;"></div>
                     </div>
                     <div class="ust-meta">
-                        <div class="data-row"><span class="data-lbl">Level (LIT-101)</span><span><span class="data-val" id="val-ust-lvl" data-basis-param="fuel.level_pct" tabindex="0" role="button">85.0</span><span class="data-unit">%</span></span></div>
-                        <div class="data-row"><span class="data-lbl">Gross Volume</span><span><span class="data-val" id="val-ust-gross">51,000</span><span class="data-unit">L</span></span></div>
-                        <div class="data-row"><span class="data-lbl">Usable Reserve</span><span><span class="data-val" id="val-ust-usable" style="color:var(--diesel-bright)">45,900</span><span class="data-unit">L</span></span></div>
+                        <div class="data-row"><span class="data-lbl">Level (LIT-101)</span><span><span class="data-val" id="val-ust-lvl" data-basis-param="fuel.level_pct" tabindex="0" role="button">&mdash;</span><span class="data-unit">%</span></span></div>
+                        <div class="data-row"><span class="data-lbl">Gross Volume</span><span><span class="data-val" id="val-ust-gross">&mdash;</span><span class="data-unit">L</span></span></div>
+                        <div class="data-row"><span class="data-lbl">Usable Reserve</span><span><span class="data-val" id="val-ust-usable">&mdash;</span><span class="data-unit">L</span></span></div>
                         <div class="data-row"><span class="data-lbl">Tank Temp (TIT-101)</span><span><span class="data-val" id="val-ust-tmp">&mdash;</span><span class="data-unit">&deg;C</span></span></div>
-                        <div class="data-row"><span class="data-lbl">Last Delivery</span><span><span class="data-val" style="font-size:0.7rem">14 May</span></span></div>
+                        <div class="data-row"><span class="data-lbl">Last Delivery</span><span><span class="data-val" style="font-size:0.7rem" title="No delivery-history source in the current simulation">&mdash;</span></span></div>
                     </div>
                 </div>
                 <div class="basis-note">
@@ -721,10 +739,10 @@
 
             <div class="panel">
                 <div class="panel-header"><span>Bulk Fill Point</span><i class="fas fa-truck ph-ic"></i></div>
-                <div class="data-row"><span class="data-lbl">Fill Coupling</span><span class="data-val" id="fill-status" style="font-size:0.72rem;color:var(--text-dim)">DISCONNECTED</span></div>
-                <div class="data-row"><span class="data-lbl">Overfill Prevention</span><span class="data-val pf-ok" id="fill-ofp" style="font-size:0.72rem">ARMED</span></div>
-                <div class="data-row"><span class="data-lbl">Fill Rate</span><span><span class="data-val" id="fill-rate">0</span><span class="data-unit">L/min</span></span></div>
-                <button onclick="toggleFilling()" class="btn full" id="btn-fill" style="margin-top:9px;" type="button"><i class="fas fa-plug"></i> Connect Tanker Hose</button>
+                <div class="data-row"><span class="data-lbl">Fill Coupling</span><span class="data-val" id="fill-status" style="font-size:0.72rem;color:var(--text-dim)">UNAVAILABLE</span></div>
+                <div class="data-row"><span class="data-lbl">Overfill Prevention</span><span class="data-val" id="fill-ofp" style="font-size:0.72rem">UNAVAILABLE</span></div>
+                <div class="data-row"><span class="data-lbl">Fill Rate</span><span><span class="data-val" id="fill-rate">&mdash;</span><span class="data-unit">L/min</span></span></div>
+                <button onclick="toggleFilling()" class="btn full" id="btn-fill" style="margin-top:9px;" type="button" disabled><i class="fas fa-plug"></i> Connect Tanker Hose</button>
             </div>
         </div>
 
@@ -733,17 +751,17 @@
             <div class="panel">
                 <div class="panel-header"><span>Fuel Flow Path</span><i class="fas fa-route ph-ic"></i></div>
                 <div class="flow-path">
-                    <div class="fp-node active"><i class="fas fa-database fn-ic"></i><strong>UST-01</strong><span id="fp-ust">85%</span></div>
+                    <div class="fp-node"><i class="fas fa-database fn-ic"></i><strong>UST-01</strong><span id="fp-ust">UNAVAILABLE</span></div>
                     <i class="fas fa-arrow-right fp-arrow" id="fp-a1"></i>
-                    <div class="fp-node" id="fp-pump-node"><i class="fas fa-fan fn-ic"></i><strong>P-101</strong><span id="fp-pump">STBY</span></div>
+                    <div class="fp-node" id="fp-pump-node"><i class="fas fa-fan fn-ic"></i><strong>P-101</strong><span id="fp-pump">UNAVAILABLE</span></div>
                     <i class="fas fa-arrow-right fp-arrow" id="fp-a2"></i>
-                    <div class="fp-node"><i class="fas fa-filter fn-ic"></i><strong>FPU-01</strong><span id="fp-fpu">OK</span></div>
+                    <div class="fp-node"><i class="fas fa-filter fn-ic"></i><strong>FPU-01</strong><span id="fp-fpu">UNAVAILABLE</span></div>
                     <i class="fas fa-arrow-right fp-arrow" id="fp-a3"></i>
                     <div class="fp-node"><i class="fas fa-oil-can fn-ic"></i><strong>Day Tks</strong><span id="fp-dt">&mdash;</span></div>
                     <i class="fas fa-arrow-right fp-arrow" id="fp-a4"></i>
-                    <div class="fp-node"><i class="fas fa-bolt fn-ic"></i><strong>Gensets</strong><span id="fp-gen">1 run</span></div>
+                    <div class="fp-node"><i class="fas fa-bolt fn-ic"></i><strong>Gensets</strong><span id="fp-gen">UNAVAILABLE</span></div>
                 </div>
-                <div class="data-row" style="margin-top:6px;"><span class="data-lbl">Transfer Direction</span><span class="data-val" style="font-size:0.7rem;color:var(--text-secondary)">UST &rarr; Day Tank (lift)</span></div>
+                <div class="data-row" style="margin-top:6px;"><span class="data-lbl">Transfer Direction</span><span class="data-val" id="transfer-direction" style="font-size:0.7rem;color:var(--text-secondary)">UNAVAILABLE</span></div>
             </div>
 
             <div class="panel">
@@ -757,21 +775,21 @@
                                 <div style="font-size:0.66rem;color:var(--text-dim);">Viking L124A &middot; 180 L/min</div>
                             </div>
                         </div>
-                        <span class="mode-chip" id="pump-mode">AUTO</span>
+                        <span class="mode-chip" id="pump-mode">UNAVAILABLE</span>
                     </div>
                     <div class="gi-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;">
-                        <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:2px;"><span class="data-lbl" style="font-size:0.64rem;">Current</span><span><span class="data-val" id="val-p1-amp">0.0</span><span class="data-unit">A</span></span></div>
-                        <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:2px;"><span class="data-lbl" style="font-size:0.64rem;">Disch Press</span><span><span class="data-val" id="val-p1-dp">0.1</span><span class="data-unit">bar</span></span></div>
-                        <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:2px;"><span class="data-lbl" style="font-size:0.64rem;">Flow</span><span><span class="data-val" id="val-p1-flow">0</span><span class="data-unit">L/min</span></span></div>
-                        <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:2px;"><span class="data-lbl" style="font-size:0.64rem;">Vibration</span><span><span class="data-val" id="val-p1-vib">0.0</span><span class="data-unit">mm/s</span></span></div>
+                        <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:2px;"><span class="data-lbl" style="font-size:0.64rem;">Current</span><span><span class="data-val" id="val-p1-amp">&mdash;</span><span class="data-unit">A</span></span></div>
+                        <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:2px;"><span class="data-lbl" style="font-size:0.64rem;">Disch Press</span><span><span class="data-val" id="val-p1-dp">&mdash;</span><span class="data-unit">bar</span></span></div>
+                        <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:2px;"><span class="data-lbl" style="font-size:0.64rem;">Flow</span><span><span class="data-val" id="val-p1-flow">&mdash;</span><span class="data-unit">L/min</span></span></div>
+                        <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:2px;"><span class="data-lbl" style="font-size:0.64rem;">Vibration</span><span><span class="data-val" id="val-p1-vib">&mdash;</span><span class="data-unit">mm/s</span></span></div>
                         <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:2px;"><span class="data-lbl" style="font-size:0.64rem;">Run Hours</span><span><span class="data-val" id="val-p1-rh">&mdash;</span><span class="data-unit">h</span></span></div>
                         <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:2px;"><span class="data-lbl" style="font-size:0.64rem;">Starter</span><span class="data-val" id="val-p1-st" style="font-size:0.7rem;">&mdash;</span></div>
                     </div>
                 </div>
-                <div class="conditioning-mimic is-running" id="fuel-polish-loop" aria-label="Fuel polishing and conditioning loop">
+                <div class="conditioning-mimic is-unavailable" id="fuel-polish-loop" aria-label="Fuel polishing and conditioning loop">
                     <div class="conditioning-head">
                         <span class="conditioning-title">FPU-01 · Fuel Conditioning / Polishing Loop</span>
-                        <span class="conditioning-state" id="polish-status">RUNNING</span>
+                        <span class="conditioning-state" id="polish-status">UNAVAILABLE</span>
                     </div>
                     <div class="conditioning-path" aria-hidden="true">
                         <span class="conditioning-node">UST-01<small>side-stream suction</small></span>
@@ -780,7 +798,7 @@
                         <span class="conditioning-line"></span>
                         <span class="conditioning-node">UST RETURN<small>conditioned fuel</small></span>
                     </div>
-                    <div class="conditioning-foot"><span id="polish-mode"><strong>SIMULATED</strong> · PERIODIC RECIRCULATION</span><span id="polish-inst">DP &mdash; · WIF &mdash;</span></div>
+                    <div class="conditioning-foot"><span id="polish-mode"><strong>UNAVAILABLE</strong> &middot; engine authority required</span><span id="polish-inst">DP &mdash; &middot; WIF &mdash;</span></div>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:11px;">
                     <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:3px;border:1px solid var(--border-soft);border-radius:6px;padding:9px;background:var(--panel-bg-2);"><span class="data-lbl" style="font-size:0.64rem;">Polisher Diff Press</span><span><span class="data-val" id="val-dp">&mdash;</span><span class="data-unit">bar</span></span></div>
@@ -802,28 +820,28 @@
             <div class="panel">
                 <div class="panel-header"><span>Safety Interlocks</span><i class="fas fa-shield-alt ph-ic"></i></div>
                 <div class="ilk-grid">
-                    <div class="ilk normal" id="ilk-leak"><span class="ilk-dot"></span><span class="ilk-txt"><span class="ilk-name">Bund / Sump Leak</span><span class="ilk-stat">DRY</span></span></div>
-                    <div class="ilk normal" id="ilk-bund"><span class="ilk-dot"></span><span class="ilk-txt"><span class="ilk-name">Bund Sump Level</span><span class="ilk-stat">NORMAL</span></span></div>
-                    <div class="ilk normal" id="ilk-water"><span class="ilk-dot"></span><span class="ilk-txt"><span class="ilk-name">Water-in-Fuel</span><span class="ilk-stat">NORMAL</span></span></div>
-                    <div class="ilk normal" id="ilk-polish"><span class="ilk-dot"></span><span class="ilk-txt"><span class="ilk-name">Fuel Polishing</span><span class="ilk-stat">RUNNING</span></span></div>
-                    <div class="ilk normal" id="ilk-dtll"><span class="ilk-dot"></span><span class="ilk-txt"><span class="ilk-name">Day Tank Low-Low</span><span class="ilk-stat">CLEAR</span></span></div>
-                    <div class="ilk normal" id="ilk-pumpfail"><span class="ilk-dot"></span><span class="ilk-txt"><span class="ilk-name">Pump Fail-to-Run</span><span class="ilk-stat">CLEAR</span></span></div>
+                    <div class="ilk unavailable" id="ilk-leak"><span class="ilk-dot"></span><span class="ilk-txt"><span class="ilk-name">Bund / Sump Leak</span><span class="ilk-stat">UNAVAILABLE</span></span></div>
+                    <div class="ilk unavailable" id="ilk-bund"><span class="ilk-dot"></span><span class="ilk-txt"><span class="ilk-name">Bund Sump Level</span><span class="ilk-stat">UNAVAILABLE</span></span></div>
+                    <div class="ilk unavailable" id="ilk-water"><span class="ilk-dot"></span><span class="ilk-txt"><span class="ilk-name">Water-in-Fuel</span><span class="ilk-stat">UNAVAILABLE</span></span></div>
+                    <div class="ilk unavailable" id="ilk-polish"><span class="ilk-dot"></span><span class="ilk-txt"><span class="ilk-name">Fuel Polishing</span><span class="ilk-stat">UNAVAILABLE</span></span></div>
+                    <div class="ilk unavailable" id="ilk-dtll"><span class="ilk-dot"></span><span class="ilk-txt"><span class="ilk-name">Day Tank Low-Low</span><span class="ilk-stat">UNAVAILABLE</span></span></div>
+                    <div class="ilk unavailable" id="ilk-pumpfail"><span class="ilk-dot"></span><span class="ilk-txt"><span class="ilk-name">Pump Fail-to-Run</span><span class="ilk-stat">UNAVAILABLE</span></span></div>
                 </div>
                 <div class="containment-chain" id="leak-detection-chain" aria-label="Leak detection and containment permissives">
-                    <div class="containment-row" data-containment-point="interstitial"><span class="containment-tag">LDS-101</span><span class="containment-name">Double-wall interstitial</span><span class="containment-value" id="containment-interstitial">DRY</span></div>
-                    <div class="containment-row" data-containment-point="bund-sump"><span class="containment-tag">LS-102</span><span class="containment-name">Bund sump level</span><span class="containment-value" id="containment-sump">NORMAL</span></div>
-                    <div class="containment-row" data-containment-point="transfer"><span class="containment-tag">P-101 PERM</span><span class="containment-name">Transfer permissive</span><span class="containment-value" id="containment-transfer">ENABLED</span></div>
-                    <div class="containment-row" data-containment-point="fill"><span class="containment-tag">XV-101 PERM</span><span class="containment-name">Bulk-fill permissive</span><span class="containment-value" id="containment-fill">ENABLED</span></div>
-                    <div class="containment-action" id="containment-action"><strong>LOGIC READY</strong> · containment dry and transfer train healthy</div>
+                    <div class="containment-row is-unavailable" data-containment-point="interstitial"><span class="containment-tag">LDS-101</span><span class="containment-name">Double-wall interstitial</span><span class="containment-value" id="containment-interstitial">UNAVAILABLE</span></div>
+                    <div class="containment-row is-unavailable" data-containment-point="bund-sump"><span class="containment-tag">LS-102</span><span class="containment-name">Bund sump level</span><span class="containment-value" id="containment-sump">UNAVAILABLE</span></div>
+                    <div class="containment-row is-unavailable" data-containment-point="transfer"><span class="containment-tag">P-101 PERM</span><span class="containment-name">Transfer permissive</span><span class="containment-value" id="containment-transfer">UNAVAILABLE</span></div>
+                    <div class="containment-row is-unavailable" data-containment-point="fill"><span class="containment-tag">XV-101 PERM</span><span class="containment-name">Bulk-fill permissive</span><span class="containment-value" id="containment-fill">UNAVAILABLE</span></div>
+                    <div class="containment-action" id="containment-action"><strong>UNAVAILABLE</strong> &middot; engine authority required</div>
                 </div>
             </div>
 
             <div class="panel">
                 <div class="panel-header"><span>Active Alarms &amp; Events</span><i class="fas fa-bell ph-ic"></i></div>
                 <div class="alarm-list" id="alarm-list" role="log" aria-live="polite">
-                    <div class="alarm-empty">No active alarms</div>
+                    <div class="alarm-empty">UNAVAILABLE &mdash; alarm authority required</div>
                 </div>
-                <button onclick="ackAlarms()" class="btn full" style="margin-top:11px;" type="button"><i class="fas fa-check"></i> Acknowledge</button>
+                <button onclick="ackAlarms()" class="btn full" id="btn-ack" style="margin-top:11px;" type="button" disabled><i class="fas fa-check"></i> Acknowledge</button>
             </div>
 
             <div class="panel">
@@ -841,11 +859,11 @@
     <div class="control-bar" style="padding-bottom:18px;">
         <div class="cb-left">
             <button onclick="toggleFullscreen()" class="btn" id="btn-fullscreen" type="button"><i class="fas fa-expand"></i> Fullscreen <span class="kbd">F</span></button>
-            <button onclick="resetSimulation()" class="btn" type="button"><i class="fas fa-redo"></i> Reset <span class="kbd">R</span></button>
-            <button onclick="togglePump()" class="btn" id="btn-pump" type="button"><i class="fas fa-power-off"></i> Pump Override <span class="kbd">P</span></button>
+            <button onclick="resetSimulation()" class="btn" id="btn-reset" type="button" disabled><i class="fas fa-redo"></i> Reset <span class="kbd">R</span></button>
+            <button onclick="togglePump()" class="btn" id="btn-pump" type="button" disabled><i class="fas fa-power-off"></i> Pump Override <span class="kbd">P</span></button>
         </div>
         <div class="cb-right">
-            <span class="cb-note" id="cb-basis">Basis: conv-engine.js v1.22.0 &middot; deterministic engineering values</span>
+            <span class="cb-note" id="cb-basis">Basis: UNAVAILABLE &middot; governed engine authority required</span>
         </div>
     </div>
 
@@ -854,7 +872,48 @@
         'use strict';
 
         /* ---- Engine binding (single source of truth) ---------------- */
-        var SNAP = (window.CONV_CALC && window.CONV_CALC.snapshot) ? window.CONV_CALC.snapshot : null;
+        var engineScript = document.querySelector('script[src^="js/conv-engine.js?v="]');
+        var engineVersionMatch = engineScript
+            ? engineScript.getAttribute('src').match(/[?&]v=([^&]+)/)
+            : null;
+        var CONV_CURRENT_ENGINE_VERSION = '2.0.0';
+        var requestedEngineVersion = engineVersionMatch
+            ? decodeURIComponent(engineVersionMatch[1])
+            : null;
+        var EXPECTED_ENGINE_VERSION = requestedEngineVersion === CONV_CURRENT_ENGINE_VERSION
+            ? CONV_CURRENT_ENGINE_VERSION : null;
+        var candidateSnapshot = (window.CONV_CALC && window.CONV_CALC.snapshot)
+            ? window.CONV_CALC.snapshot
+            : null;
+
+        function isFiniteNumber(value) {
+            return typeof value === 'number' && isFinite(value);
+        }
+
+        function hasCompleteFuelAuthority(snapshot) {
+            var fuel = snapshot && snapshot.fuel;
+            var site = snapshot && snapshot.site;
+            var meta = snapshot && snapshot.meta;
+            if (!fuel || !site || !meta || !EXPECTED_ENGINE_VERSION
+                || meta.version !== EXPECTED_ENGINE_VERSION) return false;
+            var required = [
+                site.it_load_kw, site.facility_load_kw,
+                fuel.level_pct, fuel.tank_capacity_l, fuel.usable_l,
+                fuel.usable_fraction, fuel.specific_consumption_l_per_kwh,
+                fuel.generator_consumption_lph, fuel.autonomy_hr,
+                fuel.level_overfill_pct, fuel.level_low_pct, fuel.level_low_low_pct
+            ];
+            return required.every(isFiniteNumber)
+                && site.it_load_kw > 0 && site.facility_load_kw > 0
+                && fuel.tank_capacity_l > 0 && fuel.generator_consumption_lph > 0
+                && typeof meta.scenario === 'string' && meta.scenario.trim().length > 0
+                && typeof meta.data_quality === 'string' && meta.data_quality.trim().length > 0;
+        }
+
+        var FUEL_AUTHORITY_AVAILABLE = hasCompleteFuelAuthority(candidateSnapshot);
+        var SNAP = FUEL_AUTHORITY_AVAILABLE ? candidateSnapshot : null;
+        document.body.setAttribute('data-rz-basis-authority',
+            FUEL_AUTHORITY_AVAILABLE ? 'current' : 'unavailable');
 
         /* Fallback used ONLY if the engine failed to load. WAS: plausible
          * literals (60,000 L / 45,900 L / 956 L·hr / 2,682.5 kW) from the
@@ -865,10 +924,10 @@
          * can silently outlive the basis it came from. */
         var FUEL = SNAP ? SNAP.fuel : { level_pct: null, tank_capacity_l: null, usable_l: null, generator_consumption_lph: null, autonomy_hr: null };
         var SITE = SNAP ? SNAP.site : { it_load_kw: null, facility_load_kw: null };
-        var META = SNAP ? SNAP.meta : { scenario: 'Simulated', data_quality: 'GOOD', version: null };
+        var META = SNAP ? SNAP.meta : { scenario: 'UNAVAILABLE', data_quality: 'UNAVAILABLE', version: null };
 
         var DASH = '—';
-        function isNum(v) { return typeof v === 'number' && isFinite(v); }
+        function isNum(v) { return isFiniteNumber(v); }
 
         /* Every derived constant is null-propagating: null arithmetic yields 0
          * in JS, and a rendered 0 lies just as convincingly as a stale literal. */
@@ -978,6 +1037,7 @@
         }
 
         window.RZFuelOperator = Object.freeze({
+            authorityAvailable: FUEL_AUTHORITY_AVAILABLE,
             evaluateContainment: evaluateContainment,
             severityFor: severityFor,
             cardClassFor: cardClassFor,
@@ -1246,7 +1306,70 @@
             }
         }
 
+        function setProcessControls(enabled) {
+            ['btn-fill', 'btn-ack', 'btn-reset', 'btn-pump', 'fs-reset'].forEach(function (id) {
+                var control = $(id);
+                if (control) control.disabled = !enabled;
+            });
+        }
+
+        function renderUnavailable() {
+            document.body.dataset.fuelAuthority = 'unavailable';
+            var setText = function (id, value) {
+                var element = $(id);
+                if (element) element.textContent = value;
+            };
+            setProcessControls(false);
+            setText('as-state', 'UNAVAILABLE');
+            $('as-state').className = 'as-state unavailable';
+            ['as-crit', 'as-warn', 'as-stale'].forEach(function (id) { setText(id, DASH); });
+            setText('as-scn', 'UNAVAILABLE');
+            [
+                'kpi-autonomy', 'kpi-usable', 'kpi-consumption', 'kpi-genload', 'kpi-np1',
+                'val-ust-lvl', 'val-ust-gross', 'val-ust-usable', 'val-ust-tmp',
+                'val-p1-amp', 'val-p1-dp', 'val-p1-flow', 'val-p1-vib', 'val-p1-rh',
+                'val-dp', 'val-wif', 'fill-rate'
+            ].forEach(function (id) { setText(id, DASH); });
+            setText('kpi-autonomy-sub', 'UNAVAILABLE — complete current fuel authority required');
+            setText('kpi-usable-sub', 'UNAVAILABLE — complete current fuel authority required');
+            setText('kpi-consumption-rate', DASH);
+            setText('kpi-genload-sub', 'UNAVAILABLE');
+            setText('kpi-np1-tag', 'UNAVAILABLE');
+            $('kpi-np1-tag').className = 'k-tag';
+            setText('fuel-current-basis-value', 'UNAVAILABLE — governed engine authority required');
+            setText('cb-basis', 'Basis: UNAVAILABLE · expected conv-engine.js v' + (EXPECTED_ENGINE_VERSION || DASH));
+            setText('inv-basis-note', 'UNAVAILABLE (complete current engine snapshot required).');
+            ['ust-mark-overfill', 'ust-mark-low', 'ust-mark-lowlow'].forEach(function (id) { setText(id, DASH); });
+            $('liq-ust').style.height = '0';
+            ['fp-ust', 'fp-pump', 'fp-fpu', 'fp-dt', 'fp-gen', 'pump-mode', 'val-p1-st',
+                'fill-status', 'fill-ofp', 'transfer-direction'].forEach(function (id) { setText(id, 'UNAVAILABLE'); });
+            document.querySelectorAll('.flow-path .fp-node').forEach(function (node) { node.classList.remove('active'); });
+            document.querySelectorAll('.fp-arrow').forEach(function (node) { node.classList.remove('active'); });
+            $('pump-ic').classList.remove('running');
+            $('tank-tbody').innerHTML = '<tr><td colspan="4">UNAVAILABLE — inventory authority required</td></tr>';
+            $('genset-rows').innerHTML = '<div class="alarm-empty">UNAVAILABLE — generator-load authority required</div>';
+            $('fuel-polish-loop').className = 'conditioning-mimic is-unavailable';
+            setText('polish-status', 'UNAVAILABLE');
+            $('polish-mode').innerHTML = '<strong>UNAVAILABLE</strong> · engine authority required';
+            setText('polish-inst', 'DP ' + DASH + ' · WIF ' + DASH);
+            document.querySelectorAll('.ilk').forEach(function (card) {
+                card.className = 'ilk unavailable';
+                var status = card.querySelector('.ilk-stat');
+                if (status) status.textContent = 'UNAVAILABLE';
+            });
+            document.querySelectorAll('.containment-row').forEach(function (row) {
+                row.className = 'containment-row is-unavailable';
+                var value = row.querySelector('.containment-value');
+                if (value) value.textContent = 'UNAVAILABLE';
+            });
+            $('containment-action').className = 'containment-action';
+            $('containment-action').innerHTML = '<strong>UNAVAILABLE</strong> · engine authority required';
+            $('alarm-list').innerHTML = '<div class="alarm-empty">UNAVAILABLE — alarm authority required</div>';
+            $('ust-trend').setAttribute('points', '');
+        }
+
         function render() {
+            document.body.dataset.fuelAuthority = 'current';
             bindBasisChip();
             bindThresholds();
             $('val-ust-lvl').textContent = fmt1(state.ustPct);
@@ -1275,6 +1398,7 @@
             $('polish-inst').title = UNAVAILABLE_TITLE;
             $('fp-dt').textContent = GENSET_COUNT + ' fed';
             $('val-p1-st').textContent = state.pumpRunning ? 'RUNNING' : 'READY';
+            $('transfer-direction').textContent = 'UST → Day Tank (lift)';
 
             $('val-p1-amp').textContent = fmt1(state.amps);
             $('val-p1-dp').textContent = fmt1(state.dp);
@@ -1323,24 +1447,28 @@
         /* ---- Loops -------------------------------------------------- */
         setInterval(function () {
             $('clock').textContent = new Date().toLocaleTimeString('en-GB');
+            if (!FUEL_AUTHORITY_AVAILABLE) return;
             stepPhysics();
             render();
         }, 1000);
 
         // "updated Ns ago" ticker between renders
         setInterval(function () {
+            if (!FUEL_AUTHORITY_AVAILABLE) return;
             state.lastUpdate += 1;
             var el = $('as-upd'); if (el) el.textContent = state.lastUpdate + 's';
         }, 1000);
 
         /* ---- Controls ----------------------------------------------- */
         window.togglePump = function () {
+            if (!FUEL_AUTHORITY_AVAILABLE) return;
             state.manualPump = true;
             state.pumpRunning = !state.pumpRunning;
             $('btn-pump').classList.toggle('active', state.pumpRunning);
             render();
         };
         window.resetSimulation = function () {
+            if (!FUEL_AUTHORITY_AVAILABLE) return;
             state.ustPct = FUEL.level_pct;
             state.dtA = 92.0; state.dtB = 46.0; state.dtC = 88.0;
             state.pumpRunning = false; state.manualPump = false;
@@ -1356,10 +1484,12 @@
             render();
         };
         window.ackAlarms = function () {
+            if (!FUEL_AUTHORITY_AVAILABLE) return;
             state.acked = true;
             render();
         };
         window.toggleFilling = function () {
+            if (!FUEL_AUTHORITY_AVAILABLE) return;
             state.filling = !state.filling;
             state.acked = false;
             var bf = $('btn-fill');
@@ -1415,10 +1545,13 @@
             },
             'tank-ust': {
                 title: 'UST-01 Bulk Storage',
-                rows: [
+                rows: FUEL_AUTHORITY_AVAILABLE ? [
                     ['Capacity', grp(TANK_CAP) + ' L'], ['Usable fraction', fmt1(USABLE_FRACTION * 100) + '%'],
                     ['Fuel', 'Diesel B30'], ['Containment', 'Double-wall + bund'],
                     ['Leak detect', 'Interstitial + sump'], ['Backs autonomy', grp(usableL(state.ustPct)) + ' L']
+                ] : [
+                    ['Authority', 'UNAVAILABLE'],
+                    ['Current values', 'Suppressed until the complete governed engine loads']
                 ]
             }
         };
@@ -1447,7 +1580,17 @@
         wireTip($('tank-ust'), 'tank-ust');
 
         /* ---- Initial paint ------------------------------------------ */
-        render();
+        if (FUEL_AUTHORITY_AVAILABLE) {
+            setProcessControls(true);
+            $('fill-status').textContent = 'DISCONNECTED';
+            $('fill-status').style.color = 'var(--text-dim)';
+            $('fill-ofp').textContent = 'ARMED';
+            $('fill-ofp').className = 'data-val pf-ok';
+            $('fill-rate').textContent = '0';
+            render();
+        } else {
+            renderUnavailable();
+        }
     })();
     </script>
 <script src="auth.js?v=2026-08-26-h1h2" defer></script>

@@ -91,10 +91,10 @@
         "@type": "HowTo",
         "name": "How to calculate diesel genset fuel autonomy",
         "step": [
-            { "@type": "HowToStep", "name": "Identify tank parameters", "text": "Record bulk-tank capacity (60,000 L), usable fraction (90%), and current level (85%) from the site basis document." },
-            { "@type": "HowToStep", "name": "Compute usable reserve", "text": "Usable fuel = 60,000 × 0.90 × 0.85 = 45,900 L. This is the fuel volume actually available to the gensets at the measured level." },
-            { "@type": "HowToStep", "name": "Determine burn rate", "text": "Generator consumption = 956 L/hr at the site facility load of 2,683 kW (1,850 kW IT × 1.45 PUE). Denominator is always the bulk-tank at site load (Rule 3)." },
-            { "@type": "HowToStep", "name": "Calculate autonomy", "text": "Autonomy = 45,900 L ÷ 956 L/hr = 48 hr (2 days). Compare against the approved site risk, refuelling and generator-loading policy; no universal Tier duration is inferred." }
+            { "@type": "HowToStep", "name": "Identify tank parameters", "text": "Record the governed bulk-tank capacity (972,737 L), usable fraction (90%), and deterministic scenario level (85%) from CONV_CALC v2.0.0." },
+            { "@type": "HowToStep", "name": "Compute usable reserve", "text": "Usable fuel = 972,737 × 0.90 × 0.85 = 744,143.805 L, displayed as 744,144 L. The level is simulated, not a measured field value." },
+            { "@type": "HowToStep", "name": "Determine burn rate", "text": "Generator consumption = 43,500 kW facility load × 0.356384 L/kWh = 15,503 L/hr after display rounding. The denominator is the governed campus facility load." },
+            { "@type": "HowToStep", "name": "Calculate autonomy", "text": "Autonomy = 744,143.805 L ÷ the unrounded governed burn rate = 48 hr (2 days). Compare against approved risk, refuelling and generator-dispatch policy; this result does not prove generator capacity or a Tier duration." }
         ]
     }
     </script>
@@ -113,12 +113,12 @@
             {
                 "@type": "Question",
                 "name": "What is Rule 3 for the autonomy denominator?",
-                "acceptedAnswer": { "@type": "Answer", "text": "Rule 3 (ACCURACY_VALIDATION.md): the denominator of every ratio metric must be stated explicitly. For fuel autonomy the denominator is the bulk-tank at site facility load (956 L/hr at 2,683 kW). Never use a per-genset rating or a partial-load figure as the denominator without labelling it as such." }
+                "acceptedAnswer": { "@type": "Answer", "text": "Rule 3 (ACCURACY_VALIDATION.md): every ratio states its denominator. Fuel autonomy uses the governed 43,500 kW campus facility load and the derived 15,503 L/hr display burn. Never substitute the retired 956 L/hr anchor or a per-genset figure as current authority." }
             },
             {
                 "@type": "Question",
                 "name": "How does partial-load operation affect autonomy?",
-                "acceptedAnswer": { "@type": "Answer", "text": "Autonomy scales inversely with load: autonomy (hr) = usable L / (956 × load_fraction). At 50% facility load the burn rate halves and autonomy doubles. The cockpit computes this in real time from the CONV_CALC snapshot." }
+                "acceptedAnswer": { "@type": "Answer", "text": "CONV_CALC derives burn as facility kW × 0.356384 L/kWh, so autonomy changes when the governed scenario load changes. The cockpit is a deterministic simulation, not real-time metering." }
             }
         ]
     }
@@ -311,14 +311,14 @@
         <header class="mn-hero">
             <p class="mn-eyebrow">Technical Manual · Backup Power</p>
             <h1>Fuel &amp; Genset Autonomy — Cockpit Methodology &amp; Formulas</h1>
-            <p>Every locked parameter, equation, constant, and reference behind the diesel genset fuel autonomy cockpit. All math is executed by the deterministic engine <code class="mn-mono">js/conv-engine.js</code> (<code class="mn-mono">CONV_CALC</code>) against the site basis in <code class="mn-mono">conv/review/09-engineering-basis-and-calculations.md</code> — no user-adjusted inputs, no random values, no back-solved constants.</p>
+            <p>Every locked parameter, equation, evidence class, and reference behind the diesel genset fuel autonomy cockpit. The deterministic <code class="mn-mono">CONV_CALC v2.0.0</code> engine derives the governed campus values from versioned inputs; assumed sizing and retired source anchors are labelled rather than presented as measured data.</p>
             <div class="mn-meta">
-                <span class="mn-chip">Engine <strong>CONV_CALC v1.0.0</strong></span>
-                <span class="mn-chip">Genset <strong>Cat 3516E · 2.75 MW</strong></span>
-                <span class="mn-chip">Tank <strong>60,000 L UST</strong></span>
+                <span class="mn-chip">Engine <strong>CONV_CALC v2.0.0</strong></span>
+                <span class="mn-chip">Local mimic <strong>Cat 3516E · capacity not governed</strong></span>
+                <span class="mn-chip">Tank <strong>972,737 L UST</strong></span>
                 <span class="mn-chip">Autonomy <strong>48 hr @ site load</strong></span>
             </div>
-            <a class="mn-toollink" href="../fuel-system.html">▶ Open the live Fuel System Cockpit</a>
+            <a class="mn-toollink" href="../fuel-system.html">▶ Open the simulated Fuel System Cockpit</a>
         </header>
 
         <nav class="mn-section mn-note" aria-labelledby="contents-title">
@@ -329,27 +329,29 @@
         <!-- 1. PURPOSE -->
         <section class="mn-section" id="purpose">
             <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
-            <p class="mn-lead">The fuel autonomy cockpit answers one operational question: <em>how many hours of backup power does the on-site fuel inventory provide at current facility load?</em> It is a <strong>locked scenario</strong> — all parameters are sourced from the site engineering basis document (<code class="mn-mono">conv/review/09</code>) and frozen in <code class="mn-mono">CONV_MODEL</code>. There are no user-adjustable inputs; the cockpit reads live state from the <code class="mn-mono">CONV_CALC.snapshot</code> and renders deterministic outputs.</p>
-            <p class="mn-lead"><strong>Truth boundary:</strong> 45,900 L usable ÷ 956 L/h = 48.0 h belongs only to the current 2.6825 MW facility scenario. The four-hall capacity study must not scale this rate or autonomy; it remains unavailable until approved generator count, loading/dispatch curves, fuel-return basis, storage policy and N+1 transfer arrangement are supplied.</p>
-            <p class="mn-lead">The governing accuracy rule is <strong>Rule 3 (ACCURACY_VALIDATION.md)</strong>: the denominator of every derived metric must be stated explicitly. For fuel autonomy the denominator is the bulk underground storage tank (UST-01) consumption rate at the <em>full site facility load</em> — 956 L/hr at 2,683 kW. Partial-load scenarios are labelled as such; the headline figure always uses the site-load denominator.</p>
+            <p class="mn-lead">The fuel autonomy cockpit answers one operational question: <em>how many hours does the governed simulated inventory provide at the adopted facility load?</em> It is a <strong>locked deterministic scenario</strong>: four halls, 30,000 kW current IT, 43,500 kW facility load and PUE 1.45. The 40,000 kW IT value is design capacity only. The page reads a complete <code class="mn-mono">CONV_CALC v2.0.0</code> snapshot and must show unavailable if that authority is absent or incomplete.</p>
+            <p class="mn-lead"><strong>Truth boundary:</strong> 744,143.805 L usable divided by the unrounded engine-derived campus burn gives 48.0 h. The displayed burn is 15,503 L/h. These are simulated/adopted planning outputs, not measured inventory or meter telemetry, and they do not prove that the authored three-genset mimic can carry 43.5 MW.</p>
+            <p class="mn-lead">The governing accuracy rule is <strong>Rule 3 (ACCURACY_VALIDATION.md)</strong>: the denominator of every derived metric must be stated explicitly. Here, burn derives from the 43,500 kW campus facility load and the sourced specific-consumption anchor of 0.356384 L/kWh. The retired 956 L/h at 2,682.5 kW pair is provenance for that rate, not current authority.</p>
         </section>
 
         <!-- 2. INPUTS -->
         <section class="mn-section" id="inputs">
             <h2><span class="mn-num">02</span> Inputs — locked tank &amp; genset parameters</h2>
-            <p class="mn-lead">All inputs are locked site-basis constants. The cockpit does not expose user input fields — it reads the deterministic snapshot from <code class="mn-mono">CONV_CALC</code> or falls back to the hard-coded basis values below.</p>
+            <p class="mn-lead">All inputs are locked engine values. The cockpit does not expose user input fields and must fail closed rather than falling back to retired literals.</p>
             <div class="mn-tablewrap">
             <table class="mn-table">
                 <thead><tr><th>Parameter</th><th>Symbol</th><th>Value</th><th>Unit</th><th>Source</th></tr></thead>
                 <tbody>
-                    <tr><td>Bulk tank capacity</td><td><code>tank_capacity_l</code></td><td><code>60,000</code></td><td>L</td><td>conv/review/09 line 140</td></tr>
+                    <tr><td>Bulk tank capacity</td><td><code>tank_capacity_l</code></td><td><code>972,737</code></td><td>L</td><td>CONV_CALC v2.0.0; assumed sizing to preserve the 48 h target at campus burn</td></tr>
                     <tr><td>Usable fraction</td><td><code>usable_fraction</code></td><td><code>0.90</code></td><td>—</td><td>conv/review/09 line 141 — bottom 10% not reliably pumpable (sump/suction limits)</td></tr>
-                    <tr><td>Measured level</td><td><code>level_pct</code></td><td><code>85</code></td><td>%</td><td>conv/review/09 line 16 — SCADA reading at basis snapshot</td></tr>
-                    <tr><td>Generator consumption</td><td><code>generator_consumption_lph</code></td><td><code>956</code></td><td>L/hr</td><td>conv/review/09 lines 144–147 — at facility load 2,683 kW</td></tr>
-                    <tr><td>IT load</td><td><code>it_load_kw</code></td><td><code>1,850</code></td><td>kW</td><td>conv/review/09 line 10</td></tr>
+                    <tr><td>Scenario level</td><td><code>level_pct</code></td><td><code>85</code></td><td>%</td><td>Deterministic simulated state; not measured telemetry</td></tr>
+                    <tr><td>Specific consumption</td><td><code>specific_consumption_l_per_kwh</code></td><td><code>0.356384</code></td><td>L/kWh</td><td>Rate inferred from the retired sourced pair 956 L/h at 2,682.5 kW</td></tr>
+                    <tr><td>Generator consumption (derived)</td><td><code>generator_consumption_lph</code></td><td><code>15,503</code></td><td>L/hr</td><td>43,500 kW × 0.356384 L/kWh; displayed rounded</td></tr>
+                    <tr><td>Current IT load</td><td><code>it_load_kw</code></td><td><code>30,000</code></td><td>kW</td><td>Four halls × 7,500 kW adopted simulated scenario</td></tr>
                     <tr><td>PUE</td><td><code>pue</code></td><td><code>1.45</code></td><td>—</td><td>conv/review/09 line 11</td></tr>
-                    <tr><td>Facility load (derived)</td><td><code>facility_load_kw</code></td><td><code>2,682.5</code></td><td>kW</td><td>1,850 × 1.45 = 2,682.5 kW — displayed as 2,683 kW</td></tr>
-                    <tr><td>Genset make / model</td><td>—</td><td>Cat 3516E</td><td>—</td><td>Nameplate — 2.75 MW rated, 3 units N+1 (DT-GEN-A/B/C)</td></tr>
+                    <tr><td>Facility load (derived)</td><td><code>facility_load_kw</code></td><td><code>43,500</code></td><td>kW</td><td>30,000 × 1.45 = 43,500 kW</td></tr>
+                    <tr><td>IT design capacity</td><td><code>it_design_kw</code></td><td><code>40,000</code></td><td>kW</td><td>Four halls × 10 MW; planning/design capacity, not current load</td></tr>
+                    <tr><td>Genset make / model</td><td>—</td><td>Cat 3516E · three-unit mimic</td><td>—</td><td>Illustrative local topology; campus capacity and N+1 adequacy are UNAVAILABLE pending an approved generator design</td></tr>
                     <tr><td>Backup SLA</td><td><code>SLA_HR</code></td><td><code>24</code></td><td>hr</td><td>Site operations standard — N+1 autonomy must exceed this</td></tr>
                 </tbody>
             </table>
@@ -365,22 +367,29 @@
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Facility load</h3>
             <div class="mn-formula">
                 <span class="mn-eq">facility_load_kw = it_load_kw × PUE</span>
-                <span class="mn-eq">                 = 1,850 × 1.45 = 2,682.5 kW</span>
-                <span class="mn-where">In <code>facilityLoadKw(m)</code>. PUE = Power Usage Effectiveness; denominator anchor for the 956 L/hr burn rate.<span class="mn-src">CONV_CALC · conv/review/09</span></span>
+                <span class="mn-eq">                 = 30,000 × 1.45 = 43,500 kW</span>
+                <span class="mn-where">In <code>facilityLoadKw(m)</code>. PUE = Power Usage Effectiveness; this governed current load anchors the campus burn calculation.<span class="mn-src">CONV_CALC v2.0.0</span></span>
             </div>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Usable fuel reserve</h3>
             <div class="mn-formula">
                 <span class="mn-eq">usable_L = tank_capacity_l × usable_fraction × (level_pct / 100)</span>
-                <span class="mn-eq">         = 60,000 × 0.90 × (85 / 100) = 45,900 L</span>
-                <span class="mn-where">In <code>fuelUsableL(m)</code>. Triples the level-fraction into the usable-fraction so that a drop in level reduces the reserve proportionally. The 90% usable ceiling is fixed by tank physics, not the level reading.<span class="mn-src">CONV_CALC · conv/review/09 lines 141–143</span></span>
+                <span class="mn-eq">         = 972,737 × 0.90 × (85 / 100) = 744,143.805 L ≈ 744,144 L</span>
+                <span class="mn-where">In <code>fuelUsableL(m)</code>. The 85% level is deterministic simulated state. Tank capacity is an assumed design value pending Basis-of-Design confirmation.<span class="mn-src">CONV_CALC v2.0.0</span></span>
+            </div>
+
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Campus burn rate</h3>
+            <div class="mn-formula">
+                <span class="mn-eq">burn_lph = facility_load_kw × specific_consumption_l_per_kwh</span>
+                <span class="mn-eq">         = 43,500 × 0.356384 = 15,502.704 L/h ≈ 15,503 L/h</span>
+                <span class="mn-where">In <code>generatorConsumptionLph(m)</code>. The specific-consumption rate is the reusable quantity derived from the retired 956 L/h at 2,682.5 kW source pair.<span class="mn-src">CONV_CALC v2.0.0 · source review 09 lines 144–147</span></span>
             </div>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Fuel autonomy — Rule 3 denominator</h3>
             <div class="mn-formula">
                 <span class="mn-eq">autonomy_hr = usable_L / generator_consumption_lph</span>
-                <span class="mn-eq">           = 45,900 / 956 = 48.0 hr</span>
-                <span class="mn-where">In <code>fuelAutonomyHr(m)</code>. Denominator = <em>bulk-tank at site load</em> (Rule 3). The 956 L/hr burn rate was measured / calculated at the full facility load of 2,682.5 kW. Using any other denominator (e.g. a single-genset nameplate or a partial-load estimate) without labelling it as such violates Rule 3 and produces a misleading result.<span class="mn-src">CONV_CALC · conv/review/09 lines 144–147</span></span>
+                <span class="mn-eq">           = 744,143.805 / 15,502.704 = 48.0 hr</span>
+                <span class="mn-where">In <code>fuelAutonomyHr(m)</code>. The engine uses unrounded operands; 15,503 L/h is display rounding. This arithmetic proves fuel duration only, not generator electrical adequacy.<span class="mn-src">CONV_CALC v2.0.0</span></span>
             </div>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Days to empty</h3>
@@ -391,14 +400,14 @@
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Partial-load autonomy scaling</h3>
             <div class="mn-formula">
-                <span class="mn-eq">autonomy_hr(f) = usable_L / (956 × load_fraction)    where 0 &lt; load_fraction ≤ 1</span>
+                <span class="mn-eq">autonomy_hr(f) = usable_L / (43,500 × f × 0.356384)    where 0 &lt; f ≤ 1</span>
                 <span class="mn-where">Autonomy scales inversely with load fraction <code>f</code>. At 50% facility load the burn rate halves and autonomy doubles to 96 hr. Always label the load fraction used in the denominator.<span class="mn-src">CONV_CALC — partial-load note</span></span>
             </div>
 
-            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">N+1 genset autonomy</h3>
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">N+1 electrical-capacity boundary</h3>
             <div class="mn-formula">
-                <span class="mn-eq">autonomy_n1_hr = usable_L / generator_consumption_lph  (same as site autonomy)</span>
-                <span class="mn-where">In <code>fuelAutonomyHr(m)</code> reused for N+1. When one genset faults, the surviving units carry the same total facility load (956 L/hr site consumption unchanged). The failed unit's day-tank is isolated; the UST-01 still backs the full-site burn rate. N+1 autonomy equals the site-level figure; the check is that both exceed the 24 hr SLA.<span class="mn-src">CONV_CALC — N+1 note · fuel-system.html lines 749–753</span></span>
+                <span class="mn-eq">fuel_duration_with_one_unit_unavailable = 48.0 hr, only if the approved surviving fleet can carry 43,500 kW</span>
+                <span class="mn-where">The current engine does not contain a governed campus generator count, derating curve or dispatch model. Therefore N+1 electrical adequacy is <strong>UNAVAILABLE</strong>; the three-unit mimic must not be used as proof.<span class="mn-src">Truth-boundary rule · generator design pending</span></span>
             </div>
         </section>
 
@@ -410,16 +419,17 @@
             <table class="mn-table">
                 <thead><tr><th>Constant</th><th>Value</th><th>Unit</th><th>Engine key</th><th>Source reference</th></tr></thead>
                 <tbody>
-                    <tr><td>Tank capacity</td><td><code>60,000</code></td><td>L</td><td><code>CONV_MODEL.fuel.tank_capacity_l</code></td><td>conv/review/09 line 140</td></tr>
+                    <tr><td>Tank capacity</td><td><code>972,737</code></td><td>L</td><td><code>CONV_MODEL.fuel.tank_capacity_l</code></td><td>Assumed design sizing for 48 h at current campus burn</td></tr>
                     <tr><td>Usable fraction</td><td><code>0.90</code></td><td>—</td><td><code>CONV_MODEL.fuel.usable_fraction</code></td><td>conv/review/09 line 141</td></tr>
-                    <tr><td>Level (basis snapshot)</td><td><code>85</code></td><td>%</td><td><code>CONV_MODEL.fuel.level_pct</code></td><td>conv/review/09 line 16</td></tr>
-                    <tr><td>Burn rate</td><td><code>956</code></td><td>L/hr</td><td><code>CONV_MODEL.fuel.generator_consumption_lph</code></td><td>conv/review/09 lines 144–147</td></tr>
-                    <tr><td>IT load</td><td><code>1,850</code></td><td>kW</td><td><code>CONV_MODEL.site.it_load_kw</code></td><td>conv/review/09 line 10</td></tr>
+                    <tr><td>Level (basis snapshot)</td><td><code>85</code></td><td>%</td><td><code>CONV_MODEL.fuel.level_pct</code></td><td>Simulated/adopted, not measured</td></tr>
+                    <tr><td>Specific consumption</td><td><code>0.356384</code></td><td>L/kWh</td><td><code>CONV_MODEL.fuel.specific_consumption_l_per_kwh</code></td><td>Derived from retired source pair; rate retained across rebaseline</td></tr>
+                    <tr><td>Burn rate</td><td><code>15,503</code></td><td>L/hr</td><td><code>CONV_CALC.snapshot.fuel.generator_consumption_lph</code></td><td>Derived and display-rounded</td></tr>
+                    <tr><td>IT load</td><td><code>30,000</code></td><td>kW</td><td><code>CONV_MODEL.site.it_load_kw</code></td><td>Adopted current simulated campus scenario</td></tr>
                     <tr><td>PUE</td><td><code>1.45</code></td><td>—</td><td><code>CONV_MODEL.site.pue</code></td><td>conv/review/09 line 11</td></tr>
                     <tr><td>Backup SLA</td><td><code>24</code></td><td>hr</td><td><code>SLA_HR</code> (fuel-system.html)</td><td>Site operations standard</td></tr>
                     <tr><td>Day-tank low-low alarm</td><td><code>25</code></td><td>%</td><td><code>DT_LOWLOW</code> (fuel-system.html)</td><td>Interlock setpoint — forces P-101 to RUN</td></tr>
-                    <tr><td>Genset count</td><td><code>3</code></td><td>units</td><td><code>GENSET_COUNT</code> (fuel-system.html)</td><td>DT-GEN-A/B/C (N+1 topology)</td></tr>
-                    <tr><td>Genset model</td><td>Cat 3516E</td><td>—</td><td>Nameplate</td><td>2.75 MW rated; 3 units → 3× 2.75 = 8.25 MW installed vs 2.68 MW site load</td></tr>
+                    <tr><td>Genset count</td><td><code>3</code></td><td>units</td><td><code>GENSET_COUNT</code> (fuel-system.html)</td><td>Illustrative DT-GEN-A/B/C mimic; not current campus capacity authority</td></tr>
+                    <tr><td>Genset model</td><td>Cat 3516E</td><td>—</td><td>Local nameplate text</td><td>Campus fleet quantity, derating and N+1 adequacy are UNAVAILABLE</td></tr>
                 </tbody>
             </table>
             </div>
@@ -432,10 +442,10 @@
             <table class="mn-table">
                 <thead><tr><th>KPI</th><th>Formula</th><th>Unit</th><th>Interpretation</th></tr></thead>
                 <tbody>
-                    <tr><td>Autonomy</td><td><code>usable_L / 956</code></td><td>hr</td><td>Hours of site-load-rated backup. SLA gate: must exceed 24 hr.</td></tr>
-                    <tr><td>Usable reserve</td><td><code>60,000 × 0.90 × level%</code></td><td>L</td><td>Fuel volume available to gensets at current level.</td></tr>
-                    <tr><td>Facility load</td><td><code>1,850 × 1.45</code></td><td>kW</td><td>Total site electrical load driving the 956 L/hr burn denominator.</td></tr>
-                    <tr><td>N+1 autonomy</td><td>same as site autonomy</td><td>hr</td><td>One genset down — surviving units cover same site kW, burn unchanged.</td></tr>
+                    <tr><td>Autonomy</td><td><code>usable_L / computed_burn_lph</code></td><td>hr</td><td>48 h at the adopted 43,500 kW simulated facility load.</td></tr>
+                    <tr><td>Usable reserve</td><td><code>972,737 × 0.90 × level%</code></td><td>L</td><td>Simulated available inventory; 744,144 L at 85% level.</td></tr>
+                    <tr><td>Facility load</td><td><code>30,000 × 1.45</code></td><td>kW</td><td>43,500 kW current simulated campus load driving burn.</td></tr>
+                    <tr><td>N+1 electrical adequacy</td><td>requires approved fleet and dispatch model</td><td>state</td><td>UNAVAILABLE; not established by fuel-duration arithmetic.</td></tr>
                     <tr><td>Days to empty</td><td><code>autonomy_hr / 24</code></td><td>days</td><td>Display convenience; not a separate calculation.</td></tr>
                     <tr><td>UST level</td><td>SCADA LIT-101</td><td>%</td><td>Drives the level-fraction in <code>fuelUsableL</code>; alarm at &lt;60% (warn), &lt;30% (crit).</td></tr>
                     <tr><td>Day-tank levels</td><td>SCADA LIT-A/B/C</td><td>%</td><td>Individual genset day-tank fill; low-low &lt;25% triggers P-101 forced run.</td></tr>
@@ -447,42 +457,42 @@
         <!-- 6. WORKED EXAMPLE -->
         <section class="mn-section" id="worked-example">
             <h2><span class="mn-num">06</span> Worked example</h2>
-            <p class="mn-lead">Basis scenario: UST-01 at 85% level, full site facility load 2,682.5 kW. Numbers reproduce the live engine output exactly at the basis snapshot.</p>
+            <p class="mn-lead">Governed scenario: four halls at 7,500 kW each, UST-01 at a simulated 85% level and 43,500 kW facility load. Numbers reproduce the deterministic CONV_CALC v2.0.0 snapshot.</p>
             <div class="mn-worked">
                 <ol>
-                    <li>Facility load: <code>1,850 kW × 1.45 =</code> <span class="mn-result">2,682.5 kW</span> (displayed 2,683 kW)</li>
-                    <li>Usable fuel: <code>60,000 × 0.90 × (85/100) =</code> <span class="mn-result">45,900 L</span></li>
-                    <li>Burn rate: <span class="mn-result">956 L/hr</span> at 2,682.5 kW site load (Rule 3 denominator — bulk-tank at site load)</li>
-                    <li>Autonomy: <code>45,900 / 956 =</code> <span class="mn-result">48.0 hr</span> ✓ exceeds 24 hr SLA</li>
-                    <li>N+1 check: one genset faults → surviving two carry 2,682.5 kW unchanged → burn 956 L/hr → <span class="mn-result">48.0 hr</span> N+1 autonomy ✓</li>
+                    <li>Facility load: <code>30,000 kW × 1.45 =</code> <span class="mn-result">43,500 kW</span>.</li>
+                    <li>Usable fuel: <code>972,737 × 0.90 × (85/100) =</code> <span class="mn-result">744,143.805 L</span> → displayed 744,144 L.</li>
+                    <li>Burn rate: <code>43,500 × 0.356384 =</code> <span class="mn-result">15,502.704 L/hr</span> → displayed 15,503 L/hr.</li>
+                    <li>Autonomy: <code>744,143.805 / 15,502.704 =</code> <span class="mn-result">48.0 hr</span> ✓ exceeds the authored 24 hr duration objective.</li>
+                    <li>N+1 electrical adequacy: <span class="mn-result">UNAVAILABLE</span> until the campus fleet, derating and dispatch model are approved.</li>
                     <li>Days to empty: <code>48.0 / 24 =</code> <span class="mn-result">2.0 days</span></li>
-                    <li>Installed headroom: 3 × Cat 3516E × 2.75 MW = <span class="mn-result">8.25 MW</span> installed vs 2.68 MW site load → 3.07× derating margin</li>
+                    <li>The three Cat 3516E symbols remain an illustrative local mimic and are not presented as the 43.5 MW campus generator design.</li>
                 </ol>
             </div>
-            <div class="mn-note"><strong>Rule 3 reminder:</strong> the 956 L/hr figure is anchored to the full site facility load of 2,682.5 kW. Any autonomy calculation using a different denominator (single-genset nameplate, partial IT load, etc.) <em>must</em> label that denominator explicitly. Unlabelled deviations from the site-load denominator are a Rule 3 violation and produce optimistic, misleading autonomy figures.</div>
+            <div class="mn-note"><strong>Rule 3 reminder:</strong> current autonomy uses the engine-derived burn at 43,500 kW. The retired 956 L/hr at 2,682.5 kW pair survives only as provenance for 0.356384 L/kWh. Any different load or generator curve must be labelled and recomputed explicitly.</div>
         </section>
 
         <!-- 7. REFERENCES -->
         <section class="mn-section" id="references">
             <h2><span class="mn-num">07</span> References &amp; standards</h2>
             <ul class="mn-refs">
-                <li><b>conv/review/09</b> — <code>09-engineering-basis-and-calculations.md</code>: primary site basis document. Tank capacity (line 140), usable fraction (141), level (16), burn rate (144–147), IT load (10), PUE (11).</li>
+                <li><b>conv/review/09</b> — source provenance for usable fraction, PUE and the retired 956 L/h at 2,682.5 kW pair from which the specific-consumption rate is derived.</li>
                 <li><b>IEC 60255-21</b> — Electrical relays: vibration, shock, and seismic standards for protection relays in generator protection panels.</li>
                 <li><b>ISO 8217</b> — Fuel grades for marine and stationary diesel engines; relevant to diesel fuel quality, contamination limits, and storage requirements for UST-01.</li>
-                <li><b>Cat 3516E nameplate</b> — Caterpillar 3516E diesel generator, 2.75 MW rated output. Three units (DT-GEN-A/B/C) providing N+1 backup power topology for the facility.</li>
+                <li><b>Cat 3516E nameplate</b> — local mimic equipment text only; no current campus generator quantity or N+1 capacity claim is made.</li>
                 <li><b>ACCURACY_VALIDATION.md Rule 3</b> — Denominator transparency rule: every derived ratio must state its denominator explicitly (bulk-tank at site load for fuel autonomy).</li>
-                <li><b>Engine source</b> — <code class="mn-mono">js/conv-engine.js</code> (CONV_CALC v1.0.0, deep-frozen): <code>fuelUsableL()</code> + <code>fuelAutonomyHr()</code> + <code>facilityLoadKw()</code>.</li>
-                <li><b>Cockpit source</b> — <code class="mn-mono">fuel-system.html</code>: SCADA operator console; reads <code>CONV_CALC.snapshot</code>, falls back to locked basis values.</li>
+                <li><b>Engine source</b> — <code class="mn-mono">js/conv-engine.js</code> (CONV_CALC v2.0.0, deep-frozen): <code>facilityLoadKw()</code>, <code>generatorConsumptionLph()</code>, <code>fuelUsableL()</code> and <code>fuelAutonomyHr()</code>.</li>
+                <li><b>Cockpit source</b> — <code class="mn-mono">fuel-system.html</code>: simulated SCADA operator console; a missing, legacy or incomplete engine authority fails closed.</li>
             </ul>
         </section>
 
         <!-- 8. ASSUMPTIONS -->
         <section class="mn-section" id="limitations">
             <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
-            <p class="mn-lead">The 956 L/hr burn rate is a site-basis figure derived from the Cat 3516E at the full 2,682.5 kW facility load. Real genset consumption varies with actual electrical load, ambient temperature, engine age, and fuel specification; the basis figure is used as the conservative (highest normal load) planning denominator. Usable-fraction (90%) is a fixed engineering margin — actual pumpable volume depends on sump-pump depth and UST geometry and should be validated at commissioning. Day-tank draw rates in the SCADA simulation are deterministic approximations for the operator console and do not replace a fuel-flow meter calibration. This manual and the cockpit are an <strong>engineering education and operational pre-planning aid</strong>; site-specific autonomy planning must be validated by a qualified power-systems engineer against actual fuel analysis and genset load-profile data.</p>
+            <p class="mn-lead">The 0.356384 L/kWh specific-consumption rate is inferred from a retired source pair, not a vendor curve for the current campus. Real consumption varies with dispatch, generator loading, ambient conditions, engine age and fuel specification. The 972,737 L tank is an assumed design sizing that preserves a 48 h target at the adopted load; the 85% level is simulated. Actual pumpable volume, tank geometry, fuel-return behavior, generator quantity, derating and N+1 capacity require approved design and commissioning evidence. This manual and cockpit remain an <strong>engineering education and pre-planning aid</strong>, not live telemetry or operating authorization.</p>
         </section>
 
-        <a class="mn-toollink" href="../fuel-system.html">▶ Open the live Fuel System Cockpit</a>
+        <a class="mn-toollink" href="../fuel-system.html">▶ Open the simulated Fuel System Cockpit</a>
     </main>
 
     <footer class="footer footer-enhanced">

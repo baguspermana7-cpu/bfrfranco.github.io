@@ -1,6 +1,6 @@
 # DataHall AI Dashboard Standard
 
-> **Last reviewed: 2026-08-26** · Status: `ACTIVE` · Release: `v1.130.0`
+> **Last reviewed: 2026-08-30** · Status: `ACTIVE` · Release: `v1.134.14`
 >
 > Canonical feature key remains `datahall-ai`; the implementation filename remains
 > `datahallAI.html`. Access is root plus the explicit educator-role exception. A plain
@@ -8,9 +8,23 @@
 
 > Patterns, conventions, and lessons learned for `datahallAI.html`
 
-Last updated: 2026-08-26 (operator workflows and platform-study update)
+Last updated: 2026-08-30 (authority fail-closed and cross-project capacity boundary)
 
 ---
+
+## v1.134.14 Authority and cross-project boundary
+
+- AI/HPC and Conventional remain separate authorities. Neither page may borrow a plausible
+  value, cache, drawer registry entry, fallback literal, or study field from the other project.
+- Every engine-owned consumer requires its governed version **and** complete schema. Missing,
+  legacy, requested-version-mismatched, or same-version-incomplete payloads fail closed across
+  first paint, scheduled refresh, KPI/sidebar duplicates, generated documents, shared drawers,
+  and hidden controls.
+- Conventional current authority is `CONV_CALC v2.0.0`: four halls, 30,000 kW current IT,
+  43,500 kW facility load, PUE 1.45, and 2,000 installed rack positions (500 per hall).
+  The 40,000 kW IT figure is the four-hall planning/design capacity only.
+- UI copy uses **simulated**, **deterministic display refresh**, or **scenario state**. A timer
+  does not make browser-generated values live telemetry.
 
 ## v1.130.0 Operator-workspace contract
 
@@ -22,7 +36,7 @@ P&IDs, SLD, rack diagrams, engineering model, or Scenario A calculations.
 | Scope | Current/adopted basis | Study-only basis |
 |---|---|---|
 | DC AI/HPC | 4 halls × 3.564 MW IT; 27 logical GB200 NVL72 domains/hall in the project-specific split form; 2 physical positions/domain; 54 positions/hall; 66 kW/position; 14.256 MW facility IT | GB300 reference at 142 kW per integrated rack/domain: 27 racks/hall, 3.834 MW/hall, 15.336 MW/facility, 5.990625 kW/m² gross hall IT density. Never mutates Scenario A. |
-| DC Conventional | `CONV_CALC` current snapshot: 1.850 MW IT and PUE 1.45 | Campus capacity plan: 4 halls × 10 MW IT = 40 MW. It is not current telemetry and requires Engineer-of-Record validation. |
+| DC Conventional | `CONV_CALC v2.0.0`: 4 halls × 7.500 MW = 30.000 MW current simulated IT; 43.500 MW facility at PUE 1.45; 2,000 installed positions (500/hall) | 4 halls × 10 MW IT = 40 MW planning/design capacity. It is not current load or telemetry and requires Engineer-of-Record validation. |
 
 Density means `IT load per hall / gross hall floor area`. The public field is
 `hallItDensityKWPerM2`; the ambiguous `densityKWPerM2` name is retired.

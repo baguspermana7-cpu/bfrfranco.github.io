@@ -2,7 +2,7 @@
 title: Conventional DC Operations Standard
 type: standard-mirror
 source: standarization/CONVENTIONAL_DC_OPERATIONS_STANDARD.md
-updated: 2026-08-29
+updated: 2026-08-30
 ---
 
 # Conventional DC Operations
@@ -53,6 +53,51 @@ Canonical source: [[../../../../standarization/CONVENTIONAL_DC_OPERATIONS_STANDA
 - Design Studio scope identifiers are `current` and `current-plus-study`; the latter is a governed
   planning-study comparison, not the adopted current operating state.
 - SCADA motion and color project evaluated state; they never create operational truth.
+- The Data Hall opens on rack-inlet temperature: 18–27 °C inclusive is normal green and
+  25.4 °C is the adopted setpoint. Power density is a separate selected layer.
+- A selected hall has no EPMS reconciliation until a governed hall submeter exists. Equal
+  campus allocation is planning reference only and stays neutral.
+- Chiller runtime gates wait through a simulation tick; every branch retains current 19.4/27.0 °C
+  and engine-derived flow envelopes rather than retired fixed clamps.
+- The governed Conventional engine is pinned to v2.0.0 and every cockpit validates its complete
+  required schema. Missing, request-mismatch, matched-legacy and same-version-incomplete bundles
+  fail closed across first paint, runtime values, controls, tooltips and shared basis drawers.
+- CHW quantities remain on distinct planes: 943.0 L/s is the IT sensible-load reference,
+  982.3 L/s is the evaporator-duty reference, measured header flow is unavailable, 31,250 kW is
+  evaporator duty and 36,403.4 kW is condenser/tower rejection.
+- Calculated flow never impersonates an MFM/header measurement or supplies an independent COP;
+  governed plant efficiency is 6.06 COP / 0.58 kW/RT. Chiller capacity is 35 MW running, 45 MW
+  N+1 and 13.75 MW N+1 margin; no per-unit rating is displayed without governed authority.
+- Shared provenance drawers default-deny and require a validated host opt-in. Linked generated
+  documents, PRD and Manuals are independently parity-gated against the governed snapshot.
+- ICT and EPMS also start neutral and withhold topology, flow, commands, exports and scheduled
+  updates until the complete v2 authority validates. Shared provenance renders `COMMS LOST —
+  AUTHORITY UNAVAILABLE` whenever Conventional or AI authority is unavailable; simulated mode
+  alone cannot overrule failed authority.
+- Municipal water treatment is site-wide, not cloned by Hall A–D. Fire authority loss fails
+  closed across all cards, interlocks and 13 process-path consumers.
+- Dense AI cockpit chrome uses dedicated horizontal rails and an internally scrolling remaining
+  viewport, verified at 390/768/1440/1920 without overlap or unreachable content.
+- Required scenario and data-quality provenance must be non-empty; blank same-version metadata fails
+  closed and cannot advance a status timestamp.
+- EPMS separates Feed A/red and Feed B/green identity from energized/open/tripped state, derives its
+  viewport from rendered chrome, and labels final rack symbols as aggregate groups rather than
+  individual rack meters.
+- Fire keeps FACP health independent from hydraulic reserve adequacy: a reserve design deficit is
+  amber, uses governed shortfall logic and never fabricates an active supervisory alarm.
+- Water threshold captions remain attached to their owning instruments; Chiller diagnostics use the
+  governed 7.6 K delta-T plane; PUE 1.45 is adopted simulated design-point input, not measured PUE.
+- Phone grids reset desktop spans, and shared/process/AI motion stops under reduced-motion without
+  hiding static command, feedback, permissive or alarm state.
+- Fire's 7,200 m³ site rack-footprint value is a non-sizing proxy, never protected-enclosure volume;
+  jockey pressure metadata follows the governed simulated header state.
+- Water site balance/WUE is engine-derived, while treatment-train equipment state is deterministic
+  page-authored simulation because the engine has no treatment telemetry authority.
+- All operator numerics use JetBrains Mono tabular/slashed-zero figures. Phone child geometry and
+  bounded desktop inspector scrollports are asserted directly, not inferred from page overflow.
+- The release workflow runs the full three-document Design Studio browser selection/export gate.
+- Chiller scenario evolution is reproducible; healthy duty pumps do not swap randomly, so diagnostics
+  and first-out state cannot change merely because the page was reloaded at a different instant.
 
 Read the canonical standard for subsystem minimums, engineering formulas, UI/UX constraints,
 machine-checkable gates, references and the durable change/lesson ledger.

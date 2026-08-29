@@ -94,6 +94,13 @@ gate "Conventional alarms — common historian workspace" node --test tools/test
 gate "Conventional alarms — modal runtime and accessibility" node tools/test-conv-alarm-runtime.mjs
 gate "Conventional cooling/water — operator UI" node --test tools/test-conv-cooling-water-ui.mjs
 gate "Conventional fire/fuel — operator consequences" node --test tools/test-conv-fire-fuel-operator.mjs
+gate "Conventional dashboard — complete authority and Design Studio" node tools/test-conv-dashboard-authority.mjs
+gate "Conventional Design Studio — document selection, scope, and export" node tools/test-conv-design-studio-browser.mjs
+gate "Conventional ICT and EPMS — complete authority fail-close" node tools/test-conv-secondary-authority.mjs
+gate "Conventional data hall — complete authority fan-out" node tools/test-datahall-authority.mjs
+gate "Conventional fire — complete authority fan-out" node tools/test-fire-system-runtime-authority.mjs
+gate "AI data hall — complete model/calculation authority" node tools/test-datahall-ai-authority.mjs
+gate "SCADA cockpit — responsive operator regressions" node tools/test-operator-cockpit-regressions.mjs
 gate "Conventional data hall — operator engineering" node --test tools/test-datahall-operator-engineering.mjs
 gate "Conventional data hall/ICT — runtime state" node --test tools/test-ict-datahall-operator-runtime.mjs
 gate "Conventional ICT — operator architecture" node --test tools/test-ict-operator-architecture.mjs
@@ -102,6 +109,7 @@ gate "Dark coverage — fail-closed confirmation verdict" node --test tools/test
 
 # Public telemetry documentation is a shipped cockpit contract, not an optional audit.
 gate "telemetry docs — structure, contract links, and sourced-manual preservation" node tools/test-telemetry-docs.mjs
+gate "Conventional linked manuals and PRD — current authority parity" node tools/test-conv-document-parity.mjs
 gate "telemetry docs — generated discovery parity" node tools/test-telemetry-discovery.mjs
 gate "telemetry docs — browser, a11y, mobile, and gate safety" node tools/test-telemetry-e2e.mjs
 

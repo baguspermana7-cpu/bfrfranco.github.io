@@ -1,4 +1,4 @@
-# Telemetry quality standard — v1.43.2+
+# Telemetry quality standard — v1.43.4+
 
 Companion to [`LINE_MODEL.md`](LINE_MODEL.md), [`BREAKER_SYMBOLS.md`](BREAKER_SYMBOLS.md), and [`INSPECTOR.md`](INSPECTOR.md). Responds to team review docs:
 
@@ -17,7 +17,7 @@ Companion to [`LINE_MODEL.md`](LINE_MODEL.md), [`BREAKER_SYMBOLS.md`](BREAKER_SY
 | State | Chip label | Colour | Meaning |
 |---|---|---|---|
 | `live` | LIVE | green | Genuine telemetry, no qualifier needed |
-| `simulated` | SIM | violet | Engine-derived / modelled, not live sensors |
+| `simulated` | SIM | instrument cyan | Engine-derived / modelled, not live sensors |
 | `stale` | STALE | amber | Last update older than configured threshold |
 | `manual` | MANUAL | cyan | Operator override, not live measurement |
 | `comms_lost` | NO COMMS | red | Sensor / gateway unreachable |
@@ -33,6 +33,9 @@ Set `<body data-rz-data-mode="...">` to declare what the page is showing. The se
    `[data-rz-telemetry-banner-slot]` immediately after the page header. A fixed fallback is retained
    only for legacy adopters and is not acceptable for a gated cockpit.
 3. Skips the banner when mode = `live` (operators don't need a label when telemetry is genuine)
+4. Treats `data-rz-basis-authority="unavailable"` or
+   `data-datahall-authority="unavailable"` as dominant over the declared page mode. The banner and
+   inherited point quality become `comms_lost` and read `COMMS LOST — AUTHORITY UNAVAILABLE`.
 
 All four BMS cockpit pages currently declare `data-rz-data-mode="simulated"`. Reviewer mandate (doc-28): "Jika menggunakan sample data, beri label sample/simulated agar tidak terlihat seperti live."
 
@@ -68,11 +71,16 @@ window.RZTelemetryQuality.audit(document);     /* { mode, bannerVisible, points,
 | v1.131.0 | `datahall.html` | `simulated` | ✓ in-flow | N/A |
 | v1.131.0 | `ict.html` | `simulated` | ✓ in-flow | N/A |
 
-At v1.131.0 all six current adopting cockpits (`datahallAI`, Data Hall, Chiller, Water, Fire and
-ICT) provide an in-flow banner slot. A 390 px browser gate verifies the banner is not fixed and its
-rectangle starts below the page header.
+At v1.134.14 all six current adopting cockpits (`datahallAI`, Data Hall, Chiller, Water, Fire and
+ICT) provide an in-flow banner slot. A dense cockpit may use the compact variant inside a header
+instrument rail, provided the header reserves its geometry, the label remains explicit, and the
+44 px dismissal target is preserved. A 390 px browser gate verifies that provenance does not
+overlap the tab rail and that the remaining cockpit is reachable through its owned scrollport.
+On narrow screens the provenance slot is the first in-flow item after the protected header; no
+navigation, tab or action may visually occupy its reserved row.
 
-EPMS_Telemetry.html is untouched per the owner mandate.
+`EPMS_Telemetry.html` retains its own operator status strip rather than this shared banner; its
+complete v2 authority gate independently withholds the single-line and commands on authority loss.
 
 ## Authoring guidelines
 
@@ -87,6 +95,14 @@ EPMS_Telemetry.html is untouched per the owner mandate.
    `:focus-visible` outline, and remains keyboard reachable.
 8. **Respect motion and theme.** Stop banner pulse/transition for `prefers-reduced-motion: reduce`;
    use semantic light-theme foreground/background pairs rather than reusing luminous dark-theme text.
+9. **Compact is geometry, not weaker provenance.** `data-rz-telemetry-compact` may shorten the
+   visible wording, but the full non-live meaning stays in its accessible title and the state
+   remains instrument cyan. Purple is not part of the industrial cockpit state grammar.
+10. **Authority outranks mode.** Never show a simulated engine-derived label when the engine/model
+    validator has failed. Page and point quality become `comms_lost` until authority is restored.
+11. **Provenance must be substantive.** Required scenario and data-quality fields are trimmed and
+    must remain non-empty. Property presence alone is insufficient; blank provenance fails closed,
+    and status clocks/timestamps cannot continue advancing while authority is unavailable.
 
 ## Out of scope this standard
 

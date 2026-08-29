@@ -60,13 +60,19 @@ const MIME = Object.freeze({
     '.webp': 'image/webp', '.woff2': 'font/woff2',
 });
 const server = createServer(async (req, res) => {
-    const pathname = new URL(req.url, 'http://localhost').pathname;
+    const requestUrl = new URL(req.url, 'http://localhost');
+    const pathname = requestUrl.pathname;
     const relative = pathname.endsWith('/') ? `${pathname.slice(1)}index.html` : pathname.slice(1);
     const full = resolve(ROOT, decodeURIComponent(relative));
     if (full !== ROOT && !full.startsWith(ROOT + sep)) { res.writeHead(403).end(); return; }
     try {
+        let payload = await readFile(full);
+        if (extname(full) === '.html' && requestUrl.searchParams.get('rzFixture') === 'matchedLegacy') {
+            payload = Buffer.from(payload.toString('utf8')
+                .replace(/js\/conv-engine\.js\?v=2\.0\.0/g, 'js/conv-engine.js?v=1.9.0'));
+        }
         res.writeHead(200, { 'content-type': MIME[extname(full)] || 'application/octet-stream' })
-            .end(await readFile(full));
+            .end(payload);
     } catch { res.writeHead(404).end(); }
 });
 await new Promise((accept) => server.listen(0, '127.0.0.1', accept));
@@ -82,12 +88,16 @@ function leadingNumber(text) {
 }
 
 let checked = 0;
+let authorityFixturesChecked = 0;
 try {
     for (const page of ADOPTERS) {
         const tab = await browser.newPage();
         await tab.goto(`${base}/${page}`, { waitUntil: 'domcontentloaded', timeout: 45000 });
         await tab.waitForFunction(() => window.RZBasisDrawer && window.RZ_CONV_PARAMETERS, { timeout: 20000 });
         await new Promise((accept) => setTimeout(accept, 2200));
+
+        assert.equal(await tab.evaluate(() => window.RZBasisDrawer.authorityAvailable()), true,
+            `${page}: healthy current authority did not opt the shared drawer in`);
 
         const hooks = await tab.evaluate(() => [...document.querySelectorAll('[data-basis-param]')]
             .map((el) => ({
@@ -138,8 +148,57 @@ try {
         }
         await tab.close();
     }
+
+    /* D5 — current-looking registry values must not escape through a forced API call
+       when the host engine is absent, legacy, or same-version-but-incomplete. The
+       generated registry is design evidence; it is never runtime authority by itself. */
+    const AUTHORITY_FIXTURES = Object.freeze({
+        missing: 'delete window.CONV_CALC;',
+        legacy: `window.CONV_CALC={snapshot:{meta:{version:'1.9.0',scenario:'Legacy',data_quality:'GOOD'},site:{it_load_kw:1850,facility_load_kw:2682.5,non_it_load_kw:832.5,pue:1.45},racks:{at_8kw:231},electrical:{epms_total_kw:2682.5,ups_system_count:2,ups_module_kw_rated:250,ups_modules_per_system:5}}};`,
+        incomplete: `window.CONV_CALC={snapshot:{meta:{version:'2.0.0',scenario:'Simulated',data_quality:'GOOD'},site:{it_load_kw:30000,facility_load_kw:43500,non_it_load_kw:13500,pue:1.45},racks:{at_8kw:3750},electrical:{epms_total_kw:43500,ups_system_count:2,ups_module_kw_rated:500,ups_modules_per_system:10}}};`,
+        matchedLegacy: `window.CONV_CALC={snapshot:{meta:{version:'1.9.0',scenario:'Legacy',data_quality:'GOOD'},site:{it_load_kw:1850,facility_load_kw:2682.5,non_it_load_kw:832.5,pue:1.45},campus:{hall_count:4,racks_total:924,halls:[{},{},{},{}]},racks:{at_8kw:231},electrical:{epms_total_kw:2682.5,ups_system_count:2,ups_module_kw_rated:250,ups_modules_per_system:5}},getHallSnapshot:function(){return null;},wueFromFlowLpm:function(){return 1.2;}};`,
+    });
+    for (const page of ADOPTERS) {
+        for (const [fixtureName, fixtureScript] of Object.entries(AUTHORITY_FIXTURES)) {
+            const tab = await browser.newPage();
+            await tab.setRequestInterception(true);
+            tab.on('request', (request) => {
+                if (new URL(request.url()).pathname.endsWith('/js/conv-engine.js')) {
+                    request.respond({ status: 200, contentType: 'text/javascript', body: fixtureScript });
+                    return;
+                }
+                request.continue();
+            });
+            const fixtureUrl = fixtureName === 'matchedLegacy'
+                ? `${base}/${page}?rzFixture=matchedLegacy`
+                : `${base}/${page}`;
+            await tab.goto(fixtureUrl, { waitUntil: 'domcontentloaded', timeout: 45000 });
+            await tab.waitForFunction(() => window.RZBasisDrawer && window.RZ_CONV_PARAMETERS,
+                { timeout: 20000 });
+            await new Promise((accept) => setTimeout(accept, 800));
+            const verdict = await tab.evaluate(() => {
+                const authorityAvailable = window.RZBasisDrawer.authorityAvailable();
+                window.RZBasisDrawer.open('site.it_load_kw');
+                const panel = document.getElementById('rz-basis-drawer-panel');
+                const panelText = panel ? panel.textContent.replace(/\s+/g, ' ').trim() : '';
+                window.RZBasisDrawer.close();
+                return { authorityAvailable, panelText };
+            });
+            assert.equal(verdict.authorityAvailable, false,
+                `${page} ${fixtureName}: shared drawer accepted non-current host authority`);
+            if (verdict.panelText) {
+                assert.match(verdict.panelText, /UNAVAILABLE|Runtime basis unavailable/i,
+                    `${page} ${fixtureName}: forced drawer did not disclose unavailable authority`);
+                assert.doesNotMatch(verdict.panelText, /\b30,?000\b|\b43,?500\b|\b1\.45\b/,
+                    `${page} ${fixtureName}: forced drawer leaked plausible current values`);
+            }
+            authorityFixturesChecked += 1;
+            await tab.close();
+        }
+    }
     console.log(`PASS Conventional basis drawer — ${hookCount} hooks across ${ADOPTERS.length} pages, `
-        + `all resolve to registered parameters; ${checked} value/explanation pairs agree`);
+        + `all resolve to registered parameters; ${checked} value/explanation pairs agree; `
+        + `${authorityFixturesChecked} hostile authority fixtures fail closed`);
 } finally {
     await browser.close();
     await new Promise((accept) => server.close(accept));

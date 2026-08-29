@@ -70,6 +70,7 @@
     }
     </script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap');
         /* --- Grounded operator-console palette (matches EPMS_Telemetry exemplar) --- */
         :root {
             --bg-core: #02040a;
@@ -98,14 +99,20 @@
         body {
             background: var(--bg-core);
             color: var(--txt-main);
-            font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
+            font-family: 'IBM Plex Sans', system-ui, sans-serif;
+            font-variant-numeric: tabular-nums slashed-zero;
+            font-feature-settings: "tnum" 1, "zero" 1;
             margin: 0; padding: 0;
             height: 100vh; width: 100vw;
             display: flex; flex-direction: column;
             overflow: hidden;
             font-size: 13px;
         }
-        .num { font-family: 'Consolas', 'SF Mono', monospace; font-variant-numeric: tabular-nums; }
+        .num, [data-basis-param], .as-val, .metric-val, .rack-load, .rack-temp {
+            font-family: 'JetBrains Mono', monospace;
+            font-variant-numeric: tabular-nums slashed-zero;
+            font-feature-settings: "tnum" 1, "zero" 1;
+        }
 
         a { color: inherit; }
 
@@ -143,7 +150,7 @@
         .hall-selector button {
             min-width: 42px; min-height: 30px; padding: 4px 9px; border: 1px solid var(--border);
             background: rgba(255,255,255,.025); color: var(--txt-dim); cursor: pointer;
-            font: 700 10px/1 'Consolas','SF Mono',monospace;
+            font: 700 10px/1 'JetBrains Mono',monospace;
         }
         .hall-selector button:hover { border-color: var(--sel); color: var(--txt-main); }
         .hall-selector button[aria-pressed="true"] {
@@ -166,13 +173,16 @@
         .as-state.normal .as-dot { background: var(--st-normal); }
         .as-state.warn   .as-dot { background: var(--st-warn); }
         .as-state.alarm  .as-dot { background: var(--st-alarm); animation: blink 1s steps(1) infinite; }
+        .as-state.unavailable .as-dot { background: var(--txt-faint); animation: none; }
         .as-state .as-state-txt { font-size: 13px; font-weight: 800; letter-spacing: 0.5px; }
         .as-state.normal .as-state-txt { color: var(--st-normal); }
         .as-state.warn   .as-state-txt { color: var(--st-warn); }
         .as-state.alarm  .as-state-txt { color: var(--st-alarm); }
+        .as-state.unavailable .as-state-txt { color: var(--txt-faint); }
         .v-crit  { color: var(--st-alarm); }
         .v-warn  { color: var(--st-warn); }
         .v-ok    { color: var(--st-normal); }
+        .v-na    { color: var(--txt-faint); }
         .v-zero  { color: var(--txt-dim); }
         .as-spacer { flex: 1; background: var(--bg-panel); }
         .as-scenario { display: flex; align-items: center; gap: 6px; padding: 6px 16px; background: var(--bg-panel); font-size: 11px; color: var(--txt-dim); }
@@ -210,7 +220,7 @@
         .basis-split { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
         .basis-cell { border: 1px solid var(--border-soft); padding: 7px; background: rgba(2,4,10,.25); }
         .basis-cell .basis-label { color: var(--txt-faint); font-size: 8.5px; letter-spacing: .45px; text-transform: uppercase; }
-        .basis-cell .basis-value { color: var(--txt-main); margin-top: 3px; font: 700 12px/1.2 'Consolas','SF Mono',monospace; }
+        .basis-cell .basis-value { color: var(--txt-main); margin-top: 3px; font: 700 12px/1.2 'JetBrains Mono',monospace; }
         .basis-cell .basis-note { color: var(--txt-faint); margin-top: 3px; font-size: 9px; line-height: 1.35; }
 
         .bar-track { height: 6px; width: 100%; background: rgba(255,255,255,0.06); border-radius: 3px; margin-top: 6px; overflow: hidden; }
@@ -220,6 +230,8 @@
         .pill.pass { background: rgba(63,157,107,0.15); color: var(--st-normal); border: 1px solid rgba(63,157,107,0.4); }
         .pill.warn { background: rgba(217,154,43,0.15); color: var(--st-warn); border: 1px solid rgba(217,154,43,0.4); }
         .pill.fail { background: rgba(228,86,74,0.15); color: var(--st-alarm); border: 1px solid rgba(228,86,74,0.4); }
+        .pill.unavailable { background: rgba(148,163,184,0.08); color: var(--txt-faint); border: 1px solid var(--border); }
+        button:disabled, button[aria-disabled="true"] { cursor: not-allowed; opacity: 0.58; }
 
         /* CRAH air-side status rows */
         .unit-row {
@@ -391,7 +403,7 @@
         /* --- MODAL --- */
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(2,4,10,0.8); z-index: 10000; display: none;
-            justify-content: center; align-items: center; backdrop-filter: blur(3px);
+            justify-content: center; align-items: center;
         }
         .modal-box {
             background: var(--bg-panel); border: 1px solid var(--border); width: 420px; max-width: 92vw;
@@ -431,8 +443,10 @@
             .hall-scope-bar { align-items: flex-start; flex-direction: column; }
             .hall-selector { width: 100%; }
             .hall-selector button { flex: 1; min-height: 44px; }
-            .alarm-strip { flex-wrap: wrap; }
-            .as-cell { min-width: 33%; }
+            .alarm-strip { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; }
+            .as-state, .as-scenario { grid-column: 1 / -1; }
+            .as-cell { min-width: 0; }
+            .as-cell:nth-child(6) { grid-column: 1 / -1; }
             .as-spacer { display: none; }
             .balance-band { flex-wrap: wrap; }
             .bb-cell { min-width: 48%; }
@@ -442,7 +456,6 @@
             .legend { width: 100%; margin-left: 0; }
         }
         @media (max-width: 480px) {
-            .as-cell { min-width: 50%; }
             .bb-cell { min-width: 100%; }
             .zone-field { gap: 3px; }
         }
@@ -453,13 +466,13 @@
     <!-- Single scenario basis + pure calculations (Conventional BMS engine).
          Plain external script in <head>, BEFORE the page's inline script.
          Never inline this into a JS string literal. -->
-    <script src="js/conv-engine.js?v=1.22.0"></script>
+    <script src="js/conv-engine.js?v=2.0.0"></script>
     <!-- v1.134.2 — the GENERATED parameter registry plus the ONE shared basis drawer. This
          page used to carry its own hand-written basisFor dictionary; a drawer that restates
          provenance by hand is how v1.132.0 shipped a drawer explaining a density it had not
          derived. The drawer renders the registry now, so it cannot claim what is not there. -->
     <script src="js/conv-parameters.js?v=1.134.2"></script>
-    <script src="js/rz-basis-drawer.js?v=1.134.2"></script>
+    <script src="js/rz-basis-drawer.js?v=1.134.14"></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
          Loaded for cross-page consistency; body does NOT carry rz-bms-shell
          class. Spec: standarization/BMS_SHELL.md ; conv/review/14 §3. -->
@@ -467,7 +480,7 @@
     <script src="js/rz-bms-shell.js?v=1.24.1" defer></script>
     <!-- v1.43.21 — data-quality service (SIM banner + chip). Additive; the rack/
          CRAH grid + all displayed values are unchanged. P1 datahall metadata. -->
-    <script src="js/rz-telemetry-quality.js?v=1.131.0" defer></script>
+    <script src="js/rz-telemetry-quality.js?v=1.134.14" defer></script>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-07-22-navfix" defer></script>
     <script src="js/rz-cookie-consent.js?v=2026-07-14" defer></script>
@@ -495,22 +508,22 @@
     <div class="crah-pop" id="crahPop" role="dialog" aria-modal="false" aria-labelledby="cp-title">
       <span class="cp-close" onclick="window.__closeCrahPop()" role="button" tabindex="0" aria-label="Close">&times;</span>
       <div class="cp-head">
-        <span class="cp-title" id="cp-title">CRAH-A01</span>
-        <span class="cp-state" id="cp-state">RUN</span>
+        <span class="cp-title" id="cp-title">CRAH Authority UNAVAILABLE</span>
+        <span class="cp-state" id="cp-state">UNAVAILABLE</span>
       </div>
-      <div class="cp-grid" id="cp-grid"></div>
+      <div class="cp-grid" id="cp-grid">UNAVAILABLE</div>
     </div>
 
     <!-- Equipment inspector modal (kept for any non-CRAH inspector use) -->
     <div class="modal-overlay" id="unitModal">
         <div class="modal-box">
             <span class="close-modal" onclick="closeModal()" role="button" tabindex="0" aria-label="Close">&times;</span>
-            <h3 id="m-title">Equipment</h3>
-            <div class="m-sub" id="m-sub">&mdash;</div>
-            <div class="m-grid" id="m-grid"></div>
+            <h3 id="m-title">Equipment Authority UNAVAILABLE</h3>
+            <div class="m-sub" id="m-sub">UNAVAILABLE</div>
+            <div class="m-grid" id="m-grid">UNAVAILABLE</div>
             <div class="m-section">
                 <div class="m-section-t">Data Source</div>
-                <div class="m-grid" id="m-source"></div>
+                <div class="m-grid" id="m-source">UNAVAILABLE</div>
             </div>
         </div>
     </div>
@@ -535,25 +548,25 @@
 
     <!-- ALARM STRIP — operator-first, top of information hierarchy -->
     <div class="alarm-strip" id="alarmStrip">
-        <div class="as-state normal" id="as-state">
+        <div class="as-state unavailable" id="as-state">
             <div class="as-dot"></div>
-            <div class="as-state-txt" id="as-state-txt">NORMAL</div>
+            <div class="as-state-txt" id="as-state-txt">UNAVAILABLE</div>
         </div>
         <div class="as-cell">
             <div class="as-lbl">Critical</div>
-            <div class="as-val num v-zero" id="as-crit">0</div>
+            <div class="as-val num v-na" id="as-crit">UNAVAILABLE</div>
         </div>
         <div class="as-cell">
             <div class="as-lbl">Warning</div>
-            <div class="as-val num v-zero" id="as-warn">0</div>
+            <div class="as-val num v-na" id="as-warn">UNAVAILABLE</div>
         </div>
         <div class="as-cell">
             <div class="as-lbl">Maint / Bypass</div>
-            <div class="as-val num v-zero" id="as-maint">0</div>
+            <div class="as-val num v-na" id="as-maint">UNAVAILABLE</div>
         </div>
         <div class="as-cell">
             <div class="as-lbl">Comms</div>
-            <div class="as-val num v-ok" id="as-comms">OK</div>
+            <div class="as-val num v-na" id="as-comms">UNAVAILABLE</div>
         </div>
         <div class="as-cell">
             <div class="as-lbl">Last Update</div>
@@ -562,9 +575,9 @@
         <div class="as-spacer"></div>
         <div class="as-scenario">
             <span>Data Quality</span>
-            <span class="as-chip" id="as-dq">GOOD</span>
+            <span class="as-chip" id="as-dq">UNAVAILABLE</span>
             <span>Scenario</span>
-            <span class="as-chip" id="as-scn">Simulated</span>
+            <span class="as-chip" id="as-scn">UNAVAILABLE</span>
         </div>
     </div>
 
@@ -573,11 +586,11 @@
          v1.33.2 — each metric clickable for basis drawer (ACCURACY_VALIDATION.md Rule 6). -->
     <div id="dh-ops-rollup" role="status" aria-live="polite" style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:8px 14px;background:rgba(12,20,35,0.65);border-bottom:1px solid #2b3a52;font-family:'JetBrains Mono','IBM Plex Sans',sans-serif;font-size:12px;color:#cbd5e1;font-variant-numeric:tabular-nums;">
         <span style="color:#9aa3af;font-weight:700;letter-spacing:.06em;text-transform:uppercase;">Operations Rollup</span>
-        <span data-basis="state" tabindex="0" role="button" aria-label="Hall state — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Hall <b id="dh-hall-state" style="color:#22c55e;">NORMAL</b></span>
-        <span data-basis-param="hall.it_load_kw" tabindex="0" role="button" aria-label="Rack Load — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Rack Load <b id="dh-rack-load" style="color:#fff;">&mdash;</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
-        <span data-basis="margin" tabindex="0" role="button" aria-label="Cooling Margin — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Cooling Margin <b id="dh-cooling-margin" style="color:#22c55e;">18</b><span style="color:#94a3b8;font-weight:400;">%</span></span>
-        <span data-basis-param="site.pue" tabindex="0" role="button" aria-label="PUE — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">PUE <b id="dh-pue" style="color:#fff;">1.45</b></span>
-        <span data-basis-param="hall.rack_actual_avg_kw" tabindex="0" role="button" aria-label="Power Density — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Power Density <b id="dh-pd" style="color:#fff;">&mdash;</b><span style="color:#94a3b8;font-weight:400;"> kW/rack</span></span>
+        <span data-basis="state" tabindex="0" role="button" aria-label="Hall state — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Hall <b id="dh-hall-state" style="color:#9aa3af;">UNAVAILABLE</b></span>
+        <span data-basis-param="hall.it_load_kw" tabindex="0" role="button" aria-label="Rack Load — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Rack Load <b id="dh-rack-load" style="color:#9aa3af;">UNAVAILABLE</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
+        <span data-basis="margin" tabindex="0" role="button" aria-label="Cooling Margin — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Cooling Margin <b id="dh-cooling-margin" style="color:#9aa3af;">UNAVAILABLE</b><span style="color:#94a3b8;font-weight:400;">%</span></span>
+        <span data-basis-param="site.pue" tabindex="0" role="button" aria-label="PUE — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">PUE <b id="dh-pue" style="color:#9aa3af;">UNAVAILABLE</b></span>
+        <span data-basis-param="hall.rack_actual_avg_kw" tabindex="0" role="button" aria-label="Power Density — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Power Density <b id="dh-pd" style="color:#9aa3af;">UNAVAILABLE</b><span style="color:#94a3b8;font-weight:400;"> kW/rack</span></span>
         <span style="flex:1"></span>
         <span style="color:#94a3b8;font-size:11px;">Click any KPI for basis · Mode toggles below</span>
     </div>
@@ -585,10 +598,10 @@
     <div class="hall-scope-bar">
         <div class="hall-scope-copy"><strong id="hall-scope-label">Data Hall A</strong> · one locked reference scenario per selected hall; changing scope updates tags and inspection context without altering the deterministic engine input.</div>
         <div class="hall-selector" id="hall-selector" role="group" aria-label="Select data hall operational scope">
-            <button type="button" data-hall="A" aria-pressed="true" onclick="selectHall('A')">Hall A</button>
-            <button type="button" data-hall="B" aria-pressed="false" onclick="selectHall('B')">Hall B</button>
-            <button type="button" data-hall="C" aria-pressed="false" onclick="selectHall('C')">Hall C</button>
-            <button type="button" data-hall="D" aria-pressed="false" onclick="selectHall('D')">Hall D</button>
+            <button type="button" data-hall="A" aria-pressed="true" onclick="selectHall('A')" disabled>Hall A</button>
+            <button type="button" data-hall="B" aria-pressed="false" onclick="selectHall('B')" disabled>Hall B</button>
+            <button type="button" data-hall="C" aria-pressed="false" onclick="selectHall('C')" disabled>Hall C</button>
+            <button type="button" data-hall="D" aria-pressed="false" onclick="selectHall('D')" disabled>Hall D</button>
         </div>
     </div>
 
@@ -602,6 +615,11 @@
     /* v1.24.1 doc-14 §3 — bind ops rollup to engine + mount the mode selector via the shell. */
     (function(){
         function bindRollup(){
+            if(window.RZ_DATAHALL_AUTHORITY_AVAILABLE !== true) return;
+            if(typeof window.RZ_DATAHALL_PAINT_ROLLUP === 'function') {
+                window.RZ_DATAHALL_PAINT_ROLLUP();
+                return;
+            }
             if(!window.CONV_CALC || !window.CONV_CALC.snapshot) return;
             /* v1.132.0 BINDING REPAIR — this read `site.it_kw` and `datahall.racks_total`; neither key has ever
                existed on the snapshot (real key is `site.it_load_kw`, and there is no `datahall` branch). Both
@@ -615,7 +633,8 @@
                density are HALL quantities, so both now come from the hall snapshot. PUE stays campus-scoped:
                it is a site metric and there is no per-hall PUE in the study. */
             var s = window.CONV_CALC.snapshot;
-            var hall = window.CONV_CALC.getHallSnapshot ? window.CONV_CALC.getHallSnapshot('A') : null;
+            var hallCode = window.RZ_DATAHALL_SELECTED_HALL || 'A';
+            var hall = window.CONV_CALC.getHallSnapshot ? window.CONV_CALC.getHallSnapshot(hallCode) : null;
             var itKw = (hall && hall.it_load_kw != null) ? hall.it_load_kw : null;
             var it = (itKw != null) ? (itKw / 1000).toFixed(2) : '—';
             var pue = (s.site && s.site.pue != null) ? s.site.pue.toFixed(2) : '—';
@@ -628,6 +647,7 @@
         }
         function mountModes(){
             var host = document.getElementById('dh-mode-toolbar');
+            if(window.RZ_DATAHALL_AUTHORITY_AVAILABLE !== true) return;
             if(!host || !window.RZBMSShell || !window.RZBMSShell.layerToggle) return;
             /* v1.29.3 — radio-style: each click overrides previous and delegates to window.setMode()
                so the toolbar now drives the rack heatmap (was visual-only in v1.24.1). */
@@ -636,24 +656,28 @@
                 'space':'space', 'alarms':'alarms'
             };
             window.RZBMSShell.layerToggle(host, [
-                {id:'power',         label:'Power', pressed:true},
-                {id:'temperature',   label:'Temperature'},
+                {id:'power',         label:'Power'},
+                {id:'temperature',   label:'Temperature', pressed:true},
                 {id:'cooling-margin',label:'Cooling Margin'},
                 {id:'space',         label:'Space'},
                 {id:'alarms',        label:'Alarms'}
-            ], function(active){
-                /* radio shim: keep only last pressed */
-                var last = active[active.length-1] || 'power';
-                var btns = host.querySelectorAll('button[data-bms-layer]');
+            ], function(){ /* shared builder is multi-select; radio behavior is bound below */ });
+            function activateLayer(last){
+                var btns = host.querySelectorAll('button[data-layer]');
                 for (var i=0; i<btns.length; i++){
-                    var on = btns[i].getAttribute('data-bms-layer') === last;
+                    var on = btns[i].getAttribute('data-layer') === last;
                     btns[i].setAttribute('aria-pressed', on ? 'true' : 'false');
                     btns[i].classList.toggle('on', on);
                 }
                 document.body.setAttribute('data-dh-mode', last);
-                var sm = TOOLBAR_TO_MODE[last] || 'power';
+                var sm = TOOLBAR_TO_MODE[last] || 'temp';
                 if (typeof window.setMode === 'function') window.setMode(sm);
-            });
+            }
+            var buttons = host.querySelectorAll('button[data-layer]');
+            for(var i=0; i<buttons.length; i++){
+                buttons[i].addEventListener('click', function(){ activateLayer(this.getAttribute('data-layer')); });
+            }
+            activateLayer('temperature');
         }
         function init(){ bindRollup(); mountModes(); }
         if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
@@ -672,40 +696,40 @@
                      plant that no longer exists (the engine runs 7 of 10). Replaced by the
                      engine's own counts. -->
                 <div class="kv" data-basis-param="cooling.chillers_running" tabindex="0" role="button"
-                     title="Chillers running — click for basis"><span class="k">Chillers</span><span class="v num" id="ch-count">--</span></div>
+                     title="Chillers running — click for basis"><span class="k">Chillers</span><span class="v num" id="ch-count">UNAVAILABLE</span></div>
                 <div class="kv" style="margin-top:7px; padding-top:7px; border-top:1px solid var(--border-soft);"
                      data-basis-param="cooling.rack_inlet_target_c" tabindex="0" role="button"
                      title="Rack-inlet design target — click for basis">
-                    <span class="k">Rack inlet (target)</span><span class="v num" id="th-inlet">--</span>
+                    <span class="k">Rack inlet (target)</span><span class="v num" id="th-inlet">UNAVAILABLE</span>
                 </div>
                 <!-- The supply-air plane and the two assumptions that place it. These were the
                      invisible half of the 15.2 C question: the temperature was shown, the coil
                      approach and the containment assumption behind it were not. -->
                 <div class="kv" data-basis-param="cooling.crah_supply_air_c" tabindex="0" role="button"
-                     title="CRAH supply air — click for basis"><span class="k">CRAH supply air</span><span class="v num" id="th-supply">--</span></div>
+                     title="CRAH supply air — click for basis"><span class="k">CRAH supply air</span><span class="v num" id="th-supply">UNAVAILABLE</span></div>
                 <!-- v1.134.11 — the containment assumption that places the supply plane. It was
                      engine-published and shown nowhere, so the one number that decides whether
                      25.4 C supply is credible was invisible. -->
                 <div class="kv" data-basis-param="cooling.supply_path_mixing_k" tabindex="0" role="button"
-                     title="Supply-path mixing (containment assumption) — click for basis"><span class="k">Supply-path mixing</span><span class="v num" id="th-mixing">--</span></div>
+                     title="Supply-path mixing (containment assumption) — click for basis"><span class="k">Supply-path mixing</span><span class="v num" id="th-mixing">UNAVAILABLE</span></div>
                 <div class="kv" data-basis-param="cooling.chw_coil_approach_k" tabindex="0" role="button"
-                     title="Coil approach (ASSUMED) — click for basis"><span class="k">Coil approach</span><span class="v num" id="th-approach">--</span></div>
+                     title="Coil approach (ASSUMED) — click for basis"><span class="k">Coil approach</span><span class="v num" id="th-approach">UNAVAILABLE</span></div>
                 <div class="kv" data-basis-param="cooling.chws_c" tabindex="0" role="button"
-                     title="CHWS — click for basis"><span class="k">CHWS</span><span class="v num" id="chws">--</span></div>
+                     title="CHWS — click for basis"><span class="k">CHWS</span><span class="v num" id="chws">UNAVAILABLE</span></div>
                 <div class="kv" data-basis-param="cooling.chwr_c" tabindex="0" role="button"
-                     title="CHWR — click for basis"><span class="k">CHWR</span><span class="v num" id="chwr">--</span></div>
+                     title="CHWR — click for basis"><span class="k">CHWR</span><span class="v num" id="chwr">UNAVAILABLE</span></div>
                 <div class="kv" data-basis-param="cooling.chw_delta_t" tabindex="0" role="button"
-                     title="CHW delta-T — click for basis"><span class="k">&Delta;T</span><span class="v num" id="chdt">--</span></div>
+                     title="CHW delta-T — click for basis"><span class="k">&Delta;T</span><span class="v num" id="chdt">UNAVAILABLE</span></div>
                 <div class="kv" data-basis-param="cooling.flow_lps" tabindex="0" role="button"
-                     title="CHW flow — click for basis"><span class="k">CHW Flow</span><span class="v num" id="chflow">--</span></div>
-                <div class="formula" id="f-flow">flow = cooling kW / (4.186 &middot; &Delta;T)</div>
+                     title="CHW flow — click for basis"><span class="k">CHW Flow</span><span class="v num" id="chflow">UNAVAILABLE</span></div>
+                <div class="formula" id="f-flow">UNAVAILABLE</div>
             </div>
 
             <div class="panel">
                 <div class="panel-title">CRAH Air-Side Status</div>
                 <!-- v1.134.9 — declared authored page basis; see the reason on the element. -->
-                <div id="crah-list" data-rz-authored-basis="Per-CRAH leaving-air, return-air and saturation readings are simulated unit state. conv-engine.js models the hall's thermal PLANES (rack inlet, CRAH supply, CHWS, CHWR, delta-T) and the plant's chilled-water flow; it publishes no per-CRAH quantity, so these readings have no engine parameter to trace to. The hall's cooling demand, its available capacity and every thermal plane on this page are engine-bound and stay in the denominator."></div>
-                <div class="formula" id="crah-air-note">LA&rarr;RA = CRAH leaving air to CRAH return air. Return-path basis assumes contained hot-aisle return with 0 K mixing adjustment; rack-inlet setpoint is separate.</div>
+                <div id="crah-list" data-rz-authored-basis="Per-CRAH leaving-air, return-air and saturation readings are simulated unit state. conv-engine.js models the hall's thermal PLANES (rack inlet, CRAH supply, CHWS, CHWR, delta-T) and the plant's chilled-water flow; it publishes no per-CRAH quantity, so these readings have no engine parameter to trace to. The hall's cooling demand, its available capacity and every thermal plane on this page are engine-bound and stay in the denominator.">UNAVAILABLE</div>
+                <div class="formula" id="crah-air-note">UNAVAILABLE</div>
             </div>
         </div>
 
@@ -714,47 +738,47 @@
             <div class="balance-band" id="balanceBand">
                 <div class="bb-cell">
                     <div class="bb-lbl" id="bb-hall-label">Hall A IT Load</div>
-                    <div class="bb-val num"><span id="bb-itload">--</span> <span class="bb-unit">MW</span></div>
+                    <div class="bb-val num"><span id="bb-itload">UNAVAILABLE</span> <span class="bb-unit">MW</span></div>
                     <!-- v1.134.11 — this sub-line was briefly hooked to hall.facility_load_kw. It shows the
                          hall's IT load summed from the cabinet field, not the facility load, and the
                          drawer gate rejected the mismatch. Corrected, and the facility figure given
                          its own cell below rather than borrowed from a line that means something else. -->
-                    <div class="bb-sub" id="bb-itsub" data-basis-param="hall.it_load_kw" tabindex="0" role="button" title="Hall IT load — click for basis">&mdash;</div>
-                    <div class="bb-sub" id="bb-facsub" data-basis-param="hall.facility_load_kw" tabindex="0" role="button" title="Hall facility load — click for basis">&mdash;</div>
+                    <div class="bb-sub" id="bb-itsub" data-basis-param="hall.it_load_kw" tabindex="0" role="button" title="Hall IT load — click for basis">UNAVAILABLE</div>
+                    <div class="bb-sub" id="bb-facsub" data-basis-param="hall.facility_load_kw" tabindex="0" role="button" title="Hall facility load — click for basis">UNAVAILABLE</div>
                 </div>
                 <div class="bb-cell">
                     <div class="bb-lbl">Rack Count / Avg</div>
-                    <div class="bb-val num"><span id="bb-racks">--</span></div>
-                    <div class="bb-sub" id="bb-avg">&mdash;</div>
+                    <div class="bb-val num"><span id="bb-racks">UNAVAILABLE</span></div>
+                    <div class="bb-sub" id="bb-avg">UNAVAILABLE</div>
                 </div>
                 <div class="bb-cell">
                     <div class="bb-lbl">Hall Utilization</div>
-                    <div class="bb-val num"><span id="bb-util" data-basis-param="hall.utilisation_pct" tabindex="0" role="button" title="Hall utilisation — click for basis">--</span> <span class="bb-unit">%</span></div>
-                    <div class="bb-sub" id="bb-design" data-basis-param="hall.it_design_kw" tabindex="0" role="button" title="Hall IT design capacity — click for basis">&mdash;</div>
+                    <div class="bb-val num"><span id="bb-util" data-basis-param="hall.utilisation_pct" tabindex="0" role="button" title="Hall utilisation — click for basis">UNAVAILABLE</span> <span class="bb-unit">%</span></div>
+                    <div class="bb-sub" id="bb-design" data-basis-param="hall.it_design_kw" tabindex="0" role="button" title="Hall IT design capacity — click for basis">UNAVAILABLE</div>
                 </div>
                 <div class="bb-cell">
-                    <div class="bb-lbl">Balance vs EPMS</div>
-                    <div class="bb-val num" id="bb-balance">--</div>
-                    <div class="bb-sub" id="bb-balsub">&mdash;</div>
+                    <div class="bb-lbl">Hall IT reconciliation</div>
+                    <div class="bb-val num v-na" id="bb-balance">UNAVAILABLE</div>
+                    <div class="bb-sub" id="bb-balsub">UNAVAILABLE</div>
                 </div>
                 <div class="bb-cell">
                     <div class="bb-lbl">Cooling Demand / Avail</div>
-                    <div class="bb-val num"><span id="bb-cool">--</span></div>
-                    <div class="bb-sub" id="bb-coolsub">&mdash;</div>
+                    <div class="bb-val num"><span id="bb-cool">UNAVAILABLE</span></div>
+                    <div class="bb-sub" id="bb-coolsub">UNAVAILABLE</div>
                 </div>
                 <div class="bb-cell">
                     <div class="bb-lbl">N+1 Cooling</div>
-                    <div class="bb-val"><span class="pill pass" id="bb-np1">&mdash;</span></div>
-                    <div class="bb-sub" id="bb-np1sub">&mdash;</div>
+                    <div class="bb-val"><span class="pill unavailable" id="bb-np1">UNAVAILABLE</span></div>
+                    <div class="bb-sub" id="bb-np1sub">UNAVAILABLE</div>
                 </div>
             </div>
 
             <div class="mode-bar">
-                <button class="mode-btn active" data-mode="power"  onclick="setMode('power')">Power Density</button>
-                <button class="mode-btn"        data-mode="temp"   onclick="setMode('temp')">Rack-Inlet Temp</button>
-                <button class="mode-btn"        data-mode="cooling-margin" onclick="setMode('cooling-margin')">Cooling Margin</button>
-                <button class="mode-btn"        data-mode="alarms" onclick="setMode('alarms')">Alarms</button>
-                <button class="mode-btn"        data-mode="space"  onclick="setMode('space')">Space</button>
+                <button class="mode-btn"        data-mode="power"  onclick="setMode('power')" disabled>Power Density</button>
+                <button class="mode-btn active" data-mode="temp"   onclick="setMode('temp')" disabled>Rack-Inlet Temp</button>
+                <button class="mode-btn"        data-mode="cooling-margin" onclick="setMode('cooling-margin')" disabled>Cooling Margin</button>
+                <button class="mode-btn"        data-mode="alarms" onclick="setMode('alarms')" disabled>Alarms</button>
+                <button class="mode-btn"        data-mode="space"  onclick="setMode('space')" disabled>Space</button>
                 <div class="legend" id="legend"></div>
             </div>
 
@@ -779,33 +803,33 @@
         <div class="sidebar sidebar-right">
             <div class="panel">
                 <div class="panel-title">Active Alarms</div>
-                <div id="alarm-list" style="font-size:11px; color:var(--txt-faint);">No active alarms</div>
+                <div id="alarm-list" style="font-size:11px; color:var(--txt-faint);">Authority UNAVAILABLE</div>
             </div>
             <div class="panel">
                 <div class="panel-title" id="env-hall-title">Environment (Hall A)</div>
-                <div class="kv"><span class="k">Rack-inlet / cold-aisle</span><span class="v num" id="env-temp">--</span></div>
-                <div class="kv"><span class="k">Avg Hot-Aisle</span><span class="v num" id="env-hot-aisle">--</span></div>
-                <div class="kv"><span class="k">CRAH Return</span><span class="v num" id="env-return">--</span></div>
-                <div class="kv"><span class="k">Avg RH</span><span class="v num" id="env-rh">--</span></div>
-                <div class="kv"><span class="k">Dew Point</span><span class="v num" id="env-dewpoint">--</span></div>
-                <div class="kv"><span class="k">Hottest Rack-Inlet</span><span class="v num" id="env-hot">--</span></div>
+                <div class="kv"><span class="k">Rack-inlet / cold-aisle</span><span class="v num" id="env-temp">UNAVAILABLE</span></div>
+                <div class="kv"><span class="k">Avg Hot-Aisle</span><span class="v num" id="env-hot-aisle">UNAVAILABLE</span></div>
+                <div class="kv"><span class="k">CRAH Return</span><span class="v num" id="env-return">UNAVAILABLE</span></div>
+                <div class="kv"><span class="k">Avg RH</span><span class="v num" id="env-rh">UNAVAILABLE</span></div>
+                <div class="kv"><span class="k">Dew Point</span><span class="v num" id="env-dewpoint">UNAVAILABLE</span></div>
+                <div class="kv"><span class="k">Hottest Rack-Inlet</span><span class="v num v-na" id="env-hot">UNAVAILABLE</span></div>
                 <div class="kv-sub">Rack-inlet design 25.4&deg;C · recommended envelope 18&ndash;27&deg;C · humidity interpreted with dew point / non-condensing constraints · CRAH return assumes contained hot-aisle path (0 K mixing adjustment).</div>
             </div>
             <div class="panel">
                 <div class="panel-title">Rack Density Basis</div>
                 <div class="basis-split">
-                    <div class="basis-cell"><div class="basis-label">Current operating density</div><div class="basis-value" id="density-current">--</div><div class="basis-note">IT kW / active rack</div></div>
-                    <div class="basis-cell"><div class="basis-label">Installed rack study</div><div class="basis-value" id="density-study">--</div><div class="basis-note">positions × cabinet design rating</div></div>
+                    <div class="basis-cell"><div class="basis-label">Current operating density</div><div class="basis-value" id="density-current">UNAVAILABLE</div><div class="basis-note">IT kW / active rack</div></div>
+                    <div class="basis-cell"><div class="basis-label">Installed rack study</div><div class="basis-value" id="density-study">UNAVAILABLE</div><div class="basis-note">positions × cabinet design rating</div></div>
                     <!-- v1.134.11 — the selected peak was briefly hooked to the wrapper of the
                          design-average cell, so its drawer explained 30 kW/rack beside a line reading
                          "500 x 20 kW". The drawer gate rejected it; the peak has its own cell now. -->
-                    <div class="basis-cell" data-basis-param="hall.rack_selected_peak_kw" tabindex="0" role="button" title="Cabinet selected peak — click for basis"><div class="basis-label">Selected cabinet peak</div><div class="basis-value" id="density-peak">&mdash;</div></div>
+                    <div class="basis-cell" data-basis-param="hall.rack_selected_peak_kw" tabindex="0" role="button" title="Cabinet selected peak — click for basis"><div class="basis-label">Selected cabinet peak</div><div class="basis-value" id="density-peak">UNAVAILABLE</div></div>
                 </div>
                 <div class="formula">Current telemetry is not the same as the installed design study; both remain visible and separately labelled.</div>
             </div>
             <div class="panel" style="flex:1;">
                 <div class="panel-title">Selected</div>
-                <div id="sel-detail" style="font-size:11px; color:var(--txt-faint);">Hover or click a rack / CRAH unit to inspect.</div>
+                <div id="sel-detail" style="font-size:11px; color:var(--txt-faint);">Authority UNAVAILABLE</div>
             </div>
         </div>
     </div>
@@ -815,7 +839,7 @@
             <span>Event Log</span>
             <span style="color:var(--txt-dim); font-weight:600; letter-spacing:0;">deterministic &mdash; bound to single scenario basis (conv-engine)</span>
         </div>
-        <div class="log-container" id="log-box"></div>
+        <div class="log-container" id="log-box"><div class="log-entry"><span class="l-crit">Data Hall authority UNAVAILABLE.</span></div></div>
     </div>
 
     <script>
@@ -828,13 +852,174 @@
          * never Math.random() and never hardcoded. Deterministic:
          * reload yields identical numbers.
          * ========================================================== */
-        if (!window.CONV_CALC || !window.CONV_CALC.snapshot) {
+        var AUTHORED_RACKS_PER_ZONE = 20;
+        var CONV_CURRENT_ENGINE_VERSION = '2.0.0';
+        function requestedEngineVersion() {
+            var script = document.querySelector('script[src*="conv-engine.js"]');
+            var src = script ? script.getAttribute('src') : '';
+            var match = src ? src.match(/[?&]v=([^&]+)/) : null;
+            return match ? decodeURIComponent(match[1]) : null;
+        }
+        function isFiniteNumber(value) {
+            return typeof value === 'number' && isFinite(value);
+        }
+        function isPositiveNumber(value) {
+            return isFiniteNumber(value) && value > 0;
+        }
+        function hasCompleteHallSnapshot(hall, code) {
+            if (!hall || hall.code !== code) return false;
+            var positiveValues = [
+                hall.it_design_kw, hall.it_load_kw, hall.facility_load_kw, hall.racks,
+                hall.rack_design_avg_kw, hall.rack_selected_peak_kw, hall.rack_actual_avg_kw
+            ];
+            return positiveValues.every(isPositiveNumber)
+                && Number.isInteger(hall.racks)
+                && hall.racks % AUTHORED_RACKS_PER_ZONE === 0
+                && isFiniteNumber(hall.utilisation_pct)
+                && hall.utilisation_pct > 0 && hall.utilisation_pct <= 100
+                && hall.it_design_kw >= hall.it_load_kw
+                && hall.rack_selected_peak_kw >= hall.rack_design_avg_kw;
+        }
+        function hasCompleteDatahallAuthority(calc, expectedVersion) {
+            try {
+                if (!calc || !calc.snapshot || !expectedVersion
+                    || typeof calc.getHallSnapshot !== 'function'
+                    || typeof calc.listHalls !== 'function') return false;
+                var snapshot = calc.snapshot;
+                var meta = snapshot.meta;
+                var site = snapshot.site;
+                var electrical = snapshot.electrical;
+                var cooling = snapshot.cooling;
+                var environment = snapshot.environment;
+                if (!meta || meta.version !== expectedVersion
+                    || typeof meta.scenario !== 'string' || !meta.scenario.trim()
+                    || typeof meta.data_quality !== 'string' || !meta.data_quality.trim()
+                    || !site || !electrical || !cooling || !environment) return false;
+                var requiredPositive = [
+                    site.it_load_kw, site.pue, electrical.epms_ups_output_kw,
+                    cooling.rack_inlet_target_c, cooling.crah_supply_air_c,
+                    cooling.chw_coil_approach_k, cooling.chws_c, cooling.chwr_c,
+                    cooling.chw_delta_t, cooling.flow_lps, cooling.heat_rejection_kw,
+                    environment.avg_rh_pct
+                ];
+                var countsValid = Number.isInteger(cooling.chillers_running)
+                    && Number.isInteger(cooling.chillers_total)
+                    && cooling.chillers_running > 0
+                    && cooling.chillers_total >= cooling.chillers_running;
+                if (!requiredPositive.every(isPositiveNumber)
+                    || !isFiniteNumber(cooling.supply_path_mixing_k)
+                    || cooling.supply_path_mixing_k < 0
+                    || cooling.chwr_c <= cooling.chws_c
+                    || environment.avg_rh_pct > 100
+                    || !countsValid) return false;
+                var hallRefs = calc.listHalls();
+                if (!Array.isArray(hallRefs) || hallRefs.length !== 4) return false;
+                var codes = hallRefs.map(function (hall) {
+                    return typeof hall === 'string' ? hall : hall && hall.code;
+                }).sort();
+                if (codes.join('') !== 'ABCD') return false;
+                return codes.every(function (code) {
+                    return hasCompleteHallSnapshot(calc.getHallSnapshot(code), code);
+                });
+            } catch (error) {
+                return false;
+            }
+        }
+        function setAuthorityControls(enabled) {
+            var controls = document.querySelectorAll('#hall-selector button,.mode-btn,#dh-mode-toolbar button');
+            for (var i = 0; i < controls.length; i++) {
+                controls[i].disabled = !enabled;
+                if (enabled) controls[i].removeAttribute('aria-disabled');
+                else controls[i].setAttribute('aria-disabled', 'true');
+            }
+        }
+        function disableAuthorityDrawers() {
+            var triggers = document.querySelectorAll('[data-basis-param],[data-basis]');
+            for (var i = 0; i < triggers.length; i++) {
+                var trigger = triggers[i];
+                if (trigger.hasAttribute('data-basis-param')) {
+                    trigger.setAttribute('data-basis-param-unavailable',
+                        trigger.getAttribute('data-basis-param'));
+                    trigger.removeAttribute('data-basis-param');
+                }
+                if (trigger.hasAttribute('data-basis')) {
+                    trigger.setAttribute('data-basis-unavailable', trigger.getAttribute('data-basis'));
+                    trigger.removeAttribute('data-basis');
+                }
+                trigger.setAttribute('aria-disabled', 'true');
+                trigger.setAttribute('tabindex', '-1');
+                trigger.removeAttribute('role');
+                trigger.style.cursor = 'default';
+            }
+            var sharedDrawer = window.RZBasisDrawer;
+            if (sharedDrawer) {
+                sharedDrawer.close();
+                sharedDrawer.open = function () { return false; };
+            }
+            var customDrawer = document.getElementById('kpiBasisDrawer');
+            if (customDrawer) customDrawer.remove();
+        }
+        function renderAuthorityUnavailable() {
+            var unavailableIds = [
+                'as-crit','as-warn','as-maint','as-comms','as-update','as-dq','as-scn',
+                'dh-hall-state','dh-rack-load','dh-cooling-margin','dh-pue','dh-pd',
+                'ch-count','th-inlet','th-supply','th-mixing','th-approach','chws','chwr',
+                'chdt','chflow','f-flow','bb-itload','bb-itsub','bb-facsub','bb-racks',
+                'bb-avg','bb-util','bb-design','bb-balance','bb-balsub','bb-cool',
+                'bb-coolsub','bb-np1','bb-np1sub','env-temp','env-hot-aisle','env-return',
+                'env-rh','env-dewpoint','env-hot','density-current','density-study',
+                'density-peak','sel-detail','crah-list','crah-air-note','m-sub','m-grid',
+                'm-source','cp-state','cp-grid'
+            ];
+            unavailableIds.forEach(function (id) {
+                var node = document.getElementById(id);
+                if (node) node.textContent = 'UNAVAILABLE';
+            });
+            document.getElementById('as-state').className = 'as-state unavailable';
+            document.getElementById('as-state-txt').textContent = 'UNAVAILABLE';
+            ['as-crit','as-warn','as-maint','as-comms','env-hot'].forEach(function (id) {
+                var node = document.getElementById(id);
+                if (node) node.className = (id === 'env-hot' ? 'v num v-na' : 'as-val num v-na');
+            });
+            document.getElementById('bb-balance').className = 'bb-val num v-na';
+            document.getElementById('bb-np1').className = 'pill unavailable';
+            document.getElementById('alarm-list').textContent = 'Authority UNAVAILABLE';
+            document.getElementById('m-title').textContent = 'Equipment Authority UNAVAILABLE';
+            document.getElementById('cp-title').textContent = 'CRAH Authority UNAVAILABLE';
+            document.getElementById('unitModal').style.display = 'none';
+            document.getElementById('crahPop').classList.remove('open');
+            document.getElementById('zone-field').innerHTML = '';
+            document.getElementById('crah-top').innerHTML = '';
+            document.getElementById('crah-bottom').innerHTML = '';
+            document.getElementById('legend').textContent = 'UNAVAILABLE';
             document.getElementById('log-box').innerHTML =
-                '<div class="log-entry"><span class="l-crit">' +
-                'conv-engine.js failed to load — cannot bind scenario basis.' +
-                '</span></div>';
+                '<div class="log-entry"><span class="l-crit">Data Hall authority UNAVAILABLE — requested conv-engine v' +
+                (requestedEngineVersion() || 'UNAVAILABLE') + ' is missing, mismatched, or incomplete.</span></div>';
+            setAuthorityControls(false);
+            disableAuthorityDrawers();
+            window.__inspectCrah = function () { return false; };
+            window.__closeCrahPop = function () { return false; };
+            window.closeModal = function () { return false; };
+            window.selectHall = function () { return false; };
+            window.setMode = function () { return false; };
+            window.RZ_DATAHALL_COOLING = null;
+            window.RZ_DATAHALL_SELECTED_HALL = null;
+        }
+
+        var requestedConvEngineVersion = requestedEngineVersion();
+        var EXPECTED_CONV_ENGINE_VERSION = requestedConvEngineVersion === CONV_CURRENT_ENGINE_VERSION
+            ? CONV_CURRENT_ENGINE_VERSION : null;
+        var DATAHALL_AUTHORITY_AVAILABLE = hasCompleteDatahallAuthority(
+            window.CONV_CALC, EXPECTED_CONV_ENGINE_VERSION
+        );
+        window.RZ_DATAHALL_AUTHORITY_AVAILABLE = DATAHALL_AUTHORITY_AVAILABLE;
+        document.body.setAttribute('data-rz-basis-authority',
+            DATAHALL_AUTHORITY_AVAILABLE ? 'current' : 'unavailable');
+        if (!DATAHALL_AUTHORITY_AVAILABLE) {
+            renderAuthorityUnavailable();
             return;
         }
+        setAuthorityControls(true);
         var CALC = window.CONV_CALC;
         var S = CALC.snapshot;
 
@@ -854,11 +1039,18 @@
         var HALL = CALC.getHallSnapshot(SELECTED_HALL);
         if (!HALL) throw new Error('datahall: no hall snapshot for ' + SELECTED_HALL);
         var SITE_IT_KW   = HALL.it_load_kw;              // hall IT load (engine, kW)
-        var EPMS_IT_KW    = S.electrical.epms_ups_output_kw; // EPMS IT reconciliation point (campus)
+        var SITE_EPMS_IT_KW = S.electrical.epms_ups_output_kw; // campus UPS output (engine, kW)
+        var HALL_CODES = CALC.listHalls();
+        if (!HALL_CODES || !HALL_CODES.length) {
+            throw new Error('datahall: engine published no hall scopes');
+        }
+        /* There is no governed per-hall EPMS submeter in this study. Equal allocation is a
+         * planning reference only; it must never be presented as a measured reconciliation. */
+        var HALL_EPMS_REFERENCE_KW = SITE_EPMS_IT_KW / HALL_CODES.length;
         /* Cabinets per row is the authored floor layout; the ROW COUNT is derived from
          * the engine's rack count so the plan can never draw a different hall than the
          * one the numbers describe. */
-        var RACKS_PER_ZONE = 20;                          // cabinets per row
+        var RACKS_PER_ZONE = AUTHORED_RACKS_PER_ZONE;     // cabinets per row
         var TOTAL_RACKS   = HALL.racks;                   // engine — 500 cabinets per hall
         if (TOTAL_RACKS % RACKS_PER_ZONE !== 0) {
             throw new Error('datahall: hall rack count ' + TOTAL_RACKS +
@@ -999,15 +1191,13 @@
         }
         // Temperature tier for rack inlet / cold aisle.
         function tempFill(c) {
-            if (c < 22) return '#2f5e46';
-            if (c < 25) return '#3f6f4e';
-            if (c < 27) return '#7a5a1f';
-            if (c < 30) return '#9a5026';
+            if (c < RACK_INLET_RECOMMENDED_MIN_C) return '#7a5a1f';
+            if (c <= RACK_INLET_RECOMMENDED_MAX_C) return '#2f5e46';
+            if (c <= 30) return '#9a5026';
             return '#9a342f';
         }
 
         /* --- Cooling balance (derived from engine) ----------------------- */
-        var HEAT_KW   = S.cooling.heat_rejection_kw;        // IT + UPS loss (campus)
         var COOL_DEMAND_KW = SITE_IT_KW;                     // sensible hall heat ~= hall IT
         /* CRAH fleet — DERIVED, not authored. The counts were literals (20 installed /
          * 17 running) sized for the retired 1.85 MW hall; against a 10 MW hall they
@@ -1029,6 +1219,7 @@
          * passed, so the modelling error never surfaced. */
         var COOL_AVAIL_N1_KW = (CRAH_TOTAL - 1) * CRAH_UNIT_KW;
         var COOL_HEADROOM = COOL_AVAIL_KW - COOL_DEMAND_KW;
+        var COOL_MARGIN_PCT = COOL_AVAIL_KW > 0 ? (COOL_HEADROOM / COOL_AVAIL_KW) * 100 : null;
         var N1_PASS = COOL_AVAIL_N1_KW >= COOL_DEMAND_KW;
 
         /* --- Per-zone deterministic thermal chain -------------------------
@@ -1146,7 +1337,7 @@
          * RENDER
          * ========================================================== */
         var TT = document.getElementById('tooltip');
-        var currentMode = 'power';
+        var currentMode = 'temp';
         var selectedRackIdx = null;
 
         function fmtMW(kw) { return (kw / 1000).toFixed(3); }
@@ -1164,7 +1355,40 @@
             return next;
         }
 
+        function publishCoolingAuthority() {
+            window.RZ_DATAHALL_SELECTED_HALL = SELECTED_HALL;
+            window.RZ_DATAHALL_COOLING = Object.freeze({
+                hall: SELECTED_HALL,
+                demandKw: COOL_DEMAND_KW,
+                availableKw: COOL_AVAIL_KW,
+                headroomKw: COOL_HEADROOM,
+                marginPct: COOL_MARGIN_PCT,
+                unitCapacityKw: CRAH_UNIT_KW,
+                runningUnits: CRAH_RUNNING,
+                installedUnits: CRAH_TOTAL,
+                n1AvailableKw: COOL_AVAIL_N1_KW,
+                n1Pass: N1_PASS
+            });
+        }
+
+        function paintOpsRollup() {
+            var stateEl = document.getElementById('dh-hall-state');
+            var state = critCount > 0 ? 'ALARM' : (warnCount > 0 ? 'WARNING' : 'NORMAL');
+            stateEl.textContent = state;
+            stateEl.style.color = critCount > 0 ? 'var(--st-alarm)'
+                : (warnCount > 0 ? 'var(--st-warn)' : 'var(--st-normal)');
+            document.getElementById('dh-rack-load').textContent = (SITE_IT_KW / 1000).toFixed(2);
+            document.getElementById('dh-pue').textContent = S.site.pue.toFixed(2);
+            document.getElementById('dh-pd').textContent = (SITE_IT_KW / TOTAL_RACKS).toFixed(1);
+            var marginEl = document.getElementById('dh-cooling-margin');
+            marginEl.textContent = COOL_MARGIN_PCT.toFixed(1);
+            marginEl.style.color = COOL_MARGIN_PCT < 5 ? 'var(--st-warn)' : 'var(--st-normal)';
+            publishCoolingAuthority();
+        }
+        window.RZ_DATAHALL_PAINT_ROLLUP = paintOpsRollup;
+
         function paintBalanceBand() {
+            paintOpsRollup();
             document.getElementById('bb-itload').textContent = fmtMW(rackTotal);
             var facCell = document.getElementById('bb-facsub');
             if (facCell && HALL && HALL.facility_load_kw != null) {
@@ -1195,19 +1419,22 @@
                 + ' tabindex="0" role="button" title="Cabinet design average — click for basis">'
                 + RACK_RATING_KW + '</span> kW';
 
-            // Balance vs EPMS IT reconciliation point
-            var balKw = rackTotal - EPMS_IT_KW;
-            var balPct = (balKw / EPMS_IT_KW) * 100;
+            // Fail closed: there is no governed hall EPMS submeter to reconcile against.
+            // Keep the equal-share calculation visible only as a neutral planning reference.
             var balEl = document.getElementById('bb-balance');
-            balEl.textContent = (balKw >= 0 ? '+' : '') + balKw.toFixed(0) + ' kW';
-            balEl.className = 'bb-val num ' + (Math.abs(balPct) <= S.electrical.metering_tolerance_pct ? 'v-ok' : 'v-warn');
+            balEl.textContent = 'UNAVAILABLE';
+            balEl.className = 'bb-val num v-na';
             document.getElementById('bb-balsub').textContent =
-                (balPct >= 0 ? '+' : '') + balPct.toFixed(2) + '% · EPMS IT ' + fmtMW(EPMS_IT_KW) + ' MW (±' + S.electrical.metering_tolerance_pct + '%)';
+                'No governed hall EPMS submeter · planning reference only: site EPMS '
+                + fmtMW(SITE_EPMS_IT_KW) + ' MW ÷ ' + HALL_CODES.length + ' halls = '
+                + fmtMW(HALL_EPMS_REFERENCE_KW) + ' MW';
 
             document.getElementById('bb-cool').textContent =
                 fmtMW(COOL_DEMAND_KW) + ' / ' + fmtMW(COOL_AVAIL_KW) + ' MW';
             document.getElementById('bb-coolsub').textContent =
-                'Headroom ' + Math.round(COOL_HEADROOM) + ' kW · heat-rej ' + Math.round(HEAT_KW) + ' kW (IT+UPS)';
+                'Hall operating headroom ' + Math.round(COOL_HEADROOM) + ' kW · margin ' +
+                COOL_MARGIN_PCT.toFixed(2) + '% of available · CRAH assumption ' +
+                CRAH_RUNNING + ' × ' + CRAH_UNIT_KW + ' kW';
 
             var np1 = document.getElementById('bb-np1');
             np1.textContent = N1_PASS ? 'PASS' : 'FAIL';
@@ -1262,6 +1489,9 @@
                     '</div>';
             });
             document.getElementById('crah-list').innerHTML = html;
+            document.getElementById('crah-air-note').innerHTML =
+                'LA&rarr;RA = CRAH leaving air to CRAH return air. Return-path basis assumes ' +
+                'contained hot-aisle return with 0 K mixing adjustment; rack-inlet setpoint is separate.';
         }
 
         function paintAlarmList() {
@@ -1297,6 +1527,9 @@
 
             document.getElementById('as-dq').textContent = S.meta.data_quality;
             document.getElementById('as-scn').textContent = S.meta.scenario;
+            var comms = document.getElementById('as-comms');
+            comms.textContent = 'OK';
+            comms.className = 'as-val num v-ok';
 
             var st = document.getElementById('as-state');
             var stt = document.getElementById('as-state-txt');
@@ -1315,8 +1548,9 @@
                 ];
             } else if (mode === 'temp') {
                 items = [
-                    ['#2f5e46', '<22°C'], ['#3f6f4e', '22–25'],
-                    ['#7a5a1f', '25–27'], ['#9a5026', '27–30'], ['#9a342f', '>30°C']
+                    ['#7a5a1f', '<18°C below recommended'],
+                    ['#2f5e46', '18–27°C recommended'],
+                    ['#9a5026', '>27–30°C high'], ['#9a342f', '>30°C critical']
                 ];
             } else if (mode === 'cooling-margin') {
                 items = [
@@ -1650,9 +1884,9 @@
             /* v1.29.3 — also sync the top toolbar pressed state */
             var MODE_TO_TOOLBAR = { 'power':'power', 'temp':'temperature', 'cooling-margin':'cooling-margin', 'space':'space', 'alarms':'alarms' };
             var tbId = MODE_TO_TOOLBAR[mode] || 'power';
-            var tbBtns = document.querySelectorAll('#dh-mode-toolbar button[data-bms-layer]');
+            var tbBtns = document.querySelectorAll('#dh-mode-toolbar button[data-layer]');
             for (var j = 0; j < tbBtns.length; j++) {
-                var on = tbBtns[j].getAttribute('data-bms-layer') === tbId;
+                var on = tbBtns[j].getAttribute('data-layer') === tbId;
                 tbBtns[j].setAttribute('aria-pressed', on ? 'true' : 'false');
                 tbBtns[j].classList.toggle('on', on);
             }
@@ -1736,7 +1970,7 @@
         paintAlarmList();
         paintAlarmStrip();
         renderFloor();
-        legendFor('power');
+        legendFor('temp');
         tick();
         setInterval(tick, 1000);
 
@@ -1789,7 +2023,10 @@
 'use strict';
 var d=document;
 function nowStamp(){var t=new Date();return t.getFullYear()+'-'+('0'+(t.getMonth()+1)).slice(-2)+'-'+('0'+t.getDate()).slice(-2)+' '+t.toLocaleTimeString('en-GB');}
-function snap(){return (window.CONV_CALC&&window.CONV_CALC.snapshot)?window.CONV_CALC.snapshot:null;}
+function snap(){
+  return (window.RZ_DATAHALL_AUTHORITY_AVAILABLE===true&&window.CONV_CALC&&window.CONV_CALC.snapshot)
+    ?window.CONV_CALC.snapshot:null;
+}
 function basisFor(id){
   var s=snap();if(!s)return null;
   /* v1.132.0 BINDING REPAIR — same phantom key as the ops-rollup binder: `datahall.racks_total` is not on
@@ -1800,10 +2037,14 @@ function basisFor(id){
      NUMERATOR stayed `site.it_load_kw`, which v1.133.0 turned into a campus roll-up. The
      drawer then explained 30,000 kW over 500 cabinets = 60 kW/rack for a hall that runs at
      15. Both ends of every ratio must come from the same scope; take both from the hall. */
-  var hall=(window.CONV_CALC&&window.CONV_CALC.getHallSnapshot)?window.CONV_CALC.getHallSnapshot('A'):null;
-  var racks=(hall&&hall.racks>0)?hall.racks:null;
-  var hallItKw=(hall&&hall.it_load_kw!=null)?hall.it_load_kw:null;
-  var rackKw=(racks&&hallItKw!=null)?(hallItKw/racks):null;
+  var selectedHall=window.RZ_DATAHALL_SELECTED_HALL||'A';
+  var hall=(window.CONV_CALC&&window.CONV_CALC.getHallSnapshot)?window.CONV_CALC.getHallSnapshot(selectedHall):null;
+  var cooling=window.RZ_DATAHALL_COOLING;
+  if(!hall||!cooling)return null;
+  var critical=d.getElementById('as-crit').textContent;
+  var warning=d.getElementById('as-warn').textContent;
+  var maintenance=d.getElementById('as-maint').textContent;
+  var hallState=d.getElementById('as-state-txt').textContent;
   var dict={
     /* v1.134.3 — every other entry moved to the registry-rendered shared drawer
        (js/rz-basis-drawer.js). Only these remain, and each for a stated reason:
@@ -1812,31 +2053,32 @@ function basisFor(id){
       title:'Hall State',
       formula:'state = worst(alarms in scope)',
       inputs:[
-        ['Critical alarms','0 (engine state)'],
-        ['Warning alarms','0 (engine state)'],
-        ['Maintenance flags','0 (engine state)']
+        ['Critical alarms',critical],
+        ['Warning alarms',warning],
+        ['Maintenance / bypass',maintenance]
       ],
-      output:'NORMAL',
-      scope:'Data hall (this page)',
+      output:hallState,
+      scope:'Data Hall '+selectedHall,
       denominator:'severity rank',
-      source:'design placeholder — bind to event log when SCADA wired',
-      mode:'DESIGN PLACEHOLDER',
-      note:'A live BMS aggregates the highest-severity active alarm per zone. Current display is illustrative of normal state.'
+      source:'page alarm evaluator over the governed Hall '+selectedHall+' rack field',
+      mode:'SIMULATED / DERIVED',
+      note:'This is deterministic simulated alarm state, not measured BMS telemetry.'
     },
     margin:{
       title:'Cooling Margin',
-      formula:'margin (%) = (cooling_capacity − heat_rejection) / cooling_capacity × 100',
+      formula:'Hall operating margin (%) = (available CRAH duty − Hall sensible demand) / available CRAH duty × 100',
       inputs:[
-        ['Heat rejection (IT + UPS loss)',Math.round(s.cooling.heat_rejection_kw).toLocaleString()+' kW'],
-        ['Plant capacity (engineering)','~2,350 kW (2 chillers × 1,175 kW)'],
-        ['Margin (engineering)','~18 %']
+        ['Hall sensible demand',Math.round(cooling.demandKw).toLocaleString()+' kW'],
+        ['Available running CRAH duty',Math.round(cooling.availableKw).toLocaleString()+' kW'],
+        ['Operating headroom',Math.round(cooling.headroomKw).toLocaleString()+' kW']
       ],
-      output:'18 %',
-      scope:'Cooling plant vs heat rejection',
-      denominator:'% of cooling capacity',
-      source:'derived from snapshot.cooling.heat_rejection_kw + plant capacity',
-      mode:'DERIVED',
-      note:'Drop below 10 % triggers operator review (potential N+1 erosion). Below 5 % is a CRITICAL trip — schedule load shed or activate spare chiller.'
+      output:cooling.marginPct.toFixed(2)+' %',
+      outputStyle:'background:#3b2b12;color:#f2cc7d;border:1px solid rgba(217,154,43,.45);',
+      scope:'Data Hall '+cooling.hall+' CRAH operating duty',
+      denominator:'available running CRAH duty',
+      source:'Hall IT demand + authored 130 kW/CRAH assumption; '+cooling.runningUnits+' running / '+cooling.installedUnits+' installed',
+      mode:'SIMULATED / DERIVED',
+      note:'The 0.53% figure is an operating-duty margin, not central-plant margin. N+1 is evaluated separately against surviving installed CRAH duty.'
     }
   };
   return dict[id]||null;
@@ -1846,7 +2088,7 @@ function showBasisDrawer(id){
   var ex=d.getElementById('kpiBasisDrawer');if(ex)ex.remove();
   var ov=d.createElement('div');
   ov.id='kpiBasisDrawer';ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.setAttribute('aria-labelledby','kbdTitle');
-  ov.style.cssText='position:fixed;inset:0;background:rgba(8,15,27,.82);backdrop-filter:blur(4px);z-index:10000;display:flex;align-items:center;justify-content:center;padding:18px;';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(8,15,27,.92);z-index:10000;display:flex;align-items:center;justify-content:center;padding:18px;';
   var box=d.createElement('div');
   box.style.cssText='background:#0f1729;border:1px solid #2b3a52;border-radius:10px;max-width:720px;width:100%;max-height:90vh;display:flex;flex-direction:column;color:#dbe5f0;font-family:"IBM Plex Sans",sans-serif;';
   var hdr='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;border-bottom:1px solid #2b3a52;">'+
@@ -1859,7 +2101,8 @@ function showBasisDrawer(id){
   body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Inputs</span><table style="width:100%;border-collapse:collapse;margin-top:4px;font-size:12px;">';
   for(var i=0;i<b.inputs.length;i++){body+='<tr><td style="padding:5px 6px;border-bottom:1px solid rgba(43,58,82,.5);color:#94a3b8;">'+b.inputs[i][0]+'</td><td style="padding:5px 6px;border-bottom:1px solid rgba(43,58,82,.5);font-family:JetBrains Mono,monospace;color:#dbe5f0;text-align:right;">'+b.inputs[i][1]+'</td></tr>';}
   body+='</table></div>';
-  body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Output</span><div style="font-family:JetBrains Mono,monospace;background:#0a7d28;color:#fff;border-radius:6px;padding:8px 11px;margin-top:4px;font-size:13px;font-weight:700;">'+b.output+'</div></div>';
+  var outputStyle=b.outputStyle||'background:#0a7d28;color:#fff;';
+  body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Output</span><div style="font-family:JetBrains Mono,monospace;'+outputStyle+'border-radius:6px;padding:8px 11px;margin-top:4px;font-size:13px;font-weight:700;">'+b.output+'</div></div>';
   body+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">';
   body+='<div><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Scope</span><div style="color:#dbe5f0;margin-top:3px;">'+b.scope+'</div></div>';
   body+='<div><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Denominator</span><div style="color:#dbe5f0;margin-top:3px;font-family:JetBrains Mono,monospace;">'+b.denominator+'</div></div>';

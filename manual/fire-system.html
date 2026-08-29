@@ -27,7 +27,7 @@
 
     <!-- SEO Meta Tags -->
     <title>Fire Suppression System — Control Cockpit | Technical Manual | ResistanceZero</title>
-    <meta name="description" content="Technical methodology for the DC fire suppression system control cockpit: ISA-18.2 alarm state machine, VESDA staged cause-effect matrix, FM-200/N2 purge logic, NFPA 2001/72 basis, and protected-volume derivation.">
+    <meta name="description" content="Technical methodology for the DC fire suppression system control cockpit: ISA-18.2 alarm state machine, VESDA staged cause-effect matrix, fire-water reserve, NFPA context, and explicit suppression-sizing boundaries.">
     <meta name="ai-content-declaration" content="human-authored">
     <meta name="keywords" content="fire suppression cockpit, VESDA, FM-200, N2 purge, cause-effect matrix, alarm state machine, ISA-18.2, NFPA 2001, NFPA 72, data center fire safety, BMS dashboard methodology">
     <meta name="author" content="Bagus Dwi Permana">
@@ -41,7 +41,7 @@
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://resistancezero.com/manual/fire-system.html">
     <meta property="og:title" content="Fire Suppression System — Control Cockpit | Technical Manual">
-    <meta property="og:description" content="ISA-18.2 alarm state machine, VESDA staged cause-effect matrix, FM-200/N2 purge discharge logic, and NFPA 2001/72 protected-volume derivation behind the fire-system cockpit.">
+    <meta property="og:description" content="ISA-18.2 alarm state machine, VESDA staged cause-effect matrix, fire-water reserve, and the explicit non-sizing boundary behind the fire-system cockpit.">
     <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
     <meta property="og:image:alt" content="Fire Suppression System Control Cockpit Methodology">
     <meta property="og:locale" content="en_US">
@@ -114,8 +114,8 @@
             },
             {
                 "@type": "Question",
-                "name": "How is the protected data-hall volume derived in the cockpit?",
-                "acceptedAnswer": { "@type": "Answer", "text": "The cockpit binds to the conventional BMS basis engine (conv-engine.js / CONV_CALC.snapshot). Protected white-space volume is derived deterministically: HALL_VOL_M3 = round(racks × 1.2 m² footprint × 3.0 m clear height). At the 231-rack / 1.85 MW IT basis this evaluates to 831 m³. The 32 × 20 × 4.2 m (2688 m³) figure in the fire-calculator manual refers to the gross enclosure, not the cockpit's rack-footprint volume." }
+                "name": "How is the cockpit's rack-footprint context derived?",
+                "acceptedAnswer": { "@type": "Answer", "text": "The cockpit binds to the current Conventional authority in conv-engine.js / CONV_CALC.snapshot: 30,000 kW site IT across four halls and 2,000 racks total. SITE_RACK_FOOTPRINT_CONTEXT_M3 = round(2,000 racks × 1.2 m² footprint × 3.0 m) gives 7,200 m³, but this is a site-wide rack-footprint proxy only — it is not a protected-enclosure or suppression-sizing volume. Gross enclosure volume must come from surveyed zone geometry and an AHJ-approved hydraulic or clean-agent calculation. The 32 × 20 × 4.2 m (2,688 m³) figure later in this manual is an illustrative worked example, not current-site sizing authority." }
             },
             {
                 "@type": "Question",
@@ -313,7 +313,7 @@
         <header class="mn-hero">
             <p class="mn-eyebrow">Technical Manual · Fire Control</p>
             <h1>Fire Suppression System — Control Cockpit</h1>
-            <p>Methodology behind the operational fire-system cockpit: ISA-18.2 alarm state machine, VESDA staged cause-effect matrix, FM-200 pre-action and N2 purge discharge logic, manual controls, and the engineering basis linking protected volume to the conventional BMS engine. This cockpit is state-driven — the dominant logic is a discrete event machine, not a mass-equation calculator.</p>
+            <p>Methodology behind the operational fire-system cockpit: ISA-18.2 alarm state machine, VESDA staged cause-effect matrix, FM-200 pre-action and N2 purge discharge logic, manual controls, and the current Conventional authority for site context and fire-water reserve. This cockpit is state-driven — the dominant logic is a discrete event machine, not a mass-equation calculator.</p>
             <div class="mn-meta">
                 <span class="mn-chip">Alarm engine <strong>RZAlarmState v1.43.4</strong></span>
                 <span class="mn-chip">Basis <strong>ISA-18.2 / NFPA 2001 / NFPA 72</strong></span>
@@ -332,8 +332,8 @@
         <section class="mn-section" id="purpose">
             <h2><span class="mn-num">01</span> Purpose &amp; scope</h2>
             <p class="mn-lead">The fire-system cockpit (<code class="mn-mono">fire-system.html</code>) is an operational BMS dashboard for monitoring and simulating the data-centre fire-suppression system: pre-action sprinkler zones, FM-200 / inert-gas clean-agent cylinders, and the N2 purge system. It documents alarm progression, cause-effect interlocks, and manual override controls — it is <em>not</em> a sizing calculator. Agent-quantity math lives in the separate <a href="../fire-calculator.html" class="mn-inline">fire-calculator.html</a> (documented in <a href="fire.html" class="mn-inline">manual/fire.html</a>).</p>
-            <p class="mn-lead"><strong>Truth boundary:</strong> Hall A–D and rack counts provide protected-area context, not agent or fire-water sizing. The four-hall capacity study cannot scale cylinder quantity, pump flow, tank duration or cause/effect by proportion; those remain subject to hazard classification, hydraulic/calculation authority and AHJ-approved design.</p>
-            <p class="mn-lead">The cockpit serves four operational questions: <em>what is the current alarm stage</em>, <em>which cause-effect actions have been triggered</em>, <em>are the manual abort / bypass / simulation controls in a safe state</em>, and <em>does the locked protected-volume basis match the rest of the DC suite</em>. All state is deterministic — no <code class="mn-mono">Math.random()</code>, no back-solved constants.</p>
+            <p class="mn-lead"><strong>Truth boundary:</strong> Hall A–D and the 2,000-rack total provide site and rack-footprint context, not agent or fire-water sizing. Neither the current four-hall operating basis nor a capacity study may scale cylinder quantity, pump flow, tank duration or cause/effect by proportion; those remain subject to hazard classification, surveyed gross-enclosure geometry, hydraulic or clean-agent calculations, and AHJ-approved design.</p>
+            <p class="mn-lead">The cockpit serves four operational questions: <em>what is the current alarm stage</em>, <em>which cause-effect actions have been triggered</em>, <em>are the manual abort / bypass / simulation controls in a safe state</em>, and <em>does the current site and fire-reserve authority match the rest of the DC suite</em>. All state is deterministic — no <code class="mn-mono">Math.random()</code>, no back-solved constants.</p>
         </section>
 
         <!-- 2. INPUTS -->
@@ -360,17 +360,21 @@
             <table class="mn-table">
                 <thead><tr><th>Parameter</th><th>Symbol</th><th>Value</th><th>Source</th></tr></thead>
                 <tbody>
-                    <tr><td>IT load</td><td><code>IT_LOAD_KW</code></td><td>1 850 kW (1.85 MW)</td><td><code>CONV_CALC.snapshot.site.it_load_kw</code> — conventional BMS basis engine</td></tr>
-                    <tr><td>Rack count (8 kW/rack)</td><td><code>RACKS</code></td><td>231</td><td><code>CONV_CALC.snapshot.racks.at_8kw</code></td></tr>
-                    <tr><td>Protected hall volume</td><td><code>HALL_VOL_M3</code></td><td>831 m³ (rack-footprint basis)</td><td>Derived: <code>round(231 × 1.2 m² × 3.0 m)</code></td></tr>
+                    <tr><td>Site IT load</td><td><code>IT_LOAD_KW</code></td><td>30,000 kW (30.00 MW)</td><td><code>CONV_CALC.snapshot.site.it_load_kw</code> — current Conventional authority</td></tr>
+                    <tr><td>Data halls</td><td><code>campus.hall_count</code></td><td>4 (Hall A–D)</td><td><code>CONV_CALC.snapshot.campus.hall_count</code></td></tr>
+                    <tr><td>Physical racks, site total</td><td><code>RACKS</code></td><td>2,000</td><td><code>CONV_CALC.snapshot.campus.racks_total</code></td></tr>
+                    <tr><td>Rack-footprint context</td><td><code>SITE_RACK_FOOTPRINT_CONTEXT_M3</code></td><td>7,200 m³ (non-sizing proxy)</td><td>Derived: <code>round(2,000 × 1.2 m² × 3.0 m)</code>; not gross-enclosure volume</td></tr>
                     <tr><td>Pre-action zones</td><td><code>ZONE_COUNT</code></td><td>5 (PACV-01 .. 05)</td><td>Fixed — data-hall layout</td></tr>
                     <tr><td>VESDA zones</td><td>—</td><td>8 (4 halls × 2 circuits each)</td><td>Site design — coverage per NFPA 72</td></tr>
-                    <tr><td>Fire reserve tank</td><td><code>TANK_CAP_M3</code></td><td>114 m³</td><td>Civil — fixed capacity</td></tr>
-                    <tr><td>Pump demand</td><td><code>PUMP_DEMAND_LPM</code></td><td>2 500 L/min</td><td>Hydraulic design basis</td></tr>
+                    <tr><td>Fire-water reserve</td><td><code>fire.stored_m3 / reserve_capacity_m3</code></td><td>104.9 m³ available / 114 m³ installed</td><td><code>CONV_CALC.snapshot.fire</code> at the simulated 92% level</td></tr>
+                    <tr><td>Fire-pump demand</td><td><code>fire.pump_demand_lpm</code></td><td>2,500 L/min</td><td>Assumed hydraulic design basis in <code>CONV_CALC.snapshot.fire</code></td></tr>
+                    <tr><td>Required reserve</td><td><code>fire.required_duration_min / required_capacity_m3</code></td><td>60 min / 150 m³</td><td><code>2,500 L/min × 60 min</code></td></tr>
+                    <tr><td>Available duration</td><td><code>fire.duration_min</code></td><td>42 min at the current 92% level</td><td><code>104.9 m³ × 1,000 ÷ 2,500 L/min</code></td></tr>
+                    <tr><td>Installed-capacity shortfall</td><td><code>fire.capacity_shortfall_m3</code></td><td>36 m³</td><td><code>150 m³ required − 114 m³ installed</code>; does not meet the stated duration</td></tr>
                 </tbody>
             </table>
             </div>
-            <div class="mn-note"><strong>Note on protected volume:</strong> the cockpit derives <code>HALL_VOL_M3 = 831 m³</code> from the rack footprint basis (CONV_CALC snapshot). The fire-calculator manual cites <strong>2 688 m³</strong> (32 × 20 × 4.2 m) — that is the gross enclosure volume used for agent-mass sizing. The two figures are used for different purposes and are both correct within their domain. The cockpit does not recompute agent mass; it inherits the pre-action zone count and volume context from the BMS basis.</div>
+            <div class="mn-note"><strong>Context is not sizing authority:</strong> the cockpit derives <code>SITE_RACK_FOOTPRINT_CONTEXT_M3 = 7,200 m³</code> from the site-wide rack footprint (<code>2,000 × 1.2 m² × 3.0 m</code>) solely to keep operational context aligned with the Conventional snapshot. It is not a protected-enclosure measurement and must not drive cylinder mass, sprinkler density, pump selection or tank sizing. The <strong>2,688 m³</strong> gross enclosure in §06 is an illustrative geometry for the worked calculation; a real zone volume must be surveyed and reconciled through the qualified fire-protection engineer, FACP/suppression supplier and AHJ.</div>
         </section>
 
         <!-- 3. METHODOLOGY -->
@@ -487,7 +491,7 @@
                     <li>Post-discharge hold time: <span class="mn-result">≥ 10 min</span> before ventilation re-entry. Cockpit shows lockout state until manual key-reset.</li>
                 </ol>
             </div>
-            <div class="mn-note"><strong>Honesty note:</strong> the cockpit's protected-volume parameter (<code>HALL_VOL_M3 = 831 m³</code> rack-footprint basis) and the gross enclosure sizing volume (2 688 m³) serve different purposes. The cockpit uses the rack-footprint figure to stay consistent with the conventional BMS suite. The gross-enclosure figure is the input to the agent-mass calculation. A real design would reconcile both with the AHJ and the FACP supplier.</div>
+            <div class="mn-note"><strong>Honesty note:</strong> the cockpit's <code>SITE_RACK_FOOTPRINT_CONTEXT_M3 = 7,200 m³</code> value is a non-sizing, site-wide rack-footprint proxy. The 2,688 m³ gross enclosure above is an illustrative input to the agent-mass example, not evidence that the current site has that protected volume. Production sizing requires surveyed gross and net zone volumes, leakage and room-integrity evidence, and approval by the qualified fire-protection engineer, suppression supplier and AHJ.</div>
         </section>
 
         <!-- 7. REFERENCES -->
@@ -508,7 +512,7 @@
         <section class="mn-section" id="limitations">
             <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
             <p class="mn-lead">The cockpit is a <strong>demonstration and training tool only</strong> — it is not connected to a real FACP, real smoke detectors, or live suppression cylinders. Simulation mode requires explicit ARM before any stage can advance, and all staged scenarios are deterministic (no random alarm generation). Pressure values are simulated based on the stage rules, not measured from real transducers.</p>
-            <p class="mn-lead">Protected-volume derivation uses the rack-footprint approximation (<code>racks × 1.2 m² × 3.0 m</code>). This is appropriate for BMS-suite consistency but will diverge from a detailed room survey that accounts for raised-floor void, ceiling plenum, obstructions, and actual clear height. Final system design and AHJ approval must be performed by a qualified fire-protection engineer. The NFPA 2001 agent-mass worked example in §06 is an illustrative sizing estimate; it does not substitute for a sealed engineering calculation.</p>
+            <p class="mn-lead">The 7,200 m³ rack-footprint context uses <code>2,000 racks × 1.2 m² × 3.0 m</code> only for BMS-suite reconciliation. It is not a protected-volume derivation and deliberately excludes the surveyed gross/net zone geometry, raised-floor void, ceiling plenum, obstructions, leakage and actual clear height required for suppression design. Final system design and AHJ approval must be performed by a qualified fire-protection engineer. The NFPA 2001 agent-mass worked example in §06 is illustrative; it does not substitute for a sealed engineering calculation.</p>
             <p class="mn-lead">The ISA-18.2 alarm-colour rule (red reserved for <code>alarmActive = true</code> states only) is strictly enforced in the cockpit UI. Operators trained on systems that use red for "anything abnormal" must note that amber and grey are the correct colours for shelved, suppressed, and OOS states in this implementation.</p>
         </section>
 

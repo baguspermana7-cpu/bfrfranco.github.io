@@ -18,12 +18,11 @@
  *   H3 datahall.html — STILL RECONCILES. After the swap the cabinet field must still sum to
  *      the hall's registered IT load. A rebuild that loses the reconciliation is worse than
  *      no rebuild.
- *   H4 chiller-plant.html + water-system.html — NOT A DATA SWAP, and correctly so. The
- *      chilled-water plant and the water treatment train are CENTRAL: one plant serves all
- *      four halls. Re-scoping their telemetry per hall would fabricate a per-hall split that
- *      no hydronic distribution design exists to justify (the engine says exactly that:
- *      hall.chillers_allocated is null, with the reason attached). Their selectors must stay
- *      labelled view context, and their telemetry must NOT move.
+ *   H4 chiller-plant.html — NOT A DATA SWAP. The chilled-water plant is central, so its
+ *      existing Hall selector remains view context and must not mutate plant telemetry.
+ *   H5 water-system.html — SITE-WIDE ONLY. The municipal treatment train has no published
+ *      downstream hall submeters. It must not expose a Hall A-D selector or fabricate a
+ *      per-hall split; the site balance stays visible and hall allocation fails closed.
  *
  * Run: node tools/test-conv-hall-scope.mjs
  */
@@ -68,6 +67,9 @@ async function openPage(page) {
 try {
     /* ── H1..H3 datahall ───────────────────────────────────────────────────── */
     const hall = await openPage('datahall.html');
+    /* `.rk-val` is mode-sensitive (temperature is the current first-paint mode).
+       Reconciliation must explicitly inspect the power layer, never sum temperatures. */
+    await hall.evaluate(() => window.setMode('power'));
     const readField = () => hall.evaluate(() => {
         const cells = [...document.querySelectorAll('.rack .rk-val')].map((e) => e.textContent.trim());
         const sum = cells.reduce((acc, c) => {
@@ -111,10 +113,9 @@ try {
         + `registered hall load is ${expected} kW — the rebuild lost the reconciliation`);
     await hall.close();
 
-    /* ── H4 central plants must NOT re-scope ───────────────────────────────── */
+    /* ── H4 central chiller plant must NOT re-scope ────────────────────────── */
     for (const [page, cells, labelId] of [
         ['chiller-plant.html', ['kChws', 'kChwr', 'kFlow', 'kCool'], 'chillerHallLabel'],
-        ['water-system.html', ['kWue', 'kMakeup', 'kTotal'], 'waterHallLabel'],
     ]) {
         const tab = await openPage(page);
         const read = () => tab.evaluate((ids) => ids.map((i) => {
@@ -148,8 +149,28 @@ try {
         await tab.close();
     }
 
-    console.log('PASS Conventional hall scope — datahall re-scopes its cabinet field and still '
-        + 'reconciles; central plants stay campus-wide and say so');
+    /* ── H5 municipal water treatment is one site-wide plant ──────────────── */
+    const water = await openPage('water-system.html');
+    const waterScope = await water.evaluate(() => ({
+        hallControls: document.querySelectorAll('[data-hall]').length,
+        activeHall: document.body.dataset.activeHall,
+        label: document.getElementById('waterSiteLabel')?.textContent.trim(),
+        basis: document.querySelector('[data-basis="current"]')?.textContent.replace(/\s+/g, ' ').trim(),
+        hallAllocation: document.getElementById('alloc-hall')?.textContent.trim(),
+        note: document.getElementById('water-scope-note')?.textContent.replace(/\s+/g, ' ').trim(),
+    }));
+    assert.equal(waterScope.hallControls, 0,
+        'water-system: a site-wide municipal plant must not expose Hall A-D controls');
+    assert.equal(waterScope.activeHall, undefined,
+        'water-system: site-wide plant must not carry an active-hall state');
+    assert.match(waterScope.label, /site-wide/i);
+    assert.match(waterScope.basis, /site scope/i);
+    assert.match(waterScope.hallAllocation, /UNAVAILABLE/i);
+    assert.match(waterScope.note, /submeter/i);
+    await water.close();
+
+    console.log('PASS Conventional hall scope — datahall re-scopes, chiller remains view-only, '
+        + 'and municipal water is site-wide with hall allocation unavailable');
 } finally {
     await browser.close();
     await new Promise((accept) => server.close(accept));

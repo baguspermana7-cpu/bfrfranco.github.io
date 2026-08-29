@@ -75,11 +75,11 @@
          derived engineering values (IT/facility load, protected volumes/zones).
          Loaded NON-deferred so window.CONV_CALC exists before the inline script.
          Basis: conv/review/09-engineering-basis-and-calculations.md -->
-    <script src="js/conv-engine.js?v=1.22.0"></script>
+    <script src="js/conv-engine.js?v=2.0.0"></script>
     <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
          Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
     <script src="js/conv-parameters.js?v=1.134.3"></script>
-    <script src="js/rz-basis-drawer.js?v=1.134.3"></script>
+    <script src="js/rz-basis-drawer.js?v=1.134.14"></script>
     <!-- v1.42.5 — Semantic line model. Allows probe-line-model.mjs to audit
          the static SVG fire-water + N2 pipes tagged with data-rz-line +
          from / to / medium / state / capacity / current. -->
@@ -90,7 +90,7 @@
     <script src="js/rz-alarm-state.js?v=1.43.4" defer></script>
     <script src="js/rz-inspector.js?v=1.43.4" defer></script>
     <!-- v1.43.2 — Data-quality service: top-banner + per-element chip. -->
-    <script src="js/rz-telemetry-quality.js?v=1.131.0" defer></script>
+    <script src="js/rz-telemetry-quality.js?v=1.134.14" defer></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
          Loaded for cross-page consistency; body does NOT carry rz-bms-shell
          class. Spec: standarization/BMS_SHELL.md ; conv/review/14 §5. -->
@@ -101,6 +101,7 @@
     <script src="js/conv-alarm-events.js?v=1.0.0" defer></script>
     <script src="js/conv-alarm-workspace.js?v=1.131.0" defer></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap');
         /* ===== Grounded mission-critical operations palette (doc-10 §Color) =====
            Red is RESERVED strictly for active alarm / trip / fire / leak / discharge.
            Normal pipe/state = muted slate. Supervisory = amber. Selected = cyan. */
@@ -125,19 +126,25 @@
         body {
             background-color: var(--bg-deep);
             color: var(--text-main);
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: 'IBM Plex Sans', system-ui, sans-serif;
+            font-variant-numeric: tabular-nums slashed-zero;
+            font-feature-settings: "tnum" 1, "zero" 1;
         }
 
         .glass-panel {
             background: var(--panel-bg);
             border: 1px solid var(--panel-line);
         }
-        .font-tech { font-family: 'Consolas', 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
+        .font-tech, .metric-val, .tooltip-value, [data-basis-param] {
+            font-family: 'JetBrains Mono', monospace;
+            font-variant-numeric: tabular-nums slashed-zero;
+            font-feature-settings: "tnum" 1, "zero" 1;
+        }
 
         /* ===== Top alarm strip (doc-13 / doc-10 §Information Hierarchy) ===== */
         .alarm-strip {
             display: flex; align-items: center; flex-wrap: wrap; gap: 10px 22px;
-            padding: 10px 18px; border-radius: 12px;
+            padding: 10px 18px; border-radius: 4px;
             border: 1px solid var(--panel-line); background: var(--panel-bg);
         }
         .alarm-strip.state-normal { border-left: 5px solid var(--st-normal); }
@@ -174,23 +181,23 @@
         .eq-name { fill: #cbd5e1; font-size: 10px; font-weight: 700; }
 
         /* ===== Control buttons ===== */
-        .ctrl-btn { background: rgba(255,255,255,0.04); border: 1px solid var(--panel-line); color: var(--text-dim); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 700; transition: all .15s; min-height: 32px; }
+        .ctrl-btn { background: rgba(255,255,255,0.04); border: 1px solid var(--panel-line); color: var(--text-dim); padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: 700; transition: all .15s; min-height: 32px; }
         .ctrl-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
         .ctrl-btn.active { background: rgba(56,189,248,0.12); border-color: var(--st-select); color: var(--st-select); }
         .kbd-hint { background: rgba(255,255,255,0.06); padding: 2px 6px; border-radius: 3px; font-size: 9px; color: var(--text-faint); margin-left: 5px; }
 
         /* Simulation control — explicitly gated & labelled (doc-05 §1, doc-10 §Controls) */
-        .sim-panel { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; padding: 10px 16px; border-radius: 10px; border: 1px dashed var(--st-warn); background: rgba(245,158,11,0.06); }
-        .sim-badge { font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--st-warn); border: 1px solid var(--st-warn); border-radius: 6px; padding: 4px 9px; }
+        .sim-panel { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; padding: 10px 16px; border-radius: 4px; border: 1px dashed var(--st-warn); background: #111827; }
+        .sim-badge { font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--st-warn); border: 1px solid var(--st-warn); border-radius: 3px; padding: 4px 9px; }
         .sim-badge.on { color: #fff; background: var(--st-warn); }
-        .sim-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--st-warn); color: var(--st-warn); padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 800; min-height: 36px; transition: all .15s; }
+        .sim-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--st-warn); color: var(--st-warn); padding: 7px 14px; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: 800; min-height: 36px; transition: all .15s; }
         .sim-btn:hover:not(:disabled) { background: var(--st-warn); color: #1a1300; }
         .sim-btn:disabled { opacity: .45; cursor: not-allowed; }
         .sim-btn.arm { border-color: var(--st-select); color: var(--st-select); }
         .sim-btn.arm:hover:not(:disabled) { background: var(--st-select); color: #04121c; }
 
         /* ===== Side / inspector panels ===== */
-        .panel { background: var(--panel-bg); border: 1px solid var(--panel-line); border-radius: 12px; padding: 14px 16px; }
+        .panel { background: var(--panel-bg); border: 1px solid var(--panel-line); border-radius: 4px; padding: 14px 16px; }
         .panel-title { font-size: 11px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 10px; border-bottom: 1px solid var(--panel-line); padding-bottom: 7px; }
         .metric-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; font-size: 12px; border-bottom: 1px solid rgba(148,163,184,0.06); }
         .metric-row:last-child { border-bottom: 0; }
@@ -203,7 +210,7 @@
         /* Cause-effect matrix (doc-05 §2) */
         .ce-row { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; padding: 7px 0; border-bottom: 1px solid rgba(148,163,184,0.07); }
         .ce-row:last-child { border-bottom: 0; }
-        .ce-stage { width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; background: rgba(148,163,184,0.12); color: var(--text-dim); border: 1px solid var(--panel-line); }
+        .ce-stage { width: 24px; height: 24px; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; background: rgba(148,163,184,0.12); color: var(--text-dim); border: 1px solid var(--panel-line); }
         .ce-row.is-active .ce-stage { background: var(--st-alarm); color: #fff; border-color: var(--st-alarm); }
         /* Stage 0 = Normal: green, NEVER red (red reserved for active alarm) */
         .ce-row.is-normal .ce-stage { background: rgba(52,211,153,0.16); color: var(--st-normal); border-color: var(--st-normal); }
@@ -243,7 +250,8 @@
 
         /* Current operating basis is visually locked away from expansion studies. */
         .fire-scope-strip {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;
+            display: grid; grid-template-columns: minmax(0,1.15fr) minmax(0,1fr) minmax(0,1fr);
+            gap: 8px; margin-bottom: 12px;
         }
         .fire-scope-card {
             display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: center;
@@ -254,25 +262,53 @@
             font: 800 8px/1.2 'JetBrains Mono', monospace; letter-spacing: .06em; white-space: nowrap;
         }
         .fire-scope-card.study .scope-tag { border-color: rgba(56,189,248,.42); color: var(--st-select); }
+        .fire-scope-card.finding { border-color: rgba(245,158,11,.5); }
+        .fire-scope-card.finding .finding-title { color: var(--st-warn); }
+        .fire-scope-card.finding.is-warning { border-color: rgba(245,158,11,.72); }
+        .fire-scope-card.finding.is-warning .finding-title { color: var(--st-warn); }
         .fire-scope-card strong { display: block; color: var(--text-main); font: 700 10px/1.35 'JetBrains Mono', monospace; }
         .fire-scope-card small { display: block; margin-top: 2px; color: var(--text-faint); font-size: 9px; line-height: 1.35; }
 
-        .main-svg { padding: 14px !important; overflow: auto !important; border-radius: 8px !important; }
+        .main-svg { padding: 14px !important; overflow: auto !important; border-radius: 4px !important; }
         #fire-svg { display: block; width: 100%; min-width: 0; }
-        .layout-grid { grid-template-columns: minmax(720px,1fr) minmax(340px,380px) !important; align-items: start; }
+        .layout-grid {
+            grid-template-columns: minmax(0,1fr) minmax(320px,360px) !important;
+            gap: 14px;
+            align-items: start;
+        }
+        .layout-grid > * { min-width: 0; }
+        .fire-inspector-grid {
+            display: grid !important;
+            grid-template-columns: minmax(0,1fr);
+            gap: 10px;
+            align-items: start;
+        }
+        @media (min-width: 1280px) {
+            .fire-inspector-grid {
+                position: sticky;
+                top: 12px;
+                max-height: min(760px, calc(100dvh - 180px));
+                overflow-y: auto;
+                overscroll-behavior: contain;
+                padding-right: 4px;
+                scrollbar-width: thin;
+                scrollbar-color: var(--panel-line) transparent;
+            }
+        }
         button:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--st-select); outline-offset: 3px; }
 
         /* Pump status chips */
-        .pump-card { border: 1px solid var(--panel-line); border-radius: 9px; padding: 10px 12px; background: rgba(255,255,255,0.02); }
+        .pump-card { border: 1px solid var(--panel-line); border-radius: 4px; padding: 10px 12px; background: #101722; }
         .pump-card .pc-tag { font-size: 10px; color: var(--text-faint); font-weight: 700; }
         .pump-card .pc-name { font-size: 12px; color: #cbd5e1; font-weight: 700; margin: 2px 0 7px; }
-        .pc-state { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; padding: 3px 8px; border-radius: 5px; }
+        .pc-state { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; }
         .pc-state.auto { color: var(--st-normal); background: rgba(52,211,153,0.12); }
         .pc-state.run  { color: #fff; background: rgba(245,158,11,0.18); border: 1px solid var(--st-warn); }
         .pc-state.trip { color: #fff; background: rgba(239,68,68,0.2); border: 1px solid var(--st-alarm); }
+        .pc-state.unknown { color: var(--st-warn); background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.45); }
 
         /* Tooltips */
-        .equipment-tooltip { position: absolute; background: rgba(13,19,32,0.98); border: 1px solid var(--st-select); border-radius: 8px; padding: 10px 14px; font-size: 10px; z-index: 100; pointer-events: none; opacity: 0; transition: opacity .15s; box-shadow: 0 4px 20px rgba(0,0,0,0.55); max-width: 240px; }
+        .equipment-tooltip { position: absolute; background: #0d1320; border: 1px solid var(--st-select); border-radius: 3px; padding: 10px 14px; font-size: 10px; z-index: 100; pointer-events: none; opacity: 0; transition: opacity .15s; box-shadow: 0 4px 20px rgba(0,0,0,0.55); max-width: 240px; }
         .equipment-tooltip.visible { opacity: 1; }
         .tooltip-title { color: var(--st-select); font-weight: 800; font-size: 11px; margin-bottom: 6px; text-transform: uppercase; }
         .tooltip-row { display: flex; justify-content: space-between; gap: 14px; margin: 3px 0; }
@@ -280,14 +316,14 @@
         .tooltip-value { color: #fff; font-weight: 700; }
 
         /* Log panel */
-        .log-panel { background: var(--panel-bg); border: 1px solid var(--panel-line); border-radius: 12px; padding: 14px 18px; }
+        .log-panel { background: var(--panel-bg); border: 1px solid var(--panel-line); border-radius: 4px; padding: 14px 18px; }
 
         /* Fullscreen */
         body.fullscreen .no-print { display: none !important; }
         body.fullscreen .glass-panel.main-svg { border-radius: 0; }
         body.fullscreen .fullscreen-controls { display: flex !important; }
         .fullscreen-controls { display: none; position: fixed; top: 15px; right: 15px; z-index: 1000; gap: 10px; }
-        .fs-btn { background: var(--panel-bg); border: 1px solid var(--panel-line); color: #fff; padding: 10px 16px; min-height: 44px; border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: bold; display: flex; align-items: center; gap: 6px; transition: all .2s; }
+        .fs-btn { background: var(--panel-bg); border: 1px solid var(--panel-line); color: #fff; padding: 10px 16px; min-height: 44px; border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: bold; display: flex; align-items: center; gap: 6px; transition: all .2s; }
         .fs-btn:hover { background: rgba(30,41,59,0.95); border-color: var(--st-select); }
 
         /* Zoom controls */
@@ -297,28 +333,30 @@
         .zoom-btn.active { background: rgba(56,189,248,0.12); border-color: var(--st-select); color: var(--st-select); }
 
         /* Mobile responsive */
-        @media (max-width: 1180px) {
+        @media (max-width: 1279px) {
             body { padding: 12px !important; }
-            .main-svg { padding: 16px !important; border-radius: 18px !important; }
+            .main-svg { padding: 12px !important; border-radius: 4px !important; }
             .layout-grid { grid-template-columns: 1fr !important; }
+            .fire-scope-strip { grid-template-columns: 1fr; }
+            .fire-inspector-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
         }
         @media (max-width: 768px) {
             body { padding: 10px !important; }
-            .main-svg { padding: 12px !important; border-radius: 14px !important; overflow-x: auto !important; }
+            .main-svg { padding: 10px !important; border-radius: 4px !important; overflow-x: auto !important; }
             .alarm-strip { padding: 8px 12px; }
             .as-banner { font-size: 12px; }
-            .fire-scope-strip { grid-template-columns: 1fr; }
             .fire-interlock-head { display: none; }
             .fire-interlock-row { grid-template-columns: 1fr; gap: 3px; }
             .fire-interlock-row .il-command::before { content: 'Command · '; color: var(--text-faint); }
             .fire-interlock-row .il-feedback::before { content: 'Feedback · '; color: var(--text-faint); }
+            .fire-inspector-grid { grid-template-columns: minmax(0,1fr); }
         }
         @media (max-width: 900px) {
             /* v1.134.6 — the mimic keeps its 900 px design width so the node labels stay
                separated, but its panel adds 24 px of padding each side, so the panel measured
                948 px at a 900 px viewport and the DOCUMENT scrolled sideways rather than the
                diagram. Let the panel shrink and scroll its own content. */
-            #fire-svg { min-width: 852px; }
+            #fire-svg { min-width: 852px; max-width: none !important; }
             .main-svg { min-width: 0; max-width: 100%; overflow-x: auto;
                 -webkit-overflow-scrolling: touch; padding-left: 12px; padding-right: 12px; }
         }
@@ -357,7 +395,7 @@
     <div class="flex flex-wrap justify-between items-center gap-3 mb-3 no-print">
         <div class="flex items-center gap-3">
             <h1 class="text-base font-bold text-white tracking-wide">Fire Protection &amp; Suppression — BMS</h1>
-            <span class="text-[10px] text-slate-500 font-tech" id="basis-tag">Basis: IT 1.85 MW</span>
+            <span class="text-[10px] text-slate-500 font-tech" id="basis-tag">Basis: UNAVAILABLE</span>
         </div>
         <div class="flex flex-wrap gap-2 items-center" data-rz-alarm-launch-slot>
             <button onclick="location.href='dc-conventional.html'" class="ctrl-btn"><i class="fas fa-arrow-left mr-1"></i> BACK</button>
@@ -369,29 +407,29 @@
     <div data-rz-telemetry-banner-slot></div>
 
     <!-- ===== Top Alarm Strip (alarm-first, doc-13 / doc-10) ===== -->
-    <div id="alarm-strip" class="alarm-strip state-normal mb-3" role="status" aria-live="polite">
-        <span class="as-banner" id="as-banner" style="color:var(--st-normal)">FIRE SYSTEM NORMAL</span>
-        <span class="as-item"><span class="as-dot ok" id="as-dot-facp"></span>FACP <b id="as-facp">Online</b></span>
-        <span class="as-item"><span class="as-dot ok" id="as-dot-vesda"></span>VESDA <b id="as-vesda">Normal</b></span>
-        <span class="as-item"><span class="as-dot" id="as-dot-crit"></span>Critical <b id="as-crit">0</b></span>
-        <span class="as-item"><span class="as-dot" id="as-dot-sup"></span>Supervisory <b id="as-sup">0</b></span>
-        <span class="as-item"><span class="as-dot" id="as-dot-trbl"></span>Trouble <b id="as-trbl">0</b></span>
+    <div id="alarm-strip" class="alarm-strip state-warn mb-3" role="status" aria-live="polite">
+        <span class="as-banner" id="as-banner" style="color:var(--st-warn)">FIRE AUTHORITY UNAVAILABLE</span>
+        <span class="as-item"><span class="as-dot warn" id="as-dot-facp"></span>FACP <b id="as-facp">UNAVAILABLE</b></span>
+        <span class="as-item"><span class="as-dot warn" id="as-dot-vesda"></span>VESDA <b id="as-vesda">UNAVAILABLE</b></span>
+        <span class="as-item"><span class="as-dot warn" id="as-dot-crit"></span>Critical <b id="as-crit">UNAVAILABLE</b></span>
+        <span class="as-item"><span class="as-dot warn" id="as-dot-sup"></span>Supervisory <b id="as-sup">UNAVAILABLE</b></span>
+        <span class="as-item"><span class="as-dot warn" id="as-dot-trbl"></span>Trouble <b id="as-trbl">UNAVAILABLE</b></span>
         <!-- v2.0.1 DEAD-BINDING FIX: "0" was a hooked literal nothing ever assigned — the page holds no
              point-disablement/isolation register, so a rendered "0 disabled points" was an unearned all-clear
              on a fire panel. Rendered as the unavailable marker by bindBasis() until a real source exists. -->
         <span class="as-item">Disabled Pts <b id="as-disabled">—</b></span>
-        <span class="as-item">Tank <b id="as-tank">92% / 105 m³</b></span>
-        <span class="as-item">Static <b id="as-press">12.5 bar</b></span>
-        <span class="as-item">Quality <b id="as-quality">GOOD</b></span>
-        <span class="as-item">Scenario <b id="as-scenario">Simulated</b></span>
-        <span class="as-item">Updated <b id="as-updated">--:--:--</b></span>
+        <span class="as-item">Tank <b id="as-tank">UNAVAILABLE</b></span>
+        <span class="as-item">Static <b id="as-press">UNAVAILABLE</b></span>
+        <span class="as-item">Quality <b id="as-quality">UNAVAILABLE</b></span>
+        <span class="as-item">Scenario <b id="as-scenario">UNAVAILABLE</b></span>
+        <span class="as-item">Updated <b id="as-updated">UNAVAILABLE</b></span>
     </div>
 
     <!-- ===== v1.23.5 doc-14 §5: Fire-stages legend — visible reference of the 6-stage progression.
          Active stage is highlighted by setFireStageChip() whenever the simulation state changes.
          Calm by default (no red glow); only the active chip in stage 3+ gets the red treatment. -->
     <div id="fire-stages-legend" class="fire-stages-legend mb-3" aria-label="Fire alarm stage progression legend" role="group" style="display:flex;flex-wrap:wrap;gap:6px;font-family:'JetBrains Mono','IBM Plex Sans',sans-serif;font-size:10px;letter-spacing:0.05em;text-transform:uppercase;padding:8px 10px;background:rgba(15,23,42,0.55);border:1px solid rgba(71,85,105,0.35);border-radius:6px;">
-        <span data-stage="0" class="fs-chip is-active" style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;border:1px solid rgba(71,85,105,0.55);background:rgba(71,85,105,0.18);color:var(--st-normal,#22c55e);font-weight:700;"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span>0 · Normal</span>
+        <span data-stage="0" class="fs-chip" style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;border:1px solid rgba(71,85,105,0.4);background:rgba(15,23,42,0.4);color:#94a3b8;font-weight:600;"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span>0 · Normal</span>
         <span data-stage="1" class="fs-chip" style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;border:1px solid rgba(71,85,105,0.4);background:rgba(15,23,42,0.4);color:#94a3b8;font-weight:600;"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span>1 · VESDA Alert</span>
         <span data-stage="2" class="fs-chip" style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;border:1px solid rgba(71,85,105,0.4);background:rgba(15,23,42,0.4);color:#94a3b8;font-weight:600;"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span>2 · Smoke / Pre-alarm</span>
         <span data-stage="3" class="fs-chip" style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;border:1px solid rgba(71,85,105,0.4);background:rgba(15,23,42,0.4);color:#94a3b8;font-weight:600;"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span>3 · Confirmed</span>
@@ -404,18 +442,17 @@
         <!-- v1.134.8 — an open, quantified finding: the installed fire-water reserve cannot
              meet the duration this drawing itself requires. Rendered from the engine so it
              cannot be forgotten or edited away on one page. -->
-        <div class="fire-scope-card" id="fire-reserve-finding"
-             style="border-color:#e4564a">
-          <span><strong style="color:#e4564a">Fire-water reserve vs stated duration</strong>
-            <small id="fire-duration-shortfall">&mdash;</small></span>
+        <div class="fire-scope-card finding is-unavailable" id="fire-reserve-finding">
+          <span><strong class="finding-title">Fire-water reserve vs stated duration</strong>
+            <small id="fire-duration-shortfall">UNAVAILABLE — awaiting current fire-water basis.</small></span>
         </div>
         <div class="fire-scope-card" id="fire-current-basis">
             <span class="scope-tag">CURRENT · ENGINE BOUND</span>
-            <span><strong id="fire-current-basis-value">1.85 MW IT · 114 m³ fire reserve · 5 pre-action zones</strong><small>Live mimic and staged scenario use this locked Conventional DC basis.</small></span>
+            <span><strong id="fire-current-basis-value">UNAVAILABLE</strong><small>Simulated mimic and staged scenario use this locked Conventional DC basis.</small></span>
         </div>
         <div class="fire-scope-card study" id="fire-study-basis">
             <span class="scope-tag">STUDY ONLY</span>
-            <span><strong>4 × 10 MW halls · separate hydraulic design required</strong><small>Expansion does not resize the live tank, pumps, zoning or cause/effect model.</small></span>
+            <span><strong>4 × 10 MW halls · separate hydraulic design required</strong><small>Expansion does not resize the current-scenario tank, pumps, zoning or cause/effect model.</small></span>
         </div>
     </section>
 
@@ -440,12 +477,6 @@
             </div>
 
             <svg id="fire-svg" viewBox="0 0 1400 660" class="w-full h-full" style="transition: transform 0.3s;" role="group" aria-label="Fire water and inert gas process diagram">
-                <defs>
-                    <linearGradient id="tankWater" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stop-color="#2563a8" /><stop offset="100%" stop-color="#13315a" />
-                    </linearGradient>
-                </defs>
-
                 <!-- Landlord make-up supply. v1.42.5 — tagged with line-model metadata. -->
                 <path id="path-landlord" d="M 0 520 L 150 520 L 150 200 L 250 200" class="pipe-base" data-rz-line="1" data-id="fs-landlord-makeup" data-from="LANDLORD-SUPPLY" data-to="TK-FW-01" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN150 make-up" data-current="auto-refill on tank low" data-redundancy="duty"/>
                 <g transform="translate(110, 268)">
@@ -459,7 +490,7 @@
                     <rect width="300" height="420" fill="#0c1424" stroke="#475569" stroke-width="3" rx="10" />
                     <clipPath id="tankClip"><rect x="3" y="3" width="294" height="414" rx="8" /></clipPath>
                     <g clip-path="url(#tankClip)">
-                        <rect id="tank-water" x="0" y="50" width="300" height="370" fill="url(#tankWater)" class="liquid-anim" />
+                        <rect id="tank-water" x="0" y="420" width="300" height="0" fill="var(--st-offline)" class="liquid-anim" />
                     </g>
                     <!-- low / low-low alarm reference lines -->
                     <line x1="0" y1="124" x2="300" y2="124" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="6 5" opacity="0.55" />
@@ -468,41 +499,60 @@
                     <text x="296" y="193" text-anchor="end" fill="#fb923c" font-size="8" font-weight="bold">LOW-LOW 60%</text>
                     <text x="150" y="-30" text-anchor="middle" class="eq-name" font-size="11">TK-FW-01 · Fire Reserve Tank</text>
                     <text id="tank-cap-tag" x="150" y="-15" text-anchor="middle" class="eq-tag">&mdash;</text>
-                    <text id="tank-level-txt" x="150" y="225" text-anchor="middle" fill="#cbd5e1" font-size="40" font-weight="800" class="font-tech">92%</text>
-                    <text id="tank-vol-txt" x="150" y="252" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="700" class="font-tech">105 m³ / 114 m³</text>
-                    <text id="tank-dur-txt" x="150" y="274" text-anchor="middle" fill="#64748b" font-size="11" class="font-tech">Duration ≈ 0 min</text>
+                    <text id="tank-level-txt" x="150" y="225" text-anchor="middle" fill="#cbd5e1" font-size="24" font-weight="800" class="font-tech">UNAVAILABLE</text>
+                    <text id="tank-vol-txt" x="150" y="252" text-anchor="middle" fill="#94a3b8" font-size="14" font-weight="700" class="font-tech">UNAVAILABLE</text>
+                    <text id="tank-dur-txt" x="150" y="274" text-anchor="middle" fill="#64748b" font-size="11" class="font-tech">Duration · UNAVAILABLE</text>
                 </g>
 
                 <!-- Suction header. v1.42.5 — tagged with line-model metadata. -->
-                <path id="path-suction" d="M 550 400 L 680 400 L 680 150 L 750 150 M 680 400 L 750 400 M 680 400 L 680 540 L 750 540" class="pipe-base" data-rz-line="1" data-id="fs-suction-header" data-from="TK-FW-01" data-to="FP-SUCTION-MANIFOLD" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN300 suction" data-current="0 m³/h (standby)" data-redundancy="common"/>
+                <path id="path-suction" d="M 550 400 L 680 400 L 680 150 L 750 150 M 680 400 L 750 400 M 680 400 L 680 540 L 750 540" class="pipe-base" data-rz-line="1" data-id="fs-suction-header" data-from="TK-FW-01" data-to="FP-SUCTION-MANIFOLD" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN300 suction" data-current="UNAVAILABLE" data-redundancy="common"/>
                 <rect class="pipe-label-box" x="585" y="388" width="74" height="16" rx="3" />
                 <text x="622" y="400" text-anchor="middle" class="pipe-label">SUCTION HDR</text>
 
                 <!-- Main fire pump 1 -->
                 <g transform="translate(750, 150)" id="grp-main1" tabindex="0" role="button" aria-label="Main Fire Pump 1 FP-01">
-                    <circle r="40" fill="#020a16" stroke="#475569" stroke-width="2" id="node-m1" />
-                    <g id="spin-m1" class="impeller"><line x1="-18" y1="0" x2="18" y2="0" stroke="#64748b" stroke-width="4" /><line x1="0" y1="-18" x2="0" y2="18" stroke="#64748b" stroke-width="4" /></g>
-                    <circle id="led-m1" cx="0" cy="-52" r="6" fill="#34d399" />
-                    <text x="55" y="-12" class="eq-name">Main Fire Pump 1</text>
-                    <text x="55" y="2" class="eq-tag">FP-01 · electric · AUTO</text>
+                    <!-- RZ Engineering Symbol Atlas PP001A: centrifugal-pump casing + base. -->
+                    <g id="node-m1" transform="translate(-40 -34) scale(.8333)"
+                       data-symbol-source="assets/ltc/src/PP001A.svg" fill="#020a16" stroke="#475569" stroke-width="2.4">
+                        <path d="M83 40.5C83 21.17 67.33 5.5 48 5.5C28.67 5.5 13 21.17 13 40.5C13 50.9622 17.5904 60.3522 24.8671 66.7659L13 90.5H83L71.1329 66.7659C78.4096 60.3522 83 50.9622 83 40.5ZM48 74.5C29.2223 74.5 14 59.2777 14 40.5C14 21.7223 29.2223 6.5 48 6.5C66.7777 6.5 82 21.7223 82 40.5C82 59.2777 66.7777 74.5 48 74.5ZM48 75.5C56.4973 75.5 64.2874 72.4719 70.3499 67.4359L81.382 89.5H14.618L25.6501 67.4359C31.7126 72.4719 39.5027 75.5 48 75.5Z" />
+                    </g>
+                    <g id="spin-m1" class="impeller" data-pid-symbol="centrifugal-pump" aria-hidden="true">
+                        <circle r="11" fill="none" stroke="#64748b" stroke-width="2" />
+                        <path d="M0-10C7-8 11-4 11 0C6-2 2-1 0 2Z M-8 6C-9-1-7-7-3-9C-3-4-1-1 2 0Z M8 6C2 10-4 10-7 7C-2 6 1 4 1 1Z" fill="#64748b" />
+                    </g>
+                    <circle id="led-m1" cx="0" cy="-52" r="6" fill="#64748b" />
+                    <text x="55" y="-22" class="eq-name">Main Fire Pump 1</text>
+                    <text id="label-m1-state" x="55" y="-8" class="eq-tag">FP-01 · UNAVAILABLE</text>
                 </g>
 
                 <!-- Jockey pump -->
                 <g transform="translate(750, 400)" id="grp-jockey" tabindex="0" role="button" aria-label="Jockey Pump JP-01">
-                    <circle r="25" fill="#020a16" stroke="#475569" stroke-width="2" id="node-j" />
-                    <g id="spin-j" class="impeller"><line x1="-12" y1="0" x2="12" y2="0" stroke="#64748b" stroke-width="3" /><line x1="0" y1="-12" x2="0" y2="12" stroke="#64748b" stroke-width="3" /></g>
-                    <circle id="led-j" cx="0" cy="-37" r="5" fill="#34d399" />
-                    <text x="42" y="-10" class="eq-name">Jockey Pump</text>
-                    <text x="42" y="3" class="eq-tag">JP-01 · pressure maintain · AUTO</text>
+                    <g id="node-j" transform="translate(-25 -21) scale(.5208)"
+                       data-symbol-source="assets/ltc/src/PP001A.svg" fill="#020a16" stroke="#475569" stroke-width="3.8">
+                        <path d="M83 40.5C83 21.17 67.33 5.5 48 5.5C28.67 5.5 13 21.17 13 40.5C13 50.9622 17.5904 60.3522 24.8671 66.7659L13 90.5H83L71.1329 66.7659C78.4096 60.3522 83 50.9622 83 40.5ZM48 74.5C29.2223 74.5 14 59.2777 14 40.5C14 21.7223 29.2223 6.5 48 6.5C66.7777 6.5 82 21.7223 82 40.5C82 59.2777 66.7777 74.5 48 74.5ZM48 75.5C56.4973 75.5 64.2874 72.4719 70.3499 67.4359L81.382 89.5H14.618L25.6501 67.4359C31.7126 72.4719 39.5027 75.5 48 75.5Z" />
+                    </g>
+                    <g id="spin-j" class="impeller" data-pid-symbol="centrifugal-pump" aria-hidden="true">
+                        <circle r="7" fill="none" stroke="#64748b" stroke-width="1.6" />
+                        <path d="M0-7C5-5 7-3 7 0C4-1 1-1 0 1Z M-5 4C-6-1-4-5-2-6C-2-3-1-1 1 0Z M5 4C1 7-3 7-5 5C-1 4 1 3 1 1Z" fill="#64748b" />
+                    </g>
+                    <circle id="led-j" cx="0" cy="-37" r="5" fill="#64748b" />
+                    <text x="42" y="-21" class="eq-name">Jockey Pump</text>
+                    <text id="label-j-state" x="42" y="-8" class="eq-tag">JP-01 · UNAVAILABLE</text>
                 </g>
 
                 <!-- Main fire pump 2 (diesel standby) -->
                 <g transform="translate(750, 540)" id="grp-main2" tabindex="0" role="button" aria-label="Main Fire Pump 2 FP-02 diesel standby">
-                    <circle r="40" fill="#020a16" stroke="#475569" stroke-width="2" id="node-m2" />
-                    <g id="spin-m2" class="impeller"><line x1="-18" y1="0" x2="18" y2="0" stroke="#64748b" stroke-width="4" /><line x1="0" y1="-18" x2="0" y2="18" stroke="#64748b" stroke-width="4" /></g>
-                    <circle id="led-m2" cx="0" cy="-52" r="6" fill="#34d399" />
-                    <text x="55" y="-12" class="eq-name">Main Fire Pump 2</text>
-                    <text x="55" y="2" class="eq-tag">FP-02 · diesel · STANDBY</text>
+                    <g id="node-m2" transform="translate(-40 -34) scale(.8333)"
+                       data-symbol-source="assets/ltc/src/PP001A.svg" fill="#020a16" stroke="#475569" stroke-width="2.4">
+                        <path d="M83 40.5C83 21.17 67.33 5.5 48 5.5C28.67 5.5 13 21.17 13 40.5C13 50.9622 17.5904 60.3522 24.8671 66.7659L13 90.5H83L71.1329 66.7659C78.4096 60.3522 83 50.9622 83 40.5ZM48 74.5C29.2223 74.5 14 59.2777 14 40.5C14 21.7223 29.2223 6.5 48 6.5C66.7777 6.5 82 21.7223 82 40.5C82 59.2777 66.7777 74.5 48 74.5ZM48 75.5C56.4973 75.5 64.2874 72.4719 70.3499 67.4359L81.382 89.5H14.618L25.6501 67.4359C31.7126 72.4719 39.5027 75.5 48 75.5Z" />
+                    </g>
+                    <g id="spin-m2" class="impeller" data-pid-symbol="centrifugal-pump" aria-hidden="true">
+                        <circle r="11" fill="none" stroke="#64748b" stroke-width="2" />
+                        <path d="M0-10C7-8 11-4 11 0C6-2 2-1 0 2Z M-8 6C-9-1-7-7-3-9C-3-4-1-1 2 0Z M8 6C2 10-4 10-7 7C-2 6 1 4 1 1Z" fill="#64748b" />
+                    </g>
+                    <circle id="led-m2" cx="0" cy="-52" r="6" fill="#64748b" />
+                    <text x="55" y="-22" class="eq-name">Main Fire Pump 2</text>
+                    <text id="label-m2-state" x="55" y="-8" class="eq-tag">FP-02 · UNAVAILABLE</text>
                 </g>
 
                 <!-- N2 / inert gas generator -->
@@ -512,14 +562,14 @@
                     <g id="spin-n2" class="impeller"><line x1="-12" y1="0" x2="12" y2="0" stroke="#64748b" stroke-width="2" /><line x1="0" y1="-12" x2="0" y2="12" stroke="#64748b" stroke-width="2" /></g>
                     <text x="60" y="26" fill="#cbd5e1" font-size="10" font-weight="800">N2 INERT GEN</text>
                     <text x="60" y="40" class="eq-tag">N2-GEN-01</text>
-                    <text x="60" y="55" fill="#94a3b8" font-size="9" font-weight="bold">Hdr 2.4 bar · STANDBY</text>
+                    <text id="label-n2-state" x="60" y="55" fill="#94a3b8" font-size="9" font-weight="bold">Hdr · UNAVAILABLE</text>
                 </g>
-                <path id="path-n2" d="M 912 558 L 912 348 L 1262 348" class="pipe-base" data-rz-line="1" data-id="fs-n2-supply" data-from="N2-GEN-01" data-to="N2-DIST-HEADER" data-medium="fire" data-direction="forward" data-state="standby" data-capacity="N2 2.4 bar" data-current="STANDBY (pressure maintain)" data-redundancy="duty"/>
+                <path id="path-n2" d="M 912 558 L 912 348 L 1262 348" class="pipe-base" data-rz-line="1" data-id="fs-n2-supply" data-from="N2-GEN-01" data-to="N2-DIST-HEADER" data-medium="fire" data-direction="forward" data-state="unavailable" data-capacity="N2 2.4 bar" data-current="UNAVAILABLE" data-redundancy="duty"/>
 
                 <!-- Discharge headers. v1.42.5 — tagged. -->
-                <path id="path-discharge" d="M 820 150 L 1000 150 L 1000 400 L 1150 400" class="pipe-base" data-rz-line="1" data-id="fs-fp01-discharge" data-from="FP-01" data-to="DISCHARGE-HEADER" data-medium="fws" data-direction="forward" data-state="standby" data-capacity="DN250 main fire pump" data-current="0 m³/h (AUTO standby)" data-redundancy="duty" data-sensor="FP-01"/>
-                <path id="path-j-discharge" d="M 790 400 L 1000 400" class="pipe-base" data-rz-line="1" data-id="fs-jp-discharge" data-from="JP-01" data-to="DISCHARGE-HEADER" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN80 jockey" data-current="pressure maintain @ 7.5 bar" data-redundancy="duty" data-sensor="JP-01"/>
-                <path id="path-m2-discharge" d="M 820 540 L 1000 540 L 1000 400" class="pipe-base" data-rz-line="1" data-id="fs-fp02-discharge" data-from="FP-02" data-to="DISCHARGE-HEADER" data-medium="fws" data-direction="forward" data-state="standby" data-capacity="DN250 diesel standby" data-current="STANDBY" data-redundancy="redundant_b" data-sensor="FP-02"/>
+                <path id="path-discharge" d="M 820 150 L 1000 150 L 1000 400 L 1150 400" class="pipe-base" data-rz-line="1" data-id="fs-fp01-discharge" data-from="FP-01" data-to="DISCHARGE-HEADER" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN250 main fire pump" data-current="UNAVAILABLE" data-redundancy="duty" data-sensor="FP-01"/>
+                <path id="path-j-discharge" d="M 790 400 L 1000 400" class="pipe-base" data-rz-line="1" data-id="fs-jp-discharge" data-from="JP-01" data-to="DISCHARGE-HEADER" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN80 jockey" data-current="UNAVAILABLE" data-redundancy="duty" data-sensor="JP-01"/>
+                <path id="path-m2-discharge" d="M 820 540 L 1000 540 L 1000 400" class="pipe-base" data-rz-line="1" data-id="fs-fp02-discharge" data-from="FP-02" data-to="DISCHARGE-HEADER" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN250 diesel standby" data-current="UNAVAILABLE" data-redundancy="redundant_b" data-sensor="FP-02"/>
                 <rect class="pipe-label-box" x="1052" y="392" width="86" height="16" rx="3" />
                 <text x="1095" y="404" text-anchor="middle" class="pipe-label">DISCHARGE HDR</text>
 
@@ -529,11 +579,11 @@
                     <circle cx="84" cy="14" r="22" fill="#0c1424" stroke="#64748b" />
                     <line id="gauge-pin" x1="84" y1="14" x2="84" y2="-2" stroke="#cbd5e1" stroke-width="3" style="transform-origin:84px 14px; transform:rotate(45deg); transition:.5s;" />
                     <text x="84" y="58" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="bold">Header flow</text>
-                    <text id="flow-val" x="84" y="74" text-anchor="middle" fill="#cbd5e1" font-size="12" class="font-tech" font-weight="bold">0.0 m³/h</text>
+                    <text id="flow-val" x="84" y="74" text-anchor="middle" fill="#cbd5e1" font-size="12" class="font-tech" font-weight="bold">UNAVAILABLE</text>
                 </g>
 
-                <path id="path-to-wet" d="M 1150 400 L 1150 110 L 1200 110" class="pipe-base" data-rz-line="1" data-id="fs-to-wet-zone" data-from="DISCHARGE-HEADER" data-to="WAV-ZONE-BANK" data-medium="fws" data-direction="forward" data-state="standby" data-capacity="DN150 wet sprinkler" data-current="charged (Cl2 res 0.6 ppm)" data-redundancy="duty"/>
-                <path id="path-to-pre" d="M 1150 400 L 1150 520 L 1200 520" class="pipe-base" data-rz-line="1" data-id="fs-to-preaction-zone" data-from="DISCHARGE-HEADER" data-to="PACV-ZONE-BANK" data-medium="fws" data-direction="forward" data-state="standby" data-capacity="DN150 pre-action" data-current="dry pipe charged on detect" data-redundancy="duty"/>
+                <path id="path-to-wet" d="M 1150 400 L 1150 110 L 1200 110" class="pipe-base" data-rz-line="1" data-id="fs-to-wet-zone" data-from="DISCHARGE-HEADER" data-to="WAV-ZONE-BANK" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN150 wet sprinkler" data-current="UNAVAILABLE" data-redundancy="duty"/>
+                <path id="path-to-pre" d="M 1150 400 L 1150 520 L 1200 520" class="pipe-base" data-rz-line="1" data-id="fs-to-preaction-zone" data-from="DISCHARGE-HEADER" data-to="PACV-ZONE-BANK" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN150 pre-action" data-current="UNAVAILABLE" data-redundancy="duty"/>
 
                 <!-- Wet alarm / zone control valves -->
                 <g transform="translate(1200, 70)">
@@ -547,12 +597,12 @@
                 </g>
 
                 <!-- N2 distribution header to pre-action zone valves. v1.42.5 — tagged. -->
-                <path id="path-n2-header" d="M 1200 348 L 1400 348" class="pipe-base" data-rz-line="1" data-id="fs-n2-distribution-header" data-from="N2-GEN-01" data-to="PV-N2-MANIFOLD" data-medium="fire" data-direction="forward" data-state="standby" data-capacity="N2 2.4 bar header" data-current="pressure maintain" data-redundancy="duty"/>
-                <path id="path-n2-pv1" d="M 1218 348 L 1218 480" class="pipe-base" data-rz-line="1" data-id="fs-n2-pv1" data-from="PV-N2-MANIFOLD" data-to="PACV-01" data-medium="fire" data-direction="forward" data-state="standby" data-capacity="N2 zone branch" data-redundancy="duty"/>
-                <path id="path-n2-pv2" d="M 1262 348 L 1262 480" class="pipe-base" data-rz-line="1" data-id="fs-n2-pv2" data-from="PV-N2-MANIFOLD" data-to="PACV-02" data-medium="fire" data-direction="forward" data-state="standby" data-capacity="N2 zone branch" data-redundancy="duty"/>
-                <path id="path-n2-pv3" d="M 1306 348 L 1306 480" class="pipe-base" data-rz-line="1" data-id="fs-n2-pv3" data-from="PV-N2-MANIFOLD" data-to="PACV-03" data-medium="fire" data-direction="forward" data-state="standby" data-capacity="N2 zone branch" data-redundancy="duty"/>
-                <path id="path-n2-pv4" d="M 1350 348 L 1350 480" class="pipe-base" data-rz-line="1" data-id="fs-n2-pv4" data-from="PV-N2-MANIFOLD" data-to="PACV-04" data-medium="fire" data-direction="forward" data-state="standby" data-capacity="N2 zone branch" data-redundancy="duty"/>
-                <path id="path-n2-pv5" d="M 1394 348 L 1394 480" class="pipe-base" data-rz-line="1" data-id="fs-n2-pv5" data-from="PV-N2-MANIFOLD" data-to="PACV-05" data-medium="fire" data-direction="forward" data-state="standby" data-capacity="N2 zone branch" data-redundancy="duty"/>
+                <path id="path-n2-header" d="M 1200 348 L 1400 348" class="pipe-base" data-rz-line="1" data-id="fs-n2-distribution-header" data-from="N2-GEN-01" data-to="PV-N2-MANIFOLD" data-medium="fire" data-direction="forward" data-state="unavailable" data-capacity="N2 2.4 bar header" data-current="UNAVAILABLE" data-redundancy="duty"/>
+                <path id="path-n2-pv1" d="M 1218 348 L 1218 480" class="pipe-base" data-rz-line="1" data-id="fs-n2-pv1" data-from="PV-N2-MANIFOLD" data-to="PACV-01" data-medium="fire" data-direction="forward" data-state="unavailable" data-capacity="N2 zone branch" data-current="UNAVAILABLE" data-redundancy="duty"/>
+                <path id="path-n2-pv2" d="M 1262 348 L 1262 480" class="pipe-base" data-rz-line="1" data-id="fs-n2-pv2" data-from="PV-N2-MANIFOLD" data-to="PACV-02" data-medium="fire" data-direction="forward" data-state="unavailable" data-capacity="N2 zone branch" data-current="UNAVAILABLE" data-redundancy="duty"/>
+                <path id="path-n2-pv3" d="M 1306 348 L 1306 480" class="pipe-base" data-rz-line="1" data-id="fs-n2-pv3" data-from="PV-N2-MANIFOLD" data-to="PACV-03" data-medium="fire" data-direction="forward" data-state="unavailable" data-capacity="N2 zone branch" data-current="UNAVAILABLE" data-redundancy="duty"/>
+                <path id="path-n2-pv4" d="M 1350 348 L 1350 480" class="pipe-base" data-rz-line="1" data-id="fs-n2-pv4" data-from="PV-N2-MANIFOLD" data-to="PACV-04" data-medium="fire" data-direction="forward" data-state="unavailable" data-capacity="N2 zone branch" data-current="UNAVAILABLE" data-redundancy="duty"/>
+                <path id="path-n2-pv5" d="M 1394 348 L 1394 480" class="pipe-base" data-rz-line="1" data-id="fs-n2-pv5" data-from="PV-N2-MANIFOLD" data-to="PACV-05" data-medium="fire" data-direction="forward" data-state="unavailable" data-capacity="N2 zone branch" data-current="UNAVAILABLE" data-redundancy="duty"/>
 
                 <!-- v1.134.6 — the valve bank was translated to x=1200 and its fifth valve
                      (x=176, width 36) ended at 1412 against a 1400 viewBox, so PACV-05 and its
@@ -586,12 +636,12 @@
       </div>
 
       <!-- ===== Right inspector column ===== -->
-      <div class="flex flex-col gap-3">
+      <div class="fire-inspector-grid">
         <!-- Cause-effect matrix -->
         <div class="panel">
             <div class="panel-title">Fire Cause &amp; Effect Matrix</div>
             <div id="ce-matrix"></div>
-            <div class="fire-authority"><strong id="fire-authority">FACP AUTHORITATIVE · NORMAL</strong><span>Commands ≠ field proof</span></div>
+            <div class="fire-authority"><strong id="fire-authority">FACP AUTHORITY · UNAVAILABLE</strong><span>Commands ≠ field proof</span></div>
             <div id="fire-interlock-list" aria-label="FACP cause and effect outputs">
                 <div class="fire-interlock-head"><span>Subsystem</span><span>FACP command</span><span>Downstream feedback</span></div>
             </div>
@@ -602,7 +652,7 @@
             <div class="panel-title">Fire Pump Set</div>
             <div class="grid grid-cols-1 gap-2" id="pump-cards"></div>
             <div class="mt-3" style="border-top:1px solid var(--panel-line); padding-top:8px;">
-                <div class="metric-row"><span class="metric-label">Static pressure (actual)</span><span class="metric-val" id="m-static">12.5 bar</span></div>
+                <div class="metric-row"><span class="metric-label">Static pressure (actual)</span><span class="metric-val warn" id="m-static">UNAVAILABLE</span></div>
                 <!-- v2.0.1 DEAD-BINDING FIX: these three rows were hand-typed copies of P_JOCKEY_ON/OFF,
                      P_FP1_ON/P_FP2_ON and P_LOW_ALM. The simulation acts on the constants, so a change to a
                      setpoint silently left the panel lying. Now rendered from the same constants in
@@ -620,13 +670,13 @@
         <!-- Water reserve & duration -->
         <div class="panel">
             <div class="panel-title">Water Reserve &amp; Demand</div>
-            <div class="metric-row"><span class="metric-label">Tank level</span><span class="metric-val" id="m-tank-pct" data-basis-param="fire.level_pct" tabindex="0" role="button" title="Tank level — click for basis">92%</span></div>
-            <div class="metric-row"><span class="metric-label">Available volume</span><span class="metric-val" id="m-tank-vol" data-basis-param="fire.stored_m3" tabindex="0" role="button" title="Stored fire water — click for basis">105 m³ / 114 m³</span></div>
-            <div class="metric-row"><span class="metric-label">Fire pump demand</span><span class="metric-val" id="m-pump-demand" data-basis-param="fire.pump_demand_lpm" tabindex="0" role="button">&mdash;</span></div>
-            <div class="metric-row"><span class="metric-label">Available duration</span><span class="metric-val" id="m-duration">— min</span></div>
-            <div class="metric-row"><span class="metric-label">Protected IT load (basis)</span><span class="metric-val" id="m-it-basis" data-basis-param="site.it_load_kw" tabindex="0" role="button">1.85 MW</span></div>
-            <div class="metric-row"><span class="metric-label">Protected hall volume</span><span class="metric-val" id="m-hall-vol">— m³</span></div>
-            <div class="metric-row"><span class="metric-label">Pre-action zones</span><span class="metric-val" id="m-zones">5 zones · all Normal</span></div>
+            <div class="metric-row"><span class="metric-label">Tank level</span><span class="metric-val warn" id="m-tank-pct" data-basis-param="fire.level_pct" tabindex="0" role="button" title="Tank level — click for basis">UNAVAILABLE</span></div>
+            <div class="metric-row"><span class="metric-label">Available volume</span><span class="metric-val warn" id="m-tank-vol" data-basis-param="fire.stored_m3" tabindex="0" role="button" title="Stored fire water — click for basis">UNAVAILABLE</span></div>
+            <div class="metric-row"><span class="metric-label">Fire pump demand</span><span class="metric-val warn" id="m-pump-demand" data-basis-param="fire.pump_demand_lpm" tabindex="0" role="button">UNAVAILABLE</span></div>
+            <div class="metric-row"><span class="metric-label">Available duration</span><span class="metric-val warn" id="m-duration">UNAVAILABLE</span></div>
+            <div class="metric-row"><span class="metric-label">Protected IT load (basis)</span><span class="metric-val warn" id="m-it-basis" data-basis-param="site.it_load_kw" tabindex="0" role="button">UNAVAILABLE</span></div>
+            <div class="metric-row"><span class="metric-label">Site rack-footprint proxy (non-sizing)</span><span class="metric-val warn" id="m-hall-vol">UNAVAILABLE</span></div>
+            <div class="metric-row"><span class="metric-label">Pre-action zones</span><span class="metric-val warn" id="m-zones">UNAVAILABLE</span></div>
             <p class="metric-sub mt-2">Duration = available litres ÷ fire-pump demand. Suppression release quantities are <b>preliminary</b> pending hydraulic calc.</p>
         </div>
 
@@ -634,7 +684,7 @@
         <div class="panel log-panel">
             <div class="panel-title"><i class="fas fa-terminal mr-1"></i> Alarm &amp; Event Log</div>
             <div id="log-view" class="overflow-y-auto space-y-1 text-[11px] font-tech pr-1 leading-relaxed" style="max-height:160px;">
-                <p style="color:rgba(52,211,153,0.8)">System healthy · 0 active / 0 unack · static pressure stable 12.5 bar · FACP comms OK.</p>
+                <p id="authority-log-entry" style="color:var(--st-warn)">Fire authority UNAVAILABLE · no current FACP, pressure, pump or reserve state can be asserted.</p>
             </div>
         </div>
       </div>
@@ -654,32 +704,76 @@
          * ================================================================== */
 
         var S = (window.CONV_CALC && window.CONV_CALC.snapshot) ? window.CONV_CALC.snapshot : null;
+        var UNAVAILABLE = 'UNAVAILABLE';
+
+        function isFiniteNumber(value) {
+            return typeof value === 'number' && isFinite(value);
+        }
+        function positiveNumber(value) {
+            return isFiniteNumber(value) && value > 0 ? value : null;
+        }
+        function boundedPercent(value) {
+            return isFiniteNumber(value) && value >= 0 && value <= 100 ? value : null;
+        }
+        function positiveInteger(value) {
+            return isFiniteNumber(value) && value > 0 && value % 1 === 0 ? value : null;
+        }
+        function nonEmptyString(value) {
+            return typeof value === 'string' && value.trim().length > 0;
+        }
 
         /* ---- Engineering bindings derived from the single basis -------------
-         * The fire reserve serves the data hall the engine describes
-         * (IT 1.85 MW). Protected hall volume and pre-action zone count are
-         * derived deterministically from the engine's rack basis so they stay
-         * consistent with the rest of the conventional suite.
+         * A current authority must expose the four-hall campus schema. An older
+         * cached engine is deliberately rejected instead of republishing its
+         * retired 1.85 MW single-hall basis as if it were current.
          */
-        var IT_LOAD_KW   = S ? S.site.it_load_kw : 1850;          // 1850
-        var IT_LOAD_MW   = IT_LOAD_KW / 1000;                     // 1.85
-        var RACKS        = S ? S.racks.at_8kw : 231;              // 231 racks @ 8 kW/rack basis
-        // Protected white-space volume: racks * footprint(1.2 m2) * 3.0 m clear height
-        var HALL_VOL_M3  = Math.round(RACKS * 1.2 * 3.0);         // deterministic from basis
+        var engineScript = document.querySelector('script[src*="conv-engine.js"]');
+        var engineVersionMatch = engineScript
+            ? engineScript.getAttribute('src').match(/[?&]v=([^&]+)/)
+            : null;
+        var CONV_CURRENT_ENGINE_VERSION = '2.0.0';
+        var requestedEngineVersion = engineVersionMatch
+            ? decodeURIComponent(engineVersionMatch[1])
+            : null;
+        var expectedEngineVersion = requestedEngineVersion === CONV_CURRENT_ENGINE_VERSION
+            ? CONV_CURRENT_ENGINE_VERSION : null;
+        var HAS_CURRENT_BASIS = !!(S && S.meta && expectedEngineVersion
+            && S.meta.version === expectedEngineVersion
+            && nonEmptyString(S.meta.scenario)
+            && nonEmptyString(S.meta.data_quality)
+            && S.site && S.campus
+            && S.campus.hall_count === 4
+            && positiveNumber(S.site.it_load_kw)
+            && positiveInteger(S.campus.racks_total));
+        var IT_LOAD_KW   = HAS_CURRENT_BASIS ? positiveNumber(S.site.it_load_kw) : null;
+        var IT_LOAD_MW   = IT_LOAD_KW ? IT_LOAD_KW / 1000 : null;
+        var RACKS        = HAS_CURRENT_BASIS ? positiveInteger(S.campus.racks_total) : null;
+        // Site rack-footprint proxy only: not protected-enclosure volume and never a sizing input.
+        var SITE_RACK_FOOTPRINT_CONTEXT_M3 = RACKS ? Math.round(RACKS * 1.2 * 3.0) : null;
         /* v1.134.8 — the fire basis lived entirely in page constants and nothing computed the
            one number that matters: how long the reserve actually lasts. conv-engine.js carries
            it now and does the arithmetic. */
-        var FIRE = (S && S.fire) ? S.fire : null;
-        var ZONE_COUNT   = FIRE ? FIRE.zone_count : 5;                                     // 5 pre-action zones (PACV-01..05)
+        var FIRE = (HAS_CURRENT_BASIS && S.fire) ? S.fire : null;
+        var ZONE_COUNT = FIRE ? positiveInteger(FIRE.zone_count) : null;
 
         // Fire reserve tank (fixed civil capacity) + thresholds
-        var TANK_CAP_M3   = FIRE ? FIRE.reserve_capacity_m3 : null;
+        var TANK_CAP_M3 = FIRE ? positiveNumber(FIRE.reserve_capacity_m3) : null;
+        var FIRE_LEVEL_PCT = FIRE ? boundedPercent(FIRE.level_pct) : null;
         var TANK_LOW_PCT  = 80;   // low alarm
         var TANK_LL_PCT   = 60;   // low-low alarm
-        var PUMP_DEMAND_LPM = FIRE ? FIRE.pump_demand_lpm : null;
+        var PUMP_DEMAND_LPM = FIRE ? positiveNumber(FIRE.pump_demand_lpm) : null;
+        var HAS_FIRE_RESERVE_BASIS = !!(TANK_CAP_M3 && FIRE_LEVEL_PCT !== null
+            && PUMP_DEMAND_LPM && positiveNumber(FIRE.required_duration_min)
+            && isFiniteNumber(FIRE.duration_min) && isFiniteNumber(FIRE.duration_at_full_min)
+            && positiveNumber(FIRE.required_capacity_m3) && isFiniteNumber(FIRE.capacity_shortfall_m3));
 
         // Pressure setpoints (bar) — shown explicitly per doc-05 §Pressure Thresholds
-        var P_STATIC   = FIRE ? FIRE.static_pressure_bar : 12.5;
+        var P_STATIC = FIRE ? positiveNumber(FIRE.static_pressure_bar) : null;
+        var HAS_FIRE_AUTHORITY = !!(HAS_FIRE_RESERVE_BASIS && ZONE_COUNT && P_STATIC);
+        var HAS_FIRE_WATER_DESIGN_DEFICIT = !!(HAS_FIRE_AUTHORITY
+            && FIRE.capacity_shortfall_m3 > 0);
+        document.body.setAttribute('data-rz-basis-authority',
+            HAS_FIRE_AUTHORITY ? 'current' : 'unavailable');
         var P_JOCKEY_ON = 11.5, P_JOCKEY_OFF = 12.8;
         var P_FP1_ON   = 10.5,  P_FP2_ON = 9.5;
         var P_LOW_ALM  = 8.5;
@@ -699,7 +793,7 @@
             stage: 0,            // 0 Normal · 1 VESDA Alert · 2 Smoke Detector · 3 Confirmed · 4 Suppression Armed · 5 Discharge
             armed: false,        // simulation must be ARMED + confirmed before staging
             press: P_STATIC,
-            tankPct: 92,
+            tankPct: FIRE_LEVEL_PCT,
             timer: null,
             countdown: 0
         };
@@ -749,14 +843,17 @@
             var html = '<div class="fire-interlock-head"><span>Subsystem</span><span>FACP command</span><span>Downstream feedback</span></div>';
             for (var i = 0; i < effects.length; i++) {
                 var effect = effects[i];
-                var cls = 'fire-interlock-row' + (effect.requested ? ' is-requested' : '') + (effect.manualOnly ? ' is-manual' : '');
+                var cls = 'fire-interlock-row' + (HAS_FIRE_AUTHORITY && effect.requested ? ' is-requested' : '')
+                    + (HAS_FIRE_AUTHORITY && effect.manualOnly ? ' is-manual' : '');
                 html += '<div class="' + cls + '" data-interlock="' + effect.system + '">' +
                     '<span class="il-system">' + effect.system + '</span>' +
-                    '<span class="il-command">' + effect.command + '</span>' +
-                    '<span class="il-feedback">' + effect.feedback + '</span></div>';
+                    '<span class="il-command">' + (HAS_FIRE_AUTHORITY ? effect.command : UNAVAILABLE) + '</span>' +
+                    '<span class="il-feedback">' + (HAS_FIRE_AUTHORITY ? effect.feedback : UNAVAILABLE) + '</span></div>';
             }
             list.innerHTML = html;
-            $('fire-authority').textContent = 'FACP AUTHORITATIVE · STAGE ' + state.stage + (state.armed ? ' · SIM ARMED' : ' · SIM OFF');
+            $('fire-authority').textContent = HAS_FIRE_AUTHORITY
+                ? 'FACP AUTHORITATIVE · STAGE ' + state.stage + (state.armed ? ' · SIM ARMED' : ' · SIM OFF')
+                : 'FACP AUTHORITY · ' + UNAVAILABLE;
         }
 
         window.RZFireOperator = Object.freeze({ interlocksForStage: interlocksForStage });
@@ -767,10 +864,10 @@
                 var row = CE[i];
                 var cls = 'ce-row';
                 // Stage 0 highlighted GREEN (is-normal) only while system is Normal.
-                if (row.s === 0 && state.stage === 0) cls += ' is-normal';
+                if (HAS_FIRE_AUTHORITY && row.s === 0 && state.stage === 0) cls += ' is-normal';
                 // Stages 1..N: rule-based active highlight when reached. Stage 4
                 // is the "armed" amber state; once discharge (5) it goes active.
-                if (row.s >= 1 && row.s <= state.stage) {
+                if (HAS_FIRE_AUTHORITY && row.s >= 1 && row.s <= state.stage) {
                     if (row.s === 4 && state.stage === 4) cls += ' is-armed';
                     else cls += ' is-active';
                 }
@@ -783,53 +880,67 @@
 
         // ---- Fire pump cards (auto / run / trip — doc-05 §3) ----
         function pumpCardHTML(tag, name, st, sub) {
-            var cls = st === 'RUN' ? 'run' : (st === 'TRIP' ? 'trip' : 'auto');
-            var label = st === 'RUN' ? 'RUNNING' : (st === 'TRIP' ? 'TRIP' : 'AUTO · STANDBY');
+            var cls = st === 'RUN' ? 'run' : (st === 'TRIP' ? 'trip' : (st === 'UNKNOWN' ? 'unknown' : 'auto'));
+            var label = st === 'RUN' ? 'RUNNING' : (st === 'TRIP' ? 'TRIP' : (st === 'UNKNOWN' ? UNAVAILABLE : 'AUTO · STANDBY'));
             return '<div class="pump-card"><div class="pc-tag">' + tag + '</div><div class="pc-name">' + name +
                    '</div><span class="pc-state ' + cls + '">' + label + '</span>' +
                    '<div class="metric-sub" style="margin-top:6px">' + sub + '</div></div>';
         }
         function renderPumps() {
-            var jSt = state.stage >= 3 && state.press <= P_JOCKEY_ON ? 'RUN' : 'AUTO';
-            var m1St = state.stage >= 3 && state.press <= P_FP1_ON ? 'RUN' : 'AUTO';
-            var m2St = state.stage >= 4 && state.press <= P_FP2_ON ? 'RUN' : 'AUTO';
+            var pressureAvailable = HAS_FIRE_AUTHORITY && isFiniteNumber(state.press);
+            var jSt = pressureAvailable ? (state.stage >= 3 && state.press <= P_JOCKEY_ON ? 'RUN' : 'AUTO') : 'UNKNOWN';
+            var m1St = pressureAvailable ? (state.stage >= 3 && state.press <= P_FP1_ON ? 'RUN' : 'AUTO') : 'UNKNOWN';
+            var m2St = pressureAvailable ? (state.stage >= 4 && state.press <= P_FP2_ON ? 'RUN' : 'AUTO') : 'UNKNOWN';
+            var unavailableSub = UNAVAILABLE + ' — current pressure and controller feedback absent';
             $('pump-cards').innerHTML =
                 pumpCardHTML('JP-01', 'Jockey Pump · 18 m³/h · 5.5 kW',
-                    jSt, 'Start ' + P_JOCKEY_ON + ' bar · stop ' + P_JOCKEY_OFF + ' bar · flow switch ' + (jSt === 'RUN' ? 'PROVEN' : 'idle')) +
+                    jSt, pressureAvailable
+                        ? 'Start ' + P_JOCKEY_ON + ' bar · stop ' + P_JOCKEY_OFF + ' bar · flow switch ' + (jSt === 'RUN' ? 'PROVEN' : 'idle')
+                        : unavailableSub) +
                 pumpCardHTML('FP-01', 'Main Fire Pump 1 · electric · 227 m³/h · 75 kW',
-                    m1St, 'Start ' + P_FP1_ON + ' bar · controller power healthy · phase OK') +
+                    m1St, pressureAvailable ? 'Start ' + P_FP1_ON + ' bar · controller power healthy · phase OK' : unavailableSub) +
                 pumpCardHTML('FP-02', 'Main Fire Pump 2 · diesel · 227 m³/h',
-                    m2St, 'Start ' + P_FP2_ON + ' bar · battery charger OK · fuel 88% · engine ' + (m2St === 'RUN' ? 'CRANKED' : 'standby'));
+                    m2St, pressureAvailable
+                        ? 'Start ' + P_FP2_ON + ' bar · battery charger OK · fuel 88% · engine ' + (m2St === 'RUN' ? 'CRANKED' : 'standby')
+                        : unavailableSub);
         }
 
         // ---- Tank UI bound to current tank %, with engine-derived volume ----
-        function volM3(pct) { return TANK_CAP_M3 * pct / 100; }
+        function volM3(pct) {
+            return TANK_CAP_M3 && boundedPercent(pct) !== null ? TANK_CAP_M3 * pct / 100 : null;
+        }
         function durationMin(pct) {
-            var litres = volM3(pct) * 1000;
-            return Math.round(litres / PUMP_DEMAND_LPM);
+            var volume = volM3(pct);
+            return volume !== null && PUMP_DEMAND_LPM ? Math.round(volume * 1000 / PUMP_DEMAND_LPM) : null;
         }
         function updateTankUI() {
             var pct = state.tankPct;
-            var h = (pct / 100) * 370;
+            var pctAvailable = boundedPercent(pct) !== null;
+            var h = pctAvailable ? (pct / 100) * 370 : 0;
             tankWater.setAttribute('height', h);
-            tankWater.setAttribute('y', 50 + (370 - h));
-            tankTxt.textContent = Math.round(pct) + '%';
+            tankWater.setAttribute('y', 420 - h);
+            tankTxt.setAttribute('font-size', pctAvailable ? '40' : '24');
+            tankTxt.textContent = pctAvailable ? Math.round(pct) + '%' : UNAVAILABLE;
             var vol = volM3(pct);
-            tankVolTxt.textContent = vol.toFixed(0) + ' m³ / ' + TANK_CAP_M3 + ' m³';
-            tankDurTxt.textContent = 'Duration ≈ ' + durationMin(pct) + ' min';
+            var duration = durationMin(pct);
+            tankVolTxt.textContent = vol !== null ? vol.toFixed(0) + ' m³ / ' + TANK_CAP_M3 + ' m³' : UNAVAILABLE;
+            tankDurTxt.textContent = duration !== null ? 'Duration ≈ ' + duration + ' min' : 'Duration · ' + UNAVAILABLE;
             // tank water colour reflects level alarm (red ONLY when low-low)
-            if (pct <= TANK_LL_PCT) tankWater.setAttribute('fill', 'var(--st-alarm)');
-            else tankWater.setAttribute('fill', 'url(#tankWater)');
+            if (!pctAvailable) tankWater.setAttribute('fill', 'var(--st-offline)');
+            else if (pct <= TANK_LL_PCT) tankWater.setAttribute('fill', 'var(--st-alarm)');
+            else tankWater.setAttribute('fill', 'var(--supply-blue)');
 
-            $('m-tank-pct').textContent = Math.round(pct) + '%';
-            $('m-tank-vol').textContent = vol.toFixed(0) + ' m³ / ' + TANK_CAP_M3 + ' m³';
+            $('m-tank-pct').textContent = pctAvailable ? Math.round(pct) + '%' : UNAVAILABLE;
+            $('m-tank-pct').className = 'metric-val' + (!pctAvailable || pct <= TANK_LOW_PCT ? ' warn' : '');
+            $('m-tank-vol').textContent = vol !== null ? vol.toFixed(0) + ' m³ / ' + TANK_CAP_M3 + ' m³' : UNAVAILABLE;
+            $('m-tank-vol').className = 'metric-val' + (vol === null ? ' warn' : '');
             var dEl = $('m-duration');
-            dEl.textContent = durationMin(pct) + ' min';
-            dEl.className = 'metric-val' + (pct <= TANK_LL_PCT ? ' alarm' : (pct <= TANK_LOW_PCT ? ' warn' : ''));
+            dEl.textContent = duration !== null ? duration + ' min' : UNAVAILABLE;
+            dEl.className = 'metric-val' + (duration === null || pct <= TANK_LOW_PCT ? ' warn' : '');
 
             // make-up supply (deterministic): engages only when below LOW threshold
             var v = $('v-landlord'), p = $('path-landlord');
-            if (pct <= TANK_LOW_PCT) {
+            if (pctAvailable && pct <= TANK_LOW_PCT) {
                 v.style.fill = 'rgba(56,189,248,0.18)';
                 v.style.stroke = 'var(--supply-blue)';
                 p.classList.add('flow-supply');
@@ -847,8 +958,16 @@
 
         // ---- Gauge / header readout ----
         function updateGauge() {
+            if (!HAS_FIRE_AUTHORITY || !isFiniteNumber(state.press) || !P_STATIC) {
+                pin.style.opacity = '.35';
+                $('m-static').textContent = UNAVAILABLE;
+                $('m-static').className = 'metric-val warn';
+                $('as-press').textContent = UNAVAILABLE;
+                return;
+            }
             // 0 bar -> -90deg, 12.5 bar -> +45deg (deterministic mapping)
             var angle = -90 + (state.press / P_STATIC) * 135;
+            pin.style.opacity = '1';
             pin.style.transform = 'rotate(' + angle + 'deg)';
             $('m-static').textContent = state.press.toFixed(1) + ' bar';
             $('m-static').className = 'metric-val' + (state.press <= P_LOW_ALM ? ' alarm' : (state.press <= P_JOCKEY_ON ? ' warn' : ''));
@@ -861,9 +980,54 @@
         var pacv = ['pv-1', 'pv-2', 'pv-3', 'pv-4', 'pv-5'];
         var wav = ['wv-1', 'wv-2', 'wv-3'];
 
-        function setPump(node, spin, led, on, alarm) {
+        var FIRE_WATER_LINE_BASIS = [
+            { id: 'path-suction', state: 'energized', current: '0 m³/h (standby)' },
+            { id: 'path-discharge', state: 'standby', current: '0 m³/h (AUTO standby)' },
+            { id: 'path-j-discharge', state: 'energized', current: function () {
+                return isFiniteNumber(state.press)
+                    ? 'pressure maintained @ ' + state.press.toFixed(1) + ' bar (simulated static)'
+                    : UNAVAILABLE;
+            } },
+            { id: 'path-m2-discharge', state: 'standby', current: 'STANDBY' },
+            { id: 'path-to-wet', state: 'standby', current: 'charged (Cl2 res 0.6 ppm)' },
+            { id: 'path-to-pre', state: 'standby', current: 'dry pipe charged on detect' },
+            { id: 'path-n2', state: 'standby', current: 'STANDBY (pressure maintain)' },
+            { id: 'path-n2-header', state: 'standby', current: 'pressure maintain' },
+            { id: 'path-n2-pv1', state: 'standby', current: null },
+            { id: 'path-n2-pv2', state: 'standby', current: null },
+            { id: 'path-n2-pv3', state: 'standby', current: null },
+            { id: 'path-n2-pv4', state: 'standby', current: null },
+            { id: 'path-n2-pv5', state: 'standby', current: null }
+        ];
+
+        function renderEquipmentAuthority() {
+            for (var i = 0; i < FIRE_WATER_LINE_BASIS.length; i++) {
+                var lineBasis = FIRE_WATER_LINE_BASIS[i];
+                var line = $(lineBasis.id);
+                line.setAttribute('data-state', HAS_FIRE_AUTHORITY ? lineBasis.state : 'unavailable');
+                if (!HAS_FIRE_AUTHORITY) {
+                    line.setAttribute('data-current', UNAVAILABLE);
+                } else if (lineBasis.current !== null) {
+                    line.setAttribute('data-current', typeof lineBasis.current === 'function'
+                        ? lineBasis.current() : lineBasis.current);
+                } else {
+                    line.removeAttribute('data-current');
+                }
+            }
+            $('label-m1-state').textContent = HAS_FIRE_AUTHORITY ? 'FP-01 · electric · AUTO' : 'FP-01 · ' + UNAVAILABLE;
+            $('label-j-state').textContent = HAS_FIRE_AUTHORITY ? 'JP-01 · pressure maintain · AUTO' : 'JP-01 · ' + UNAVAILABLE;
+            $('label-m2-state').textContent = HAS_FIRE_AUTHORITY ? 'FP-02 · diesel · STANDBY' : 'FP-02 · ' + UNAVAILABLE;
+            $('label-n2-state').textContent = HAS_FIRE_AUTHORITY ? 'Hdr 2.4 bar · STANDBY' : 'Hdr · ' + UNAVAILABLE;
+        }
+
+        function setPump(node, spin, led, on, alarm, authorityAvailable) {
             var n = $(node), sp = $(spin), l = $(led);
-            if (on) {
+            if (!authorityAvailable) {
+                sp.classList.remove('spinning');
+                n.style.stroke = '#64748b';
+                n.removeAttribute('filter');
+                if (l) l.setAttribute('fill', '#64748b');
+            } else if (on) {
                 sp.classList.add('spinning');
                 n.style.stroke = alarm ? 'var(--st-alarm)' : 'var(--st-warn)';
                 n.setAttribute('filter', alarm ? 'drop-shadow(0 0 8px var(--st-alarm))' : 'drop-shadow(0 0 6px var(--st-warn))');
@@ -877,6 +1041,7 @@
         }
 
         function applyStageVisuals() {
+            renderEquipmentAuthority();
             // reset flow classes first
             firePaths.forEach(function (id) { var e = $(id); if (e) e.classList.remove('flow-fire'); });
             n2Paths.forEach(function (id) { var e = $(id); if (e) e.classList.remove('flow-n2'); });
@@ -885,14 +1050,17 @@
 
             var st = state.stage;
             // pumps run by deterministic pressure rule once confirmed (stage>=3)
-            var jOn = st >= 3 && state.press <= P_JOCKEY_ON;
-            var m1On = st >= 3 && state.press <= P_FP1_ON;
-            var m2On = st >= 4 && state.press <= P_FP2_ON;
-            setPump('node-j', 'spin-j', 'led-j', jOn, false);
-            setPump('node-m1', 'spin-m1', 'led-m1', m1On, m1On);
-            setPump('node-m2', 'spin-m2', 'led-m2', m2On, m2On);
+            var pressureAvailable = HAS_FIRE_AUTHORITY && isFiniteNumber(state.press);
+            var jOn = pressureAvailable && st >= 3 && state.press <= P_JOCKEY_ON;
+            var m1On = pressureAvailable && st >= 3 && state.press <= P_FP1_ON;
+            var m2On = pressureAvailable && st >= 4 && state.press <= P_FP2_ON;
+            setPump('node-j', 'spin-j', 'led-j', jOn, false, pressureAvailable);
+            setPump('node-m1', 'spin-m1', 'led-m1', m1On, m1On, pressureAvailable);
+            setPump('node-m2', 'spin-m2', 'led-m2', m2On, m2On, pressureAvailable);
 
-            if (jOn || m1On || m2On) {
+            if (!pressureAvailable) {
+                flowTxt.textContent = UNAVAILABLE;
+            } else if (jOn || m1On || m2On) {
                 ['path-suction', 'path-discharge', 'path-j-discharge', 'path-to-wet'].forEach(function (id) {
                     var e = $(id); if (e) e.classList.add('flow-fire');
                 });
@@ -904,13 +1072,13 @@
             }
 
             // N2 / pre-action discharge only at stage 5
-            if (st >= 5) {
+            if (HAS_FIRE_AUTHORITY && st >= 5) {
                 n2Paths.forEach(function (id) { var e = $(id); if (e) e.classList.add('flow-n2'); });
                 $('path-to-pre').classList.add('flow-fire');
                 pacv.forEach(function (id) { var e = $(id); if (e) { e.style.fill = 'rgba(239,68,68,0.2)'; e.style.stroke = 'var(--st-alarm)'; } });
                 $('spin-n2').classList.add('spinning');
                 $('node-n2').style.stroke = 'var(--st-alarm)';
-            } else if (st >= 3) {
+            } else if (HAS_FIRE_AUTHORITY && st >= 3) {
                 // pre-action lines charged but not discharging — neutral, NOT red
                 pacv.forEach(function (id) { var e = $(id); if (e) { e.style.stroke = 'var(--st-warn)'; } });
                 $('spin-n2').classList.remove('spinning');
@@ -957,8 +1125,36 @@
         // ---- Top alarm strip (rule-based counts, never random) ----
         function updateAlarmStrip() {
             var st = state.stage;
+            if (!HAS_FIRE_AUTHORITY) {
+                var unavailableStrip = $('alarm-strip');
+                unavailableStrip.className = 'alarm-strip state-warn mb-3';
+                var unavailableBanner = $('as-banner');
+                unavailableBanner.textContent = 'FIRE AUTHORITY UNAVAILABLE';
+                unavailableBanner.style.color = 'var(--st-warn)';
+                setFireStageChip(-1);
+                $('as-facp').textContent = UNAVAILABLE;
+                $('as-vesda').textContent = UNAVAILABLE;
+                $('as-crit').textContent = UNAVAILABLE;
+                $('as-sup').textContent = UNAVAILABLE;
+                $('as-trbl').textContent = UNAVAILABLE;
+                $('as-dot-facp').className = 'as-dot warn';
+                $('as-dot-vesda').className = 'as-dot warn';
+                $('as-dot-crit').className = 'as-dot warn';
+                $('as-dot-sup').className = 'as-dot warn';
+                $('as-dot-trbl').className = 'as-dot warn';
+                $('as-tank').textContent = UNAVAILABLE;
+                $('as-press').textContent = UNAVAILABLE;
+                $('as-quality').textContent = UNAVAILABLE;
+                $('as-scenario').textContent = UNAVAILABLE;
+                $('as-updated').textContent = UNAVAILABLE;
+                return;
+            }
             var crit = 0, sup = 0, trbl = 0;
-            var banner = 'FIRE SYSTEM NORMAL', bcol = 'var(--st-normal)', stripCls = 'state-normal';
+            var banner = HAS_FIRE_WATER_DESIGN_DEFICIT
+                ? 'FACP NORMAL · FIRE-WATER RESERVE DESIGN DEFICIT'
+                : 'FIRE SYSTEM NORMAL';
+            var bcol = HAS_FIRE_WATER_DESIGN_DEFICIT ? 'var(--st-warn)' : 'var(--st-normal)';
+            var stripCls = HAS_FIRE_WATER_DESIGN_DEFICIT ? 'state-warn' : 'state-normal';
             var vesda = 'Normal', vesdaDot = 'ok';
 
             if (st === 1) { sup = 1; vesda = 'Alert'; vesdaDot = 'warn';
@@ -974,6 +1170,8 @@
             var b = $('as-banner'); b.textContent = banner; b.style.color = bcol;
             // v1.23.5 doc-14 §5: highlight active chip in the fire-stages legend.
             setFireStageChip(st);
+            $('as-facp').textContent = 'Online';
+            $('as-dot-facp').className = 'as-dot ok';
             $('as-vesda').textContent = vesda;
             $('as-dot-vesda').className = 'as-dot ' + vesdaDot;
             $('as-crit').textContent = crit;
@@ -982,10 +1180,13 @@
             $('as-dot-sup').className = 'as-dot' + (sup ? ' warn' : '');
             $('as-trbl').textContent = trbl;
             $('as-dot-trbl').className = 'as-dot' + (trbl ? ' warn' : '');
-            $('as-tank').textContent = Math.round(state.tankPct) + '% / ' + volM3(state.tankPct).toFixed(0) + ' m³';
-            $('as-facp').textContent = 'Online';
-            $('as-quality').textContent = S ? S.meta.data_quality : 'GOOD';
-            $('as-scenario').textContent = (S ? S.meta.scenario : 'Simulated') + (state.armed ? ' · SIM ARMED' : '');
+            var tankVolume = volM3(state.tankPct);
+            $('as-tank').textContent = boundedPercent(state.tankPct) !== null && tankVolume !== null
+                ? Math.round(state.tankPct) + '% / ' + tankVolume.toFixed(0) + ' m³'
+                : UNAVAILABLE;
+            $('as-quality').textContent = S.meta.data_quality.trim();
+            $('as-scenario').textContent = S.meta.scenario.trim()
+                + (state.armed ? ' · SIM ARMED' : '');
         }
 
         // ---- Log ----
@@ -1003,8 +1204,10 @@
 
         // ---- Full repaint from state ----
         function repaint() {
-            $('fire-current-basis-value').textContent = IT_LOAD_MW.toFixed(2) + ' MW IT · ' +
-                TANK_CAP_M3 + ' m³ fire reserve · ' + ZONE_COUNT + ' pre-action zones';
+            $('fire-current-basis-value').textContent = HAS_CURRENT_BASIS && HAS_FIRE_AUTHORITY
+                ? IT_LOAD_MW.toFixed(2) + ' MW IT · ' + TANK_CAP_M3 + ' m³ fire reserve · '
+                    + ZONE_COUNT + ' pre-action zones'
+                : UNAVAILABLE + ' — current four-hall fire authority is missing or stale.';
             updateTankUI();
             updateGauge();
             applyStageVisuals();
@@ -1012,28 +1215,40 @@
             renderFireInterlocks();
             renderPumps();
             updateAlarmStrip();
-            $('as-updated').textContent = new Date().toLocaleTimeString('en-GB');
+            $('as-updated').textContent = HAS_FIRE_AUTHORITY
+                ? new Date().toLocaleTimeString('en-GB') : UNAVAILABLE;
         }
 
         /* ---- Static panel bindings from the single engine basis ---- */
         function bindBasis() {
-            if (S) {
-                $('basis-tag').textContent = 'Basis: IT ' + IT_LOAD_MW.toFixed(2) + ' MW · ' + RACKS + ' racks';
+            if (HAS_CURRENT_BASIS) {
+                $('basis-tag').textContent = 'Basis: IT ' + IT_LOAD_MW.toFixed(2) + ' MW · '
+                    + RACKS.toLocaleString('en-US') + ' racks';
                 $('m-it-basis').textContent = IT_LOAD_MW.toFixed(2) + ' MW';
+                $('m-it-basis').className = 'metric-val';
+            } else {
+                $('basis-tag').textContent = 'Basis: ' + UNAVAILABLE;
+                $('m-it-basis').textContent = UNAVAILABLE;
+                $('m-it-basis').className = 'metric-val warn';
             }
-            $('m-hall-vol').textContent = HALL_VOL_M3.toLocaleString() + ' m³';
-            $('m-zones').textContent = ZONE_COUNT + ' zones · all Normal';
+            $('m-hall-vol').textContent = SITE_RACK_FOOTPRINT_CONTEXT_M3
+                ? SITE_RACK_FOOTPRINT_CONTEXT_M3.toLocaleString('en-US') + ' m³ proxy' : UNAVAILABLE;
+            $('m-hall-vol').className = 'metric-val' + (SITE_RACK_FOOTPRINT_CONTEXT_M3 ? '' : ' warn');
+            $('m-zones').textContent = ZONE_COUNT ? ZONE_COUNT + ' zones · all Normal' : UNAVAILABLE;
+            $('m-zones').className = 'metric-val' + (ZONE_COUNT ? '' : ' warn');
             /* v1.134.8 — the drawing stated "Capacity 114 m3 · Required duration >= 60 min" as
                two hand-typed facts and never checked one against the other. The engine does:
                at the design pump demand this reserve lasts 42 min at the current level and
                45.6 min even FULL, against a stated 60 min. The installed tank cannot meet its
                own requirement, short by 36 m3. Stating that is the whole point of a basis. */
-            if (FIRE) {
+            var reserveFinding = $('fire-reserve-finding');
+            var shortfall = $('fire-duration-shortfall');
+            if (HAS_FIRE_RESERVE_BASIS) {
                 $('tank-cap-tag').textContent = 'Capacity ' + FIRE.reserve_capacity_m3 + ' m\u00b3 · '
                     + 'required \u2265 ' + FIRE.required_duration_min + ' min · delivers '
                     + FIRE.duration_at_full_min + ' min when full';
                 $('m-pump-demand').textContent = FIRE.pump_demand_lpm.toLocaleString() + ' L/min';
-                var shortfall = $('fire-duration-shortfall');
+                $('m-pump-demand').className = 'metric-val';
                 if (shortfall) {
                     shortfall.textContent = FIRE.capacity_shortfall_m3 > 0
                         ? ('Reserve is ' + FIRE.capacity_shortfall_m3 + ' m\u00b3 short of the '
@@ -1044,8 +1259,16 @@
                            + FIRE.duration_at_full_min + ' min full, '
                            + FIRE.duration_min + ' min at the current ' + FIRE.level_pct + '% level.')
                         : ('Reserve meets the ' + FIRE.required_duration_min + ' min requirement.');
-                    shortfall.style.color = FIRE.capacity_shortfall_m3 > 0 ? '#e4564a' : '';
                 }
+                reserveFinding.className = 'fire-scope-card finding'
+                    + (HAS_FIRE_WATER_DESIGN_DEFICIT ? ' is-warning' : '');
+            } else {
+                $('tank-cap-tag').textContent = UNAVAILABLE;
+                $('m-pump-demand').textContent = UNAVAILABLE;
+                $('m-pump-demand').className = 'metric-val warn';
+                if (shortfall) shortfall.textContent = UNAVAILABLE
+                    + ' — current reserve capacity, demand, level, or duration basis is missing.';
+                reserveFinding.className = 'fire-scope-card finding is-unavailable';
             }
             /* Pump setpoints render from the SAME constants the pressure state machine
                acts on (see jSt / fire-pump staging below), so the panel cannot display a
@@ -1058,6 +1281,19 @@
                than reading as an all-clear — on a fire panel that distinction matters. */
             $('as-disabled').title  = 'UNAVAILABLE — no point-disablement register in the current basis';
             $('m-ctrl-pwr').title   = 'UNAVAILABLE — controller power / supervisory input is not modelled in the current basis';
+            var authorityLog = $('authority-log-entry');
+            if (HAS_FIRE_AUTHORITY) {
+                authorityLog.textContent = 'System healthy · 0 active / 0 unack · static pressure stable '
+                    + P_STATIC.toFixed(1) + ' bar · FACP comms OK.';
+                authorityLog.style.color = 'rgba(52,211,153,0.8)';
+            } else {
+                authorityLog.textContent = 'Fire authority ' + UNAVAILABLE
+                    + ' · no current FACP, pressure, pump or reserve state can be asserted.';
+                authorityLog.style.color = 'var(--st-warn)';
+            }
+            $('btn-arm').disabled = !HAS_FIRE_AUTHORITY;
+            $('btn-arm').title = HAS_FIRE_AUTHORITY ? '' : UNAVAILABLE + ' — current Fire authority required';
+            $('btn-sim-fire').disabled = !HAS_FIRE_AUTHORITY || !state.armed;
         }
 
         /* ====================== Simulation control ======================
@@ -1066,6 +1302,7 @@
          * advances through this deterministic state machine.
          */
         function toggleSimArm() {
+            if (!HAS_FIRE_AUTHORITY) return;
             state.armed = !state.armed;
             var badge = $('sim-mode-badge'), armBtn = $('btn-arm'), fireBtn = $('btn-sim-fire');
             if (state.armed) {
@@ -1085,7 +1322,7 @@
         }
 
         function confirmSimFire() {
-            if (!state.armed) { return; }
+            if (!HAS_FIRE_AUTHORITY || !state.armed) { return; }
             var ok = window.confirm(
                 'SIMULATE FIRE EVENT\n\n' +
                 'This runs a STAGED demonstration of the fire cause-and-effect ' +
@@ -1117,7 +1354,9 @@
                 state.timer = setTimeout(function () {
                     s.run();
                     // deterministic pressure decay once pumps are demanded (stage>=3)
-                    if (state.stage >= 3) { state.press = Math.max(P_FP2_ON - 1, P_STATIC - (state.stage - 2) * 1.6); }
+                    if (state.stage >= 3 && P_STATIC && isFiniteNumber(state.press)) {
+                        state.press = Math.max(P_FP2_ON - 1, P_STATIC - (state.stage - 2) * 1.6);
+                    }
                     repaint();
                     step();
                 }, s.ms - (i > 1 ? seq[i - 2].ms : 0));
@@ -1130,8 +1369,12 @@
             state.timer = setInterval(function () {
                 state.countdown -= 5;
                 // deterministic tank/pressure draw-down during suppression demand
-                state.tankPct = Math.max(58, state.tankPct - 2.0);
-                state.press = Math.max(P_FP2_ON - 0.5, state.press - 0.4);
+                if (boundedPercent(state.tankPct) !== null) {
+                    state.tankPct = Math.max(58, state.tankPct - 2.0);
+                }
+                if (isFiniteNumber(state.press)) {
+                    state.press = Math.max(P_FP2_ON - 0.5, state.press - 0.4);
+                }
                 if (state.countdown <= 0) {
                     clearInterval(state.timer); state.timer = null;
                     state.stage = 5;
@@ -1147,7 +1390,7 @@
             if (state.timer) { clearTimeout(state.timer); clearInterval(state.timer); state.timer = null; }
             state.stage = 0;
             state.press = P_STATIC;
-            state.tankPct = 92;
+            state.tankPct = FIRE_LEVEL_PCT;
             state.countdown = 0;
             $('btn-sim-fire').disabled = !state.armed;
             repaint();
@@ -1200,27 +1443,36 @@
         });
 
         /* ---- Equipment tooltips / inspector (doc-10 §Modal) ---- */
+        function authorityState(value) {
+            return HAS_FIRE_AUTHORITY ? value : UNAVAILABLE;
+        }
         var equipmentSpecs = {
             'grp-main1': { title: 'FP-01 · Main Fire Pump 1', rows: [
                 ['Type', 'Electric centrifugal'], ['Capacity', '227 m³/h @ 120 m'], ['Power', '75 kW'],
-                ['Mode', 'AUTO'], ['Start setpoint', P_FP1_ON + ' bar'], ['Controller power', 'Healthy'],
-                ['Last test', '2026-05-12 (weekly churn)'], ['Cause-effect', 'Stage 3+ on low header pressure'] ] },
+                ['Mode', authorityState('AUTO')], ['Start setpoint', P_FP1_ON + ' bar'],
+                ['Controller power', authorityState('Healthy')],
+                ['Last test', authorityState('2026-05-12 (weekly churn)')],
+                ['Cause-effect', 'Stage 3+ on low header pressure'] ] },
             'grp-main2': { title: 'FP-02 · Main Fire Pump 2 (diesel)', rows: [
                 ['Type', 'Diesel centrifugal'], ['Capacity', '227 m³/h @ 120 m'],
-                ['Mode', 'AUTO standby'], ['Start setpoint', P_FP2_ON + ' bar'], ['Battery charger', 'OK'],
-                ['Fuel level', '88%'], ['Last test', '2026-05-12'], ['Cause-effect', 'Stage 4+ backup to FP-01'] ] },
+                ['Mode', authorityState('AUTO standby')], ['Start setpoint', P_FP2_ON + ' bar'],
+                ['Battery charger', authorityState('OK')], ['Fuel level', authorityState('88%')],
+                ['Last test', authorityState('2026-05-12')], ['Cause-effect', 'Stage 4+ backup to FP-01'] ] },
             'grp-jockey': { title: 'JP-01 · Jockey Pump', rows: [
                 ['Type', 'Multi-stage'], ['Capacity', '18 m³/h @ 140 m'], ['Power', '5.5 kW'],
-                ['Mode', 'AUTO'], ['Start / stop', P_JOCKEY_ON + ' / ' + P_JOCKEY_OFF + ' bar'],
-                ['Function', 'Pressure maintenance'], ['Flow switch', 'Supervised'] ] },
+                ['Mode', authorityState('AUTO')], ['Start / stop', P_JOCKEY_ON + ' / ' + P_JOCKEY_OFF + ' bar'],
+                ['Function', 'Pressure maintenance'], ['Flow switch', authorityState('Supervised')] ] },
             'grp-n2': { title: 'N2-GEN-01 · Inert Gas Generator', rows: [
-                ['Header pressure', '2.4 bar'], ['Mode', 'STANDBY'], ['Release circuit', 'Healthy'],
-                ['Protected zones', ZONE_COUNT + ' pre-action zones'], ['Abort station', 'Live'],
+                ['Header pressure', authorityState('2.4 bar')], ['Mode', authorityState('STANDBY')],
+                ['Release circuit', authorityState('Healthy')],
+                ['Protected zones', HAS_FIRE_AUTHORITY && ZONE_COUNT ? ZONE_COUNT + ' pre-action zones' : UNAVAILABLE],
+                ['Abort station', authorityState('Live')],
                 ['Hold time target', '600 s'], ['Cause-effect', 'Discharge at Stage 5 only'] ] },
             'grp-gauge': { title: 'Discharge Header', rows: [
-                ['Static pressure', P_STATIC + ' bar'], ['Low alarm', P_LOW_ALM + ' bar'],
+                ['Static pressure', P_STATIC ? P_STATIC + ' bar' : UNAVAILABLE], ['Low alarm', P_LOW_ALM + ' bar'],
                 ['Jockey on/off', P_JOCKEY_ON + ' / ' + P_JOCKEY_OFF + ' bar'],
-                ['FP-01 / FP-02 start', P_FP1_ON + ' / ' + P_FP2_ON + ' bar'], ['Pump demand', PUMP_DEMAND_LPM + ' L/min'] ] }
+                ['FP-01 / FP-02 start', P_FP1_ON + ' / ' + P_FP2_ON + ' bar'],
+                ['Pump demand', PUMP_DEMAND_LPM ? PUMP_DEMAND_LPM + ' L/min' : UNAVAILABLE] ] }
         };
         function showTooltip(e, id) {
             var spec = equipmentSpecs[id];
@@ -1258,9 +1510,11 @@
         repaint();
         // re-assert engine-true values on a stable cadence (idempotent — source
         // is the frozen scenario + deterministic state machine, never a PRNG)
-        setInterval(function () {
-            $('as-updated').textContent = new Date().toLocaleTimeString('en-GB');
-        }, 5000);
+        if (HAS_FIRE_AUTHORITY) {
+            setInterval(function () {
+                $('as-updated').textContent = new Date().toLocaleTimeString('en-GB');
+            }, 5000);
+        }
     })();
     </script>
 <script src="auth.js?v=2026-08-26-h1h2" defer></script>

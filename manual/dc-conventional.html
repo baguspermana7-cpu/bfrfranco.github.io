@@ -93,7 +93,7 @@
         "step": [
             { "@type": "HowToStep", "name": "Lock the adopted campus basis", "text": "Fix four halls at 7,500 kW current IT per hall, 10,000 kW design IT per hall, 500 racks per hall, PUE 1.45, and the authored inputs in CONV_MODEL — no user inputs, fully deterministic." },
             { "@type": "HowToStep", "name": "Derive facility and non-IT loads", "text": "Facility = IT × PUE = 30,000 × 1.45 = 43,500 kW. Non-IT = Facility − IT = 13,500 kW." },
-            { "@type": "HowToStep", "name": "Compute cooling and water metrics", "text": "CHW flow = IT load / (4.186 × ΔT) = 30,000 / (4.186 × 7.6) = 943.0 L/s. CHWS/CHWR = 19.4/27.0 °C. WUE = 1.20 L/kWh; equivalent cooling makeup = (1.20 × 30,000) / 60 = 600.0 L/min." },
+            { "@type": "HowToStep", "name": "Compute cooling and water metrics", "text": "CHWS/CHWR = 19.4/27.0 °C and ΔT = 7.6 K. The IT sensible-load CHW reference is 943.0 L/s; evaporator duty is 31,250 kW; the plant-duty CHW reference is 982.3 L/s; condenser/tower rejection is 36,403.4 kW. Both flows are calculated references and measured header flow is unavailable. WUE = 1.20 L/kWh; equivalent cooling makeup = 600.0 L/min." },
             { "@type": "HowToStep", "name": "Verify fuel autonomy", "text": "Usable fuel = 972,737 × 0.90 × 0.85 = 744,144 L; burn = 43,500 × 0.356384 = 15,503 L/hr; autonomy = 744,144 / 15,503 = 48.0 hr." }
         ]
     }
@@ -415,9 +415,11 @@
                 <span class="mn-eq">CRAH supply = rack inlet − supply mixing → 25.4 − 0.0 = 25.4 °C</span>
                 <span class="mn-eq">CHWS = CRAH supply − coil approach       → 25.4 − 6.0 = 19.4 °C</span>
                 <span class="mn-eq">ΔT = CHWR − CHWS                         → 27.0 − 19.4 = 7.6 K</span>
-                <span class="mn-eq">CHW flow = IT load / (Cp × ΔT)           → 30 000 / (4.186 × 7.6) = 943.0 L/s</span>
-                <span class="mn-eq">Heat rejection = IT + UPS loss           → 30 000 + 1 250 = 31 250 kW</span>
-                <span class="mn-where">In <code>crahSupplyAirC(m)</code>, <code>chwsC(m)</code>, <code>chwrC(m)</code>, <code>chwFlowLps(m)</code> and <code>heatRejectionKw(m)</code>. Cp = 4.186 kJ/(kg·K) for water. The 6.0 K coil approach is assumed pending selection. The separate condenser-water loop is 32.0/37.0°C and must not be labelled CHWS/CHWR.<span class="mn-src">governed rack-inlet target; engine v2 thermal chain</span></span>
+                <span class="mn-eq">IT sensible-load CHW reference = IT / (Cp × ΔT) → 30 000 / (4.186 × 7.6) = 943.0 L/s</span>
+                <span class="mn-eq">Evaporator duty = IT + UPS loss                 → 30 000 + 1 250 = 31 250 kW</span>
+                <span class="mn-eq">Plant-duty CHW reference = Qevap / (Cp × ΔT)    → 31 250 / (4.186 × 7.6) = 982.3 L/s</span>
+                <span class="mn-eq">Condenser/tower rejection = Qevap + chiller kW  → 31 250 + 5 153.4 = 36 403.4 kW</span>
+                <span class="mn-where">In <code>crahSupplyAirC(m)</code>, <code>chwsC(m)</code>, <code>chwrC(m)</code>, <code>chwFlowLps(m)</code> and the historical compatibility function <code>heatRejectionKw(m)</code>. Despite that API name, <code>snapshot.cooling.heat_rejection_kw</code> is evaporator duty; true tower rejection is <code>tower_rejection_kw_th</code>. Cp = 4.186 kJ/(kg·K) for water. The 6.0 K coil approach is assumed pending selection. Both flow values are calculated references; measured header flow is <strong>UNAVAILABLE</strong>. The separate condenser-water loop is 32.0/37.0°C and must not be labelled CHWS/CHWR.<span class="mn-src">governed rack-inlet target; engine v2 thermal chain</span></span>
             </div>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Water usage effectiveness (WUE)</h3>
@@ -485,8 +487,11 @@
                     <tr><td>Non-IT load</td><td><code>nonItLoadKw()</code></td><td>13 500</td><td>kW</td></tr>
                     <tr><td>UPS loss</td><td><code>upsLossKw()</code></td><td>1 250</td><td>kW</td></tr>
                     <tr><td>CHW ΔT</td><td><code>chwDeltaT()</code></td><td>7.6</td><td>K</td></tr>
-                    <tr><td>CHW flow</td><td><code>chwFlowLps()</code></td><td>943.0</td><td>L/s</td></tr>
-                    <tr><td>Heat rejection</td><td><code>heatRejectionKw()</code></td><td>31 250</td><td>kW</td></tr>
+                    <tr><td>IT sensible-load CHW reference</td><td><code>chwFlowLps()</code></td><td>943.0</td><td>L/s</td></tr>
+                    <tr><td>Plant-duty CHW reference</td><td><code>heatRejectionKw() / (Cp × ΔT)</code></td><td>982.3</td><td>L/s</td></tr>
+                    <tr><td>Measured CHW header flow</td><td>not bound</td><td>UNAVAILABLE</td><td>L/s</td></tr>
+                    <tr><td>Evaporator duty</td><td><code>heatRejectionKw()</code> compatibility API</td><td>31 250</td><td>kW</td></tr>
+                    <tr><td>Condenser / tower rejection</td><td><code>snapshot.cooling.tower_rejection_kw_th</code></td><td>36 403.4</td><td>kW</td></tr>
                     <tr><td>UPS per-module load</td><td><code>upsModuleKw()</code></td><td>468.8</td><td>kW</td></tr>
                     <tr><td>UPS per-system load</td><td><code>upsSystemKw()</code></td><td>15 000</td><td>kW</td></tr>
                     <tr><td>Cooling makeup flow</td><td><code>waterFlowLpmForWue()</code></td><td>600.0</td><td>L/min</td></tr>
@@ -519,8 +524,10 @@
                     <tr><td>UPS per-module kW</td><td><code>upsModuleKw()</code></td><td>kW</td><td>EPMS UPS A / UPS B gauges</td></tr>
                     <tr><td>CHW supply / return</td><td><code>model.cooling.chws_c / chwr_c</code></td><td>°C</td><td>Cooling panel — primary loop only</td></tr>
                     <tr><td>CHW ΔT</td><td><code>chwDeltaT()</code></td><td>K</td><td>Cooling panel</td></tr>
-                    <tr><td>CHW flow</td><td><code>chwFlowLps()</code></td><td>L/s</td><td>Cooling panel</td></tr>
-                    <tr><td>Heat rejection</td><td><code>heatRejectionKw()</code></td><td>kW</td><td>Cooling sanity band</td></tr>
+                    <tr><td>IT sensible-load CHW reference</td><td><code>chwFlowLps()</code></td><td>L/s</td><td>Cooling panel; calculated, not measured</td></tr>
+                    <tr><td>Plant-duty CHW reference</td><td><code>heatRejectionKw() / (Cp × ΔT)</code></td><td>L/s</td><td>Cooling reconciliation; calculated, not measured</td></tr>
+                    <tr><td>Evaporator duty</td><td><code>heatRejectionKw()</code> compatibility API</td><td>kW</td><td>Cooling plant duty</td></tr>
+                    <tr><td>Condenser / tower rejection</td><td><code>snapshot.cooling.tower_rejection_kw_th</code></td><td>kW</td><td>Condenser-water / heat-rejection plane</td></tr>
                     <tr><td>Chillers running / total</td><td><code>model.cooling.chillers_*</code></td><td>—</td><td>Cooling panel status</td></tr>
                     <tr><td>Water makeup flow</td><td><code>waterFlowLpmForWue()</code></td><td>L/min</td><td>Water panel</td></tr>
                     <tr><td>Fuel level / usable</td><td><code>model.fuel.level_pct / fuelUsableL()</code></td><td>% / L</td><td>Fuel panel gauge</td></tr>
@@ -556,8 +563,8 @@
                     <li><strong>Non-IT load:</strong> <code>43 500 − 30 000 =</code> <span class="mn-result">13 500 kW</span></li>
                     <li><strong>PUE reconciliation:</strong> <code>43 500 / 30 000 =</code> <span class="mn-result">1.45</span> ✓ (identity holds)</li>
                     <li><strong>UPS loss:</strong> <code>30 000 × (1/0.96 − 1) =</code> <span class="mn-result">1 250 kW</span> · normal system load: <code>30 000 / 2 =</code> <span class="mn-result">15 000 kW</span> · module load: <code>30 000 / 64 =</code> <span class="mn-result">468.75 kW</span></li>
-                    <li><strong>CHW ΔT:</strong> <code>27.0 − 19.4 =</code> <span class="mn-result">7.6 K</span> · CHW flow: <code>30 000 / (4.186 × 7.6) =</code> <span class="mn-result">943.0 L/s</span></li>
-                    <li><strong>Heat rejection:</strong> <code>30 000 + 1 250 =</code> <span class="mn-result">31 250 kW</span></li>
+                    <li><strong>CHW references:</strong> <code>27.0 − 19.4 =</code> <span class="mn-result">7.6 K</span> · IT sensible-load reference: <code>30 000 / (4.186 × 7.6) =</code> <span class="mn-result">943.0 L/s</span> · evaporator-duty reference: <code>31 250 / (4.186 × 7.6) =</code> <span class="mn-result">982.3 L/s</span> · measured header flow: <span class="mn-result">UNAVAILABLE</span></li>
+                    <li><strong>Thermal duties:</strong> evaporator: <code>30 000 + 1 250 =</code> <span class="mn-result">31 250 kW</span> · condenser/tower: <code>31 250 + 5 153.4 =</code> <span class="mn-result">36 403.4 kW</span></li>
                     <li><strong>WUE check:</strong> 1.20 L/kWh (basis) · equivalent cooling makeup: <code>(1.20 × 30 000) / 60 =</code> <span class="mn-result">600.0 L/min</span></li>
                     <li><strong>Carbon rate:</strong> <code>43 500 × 0.42 =</code> <span class="mn-result">18 270 kgCO₂/hr</span> · CUE (IT-basis): <code>0.42 × 1.45 =</code> <span class="mn-result">0.609 kgCO₂/kWh-IT</span></li>
                     <li><strong>Usable fuel:</strong> <code>972 737 × 0.90 × 0.85 =</code> <span class="mn-result">744 144 L</span> · burn: <code>43 500 × 0.356384 =</code> <span class="mn-result">15 503 L/hr</span> · autonomy: <code>744 144 / 15 503 =</code> <span class="mn-result">48.0 hr</span></li>
@@ -648,11 +655,11 @@
                     <tr><td>Comms / stale</td><td><code>as-comms</code>, <code>as-stale</code></td><td>Model-integrity check.</td><td>Comms OK means a versioned local snapshot exists; stale 0 means the frozen scenario has no acquisition-age concept.</td></tr>
                     <tr><td>Last Update</td><td><code>as-update</code></td><td>Browser clock.</td><td>Display time, not field sample time.</td></tr>
                     <tr><td>UPS A/B</td><td><code>sUpsA</code>, <code>sUpsB</code></td><td>Derived from two 40,000 kW-rated systems, 32 × 1,250 kW modules/system.</td><td>15,000 kW/system normal (37.5%); 30,000 kW failover (75%); nameplates remain assumed pending approved schedule.</td></tr>
-                    <tr><td>Chillers</td><td>Chillers row / shared basis drawer</td><td>7/10 derived from current 31,250 kW duty, 5,000 kW<sub>th</sub>/unit and central N+1.</td><td>Per-hall allocation remains unavailable until the hydronic distribution design exists.</td></tr>
-                    <tr><td>Network / topology / uptime</td><td>Network, UPS Topology, Uptime rows</td><td>Static modeled state / unavailable evidence.</td><td>Online and 2N OK are overview claims; uptime fails closed as UNAVAILABLE because it is not event-derived.</td></tr>
-                    <tr><td>Environment DP</td><td>DP +2.1 Pa row</td><td>Static presentation.</td><td>No pressure-sensor source, timestamp or alarm threshold is currently bound.</td></tr>
-                    <tr><td>FACP / VESDA</td><td>Safety rows</td><td>Static presentation.</td><td>Normal state is not proof of detector, panel, cause-effect or suppression compliance.</td></tr>
-                    <tr><td>Day tank</td><td>Day Tank 92% row</td><td>Static presentation.</td><td>Bulk-tank 85%/48 h arithmetic does not validate this separate buffer value.</td></tr>
+                    <tr><td>Chillers</td><td>Chillers row / shared basis drawer</td><td>7/10 derived from current 31,250 kW evaporator duty, 5,000 kW<sub>th</sub>/unit and central N+1.</td><td>Per-hall allocation remains unavailable until the hydronic distribution design exists.</td></tr>
+                    <tr><td>Network / topology / uptime</td><td>Network, UPS Topology, Uptime rows</td><td>UNAVAILABLE.</td><td>No dedicated network/topology authority or authenticated downtime event log is bound on the overview.</td></tr>
+                    <tr><td>Environment DP</td><td>Differential Pressure row</td><td>UNAVAILABLE.</td><td>No pressure-sensor source, timestamp or alarm threshold is currently bound.</td></tr>
+                    <tr><td>FACP / VESDA</td><td>Safety rows</td><td>UNAVAILABLE.</td><td>The overview has no bound fire-panel authority; the dedicated Fire cockpit owns validated fire state.</td></tr>
+                    <tr><td>Day tank</td><td>Day Tank row</td><td>UNAVAILABLE.</td><td>Bulk-tank 85%/48 h arithmetic does not validate a separate per-genset buffer value.</td></tr>
                     <tr><td>Data Quality / Scenario</td><td><code>as-dq</code>, <code>as-scn</code></td><td>Snapshot metadata.</td><td>GOOD describes internal model availability; Simulated is the governing provenance.</td></tr>
                     <tr><td>EPMS final rack path</td><td><code>w_ats_rack_*</code></td><td>Modeled topology state in <code>EPMS_Telemetry.html</code>.</td><td>The conductor inherits its actual energizing source; red/green never replaces source and energized-state text.</td></tr>
                     <tr><td>Four-hall design-point appendix</td><td>Design Studio current-plus-study</td><td>Governed planning-study envelope paired with the adopted operating snapshot.</td><td>4 × 10 MW = 40 MW IT and 58 MW facility are the design-point study; current remains 4 × 7.5 MW = 30 MW IT.</td></tr>

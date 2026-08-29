@@ -92,8 +92,8 @@
         "name": "How to derive makeup-water flow and annual consumption from WUE",
         "step": [
             { "@type": "HowToStep", "name": "Fix the WUE basis", "text": "Establish the site WUE basis value in L/kWh (Rule 3: denominator is IT-energy, not facility-energy). Basis for this site: 1.20 L/kWh (sensor-read target, doc-09 line 13)." },
-            { "@type": "HowToStep", "name": "Compute instant makeup flow", "text": "Instant makeup flow (L/min) = (WUE × IT load kW) / 60. At 1850 kW: (1.20 × 1850) / 60 = 37.0 L/min." },
-            { "@type": "HowToStep", "name": "Compute annual water consumption", "text": "Annual water (L) = WUE × annual IT kWh = 1.20 × (1850 × 8760) ≈ 19,447,200 L ≈ 19.4 ML." },
+            { "@type": "HowToStep", "name": "Compute site cooling makeup", "text": "Cooling makeup (L/min) = (WUE × site IT kW) / 60. At 30,000 kW: (1.20 × 30,000) / 60 = 600 L/min." },
+            { "@type": "HowToStep", "name": "Compute annual WUE-included water", "text": "Annual cooling water = WUE × annual IT energy = 1.20 × (30,000 × 8,760) = 315,360,000 L = 315.36 ML." },
             { "@type": "HowToStep", "name": "Check blowdown and TDS cycles", "text": "Blowdown flow = makeup_flow × (1/cycles_of_concentration). Max cycles ≤ 5 per water-quality target. Monitor TDS; blow down when TDS approaches limit." }
         ]
     }
@@ -108,7 +108,7 @@
             {
                 "@type": "Question",
                 "name": "What is WUE and what is its denominator?",
-                "acceptedAnswer": { "@type": "Answer", "text": "Water Usage Effectiveness (WUE) = annual site water consumption (L) ÷ annual IT energy (kWh). The denominator is IT energy, NOT facility (total) energy — this is Rule 3 of the conv-engine accuracy standard. The basis for this site is 1.20 L/kWh (doc-09 line 13). It is a basis/target value; the live cockpit sensor-reads the flow meter and back-computes WUE in real time." }
+                "acceptedAnswer": { "@type": "Answer", "text": "Water Usage Effectiveness (WUE) = annual site water consumption (L) divided by annual IT energy (kWh). The denominator is IT energy, not facility energy. This simulated cockpit adopts 1.20 L/kWh and derives 600 L/min cooling makeup at 30,000 kW IT; it does not claim a live meter." }
             },
             {
                 "@type": "Question",
@@ -117,8 +117,8 @@
             },
             {
                 "@type": "Question",
-                "name": "Why is the filtration ΔP threshold 2.0 bar?",
-                "acceptedAnswer": { "@type": "Answer", "text": "2.0 bar differential pressure across the multimedia/sand filter is the standard backwash trigger per manufacturer data and site commissioning. Below this the filter is operating normally; at or above 2.0 bar the media is fouled and a backwash cycle must be initiated to restore flow capacity and avoid breakthrough of suspended solids." }
+                "name": "What filtration differential-pressure threshold does this cockpit use?",
+                "acceptedAnswer": { "@type": "Answer", "text": "The adopted simulated threshold is 0.80 bar and the current value is 0.40 bar. A real backwash threshold must come from the selected filter manufacturer and commissioned clean/dirty pressure-drop data." }
             }
         ]
     }
@@ -311,9 +311,9 @@
         <header class="mn-hero">
             <p class="mn-eyebrow">Technical Manual · Water &amp; WUE</p>
             <h1>Water System &amp; WUE — Cockpit Methodology &amp; Formulas</h1>
-            <p>Every input, formula, constant, output, and reference behind the Water System &amp; WUE cockpit. All derived values originate from the deterministic engine <code class="mn-mono">js/conv-engine.js</code> (<code class="mn-mono">CONV_CALC.waterFlowLpmForWue</code>, <code class="mn-mono">wueFromFlowLpm</code>) anchored to the single-scenario basis in <code class="mn-mono">CONV_MODEL</code> — no back-solved constants, no random values. Real-time instrument reads (flow meter, conductivity probe, ΔP transducer) override the basis values when the cockpit is live.</p>
+            <p>Every input, formula, constant, output, and reference behind the site-wide municipal Water Treatment &amp; Service cockpit. Site balance and WUE values derive from <code class="mn-mono">CONV_CALC v2.0.0</code>; treatment-process states are explicitly labelled, deterministic page-authored simulation values because the engine has no treatment-train telemetry authority. No live meter overrides are implied. Missing or stale site authority fails closed to <strong>UNAVAILABLE</strong>.</p>
             <div class="mn-meta">
-                <span class="mn-chip">Engine <strong>CONV_CALC v1.0.0</strong></span>
+                <span class="mn-chip">Engine <strong>CONV_CALC v2.0.0</strong></span>
                 <span class="mn-chip">WUE Basis <strong>1.20 L/kWh IT</strong></span>
                 <span class="mn-chip">Inputs <strong>water-quality probe + valve controls</strong></span>
                 <span class="mn-chip">Source <strong>conv review 09</strong></span>
@@ -329,26 +329,26 @@
         <!-- 1. PURPOSE -->
         <section class="mn-section" id="purpose">
             <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
-            <p class="mn-lead">The cockpit monitors three interlocked water subsystems in a conventional data-centre facility: (1) <strong>cooling-tower makeup water</strong> — quantified by WUE; (2) <strong>water treatment</strong> — chemical dosing, TDS control, blowdown scheduling, and ASHRAE 188 / ISO 11731-2 Legionella management; and (3) <strong>filtration</strong> — multimedia pre-treatment with differential-pressure alarming at the 2.0 bar threshold. Its primary KPI, WUE, is derived from a single frozen scenario basis and then continuously refined by live sensor reads.</p>
-            <p class="mn-lead"><strong>Truth boundary:</strong> the displayed 37.0 L/min cooling-makeup equivalent and 1.20 L/kWh ratio belong to the current 1.850 MW IT scenario. A four-hall study water balance applies only to its declared evaporative heat rejection and remains unavailable until ambient design conditions, cycles of concentration, drift, blowdown and water-quality inputs are approved.</p>
-            <p class="mn-lead">Engineering basis: <strong>conv review document 09</strong> ("09-engineering-basis-and-calculations.md") lines 99–104 and 189–190, cross-referenced against the Uptime Institute WUE metric definition. The single-scenario IT load is <strong>1,850 kW</strong> (current) against a design capacity of 2,000 kW. Every water-volume number on every page of the Conventional BMS suite is derived from the same <code class="mn-mono">CONV_MODEL</code> object so the suite is internally consistent.</p>
+            <p class="mn-lead">The cockpit models one <strong>site-wide municipal treatment train</strong>: incoming meter, raw-water storage, media filtration, duty/standby booster pumps, dosing, UV treatment, treated-water storage, cooling makeup, domestic/process service and drain. Hall A-D are downstream electrical/thermal operating views; they do not partition the municipal plant.</p>
+            <p class="mn-lead"><strong>Truth boundary:</strong> current site IT is 30,000 kW. WUE-included cooling makeup is 600 L/min; domestic/process service is 8 L/min; total treated flow is 608 L/min. Selecting or inspecting a Hall must not change these site quantities.</p>
+            <p class="mn-lead">The WUE definition follows the Uptime Institute site-water-to-IT-energy denominator. Treatment flow, cooling makeup and domestic/process flow remain separately labelled so the total is auditable.</p>
             <div class="mn-note"><strong>Rule 3 — WUE denominator:</strong> WUE = annual site water consumption (L) ÷ annual IT energy (kWh). The denominator is <em>IT energy only</em>, not facility (total) energy. Using facility energy (PUE × IT) deflates WUE by ~PUE (1.45×) and understates the cooling-system water intensity. This rule is accuracy-gate-enforced in <code class="mn-mono">CONV_CALC</code>.</div>
         </section>
 
         <!-- 2. INPUTS -->
         <section class="mn-section" id="inputs">
-            <h2><span class="mn-num">02</span> Inputs — water-quality probe reads &amp; valve controls</h2>
-            <p class="mn-lead">The cockpit receives two classes of input: (a) basis constants from <code class="mn-mono">CONV_MODEL</code> (fixed scenario values) and (b) live sensor reads from water-quality probes and valve position feedback. The table below distinguishes them.</p>
+            <h2><span class="mn-num">02</span> Inputs — simulated point model &amp; control states</h2>
+            <p class="mn-lead">The cockpit binds adopted engine constants and deterministic simulated instrument/control states. The tags model what a commissioned system would expose, but no point is presented as live telemetry.</p>
             <div class="mn-tablewrap">
             <table class="mn-table">
                 <thead><tr><th>Input</th><th>Symbol</th><th>Unit</th><th>Type</th><th>Meaning</th></tr></thead>
                 <tbody>
-                    <tr><td>IT load <code>it_load_kw</code></td><td><code>P<sub>IT</sub></code></td><td>kW</td><td>Basis (1,850 kW)</td><td>Current IT power draw — single source of truth from CONV_MODEL. Live cockpit may read the EPMS meter; basis value is the scenario anchor.</td></tr>
-                    <tr><td>WUE basis <code>wue_l_per_kwh</code></td><td><code>WUE</code></td><td>L/kWh</td><td>Basis (1.20 L/kWh)</td><td>Site water-usage effectiveness. <em>Basis value</em> from doc-09 line 13. Live read: back-computed from measured flow meter ÷ IT load.</td></tr>
-                    <tr><td>Makeup flow <code>flow_lpm</code></td><td><code>Q<sub>mu</sub></code></td><td>L/min</td><td>Sensor-read (flow meter)</td><td>Instantaneous makeup water entering the cooling-tower basin. Sensor primary; basis derivation is the fallback.</td></tr>
-                    <tr><td>Conductivity / TDS <code>tds_ppm</code></td><td><code>TDS</code></td><td>ppm (mg/L)</td><td>Sensor-read (conductivity probe)</td><td>Total dissolved solids in tower basin water. Drives blowdown logic and cycles-of-concentration calculation.</td></tr>
-                    <tr><td>Feed-water TDS <code>tds_feed_ppm</code></td><td><code>TDS<sub>feed</sub></code></td><td>ppm</td><td>Sensor-read or lab sample</td><td>Mains / RO permeate TDS. Used in cycles-of-concentration formula.</td></tr>
-                    <tr><td>Filtration ΔP <code>delta_p_bar</code></td><td><code>ΔP</code></td><td>bar</td><td>Sensor-read (ΔP transducer)</td><td>Differential pressure across the multimedia/sand filter. Threshold 2.0 bar triggers backwash alarm.</td></tr>
+                    <tr><td>Site IT load <code>it_load_kw</code></td><td><code>P<sub>IT</sub></code></td><td>kW</td><td>Current (30,000 kW)</td><td>Adopted simulated site authority from CONV_CALC.</td></tr>
+                    <tr><td>WUE basis <code>wue_l_per_kwh</code></td><td><code>WUE</code></td><td>L/kWh</td><td>Adopted (1.20 L/kWh)</td><td>Site water-usage effectiveness from the governed snapshot.</td></tr>
+                    <tr><td>Makeup flow <code>flow_lpm</code></td><td><code>Q<sub>mu</sub></code></td><td>L/min</td><td>Engine-derived</td><td>600 L/min WUE-included cooling makeup.</td></tr>
+                    <tr><td>Conductivity / TDS <code>tds_ppm</code></td><td><code>TDS</code></td><td>ppm (mg/L)</td><td>Simulated probe</td><td>Current deterministic treated-water value; a live implementation would drive blowdown from a quality-qualified point.</td></tr>
+                    <tr><td>Feed-water TDS <code>tds_feed_ppm</code></td><td><code>TDS<sub>feed</sub></code></td><td>ppm</td><td>Simulated input</td><td>Municipal/feed-water quality context.</td></tr>
+                    <tr><td>Filtration ΔP <code>delta_p_bar</code></td><td><code>ΔP</code></td><td>bar</td><td>Simulated transducer</td><td>Current 0.40 bar; 0.80 bar triggers the modelled backwash threshold.</td></tr>
                     <tr><td>Valve states <code>valve_*</code></td><td>—</td><td>open / closed / %</td><td>Control feedback</td><td>Blowdown valve, makeup valve, bypass valve positions — logged for audit and interlock checks.</td></tr>
                     <tr><td>Chemical dosing <code>dose_*</code></td><td>—</td><td>L/hr or kg/day</td><td>Controller feedback</td><td>Biocide, scale inhibitor, and corrosion inhibitor dosing rates — inputs to ASHRAE 188 Water Management Plan compliance log.</td></tr>
                 </tbody>
@@ -365,42 +365,43 @@
             <div class="mn-formula">
                 <span class="mn-eq">WUE = Annual_water_L / Annual_IT_kWh        [L/kWh]</span>
                 <span class="mn-eq">WUE = (Q_mu_Lpm × 60) / P_IT_kW            (instant back-compute from live flow)</span>
-                <span class="mn-where">In <code>wueFromFlowLpm(m, flowLpm)</code>. Denominator = IT energy. Basis: 1.20 L/kWh (doc-09 line 13). This is a <em>basis/target</em> value; the sensor-read flow meter back-computes live WUE each scan.<span class="mn-src">conv review 09 · BASIS</span></span>
+                <span class="mn-where">In <code>wueFromFlowLpm(m, flowLpm)</code>. Denominator = site IT energy. The 1.20 L/kWh value is an adopted simulated project basis; a future live mode would require a quality-qualified municipal/cooling makeup meter and site IT meter.<span class="mn-src">CONV_CALC v2.0.0 · Uptime WUE definition</span></span>
             </div>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Instant makeup-water flow from WUE</h3>
             <div class="mn-formula">
                 <span class="mn-eq">Q_mu = (WUE × P_IT) / 60        [L/min]</span>
-                <span class="mn-where">In <code>waterFlowLpmForWue(m)</code>. Converts the per-hour WUE rate to a per-minute flow for instrumentation display. Check: (1.20 × 1850) / 60 = <strong>37.0 L/min</strong>.<span class="mn-src">conv review 09 · DERIVED</span></span>
+                <span class="mn-where">In <code>waterFlowLpmForWue(m)</code>. Converts the WUE rate to a site cooling-makeup equivalent. Check: (1.20 × 30,000) / 60 = <strong>600 L/min</strong>.<span class="mn-src">CONV_CALC v2.0.0 · DERIVED</span></span>
             </div>
-            <div class="mn-note"><strong>Makeup vs circulation distinction:</strong> <code>Q_mu</code> (37.0 L/min at basis) is the <em>net fresh water added</em> to replace evaporation + blowdown + drift. The <em>circulation flow</em> through the tower deck and heat exchangers is typically 20–50× larger. The two must never be conflated — confusing them overstates WUE consumption by that factor.</div>
+            <div class="mn-note"><strong>Makeup vs treatment vs circulation:</strong> <code>Q_mu = 600 L/min</code> is WUE-included cooling makeup. Site treatment total is 608 L/min after adding 8 L/min domestic/process service. Neither value is condenser-water circulation flow; circulation is a separate hydraulic quantity.</div>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Annual water consumption</h3>
             <div class="mn-formula">
                 <span class="mn-eq">Annual_water_L = WUE × P_IT × 8760        [L/yr]</span>
-                <span class="mn-where">Assumes full-year operation at the scenario IT load. Check: 1.20 × 1850 × 8760 = <strong>19,447,200 L ≈ 19.4 ML/yr</strong>. Displayed on the cockpit's annual summary panel.<span class="mn-src">conv review 09 · DERIVED</span></span>
+                <span class="mn-where">At the adopted steady load: 1.20 × 30,000 × 8,760 = <strong>315,360,000 L = 315.36 ML/yr</strong> of WUE-included cooling water. Adding 8 L/min domestic/process continuously would make total treatment 319.565 ML/yr.<span class="mn-src">CONV_CALC v2.0.0 · DERIVED</span></span>
             </div>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Cycles of concentration &amp; blowdown</h3>
             <div class="mn-formula">
                 <span class="mn-eq">CoC = TDS_basin / TDS_feed        (dimensionless, target ≤ 5)</span>
-                <span class="mn-eq">Q_bd = Q_mu / (CoC − 1)           [L/min]  (blowdown flow to maintain CoC)</span>
-                <span class="mn-eq">Q_evap = Q_mu − Q_bd − Q_drift    [L/min]  (evaporation, residual)</span>
-                <span class="mn-where">CoC ≤ 5 limits scale-forming ion concentration while minimising water waste. At CoC = 5 blowdown is 25% of makeup. Conductivity probe monitors TDS<sub>basin</sub>; the controller triggers the blowdown valve when TDS<sub>basin</sub> approaches TDS<sub>feed</sub> × CoC<sub>max</sub>. Drift is typically &lt;0.002% of circulation (eliminated by drift eliminators).<span class="mn-src">Uptime WUE · ASHRAE 188 · DERIVED</span></span>
+                <span class="mn-eq">Q_drift = 0.005 × Q_mu             [L/min]  (adopted model fraction)</span>
+                <span class="mn-eq">Q_bd = (Q_mu − Q_drift) / CoC     [L/min]</span>
+                <span class="mn-eq">Q_evap = (Q_mu − Q_drift) × (CoC − 1) / CoC</span>
+                <span class="mn-where">At the adopted CoC 4 and 600 L/min makeup, the deterministic model gives 3.0 L/min drift, 149.3 L/min blowdown and 447.8 L/min evaporation after display rounding. These are simulation allocations, not commissioned water chemistry.<span class="mn-src">water-system.html current split algorithm</span></span>
             </div>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Filtration differential pressure</h3>
             <div class="mn-formula">
                 <span class="mn-eq">ΔP_clean ≈ 0.3–0.5 bar           (new media, design point)</span>
-                <span class="mn-eq">ΔP_alarm = 2.0 bar                (backwash trigger threshold)</span>
-                <span class="mn-where">Measured by a ΔP transducer across the multimedia filter inlet/outlet. Rising ΔP indicates media fouling or biological growth. At 2.0 bar the head loss exceeds acceptable limits and a backwash cycle is automatically (or manually) initiated. Threshold is from site commissioning data — not a universal standard; confirm against installed filter manufacturer data sheet.<span class="mn-src">Site commissioning · INSTRUMENT</span></span>
+                <span class="mn-eq">ΔP_current = 0.40 bar; ΔP_backwash = 0.80 bar (adopted simulation)</span>
+                <span class="mn-where">A differential-pressure transducer would be installed across the media filter. Rising ΔP can indicate fouling, but the production backwash threshold must come from the selected filter manufacturer and commissioned clean/dirty curves.<span class="mn-src">Project simulation · manufacturer authority required</span></span>
             </div>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Legionella / microbiological monitoring (ASHRAE 188)</h3>
             <div class="mn-formula">
-                <span class="mn-eq">HPC ≤ 1×10³ CFU/mL                (operational target, ISO 11731-2)</span>
-                <span class="mn-eq">Legionella spp. &lt; 1 CFU/100 mL   (ASHRAE 188 action level)</span>
-                <span class="mn-where">Cooling towers are a Legionella growth environment (warm water, nutrients, aerosol). ASHRAE 188 Water Management Plan mandates documented control targets, sampling frequency, and corrective actions. Biocide dosing (oxidising + non-oxidising rotation) and blowdown together keep heterotrophic plate count (HPC) and Legionella below action levels.<span class="mn-src">ASHRAE 188 · ISO 11731-2 · STANDARD</span></span>
+                <span class="mn-eq">Program limits = site Water Management Plan / AHJ authority</span>
+                <span class="mn-eq">Laboratory method = approved Legionella sampling and enumeration procedure</span>
+                <span class="mn-where">ASHRAE 188 establishes a risk-management and Water Management Program framework; it does not supply one universal numerical action level for every site. ISO 11731 provides a Legionella culture method. Project limits, sampling cadence and corrective actions must be approved and documented separately.<span class="mn-src">ASHRAE 188 · ISO 11731</span></span>
             </div>
         </section>
 
@@ -413,16 +414,16 @@
                 <thead><tr><th>Constant</th><th>Value</th><th>Unit</th><th>Source</th><th>Type</th></tr></thead>
                 <tbody>
                     <tr><td><code>wue_l_per_kwh</code></td><td>1.20</td><td>L/kWh IT</td><td>doc-09 line 13; doc-01 §3</td><td>Basis (target)</td></tr>
-                    <tr><td><code>it_load_kw</code></td><td>1,850</td><td>kW</td><td>doc-09 line 10</td><td>Basis (current)</td></tr>
+                    <tr><td><code>it_load_kw</code></td><td>30,000</td><td>kW</td><td>CONV_CALC v2.0.0</td><td>Adopted current site basis</td></tr>
                     <tr><td>Annual hours</td><td>8,760</td><td>hr/yr</td><td>Calendar constant</td><td>Fixed</td></tr>
                     <tr><td>Max CoC</td><td>5</td><td>—</td><td>Water management practice; ASHRAE 188 guidance</td><td>Operational target</td></tr>
-                    <tr><td>Filtration ΔP alarm</td><td>2.0</td><td>bar</td><td>Site commissioning data sheet</td><td>Instrument threshold</td></tr>
-                    <tr><td>Legionella action level</td><td>&lt;1 CFU/100 mL</td><td>CFU/100 mL</td><td>ASHRAE 188</td><td>Regulatory threshold</td></tr>
-                    <tr><td>HPC operational target</td><td>≤1×10³ CFU/mL</td><td>CFU/mL</td><td>ISO 11731-2</td><td>Operational target</td></tr>
+                    <tr><td>Filtration ΔP backwash threshold</td><td>0.80</td><td>bar</td><td>Adopted simulated operating basis</td><td>Instrument threshold</td></tr>
+                    <tr><td>Legionella action level</td><td>UNAVAILABLE</td><td>site-defined</td><td>Water Management Program / AHJ</td><td>No universal value asserted</td></tr>
+                    <tr><td>Laboratory method</td><td>Project-selected</td><td>method</td><td>ISO 11731 context</td><td>Test method, not an operating limit</td></tr>
                 </tbody>
             </table>
             </div>
-            <div class="mn-note"><strong>Basis vs sensor-read:</strong> <code>wue_l_per_kwh = 1.20</code> is a <em>basis target</em> from the engineering review — it is what the system was designed to achieve. In live cockpit operation the flow meter provides actual <code>Q_mu</code>; the system back-computes <em>actual</em> WUE via <code>wueFromFlowLpm()</code>. When the two diverge (actual WUE &gt; 1.20), the delta surfaces as a water-efficiency alert. The basis chip on the KPI panel always labels which value is shown.</div>
+            <div class="mn-note"><strong>Simulated authority boundary:</strong> site water balance, IT load and <code>wue_l_per_kwh = 1.20</code> are engine-derived. Raw/domestic tank level, filter ΔP, TDS, chlorine dose, UV intensity and booster-pump state are authority-gated deterministic page-authored process simulation values; <code>CONV_CALC</code> does not provide treatment-train telemetry. A future live mode must qualify both water and IT meters for freshness and quality before computing actual WUE; no simulated value is presented as a field measurement.</div>
         </section>
 
         <!-- 5. OUTPUTS -->
@@ -433,13 +434,14 @@
                 <thead><tr><th>Output</th><th>Formula</th><th>Unit</th><th>Interpretation</th></tr></thead>
                 <tbody>
                     <tr><td>WUE (basis)</td><td><code>CONV_MODEL.environment.wue_l_per_kwh</code></td><td>L/kWh</td><td>Target value from engineering review. Green chip on cockpit.</td></tr>
-                    <tr><td>WUE (live)</td><td><code>wueFromFlowLpm(lpm)</code></td><td>L/kWh</td><td>Computed from measured flow meter. Alarm if &gt; basis.</td></tr>
-                    <tr><td>Instant makeup flow</td><td><code>waterFlowLpmForWue(m)</code></td><td>L/min</td><td>37.0 L/min at basis. Flow-meter primary.</td></tr>
-                    <tr><td>Annual water consumption</td><td><code>WUE × P_IT × 8760</code></td><td>L/yr (ML/yr)</td><td>≈ 19.4 ML/yr at basis. Summary panel.</td></tr>
+                    <tr><td>WUE reconciliation</td><td><code>wueFromFlowLpm(lpm)</code></td><td>L/kWh</td><td>Computed from the same simulated site cooling-makeup and IT authority.</td></tr>
+                    <tr><td>Cooling makeup</td><td><code>waterFlowLpmForWue(m)</code></td><td>L/min</td><td>600 L/min WUE-included site basis.</td></tr>
+                    <tr><td>Total treatment</td><td><code>cooling makeup + domestic/process</code></td><td>L/min</td><td>600 + 8 = 608 L/min.</td></tr>
+                    <tr><td>Annual cooling water</td><td><code>WUE × P_IT × 8760</code></td><td>L/yr (ML/yr)</td><td>315.36 ML/yr at the adopted steady load.</td></tr>
                     <tr><td>Cycles of concentration</td><td><code>TDS_basin / TDS_feed</code></td><td>—</td><td>Target ≤ 5. Amber alert at CoC &gt; 4.5, red at CoC &gt; 5.</td></tr>
                     <tr><td>Blowdown flow</td><td><code>Q_mu / (CoC − 1)</code></td><td>L/min</td><td>Required blowdown to maintain target CoC.</td></tr>
-                    <tr><td>Filtration ΔP status</td><td>ΔP transducer reading</td><td>bar</td><td>Green &lt;1.5 bar, amber 1.5–2.0, red ≥ 2.0 (backwash required).</td></tr>
-                    <tr><td>Legionella / HPC status</td><td>Lab / online probe result</td><td>CFU/mL or CFU/100 mL</td><td>ASHRAE 188 action-level indicator.</td></tr>
+                    <tr><td>Filtration ΔP status</td><td>ΔP transducer reading</td><td>bar</td><td>Current 0.40 bar; backwash threshold 0.80 bar.</td></tr>
+                    <tr><td>Legionella / HPC status</td><td>Approved laboratory result</td><td>method-dependent</td><td>Compared only with the site Water Management Program; UNAVAILABLE in this simulation.</td></tr>
                     <tr><td>Chemical dosing status</td><td>Dosing controller feedback</td><td>L/hr / kg/day</td><td>On-duty/off indicator per biocide and inhibitor channel.</td></tr>
                 </tbody>
             </table>
@@ -449,19 +451,18 @@
         <!-- 6. WORKED EXAMPLE -->
         <section class="mn-section" id="worked-example">
             <h2><span class="mn-num">06</span> Worked example</h2>
-            <p class="mn-lead">Scenario: basis IT load 1,850 kW, WUE 1.20 L/kWh, TDS<sub>feed</sub> = 150 ppm, TDS<sub>basin</sub> = 600 ppm (CoC = 4), filtration ΔP = 1.1 bar. All numbers reproduce <code class="mn-mono">CONV_CALC</code> output exactly.</p>
+            <p class="mn-lead">Scenario: current site IT 30,000 kW, WUE 1.20 L/kWh, 600 L/min cooling makeup, 8 L/min domestic/process service, TDS 140 ppm, and filtration ΔP 0.40 bar. Water treatment is one site-wide municipal process train.</p>
             <div class="mn-worked">
                 <ol>
-                    <li>Instant makeup flow: <code>Q_mu = (1.20 × 1850) / 60 =</code> <span class="mn-result">37.0 L/min</span> <span style="color:var(--mn-muted);font-size:0.8rem;">(basis; flow meter overrides in live mode)</span></li>
-                    <li>Annual water consumption: <code>1.20 × 1850 × 8760 =</code> <span class="mn-result">19,447,200 L ≈ 19.4 ML/yr</span></li>
-                    <li>Live WUE back-compute (if meter reads 38.5 L/min): <code>(38.5 × 60) / 1850 =</code> <span class="mn-result">1.249 L/kWh</span> → above basis 1.20, water-efficiency alert</li>
-                    <li>Cycles of concentration: <code>600 / 150 =</code> <span class="mn-result">CoC 4.0</span> (within ≤ 5 target ✓)</li>
-                    <li>Required blowdown to hold CoC = 4: <code>37.0 / (4 − 1) =</code> <span class="mn-result">12.3 L/min</span></li>
-                    <li>Filtration ΔP = 1.1 bar → <span class="mn-result">NORMAL</span> (threshold 2.0 bar, no backwash required)</li>
-                    <li>Annual water with blowdown included: evaporation = <code>37.0 − 12.3 − ~0.07 (drift) ≈</code> <span class="mn-result">24.6 L/min evaporated</span>; total input = <span class="mn-result">37.0 L/min makeup</span> (steady state)</li>
+                    <li>Cooling makeup: <code>Q_mu = (1.20 × 30,000) / 60 =</code> <span class="mn-result">600 L/min</span>.</li>
+                    <li>Total treatment: <code>600 + 8 =</code> <span class="mn-result">608 L/min</span>.</li>
+                    <li>Annual WUE-included cooling water: <code>600 × 60 × 8,760 =</code> <span class="mn-result">315.36 ML/yr</span>.</li>
+                    <li>Current cooling split: evaporation <span class="mn-result">447.8 L/min</span> + blowdown <span class="mn-result">149.3 L/min</span> + drift <span class="mn-result">3.0 L/min</span> = 600.1 L/min after display rounding.</li>
+                    <li>Annual components: evaporation <span class="mn-result">235.364 ML</span>, blowdown <span class="mn-result">78.472 ML</span>, drift <span class="mn-result">1.577 ML</span>.</li>
+                    <li>Filtration ΔP = 0.40 bar → <span class="mn-result">NORMAL</span> (backwash threshold 0.80 bar).</li>
                 </ol>
             </div>
-            <div class="mn-note"><strong>Engineering reading:</strong> at CoC = 4 the blowdown is 33% of makeup (12.3 of 37.0 L/min). Raising CoC to 5 would drop blowdown to 25% (9.3 L/min), saving ~3 L/min — approximately 1.6 ML/yr in water savings, at the cost of tighter TDS monitoring. The tradeoff is governed by local water cost vs. chemical-treatment cost and scale-fouling risk.</div>
+            <div class="mn-note"><strong>Engineering reading:</strong> the displayed evaporation/blowdown/drift split is an adopted simulation balance. Real optimization requires measured conductivity, ambient wet-bulb, cycles of concentration, drift-eliminator performance and water chemistry. Hall selection is intentionally absent because the treatment train is a site utility.</div>
         </section>
 
         <!-- 7. REFERENCES -->
@@ -471,15 +472,15 @@
                 <li><b>ASHRAE 188 (2021)</b> — Legionellosis: Risk Management for Building Water Systems. Mandates a Water Management Plan for cooling towers including control targets, sampling schedules, corrective actions, and record retention. The cockpit's biocide dosing and Legionella status indicators are ASHRAE 188 WMP deliverables.</li>
                 <li><b>ISO 11731-2</b> — Water quality — Detection and enumeration of Legionella — Part 2: Direct membrane filtration method for waters with low bacterial counts. HPC ≤ 1×10³ CFU/mL operational target cited from this standard.</li>
                 <li><b>Uptime Institute WUE Metric</b> — Water Usage Effectiveness white paper. Defines WUE = annual site water ÷ annual IT energy. Source of the IT-denominator Rule 3.</li>
-                <li><b>conv review 09</b> — "09-engineering-basis-and-calculations.md" lines 99–104, 189–190. Single-scenario basis for WUE 1.20 L/kWh, IT load 1,850 kW, and the water-flow contract of the Conventional BMS suite.</li>
-                <li><b>Engine source</b> — <code class="mn-mono">js/conv-engine.js</code> (CONV_CALC v1.0.0) + frozen <code class="mn-mono">CONV_MODEL</code>. Functions: <code>waterFlowLpmForWue()</code>, <code>wueFromFlowLpm()</code>.</li>
+                <li><b>Governed project authority</b> — current 30,000 kW site IT, WUE 1.20 L/kWh, 600 L/min cooling makeup and 608 L/min total treatment.</li>
+                <li><b>Engine source</b> — <code class="mn-mono">js/conv-engine.js</code> (CONV_CALC v2.0.0). Functions: <code>waterFlowLpmForWue()</code>, <code>wueFromFlowLpm()</code>.</li>
             </ul>
         </section>
 
         <!-- 8. ASSUMPTIONS -->
         <section class="mn-section" id="limitations">
             <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
-            <p class="mn-lead">The WUE basis (1.20 L/kWh) is a <strong>site target</strong> from the engineering review — it assumes steady-state operation at 1,850 kW IT load with the cooling tower operating at design cycles of concentration and no abnormal evaporative losses. Actual WUE varies with ambient wet-bulb temperature (higher in summer), partial-load operation, and tower maintenance state; the cockpit surfaces these deviations by continuously back-computing live WUE from the flow meter. The annual 19.4 ML figure assumes 8,760 hr/yr at the stated IT load — seasonality and planned downtime will reduce the actual total. Blowdown volume estimates use the steady-state CoC formula; transient startup, chemical slug dosing, and emergency drain events are metered separately. Filtration ΔP thresholds are from site commissioning data and must be re-validated after any media replacement or hydraulic modification. This manual is an <strong>engineering education and operational reference</strong>; a licensed water-treatment engineer and microbiologist must author the site's formal ASHRAE 188 Water Management Plan.</p>
+            <p class="mn-lead">The WUE basis (1.20 L/kWh) is an adopted <strong>site target</strong> at 30,000 kW IT. Actual WUE varies with ambient conditions, partial load and plant mode. This simulated cockpit does not claim live metering. The annual 315.36 ML cooling figure and 319.565 ML total-treatment figure assume 8,760 hours at constant flow. Blowdown, dosing, filtration and microbiological limits require site commissioning records and a formal water-management plan authored by qualified specialists.</p>
         </section>
 
         <a class="mn-toollink" href="../water-system.html">&#9654; Open the live Water System &amp; WUE Cockpit</a>

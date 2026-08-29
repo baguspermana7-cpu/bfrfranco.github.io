@@ -91,9 +91,9 @@
         "@type": "HowTo",
         "name": "How to derive CHW flow and display chiller-plant status on a SCADA HMI",
         "step": [
-            { "@type": "HowToStep", "name": "Lock the CHW basis", "text": "Fix CHWS 7.2 C and CHWR 14.8 C as the single-source canonical basis from conv-engine.js. Never hardcode divergent values per page." },
-            { "@type": "HowToStep", "name": "Derive CHW flow", "text": "Flow (L/s) = IT load (kW) / (4.186 x delta-T). With IT=1850 kW and delta-T=7.6 K: 1850 / (4.186 x 7.6) = 58.1 L/s." },
-            { "@type": "HowToStep", "name": "Apply lead-lag logic", "text": "2 chillers running out of 3 installed. Start the lead chiller first; promote the lag chiller when demand exceeds lead capacity headroom." },
+            { "@type": "HowToStep", "name": "Lock the CHW basis", "text": "Use CHWS 19.4 C and CHWR 27.0 C from CONV_CALC v2.0.0. Never hardcode divergent values per page." },
+            { "@type": "HowToStep", "name": "Derive CHW reference flows", "text": "The IT sensible-load reference is 30,000 / (4.186 x 7.6) = 943.0 L/s. The current 31,250 kW evaporator-duty reference is 982.3 L/s. Neither is a measured header-flow reading." },
+            { "@type": "HowToStep", "name": "Apply lead-lag logic", "text": "Seven chillers run out of ten installed. The remaining three units provide governed N+1 capacity; stage units from load and leaving-water temperature without inventing live field feedback." },
             { "@type": "HowToStep", "name": "Display equipment status", "text": "Use ISA P&ID symbols for pumps, valves, and sensors. Animate flow lines in muted teal; reserve fault-red strictly for alarm conditions." }
         ]
     }
@@ -107,13 +107,13 @@
         "mainEntity": [
             {
                 "@type": "Question",
-                "name": "Why does the page use CHWS 7.2 C not 19 C?",
-                "acceptedAnswer": { "@type": "Answer", "text": "The original chiller-plant page showed CHWS/CHWR 19.1/22.6 C — a conflict with the dashboard CHW basis of 7.2/14.8 C. Per the single-source engineering basis in conv-engine.js (resolving the doc-04 conflict), the canonical basis is 7.2 C supply / 14.8 C return. The 18.8 C value is the secondary-loop setpoint (Rule 5 — labelled Secondary Loop SP, never CHWS SP)." }
+                "name": "What CHW temperatures govern the current cockpit?",
+                "acceptedAnswer": { "@type": "Answer", "text": "The current governed warm-water CHW circuit is 19.4 C supply and 27.0 C return, a 7.6 K rise. The condenser-water circuit is separately 32 C supply and 37 C return. Retired low-temperature examples are not active authority." }
             },
             {
                 "@type": "Question",
                 "name": "What is the CHW flow formula?",
-                "acceptedAnswer": { "@type": "Answer", "text": "CHW flow (L/s) = cooling load (kW) / (c_p x delta-T). Using the canonical IT load of 1850 kW as the cooling-kW term and delta-T = 14.8 − 7.2 = 7.6 K: 1850 / (4.186 x 7.6) = 58.1 L/s total plant flow. c_p = 4.186 kJ/(kg·K) for water at typical chilled-water conditions." }
+                "acceptedAnswer": { "@type": "Answer", "text": "CHW reference flow (L/s) = thermal term (kW) / (c_p x delta-T). At 7.6 K, the 30,000 kW IT sensible term gives 943.0 L/s; the 31,250 kW evaporator-duty term gives 982.3 L/s. Actual header flow remains unavailable without a meter." }
             },
             {
                 "@type": "Question",
@@ -313,10 +313,10 @@
             <h1>Chiller Plant — P&amp;ID Methodology &amp; Engineering Basis</h1>
             <p>Full engineering methodology for the chiller-plant SCADA HMI: ISA P&amp;ID symbol conventions, primary/secondary chilled-water loop design, lead-lag chiller sequencing, CHW flow derivation, and the display/status engine anchored to <code class="mn-mono">js/conv-engine.js</code>. This is an honest account — the page is a <em>partial-calc display engine</em>, not a full thermo-hydraulic simulation.</p>
             <div class="mn-meta">
-                <span class="mn-chip">Engine <strong>conv-engine.js v1.0.0</strong></span>
-                <span class="mn-chip">Basis <strong>ISA 5.1 / ASHRAE 90.4</strong></span>
-                <span class="mn-chip">CHW Basis <strong>7.2 / 14.8 °C</strong></span>
-                <span class="mn-chip">Plant Config <strong>2/3 Lead-Lag</strong></span>
+                <span class="mn-chip">Engine <strong>conv-engine.js v2.0.0</strong></span>
+                <span class="mn-chip">Basis <strong>CONV_CALC v2.0.0</strong></span>
+                <span class="mn-chip">CHW Basis <strong>19.4 / 27.0 °C</strong></span>
+                <span class="mn-chip">Plant Config <strong>7/10 · N+1</strong></span>
             </div>
             <a class="mn-toollink" href="../chiller-plant.html">&#9654; Open the live Chiller Plant HMI</a>
         </header>
@@ -329,10 +329,10 @@
         <!-- 1. PURPOSE -->
         <section class="mn-section" id="purpose">
             <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
-            <p class="mn-lead">The chiller-plant page is an operator-grade SCADA HMI mimic — an ISA-style P&amp;ID rendered in the browser. Its job is to show <em>plant topology</em> (primary/secondary loops, chiller train positions, pump duty/standby), <em>real-time status</em> (run/fault, lead-lag state, flow animation), and <em>setpoint annotations</em> (CHWS supply temperature, differential-pressure setpoints, N+1 headroom).</p>
-            <p class="mn-lead"><strong>Truth boundary:</strong> current telemetry remains the locked 1.850 MW cooling-demand scenario from <code class="mn-mono">CONV_CALC</code>. The separate four-hall × 10 MW IT study is capacity-planning context only; chiller quantity, tower capacity, pump duty and pipe sizing are unavailable until discipline load, diversity and redundancy selections are approved.</p>
-            <p class="mn-lead">What the page is <strong>not</strong>: it is not a thermo-hydraulic simulator. Equipment-level values (pump speed %, valve %, per-loop flow splits) are display/status fields from the conv-engine CHW basis, not back-calculated from independent hydraulic models. The one heavy derivation is <strong>total plant CHW flow</strong>, which is computed from the IT load and the canonical delta-T — all other displayed numbers are consistent descendants of that single basis.</p>
-            <p class="mn-lead">Governing standard for P&amp;ID symbology is <strong>ISA 5.1 Instrumentation Symbols and Identification</strong>. Chiller envelope is bounded by <strong>ASHRAE 90.4 / ASHRAE TC9.9 recommended CHW supply range 6–9 °C</strong>. Single-source engineering basis is locked in <code class="mn-mono">js/conv-engine.js</code> (see §3 below).</p>
+            <p class="mn-lead">The chiller-plant page is an operator-grade SCADA HMI mimic — an ISA-style P&amp;ID rendered in the browser. Its job is to show <em>plant topology</em> (primary/secondary loops, chiller train positions, pump duty/standby), <em>deterministic simulated status</em> (run/fault, lead-lag state, flow animation), and <em>setpoint annotations</em> (CHWS supply temperature, differential-pressure setpoints, N+1 headroom).</p>
+            <p class="mn-lead"><strong>Truth boundary:</strong> current telemetry is the adopted 30 MW site-IT scenario from <code class="mn-mono">CONV_CALC v2.0.0</code>. The 40 MW site-IT figure is the governed four-hall design boundary. Current plant status is 7 of 10 water-cooled centrifugal chillers running, 31.25 MW evaporator duty, 36.4034 MW condenser/tower heat rejection, 35 MW running capacity, and 45 MW post-one-unit-loss capacity.</p>
+            <p class="mn-lead">What the page is <strong>not</strong>: it is not a dynamic thermo-hydraulic simulator. Pump speed, valve position, pressure and per-machine annotations are bounded deterministic HMI values. The 943.0 and 982.3 L/s figures are calculated reference flows, not measured header flow. Evaporator duty, tower rejection, chiller input, COP, kW/RT and N+1 margin descend from the governed engine snapshot.</p>
+            <p class="mn-lead">P&amp;ID tags follow <strong>ANSI/ISA-5.1</strong>. <strong>ASHRAE 90.4</strong> is cited as the data-centre energy-performance framework; it is not used here to invent a universal CHW setpoint or COP. The project temperatures and equipment assumptions remain explicit scenario inputs.</p>
         </section>
 
         <!-- 2. INPUTS -->
@@ -343,50 +343,54 @@
             <table class="mn-table">
                 <thead><tr><th>Input / Toggle</th><th>Value / Range</th><th>Type</th><th>Notes</th></tr></thead>
                 <tbody>
-                    <tr><td>CHWS temperature</td><td><code>7.2 °C</code></td><td>Locked basis</td><td>Primary chilled-water supply. Conv-engine <code>MODEL.cooling.chws_c</code>. Source: doc-09 line 15.</td></tr>
-                    <tr><td>CHWR temperature</td><td><code>14.8 °C</code></td><td>Locked basis</td><td>Primary chilled-water return. Conv-engine <code>MODEL.cooling.chwr_c</code>. Source: doc-09 line 15.</td></tr>
-                    <tr><td>IT load</td><td><code>1,850 kW</code></td><td>Locked basis</td><td>Site IT load from <code>MODEL.site.it_load_kw</code>. Cooling-kW term in flow equation.</td></tr>
-                    <tr><td>Secondary loop SP</td><td><code>18.8 °C</code></td><td>Locked basis</td><td><strong>Rule 5:</strong> this is the secondary (condenser-side) loop setpoint — NEVER labelled "CHWS SP". See §3 terminology note.</td></tr>
+                    <tr><td>CHWS temperature</td><td><code>19.4 °C</code></td><td>Adopted current basis</td><td>Warm-water primary chilled-water supply from <code>snapshot.cooling.chws_c</code>.</td></tr>
+                    <tr><td>CHWR temperature</td><td><code>27.0 °C</code></td><td>Adopted current basis</td><td>Warm-water primary chilled-water return from <code>snapshot.cooling.chwr_c</code>.</td></tr>
+                    <tr><td>Current site IT load</td><td><code>30,000 kW</code></td><td>Adopted current basis</td><td>IT sensible-load reference-flow term from <code>snapshot.site.it_load_kw</code>.</td></tr>
+                    <tr><td>Current evaporator duty</td><td><code>31,250 kW</code></td><td>Derived current basis</td><td>IT plus UPS loss; the plant-duty reference-flow numerator, not condenser/tower heat rejection.</td></tr>
+                    <tr><td>Condenser/tower rejection</td><td><code>36,403.4 kW</code></td><td>Derived current basis</td><td>Evaporator duty plus chiller electrical input.</td></tr>
+                    <tr><td>Condenser water</td><td><code>32 / 37 °C</code></td><td>Adopted current basis</td><td>Distinct condenser-water supply/return circuit; never relabelled as CHWS/CHWR.</td></tr>
                     <tr><td>Lead-lag mode</td><td>AUTO / MANUAL</td><td>Mode toggle</td><td>AUTO: engine picks lead chiller by run-hours. MANUAL: operator selects.</td></tr>
                     <tr><td>View detail level</td><td>OVERVIEW / DETAIL / ENGINEERING</td><td>Mode toggle</td><td>Controls label density on the P&amp;ID. OVERVIEW shows only major status; ENGINEERING reveals all sensor annotations.</td></tr>
-                    <tr><td>Chillers running / installed</td><td><code>2 / 3</code></td><td>Locked basis</td><td>From <code>MODEL.cooling.chillers_running / chillers_total</code>. Determines N+1 headroom display.</td></tr>
+                    <tr><td>Chillers running / installed</td><td><code>7 / 10</code></td><td>Adopted current basis</td><td>Each assumed at 5,000 kW thermal; central plant redundancy is N+1.</td></tr>
                 </tbody>
             </table>
             </div>
-            <div class="mn-note"><strong>Terminology Rule 5:</strong> 18.8 °C is the <em>secondary loop setpoint</em> (condenser-water / warm-water side), not the CHWS setpoint. The CHWS setpoint is 7.0–7.2 °C. Mislabelling 18.8 °C as "CHWS SP" was the original doc-04 engineering conflict — do not reintroduce it. Any label on the P&amp;ID for this value must read "Secondary Loop SP" or "CW Supply SP" depending on the loop segment shown.</div>
+            <div class="mn-note"><strong>Loop identity rule:</strong> CHWS/CHWR are 19.4/27.0 °C. CDWS/CDWR are 32/37 °C. A page must fail closed to UNAVAILABLE when this complete current authority is missing; it must never revive retired temperature pairs or infer a secondary setpoint.</div>
         </section>
 
         <!-- 3. METHODOLOGY -->
         <section class="mn-section" id="methodology">
             <h2><span class="mn-num">03</span> Calculation methodology</h2>
-            <p class="mn-lead">Three real derivations power the page: CHW delta-T, total plant CHW flow, and chiller input power. Everything else is status/display logic driven by those three numbers. Function names map one-to-one to <code class="mn-mono">js/conv-engine.js</code>.</p>
+            <p class="mn-lead">The page derives CHW delta-T, two explicitly scoped reference flows, chiller input power, and condenser/tower rejection. Actual header and branch flow remain unavailable without meters. Function names map one-to-one to <code class="mn-mono">js/conv-engine.js</code>.</p>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">CHW delta-T</h3>
             <div class="mn-formula">
-                <span class="mn-eq">ΔT = CHWR − CHWS = 14.8 − 7.2 = 7.6 K</span>
-                <span class="mn-where">In <code>chwDeltaT(m)</code>. Source: <code>MODEL.cooling.chwr_c − MODEL.cooling.chws_c</code>. Anchors every flow and heat-transfer calculation on this page.<span class="mn-src">conv-engine.js · doc-09 line 83</span></span>
+                <span class="mn-eq">ΔT = CHWR − CHWS = 27.0 − 19.4 = 7.6 K</span>
+                <span class="mn-where">In <code>chwDeltaT(m)</code>. Source: <code>snapshot.cooling.chwr_c − snapshot.cooling.chws_c</code>. Anchors current flow and heat-transfer calculations.<span class="mn-src">CONV_CALC v2.0.0</span></span>
             </div>
 
-            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Total plant CHW flow</h3>
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">CHW reference flows</h3>
             <div class="mn-formula">
-                <span class="mn-eq">Q̇  =  IT_load  /  (c_p  ×  ΔT)</span>
-                <span class="mn-eq">Q̇  =  1850  /  (4.186  ×  7.6)  =  58.1 L/s</span>
-                <span class="mn-where">In <code>chwFlowLps(m)</code>. <code>c_p = 4.186 kJ/(kg·K)</code> for water. The IT load (1,850 kW) is the cooling-kW term — per doc-09 worked example (line 84). heat-rejection including UPS losses (~1,927 kW) is also exposed for N+1 headroom checks but is NOT the canonical flow-derivation term.<span class="mn-src">conv-engine.js · doc-09 lines 81–85</span></span>
+                <span class="mn-eq">Q̇_IT-ref = IT_load / (c_p × ΔT) = 30,000 / (4.186 × 7.6) = 943.0 L/s</span>
+                <span class="mn-eq">Q̇_plant-duty-ref = evaporator_duty / (c_p × ΔT) = 31,250 / (4.186 × 7.6) = 982.3 L/s</span>
+                <span class="mn-where"><code>c_p = 4.186 kJ/(kg·K)</code>. The engine publishes 943.0 L/s as its IT sensible-load reference; the HMI also reconciles the 982.3 L/s current plant-duty reference. Both are calculations. Measured header flow is UNAVAILABLE.<span class="mn-src">CONV_CALC v2.0.0 · chwFlowLps · cooling.heat_rejection_kw</span></span>
             </div>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Per-loop flow split</h3>
             <div class="mn-formula">
                 <span class="mn-eq">Flow_per_loop  =  Q̇_total  /  n_loops</span>
-                <span class="mn-eq">Example (4 loops):  58.1  /  4  =  14.5 L/s per loop</span>
-                <span class="mn-where">Display-only derivation — the page shows even split as the nominal state. Real plants balance by valve position and pump speed; those per-loop values are status annotations, not calculated from a hydraulic model.<span class="mn-src">doc-09 lines 86–93 · doc-04 §Cooling Calculation</span></span>
+                <span class="mn-eq">Displayed engine-reference split: 943.0 / 7 = 134.7 L/s per running chiller</span>
+                <span class="mn-eq">Plant-duty sizing reference: 982.3 / 7 = 140.3 L/s per running chiller</span>
+                <span class="mn-where">Display-only derivations. Real plants balance by valve position and pump speed; actual branch flow is UNAVAILABLE without branch meters.<span class="mn-src">doc-09 lines 86–93 · doc-04 §Cooling Calculation</span></span>
             </div>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Chiller input power (kW/ton sanity check)</h3>
             <div class="mn-formula">
-                <span class="mn-eq">P_chiller  =  Q̇_cooling  /  COP</span>
-                <span class="mn-eq">At COP 4.5:   1850  /  4.5  =  411 kW  compressor input</span>
-                <span class="mn-eq">kW/ton  =  3.517  /  COP  =  3.517  /  4.5  =  0.78 kW/ton</span>
-                <span class="mn-where">Used for the Plant Capacity Panel "Plant kW/ton" KPI. COP 4.5 is the ASHRAE 90.4 benchmark reference for the operating conditions shown. Actual COP varies with condenser water temperature and part-load ratio; this is a steady-state display benchmark, not a live transient calculation.<span class="mn-src">ASHRAE 90.4 · doc-09 lines 39–45</span></span>
+                <span class="mn-eq">P_chiller = evaporator duty × specific power</span>
+                <span class="mn-eq">= 31,250 × 0.16491 = 5,153.4 kW electrical</span>
+                <span class="mn-eq">COP = 31,250 / 5,153.4 = 6.06; plant efficiency = 0.58 kW/RT</span>
+                <span class="mn-eq">Condenser/tower rejection = 31,250 + 5,153.4 = 36,403.4 kW</span>
+                <span class="mn-where">These are adopted engine-derived current KPIs. They are not universal ASHRAE setpoints and must be replaced by measured plant power and calibrated thermal load for live use.<span class="mn-src">CONV_CALC v2.0.0 · chillerInputKwE</span></span>
             </div>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Lead-lag sequencing logic</h3>
@@ -401,8 +405,10 @@
             <div class="mn-formula">
                 <span class="mn-eq">Available capacity   =  chillers_running  ×  Q̇_rated_per_chiller</span>
                 <span class="mn-eq">N+1 margin           =  available  −  Q̇_demand</span>
-                <span class="mn-eq">Example (2×1200 kW running, demand 1850 kW):  2400 − 1850  =  550 kW headroom</span>
-                <span class="mn-where">Display KPI for the Plant Capacity Panel. N+1 is satisfied when available &gt; demand AND at least one chiller is in standby. Margin below 200 kW triggers a WARN colour transition (amber) on the panel; negative = ALARM (fault-red).<span class="mn-src">doc-04 §Plant Capacity Panel</span></span>
+                <span class="mn-eq">Current running capacity = 7 × 5,000 = 35,000 kW thermal</span>
+                <span class="mn-eq">Post-one-unit-loss installed capacity = 9 × 5,000 = 45,000 kW thermal</span>
+                <span class="mn-eq">N+1 margin = 45,000 − 31,250 = 13,750 kW thermal</span>
+                <span class="mn-where">The 45 MW figure is capacity with one of ten installed units unavailable. Current running capacity and post-failure installed capacity are different denominators and are labelled separately.<span class="mn-src">CONV_CALC v2.0.0 · cooling capacity fields</span></span>
             </div>
         </section>
 
@@ -436,8 +442,8 @@
             <table class="mn-table">
                 <thead><tr><th>Parameter</th><th>Primary Loop</th><th>Secondary Loop</th></tr></thead>
                 <tbody>
-                    <tr><td>Supply temperature</td><td>7.2 °C (CHWS)</td><td>7.2 °C at coil inlet (same water, decoupled flow)</td></tr>
-                    <tr><td>Return temperature</td><td>14.8 °C (CHWR)</td><td>14.8 °C at coil outlet (same ΔT at design load)</td></tr>
+                    <tr><td>Supply temperature</td><td>19.4 °C (CHWS)</td><td>19.4 °C at the facility distribution supply header</td></tr>
+                    <tr><td>Return temperature</td><td>27.0 °C (CHWR)</td><td>27.0 °C at the facility distribution return header</td></tr>
                     <tr><td>Flow regime</td><td>Constant-flow (primary pumps run at fixed speed)</td><td>Variable-flow (VFD pumps track DP setpoint)</td></tr>
                     <tr><td>DP setpoint</td><td>N/A (constant speed)</td><td>Secondary pump DP SP (operator-configurable)</td></tr>
                     <tr><td>Bypass / decoupler</td><td>Shared — absorbs primary/secondary flow mismatch</td><td>Shared — bypass flow direction reverses under low-load</td></tr>
@@ -446,22 +452,25 @@
                 </tbody>
             </table>
             </div>
-            <div class="mn-note"><strong>Secondary loop SP (18.8 °C — Rule 5):</strong> The 18.8 °C setpoint visible on older versions of the page referred to a secondary (warm-water or condenser-water) circuit that was NOT the primary CHW loop. Per the doc-04 conflict resolution, this value is retained as the <em>Secondary Loop SP</em> annotation only — it is never labelled CHWS SP, which must remain 7.0–7.2 °C. If 18.8 °C does not appear on the visible HMI in the current build, that is intentional (it belongs to a condenser-water annotation that may not be rendered in the default view layer).</div>
+            <div class="mn-note"><strong>Hydraulic scope:</strong> the HMI draws four representative machine modules for readability, while the governed plant contains ten chillers with seven running. The module mimic is not a four-machine total. Per-machine flow, pump head and pipe diameter require the as-built hydraulic design; absent values fail closed rather than being invented.</div>
         </section>
 
         <!-- 6. WORKED EXAMPLE -->
         <section class="mn-section" id="worked-example">
-            <h2><span class="mn-num">06</span> Worked example — 58.1 L/s derivation</h2>
-            <p class="mn-lead">This is the canonical CHW flow derivation that the page's Plant Capacity Panel and flow annotations are anchored to. Numbers reproduce conv-engine.js output exactly.</p>
+            <h2><span class="mn-num">06</span> Worked example — current 30 MW site</h2>
+            <p class="mn-lead">This example reproduces the governed current plant fields. Every scope is explicit: site IT reference, evaporator-duty reference, condenser/tower rejection, running-machine display split, current running capacity, and post-one-unit-loss installed capacity.</p>
             <div class="mn-worked">
                 <ol>
-                    <li>CHW delta-T: <code>ΔT = CHWR − CHWS = 14.8 − 7.2 =</code> <span class="mn-result">7.6 K</span></li>
-                    <li>Cooling-kW term: IT load <span class="mn-result">= 1,850 kW</span> (canonical basis, <code>MODEL.site.it_load_kw</code>)</li>
-                    <li>CHW flow: <code>Q̇ = 1850 / (4.186 × 7.6) = 1850 / 31.81 =</code> <span class="mn-result">58.1 L/s</span></li>
-                    <li>Per-loop average (4 loops): <code>58.1 / 4 =</code> <span class="mn-result">14.5 L/s per loop</span> — consistent with the ~17–19 L/s per-loop readings at near-design load shown on-screen</li>
-                    <li>Available plant capacity (2 chillers × 1,200 kW rated): <span class="mn-result">2,400 kW</span></li>
-                    <li>N+1 cooling headroom: <code>2,400 − 1,850 =</code> <span class="mn-result">550 kW</span> → displayed as green on the Plant Capacity Panel</li>
-                    <li>Chiller compressor input (COP 4.5 reference): <code>1,850 / 4.5 =</code> <span class="mn-result">411 kW</span> → Plant kW/ton = <code>3.517 / 4.5 =</code> <span class="mn-result">0.78 kW/ton</span></li>
+                    <li>CHW delta-T: <code>27.0 − 19.4 =</code> <span class="mn-result">7.6 K</span>.</li>
+                    <li>Cooling-flow term: current site IT <span class="mn-result">30,000 kW</span>.</li>
+                    <li>IT sensible-load reference flow: <code>30,000 / (4.186 × 7.6) =</code> <span class="mn-result">943.0 L/s</span>.</li>
+                    <li>Evaporator-duty reference flow: <code>31,250 / (4.186 × 7.6) =</code> <span class="mn-result">982.3 L/s</span>.</li>
+                    <li>Displayed engine-reference split: <code>943.0 / 7 =</code> <span class="mn-result">134.7 L/s per running machine</span>; plant-duty sizing reference is <span class="mn-result">140.3 L/s</span>; actual balancing requires measured branch flow.</li>
+                    <li>Evaporator duty: <code>30,000 + 1,250 =</code> <span class="mn-result">31,250 kW</span>.</li>
+                    <li>Current running capacity: <code>7 × 5,000 =</code> <span class="mn-result">35,000 kW thermal</span>.</li>
+                    <li>Post-one-unit-loss capacity: <code>9 × 5,000 =</code> <span class="mn-result">45,000 kW</span>; N+1 margin = <span class="mn-result">13,750 kW</span>.</li>
+                    <li>Chiller input: <code>31,250 × 0.16491 =</code> <span class="mn-result">5,153.4 kW electrical</span>; COP <span class="mn-result">6.06</span>; <span class="mn-result">0.58 kW/RT</span>.</li>
+                    <li>Condenser/tower rejection: <code>31,250 + 5,153.4 =</code> <span class="mn-result">36,403.4 kW</span>.</li>
                 </ol>
             </div>
             <div class="mn-note"><strong>Honesty note:</strong> Steps 4–7 are display benchmarks derived from the locked basis, not measured or simulated from independent hydraulic/thermodynamic models. The page's purpose is SCADA HMI visualisation — the genuine engineering rigour is in the CHW basis derivation (steps 1–3) and the N+1 headroom logic. Equipment-level annotations (pump speed, valve %, VFD current) are display-only status fields.</div>
@@ -472,18 +481,18 @@
             <h2><span class="mn-num">07</span> References &amp; standards</h2>
             <ul class="mn-refs">
                 <li><b>ISA 5.1 (2022)</b> — Instrumentation Symbols and Identification: P&amp;ID tag prefixes (TT, FT, PT, MV, CV), loop bubble conventions, equipment symbol styles used on the chiller-plant HMI.</li>
-                <li><b>ASHRAE 90.4 (2022)</b> — Energy Standard for Data Centers: chiller COP reference (kW/ton benchmark), CHW supply temperature guidance 6–9 °C, N+1 cooling redundancy framing.</li>
-                <li><b>ASHRAE TC9.9 (2021)</b> — Thermal Guidelines for Data Processing Environments: CHWS recommended range A1/A2 class, cold-aisle setpoint 18–27 °C (supply air), CHW supply 7–10 °C (typical DX/CRAH coupling).</li>
-                <li><b>conv review 04</b> — <code class="mn-mono">Documents/screenshot bms rz/conv/review/04-chiller-plant-review.md</code>: original engineering conflict (19.1/22.6 vs 7.2/14.8 C), CHW flow alternatives (58.1 vs 126.3 L/s), resolution Decision A (conventional CHW 7/15 C).</li>
-                <li><b>conv review 09</b> — <code class="mn-mono">Documents/screenshot bms rz/conv/review/09-engineering-basis-and-calculations.md</code>: canonical site basis (IT 1,850 kW, PUE 1.45, CHW 7.2/14.8 C), CHW flow worked example line 84, non-IT power breakdown (chiller compressors 370 kW, pumps 210 kW, CRAH 130 kW).</li>
-                <li><b>Engine source</b> — <code class="mn-mono">js/conv-engine.js</code> (conv-engine v1.0.0): <code>chwDeltaT()</code>, <code>chwFlowLps()</code>, <code>heatRejectionKw()</code>, <code>MODEL.cooling.*</code>. Single-source canonical basis for all BMS pages.</li>
+                <li><b>ASHRAE 90.4</b> — Energy Standard for Data Centers; cited for energy-performance methodology, not as authority for a universal CHW setpoint, COP, or redundancy topology.</li>
+                <li><b>ASHRAE Handbook — Data Centers and Telecommunication Facilities</b> — equipment environmental classes and project-specific facility-water guidance; air inlet and water-loop limits are different domains.</li>
+                <li><b>ANSI/ISA-5.1</b> — Instrumentation Symbols and Identification; basis for tag and P&amp;ID symbol conventions.</li>
+                <li><b>Governed project authority</b> — <code class="mn-mono">CONV_CALC.snapshot</code>: current 30 MW IT, CHW 19.4/27.0 °C, condenser water 32/37 °C, and central 7/10 chiller status.</li>
+                <li><b>Engine source</b> — <code class="mn-mono">js/conv-engine.js</code> (CONV_CALC v2.0.0): <code>chwDeltaT()</code>, <code>chwFlowLps()</code>, <code>heatRejectionKw()</code>, and plant-efficiency derivations.</li>
             </ul>
         </section>
 
         <!-- 8. ASSUMPTIONS & LIMITATIONS -->
         <section class="mn-section" id="limitations">
             <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
-            <p class="mn-lead">The HMI assumes a well-balanced, decoupled primary/secondary plant operating at steady-state design load. Transient effects (chiller pull-down time, pump start-up inrush, glycol correction to c_p) are not modelled. COP 4.5 is a reference benchmark — actual COP depends on condenser water temperature, part-load ratio, and compressor staging; the live HMI does not update COP from a transient model.</p>
+            <p class="mn-lead">The HMI assumes a well-balanced, decoupled primary/secondary plant at the adopted steady-state operating point. Transient effects (pull-down, pump inrush, glycol correction, tower approach and dynamic staging) are not modelled. The displayed COP 6.06 and 0.58 kW/RT are engine-derived scenario values; live use requires measured electrical power, calibrated flow and temperature sensors.</p>
             <p class="mn-lead">Flow-velocity animation on the P&amp;ID is a visual cue proportional to the displayed flow value; it is not derived from a hydraulic resistance network. Pipe diameters and friction factors are not modelled. Equipment-level display values (valve %, VFD speed %, run hours) are status-field annotations consistent with the engineering basis — they are not back-calculated from independent models and must be treated as <strong>illustrative display parameters</strong> in any off-page engineering analysis.</p>
             <p class="mn-lead">This page and its methodology are an <strong>engineering education and visualisation aid</strong>. Final plant design, setpoint commissioning, and N+1 validation must be performed by qualified mechanical/controls engineers against the actual installed equipment and as-built P&amp;IDs.</p>
         </section>

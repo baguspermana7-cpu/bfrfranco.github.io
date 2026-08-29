@@ -179,6 +179,8 @@
 .rz-ops-metric__value {
   color: var(--rz-ops-text);
   font: 700 14px/1.35 "JetBrains Mono", monospace;
+  font-feature-settings: "tnum" 1, "zero" 1;
+  font-variant-numeric: tabular-nums slashed-zero;
   overflow-wrap: anywhere;
 }
 
@@ -191,9 +193,9 @@
 
 .rz-ops-table {
   border-collapse: collapse;
-  font-feature-settings: "zero" 1;
+  font-feature-settings: "tnum" 1, "zero" 1;
   font: 500 10px/1.4 "JetBrains Mono", monospace;
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: tabular-nums slashed-zero;
   min-width: 920px;
   width: 100%;
 }
@@ -341,6 +343,16 @@
   stroke: var(--rz-ops-muted) !important;
 }
 
+.ai-dashboard-grid,
+.ai-kpi-strip {
+  min-width: 0;
+}
+
+.ai-dashboard-image,
+.ai-dashboard-rail {
+  min-width: 0;
+}
+
 @keyframes rzOpsPowerFlow {
   from { stroke-dashoffset: 28; }
   to { stroke-dashoffset: 0; }
@@ -369,31 +381,53 @@
 
 @media (max-width: 800px) {
   html,
-  body { overflow: auto; }
+  body { overflow: hidden; }
   .hdr {
-    gap: 6px;
+    gap: 3px !important;
     height: auto;
     min-height: 44px;
-    padding: 8px 10px;
+    padding: 4px 6px !important;
     position: relative;
     flex-wrap: wrap;
   }
   .hdr > div:first-child {
-    flex-wrap: wrap;
+    flex: 0 0 100%;
+    flex-wrap: nowrap !important;
+    height: 44px;
     max-width: 100%;
+    max-height: 44px;
     min-width: 0;
+    overflow-x: auto;
+    padding-bottom: 2px;
     width: 100%;
   }
   .hdr h1 {
-    flex: 1 0 100%;
-    flex-wrap: wrap;
-    max-width: 100%;
-    min-width: 0;
-    order: -1;
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+    max-width: none;
+    min-width: max-content;
+    order: 0;
+    white-space: nowrap;
+  }
+  .hdr [data-rz-telemetry-banner-slot] {
+    flex: 0 0 230px;
+    max-width: 230px;
+    order: -2;
+  }
+  /* auth.js relocates the live PRD/Manual anchors above the access gate and
+     leaves these same-size slots in the header. Keep the contract slots ahead
+     of the telemetry banner so their fixed anchors remain inside the initial
+     mobile viewport instead of landing beyond the horizontal scroll edge. */
+  .hdr-main > .rz-public-contract-slot {
+    flex: 0 0 auto;
+    order: -3;
   }
   .hdr-r {
-    flex-wrap: nowrap;
+    flex: 0 0 100%;
+    flex-wrap: nowrap !important;
+    height: 44px;
     max-width: 100%;
+    max-height: 44px;
     min-width: 0;
     overflow-x: auto;
     padding-bottom: 2px;
@@ -407,8 +441,21 @@
     min-height: 44px;
     top: 0;
   }
+  .tabs::-webkit-scrollbar,
+  .hdr-r::-webkit-scrollbar { height: 3px; }
+  .tabs::-webkit-scrollbar-track,
+  .hdr-r::-webkit-scrollbar-track { background: var(--rz-ops-surface); }
+  .tabs::-webkit-scrollbar-thumb,
+  .hdr-r::-webkit-scrollbar-thumb { background: var(--rz-ops-line-strong); border-radius: 0; }
   .tabs button { flex: 0 0 auto; min-height: 36px; }
-  .wrap { min-height: calc(100dvh - 80px); }
+  .wrap { min-height: 0; }
+  .ai-kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .ai-dashboard-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    height: auto !important;
+  }
+  .ai-dashboard-image { min-height: 320px; }
+  .ai-dashboard-rail { overflow: visible !important; }
   .rz-ops-section { padding: var(--rz-ops-space-2); }
   .rz-ops-section__head { flex-direction: column; }
   .rz-ops-field,

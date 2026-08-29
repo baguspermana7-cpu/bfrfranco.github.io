@@ -73,7 +73,7 @@ function conventionalDocumentAligned(text) {
   const labeledCurrentValues = [
     /(?:IT load|Current IT).{0,220}30[ ,]000\s*kW/i,
     /(?:Facility load|Facility).{0,220}43[ ,]500\s*kW/i,
-    /CHW(?:\s+ΔT\s*\/)?\s*flow.{0,240}943(?:[.,]0)?\s*L\/s/i,
+    /IT sensible-load(?:\s+CHW)?\s+reference.{0,240}943(?:[.,]0)?\s*L\/s/i,
     /(?:Usable fuel|Usable volume).{0,240}744[ ,]144\s*L/i,
     /(?:Equivalent cooling makeup|Water equivalent flow).{0,240}600(?:[.,]0)?\s*L\/min/i,
     /Uptime.{0,240}UNAVAILABLE/i,
@@ -196,13 +196,13 @@ console.log('\n=== DC Conv accuracy probes (dc-conventional.html) ===');
     kpiTemp:'22.4', cTemp:'22.4°C', sTempAvg:'22.4°C', cRh:'48%', sRhAvg:'48%',
     cFuel:'85%', sFuelMain:'85%', sAutonomy:'48 hrs · bulk tank @ campus load'
   };
-  const rawExpectedSurfaces = {...expectedSurfaces, sAutonomy:'—', kpiUptime:'—'};
+  const rawExpectedSurfaces = [...Object.keys(expectedSurfaces), 'kpiUptime'];
   const rawHtml = await readFile(path.resolve(process.cwd(), 'dc-conventional.html'), 'utf8');
-  const rawSurfaceMismatches = Object.entries(rawExpectedSurfaces)
-    .map(([id, expected]) => ({id, expected, actual:rawElementText(rawHtml, id)}))
-    .filter(({expected, actual}) => actual !== expected);
+  const rawSurfaceMismatches = rawExpectedSurfaces
+    .map((id) => ({id, actual:rawElementText(rawHtml, id)}))
+    .filter(({actual}) => !/^(?:—|--|UNAVAILABLE)$/i.test(actual));
   assert(rawSurfaceMismatches.length === 0,
-    'CONV-Test-0: raw first-paint fallbacks are current or explicitly unavailable',
+    'CONV-Test-0: raw first-paint fallbacks remain neutral until authority validates',
     JSON.stringify(rawSurfaceMismatches));
 
   const page = await browser.newPage();
@@ -436,7 +436,7 @@ console.log('\n=== Generate Design Tech Spec PDF probes ===');
     assert(/1\.45/.test(dcConvPdf), 'TS-CONV-4: PDF carries PUE 1.45', '');
     assert(/Grid factor|grid_factor/i.test(dcConvPdf), 'TS-CONV-5: PDF uses "Grid factor" terminology (not CUE alone)', '');
     assert(/0\.6[01]\s*kg/i.test(dcConvPdf), 'TS-CONV-6: PDF derives CUE_IT 0.61 kg/kWh IT', '');
-    assert(/\bCHW flow rate\b.{0,360}\b943(?:[.,]0)?\s*L\/s/i.test(convPdfText), 'TS-CONV-7: labeled CHW-flow output carries 943.0 L/s', '');
+    assert(/\bIT sensible-load CHW reference\b.{0,360}\b943(?:[.,]0)?\s*L\/s/i.test(convPdfText), 'TS-CONV-7: labeled IT sensible-load CHW reference carries 943.0 L/s', '');
     assert(/\bUsable fuel volume now\b.{0,360}\b744[ ,]144\s*L/i.test(convPdfText), 'TS-CONV-8: labeled usable-fuel output carries 744,144 L', '');
     assert(/\bInstant make-up water flow\b.{0,360}\b600(?:[.,]0)?\s*L\/min/i.test(convPdfText), 'TS-CONV-9a: labeled WUE-equivalent flow carries 600.0 L/min', '');
     assert(/\bInstant make-up water flow\b.{0,520}\bCONV_CALC\.snapshot\.water\.flow_lpm_for_wue\b/i.test(convPdfText), 'TS-CONV-9b: WUE-equivalent flow cites the current engine snapshot identity', '');

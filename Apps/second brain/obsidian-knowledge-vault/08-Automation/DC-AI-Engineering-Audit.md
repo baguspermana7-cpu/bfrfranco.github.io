@@ -4,7 +4,7 @@ title: DC AI BMS — Engineering Audit & Improvement Roadmap
 file: /home/baguspermana7/rz-work/Automation/DC AI/Engineering-Audit-2026-05-01.md
 group: automation
 tags: [bms, scada, dcai, audit, p&id, sld, ldc, iec-62443]
-last_updated: 2026-08-26
+last_updated: 2026-08-30
 status: private
 gitignored: true
 parent: [[DataHall-AI]]
@@ -83,3 +83,17 @@ All LDC traffic transits through unidirectional gateway (data diode) to L3 histo
 - New follow-on UI work must preserve the module/test boundary in `js/datahall-ai/` and the no-global-shutdown/FACP-authority rules.
 - Full-site dark verification keeps strict product semantics: a sweep candidate needs two normal-timing clean confirmations in separate fresh Chromium processes; reproduced findings, incomplete confirmation, or render errors fail closed.
 - Theme sampling forces style recalculation and waits for two rendered frames before the transition interval; host wall-clock time cannot substitute for proof that the palette was actually painted.
+
+## v1.134.14 operator-chrome and authority milestone
+
+- The simulated provenance instrument is now compact, instrument-cyan and contained in the
+  header; the page no longer claims live telemetry.
+- Header actions and primary navigation own separate horizontal rails. The remaining cockpit
+  height is calculated by flex layout rather than a fixed 80 px assumption, so 1440 and 390 px
+  views retain reachable main/sidebar scrollports without menu overlap.
+- The dashboard/engineering geometry and semantic modules remain intact; the regression gate
+  tests header/tab separation, horizontal overflow and vertical reachability.
+- Current-value UI and generated-document language says `SIMULATED` / deterministic display
+  refresh; `live` or `real-time` is retained only for clearly labeled future design capability.
+- Missing, legacy, request-mismatch and same-version-incomplete datahall model/calculation bundles
+  keep the cockpit inert and `UNAVAILABLE`, including BOD, Generate Design, FAQ and hidden drawers.

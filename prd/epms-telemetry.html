@@ -109,7 +109,7 @@
             <p>A testable contract for the source-transfer, breaker, power-flow, telemetry and export behavior in <code>EPMS_Telemetry.html</code>. The page is a simulated teaching cockpit. It is not a live EPMS, protection relay, switching authority or approved operating procedure.</p>
             <div class="mn-meta">
                 <span class="mn-chip">Cockpit <strong>EPMS_Telemetry.html</strong></span>
-                <span class="mn-chip">Shared basis <strong>CONV_CALC.snapshot</strong></span>
+                <span class="mn-chip">Shared basis <strong>CONV_CALC v2.0.0</strong></span>
                 <span class="mn-chip">Diagram <strong>3 streams / 2 utility sources</strong></span>
                 <span class="mn-chip">Data mode <strong>SIMULATED</strong></span>
             </div>
@@ -130,7 +130,7 @@
                 <tr><td>Facilities operator</td><td>Triage a source loss or breaker trip.</td><td>Status strip → one-line → event log.</td><td>Names active source, affected stream and breaker state within one scan.</td></tr>
                 <tr><td>Electrical engineer</td><td>Review topology, ratings and calculated current.</td><td>Source/MV/RMU/TX/LVSB/ATS/UPS/PDU branches and telemetry labels.</td><td>Can identify voltage basis, power factor and capacity gaps.</td></tr>
                 <tr><td>Commissioning engineer</td><td>Exercise transfer and breaker-state sequences.</td><td>Utility/tie controls, breaker gestures, generator state and alarms.</td><td>Every action has a deterministic expected state and visible feedback.</td></tr>
-                <tr><td>Design reviewer</td><td>Reconcile EPMS totals with the conventional facility basis.</td><td>Facility/IT/PUE strip and representative rack-row scope.</td><td>Mismatch is visible rather than hidden by display rounding.</td></tr>
+                <tr><td>Design reviewer</td><td>Reconcile EPMS totals with the conventional facility basis.</td><td>Facility/IT/PUE strip and aggregate rack-group scope.</td><td>Top, bottom and terminal roll-ups reconcile without hiding aggregation.</td></tr>
                 <tr><td>Educator / learner</td><td>Understand a three-stream protected electrical one-line.</td><td>Legend, labels, manual formulas and exports.</td><td>Can distinguish a simulated state from an approved switching instruction.</td></tr>
             </tbody></table></div>
         </section>
@@ -139,7 +139,7 @@
             <h2><span class="mn-num">03</span> Scope &amp; non-goals</h2>
             <div class="mn-grid">
                 <article class="mn-card"><h3>In scope</h3><ul><li>Utility A/B, MV tie, A/B/C streams and generator transfer simulation.</li><li>MV/RMU/transformer/LVSB/ATSDB/UPS/PDU/rack and mechanical-load topology.</li><li>Open, closed and trip breaker presentation.</li><li>Voltage/current/kW labels, site roll-up, alarm count and timestamps.</li><li>Zoom, pan, fit, reset and PDF/CSV/JSON report actions.</li></ul></article>
-                <article class="mn-card"><h3>Non-goals</h3><ul><li>No field meters, IEC 61850, Modbus, SCADA historian or relay connection.</li><li>No remote switching, lockout/tagout, synchronization or protection study.</li><li>No validated short-circuit, arc-flash, coordination or load-flow result.</li><li>No claim that the ten visible racks represent the full 1.85 MW IT estate.</li><li>No procurement, safety or operations authorization.</li></ul></article>
+                <article class="mn-card"><h3>Non-goals</h3><ul><li>No field meters, IEC 61850, Modbus, SCADA historian or relay connection.</li><li>No remote switching, lockout/tagout, synchronization or protection study.</li><li>No validated short-circuit, arc-flash, coordination or load-flow result.</li><li>No claim that the ten aggregate rack groups are ten physical cabinets, feeders or protection zones.</li><li>No procurement, safety or operations authorization.</li></ul></article>
             </div>
         </section>
 
@@ -147,7 +147,8 @@
             <h2><span class="mn-num">04</span> Functional requirements</h2>
             <p class="mn-lead">Every visible control, status family and diagram family is mapped below. Generated equipment instances are covered by their stable ID ranges.</p>
             <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>ID</th><th>Visible element / requirement</th><th>Acceptance</th></tr></thead><tbody>
-                <tr><td>FR-01</td><td>Show an engine-bound top strip for Facility Load, IT Load and PUE.</td><td><code>epms-fac</code>, <code>epms-it</code> and <code>epms-pue</code> read <code>CONV_CALC.snapshot</code> when available.</td></tr>
+                <tr><td>FR-01</td><td>Show an engine-bound top strip for Facility Load, IT Load and PUE.</td><td><code>epms-fac</code>, <code>epms-it</code> and <code>epms-pue</code> read a complete <code>CONV_CALC v2.0.0</code> snapshot: 43.50 MW facility, 30.00 MW current IT and PUE 1.45.</td></tr>
+                <tr><td>FR-01A</td><td>Reject missing, legacy, requested-version-mismatched or same-version-incomplete authority.</td><td>All engine-owned fields, status chips, drawer values and controls become unavailable/inert without leaking plausible retired values.</td></tr>
                 <tr><td>FR-02</td><td>Show Utility, UPS A/B, generator, trip, data-quality and scenario labels.</td><td>Labels remain visible above the one-line and say Simulated rather than Live.</td></tr>
                 <tr><td>FR-03</td><td>Show a five-state line legend: energized, standby, open, alarm/trip and maintenance bypass.</td><td>Each state has text plus line sample; meaning is not color-only.</td></tr>
                 <tr><td>FR-04</td><td>Provide Back, Portfolio, PRD and Manual navigation.</td><td>All links are keyboard reachable and resolve without changing simulator state.</td></tr>
@@ -164,7 +165,7 @@
                 <tr><td>FR-15</td><td>Render UPS IT A/B/C and UPS mechanical A/B.</td><td>Incoming and downstream paths remain distinct; status labels do not imply metered load.</td></tr>
                 <tr><td>FR-16</td><td>Render ATS panel ties, CDP and mechanical branches.</td><td><code>ATS_PNL1/2</code>, <code>CDP</code>, CH-1…4 and AHU-1/2 appear at stable locations.</td></tr>
                 <tr><td>FR-17</td><td>Render ten DAHU branches.</td><td><code>DAHU_A_0…4</code> and <code>DAHU_B_0…4</code> each have breaker, path and telemetry.</td></tr>
-                <tr><td>FR-18</td><td>Render ten representative rack paths.</td><td>Each <code>RACK_0…9</code> has main/catcher PDU, rack ATS and final protected branch.</td></tr>
+                <tr><td>FR-18</td><td>Render ten aggregate rack-group paths.</td><td>Each <code>RACK_0…9</code> has main/catcher PDU, rack ATS, 3,000 kW and 200-position disclosure.</td></tr>
                 <tr><td>FR-19</td><td>Initialize every wire breaker to closed unless its model declares open.</td><td>Generator incomers, tie and catcher-panel alternatives start open; all other modeled defaults match <code>WIRES</code>.</td></tr>
                 <tr><td>FR-20</td><td>Support breaker closed/open/trip simulation.</td><td>Click toggles open/closed, Alt sets open and Shift sets trip; state is visible in symbol and alarm count.</td></tr>
                 <tr><td>FR-21</td><td>Run ATS transfer logic for streams A, B and C.</td><td>Utility loss opens utility breaker, starts the generator and closes generator breaker after the declared simulated delay; restoration reverses the sequence.</td></tr>
@@ -184,13 +185,13 @@
             <h2><span class="mn-num">05</span> Data model &amp; telemetry points</h2>
             <p class="mn-lead">Rows enumerate every displayed point family. Wildcards identify generated instances and are the canonical point namespace, not an omission of individual equipment.</p>
             <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Signal</th><th>Symbol / ID</th><th>Unit</th><th>Nominal / semantics</th><th>Source binding</th></tr></thead><tbody>
-                <tr><td>Facility load</td><td><code>epms-fac</code></td><td>MW</td><td>2.68; engine-bound aggregate.</td><td><code>CONV_CALC.snapshot.site.facility_kw / 1000</code>.</td></tr>
-                <tr><td>IT load</td><td><code>epms-it</code></td><td>MW</td><td>1.85; engine-bound protected IT aggregate.</td><td><code>snapshot.site.it_kw / 1000</code>.</td></tr>
+                <tr><td>Facility load</td><td><code>epms-fac</code></td><td>MW</td><td>43.50; engine-bound campus aggregate.</td><td><code>CONV_CALC.snapshot.site.facility_load_kw / 1000</code>.</td></tr>
+                <tr><td>IT load</td><td><code>epms-it</code></td><td>MW</td><td>30.00; engine-bound protected IT aggregate.</td><td><code>snapshot.site.it_load_kw / 1000</code>.</td></tr>
                 <tr><td>PUE</td><td><code>epms-pue</code></td><td>ratio</td><td>1.45; facility/IT basis.</td><td><code>snapshot.site.pue</code>.</td></tr>
-                <tr><td>Utility summary</td><td>top-strip Utility</td><td>state</td><td>OK presentation; green normal.</td><td>Static label; not bound to <code>SIM.sources</code>.</td></tr>
-                <tr><td>UPS summary</td><td>top-strip UPS A/B</td><td>state</td><td>Online presentation.</td><td>Static label; not a live UPS register.</td></tr>
-                <tr><td>Generator / trip summary</td><td>top-strip Gen / Trips</td><td>state / count</td><td>Standby / 0 presentation.</td><td>Static top strip; dynamic equivalents exist below.</td></tr>
-                <tr><td>Data quality / scenario</td><td>top-strip Data / Scenario</td><td>quality / mode</td><td>GOOD / Simulated.</td><td>Static provenance declaration.</td></tr>
+                <tr><td>Utility summary</td><td>top-strip Utility</td><td>state</td><td>Available source count.</td><td><code>SIM.sources</code> via <code>updateEpmsStatusStrip()</code>.</td></tr>
+                <tr><td>UPS summary</td><td>top-strip UPS A/B</td><td>state</td><td>Governed module/system basis.</td><td><code>snapshot.electrical</code>; not a live UPS register.</td></tr>
+                <tr><td>Generator / trip summary</td><td>top-strip Gen / Trips</td><td>state / count</td><td>Running generator count / open breaker count.</td><td>Bound to <code>SIM</code> state.</td></tr>
+                <tr><td>Data quality / scenario</td><td>top-strip Data / Scenario</td><td>quality / mode</td><td>GOOD / Simulated under current authority.</td><td>Validated <code>snapshot.meta</code>; unavailable on missing provenance.</td></tr>
                 <tr><td>Utility source availability</td><td><code>SIM.sources.A/B</code>, <code>btn-u-a/b</code></td><td>boolean</td><td>Active or off.</td><td>User toggle in local simulator.</td></tr>
                 <tr><td>Generator running</td><td><code>SIM.genRunning.A/B/C</code>, <code>btn-gen-a/b/c</code></td><td>boolean</td><td>Standby or running.</td><td><code>runATSLogic()</code>.</td></tr>
                 <tr><td>Breaker state</td><td><code>SIM.breakers[br_*]</code></td><td>enum</td><td>closed / open / trip; trip is fault-red.</td><td><code>WIRES[].br</code> plus user gesture/ATS.</td></tr>
@@ -198,17 +199,17 @@
                 <tr><td>MV feeders</td><td><code>tele-w_mv_a/b</code>, <code>tele-w_rmu_a/b</code>, <code>tele-w_mv_tie</code></td><td>V / A / kW</td><td>20,000 V; illustrative power assignment.</td><td><code>WIRES</code> voltage + <code>calcPowerFlow()</code>.</td></tr>
                 <tr><td>Ring / transformer feeders</td><td><code>tele-w_ring_ac/bc</code>, <code>tele-w_tx_a/b/c</code></td><td>V / A / kW</td><td>20 kV upstream; current from assigned kW/PF.</td><td><code>WIRES</code> and 3-phase current formula.</td></tr>
                 <tr><td>LVSB / generator feeders</td><td><code>tele-w_lvsb_*</code>, <code>tele-w_gen_*</code></td><td>V / A / kW</td><td>400 V; utility or generator source path.</td><td><code>WIRES</code>, breaker state and source reachability.</td></tr>
-                <tr><td>IT distribution feeders</td><td><code>tele-w_db_a/b/c</code>, <code>tele-w_ups_a/b/c</code></td><td>V / A / kW</td><td>400 V; assigned 1,000/300 kW based on destination type.</td><td><code>calcPowerFlow()</code> destination-name mapping.</td></tr>
+                <tr><td>IT distribution feeders</td><td><code>tele-w_db_a/b/c</code>, <code>tele-w_ups_a/b/c</code></td><td>V / A / kW</td><td>400 V; engine-derived share of 30,000 kW IT.</td><td><code>EPMS_LADDER</code> plus <code>calcPowerFlow()</code>.</td></tr>
                 <tr><td>Mechanical distribution</td><td><code>tele-w_db_m_*</code>, <code>tele-w_ups_m_*_in</code>, <code>tele-w_ats*</code></td><td>V / A / kW</td><td>400 V; illustrative feeder values.</td><td><code>WIRES</code> and destination-name mapping.</td></tr>
                 <tr><td>Chiller/AHU branches</td><td><code>tele-w_ch1…4</code>, <code>tele-w_ahu1/2</code></td><td>V / A / kW</td><td>400 V; energized state and assigned load.</td><td><code>WIRES</code>.</td></tr>
-                <tr><td>DAHU branches</td><td><code>tele-w_dahu_a_0…4</code>, <code>tele-w_dahu_b_0…4</code></td><td>V / A / kW</td><td>400 V; 30 kW assignment per destination rule.</td><td>Generated <code>WIRES</code> loops.</td></tr>
+                <tr><td>DAHU branches</td><td><code>tele-w_dahu_a_0…4</code>, <code>tele-w_dahu_b_0…4</code></td><td>V / A / kW</td><td>400 V; derived share of governed non-IT load.</td><td><code>EPMS_LADDER.dahuKw</code>.</td></tr>
                 <tr><td>Rack PDU incoming</td><td><code>w_ups_pdu_m_0…9</code>, <code>w_ups_pdu_c_0…9</code></td><td>state</td><td>No telemetry label; topology/energization only.</td><td><code>WIRES[].noTele=true</code>.</td></tr>
-                <tr><td>Rack ATS feeders</td><td><code>tele-w_pdu_ats_m_0…9</code>, <code>tele-w_pdu_ats_c_0…9</code></td><td>V / A / kW</td><td>230 V; 60 kW assignment because destination contains PDU upstream only; branch mapping is illustrative.</td><td>Generated <code>WIRES</code>.</td></tr>
-                <tr><td>Final rack branch</td><td><code>tele-w_ats_rack_0…9</code></td><td>V / A / kW</td><td>230 V; 6 kW per representative rack.</td><td><code>calcPowerFlow()</code> rack destination rule.</td></tr>
+                <tr><td>Rack ATS feeders</td><td><code>tele-w_pdu_ats_m_0…9</code>, <code>tele-w_pdu_ats_c_0…9</code></td><td>V / A / kW</td><td>Intermediate topology allocation derived from the governed IT load.</td><td><code>EPMS_LADDER</code> and generated <code>WIRES</code>.</td></tr>
+                <tr><td>Final rack group</td><td><code>tele-w_ats_rack_0…9</code></td><td>aggregate kW / count</td><td>3,000 kW and 200 installed positions per group; no invented physical V/A.</td><td><code>site.it_load_kw / 10</code> and <code>campus.racks_total / 10</code>.</td></tr>
                 <tr><td>CDP feeder</td><td><code>tele-w_cdp</code></td><td>V / A / kW</td><td>230 V; controls load presentation.</td><td><code>WIRES</code>.</td></tr>
-                <tr><td>Total load</td><td><code>val-total-load</code></td><td>kW</td><td>2,400–2,499 while either utility is on; illustrative jitter.</td><td><code>updateStatusBar()</code> with <code>Math.random()</code>.</td></tr>
-                <tr><td>Power factor</td><td><code>val-pf</code></td><td>ratio</td><td>0.92–0.95 jitter.</td><td><code>updateStatusBar()</code>.</td></tr>
-                <tr><td>Frequency</td><td><code>val-freq</code></td><td>Hz</td><td>Approximately 49.95–50.05, shown to 0.1 Hz.</td><td><code>updateStatusBar()</code>.</td></tr>
+                <tr><td>Total load</td><td><code>val-total-load</code></td><td>kW</td><td>43,500 while a utility source is available; 0 in the modeled dark-site state.</td><td><code>snapshot.electrical.epms_total_kw</code>.</td></tr>
+                <tr><td>Power factor</td><td><code>val-pf</code></td><td>ratio</td><td>UNAVAILABLE.</td><td>No governed point; no fallback or random value.</td></tr>
+                <tr><td>Frequency</td><td><code>val-freq</code></td><td>Hz</td><td>UNAVAILABLE.</td><td>No governed point; no fallback or random value.</td></tr>
                 <tr><td>Breaker roll-up</td><td><code>val-breakers</code></td><td>closed / total</td><td>Direct state count.</td><td><code>SIM.breakers</code>.</td></tr>
                 <tr><td>Alarm roll-up</td><td><code>val-alarms</code></td><td>count</td><td>Number of breakers in trip.</td><td><code>SIM.breakers</code> filter.</td></tr>
                 <tr><td>System mode</td><td><code>val-system</code></td><td>state</td><td>ONLINE if either utility boolean is true; otherwise GEN MODE.</td><td><code>updateStatusBar()</code>.</td></tr>
@@ -218,10 +219,10 @@
 
         <section class="mn-section" id="formulas">
             <h2><span class="mn-num">06</span> Formulas &amp; derivations</h2>
-            <div class="mn-formula"><span class="mn-eq">Facility_kW = IT_kW × PUE = 1,850 × 1.45 = 2,682.5 kW</span><span class="mn-eq">NonIT_kW = Facility_kW − IT_kW = 832.5 kW</span><span class="mn-where">Source: <code>CONV_CALC.snapshot.site</code> and the Conventional manual. These values drive the top strip, not the jittered bottom Total Load.</span></div>
-            <div class="mn-formula"><span class="mn-eq">I_3φ = P_kW × 1,000 / (√3 × V_LL × PF)</span><span class="mn-eq">Example: 2,400 kW at 20,000 V and PF 0.90 → 76.98 A → 76 A after floor()</span><span class="mn-where">The cockpit applies this three-phase formula to every displayed wire, including 230 V rack branches. The latter is an acknowledged modeling shortcut; a single-phase branch would use <code>I=P/V/PF</code>.</span></div>
+            <div class="mn-formula"><span class="mn-eq">Facility_kW = IT_kW × PUE = 30,000 × 1.45 = 43,500 kW</span><span class="mn-eq">NonIT_kW = Facility_kW − IT_kW = 13,500 kW</span><span class="mn-where">Source: complete <code>CONV_CALC v2.0.0</code> snapshot. Current load is four halls × 7,500 kW; 40,000 kW is planning/design capacity only.</span></div>
+            <div class="mn-formula"><span class="mn-eq">I_3φ = P_kW × 1,000 / (√3 × V_LL × PF)</span><span class="mn-eq">Example: 43,500 kW at 20,000 V and PF 0.90 → 1,395.30 A → 1,395 A after floor()</span><span class="mn-where">Intermediate wire labels use the declared three-phase assumption. Final rack groups are aggregate roll-ups and intentionally suppress physical V/A.</span></div>
             <div class="mn-formula"><span class="mn-eq">closedBreakers = count(SIM.breakers[state = closed])</span><span class="mn-eq">activeAlarms = count(SIM.breakers[state = trip])</span><span class="mn-where">These roll-ups are deterministic for a given interaction sequence.</span></div>
-            <div class="mn-formula"><span class="mn-eq">TotalLoad_kW = utilityAvailable ? 2,400 + floor(random × 100) : 0</span><span class="mn-eq">PF = round2(0.92 + random × 0.03)</span><span class="mn-eq">f_Hz = round1(50.0 + (random − 0.5) × 0.1)</span><span class="mn-where">These are simulator display functions, not engineering calculations or meter models. The manual marks them as illustrative until replaced by one reconciled scenario source.</span></div>
+            <div class="mn-formula"><span class="mn-eq">TotalLoad_kW = utilityAvailable ? electrical.epms_total_kw : 0</span><span class="mn-eq">PF = UNAVAILABLE</span><span class="mn-eq">f_Hz = UNAVAILABLE</span><span class="mn-where">The total shares the governed scenario source; unpublished points remain neutral rather than receiving plausible defaults.</span></div>
         </section>
 
         <section class="mn-section" id="ux">
@@ -240,7 +241,8 @@
         <section class="mn-section" id="acceptance">
             <h2><span class="mn-num">08</span> Acceptance criteria</h2>
             <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>ID</th><th>Given / when / then</th><th>Evidence</th></tr></thead><tbody>
-                <tr><td>AC-01</td><td>Given <code>CONV_CALC.snapshot</code>, when the page loads, then top-strip values are 2.68 MW, 1.85 MW and 1.45.</td><td>DOM assertion against engine output.</td></tr>
+                <tr><td>AC-01</td><td>Given complete <code>CONV_CALC v2.0.0</code> authority, when the page loads, then top-strip values are 43.50 MW, 30.00 MW and 1.45.</td><td>DOM assertion against engine output.</td></tr>
+                <tr><td>AC-01A</td><td>Given missing, legacy or same-version-incomplete authority, then all governed values and the shared basis drawer remain unavailable and no retired current value appears.</td><td>Hostile-fixture browser assertions.</td></tr>
                 <tr><td>AC-02</td><td>Given Utility A on, when it is toggled off, then its button and reachable flow become off and an event is logged.</td><td>Puppeteer interaction.</td></tr>
                 <tr><td>AC-03</td><td>Given both utilities unavailable, when ATS delays settle, then system mode is GEN MODE and required generator paths close.</td><td>Fake-clock state sequence.</td></tr>
                 <tr><td>AC-04</td><td>Given utility restoration, then generator breaker opens before utility breaker closes for that stream.</td><td>Fake-clock state sequence.</td></tr>
@@ -275,7 +277,7 @@
             <h2><span class="mn-num">10</span> Provenance &amp; sources</h2>
             <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Source</th><th>Governs</th><th>Binding / use</th></tr></thead><tbody>
                 <tr><td><code>EPMS_Telemetry.html</code></td><td>Visible topology, controls, state machine, telemetry assignment and exports.</td><td>Primary implementation source.</td></tr>
-                <tr><td><code>js/conv-engine.js</code></td><td>1,850 kW IT, 2,682.5 kW facility and PUE 1.45 shared basis.</td><td>Top status strip through <code>CONV_CALC.snapshot</code>.</td></tr>
+                <tr><td><code>js/conv-engine.js</code></td><td>CONV_CALC v2.0.0: four halls, 30,000 kW current IT, 43,500 kW facility, PUE 1.45 and 2,000 installed rack positions.</td><td>Top status strip through a schema-complete snapshot; 40 MW IT remains planning/design capacity.</td></tr>
                 <tr><td><a class="mn-inline" href="../manual/epms-telemetry.html">EPMS Technical Manual</a></td><td>Electrical formulas, transfer sequence, point interpretation and worked examples.</td><td>Human-readable methodology.</td></tr>
                 <tr><td>IEC 60364</td><td>Low-voltage installation principles and conductor/protection context.</td><td>Design reference only; simulator is not a compliance calculation.</td></tr>
                 <tr><td>IEC 60909</td><td>Short-circuit current calculation framework.</td><td>Future study boundary; no fault level is currently calculated.</td></tr>
@@ -289,16 +291,16 @@
         <section class="mn-section" id="risks">
             <h2><span class="mn-num">11</span> Open questions &amp; risks</h2>
             <div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>Risk / open question</th><th>Current evidence</th><th>Required resolution</th></tr></thead><tbody>
-                <tr><td>Site total is internally inconsistent.</td><td>Top strip is 2.6825 MW from <code>CONV_CALC</code>; bottom Total Load jitters at 2.4–2.499 MW.</td><td>Bind both to one scenario with an explicit metering tolerance, or label bottom value as a separate sample meter.</td></tr>
-                <tr><td>Ten visible racks do not reconcile to 1.85 MW IT.</td><td>Ten × 6 kW = 60 kW; the page does not label the row as representative.</td><td>Declare representative scope or render aggregate PDU rows whose sum matches IT.</td></tr>
-                <tr><td>Wire kW is destination-name based.</td><td>Values 2,400/1,000/300/60/30/6 kW are assignments, not a conserved load-flow model.</td><td>Replace with a topology-aware allocation that balances at each bus.</td></tr>
-                <tr><td>230 V rack current uses the three-phase formula.</td><td>One formula is applied to all wires.</td><td>Declare phase model per branch and use single- or three-phase calculation accordingly.</td></tr>
+                <tr><td>Site aggregate is a modeled authority, not a field meter.</td><td>Top and bottom both bind to 43.50 MW from <code>CONV_CALC v2.0.0</code>.</td><td>Add physical meter identity, timestamp and tolerance before any live-operations claim.</td></tr>
+                <tr><td>Ten terminal symbols are aggregate rack groups.</td><td>Ten × 3,000 kW = 30 MW and ten × 200 positions = 2,000 positions.</td><td>Keep the aggregate label explicit; do not present a group as one cabinet or feeder.</td></tr>
+                <tr><td>Intermediate wire kW is topology-class allocation.</td><td>Values derive from site IT/non-IT totals and drawn branch counts, not a solved network.</td><td>Replace with a bus-conserving load-flow/allocation model if detailed feeder design is required.</td></tr>
+                <tr><td>Rack-group V/A is not governed.</td><td>Final group labels show only aggregate kW and rack count.</td><td>Publish branch phase/voltage/conductor topology before exposing physical current.</td></tr>
                 <tr><td>Source colors conflict with alarm semantics.</td><td>Stream A is fault-red and stream C is purple even when normal.</td><td>Move source identity to labels/markers; reserve red for trip and avoid purple as primary operational chrome.</td></tr>
-                <tr><td>Top status fields can become stale.</td><td>Utility/UPS/Gen/Trips/Data are static while lower simulator state changes.</td><td>Bind to the same state object and expose timestamp/quality per point.</td></tr>
+                <tr><td>Point-level freshness is absent.</td><td>Top source/gen/trip state is bound, while quality remains snapshot-level.</td><td>Expose acquisition timestamp, stale threshold and quality per point.</td></tr>
                 <tr><td>Breaker gestures are undiscoverable and lack confirmation.</td><td>Alt/Shift behavior exists only in code; any diagram click changes state.</td><td>Add explicit training controls, keyboard semantics and confirmation for destructive/safety-like actions.</td></tr>
                 <tr><td>ATS timing is illustrative.</td><td>1 s restoration and 2 s generator start are browser timers, not equipment curves/interlocks.</td><td>Label simulated timing and model sync/check permissives before any operational claim.</td></tr>
-                <tr><td>Generator/capacity duty is not reconciled.</td><td>Three 2.5 MW sets are shown without required-running/N+1 or fuel coupling.</td><td>Derive duty and autonomy from facility load and documented generator curve.</td></tr>
-                <tr><td>Data quality says GOOD without point freshness.</td><td>No acquisition timestamp, stale threshold or bad-quality state per wire.</td><td>Adopt <code>RZTelemetryQuality</code> or equivalent point-level quality contract.</td></tr>
+                <tr><td>Generator/capacity duty is not reconciled.</td><td>Three 2.5 MW sets cannot establish capacity for the governed 43.50 MW facility load.</td><td>Keep adequacy unavailable until fleet quantity, derating, dispatch, N+1 and the 15,503 L/h fuel basis are governed together.</td></tr>
+                <tr><td>Data quality is snapshot-level.</td><td>The shared telemetry banner and metadata validate authority, but individual wires have no sample age.</td><td>Adopt point-level freshness and bad-quality state before a live integration.</td></tr>
                 <tr><td>Export omits simulation provenance.</td><td>Files contain current values but not a formal data-mode field.</td><td>Add schema/version/data-mode and units without changing existing behavior until separately approved.</td></tr>
             </tbody></table></div>
             <div class="mn-actions"><a class="mn-action primary" href="../EPMS_Telemetry.html">Open cockpit</a><a class="mn-action" href="../manual/epms-telemetry.html">Read technical manual</a></div>

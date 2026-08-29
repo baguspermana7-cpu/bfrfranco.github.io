@@ -1,10 +1,26 @@
 # BMS Shell — Shared Operations-Console Standard (v1.23.0+)
 
-## v1.131.0 — Conventional DC operator hardening (2026-08-27)
+## v1.134.14 — governed authority and fail-closed shell (2026-08-30)
 
-- **Two truth domains:** the 1.850 MW current simulation remains owned by `CONV_CALC`;
-  the four-hall, 40 MW IT capacity study is immutable, separately labelled and fails closed
-  when rack density, thermal envelope, resilience or dPUE scope does not reconcile.
+- **Current Conventional authority:** a complete `CONV_CALC v2.0.0` snapshot owns four halls,
+  30,000 kW current simulated IT, 43,500 kW facility load, PUE 1.45, and 2,000 installed
+  rack positions (500 per hall). The 40,000 kW IT value is planning/design capacity only.
+- **Complete-schema handshake:** a matching version string alone is insufficient. Missing,
+  legacy, requested-version-mismatched, or same-version-incomplete authority makes every
+  engine-owned consumer unavailable and every related command inert.
+- **All consumers means all consumers:** first paint, scheduled refresh, KPI duplicates,
+  sidebars, hidden panels, shared Basis drawers, exported/generated documents and responsive
+  variants obey the same authority result. Plausible fallback values are forbidden.
+- **Telemetry language:** browser timers are deterministic display refreshes. Shell labels use
+  `SIMULATED`, `scenario`, or `display refresh`; they do not imply a live meter or historian.
+- The sections below are a **historical release archive**. Values described there record what
+  shipped at that time and are not current engineering authority unless reaffirmed above.
+
+## v1.131.0 — Conventional DC operator hardening (historical, 2026-08-27)
+
+- **Superseded authority note:** this release still used the retired 1.850 MW single-hall
+  simulation. It was subsequently replaced by the v2.0.0 four-hall authority stated above.
+  Its separate 40 MW IT capacity study did not represent current load.
 - **Operator consequence before decoration:** Data Hall, Chiller, Fire, Fuel, Water and ICT
   now expose selected-object basis, current/study context, command versus feedback, consequence,
   redundancy and responsive diagnostics without changing the underlying process engines.
@@ -26,15 +42,15 @@
 - **Release gate:** Conventional basis, historian, cooling/water, fire/fuel, data-hall and ICT
   regressions are mandatory entries in `tools/ship-gate.sh`.
 
-## v1.130.0 — semantic operator workflows (2026-08-26)
+## v1.130.0 — semantic operator workflows (historical, 2026-08-26)
 
 - **DC AI/HPC:** added a dedicated Alarm & Events query workspace, rack-density/platform
   comparison, evaluated electrical-state toolbar/timeline, and FACP-authoritative fire
   cause-and-effect matrix. Existing P&IDs, SLD geometry, simulation bindings and dashboard
   remain in place.
-- **Shared Generate Design:** AI and Conventional cockpits now use one keyboard-accessible
-  Design Studio. The locked current basis is the default; GB300 and 4 × 10 MW conventional
-  capacity content is study-only and cannot mutate live calculations.
+- **Shared Generate Design:** AI and Conventional cockpits added one keyboard-accessible
+  Design Studio. At that release the then-locked basis was the default; GB300 and 4 × 10 MW
+  conventional capacity content remained study-only and could not mutate scenario calculations.
 - **EPMS source-color truth:** the final ATS-to-rack conductor inherits its actual evaluated
   source. A rack on Feed A/generator-A is red, a rack on Feed B is green, and a de-energized
   path is quiet gray; a hard-coded green tail is forbidden.
@@ -56,7 +72,7 @@ Reusable lesson: legacy diagrams often encode visual state directly in CSS class
 adding simulation, introduce a pure evaluated topology first, then project that state onto
 the preserved SVG. This prevents contradictory animation without redrawing an approved SLD.
 
-## Adoption status table (closing v1.23 → v1.24 phase, 2026-05-22)
+## Adoption status table (historical v1.23 → v1.24 archive, 2026-05-22)
 
 | Page | Adoption ship | Shell library loaded | `body.rz-bms-shell` | Doc-14/24 fixes applied | Engine binding |
 |---|---|---|---|---|---|
@@ -127,7 +143,10 @@ surgical/additive scope:
   requires comprehensive CSS rework over the existing light/dark token
   system).
 
-## Status
+## Historical release status (not current authority)
+
+The figures in this archive document the UI state at each named release. They are retained
+for regression archaeology only; v1.134.14 and `CONV_CALC v2.0.0` govern current consumers.
 
 **v1.23.0 (2026-05-22)** — Foundation only. Library files shipped, no
 pages migrated yet.
@@ -169,19 +188,19 @@ active chip dynamically (green ≤0 / amber 1–2 / red 3–6 — calm normal,
 loud abnormal, doc-14 §5: "Use red only during active alarm/discharge").
 State-machine transitions (`state.stage`) unchanged.
 
-**v1.24.0 (2026-05-22)** — `EPMS_Telemetry.html` adopted (exemplar
+**v1.24.0 (2026-05-22, historical/retired basis)** — `EPMS_Telemetry.html` adopted (exemplar
 designation revoked by owner). `conv-engine.js` now loaded —
-Facility/IT/PUE values match dashboard. Doc-14 §2 fixes: engineering
+Facility/IT/PUE values matched that release's dashboard. Doc-14 §2 fixes: engineering
 status strip ("EPMS NORMAL · Facility 2.68 MW · IT 1.85 MW · PUE 1.45 ·
 Utility OK · UPS A/B Online · Gen Standby · Trips 0") + visible
 line-status legend (Energized / Standby / Open / Alarm/Trip /
-Maintenance Bypass) above the SVG. All existing one-line + topbar
-content untouched.
+Maintenance Bypass) above the SVG. Those numerical values are retired historical evidence,
+not current authority. All existing one-line + topbar content was untouched.
 
-**v1.24.1 (2026-05-22)** — `datahall.html` adopted. Library loaded.
+**v1.24.1 (2026-05-22, historical/retired basis)** — `datahall.html` adopted. Library loaded.
 Doc-14 §3 fixes: operations rollup (`#dh-ops-rollup`) right after the
-alarm strip showing Hall NORMAL · Rack Load 1.85 MW · Cooling Margin
-18% · PUE 1.45 · Power Density 9.3 kW/rack (engine-bound) + view-mode
+alarm strip showing the then-current, now-retired Hall NORMAL · Rack Load 1.85 MW · Cooling
+Margin 18% · PUE 1.45 · Power Density 9.3 kW/rack values + view-mode
 selector (`#dh-mode-toolbar` via `RZBMSShell.layerToggle`) with 5 modes
 (Power/Temperature/Cooling Margin/Space/Alarms) that sets
 `body[data-dh-mode]`. Per-mode render rules deferred.

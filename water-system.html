@@ -73,11 +73,11 @@
     <!-- conv-engine: single scenario basis (WUE = water vol / IT energy, computed).
          Loaded NON-deferred + external so window.CONV_CALC exists before the
          inline binding script. NEVER inline this in a JS string literal. -->
-    <script src="js/conv-engine.js?v=1.22.0"></script>
+    <script src="js/conv-engine.js?v=2.0.0"></script>
     <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
          Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
     <script src="js/conv-parameters.js?v=1.134.3"></script>
-    <script src="js/rz-basis-drawer.js?v=1.134.3"></script>
+    <script src="js/rz-basis-drawer.js?v=1.134.14"></script>
     <!-- v1.42.5 — Semantic line model. Allows probe-line-model.mjs to audit
          the static SVG pipes tagged with data-rz-line / data-from / data-to
          / data-medium / data-state / etc. Loaded for validator parity. -->
@@ -88,7 +88,7 @@
     <script src="js/rz-alarm-state.js?v=1.43.4" defer></script>
     <script src="js/rz-inspector.js?v=1.43.4" defer></script>
     <!-- v1.43.2 — Data-quality service: top-banner + per-element chip. -->
-    <script src="js/rz-telemetry-quality.js?v=1.131.0" defer></script>
+    <script src="js/rz-telemetry-quality.js?v=1.134.14" defer></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
          Loaded for cross-page consistency; body does NOT carry rz-bms-shell
          class. Spec: standarization/BMS_SHELL.md ; conv/review/14 §7. -->
@@ -99,6 +99,7 @@
     <script src="js/conv-alarm-workspace.js?v=1.131.0" defer></script>
     <script src="js/rz-bms-shell.js?v=1.23.4" defer></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap');
         /* Grounded operator-console palette (matches EPMS_Telemetry exemplar).
            Red is reserved for ALARM/TRIP only — never decoration. */
         :root {
@@ -118,59 +119,59 @@
         }
         * { box-sizing: border-box; }
         body { margin: 0; background: var(--bg-core); color: var(--text-main);
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            font-variant-numeric: tabular-nums; }
+            font-family: 'IBM Plex Sans', system-ui, sans-serif;
+            font-variant-numeric: tabular-nums slashed-zero;
+            font-feature-settings: "tnum" 1, "zero" 1; }
         .wrap { padding: 14px 18px 70px; max-width: 1680px; margin: 0 auto; }
         a { color: inherit; }
-        .mono { font-family: 'Consolas', 'SF Mono', monospace; }
+        .mono, .metric-val, .k-val, .data-val, [data-basis-param] {
+            font-family: 'JetBrains Mono', monospace;
+            font-variant-numeric: tabular-nums slashed-zero;
+            font-feature-settings: "tnum" 1, "zero" 1;
+        }
 
         /* Top status bar — alarm/safety state FIRST (doc-10 hierarchy) */
         .topbar { display: flex; align-items: center; flex-wrap: wrap; gap: 14px;
             background: var(--panel-bg); border: 1px solid var(--panel-line);
-            border-radius: 8px; padding: 10px 16px; margin-bottom: 12px; }
+            border-radius: 4px; padding: 10px 16px; margin-bottom: 12px; }
         .brand { font-weight: 800; font-size: 17px; color: #fff; letter-spacing: .3px; }
         .brand small { display: block; font-size: 10px; font-weight: 600;
             color: var(--text-faint); letter-spacing: 1px; text-transform: uppercase; }
         .nav-btn { display: inline-flex; align-items: center; gap: 7px;
             text-decoration: none; color: var(--text-dim); font-size: 12px;
             font-weight: 600; padding: 8px 12px; min-height: 40px;
-            border: 1px solid var(--panel-line); border-radius: 6px;
+            border: 1px solid var(--panel-line); border-radius: 3px;
             background: transparent; cursor: pointer; transition: all .15s; }
         .nav-btn:hover { background: rgba(255,255,255,.07); color: #fff; }
         .alarm-strip { display: flex; align-items: center; flex-wrap: wrap; gap: 18px;
             background: var(--panel-bg); border: 1px solid var(--panel-line);
-            border-left: 4px solid var(--st-ok); border-radius: 8px;
+            border-left: 4px solid var(--st-ok); border-radius: 4px;
             padding: 10px 18px; margin-bottom: 12px; }
         .alarm-strip.has-alarm { border-left-color: var(--st-bad); }
         .alarm-strip.has-warn { border-left-color: var(--st-warn); }
+        .alarm-strip.is-unavailable { border-left-color: #64748b; }
         .alarm-state { font-size: 15px; font-weight: 800; letter-spacing: 1px;
             color: var(--st-ok); }
         .alarm-state.warn { color: var(--st-warn); }
         .alarm-state.bad { color: var(--st-bad); }
+        .alarm-state.unavailable { color: #94a3b8; }
         .alarm-chip { font-size: 11px; color: var(--text-dim); }
         .alarm-chip b { color: var(--text-main); font-weight: 700; }
         .alarm-chip .crit { color: var(--st-bad); }
         .alarm-chip .warnv { color: var(--st-warn); }
 
-        .ops-context { display: grid; grid-template-columns: minmax(250px,.8fr) minmax(260px,1fr) minmax(280px,1.2fr);
+        .ops-context { display: grid; grid-template-columns: repeat(2,minmax(0,1fr));
             gap: 8px; margin-bottom: 12px; min-width: 0; }
-        .hall-selector, .basis-card { min-width: 0; border: 1px solid var(--panel-line);
-            border-radius: 8px; background: var(--panel-bg); padding: 9px 11px; }
-        .context-label { display: block; margin-bottom: 6px; color: var(--text-dim);
-            font: 700 9px/1.3 'Consolas', monospace; letter-spacing: .08em; text-transform: uppercase; }
-        .hall-controls { display: grid; grid-template-columns: repeat(4,minmax(42px,1fr)); gap: 5px; }
-        .hall-btn { min-height: 32px; border: 1px solid #42536d; border-radius: 5px;
-            background: #111c2d; color: #aab9cc; font: 700 10px 'Consolas', monospace; cursor: pointer; }
-        .hall-btn[aria-pressed="true"] { border-color: #4c9abc; background: #172c40; color: #f0f7fb;
-            box-shadow: inset 0 -2px 0 var(--medium-water); }
-        .hall-btn:focus-visible, .btn:focus-visible, .zoom-btn:focus-visible, .nav-btn:focus-visible {
+        .basis-card { min-width: 0; border: 1px solid var(--panel-line);
+            border-radius: 4px; background: var(--panel-bg); padding: 9px 11px; }
+        .btn:focus-visible, .zoom-btn:focus-visible, .nav-btn:focus-visible {
             outline: 2px solid #8bd8f4; outline-offset: 2px; }
         .basis-card { display: flex; flex-direction: column; justify-content: center; }
         .basis-card.current { border-left: 3px solid var(--medium-water); }
         .basis-card.study { border-left: 3px solid var(--st-warn); }
-        .basis-title { color: #dce7f2; font: 700 10px/1.3 'Consolas', monospace;
+        .basis-title { color: #dce7f2; font: 700 10px/1.3 'JetBrains Mono', monospace;
             letter-spacing: .04em; text-transform: uppercase; }
-        .basis-value { margin-top: 3px; color: var(--text-dim); font: 10px/1.4 'Consolas', monospace; }
+        .basis-value { margin-top: 3px; color: var(--text-dim); font: 10px/1.4 'JetBrains Mono', monospace; }
         .basis-card.study .basis-title, .basis-guard { color: #e7c96f; }
         .basis-guard { font-weight: 700; }
 
@@ -182,11 +183,10 @@
         .kpi-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
             gap: 10px; margin-bottom: 12px; }
         .kpi { background: var(--panel-bg); border: 1px solid var(--panel-line);
-            border-radius: 8px; padding: 12px 14px; }
+            border-radius: 4px; padding: 12px 14px; }
         .kpi.hero {
             border-color: rgba(45,212,191,0.45);
-            background: linear-gradient(180deg, #0e1a2c, #0a1322);
-            box-shadow: inset 0 0 0 1px rgba(45,212,191,0.08);
+            background: #0d1827;
         }
         .kpi.hero h3 { font-size: 11px; color: var(--medium-treated); letter-spacing: 0.7px; }
         .kpi.hero .v { font-size: 36px; color: #fff; }
@@ -208,7 +208,7 @@
         .kpi .th.bad { color: var(--st-bad); }
 
         .panel { background: var(--panel-bg); border: 1px solid var(--panel-line);
-            border-radius: 8px; padding: 16px 18px; margin-bottom: 12px; }
+            border-radius: 4px; padding: 16px 18px; margin-bottom: 12px; }
         .panel-title { font-size: 12px; font-weight: 700; text-transform: uppercase;
             letter-spacing: .8px; color: var(--text-dim); margin: 0 0 12px;
             display: flex; align-items: center; gap: 8px; }
@@ -240,10 +240,10 @@
         .eq-grp { cursor: pointer; }
         .eq-grp:hover .eq { stroke: var(--sel); }
         .tag { fill: #fbbf24; font-size: 11px; font-weight: 700;
-            font-family: 'Consolas', monospace; }
+            font-family: 'JetBrains Mono', monospace; }
         .lbl { fill: var(--text-dim); font-size: 10px; font-weight: 600; }
         .val { fill: #fff; font-size: 11px; font-weight: 700;
-            font-family: 'Consolas', monospace; }
+            font-family: 'JetBrains Mono', monospace; }
         .val.ok { fill: var(--st-ok); }
         .val.warn { fill: var(--st-warn); }
         .val.bad { fill: var(--st-bad); }
@@ -256,13 +256,13 @@
             padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.06); font-size: 12px; }
         .insp-row:last-child { border-bottom: 0; }
         .insp-row .k { color: var(--text-dim); }
-        .insp-row .vv { color: #fff; font-weight: 700; font-family: 'Consolas', monospace; }
+        .insp-row .vv { color: #fff; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
         .insp-row .vv.ok { color: var(--st-ok); }
         .insp-row .vv.warn { color: var(--st-warn); }
         .insp-row .vv.bad { color: var(--st-bad); }
         .balance-note { font-size: 11px; line-height: 1.6; color: var(--text-dim);
             background: rgba(255,255,255,.03); border: 1px dashed var(--panel-line);
-            border-radius: 6px; padding: 10px 12px; margin-top: 10px; }
+            border-radius: 4px; padding: 10px 12px; margin-top: 10px; }
         .balance-note b { color: var(--text-main); }
         .scope-tag { display: inline-block; font-size: 9px; font-weight: 700;
             padding: 2px 7px; border-radius: 3px; text-transform: uppercase;
@@ -287,7 +287,7 @@
         .btn { display: inline-flex; align-items: center; gap: 7px;
             background: rgba(255,255,255,.05); border: 1px solid var(--panel-line);
             color: var(--text-dim); padding: 8px 14px; min-height: 40px;
-            border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 700;
+            border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: 700;
             transition: all .15s; }
         .btn:hover { background: rgba(255,255,255,.1); color: #fff; }
         .btn.active { border-color: var(--sel); color: var(--sel);
@@ -297,55 +297,67 @@
             background: rgba(234,179,8,.12); }
         .zoom-btn { background: rgba(255,255,255,.05); border: 1px solid var(--panel-line);
             color: var(--text-dim); padding: 7px 11px; min-height: 40px;
-            border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;
+            border-radius: 3px; cursor: pointer; font-size: 11px; font-weight: 600;
             transition: all .15s; }
         .zoom-btn:hover { background: rgba(255,255,255,.1); color: #fff; }
         .zoom-btn.active { border-color: var(--sel); color: var(--sel);
             background: rgba(34,211,238,.12); }
 
         .chart-card { background: var(--panel-bg); border: 1px solid var(--panel-line);
-            border-radius: 8px; padding: 14px 16px; }
+            border-radius: 4px; padding: 14px 16px; }
+        .trend-chart-frame { height: 220px; min-height: 220px; position: relative; }
+        .trend-chart-frame canvas { height: 100% !important; width: 100% !important; }
+        .trend-unavailable { position: absolute; inset: 0; display: flex; align-items: center;
+            justify-content: center; border: 1px dashed #526173; color: #94a3b8;
+            background: #0a111d; font: 600 11px/1.5 'JetBrains Mono', monospace;
+            letter-spacing: .04em; text-align: center; padding: 18px; }
+        .trend-unavailable[hidden] { display: none; }
 
         /* Bottom status bar */
         .status-bar { position: fixed; bottom: 0; left: 0; right: 0;
             background: rgba(8,14,26,.97); border-top: 1px solid var(--panel-line);
             padding: 8px 18px; display: flex; gap: 22px; align-items: center;
-            flex-wrap: wrap; z-index: 50; backdrop-filter: blur(8px); }
+            flex-wrap: wrap; z-index: 50; }
         .status-item { display: flex; align-items: center; gap: 7px; font-size: 11px; }
         .status-led { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 auto; }
         .led-ok { background: var(--st-ok); box-shadow: 0 0 5px var(--st-ok); }
         .led-warn { background: var(--st-warn); box-shadow: 0 0 5px var(--st-warn); }
         .led-bad { background: var(--st-bad); box-shadow: 0 0 5px var(--st-bad); }
+        .led-unavailable { background: #64748b; box-shadow: none; }
         .status-item .k { color: var(--text-faint); }
-        .status-item .vv { color: #fff; font-weight: 700; font-family: 'Consolas', monospace; }
+        .status-item .vv { color: #fff; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
         .status-spacer { flex: 1; }
 
         .plant-summary-grid { display: grid; grid-template-columns: minmax(0,1.15fr) minmax(0,.85fr);
             gap: 10px; margin-top: 12px; }
-        .plant-summary { border: 1px solid var(--panel-line); border-radius: 7px; background: #09111f; padding: 10px; }
-        .summary-title { margin-bottom: 8px; color: var(--text-dim); font: 700 10px 'Consolas', monospace;
+        .plant-summary { border: 1px solid var(--panel-line); border-radius: 4px; background: #09111f; padding: 10px; }
+        .summary-title { margin-bottom: 8px; color: var(--text-dim); font: 700 10px 'JetBrains Mono', monospace;
             letter-spacing: .08em; text-transform: uppercase; }
         .pump-pair { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
         .pump-unit { display: grid; grid-template-columns: 36px minmax(0,1fr) auto; gap: 9px; align-items: center;
-            min-width: 0; border: 1px solid #34465f; border-radius: 6px; padding: 8px; background: #101b2c; }
+            min-width: 0; border: 1px solid #34465f; border-radius: 4px; padding: 8px; background: #101b2c; }
         .pump-unit[data-state="running"] { border-left: 3px solid var(--st-ok); }
         .pump-unit[data-state="available"] { border-left: 3px solid #64748b; }
+        .pump-unit[data-state="unavailable"] { border-left: 3px solid #64748b; opacity: .72; }
         .pump-icon { position: relative; width: 32px; height: 32px; border: 1.5px solid #7c92ad; border-radius: 50%; }
         .pump-icon::after { content: ""; position: absolute; left: 9px; top: 7px; border-top: 8px solid transparent;
             border-bottom: 8px solid transparent; border-left: 14px solid #7c92ad; }
         .pump-unit[data-state="running"] .pump-icon { border-color: var(--medium-treated); }
         .pump-unit[data-state="running"] .pump-icon::after { border-left-color: var(--medium-treated); }
-        .pump-name { color: #f0f5fa; font: 700 11px 'Consolas', monospace; }
-        .pump-meta { margin-top: 2px; color: var(--text-faint); font: 9px/1.35 'Consolas', monospace; }
-        .pump-state { color: #c4d1df; font: 700 9px 'Consolas', monospace; text-align: right; }
+        .pump-name { color: #f0f5fa; font: 700 11px 'JetBrains Mono', monospace; }
+        .pump-meta { margin-top: 2px; color: var(--text-faint); font: 9px/1.35 'JetBrains Mono', monospace; }
+        .pump-state { color: #c4d1df; font: 700 9px 'JetBrains Mono', monospace; text-align: right; }
         .pump-unit[data-state="running"] .pump-state { color: var(--st-ok); }
+        .pump-unit[data-state="unavailable"] .pump-state { color: #94a3b8; }
+        .sev.unavailable { color: #94a3b8; border-color: #64748b; }
         .allocation-list { display: grid; gap: 5px; }
         .allocation-row { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px; align-items: baseline;
-            padding: 5px 0; border-bottom: 1px dashed rgba(148,163,184,.22); font: 10px 'Consolas', monospace; }
+            padding: 5px 0; border-bottom: 1px dashed rgba(148,163,184,.22); font: 10px 'JetBrains Mono', monospace; }
         .allocation-row:last-child { border-bottom: 0; }
         .allocation-row span { color: var(--text-dim); }
         .allocation-row strong { color: #f3f7fb; }
-        .scope-note { margin-top: 7px; color: var(--text-faint); font: 9px/1.4 'Consolas', monospace; }
+        .allocation-row strong.unavailable, .vv.unavailable, .th.unavailable { color: #94a3b8; }
+        .scope-note { margin-top: 7px; color: var(--text-faint); font: 9px/1.4 'JetBrains Mono', monospace; }
 
         body.fullscreen .no-print { display: none; }
 
@@ -356,7 +368,6 @@
             .layout { grid-template-columns: 1fr; }
             .kpi-grid { grid-template-columns: repeat(3, 1fr); }
             .ops-context { grid-template-columns: 1fr 1fr; }
-            .hall-selector { grid-column: 1 / -1; }
         }
         @media (max-width: 1024px) {
             /* v1.29.3 — EcoStruxure-grade responsive treatment.
@@ -380,18 +391,16 @@
         @media (max-width: 768px) {
             html, body { overflow-x: hidden; max-width: 100vw; }
             img, picture, video { max-width: 100%; height: auto; }
-            .wrap { padding: 10px 10px 90px; }
+            .wrap { padding: 10px; }
             h1, .brand { font-size: 15px !important; }
             svg.pid { min-width: 1180px; }
             .diagram-wrap { overflow-x: auto !important;
                 -webkit-overflow-scrolling: touch; max-width: 100% !important; }
             .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
             .kpi .v { font-size: 19px; }
-            .status-bar { gap: 12px; padding: 8px 10px; }
+            .status-bar { gap: 12px; padding: 8px 10px; position: static; }
             .topbar, .alarm-strip { padding: 10px 12px; }
             .ops-context { grid-template-columns: 1fr; }
-            .hall-selector { grid-column: auto; }
-            .hall-btn { min-height: 44px; }
             .plant-summary-grid, .pump-pair { grid-template-columns: 1fr; }
             button, a.btn, [role="button"], .nav-btn, .btn, .zoom-btn { min-height: 44px; }
             .nav-menu, .nav-links { display: none !important; }
@@ -414,7 +423,7 @@
     <!-- v1.43.20 — instrument register (RZ Dark System v1). Chrome-only, dark-only, scoped. -->
     <link rel="stylesheet" href="css/rz-cockpit-instrument.css?v=1.43.19">
 </head>
-<body data-rz-data-mode="simulated" data-active-hall="A">
+<body data-rz-data-mode="simulated">
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <div class="wrap">
 
@@ -445,36 +454,23 @@
 
     <!-- Alarm / safety state FIRST (doc-10 information hierarchy) -->
     <div class="alarm-strip" id="alarmStrip">
-        <span class="alarm-state" id="alarmState">NORMAL</span>
-        <span class="alarm-chip"><b class="crit" id="cntCrit">0</b> Critical</span>
-        <span class="alarm-chip"><b class="warnv" id="cntWarn">0</b> Warning</span>
-        <span class="alarm-chip"><b id="cntStale">0</b> Stale Points</span>
+        <span class="alarm-state unavailable" id="alarmState">UNAVAILABLE</span>
+        <span class="alarm-chip"><b class="crit" id="cntCrit">&mdash;</b> Critical</span>
+        <span class="alarm-chip"><b class="warnv" id="cntWarn">&mdash;</b> Warning</span>
+        <span class="alarm-chip"><b id="cntStale">&mdash;</b> Stale Points</span>
         <span class="alarm-chip">Last Update <b id="lastUpdate">--:--:--</b></span>
-        <span class="alarm-chip">Scenario <b id="scenarioName">Simulated</b></span>
-        <span class="alarm-chip">Data Quality <b id="dataQuality">GOOD</b></span>
+        <span class="alarm-chip">Scenario <b id="scenarioName">UNAVAILABLE</b></span>
+        <span class="alarm-chip">Data Quality <b id="dataQuality">UNAVAILABLE</b></span>
     </div>
 
-    <section class="ops-context" aria-label="Hall view and engineering basis">
-        <div class="hall-selector">
-            <span class="context-label">View context · water balance unchanged</span>
-            <div class="hall-controls" role="group" aria-label="Select data hall view">
-                <button class="hall-btn" type="button" data-hall="A" aria-pressed="true">Hall A</button>
-                <button class="hall-btn" type="button" data-hall="B" aria-pressed="false">Hall B</button>
-                <button class="hall-btn" type="button" data-hall="C" aria-pressed="false">Hall C</button>
-                <button class="hall-btn" type="button" data-hall="D" aria-pressed="false">Hall D</button>
-            </div>
-        </div>
+    <section class="ops-context" aria-label="Site water engineering basis">
         <div class="basis-card current" data-basis="current">
-            <div class="basis-title" id="waterHallLabel">Current engine basis · Hall A</div>
-            <!-- v2.0.0 BINDING REPAIR — this card stated the operating basis as static text and was never
-                 bound to the engine, so it kept claiming 1.850 MW / 37.0 L/min after the campus migration.
-                 Now written from CONV_CALC at runtime (see bindWaterBasis below); the literal here is only
-                 the pre-script placeholder. -->
-            <div class="basis-value" id="water-current-basis-value">Representative view · engine basis loading…</div>
+            <div class="basis-title" id="waterSiteLabel">Current engine basis · site-wide plant</div>
+            <div class="basis-value" id="water-current-basis-value">Site scope · engine basis loading…</div>
         </div>
         <div class="basis-card study" data-basis="study">
-            <div class="basis-title">Capacity study · 4 × 10 MW IT</div>
-            <div class="basis-value"><span class="basis-guard">READ-ONLY PLANNING BASIS</span> · no effect on current pumps, flow, or WUE</div>
+            <div class="basis-title">Site capacity study · 40 MW IT</div>
+            <div class="basis-value"><span class="basis-guard">READ-ONLY PLANNING BASIS</span> · no effect on current site pumps, flow, or WUE</div>
         </div>
     </section>
 
@@ -483,28 +479,28 @@
     <div class="kpi-grid">
         <div class="kpi hero">
             <h3>Instant WUE</h3>
-            <div class="v"><span id="kWue" data-basis-param="water.wue_l_per_kwh" tabindex="0" role="button">1.20</span> <small>L/kWh</small></div>
+            <div class="v"><span id="kWue" data-basis-param="water.wue_l_per_kwh" tabindex="0" role="button">&mdash;</span> <small>L/kWh</small></div>
             <div class="th" id="kWueTh">Target &le; 1.30 &middot; computed</div>
         </div>
         <div class="kpi">
             <h3>Cooling Makeup Flow</h3>
-            <div class="v"><span id="kMakeup" data-basis-param="water.flow_lpm_for_wue" tabindex="0" role="button">37.0</span> <small>L/min</small></div>
-            <div class="th" id="kMakeupTh">Normal 30&ndash;55 &middot; WUE-incl</div>
+            <div class="v"><span id="kMakeup" data-basis-param="water.flow_lpm_for_wue" tabindex="0" role="button">&mdash;</span> <small>L/min</small></div>
+            <div class="th" id="kMakeupTh">Site total &middot; derived from WUE &times; IT load</div>
         </div>
         <div class="kpi">
             <h3>Total Treatment Flow</h3>
-            <div class="v"><span id="kTotal">45.0</span> <small>L/min</small></div>
-            <div class="th" id="kTotalTh">Makeup + domestic</div>
+            <div class="v"><span id="kTotal">&mdash;</span> <small>L/min</small></div>
+            <div class="th" id="kTotalTh">Site makeup + domestic/process</div>
         </div>
         <div class="kpi">
             <h3>Filter DP</h3>
-            <div class="v"><span id="kDp">0.40</span> <small>bar</small></div>
-            <div class="th" id="kDpTh">Backwash &gt; 0.80</div>
+            <div class="v"><span id="kDp">UNAVAILABLE</span> <small>bar</small></div>
+            <div class="th unavailable" id="kDpTh">UNAVAILABLE</div>
         </div>
         <div class="kpi">
             <h3>Treated TDS</h3>
-            <div class="v"><span id="kTds">140</span> <small>ppm</small></div>
-            <div class="th" id="kTdsTh">Limit &lt; 500</div>
+            <div class="v"><span id="kTds">UNAVAILABLE</span> <small>ppm</small></div>
+            <div class="th unavailable" id="kTdsTh">UNAVAILABLE</div>
         </div>
     </div>
 
@@ -524,41 +520,41 @@
                 <!-- ===== Pipes (muted base) ===== v1.42.5 — tagged with line-model metadata.
                      data-rz-line + from / to / medium / state / capacity / current / sensor. -->
                 <!-- Mains in -> raw tank -->
-                <path class="pipe" d="M40 90 H150" data-rz-line="1" data-id="ws-mains-in" data-from="MAINS-FM-101" data-to="TK-101-RAW" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN50" data-current="45.0 L/min @ 2.1 bar" data-redundancy="duty" data-sensor="FM-101"/>
+                <path class="pipe" d="M40 90 H150" data-rz-line="1" data-id="ws-mains-in" data-from="MAINS-FM-101" data-to="TK-101-RAW" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN50" data-current="UNAVAILABLE" data-redundancy="duty" data-sensor="FM-101"/>
                 <!-- Raw tank -> filter -->
-                <path class="pipe" d="M250 130 H300" data-rz-line="1" data-id="ws-raw-to-filter" data-from="TK-101-RAW" data-to="FLT-201" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN50" data-current="2.4 bar in" data-redundancy="duty"/>
+                <path class="pipe" d="M250 130 H300" data-rz-line="1" data-id="ws-raw-to-filter" data-from="TK-101-RAW" data-to="FLT-201" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN50" data-current="UNAVAILABLE" data-redundancy="duty"/>
                 <!-- Filter -> booster pump -->
-                <path class="pipe" d="M400 130 H470" data-rz-line="1" data-id="ws-filter-to-pump" data-from="FLT-201" data-to="P-301-BOOSTER" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN50" data-current="2.0 bar / DP 0.40 bar" data-redundancy="duty/standby"/>
+                <path class="pipe" d="M400 130 H470" data-rz-line="1" data-id="ws-filter-to-pump" data-from="FLT-201" data-to="P-301-BOOSTER" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN50" data-current="UNAVAILABLE" data-redundancy="duty/standby"/>
                 <!-- Pump -> dosing tee -> UV -->
-                <path class="pipe" d="M540 130 H660" data-rz-line="1" data-id="ws-pump-to-uv" data-from="P-301-BOOSTER" data-to="UV-401" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN50 / 2 × 7.5 kW" data-current="P-301A running / P-301B available" data-redundancy="duty/standby" data-sensor="DOS-302"/>
+                <path class="pipe" d="M540 130 H660" data-rz-line="1" data-id="ws-pump-to-uv" data-from="P-301-BOOSTER" data-to="UV-401" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN50 / 2 × 7.5 kW" data-current="UNAVAILABLE" data-redundancy="duty/standby" data-sensor="DOS-302"/>
                 <!-- P-301B standby branch. Untagged because the semantic line model
                      represents the booster station as one duty/standby train. -->
                 <path class="pump-branch" d="M440 130 V225 H470"/>
                 <path class="pump-branch" d="M540 225 H600 V130"/>
                 <!-- UV -> treated header tee -->
-                <path class="pipe" d="M760 130 H850 V210" data-rz-line="1" data-id="ws-uv-to-treated-header" data-from="UV-401" data-to="TREATED-HEADER-TEE" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN50" data-current="99.8% UV efficacy" data-redundancy="duty" data-sensor="UV-401"/>
+                <path class="pipe" d="M760 130 H850 V210" data-rz-line="1" data-id="ws-uv-to-treated-header" data-from="UV-401" data-to="TREATED-HEADER-TEE" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN50" data-current="UNAVAILABLE" data-redundancy="duty" data-sensor="UV-401"/>
                 <!-- Treated header split: -> domestic tank (v1.41.5 — straight down, no Z-routing that visually appeared as 2 pipes) -->
-                <path class="pipe" d="M850 210 V250" data-rz-line="1" data-id="ws-treated-to-domtank" data-from="TREATED-HEADER-TEE" data-to="TK-402-DOM" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN50" data-current="treated water to TK-402" data-redundancy="duty"/>
+                <path class="pipe" d="M850 210 V250" data-rz-line="1" data-id="ws-treated-to-domtank" data-from="TREATED-HEADER-TEE" data-to="TK-402-DOM" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN50" data-current="UNAVAILABLE" data-redundancy="duty"/>
                 <!-- Treated header -> cooling makeup -->
-                <path class="pipe" d="M850 210 V300 H980" data-rz-line="1" data-id="ws-treated-to-makeup" data-from="TREATED-HEADER-TEE" data-to="MK-501-MAKEUP" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN50" data-current="treated water to cooling makeup" data-redundancy="duty"/>
+                <path class="pipe" d="M850 210 V300 H980" data-rz-line="1" data-id="ws-treated-to-makeup" data-from="TREATED-HEADER-TEE" data-to="MK-501-MAKEUP" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN50" data-current="UNAVAILABLE" data-redundancy="duty"/>
                 <!-- Domestic tank -> service header -->
-                <path class="pipe" d="M760 360 H700" data-rz-line="1" data-id="ws-domtank-to-service" data-from="TK-402-DOM" data-to="SERVICE-HEADER" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN50" data-current="domestic service supply" data-redundancy="duty"/>
+                <path class="pipe" d="M760 360 H700" data-rz-line="1" data-id="ws-domtank-to-service" data-from="TK-402-DOM" data-to="SERVICE-HEADER" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN50" data-current="UNAVAILABLE" data-redundancy="duty"/>
                 <!-- Filter backwash -> drain -->
-                <path class="pipe" d="M350 180 V250 H260" data-rz-line="1" data-id="ws-bw-to-drain" data-from="FLT-201" data-to="DRAIN" data-medium="drain" data-direction="forward" data-state="de-energized" data-capacity="DN50 backwash" data-current="INHIBIT (state machine)" data-redundancy="maintenance" data-sensor="XV-202"/>
+                <path class="pipe" d="M350 180 V250 H260" data-rz-line="1" data-id="ws-bw-to-drain" data-from="FLT-201" data-to="DRAIN" data-medium="drain" data-direction="forward" data-state="unavailable" data-capacity="DN50 backwash" data-current="UNAVAILABLE" data-redundancy="maintenance" data-sensor="XV-202"/>
                 <!-- Make-up system blowdown / discharge -> drain (v1.41.5) -->
-                <path class="pipe" d="M1075 360 V410 H40" data-rz-line="1" data-id="ws-makeup-blowdown" data-from="MK-501-MAKEUP" data-to="DRAIN" data-medium="drain" data-direction="forward" data-state="energized" data-capacity="DN50 blowdown" data-current="make-up system discharge" data-redundancy="duty"/>
+                <path class="pipe" d="M1075 360 V410 H40" data-rz-line="1" data-id="ws-makeup-blowdown" data-from="MK-501-MAKEUP" data-to="DRAIN" data-medium="drain" data-direction="forward" data-state="unavailable" data-capacity="DN50 blowdown" data-current="UNAVAILABLE" data-redundancy="duty"/>
 
                 <!-- ===== Animated flow (medium-coloured) ===== -->
-                <path class="flow water" id="f-in"     d="M40 90 H150"/>
-                <path class="flow water" id="f-raw"    d="M250 130 H300"/>
-                <path class="flow water" id="f-filt"   d="M400 130 H470"/>
-                <path class="flow treated" id="f-pump" d="M540 130 H660"/>
-                <path class="flow treated" id="f-uv"   d="M760 130 H850 V210"/>
-                <path class="flow treated" id="f-dom"  d="M850 210 V250"/>
-                <path class="flow treated" id="f-mk"   d="M850 210 V300 H980"/>
-                <path class="flow treated" id="f-svc"  d="M760 360 H700"/>
+                <path class="flow water stopped" id="f-in"     d="M40 90 H150"/>
+                <path class="flow water stopped" id="f-raw"    d="M250 130 H300"/>
+                <path class="flow water stopped" id="f-filt"   d="M400 130 H470"/>
+                <path class="flow treated stopped" id="f-pump" d="M540 130 H660"/>
+                <path class="flow treated stopped" id="f-uv"   d="M760 130 H850 V210"/>
+                <path class="flow treated stopped" id="f-dom"  d="M850 210 V250"/>
+                <path class="flow treated stopped" id="f-mk"   d="M850 210 V300 H980"/>
+                <path class="flow treated stopped" id="f-svc"  d="M760 360 H700"/>
                 <path class="flow drain stopped" id="f-bw" d="M350 180 V250 H260"/>
-                <path class="flow drain" id="f-bd"     d="M1075 360 V410 H40"/>
+                <path class="flow drain stopped" id="f-bd"     d="M1075 360 V410 H40"/>
 
                 <!-- junctions / tees -->
                 <circle class="junction" cx="850" cy="210" r="4"/>
@@ -577,18 +573,18 @@
                     <rect class="eq" x="40" y="50" width="90" height="78" rx="4"/>
                     <text class="tag" x="46" y="42">FM-101</text>
                     <text class="lbl" x="46" y="70">Mains / Meter</text>
-                    <text class="val" id="m-mains" x="46" y="90">45.0 L/min</text>
-                    <text class="val" id="m-mains-p" x="46" y="108">2.1 bar</text>
+                    <text class="val" id="m-mains" x="46" y="90">UNAVAILABLE</text>
+                    <text class="val" id="m-mains-p" x="46" y="108">UNAVAILABLE</text>
                 </g>
 
                 <!-- Raw water tank -->
                 <g class="eq-grp" data-eq="rawtank">
                     <rect class="eq" x="150" y="60" width="100" height="150" rx="3"/>
-                    <rect class="tank-fill" id="rawFill" x="153" y="115" width="94" height="92"/>
+                    <rect class="tank-fill" id="rawFill" x="153" y="207" width="94" height="0"/>
                     <text class="tag" x="156" y="52">TK-101</text>
                     <text class="lbl" x="156" y="230">Raw Tank 25 m&sup3;</text>
-                    <text class="val" id="m-raw-pct" x="190" y="145" style="font-size:17px;">82%</text>
-                    <text class="val" id="m-raw-vol" x="166" y="165">20.5 m&sup3;</text>
+                    <text class="val" id="m-raw-pct" x="178" y="145" style="font-size:14px;">UNAVAILABLE</text>
+                    <text class="val" id="m-raw-vol" x="166" y="165">UNAVAILABLE</text>
                 </g>
 
                 <!-- Multimedia / carbon filter -->
@@ -596,34 +592,34 @@
                     <rect class="eq" x="300" y="80" width="100" height="100" rx="3"/>
                     <text class="tag" x="306" y="72">FLT-201</text>
                     <text class="lbl" x="306" y="105">Media Filter</text>
-                    <text class="val" id="m-flt-in" x="306" y="125">In 2.4 bar</text>
-                    <text class="val" id="m-flt-out" x="306" y="143">Out 2.0 bar</text>
-                    <text class="val" id="m-flt-dp" x="306" y="161">DP 0.40 bar</text>
+                    <text class="val" id="m-flt-in" x="306" y="125">UNAVAILABLE</text>
+                    <text class="val" id="m-flt-out" x="306" y="143">UNAVAILABLE</text>
+                    <text class="val" id="m-flt-dp" x="306" y="161">UNAVAILABLE</text>
                 </g>
 
                 <!-- Backwash valve -->
                 <g class="eq-grp" data-eq="backwash">
                     <rect class="eq" x="220" y="232" width="40" height="36" rx="3"/>
                     <text class="tag" x="200" y="290">XV-202</text>
-                    <text class="lbl" x="200" y="308" id="m-bw-st">Backwash INHIBIT</text>
+                    <text class="lbl" x="200" y="308" id="m-bw-st">Backwash UNAVAILABLE</text>
                 </g>
 
                 <!-- Booster pump pair — static ISA-style centrifugal symbols. -->
-                <g class="eq-grp" data-eq="pump-duty" aria-label="P-301A duty pump running">
+                <g class="eq-grp" data-eq="pump-duty" aria-label="P-301A duty pump authority unavailable">
                     <circle class="eq" cx="505" cy="130" r="35"/>
-                    <path class="pump-symbol" d="M491 112 L526 130 L491 148 Z" fill="#5eead4" stroke="#5eead4" stroke-width="1.5"/>
+                    <path class="pump-symbol" d="M491 112 L526 130 L491 148 Z" fill="#718096" stroke="#8ca0b8" stroke-width="1.5"/>
                     <text class="tag" x="466" y="80">P-301A · DUTY</text>
                     <text class="lbl" x="552" y="118">Booster Pump A</text>
-                    <text class="val ok" id="m-pump-st" x="552" y="136">RUNNING</text>
-                    <text class="val" id="m-pump-kw" x="552" y="154">7.5 kW</text>
+                    <text class="val" id="m-pump-st" x="552" y="136">UNAVAILABLE</text>
+                    <text class="val" id="m-pump-kw" x="552" y="154">UNAVAILABLE</text>
                 </g>
-                <g class="eq-grp" data-eq="pump-standby" aria-label="P-301B standby pump available">
+                <g class="eq-grp" data-eq="pump-standby" aria-label="P-301B standby pump authority unavailable">
                     <circle class="eq" cx="505" cy="225" r="35"/>
                     <path class="pump-symbol" d="M491 207 L526 225 L491 243 Z" fill="#718096" stroke="#8ca0b8" stroke-width="1.5"/>
                     <text class="tag" x="448" y="276">P-301B · STANDBY</text>
                     <text class="lbl" x="552" y="213">Booster Pump B</text>
-                    <text class="val" id="m-pump-b-st" x="552" y="231">AVAILABLE</text>
-                    <text class="val" id="m-pump-b-kw" x="552" y="249">0.0 kW</text>
+                    <text class="val" id="m-pump-b-st" x="552" y="231">UNAVAILABLE</text>
+                    <text class="val" id="m-pump-b-kw" x="552" y="249">UNAVAILABLE</text>
                 </g>
 
                 <!-- Cl2 dosing -->
@@ -631,8 +627,8 @@
                     <rect class="eq" x="630" y="92" width="60" height="76" rx="3"/>
                     <text class="tag" x="636" y="84">DOS-302</text>
                     <text class="lbl" x="636" y="120">Cl&#8322; Dose</text>
-                    <text class="val" id="m-cl2" x="636" y="140">0.85 L/h</text>
-                    <text class="val" id="m-cl2-res" x="636" y="158">0.6 ppm</text>
+                    <text class="val" id="m-cl2" x="636" y="140">UNAVAILABLE</text>
+                    <text class="val" id="m-cl2-res" x="636" y="158">UNAVAILABLE</text>
                 </g>
 
                 <!-- UV steriliser (v1.41.5 — relocated past DOS-302 rect to fix label overlap) -->
@@ -640,17 +636,17 @@
                     <rect class="eq" x="700" y="105" width="60" height="50" rx="6"/>
                     <text class="tag" x="706" y="97">UV-401</text>
                     <text class="lbl" x="706" y="125">UV Steril.</text>
-                    <text class="val ok" id="m-uv" x="706" y="146">99.8%</text>
+                    <text class="val" id="m-uv" x="706" y="146">UNAVAILABLE</text>
                 </g>
 
                 <!-- Treated / domestic tank -->
                 <g class="eq-grp" data-eq="domtank">
                     <rect class="eq" x="760" y="250" width="100" height="150" rx="3"/>
-                    <rect class="tank-fill treated" id="domFill" x="763" y="290" width="94" height="107"/>
+                    <rect class="tank-fill treated" id="domFill" x="763" y="397" width="94" height="0"/>
                     <text class="tag" x="766" y="242">TK-402</text>
                     <text class="lbl" x="766" y="420">Domestic Tank 30 m&sup3;</text>
-                    <text class="val" id="m-dom-pct" x="800" y="320" style="font-size:17px;">88%</text>
-                    <text class="val" id="m-dom-vol" x="776" y="340">26.4 m&sup3;</text>
+                    <text class="val" id="m-dom-pct" x="788" y="320" style="font-size:14px;">UNAVAILABLE</text>
+                    <text class="val" id="m-dom-vol" x="776" y="340">UNAVAILABLE</text>
                 </g>
 
                 <!-- Make-up Water System (v1.41.5 — renamed from "Cooling Tower" per dry-only design; no evaporative tower in this baseline) -->
@@ -659,15 +655,15 @@
                     <text class="tag" x="986" y="262">MK-501</text>
                     <text class="lbl" x="986" y="295">Make-up Water</text>
                     <text class="lbl" x="986" y="311">System</text>
-                    <text class="val treated" id="m-mk" x="986" y="331">37.0 L/min</text>
-                    <text class="val" id="m-mk-bd" x="986" y="349">BD 9.2 L/min</text>
+                    <text class="val treated" id="m-mk" x="986" y="331">UNAVAILABLE</text>
+                    <text class="val" id="m-mk-bd" x="986" y="349">BD UNAVAILABLE</text>
                 </g>
 
                 <!-- Service / domestic header label -->
                 <g>
                     <text class="lbl" x="610" y="356">Domestic /</text>
                     <text class="lbl" x="610" y="372">Service</text>
-                    <text class="val" id="m-svc" x="610" y="392">8.0 L/min</text>
+                    <text class="val" id="m-svc" x="610" y="392">UNAVAILABLE</text>
                 </g>
 
                 <!-- Drain / blowdown label -->
@@ -675,30 +671,31 @@
             </svg>
             </div>
 
-            <div class="plant-summary-grid" aria-label="Booster redundancy and water allocation">
+            <div class="plant-summary-grid" aria-label="Booster redundancy and site water allocation">
                 <section class="plant-summary">
                     <div class="summary-title">Booster Station · Automatic Lead/Lag</div>
                     <div class="pump-pair">
-                        <div class="pump-unit" data-pump-id="P-301A" data-role="duty" data-state="running">
+                        <div class="pump-unit" data-pump-id="P-301A" data-role="duty" data-state="unavailable">
                             <span class="pump-icon pump-symbol" aria-hidden="true"></span>
-                            <div><div class="pump-name">P-301A · Duty</div><div class="pump-meta">Run feedback proven · 7.5 kW · lead selected</div></div>
-                            <div class="pump-state">RUNNING</div>
+                            <div><div class="pump-name">P-301A · Duty</div><div class="pump-meta">No current point authority</div></div>
+                            <div class="pump-state">UNAVAILABLE</div>
                         </div>
-                        <div class="pump-unit" data-pump-id="P-301B" data-role="standby" data-state="available">
+                        <div class="pump-unit" data-pump-id="P-301B" data-role="standby" data-state="unavailable">
                             <span class="pump-icon pump-symbol" aria-hidden="true"></span>
-                            <div><div class="pump-name">P-301B · Standby</div><div class="pump-meta">Auto available · 0.0 kW · starts on fail/low pressure</div></div>
-                            <div class="pump-state">AVAILABLE</div>
+                            <div><div class="pump-name">P-301B · Standby</div><div class="pump-meta">No current point authority</div></div>
+                            <div class="pump-state">UNAVAILABLE</div>
                         </div>
                     </div>
                 </section>
                 <section class="plant-summary">
-                    <div class="summary-title">Treatment Header Allocation</div>
+                    <div class="summary-title">Site Treatment Header</div>
                     <div class="allocation-list">
-                        <div class="allocation-row"><span>Total treated flow</span><strong id="alloc-treatment">45.0 L/min</strong></div>
-                        <div class="allocation-row"><span>Cooling makeup · WUE included</span><strong id="alloc-makeup">37.0 L/min</strong></div>
-                        <div class="allocation-row"><span>Domestic/process · WUE excluded</span><strong id="alloc-domestic">8.0 L/min</strong></div>
+                        <div class="allocation-row"><span>Total treated flow · site</span><strong id="alloc-treatment" class="unavailable">UNAVAILABLE</strong></div>
+                        <div class="allocation-row"><span>Cooling makeup · site · WUE included</span><strong id="alloc-makeup" class="unavailable">UNAVAILABLE</strong></div>
+                        <div class="allocation-row"><span>Domestic/process · site · WUE excluded</span><strong id="alloc-domestic" class="unavailable">UNAVAILABLE</strong></div>
+                        <div class="allocation-row"><span>Downstream hall allocation</span><strong id="alloc-hall" class="unavailable">UNAVAILABLE</strong></div>
                     </div>
-                    <div class="scope-note">Current engine balance: treatment = cooling makeup + domestic/process. Study capacity remains read-only.</div>
+                    <div class="scope-note" id="water-scope-note">Municipal treatment is one site-wide plant. Hall allocation remains UNAVAILABLE until validated downstream submeter data is published.</div>
                 </section>
             </div>
 
@@ -715,60 +712,56 @@
         <div>
             <div class="panel">
                 <div class="panel-title">WUE Reconciliation</div>
-                <div class="insp-row"><span class="k">IT Load</span><span class="vv" id="iIt" data-basis-param="site.it_load_kw" tabindex="0" role="button">1,850 kW</span></div>
-                <div class="insp-row"><span class="k">IT Energy (1 h)</span><span class="vv" id="iItE">1,850 kWh</span></div>
-                <div class="insp-row"><span class="k">WUE-incl water (1 h)</span><span class="vv" id="iWaterHr">2,220 L</span></div>
-                <div class="insp-row"><span class="k">Instant WUE</span><span class="vv ok" id="iWue" data-basis-param="water.wue_l_per_kwh" tabindex="0" role="button">1.20 L/kWh</span></div>
-                <div class="insp-row"><span class="k">24 h WUE</span><span class="vv ok" id="iWue24">1.18 L/kWh</span></div>
+                <div class="insp-row"><span class="k">IT Load · site</span><span class="vv unavailable" id="iIt" data-basis-param="site.it_load_kw" tabindex="0" role="button">UNAVAILABLE</span></div>
+                <div class="insp-row"><span class="k">IT Energy · site (1 h)</span><span class="vv unavailable" id="iItE">UNAVAILABLE</span></div>
+                <div class="insp-row"><span class="k">WUE-incl water · site (1 h)</span><span class="vv unavailable" id="iWaterHr">UNAVAILABLE</span></div>
+                <div class="insp-row"><span class="k">Instant WUE · site</span><span class="vv unavailable" id="iWue" data-basis-param="water.wue_l_per_kwh" tabindex="0" role="button">UNAVAILABLE</span></div>
+                <div class="insp-row"><span class="k">24 h WUE · historian</span><span class="vv unavailable" id="iWue24">UNAVAILABLE</span></div>
                 <div class="balance-note" id="balanceNote">
-                    WUE = WUE-included water volume &divide; IT energy
-                    (computed from <b>conv-engine</b>, not static).
+                    Site WUE = site WUE-included water volume &divide; site IT energy
+                    (computed from <b>conv-engine</b>, not a per-hall allocation).
                 </div>
             </div>
 
             <div class="panel">
-                <div class="panel-title">Water Scope Split</div>
+                <div class="panel-title">Site Water Scope</div>
                 <div class="insp-row">
                     <span class="k">Cooling makeup <span class="scope-tag incl">WUE</span></span>
-                    <span class="vv" id="iScMk" data-basis-param="water.flow_lpm_for_wue" tabindex="0" role="button">37.0 L/min</span>
+                    <span class="vv unavailable" id="iScMk" data-basis-param="water.flow_lpm_for_wue" tabindex="0" role="button">UNAVAILABLE</span>
                 </div>
                 <div class="insp-row" style="padding-left:14px;">
-                    <span class="k">&boxur; Evaporation</span><span class="vv" id="iScEv">27.6 L/min</span>
+                    <span class="k">&boxur; Evaporation · model</span><span class="vv unavailable" id="iScEv">UNAVAILABLE</span>
                 </div>
                 <div class="insp-row" style="padding-left:14px;">
-                    <span class="k">&boxur; Blowdown</span><span class="vv" id="iScBd">9.2 L/min</span>
+                    <span class="k">&boxur; Blowdown · model</span><span class="vv unavailable" id="iScBd">UNAVAILABLE</span>
                 </div>
                 <div class="insp-row" style="padding-left:14px;">
-                    <span class="k">&boxur; Drift</span><span class="vv" id="iScDr">0.18 L/min</span>
+                    <span class="k">&boxur; Drift · model</span><span class="vv unavailable" id="iScDr">UNAVAILABLE</span>
                 </div>
                 <div class="insp-row">
                     <span class="k">Domestic / process <span class="scope-tag excl">EXCL</span></span>
-                    <span class="vv" id="iScDom">8.0 L/min</span>
+                    <span class="vv unavailable" id="iScDom">UNAVAILABLE</span>
                 </div>
                 <div class="insp-row">
                     <span class="k"><b>Total treatment</b></span>
-                    <span class="vv" id="iScTot">45.0 L/min</span>
+                    <span class="vv unavailable" id="iScTot">UNAVAILABLE</span>
                 </div>
-                <div class="balance-note">
-                    Total treatment <b id="iWhyTot">45.0</b> L/min &minus; domestic
-                    <b id="iWhyDom">8.0</b> L/min = WUE-included makeup
-                    <b id="iWhyMk">37.0</b> L/min &rarr; reconciles dashboard
-                    <!-- v1.134.0 — this one figure was a bare <b> while its three siblings
-                         above and the all-flow value beside it are engine-bound, so a change
-                         to the engine WUE left this sentence contradicting itself. Hooked. -->
-                    WUE <b id="iWhyWue" data-basis-param="environment.wue_l_per_kwh" tabindex="0" role="button">&mdash;</b> vs all-flow <b id="iWhyAll">1.46</b> L/kWh.
+                <div class="balance-note" id="scope-reconciliation-note">
+                    <span id="scope-reconciliation-values" hidden>
+                        Total site treatment <b id="iWhyTot">&mdash;</b> L/min &minus; site domestic/process
+                        <b id="iWhyDom">&mdash;</b> L/min = site WUE-included makeup
+                        <b id="iWhyMk">&mdash;</b> L/min. WUE
+                        <b id="iWhyWue" data-basis-param="water.wue_l_per_kwh" tabindex="0" role="button">&mdash;</b>
+                        vs all-treated-flow equivalent <b id="iWhyAll">&mdash;</b> L/kWh.
+                    </span>
+                    <span id="scope-reconciliation-unavailable">UNAVAILABLE &mdash; current site-water balance requires the conv-engine snapshot.</span>
                 </div>
             </div>
 
             <div class="panel">
                 <div class="panel-title">Active Alarms &amp; Status</div>
                 <ul class="alarm-list" id="alarmList">
-                    <li><span class="sev ok">OK</span><span class="msg"><b>Raw Tank TK-101</b> &mdash; 82% / 20.5 m&sup3; (low &lt; 30%)</span></li>
-                    <li><span class="sev ok">OK</span><span class="msg"><b>Domestic Tank TK-402</b> &mdash; 88% / 26.4 m&sup3; (low &lt; 40%)</span></li>
-                    <li><span class="sev ok">OK</span><span class="msg"><b>Filter FLT-201</b> &mdash; DP 0.40 bar (backwash &gt; 0.80)</span></li>
-                    <li><span class="sev ok">OK</span><span class="msg"><b>Treated TDS</b> &mdash; 140 ppm (limit &lt; 500)</span></li>
-                    <li><span class="sev ok">OK</span><span class="msg"><b>UV-401</b> &mdash; 99.8% intensity, lamp healthy</span></li>
-                    <li><span class="sev ok">OK</span><span class="msg"><b>Dosing DOS-302</b> &mdash; cmd ON, run feedback OK</span></li>
+                    <li><span class="sev unavailable">UNAVAILABLE</span><span class="msg"><b>Process telemetry</b> &mdash; current authority has not been established.</span></li>
                 </ul>
             </div>
         </div>
@@ -779,7 +772,10 @@
         <div class="panel-title">Filter DP &amp; Cooling Makeup Flow — 24 h Trend
             <span class="sub">— thresholds shown; current marker right edge</span>
         </div>
-        <canvas id="pressureTrend" height="78"></canvas>
+        <div class="trend-chart-frame">
+            <canvas id="pressureTrend" aria-label="Filter differential pressure and cooling makeup 24-hour trend"></canvas>
+            <div id="pressureTrendUnavailable" class="trend-unavailable">UNAVAILABLE &mdash; historian and current process authority required.</div>
+        </div>
     </div>
 
     </div><!-- /wrap -->
@@ -787,22 +783,22 @@
     <!-- Bottom status bar -->
     <div class="status-bar no-print">
         <div class="status-item">
-            <div class="status-led led-ok" id="led-system"></div>
-            <span class="k">SYSTEM</span><span class="vv" id="status-system">NORMAL</span>
+            <div class="status-led led-unavailable" id="led-system"></div>
+            <span class="k">SYSTEM</span><span class="vv" id="status-system">UNAVAILABLE</span>
         </div>
         <div class="status-item">
-            <div class="status-led led-ok" id="led-tank"></div>
-            <span class="k">RAW TANK</span><span class="vv" id="status-tank">82%</span>
+            <div class="status-led led-unavailable" id="led-tank"></div>
+            <span class="k">RAW TANK</span><span class="vv" id="status-tank">UNAVAILABLE</span>
         </div>
         <div class="status-item">
-            <div class="status-led led-ok" id="led-pump"></div>
-            <span class="k">BOOSTER PAIR</span><span class="vv" id="status-pump">P-301A DUTY · P-301B STBY</span>
+            <div class="status-led led-unavailable" id="led-pump"></div>
+            <span class="k">BOOSTER PAIR</span><span class="vv" id="status-pump">UNAVAILABLE</span>
         </div>
         <div class="status-item">
-            <span class="k">MAKEUP</span><span class="vv" id="status-flow">37.0 L/min</span>
+            <span class="k">MAKEUP</span><span class="vv" id="status-flow">UNAVAILABLE</span>
         </div>
         <div class="status-item">
-            <span class="k">WUE</span><span class="vv" id="status-wue">1.20 L/kWh</span>
+            <span class="k">WUE</span><span class="vv" id="status-wue">UNAVAILABLE</span>
         </div>
         <div class="status-spacer"></div>
         <div class="status-item">
@@ -828,43 +824,61 @@
 
             // ---- Pull the frozen scenario snapshot --------------------------
             var S = (window.CONV_CALC && window.CONV_CALC.snapshot) || null;
+            /* The cache token is also the authority contract. A complete but retired cached
+               snapshot is not safer than a missing engine: it must fail closed instead of
+               republishing its plausible-looking water balance. Keep one version source by
+               reading the token from the script request rather than retyping it here. */
+            var engineScript = document.querySelector('script[src^="js/conv-engine.js?v="]');
+            var engineVersionMatch = engineScript
+                ? engineScript.getAttribute('src').match(/[?&]v=([^&]+)/)
+                : null;
+            var CONV_CURRENT_ENGINE_VERSION = '2.0.0';
+            var requestedEngineVersion = engineVersionMatch
+                ? decodeURIComponent(engineVersionMatch[1])
+                : null;
+            var expectedEngineVersion = requestedEngineVersion === CONV_CURRENT_ENGINE_VERSION
+                ? CONV_CURRENT_ENGINE_VERSION : null;
+            var currentEngineAuthority = !!(S && S.meta && expectedEngineVersion
+                && S.meta.version === expectedEngineVersion
+                && typeof S.meta.scenario === 'string' && S.meta.scenario.trim().length > 0
+                && typeof S.meta.data_quality === 'string' && S.meta.data_quality.trim().length > 0);
+            var unavailableBasisReason = S
+                ? 'engine authority mismatch'
+                : 'conv-engine site-water basis not loaded';
 
-            // Deterministic water-balance basis (doc-07 lines 116-124,
-            // doc-13 lines 336-358). Cooling makeup is anchored to the engine's
-            // WUE-derived flow (the canonical WUE numerator); evaporation /
-            // blowdown / drift split uses a typical cooling-tower COC = 4.
+            // Deterministic SITE water-balance basis. Cooling makeup is anchored
+            // to the engine's WUE-derived site flow (the canonical WUE numerator);
+            // evaporation / blowdown / drift remain clearly labelled model splits.
             var COC = 4;                       // cycles of concentration (typical)
-            /* v1.134.8 — was a page constant. The engine publishes it, and the treated total
-               with it, so the treatment train's design flow has one source. */
-            var DOMESTIC_LPM = S ? S.water.domestic_lpm : null;
+            var DOMESTIC_LPM = currentEngineAuthority && S.water ? S.water.domestic_lpm : null;
+            var itLoadKw    = currentEngineAuthority && S.site ? S.site.it_load_kw : null;
+            var wueEngine   = currentEngineAuthority && S.water ? S.water.wue_l_per_kwh : null;
+            var makeupLpm   = currentEngineAuthority && S.water ? S.water.flow_lpm_for_wue : null;
+            var totalLpm    = currentEngineAuthority && S.water && ok(S.water.total_treated_lpm)
+                ? S.water.total_treated_lpm
+                : (ok(makeupLpm) && ok(DOMESTIC_LPM) ? makeupLpm + DOMESTIC_LPM : null);
+            /* Complete authority includes the calculator API used below, not only its
+               numeric snapshot. A same-version partial bundle must fail closed before
+               either call can throw and leave plausible first-paint values behind. */
+            var siteBalanceAvailable = currentEngineAuthority
+                && typeof window.CONV_CALC.wueFromFlowLpm === 'function'
+                && ok(itLoadKw) && itLoadKw > 0
+                && ok(wueEngine) && ok(makeupLpm) && ok(DOMESTIC_LPM) && ok(totalLpm);
+            document.body.setAttribute('data-rz-basis-authority',
+                siteBalanceAvailable ? 'current' : 'unavailable');
 
-            /* v1.134.0 — every fallback here was a plausible literal from the retired
-               1.85 MW basis (1850 / 1.20 / 37.0 / 1927.1). A dead engine binding therefore
-               rendered a complete, correct-looking water balance: the exact defect class
-               repaired site-wide in v1.132.0. Fallbacks are null now, and the renderer
-               prints the unavailable marker for null, so a missing engine is visible. */
-            var itLoadKw    = S ? S.site.it_load_kw : null;
-            var wueEngine   = S ? S.environment.wue_l_per_kwh : null;
-            var makeupLpm   = S ? S.water.flow_lpm_for_wue : null;   // computed numerator
-            var heatRejKw   = S ? S.cooling.heat_rejection_kw : null;
+            var driftLpm    = siteBalanceAvailable ? 0.005 * makeupLpm : null;
+            var evapPlusBd  = siteBalanceAvailable ? makeupLpm - driftLpm : null;
+            var evapLpm     = siteBalanceAvailable ? evapPlusBd * (COC - 1) / COC : null;
+            var blowdownLpm = siteBalanceAvailable ? evapPlusBd / COC : null;
 
-            var driftLpm    = 0.005 * makeupLpm;
-            var evapPlusBd  = makeupLpm - driftLpm;
-            var evapLpm     = evapPlusBd * (COC - 1) / COC;
-            var blowdownLpm = evapPlusBd / COC;
-            var totalLpm    = (S && S.water.total_treated_lpm != null)
-                ? S.water.total_treated_lpm : (makeupLpm + DOMESTIC_LPM);
-
-            // WUE computed (not the literal): water volume / IT energy.
-            var wueComputed = window.CONV_CALC
-                ? window.CONV_CALC.wueFromFlowLpm(makeupLpm)   // = (makeup*60)/itLoad
-                : (makeupLpm * 60) / itLoadKw;
-            var wueAllFlow  = window.CONV_CALC
+            // WUE computed from the site numerator and site IT denominator.
+            var wueComputed = siteBalanceAvailable
+                ? window.CONV_CALC.wueFromFlowLpm(makeupLpm)
+                : null;
+            var wueAllFlow  = siteBalanceAvailable
                 ? window.CONV_CALC.wueFromFlowLpm(totalLpm)
-                : (totalLpm * 60) / itLoadKw;
-            // 24h WUE: deterministic slight improvement vs instant (rolling avg
-            // runs marginally lower than the spot value) — doc-13 line 349.
-            var wue24 = wueComputed - 0.02;
+                : null;
 
             // Static treatment-quality basis (no PRNG; plausible operating point)
             var rawPct = 82, rawVol = (rawPct / 100) * 25;          // TK-101 25 m3
@@ -872,153 +886,239 @@
             var filterDp = 0.40, tds = 140, cl2 = 0.85, cl2Res = 0.6, uvInt = 99.8;
             var pumpKw = 7.5;
 
-            /* v1.134.0 — null propagates to the unavailable marker instead of NaN or 0.
-               A rendered 0 on a water balance reads as "no consumption", which is a
-               stronger and more wrong claim than "we do not know". */
+            /* Null propagates to an explicit unavailable marker instead of NaN or 0.
+               A rendered 0 reads as "no consumption", not "no trustworthy source". */
             function ok(n) { return typeof n === 'number' && isFinite(n); }
             function f1(n) { return ok(n) ? (Math.round(n * 10) / 10).toFixed(1) : '\u2014'; }
             function f2(n) { return ok(n) ? (Math.round(n * 100) / 100).toFixed(2) : '\u2014'; }
             function set(id, v) { var e = document.getElementById(id); if (e) e.textContent = v; }
             function nfmt(n) { return ok(n) ? Math.round(n).toLocaleString('en-US') : '\u2014'; }
-
-            var HALL_VIEWS = ['A', 'B', 'C', 'D'];
-            function selectHallView(hall) {
-                var selected = String(hall || '').toUpperCase();
-                if (HALL_VIEWS.indexOf(selected) < 0) return;
-                document.body.setAttribute('data-active-hall', selected);
-                var buttons = document.querySelectorAll('[data-hall]');
-                for (var i = 0; i < buttons.length; i++) {
-                    buttons[i].setAttribute('aria-pressed', buttons[i].getAttribute('data-hall') === selected ? 'true' : 'false');
-                }
-                set('waterHallLabel', 'Current engine basis · Hall ' + selected);
+            function metric(n, digits, unit) {
+                if (!ok(n)) return 'UNAVAILABLE';
+                return (digits === 2 ? f2(n) : f1(n)) + (unit ? ' ' + unit : '');
             }
-            function bindHallViews() {
-                var buttons = document.querySelectorAll('[data-hall]');
-                for (var i = 0; i < buttons.length; i++) {
-                    buttons[i].addEventListener('click', function () {
-                        selectHallView(this.getAttribute('data-hall'));
-                    });
-                }
-                selectHallView(document.body.getAttribute('data-active-hall') || 'A');
+            function markUnavailable(id, unavailable) {
+                var el = document.getElementById(id);
+                if (el) el.classList.toggle('unavailable', unavailable);
             }
 
             // ---- Threshold evaluation (doc-07 §"Alarm Rules") --------------
             function evalThresholds() {
                 var crit = 0, warn = 0;
+                if (!siteBalanceAvailable) return { crit: 0, warn: 0, unavailable: true };
                 if (rawPct < 30) crit++; else if (rawPct < 40) warn++;
                 if (domPct < 40) crit++; else if (domPct < 50) warn++;
                 if (filterDp > 0.80) crit++; else if (filterDp > 0.65) warn++;
                 if (tds > 500) crit++; else if (tds > 350) warn++;
                 if (uvInt < 70) crit++; else if (uvInt < 85) warn++;
-                if (makeupLpm < 30 || makeupLpm > 55) warn++;
                 if (wueComputed > 1.30) warn++;
-                return { crit: crit, warn: warn };
+                return { crit: crit, warn: warn, unavailable: false };
             }
 
             // ---- Render once (deterministic) ------------------------------
             function render() {
                 // KPI strip
-                set('kWue', f2(wueComputed));
-                set('kWueTh', 'Target ≤ 1.30 · computed = (' + nfmt(makeupLpm * 60) + ' L/h) ÷ ' + nfmt(itLoadKw) + ' kW');
-                set('kMakeup', f1(makeupLpm));
-                set('kTotal', f1(totalLpm));
-                set('kDp', f2(filterDp));
-                set('kTds', Math.round(tds));
+                set('kWue', siteBalanceAvailable ? f2(wueComputed) : 'UNAVAILABLE');
+                set('kWueTh', siteBalanceAvailable
+                    ? 'Target ≤ 1.30 · site = (' + nfmt(makeupLpm * 60) + ' L/h) ÷ ' + nfmt(itLoadKw) + ' kW'
+                    : 'UNAVAILABLE · ' + unavailableBasisReason);
+                set('kMakeup', siteBalanceAvailable ? f1(makeupLpm) : 'UNAVAILABLE');
+                set('kTotal', siteBalanceAvailable ? f1(totalLpm) : 'UNAVAILABLE');
+                set('kMakeupTh', siteBalanceAvailable
+                    ? 'Site total · WUE × IT load ÷ 60'
+                    : 'UNAVAILABLE · ' + unavailableBasisReason);
+                set('kTotalTh', siteBalanceAvailable
+                    ? 'Site makeup + domestic/process'
+                    : 'UNAVAILABLE · ' + unavailableBasisReason);
+                set('kDp', siteBalanceAvailable ? f2(filterDp) : 'UNAVAILABLE');
+                set('kTds', siteBalanceAvailable ? Math.round(tds) : 'UNAVAILABLE');
+                set('kDpTh', siteBalanceAvailable ? 'Backwash > 0.80 bar' : 'UNAVAILABLE');
+                set('kTdsTh', siteBalanceAvailable ? 'Limit < 500 ppm' : 'UNAVAILABLE');
 
                 var th = evalThresholds();
-                document.getElementById('kWueTh').className = 'th ' + (wueComputed > 1.30 ? 'warn' : 'ok');
-                document.getElementById('kMakeupTh').className = 'th ' + ((makeupLpm < 30 || makeupLpm > 55) ? 'warn' : 'ok');
-                document.getElementById('kDpTh').className = 'th ' + (filterDp > 0.80 ? 'bad' : (filterDp > 0.65 ? 'warn' : 'ok'));
-                document.getElementById('kTdsTh').className = 'th ' + (tds > 500 ? 'bad' : (tds > 350 ? 'warn' : 'ok'));
+                document.getElementById('kWueTh').className = 'th '
+                    + (th.unavailable ? 'unavailable' : (wueComputed > 1.30 ? 'warn' : 'ok'));
+                document.getElementById('kMakeupTh').className = 'th'
+                    + (th.unavailable ? ' unavailable' : '');
+                document.getElementById('kTotalTh').className = 'th'
+                    + (th.unavailable ? ' unavailable' : '');
+                document.getElementById('kDpTh').className = 'th ' + (th.unavailable ? 'unavailable' : (filterDp > 0.80 ? 'bad' : (filterDp > 0.65 ? 'warn' : 'ok')));
+                document.getElementById('kTdsTh').className = 'th ' + (th.unavailable ? 'unavailable' : (tds > 500 ? 'bad' : (tds > 350 ? 'warn' : 'ok')));
 
                 // Alarm strip
-                var state = th.crit > 0 ? 'ALARM' : (th.warn > 0 ? 'WARNING' : 'NORMAL');
+                var state = th.unavailable ? 'UNAVAILABLE'
+                    : (th.crit > 0 ? 'ALARM' : (th.warn > 0 ? 'WARNING' : 'NORMAL'));
                 set('alarmState', state);
-                set('cntCrit', th.crit);
-                set('cntWarn', th.warn);
-                set('cntStale', 0);
-                set('scenarioName', S ? S.meta.scenario : 'Simulated');
-                set('dataQuality', S ? S.meta.data_quality : 'GOOD');
+                set('cntCrit', th.unavailable ? '\u2014' : th.crit);
+                set('cntWarn', th.unavailable ? '\u2014' : th.warn);
+                set('cntStale', th.unavailable ? '\u2014' : 0);
+                if (!siteBalanceAvailable) {
+                    set('lastUpdate', 'UNAVAILABLE');
+                    set('status-time', 'UNAVAILABLE');
+                }
+                set('scenarioName', siteBalanceAvailable && S.meta.scenario ? S.meta.scenario : 'UNAVAILABLE');
+                set('dataQuality', siteBalanceAvailable && S.meta.data_quality ? S.meta.data_quality : 'UNAVAILABLE');
                 var strip = document.getElementById('alarmStrip');
                 var st = document.getElementById('alarmState');
-                strip.className = 'alarm-strip' + (th.crit ? ' has-alarm' : (th.warn ? ' has-warn' : ''));
-                st.className = 'alarm-state' + (th.crit ? ' bad' : (th.warn ? ' warn' : ''));
+                strip.className = 'alarm-strip' + (th.unavailable ? ' is-unavailable'
+                    : (th.crit ? ' has-alarm' : (th.warn ? ' has-warn' : '')));
+                st.className = 'alarm-state' + (th.unavailable ? ' unavailable'
+                    : (th.crit ? ' bad' : (th.warn ? ' warn' : '')));
 
                 // SVG equipment values
-                set('m-mains', f1(totalLpm) + ' L/min');
-                set('m-mains-p', '2.1 bar');
-                set('m-raw-pct', rawPct + '%');
-                set('m-raw-vol', f1(rawVol) + ' m³');
-                set('m-flt-in', 'In 2.4 bar');
-                set('m-flt-out', 'Out ' + f1(2.4 - filterDp) + ' bar');
-                set('m-flt-dp', 'DP ' + f2(filterDp) + ' bar');
-                set('m-pump-st', 'RUNNING');
-                set('m-pump-kw', pumpKw + ' kW');
-                set('m-pump-b-st', 'AVAILABLE');
-                set('m-pump-b-kw', '0.0 kW');
-                set('m-cl2', cl2 + ' L/h');
-                set('m-cl2-res', cl2Res + ' ppm');
-                set('m-uv', uvInt + '% INT');
-                set('m-dom-pct', domPct + '%');
-                set('m-dom-vol', f1(domVol) + ' m³');
-                set('m-mk', f1(makeupLpm) + ' L/min');
-                set('m-mk-bd', 'BD ' + f1(blowdownLpm) + ' L/min');
-                set('m-svc', f1(DOMESTIC_LPM) + ' L/min');
+                set('m-mains', metric(totalLpm, 1, 'L/min'));
+                var mainsLine = document.querySelector('[data-id="ws-mains-in"]');
+                if (mainsLine) {
+                    mainsLine.setAttribute('data-current', siteBalanceAvailable
+                        ? metric(totalLpm, 1, 'L/min') + ' @ 2.1 bar'
+                        : 'UNAVAILABLE — ' + unavailableBasisReason);
+                }
+                set('m-mains-p', siteBalanceAvailable ? '2.1 bar' : 'UNAVAILABLE');
+                set('m-raw-pct', siteBalanceAvailable ? rawPct + '%' : 'UNAVAILABLE');
+                set('m-raw-vol', siteBalanceAvailable ? f1(rawVol) + ' m³' : 'UNAVAILABLE');
+                set('m-flt-in', siteBalanceAvailable ? 'In 2.4 bar' : 'UNAVAILABLE');
+                set('m-flt-out', siteBalanceAvailable ? 'Out ' + f1(2.4 - filterDp) + ' bar' : 'UNAVAILABLE');
+                set('m-flt-dp', siteBalanceAvailable ? 'DP ' + f2(filterDp) + ' bar' : 'UNAVAILABLE');
+                set('m-pump-st', siteBalanceAvailable ? 'RUNNING' : 'UNAVAILABLE');
+                set('m-pump-kw', siteBalanceAvailable ? pumpKw + ' kW' : 'UNAVAILABLE');
+                set('m-pump-b-st', siteBalanceAvailable ? 'AVAILABLE' : 'UNAVAILABLE');
+                set('m-pump-b-kw', siteBalanceAvailable ? '0.0 kW' : 'UNAVAILABLE');
+                set('m-bw-st', siteBalanceAvailable ? 'Backwash INHIBIT' : 'Backwash UNAVAILABLE');
+                set('m-cl2', siteBalanceAvailable ? cl2 + ' L/h' : 'UNAVAILABLE');
+                set('m-cl2-res', siteBalanceAvailable ? cl2Res + ' ppm' : 'UNAVAILABLE');
+                set('m-uv', siteBalanceAvailable ? uvInt + '% INT' : 'UNAVAILABLE');
+                set('m-dom-pct', siteBalanceAvailable ? domPct + '%' : 'UNAVAILABLE');
+                set('m-dom-vol', siteBalanceAvailable ? f1(domVol) + ' m³' : 'UNAVAILABLE');
+                set('m-mk', metric(makeupLpm, 1, 'L/min'));
+                set('m-mk-bd', siteBalanceAvailable ? 'BD ' + f1(blowdownLpm) + ' L/min' : 'BD UNAVAILABLE');
+                set('m-svc', metric(DOMESTIC_LPM, 1, 'L/min'));
 
                 // Tank fill heights (SVG): TK-101 rect y=60 h=150 (3..207 usable)
                 var rawF = document.getElementById('rawFill');
-                if (rawF) { var rh = 147 * (rawPct / 100); rawF.setAttribute('y', 207 - rh); rawF.setAttribute('height', rh); }
+                if (rawF) { var rh = siteBalanceAvailable ? 147 * (rawPct / 100) : 0; rawF.setAttribute('y', 207 - rh); rawF.setAttribute('height', rh); }
                 var domF = document.getElementById('domFill');
-                if (domF) { var dh = 147 * (domPct / 100); domF.setAttribute('y', 397 - dh); domF.setAttribute('height', dh); }
+                if (domF) { var dh = siteBalanceAvailable ? 147 * (domPct / 100) : 0; domF.setAttribute('y', 397 - dh); domF.setAttribute('height', dh); }
 
                 // Right inspector — WUE reconciliation
-                set('iIt', nfmt(itLoadKw) + ' kW');
-                set('iItE', nfmt(itLoadKw) + ' kWh');
-                set('iWaterHr', nfmt(makeupLpm * 60) + ' L');
-                set('iWue', f2(wueComputed) + ' L/kWh');
-                set('iWue24', f2(wue24) + ' L/kWh');
-                document.getElementById('iWue').className = 'vv ' + (wueComputed > 1.30 ? 'warn' : 'ok');
+                set('iIt', siteBalanceAvailable ? nfmt(itLoadKw) + ' kW' : 'UNAVAILABLE');
+                set('iItE', siteBalanceAvailable ? nfmt(itLoadKw) + ' kWh' : 'UNAVAILABLE');
+                set('iWaterHr', siteBalanceAvailable ? nfmt(makeupLpm * 60) + ' L' : 'UNAVAILABLE');
+                set('iWue', metric(wueComputed, 2, 'L/kWh'));
+                set('iWue24', 'UNAVAILABLE');
+                ['iIt', 'iItE', 'iWaterHr'].forEach(function (id) {
+                    markUnavailable(id, !siteBalanceAvailable);
+                });
+                document.getElementById('iWue').className = 'vv '
+                    + (th.unavailable ? 'unavailable' : (wueComputed > 1.30 ? 'warn' : 'ok'));
+                markUnavailable('iWue24', true);
 
-                // Scope split
-                set('iScMk', f1(makeupLpm) + ' L/min');
-                set('iScEv', f1(evapLpm) + ' L/min');
-                set('iScBd', f1(blowdownLpm) + ' L/min');
-                set('iScDr', f2(driftLpm) + ' L/min');
-                set('iScDom', f1(DOMESTIC_LPM) + ' L/min');
-                set('iScTot', f1(totalLpm) + ' L/min');
-                set('iWhyTot', f1(totalLpm));
-                set('iWhyDom', f1(DOMESTIC_LPM));
-                set('iWhyMk', f1(makeupLpm));
-                set('iWhyAll', f2(wueAllFlow));
-                set('iWhyWue', f2(wueEngine));
-                set('alloc-treatment', f1(totalLpm) + ' L/min');
-                set('alloc-makeup', f1(makeupLpm) + ' L/min');
-                set('alloc-domestic', f1(DOMESTIC_LPM) + ' L/min');
-                /* v2.0.0 — the current-basis card is engine-written, never static text (it previously
-                   claimed 1.850 MW / 37.0 L/min forever). Same source as every figure above it. */
-                set('water-current-basis-value',
-                    'Representative view · ' + (S.site.it_load_kw / 1000).toFixed(3) + ' MW IT · ' +
-                    f1(makeupLpm) + ' L/min WUE-included makeup');
+                // Site scope. The engine publishes no downstream hall submeters.
+                ['iScMk', 'iScEv', 'iScBd', 'iScDr', 'iScDom', 'iScTot'].forEach(function (id) {
+                    markUnavailable(id, !siteBalanceAvailable);
+                });
+                set('iScMk', metric(siteBalanceAvailable ? makeupLpm : null, 1, 'L/min'));
+                set('iScEv', metric(siteBalanceAvailable ? evapLpm : null, 1, 'L/min'));
+                set('iScBd', metric(siteBalanceAvailable ? blowdownLpm : null, 1, 'L/min'));
+                set('iScDr', metric(siteBalanceAvailable ? driftLpm : null, 2, 'L/min'));
+                set('iScDom', metric(siteBalanceAvailable ? DOMESTIC_LPM : null, 1, 'L/min'));
+                set('iScTot', metric(siteBalanceAvailable ? totalLpm : null, 1, 'L/min'));
+                set('iWhyTot', siteBalanceAvailable ? f1(totalLpm) : '\u2014');
+                set('iWhyDom', siteBalanceAvailable ? f1(DOMESTIC_LPM) : '\u2014');
+                set('iWhyMk', siteBalanceAvailable ? f1(makeupLpm) : '\u2014');
+                set('iWhyAll', siteBalanceAvailable ? f2(wueAllFlow) : '\u2014');
+                set('iWhyWue', siteBalanceAvailable ? f2(wueEngine) : '\u2014');
+
+                var reconValues = document.getElementById('scope-reconciliation-values');
+                var reconUnavailable = document.getElementById('scope-reconciliation-unavailable');
+                if (reconValues) reconValues.hidden = !siteBalanceAvailable;
+                if (reconUnavailable) reconUnavailable.hidden = siteBalanceAvailable;
+
+                set('alloc-treatment', metric(siteBalanceAvailable ? totalLpm : null, 1, 'L/min'));
+                set('alloc-makeup', metric(siteBalanceAvailable ? makeupLpm : null, 1, 'L/min'));
+                set('alloc-domestic', metric(siteBalanceAvailable ? DOMESTIC_LPM : null, 1, 'L/min'));
+                ['alloc-treatment', 'alloc-makeup', 'alloc-domestic'].forEach(function (id) {
+                    markUnavailable(id, !siteBalanceAvailable);
+                });
+                set('water-current-basis-value', siteBalanceAvailable
+                    ? 'Site scope · ' + (itLoadKw / 1000).toFixed(3) + ' MW IT · '
+                        + f1(makeupLpm) + ' L/min WUE-included makeup'
+                    : 'Site scope · UNAVAILABLE — ' + unavailableBasisReason);
 
                 // Alarm list (live state vs threshold)
                 renderAlarmList(th);
 
                 // Bottom status bar
-                set('status-tank', rawPct + '%');
-                set('status-pump', 'P-301A DUTY · P-301B STBY');
-                set('status-flow', f1(makeupLpm) + ' L/min');
-                set('status-wue', f2(wueComputed) + ' L/kWh');
+                set('status-tank', siteBalanceAvailable ? rawPct + '%' : 'UNAVAILABLE');
+                set('status-pump', siteBalanceAvailable ? 'P-301A DUTY · P-301B STBY' : 'UNAVAILABLE');
+                set('status-flow', metric(makeupLpm, 1, 'L/min'));
+                set('status-wue', metric(wueComputed, 2, 'L/kWh'));
                 set('status-system', state);
                 var ledSys = document.getElementById('led-system');
-                ledSys.className = 'status-led ' + (th.crit ? 'led-bad' : (th.warn ? 'led-warn' : 'led-ok'));
+                ledSys.className = 'status-led ' + (th.unavailable ? 'led-unavailable'
+                    : (th.crit ? 'led-bad' : (th.warn ? 'led-warn' : 'led-ok')));
+                ['led-tank', 'led-pump'].forEach(function (id) {
+                    var led = document.getElementById(id);
+                    if (led) led.className = 'status-led ' + (siteBalanceAvailable ? 'led-ok' : 'led-unavailable');
+                });
+                document.querySelectorAll('[data-pump-id]').forEach(function (pump) {
+                    var isDuty = pump.getAttribute('data-pump-id') === 'P-301A';
+                    pump.setAttribute('data-state', siteBalanceAvailable ? (isDuty ? 'running' : 'available') : 'unavailable');
+                    var stateLabel = pump.querySelector('.pump-state');
+                    if (stateLabel) stateLabel.textContent = siteBalanceAvailable ? (isDuty ? 'RUNNING' : 'AVAILABLE') : 'UNAVAILABLE';
+                    var meta = pump.querySelector('.pump-meta');
+                    if (meta) meta.textContent = siteBalanceAvailable
+                        ? (isDuty
+                            ? 'Run feedback proven · 7.5 kW · lead selected'
+                            : 'Auto available · 0.0 kW · starts on fail/low pressure')
+                        : 'No current point authority';
+                });
+                var pumpDutyGroup = document.querySelector('[data-eq="pump-duty"]');
+                if (pumpDutyGroup) {
+                    pumpDutyGroup.setAttribute('aria-label', siteBalanceAvailable
+                        ? 'P-301A duty pump running' : 'P-301A duty pump authority unavailable');
+                    var pumpDutySymbol = pumpDutyGroup.querySelector('.pump-symbol');
+                    if (pumpDutySymbol) {
+                        pumpDutySymbol.setAttribute('fill', siteBalanceAvailable ? '#5eead4' : '#718096');
+                        pumpDutySymbol.setAttribute('stroke', siteBalanceAvailable ? '#5eead4' : '#8ca0b8');
+                    }
+                }
+                var processLineOperating = {
+                    'ws-mains-in': ['energized', metric(totalLpm, 1, 'L/min') + ' @ 2.1 bar'],
+                    'ws-raw-to-filter': ['energized', '2.4 bar inlet'],
+                    'ws-filter-to-pump': ['energized', '2.0 bar / DP ' + f2(filterDp) + ' bar'],
+                    'ws-pump-to-uv': ['energized', 'P-301A running / P-301B available'],
+                    'ws-uv-to-treated-header': ['energized', f1(uvInt) + '% UV intensity'],
+                    'ws-treated-to-domtank': ['energized', metric(DOMESTIC_LPM, 1, 'L/min') + ' to TK-402'],
+                    'ws-treated-to-makeup': ['energized', metric(makeupLpm, 1, 'L/min') + ' cooling makeup'],
+                    'ws-domtank-to-service': ['energized', metric(DOMESTIC_LPM, 1, 'L/min') + ' service supply'],
+                    'ws-bw-to-drain': ['de-energized', 'INHIBIT (state machine)'],
+                    'ws-makeup-blowdown': ['energized', metric(blowdownLpm, 1, 'L/min') + ' blowdown']
+                };
+                document.querySelectorAll('#water-svg [data-rz-line]').forEach(function (line) {
+                    var operating = processLineOperating[line.getAttribute('data-id')];
+                    line.setAttribute('data-state', siteBalanceAvailable && operating ? operating[0] : 'unavailable');
+                    line.setAttribute('data-current', siteBalanceAvailable && operating
+                        ? operating[1] : 'UNAVAILABLE — ' + unavailableBasisReason);
+                });
+                document.querySelectorAll('#water-svg .flow').forEach(function (flow) {
+                    flow.classList.toggle('stopped', !siteBalanceAvailable || flow.id === 'f-bw');
+                });
+                ['btn-sim', 'btn-bw', 'btn-reset'].forEach(function (id) {
+                    var control = document.getElementById(id);
+                    if (control) control.disabled = !siteBalanceAvailable;
+                });
             }
 
             function alarmRow(sev, label, detail) {
                 return '<li><span class="sev ' + sev + '">' +
-                    (sev === 'bad' ? 'ALARM' : sev === 'warn' ? 'WARN' : 'OK') +
+                    (sev === 'bad' ? 'ALARM' : sev === 'warn' ? 'WARN' : sev === 'unavailable' ? 'UNAVAILABLE' : 'OK') +
                     '</span><span class="msg"><b>' + label + '</b> &mdash; ' + detail + '</span></li>';
             }
-            function renderAlarmList() {
+            function renderAlarmList(th) {
+                if (th && th.unavailable) {
+                    document.getElementById('alarmList').innerHTML = alarmRow('unavailable', 'Process telemetry', 'UNAVAILABLE — ' + unavailableBasisReason);
+                    return;
+                }
                 var rows = '';
                 rows += alarmRow(rawPct < 30 ? 'bad' : rawPct < 40 ? 'warn' : 'ok',
                     'Raw Tank TK-101', rawPct + '% / ' + f1(rawVol) + ' m³ (low &lt; 30%)');
@@ -1034,13 +1134,21 @@
                 document.getElementById('alarmList').innerHTML = rows;
             }
 
-            bindHallViews();
             render();
 
             // ---- Chart: Filter DP + makeup flow, with threshold bands -----
             var chart = null;
             var cnv = document.getElementById('pressureTrend');
-            if (cnv && window.Chart) {
+            var trendUnavailable = document.getElementById('pressureTrendUnavailable');
+            var chartAuthorityAvailable = siteBalanceAvailable && !!window.Chart;
+            if (cnv) cnv.hidden = !chartAuthorityAvailable;
+            if (trendUnavailable) {
+                trendUnavailable.hidden = chartAuthorityAvailable;
+                trendUnavailable.textContent = siteBalanceAvailable
+                    ? 'UNAVAILABLE — chart library did not load.'
+                    : 'UNAVAILABLE — historian and current process authority required.';
+            }
+            if (cnv && window.Chart && siteBalanceAvailable) {
                 var labels = [], dpSeed = [], mkSeed = [];
                 for (var i = 0; i < 24; i++) {
                     labels.push(((i) < 10 ? '0' : '') + i + ':00');
@@ -1048,6 +1156,8 @@
                     dpSeed.push(0.38 + 0.06 * Math.sin(i / 24 * Math.PI * 2) + (i > 18 ? 0.03 : 0));
                     mkSeed.push(makeupLpm + 3 * Math.sin((i + 3) / 24 * Math.PI * 2));
                 }
+                var makeupAxisMin = Math.max(0, Math.floor((makeupLpm * 0.9) / 10) * 10);
+                var makeupAxisMax = Math.ceil((makeupLpm * 1.1) / 10) * 10;
                 chart = new Chart(cnv.getContext('2d'), {
                     type: 'line',
                     data: {
@@ -1073,7 +1183,7 @@
                                 title: { display: true, text: 'DP (bar)', color: '#38bdf8', font: { size: 10 } },
                                 grid: { color: 'rgba(148,163,184,.12)' },
                                 ticks: { color: '#64748b', font: { size: 9 } } },
-                            yMk: { position: 'right', min: 25, max: 60,
+                            yMk: { position: 'right', min: makeupAxisMin, max: makeupAxisMax,
                                 title: { display: true, text: 'Makeup (L/min)', color: '#2dd4bf', font: { size: 10 } },
                                 grid: { drawOnChartArea: false },
                                 ticks: { color: '#64748b', font: { size: 9 } } }
@@ -1112,6 +1222,7 @@
             };
 
             window.toggleSimulation = function () {
+                if (!siteBalanceAvailable) return;
                 simOn = !simOn;
                 var b = document.getElementById('btn-sim');
                 if (simOn) {
@@ -1123,7 +1234,9 @@
                         var d0 = chart.data.datasets[0].data;
                         var d1 = chart.data.datasets[1].data;
                         d0.shift(); d0.push(0.40 + (Math.random() * 0.06 - 0.03));
-                        d1.shift(); d1.push(makeupLpm + (Math.random() * 4 - 2));
+                        d1.shift(); d1.push(siteBalanceAvailable
+                            ? makeupLpm + (Math.random() * 4 - 2)
+                            : null);
                         chart.update('none');
                     }, 2500);
                 } else {
@@ -1134,6 +1247,7 @@
             };
 
             window.triggerBackwash = function () {
+                if (!siteBalanceAvailable) return;
                 var bw = document.getElementById('f-bw');
                 var btn = document.getElementById('btn-bw');
                 if (!bw) return;
@@ -1148,6 +1262,7 @@
             };
 
             window.resetSimulation = function () {
+                if (!siteBalanceAvailable) return;
                 if (simTimer) { clearInterval(simTimer); simTimer = null; }
                 simOn = false;
                 var b = document.getElementById('btn-sim');
@@ -1166,8 +1281,10 @@
                 set('status-uptime', pad(h) + ':' + pad(m) + ':' + pad(s));
                 var now = new Date();
                 var t = pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
-                set('status-time', t);
-                set('lastUpdate', t);
+                /* This clock is the browser UI clock, not evidence that governed telemetry
+                   refreshed. Keep both fields neutral when provenance is unavailable. */
+                set('status-time', siteBalanceAvailable ? t : 'UNAVAILABLE');
+                set('lastUpdate', siteBalanceAvailable ? t : 'UNAVAILABLE');
             }, 1000);
 
             // ---- Keyboard shortcuts ---------------------------------------

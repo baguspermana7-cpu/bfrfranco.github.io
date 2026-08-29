@@ -5,6 +5,15 @@ import { extname, resolve, sep } from 'node:path';
 import puppeteer from 'puppeteer';
 
 const ROOT = process.cwd();
+const FUEL_SOURCE = await readFile('fuel-system.html', 'utf8');
+const FUEL_ENGINE_VERSION = FUEL_SOURCE.match(/js\/conv-engine\.js\?v=([^"']+)/)?.[1];
+assert.ok(FUEL_ENGINE_VERSION, 'fuel page must request a versioned Conventional engine');
+const CURRENT_ENGINE_SOURCE = await readFile('js/conv-engine.js', 'utf8');
+const BLANK_METADATA_ENGINE = CURRENT_ENGINE_SOURCE
+  .replace("scenario: 'Simulated'", "scenario: '   '")
+  .replace("data_quality: 'GOOD'", "data_quality: ''");
+assert.notEqual(BLANK_METADATA_ENGINE, CURRENT_ENGINE_SOURCE,
+  'blank-metadata fixture must alter the current engine source');
 const MIME = Object.freeze({
   '.css': 'text/css',
   '.html': 'text/html',
@@ -53,6 +62,68 @@ async function openOperatorPage(browser, origin, path) {
   await page.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
   await page.goto(`${origin}/${path}`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
   return page;
+}
+
+async function openFuelFixture(browser, origin, engineSource) {
+  const page = await browser.newPage();
+  const pageErrors = [];
+  page.on('pageerror', (error) => pageErrors.push(error.message));
+  await page.setRequestInterception(true);
+  page.on('request', (request) => {
+    const url = request.url();
+    const pathname = new URL(url).pathname;
+    if (pathname.endsWith('/js/conv-engine.js')) {
+      if (engineSource === null) void request.abort();
+      else void request.respond({ status: 200, contentType: 'text/javascript', body: engineSource });
+    } else if (url.startsWith(origin) || url.startsWith('data:')) {
+      void request.continue();
+    } else {
+      void request.abort();
+    }
+  });
+  await page.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
+  await page.goto(`${origin}/fuel-system.html`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+  return { page, pageErrors };
+}
+
+async function assertFuelUnavailable(page, pageErrors, context) {
+  await page.hover('#tank-ust');
+  await page.waitForFunction(() => document.getElementById('equipment-tooltip')?.classList.contains('visible'));
+  const result = await page.evaluate(() => ({
+    authority: document.body.dataset.fuelAuthority,
+    operatorAuthority: window.RZFuelOperator?.authorityAvailable,
+    status: document.getElementById('as-state')?.textContent.trim(),
+    scenario: document.getElementById('as-scn')?.textContent.trim(),
+    autonomy: document.getElementById('kpi-autonomy')?.textContent.trim(),
+    n1: document.getElementById('kpi-np1-tag')?.textContent.trim(),
+    basis: document.getElementById('fuel-current-basis-value')?.textContent.trim(),
+    controlsDisabled: Array.from(document.querySelectorAll('#btn-fill,#btn-ack,#btn-reset,#btn-pump,#fs-reset'))
+      .every((button) => button.disabled),
+    interlocks: Array.from(document.querySelectorAll('.ilk .ilk-stat')).map((item) => item.textContent.trim()),
+    containment: Array.from(document.querySelectorAll('.containment-value')).map((item) => item.textContent.trim()),
+    activePaths: document.querySelectorAll('.flow-path .active,.fp-arrow.active,.pump-ic.running').length,
+    polishing: document.getElementById('polish-status')?.textContent.trim(),
+    alarms: document.getElementById('alarm-list')?.textContent.replace(/\s+/g, ' ').trim(),
+    tankTooltip: document.getElementById('equipment-tooltip')?.textContent.replace(/\s+/g, ' ').trim(),
+    text: document.body.innerText.replace(/\s+/g, ' '),
+  }));
+  assert.deepEqual(pageErrors, [], `${context}: page errors: ${pageErrors.join(' | ')}`);
+  assert.equal(result.authority, 'unavailable');
+  assert.equal(result.operatorAuthority, false);
+  assert.equal(result.status, 'UNAVAILABLE');
+  assert.equal(result.scenario, 'UNAVAILABLE');
+  assert.match(result.autonomy, /^(?:—|UNAVAILABLE)$/i);
+  assert.equal(result.n1, 'UNAVAILABLE');
+  assert.match(result.basis, /UNAVAILABLE/i);
+  assert.equal(result.controlsDisabled, true);
+  assert.ok(result.interlocks.every((state) => state === 'UNAVAILABLE'));
+  assert.ok(result.containment.every((state) => state === 'UNAVAILABLE'));
+  assert.equal(result.activePaths, 0);
+  assert.equal(result.polishing, 'UNAVAILABLE');
+  assert.match(result.alarms, /UNAVAILABLE/i);
+  assert.match(result.tankTooltip, /UNAVAILABLE/i);
+  assert.doesNotMatch(result.tankTooltip, /\b0(?:\.0)?\s*(?:L|%)/i);
+  assert.doesNotMatch(result.text, /\b(?:NaN|Infinity|null|undefined)\b/i);
 }
 
 const { server, origin } = await startServer();
@@ -157,6 +228,8 @@ try {
       polish: true,
     });
     return {
+      authority: document.body.dataset.fuelAuthority,
+      operatorAuthority: window.RZFuelOperator.authorityAvailable,
       polishStatus: document.getElementById('polish-status')?.textContent.trim(),
       polishMode: document.getElementById('polish-mode')?.textContent.trim(),
       leakRows: document.querySelectorAll('#leak-detection-chain [data-containment-point]').length,
@@ -176,6 +249,8 @@ try {
     };
   });
 
+  assert.equal(fuelState.authority, 'current');
+  assert.equal(fuelState.operatorAuthority, true);
   assert.equal(fuelState.polishStatus, 'RUNNING');
   assert.match(fuelState.polishMode, /SIMULATED/i);
   assert.ok(fuelState.leakRows >= 4, 'fuel containment chain must expose sensors and permissives');
@@ -216,14 +291,72 @@ try {
 
   await fuel.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });
   await new Promise((accept) => setTimeout(accept, 150));
-  const mobileOverflow = await fuel.evaluate(() => {
+  const fuelMobile = await fuel.evaluate(() => {
     window.scrollTo(9999, 0);
-    const value = window.scrollX;
+    const overflow = window.scrollX;
     window.scrollTo(0, 0);
-    return value;
+    const cards = Array.from(document.querySelectorAll('.kpi-strip .kpi')).map((card) => {
+      const rect = card.getBoundingClientRect();
+      return { left: rect.left, right: rect.right, width: rect.width };
+    });
+    const columns = Array.from(document.querySelectorAll('.main-grid > .col')).map((column) => {
+      const rect = column.getBoundingClientRect();
+      return { left: rect.left, right: rect.right, width: rect.width };
+    });
+    const panels = Array.from(document.querySelectorAll('.main-grid .panel')).map((panel) => {
+      const rect = panel.getBoundingClientRect();
+      return { left: rect.left, right: rect.right, width: rect.width };
+    });
+    return { overflow, cards, columns, panels };
   });
-  assert.ok(mobileOverflow <= 2, `fuel page overflowed mobile viewport by ${mobileOverflow}px`);
+  assert.ok(fuelMobile.overflow <= 2, `fuel page overflowed mobile viewport by ${fuelMobile.overflow}px`);
+  assert.ok(fuelMobile.cards.length >= 5, 'fuel mobile view must retain every KPI card');
+  assert.ok(fuelMobile.cards.every((card) => card.left >= 0 && card.right <= 390 && card.width > 0),
+    `fuel KPI escaped mobile viewport: ${JSON.stringify(fuelMobile.cards)}`);
+  assert.ok(fuelMobile.columns.every((column) => column.left >= 0 && column.right <= 390 && column.width > 0),
+    `fuel content column was clipped by the mobile viewport: ${JSON.stringify(fuelMobile.columns)}`);
+  assert.ok(fuelMobile.panels.every((panel) => panel.left >= 0 && panel.right <= 390 && panel.width > 0),
+    `fuel panel was clipped by the mobile viewport: ${JSON.stringify(fuelMobile.panels)}`);
   await fuel.close();
+
+  const missingFixture = await openFuelFixture(browser, origin, null);
+  await assertFuelUnavailable(missingFixture.page, missingFixture.pageErrors, 'missing fuel engine');
+  await missingFixture.page.close();
+
+  const legacyFixture = await openFuelFixture(browser, origin, `
+    window.CONV_CALC = { snapshot: {
+      site: { it_load_kw: 1850, facility_load_kw: 2682.5 },
+      fuel: {
+        level_pct: 85, tank_capacity_l: 60000, usable_l: 45900,
+        usable_fraction: 0.9, specific_consumption_l_per_kwh: 0.356,
+        generator_consumption_lph: 956, autonomy_hr: 48,
+        level_overfill_pct: 95, level_low_pct: 60, level_low_low_pct: 30
+      },
+      meta: { version: '1.22.0', scenario: 'Simulated', data_quality: 'GOOD' }
+    } };
+  `);
+  await assertFuelUnavailable(legacyFixture.page, legacyFixture.pageErrors, 'legacy fuel engine');
+  await legacyFixture.page.close();
+
+  const incompleteFixture = await openFuelFixture(browser, origin, `
+    window.CONV_CALC = { snapshot: {
+      site: { it_load_kw: 30000, facility_load_kw: 43500 },
+      fuel: {
+        level_pct: 85, tank_capacity_l: 972737, usable_l: 744144,
+        usable_fraction: 0.9, specific_consumption_l_per_kwh: 0.356,
+        generator_consumption_lph: 15503,
+        level_overfill_pct: 95, level_low_pct: 60, level_low_low_pct: 30
+      },
+      meta: { version: '${FUEL_ENGINE_VERSION}', scenario: 'Simulated', data_quality: 'GOOD' }
+    } };
+  `);
+  await assertFuelUnavailable(incompleteFixture.page, incompleteFixture.pageErrors, 'incomplete current fuel engine');
+  await incompleteFixture.page.close();
+
+  const blankMetadataFixture = await openFuelFixture(browser, origin, BLANK_METADATA_ENGINE);
+  await assertFuelUnavailable(blankMetadataFixture.page, blankMetadataFixture.pageErrors,
+    'same-version blank-provenance fuel engine');
+  await blankMetadataFixture.page.close();
 
   console.log('PASS Conventional fire/fuel operator truth, containment, responsive layout, and preserved flows');
 } finally {
