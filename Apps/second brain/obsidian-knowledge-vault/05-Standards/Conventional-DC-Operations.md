@@ -98,6 +98,13 @@ Canonical source: [[../../../../standarization/CONVENTIONAL_DC_OPERATIONS_STANDA
 - The release workflow runs the full three-document Design Studio browser selection/export gate.
 - Chiller scenario evolution is reproducible; healthy duty pumps do not swap randomly, so diagnostics
   and first-out state cannot change merely because the page was reloaded at a different instant.
+- Authorized visual audits require the exact route-owned `data-rz-cockpit-root`, remove only exact auth
+  overlay IDs, preserve feature dialogs, and fail non-zero after saving any error/missing-capture evidence.
+- Local cockpit previews never call external geolocation and discard stale session geo first. Shared
+  authentication and selection chrome uses flat surfaces, standard instrument cyan and no purple gradient,
+  glow or neon fill.
+- The Conventional landing header is flat and motionless; its phone alarm summary uses three balanced
+  metric columns, and all operator numerics use tabular/slashed-zero figures.
 
 Read the canonical standard for subsystem minimums, engineering formulas, UI/UX constraints,
 machine-checkable gates, references and the durable change/lesson ledger.

@@ -158,6 +158,8 @@ alongside the four audit scripts (`audit-script-tags`,
    facility: 7 running + 1 N+1 = 8 × 2.75 MW.
 6. **KPI colour grammar** — green only when inside band.
 7. **Basis drawer** on every top KPI (v1.32.2+).
+8. **First-paint truth** — authority KPIs render their exact engine value from the first frame.
+   Count-up animation, easing through plausible values and delayed restoration are prohibited.
 
 ### DC Conv
 
@@ -200,6 +202,12 @@ alongside the four audit scripts (`audit-script-tags`,
 | `tools/test-conv-calc.mjs` 22/22 must pass | STILL LOCKED |
 
 ## Implementation history
+
+- **v1.134.15** (2026-08-30): First-paint truth is release-gated for the AI authority KPIs; the visual
+  harness now verifies the exact route-owned `data-rz-cockpit-root` after removing only exact authentication
+  blockers. Non-auth feature dialogs survive, and error/missing-capture evidence makes the audit CLI exit
+  non-zero. Mobile telemetry disclosure and BoD table evidence are exercised with real pointer and geometry
+  checks; local preview clears stale geolocation caches before installing a blank deterministic fallback.
 
 - **v1.134.14** (2026-08-30): Operator-cockpit continuity and complete-authority gates added. Data Hall thermal
   colors and hall-metering scope, post-tick chiller envelopes, site-wide municipal water,

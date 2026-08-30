@@ -4,6 +4,11 @@ import { createServer } from 'node:http';
 import { extname, resolve, sep } from 'node:path';
 import puppeteer from 'puppeteer';
 
+import {
+  enterAuthorizedAuditState,
+  primeCockpitAuditDocument,
+} from './lib/cockpit-audit-state.mjs';
+
 const ROOT = process.cwd();
 const MIME = Object.freeze({
   '.css': 'text/css', '.html': 'text/html', '.js': 'text/javascript',
@@ -11,6 +16,9 @@ const MIME = Object.freeze({
   '.woff2': 'font/woff2',
 });
 const CHILLER_SOURCE = await readFile(resolve(ROOT, 'chiller-plant.html'), 'utf8');
+const DATAHALL_AI_SOURCE = await readFile(resolve(ROOT, 'datahallAI.html'), 'utf8');
+const EPMS_SOURCE = await readFile(resolve(ROOT, 'EPMS_Telemetry.html'), 'utf8');
+const WATER_SOURCE = await readFile(resolve(ROOT, 'water-system.html'), 'utf8');
 assert.match(CHILLER_SOURCE, /<script src="js\/conv-engine\.js\?v=2\.0\.0"><\/script>/,
   'chiller must request the governed engine revision');
 assert.doesNotMatch(CHILLER_SOURCE, /(?:Cooling Demand 1\.93 MW|id="kCool">1\.93 MW|id="spFlowTxt">18\.0 L\/s)/,
@@ -19,6 +27,12 @@ assert.match(CHILLER_SOURCE, /id="asLevel">UNAVAILABLE<\/span>/,
   'chiller first paint must begin fail closed');
 assert.doesNotMatch(CHILLER_SOURCE, /Math\.random\s*\(/,
   'chiller operator state must use reproducible scenario evolution, not reload-dependent randomness');
+assert.doesNotMatch(DATAHALL_AI_SOURCE, /__rzKpiAnimated|One-time count-up on first paint/,
+  'AI authority KPIs must not animate through plausible but false engineering values');
+assert.doesNotMatch(EPMS_SOURCE, /CYAN\s*=\s*'#22d3ee'/i,
+  'EPMS provenance must use the governed instrument-cyan token, not neon cyan');
+assert.doesNotMatch(WATER_SOURCE, /--sel:\s*#22d3ee/i,
+  'Water selection must use the governed instrument-cyan token, not neon cyan');
 
 function safePath(pathname) {
   const decoded = decodeURIComponent(pathname);
@@ -161,11 +175,20 @@ const browser = await puppeteer.launch({
 
 try {
   const page = await browser.newPage();
+  await primeCockpitAuditDocument(page, 'dark');
+  await page.evaluateOnNewDocument(() => {
+    sessionStorage.setItem('rz_geo_cache', JSON.stringify({
+      ip: '203.0.113.9', country: 'Testland', cc: 'TEST', city: 'Cached City',
+      region: 'Stale Region', tz: 'Etc/UTC', org: 'Audit Fixture', _ts: Date.now(),
+    }));
+  });
   const pageErrors = [];
+  const requestedUrls = [];
   page.on('pageerror', (error) => pageErrors.push(error.message));
   await page.setRequestInterception(true);
   page.on('request', (request) => {
     const url = request.url();
+    requestedUrls.push(url);
     if (url.startsWith(origin) || url.startsWith('data:')) request.continue();
     else request.abort();
   });
@@ -173,6 +196,22 @@ try {
   await page.setViewport({ width: 1920, height: 1080, deviceScaleFactor: 1 });
   await page.goto(`${origin}/datahall.html`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
   await page.waitForSelector('#zone-field .rack .rk-val', { timeout: 10_000 });
+  const localTracker = await page.evaluate(() => {
+    window.rzTrack('audit_local_geo');
+    const events = JSON.parse(localStorage.getItem('rz_user_events') || '[]');
+    return {
+      cache: sessionStorage.getItem('rz_geo_cache'),
+      event: events.find((entry) => entry.type === 'audit_local_geo') || null,
+    };
+  });
+  assert.equal(localTracker.cache, null, 'localhost tracker must discard a stale geolocation cache');
+  assert.deepEqual({
+    ip: localTracker.event?.ip,
+    country: localTracker.event?.country,
+    cc: localTracker.event?.cc,
+    city: localTracker.event?.city,
+  }, { ip: '', country: '', cc: '', city: '' },
+  'localhost tracker events must never reuse cached production-like geolocation');
   const hall = await page.evaluate(() => {
     const occupied = Array.from(document.querySelectorAll('#zone-field .rack'))
       .find((node) => /\d+\.\d+°C/.test(node.querySelector('.rk-val')?.textContent || ''));
@@ -381,10 +420,8 @@ try {
     await page.setViewport({ ...viewport, deviceScaleFactor: 1 });
     await page.goto(`${origin}/datahallAI.html`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
     await page.waitForSelector('.rz-tq-banner', { timeout: 10_000 });
+    await enterAuthorizedAuditState(page, 'dc-ai');
     const layout = await page.evaluate(() => {
-      document.body.classList.remove('locked');
-      document.querySelectorAll('.root-gate,.rz-restricted-overlay,.rz-modal-overlay')
-        .forEach((node) => node.remove());
       const rect = (node) => {
         const value = node.getBoundingClientRect();
         return { left: value.left, right: value.right, top: value.top, bottom: value.bottom };
@@ -396,7 +433,13 @@ try {
       const main = document.querySelector('.mn');
       const dashboardGrid = document.querySelector('.ai-dashboard-grid');
       const dashboardImage = document.querySelector('.ai-dashboard-image');
+      const sidebar = document.querySelector('.side');
+      const sideToggle = document.getElementById('sideTog');
       const sideReopen = document.getElementById('sideReopen');
+      const loginButton = document.getElementById('rzLoginBtn');
+      const loginStyle = loginButton ? getComputedStyle(loginButton) : null;
+      const beforeStyle = getComputedStyle(document.body, '::before');
+      const afterStyle = getComputedStyle(document.body, '::after');
       return {
         chip: document.querySelector('.hdr h1 .chip')?.textContent?.trim(),
         provenance: document.querySelector('.rz-tq-banner-label')?.textContent?.trim(),
@@ -410,14 +453,48 @@ try {
         mainOverflowY: main ? getComputedStyle(main).overflowY : '',
         dashboardColumns: dashboardGrid ? getComputedStyle(dashboardGrid).gridTemplateColumns : '',
         dashboardImageWidth: dashboardImage?.getBoundingClientRect().width || 0,
+        kpis: Object.fromEntries(['dkPue', 'dkWue', 'dkCue', 'dkIt', 'dkGpu', 'dkDom']
+          .map((id) => [id, document.getElementById(id)?.textContent?.trim()])),
+        sideCollapsed: wrap?.classList.contains('side-collapsed') || false,
+        sidebarHeight: sidebar?.getBoundingClientRect().height || 0,
+        sideToggleDisplay: sideToggle ? getComputedStyle(sideToggle).display : '',
         sideReopenDisplay: sideReopen ? getComputedStyle(sideReopen).display : '',
+        authVisual: loginStyle ? {
+          backgroundImage: loginStyle.backgroundImage,
+          borderRadius: loginStyle.borderRadius,
+          boxShadow: loginStyle.boxShadow,
+          color: loginStyle.color,
+        } : null,
+        atmosphere: {
+          beforeContent: beforeStyle.content,
+          beforeImage: beforeStyle.backgroundImage,
+          afterContent: afterStyle.content,
+          afterImage: afterStyle.backgroundImage,
+        },
         headerDotAnimation: getComputedStyle(document.querySelector('.hdr-r > .dot')).animationName,
         horizontalOverflow: document.documentElement.scrollWidth - window.innerWidth,
       };
     });
     assert.doesNotMatch(layout.chip, /Live Telemetry/i, 'simulated page must not claim live telemetry');
     assert.match(`${layout.chip} ${layout.provenance}`, /simulated/i);
+    assert.deepEqual(layout.kpis, {
+      dkPue: '1.30', dkWue: '0.00', dkCue: '0.90', dkIt: '14.26',
+      dkGpu: '7,776', dkDom: '108',
+    }, 'AI authority KPIs must never animate through plausible but false intermediate values');
     assert.equal(layout.slotInHeader, true, 'telemetry provenance must be a compact header instrument');
+    assert.ok(layout.authVisual, 'cockpit auth control must be present for visual-contract validation');
+    assert.equal(layout.authVisual.backgroundImage, 'none',
+      'cockpit auth control must not use a decorative gradient');
+    assert.ok(parseFloat(layout.authVisual.borderRadius) <= 4,
+      `cockpit auth control radius drifted to ${layout.authVisual.borderRadius}`);
+    assert.equal(layout.authVisual.boxShadow, 'none',
+      'cockpit auth control must not use a decorative glow');
+    assert.doesNotMatch(layout.authVisual.color, /167, 139, 250|139, 92, 246/,
+      'cockpit auth control must not use the rejected purple accent');
+    assert.equal(layout.atmosphere.beforeImage, 'none',
+      'cockpit shell must not carry decorative graticule noise');
+    assert.equal(layout.atmosphere.afterImage, 'none',
+      'cockpit shell must not carry decorative scanline noise');
     assert.equal(boxesOverlap(layout.header, layout.tabs), false, `header overlapped tabs at ${viewport.width}px`);
     assert.ok(layout.wrap.bottom <= viewport.height + 1,
       `AI cockpit extended ${layout.wrap.bottom - viewport.height}px below the viewport at ${viewport.width}px`);
@@ -432,12 +509,147 @@ try {
         'AI mobile dashboard must stack the primary image above its status rail');
       assert.ok(layout.dashboardImageWidth >= 340,
         `AI mobile primary surface collapsed to ${layout.dashboardImageWidth}px`);
+      assert.equal(layout.sideCollapsed, true,
+        'AI mobile telemetry spine must default to its compact operator state');
+      assert.ok(layout.sidebarHeight <= 64,
+        `AI mobile telemetry spine consumed ${layout.sidebarHeight}px before operator expansion`);
+      assert.notEqual(layout.sideToggleDisplay, 'none',
+        'AI mobile telemetry spine must expose an explicit expand control');
       assert.equal(layout.sideReopenDisplay, 'none',
         'desktop sidebar reopen control must stay hidden on mobile');
       assert.ok(layout.header.bottom - layout.header.top <= 100,
         `AI mobile header consumed ${layout.header.bottom - layout.header.top}px of operator space`);
+      const toggleGeometry = await page.$eval('#sideTog', (node) => {
+        const box = node.getBoundingClientRect();
+        const hit = document.elementFromPoint(box.left + (box.width / 2), box.top + (box.height / 2));
+        return {
+          box: { left: box.left, top: box.top, width: box.width, height: box.height },
+          hitId: hit?.id || '',
+          inert: Boolean(node.closest('[inert]')),
+          pointerEvents: getComputedStyle(node).pointerEvents,
+        };
+      });
+      assert.equal(toggleGeometry.hitId, 'sideTog',
+        `AI mobile telemetry control is obscured: ${JSON.stringify(toggleGeometry)}`);
+      await page.click('#sideTog');
+      const expandedSidebar = await page.evaluate(() => ({
+        collapsed: document.querySelector('.wrap')?.classList.contains('side-collapsed') || false,
+        height: document.querySelector('.side')?.getBoundingClientRect().height || 0,
+        label: document.getElementById('sideTog')?.getAttribute('aria-label') || '',
+      }));
+      assert.equal(expandedSidebar.collapsed, false,
+        `AI mobile telemetry spine must expand on explicit operator request: ${JSON.stringify(toggleGeometry)}`);
+      assert.ok(expandedSidebar.height >= 120,
+        `AI mobile telemetry spine did not expose its detail (${expandedSidebar.height}px)`);
+      assert.match(expandedSidebar.label, /collapse/i,
+        'expanded mobile telemetry spine must advertise the inverse action');
+      await page.click('#bodTrig');
+      await page.waitForSelector('#bodDrawer.show', { timeout: 5_000 });
+      const drawerLayout = await page.evaluate(() => {
+        const drawer = document.getElementById('bodDrawer');
+        const contractLayer = document.querySelector('.rz-public-contract-layer');
+        const tableMetrics = Array.from(document.querySelectorAll('.dh-bod-tbl')).map((table) => ({
+          clientWidth: table.clientWidth,
+          scrollWidth: table.scrollWidth,
+          overflow: table.scrollWidth - table.clientWidth,
+          tableLayout: getComputedStyle(table).tableLayout,
+          parentWidth: table.parentElement?.clientWidth || 0,
+          widestCell: Array.from(table.querySelectorAll('td')).map((cell) => ({
+            text: (cell.textContent || '').trim().slice(0, 72),
+            overflow: cell.scrollWidth - cell.clientWidth,
+            whiteSpace: getComputedStyle(cell).whiteSpace,
+            overflowWrap: getComputedStyle(cell).overflowWrap,
+          })).sort((left, right) => right.overflow - left.overflow)[0],
+        }));
+        const tableOverflow = tableMetrics.reduce((maximum, table) => Math.max(maximum, table.overflow), 0);
+        return {
+          clientWidth: drawer?.clientWidth || 0,
+          scrollWidth: drawer?.scrollWidth || 0,
+          tableOverflow,
+          tableMetrics,
+          contractLayerDisplay: contractLayer ? getComputedStyle(contractLayer).display : '',
+        };
+      });
+      assert.ok(drawerLayout.scrollWidth <= drawerLayout.clientWidth + 1,
+        `AI mobile basis drawer overflows by ${drawerLayout.scrollWidth - drawerLayout.clientWidth}px`);
+      assert.ok(drawerLayout.tableOverflow <= 1,
+        `AI mobile basis table clips engineering evidence: ${JSON.stringify(drawerLayout.tableMetrics)}`);
+      assert.equal(drawerLayout.contractLayerDisplay, 'none',
+        'public header links must not obscure an active engineering drawer');
     }
   }
+
+  await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });
+  await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+  await page.goto(`${origin}/dc-conventional.html`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+  await enterAuthorizedAuditState(page, 'dc-conventional');
+  await page.waitForSelector('#alarmStrip', { timeout: 10_000 });
+  const conventionalChrome = await page.evaluate(() => {
+    const styles = (selector) => Array.from(document.querySelectorAll(selector)).map((node) => {
+      const style = getComputedStyle(node);
+      return {
+        selector,
+        text: (node.textContent || '').trim().slice(0, 48),
+        backgroundImage: style.backgroundImage,
+        backdropFilter: style.backdropFilter,
+        borderRadius: Number.parseFloat(style.borderRadius) || 0,
+        animationName: style.animationName,
+        boxShadow: style.boxShadow,
+        fontVariantNumeric: style.fontVariantNumeric,
+        fontFeatureSettings: style.fontFeatureSettings,
+      };
+    });
+    const alarm = document.getElementById('alarmStrip');
+    const alarmStyle = getComputedStyle(alarm);
+    const alarmRect = alarm.getBoundingClientRect();
+    return {
+      header: styles('.header')[0],
+      buttons: styles('.back-btn'),
+      badge: styles('.live-badge')[0],
+      statusDot: styles('.status-dot')[0],
+      numerics: styles('.kpi-value, .as-val, .stat-value, .callout-value'),
+      alarm: {
+        display: alarmStyle.display,
+        columns: alarmStyle.gridTemplateColumns.split(' ').filter(Boolean).length,
+        height: alarmRect.height,
+        width: alarmRect.width,
+        maxCellWidth: Math.max(...Array.from(alarm.querySelectorAll('.as-cell'))
+          .map((node) => node.getBoundingClientRect().width)),
+      },
+    };
+  });
+  assert.equal(conventionalChrome.header.backdropFilter, 'none',
+    'Conventional header must use a flat instrument surface without blur');
+  assert.equal(conventionalChrome.header.backgroundImage, 'none',
+    'Conventional header must not use a decorative gradient');
+  assert.ok(conventionalChrome.buttons.every((button) => button.backgroundImage === 'none'),
+    `Conventional controls must stay flat: ${JSON.stringify(conventionalChrome.buttons)}`);
+  assert.ok(conventionalChrome.buttons.every((button) => button.borderRadius <= 4),
+    'Conventional controls must keep restrained industrial corner radii');
+  assert.equal(conventionalChrome.badge.animationName, 'none',
+    'authority badge must not pulse');
+  assert.equal(conventionalChrome.badge.boxShadow, 'none',
+    'authority badge must not glow');
+  assert.ok(conventionalChrome.badge.borderRadius <= 4,
+    'authority badge must not render as a pill');
+  assert.equal(conventionalChrome.statusDot.animationName, 'none',
+    'header status must not blink under reduced motion');
+  assert.ok(conventionalChrome.numerics.length >= 20,
+    'Conventional cockpit numeric evidence is unexpectedly sparse');
+  assert.ok(conventionalChrome.numerics.every((metric) => (
+    metric.fontVariantNumeric.includes('tabular-nums')
+      && metric.fontVariantNumeric.includes('slashed-zero')
+      && /tnum/.test(metric.fontFeatureSettings)
+      && /zero/.test(metric.fontFeatureSettings)
+  )), `Conventional numerics lost operator typography: ${JSON.stringify(conventionalChrome.numerics)}`);
+  assert.equal(conventionalChrome.alarm.display, 'grid',
+    'mobile alarm summary must use a compact grid');
+  assert.equal(conventionalChrome.alarm.columns, 3,
+    'mobile alarm metrics must use three balanced columns');
+  assert.ok(conventionalChrome.alarm.height <= 200,
+    `mobile alarm summary is too tall at ${conventionalChrome.alarm.height}px`);
+  assert.ok(conventionalChrome.alarm.maxCellWidth <= conventionalChrome.alarm.width / 2,
+    'mobile alarm metrics must not waste half a row per value');
 
   const numericContracts = [
     ['datahall.html', '#bb-util'],
@@ -473,6 +685,8 @@ try {
   }
 
   assert.deepEqual(pageErrors, [], `browser page errors: ${pageErrors.join(' | ')}`);
+  assert.equal(requestedUrls.some((url) => url.startsWith('https://ipapi.co/')), false,
+    'local cockpit validation must not call the third-party geolocation service');
   console.log('PASS operator cockpit thermal semantics, plant envelope, and AI header layout');
 } finally {
   await browser.close();

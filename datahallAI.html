@@ -593,8 +593,8 @@ body.dh-bod-open .rz-nav-burger{display:none!important}
 [data-theme="light"] .dh-bod-sec[open]>summary{border-bottom-color:#dbe2ea}
 .dh-bod-sec>summary .tag{margin-left:auto;font-size:8px;font-weight:600;color:#64748b;letter-spacing:.04em}
 .dh-bod-secbody{padding:4px 10px 10px}
-.dh-bod-tbl{width:100%;border-collapse:collapse;font-family:'JetBrains Mono';font-size:9px}
-.dh-bod-tbl td{padding:3px 4px;border-bottom:1px solid #1c2230;vertical-align:top}
+.dh-bod-tbl{width:100%;table-layout:fixed;border-collapse:collapse;font-family:'JetBrains Mono';font-size:9px}
+.dh-bod-tbl td{padding:3px 4px;border-bottom:1px solid #1c2230;vertical-align:top;white-space:normal;overflow-wrap:anywhere}
 [data-theme="light"] .dh-bod-tbl td{border-bottom-color:#e2e8f0}
 .dh-bod-tbl td:first-child{color:#8b919c;width:42%}
 [data-theme="light"] .dh-bod-tbl td:first-child{color:#64748b}
@@ -705,8 +705,8 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
          atmosphere + mono headings + panel borders. Dark-only, scoped. Never
          touches SVG semantic colours or engine values (#p-dash byte-identical;
          75/75 accuracy probe stays green). Spec: standarization/COCKPIT_RESKIN_PLAN.md -->
-    <link rel="stylesheet" href="css/rz-cockpit-instrument.css?v=1.43.19">
-    <link rel="stylesheet" href="css/datahall-ai-operator.css?v=1.134.14">
+    <link rel="stylesheet" href="css/rz-cockpit-instrument.css?v=1.134.15">
+    <link rel="stylesheet" href="css/datahall-ai-operator.css?v=1.134.15">
     <link rel="stylesheet" href="css/rz-design-studio.css?v=1.130.0">
     <script src="js/datahall-ai/operator-ui.js?v=1.130.0" defer></script>
 <style id="rz-skiplink-v1">
@@ -755,7 +755,7 @@ Requested model/calculation versions and the complete locked schema must validat
 <button data-t="alarms">Alarms &amp; Events</button>
 <button data-t="bms">BMS</button>
 </nav>
-<div class="wrap" inert>
+<div class="wrap" data-rz-cockpit-root="dc-ai" inert>
 <button type="button" class="dh-sidereopen" id="sideReopen" aria-label="Show sidebar" title="Show sidebar">&#9656;</button>
 <aside tabindex="0" class="side">
 <div class="dh-head" style="display:flex;align-items:flex-start;gap:6px">
@@ -1391,23 +1391,39 @@ var DHE=DH;
 setInterval(()=>{$('clk').textContent=new Date().toLocaleTimeString('en-GB')},1000);
 $('tabs').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')return;document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('on'));e.target.classList.add('on');document.querySelectorAll('.pn').forEach(p=>p.classList.remove('on'));const el=$('p-'+e.target.dataset.t);if(el)el.classList.add('on')});
 $('elecTabs').addEventListener('click',function(e){if(!e.target.classList.contains('et'))return;document.querySelectorAll('.elec-tabs .et').forEach(function(b){b.classList.remove('on')});e.target.classList.add('on');document.querySelectorAll('.ep').forEach(function(p){p.classList.remove('on')});var el=$('ep-'+e.target.dataset.ep);if(el)el.classList.add('on')});
-/* v1.20.5 Lever A — desktop sidebar collapse (doc-18). Additive only; default
-   is uncollapsed so first paint (incl. #p-dash) is unchanged. User choice is
-   remembered. CSS gates the visual effect to >=1025px. */
+/* Operator telemetry-spine collapse. Desktop opens by default; compact
+   viewports close by default so the active schematic owns the first screen.
+   Preferences are kept separately so a mobile choice cannot alter desktop. */
 (function(){
   var wrap=document.querySelector('.wrap'),tog=$('sideTog'),reo=$('sideReopen');
   if(!wrap||!tog)return;
+  var compact=window.matchMedia?window.matchMedia('(max-width:1024px)'):null;
+  function isCompact(){return !!(compact&&compact.matches);}
+  function storageKey(){return isCompact()?'dhSideCollapsedMobile':'dhSideCollapsed';}
+  function actionLabel(c){
+    if(isCompact())return c?'Expand telemetry spine':'Collapse telemetry spine';
+    return c?'Show sidebar':'Collapse sidebar to widen diagram';
+  }
   function apply(c){
     wrap.classList.toggle('side-collapsed',!!c);
-    tog.innerHTML=c?'&#9656;':'&#9666;';
-    tog.setAttribute('aria-label',c?'Show sidebar':'Collapse sidebar to widen diagram');
+    tog.innerHTML=isCompact()?(c?'&#9662;':'&#9652;'):(c?'&#9656;':'&#9666;');
+    tog.setAttribute('aria-expanded',c?'false':'true');
+    tog.setAttribute('aria-label',actionLabel(c));
     tog.title=tog.getAttribute('aria-label');
   }
-  function set(c){try{localStorage.setItem('dhSideCollapsed',c?'1':'0');}catch(e){}apply(c);}
-  var saved=null;try{saved=localStorage.getItem('dhSideCollapsed');}catch(e){}
-  if(saved==='1')apply(true);
+  function read(){
+    var saved=null;try{saved=localStorage.getItem(storageKey());}catch(e){}
+    return saved===null?isCompact():saved==='1';
+  }
+  function set(c){try{localStorage.setItem(storageKey(),c?'1':'0');}catch(e){}apply(c);}
+  function restore(){apply(read());}
+  restore();
   tog.addEventListener('click',function(){set(!wrap.classList.contains('side-collapsed'));});
   if(reo)reo.addEventListener('click',function(){set(false);});
+  if(compact){
+    if(compact.addEventListener)compact.addEventListener('change',restore);
+    else if(compact.addListener)compact.addListener(restore);
+  }
 })();
 function tx(x,y,t,c,s,a,w){return`<text x="${x}" y="${y}" fill="${c||'var(--t2)'}" font-family="${J}" font-size="${s||6}" ${a?`text-anchor="${a}"`:''} ${w?'font-weight="600"':''}>${t}</text>`}
 function bx(x,y,w,h,c,r){return`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r||3}" fill="rgba(255,255,255,.015)" stroke="${c}" stroke-width=".7"/>`}
@@ -7954,37 +7970,8 @@ if(el('dcWind'))el('dcWind').textContent=RI(8,15)+'m/s';
 }
 updateDashKPI();
 setInterval(updateDashKPI,4000);
-/* v1.43.5 — RZ Dark System "animated on load" primitive applied to #p-dash
-   (review pivot: dark mode read as static/slop). One-time count-up on first
-   paint. ADDITIVE + PROBE-SAFE: each value's exact original string is captured
-   and restored verbatim at animation end, so displayed final text is
-   byte-identical (accuracy probe reads post-settle). Honours reduced-motion.
-   Spec: standarization/DARK_MODE_STANDARD.md (motion primitive: count-up). */
-(function(){
-  if(window.__rzKpiAnimated)return;window.__rzKpiAnimated=true;
-  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
-  if(reduce)return;
-  var ids=['dkPue','dkWue','dkCue','dkIt','dkGpu','dkDom'];
-  var dur=820; /* settles well before the 1200ms accuracy-probe read */
-  ids.forEach(function(id){
-    var elx=document.getElementById(id);if(!elx)return;
-    var orig=elx.textContent;var num=parseFloat(orig.replace(/,/g,''));
-    if(isNaN(num)){return;}
-    var dec=(orig.split('.')[1]||'').length;
-    var hasComma=/,/.test(orig);
-    var start=null,done=false;
-    function fmt(v){var s=v.toLocaleString(undefined,{minimumFractionDigits:dec,maximumFractionDigits:dec});return hasComma?s:s.replace(/,/g,'');}
-    function settle(){if(done)return;done=true;elx.textContent=orig;}
-    function frame(t){if(done)return;if(!start)start=t;var k=Math.min((t-start)/dur,1);var e=1-Math.pow(1-k,3);
-      if(k<1){elx.textContent=fmt(num*e);requestAnimationFrame(frame);}else{settle();}}
-    requestAnimationFrame(frame);
-    /* HARD GUARANTEE — if rAF stalls (backgrounded/throttled tab), force the
-       exact original value. dkGpu/dkDom are NOT refreshed by the 4s interval,
-       so without this they could freeze mid-animation showing a wrong basis
-       number. setTimeout fires even in throttled tabs. */
-    setTimeout(settle,dur+300);
-  });
-})();
+/* Authority KPIs are instruments, not decorative counters. Keep the first
+   paint and every runtime frame on the exact engine-derived value. */
 
 /* =========================================================================
  * v1.32.7 — KPI Basis Drawer (ACCURACY_VALIDATION.md Rule 6).
@@ -11375,7 +11362,7 @@ inner.addEventListener('touchend',function(){lastDist=0},{passive:true});
     setTimeout(applyGate, 1600);
 })();
 </script>
-<script src="rz-tracker.js" defer></script>
+<script src="rz-tracker.js?v=2026-08-30-local-runtime" defer></script>
 
 
 

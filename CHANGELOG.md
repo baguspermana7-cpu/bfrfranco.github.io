@@ -11,6 +11,50 @@ release sections rather than semver.
 
 ---
 
+## v1.134.15 — 2026-08-30 (Truthful first paint and compact operator shell)
+
+Owner direction: *“continue improve more.”*
+
+### Added
+
+- Added a reusable authorized-audit-state helper and focused contract test. Browser audits now remove
+  only authentication blockers, restore recognized operator surfaces from `inert`, verify that a real
+  cockpit root remains mounted, and reject an invalid or still-locked audit surface.
+- Extended the operator regression to exercise the AI telemetry spine with a real unobscured pointer
+  click, exact engine KPI values, flat authentication chrome, a responsive BoD drawer, and site-local
+  telemetry behavior.
+
+### Fixed
+
+- Removed the decorative AI KPI count-up. PUE, WUE, CUE, IT load, GPU count and NVL72 domains now show
+  the exact governed value on first paint and every subsequent frame.
+- Made the AI mobile telemetry spine compact by default with an explicit 40 px disclosure control;
+  operator detail remains one click away without displacing the primary schematic on initial load.
+- Prevented public header links from covering an active engineering drawer and fixed the drawer's
+  internal evidence tables so long values and source identifiers wrap instead of being clipped.
+- Flattened cockpit authentication controls and removed decorative grids, scanlines, purple gradients,
+  glow and neon cyan from the operator register while preserving semantic power, process and alarm colors.
+- Stopped local cockpit previews from calling the external geolocation service. Localhost/file sessions
+  now clear stale session geolocation before using a deterministic blank location fallback; production
+  behavior remains unchanged.
+- Replaced generic visual-audit root and modal selectors with route-specific
+  `data-rz-cockpit-root` identities and exact authentication overlay IDs. Feature dialogs are preserved,
+  missing/wrong roots fail, and every recorded error or missing capture exits non-zero after evidence is saved.
+- Flattened the Conventional landing header and action controls, removed blur, gradient, glow and idle
+  motion, enabled tabular/slashed-zero numerics, and compacted the phone alarm summary to three balanced
+  columns without document overflow.
+
+### Documentation
+
+- Updated the BMS Shell, accuracy-validation and SCADA/BMS cockpit design contracts with first-paint
+  truth, compact mobile telemetry, foreground ownership and flat-field rules.
+
+### Verification
+
+- Focused operator and adversarial audit-state regressions pass. Fresh 68-view desktop/mobile dark/light
+  evidence reports zero viewport overflow, zero neon findings and zero audit errors across the Conventional
+  and AI cockpit suite.
+
 ## v1.134.14 — 2026-08-30 (SCADA operator cockpit integrity and evidence closure)
 
 Owner direction: *“audit total dan perbaiki … do autonomous sampai proper, no mistake … gunakan

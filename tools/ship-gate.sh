@@ -100,6 +100,7 @@ gate "Conventional ICT and EPMS — complete authority fail-close" node tools/te
 gate "Conventional data hall — complete authority fan-out" node tools/test-datahall-authority.mjs
 gate "Conventional fire — complete authority fan-out" node tools/test-fire-system-runtime-authority.mjs
 gate "AI data hall — complete model/calculation authority" node tools/test-datahall-ai-authority.mjs
+gate "SCADA cockpit — authorized audit evidence contract" node tools/test-cockpit-audit-state.mjs
 gate "SCADA cockpit — responsive operator regressions" node tools/test-operator-cockpit-regressions.mjs
 gate "Conventional data hall — operator engineering" node --test tools/test-datahall-operator-engineering.mjs
 gate "Conventional data hall/ICT — runtime state" node --test tools/test-ict-datahall-operator-runtime.mjs

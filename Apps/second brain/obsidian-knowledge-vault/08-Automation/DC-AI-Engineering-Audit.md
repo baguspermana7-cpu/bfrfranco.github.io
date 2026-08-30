@@ -97,3 +97,17 @@ All LDC traffic transits through unidirectional gateway (data diode) to L3 histo
   refresh; `live` or `real-time` is retained only for clearly labeled future design capability.
 - Missing, legacy, request-mismatch and same-version-incomplete datahall model/calculation bundles
   keep the cockpit inert and `UNAVAILABLE`, including BOD, Generate Design, FAQ and hidden drawers.
+
+## v1.134.15 truthful-first-paint milestone
+
+- Engine KPIs no longer count through plausible false values. PUE 1.30, WUE 0.00, CUE 0.90,
+  IT 14.26 MW, 7,776 GPUs and 108 NVL72 domains are exact from the first rendered frame.
+- Mobile telemetry starts as a compact 60 px spine and expands through an unobscured 40 px control;
+  its preference is independent from desktop.
+- The BoD drawer owns the foreground and wraps all values and evidence sources at 390 px. Floating
+  public links cannot obscure its title or actions.
+- Cockpit/auth chrome is flat and semantic: no grid/scanline decoration, purple gradient, glow or
+  neon selection fill. Fresh dark/light desktop/mobile audits report no viewport overflow or errors.
+- The AI route exposes the exact `data-rz-cockpit-root="dc-ai"` identity. Audit authorization removes
+  only exact login/restriction overlays, preserves engineering dialogs, and exits non-zero after saving
+  any wrong-root, error or missing-capture evidence.

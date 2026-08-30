@@ -35,6 +35,21 @@ Build a dense operator workspace that reads like a control-room HMI, not a SaaS 
 
 At narrow widths, action rails may wrap or scroll horizontally. The primary schematic uses its own pan region; the document itself must not acquire horizontal overflow.
 
+The following foreground and first-paint rules are also mandatory:
+
+- Engine-owned KPIs are instruments, not decorative counters. They render the exact authority value
+  immediately; no count-up or plausible intermediate value is allowed.
+- A mobile telemetry spine starts compact and remains explicitly expandable through an unobscured
+  operator control. Desktop and mobile preferences are stored independently.
+- An open engineering drawer owns the foreground. Public header links yield until it closes, and every
+  evidence table wraps long values/source identifiers without clipping.
+- Localhost and `file:` previews must not depend on third-party geolocation requests.
+- A local preview also discards any previously cached production-like geolocation before recording events.
+- Each audit target exposes one route-specific `data-rz-cockpit-root`. Audit tooling removes only exact
+  authentication overlays, preserves feature dialogs, and fails non-zero for wrong/missing roots or captures.
+- Conventional phone alarm summaries use three balanced metric columns with full-width state/context rows;
+  all telemetry numerics use tabular and slashed-zero figures.
+
 ## Page-specific decisions
 
 ### Conventional data hall
@@ -81,6 +96,8 @@ At narrow widths, action rails may wrap or scroll horizontally. The primary sche
 - The wide provenance banner becomes a compact cyan header instrument with a 44 px dismiss target.
 - Header identity states `Simulated`, never `Live Telemetry`.
 - Header, provenance, actions, and tabs must not overlap at desktop or mobile widths.
+- Authentication and account chrome inherit the same flat industrial register; no purple gradient,
+  glow, glass treatment or exaggerated radius may appear above the cockpit.
 
 ## Verification contract
 

@@ -2,6 +2,12 @@
 // Writes evidence to /tmp/uiux_audit/. Deletes itself NEVER (the caller deletes).
 import puppeteer from 'puppeteer';
 import { mkdir, writeFile } from 'fs/promises';
+import {
+  assertAuditFindingsComplete,
+  assertAuthorizedAuditState,
+  enterAuthorizedAuditState,
+  primeCockpitAuditDocument,
+} from './lib/cockpit-audit-state.mjs';
 
 const OUT = '/tmp/uiux_audit';
 const BASE = 'http://127.0.0.1:8081';
@@ -13,17 +19,18 @@ const THEMES = ['light','dark'];
 
 // DC-AI panels (the ones IN-SCOPE — p-dash is OUT of scope per orchestrator note)
 const DC_AI_TABS = ['over','hall','rack','cool','elec','net','fire','bms'];
+const DC_AI_COCKPIT = 'dc-ai';
 
 // Conv suite pages
 const CONV_PAGES = [
-  { name:'dc-conventional', url:'/dc-conventional.html' },
-  { name:'epms',            url:'/EPMS_Telemetry.html' },   // exemplar
-  { name:'datahall',        url:'/datahall.html' },
-  { name:'chiller-plant',   url:'/chiller-plant.html' },
-  { name:'fire-system',     url:'/fire-system.html' },
-  { name:'fuel-system',     url:'/fuel-system.html' },
-  { name:'water-system',    url:'/water-system.html' },
-  { name:'ict',             url:'/ict.html' },
+  { name:'dc-conventional', url:'/dc-conventional.html', cockpit:'dc-conventional' },
+  { name:'epms',            url:'/EPMS_Telemetry.html', cockpit:'epms' },
+  { name:'datahall',        url:'/datahall.html', cockpit:'datahall' },
+  { name:'chiller-plant',   url:'/chiller-plant.html', cockpit:'chiller-plant' },
+  { name:'fire-system',     url:'/fire-system.html', cockpit:'fire-system' },
+  { name:'fuel-system',     url:'/fuel-system.html', cockpit:'fuel-system' },
+  { name:'water-system',    url:'/water-system.html', cockpit:'water-system' },
+  { name:'ict',             url:'/ict.html', cockpit:'ict' },
 ];
 
 await mkdir(OUT, { recursive: true });
@@ -34,6 +41,11 @@ const browser = await puppeteer.launch({
 });
 
 const findings = {};
+const expectedKeys = VIEWPORTS.flatMap((viewport) => THEMES.flatMap((theme) => [
+  ...DC_AI_TABS.map((tab) => `dcai_${tab}_${theme}_${viewport.name}`),
+  `dcai_bod_${theme}_${viewport.name}`,
+  ...CONV_PAGES.map((page) => `${page.name}_${theme}_${viewport.name}`),
+]));
 
 async function inspectPage(page, key) {
   return await page.evaluate(() => {
@@ -129,14 +141,9 @@ for (const vp of VIEWPORTS){
     await page.setViewport({ width:vp.w, height:vp.h, deviceScaleFactor:1 });
     await page.emulateMediaFeatures([{ name:'prefers-color-scheme', value:theme }]);
     try {
+      await primeCockpitAuditDocument(page, theme);
       await page.goto(BASE+'/datahallAI.html', { waitUntil:'networkidle2', timeout:30000 });
-      // bypass auth gate
-      await page.evaluate(()=>{
-        document.body.classList.remove('locked');
-        const g=document.querySelector('.root-gate'); if(g) g.style.display='none';
-        // force theme
-        if(window.localStorage){ localStorage.setItem('theme', arguments.length>0? arguments[0]: ''); }
-      });
+      await enterAuthorizedAuditState(page, DC_AI_COCKPIT);
       // explicitly set theme attr if engine uses [data-theme]
       await page.evaluate((t)=>{ document.documentElement.setAttribute('data-theme', t); document.body.setAttribute('data-theme', t); }, theme);
       await new Promise(r=>setTimeout(r,800));
@@ -147,9 +154,10 @@ for (const vp of VIEWPORTS){
           if(btn) btn.click();
         }, tab);
         await new Promise(r=>setTimeout(r,500));
+        await assertAuthorizedAuditState(page, DC_AI_COCKPIT);
         const key = `dcai_${tab}_${theme}_${vp.name}`;
         const path = `${OUT}/${key}.png`;
-        try { await page.screenshot({ path, fullPage:false }); } catch(e){}
+        await page.screenshot({ path, fullPage:false });
         const facts = await inspectPage(page, key);
         findings[key] = { path, ...facts };
       }
@@ -159,7 +167,7 @@ for (const vp of VIEWPORTS){
       });
       await new Promise(r=>setTimeout(r,500));
       const key = `dcai_bod_${theme}_${vp.name}`;
-      try { await page.screenshot({ path:`${OUT}/${key}.png`, fullPage:false }); } catch(e){}
+      await page.screenshot({ path:`${OUT}/${key}.png`, fullPage:false });
       const bodFacts = await page.evaluate(()=>{
         const d = document.getElementById('bodDrawer');
         if(!d) return { found:false };
@@ -169,7 +177,9 @@ for (const vp of VIEWPORTS){
         const closeBtn = !!document.getElementById('bodDrawerClose');
         return { found:true, ariaModal, role, visible, closeBtn };
       });
+      if (!bodFacts.found) throw new Error('AI basis drawer capture target is missing');
       findings[key] = { path:`${OUT}/${key}.png`, ...bodFacts };
+      delete findings[`dcai_ERR_${theme}_${vp.name}`];
     } catch(e){
       findings[`dcai_ERR_${theme}_${vp.name}`] = { error: e.message };
     }
@@ -181,16 +191,20 @@ for (const vp of VIEWPORTS){
       await cpage.setViewport({ width:vp.w, height:vp.h, deviceScaleFactor:1 });
       await cpage.emulateMediaFeatures([{ name:'prefers-color-scheme', value:theme }]);
       try {
+        await primeCockpitAuditDocument(cpage, theme);
         await cpage.goto(BASE+cp.url, { waitUntil:'networkidle2', timeout:30000 });
+        await enterAuthorizedAuditState(cpage, cp.cockpit);
         await cpage.evaluate((t)=>{
           document.documentElement.setAttribute('data-theme', t);
           document.body.setAttribute('data-theme', t);
         }, theme);
         await new Promise(r=>setTimeout(r,1200));
+        await assertAuthorizedAuditState(cpage, cp.cockpit);
         const key = `${cp.name}_${theme}_${vp.name}`;
-        try { await cpage.screenshot({ path:`${OUT}/${key}.png`, fullPage:false }); } catch(e){}
+        await cpage.screenshot({ path:`${OUT}/${key}.png`, fullPage:false });
         const facts = await inspectPage(cpage, key);
         findings[key] = { path:`${OUT}/${key}.png`, ...facts };
+        delete findings[`${cp.name}_ERR_${theme}_${vp.name}`];
       } catch(e){
         findings[`${cp.name}_ERR_${theme}_${vp.name}`] = { error: e.message };
       }
@@ -201,4 +215,5 @@ for (const vp of VIEWPORTS){
 
 await writeFile(`${OUT}/findings.json`, JSON.stringify(findings, null, 2));
 await browser.close();
+assertAuditFindingsComplete(findings, expectedKeys);
 console.log('Done. Findings →', `${OUT}/findings.json`);

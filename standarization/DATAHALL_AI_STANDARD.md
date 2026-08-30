@@ -1,6 +1,6 @@
 # DataHall AI Dashboard Standard
 
-> **Last reviewed: 2026-08-30** · Status: `ACTIVE` · Release: `v1.134.14`
+> **Last reviewed: 2026-08-30** · Status: `ACTIVE` · Release: `v1.134.15`
 >
 > Canonical feature key remains `datahall-ai`; the implementation filename remains
 > `datahallAI.html`. Access is root plus the explicit educator-role exception. A plain
@@ -8,9 +8,23 @@
 
 > Patterns, conventions, and lessons learned for `datahallAI.html`
 
-Last updated: 2026-08-30 (authority fail-closed and cross-project capacity boundary)
+Last updated: 2026-08-30 (truthful first paint and responsive operator priority)
 
 ---
+
+## v1.134.15 First-paint and mobile-foreground contract
+
+- PUE, WUE, CUE, IT load, GPU count and NVL72-domain count render their exact governed value on
+  first paint. Decorative count-up and delayed restoration are prohibited.
+- At 1024 px and below, the telemetry spine begins compact and exposes a direct 40 px disclosure.
+  Mobile and desktop preferences are independent; expanding the spine cannot create page overflow.
+- The Basis of Design drawer owns the foreground while open. Public contract links yield, and fixed
+  table layout plus explicit wrapping keeps values and source identifiers visible at 390 px.
+- Shared authentication chrome follows the flat instrument register: no purple gradient, glow,
+  glass treatment, decorative grid or neon selection fill.
+- Automated rendering targets the unique `data-rz-cockpit-root="dc-ai"` identity. Only exact
+  authentication overlay IDs may be removed; engineering dialogs remain intact and incomplete
+  evidence must terminate the audit with a non-zero status.
 
 ## v1.134.14 Authority and cross-project boundary
 

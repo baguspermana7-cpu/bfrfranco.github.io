@@ -1,15 +1,26 @@
 // DC-AI only — fixed
 import puppeteer from 'puppeteer';
 import { mkdir, writeFile, readFile } from 'fs/promises';
+import {
+  assertAuditFindingsComplete,
+  assertAuthorizedAuditState,
+  enterAuthorizedAuditState,
+  primeCockpitAuditDocument,
+} from './lib/cockpit-audit-state.mjs';
 const OUT='/tmp/uiux_audit'; const BASE='http://127.0.0.1:8081';
 const VIEWPORTS=[{name:'d',w:1440,h:900},{name:'m',w:390,h:844}];
 const THEMES=['light','dark'];
 const DC_AI_TABS=['over','hall','rack','cool','elec','net','fire','bms'];
+const DC_AI_COCKPIT='dc-ai';
 
 await mkdir(OUT,{recursive:true});
 const browser=await puppeteer.launch({args:['--no-sandbox','--disable-setuid-sandbox'],defaultViewport:null});
 let existing={}; try{ existing=JSON.parse(await readFile(`${OUT}/findings.json`,'utf8')); }catch(e){}
 const findings={...existing};
+const expectedKeys=VIEWPORTS.flatMap((viewport)=>THEMES.flatMap((theme)=>[
+  ...DC_AI_TABS.map((tab)=>`dcai_${tab}_${theme}_${viewport.name}`),
+  `dcai_bod_${theme}_${viewport.name}`,
+]));
 
 function inspectFn(){
   function rgbToHex(rgb){const m=rgb&&rgb.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);if(!m)return null;const h=n=>Number(n).toString(16).padStart(2,'0');return ('#'+h(m[1])+h(m[2])+h(m[3])).toUpperCase();}
@@ -46,16 +57,18 @@ for(const vp of VIEWPORTS){
     await page.setViewport({width:vp.w,height:vp.h,deviceScaleFactor:1});
     await page.emulateMediaFeatures([{name:'prefers-color-scheme',value:theme}]);
     try{
+      await primeCockpitAuditDocument(page, theme);
       await page.goto(BASE+'/datahallAI.html',{waitUntil:'networkidle2',timeout:30000});
-      await page.evaluate(()=>{document.body.classList.remove('locked');const g=document.querySelector('.root-gate');if(g)g.style.display='none';});
+      await enterAuthorizedAuditState(page,DC_AI_COCKPIT);
       await page.evaluate(t=>{document.documentElement.setAttribute('data-theme',t);document.body.setAttribute('data-theme',t);try{localStorage.setItem('theme',t);}catch(e){}},theme);
       await new Promise(r=>setTimeout(r,1200));
       for(const tab of DC_AI_TABS){
         await page.evaluate(t=>{const btn=document.querySelector('nav.tabs button[data-t="'+t+'"]');if(btn)btn.click();},tab);
         await new Promise(r=>setTimeout(r,700));
+        await assertAuthorizedAuditState(page,DC_AI_COCKPIT);
         const key=`dcai_${tab}_${theme}_${vp.name}`;
         const path=`${OUT}/${key}.png`;
-        try{await page.screenshot({path,fullPage:false});}catch(e){}
+        await page.screenshot({path,fullPage:false});
         const facts=await page.evaluate(inspectFn);
         findings[key]={path,...facts};
       }
@@ -63,13 +76,16 @@ for(const vp of VIEWPORTS){
       await page.evaluate(()=>{const t=document.getElementById('bodTrig');if(t)t.click();});
       await new Promise(r=>setTimeout(r,700));
       const bk=`dcai_bod_${theme}_${vp.name}`;
-      try{await page.screenshot({path:`${OUT}/${bk}.png`,fullPage:false});}catch(e){}
+      await page.screenshot({path:`${OUT}/${bk}.png`,fullPage:false});
       const bod=await page.evaluate(()=>{const d=document.getElementById('bodDrawer');if(!d)return{found:false};return{found:true,ariaModal:d.getAttribute('aria-modal'),role:d.getAttribute('role'),ariaHidden:d.getAttribute('aria-hidden'),display:getComputedStyle(d).display,closeBtn:!!document.getElementById('bodDrawerClose'),escSupport:!!document.getElementById('bodDrawerClose')};});
+      if(!bod.found)throw new Error('AI basis drawer capture target is missing');
       findings[bk]={path:`${OUT}/${bk}.png`,...bod};
+      delete findings[`dcai_ERR_${theme}_${vp.name}`];
     }catch(e){findings[`dcai_ERR_${theme}_${vp.name}`]={error:e.message};}
     await page.close();
   }
 }
 await writeFile(`${OUT}/findings.json`,JSON.stringify(findings,null,2));
 await browser.close();
+assertAuditFindingsComplete(findings,expectedKeys);
 console.log('Done DC-AI →',`${OUT}/findings.json`);

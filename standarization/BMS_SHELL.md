@@ -1,5 +1,26 @@
 # BMS Shell — Shared Operations-Console Standard (v1.23.0+)
 
+## v1.134.15 — truthful first paint and responsive operator priority (2026-08-30)
+
+- **Authority before animation:** engine-owned KPI values render exactly on the first frame. Count-up,
+  easing, placeholder interpolation and any other plausible intermediate engineering value are forbidden.
+- **Mobile telemetry priority:** below 1025 px, a dense telemetry spine starts compact and exposes a
+  clearly labeled, minimum-40-px disclosure control. Expanding it must not create document overflow.
+- **Foreground ownership:** an active engineering drawer owns the viewport. Floating public links yield
+  until it closes; drawer tables use fixed layout plus explicit wrapping so evidence is never clipped.
+- **Flat instrument register:** authentication and cockpit chrome use flat surfaces, 1 px borders and
+  restrained radii. Decorative grids, scanlines, purple gradients, glow and neon selection fills are
+  prohibited; semantic process and alarm colors remain load-bearing.
+- **Audit integrity:** every audited route owns one unique `data-rz-cockpit-root` identity. A probe may
+  remove only the exact authentication overlay IDs and `inert` from that root/its ancestors; it must not
+  remove feature dialogs. Wrong/missing roots, recorded errors and missing captures exit non-zero after
+  preserving evidence.
+- **Local preview isolation:** localhost and `file:` cockpit sessions do not call external geolocation.
+  Any stale session geolocation is discarded before the blank local fallback is installed. Production
+  telemetry behavior is unchanged.
+- **Conventional compact status:** operator numerics use tabular/slashed-zero figures. On phones the alarm
+  summary is a three-column metric grid with full-width state and scenario rows, not one half-empty row per KPI.
+
 ## v1.134.14 — governed authority and fail-closed shell (2026-08-30)
 
 - **Current Conventional authority:** a complete `CONV_CALC v2.0.0` snapshot owns four halls,
@@ -119,10 +140,10 @@ engine files + `#p-dash` byte-identical to HEAD throughout.
 These are larger redesign-grade fixes from doc-24/doc-14 that go beyond
 surgical/additive scope:
 
-- **doc-24 #2** — Reduce datahallAI left sidebar to operational summary
-  by default; engineering basis collapsible.
-- **doc-24 #4** — Quiet normal states across the cockpit (broad
-  desaturation work).
+- **doc-24 #2 — PARTIAL v1.134.15** — Mobile telemetry now starts compact with an explicit disclosure;
+  desktop summary reduction and engineering-basis grouping remain queued.
+- **doc-24 #4 — PARTIAL v1.134.15** — Shared/auth chrome is flat and neon-free; broad diagram-state
+  desaturation remains queued because semantic process colors are load-bearing.
 - **doc-24 #5** — Convert all-green data-hall/network blocks into
   heatmap/outlier views (per-tab render-tree restructuring).
 - **doc-24 #6** — Right object-inspector consistency across all 9 tabs

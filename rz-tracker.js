@@ -15,7 +15,20 @@
 
     // ═══ GEO INFO (cached per session) ═══
     var geoInfo=null;
+    function fallbackGeo(){
+        return {ip:'',country:'',cc:'',city:'',region:'',tz:Intl.DateTimeFormat().resolvedOptions().timeZone||'',org:'',_ts:Date.now()};
+    }
+    function isLocalRuntime(){
+        return location.protocol==='file:'||/^(?:localhost|127(?:\.\d{1,3}){3}|\[::1\])$/.test(location.hostname);
+    }
     function loadGeo(){
+        // Local audits and development are an explicit privacy boundary. Discard
+        // any production-like cache before it can populate a localhost event.
+        if(isLocalRuntime()){
+            try{sessionStorage.removeItem(GEO_KEY)}catch(e){}
+            geoInfo=fallbackGeo();
+            return Promise.resolve(geoInfo);
+        }
         // Check cache (valid for 30 min)
         try{
             var cached=JSON.parse(sessionStorage.getItem(GEO_KEY)||'null');
@@ -38,7 +51,7 @@
             patchSessionEvents();
             return geoInfo;
         }).catch(function(){
-            geoInfo={ip:'',country:'',cc:'',city:'',region:'',tz:Intl.DateTimeFormat().resolvedOptions().timeZone||'',org:'',_ts:Date.now()};
+            geoInfo=fallbackGeo();
             return geoInfo;
         });
     }

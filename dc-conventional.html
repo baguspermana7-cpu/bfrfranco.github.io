@@ -70,6 +70,8 @@ html, body {
     background: var(--bg-dark);
     color: var(--text-primary);
     font-family: "IBM Plex Sans", -apple-system, sans-serif;
+    font-variant-numeric: tabular-nums slashed-zero;
+    font-feature-settings: "tnum" 1, "zero" 1;
     height: 100%;
     overflow: hidden;
 }
@@ -79,8 +81,8 @@ a { color: inherit; text-decoration: none; }
 
 /* Header */
 .header {
-    background: rgba(10, 15, 26, 0.95);
-    backdrop-filter: blur(20px);
+    background: #0a0f1a;
+    backdrop-filter: none;
     border-bottom: 1px solid var(--border);
     padding: 10px 20px;
     display: flex;
@@ -112,17 +114,17 @@ a { color: inherit; text-decoration: none; }
     align-items: center;
     gap: 8px;
     padding: 6px 14px;
-    background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(6, 182, 212, 0.05));
-    border: 1px solid rgba(6, 182, 212, 0.3);
-    border-radius: 8px;
+    background: #0d1724;
+    border: 1px solid #155e75;
+    border-radius: 3px;
     color: var(--accent-cyan);
     font-size: 12px;
     font-weight: 500;
-    transition: all 0.2s;
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s;
 }
 .back-btn:hover {
-    background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(6, 182, 212, 0.1));
-    transform: translateX(-2px);
+    background: #102330;
+    border-color: var(--accent-cyan);
 }
 
 .header-title {
@@ -137,21 +139,18 @@ a { color: inherit; text-decoration: none; }
     font-size: 9px;
     font-weight: 600;
     padding: 3px 8px;
-    background: rgba(100, 116, 139, 0.12);
-    border: 1px solid rgba(100, 116, 139, 0.3);
-    border-radius: 20px;
+    background: #111827;
+    border: 1px solid #334155;
+    border-radius: 3px;
     color: var(--text-secondary);
     animation: none;
 }
 body[data-conv-authority="current"] .live-badge {
-    background: rgba(16, 185, 129, 0.15);
-    border-color: rgba(16, 185, 129, 0.3);
+    background: #0b211a;
+    border-color: #166534;
     color: var(--accent-green);
-    animation: pulse 2s ease-in-out infinite;
-}
-@keyframes pulse {
-    0%, 100% { opacity: 0.8; }
-    50% { opacity: 1; box-shadow: 0 0 12px rgba(16, 185, 129, 0.4); }
+    animation: none;
+    box-shadow: none;
 }
 
 .header-right {
@@ -171,11 +170,7 @@ body[data-conv-authority="current"] .live-badge {
 }
 body[data-conv-authority="current"] .status-dot {
     background: var(--accent-green);
-    animation: blink 2s ease-in-out infinite;
-}
-@keyframes blink {
-    0%, 100% { opacity: 0.4; }
-    50% { opacity: 1; }
+    animation: none;
 }
 
 /* Main Layout - Fill viewport */
@@ -372,6 +367,10 @@ body[data-conv-authority="current"] .status-dot {
     font-weight: 700;
     font-family: 'JetBrains Mono', monospace;
 }
+.kpi-value, .as-val, .stat-value, .callout-value {
+    font-variant-numeric: tabular-nums slashed-zero;
+    font-feature-settings: "tnum" 1, "zero" 1;
+}
 .kpi-unit {
     font-size: 10px;
     color: var(--text-muted);
@@ -420,6 +419,9 @@ body[data-conv-authority="current"] .status-dot {
     background: rgba(6,182,212,0.12); color: var(--accent-cyan); border: 1px solid rgba(6,182,212,0.35);
 }
 @keyframes as-blink { 50% { opacity: 0.25; } }
+@media (prefers-reduced-motion: reduce) {
+    .as-state.alarm .as-dot { animation: none; }
+}
 body[data-conv-authority="unavailable"] .callout {
     border-color: var(--border-light);
 }
@@ -595,8 +597,13 @@ body[data-conv-authority="unavailable"] .stats-panel .stat-value {
     .nav-menu-item { padding: 14px 10px; min-height: 44px; }
     .nav-menu-item .icon { width: 28px; height: 28px; }
 
-    .alarm-strip { flex-wrap: wrap; }
-    .as-cell { min-width: 33%; }
+    .alarm-strip {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        align-items: stretch;
+    }
+    .as-state, .as-scenario { grid-column: 1 / -1; width: auto; }
+    .as-cell { min-width: 0; padding: 6px 8px; }
     .as-spacer { display: none; }
     .as-scenario { width: 100%; flex-wrap: wrap; }
 
@@ -632,9 +639,9 @@ body[data-conv-authority="unavailable"] .stats-panel .stat-value {
     .kpi-value { font-size: 16px; }
     .kpi-unit { font-size: 10px; }
 
-    .alarm-strip { flex-wrap: wrap; }
-    .as-cell { min-width: 50%; }
-    .as-state { width: 100%; }
+    .alarm-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .as-cell { min-width: 0; }
+    .as-state { width: auto; }
 
     .nav-sidebar { padding: 8px; gap: 4px; }
     .nav-menu-item {
@@ -694,14 +701,14 @@ body[data-conv-authority="unavailable"] .stats-panel .stat-value {
 [data-theme="light"] html, [data-theme="light"] body { background: var(--bg-dark); color: var(--text-primary); }
 
 /* Header */
-[data-theme="light"] .header { background: rgba(255, 255, 255, 0.98); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+[data-theme="light"] .header { background: #ffffff; box-shadow: none; }
 [data-theme="light"] .header-title { color: var(--text-primary); }
 [data-theme="light"] .live-badge { background: rgba(100, 116, 139, 0.1); color: #475569; }
 [data-theme="light"] .status-dot { background: #64748b; }
 [data-theme="light"] body[data-conv-authority="current"] .live-badge { background: rgba(16, 185, 129, 0.1); color: #166534; }
 [data-theme="light"] body[data-conv-authority="current"] .status-dot { background: #16a34a; }
-[data-theme="light"] .back-btn { background: linear-gradient(135deg, rgba(6, 182, 212, 0.08), rgba(6, 182, 212, 0.04)); border-color: rgba(6, 182, 212, 0.25); }
-[data-theme="light"] .back-btn:hover { background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(6, 182, 212, 0.08)); }
+[data-theme="light"] .back-btn { background: #f8fafc; border-color: #0e7490; }
+[data-theme="light"] .back-btn:hover { background: #ecfeff; border-color: #0891b2; }
 
 /* Navigation Section */
 [data-theme="light"] .nav-section { background: var(--bg-sidebar); box-shadow: 0 4px 20px rgba(0,0,0,0.06); }
@@ -944,7 +951,7 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
 [data-theme="dark"] .skip-link{background:#60a5fa;color:#0f172a}
 </style>
     <!-- v1.43.20 — instrument register (RZ Dark System v1). Chrome-only, dark-only, scoped. -->
-    <link rel="stylesheet" href="css/rz-cockpit-instrument.css?v=1.43.19">
+    <link rel="stylesheet" href="css/rz-cockpit-instrument.css?v=1.134.15">
     <link rel="stylesheet" href="css/rz-design-studio.css?v=1.130.0">
 </head>
 <body>
@@ -962,7 +969,7 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
             <span class="rz-conv-alarm-slot" data-rz-alarm-launch-slot></span>
             <button class="back-btn" id="genDesignTrigConv" type="button" aria-haspopup="dialog" aria-disabled="true" disabled title="UNAVAILABLE until the current engine authority is validated" style="background:rgba(245,158,11,.10);border-color:rgba(245,158,11,.32);color:#fbbf24"><i class="fas fa-file-lines" aria-hidden="true"></i>Generate Design</button>
             <button class="back-btn" id="faqTrigConv" type="button" aria-haspopup="dialog" aria-disabled="true" disabled title="UNAVAILABLE until the current engine authority is validated" style="background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.28);color:#67e8f9">&#10067; FAQ</button>
-            <a href="index.html" class="back-btn" style="background:linear-gradient(135deg, rgba(100, 116, 139, 0.1), rgba(100, 116, 139, 0.05));border-color:rgba(100, 116, 139, 0.3);color:var(--accent-purple)">
+            <a href="index.html" class="back-btn" style="border-color:rgba(100, 116, 139, 0.3);color:var(--accent-purple)">
                 <span>←</span> Portfolio
             </a>
             <a href="datacenter-solutions.html" class="back-btn">
@@ -1026,7 +1033,7 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
     </nav>
 
     <!-- Main Content -->
-    <main class="content-area" id="main-content">
+    <main class="content-area" id="main-content" data-rz-cockpit-root="dc-conventional">
         <!-- ALARM STRIP — operator-first, top of information hierarchy.
              Mirrors datahall.html canonical strip. Counts derived from
              window.CONV_CALC.snapshot (deterministic, no Math.random). -->
@@ -1686,7 +1693,7 @@ prefersDark.addEventListener('change',e=>{if(!localStorage.getItem('theme'))appl
 <script src="js/rz-feature-flags.js?v=2026-05-14" defer></script>
 <script src="auth.js?v=2026-08-27-contract-tab-order" defer></script>
 <script src="rz-engine.min.js?v=2026-07-27-maint" defer></script>
-<script src="rz-tracker.js" defer></script>
+<script src="rz-tracker.js?v=2026-08-30-local-runtime" defer></script>
 
 
 
