@@ -75,6 +75,12 @@ const RULES = [
     // arrows/checks/math (typographic, handled by their own idioms). Everything else in the pictograph
     // ranges = slop → use a Font Awesome / thin-line icon instead. `u` flag is mandatory (surrogate pairs).
     test: (t) => {
+      /* v1.134.22 — an emoji in `console.log` is TERMINAL output from a build script, not a
+         UI icon. generate-pdf.js is a Node tool nobody's browser ever loads; flagging its
+         progress log put a real finding (a 📌 on an actual button) behind three that could
+         never be seen by a user. Console arguments are stripped before the scan; anything
+         drawn into the DOM is untouched. */
+      t = String(t).replace(/console\.(?:log|info|warn|error|debug)\s*\((?:[^()"'`]|"[^"]*"|'[^']*'|`[^`]*`)*\)/g, '');
       const WHITELIST = new Set(["🔒","🔓","⚠","⚡","★","☆","⭐","✅","✓","✔","✗","✘","❌","➜","🌐","⚑","☀","☽","☾","☼"]);
       const PICTO = /[\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F900}-\u{1FAFF}\u{2600}-\u{26FF}\u{2728}]/gu;
       const FLAG = /[\u{1F1E6}-\u{1F1FF}]/u;   // regional-indicator halves → country flags (data, kept)

@@ -214,7 +214,7 @@
         var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">';
         html += '<title>' + calcName + ' — Results Card</title>';
         html += '<style>';
-        html += 'body{margin:0;padding:40px;font-family:Inter,system-ui,sans-serif;background:#f8fafc;}';
+        html += 'body{margin:0;padding:40px;font-family:IBM Plex Sans,system-ui,sans-serif;background:#f8fafc;}';
         html += '.card{max-width:500px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.1);}';
         html += '.card-header{background:linear-gradient(135deg,' + accentColor + ',#1e293b);padding:24px;color:#fff;}';
         html += '.card-header h2{margin:0 0 4px;font-size:1.2rem;font-weight:700;}';

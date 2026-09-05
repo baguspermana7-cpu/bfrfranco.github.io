@@ -248,7 +248,7 @@
         var cmp = el('div', { className: 'ltc-overview-card ltc-compare-card' });
         cmp.innerHTML = '<div class="ltc-overview-label">● SCENARIO COMPARE <span class="ltc-muted">— pin a design (A), tune inputs, compare vs current (B)</span></div>' +
             '<div class="ltc-compare-actions">' +
-            '<button type="button" class="ltc-nav-btn ltc-nav-btn-primary" id="ltcPinA">📌 Pin current as A</button>' +
+            '<button type="button" class="ltc-nav-btn ltc-nav-btn-primary" id="ltcPinA"><i class="fas fa-thumbtack" aria-hidden="true"></i> Pin current as A</button>' +
             '<button type="button" class="ltc-nav-btn ltc-nav-btn-outline" id="ltcClearA">Clear</button>' +
             '</div>' +
             '<div id="ltcCompareTable" class="ltc-compare-table"></div>';

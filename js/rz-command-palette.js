@@ -197,7 +197,13 @@
     }
     var cat = (item.category || '').toLowerCase();
     if (cat === 'calculator') return '&#9889;';
-    if (cat === 'tool') return '&#9881;';
+    /* was a gear pictograph — a drawn glyph in the same 1.4px line weight the rest of
+       the palette uses, so it sits with the result rows instead of on top of them. */
+    if (cat === 'tool') return '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" '
+      + 'stroke="currentColor" stroke-width="1.6" aria-hidden="true">'
+      + '<circle cx="12" cy="12" r="3"/>'
+      + '<path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/>'
+      + '</svg>';
     return '&#9733;';
   }
   function getCatFilter(cat) {

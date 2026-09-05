@@ -17,7 +17,7 @@
   // ─── Styles ─────────────────────────────────────────────────────────────────
   const style = document.createElement('style');
   style.textContent = `
-    #rz-chat-widget * { box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+    #rz-chat-widget * { box-sizing: border-box; font-family: 'IBM Plex Sans', system-ui, sans-serif; }
 
     #rz-chat-fab {
       position: fixed;
@@ -227,7 +227,7 @@
 
     <div id="rz-chat-window" role="dialog" aria-label="AI Chat Assistant">
       <div id="rz-chat-header">
-        <div class="avatar">🤖</div>
+        <div class="avatar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="4" y="8" width="16" height="11" rx="2.5"/><path d="M12 4v4M8.5 13h.01M15.5 13h.01M9 16.5h6"/></svg></div>
         <div class="info">
           <div class="name">RZ Assistant</div>
           <div class="status"><span class="status-dot"></span> Ask me anything</div>
@@ -236,7 +236,7 @@
       </div>
       <div id="rz-chat-messages">
         <div class="rz-welcome">
-          <strong>Hi! I'm the RZ Assistant 👋</strong>
+          <strong>Hi! I'm the RZ Assistant</strong>
           Ask me about Bagus's articles on data center engineering, his background, or anything on this site.
         </div>
       </div>
@@ -301,7 +301,7 @@
     messages = [];
     msgContainer.innerHTML = `
       <div class="rz-welcome">
-        <strong>Hi! I'm the RZ Assistant 👋</strong>
+        <strong>Hi! I'm the RZ Assistant</strong>
         Ask me about Bagus's articles on data center engineering, his background, or anything on this site.
       </div>
     `;

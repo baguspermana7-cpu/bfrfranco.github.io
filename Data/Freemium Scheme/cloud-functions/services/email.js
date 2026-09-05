@@ -41,7 +41,7 @@ async function sendWelcome(email, name) {
     to: email,
     subject: 'Welcome to ResistanceZero',
     html: `
-      <div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto;padding:24px;">
+      <div style="font-family:IBM Plex Sans,sans-serif;max-width:600px;margin:0 auto;padding:24px;">
         <h2 style="color:#1e3a5f;">Welcome to ResistanceZero${name ? ', ' + name : ''}</h2>
         <p style="color:#475569;line-height:1.6;">
           Your account is ready. You can now access our data center infrastructure calculators
@@ -71,7 +71,7 @@ async function sendPaymentReceipt(email, { invoiceNumber, planName, amount, paid
     to: email,
     subject: `Payment Receipt — ${invoiceNumber}`,
     html: `
-      <div style="font-family:Inter,sans-serif;max-width:600px;margin:0 auto;padding:24px;">
+      <div style="font-family:IBM Plex Sans,sans-serif;max-width:600px;margin:0 auto;padding:24px;">
         <h2 style="color:#1e3a5f;">Payment Received</h2>
         <table style="width:100%;border-collapse:collapse;margin:16px 0;">
           <tr><td style="padding:8px 0;color:#64748b;">Invoice</td><td style="padding:8px 0;font-weight:600;">${invoiceNumber}</td></tr>

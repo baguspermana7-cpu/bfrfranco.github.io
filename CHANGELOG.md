@@ -11,6 +11,47 @@ release sections rather than semver.
 
 ---
 
+## v1.134.22 — 2026-09-05
+
+### The rest of the anti-vibecode monitor, taken to two findings
+
+v1.134.21 cleared the purple. Running the same auditor with that noise gone left four rules
+still reporting, and three of them were real:
+
+- **Inter as the primary face (7 modules).** The pages load IBM Plex Sans, but seven modules
+  that inject their own panels — the inspector, the LTC modelling lab, the chat widget, the
+  scenario toast, the share card, the gamification toast, the service worker's offline page,
+  and the transactional mail template — hardcoded `font-family: Inter`. Anything they drew
+  rendered in a different face from the page around it. Only `font-family:` declarations were
+  touched; "Interlock", "Interactive" and "Interrupt kA" are words, not fonts.
+- **Emoji as application icons (4 modules).** A 📌 on the LTC lab's "Pin current as A" button,
+  a ☁ in the scenario save toast, a 🤖 avatar and a 👋 in the chat welcome, and a ⚙ badge on
+  every tool row in the command palette. Each is a control or badge a user actually sees, so
+  each took a drawn icon: Font Awesome where the module already loads it, otherwise an inline
+  SVG on `currentColor` at the same 1.6px stroke weight as its surroundings.
+- **The auditor was flagging a build script's progress log.** `generate-pdf.js` prints 📄 🚀
+  📊 to a terminal nobody's browser ever loads. Three unreachable findings sat in front of one
+  real one. `console.*` arguments are stripped before the emoji scan; anything drawn into the
+  DOM is untouched.
+
+### Cache-key drift, again — and the same fix
+
+`rz-command-palette.js` was being requested under **two tokens, 40 pages each**. A change to
+the shared palette reached half the site and not the other half, which is exactly the
+stylesheet drift v1.134.21 fixed. All eight modules changed here are now on one token across
+95 tags in 94 pages.
+
+### Left open, deliberately: glassmorphism on cards
+
+One finding remains, and it is a design decision rather than a defect to fix quietly.
+`.metric-card`, `.oe-card`, `.case-card`, `.bento-photo-logo`, `.share-btn` and a
+"Card Glass Morphism Intensify on Hover" rule (blur 20px) carry `backdrop-filter` on
+**decorative** surfaces — §A rule 6, whose replacement is an opaque instrument surface with a
+1px hairline. The auditor is already selector-aware and correctly ignores the functional
+blurs (navbar, modal, overlay, palette, ticker, drawer, cookie banner); these are the real
+ones. Applying the replacement changes how the cards look on the homepage and across the
+article grid, so it is reported for the owner to see rather than swept in with a colour pass.
+
 ## v1.134.21 — 2026-09-05
 
 ### The homepage was running old auth code — and nothing said so

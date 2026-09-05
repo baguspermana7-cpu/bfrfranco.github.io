@@ -5371,7 +5371,7 @@
                     '<meta name="viewport" content="width=device-width, initial-scale=1">' +
                     '<title>LTC Report</title>' +
                     '<style>' +
-                    '@page{size:A4;margin:15mm;}*{box-sizing:border-box;}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;color:#1f2937;background:#ffffff;line-height:1.42;}' +
+                    '@page{size:A4;margin:15mm;}*{box-sizing:border-box;}body{margin:0;font-family:IBM Plex Sans,Segoe UI,Arial,sans-serif;color:#1f2937;background:#ffffff;line-height:1.42;}' +
                     '.r-wrap{padding:10px 14px 20px;} .r-head{display:flex;justify-content:space-between;gap:16px;border-bottom:2px solid #dbe5ef;padding-bottom:10px;margin-bottom:12px;}' +
                     '.r-head h1{font-size:20px;margin:0 0 4px;color:#1e3a5f;} .r-head p{margin:0;font-size:12px;color:#374151;} .r-brand{margin-top:5px;font-size:9px;color:#64748b;letter-spacing:.09em;text-transform:uppercase;font-weight:700;} .r-head-meta{font-size:11px;line-height:1.55;text-align:right;color:#334155;}' +
                     '.r-sec{margin-top:12px;border:1px solid #dbe5ef;border-radius:10px;overflow:visible;break-inside:auto;page-break-inside:auto;} .r-sec h2{margin:0;padding:8px 10px;font-size:13px;color:#1e3a5f;background:#f8fafc;border-bottom:1px solid #dbe5ef;break-after:avoid-page;page-break-after:avoid;}' +
@@ -5418,7 +5418,7 @@
                 var w = window.open('', '_blank', 'width=1200,height=860');
                 if (!w) return false;
                 w.document.open();
-                w.document.write('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Preparing LTC Report</title><style>body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:#f8fafc;color:#1f2937;display:flex;align-items:center;justify-content:center;height:100vh;} .box{max-width:560px;padding:20px;border:1px solid #dbe5ef;border-radius:10px;background:#ffffff;box-shadow:0 10px 30px rgba(15,23,42,0.08);} h1{margin:0 0 8px;font-size:18px;color:#1e3a5f;} p{margin:0;font-size:13px;color:#475569;line-height:1.5;}<\/style></head><body><div class="box"><h1>Preparing PDF Report</h1><p>Generating full engineering content and visual packs. This can take a few seconds for Monte Carlo and compare snapshots.</p></div></body></html>');
+                w.document.write('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Preparing LTC Report</title><style>body{margin:0;font-family:IBM Plex Sans,Segoe UI,Arial,sans-serif;background:#f8fafc;color:#1f2937;display:flex;align-items:center;justify-content:center;height:100vh;} .box{max-width:560px;padding:20px;border:1px solid #dbe5ef;border-radius:10px;background:#ffffff;box-shadow:0 10px 30px rgba(15,23,42,0.08);} h1{margin:0 0 8px;font-size:18px;color:#1e3a5f;} p{margin:0;font-size:13px;color:#475569;line-height:1.5;}<\/style></head><body><div class="box"><h1>Preparing PDF Report</h1><p>Generating full engineering content and visual packs. This can take a few seconds for Monte Carlo and compare snapshots.</p></div></body></html>');
                 w.document.close();
                 setTimeout(function() {
                     try {
@@ -5429,7 +5429,7 @@
                     } catch (err) {
                         if (w && !w.closed) {
                             w.document.open();
-                            w.document.write('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>PDF Export Error</title><style>body{font-family:Inter,Segoe UI,Arial,sans-serif;padding:24px;color:#1f2937;background:#ffffff;} h1{color:#991b1b;} pre{white-space:pre-wrap;word-break:break-word;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:12px;}<\/style></head><body><h1>PDF export failed</h1><p>Unexpected report generation error.</p><pre>' + escapeHtml(String(err && err.message ? err.message : err)) + '<\/pre></body></html>');
+                            w.document.write('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>PDF Export Error</title><style>body{font-family:IBM Plex Sans,Segoe UI,Arial,sans-serif;padding:24px;color:#1f2937;background:#ffffff;} h1{color:#991b1b;} pre{white-space:pre-wrap;word-break:break-word;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:12px;}<\/style></head><body><h1>PDF export failed</h1><p>Unexpected report generation error.</p><pre>' + escapeHtml(String(err && err.message ? err.message : err)) + '<\/pre></body></html>');
                             w.document.close();
                         }
                     }

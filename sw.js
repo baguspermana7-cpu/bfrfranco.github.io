@@ -2,7 +2,7 @@
 // Cache-first for static assets, network-first for HTML pages
 // CACHE_NAME is auto-synced from js/rz-version.js by tools/sync-sw-version.py
 
-const CACHE_NAME = 'rz-cache-v1.134.21'; // version-aware: invalidates on every site bump
+const CACHE_NAME = 'rz-cache-v1.134.22'; // version-aware: invalidates on every site bump
 
 // v1.29.0 — Critical auth/config files that MUST be fetched fresh when online.
 // Cached only as offline fallback. Rescues users stranded on a stale SW
@@ -198,7 +198,7 @@ function offlineHTML() {
     '<meta name="viewport" content="width=device-width,initial-scale=1">' +
     '<title>Offline · Resistance Zero</title>' +
     '<style>' +
-      'body{font-family:Inter,-apple-system,sans-serif;display:flex;align-items:center;' +
+      'body{font-family:IBM Plex Sans,-apple-system,sans-serif;display:flex;align-items:center;' +
       'justify-content:center;min-height:100vh;margin:0;' +
       'background:linear-gradient(180deg,#0f172a 0%,#1e1b4b 50%,#0f172a 100%);' +
       'color:#f1f5f9;text-align:center;padding:2rem}' +

@@ -129,7 +129,7 @@
       var res = await S.saveScenario(calc, name, { summary: opts.summary || {}, inputs: inputs });
       if (res.error) { show('Save failed: ' + res.error, false); return; }
       // Trusted, hardcoded content — safe to use innerHTML for the account link (discoverability).
-      showOk('☁ Saved — <a href="account.html" style="color:#67e8f9;text-decoration:underline;">open My Account</a>');
+      showOk('<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="vertical-align:-1px;margin-right:5px" aria-hidden="true"><path d="M6.5 19a4.5 4.5 0 0 1 0-9 6 6 0 0 1 11.6-1.6A4 4 0 0 1 18 19z"/></svg>Saved — <a href="account.html" style="color:#67e8f9;text-decoration:underline;">open My Account</a>');
     } catch (e) { show('Save failed: ' + (e && e.message || e), false); }
   }
 
