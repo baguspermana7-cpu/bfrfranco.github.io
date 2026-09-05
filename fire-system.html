@@ -75,7 +75,7 @@
          derived engineering values (IT/facility load, protected volumes/zones).
          Loaded NON-deferred so window.CONV_CALC exists before the inline script.
          Basis: conv/review/09-engineering-basis-and-calculations.md -->
-    <script src="js/conv-engine.js?v=2.1.0"></script>
+    <script src="js/conv-engine.js?v=2.2.0"></script>
     <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
          Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
     <script src="js/conv-parameters.js?v=1.134.3"></script>
@@ -475,9 +475,9 @@
             <div class="text-[11px] text-slate-400 font-bold uppercase tracking-widest">Fire Water &amp; Inert Gas Process Mimic</div>
             <div class="zoom-controls">
                 <span class="text-slate-500 text-[10px] mr-1">ZOOM</span>
-                <button onclick="setZoom(0.75)" class="zoom-btn" data-zoom="0.75">75%</button>
-                <button onclick="setZoom(1)" class="zoom-btn active" data-zoom="1">100%</button>
-                <button onclick="setZoom(1.2)" class="zoom-btn" data-zoom="1.2">120%</button>
+                <button onclick="setZoom(0.75)" class="zoom-btn" data-zoom="0.75" data-rz-authored-basis="Zoom buttons state a VIEWPORT SCALE — how large the mimic is drawn — not a plant quantity. The same drawing at 75 percent and at 120 percent shows the same system, and conv-engine.js could not publish a number that decides how big a diagram appears on a screen.">75%</button>
+                <button onclick="setZoom(1)" class="zoom-btn active" data-zoom="1" data-rz-authored-basis="Zoom buttons state a VIEWPORT SCALE — how large the mimic is drawn — not a plant quantity. The same drawing at 75 percent and at 120 percent shows the same system, and conv-engine.js could not publish a number that decides how big a diagram appears on a screen.">100%</button>
+                <button onclick="setZoom(1.2)" class="zoom-btn" data-zoom="1.2" data-rz-authored-basis="Zoom buttons state a VIEWPORT SCALE — how large the mimic is drawn — not a plant quantity. The same drawing at 75 percent and at 120 percent shows the same system, and conv-engine.js could not publish a number that decides how big a diagram appears on a screen.">120%</button>
                 <button onclick="fitToScreen()" class="zoom-btn"><i class="fas fa-compress-arrows-alt"></i> FIT</button>
             </div>
         </div>
@@ -506,9 +506,9 @@
                     </g>
                     <!-- low / low-low alarm reference lines -->
                     <line x1="0" y1="124" x2="300" y2="124" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="6 5" opacity="0.55" />
-                    <text x="296" y="119" text-anchor="end" fill="#f59e0b" font-size="10" font-weight="bold">LOW 80%</text>
+                    <text x="296" y="119" text-anchor="end" fill="#f59e0b" font-size="10" font-weight="bold" data-rz-authored-basis="Tank LOW and LOW-LOW reference lines are ALARM SETPOINTS for the reserve tank, chosen for this installation. conv-engine.js publishes the fire reserve VOLUME and the demand it must cover - both traced on this page - but not the level at which an operator should be warned, which is a local alarm-philosophy decision no engine parameter carries.">LOW 80%</text>
                     <line x1="0" y1="198" x2="300" y2="198" stroke="#fb923c" stroke-width="1.5" stroke-dasharray="6 5" opacity="0.55" />
-                    <text x="296" y="193" text-anchor="end" fill="#fb923c" font-size="10" font-weight="bold">LOW-LOW 60%</text>
+                    <text x="296" y="193" text-anchor="end" fill="#fb923c" font-size="10" font-weight="bold" data-rz-authored-basis="Tank LOW and LOW-LOW reference lines are ALARM SETPOINTS for the reserve tank, chosen for this installation. conv-engine.js publishes the fire reserve VOLUME and the demand it must cover - both traced on this page - but not the level at which an operator should be warned, which is a local alarm-philosophy decision no engine parameter carries.">LOW-LOW 60%</text>
                     <text x="150" y="-30" text-anchor="middle" class="eq-name" font-size="11">TK-FW-01 · Fire Reserve Tank</text>
                     <text id="tank-cap-tag" x="150" y="-15" text-anchor="middle" class="eq-tag">&mdash;</text>
                     <text id="tank-level-txt" x="150" y="225" text-anchor="middle" fill="#cbd5e1" font-size="24" font-weight="800" class="font-tech">UNAVAILABLE</text>
@@ -574,7 +574,7 @@
                     <g id="spin-n2" class="impeller"><line x1="-12" y1="0" x2="12" y2="0" stroke="#64748b" stroke-width="2" /><line x1="0" y1="-12" x2="0" y2="12" stroke="#64748b" stroke-width="2" /></g>
                     <text x="60" y="26" fill="#cbd5e1" font-size="10" font-weight="800">N2 INERT GEN</text>
                     <text x="60" y="40" class="eq-tag">N2-GEN-01</text>
-                    <text id="label-n2-state" x="60" y="55" fill="#94a3b8" font-size="9" font-weight="bold">Hdr · UNAVAILABLE</text>
+                    <text id="label-n2-state" x="60" y="55" fill="#94a3b8" font-size="9" font-weight="bold" data-rz-authored-basis="Header pressure is simulated hydraulic state. conv-engine.js models the fire-water demand and the stored reserve, not the pressure the ring main happens to be sitting at, so this reading has no engine parameter to trace to.">Hdr · UNAVAILABLE</text>
                 </g>
                 <path id="path-n2" d="M 912 558 L 912 348 L 1262 348" class="pipe-base" data-rz-line="1" data-id="fs-n2-supply" data-from="N2-GEN-01" data-to="N2-DIST-HEADER" data-medium="fire" data-direction="forward" data-state="unavailable" data-capacity="N2 2.4 bar" data-current="UNAVAILABLE" data-redundancy="duty"/>
 
@@ -669,9 +669,9 @@
                      P_FP1_ON/P_FP2_ON and P_LOW_ALM. The simulation acts on the constants, so a change to a
                      setpoint silently left the panel lying. Now rendered from the same constants in
                      bindBasis() — the displayed setpoint and the acted-on setpoint cannot diverge. -->
-                <div class="metric-row"><span class="metric-label">Jockey start / stop</span><span class="metric-val" id="m-sp-jockey">— bar</span></div>
-                <div class="metric-row"><span class="metric-label">FP-01 start / FP-02 start</span><span class="metric-val" id="m-sp-fp">— bar</span></div>
-                <div class="metric-row"><span class="metric-label">Low-pressure alarm</span><span class="metric-val" id="m-sp-lowalm">— bar</span></div>
+                <div class="metric-row"><span class="metric-label">Jockey start / stop</span><span class="metric-val" id="m-sp-jockey" data-rz-authored-basis="Fire-pump start and stop pressures, the low-pressure alarm and the pump NAMEPLATE ratings are control setpoints and equipment specification. conv-engine.js models the fire-water DEMAND and the reserve that must cover it; it publishes no pump schedule and no pressure plane, so neither a rated duty printed from a datasheet nor a cut-in pressure set by the fire-protection design has an engine parameter to trace to. The reserve volume, the demand and the shortfall between them are engine-bound and stay in the denominator.">— bar</span></div>
+                <div class="metric-row"><span class="metric-label">FP-01 start / FP-02 start</span><span class="metric-val" id="m-sp-fp" data-rz-authored-basis="Fire-pump start and stop pressures, the low-pressure alarm and the pump NAMEPLATE ratings are control setpoints and equipment specification. conv-engine.js models the fire-water DEMAND and the reserve that must cover it; it publishes no pump schedule and no pressure plane, so neither a rated duty printed from a datasheet nor a cut-in pressure set by the fire-protection design has an engine parameter to trace to. The reserve volume, the demand and the shortfall between them are engine-bound and stay in the denominator.">— bar</span></div>
+                <div class="metric-row"><span class="metric-label">Low-pressure alarm</span><span class="metric-val" id="m-sp-lowalm" data-rz-authored-basis="Fire-pump start and stop pressures, the low-pressure alarm and the pump NAMEPLATE ratings are control setpoints and equipment specification. conv-engine.js models the fire-water DEMAND and the reserve that must cover it; it publishes no pump schedule and no pressure plane, so neither a rated duty printed from a datasheet nor a cut-in pressure set by the fire-protection design has an engine parameter to trace to. The reserve volume, the demand and the shortfall between them are engine-bound and stay in the denominator.">— bar</span></div>
                 <!-- v2.0.1 DEAD-BINDING FIX: "Healthy" was a hooked literal nothing ever assigned. The page
                      models no controller-power/supervisory input, and a comforting default on a fire panel is
                      the worst possible failure mode — render the unavailable marker instead (set in bindBasis). -->
@@ -687,7 +687,7 @@
             <div class="metric-row"><span class="metric-label">Fire pump demand</span><span class="metric-val warn" id="m-pump-demand" data-basis-param="fire.pump_demand_lpm" tabindex="0" role="button">UNAVAILABLE</span></div>
             <div class="metric-row"><span class="metric-label">Available duration</span><span class="metric-val warn" id="m-duration">UNAVAILABLE</span></div>
             <div class="metric-row"><span class="metric-label">Protected IT load (basis)</span><span class="metric-val warn" id="m-it-basis" data-basis-param="site.it_load_kw" tabindex="0" role="button">UNAVAILABLE</span></div>
-            <div class="metric-row"><span class="metric-label">Site rack-footprint proxy (non-sizing)</span><span class="metric-val warn" id="m-hall-vol">UNAVAILABLE</span></div>
+            <div class="metric-row"><span class="metric-label">Site rack-footprint proxy (non-sizing)</span><span class="metric-val warn" id="m-hall-vol" data-rz-authored-basis="A rack-footprint volume PROXY, labelled non-sizing on the row itself. It multiplies the engine rack count by two authored geometric assumptions - 1.2 square metres of floor per cabinet and 3.0 metres of clear height - that are local to this building and that conv-engine.js does not model. It exists to give an operator a sense of scale beside the gas-suppression figures and is explicitly not a basis for agent quantity.">UNAVAILABLE</span></div>
             <div class="metric-row"><span class="metric-label">Pre-action zones</span><span class="metric-val warn" id="m-zones">UNAVAILABLE</span></div>
             <p class="metric-sub mt-2">Duration = available litres ÷ fire-pump demand. Suppression release quantities are <b>preliminary</b> pending hydraulic calc.</p>
         </div>
@@ -743,7 +743,7 @@
         var engineVersionMatch = engineScript
             ? engineScript.getAttribute('src').match(/[?&]v=([^&]+)/)
             : null;
-        var CONV_CURRENT_ENGINE_VERSION = '2.1.0';
+        var CONV_CURRENT_ENGINE_VERSION = '2.2.0';
         var requestedEngineVersion = engineVersionMatch
             ? decodeURIComponent(engineVersionMatch[1])
             : null;
@@ -891,13 +891,22 @@
         }
 
         // ---- Fire pump cards (auto / run / trip — doc-05 §3) ----
+        var PUMP_SETPOINT_BASIS = 'Fire-pump start and stop pressures, the low-pressure alarm and the pump NAMEPLATE ratings are control setpoints and equipment specification. conv-engine.js models the fire-water DEMAND and the reserve that must cover it; it publishes no pump schedule and no pressure plane, so neither a rated duty printed from a datasheet nor a cut-in pressure set by the fire-protection design has an engine parameter to trace to. The reserve volume, the demand and the shortfall between them are engine-bound and stay in the denominator.';
+
         function pumpCardHTML(tag, name, st, sub) {
             var cls = st === 'RUN' ? 'run' : (st === 'TRIP' ? 'trip' : (st === 'UNKNOWN' ? 'unknown' : 'auto'));
             var label = st === 'RUN' ? 'RUNNING' : (st === 'TRIP' ? 'TRIP' : (st === 'UNKNOWN' ? UNAVAILABLE : 'AUTO · STANDBY'));
-            return '<div class="pump-card"><div class="pc-tag">' + tag + '</div><div class="pc-name">' + name +
+            /* v1.134.24 — the name line carries the pump's NAMEPLATE duty and the sub-line its
+               cut-in pressures. Both are equipment specification and fire-protection setpoints,
+               declared here; the pump STATE beside them follows the simulation and carries no
+               number. */
+            return '<div class="pump-card"><div class="pc-tag">' + tag + '</div>' +
+                   '<div class="pc-name" data-rz-authored-basis="' + PUMP_SETPOINT_BASIS + '">' + name +
                    '</div><span class="pc-state ' + cls + '">' + label + '</span>' +
-                   '<div class="metric-sub" style="margin-top:6px">' + sub + '</div></div>';
+                   '<div class="metric-sub" style="margin-top:6px" data-rz-authored-basis="' +
+                   PUMP_SETPOINT_BASIS + '">' + sub + '</div></div>';
         }
+
         function renderPumps() {
             var pressureAvailable = HAS_FIRE_AUTHORITY && isFiniteNumber(state.press);
             var jSt = pressureAvailable ? (state.stage >= 3 && state.press <= P_JOCKEY_ON ? 'RUN' : 'AUTO') : 'UNKNOWN';

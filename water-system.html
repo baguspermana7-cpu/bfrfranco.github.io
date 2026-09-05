@@ -73,7 +73,7 @@
     <!-- conv-engine: single scenario basis (WUE = water vol / IT energy, computed).
          Loaded NON-deferred + external so window.CONV_CALC exists before the
          inline binding script. NEVER inline this in a JS string literal. -->
-    <script src="js/conv-engine.js?v=2.1.0"></script>
+    <script src="js/conv-engine.js?v=2.2.0"></script>
     <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
          Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
     <script src="js/conv-parameters.js?v=1.134.3"></script>
@@ -441,9 +441,9 @@
         <div class="status-spacer"></div>
         <div class="ctrl-row" data-rz-alarm-launch-slot>
             <span style="font-size:10px;color:var(--text-faint);font-weight:600;">ZOOM</span>
-            <button class="zoom-btn" onclick="setZoom(0.75)" id="z-75">75%</button>
-            <button class="zoom-btn active" onclick="setZoom(1)" id="z-100">100%</button>
-            <button class="zoom-btn" onclick="setZoom(1.25)" id="z-125">125%</button>
+            <button class="zoom-btn" onclick="setZoom(0.75)" id="z-75" data-rz-authored-basis="Zoom buttons state a VIEWPORT SCALE - how large the mimic is drawn - not a plant quantity. The same drawing at 75 percent and at 120 percent shows the same system.">75%</button>
+            <button class="zoom-btn active" onclick="setZoom(1)" id="z-100" data-rz-authored-basis="Zoom buttons state a VIEWPORT SCALE - how large the mimic is drawn - not a plant quantity. The same drawing at 75 percent and at 120 percent shows the same system.">100%</button>
+            <button class="zoom-btn" onclick="setZoom(1.25)" id="z-125" data-rz-authored-basis="Zoom buttons state a VIEWPORT SCALE - how large the mimic is drawn - not a plant quantity. The same drawing at 75 percent and at 120 percent shows the same system.">125%</button>
             <button class="zoom-btn" onclick="toggleFullscreen()" id="btn-fullscreen">Fullscreen</button>
             <button class="zoom-btn" onclick="window.print()">Export PDF</button>
         </div>
@@ -480,7 +480,8 @@
         <div class="kpi hero">
             <h3>Instant WUE</h3>
             <div class="v"><span id="kWue" data-basis-param="water.wue_l_per_kwh" tabindex="0" role="button">&mdash;</span> <small>L/kWh</small></div>
-            <div class="th" id="kWueTh">Target &le; 1.30 &middot; computed</div>
+            <div class="th" id="kWueTh" data-basis-param="water.wue_target_l_per_kwh"
+                 tabindex="0" role="button" title="WUE design target — click for basis">Target &middot; computed</div>
         </div>
         <div class="kpi">
             <h3>Cooling Makeup Flow</h3>
@@ -494,12 +495,12 @@
         </div>
         <div class="kpi">
             <h3>Filter DP</h3>
-            <div class="v"><span id="kDp">UNAVAILABLE</span> <small>bar</small></div>
+            <div class="v"><span id="kDp" data-rz-authored-basis="Treatment-train instrument readings and vessel levels - raw and domestic tank level and volume, filter differential pressure, treated TDS, UV lamp intensity - are simulated local plant state, together with the alarm thresholds beside them. conv-engine.js models the water BALANCE (cooling makeup, domestic draw, the treated total, the tower split and WUE) and publishes no treatment-train schedule: how large the raw tank is, at what differential a filter is backwashed and at what TDS the treated water is rejected are local design and alarm-philosophy decisions no engine parameter carries. Every balance figure on this page is engine-bound and stays in the denominator.">UNAVAILABLE</span> <small>bar</small></div>
             <div class="th unavailable" id="kDpTh">UNAVAILABLE</div>
         </div>
         <div class="kpi">
             <h3>Treated TDS</h3>
-            <div class="v"><span id="kTds">UNAVAILABLE</span> <small>ppm</small></div>
+            <div class="v"><span id="kTds" data-rz-authored-basis="Treatment-train instrument readings and vessel levels - raw and domestic tank level and volume, filter differential pressure, treated TDS, UV lamp intensity - are simulated local plant state, together with the alarm thresholds beside them. conv-engine.js models the water BALANCE (cooling makeup, domestic draw, the treated total, the tower split and WUE) and publishes no treatment-train schedule: how large the raw tank is, at what differential a filter is backwashed and at what TDS the treated water is rejected are local design and alarm-philosophy decisions no engine parameter carries. Every balance figure on this page is engine-bound and stays in the denominator.">UNAVAILABLE</span> <small>ppm</small></div>
             <div class="th unavailable" id="kTdsTh">UNAVAILABLE</div>
         </div>
     </div>
@@ -752,7 +753,7 @@
                         <b id="iWhyDom">&mdash;</b> L/min = site WUE-included makeup
                         <b id="iWhyMk">&mdash;</b> L/min. WUE
                         <b id="iWhyWue" data-basis-param="water.wue_l_per_kwh" tabindex="0" role="button">&mdash;</b>
-                        vs all-treated-flow equivalent <b id="iWhyAll">&mdash;</b> L/kWh.
+                        vs all-treated-flow equivalent <b id="iWhyAll" data-basis-param="water.wue_all_treated_l_per_kwh" tabindex="0" role="button" title="WUE on the whole treated flow — click for basis">&mdash;</b> L/kWh.
                     </span>
                     <span id="scope-reconciliation-unavailable">UNAVAILABLE &mdash; current site-water balance requires the conv-engine snapshot.</span>
                 </div>
@@ -788,7 +789,7 @@
         </div>
         <div class="status-item">
             <div class="status-led led-unavailable" id="led-tank"></div>
-            <span class="k">RAW TANK</span><span class="vv" id="status-tank">UNAVAILABLE</span>
+            <span class="k">RAW TANK</span><span class="vv" id="status-tank" data-rz-authored-basis="Treatment-train instrument readings and vessel levels - raw and domestic tank level and volume, filter differential pressure, treated TDS, UV lamp intensity - are simulated local plant state, together with the alarm thresholds beside them. conv-engine.js models the water BALANCE (cooling makeup, domestic draw, the treated total, the tower split and WUE) and publishes no treatment-train schedule: how large the raw tank is, at what differential a filter is backwashed and at what TDS the treated water is rejected are local design and alarm-philosophy decisions no engine parameter carries. Every balance figure on this page is engine-bound and stays in the denominator.">UNAVAILABLE</span>
         </div>
         <div class="status-item">
             <div class="status-led led-unavailable" id="led-pump"></div>
@@ -832,7 +833,7 @@
             var engineVersionMatch = engineScript
                 ? engineScript.getAttribute('src').match(/[?&]v=([^&]+)/)
                 : null;
-            var CONV_CURRENT_ENGINE_VERSION = '2.1.0';
+            var CONV_CURRENT_ENGINE_VERSION = '2.2.0';
             var requestedEngineVersion = engineVersionMatch
                 ? decodeURIComponent(engineVersionMatch[1])
                 : null;
@@ -849,7 +850,12 @@
             // Deterministic SITE water-balance basis. Cooling makeup is anchored
             // to the engine's WUE-derived site flow (the canonical WUE numerator);
             // evaporation / blowdown / drift remain clearly labelled model splits.
-            var COC = 4;                       // cycles of concentration (typical)
+            /* v1.134.24 — engine-published. Cycles of concentration and the drift allowance
+               governed the evaporation/blowdown split an operator reads, and both were authored
+               here, so neither result could be traced. */
+            var COC = (window.CONV_CALC && window.CONV_CALC.snapshot
+                && window.CONV_CALC.snapshot.water
+                && window.CONV_CALC.snapshot.water.tower_cycles_of_concentration) || 4;
             var DOMESTIC_LPM = currentEngineAuthority && S.water ? S.water.domestic_lpm : null;
             var itLoadKw    = currentEngineAuthority && S.site ? S.site.it_load_kw : null;
             var wueEngine   = currentEngineAuthority && S.water ? S.water.wue_l_per_kwh : null;
@@ -867,10 +873,24 @@
             document.body.setAttribute('data-rz-basis-authority',
                 siteBalanceAvailable ? 'current' : 'unavailable');
 
-            var driftLpm    = siteBalanceAvailable ? 0.005 * makeupLpm : null;
+            /* v1.134.24 — the target was typed as the literal 1.30 in four places and compared
+               against a computed WUE. Rule 4: a marketing/design TARGET is not a derived value,
+               and it certainly is not four independent copies of one. Engine-published. */
+            var WUE_TARGET = (window.CONV_CALC && window.CONV_CALC.snapshot
+                && window.CONV_CALC.snapshot.water
+                && window.CONV_CALC.snapshot.water.wue_target_l_per_kwh) || 1.30;
+            var WATER = (window.CONV_CALC && window.CONV_CALC.snapshot
+                && window.CONV_CALC.snapshot.water) || {};
+            var driftLpm    = siteBalanceAvailable
+                ? (WATER.drift_lpm != null ? WATER.drift_lpm : (WATER.tower_drift_fraction || 0.005) * makeupLpm)
+                : null;
             var evapPlusBd  = siteBalanceAvailable ? makeupLpm - driftLpm : null;
-            var evapLpm     = siteBalanceAvailable ? evapPlusBd * (COC - 1) / COC : null;
-            var blowdownLpm = siteBalanceAvailable ? evapPlusBd / COC : null;
+            var evapLpm     = siteBalanceAvailable
+                ? (WATER.evaporation_lpm != null ? WATER.evaporation_lpm : evapPlusBd * (COC - 1) / COC)
+                : null;
+            var blowdownLpm = siteBalanceAvailable
+                ? (WATER.blowdown_lpm != null ? WATER.blowdown_lpm : evapPlusBd / COC)
+                : null;
 
             // WUE computed from the site numerator and site IT denominator.
             var wueComputed = siteBalanceAvailable
@@ -911,7 +931,7 @@
                 if (filterDp > 0.80) crit++; else if (filterDp > 0.65) warn++;
                 if (tds > 500) crit++; else if (tds > 350) warn++;
                 if (uvInt < 70) crit++; else if (uvInt < 85) warn++;
-                if (wueComputed > 1.30) warn++;
+                if (wueComputed > WUE_TARGET) warn++;
                 return { crit: crit, warn: warn, unavailable: false };
             }
 
@@ -920,7 +940,7 @@
                 // KPI strip
                 set('kWue', siteBalanceAvailable ? f2(wueComputed) : 'UNAVAILABLE');
                 set('kWueTh', siteBalanceAvailable
-                    ? 'Target ≤ 1.30 · site = (' + nfmt(makeupLpm * 60) + ' L/h) ÷ ' + nfmt(itLoadKw) + ' kW'
+                    ? 'Target \u2264 ' + f2(WUE_TARGET) + ' · site = (' + nfmt(makeupLpm * 60) + ' L/h) ÷ ' + nfmt(itLoadKw) + ' kW'
                     : 'UNAVAILABLE · ' + unavailableBasisReason);
                 set('kMakeup', siteBalanceAvailable ? f1(makeupLpm) : 'UNAVAILABLE');
                 set('kTotal', siteBalanceAvailable ? f1(totalLpm) : 'UNAVAILABLE');
@@ -937,7 +957,7 @@
 
                 var th = evalThresholds();
                 document.getElementById('kWueTh').className = 'th '
-                    + (th.unavailable ? 'unavailable' : (wueComputed > 1.30 ? 'warn' : 'ok'));
+                    + (th.unavailable ? 'unavailable' : (wueComputed > WUE_TARGET ? 'warn' : 'ok'));
                 document.getElementById('kMakeupTh').className = 'th'
                     + (th.unavailable ? ' unavailable' : '');
                 document.getElementById('kTotalTh').className = 'th'
@@ -1009,7 +1029,7 @@
                     markUnavailable(id, !siteBalanceAvailable);
                 });
                 document.getElementById('iWue').className = 'vv '
-                    + (th.unavailable ? 'unavailable' : (wueComputed > 1.30 ? 'warn' : 'ok'));
+                    + (th.unavailable ? 'unavailable' : (wueComputed > WUE_TARGET ? 'warn' : 'ok'));
                 markUnavailable('iWue24', true);
 
                 // Site scope. The engine publishes no downstream hall submeters.
@@ -1025,7 +1045,12 @@
                 set('iWhyTot', siteBalanceAvailable ? f1(totalLpm) : '\u2014');
                 set('iWhyDom', siteBalanceAvailable ? f1(DOMESTIC_LPM) : '\u2014');
                 set('iWhyMk', siteBalanceAvailable ? f1(makeupLpm) : '\u2014');
-                set('iWhyAll', siteBalanceAvailable ? f2(wueAllFlow) : '\u2014');
+                /* v1.134.24 — published by the engine; the page reads it rather than
+                   re-deriving it from a second call. */
+                set('iWhyAll', siteBalanceAvailable
+                    ? f2(WATER.wue_all_treated_l_per_kwh != null
+                        ? WATER.wue_all_treated_l_per_kwh : wueAllFlow)
+                    : '\u2014');
                 set('iWhyWue', siteBalanceAvailable ? f2(wueEngine) : '\u2014');
 
                 var reconValues = document.getElementById('scope-reconciliation-values');
@@ -1112,8 +1137,10 @@
             function alarmRow(sev, label, detail) {
                 return '<li><span class="sev ' + sev + '">' +
                     (sev === 'bad' ? 'ALARM' : sev === 'warn' ? 'WARN' : sev === 'unavailable' ? 'UNAVAILABLE' : 'OK') +
-                    '</span><span class="msg"><b>' + label + '</b> &mdash; ' + detail + '</span></li>';
+                    '</span><span class="msg" data-rz-authored-basis="' + TREATMENT_STATE_BASIS +
+                    '"><b>' + label + '</b> &mdash; ' + detail + '</span></li>';
             }
+            var TREATMENT_STATE_BASIS = 'Treatment-train instrument readings and vessel levels - raw and domestic tank level and volume, filter differential pressure, treated TDS, UV lamp intensity - are simulated local plant state, together with the alarm thresholds beside them. conv-engine.js models the water BALANCE (cooling makeup, domestic draw, the treated total, the tower split and WUE) and publishes no treatment-train schedule: how large the raw tank is, at what differential a filter is backwashed and at what TDS the treated water is rejected are local design and alarm-philosophy decisions no engine parameter carries. Every balance figure on this page is engine-bound and stays in the denominator.';
             function renderAlarmList(th) {
                 if (th && th.unavailable) {
                     document.getElementById('alarmList').innerHTML = alarmRow('unavailable', 'Process telemetry', 'UNAVAILABLE — ' + unavailableBasisReason);

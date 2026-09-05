@@ -40,7 +40,7 @@ window.CONV_CALC = Object.freeze({
 const INCOMPLETE_FIRE_FIXTURE = `
 window.CONV_CALC = Object.freeze({
   snapshot: Object.freeze({
-    meta: Object.freeze({ scenario: 'Simulated', data_quality: 'GOOD', version: '2.1.0' }),
+    meta: Object.freeze({ scenario: 'Simulated', data_quality: 'GOOD', version: '2.2.0' }),
     site: Object.freeze({ it_load_kw: 30000 }),
     campus: Object.freeze({ hall_count: 4, racks_total: 2000 }),
     fire: Object.freeze({ static_pressure_bar: 12.5 })
@@ -50,7 +50,7 @@ window.CONV_CALC = Object.freeze({
 const MISSING_META_FIXTURE = `
 window.CONV_CALC = Object.freeze({
   snapshot: Object.freeze({
-    meta: Object.freeze({ version: '2.1.0' }),
+    meta: Object.freeze({ version: '2.2.0' }),
     site: Object.freeze({ it_load_kw: 30000 }),
     campus: Object.freeze({ hall_count: 4, racks_total: 2000 }),
     fire: Object.freeze({
@@ -74,14 +74,14 @@ function withLegacyEngine(source) {
     const scriptPattern = /<script src="js\/conv-engine\.js\?v=[^"]+"><\/script>/;
     assert.match(source, scriptPattern, 'fire page must load the governed Conventional engine');
     return source.replace(scriptPattern,
-      `<script type="application/json" src="js/conv-engine.js?v=2.1.0"></script><script>${LEGACY_ENGINE_FIXTURE}<\/script>`);
+      `<script type="application/json" src="js/conv-engine.js?v=2.2.0"></script><script>${LEGACY_ENGINE_FIXTURE}<\/script>`);
 }
 
 function withIncompleteFireEngine(source) {
   const scriptPattern = /<script src="js\/conv-engine\.js\?v=[^"]+"><\/script>/;
   assert.match(source, scriptPattern, 'fire page must load the governed Conventional engine');
   return source.replace(scriptPattern,
-    `<script type="application/json" src="js/conv-engine.js?v=2.1.0"></script><script>${INCOMPLETE_FIRE_FIXTURE}<\/script>`);
+    `<script type="application/json" src="js/conv-engine.js?v=2.2.0"></script><script>${INCOMPLETE_FIRE_FIXTURE}<\/script>`);
 }
 
 function withoutEngine(source) {
@@ -95,7 +95,7 @@ function withMissingMetaEngine(source) {
   const scriptPattern = /<script src="js\/conv-engine\.js\?v=[^"]+"><\/script>/;
   assert.match(source, scriptPattern, 'fire page must load the governed Conventional engine');
   return source.replace(scriptPattern,
-    `<script type="application/json" src="js/conv-engine.js?v=2.1.0"></script><script>${MISSING_META_FIXTURE}<\/script>`);
+    `<script type="application/json" src="js/conv-engine.js?v=2.2.0"></script><script>${MISSING_META_FIXTURE}<\/script>`);
 }
 
 async function serve(request, response) {

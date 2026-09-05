@@ -1,6 +1,6 @@
 {
   "generatedBy": "tools/build-conv-parameter-registry.mjs",
-  "engineVersion": "2.1.0",
+  "engineVersion": "2.2.0",
   "note": "GENERATED — do not hand-edit. Curated metadata lives in data/conv-parameters.curated.json.",
   "parameters": [
     {
@@ -4139,7 +4139,7 @@
       "label": "Engine version",
       "unit": null,
       "kind": "authored",
-      "value": "2.1.0",
+      "value": "2.2.0",
       "formula": null,
       "formulaNotExpressible": "The engine's own version string.",
       "deps": [],
@@ -4616,6 +4616,46 @@
       }
     },
     {
+      "id": "water.blowdown_lpm",
+      "label": "Tower blowdown",
+      "unit": "L/min",
+      "kind": "derived",
+      "value": 149.3,
+      "formula": "(flow_lpm_for_wue - drift_lpm) / tower_cycles_of_concentration",
+      "formulaExpr": "(water.flow_lpm_for_wue - water.drift_lpm) / water.tower_cycles_of_concentration",
+      "deps": [
+        "water.drift_lpm",
+        "water.flow_lpm_for_wue",
+        "water.tower_cycles_of_concentration"
+      ],
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_load_kw",
+        "campus.halls.1.it_load_kw",
+        "campus.halls.2.it_load_kw",
+        "campus.halls.3.it_load_kw",
+        "environment.wue_l_per_kwh",
+        "water.tower_cycles_of_concentration",
+        "water.tower_drift_fraction"
+      ],
+      "consumers": [
+        {
+          "page": "water-system.html",
+          "reads": 2
+        }
+      ],
+      "tests": [
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "At C cycles, the blowdown is what leaves to hold the dissolved-solids balance."
+      }
+    },
+    {
       "id": "water.domestic_lpm",
       "label": "Domestic / process draw",
       "unit": "L/min",
@@ -4646,6 +4686,84 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-29",
         "method": "Excluded from WUE, which counts cooling makeup only. No metered domestic demand has been supplied."
+      }
+    },
+    {
+      "id": "water.drift_lpm",
+      "label": "Tower drift loss",
+      "unit": "L/min",
+      "kind": "derived",
+      "value": 3,
+      "formula": "flow_lpm_for_wue x tower_drift_fraction",
+      "formulaExpr": "water.flow_lpm_for_wue * water.tower_drift_fraction",
+      "deps": [
+        "water.flow_lpm_for_wue",
+        "water.tower_drift_fraction"
+      ],
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_load_kw",
+        "campus.halls.1.it_load_kw",
+        "campus.halls.2.it_load_kw",
+        "campus.halls.3.it_load_kw",
+        "environment.wue_l_per_kwh",
+        "water.tower_drift_fraction"
+      ],
+      "consumers": [
+        {
+          "page": "water-system.html",
+          "reads": 2
+        }
+      ],
+      "tests": [
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "The first term of the open-tower balance."
+      }
+    },
+    {
+      "id": "water.evaporation_lpm",
+      "label": "Tower evaporation",
+      "unit": "L/min",
+      "kind": "derived",
+      "value": 447.8,
+      "formula": "(flow_lpm_for_wue - drift_lpm) x (tower_cycles_of_concentration - 1) / tower_cycles_of_concentration",
+      "formulaExpr": "(water.flow_lpm_for_wue - water.drift_lpm) * (water.tower_cycles_of_concentration - 1) / water.tower_cycles_of_concentration",
+      "deps": [
+        "water.drift_lpm",
+        "water.flow_lpm_for_wue",
+        "water.tower_cycles_of_concentration"
+      ],
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_load_kw",
+        "campus.halls.1.it_load_kw",
+        "campus.halls.2.it_load_kw",
+        "campus.halls.3.it_load_kw",
+        "environment.wue_l_per_kwh",
+        "water.tower_cycles_of_concentration",
+        "water.tower_drift_fraction"
+      ],
+      "consumers": [
+        {
+          "page": "water-system.html",
+          "reads": 2
+        }
+      ],
+      "tests": [
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "The remainder of the makeup once drift and blowdown are accounted for."
       }
     },
     {
@@ -4733,6 +4851,102 @@
       }
     },
     {
+      "id": "water.tower_cycles_of_concentration",
+      "label": "Cooling-tower cycles of concentration",
+      "unit": "None",
+      "kind": "authored",
+      "value": 4,
+      "formula": null,
+      "deps": [],
+      "scope": "site",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "water.tower_cycles_of_concentration"
+      ],
+      "consumers": [
+        {
+          "page": "water-system.html",
+          "reads": 2
+        }
+      ],
+      "tests": [
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "Typical open-tower operation. Was authored on water-system.html, where it governed the evaporation/blowdown split an operator reads."
+      }
+    },
+    {
+      "id": "water.tower_drift_fraction",
+      "label": "Tower drift allowance, fraction of makeup",
+      "unit": "None",
+      "kind": "authored",
+      "value": 0.005,
+      "formula": null,
+      "deps": [],
+      "scope": "site",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "water.tower_drift_fraction"
+      ],
+      "consumers": [
+        {
+          "page": "water-system.html",
+          "reads": 1
+        }
+      ],
+      "tests": [
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "0.5% of makeup with drift eliminators fitted. Was a literal 0.005 on the page."
+      }
+    },
+    {
+      "id": "water.wue_all_treated_l_per_kwh",
+      "label": "WUE on the whole treated flow",
+      "unit": "L/kWh",
+      "kind": "derived",
+      "value": 1.22,
+      "formula": "total_treated_lpm x 60 / it_load_kw",
+      "formulaExpr": "water.total_treated_lpm * 60 / site.it_load_kw",
+      "deps": [
+        "site.it_load_kw",
+        "water.total_treated_lpm"
+      ],
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_load_kw",
+        "campus.halls.1.it_load_kw",
+        "campus.halls.2.it_load_kw",
+        "campus.halls.3.it_load_kw",
+        "environment.wue_l_per_kwh"
+      ],
+      "consumers": [
+        {
+          "page": "water-system.html",
+          "reads": 4
+        }
+      ],
+      "tests": [
+        "test-conv-formula.mjs (formula evaluated)",
+        "test-conv-basis-drawer.mjs (drawer value vs water-system.html)"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "Shown beside the reported WUE so the domestic exclusion is visible rather than implied."
+      }
+    },
+    {
       "id": "water.wue_l_per_kwh",
       "label": "WUE (water branch)",
       "unit": "L/kWh",
@@ -4764,6 +4978,36 @@
         "ref": "conv/review/09-engineering-basis-and-calculations.md",
         "asOf": "2026-08-28",
         "section": "line 13"
+      }
+    },
+    {
+      "id": "water.wue_target_l_per_kwh",
+      "label": "WUE design target",
+      "unit": "L/kWh",
+      "kind": "authored",
+      "value": 1.3,
+      "formula": null,
+      "deps": [],
+      "scope": "site",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "water.wue_target_l_per_kwh"
+      ],
+      "consumers": [
+        {
+          "page": "water-system.html",
+          "reads": 4
+        }
+      ],
+      "tests": [
+        "test-conv-parameter-registry.mjs (provenance + evidence class)",
+        "test-conv-basis-drawer.mjs (drawer value vs water-system.html)"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "A design TARGET, published as one. It was the literal 1.30 typed in four places on the water cockpit and compared against a computed WUE, which is the marketing-target-versus-derived-value confusion ACCURACY_VALIDATION Rule 4 forbids."
       }
     }
   ]

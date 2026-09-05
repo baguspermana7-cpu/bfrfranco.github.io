@@ -1999,6 +1999,116 @@
         "method": "Stated as a plant AVERAGE and labelled as one: per-unit loading is not published, so no per-machine figure is shown."
       },
       "formulaExpr": "cooling.heat_rejection_kw / (cooling.chillers_running * cooling.chiller_unit_kw_th) * 100"
+    },
+    {
+      "id": "water.tower_cycles_of_concentration",
+      "label": "Cooling-tower cycles of concentration",
+      "unit": "None",
+      "scope": "site",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "Typical open-tower operation. Was authored on water-system.html, where it governed the evaporation/blowdown split an operator reads."
+      }
+    },
+    {
+      "id": "water.tower_drift_fraction",
+      "label": "Tower drift allowance, fraction of makeup",
+      "unit": "None",
+      "scope": "site",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "0.5% of makeup with drift eliminators fitted. Was a literal 0.005 on the page."
+      }
+    },
+    {
+      "id": "water.drift_lpm",
+      "label": "Tower drift loss",
+      "unit": "L/min",
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "formula": "flow_lpm_for_wue x tower_drift_fraction",
+      "deps": [
+        "water.flow_lpm_for_wue",
+        "water.tower_drift_fraction"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "The first term of the open-tower balance."
+      },
+      "formulaExpr": "water.flow_lpm_for_wue * water.tower_drift_fraction"
+    },
+    {
+      "id": "water.blowdown_lpm",
+      "label": "Tower blowdown",
+      "unit": "L/min",
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "formula": "(flow_lpm_for_wue - drift_lpm) / tower_cycles_of_concentration",
+      "deps": [
+        "water.drift_lpm",
+        "water.flow_lpm_for_wue",
+        "water.tower_cycles_of_concentration"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "At C cycles, the blowdown is what leaves to hold the dissolved-solids balance."
+      },
+      "formulaExpr": "(water.flow_lpm_for_wue - water.drift_lpm) / water.tower_cycles_of_concentration"
+    },
+    {
+      "id": "water.evaporation_lpm",
+      "label": "Tower evaporation",
+      "unit": "L/min",
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "formula": "(flow_lpm_for_wue - drift_lpm) x (tower_cycles_of_concentration - 1) / tower_cycles_of_concentration",
+      "deps": [
+        "water.drift_lpm",
+        "water.flow_lpm_for_wue",
+        "water.tower_cycles_of_concentration"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "The remainder of the makeup once drift and blowdown are accounted for."
+      },
+      "formulaExpr": "(water.flow_lpm_for_wue - water.drift_lpm) * (water.tower_cycles_of_concentration - 1) / water.tower_cycles_of_concentration"
+    },
+    {
+      "id": "water.wue_target_l_per_kwh",
+      "label": "WUE design target",
+      "unit": "L/kWh",
+      "scope": "site",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "A design TARGET, published as one. It was the literal 1.30 typed in four places on the water cockpit and compared against a computed WUE, which is the marketing-target-versus-derived-value confusion ACCURACY_VALIDATION Rule 4 forbids."
+      }
+    },
+    {
+      "id": "water.wue_all_treated_l_per_kwh",
+      "label": "WUE on the whole treated flow",
+      "unit": "L/kWh",
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "formula": "total_treated_lpm x 60 / it_load_kw",
+      "deps": [
+        "site.it_load_kw",
+        "water.total_treated_lpm"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "Shown beside the reported WUE so the domestic exclusion is visible rather than implied."
+      },
+      "formulaExpr": "water.total_treated_lpm * 60 / site.it_load_kw"
     }
   ]
 }

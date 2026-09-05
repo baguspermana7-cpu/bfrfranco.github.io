@@ -309,11 +309,20 @@ try {
                        form escaped the rule above, so every column header on the grid was being
                        read as an untraced engineering value: 26, 34, 41, 59. A letter glued to
                        digits with no separator and no unit is a name, not a measurement. */
-                    .replace(/\b[A-Z]{1,3}\d{1,3}\b/g, ' ')
+                    .replace(/\b[A-Z]{1,3}\d{1,3}[A-Z]?\b/g, ' ')
                     /* A pipe DESIGNATION is a specification, not a reading: "DN100" is the
                        nominal bore of the line, and reading 100 out of it and asking which
                        registry parameter explains it is a category error. */
-                    .replace(/\bDN\s?\d+\b/gi, ' ');
+                    .replace(/\bDN\s?\d+\b/gi, ' ')
+                    /* A SEMVER is an identifier. The cockpits state which engine revision they
+                       are bound to — "conv-engine v2.1.0" — and the extractor was reading 2.1
+                       out of it and asking which parameter explains a temperature of 2.1. */
+                    .replace(/\bv?\d+\.\d+\.\d+\b/g, ' ')
+                    /* A SOURCE CITATION is not a reading. The fuel cockpit cites its basis as
+                       "(conv/review/09-engineering-basis lines 133-147)"; the line numbers were
+                       being counted as untraced engineering values, which would push an author
+                       toward deleting the citation to clear the backlog. */
+                    .replace(/\blines?\s+\d+(?:\s*[\u2013\u2014-]\s*\d+)?/gi, ' ');
                 const matches = text.match(/-?\d[\d,]*(?:\.\d+)?/g);
                 if (!matches) continue;
                 /* The label is what makes an unaccounted finding actionable, and it was

@@ -11,6 +11,72 @@ release sections rather than semver.
 
 ---
 
+## v1.134.24 — 2026-09-05
+
+### 100 % — every number on all eight Conventional cockpits is accounted for
+
+The coverage gate walks the rendered DOM and asks of each number a human can read: can the
+parameter registry explain it? It started this programme at roughly 24 %, stood at 54.3 % this
+morning and at 79.1 % after v1.134.23. It now reports **189 / 189 traced**, with 831 further
+numbers in regions DECLARED as authored page basis, each carrying a written reason.
+
+    dc-conventional 100 %   datahall 100 %   chiller-plant 100 %   water-system 100 %
+    fire-system 100 %       fuel-system 100 %   ict 100 %          EPMS 100 %
+
+**The gate is now STRICT.** The flip condition written into ship-gate.sh when this began has
+been met, so it fails on the first untraced number rather than reporting one. Reaching 100 %
+is worth little if the next unbound literal can walk back in unnoticed; proven by
+reintroducing one (`1234.5 kW` on the EPMS status strip — RED, exit 1) and removing it again.
+
+### Seven more quantities published, and a target that was pretending to be a value
+
+The water cockpit split the cooling-tower balance itself: cycles of concentration and the
+drift allowance were authored on the page, so the evaporation and blowdown an operator reads —
+447.8 and 149.3 L/min — followed from the engine's makeup flow but had nothing to trace to.
+Both constants and all three results moved to the engine, along with WUE evaluated on the
+whole treated flow.
+
+Worse was the **WUE target**. `1.30` was typed as a literal in **four** places on that page and
+compared against a computed WUE to decide whether the KPI turns amber. That is precisely the
+marketing-target-versus-derived-value confusion ACCURACY_VALIDATION Rule 4 forbids, and it was
+four independent copies of the same claim. It is published as a target, read once.
+
+### The rest was classification, not arithmetic
+
+Most of the remaining backlog was never engine work, and saying so plainly is the point — an
+undeclared number and a number that cannot be derived are different problems:
+
+- **Equipment nameplate data.** A pump's rated duty printed from a datasheet (Viking L124A,
+  180 L/min; fire pumps at 227 m³/h and 75 kW) is a specification, not a measurement.
+- **Control setpoints and alarm philosophy.** Fire-pump cut-in pressures, the low-pressure
+  alarm, day-tank fill bands, tank LOW / LOW-LOW lines, filter backwash and TDS limits. The
+  engine models the demand and the reserve that must cover it; at what level an operator
+  should be warned is a local decision no parameter carries.
+- **Simulated local state.** Day-tank levels, bulk-tank level, treatment-train instrument
+  readings, UV lamp intensity, header pressure, breaker position counts. The engine models
+  loads, capacities, the thermal chain and the water balance; it publishes no switchgear
+  schedule and no treatment-train schedule.
+- **Viewport state.** Zoom percentage says how large a drawing is on a screen. There is
+  nothing in a data-centre model that could determine it.
+
+Each is declared where it applies, with its own reason — never a blanket over a panel that
+also carries engine figures. The fuel inventory table declares its DT- rows and leaves the UST
+row counted; the genset cards declare level and volume and leave the load cell counted; the
+fire pump cards declare the nameplate and the setpoint lines and leave the state alone.
+
+### Four more things the extractor was counting that are not measurements
+
+A semver (`conv-engine v2.2.0` read as 2.1), a source citation (`lines 133–147`), an equipment
+designation with a trailing letter (`L124A`), and the shared auth modal that appears on every
+page of the site. Each pushed the reported figure down while pointing at nothing an engineer
+could fix — and a backlog full of those is how a coverage number stops being believed.
+
+### Engine 2.1.0 -> 2.2.0
+
+Additive again: seven published quantities, none removed. The version pins and cache tokens on
+all eight cockpits moved with it — `tools/test-conv-engine-version-pins.mjs`, added yesterday
+after exactly this bump blanked every screen, confirmed the set was complete.
+
 ## v1.134.23 — 2026-09-05
 
 ### Coverage 54.3 % to 79.1 %, and three of the eight cockpits now trace every number

@@ -87,7 +87,7 @@ const LEGACY_CHILLER_ENGINE = `window.CONV_CALC = Object.freeze({
 });`;
 const INCOMPLETE_CURRENT_CHILLER_ENGINE = `window.CONV_CALC = Object.freeze({
   snapshot: Object.freeze({
-    meta: Object.freeze({ version: '2.1.0', scenario: 'Simulated' }),
+    meta: Object.freeze({ version: '2.2.0', scenario: 'Simulated' }),
     site: Object.freeze({}),
     cooling: Object.freeze({
       chws_c: 19.4, chwr_c: 27.0, chw_delta_t: 7.6, flow_lps: 943.0,
@@ -97,7 +97,7 @@ const INCOMPLETE_CURRENT_CHILLER_ENGINE = `window.CONV_CALC = Object.freeze({
 });`;
 const MISSING_META_CURRENT_CHILLER_ENGINE = `window.CONV_CALC = Object.freeze({
   snapshot: Object.freeze({
-    meta: Object.freeze({ version: '2.1.0' }),
+    meta: Object.freeze({ version: '2.2.0' }),
     site: Object.freeze({ it_load_kw: 30000, facility_load_kw: 43500, pue: 1.45 }),
     cooling: Object.freeze({
       chws_c: 19.4, chwr_c: 27.0, chw_delta_t: 7.6, flow_lps: 943.0,

@@ -61,14 +61,15 @@ gate "Conventional snapshot binding — no phantom keys, strips follow the engin
 # where it came from, and what moves it. Dependency edges are MEASURED (the engine is recomputed
 # once per authored input) rather than declared, so "everything is wired" is a fact, not a claim.
 gate "Conventional parameter registry — schema, staleness, provenance, measured wiring" node tools/test-conv-parameter-registry.mjs
-# MONITOR (advisory, exit 0 by design): walks the RENDERED DOM of all 8 cockpits and asks of every
-# number a human can read whether any registry parameter accounts for it. The denominator is rendered
-# text, NOT element ids, because ~390 of the ~945 numbers on these pages carry no id at all (chiller
-# P&ID text nodes, ict link-table cells, hand-written KPI cells) — an id-keyed gate would report 100 %
-# while missing two thirds of the screen. Today's honest figure is ~24 %.
-# FLIP TO STRICT (add --strict) once page-level derived displays are registered and the P&ID/table
-# text nodes are bound; a gate that fails from day one gets muted instead of paid down.
-gate "Conventional coverage MONITOR — rendered numbers traced to the registry" node tools/test-conv-coverage.mjs
+# STRICT since v1.134.24 — the flip condition written here when this started at ~24 % has been met:
+# every number rendered on all 8 cockpits either resolves to a registry parameter or sits in a region
+# DECLARED as authored page basis with a written reason. 189 / 189 traced, 831 declared.
+# The denominator is rendered text, NOT element ids, because ~390 of the numbers on these pages carry
+# no id at all (chiller P&ID text nodes, ict link-table cells, hand-written KPI cells) — an id-keyed
+# gate would report 100 % while missing two thirds of the screen.
+# It fails on the FIRST untraced number now, which is the point: reaching 100 % is worth little if the
+# next unbound literal can walk back in unnoticed.
+gate "Conventional coverage — every rendered number traced to the registry" node tools/test-conv-coverage.mjs --strict
 # The shared basis drawer renders the registry rather than restating provenance by hand. This
 # asserts every data-basis-param resolves, the modules actually load, the hooks are keyboard
 # controls, and the drawer's number agrees with the number in the row it explains.

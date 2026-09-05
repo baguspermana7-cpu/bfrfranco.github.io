@@ -42,7 +42,7 @@ const LEGACY_ENGINE = `window.CONV_CALC = Object.freeze({
 
 const INCOMPLETE_CURRENT_ENGINE = `window.CONV_CALC = Object.freeze({
   snapshot: Object.freeze({
-    meta: Object.freeze({ version: '2.1.0', scenario: 'Simulated', data_quality: 'GOOD' }),
+    meta: Object.freeze({ version: '2.2.0', scenario: 'Simulated', data_quality: 'GOOD' }),
     site: Object.freeze({ it_load_kw: 30000, pue: 1.45 }),
     electrical: Object.freeze({ epms_ups_output_kw: 30000 }),
     cooling: Object.freeze({

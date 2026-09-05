@@ -161,6 +161,16 @@
        the calculation: named here so the formula on screen resolves to something, and so
        the engine has no economically-material literal inside a function body. */
     var WATER_CP_KJ_PER_KG_K = 4.186;    // STANDARD — specific heat of water
+    /* v1.134.24 — the tower water balance was split on water-system.html: cycles of
+       concentration and the drift allowance were authored there, so the evaporation and
+       blowdown an operator reads had no parameter to trace to even though both follow
+       from the engine's own makeup flow. The WUE TARGET was worse — a literal 1.30 typed
+       in three places on that page, compared against a computed value, which is exactly
+       the marketing-target-versus-derived-value confusion ACCURACY_VALIDATION Rule 4
+       exists to stop. */
+    var TOWER_CYCLES_OF_CONCENTRATION = 4.0;   // ADOPTED — typical open-tower operation
+    var TOWER_DRIFT_FRACTION = 0.005;          // ADOPTED — 0.5% of makeup, drift eliminators
+    var WUE_TARGET_L_PER_KWH = 1.30;           // ADOPTED — design target, NOT a derived value
     var RETURN_PATH_MIXING_K = 0.0;      // ADOPTED — contained hot aisle, no bypass
     var CHW_COIL_APPROACH_K = 6.0;       // ASSUMED — pending coil selection
     var CHW_DELTA_T_K = 7.6;             // ADOPTED — carried from the prior basis
@@ -657,6 +667,9 @@
             static_pressure_bar: 12.5
         },
         water: {
+            tower_cycles_of_concentration: TOWER_CYCLES_OF_CONCENTRATION,
+            tower_drift_fraction: TOWER_DRIFT_FRACTION,
+            wue_target_l_per_kwh: WUE_TARGET_L_PER_KWH,
             /* Domestic / process draw, EXCLUDED from WUE (WUE counts cooling makeup only).
              * ASSUMED — no metered domestic demand has been supplied. */
             domestic_lpm: 8.0,
@@ -678,7 +691,7 @@
             basis: 'Adopted project scenario — simulated, not measured telemetry',
             basis_doc: 'conv/review/09-engineering-basis-and-calculations.md',
             study_doc: 'js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)',
-            version: '2.1.0'
+            version: '2.2.0'
         }
     };
 
@@ -967,7 +980,27 @@
                    the treated total was computed on the page from it. Both belong here: the
                    treated total is what the treatment train is sized for. */
                 domestic_lpm: m.water.domestic_lpm,
-                total_treated_lpm: round1(waterLpm + m.water.domestic_lpm)
+                total_treated_lpm: round1(waterLpm + m.water.domestic_lpm),
+                /* v1.134.24 — the open-tower balance. Makeup replaces what leaves as drift,
+                   evaporation and blowdown; at C cycles of concentration the blowdown is
+                   (makeup - drift) / C and the evaporation is the rest. Both were split on
+                   water-system.html from constants it kept privately. */
+                tower_cycles_of_concentration: m.water.tower_cycles_of_concentration,
+                tower_drift_fraction: m.water.tower_drift_fraction,
+                drift_lpm: round2(waterLpm * m.water.tower_drift_fraction),
+                blowdown_lpm: round1((waterLpm - waterLpm * m.water.tower_drift_fraction)
+                    / m.water.tower_cycles_of_concentration),
+                evaporation_lpm: round1((waterLpm - waterLpm * m.water.tower_drift_fraction)
+                    * (m.water.tower_cycles_of_concentration - 1) / m.water.tower_cycles_of_concentration),
+                /* The design TARGET, published as a target. It was a literal 1.30 typed three
+                   times on the water cockpit and compared against a computed WUE — the exact
+                   marketing-target-versus-derived-value confusion Rule 4 forbids. */
+                wue_target_l_per_kwh: m.water.wue_target_l_per_kwh,
+                /* WUE evaluated on the WHOLE treated flow rather than cooling makeup alone. The
+                   cockpit shows it beside the reported WUE to make the exclusion visible. */
+                wue_all_treated_l_per_kwh: m.site.it_load_kw
+                    ? round2((waterLpm + m.water.domestic_lpm) * 60 / m.site.it_load_kw)
+                    : null
             },
             racks: {
                 at_6kw: Math.round(activeRacks(m, 6)),

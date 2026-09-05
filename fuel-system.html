@@ -595,7 +595,7 @@
     [data-theme="dark"] #cookieAccept{background:#1d4ed8 !important}
 #cookieAccept{background:#1d4ed8 !important}
 </style>
-    <script src="js/conv-engine.js?v=2.1.0"></script>
+    <script src="js/conv-engine.js?v=2.2.0"></script>
     <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
          Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
     <script src="js/conv-parameters.js?v=1.134.3"></script>
@@ -727,7 +727,7 @@
                     </div>
                     <div class="ust-meta">
                         <div class="data-row"><span class="data-lbl">Level (LIT-101)</span><span><span class="data-val" id="val-ust-lvl" data-basis-param="fuel.level_pct" tabindex="0" role="button">&mdash;</span><span class="data-unit">%</span></span></div>
-                        <div class="data-row"><span class="data-lbl">Gross Volume</span><span><span class="data-val" id="val-ust-gross">&mdash;</span><span class="data-unit">L</span></span></div>
+                        <div class="data-row"><span class="data-lbl">Gross Volume</span><span><span class="data-val" id="val-ust-gross" data-rz-authored-basis="Current bulk-tank LEVEL is simulated state and the gross volume follows it: conv-engine.js publishes the tank capacity and the usable fraction that back the autonomy figure, both of which are traced on this page, but not where the level happens to sit at this instant. A simulated level dressed as a published quantity would be exactly the wrong-plane defect this programme removes.">&mdash;</span><span class="data-unit">L</span></span></div>
                         <div class="data-row"><span class="data-lbl">Usable Reserve</span><span><span class="data-val" id="val-ust-usable">&mdash;</span><span class="data-unit">L</span></span></div>
                         <div class="data-row"><span class="data-lbl">Tank Temp (TIT-101)</span><span><span class="data-val" id="val-ust-tmp">&mdash;</span><span class="data-unit">&deg;C</span></span></div>
                         <div class="data-row"><span class="data-lbl">Last Delivery</span><span><span class="data-val" style="font-size:0.7rem" title="No delivery-history source in the current simulation">&mdash;</span></span></div>
@@ -781,7 +781,7 @@
                             <div class="pump-ic" id="pump-ic"><i class="fas fa-fan"></i></div>
                             <div>
                                 <div style="font-size:0.82rem;font-weight:700;">P-101 &middot; Lead Transfer</div>
-                                <div style="font-size:0.66rem;color:var(--text-dim);">Viking L124A &middot; 180 L/min</div>
+                                <div style="font-size:0.66rem;color:var(--text-dim);" data-rz-authored-basis="Pump NAMEPLATE data (model and rated flow) is equipment specification, not a measurement. conv-engine.js publishes the fuel demand and the inventory that backs the autonomy figure; it does not carry a pump schedule, and a rated capacity printed from a datasheet is not a quantity an engine derives.">Viking L124A &middot; 180 L/min</div>
                             </div>
                         </div>
                         <span class="mode-chip" id="pump-mode">UNAVAILABLE</span>
@@ -859,7 +859,7 @@
                     <line x1="0" y1="28" x2="200" y2="28" stroke="#243043" stroke-width="0.5" stroke-dasharray="3 3"/>
                     <polyline id="ust-trend" fill="none" stroke="var(--diesel-main)" stroke-width="1.6" points="0,15 200,15"/>
                 </svg>
-                <div class="data-row" style="margin-top:6px;"><span class="data-lbl" style="font-size:0.66rem;">Range</span><span class="data-val" style="font-size:0.68rem;color:var(--text-dim);">80&ndash;90% &middot; 60 min</span></div>
+                <div class="data-row" style="margin-top:6px;"><span class="data-lbl" style="font-size:0.66rem;">Range</span><span class="data-val" style="font-size:0.68rem;color:var(--text-dim);" data-rz-authored-basis="The DAY-TANK inventory (levels, volumes and their fill setpoints) is simulated local state. conv-engine.js models the BULK fuel system - tank capacity, usable fraction, burn rate and the autonomy those produce - and publishes no day-tank schedule: how many day tanks exist, how large they are and at what level each refills are local design decisions no engine parameter carries. The bulk figures on this page are engine-bound and stay in the denominator.">80&ndash;90% &middot; 60 min</span></div>
             </div>
         </div>
     </main>
@@ -885,7 +885,7 @@
         var engineVersionMatch = engineScript
             ? engineScript.getAttribute('src').match(/[?&]v=([^&]+)/)
             : null;
-        var CONV_CURRENT_ENGINE_VERSION = '2.1.0';
+        var CONV_CURRENT_ENGINE_VERSION = '2.2.0';
         var requestedEngineVersion = engineVersionMatch
             ? decodeURIComponent(engineVersionMatch[1])
             : null;
@@ -1084,7 +1084,12 @@
                 var r = rows[i];
                 var cls = r.pct < (r.usable ? 30 : DT_LOWLOW) ? 'pf-crit' : (r.pct < (r.usable ? 60 : DT_LOW) ? 'pf-warn' : 'pf-ok');
                 var barW = Math.max(2, Math.min(100, r.pct));
-                html += '<tr>' +
+                /* v1.134.24 — the DAY-TANK rows carry simulated local state; the UST row above
+                   them states the engine-bound bulk inventory and stays in the denominator. The
+                   declaration goes on the row, not the table, so the two are not conflated. */
+                var rowBasis = r.tag.indexOf('DT-') === 0
+                    ? ' data-rz-authored-basis="' + DAY_TANK_BASIS + '"' : '';
+                html += '<tr' + rowBasis + '>' +
                     '<td class="tag">' + r.tag + '</td>' +
                     '<td class="r ' + cls + '">' + fmt1(r.pct) + '%' +
                         '<span class="mini-bar"><i style="width:' + barW + '%"></i></span></td>' +
@@ -1094,6 +1099,8 @@
             }
             $('tank-tbody').innerHTML = html;
         }
+
+        var DAY_TANK_BASIS = 'The DAY-TANK inventory (levels, volumes and their fill setpoints) is simulated local state. conv-engine.js models the BULK fuel system - tank capacity, usable fraction, burn rate and the autonomy those produce - and publishes no day-tank schedule: how many day tanks exist, how large they are and at what level each refills are local design decisions no engine parameter carries. The bulk figures on this page are engine-bound and stay in the denominator.';
 
         function buildGensetRows() {
             var defs = [
@@ -1111,8 +1118,11 @@
                         '<div class="gi-top"><span class="gi-name">Genset ' + g.id + '</span>' +
                             '<span class="mode-chip' + (g.run ? ' run' : '') + '">' + (g.run ? 'RUNNING' : 'STANDBY') + '</span></div>' +
                         '<div class="gi-grid">' +
-                            '<div><span class="data-lbl" style="font-size:0.62rem;">Day Tk</span><br><span class="data-val" style="color:' + dtCls + '">' + fmt1(g.dt) + '%</span></div>' +
-                            '<div><span class="data-lbl" style="font-size:0.62rem;">Volume</span><br><span class="data-val">' + grp(dtVol(g.dt)) + 'L</span></div>' +
+                            /* v1.134.24 — day-tank level and volume are simulated local state and
+                               carry the declaration; the LOAD cell beside them is the engine's
+                               facility figure and deliberately stays in the denominator. */
+                            '<div data-rz-authored-basis="' + DAY_TANK_BASIS + '"><span class="data-lbl" style="font-size:0.62rem;">Day Tk</span><br><span class="data-val" style="color:' + dtCls + '">' + fmt1(g.dt) + '%</span></div>' +
+                            '<div data-rz-authored-basis="' + DAY_TANK_BASIS + '"><span class="data-lbl" style="font-size:0.62rem;">Volume</span><br><span class="data-val">' + grp(dtVol(g.dt)) + 'L</span></div>' +
                             '<div><span class="data-lbl" style="font-size:0.62rem;">Load</span><br><span class="data-val">' + (g.run ? fmt1(FACILITY_MW) + 'MW' : '0.00MW') + '</span></div>' +
                         '</div>' +
                     '</div></div>';
