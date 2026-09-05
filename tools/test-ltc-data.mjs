@@ -81,22 +81,73 @@ function ok(name, cond, detail) {
 
 /* ══════════════════════════════════════════════════════════
  * 2. DATA.cduVendors — CDU vendor specs
- * Bounds: capacity 50–600 kW; flow 50–800 Lpm; dP 0.3–3.0 bar;
- *         lead 8–50 wk; cost 200–1000 $/kW
- * Source: CoolIT/Asetek/Vertiv/Boyd datasheets 2024-25
+ *
+ * These assertions changed shape in v1.135.1, and the reason matters more than
+ * the new bounds. The old gate checked capacity in [50, 600] kW, flow in
+ * [50, 800] Lpm, dP in [0.3, 3.0] bar, lead in [8, 50] wk and cost in
+ * [200, 1000] $/kW — and every one of those bands passed, because the data it
+ * was checking had been invented to sit inside them. A band gate cannot tell a
+ * sourced number from a plausible one; it only rejects the implausible.
+ *
+ * So the gate now checks PROVENANCE, not plausibility: every entry names a real
+ * product, carries the vendor URL that capacity came from, and declares an
+ * evidence class per numeric field. A field the vendor does not publish must be
+ * null — a stand-in that merely looks reasonable is exactly the failure this
+ * replaces. Bands are kept only as a sanity floor, widened to the real market
+ * (a 2 MW in-row CDU is a shipping product; the old ceiling said otherwise).
  * ══════════════════════════════════════════════════════════ */
 {
     ok('cduVendors present', D.cduVendors != null && typeof D.cduVendors === 'object');
     const vendors = Object.entries(D.cduVendors);
     ok('cduVendors: ≥5 entries', vendors.length >= 5, String(vendors.length));
 
+    const EVIDENCE = new Set(['PUBLISHED', 'DERIVED', 'ESTIMATE', 'UNAVAILABLE']);
+
     for (const [key, v] of vendors) {
-        ok(`cduVendors.${key}: capacityKw in [50, 600]`, v.capacityKw >= 50 && v.capacityKw <= 600, v.capacityKw);
-        ok(`cduVendors.${key}: flowLpm in [50, 800]`, v.flowLpm >= 50 && v.flowLpm <= 800, v.flowLpm);
-        ok(`cduVendors.${key}: dpBar in [0.3, 3.0]`, v.dpBar >= 0.3 && v.dpBar <= 3.0, v.dpBar);
-        ok(`cduVendors.${key}: leadWeeks in [8, 50]`, v.leadWeeks >= 8 && v.leadWeeks <= 50, v.leadWeeks);
-        ok(`cduVendors.${key}: costUsdPerKw in [200, 1000]`, v.costUsdPerKw >= 200 && v.costUsdPerKw <= 1000, v.costUsdPerKw);
         ok(`cduVendors.${key}: vendor string`, typeof v.vendor === 'string' && v.vendor.length > 0);
+        ok(`cduVendors.${key}: model string`, typeof v.model === 'string' && v.model.length > 0);
+
+        /* Provenance — a capacity with no URL behind it is an assertion, not data. */
+        ok(`cduVendors.${key}: url is a vendor https URL`,
+            typeof v.url === 'string' && /^https:\/\//.test(v.url), v.url);
+        ok(`cduVendors.${key}: evidence map present`,
+            v.evidence != null && typeof v.evidence === 'object');
+        ok(`cduVendors.${key}: capacity evidence PUBLISHED`,
+            v.evidence && v.evidence.capacityKw === 'PUBLISHED', v.evidence && v.evidence.capacityKw);
+        for (const [field, cls] of Object.entries(v.evidence || {})) {
+            ok(`cduVendors.${key}.${field}: evidence class known`, EVIDENCE.has(cls), cls);
+        }
+
+        /* A number the vendor does not publish must be absent, never approximated. */
+        for (const field of ['flowLpm', 'dpBar']) {
+            const cls = v.evidence && v.evidence[field];
+            if (cls === 'UNAVAILABLE') {
+                ok(`cduVendors.${key}.${field}: UNAVAILABLE means null`, v[field] === null, String(v[field]));
+            } else if (v[field] != null) {
+                ok(`cduVendors.${key}.${field}: a value carries an evidence class`, EVIDENCE.has(cls), String(cls));
+            }
+        }
+
+        /* Lead time and installed cost are market conditions, not product properties.
+           They belong to DATA.leadTimes, which has its own source; carrying them here
+           is how six per-model figures got invented in the first place. */
+        ok(`cduVendors.${key}: no per-model leadWeeks`, v.leadWeeks === undefined, String(v.leadWeeks));
+        ok(`cduVendors.${key}: no per-model costUsdPerKw`, v.costUsdPerKw === undefined, String(v.costUsdPerKw));
+
+        /* Sanity floor only — the real market runs 30 kW liquid-to-air to 2.5 MW in-row. */
+        ok(`cduVendors.${key}: capacityKw in [30, 3000]`,
+            v.capacityKw >= 30 && v.capacityKw <= 3000, v.capacityKw);
+        if (v.flowLpm != null) {
+            ok(`cduVendors.${key}: flowLpm in [20, 5000]`, v.flowLpm >= 20 && v.flowLpm <= 5000, v.flowLpm);
+        }
+    }
+
+    /* The correction is only complete if the invented products are gone. */
+    const banned = ['RACK CDU 200kW', 'InfraRed CDU 300kW', 'EcoBreeze CDU 180kW',
+                    'iCDU 120kW', 'Liebert XDU 150kW', 'RackCDU D2C 250kW'];
+    const models = vendors.map(([, v]) => v.model).join(' | ');
+    for (const b of banned) {
+        ok(`cduVendors: retired invented model "${b}"`, !models.includes(b));
     }
 }
 

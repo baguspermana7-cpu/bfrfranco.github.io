@@ -9263,23 +9263,106 @@
             'ltcCalibration.validationBands': { source: 'Model-validation benchmark bands: PUE band = DATA.pueMatrix.liquid tier4–tier2 (Uptime Institute survey 2026), fleet reference DATA.benchmarksCorpus.pue.hyperscale p10/p50; WUE envelope = DATA.water.wueByType immersion…rear-door (ASHRAE screening); ΔT / supply-temp / flow-intensity = DATA.cdu.bands (ASHRAE TC9.9 W-classes + OCP cold-plate); pump-fraction ≤3% IT = OCP cold-plate hydraulic guidance (mirrors lab conPumpPctMax default). Consumed by models.ltc.validation() — drift is reported, bands never silently loosened.', asOf: '2026', unit: 'per-metric lo/hi + anchor citation', method: 'model-calibration report (MODEL_CALIBRATION_STANDARD)' },
             /* ── W3 provenance entries ── */
             'coolants.extended':    { source: 'W3-D1 coolant extension: pg40 + dielectric_1p/2p added. pg40: ASHRAE HoF 2021 ch.31 propylene glycol tables (cp 3.58 kJ/kg·K, rho 1050 kg/m³, freeze −23 °C). dielectric_1p: OCP Immersion Fluid Base Specification Rev 2022 (cp ~1.5 kJ/kg·K, rho 1600 kg/m³, viscosity ~3.5 mPa·s). dielectric_2p: OCP Immersion Fluid Base Spec (fluorocarbon class, boiling 49-60 °C, cp ~1.1 kJ/kg·K). viscosityMpas + thermalCondWmk added to all entries from /data/cdu/coolant-properties-extended.csv (IAPWS-IF97 for water; ASHRAE HoF 2021 for PG; OCP spec for dielectrics).', asOf: '2025', unit: 'kJ/kg·K (cp), kg/m³ (rho), mPa·s (viscosity), W/m·K (k)', method: 'STANDARD thermophysical properties; curated CSV /data/cdu/coolant-properties-extended.csv' },
-            'cduVendors':           { source: 'W3-D1 CDU vendor specs — vendor datasheets 2024-25: CoolIT Systems RACK CDU datasheet (200 kW, 340 Lpm); Asetek RackCDU D2C product page 2025 (250 kW); Vertiv Liebert XDU specification 2025 (150 kW, 265 Lpm); Boyd Technologies thermal datasheet 2024 (300 kW); Airedale product range 2025 (120 kW); Schneider Electric data center cooling portfolio 2025 (180 kW). costUsdPerKw = budgetary installed estimate. Curated /data/cdu/cdu-vendor-specs.csv.', asOf: '2025', unit: 'kW (capacity), Lpm (flow), bar (dP), weeks (lead), USD/kW (budgetary cost)', method: 'SCREENING — vendor published capability; verify with current quote for project procurement' },
+            'cduVendors':           { source: 'W3-D1 CDU vendor specs — PUBLISHED vendor product pages, verified 2026-09-06: CoolIT CHx200 (coolitsystems.com/product/chx200-cdu) and CHx1000 (coolitsystems.com/product/chx1000, 1000 kW @ 3 °C approach, 1.5 LPM/kW); Vertiv CoolChip CDU 70 / 600 / 1350 (vertiv.com CoolChip CDU catalogue, 70 kW @ 11 °C ΔT liquid-to-air, 600 and 1350 kW @ 4 °C ΔT); Boyd 4U CDU technical datasheet (80 kW typical) and ROL4000 announcement (2 MW @ 3 °C approach); Airedale by Modine CDU range page (1 MW at ASHRAE W2/W3; skid range 400 kW–2 MW); Motivair by Schneider Electric MCDU-70 (se.com press release, family 105 kW–2.5 MW). CORRECTION v1.135.1: the six products previously listed here do not exist — CoolIT \"RACK CDU 200kW\", Boyd \"InfraRed CDU 300kW\", Schneider \"EcoBreeze CDU 180kW\", Airedale \"iCDU 120kW\", Vertiv \"Liebert XDU 150kW\" and an Asetek RackCDU entry cited to a 2025 product page for what Asetek files as heritage technology; their flow, dP, lead-time and $/kW figures were invented. Lead time is not a product property and is not carried here — see DATA.leadTimes.cdu_*. Installed $/kW is not published by these vendors and is absent rather than estimated. Curated /data/cdu/cdu-vendor-specs.csv.', asOf: '2026-09', unit: 'kW (capacity), K (approach), Lpm (secondary flow where derived), m³/h (air flow, liquid-to-air only)', method: 'PUBLISHED capacity from the vendor product page named in each entry.url; any figure the vendor does not publish is null with evidence UNAVAILABLE. Verify with a current quote for procurement.' },
             'refrigerants.extended':{ source: 'W3-D2 refrigerant extension: R744 + Novec7000 added; priceUsdPerKg + pfas flag added to all 11 entries. R744 (CO2): IIR Informatory Note; transcritical high-pressure cycle. Novec7000: 3M Technical Data Sheet (GWP 530, boiling 34 °C, HoV 142 kJ/kg); PFAS flag per EU PFAS restriction proposal 2023 (3M announced PFAS production exit by end-2025). Prices: 2025 market spot/contract (Chemours/Honeywell/3M trade publications + distributor surveys). ASHRAE 34 safety class per ASHRAE Standard 34-2022. Curated /data/refrigerants.csv.', asOf: '2025', unit: 'GWP (IPCC AR4), ASHRAE 34 safety, $/kg (market price 2025), boolean (PFAS scope)', method: 'AUTHORITATIVE for GWP/safety; MARKET-SCREENING for price (spot ± 20%); PFAS scope per EU proposal (not yet final)' },
             'electricityTariffs':   { source: 'W3-D3 electricity tariffs — industrial/DC blended $/kWh per country: US EIA Electric Power Monthly Table 5.6 (7.9¢/kWh 2024); Eurostat Electricity Price Statistics 2024 H2 (DE/NL/IE/GB/FR); EMA Singapore 2024 non-residential; PLN Indonesia industrial B3 tariff 2024; TNB Malaysia Tariff D 2024; IEA 2024 (IN/AU); Japan METI large industrial 2024. Grid carbon: Ember 2024/2025 country-level grid intensity. ToU bands: utility ToU tariff schedules (indicative). Cross-checked vs DATA.countries[id].economy.electricityRate (same source tier; this table adds ToU+carbon, does not diverge from countries rate). Curated /data/energy/electricity-tariffs.csv.', asOf: '2025', unit: '$/kWh (rate + ToU bands), kgCO2/kWh (grid carbon)', method: 'PUBLISHED tariff schedules; exclude recoverable VAT; blended rate for large industrial — site-specific PPA may differ significantly' },
             'waterTariffs':         { source: 'W3-D3 water tariffs — industrial/municipal $/m³ per country: Circle of Blue Water Pricing Survey 2024 (US 1.50); Eurostat water supply prices 2023 (DE/NL/FR); Irish Water non-domestic schedule 2024 (IE); PUB Singapore 2024 non-domestic waterborne fee (SG 2.70); BPS/PDAM Jakarta 2024 (ID 0.35); Malaysia National Water Services Commission Selangor industrial 2024 (MY 0.18); UN FAO AQUASTAT India (IN 0.15); Japan MLIT 2024 (JP 1.30); Water Services Association of Australia 2024 (AU 1.85); Ofwat England & Wales non-household 2024 (GB 2.20); Brazil ANA 2024 (BR 0.40); South Africa DWS 2024 (ZA 0.80). Scarcity: WRI Aqueduct 4.0 2023 overall water risk 0-5. Curated /data/water/water-tariffs.csv.', asOf: '2025', unit: '$/m³ (industrial/municipal tariff), WRI Aqueduct 4.0 index (0-5)', method: 'PUBLISHED utility tariff schedules; industrial tier where published; reclaimed/well water not included' },
             'leadTimes':            { source: 'W3-D4 equipment lead times — 2025 supply-constrained market observation: CDU (Vertiv supply chain update 2025; CoolIT APAC 2025); UPS (Schneider Electric Galaxy VX lead-time advisory 2025; Vertiv EMEA 2025); Genset (Caterpillar 2025 dealer updates; MTU Emergency Power EMEA 2025); Chiller (Trane commercial lead-time advisory 2025; Carrier EMEA; York APAC); MV Transformer (PJM Dominion DC Load Forecast documentation 2025 citing 52-72 wk MV transformer lead; Siemens Energy 2025; Hitachi Energy APAC 2025). Curated /data/supply/lead-times.csv.', asOf: '2025', unit: 'weeks (lead time typical + stressed)', method: 'SCREENING — 2025 supply-chain snapshot; verify with current vendor for project procurement; transformer lead is the dominant critical path' }
         },
 
-        /* ══ W3-D1: DATA.cduVendors — CDU vendor specs database.
-         * capacity_kw / flow_lpm / dp_bar / leadWeeks / costUsdPerKw from vendor datasheets 2024-25.
-         * Curated in /data/cdu/cdu-vendor-specs.csv. Screening-grade; verify with current vendor quote. ══ */
+        /* ══ W3-D1: DATA.cduVendors — CDU vendor specs, PUBLISHED products only.
+         *
+         * CORRECTION (v1.135.1). The previous table listed six products that do not exist:
+         * "CoolIT RACK CDU 200kW" (CoolIT ships the CHx line; RackCDU is Asetek's mark),
+         * "Boyd InfraRed CDU 300kW" (Boyd ships 4U/10U CDUs and the ROL4000),
+         * "Schneider EcoBreeze CDU 180kW" (EcoBreeze is an indirect-evaporative AHU, not a CDU),
+         * "Airedale iCDU 120kW" and "Vertiv Liebert XDU 150kW" (no such models), plus an Asetek
+         * RackCDU entry sourced to a "2025 product page" that Asetek itself files under heritage
+         * technology. Every flow, dP, lead-time and $/kW figure attached to them was invented, and
+         * the CSV `quote` column held paraphrases written as if lifted from a datasheet.
+         *
+         * The rule now: `capacityKw` and `model` are PUBLISHED and carry the vendor URL they came
+         * from. A number the vendor does not publish is `null` with evidence UNAVAILABLE — never a
+         * plausible-looking stand-in. `flowLpm` is only present where the vendor publishes a flow
+         * or a LPM/kW rule for that model, and then it is DERIVED and says so.
+         *
+         * Lead time is NOT carried per model — it is a market condition, not a product property.
+         * Use DATA.leadTimes.cdu_{americas,emea,apac}, which has its own sourced entry.
+         * Installed $/kW is not published by any of these vendors and is therefore absent.
+         * Curated in /data/cdu/cdu-vendor-specs.csv. ══ */
         cduVendors: {
-            coolit_rack200:   { vendor: 'CoolIT Systems',    model: 'RACK CDU 200kW',     capacityKw: 200, flowLpm: 340, dpBar: 1.2, leadWeeks: 20, costUsdPerKw: 350, coolant: 'water/PG', note: 'CoolIT RACK CDU; shipping in GB200 NVL72 deployments; CoolIT datasheet 2024' },
-            asetek_d2c250:    { vendor: 'Asetek',            model: 'RackCDU D2C 250kW',  capacityKw: 250, flowLpm: 380, dpBar: 1.0, leadWeeks: 18, costUsdPerKw: 380, coolant: 'water/PG', note: 'Asetek RackCDU D2C 250 kW; direct-to-chip; Asetek product page 2025' },
-            vertiv_xdu150:    { vendor: 'Vertiv',            model: 'Liebert XDU 150kW',  capacityKw: 150, flowLpm: 265, dpBar: 0.9, leadWeeks: 16, costUsdPerKw: 420, coolant: 'water/PG', note: 'Vertiv Liebert XDU 150 kW; product spec 2025' },
-            boyd_infrared300: { vendor: 'Boyd Technologies', model: 'InfraRed CDU 300kW', capacityKw: 300, flowLpm: 450, dpBar: 1.1, leadWeeks: 24, costUsdPerKw: 320, coolant: 'water/PG', note: 'Boyd CDU 300 kW for high-density AI; Boyd datasheet 2024' },
-            airedale_icdu120: { vendor: 'Airedale',          model: 'iCDU 120kW',         capacityKw: 120, flowLpm: 200, dpBar: 0.8, leadWeeks: 14, costUsdPerKw: 460, coolant: 'water/PG', note: 'Airedale iCDU 120 kW; 2025 product range' },
-            se_ecobreeze180:  { vendor: 'Schneider Electric', model: 'EcoBreeze CDU 180kW', capacityKw: 180, flowLpm: 300, dpBar: 1.0, leadWeeks: 18, costUsdPerKw: 390, coolant: 'water/PG', note: 'Schneider Electric CDU 180 kW; portfolio 2025' }
+            coolit_chx200: {
+                vendor: 'CoolIT Systems', model: 'CHx200', capacityKw: 200, approachK: null,
+                coolingType: 'liquid-to-liquid', formFactor: '4U rack-mount', coolant: 'water/PG',
+                flowLpm: null, dpBar: null,
+                url: 'https://www.coolitsystems.com/product/chx200-cdu/',
+                evidence: { capacityKw: 'PUBLISHED', flowLpm: 'UNAVAILABLE', dpBar: 'UNAVAILABLE' },
+                note: 'CoolIT CHx200 — 200 kW in a 4U chassis; rated for ASHRAE W17 to W+ warm water. Flow and dP are not on the public product page.'
+            },
+            coolit_chx1000: {
+                vendor: 'CoolIT Systems', model: 'CHx1000', capacityKw: 1000, approachK: 3,
+                coolingType: 'liquid-to-liquid', formFactor: 'single-rack footprint', coolant: 'water/PG',
+                flowLpm: 1500, dpBar: null,
+                url: 'https://www.coolitsystems.com/product/chx1000/',
+                evidence: { capacityKw: 'PUBLISHED', flowLpm: 'DERIVED', dpBar: 'UNAVAILABLE' },
+                note: 'CoolIT CHx1000 — 1000 kW at a 3 °C approach. flowLpm is DERIVED as 1000 kW × the 1.5 LPM/kW CoolIT publishes for this model at that approach, not a separately published flow.'
+            },
+            vertiv_coolchip70: {
+                vendor: 'Vertiv', model: 'CoolChip CDU 70', capacityKw: 70, approachK: null,
+                coolingType: 'liquid-to-air', formFactor: 'in-rack', coolant: 'water/PG',
+                flowLpm: null, dpBar: null, airFlowM3h: 10100,
+                url: 'https://www.vertiv.com/en-us/products-catalog/thermal-management/high-density-solutions/vertiv-coolchip-cdu/',
+                evidence: { capacityKw: 'PUBLISHED', airFlowM3h: 'PUBLISHED', flowLpm: 'UNAVAILABLE', dpBar: 'UNAVAILABLE' },
+                note: 'Vertiv CoolChip CDU 70 — 70 kW at 11 °C ΔT, liquid-to-AIR (rejects to room air, no facility water). 10,100 m³/h air. The only self-contained option in this table.'
+            },
+            vertiv_coolchip600: {
+                vendor: 'Vertiv', model: 'CoolChip CDU 600 (Liebert XDU600)', capacityKw: 600, approachK: null,
+                coolingType: 'liquid-to-liquid', formFactor: 'floor-standing', coolant: 'water/PG',
+                flowLpm: null, dpBar: null,
+                url: 'https://www.vertiv.com/en-us/products-catalog/thermal-management/high-density-solutions/vertiv-coolchip-cdu/',
+                evidence: { capacityKw: 'PUBLISHED', flowLpm: 'UNAVAILABLE', dpBar: 'UNAVAILABLE' },
+                note: 'Vertiv CoolChip CDU 600 — 600 kW at 4 °C ΔT. CoolChip is the current name of the Liebert XDU family.'
+            },
+            vertiv_coolchip1350: {
+                vendor: 'Vertiv', model: 'CoolChip CDU 1350 (Liebert XDU1350)', capacityKw: 1350, approachK: null,
+                coolingType: 'liquid-to-liquid', formFactor: 'floor-standing', coolant: 'water/PG',
+                flowLpm: null, dpBar: null,
+                url: 'https://www.vertiv.com/en-us/products-catalog/thermal-management/high-density-solutions/vertiv-coolchip-cdu/',
+                evidence: { capacityKw: 'PUBLISHED', flowLpm: 'UNAVAILABLE', dpBar: 'UNAVAILABLE' },
+                note: 'Vertiv CoolChip CDU 1350 — 1,350 kW at 4 °C ΔT; widely deployed in large AI/HPC halls.'
+            },
+            boyd_4u: {
+                vendor: 'Boyd', model: '4U CDU', capacityKw: 80, approachK: null,
+                coolingType: 'liquid-to-liquid', formFactor: '4U rack-mount', coolant: 'water/PG',
+                flowLpm: null, dpBar: null,
+                url: 'https://info.boydcorp.com/hubfs/Thermal/Liquid-Cooling/Boyd-4U-Cooling-Distribution-Unit-CDU.pdf',
+                evidence: { capacityKw: 'PUBLISHED', flowLpm: 'UNAVAILABLE', dpBar: 'UNAVAILABLE' },
+                note: 'Boyd 4U liquid-to-liquid CDU — typical capacity 80 kW, N+1 pumps and PSUs. Boyd also publishes a 10U liquid-to-air unit at over 30 kW for sites with no facility water.'
+            },
+            boyd_rol4000: {
+                vendor: 'Boyd', model: 'ROL4000', capacityKw: 2000, approachK: 3,
+                coolingType: 'liquid-to-liquid', formFactor: 'in-row', coolant: 'water/PG',
+                flowLpm: null, dpBar: null,
+                url: 'https://www.boydcorp.com/about-boyd/resources/news-and-events/boyd-2mw-cdu-for-liquid-cooled-ai-data-centers-rol4000.html',
+                evidence: { capacityKw: 'PUBLISHED', flowLpm: 'UNAVAILABLE', dpBar: 'UNAVAILABLE' },
+                note: 'Boyd ROL4000 — 2 MW at a 3 °C approach, in-row, following the open Project Deschutes 5th-gen CDU design.'
+            },
+            airedale_cdu1000: {
+                vendor: 'Airedale by Modine', model: 'CDU (1 MW)', capacityKw: 1000, approachK: null,
+                coolingType: 'liquid-to-liquid', formFactor: 'floor-standing', coolant: 'water/PG',
+                flowLpm: null, dpBar: null,
+                url: 'https://www.airedale.com/data-centers/liquid-cooling/cdu/',
+                evidence: { capacityKw: 'PUBLISHED', flowLpm: 'UNAVAILABLE', dpBar: 'UNAVAILABLE' },
+                note: 'Airedale by Modine CDU — 1 MW at ASHRAE W2/W3 facility water; secondary loop supply up to 30 °C, primary up to 26 °C. A skid-based range spans 400 kW to 2 MW+.'
+            },
+            motivair_mcdu: {
+                vendor: 'Motivair by Schneider Electric', model: 'MCDU-70', capacityKw: 2500, approachK: null,
+                coolingType: 'liquid-to-liquid', formFactor: 'floor-standing', coolant: 'water/PG',
+                flowLpm: null, dpBar: null,
+                url: 'https://www.se.com/ww/en/about-us/newsroom/news/press-releases/schneider-electric-unveils-liquid-cooling-portfolio-with-motivair-featuring-dedicated-solutions-and-services-for-hpc-and-ai-workloads-68d69e595c9dbb622505caf3/',
+                evidence: { capacityKw: 'PUBLISHED', flowLpm: 'UNAVAILABLE', dpBar: 'UNAVAILABLE' },
+                note: 'Motivair MCDU-70 — top of a family Schneider publishes as 105 kW to 2.5 MW, multiple units scaling past 10 MW. This is Schneider\'s CDU line; EcoBreeze is an indirect-evaporative AHU and has never been one.'
+            }
         },
 
         /* ══ W3-D3: DATA.electricityTariffs — per-country electricity cost + grid-carbon.
@@ -15227,7 +15310,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-07-26-h"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-09-06-cdu"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string

@@ -11,6 +11,66 @@ release sections rather than semver.
 
 ---
 
+## v1.135.1 — 2026-09-06
+
+### Fixed — six CDU products in the engine did not exist
+
+`DATA.cduVendors` shipped as a "CDU vendor specs database" sourced to *"vendor datasheets 2024-25"*,
+and `data/cdu/cdu-vendor-specs.csv` carried a `quote` column holding text written as if lifted from
+those datasheets. Checked against the vendors' own published product pages:
+
+| shipped as | what the vendor actually publishes |
+|---|---|
+| CoolIT Systems "RACK CDU 200kW" | CoolIT ships the **CHx** line — CHx200 / CHx750 / CHx1000 / CHx1500 / CHx2000. *RackCDU* is Asetek's mark, not CoolIT's. |
+| Boyd Technologies "InfraRed CDU 300kW" | Boyd publishes a **4U** liquid-to-liquid CDU (80 kW typical), a **10U** liquid-to-air unit (>30 kW), and the **ROL4000** at 2 MW. There is no InfraRed CDU. |
+| Schneider Electric "EcoBreeze CDU 180kW" | **EcoBreeze is an indirect-evaporative air handler**, not a CDU. Schneider's CDU line is **Motivair**, 105 kW to 2.5 MW. |
+| Airedale "iCDU 120kW" | Airedale by Modine publishes a **1 MW** CDU and a skid range of **400 kW – 2 MW+**. No iCDU. |
+| Vertiv "Liebert XDU 150kW" | The family is real; the model is not. Published: CoolChip CDU **70 / 121 / 450 / 600 / 1350 / 2300**. |
+| Asetek "RackCDU D2C 250kW", cited to a *2025 product page* | Asetek files RackCDU under **heritage technology**. |
+
+Every `flow_lpm`, `dp_bar`, `lead_weeks` and `cost_usd_per_kw` attached to those six was invented,
+and the six capacities sat neatly inside the gate's own `[50, 600] kW` band — which is why the gate
+passed. **A band gate cannot tell a sourced number from a plausible one.** It only rejects the
+implausible, and fabricated data is plausible by construction.
+
+Replaced with nine products verified against the vendor pages named in each entry's `url`, and the
+rule inverted: `capacityKw` and `model` are PUBLISHED and carry that URL; anything the vendor does
+not publish is **`null` with evidence `UNAVAILABLE`**, never a stand-in. One flow figure survives —
+CHx1000 at 1,500 Lpm — declared `DERIVED`, because CoolIT publishes 1.5 LPM/kW at a 3 °C approach
+for that model and 1000 × 1.5 is arithmetic, not a datasheet reading.
+
+Removed from the table entirely: per-model **lead time** and **installed $/kW**. Neither is a
+product property — lead time is a market condition and already has a sourced home in
+`DATA.leadTimes.cdu_{americas,emea,apac}`; installed cost is published by none of these vendors, so
+it is absent rather than estimated. Carrying them per model is how six fictional figures got a place
+to live.
+
+### Changed — the gate now checks provenance, not plausibility
+
+`tools/test-ltc-data.mjs` §2 no longer asserts five numeric bands. It asserts that every entry names
+a real product, carries an `https://` vendor URL, declares an evidence class per numeric field, and
+holds `null` wherever that class is `UNAVAILABLE`. It also asserts the six invented model strings
+are **gone**, so the correction cannot silently regress. Bands are kept only as a sanity floor and
+widened to the real market — 30 kW liquid-to-air to 2.5 MW in-row; the old 600 kW ceiling would
+reject a shipping product.
+
+499 assertions green.
+
+### Fixed — `rz-engine.min.js` was requested under three different cache tokens
+
+58 pages asked for `?v=2026-09-05-mint`, 6 for `?v=2026-08-01-opexfix`, 2 for `?v=2026-07-26-h`. One
+asset in three cache entries means a corrected engine reaches a page only if that page's particular
+token happens to move — the same class as the stale-min-twin bug, one layer up. Normalised to a
+single `?v=2026-09-06-cdu` across all 66 references.
+
+Auto-link chain re-run: `build-engine-catalog.mjs` (53 namespaces, 235 functions, 162 sources),
+`test-value-bindings.mjs` 85/85, `test-rz-engine.mjs` 763/763, `audit-min-twins.mjs` green.
+
+Standards: `standarization/SUPER_ENGINE.md` §Z (every DATA value carries a source),
+`standarization/ACCURACY_VALIDATION.md` (evidence taxonomy).
+
+---
+
 ## v1.135.0 — 2026-09-06
 
 ### The anti-slop gate was never a gate
