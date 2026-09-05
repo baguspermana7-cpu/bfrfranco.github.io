@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v1.134.16 — 2026-09-05 (The changelog build stamped the wall clock, so its own staleness gate fired on the calendar)
+
+`tools/build-changelog-html.py` wrote `dateModified` from `datetime.now()`. The generated
+`changelog.html` therefore changed every calendar day even when the changelog itself had not,
+and the harness gate — which rebuilds the file and compares it to the committed one — failed
+with a one-line diff that had nothing to do with the content. Taking over the tree today
+reproduced it immediately: a build from 2026-08-30 against a check run on 2026-09-05.
+
+**An alarm that means nothing trains people to regenerate-and-commit without reading**, which
+is precisely how a real drift would get waved through. The stamp is the LATEST RELEASE date
+now — which is what `dateModified` means for a release log — so the artifact is reproducible
+and the gate only fires on genuine drift. Verified by building twice and comparing hashes.
+
 ## v1.134.15 — 2026-08-30 (Truthful first paint and compact operator shell)
 
 Owner direction: *“continue improve more.”*

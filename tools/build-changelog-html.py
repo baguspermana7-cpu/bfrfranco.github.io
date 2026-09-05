@@ -353,7 +353,14 @@ def build_html(entries):
     latest     = anchored_entries[0]['version'] if anchored_entries else '1.x.x'
     count      = len(anchored_entries)
     cards      = '\n'.join(render_entry(e, is_current=(i == 0)) for i, e in enumerate(anchored_entries))
-    today      = datetime.now().strftime('%Y-%m-%d')
+    # v1.134.16 — `dateModified` used to be the wall clock, which made this generated file
+    # change every calendar day. The staleness gate compares a fresh build against the
+    # committed one, so a build run on a later day failed the gate with a one-line diff that
+    # had nothing to do with the changelog's content — an alarm that means nothing trains
+    # people to regenerate-and-commit without reading. Stamp the LATEST RELEASE date instead:
+    # it is what `dateModified` actually means for a release log, and it makes the artifact
+    # reproducible, so the gate only fires on real drift.
+    today      = anchored_entries[0]['date'] if anchored_entries else datetime.now().strftime('%Y-%m-%d')
     filter_js  = FILTER_JS
 
     # JSON-LD structured data
