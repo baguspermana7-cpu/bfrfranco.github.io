@@ -176,8 +176,13 @@
         @keyframes rotateImp { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
         .liquid-anim { transition: height .8s linear, y .8s linear; }
-        .valve-label { fill: var(--text-faint); font-size: 8px; font-weight: bold; }
-        .eq-tag { fill: var(--text-dim); font-size: 9px; font-weight: 700; }
+        /* v1.134.18 — 8px authored lands at exactly 9.0 px on screen at this drawing's scale, the
+       floor below which a label stops being readable. Valve tags identify the device an
+       operator is about to act on; 10px clears it with margin. */
+        .valve-label { fill: var(--text-faint); font-size: 10px; font-weight: bold; }
+        /* v1.134.18 — 9px authored rendered at 7px once the mimic was scaled down. Equipment tags
+       name the thing an operator is looking at; they hold at 11px. */
+        .eq-tag { fill: var(--text-dim); font-size: 11px; font-weight: 700; }
         .eq-name { fill: #cbd5e1; font-size: 10px; font-weight: 700; }
 
         /* ===== Control buttons ===== */
@@ -270,7 +275,11 @@
         .fire-scope-card small { display: block; margin-top: 2px; color: var(--text-faint); font-size: 9px; line-height: 1.35; }
 
         .main-svg { padding: 14px !important; overflow: auto !important; border-radius: 4px !important; }
-        #fire-svg { display: block; width: 100%; min-width: 0; }
+        /* v1.134.18 — the 1:1 floor applies at EVERY width, not only on phones. At a 1280
+           laptop the panel is ~900px, which put this 1400-unit mimic at 0.64 scale and its
+           valve tags at 6px. The panel scrolls; the drawing does not shrink below legible. */
+        #fire-svg { display: block; width: 100%; min-width: 1400px; }
+        .main-svg { overflow-x: auto; -webkit-overflow-scrolling: touch; }
         .layout-grid {
             grid-template-columns: minmax(0,1fr) minmax(320px,360px) !important;
             gap: 14px;
@@ -356,7 +365,10 @@
                separated, but its panel adds 24 px of padding each side, so the panel measured
                948 px at a 900 px viewport and the DOCUMENT scrolled sideways rather than the
                diagram. Let the panel shrink and scroll its own content. */
-            #fire-svg { min-width: 852px; max-width: none !important; }
+            /* v1.134.18 — 852px put the 1400-unit mimic at 0.61 scale, so a 10px valve tag
+               rendered at 6px on a phone. Hold it at 1:1 and let the panel scroll: a label an
+               operator cannot read is worse than one they have to scroll to. */
+            #fire-svg { min-width: 1400px; max-width: none !important; }
             .main-svg { min-width: 0; max-width: 100%; overflow-x: auto;
                 -webkit-overflow-scrolling: touch; padding-left: 12px; padding-right: 12px; }
         }
@@ -494,9 +506,9 @@
                     </g>
                     <!-- low / low-low alarm reference lines -->
                     <line x1="0" y1="124" x2="300" y2="124" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="6 5" opacity="0.55" />
-                    <text x="296" y="119" text-anchor="end" fill="#f59e0b" font-size="8" font-weight="bold">LOW 80%</text>
+                    <text x="296" y="119" text-anchor="end" fill="#f59e0b" font-size="10" font-weight="bold">LOW 80%</text>
                     <line x1="0" y1="198" x2="300" y2="198" stroke="#fb923c" stroke-width="1.5" stroke-dasharray="6 5" opacity="0.55" />
-                    <text x="296" y="193" text-anchor="end" fill="#fb923c" font-size="8" font-weight="bold">LOW-LOW 60%</text>
+                    <text x="296" y="193" text-anchor="end" fill="#fb923c" font-size="10" font-weight="bold">LOW-LOW 60%</text>
                     <text x="150" y="-30" text-anchor="middle" class="eq-name" font-size="11">TK-FW-01 · Fire Reserve Tank</text>
                     <text id="tank-cap-tag" x="150" y="-15" text-anchor="middle" class="eq-tag">&mdash;</text>
                     <text id="tank-level-txt" x="150" y="225" text-anchor="middle" fill="#cbd5e1" font-size="24" font-weight="800" class="font-tech">UNAVAILABLE</text>

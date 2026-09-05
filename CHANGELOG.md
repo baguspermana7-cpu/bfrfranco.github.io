@@ -11,6 +11,50 @@ release sections rather than semver.
 
 ---
 
+## v1.134.18 — 2026-09-05 (Every gate passed while a quarter of the cockpit text was too small to read)
+
+Fixing the chiller drawing raised the obvious question: what do the others measure? So I
+measured the rendered height of every SVG label on all four diagrams — the rendered box, which
+counts every ancestor transform, not a viewBox calculation.
+
+| | scale | median label | under 9 px |
+|---|---|---|---|
+| EPMS single-line | 0.47 | **4 px** | **219 of 219** |
+| fire mimic | 0.89 | 8 px | 28 of 32 |
+| chiller P&ID | 0.87 | 13 px | 0 |
+| water process | 1.08 | 16 px | 0 |
+
+**Every one of those pages passed every gate.** Collision, clipping, degenerate-label, dark
+mode, responsive — none of them ask whether a human can READ the thing.
+
+**EPMS: level of detail, because 219 four-pixel numbers are not information.** The single-line
+is 3600 × 2600 and carries 98 wire telemetry labels; fit-to-screen puts every one under 6 px.
+Drawing them anyway is texture that looks like data. The drawing now has three honest states:
+**fit** shows topology and energisation colour and nothing else (`topology only`); the
+**working zoom it now opens at** shows device identity at 11 px (`zoom in for values`); zooming
+further reveals the telemetry at 11 px (`values shown`). It opens at the working zoom anchored
+at the utility incomers — where the one-line starts — instead of on a picture nobody can read.
+Fit stays one click away.
+
+**fire: the 1:1 floor applies at every width, not just on phones.** An 852 px min-width put the
+1400-unit mimic at 0.64 scale on a 1280 laptop and its valve tags at 6 px. Valve tags name the
+device an operator is about to act on. The panel scrolls; the drawing does not shrink below
+legible. Valve labels 8 → 10 px, equipment tags 9 → 11 px.
+
+**chiller:** the small-screen `min-width` was still 2300 px, the retired canvas width. 1:1 with
+the trimmed viewBox now.
+
+**The measurement is a gate (G5).** Any label rendering below 8.5 px fails the ship, measured on
+the rendered box across 4 diagrams × 4 viewports × 2 themes.
+
+Arming it exposed one legitimate conflict: a pan/zoom canvas has content beyond its frame by
+design — that is what panning is for — and the clipping rule flagged 300 findings on EPMS. The
+page declares `data-rz-pannable`, which exempts the **clipping** rule only, and the gate refuses
+the declaration unless the page actually ships a zoom control to pan with. Collisions,
+degenerate labels and the legibility floor still apply to it.
+
+All four diagrams: **0 labels below the floor.**
+
 ## v1.134.17 — 2026-09-05 (A third of the P&ID was spent on duplicated tables, so the drawing rendered at 55 %)
 
 The chiller cockpit's own reason for existing — the process drawing — was the least legible

@@ -143,6 +143,17 @@ try {
               box: el.getBoundingClientRect(),
             })).filter((t) => t.text.length > 0);
 
+            /* G5 — LEGIBILITY. A label smaller than this on screen is not small text; it is
+               texture that looks like data. The chiller P&ID rendered at 0.55 scale with 5-6 px
+               equipment labels and passed every collision and clipping check, because none of
+               them ask whether a human can READ the thing. Measured on the rendered box, so
+               every ancestor transform counts — EPMS pans and zooms a <g>, and a viewBox-only
+               calculation understated it by more than 2x. */
+            const MIN_LEGIBLE_PX = 8.5;
+            const illegible = texts
+              .filter((t) => t.box.height > 0 && t.box.height < MIN_LEGIBLE_PX)
+              .map((t) => `${t.text} (${Math.round(t.box.height * 10) / 10}px)`);
+
             /* G4 — a label that paints nothing */
             const degenerate = texts
               .filter((t) => t.box.width < 0.5 || t.box.height < 0.5)
@@ -167,9 +178,16 @@ try {
               }
             }
 
-            /* G2 — element painted outside its own SVG viewport box */
+            /* G2 — element painted outside its own SVG viewport box.
+               SKIPPED on a PAN/ZOOM canvas, which the page declares with data-rz-pannable:
+               there, content beyond the frame is not clipped, it is off-screen and reachable
+               by panning — that is the whole interaction. The declaration is not a blanket
+               exemption: collisions, degenerate labels and LEGIBILITY are still enforced, and
+               it is refused unless the page actually ships a zoom control to pan with. */
+            const pannable = svg.hasAttribute('data-rz-pannable')
+                && !!document.querySelector('[onclick*="setZoom"], [onclick*="fitScreen"]');
             const clipped = [];
-            for (const el of svg.querySelectorAll('text, rect, circle, path, line, polygon, image, use')) {
+            for (const el of (pannable ? [] : svg.querySelectorAll('text, rect, circle, path, line, polygon, image, use'))) {
               if (!visible(el)) continue;
               const box = el.getBoundingClientRect();
               if (box.width === 0 && box.height === 0) continue;
@@ -195,6 +213,9 @@ try {
               clipped: clipped.slice(0, 40),
               clippedCount: clipped.length,
               degenerate,
+              pannable,
+              illegible: illegible.slice(0, 20),
+              illegibleCount: illegible.length,
               docOverflowPx: Math.max(0, document.documentElement.scrollWidth - document.documentElement.clientWidth),
             };
           },
@@ -221,6 +242,10 @@ try {
         for (const c of result.clipped) {
           record(diagram.page, viewport.name, theme, 'G2-clipped',
             `<${c.tag}> ${c.label ? `"${c.label}" ` : ''}outside the SVG box by ${c.overflowPx}px`);
+        }
+        for (const d of (result.illegible || [])) {
+          record(diagram.page, viewport.name, theme, 'G5-illegible',
+            `label renders below ${8.5}px: ${d}`);
         }
         for (const d of result.degenerate) {
           record(diagram.page, viewport.name, theme, 'G4-degenerate', `label paints nothing: "${d}"`);

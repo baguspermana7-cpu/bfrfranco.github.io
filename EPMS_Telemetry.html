@@ -177,6 +177,19 @@
 
     /* Telemetry */
     .tele-bg { fill: rgba(0,0,0,0.85); stroke: #444; stroke-width: 0.5; }
+    /* v1.134.18 — LEVEL OF DETAIL. This single-line is 3600 units wide and carries 98 wire
+       telemetry labels. Fit-to-screen renders them at ~4 px, which is not small text — it is
+       not information at all, just texture that looks like data. Below a legibility threshold
+       the values are HIDDEN and the drawing shows what it can actually communicate at that
+       size: topology, energisation colour and device identity. Zoom in and the numbers return.
+       Hiding an unreadable number is more honest than drawing it. */
+    svg:not(.lod-values) .tele-txt,
+    svg:not(.lod-values) .dev-sub,
+    svg:not(.lod-values) .dev-spec { display: none; }
+    svg:not(.lod-values) .tele-bg { display: none; }
+    /* Second tier: below this even the device NAMES are sub-legible. At fit-to-screen an
+       operator gets what that size can honestly carry — topology and energisation colour. */
+    svg:not(.lod-identity) .dev-lbl { display: none; }
     .tele-txt { fill: #fff; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: bold; pointer-events: none; font-feature-settings: "zero" 1; }
 
     /* IEC Breaker */
@@ -551,7 +564,11 @@
 })();
 </script>
 
-<svg id="viewport" viewBox="0 0 3600 2600">
+<!-- v1.134.18 — a PAN/ZOOM canvas. Content beyond the frame is off-screen, not clipped:
+     this one-line is 3600 x 2600 and is worked by panning, which is why it ships zoom and
+     fit controls. The declaration exempts the clipping rule ONLY; collisions, degenerate
+     labels and the legibility floor are still enforced on it. -->
+<svg id="viewport" viewBox="0 0 3600 2600" data-rz-pannable="1">
     <defs>
         <g id="sym-tx">
             <circle cx="0" cy="-8" r="8" class="tx-circle"/>
@@ -585,7 +602,7 @@
         <div style="flex:1"></div>
         <div style="display:flex; gap:8px; align-items:center;">
             <span style="font-size:10px; color:#9aa3af; margin-right:4px;">ZOOM:</span>
-            <span id="zoomIndicator" class="zoom-indicator">50%</span>
+            <span id="zoomIndicator" class="zoom-indicator">50%</span><span id="lodHint" class="zoom-indicator" style="opacity:.8">zoom in for values</span>
             <button class="zoom-btn" onclick="setZoom(0.5)" title="50%">50%</button>
             <button class="zoom-btn" onclick="setZoom(0.75)" title="75%">75%</button>
             <button class="zoom-btn" onclick="setZoom(1.2)" title="120%">120%</button>
@@ -1004,7 +1021,11 @@ function init(){
 
     // Auto-center the diagram after layout is drawn
     setTimeout(() => {
-        fitScreen();
+        /* v1.134.18 — was fitScreen(). Fit puts every label under 6 px on this drawing, so the
+           cockpit opened on a picture nobody could read. Open at the working zoom instead,
+           anchored at the utility incomers where the one-line starts; Fit stays one click away
+           for the overview. */
+        openAtWorkingZoom();
         updateStatusBar();
     }, 50);
 
@@ -1419,14 +1440,65 @@ function screenToSVG(screenX, screenY) {
     return { x: svgPt.x, y: svgPt.y };
 }
 
+/* Smallest on-screen size at which a monospace telemetry value is worth drawing. Below this
+   the label is hidden rather than rendered as unreadable texture. */
+const LOD_MIN_TEXT_PX = 9;
+const LOD_SMALLEST_USER_FONT_PX = 8;    // .dev-sub / .tele-txt tier
+const LOD_IDENTITY_USER_FONT_PX = 11;   // .dev-lbl tier — device names
+
+/* The working zoom this cockpit OPENS at. Fit-to-screen puts a 3600 x 2600 single-line into
+   ~1680 x 800 and every label lands under 6 px, so "fit" shows an operator a picture they
+   cannot read. Open at the scale where device names are legible and let them pan — which is
+   how a real single-line is worked — and keep Fit as an explicit control for the overview. */
+function workingZoom(){
+    const svg = document.getElementById('viewport');
+    const vb = (svg && (svg.getAttribute('viewBox')||'').split(/\s+/).map(Number)) || [];
+    const rendered = svg ? svg.getBoundingClientRect().width : 0;
+    if (!vb[2] || !rendered) return 1.6;
+    return Math.min(2.4, Math.max(1.2, (LOD_MIN_TEXT_PX + 1) / (LOD_IDENTITY_USER_FONT_PX * (rendered / vb[2]))));
+}
+
+function applyLevelOfDetail() {
+    const svg = document.getElementById('viewport');
+    if (!svg) return;
+    const vb = (svg.getAttribute('viewBox') || '').split(/\s+/).map(Number);
+    const rendered = svg.getBoundingClientRect().width;
+    if (!vb[2] || !rendered) return;
+    const perUnit = (rendered / vb[2]) * scale;
+    const valuesPx = LOD_SMALLEST_USER_FONT_PX * perUnit;   // .dev-sub / .tele-txt tier
+    const identityPx = LOD_IDENTITY_USER_FONT_PX * perUnit; // .dev-lbl tier
+    svg.classList.toggle('lod-values', valuesPx >= LOD_MIN_TEXT_PX);
+    svg.classList.toggle('lod-identity', identityPx >= LOD_MIN_TEXT_PX);
+    const hint = document.getElementById('lodHint');
+    if (hint) {
+        hint.textContent = valuesPx >= LOD_MIN_TEXT_PX ? 'values shown'
+            : (identityPx >= LOD_MIN_TEXT_PX ? 'zoom in for values' : 'topology only');
+    }
+}
+
 function setTransform(){
     scene.setAttribute('transform', `translate(${px},${py}) scale(${scale})`);
     updateZoomIndicator();
+    applyLevelOfDetail();
 }
 
 function updateZoomIndicator() {
     const indicator = document.getElementById('zoomIndicator');
     if(indicator) indicator.textContent = Math.round(scale * 100) + '%';
+}
+
+/* Open the single-line where an operator starts reading it: the incoming utility end, at a
+   zoom where device names are legible. */
+function openAtWorkingZoom(){
+    scale = workingZoom();
+    const svg = document.getElementById('viewport');
+    const vb = (svg.getAttribute('viewBox')||'').split(/\s+/).map(Number);
+    /* Anchor near the top-left of the drawn content rather than its centre — the sources are
+       there, and a centred view of a wide one-line opens in the middle of nothing. */
+    px = 40 - CONTENT_MIN_X * scale;
+    py = 40 - CONTENT_MIN_Y * scale;
+    setTransform();
+    log(`View: working zoom ${Math.round(scale*100)}% \u2014 pan to follow the one-line, or Fit for the overview`);
 }
 
 function fitScreen() {
@@ -1465,7 +1537,7 @@ function fitScreen() {
     py = visibleCenterSvg.y - CONTENT_CENTER_Y * scale;
 
     setTransform();
-    log('View: Fit to Screen');
+    log('View: Fit to Screen \u2014 topology only; zoom in for telemetry values');
 }
 
 function setZoom(newScale) {
