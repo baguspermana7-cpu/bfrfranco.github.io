@@ -1,3 +1,15 @@
+/* v1.134.20 — the shared auth component was styled entirely in Anthropic purple
+ * (#8B5CF6 / #A78BFA / #7C3AED, plus their rgb() forms): login button, user avatar, PRO
+ * badge, modal border, sign-in button, focused inputs, legal links. That colour is
+ * HARD-BANNED by standarization/ANTI_VIBECODE_STANDARD.md §A.3 and by CLAUDE.md's rejected-
+ * patterns list, which named mint #7DDDB4 as its replacement — and this module ships on every
+ * page of the site, so the ban was being broken site-wide.
+ * It went unnoticed because the audit that enforces the ban tested only the literal string
+ * "#8b5cf6" and scanned only .html and .css. This module authors the same colour as
+ * rgb(139, 92, 246) in JavaScript. Both gaps are fixed in tools/audit-vibecode.mjs.
+ * Filled surfaces (PRO badge, submit button) carry DARK ink: mint is a light hue and white
+ * text on it fails contrast, which is the site's own rule for an accent-filled control.
+ */
 /**
  * auth.js — Shared Authentication Module for ResistanceZero
  * Provides consistent Login/Logout UI across all pages.
@@ -507,21 +519,21 @@
             /* Auth wrap */
             '.rz-auth-wrap{display:inline-flex;align-items:center;position:relative;margin-left:8px;vertical-align:middle;}',
             /* Login button */
-            '.rz-login-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:10px;border:1px solid rgba(139,92,246,0.4);background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(168,85,247,0.08));color:#a78bfa;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.3s;font-family:inherit;white-space:nowrap;}',
-            '.rz-login-btn:hover{background:linear-gradient(135deg,rgba(139,92,246,0.25),rgba(168,85,247,0.15));transform:translateY(-1px);box-shadow:0 4px 15px rgba(139,92,246,0.2);}',
+            '.rz-login-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:10px;border:1px solid rgba(125,221,180,0.4);background:linear-gradient(135deg,rgba(125,221,180,0.15),rgba(168,85,247,0.08));color:#A8ECCF;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.3s;font-family:inherit;white-space:nowrap;}',
+            '.rz-login-btn:hover{background:linear-gradient(135deg,rgba(125,221,180,0.25),rgba(168,85,247,0.15));transform:translateY(-1px);box-shadow:0 4px 15px rgba(125,221,180,0.2);}',
             '.rz-login-btn i{font-size:1rem;}',
             /* User button (logged in) */
-            '.rz-user-btn{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:10px;border:1px solid rgba(139,92,246,0.3);background:rgba(139,92,246,0.08);color:#c4b5fd;cursor:pointer;font-family:inherit;font-size:0.82rem;transition:all 0.3s;}',
-            '.rz-user-btn:hover{background:rgba(139,92,246,0.15);}',
-            '.rz-user-avatar{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#8b5cf6,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:#fff;}',
+            '.rz-user-btn{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:10px;border:1px solid rgba(125,221,180,0.3);background:rgba(125,221,180,0.08);color:#c4b5fd;cursor:pointer;font-family:inherit;font-size:0.82rem;transition:all 0.3s;}',
+            '.rz-user-btn:hover{background:rgba(125,221,180,0.15);}',
+            '.rz-user-avatar{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#7DDDB4,#A8ECCF);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:#fff;}',
             '.rz-user-email{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}',
             '.rz-user-chevron{font-size:0.65rem;opacity:0.6;transition:transform 0.2s;}',
             /* Dropdown */
-            '.rz-user-dropdown{position:absolute;top:calc(100% + 6px);right:0;min-width:220px;background:rgba(15,23,42,0.98);border:1px solid rgba(139,92,246,0.3);border-radius:12px;padding:12px;opacity:0;visibility:hidden;transform:translateY(-8px);transition:all 0.2s;z-index:9999;backdrop-filter:blur(20px);}',
+            '.rz-user-dropdown{position:absolute;top:calc(100% + 6px);right:0;min-width:220px;background:rgba(15,23,42,0.98);border:1px solid rgba(125,221,180,0.3);border-radius:12px;padding:12px;opacity:0;visibility:hidden;transform:translateY(-8px);transition:all 0.2s;z-index:9999;backdrop-filter:blur(20px);}',
             '.rz-user-dropdown.show{opacity:1;visibility:visible;transform:translateY(0);}',
             '.rz-dd-header{display:flex;align-items:center;gap:8px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.1);margin-bottom:8px;}',
             '.rz-dd-badge{padding:3px 10px;border-radius:6px;font-size:0.7rem;font-weight:700;letter-spacing:0.5px;}',
-            '.rz-dd-badge.pro{background:linear-gradient(135deg,#8b5cf6,#a78bfa);color:#fff;}',
+            '.rz-dd-badge.pro{background:linear-gradient(135deg,#7DDDB4,#A8ECCF);color:#0B1F17;}',
             '.rz-dd-badge.free{background:rgba(100,116,139,0.2);color:#94a3b8;}',
             /* Educator role (tier=pro, role=educator) — instrument-cyan, matches rz-ops admin UI. NOT purple. */
             '.rz-dd-badge.educator{background:rgba(8,145,178,0.18);color:#67e8f9;}',
@@ -531,16 +543,16 @@
             /* Login Modal */
             '.rz-modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);z-index:99999;display:none;align-items:center;justify-content:center;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}',
             '.rz-modal-overlay.show{display:flex;}',
-            '.rz-modal{width:380px;max-width:90vw;background:#0f172a;border:1px solid rgba(139,92,246,0.3);border-radius:16px;padding:32px;position:relative;box-shadow:0 25px 60px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.04) inset;}',
+            '.rz-modal{width:380px;max-width:90vw;background:#0f172a;border:1px solid rgba(125,221,180,0.3);border-radius:16px;padding:32px;position:relative;box-shadow:0 25px 60px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.04) inset;}',
             '.rz-modal-close{position:absolute;top:12px;right:12px;width:32px;height:32px;border:none;border-radius:8px;background:rgba(255,255,255,0.05);color:#94a3b8;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;}',
             '.rz-modal-close:hover{background:rgba(255,255,255,0.1);color:#fff;}',
             '.rz-modal h3{margin:0 0 6px;font-size:1.3rem;color:#f1f5f9;font-weight:700;}',
             '.rz-modal .rz-modal-sub{font-size:0.82rem;color:#94a3b8;margin:0 0 24px;}',
             '.rz-modal label{display:block;font-size:0.78rem;font-weight:600;color:#94a3b8;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;}',
             '.rz-modal input[type="email"],.rz-modal input[type="password"]{width:100%;padding:10px 14px;border-radius:10px;border:1px solid #334155;background:#1e293b;color:#f1f5f9;font-size:0.9rem;font-family:inherit;margin-bottom:16px;box-sizing:border-box;outline:none;transition:border-color 0.2s,box-shadow 0.2s;}',
-            '.rz-modal input:focus{border-color:rgba(139,92,246,0.5);box-shadow:0 0 0 3px rgba(139,92,246,0.1);}',
-            '.rz-modal .rz-submit-btn{width:100%;padding:12px;border:none;border-radius:10px;background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;font-size:0.9rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.3s;}',
-            '.rz-modal .rz-submit-btn:hover{transform:translateY(-1px);box-shadow:0 8px 25px rgba(139,92,246,0.3);}',
+            '.rz-modal input:focus{border-color:rgba(125,221,180,0.5);box-shadow:0 0 0 3px rgba(125,221,180,0.1);}',
+            '.rz-modal .rz-submit-btn{width:100%;padding:12px;border:none;border-radius:10px;background:linear-gradient(135deg,#7DDDB4,#4FBF92);color:#0B1F17;font-size:0.9rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.3s;}',
+            '.rz-modal .rz-submit-btn:hover{transform:translateY(-1px);box-shadow:0 8px 25px rgba(125,221,180,0.3);}',
             '.rz-modal .rz-submit-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none;}',
             '.rz-modal .rz-error{display:none;padding:8px 12px;border-radius:8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#f87171;font-size:0.8rem;margin-bottom:12px;}',
             '.rz-modal .rz-error.show{display:block;}',
@@ -550,30 +562,30 @@
             '.rz-modal .rz-success p{color:#f1f5f9;font-weight:600;margin:4px 0;}',
             '.rz-modal .rz-success small{color:#64748b;font-size:0.8rem;}',
             /* Light theme */
-            '[data-theme="light"] .rz-login-btn{background:linear-gradient(135deg,rgba(139,92,246,0.1),rgba(168,85,247,0.05));color:#7c3aed;border-color:rgba(139,92,246,0.3);}',
-            '[data-theme="light"] .rz-user-btn{background:rgba(139,92,246,0.06);color:#6d28d9;border-color:rgba(139,92,246,0.2);}',
-            '[data-theme="light"] .rz-user-avatar{background:linear-gradient(135deg,#7c3aed,#8b5cf6);}',
-            '[data-theme="light"] .rz-user-dropdown{background:rgba(255,255,255,0.98);border-color:rgba(139,92,246,0.2);box-shadow:0 10px 40px rgba(0,0,0,0.12);}',
+            '[data-theme="light"] .rz-login-btn{background:linear-gradient(135deg,rgba(125,221,180,0.1),rgba(168,85,247,0.05));color:#4FBF92;border-color:rgba(125,221,180,0.3);}',
+            '[data-theme="light"] .rz-user-btn{background:rgba(125,221,180,0.06);color:#6d28d9;border-color:rgba(125,221,180,0.2);}',
+            '[data-theme="light"] .rz-user-avatar{background:linear-gradient(135deg,#4FBF92,#7DDDB4);}',
+            '[data-theme="light"] .rz-user-dropdown{background:rgba(255,255,255,0.98);border-color:rgba(125,221,180,0.2);box-shadow:0 10px 40px rgba(0,0,0,0.12);}',
             '[data-theme="light"] .rz-dd-email{color:#475569;}',
             '[data-theme="light"] .rz-dd-logout{background:rgba(239,68,68,0.06);color:#dc2626;}',
-            '[data-theme="light"] .rz-modal{background:#ffffff;border-color:rgba(139,92,246,0.2);box-shadow:0 25px 60px rgba(0,0,0,0.15),0 0 0 1px rgba(0,0,0,0.04) inset;}',
+            '[data-theme="light"] .rz-modal{background:#ffffff;border-color:rgba(125,221,180,0.2);box-shadow:0 25px 60px rgba(0,0,0,0.15),0 0 0 1px rgba(0,0,0,0.04) inset;}',
             '[data-theme="light"] .rz-modal h3{color:#1e293b;}',
             '[data-theme="light"] .rz-modal .rz-modal-sub{color:#64748b;}',
             '[data-theme="light"] .rz-modal label{color:#475569;}',
             '.rz-modal .rz-modal-legal{color:#94a3b8;}',
-            '.rz-modal .rz-modal-legal a{color:#a78bfa;text-decoration:underline;text-underline-offset:2px;}',
+            '.rz-modal .rz-modal-legal a{color:#A8ECCF;text-decoration:underline;text-underline-offset:2px;}',
             '[data-theme="light"] .rz-modal .rz-modal-legal{color:#475569;}',
             '[data-theme="light"] .rz-modal .rz-modal-legal a{color:#6d28d9;}',
             '[data-theme="light"] .rz-modal input[type="email"],[data-theme="light"] .rz-modal input[type="password"]{background:#f1f5f9;border-color:#e2e8f0;color:#1e293b;}',
-            '[data-theme="light"] .rz-modal input:focus{border-color:rgba(139,92,246,0.5);background:#fff;}',
+            '[data-theme="light"] .rz-modal input:focus{border-color:rgba(125,221,180,0.5);background:#fff;}',
             '[data-theme="light"] .rz-modal-close{background:rgba(0,0,0,0.05);color:#64748b;}',
-            '[data-theme="light"] .rz-demo-hint{background:rgba(139,92,246,0.06) !important;border-color:rgba(139,92,246,0.15) !important;color:#475569 !important;}',
-            '[data-theme="light"] .rz-demo-hint code{background:rgba(139,92,246,0.1) !important;color:#6d28d9 !important;}',
-            '[data-theme="light"] .rz-demo-hint .rz-demo-label{color:#7c3aed !important;}',
-            '[data-theme="light"] .rz-pro-link{color:#7c3aed !important;}',
+            '[data-theme="light"] .rz-demo-hint{background:rgba(125,221,180,0.06) !important;border-color:rgba(125,221,180,0.15) !important;color:#475569 !important;}',
+            '[data-theme="light"] .rz-demo-hint code{background:rgba(125,221,180,0.1) !important;color:#6d28d9 !important;}',
+            '[data-theme="light"] .rz-demo-hint .rz-demo-label{color:#4FBF92 !important;}',
+            '[data-theme="light"] .rz-pro-link{color:#4FBF92 !important;}',
             '[data-theme="light"] .rz-pro-link:hover{color:#6d28d9 !important;}',
             /* Pro link */
-            '.rz-pro-link:hover{color:#a78bfa !important;text-decoration:underline !important;}',
+            '.rz-pro-link:hover{color:#A8ECCF !important;text-decoration:underline !important;}',
             '.rz-root-link .rz-lock-icon{font-size:.7em;margin-right:5px;opacity:.65;}',
             '.rz-root-link.rz-root-locked{filter:saturate(0.9);}',
             '.floating-side-card.rz-root-link .floating-card-label{display:inline-flex;align-items:center;}',
@@ -613,7 +625,7 @@
             '<div class="rz-modal">' +
                 '<button class="rz-modal-close" onclick="window._rzAuth.hideModal()" aria-label="Close login dialog">&times;</button>' +
                 '<div id="rzModalForm">' +
-                    '<h3 id="rzModalTitle"><i class="fas fa-shield-alt" style="color:#8b5cf6;margin-right:8px;" aria-hidden="true"></i>Sign In</h3>' +
+                    '<h3 id="rzModalTitle"><i class="fas fa-shield-alt" style="color:#7DDDB4;margin-right:8px;" aria-hidden="true"></i>Sign In</h3>' +
                     '<p class="rz-modal-sub">Access calculators, tools, and analytical content.</p>' +
                     '<div class="rz-error" id="rzModalError">Invalid email or password.</div>' +
                     /* v1.40.1 — wrapped in <form> so Enter submits + autocomplete + browser warns on insecure context */
@@ -627,10 +639,10 @@
                     '<div class="rz-modal-legal" style="text-align:center;margin-top:12px;font-size:0.68rem;line-height:1.5;">' +
                         'By signing in, you agree to our <a href="terms.html">Terms</a> &amp; <a href="privacy.html">Privacy Policy</a>' +
                     '</div>' +
-                    '<div class="rz-demo-hint" style="text-align:center;margin-top:14px;padding:10px 12px;border-radius:8px;background:rgba(139,92,246,0.12);border:1px solid rgba(139,92,246,0.25);font-size:0.78rem;color:#94a3b8;line-height:1.5;">' +
-                        '<span class="rz-demo-label" style="color:#a78bfa;font-weight:600;">Demo Account:</span><br>' +
-                        '<code style="background:rgba(139,92,246,0.15);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#c4b5fd;">demo@resistancezero.com</code> / ' +
-                        '<code style="background:rgba(139,92,246,0.15);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#c4b5fd;">demo2026</code>' +
+                    '<div class="rz-demo-hint" style="text-align:center;margin-top:14px;padding:10px 12px;border-radius:8px;background:rgba(125,221,180,0.12);border:1px solid rgba(125,221,180,0.25);font-size:0.78rem;color:#94a3b8;line-height:1.5;">' +
+                        '<span class="rz-demo-label" style="color:#A8ECCF;font-weight:600;">Demo Account:</span><br>' +
+                        '<code style="background:rgba(125,221,180,0.15);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#c4b5fd;">demo@resistancezero.com</code> / ' +
+                        '<code style="background:rgba(125,221,180,0.15);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#c4b5fd;">demo2026</code>' +
                     '</div>' +
                 '</div>' +
                 '<div class="rz-success" id="rzModalSuccess">' +
@@ -890,13 +902,13 @@
                     }
                     /* v1.29.0 — append stale-cache rescue link */
                     errorEl.innerHTML = msg + ' ' +
-                        '<a href="#" onclick="event.preventDefault();if(navigator.serviceWorker){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()});});}if(window.caches){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});}localStorage.removeItem(\'rz_premium_session\');localStorage.removeItem(\'rz_auth_v2\');localStorage.removeItem(\'rz_auth_gw\');localStorage.removeItem(\'rz_auth_csrf\');setTimeout(function(){location.reload()},500);return false;" style="color:#a78bfa;text-decoration:underline;cursor:pointer">Try fresh reload</a>';
+                        '<a href="#" onclick="event.preventDefault();if(navigator.serviceWorker){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()});});}if(window.caches){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});}localStorage.removeItem(\'rz_premium_session\');localStorage.removeItem(\'rz_auth_v2\');localStorage.removeItem(\'rz_auth_gw\');localStorage.removeItem(\'rz_auth_csrf\');setTimeout(function(){location.reload()},500);return false;" style="color:#A8ECCF;text-decoration:underline;cursor:pointer">Try fresh reload</a>';
                     errorEl.classList.add('show');
                 });
                 return;
             }
 
-            var rescueLink = ' <a href="#" onclick="event.preventDefault();if(navigator.serviceWorker){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()});});}if(window.caches){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});}localStorage.removeItem(\'rz_premium_session\');localStorage.removeItem(\'rz_auth_v2\');localStorage.removeItem(\'rz_auth_gw\');localStorage.removeItem(\'rz_auth_csrf\');setTimeout(function(){location.reload()},500);return false;" style="color:#a78bfa;text-decoration:underline;cursor:pointer">Try fresh reload</a>';
+            var rescueLink = ' <a href="#" onclick="event.preventDefault();if(navigator.serviceWorker){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()});});}if(window.caches){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});}localStorage.removeItem(\'rz_premium_session\');localStorage.removeItem(\'rz_auth_v2\');localStorage.removeItem(\'rz_auth_gw\');localStorage.removeItem(\'rz_auth_csrf\');setTimeout(function(){location.reload()},500);return false;" style="color:#A8ECCF;text-decoration:underline;cursor:pointer">Try fresh reload</a>';
             function _showErr(msg) { if (!errorEl) return; errorEl.innerHTML = msg + rescueLink; errorEl.classList.add('show'); }
             function _finish(u) {
                 if (errorEl) { errorEl.classList.remove('show'); errorEl.textContent = ''; }

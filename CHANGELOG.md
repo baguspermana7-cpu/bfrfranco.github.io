@@ -11,6 +11,67 @@ release sections rather than semver.
 
 ---
 
+## v1.134.20 — 2026-09-05 (Site-wide: 934 unreadable or clipped labels, and a hard-banned colour on every page because its gate was never wired)
+
+The cockpit work kept finding the same three defects, so I built the measurement and pointed it
+at all 179 pages: **934 findings.**
+
+**848 illegible labels, all from one root cause.** The incident timelines' viewBox width grows
+with the number of events — 1420 for a short incident, 2248 for a long one — while
+`.viz svg { max-width:100% }` squeezed it into the column. **So the more an incident had to
+say, the smaller its own timeline printed it:** phase chips and clock times rendered at 4 px
+across 43 pages. The container was already a scroller; `max-width` was defeating it. Pinning the
+intrinsic height (every timeline viewBox is `0 0 W 96`) lets the browser derive width from the
+aspect ratio, so the drawing renders 1:1 at any event count and the panel scrolls instead of
+shrinking. **848 → 0.**
+
+**86 clipped labels.** `dc-incidents.html`'s index table ellipsises its title and summary
+columns, which is right for a dense table — but the cut text was reachable only by navigating
+to the incident, and a summary was losing 238–298 px of its sentence. Every cell carries its
+full text now, so the truncation is deliberate **and** non-lossy — which is the condition the
+audit checks: it accepts an ellipsis only when a `title` actually *contains* the full string,
+not merely when one exists.
+
+**And the audit was wrong twice before I trusted it.** It read `.sr-only` form labels as
+truncation — flagging `index.html`'s contact form for doing accessibility correctly — and its
+first server implementation wrote a header before reading the file, so one missing asset killed
+the whole run.
+
+---
+
+**A hard-banned colour has been shipping on every page of the site.** The shared auth component
+— login button, user avatar, PRO badge, modal border, sign-in button, focused inputs, legal
+links — is styled in **Anthropic purple `#8B5CF6`**, which `ANTI_VIBECODE_STANDARD.md` §A.3 and
+CLAUDE.md's rejected-patterns list both name explicitly, mint `#7DDDB4` being the prescribed
+replacement.
+
+Two reasons it was never caught:
+- **`audit-vibecode` is not wired into `tools/ship-gate.sh` at all.** The standard has claimed
+  since 2026-08-23 that it is ("wired into tools/ship-gate.sh (product gate
+  `audit-vibecode --strict`)"). It is not, so the ban has been unenforced the whole time.
+- The detector tested the literal string `#8b5cf6` and scanned only `.html` and `.css`. The auth
+  module authors the same colour as `rgb(139, 92, 246)` **in JavaScript**. A ban that recognises
+  one spelling of the thing it bans, in two of the three file types that can express it, is not
+  a ban.
+
+Both gaps are fixed: the rule matches the hex, the `rgb()`/`rgba()` forms and the `#A78BFA`
+sibling; `.js` is scanned (skipping generated `.min.` twins); and JS block comments are stripped
+first, on the same principle that already exempts `<code>` prose — a comment explaining a purge
+is not committing it. The auth component is on the mint palette, with **dark ink** on its filled
+surfaces because mint is light and white text on it fails contrast.
+
+Arming the EPMS working-zoom default from v1.134.18 turned out to have a defect of its own,
+caught here: it anchored the view at a flat (40, 40) in SVG units, which ignores the topbar, the
+context banner and the sidebar — so the single-line opened **underneath the page chrome**.
+`fitScreen()` measures that visible region carefully; the new entry point now uses the same
+measurements instead of a guess.
+
+**The gate is wired as a MONITOR, and the reason is stated rather than assumed.** ~102 pages
+still use `#A78BFA` as a *semantic* marker — "Root only — restricted access" links and one
+tool-card accent. The standard bans the raw violet and says those uses must move to a **named
+token**, but it does not say which hue that token carries. That is an owner brand decision;
+silently repainting a hundred pages is not mine to make. Flip to strict once the hue is chosen.
+
 ## v1.134.19 — 2026-09-05 (A healthy data hall showed a permanent red authority failure, and 1,000 cabinet labels nobody could read)
 
 Having measured the SVG diagrams, I had still never simply **looked** at the four cockpits that

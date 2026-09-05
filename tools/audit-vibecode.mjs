@@ -28,7 +28,11 @@ function walk(dir, out = []) {
     const p = join(dir, name);
     let st; try { st = statSync(p); } catch { continue; }
     if (st.isDirectory()) walk(p, out);
-    else if ([".html", ".css"].includes(extname(name))) out.push(p);
+    /* v1.134.20 — .js was never scanned, and that is where the site's shared auth component
+       authors its colours. A design ban enforced only on HTML and CSS misses every token a
+       module injects at runtime. Generated `.min.` twins are skipped: they are built from the
+       source that IS scanned, so flagging both reports one defect twice. */
+    else if ([".html", ".css", ".js"].includes(extname(name)) && !name.includes(".min.")) out.push(p);
   }
   return out;
 }
@@ -39,7 +43,14 @@ const RULES = [
     test: (t) => (/font-family:\s*['"]?(Inter|Geist|Space Grotesk)\b/i.test(t) || /family=(Inter|Geist|Space\+Grotesk)\b/.test(t))
       ? "Inter/Geist/Space-Grotesk as a PRIMARY font (use 'IBM Plex Sans')" : null },
   { id: "anthropic-purple",
-    test: (t) => /#8b5cf6/i.test(t) ? "#8B5CF6 (rejected Anthropic-purple) — use a semantic token/mint" : null },
+    /* v1.134.20 — this tested the literal `#8b5cf6` and nothing else, so it never saw the
+       shared auth module, which authors the very same colour as `rgb(139, 92, 246)` across the
+       login button, the user dropdown, the modal border and every focused input — on every
+       page of the site. A ban that only recognises one spelling of the thing it bans is not a
+       ban. Covers the hex, the rgb()/rgba() forms, and the violet-400 sibling #A78BFA the same
+       component pairs it with. */
+    test: (t) => (/#8b5cf6|#a78bfa|rgba?\(\s*139\s*,\s*92\s*,\s*246\s*[,)]|rgba?\(\s*167\s*,\s*139\s*,\s*250\s*[,)]/i.test(t))
+      ? "Anthropic-purple (#8B5CF6 / #A78BFA, in any notation) — use a semantic token / mint #7DDDB4" : null },
   { id: "emoji-ui-icon",
     // Decorative PICTOGRAPH emoji as UI icons/headings/badges (sign #5). Whitelisted (kept): 🔒/🔓 lock
     // (gated-feature affordance), ⚠ warn, ⚡ energy, ★☆⭐ rating, regional-indicator FLAGS (country data),
@@ -98,7 +109,15 @@ const findings = [];
 // historical CSS like `<code>#8b5cf6</code>` while DESCRIBING the purge — documenting a tell is not
 // committing it). Real usage lives in style="" / class="" / CSS rules, which survive this strip.
 function stripDocProse(t) {
-  return t.replace(/<code[\s\S]*?<\/code>/gi, "").replace(/<pre[\s\S]*?<\/pre>/gi, "");
+  return t
+    .replace(/<code[\s\S]*?<\/code>/gi, "")
+    .replace(/<pre[\s\S]*?<\/pre>/gi, "")
+    /* v1.134.20 — the same principle now that .js is scanned: a block comment EXPLAINING why a
+       banned token was purged is documentation, not a commitment of it. Without this the
+       header that records the auth-component conversion would itself trip the rule it
+       describes. Only /* *\/ comments are stripped — a line comment can sit at the end of a
+       live declaration, so removing those could hide a real usage. */
+    .replace(/\/\*[\s\S]*?\*\//g, "");
 }
 // Decode NUMERIC HTML entities (&#128214; / &#x1F4D6;) so an emoji written as an entity is caught by the
 // same char-based rules as a literal one — a book pill authored as `&#128214;` renders 📖 all the same.

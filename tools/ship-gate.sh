@@ -115,6 +115,21 @@ gate "telemetry docs — generated discovery parity" node tools/test-telemetry-d
 gate "telemetry docs — browser, a11y, mobile, and gate safety" node tools/test-telemetry-e2e.mjs
 
 # Harness documentation is release state: public-safety and generated links must not drift.
+# ANTI-VIBECODE. standarization/ANTI_VIBECODE_STANDARD.md has claimed since 2026-08-23 that this
+# is "wired into tools/ship-gate.sh (product gate audit-vibecode --strict)". It was NOT wired at
+# all, so the hard-banned design tokens went unenforced for the whole period — which is how the
+# shared auth component shipped Anthropic purple on every page of the site.
+# MONITOR, not strict, for one stated reason: ~102 pages still use #A78BFA as a SEMANTIC marker
+# ("Root only — restricted access" links, one tool-card accent). The standard bans the raw
+# violet and says those uses must move to a NAMED TOKEN, but it does not say which hue the token
+# carries — that is an owner brand decision, and silently repainting a hundred pages is not mine
+# to make. FLIP TO STRICT once that hue is chosen and the sweep lands.
+gate "anti-vibecode MONITOR — hard-banned design tokens" bash -c "node tools/audit-vibecode.mjs; true"
+# LEGIBILITY. Rendered label height across every page: a label below the floor is not small text,
+# it is texture that looks like information. 848 findings on the first run, all from one root
+# cause — the incident timelines' viewBox grew with the event count while max-width squeezed them
+# into the column, so the more an incident had to say the smaller it printed. Now zero.
+gate "site legibility — no unreadable SVG labels, no clipped text" node tools/audit-legibility.mjs --strict
 gate "agent harness standard — privacy and release parity" node tools/test-agent-harness-standard.mjs
 
 # Engine-files byte-identical guard (locked since v1.32.x accuracy review)
