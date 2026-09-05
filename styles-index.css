@@ -774,7 +774,7 @@ a {
     color: var(--medium-blue);
     margin-bottom: 2rem;
     padding-left: 1rem;
-    border-left: 3px solid var(--light-blue);
+    border-left: 2px solid var(--light-blue);
 }
 
 .hero-cta {
@@ -970,7 +970,7 @@ a {
     gap: 1rem;
     margin-bottom: 1.5rem;
     padding: 0.75rem 1rem;
-    border-radius: 12px;
+    border-radius: var(--rz-radius);
     background: var(--bg-secondary, rgba(0,0,0,0.03));
     border: 1px solid var(--border-color, rgba(0,0,0,0.06));
 }
@@ -1050,7 +1050,7 @@ a {
     align-items: center;
     gap: 0.5rem;
     padding: 0.4rem 1rem;
-    border-radius: 20px;
+    border-radius: var(--rz-radius);
     background: rgba(16, 185, 129, 0.08);
     border: 1px solid rgba(16, 185, 129, 0.2);
     font-size: 0.8rem;
@@ -1125,7 +1125,7 @@ a {
 .bento-card {
     background: var(--card-bg);
     border: 1px solid rgba(0, 0, 0, 0.08);
-    border-radius: 12px;
+    border-radius: var(--rz-radius);
     transition: border-color 0.3s ease;
     display: flex;
     flex-direction: column;
@@ -1142,7 +1142,7 @@ a {
     transition: border-color 0.3s ease;
     position: relative;
     overflow: hidden;
-    border-radius: 16px;
+    border-radius: var(--rz-radius);
 }
 /* Per-card colored glow rising from the bottom edge (reference-matched). Always
    visible; intensity scales by theme (day subtle → dark medium → rainbow strong). */
@@ -1488,7 +1488,7 @@ html.rz-rainbow .bento-cta-row .btn-bento-primary { border-color: rgba(148,163,2
     color: #059669;
     background: rgba(5, 150, 105, 0.1);
     border: 1px solid rgba(5, 150, 105, 0.2);
-    border-radius: 20px;
+    border-radius: var(--rz-radius);
     padding: 1px 7px;
     margin-bottom: 0.3rem;
     letter-spacing: 0.01em;
@@ -1707,138 +1707,6 @@ html.rz-rainbow .bento-cta-row .btn-bento-primary { border-color: rgba(148,163,2
     98% { transform: translateX(1px); }
 }
 
-/* Floating Side Cards */
-.floating-side-cards {
-    position: fixed;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 90;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-}
-
-.floating-side-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.4rem;
-    padding: 0.75rem 0.5rem;
-    background: var(--card-bg);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    border-right: none;
-    text-decoration: none;
-    font-size: 0.55rem;
-    font-weight: 700;
-    color: var(--body-color);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    box-shadow: -2px 2px 10px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    min-height: 90px;
-    transform: translateX(110%);
-    animation: floatingSlideIn 0.5s ease-out forwards, floatingBounce 0.4s ease-in-out 2.8s 1;
-    animation-delay: 2s, 2.8s;
-}
-
-.floating-side-card:last-child {
-    animation-delay: 2.15s, 2.95s;
-}
-
-@keyframes floatingSlideIn {
-    from { transform: translateX(110%); }
-    to { transform: translateX(0); }
-}
-
-@keyframes floatingBounce {
-    0%, 100% { transform: translateX(0); }
-    40% { transform: translateX(-6px); }
-    70% { transform: translateX(2px); }
-}
-
-.floating-side-card:first-child {
-    border-radius: 8px 0 0 0;
-}
-
-.floating-side-card:last-child {
-    border-radius: 0 0 0 8px;
-    border-top: none;
-}
-
-.floating-side-card:hover {
-    padding-right: 0.75rem;
-    box-shadow: -4px 4px 20px rgba(0, 0, 0, 0.15);
-}
-
-.floating-card-ai:hover {
-    background: #64748b;
-    color: #fff;
-}
-
-.floating-card-conv:hover {
-    background: var(--accent-emerald);
-    color: #fff;
-}
-
-[data-theme="dark"] .floating-side-card {
-    background: #1e293b;
-    border-color: rgba(255, 255, 255, 0.1);
-    box-shadow: -2px 2px 10px rgba(0, 0, 0, 0.4);
-}
-
-[data-theme="dark"] .floating-card-ai:hover {
-    background: #64748b;
-}
-
-[data-theme="dark"] .floating-card-conv:hover {
-    background: var(--accent-emerald);
-}
-
-.floating-card-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    animation: statusPulse 2s ease-in-out infinite;
-}
-
-.floating-dot-blue {
-    background: #64748b;
-    box-shadow: 0 0 8px rgba(100, 116, 139, 0.6);
-}
-
-.floating-dot-emerald {
-    background: var(--accent-emerald);
-    box-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
-}
-
-.floating-card-label {
-    white-space: nowrap;
-}
-
-.floating-side-card svg {
-    flex-shrink: 0;
-    opacity: 0.5;
-    transform: rotate(90deg);
-}
-
-.floating-side-card:hover .floating-card-dot {
-    box-shadow: 0 0 12px currentColor;
-}
-
-.floating-side-card:hover svg {
-    opacity: 1;
-}
-
-@media (max-width: 768px) {
-    .floating-side-cards {
-        display: none;
-    }
-}
 
 /* Bento Grid Responsive */
 @media (max-width: 1024px) {
@@ -2033,7 +1901,7 @@ section {
     height: 60px;
     margin: 0 auto 1.5rem;
     background: linear-gradient(135deg, rgba(45, 90, 135, 0.1) 0%, rgba(74, 144, 184, 0.1) 100%);
-    border-radius: 12px;
+    border-radius: var(--rz-radius);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2120,7 +1988,7 @@ section {
     text-transform: uppercase;
     letter-spacing: 0.08em;
     padding: 0.2rem 0.6rem;
-    border-radius: 20px;
+    border-radius: var(--rz-radius);
     margin-bottom: 0.75rem;
 }
 
@@ -2317,7 +2185,7 @@ section {
 .case-highlight {
     background: linear-gradient(135deg, rgba(45, 90, 135, 0.05) 0%, rgba(74, 144, 184, 0.05) 100%);
     padding: 1.5rem;
-    border-radius: 12px;
+    border-radius: var(--rz-radius);
     margin-bottom: 1.5rem;
     text-align: center;
 }
@@ -2580,7 +2448,7 @@ section {
 .experience-card {
     background: var(--white);
     padding: 3rem;
-    border-radius: 20px;
+    border-radius: var(--rz-radius);
     text-align: center;
     box-shadow: var(--shadow-xl);
     border: 2px solid var(--gray-200);
@@ -2676,7 +2544,7 @@ section {
     align-items: center;
     gap: 1.25rem;
     padding: 1rem;
-    border-radius: 12px;
+    border-radius: var(--rz-radius);
     transition: all 0.3s ease;
 }
 
@@ -5040,20 +4908,6 @@ section {
     opacity: 0.5;
 }
 
-/* --- Gradient Orbs (#47) --- */
-.gradient-orb {
-    position: fixed;
-    border-radius: 50%;
-    filter: blur(80px);
-    pointer-events: none;
-    z-index: -1;
-    opacity: 0.06;
-    transition: none;
-}
-.gradient-orb-1 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(245,158,11,0.6), transparent 70%); }
-.gradient-orb-2 { width: 350px; height: 350px; background: radial-gradient(circle, rgba(74,144,184,0.6), transparent 70%); }
-.gradient-orb-3 { width: 280px; height: 280px; background: radial-gradient(circle, rgba(16,185,129,0.6), transparent 70%); }
-[data-theme="dark"] .gradient-orb { opacity: 0.10; }
 
 /* --- Card Flip (#25) --- */
 .case-card {
@@ -5319,7 +5173,6 @@ section {
     .click-ripple,
     .aurora-orb,
     .grid-reveal-canvas,
-    .gradient-orb,
     .section-progress,
     .nav-indicator,
     .border-trail-dot,
@@ -5345,7 +5198,6 @@ section {
     .click-ripple,
     .aurora-orb,
     .grid-reveal-canvas,
-    .gradient-orb,
     .holo-overlay,
     .tilt-reflection { display: none !important; }
 }
@@ -5356,7 +5208,6 @@ section {
     .cursor-trail-container,
     .cursor-text-follower,
     .grid-reveal-canvas,
-    .gradient-orb,
     .nav-indicator,
     .aurora-orb { display: none !important; }
     .floating-shape-4,

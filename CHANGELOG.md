@@ -11,6 +11,83 @@ release sections rather than semver.
 
 ---
 
+## v1.135.2 — 2026-09-06
+
+### Seven more §A rules, and what running them actually taught
+
+v1.135.0 made the anti-slop audit a real gate and stated honestly that it covered 11 of the
+standard's 26 rules. This adds seven — §A 7, 10, 11, 12, 22, 23, 24 — taking it to **15 gating,
+3 monitor-with-strict-scope, 4 monitor-only, 2 render-hosted, 2 declared un-gateable**.
+
+Four of the seven measure **zero** on today's tree and ship strict on arrival: standalone glowing
+orbs, a raw white page background, a bouncing call-to-action, and a decorative hover that moves on
+`transition: all`. Each was proven RED against a fixture before it was wired.
+
+Three carry a real backlog and ship as **monitors that are strict on the flagship surfaces** —
+`index.html`, `styles.css`, `styles-index.css`. Landing them strict site-wide would turn `main` red
+on 220 files and the only available response would be to weaken them, which is exactly how this
+tool came to be wired as `; true`.
+
+### The instrument had to be rewritten before it could run at all
+
+The obvious CSS-block extractor — `/([^{}]+)\{([^{}]*)\}/g` — is **catastrophic** here. At a nested
+or unbalanced brace the inner `[^{}]*\}` fails and the engine backtracks the outer `[^{}]+` one
+character at a time across the preceding prose. Measured: **10.3 seconds on one 238 KB article**,
+and the whole-tree scan never finished. A linear scanner does the same job in ~2 s over 420 files.
+
+It tracks enclosing at-rules on a **stack**. A first cut kept one running `at` string and never
+cleared it when the wrapper closed, so every block after a `@media print { … }` inherited "print"
+and was silently exempted. An exemption that leaks forward is worse than no exemption: the gate
+goes quiet exactly where a page has the most rules.
+
+### Three findings that were the tool's fault, and were fixed rather than muted
+
+- **A print stylesheet is not a page background.** `article-7.html` builds a PDF window with
+  `'<style>body{…background:#ffffff…}'` inside a JS string. Rule 22 now strips `<script>` before
+  reading `<style>`, and skips any sheet declaring `@page` — `article-9-paper.html` sets A4 with
+  2 cm margins, and printed paper is white. Demanding a token background there produces grey PDFs.
+- **The aurora hero is §B protected and is made of orbs.** It is named `aurora-*` everywhere, so
+  the exemption is exact rather than a guess at opacity.
+- **`.bg-orb` carries none of the card/panel vocabulary.** The orb rule had to stop requiring it.
+
+### Rule 11 fell from 93 files to 13 by getting more honest, not weaker
+
+- **State blocks.** `.card:hover { box-shadow: … }` lists only what changes; the border is in the
+  base rule. Nine of the first fifteen flagship findings were correctly built cards read one state
+  at a time. The rule is about delineation **at rest**.
+- **Circles.** A status dot's glow ring *is* its signal. `border-radius: 50%` is a shape.
+- **Images.** A photograph or logo has no border to be delineated by.
+
+**Rule 23 was narrowed for the same reason.** A first cut flagged `.fp-arrow.active` on
+`fuel-system.html` — a P&ID flow indicator whose animation *is* the reading, telling the operator
+the line is live. Deleting information from a process diagram to satisfy a marketing-copy rule is
+not a win. It now matches a resting infinite bounce/float on a call-to-action, and nothing else.
+
+### Fixed — the flagship sweep
+
+34 blocks across both stylesheets, edited in sync: decorative radii of 8/10/12/16/20 px moved to
+`var(--rz-radius)` (4px — design.md:643, *"4px says precision machined panel component"*), and
+3–4px coloured rails moved to the 2px semantic rail the editorial language prescribes. That
+includes the five pastel bento cards, which keep their palette and lose 1px of rail.
+
+### Removed — two dead patterns the owner had already rejected
+
+- **`.floating-side-card*`** — 132 lines in `styles-index.css` styling markup that lived only on
+  `articles.html`. That page loads `styles.min.css`, which never had these rules, so the block
+  **rendered entirely unstyled**: two bare links with loose dots and chevrons at the foot of the
+  page. The rotated floating side-cards are listed as a rejected pattern in `CLAUDE.md`. Markup and
+  CSS both gone.
+- **`.gradient-orb*`** — the CSS half of cursor-tracking effect #47, whose JS was disabled in
+  v1.135.0. Cursor-tracking is also a rejected pattern; only half of it was removed.
+
+Both stylesheets re-minified, `audit-min-twins --strict` green, `?v=2026-09-06-slop` across all 160
+stylesheet references.
+
+Standard: `standarization/ANTI_VIBECODE_STANDARD.md` (coverage table + the monitor/strict-scope
+contract + every exemption above, with the measurement that produced it).
+
+---
+
 ## v1.135.1 — 2026-09-06
 
 ### Fixed — six CDU products in the engine did not exist

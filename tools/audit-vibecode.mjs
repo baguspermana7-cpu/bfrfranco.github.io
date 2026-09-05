@@ -37,6 +37,79 @@ function walk(dir, out = []) {
   return out;
 }
 
+
+/* ── v1.135.2 — SHARED CSS-BLOCK MACHINERY for the decorative-surface rules ──────────────
+   Seven §A rules (7, 10, 11, 12, 22, 23, 24) are properties of a CSS RULE BLOCK, not of a
+   file, so they need the block boundaries the earlier rules never had to find.
+
+   The obvious extractor — /([^{}]+)\{([^{}]*)\}/g — is CATASTROPHIC on this tree. At a
+   nested or unbalanced brace the inner [^{}]*\} fails and the engine backtracks the outer
+   [^{}]+ one character at a time across the preceding prose run. Measured: 10.3 SECONDS on
+   one 238 KB article, and the whole-tree scan never finished at all. The linear pass below
+   does the same job in ~2 s across 420 files. */
+function cssBlocks(t) {
+  /* A STACK, not a running variable. The first cut tracked the enclosing at-rule in a single
+     `at` string and never cleared it when the wrapper closed, so every block after a
+     `@media print { … }` inherited "print" and was silently exempted — and every block after
+     `@media (max-width: 600px)` was reported as living inside it. A gate whose exemption
+     leaks forward is worse than no exemption: it goes quiet exactly where a page has the most
+     rules. Depth is tracked properly here and `at` names only true ancestors. */
+  const out = []; const stack = []; let selStart = 0;
+  for (let i = 0; i < t.length; i++) {
+    const c = t.charCodeAt(i);
+    if (c === 123 /* { */) {
+      if (stack.length) stack[stack.length - 1].hadChild = true;
+      stack.push({ sel: t.slice(selStart, i).trim(), start: i + 1, hadChild: false });
+      selStart = i + 1;
+    } else if (c === 125 /* } */) {
+      const frame = stack.pop();
+      if (frame && !frame.hadChild && frame.sel && frame.sel.length < 400) {
+        out.push({
+          sel: frame.sel,
+          body: t.slice(frame.start, i),
+          at: stack.filter((x) => x.sel.startsWith('@')).map((x) => x.sel).join(' '),
+          idx: frame.start,
+        });
+      }
+      selStart = i + 1;
+    }
+  }
+  return out;
+}
+
+/* The DECORATIVE vocabulary, widened in v1.135.2 after measuring. The glass rule's original
+   list (card|panel|tile|bento|hero|badge|chip|widget) does not contain `.skill-item` — the
+   exact card the owner pointed at on the homepage. Site-wide, 122 multi-flag decorative
+   blocks sat OUTSIDE that vocabulary against 111 inside it, so a copy-paste of the glass
+   selector would have missed more slop than it caught. */
+const DECOR_SEL = /(card|panel|tile|bento|hero|badge|chip|widget|item|box|callout|stat|note|insight|metric|kpi|block|highlight|feature|quote|pill|tag)/i;
+/* Functional UI is exempt everywhere. A drawer needs a radius, a dropdown needs a shadow,
+   a focus ring needs a transition. Banning those would push authors to break real controls
+   in order to satisfy a design rule that was never aimed at them. */
+const FUNC_SEL = /(nav|navbar|modal|overlay|gate|search|palette|ticker|dropdown|tooltip|sticky|header|drawer|sheet|toast|banner|menu|btn|button|input|select|field|form|dialog|popover|inspector|hmi|tab|scroll|cursor|marquee|share)/i;
+
+function decorBlocks(t) {
+  return cssBlocks(t).filter((b) => /^[.#]/.test(b.sel) && DECOR_SEL.test(b.sel) && !FUNC_SEL.test(b.sel));
+}
+
+/* Rule 22 scans STYLESHEET text only — a <style> block or a .css file. A print stylesheet
+   that a page builds as a JS string for a PDF window legitimately paints white paper, and
+   flagging it would push an author to produce grey PDFs. Measured: all four of this rule's
+   original findings were exactly that. */
+function stylesheetText(t, file) {
+  if (file.endsWith('.css')) return t;
+  if (!file.endsWith('.html')) return '';
+  /* Strip <script> FIRST. article-7.html builds a print window with
+     `'<style>body{…background:#ffffff…}'` inside a JS string; a naive <style> scan reads
+     that as the page's own stylesheet and reports a white page background on an article
+     that has none. A <style> authored inside a script is a template, not this page's CSS. */
+  t = t.replace(/<script[\s\S]*?<\/script>/gi, ' ');
+  let out = '', m;
+  const re = /<style[^>]*>([\s\S]*?)<\/style>/gi;
+  while ((m = re.exec(t))) out += m[1] + '\n';
+  return out;
+}
+
 // each rule: {id, test(text, file) -> match string | null}
 const RULES = [
   { id: "inter-primary-font",
@@ -160,7 +233,135 @@ const RULES = [
   { id: "pricing-tiers",                                             // §A rule 26
     test: (t) => /\b(pricing-tier|price-card|pricing-table|plan-card|tier-price)\b/i.test(t)
       ? "pricing-tier template markup — this site sells nothing" : null },
+
+  /* ── v1.135.2 — DECORATIVE-SURFACE RULES ───────────────────────────────────
+     §A rules 7, 10, 11, 12, 22, 23 and 24. Four of them measure ZERO on today's tree and
+     ship strict on arrival. Three carry a real backlog and ship as MONITORS that are
+     STRICT on the flagship surfaces — the same monitor-then-flip discipline that took the
+     Conventional coverage gate from 24 % to 100 %. Baselines, measured before any edit:
+       rule 7  standalone orbs .............   0 blocks /   0 files   → strict
+       rule 22 pure-white body ............    0 blocks /   0 files   → strict
+       rule 23 animated CTA ...............    0 blocks /   0 files   → strict
+       rule 24 excessive hover ............    0 blocks /   0 files   → strict
+       rule 10 coloured left-stripe .......  259 blocks /  95 files   → monitor
+       rule 11 shadow as sole affordance ..  131 blocks /  93 files   → monitor
+       rule 12 large corner radius ........ 1058 blocks / 169 files   → monitor  */
+
+  { id: "standalone-orbs",                                           // §A rule 7
+    /* The aurora-mesh hero is §B PROTECTED and is a gradient WASH on a container, not a
+       circle. What this bans is the free-floating glowing disc: a round element that is
+       nothing but blur and colour. Naming the shape (50% radius + blur/radial fill) is
+       what keeps the protected hero out of it. */
+    test: (t) => {
+      /* NOT decorBlocks: the orb vocabulary IS the decorative signal, and a selector like
+         `.bg-orb` carries none of the card/panel words. Requiring both missed the fixture
+         this rule was written against. */
+      const hits = cssBlocks(t).filter((b) =>
+        /^[.#]/.test(b.sel)
+        && /(^|[^a-z])(orb|blob|glow-circle|bg-glow)/i.test(b.sel)
+        /* §B PROTECTED: the aurora-mesh hero IS a set of drifting radial washes and is the
+           site's signature. It is named `aurora-*` everywhere it appears, so the exemption
+           can be exact rather than a guess at opacity. */
+        && !/aurora/i.test(b.sel)
+        && !FUNC_SEL.test(b.sel)
+        && /border-radius:\s*50%/.test(b.body)
+        && /filter:\s*blur\(|radial-gradient/.test(b.body));
+      return hits.length ? `${hits.length} standalone glowing orb(s): ${hits.slice(0, 3).map((h) => h.sel).join(', ')}` : null;
+    } },
+
+  { id: "white-body-bg",                                             // §A rule 22
+    test: (t, f) => {
+      const css = stylesheetText(t, f);
+      if (!css) return null;
+      /* A stylesheet that declares `@page` is a PAPER document — article-9-paper.html sets
+         A4 with 2 cm margins. Printed paper is white; demanding a token background there
+         would produce grey PDFs to satisfy a screen rule. */
+      if (/@page\b/.test(css)) return null;
+      const hits = cssBlocks(css).filter((b) =>
+        !/print/i.test(b.at)
+        && /(^|,)\s*(html\s+)?body\s*(,|$)/i.test(b.sel)
+        && /background(-color)?:\s*(#fff\b|#ffffff\b|white\b)/i.test(b.body));
+      return hits.length ? `raw white page background on body (use the token background)` : null;
+    } },
+
+  { id: "animated-cta",                                              // §A rule 23
+    /* Deliberately narrow, and the narrowing was earned. A first cut matching any
+       arrow|cta|bounce selector flagged `.fp-arrow.active` on fuel-system.html — a P&ID
+       flow indicator whose animation IS the reading, telling the operator the line is
+       live. Banning that would delete information from a process diagram to satisfy a
+       marketing-copy rule. So: a resting (never :hover) infinite bounce/float on a
+       call-to-action, and nothing else. The §B Pixel-Rise scroll cue stays exempt. */
+    test: (t) => {
+      const hits = cssBlocks(t).filter((b) =>
+        /(cta|hero-btn|scroll-down|scroll-cue|bounce-arrow)/i.test(b.sel)
+        && !/:hover|:focus/.test(b.sel)
+        && !/scroll-explore/i.test(b.sel)
+        && /animation:[^;]*(bounce|float)[^;]*infinite/i.test(b.body));
+      return hits.length ? `${hits.length} bouncing call-to-action: ${hits.slice(0, 3).map((h) => h.sel).join(', ')}` : null;
+    } },
+
+  { id: "excessive-hover",                                           // §A rule 24
+    test: (t) => {
+      const hits = decorBlocks(t).filter((b) =>
+        /:hover/.test(b.sel)
+        && /transform:\s*(translate|scale)/i.test(b.body)
+        && /transition:\s*all/i.test(b.body));
+      return hits.length ? `${hits.length} decorative hover(s) moving on \`transition: all\`: ${hits.slice(0, 3).map((h) => h.sel).join(', ')}` : null;
+    } },
+
+  { id: "colored-left-stripe",                                       // §A rule 10  [MONITOR]
+    test: (t) => {
+      const hits = decorBlocks(t).filter((b) => {
+        const m = b.body.match(/border-left:\s*(\d+)px/);
+        return m && +m[1] >= 3;
+      });
+      return hits.length ? `${hits.length} coloured left-stripe rail(s) ≥3px (the language is a 2px semantic rail + 1px hairline): ${hits.slice(0, 3).map((h) => h.sel).join(', ')}` : null;
+    } },
+
+  { id: "shadow-sole-affordance",                                    // §A rule 11  [MONITOR]
+    /* design.md:645 — "cards are delineated by their border, not their shadow". The
+       measurable form is a shadow with NO border anywhere in the same block. */
+    test: (t) => {
+      const hits = decorBlocks(t).filter((b) =>
+        /box-shadow:\s*(?!none)/.test(b.body)
+        /* A STATE block lists only what changes. `.card:hover { box-shadow: … }` has its
+           border in the base rule, so reading the state block alone reports every correctly
+           built card as shadow-only — 9 of this rule's first 15 flagship findings were that.
+           The rule is about how a surface is delineated AT REST. */
+        && !/:(hover|focus|focus-visible|active|visited|target)\b/.test(b.sel)
+        /* A circle is a shape, not a rounded panel. "Cards are delineated by their border,
+           not their shadow" is about cards; a status dot's glow ring IS its signal. */
+        && !/border-radius:\s*50%/.test(b.body)
+        /* Rule 11 as written is "drop-shadows as the primary CARD affordance". A photograph,
+           a logo or an avatar is not a card and has no border to be delineated by; asking one
+           to grow a hairline is asking for a framed picture nobody wanted. */
+        && !/(image|img|photo|avatar|logo|thumb|portrait|figure)/i.test(b.sel)
+        && !/(^|;|\s)border(-(top|right|bottom|left|color|width|style))?\s*:/.test(b.body));
+      return hits.length ? `${hits.length} decorative surface(s) delineated by shadow with no border: ${hits.slice(0, 3).map((h) => h.sel).join(', ')}` : null;
+    } },
+
+  { id: "large-radius",                                              // §A rule 12  [MONITOR]
+    test: (t) => {
+      const hits = decorBlocks(t).filter((b) => {
+        const m = b.body.match(/border-radius:\s*(\d+)px/);
+        return m && +m[1] >= 8;
+      });
+      return hits.length ? `${hits.length} decorative surface(s) at ≥8px radius (the instrument scale is 4px): ${hits.slice(0, 3).map((h) => h.sel).join(', ')}` : null;
+    } },
 ];
+
+
+/* ── v1.135.2 — MONITOR RULES AND STRICT SCOPE ─────────────────────────────────────────
+   Three of the seven new rules carry a real backlog (259 / 131 / 1058 blocks). Landing them
+   strict site-wide would turn main red on 220 files and the only available response would be
+   to weaken or mute them — which is how this tool ended up wired as `; true` in the first
+   place. So they REPORT everywhere and FAIL on the flagship surfaces: the homepage and the
+   two stylesheets that reach it. Those are what the owner is actually looking at, they are
+   top-three in every category the sweep measured, and a rule that gates somewhere real is a
+   gate. Each file family moves into STRICT_SCOPE as it is swept; when the tail reaches zero
+   the monitor set empties and this block goes away. */
+const MONITOR_RULES = new Set(["colored-left-stripe", "shadow-sole-affordance", "large-radius"]);
+const STRICT_SCOPE = new Set(["index.html", "styles.css", "styles-index.css"]);
 
 const files = walk(ROOT);
 const findings = [];
@@ -188,7 +389,9 @@ for (const f of files) {
   let t; try { t = decodeEntities(stripDocProse(readFileSync(f, "utf8"))); } catch { continue; }
   for (const r of RULES) {
     const m = r.test(t, f);
-    if (m) findings.push({ file: f.replace(ROOT + "/", ""), rule: r.id, msg: m });
+    if (!m) continue;
+    const rel = f.replace(ROOT + "/", "");
+    findings.push({ file: rel, rule: r.id, msg: m, monitor: MONITOR_RULES.has(r.id) && !STRICT_SCOPE.has(rel) });
   }
 }
 
@@ -197,12 +400,27 @@ for (const req of ["terms.html", "privacy.html"]) {
   if (!existsSync(join(ROOT, req))) findings.push({ file: req, rule: "missing-legal", msg: `${req} missing (required)` });
 }
 
-const byRule = {};
-for (const f of findings) (byRule[f.rule] ||= []).push(f.file);
+const gating = findings.filter((f) => !f.monitor);
+const monitored = findings.filter((f) => f.monitor);
+const group = (list) => {
+  const by = {};
+  for (const f of list) (by[f.rule] ||= []).push(f.file);
+  return by;
+};
 console.log("── ANTI-VIBECODE AUDIT ──");
 if (!findings.length) { console.log("CLEAN — no vibecode tells."); process.exit(0); }
-for (const [rule, fs] of Object.entries(byRule)) {
-  console.log(`  ✗ ${rule}: ${fs.length} file(s) — ${byRule[rule].slice(0, 4).join(", ")}${fs.length > 4 ? " …" : ""}`);
+
+for (const [rule, fs] of Object.entries(group(gating))) {
+  console.log(`  ✗ ${rule}: ${fs.length} file(s) — ${fs.slice(0, 4).join(", ")}${fs.length > 4 ? " …" : ""}`);
 }
-console.log(`── ${findings.length} finding(s) across ${new Set(findings.map((f) => f.file)).size} file(s). See standarization/ANTI_VIBECODE_STANDARD.md`);
-process.exit(STRICT ? 1 : 0);
+const mon = group(monitored);
+if (Object.keys(mon).length) {
+  console.log("  ── monitor (reports everywhere, fails on the flagship surfaces) ──");
+  for (const [rule, fs] of Object.entries(mon)) {
+    console.log(`    · ${rule}: ${fs.length} file(s) — ${fs.slice(0, 4).join(", ")}${fs.length > 4 ? " …" : ""}`);
+  }
+  console.log(`    flip condition: a monitor rule goes strict when its count reaches 0, or when the files it still flags are added to STRICT_SCOPE.`);
+}
+console.log(`── ${gating.length} gating + ${monitored.length} monitored finding(s) across ${new Set(findings.map((f) => f.file)).size} file(s). See standarization/ANTI_VIBECODE_STANDARD.md`);
+if (!gating.length) console.log("── no GATING findings — safe to push.");
+process.exit(STRICT && gating.length ? 1 : 0);

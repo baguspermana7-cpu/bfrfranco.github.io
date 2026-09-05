@@ -90,15 +90,68 @@ and the seven that existed could not fail a build. That is how a card could carr
 3px rail, a shadow doing the delineation and `transition: all` on the homepage while the gate
 reported clean — and it is why the owner kept finding slop the tool had passed.
 
-As of v1.135.0 the gate is **strict**, and coverage is:
+As of v1.135.2 the gate is **strict**, and coverage is:
 
 | status | rules | count |
 |---|---|---|
-| **Gating detectors** | 1, 2, 3, 4, 5, 6, 17, 18, 19, 21, 26 | **11** |
-| Planned gating (design sweep in progress) | 7, 10, 11, 12, 22, 23, 24 | 7 |
+| **Gating detectors** | 1, 2, 3, 4, 5, 6, 7, 17, 18, 19, 21, 22, 23, 24, 26 | **15** |
+| **Monitor + strict on the flagship surfaces** | 10, 11, 12 | 3 |
 | Monitor-only — real signal, structural false positives | 8, 9, 14, 15 | 4 |
 | Render-hosted (needs computed geometry, not text) | 20, 25 | 2 |
 | **Un-gateable judgement calls — declared, not faked** | 13, 16 | 2 |
+
+### Monitor + strict scope (v1.135.2)
+
+Rules 10, 11 and 12 carry a real backlog. Landing them strict site-wide would turn `main` red on
+220 files, and the only available response would be to weaken or mute them — which is exactly how
+this tool ended up wired as `; true`. So they **report everywhere and fail on `STRICT_SCOPE`**:
+`index.html`, `styles.css`, `styles-index.css`. Those are what the owner is looking at, they are
+top-three in every category the sweep measured, and a rule that gates somewhere real is a gate.
+Each file family joins `STRICT_SCOPE` as it is swept; when a rule reaches zero the monitor set
+loses it. Baselines measured on the tree before any edit:
+
+| rule | at v1.135.2 | after the flagship sweep |
+|---|---:|---:|
+| 10 coloured left-stripe ≥3px | 259 blocks / 95 files | 253 / 93 — flagship clear |
+| 11 shadow as the sole affordance | 131 blocks / 93 files | 20 / 13 — see below |
+| 12 decorative radius ≥8px | 1058 blocks / 169 files | 1012 / 167 — flagship clear |
+
+**Rule 11 fell from 93 files to 13 by getting more honest, not weaker.** Three exemptions, each
+found by reading what it flagged:
+
+1. **State blocks.** `.card:hover { box-shadow: … }` lists only what changes; the border is in the
+   base rule. Nine of the rule's first fifteen flagship findings were correctly built cards being
+   read one state at a time. The rule is about how a surface is delineated **at rest**.
+2. **Circles.** A status dot's glow ring *is* its signal. "Cards are delineated by their border"
+   is about cards; `border-radius: 50%` is a shape, not a rounded panel.
+3. **Images.** A photograph, logo or avatar has no border to be delineated by. Asking one to grow
+   a hairline is asking for a framed picture nobody wanted.
+
+**Rule 23 was narrowed for the same reason.** A first cut matching any `arrow|cta|bounce` selector
+flagged `.fp-arrow.active` on `fuel-system.html` — a P&ID flow indicator whose animation *is* the
+reading, telling the operator the line is live. Deleting information from a process diagram to
+satisfy a marketing-copy rule is not a win. It now matches a resting (never `:hover`) infinite
+bounce/float on a call-to-action, and nothing else.
+
+**The extractor had to be rewritten before any of this could run.** The obvious CSS-block regex
+`/([^{}]+)\{([^{}]*)\}/g` is catastrophic on this tree: at a nested or unbalanced brace the inner
+`[^{}]*\}` fails and the engine backtracks the outer `[^{}]+` one character at a time across the
+preceding prose. Measured **10.3 seconds on a single 238 KB article**, and the whole-tree scan never
+finished. The linear scanner does the same job in ~2 s across 420 files. It tracks enclosing
+at-rules on a **stack** — a first cut kept one running `at` string and never cleared it, so every
+block after a `@media print { … }` inherited "print" and was silently exempted. An exemption that
+leaks forward is worse than none: it goes quiet exactly where a page has the most rules.
+
+**Three findings that were the tool's fault, not the site's**, all fixed rather than muted: a print
+stylesheet a page builds as a JS string legitimately paints white paper (rule 22 now strips
+`<script>` before reading `<style>`, and skips any sheet declaring `@page`); the §B aurora-mesh hero
+is named `aurora-*` everywhere and is exempt from the orb rule by that exact name; and the orb rule
+itself had to stop requiring the card/panel vocabulary, because `.bg-orb` contains none of it.
+
+**Two dead patterns removed while sweeping**, both previously rejected by the owner:
+`.floating-side-card*` — 132 lines in `styles-index.css` for markup that lived only on
+`articles.html`, which loads `styles.min.css` and therefore **rendered it entirely unstyled**; and
+`.gradient-orb*` — the CSS half of cursor-tracking effect #47, whose JS was disabled in v1.135.0.
 
 Rules 13 and 16 will never have a detector. "Purple-and-black *scheme*" is an aggregate palette
 judgement, and "bento grid as generic filler" turns on whether the content is genuinely a
