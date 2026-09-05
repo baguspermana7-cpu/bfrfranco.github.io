@@ -272,12 +272,96 @@
         }
     });
 
+    /* ── Glossary tooltips, wired from the registry ─────────────────────────────
+       Plan B2 asked that every parameter with an `explainKey` get its tooltip wired, with
+       the mapping GENERATED rather than hand-authored on each page. Two rules make that safe:
+
+       1. The tooltip goes on the LABEL, never on the value cell. The value cell already opens
+          this drawer, and the two answer different questions — the drawer says where THIS
+          NUMBER came from, the tooltip says what the TERM means. Putting both on one element
+          would give it two panels and two focus behaviours.
+       2. Nothing is written into the page. The key names a glossary entry; rz-explain.js owns
+          the text, so a definition can never drift between a cockpit and the glossary.
+
+       A page without rz-explain.js loaded simply gets no tooltips — the attribute is inert. */
+    /* Deliberately narrow. A first version also accepted `label`, `th`, `dt` and `.panel-title`;
+       those match EARLIER in document order inside a row than the cell's own label, so a hook
+       picked up the heading of the panel it sits in and datahall's wiring fell from nine to
+       four. A label selector that can match the wrong label is worse than one that matches
+       nothing — a tooltip on the wrong term is a wrong answer, a missing one is a gap. */
+    var LABEL_SELECTORS = '.k,.k-lbl,.data-lbl,.bb-lbl,.kpi-label,.kpi-lbl,.metric-label,'
+        + '.kv-label,.basis-label,.stat-label,.card-label';
+    var ROW_SELECTORS = '.kv,.data-row,.sp-row,.bb-cell,.basis-cell,.status-item,.metric-row,'
+        + '.kpi,.kpi-card,.stat-row,.meta-chip';
+
+    function labelFor(hook) {
+        /* The label is the nearest preceding sibling that looks like one, else a labelled
+           descendant of the row the hook sits in. Both shapes exist across these cockpits. */
+        var sib = hook.previousElementSibling;
+        while (sib) {
+            if (sib.matches && sib.matches(LABEL_SELECTORS)) return sib;
+            sib = sib.previousElementSibling;
+        }
+        var row = hook.closest ? hook.closest(ROW_SELECTORS) : null;
+        var inRow = row ? row.querySelector(LABEL_SELECTORS) : null;
+        if (inRow && inRow !== hook && !inRow.contains(hook)) return inRow;
+        /* Chip form: the value sits in a <b> inside an element that carries the term as its own
+           text — "IT <b>30,000</b> kW". There is no separate label element, so the container IS
+           the label. Only accept it when it has text of its own beyond the hook, otherwise the
+           tooltip would attach to a wrapper that reads as nothing. */
+        var host = hook.parentElement;
+        if (host && !host.hasAttribute('data-basis-param')) {
+            var own = '';
+            for (var n = 0; n < host.childNodes.length; n++) {
+                if (host.childNodes[n].nodeType === 3) own += host.childNodes[n].textContent;
+            }
+            if (own.replace(/[\s\u00b7|:/]/g, '').length >= 2) return host;
+        }
+        return null;
+    }
+
+    function wireExplainKeys() {
+        var reg = registry();
+        if (!reg) return 0;
+        var keyById = {};
+        for (var i = 0; i < reg.parameters.length; i++) {
+            var p = reg.parameters[i];
+            if (p.explainKey) keyById[p.id] = p.explainKey;
+        }
+        var hooks = document.querySelectorAll('[data-basis-param]');
+        var wired = 0;
+        for (var h = 0; h < hooks.length; h++) {
+            var key = keyById[hooks[h].getAttribute('data-basis-param')];
+            if (!key) continue;
+            var label = labelFor(hooks[h]);
+            /* Never on the hook itself, and never twice. */
+            if (!label || label === hooks[h] || label.hasAttribute('data-explain')) continue;
+            if (label.hasAttribute('data-basis-param')) continue;
+            label.setAttribute('data-explain', key);
+            wired += 1;
+        }
+        /* rz-explain.js exposes attach(el, key) for one element and attachExplicit(root) for a
+           subtree — this needs the second. Calling attach() would silently wire nothing. */
+        if (wired && root.RZExplain && typeof root.RZExplain.attachExplicit === 'function') {
+            root.RZExplain.attachExplicit(document);
+        }
+        return wired;
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', wireExplainKeys);
+    } else {
+        wireExplainKeys();
+    }
+
     root.RZBasisDrawer = {
         open: open,
         close: close,
         get: byId,
         authorityAvailable: runtimeAuthorityAvailable,
         /* Exposed so a gate can assert the page's markup and the registry agree. */
+        /* Exposed so a gate can assert the wiring actually happened in a real render. */
+        wireExplainKeys: wireExplainKeys,
         ids: function () {
             var reg = registry();
             if (!reg) return [];

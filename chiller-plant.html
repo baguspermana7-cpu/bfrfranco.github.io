@@ -561,7 +561,13 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
     <script src="js/conv-engine.js?v=2.2.0"></script>
     <!-- v1.134.2 — generated parameter registry + the shared basis drawer. -->
     <script src="js/conv-parameters.js?v=1.134.2"></script>
-    <script src="js/rz-basis-drawer.js?v=1.134.14"></script>
+    <!-- v1.134.25 — RZExplain, the site glossary engine. The cockpits were the only
+         substantial pages carrying none of it, so terms an operator has to read
+         (approach temperature, cycles of concentration, N+1, WUE) had nowhere to go.
+         Loaded BEFORE the basis drawer, which wires the keys from the registry. -->
+    <script src="js/rz-explain-db.js?v=2026-09-05-cockpit" defer></script>
+    <script src="js/rz-explain.js?v=2026-09-05-cockpit" defer></script>
+    <script src="js/rz-basis-drawer.js?v=2026-09-05-cockpit"></script>
     <!-- v1.42.4 — Semantic line + breaker model libraries. Foundation for
          review docs 27/28 §3.1 + 17/18 §3.2 cross-page adoption. Non-deferred
          so drawPid() can call RZLineModel.line() at parse time. Additive —

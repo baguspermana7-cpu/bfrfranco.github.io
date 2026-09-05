@@ -188,7 +188,8 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-29",
         "method": "Typical tower range; pending the site wet-bulb basis."
-      }
+      },
+      "explainKey": "cooling-tower"
     },
     {
       "id": "cooling.cdw_return_c",
@@ -205,7 +206,8 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-29"
       },
-      "formulaExpr": "cooling.cdw_supply_c + cooling.cdw_range_k"
+      "formulaExpr": "cooling.cdw_supply_c + cooling.cdw_range_k",
+      "explainKey": "cooling-tower"
     },
     {
       "id": "cooling.cdw_supply_c",
@@ -217,7 +219,8 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-29",
         "method": "Typical tropical design value; no site wet-bulb design figure has been supplied. Replace with the site wet-bulb basis when it exists."
-      }
+      },
+      "explainKey": "cooling-tower"
     },
     {
       "id": "cooling.chiller_capacity_kw_th",
@@ -235,7 +238,8 @@
         "asOf": "2026-08-29",
         "method": "Nameplate arithmetic; the unit capacity it multiplies is ASSUMED."
       },
-      "formulaExpr": "cooling.chillers_running * cooling.chiller_unit_kw_th"
+      "formulaExpr": "cooling.chillers_running * cooling.chiller_unit_kw_th",
+      "explainKey": "chiller"
     },
     {
       "id": "cooling.chiller_design_duty_kw_th",
@@ -252,7 +256,8 @@
         "asOf": "2026-08-28",
         "section": "chillerDesignDutyKwTh()"
       },
-      "formulaNotExpressible": "Computed at the DESIGN point, not from the live snapshot values, so it cannot be re-derived from published parameters."
+      "formulaNotExpressible": "Computed at the DESIGN point, not from the live snapshot values, so it cannot be re-derived from published parameters.",
+      "explainKey": "chiller"
     },
     {
       "id": "cooling.chiller_input_kw_e",
@@ -270,7 +275,8 @@
         "asOf": "2026-08-29",
         "method": "Replaces an authored page curve that produced 0.11 kW/RT."
       },
-      "formulaExpr": "cooling.heat_rejection_kw * cooling.chiller_specific_power_kw_e_per_kw_th"
+      "formulaExpr": "cooling.heat_rejection_kw * cooling.chiller_specific_power_kw_e_per_kw_th",
+      "explainKey": "chiller"
     },
     {
       "id": "cooling.chiller_input_per_machine_kw_e",
@@ -288,7 +294,8 @@
         "asOf": "2026-09-05",
         "method": "The P&ID prints one machine's electrical input on every chiller it draws. That share was being divided out on the page, so the number an operator reads had no parameter to trace to; published by the engine instead."
       },
-      "formulaExpr": "cooling.chiller_input_kw_e / cooling.chillers_running"
+      "formulaExpr": "cooling.chiller_input_kw_e / cooling.chillers_running",
+      "explainKey": "chiller"
     },
     {
       "id": "cooling.chiller_n1_capacity_kw_th",
@@ -306,7 +313,8 @@
         "asOf": "2026-08-29",
         "method": "Worst single-machine outage against the INSTALLED set, so the standby is counted."
       },
-      "formulaExpr": "( cooling.chillers_total - 1 ) * cooling.chiller_unit_kw_th"
+      "formulaExpr": "( cooling.chillers_total - 1 ) * cooling.chiller_unit_kw_th",
+      "explainKey": "n-plus-1"
     },
     {
       "id": "cooling.chiller_n1_margin_kw_th",
@@ -324,7 +332,8 @@
         "asOf": "2026-09-05",
         "method": "The figure the cockpit colours red or green for redundancy. It was subtracted on the page, so the number an operator acts on had no parameter to trace to."
       },
-      "formulaExpr": "cooling.chiller_n1_capacity_kw_th - cooling.heat_rejection_kw"
+      "formulaExpr": "cooling.chiller_n1_capacity_kw_th - cooling.heat_rejection_kw",
+      "explainKey": "n-plus-1"
     },
     {
       "id": "cooling.flow_per_machine_lps",
@@ -389,7 +398,8 @@
         "ref": "js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)",
         "asOf": "2026-08-28",
         "section": "resilience.subsystems.cooling"
-      }
+      },
+      "explainKey": "n-plus-1"
     },
     {
       "id": "cooling.chiller_specific_power_kw_e_per_kw_th",
@@ -397,7 +407,7 @@
       "unit": "kW_e/kW_th",
       "scope": "plant",
       "evidenceClass": "ASSUMED",
-      "explainKey": "chiller-specific-power",
+      "explainKey": "cop",
       "source": {
         "ref": "js/conv-engine.js",
         "section": "cooling",
@@ -416,7 +426,8 @@
         "section": "water.heatRejectionType",
         "asOf": "2026-08-29",
         "method": "The study fixes evaporative cooling-tower heat rejection, which means water-cooled machines. Adopted by the owner 2026-08-29, replacing the air-cooled depiction the P&ID had carried."
-      }
+      },
+      "explainKey": "chiller"
     },
     {
       "id": "cooling.chiller_unit_kw_th",
@@ -429,7 +440,8 @@
         "asOf": "2026-08-28",
         "section": "CHILLER_UNIT_KW_TH",
         "method": "Water-cooled centrifugal, ~1,422 RT. No vendor selection has been made; pending Basis-of-Design confirmation."
-      }
+      },
+      "explainKey": "chiller"
     },
     {
       "id": "cooling.chillers_running",
@@ -447,7 +459,8 @@
         "asOf": "2026-08-28",
         "section": "chillersRunning()"
       },
-      "formulaExpr": "ceil( cooling.heat_rejection_kw / cooling.chiller_unit_kw_th )"
+      "formulaExpr": "ceil( cooling.heat_rejection_kw / cooling.chiller_unit_kw_th )",
+      "explainKey": "chiller"
     },
     {
       "id": "cooling.chillers_total",
@@ -466,7 +479,8 @@
         "section": "chillersTotal()",
         "method": "Installed count is sized on the DESIGN duty, not the current load: running counts duty units at the adopted load, installed carries the design point plus the N+1 spare. A first curated formula said running + 1 and the formula gate rejected it — the engine was right."
       },
-      "formulaExpr": "ceil( cooling.chiller_design_duty_kw_th / cooling.chiller_unit_kw_th ) + 1"
+      "formulaExpr": "ceil( cooling.chiller_design_duty_kw_th / cooling.chiller_unit_kw_th ) + 1",
+      "explainKey": "chiller"
     },
     {
       "id": "cooling.chw_coil_approach_k",
@@ -481,7 +495,7 @@
         "section": "THERMAL CHAIN",
         "method": "Sensible-duty CHW coil. No coil selection has been made — this is the one number a vendor submittal should replace."
       },
-      "explainKey": "chw-approach"
+      "explainKey": "approach-temperature"
     },
     {
       "id": "cooling.chw_delta_t",
@@ -496,7 +510,7 @@
         "section": "line 83",
         "method": "Carried unchanged from the prior basis so plant flow and duty arithmetic are unchanged."
       },
-      "explainKey": "chw-delta-t",
+      "explainKey": "delta-t",
       "formulaNotExpressible": "Republishes the authored model input chw_delta_t_k, which has no registry id of its own."
     },
     {
@@ -515,7 +529,7 @@
         "asOf": "2026-08-28",
         "section": "THERMAL CHAIN"
       },
-      "explainKey": "chwr",
+      "explainKey": "chwst",
       "formulaExpr": "cooling.chws_c + cooling.chw_delta_t"
     },
     {
@@ -535,7 +549,7 @@
         "section": "THERMAL CHAIN",
         "method": "Re-derived in v1.134.0 from the adopted rack-inlet target; the retired 7.2 C belonged to the 1.85 MW basis."
       },
-      "explainKey": "chws",
+      "explainKey": "chwst",
       "formulaExpr": "cooling.crah_supply_air_c - cooling.chw_coil_approach_k"
     },
     {
@@ -555,7 +569,7 @@
         "section": "THERMAL CHAIN",
         "method": "This plane is NOT the rack inlet and NOT the CRAH return."
       },
-      "explainKey": "crah-supply-air",
+      "explainKey": "crah",
       "formulaExpr": "cooling.rack_inlet_target_c - cooling.supply_path_mixing_k"
     },
     {
@@ -609,7 +623,8 @@
         "asOf": "2026-08-28",
         "section": "line 81"
       },
-      "formulaExpr": "site.it_load_kw + electrical.ups_loss_kw"
+      "formulaExpr": "site.it_load_kw + electrical.ups_loss_kw",
+      "explainKey": "heat-rejection"
     },
     {
       "id": "cooling.nameplate_evidence_class",
@@ -631,7 +646,7 @@
       "scope": "plant",
       "evidenceClass": "DERIVED",
       "formula": "1 / chiller_specific_power_kw_e_per_kw_th",
-      "explainKey": "plant-cop",
+      "explainKey": "cop",
       "deps": [
         "cooling.chiller_specific_power_kw_e_per_kw_th"
       ],
@@ -669,7 +684,7 @@
         "section": "cooling.rackInletTargetC",
         "method": "Owner-adopted equipment-inlet target. ASHRAE 18-27 C is the recommended envelope, not this target."
       },
-      "explainKey": "rack-inlet-target"
+      "explainKey": "cold-aisle"
     },
     {
       "id": "cooling.supply_path_mixing_k",
@@ -719,7 +734,8 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-09-05",
         "method": "No vendor selection has been made. Was authored on datahall.html, where it sized the whole fleet and nothing in the registry could explain any of the results."
-      }
+      },
+      "explainKey": "crah"
     },
     {
       "id": "cooling.crah_required",
@@ -737,7 +753,8 @@
         "asOf": "2026-09-05",
         "method": "Sensible hall heat is taken as the hall IT load, the substitution this cockpit has always made and the same one doc-09 uses for the CHW flow term."
       },
-      "formulaExpr": "ceil(hall.it_load_kw / cooling.crah_unit_sensible_kw)"
+      "formulaExpr": "ceil(hall.it_load_kw / cooling.crah_unit_sensible_kw)",
+      "explainKey": "crah"
     },
     {
       "id": "cooling.crah_installed",
@@ -754,7 +771,8 @@
         "asOf": "2026-09-05",
         "method": "N+1 per the study resilience contract: one standby that auto-starts on a trip."
       },
-      "formulaExpr": "cooling.crah_required + 1"
+      "formulaExpr": "cooling.crah_required + 1",
+      "explainKey": "crah"
     },
     {
       "id": "cooling.crah_running",
@@ -771,7 +789,8 @@
         "asOf": "2026-09-05",
         "method": "The +1 is standby, so the running count is the required count."
       },
-      "formulaExpr": "cooling.crah_required"
+      "formulaExpr": "cooling.crah_required",
+      "explainKey": "crah"
     },
     {
       "id": "cooling.crah_available_kw",
@@ -789,7 +808,8 @@
         "asOf": "2026-09-05",
         "method": "The capacity half of the balance band's cooling cell."
       },
-      "formulaExpr": "cooling.crah_running * cooling.crah_unit_sensible_kw"
+      "formulaExpr": "cooling.crah_running * cooling.crah_unit_sensible_kw",
+      "explainKey": "crah"
     },
     {
       "id": "cooling.crah_n1_available_kw",
@@ -807,7 +827,8 @@
         "asOf": "2026-09-05",
         "method": "Measured against the INSTALLED fleet because the standby starts. An earlier page form used (running - 1) and silently ignored the standby; at 17/20 it still passed, so the modelling error never surfaced. It coincides with crah_available_kw under the current standby rule and would diverge the moment that rule changed, which is why both are published."
       },
-      "formulaExpr": "(cooling.crah_installed - 1) * cooling.crah_unit_sensible_kw"
+      "formulaExpr": "(cooling.crah_installed - 1) * cooling.crah_unit_sensible_kw",
+      "explainKey": "n-plus-1"
     },
     {
       "id": "cooling.return_path_mixing_k",
@@ -837,7 +858,8 @@
         "asOf": "2026-09-05",
         "method": "The plane immediately downstream of the rack inlet. The data hall drew it per row and nothing in the registry could explain any of those readings."
       },
-      "formulaExpr": "cooling.rack_inlet_target_c + cooling.airside_delta_t_k"
+      "formulaExpr": "cooling.rack_inlet_target_c + cooling.airside_delta_t_k",
+      "explainKey": "hot-aisle"
     },
     {
       "id": "cooling.crah_return_air_c",
@@ -855,7 +877,8 @@
         "asOf": "2026-09-05",
         "method": "Completes the air chain: rack inlet -> hot aisle -> CRAH return, each plane named."
       },
-      "formulaExpr": "cooling.hot_aisle_c + cooling.return_path_mixing_k"
+      "formulaExpr": "cooling.hot_aisle_c + cooling.return_path_mixing_k",
+      "explainKey": "crah"
     },
     {
       "id": "cooling.tower_rejection_kw_th",
@@ -873,7 +896,8 @@
         "asOf": "2026-08-29",
         "method": "The tower rejects the chiller duty plus the compressor work."
       },
-      "formulaExpr": "cooling.heat_rejection_kw * ( 1 + cooling.chiller_specific_power_kw_e_per_kw_th )"
+      "formulaExpr": "cooling.heat_rejection_kw * ( 1 + cooling.chiller_specific_power_kw_e_per_kw_th )",
+      "explainKey": "cooling-tower"
     },
     {
       "id": "electrical.epms_total_kw",
@@ -889,7 +913,8 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28"
       },
-      "formulaExpr": "site.facility_load_kw"
+      "formulaExpr": "site.facility_load_kw",
+      "explainKey": "epms"
     },
     {
       "id": "electrical.epms_ups_output_kw",
@@ -905,7 +930,8 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28"
       },
-      "formulaExpr": "site.it_load_kw"
+      "formulaExpr": "site.it_load_kw",
+      "explainKey": "epms"
     },
     {
       "id": "electrical.metering_tolerance_pct",
@@ -942,7 +968,8 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-29",
         "method": "Double-conversion efficiency at the operating point. No vendor curve has been supplied."
-      }
+      },
+      "explainKey": "ups"
     },
     {
       "id": "electrical.ups_loss_kw",
@@ -960,7 +987,8 @@
         "asOf": "2026-08-28",
         "section": "line 39"
       },
-      "formulaExpr": "site.it_load_kw * ( 1 / electrical.ups_efficiency - 1 )"
+      "formulaExpr": "site.it_load_kw * ( 1 / electrical.ups_efficiency - 1 )",
+      "explainKey": "ups"
     },
     {
       "id": "electrical.ups_module_count",
@@ -1006,7 +1034,8 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28",
         "method": "Modular UPS frame rating assumed; no vendor selection has been made."
-      }
+      },
+      "explainKey": "ups"
     },
     {
       "id": "electrical.ups_modules_per_system",
@@ -1024,7 +1053,8 @@
       "deps": [
         "site.it_design_kw",
         "electrical.ups_module_kw_rated"
-      ]
+      ],
+      "explainKey": "ups-paralleling"
     },
     {
       "id": "electrical.ups_redundancy",
@@ -1036,7 +1066,8 @@
         "ref": "js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)",
         "asOf": "2026-08-28",
         "section": "resilience.subsystems.electrical"
-      }
+      },
+      "explainKey": "2n"
     },
     {
       "id": "electrical.ups_system_count",
@@ -1049,7 +1080,8 @@
         "asOf": "2026-08-28",
         "section": "resilience.subsystems.electrical",
         "method": "2N implies two independent systems."
-      }
+      },
+      "explainKey": "ups"
     },
     {
       "id": "electrical.ups_system_kw",
@@ -1066,7 +1098,8 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28"
       },
-      "formulaExpr": "electrical.epms_ups_output_kw / electrical.ups_system_count"
+      "formulaExpr": "electrical.epms_ups_output_kw / electrical.ups_system_count",
+      "explainKey": "ups"
     },
     {
       "id": "electrical.ups_system_rated_kw",
@@ -1083,7 +1116,8 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28"
       },
-      "formulaExpr": "electrical.ups_modules_per_system * electrical.ups_module_kw_rated"
+      "formulaExpr": "electrical.ups_modules_per_system * electrical.ups_module_kw_rated",
+      "explainKey": "ups"
     },
     {
       "id": "environment.avg_rh_pct",
@@ -1121,7 +1155,8 @@
         "asOf": "2026-08-28",
         "section": "line 14",
         "method": "Denominator is FACILITY kWh, not IT kWh."
-      }
+      },
+      "explainKey": "grid-carbon-intensity"
     },
     {
       "id": "environment.carbon_kg_per_hr",
@@ -1169,7 +1204,7 @@
         "fire.required_capacity_m3",
         "fire.reserve_capacity_m3"
       ],
-      "explainKey": "fire-shortfall",
+      "explainKey": "fire-suppression",
       "formulaExpr": "fire.required_capacity_m3 - fire.reserve_capacity_m3"
     },
     {
@@ -1206,7 +1241,7 @@
         "fire.pump_demand_lpm",
         "fire.stored_m3"
       ],
-      "explainKey": "fire-duration",
+      "explainKey": "fire-suppression",
       "formulaExpr": "fire.stored_m3 * 1000 / fire.pump_demand_lpm"
     },
     {
@@ -1330,7 +1365,8 @@
         "asOf": "2026-08-28",
         "section": "lines 133-147"
       },
-      "formulaExpr": "fuel.usable_l / fuel.generator_consumption_lph"
+      "formulaExpr": "fuel.usable_l / fuel.generator_consumption_lph",
+      "explainKey": "fuel-autonomy"
     },
     {
       "id": "fuel.generator_consumption_lph",
@@ -1347,7 +1383,8 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28"
       },
-      "formulaExpr": "site.facility_load_kw * fuel.specific_consumption_l_per_kwh"
+      "formulaExpr": "site.facility_load_kw * fuel.specific_consumption_l_per_kwh",
+      "explainKey": "genset"
     },
     {
       "id": "fuel.level_low_low_pct",
@@ -1418,7 +1455,8 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28",
         "method": "Diesel genset specific consumption assumed; no engine data sheet has been supplied."
-      }
+      },
+      "explainKey": "genset"
     },
     {
       "id": "fuel.tank_capacity_l",
@@ -1461,7 +1499,8 @@
         "asOf": "2026-08-28",
         "section": "lines 133-147"
       },
-      "formulaExpr": "fuel.tank_capacity_l * fuel.usable_fraction * fuel.level_pct / 100"
+      "formulaExpr": "fuel.tank_capacity_l * fuel.usable_fraction * fuel.level_pct / 100",
+      "explainKey": "fuel-autonomy"
     },
     {
       "id": "hall.chillers_allocated",
@@ -1534,7 +1573,7 @@
         "asOf": "2026-08-28",
         "method": "Adopted normal scenario, SIMULATED/ADOPTED. Registered once from the first hall. The generator ASSERTS all four halls are identical under the current study, so this genuinely represents any of them; if a future study differentiates them the build throws rather than letting one stand for all."
       },
-      "explainKey": "hall-it-load"
+      "explainKey": "it-load"
     },
     {
       "id": "hall.rack_actual_avg_kw",
@@ -1566,7 +1605,8 @@
         "section": "rack.selectedAverageKw",
         "asOf": "2026-08-28",
         "method": "500 cabinets x 20 kW = 10,000 kW closes against the hall design. Registered once from the first hall. The generator ASSERTS all four halls are identical under the current study, so this genuinely represents any of them; if a future study differentiates them the build throws rather than letting one stand for all."
-      }
+      },
+      "explainKey": "rack-density"
     },
     {
       "id": "hall.rack_selected_peak_kw",
@@ -1579,7 +1619,8 @@
         "section": "rack.selectedPeakKw",
         "asOf": "2026-08-28",
         "method": "Registered once from the first hall. The generator ASSERTS all four halls are identical under the current study, so this genuinely represents any of them; if a future study differentiates them the build throws rather than letting one stand for all."
-      }
+      },
+      "explainKey": "rack-density"
     },
     {
       "id": "hall.racks",
@@ -1592,7 +1633,8 @@
         "section": "rack.countPerHall",
         "asOf": "2026-08-28",
         "method": "Registered once from the first hall. The generator ASSERTS all four halls are identical under the current study, so this genuinely represents any of them; if a future study differentiates them the build throws rather than letting one stand for all."
-      }
+      },
+      "explainKey": "rack-density"
     },
     {
       "id": "hall.utilisation_pct",
@@ -1723,7 +1765,8 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28"
       },
-      "formulaExpr": "site.it_load_kw / 10"
+      "formulaExpr": "site.it_load_kw / 10",
+      "explainKey": "rack-density"
     },
     {
       "id": "racks.at_6kw",
@@ -1739,7 +1782,8 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28"
       },
-      "formulaExpr": "site.it_load_kw / 6"
+      "formulaExpr": "site.it_load_kw / 6",
+      "explainKey": "rack-density"
     },
     {
       "id": "racks.at_8kw",
@@ -1755,7 +1799,8 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28"
       },
-      "formulaExpr": "site.it_load_kw / 8"
+      "formulaExpr": "site.it_load_kw / 8",
+      "explainKey": "rack-density"
     },
     {
       "id": "site.facility_load_kw",
@@ -1810,7 +1855,8 @@
       },
       "formulaExpr": "campus.it_design_kw",
       "display": "internal",
-      "displayReason": "Republishes campus.it_design_kw under the legacy site.* key that predates the campus model. The campus value is what the cockpits render."
+      "displayReason": "Republishes campus.it_design_kw under the legacy site.* key that predates the campus model. The campus value is what the cockpits render.",
+      "explainKey": "it-load"
     },
     {
       "id": "site.it_load_kw",
@@ -1942,7 +1988,8 @@
         "asOf": "2026-08-28",
         "section": "line 13"
       },
-      "formulaExpr": "environment.wue_l_per_kwh"
+      "formulaExpr": "environment.wue_l_per_kwh",
+      "explainKey": "wue"
     },
     {
       "id": "electrical.ups_load_pct_normal",
@@ -1961,7 +2008,8 @@
         "asOf": "2026-09-05",
         "method": "Was computed on dc-conventional.html. An earlier form there divided the CAMPUS load by a HALL-scale rating and rendered 750% as though it were telemetry."
       },
-      "formulaExpr": "(site.it_load_kw / electrical.ups_system_count) / electrical.ups_system_rated_kw * 100"
+      "formulaExpr": "(site.it_load_kw / electrical.ups_system_count) / electrical.ups_system_rated_kw * 100",
+      "explainKey": "ups"
     },
     {
       "id": "electrical.ups_load_pct_on_failover",
@@ -1979,7 +2027,8 @@
         "asOf": "2026-09-05",
         "method": "On a 2N transfer the surviving system carries the whole IT load."
       },
-      "formulaExpr": "site.it_load_kw / electrical.ups_system_rated_kw * 100"
+      "formulaExpr": "site.it_load_kw / electrical.ups_system_rated_kw * 100",
+      "explainKey": "2n"
     },
     {
       "id": "cooling.chiller_part_load_pct",
@@ -1998,7 +2047,8 @@
         "asOf": "2026-09-05",
         "method": "Stated as a plant AVERAGE and labelled as one: per-unit loading is not published, so no per-machine figure is shown."
       },
-      "formulaExpr": "cooling.heat_rejection_kw / (cooling.chillers_running * cooling.chiller_unit_kw_th) * 100"
+      "formulaExpr": "cooling.heat_rejection_kw / (cooling.chillers_running * cooling.chiller_unit_kw_th) * 100",
+      "explainKey": "chiller"
     },
     {
       "id": "water.tower_cycles_of_concentration",
@@ -2010,7 +2060,8 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-09-05",
         "method": "Typical open-tower operation. Was authored on water-system.html, where it governed the evaporation/blowdown split an operator reads."
-      }
+      },
+      "explainKey": "cooling-tower"
     },
     {
       "id": "water.tower_drift_fraction",
@@ -2022,7 +2073,8 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-09-05",
         "method": "0.5% of makeup with drift eliminators fitted. Was a literal 0.005 on the page."
-      }
+      },
+      "explainKey": "cooling-tower"
     },
     {
       "id": "water.drift_lpm",
@@ -2040,7 +2092,8 @@
         "asOf": "2026-09-05",
         "method": "The first term of the open-tower balance."
       },
-      "formulaExpr": "water.flow_lpm_for_wue * water.tower_drift_fraction"
+      "formulaExpr": "water.flow_lpm_for_wue * water.tower_drift_fraction",
+      "explainKey": "cooling-tower"
     },
     {
       "id": "water.blowdown_lpm",
@@ -2059,7 +2112,8 @@
         "asOf": "2026-09-05",
         "method": "At C cycles, the blowdown is what leaves to hold the dissolved-solids balance."
       },
-      "formulaExpr": "(water.flow_lpm_for_wue - water.drift_lpm) / water.tower_cycles_of_concentration"
+      "formulaExpr": "(water.flow_lpm_for_wue - water.drift_lpm) / water.tower_cycles_of_concentration",
+      "explainKey": "cooling-tower"
     },
     {
       "id": "water.evaporation_lpm",
@@ -2078,7 +2132,8 @@
         "asOf": "2026-09-05",
         "method": "The remainder of the makeup once drift and blowdown are accounted for."
       },
-      "formulaExpr": "(water.flow_lpm_for_wue - water.drift_lpm) * (water.tower_cycles_of_concentration - 1) / water.tower_cycles_of_concentration"
+      "formulaExpr": "(water.flow_lpm_for_wue - water.drift_lpm) * (water.tower_cycles_of_concentration - 1) / water.tower_cycles_of_concentration",
+      "explainKey": "cooling-tower"
     },
     {
       "id": "water.wue_target_l_per_kwh",
@@ -2090,7 +2145,8 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-09-05",
         "method": "A design TARGET, published as one. It was the literal 1.30 typed in four places on the water cockpit and compared against a computed WUE, which is the marketing-target-versus-derived-value confusion ACCURACY_VALIDATION Rule 4 forbids."
-      }
+      },
+      "explainKey": "wue"
     },
     {
       "id": "water.wue_all_treated_l_per_kwh",
@@ -2108,7 +2164,8 @@
         "asOf": "2026-09-05",
         "method": "Shown beside the reported WUE so the domestic exclusion is visible rather than implied."
       },
-      "formulaExpr": "water.total_treated_lpm * 60 / site.it_load_kw"
+      "formulaExpr": "water.total_treated_lpm * 60 / site.it_load_kw",
+      "explainKey": "wue"
     }
   ]
 }

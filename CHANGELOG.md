@@ -11,6 +11,60 @@ release sections rather than semver.
 
 ---
 
+## v1.134.25 — 2026-09-05
+
+### The cockpits get the glossary — wired from the registry, not written into the pages
+
+The eight Conventional cockpits carried **zero** `data-explain` attributes. They were the only
+substantial pages on the site with no glossary access at all, which is backwards: they are the
+pages that use "approach temperature", "cycles of concentration", "N+1" and "WUE" as ordinary
+vocabulary, and an operator meeting one had nowhere to go.
+
+Plan B2 asked for this with the mapping **generated**, and that is how it works. The registry
+carries an `explainKey` per parameter; `js/rz-basis-drawer.js` applies it at render time. **No
+page authors any text**, so a definition cannot drift between a cockpit and the glossary.
+
+**Two surfaces, deliberately kept apart.** The basis drawer on the value cell says where THIS
+NUMBER came from; the tooltip on the label says what the TERM means. Those are different
+questions, so they never share an element — one element carrying both would have two panels
+fighting over the same focus. 72 parameters carry a key; 48 tooltips wire across the 8 pages.
+
+Two things went wrong while building it, and both are worth recording:
+
+- A first version of the label resolver also accepted `label`, `th`, `dt` and `.panel-title`.
+  Those match EARLIER in document order inside a row than the cell's own label, so a hook
+  picked up the heading of the panel it sat in and datahall's wiring fell from nine to four.
+  **A label selector that can match the wrong label is worse than one that matches nothing** —
+  a tooltip on the wrong term is a wrong answer; a missing one is a gap.
+- The new gate found **four dead keys** on its first run — `chiller-specific-power`,
+  `fire-shortfall`, `fire-duration`, `hall-it-load` — none of which exist in the glossary.
+  `rz-explain.js` skips an unknown key in silence, so a tooltip that never appears looks
+  exactly like one nobody asked for. Repointed at the terms that actually define the concept
+  (`cop`, `fire-suppression`, `it-load`) rather than inventing entries to match the keys.
+
+`tools/test-conv-explain-wiring.mjs` (new ship gate) asserts the keys resolve, the modules load
+in the right order, every declared tooltip actually becomes a trigger in a real render, and no
+element carries both attributes. Proven RED on a deliberately dead key, then GREEN.
+
+### Two Plan B2 gaps closed
+
+- **`BOUND_PATHS` is derived from the registry.** It was a hand-maintained list of **nine**
+  paths, which is the wrong shape: a list someone must remember to extend falls behind the
+  moment a page binds something new, and the paths it checks are the ones already least likely
+  to be wrong. It now covers **132** — every parameter the registry says a cockpit reads —
+  without anyone maintaining it. (`hall.` is a scope prefix, not a snapshot branch; those
+  resolve against the hall snapshot, or every one would report as a phantom key.) The FORBIDDEN
+  list stays hand-written on purpose: nothing can derive "these keys must never come back" from
+  an engine that no longer has them.
+- **Doc anchors are generated and reported.** Every parameter now carries `docs[]` — the files
+  under `manual/` or `standarization/` that name it by its snapshot path. Prose that merely
+  mentions "PUE" is not an anchor for `site.pue`, because it cannot say which of several PUE
+  figures it means. Today: **38 of 138 documented, 100 outstanding, listed in full on every
+  run.** REPORTED, not enforced — about a quarter of the registry is younger than the
+  methodology pages that would document it, and a gate that fails from day one gets muted
+  instead of paid down. That is the same reasoning that kept the coverage gate a monitor until
+  it reached 100 %; the flip condition is written next to the check.
+
 ## v1.134.24 — 2026-09-05
 
 ### 100 % — every number on all eight Conventional cockpits is accounted for

@@ -54,15 +54,33 @@ function resolvePath(path) {
   return path.split('.').reduce((node, key) => (node == null ? undefined : node[key]), snapshot);
 }
 
-/* Paths the Conventional cockpits bind to. Add a row when a page starts reading a new snapshot path —
-   that is the point: the gate should be updated deliberately, not discovered in production. */
-const BOUND_PATHS = Object.freeze([
-  'site.it_load_kw', 'site.it_design_kw', 'site.facility_load_kw', 'site.pue',
-  'site.non_it_load_kw', 'electrical.epms_ups_output_kw',
-  'racks.at_6kw', 'racks.at_8kw', 'racks.at_10kw',
-]);
+/* v1.134.25 — this was a HAND-MAINTAINED list of nine paths, which Plan B2 flagged as the wrong
+   shape: a list someone must remember to extend is a list that falls behind the moment a page
+   binds something new, and the paths it checks are exactly the ones already least likely to be
+   wrong. The registry knows every published path AND which pages consume each one, so the set is
+   derived from it. The list grew from 9 to every consumed parameter without anyone maintaining it.
+
+   The FORBIDDEN list below stays hand-written on purpose: it names keys that must never come
+   back, and nothing can derive that from an engine which no longer has them. */
+const registry = JSON.parse(await readFile('data/conv-parameters.json', 'utf8'));
+const BOUND_PATHS = Object.freeze(registry.parameters
+  .filter((p) => Array.isArray(p.consumers) && p.consumers.length > 0)
+  .map((p) => p.id));
+assert.ok(BOUND_PATHS.length >= 50,
+  `only ${BOUND_PATHS.length} consumed parameters found — the registry looks stale or unreadable`);
+/* `hall.` is a SCOPE prefix, not a top-level snapshot branch: those quantities are published
+   per hall by getHallSnapshot() and on campus.halls[]. Resolving them against the root snapshot
+   would report every one as a phantom key, which is a gate bug, not a finding. */
+const hallSnapshot = (CALC.getHallSnapshot && CALC.getHallSnapshot('A'))
+  || (snapshot.campus && snapshot.campus.halls && snapshot.campus.halls[0]) || null;
+assert.ok(hallSnapshot, 'the engine publishes no hall snapshot to resolve hall-scoped parameters against');
 for (const path of BOUND_PATHS) {
-  assert.notEqual(resolvePath(path), undefined, `snapshot path must exist: ${path}`);
+  const value = path.startsWith('hall.')
+    ? hallSnapshot[path.slice('hall.'.length)]
+    : resolvePath(path);
+  assert.notEqual(value, undefined,
+    `snapshot path must exist: ${path} — the registry says a cockpit reads it and the engine does `
+    + 'not publish it, which is the phantom-key defect this gate exists to catch');
 }
 
 /* Paths that must NEVER reappear — these are the exact phantom keys that caused the silent fallbacks. */

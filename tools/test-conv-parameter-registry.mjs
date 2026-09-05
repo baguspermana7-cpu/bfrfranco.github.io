@@ -265,6 +265,27 @@ assert.equal(untested.length, 0,
     + '. Give it a formulaExpr, a source and evidence class, a drawer hook, a declared '
     + 'distribution, or a named semantic check — not an exemption.');
 const unread = registry.parameters.filter((p) => p.consumers.length === 0).length;
+/* ── R9 DOC ANCHORS — reported, not enforced ────────────────────────────────
+   Plan B2 asked that every parameter carry at least one doc anchor alongside its consumer and
+   its test. The anchors are GENERATED (a doc that names the parameter by its snapshot path;
+   prose mentioning "PUE" is not an anchor for site.pue, because it cannot say which of several
+   PUE figures it means), so this is a measurement rather than a chore.
+
+   It REPORTS. About a quarter of the registry is younger than the methodology pages that would
+   document it, and a gate that fails from day one gets muted instead of paid down — the same
+   reasoning that kept the coverage gate a monitor until it reached 100 %.
+
+   FLIP TO STRICT once the undocumented count reaches zero: change the console.log below to an
+   assert. The list is printed every run so the backlog stays visible. */
+const undocumented = registry.parameters.filter((p) => !p.docs || p.docs.length === 0);
+console.log(`     doc anchors: ${registry.parameters.length - undocumented.length} of `
+    + `${registry.parameters.length} parameters are named by a file under manual/ or `
+    + `standarization/ (REPORTED, not enforced)`);
+if (undocumented.length) {
+    console.log(`     undocumented (${undocumented.length}): `
+        + undocumented.map((p) => p.id).join(', '));
+}
+
 console.log(`PASS Conventional parameter registry — ${registry.parameters.length} parameters `
     + `(${derived} derived, ${registry.parameters.length - derived} authored), engine v${registry.engineVersion}`);
 console.log(`     schema OK · current · provenance complete · ${byId.size} ids, dependency graph acyclic and measured`);

@@ -145,6 +145,23 @@ function readTokens(id, uniqueLeaves) {
     return tokens;
 }
 
+
+/* The published documentation surfaces. manual/ holds the methodology pages, standarization/
+   the standards they implement; both name parameters by snapshot path. Kept to files that can
+   actually anchor a parameter — generated archives and screenshots cannot. */
+function docFiles() {
+    const out = [];
+    for (const dir of ['manual', 'standarization']) {
+        let entries;
+        try { entries = readdirSync(join(ROOT, dir)); } catch { continue; }
+        for (const name of entries) {
+            if (!/\.(html|md)$/.test(name)) continue;
+            out.push(`${dir}/${name}`);
+        }
+    }
+    return out.sort();
+}
+
 function gateFiles() {
     return readdirSync(join(ROOT, 'tools'))
         .filter((f) => /^test-(conv|datahall|epms|ict)[-\w]*\.mjs$/.test(f))
@@ -242,6 +259,14 @@ export function buildRegistry() {
     const curatedById = new Map(curated.parameters.map((p) => [p.id, p]));
 
     const pageSources = COCKPITS.map((page) => ({ page, text: readFileSync(join(ROOT, page), 'utf8') }));
+    /* v1.134.25 — DOC ANCHORS. Plan B2 asked that every parameter have at least one doc anchor
+       as well as a consumer and a test. The published methodology pages under manual/ and the
+       standards under standarization/ already name parameters by their snapshot path, so the
+       anchor is discoverable rather than something to maintain by hand — the same treatment
+       consumers and tests get. It is REPORTED, not enforced: about a quarter of the registry is
+       younger than its documentation, and a gate that fails from day one gets muted instead of
+       paid down. The flip condition is stated in tools/test-conv-parameter-registry.mjs. */
+    const docSources = docFiles().map((file) => ({ file, text: readFileSync(join(ROOT, file), 'utf8') }));
     const gateSources = gateFiles().map((file) => ({ file, text: readFileSync(join(ROOT, 'tools', file), 'utf8') }));
 
     /* A leaf is unique when exactly one registered id ends with it. */
@@ -282,6 +307,12 @@ export function buildRegistry() {
            through the registry. */
         const tests = gateSources
             .filter(({ text }) => tokens.some((t) => text.includes(t)))
+            .map(({ file }) => file);
+        /* A doc anchor names the parameter by its PATH — prose that merely mentions "PUE"
+           is not an anchor for site.pue, because it cannot tell you which of several PUE
+           figures on the page it means. */
+        const docs = docSources
+            .filter(({ text }) => text.includes(id))
             .map(({ file }) => file);
         if (meta.formulaExpr) tests.push('test-conv-formula.mjs (formula evaluated)');
         /* The registry gate's semantic section checks the text parameters the numeric
@@ -331,6 +362,7 @@ export function buildRegistry() {
             dependsOnInputs: edges,
             consumers,
             tests,
+            docs,
         };
         if (meta.source) record.source = meta.source;
         /* Drop the nulls the schema allows to be absent, so the file stays readable and the

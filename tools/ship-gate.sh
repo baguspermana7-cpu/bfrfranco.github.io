@@ -74,6 +74,13 @@ gate "Conventional coverage — every rendered number traced to the registry" no
 # asserts every data-basis-param resolves, the modules actually load, the hooks are keyboard
 # controls, and the drawer's number agrees with the number in the row it explains.
 gate "Conventional basis drawer — hooks resolve, explanations match their KPI" node tools/test-conv-basis-drawer.mjs
+# GLOSSARY WIRING. Two surfaces that must stay separate: the basis drawer on the value cell says
+# where THIS NUMBER came from, the tooltip on the label says what the TERM means. The mapping is
+# generated from the registry's explainKey, never hand-authored on a page. This gate found four
+# dead keys on its first run — rz-explain.js skips an unknown key in silence, so a tooltip that
+# never appears looks exactly like one nobody asked for.
+gate "Conventional glossary wiring — explainKeys resolve and reach the page" node tools/test-conv-explain-wiring.mjs
+
 # Hall selection: a REAL scope swap on the page that draws one hall, and an honest view label on
 # the pages whose plant is central. Both directions are asserted — a cosmetic selector and an
 # invented per-hall split are both failures.
