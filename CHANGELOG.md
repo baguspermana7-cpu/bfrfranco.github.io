@@ -11,6 +11,59 @@ release sections rather than semver.
 
 ---
 
+## v1.134.17 — 2026-09-05 (A third of the P&ID was spent on duplicated tables, so the drawing rendered at 55 %)
+
+The chiller cockpit's own reason for existing — the process drawing — was the least legible
+thing on the screen. The supervisory column occupied x 1520–2280 of a 2300-wide viewBox: **a
+third of the drawing given to tabular telemetry.** The panel renders ~1274 px, so everything
+was drawn at **0.55 scale** and the equipment labels were 5–6 px. Worse, that column's top
+three cards repeated CHWS, CHWR, ΔT and flow, which the right-hand inspector already showed —
+**the same four numbers appeared three times per screen.**
+
+**Tabular telemetry does not belong in a scaled SVG.** It is HTML now (`#supPanel`), where it
+renders at native resolution, wraps on a phone and scrolls instead of shrinking: plant
+efficiency, capacity and status, active setpoints, system state, and the loop summary as a real
+table with tabular numerals. The duplicated header cards are simply gone — the inspector is
+their one home.
+
+The viewBox drops to the drawing's real extent (content ends at 1396), taking the process
+trains from **0.55 to ~0.87 scale — a 1.6× gain in legibility with nothing removed.**
+
+**Three faults surfaced once the drawing was big enough to read them:**
+- **`ACC / CH-nn`** — ACC is an air-cooled chiller tag. The owner adopted the water-cooled basis
+  in v1.134.8 and the module header became WCC then; this inner label was missed and had been
+  contradicting the adopted basis four times per screen ever since.
+- **The T2 reading sat at the top EDGE of its own box** (y+148 against a y+146 box) while T1
+  beside it sat correctly at y+162, and **the COMP strip was drawn straight over the T-row
+  boxes.** Both were invisible while COMP read "—"; giving it a real value in v1.134.8 turned
+  the overlap into visible text-on-text.
+- **The background grid's column count was the literal 116** (× 20 = 2320), sized for the old
+  viewBox. After the trim it drew 43 columns past the drawing's right edge. Both grids derive
+  their counts from `VW`/`VH` now, so a grid cannot outrun its own canvas again.
+
+Every one of the three was caught by the strict geometry gate within seconds of the change —
+which is the argument for having armed it in v1.134.6 rather than leaving it advisory.
+
+**The operator-regression gate then caught two things the move had cost**, which is exactly
+what it is for:
+- The flow reference lost its **`CALCULATED • NOT METERED`** basis chip. That chip is an
+  ACCURACY_VALIDATION Rule-6 requirement, not decoration: the figure is a calculated
+  reference, not a meter reading, and an operator must be able to see the difference. Restored.
+- The capacity figures were re-rounded to one decimal, turning an **N+1 margin of 13.75 MW into
+  13.8**. A relabel is a UI decision; a lost digit is not. The precision the gate fixed is back.
+
+Also: `Input power` and `Duty` rendered as em-dashes because the formatter called `isFinite()`
+on an already-formatted string, so `"5,153"` failed the test while `COP` beside it passed. Key
+and value spans had no separator, so `textContent` read `Run cap35.0 MW` — which breaks
+copy-paste and a screen reader as surely as it broke the gate. And `Loops online 4 / 4` beside
+`Chillers 7 / 10 running` read as a contradiction until you noticed the denominators differ; it
+says `Drawn loops online … shown`.
+
+One deliberate narrowing: the gate's text sweep covers the drawing and the new panel, **not**
+the whole right column — that prose contains the sentence "measured header flow remains
+unavailable", and its own no-fake-instrumentation rule would have failed the page for saying
+the honest thing.
+
 ## v1.134.16 — 2026-09-05 (The changelog build stamped the wall clock, so its own staleness gate fired on the calendar)
 
 `tools/build-changelog-html.py` wrote `dateModified` from `datetime.now()`. The generated

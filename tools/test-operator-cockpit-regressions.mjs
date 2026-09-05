@@ -275,7 +275,23 @@ try {
         copTrend: st.spark.cop.at(-1),
         kwPerRtTrend: st.spark.kwRt.at(-1),
       } : null,
-      loopText: document.getElementById('pidSvg')?.textContent || '',
+      /* v1.134.17 — the supervisory telemetry left the SVG. It occupied a third of a
+         2300-wide viewBox, which forced the whole drawing to 0.55 scale, and its top cards
+         duplicated the inspector. The values are all still on screen — the loop table and the
+         plant cards in #supPanel, the header figures in the inspector — so this reads the
+         cockpit's operator surface rather than the drawing alone. Narrowing it back to
+         #pidSvg would assert WHERE a number is drawn, not THAT an operator can read it. */
+      /* v1.134.17 — the supervisory telemetry left the SVG: it occupied a third of a
+         2300-wide viewBox, forcing the whole drawing to 0.55 scale, and its top cards
+         duplicated the inspector. The values moved to #supPanel, so this reads the drawing
+         AND that panel. It deliberately does NOT sweep in the whole right column: that prose
+         contains the sentence "measured header flow remains unavailable", which is the
+         honest statement this gate's own no-fake-instrumentation rule wants — matching it
+         would fail the page for saying the right thing. */
+      loopText: [
+        document.getElementById('pidSvg')?.textContent || '',
+        document.getElementById('supPanel')?.textContent || '',
+      ].join(' '),
       bodyText: document.body.innerText,
     };
   });
@@ -295,7 +311,8 @@ try {
     copTrend: 6.06,
     kwPerRtTrend: 0.58,
   }, 'P&ID trends and capacity block must use the validated engine authority');
-  assert.match(chiller.loopText, /IT REFERENCE FLOW/i);
+  assert.match(chiller.loopText, /IT[- ]REFERENCE FLOW/i,
+    'the IT-reference flow must remain readable somewhere on the operator surface');
   assert.match(chiller.loopText, /CALCULATED\s*•\s*NOT METERED/i);
   assert.match(chiller.loopText, /CALC BRANCH REF/i);
   assert.match(chiller.loopText, /Run cap 35(?:\.0)? MW/i);

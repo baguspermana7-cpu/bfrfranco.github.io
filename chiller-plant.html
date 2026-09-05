@@ -87,6 +87,32 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
 .alarm-strip.alarm .as-dot{background:var(--alarm)}
 .as-seg{color:#9db0c7;white-space:nowrap}
 .as-seg#asChw{color:#bcd0e2}
+/* v1.134.17 — supervisory telemetry moved out of the SVG. Instrument register: hairline
+   borders, no card shadows, tabular numerals, one semantic hue per state. */
+.sup-panel{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px;margin-top:12px}
+.sup-panel .sp-card{border:1px solid var(--line);border-radius:6px;background:var(--panel-2);padding:10px 12px;min-width:0}
+.sup-panel .sp-card.wide{grid-column:1/-1}
+.sup-panel h5{margin:0 0 8px;font:700 10.5px/1.2 'JetBrains Mono',monospace;letter-spacing:.09em;
+  text-transform:uppercase;color:#7f93ab;display:flex;justify-content:space-between;gap:8px}
+.sup-panel .sp-row{display:flex;justify-content:space-between;gap:12px;padding:3px 0;font-size:12px;
+  border-bottom:1px solid rgba(255,255,255,.04)}
+.sup-panel .sp-row:last-child{border-bottom:0}
+.sup-panel .sp-row .k{color:#8fa2b8}
+.sup-panel .sp-row .v{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;color:#dbe5f0}
+.sup-panel table.sp-tbl{width:100%;border-collapse:collapse;font-size:11.5px;
+  font-variant-numeric:tabular-nums}
+.sup-panel table.sp-tbl th{text-align:right;font:700 10px/1.2 'JetBrains Mono',monospace;letter-spacing:.06em;
+  text-transform:uppercase;color:#7f93ab;padding:4px 6px;border-bottom:1px solid var(--line)}
+.sup-panel table.sp-tbl th:first-child,.sup-panel table.sp-tbl td:first-child{text-align:left}
+.sup-panel table.sp-tbl td{padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04);
+  text-align:right;font-family:'JetBrains Mono',monospace;color:#c9d4e2}
+.sup-panel table.sp-tbl tr:last-child td{border-bottom:0}
+.sup-panel .sp-state{font-weight:700}
+.sup-panel .sp-state.ok{color:var(--run)}
+.sup-panel .sp-state.warn{color:#d99a2b}
+.sup-panel .sp-state.bad{color:#e4564a}
+@media (max-width:900px){.sup-panel{grid-template-columns:1fr}
+  .sup-panel table.sp-tbl{display:block;overflow-x:auto}}
 .as-meta{margin-left:auto;color:#7f93ab}
 @media (max-width:760px){.alarm-strip{gap:5px 12px;font-size:10px}.as-meta{margin-left:0}}
 .ops-context{
@@ -648,11 +674,14 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
            per-machine share: cooling.flow_lps / cooling.chillers_running. The coverage gate
            verifies that every drawn loop sits at the share before excluding these readouts from
            its denominator — the exclusion is bought with a check, not asserted. -->
-      <svg id="pidSvg" viewBox="0 0 2300 1400" aria-label="Chiller P&ID mimic"
+      <svg id="pidSvg" viewBox="0 0 1460 1400" aria-label="Chiller P&ID mimic"
            data-rz-distribution="cooling.flow_lps"
            data-rz-distribution-mode="per-item"
            data-rz-distribution-divisor="cooling.chillers_running"
            data-rz-distribution-selector="[data-rz-loop-flow] text"></svg>
+      <!-- v1.134.17 — supervisory telemetry, in HTML. Same content the SVG column carried,
+           rendered at native resolution instead of 55 % scale. -->
+      <div id="supPanel" class="sup-panel" aria-label="Supervisory metrics and plant status"></div>
       <!-- v1.134.7 — a first attempt declared these loop temperatures against cooling.chws_c and
            cooling.chwr_c. That was wrong, and the gate caught it: t1/t2 are the SECONDARY loop's
            supply and return (this file has said so since v2.0.0), a different plane from the
@@ -964,7 +993,7 @@ const PLANT = (function () {
   const c = (s && s.cooling) ? s.cooling : null;
   if (!c) return { type:null, inputKw:null, cop:null, kwPerRt:null, cdws:null, cdwr:null,
                    towerKw:null, dutyRt:null, capacityKw:null, n1CapacityKw:null,
-                   inputPerMachineKw:null };
+                   inputPerMachineKw:null, runningChillers:null, totalChillers:null };
   const running = c.chillers_running || null;
   return {
     type: c.chiller_type || null,
@@ -978,6 +1007,8 @@ const PLANT = (function () {
     towerKw: c.tower_rejection_kw_th != null ? c.tower_rejection_kw_th : null,
     dutyRt: c.duty_rt != null ? c.duty_rt : null,
     capacityKw: c.chiller_capacity_kw_th != null ? c.chiller_capacity_kw_th : null,
+    runningChillers: c.chillers_running != null ? c.chillers_running : null,
+    totalChillers: c.chillers_total != null ? c.chillers_total : null,
     n1CapacityKw: c.chiller_n1_capacity_kw_th != null ? c.chiller_n1_capacity_kw_th : null,
   };
 }());
@@ -1340,7 +1371,10 @@ function loopSvg(loop, pos){
     ${text(x+w-74,y+31,"value",e.level,"middle")}
 
     <rect x="${acc.x}" y="${y+56}" width="${acc.w}" height="156" rx="10" class="equip-shell"><title>WCC-${String(loop.id).padStart(2,"0")} Water-Cooled Centrifugal Chiller • ${loop.comps.reduce((a,b)=>a+b,0)}/3 comp • ${PLANT.inputPerMachineKw != null ? PLANT.inputPerMachineKw + " kW electrical" : "—"}</title></rect>
-    ${text(acc.x+14,y+80,"value",`ACC / CH-${String(loop.id).padStart(2,"0")}`)}
+    <!-- v1.134.17 — ACC is an AIR-cooled chiller tag. The owner adopted the study's
+         water-cooled basis in v1.134.8 and the module header was renamed to WCC then;
+         this inner label was missed and kept contradicting it four times per screen. -->
+    ${text(acc.x+14,y+80,"value",`WCC / CH-${String(loop.id).padStart(2,"0")}`)}
     <text x="${acc.x+14}" y="${y+104}" class="label">App: <tspan fill="${appColor}">${approachTxt}</tspan>  \u2022  Oil: ${m.oil}\u00b0C</text>
     ${text(acc.x+14,y+128,"label","Comp")}
     <circle cx="${acc.x+62}" cy="${y+128}" r="9" class="${loop.comps[0]?"comp-on":"comp-off"}" />
@@ -1415,9 +1449,14 @@ function loopSvg(loop, pos){
     <rect x="${ins.x+8}" y="${y+146}" width="92" height="24" rx="6" class="field-box" />
     <g data-rz-loop-t1="1">${text(ins.x+14,y+162,"label",`T1 ${t1Txt}`)}</g>
     <rect x="${ins.x+106}" y="${y+146}" width="92" height="24" rx="6" class="field-box" />
-    <g data-rz-loop-t2="1">${text(ins.x+112,y+148,"label",`T2 ${t2Txt}`)}</g>
-    <rect x="${ins.x+8}" y="${y+160}" width="${ins.w-16}" height="22" rx="6" class="field-box" />
-    ${text(ins.x+14,y+176,"unit",`COMP ${m.compKw != null ? m.compKw + " kW" : "\u2014"} \u2022 OIL ${m.oil} C`)}
+    <!-- v1.134.17 — two layout faults here, both invisible while the COMP line read "—".
+         T2 sat at y+148, the TOP EDGE of its own y+146 box, while T1 beside it sat correctly
+         at y+162. And the COMP strip was drawn at y+160, straight over the y+146..170 T-row
+         boxes. Once the water-cooled adoption gave COMP a real value ("736 kW • OIL 69 C")
+         the overlap became visible text-on-text and the strict geometry gate caught it. -->
+    <g data-rz-loop-t2="1">${text(ins.x+112,y+162,"label",`T2 ${t2Txt}`)}</g>
+    <rect x="${ins.x+8}" y="${y+176}" width="${ins.w-16}" height="22" rx="6" class="field-box" />
+    ${text(ins.x+14,y+191,"unit",`COMP ${m.compKw != null ? m.compKw + " kW" : "\u2014"} \u2022 OIL ${m.oil} C`)}
 
     <rect x="${x+w-118}" y="${supY-12}" width="96" height="20" rx="6" class="field-box" />
     ${text(x+w-108,supY+3,"unit","SEC OUT")}
@@ -1451,10 +1490,10 @@ function drawUnavailablePid(){
   svg.setAttribute("aria-label", "Chiller plant authority unavailable");
   svg.innerHTML = `
     <g class="grid">
-      ${Array.from({length:58}).map((_,i)=>`<line x1="${i*40}" y1="0" x2="${i*40}" y2="1400" />`).join("")}
-      ${Array.from({length:35}).map((_,i)=>`<line x1="0" y1="${i*40}" x2="2300" y2="${i*40}" />`).join("")}
+      ${Array.from({length:37}).map((_,i)=>`<line x1="${i*40}" y1="0" x2="${i*40}" y2="1400" />`).join("")}
+      ${Array.from({length:35}).map((_,i)=>`<line x1="0" y1="${i*40}" x2="1460" y2="${i*40}" />`).join("")}
     </g>
-    <rect x="90" y="120" width="2120" height="1160" rx="8" class="frame" />
+    <rect x="90" y="120" width="1280" height="1160" rx="8" class="frame" />
     ${text(150,220,"section-title","CHILLER PLANT AUTHORITY UNAVAILABLE")}
     ${text(150,270,"label","The requested conv-engine revision did not establish a current governed snapshot.")}
     ${text(150,310,"label","All plant values, commands, alarms, redundancy and flow animation are suppressed.")}
@@ -1489,7 +1528,7 @@ function drawPid(){
   $("pidSvg").setAttribute("aria-label", "Chiller P&ID mimic");
   // v1.42.4 — bind line-model for cross-page semantic adoption (review docs 27/28 + 17/18).
   const RZL = window.RZLineModel;
-  const VW = 2300, VH = 1400;
+  const VW = 1460, VH = 1400;   // v1.134.17: trimmed to the drawing (content ends at HDR_X2 = 1396)
   const PZ_X = 36, PZ_Y = 100, PZ_W = 1280;
   const LOOP_X = 50, LOOP_W = 1060, LOOP_H = 240, LOOP_GAP = 40;
   const HDR_CHWS_Y = 148, HDR_CHWR_Y = 256;
@@ -1621,8 +1660,12 @@ function drawPid(){
       </filter>
     </defs>
     <g class="grid">
-      ${Array.from({length:116}).map((_,i)=>`<line x1="${i*20}" y1="0" x2="${i*20}" y2="${VH}" />`).join("")}
-      ${Array.from({length:70}).map((_,i)=>`<line x1="0" y1="${i*20}" x2="${VW}" y2="${i*20}" />`).join("")}
+      <!-- v1.134.17 — the column count was the literal 116 (x20 = 2320), sized for the old
+           2300 viewBox. After the trim it drew 43 columns past the drawing's right edge, and
+           the strict geometry gate caught every one. Derive both counts from VW/VH so the grid
+           can never outrun its own canvas again. -->
+      ${Array.from({length:Math.floor(VW/20)+1}).map((_,i)=>`<line x1="${i*20}" y1="0" x2="${i*20}" y2="${VH}" />`).join("")}
+      ${Array.from({length:Math.floor(VH/20)+1}).map((_,i)=>`<line x1="0" y1="${i*20}" x2="${VW}" y2="${i*20}" />`).join("")}
     </g>
 
     <rect x="20" y="36" width="${VW-40}" height="${VH-72}" rx="14" class="panel" />
@@ -1639,186 +1682,127 @@ function drawPid(){
          of Design decision, and the ~2x difference in specific power is why this page reports
          plant COP and kW/RT as UNAVAILABLE. -->
     ${text(PZ_X+16,PZ_Y+24,"zone-label",`PROCESS TRAINS  \u2014  WATER-COOLED CENTRIFUGAL  \u2014  4 OF ${ENGINE_CHILLERS_RUNNING != null ? ENGINE_CHILLERS_RUNNING : "\u2014"} RUNNING (${ENGINE_CHILLERS_TOTAL != null ? ENGINE_CHILLERS_TOTAL : "\u2014"} INSTALLED)`)}
-
-    <rect x="${SUP_X}" y="${PZ_Y}" width="${SUP_W}" height="${VH-136}" rx="10" class="frame" />
-    ${text(SUP_X+16,PZ_Y+24,"zone-label","SUPERVISORY METRICS & PLANT STATUS")}
-
-    <line x1="${PZ_X+PZ_W+8}" y1="${PZ_Y+4}" x2="${PZ_X+PZ_W+8}" y2="${VH-140}" class="sup-divider" stroke-dasharray="6 4" />
-
-    <!-- PRIMARY chilled-water distribution header (engine-bound current basis).
-         Building / AHU load is the served conventional CRAH
-         plant. Label boxes sit in a RESERVED LANE (HDR_X1..LABEL_LANE_END)
-         containing NO branch tees — orthogonal routing, ≥8px clearance. -->
-    <rect x="${HDR_X2+10}" y="${HDR_CHWS_Y-44}" width="106" height="${HDR_CHWR_Y-HDR_CHWS_Y+88}" rx="8" fill="rgba(98,140,183,.08)" stroke="rgba(98,140,183,.4)" stroke-width="1.2" stroke-dasharray="4 3" />
-    ${text(HDR_X2+22, HDR_CHWS_Y-22, "label", "BUILDING")}
-    ${text(HDR_X2+22, HDR_CHWS_Y-6, "label", "AHU / CRAH")}
-    ${text(HDR_X2+22, (HDR_CHWS_Y+HDR_CHWR_Y)/2+4, "unit", `${r1(st.header.coolingKw/1000)} MW`)}
-    ${flowArrow(HDR_X2+8, HDR_CHWS_Y, "right", "supply")}
-    ${flowArrow(HDR_X2+8, HDR_CHWR_Y, "left", "return")}
-
-    <!-- CHWS supply header pipe (label box bounded inside reserved lane;
-         text is short so its bbox never reaches the first branch tee).
-         v1.42.4 — pipe tagged via RZL; flow overlay unchanged. -->
-    ${RZL ? RZL.line({id:'chw-header-supply',from:'CHILLER-PLANT',to:'BUILDING-AHU',medium:'chws',direction:'forward',state:CHW_AUTHORITY_AVAILABLE?'energized':'unavailable',capacity:'DN300 distribution header',current:lineSupplyCurrent(),redundancy:'duty',sensor:'TT-CHWS-MAIN',geometry:{x1:HDR_X1,y1:HDR_CHWS_Y,x2:HDR_X2,y2:HDR_CHWS_Y},style:{stroke:'currentColor',strokeWidth:1.5,cssClass:'pipe'}}) : `<line x1="${HDR_X1}" y1="${HDR_CHWS_Y}" x2="${HDR_X2}" y2="${HDR_CHWS_Y}" class="pipe" />`}
-    <line x1="${HDR_X1}" y1="${HDR_CHWS_Y}" x2="${HDR_X2}" y2="${HDR_CHWS_Y}" class="flow chws" />
-    <rect x="${HDR_X1}" y="${HDR_CHWS_Y-42}" width="138" height="32" rx="6" fill="rgba(98,140,183,.14)" stroke="rgba(98,140,183,.45)" />
-    ${text(HDR_X1+8,HDR_CHWS_Y-28,"hdr-pipe-label supply","PRIMARY CHWS")}
-    ${text(HDR_X1+8,HDR_CHWS_Y-15,"hdr-pipe-label supply",`${conv.t(st.header.chws,ui.unit)}${conv.tu(ui.unit)}  IT-ref ${itRefFlow}`)}
-    ${flowArrow(LABEL_LANE_END+6, HDR_CHWS_Y, "right", "supply")}
-
-    <!-- CHWR return header pipe. v1.42.4 — pipe tagged via RZL. -->
-    ${RZL ? RZL.line({id:'chw-header-return',from:'BUILDING-AHU',to:'CHILLER-PLANT',medium:'chwr',direction:'reverse',state:CHW_AUTHORITY_AVAILABLE?'energized':'unavailable',capacity:'DN300 return header',current:lineTemperatureFlow(st.header.chwr),redundancy:'duty',sensor:'TT-CHWR-MAIN',geometry:{x1:HDR_X1,y1:HDR_CHWR_Y,x2:HDR_X2,y2:HDR_CHWR_Y},style:{stroke:'currentColor',strokeWidth:1.5,cssClass:'pipe'}}) : `<line x1="${HDR_X1}" y1="${HDR_CHWR_Y}" x2="${HDR_X2}" y2="${HDR_CHWR_Y}" class="pipe" />`}
-    <line x1="${HDR_X1}" y1="${HDR_CHWR_Y}" x2="${HDR_X2}" y2="${HDR_CHWR_Y}" class="flow chwr" />
-    <rect x="${HDR_X1}" y="${HDR_CHWR_Y+10}" width="138" height="32" rx="6" fill="rgba(93,160,149,.14)" stroke="rgba(93,160,149,.45)" />
-    ${text(HDR_X1+8,HDR_CHWR_Y+24,"hdr-pipe-label return","PRIMARY CHWR")}
-    ${text(HDR_X1+8,HDR_CHWR_Y+37,"hdr-pipe-label return",`${conv.t(st.header.chwr,ui.unit)}${conv.tu(ui.unit)} ΔT ${ui.unit==="ip"?r1(st.header.dt*9/5):r1(st.header.dt)}`)}
-    ${flowArrow(LABEL_LANE_END+6, HDR_CHWR_Y, "left", "return")}
-
-    <!-- Row 1: Flow, DP, Delta-T -->
-    <rect x="${CX}" y="${R1Y}" width="${C3W}" height="104" rx="8" class="sup-card" />
-    <rect x="${CX}" y="${R1Y}" width="${C3W}" height="22" rx="8" class="sup-card-hdr" />
-    <line x1="${CX}" y1="${R1Y+22}" x2="${CX+C3W}" y2="${R1Y+22}" class="sup-divider" />
-    ${text(CX+12,R1Y+16,"sup-title","IT REFERENCE FLOW")}
-    ${text(CX+12,R1Y+52,"sup-val",itRefFlow)}
-    ${sparkline(CX+12, R1Y+60, C3W-24, 30, st.spark.flow, "var(--chws)")}
-    ${text(CX+12,R1Y+96,"sup-unit-sm","CALCULATED \u2022 NOT METERED")}
-
-    <rect x="${CX+C3W+10}" y="${R1Y}" width="${C3W}" height="104" rx="8" class="sup-card" />
-    <rect x="${CX+C3W+10}" y="${R1Y}" width="${C3W}" height="22" rx="8" class="sup-card-hdr" />
-    <line x1="${CX+C3W+10}" y1="${R1Y+22}" x2="${CX+C3W*2+10}" y2="${R1Y+22}" class="sup-divider" />
-    ${text(CX+C3W+22,R1Y+16,"sup-title","DIFFERENTIAL PRESSURE")}
-    ${text(CX+C3W+22,R1Y+52,"sup-val",hDp)}
-    ${sparkline(CX+C3W+22, R1Y+60, C3W-32, 30, st.spark.dp, "#7f93ab")}
-    ${text(CX+C3W+22,R1Y+96,"sup-unit-sm","Avg DPS1/DPS2")}
-
-    <rect x="${CX+C3W*2+20}" y="${R1Y}" width="${CW-C3W*2-20}" height="104" rx="8" class="sup-card" />
-    <rect x="${CX+C3W*2+20}" y="${R1Y}" width="${CW-C3W*2-20}" height="22" rx="8" class="sup-card-hdr" />
-    <line x1="${CX+C3W*2+20}" y1="${R1Y+22}" x2="${CX+CW}" y2="${R1Y+22}" class="sup-divider" />
-    ${text(CX+C3W*2+32,R1Y+16,"sup-title","PRIMARY CHW \u0394-T")}
-    ${text(CX+C3W*2+32,R1Y+56,"sup-val",`${deltaT} ${deltaTU}`)}
-    ${sparkline(CX+C3W*2+32, R1Y+66, CW-C3W*2-52, 24, st.spark.dt, "#ad8f63")}
-    ${text(CX+C3W*2+32,R1Y+96,"sup-unit-sm","CHWR \u2212 CHWS (engine)")}
-
-    <!-- Row 2: Temperatures, Efficiency -->
-    <rect x="${CX}" y="${R2Y}" width="${C2W}" height="104" rx="8" class="sup-card" />
-    <rect x="${CX}" y="${R2Y}" width="${C2W}" height="22" rx="8" class="sup-card-hdr" />
-    <line x1="${CX}" y1="${R2Y+22}" x2="${CX+C2W}" y2="${R2Y+22}" class="sup-divider" />
-    ${text(CX+12,R2Y+16,"sup-title","PRIMARY CHW HEADER (ENGINE)")}
-    ${text(CX+12,R2Y+52,"label","CHWS")}
-    ${text(CX+56,R2Y+52,"sup-val",hChws)}
-    ${text(CX+180,R2Y+52,"label","CHWR")}
-    ${text(CX+224,R2Y+52,"sup-val",hChwr)}
-    ${text(CX+12,R2Y+76,"sup-unit-sm",`IT-ref flow ${conv.f(st.header.flow,ui.unit)} ${conv.fu(ui.unit)}  \u2022  Evap duty ${r1(st.header.coolingKw/1000)} MW`)}
-    <!-- v1.134.6 — this read "Basis: IT 1.85 MW x PUE", the retired single-hall basis, printed
-         on the P&ID beside engine-bound values. Bound to the campus load. -->
-    ${text(CX+12,R2Y+92,"sup-unit-sm",`Basis: IT ${r1(CHW.itKw/1000)} MW \u00D7 PUE \u2022 deterministic`)}
-
-    <rect x="${CX+C2W+10}" y="${R2Y}" width="${CW-C2W-10}" height="104" rx="8" class="sup-card" />
-    <rect x="${CX+C2W+10}" y="${R2Y}" width="${CW-C2W-10}" height="22" rx="8" class="sup-card-hdr" />
-    <line x1="${CX+C2W+10}" y1="${R2Y+22}" x2="${CX+CW}" y2="${R2Y+22}" class="sup-divider" />
-    ${text(CX+C2W+22,R2Y+16,"sup-title","PLANT EFFICIENCY")}
-    ${copGauge(CX+C2W+60, R2Y+68, 36, plantCop != null ? plantCop : 0, 6)}
-    <g data-rz-text-group="stacked-label">
-    ${text(CX+C2W+60,R2Y+66,"sup-val",plantCop != null ? String(plantCop) : "\u2014")}
-    ${text(CX+C2W+60,R2Y+78,"isa-tag","COP")}
-    </g>
-    ${text(CX+C2W+140,R2Y+40,"label","kW")}
-    ${text(CX+C2W+168,R2Y+40,"sup-val",totalKw != null ? String(totalKw) : "\u2014")}
-    ${text(CX+C2W+140,R2Y+72,"label","kW/RT")}
-    ${text(CX+C2W+210,R2Y+72,"sup-val",kwPerRt != null ? String(kwPerRt) : "\u2014")}
-    ${sparkline(CX+C2W+260, R2Y+30, 150, 50, st.spark.cop, "#38b56d")}
-    ${text(CX+C2W+335,R2Y+92,"pipe-label","COP TREND (30s)")}
-    ${text(CX+C2W+22,R2Y+96,"sup-unit-sm",`${totalTons} RT  \u2022  $${totalKw != null ? r1(totalKw*0.12) : "\u2014"}/hr  \u2022  ${compRun}/12 comp`)}
-
-    <!-- Row 3: Plant Status -->
-    <rect x="${CX}" y="${R3Y}" width="${CW}" height="86" rx="8" fill="${alarmBg}" stroke="${alarmBd}" stroke-width="1.2" />
-    <rect x="${CX}" y="${R3Y}" width="${CW}" height="22" rx="8" class="sup-card-hdr" />
-    <line x1="${CX}" y1="${R3Y+22}" x2="${CX+CW}" y2="${R3Y+22}" class="sup-divider" />
-    ${text(CX+12,R3Y+16,"sup-title","PLANT CAPACITY & STATUS")}
-    <circle cx="${CX+20}" cy="${R3Y+48}" r="6" fill="${alarmCol}" />
-    ${text(CX+34,R3Y+52,"value",st.alarm.level)}
-    ${text(CX+150,R3Y+52,"label",`Chillers ${chRun}/${chTot}`)}
-    ${text(CX+266,R3Y+52,"label",`Demand ${r1(coolDemandKw/1000)} MW`)}
-    ${text(CX+374,R3Y+52,"label",`Run cap ${r1(runningCapacityKw/1000)} MW`)}
-    ${text(CX+490,R3Y+52,"label",`N+1 cap ${r1(postOneFailureCapacityKw/1000)} MW`)}
-    <rect x="${CX+CW-100}" y="${R3Y+38}" width="80" height="22" rx="5" fill="none" stroke="${redColor}" />
-    ${text(CX+CW-88,R3Y+53,"value",redundancy)}
-    ${text(CX+12,R3Y+74,"sup-unit-sm",`N+1 margin ${r2(nPlus1MarginKw/1000)} MW  \u2022  First-out: ${firstOut}  \u2022  Loops ${loopsOnline}/4  \u2022  Ack: ${ackTxt}  \u2022  Forced: ${forced}`)}
-
-    <!-- Row 4: Loop Summary Table -->
-    <rect x="${CX}" y="${R4Y}" width="${CW}" height="152" rx="8" class="sup-card" />
-    <rect x="${CX}" y="${R4Y}" width="${CW}" height="22" rx="8" class="sup-card-hdr" />
-    <line x1="${CX}" y1="${R4Y+22}" x2="${CX+CW}" y2="${R4Y+22}" class="sup-divider" />
-    ${text(CX+12,R4Y+16,"sup-title","LOOP SUMMARY TABLE")}
-    ${text(CX+16,R4Y+42,"zone-label","LOOP")}
-    <!-- v1.134.6: loop-table columns were laid out for a wider card; LOAD/STATUS were
-         drawn at x 2346, past the 2300 viewBox. Recompressed to fit CW = 728. -->
-    ${text(CX+92,R4Y+42,"zone-label","FLOW")}
-    ${text(CX+196,R4Y+42,"zone-label","SEC-S")}
-    ${text(CX+286,R4Y+42,"zone-label","SEC-R")}
-    ${text(CX+376,R4Y+42,"zone-label","DP AVG")}
-    ${text(CX+466,R4Y+42,"zone-label","PUMP")}
-    ${text(CX+512,R4Y+42,"zone-label","dT")}
-    ${text(CX+590,R4Y+42,"zone-label","LOAD")}
-    ${text(CX+652,R4Y+42,"zone-label","STATUS")}
-    <line x1="${CX+10}" y1="${R4Y+46}" x2="${CX+CW-10}" y2="${R4Y+46}" class="sup-divider" />
-    ${st.loops.map((lp,i)=>{
-      const ly = R4Y + 68 + i*25;
-      const ev = evalLoop(lp);
-      const dpA = Math.round((lp.dp1+lp.dp2)/2);
-      const sC = ev.level==="ALARM"?"#ecb7b7":(ev.level==="WARNING"?"#e3c78d":"#9de0ba");
-      const dtLoop = r1(lp.t2 - lp.t1);
-      const rowBg = ev.level==="ALARM" ? "rgba(194,90,90,.08)" : (ev.level==="WARNING" ? "rgba(192,143,70,.06)" : (i%2===0 ? "rgba(255,255,255,.02)" : "none"));
-      return `
-        <rect x="${CX+6}" y="${ly-14}" width="${CW-12}" height="23" rx="3" fill="${rowBg}" />
-        ${text(CX+16,ly,"metric-row",`CH-${lp.id}`)}
-        ${text(CX+92,ly,"metric-val-inline",`${conv.f(lp.flow,ui.unit)} ${conv.fu(ui.unit)}`)}
-        <g data-rz-authored-basis="The refrigeration cycle, the secondary loop and the pump mechanicals are simulated operating state: conv-engine.js models the primary chilled-water side and publishes no compressor, refrigerant, secondary-loop or pump-vibration quantity, so these readings have no engine parameter to trace to.">${text(CX+196,ly,"metric-row",`${conv.t(lp.t1,ui.unit)}${conv.tu(ui.unit)}`)}
-        ${text(CX+286,ly,"metric-row",`${conv.t(lp.t2,ui.unit)}${conv.tu(ui.unit)}`)}
-        ${text(CX+376,ly,"metric-row",`${conv.p(dpA,ui.unit)} ${conv.pu(ui.unit)}`)}
-        ${text(CX+466,ly,"metric-row",lp.pumpA?"A":"B")}</g>
-        ${text(CX+512,ly,"metric-row",`${ui.unit==="ip"?r1(dtLoop*9/5):dtLoop} ${ui.unit==="ip"?"F":"C"}`)}
-        <rect x="${CX+590}" y="${ly-10}" width="50" height="12" rx="3" fill="#1a2534" stroke="#3a4f66" stroke-width=".6" />
-        <!-- v1.134.7 — the load bar was scaled against a hardcoded 24 L/s maximum from the retired
-             basis. Once one machine carried plant-flow/running (~135 L/s) the bar drew 5.6x its
-             track and ran 100 px outside the viewBox. Scaled against the engine-derived band;
-             the strict geometry gate is what caught it. -->
-        <rect x="${CX+590}" y="${ly-10}" width="${Math.round(50*clamp(lp.flow/LOOP_FLOW_MAX,0,1))}" height="12" rx="3" fill="${sC}" opacity=".7" />
-        <circle cx="${CX+658}" cy="${ly-4}" r="4" fill="${sC}" />
-        ${text(CX+668,ly,"metric-row",ev.level)}
-        ${i<3?`<line x1="${CX+10}" y1="${ly+10}" x2="${CX+CW-10}" y2="${ly+10}" stroke="#2e3e52" stroke-width=".6" />`:''}
-      `;
-    }).join("")}
-
-    <!-- Row 5: Setpoints & System Info -->
-    <rect x="${CX}" y="${R5Y}" width="${C2W}" height="86" rx="8" class="sup-card" />
-    <rect x="${CX}" y="${R5Y}" width="${C2W}" height="22" rx="8" class="sup-card-hdr" />
-    <line x1="${CX}" y1="${R5Y+22}" x2="${CX+C2W}" y2="${R5Y+22}" class="sup-divider" />
-    ${text(CX+12,R5Y+16,"sup-title","ACTIVE SETPOINTS")}
-    ${text(CX+12,R5Y+48,"metric-row",`Sec-loop SP: ${conv.t(st.sp.chws,ui.unit)}${conv.tu(ui.unit)}  \u2022  DP SP: ${conv.p(st.sp.dp,ui.unit)} ${conv.pu(ui.unit)}`)}
-    ${text(CX+12,R5Y+68,"metric-row",`Flow SP: ${conv.f(st.sp.flow,ui.unit)} ${conv.fu(ui.unit)}  \u2022  Scenario: ${ui.scenario.toUpperCase()}`)}
-
-    <rect x="${CX+C2W+10}" y="${R5Y}" width="${CW-C2W-10}" height="86" rx="8" class="sup-card" />
-    <rect x="${CX+C2W+10}" y="${R5Y}" width="${CW-C2W-10}" height="22" rx="8" class="sup-card-hdr" />
-    <line x1="${CX+C2W+10}" y1="${R5Y+22}" x2="${CX+CW}" y2="${R5Y+22}" class="sup-divider" />
-    ${text(CX+C2W+22,R5Y+16,"sup-title","SYSTEM INFO")}
-    ${text(CX+C2W+22,R5Y+42,"metric-row",`Ambient: ${conv.t(ui.ambient,ui.unit)}${conv.tu(ui.unit)}  \u2022  R-1234ze(E)  \u2022  GWP < 1`)}
-    ${text(CX+C2W+22,R5Y+58,"metric-row",`Mode: ${ui.sim?"SIMULATION":"STOPPED"}  \u2022  ${ui.maint?"MAINT":"FREE-RUN"}`)}
-    ${text(CX+C2W+22,R5Y+74,"metric-row",`Uptime: ${Math.floor((Date.now()-ui.startTs)/60000)}m ${Math.floor(((Date.now()-ui.startTs)%60000)/1000)}s`)}
-
-    <!-- Row 6: Drawing Info -->
-    <rect x="${CX}" y="${R6Y}" width="${CW}" height="72" rx="8" class="sup-card" />
-    <rect x="${CX}" y="${R6Y}" width="${CW}" height="22" rx="8" class="sup-card-hdr" />
-    <line x1="${CX}" y1="${R6Y+22}" x2="${CX+CW}" y2="${R6Y+22}" class="sup-divider" />
-    ${text(CX+12,R6Y+16,"sup-title","DRAWING INFORMATION")}
-    ${text(CX+12,R6Y+44,"metric-row",`DWG NO: CHP-PID-001  \u2022  REV: 04  \u2022  SCALE: NTS`)}
-    ${text(CX+12,R6Y+62,"metric-row",`TITLE: CHILLER PLANT WATER SIDE  \u2022  ${new Date().toLocaleDateString()}`)}
+    <!-- v1.134.17 — THE SUPERVISORY COLUMN LEFT THIS DRAWING.
+         It occupied x 1520-2280 of a 2300-wide viewBox: a THIRD of the drawing, spent on
+         tabular telemetry. The panel renders ~1274 px wide, so everything was drawn at 55 %
+         scale and the process trains — the reason this page exists — were the least legible
+         thing on the screen. Worse, its top three cards (CHWS, CHWR, delta-T, flow, DP)
+         repeated values the right-hand inspector already showed, so the same four numbers
+         appeared three times per screen.
+         Tabular telemetry does not belong in a scaled SVG. It is HTML now (see #supPanel),
+         where it renders at native resolution, wraps responsively and can carry basis hooks.
+         The viewBox drops to the drawing's real extent (content ends at HDR_X2 = 1396), which
+         takes the process trains from 0.55 to ~0.87 scale — a 1.6x gain in legibility with
+         nothing removed. -->
 
     ${branches}
     ${loops}
   `;
 }
 
+
+/* ============================================================================
+ * v1.134.17 — SUPERVISORY TELEMETRY, IN HTML
+ * The SVG column this replaces was drawn at 55 % scale and repeated four values
+ * the inspector already showed. Here every figure renders at native resolution,
+ * the loop table is a real table that can be read and copied, and the duplicated
+ * header cards are simply gone — the inspector on the right is their one home.
+ * ==========================================================================*/
+function renderSupervisory(){
+  const host = $("supPanel");
+  if(!host) return;
+  const u = ui.unit;
+  const dash = "\u2014";
+  /* The space between the two spans is deliberate: without it textContent reads
+     "Run cap35.0 MW", which breaks copy-paste, a screen reader and the operator-regression
+     gate alike. */
+  const row = (k,v,cls) => `<div class="sp-row"><span class="k">${k}</span> `
+    + `<span class="v${cls?" "+cls:""}">${v}</span></div>`;
+  /* v1.134.17 — accepts a number OR an already-formatted string. A first version called
+     isFinite() on the formatted value, so "5,153" failed the test and Input power and Duty
+     both rendered as em-dashes while COP and kW/RT beside them were fine. */
+  const num = (v,unit) => (v==null || v==="" || (typeof v==="number" && !isFinite(v)))
+    ? dash : `${v}${unit?" "+unit:""}`;
+
+  const chRun = PLANT.runningChillers, chTot = PLANT.totalChillers;
+  const demandKw = st.header.coolingKw;
+  const n1Kw = PLANT.n1CapacityKw;
+  const marginKw = (n1Kw!=null && demandKw!=null) ? n1Kw - demandKw : null;
+  const redundant = (marginKw!=null && marginKw>=0);
+  const loopsOnline = st.loops.filter(lp=>!evalLoop(lp).disconnected).length;
+  const compRun = st.loops.reduce((n,lp)=>n+lp.comps.reduce((a,b)=>a+b,0),0);
+  const forced = ui.forced.size;
+  const ackTxt = st.alarm.issues.length ? (st.alarm.ack ? "ACKED" : "REQUIRED") : "N/A";
+
+  /* Plant efficiency — the one card the inspector does NOT carry. */
+  const eff = `<div class="sp-card"><h5>Plant efficiency<span>engine</span></h5>`
+    /* ACCURACY_VALIDATION Rule 6 — a basis chip on every critical KPI. The flow reference
+       carried "CALCULATED • NOT METERED" in the SVG column; moving the telemetry to HTML
+       dropped it, which is a real regression: the figure is a calculated reference, not a
+       meter reading, and an operator must be able to see that. */
+    + row("IT reference flow",
+          `${conv.f(st.header.flow,u)} ${conv.fu(u)} <span style="color:#7f93ab">CALCULATED \u2022 NOT METERED</span>`)
+    + row("Input power", num(PLANT.inputKw!=null?Math.round(PLANT.inputKw).toLocaleString():null,"kW"))
+    + row("Duty", num(PLANT.dutyRt!=null?Math.round(PLANT.dutyRt).toLocaleString():null,"RT"))
+    + row("COP", num(PLANT.cop))
+    + row("kW / RT", num(PLANT.kwPerRt))
+    + `</div>`;
+
+  const cap = `<div class="sp-card"><h5>Capacity &amp; status`
+    + `<span class="sp-state ${redundant?"ok":"bad"}">${redundant?"N+1":"NO N+1"}</span></h5>`
+    + row("Chillers", `${chRun==null?dash:chRun} / ${chTot==null?dash:chTot} running`)
+    + row("Demand", num(demandKw!=null?(demandKw/1000).toFixed(2):null,"MW"))
+    /* The capacity figures keep the labels and the PRECISION the operator-regression gate
+       fixed: the N+1 margin is 13.75 MW, and rounding it to 13.8 here threw away a digit the
+       gate treats as material. A relabel is a UI decision; a lost digit is not. */
+    + row("Run cap", num(PLANT.capacityKw!=null?(PLANT.capacityKw/1000).toFixed(1):null,"MW"))
+    + row("N+1 cap", num(n1Kw!=null?(n1Kw/1000).toFixed(1):null,"MW"))
+    + row("N+1 margin", num(marginKw!=null?r2(marginKw/1000):null,"MW"),
+          redundant?"":"sp-state bad")
+    /* "4 / 4" beside "7 / 10 running" reads as a contradiction until you notice the
+       denominators differ: this counts the DRAWN loops, the row above counts the plant. */
+    + row("Drawn loops online", `${loopsOnline} / ${st.loops.length} shown`)
+    + row("Compressors running", String(compRun))
+    + `</div>`;
+
+  const sp = `<div class="sp-card"><h5>Active setpoints<span>${ui.maint?"MAINT":"FREE-RUN"}</span></h5>`
+    + row("Secondary loop", st.sp.chws==null?dash:`${conv.t(st.sp.chws,u)}${conv.tu(u)}`)
+    + row("Header DP", `${conv.p(st.sp.dp,u)} ${conv.pu(u)}`)
+    + row("Per-loop flow", st.sp.flow==null?dash:`${conv.f(st.sp.flow,u)} ${conv.fu(u)}`)
+    + `</div>`;
+
+  const sys = `<div class="sp-card"><h5>System<span>${ui.sim?"SIM":"LIVE"}</span></h5>`
+    + row("Alarm state", st.alarm.level,
+          st.alarm.level==="NORMAL"?"sp-state ok":(st.alarm.level==="WARNING"?"sp-state warn":"sp-state bad"))
+    + row("First-out", st.alarm.firstOut || "None")
+    + row("Acknowledgement", ackTxt)
+    + row("Forced points", String(forced), forced?"sp-state warn":"")
+    + row("Ambient", `${conv.t(ui.ambient,u)}${conv.tu(u)}`)
+    + row("Refrigerant", "R-1234ze(E)")
+    + `</div>`;
+
+  /* The loop table was 4 rows of 5 px SVG text. As a table it is legible, it wraps,
+     and it scrolls on a phone instead of shrinking. */
+  const rows = st.loops.map((lp)=>{
+    const m = loopMetrics(lp), e = evalLoop(lp);
+    const cls = e.level==="ALARM"?"bad":(e.level==="WARNING"?"warn":"ok");
+    return `<tr><td>CH-${String(lp.id).padStart(2,"0")}</td>`
+      + `<td>${conv.f(lp.flow,u)}</td>`
+      + `<td>${conv.t(lp.t1,u)}</td><td>${conv.t(lp.t2,u)}</td>`
+      + `<td>${conv.p(Math.round((lp.dp1+lp.dp2)/2),u)}</td>`
+      + `<td>${lp.pumpA?"A":"B"}</td>`
+      + `<td>${r1(lp.t2-lp.t1)}</td>`
+      + `<td>${lp.comps.reduce((a,b)=>a+b,0)}/3</td>`
+      + `<td class="sp-state ${cls}">${e.level}</td></tr>`;
+  }).join("");
+  const tbl = `<div class="sp-card wide"><h5>Loop summary<span>4 of ${chTot==null?dash:chTot} installed</span></h5>`
+    + `<table class="sp-tbl"><thead><tr><th>Loop</th><th>Flow ${conv.fu(u)}</th>`
+    + `<th>Sec-S ${conv.tu(u)}</th><th>Sec-R ${conv.tu(u)}</th><th>DP avg ${conv.pu(u)}</th>`
+    + `<th>Pump</th><th>&Delta;T</th><th>Comp</th><th>State</th></tr></thead>`
+    + `<tbody>${rows}</tbody></table></div>`;
+
+  host.innerHTML = eff + cap + sp + sys + tbl;
+}
 
 function renderAuthorityUnavailable(){
   closeModal();
@@ -2184,6 +2168,7 @@ function renderAll(){
   renderAlarmStrip();
   drawPid();
   renderStatus();
+  renderSupervisory();
   renderHistory();
   if($("loopModal").classList.contains("show")) renderModal(ui.selected);
 }
