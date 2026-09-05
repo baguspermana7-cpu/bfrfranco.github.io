@@ -11,6 +11,41 @@ release sections rather than semver.
 
 ---
 
+## v1.134.19 — 2026-09-05 (A healthy data hall showed a permanent red authority failure, and 1,000 cabinet labels nobody could read)
+
+Having measured the SVG diagrams, I had still never simply **looked** at the four cockpits that
+do not have one. Doing that found a functional defect first.
+
+**`datahall.html` shipped a CRITICAL "Data Hall authority UNAVAILABLE." line baked into the
+event-log markup as a placeholder.** Nothing removed it when authority *was* available — and it
+is: `data-rz-basis-authority` reads `current`. So a perfectly healthy console permanently
+displayed a red authority failure at the top of its log. That is the static-seed defect the
+cockpits were swept for in v1.132.0, **inverted**: a false alarm rather than a false all-clear,
+and no less wrong. The container starts empty; the line is written only by the path that
+actually detects the condition.
+
+**The cabinet field carried 1,000 strings that could not be read.** A hall is 500 cabinets, and
+at the width this grid gets a cell is **14.7 px across** while `A-AL01` at 7.5 px needs nearer
+30. Every cabinet drew a tag and a value anyway, smeared into texture that looked like data.
+The heatmap colour *is* the information at that size and it is accurate; the strings were not.
+Labels now appear only when a cell is wide enough to hold them — measured from the live cell, so
+a wider viewport turns them back on by itself — and the exact figures for any one cabinet are a
+hover or click away in the inspector, which is how you read a specific cabinet anyway. Same rule
+the EPMS single-line got in v1.134.18.
+
+**Two more labels were being cut mid-character.** The row headers read `Row A · CA-A01` and
+ellipsised to `Row ...` on all 25 columns — the same non-label, 25 times. They show the row
+letter, which is what distinguishes them and does fit; the full aisle tag moved to the title and
+the inspector. The CRAH rail showed its leaving-air figure as `25.` — **a number cut mid-digit
+reads as a different number.** The tag stands alone; the value was already in the title and is
+listed at a legible size in the CRAH air-side panel beside it.
+
+**`fuel-system.html`:** the tank threshold marks were 8.8 px white at 50 % opacity laid straight
+over the amber liquid — unreadable wherever they fell, on the one control that explains a level
+alarm. They carry the site's dark instrument treatment now.
+
+`ict.html` and `dc-conventional.html` were examined and needed nothing.
+
 ## v1.134.18 — 2026-09-05 (Every gate passed while a quarter of the cockpit text was too small to read)
 
 Fixing the chiller drawing raised the obvious question: what do the others measure? So I

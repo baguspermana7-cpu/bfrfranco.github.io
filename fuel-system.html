@@ -279,10 +279,19 @@
             background: linear-gradient(180deg, var(--diesel-bright), var(--diesel-main));
             transition: height 0.6s ease; opacity: 0.92;
         }
+        /* v1.134.19 — these threshold marks were 8.8px white at 50% opacity laid straight over
+           the amber liquid: unreadable wherever they fell, and the one place a level alarm gets
+           explained. A dark instrument chip carries them over both the fill and the empty tank —
+           the same dark-glass + hairline idiom the articles grid uses for its number badges. */
         .ust-mark {
-            position: absolute; left: 0; right: 0; border-top: 1px dashed rgba(255,255,255,0.22);
-            font-size: 0.55rem; color: rgba(255,255,255,0.5); padding-left: 3px;
+            position: absolute; left: 0; right: 0; border-top: 1px dashed rgba(255,255,255,0.3);
+            font-size: 0.62rem; padding-left: 3px;
             font-family: 'JetBrains Mono', monospace; pointer-events: none;
+        }
+        .ust-mark::first-line { color: inherit; }
+        .ust-mark {
+            color: #e8eef5;
+            text-shadow: 0 0 3px rgba(8,12,18,.95), 0 0 6px rgba(8,12,18,.85);
         }
         .ust-meta { flex: 1; display: flex; flex-direction: column; justify-content: center; }
 

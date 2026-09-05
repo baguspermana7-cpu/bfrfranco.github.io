@@ -326,6 +326,20 @@
         }
         .rack:hover { outline: 1px solid #fff; outline-offset: -1px; z-index: 5; }
         .rack.sel { outline: 2px solid var(--sel); outline-offset: -1px; z-index: 6; }
+        /* v1.134.19 — LEVEL OF DETAIL on the cabinet field.
+           A hall is 500 cabinets. At the width this grid gets, a cell is ~15 px across while
+           "A-AL01" at 7.5 px needs nearer 30 — so every cabinet carried two strings that could
+           not be read, 1,000 of them, smeared into texture that looked like data. The heatmap
+           colour IS the information at that size, and it is accurate; the strings were not.
+           Labels appear only when a cell is wide enough to hold them (.rack-field.lod-labels,
+           set from the measured cell width), and the exact figures for any one cabinet are one
+           hover or click away in the inspector — which is how you read a specific cabinet
+           anyway. Same rule the EPMS single-line got in v1.134.18: an unreadable number is not
+           a smaller number, it is noise. */
+        #zone-field .rack .rk-id,
+        #zone-field .rack .rk-val { display: none; }
+        #zone-field.lod-labels .rack .rk-id { display: block; }
+        #zone-field.lod-labels .rack .rk-val { display: block; }
         .rack .rk-id { font-weight: 700; font-size: 7.5px; letter-spacing: -0.2px; opacity: 0.92; }
         .rack .rk-val { font-size: 7.5px; opacity: 0.78; margin-top: 1px; font-variant-numeric: tabular-nums; }
         .rack.excursion { animation: rk-pulse 0.9s ease-in-out infinite; }
@@ -839,7 +853,13 @@
             <span>Event Log</span>
             <span style="color:var(--txt-dim); font-weight:600; letter-spacing:0;">deterministic &mdash; bound to single scenario basis (conv-engine)</span>
         </div>
-        <div class="log-container" id="log-box"><div class="log-entry"><span class="l-crit">Data Hall authority UNAVAILABLE.</span></div></div>
+        <!-- v1.134.19 — this shipped with a CRITICAL "Data Hall authority UNAVAILABLE." line baked
+             into the markup as a placeholder. Nothing removed it when authority WAS available, so a
+             healthy console permanently displayed a red authority failure at the top of its event
+             log. That is the static-seed defect the cockpits were swept for in v1.132.0, inverted:
+             a false ALARM instead of a false all-clear, and no less wrong. The container starts
+             empty; the unavailable line is written only by the path that actually detects it. -->
+        <div class="log-container" id="log-box"></div>
     </div>
 
     <script>
@@ -1597,12 +1617,14 @@
                 for (var n = start; n <= end; n++) {
                     var u = crahUnits[n - 1];
                     var cls = u.running ? '' : 'stby';
-                    var satTxt = u.running ? u.leavingAirC.toFixed(1) + '°C' : 'OFF';
                     h += '<div class="crah-cell ' + cls + '" data-crah="' + u.n + '" ' +
                         'onclick="window.__inspectCrah(' + u.n + ', event)" ' +
                         'title="' + u.tag + ' — ' + u.state + ' — leaving air ' + (u.running ? u.leavingAirC.toFixed(1) + '°C' : 'off') + '">' +
                         '<span class="cc-dot"></span>' + u.tag.replace('CRAH-', '') +
-                        '<span class="cc-sat">' + satTxt + '</span></div>';
+                        /* v1.134.19 — the saturation figure ellipsised to "25." here. A number cut
+                           mid-digit reads as a different number; the CRAH air-side list on the left
+                           carries the same value at a legible size. Tag only, value on hover. */
+                        '</div>';
                 }
                 return h;
             }
@@ -1625,7 +1647,11 @@
                 var zn = zones[z];
                 var rowChar = String.fromCharCode(65 + z);
                 fh += '<div class="zone">' +
-                    '<div class="zone-head">Row ' + rowChar + ' · ' + zoneAisleTag(z) + '</div>' +
+                    /* v1.134.19 — was "Row A · CA-A01", which ellipsised to "Row ..." on all 25
+                       columns: the same non-label 25 times. The row letter is what distinguishes
+                       them and it fits; the full aisle tag stays in the title attribute and in the
+                       inspector, where there is room to read it. */
+                    '<div class="zone-head" title="Row ' + rowChar + ' \u00b7 ' + zoneAisleTag(z) + '">' + rowChar + '</div>' +
                     '<div class="zone-racks" id="zr-' + z + '"></div>' +
                     '<div class="zone-foot num">' + zn.heat.toFixed(0) + ' kW · IN ' +
                     zn.rackInletC.toFixed(1) + '°C · HOT ' + zn.hotAisleC.toFixed(1) + '°C</div>' +
@@ -1648,7 +1674,23 @@
             }
             wireRacks();
             repaintRacks();
+            applyRackLabelDetail();
         }
+
+        /* A cabinet cell must be wide enough to hold its own tag before that tag is drawn.
+           "A-AL01" at 7.5px measures ~30px; below that the label is not information. Measured
+           from the live cell, so a wider viewport or a future layout change turns the labels
+           back on by itself rather than needing this number revisited. */
+        var RACK_LABEL_MIN_CELL_PX = 30;
+        function applyRackLabelDetail() {
+            var field = document.getElementById('zone-field');
+            if (!field) return;
+            var cell = field.querySelector('.rack');
+            if (!cell) return;
+            var w = cell.getBoundingClientRect().width;
+            field.classList.toggle('lod-labels', w >= RACK_LABEL_MIN_CELL_PX);
+        }
+        window.addEventListener('resize', applyRackLabelDetail);
 
         function repaintRacks() {
             // v1.41.4 — per-mode inline labels (rack ID + value), excursion ring
