@@ -125,6 +125,41 @@ const RULES = [
       }
       return decor >= 3 ? `glassmorphism blur on ${decor} decorative surface(s)` : null;
     } },
+
+  /* ── v1.135.0 — GUARD RULES ────────────────────────────────────────────────
+     Four §A rules that measure ZERO on this tree today. They are cheap, they carry no
+     backlog, and they exist so the patterns cannot come back the way the purple did.
+     Shipped strict on arrival for exactly that reason: a rule added after a regression
+     is a post-mortem; a rule added before one is a gate. Each names the §A rule it
+     enforces so the tool and the standard cannot drift apart. */
+  { id: "terminal-mock",                                             // §A rule 17
+    test: (t) => /\b(terminal-window|fake-terminal|terminal-mock|term-dots|window-dots|traffic-lights|mac-window)\b/i.test(t)
+      ? "decorative terminal-window mock — use a real embed or real output" : null },
+
+  { id: "fake-testimonial",                                          // §A rule 18
+    /* A SHAPE guard, not a truth check: no gate can know whether a quote is real. It
+       asserts the site does not carry testimonial-shaped markup at all, which is the
+       only machine-checkable half of the rule. Labelled honestly rather than implying
+       the stronger claim. */
+    test: (t) => /\b(testimonial|client-quote|customer-quote|review-card|star-rating-card)\b/i.test(t)
+      ? "testimonial-shaped markup — this site invents no quotes" : null },
+
+  { id: "not-x-its-y",                                               // §A rule 19
+    /* Runs on PROSE, so tags, scripts and styles are stripped first — otherwise a class
+       name or a JS string trips it. Deliberately narrow: it matches the specific slop
+       formula, not every contrastive sentence, because a lossy copy rule that cries wolf
+       gets muted and then protects nothing. */
+    test: (t) => {
+      const prose = t.replace(/<script[\s\S]*?<\/script>/gi, ' ')
+                     .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+                     .replace(/<[^>]+>/g, ' ');
+      const m = prose.match(/\bit(?:'|&#39;|&rsquo;|\u2019)?s not (?:just )?(?:a |an |the |about )?[^.,;\u2014-]{2,40}[,\u2014-]\s*it(?:'|&#39;|&rsquo;|\u2019)?s\b/i);
+      return m ? `"it's not X, it's Y" copy formula: "${m[0].trim()}"` : null;
+    } },
+
+  { id: "pricing-tiers",                                             // §A rule 26
+    test: (t) => /\b(pricing-tier|price-card|pricing-table|plan-card|tier-price)\b/i.test(t)
+      ? "pricing-tier template markup — this site sells nothing" : null },
 ];
 
 const files = walk(ROOT);

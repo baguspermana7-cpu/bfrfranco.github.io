@@ -123,16 +123,16 @@ gate "telemetry docs — generated discovery parity" node tools/test-telemetry-d
 gate "telemetry docs — browser, a11y, mobile, and gate safety" node tools/test-telemetry-e2e.mjs
 
 # Harness documentation is release state: public-safety and generated links must not drift.
-# ANTI-VIBECODE. standarization/ANTI_VIBECODE_STANDARD.md has claimed since 2026-08-23 that this
-# is "wired into tools/ship-gate.sh (product gate audit-vibecode --strict)". It was NOT wired at
-# all, so the hard-banned design tokens went unenforced for the whole period — which is how the
-# shared auth component shipped Anthropic purple on every page of the site.
-# MONITOR, not strict, for one stated reason: ~102 pages still use #A78BFA as a SEMANTIC marker
-# ("Root only — restricted access" links, one tool-card accent). The standard bans the raw
-# violet and says those uses must move to a NAMED TOKEN, but it does not say which hue the token
-# carries — that is an owner brand decision, and silently repainting a hundred pages is not mine
-# to make. FLIP TO STRICT once that hue is chosen and the sweep lands.
-gate "anti-vibecode MONITOR — hard-banned design tokens" bash -c "node tools/audit-vibecode.mjs; true"
+# ANTI-VIBECODE — STRICT since v1.135.0. The flip condition written here has been met.
+# History, because it is the point: the standard claimed from 2026-08-23 that this was wired as
+# --strict. It was not wired at all — the exit code was forced to 0 — so the hard-banned tokens
+# went unenforced for the whole period, which is how the shared auth component shipped Anthropic
+# purple on every page of the site. The stated blocker was that ~102 pages used #A78BFA as a
+# semantic marker with no named token to move to; v1.134.21 chose --rz-restricted and swept all
+# 106 files to zero. The last two findings (glassmorphism on .metric-card / .oe-card / .case-card
+# in both stylesheets) were fixed in v1.135.0, so there is nothing left to defer behind.
+# A monitor that is read as a gate is worse than no gate: it is a green light nobody earned.
+gate "anti-vibecode — hard-banned design tokens" node tools/audit-vibecode.mjs --strict
 # LEGIBILITY. Rendered label height across every page: a label below the floor is not small text,
 # it is texture that looks like information. 848 findings on the first run, all from one root
 # cause — the incident timelines' viewBox grew with the event count while max-width squeezed them

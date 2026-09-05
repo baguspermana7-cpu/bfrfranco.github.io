@@ -81,6 +81,35 @@ on any hard-banned finding. Detectors + precision rules (all learned from real f
   the `📖 Technical Manual` pill shipped as `&#128214;` on ~40 pages and a literal-only scan missed every
   one; a headless render (`document.body.innerText`) caught it. Verify emoji work with a real render, not
   just a static grep.
+### Detector coverage — stated honestly (v1.135.0)
+
+For most of this standard's life the tool implemented **7 of these 26 rules** while the document
+claimed it was wired as `--strict`. It was not wired at all: `ship-gate.sh` ran it as
+`node tools/audit-vibecode.mjs; true`, forcing the exit code to 0. Nineteen rules had no detector
+and the seven that existed could not fail a build. That is how a card could carry an 8px radius, a
+3px rail, a shadow doing the delineation and `transition: all` on the homepage while the gate
+reported clean — and it is why the owner kept finding slop the tool had passed.
+
+As of v1.135.0 the gate is **strict**, and coverage is:
+
+| status | rules | count |
+|---|---|---|
+| **Gating detectors** | 1, 2, 3, 4, 5, 6, 17, 18, 19, 21, 26 | **11** |
+| Planned gating (design sweep in progress) | 7, 10, 11, 12, 22, 23, 24 | 7 |
+| Monitor-only — real signal, structural false positives | 8, 9, 14, 15 | 4 |
+| Render-hosted (needs computed geometry, not text) | 20, 25 | 2 |
+| **Un-gateable judgement calls — declared, not faked** | 13, 16 | 2 |
+
+Rules 13 and 16 will never have a detector. "Purple-and-black *scheme*" is an aggregate palette
+judgement, and "bento grid as generic filler" turns on whether the content is genuinely a
+dashboard. A detector that guessed at either would report clean on the cases that matter, which is
+worse than an honest gap. They are human-review items and this table says so.
+
+**Rules 18 and 19 are shape guards, not truth checks.** No gate can know whether a quotation is
+invented; the detector asserts only that the site carries no testimonial-shaped markup at all.
+Rule 19 matches the specific slop formula, not every contrastive sentence — a lossy copy rule that
+cries wolf gets muted and then protects nothing.
+
 - **Two exemptions the rule needs to be usable** (both found by running it, v1.134.21):
   1. **Protected aurora.** A translucent stop INSIDE a `gradient()` is not a finding — §B
      protects the aurora-mesh hero and its palette legitimately includes a violet. A solid

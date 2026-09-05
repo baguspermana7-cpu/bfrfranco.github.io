@@ -47,12 +47,31 @@ export async function inspectAuthorizedAuditState(page, cockpitIdentity) {
   return page.evaluate((blockerSelector, expectedRootSelector) => {
     const roots = Array.from(document.querySelectorAll(expectedRootSelector));
     const root = roots[0] || null;
+    /* v1.135.0 — MEASURABLE, not merely unlocked. Clearing body.locked, the overlays and
+       `inert` says the surface is not BLOCKED; it does not say the surface is on screen.
+       datahallAI.html ships `data-datahall-authority="unavailable"`, and its own CSS then
+       does `#tabs, .wrap { display: none !important }` — so an audit could satisfy every
+       check above while measuring a page with no box at all, and report it clean. That is
+       how eight of ten tabs went unmeasured for this long. A hidden root is now a failure,
+       and the attribute that hid it is named in the error rather than left to be guessed. */
+    const rootStyle = root ? getComputedStyle(root) : null;
+    const rootBox = root ? root.getBoundingClientRect() : null;
+    const rootMeasurable = Boolean(root)
+      && rootStyle.display !== 'none'
+      && rootStyle.visibility !== 'hidden'
+      && rootBox.width > 2 && rootBox.height > 2;
     return {
       bodyLocked: document.body.classList.contains('locked'),
       blockingOverlayCount: document.querySelectorAll(blockerSelector).length,
       cockpitRootCount: roots.length,
       hasCockpitRoot: roots.length === 1,
       cockpitRootInert: Boolean(root?.closest('[inert]')),
+      cockpitRootMeasurable: rootMeasurable,
+      cockpitRootHiddenBy: root && !rootMeasurable
+        ? (document.body.getAttribute('data-datahall-authority')
+          || document.body.getAttribute('data-rz-basis-authority')
+          || 'unknown-rule')
+        : null,
     };
   }, AUTH_BLOCKER_SELECTOR, rootSelector);
 }
@@ -60,7 +79,8 @@ export async function inspectAuthorizedAuditState(page, cockpitIdentity) {
 export async function assertAuthorizedAuditState(page, cockpitIdentity) {
   const state = await inspectAuthorizedAuditState(page, cockpitIdentity);
   if (state.bodyLocked || state.blockingOverlayCount > 0
-      || !state.hasCockpitRoot || state.cockpitRootInert) {
+      || !state.hasCockpitRoot || state.cockpitRootInert
+      || !state.cockpitRootMeasurable) {
     throw new Error(`invalid authorized audit surface: ${JSON.stringify(state)}`);
   }
 }

@@ -26,6 +26,9 @@ import { readFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { extname, resolve, sep } from 'node:path';
 import puppeteer from 'puppeteer';
+import { TAB_SETS, NO_TAB_SET, activateTab } from './lib/cockpit-tabs.mjs';
+import { primeCockpitAuditDocument, enterAuthorizedAuditState, assertAuthorizedAuditState }
+    from './lib/cockpit-audit-state.mjs';
 
 const ROOT = process.cwd();
 const ARGS = process.argv.slice(2);
@@ -53,7 +56,21 @@ const DIAGRAMS = Object.freeze([
   /* EPMS: the root SVG (viewBox 0 0 3600 2600) holds every layer — wires, flow, devices, breakers and
      the telemetry text. Targeting a single layer (e.g. #l-wires) reports texts=0 and measures nothing. */
   { page: 'EPMS_Telemetry.html', selector: 'svg#viewport', label: 'EPMS single-line' },
+  /* v1.135.0 — the tabbed cockpit. Its thirteen diagrams live on eight different tabs and five
+     electrical sub-panels, none of which any gate had ever opened: the default tab holds no SVG
+     at all, so every render gate measured an empty set and reported the page clean while it
+     carried ~2,050 sub-floor labels and ~200 overlapping pairs. Expanded from the declared tab
+     set rather than re-typed, so the two lists cannot drift. */
+  ...TAB_SETS['datahallAI.html'].diagrams.map((entry) => ({
+    page: 'datahallAI.html',
+    selector: entry.selector,
+    label: `DC AI ${entry.label}`,
+    tabEntry: entry,
+  })),
 ]);
+
+/* Pages declared as having nothing to activate — recorded so an absence is a decision. */
+void NO_TAB_SET;
 
 const VIEWPORTS = Object.freeze([
   { name: 'desktop', width: 1680, height: 1000 },
@@ -102,10 +119,24 @@ try {
         }, theme);
         /* Cockpits run continuous animation timers, so `networkidle2` can never settle on some of them.
            Wait for the document, then for the diagram element itself, then a short paint settle. */
+        const tabSet = TAB_SETS[diagram.page] || null;
+        if (tabSet) await primeCockpitAuditDocument(tab, theme);
         await tab.goto(`${base}/${diagram.page}`, { waitUntil: 'domcontentloaded', timeout: 45000 });
-        await tab.waitForSelector(diagram.selector, { timeout: 20000 }).catch(() => {});
         await tab.evaluate((t) => document.documentElement.setAttribute('data-theme', t), theme);
-        await new Promise((accept) => setTimeout(accept, 1200));
+        if (tabSet) {
+          /* A root-gated cockpit renders behind a full-viewport gate and an `inert` wrapper, and
+             hides its own tab bar until the engine authority resolves. Measuring it without this
+             step measures a hidden page — assertAuthorizedAuditState now refuses that outright. */
+          await new Promise((accept) => setTimeout(accept, 1400));
+          await enterAuthorizedAuditState(tab, tabSet.cockpit);
+          await assertAuthorizedAuditState(tab, tabSet.cockpit);
+        }
+        await tab.waitForSelector(diagram.selector, { timeout: 20000 }).catch(() => {});
+        if (diagram.tabEntry) {
+          await activateTab(tab, tabSet, diagram.tabEntry);
+        } else {
+          await new Promise((accept) => setTimeout(accept, 1200));
+        }
 
         const result = await tab.evaluate(
           ({ selector, overlapTolerance, clipTolerance }) => {
@@ -283,4 +314,19 @@ try {
   await new Promise((accept) => server.close(accept));
 }
 
-process.exit(MEASURE_ONLY || findings.length === 0 ? 0 : 1);
+/* v1.135.0 — MONITOR SCOPE. datahallAI.html's thirteen diagrams entered this gate for the first
+   time in this release; before it, no render gate had ever opened eight of its ten tabs, so it
+   arrives with a real backlog (2,678 findings at entry: 812 collisions, 1,780 sub-floor labels,
+   86 clipped). Failing the build on day one would get the whole gate muted, which is how the
+   page went unmeasured this long in the first place. Its findings are REPORTED every run and the
+   rest of the suite stays strict.
+   FLIP TO STRICT: delete this page from MONITOR_PAGES once its rows read zero. Do not widen the
+   tolerance to get there — pay the sweep. Everything else in DIAGRAMS gates today. */
+const MONITOR_PAGES = new Set(['datahallAI.html']);
+const blocking = findings.filter((f) => !MONITOR_PAGES.has(f.page));
+const monitored = findings.length - blocking.length;
+if (monitored) {
+  console.log(`\n  NOTE — ${monitored} finding(s) on ${[...MONITOR_PAGES].join(', ')} are REPORTED, not gating.`);
+  console.log('         They entered measurement in v1.135.0; flip to strict when they reach zero.');
+}
+process.exit(MEASURE_ONLY || blocking.length === 0 ? 0 : 1);

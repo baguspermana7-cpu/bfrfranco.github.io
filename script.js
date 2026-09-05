@@ -1377,8 +1377,10 @@ function initMotionEffects() {
             }
         }
 
-        // --- #46: Grid Pattern Reveal ---
-        if (hasPointer && !isMobile && !lowEnd) {
+        // --- #46: Grid Pattern Reveal --- DISABLED (v1.135.0)
+        // A dot grid painted on a canvas that follows the pointer: CLAUDE.md rejected pattern
+        // #1 (dot-grid) and #4 (cursor-tracking). Canvas-painted, so no CSS rule could see it.
+        if (false && hasPointer && !isMobile && !lowEnd) {
             var gridCanvas = document.createElement('canvas');
             gridCanvas.className = 'grid-reveal-canvas';
             gridCanvas.setAttribute('aria-hidden', 'true');
@@ -1428,8 +1430,11 @@ function initMotionEffects() {
             }, { passive: true });
         }
 
-        // --- #47: Mouse-Reactive Gradient Orbs ---
-        if (hasPointer && !isMobile && !lowEnd) {
+        // --- #47: Mouse-Reactive Gradient Orbs --- DISABLED (v1.135.0)
+        // Three blurred colour orbs lerping toward the cursor on a rAF loop: CLAUDE.md rejected
+        // pattern #4 (cursor-tracking) and ANTI_VIBECODE §A rule 7 (standalone decorative orbs).
+        // The §B-protected aurora-mesh hero already carries this character, without the tracking.
+        if (false && hasPointer && !isMobile && !lowEnd) {
             var orbConfigs = [
                 { class: 'gradient-orb-1', lerp: 0.02 },
                 { class: 'gradient-orb-2', lerp: 0.04 },

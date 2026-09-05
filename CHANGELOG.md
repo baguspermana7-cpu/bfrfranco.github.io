@@ -11,6 +11,117 @@ release sections rather than semver.
 
 ---
 
+## v1.135.0 — 2026-09-06
+
+### The anti-slop gate was never a gate
+
+The owner kept finding AI-design slop on pages the anti-vibecode audit passed — most recently on
+`index.html` itself. The cause was not a sloppy sweep. Two measurements:
+
+1. **`ship-gate.sh` ran the audit as `node tools/audit-vibecode.mjs; true`** — the exit code was
+   forced to 0. The standard has claimed since 2026-08-23 that it was wired as `--strict`. It was
+   not wired at all, and it had **2 live findings** it was reporting into the void.
+2. **The tool implemented 7 of the standard's 26 rules.** Nineteen §A patterns had no detector.
+   Every sweep I ran fixed what the instrument could see, and the instrument covered 27 %.
+
+So the gate is now genuinely strict, and the coverage table in the standard states honestly which
+rules gate, which are monitor-only, which need a render, and which two can never be automated at
+all rather than being given a detector that reports clean.
+
+### The card the owner pointed at, and what it was doing
+
+`.skill-item` — the "Core Competencies" cards — rendered with **five** violations at once:
+
+| rendered | the standard's own value |
+|---|---|
+| `border-radius: 8px` | 4px — *"precision machined panel component"* (design.md:628) |
+| `border-left: 3px` coloured rail | 2px max — *"3-4px slabs are never used for borders"* (design.md:209) |
+| `border-top: 0px` — **no hairline at all** | 1px hairline; *"cards are delineated by their border, not their shadow"* (design.md:645) |
+| `box-shadow` as the only delineation | no resting shadow |
+| `transition: all` + `translateX(5px)` on hover | named property, border-colour only (design.md:888) |
+
+None of those five had a detector.
+
+### The design system existed only as a document
+
+`documentation/design.md` prescribes `--rz-space-*`, `--rz-line-tier-*`, a 4px radius and a single
+shadow level. **Grep returned zero occurrences of any of them in the shipped stylesheets.** The
+system was never implemented, which is why every surface was hand-styled and drifted. This release
+introduces the token layer — line tiers at 0.18 / 0.12 / 0.07, the 4pt spacing ladder, one shadow
+level, one state-transition duration — into both stylesheets, and moves the cards onto it.
+
+### Three overrides that were silently undoing the fix
+
+The sweep had to reach past the card definitions to blocks 700–2,600 lines further down that
+re-applied what the pattern removes:
+
+- **`#27: Card Depth Shadow Layers`** — five stacked shadows on hover, against a standard that caps
+  the site at one level.
+- **`#29: Card Glass Morphism Intensify on Hover`** — the glassmorphism finding the gate was
+  reporting, applied on hover so it survived any fix to the resting state.
+- **A "glow" layer** re-adding `box-shadow` + a coloured glow to `.skill-item`, `.cert-item` and
+  `.experience-card` on hover.
+
+A sweep that edited only the first declaration of each selector would have looked correct in the
+source and changed nothing on screen.
+
+### Two rejected patterns running live, invisible to any CSS rule
+
+- **`#46: Grid Pattern Reveal`** painted a **dot grid onto a canvas that follows the pointer**.
+- **`#47: Mouse-Reactive Gradient Orbs`** dragged three blurred colour orbs after the cursor on a
+  `requestAnimationFrame` loop.
+
+`CLAUDE.md` lists dot-grid as rejected pattern #1 and cursor-tracking as #4 — and records that
+cursor effects were *already disabled* in this same file (`initCardTilt`, `initSpotlight`). These
+two were missed, and neither was findable by a stylesheet audit: one paints to a canvas, the other
+is injected at runtime. Both disabled with the same early-return idiom, the code left in place as
+history.
+
+### The owner's "jarak2nya" had a specific cause
+
+`index.html` opened **`<div class="certifications-grid">` twice**, both closing at the same point.
+So `margin-top: 2rem` applied twice — 4 rem of dead space — the outer flex container held exactly
+one child so its `gap` did nothing, and `flex: 0 0 calc(33.333% - 2rem)` computed its three-column
+width against the wrong box. Underneath it, **`.cert-item` was declared twice** across a media
+query: the first block set `padding: 2rem` and `min-height: 200px`, the second overrode padding to
+`1rem` and left the min-height alone, so the box reserved vertical space for a padding it no longer
+had. One wrapper and one declaration now.
+
+### Four guard rules, shipped strict on arrival
+
+Terminal-window mocks, testimonial-shaped markup, the "it's not X, it's Y" copy formula, and
+pricing-tier templates. All four measure **zero** today. They cost four regexes and no sweep, and
+they exist so these cannot arrive the way the purple did — a rule added after a regression is a
+post-mortem; a rule added before one is a gate. Proven RED against a throwaway fixture, GREEN when
+removed.
+
+### Verified on the render, not in the source
+
+Both themes: `.skill-item` at 4px radius, a 2px rail, a **1px hairline that did not previously
+exist**, no shadow, `transition: border-color`. One `.certifications-grid`. Zero `.gradient-orb`.
+Zero grid-reveal canvas. `audit-dark-coverage --strict` and `audit-responsive-layout --strict` both
+still pass — a design sweep must not buy tidiness with contrast or layout.
+
+### Also: eight cockpit tabs entered measurement for the first time
+
+`datahallAI.html` has ten tabs. Its default tab contains **zero `<svg>` elements**, and inactive
+panels are `display:none`, so every render gate measured an empty set and reported the page clean —
+`audit-legibility.mjs` has been running `--strict` against it in the ship gate the whole time.
+New `tools/lib/cockpit-tabs.mjs` activates each declared tab before measuring, asserting rather
+than attempting (the existing probe does `if (btn) btn.click()`, so a missing tab was silent),
+waiting for a real layout box instead of a timer, and yielding two frames so any level-of-detail
+pass has applied.
+
+`tools/lib/cockpit-audit-state.mjs` gained a `cockpitRootMeasurable` clause: it cleared
+`body.locked`, the overlays and `inert`, but not `data-datahall-authority="unavailable"`, whose own
+CSS `display:none`s the tab bar — so a probe could pass every check while measuring a hidden page.
+
+**Entry baseline, page untouched: 2,678 geometry findings** (812 collisions, 1,780 labels below the
+8.5 px floor, 86 clipped) and 565 legibility findings, where both gates previously reported
+nothing. Both are wired as **monitors for that page only** with the flip condition written beside
+them — failing the build on day one is how a gate gets muted, which is how the page went unmeasured
+this long. Every other page stays strict.
+
 ## v1.134.25 — 2026-09-05
 
 ### The cockpits get the glossary — wired from the registry, not written into the pages

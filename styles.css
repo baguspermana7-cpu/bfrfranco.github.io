@@ -67,6 +67,21 @@
     --transition-slow: 0.5s ease;
 
     /* Glassmorphism - Light Mode */
+
+    /* ── RZ design tokens (v1.135.0) ─────────────────────────────────────────
+       documentation/design.md prescribes this system; the shipped stylesheets
+       implemented none of it, so every surface was hand-styled and drifted. The
+       values below are quoted from the standard, not chosen here. */
+    --rz-surface-card: #ffffff;
+    --rz-line-tier-1: rgba(15, 23, 42, 0.18);
+    --rz-line-tier-2: rgba(15, 23, 42, 0.12);
+    --rz-line-tier-3: rgba(15, 23, 42, 0.07);
+    --rz-radius: 4px;
+    --rz-shadow-active: 0 1px 3px rgba(0, 0, 0, 0.18);
+    --rz-motion-state: 200ms ease;
+    --rz-space-1: 4px;  --rz-space-2: 8px;  --rz-space-3: 12px; --rz-space-4: 16px;
+    --rz-space-6: 24px; --rz-space-8: 32px; --rz-space-10: 40px; --rz-space-12: 48px;
+    --rz-space-16: 64px; --rz-space-24: 96px; --rz-space-32: 128px;
     --glass-bg: rgba(255, 255, 255, 0.7);
     --glass-border: rgba(30, 58, 95, 0.1);
     --glass-blur: blur(10px);
@@ -115,6 +130,13 @@
     --black: #ffffff;
 
     /* Glassmorphism - Dark Mode */
+
+    /* Dark surface + hairlines — design.md --rz-bg-elevated and the tier scale. */
+    --rz-surface-card: #111827;
+    --rz-line-tier-1: rgba(255, 255, 255, 0.18);
+    --rz-line-tier-2: rgba(255, 255, 255, 0.12);
+    --rz-line-tier-3: rgba(255, 255, 255, 0.07);
+    --rz-shadow-active: 0 1px 3px rgba(0, 0, 0, 0.35);
     --glass-bg: rgba(15, 15, 26, 0.8);
     --glass-border: rgba(74, 144, 184, 0.2);
     --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
@@ -1779,15 +1801,12 @@ section {
 }
 
 .metric-card {
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
+    background: var(--rz-surface-card);
     padding: 2.5rem 2rem;
-    border-radius: 16px;
+    border-radius: var(--rz-radius);
     text-align: center;
-    box-shadow: var(--glass-shadow);
-    border: 1px solid var(--glass-border);
-    transition: all var(--transition-normal);
+    border: 1px solid var(--rz-line-tier-2);
+    transition: border-color var(--rz-motion-state);
     position: relative;
     overflow: hidden;
 }
@@ -1871,14 +1890,11 @@ section {
 }
 
 .oe-card {
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
+    background: var(--rz-surface-card);
     padding: 1.25rem 1.15rem;
-    border-radius: 14px;
-    box-shadow: var(--glass-shadow);
-    border: 1px solid var(--glass-border);
-    transition: transform 0.3s ease;
+    border-radius: var(--rz-radius);
+    border: 1px solid var(--rz-line-tier-2);
+    transition: border-color var(--rz-motion-state);
     position: relative;
     overflow: hidden;
 }
@@ -2032,14 +2048,11 @@ section {
 }
 
 .case-card {
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border-radius: 20px;
+    background: var(--rz-surface-card);
+    border-radius: var(--rz-radius);
     padding: 2rem;
-    box-shadow: var(--glass-shadow);
-    transition: all var(--transition-normal);
-    border: 1px solid var(--glass-border);
+    transition: border-color var(--rz-motion-state);
+    border: 1px solid var(--rz-line-tier-2);
     position: relative;
     overflow: hidden;
 }
@@ -2249,20 +2262,22 @@ section {
 }
 
 .skill-item {
-    background: var(--white);
-    padding: 0.875rem 1.25rem;
-    border-radius: 8px;
+    /* v1.135.0 — was: 8px radius, a 3px rail, a shadow doing the delineation with no
+       border at all, `transition: all`, and translateX(5px) on hover. design.md §6 card
+       pattern: 1px hairline, 4px radius, 2px rail max, no resting shadow, named transition. */
+    background: var(--rz-surface-card);
+    padding: var(--rz-space-3) var(--rz-space-4);
+    border-radius: var(--rz-radius);
+    border: 1px solid var(--rz-line-tier-2);
+    border-left: 2px solid var(--light-blue);
     font-size: 0.9375rem;
     font-weight: 500;
     color: var(--gray-700);
-    box-shadow: var(--shadow-sm);
-    transition: all var(--transition-normal);
-    border-left: 3px solid var(--light-blue);
+    transition: border-color var(--rz-motion-state);
 }
 
 .skill-item:hover {
-    transform: translateX(5px);
-    box-shadow: var(--shadow-md);
+    border-color: var(--rz-line-tier-1);
     border-left-color: var(--medium-blue);
 }
 
@@ -2288,46 +2303,34 @@ section {
 }
 
 .cert-item {
-    /* Ini memaksa setiap kotak lebarnya 1/3 layar (dikurang jarak gap) 
-       sehingga tampilannya persis seperti 3 kolom */
-    flex: 0 0 calc(33.333% - 2rem); 
-    
-    /* Style standar kotak Anda (pastikan ini tetap ada) */
-    background: #fff;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    /* v1.135.0 — was TWO .cert-item blocks (padding 2rem then 1rem) separated by a media
+       query, so the box kept min-height: 200px sized for a padding the second block removed.
+       One declaration now, on the design.md card pattern: opaque surface, 1px hairline,
+       4px radius, no resting shadow, border-colour transition. */
+    flex: 0 0 calc(33.333% - 2rem);
+    background: var(--rz-surface-card);
+    padding: var(--rz-space-6);
+    border-radius: var(--rz-radius);
+    border: 1px solid var(--rz-line-tier-2);
     text-align: center;
-    transition: transform 0.3s ease;
+    transition: border-color var(--rz-motion-state);
+    cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 200px; /* Menjaga tinggi kotak seragam */
+    min-height: 200px;
 }
 
-/* Biar aman di HP (Layar Kecil) jadi 1 kolom */
+/* One column on small screens. */
 @media (max-width: 768px) {
     .cert-item {
-        flex: 0 0 100%; /* Di HP jadi 1 baris penuh */
+        flex: 0 0 100%;
     }
 }
 
-.cert-item {
-    background: var(--white);
-    padding: 1rem;
-    border-radius: 12px;
-    text-align: center;
-    box-shadow: var(--shadow-sm);
-    transition: all var(--transition-normal);
-    border: 1px solid var(--gray-200);
-    cursor: pointer;
-}
-
 .cert-item:hover {
-    transform: translateY(-6px);
-    box-shadow: var(--shadow-md);
-    border-color: var(--light-blue);
+    border-color: var(--rz-line-tier-1);
 }
 
 .cert-item img {
@@ -2952,36 +2955,21 @@ section {
     transform: translateY(-8px);
 }
 
-/* Skill items glow on hover */
-.skill-item:hover {
-    border-left-color: var(--accent-gold);
-    box-shadow:
-        var(--shadow-md),
-        0 0 15px rgba(245, 158, 11, 0.25);
-}
-
-/* Certification items glow */
-.cert-item:hover {
-    border-color: var(--accent-gold);
-    box-shadow:
-        var(--shadow-md),
-        0 0 20px rgba(245, 158, 11, 0.2);
-}
-
-/* Experience card enhanced glow */
+/* v1.135.0 — the card-glow override layer is gone. These blocks sat ~700 lines below the
+   card definitions and silently re-applied a stacked shadow plus a coloured glow on hover,
+   which is what design.md:888 (border-colour only on a card hover) and :242 (one shadow
+   level site-wide) forbid. The input focus ring survives in single-level form: a focus
+   affordance is functional, not card decoration. */
+.skill-item:hover,
+.cert-item:hover,
 .experience-card:hover {
-    box-shadow:
-        0 25px 50px rgba(0, 0, 0, 0.15),
-        0 0 30px rgba(245, 158, 11, 0.25);
+    border-color: var(--accent-gold);
 }
 
-/* Contact form input glow */
 .form-group input:focus,
 .form-group textarea:focus {
     border-color: var(--accent-gold);
-    box-shadow:
-        0 0 0 4px rgba(245, 158, 11, 0.15),
-        0 0 15px rgba(245, 158, 11, 0.15);
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.18);
 }
 
 /* Subtle shimmer animation */
@@ -6558,41 +6546,15 @@ section {
     contain: style paint;
 }
 
-/* --- #27: Card Depth Shadow Layers --- */
-.metric-card:hover,
-.case-card:hover {
-    box-shadow:
-        0 2px 4px rgba(0,0,0,0.04),
-        0 4px 8px rgba(0,0,0,0.06),
-        0 8px 16px rgba(0,0,0,0.08),
-        0 16px 32px rgba(0,0,0,0.10),
-        0 0 20px rgba(245,158,11,0.25);
-}
-[data-theme="dark"] .metric-card:hover,
-[data-theme="dark"] .case-card:hover {
-    box-shadow:
-        0 2px 4px rgba(0,0,0,0.12),
-        0 4px 8px rgba(0,0,0,0.16),
-        0 8px 16px rgba(0,0,0,0.20),
-        0 16px 32px rgba(0,0,0,0.24),
-        0 0 20px rgba(245,158,11,0.3);
-}
-
-/* --- #29: Card Glass Morphism Intensify on Hover --- */
-.metric-card,
-.case-card,
-.oe-card {
-    transition: transform 0.4s cubic-bezier(0.2, 1, 0.3, 1),
-                box-shadow 0.4s cubic-bezier(0.2, 1, 0.3, 1),
-                border-color 0.4s ease,
-                backdrop-filter 0.4s ease,
-                -webkit-backdrop-filter 0.4s ease;
-}
+/* v1.135.0 — #27 (five stacked shadows) and #29 ("Card Glass Morphism
+   Intensify on Hover") removed. They sat ~2,600 lines below the card
+   definitions and silently re-applied the glassmorphism and the shadow stack
+   that the card pattern removes. design.md:886 permits neither on a card, and
+   its hover state is border-colour only. */
 .metric-card:hover,
 .case-card:hover,
 .oe-card:hover {
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
+    border-color: var(--rz-line-tier-1);
 }
 
 /* --- #32: Card Entry Swing --- */

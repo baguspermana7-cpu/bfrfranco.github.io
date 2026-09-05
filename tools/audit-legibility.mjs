@@ -22,6 +22,8 @@ import { readFile, readdir } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { extname, resolve, sep, join } from 'node:path';
 import puppeteer from 'puppeteer';
+import { TAB_SETS, activateTab } from './lib/cockpit-tabs.mjs';
+import { primeCockpitAuditDocument, enterAuthorizedAuditState } from './lib/cockpit-audit-state.mjs';
 
 const ROOT = process.cwd();
 const ARGS = process.argv.slice(2);
@@ -70,9 +72,16 @@ try {
         tab.on('pageerror', () => {});
         try {
             await tab.setViewport({ width: 1680, height: 1050 });
+            /* v1.135.0 — TABS. This audit measures what is VISIBLE, and a tabbed cockpit hides its
+               inactive panels with display:none, so their text has a zero-area box and is skipped.
+               On datahallAI.html the default tab holds no <svg> at all, so the audit has been
+               running --strict against that page in the ship gate, measuring an empty set and
+               reporting it clean, while eight tabs carried ~2,050 sub-floor labels. */
+            const tabSet = TAB_SETS[page] || null;
+            if (tabSet) await primeCockpitAuditDocument(tab, 'dark');
             await tab.goto(`${base}/${page}`, { waitUntil: 'domcontentloaded', timeout: 30000 });
             await new Promise((accept) => setTimeout(accept, 1800));
-            const result = await tab.evaluate(({ minPx, slack }) => {
+            const scanOnce = () => tab.evaluate(({ minPx, slack }) => {
                 const out = { illegible: [], truncated: [], truncatedNumeric: [] };
                 const seen = new Set();
                 const visible = (el) => {
@@ -131,6 +140,26 @@ try {
                 return out;
             }, { minPx: MIN_PX, slack: TRUNC_SLACK_PX });
 
+            const result = { illegible: [], truncated: [], truncatedNumeric: [] };
+            const merge = (part) => {
+                result.illegible.push(...part.illegible);
+                result.truncated.push(...part.truncated);
+                result.truncatedNumeric.push(...part.truncatedNumeric);
+            };
+            if (tabSet) {
+                await enterAuthorizedAuditState(tab, tabSet.cockpit);
+                const seenTabs = new Set();
+                for (const entry of tabSet.diagrams) {
+                    const key = `${entry.tab}/${entry.sub || ''}`;
+                    if (seenTabs.has(key)) continue;
+                    seenTabs.add(key);
+                    await activateTab(tab, tabSet, entry);
+                    merge(await scanOnce());
+                }
+            } else {
+                merge(await scanOnce());
+            }
+
             scanned += 1;
             for (const f of result.illegible) findings.push({ page, kind: 'L1-illegible', detail: `"${f.text}" renders ${f.px}px` });
             for (const f of result.truncatedNumeric) findings.push({ page, kind: 'L2-truncated-number', detail: `"${f.text}" clipped by ${f.overflowPx}px` });
@@ -154,7 +183,16 @@ try {
             if (list.length > 6) console.log(`      ... and ${list.length - 6} more`);
         }
     }
-    if (STRICT && findings.length) process.exitCode = 1;
+    /* v1.135.0 — same monitor scope as the geometry gate, for the same reason: datahallAI.html's
+       eight hidden tabs entered measurement in this release and arrive with 565 findings. Reported
+       every run, not gating, until the sweep lands. Every other page stays strict. */
+    const MONITOR_PAGES = new Set(['datahallAI.html']);
+    const blocking = findings.filter((f) => !MONITOR_PAGES.has(f.page));
+    const monitored = findings.length - blocking.length;
+    if (monitored) {
+        console.log(`\n  NOTE — ${monitored} finding(s) on ${[...MONITOR_PAGES].join(', ')} are REPORTED, not gating.`);
+    }
+    if (STRICT && blocking.length) process.exitCode = 1;
 } finally {
     await browser.close();
     await new Promise((accept) => server.close(accept));
