@@ -273,6 +273,24 @@
       "formulaExpr": "cooling.heat_rejection_kw * cooling.chiller_specific_power_kw_e_per_kw_th"
     },
     {
+      "id": "cooling.chiller_input_per_machine_kw_e",
+      "label": "Chiller electrical input, per running machine",
+      "unit": "kW",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "chiller_input_kw_e / chillers_running",
+      "deps": [
+        "cooling.chiller_input_kw_e",
+        "cooling.chillers_running"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "The P&ID prints one machine's electrical input on every chiller it draws. That share was being divided out on the page, so the number an operator reads had no parameter to trace to; published by the engine instead."
+      },
+      "formulaExpr": "cooling.chiller_input_kw_e / cooling.chillers_running"
+    },
+    {
       "id": "cooling.chiller_n1_capacity_kw_th",
       "label": "Chiller capacity with one machine out",
       "unit": "kW_th",
@@ -289,6 +307,77 @@
         "method": "Worst single-machine outage against the INSTALLED set, so the standby is counted."
       },
       "formulaExpr": "( cooling.chillers_total - 1 ) * cooling.chiller_unit_kw_th"
+    },
+    {
+      "id": "cooling.chiller_n1_margin_kw_th",
+      "label": "Chiller plant N+1 margin",
+      "unit": "kW_th",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "chiller_n1_capacity_kw_th - heat_rejection_kw",
+      "deps": [
+        "cooling.chiller_n1_capacity_kw_th",
+        "cooling.heat_rejection_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "The figure the cockpit colours red or green for redundancy. It was subtracted on the page, so the number an operator acts on had no parameter to trace to."
+      },
+      "formulaExpr": "cooling.chiller_n1_capacity_kw_th - cooling.heat_rejection_kw"
+    },
+    {
+      "id": "cooling.flow_per_machine_lps",
+      "label": "Chilled-water flow, per running machine",
+      "unit": "L/s",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "flow_lps / chillers_running",
+      "deps": [
+        "cooling.chillers_running",
+        "cooling.flow_lps"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "The per-loop flow setpoint. Both the mimic and the setpoint card divided the header flow themselves; published once instead."
+      },
+      "formulaExpr": "cooling.flow_lps / cooling.chillers_running"
+    },
+    {
+      "id": "cooling.plant_duty_flow_lps",
+      "label": "Chilled-water flow at evaporator duty",
+      "unit": "L/s",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "heat_rejection_kw / (4.186 x chw_delta_t)",
+      "deps": [
+        "cooling.chw_delta_t",
+        "cooling.heat_rejection_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "The flow the evaporator duty (IT plus UPS loss) actually needs, against which the cockpit compares the IT-only reference. It was computed on the page."
+      },
+      "formulaExpr": "cooling.heat_rejection_kw / (4.186 * cooling.chw_delta_t)"
+    },
+    {
+      "id": "cooling.plant_duty_flow_uplift_pct",
+      "label": "Flow uplift, plant duty over IT reference",
+      "unit": "%",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "(1 / ups_efficiency - 1) x 100",
+      "deps": [
+        "electrical.ups_efficiency"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "The gap an operator reads to judge whether the header is sized for the real duty. The card presents it as a ratio of two flows, and the registry's measured-wiring check refused that: perturbing anything that moves flow_lps leaves this number untouched. It is right to refuse — the delta-T and the IT load appear in BOTH flows and cancel, so the flow uplift is exactly the UPS loss fraction, 1/eta - 1, and nothing else. Declared as what it actually depends on."
+      },
+      "formulaExpr": "(1 / electrical.ups_efficiency - 1) * 100"
     },
     {
       "id": "cooling.chiller_redundancy",
@@ -595,6 +684,178 @@
         "section": "THERMAL CHAIN",
         "method": "Contained cold aisle: the same 0 K assumption the return path uses. Applying it in one direction only produced the 15.2 C supply-air defect."
       }
+    },
+    {
+      "id": "cooling.airside_delta_t_k",
+      "label": "Design airside rise across the rack",
+      "unit": "K",
+      "scope": "plant",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "Was DESIGN_AIRSIDE_DELTA_T_C = 11 on datahall.html. A containment design figure, adopted, not measured — moved onto the thermal chain so the hot-aisle plane stops being an orphan."
+      }
+    },
+    {
+      "id": "cooling.water_cp_kj_per_kg_k",
+      "label": "Specific heat of water",
+      "unit": "kJ/(kg.K)",
+      "scope": "plant",
+      "evidenceClass": "STANDARD",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "A physical constant, but still a term of the flow calculation. It was a bare literal inside chwFlowLps() and inside the formula datahall.html prints to the operator, so the printed formula contained a number the registry could not explain."
+      }
+    },
+    {
+      "id": "cooling.crah_unit_sensible_kw",
+      "label": "CRAH unit sensible capacity",
+      "unit": "kW",
+      "scope": "hall",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "No vendor selection has been made. Was authored on datahall.html, where it sized the whole fleet and nothing in the registry could explain any of the results."
+      }
+    },
+    {
+      "id": "cooling.crah_required",
+      "label": "CRAH units required, per hall",
+      "unit": "None",
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "formula": "ceil(hall sensible heat / crah_unit_sensible_kw)",
+      "deps": [
+        "cooling.crah_unit_sensible_kw",
+        "hall.it_load_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "Sensible hall heat is taken as the hall IT load, the substitution this cockpit has always made and the same one doc-09 uses for the CHW flow term."
+      },
+      "formulaExpr": "ceil(hall.it_load_kw / cooling.crah_unit_sensible_kw)"
+    },
+    {
+      "id": "cooling.crah_installed",
+      "label": "CRAH units installed, per hall",
+      "unit": "None",
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "formula": "crah_required + 1",
+      "deps": [
+        "cooling.crah_required"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "N+1 per the study resilience contract: one standby that auto-starts on a trip."
+      },
+      "formulaExpr": "cooling.crah_required + 1"
+    },
+    {
+      "id": "cooling.crah_running",
+      "label": "CRAH units running, per hall",
+      "unit": "None",
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "formula": "crah_required",
+      "deps": [
+        "cooling.crah_required"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "The +1 is standby, so the running count is the required count."
+      },
+      "formulaExpr": "cooling.crah_required"
+    },
+    {
+      "id": "cooling.crah_available_kw",
+      "label": "CRAH sensible capacity available, per hall",
+      "unit": "kW",
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "formula": "crah_running x crah_unit_sensible_kw",
+      "deps": [
+        "cooling.crah_running",
+        "cooling.crah_unit_sensible_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "The capacity half of the balance band's cooling cell."
+      },
+      "formulaExpr": "cooling.crah_running * cooling.crah_unit_sensible_kw"
+    },
+    {
+      "id": "cooling.crah_n1_available_kw",
+      "label": "CRAH capacity surviving one unit outage, per hall",
+      "unit": "kW",
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "formula": "(crah_installed - 1) x crah_unit_sensible_kw",
+      "deps": [
+        "cooling.crah_installed",
+        "cooling.crah_unit_sensible_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "Measured against the INSTALLED fleet because the standby starts. An earlier page form used (running - 1) and silently ignored the standby; at 17/20 it still passed, so the modelling error never surfaced. It coincides with crah_available_kw under the current standby rule and would diverge the moment that rule changed, which is why both are published."
+      },
+      "formulaExpr": "(cooling.crah_installed - 1) * cooling.crah_unit_sensible_kw"
+    },
+    {
+      "id": "cooling.return_path_mixing_k",
+      "label": "Return-path mixing allowance",
+      "unit": "K",
+      "scope": "plant",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "Contained hot aisle, no bypass assumed. Was RETURN_PATH_MIXING_ADJUSTMENT_C on the page."
+      }
+    },
+    {
+      "id": "cooling.hot_aisle_c",
+      "label": "Hot-aisle temperature",
+      "unit": "degC",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "rack_inlet_target_c + airside_delta_t_k",
+      "deps": [
+        "cooling.airside_delta_t_k",
+        "cooling.rack_inlet_target_c"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "The plane immediately downstream of the rack inlet. The data hall drew it per row and nothing in the registry could explain any of those readings."
+      },
+      "formulaExpr": "cooling.rack_inlet_target_c + cooling.airside_delta_t_k"
+    },
+    {
+      "id": "cooling.crah_return_air_c",
+      "label": "CRAH return-air temperature",
+      "unit": "degC",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "hot_aisle_c + return_path_mixing_k",
+      "deps": [
+        "cooling.hot_aisle_c",
+        "cooling.return_path_mixing_k"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "Completes the air chain: rack inlet -> hot aisle -> CRAH return, each plane named."
+      },
+      "formulaExpr": "cooling.hot_aisle_c + cooling.return_path_mixing_k"
     },
     {
       "id": "cooling.tower_rejection_kw_th",
@@ -1682,6 +1943,62 @@
         "section": "line 13"
       },
       "formulaExpr": "environment.wue_l_per_kwh"
+    },
+    {
+      "id": "electrical.ups_load_pct_normal",
+      "label": "UPS system loading, normal",
+      "unit": "%",
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "formula": "(it_load_kw / ups_system_count) / ups_system_rated_kw x 100",
+      "deps": [
+        "electrical.ups_system_count",
+        "electrical.ups_system_rated_kw",
+        "site.it_load_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "Was computed on dc-conventional.html. An earlier form there divided the CAMPUS load by a HALL-scale rating and rendered 750% as though it were telemetry."
+      },
+      "formulaExpr": "(site.it_load_kw / electrical.ups_system_count) / electrical.ups_system_rated_kw * 100"
+    },
+    {
+      "id": "electrical.ups_load_pct_on_failover",
+      "label": "UPS system loading after 2N failover",
+      "unit": "%",
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "formula": "it_load_kw / ups_system_rated_kw x 100",
+      "deps": [
+        "electrical.ups_system_rated_kw",
+        "site.it_load_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "On a 2N transfer the surviving system carries the whole IT load."
+      },
+      "formulaExpr": "site.it_load_kw / electrical.ups_system_rated_kw * 100"
+    },
+    {
+      "id": "cooling.chiller_part_load_pct",
+      "label": "Chiller plant average part load",
+      "unit": "%",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "heat_rejection_kw / (chillers_running x chiller_unit_kw_th) x 100",
+      "deps": [
+        "cooling.chiller_unit_kw_th",
+        "cooling.chillers_running",
+        "cooling.heat_rejection_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-09-05",
+        "method": "Stated as a plant AVERAGE and labelled as one: per-unit loading is not published, so no per-machine figure is shown."
+      },
+      "formulaExpr": "cooling.heat_rejection_kw / (cooling.chillers_running * cooling.chiller_unit_kw_th) * 100"
     }
   ]
 }

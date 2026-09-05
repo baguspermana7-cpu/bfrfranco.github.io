@@ -33,7 +33,7 @@ const LEGACY_ENGINE = `window.CONV_CALC = Object.freeze({
 
 const INCOMPLETE_CURRENT_ENGINE = `window.CONV_CALC = Object.freeze({
   snapshot: Object.freeze({
-    meta: Object.freeze({ version:'2.0.0', scenario:'Simulated', data_quality:'GOOD' }),
+    meta: Object.freeze({ version:'2.1.0', scenario:'Simulated', data_quality:'GOOD' }),
     site: Object.freeze({ it_load_kw:30000, facility_load_kw:43500, non_it_load_kw:13500, pue:1.45 }),
     racks: Object.freeze({}),
     campus: Object.freeze({ halls:Object.freeze(['A','B','C','D']) }),

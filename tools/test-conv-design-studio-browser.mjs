@@ -3,6 +3,11 @@ import { readFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { extname, resolve, sep } from 'node:path';
 import puppeteer from 'puppeteer';
+import { createRequire as __rzRequire } from 'node:module';
+const ENGINE_PUBLISHED_VERSION = (() => {
+  const m = __rzRequire(import.meta.url)(process.cwd() + '/js/conv-engine.js');
+  return (m.CONV_CALC || m).snapshot.meta.version;
+})();
 
 const ROOT = process.cwd();
 const MIME = Object.freeze({
@@ -36,7 +41,13 @@ const DOCUMENTS = Object.freeze([
 const COCKPIT_SOURCE = await readFile(resolve(ROOT, 'dc-conventional.html'), 'utf8');
 assert.match(
   COCKPIT_SOURCE,
-  /<script src="js\/conv-engine\.js\?v=2\.0\.0" data-conv-engine-authority><\/script>/,
+/* v1.134.23 — this asserted the cache token as the LITERAL 2.0.0. Bumping the engine to
+   2.1.0 broke it here and in three sibling gates, while the pages themselves were correct:
+   the gate was pinning a version, not checking agreement. Read the published version instead,
+   so the assertion keeps its meaning when the engine legitimately moves. Whether the pages
+   AGREE with it is tools/test-conv-engine-version-pins.mjs's job. */
+  new RegExp('<script src="js/conv-engine\\.js\\?v='
+    + ENGINE_PUBLISHED_VERSION.replace(/\./g, '\\.') + '" data-conv-engine-authority></script>'),
   'Conventional cockpit must cache-bust and identify the governed v2 engine',
 );
 

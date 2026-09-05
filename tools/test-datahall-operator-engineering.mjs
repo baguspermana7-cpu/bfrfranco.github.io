@@ -51,7 +51,14 @@ for (const label of [
 includes('Current operating density', 'current rack-density basis must be separated from design study');
 includes('Installed rack study', 'installed rack study must be separated from live density');
 includes('Sensible heat equivalence', 'rack electrical load to heat-load assumption must be disclosed');
-includes('var RETURN_PATH_MIXING_ADJUSTMENT_C = 0', 'CRAH return path must use a named, disclosed mixing assumption');
+/* v1.134.23 — this asserted the literal `= 0`, i.e. that the assumption is AUTHORED HERE.
+   The mixing allowance moved onto the engine with the rest of the thermal chain, so the page
+   now reads it instead of owning it. The requirement it was protecting is unchanged and is
+   still checked: the constant is named, and the assumption is disclosed to the operator on
+   the line below. What changed is where the value lives, which is an improvement — an
+   authored constant on a page is exactly what the parameter programme removes. */
+includes('var RETURN_PATH_MIXING_ADJUSTMENT_C = S.cooling.return_path_mixing_k',
+  'CRAH return path must use a named mixing assumption read from the engine');
 includes('contained hot-aisle return with 0 K mixing adjustment', 'CRAH return assumption must be visible to operators');
 assert.equal(html.includes('hotAisleC - 0.8'), false, 'CRAH return must not use an unexplained 0.8C offset');
 assert.equal(html.includes('Cooling efficiency index'), false, 'allocated-duty utilization must not be mislabeled as plant efficiency');

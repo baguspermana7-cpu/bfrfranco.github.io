@@ -480,7 +480,7 @@
     <!-- Single scenario basis + pure calculations (Conventional BMS engine).
          Plain external script in <head>, BEFORE the page's inline script.
          Never inline this into a JS string literal. -->
-    <script src="js/conv-engine.js?v=2.0.0"></script>
+    <script src="js/conv-engine.js?v=2.1.0"></script>
     <!-- v1.134.2 — the GENERATED parameter registry plus the ONE shared basis drawer. This
          page used to carry its own hand-written basisFor dictionary; a drawer that restates
          provenance by hand is how v1.132.0 shipped a drawer explaining a density it had not
@@ -726,6 +726,19 @@
                      25.4 C supply is credible was invisible. -->
                 <div class="kv" data-basis-param="cooling.supply_path_mixing_k" tabindex="0" role="button"
                      title="Supply-path mixing (containment assumption) — click for basis"><span class="k">Supply-path mixing</span><span class="v num" id="th-mixing">UNAVAILABLE</span></div>
+                <!-- v1.134.23 — the chain used to stop at the supply plane and resume at CHWS,
+                     leaving the two AIR planes downstream of the rack unstated even though this
+                     cockpit draws a hot-aisle temperature for every row. The rise across the rack
+                     and the return-path mixing were page constants; both are engine-published now,
+                     so the chain reads rack inlet -> hot aisle -> CRAH return without a gap. -->
+                <div class="kv" data-basis-param="cooling.airside_delta_t_k" tabindex="0" role="button"
+                     title="Airside rise across the rack (ADOPTED) — click for basis"><span class="k">Airside &Delta;T</span><span class="v num" id="th-airdt">UNAVAILABLE</span></div>
+                <div class="kv" data-basis-param="cooling.hot_aisle_c" tabindex="0" role="button"
+                     title="Hot-aisle temperature — click for basis"><span class="k">Hot aisle</span><span class="v num" id="th-hot">UNAVAILABLE</span></div>
+                <div class="kv" data-basis-param="cooling.return_path_mixing_k" tabindex="0" role="button"
+                     title="Return-path mixing (containment assumption) — click for basis"><span class="k">Return-path mixing</span><span class="v num" id="th-retmix">UNAVAILABLE</span></div>
+                <div class="kv" data-basis-param="cooling.crah_return_air_c" tabindex="0" role="button"
+                     title="CRAH return air — click for basis"><span class="k">CRAH return air</span><span class="v num" id="th-return">UNAVAILABLE</span></div>
                 <div class="kv" data-basis-param="cooling.chw_coil_approach_k" tabindex="0" role="button"
                      title="Coil approach (ASSUMED) — click for basis"><span class="k">Coil approach</span><span class="v num" id="th-approach">UNAVAILABLE</span></div>
                 <div class="kv" data-basis-param="cooling.chws_c" tabindex="0" role="button"
@@ -757,13 +770,13 @@
                          hall's IT load summed from the cabinet field, not the facility load, and the
                          drawer gate rejected the mismatch. Corrected, and the facility figure given
                          its own cell below rather than borrowed from a line that means something else. -->
-                    <div class="bb-sub" id="bb-itsub" data-basis-param="hall.it_load_kw" tabindex="0" role="button" title="Hall IT load — click for basis">UNAVAILABLE</div>
+                    <div class="bb-sub" id="bb-itsub" data-rz-authored-basis="Active-cabinet count and the active average are summaries of the SIMULATED rack field, not engine quantities: conv-engine.js publishes the hall IT load and the installed rack count, and the occupancy pattern that decides which cabinets are live is generated on this page. The field itself is not exempt - its per-cabinet values are a declared distribution whose SUM is verified against hall.it_load_kw on every run, so the quantity these lines summarise is checked even though the split is simulated." data-basis-param="hall.it_load_kw" tabindex="0" role="button" title="Hall IT load — click for basis">UNAVAILABLE</div>
                     <div class="bb-sub" id="bb-facsub" data-basis-param="hall.facility_load_kw" tabindex="0" role="button" title="Hall facility load — click for basis">UNAVAILABLE</div>
                 </div>
                 <div class="bb-cell">
                     <div class="bb-lbl">Rack Count / Avg</div>
-                    <div class="bb-val num"><span id="bb-racks">UNAVAILABLE</span></div>
-                    <div class="bb-sub" id="bb-avg">UNAVAILABLE</div>
+                    <div class="bb-val num"><span id="bb-racks" data-rz-authored-basis="Active-cabinet count and the active average are summaries of the SIMULATED rack field, not engine quantities: conv-engine.js publishes the hall IT load and the installed rack count, and the occupancy pattern that decides which cabinets are live is generated on this page. The field itself is not exempt - its per-cabinet values are a declared distribution whose SUM is verified against hall.it_load_kw on every run, so the quantity these lines summarise is checked even though the split is simulated.">UNAVAILABLE</span></div>
+                    <div class="bb-sub" id="bb-avg" data-rz-authored-basis="Active-cabinet count and the active average are summaries of the SIMULATED rack field, not engine quantities: conv-engine.js publishes the hall IT load and the installed rack count, and the occupancy pattern that decides which cabinets are live is generated on this page. The field itself is not exempt - its per-cabinet values are a declared distribution whose SUM is verified against hall.it_load_kw on every run, so the quantity these lines summarise is checked even though the split is simulated." >UNAVAILABLE</div>
                 </div>
                 <div class="bb-cell">
                     <div class="bb-lbl">Hall Utilization</div>
@@ -810,6 +823,26 @@
                      data-rz-distribution-selector=".rack .rk-val"
                      data-rz-distribution-mode="sum"></div>
                 <div class="crah-rail" id="crah-bottom" aria-label="CRAH air-side units (south)"></div>
+                <!-- v1.134.23 — three MORE declared distributions for the per-row footers. Each
+                     buys its exclusion with a check, and each names the plane it reconciles to:
+                     the row heats must SUM to the hall IT load; every row's inlet must sit at the
+                     adopted rack-inlet target and every row's hot aisle at the published hot-aisle
+                     plane. A row that drifts off its plane fails, which is a stronger statement
+                     than tracing 25 cells one at a time. An element can carry one declaration, so
+                     these are three hosts; the selectors are document-scoped by the gate when a
+                     host has no matching descendants. -->
+                <div hidden
+                     data-rz-distribution="hall.it_load_kw"
+                     data-rz-distribution-selector=".zone-foot .zf-kw"
+                     data-rz-distribution-mode="sum"></div>
+                <div hidden
+                     data-rz-distribution="cooling.rack_inlet_target_c"
+                     data-rz-distribution-selector=".zone-foot .zf-in"
+                     data-rz-distribution-mode="per-item"></div>
+                <div hidden
+                     data-rz-distribution="cooling.hot_aisle_c"
+                     data-rz-distribution-selector=".zone-foot .zf-hot"
+                     data-rz-distribution-mode="per-item"></div>
             </div>
         </div>
 
@@ -825,14 +858,14 @@
                 <div class="kv"><span class="k">Avg Hot-Aisle</span><span class="v num" id="env-hot-aisle">UNAVAILABLE</span></div>
                 <div class="kv"><span class="k">CRAH Return</span><span class="v num" id="env-return">UNAVAILABLE</span></div>
                 <div class="kv"><span class="k">Avg RH</span><span class="v num" id="env-rh">UNAVAILABLE</span></div>
-                <div class="kv"><span class="k">Dew Point</span><span class="v num" id="env-dewpoint">UNAVAILABLE</span></div>
-                <div class="kv"><span class="k">Hottest Rack-Inlet</span><span class="v num v-na" id="env-hot">UNAVAILABLE</span></div>
+                <div class="kv"><span class="k">Dew Point</span><span class="v num" id="env-dewpoint" data-rz-authored-basis="Dew point and the hottest measured rack inlet are simulated hall environment: conv-engine.js publishes the design thermal PLANES (rack inlet target, hot aisle, CRAH supply and return) and a site annual average humidity, but no instantaneous per-hall psychrometric state. Binding a simulated instantaneous reading to a design plane would be the wrong-plane defect this programme exists to remove.">UNAVAILABLE</span></div>
+                <div class="kv"><span class="k">Hottest Rack-Inlet</span><span class="v num v-na" id="env-hot" data-rz-authored-basis="Dew point and the hottest measured rack inlet are simulated hall environment: conv-engine.js publishes the design thermal PLANES (rack inlet target, hot aisle, CRAH supply and return) and a site annual average humidity, but no instantaneous per-hall psychrometric state. Binding a simulated instantaneous reading to a design plane would be the wrong-plane defect this programme exists to remove.">UNAVAILABLE</span></div>
                 <div class="kv-sub">Rack-inlet design 25.4&deg;C · recommended envelope 18&ndash;27&deg;C · humidity interpreted with dew point / non-condensing constraints · CRAH return assumes contained hot-aisle path (0 K mixing adjustment).</div>
             </div>
             <div class="panel">
                 <div class="panel-title">Rack Density Basis</div>
                 <div class="basis-split">
-                    <div class="basis-cell"><div class="basis-label">Current operating density</div><div class="basis-value" id="density-current">UNAVAILABLE</div><div class="basis-note">IT kW / active rack</div></div>
+                    <div class="basis-cell"><div class="basis-label">Current operating density</div><div class="basis-value" id="density-current" data-rz-authored-basis="Active-cabinet count and the active average are summaries of the SIMULATED rack field, not engine quantities: conv-engine.js publishes the hall IT load and the installed rack count, and the occupancy pattern that decides which cabinets are live is generated on this page. The field itself is not exempt - its per-cabinet values are a declared distribution whose SUM is verified against hall.it_load_kw on every run, so the quantity these lines summarise is checked even though the split is simulated.">UNAVAILABLE</div><div class="basis-note">IT kW / active rack</div></div>
                     <div class="basis-cell"><div class="basis-label">Installed rack study</div><div class="basis-value" id="density-study">UNAVAILABLE</div><div class="basis-note">positions × cabinet design rating</div></div>
                     <!-- v1.134.11 — the selected peak was briefly hooked to the wrapper of the
                          design-average cell, so its drawer explained 30 kW/rack beside a line reading
@@ -873,7 +906,7 @@
          * reload yields identical numbers.
          * ========================================================== */
         var AUTHORED_RACKS_PER_ZONE = 20;
-        var CONV_CURRENT_ENGINE_VERSION = '2.0.0';
+        var CONV_CURRENT_ENGINE_VERSION = '2.1.0';
         function requestedEngineVersion() {
             var script = document.querySelector('script[src*="conv-engine.js"]');
             var src = script ? script.getAttribute('src') : '';
@@ -1093,8 +1126,10 @@
         var RACK_INLET_DESIGN_C = S.cooling.rack_inlet_target_c;
         var RACK_INLET_RECOMMENDED_MIN_C = 18;
         var RACK_INLET_RECOMMENDED_MAX_C = 27;
-        var DESIGN_AIRSIDE_DELTA_T_C = 11;
-        var RETURN_PATH_MIXING_ADJUSTMENT_C = 0;
+        /* v1.134.23 — both were authored here, which made the hot-aisle plane an orphan
+           constant on a page whose whole thermal chain is otherwise engine-derived. */
+        var DESIGN_AIRSIDE_DELTA_T_C = S.cooling.airside_delta_t_k;
+        var RETURN_PATH_MIXING_ADJUSTMENT_C = S.cooling.return_path_mixing_k;
         // ASHRAE air-balance constant: rho*cp ~= 1.2 * 1.006 kJ/(m3.K)
         var AIR_RHO_CP    = 1.2 * 1.006;
 
@@ -1228,16 +1263,19 @@
          *   N required = ceil(hall sensible heat / unit capacity)
          *   installed  = N + 1   (study resilience contract: cooling = 'N+1')
          *   running    = N       (the +1 is a standby that auto-starts on a trip) */
-        var CRAH_UNIT_KW = 130;                               // kW sensible per unit — ASSUMED
-        var CRAH_REQUIRED = Math.ceil(COOL_DEMAND_KW / CRAH_UNIT_KW);
-        var CRAH_TOTAL   = CRAH_REQUIRED + 1;                 // N+1 installed
-        var CRAH_RUNNING = CRAH_REQUIRED;                     // one unit on standby
-        var COOL_AVAIL_KW = CRAH_RUNNING * CRAH_UNIT_KW;
+        /* v1.134.23 — engine-published. The assumption and every step off it moved to
+           conv-engine.js; keeping the arithmetic here is what made the cooling half of the
+           balance band untraceable. */
+        var CRAH_UNIT_KW = S.cooling.crah_unit_sensible_kw;
+        var CRAH_REQUIRED = S.cooling.crah_required;
+        var CRAH_TOTAL   = S.cooling.crah_installed;          // N+1 installed
+        var CRAH_RUNNING = S.cooling.crah_running;            // one unit on standby
+        var COOL_AVAIL_KW = S.cooling.crah_available_kw;
         /* Worst single-unit outage measured against the INSTALLED fleet: the standby
          * starts, so the surviving capacity is (installed - 1) units. The old form
          * used (running - 1) and silently ignored the standby — with 17/20 it still
          * passed, so the modelling error never surfaced. */
-        var COOL_AVAIL_N1_KW = (CRAH_TOTAL - 1) * CRAH_UNIT_KW;
+        var COOL_AVAIL_N1_KW = S.cooling.crah_n1_available_kw;
         var COOL_HEADROOM = COOL_AVAIL_KW - COOL_DEMAND_KW;
         var COOL_MARGIN_PCT = COOL_AVAIL_KW > 0 ? (COOL_HEADROOM / COOL_AVAIL_KW) * 100 : null;
         var N1_PASS = COOL_AVAIL_N1_KW >= COOL_DEMAND_KW;
@@ -1474,12 +1512,25 @@
             document.getElementById('th-supply').textContent = S.cooling.crah_supply_air_c.toFixed(1) + ' °C';
             document.getElementById('th-approach').textContent = S.cooling.chw_coil_approach_k.toFixed(1) + ' K';
             document.getElementById('th-mixing').textContent = S.cooling.supply_path_mixing_k.toFixed(1) + ' K';
+            document.getElementById('th-airdt').textContent = S.cooling.airside_delta_t_k.toFixed(1) + ' K';
+            document.getElementById('th-hot').textContent = S.cooling.hot_aisle_c.toFixed(1) + ' \u00b0C';
+            document.getElementById('th-retmix').textContent = S.cooling.return_path_mixing_k.toFixed(1) + ' K';
+            document.getElementById('th-return').textContent = S.cooling.crah_return_air_c.toFixed(1) + ' \u00b0C';
             document.getElementById('chws').textContent = S.cooling.chws_c.toFixed(1) + ' °C';
             document.getElementById('chwr').textContent = S.cooling.chwr_c.toFixed(1) + ' °C';
             document.getElementById('chdt').textContent = S.cooling.chw_delta_t.toFixed(1) + ' K';
             document.getElementById('chflow').textContent = S.cooling.flow_lps.toFixed(1) + ' L/s';
-            document.getElementById('f-flow').textContent =
-                'central plant · flow = ' + campusItKw.toLocaleString() + ' kW / (4.186 · ' +
+            /* v1.134.23 — the printed formula quoted 4.186 as a literal, so the one number on
+               this line a reader would want to check was the one the registry could not explain.
+               It is read from the engine now, and the constant carries its own basis hook: the
+               hook has to sit on the element whose text IS the value, or the drawer gate rightly
+               refuses it for explaining 4.186 beside a line that starts with 30,000. Every term
+               interpolated here is an engine number, so innerHTML introduces no untrusted text. */
+            document.getElementById('f-flow').innerHTML =
+                'central plant · flow = ' + campusItKw.toLocaleString() + ' kW / ('
+                + '<span class="fx-const" data-basis-param="cooling.water_cp_kj_per_kg_k"'
+                + ' tabindex="0" role="button" title="Specific heat of water — click for basis">'
+                + S.cooling.water_cp_kj_per_kg_k + '</span> · ' +
                 S.cooling.chw_delta_t.toFixed(1) + ') = ' + S.cooling.flow_lps.toFixed(1) + ' L/s';
             document.getElementById('ch-count').textContent =
                 S.cooling.chillers_running + ' / ' + S.cooling.chillers_total + ' running';
@@ -1558,8 +1609,12 @@
             else { st.className = 'as-state normal'; stt.textContent = 'NORMAL'; }
         }
 
+        var LEGEND_BAND_BASIS = 'The heat-map legend bands are a UI CLASSIFICATION chosen so an operator can read utilisation and temperature at a glance. They are thresholds for colouring cells, not engineering quantities - conv-engine.js publishes rack loads, design capacities and thermal planes, and no band boundary follows from any of them. Registering a colour cut-off as a design parameter would put a presentation choice into the basis. The ASHRAE 18-27 C figures in the thermal legend are the published recommended envelope, quoted as a reference band, not a value this cockpit derives.';
         function legendFor(mode) {
             var lg = document.getElementById('legend');
+            /* v1.134.23 — band boundaries are a presentation choice, declared as such on
+               the host rather than left to read as untraced engineering values. */
+            lg.setAttribute('data-rz-authored-basis', LEGEND_BAND_BASIS);
             var items;
             if (mode === 'power') {
                 items = [
@@ -1653,8 +1708,16 @@
                        inspector, where there is room to read it. */
                     '<div class="zone-head" title="Row ' + rowChar + ' \u00b7 ' + zoneAisleTag(z) + '">' + rowChar + '</div>' +
                     '<div class="zone-racks" id="zr-' + z + '"></div>' +
-                    '<div class="zone-foot num">' + zn.heat.toFixed(0) + ' kW · IN ' +
-                    zn.rackInletC.toFixed(1) + '°C · HOT ' + zn.hotAisleC.toFixed(1) + '°C</div>' +
+                    /* v1.134.23 — one text node carried three different quantities, so none of
+                       them could be declared against its own basis and all 75 readings counted as
+                       untraced. Split into named spans: the row heat reconciles by SUM to the
+                       hall's IT load, the inlet and hot-aisle temperatures sit PER ROW on the
+                       engine's published planes. */
+                    '<div class="zone-foot num">' +
+                      '<span class="zf-kw">' + zn.heat.toFixed(0) + ' kW</span> · ' +
+                      '<span class="zf-in">IN ' + zn.rackInletC.toFixed(1) + '°C</span> · ' +
+                      '<span class="zf-hot">HOT ' + zn.hotAisleC.toFixed(1) + '°C</span>' +
+                    '</div>' +
                     '</div>';
             }
             field.innerHTML = fh;

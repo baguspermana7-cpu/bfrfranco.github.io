@@ -144,6 +144,24 @@
      */
     var RACK_INLET_TARGET_C = 25.4;      // study cooling.rackInletTargetC — ADOPTED
     var SUPPLY_PATH_MIXING_K = 0.0;      // contained cold aisle — ADOPTED
+    /* v1.134.23 — the AIRSIDE rise across the rack was a page constant on datahall.html
+       (DESIGN_AIRSIDE_DELTA_T_C = 11), which made the hot-aisle plane an orphan: the
+       cockpit drew a hot-aisle temperature for every row and nothing in the registry
+       could explain any of them. It belongs on the thermal chain with the planes either
+       side of it. ADOPTED — a containment design figure, not a measurement. */
+    var AIRSIDE_DELTA_T_K = 11.0;        // ADOPTED — design rack rise, contained aisle
+    /* v1.134.23 — the CRAH fleet was sized entirely on datahall.html: one ASSUMED unit
+       capacity and four arithmetic steps off it. Every figure the balance band shows for
+       cooling (available kW, the N+1 availability, the unit counts) came out of that
+       private block, so none of them could be traced. The assumption moves here and the
+       arithmetic follows it; the page reads the results. */
+    var CRAH_UNIT_SENSIBLE_KW = 130.0;   // ASSUMED — no vendor selection made
+    /* v1.134.23 — 4.186 appeared as a bare literal in chwFlowLps() and again inside the
+       formula datahall.html PRINTS to the operator. A physical constant is still a term of
+       the calculation: named here so the formula on screen resolves to something, and so
+       the engine has no economically-material literal inside a function body. */
+    var WATER_CP_KJ_PER_KG_K = 4.186;    // STANDARD — specific heat of water
+    var RETURN_PATH_MIXING_K = 0.0;      // ADOPTED — contained hot aisle, no bypass
     var CHW_COIL_APPROACH_K = 6.0;       // ASSUMED — pending coil selection
     var CHW_DELTA_T_K = 7.6;             // ADOPTED — carried from the prior basis
     var CRAH_SUPPLY_AIR_C = RACK_INLET_TARGET_C - SUPPLY_PATH_MIXING_K;
@@ -253,6 +271,15 @@
     /* CHW delta-T = CHWR - CHWS.
      * source: 00-overview-audit.md line 82 ; 09 line 83 ("DeltaT = 14.8 - 7.2 = 7.6 C")
      */
+    /* CRAH units REQUIRED for one hall = ceil(hall sensible heat / unit sensible capacity).
+       Sensible hall heat is taken as the hall IT load, which is the substitution this
+       cockpit has always made and which doc-09 uses for the CHW flow term too. */
+    function crahRequired(m) {
+        var perHall = m.campus.halls.length ? (m.site.it_load_kw / m.campus.halls.length) : 0;
+        return m.cooling.crah_unit_sensible_kw
+            ? Math.ceil(perHall / m.cooling.crah_unit_sensible_kw) : 0;
+    }
+
     function chwDeltaT(m) {
         return m.cooling.chw_delta_t_k;
     }
@@ -286,7 +313,7 @@
      *   check (campus normal): 30,000 / (4.186 * 7.6) = 942.993 -> 943.0 L/s
      */
     function chwFlowLps(m) {
-        return m.site.it_load_kw / (4.186 * chwDeltaT(m));
+        return m.site.it_load_kw / (m.cooling.water_cp_kj_per_kg_k * chwDeltaT(m));
     }
 
     /* Chiller plant DUTY the total count is sized against = heat rejection at
@@ -502,6 +529,10 @@
                downstream temperature here. */
             rack_inlet_target_c: RACK_INLET_TARGET_C,
             supply_path_mixing_k: SUPPLY_PATH_MIXING_K,
+            airside_delta_t_k: AIRSIDE_DELTA_T_K,
+            crah_unit_sensible_kw: CRAH_UNIT_SENSIBLE_KW,
+            water_cp_kj_per_kg_k: WATER_CP_KJ_PER_KG_K,
+            return_path_mixing_k: RETURN_PATH_MIXING_K,
             chw_coil_approach_k: CHW_COIL_APPROACH_K,
             chw_delta_t_k: CHW_DELTA_T_K,
             /* Chiller unit capacity — ASSUMED (project design decision pending
@@ -647,7 +678,7 @@
             basis: 'Adopted project scenario — simulated, not measured telemetry',
             basis_doc: 'conv/review/09-engineering-basis-and-calculations.md',
             study_doc: 'js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)',
-            version: '2.0.0'
+            version: '2.1.0'
         }
     };
 
@@ -768,6 +799,17 @@
                 ups_system_count: m.electrical.ups_system_count,
                 ups_system_kw: round1(upsSystemKw(m)),
                 ups_system_rated_kw: upsSystemRatedKw(m),
+                /* v1.134.23 — the two UPS LOADING figures the cockpit stats panel shows.
+                   They were computed on dc-conventional.html from published terms; an earlier form
+                   there divided the CAMPUS load by a HALL-scale rating and rendered "750% nrm /
+                   1500% fail" as though it were telemetry, which is the scope defect this
+                   programme exists to remove. Published once, with the failover case stated: on a
+                   2N transfer the surviving system carries the whole IT load. */
+                ups_load_pct_normal: m.electrical.ups_system_count
+                    ? round1((m.site.it_load_kw / m.electrical.ups_system_count)
+                        / upsSystemRatedKw(m) * 100)
+                    : null,
+                ups_load_pct_on_failover: round1(m.site.it_load_kw / upsSystemRatedKw(m) * 100),
                 ups_redundancy: m.electrical.ups_redundancy,
                 nameplate_evidence_class: m.meta.nameplate_evidence_class,
                 metering_tolerance_pct: m.electrical.metering_tolerance_pct
@@ -786,6 +828,25 @@
                    crah_supply_air_c as authored inputs, not as derived values. */
                 rack_inlet_target_c: m.cooling.rack_inlet_target_c,
                 supply_path_mixing_k: m.cooling.supply_path_mixing_k,
+                /* The two air planes DOWNSTREAM of the rack inlet, completing the chain
+                   the thermal re-derivation started at the top: rack inlet -> hot aisle
+                   -> CRAH return. Both were drawn on the data-hall cockpit from constants
+                   it kept privately. */
+                airside_delta_t_k: m.cooling.airside_delta_t_k,
+                /* CRAH fleet, per hall. Sensible hall heat is the hall IT load; the +1 is a
+                   standby that auto-starts on a trip, so the surviving capacity after the
+                   worst single outage is (installed - 1) units, not (running - 1). */
+                crah_unit_sensible_kw: m.cooling.crah_unit_sensible_kw,
+                water_cp_kj_per_kg_k: m.cooling.water_cp_kj_per_kg_k,
+                crah_required: crahRequired(m),
+                crah_installed: crahRequired(m) + 1,
+                crah_running: crahRequired(m),
+                crah_available_kw: round1(crahRequired(m) * m.cooling.crah_unit_sensible_kw),
+                crah_n1_available_kw: round1(crahRequired(m) * m.cooling.crah_unit_sensible_kw),
+                return_path_mixing_k: m.cooling.return_path_mixing_k,
+                hot_aisle_c: round2(m.cooling.rack_inlet_target_c + m.cooling.airside_delta_t_k),
+                crah_return_air_c: round2(m.cooling.rack_inlet_target_c
+                    + m.cooling.airside_delta_t_k + m.cooling.return_path_mixing_k),
                 chw_coil_approach_k: m.cooling.chw_coil_approach_k,
                 crah_supply_air_c: round2(crahSupplyAirC(m)),
                 chws_c: round2(chwsC(m)),
@@ -809,6 +870,15 @@
                    operator reads. Derived from the adopted machine type — never authored on a
                    page, which is where the impossible 0.11 kW/RT came from. */
                 chiller_input_kw_e: round1(heatRej * m.cooling.chiller_specific_power_kw_e_per_kw_th),
+                /* v1.134.23 — the P&ID prints the electrical input of ONE machine on every
+                   chiller it draws, and that per-machine share was being computed on the page
+                   from the plant total. It is the same private-arithmetic pattern the plant
+                   capacity figures had in v1.134.7: the number an operator reads had no
+                   registry parameter to trace to, so it counted as untraced. Published here,
+                   the page reads it instead of dividing. */
+                chiller_input_per_machine_kw_e: chillersRunning(m)
+                    ? round1(heatRej * m.cooling.chiller_specific_power_kw_e_per_kw_th / chillersRunning(m))
+                    : null,
                 cdw_supply_c: m.cooling.cdw_supply_c,
                 cdw_range_k: m.cooling.cdw_range_k,
                 cdw_return_c: round2(m.cooling.cdw_supply_c + m.cooling.cdw_range_k),
@@ -816,8 +886,33 @@
                 tower_rejection_kw_th: round1(heatRej * (1 + m.cooling.chiller_specific_power_kw_e_per_kw_th)),
                 plant_cop: round2(1 / m.cooling.chiller_specific_power_kw_e_per_kw_th),
                 plant_kw_per_rt: round2(m.cooling.chiller_specific_power_kw_e_per_kw_th * 3.517),
+                /* Plant-average part load. Per-UNIT loading is not published — the mimic
+                   simulates individual machines — so this is stated as an average and labelled
+                   as one. It was derived on dc-conventional.html from these same terms. */
+                chiller_part_load_pct: (chillersRunning(m) && m.cooling.chiller_unit_kw_th)
+                    ? round1(heatRej / (chillersRunning(m) * m.cooling.chiller_unit_kw_th) * 100)
+                    : null,
                 chiller_capacity_kw_th: round1(chillersRunning(m) * m.cooling.chiller_unit_kw_th),
                 chiller_n1_capacity_kw_th: round1((chillersTotal(m) - 1) * m.cooling.chiller_unit_kw_th),
+                /* v1.134.23 — the N+1 MARGIN is the number the chiller cockpit colours red or
+                   green, and it was being subtracted on the page. Same class of private
+                   arithmetic as the per-machine input: an operator reads it, the registry could
+                   not explain it. Published so the page reads instead of computing. */
+                chiller_n1_margin_kw_th: round1((chillersTotal(m) - 1) * m.cooling.chiller_unit_kw_th - heatRej),
+                /* The per-loop flow SETPOINT the plant runs each machine at. The mimic and the
+                   setpoint card both showed it; both divided the header flow themselves. */
+                flow_per_machine_lps: chillersRunning(m)
+                    ? round1(chwFlowLps(m) / chillersRunning(m))
+                    : null,
+                /* v1.134.23 — the chiller cockpit's flow-reconciliation card compares the
+                   IT-only reference flow against the flow the EVAPORATOR duty actually needs
+                   (IT plus UPS loss), and states the uplift between them. Both were computed
+                   on the page from engine terms, so the two figures an operator uses to judge
+                   whether the header is sized for the real duty had nothing to trace to. */
+                plant_duty_flow_lps: round1(heatRej / (m.cooling.water_cp_kj_per_kg_k * chwDeltaT(m))),
+                plant_duty_flow_uplift_pct: chwFlowLps(m)
+                    ? round1(((heatRej / (m.cooling.water_cp_kj_per_kg_k * chwDeltaT(m))) / chwFlowLps(m) - 1) * 100)
+                    : null,
                 duty_rt: round1(heatRej / 3.517),
                 nameplate_evidence_class: m.meta.nameplate_evidence_class
             },

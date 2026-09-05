@@ -3,6 +3,11 @@ import { readFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { extname, resolve, sep } from 'node:path';
 import puppeteer from 'puppeteer';
+import { createRequire as __rzRequire } from 'node:module';
+const ENGINE_PUBLISHED_VERSION = (() => {
+  const m = __rzRequire(import.meta.url)(process.cwd() + '/js/conv-engine.js');
+  return (m.CONV_CALC || m).snapshot.meta.version;
+})();
 
 const ROOT = process.cwd();
 const FIRE_PATH = resolve(ROOT, 'fire-system.html');
@@ -35,7 +40,7 @@ window.CONV_CALC = Object.freeze({
 const INCOMPLETE_FIRE_FIXTURE = `
 window.CONV_CALC = Object.freeze({
   snapshot: Object.freeze({
-    meta: Object.freeze({ scenario: 'Simulated', data_quality: 'GOOD', version: '2.0.0' }),
+    meta: Object.freeze({ scenario: 'Simulated', data_quality: 'GOOD', version: '2.1.0' }),
     site: Object.freeze({ it_load_kw: 30000 }),
     campus: Object.freeze({ hall_count: 4, racks_total: 2000 }),
     fire: Object.freeze({ static_pressure_bar: 12.5 })
@@ -45,7 +50,7 @@ window.CONV_CALC = Object.freeze({
 const MISSING_META_FIXTURE = `
 window.CONV_CALC = Object.freeze({
   snapshot: Object.freeze({
-    meta: Object.freeze({ version: '2.0.0' }),
+    meta: Object.freeze({ version: '2.1.0' }),
     site: Object.freeze({ it_load_kw: 30000 }),
     campus: Object.freeze({ hall_count: 4, racks_total: 2000 }),
     fire: Object.freeze({
@@ -69,14 +74,14 @@ function withLegacyEngine(source) {
     const scriptPattern = /<script src="js\/conv-engine\.js\?v=[^"]+"><\/script>/;
     assert.match(source, scriptPattern, 'fire page must load the governed Conventional engine');
     return source.replace(scriptPattern,
-      `<script type="application/json" src="js/conv-engine.js?v=2.0.0"></script><script>${LEGACY_ENGINE_FIXTURE}<\/script>`);
+      `<script type="application/json" src="js/conv-engine.js?v=2.1.0"></script><script>${LEGACY_ENGINE_FIXTURE}<\/script>`);
 }
 
 function withIncompleteFireEngine(source) {
   const scriptPattern = /<script src="js\/conv-engine\.js\?v=[^"]+"><\/script>/;
   assert.match(source, scriptPattern, 'fire page must load the governed Conventional engine');
   return source.replace(scriptPattern,
-    `<script type="application/json" src="js/conv-engine.js?v=2.0.0"></script><script>${INCOMPLETE_FIRE_FIXTURE}<\/script>`);
+    `<script type="application/json" src="js/conv-engine.js?v=2.1.0"></script><script>${INCOMPLETE_FIRE_FIXTURE}<\/script>`);
 }
 
 function withoutEngine(source) {
@@ -90,7 +95,7 @@ function withMissingMetaEngine(source) {
   const scriptPattern = /<script src="js\/conv-engine\.js\?v=[^"]+"><\/script>/;
   assert.match(source, scriptPattern, 'fire page must load the governed Conventional engine');
   return source.replace(scriptPattern,
-    `<script type="application/json" src="js/conv-engine.js?v=2.0.0"></script><script>${MISSING_META_FIXTURE}<\/script>`);
+    `<script type="application/json" src="js/conv-engine.js?v=2.1.0"></script><script>${MISSING_META_FIXTURE}<\/script>`);
 }
 
 async function serve(request, response) {
@@ -196,7 +201,14 @@ function assertNoInvalidNumerics(values, context) {
 }
 
 const source = await readFile(FIRE_PATH, 'utf8');
-assert.match(source, /js\/conv-engine\.js\?v=2\.0\.0/, 'fire page must load the current conventional engine cache token');
+/* v1.134.23 — this asserted the cache token as the LITERAL 2.0.0. Bumping the engine to
+   2.1.0 broke it here and in three sibling gates, while the pages themselves were correct:
+   the gate was pinning a version, not checking agreement. Read the published version instead,
+   so the assertion keeps its meaning when the engine legitimately moves. Whether the pages
+   AGREE with it is tools/test-conv-engine-version-pins.mjs's job. */
+assert.match(source, new RegExp('js/conv-engine\\.js\\?v='
+  + ENGINE_PUBLISHED_VERSION.replace(/\./g, '\\.')),
+  'fire page must load the current conventional engine cache token');
 assert.match(source, /id="fire-current-basis-value">UNAVAILABLE</, 'first-paint current basis must fail closed');
 assert.match(source, /id="tank-vol-txt"[^>]*>UNAVAILABLE</, 'first-paint reserve volume must fail closed');
 assert.match(source, /id="tank-dur-txt"[^>]*>Duration · UNAVAILABLE</, 'first-paint duration must fail closed');

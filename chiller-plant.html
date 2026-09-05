@@ -558,7 +558,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
          window.CONV_CALC exists before the inline SCADA script runs.
          Basis: conv/review/09-engineering-basis-and-calculations.md ;
          CHW-relabel decision: conv/review/04-chiller-plant-review.md -->
-    <script src="js/conv-engine.js?v=2.0.0"></script>
+    <script src="js/conv-engine.js?v=2.1.0"></script>
     <!-- v1.134.2 — generated parameter registry + the shared basis drawer. -->
     <script src="js/conv-parameters.js?v=1.134.2"></script>
     <script src="js/rz-basis-drawer.js?v=1.134.14"></script>
@@ -895,7 +895,7 @@ function selectHallView(hall){
  * CHW-relabel decision: conv/review/04-chiller-plant-review.md (Recommended
  * Decision → Option A) ; basis: conv/review/09-engineering-basis-and-calculations.md
  */
-const CONV_CURRENT_ENGINE_VERSION = '2.0.0';
+const CONV_CURRENT_ENGINE_VERSION = '2.1.0';
 const EXPECTED_CONV_ENGINE_VERSION = (function(){
   const engineScript = document.querySelector('script[src*="conv-engine.js"]');
   const match = engineScript ? engineScript.getAttribute('src').match(/[?&]v=([^&]+)/) : null;
@@ -916,6 +916,10 @@ function chwBasis(){
       chwr: s.cooling.chwr_c,                 // CHWS + ΔT
       dt: s.cooling.chw_delta_t,              // 7.6 K
       flow: r1(s.cooling.flow_lps),           // L/s, IT sensible-load reference only
+      flowPerMachine: s.cooling.flow_per_machine_lps != null   // v1.134.23, published share
+        ? r1(s.cooling.flow_per_machine_lps) : null,
+      dutyFlow: s.cooling.plant_duty_flow_lps,          // v1.134.23, published
+      dutyUpliftPct: s.cooling.plant_duty_flow_uplift_pct,
       coolingKw: s.cooling.heat_rejection_kw, // kW, current evaporator duty (IT + UPS loss)
       itKw: (s.site && s.site.it_load_kw != null) ? s.site.it_load_kw : null,
       scenario: s.meta && s.meta.scenario
@@ -925,7 +929,7 @@ function chwBasis(){
    * That is the exact failure mode repaired across these cockpits in v1.132.0:
    * a plausible constant standing in for a dead binding renders a page that
    * looks correct and is not. If the engine is missing, say so. */
-  return { chws:null, chwr:null, dt:null, flow:null, coolingKw:null, itKw:null, scenario:"UNAVAILABLE — engine not loaded" };
+  return { chws:null, chwr:null, dt:null, flow:null, flowPerMachine:null, dutyFlow:null, dutyUpliftPct:null, coolingKw:null, itKw:null, scenario:"UNAVAILABLE — engine not loaded" };
 }
 const CHW = chwBasis();
 function isPositiveFinite(value){
@@ -1000,8 +1004,10 @@ const PLANT = (function () {
   return {
     type: c.chiller_type || null,
     inputKw: c.chiller_input_kw_e != null ? c.chiller_input_kw_e : null,
-    inputPerMachineKw: (c.chiller_input_kw_e != null && running)
-      ? Math.round(c.chiller_input_kw_e / running) : null,
+    /* v1.134.23 — the engine publishes this now; the page no longer keeps its own copy of
+       the division. Reading a published value is what makes the number traceable. */
+    inputPerMachineKw: c.chiller_input_per_machine_kw_e != null
+      ? Math.round(c.chiller_input_per_machine_kw_e) : null,
     cop: c.plant_cop != null ? c.plant_cop : null,
     kwPerRt: c.plant_kw_per_rt != null ? c.plant_kw_per_rt : null,
     cdws: c.cdw_supply_c != null ? c.cdw_supply_c : null,
@@ -1012,6 +1018,7 @@ const PLANT = (function () {
     runningChillers: c.chillers_running != null ? c.chillers_running : null,
     totalChillers: c.chillers_total != null ? c.chillers_total : null,
     n1CapacityKw: c.chiller_n1_capacity_kw_th != null ? c.chiller_n1_capacity_kw_th : null,
+    n1MarginKw: c.chiller_n1_margin_kw_th != null ? c.chiller_n1_margin_kw_th : null,
   };
 }());
 
@@ -1032,8 +1039,11 @@ const ENGINE_CHILLERS_TOTAL = (function () {
 /* Engine-derived operating bands for one machine. The simulation tick used to clamp flow to
    0-24 L/s and loop water to 16-22.5 / 20.8-25 C — all retired-basis ranges, which dragged the
    loops back to the old scale on the first tick no matter what they were initialised to. */
-const LOOP_FLOW_DESIGN = (CHW.flow != null && ENGINE_CHILLERS_RUNNING)
-  ? CHW.flow / ENGINE_CHILLERS_RUNNING : null;
+/* v1.134.23 — the engine publishes the per-machine share; the page stops dividing. Keeping
+   the division here meant the flow setpoint an operator reads had no registry parameter. */
+const LOOP_FLOW_DESIGN = (CHW.flowPerMachine != null)
+  ? CHW.flowPerMachine
+  : ((CHW.flow != null && ENGINE_CHILLERS_RUNNING) ? CHW.flow / ENGINE_CHILLERS_RUNNING : null);
 const LOOP_FLOW_MIN = LOOP_FLOW_DESIGN != null ? r1(LOOP_FLOW_DESIGN * 0.55) : 0;
 const LOOP_FLOW_MAX = LOOP_FLOW_DESIGN != null ? r1(LOOP_FLOW_DESIGN * 1.15) : 24;
 const LOOP_T1_MIN = CHW.chws != null ? r1(CHW.chws - 1.6) : 16;
@@ -1257,6 +1267,13 @@ function valveSym(x,y,size,orient){
     <polygon points="${x-s},${y+s} ${x},${y} ${x+s},${y+s}" class="valve-body" />`;
 }
 
+/* v1.134.23 — the SAME declared reason now covers all three simulated-state blocks on
+   the P&ID. It was written once for the refrigerant cycle; the suction/discharge/
+   superheat panel and the pump mechanicals sat outside the declaring group, so 20-odd
+   readings that this text already explains were being counted as untraced work. A
+   constant rather than three copies, because three copies drift. */
+const AUTHORED_MECHANICAL_BASIS = "The refrigeration cycle, the secondary loop and the pump mechanicals are simulated operating state: conv-engine.js models the primary chilled-water side (CHWS, CHWR, delta-T, flow, heat rejection, chiller count) and publishes no compressor, refrigerant, secondary-loop or pump-vibration quantity, so these readings have no engine parameter to trace to. The primary-side values on this drawing are engine-derived and remain in the denominator.";
+
 function loopMetrics(loop){
   const e = evalLoop(loop);
   const runA = loop.pumpA && loop.spdA > 0;
@@ -1359,7 +1376,15 @@ function loopSvg(loop, pos){
   const pmp = { x: x+498, w: 210 };
   const ins = { x: x+716, w: 200 };
   const flowDur = dis ? 1.3 : Math.max(3, 8 - (loop.flow/24)*5);
-  const approachT = dis ? 0 : r1(loop.t1 - (loop.t1 - 2.8));
+  /* v1.134.23 — this read `r1(loop.t1 - (loop.t1 - 2.8))`, which cancels to the literal
+     2.8 for every loop at every load. It LOOKED derived, which is exactly the dead-binding
+     shape the parameter programme exists to remove: a plausible constant dressed as
+     arithmetic, so a reader checking the page believes a temperature is following
+     something. conv-engine.js publishes no refrigerant-side plane, so the evaporator
+     approach IS an authored bounded value here — written as one, and declared with the
+     rest of the simulated machine state rather than disguised. */
+  const EVAP_APPROACH_K = 2.8;
+  const approachT = dis ? 0 : EVAP_APPROACH_K;
   const approachTxt = `${ui.unit==="ip"?r1(approachT*9/5):approachT}${conv.tu(ui.unit)}`;
   const appColor = approachT < 3 ? "#38b56d" : (approachT < 5 ? "#c08f46" : "#c25a5a");
 
@@ -1377,7 +1402,7 @@ function loopSvg(loop, pos){
          water-cooled basis in v1.134.8 and the module header was renamed to WCC then;
          this inner label was missed and kept contradicting it four times per screen. -->
     ${text(acc.x+14,y+80,"value",`WCC / CH-${String(loop.id).padStart(2,"0")}`)}
-    <text x="${acc.x+14}" y="${y+104}" class="label">App: <tspan fill="${appColor}">${approachTxt}</tspan>  \u2022  Oil: ${m.oil}\u00b0C</text>
+    <text x="${acc.x+14}" y="${y+104}" class="label" data-rz-authored-basis="${AUTHORED_MECHANICAL_BASIS}">App: <tspan fill="${appColor}">${approachTxt}</tspan>  \u2022  Oil: ${m.oil}\u00b0C</text>
     ${text(acc.x+14,y+128,"label","Comp")}
     <circle cx="${acc.x+62}" cy="${y+128}" r="9" class="${loop.comps[0]?"comp-on":"comp-off"}" />
     <text x="${acc.x+62}" y="${y+131}" class="isa-bubble-txt">C1</text>
@@ -1398,7 +1423,7 @@ function loopSvg(loop, pos){
     <line x1="${portX}" y1="${retY}" x2="${acc.x+acc.w}" y2="${retY}" class="${fClsR}" style="animation-duration:${flowDur*1.05}s" />
 
     <rect x="${ref.x}" y="${y+56}" width="${ref.w}" height="156" rx="10" class="equip-shell" />
-    <g data-rz-authored-basis="The refrigeration cycle, the secondary loop and the pump mechanicals are simulated operating state: conv-engine.js models the primary chilled-water side (CHWS, CHWR, delta-T, flow, heat rejection, chiller count) and publishes no compressor, refrigerant, secondary-loop or pump-vibration quantity, so these readings have no engine parameter to trace to. The primary-side values on this drawing are engine-derived and remain in the denominator.">${text(ref.x+14,y+68,"unit","REFRIGERANT CYCLE  R-1234ze(E)")}  <!-- v1.134.6: was y+76, colliding with COND -->
+    <g data-rz-authored-basis="${AUTHORED_MECHANICAL_BASIS}">${text(ref.x+14,y+68,"unit","REFRIGERANT CYCLE  R-1234ze(E)")}  <!-- v1.134.6: was y+76, colliding with COND -->
     <circle cx="${ref.x+46}" cy="${y+114}" r="18" class="${dis?"comp-off":"comp-on"}" />
     <polygon points="${ref.x+38},${y+104} ${ref.x+58},${y+114} ${ref.x+38},${y+124}" class="${dis?"comp-off":"comp-on"}" />
     ${text(ref.x+46,y+141,"unit","COMP","middle")}
@@ -1407,17 +1432,19 @@ function loopSvg(loop, pos){
     <rect x="${ref.x+96}" y="${y+136}" width="130" height="26" rx="5" class="field-box" />
     ${text(ref.x+104,y+154,"label",`EVAP ${eSatTxt}`)}</g>
     ${valveSym(ref.x+216, y+114, 7, "h")}
-    <g data-rz-text-group="stacked-label">
+    <g data-rz-text-group="stacked-label" data-rz-authored-basis="${AUTHORED_MECHANICAL_BASIS}">
     ${text(ref.x+228,y+112,"unit","EXV")}
     ${text(ref.x+228,y+124,"unit",`${exvPositionPct(loop)}%`)}
     </g>
     <path d="M${ref.x+64},${y+104} L${ref.x+96},${y+80} L${ref.x+210},${y+80} L${ref.x+216},${y+114} L${ref.x+210},${y+148} L${ref.x+96},${y+148} L${ref.x+64},${y+124}" class="ref-cycle ${dis?"off":""}" />
+    <g data-rz-authored-basis="${AUTHORED_MECHANICAL_BASIS}">
     <rect x="${ref.x+4}" y="${y+168}" width="112" height="34" rx="5" class="field-box" />
     ${text(ref.x+10,y+182,"unit",`SUCT ${sucTxt}`)}
     ${text(ref.x+10,y+196,"unit",`DISC ${disTxt}`)}
     <rect x="${ref.x+120}" y="${y+168}" width="112" height="34" rx="5" class="field-box" />
     ${text(ref.x+126,y+182,"unit",`SH ${shTxt}`)}
     ${text(ref.x+126,y+196,"unit",`SC ${scTxt}`)}
+    </g>
 
     <rect x="${pmp.x}" y="${y+56}" width="${pmp.w}" height="156" rx="10" class="equip-shell"><title>CHWP-${String(loop.id).padStart(2,"0")}A/B • ${m.runA?"A DUTY":"B DUTY"} • SPD ${m.runA?Math.round(loop.spdA):Math.round(loop.spdB)}%</title></rect>
     ${text(pmp.x+12,y+68,"unit","PRIMARY PUMP PACKAGE")}  <!-- v1.134.6: was y+76, colliding with DUTY/SPD -->
@@ -1429,6 +1456,7 @@ function loopSvg(loop, pos){
     <polygon points="${pmp.x+44},${retY-10} ${pmp.x+64},${retY} ${pmp.x+44},${retY+10}" class="${m.runB?"pump-run":"pump-off"}" />
     <circle cx="${pmp.x+52}" cy="${retY}" r="5" class="${m.runB?"status-run":"status-stdby"}" />
     <text x="${pmp.x+20}" y="${retY+4}" class="unit" fill="${m.runB?"var(--run)":"#7b8ca3"}" style="font-weight:700">${m.runB?"DUTY":"STBY"}</text>
+    <g data-rz-authored-basis="${AUTHORED_MECHANICAL_BASIS}">
     <rect x="${pmp.x+80}" y="${y+68}" width="124" height="22" rx="5" class="field-box" />
     ${text(pmp.x+86,y+83,"unit",`SPD ${Math.round(loop.spdA)}%  AMP ${m.ampA} A`)}
     <rect x="${pmp.x+80}" y="${y+92}" width="124" height="22" rx="5" class="field-box" />
@@ -1437,28 +1465,29 @@ function loopSvg(loop, pos){
     ${text(pmp.x+86,y+143,"unit",`SPD ${Math.round(loop.spdB)}%  AMP ${m.ampB} A`)}
     <rect x="${pmp.x+80}" y="${y+152}" width="124" height="22" rx="5" class="field-box" />
     ${text(pmp.x+86,y+167,"unit",`HEAD ${headBU}  VIB ${m.vibB}`)}
+    </g>
 
     <rect x="${ins.x}" y="${y+56}" width="${ins.w}" height="156" rx="10" class="equip-shell"><title>Simulated loop state CH-${loop.id} • calculated branch reference: ${flowTxt} • T1: ${t1Txt} • T2: ${t2Txt}</title></rect>
     ${text(ins.x+12,y+72,"unit","SIMULATED LOOP STATE")}
     <rect x="${ins.x+8}" y="${y+82}" width="${ins.w-16}" height="24" rx="6" class="field-box" />
     <g data-rz-loop-flow="1">${text(ins.x+16,y+98,"label",`CALC BRANCH REF  ${flowTxt}`)}</g>
     <rect x="${ins.x+4}" y="${y+112}" width="94" height="30" rx="6" class="field-box" />
-    <g data-rz-authored-basis="The refrigeration cycle, the secondary loop and the pump mechanicals are simulated operating state: conv-engine.js models the primary chilled-water side (CHWS, CHWR, delta-T, flow, heat rejection, chiller count) and publishes no compressor, refrigerant, secondary-loop or pump-vibration quantity, so these readings have no engine parameter to trace to. The primary-side values on this drawing are engine-derived and remain in the denominator.">${text(ins.x+10,y+131,"unit","DPS1")}
+    <g data-rz-authored-basis="${AUTHORED_MECHANICAL_BASIS}">${text(ins.x+10,y+131,"unit","DPS1")}
     ${text(ins.x+66,y+131,"value",dp1Txt,"middle")}
     <rect x="${ins.x+102}" y="${y+112}" width="94" height="30" rx="6" class="field-box" />
     ${text(ins.x+108,y+131,"unit","DPS2")}
     ${text(ins.x+164,y+131,"value",dp2Txt,"middle")}</g>
     <rect x="${ins.x+8}" y="${y+146}" width="92" height="24" rx="6" class="field-box" />
-    <g data-rz-loop-t1="1">${text(ins.x+14,y+162,"label",`T1 ${t1Txt}`)}</g>
+    <g data-rz-loop-t1="1" data-rz-authored-basis="${AUTHORED_MECHANICAL_BASIS}">${text(ins.x+14,y+162,"label",`T1 ${t1Txt}`)}</g>
     <rect x="${ins.x+106}" y="${y+146}" width="92" height="24" rx="6" class="field-box" />
     <!-- v1.134.17 — two layout faults here, both invisible while the COMP line read "—".
          T2 sat at y+148, the TOP EDGE of its own y+146 box, while T1 beside it sat correctly
          at y+162. And the COMP strip was drawn at y+160, straight over the y+146..170 T-row
          boxes. Once the water-cooled adoption gave COMP a real value ("736 kW • OIL 69 C")
          the overlap became visible text-on-text and the strict geometry gate caught it. -->
-    <g data-rz-loop-t2="1">${text(ins.x+112,y+162,"label",`T2 ${t2Txt}`)}</g>
+    <g data-rz-loop-t2="1" data-rz-authored-basis="${AUTHORED_MECHANICAL_BASIS}">${text(ins.x+112,y+162,"label",`T2 ${t2Txt}`)}</g>
     <rect x="${ins.x+8}" y="${y+176}" width="${ins.w-16}" height="22" rx="6" class="field-box" />
-    ${text(ins.x+14,y+191,"unit",`COMP ${m.compKw != null ? m.compKw + " kW" : "\u2014"} \u2022 OIL ${m.oil} C`)}
+    ${text(ins.x+14,y+191,"unit",`COMP ${m.compKw != null ? m.compKw + " kW" : "\u2014"} \u2022`)}<g data-rz-authored-basis="${AUTHORED_MECHANICAL_BASIS}">${text(ins.x+112,y+191,"unit",`OIL ${m.oil} C`)}</g>
 
     <rect x="${x+w-118}" y="${supY-12}" width="96" height="20" rx="6" class="field-box" />
     ${text(x+w-108,supY+3,"unit","SEC OUT")}
@@ -1718,8 +1747,21 @@ function renderSupervisory(){
   /* The space between the two spans is deliberate: without it textContent reads
      "Run cap35.0 MW", which breaks copy-paste, a screen reader and the operator-regression
      gate alike. */
-  const row = (k,v,cls) => `<div class="sp-row"><span class="k">${k}</span> `
+  /* v1.134.23 — `attrs` lets ONE row carry a declaration. Two rows in this panel are not
+     engine quantities (the ambient the operator sets on the slider, and the refrigerant
+     designation), and wrapping the whole card to reach them would have swept the engine
+     figures beside them out of the denominator too. */
+  const row = (k,v,cls,attrs) => `<div class="sp-row"${attrs?" "+attrs:""}><span class="k">${k}</span> `
     + `<span class="v${cls?" "+cls:""}">${v}</span></div>`;
+  const AMBIENT_BASIS = 'data-rz-authored-basis="Ambient dry-bulb is an OPERATOR INPUT on this '
+    + 'cockpit — the slider the scenario controls drive — not an engine quantity. conv-engine.js '
+    + 'publishes a site annual average (environment.avg_temp_c) which is a different thing from '
+    + 'the instantaneous ambient this mimic simulates against, so binding the two would be the '
+    + 'wrong-plane defect this programme exists to remove."';
+  const REFRIGERANT_BASIS = 'data-rz-authored-basis="The refrigerant designation is a machine '
+    + 'SPECIFICATION of the adopted water-cooled centrifugal type, not a measurement. R-1234ze(E) '
+    + 'carries no numeric quantity an engine parameter could publish; the digits in the ASHRAE '
+    + 'number are part of the name."';
   /* v1.134.17 — accepts a number OR an already-formatted string. A first version called
      isFinite() on the formatted value, so "5,153" failed the test and Input power and Duty
      both rendered as em-dashes while COP and kW/RT beside them were fine. */
@@ -1729,7 +1771,11 @@ function renderSupervisory(){
   const chRun = PLANT.runningChillers, chTot = PLANT.totalChillers;
   const demandKw = st.header.coolingKw;
   const n1Kw = PLANT.n1CapacityKw;
-  const marginKw = (n1Kw!=null && demandKw!=null) ? n1Kw - demandKw : null;
+  /* v1.134.23 — published by the engine. The fallback subtraction stays only for a
+     host that predates the parameter; a live current engine always takes the first arm. */
+  const marginKw = PLANT.n1MarginKw != null
+    ? PLANT.n1MarginKw
+    : ((n1Kw!=null && demandKw!=null) ? n1Kw - demandKw : null);
   const redundant = (marginKw!=null && marginKw>=0);
   const loopsOnline = st.loops.filter(lp=>!evalLoop(lp).disconnected).length;
   const compRun = st.loops.reduce((n,lp)=>n+lp.comps.reduce((a,b)=>a+b,0),0);
@@ -1779,8 +1825,8 @@ function renderSupervisory(){
     + row("First-out", st.alarm.firstOut || "None")
     + row("Acknowledgement", ackTxt)
     + row("Forced points", String(forced), forced?"sp-state warn":"")
-    + row("Ambient", `${conv.t(ui.ambient,u)}${conv.tu(u)}`)
-    + row("Refrigerant", "R-1234ze(E)")
+    + row("Ambient", `${conv.t(ui.ambient,u)}${conv.tu(u)}`, "", AMBIENT_BASIS)
+    + row("Refrigerant", "R-1234ze(E)", "", REFRIGERANT_BASIS)
     + `</div>`;
 
   /* The loop table was 4 rows of 5 px SVG text. As a table it is legible, it wraps,
@@ -1801,7 +1847,7 @@ function renderSupervisory(){
     + `<table class="sp-tbl"><thead><tr><th>Loop</th><th>Flow ${conv.fu(u)}</th>`
     + `<th>Sec-S ${conv.tu(u)}</th><th>Sec-R ${conv.tu(u)}</th><th>DP avg ${conv.pu(u)}</th>`
     + `<th>Pump</th><th>&Delta;T</th><th>Comp</th><th>State</th></tr></thead>`
-    + `<tbody>${rows}</tbody></table></div>`;
+    + `<tbody data-rz-authored-basis="${AUTHORED_MECHANICAL_BASIS}">${rows}</tbody></table></div>`;
 
   host.innerHTML = eff + cap + sp + sys + tbl;
 }
@@ -1868,13 +1914,23 @@ function renderKpi(){
      basis as the header above, so the card can never state a different plant.
      IT reference = IT load / (4.186 * dT)
      plant duty   = evaporator duty / (4.186 * dT)   (IT + UPS loss)  */
-  const flowIt = (CHW.itKw != null && CHW.dt) ? (CHW.itKw / (4.186 * CHW.dt)) : null;
-  const flowHr = (CHW.coolingKw != null && CHW.dt) ? (CHW.coolingKw / (4.186 * CHW.dt)) : null;
+  /* v1.134.23 — the engine publishes both sides of this reconciliation now, so the card
+     stops re-deriving them. The fallbacks stay only for a host without the parameters. */
+  const flowIt = CHW.flow != null ? CHW.flow
+    : ((CHW.itKw != null && CHW.dt) ? (CHW.itKw / (4.186 * CHW.dt)) : null);
+  const flowHr = CHW.dutyFlow != null ? CHW.dutyFlow
+    : ((CHW.coolingKw != null && CHW.dt) ? (CHW.coolingKw / (4.186 * CHW.dt)) : null);
   $("kFlowIt").textContent  = flowIt != null ? `${conv.f(r1(flowIt),ui.unit)} ${conv.fu(ui.unit)}` : "—";
   $("kFlowHr").textContent  = flowHr != null ? `${conv.f(r1(flowHr),ui.unit)} ${conv.fu(ui.unit)}` : "—";
-  $("kFlowGap").textContent = (flowIt && flowHr) ? `${(((flowHr/flowIt)-1)*100).toFixed(1)} %` : "—";
+  $("kFlowGap").textContent = CHW.dutyUpliftPct != null
+    ? `${CHW.dutyUpliftPct.toFixed(1)} %`
+    : ((flowIt && flowHr) ? `${(((flowHr/flowIt)-1)*100).toFixed(1)} %` : "\u2014");
   $("kCool").textContent = `${r1(st.header.coolingKw/1000)} MW`;
+  /* Header differential pressure is simulated hydraulic state — conv-engine.js models
+     the thermal side and publishes no pressure plane, so this reading has no parameter
+     to trace to and says so on the element rather than sitting in the untraced pile. */
   $("kDp").textContent = `${conv.p(st.header.dp,ui.unit)} ${conv.pu(ui.unit)}`;
+  $("kDp").setAttribute("data-rz-authored-basis", AUTHORED_MECHANICAL_BASIS);
   /* v1.134.11 — the basis behind the efficiency figures, on screen. */
   const eSnap = engineSnap();
   if (eSnap && eSnap.cooling) {

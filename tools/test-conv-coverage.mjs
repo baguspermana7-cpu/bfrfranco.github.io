@@ -253,7 +253,15 @@ try {
             for (const host of document.querySelectorAll('[data-rz-distribution]')) {
               const selector = host.getAttribute('data-rz-distribution-selector');
               if (!selector) continue;
-              for (const cell of host.querySelectorAll(selector)) declaredCells.add(cell);
+              /* v1.134.23 — the VERIFICATION above falls back to a document-scoped query when a
+                 host has no matching descendants, and this exclusion did not. A declaration
+                 hosted outside the region it describes therefore reconciled AND left its cells
+                 in the denominator: the work was done, the number did not move, and the backlog
+                 looked untouched. The two paths must resolve the same cells or the gate is
+                 measuring one thing and reporting another. */
+              let cells = [...host.querySelectorAll(selector)];
+              if (cells.length === 0) cells = [...document.querySelectorAll(selector)];
+              for (const cell of cells) declaredCells.add(cell);
             }
             const insideDeclared = (el) => {
               for (const cell of declaredCells) if (cell === el || cell.contains(el)) return true;
@@ -266,6 +274,19 @@ try {
                 if (!el) continue;
                 const tag = el.tagName;
                 if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT') continue;
+                /* An ISA-5.1 instrument bubble is a TAG drawn in two lines: the function code
+                   on top ("TT", "PT") and the loop number underneath ("101"). The loop number
+                   is an identifier — it is the same kind of thing as "FM-101", which this gate
+                   already strips, and it only escaped because the bubble puts the letters and
+                   the digits in separate elements so the tag pattern never sees them together.
+                   Counting them made a P&ID look like it had dozens of untraced measurements. */
+                if (el.classList && el.classList.contains('isa-bubble-txt')) continue;
+                /* The SHARED auth modal is injected by auth.js on every page of the site. It is
+                   site chrome, not cockpit instrumentation: its demo credentials and legal text
+                   are the same on the calculators and the articles, and no parameter registry for
+                   a data-centre engine could or should explain "demo2026". Excluded by its own
+                   container so nothing inside a cockpit panel is caught by the same rule. */
+                if (el.closest('#rzModalForm, .rz-modal, .rz-user-dropdown, #rzAuthModal')) continue;
                 /* Excluded ONLY because the sum is verified above. */
                 if (insideDeclared(el)) continue;
                 if (insideAuthored(el)) { results.push({ authored: true }); continue; }
@@ -282,11 +303,35 @@ try {
                     .replace(/\b\d{1,2}:\d{2}(?::\d{2})?\b/g, ' ')
                     /* Equipment tags are identifiers, not measurements. "FM-101" was being read
                        as the value -101 and counted as an untraced engineering number. */
-                    .replace(/\b[A-Z]{1,}[-\u2011]\d+[A-Z]?\b/g, ' ');
+                    .replace(/\b[A-Z]{1,}[-\u2011]\d+[A-Z]?\b/g, ' ')
+                    /* Cabinet and row designations are written WITHOUT a hyphen — the data
+                       hall's column headers are A01..A59 and its rack ids CA-A04. The hyphenless
+                       form escaped the rule above, so every column header on the grid was being
+                       read as an untraced engineering value: 26, 34, 41, 59. A letter glued to
+                       digits with no separator and no unit is a name, not a measurement. */
+                    .replace(/\b[A-Z]{1,3}\d{1,3}\b/g, ' ')
+                    /* A pipe DESIGNATION is a specification, not a reading: "DN100" is the
+                       nominal bore of the line, and reading 100 out of it and asking which
+                       registry parameter explains it is a category error. */
+                    .replace(/\bDN\s?\d+\b/gi, ' ');
                 const matches = text.match(/-?\d[\d,]*(?:\.\d+)?/g);
                 if (!matches) continue;
-                const label = (el.closest('[data-basis],[id],.kv,.data-row,.stat-row,.metric-row') || el)
-                    .textContent.replace(/\s+/g, ' ').trim().slice(0, 70);
+                /* The label is what makes an unaccounted finding actionable, and it was
+                   reading the nearest LABELLED ANCESTOR's whole textContent. On a P&ID whose
+                   nearest such ancestor is the entire drawing, seven different numbers all
+                   reported the same 70-character banner, which says nothing about any of them.
+                   Prefer what is actually near the number: the text node itself, then the
+                   element's own text, and only then a short ancestor context for the cells
+                   that genuinely carry no text of their own. */
+                const ownText = node.textContent.replace(/\s+/g, ' ').trim();
+                const elText = el.textContent.replace(/\s+/g, ' ').trim();
+                const holder = el.closest('[data-basis],[id],.kv,.data-row,.stat-row,.metric-row');
+                const context = holder && holder !== el
+                    ? holder.textContent.replace(/\s+/g, ' ').trim().slice(0, 40)
+                    : '';
+                const near = ownText.length >= 3 ? ownText
+                    : (elText.length >= 3 ? elText : context);
+                const label = `${near.slice(0, 48)}${context && near !== context ? `  \u00ab ${context}` : ''}`;
                 for (const m of matches) {
                     const key = `${m}|${label}`;
                     if (seen.has(key)) continue;
@@ -333,10 +378,13 @@ try {
         for (const row of perPage) {
             if (row.unaccounted.length === 0) continue;
             console.log(`\n  ${row.page} — ${row.unaccounted.length}`);
-            for (const f of row.unaccounted.slice(0, 14)) {
+            for (const f of row.unaccounted.slice(0, ARGS.includes('--all') ? Infinity : 14)) {
                 console.log(`    ${String(f.value).padStart(12)}  ${f.id ? `#${f.id} ` : ''}${f.label}`);
             }
-            if (row.unaccounted.length > 14) console.log(`    ... and ${row.unaccounted.length - 14} more`);
+            /* `--all` prints the whole backlog. Truncating at 14 keeps the ship-gate log
+               readable, but paying the backlog down needs to SEE it. */
+            if (!ARGS.includes('--all') && row.unaccounted.length > 14)
+                console.log(`    ... and ${row.unaccounted.length - 14} more (--all to list)`);
         }
     }
     if (distributionFailures.length > 0) {

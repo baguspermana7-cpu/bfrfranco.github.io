@@ -7,7 +7,7 @@ import puppeteer from 'puppeteer';
 const ROOT = process.cwd();
 const PAGE_SOURCE = await readFile(resolve(ROOT, 'dc-conventional.html'), 'utf8');
 const ENGINE_SOURCE = await readFile(resolve(ROOT, 'js/conv-engine.js'), 'utf8');
-const CURRENT_VERSION = '2.0.0';
+const CURRENT_VERSION = '2.1.0';
 const MIME = Object.freeze({
   '.css': 'text/css',
   '.html': 'text/html',
@@ -31,7 +31,7 @@ const AUTHORITY_VALUE_IDS = Object.freeze([
 const FIXTURE_SOURCES = Object.freeze({
   healthy: ENGINE_SOURCE,
   missing: 'window.CONV_MODEL = undefined; window.CONV_CALC = undefined;',
-  legacy: ENGINE_SOURCE.replace("version: '2.0.0'", "version: '1.9.0'"),
+  legacy: ENGINE_SOURCE.replace("version: '2.1.0'", "version: '1.9.0'"),
   incomplete: `
     window.CONV_MODEL = { meta: { version: '${CURRENT_VERSION}' } };
     window.CONV_CALC = {
@@ -84,7 +84,7 @@ async function preparePage(browser, origin, fixture, javaScriptEnabled = true) {
     const url = request.url();
     if (request.isNavigationRequest() && url.startsWith(`${origin}/dc-conventional.html`)) {
       const body = fixture === 'request-mismatch'
-        ? PAGE_SOURCE.replace('js/conv-engine.js?v=2.0.0', 'js/conv-engine.js?v=1.9.0')
+        ? PAGE_SOURCE.replace('js/conv-engine.js?v=2.1.0', 'js/conv-engine.js?v=1.9.0')
         : PAGE_SOURCE;
       request.respond({ status: 200, contentType: 'text/html', body });
       return;

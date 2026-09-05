@@ -11,6 +11,105 @@ release sections rather than semver.
 
 ---
 
+## v1.134.23 — 2026-09-05
+
+### Coverage 54.3 % to 79.1 %, and three of the eight cockpits now trace every number
+
+The coverage gate answers one question: of the numbers an operator actually reads on these
+screens, how many can the parameter registry explain? It has been reporting roughly half.
+Paying that down turned out to be four different kinds of work, and separating them is the
+point — "nobody has bound this yet", "this is not an engine quantity", "this is an
+identifier, not a measurement" and "the gate is measuring the wrong thing" are different
+problems and had been sitting in one pile.
+
+**dc-conventional 88.9 to 100 %. datahall 46.0 to 97.4 %. chiller-plant 38.5 to 100 %.**
+
+### Private arithmetic, published
+
+Fourteen quantities were being computed on a page from engine terms. Each one is a number an
+operator reads and acts on, and not one of them had a registry parameter to trace to — the
+same shape as the plant-capacity figures fixed in v1.134.7, and the same shape as the defect
+that once rendered "750 % nrm / 1500 % fail" in a stats panel because a campus load had been
+divided by a hall-scale rating.
+
+- **Chiller plant:** per-machine electrical input; the N+1 margin the cockpit colours red or
+  green; the per-loop flow setpoint; the flow the evaporator duty actually needs and its
+  uplift over the IT-only reference; the plant average part load.
+- **CRAH fleet (per hall):** the unit sensible capacity was an ASSUMED page constant that
+  sized the whole fleet on datahall.html, and every figure off it — units required, installed,
+  running, available kW, capacity surviving one outage — was page arithmetic. All six moved.
+- **Air chain:** `DESIGN_AIRSIDE_DELTA_T_C = 11` was authored on the page, which left the
+  hot-aisle plane an orphan on a cockpit that draws a hot-aisle temperature for every row.
+  The rise, the return-path mixing and the two planes they produce are engine-published, so
+  the chain now reads rack inlet -> hot aisle -> CRAH return with no gap, and the panel shows
+  all four.
+- **UPS loading**, normal and after a 2N failover.
+- **4.186**, the specific heat of water, was a bare literal inside `chwFlowLps()` AND inside
+  the formula datahall.html prints to the operator — so the one term on that line a reader
+  would want to check was the one nothing could explain. Named, and hooked to its own basis
+  drawer on the span that carries it.
+
+### A dead binding, found by looking
+
+`approachT = r1(loop.t1 - (loop.t1 - 2.8))` on the chiller P&ID cancels to the literal 2.8
+for every loop at every load. It LOOKED derived — a plausible constant dressed as
+arithmetic — which is the exact shape the parameter programme exists to remove. The engine
+publishes no refrigerant-side plane, so the evaporator approach is an authored bounded value
+here; it is written as one now, named, and declared with the rest of the simulated machine
+state instead of disguised as a calculation.
+
+### And one the registry refused
+
+`plant_duty_flow_uplift_pct` was declared as a ratio of two flows. The measured-wiring check
+rejected it: perturbing anything that moves `flow_lps` leaves the uplift untouched. The check
+is right — the delta-T and the IT load appear in BOTH flows and cancel, so the flow uplift is
+exactly the UPS loss fraction, `1/eta - 1`, and nothing else. Declared as what it actually
+depends on. A gate that only confirmed what the author already believed would not have caught
+that.
+
+### Declared, with the reason written down
+
+Numbers that are genuinely not engine quantities get their own bucket and must carry a stated
+reason. The chiller P&ID's refrigerant cycle, secondary loop and pump mechanicals already had
+that reason written for ONE of three blocks — the suction/discharge panel, the pump
+mechanicals, the EXV, the oil temperatures and the loop-summary table sat outside the
+declaring element, so twenty-odd readings that the text already explained were counted as
+outstanding work. One constant, referenced everywhere it applies, rather than four copies that
+drift. The data hall's row footers were one text node carrying three different quantities, so
+none could be declared separately; split into named spans, the row heats now reconcile by SUM
+to the hall IT load and every row's inlet and hot aisle must sit on the published planes.
+
+Also declared, each with its own reason rather than a blanket: the heat-map legend bands (a
+colour cut-off is a presentation choice, not a design parameter), the simulated rack-field
+summaries, the instantaneous psychrometric readings, the operator-set ambient, and the
+refrigerant designation.
+
+### Four corrections to the gate itself
+
+- **A declaration that verified still counted.** The verification falls back to a
+  document-scoped query when a host has no matching descendants; the EXCLUSION did not. So a
+  declaration hosted outside the region it describes reconciled, and its cells stayed in the
+  denominator — the work was done, the number did not move, and the backlog looked untouched.
+- **Identifiers were being read as measurements.** ISA-5.1 instrument bubbles draw a tag in
+  two lines ("TT" over "101"), so the digits escaped the tag pattern the gate already had;
+  cabinet columns are written `A26` with no hyphen and escaped it too. A pipe designation
+  (`DN100`) is a specification. None of these are readings.
+- **The label was useless where it mattered most.** It reported the nearest LABELLED
+  ANCESTOR's text, so on a P&ID whose nearest such ancestor is the whole drawing, seven
+  different numbers all reported the same banner. It now reports what is actually next to the
+  number, and `--all` prints the whole backlog instead of the first fourteen.
+- **Site chrome is not cockpit instrumentation.** The shared auth modal is injected on every
+  page of the site; no data-centre parameter registry could or should explain "demo2026".
+
+### Still outstanding
+
+water-system 61.5 %, fire-system 64.6 %, fuel-system 65.2 %, EPMS 71.4 %. Their backlogs are
+equipment nameplate data, control setpoints and simulated vessel state — the same shapes
+handled here — and are listed in full by `node tools/test-conv-coverage.mjs --all`. One entry
+remains on datahall: the event log narrates figures rendered elsewhere on the page, and
+declaring a log as authored basis would make it a place to hide numbers, so it is left visible
+in the backlog instead.
+
 ## v1.134.22 — 2026-09-05
 
 ### The rest of the anti-vibecode monitor, taken to two findings

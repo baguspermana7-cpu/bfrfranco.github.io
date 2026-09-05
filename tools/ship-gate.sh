@@ -137,6 +137,12 @@ gate "agent harness standard — privacy and release parity" node tools/test-age
 # where the twin still carried the Anthropic purple the same release had just removed from the
 # source. terser -c -m is byte-reproducible for every twin here, so the check is exact.
 gate "min-twin freshness — no page runs a stale minified build" node tools/audit-min-twins.mjs --strict
+# ENGINE VERSION PINS. Every Conventional cockpit fails CLOSED on an engine it does not
+# recognise — correct behaviour, and the reason bumping the engine 2.0.0 -> 2.1.0 in v1.134.23
+# blanked all eight at once: no page threw, nothing logged, the authority check just returned
+# false and nineteen unrelated gates timed out waiting for elements that were never drawn.
+gate "engine version pins — pages agree with the engine they load" node tools/test-conv-engine-version-pins.mjs
+
 
 
 # Engine-files byte-identical guard (locked since v1.32.x accuracy review)

@@ -3,6 +3,11 @@ import { readFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { extname, resolve, sep } from 'node:path';
 import puppeteer from 'puppeteer';
+import { createRequire as __rzRequire } from 'node:module';
+const ENGINE_PUBLISHED_VERSION = (() => {
+  const m = __rzRequire(import.meta.url)(process.cwd() + '/js/conv-engine.js');
+  return (m.CONV_CALC || m).snapshot.meta.version;
+})();
 
 const ROOT = process.cwd();
 const PAGE_PATH = resolve(ROOT, 'datahall.html');
@@ -37,7 +42,7 @@ const LEGACY_ENGINE = `window.CONV_CALC = Object.freeze({
 
 const INCOMPLETE_CURRENT_ENGINE = `window.CONV_CALC = Object.freeze({
   snapshot: Object.freeze({
-    meta: Object.freeze({ version: '2.0.0', scenario: 'Simulated', data_quality: 'GOOD' }),
+    meta: Object.freeze({ version: '2.1.0', scenario: 'Simulated', data_quality: 'GOOD' }),
     site: Object.freeze({ it_load_kw: 30000, pue: 1.45 }),
     electrical: Object.freeze({ epms_ups_output_kw: 30000 }),
     cooling: Object.freeze({
@@ -167,7 +172,13 @@ async function openWithEngine(browser, origin, fixture) {
 }
 
 const source = await readFile(PAGE_PATH, 'utf8');
-assert.match(source, /<script src="js\/conv-engine\.js\?v=2\.0\.0"><\/script>/,
+/* v1.134.23 — this asserted the cache token as the LITERAL 2.0.0. Bumping the engine to
+   2.1.0 broke it here and in three sibling gates, while the pages themselves were correct:
+   the gate was pinning a version, not checking agreement. Read the published version instead,
+   so the assertion keeps its meaning when the engine legitimately moves. Whether the pages
+   AGREE with it is tools/test-conv-engine-version-pins.mjs's job. */
+assert.match(source, new RegExp('<script src="js/conv-engine\\.js\\?v='
+  + ENGINE_PUBLISHED_VERSION.replace(/\./g, '\\.') + '"></script>'),
   'data hall must request the governed engine revision');
 assert.match(source, /id="as-state-txt">UNAVAILABLE<\/div>/,
   'alarm strip first paint must begin fail closed');
