@@ -36,7 +36,7 @@
             + '.pln-tt-name{font:700 0.92rem/1.3 inherit;color:#f1f5f9;flex:1 1 auto;}'
             + '.pln-tt-kv{display:inline-block;padding:0.1rem 0.45rem;border-radius:999px;font-size:0.7rem;font-weight:600;}'
             + '.pln-tt-kv-500{background:rgba(59,130,246,0.18);color:#93c5fd;}'
-            + '.pln-tt-kv-275{background:rgba(167,139,250,0.18);color:#c4b5fd;}'
+            + '.pln-tt-kv-275{background:rgba(195,176,250,0.18);color:#c4b5fd;}'
             + '.pln-tt-kv-150{background:rgba(248,113,113,0.18);color:#fca5a5;}'
             + '.pln-tt-kv-70{background:rgba(245,158,11,0.18);color:#fcd34d;}'
             + '.pln-tt-kv-20{background:rgba(20,184,166,0.18);color:#5eead4;}'

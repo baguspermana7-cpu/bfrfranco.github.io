@@ -5922,10 +5922,10 @@
         /* Market-viz mapping — single source for the map/cards/charts across DC pages (maturity + region →
          * accent colour, CAGR thresholds). UI-layer constants live here so "edit once → re-flows everywhere". */
         marketViz: {
-            maturityColors: { established: '#0d9488', growing: '#f59e0b', emerging: '#8b5cf6' },
+            maturityColors: { established: '#0d9488', growing: '#f59e0b', emerging: '#7B4FE0' },
             regionColors: {
                 'North America': '#3b82f6', 'Europe': '#0d9488', 'Asia Pacific': '#f59e0b',
-                'Latin America': '#10b981', 'Middle East & Africa': '#8b5cf6'
+                'Latin America': '#10b981', 'Middle East & Africa': '#7B4FE0'
             },
             cagrHigh: 0.20, cagrMid: 0.10, fallback: '#64748b'
         },
@@ -12657,7 +12657,7 @@
                     var rd = R.redundancy[rich.input.redundancy] || R.redundancy['N+1'];
                     var eq = rich.equip;
                     var fatUnits = (eq.switchgear || 0) + (eq.transformers || 0) + (eq.generators || 0) + (eq.chillers || 0) + Math.ceil((eq.ups_modules || 0) / 4);
-                    var colors = { L0: '#64748b', L1: '#0ea5e9', L2: '#14b8a6', L3: '#10b981', L4: '#f59e0b', L5: '#8b5cf6', L6: '#ec4899' };
+                    var colors = { L0: '#64748b', L1: '#0ea5e9', L2: '#14b8a6', L3: '#10b981', L4: '#f59e0b', L5: '#7B4FE0', L6: '#ec4899' };
                     var sched = rich.schedule || [];
                     var ovl = DATA.construction.wbsFastTrackOverlap;
                     function distribute(tpl, s, e, color) {
@@ -15311,7 +15311,7 @@
             costStackedBar: function (series, legend, opts) {
                 opts = opts || {}; var w = opts.width || 480, h = opts.height || 220, pad = 34;
                 if (!series || !series.length) return RZEngine.charts._svg(w, h, '');
-                var palette = opts.palette || ['#dc2626', '#0891b2', '#f59e0b', '#16a34a', '#8b5cf6', '#d946ef'];
+                var palette = opts.palette || ['#dc2626', '#0891b2', '#f59e0b', '#16a34a', '#7B4FE0', '#d946ef'];
                 var totals = series.map(function (s) { return s.parts.reduce(function (a, b) { return a + b; }, 0); });
                 var maxT = Math.max.apply(null, totals) || 1, bw = (w - 2 * pad) / series.length * 0.6, gap = (w - 2 * pad) / series.length, inner = '';
                 series.forEach(function (s, i) {

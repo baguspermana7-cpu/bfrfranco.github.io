@@ -119,7 +119,7 @@
     return '<circle cx="' + cx + '" cy="' + (cy - 6) + '" r="2" fill="' + c + '" opacity=".5"/>' +
            '<circle cx="' + cx + '" cy="' + (cy + 6) + '" r="2" fill="' + c + '" opacity=".5"/>' +
            '<line x1="' + cx + '" y1="' + (cy + 5) + '" x2="' + (cx + 5) + '" y2="' + (cy - 4) + '" stroke="' + c + '" stroke-width="1.4"/>' +
-           '<rect x="' + (cx - 11) + '" y="' + (cy - 2) + '" width="7" height="5" rx=".8" fill="rgba(167,139,250,.22)" stroke="' + c + '" stroke-width=".4"/>' +
+           '<rect x="' + (cx - 11) + '" y="' + (cy - 2) + '" width="7" height="5" rx=".8" fill="rgba(195,176,250,.22)" stroke="' + c + '" stroke-width=".4"/>' +
            '<path d="M' + (cx - 9) + ' ' + (cy - 2) + ' L' + (cx - 9) + ' ' + (cy - 4) + ' a1.5 1.5 0 0 1 3 0 L' + (cx - 6) + ' ' + (cy - 2) + '" fill="none" stroke="' + c + '" stroke-width=".5"/>';
   }
 

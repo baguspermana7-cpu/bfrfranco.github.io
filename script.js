@@ -1577,7 +1577,7 @@ window.subscribeNewsletter = window.subscribeNewsletter || function(e) {
         if (statusEl) { statusEl.textContent = msg; }
         else if (form) {
             var p = document.createElement('p');
-            p.style.cssText = 'color:#a78bfa;font-size:0.85rem;margin-top:0.5rem;';
+            p.style.cssText = 'color:#C3B0FA;font-size:0.85rem;margin-top:0.5rem;';
             p.textContent = msg;
             form.appendChild(p);
         }
@@ -1592,7 +1592,7 @@ window.subscribeNewsletter = window.subscribeNewsletter || function(e) {
     var body = encodeURIComponent('Hi,\n\nPlease add me to the Resistance Zero newsletter.\n\nMy email: ' + email + '\n\nThanks!');
     window.open('mailto:bagusdpermana7@gmail.com?subject=' + subject + '&body=' + body, '_blank');
     if (form) {
-        form.innerHTML = '<p style="color:#a78bfa;font-weight:600;padding:1rem 0;">&#10003; Email client opened — send the message to confirm your subscription.</p>';
+        form.innerHTML = '<p style="color:#C3B0FA;font-weight:600;padding:1rem 0;">&#10003; Email client opened — send the message to confirm your subscription.</p>';
     }
     return false;
 };

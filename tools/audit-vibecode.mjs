@@ -49,8 +49,26 @@ const RULES = [
        page of the site. A ban that only recognises one spelling of the thing it bans is not a
        ban. Covers the hex, the rgb()/rgba() forms, and the violet-400 sibling #A78BFA the same
        component pairs it with. */
-    test: (t) => (/#8b5cf6|#a78bfa|rgba?\(\s*139\s*,\s*92\s*,\s*246\s*[,)]|rgba?\(\s*167\s*,\s*139\s*,\s*250\s*[,)]/i.test(t))
-      ? "Anthropic-purple (#8B5CF6 / #A78BFA, in any notation) — use a semantic token / mint #7DDDB4" : null },
+    test: (t) => {
+      /* The aurora-mesh hero is §B PROTECTED and its stops legitimately include a violet.
+         Widening this rule to rgb() notation in v1.134.20 made it flag that hero on every
+         page that loads the shared stylesheets — the exact over-eager de-slop pass §B exists
+         to prevent. So a translucent stop INSIDE a gradient() is not a finding: the pill this
+         rule bans is an opaque accent on text, a fill or a border, never an alpha-0.15 wash
+         under a 22-second drift. A solid `#A78BFA` anywhere still fails, gradient or not. */
+      /* An ATTRIBUTE SELECTOR that matches the banned colour exists to REPAIR it —
+         `[style*="rgb(139, 92, 246)"] { color:#6d28d9 !important }` repaints whatever a chart
+         library injects inline. Flagging the repair as the offence would push an author to
+         delete the only thing keeping the colour off the page. Naming a colour in a selector
+         is not painting with it. */
+      const scrubbed = String(t)
+        .replace(/\[style\*=(["'])[^"']*\1\]/g, '')
+        .replace(
+        /(?:linear|radial|conic)-gradient\([^()]*(?:\([^()]*\)[^()]*)*\)/gi,
+        (grad) => grad.replace(/rgba\(\s*(?:139\s*,\s*92\s*,\s*246|167\s*,\s*139\s*,\s*250)\s*,\s*0?\.\d+\s*\)/gi, ''));
+      return (/#8b5cf6|#a78bfa|rgba?\(\s*139\s*,\s*92\s*,\s*246\s*[,)]|rgba?\(\s*167\s*,\s*139\s*,\s*250\s*[,)]/i.test(scrubbed))
+        ? "Anthropic-purple (#8B5CF6 / #A78BFA, in any notation) — use a semantic token / mint #7DDDB4" : null;
+    } },
   { id: "emoji-ui-icon",
     // Decorative PICTOGRAPH emoji as UI icons/headings/badges (sign #5). Whitelisted (kept): 🔒/🔓 lock
     // (gated-feature affordance), ⚠ warn, ⚡ energy, ★☆⭐ rating, regional-indicator FLAGS (country data),

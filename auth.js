@@ -519,8 +519,8 @@
             /* Auth wrap */
             '.rz-auth-wrap{display:inline-flex;align-items:center;position:relative;margin-left:8px;vertical-align:middle;}',
             /* Login button */
-            '.rz-login-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:10px;border:1px solid rgba(125,221,180,0.4);background:linear-gradient(135deg,rgba(125,221,180,0.15),rgba(168,85,247,0.08));color:#A8ECCF;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.3s;font-family:inherit;white-space:nowrap;}',
-            '.rz-login-btn:hover{background:linear-gradient(135deg,rgba(125,221,180,0.25),rgba(168,85,247,0.15));transform:translateY(-1px);box-shadow:0 4px 15px rgba(125,221,180,0.2);}',
+            '.rz-login-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:10px;border:1px solid rgba(125,221,180,0.4);background:linear-gradient(135deg,rgba(125,221,180,0.15),rgba(125,221,180,0.08));color:#A8ECCF;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.3s;font-family:inherit;white-space:nowrap;}',
+            '.rz-login-btn:hover{background:linear-gradient(135deg,rgba(125,221,180,0.25),rgba(125,221,180,0.15));transform:translateY(-1px);box-shadow:0 4px 15px rgba(125,221,180,0.2);}',
             '.rz-login-btn i{font-size:1rem;}',
             /* User button (logged in) */
             '.rz-user-btn{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:10px;border:1px solid rgba(125,221,180,0.3);background:rgba(125,221,180,0.08);color:#c4b5fd;cursor:pointer;font-family:inherit;font-size:0.82rem;transition:all 0.3s;}',
@@ -562,8 +562,8 @@
             '.rz-modal .rz-success p{color:#f1f5f9;font-weight:600;margin:4px 0;}',
             '.rz-modal .rz-success small{color:#64748b;font-size:0.8rem;}',
             /* Light theme */
-            '[data-theme="light"] .rz-login-btn{background:linear-gradient(135deg,rgba(125,221,180,0.1),rgba(168,85,247,0.05));color:#4FBF92;border-color:rgba(125,221,180,0.3);}',
-            '[data-theme="light"] .rz-user-btn{background:rgba(125,221,180,0.06);color:#6d28d9;border-color:rgba(125,221,180,0.2);}',
+            '[data-theme="light"] .rz-login-btn{background:linear-gradient(135deg,rgba(125,221,180,0.1),rgba(125,221,180,0.05));color:#4FBF92;border-color:rgba(125,221,180,0.3);}',
+            '[data-theme="light"] .rz-user-btn{background:rgba(125,221,180,0.06);color:#146B4A;border-color:rgba(125,221,180,0.2);}',
             '[data-theme="light"] .rz-user-avatar{background:linear-gradient(135deg,#4FBF92,#7DDDB4);}',
             '[data-theme="light"] .rz-user-dropdown{background:rgba(255,255,255,0.98);border-color:rgba(125,221,180,0.2);box-shadow:0 10px 40px rgba(0,0,0,0.12);}',
             '[data-theme="light"] .rz-dd-email{color:#475569;}',
@@ -575,12 +575,12 @@
             '.rz-modal .rz-modal-legal{color:#94a3b8;}',
             '.rz-modal .rz-modal-legal a{color:#A8ECCF;text-decoration:underline;text-underline-offset:2px;}',
             '[data-theme="light"] .rz-modal .rz-modal-legal{color:#475569;}',
-            '[data-theme="light"] .rz-modal .rz-modal-legal a{color:#6d28d9;}',
+            '[data-theme="light"] .rz-modal .rz-modal-legal a{color:#146B4A;}',
             '[data-theme="light"] .rz-modal input[type="email"],[data-theme="light"] .rz-modal input[type="password"]{background:#f1f5f9;border-color:#e2e8f0;color:#1e293b;}',
             '[data-theme="light"] .rz-modal input:focus{border-color:rgba(125,221,180,0.5);background:#fff;}',
             '[data-theme="light"] .rz-modal-close{background:rgba(0,0,0,0.05);color:#64748b;}',
             '[data-theme="light"] .rz-demo-hint{background:rgba(125,221,180,0.06) !important;border-color:rgba(125,221,180,0.15) !important;color:#475569 !important;}',
-            '[data-theme="light"] .rz-demo-hint code{background:rgba(125,221,180,0.1) !important;color:#6d28d9 !important;}',
+            '[data-theme="light"] .rz-demo-hint code{background:rgba(125,221,180,0.1) !important;color:#146B4A !important;}',
             '[data-theme="light"] .rz-demo-hint .rz-demo-label{color:#4FBF92 !important;}',
             '[data-theme="light"] .rz-pro-link{color:#4FBF92 !important;}',
             '[data-theme="light"] .rz-pro-link:hover{color:#6d28d9 !important;}',

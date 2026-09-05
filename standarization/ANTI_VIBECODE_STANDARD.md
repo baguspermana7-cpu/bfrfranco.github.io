@@ -15,7 +15,7 @@ generic set reads as "vibecoded" and must be removed.
 |---|---|---|
 | 1 | **Inter / Geist / Space Grotesk as PRIMARY font** | Base UI font = **`'IBM Plex Sans'`**; display = Fraunces; mono = JetBrains Mono. Inter/Geist/Space-Grotesk may NOT be the first family in any `font-family` stack. |
 | 2 | Dot-grid pattern on `.hero-background` / any bg | Soft radial washes only (gold+mint, opacity ≤0.06). |
-| 3 | Anthropic-purple `#8B5CF6` as a pill/accent | Mint `#7DDDB4`; residual semantic uses must move to a named token, never the raw pill color. |
+| 3 | Anthropic-purple `#8B5CF6` as a pill/accent | Mint `#7DDDB4`; residual semantic uses must move to a named token, never the raw pill color. **Named tokens that exist for this (v1.134.21):** `--rz-restricted` (root-gated links; `#7A4800` light / `#FFAA00` dark) and `--oe-violet` (the violet slot of the eight-hue `.oe-*` categorical family; `#5B34C4` / `#C3B0FA`). Categorical uses elsewhere take the same re-chosen ramp `#C3B0FA` / `#7B4FE0`; brand surfaces take mint (`#A8ECCF` dark, `#146B4A` light — `#4FBF92` is 2.3:1 on white and must not be used as text). |
 | 4 | Sparkle icons ✨ / wand / `fa-magic` as UI | Instrument icons (thin-line), never "AI sparkle". |
 | 5 | Emojis as application icons/controls or in headings | Drawn/SVG or professional icon; text stays emoji-free. |
 | 6 | Glassmorphism / liquid-glass (`backdrop-filter: blur` as decoration) | Opaque instrument surfaces + 1px hairline. |
@@ -81,6 +81,15 @@ on any hard-banned finding. Detectors + precision rules (all learned from real f
   the `📖 Technical Manual` pill shipped as `&#128214;` on ~40 pages and a literal-only scan missed every
   one; a headless render (`document.body.innerText`) caught it. Verify emoji work with a real render, not
   just a static grep.
+- **Two exemptions the rule needs to be usable** (both found by running it, v1.134.21):
+  1. **Protected aurora.** A translucent stop INSIDE a `gradient()` is not a finding — §B
+     protects the aurora-mesh hero and its palette legitimately includes a violet. A solid
+     `#A78BFA` still fails, gradient or not. Without this the rule flagged the site's own
+     signature on every page that loads the shared stylesheets.
+  2. **Repairs are not offences.** `[style*="rgb(139, 92, 246)"] { color:… !important }`
+     exists to repaint what a chart library injects inline. Naming a colour in a selector is
+     not painting with it; flagging it pushes an author to delete the only thing keeping the
+     colour off the page. Attribute selectors are stripped before the scan.
 - **Documentation exemption**: `<code>`/`<pre>` prose is stripped before scanning (a changelog entry that
   quotes `#8b5cf6` while DESCRIBING its purge is not committing it). `changelog.html` (generated archive
   that quotes historical CSS as before/after illustration) is excluded from scope entirely — the ban is

@@ -9,7 +9,7 @@
     };
     var TILE_ATTR = '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/">OSM</a>';
 
-    var VOLTAGE_COLORS = { 500: '#3b82f6', 275: '#a78bfa', 150: '#f87171' };
+    var VOLTAGE_COLORS = { 500: '#3b82f6', 275: '#C3B0FA', 150: '#f87171' };
     var VOLTAGE_DEFAULT = '#94a3b8';
     var LINE_WEIGHTS = { 500: 3, 275: 2.5, 150: 2 };
     var LINE_DASH = { 500: '14 8', 275: '10 6', 150: '6 4' };

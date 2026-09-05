@@ -3396,7 +3396,7 @@
                             sensitivityCandidate('liquidCapture', 'Liquid Capture (%)', '#14b8a6', 'Shifts burden between liquid and air branches.', 1.2),
                             sensitivityCandidate('upsEff', 'UPS Efficiency (%)', '#f59e0b', 'Electrical conversion loss sensitivity.', 1.15),
                             sensitivityCandidate('distLoss', 'Distribution Loss (%)', '#d97706', 'Distribution chain loss overhead.', 1.1),
-                            sensitivityCandidate('controlQuality', 'Control Quality (%)', '#8b5cf6', 'Control quality impact on cooling efficiency realization.', 0.95),
+                            sensitivityCandidate('controlQuality', 'Control Quality (%)', '#7B4FE0', 'Control quality impact on cooling efficiency realization.', 0.95),
                             sensitivityCandidate('airCop', 'Air Path COP', '#0284c7', 'Residual air branch efficiency response.', 0.9),
                             sensitivityCandidate('fanPower', 'Fan Power Budget (%IT)', '#16a34a', 'Configured airflow demand envelope.', 0.9)
                         ];
@@ -3416,7 +3416,7 @@
                             sensitivityCandidate('pumpEff', 'Pump Efficiency (%)', '#7c3aed', 'Hydraulic conversion efficiency.', 1.05),
                             sensitivityCandidate('fanPower', 'Fan Power Budget (%IT)', '#16a34a', 'Airflow fan branch demand.', 1.0),
                             sensitivityCandidate('economizerHours', 'Economizer Availability (%)', '#0ea5e9', 'Free-cooling effect on thermal branch.', 0.95),
-                            sensitivityCandidate('controlQuality', 'Control Quality (%)', '#8b5cf6', 'Control-led thermal optimization response.', 0.9)
+                            sensitivityCandidate('controlQuality', 'Control Quality (%)', '#7B4FE0', 'Control-led thermal optimization response.', 0.9)
                         ];
                     }
                     if (nodeId === 'elec') {
@@ -3431,7 +3431,7 @@
                         return [
                             sensitivityCandidate('itLoadMw', 'IT Load (MW)', '#64748b', 'Aux baseline scales with facility size.', 1.2),
                             sensitivityCandidate('monitoring', 'Monitoring Coverage (%)', '#475569', 'Monitoring quality affects auxiliary overhead.', 1.1),
-                            sensitivityCandidate('controlQuality', 'Control Quality (%)', '#8b5cf6', 'Control maturity impact on support burden.', 0.95),
+                            sensitivityCandidate('controlQuality', 'Control Quality (%)', '#7B4FE0', 'Control maturity impact on support burden.', 0.95),
                             sensitivityCandidate('coefFutureTech', 'Future Tech Multiplier (%)', '#0ea5e9', 'Future efficiency drift on support load.', 0.8)
                         ];
                     }
@@ -3440,7 +3440,7 @@
                             sensitivityCandidate('liquidCapture', 'Liquid Capture (%)', '#0d9488', 'Captured heat fraction feeding liquid loop.', 1.5),
                             sensitivityCandidate('coefCduLoss', 'CDU Loss Coefficient (%)', '#14b8a6', 'CDU parasitic term contribution.', 1.25),
                             sensitivityCandidate('coefHeatTransfer', 'Heat Transfer Effectiveness (%)', '#06b6d4', 'Heat-transfer efficiency in liquid domain.', 1.05),
-                            sensitivityCandidate('controlQuality', 'Control Quality (%)', '#8b5cf6', 'Control effect on liquid COP realization.', 0.95),
+                            sensitivityCandidate('controlQuality', 'Control Quality (%)', '#7B4FE0', 'Control effect on liquid COP realization.', 0.95),
                             sensitivityCandidate('supplyTemp', 'Liquid Supply Temp (C)', '#0284c7', 'Supply setpoint shift affecting liquid COP.', 0.9),
                             sensitivityCandidate('returnTemp', 'Liquid Return Temp (C)', '#0369a1', 'Return setpoint shift affecting deltaT and flow.', 0.9)
                         ];
@@ -3448,7 +3448,7 @@
                     if (nodeId === 'pump') {
                         return [
                             sensitivityCandidate('pumpHead', 'Pump Head (m)', '#7c3aed', 'Direct hydraulic work requirement.', 1.5),
-                            sensitivityCandidate('pumpEff', 'Pump Efficiency (%)', '#8b5cf6', 'Efficiency loss amplification on pump kW.', 1.45),
+                            sensitivityCandidate('pumpEff', 'Pump Efficiency (%)', '#7B4FE0', 'Efficiency loss amplification on pump kW.', 1.45),
                             sensitivityCandidate('hydraulicMargin', 'Hydraulic Margin (%)', '#a855f7', 'Design safety margin overhead.', 1.2),
                             sensitivityCandidate('coefPipeLoss', 'Pipe Loss Multiplier', '#9333ea', 'Pressure-drop multiplier impact.', 1.15),
                             sensitivityCandidate('highDensityShare', 'High-Density Share (%)', '#6d28d9', 'Density-driven hydraulic stress influence.', 0.95)
@@ -3459,7 +3459,7 @@
                             sensitivityCandidate('liquidCapture', 'Liquid Capture (%)', '#0284c7', 'Residual uncaptured heat moved to air path.', 1.45),
                             sensitivityCandidate('airCop', 'Air Path COP', '#0ea5e9', 'Air-side COP impact on electrical demand.', 1.35),
                             sensitivityCandidate('economizerHours', 'Economizer Availability (%)', '#1d4ed8', 'Outdoor-air/economizer relief factor.', 1.1),
-                            sensitivityCandidate('controlQuality', 'Control Quality (%)', '#8b5cf6', 'Control-induced air branch efficiency shift.', 0.95),
+                            sensitivityCandidate('controlQuality', 'Control Quality (%)', '#7B4FE0', 'Control-induced air branch efficiency shift.', 0.95),
                             sensitivityCandidate('supplyTemp', 'Liquid Supply Temp (C)', '#0369a1', 'Setpoint coupling to residual thermal burden.', 0.8)
                         ];
                     }
@@ -3474,7 +3474,7 @@
                     }
                     return [
                         sensitivityCandidate('itLoadMw', 'IT Load (MW)', '#2563eb', 'Primary load scaling term.', 1.1),
-                        sensitivityCandidate('controlQuality', 'Control Quality (%)', '#8b5cf6', 'Control quality effect.', 1.0),
+                        sensitivityCandidate('controlQuality', 'Control Quality (%)', '#7B4FE0', 'Control quality effect.', 1.0),
                         sensitivityCandidate('airCop', 'Air Path COP', '#0284c7', 'Cooling efficiency influence.', 0.9)
                     ];
                 }
@@ -3838,7 +3838,7 @@
                     focus = flows.pump;
                     var pumpFactors = scaleDetailParts([
                         { label: 'Static Head Requirement', value: Math.max(input.pumpHead || 1, 1), color: '#7c3aed', note: 'Nominal vertical/lift and base hydraulic head.' },
-                        { label: 'Pipe Friction Multiplier', value: Math.max((input.coefPipeLoss || 1) - 0.85, 0.15), color: '#8b5cf6', note: 'Pipe complexity and pressure-drop multiplier.' },
+                        { label: 'Pipe Friction Multiplier', value: Math.max((input.coefPipeLoss || 1) - 0.85, 0.15), color: '#7B4FE0', note: 'Pipe complexity and pressure-drop multiplier.' },
                         { label: 'Hydraulic Margin', value: Math.max((input.hydraulicMargin || 0) / 100, 0.05), color: '#a855f7', note: 'Design safety margin for uncertain operating envelope.' },
                         { label: 'Redundancy Overhead', value: Math.max(redundancyFactor - 1, 0.05), color: '#9333ea', note: 'N+1 / 2N redundancy circulation overhead.' },
                         { label: 'Density Stress Effect', value: Math.max((internals.densityStress || 1) - 1, 0.05), color: '#6d28d9', note: 'Rack density impact on effective pumping requirement.' }
@@ -3847,7 +3847,7 @@
                     spec.subtitle = 'Pump branch decomposition by hydraulic design and reliability drivers.';
                     spec.nodes = [
                         { id: 'p_h1', label: 'Static Head', col: 0, color: '#7c3aed' },
-                        { id: 'p_h2', label: 'Pipe Friction', col: 0, color: '#8b5cf6' },
+                        { id: 'p_h2', label: 'Pipe Friction', col: 0, color: '#7B4FE0' },
                         { id: 'p_h3', label: 'Hydraulic Margin', col: 0, color: '#a855f7' },
                         { id: 'p_h4', label: 'Redundancy', col: 0, color: '#9333ea' },
                         { id: 'p_h5', label: 'Density Stress', col: 0, color: '#6d28d9' },

@@ -11,6 +11,87 @@ release sections rather than semver.
 
 ---
 
+## v1.134.21 — 2026-09-05
+
+### The homepage was running old auth code — and nothing said so
+
+`index.html` is one of only two pages that load `auth.min.js` instead of `auth.js`. That
+twin was last built on 2026-08-26 and was never rebuilt when v1.134.20 converted the shared
+auth component off Anthropic purple, so the release that removed the purple **did not reach
+the homepage**: every other page showed the mint login button and the homepage kept the
+purple one. The changelog records the identical failure once before ("the homepage always
+ran old auth logic regardless of auth.js fixes"), fixed by hand, with nothing added to stop
+it recurring. It recurred.
+
+- **`tools/audit-min-twins.mjs` (new ship gate).** Every `X.min.js` / `X.min.css` is
+  rebuilt with the repo's own builder and compared byte-for-byte against what is shipped.
+  `terser -c -m` and `cleancss` are both reproducible here, so the check is exact rather
+  than advisory, and the twin list is enumerated from the filesystem so a new twin is
+  covered the day it is added. Proven behaviourally: the gate was run against the twin as
+  it actually shipped (RED, "28750 bytes shipped vs 30886 rebuilt") before the rebuild
+  turned it GREEN, and again against a hand-edited `styles.min.css`.
+- A terser or cleancss upgrade will also fail this gate. That is correct — the twins are
+  build output and must be regenerated when the builder changes.
+
+### Finishing the purple removal, on the other 106 pages
+
+v1.134.20 fixed `auth.js` and widened the gate that had missed it. Running that widened gate
+across the site reported the same colour on **106 files**; this release takes it to **zero**,
+and the work split into three genuinely different cases rather than one find-and-replace.
+
+- **Root-gated links (62 pages) → a named token.** The "Second Brain — Root only" menu item
+  was `#A78BFA` inline on every page that has the menu. New `--rz-restricted` (amber:
+  `#7A4800` light, `#FFAA00` dark). This was also an **accessibility** defect, not only a
+  brand one: the purple measured **2.7:1 on the white dropdown**, and the replacement
+  measures 7.6:1 there and 9.7:1 on the dark surface.
+- **Categorical uses (~200 sites) → the value moves, the meaning stays.** A 275 kV line on
+  the PLN grid maps, a chart series, an out-of-service state chip, the `.oe-*-violet` slot
+  in an eight-hue family — these carry data, not brand. Most were *already* named tokens
+  (`--pjg-v275`, `--cmp-b`, `--pillar-light`) whose only fault was the value, which is
+  exactly what ANTI_VIBECODE_STANDARD §A rule 3 asks to fix. They keep their identity on a
+  re-chosen ramp (`#C3B0FA` / `#7B4FE0`) that also reads better than what it replaces
+  (9.3:1 vs 6.6:1 on `#0F172A`).
+- **Brand surfaces → mint.** `terms.html` link colour, the `FF-1` card border, the
+  `privacy.html` callout, two tool-card accents and the gamification toast were the actual
+  banned pattern and took the mint ramp.
+- **`auth.js` light theme finished.** v1.134.20 converted the dark theme and left three
+  light-theme inks and two gradient stops violet, so the same component read mint at night
+  and purple by day. `#146B4A` is the light-surface mint ink — `#4FBF92` measures 2.3:1 on
+  white and would have failed as text.
+
+### Two corrections to the gate itself
+
+The widened rule was over-eager in two specific ways, and both were found by running it
+rather than by reasoning about it:
+
+- **It flagged the aurora-mesh hero**, which §B PROTECTS by name and whose palette
+  legitimately includes a violet. A translucent stop inside a `gradient()` is now exempt;
+  a solid `#A78BFA` still fails, gradient or not. The sweep had actually recoloured those
+  stops before this was caught — they are restored to the original values.
+- **It flagged the repairs, not the offence.** `[style*="rgb(139, 92, 246)"] { color:… }`
+  exists to repaint whatever a chart library injects inline. Naming a colour in a selector
+  is not painting with it, and flagging it would push an author to delete the only thing
+  keeping the colour off the page. Attribute selectors are stripped before the scan.
+
+### Cache-bust drift, fixed while it was visible
+
+`styles.min.css` was being requested under **three different tokens** — `2026-07-05-a11y3`
+on 70 pages, `20260225` on 50, `20260524` on 28. Different bust strings are different URLs,
+so the same file sat in three cache entries and a fix reached a page only if that page's
+particular token happened to move. All four rebuilt assets (`styles.min.css`,
+`styles-index.min.css`, `rz-engine.min.js`, `script.min.js`) are now on one token across
+272 tags in 171 pages.
+
+`rz-engine.js` changed (three categorical colour constants), so the AUTO-LINKING chain ran:
+`build-engine-catalog.mjs` regenerated, `test-value-bindings.mjs` green at 85/85.
+
+### Known residual
+
+`dcmoc/` is a built Next.js bundle. Its `layout.tsx` now points at the new engine token, but
+the shipped `out/` still carries the previous one — DCMOC charts keep the old categorical
+violet until that app is next built. Rebuilding it was out of scope for this release and is
+not something to do mid-session; it is recorded here rather than left to be discovered.
+
 ## v1.134.20 — 2026-09-05 (Site-wide: 934 unreadable or clipped labels, and a hard-banned colour on every page because its gate was never wired)
 
 The cockpit work kept finding the same three defects, so I built the measurement and pointed it

@@ -36,7 +36,7 @@
     'rtn_unack':  { label: 'Returned-to-normal (unack)', abbr: 'RTN', alarmActive: false, color: '#7dd3fc' },
     'shelved':    { label: 'Shelved (operator)',      abbr: 'SHLV',  alarmActive: false, color: '#c4b5fd' },
     'suppressed': { label: 'Suppressed by design',    abbr: 'SUPP',  alarmActive: false, color: '#94a3b8' },
-    'oos':        { label: 'Out-of-service (maint.)', abbr: 'OOS',   alarmActive: false, color: '#a78bfa' }
+    'oos':        { label: 'Out-of-service (maint.)', abbr: 'OOS',   alarmActive: false, color: '#C3B0FA' }
   };
 
   /* ------------------------------------------------------------------ */

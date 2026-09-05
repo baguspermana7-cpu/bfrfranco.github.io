@@ -346,7 +346,7 @@ svg text{user-select:none}
 .ircdu-hmi{position:fixed;z-index:200;display:none;width:960px;max-width:94vw;max-height:90vh;overflow-y:auto;background:linear-gradient(180deg,#0e0a20,#060418);border:1px solid rgba(100, 116, 139,.45);border-radius:8px;box-shadow:0 8px 40px rgba(88,28,200,.3);backdrop-filter:blur(12px)}
 .ircdu-hmi.show{display:block}
 .ircdu-hmi-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:linear-gradient(90deg,rgba(100, 116, 139,.12),rgba(88,80,190,.08));border-bottom:1px solid rgba(100, 116, 139,.2)}
-.ircdu-hmi-hdr h4{font-family:'JetBrains Mono';font-size:12px;font-weight:600;color:#a78bfa;margin:0}
+.ircdu-hmi-hdr h4{font-family:'JetBrains Mono';font-size:12px;font-weight:600;color:#C3B0FA;margin:0}
 .ircdu-hmi-hdr .mode{font-family:'JetBrains Mono';font-size:9px;padding:2px 8px;border-radius:3px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:var(--g)}
 .ircdu-hmi-close{background:none;border:1px solid var(--bd2);border-radius:4px;color:var(--t2);cursor:pointer;font-size:16px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;transition:.2s}
 .ircdu-hmi-close:hover{background:rgba(255,255,255,.08);color:var(--t1)}
@@ -512,7 +512,7 @@ svg text{user-select:none}
 .dh-nav{display:flex;gap:4px;margin-bottom:8px}
 .dh-btn{padding:6px 16px;border-radius:4px;font-size:11px;font-family:'JetBrains Mono';background:var(--bg2);color:var(--t2);border:1px solid var(--bd);text-decoration:none;cursor:pointer;transition:.2s}
 .dh-btn:hover{background:rgba(100, 116, 139,.08);color:var(--t1);border-color:var(--bd2)}
-.dh-btn.active{background:rgba(100, 116, 139,.15);color:#a78bfa;border-color:rgba(100, 116, 139,.4)}
+.dh-btn.active{background:rgba(100, 116, 139,.15);color:#C3B0FA;border-color:rgba(100, 116, 139,.4)}
 [data-theme="light"] .dh-btn{background:#f1f5f9;color:#475569;border-color:#cbd5e1}
 [data-theme="light"] .dh-btn.active{background:rgba(100, 116, 139,.12);color:#7c3aed;border-color:rgba(100, 116, 139,.35)}
 .dh-head{padding:10px 8px 6px;border-bottom:1px solid var(--bd);margin-bottom:6px}
@@ -625,10 +625,10 @@ body.dh-bod-open .rz-nav-burger{display:none!important}
 @media(max-width:480px){.dh-bod-hdr{flex-wrap:wrap}.dh-bod-hdr h4{flex:1 1 100%;order:1}.dh-bod-hdr .mode{order:2}.dh-bod-hdr .dh-bod-pdf{order:3;margin-left:auto}.dh-bod-hdr .dh-bod-close{order:4}}
 @media(max-width:390px){.dh-bod-body{padding:10px 10px 36px}.dh-bod-hdr h4{font-size:11px}.dh-bod-hdr .mode,.dh-bod-hdr .dh-bod-pdf{font-size:8.5px}.dh-bod-tbl,.dh-bod-au .stp{font-size:8.5px}}
 /* a11y (v1.51.10) */
-[data-theme="dark"] #dkCue{color:#a78bfa !important}
+[data-theme="dark"] #dkCue{color:#C3B0FA !important}
 /* the callouts strip stays a dark canvas island in light mode — give it the
    dark-canvas token set locally instead of the light page tokens */
-[data-theme="light"] #dcCallouts{--g:#22c55e;--c:#06b6d4;--o:#f59e0b;--r:#f87171;--p:#a78bfa;--pk:#ec4899;--b:#60a5fa;--t1:#e2e5ea;--t2:#9aa3af;--t3:#9aa3af}
+[data-theme="light"] #dcCallouts{--g:#22c55e;--c:#06b6d4;--o:#f59e0b;--r:#f87171;--p:#C3B0FA;--pk:#ec4899;--b:#60a5fa;--t1:#e2e5ea;--t2:#9aa3af;--t3:#9aa3af}
 #dcCallouts div > div{color:#9aa3af}
 :root:not([data-theme="dark"]) [style*="color:#50c8ff"]{color:#0369a1 !important}
 [data-theme="dark"] #cookieAccept{background:#1d4ed8 !important}
@@ -3155,7 +3155,7 @@ const RP=[{y:rpY(30),lA:'ROW A',lB:'ROW B',p:'1'},{y:rpY(126),lA:'ROW C',lB:'ROW
 // In-Rack CDU racks (Vertiv CoolChip CDU 121) — varies per data hall
 var IRCDU=new Set(IRCDU_SETS[currentDH]);
 function rk(x,y,id){if(IRCDU.has(id))return rkCdu(x,y,id);let r=`<g class="rg" filter="url(#gG)"><rect x="${x}" y="${y}" width="${RW}" height="${RH}" rx="2" fill="rgba(34,197,94,.18)" stroke="rgba(34,197,94,.5)" stroke-width=".6"/>`;for(let i=0;i<3;i++)r+=`<rect x="${x+2}" y="${y+2+i*3.5}" width="${RW-4}" height="2" rx=".3" fill="rgba(34,197,94,${.4-i*.07})"/>`;r+=`<circle cx="${x+RW-3}" cy="${y+RH-3}" r="1" fill="var(--g)" opacity=".8"/><text x="${x+RW/2}" y="${y+RH-1.5}" fill="var(--t3)" font-family="${J}" font-size="3" text-anchor="middle">${id}</text></g>`;return r}
-function rkCdu(x,y,id){let r=`<g class="rg" data-ircdu="${id}" style="cursor:pointer" filter="url(#gG)"><rect x="${x}" y="${y}" width="${RW}" height="${RH}" rx="2" fill="rgba(88,80,190,.22)" stroke="rgba(100, 116, 139,.6)" stroke-width=".7"/>`;for(let i=0;i<3;i++)r+=`<rect x="${x+2}" y="${y+2+i*3.5}" width="${RW-4}" height="2" rx=".3" fill="rgba(109,92,206,${.45-i*.08})"/>`;r+=`<circle cx="${x+RW-3}" cy="${y+RH-3}" r="1.2" fill="#a78bfa" class="ircdu-pulse"/>`;r+=`<rect x="${x+1}" y="${y+RH-5}" width="8" height="3.5" rx=".5" fill="rgba(100, 116, 139,.25)" stroke="rgba(100, 116, 139,.5)" stroke-width=".3"/>`;r+=`<text x="${x+5}" y="${y+RH-2.5}" fill="#c4b5fd" font-family="${J}" font-size="2" text-anchor="middle">CDU</text>`;r+=`<text x="${x+RW/2}" y="${y+RH-1.5}" fill="var(--t3)" font-family="${J}" font-size="3" text-anchor="middle">${id}</text><rect x="${x}" y="${y}" width="${RW}" height="${RH}" fill="transparent" data-ircdu="${id}" style="cursor:pointer"/></g>`;return r}
+function rkCdu(x,y,id){let r=`<g class="rg" data-ircdu="${id}" style="cursor:pointer" filter="url(#gG)"><rect x="${x}" y="${y}" width="${RW}" height="${RH}" rx="2" fill="rgba(88,80,190,.22)" stroke="rgba(100, 116, 139,.6)" stroke-width=".7"/>`;for(let i=0;i<3;i++)r+=`<rect x="${x+2}" y="${y+2+i*3.5}" width="${RW-4}" height="2" rx=".3" fill="rgba(109,92,206,${.45-i*.08})"/>`;r+=`<circle cx="${x+RW-3}" cy="${y+RH-3}" r="1.2" fill="#C3B0FA" class="ircdu-pulse"/>`;r+=`<rect x="${x+1}" y="${y+RH-5}" width="8" height="3.5" rx=".5" fill="rgba(100, 116, 139,.25)" stroke="rgba(100, 116, 139,.5)" stroke-width=".3"/>`;r+=`<text x="${x+5}" y="${y+RH-2.5}" fill="#c4b5fd" font-family="${J}" font-size="2" text-anchor="middle">CDU</text>`;r+=`<text x="${x+RW/2}" y="${y+RH-1.5}" fill="var(--t3)" font-family="${J}" font-size="3" text-anchor="middle">${id}</text><rect x="${x}" y="${y}" width="${RW}" height="${RH}" fill="transparent" data-ircdu="${id}" style="cursor:pointer"/></g>`;return r}
 function renderHall(){
 IRCDU=new Set(IRCDU_SETS[currentDH]);
 let s='';
@@ -3420,7 +3420,7 @@ s+='<rect x="1052" y="4" width="68" height="20" rx="3" fill="rgba(59,130,246,.10
 s+=tx(1086,12,'AF / 70E','var(--b)',5,'middle',1);
 s+=tx(1086,20,'PPE Cat 2','var(--b)',3.5,'middle');
 // Earthing per IEC 60364-5-54
-s+='<rect x="1124" y="4" width="72" height="20" rx="3" fill="rgba(167,139,250,.10)" stroke="var(--p)" stroke-width=".5"/>';
+s+='<rect x="1124" y="4" width="72" height="20" rx="3" fill="rgba(195,176,250,.10)" stroke="var(--p)" stroke-width=".5"/>';
 s+=tx(1160,12,'TN-S 60364','var(--p)',5,'middle',1);
 s+=tx(1160,20,'<1\u03a9 ground','var(--p)',3.5,'middle');
 
@@ -6361,7 +6361,7 @@ s+=`<circle cx="794" cy="14" r="2.2" fill="var(--c)"><animate attributeName="opa
 s+=tx(823,13,'FREE-COOL ENG','var(--c)',4.2,'middle',1);
 s+=tx(823,19,'OAT 24.6°C / WBT 22°C','var(--c)',2.8,'middle');
 // ISA-5.1 instrument-tag prefix legend
-s+=`<rect x="866" y="6" width="84" height="16" rx="3" fill="rgba(167,139,250,.08)" stroke="var(--p)" stroke-width=".5"/>`;
+s+=`<rect x="866" y="6" width="84" height="16" rx="3" fill="rgba(195,176,250,.08)" stroke="var(--p)" stroke-width=".5"/>`;
 s+=tx(908,13,'ISA-5.1 TAGS','var(--p)',4.2,'middle',1);
 s+=tx(908,19,'TT/PT/FT/AT/BTU','var(--p)',2.8,'middle');
 // ===== OUTDOOR / DRY COOLER ARRAY SECTION =====
@@ -8133,7 +8133,7 @@ function showBasisDrawer(id){
   body+='<div><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Scope</span><div style="color:#dbe5f0;margin-top:3px;">'+b.scope+'</div></div>';
   body+='<div><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Denominator</span><div style="color:#dbe5f0;margin-top:3px;font-family:JetBrains Mono,monospace;">'+b.denominator+'</div></div>';
   body+='</div>';
-  body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Source object</span><div style="font-family:JetBrains Mono,monospace;color:#a78bfa;margin-top:3px;font-size:12px;">'+b.source+'</div></div>';
+  body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Source object</span><div style="font-family:JetBrains Mono,monospace;color:#C3B0FA;margin-top:3px;font-size:12px;">'+b.source+'</div></div>';
   body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Last update</span><div style="font-family:JetBrains Mono,monospace;color:#dbe5f0;margin-top:3px;font-size:12px;">'+nowStamp()+' (deterministic; engine snapshot does not drift)</div></div>';
   if(b.note){body+='<div style="border-left:3px solid #fbbf24;padding:8px 11px;background:rgba(245,158,11,.06);color:#fde68a;font-size:12px;line-height:1.5;">'+b.note+'</div>';}
   body+='</div>';
@@ -8281,7 +8281,7 @@ s+=`<rect width="960" height="480" fill="url(#bmsGrid)"/>`;
 s+=tx(480,16,'BMS/DCIM ARCHITECTURE — RING TOPOLOGY — REDUNDANT SERVERS','var(--t3)',8,'middle',1);
 // ===== STANDARDS HEADER STRIP — IEC 62443 / BACnet / IEC 61850 / IEEE 1588 PTP =====
 // IEC 62443 zoning (matches the L0..L4 swim-lane structure)
-s+=`<rect x="6" y="4" width="80" height="20" rx="3" fill="rgba(167,139,250,.10)" stroke="var(--p)" stroke-width=".5"/>`;
+s+=`<rect x="6" y="4" width="80" height="20" rx="3" fill="rgba(195,176,250,.10)" stroke="var(--p)" stroke-width=".5"/>`;
 s+=tx(46,12,'IEC 62443','var(--p)',5,'middle',1);
 s+=tx(46,20,'L0..L4 zones','var(--p)',3.2,'middle');
 // BACnet / Modbus / IEC 61850 protocol stack legend
@@ -8393,7 +8393,7 @@ s+=`<line x1="${px}" y1="225" x2="${px}" y2="157" stroke="var(--p)" stroke-width
 // Field-level operator touchpanels at chiller plant, e-house A/B, NOC, BMS room.
 // Sits between L1 Controller (PLC/DDC) and L3 Operations (Servers/SCADA).
 // Drawn AFTER PLC-to-Ring lines so the LDC boxes visually overlay them at the tap points.
-s+=`<rect x="10" y="163" width="940" height="32" rx="4" fill="rgba(167,139,250,.04)" stroke="rgba(167,139,250,.28)" stroke-width="1" stroke-dasharray="2 2"/>`;
+s+=`<rect x="10" y="163" width="940" height="32" rx="4" fill="rgba(195,176,250,.04)" stroke="rgba(195,176,250,.28)" stroke-width="1" stroke-dasharray="2 2"/>`;
 s+=tx(480,170,'L2 SUPERVISORY — LDC (LOCAL DISPLAY CONTROLLERS) — IEC 62443 ZONE','var(--p)',5.5,'middle',1);
 const ldcs=[
 {x:20,t:'LDC-01',s:'CHILLER PLT',c:'Schneider Magelis 12"',z:'L2'},
@@ -8404,9 +8404,9 @@ const ldcs=[
 ];
 ldcs.forEach((d,di)=>{
 s+=`<g data-tip="${d.t}: ${d.c} — Field operator touchpanel at ${d.s}. IEC 62443 Zone L2 Supervisory. Local override permitted; every action logged via OPC UA to historian. Connected to L1 controllers via Profinet/IEC 61850/BACnet.">`;
-s+=`<rect x="${d.x}" y="176" width="170" height="16" rx="2" fill="rgba(167,139,250,.10)" stroke="var(--p)" stroke-width=".7"/>`;
+s+=`<rect x="${d.x}" y="176" width="170" height="16" rx="2" fill="rgba(195,176,250,.10)" stroke="var(--p)" stroke-width=".7"/>`;
 // touchpanel screen indicator
-s+=`<rect x="${d.x+3}" y="178" width="22" height="12" rx=".5" fill="rgba(167,139,250,.22)" stroke="var(--p)" stroke-width=".3"/>`;
+s+=`<rect x="${d.x+3}" y="178" width="22" height="12" rx=".5" fill="rgba(195,176,250,.22)" stroke="var(--p)" stroke-width=".3"/>`;
 // 3 horizontal "screen lines" suggest a UI
 s+=`<line x1="${d.x+5}" y1="181" x2="${d.x+22}" y2="181" stroke="var(--p)" stroke-width=".4" opacity=".7"/>`;
 s+=`<line x1="${d.x+5}" y1="184" x2="${d.x+18}" y2="184" stroke="var(--p)" stroke-width=".4" opacity=".5"/>`;
@@ -9845,7 +9845,7 @@ var flowSec=RI(40,90),pumpSpd=RI(60,85),pumpAmps=parseFloat(R(2.5,5.0));
 var valvePos=RI(40,70),resLvl=RI(70,95),filterDP=parseFloat(R(0.1,0.4));
 var hxDuty=RI(50,90),expVol=RI(60,80),fillPump=Math.random()>0.8?'RUN':'STBY',priFlow=RI(80,130);
 var s='',pX=14,pW=W-28,CX=pX+pW/2,rE=pX+pW-12;
-var priC='var(--c)',secC='#a78bfa',retC='var(--o)',fillC='var(--c)';
+var priC='var(--c)',secC='#C3B0FA',retC='var(--o)',fillC='var(--c)';
 var CR=14,PR=16;// circle radii
 // Pipe helper: animated dashed
 function ap(x1,y1,x2,y2,c,w,rev){return '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+c+'" stroke-width="'+(w||3)+'" stroke-dasharray="8 4"><animate attributeName="stroke-dashoffset" values="0;'+(rev?'24':'-24')+'" dur="3s" repeatCount="indefinite"/></line>';}
@@ -9856,7 +9856,7 @@ function ar(x,y,c,left){var d=left?1:-1;return '<polygon points="'+(x+4*d)+','+(
 s+='<rect width="'+W+'" height="'+H+'" fill="#080a18" rx="4"/>';
 // ===== HEADER =====
 s+='<rect x="0" y="0" width="'+W+'" height="28" fill="rgba(100, 116, 139,.08)"/>';
-s+='<text x="14" y="19" fill="#a78bfa" font-family="'+F+'" font-size="13" font-weight="600">VERTIV CoolChip CDU 121 \u2014 Rack '+rackId+'</text>';
+s+='<text x="14" y="19" fill="#C3B0FA" font-family="'+F+'" font-size="13" font-weight="600">VERTIV CoolChip CDU 121 \u2014 Rack '+rackId+'</text>';
 s+='<circle cx="380" cy="14" r="5" fill="var(--g)" opacity=".8"/>';
 s+='<text x="390" y="19" fill="var(--g)" font-family="'+F+'" font-size="10">RUN</text>';
 s+='<text x="'+W/2+'" y="19" fill="var(--t2)" font-family="'+F+'" font-size="10" text-anchor="middle">In-Rack L2L CDU | 121 kW</text>';
@@ -9871,7 +9871,7 @@ s+='<text x="'+(kx+bw/2)+'" y="58" fill="'+kpis[k].c+'" font-family="'+F+'" font
 // ===== P&ID BOX =====
 var pY=68,pH=370;
 s+='<rect x="'+pX+'" y="'+pY+'" width="'+pW+'" height="'+pH+'" rx="4" fill="rgba(100, 116, 139,.03)" stroke="rgba(100, 116, 139,.25)" stroke-width=".7"/>';
-s+='<text x="'+(pX+10)+'" y="'+(pY+18)+'" fill="#a78bfa" font-family="'+F+'" font-size="11" font-weight="600">P&ID PIPING SCHEMATIC</text>';
+s+='<text x="'+(pX+10)+'" y="'+(pY+18)+'" fill="#C3B0FA" font-family="'+F+'" font-size="11" font-weight="600">P&ID PIPING SCHEMATIC</text>';
 s+='<text x="'+(pX+pW-10)+'" y="'+(pY+18)+'" fill="var(--t3)" font-family="'+F+'" font-size="8" text-anchor="end">Vertiv Doc 20000656</text>';
 // ===== SUPPLY ROW =====
 var supY=pY+110;
@@ -10061,7 +10061,7 @@ s+='<text x="'+(pX+460)+'" y="'+(lgY+10)+'" fill="var(--t3)" font-family="'+F+'"
 // ===== OPERATING PARAMETERS =====
 var opY=pY+pH+10,opW=Math.floor(pW/2)-6;
 s+='<rect x="'+pX+'" y="'+opY+'" width="'+opW+'" height="108" rx="4" fill="rgba(100, 116, 139,.04)" stroke="rgba(100, 116, 139,.25)" stroke-width=".4"/>';
-s+='<text x="'+(pX+10)+'" y="'+(opY+16)+'" fill="#a78bfa" font-family="'+F+'" font-size="11" font-weight="600">OPERATING PARAMETERS</text>';
+s+='<text x="'+(pX+10)+'" y="'+(opY+16)+'" fill="#C3B0FA" font-family="'+F+'" font-size="11" font-weight="600">OPERATING PARAMETERS</text>';
 s+='<text x="'+(pX+10)+'" y="'+(opY+32)+'" fill="'+priC+'" font-family="'+F+'" font-size="9" font-weight="600">PRIMARY CIRCUIT</text>';
 s+='<text x="'+(pX+10)+'" y="'+(opY+46)+'" fill="var(--t3)" font-family="'+F+'" font-size="8">Inlet (T1):</text>';
 s+='<text x="'+(pX+85)+'" y="'+(opY+46)+'" fill="'+priC+'" font-family="'+F+'" font-size="9" font-weight="600">'+t1.toFixed(1)+'\u00B0C</text>';
@@ -10073,9 +10073,9 @@ s+='<text x="'+(pX+10)+'" y="'+(opY+60)+'" fill="var(--t3)" font-family="'+F+'" 
 s+='<text x="'+(pX+95)+'" y="'+(opY+60)+'" fill="'+priC+'" font-family="'+F+'" font-size="9" font-weight="600">'+ps1.toFixed(1)+' bar</text>';
 s+='<text x="'+(pX+170)+'" y="'+(opY+60)+'" fill="var(--t3)" font-family="'+F+'" font-size="8">Max: 10 bar</text>';
 s+='<text x="'+(pX+270)+'" y="'+(opY+60)+'" fill="var(--t3)" font-family="'+F+'" font-size="8">Conn: 1.5" San Clamp</text>';
-s+='<text x="'+(pX+10)+'" y="'+(opY+76)+'" fill="#a78bfa" font-family="'+F+'" font-size="9" font-weight="600">SECONDARY CIRCUIT</text>';
+s+='<text x="'+(pX+10)+'" y="'+(opY+76)+'" fill="#C3B0FA" font-family="'+F+'" font-size="9" font-weight="600">SECONDARY CIRCUIT</text>';
 s+='<text x="'+(pX+10)+'" y="'+(opY+90)+'" fill="var(--t3)" font-family="'+F+'" font-size="8">Supply (T2a):</text>';
-s+='<text x="'+(pX+100)+'" y="'+(opY+90)+'" fill="#a78bfa" font-family="'+F+'" font-size="9" font-weight="600">'+t2a.toFixed(1)+'\u00B0C</text>';
+s+='<text x="'+(pX+100)+'" y="'+(opY+90)+'" fill="#C3B0FA" font-family="'+F+'" font-size="9" font-weight="600">'+t2a.toFixed(1)+'\u00B0C</text>';
 s+='<text x="'+(pX+160)+'" y="'+(opY+90)+'" fill="var(--t3)" font-family="'+F+'" font-size="8">Return (T4):</text>';
 s+='<text x="'+(pX+245)+'" y="'+(opY+90)+'" fill="var(--o)" font-family="'+F+'" font-size="9" font-weight="600">'+t4.toFixed(1)+'\u00B0C</text>';
 s+='<text x="'+(pX+300)+'" y="'+(opY+90)+'" fill="var(--t3)" font-family="'+F+'" font-size="8">Flow:</text>';
@@ -10112,7 +10112,7 @@ s+='<text x="'+(pX+pW-10)+'" y="'+(alY+52)+'" fill="var(--g)" font-family="'+F+'
 // ===== BOTTOM STATUS BAR =====
 s+='<rect x="0" y="'+(H-24)+'" width="'+W+'" height="24" fill="rgba(100, 116, 139,.06)"/>';
 s+='<text x="12" y="'+(H-8)+'" fill="var(--t3)" font-family="'+F+'" font-size="9">Rack '+rackId+' | CoolChip CDU 121 | HX '+hxDuty+'kW | Pump '+pumpSpd+'% | Sec '+flowSec+'L/m | Res '+resLvl+'%</text>';
-s+='<text x="'+(W-12)+'" y="'+(H-8)+'" fill="#a78bfa" font-family="'+F+'" font-size="9" text-anchor="end">T1:'+t1.toFixed(1)+' T2a:'+t2a.toFixed(1)+' T4:'+t4.toFixed(1)+' T5:'+t5.toFixed(1)+'\u00B0C | \u0394T '+(t4-t2a).toFixed(1)+'\u00B0C</text>';
+s+='<text x="'+(W-12)+'" y="'+(H-8)+'" fill="#C3B0FA" font-family="'+F+'" font-size="9" text-anchor="end">T1:'+t1.toFixed(1)+' T2a:'+t2a.toFixed(1)+' T4:'+t4.toFixed(1)+' T5:'+t5.toFixed(1)+'\u00B0C | \u0394T '+(t4-t2a).toFixed(1)+'\u00B0C</text>';
 el.innerHTML=s;
 }
 // Auto-refresh In-Rack CDU HMI
@@ -10993,9 +10993,9 @@ var priIn=R(12.0,14.0),priOut=R(18.0,22.0),secSup=R(35.0,37.0),secRet=R(48.0,52.
 var pumpSpd=RI(60,85),flowSec=RI(40,90),valvePos=RI(40,70),resLvl=RI(70,95),filterDP=R(0.1,0.4);
 var hxDuty=RI(50,90);
 var row=function(l,v,c){return '<div style="display:flex;justify-content:space-between;padding:1px 0"><span style="color:var(--t3)">'+l+'</span><span style="color:'+(c||'inherit')+'">'+v+'</span></div>';};
-tip.innerHTML='<div style="color:#a78bfa;font-weight:600;margin-bottom:4px">NVL36 Rack '+ircId+' <span style="color:#c4b5fd;font-size:8px;background:rgba(100, 116, 139,.2);padding:1px 5px;border-radius:3px;margin-left:4px">In-Rack CDU</span></div>'+
+tip.innerHTML='<div style="color:#C3B0FA;font-weight:600;margin-bottom:4px">NVL36 Rack '+ircId+' <span style="color:#c4b5fd;font-size:8px;background:rgba(100, 116, 139,.2);padding:1px 5px;border-radius:3px;margin-left:4px">In-Rack CDU</span></div>'+
 row('GPUs','36 B200','')+row('GPU Util',gpuU+'%','var(--g)')+row('GPU Temp',gpuT+'\u00B0C',gpuT>78?'var(--o)':'var(--g)')+row('Power',pwr+' kW','var(--o)')+
-'<div style="border-top:1px solid rgba(100, 116, 139,.2);margin:3px 0;padding-top:3px"><span style="color:#a78bfa;font-weight:600;font-size:8px">Vertiv CoolChip CDU 121</span></div>'+
+'<div style="border-top:1px solid rgba(100, 116, 139,.2);margin:3px 0;padding-top:3px"><span style="color:#C3B0FA;font-weight:600;font-size:8px">Vertiv CoolChip CDU 121</span></div>'+
 row('Primary In/Out',priIn+'/'+priOut+'\u00B0C','var(--c)')+
 row('Secondary Sup/Ret',secSup+'/'+secRet+'\u00B0C','var(--p)')+
 row('Pump VFD',pumpSpd+'%','var(--o)')+row('Sec Flow',flowSec+' L/min','var(--c)')+
@@ -11309,7 +11309,7 @@ inner.addEventListener('touchend',function(){lastDist=0},{passive:true});
 
 </script><script src="js/rz-feature-flags.js?v=2026-05-14" defer></script>
 <script src="auth.js?v=2026-08-27-contract-tab-order" defer></script>
-<script src="rz-engine.min.js?v=2026-07-27-maint" defer></script>
+<script src="rz-engine.min.js?v=2026-09-05-mint" defer></script>
 <script>
 (function(){
     /* Tier-feature gate. Replaces the legacy ROOT_ONLY hard block with the

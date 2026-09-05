@@ -131,6 +131,13 @@ gate "anti-vibecode MONITOR — hard-banned design tokens" bash -c "node tools/a
 # into the column, so the more an incident had to say the smaller it printed. Now zero.
 gate "site legibility — no unreadable SVG labels, no clipped text" node tools/audit-legibility.mjs --strict
 gate "agent harness standard — privacy and release parity" node tools/test-agent-harness-standard.mjs
+# MIN-TWIN FRESHNESS. index.html is one of two pages that load auth.min.js instead of auth.js,
+# so a stale twin means the HOMEPAGE runs old auth code while every other page runs the fixed
+# one — silently. That shipped twice: once caught by hand in v1.126.x, and again by v1.134.20,
+# where the twin still carried the Anthropic purple the same release had just removed from the
+# source. terser -c -m is byte-reproducible for every twin here, so the check is exact.
+gate "min-twin freshness — no page runs a stale minified build" node tools/audit-min-twins.mjs --strict
+
 
 # Engine-files byte-identical guard (locked since v1.32.x accuracy review)
 echo
