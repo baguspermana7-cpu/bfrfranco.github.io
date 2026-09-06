@@ -12,7 +12,12 @@ Last updated: 2026-08-30 (truthful first paint and responsive operator priority)
 
 ---
 
-## v1.136.0 GB300 basis engine — built ALONGSIDE, page not yet switched
+## v2.0.0 GB300 basis engine — page SWITCHED (was: v1.136.0 "built alongside")
+
+**Status:** `datahallAI.html` now loads the GB300 basis engine as its authority. This section was
+originally written when the engine existed only alongside the page (v1.136.0); Track A §A2b
+(2026-09-06) completed the switch and this note is updated in place rather than left describing a
+state that no longer exists.
 
 **Owner decisions (2026-09-05):** IT 300–500 MW, four halls, NVL72-class racks at 100–140 kW or
 newer; "500 MW" is RACK IT, not the total envelope; cooling basis "yang terbaik" = warm TCS,
@@ -20,11 +25,38 @@ dry-only heat rejection, so the `WUE 0.00` the cockpit already shows becomes tru
 tuned to reach a PUE ("jangan dibuat-buat").
 
 **Files.** `js/dcai-model.js` (authored leaves only, every one with a `// source:` line and an
-evidence class) + `js/dcai-engine.js` (pure; `window.DCAI_CALC.snapshot`, `meta.version 1.0.0`).
+evidence class) + `js/dcai-engine.js` (pure; `window.DCAI_CALC.snapshot`, `meta.version 1.0.0`) +
+`js/dcai-parameters.js` (generated registry twin, `window.RZ_DCAI_PARAMETERS`) are the current
+authority, loaded via `<script data-datahall-model-authority>` / `data-datahall-calc-authority` /
+`data-datahall-registry>` at pinned `?v=1.0.0`, spec version `gb300-500mw-2026-09-06`. The shared
+`js/rz-basis-drawer.js?v=2.0.0` is loaded with `data-rz-registry="RZ_DCAI_PARAMETERS"` so the AI
+page's basis drawer is the SAME component as the Conventional cockpits, not a page-local copy.
+
 The GB200 pair `js/datahall-model.js` + `js/datahall-calculations.js` is **RETIRED, FROZEN and
 STILL TESTED** — the ship gate refuses any byte change to them and `test-datahall-calc.mjs` keeps
-proving 57/57. `datahallAI.html` still loads the GB200 pair; Track A §A2b switches it. Until then
-the AI page's on-screen numbers are the OLD basis, deliberately.
+proving 57/57. `datahallAI.html` no longer loads them at runtime; they remain on disk solely as the
+tested retirement record and as the named "reference study" in the platform-comparison selector
+(`baselineImpact: NONE` — it can never move the adopted GB300 numbers).
+
+**Known open gap (tracked, not silently accepted):** the Tech Spec PDF builder
+(`buildTechSpecHtml()`) and its §3.4–3.6 worked sections (per-domain power matrix, floor-loading
+note, cable-schedule preview) have not completed their GB300 rewrite — they still use `rack-pos`
+vocabulary, and `legacyView().eq.busway` does not publish the `selectedRatingA` /
+`undersizedRatingA` fields those sections read, so Generate-Design PDF export currently throws
+`Non-finite numeric input: NaN` and aborts. The Basis-of-Design PDF builder (`buildBodPdfHtml()`)
+is fully rewritten and carries none of the retired vocabulary. See
+`standarization/ACCURACY_VALIDATION.md` Rule 5 status note for the probe evidence
+(`AI-Test-3a`, `TS-AI-1`).
+
+**LV electrical grouping (new at GB300 — 880 racks/hall will not fit a per-rack SLD).** Each
+1,922 m² hall (62 × 31 m) is laid out as **10 rows × 88 racks**. Each row is fed as **4 RPP groups
+of 22 racks** (`geometry.racks_per_row` 88, `geometry.rack_rows` 10, `geometry.racks_per_group` 22,
+`geometry.rack_groups_per_hall` 40 → RG-01..RG-40 per hall, fed A+B). One group is
+22 × 142 kW = **3.12 MW ≈ 4.7 kA at 400 V / PF 0.96** (`distribution.group_kw`,
+`distribution.group_current_a`), which a **5,000 A busway trunk** carries
+(`distribution.busway_trunk_a`, `distribution.busway_loading_pct`). This is the aggregation unit
+every diagram (SLD L6, hall mimic row strips, BoD PDF per-group table) now draws instead of a
+per-rack node — 880 per-rack edges would not fit any diagram legibly.
 
 **Basis.** `facility.racksPerHall 880` × 4 halls × `facility.rackItKw 142` → `power.rack_it_facility_mw`
 499.84 (`power.it_envelope` = `rack-only`; `power.nameplate_it_mw_label` 500 is a LABEL, never a
@@ -101,7 +133,7 @@ P&IDs, SLD, rack diagrams, engineering model, or Scenario A calculations.
 
 | Scope | Current/adopted basis | Study-only basis |
 |---|---|---|
-| DC AI/HPC | 4 halls × 3.564 MW IT; 27 logical GB200 NVL72 domains/hall in the project-specific split form; 2 physical positions/domain; 54 positions/hall; 66 kW/position; 14.256 MW facility IT | GB300 reference at 142 kW per integrated rack/domain: 27 racks/hall, 3.834 MW/hall, 15.336 MW/facility, 5.990625 kW/m² gross hall IT density. Never mutates Scenario A. |
+| DC AI/HPC | `DCAI_CALC v1.0.0` (spec `gb300-500mw-2026-09-06`): 4 halls × 880 GB300 NVL72 racks/hall = 3,520 racks; one rack IS one NVLink domain at **142 kW/rack**; rack IT 499.84 MW facility (`power.rack_it_facility_mw`, LABEL "500 MW" never a denominator), total IT 539.05 MW facility (the PUE denominator); 253,440 GPUs; PUE 1.165 design day; hall 62×31 m, 1,922 m², 65.0 kW/m² gross IT density | GB200 split-domain reference (RETIRED, frozen, `baselineImpact: NONE`): 4 halls × 3.564 MW IT; 27 logical NVL72 domains/hall, 2 physical rack positions/domain, 54 positions/hall, 66 kW/position, 14.256 MW facility IT. Kept only as a named comparison in the platform selector — it can never move the adopted GB300 numbers. |
 | DC Conventional | `CONV_CALC v2.0.0`: 4 halls × 7.500 MW = 30.000 MW current simulated IT; 43.500 MW facility at PUE 1.45; 2,000 installed positions (500/hall) | 4 halls × 10 MW IT = 40 MW planning/design capacity. It is not current load or telemetry and requires Engineer-of-Record validation. |
 
 Density means `IT load per hall / gross hall floor area`. The public field is

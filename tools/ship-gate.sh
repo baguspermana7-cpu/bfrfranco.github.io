@@ -174,7 +174,7 @@ fi
 # 8: optional accuracy probe (file:// or http://)
 case "${1:-}" in
   --probe)
-    gate "probe-accuracy-validation — 83/83 (file://)" \
+    gate "probe-accuracy-validation — 82/82 (file://)" \
       bash -c "RZ_BASE=file timeout 180 node tools/probe-accuracy-validation.mjs > /tmp/_probe.log 2>&1 || (cat /tmp/_probe.log; exit 1)"
     ;;
   --probe-http)
@@ -188,7 +188,7 @@ case "${1:-}" in
       echo "   Start one first:  python3 -m http.server 8090 --directory \$(pwd)"
       fail=$((fail+1))
     else
-      gate "probe-accuracy-validation — 83/83 (HTTP ${base})" \
+      gate "probe-accuracy-validation — 82/82 (HTTP ${base})" \
         bash -c "RZ_BASE='${base}' timeout 180 node tools/probe-accuracy-validation.mjs > /tmp/_probe.log 2>&1 || (cat /tmp/_probe.log; exit 1)"
     fi
     ;;

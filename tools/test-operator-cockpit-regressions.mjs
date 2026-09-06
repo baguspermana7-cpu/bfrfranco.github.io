@@ -506,9 +506,15 @@ try {
     });
     assert.doesNotMatch(layout.chip, /Live Telemetry/i, 'simulated page must not claim live telemetry');
     assert.match(`${layout.chip} ${layout.provenance}`, /simulated/i);
+    /* v2.0.0 — expectations are READ from the GB300 engine snapshot and formatted the way the page
+       formats them (PUE 3 dp, IT 2 dp MW, counts with thousands separators, CUE = grid x PUE),
+       never typed: a typed 1.30 sat here for a year after the basis that produced it retired. */
+    const __snap = __rzRequire(import.meta.url)(resolve('js/dcai-engine.js')).snapshot;
+    const __grp = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     assert.deepEqual(layout.kpis, {
-      dkPue: '1.30', dkWue: '0.00', dkCue: '0.90', dkIt: '14.26',
-      dkGpu: '7,776', dkDom: '108',
+      dkPue: __snap.pue.design_day.toFixed(3), dkWue: __snap.wue.l_per_kwh.toFixed(2),
+      dkCue: __snap.pue.cue_it_kg_per_kwh.toFixed(2), dkIt: __snap.power.total_it_mw.toFixed(2),
+      dkGpu: __grp(__snap.compute.gpu_facility), dkDom: __grp(__snap.compute.racks_facility),
     }, 'AI authority KPIs must never animate through plausible but false intermediate values');
     assert.equal(layout.slotInHeader, true, 'telemetry provenance must be a compact header instrument');
     assert.ok(layout.authVisual, 'cockpit auth control must be present for visual-contract validation');

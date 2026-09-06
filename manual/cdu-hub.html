@@ -27,7 +27,7 @@
 
     <!-- SEO Meta Tags -->
     <title>Liquid-Cooling CDU Toolkit — Methodology &amp; Technical Manual | ResistanceZero</title>
-    <meta name="description" content="Full engineering methodology for the Liquid-Cooling CDU Toolkit: CDU sizing formulas, selection guide basis, maintenance checklist, interactive Mini-BMS cockpit, and deep comparison — all sourced from DATAHALL_CALC, ISO 4413, ASHRAE 15, and OEM datasheets.">
+    <meta name="description" content="Full engineering methodology for the Liquid-Cooling CDU Toolkit: CDU sizing formulas, selection guide basis, maintenance checklist, interactive Mini-BMS cockpit, and deep comparison — all sourced from DCAI_CALC (GB300 basis), ISO 4413, ASHRAE 15, and OEM datasheets.">
     <meta name="ai-content-declaration" content="human-authored">
     <meta name="keywords" content="CDU sizing, coolant distribution unit, liquid cooling methodology, CDU count formula, hydronic flow, CDU pump power, N+1 redundancy, ISO 4413, ASHRAE 15, CoolChip, Asetek, data center liquid cooling">
     <meta name="author" content="Bagus Dwi Permana">
@@ -77,7 +77,7 @@
         "headline": "Liquid-Cooling CDU Toolkit — Methodology & Technical Manual",
         "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
         "publisher": { "@type": "Organization", "name": "ResistanceZero" },
-        "about": "CDU sizing methodology for AI/HPC data centers: CDU count, per-unit flow, pump power, N+1 redundancy — anchored to DATAHALL_CALC, ISO 4413, and ASHRAE 15",
+        "about": "CDU sizing methodology for AI/HPC data centers: CDU count, per-unit flow, pump power, N+1 redundancy — anchored to DCAI_CALC (GB300 basis), ISO 4413, and ASHRAE 15",
         "articleSection": "CDU & Liquid Cooling",
         "dependencies": "ISO 4413, ASHRAE 15, ASHRAE TC 9.9, OCP Thermal WG",
         "proficiencyLevel": "Expert"
@@ -91,11 +91,11 @@
         "@type": "HowTo",
         "name": "How to size Coolant Distribution Units for an AI/HPC data hall",
         "step": [
-            { "@type": "HowToStep", "name": "Determine liquid heat load", "text": "Compute liquid_heat_kW = IT_kW × liquid_capture_ratio. For an 85% liquid-capture hall, 85% of IT load is transferred to the CDU secondary loop." },
-            { "@type": "HowToStep", "name": "Select CDU unit rating", "text": "Choose a CDU model by heat-rejection capacity (kW). The DATAHALL_CALC baseline uses a 350 kW end-of-row CDU (21-worked-examples.md Ex7); Vertiv CoolChip CDU 121 = 121 kW is the per-rack class reference." },
-            { "@type": "HowToStep", "name": "Compute CDU running count", "text": "CDU_count = ceil(liquid_heat_kW / CDU_rating_kW). For liquid_heat = 12,118 kW and CDU_rating = 350 kW, count = ceil(34.62) = 35 running units." },
-            { "@type": "HowToStep", "name": "Derive per-unit flow and load", "text": "Per-CDU flow (LPM) = total_hydronic_flow_LPM / CDU_count; per-CDU load (kW) = liquid_heat_kW / CDU_count. Total flow is computed by hydronicFlowLPM(liquid_heat, rho, Cp, deltaT)." },
-            { "@type": "HowToStep", "name": "Size CDU pump power and apply N+1", "text": "CDU pump power (kW) = flow (m³/s) × head (Pa) / pump_efficiency. Provision N+1 standby capacity; the DATAHALL_CALC PUE basis assumes 120 kW CDU pump power at the 7,128 kW reference IT load." }
+            { "@type": "HowToStep", "name": "Determine liquid heat load", "text": "Compute liquid_heat_kWth = rack_IT_kWe × liquid_capture_ratio. For the adopted GB300 basis (85% liquid capture), 124,960 kW rack IT per hall × 0.85 = 106,216 kW liquid heat per hall." },
+            { "@type": "HowToStep", "name": "Select CDU unit rating", "text": "Choose a CDU model by heat-rejection capacity (kWth). The DCAI_CALC adopted basis uses a 1,000 kWth CoolIT CHx1000 row CDU; Vertiv CoolChip CDU 121 = 121 kW remains a per-rack class reference for smaller deployments." },
+            { "@type": "HowToStep", "name": "Compute CDU running count", "text": "CDU_count = ceil(liquid_heat_kWth / CDU_rating_kWth). For liquid_heat = 106,216 kW per hall and CDU_rating = 1,000 kW, count = ceil(106.216) = 107 running units per hall (428 facility-wide across 4 halls)." },
+            { "@type": "HowToStep", "name": "Derive per-unit flow and load", "text": "Per-CDU flow (m³/h) = total_hydronic_flow_m3h / CDU_count; per-CDU load (kW) = liquid_heat_kW / CDU_count. Total flow is computed by flowM3h(liquid_heat, rho, Cp, deltaT) at the adopted 40/50°C warm TCS basis." },
+            { "@type": "HowToStep", "name": "Size CDU pump power and apply standby", "text": "CDU pump power (kW) = flow (m³/s) × head (Pa) / pump_efficiency. Provision one standby unit per hall (107 duty + 1 standby = 108 installed); the DCAI_CALC facility electrical basis reports the CDW pump total at design.electrical.cdw_pumps_kwe, not a nameplate figure." }
         ]
     }
     </script>
@@ -109,12 +109,12 @@
             {
                 "@type": "Question",
                 "name": "How many CDUs does a data hall need?",
-                "acceptedAnswer": { "@type": "Answer", "text": "CDU running count = ceil(liquid_heat_kW / CDU_rating_kW). Liquid heat = IT load × liquid-capture ratio (typically 85% for direct-to-chip halls). For a 4-hall facility at Scenario B (7,128 kW/hall × 85% = 6,059 kW liquid heat) with 350 kW EoR CDUs, each hall needs ceil(6059/350) = 18 running CDUs; at the full-facility peak of 14,256 kW IT × 85% = 12,118 kW liquid heat across all halls, the facility total is ceil(12118/350) = 35 running CDUs with N+1 provision." }
+                "acceptedAnswer": { "@type": "Answer", "text": "CDU running count = ceil(liquid_heat_kW / CDU_rating_kW). Liquid heat = rack IT load × liquid-capture ratio (85% for the adopted GB300 direct-to-chip basis). For a 4-hall facility with 880 NVL72 racks/hall at 142 kW/rack (124,960 kW rack IT/hall × 0.85 = 106,216 kW liquid heat) with 1,000 kWth CoolIT CHx1000 CDUs, each hall needs ceil(106,216/1,000) = 107 running CDUs + 1 standby = 108 installed/hall; facility-wide that is 428 running + 4 standby = 432 installed." }
             },
             {
                 "@type": "Question",
                 "name": "What is the per-CDU secondary flow rate?",
-                "acceptedAnswer": { "@type": "Answer", "text": "First compute total hydronic flow: flow_LPM = liquid_heat_kW × 60 / (rho_kg/L × Cp_kJ/kgK × deltaT_K). Using DATAHALL_CALC constants (rho = 1.0 kg/L, Cp = 4.186 kJ/kgK, deltaT = 10 K), the total flow for 12,118 kW liquid heat is 17,384 LPM. Dividing by 35 CDUs gives 497 LPM per CDU. Then per-CDU load = 12,118 / 35 = 346 kW per unit." }
+                "acceptedAnswer": { "@type": "Answer", "text": "First compute total hydronic flow: flow_m3h = liquid_heat_kW × 3600 / (rho_kg/m3 × Cp_kJ/kgK × deltaT_K). Using DCAI_CALC constants (rho = 1,000 kg/m³, Cp = 4.186 kJ/kgK, deltaT = 10 K), the total flow for 106,216 kW liquid heat per hall is 9,612.3 m³/h. Dividing by 107 CDUs gives ~89.8 m³/h per CDU. Then per-CDU load = 106,216 / 107 ≈ 992.7 kW per unit (99.3% of the 1,000 kW rating)." }
             },
             {
                 "@type": "Question",
@@ -282,6 +282,30 @@
     </style>
 </head>
 <body>
+    <script src="../js/dcai-parameters.js?v=1.0.0"></script>
+    <script>
+    (function(){
+      /* v2.0.0 — this must run AFTER the DOM below has parsed, or
+         querySelectorAll('[data-dcai-param]') silently finds zero elements
+         (the script tag sits right after <body>, before any span exists) —
+         a documented silent-render-trap class of bug. DOMContentLoaded fires
+         once the whole document (including this script's own inline
+         siblings further down) has been parsed. */
+      document.addEventListener('DOMContentLoaded', function(){
+        var REG = window.RZ_DCAI_PARAMETERS && window.RZ_DCAI_PARAMETERS.parameters;
+        if (!REG) return;
+        function byId(id){ for (var i=0;i<REG.length;i++) if (REG[i].id===id) return REG[i]; return null; }
+        document.querySelectorAll('[data-dcai-param]').forEach(function(el){
+          var p = byId(el.getAttribute('data-dcai-param'));
+          if (!p || p.value == null) return;
+          var v = p.value;
+          if (typeof v === 'number' && el.hasAttribute('data-dcai-fmt-int')) v = Math.round(v).toLocaleString('en-US');
+          else if (typeof v === 'number' && el.hasAttribute('data-dcai-fmt-dp')) v = v.toFixed(Number(el.getAttribute('data-dcai-fmt-dp')));
+          el.textContent = String(v);
+        });
+      });
+    })();
+    </script>
     <nav class="navbar">
         <div class="nav-container">
             <a href="../index.html" class="nav-logo">
@@ -312,10 +336,10 @@
         <header class="mn-hero">
             <p class="mn-eyebrow">Technical Manual · CDU &amp; Liquid Cooling</p>
             <h1>Liquid-Cooling CDU Toolkit — Methodology &amp; Formulas</h1>
-            <p>Every input, equation, constant, output, and reference behind the four-resource CDU Toolkit — selection guide, maintenance checklist, interactive Mini-BMS cockpit, and deep comparison. The sizing math is anchored to <code class="mn-mono">DATAHALL_CALC.cduRunningCount()</code> and <code class="mn-mono">DATAHALL_CALC.hydronicFlowLPM()</code>, which implement the deterministic engine in <code class="mn-mono">js/datahall-calculations.js</code>. No back-solved constants, no random values.</p>
+            <p>Every input, equation, constant, output, and reference behind the four-resource CDU Toolkit — selection guide, maintenance checklist, interactive Mini-BMS cockpit, and deep comparison. The sizing math is anchored to the GB300 campus engine <code class="mn-mono">js/dcai-engine.js</code> (<code class="mn-mono">DCAI_CALC</code>) reading <code class="mn-mono">js/dcai-model.js</code> (<code class="mn-mono">DCAI_MODEL</code>). No back-solved constants, no random values.</p>
             <div class="mn-meta">
-                <span class="mn-chip">Engine <strong>DATAHALL_CALC v1.20.x</strong></span>
-                <span class="mn-chip">Basis <strong>21-worked-examples.md Ex7</strong></span>
+                <span class="mn-chip">Engine <strong>DCAI_CALC v1.0.0</strong></span>
+                <span class="mn-chip">Basis <strong>gb300-500mw-2026-09-06</strong></span>
                 <span class="mn-chip">Resources <strong>4</strong></span>
                 <span class="mn-chip">Outputs <strong>CDU count · flow · load · pump power</strong></span>
             </div>
@@ -327,7 +351,7 @@
             <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
             <p class="mn-lead">The CDU Toolkit is a four-resource set for selecting, operating, visualising, and comparing liquid-cooling Coolant Distribution Units in AI/HPC data centers. It answers four design questions: <em>which CDU topology fits a given density and infrastructure constraint</em>, <em>how many CDUs are required and what flow does each carry</em>, <em>what are the live operating parameters and fault signatures</em>, and <em>how do CDU types compare on TCO, field-failure modes, and vendor support</em>.</p>
             <p class="mn-lead">The four constituent resources are: (1) <strong>Selection &amp; Deployment Guide</strong> — a reference document with verified vendor specs, sizing math, and installation requirements; (2) <strong>Installation, Inspection &amp; Maintenance Checklist</strong> — operational parameter bands, water-quality criteria (ASHRAE TC 9.9 W-classes, OCP limits), commissioning procedure, symptom table, and PM cadences; (3) <strong>Mini-BMS Cockpit</strong> — an interactive cockpit per CDU type with animated P&amp;ID, live simulated parameters, and fault injection; (4) <strong>Deep Comparison</strong> — source-tagged comparison across field issues, BMS/DCIM integration, vendor after-sales, and TCO.</p>
-            <p class="mn-lead">The governing sizing authority is <strong>21-worked-examples.md Example 7</strong> ("If CDU = 350 kW, running count = ceil(liquid_heat / 350)"), executed by <code class="mn-mono">DATAHALL_CALC.cduRunningCount()</code> in <code class="mn-mono">js/datahall-calculations.js</code>. Supporting fluid standards are <strong>ISO 4413</strong> (hydraulic fluid power safety), <strong>ASHRAE 15</strong> (refrigeration-system containment), and <strong>ASHRAE TC 9.9</strong> (data-center liquid-cooling best practice). The Mini-BMS cockpit inherits <code class="mn-mono">DATAHALL_CALC</code> constants for Rule-1 consistency — parameter bands, N+1 logic, and pump-power figures trace to the same locked model as the datahall dashboard.</p>
+            <p class="mn-lead">The governing sizing authority is the adopted GB300 campus basis (<code class="mn-mono">data/dcai-parameters.json</code>, spec <code class="mn-mono">gb300-500mw-2026-09-06</code>): "CDU_duty = ceil(liquid_heat_kWth / 1,000)", executed by <code class="mn-mono">js/dcai-engine.js</code> (<code class="mn-mono">DCAI_CALC</code>). Supporting fluid standards are <strong>ISO 4413</strong> (hydraulic fluid power safety), <strong>ASHRAE 15</strong> (refrigeration-system containment), and <strong>ASHRAE TC 9.9</strong> (data-center liquid-cooling best practice). The Mini-BMS cockpit inherits <code class="mn-mono">DCAI_CALC</code> constants for Rule-1 consistency — parameter bands, standby logic, and pump-power figures trace to the same adopted model as the datahall dashboard.</p>
         </section>
 
         <!-- 2. INPUTS -->
@@ -340,12 +364,12 @@
             <table class="mn-table">
                 <thead><tr><th>Field</th><th>Symbol</th><th>Unit</th><th>Range / typical</th><th>Meaning</th></tr></thead>
                 <tbody>
-                    <tr><td>IT load per hall <code>itPerHall_kW</code></td><td><code>IT</code></td><td>kW</td><td>Scenario A 3 564 · B 7 128</td><td>Total IT load for the data hall, per the DATAHALL_CALC locked scenarios.</td></tr>
-                    <tr><td>Liquid capture ratio <code>liquidCaptureRatio</code></td><td><code>α</code></td><td>—</td><td>0.85 (locked)</td><td>Fraction of IT heat removed by the secondary hydronic loop. 85% from BASELINE-DECISION.md.</td></tr>
-                    <tr><td>CDU unit rating <code>cdu.ratingKW</code></td><td><code>R</code></td><td>kW</td><td>350 (EoR) · 121 (per-rack)</td><td>Heat-rejection capacity per CDU. Engine default = 350 kW end-of-row CDU (Ex7). Vertiv CoolChip 121 kW is the per-rack reference.</td></tr>
-                    <tr><td>TCS deltaT <code>tcsDeltaT_K</code></td><td><code>ΔT</code></td><td>K</td><td>10 (locked)</td><td>Secondary-loop supply/return temperature difference: 35 °C supply → 45 °C return.</td></tr>
-                    <tr><td>Water density <code>rhoKgPerL</code></td><td><code>ρ</code></td><td>kg/L</td><td>1.0</td><td>TCS loop water density (Ex6 basis). Adjust for glycol mixtures.</td></tr>
-                    <tr><td>Water specific heat <code>cpKjPerKgK</code></td><td><code>C<sub>p</sub></code></td><td>kJ/(kg·K)</td><td>4.186</td><td>TCS loop specific heat capacity (Ex6 basis).</td></tr>
+                    <tr><td>Rack IT load per hall <code>power.rack_it_hall_kwe</code></td><td><code>IT</code></td><td>kW</td><td><span data-dcai-param="power.rack_it_hall_kwe" data-dcai-fmt-int>124,960</span></td><td>Total rack IT load for the data hall (880 racks × 142 kW), per the DCAI_CALC adopted basis.</td></tr>
+                    <tr><td>Liquid capture ratio <code>heat.liquid_capture_ratio</code></td><td><code>α</code></td><td>—</td><td>0.85 (adopted)</td><td>Fraction of rack IT heat removed by the secondary hydronic loop.</td></tr>
+                    <tr><td>CDU unit rating <code>equipment.cdu_unit_kwth</code></td><td><code>R</code></td><td>kW</td><td>1,000 (CoolIT CHx1000) · 121 (per-rack)</td><td>Heat-rejection capacity per CDU. Engine default = 1,000 kWth CoolIT CHx1000 row CDU. Vertiv CoolChip 121 kW remains the per-rack class reference.</td></tr>
+                    <tr><td>TCS deltaT <code>tcsDeltaT_K</code></td><td><code>ΔT</code></td><td>K</td><td>10 (adopted)</td><td>Secondary-loop supply/return temperature difference: 40 °C supply → 50 °C return (warm, dry-only).</td></tr>
+                    <tr><td>Water density <code>rhoKgPerM3</code></td><td><code>ρ</code></td><td>kg/m³</td><td>1,000</td><td>TCS loop water density (STANDARD constant). Adjust for glycol mixtures.</td></tr>
+                    <tr><td>Water specific heat <code>cpKjPerKgK</code></td><td><code>C<sub>p</sub></code></td><td>kJ/(kg·K)</td><td>4.186</td><td>TCS loop specific heat capacity (STANDARD constant).</td></tr>
                     <tr><td>CDU pump head <code>pumpHead_Pa</code></td><td><code>H</code></td><td>Pa</td><td>250 000–500 000</td><td>Total dynamic head across the secondary loop, used in pump-power sizing.</td></tr>
                     <tr><td>Pump efficiency <code>pumpEff</code></td><td><code>η</code></td><td>—</td><td>0.70–0.80</td><td>Pump shaft efficiency. CDU VFD pumps typically 72–78%.</td></tr>
                 </tbody>
@@ -370,70 +394,72 @@
         <!-- 3. METHODOLOGY -->
         <section class="mn-section">
             <h2><span class="mn-num">03</span> Calculation methodology</h2>
-            <p class="mn-lead">Four sizing steps executed sequentially by <code class="mn-mono">DATAHALL_CALC</code>. Function names map one-to-one to <code class="mn-mono">js/datahall-calculations.js</code>. The Selection Guide and Checklist are reference/editorial documents — they state spec values and parameter bands but do not call the engine. The Mini-BMS cockpit inherits the same constants for consistency.</p>
+            <p class="mn-lead">Four sizing steps executed sequentially by <code class="mn-mono">DCAI_CALC</code>. Function names map one-to-one to <code class="mn-mono">js/dcai-engine.js</code>. The Selection Guide and Checklist are reference/editorial documents — they state spec values and parameter bands but do not call the engine. The Mini-BMS cockpit inherits the same constants for consistency.</p>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 1 — Liquid heat load</h3>
             <div class="mn-formula">
-                <span class="mn-eq">liquid_heat_kW = IT_kW × liquid_capture_ratio</span>
-                <span class="mn-where">In <code>DATAHALL_CALC.liquidHeat(itKW, captureRatio)</code>. Capture ratio is 0.85 (85%) from BASELINE-DECISION.md. Air-side residual = IT_kW × (1 − α).<span class="mn-src">DATAHALL_CALC · Ex5</span></span>
+                <span class="mn-eq">liquid_heat_kWth = rack_IT_kWe × liquid_capture_ratio</span>
+                <span class="mn-where">Capture ratio is 0.85 (85%), adopted for direct-to-chip GB300 racks. Air-side residual carries the remaining 15% of rack IT plus everything outside the rack that never enters the liquid loop.<span class="mn-src">js/dcai-engine.js compute()</span></span>
             </div>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 2 — CDU running count</h3>
             <div class="mn-formula">
-                <span class="mn-eq">CDU_count = ceil( liquid_heat_kW / CDU_rating_kW )</span>
-                <span class="mn-where">In <code>DATAHALL_CALC.cduRunningCount(liquidHeatKW, cduRatingKW)</code>. Engine default CDU_rating = 350 kW (21-worked-examples.md Ex7 "If CDU = 350 kW"). Ceiling ensures full coverage; fractional CDU is not permissible.<span class="mn-src">DATAHALL_CALC · Ex7</span></span>
+                <span class="mn-eq">CDU_duty = ceil( liquid_heat_kWth / CDU_rating_kWth )</span>
+                <span class="mn-eq">CDU_installed = CDU_duty + 1 standby</span>
+                <span class="mn-where">In <code>ceilCount(duty, unit)</code>. Engine default CDU_rating = 1,000 kWth (CoolIT CHx1000 row CDU). Ceiling ensures full coverage; fractional CDU is not permissible.<span class="mn-src">js/dcai-engine.js ceilCount() · equipment.cdu_unit_kwth</span></span>
             </div>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 3 — Total hydronic flow and per-CDU apportionment</h3>
             <div class="mn-formula">
-                <span class="mn-eq">total_flow_LPM = liquid_heat_kW × 60 / ( ρ × C<sub>p</sub> × ΔT )</span>
-                <span class="mn-eq">per_CDU_flow_LPM = total_flow_LPM / CDU_count</span>
-                <span class="mn-eq">per_CDU_load_kW = liquid_heat_kW / CDU_count</span>
-                <span class="mn-where">In <code>DATAHALL_CALC.hydronicFlowLPM(qKW, rhoKgL, cpKjKgK, deltaTK)</code>. ρ = 1.0 kg/L, C<sub>p</sub> = 4.186 kJ/(kg·K), ΔT = 10 K from the locked model. Flow divides equally across running CDUs in a balanced manifold arrangement.<span class="mn-src">DATAHALL_CALC · Ex6 + Ex7</span></span>
+                <span class="mn-eq">total_flow_m3h = liquid_heat_kWth × 3600 / ( ρ × C<sub>p</sub> × ΔT )</span>
+                <span class="mn-eq">per_CDU_flow_m3h = total_flow_m3h / CDU_duty</span>
+                <span class="mn-eq">per_CDU_load_kW = liquid_heat_kWth / CDU_duty</span>
+                <span class="mn-where">In <code>flowM3h(qKwTh, rhoKgM3, cpKjKgK, deltaTK)</code>. ρ = 1,000 kg/m³, C<sub>p</sub> = 4.186 kJ/(kg·K), ΔT = 10 K from the adopted model (warm 40/50°C TCS). Flow divides equally across running CDUs in a balanced manifold arrangement.<span class="mn-src">js/dcai-engine.js flowM3h() · design.flows.tcs_m3h</span></span>
             </div>
 
-            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 4 — CDU pump power and N+1 redundancy</h3>
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 4 — CDU pump power and standby provision</h3>
             <div class="mn-formula">
                 <span class="mn-eq">pump_power_kW = flow_m3s × head_Pa / ( pump_eff × 1000 )</span>
-                <span class="mn-eq">flow_m3s = flow_LPM / 60 000</span>
-                <span class="mn-eq">N+1_CDU_count = CDU_count + 1    (one full-capacity standby)</span>
-                <span class="mn-where">CDU pump power reference: at 7 128 kW IT load the PUE basis assumes 120 kW CDU pump power total (21-worked-examples.md Ex9 "CDU pumps = 120 kW"). Standby provision = N+1 (one standby per running group). The Mini-BMS P&amp;ID shows P-01A duty / P-01B standby with auto-changeover on pump failure (F11.2).<span class="mn-src">DATAHALL_CALC · Ex9</span></span>
+                <span class="mn-eq">flow_m3s = flow_m3h / 3600</span>
+                <span class="mn-eq">CDU_installed = CDU_duty + 1    (one standby unit per hall)</span>
+                <span class="mn-where">CDU pump power reference: the facility electrical basis publishes the CDW (condenser distribution water) pump total directly from flow × head, not a fixed reference figure — see <code>design.electrical.cdw_pumps_kwe</code> (~2,790 kW facility-wide at the design-day operating point). Standby provision is one unit per hall (107 duty + 1 standby = 108 installed/hall). The Mini-BMS P&amp;ID shows P-01A duty / P-01B standby with auto-changeover on pump failure (F11.2).<span class="mn-src">js/dcai-engine.js pumpKwe() · design.electrical.cdw_pumps_kwe</span></span>
             </div>
         </section>
 
         <!-- 4. CONSTANTS -->
         <section class="mn-section">
             <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
-            <p class="mn-lead">Every constant lives in the deep-frozen <code class="mn-mono">DATAHALL_MODEL</code> with a <code>// source:</code> tag. CDU-relevant constants:</p>
+            <p class="mn-lead">Every constant lives in the deep-frozen <code class="mn-mono">DCAI_MODEL</code> with a <code>// source:</code> tag and an evidence class. CDU-relevant constants:</p>
             <div class="mn-tablewrap">
             <table class="mn-table">
                 <thead><tr><th>Constant</th><th>Value</th><th>Source</th><th>Notes</th></tr></thead>
                 <tbody>
-                    <tr><td>CDU rating (EoR, default)</td><td><code>350 kW</code></td><td>21-worked-examples.md Ex7</td><td>End-of-row CDU sizing basis in the cduRunningCount engine call.</td></tr>
-                    <tr><td>Vertiv CoolChip CDU 121</td><td><code>121 kW</code></td><td>00-overview-audit.md Source Sanity</td><td>Per-rack class reference; noted as <code>coolChipNoteKW</code> in the model. Not the Ex7 running-count basis.</td></tr>
-                    <tr><td>Liquid capture ratio</td><td><code>0.85</code></td><td>BASELINE-DECISION.md</td><td>85% of IT heat to the secondary hydronic loop for direct-to-chip halls.</td></tr>
-                    <tr><td>TCS supply temperature</td><td><code>35 °C</code></td><td>BASELINE-DECISION.md</td><td>Secondary-loop supply to CDU cold-plate manifold.</td></tr>
-                    <tr><td>TCS return temperature</td><td><code>45 °C</code></td><td>BASELINE-DECISION.md</td><td>Return from cold plates; ΔT = 10 K across the loop.</td></tr>
-                    <tr><td>Water density (ρ)</td><td><code>1.0 kg/L</code></td><td>21-worked-examples.md Ex6</td><td>Pure water at ~35 °C. Glycol mixtures require adjustment.</td></tr>
-                    <tr><td>Water C<sub>p</sub></td><td><code>4.186 kJ/(kg·K)</code></td><td>21-worked-examples.md Ex6</td><td>Specific heat used in hydronicFlowLPM().</td></tr>
-                    <tr><td>CDU pump power (ref, at 7 128 kW IT)</td><td><code>120 kW</code></td><td>21-worked-examples.md Ex9</td><td>CDU pump total at the Scenario B reference IT load — used in PUE bottom-up basis.</td></tr>
+                    <tr><td>CDU rating (row CDU, adopted default)</td><td><code><span data-dcai-param="equipment.cdu_unit_kwth" data-dcai-fmt-int>1,000</span> kW</code></td><td>data/dcai-parameters.json equipment.cdu_unit_kwth</td><td>CoolIT CHx1000 sizing basis for the CDU duty-count engine call.</td></tr>
+                    <tr><td>Vertiv CoolChip CDU 121</td><td><code>121 kW</code></td><td>OEM datasheet, Source Sanity</td><td>Per-rack class reference for smaller in-rack deployments. Not the adopted facility-scale basis.</td></tr>
+                    <tr><td>Liquid capture ratio</td><td><code>0.85</code></td><td>data/dcai-parameters.json heat.liquid_capture_ratio</td><td>85% of rack IT heat to the secondary hydronic loop for direct-to-chip racks.</td></tr>
+                    <tr><td>TCS supply temperature</td><td><code>40 °C</code></td><td>data/dcai-parameters.json design.planes.p07_tcs_supply_c</td><td>Warm secondary-loop supply to CDU cold-plate manifold, dry-only heat rejection.</td></tr>
+                    <tr><td>TCS return temperature</td><td><code>50 °C</code></td><td>data/dcai-parameters.json design.planes.p08_tcs_return_c</td><td>Return from cold plates; ΔT = 10 K across the loop.</td></tr>
+                    <tr><td>Water density (ρ)</td><td><code>1,000 kg/m³</code></td><td>STANDARD physical constant</td><td>Pure water at the TCS operating range. Glycol mixtures require adjustment.</td></tr>
+                    <tr><td>Water C<sub>p</sub></td><td><code>4.186 kJ/(kg·K)</code></td><td>STANDARD physical constant</td><td>Specific heat used in flowM3h().</td></tr>
+                    <tr><td>CDU pump power (facility, design-day)</td><td><code>~2,790 kW</code></td><td>design.electrical.cdw_pumps_kwe</td><td>Derived from flow × head at the design-day operating point — never a fixed reference figure.</td></tr>
                     <tr><td>Secondary loop ΔP target</td><td><code>0.5–3.0 bar</code></td><td>CDU Mini-BMS operating bands · ASHRAE TC 9.9</td><td>Differential pressure across the CDU secondary manifold; alarm outside this band.</td></tr>
                     <tr><td>System pressure (secondary)</td><td><code>2–6 bar</code></td><td>CDU Mini-BMS operating bands</td><td>Secondary-loop static pressure; leak alarm if rapid drop detected.</td></tr>
-                    <tr><td>Flow rate target</td><td><code>1.0–1.5 LPM/kW</code></td><td>CDU Mini-BMS operating bands · OCP Thermal WG</td><td>Per-kW flow guidance for cold-plate DCW systems; OCP specification for HPC racks.</td></tr>
-                    <tr><td>Secondary supply temperature</td><td><code>17–45 °C</code></td><td>CDU Mini-BMS · ASHRAE TC 9.9</td><td>Acceptable secondary supply range; dew-point reset ensures &ge;dew point + 3 °C to avoid condensation.</td></tr>
+                    <tr><td>Flow rate target</td><td><code>1.0–1.5 L/min/kW</code></td><td>CDU Mini-BMS operating bands · OCP Thermal WG</td><td>Per-kW flow guidance for cold-plate DCW systems; OCP specification for HPC racks.</td></tr>
+                    <tr><td>Secondary supply temperature</td><td><code>17–50 °C</code></td><td>CDU Mini-BMS · ASHRAE TC 9.9</td><td>Acceptable secondary supply range; dew-point reset ensures &ge;dew point + 3 °C to avoid condensation.</td></tr>
                 </tbody>
             </table>
             </div>
+            <div class="mn-note"><strong>Retired basis (GB200):</strong> this toolkit's sizing methodology was originally anchored to a GB200 NVL72 split-domain basis-of-design (BASELINE-DECISION.md, locked 2026-05-17): Scenario A/B IT loads (3,564 / 7,128 kW per hall, 14,256 MW facility at Scenario A), a 350 kW end-of-row CDU rating (21-worked-examples.md Ex7), a 120 kW CDU-pump reference at the 7,128 kW Scenario B IT load (Ex9), and a nameplate chiller COP of 6.8. That basis was retired 2026-09-06 by owner decision (plan cheerful-cuddling-mitten.md) in favour of the adopted GB300 NVL72 basis documented throughout this page — 880 racks/hall at 142 kW/rack (one rack = one NVLink domain), 1,000 kWth CoolIT CHx1000 CDUs, and a Carnot-fraction-derived chiller COP. The retired files, <code class="mn-mono">js/datahall-model.js</code> and <code class="mn-mono">js/datahall-calculations.js</code>, remain on disk byte-frozen and still pass their own 57 worked-example tests (<code class="mn-mono">tools/test-datahall-calc.mjs</code>) as the retirement record — they are historical, not the current basis, and are the only place on this page where the retired figures above describe anything other than a retired reference.</div>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.25rem;">CDU OEM reference models</h3>
             <div class="mn-tablewrap">
             <table class="mn-table">
                 <thead><tr><th>OEM / Model</th><th>Capacity</th><th>Type</th><th>Source class</th></tr></thead>
                 <tbody>
-                    <tr><td>Vertiv CoolChip CDU 121</td><td>121 kW</td><td>In-rack / per-rack L2L</td><td>Source Sanity (00-overview-audit.md) — per-rack density class; <code>coolChipNoteKW</code> in DATAHALL_MODEL.</td></tr>
+                    <tr><td>Vertiv CoolChip CDU 121</td><td>121 kW</td><td>In-rack / per-rack L2L</td><td>Source Sanity — per-rack density class; <code>coolChipNoteKW</code> reference, not the adopted facility-scale default.</td></tr>
                     <tr><td>Asetek RackCDU D2C</td><td>20–100 kW</td><td>In-rack / direct-to-chip</td><td>OEM datasheet; representative per-rack class for mid-density HPC.</td></tr>
-                    <tr><td>Generic 350 kW EoR CDU</td><td>350 kW</td><td>End-of-row L2L</td><td>21-worked-examples.md Ex7 sizing basis. Represents mid-range EoR CDUs from multiple vendors (Schneider EcoBreeze variants, Liqtech, etc.).</td></tr>
-                    <tr><td>High-capacity EoR CDU</td><td>500–800 kW</td><td>End-of-row L2L</td><td>Emerging class for AI/HPC islands &gt;200 kW/rack; not the DATAHALL_CALC default.</td></tr>
+                    <tr><td>CoolIT CHx1000 (row CDU, adopted default)</td><td>1,000 kW</td><td>End-of-row / row L2L</td><td>data/dcai-parameters.json equipment.cdu_model — the adopted GB300 sizing basis.</td></tr>
+                    <tr><td>High-capacity EoR CDU</td><td>500–800 kW</td><td>End-of-row L2L</td><td>Alternative mid-range class for smaller AI/HPC islands; not the DCAI_CALC default.</td></tr>
                 </tbody>
             </table>
             </div>
@@ -449,12 +475,12 @@
             <table class="mn-table">
                 <thead><tr><th>Output</th><th>Formula / source</th><th>Unit</th><th>Interpretation</th></tr></thead>
                 <tbody>
-                    <tr><td>Liquid heat load</td><td><code>IT × 0.85</code></td><td>kW</td><td>Heat rejected to the secondary hydronic loop. Drives all downstream CDU sizing.</td></tr>
-                    <tr><td>CDU running count</td><td><code>ceil(liquid_heat / 350)</code></td><td>count</td><td>Minimum CDUs needed to cover the liquid heat load at full-capacity rating.</td></tr>
-                    <tr><td>N+1 CDU count</td><td><code>CDU_count + 1</code></td><td>count</td><td>Total CDUs provisioned including one full-capacity standby for single-failure tolerance.</td></tr>
-                    <tr><td>Total hydronic flow</td><td><code>liquid_heat × 60 / (1.0 × 4.186 × 10)</code></td><td>LPM</td><td>Secondary-loop flow required to carry the liquid heat load at 10 K ΔT.</td></tr>
-                    <tr><td>Per-CDU flow</td><td><code>total_flow / CDU_count</code></td><td>LPM</td><td>Flow each running CDU handles. Used to size manifold headers and check velocity limits.</td></tr>
-                    <tr><td>Per-CDU load</td><td><code>liquid_heat / CDU_count</code></td><td>kW</td><td>Thermal load per unit. Confirms CDU is operating within rated capacity with margin.</td></tr>
+                    <tr><td>Liquid heat load</td><td><code>rack_IT × 0.85</code></td><td>kW</td><td>Heat rejected to the secondary hydronic loop. Drives all downstream CDU sizing.</td></tr>
+                    <tr><td>CDU duty count</td><td><code>ceil(liquid_heat / 1,000)</code></td><td>count</td><td>Minimum CDUs needed to cover the liquid heat load at full-capacity rating.</td></tr>
+                    <tr><td>CDU installed count</td><td><code>CDU_duty + 1</code></td><td>count</td><td>Total CDUs provisioned including one standby unit per hall for single-failure tolerance.</td></tr>
+                    <tr><td>Total hydronic flow</td><td><code>liquid_heat × 3600 / (1,000 × 4.186 × 10)</code></td><td>m³/h</td><td>Secondary-loop flow required to carry the liquid heat load at 10 K ΔT.</td></tr>
+                    <tr><td>Per-CDU flow</td><td><code>total_flow / CDU_duty</code></td><td>m³/h</td><td>Flow each running CDU handles. Used to size manifold headers and check velocity limits.</td></tr>
+                    <tr><td>Per-CDU load</td><td><code>liquid_heat / CDU_duty</code></td><td>kW</td><td>Thermal load per unit. Confirms CDU is operating within rated capacity with margin.</td></tr>
                     <tr><td>CDU pump power (total)</td><td><code>flow_m3s × head / η / 1000</code></td><td>kW</td><td>Electrical power for CDU circulation pumps — included in the PUE basis as a distinct cooling-ancillary line.</td></tr>
                     <tr><td>Cockpit status flags</td><td>live simulation</td><td>bool / enum</td><td>Mini-BMS: N+1 healthy / N (standby lost) / FAULT; leak=0 / leak detected; chemistry in-spec / drift alarm.</td></tr>
                 </tbody>
@@ -465,48 +491,48 @@
         <!-- 6. WORKED EXAMPLE -->
         <section class="mn-section">
             <h2><span class="mn-num">06</span> Worked example</h2>
-            <p class="mn-lead">Full-facility peak: 4 halls × Scenario B IT 7 128 kW/hall = 28 512 kW total IT. Verify CDU count, per-unit flow, and per-unit load against <code class="mn-mono">DATAHALL_CALC</code>. Scenario B (IT = 7 128 kW/hall) is the reference case for the PUE bottom-up worked example (Ex9).</p>
+            <p class="mn-lead">Adopted GB300 basis: 4 halls × 880 NVL72 racks/hall × 142 kW/rack = 499,840 kW (499.84 MW) rack IT facility-wide. Verify CDU count, per-unit flow, and per-unit load against <code class="mn-mono">DCAI_CALC.snapshot</code>. Per-hall sizing is computed first, then scaled by 4 halls — this is the same order the live engine uses, and it is NOT the same as ceiling the facility total in one step (ceiling is not linearly additive).</p>
             <div class="mn-worked">
                 <ol>
-                    <li>Facility IT load: <code>4 halls × 7 128 kW =</code> <span class="mn-result">28 512 kW</span></li>
-                    <li>Liquid heat (85% capture): <code>28 512 × 0.85 =</code> <span class="mn-result">24 235 kW</span> · Air-side residual: <code>28 512 × 0.15 =</code> <span class="mn-result">4 277 kW</span></li>
-                    <li>CDU running count: <code>ceil(24 235 / 350) = ceil(69.24) =</code> <span class="mn-result">70 CDUs (facility-wide)</span></li>
-                    <li><em>Per-hall basis (Ex7 reference):</em> <code>7 128 × 0.85 = 6 059 kW</code> liquid heat per hall → <code>ceil(6 059 / 350) = ceil(17.31) =</code> <span class="mn-result">18 CDUs/hall</span> · N+1 = <span class="mn-result">19 CDUs/hall</span></li>
-                    <li>Total hydronic flow per hall: <code>6 059 × 60 / (1.0 × 4.186 × 10) =</code> <span class="mn-result">8 686 LPM</span></li>
-                    <li>Per-CDU flow: <code>8 686 / 18 =</code> <span class="mn-result">483 LPM/CDU</span></li>
-                    <li>Per-CDU load: <code>6 059 / 18 =</code> <span class="mn-result">337 kW/CDU</span> (96% of 350 kW rating — within capacity)</li>
-                    <li><em>Facility-level Scenario B alternative (single-hall perspective for Ex7):</em> liquid heat 6 059 kW → 18 running CDUs · per-CDU 483 LPM / 337 kW ✓</li>
-                    <li>CDU pump power (total, Ex9 reference at 7 128 kW IT): <span class="mn-result">120 kW</span> CDU pump ancillary contribution to PUE basis.</li>
-                    <li>Sanity check — per-CDU flow vs OCP band: <code>483 LPM / 337 kW =</code> <span class="mn-result">1.43 LPM/kW</span> → within the 1.0–1.5 LPM/kW operating band ✓</li>
+                    <li>Rack IT per hall: <code>880 × 142 =</code> <span class="mn-result">124,960 kW</span> → facility <code>× 4 =</code> <span class="mn-result">499,840 kW (499.84 MW)</span></li>
+                    <li>Liquid heat per hall (85% capture): <code>124,960 × 0.85 =</code> <span class="mn-result">106,216 kW</span> · Air-side residual (15% of rack IT plus fabric/OOB/storage/UPS-loss/dist-loss/aux): <span class="mn-result">35,509 kW</span></li>
+                    <li>CDU duty count per hall: <code>ceil(106,216 / 1,000) =</code> <span class="mn-result">107 CDUs/hall</span> + 1 standby = <span class="mn-result">108 installed/hall</span></li>
+                    <li>Facility total: <code>107 × 4 = 428 running</code> + <code>1 × 4 = 4 standby</code> = <span class="mn-result">432 installed facility-wide</span></li>
+                    <li>Total hydronic flow per hall: <code>106,216 × 3600 / (1,000 × 4.186 × 10) =</code> <span class="mn-result">9,612.3 m³/h</span> → facility <code>× 4 =</code> <span class="mn-result">38,449.2 m³/h</span></li>
+                    <li>Per-CDU flow: <code>9,612.3 / 107 =</code> <span class="mn-result">89.8 m³/h/CDU</span></li>
+                    <li>Per-CDU load: <code>106,216 / 107 =</code> <span class="mn-result">992.7 kW/CDU</span> (99.3% of 1,000 kW rating — within capacity)</li>
+                    <li>CDU pump power (facility, design-day operating point): <span class="mn-result">~2,790 kW</span> — <code>design.electrical.cdw_pumps_kwe</code>, derived from flow × head, not a fixed reference figure.</li>
+                    <li>Sanity check — per-CDU flow vs OCP band: <code>89.8 m³/h = 1,496.7 L/min; 1,496.7 / 992.7 =</code> <span class="mn-result">1.51 L/min/kW</span> → essentially at the top of the 1.0–1.5 L/min/kW operating band ✓</li>
                 </ol>
             </div>
-            <div class="mn-note"><strong>DATAHALL_CALC anchor:</strong> the Ex7 sizing example uses a 12 118 kW liquid heat figure in some expositions (IT 14 256 × 85%). Running that through the same formula: <code>ceil(12 118 / 350) = ceil(34.62) =</code> <strong>35 CDUs</strong>; total flow <code>12 118 × 60 / (1.0 × 4.186 × 10) = 17 380 LPM</code>; per-CDU flow <code>17 380 / 35 = 497 LPM</code>; per-CDU load <code>12 118 / 35 = 346 kW</code>. These are the canonical facility-Scenario-A numbers cited in the toolkit summary (Scenario A IT 3 564 kW/hall × 4 halls × 85% = 12 118 kW, 35 CDUs, 497 LPM, 346 kW per unit).</div>
+            <div class="mn-note"><strong>DCAI_CALC anchor:</strong> these are the canonical adopted-basis numbers cited throughout this toolkit (880 racks/hall × 142 kW × 0.85 = 106,216 kW liquid heat/hall, 107 CDUs/hall running, 108 installed/hall, 432 installed facility-wide, 89.8 m³/h and 992.7 kW per unit). See §04 "Retired basis" note for the retired end-of-row sizing this toolkit used before 2026-09-06.</div>
         </section>
 
         <!-- 7. REFERENCES -->
         <section class="mn-section">
             <h2><span class="mn-num">07</span> References &amp; standards</h2>
             <ul class="mn-refs">
-                <li><b>21-worked-examples.md Ex7</b> — CDU running count sizing basis: "If CDU = 350 kW, count = ceil(liquid_heat / 350)". Canonical authority for <code>cduRunningCount()</code>.</li>
-                <li><b>21-worked-examples.md Ex9</b> — PUE bottom-up basis: CDU pump power = 120 kW at 7 128 kW IT reference load. Nameplate COP 6.8 (Carrier 19DV) — not calibrated.</li>
-                <li><b>21-worked-examples.md Ex6</b> — Hydronic flow formula: ρ = 1.0 kg/L, C<sub>p</sub> = 4.186 kJ/(kg·K). Water property basis for <code>hydronicFlowLPM()</code>.</li>
-                <li><b>BASELINE-DECISION.md</b> — Locked basis of design: liquid capture ratio 0.85, TCS 35/45 °C (ΔT 10 K), Scenario A/B IT loads.</li>
-                <li><b>00-overview-audit.md (Source Sanity)</b> — Vertiv CoolChip CDU 121 = 121 kW per-rack reference; Carrier 19DV 1 231–4 044 kW chiller range.</li>
+                <li><b>data/dcai-parameters.json (spec gb300-500mw-2026-09-06)</b> — CDU duty-count sizing basis: "CDU_duty = ceil(liquid_heat_kWth / 1,000)". Canonical authority for the engine's CDU count.</li>
+                <li><b>design.electrical.cdw_pumps_kwe</b> — CDU/CDW pump power derived from flow × head at the design-day operating point, not a fixed reference figure. Chiller COP is derived from a Carnot fraction over the actual lift — never a nameplate value.</li>
+                <li><b>js/dcai-engine.js flowM3h()</b> — Hydronic flow formula: ρ = 1,000 kg/m³, C<sub>p</sub> = 4.186 kJ/(kg·K). Water property basis, unchanged physical constants from the prior engine.</li>
+                <li><b>data/dcai-parameters.json</b> — Adopted basis of design: liquid capture ratio 0.85, TCS 40/50 °C (ΔT 10 K, warm dry-only), 880 racks/hall at 142 kW/rack.</li>
+                <li><b>NVIDIA Enterprise Reference Architecture components</b> — governing hardware reference for the 142 kW/rack GB300 NVL72 basis.</li>
                 <li><b>ISO 4413:2011</b> — Hydraulic fluid-power safety: pressure-test requirements, containment, relief-valve ratings for CDU secondary circuits.</li>
                 <li><b>ASHRAE 15:2022</b> — Safety Standard for Refrigeration Systems: coolant concentration limits, leak detection requirements for refrigerant-based CDU variants.</li>
                 <li><b>ASHRAE TC 9.9 (2021)</b> — Liquid Cooling Guidelines for Datacom Equipment: W-class water quality (W1–W4 conductivity, pH, dissolved O<sub>2</sub>), secondary-loop temperature and pressure ranges, commissioning criteria.</li>
-                <li><b>OCP Thermal WG</b> — Open Compute cold-plate and connector specifications; 1.0–1.5 LPM/kW flow-rate guidance for HPC racks.</li>
+                <li><b>OCP Thermal WG</b> — Open Compute cold-plate and connector specifications; 1.0–1.5 L/min/kW flow-rate guidance for HPC racks.</li>
                 <li><b>DMTF Redfish §Thermal</b> — CDU BMS/DCIM integration schema: <code>CoolingLoop</code>, <code>CoolantConnector</code>, SNMP/RESTful telemetry. Referenced in the Mini-BMS architecture section.</li>
-                <li><b>OEM datasheets — Vertiv, Asetek, doc-21</b> — CDU heat-rejection capacities, flow/pressure envelopes, maintenance intervals. See cdu-checklist.html §07 for spare-parts references.</li>
-                <li><b>Engine source</b> — <code class="mn-mono">js/datahall-calculations.js</code> (DATAHALL_CALC) · <code class="mn-mono">js/datahall-model.js</code> (DATAHALL_MODEL, deep-frozen) · worked examples gate <code class="mn-mono">tools/test-datahall-calc.mjs</code> (57/57).</li>
+                <li><b>OEM datasheets — Vertiv, Asetek, CoolIT</b> — CDU heat-rejection capacities, flow/pressure envelopes, maintenance intervals. See cdu-checklist.html §07 for spare-parts references.</li>
+                <li><b>Engine source</b> — <code class="mn-mono">js/dcai-engine.js</code> (DCAI_CALC) · <code class="mn-mono">js/dcai-model.js</code> (DCAI_MODEL, deep-frozen) · <code class="mn-mono">js/dcai-parameters.js</code> (shared registry) · balance-identity gate <code class="mn-mono">tools/test-dcai-engine.mjs</code>.</li>
+                <li><b>js/datahall-model.js + js/datahall-calculations.js (RETIRED 2026-09-06)</b> — the byte-frozen retired-era pair, kept only as the retirement record; see §04 "Retired basis" note.</li>
             </ul>
         </section>
 
         <!-- 8. ASSUMPTIONS -->
         <section class="mn-section">
             <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
-            <p class="mn-lead">The CDU count formula assumes all CDUs are identically rated and the manifold is hydraulically balanced (equal flow share). In practice, diversity factors, partial-load derating, and manifold pressure-drop asymmetry should be modelled; consult the CDU OEM for site-specific sizing confirmation. The 350 kW CDU rating is the Ex7 basis — it is representative of end-of-row CDUs but is not a specific vendor model; actual CDU ratings must be confirmed against the chosen OEM's datasheet.</p>
-            <p class="mn-lead">The pump-power figure (120 kW at 7 128 kW IT) is the PUE-basis reference for Scenario B — it is an ancillary assumption in the bottom-up PUE model, not a design output of the CDU sizing step. Site pump power depends on actual loop head, pipe routing, and equipment arrangement. The 1.0–1.5 LPM/kW operating band from OCP applies to cold-plate direct-to-chip systems; in-row or sidecar CDUs with larger heat exchangers may accept lower per-kW flow.</p>
+            <p class="mn-lead">The CDU count formula assumes all CDUs are identically rated and the manifold is hydraulically balanced (equal flow share). In practice, diversity factors, partial-load derating, and manifold pressure-drop asymmetry should be modelled; consult the CDU OEM for site-specific sizing confirmation. The 1,000 kW CoolIT CHx1000 rating is the adopted basis — it names a real vendor model, but actual CDU ratings must still be confirmed against the chosen OEM's current datasheet at time of procurement.</p>
+            <p class="mn-lead">The CDU pump-power figure (~2,790 kW facility, design-day) is derived from flow × head at the engine's design-day operating point — it is not a fixed reference value scaled from a single worked example, and it moves with ambient across the weather year the same way the chiller COP does. Site pump power depends on actual loop head, pipe routing, and equipment arrangement. The 1.0–1.5 L/min/kW operating band from OCP applies to cold-plate direct-to-chip systems; in-row or sidecar CDUs with larger heat exchangers may accept lower per-kW flow.</p>
             <p class="mn-lead">Water-quality criteria (ASHRAE TC 9.9 W-classes) in the Checklist are acceptance thresholds, not ongoing operating targets; continuous monitoring with automatic dosing is recommended for CDU installations above 200 kW/hall. The FMECA fault codes (F11.1–F11.5) referenced by the Mini-BMS are educational mappings to <code>ai-engineering-maintenance.html</code> — they are not a substitute for a site-specific FMECA analysis. This toolkit and its methodology are an <strong>engineering education and pre-design aid</strong>; final CDU design and commissioning must be carried out by a qualified mechanical/facilities engineer to the authority having jurisdiction and in compliance with the site's cooling-infrastructure specifications.</p>
         </section>
 

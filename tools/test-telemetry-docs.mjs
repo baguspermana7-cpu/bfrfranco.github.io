@@ -16,8 +16,123 @@ const REQUIRED_STYLES = ['../css/rz-documentation-ui.css'];
 const BASELINE_REV = '2348d9ab6ebf121332c48d7b02f1c6398c232039';
 const INTENTIONAL_MANUAL_REPLACEMENTS = Object.freeze({
   datahallai: Object.freeze({
+    /* v2.0.0 — the AI manual was rewritten against the GB300 engine snapshot. Every retired
+       GB200 formula, result and source fragment maps to the fragment that replaced it; the
+       map was generated from the two files and reviewed, not typed. */
     '<li><b>NVIDIA GB200 NVL72</b> — Blackwell GPU rack-scale specification: 72 GPU + 36 Grace CPU per NVL72, direct liquid cooling, ~120–140 kW per NVL72 domain (adopted design value 132 kW).</li>':
-      'governing hardware context for the locked 72-GPU / 36-Grace-CPU, direct-liquid-cooled GB200 baseline.',
+      '<span class="mn-src">NVIDIA GB300 NVL72 spec</span>',
+    '<span class="mn-eq">IT_kW = Σ rack_kW + network_kW + storage_kW</span>':
+      '<span class="mn-eq">Total_IT_kWe = Rack_IT_kWe + fabric_kWe + OOB_kWe + storage/mgmt_kWe</span>',
+    '<span class="mn-src">doc-00 line 107 · doc-21 Ex1</span>':
+      '<span class="mn-src">NVIDIA GB300 NVL72 spec</span>',
+    '<span class="mn-eq">NVL72_kW = racksPerNVL72 × rack_kW</span>':
+      '<span class="mn-eq">1 NVL72 rack = 1 NVLink domain = 72 GPU + 36 Grace CPU + 18 NVSwitch</span>',
+    '<span class="mn-src">doc-00 line 108 · doc-21 Ex1</span>':
+      '<span class="mn-src">NVIDIA GB300 NVL72 spec</span>',
+    '<span class="mn-eq">Facility_kW = IT_kW + coolingElec_kW + upsLoss_kW + distLoss_kW + aux_kW</span>':
+      '<span class="mn-eq">Facility_kWe = Total_IT_kWe + cooling_kWe + upsLoss_kWe + distLoss_kWe + aux_kWe</span>',
+    '<span class="mn-src">doc-00 line 109</span>':
+      '<span class="mn-src">js/dcai-engine.js compute() · tools/test-dcai-engine.mjs</span>',
+    '<span class="mn-eq">PUE = Facility_kW / IT_kW</span>':
+      '<span class="mn-eq">Facility_kWe = Total_IT_kWe + cooling_kWe + upsLoss_kWe + distLoss_kWe + aux_kWe</span>',
+    '<span class="mn-src">doc-00 line 110 · doc-21 Ex9 · ISO/IEC 30134-2</span>':
+      '<span class="mn-src">js/dcai-engine.js operatingPoint() · ISO/IEC 30134-2</span>',
+    '<span class="mn-eq">Liquid_heat_kW = IT_kW × liquid_capture_ratio (0.85 for NVL72 direct liquid)</span>':
+      '<span class="mn-eq">Liquid_heat_kWth = Rack_IT_kWe × liquid_capture_ratio (0.85 direct liquid)</span>',
+    '<span class="mn-eq">Air_heat_kW = IT_kW × (1 − liquid_capture_ratio)</span>':
+      '<span class="mn-eq">Air_heat_kWth = Rack_IT_kWe × (1 − liquid_capture_ratio) + fabric + OOB + storage/mgmt + UPS-loss + dist-loss + aux</span>',
+    '<span class="mn-src">doc-00 lines 114-115 · doc-21 Ex5</span>':
+      '<span class="mn-src">js/dcai-engine.js compute() · tools/test-dcai-engine.mjs</span>',
+    '<span class="mn-eq">Flow_LPM = Q_kW × 60 / (ρ_kg/L × Cp_kJ/kg·K × ΔT_K)</span>':
+      '<span class="mn-eq">Flow_m³/h = Q_kWth × 3600 / (ρ_kg/m³ × Cp_kJ/kg·K × ΔT_K)</span>',
+    '<span class="mn-src">doc-00 line 117 · doc-21 Ex6 · BASELINE-DECISION.md</span>':
+      '<span class="mn-src">js/dcai-engine.js flowM3h() · design.flows.tcs_m3h</span>',
+    '<span class="mn-eq">CDU_running = ceil( Liquid_heat_kW / CDU_rating_kW )</span>':
+      '<span class="mn-eq">CDU_duty = ceil( Liquid_heat_kWth_per_hall / CDU_unit_kWth )</span>',
+    '<span class="mn-src">doc-21 Ex7</span>':
+      '<span class="mn-src">js/dcai-engine.js ceilCount() · equipment.cdu_installed_facility</span>',
+    '<span class="mn-eq">perCRAH_kW = Air_heat_kW / activeUnits</span>':
+      '<span class="mn-eq">perCRAH_kWth = Air_heat_kWth / CRAH_duty_units</span>',
+    '<span class="mn-eq">Flow_m3/h = Q_kW × 3600 / (ρ_kg/m³ × Cp_kJ/kg·K × ΔT_K)</span>':
+      '<span class="mn-eq">Flow_m³/h = Q_kWth × 3600 / (ρ_kg/m³ × Cp_kJ/kg·K × ΔT_K)</span>',
+    '<span class="mn-src">doc-00 line 118 · doc-21 Ex8</span>':
+      '<span class="mn-src">js/dcai-engine.js airM3s() · equipment.crah_installed_facility</span>',
+    '<span class="mn-eq">Chiller_input_kW = cooling_heat_kW / COP_nameplate</span>':
+      '<span class="mn-eq">COP = min(copMax, carnotFraction × Carnot)</span>',
+    '<span class="mn-src">doc-00 line 119 · doc-21 Ex9</span>':
+      '<span class="mn-src">js/dcai-engine.js copFromLift() · design.planes.p18_cop_air_path</span>',
+    '<span class="mn-eq">chillerInput_kW = IT_kW / COP (COP = 6.8 nameplate)</span>':
+      '<span class="mn-eq">COP = min(copMax, carnotFraction × Carnot)</span>',
+    '<span class="mn-eq">pumps_kW = 200 × (IT / 7128) (scale from Ex9 ref)</span>':
+      '<span class="mn-eq">for each weather bin: op = operatingPoint(model, bin.ambientDbC, fixed)</span>',
+    '<span class="mn-eq">fans_kW = 250 × (IT / 7128)</span>':
+      '<span class="mn-eq">for each weather bin: op = operatingPoint(model, bin.ambientDbC, fixed)</span>',
+    '<span class="mn-eq">cduPumps_kW = 120 × (IT / 7128)</span>':
+      '<span class="mn-eq">for each weather bin: op = operatingPoint(model, bin.ambientDbC, fixed)</span>',
+    '<span class="mn-eq">crahFans_kW = 80 × (IT / 7128)</span>':
+      '<span class="mn-eq">for each weather bin: op = operatingPoint(model, bin.ambientDbC, fixed)</span>',
+    '<span class="mn-eq">upsDistLoss_kW = 300 × (IT / 7128)</span>':
+      '<span class="mn-eq">for each weather bin: op = operatingPoint(model, bin.ambientDbC, fixed)</span>',
+    '<span class="mn-eq">aux_kW = 150 × (IT / 7128)</span>':
+      '<span class="mn-eq">for each weather bin: op = operatingPoint(model, bin.ambientDbC, fixed)</span>',
+    '<span class="mn-eq">nonIT_kW = chillerInput + pumps + fans + cduPumps + crahFans + upsDistLoss + aux</span>':
+      '<span class="mn-eq">Facility_kWe = Total_IT_kWe + cooling_kWe + upsLoss_kWe + distLoss_kWe + aux_kWe</span>',
+    '<span class="mn-eq">Facility_kW = IT_kW + nonIT_kW</span>':
+      '<span class="mn-eq">Facility_kWe = Total_IT_kWe + cooling_kWe + upsLoss_kWe + distLoss_kWe + aux_kWe</span>',
+    '<span class="mn-src">doc-21 Ex9 · doc-00 lines 301-308 · BASELINE-DECISION.md</span>':
+      '<span class="mn-src">js/dcai-engine.js operatingPoint() · ISO/IEC 30134-2</span>',
+    '<span class="mn-src">doc-00 lines 122-123 · doc-21 Ex3 · doc-21 Ex4</span>':
+      '<span class="mn-src">js/dcai-engine.js compute() · distribution.group_kw · distribution.busway_trunk_a</span>',
+    '<span class="mn-src">doc-21 Ex10</span>':
+      '<span class="mn-src">data/dcai-parameters.json geometry.*</span>',
+    '<span class="mn-result">54 rack positions/hall</span>':
+      '<span class="mn-result">Rack IT = 124,960 kW/hall</span>',
+    '<span class="mn-result">IT = 3,564 kW/hall</span>':
+      '<span class="mn-result">Rack IT = 124,960 kW/hall</span>',
+    '<span class="mn-result">79.2% load</span>':
+      '<span class="mn-result">79.9% UPS loading</span>',
+    '<span class="mn-result">5,357 A</span>':
+      '<span class="mn-result">4,697 A</span>',
+    '<span class="mn-result">6,300 A selected</span>':
+      '<span class="mn-result">5,000 A busway trunk</span>',
+    '<span class="mn-result">3,713 kVA</span>':
+      '<span class="mn-result">4,697 A</span>',
+    '<span class="mn-result">74.3%</span>':
+      '<span class="mn-result">5,000 A busway trunk</span>',
+    '<span class="mn-result">3,029 kW</span>':
+      '<span class="mn-result">106,216 kW/hall</span>',
+    '<span class="mn-result">535 kW</span>':
+      '<span class="mn-result">35,509 kW/hall</span>',
+    '<span class="mn-result">4,342 LPM total</span>':
+      '<span class="mn-result">9,612.3 m³/h/hall</span>',
+    '<span class="mn-result">80.4 LPM/rack</span>':
+      '<span class="mn-result">9,612.3 m³/h/hall</span>',
+    '<span class="mn-result">9 CDUs running</span>':
+      '<span class="mn-result">107 CDUs running</span>',
+    '<span class="mn-result">18.4 m³/h/CRAH</span>':
+      '<span class="mn-result">178 CRAH running/hall</span>',
+    '<span class="mn-result">1,048 kW</span>':
+      '<span class="mn-result">35,509 kW/hall</span>',
+    '<span class="mn-result">2,148 kW</span>':
+      '<span class="mn-result">1.165</span>',
+    '<span class="mn-result">1.30</span>':
+      '<span class="mn-result">1.165</span>',
+    '<span class="mn-result">2,688 m³/hall</span>':
+      '<span class="mn-result">10,571 m³/hall</span>',
+    '<li><b>BASELINE-DECISION.md (locked 2026-05-17)</b> — Single immutable source of truth for the whole cockpit: 4 halls, 27 NVL72/hall, 132 kW/NVL72 (Scenario A), 85% liquid capture, TCS 35/45 °C, PUE design band 1.12–1.25.</li>':
+      '<li><b>js/datahall-model.js + js/datahall-calculations.js (RETIRED 2026-09-06)</b> — the byte-frozen retired-era pair, kept only as the retirement record; see §02 "Retired basis" note.</li>',
+    '<li><b>21-calculation-worked-examples.md (doc-21)</b> — 10 fully-traced examples (Ex1–Ex10) that are the acceptance test cases for <code class="mn-mono">tools/test-datahall-calc.mjs</code> (57/57 assertions).</li>':
+      '<li><b>tools/test-dcai-engine.mjs</b> — balance-identity acceptance tests (IT = rack + fabric + OOB + storage/mgmt, facility = IT + non-IT, PUE = facility / IT, weather bins sum to 8,760 h, and more) run on every change to the engine.</li>',
+    '<li><b>Carrier 19DV centrifugal chiller</b> — Nameplate COP 6.8 used in doc-21 Ex9 (not calibrated to hit a target PUE).</li>':
+      '<li><b>Chiller COP methodology</b> — derived from a Carnot-fraction over the actual evaporator/condenser lift (<code class="mn-mono">copFromLift()</code>), never a vendor nameplate figure, and never calibrated to hit a target PUE.</li>',
+    '<li><b>Engine sources</b> — <code class="mn-mono">js/datahall-calculations.js</code> (DATAHALL_CALC, pure derivation engine) + <code class="mn-mono">js/datahall-model.js</code> (DATAHALL_MODEL, deep-frozen basis).</li>':
+      '<li><b>Engine sources</b> — <code class="mn-mono">js/dcai-engine.js</code> (DCAI_CALC, pure derivation engine) + <code class="mn-mono">js/dcai-model.js</code> (DCAI_MODEL, deep-frozen authored basis) + <code class="mn-mono">js/dcai-parameters.js</code> (shared registry for the basis drawer).</li>',
+    '<li><b>standarization/ACCURACY_VALIDATION.md</b> — 6 accuracy rules + 40 acceptance tests enforced by <code class="mn-mono">tools/probe-accuracy-validation.mjs</code>.</li>':
+      '<li><b>standarization/ACCURACY_VALIDATION.md</b> — 6 accuracy rules enforced by <code class="mn-mono">tools/probe-accuracy-validation.mjs</code>.</li>',
+    '<span class="mn-eq">kW = √3 × V_LL × I × PF / 1000 [3-phase real power check]</span>':
+      '<span class="mn-eq">I_A = kW × 1000 / (√3 × V_LL × PF) [required current]</span>',
+    '<li><b>00-overview-audit.md (doc-00)</b> — Core Calculation Engine definition (lines 104-125), Source Sanity References, equipment corrections (Cat 3516E ≈ 2.5–2.75 MW).</li>':
+      '<li><b>Engine sources</b> — <code class="mn-mono">js/dcai-engine.js</code> (DCAI_CALC, pure derivation engine) + <code class="mn-mono">js/dcai-model.js</code> (DCAI_MODEL, deep-frozen authored basis) + <code class="mn-mono">js/dcai-parameters.js</code> (shared registry for the basis drawer).</li>',
   }),
   'dc-conventional': Object.freeze({
     '<span class="mn-eq">Facility = IT × PUE → 1 850 × 1.45 = 2 682.5 kW</span>':

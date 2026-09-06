@@ -177,14 +177,18 @@ console.log('\n=== DC AI accuracy probes (datahallAI.html) ===');
       isOpen: dlg.getAttribute('aria-hidden') === 'false',
       hasValue: txt.includes('Value'),
       hasScope: txt.includes('Scope'),
-      hasSource: txt.includes('Source'),
+      /* pue.design_day is DERIVED with no single citation — the drawer's
+         contract for a derived quantity is "Measured inputs" (its perturbed
+         dependency list), not a "Source" row, which only renders for
+         authored/cited parameters (see js/rz-basis-drawer.js render()). */
+      hasMeasuredInputsOrSource: txt.includes('Measured inputs') || txt.includes('Source'),
       hasEvidence: /ADOPTED|DERIVED|SIMULATED|ASSUMED|UNAVAILABLE/.test(txt)
     };
   });
   assert(drawerOk?.isOpen, 'AI-Test-7a: shared basis drawer opens (aria-hidden=false) on PUE click', '');
   assert(drawerOk?.hasValue, 'AI-Test-7b: drawer shows Value', '');
   assert(drawerOk?.hasScope, 'AI-Test-7c: drawer shows Scope', '');
-  assert(drawerOk?.hasSource, 'AI-Test-7d: drawer shows Source', '');
+  assert(drawerOk?.hasMeasuredInputsOrSource, 'AI-Test-7d: drawer shows its provenance (Measured inputs for a derived value, or Source for a cited one)', '');
   assert(drawerOk?.hasEvidence, 'AI-Test-7e: drawer carries an evidence-class chip', '');
 
   await page.close();
@@ -428,7 +432,11 @@ console.log('\n=== Generate Design Tech Spec PDF probes ===');
     assert(/539|499|134,?763/.test(bodPdf), 'BoD-AI-3: PDF carries engine values (539/499 MW facility or 134,763 kW hall IT, GB300)', '');
     assert(/1\.16|1\.17/.test(bodPdf), 'BoD-AI-4: PDF carries PUE 1.165 design day (GB300)', '');
     assert(/142 kW/.test(bodPdf), 'BoD-AI-5: PDF carries 142 kW per NVL72-rack basis (GB300)', '');
-    assert(/Scenario\s*A/i.test(bodPdf), 'BoD-AI-6: PDF cites Scenario A locked', '');
+    /* v2.0.0 — buildBodPdfHtml (datahallAI.html:12531+) was fully rewritten off the GB300
+       snapshot and no longer mentions the retired "Scenario A" label anywhere (confirmed by
+       source inspection); the Tech Spec builder has not caught up yet (TS-AI-3 still expects
+       it), so this assertion is INVERTED here rather than left stale. */
+    assert(!/Scenario\s*A/i.test(bodPdf), 'BoD-AI-6: PDF no longer cites the retired "Scenario A" label (GB300 rewrite complete for the BoD PDF)', '');
     assert(/Carnot/i.test(bodPdf) && /COP/.test(bodPdf),
       'BoD-AI-7: PDF cites chiller COP printed WITH its Carnot-fraction derivation, never a bare nameplate figure', '');
   }

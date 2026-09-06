@@ -29,7 +29,7 @@
     <title>AI/HPC Data Hall — NVL72 Cockpit — Technical Manual &amp; Methodology | ResistanceZero</title>
     <meta name="description" content="Engineering manual for the AI Data Hall NVL72 cockpit: locked power and cooling formulas, telemetry controls, alarm quality, worked examples, and standards.">
     <meta name="ai-content-declaration" content="human-authored">
-    <meta name="keywords" content="GB200 NVL72, AI data hall, direct liquid cooling, PUE methodology, hydronic flow, CDU sizing, ASHRAE, ISO IEC 30134, data hall cockpit, NVIDIA Blackwell">
+    <meta name="keywords" content="GB300 NVL72, AI data hall, direct liquid cooling, PUE methodology, hydronic flow, CDU sizing, ASHRAE, ISO IEC 30134, data hall cockpit, NVIDIA Blackwell">
     <meta name="author" content="Bagus Dwi Permana">
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
     <meta name="theme-color" content="#0b0f14">
@@ -41,7 +41,7 @@
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://resistancezero.com/manual/datahallai.html">
     <meta property="og:title" content="AI/HPC Data Hall — NVL72 Cockpit — Technical Manual &amp; Methodology">
-    <meta property="og:description" content="GB200 NVL72 basis-of-design, direct liquid cooling formulas, PUE derivation, hydronic flow, CDU sizing, and 10 worked examples behind the AI Data Hall Cockpit.">
+    <meta property="og:description" content="GB300 NVL72 basis-of-design, direct liquid cooling formulas, PUE derivation, hydronic flow, CDU sizing, and 10 worked examples behind the AI Data Hall Cockpit.">
     <meta property="og:image" content="https://resistancezero.com/assets/profile-photo.jpg">
     <meta property="og:image:alt" content="AI Data Hall NVL72 Cockpit Methodology">
     <meta property="og:locale" content="en_US">
@@ -51,7 +51,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@BagusDPermana">
     <meta name="twitter:title" content="AI/HPC Data Hall — NVL72 Cockpit — Technical Manual">
-    <meta name="twitter:description" content="GB200 NVL72 basis-of-design, direct liquid cooling, PUE derivation, hydronic flow, CDU sizing, and worked examples.">
+    <meta name="twitter:description" content="GB300 NVL72 basis-of-design, direct liquid cooling, PUE derivation, hydronic flow, CDU sizing, and worked examples.">
     <meta name="twitter:image" content="https://resistancezero.com/assets/profile-photo.jpg">
     <meta name="twitter:image:alt" content="AI Data Hall NVL72 Cockpit Methodology">
 
@@ -77,9 +77,9 @@
         "headline": "AI/HPC Data Hall — NVL72 Cockpit — Technical Manual & Methodology",
         "author": { "@type": "Person", "name": "Bagus Dwi Permana" },
         "publisher": { "@type": "Organization", "name": "ResistanceZero" },
-        "about": "GB200 NVL72 AI data hall engineering methodology: direct liquid cooling, PUE derivation, hydronic flow, and CDU sizing for mission-critical HPC infrastructure",
+        "about": "GB300 NVL72 AI data hall engineering methodology: direct liquid cooling, PUE derivation, hydronic flow, and CDU sizing for mission-critical HPC infrastructure",
         "articleSection": "Data Center Engineering",
-        "dependencies": "NVIDIA GB200 NVL72 spec, ASHRAE A1/A2, ISO/IEC 30134-2, ISO/IEC 30134-8, BASELINE-DECISION.md",
+        "dependencies": "NVIDIA GB300 NVL72 spec, ASHRAE A2, ISO/IEC 30134-2, ISO/IEC 30134-8, data/dcai-parameters.json (spec gb300-500mw-2026-09-06)",
         "proficiencyLevel": "Expert"
     }
     </script>
@@ -89,13 +89,13 @@
     {
         "@context": "https://schema.org",
         "@type": "HowTo",
-        "name": "How to derive AI data hall power and cooling from GB200 NVL72 basis",
+        "name": "How to derive AI data hall power and cooling from the adopted GB300 NVL72 basis",
         "step": [
-            { "@type": "HowToStep", "name": "Establish the locked basis", "text": "Start from the BASELINE-DECISION.md: 4 halls, 27 NVL72 domains/hall, 132 kW per NVL72 (not per rack), 85% liquid capture, TCS 35/45 C, ΔT 10 K." },
-            { "@type": "HowToStep", "name": "Derive IT load", "text": "IT_load = Σ rack_kW + network_kW + storage_kW. For Scenario A: 27 × 132 = 3,564 kW per hall." },
-            { "@type": "HowToStep", "name": "Split cooling to liquid and air", "text": "Liquid heat = IT × 0.85; Air heat = IT × 0.15. For Scenario A: 3,029 kW liquid, 535 kW air." },
-            { "@type": "HowToStep", "name": "Size hydronic flow and CDU count", "text": "Flow_LPM = Q_kW × 60 / (ρ × Cp × ΔT). CDU_count = ceil(liquid_kW / 350). For Scenario A: 4,342 LPM total, 9 CDUs running." },
-            { "@type": "HowToStep", "name": "Derive PUE bottom-up", "text": "Chiller input = cooling_heat / COP (nameplate 6.8). Add ancillaries. PUE = Facility_kW / IT_kW. The nameplate COP is never back-solved." }
+            { "@type": "HowToStep", "name": "Establish the adopted basis", "text": "Start from data/dcai-parameters.json (spec gb300-500mw-2026-09-06): 4 halls, 880 NVL72 racks per hall — one rack IS one NVLink domain, there is no split-domain footprint — 142 kW per rack, 85% liquid capture, TCS 40/50 C warm supply/return, dry-only heat rejection." },
+            { "@type": "HowToStep", "name": "Derive IT load", "text": "Rack_IT_kW = racks_per_hall x rack_kW. For the adopted basis: 880 x 142 = 124,960 kW rack IT per hall (499.84 MW facility). Total IT (rack + fabric switches + OOB + storage/mgmt, the PUE denominator) = 134,763.2 kW per hall (539.05 MW facility)." },
+            { "@type": "HowToStep", "name": "Split cooling to liquid and air", "text": "Liquid heat = rack_IT x 0.85. Air heat = rack_IT x 0.15 plus fabric/OOB/storage electrical load plus UPS, distribution and auxiliary losses. For the adopted basis: 106,216 kW liquid and 35,509 kW air per hall." },
+            { "@type": "HowToStep", "name": "Size hydronic flow and CDU count", "text": "CDU_count = ceil(liquid_heat_kW / CDU_unit_kWth) + standby. For the adopted basis: 107 CoolIT CHx1000 (1,000 kWth each) running per hall + 1 standby = 108 installed per hall, 432 installed facility-wide." },
+            { "@type": "HowToStep", "name": "Derive PUE bottom-up", "text": "Chiller electrical input is derived from a Carnot-fraction COP over the actual evaporator/condenser temperature lift, not a nameplate figure. PUE = Facility_kW / Total_IT_kW. Design-day PUE is 1.165, annual bin-weighted 1.158, worst-bin (36 C ambient) 1.250, against a 1.12 target — the gap is reported, never closed by tuning the COP." }
         ]
     }
     </script>
@@ -108,18 +108,18 @@
         "mainEntity": [
             {
                 "@type": "Question",
-                "name": "What is the locked Scenario A IT load per hall?",
-                "acceptedAnswer": { "@type": "Answer", "text": "Scenario A (locked): 27 NVL72 domains × 132 kW per NVL72 = 3,564 kW per hall. The 132 kW is per NVL72 pair (2 physical rack positions at 66 kW each), NOT per individual rack. Scenario B (variant) treats 132 kW as per physical rack → 7,128 kW per hall, which makes the 4,500 kW UPS impossible." }
+                "name": "What is the adopted GB300 IT load per hall?",
+                "acceptedAnswer": { "@type": "Answer", "text": "Adopted GB300 basis: 880 NVL72 racks per hall x 142 kW per rack = 124,960 kW rack IT per hall (499.84 MW facility rack IT). One rack IS one NVLink domain at GB300 — there is no split-domain footprint. Total IT including fabric switches, OOB and storage/mgmt electrical load is 134,763.2 kW per hall (539.05 MW facility) — this total-IT figure, not the rack-only figure, is the PUE denominator." }
             },
             {
                 "@type": "Question",
-                "name": "Why is the PUE 1.30 and not 1.08?",
-                "acceptedAnswer": { "@type": "Answer", "text": "The PUE is derived bottom-up from the nameplate COP 6.8 of the Carrier 19DV chiller plus real ancillary loads (pumps, fans, CDU pumps, CRAH fans, UPS/distribution loss, aux). For Scenario B IT 7,128 kW: chiller input 1,048 + ancillaries 1,100 = non-IT 2,148 kW → PUE = (7,128 + 2,148)/7,128 = 1.30. A target PUE ≤ 1.12 is a design aspiration, not a derived operational value." }
+                "name": "Why is the PUE 1.165 and not lower?",
+                "acceptedAnswer": { "@type": "Answer", "text": "The PUE is derived bottom-up: chiller electrical input comes from a Carnot-fraction COP over the actual evaporator/condenser lift (never a nameplate figure), plus measured pump, fan, UPS-loss, distribution-loss and auxiliary terms. At the design-day ambient the largest non-IT term is the chillers (~25,811 kWe facility, ~29% of non-IT). Facility load / Total IT = 628,087 / 539,053 = PUE 1.165 design-day (1.158 annual bin-weighted, 1.250 at the 36 C worst bin). The 1.12 target is a design aspiration; the engine reports the +0.045 gap rather than closing it." }
             },
             {
                 "@type": "Question",
-                "name": "How is hydronic TCS flow calculated?",
-                "acceptedAnswer": { "@type": "Answer", "text": "Flow_LPM = Q_kW × 60 / (ρ × Cp × ΔT) where ρ = 1.0 kg/L, Cp = 4.186 kJ/kg·K, ΔT = 10 K. For Scenario A liquid heat 3,029 kW: 3,029 × 60 / (1.0 × 4.186 × 10) = 4,342 LPM total; 4,342 / 54 racks = 80.4 LPM per rack position." }
+                "name": "How is CDU count sized at GB300?",
+                "acceptedAnswer": { "@type": "Answer", "text": "CDU_running = ceil(liquid_heat_kW_per_hall / CDU_unit_kWth). Liquid heat per hall = 124,960 kW rack IT x 0.85 = 106,216 kW. CoolIT CHx1000 units are rated 1,000 kWth each, so 107 run per hall + 1 standby = 108 installed per hall, x 4 halls = 432 installed facility-wide." }
             }
         ]
     }
@@ -285,6 +285,30 @@
     <script src="../js/rz-documentation-ui.js?v=1.129.0" defer></script>
 </head>
 <body>
+    <script src="../js/dcai-parameters.js?v=1.0.0"></script>
+    <script>
+    (function(){
+      /* v2.0.0 — this must run AFTER the DOM below has parsed, or
+         querySelectorAll('[data-dcai-param]') silently finds zero elements
+         (the script tag sits right after <body>, before any span exists) —
+         a documented silent-render-trap class of bug. DOMContentLoaded fires
+         once the whole document (including this script's own inline
+         siblings further down) has been parsed. */
+      document.addEventListener('DOMContentLoaded', function(){
+        var REG = window.RZ_DCAI_PARAMETERS && window.RZ_DCAI_PARAMETERS.parameters;
+        if (!REG) return;
+        function byId(id){ for (var i=0;i<REG.length;i++) if (REG[i].id===id) return REG[i]; return null; }
+        document.querySelectorAll('[data-dcai-param]').forEach(function(el){
+          var p = byId(el.getAttribute('data-dcai-param'));
+          if (!p || p.value == null) return;
+          var v = p.value;
+          if (typeof v === 'number' && el.hasAttribute('data-dcai-fmt-int')) v = Math.round(v).toLocaleString('en-US');
+          else if (typeof v === 'number' && el.hasAttribute('data-dcai-fmt-dp')) v = v.toFixed(Number(el.getAttribute('data-dcai-fmt-dp')));
+          el.textContent = String(v);
+        });
+      });
+    })();
+    </script>
     <nav class="navbar">
         <div class="nav-container">
             <a href="../index.html" class="nav-logo">
@@ -315,13 +339,13 @@
         <header class="mn-hero">
             <p class="mn-eyebrow">Technical Manual · Cockpit Basis</p>
             <h1>AI/HPC Data Hall — NVL72 Cockpit — Methodology &amp; Formulas</h1>
-            <p>Every input, equation, constant, output, and reference behind the GB200 NVL72 AI Data Hall Cockpit. All math is anchored to the locked Scenario A basis-of-design and executed by the deterministic engine <code class="mn-mono">js/datahall-calculations.js</code> (<code class="mn-mono">DATAHALL_CALC</code>) against the deep-frozen model in <code class="mn-mono">js/datahall-model.js</code> (<code class="mn-mono">DATAHALL_MODEL</code>) — no <code class="mn-mono">Math.random()</code> on basis KPIs, no back-solved constants, no per-tab divergence.</p>
+            <p>Every input, equation, constant, output, and reference behind the GB300 NVL72 AI Data Hall Cockpit. All math is anchored to the adopted GB300 campus basis-of-design and executed by the deterministic engine <code class="mn-mono">js/dcai-engine.js</code> (<code class="mn-mono">DCAI_CALC</code>) against the authored leaf model in <code class="mn-mono">js/dcai-model.js</code> (<code class="mn-mono">DCAI_MODEL</code>) and published through the shared registry <code class="mn-mono">js/dcai-parameters.js</code> — no <code class="mn-mono">Math.random()</code> on basis KPIs, no back-solved COP, no per-tab divergence.</p>
             <div class="mn-meta">
-                <span class="mn-chip">Engine <strong>DATAHALL_CALC v1.0</strong></span>
-                <span class="mn-chip">Basis <strong>BASELINE-DECISION.md (locked 2026-05-17)</strong></span>
-                <span class="mn-chip">Scenario <strong>A (132 kW / NVL72)</strong></span>
-                <span class="mn-chip">Inputs <strong>LOCKED + tab selection</strong></span>
-                <span class="mn-chip">Worked examples <strong>10 (doc-21)</strong></span>
+                <span class="mn-chip">Engine <strong>DCAI_CALC v1.0.0</strong></span>
+                <span class="mn-chip">Basis <strong>gb300-500mw-2026-09-06 (adopted 2026-09-06)</strong></span>
+                <span class="mn-chip">Rack <strong>142 kW / NVL72 rack</strong></span>
+                <span class="mn-chip">Inputs <strong>ADOPTED + tab selection</strong></span>
+                <span class="mn-chip">Worked examples <strong>10</strong></span>
             </div>
             <a class="mn-toollink" href="../datahallAI.html">&#9654; Open the AI Data Hall Cockpit</a>
         </header>
@@ -331,7 +355,7 @@
             <ol>
                 <li><a class="mn-inline" href="#purpose">Purpose &amp; engineering basis</a></li>
                 <li><a class="mn-inline" href="#inputs">Inputs — locked basis and selection</a></li>
-                <li><a class="mn-inline" href="#DATAHALL_CALC">Calculation methodology</a></li>
+                <li><a class="mn-inline" href="#DCAI_CALC">Calculation methodology</a></li>
                 <li><a class="mn-inline" href="#constants">Constants &amp; data sources</a></li>
                 <li><a class="mn-inline" href="#outputs">Outputs</a></li>
                 <li><a class="mn-inline" href="#worked-example">Worked example</a></li>
@@ -346,171 +370,169 @@
         <!-- 1. PURPOSE -->
         <section class="mn-section" id="purpose">
             <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
-            <p class="mn-lead">The AI Data Hall Cockpit is a deterministic digital-twin dashboard for a GB200 NVL72 HPC facility operating direct liquid cooling. It answers five engineering questions: <em>what is the IT load per hall and per facility</em>, <em>how is heat split between liquid and air paths</em>, <em>what hydronic flow and how many CDUs are required</em>, <em>what is the honest bottom-up PUE</em>, and <em>what does the electrical distribution look like under the locked load</em>.</p>
-            <p class="mn-lead">Basis of design is <strong>locked</strong>: the <code class="mn-mono">DATAHALL_MODEL</code> object is deep-frozen at page load. No tab can mutate it. Every KPI on every tab reads from the same <code class="mn-mono">DATAHALL_CALC.lockedState()</code> and <code class="mn-mono">DATAHALL_CALC.pueBasis()</code> call — Rule 1 (one source of truth) of <code class="mn-mono">standarization/ACCURACY_VALIDATION.md</code>. The governing hardware reference is the <strong>NVIDIA GB200 NVL72</strong> specification; thermal and facility methodology follows <strong>ASHRAE A2</strong> and <strong>ISO/IEC 30134-2</strong> (PUE) and <strong>ISO/IEC 30134-8</strong> (CUE<sub>IT</sub>).</p>
+            <p class="mn-lead">The AI Data Hall Cockpit is a deterministic digital-twin dashboard for a GB300 NVL72 HPC campus operating direct liquid cooling. It answers five engineering questions: <em>what is the IT load per hall and per facility</em>, <em>how is heat split between liquid and air paths</em>, <em>what hydronic flow and how many CDUs are required</em>, <em>what is the honest bottom-up PUE across the year</em>, and <em>what does the electrical distribution look like under the adopted load</em>.</p>
+            <p class="mn-lead">Basis of design is <strong>adopted, not locked-and-forgotten</strong>: the <code class="mn-mono">DCAI_MODEL</code> object holds authored leaves only — every number carries a <code class="mn-mono">// source:</code> line and an evidence class — and is deep-frozen at page load; no tab can mutate it. Every KPI on every tab reads from the same <code class="mn-mono">DCAI_CALC.snapshot</code> — Rule 1 (one source of truth) of <code class="mn-mono">standarization/ACCURACY_VALIDATION.md</code>. The governing hardware reference is the <strong>NVIDIA GB300 NVL72</strong> specification (one rack = one 72-GPU NVLink domain, 142 kW/rack); thermal and facility methodology follows <strong>ASHRAE A2</strong> and <strong>ISO/IEC 30134-2</strong> (PUE) and <strong>ISO/IEC 30134-8</strong> (CUE<sub>IT</sub>).</p>
         </section>
 
         <!-- 2. INPUTS / LOCKED BASIS -->
         <section class="mn-section" id="inputs">
-            <h2><span class="mn-num">02</span> Inputs — LOCKED basis + tab selection</h2>
-            <p class="mn-lead">The primary input block is the immutable <code class="mn-mono">DATAHALL_MODEL</code> (Scenario A, locked 2026-05-17). Tab-selection controls (scenario toggle, view mode) change which derived quantities are <em>displayed</em> but do not alter the underlying constants. All values below are from <code class="mn-mono">BASELINE-DECISION.md</code> and verified in doc-21 worked examples.</p>
+            <h2><span class="mn-num">02</span> Inputs — ADOPTED basis + tab selection</h2>
+            <p class="mn-lead">The primary input block is the deep-frozen <code class="mn-mono">DCAI_MODEL</code> — authored leaves only, spec <code class="mn-mono">gb300-500mw-2026-09-06</code>, adopted 2026-09-06. Tab-selection controls (view mode, hall selection) change which derived quantities are <em>displayed</em> but do not alter the underlying constants. All values below are published in <code class="mn-mono">data/dcai-parameters.json</code> and verified by <code class="mn-mono">tools/test-dcai-engine.mjs</code>.</p>
             <div class="mn-tablewrap">
             <table class="mn-table">
-                <thead><tr><th>Parameter</th><th>Symbol</th><th>Value (Scenario A)</th><th>Source</th></tr></thead>
+                <thead><tr><th>Parameter</th><th>Symbol</th><th>Value (adopted GB300)</th><th>Source</th></tr></thead>
                 <tbody>
-                    <tr><td>Facility data halls</td><td><code>halls</code></td><td>4</td><td>BASELINE-DECISION.md</td></tr>
-                    <tr><td>NVL72 domains per hall</td><td><code>nvl72PerHall</code></td><td>27</td><td>BASELINE-DECISION.md</td></tr>
-                    <tr><td>Physical rack positions per NVL72</td><td><code>racksPerNVL72</code></td><td>2</td><td>doc-21 Ex1 "1 NVL72 = 2 rack concept"</td></tr>
-                    <tr><td>Physical rack positions per hall</td><td><code>racksPerHall</code></td><td>54</td><td>27 × 2</td></tr>
-                    <tr><td>GPU per NVL72 / CPU per NVL72</td><td><code>gpuPerNVL72 / cpuPerNVL72</code></td><td>72 / 36</td><td>NVIDIA GB200 NVL72 spec</td></tr>
-                    <tr><td>IT load per NVL72 pair (LOCKED)</td><td><code>kwPerNVL72</code></td><td><strong>132 kW</strong></td><td>BASELINE-DECISION.md "Adopted load — 132 kW per NVL72 (NOT per rack)"</td></tr>
-                    <tr><td>IT load per physical rack position</td><td><code>kwPerRack</code></td><td>66 kW</td><td>132 / 2 — doc-21 Ex1</td></tr>
-                    <tr><td>IT load per hall (Scenario A)</td><td><code>itPerHall_kW</code></td><td>3,564 kW</td><td>27 × 132 — doc-21 Ex1</td></tr>
-                    <tr><td>IT load per facility (Scenario A)</td><td><code>itPerFacility_kW</code></td><td>14,256 kW</td><td>3,564 × 4</td></tr>
-                    <tr><td>Liquid capture ratio</td><td><code>liquidCaptureRatio</code></td><td>0.85</td><td>BASELINE-DECISION.md "Liquid capture 85%"</td></tr>
-                    <tr><td>TCS supply / return</td><td><code>tcsSupplyC / tcsReturnC</code></td><td>35 / 45 °C</td><td>BASELINE-DECISION.md "35 / 45 °C (ΔT 10 K)"</td></tr>
-                    <tr><td>TCS delta-T</td><td><code>tcsDeltaT_K</code></td><td>10 K</td><td>BASELINE-DECISION.md</td></tr>
-                    <tr><td>Water density</td><td><code>rhoKgPerL</code></td><td>1.0 kg/L</td><td>doc-21 Ex6</td></tr>
-                    <tr><td>Water specific heat</td><td><code>cpKjPerKgK</code></td><td>4.186 kJ/kg·K</td><td>doc-21 Ex6</td></tr>
-                    <tr><td>LV voltage (line-line)</td><td><code>voltageLL</code></td><td>400 V</td><td>doc-21 Ex3</td></tr>
-                    <tr><td>Power factor</td><td><code>powerFactor</code></td><td>0.96</td><td>doc-21 Ex3</td></tr>
-                    <tr><td>CDU rating</td><td><code>cdu.ratingKW</code></td><td>350 kW (EoR)</td><td>doc-21 Ex7</td></tr>
-                    <tr><td>Chiller nameplate COP</td><td><code>chiller.nameplateCOP</code></td><td>6.8</td><td>doc-21 Ex9; Carrier 19DV</td></tr>
-                    <tr><td>UPS rating per feed</td><td><code>ups.ratingKW</code></td><td>4,500 kW (2N)</td><td>doc-21 Ex2</td></tr>
-                    <tr><td>Transformer rating</td><td><code>transformer.ratingMVA</code></td><td>5 MVA</td><td>doc-21 Ex4</td></tr>
-                    <tr><td>Active CRAH units</td><td><code>crah.activeUnits</code></td><td>5</td><td>doc-21 Ex8</td></tr>
-                    <tr><td>CRAH chilled-water ΔT</td><td><code>crah.chwDeltaT_K</code></td><td>5 K</td><td>doc-21 Ex8</td></tr>
-                    <tr><td>PUE design band (target)</td><td><code>pueDesignBand</code></td><td>1.12 – 1.25</td><td>BASELINE-DECISION.md</td></tr>
-                    <tr><td>Data hall geometry (L × W × H)</td><td><code>geometry</code></td><td>32 × 20 × 4.2 m</td><td>doc-21 Ex10</td></tr>
+                    <tr><td>Facility data halls</td><td><code>facility.halls</code></td><td>4</td><td>js/dcai-model.js (ADOPTED)</td></tr>
+                    <tr><td>NVL72 racks per hall</td><td><code>compute.racks_per_hall</code></td><td><span data-dcai-param="compute.racks_per_hall" data-dcai-fmt-int>880</span></td><td>data/dcai-parameters.json</td></tr>
+                    <tr><td>Racks per NVL72 domain</td><td><code>compute.racks_per_nvl72_domain</code></td><td>1</td><td>NVIDIA GB300 NVL72 spec — one rack IS one NVLink domain, no split-domain footprint any more</td></tr>
+                    <tr><td>Racks per facility</td><td><code>compute.racks_facility</code></td><td><span data-dcai-param="compute.racks_facility" data-dcai-fmt-int>3,520</span></td><td>data/dcai-parameters.json</td></tr>
+                    <tr><td>GPU per rack / CPU (Grace) per rack</td><td><code>compute.gpu_per_rack / compute.cpu_per_rack</code></td><td>72 / 36</td><td>NVIDIA GB300 NVL72 spec</td></tr>
+                    <tr><td>GPU per facility</td><td><code>compute.gpu_facility</code></td><td><span data-dcai-param="compute.gpu_facility" data-dcai-fmt-int>253,440</span></td><td>data/dcai-parameters.json</td></tr>
+                    <tr><td>NVSwitch per rack</td><td><code>compute.nvswitch_per_rack</code></td><td>18</td><td>NVIDIA GB300 NVL72 spec</td></tr>
+                    <tr><td>IT load per rack (ADOPTED)</td><td><code>power.rack_it_kw</code></td><td><strong>142 kW</strong></td><td>NVIDIA GB300 NVL72 spec (PUBLISHED)</td></tr>
+                    <tr><td>Rack IT per hall</td><td><code>power.rack_it_hall_kwe</code></td><td>124,960 kW</td><td>880 × 142</td></tr>
+                    <tr><td>Rack IT per facility</td><td><code>power.rack_it_facility_mw</code></td><td><span data-dcai-param="power.rack_it_facility_mw" data-dcai-fmt-dp="2">499.84</span> MW</td><td>124,960 × 4 / 1000</td></tr>
+                    <tr><td>Nameplate IT label</td><td><code>power.nameplate_it_mw_label</code></td><td>500 (LABEL only — never a denominator)</td><td>Owner decision, plan cheerful-cuddling-mitten.md</td></tr>
+                    <tr><td>Total IT per hall (rack + fabric + OOB + storage/mgmt)</td><td><code>power.total_it_hall_kwe</code></td><td>134,763.2 kW</td><td>data/dcai-parameters.json</td></tr>
+                    <tr><td>Total IT per facility (the PUE denominator)</td><td><code>power.total_it_mw</code></td><td><span data-dcai-param="power.total_it_mw" data-dcai-fmt-dp="2">539.05</span> MW</td><td>data/dcai-parameters.json</td></tr>
+                    <tr><td>Liquid capture ratio</td><td><code>heat.liquid_capture_ratio</code></td><td>0.85</td><td>ADOPTED, direct liquid cooling</td></tr>
+                    <tr><td>TCS supply / return</td><td><code>design.planes.p07_tcs_supply_c / p08_tcs_return_c</code></td><td>40 / 50 °C</td><td>ADOPTED — warm, dry-only heat rejection</td></tr>
+                    <tr><td>Water density</td><td><code>rhoKgPerL</code></td><td>1.0 kg/L</td><td>STANDARD physical constant</td></tr>
+                    <tr><td>Water specific heat</td><td><code>cpKjPerKgK</code></td><td>4.186 kJ/kg·K</td><td>STANDARD physical constant</td></tr>
+                    <tr><td>LV voltage (line-line)</td><td><code>distribution.voltage_ll_v</code></td><td>400 V</td><td>data/dcai-parameters.json</td></tr>
+                    <tr><td>Power factor</td><td><code>distribution.power_factor</code></td><td>0.96</td><td>data/dcai-parameters.json</td></tr>
+                    <tr><td>CDU model / unit rating</td><td><code>equipment.cdu_model / equipment.cdu_unit_kwth</code></td><td>CoolIT CHx1000, 1,000 kWth</td><td>PUBLISHED vendor rating</td></tr>
+                    <tr><td>Chiller unit / COP basis</td><td><code>equipment.chiller_unit_kwth / design.planes.p18_cop_air_path</code></td><td>4,000 kWth; COP derived from a Carnot fraction over the actual lift, air-path COP ≈ 5.50 at design (NEVER a nameplate figure)</td><td>data/dcai-parameters.json, js/dcai-engine.js copFromLift()</td></tr>
+                    <tr><td>UPS frame rating</td><td><code>equipment.ups_frame_kw</code></td><td>1,250 kW (2N)</td><td>data/dcai-parameters.json</td></tr>
+                    <tr><td>Transformer unit rating</td><td><code>equipment.transformer_unit_mva</code></td><td>2.5 MVA</td><td>data/dcai-parameters.json</td></tr>
+                    <tr><td>CRAH unit rating</td><td><code>equipment.crah_unit_kwth</code></td><td>200 kWth</td><td>data/dcai-parameters.json</td></tr>
+                    <tr><td>PUE design band (target)</td><td><code>pue.band_min / pue.band_max</code></td><td>1.12 – 1.25 (target 1.12)</td><td>data/dcai-parameters.json</td></tr>
+                    <tr><td>Data hall geometry (L × W × H)</td><td><code>geometry.hall_length_m / width_m / height_m</code></td><td>62 × 31 × 5.5 m = 1,922 m²</td><td>data/dcai-parameters.json</td></tr>
                 </tbody>
             </table>
             </div>
-            <div class="mn-note"><strong>Scenario A vs B:</strong> Scenario A (LOCKED) treats 132 kW as per NVL72 pair → 3,564 kW/hall. Scenario B (variant, NOT adopted) treats 132 kW as per physical rack → 7,128 kW/hall, which overloads the 4,500 kW 2N UPS (158% loading — impossible per doc-21 Ex2) and requires 12,000 A busway. The cockpit labels every KPI with its basis scenario and locks the derived panel to Scenario A.</div>
-            <div class="mn-note"><strong>GB300 reference study — not adopted:</strong> the platform selector may compare the locked GB200 footprint with one GB300 NVL72 rack per logical domain at the official <strong>up-to-142 kW/rack</strong> reference. With the same 27-domain planning count, that is 27 physical racks and 3,834 kW IT per hall (15.336 MW across four halls). It does not replace Scenario A, alter <code class="mn-mono">DATAHALL_MODEL</code>, or prove that the existing electrical, liquid-cooling, structural or network design can support GB300.</div>
+            <div class="mn-note"><strong>Retired basis (GB200):</strong> this page was originally built around a GB200 NVL72 split-domain basis-of-design (BASELINE-DECISION.md, locked 2026-05-17): 27 NVL72 domains per hall, 2 rack-positions per domain at 66 kW each = 132 kW per domain, 54 rack-positions per hall, 14.256 MW IT per facility (Scenario A), CDU sized at 350 kW end-of-row units, and a nameplate chiller COP of 6.8. That basis was retired 2026-09-06 by owner decision (plan cheerful-cuddling-mitten.md) in favour of the GB300 NVL72 basis documented in this section — one rack IS one NVLink domain at 142 kW/rack, with no split-domain construct at all. The retired files, <code class="mn-mono">js/datahall-model.js</code> and <code class="mn-mono">js/datahall-calculations.js</code>, remain on disk byte-frozen and still pass their own 57 worked-example tests (<code class="mn-mono">tools/test-datahall-calc.mjs</code>) as the retirement record — they are historical, not the current basis, and are the only place on this page where GB200 numbers describe anything other than a retired reference.</div>
         </section>
 
         <!-- 3. METHODOLOGY -->
-        <section class="mn-section" id="DATAHALL_CALC">
+        <section class="mn-section" id="DCAI_CALC">
             <h2><span class="mn-num">03</span> Calculation methodology</h2>
-            <p class="mn-lead">All formulas below are implemented verbatim in <code class="mn-mono">js/datahall-calculations.js</code>. Function names are in parentheses. Source lines cite <code class="mn-mono">00-overview-audit.md</code> "Core Calculation Engine" (lines 104-125) and doc-21 worked examples.</p>
+            <p class="mn-lead">All formulas below are implemented verbatim in <code class="mn-mono">js/dcai-engine.js</code>. Function names are in parentheses. Source references cite the module's own header comments and <code class="mn-mono">tools/test-dcai-engine.mjs</code>, which asserts the balance identities below on every run.</p>
 
-            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">IT load — <code>itLoad()</code></h3>
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Rack and IT load — <code>compute()</code></h3>
             <div class="mn-formula">
-                <span class="mn-eq">IT_kW = Σ rack_kW  +  network_kW  +  storage_kW</span>
-                <span class="mn-where">In <code>itLoad(rackPowerKWArray, networkKW, storageKW)</code>. For Scenario A: Σ rack_kW = 27 NVL72 × 132 kW = 3,564 kW. Network and storage additive.<span class="mn-src">doc-00 line 107 · doc-21 Ex1</span></span>
+                <span class="mn-eq">Rack_IT_kWe   = racks_per_hall × rack_it_kw</span>
+                <span class="mn-eq">Total_IT_kWe  = Rack_IT_kWe  +  fabric_kWe  +  OOB_kWe  +  storage/mgmt_kWe</span>
+                <span class="mn-where">Adopted basis: 880 × 142 = 124,960 kW rack IT per hall (499.84 MW facility). Total IT per hall adds fabric-switch, out-of-band and storage/management electrical load: 124,960 + 7,040 + 264 + 2,499.2 = 134,763.2 kW/hall (539.05 MW facility) — this total, not the rack-only figure, is the PUE denominator.<span class="mn-src">js/dcai-engine.js compute() · tools/test-dcai-engine.mjs</span></span>
             </div>
 
-            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">NVL72 power — <code>nvl72Power()</code></h3>
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Rack density — <code>racks_per_nvl72_domain</code></h3>
             <div class="mn-formula">
-                <span class="mn-eq">NVL72_kW = racksPerNVL72 × rack_kW</span>
-                <span class="mn-where">In <code>nvl72Power(nvl36RackPowerKW, racksPerNVL72)</code>. 2 × 66 kW = 132 kW per NVL72 pair.<span class="mn-src">doc-00 line 108 · doc-21 Ex1</span></span>
+                <span class="mn-eq">1 NVL72 rack  =  1 NVLink domain  =  72 GPU + 36 Grace CPU + 18 NVSwitch</span>
+                <span class="mn-where">The adopted basis retires the split-domain footprint entirely (see §02 "Retired basis" note): <code>racks_per_nvl72_domain = 1</code>. There is no "2 rack-positions per domain" arithmetic any more.<span class="mn-src">NVIDIA GB300 NVL72 spec</span></span>
             </div>
 
-            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Facility load — <code>facilityKW()</code></h3>
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Facility load — <code>compute()</code></h3>
             <div class="mn-formula">
-                <span class="mn-eq">Facility_kW = IT_kW  +  coolingElec_kW  +  upsLoss_kW  +  distLoss_kW  +  aux_kW</span>
-                <span class="mn-where">In <code>facilityKW(itKW, coolingElecKW, upsLossKW, distLossKW, auxKW)</code>. The denominator for PUE and CUE.<span class="mn-src">doc-00 line 109</span></span>
+                <span class="mn-eq">Facility_kWe = Total_IT_kWe  +  cooling_kWe  +  upsLoss_kWe  +  distLoss_kWe  +  aux_kWe</span>
+                <span class="mn-where">In <code>compute(m)</code>, published as <code>design.electrical.facility_kwe</code>. The denominator for PUE and CUE<sub>IT</sub>.<span class="mn-src">js/dcai-engine.js compute()</span></span>
             </div>
 
-            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">PUE — <code>pue()</code></h3>
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">PUE — <code>op.pue</code></h3>
             <div class="mn-formula">
-                <span class="mn-eq">PUE = Facility_kW / IT_kW</span>
-                <span class="mn-where">In <code>pue(facilityKW, itKW)</code>. ISO/IEC 30134-2 definition. The result is DERIVED (cyan chip), not the TARGET (1.12–1.25 band from BASELINE). Rule 4: marketing target ≠ derived value.<span class="mn-src">doc-00 line 110 · doc-21 Ex9 · ISO/IEC 30134-2</span></span>
+                <span class="mn-eq">PUE = Facility_kWe / Total_IT_kWe</span>
+                <span class="mn-where">Computed once per weather bin inside <code>operatingPoint()</code>. ISO/IEC 30134-2 definition. Design-day 1.165, annual bin-weighted 1.158, worst-bin (36 °C) 1.250 — all DERIVED (cyan chip), never the TARGET (1.12–1.25 band). Rule 4: marketing target ≠ derived value.<span class="mn-src">js/dcai-engine.js operatingPoint() · ISO/IEC 30134-2</span></span>
             </div>
 
-            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Liquid heat / air heat — <code>liquidHeat()</code>, <code>airHeat()</code></h3>
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Liquid heat / air heat — <code>compute()</code></h3>
             <div class="mn-formula">
-                <span class="mn-eq">Liquid_heat_kW = IT_kW × liquid_capture_ratio       (0.85 for NVL72 direct liquid)</span>
-                <span class="mn-eq">Air_heat_kW    = IT_kW × (1 − liquid_capture_ratio)</span>
-                <span class="mn-where">In <code>liquidHeat(itKW, captureRatio)</code> and <code>airHeat(itKW, captureRatio)</code>. Scenario A: 3,564 × 0.85 = 3,029 kW liquid; 3,564 × 0.15 = 535 kW residual air.<span class="mn-src">doc-00 lines 114-115 · doc-21 Ex5</span></span>
+                <span class="mn-eq">Liquid_heat_kWth = Rack_IT_kWe × liquid_capture_ratio        (0.85 direct liquid)</span>
+                <span class="mn-eq">Air_heat_kWth    = Rack_IT_kWe × (1 − liquid_capture_ratio)  +  fabric + OOB + storage/mgmt + UPS-loss + dist-loss + aux</span>
+                <span class="mn-where">Per hall: 124,960 × 0.85 = <strong>106,216 kW liquid</strong>; the residual air path is NOT a simple 15% split — it also carries the electrical load that never enters the liquid loop (fabric switches, OOB, storage/mgmt, UPS loss, distribution loss, auxiliary), which is why it publishes as <strong>35,509 kW air</strong> per hall rather than the naive 18,744 kW.<span class="mn-src">js/dcai-engine.js compute() line ~311</span></span>
             </div>
 
-            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Hydronic TCS flow — <code>hydronicFlowLPM()</code></h3>
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Hydronic TCS/CDU flow — <code>flowM3h()</code></h3>
             <div class="mn-formula">
-                <span class="mn-eq">Flow_LPM = Q_kW × 60  /  (ρ_kg/L × Cp_kJ/kg·K × ΔT_K)</span>
-                <span class="mn-where">In <code>hydronicFlowLPM(qKW, rhoKgL, cpKjKgK, deltaTK)</code>. Q is the LIQUID CAPTURED heat (85% of IT), not full IT load. The UI must state this basis explicitly per doc-21 Ex6 "UI requirement: show whether flow is based on liquid captured heat or full rack heat."<span class="mn-src">doc-00 line 117 · doc-21 Ex6 · BASELINE-DECISION.md</span></span>
+                <span class="mn-eq">Flow_m³/h = Q_kWth × 3600  /  (ρ_kg/m³ × Cp_kJ/kg·K × ΔT_K)</span>
+                <span class="mn-where">In <code>flowM3h(qKwTh, rhoKgPerM3, cpKjPerKgK, deltaTK)</code>. Q is the LIQUID CAPTURED heat (85% of rack IT), not full IT load — the UI states this basis explicitly. TCS runs warm (40/50 °C supply/return) and dry-only, which is what keeps WUE truly 0.00 rather than merely unmeasured.<span class="mn-src">js/dcai-engine.js flowM3h() · design.flows.tcs_m3h</span></span>
             </div>
 
-            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">CDU count — <code>cduRunningCount()</code></h3>
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">CDU count — <code>ceilCount()</code></h3>
             <div class="mn-formula">
-                <span class="mn-eq">CDU_running = ceil( Liquid_heat_kW / CDU_rating_kW )</span>
-                <span class="mn-where">In <code>cduRunningCount(liquidHeatKW, cduRatingKW)</code>. CDU_rating = 350 kW (end-of-row, doc-21 Ex7). Recommended installed count is N+1 or N+2 above running minimum.<span class="mn-src">doc-21 Ex7</span></span>
+                <span class="mn-eq">CDU_duty = ceil( Liquid_heat_kWth_per_hall / CDU_unit_kWth )</span>
+                <span class="mn-eq">CDU_installed = CDU_duty + standby</span>
+                <span class="mn-where">In <code>ceilCount(duty, unit)</code>. CoolIT CHx1000 units are rated 1,000 kWth. ceil(106,216 / 1,000) = <span class="mn-result">107 CDUs running</span> per hall + 1 standby = <span class="mn-result">108 installed per hall</span>, × 4 halls = <span class="mn-result"><span data-dcai-param="equipment.cdu_installed_facility" data-dcai-fmt-int>432</span> installed facility-wide</span> — N+3 style single-unit standby, not an N+1 block.<span class="mn-src">js/dcai-engine.js ceilCount() · equipment.cdu_installed_facility</span></span>
             </div>
 
-            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">CRAH residual cooling — <code>fwsFlowM3h()</code></h3>
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">CRAH residual cooling — <code>airM3s()</code></h3>
             <div class="mn-formula">
-                <span class="mn-eq">perCRAH_kW = Air_heat_kW / activeUnits</span>
-                <span class="mn-eq">Flow_m3/h  = Q_kW × 3600 / (ρ_kg/m³ × Cp_kJ/kg·K × ΔT_K)</span>
-                <span class="mn-where">In <code>fwsFlowM3h(qKW, rhoKgM3, cpKjKgK, deltaTK)</code>. ρ = 1000 kg/m³, ΔT = 5 K (CRAH chilled-water loop). Residual air carries the remaining 15% of IT heat. Doc-21 Ex8 demonstrates: Scenario B 214 kW/CRAH → 36.8 m³/h per unit.<span class="mn-src">doc-00 line 118 · doc-21 Ex8</span></span>
+                <span class="mn-eq">perCRAH_kWth = Air_heat_kWth / CRAH_duty_units</span>
+                <span class="mn-eq">Flow_m³/s = Q_kWth / (ρ_air × Cp_air × ΔT_K)</span>
+                <span class="mn-where">In <code>airM3s(qKwTh, rhoAir, cpAir, deltaTK)</code>. 178 CRAH duty + 1 standby = 179 installed per hall (200 kWth/unit), 716 facility.<span class="mn-src">js/dcai-engine.js airM3s() · equipment.crah_installed_facility</span></span>
             </div>
 
-            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Chiller input — <code>chillerInput()</code></h3>
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Chiller COP — <code>copFromLift()</code></h3>
             <div class="mn-formula">
-                <span class="mn-eq">Chiller_input_kW = cooling_heat_kW / COP_nameplate</span>
-                <span class="mn-where">In <code>chillerInput(coolingKW, cop)</code>. COP_nameplate = 6.8 (Carrier 19DV, doc-21 Ex9). This COP is NEVER calibrated or back-solved to hit a target PUE. "cooling_heat" in the PUE path equals full IT load (doc-21 Ex9: "cooling heat = 7,128 kW = IT").<span class="mn-src">doc-00 line 119 · doc-21 Ex9</span></span>
+                <span class="mn-eq">Carnot = (evapC + 273.15) / (condC − evapC)</span>
+                <span class="mn-eq">COP = min(copMax, carnotFraction × Carnot)</span>
+                <span class="mn-where">In <code>copFromLift(evapC, condC, carnotFraction, copMax)</code>. There is no nameplate COP anywhere in this engine — the ~5.50 air-path COP at the design ambient FALLS OUT of the actual evaporator/condenser temperature lift and a Carnot fraction (~0.30–0.32), and moves with ambient across the year (worse at the 36 °C worst bin). This COP is NEVER calibrated or back-solved to hit a target PUE.<span class="mn-src">js/dcai-engine.js copFromLift() · design.planes.p18_cop_air_path</span></span>
             </div>
 
-            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Bottom-up PUE with 5-part basis — <code>pueBasis()</code></h3>
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Bottom-up PUE across the weather year — <code>compute()</code></h3>
             <div class="mn-formula">
-                <span class="mn-eq">chillerInput_kW  = IT_kW / COP                         (COP = 6.8 nameplate)</span>
-                <span class="mn-eq">pumps_kW         = 200 × (IT / 7128)                   (scale from Ex9 ref)</span>
-                <span class="mn-eq">fans_kW          = 250 × (IT / 7128)</span>
-                <span class="mn-eq">cduPumps_kW      = 120 × (IT / 7128)</span>
-                <span class="mn-eq">crahFans_kW      =  80 × (IT / 7128)</span>
-                <span class="mn-eq">upsDistLoss_kW   = 300 × (IT / 7128)</span>
-                <span class="mn-eq">aux_kW           = 150 × (IT / 7128)</span>
-                <span class="mn-eq">nonIT_kW         = chillerInput + pumps + fans + cduPumps + crahFans + upsDistLoss + aux</span>
-                <span class="mn-eq">Facility_kW      = IT_kW + nonIT_kW</span>
-                <span class="mn-eq">PUE              = Facility_kW / IT_kW</span>
-                <span class="mn-where">In <code>pueBasis(itKW, model)</code>. The 6 ancillary reference values (200/250/120/80/300/150 kW) are the Scenario B reference point from doc-21 Ex9, scaled linearly for any IT load. The 5-part basis breakdown (IT / cooling / UPS-loss / dist-loss / aux) is returned for display per doc-00 lines 301-308. Nothing is back-solved.<span class="mn-src">doc-21 Ex9 · doc-00 lines 301-308 · BASELINE-DECISION.md</span></span>
+                <span class="mn-eq">for each weather bin: op = operatingPoint(model, bin.ambientDbC, fixed)</span>
+                <span class="mn-eq">annual_bin_weighted = Σ(facility_kWh) / Σ(IT_kWh)   across 8,760 h</span>
+                <span class="mn-eq">free_cooling_cliff_c = tcsSupplyC − cduApproachK − dryCoolerApproachK</span>
+                <span class="mn-where">In <code>compute(m)</code>. The liquid path free-cools whenever ambient + dry-cooler approach ≤ TCS supply − CDU approach; below the 34 °C cliff the chiller is bypassed on the liquid side. The adopted design-day ambient sits ON that cliff (0.0 K margin). Design-day PUE 1.165, annual bin-weighted 1.158 (98.2% of hours free-cool), worst-bin (36 °C) 1.250, target 1.12, gap +0.045 — reported, never closed by tuning an input.<span class="mn-src">js/dcai-engine.js compute() · pue.free_cooling_cliff_ambient_c · pue.gap_to_target</span></span>
             </div>
 
-            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Electrical — current, kVA, 3-phase kW</h3>
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Electrical — current, kVA, busway</h3>
             <div class="mn-formula">
                 <span class="mn-eq">I_A   = kW × 1000 / (√3 × V_LL × PF)    [required current]</span>
                 <span class="mn-eq">kVA   = kW / PF                           [apparent power]</span>
-                <span class="mn-eq">kW    = √3 × V_LL × I × PF / 1000        [3-phase real power check]</span>
-                <span class="mn-where">In <code>requiredCurrentA()</code>, <code>kva()</code>, <code>threePhaseKW()</code>. Spec uses 1.732 (not full √3 = 1.7320508) to match doc-21 Ex3 exactly. V = 400 V, PF = 0.96.<span class="mn-src">doc-00 lines 122-123 · doc-21 Ex3 · doc-21 Ex4</span></span>
+                <span class="mn-eq">group_kW = racks_per_group × rack_it_kw   [RPP group load]</span>
+                <span class="mn-where">V = 400 V, PF = 0.96. One RPP group = 22 racks × 142 kW = 3,124 kW ≈ 4,697 A, carried on a 5,000 A busway trunk (93.9% loaded) — 40 groups per hall (4 per row × 10 rows), 80 RPP per hall.<span class="mn-src">js/dcai-engine.js compute() · distribution.group_kw · distribution.busway_trunk_a</span></span>
             </div>
 
-            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Room volume — <code>roomVolumeM3()</code></h3>
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Room volume &amp; density — <code>hall_volume_m3</code>, <code>it_density_kw_per_m2</code></h3>
             <div class="mn-formula">
                 <span class="mn-eq">Volume_m³ = length_m × width_m × height_m</span>
-                <span class="mn-where">In <code>roomVolumeM3(lengthM, widthM, heightM)</code>. Geometry: 32 × 20 × 4.2 = 2,688 m³ per doc-21 Ex10. Fire-agent sizing (if implemented) requires further inputs per NFPA 2001 — room volume alone is insufficient.<span class="mn-src">doc-21 Ex10</span></span>
+                <span class="mn-eq">Density_kW/m² = Rack_IT_kWe_per_hall / hall_area_m2</span>
+                <span class="mn-where">Geometry: 62 × 31 × 5.5 = 10,571 m³ per hall (1,922 m² floor area). Gross IT density = 124,960 / 1,922 = 65.0 kW/m². Fire-agent sizing (if implemented) requires further inputs per NFPA 2001 — room volume alone is insufficient.<span class="mn-src">data/dcai-parameters.json geometry.*</span></span>
             </div>
         </section>
 
         <!-- 4. CONSTANTS -->
         <section class="mn-section" id="constants">
             <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
-            <p class="mn-lead">Every constant lives in the deep-frozen <code class="mn-mono">DATAHALL_MODEL</code> with a <code>// source:</code> comment. No economically-material literal lives inside a function body. Key hardware constants:</p>
+            <p class="mn-lead">Every constant lives in the deep-frozen <code class="mn-mono">DCAI_MODEL</code> with a <code>// source:</code> comment and an evidence class (PUBLISHED / ADOPTED / ASSUMED / STANDARD / LABEL). No economically-material literal lives inside a function body. Key hardware constants:</p>
             <div class="mn-tablewrap">
             <table class="mn-table">
                 <thead><tr><th>Equipment</th><th>Model / Reference</th><th>Rating / Value</th><th>Source</th></tr></thead>
                 <tbody>
-                    <tr><td>UPS</td><td>Modular UPS, 2N A/B topology</td><td>4,500 kW per feed</td><td>doc-21 Ex2; BASELINE-DECISION.md</td></tr>
-                    <tr><td>Transformer</td><td>Cast-resin distribution transformer</td><td>5 MVA (10 MVA conservative)</td><td>doc-21 Ex4; BASELINE-DECISION.md</td></tr>
-                    <tr><td>Busway</td><td>Undersized: 4,000 A → Selected: 6,300 A</td><td>~5,357 A required (Scenario A)</td><td>doc-21 Ex3</td></tr>
-                    <tr><td>Generator</td><td>Caterpillar 3516E</td><td>2,500–2,750 kW</td><td>NVIDIA GB200 NVL72 spec context; BASELINE "NOT 8 MW"</td></tr>
-                    <tr><td>CDU</td><td>350 kW end-of-row CDU</td><td>350 kW thermal</td><td>doc-21 Ex7</td></tr>
-                    <tr><td>Chiller</td><td>Carrier 19DV water-cooled centrifugal</td><td>1,231–4,044 kW; COP 6.8</td><td>doc-21 Ex9; Carrier 19DV nameplate</td></tr>
-                    <tr><td>CRAH</td><td>Active units per hall</td><td>5 active; ΔT 5 K</td><td>doc-21 Ex8</td></tr>
-                    <tr><td>GB300 study reference</td><td>GB300 NVL72 full-rack system</td><td>Up to 142 kW/rack; 72 GPU + 36 CPU</td><td>NVIDIA Enterprise Reference Architecture components; non-adopted comparison only</td></tr>
+                    <tr><td>UPS</td><td>1.25 MW modular frame, 2N topology</td><td>1,250 kW per frame; 135 frames/hall/feed, 1,080 total</td><td>data/dcai-parameters.json equipment.ups_frame_kw</td></tr>
+                    <tr><td>Transformer</td><td>Cast-resin distribution transformer</td><td>2.5 MVA; 33 per hall per feed, 262 facility total</td><td>data/dcai-parameters.json equipment.transformer_unit_mva</td></tr>
+                    <tr><td>Busway</td><td>RPP-group trunk, 5,000 A rated</td><td>~4,697 A required per 22-rack group (93.9% loaded)</td><td>data/dcai-parameters.json distribution.busway_trunk_a</td></tr>
+                    <tr><td>Generator</td><td>4 MW class MV diesel generator (generic — no specific model is named in the current basis)</td><td>4,000 kW/unit; 169 running (N+2), 171 installed</td><td>data/dcai-parameters.json equipment.generator_model</td></tr>
+                    <tr><td>CDU</td><td>CoolIT CHx1000 (row CDU)</td><td>1,000 kWth; 107 running + 1 standby = 108/hall, 432 facility</td><td>data/dcai-parameters.json equipment.cdu_model</td></tr>
+                    <tr><td>Chiller</td><td>Water-cooled centrifugal, COP derived (not nameplate)</td><td>4,000 kWth/unit; 36 running design day, 142 worst bin, 143 installed</td><td>data/dcai-parameters.json equipment.chiller_unit_kwth</td></tr>
+                    <tr><td>CRAH</td><td>Air-side residual-heat unit</td><td>200 kWth/unit; 178 running + 1 standby = 179/hall, 716 facility</td><td>data/dcai-parameters.json equipment.crah_unit_kwth</td></tr>
+                    <tr><td>Dry coolers</td><td>Facility dry-cooling loop (no evaporative term — WUE stays 0.00)</td><td>1,000 kW/unit; 593 running design, 631 installed</td><td>data/dcai-parameters.json equipment.dry_cooler_unit_kwth</td></tr>
                 </tbody>
             </table>
             </div>
             <div class="mn-tablewrap" style="margin-top:0.9rem;">
             <table class="mn-table">
-                <thead><tr><th>PUE ancillary (Ex9 Scenario B reference)</th><th>kW (at IT = 7,128 kW)</th><th>Scales by</th></tr></thead>
+                <thead><tr><th>Facility electrical (design-day operating point)</th><th>kWe (facility, 4 halls)</th><th>Share of non-IT</th></tr></thead>
                 <tbody>
-                    <tr><td>Chiller input (COP 6.8 nameplate)</td><td>1,048</td><td>IT / COP (not scaled)</td></tr>
-                    <tr><td>Primary pumps</td><td>200</td><td>IT / 7,128</td></tr>
-                    <tr><td>Drycooler / cooling tower fans</td><td>250</td><td>IT / 7,128</td></tr>
-                    <tr><td>CDU pumps</td><td>120</td><td>IT / 7,128</td></tr>
-                    <tr><td>CRAH fans</td><td>80</td><td>IT / 7,128</td></tr>
-                    <tr><td>UPS + distribution loss</td><td>300</td><td>IT / 7,128</td></tr>
-                    <tr><td>Auxiliary (lighting, controls, security)</td><td>150</td><td>IT / 7,128</td></tr>
-                    <tr><td><strong>Total non-IT (Scenario B reference)</strong></td><td><strong>2,148</strong></td><td></td></tr>
+                    <tr><td>Chillers (largest non-IT term)</td><td>25,811</td><td>29.0%</td></tr>
+                    <tr><td>Dry-cooler / cooling-tower fans</td><td>15,925</td><td>17.9%</td></tr>
+                    <tr><td>UPS loss</td><td>19,551</td><td>22.0%</td></tr>
+                    <tr><td>Pumps (TCS + HTW + CHW + CDW)</td><td>14,824</td><td>16.6%</td></tr>
+                    <tr><td>CRAH fans</td><td>4,626</td><td>5.2%</td></tr>
+                    <tr><td>Distribution loss</td><td>6,547</td><td>7.4%</td></tr>
+                    <tr><td>Auxiliary (lighting, controls, security)</td><td>1,749</td><td>2.0%</td></tr>
+                    <tr><td><strong>Total non-IT (design-day)</strong></td><td><strong>89,034</strong></td><td></td></tr>
                 </tbody>
             </table>
             </div>
@@ -523,21 +545,21 @@
             <table class="mn-table">
                 <thead><tr><th>Output</th><th>Engine function</th><th>Unit</th><th>Basis chip</th><th>Interpretation</th></tr></thead>
                 <tbody>
-                    <tr><td>IT load per hall / facility</td><td><code>lockedState().itPerHall_kW</code></td><td>kW</td><td>BOD LOCKED</td><td>27 × 132 kW (Scenario A). Never randomised.</td></tr>
-                    <tr><td>Liquid heat</td><td><code>lockedState().liquidHeat_kW</code></td><td>kW</td><td>DERIVED</td><td>IT × 0.85; drives CDU count and TCS flow.</td></tr>
-                    <tr><td>Residual air heat</td><td><code>lockedState().airHeat_kW</code></td><td>kW</td><td>DERIVED</td><td>IT × 0.15; drives CRAH sizing.</td></tr>
-                    <tr><td>TCS total flow</td><td><code>lockedState().tcsFlowTotal_LPM</code></td><td>LPM</td><td>DERIVED</td><td>Based on liquid captured heat (85%), not full rack heat — label required.</td></tr>
-                    <tr><td>TCS flow per rack position</td><td><code>lockedState().tcsFlowPerRack_LPM</code></td><td>LPM</td><td>DERIVED</td><td>Total / 54 rack positions. Shows 80.4 LPM for Scenario A.</td></tr>
-                    <tr><td>CDU running count</td><td><code>lockedState().cduRunningCount</code></td><td>count</td><td>DERIVED</td><td>ceil(liquid_kW / 350). Recommended installed = N+1 or N+2 above running.</td></tr>
-                    <tr><td>CRAH flow per unit</td><td><code>lockedState().crahFlowPerUnit_m3h</code></td><td>m³/h</td><td>DERIVED</td><td>Per active CRAH at 5 K CHW delta-T.</td></tr>
-                    <tr><td>Required busway current</td><td><code>lockedState().requiredCurrent_A</code></td><td>A</td><td>DERIVED</td><td>Must not exceed busway rating. 5,357 A Scenario A → 6,300 A selected.</td></tr>
-                    <tr><td>Transformer apparent power</td><td><code>lockedState().transformer_kVA</code></td><td>kVA</td><td>DERIVED</td><td>IT_kW / PF. 3,713 kVA → 74.3% of 5 MVA (Scenario A, plausible).</td></tr>
-                    <tr><td>UPS loading %</td><td><code>lockedState().upsLoadingPct</code></td><td>%</td><td>DERIVED</td><td>IT_kW / UPS_rated. 79.2% Scenario A — plausible with margin.</td></tr>
-                    <tr><td>PUE (bottom-up)</td><td><code>pueBasis().pue</code></td><td>—</td><td>DERIVED</td><td>Facility / IT. Shows the honest derived value, never the target.</td></tr>
-                    <tr><td>PUE 5-part basis</td><td><code>pueBasis().basis</code></td><td>kW</td><td>DERIVED</td><td>IT / cooling / UPS-loss / dist-loss / aux — human-auditable breakdown.</td></tr>
-                    <tr><td>Data hall volume</td><td><code>dataHallVolume()</code></td><td>m³</td><td>BOD LOCKED</td><td>32 × 20 × 4.2 = 2,688 m³ per hall.</td></tr>
-                    <tr><td>Gross IT floor density — locked</td><td><code>RZDataHallRackDensity.getBaseline()</code></td><td>kW/m²</td><td>BOD LOCKED</td><td>3,564 kW / 640 m² = 5.56875 kW/m²; 54 physical positions at 66 kW each.</td></tr>
-                    <tr><td>GB300 capacity reference</td><td><code>RZDataHallRackDensity.studyReference('gb300-nvl72-142kw-study')</code></td><td>rack / kW / MW / kW/m²</td><td>REFERENCE STUDY</td><td>27 racks × 142 kW = 3.834 MW/hall = 5.990625 kW/m². No adoption or current telemetry claim.</td></tr>
+                    <tr><td>Rack IT load per hall / facility</td><td><code>snapshot.power.rack_it_hall_kwe</code></td><td>kW</td><td>ADOPTED</td><td>880 × 142 kW = 124,960 kW/hall (499.84 MW facility). Never randomised.</td></tr>
+                    <tr><td>Total IT per hall / facility (PUE denominator)</td><td><code>snapshot.power.total_it_hall_kwe</code></td><td>kW</td><td>DERIVED</td><td>134,763.2 kW/hall (539.05 MW facility) — rack IT + fabric + OOB + storage/mgmt.</td></tr>
+                    <tr><td>Liquid heat</td><td><code>snapshot.heat.liquid_hall_kwth</code></td><td>kW</td><td>DERIVED</td><td>Rack IT × 0.85; drives CDU count and TCS flow.</td></tr>
+                    <tr><td>Residual air heat</td><td><code>snapshot.heat.air_hall_kwth</code></td><td>kW</td><td>DERIVED</td><td>Rack IT × 0.15 plus fabric/OOB/storage/UPS-loss/dist-loss/aux; drives CRAH sizing.</td></tr>
+                    <tr><td>TCS total flow</td><td><code>snapshot.design.flows.tcs_m3h</code></td><td>m³/h</td><td>DERIVED</td><td>Based on liquid captured heat (85%), not full rack heat — label required.</td></tr>
+                    <tr><td>CDU running / installed count</td><td><code>snapshot.equipment.cdu_duty_per_hall / cdu_installed_per_hall</code></td><td>count</td><td>DERIVED</td><td>ceil(liquid_kWth / 1,000). 107 running + 1 standby = 108 installed/hall, 432 facility.</td></tr>
+                    <tr><td>CRAH flow per unit</td><td><code>snapshot.design.flows.crah_air_m3s</code></td><td>m³/s</td><td>DERIVED</td><td>Per active CRAH; 178 running + 1 standby = 179 installed/hall.</td></tr>
+                    <tr><td>Busway trunk loading</td><td><code>snapshot.distribution.busway_loading_pct</code></td><td>%</td><td>DERIVED</td><td>~4,697 A required per 22-rack RPP group on a 5,000 A trunk = 93.9% loaded.</td></tr>
+                    <tr><td>Transformer apparent power</td><td><code>snapshot.equipment.facility_kva</code></td><td>kVA</td><td>DERIVED</td><td>Total IT_kW / PF; 262 × 2.5 MVA transformers facility-wide.</td></tr>
+                    <tr><td>UPS loading %</td><td><code>snapshot.equipment.ups_loading_pct</code></td><td>%</td><td>DERIVED</td><td>~79.9% of the 2N 1,250 kW frame fleet — plausible with margin.</td></tr>
+                    <tr><td>PUE (bottom-up, design/annual/worst)</td><td><code>snapshot.pue.design_day / annual_bin_weighted / worst_bin</code></td><td>—</td><td>DERIVED</td><td><span data-dcai-param="pue.design_day" data-dcai-fmt-dp="3">1.165</span> / 1.158 / 1.250. Shows the honest derived value across the weather year, never the target.</td></tr>
+                    <tr><td>Free-cooling cliff</td><td><code>snapshot.pue.free_cooling_cliff_ambient_c</code></td><td>°C</td><td>DERIVED</td><td>34 °C — the adopted design day sits ON the cliff (0.0 K margin).</td></tr>
+                    <tr><td>Data hall volume</td><td><code>snapshot.geometry.hall_volume_m3</code></td><td>m³</td><td>ADOPTED</td><td>62 × 31 × 5.5 = 10,571 m³ per hall.</td></tr>
+                    <tr><td>Gross IT floor density</td><td><code>snapshot.geometry.it_density_kw_per_m2</code></td><td>kW/m²</td><td>DERIVED</td><td>124,960 kW / 1,922 m² = 65.0 kW/m²; 880 NVL72 racks at 142 kW each.</td></tr>
+                    <tr><td>Retired platform reference</td><td><code>RZDataHallRackDensity.studyReference('gb200-legacy')</code></td><td>rack / kW / MW / kW/m²</td><td>RETIRED REFERENCE</td><td>The pre-2026-09-06 split-domain footprint on its own smaller hall geometry — see §02 "Retired basis" note for the figures. Historical only, cannot alter the adopted baseline.</td></tr>
                 </tbody>
             </table>
             </div>
@@ -546,8 +568,8 @@
                 <thead><tr><th>Release acceptance</th><th>Executable evidence</th><th>Required invariant</th></tr></thead>
                 <tbody>
                     <tr><td>Alarm query and first-out</td><td><code>tools/test-datahall-ai-alarm-query.mjs</code></td><td>All filter families compose; first-out is earliest per incident; export follows the filtered set.</td></tr>
-                    <tr><td>Rack-density profiles</td><td><code>tools/test-datahall-ai-rack-density.mjs</code></td><td>Locked GB200 values remain immutable; GB300 is calculated and labeled reference-only.</td></tr>
-                    <tr><td>Electrical semantic truth</td><td><code>tools/test-datahall-ai-electrical-topology.mjs</code></td><td>Normal/fault scenarios reconcile all 54 racks and animation consumes semantic state.</td></tr>
+                    <tr><td>Rack-density profiles</td><td><code>tools/test-datahall-ai-rack-density.mjs</code></td><td>Adopted basis is derived from the model leaves; the retired basis (see §02) remains a named reference on its own geometry and cannot change the baseline.</td></tr>
+                    <tr><td>Electrical semantic truth</td><td><code>tools/test-datahall-ai-electrical-topology.mjs</code></td><td>Normal/fault scenarios reconcile all 880 racks per hall and animation consumes semantic state.</td></tr>
                     <tr><td>Fire cause/effect</td><td><code>tools/test-datahall-ai-fire-cause-effect.mjs</code></td><td>Zoned commands, feedback, inhibition and reset authority validate; BMS/DCIM is monitor-only.</td></tr>
                     <tr><td>Shared Design Studio</td><td><code>tools/test-rz-design-studio.mjs</code></td><td>Current/current-plus-study registration, validated issue metadata and accessible dialog lifecycle remain intact.</td></tr>
                     <tr><td>Operator UI integration</td><td><code>tools/test-datahall-ai-operator-ui.mjs</code> plus browser journey</td><td>Controls bind to the pure modules, dialogs remain accessible, and no document overflow or console error is introduced.</td></tr>
@@ -558,39 +580,39 @@
 
         <!-- 6. WORKED EXAMPLE -->
         <section class="mn-section" id="worked-example">
-            <h2><span class="mn-num">06</span> Worked example — Scenario A (LOCKED basis)</h2>
-            <p class="mn-lead">Numbers reproduce the engine output exactly for Scenario A (132 kW / NVL72). Examples 1–10 are the acceptance tests in <code class="mn-mono">tools/test-datahall-calc.mjs</code> (57/57 assertions). Below is a compressed trace of the ten examples.</p>
+            <h2><span class="mn-num">06</span> Worked example — adopted GB300 basis</h2>
+            <p class="mn-lead">Numbers reproduce the engine output exactly for the adopted GB300 basis (142 kW/rack, one rack = one NVLink domain). Examples 1–10 are illustrative walk-throughs consistent with the balance identities asserted by <code class="mn-mono">tools/test-dcai-engine.mjs</code>. Below is a compressed trace of ten examples.</p>
             <div class="mn-worked">
                 <ol>
-                    <li><strong>Ex1 — IT load &amp; rack count:</strong> 27 NVL72 × 2 racks = <span class="mn-result">54 rack positions/hall</span>. 27 × 132 kW = <span class="mn-result">IT = 3,564 kW/hall</span>; 66 kW/rack position.</li>
-                    <li><strong>Ex2 — UPS sizing:</strong> IT 3,564 kW ÷ UPS 4,500 kW = <span class="mn-result">79.2% load</span> — plausible (2N, some margin). Scenario B 7,128 ÷ 4,500 = 158.4% — impossible.</li>
-                    <li><strong>Ex3 — Busway current:</strong> I = 3,564 × 1000 / (1.732 × 400 × 0.96) = <span class="mn-result">5,357 A</span> → 4,000 A busway undersized; <span class="mn-result">6,300 A selected</span>.</li>
-                    <li><strong>Ex4 — Transformer loading:</strong> kVA = 3,564 / 0.96 = <span class="mn-result">3,713 kVA</span>; 5 MVA load = <span class="mn-result">74.3%</span> — plausible.</li>
-                    <li><strong>Ex5 — Cooling split:</strong> Liquid = 3,564 × 0.85 = <span class="mn-result">3,029 kW</span>; Air = 3,564 × 0.15 = <span class="mn-result">535 kW</span>.</li>
-                    <li><strong>Ex6 — TCS flow (Scenario A):</strong> Flow = 3,029 × 60 / (1.0 × 4.186 × 10) = <span class="mn-result">4,342 LPM total</span>; 4,342 / 54 = <span class="mn-result">80.4 LPM/rack</span>. Flow basis = liquid captured heat (85%), not full rack heat.</li>
-                    <li><strong>Ex7 — CDU count:</strong> ceil(3,029 / 350) = ceil(8.65) = <span class="mn-result">9 CDUs running</span>; recommended installed 10–12.</li>
-                    <li><strong>Ex8 — CRAH residual:</strong> 535 kW / 5 CRAH = 107 kW/unit; m³/h = 107 × 3600 / (1000 × 4.186 × 5) = <span class="mn-result">18.4 m³/h/CRAH</span>.</li>
-                    <li><strong>Ex9 — Chiller input &amp; PUE (Scenario B reference point):</strong> Chiller = 7,128 / 6.8 = <span class="mn-result">1,048 kW</span>. Non-IT = 1,048 + 200 + 250 + 120 + 80 + 300 + 150 = <span class="mn-result">2,148 kW</span>. PUE = (7,128 + 2,148) / 7,128 = <span class="mn-result">1.30</span>. For Scenario A (IT 3,564 kW scaled): PUE ~1.30 by same methodology.</li>
-                    <li><strong>Ex10 — Data hall volume:</strong> 32 × 20 × 4.2 = <span class="mn-result">2,688 m³/hall</span>. Fire-agent design requires additional NFPA 2001 inputs; room volume alone is insufficient.</li>
+                    <li><strong>Ex1 — Rack IT load &amp; count:</strong> 880 NVL72 racks/hall (one rack = one NVLink domain, no split footprint). 880 × 142 kW = <span class="mn-result">Rack IT = 124,960 kW/hall</span> = <span class="mn-result">499.84 MW facility</span>.</li>
+                    <li><strong>Ex2 — Total IT (PUE denominator):</strong> 124,960 + 7,040 fabric + 264 OOB + 2,499.2 storage/mgmt = <span class="mn-result">134,763.2 kW/hall</span> = <span class="mn-result">539.05 MW facility</span>. The 500 MW figure is a LABEL on the rack-only envelope, never this denominator.</li>
+                    <li><strong>Ex3 — Cooling split:</strong> Liquid = 124,960 × 0.85 = <span class="mn-result">106,216 kW/hall</span>. Air = 124,960 × 0.15 + fabric + OOB + storage/mgmt + UPS-loss + dist-loss + aux = <span class="mn-result">35,509 kW/hall</span> — not a naive 15% split, because everything outside the rack that never enters the liquid loop rides the air path.</li>
+                    <li><strong>Ex4 — TCS flow:</strong> Facility flow 38,449.2 m³/h ÷ 4 halls = <span class="mn-result">9,612.3 m³/h/hall</span>. Flow basis = liquid captured heat (85% of rack IT), not full IT load; TCS runs warm and dry-only (40/50 °C), consistent with WUE 0.00.</li>
+                    <li><strong>Ex5 — CDU count:</strong> ceil(106,216 / 1,000) = <span class="mn-result">107 CoolIT CHx1000 running/hall</span> + 1 standby = <span class="mn-result">108 installed/hall</span>; × 4 halls = <span class="mn-result">432 installed facility-wide</span>.</li>
+                    <li><strong>Ex6 — CRAH count:</strong> ceil(35,509 / 200) = <span class="mn-result">178 CRAH running/hall</span> + 1 standby = <span class="mn-result">179 installed/hall</span>; × 4 halls = <span class="mn-result">716 installed facility-wide</span>.</li>
+                    <li><strong>Ex7 — RPP group &amp; busway:</strong> 22 racks/group × 142 kW = 3,124 kW/group; I = 3,124 × 1000 / (1.732 × 400 × 0.96) = <span class="mn-result">4,697 A</span> on a <span class="mn-result">5,000 A busway trunk</span> = 93.9% loaded. 40 groups/hall (4 per row × 10 rows), 80 RPP/hall.</li>
+                    <li><strong>Ex8 — UPS &amp; generators:</strong> 540 UPS frames/feed × 1,250 kW = 675,000 kW installed per-feed capacity; total IT 539,052.8 kW ÷ 675,000 = <span class="mn-result">79.9% UPS loading</span> (2N, plausible). Facility electrical load ≈ 628,087 kW: 169 running (duty) + 2 standby = <span class="mn-result">171 installed 4 MW-class generators</span> (N+2).</li>
+                    <li><strong>Ex9 — PUE across the weather year:</strong> Facility 628,087 kW / Total IT 539,053 kW = design-day PUE <span class="mn-result">1.165</span>; annual bin-weighted <span class="mn-result">1.158</span> (98.2% of hours free-cool); worst-bin at 36 °C ambient <span class="mn-result">1.250</span>. Free-cooling cliff = 34 °C ambient, and the adopted design day sits ON that cliff (0.0 K margin). Target 1.12 → gap <span class="mn-result">+0.045</span>, reported, never closed by tuning the COP.</li>
+                    <li><strong>Ex10 — Geometry &amp; density:</strong> 62 × 31 × 5.5 = <span class="mn-result">10,571 m³/hall</span> (1,922 m² floor). Gross IT density = 124,960 / 1,922 = <span class="mn-result">65.0 kW/m²</span>. Fire-agent design requires additional NFPA 2001 inputs; room volume alone is insufficient.</li>
                 </ol>
             </div>
-            <div class="mn-note"><strong>PUE reading:</strong> The derived PUE (~1.30 at full load, Scenario B reference) reflects chiller-based direct liquid cooling without free-cooling bypass. The target band 1.12–1.25 (BASELINE-DECISION.md) is achievable with partial free cooling or heat rejection improvements but is a <em>design target</em>, not the operational result from this engine. Rule 4 (ACCURACY_VALIDATION.md): <strong>target ≠ derived value</strong> — the cockpit shows them in different colours and chips.</div>
+            <div class="mn-note"><strong>PUE reading:</strong> The derived PUE (1.165 design-day, 1.158 annual, 1.250 at the 36 °C worst bin) reflects a Carnot-fraction chiller COP under a free-cooling regime that covers 98.2% of the year, not a nameplate figure applied to 100% of the heat. The 1.12 target is a <em>design aspiration</em>; the engine reports the +0.045 gap rather than closing it. Rule 4 (ACCURACY_VALIDATION.md): <strong>target ≠ derived value</strong> — the cockpit shows them in different colours and chips.</div>
         </section>
 
         <!-- 7. ACCURACY VALIDATION -->
         <section class="mn-section" id="accuracy">
             <h2><span class="mn-num">07</span> Accuracy validation — 6 rules</h2>
-            <p class="mn-lead">Codified in <code class="mn-mono">standarization/ACCURACY_VALIDATION.md</code> and enforced by <code class="mn-mono">tools/probe-accuracy-validation.mjs</code> (40/40 acceptance tests). Gate any change that touches the cockpit pages.</p>
+            <p class="mn-lead">Codified in <code class="mn-mono">standarization/ACCURACY_VALIDATION.md</code> and enforced by <code class="mn-mono">tools/probe-accuracy-validation.mjs</code>. Gate any change that touches the cockpit pages.</p>
             <div class="mn-tablewrap">
             <table class="mn-table">
                 <thead><tr><th>Rule</th><th>Requirement</th><th>Failure example</th></tr></thead>
                 <tbody>
-                    <tr><td><code>Rule 1</code> — One source of truth</td><td>Every KPI on every tab reads from <code>DATAHALL_CALC.lockedState()</code> or <code>pueBasis()</code> — never from a separate variable or inline literal.</td><td>Dashboard showing 66 kW/rack while the electrical tab shows 132 kW/rack simultaneously.</td></tr>
-                    <tr><td><code>Rule 2</code> — No Math.random on basis KPIs</td><td>IT load, PUE, Facility load, GPU count, CDU count, UPS/transformer ratings: deterministic. Reload 20× — must be identical every time.</td><td>Random jitter on TCS flow or dashboard rack-load causing different values each load.</td></tr>
-                    <tr><td><code>Rule 3</code> — Every metric carries a denominator</td><td>PUE = Facility ÷ IT; UPS loading = load ÷ rated; transformer = kVA_load ÷ kVA_rating. Denominator shown in tooltip or inline.</td><td>PUE shown without stating the IT kW basis.</td></tr>
-                    <tr><td><code>Rule 4</code> — Target ≠ derived value</td><td>Target PUE ≤ 1.12 (design band, blue chip) and derived PUE 1.30 (engine output, cyan chip) are two different numbers with different colour meanings.</td><td>Showing "PUE 1.12" (target) in green as if it were the operating result.</td></tr>
-                    <tr><td><code>Rule 5</code> — Terminology matches engineering basis</td><td>Use "NVL72 domain" (132 kW logical pair) and "physical rack position" (66 kW per slot). Never call a 66 kW rack an "NVL72 rack" — NVIDIA spec says ~120 kW per NVL72 rack-scale system.</td><td>Labelling the 66 kW slot as an "NVL72 rack" when it is one of two physical positions in an NVL72 footprint.</td></tr>
-                    <tr><td><code>Rule 6</code> — Basis chip on every critical KPI</td><td>Each KPI carries: MEASURED / DERIVED / TARGET / SIMULATED / BOD LOCKED / MANUAL. Click opens a drawer with formula, inputs, output, scope, denominator, source.</td><td>A PUE tile with no chip — operator cannot determine if the value is a target or a derived result.</td></tr>
+                    <tr><td><code>Rule 1</code> — One source of truth</td><td>Every KPI on every tab reads from the same <code>DCAI_CALC.snapshot</code> — never from a separate variable or inline literal.</td><td>Dashboard showing the retired per-domain figure (see §02) while the electrical tab shows 142 kW/rack simultaneously.</td></tr>
+                    <tr><td><code>Rule 2</code> — No Math.random on basis KPIs</td><td>IT load, PUE, Facility load, GPU count, CDU count, UPS/transformer/generator ratings: deterministic. Reload 20× — must be identical every time.</td><td>Random jitter on TCS flow or dashboard rack-load causing different values each load.</td></tr>
+                    <tr><td><code>Rule 3</code> — Every metric carries a denominator</td><td>PUE = Facility ÷ Total IT; UPS loading = load ÷ rated; transformer = kVA_load ÷ kVA_rating. Denominator shown in tooltip or inline.</td><td>PUE shown without stating whether the denominator is rack IT (499.84 MW) or total IT (539.05 MW).</td></tr>
+                    <tr><td><code>Rule 4</code> — Target ≠ derived value</td><td>Target PUE ≤ 1.12 (design band, blue chip) and derived PUE 1.165 design-day / 1.158 annual / 1.250 worst-bin (engine output, cyan chip) are different numbers with different colour meanings.</td><td>Showing "PUE 1.12" (target) in green as if it were the operating result.</td></tr>
+                    <tr><td><code>Rule 5</code> — Terminology matches the adopted engineering basis</td><td>Use "NVL72 rack" — one rack IS one 72-GPU NVLink domain at 142 kW, so no disambiguating "rack position" language is needed or correct any more. Never use "rack-pos", "physical rack position", or the retired per-domain/per-position kW figures (see §02) as if current.</td><td>Labelling a rack as a "physical rack position" or citing the retired per-domain kW figure as the current one.</td></tr>
+                    <tr><td><code>Rule 6</code> — Basis chip on every critical KPI</td><td>Each KPI carries: MEASURED / DERIVED / TARGET / SIMULATED / ADOPTED / MANUAL. Click opens the shared basis drawer with formula, inputs, output, scope, denominator, source.</td><td>A PUE tile with no chip — operator cannot determine if the value is a target or a derived result.</td></tr>
                 </tbody>
             </table>
             </div>
@@ -600,19 +622,19 @@
         <section class="mn-section" id="references">
             <h2><span class="mn-num">08</span> References &amp; standards</h2>
             <ul class="mn-refs">
-                <li><a class="mn-inline" href="https://docs.nvidia.com/dgx/dgxgb200-user-guide/hardware.html"><b>NVIDIA DGX GB200 hardware documentation</b></a> — governing hardware context for the locked 72-GPU / 36-Grace-CPU, direct-liquid-cooled GB200 baseline.</li>
-                <li><a class="mn-inline" href="https://docs.nvidia.com/enterprise-reference-architectures/nvl72-ai-factory/latest/components.html"><b>NVIDIA Enterprise Reference Architecture — components</b></a> — official GB300 full-rack and up-to-142 kW/rack reference used only in the non-adopted comparison.</li>
-                <li><b>BASELINE-DECISION.md (locked 2026-05-17)</b> — Single immutable source of truth for the whole cockpit: 4 halls, 27 NVL72/hall, 132 kW/NVL72 (Scenario A), 85% liquid capture, TCS 35/45 °C, PUE design band 1.12–1.25.</li>
-                <li><b>21-calculation-worked-examples.md (doc-21)</b> — 10 fully-traced examples (Ex1–Ex10) that are the acceptance test cases for <code class="mn-mono">tools/test-datahall-calc.mjs</code> (57/57 assertions).</li>
-                <li><b>00-overview-audit.md (doc-00)</b> — Core Calculation Engine definition (lines 104-125), Source Sanity References, equipment corrections (Cat 3516E ≈ 2.5–2.75 MW).</li>
+                <li><a class="mn-inline" href="https://docs.nvidia.com/enterprise-reference-architectures/nvl72-ai-factory/latest/components.html"><b>NVIDIA Enterprise Reference Architecture — components</b></a> — governing hardware reference for the adopted 72-GPU / 36-Grace-CPU / 18-NVSwitch GB300 NVL72 rack at 142 kW.</li>
+                <li><b>data/dcai-parameters.json (spec gb300-500mw-2026-09-06, adopted 2026-09-06)</b> — Single immutable parameter registry for the whole cockpit: 4 halls, 880 NVL72 racks/hall, 142 kW/rack, 85% liquid capture, TCS 40/50 °C dry-only, PUE design band 1.12–1.25.</li>
+                <li><b>js/dcai-model.js</b> — authored leaves, every value typed with a <code class="mn-mono">// source:</code> line and an evidence class (PUBLISHED / ADOPTED / ASSUMED / STANDARD / LABEL).</li>
+                <li><b>tools/test-dcai-engine.mjs</b> — balance-identity acceptance tests (IT = rack + fabric + OOB + storage/mgmt, facility = IT + non-IT, PUE = facility / IT, weather bins sum to 8,760 h, and more) run on every change to the engine.</li>
                 <li><b>ASHRAE A2 / ASHRAE 90.4</b> — Inlet temperature envelope for HPC cooling; energy efficiency for data centres.</li>
                 <li><b>ISO/IEC 30134-2</b> — Data centre key performance indicators: Power Usage Effectiveness (PUE) — definition, measurement scope, and boundary.</li>
                 <li><b>ISO/IEC 30134-8</b> — Carbon Usage Effectiveness relative to IT equipment energy (CUE<sub>IT</sub>).</li>
-                <li><b>Carrier 19DV centrifugal chiller</b> — Nameplate COP 6.8 used in doc-21 Ex9 (not calibrated to hit a target PUE).</li>
-                <li><b>Engine sources</b> — <code class="mn-mono">js/datahall-calculations.js</code> (DATAHALL_CALC, pure derivation engine) + <code class="mn-mono">js/datahall-model.js</code> (DATAHALL_MODEL, deep-frozen basis).</li>
-                <li><b>standarization/ACCURACY_VALIDATION.md</b> — 6 accuracy rules + 40 acceptance tests enforced by <code class="mn-mono">tools/probe-accuracy-validation.mjs</code>.</li>
+                <li><b>Chiller COP methodology</b> — derived from a Carnot-fraction over the actual evaporator/condenser lift (<code class="mn-mono">copFromLift()</code>), never a vendor nameplate figure, and never calibrated to hit a target PUE.</li>
+                <li><b>Engine sources</b> — <code class="mn-mono">js/dcai-engine.js</code> (DCAI_CALC, pure derivation engine) + <code class="mn-mono">js/dcai-model.js</code> (DCAI_MODEL, deep-frozen authored basis) + <code class="mn-mono">js/dcai-parameters.js</code> (shared registry for the basis drawer).</li>
+                <li><b>standarization/ACCURACY_VALIDATION.md</b> — 6 accuracy rules enforced by <code class="mn-mono">tools/probe-accuracy-validation.mjs</code>.</li>
                 <li><a class="mn-inline" href="https://www.isa.org/standards-and-publications/isa-standards/isa-18-series-of-standards"><b>ISA-18 alarm-management series</b></a> — lifecycle, operator response, rationalization and first-out context for the simulated alarm workspace.</li>
                 <li><a class="mn-inline" href="https://webstore.iec.ch/en/publication/65543"><b>IEC 62682:2022</b></a> — management of alarms for process industries; terminology and acceptance reference, not a conformance claim.</li>
+                <li><b>js/datahall-model.js + js/datahall-calculations.js (RETIRED 2026-09-06)</b> — the byte-frozen retired-era pair, kept only as the retirement record; see §02 "Retired basis" note.</li>
             </ul>
         </section>
 
@@ -625,14 +647,14 @@
                 <thead><tr><th>Control / view</th><th>Hook</th><th>Expected behavior</th><th>Engineering boundary</th></tr></thead>
                 <tbody>
                     <tr><td>Portfolio / DC Solutions / PRD / Manual</td><td><code>.bbtn</code></td><td>Navigate without changing the locked scenario.</td><td>Documentation is public; the cockpit keeps its existing tier gate.</td></tr>
-                    <tr><td>Basis of Design</td><td><code>bodTrig</code>, <code>bodDrawer</code></td><td>Open the calculation-audit drawer populated from <code>DATAHALL_CALC</code>; export its printable PDF.</td><td>It is an auditable design basis, not a field test certificate.</td></tr>
+                    <tr><td>Basis of Design</td><td><code>bodTrig</code>, <code>bodDrawer</code></td><td>Open the calculation-audit drawer populated from <code>DCAI_CALC</code>; export its printable PDF.</td><td>It is an auditable design basis, not a field test certificate.</td></tr>
                     <tr><td>Generate Design / Design Studio</td><td><code>genDesignTrig</code>, <code>RZDesignStudio</code></td><td>Open the shared dialog, display one current engine snapshot and provenance, then allow only the registered document types and current/current-plus-study scopes.</td><td>The study appendix is labeled non-adopted; it never mutates the snapshot. Focus is trapped and returned; failure is visible.</td></tr>
                     <tr><td>FAQ / Theme</td><td><code>faqTrig</code>, <code>themeToggle</code></td><td>Open the FAQ dialog; switch/persist the light/dark palette.</td><td>Neither action changes model values.</td></tr>
                     <tr><td>Primary tabs</td><td><code>button[data-t]</code></td><td>Select Dashboard, Data Hall, Room Layout, Rack, Cooling, Electrical, Network, Fire, BMS, or Alarms &amp; Events; one <code>.pn</code> remains active.</td><td>Tab changes presentation only.</td></tr>
-                    <tr><td>Rack-density platform study</td><td><code>platformProfile</code>, <code>platformComparisonBody</code></td><td>Keep locked GB200 values visible and optionally show the GB300 planning reference.</td><td>Selection is read-only presentation; GB300 is not adopted and does not alter any operating KPI.</td></tr>
+                    <tr><td>Rack-density platform study</td><td><code>platformProfile</code>, <code>platformComparisonBody</code></td><td>Keep the adopted values as the baseline and optionally show the retired reference (see §02) on its own geometry.</td><td>Selection is read-only presentation; the retired reference cannot alter any operating KPI.</td></tr>
                     <tr><td>Sidebar collapse / reopen</td><td><code>sideTog</code>, <code>sideReopen</code></td><td>Widen the active diagram on desktop and remember the preference.</td><td>Does not hide alarm meaning or alter data.</td></tr>
                     <tr><td>Floor selection / Overview</td><td>generated floor targets, <code>floorBack</code></td><td>Open a tagged floor plan and return to the building view.</td><td>Geometry is a design visualization, not a surveyed as-built.</td></tr>
-                    <tr><td>Hall selection</td><td><code>button[data-dh="1…4"]</code></td><td>Select DH-1 through DH-4 and update active hall context.</td><td>All halls share Scenario A unless a future model declares a variance.</td></tr>
+                    <tr><td>Hall selection</td><td><code>button[data-dh="1…4"]</code></td><td>Select DH-1 through DH-4 and update active hall context.</td><td>All halls share the same adopted basis unless a future model declares a variance.</td></tr>
                     <tr><td>Electrical sub-tabs</td><td><code>button[data-ep]</code></td><td>Select facility Overview or DH-01…DH-04 SLD.</td><td>Only one <code>.ep</code> panel is active.</td></tr>
                     <tr><td>Electrical operating scenario</td><td><code>electricalScenario</code>, <code>electricalPathSummary</code>, <code>electricalTimeline</code></td><td>Evaluate normal, utility/source, busway and rack-feed events; render served/2N/degraded/lost totals, path state and ordered event timeline.</td><td>Semantic topology determines animation. De-energized paths never remain visually active; all meaning survives reduced motion.</td></tr>
                     <tr><td>SLD equipment</td><td><code>data-sld-click</code>, <code>data-rz-line</code>, <code>data-rz-breaker</code></td><td>Open the appropriate SLD mimic or right inspector for MV, RMU, transformer, MSB, UPS, busway, rack PSU or cooling feed.</td><td>Selection is read-only; no breaker command leaves the browser.</td></tr>
@@ -640,7 +662,7 @@
                     <tr><td>Rack / component detail</td><td>generated rack/tray/component targets, <code>rackModal</code></td><td>Open the selected tag, type and component diagram.</td><td>Component inventory follows the locked reference architecture.</td></tr>
                     <tr><td>CDU / chiller / cooling tower</td><td><code>data-cdu</code>, <code>data-ch</code>, cooling-tower targets</td><td>Open a tag-specific process HMI with status and values.</td><td>Local pressure/flow/temperature movement is simulated sensor-class data.</td></tr>
                     <tr><td>Pump / TCS / chemistry equipment</td><td>generated equipment targets, <code>eqHmi</code></td><td>Open the type-specific equipment HMI.</td><td>Displayed setpoints/nameplates require tag-level source records before field use.</td></tr>
-                    <tr><td>In-rack CDU / CRAH</td><td><code>data-ircdu</code>, generated CRAH targets</td><td>Open rack hydronic or air-side detail.</td><td>Heat/flow basis remains Scenario A; jitter is not a sizing input.</td></tr>
+                    <tr><td>In-rack CDU / CRAH</td><td><code>data-ircdu</code>, generated CRAH targets</td><td>Open rack hydronic or air-side detail.</td><td>Heat/flow basis remains the adopted basis; jitter is not a sizing input.</td></tr>
                     <tr><td>Corridor services</td><td>FWS, leak, cable-tray targets</td><td>Open corridor-service HMI for the selected family.</td><td>No service-isolation or safety command is implemented.</td></tr>
                     <tr><td>Battery ESS</td><td><code>data-bat</code>, <code>batHmi</code></td><td>Open the 480 VDC system/unit view for the selected hall and unit.</td><td>Runtime/SOC/thermal values are simulation unless identified as engine basis.</td></tr>
                     <tr><td>Fire cause-and-effect matrix</td><td><code>fireScenario</code>, <code>fireZone</code>, <code>fireCauseEffectBody</code></td><td>Select an initiating event/zone and inspect affected notification, lift, access, AHU/CRAH, smoke-control, suppression, EPO, generator, CCTV and BMS/DCIM outputs with required feedback.</td><td>FACP is command authority. BMS/DCIM only publishes/monitors the event; the browser sends no command.</td></tr>
@@ -662,10 +684,10 @@
             <table class="mn-table">
                 <thead><tr><th>Point family</th><th>Representative hook</th><th>Class / cadence</th><th>Alarm or quality reading</th></tr></thead>
                 <tbody>
-                    <tr><td>Facility inventory and IT</td><td><code>DHE.halls</code>, <code>dkIt</code>, <code>sPit</code></td><td>BOD locked; immutable.</td><td>4 halls, 27 NVL72/hall, 3,564 kW/hall, 14.256 MW facility.</td></tr>
-                    <tr><td>Heat split / flow / CDU / CRAH</td><td><code>sDLC</code>, <code>sAir</code>, <code>sCDU</code>, <code>sCRAH</code></td><td>Derived; immutable.</td><td>3,029/535 kW, 4,342 L/min, 9/12 CDU and five active CRAHs per hall.</td></tr>
-                    <tr><td>Electrical capacity</td><td><code>reqCurrentA</code>, transformer/UPS/busway fields</td><td>Derived; immutable.</td><td>5,359 A, 3,713 kVA, 74.3% TX, 79.2% UPS failover, 6,300 A selected busway.</td></tr>
-                    <tr><td>PUE / WUE / CUE / IT / GPU / domains</td><td><code>dkPue</code>, <code>dkWue</code>, <code>dkCue</code>, <code>dkIt</code>, <code>dkGpu</code>, <code>dkDom</code></td><td>Derived or BOD locked; 4 s reassertion for dashboard fields.</td><td>Final text is deterministic; source/denominator lives in the basis drawer and tooltip.</td></tr>
+                    <tr><td>Facility inventory and IT</td><td><code>DHE.halls</code>, <code>dkIt</code>, <code>sPit</code></td><td>ADOPTED; immutable.</td><td>4 halls, 880 NVL72 racks/hall, 124,960 kW rack IT/hall, 539.05 MW total IT facility (PUE denominator).</td></tr>
+                    <tr><td>Heat split / flow / CDU / CRAH</td><td><code>sDLC</code>, <code>sAir</code>, <code>sCDU</code>, <code>sCRAH</code></td><td>Derived; immutable.</td><td>106,216/35,509 kW liquid/air per hall, 9,612.3 m³/h TCS flow, 107/108 CDU and 178/179 CRAH duty/installed per hall.</td></tr>
+                    <tr><td>Electrical capacity</td><td><code>reqCurrentA</code>, transformer/UPS/busway fields</td><td>Derived; immutable.</td><td>4,697 A per RPP group, 93.9% busway loading, 79.9% UPS loading, 5,000 A busway trunk.</td></tr>
+                    <tr><td>PUE / WUE / CUE / IT / GPU / racks</td><td><code>dkPue</code>, <code>dkWue</code>, <code>dkCue</code>, <code>dkIt</code>, <code>dkGpu</code>, <code>dkDom</code></td><td>Derived or ADOPTED; 4 s reassertion for dashboard fields.</td><td>Final text is deterministic; source/denominator lives in the basis drawer and tooltip.</td></tr>
                     <tr><td>Uptime / active alarms KPI</td><td>Uptime card, <code>dkAlm</code></td><td>Design placeholder.</td><td>99.99% and zero active are not a persisted outage/event history.</td></tr>
                     <tr><td>TCS and room sensors</td><td><code>sTS</code>, <code>sTR</code>, hot/cold temperature/RH IDs</td><td>Sensor-class jitter; 4 s cadence.</td><td>Jitter is allowed only around 35/45°C or declared room bands; it must not alter locked ΔT sizing.</td></tr>
                     <tr><td>Occupancy/access</td><td><code>pplCount</code>, <code>lastEntry</code>, <code>dkPpl</code>, <code>dkEntry</code></td><td>Sensor/browser-time simulation.</td><td>Not a physical access-control record.</td></tr>
@@ -679,7 +701,7 @@
                     <tr><td>Alarm-query records</td><td><code>RZDataHallAlarmQuery</code></td><td>Immutable simulated event fixtures.</td><td>Date/point/system/severity/lifecycle/quality/value/state/event/action/text filters compose; first-out selects earliest per incident and CSV exports the filtered set.</td></tr>
                     <tr><td>Electrical scenario truth</td><td><code>RZDatahallAIElectrical.evaluateScenario()</code></td><td>Pure semantic topology evaluation.</td><td>Served + lost = 54; 2N/degraded are mutually interpretable availability classes; CSS animation is a consumer, never the source of truth.</td></tr>
                     <tr><td>Fire cause/effect</td><td><code>RZDatahallAIFireCauseEffect.evaluateEvent()</code></td><td>Immutable zoned training matrix.</td><td>Rows expose command authority, expected feedback, inhibition and reset authority. FACP controls; BMS/DCIM monitor-only.</td></tr>
-                    <tr><td>Rack-density comparison</td><td><code>RZDataHallRackDensity</code></td><td>Locked baseline plus reference-only study.</td><td>GB200 = 54 positions × 66 kW; GB300 study = 27 racks × up to 142 kW. Neither value is field telemetry.</td></tr>
+                    <tr><td>Rack-density comparison</td><td><code>RZDataHallRackDensity</code></td><td>Adopted baseline plus a retired-only reference.</td><td>Adopted = 880 racks × 142 kW/rack; the retired reference sits on its own smaller hall geometry (see §02). Neither value is field telemetry.</td></tr>
                 </tbody>
             </table>
             </div>
@@ -694,13 +716,13 @@
             <table class="mn-table">
                 <thead><tr><th>Term</th><th>Cockpit meaning</th><th>Do not confuse with</th></tr></thead>
                 <tbody>
-                    <tr><td><span data-explain="NVL72">NVL72 domain</span></td><td>Logical 72-GPU / 36-Grace domain at 132 kW in Scenario A, represented by two 66 kW physical rack positions.</td><td>A single 66 kW physical rack position.</td></tr>
-                    <tr><td><span data-explain="DLC">Direct liquid cooling</span></td><td>Cold-plate path capturing 85% of IT heat.</td><td>Total facility cooling electrical power.</td></tr>
-                    <tr><td><span data-explain="TCS">TCS</span></td><td>Technology Cooling System at 35/45°C, ΔT 10 K.</td><td>Facility-water/chilled-water loop.</td></tr>
+                    <tr><td><span data-explain="NVL72">NVL72 rack</span></td><td>One physical rack IS one 72-GPU / 36-Grace-CPU / 18-NVSwitch NVLink domain at 142 kW — no split-domain footprint in the adopted basis.</td><td>The retired "domain spans two rack-positions" construct (see §02 retired-basis note).</td></tr>
+                    <tr><td><span data-explain="DLC">Direct liquid cooling</span></td><td>Cold-plate path capturing 85% of rack IT heat.</td><td>Total facility cooling electrical power.</td></tr>
+                    <tr><td><span data-explain="TCS">TCS</span></td><td>Technology Cooling System at 40/50°C, warm and dry-only.</td><td>Facility-water/chilled-water loop.</td></tr>
                     <tr><td><span data-explain="FWS">FWS</span></td><td>Facility Water System coupled through CDU heat exchangers.</td><td>Rack-side coolant circuit.</td></tr>
-                    <tr><td><span data-explain="CDU">CDU</span></td><td>Coolant Distribution Unit, 350 kW design rating, nine running per hall.</td><td>Chiller or CRAH.</td></tr>
-                    <tr><td><span data-explain="CRAH">CRAH</span></td><td>Air-side unit serving the 15% residual heat.</td><td>Liquid-cooling primary path.</td></tr>
-                    <tr><td><span data-explain="PUE">PUE</span></td><td>Facility power divided by IT power; ≈1.30 is derived, 1.12–1.25 is a target band.</td><td>A marketing target presented as measured output.</td></tr>
+                    <tr><td><span data-explain="CDU">CDU</span></td><td>Coolant Distribution Unit — CoolIT CHx1000, 1,000 kWth design rating, 107 running per hall.</td><td>Chiller or CRAH.</td></tr>
+                    <tr><td><span data-explain="CRAH">CRAH</span></td><td>Air-side unit serving the residual heat outside the liquid loop.</td><td>Liquid-cooling primary path.</td></tr>
+                    <tr><td><span data-explain="PUE">PUE</span></td><td>Facility power divided by total IT power; 1.165 design-day is derived, 1.12–1.25 is a target band.</td><td>A marketing target presented as measured output.</td></tr>
                     <tr><td><span data-explain="WUE">WUE</span></td><td>Water per IT energy; 0.00 only for the declared dry-only baseline.</td><td>Domestic/process water or an adiabatic configuration.</td></tr>
                     <tr><td><span data-explain="CUE">CUE</span></td><td>Carbon per IT energy; grid factor × PUE in the current calculation.</td><td>Raw facility-kWh grid emission factor.</td></tr>
                     <tr><td><span data-explain="2N">2N</span></td><td>Each UPS feed can carry the protected load; normal display assumes equal sharing.</td><td>N+1 parallel capacity.</td></tr>

@@ -11,6 +11,92 @@ release sections rather than semver.
 
 ---
 
+## v2.0.0 — 2026-09-06
+
+### The AI cockpit now runs on the GB300 / 500 MW basis — MAJOR
+
+`datahallAI.html` no longer loads the GB200 engine pair. It loads `js/dcai-model.js`,
+`js/dcai-engine.js` and the generated registry twin `js/dcai-parameters.js`, all pinned at the
+engine version the authority block checks; the retired pair stays on disk byte-frozen under the ship
+gate and still proves its own 57 worked examples. Every number the page renders — sidebar, KPI strip,
+building isometric, floor plans, hall mimic, rack architecture, cooling P&ID, five electrical SLDs,
+network fabric, the Basis-of-Design drawer, both PDFs and the FAQ — is now read from
+`DCAI_CALC.snapshot`. The published IT moves from 14.26 MW to **499.84 MW rack IT / 539.05 MW total
+IT**, GPUs from 7,776 to **253,440**, and the PUE from a tuned 1.30 to a derived **1.165** (design
+day) with the free-cooling cliff stated on the page.
+
+### A gate that could not exist before this release
+
+`tools/test-datahall-ai-no-retired-literals.mjs` denylists every NUMERAL of the retired basis
+(3,564 / 14.256 / 7,776 / 54 racks / 27 NVL72 / 132 kW / 66 kW / 350 kW / 9 run / 12 installed /
+4.5 MW / 5 MVA / 6300 A / 3516E / 2.75 MW / COP 6.8 / Scenario A / rack-pos …). Proven **RED at 456
+hits** on the pre-switch page, **CLEAN** now. The rule it enforces is the one from
+`feedback_binding_gate_blind_to_scope`: a dead binding must never show a plausible retired constant.
+The 204 `DHE?…:'3,564'`-style fallback ternaries were swept to `'—'` / `null`; the page already fails
+closed when its authority is unavailable, so a fallback's only possible job was to lie convincingly.
+
+### What changed, by surface
+
+- **Authority.** The hand-typed allow-lists (68 numeric + 15 string model paths, 28 function names,
+  33 state keys) are gone. The page validates the live snapshot against the GENERATED registry — every
+  id, with its type — plus the engine version, the model's spec version, and the `?v=` on three
+  script tags. A renamed engine quantity fails closed; a new one is covered the day it exists.
+  `tools/test-dcai-engine-version-pin.mjs` asserts the four pins agree (the v1.134.23 blank-page
+  failure, prevented here before it can happen).
+- **Bind.** `DHE` is now an adapter over the snapshot: ~60 legacy field names kept so ~200 read
+  sites keep working, each mapped and commented where its meaning changed (`kwPerNVL72` equals
+  `kwPerRack` — one GB300 rack IS the domain; `reqCurrentA` is the LV GROUP current). Sixteen dead
+  fields deleted; `cduInstalled` and `wue` stop being literals.
+- **KPI strip and telemetry spine (WP4).** Every cell carries `data-basis-param` and is painted by
+  one function, `RZDCAIBasis`, from the same dotted path the shared `js/rz-basis-drawer.js` explains
+  (the drawer's registry global is now configurable; the eight Conventional adopters are untouched).
+  The hand-written `basisFor` dictionary and its page-local drawer are deleted. `#dkPue` shows
+  1.165 in cyan (Rule 4) with annual / worst / target / gap beside it; `#dkGpu` and `#dkDom` are
+  written from the engine (they were static text); the two `Math.random` TCS "sensors" are the
+  engine's design planes (Rule 2). The 0.69 grid factor that lived in nine places is one model leaf.
+- **Electrical (WP2).** `js/datahall-ai/electrical-topology.js` scales from 54 hardcoded racks to
+  the engine's 880 through **40 RPP groups of 22 racks** (3.12 MW ≈ 4.7 kA on a 5,000 A trunk — the
+  grouping is an ampacity fact, published as `distribution.*`, not a drawing convenience). 2N /
+  DEGRADED / COMMON_SOURCE semantics unchanged; per-group fault counts; hall counts 880 / 3,520;
+  171 gensets modelled, 8 drawn. Tests derive every expectation from the snapshot.
+- **Diagrams (WP3).** SLD per hall on the 40 groups with the trunk loading DERIVED; overview genset
+  bank with the facility pool counted; hall mimic as 10 row strips of 88 (≈ today's node count, not
+  6,000 rack glyphs); rack architecture redrawn for GB300 (18 compute trays, 9 NVSwitch trays, 8 power
+  shelves — 5 duty, N+3, 4+4 unachievable); cooling P&ID as banks with the **cliff panel** printing
+  both sides of the economiser inequality (HTW required 37.0 °C vs achievable 37.0 °C, margin 0.0 K,
+  cliff 34 °C) in place of a dry cooler that used to leave fluid colder than the air; floor plans and
+  the building isometric relabelled from the engine.
+- **Documents (WP5).** BoD drawer, BoD PDF, Tech Spec and FAQ describe the plant the engine computes
+  — the COP is printed with its Carnot-fraction derivation, the busway with its loading, the gensets
+  as a facility pool of 4 MW machines (the 2.75 MW class was rejected by arithmetic: >200 sets). The
+  PDF's per-rack table became per-group. The GB200 basis survives only as a labelled retired
+  reference and in the platform selector as `Retired GB200 split-domain basis`.
+- **Registry.** R8 "every parameter rendered or declared internal" flipped **STRICT** in this
+  commit, as its v1.136.0 flip condition required: 171 of 200 read by the page, 29 declared internal
+  with a written reason each (ambiguous-leaf twins the adapter reads under an alias, consistency
+  flags the gate asserts, per-bin values, null-while-free-cooling planes).
+
+### Honest boundaries
+
+The building grid is still the retired-basis 72 × 48 m plot and says so on the floor plan: two
+62 × 31 m halls and 270 UPS frames per hall do not fit the drawn rooms, and re-gridding the site is
+its own change. The Network tab draws 27 representative racks and labels them as such (Track A §A7
+redesigns it). The AI page is not yet in the coverage gate as a monitor; the coverage tool is bound
+to the Conventional registry. 142 kW per rack is ADOPTED (NVIDIA publishes no rack power); annual
+figures are ASSUMED (no TMY). Nothing was tuned: the PUE is what the declared terms produce.
+
+### Execution note
+
+Six Opus agents were dispatched in worktrees and all six were terminated by a session rate limit
+mid-task, on branches cut from `main` rather than the switched page. Their partial work was merged
+one package at a time and completed by hand; the record is in the plan file.
+
+Standards: `ACCURACY_VALIDATION.md` (Rule 5 rewritten for GB300 vocabulary; acceptance list
+re-pinned), `DATAHALL_AI_STANDARD.md` (capacity table, LV grouping), manuals and PRD rewritten
+against the snapshot. Ship gate: 57 gates; `probe-accuracy-validation` re-pinned to the snapshot and measured at **82/82** (AI-Test-3 inverted: at GB300 the page must NOT say `rack-pos` or `66 kW` and MUST say `142 kW`; TS-AI and BoD-AI assert the derived COP is printed with its Carnot derivation).
+
+---
+
 ## v1.136.0 — 2026-09-06
 
 ### Added — a GB300 / 500 MW basis engine for the AI campus, built alongside the retired GB200 one

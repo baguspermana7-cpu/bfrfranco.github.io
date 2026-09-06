@@ -81,14 +81,25 @@ GREEN (which would falsely imply it's inside the ≤1.12 target band).
 
 ### Rule 5 — Terminology must match the engineering basis
 
-For DC AI's GB200 NVL72 + 2-rack-footprint topology, use:
+For DC AI's **GB300 NVL72** topology (adopted 2026-09-06, live since v2.0.0), **one rack IS one
+NVLink domain** — there is no split-domain footprint any more. Use:
 
-- `NVL72 domain` (logical 72-GPU unit; 132 kW per domain footprint)
-- `physical rack position` (one of 2 racks carrying the NVL72 split;
-  66 kW per position)
+- `NVL72 rack` (one physical rack = one 72-GPU NVLink domain; **142 kW** per rack)
+- `rack row` (a physical aggregation unit for the hall mimic and floor plan; **88 racks**)
+- `RPP group` (the electrical aggregation unit fed by one busway trunk; **22 racks**, ≈3.12 MW,
+  ≈4.7 kA at 400 V — four groups per row, 40 groups per hall)
 
-NEVER call a 66 kW position an "NVL72 rack" — NVIDIA reference spec
-says ~120 kW per NVL72 rack-scale system.
+NEVER use, for the current GB300 basis:
+
+- `rack-pos` / `physical rack position` (that vocabulary describes the RETIRED GB200 split-domain
+  footprint, where a domain spanned 2 racks)
+- `66 kW` (the retired GB200 per-rack-position figure)
+- `132 kW per NVL72` (the retired GB200 per-domain figure; the GB300 figure is 142 kW per rack)
+
+The retired GB200 vocabulary (`NVL72 domain` / `physical rack position`, 132 / 66 kW) still applies
+**only** when describing the byte-frozen `js/datahall-model.js` + `js/datahall-calculations.js`
+pair as a named historical reference (e.g. the platform-comparison selector), and any such mention
+must be labelled as the retired basis, never presented as the page's current numbers.
 
 For DC Conv, separate:
 
@@ -96,16 +107,23 @@ For DC Conv, separate:
 - `Secondary loop SP` (follows the primary CHWS floor: 19.4 °C at the
   current governed point and may be raised for bypass; NEVER labelled "CHWS SP")
 
-### Rule 5 — status note (v1.136.0)
+### Rule 5 — status note (v2.0.0)
 
-Rule 5's GB200 vocabulary (`NVL72 domain` / `physical rack position`, 132 / 66 kW) is still what
-`datahallAI.html` renders, because the page still loads the GB200 pair. A GB300 basis engine now
-exists alongside it (`js/dcai-model.js` + `js/dcai-engine.js`; see DATAHALL_AI_STANDARD §v1.136.0),
-in which **one rack IS the NVL72 domain** (`compute.racks_per_nvl72_domain` = 1, PUBLISHED from the
-reference architecture). When Track A §A2b switches the page, Rule 5 must be rewritten: at GB300 the
-142 kW rack is the domain, so "never call a 66 kW position an NVL72 rack" would fail the probe on
-correct text. The GB200 pair is RETIRED the way `conv-engine.js` retired the 1.85 MW hall — frozen
-byte-identical by the ship gate, still reproducing its own 57 worked examples, no longer the basis.
+**`datahallAI.html` is switched.** As of v2.0.0 (Track A §A2b, 2026-09-06) the page loads
+`js/dcai-model.js` + `js/dcai-engine.js` + `js/dcai-parameters.js` (spec
+`gb300-500mw-2026-09-06`, asset version `1.0.0`) as its authority, not the GB200 pair. Rule 5's
+vocabulary above is the CURRENT text contract, enforced by `tools/probe-accuracy-validation.mjs`
+AI-Test-3 (now INVERTED versus the pre-v2.0.0 wording: it forbids `rack-pos`/`66 kW` and requires
+`142 kW`) and by `tools/test-datahall-ai-no-retired-literals.mjs`. The GB200 pair
+(`js/datahall-model.js` + `js/datahall-calculations.js`) is RETIRED the way `conv-engine.js`
+retired the 1.85 MW hall — frozen byte-identical by the ship gate, still reproducing its own 57
+worked examples via `tools/test-datahall-calc.mjs`, no longer the page's basis. **Known open
+gap** (tracked, not silently accepted): the Tech Spec PDF builder (`buildTechSpecHtml()`) and
+its §3.4–3.6 worked sections have not yet completed their GB300 rewrite — they still contain
+`rack-pos` vocabulary and a `legacyView().eq.busway` field mismatch (`selectedRatingA` /
+`undersizedRatingA` are not published by the current adapter) that throws
+`Non-finite numeric input: NaN` and aborts Generate-Design PDF export. The Basis-of-Design PDF
+builder (`buildBodPdfHtml()`) is fully rewritten and carries none of the retired vocabulary.
 
 ### Rule 6 — Basis chip on every critical KPI (v1.32.2+)
 
@@ -143,8 +161,8 @@ RZ_BASE=file node tools/probe-accuracy-validation.mjs
 Exit code 0 on PASS, 1 on FAIL. The probe covers:
 
 - DC AI: tests 1a–1f (headline consistency), 2 (reload determinism),
-  3a–3b (terminology), 4 (CDU count), 5 (generator arithmetic),
-  6 (colour grammar), 7a–7g (basis drawer contract).
+  3a–3c (terminology, INVERTED at GB300 vs the pre-v2.0.0 wording), 4 (CDU count),
+  5 (generator arithmetic), 6 (colour grammar), 7a–7e (shared basis-drawer contract).
 - DC Conv: tests 1a–1b (carbon denominator), 2a (chiller loop label),
   3a–3b (PUE reconciliation), 4 (WUE reconciliation), 5 (fuel
   autonomy scope), 6 (UPS 2N normal+failover), 7 (reload
@@ -154,21 +172,28 @@ Approximate runtime: 25–35 s headless. Adopt as a per-ship gate
 alongside the four audit scripts (`audit-script-tags`,
 `audit-js-syntax`, `audit-version-stamp`, `audit-mobile-responsive`).
 
-### DC AI
+### DC AI (GB300 basis, v2.0.0)
 
-1. **Headline consistency** — IT facility load = 14.26 MW on every
-   page; PUE = 1.30 on every page; facility load = 18.55 MW on every
-   page.
+1. **Headline consistency** — rack IT = 499.84 MW, total IT (the PUE denominator) = 539.05 MW,
+   PUE (design day) = 1.165, WUE = 0.00, CUE_IT = 0.80 (grid 0.69 × PUE), GPUs = 253,440, NVL72
+   racks = 3,520 — identical on every surface that renders them (`#dkIt`/`#dkPue`/… and the
+   generated PDFs).
 2. **No random basis values** — reload 20× and PUE/WUE/CUE/IT/facility/
    GPU/NVL72/CDU/genset are byte-identical.
-3. **Market terminology** — no UI text implies 66 kW is a single
-   NVIDIA NVL72 rack.
-4. **CDU count math** — for 350 kW basis: 9 running × 4 halls = 36;
-   12 installed × 4 halls = 48.
-5. **Generator arithmetic** — total = units × rating. For 18.55 MW
-   facility: 7 running + 1 N+1 = 8 × 2.75 MW.
-6. **KPI colour grammar** — green only when inside band.
-7. **Basis drawer** on every top KPI (v1.32.2+).
+3. **Market terminology (INVERTED vs the GB200 wording)** — the page MUST NOT contain `rack-pos`
+   or `66 kW` (retired GB200 vocabulary), and MUST contain `142 kW` (the GB300 per-rack figure —
+   at GB300 a rack IS the NVL72 domain, so no disambiguating "rack position" language is needed
+   or correct any more).
+4. **CDU count math** — `equipment.cdu_duty_per_hall` = 107 running + 1 standby =
+   `equipment.cdu_installed_per_hall` 108 per hall; × 4 halls = `equipment.cdu_installed_facility`
+   432.
+5. **Generator arithmetic** — total = units × rating. Facility electrical load ≈ 628 MW:
+   169 running (duty) + 2 standby = 171 installed (N+2) × 4 MW gensets.
+6. **KPI colour grammar** — green only when inside band; PUE stays cyan (informational, Rule 4).
+7. **Basis drawer** — every top KPI carries `data-basis-param` onto a `RZ_DCAI_PARAMETERS`
+   registry id and opens the shared `#rz-basis-drawer` (`js/rz-basis-drawer.js`), same drawer as
+   the Conventional cockpits (v2.0.0 — replaces the retired page-local `#kpiBasisDrawer` +
+   `basisFor` dictionary).
 8. **First-paint truth** — authority KPIs render their exact engine value from the first frame.
    Count-up animation, easing through plausible values and delayed restoration are prohibited.
 
@@ -281,3 +306,24 @@ alongside the four audit scripts (`audit-script-tags`,
   undefined — `CONV_CALC.snapshot` has no `datahall` key). Fixed
   by hardcoding 200 racks design constant with defensive guard.
   **75/75 PASS** (was 67; +8 FAQ assertions).
+- **v2.0.0** (2026-09-06, Track A §A2b WP1–WP5): `datahallAI.html` switched from the GB200 pair
+  to the GB300 basis engine (`js/dcai-model.js` + `js/dcai-engine.js` + `js/dcai-parameters.js`,
+  spec `gb300-500mw-2026-09-06`). Rule 5 rewritten for GB300 vocabulary (above); DC AI acceptance
+  tests 1/3/4/5/7 re-pinned to the new snapshot (539.05 MW total IT, 1.165 PUE, 142 kW/rack,
+  108/432 CDU, 171 gensets). `tools/test-datahall-ai-authority.mjs`,
+  `tools/test-datahall-ai-cdu-basis.mjs` and `tools/test-datahall-ai-operator-ui.mjs` rewritten for
+  the new authority contract. `tools/probe-accuracy-validation.mjs` now executes **73 total
+  assertions** (was quoted 83/83 in `tools/ship-gate.sh` before this measurement; the gap is the 9
+  Tech Spec assertions TS-AI-2..10 that are skipped while TS-AI-1 fails — see below). **71/73
+  PASS** at time of writing; the 2 open failures are BOTH inside `datahallAI.html`'s still-in-flight
+  Tech Spec PDF rewrite, not gate defects:
+  - `AI-Test-3a` — `rack-pos` / `rack position` GB200 vocabulary still appears in the Tech Spec's
+    §3.4–3.6 worked sections (per-domain power matrix, floor-loading note, cable-schedule preview).
+  - `TS-AI-1` — clicking Generate Design throws `Non-finite numeric input: NaN` inside
+    `buildTechSpecHtml()` because it reads `legacyView().eq.busway.selectedRatingA` /
+    `.undersizedRatingA`, fields the current adapter does not publish (`eq.busway` only has
+    `trunkRatingA` / `groupCurrentA` / `loadingPct`); this aborts PDF generation entirely, so
+    TS-AI-2..10 never execute in this run.
+  The Basis-of-Design PDF builder (`buildBodPdfHtml()`) is fully rewritten: BoD-AI-3/4/5/7
+  re-pinned to the GB300 snapshot, and BoD-AI-6 was INVERTED (it no longer cites "Scenario A" —
+  confirmed absent from the rewritten BoD PDF source) rather than left asserting retired wording.

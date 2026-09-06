@@ -53,7 +53,7 @@ node   tools/audit-hero-images.mjs --strict        # hero images: any page with 
 ```bash
 node tools/test-datahall-calc.mjs                  # 57/57 doc-21 worked examples
 node tools/test-conv-calc.mjs                      # 22/22 conv DoD identities
-RZ_BASE=file node tools/probe-accuracy-validation.mjs   # 40/40 reviewer acceptance tests
+RZ_BASE=file node tools/probe-accuracy-validation.mjs   # 82/82 reviewer acceptance tests
 node tools/test-dc-corpus.mjs                      # DC corpus gate — provenance-mandatory facts + monotonic distributions (gate any corpus/aggregate change)
 node tools/test-rz-engine.mjs                      # RZEngine v2.0 — model worked examples + data invariants + reachability + provenance (gate any change to rz-engine.js)
 node tools/test-fin-engine.mjs                     # FIN Engine — ratios/valuation/technical/score worked examples + ta.js PARITY + invariants + provenance + disclaimer (gate any change to fin-engine.js)
@@ -371,7 +371,7 @@ Music: `my-video/public/audio/intro-music.mp3` — currently a synthesized elect
 | `tools/inject-schema-faq-howto.py` | add FAQ/HowTo JSON-LD to calc/tool pages |
 | `tools/test-datahall-calc.mjs` | DC AI engine — 57/57 doc-21 worked examples |
 | `tools/test-conv-calc.mjs` | DC Conv engine — 22/22 DoD identities |
-| `tools/probe-accuracy-validation.mjs` | Reviewer's 23 acceptance tests + cross-page Rule-1 consistency — 40/40 PASS at v1.35.1 (see standarization/ACCURACY_VALIDATION.md) |
+| `tools/probe-accuracy-validation.mjs` | Reviewer's 23 acceptance tests + cross-page Rule-1 consistency — 82/82 executed assertions at v2.0.0 (GB300 DC AI switch; see standarization/ACCURACY_VALIDATION.md) |
 | `tools/build-countries-data.mjs` | Generates `rz-engine.js DATA.countries` (single-source country reference) from `dcmoc/src/constants/countries.ts`. Rerun after editing countries.ts, then terser + `?v=` bump. See standarization/ENGINE_UNIFICATION.md |
 | `tools/test-reference-parity.mjs` | Reference-data parity gate — fails if `DATA.countries` drifts from the DCMOC source, or per-country electricity/grid-carbon/tax/enums/currency diverge (126/0) |
 
