@@ -78,10 +78,16 @@
 - **State before decoration:** energized animation, alarm emphasis and cause/effect selection
   are derived from validated semantic state. Color and animation supplement text, equipment
   identity, sequence and redundancy status; they never create operational truth.
-- **Explicit conductor projection:** AI SLD lines bind to an evaluated topology edge or
-  rack-edge prefix through `electrical-visual-map.js`. Role-wide fallback is prohibited.
-  Overview declares four halls/216 positions; a selected hall declares 54 positions; unknown
-  lines fail closed and normally-open ties stay non-animated.
+- **Explicit conductor projection:** AI SLD lines bind to an evaluated topology edge or a
+  group-feeder prefix (`EDGE-RPP-A-`) through `electrical-visual-map.js`. Role-wide fallback
+  is prohibited. Counts are READ FROM THE ENGINE, never typed: at the GB300 basis a selected
+  hall declares `compute.racks_per_hall` (880 racks, aggregated into
+  `geometry.rack_groups_per_hall` = 40 RPP groups of 22) and the overview declares
+  `compute.racks_facility` (3,520). Unknown lines fail closed, normally-open ties stay
+  non-animated, and a single faulted rack cord is an integer COUNT inside its group — it
+  makes the drawn bank partially energized without de-energizing the group feeder.
+  *(v2.0.0, 2026-09-06 — the retired GB200 wording said "four halls/216 positions … 54
+  positions"; those were per-rack nodes at 66 kW and no longer exist.)*
 - **Alarm authority separation:** historical query counters belong to the query workspace;
   live BMS KPI chips retain their independent engine writer. First-out always comes from the
   unfiltered incident provenance, invalid queries clear stale results, and CSV values are

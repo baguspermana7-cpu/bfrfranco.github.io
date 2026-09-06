@@ -1,9 +1,42 @@
-/* Explicit projection from AI SLD conductors to evaluated topology edges. */
+/* Explicit projection from AI SLD conductors to evaluated topology edges.
+ *
+ * v2.0.0 — the evaluated topology aggregates racks into RPP groups, so a bank
+ * line binds to an `EDGE-RPP-A-` prefix (40 group feeders) rather than to 54
+ * per-rack edges, and rack counts are SUMMED from each group instead of counted
+ * one node per rack. A partial bank is now two different facts: some group
+ * feeders de-energized, or some individual rack cords faulted inside groups
+ * that are still fed — both make the drawn line partially energized.
+ */
 (function (root) {
   'use strict';
 
-  var HALL_COUNT = 4;
+  /* Only used when no engine snapshot is reachable at all; the hall count is a
+     published quantity (racks_facility / racks_per_hall), never a house number. */
+  var FALLBACK_HALL_COUNT = 4;
   var HALL_SCOPE = /^dh0([1-4])$/;
+
+  function snapshotOrNull() {
+    if (root && root.DCAI_CALC && root.DCAI_CALC.snapshot) { return root.DCAI_CALC.snapshot; }
+    if (typeof module !== 'undefined' && module.exports && typeof require === 'function') {
+      try { return require('../dcai-engine.js').snapshot; } catch (e) { return null; }
+    }
+    return null;
+  }
+
+  function resolveHallCount() {
+    var snapshot = snapshotOrNull();
+    var facility;
+    var perHall;
+    if (!snapshot || !snapshot.compute) { return FALLBACK_HALL_COUNT; }
+    facility = snapshot.compute.racks_facility;
+    perHall = snapshot.compute.racks_per_hall;
+    if (typeof facility !== 'number' || typeof perHall !== 'number' || perHall <= 0) {
+      return FALLBACK_HALL_COUNT;
+    }
+    return facility / perHall;
+  }
+
+  var HALL_COUNT = resolveHallCount();
 
   function edgeId(feed, segment) {
     return 'EDGE-' + segment.replace(/\{F\}/g, feed);
@@ -75,6 +108,18 @@
     }).map(function (id) { return index[id]; });
   }
 
+  function sumFaulted(edges) {
+    return edges.reduce(function (total, edge) {
+      return total + (typeof edge.faultedRacks === 'number' ? edge.faultedRacks : 0);
+    }, 0);
+  }
+
+  function sumServed(edges) {
+    return edges.reduce(function (total, edge) {
+      return total + (typeof edge.servedRacks === 'number' ? edge.servedRacks : 0);
+    }, 0);
+  }
+
   function projectLine(descriptor, result, scope) {
     var safeDescriptor = descriptor || {};
     var normalizedScope = normalizeScope(scope);
@@ -87,8 +132,11 @@
     var sourceIds = unique(activeEdges.reduce(function (all, edge) {
       return all.concat(edge.sourceIds || []);
     }, []));
+    var faultedRacks = sumFaulted(edges);
     var active = edges.length > 0 && activeEdges.length > 0;
-    var partial = active && activeEdges.length < edges.length;
+    /* a bank is partial when some feeders are down OR when racks inside a fed
+       group have lost a cord — the aggregated topology reports the second as a count */
+    var partial = active && (activeEdges.length < edges.length || faultedRacks > 0);
     return Object.freeze({
       active: active,
       partial: partial,
@@ -97,21 +145,35 @@
       semanticState: !inScope ? 'out-of-scope' : openTie ? 'open' : !edges.length ? 'unmapped' :
         partial ? 'partially-energized' : (semanticStates[0] || 'de-energized'),
       edgeIds: Object.freeze(edges.map(function (edge) { return edge.id; })),
-      sourceIds: Object.freeze(sourceIds)
+      sourceIds: Object.freeze(sourceIds),
+      faultedRacks: faultedRacks,
+      servedRacks: sumServed(edges)
     });
   }
 
+  function readCount(group, key) {
+    var value = group[key];
+    if (typeof value !== 'number' || !isFinite(value)) {
+      throw new Error('Rack group ' + (group.id || '?') + ' has no ' + key +
+        ' — the aggregated topology is required (electrical-topology.js >= 2.0.0)');
+    }
+    return value;
+  }
+
+  /* Counts are SUMMED from the groups: one group carries rackCount racks, and the
+     per-rack buckets are published by the state engine, never re-derived here. */
   function hallCounts(racks, scope) {
     var counts = { total: 0, available: 0, twoN: 0, degraded: 0, lost: 0 };
     var source = racks && typeof racks === 'object' ? racks : {};
-    Object.keys(source).forEach(function (id) {
-      counts.total += 1;
-      if (source[id].serviceAvailable) { counts.available += 1; }
-      if (source[id].redundancyState === '2N') { counts.twoN += 1; }
-      if (source[id].redundancyState === 'DEGRADED') { counts.degraded += 1; }
-      if (source[id].redundancyState === 'LOST') { counts.lost += 1; }
-    });
     var multiplier = normalizeScope(scope) === 'overview' ? HALL_COUNT : 1;
+    Object.keys(source).forEach(function (id) {
+      var group = source[id];
+      counts.total += readCount(group, 'rackCount');
+      counts.available += readCount(group, 'servedRackCount');
+      counts.twoN += readCount(group, 'twoNCount');
+      counts.degraded += readCount(group, 'degradedCount');
+      counts.lost += readCount(group, 'lostCount');
+    });
     Object.keys(counts).forEach(function (key) { counts[key] *= multiplier; });
     return Object.freeze(counts);
   }
@@ -124,7 +186,7 @@
     normalizeScope: normalizeScope,
     projectLine: projectLine,
     hallCounts: hallCounts,
-    version: '1.0.0'
+    version: '2.0.0'
   });
 
   if (root) { root.RZDatahallAIElectricalVisualMap = API; }

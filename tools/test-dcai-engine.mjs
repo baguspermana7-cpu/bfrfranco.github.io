@@ -253,6 +253,35 @@ approx(S.heat.liquid_hall_kwth * M.facility.halls, S.heat.liquid_kwth, 1e-6, 'ha
   approx(Ge.rack_footprint_fraction, Ge.rack_footprint_m2_per_hall / Ge.hall_area_m2, 1e-12, 'rack_footprint_fraction = footprint / area');
   approx(Ge.it_density_kw_per_m2, S.power.rack_it_hall_kwe / Ge.hall_area_m2, 1e-9, 'it_density_kw_per_m2 = hall rack IT / area');
 
+  /* --- floor grid and the LV grouping that hangs off it (WP2 electrical scaling) --- */
+  ok(S.geometry.racks_per_row === M.facility.racksPerHall / M.geometry.rows, 'geometry.racks_per_row = racks per hall / rows');
+  ok(S.geometry.rack_groups_per_hall === M.facility.racksPerHall / M.electrical.racksPerRppGroup, 'geometry.rack_groups_per_hall = racks per hall / racks per RPP group');
+  ok(S.geometry.groups_per_row === S.geometry.racks_per_row / S.geometry.racks_per_group, 'geometry.groups_per_row = racks per row / racks per group');
+  ok(S.geometry.integer_layout === true && S.geometry.rack_rows * S.geometry.racks_per_row === M.facility.racksPerHall &&
+     S.geometry.rack_groups_per_hall * S.geometry.racks_per_group === M.facility.racksPerHall,
+     'geometry.integer_layout: rows x racks/row = groups x racks/group = racks/hall');
+
+  const Di = S.distribution;
+  const lineCurrent = (kw) => (kw * 1000) / (Math.sqrt(3) * M.electrical.voltageLL * M.electrical.powerFactor);
+  ok(S.distribution.racks_per_group === M.electrical.racksPerRppGroup, 'distribution.racks_per_group republishes the authored grouping leaf');
+  ok(S.distribution.rpp_groups_per_hall === Ge.rack_groups_per_hall, 'distribution.rack_groups_per_hall agrees with the floor grid');
+  ok(S.distribution.group_kw === M.electrical.racksPerRppGroup * M.facility.rackItKw, 'distribution.group_kw = racks per group x rack kW');
+  approx(S.distribution.group_current_a, lineCurrent(Di.group_kw), 1e-9, 'distribution.group_current_a = kW / (sqrt3 x V x PF)');
+  approx(S.distribution.rack_feed_current_a, lineCurrent(M.facility.rackItKw), 1e-9, 'distribution.rack_feed_current_a = rack kW / (sqrt3 x V x PF)');
+  approx(S.distribution.busway_loading_pct, (Di.group_current_a / M.electrical.buswayTrunkA) * 100, 1e-9, 'distribution.busway_loading_pct = group current / trunk rating');
+  ok(S.distribution.busway_trunk_fits_group === (Di.group_current_a <= M.electrical.buswayTrunkA) && Di.busway_trunk_fits_group === true,
+     'distribution.busway_trunk_fits_group: the group current fits the declared trunk rating', Di.busway_loading_pct);
+  ok(S.distribution.rack_feed_dual_corded === true, 'distribution.rack_feed_dual_corded: every rack is fed A and B');
+  ok(S.distribution.rpp_per_hall === Ge.rack_groups_per_hall * 2, 'distribution.rpp_per_hall = one RPP per group per feed');
+  ok(S.distribution.hall_group_kw_check === true && Di.group_kw * Ge.rack_groups_per_hall === S.power.rack_it_hall_kwe,
+     'distribution.hall_group_kw_check: groups x group kW = hall rack IT');
+
+  ok(S.distribution.transformers_per_hall_per_feed === Math.ceil(E.facility_kva / (M.facility.halls * 2) / (M.equipment.transformer.unitMva * 1000)),
+     'equipment.transformers_per_hall_per_feed = ceil(kVA per hall per feed / unit)');
+  ok(S.distribution.ups_frames_per_hall_per_feed === Math.ceil(S.power.total_it_kwe / M.facility.halls / (M.equipment.ups.unitKw * M.equipment.ups.designLoadingMax)),
+     'equipment.ups_frames_per_hall_per_feed = ceil(hall IT / (frame x design loading))');
+  ok(S.distribution.gensets_facility_shared === true, 'equipment.gensets_facility_shared: the pool is sized on the facility load, with no per-hall split');
+
   ok(N.gpu_downlinks_per_hall === S.compute.gpu_per_hall, 'gpu_downlinks_per_hall = GPUs per hall (one 800G port each)');
   ok(N.leaf_spine_links_per_hall === N.leaves_per_hall * M.fabric.leafUpPorts, 'leaf_spine_links = leaves x up-ports');
   ok(N.spines_per_hall === N.leaf_spine_links_per_hall / M.fabric.spineDownPorts, 'spines = leaf-spine links / spine down-ports');

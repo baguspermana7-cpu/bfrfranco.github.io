@@ -451,6 +451,8 @@
       busway_loading_pct: div(groupCurrentA, el.buswayTrunkA) * 100,
       busway_trunk_fits_group: groupCurrentA <= el.buswayTrunkA,
       rpp_groups_per_hall: groupsPerHall,
+      rack_feed_dual_corded: true,                             // A + B cord per rack, each sized for full load
+      hall_group_kw_check: groupKw * groupsPerHall === rackItHall_kwe,   // groups x group kW closes to the hall rack IT
       rpp_per_hall: groupsPerHall * 2,                         // A + B per group
       transformers_per_hall_per_feed: Math.ceil(div(transformers, f.halls * 2)),
       ups_frames_per_hall_per_feed: Math.ceil(div(upsFramesPerFeed, f.halls)),
