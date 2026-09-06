@@ -11,6 +11,73 @@ release sections rather than semver.
 
 ---
 
+## v2.1.0 — 2026-09-06
+
+### Traceability symbols on every drawing of the AI cockpit (Track A §A3)
+
+The owner asked for the symbol on the parameter — *"dikasi traceability symbol juga di parameter"* —
+on the drawings, not only on the cards. Every engine number drawn inside the thirteen SVG diagrams of
+`datahallAI.html` now carries a registry hook and a visible mark: a 2.2-unit circle on the value's
+baseline coloured by the registry's evidence class (blue PUBLISHED, green DERIVED, amber ADOPTED,
+violet SIMULATED …), emitted as ONE declared group by the new `js/rz-svg-basis.js`. A click on a mark
+opens the right-side inspector in a new **basis mode** (`js/rz-inspector.js` 1.44.0) with the
+registry record — never the centre modal that review doc-27 §3.2 forbade over a topology. HTML cells
+keep the centre drawer and show the same dot. The evidence vocabulary lives once in `js/rz-evidence.js`
+(ten classes; the drawer's private table had been missing LABEL and PUBLISHED, so 28 parameters
+rendered a grey fallback until now). ACCURACY_VALIDATION Rule 6 is rewritten against the registry
+taxonomy; DATAHALL_AI_STANDARD gains "Traceability on drawings"; INSPECTOR.md records basis mode.
+
+### The gate that sees a hook, and what it found
+
+`tools/test-dcai-coverage.mjs` walks every visible numeral in the 13 diagrams (each tab activated,
+both floor plans opened) and the HTML of every tab, and counts a number ONLY under a resolving hook
+whose drawn string equals the registry value at an accepted scale, or under a declared
+`data-rz-authored-basis` reason. Value-string coincidence counts for nothing. RED baseline on the
+untouched page: **3,086 numerals · 199 hooked · 2,868 untraced**. After the sweep: **2,923 numerals ·
+2,282 hooked · 641 declared · 0 mismatch · 0 untraced** — STRICT from this commit, run with
+`--settle=9000` so every ticker has fired. `tools/test-dcai-basis-hooks.mjs` clicks one mark per
+diagram and asserts the inspector, not the modal, opens with the registry value;
+`tools/test-dcai-basis-map.mjs` proves the one field→id map (`window.DH_BASIS`) resolves, is complete
+for every `bo()` read, and is at parity with the adapter. All three enter `tools/ship-gate.sh`.
+
+What the hook-aware gate exposed that the v2.0.0 numeral gate could not:
+
+- **A live lie.** The cooling P&ID ticker overwrote the engine planes every few seconds with GB200-era
+  rolls — 12/22 °C FWS, 35/45 °C TCS, a dry cooler leaving *colder than the air*, COP 6.5–7.2,
+  475–510 m³/h. The static draw was right and the live page was wrong. Retired; only declared
+  telemetry jitters now. The hall header ticker (12 °C / 500 m³/h), the SLD busway meters and the UPS
+  load jitter go the same way (Rule 2).
+- **Stale cards the denylist could not name.** "8× modular UPS", "88× RPP 800A", "64 MW (8×8MW)",
+  "80MVA total", "~8,950 kVA | 12,900A", "Active Ports 512/512", "27dom", "36 GPU + 18 CPU + 18 NVS",
+  "4.8 m³/h (80 LPM) per rack", "4000A Cu Busduct", "24×RPP 630A", "FWS 12→18 °C", "Chiller 3/4 run",
+  "Approach −3.0 °C", "1400 EF", "253,440× B200" — every one rewritten on the engine or declared as
+  what it is. A LOW-COP alarm that compared the derived COP with a retired 6.0 threshold (and so fired
+  forever) now compares with the engine's own COP.
+- **A broken floor plan.** Floor 2 threw `F is not defined` on every click since the v2.0.0 salvage
+  merge; nobody had measured it. Fixed, and both floors are measured rows now.
+- **The dash PUE tile** still showed the static `1.30` until the hall tab was opened. It is `—` until
+  painted and hooked to `pue.design_day`.
+
+### Engine (v1.1.0, additive)
+
+Per-hall slices of the electrical terms (`design.electrical.*_hall_kwe`), per-hall flows
+(`design.flows.tcs_hall_lpm`, `tcs_rack_lpm`, `htw/chw_hall_m3h`), `ups_dist_loss_kwe`,
+`ups_loading_normal_pct` (each 2N side carries half), `equipment.crah/cdu_duty_per_unit_kwth`,
+`cdu_flow_per_unit_lpm`, `battery_hall_kwh`, `gensets_standby`, `transformer_loading_pct`,
+`power.shelf_kw`, `geometry.rack_it_row_kwe` — each with an identity in `tools/test-dcai-engine.mjs`,
+so a drawing marks the quantity it prints instead of dividing a facility figure itself. Registry
+200 → 223 parameters, R7/R8 still strict. The page pin, the three `?v=` tokens and the authority test
+move to 1.1.0 together (`feedback_engine_version_pin_blanks_cockpits`).
+
+### Honest boundary
+
+The mark states evidence class, not correctness. The five HMI modals are not measured by the
+coverage gate (they are not open during measurement) — their remaining randomised readings are Track
+A §A5 work. Marks on the Conventional cockpits are a separate change. Legibility monitor on the page:
+788 → 785 findings (the marks are not text; the delta is the repaired floor plan being measured).
+
+---
+
 ## v2.0.0 — 2026-09-06
 
 ### The AI cockpit now runs on the GB300 / 500 MW basis — MAJOR

@@ -56,7 +56,7 @@ const S = C.snapshot;
 /* ── 0. sources and hygiene ─────────────────────────────────────────────── */
 ok(!/Math\.random/.test(ENGINE_SRC) && !/Math\.random/.test(MODEL_SRC), 'no Math.random in model or engine');
 ok(Object.isFrozen(S) && Object.isFrozen(S.design) && Object.isFrozen(M.thermal), 'snapshot and model are deep-frozen');
-ok(S.meta.version === '1.0.0' && S.meta.spec_version === M.specVersion, 'meta carries version and spec_version');
+ok(S.meta.version === '1.1.0' && S.meta.spec_version === M.specVersion, 'meta carries version and spec_version');
 ok(!/MEASURED/.test(MODEL_SRC.replace(/nothing may claim MEASURED[^\n]*/,'')), 'nothing in the model claims MEASURED');
 {
   /* every numeric leaf in the model has a `// source:` line within the 6 lines above it */
@@ -333,6 +333,35 @@ approx(S.heat.liquid_hall_kwth * M.facility.halls, S.heat.liquid_kwth, 1e-6, 'ha
   ok(S.pue.grid_kg_co2_per_kwh === M.electrical.gridKgCo2PerKwh, 'grid_kg_co2_per_kwh republishes the one named grid factor');
   approx(S.pue.cue_it_kg_per_kwh, M.electrical.gridKgCo2PerKwh * S.pue.design_day, 1e-12, 'CUE_IT = grid factor × design PUE');
   ok(!/0\.69/.test(ENGINE_SRC.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '')), 'the grid factor is not a literal inside the engine CODE (comments may name it)');
+}
+
+/* ── 15. per-hall slices and the printed composites (A3 traceability) ──────── */
+{
+  const D = S.design, El = D.electrical, Fl = D.flows, E = S.equipment, h = M.facility.halls;
+  approx(El.ups_dist_loss_kwe, El.ups_loss_kwe + El.dist_loss_kwe, 1e-9, 'ups_dist_loss_kwe = UPS loss + distribution loss');
+  approx(El.aux_hall_kwe, El.aux_kwe / h, 1e-9, 'aux_hall_kwe = facility / halls');
+  approx(El.cooling_hall_kwe, El.cooling_kwe / h, 1e-9, 'cooling_hall_kwe = facility / halls');
+  approx(El.chillers_hall_kwe, El.chillers_kwe / h, 1e-9, 'chillers_hall_kwe = facility / halls');
+  approx(El.pumps_hall_kwe, El.pumps_kwe / h, 1e-9, 'pumps_hall_kwe = facility / halls');
+  approx(El.fans_hall_kwe, El.fans_kwe / h, 1e-9, 'fans_hall_kwe = facility / halls');
+  approx(El.ups_dist_loss_hall_kwe, El.ups_dist_loss_kwe / h, 1e-9, 'ups_dist_loss_hall_kwe = facility / halls');
+  approx(El.non_it_hall_kwe, El.non_it_kwe / h, 1e-9, 'non_it_hall_kwe = facility / halls');
+  approx(El.facility_hall_kwe, El.facility_kwe / h, 1e-9, 'facility_hall_kwe = facility / halls');
+  approx(Fl.tcs_hall_m3h, Fl.tcs_m3h / h, 1e-9, 'tcs_hall_m3h = facility / halls');
+  approx(Fl.tcs_hall_lpm, Fl.tcs_m3h / h * 1000 / 60, 1e-9, 'tcs_hall_lpm = m³/h → L/min');
+  approx(Fl.tcs_rack_lpm, Fl.tcs_hall_lpm / M.facility.racksPerHall, 1e-9, 'tcs_rack_lpm = hall L/min / racks per hall');
+  approx(Fl.htw_hall_m3h, Fl.htw_m3h / h, 1e-9, 'htw_hall_m3h = facility / halls');
+  approx(Fl.chw_hall_m3h, Fl.chw_m3h / h, 1e-9, 'chw_hall_m3h = facility / halls');
+  approx(E.crah_duty_per_unit_kwth, S.heat.air_hall_kwth / E.crah_duty_per_hall, 1e-9, 'crah_duty_per_unit_kwth = hall air heat / duty units');
+  approx(E.cdu_duty_per_unit_kwth, S.heat.liquid_hall_kwth / E.cdu_duty_per_hall, 1e-9, 'cdu_duty_per_unit_kwth = hall liquid heat / duty units');
+  approx(E.cdu_flow_per_unit_lpm, Fl.tcs_hall_lpm / E.cdu_duty_per_hall, 1e-9, 'cdu_flow_per_unit_lpm = hall TCS L/min / duty units');
+  approx(S.geometry.rack_it_row_kwe, S.geometry.racks_per_row * S.power.rack_it_kw, 1e-9, 'rack_it_row_kwe = racks per row x rack kW');
+  approx(E.transformer_loading_pct, E.facility_kva / (E.transformers * M.equipment.transformer.unitMva * 1000) * 100, 1e-9, 'transformer_loading_pct = facility kVA / installed');
+  ok(S.power.shelf_kw === M.gb300.shelfKw, 'shelf_kw republishes the shelf rating');
+  approx(E.battery_hall_kwh, E.battery_kwh / h, 1e-9, 'battery_hall_kwh = facility battery / halls');
+  ok(E.gensets_standby === E.gensets_installed - E.gensets_duty, 'gensets_standby = installed - duty');
+  approx(E.ups_loading_normal_pct, E.ups_loading_pct / 2, 1e-9, 'ups_loading_normal_pct = half of the failover loading (2N)');
+  for (const b of M.weather.bins) { const op = C.operatingPoint(b.ambientDbC); approx(op.flows.tcs_hall_lpm, op.flows.tcs_m3h / h * 1000 / 60, 1e-9, `bin ${b.ambientDbC}: hall LPM`); }
 }
 
 /* ── report ──────────────────────────────────────────────────────────────── */

@@ -460,6 +460,45 @@ function busBar(x,y,w,label,c,liveId) { ... }
 ```
 These supplement the global `bx`, `tx`, `fl`, `symCB`, `symTX`, `symUPS`, `symGen`, `symMeter`.
 
+## Traceability on drawings (Track A §A3, v2.1.0)
+
+Every engine number drawn inside the thirteen SVG diagrams carries a registry hook and a visible
+mark, and every number without a registry twin carries a declared reason. The gate is
+`tools/test-dcai-coverage.mjs --strict --settle=9000` (hook-aware: value-string coincidence counts
+for nothing), with `tools/test-dcai-basis-hooks.mjs` (marks well-formed, one real click per diagram
+opens the inspector) and `tools/test-dcai-basis-map.mjs` (the field→id map is true, complete and at
+parity with the adapter).
+
+**The seam.** The text helpers take a trailing options argument:
+
+```javascript
+tx(x,y,t,c,s,a,w,o)   tx2(...,o)   lv(id,...,o)   busEtap(...,o)   eq/eqLive(...,o)
+rm/rmLive(...,{sub:bo('field'), equip:bo('field',{also:[...]})})   isoLabel/isoBox(...,o)
+mc(c,t,su,[[label,value,bo('field')],...],{declared|basis})          // HTML cards
+o = bo('<DHE field>')                       // -> {basis:'<registry id>'} via window.DH_BASIS
+o = bo('<field>',{also:['f2','f3']})        // composite: every id the string prints
+o = bo('<field>',{nomark:true})             // repeated row: hooked, no symbol
+o = bp('<plane key>')                       // design.planes.<key>
+o = {declared:'<reason ≥ 40 chars>'}        // no registry twin — say what it is
+```
+
+`window.DH_BASIS` is the ONE map from adapter field to registry id (JSON syntax, parsed by the map
+gate and credited by the registry generator). `RZSvgBasis.tag()` emits the group; the mark colour
+comes from the registry's evidence class through `js/rz-evidence.js`, never from a page literal.
+
+**Rules.** One mark per parameter per diagram (repeats use `nomark`). A number that is an identity
+over marked parameters (row kW = racks × rack kW, half of a hall flow) is either published by the
+engine and hooked, or declared as that identity — never hooked to a parameter it does not equal (the
+gate reports that as MISMATCH). Simulated sensor jitter is declared as simulated and jitters around
+the engine plane; **no ticker may overwrite a basis quantity** — the cooling ticker that rolled the
+retired 12/22 °C FWS, 35/45 °C TCS, COP 6.5–7.2 and 500 m³/h every few seconds was retired in
+v2.1.0. Standards citations, tag ids, model names, refrigerant designations and durations are
+labels the walker scrubs; anything else with a digit is counted.
+
+**Flip record.** RED baseline 2026-09-06 (page untouched): 3,086 numerals, 199 hooked, 2,868
+untraced across 13 diagrams + HTML. After the sweep: 2,926 numerals, 2,281 hooked, 644 declared,
+0 mismatch, 0 untraced → the gate went `--strict` in the same commit.
+
 ## Zoom & Pan System
 
 SVG containers use CSS classes:

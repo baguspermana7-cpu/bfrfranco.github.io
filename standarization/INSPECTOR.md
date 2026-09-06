@@ -35,10 +35,24 @@ Companion to [`LINE_MODEL.md`](LINE_MODEL.md) + [`BREAKER_SYMBOLS.md`](BREAKER_S
 ## Public API
 
 ```js
-window.RZInspector.open(element);   /* manually open inspector for an element */
-window.RZInspector.close();         /* close */
-window.RZInspector.isOpen();        /* boolean */
+window.RZInspector.open(element);       /* manually open inspector for an element */
+window.RZInspector.openBasis(target);   /* v1.44.0 — basis mode: target is a [data-basis-param] element (or an ancestor of one) or a registry id string */
+window.RZInspector.basisIdOf(element);  /* the registry id an element resolves to, or null */
+window.RZInspector.close();             /* close */
+window.RZInspector.isOpen();            /* boolean */
 ```
+
+## Basis mode (v1.44.0, Track A §A3)
+
+A traceability mark drawn inside an SVG mimic (`RZSvgBasis.tag()`, `js/rz-svg-basis.js`) opens
+this panel — not the centre basis modal — because a scrim over the topology is the doc-27 §3.2 P0
+this standard closed. The shared basis drawer (`js/rz-basis-drawer.js`) routes every click that
+originates inside an `<svg>` to `RZInspector.openBasis()`; clicks on HTML cells keep the modal.
+In basis mode the tab strip is hidden, the header reads `BASIS · <registry id>`, and the body is
+`RZBasisDrawer.renderRecord(id)` — the record has ONE renderer. Dependency links inside the record
+navigate within the panel. Outside-click treats `[data-basis-param]` elements as inside, so a second
+mark re-renders instead of closing. A pan on the zoom wrapper sets `window.__rzSvgPanMoved` and is
+never treated as a click.
 
 ## Authoring guidelines
 
@@ -55,6 +69,7 @@ window.RZInspector.isOpen();        /* boolean */
 | v1.43.0 | `datahallAI.html` | Loaded. Verified via probe — clicks open inspector. |
 | **v1.43.1** | `chiller-plant.html`, `water-system.html`, `fire-system.html` | **Loaded.** Each verified via probe (27/27 pass — 4 inspector assertions). |
 | v1.43.2 (planned) | `datahall.html`, `ict.html` | Pending — datahall standalone + ict on standard track. EPMS still deferred per owner mandate. |
+| **v2.1.0** | `datahallAI.html` | **Basis mode live.** 2,281 hooked numerals across 13 diagrams open the record here; `tools/test-dcai-basis-hooks.mjs` clicks one mark per diagram and asserts the panel, not the modal, opens with the registry value. |
 
 ## Visual
 

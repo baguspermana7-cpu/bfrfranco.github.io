@@ -146,6 +146,10 @@
       facilityPerHallKW: basis.pb_facility,
       auxiliaryPerHallKW: basis.pb_aux,
       coolingPerHallKW: basis.pb_cooling,
+      /* facility terms come from the engine when the basis publishes them (pbF_*); a rounded
+         per-hall slice multiplied back up is off by the rounding and fails the traceability gate */
+      auxiliaryFacilityKW: finiteNumber(basis.pbF_aux) ? basis.pbF_aux : basis.pb_aux * basis.halls,
+      coolingFacilityKW: finiteNumber(basis.pbF_cooling) ? basis.pbF_cooling : basis.pb_cooling * basis.halls,
       itFacilityMW: basis.itFacilityMW,
       facilityMW: basis.facTotalMW,
       pue: basis.pue,
@@ -186,8 +190,8 @@
       setText(document, 'eOvGen' + i, value.generatorGlyphStates[i - 1]);
     }
     setText(document, 'eOvGenPoolTitle', value.generatorHeading);
-    setText(document, 'eOvNC', integerText(value.auxiliaryPerHallKW * value.halls) + ' kW facility');
-    setText(document, 'eOvCool', integerText(value.coolingPerHallKW * value.halls) + ' kW facility');
+    setText(document, 'eOvNC', integerText(value.auxiliaryFacilityKW) + ' kW facility');
+    setText(document, 'eOvCool', integerText(value.coolingFacilityKW) + ' kW facility');
     setText(document, 'eLive',
       'IT: ' + value.itFacilityMW.toFixed(2) + ' MW | Facility: ' +
       value.facilityMW.toFixed(2) + ' MW | PUE: ' + value.pue.toFixed(2) +

@@ -55,21 +55,28 @@
         return 'RZ_CONV_PARAMETERS';
     }());
 
-    var EVIDENCE_NOTE = {
-        MEASURED: 'Read from a calibrated instrument.',
-        DERIVED: 'Computed from other registered parameters.',
-        SIMULATED: 'Produced by a deterministic model, not measured.',
-        ADOPTED: 'A project decision that has been formally adopted.',
-        ASSUMED: 'An engineering assumption pending confirmation. NOT measured, NOT vendor-approved.',
-        VENDOR: 'From a vendor submittal or data sheet.',
-        STANDARD: 'From a published standard.',
-        UNAVAILABLE: 'No source exists for this value in the current basis.'
+    /* v2.1.0 — the taxonomy lives in js/rz-evidence.js (ten classes, one table for the drawer,
+       the right-side inspector and the SVG traceability mark). The inline fallback below exists
+       only for a cockpit that loads this drawer without rz-evidence.js; it carries the same ten
+       classes so LABEL and PUBLISHED can never again fall through to a grey chip and an empty
+       Evidence row (28 of the AI page's 200 parameters did exactly that in v2.0.0). */
+    var EVIDENCE_FALLBACK = {
+        PUBLISHED:   { color: '#4b8fd0', note: 'Printed by the vendor or standards body named in the source; not measured here.' },
+        STANDARD:    { color: '#4b8fd0', note: 'A physical constant or a code value.' },
+        VENDOR:      { color: '#4b8fd0', note: 'Vendor-quoted for this project; screening grade until confirmed.' },
+        DERIVED:     { color: '#3f9d6b', note: 'Computed by the engine from other parameters; nothing typed.' },
+        ADOPTED:     { color: '#d99a2b', note: 'A project or owner design decision, stated as such.' },
+        ASSUMED:     { color: '#d99a2b', note: 'A textbook or mid-band value chosen before the result was looked at; pending Basis-of-Design.' },
+        SIMULATED:   { color: '#8b7bd0', note: 'A modelled operating value or a simulated sensor; never a field reading.' },
+        MEASURED:    { color: '#3f9d6b', note: 'A real instrument reading.' },
+        LABEL:       { color: '#8fa2b8', note: 'A name, a version or a nameplate figure used as a label — never a denominator.' },
+        UNAVAILABLE: { color: '#e4564a', note: 'Not published by the source and not derivable here.' }
     };
-    var EVIDENCE_COLOR = {
-        MEASURED: '#3f9d6b', DERIVED: '#4b8fd0', SIMULATED: '#8b7bd0',
-        ADOPTED: '#3f9d6b', ASSUMED: '#d99a2b', VENDOR: '#4b8fd0',
-        STANDARD: '#4b8fd0', UNAVAILABLE: '#e4564a'
-    };
+    function evidenceInfo(cls) {
+        var key = String(cls || 'UNAVAILABLE').split('/')[0].trim().toUpperCase();
+        if (root.RZEvidence && typeof root.RZEvidence.get === 'function') return root.RZEvidence.get(key);
+        return EVIDENCE_FALLBACK[key] || EVIDENCE_FALLBACK.UNAVAILABLE;
+    }
 
     var index = null;
 
@@ -184,29 +191,16 @@
             + 'font:inherit;text-decoration:underline dotted">' + esc(label) + '</button>';
     }
 
-    function render(id) {
-        var panel = document.getElementById('rz-basis-drawer-panel');
-        if (!panel) return;
-        if (!runtimeAuthorityAvailable()) {
-            panel.innerHTML = '<h2 id="rz-basis-drawer-title" style="margin:0 0 8px;font-size:16px">'
-                + 'Runtime basis unavailable</h2><p style="font-size:13px;color:#c9d4e2">'
-                + 'UNAVAILABLE &mdash; the generated registry is a design snapshot, not current runtime '
-                + 'authority. Restore the host cockpit&apos;s requested engine version and complete schema '
-                + 'before opening <code>' + esc(id) + '</code>.</p>'
-                + '<div style="margin-top:14px;display:flex;justify-content:flex-end">'
-                + '<button type="button" data-basis-close style="background:#1c2838;color:#dbe5f0;'
-                + 'border:1px solid #2b3a52;border-radius:4px;padding:7px 14px;cursor:pointer;'
-                + 'font:inherit;font-size:12.5px">Close</button></div>';
-            return;
-        }
+    /* v2.1.0 — the record HTML has ONE renderer. The centre modal (HTML value cells) and the
+       right-side inspector (SVG diagram marks) both call this; only the chrome differs. */
+    function renderRecord(id) {
         var p = byId(id);
         if (!p) {
             /* Fail loudly. A drawer that shrugs is how an unbound KPI stayed invisible. */
-            panel.innerHTML = '<h2 id="rz-basis-drawer-title" style="margin:0 0 8px;font-size:16px">'
+            return '<h2 id="rz-basis-drawer-title" style="margin:0 0 8px;font-size:16px">'
                 + 'Basis unavailable</h2><p style="font-size:13px;color:#c9d4e2">No registry entry for '
                 + '<code>' + esc(id) + '</code>. Either the parameter is not registered, or '
                 + '<code>js/conv-parameters.js</code> did not load. Nothing is being guessed here.</p>';
-            return;
         }
         var evidence = p.evidenceClass || 'UNAVAILABLE';
         var html = '<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:6px">'
@@ -214,7 +208,7 @@
             + esc(p.label || p.id) + '</h2>'
             + '<span style="flex:0 0 auto;font-size:10.5px;font-weight:700;letter-spacing:.06em;'
             + 'padding:3px 8px;border-radius:3px;color:#0f1621;background:'
-            + (EVIDENCE_COLOR[evidence] || '#8fa2b8') + '">' + esc(evidence) + '</span></div>'
+            + evidenceInfo(evidence).color + '">' + esc(evidence) + '</span></div>'
             + '<div style="font-size:11.5px;color:#8fa2b8;margin-bottom:12px">' + esc(p.id) + '</div>';
 
         html += row('Value', '<b style="color:#fff">' + esc(fmt(p.value, p.unit)) + '</b>');
@@ -239,7 +233,7 @@
         }
 
         html += row('Evidence', '<span style="color:#c9d4e2">'
-            + esc(EVIDENCE_NOTE[evidence] || '') + '</span>');
+            + esc(evidenceInfo(evidence).note) + '</span>');
         if (p.source) {
             var src = esc(p.source.ref || '');
             if (p.source.section) src += ' &middot; ' + esc(p.source.section);
@@ -257,6 +251,25 @@
             ? esc(p.tests.join(', '))
             : '<span style="color:#d99a2b">no gate asserts this</span>');
 
+        return html;
+    }
+
+    function render(id) {
+        var panel = document.getElementById('rz-basis-drawer-panel');
+        if (!panel) return;
+        if (!runtimeAuthorityAvailable()) {
+            panel.innerHTML = '<h2 id="rz-basis-drawer-title" style="margin:0 0 8px;font-size:16px">'
+                + 'Runtime basis unavailable</h2><p style="font-size:13px;color:#c9d4e2">'
+                + 'UNAVAILABLE &mdash; the generated registry is a design snapshot, not current runtime '
+                + 'authority. Restore the host cockpit&apos;s requested engine version and complete schema '
+                + 'before opening <code>' + esc(id) + '</code>.</p>'
+                + '<div style="margin-top:14px;display:flex;justify-content:flex-end">'
+                + '<button type="button" data-basis-close style="background:#1c2838;color:#dbe5f0;'
+                + 'border:1px solid #2b3a52;border-radius:4px;padding:7px 14px;cursor:pointer;'
+                + 'font:inherit;font-size:12.5px">Close</button></div>';
+            return;
+        }
+        var html = renderRecord(id);
         html += '<div style="margin-top:14px;display:flex;gap:10px;justify-content:flex-end">'
             + '<button type="button" data-basis-close style="background:#1c2838;color:#dbe5f0;'
             + 'border:1px solid #2b3a52;border-radius:4px;padding:7px 14px;cursor:pointer;'
@@ -285,6 +298,16 @@
                 return;
             }
             if (target.hasAttribute && target.hasAttribute('data-basis-param')) {
+                /* v2.1.0 — a hook INSIDE a diagram opens the right-side inspector, never this
+                   centre modal: a scrim over the topology is the doc-27 §3.2 P0 that
+                   INSPECTOR.md closed. A pan that moved the sheet is not a click. */
+                if (target.closest && target.closest('svg')) {
+                    if (root.__rzSvgPanMoved) return;
+                    if (root.RZInspector && typeof root.RZInspector.openBasis === 'function') {
+                        root.RZInspector.openBasis(target);
+                        return;
+                    }
+                }
                 open(target.getAttribute('data-basis-param'));
                 return;
             }
@@ -296,6 +319,10 @@
         var el = event.target;
         if (el && el.hasAttribute && el.hasAttribute('data-basis-param')) {
             event.preventDefault();
+            if (el.closest && el.closest('svg') && root.RZInspector && typeof root.RZInspector.openBasis === 'function') {
+                root.RZInspector.openBasis(el);
+                return;
+            }
             open(el.getAttribute('data-basis-param'));
         }
     });
@@ -386,6 +413,10 @@
         open: open,
         close: close,
         get: byId,
+        /* v2.1.0 — the record HTML, for any host that is not this modal. */
+        renderRecord: renderRecord,
+        evidenceInfo: evidenceInfo,
+        format: fmt,
         authorityAvailable: runtimeAuthorityAvailable,
         /* Exposed so a gate can assert the page's markup and the registry agree. */
         /* Exposed so a gate can assert the wiring actually happened in a real render. */

@@ -19,7 +19,7 @@ const RACKS_FACILITY = snapshot.compute.racks_facility;
 const HALLS = RACKS_FACILITY / RACKS_PER_HALL;
 
 /* the ?v= the cockpit must load these modules at once it adopts the aggregated ids */
-const ASSET_VERSION = '2.0.0';
+const ASSET_VERSION = '2.1.0';
 
 function descriptor(lineId, extra = {}) {
   return { lineId, ...extra };

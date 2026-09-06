@@ -125,21 +125,45 @@ its §3.4–3.6 worked sections have not yet completed their GB300 rewrite — t
 `Non-finite numeric input: NaN` and aborts Generate-Design PDF export. The Basis-of-Design PDF
 builder (`buildBodPdfHtml()`) is fully rewritten and carries none of the retired vocabulary.
 
-### Rule 6 — Basis chip on every critical KPI (v1.32.2+)
+### Rule 6 — Traceability symbol on every published number (v1.32.2, rewritten v2.1.0)
 
-Each critical KPI carries one of these chips:
+Every number a cockpit renders carries **one of the ten registry evidence classes**, published once
+in `js/rz-evidence.js` and read by the basis drawer, the right-side inspector and the SVG mark:
 
-| Chip | Meaning |
-|---|---|
-| MEASURED | Real / simulated sensor reading |
-| DERIVED | Computed from engine |
-| TARGET | Design threshold (BOD) |
-| SIMULATED | Modelled value (not field) |
-| BOD LOCKED | Immutable Basis-of-Design |
-| MANUAL | Operator input |
+| Class | Colour | Meaning |
+|---|---|---|
+| PUBLISHED | blue | Printed by the vendor or standards body named in the source; not measured here |
+| STANDARD | blue | A physical constant or a code value |
+| VENDOR | blue | Vendor-quoted for this project; screening grade until confirmed |
+| DERIVED | green | Computed by the engine from other parameters; nothing typed |
+| ADOPTED | amber | A project or owner design decision, stated as such |
+| ASSUMED | amber | A textbook or mid-band value chosen before the result was looked at |
+| SIMULATED | violet | A modelled operating value or a simulated sensor; never a field reading |
+| MEASURED | green | A real instrument reading — nothing on these pages is MEASURED today |
+| LABEL | grey | A name, a version or a nameplate figure used as a label — never a denominator |
+| UNAVAILABLE | red | Not published by the source and not derivable here; shown as an em dash |
 
-A KPI click opens a basis drawer with: formula, inputs, output, scope,
-denominator, source object, data-mode, last update.
+The old six-term chip vocabulary (MEASURED / DERIVED / TARGET / SIMULATED / BOD LOCKED / MANUAL) is
+retired: BOD LOCKED → ADOPTED, SIM SENSOR → SIMULATED, TARGET → LABEL. MANUAL is dropped — nothing on
+these pages is operator input.
+
+**On the drawings (A3, v2.1.0).** A number drawn inside an SVG mimic is emitted by
+`RZSvgBasis.tag()` as ONE declared group: the `<text>` plus a **non-text mark** — a 2.2-unit circle
+on the value's baseline coloured by evidence class — with `data-basis-param="<registry id>"`,
+`tabindex="0"`, `role="button"` and a `<title>` naming label, class and id. The mark is not text, so
+the legibility and collision gates never see it; the group declares the pair so they cannot collide
+with each other. A composite string names every id it prints in `data-basis-params`; a repeated row
+(a 40-line RPP ladder) stays hooked but draws no mark (`data-rz-nomark`) — **one symbol per
+parameter per diagram, not one per mention**. A click on a mark opens the **right-side inspector**
+in basis mode (never the centre modal — review doc-27 §3.2); a pan that moved the sheet is not a
+click. HTML cells keep the centre drawer and show the same evidence dot.
+
+A number with no registry twin sits inside a `data-rz-authored-basis="<reason ≥ 40 chars>"` scope
+that says what it is (a page-authored specification, a published label, a simulated telemetry
+reading, an identity over marked parameters). **A number that is neither hooked nor declared fails
+`tools/test-dcai-coverage.mjs --strict`** — value-string coincidence with a registry value counts
+for nothing on the AI page. The gate measures with `--settle` so every ticker has fired: a hook whose
+value a die roll overwrites shows up as MISMATCH, which is the live-page form of Rule 2.
 
 ## Acceptance tests (CI-gateable)
 

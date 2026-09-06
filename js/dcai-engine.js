@@ -209,7 +209,11 @@
       },
       flows: {
         tcs_m3h: tcsFlow_m3h, htw_m3h: htwFlow_m3h, chw_m3h: chwFlow_m3h, cdw_m3h: cdwFlow_m3h,
-        crah_air_m3s: crahAir_m3s, dry_cooler_air_m3s: dryCoolerAir_m3s
+        crah_air_m3s: crahAir_m3s, dry_cooler_air_m3s: dryCoolerAir_m3s,
+        /* per-hall slices (the four halls are identical by construction) — the diagrams draw one hall */
+        tcs_hall_m3h: div(tcsFlow_m3h, fixed.halls), tcs_hall_lpm: div(tcsFlow_m3h, fixed.halls) * 1000 / 60,
+        tcs_rack_lpm: div(tcsFlow_m3h, fixed.halls * fixed.racksPerHall) * 1000 / 60,        /* the manifold branch the rack drawing prints */
+        htw_hall_m3h: div(htwFlow_m3h, fixed.halls), chw_hall_m3h: div(chwFlow_m3h, fixed.halls)
       },
       electrical: {
         chiller_air_kwe: chillerAir_kwe,
@@ -223,6 +227,16 @@
         cooling_kwe: cooling_kwe,
         ups_loss_kwe: fixed.upsLoss_kwe,
         dist_loss_kwe: fixed.distLoss_kwe,
+        ups_dist_loss_kwe: fixed.upsLoss_kwe + fixed.distLoss_kwe,      /* the pair the PUE basis prints */
+        /* per-hall slices — the four halls are identical by construction and the SLD sheets draw one */
+        aux_hall_kwe: div(fixed.aux_kwe, fixed.halls),
+        cooling_hall_kwe: div(cooling_kwe, fixed.halls),
+        chillers_hall_kwe: div(chillers_kwe, fixed.halls),
+        pumps_hall_kwe: div(pumps_kwe, fixed.halls),
+        fans_hall_kwe: div(fans_kwe, fixed.halls),
+        ups_dist_loss_hall_kwe: div(fixed.upsLoss_kwe + fixed.distLoss_kwe, fixed.halls),
+        non_it_hall_kwe: div(nonIt_kwe, fixed.halls),
+        facility_hall_kwe: div(facility_kwe, fixed.halls),
         aux_kwe: fixed.aux_kwe,
         non_it_kwe: nonIt_kwe,
         total_it_kwe: fixed.totalIt_kwe,
@@ -296,6 +310,7 @@
       total_it_hall_kwe: div(totalIt_kwe, f.halls),
       /* per-rack power shelves — the redundancy the arithmetic actually allows */
       shelf_installed_kw: shelfInstalled_kw,
+      shelf_kw: g.shelfKw,
       shelves_duty: shelvesDuty,
       shelves_spare: shelvesSpare,
       shelf_redundancy_label: 'N+' + shelvesSpare,
@@ -312,7 +327,7 @@
                      + upsLoss_kwe + distLoss_kwe + aux_kwe;
     var fixed = {
       totalIt_kwe: totalIt_kwe, liquidHeat_kwth: liquidHeat_kwth, airHeat_kwth: airHeat_kwth,
-      upsLoss_kwe: upsLoss_kwe, distLoss_kwe: distLoss_kwe, aux_kwe: aux_kwe
+      upsLoss_kwe: upsLoss_kwe, distLoss_kwe: distLoss_kwe, aux_kwe: aux_kwe, halls: f.halls, racksPerHall: f.racksPerHall
     };
 
     /* --- design point + weather bins --- */
@@ -365,6 +380,9 @@
       crah_duty_per_hall: crahDutyHall,
       crah_installed_per_hall: crahDutyHall + 1,
       crah_installed_facility: (crahDutyHall + 1) * f.halls,
+      crah_duty_per_unit_kwth: div(airHeatHall_kwth, crahDutyHall),          /* what one running CRAH carries */
+      cdu_duty_per_unit_kwth: div(liquidHeatHall_kwth, cduDutyHall),          /* what one running CDU carries */
+      cdu_flow_per_unit_lpm: div(design.flows.tcs_hall_lpm, cduDutyHall),
       chiller_unit_kwth: eq.chiller.unitKwTh,
       chillers_running_design: chillersDesign,
       chillers_running_worst_bin: chillersWorst,
@@ -381,6 +399,10 @@
       transformer_unit_mva: eq.transformer.unitMva,
       facility_kva: facilityKva,
       transformers: transformers,
+      transformer_loading_pct: div(facilityKva, transformers * eq.transformer.unitMva * 1000) * 100,
+      ups_loading_normal_pct: div(totalIt_kwe, upsFramesPerFeed * eq.ups.unitKw) * 50,   /* 2N: each side carries half in normal operation */
+      battery_hall_kwh: div(battery_kwh, f.halls),                  /* the SLD draws one hall's share */
+      gensets_standby: (gensetsDuty + 2) - gensetsDuty,          /* the same +2 the installed count carries (N+2) */
       generator_unit_kw: eq.generator.unitKw,
       generator_model: eq.generator.model,
       gensets_duty: gensetsDuty,
@@ -425,6 +447,7 @@
       hall_length_m: geo.lengthM, hall_width_m: geo.widthM, hall_height_m: geo.heightM,
       rack_rows: geo.rows,
       racks_per_row: racksPerRow,
+      rack_it_row_kwe: racksPerRow * (f.rackItKw),                       /* one row strip on the hall mimic */
       rack_groups_per_hall: groupsPerHall,
       racks_per_group: racksPerGroup,
       groups_per_row: div(racksPerRow, racksPerGroup, 'groups per row'),
@@ -494,7 +517,7 @@
     return deepFreeze({
       meta: {
         engine: 'dcai-engine.js',
-        version: '1.0.0',
+        version: '1.1.0',   /* v2.1.0: per-hall slices, per-unit duties, row kW, 2N normal loading published for the drawings */
         spec_version: m.specVersion,
         authority: m.authority,
         evidence_class: 'SIMULATED/ADOPTED',
@@ -547,7 +570,7 @@
         return operatingPoint(mm, ambientDbC, {
           totalIt_kwe: s.power.total_it_kwe, liquidHeat_kwth: s.heat.liquid_kwth, airHeat_kwth: s.heat.air_kwth,
           upsLoss_kwe: s.design.electrical.ups_loss_kwe, distLoss_kwe: s.design.electrical.dist_loss_kwe,
-          aux_kwe: s.design.electrical.aux_kwe
+          aux_kwe: s.design.electrical.aux_kwe, halls: mm.facility.halls, racksPerHall: mm.facility.racksPerHall
         });
       },
       /* primitives, exported so a page can show its arithmetic */

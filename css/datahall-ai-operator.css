@@ -548,3 +548,22 @@
 @media (prefers-reduced-motion: reduce) {
   #p-elec [data-rz-line].rz-flow-active { animation: none !important; }
 }
+
+/* ── v2.1.0 Track A §A3 — traceability marks inside SVG diagrams ────────────
+   A hooked value inside a mimic is a control: pointer, not the zoom wrapper's grab
+   cursor, and a focus ring drawn IN the SVG (a CSS outline is clipped by the viewport).
+   The mark itself is a 2.2-unit circle coloured by evidence class (js/rz-evidence.js);
+   it is not text, so neither the legibility floor nor the collision loop sees it. */
+.svg-zi .rz-basis, .rz-basis { cursor: pointer; pointer-events: all; }
+.rz-basis text { pointer-events: all; }
+.rz-basis:hover text { text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 1.5px; }
+.rz-basis:hover .rz-basis-mark, .rz-basis:focus .rz-basis-mark, .rz-basis:focus-visible .rz-basis-mark { r: 3; stroke: var(--c, #67e8f9); stroke-width: 0.9; }
+.rz-basis:focus { outline: none; }
+.rz-basis-legend text { letter-spacing: .04em; }
+.rz-inspector-basis .rz-basis-record { font-size: 12px; }
+.rz-inspector-basis .rz-basis-record b { color: #fff; }
+
+/* A3 — HTML cells that carry a registry hook show the evidence dot the drawings use */
+.cd td[data-basis-param]{cursor:pointer}
+.cd td[data-basis-param]::after{content:'';display:inline-block;width:5px;height:5px;border-radius:50%;margin-left:5px;vertical-align:middle;background:var(--rz-ev,#8fa2b8)}
+.cd td[data-basis-param]:hover{text-decoration:underline dotted}

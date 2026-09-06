@@ -98,6 +98,7 @@
   var inspectorEl = null;
   var currentEl = null;
   var currentTab = 'live';
+  var basisMode = false;   /* A3: the panel is showing a registry record, not equipment metadata */
 
   function buildShell() {
     if (inspectorEl) { return inspectorEl; }
@@ -345,13 +346,56 @@
   function open(el) {
     if (!el || !(isLine(el) || isBreaker(el))) { return; }
     buildShell();
+    leaveBasisMode();
     currentEl = el;
     render();
     inspectorEl.classList.add('open');
   }
 
+  /* ---- A3 basis mode: a registry record in the right-side panel ----------
+     Numbers drawn inside an SVG mimic carry data-basis-param; a click on one must
+     NOT open the centre modal (review doc-27 §3.2: "jangan modal tengah, menutup
+     topology"). The record HTML has ONE renderer — RZBasisDrawer.renderRecord —
+     this panel only hosts it. Works for any [data-basis-param] element or a bare id. */
+  function isBasisHook(el) { return !!(el && el.getAttribute && el.getAttribute('data-basis-param')); }
+  function basisIdOf(el) {
+    var t = el;
+    while (t && t !== doc.body) { if (isBasisHook(t)) { return t.getAttribute('data-basis-param'); } t = t.parentNode; }
+    return null;
+  }
+  function leaveBasisMode() {
+    if (!basisMode || !inspectorEl) { return; }
+    basisMode = false;
+    inspectorEl.classList.remove('rz-inspector-basis');
+    inspectorEl.querySelector('.rz-inspector-tabs').hidden = false;
+  }
+  function openBasis(target) {
+    var id = typeof target === 'string' ? target : basisIdOf(target);
+    if (!id) { return false; }
+    buildShell();
+    basisMode = true;
+    currentEl = null;
+    inspectorEl.classList.add('rz-inspector-basis');
+    inspectorEl.querySelector('.rz-inspector-tabs').hidden = true;
+    inspectorEl.querySelector('[data-slot="kind"]').textContent = 'BASIS';
+    inspectorEl.querySelector('[data-slot="id"]').textContent = id;
+    var body = inspectorEl.querySelector('[data-slot="body"]');
+    var drawer = root.RZBasisDrawer;
+    body.innerHTML = drawer && drawer.renderRecord
+      ? drawer.renderRecord(id)
+      : '<div class="rz-inspector-empty">Basis drawer not loaded — registry record for ' + esc(id) + ' cannot be shown.</div>';
+    /* the record's dependency links navigate inside the panel */
+    var links = body.querySelectorAll('[data-basis-goto]');
+    for (var i = 0; i < links.length; i++) {
+      links[i].addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); openBasis(e.currentTarget.getAttribute('data-basis-goto')); });
+    }
+    inspectorEl.classList.add('open');
+    return true;
+  }
+
   function close() {
     if (inspectorEl) { inspectorEl.classList.remove('open'); }
+    leaveBasisMode();
     currentEl = null;
   }
 
@@ -390,7 +434,8 @@
       while (t && t !== doc.body) {
         if (t === inspectorEl) { return; }
         if (t.getAttribute && (t.getAttribute('data-rz-line') === '1' ||
-                               t.getAttribute('data-rz-breaker') === '1')) { return; }
+                               t.getAttribute('data-rz-breaker') === '1' ||
+                               t.getAttribute('data-basis-param'))) { return; }
         t = t.parentNode;
       }
       close();
@@ -405,7 +450,7 @@
   }
 
   /* Export. */
-  var API = { open: open, close: close, isOpen: isOpen, version: '1.43.0' };
+  var API = { open: open, openBasis: openBasis, basisIdOf: basisIdOf, close: close, isOpen: isOpen, version: '1.44.0' };
   if (root) { root.RZInspector = API; }
 
 })(typeof window !== 'undefined' ? window : null,

@@ -259,6 +259,12 @@ export function buildRegistry({ scaffold = false } = {}) {
     const parts = id.split('.'); const leaf = parts[parts.length - 1];
     const tokens = [`.${parts.slice(-2).join('.')}`];
     if (uniqueLeaves.has(leaf)) tokens.push(`.${leaf}`);
+    /* v2.1.0 — a QUOTED full id is a read too. The SVG traceability helpers take the registry id
+       as a literal option (`tx(x,y,v,c,s,a,w,{basis:'heat.liquid_kwth'})`) and the DH_BASIS map
+       is a table of literal ids; neither contains the leading-dot form, and six ids share a leaf
+       name (`heat.*` / `design.heat.*` / `*.total_it_kwe`) so the bare leaf cannot be trusted.
+       A quoted full id is unambiguous by construction. */
+    tokens.push(`'${id}'`, `"${id}"`);
     return tokens;
   };
 

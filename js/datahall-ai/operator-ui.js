@@ -303,19 +303,29 @@
     var study = selected === 'locked' ? null : densityApi.studyReference(selected);
     var body = byId('platformComparisonBody');
     clear(body);
-    body.appendChild(platformRow([
+    var baseRow = platformRow([
       baseline.architectureName + ' — locked', baseline.status,
       baseline.logicalDomainsPerHall + ' domains × ' + baseline.rackPositionsPerDomain + ' positions',
       formatNumber(baseline.rackPositionKW, 0), baseline.rackPositionsPerHall,
       formatNumber(baseline.itPerHallKW / 1000, 3), formatNumber(baseline.hallItDensityKWPerM2, 2)
-    ]));
+    ]);
+    /* A3 traceability: every engine number in the locked row carries its registry id */
+    [null, null, 'compute.racks_per_hall', 'power.rack_it_kw', 'compute.racks_per_hall', 'power.rack_it_hall_kwe', 'geometry.it_density_kw_per_m2']
+      .forEach(function (id, i) {
+        var cell = baseRow.children[i];
+        if (!id || !cell) { return; }
+        cell.setAttribute('data-basis-param', id); cell.setAttribute('tabindex', '0'); cell.setAttribute('role', 'button');
+      });
+    body.appendChild(baseRow);
     if (study) {
-      body.appendChild(platformRow([
+      var studyRow = platformRow([
         study.reference.name, study.adoptionStatus,
         study.logicalDomainsPerHall + ' domains × ' + study.rackPositionsPerDomain + ' rack',
         formatNumber(study.rackPositionKW, 0), study.rackPositionsPerHall,
         formatNumber(study.itPerHallKW / 1000, 3), formatNumber(study.hallItDensityKWPerM2, 2)
-      ]));
+      ]);
+      studyRow.setAttribute('data-rz-authored-basis', 'reference study on the retired GB200 basis — a comparison row that never mutates the live baseline');
+      body.appendChild(studyRow);
     }
     var detail = byId('platformStudyDetail');
     clear(detail);
@@ -363,8 +373,13 @@
       var summary = byId('electricalPathSummary');
       clear(summary);
       summary.appendChild(node('div', 'rz-ops-eyebrow', result.health + ' · ' + scopeLabel + ' · ' + result.scenarioLabel));
-      summary.appendChild(node('p', 'rz-ops-caption', counts.available + '/' + counts.total + ' racks served · ' +
-        counts.twoN + ' at 2N · ' + counts.degraded + ' degraded · ' + counts.lost + ' lost'));
+      var caption = node('p', 'rz-ops-caption', counts.available + '/' + counts.total + ' racks served · ' +
+        counts.twoN + ' at 2N · ' + counts.degraded + ' degraded · ' + counts.lost + ' lost');
+      /* A3 traceability: the served/2N counts are the engine's rack count (compute.racks_facility) */
+      caption.setAttribute('data-basis-param', 'compute.racks_facility');
+      caption.setAttribute('tabindex', '0');
+      caption.setAttribute('role', 'button');
+      summary.appendChild(caption);
       var timeline = byId('electricalTimeline');
       clear(timeline);
       result.timeline.forEach(function (event) {
