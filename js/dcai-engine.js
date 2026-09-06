@@ -441,7 +441,12 @@
       /* the rack-IT-basis figure some datasheets quote; a DIFFERENT denominator, labelled */
       design_day_rack_it_basis: div(design.electrical.facility_kwe, rackIt_kwe),
       annual_basis: m.weather.basis,
-      largest_non_it_term: largestTerm(design.electrical)
+      largest_non_it_term: largestTerm(design.electrical),
+      /* CUE_IT per ISO/IEC 30134-8 — kg CO2 per kWh of IT, NOT per kWh of facility. The
+         grid factor is republished beside it so a page can never show one without the
+         other and never has to carry the constant itself. */
+      grid_kg_co2_per_kwh: m.carbon.gridKgCo2PerKwh,
+      cue_it_kg_per_kwh: m.carbon.gridKgCo2PerKwh * design.pue
     };
 
     var wue = {

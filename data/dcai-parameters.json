@@ -5431,6 +5431,70 @@
       }
     },
     {
+      "id": "pue.cue_it_kg_per_kwh",
+      "label": "CUE_IT — carbon usage effectiveness (IT denominator)",
+      "unit": "kgCO2/kWh IT",
+      "kind": "derived",
+      "value": 0.8039660769461802,
+      "formula": "CUE_IT = grid emission factor x PUE (design day)",
+      "formulaExpr": "pue.grid_kg_co2_per_kwh * pue.design_day",
+      "deps": [
+        "pue.grid_kg_co2_per_kwh",
+        "pue.design_day"
+      ],
+      "scope": "site",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "carbon.gridKgCo2PerKwh",
+        "electrical.auxFractionOfIt",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "fabric.oobKw",
+        "fabric.oobPerRack",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.rackItKw",
+        "gb300.liquidCaptureRatio",
+        "hydraulics.airCpKjPerKgK",
+        "hydraulics.airRhoKgPerM3",
+        "hydraulics.cdwPumpHeadM",
+        "hydraulics.chwPumpHeadM",
+        "hydraulics.crahFanStaticPa",
+        "hydraulics.dryCoolerFanStaticPa",
+        "hydraulics.fanEfficiency",
+        "hydraulics.fanMotorEfficiency",
+        "hydraulics.htwPumpHeadM",
+        "hydraulics.pumpEfficiency",
+        "hydraulics.pumpMotorEfficiency",
+        "hydraulics.tcsFluidCpKjPerKgK",
+        "hydraulics.tcsPumpHeadM",
+        "hydraulics.waterCpKjPerKgK",
+        "thermal.airSupplyC",
+        "thermal.airsideDeltaTK",
+        "thermal.carnotFraction",
+        "thermal.cduApproachK",
+        "thermal.cdwDeltaTK",
+        "thermal.chwCoilApproachK",
+        "thermal.chwDeltaTK",
+        "thermal.condApproachK",
+        "thermal.designAmbientDbC",
+        "thermal.dryCoolerAirDeltaTK",
+        "thermal.dryCoolerApproachK",
+        "thermal.evapApproachK",
+        "thermal.htwDeltaTK",
+        "thermal.tcsDeltaTK",
+        "thermal.tcsSupplyC"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
       "id": "pue.design_day",
       "label": "design day",
       "unit": null,
@@ -5736,6 +5800,33 @@
       "docs": [
         "standarization/DATAHALL_AI_STANDARD.md"
       ]
+    },
+    {
+      "id": "pue.grid_kg_co2_per_kwh",
+      "label": "grid emission factor",
+      "unit": "kgCO2/kWh",
+      "kind": "authored",
+      "value": 0.69,
+      "formula": null,
+      "deps": [],
+      "scope": "site",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "carbon.gridKgCo2PerKwh"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js carbon.gridKgCo2PerKwh",
+        "method": "PLN Jawa-Bali system grid emission factor, 2025 published figure, 0.69 kgCO2 per kWh delivered at the facility meter. ADOPTED",
+        "asOf": "2026-09-06"
+      }
     },
     {
       "id": "pue.hours_total",

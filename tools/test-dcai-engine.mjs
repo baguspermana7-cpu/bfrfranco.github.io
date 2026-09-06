@@ -268,6 +268,9 @@ approx(S.heat.liquid_hall_kwth * M.facility.halls, S.heat.liquid_kwth, 1e-6, 'ha
     const top = Object.entries(terms).sort((a, b) => b[1] - a[1])[0];
     ok(S.pue.largest_non_it_term.term === top[0] && S.pue.largest_non_it_term.kwe === top[1], 'largest_non_it_term.term / .kwe name the true maximum');
   }
+  ok(S.pue.grid_kg_co2_per_kwh === M.carbon.gridKgCo2PerKwh, 'pue.grid_kg_co2_per_kwh republishes the adopted grid factor, unmodified');
+  approx(S.pue.cue_it_kg_per_kwh, S.pue.grid_kg_co2_per_kwh * S.pue.design_day, 1e-12, 'CUE_IT = grid factor x design PUE (ISO/IEC 30134-8, IT-kWh denominator)');
+  ok(S.pue.cue_it_kg_per_kwh > S.pue.grid_kg_co2_per_kwh, 'CUE_IT exceeds the raw grid factor because PUE > 1 — the denominator is IT, not facility');
   ok(S.wue.consistent_with_free_cooling === true, 'wue.consistent_with_free_cooling: dry-only and free cooling are the same basis');
   ok(/^\[7 items\]/.test(`[${S.bins.length} items]`) && S.bins.length === M.weather.bins.length, 'bins.digest covers every weather bin');
 }

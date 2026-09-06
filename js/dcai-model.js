@@ -347,7 +347,15 @@
 
     /* PUE design band — a TARGET, never a denominator or a fudge (Rule 4). */
     // source: BASELINE-DECISION.md "PUE (design) | 1.12 - 1.25", carried. LABEL/TARGET
-    pueDesignBand: { min: 1.12, max: 1.25, target: 1.12 }
+    pueDesignBand: { min: 1.12, max: 1.25, target: 1.12 },
+
+    /* CARBON — the other half of the CUE denominator (ISO/IEC 30134-8: CUE = grid factor x
+       PUE, on an IT-kWh denominator). Not a physics term and not derivable from this model:
+       a published regional grid factor, carried as a project decision. It lived as a bare
+       0.69 in nine places on datahallAI.html before it had a home here. */
+    // source: PLN Jawa-Bali system grid emission factor, 2025 published figure, 0.69
+    //         kgCO2 per kWh delivered at the facility meter. ADOPTED
+    carbon: { gridKgCo2PerKwh: 0.69 }
   };
 
   deepFreeze(MODEL);
