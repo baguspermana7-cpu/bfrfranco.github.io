@@ -104,13 +104,14 @@ console.log('\n=== DC AI accuracy probes (datahallAI.html) ===');
     dom: document.getElementById('dkDom')?.textContent,
     cdu: document.getElementById('dkCdu')?.textContent
   }));
-  assert(kpis.pue === '1.30', 'AI-Test-1a: PUE = 1.30 derived', `got ${kpis.pue}`);
+  assert(kpis.pue === '1.165', 'AI-Test-1a: PUE = 1.165 derived (design day, GB300)', `got ${kpis.pue}`);
   assert(kpis.wue === '0.00', 'AI-Test-1b: WUE = 0.00 dry-only baseline', `got ${kpis.wue}`);
-  assert(kpis.cue === '0.90', 'AI-Test-1c: CUE_IT = 0.90 (grid 0.69 × PUE 1.30)', `got ${kpis.cue}`);
-  assert(kpis.it === '14.26', 'AI-Test-1d: IT Load = 14.26 MW (Scenario A locked)', `got ${kpis.it}`);
-  assert(kpis.gpu === '7,776', 'AI-Test-1e: GPUs = 7,776', `got ${kpis.gpu}`);
-  assert(kpis.dom === '108', 'AI-Test-1f: NVL72 domains = 108', `got ${kpis.dom}`);
-  assert(/36\/48|36 \/ 48/.test(kpis.cdu||''), 'AI-Test-4: CDU count 36/48 facility', `got ${kpis.cdu}`);
+  assert(kpis.cue === '0.80', 'AI-Test-1c: CUE_IT = 0.80 (grid 0.69 × PUE 1.165)', `got ${kpis.cue}`);
+  assert(kpis.it === '539.05', 'AI-Test-1d: IT Load = 539.05 MW (GB300 total IT, rack IT 499.84 is a separate published figure)', `got ${kpis.it}`);
+  assert(kpis.gpu === '253,440', 'AI-Test-1e: GPUs = 253,440', `got ${kpis.gpu}`);
+  assert(kpis.dom === '3,520', 'AI-Test-1f: NVL72 racks = 3,520 (one rack = one NVL72 domain at GB300)', `got ${kpis.dom}`);
+  assert(/\b432\b/.test(kpis.cdu||'') && /\b107\/108\b/.test(kpis.cdu||''),
+    'AI-Test-4: CDU count 432 installed facility-wide, 107/108 duty/installed per hall', `got ${kpis.cdu}`);
 
   /* ---- Test 2: No random basis values (reload N times) ---- */
   const samples = [{pue:kpis.pue, it:kpis.it, wue:kpis.wue, cue:kpis.cue}];
@@ -127,14 +128,18 @@ console.log('\n=== DC AI accuracy probes (datahallAI.html) ===');
   const stable = samples.every(s => s.pue === samples[0].pue && s.it === samples[0].it && s.wue === samples[0].wue && s.cue === samples[0].cue);
   assert(stable, `AI-Test-2: basis KPIs identical across ${ROUND_TRIPS} reloads`, JSON.stringify(samples));
 
-  /* ---- Test 3: Market terminology — no 'NVL72 rack' without disambiguation ---- */
+  /* ---- Test 3: Market terminology — INVERTED at GB300. At GB200 a rack was HALF an
+     NVL72 domain (2 rack-positions per domain, 66 kW each), so "rack-pos" language was
+     required to disambiguate. At GB300 one rack IS the NVL72 domain (142 kW), so that
+     disambiguating vocabulary is now WRONG if it survives, and the 142 kW figure must
+     be the one that appears. */
   const html = await page.content();
-  /* Allow: "NVL72 rack-scale" (NVIDIA term), "NVL72 rack-pos", "NVL72 racks"
-     Block: bare "NVL72 rack" used as singular noun without disambiguation. */
-  const ambiguous66 = /\b66\s*kW.{0,12}NVL72\s+rack\b(?!-)/i.test(html);
-  assert(!ambiguous66, 'AI-Test-3a: no "66 kW NVL72 rack" ambiguity', '');
   const hasRackPos = html.includes('rack-pos') || html.includes('rack position');
-  assert(hasRackPos, 'AI-Test-3b: "rack-pos" or "rack position" terminology present', '');
+  assert(!hasRackPos, 'AI-Test-3a: "rack-pos"/"rack position" GB200 vocabulary must not appear — at GB300 one rack IS the NVL72 domain', '');
+  const has66kW = /\b66\s*kW\b/.test(html);
+  assert(!has66kW, 'AI-Test-3b: no "66 kW" GB200 per-rack-position figure', '');
+  const has142kW = /142\s*kW/.test(html);
+  assert(has142kW, 'AI-Test-3c: "142 kW" GB300 per-rack (= per-NVL72-domain) figure present', '');
 
   /* ---- Test 5: Generator arithmetic ---- */
   const has40MW = /5\s*running.*=\s*40\s*MW/i.test(html);
@@ -151,34 +156,36 @@ console.log('\n=== DC AI accuracy probes (datahallAI.html) ===');
   assert(isNotGreen, `AI-Test-6: PUE colour is NOT green (informational neutral)`, `color=${pueColor}`);
 
   /* ---- Test 7: Basis drawer opens on PUE click ----
+     v2.0.0 — the AI page now shares js/rz-basis-drawer.js (registry
+     RZ_DCAI_PARAMETERS) with the Conventional cockpits instead of the
+     retired page-local #kpiBasisDrawer/basisFor dictionary. The hook is
+     `[data-basis-param]`, the dialog is `#rz-basis-drawer`, and the
+     rendered record is Value/Kind/Scope/Evidence/Source (see
+     js/rz-basis-drawer.js `row(...)` calls), same contract as CONV-Test-8.
      Use DOM-API click (card.click()) not puppeteer's coordinate click —
      more reliable for headless testing where viewport scroll matters. */
   await page.evaluate(() => {
-    const card = document.querySelector('.k[data-basis="pue"]');
+    const card = document.querySelector('.k[data-basis-param="pue.design_day"]');
     if (card) card.click();
   });
   await new Promise(r => setTimeout(r, 500));
   const drawerOk = await page.evaluate(() => {
-    const dlg = document.getElementById('kpiBasisDrawer');
+    const dlg = document.getElementById('rz-basis-drawer');
     if (!dlg) return null;
     const txt = dlg.textContent;
     return {
-      hasFormula: txt.includes('Formula'),
-      hasInputs: txt.includes('Inputs'),
-      hasOutput: txt.includes('Output'),
+      isOpen: dlg.getAttribute('aria-hidden') === 'false',
+      hasValue: txt.includes('Value'),
       hasScope: txt.includes('Scope'),
       hasSource: txt.includes('Source'),
-      hasLastUpdate: txt.includes('Last update'),
-      hasMode: /DERIVED|BOD LOCKED|SIM SENSOR|DESIGN PLACEHOLDER/.test(txt)
+      hasEvidence: /ADOPTED|DERIVED|SIMULATED|ASSUMED|UNAVAILABLE/.test(txt)
     };
   });
-  assert(drawerOk?.hasFormula, 'AI-Test-7a: drawer shows Formula', '');
-  assert(drawerOk?.hasInputs, 'AI-Test-7b: drawer shows Inputs', '');
-  assert(drawerOk?.hasOutput, 'AI-Test-7c: drawer shows Output', '');
-  assert(drawerOk?.hasScope, 'AI-Test-7d: drawer shows Scope', '');
-  assert(drawerOk?.hasSource, 'AI-Test-7e: drawer shows Source object', '');
-  assert(drawerOk?.hasLastUpdate, 'AI-Test-7f: drawer shows Last update', '');
-  assert(drawerOk?.hasMode, 'AI-Test-7g: drawer carries a data-mode chip', '');
+  assert(drawerOk?.isOpen, 'AI-Test-7a: shared basis drawer opens (aria-hidden=false) on PUE click', '');
+  assert(drawerOk?.hasValue, 'AI-Test-7b: drawer shows Value', '');
+  assert(drawerOk?.hasScope, 'AI-Test-7c: drawer shows Scope', '');
+  assert(drawerOk?.hasSource, 'AI-Test-7d: drawer shows Source', '');
+  assert(drawerOk?.hasEvidence, 'AI-Test-7e: drawer carries an evidence-class chip', '');
 
   await page.close();
 }
@@ -379,9 +386,9 @@ console.log('\n=== Generate Design Tech Spec PDF probes ===');
     assert(/AI Data Centre|AI Data Hall/i.test(dcAiPdf), 'TS-AI-2: PDF title carries facility name', '');
     assert(/Scenario\s*A/i.test(dcAiPdf), 'TS-AI-3: PDF cites Scenario A locked', '');
     assert(/Cover|Table of Contents|Executive Summary/i.test(dcAiPdf), 'TS-AI-4: PDF has cover / TOC / executive-summary structure', '');
-    assert(/14[.,]?2[56]/.test(dcAiPdf), 'TS-AI-5: PDF carries engine value 14.26 MW (IT facility)', '');
-    assert(/132\s*kW.*NVL72|NVL72.*132/i.test(dcAiPdf), 'TS-AI-6: PDF carries 132 kW per NVL72 basis', '');
-    assert(/7[,.]?776/.test(dcAiPdf), 'TS-AI-7: PDF carries GPU count 7,776', '');
+    assert(/539|499/.test(dcAiPdf), 'TS-AI-5: PDF carries engine value 539(.05) MW total IT or 499(.84) MW rack IT (GB300)', '');
+    assert(/142\s*kW/.test(dcAiPdf), 'TS-AI-6: PDF carries 142 kW per NVL72-rack basis (GB300)', '');
+    assert(/253,?440/.test(dcAiPdf), 'TS-AI-7: PDF carries GPU count 253,440 (GB300)', '');
     assert(/ASHRAE|NFPA|NVIDIA/i.test(dcAiPdf), 'TS-AI-8: PDF references standards (ASHRAE/NFPA/NVIDIA)', '');
     assert(/Cost Annex|CAPEX|OPEX/i.test(dcAiPdf), 'TS-AI-9: PDF includes Cost Annex (Section 10)', '');
     assert(/Appendix A|Formula Derivations/i.test(dcAiPdf), 'TS-AI-10: PDF includes Appendix A formula derivations', '');
@@ -418,11 +425,12 @@ console.log('\n=== Generate Design Tech Spec PDF probes ===');
   assert(okBod, `BoD-AI-1: BoD Export PDF returns non-trivial HTML (~${bodPdf?.length||0} chars)`, '');
   if (okBod) {
     assert(/Basis of Design|BoD/i.test(bodPdf), 'BoD-AI-2: PDF title cites "Basis of Design"', '');
-    assert(/14[.,]?2[56]|3[.,]?564/.test(bodPdf), 'BoD-AI-3: PDF carries engine values (14.26 MW or 3,564 kW)', '');
-    assert(/1\.30|PUE.*1\.3/.test(bodPdf), 'BoD-AI-4: PDF carries PUE 1.30', '');
-    assert(/132\s*kW/i.test(bodPdf), 'BoD-AI-5: PDF carries 132 kW per NVL72 basis', '');
+    assert(/539|499|134,?763/.test(bodPdf), 'BoD-AI-3: PDF carries engine values (539/499 MW facility or 134,763 kW hall IT, GB300)', '');
+    assert(/1\.16|1\.17/.test(bodPdf), 'BoD-AI-4: PDF carries PUE 1.165 design day (GB300)', '');
+    assert(/142 kW/.test(bodPdf), 'BoD-AI-5: PDF carries 142 kW per NVL72-rack basis (GB300)', '');
     assert(/Scenario\s*A/i.test(bodPdf), 'BoD-AI-6: PDF cites Scenario A locked', '');
-    assert(/COP\s*6\.8|COP.*=.*6\.8/.test(bodPdf), 'BoD-AI-7: PDF cites chiller nameplate COP 6.8', '');
+    assert(/Carnot/i.test(bodPdf) && /COP/.test(bodPdf),
+      'BoD-AI-7: PDF cites chiller COP printed WITH its Carnot-fraction derivation, never a bare nameplate figure', '');
   }
 
   /* --- DC Conv Generate Design --- */

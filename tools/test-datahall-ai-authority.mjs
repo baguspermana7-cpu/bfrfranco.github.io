@@ -3,13 +3,16 @@ import { readFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { extname, resolve, sep } from 'node:path';
 import puppeteer from 'puppeteer';
+import DCAI_ENGINE from '../js/dcai-engine.js';
 
 const ROOT = process.cwd();
 const PAGE_SOURCE = await readFile(resolve(ROOT, 'datahallAI.html'), 'utf8');
-const MODEL_SOURCE = await readFile(resolve(ROOT, 'js/datahall-model.js'), 'utf8');
-const CALC_SOURCE = await readFile(resolve(ROOT, 'js/datahall-calculations.js'), 'utf8');
-const ASSET_VERSION = '1.20.0';
-const SPEC_VERSION = 'review-2026-05-17';
+const MODEL_SOURCE = await readFile(resolve(ROOT, 'js/dcai-model.js'), 'utf8');
+const CALC_SOURCE = await readFile(resolve(ROOT, 'js/dcai-engine.js'), 'utf8');
+const REGISTRY_SOURCE = await readFile(resolve(ROOT, 'js/dcai-parameters.js'), 'utf8');
+const ASSET_VERSION = '1.0.0';
+const SPEC_VERSION = 'gb300-500mw-2026-09-06';
+const EXPECTED_SNAPSHOT = DCAI_ENGINE.snapshot;
 const CORE_ACTION_IDS = Object.freeze([
   'bodTrig', 'bodDrawerPdf', 'genDesignTrig', 'faqTrig',
   'platformProfile', 'electricalScenario', 'fireScenario', 'fireZone', 'fireEvaluate',
@@ -25,18 +28,24 @@ const MIME = Object.freeze({
   '.woff2': 'font/woff2',
 });
 
+/* Five fail-closed fixtures, each a distinct way the GB300 authority contract can break:
+ * a missing model, a stale spec version, an incomplete spec version, a version-pin mismatch
+ * between the requested and served engine, and — new for the generated registry — the
+ * registry itself failing to load. Each must leave the page in the SAME unavailable state,
+ * never a partially-rendered one with a plausible retired number showing through. */
 const MODEL_FIXTURES = Object.freeze({
   healthy: MODEL_SOURCE,
-  missing: 'window.DATAHALL_MODEL = undefined;',
+  missing: 'window.DCAI_MODEL = undefined;',
   legacy: MODEL_SOURCE.replace(
     `specVersion: '${SPEC_VERSION}'`,
-    "specVersion: 'review-2025-01-01'",
+    "specVersion: 'gb200-review-2026-05-17'",
   ),
   incomplete: MODEL_SOURCE.replace(
-    "authority: 'BASELINE-DECISION.md (locked 2026-05-17) — overrides all conflicts'",
-    "authority: ''",
+    `specVersion: '${SPEC_VERSION}'`,
+    "specVersion: ''",
   ),
   'request-mismatch': MODEL_SOURCE,
+  'registry-missing': MODEL_SOURCE,
 });
 
 function safeFilePath(pathname) {
@@ -79,17 +88,22 @@ async function preparePage(browser, origin, fixture, javaScriptEnabled = true) {
     const url = request.url();
     if (request.isNavigationRequest() && url.startsWith(`${origin}/datahallAI.html`)) {
       const body = fixture === 'request-mismatch'
-        ? PAGE_SOURCE.replace('js/datahall-calculations.js?v=1.20.0', 'js/datahall-calculations.js?v=1.19.0')
+        ? PAGE_SOURCE.replace('js/dcai-engine.js?v=1.0.0', 'js/dcai-engine.js?v=0.9.0')
         : PAGE_SOURCE;
       request.respond({ status: 200, contentType: 'text/html', body });
       return;
     }
-    if (/\/js\/datahall-model\.js(?:\?|$)/.test(url)) {
+    if (/\/js\/dcai-model\.js(?:\?|$)/.test(url)) {
       request.respond({ status: 200, contentType: 'text/javascript', body: MODEL_FIXTURES[fixture] });
       return;
     }
-    if (/\/js\/datahall-calculations\.js(?:\?|$)/.test(url)) {
-      const body = fixture === 'missing' ? 'window.DATAHALL_CALC = undefined;' : CALC_SOURCE;
+    if (/\/js\/dcai-engine\.js(?:\?|$)/.test(url)) {
+      const body = fixture === 'missing' ? 'window.DCAI_CALC = undefined;' : CALC_SOURCE;
+      request.respond({ status: 200, contentType: 'text/javascript', body });
+      return;
+    }
+    if (/\/js\/dcai-parameters\.js(?:\?|$)/.test(url)) {
+      const body = fixture === 'registry-missing' ? 'window.RZ_DCAI_PARAMETERS = undefined;' : REGISTRY_SOURCE;
       request.respond({ status: 200, contentType: 'text/javascript', body });
       return;
     }
@@ -127,6 +141,7 @@ async function authorityView(page) {
     const panel = document.getElementById('datahallAuthorityUnavailable');
     const wrap = document.querySelector('.wrap');
     const tabs = document.getElementById('tabs');
+    const authority = window.RZDatahallCurrentAuthority?.() || null;
     return {
       state: document.body.dataset.datahallAuthority,
       authorityText: panel?.textContent.replace(/\s+/g, ' ').trim() || '',
@@ -138,7 +153,10 @@ async function authorityView(page) {
       telemetryBanner: document.querySelector('.rz-tq-banner-label')?.textContent.trim() || '<missing>',
       telemetryState: document.querySelector('.rz-tq-banner')?.getAttribute('data-rz-tq-state') || '<missing>',
       actions: Object.fromEntries(actionIds.map((id) => [id, document.getElementById(id)?.disabled])),
-      authority: window.RZDatahallCurrentAuthority?.() || null,
+      assetVersion: authority?.assetVersion ?? null,
+      specVersion: authority?.specVersion ?? null,
+      totalItHallKwe: authority?.snapshot?.power?.total_it_hall_kwe ?? null,
+      pueDesignDay: authority ? Number(authority.snapshot.pue.design_day.toFixed(3)) : null,
     };
   }, CORE_ACTION_IDS);
 }
@@ -171,13 +189,15 @@ async function assertHealthyAuthority(browser, origin) {
   assert.notEqual(view.wrapDisplay, 'none');
   assert.notEqual(view.tabsDisplay, 'none');
   assert.equal(view.wrapInert, false);
-  assert.equal(view.chip, 'DH-01 | GB200 NVL72 | Simulated');
+  assert.equal(view.chip, 'DH-01 | GB300 NVL72 | Simulated');
   assert.match(view.telemetryBanner, /Simulated.*engine basis/i);
   assert.equal(view.telemetryState, 'simulated');
-  assert.equal(view.authority.assetVersion, ASSET_VERSION);
-  assert.equal(view.authority.specVersion, SPEC_VERSION);
-  assert.equal(view.authority.state.itPerHall_kW, 3564);
-  assert.equal(Number(view.authority.pue.pue.toFixed(2)), 1.3);
+  assert.equal(view.assetVersion, ASSET_VERSION);
+  assert.equal(view.specVersion, SPEC_VERSION);
+  assert.equal(view.totalItHallKwe, EXPECTED_SNAPSHOT.power.total_it_hall_kwe,
+    'the page authority snapshot must match the engine snapshot for total_it_hall_kwe');
+  assert.equal(view.pueDesignDay, Number(EXPECTED_SNAPSHOT.pue.design_day.toFixed(3)),
+    'the page authority snapshot must match the engine snapshot for pue.design_day');
   assertActions(view, false, 'healthy');
 
   const currentDataWording = await page.evaluate(() => {
@@ -217,7 +237,8 @@ async function assertInvalidAuthority(browser, origin, fixture) {
   assert.equal(view.chip, 'AUTHORITY UNAVAILABLE', `${fixture}: header chip`);
   assert.equal(view.telemetryBanner, 'COMMS LOST — AUTHORITY UNAVAILABLE', `${fixture}: telemetry provenance`);
   assert.equal(view.telemetryState, 'comms_lost', `${fixture}: telemetry quality state`);
-  assert.equal(view.authority, null, `${fixture}: validator result`);
+  assert.equal(view.assetVersion, null, `${fixture}: validator result`);
+  assert.equal(view.totalItHallKwe, null, `${fixture}: no snapshot value may leak`);
   assertActions(view, true, fixture);
 
   const bypass = await page.evaluate(() => {
@@ -271,10 +292,10 @@ const browser = await puppeteer.launch({
 try {
   await assertNeutralFirstPaint(browser, origin);
   await assertHealthyAuthority(browser, origin);
-  for (const fixture of ['missing', 'legacy', 'incomplete', 'request-mismatch']) {
+  for (const fixture of ['missing', 'legacy', 'incomplete', 'request-mismatch', 'registry-missing']) {
     await assertInvalidAuthority(browser, origin, fixture);
   }
-  console.log('PASS AI Data Hall current-authority fail-closed contract');
+  console.log('PASS AI Data Hall current-authority fail-closed contract (GB300 / dcai-engine.js)');
 } finally {
   await browser.close();
   await new Promise((accept) => server.close(accept));

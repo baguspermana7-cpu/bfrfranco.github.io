@@ -664,20 +664,20 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
     <script src="js/rz-basis-drawer.js?v=2.0.0" data-rz-registry="RZ_DCAI_PARAMETERS" defer></script>
     <!-- v1.130.0 operator decision-support modules. Pure deterministic models
          load before the page renderer; the DOM controller is deferred. -->
-    <script src="js/datahall-ai/alarm-query.js?v=1.130.0"></script>
+    <script src="js/datahall-ai/alarm-query.js?v=2.0.0"></script>
     <script>
     /* Rack-density reconciles against DCAI_MODEL at module load. Keep a
        missing engine fail-closed instead of allowing that optional workspace
        model to throw before the page authority guard can take control. */
     if (window.DCAI_MODEL && window.DCAI_CALC) {
-      document.write('<script src="js/datahall-ai/rack-density.js?v=1.130.0"><\/script>');
+      document.write('<script src="js/datahall-ai/rack-density.js?v=2.0.0"><\/script>');
     }
     </script>
-    <script src="js/datahall-ai/electrical-topology.js?v=1.130.0"></script>
-    <script src="js/datahall-ai/electrical-live.js?v=1.130.0"></script>
-    <script src="js/datahall-ai/electrical-visual-map.js?v=1.130.0"></script>
-    <script src="js/datahall-ai/fire-cause-effect.js?v=1.130.0"></script>
-    <script src="js/rz-design-studio.js?v=1.130.0"></script>
+    <script src="js/datahall-ai/electrical-topology.js?v=2.0.0"></script>
+    <script src="js/datahall-ai/electrical-live.js?v=2.0.0"></script>
+    <script src="js/datahall-ai/electrical-visual-map.js?v=2.0.0"></script>
+    <script src="js/datahall-ai/fire-cause-effect.js?v=2.0.0"></script>
+    <script src="js/rz-design-studio.js?v=2.0.0"></script>
     <!-- v1.42.0 — Semantic line model. Foundation for review docs 27/28 §3.1
          "setiap line wajib punya from_id/to_id/medium/direction/state/capacity
          /current_value/redundancy_role". Non-deferred so coolSvg IIFE can call
@@ -716,7 +716,7 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
     <link rel="stylesheet" href="css/rz-cockpit-instrument.css?v=1.134.15">
     <link rel="stylesheet" href="css/datahall-ai-operator.css?v=1.134.15">
     <link rel="stylesheet" href="css/rz-design-studio.css?v=1.130.0">
-    <script src="js/datahall-ai/operator-ui.js?v=1.130.0" defer></script>
+    <script src="js/datahall-ai/operator-ui.js?v=2.0.0" defer></script>
 <style id="rz-skiplink-v1">
 .skip-link{position:absolute;top:-50px;left:0;background:#1e3a5f;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 8px 0;transition:top .2s ease}
 .skip-link:focus{top:0}
@@ -886,7 +886,7 @@ Requested model/calculation versions and the complete locked schema must validat
 <div class="ai-dashboard-rail" style="display:flex;flex-direction:column;gap:4px;overflow-y:auto">
 <!-- Rail cards — v2.0.0 (Track A §A2b WP4). Every cell here is either an engine read with
      a registry id behind it, or a declared status. The old rows quoted equipment ratings
-     ("5MVA", "4.5MW", "2×4,000A", "350 kW each") that no engine published: they were typed
+     (transformer MVA, UPS MW, busway ampacity, CDU kW) that no engine published: they were typed
      once and then survived a whole change of basis without anyone noticing, which is the
      failure mode this work package exists to close. Busway ampacity has NO parameter in this
      registry — the engine sizes plant, not distribution gear — so the row was replaced by the
@@ -946,8 +946,8 @@ Requested model/calculation versions and the complete locked schema must validat
 </nav>
 <div class="kpi">
 <div class="k"><div class="kl" title="Power Usage Effectiveness — derived bottom-up: Facility kW ÷ IT kW. Basis on Electrical SLD.">PUE</div><div class="kv" style="color:var(--o)" id="kP">1.30</div><div class="ks" id="kPband">Derived | basis ▾</div></div>
-<div class="k"><div class="kl" title="IT compute power load per hall — 27 NVL72 × 132 kW (engine-derived)">IT</div><div class="kv" style="color:var(--o)" id="kIT">3,564</div><div class="ks">kW</div></div>
-<div class="k"><div class="kl" title="GPU utilization percentage across all 1,944 Blackwell B200 GPUs">GPU%</div><div class="kv" style="color:var(--g)" id="kG">94</div><div class="ks">1,944</div></div>
+<div class="k"><div class="kl" title="Total IT per hall — racks × rack kW plus fabric, OOB and storage (DCAI_CALC.snapshot.power.total_it_hall_kwe)">IT</div><div class="kv" style="color:var(--o)" id="kIT">&#8212;</div><div class="ks">kW</div></div>
+<div class="k"><div class="kl" title="GPU utilisation — simulated across this hall's Blackwell Ultra GPUs (count: DCAI_CALC.snapshot.compute.gpu_per_hall)">GPU%</div><div class="kv" style="color:var(--g)" id="kG">94</div><div class="ks" id="kGpuHall">&#8212;</div></div>
 <div class="k"><div class="kl" title="NVLink5 health — 130 TB/s intra-domain GPU interconnect">NVLink</div><div class="kv" style="color:var(--g)">100%</div><div class="ks">27dom</div></div>
 <div class="k"><div class="kl" title="TCS temperature differential — Return minus Supply, target ~10°C">&#916;T</div><div class="kv" style="color:var(--c)" id="kD">9.6</div><div class="ks">&#176;C</div></div>
 <div class="k"><div class="kl" title="Direct Liquid Cooling — 85% of IT heat, engine-derived liquid load">DLC</div><div class="kv" style="color:var(--c)" id="kC">85%</div><div class="ks" id="kCmw">3.03MW</div></div>
@@ -980,7 +980,7 @@ Requested model/calculation versions and the complete locked schema must validat
     <div class="rz-ops-field rz-ops-field--wide"><label for="platformProfile">Platform profile</label><select id="platformProfile" disabled><option value="locked">Adopted GB300 NVL72 project basis</option><option value="gb200-nvl72-split-domain-retired">Retired GB200 split-domain reference</option></select></div>
   </div>
   <!-- v2.0.0 (Track A §A2b WP4) — every cell below is written from DCAI_CALC.snapshot at
-       first paint. The retired GB200 figures (27 domains, 54 positions, 66 kW, 3,564 kW,
+       first paint. The retired GB200 figures (the split-domain counts, kW per position, kW per hall,
        5.57 kW/m²) are NOT typed here: they come from
        RZDataHallRackDensity.studyReference('gb200-nvl72-split-domain-retired') once WP2
        re-points that module, and until then the comparison row renders em dashes and says
@@ -2075,19 +2075,19 @@ s+=eq(14,2,2,1.8,'rgba(239,68,68,.15)','N2',3.5,'Novec 1230 Cylinder N2: 180L @ 
 s+=eq(11,5,2,1.8,'rgba(239,68,68,.15)','N3',3.5,'Novec 1230 Cylinder N3: 180L @ 42bar N\u2082, 3M\u2122, 500\u00D7500\u00D71800mm, auto/manual discharge, \u2192 Fire Tab');
 s+=eq(14,5,2,1.8,'rgba(239,68,68,.15)','N4',3.5,'Novec 1230 Cylinder N4: 180L @ 42bar N\u2082, 3M\u2122, 500\u00D7500\u00D71800mm, auto/manual discharge, \u2192 Fire Tab');
 
-// Generator Room — engine-derived Cat 3516E 2.75MW N+1 (facility backup)
-s+=rmLive(20,0,30,10,'rgba(59,130,246,.1)','rgba(59,130,246,.4)','Generator Room','30m\u00D710m',(DH?(DH.gensetFacNplus1+'\u00D7 Cat 3516E '+DH.gensetMW+'MW N+1'):'—'),(DH?('Generator: '+DH.gensetFacNplus1+'\u00D7 Caterpillar 3516E '+DH.gensetMW+'MW (2,500-2,750 ekW @60Hz), <10s start, '+DH.gensetFacN+' running + 1 standby (N+1) for '+DH.facTotalMW+' MW facility, 48hr fuel'):'—'),28,null,'Running');
-s+=eqLive(21,2,4,3,'rgba(59,130,246,.18)',(DH?('G1 '+DH.gensetMW+'MW'):'—'),4,'running','Generator G1: Caterpillar 3516E 2,750 kW (2,500-2,750 ekW @60Hz), Status: RUNNING, \u2192 Electrical Tab');
+// Generator Room — facility genset pool from the engine: unit MW, duty + standby, redundancy (DHE); six representative glyphs
+s+=rmLive(20,0,30,10,'rgba(59,130,246,.1)','rgba(59,130,246,.4)','Generator Room','30m\u00D710m',(DH?(DH.gensetFacNplus1+'\u00D7 '+DH.gensetMW+' MW '+DH.gensetRedundancy+' (facility)'):'—'),(DH?('Generator: '+DH.gensetFacNplus1+'\u00D7 '+DH.gensetMW+' MW class MV diesel ('+DH.gensetKW+' kW), facility pool: '+DH.gensetFacN+' duty + '+(DH.gensetFacNplus1-DH.gensetFacN)+' standby, '+DH.gensetRedundancy+' \u2014 6 of '+DH.gensetFacNplus1+' shown'+DH.gensetMW+'MW (2,500-2,750 ekW @60Hz), <10s start, '+DH.gensetFacN+' running + 1 standby (N+1) for '+DH.facTotalMW+' MW facility, 48hr fuel'):'—'),28,null,'Running');
+s+=eqLive(21,2,4,3,'rgba(59,130,246,.18)',(DH?('G1 '+DH.gensetMW+'MW'):'—'),4,'running','Generator G1: '+(DH?DH.gensetMW:'—')+' MW class MV diesel ('+(DH?DH.gensetKW:'—')+' kW), facility pool, Status: RUNNING, \u2192 Electrical Tab');
 s+=symFloorGEN(23,3.5);
-s+=eqLive(25.8,2,4,3,'rgba(59,130,246,.18)',(DH?('G2 '+DH.gensetMW+'MW'):'—'),4,'running','Generator G2: Caterpillar 3516E 2,750 kW (2,500-2,750 ekW @60Hz), Status: RUNNING, \u2192 Electrical Tab');
+s+=eqLive(25.8,2,4,3,'rgba(59,130,246,.18)',(DH?('G2 '+DH.gensetMW+'MW'):'—'),4,'running','Generator G2: '+(DH?DH.gensetMW:'—')+' MW class MV diesel ('+(DH?DH.gensetKW:'—')+' kW), facility pool, Status: RUNNING, \u2192 Electrical Tab');
 s+=symFloorGEN(27.8,3.5);
-s+=eqLive(30.6,2,4,3,'rgba(59,130,246,.18)',(DH?('G3 '+DH.gensetMW+'MW'):'—'),4,'running','Generator G3: Caterpillar 3516E 2,750 kW (2,500-2,750 ekW @60Hz), Status: RUNNING, \u2192 Electrical Tab');
+s+=eqLive(30.6,2,4,3,'rgba(59,130,246,.18)',(DH?('G3 '+DH.gensetMW+'MW'):'—'),4,'running','Generator G3: '+(DH?DH.gensetMW:'—')+' MW class MV diesel ('+(DH?DH.gensetKW:'—')+' kW), facility pool, Status: RUNNING, \u2192 Electrical Tab');
 s+=symFloorGEN(32.6,3.5);
-s+=eqLive(35.4,2,4,3,'rgba(59,130,246,.18)',(DH?('G4 '+DH.gensetMW+'MW'):'—'),4,'running','Generator G4: Caterpillar 3516E 2,750 kW (2,500-2,750 ekW @60Hz), Status: RUNNING, \u2192 Electrical Tab');
+s+=eqLive(35.4,2,4,3,'rgba(59,130,246,.18)',(DH?('G4 '+DH.gensetMW+'MW'):'—'),4,'running','Generator G4: '+(DH?DH.gensetMW:'—')+' MW class MV diesel ('+(DH?DH.gensetKW:'—')+' kW), facility pool, Status: RUNNING, \u2192 Electrical Tab');
 s+=symFloorGEN(37.4,3.5);
-s+=eqLive(40.2,2,4,3,'rgba(59,130,246,.18)',(DH?('G5 '+DH.gensetMW+'MW'):'—'),4,'running','Generator G5: Caterpillar 3516E 2,750 kW (2,500-2,750 ekW @60Hz), Status: RUNNING, \u2192 Electrical Tab');
+s+=eqLive(40.2,2,4,3,'rgba(59,130,246,.18)',(DH?('G5 '+DH.gensetMW+'MW'):'—'),4,'running','Generator G5: '+(DH?DH.gensetMW:'—')+' MW class MV diesel ('+(DH?DH.gensetKW:'—')+' kW), facility pool, Status: RUNNING, \u2192 Electrical Tab');
 s+=symFloorGEN(42.2,3.5);
-s+=eqLive(45,2,4,3,'rgba(59,130,246,.18)','G6 STBY',4,'standby','Generator G6 (N+1 reserve): Caterpillar 3516E 2,750 kW (2,500-2,750 ekW @60Hz), Status: STANDBY (Reserve), \u2192 Electrical Tab');
+s+=eqLive(45,2,4,3,'rgba(59,130,246,.18)','G6 STBY',4,'standby','Generator G6 (standby unit of the '+(DH?DH.gensetRedundancy:'—')+' pool): '+(DH?DH.gensetMW:'—')+' MW class MV diesel, Status: STANDBY (Reserve), \u2192 Electrical Tab');
 s+=symFloorGEN(47,3.5);
 // Day tanks (6× matching generators)
 s+=eq(21,6.5,3.5,2,'rgba(245,158,11,.15)','DT-1',3.5,'Day Tank DT-1: 2000L diesel, 1200\u00D7800\u00D71000mm, auto-fill from Fuel Farm, level sensor, 4hr@50% load');
@@ -2129,9 +2129,9 @@ s+=symFloorTX(11,20.2);
 s+='<text x="'+(MX+8*M)+'" y="'+(MY+23*M)+'" fill="var(--o)" font-family="'+J+'" font-size="5" text-anchor="middle" opacity=".6">20kV/0.4kV | '+(DH?DH.txRatingMVA:null)+'MVA each | 4 units</text>';
 
 // MSB-A / ATS-A (Feed A) — 2× MSB + 4× ATS
-s+=rmLive(16,12,14,12,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','MSB-A / ATS-A','14m\u00D712m','2\u00D7 MSB + 4\u00D7 ATS','MSB-A: 2\u00D7 Schneider Prisma P 6300A, 4\u00D7 ATS Masterpact MTZ 4000A, <100ms transfer',null,null,'Normal');
-s+=eq(17,13.5,5,2.5,'rgba(245,158,11,.15)','MSB-1A',4,'MSB-1A: Schneider Prisma P 6300A, Form 4b Type-tested, 2200\u00D7800\u00D72000mm/section, IP54, 65kA Icw, \u2192 Electrical Tab');
-s+=eq(23,13.5,5,2.5,'rgba(245,158,11,.15)','MSB-2A',4,'MSB-2A: Schneider Prisma P 6300A, Form 4b Type-tested, 2200\u00D7800\u00D72000mm/section, IP54, 65kA Icw, \u2192 Electrical Tab');
+s+=rmLive(16,12,14,12,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','MSB-A / ATS-A','14m\u00D712m','2\u00D7 MSB + 4\u00D7 ATS','MSB-A: LV switchboard '+(DH?DH.buswayAFmt:'—')+' A trunk class, 4\u00D7 ATS, <100ms transfer',null,null,'Normal');
+s+=eq(17,13.5,5,2.5,'rgba(245,158,11,.15)','MSB-1A',4,'MSB-1A: LV switchboard '+(DH?DH.buswayAFmt:'—')+' A class, Form 4b, 2200\u00D7800\u00D72000mm/section, IP54, 65kA Icw, \u2192 Electrical Tab');
+s+=eq(23,13.5,5,2.5,'rgba(245,158,11,.15)','MSB-2A',4,'MSB-2A: LV switchboard '+(DH?DH.buswayAFmt:'—')+' A class, Form 4b, 2200\u00D7800\u00D72000mm/section, IP54, 65kA Icw, \u2192 Electrical Tab');
 s+=eq(17,16.5,2.8,2,'rgba(245,158,11,.12)','ATS-1A',3.2,'ATS-1A: Schneider Masterpact MTZ 4000A, <100ms transfer, 1200\u00D7600\u00D72000mm, motorized, 4-pole, \u2192 Electrical Tab');
 s+=eq(20.3,16.5,2.8,2,'rgba(245,158,11,.12)','ATS-2A',3.2,'ATS-2A: Schneider Masterpact MTZ 4000A, <100ms transfer, 1200\u00D7600\u00D72000mm, motorized, 4-pole, \u2192 Electrical Tab');
 s+=eq(23.6,16.5,2.8,2,'rgba(245,158,11,.12)','ATS-3A',3.2,'ATS-3A: Schneider Masterpact MTZ 4000A, <100ms transfer, 1200\u00D7600\u00D72000mm, motorized, 4-pole, \u2192 Electrical Tab');
@@ -2147,9 +2147,9 @@ s+=eq(31,18,4,2,'rgba(100, 116, 139,.12)','EPMS',4,'EPMS: Schneider ION9000, Rev
 s+=eq(36,18,4,2,'rgba(100, 116, 139,.12)','BACnet',4,'BACnet Gateway: BACnet/IP to Modbus/TCP converter, 8-port, DIN-rail mount, OPC-UA capable, \u2192 BMS Tab');
 
 // MSB-B / ATS-B (Feed B) — 2× MSB + 4× ATS
-s+=rmLive(42,12,14,12,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','MSB-B / ATS-B','14m\u00D712m','2\u00D7 MSB + 4\u00D7 ATS','MSB-B: 2\u00D7 Schneider Prisma P 6300A, 4\u00D7 ATS Masterpact MTZ 4000A, <100ms transfer',null,null,'Normal');
-s+=eq(43,13.5,5,2.5,'rgba(245,158,11,.15)','MSB-1B',4,'MSB-1B: Schneider Prisma P 6300A, Form 4b Type-tested, 2200\u00D7800\u00D72000mm/section, IP54, 65kA Icw, \u2192 Electrical Tab');
-s+=eq(49,13.5,5,2.5,'rgba(245,158,11,.15)','MSB-2B',4,'MSB-2B: Schneider Prisma P 6300A, Form 4b Type-tested, 2200\u00D7800\u00D72000mm/section, IP54, 65kA Icw, \u2192 Electrical Tab');
+s+=rmLive(42,12,14,12,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','MSB-B / ATS-B','14m\u00D712m','2\u00D7 MSB + 4\u00D7 ATS','MSB-B: LV switchboard '+(DH?DH.buswayAFmt:'—')+' A trunk class, 4\u00D7 ATS, <100ms transfer',null,null,'Normal');
+s+=eq(43,13.5,5,2.5,'rgba(245,158,11,.15)','MSB-1B',4,'MSB-1B: LV switchboard '+(DH?DH.buswayAFmt:'—')+' A class, Form 4b, 2200\u00D7800\u00D72000mm/section, IP54, 65kA Icw, \u2192 Electrical Tab');
+s+=eq(49,13.5,5,2.5,'rgba(245,158,11,.15)','MSB-2B',4,'MSB-2B: LV switchboard '+(DH?DH.buswayAFmt:'—')+' A class, Form 4b, 2200\u00D7800\u00D72000mm/section, IP54, 65kA Icw, \u2192 Electrical Tab');
 s+=eq(43,16.5,2.8,2,'rgba(245,158,11,.12)','ATS-1B',3.2,'ATS-1B: Schneider Masterpact MTZ 4000A, <100ms transfer, 1200\u00D7600\u00D72000mm, motorized, 4-pole, \u2192 Electrical Tab');
 s+=eq(46.3,16.5,2.8,2,'rgba(245,158,11,.12)','ATS-2B',3.2,'ATS-2B: Schneider Masterpact MTZ 4000A, <100ms transfer, 1200\u00D7600\u00D72000mm, motorized, 4-pole, \u2192 Electrical Tab');
 s+=eq(49.6,16.5,2.8,2,'rgba(245,158,11,.12)','ATS-3B',3.2,'ATS-3B: Schneider Masterpact MTZ 4000A, <100ms transfer, 1200\u00D7600\u00D72000mm, motorized, 4-pole, \u2192 Electrical Tab');
@@ -2200,13 +2200,13 @@ s+=eq(31,32,4,3,'rgba(148,163,184,.1)','Lockers',4,'Locker Area: 20 personal loc
 s+=eq(36,32,4,3,'rgba(239,68,68,.1)','First Aid',3.5,'First Aid Station: AED, burn kit, eye wash, stretcher, emergency shower');
 
 // Chiller Plant Hall (East) \u2014 8\u00D7 water-cooled centrifugal chillers + CW risers up to roof manifold
-s+=rmLive(42,26,24,10,'rgba(6,182,212,.12)','rgba(6,182,212,.45)','Chiller Plant Hall','24m \u00D7 10m','8\u00D7 Carrier 19XR 4MW','Chiller Plant Hall: 8\u00D7 Carrier 19XR water-cooled centrifugal chillers, 4MW each, COP 6.8, R-1234ze(E) refrigerant, mag-bearing oil-free. CW supply/return DN500 risers route up to dry-cooler array on roof. 7+1 N+1 redundancy at 32 MW nameplate.',35,null,'Running');
+s+=rmLive(42,26,24,10,'rgba(6,182,212,.12)','rgba(6,182,212,.45)','Chiller Plant Hall','24m \u00D7 10m',(DH?(DH.chillersInstalled+'\u00D7 '+(DH.chillerRating/1000)+' MW class \u2014 facility'):'—'),'Chiller Plant Hall: '+(DH?DH.chillersInstalled:'—')+'\u00D7 water-cooled centrifugal, '+(DH?DH.chillerRating/1000:'—')+' MW class, COP '+(DH?DH.chillerCOP:'—')+' DERIVED (Carnot fraction), '+(DH?DH.chillersRunning:'—')+' running at design \u2014 8 of '+(DH?DH.chillersInstalled:'—')+' shown, R-1234ze(E) refrigerant, mag-bearing oil-free. CW supply/return DN500 risers route up to dry-cooler array on roof. 7+1 N+1 redundancy at 32 MW nameplate.',35,null,'Running');
 // 8 chillers in 2 rows of 4 (compact footprint 2.8m \u00D7 4m each \u2014 actual 19XR Frame 70-74 has 5x2.5m footprint, packed)
 for(var chx=0;chx<4;chx++){
-s+=eqLive(43+chx*5.5,27,4.5,3.5,'rgba(6,182,212,.2)','CH-'+(chx+1),4.2,'running','Chiller CH-'+(chx+1)+': Carrier 19XR water-cooled centrifugal, 4MW @ COP 6.8, R-1234ze(E), mag bearing, oil-free. Evap LWT 12\u00B0C, CW Out 38\u00B0C. Status: ONLINE. \u2192 Cooling Tab');
+s+=eqLive(43+chx*5.5,27,4.5,3.5,'rgba(6,182,212,.2)','CH-'+(chx+1),4.2,'running','Chiller CH-'+(chx+1)+': water-cooled centrifugal, '+(DH?DH.chillerRating/1000:'—')+' MW class @ COP '+(DH?DH.chillerCOP:'—')+' derived, R-1234ze(E), mag bearing, oil-free. Evap LWT '+(DH?DH.chwSupplyC:'—')+'\u00B0C, CW Out '+(DH?DH.cdwReturnC:'—')+'\u00B0C. Status: ONLINE. \u2192 Cooling Tab');
 }
 for(var chy=0;chy<3;chy++){
-s+=eqLive(43+chy*5.5,31.5,4.5,3.5,'rgba(6,182,212,.2)','CH-'+(chy+5),4.2,'running','Chiller CH-'+(chy+5)+': Carrier 19XR water-cooled centrifugal, 4MW @ COP 6.8, R-1234ze(E), mag bearing, oil-free. Evap LWT 12\u00B0C, CW Out 38\u00B0C. Status: ONLINE. \u2192 Cooling Tab');
+s+=eqLive(43+chy*5.5,31.5,4.5,3.5,'rgba(6,182,212,.2)','CH-'+(chy+5),4.2,'running','Chiller CH-'+(chy+5)+': water-cooled centrifugal, '+(DH?DH.chillerRating/1000:'—')+' MW class @ COP '+(DH?DH.chillerCOP:'—')+' derived, R-1234ze(E), mag bearing, oil-free. Evap LWT '+(DH?DH.chwSupplyC:'—')+'\u00B0C, CW Out '+(DH?DH.cdwReturnC:'—')+'\u00B0C. Status: ONLINE. \u2192 Cooling Tab');
 }
 // CH-8 standby (N+1)
 s+=eqLive(43+3*5.5,31.5,4.5,3.5,'rgba(6,182,212,.12)','CH-8 STB',4,'standby','Chiller CH-8 (N+1 standby): Carrier 19XR water-cooled centrifugal, 4MW reserve. Status: STANDBY. \u2192 Cooling Tab');
@@ -2382,7 +2382,7 @@ s+=tx(480,14,'FLOOR 2 PLAN \u2014 DATAHALL 1 + DATAHALL 2','var(--t1)',10,'middl
 s+='<rect x="'+MX+'" y="'+MY+'" width="'+(72*M)+'" height="'+(48*M)+'" fill="none" stroke="var(--t2)" stroke-width="2" rx="2"/>';
 
 // === DATA HALL 1 (North Wing) ===
-s+=rmLive(4,2,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 1',(DH?('32m \u00D7 20m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'—'),(DH?('27\u00D7 NVL72 \u2502 1,944 GPU \u2502 '+DH.kwPerRack+'kW/rack-pos (2/NVL72)'):'—'),(DH?('DH-1: GB200 NVL72, 27 domains ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT, DLC 85%+Air 15%, TCS '+DH.tcsSupply+'/'+DH.tcsReturn+'\u00B0C'):'—'),20,45,'Running');
+s+=rmLive(4,2,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 1',(DH?(DH.hallLengthM+'m \u00D7 '+DH.hallWidthM+'m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'—'),(DH?(DH.racksPerHall+' NVL72 racks \u2502 '+DH.gpuPerHall.toLocaleString()+' GPU \u2502 '+DH.kwPerRack+' kW/rack (1 rack = 1 domain)'):'—'),(DH?('DH-1: GB200 NVL72, 27 domains ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT, DLC 85%+Air 15%, TCS '+DH.tcsSupply+'/'+DH.tcsReturn+'\u00B0C'):'—'),20,45,'Running');
 // Clickable overlay for DH tab
 s+='<rect x="'+(MX+4*M)+'" y="'+(MY+2*M)+'" width="'+(32*M)+'" height="'+(20*M)+'" fill="transparent" data-tab="dh" style="cursor:pointer"><title>Click to view Data Hall details</title></rect>';
 // Rack rows indicator
@@ -2402,7 +2402,8 @@ s+='<rect x="'+MX+'" y="'+(MY+22*M)+'" width="'+(72*M)+'" height="'+(4*M)+'" fil
 s+='<text x="'+(MX+20*M)+'" y="'+(MY+24.5*M)+'" fill="var(--t3)" font-family="'+J+'" font-size="6" text-anchor="middle">MAIN CORRIDOR + OVERHEAD BUSWAY</text>';
 
 // === DATA HALL 2 (South Wing) ===
-s+=rmLive(4,26,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 2',(DH?('32m \u00D7 20m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'—'),(DH?('27\u00D7 NVL72 \u2502 1,944 GPU \u2502 '+DH.kwPerRack+'kW/rack-pos (2/NVL72)'):'—'),(DH?('DH-2: GB200 NVL72, 27 domains ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT, DLC 85%+Air 15%, TCS '+DH.tcsSupply+'/'+DH.tcsReturn+'\u00B0C'):'—'),20,45,'Running');
+s+=rmLive(4,26,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 2',(DH?(DH.hallLengthM+'m \u00D7 '+DH.hallWidthM+'m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'—'),(DH?(DH.racksPerHall+' NVL72 racks \u2502 '+DH.gpuPerHall.toLocaleString()+' GPU \u2502 '+DH.kwPerRack+' kW/rack (1 rack = 1 domain)'):'—'),(DH?('DH-2: GB200 NVL72, 27 domains ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT, DLC 85%+Air 15%, TCS '+DH.tcsSupply+'/'+DH.tcsReturn+'\u00B0C'):'—'),20,45,'Running');
+s+=`<text x="8" y="752" fill="var(--t3)" font-family="${F}" font-size="8.5" font-style="italic">BUILDING GRID: retired-basis plot \u2014 hall dimensions, rack rows and equipment counts are current (engine); site re-grid to the ${DH?DH.hallLengthM:'\u2014'} \u00D7 ${DH?DH.hallWidthM:'\u2014'} m hall is pending (Track A)</text>`;
 // Clickable overlay for DH tab
 s+='<rect x="'+(MX+4*M)+'" y="'+(MY+26*M)+'" width="'+(32*M)+'" height="'+(20*M)+'" fill="transparent" data-tab="dh" style="cursor:pointer"><title>Click to view Data Hall details</title></rect>';
 // Rack rows
@@ -2418,7 +2419,7 @@ s+='<rect x="'+(MX+4.5*M)+'" y="'+(MY+29*M)+'" width="'+(1.5*M)+'" height="'+(14
 s+='<text x="'+(MX+5.2*M)+'" y="'+(MY+36*M)+'" fill="rgba(59,130,246,.4)" font-family="'+J+'" font-size="4" text-anchor="middle" transform="rotate(-90,'+(MX+5.2*M)+','+(MY+36*M)+')">CRAH \u00D76</text>';
 
 // === Electrical Wing (East side) ===
-s+=rm(38,2,16,9,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','UPS Room A','16m \u00D7 9m','2\u00D7 EXL S1 4.5MW','UPS-A: 2\u00D7 Vertiv Liebert EXL S1, double-conversion, Li-Ion 10min');
+s+=rm(38,2,16,9,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','UPS Room A','16m \u00D7 9m',(DH?(DH.upsFramesPerFeedHall+'\u00D7 '+DH.upsRatingMW+' MW frames'):'—'),'UPS-A: '+(DH?DH.upsFramesPerFeedHall:'—')+'\u00D7 '+(DH?DH.upsRatingMW:'—')+' MW modular frames ('+(DH?DH.upsTopology:'—')+'), double-conversion, Li-Ion 10min');
 s+=eq(39,4,6,4,'rgba(245,158,11,.15)','UPS-1A',4.5);
 s+=eq(46,4,6,4,'rgba(245,158,11,.15)','UPS-2A',4.5);
 
@@ -2432,7 +2433,7 @@ s+='<text x="'+(MX+57*M)+'" y="'+(MY+12*M)+'" fill="rgba(245,158,11,.4)" font-fa
 s+=rm(60,2,12,10,'rgba(245,158,11,.08)','rgba(245,158,11,.3)','RPP Room','12m \u00D7 10m','24\u00D7RPP 630A MCCB','RPP: 24\u00D7 630A MCCB tap-off panels, cable terminations');
 s+=rm(60,12,12,10,'rgba(120,113,108,.06)','rgba(120,113,108,.25)','Cable Mgmt','12m \u00D7 10m','Cable trays + fire stops','Cable Mgmt: Cable trays, ladder rack, fire stops, cable routing');
 
-s+=rm(38,26,16,9,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','UPS Room B','16m \u00D7 9m','2\u00D7 EXL S1 4.5MW');
+s+=rm(38,26,16,9,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','UPS Room B','16m \u00D7 9m',(DH?(DH.upsFramesPerFeedHall+'\u00D7 '+DH.upsRatingMW+' MW frames'):'—'));
 s+=eq(39,28,6,4,'rgba(245,158,11,.15)','UPS-1B',4.5);
 s+=eq(46,28,6,4,'rgba(245,158,11,.15)','UPS-2B',4.5);
 
@@ -2496,7 +2497,7 @@ s+=tx(480,14,'FLOOR 3 PLAN \u2014 DATAHALL 3 + DATAHALL 4','var(--t1)',10,'middl
 s+='<rect x="'+MX+'" y="'+MY+'" width="'+(72*M)+'" height="'+(48*M)+'" fill="none" stroke="var(--t2)" stroke-width="2" rx="2"/>';
 
 // DH3 (North)
-s+=rmLive(4,2,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 3',(DH?('32m \u00D7 20m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'—'),(DH?('27\u00D7 NVL72 \u2502 1,944 GPU \u2502 '+DH.kwPerRack+'kW/rack-pos (2/NVL72)'):'—'),(DH?('DH-3: GB200 NVL72, 27 domains ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT'):'—'),20,45,'Running');
+s+=rmLive(4,2,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 3',(DH?(DH.hallLengthM+'m \u00D7 '+DH.hallWidthM+'m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'—'),(DH?(DH.racksPerHall+' NVL72 racks \u2502 '+DH.gpuPerHall.toLocaleString()+' GPU \u2502 '+DH.kwPerRack+' kW/rack (1 rack = 1 domain)'):'—'),(DH?('DH-3: GB200 NVL72, 27 domains ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT'):'—'),20,45,'Running');
 s+='<rect x="'+(MX+4*M)+'" y="'+(MY+2*M)+'" width="'+(32*M)+'" height="'+(20*M)+'" fill="transparent" data-tab="dh" style="cursor:pointer"><title>Click to view Data Hall details</title></rect>';
 for(var r=0;r<3;r++){
 s+='<rect x="'+(MX+(7+r*9)*M)+'" y="'+(MY+5*M)+'" width="'+(6*M)+'" height="'+(14*M)+'" fill="rgba(34,197,94,.06)" stroke="rgba(34,197,94,.2)" stroke-width=".3" rx="1"/>';
@@ -2512,7 +2513,8 @@ s+='<rect x="'+MX+'" y="'+(MY+22*M)+'" width="'+(72*M)+'" height="'+(4*M)+'" fil
 s+='<text x="'+(MX+20*M)+'" y="'+(MY+24.5*M)+'" fill="var(--t3)" font-family="'+J+'" font-size="6" text-anchor="middle">MAIN CORRIDOR + OVERHEAD BUSWAY</text>';
 
 // DH4 (South)
-s+=rmLive(4,26,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 4',(DH?('32m \u00D7 20m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'—'),(DH?('27\u00D7 NVL72 \u2502 1,944 GPU \u2502 '+DH.kwPerRack+'kW/rack-pos (2/NVL72)'):'—'),(DH?('DH-4: GB200 NVL72, 27 domains ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT'):'—'),20,45,'Running');
+s+=rmLive(4,26,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 4',(DH?(DH.hallLengthM+'m \u00D7 '+DH.hallWidthM+'m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'—'),(DH?(DH.racksPerHall+' NVL72 racks \u2502 '+DH.gpuPerHall.toLocaleString()+' GPU \u2502 '+DH.kwPerRack+' kW/rack (1 rack = 1 domain)'):'—'),(DH?('DH-4: GB200 NVL72, 27 domains ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT'):'—'),20,45,'Running');
+s+=`<text x="8" y="752" fill="var(--t3)" font-family="${F}" font-size="8.5" font-style="italic">BUILDING GRID: retired-basis plot \u2014 hall dimensions, rack rows and equipment counts are current (engine); site re-grid to the ${DH?DH.hallLengthM:'\u2014'} \u00D7 ${DH?DH.hallWidthM:'\u2014'} m hall is pending (Track A)</text>`;
 s+='<rect x="'+(MX+4*M)+'" y="'+(MY+26*M)+'" width="'+(32*M)+'" height="'+(20*M)+'" fill="transparent" data-tab="dh" style="cursor:pointer"><title>Click to view Data Hall details</title></rect>';
 for(var r2=0;r2<3;r2++){
 s+='<rect x="'+(MX+(7+r2*9)*M)+'" y="'+(MY+29*M)+'" width="'+(6*M)+'" height="'+(14*M)+'" fill="rgba(34,197,94,.06)" stroke="rgba(34,197,94,.2)" stroke-width=".3" rx="1"/>';
@@ -2524,7 +2526,7 @@ s+='<rect x="'+(MX+4.5*M)+'" y="'+(MY+29*M)+'" width="'+(1.5*M)+'" height="'+(14
 s+='<text x="'+(MX+5.2*M)+'" y="'+(MY+36*M)+'" fill="rgba(59,130,246,.4)" font-family="'+J+'" font-size="4" text-anchor="middle" transform="rotate(-90,'+(MX+5.2*M)+','+(MY+36*M)+')">CRAH \u00D76</text>';
 
 // Electrical wing (same as F2)
-s+=rm(38,2,16,9,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','UPS Room C','16m \u00D7 9m','2\u00D7 EXL S1 4.5MW');
+s+=rm(38,2,16,9,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','UPS Room C','16m \u00D7 9m',(DH?(DH.upsFramesPerFeedHall+'\u00D7 '+DH.upsRatingMW+' MW frames'):'—'));
 s+=eq(39,4,6,4,'rgba(245,158,11,.15)','UPS-1C',4.5);
 s+=eq(46,4,6,4,'rgba(245,158,11,.15)','UPS-2C',4.5);
 s+=rm(38,11,16,9,'rgba(245,158,11,.08)','rgba(245,158,11,.3)','Battery Room C','16m \u00D7 9m','Li-Ion NMC Racks');
@@ -2535,7 +2537,7 @@ s+='<text x="'+(MX+57*M)+'" y="'+(MY+12*M)+'" fill="rgba(245,158,11,.4)" font-fa
 s+=rm(60,2,12,10,'rgba(245,158,11,.08)','rgba(245,158,11,.3)','RPP Room','12m \u00D7 10m','24\u00D7RPP 630A MCCB','RPP: 24\u00D7 630A MCCB tap-off panels, cable terminations');
 s+=rm(60,12,12,10,'rgba(120,113,108,.06)','rgba(120,113,108,.25)','Cable Mgmt','12m \u00D7 10m','Cable trays + fire stops','Cable Mgmt: Cable trays, ladder rack, fire stops, cable routing');
 
-s+=rm(38,26,16,9,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','UPS Room D','16m \u00D7 9m','2\u00D7 EXL S1 4.5MW');
+s+=rm(38,26,16,9,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','UPS Room D','16m \u00D7 9m',(DH?(DH.upsFramesPerFeedHall+'\u00D7 '+DH.upsRatingMW+' MW frames'):'—'));
 s+=eq(39,28,6,4,'rgba(245,158,11,.15)','UPS-1D',4.5);
 s+=eq(46,28,6,4,'rgba(245,158,11,.15)','UPS-2D',4.5);
 s+=rm(38,35,16,11,'rgba(245,158,11,.08)','rgba(245,158,11,.3)','Battery Room D','16m \u00D7 11m','Li-Ion NMC Racks');
@@ -5568,7 +5570,7 @@ s+=tx2(310,198,'AN/AF (forced at 80%)','var(--t3)',3.5,'middle');
 s+=symSensor(100,180,CA,'BH');s+=tx2(80,195,'Buchholz','var(--t3)',3.5,'middle');
 s+=symSensor(100,210,CA,'PRD');s+=tx2(80,225,'PRD','var(--t3)',3.5,'middle');
 // Secondary ACB
-s+=fl2(160,215,160,240,CA,'fD');s+=symCBe(160,250,CA,true,'LSI');s+=tx2(190,248,'ACB-'+dh+'A',CA,4.5,0,1);s+=tx2(190,258,'6300A/100kA Emax2','var(--t3)',4);
+s+=fl2(160,215,160,240,CA,'fD');s+=symCBe(160,250,CA,true,'LSI');s+=tx2(190,248,'ACB-'+dh+'A',CA,4.5,0,1);s+=tx2(190,258,(DHE?(DHE.buswayAFmt+' A class ACB'):'—'),'var(--t3)',4);
 // Live params A
 s+=bx2(55,270,370,40,CA);s+=tx2(240,282,'SIMULATED STATUS',CA,4.5,'middle',1);
 s+=lv('mt-pva',75,300,R(19.8,20.2)+' kV',CA,4.5);s+=tx2(75,310,'Primary','var(--t3)',3);
@@ -5609,7 +5611,7 @@ s+=lv('mt-cb',610,118,RI(49,59)+'°C','var(--o)',4.5);s+=tx2(610,128,'Core','var
 s+=symMotor(600,180,'var(--c)');s+=tx2(615,178,'FAN-1','var(--c)',3.5);s+=lv('mt-f1b',615,188,'AUTO','var(--g)',3.5);
 s+=symMotor(660,180,'var(--c)');s+=tx2(675,178,'FAN-2','var(--c)',3.5);s+=lv('mt-f2b',675,188,'AUTO','var(--g)',3.5);
 s+=symSensor(620,210,CG,'BH');s+=tx2(600,225,'Buchholz','var(--t3)',3.5,'middle');
-s+=fl2(680,215,680,240,CG,'fD');s+=symCBe(680,250,CG,true,'LSI');s+=tx2(710,248,'ACB-'+dh+'B',CG,4.5,0,1);s+=tx2(710,258,'6300A/100kA Emax2','var(--t3)',4);
+s+=fl2(680,215,680,240,CG,'fD');s+=symCBe(680,250,CG,true,'LSI');s+=tx2(710,248,'ACB-'+dh+'B',CG,4.5,0,1);s+=tx2(710,258,(DHE?(DHE.buswayAFmt+' A class ACB'):'—'),'var(--t3)',4);
 s+=bx2(495,270,370,40,CG);s+=tx2(680,282,'SIMULATED STATUS',CG,4.5,'middle',1);
 s+=lv('mt-pvb',515,300,R(19.8,20.2)+' kV',CG,4.5);s+=tx2(515,310,'Primary','var(--t3)',3);
 s+=lv('mt-svb',610,300,RI(396,400)+' V',CG,4.5);s+=tx2(610,310,'Secondary','var(--t3)',3);
@@ -5624,7 +5626,7 @@ s+=flowParticle(680,168,240,1.5,CG);
 // GenSet + ATS
 s+=sectionSep(330,'GENSET / BACKUP');
 s+=bx2(200,340,520,80,'rgba(107,114,128,.4)');s+=tx2(460,355,'GENSET POOL + ATS','var(--t3)',5,'middle',1);
-s+=symGen(300,385,'rgba(107,114,128,.5)');s+=tx2(300,405,(DHE?(DHE.gensetFacNplus1+'×'+DHE.gensetMW+'MW Cat 3516E'):'—'),'var(--t3)',4,'middle');
+s+=symGen(300,385,'rgba(107,114,128,.5)');s+=tx2(300,405,(DHE?(DHE.gensetFacNplus1+'×'+DHE.gensetMW+' MW class'):'—'),'var(--t3)',4,'middle');
 s+=tx2(460,375,'ATS: ASCO 7000 <10s auto-transfer','var(--t3)',4,'middle');
 s+=tx2(460,390,'CB-Emergency OPEN (standby)','var(--t3)',4,'middle');
 s+=tx2(460,405,'Connects at LV 400V via ATS interlock','var(--t3)',4,'middle');
@@ -5664,7 +5666,7 @@ alm=$('alm-txB');if(alm)alm.style.display=Math.random()>0.95?'block':'none'})}
 function renderMsb(dh){
 var H=530;svg.setAttribute('viewBox','0 0 '+W+' '+H);
 var s=gridBg(W,H);
-s+=tx2(W/2,18,'MSB-'+dh+'A/B — 400V 6300A Form 4b — LV Distribution','var(--g)',8,'middle',1);
+s+=tx2(W/2,18,'MSB-'+dh+'A/B — '+(DHE?(DHE.voltageLL+'V '+DHE.buswayAFmt+'A class'):'—')+' Form 4b — LV Distribution','var(--g)',8,'middle',1);
 s+=lfLegend(5,25);
 // MSB-A panel — Idea 49: bx3 beveled panel box
 s+=bx3(30,35,420,250,CA);s+=tx2(240,52,'MSB-'+dh+'A — FEED A',CA,6,'middle',1);
@@ -5676,7 +5678,7 @@ s+=flowArrow(175,60,175,78,'5.4 MW',CA,'sldArrowR');
 s+=qFlowArrow(185,60,185,78,R(1.2,1.5)+' MVAr',CA);
 // Idea 1: P/Q/I annotation near incoming ACB MSB-A
 s+=lfAnnot(210,65,R(5200,5600),R(1200,1500),RI(4800,5400),CA);
-s+=symCBe(180,90,CA,true,'LSI');s+=tx2(205,87,'ACB-'+dh+'A Inc',CA,4.5,0,1);s+=tx2(205,97,'6300A/100kA','var(--t3)',4);
+s+=symCBe(180,90,CA,true,'LSI');s+=tx2(205,87,'ACB-'+dh+'A Inc',CA,4.5,0,1);s+=tx2(205,97,(DHE?(DHE.buswayAFmt+' A class'):'—'),'var(--t3)',4);
 // Idea 12: CB gauge above incoming ACB-A
 s+=cbGauge(180,72,RI(78,86),CA,'cg-msbA');
 // Idea 33: Fault current bar ACB-A
@@ -5689,7 +5691,7 @@ s+='<line x1="90" y1="90" x2="170" y2="90" stroke="var(--b)" stroke-width=".8" s
 s+=tx2(130,84,'ATS','var(--b)',4,'middle',1);
 // Main Bus A
 s+=fl2(180,100,180,115,CA,'fD');
-s+=busEtap(50,118,390,'MSB-'+dh+'A BUS 400V 6300A',CA,'398 V / 0.0°');
+s+=busEtap(50,118,390,'MSB-'+dh+'A BUS '+(DHE?(DHE.voltageLL+'V '+DHE.buswayAFmt+'A'):'—'),CA,'398 V / 0.0°');
 // Idea 9: Bus loading bar MSB-A
 s+=busLoadBar(50,118,390,RI(78,86),'blb-msbA');
 // Idea 26: voltage profile overlay MSB-A
@@ -5733,7 +5735,7 @@ s+=flowArrow(675,60,675,78,'5.3 MW',CG,'sldArrow');
 s+=qFlowArrow(665,60,665,78,R(1.1,1.4)+' MVAr',CG);
 // Idea 1: P/Q/I annotation near incoming ACB MSB-B
 s+=lfAnnot(710,65,R(5100,5500),R(1100,1400),RI(4700,5300),CG);
-s+=symCBe(680,90,CG,true,'LSI');s+=tx2(705,87,'ACB-'+dh+'B Inc',CG,4.5,0,1);s+=tx2(705,97,'6300A/100kA','var(--t3)',4);
+s+=symCBe(680,90,CG,true,'LSI');s+=tx2(705,87,'ACB-'+dh+'B Inc',CG,4.5,0,1);s+=tx2(705,97,(DHE?(DHE.buswayAFmt+' A class'):'—'),'var(--t3)',4);
 // Idea 12: CB gauge above incoming ACB-B
 s+=cbGauge(680,72,RI(76,84),CG,'cg-msbB');
 // Idea 33: Fault current bar ACB-B
@@ -5743,7 +5745,7 @@ s+=tx2(845,87,'ACB-GEN',CG,4);s+=tx2(845,97,'OPEN','var(--t3)',3.5);
 s+='<line x1="690" y1="90" x2="810" y2="90" stroke="var(--b)" stroke-width=".8" stroke-dasharray="3 2"/>';
 s+=tx2(750,84,'ATS','var(--b)',4,'middle',1);
 s+=fl2(680,100,680,115,CG,'fD');
-s+=busEtap(480,118,390,'MSB-'+dh+'B BUS 400V 6300A',CG,'397 V / 0.0°');
+s+=busEtap(480,118,390,'MSB-'+dh+'B BUS '+(DHE?(DHE.voltageLL+'V '+DHE.buswayAFmt+'A'):'—'),CG,'397 V / 0.0°');
 // Idea 9: Bus loading bar MSB-B
 s+=busLoadBar(480,118,390,RI(76,84),'blb-msbB');
 // Idea 26: voltage profile overlay MSB-B
@@ -5776,7 +5778,7 @@ s+=tx2(510,268,'CT: 6000/5A cl0.5S','var(--t2)',4);s+=tx2(680,268,'VT: 400/\\u22
 // Bus Tie N.O. (center)
 s+='<line x1="440" y1="122" x2="480" y2="122" stroke="var(--p)" stroke-width="1.2" stroke-dasharray="5 3"/>';
 s+=symCBe(460,122,'var(--p)',false);s+=tx2(460,110,'ACB-TIE-LV N.O.','var(--p)',4,'middle',1);
-s+=tx2(460,137,'6300A/100kA','var(--t3)',3.5,'middle');
+s+=tx2(460,137,(DHE?(DHE.buswayAFmt+' A class'):'—'),'var(--t3)',3.5,'middle');
 // Idea 24: Bus-tie transfer arrow annotation
 s+=tieArrow(460,152,'0','OPEN');
 
@@ -5807,8 +5809,8 @@ s+=lv('msb-tie',460,440,'OPEN','var(--p)',5);s+=tx2(460,450,'Bus Tie','var(--t3)
 s+=lv('msb-kw',640,440,(DHE?DHE.itHallFmt:'—')+' kW','var(--o)',5);s+=tx2(640,450,'Total Load A','var(--t3)',3.5);
 
 // Idea 41: Tooltip zones — MSB Panel
-s+=tipZone(30,35,420,250,'<b>MSB-'+dh+'A — 400V 6300A</b><div class=&quot;tt-row&quot;>Form<span class=&quot;tt-val&quot;>Form 4b</span></div><div class=&quot;tt-row&quot;>Fault Rating<span class=&quot;tt-val&quot;>100kA</span></div><div class=&quot;tt-row&quot;>Bus Rating<span class=&quot;tt-val&quot;>6300A Cu</span></div>','A');
-s+=tipZone(470,35,420,250,'<b>MSB-'+dh+'B — 400V 6300A</b><div class=&quot;tt-row&quot;>Form<span class=&quot;tt-val&quot;>Form 4b</span></div><div class=&quot;tt-row&quot;>Fault Rating<span class=&quot;tt-val&quot;>100kA</span></div><div class=&quot;tt-row&quot;>Bus Rating<span class=&quot;tt-val&quot;>6300A Cu</span></div>','B');
+s+=tipZone(30,35,420,250,'<b>MSB-'+dh+'A — '+(DHE?(DHE.voltageLL+'V '+DHE.buswayAFmt+'A class'):'—')+'</b><div class=&quot;tt-row&quot;>Form<span class=&quot;tt-val&quot;>Form 4b</span></div><div class=&quot;tt-row&quot;>Fault Rating<span class=&quot;tt-val&quot;>100kA</span></div><div class=&quot;tt-row&quot;>Bus Rating<span class=&quot;tt-val&quot;>'+(DHE?DHE.buswayAFmt:'—')+' A Cu</span></div>','A');
+s+=tipZone(470,35,420,250,'<b>MSB-'+dh+'B — '+(DHE?(DHE.voltageLL+'V '+DHE.buswayAFmt+'A class'):'—')+'</b><div class=&quot;tt-row&quot;>Form<span class=&quot;tt-val&quot;>Form 4b</span></div><div class=&quot;tt-row&quot;>Fault Rating<span class=&quot;tt-val&quot;>100kA</span></div><div class=&quot;tt-row&quot;>Bus Rating<span class=&quot;tt-val&quot;>'+(DHE?DHE.buswayAFmt:'—')+' A Cu</span></div>','B');
 // Idea 43: CB toggle zones — MSB Panel
 s+=cbToggle(180,90,'msbA-inc');
 s+=cbToggle(680,90,'msbB-inc');
@@ -7302,18 +7304,18 @@ s+=`<rect x="10" y="${EY}" width="460" height="130" rx="4" fill="var(--bg3)" str
 s+=tx(240,EY+14,'ENERGY SANKEY \u2014 COOLING CHAIN','var(--g)',7,'middle',1);
 // Sankey flow bars — width proportional to energy
 const skY=EY+26,skH=80;
-// IT Load: engine itHall (Scenario A 3,564 kW)
+// IT Load: engine itHall (total IT per hall, DHE.itHall)
 s+=`<rect x="30" y="${skY}" width="20" height="${skH}" rx="2" fill="rgba(245,158,11,.2)" stroke="var(--o)" stroke-width=".5"/>`;
 s+=tx(40,skY-4,'IT Load','var(--o)',4,'middle');
 s+=tx(40,skY+skH+10,(DH?(DH.itHallFmt+' kW'):'—'),'var(--o)',5,'middle',1);
-// DLC branch: 85% = engine liquidHeat (Scenario A 3,029 kW)
+// DLC branch: liquid capture share = engine liquidHeat (DHE.liquidHeat)
 const dlcH=Math.round(skH*.85);
 s+=`<path d="M50,${skY} L110,${skY} L110,${skY+dlcH} L50,${skY+dlcH}" fill="rgba(6,182,212,.12)" stroke="var(--c)" stroke-width=".4"/>`;
 s+=tx(80,skY+dlcH/2+3,'85% DLC','var(--c)',4,'middle');
-// Air branch: 15% = engine airHeat (Scenario A 535 kW)
+// Air branch: residual + non-rack IT = engine airHeat (DHE.airHeatFmt)
 s+=`<path d="M50,${skY+dlcH} L110,${skY+dlcH} L110,${skY+skH} L50,${skY+skH}" fill="rgba(59,130,246,.12)" stroke="var(--b)" stroke-width=".4"/>`;
 s+=tx(80,skY+dlcH+(skH-dlcH)/2+3,'15% Air','var(--b)',3.5,'middle');
-// CDU heat exchange: engine liquidHeat (Scenario A 3,029 kW)
+// CDU heat exchange: engine liquidHeat (DHE.liquidHeat)
 s+=`<path d="M110,${skY} L180,${skY+5} L180,${skY+dlcH-5} L110,${skY+dlcH}" fill="rgba(6,182,212,.08)" stroke="var(--c)" stroke-width=".4"/>`;
 s+=tx(145,skY+dlcH/2+3,'CDU','var(--c)',4,'middle');
 s+=tx(145,skY+dlcH/2+11,(DH?DH.liquidHeatFmt:'—'),'var(--c)',3.5,'middle');
@@ -7323,7 +7325,7 @@ s+=tx(215,skY+dlcH/2+3,'FWS','var(--g)',4,'middle');
 // Chiller: rejects to CW
 s+=`<path d="M250,${skY+10} L320,${skY+12} L320,${skY+dlcH-12} L250,${skY+dlcH-10}" fill="rgba(245,158,11,.08)" stroke="var(--o)" stroke-width=".4"/>`;
 s+=tx(285,skY+dlcH/2-2,'Chiller','var(--o)',4,'middle');
-s+=tx(285,skY+dlcH/2+7,'COP 6.8','var(--g)',3.5,'middle');
+s+=tx(285,skY+dlcH/2+7,(DHE?('COP '+DHE.chillerCOP+' derived'):'—'),'var(--g)',3.5,'middle');
 // Compressor work added
 s+=`<path d="M280,${skY+dlcH-12} L280,${skY+dlcH+5} L320,${skY+dlcH+5} L320,${skY+dlcH-12}" fill="rgba(245,158,11,.06)" stroke="var(--o)" stroke-width=".3"/>`;
 s+=tx(300,skY+dlcH+3,'+891 kW','var(--o)',3,'middle');
@@ -7395,7 +7397,7 @@ const dcE=$('dcEff');if(dcE)dcE.textContent=eff2.toFixed(1)+'%';
 const dcFP=$('dcFanP');if(dcFP)dcFP.textContent=RI(72,88)+'%';
 const dcHR=$('dcHeatR');if(dcHR){const cwMs2=600*1030/3600;dcHR.textContent=Math.round(cwMs2*3.85*rng).toLocaleString()+' kW';}
 const dcFl=$('dcFlow');if(dcFl)dcFl.textContent='600 m\u00B3/h';
-// Chiller — water-cooled centrifugal, COP 6.8
+// Chiller — water-cooled centrifugal, COP DERIVED (Carnot fraction over the actual lift)
 const chE=$('chEvapL');if(chE)chE.textContent=R(11.5,12.5)+'\u00B0C';
 const copV=R(6.5,7.2);
 const chC=$('chCOP');if(chC)chC.textContent=copV;
@@ -7483,7 +7485,7 @@ var pueBadgeInit=(DH?DH.pue.toFixed(2):'—');
 var pueBadge=document.createElementNS('http://www.w3.org/2000/svg','g');
 pueBadge.innerHTML='<rect x="900" y="2" width="55" height="20" rx="4" fill="rgba(34,197,94,.12)" stroke="var(--g)" stroke-width=".6"/><text x="927" y="10" fill="var(--t3)" font-family="JetBrains Mono" font-size="4" text-anchor="middle">PUE</text><text x="927" y="18" fill="var(--g)" font-family="JetBrains Mono" font-size="8" text-anchor="middle" font-weight="700" id="pueBadgeV">'+pueBadgeInit+'</text>';
 el.appendChild(pueBadge);
-// Update PUE badge from engine (deterministic — Scenario A locked, no jitter on the engineering value)
+// Update PUE badge from engine (deterministic — adopted basis, no jitter on the engineering value)
 setInterval(function(){var authority2=window.RZDatahallCurrentAuthority?window.RZDatahallCurrentAuthority():null;var pb2=authority2?authority2.pue:null;
 var pue2=pb2?pb2.pue.toFixed(2):(DH?DH.pue.toFixed(2):'—');
 var pb=$('pueBadgeV');if(pb)pb.textContent=pue2;
@@ -7493,7 +7495,7 @@ var pb=$('pueBadgeV');if(pb)pb.textContent=pue2;
 
 /* ============================================================================
  * RACK ARCHITECTURE — GB300 NVL72. ONE rack IS one NVLink domain (the GB200
- * basis split a domain across an NVL36 pair, which is why this view used to
+ * basis split a domain across an two-rack pair, which is why this view used to
  * draw two racks). Tray, shelf and NIC counts are DHE fields; anything the
  * adopted basis does not publish (per-device TDP, per-GPU memory) is NOT
  * invented here — it is simply absent.
@@ -7649,8 +7651,8 @@ mc('var(--o)','Performance Targets','Design & Operating KPIs',[['Total cooling',
 // ELECTRICAL CARDS
 $('elecCards').innerHTML=[
 mc('var(--o)','MV Switchgear','SM6 24kV + 4\u00D7 RM6 RMU (True 2N)',[['Central','Schneider SM6 24kV gas-insulated 11 panels'],['Incomers','2\u00D7 VCB-INC 630A/25kA (PLN A+B)'],['Bus Tie','1\u00D7 VCB-TIE N.O. (auto/manual)'],['Feeders','8\u00D7 VCB: 4 from Bus A + 4 from Bus B'],['Per-DH RMU','Schneider RM6 24kV 2-panel per DH'],['2N Path','Each DH receives independent A+B feeds'],['Protection','IDMT OC 50/51, E/F 50N/51N, U/V 27'],['CT/VT','200/5A cl.0.5 + 20/0.1kV cl.0.5'],['Standard','IEC 62271 / SNI 0225']]),
-mc('var(--o)','Transformers',(DHE?('8\u00D7 cast-resin '+DHE.txRatingMVA+'MVA (2 per DH)'):'—'),[['Rating',(DHE?(DHE.txRatingMVA+',000 kVA per unit (2 per DH, 8 total), '+DHE.txLoadPct.toFixed(0)+'% load'):'—')],['Type','ABB RESIBLOC cast-resin dry Dyn11'],['Voltage','20kV/0.4kV | Ik=14.4kA secondary'],['Impedance','Zk=6% | AN/AF cooling'],['Tap','\u00B12.5% \u00D72 OCTC (off-circuit)'],['ACBs','8\u00D7 6300A/100kA ABB Emax2 E6.2'],['Capacity','80MVA total (2N: each TX can carry full DH)'],['Per TX','~8,950 kVA | 12,900A @ 400V']]),
-mc('var(--b)','Generator Pool',(DHE?(DHE.gensetFacNplus1+'\u00D7 Cat 3516E '+DHE.gensetMW+'MW N+1'):'—'),[['Units',(DHE?(DHE.gensetFacNplus1+'\u00D7 '+DHE.gensetKW.toLocaleString()+' kW diesel (N+1: '+DHE.gensetFacN+'+1)'):'—')],['Engine','Caterpillar 3516E at 11kV'],['Step-up TX','6\u00D7 11kV/20kV 10MVA to MV Bus'],['APS','ASCO 7000 auto-paralleling switchgear'],['Start','Auto <10s on MV bus undervoltage'],['Capacity',(DHE?(DHE.gensetFacN+' running = '+(DHE.gensetFacN*DHE.gensetMW).toFixed(2)+'MW for '+DHE.facTotalMW+'MW facility (Scenario A locked)'):'—')],['Fuel','48hr base tank + 500L day tank per unit'],['Exhaust','SCR/DPF emission (Jakarta reg)'],['Maintenance','250hr: oil/filter | 1000hr: major']]),
+mc('var(--o)','Transformers',(DHE?(DHE.txTotal+'\u00D7 cast-resin '+DHE.txRatingMVA+' MVA ('+DHE.txPerFeedHall+' per feed per hall)'):'—'),[['Rating',(DHE?((DHE.txRatingMVA*1000).toLocaleString()+' kVA per unit ('+DHE.txTotal+' total), '+DHE.txLoadPct.toFixed(0)+'% load'):'—')],['Type','ABB RESIBLOC cast-resin dry Dyn11'],['Voltage','20kV/0.4kV | Ik=14.4kA secondary'],['Impedance','Zk=6% | AN/AF cooling'],['Tap','\u00B12.5% \u00D72 OCTC (off-circuit)'],['ACBs','8\u00D7 '+(DHE?DHE.buswayAFmt:'—')+' A/100kA ABB Emax2 E6.2'],['Capacity','80MVA total (2N: each TX can carry full DH)'],['Per TX','~8,950 kVA | 12,900A @ 400V']]),
+mc('var(--b)','Generator Pool',(DHE?(DHE.gensetFacNplus1+'\u00D7 '+DHE.gensetMW+' MW '+DHE.gensetRedundancy+' \u2014 facility pool'):'—'),[['Units',(DHE?(DHE.gensetFacNplus1+'\u00D7 '+DHE.gensetKW.toLocaleString()+' kW MV diesel ('+DHE.gensetFacN+' duty, '+DHE.gensetRedundancy+')'):'—')],['Engine',(DHE?(DHE.gensetModel+' \u2014 MV machine'):'—')],['Step-up TX','6\u00D7 11kV/20kV 10MVA to MV Bus'],['APS','ASCO 7000 auto-paralleling switchgear'],['Start','Auto <10s on MV bus undervoltage'],['Capacity',(DHE?(DHE.gensetFacN+' running = '+(DHE.gensetFacN*DHE.gensetMW).toFixed(2)+'MW for '+DHE.facTotalMW+'MW facility (the adopted GB300 basis locked)'):'—')],['Fuel','48hr base tank + 500L day tank per unit'],['Exhaust','SCR/DPF emission (Jakarta reg)'],['Maintenance','250hr: oil/filter | 1000hr: major']]),
 mc('var(--g)','UPS System',(DHE?('8\u00D7 modular UPS '+DHE.upsRatingMW+'MW (2N)'):'—'),[['Rating',(DHE?(DHE.upsRatingKW.toLocaleString()+' kW per unit (2 per DH, 8 total), '+DHE.upsLoadPct.toFixed(0)+'% load'):'—')],['Type','VFI-SS-111 double-conversion online'],['Modules','8\u00D71MW modular per frame'],['Battery','8\u00D7 Li-Ion NMC 1,333 kWh 10min'],['STS','NOT REQUIRED (dual-corded racks)'],['Efficiency','\u03B7>96% double-conv | >99% eco'],['THDi/THDv','<3% / <1% at rated load'],['Total UPS','64 MW capacity (8\u00D78MW)'],['Standard','IEC 62040-3 VFI-SS-111']]),
 mc('var(--o)','Distribution',(DHE?('8\u00D7 Busway '+DHE.buswayAFmt+'A + 88\u00D7 RPP 800A'):'—'),[['Busway',(DHE?('8\u00D7 Canalis KTA '+DHE.buswayAFmt+'A Cu overhead'):'—')],['Per DH','2 busways (Feed A + Feed B)'],['RPP','11\u00D7 800A MCCB NSX800 tap-off per busway'],['Total RPP','88 units (22 per DH)'],['Rack PSU','2\u00D7 OCP ORV3 per rack (dual-corded)'],['Conversion','400V AC \u2192 50VDC | \u03B7>97%'],['Bus Bar','50VDC 4,000A Cu vertical in-rack'],['Whip','200A 400V flex conduit to rack']]),
 mc('var(--c)','Auxiliary Basis',(DHE?('DB-AUX: '+DHE.pb_aux+' kW/hall'):'—'),[['Engine authority','DATAHALL_CALC.pueBasis()'],['Facility per hall',(DHE?DHE.pb_facilityFmt:'—')+' kW'],['IT load',(DHE?DHE.itHallFmt:'—')+' kW'],['UPS/distribution loss',(DHE?DHE.pb_upsDist:null)+' kW upstream'],['Non-IT total',(DHE?DHE.pb_nonIT:null)+' kW/hall']]),
@@ -7760,7 +7762,7 @@ s+=`<rect width="960" height="520" fill="var(--bg2)"/>`;
 s+=`<pattern id="netGrid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0L0 0 0 20" fill="none" stroke="rgba(255,255,255,.02)" stroke-width=".3"/></pattern>`;
 s+=`<rect width="960" height="520" fill="url(#netGrid)"/>`;
 // Title with live status
-s+=tx(480,18,'NETWORK FABRIC TOPOLOGY — 27 NVL72 DOMAINS — 1,944 GPU','var(--t3)',8,'middle',1);
+s+=tx(480,18,(DHE?('NETWORK FABRIC TOPOLOGY \u2014 '+DHE.racksPerHall+' NVL72 RACKS / HALL \u2014 '+DHE.gpuPerHall.toLocaleString()+' GPU \u2014 27 representative racks shown'):'—'),'var(--t3)',8,'middle',1);
 // Alarm indicator
 s+=`<rect x="850" y="8" width="100" height="18" rx="3" fill="rgba(34,197,94,.1)" stroke="var(--g)" stroke-width=".5" id="netAlarmBox"/>`;
 s+=`<text x="900" y="20" fill="var(--g)" font-family="${J}" font-size="6" text-anchor="middle" font-weight="600" id="netAlarm">ALL LINKS UP</text>`;
@@ -7811,8 +7813,8 @@ s+=`</g>`;
 // NVL72 DOMAIN LAYER with live stats
 s+=`<rect x="10" y="170" width="940" height="175" rx="4" fill="rgba(34,197,94,.05)" stroke="rgba(34,197,94,.2)" stroke-width="1"/>`;
 s+=`<rect x="232" y="178" width="496" height="13" rx="2" fill="var(--bg)" stroke="rgba(34,197,94,.25)" stroke-width=".4"/>`;
-s+=tx(480,187,'NVL72 COMPUTE DOMAINS — 27 DOMAINS × 72 GPU = 1,944 GPU — NVLink5 130 TB/s/domain','var(--g)',6.5,'middle',1);
-// Draw 27 domains in 3 rows of 9
+s+=tx(480,187,(DHE?('NVL72 RACKS \u2014 '+DHE.racksPerHall+' \u00D7 '+DHE.gpuPerRack+' GPU = '+DHE.gpuPerHall.toLocaleString()+' GPU / HALL \u2014 NVLink5 130 TB/s per rack \u2014 27 of '+DHE.racksPerHall+' shown'):'—'),'var(--g)',6.5,'middle',1);
+// Draw 27 representative racks in 3 rows of 9 (the hall has DHE.racksPerHall; the Network tab redesign is Track A §A7)
 const domRows=[[],[],[]];
 for(let d=0;d<27;d++){domRows[Math.floor(d/9)].push(d+1)}
 domRows.forEach((row,ri)=>{
@@ -7824,7 +7826,7 @@ const lfX=leaves[lfIdx].x+44;
 // v1.42.3 — domain-to-leaf bundled lane ported. 800G OSFP per NIC, 4-rail FT 1:1.
 s+=RZL?RZL.line({id:'dom'+dom+'-to-'+leaves[lfIdx].id,from:'DOM-'+dom,to:leaves[lfIdx].id,medium:'fiber',direction:'bidirectional',state:'energized',capacity:'4× 800 Gb/s NIC',current:'756 Gb/s',redundancy:'redundant_a',tag:'leaf-row-'+ri+' / pod-'+(lfIdx+1),geometry:{x1:x+48,y1:y,x2:lfX,y2:153},style:{stroke:'var(--b)',strokeWidth:.5,opacity:'.12'}}):`<line x1="${x+48}" y1="${y}" x2="${lfX}" y2="153" stroke="var(--b)" stroke-opacity=".12" stroke-width=".5"/>`;
 // doc-07: bright individual link shown ONLY when this domain is selected/hovered.
-s+=`<g class="netDom" data-tip="NVL72 Domain DOM-${dom}: 72 GPUs (2 racks), 130 TB/s NVLink5 bisection, 18\u00D7NVSwitch5, full-mesh all-to-all, 132kW total">`;
+s+=`<g class="netDom" data-tip="NVL72 Domain DOM-${dom}: 72 GPUs (one rack = one domain), 130 TB/s NVLink5, 18\u00D7NVSwitch5, full-mesh all-to-all, ${DHE?DHE.kwPerRack:'\u2014'} kW">`;
 s+=`<rect x="${x}" y="${y}" width="95" height="40" rx="3" fill="rgba(34,197,94,.1)" stroke="rgba(34,197,94,.35)" stroke-width=".6" class="rg domBox"/>`;
 s+=tx(x+48,y+11,'DOM-'+dom,'var(--g)',5.5,'middle',1);
 s+=`<text x="${x+48}" y="${y+23}" fill="var(--c)" font-family="${J}" font-size="4" text-anchor="middle" id="dom${dom-1}nvl">128 TB/s</text>`;
@@ -8218,7 +8220,7 @@ leakS.textContent='CLEAR';leakS.style.fill='var(--g)';
 })();
 // DC DASHBOARD — 4× DATA HALLS with DC Image + Callouts
 // v1.32.0 — subtitle + callouts now engine-bound (AI-ACC-01/02/03 per accuracy review doc-26).
-if($('dashSu'))$('dashSu').textContent=(DHE?('4× AI Data Halls | '+DHE.itFacilityMW.toFixed(2)+' MW IT (Scenario A locked) | '+DHE.gpuPerFacility.toLocaleString()+' GPU | PUE '+DHE.pue.toFixed(2)+' derived | WUE 0.00 dry-only | CUE_IT 0.90 (PLN Java × PUE)'):'—');
+if($('dashSu'))$('dashSu').textContent=(DHE?('4× AI Data Halls | '+DHE.itFacilityMW.toFixed(2)+' MW total IT (GB300 basis) | '+DHE.gpuPerFacility.toLocaleString()+' GPU | PUE '+DHE.pue.toFixed(3)+' design / '+DHE.pueAnnual+' annual | WUE '+DHE.wue.toFixed(2)+' dry-only | CUE_IT '+DHE.cueIt.toFixed(2)+' (grid '+DHE.gridFactor+' × PUE)'):'—');
 (function(){
 // DC Image Callouts - READABLE SIZES — values engine-bound (AI-ACC-01/02/03)
 const callEl=$('dcCallouts');
@@ -8366,6 +8368,8 @@ var RZDCAIBasis=(function(){
     set('dkCue',D.cueIt.toFixed(2));
     set('dkIt',D.itFacilityMW.toFixed(2));
     set('dkGpu',grp(D.gpuPerFacility));
+    set('kIT',D.itHallFmt);
+    set('kGpuHall',grp(D.gpuPerHall));
     set('dkDom',grp(D.racksFacility));
     /* rail composites */
     set('dkTx',grp(D.txTotal)+' × '+D.txRatingMVA+' MVA · '+D.txPerFeedHall+'/feed/hall');
@@ -8399,7 +8403,7 @@ var RZDCAIBasis=(function(){
 // dashC LIVE METRICS panel — v1.32.0 engine-bound (AI-ACC-01/02/03/07 doc-26).
 // Per-hall + facility values come from DHE so totals reconcile to dashboard strip.
 (function(){const el=$('dashC');if(!el)return;
-const _h_it=(DHE?DHE.itHall:null), _h_cool=Math.round((DHE?DHE.pb_nonIT:null)+0), _h_pue=(DHE?DHE.pue:null), _h_gpu=(DHE?(DHE.gpuPerHall||1944):null), _h_dom=(DHE?DHE.nvl72PerHall:null);
+const _h_it=(DHE?DHE.itHall:null), _h_cool=Math.round((DHE?DHE.pb_nonIT:null)+0), _h_pue=(DHE?DHE.pue:null), _h_gpu=(DHE?DHE.gpuPerHall:null), _h_dom=(DHE?DHE.nvl72PerHall:null);
 const H={it:_h_it,cool:_h_cool,pue:_h_pue,gpu:_h_gpu,dom:_h_dom};
 const F={halls:(DHE?DHE.halls:null),it:H.it*(DHE?DHE.halls:null),cool:H.cool*(DHE?DHE.halls:null),total:(DHE?DHE.pb_facility*DHE.halls:null),gpu:(DHE?DHE.gpuPerFacility:null),dom:H.dom*(DHE?DHE.halls:null)};
 // Sustainability: WUE = 0 dry-only baseline; CUE_IT = PLN Java grid 0.69 × PUE
@@ -9875,7 +9879,7 @@ s+=`<line x1="0" y1="77" x2="10" y2="77" stroke="var(--c)" stroke-width="3" clas
 s+=`<text x="5" y="69" fill="var(--c)" font-family="${F}" font-size="5" text-anchor="middle">From CDU</text>`;
 // Supply flow animation
 s+=`<line x1="10" y1="77" x2="${W-10}" y2="77" stroke="var(--c)" stroke-width="2" stroke-dasharray="12 6"><animate attributeName="stroke-dashoffset" values="0;-36" dur="3s" repeatCount="indefinite"/></line>`;
-// 54 Racks — 9 groups of 6 (G1-G9)
+// Racks — representative slots per row group (DHE.rackRows rows of DHE.racksPerRow); full count in the footer
 var rackY=95,gW=82,gStep=84;
 for(var g=0;g<9;g++){
 var gx=8+g*gStep,gy=rackY;
@@ -9936,7 +9940,7 @@ s+=`<text x="500" y="${sy}" fill="var(--t2)" font-family="${F}" font-size="5">${
 // Bottom status
 s+=`<rect x="0" y="${H-24}" width="${W}" height="24" fill="rgba(236,72,153,.06)"/>`;
 s+=`<text x="10" y="${H-9}" fill="var(--t3)" font-family="${F}" font-size="7">TCS: DI water | DN150 SS316L | 35-45\u00B0C | \u0394T ~10\u00B0C | 80 LPM per rack</text>`;
-s+=`<text x="${W-10}" y="${H-9}" fill="var(--pk)" font-family="${F}" font-size="7" text-anchor="end">54 racks (9 groups) \u00D7 72 cold plates = 3,888 total | Leak detection: All zones OK</text>`;
+s+=`<text x="${W-10}" y="${H-9}" fill="var(--pk)" font-family="${F}" font-size="7" text-anchor="end">${DHE?DHE.racksPerHall:'\u2014'} racks (${DHE?DHE.rackRows:'\u2014'} rows) \u00D7 72 cold plates = ${DHE?(DHE.racksPerHall*72).toLocaleString():'\u2014'} total | Leak detection: All zones OK</text>`;
 el.innerHTML=s;
 }
 // ===== CHEMICAL DOSING HMI =====
@@ -11801,7 +11805,7 @@ function rules(){
   /* doc-22 Cooling: CDU capacity margin <15% warn / <5% crit.
    * margin = (runningCap - liquidHeat)/runningCap, engine-derived. */
   var cduRun=ST?ST.cduRunningCount:9, cduRate=350;
-  var lh=ST?ST.liquidHeat_kW:3029;
+  var lh=ST?ST.liquidHeat_kW:null;
   var cap=cduRun*cduRate, margin=cap>0?((cap-lh)/cap*100):100;
   if(margin<5)c++; else if(margin<15)w++;
   /* doc-22 Electrical: UPS load >80% warn / >95% crit (engine upsLoadingPct) */
@@ -11964,12 +11968,6 @@ function currentAuthority(){
  * as if the engine had authored them. Everything downstream IS derived.
  * Derivation: a 10-row hall of 88 racks per row splits into quarter-rows of
  * 22 racks; 22 x rack kW at 400 V / PF 0.96 must sit under the trunk rating. */
-var PAGE_RPP_BASIS=Object.freeze({
-  racksPerRppGroup:22,
-  buswayTrunkA:5000,
-  evidenceClass:'ADOPTED (page basis) — not an engine leaf yet',
-  source:'plan cheerful-cuddling-mitten.md WP2 electrical aggregation design'
-});
 
 function legacyView(authority){
   if(!authority)return null;
@@ -11983,12 +11981,13 @@ function legacyView(authority){
   var pl=DS.planes,de=DS.electrical,fl=DS.flows,dcnt=DS.counts,dh=DS.heat;
   var halls=mdl.facility.halls;
   var VLL=mdl.electrical.voltageLL,PF=mdl.electrical.powerFactor,S3=Math.sqrt(3);
-  var EL=sn.electrical||{};
+  var EL=sn.distribution||null;
+  if(!EL||!GE.rack_groups_per_hall||!GE.racks_per_group||!GE.rack_rows)return null;   /* fail closed: the LV grouping is an engine fact */
   var racksPerHall=CO.racks_per_hall;
-  var racksPerGroup=EL.racks_per_group||PAGE_RPP_BASIS.racksPerRppGroup;
-  var groupsPerHall=EL.rack_groups_per_hall||Math.round(racksPerHall/racksPerGroup);
-  var trunkA=EL.busway_trunk_a||PAGE_RPP_BASIS.buswayTrunkA;
-  var rowsPerHall=GE.rows||EL.rows||10;
+  var racksPerGroup=GE.racks_per_group;
+  var groupsPerHall=GE.rack_groups_per_hall;
+  var trunkA=EL.busway_trunk_a;
+  var rowsPerHall=GE.rack_rows;
   function amps(kw){ return kw*1000/(S3*VLL*PF); }
   var wat={rhoKgPerM3:mdl.hydraulics.waterRhoKgPerM3,
            rhoKgPerL:mdl.hydraulics.waterRhoKgPerM3/1000,
@@ -12051,7 +12050,7 @@ function legacyView(authority){
       buswayTrunkA:trunkA,
       buswayLoadingPct:groupA/trunkA*100,
       rackFeedCurrentA:amps(P.rack_it_kw),
-      basisNote:EL.racks_per_group?'engine leaf':PAGE_RPP_BASIS.evidenceClass
+      basisNote:'engine leaves: geometry.racks_per_group, geometry.rack_rows, distribution.busway_trunk_a'
     },
     cooling:{
       liquidCaptureRatio:HT.liquid_capture_ratio,
@@ -12198,12 +12197,34 @@ function legacyView(authority){
           snapshot:sn,model:mdl,halls:halls,amps:amps};
 }
 
+/* The retired GB200 engine exported small formula helpers the PDF builders still call
+   by name (lockedState, pueBasis, dataHallVolume, loadingPct, batteryKWh, requiredCurrentA,
+   kva, liquidHeat, airHeat). They are pure arithmetic or projections of the legacy view, so
+   the facade gives them back over the GB300 snapshot rather than re-typing 160 call sites. */
+function calcFacade(calc,view){
+  if(!calc||!view)return null;
+  var S3=Math.sqrt(3);
+  return {
+    round:calc.round,
+    snapshot:calc.snapshot,
+    operatingPoint:calc.operatingPoint,
+    lockedState:function(){return view.st;},
+    pueBasis:function(){return view.pb;},
+    dataHallVolume:function(){return view.m.geometry.volumeM3;},
+    loadingPct:function(actual,rated){return actual/rated*100;},
+    batteryKWh:function(kw,minutes,dod,eta){return kw*minutes/60/dod/eta;},
+    requiredCurrentA:function(kw,vll,pf,s3){return kw*1000/((s3||S3)*vll*pf);},
+    kva:function(kw,pf){return kw/pf;},
+    liquidHeat:function(it,cap){return it*cap;},
+    airHeat:function(it,cap){return it*(1-cap);}
+  };
+}
 function refreshAuthority(){
   var authority=currentAuthority();
-  CALC=authority?authority.calc:null;
   MODEL=authority?authority.model:null;
   SNAP=authority?(authority.snapshot||(authority.calc&&authority.calc.snapshot)||null):null;
   LV=authority?legacyView(authority):null;
+  CALC=(authority&&LV)?calcFacade(authority.calc,LV):null;
   /* fail CLOSED: an authority whose snapshot does not resolve is no authority */
   return (authority&&SNAP&&LV)?authority:null;
 }
@@ -12685,7 +12706,7 @@ function buildBodPdfHtml(){
     WK('RPP group current','I = kW×1000 / (√3 × V × PF)',grp(el.groupKw)+' × 1000 / ('+el.specSqrt3+' × '+el.voltageLL+' × '+el.powerFactor+')',pdfNum(el.groupCurrentA)+' A → '+CALC.round(el.buswayLoadingPct,1)+' % of a '+grp(el.buswayTrunkA)+' A trunk','why the group is '+el.racksPerRppGroup+' racks and not a whole '+el.racksPerRow+'-rack row')+
     WK('Transformer apparent power (per hall)','kVA = kW / PF',pdfNum(pb.facility_kW)+' / '+el.powerFactor,pdfNum(st.transformer_kVA)+' kVA ('+CALC.round(st.transformerLoadingPct,1)+' % of '+eq.transformer.perFeedPerHall+' × '+eq.transformer.ratingMVA+' MVA per feed)','sized on FACILITY power, not IT alone')+
     WK('UPS frames per feed','frames = ceil(load / (frame_kW × loading_max))','facility '+pdfNum(pb.facility_kW*m.facility.halls)+' kW / ('+grp(eq.ups.ratingKW)+' × '+eq.ups.designLoadingMax+')',grp(eq.ups.framesPerFeed)+' per feed → '+grp(eq.ups.framesTotal)+' at '+eq.ups.topology,'the loading limit is the input; '+CALC.round(eq.ups.loadingPct,1)+' % is the result')+
-    WK('Generators (facility pool)','N = ceil(facility kW / unit kW) + spare',pdfNum(facTotal)+' / '+grp(eq.generator.ratingKW),eq.generator.duty+' duty + '+(eq.generator.installed-eq.generator.duty)+' standby = '+eq.generator.installed+' installed','a 4 MW MV class; the retired 2.75 MW machine class would need well over 200 sets at this scale'),
+    WK('Generators (facility pool)','N = ceil(facility kW / unit kW) + spare',pdfNum(facTotal)+' / '+grp(eq.generator.ratingKW),eq.generator.duty+' duty + '+(eq.generator.installed-eq.generator.duty)+' standby = '+eq.generator.installed+' installed','a 4 MW MV class; the retired machine class would need well over 200 sets at this scale'),
     'RPP group schedule (per hall — '+el.rppGroupsPerHall+' groups, never '+grp(m.facility.racksPerHall)+' rows)',
     (function(){
       var rows=[],n,tag,first,last;
@@ -13188,8 +13209,8 @@ function buildTechSpecHtml(){
       ['Per-NVL72 system weight','~1,360 kg','NVIDIA reference'],
       ['Per-rack-position weight (NVL72 split)','~680 kg','half of NVL72'],
       ['Add cabling, PDU, busway tap (overhead structure)','~150 kg per rack position','engineering est'],
-      ['Total downward load per rack-pos','~830 kg','sum'],
-      ['Footprint per rack-pos','0.72 m&sup2; (600×1200 mm)','reference'],
+      ['Total downward load per rack','~830 kg','sum'],
+      ['Footprint per rack','0.72 m&sup2; (600×1200 mm)','reference'],
       ['Distributed live load','~1,150 kg/m&sup2;','830 / 0.72'],
       ['Design floor live load (required)','&ge; 1,500 kg/m&sup2;','30 % margin'],
       ['Slab type','Post-tensioned RC slab-on-grade','no raised floor for liquid-cooled DC'],
@@ -13296,8 +13317,8 @@ function buildTechSpecHtml(){
     '</section>';
 
   /* ---------------- 3.4 Per-NVL72 + per-rack-position power matrix ----------------
-     v1.39.2 — large per-unit table for engineering audit. 27 NVL72 rows + 54 rack-pos rows.
-     Each row carries the same locked per-unit value (Scenario A is uniform per-NVL72),
+     v1.39.2 — large per-unit table for engineering audit. per-GROUP rows (40 RPP groups of 22 racks) — never 880 rack rows.
+     Each row carries the same locked per-unit value (the adopted basis is uniform per rack),
      but the full enumeration matters for cable schedules + breaker schedules + BMS tagging. */
   H+='<section class="page"><h3>3.4 Per-NVL72 Domain Power Matrix (per hall)</h3>'+
     '<p>Hall A is enumerated below; halls B, C, D are identical by design. Each NVL72 domain is locked at '+sc.kwPerNVL72+' kW with 2 physical rack positions ('+sc.kwPerRack+' kW each). Tag IDs follow the convention <code>NVL72-&lt;hall&gt;-&lt;nn&gt;</code> and <code>RKP-&lt;hall&gt;-&lt;nnn&gt;</code> for downstream BMS/cable schedules.</p>'+
@@ -13310,7 +13331,7 @@ function buildTechSpecHtml(){
         var rkBtag='RKP-A-'+((rkB<10?'00':rkB<100?'0':'')+rkB);
         rows+='<tr><td>NVL72-A-'+nn+'</td><td class="v">'+sc.kwPerNVL72+'</td><td>'+rkAtag+'</td><td class="v">'+sc.kwPerRack+'</td><td>'+rkBtag+'</td><td class="v">'+sc.kwPerRack+'</td></tr>';
       }
-      rows+='<tr style="background:#eee;font-weight:bold;"><td>Total (Hall A)</td><td class="v">'+grp(m.facility.nvl72PerHall*sc.kwPerNVL72)+'</td><td colspan="2">'+m.facility.racksPerHall+' rack-pos</td><td colspan="2">'+grp(m.facility.racksPerHall*sc.kwPerRack)+' kW total</td></tr>';
+      rows+='<tr style="background:#eee;font-weight:bold;"><td>Total (Hall A)</td><td class="v">'+grp(m.facility.nvl72PerHall*sc.kwPerNVL72)+'</td><td colspan="2">'+m.facility.racksPerHall+' racks</td><td colspan="2">'+grp(m.facility.racksPerHall*sc.kwPerRack)+' kW total</td></tr>';
       rows+='</tbody></table>';
       return rows;
     })()+
@@ -13319,10 +13340,10 @@ function buildTechSpecHtml(){
 
   /* ---------------- 3.5 GPU thermal envelope ---------------- */
   H+='<section class="page"><h3>3.5 GPU Thermal Envelope &amp; Per-GPU Power Allocation</h3>'+
-    '<p>The NVIDIA Blackwell B200 (used in GB200 NVL72) has a per-GPU TDP envelope of ~1,000&ndash;1,200 W depending on workload + ambient. The locked Scenario A allocates '+sc.kwPerNVL72+' kW per NVL72 across 72 GPUs + 36 Grace CPUs + 9 NVSwitch trays + manifolds.</p>'+
+    '<p>NVIDIA publishes no per-GPU or per-rack power for the GB300 NVL72 (Blackwell Ultra B300); the reference architecture bounds it with 8 &times; 33 kW power shelves installed and a 1.2 MW Scalable Unit of 8 racks. The adopted basis allocates '+sc.kwPerNVL72+' kW per NVL72 rack (ADOPTED) across 72 GPUs + 36 Grace CPUs + 9 NVSwitch trays + manifolds.</p>'+
     TC('Per-GPU + per-NVL72 component allocation')+
     R([
-      ['Per-NVL72 power (locked)',sc.kwPerNVL72+' kW','Scenario A'],
+      ['Per-NVL72 rack power (adopted)',sc.kwPerNVL72+' kW','DCAI_MODEL.facility.rackItKw — ADOPTED, bounded by the RA'],
       ['GPU count per NVL72',m.facility.gpuPerNVL72+' Blackwell B200','NVIDIA reference'],
       ['CPU count per NVL72',m.facility.cpuPerNVL72+' Grace','NVIDIA reference'],
       ['Compute trays per NVL72','18','NVIDIA reference'],
@@ -13338,7 +13359,7 @@ function buildTechSpecHtml(){
   /* ---------------- 3.6 Per-rack-position cable + breaker schedule preview ---------------- */
   H+='<section class="page"><h3>3.6 Per-Rack-Position Cable + Breaker Schedule (preview)</h3>'+
     '<p>Each '+sc.kwPerRack+' kW rack-position draws '+Math.round(sc.kwPerRack*1000/(m.electrical.specSqrt3*m.electrical.voltageLL*m.electrical.powerFactor))+' A at 400 V three-phase, pf 0.92. Below is the first 12 rack-positions of Hall A; the full schedule of '+m.facility.racksPerHall+' rack-positions per hall is generated by the cable-schedule tool (out of scope for this PDF).</p>'+
-    TC('Cable + breaker schedule (Hall A, first 12 rack-pos)')+
+    TC('Cable + breaker schedule (Hall A, first 12 racks)')+
     (function(){
       var ampsPerRack = Math.round(sc.kwPerRack*1000/(m.electrical.specSqrt3*m.electrical.voltageLL*m.electrical.powerFactor));
       var html='<table class="t"><thead><tr><th>Tag</th><th class="v">kW</th><th class="v">A</th><th>Breaker</th><th>Cable (Cu, install method E)</th><th>Feed</th></tr></thead><tbody>';
@@ -13347,7 +13368,7 @@ function buildTechSpecHtml(){
         var feed = (n%2===1) ? 'A' : 'B';
         html+='<tr><td>RKP-A-'+nn+'</td><td class="v">'+sc.kwPerRack+'</td><td class="v">'+ampsPerRack+'</td><td>200 A MCCB</td><td>3&times;120 mm&sup2; XLPE + PE</td><td>Busway '+feed+'</td></tr>';
       }
-      html+='<tr style="background:#eee;font-weight:bold;"><td>... (42 more rack-pos) ...</td><td class="v">'+sc.kwPerRack+'</td><td class="v">'+ampsPerRack+'</td><td>200 A MCCB</td><td>3&times;120 mm&sup2; XLPE</td><td>A or B</td></tr>';
+      html+='<tr style="background:#eee;font-weight:bold;"><td>... ('+(m.facility.racksPerHall-12)+' more racks) ...</td><td class="v">'+sc.kwPerRack+'</td><td class="v">'+ampsPerRack+'</td><td>200 A MCCB</td><td>3&times;120 mm&sup2; XLPE</td><td>A or B</td></tr>';
       html+='</tbody></table>';
       return html;
     })()+
@@ -13416,7 +13437,7 @@ function buildTechSpecHtml(){
        'N_gen = ceil(P_facility &divide; P_genset)',
        pdfNum(facTotal)+' kW &divide; '+elecGen.ratingKW+' kW',
        Math.ceil(facTotal/elecGen.ratingKW)+' gensets (running), +1 spare for N+1',
-       'EQUIPMENT.generator &mdash; Cat 3516E baseline')+
+       'EQUIPMENT.generator &mdash; '+eq.generator.model)+
     WK('Busway rating headroom over required current',
        'headroom = (I_busway - I_load) &divide; I_busway',
        grp(elecBus.selectedRatingA)+' A vs '+grp(CALC.round(st.requiredCurrent_A,0))+' A',
@@ -13438,7 +13459,7 @@ function buildTechSpecHtml(){
 
     '<h4>4.6 Per-Feeder Voltage-Drop Calculation (IEC 60364-5-52)</h4>'+
     '<p>Each LV feeder from the LV switchboard to the rack-position PDU is sized for &lt; 3 % steady-state voltage drop at design current. Worked examples below use the canonical formula <code>&Delta;V = (I &times; L &times; (R cos&phi; + X sin&phi;)) &divide; 1000 &times; sqrt(3)</code> for three-phase, with R/X taken from IEC 60364-5-52 Table A.52.5 for the cable size selected.</p>'+
-    TC('Per-feeder voltage drop (representative paths from LV bus to rack-pos)')+
+    TC('Per-feeder voltage drop (representative paths from LV bus to racks)')+
     R([
       ['UPS to RPP (typical 50 m, 3&times;185 mm&sup2;)','&Delta;V &lt; 0.8 % at full load','within 3 % budget'],
       ['RPP to Busway tap-off (10 m, 3&times;120 mm&sup2;)','&Delta;V &lt; 0.5 %','within budget'],
@@ -13454,8 +13475,8 @@ function buildTechSpecHtml(){
     TC('Three-phase fault current per bus')+
     R([
       ['Utility infinite-bus fault MVA (source)','assumed 500 MVA at 20 kV','typical for industrial feed'],
-      ['Transformer (5 MVA, Zk 6 %, Dyn11)','sym 3-phase Isc at LV side','~14.4 kA per equipment data'],
-      ['Generator (Cat 3516E, 2.75 MW, X"d 12 %)','sub-transient Isc contribution','~6 kA (genset only) at LV'],
+      ['Transformer ('+eq.transformer.ratingMVA+' MVA, Zk 6 % ASSUMED, Dyn11)','sym 3-phase Isc at LV side = S / (\u221a3 \u00B7 V \u00B7 Zk)','~'+(Math.round(eq.transformer.ratingMVA*1e6/(Math.sqrt(3)*m.electrical.voltageLL)/0.06/100)/10)+' kA per unit'],
+      ['Generator ('+eq.generator.model+', '+(eq.generator.ratingKW/1000)+' MW)','sub-transient Isc contribution','MV machines — LV contribution not evaluated; MV fault study pending'],
       ['Parallel sources (utility + 2 gen)','combined Isc','~16 kA at LV bus'],
       ['LV switchgear ICU rating required','25 kA at 400 V (with margin)','per IEC 60947-2 selectivity'],
       ['Busway ICU rating selected','50 kA / 1 s','double margin per Tier-IV intent'],
@@ -13464,7 +13485,7 @@ function buildTechSpecHtml(){
 
     '<h4>4.8 Battery Sizing Variants (10 / 15 / 30 min ride-through)</h4>'+
     '<p>UPS battery capacity per ride-through requirement. The base design is 10 min (per IEC 62040-3) to cover the worst-case generator start + transfer event (~10 s typical) plus operational margin for orderly shutdown. Longer ride-through is shown for sensitivity.</p>'+
-    TC('Battery sizing per ride-through option (per UPS feed, 4.5 MW protected)')+
+    TC('Battery sizing per ride-through option (per UPS frame, '+eq.ups.ratingKW+' kW protected)')+
     (function(){
       var sizes=[10,15,30];
       var html='<table class="t"><thead><tr><th>Ride-through (min)</th><th class="v">Energy required (kWh)</th><th class="v">Installed kWh (DoD 80 %, &eta;_inv 95 %)</th><th class="v">Approx. cabinet count (Li-ion NMC)</th></tr></thead><tbody>';
@@ -13499,11 +13520,11 @@ function buildTechSpecHtml(){
     R([
       ['UPS module',elecUps.model+', '+grp(elecUps.ratingKW)+' kW per feed, 2N','Vertiv Liebert APM / Schneider Galaxy / Eaton 93PM series'],
       ['Transformer',elecXfmr.model+', '+elecXfmr.ratingMVA+' MVA','ABB RESIBLOC / Schneider Trihal / Siemens GEAFOL'],
-      ['Generator',elecGen.model+', '+elecGen.ratingKW+' kW each','Cat 3516E TA datasheet + emissions cert (Tier 4 Final / Stage V)'],
-      ['LV switchboard','6300 A / 50 kA','Schneider PrismaSeT / Eaton xEnergy / ABB MNS'],
+      ['Generator',elecGen.model+', '+elecGen.ratingKW+' kW each','MV diesel set class \u2014 no model selected; emissions per local regulation'],
+      ['LV switchboard',eq.busway.trunkRatingA+' A trunk class','Schneider PrismaSeT / Eaton xEnergy / ABB MNS'],
       ['Busway',grp(elecBus.selectedRatingA)+' A','Schneider Canalis KT / GE Spectra Spec / Siemens Sentron'],
       ['RPP / PDU','800 A / 30 outputs','Vertiv MGE Galaxy / Schneider Easy / Eaton EHRP'],
-      ['ATS (Automatic Transfer Switch)','6300 A','ASCO 7000 / Cummins OTPC / Schneider TransferPacT'],
+      ['ATS (Automatic Transfer Switch)',eq.busway.trunkRatingA+' A class','ASCO 7000 / Cummins OTPC / Schneider TransferPacT'],
       ['Static Transfer Switch (STS, optional)','not required (dual-corded racks)','—'],
       ['Battery (Li-ion NMC, modular)','250 kWh cabinet','Vertiv HBL / Schneider Modulon / Eaton 9395P-MS']
     ])+
@@ -13939,7 +13960,7 @@ function buildTechSpecHtml(){
     '<p>Fat-tree non-blocking 2:1 oversubscription. For an AI training pod the design target is rail-aligned topology: each NVL72 connects to 8 leaves (1 per NVLink rail), each leaf has uplinks to spine for inter-NVL72 collective traffic. Leaf radix calculation per Mellanox/NVIDIA QM9700 (64-port NDR 400 Gb/s switch) reference.</p>'+
     TC('Spine-leaf sizing (per hall, '+m.facility.nvl72PerHall+' NVL72 × 8 rails)')+
     R([
-      ['Total leaf-facing endpoints',(m.facility.nvl72PerHall*8)+' NVL72 ports','27 × 8'],
+      ['Total leaf-facing endpoints',(m.facility.nvl72PerHall*m.facility.gpuPerNVL72)+' rack ports (one 800G per GPU)',m.facility.nvl72PerHall+' racks \u00D7 '+m.facility.gpuPerNVL72],
       ['Leaf switch model','NVIDIA QM9700 (64-port NDR 400G)','reference'],
       ['Per-leaf downlinks (to NVL72)','32 ports','split half down half up'],
       ['Per-leaf uplinks (to spine)','32 ports','non-blocking 1:1; 2:1 for cost-optimisation'],
@@ -13962,7 +13983,7 @@ function buildTechSpecHtml(){
     ])+
     TC('Per-hall IB cable count (rail-aligned NVL72 spine-leaf)')+
     R([
-      ['NVL72-to-leaf cables',(m.facility.nvl72PerHall*8)+' per hall','27 NVL72 × 8 rails'],
+      ['NVL72-to-leaf cables',(m.facility.nvl72PerHall*m.facility.gpuPerNVL72)+' per hall',m.facility.nvl72PerHall+' NVL72 racks \u00D7 '+m.facility.gpuPerNVL72+' ports (4 rails \u00D7 18 trays)'],
       ['Leaf-to-spine cables',(Math.ceil(m.facility.nvl72PerHall*8/32)*32)+' per hall','leaves × 32 uplinks each'],
       ['Total IB cables per hall',((m.facility.nvl72PerHall*8) + (Math.ceil(m.facility.nvl72PerHall*8/32)*32))+'','sum'],
       ['Total cables, all 4 halls',(((m.facility.nvl72PerHall*8) + (Math.ceil(m.facility.nvl72PerHall*8/32)*32))*m.facility.halls)+'','×4 halls'],
@@ -14099,8 +14120,8 @@ function buildTechSpecHtml(){
       ['MECH-25 CRAH return air temperature','TT-RAT','per CRAH, 5 s'],
       ['MECH-26 CRAH supply air flow','FT-CRAH','per CRAH, 5 s'],
       ['MECH-27 CRAH fan speed','VFD','per CRAH, 5 s'],
-      ['MECH-28 Cold-aisle temperature (per rack-pos)','TT-CA','distributed sensors, 30 s'],
-      ['MECH-29 Hot-aisle temperature (per rack-pos)','TT-HA','distributed sensors, 30 s'],
+      ['MECH-28 Cold-aisle temperature (per rack)','TT-CA','distributed sensors, 30 s'],
+      ['MECH-29 Hot-aisle temperature (per rack)','TT-HA','distributed sensors, 30 s'],
       ['MECH-30 Humidity per zone','HT','per CRAH zone, 1 min'],
       ['MECH-31 Differential pressure (hot/cold aisle)','PDT-A','per zone, 30 s'],
       ['FIRE-01 VESDA pre-alarm (per zone)','VESDA','aspirating, immediate'],
@@ -14346,7 +14367,7 @@ function buildTechSpecHtml(){
   /* ---------------- Appendix A formula derivations ---------------- */
   H+='<section class="page"><h3>Appendix A &mdash; Formula Derivations</h3>'+
     '<p>The engine&rsquo;s 57 doc-21 worked examples each correspond to a derivation in the standard references above. Selected derivations are reproduced here in long form; the remainder are exercised via the acceptance suite <code>tools/test-datahall-calc.mjs</code> on every site ship.</p>'+
-    '<p><strong>A.1 PUE five-part basis.</strong> <code>PUE = (IT + Cooling + Fan + UPSLoss + Other) &divide; IT</code>. Each summand is built bottom-up from equipment nameplates &mdash; the chiller COP is the NAMEPLATE value, not a back-solved field-measured value &mdash; so the result is auditable and reproducible. The reference scenario (Scenario B, IT '+pueRef.refIT_kW+' kW) provides absolute pump/fan/CDU/CRAH/UPSloss/aux figures; each is scaled by <code>IT / IT_ref</code> for any other scenario, so smaller IT loads carry proportionally smaller ancillary loads.</p>'+
+    '<p><strong>A.1 PUE five-part basis.</strong> <code>PUE = (IT + Cooling + Fan + UPSLoss + Other) &divide; IT</code>. Each summand is built bottom-up from equipment nameplates &mdash; the chiller COP is DERIVED from a Carnot fraction over the actual evaporator/condenser lift, not a nameplate and not a back-solved field-measured value &mdash; so the result is auditable and reproducible. The reference scenario (Scenario B, IT '+pueRef.refIT_kW+' kW) provides absolute pump/fan/CDU/CRAH/UPSloss/aux figures; each is scaled by <code>IT / IT_ref</code> for any other scenario, so smaller IT loads carry proportionally smaller ancillary loads.</p>'+
     '<p><strong>A.2 Direct-to-chip heat split.</strong> Cooling load splits between liquid loop and air loop in the ratio <code>liquidCaptureRatio</code>:<code>(1 - liquidCaptureRatio)</code>. CDU sizing follows from the liquid share; CRAH sizing from the air share. This is NOT a design choice once the GPU vendor has fixed the cold-plate fraction &mdash; it is a property of the silicon package.</p>'+
     '<p><strong>A.3 N+1 redundancy on chillers.</strong> Required running units = <code>ceil(load &divide; per-unit capacity)</code>; installed units = running + 1. Where the spare carries warm setpoint, switch-over is automatic; otherwise a sequencer governs.</p>'+
     '<p><strong>A.4 Hydronic flow.</strong> From <code>Q = m_dot &times; cp &times; &Delta;T</code> with <code>m_dot = rho &times; V_dot</code>, solve for <code>V_dot = Q &divide; (rho &times; cp &times; &Delta;T)</code>. In LPM: multiply by 60. Engine returns LPM for TCS loops and m&sup3;/h for FWS loops &mdash; both forms appear in the cockpit and the PDF.</p>'+
@@ -14355,7 +14376,7 @@ function buildTechSpecHtml(){
     '<p><strong>A.7 UPS battery sizing.</strong> Energy to deliver = <code>P_critical &times; t_min &divide; 60</code> (kWh). The battery is sized larger by the useful depth-of-discharge factor (0.80 typical for VRLA) and the inverter efficiency (0.95 typical), giving installed kWh = <code>(P &times; t/60) &divide; (DoD &times; eta)</code>.</p>'+
     '<p><strong>A.8 Generator sizing.</strong> Whole-building basis: total facility kW (IT + PUE losses) divided by per-genset rating, rounded up. Standby rating (not prime / continuous) is the limiting figure for emergency back-up duty.</p>'+
     '<p><strong>A.9 Fire-protected volume.</strong> Rectangular hall: <code>V = L &times; W &times; H</code>. Agent mass per NFPA 2001 9.2: <code>m = V &times; rho &times; (C &divide; (100 &minus; C))</code> where rho is agent vapour density at design condition and C is design concentration (4.2 % v/v for NOVEC 1230 Class A).</p>'+
-    '<p><strong>A.10 Carbon &amp; water accounting (CUE / WUE) &mdash; explicit denominators.</strong> Per ISO/IEC 30134-8 and the Green Grid WUE white paper, both metrics use an IT-kWh denominator: <code>CUE = kgCO&#8322; &divide; kWh_IT</code> and <code>WUE = L_water &divide; kWh_IT</code>. The site uses a regional grid emission factor (e.g. PLN Java 2025 &asymp; 0.69 kgCO&#8322;/kWh facility) and computes <code>CUE_IT = grid_factor &times; PUE</code>. For Scenario A: <code>CUE_IT = 0.69 &times; '+pueA+' = '+(0.69*pueA).toFixed(2)+' kgCO&#8322;/kWh IT</code>. WUE counts make-up water (cooling-tower evaporation + drift + blowdown + humidification); the AI factory adopted basis here is dry-only, so WUE = 0 by design. Never display a grid factor with a facility-kWh denominator under a CUE label without the denominator being explicit.</p>'+
+    '<p><strong>A.10 Carbon &amp; water accounting (CUE / WUE) &mdash; explicit denominators.</strong> Per ISO/IEC 30134-8 and the Green Grid WUE white paper, both metrics use an IT-kWh denominator: <code>CUE = kgCO&#8322; &divide; kWh_IT</code> and <code>WUE = L_water &divide; kWh_IT</code>. The site uses a regional grid emission factor (e.g. PLN Java 2025 &asymp; 0.69 kgCO&#8322;/kWh facility) and computes <code>CUE_IT = grid_factor &times; PUE</code>. For the adopted basis: <code>CUE_IT = 0.69 &times; '+pueA+' = '+(0.69*pueA).toFixed(2)+' kgCO&#8322;/kWh IT</code>. WUE counts make-up water (cooling-tower evaporation + drift + blowdown + humidification); the AI factory adopted basis here is dry-only, so WUE = 0 by design. Never display a grid factor with a facility-kWh denominator under a CUE label without the denominator being explicit.</p>'+
     '<p><strong>A.11&ndash;A.20</strong> &mdash; covered by the acceptance suite (<code>tools/test-datahall-calc.mjs</code>, 57 examples) and the engine source itself (<code>js/datahall-calculations.js</code>, 370 lines). Every example referenced in this PDF has a corresponding test that runs in CI on every release.</p>'+
     '</section>';
 
@@ -14374,16 +14395,16 @@ function buildTechSpecHtml(){
     ])+
     '<h4>B.2 Liquid capture ratio sensitivity</h4>'+
     '<p>Today the GPU vendor sets the cold-plate fraction (currently '+(m.cooling.liquidCaptureRatio*100)+' %). Hypothetical future part with higher liquid capture would shift heat from CRAH to CDU; this would slightly improve PUE because liquid loops carry heat more efficiently than air. The lever is therefore the chip generation, not the facility design.</p>'+
-    '<h4>B.3 Scenario A vs Scenario B</h4>'+
+    '<h4>B.3 Adopted basis vs retired reference</h4>'+
     TC('Scenario comparison (per hall)')+
     R([
-      ['Scenario A (adopted)','IT '+pdfNum(m.scenarios.A.itPerHall_kW)+' kW',m.scenarios.A.label],
-      ['Scenario B (variant)','IT '+grp(m.scenarios.B.itPerHall_kW)+' kW',m.scenarios.B.label],
+      ['Adopted (GB300 NVL72, one rack = one domain)','rack IT '+pdfNum(st.itPerHall_kW)+' kW per hall',sc.label],
+      ['Retired reference (GB200 split-domain)','see Appendix &mdash; Retired basis','js/datahall-model.js, frozen, 57/57 worked examples still run'],
       ['Ratio B&divide;A',CALC.round(m.scenarios.B.itPerHall_kW/m.scenarios.A.itPerHall_kW,2)+'&times;',''],
       ['B per-NVL72',m.scenarios.B.kwPerNVL72+' kW',''],
       ['A per-NVL72',m.scenarios.A.kwPerNVL72+' kW (LOCKED)','']
     ])+
-    '<p class="tp-dis">Scenario B is exposed in the engine so the cockpit can correctly LABEL a number when a user attempts to compare against an "aggressive variant". It is not used for procurement; the locked Scenario A is.</p>'+
+    '<p class="tp-dis">The retired GB200 basis is kept only as a named reference so the comparison the cockpit shows can be audited; nothing in this document is computed from it.</p>'+
     '</section>';
 
   /* ============================================================
@@ -14418,7 +14439,7 @@ function buildTechSpecHtml(){
       ['Cooling fan failure (forced-air type)','S 4 · O 4 · D 2 · RPN 32','Redundant fans on AN/AF unit; alarm + back-off load']
     ])+
 
-    '<h4>D.3 Generator (Caterpillar 3516E, '+elecGen.ratingKW+' kW)</h4>'+TC('Generator FMECA')+
+    '<h4>D.3 Generator ('+elecGen.model+', '+elecGen.ratingKW+' kW)</h4>'+TC('Generator FMECA')+
     R([
       ['Fuel contamination (microbial)','S 7 · O 4 · D 3 · RPN 84','Quarterly fuel polish + biocide; bottom-of-tank sample monthly per ASTM D6469'],
       ['Battery start-failure','S 9 · O 3 · D 2 · RPN 54','Monthly run-test; battery capacity test quarterly; replace at 4-yr or capacity &lt; 80 %'],
@@ -14440,7 +14461,7 @@ function buildTechSpecHtml(){
       ['VFD harmonic injection','S 4 · O 4 · D 4 · RPN 64','Active harmonic filter; THDi &lt; 5 % per IEEE 519']
     ])+
 
-    '<h4>D.5 CDU (350 kW EoR)</h4>'+TC('CDU FMECA')+
+    '<h4>D.5 CDU ('+eq.cdu.model+', '+eq.cdu.ratingKW+' kW)</h4>'+TC('CDU FMECA')+
     R([
       ['Pump cavitation','S 6 · O 3 · D 3 · RPN 54','NPSH monitor; suction-side pressure alarm; redundant pump auto-start'],
       ['Heat-exchanger fouling','S 5 · O 4 · D 4 · RPN 80','Quarterly approach-temp trend; CIP cleaning annually'],
@@ -14504,7 +14525,7 @@ function buildTechSpecHtml(){
       ['UPS module','Quarterly visual + thermography; annual capacitor ESR; battery imp test bi-monthly; full discharge test annually','Per IEEE 1184'],
       ['UPS battery (Li-ion NMC)','Monthly state-of-charge log; impedance per cell bi-monthly; capacity test annually; replace at 8-yr or SoH &lt; 80 %','Per IEEE 1188'],
       ['Transformer (cast-resin)','Quarterly thermography; annual megger + Doble; visual every shift','Per IEEE C57.106'],
-      ['Generator (Cat 3516E)','Weekly engine run (no-load 30 min); monthly load-bank 30 %; annual 4-hr full load','Per Cat O&amp;M; NFPA 110'],
+      ['Generator ('+eq.generator.model+')','Weekly engine run (no-load 30 min); monthly load-bank 30 %; annual 4-hr full load','Per OEM O&amp;M; NFPA 110'],
       ['Generator fuel','Monthly bottom-of-tank sample; quarterly polish + biocide; annual full polish','Per ASTM D6469'],
       ['Chiller (Carrier 19DV)','Quarterly approach-temp trend; annual brush-clean tubes; refrigerant leak check at 15 % loss','Per AHRI guidance'],
       ['CDU','Monthly DI conductivity check; quarterly filter replace; annual CIP; gasket torque annual','Per OEM'],
@@ -14559,7 +14580,7 @@ function buildTechSpecHtml(){
 
     '<h4>F.7 NVIDIA GB200 NVL72 Reference Architecture</h4><ul class="fl">'+
     '<li><strong>Rack-scale system</strong>: 72 Blackwell GPUs + 18 compute trays + 9 NVSwitch trays, NVLink 5 fabric internal.</li>'+
-    '<li><strong>Power class</strong>: approximately 120 kW per NVL72 rack-scale system at NVIDIA reference layout. This codebase splits the 132 kW operating point across 2 physical 600 mm rack positions for weight (~1,360 kg per NVL72) + cabling + serviceability.</li>'+
+    '<li><strong>Power class</strong>: '+sc.kwPerRack+' kW per NVL72 rack (ADOPTED &mdash; NVIDIA publishes no rack power; the reference architecture gives 8 &times; 33 kW shelves installed and a 1.2 MW / 8-rack Scalable Unit). One integrated rack is one domain: 8 power shelves, '+sc.shelvesDuty+' duty, '+sc.shelfRedundancy+'.</li>'+
     '<li><strong>Liquid cooling</strong>: direct-to-chip cold plates + manifolds. Cold-plate fraction (the ratio of heat captured by liquid vs air) is silicon-package-determined, not facility-design-selectable.</li>'+
     '</ul>'+
     '</section>';
@@ -14683,35 +14704,36 @@ function openFaqDialog(){
   if(!authority)return;
   var ex=d.getElementById('rzFaqDialog'); if(ex){ ex.style.display='flex'; return; }
   /* Build FAQ items at open-time when DATAHALL_MODEL + DATAHALL_CALC are available. */
-  var M=authority.model, C=authority.calc;
-  var sc=M.locked;
-  var pb=authority.pue;
-  var pueVal=C.round(pb.pue,2);
-  var eqC=M.equipment.chiller;
+  var V=(typeof legacyView==='function')?legacyView(authority):null;
+  if(!V){ return; }   /* fail closed: no view, no FAQ */
+  var M=V.m, C=authority.calc, sc=V.sc, pb=V.pb, st=V.st, eq=V.eq;
+  var pueVal=C.round(pb.pue,3);
   var f=M.facility;
   var cool=M.cooling;
   function gNum(n){return (''+n).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
   var FAQ_ITEMS=[
   ['What does the "Generate Design" button produce?',
-   'A multi-page Tech Specification PDF. Every number comes from the on-page calculation engine (DATAHALL_CALC + DATAHALL_MODEL), so the document reflects the LOCKED Scenario A (' + sc.kwPerNVL72 + ' kW per NVL72 pair). v1.30.0 ships ~60 pages (Cover, TOC, Exec Summary, Compute discipline, References, Appendix A). v1.30.1 expands to full ~220 pages covering Electrical SLD, Cooling P&ID, Fire/Safety, Network and BMS.'],
+   'A multi-page Tech Specification PDF. Every number comes from the on-page GB300 basis engine (js/dcai-engine.js, DCAI_CALC.snapshot), so the document describes the plant this page computes: ' + gNum(f.racksPerHall) + ' NVL72 racks per hall at ' + sc.kwPerRack + ' kW, ' + f.halls + ' halls, rack IT ' + (st.itPerFacility_kW/1000).toFixed(2) + ' MW and total IT ' + (st.totalItFacility_kW/1000).toFixed(2) + ' MW. Cover, contents, executive summary, compute, electrical, cooling, fire, network, BMS, worked calculations, a retired-basis appendix and references.'],
   ['Is the "Basis of Design" button different from "Generate Design"?',
-   'Yes. The Basis of Design opens a focused 14-page summary suitable for stakeholder review. The Tech Spec is a deep engineering document with worked formulae, equipment specs and references intended for design-review or hand-off to an engineer-of-record.'],
-  ['Why is the PUE ' + pueVal + ' and not the often-quoted 1.08?',
-   'Because the engine uses the chiller NAMEPLATE COP (' + eqC.nameplateCOP + ') and a five-part PUE basis (IT + Cooling + Fan + UPSLoss + Other), all bottom-up. Marketing PUEs are usually back-solved against an annualised energy total &mdash; we deliberately do not do that.'],
+   'Yes. The Basis of Design opens a focused summary suitable for stakeholder review. The Tech Spec is a deep engineering document with worked formulae, equipment counts and references intended for design review or hand-off to an engineer of record. Both read the same snapshot.'],
+  ['Why is the PUE ' + pueVal + ' and not the 1.12 target?',
+   'Because nothing is tuned. The design-day PUE is derived bottom-up: pumps from flow &times; head, fans from airflow &times; static, the chiller COP as ' + eq.chiller.carnotFraction + ' of Carnot over the actual lift (' + eq.chiller.cop.toFixed(2) + ' on the air path), UPS and distribution losses from stated efficiencies. The gap to the 1.12 target is ' + (pb.pueGap>=0?'+':'') + pb.pueGap.toFixed(3) + '; the annual figure is ' + pb.pueAnnual.toFixed(3) + ' (weather bins ASSUMED, no TMY yet) and the worst bin is ' + pb.pueWorst.toFixed(3) + '. The largest non-IT term is the air-path chiller, not the UPS.'],
+  ['Where is the free-cooling cliff and why does it matter?',
+   'The liquid path free-cools while ambient + dry-cooler approach (' + M.thermal.dryCoolerApproachK + ' K) stays at or below TCS supply (' + cool.tcsSupplyC + ' &deg;C) minus the CDU approach (' + M.thermal.cduApproachK + ' K). That is ' + M.pue.free_cooling_cliff_ambient_c + ' &deg;C dry-bulb &mdash; exactly the adopted Jakarta design day, so the margin at design is ' + M.planes.p04_free_cooling_margin_k.toFixed(1) + ' K. Every hour hotter than that runs the liquid path on chillers (' + eq.chiller.worstBin + ' against ' + eq.chiller.running + ' at design). The owner chose TCS ' + cool.tcsSupplyC + ' &deg;C dry-only on 2026-09-06 and asked the page to state the cliff rather than hide it.'],
   ['How many racks and GPUs does this facility have?',
-   '' + f.halls + ' halls &times; ' + f.nvl72PerHall + ' NVL72 per hall &times; ' + f.racksPerNVL72 + ' racks per NVL72 = ' + (f.halls*f.racksPerHall) + ' physical racks. GPUs total ' + gNum(f.gpuPerFacility) + ' Blackwell (' + f.gpuPerNVL72 + ' per NVL72).'],
+   '' + f.halls + ' halls &times; ' + gNum(f.racksPerHall) + ' GB300 NVL72 racks = ' + gNum(f.racksFacility) + ' racks. One rack is one 72-GPU NVLink domain (18 compute trays &times; 4 Blackwell Ultra + 2 Grace), so GPUs total ' + gNum(f.gpuPerFacility) + ' and Grace CPUs ' + gNum(f.cpuPerFacility) + '. Racks are laid out ' + M.electrical.rowsPerHall + ' rows &times; ' + M.electrical.racksPerRow + ' per hall and fed in ' + M.electrical.rppGroupsPerHall + ' RPP groups of ' + M.electrical.racksPerRppGroup + ' (' + (M.electrical.groupKw/1000).toFixed(2) + ' MW, ' + Math.round(M.electrical.groupCurrentA) + ' A on a ' + gNum(M.electrical.buswayTrunkA) + ' A trunk).'],
   ['Is the data here live BMS telemetry?',
-   'No. Every value is modelled / simulated from the locked basis. The page is engineered to look like an operations console so the design conversation can stay in one place, but it is not a feed from a physical facility. See the amber callout at the top of the Basis of Design drawer.'],
-  ['What is "direct-to-chip" (DLC) and how is the cooling split?',
-   'DLC routes a coolant loop directly to the GPU cold-plate, removing ' + (cool.liquidCaptureRatio*100) + '% of IT heat at high return temperature (' + (cool.tcsSupplyC||'&mdash;') + '&deg;C supply). The residual ' + (100-cool.liquidCaptureRatio*100) + '% is removed by CRAH/CRAC air handlers, sized smaller because of the DLC load shedding.'],
+   'No. Every value is modelled from the adopted basis and labelled SIMULATED. The page is engineered to look like an operations console so the design conversation can stay in one place, but it is not a feed from a physical facility.'],
+  ['What is direct-to-chip (DLC) cooling and how is the heat split?',
+   'DLC routes a warm-water loop to the GPU and CPU cold plates, removing ' + Math.round(cool.liquidCaptureRatio*100) + '% of rack heat at a ' + cool.tcsSupplyC + '/' + cool.tcsReturnC + ' &deg;C TCS supply/return. The residual ' + Math.round(100-cool.liquidCaptureRatio*100) + '% plus every watt outside the rack (fabric switches, OOB, storage, UPS and distribution losses, auxiliaries) is air-cooled through CRAHs on a chilled-water loop. Per hall that is ' + gNum(Math.round(st.liquidHeat_kW)) + ' kW liquid through ' + eq.cdu.installed + ' &times; ' + eq.cdu.model + ' (' + eq.cdu.running + ' duty + 1) and ' + gNum(Math.round(st.airHeat_kW)) + ' kW air through ' + eq.crah.installed + ' CRAHs.'],
   ['How are these numbers verified?',
-   'The engine ships with 57 doc-21 worked examples in tools/test-datahall-calc.mjs. Every site release runs them in CI; a regression fails the build. The Tech Spec PDF is built from the same engine that the on-page mimics use, so a passing test suite means the PDF&rsquo;s arithmetic is reproducible.'],
-  ['Can I change the scenario and see numbers update?',
-   'Not in v1.30.0 &mdash; Scenario A is locked because the audit story depends on a single authoritative basis. v1.31.x will introduce scenario-comparison view that runs A vs B vs C side-by-side with deltas, leaving the canonical scenario locked.'],
+   'tools/test-dcai-engine.mjs runs over 200 assertions on every ship: energy balance at every weather bin, a positive dry-cooler approach at every bin, the cliff as a step, counts as ceil(duty/unit), and the snapshot following its inputs under perturbation. tools/test-dcai-parameter-registry.mjs checks that every published parameter has provenance and a gate. The retired GB200 engine still runs its own 57 worked examples so the retirement is auditable.'],
+  ['What happened to the GB200 basis this page used to show?',
+   'It was retired on 2026-09-06 by owner decision (300&ndash;500 MW, four halls, the newest NVL72 rack). Its files (js/datahall-model.js, js/datahall-calculations.js) stay on disk byte-frozen and tested; the platform selector on this page keeps it as a named reference so the split-domain comparison can still be taught. Nothing on this page is computed from it.'],
   ['What standards underpin the design?',
-   'NVIDIA GB200 NVL72 reference architecture for compute, ASHRAE TC 9.9 for thermal envelopes, NFPA 75/76 for fire, Uptime Institute Tier Standard for resilience topology, IEC 60364 + IEEE 1100 + BS 7671 for power, BS EN 50600 for data-centre facility infrastructure. Full list in section 9 of the Tech Spec PDF.'],
+   'NVIDIA GB300 NVL72 reference architecture for compute and fabric, ASHRAE TC 9.9 for thermal envelopes (W40-class warm water), NFPA 75/76 for fire, Uptime Institute Tier Standard for resilience topology, IEC 60364 + IEEE 1100 for power, BS EN 50600 for facility infrastructure, ISO/IEC 30134 for PUE/WUE/CUE definitions.'],
   ['Why is this educational and not procurement-grade?',
-   'Two reasons. First, this is a public reference design &mdash; not project-specific. Second, real procurement needs a stamped issued-for-construction package from an engineer of record. The Tech Spec PDF is shaped like such a package because that shape teaches; it does not replace it.']
+   'Two reasons. First, this is a public reference design, not project-specific: ' + sc.kwPerRack + ' kW per rack is ADOPTED (NVIDIA publishes no rack power), every equipment unit is ASSUMED pending a Basis of Design, and the weather bins are shaped rather than a TMY file. Second, real procurement needs a stamped issued-for-construction package from an engineer of record. The Tech Spec is shaped like such a package because that shape teaches what one contains.'],
   ];
   var dlg=d.createElement('div'); dlg.id='rzFaqDialog'; dlg.setAttribute('role','dialog');
   dlg.setAttribute('aria-modal','true'); dlg.setAttribute('aria-labelledby','rzFaqTitle');

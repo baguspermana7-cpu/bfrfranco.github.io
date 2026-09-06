@@ -19,7 +19,7 @@ includes(html, 'js/datahall-ai/fire-cause-effect.js', 'AI cockpit must load the 
 includes(html, 'js/datahall-ai/operator-ui.js', 'AI cockpit must load the operator UI controller');
 assert.match(html, /<title>[^<]*Simulated Operations[^<]*<\/title>/,
   'AI search title must disclose simulated operations');
-assert.match(html, /document\.title='AI Data Hall '\+dh\+' Dashboard \| GB200 NVL72 Simulated Operations'/,
+assert.match(html, /document\.title='AI Data Hall '\+dh\+' Dashboard \| GB300 NVL72 Simulated Operations'/,
   'AI hall navigation must preserve simulated provenance in the dynamic title');
 assert.doesNotMatch(html, /(?:<title>|og:title[^>]*content=|"name":)[^\n<]*(?:Live Operations|Real-time)/i,
   'AI search, social, and structured-data titles must not claim live authority');
