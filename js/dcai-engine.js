@@ -104,6 +104,11 @@
 
   function ceilCount(duty, unit) { return Math.ceil(div(duty, unit, 'ceilCount')); }
 
+  /* Three-phase line current (A) for a real power P (kW): P*1000/(sqrt(3)*V_LL*PF) */
+  function currentA(kw, voltageLL, powerFactor) {
+    return div(num(kw, 'currentA') * 1000, Math.sqrt(3) * num(voltageLL) * num(powerFactor), 'currentA');
+  }
+
   /* ========================================================================
    * ONE OPERATING POINT — everything at a given ambient dry-bulb
    * ======================================================================*/
@@ -349,8 +354,11 @@
     var dryCoolersWorst = worst ? worst.counts.dry_coolers_running : dryCoolersDesign;
     /* frames per feed at or below the design-loading ceiling; 2N doubles it */
     var upsFramesPerFeed = ceilCount(totalIt_kwe, eq.ups.unitKw * eq.ups.designLoadingMax);
+    var upsFramesPerHallPerFeed = ceilCount(div(totalIt_kwe, f.halls), eq.ups.unitKw * eq.ups.designLoadingMax);
     var facilityKva = div(design.electrical.facility_kwe, el.powerFactor);
     var transformers = ceilCount(facilityKva, eq.transformer.unitMva * 1000);
+    /* the same ceil applied to the substation a single hall's single feed actually owns */
+    var transformersPerHallPerFeed = ceilCount(div(facilityKva, f.halls * 2), eq.transformer.unitMva * 1000);
     var gensetsDuty = ceilCount(worst ? worst.electrical.facility_kwe : design.electrical.facility_kwe, eq.generator.unitKw);
     var battery_kwh = div(div(totalIt_kwe * eq.ups.runtimeMin, 60), eq.ups.usableDoD * eq.ups.inverterEfficiency);
     var equipment = {
@@ -375,16 +383,21 @@
       ups_frame_kw: eq.ups.unitKw,
       ups_topology: eq.ups.topology,
       ups_frames_per_feed: upsFramesPerFeed,
+      ups_frames_per_hall_per_feed: upsFramesPerHallPerFeed,
       ups_frames_total: upsFramesPerFeed * 2,
       ups_loading_pct: div(totalIt_kwe, upsFramesPerFeed * eq.ups.unitKw) * 100,
       battery_kwh: battery_kwh,
       transformer_unit_mva: eq.transformer.unitMva,
       facility_kva: facilityKva,
       transformers: transformers,
+      transformers_per_hall_per_feed: transformersPerHallPerFeed,
       generator_unit_kw: eq.generator.unitKw,
       generator_model: eq.generator.model,
       gensets_duty: gensetsDuty,
       gensets_installed: gensetsDuty + 2,
+      /* the genset pool is sized on the FACILITY load; there is no per-hall split in this
+         model, and any drawing that shows gensets inside one hall must say so (Rule 3). */
+      gensets_facility_shared: true,
       generator_redundancy: eq.generator.redundancy
     };
 
@@ -411,15 +424,55 @@
       integer_topology: Number.isInteger(leaves) && Number.isInteger(spines) && Number.isInteger(cores)
     };
 
-    /* --- geometry --- */
+    /* --- geometry: the floor grid and the LV grouping that hangs off it ---
+       Rows and the racks-per-RPP-group are model leaves; every count here is their
+       quotient. `integer_grouping` is published rather than thrown so a registry
+       perturbation of racksPerHall cannot crash the engine — it reports instead. */
     var hallArea = geo.lengthM * geo.widthM;
+    var rackRows = geo.rows;
+    var racksPerRow = div(f.racksPerHall, rackRows, 'racks_per_row');
+    var racksPerGroup = el.racksPerRppGroup;
+    var groupsPerHall = div(f.racksPerHall, racksPerGroup, 'rack_groups_per_hall');
+    var groupsPerRow = div(racksPerRow, racksPerGroup, 'rack_groups_per_row');
     var geometry = {
       hall_length_m: geo.lengthM, hall_width_m: geo.widthM, hall_height_m: geo.heightM,
+      rack_rows: rackRows,
+      racks_per_row: racksPerRow,
+      racks_per_group: racksPerGroup,
+      rack_groups_per_hall: groupsPerHall,
+      rack_groups_per_row: groupsPerRow,
+      integer_grouping: Number.isInteger(racksPerRow) && Number.isInteger(groupsPerHall) &&
+        Number.isInteger(groupsPerRow) && rackRows * racksPerRow === f.racksPerHall &&
+        groupsPerHall * racksPerGroup === f.racksPerHall,
       hall_area_m2: hallArea,
       hall_volume_m3: hallArea * geo.heightM,
       rack_footprint_m2_per_hall: f.racksPerHall * geo.rackFootprintM2,
       rack_footprint_fraction: div(f.racksPerHall * geo.rackFootprintM2, hallArea),
       it_density_kw_per_m2: div(rackItHall_kwe, hallArea)
+    };
+
+    /* --- LV distribution: what one busway trunk and one RPP group actually carry ---
+       Nothing here is typed: the group is racks_per_group x rack_it_kw, and every current
+       is that kW through the model's own voltage and power factor. The trunk rating is the
+       only authored number and the loading it produces is published, never assumed to fit. */
+    var groupKw = racksPerGroup * f.rackItKw;
+    var groupCurrentA = currentA(groupKw, el.voltageLL, el.powerFactor);
+    var distribution = {
+      voltage_ll_v: el.voltageLL,
+      power_factor: el.powerFactor,
+      racks_per_group: racksPerGroup,
+      rack_groups_per_hall: groupsPerHall,
+      group_kw: groupKw,
+      group_current_a: groupCurrentA,
+      busway_trunk_a: el.buswayTrunkA,
+      busway_loading_pct: div(groupCurrentA, el.buswayTrunkA) * 100,
+      busway_within_trunk: groupCurrentA <= el.buswayTrunkA,
+      rack_feed_current_a: currentA(f.rackItKw, el.voltageLL, el.powerFactor),
+      rack_feed_dual_corded: true,
+      /* one RPP per group per FEED; the 2 is the A/B pair of the declared 2N topology, not a
+         parameter of its own (a published `rpp_per_group: 2` would be a constant no leaf moves) */
+      rpp_per_hall: groupsPerHall * 2,
+      hall_group_kw_check: groupKw * groupsPerHall === rackItHall_kwe
     };
 
     /* --- PUE, honestly --- */
@@ -473,6 +526,7 @@
       equipment: equipment,
       network: network,
       geometry: geometry,
+      distribution: distribution,
       pue: pue,
       wue: wue
     });

@@ -310,7 +310,18 @@
       powerFactor: 0.96,
       // source: auxiliary + balance-of-plant as a fraction of IT (lighting, controls,
       //         security, offices). ASSUMED
-      auxFractionOfIt: 0.0035
+      auxFractionOfIt: 0.0035,
+      // source: plan Track A §WP2 electrical design — the LV grouping unit comes from
+      //         ampacity, not taste. A whole row (88 x 142 kW = 12.5 MW) cannot hang on one
+      //         LV trunk and a half row (6.25 MW ~ 9.4 kA at 400 V) has no busway; a
+      //         quarter row of 22 racks is 3.12 MW ~ 4.7 kA, which the 5,000 A trunk below
+      //         carries. 22 also divides 88 and 880 exactly, so the grouping is integer in
+      //         both directions. ADOPTED
+      racksPerRppGroup: 22,
+      // source: 5,000 A is a standard cast-resin LV busway trunk rating class; it is the
+      //         smallest standard rating above the 4,697 A group current. ADOPTED — no
+      //         vendor selected, so the rating is a class, not a product.
+      buswayTrunkA: 5000
     },
 
     /* ------------------------------------------------------------------------
@@ -322,6 +333,10 @@
       lengthM: 62,
       widthM: 31,
       heightM: 5.5,
+      // source: plan Track A §WP2 — 10 rows at a 3.1 m pitch fills the 31 m width, and
+      //         88 racks at 0.6 m fills 52.8 m of the 62 m length with a cross-aisle.
+      //         10 x 88 = 880 exactly, so the floor grid is integer. ADOPTED
+      rows: 10,
       // source: NVIDIA GB300 NVL72 design guide rack footprint class 600 x 1200 mm. ADOPTED
       rackFootprintM2: 0.72
     },

@@ -2935,6 +2935,319 @@
       "docs": []
     },
     {
+      "id": "distribution.busway_loading_pct",
+      "label": "busway loading pct",
+      "unit": "%",
+      "kind": "derived",
+      "value": 93.93970004939538,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.buswayTrunkA",
+        "electrical.powerFactor",
+        "electrical.racksPerRppGroup",
+        "electrical.voltageLL",
+        "facility.rackItKw"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "distribution.busway_trunk_a",
+      "label": "busway trunk a",
+      "unit": null,
+      "kind": "authored",
+      "value": 5000,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.buswayTrunkA"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js electrical.buswayTrunkA",
+        "method": "5,000 A is a standard cast-resin LV busway trunk rating class; it is the smallest standard rating above the 4,697 A group current. ADOPTED — no vendor selected, so the rating is a class, not a product.",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
+      "id": "distribution.busway_within_trunk",
+      "label": "busway within trunk",
+      "unit": null,
+      "kind": "derived",
+      "value": true,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.buswayTrunkA",
+        "electrical.powerFactor",
+        "electrical.racksPerRppGroup",
+        "electrical.voltageLL",
+        "facility.rackItKw"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "distribution.group_current_a",
+      "label": "group current a",
+      "unit": null,
+      "kind": "derived",
+      "value": 4696.985002469769,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.powerFactor",
+        "electrical.racksPerRppGroup",
+        "electrical.voltageLL",
+        "facility.rackItKw"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "distribution.group_kw",
+      "label": "group kw",
+      "unit": "kW",
+      "kind": "derived",
+      "value": 3124,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.racksPerRppGroup",
+        "facility.rackItKw"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "distribution.hall_group_kw_check",
+      "label": "hall group kw check",
+      "unit": null,
+      "kind": "derived",
+      "value": true,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.racksPerRppGroup"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "distribution.power_factor",
+      "label": "power factor",
+      "unit": null,
+      "kind": "authored",
+      "value": 0.96,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.powerFactor"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js electrical.powerFactor",
+        "method": "BASELINE-DECISION.md (GB200) 400 V / PF 0.96 — carried. ADOPTED",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
+      "id": "distribution.rack_feed_current_a",
+      "label": "rack feed current a",
+      "unit": null,
+      "kind": "derived",
+      "value": 213.49931829408038,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.powerFactor",
+        "electrical.voltageLL",
+        "facility.rackItKw"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "distribution.rack_feed_dual_corded",
+      "label": "rack feed dual corded",
+      "unit": null,
+      "kind": "authored",
+      "value": true,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "LABEL",
+      "explainKey": null,
+      "dependsOnInputs": [],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js",
+        "method": "text label or identifier republished from the model",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
+      "id": "distribution.rack_groups_per_hall",
+      "label": "rack groups per hall",
+      "unit": null,
+      "kind": "derived",
+      "value": 40,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.racksPerRppGroup",
+        "facility.racksPerHall"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "distribution.racks_per_group",
+      "label": "racks per group",
+      "unit": null,
+      "kind": "authored",
+      "value": 22,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.racksPerRppGroup"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js electrical.racksPerRppGroup",
+        "method": "plan Track A §WP2 electrical design — the LV grouping unit comes from ampacity, not taste. A whole row (88 x 142 kW = 12.5 MW) cannot hang on one LV trunk and a half row (6.25 MW ~ 9.4 kA at 400 V) has no busway; a quarter row of 22 racks is 3.12 MW ~ 4.7 kA, which the 5,000 A trunk below carries. 22 also divides 88 and 880 exactly, so the grouping is integer in both directions. ADOPTED",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
+      "id": "distribution.rpp_per_hall",
+      "label": "rpp per hall",
+      "unit": null,
+      "kind": "derived",
+      "value": 80,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.racksPerRppGroup",
+        "facility.racksPerHall"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "distribution.voltage_ll_v",
+      "label": "voltage ll v",
+      "unit": null,
+      "kind": "authored",
+      "value": 400,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.voltageLL"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js electrical.voltageLL",
+        "method": "BASELINE-DECISION.md (GB200) 400 V / PF 0.96 — carried. ADOPTED",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
       "id": "equipment.battery_kwh",
       "label": "battery kwh",
       "unit": "kWh",
@@ -3693,6 +4006,30 @@
       "docs": []
     },
     {
+      "id": "equipment.gensets_facility_shared",
+      "label": "gensets facility shared",
+      "unit": null,
+      "kind": "authored",
+      "value": true,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "LABEL",
+      "explainKey": null,
+      "dependsOnInputs": [],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js",
+        "method": "text label or identifier republished from the model",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
       "id": "equipment.gensets_installed",
       "label": "gensets installed",
       "unit": null,
@@ -3833,6 +4170,47 @@
       "docs": []
     },
     {
+      "id": "equipment.transformers_per_hall_per_feed",
+      "label": "transformers per hall per feed",
+      "unit": null,
+      "kind": "derived",
+      "value": 33,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.powerFactor",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.transformer.unitMva",
+        "equipment.ups.efficiency",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "hydraulics.airCpKjPerKgK",
+        "hydraulics.airRhoKgPerM3",
+        "hydraulics.dryCoolerFanStaticPa",
+        "hydraulics.fanEfficiency",
+        "hydraulics.fanMotorEfficiency",
+        "thermal.airSupplyC",
+        "thermal.carnotFraction",
+        "thermal.cduApproachK",
+        "thermal.designAmbientDbC",
+        "thermal.dryCoolerAirDeltaTK",
+        "thermal.dryCoolerApproachK",
+        "thermal.tcsSupplyC"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
       "id": "equipment.ups_frame_kw",
       "label": "ups frame kw",
       "unit": "kW",
@@ -3878,6 +4256,33 @@
         "fabric.switchKw",
         "fabric.switchesPerRack",
         "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "equipment.ups_frames_per_hall_per_feed",
+      "label": "ups frames per hall per feed",
+      "unit": null,
+      "kind": "derived",
+      "value": 135,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "equipment.ups.designLoadingMax",
+        "equipment.ups.unitKw",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
         "facility.rackItKw",
         "facility.racksPerHall"
       ],
@@ -4096,6 +4501,29 @@
       }
     },
     {
+      "id": "geometry.integer_grouping",
+      "label": "integer grouping",
+      "unit": null,
+      "kind": "derived",
+      "value": true,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.racksPerRppGroup",
+        "facility.racksPerHall",
+        "geometry.rows"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
       "id": "geometry.it_density_kw_per_m2",
       "label": "it density kw per m2",
       "unit": "m²",
@@ -4157,6 +4585,127 @@
       "dependsOnInputs": [
         "facility.racksPerHall",
         "geometry.rackFootprintM2"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "geometry.rack_groups_per_hall",
+      "label": "rack groups per hall",
+      "unit": null,
+      "kind": "derived",
+      "value": 40,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.racksPerRppGroup",
+        "facility.racksPerHall"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "geometry.rack_groups_per_row",
+      "label": "rack groups per row",
+      "unit": null,
+      "kind": "derived",
+      "value": 4,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.racksPerRppGroup",
+        "facility.racksPerHall",
+        "geometry.rows"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "geometry.rack_rows",
+      "label": "rack rows",
+      "unit": null,
+      "kind": "authored",
+      "value": 10,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "geometry.rows"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js geometry.rows",
+        "method": "plan Track A §WP2 — 10 rows at a 3.1 m pitch fills the 31 m width, and 88 racks at 0.6 m fills 52.8 m of the 62 m length with a cross-aisle. 10 x 88 = 880 exactly, so the floor grid is integer. ADOPTED",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
+      "id": "geometry.racks_per_group",
+      "label": "racks per group",
+      "unit": null,
+      "kind": "authored",
+      "value": 22,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.racksPerRppGroup"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js electrical.racksPerRppGroup",
+        "method": "plan Track A §WP2 electrical design — the LV grouping unit comes from ampacity, not taste. A whole row (88 x 142 kW = 12.5 MW) cannot hang on one LV trunk and a half row (6.25 MW ~ 9.4 kA at 400 V) has no busway; a quarter row of 22 racks is 3.12 MW ~ 4.7 kA, which the 5,000 A trunk below carries. 22 also divides 88 and 880 exactly, so the grouping is integer in both directions. ADOPTED",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
+      "id": "geometry.racks_per_row",
+      "label": "racks per row",
+      "unit": null,
+      "kind": "derived",
+      "value": 88,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "facility.racksPerHall",
+        "geometry.rows"
       ],
       "dependsOnInputsAtCliff": [],
       "consumers": [],

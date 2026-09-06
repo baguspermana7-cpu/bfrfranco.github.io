@@ -14,7 +14,11 @@
 
   var INTERVAL_MS = 4000;
   var FALLBACK_HALL_COUNT = 4;
-  var FALLBACK_GENERATOR_COUNT = 8;
+  /* The SLD overview draws a BANK of generator glyphs, not one glyph per machine: at the
+     GB300 basis the pool is 171 x 4 MW, and 171 ids would silently exceed
+     MAX_RENDERED_EQUIPMENT and truncate. `generatorCount` is the real machine count and
+     stays whole; `generatorGlyphCount` is only how many glyphs the drawing owns. */
+  var FALLBACK_GENERATOR_GLYPHS = 8;
   var MAX_RENDERED_EQUIPMENT = 64;
   var REQUIRED_NUMBERS = [
     'halls', 'itHall', 'itFacilityMW', 'pb_aux', 'pb_cooling',
@@ -42,6 +46,41 @@
         Math.floor(basis.gensetFacNplus1) !== basis.gensetFacNplus1) {
       throw new Error('Invalid electrical live basis: positive equipment counts required');
     }
+    if (basis.gensetGlyphCount !== undefined && !validGlyphCount(basis.gensetGlyphCount)) {
+      throw new Error('Invalid electrical live basis: gensetGlyphCount');
+    }
+  }
+
+  function validGlyphCount(value) {
+    return finiteNumber(value) && value > 0 && value <= MAX_RENDERED_EQUIPMENT &&
+      Math.floor(value) === value;
+  }
+
+  function glyphCountFor(basis) {
+    return basis && validGlyphCount(basis.gensetGlyphCount) ?
+      basis.gensetGlyphCount : FALLBACK_GENERATOR_GLYPHS;
+  }
+
+  /* Each drawn glyph stands for a BANK of machines. The bank reports the worst state it
+     contains: any failed machine makes the bank FAILED, any running machine makes it
+     RUNNING, and only an all-standby bank reads STANDBY. The headline counts still come
+     from the full machine list, so the chip never disagrees with the pool. */
+  function generatorGlyphStates(states, glyphCount) {
+    var perGlyph = Math.ceil(states.length / glyphCount);
+    var glyphs = [];
+    var i;
+    var j;
+    var slice;
+    for (i = 0; i < glyphCount; i += 1) {
+      slice = states.slice(i * perGlyph, (i + 1) * perGlyph);
+      if (!slice.length) { glyphs.push(states[states.length - 1]); continue; }
+      glyphs.push('STANDBY');
+      for (j = 0; j < slice.length; j += 1) {
+        if (slice[j] === 'FAILED') { glyphs[i] = 'FAILED'; break; }
+        if (slice[j] === 'RUNNING') { glyphs[i] = 'RUNNING'; }
+      }
+    }
+    return Object.freeze ? Object.freeze(glyphs) : glyphs;
   }
 
   function integerText(value) {
@@ -90,6 +129,7 @@
     var source;
     var states;
     var heading;
+    var glyphCount;
     var value;
     validateBasis(basis);
     if (!electricalApi || typeof electricalApi.evaluateScenario !== 'function') {
@@ -99,6 +139,7 @@
     source = result.state.sources['SRC-GENSET-POOL'];
     states = generatorStates(source.state, basis.gensetFacN, basis.gensetFacNplus1);
     heading = generatorHeading(states);
+    glyphCount = glyphCountFor(basis);
     value = {
       scenarioId: result.scenarioId,
       itPerHallKW: basis.itHall,
@@ -111,8 +152,11 @@
       halls: basis.halls,
       requiredCurrentA: basis.reqCurrentA,
       generatorCount: basis.gensetFacNplus1,
+      generatorDutyCount: basis.gensetFacN,
+      generatorGlyphCount: glyphCount,
       generatorState: generatorDisplay(source.state),
       generatorStates: states,
+      generatorGlyphStates: generatorGlyphStates(states, glyphCount),
       generatorRunningCount: heading.runningCount,
       generatorStandbyCount: heading.standbyCount,
       generatorFailedCount: heading.failedCount,
@@ -138,8 +182,8 @@
   function render(document, value) {
     var i;
     for (i = 1; i <= value.halls; i += 1) { renderHall(document, value, i); }
-    for (i = 1; i <= value.generatorCount; i += 1) {
-      setText(document, 'eOvGen' + i, value.generatorStates[i - 1]);
+    for (i = 1; i <= value.generatorGlyphCount; i += 1) {
+      setText(document, 'eOvGen' + i, value.generatorGlyphStates[i - 1]);
     }
     setText(document, 'eOvGenPoolTitle', value.generatorHeading);
     setText(document, 'eOvNC', integerText(value.auxiliaryPerHallKW * value.halls) + ' kW facility');
@@ -157,8 +201,7 @@
   }
 
   function renderCount(value, fallback) {
-    return finiteNumber(value) && value > 0 && value <= MAX_RENDERED_EQUIPMENT &&
-      Math.floor(value) === value ? value : fallback;
+    return validGlyphCount(value) ? value : fallback;
   }
 
   function invalidateHall(document, hall) {
@@ -171,13 +214,14 @@
   function renderFailure(document, lastValue, basis) {
     var source = lastValue || basis || {};
     var hallCount = renderCount(source.halls, FALLBACK_HALL_COUNT);
-    var generatorCount = renderCount(
-      source.generatorCount || source.gensetFacNplus1,
-      FALLBACK_GENERATOR_COUNT
+    /* invalidate the GLYPHS the drawing owns — the machine count is not a glyph count */
+    var glyphCount = renderCount(
+      source.generatorGlyphCount || source.gensetGlyphCount,
+      FALLBACK_GENERATOR_GLYPHS
     );
     var i;
     for (i = 1; i <= hallCount; i += 1) { invalidateHall(document, i); }
-    for (i = 1; i <= generatorCount; i += 1) {
+    for (i = 1; i <= glyphCount; i += 1) {
       setText(document, 'eOvGen' + i, 'UNAVAILABLE');
     }
     setText(document, 'eOvNC', 'UNAVAILABLE');

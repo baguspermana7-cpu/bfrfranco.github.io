@@ -359,6 +359,8 @@ export function scopeFor(id) {
   if (branch === 'meta') return 'meta';
   if (branch === 'network') return 'network';
   if (branch === 'geometry') return 'hall';
+  /* LV distribution is declared per hall: one busway pair and 40 RPP groups per hall */
+  if (branch === 'distribution') return 'hall';
   if (branch === 'compute') return /per_rack|per_nvl72|nvlink/.test(id) ? 'rack' : (/per_hall/.test(id) ? 'hall' : 'campus');
   if (branch === 'power') return /^power\.(rack_it_kw|shelf|shelves|psu)/.test(id) ? 'rack' : (/hall/.test(id) ? 'hall' : 'campus');
   if (branch === 'heat') return /hall/.test(id) ? 'hall' : 'campus';
