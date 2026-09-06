@@ -1,5 +1,5 @@
 /* ============================================================================
- * rz-inspector.js — right-side inspector for line + breaker metadata (v1.43.0)
+ * rz-inspector.js — right-side inspector: line/breaker attrs, registry basis, equipment payloads (v1.45.0)
  * ----------------------------------------------------------------------------
  * Closes review doc-27 §3.2 P0:
  *   "Equipment popup masih MODAL CENTER, menutup topology. Jadikan click
@@ -82,7 +82,29 @@
     '.rz-inspector-pulse{display:inline-block;width:6px;height:6px;border-radius:50%;' +
       'background:#86efac;margin-right:6px;vertical-align:middle;animation:rzPulse 1.8s ease-in-out infinite}' +
     '@keyframes rzPulse{0%,100%{opacity:.4}50%{opacity:1}}' +
-    '@media (max-width:640px){.rz-inspector{width:100vw;right:-100vw}}';
+    /* v1.45.0 — payload mode (Track A §A5) */
+    '.rz-inspector-chip{display:inline-block;margin:6px 0 0;padding:2px 8px;border-radius:999px;font-family:JetBrains Mono,monospace;font-size:10px;font-weight:600;letter-spacing:.04em;border:1px solid rgba(255,255,255,0.18);color:#e2e8f0}' +
+    '.rz-inspector-chip.is-normal{color:#86efac;border-color:rgba(134,239,172,0.4)}' +
+    '.rz-inspector-chip.is-standby{color:#fbbf24;border-color:rgba(251,191,36,0.4)}' +
+    '.rz-inspector-chip.is-fault{color:#fca5a5;border-color:rgba(252,165,165,0.5)}' +
+    '.rz-inspector-action{margin:8px 0 0;padding:6px 10px;border:1px solid rgba(56,189,248,0.35);background:rgba(56,189,248,0.08);color:#7dd3fc;' +
+      'font-family:IBM Plex Sans,sans-serif;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;border-radius:4px;cursor:pointer}' +
+    '.rz-inspector-action:hover,.rz-inspector-action:focus-visible{background:rgba(56,189,248,0.18);outline:2px solid #38bdf8;outline-offset:1px}' +
+    '.rz-inspector-v[data-basis-param]{cursor:pointer;text-decoration:underline dotted rgba(255,255,255,0.3)}' +
+    '.rz-inspector-v[data-basis-param]::after,.rz-inspector-v[data-rz-authored-basis]::after{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;margin-left:5px;vertical-align:middle;background:var(--rz-ev,#8fa2b8)}' +
+    '.rz-inspector-v.state-run,.rz-inspector-v.state-online,.rz-inspector-v.state-up,.rz-inspector-v.state-dry,.rz-inspector-v.state-normal,.rz-inspector-v.state-float,.rz-inspector-v.state-coupled,.rz-inspector-v.state-armed,.rz-inspector-v.state-ok{color:#86efac}' +
+    '.rz-inspector-v.state-stby,.rz-inspector-v.state-bypass,.rz-inspector-v.state-de-energized,.rz-inspector-v.state-unavailable{color:#fbbf24}' +
+    '.rz-inspector-v.state-trip,.rz-inspector-v.state-wet,.rz-inspector-v.state-alarm,.rz-inspector-v.state-discharge{color:#fca5a5}' +
+    '.rz-inspector-back{display:block;margin:0 0 10px;background:none;border:none;color:#7dd3fc;font-family:IBM Plex Sans,sans-serif;font-size:10.5px;cursor:pointer;padding:0}' +
+    '.rz-inspector-spark{width:100%;height:64px;display:block;margin:6px 0 10px}' +
+    '.rz-inspector-alarm{padding:8px 10px;border:1px solid rgba(252,165,165,0.35);border-left:3px solid #fca5a5;border-radius:4px;margin-bottom:6px;font-size:11px}' +
+    '.rz-inspector-alarm .rz-inspector-dep-k{color:#fca5a5}' +
+    '.rz-inspector-prov{margin-top:14px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.08);font-size:10px;color:#64748b;font-family:JetBrains Mono,monospace}' +
+    /* responsive ladder (owner ledger 2026-08-26): ≥1440 docked when the page opts in, 1024–1439 overlay, 768–1023 bottom sheet, <768 full sheet */
+    '@media (min-width:1440px){body[data-rz-inspector-dock="1"] .rz-inspector.open{box-shadow:none}body[data-rz-inspector-dock="1"].rz-inspector-docked{padding-right:360px}}' +
+    '@media (max-width:1023px){.rz-inspector{top:auto;bottom:-100vh;right:0;left:0;width:100vw;height:55vh;border-left:none;border-top:1px solid rgba(255,255,255,0.12);transition:bottom .25s cubic-bezier(.4,0,.2,1)}.rz-inspector.open{bottom:0;right:0}}' +
+    '@media (max-width:767px){.rz-inspector{height:100vh}.rz-inspector-close{width:44px;height:44px;top:6px;right:6px}}' +
+    '@media (max-width:640px){.rz-inspector{width:100vw}}';
 
   function injectStyles() {
     if (doc.getElementById(STYLE_ID)) { return; }
@@ -99,6 +121,8 @@
   var currentEl = null;
   var currentTab = 'live';
   var basisMode = false;   /* A3: the panel is showing a registry record, not equipment metadata */
+  var payloadMode = false; /* A5: the panel is showing an equipment payload (hmi-payloads.js) */
+  var currentPayload = null, payloadOpts = null, lastTrigger = null;
 
   function buildShell() {
     if (inspectorEl) { return inspectorEl; }
@@ -111,7 +135,9 @@
       '<div class="rz-inspector-hdr">' +
         '<button class="rz-inspector-close" aria-label="Close inspector" type="button">×</button>' +
         '<div class="rz-inspector-kind" data-slot="kind">LINE</div>' +
-        '<div class="rz-inspector-id" data-slot="id">—</div>' +
+        '<div class="rz-inspector-id" data-slot="id" tabindex="-1">—</div>' +
+        '<div data-slot="chip"></div>' +
+        '<div data-slot="actions"></div>' +
       '</div>' +
       '<div class="rz-inspector-tabs" role="tablist">' +
         '<button class="rz-inspector-tab active" data-tab="live" role="tab" type="button">Live</button>' +
@@ -301,6 +327,7 @@
   }
 
   function render() {
+    if (payloadMode) { renderPayload(); return; }
     if (!currentEl || !inspectorEl) { return; }
     var m = getMetadata(currentEl);
     inspectorEl.querySelector('[data-slot="kind"]').textContent = m.kind.toUpperCase();
@@ -347,6 +374,7 @@
     if (!el || !(isLine(el) || isBreaker(el))) { return; }
     buildShell();
     leaveBasisMode();
+    leavePayloadMode();
     currentEl = el;
     render();
     inspectorEl.classList.add('open');
@@ -373,6 +401,7 @@
     var id = typeof target === 'string' ? target : basisIdOf(target);
     if (!id) { return false; }
     buildShell();
+    if (payloadMode) { payloadMode = false; inspectorEl.classList.remove('rz-inspector-payload'); inspectorEl.querySelector('[data-slot="chip"]').innerHTML = ''; inspectorEl.querySelector('[data-slot="actions"]').innerHTML = ''; }
     basisMode = true;
     currentEl = null;
     inspectorEl.classList.add('rz-inspector-basis');
@@ -393,10 +422,150 @@
     return true;
   }
 
+  /* ---- A5 payload mode: an equipment payload from js/datahall-ai/hmi-payloads.js ----
+     Every value cell carries data-basis-param (registry-backed, evidence dot from
+     RZEvidence) OR data-rz-authored-basis (declared: simulated / state / authored) —
+     never both, so the traceability walker can classify it. A click on a hooked cell
+     enters basis mode with a way back; nothing here opens the centre modal. */
+  function evColor(cls) { return root.RZEvidence ? root.RZEvidence.color(cls) : '#8fa2b8'; }
+  function evOf(id) { return root.RZSvgBasis ? root.RZSvgBasis.evidenceOf(id) : 'DERIVED'; }
+  function cellAttrs(r) {
+    if (r.basis) {
+      return ' data-basis-param="' + esc(r.basis) + '"' + (r.params ? ' data-basis-params="' + esc([r.basis].concat(r.params).join(' ')) + '"' : '')
+        + ' data-evidence="' + esc(evOf(r.basis)) + '" tabindex="0" role="button" style="--rz-ev:' + evColor(evOf(r.basis)) + '" title="' + esc(r.basis + ' · ' + evOf(r.basis)) + '"';
+    }
+    var col = r.quality === 'simulated' ? '#8b7bd0' : r.quality === 'state' ? '#7dd3fc' : '#8fa2b8';
+    return ' data-rz-authored-basis="' + esc(r.declared || '') + '" style="--rz-ev:' + col + '" title="' + esc((r.quality || 'declared').toUpperCase() + ' · ' + (r.declared || '')) + '"';
+  }
+  function payloadRow(r) {
+    var cls = 'rz-inspector-v' + (r.state ? ' state-' + esc(r.state) : '');
+    return '<div class="rz-inspector-row"><span class="rz-inspector-k">' + esc(r.label) + '</span>' +
+      '<span class="' + cls + '"' + cellAttrs(r) + '>' + esc(r.text) + (r.unit ? ' ' + esc(r.unit) : '') + '</span></div>';
+  }
+  function payloadRows(rows, empty) {
+    if (!rows || !rows.length) { return '<div class="rz-inspector-empty">' + esc(empty) + '</div>'; }
+    return rows.map(payloadRow).join('');
+  }
+  function sparkline(t) {
+    var s = t.series || [], n = s.length; if (n < 2) { return ''; }
+    var vals = s.filter(function (x) { return typeof x === 'number'; });
+    var min = Math.min.apply(null, vals), max = Math.max.apply(null, vals), span = (max - min) || 1;
+    var pts = s.map(function (v, i) { return (i / (n - 1) * 100).toFixed(2) + ',' + (v == null ? 32 : (32 - (v - min) / span * 28 + 2)).toFixed(2); }).join(' ');
+    return '<svg class="rz-inspector-spark" viewBox="0 0 100 34" preserveAspectRatio="none" aria-hidden="true">' +
+      '<polyline points="' + pts + '" fill="none" stroke="#7dd3fc" stroke-width="1.2" vector-effect="non-scaling-stroke"/></svg>';
+  }
+  function renderPayloadTab(p, tab) {
+    var t = p.tabs;
+    switch (tab) {
+      case 'live': return payloadRows(t.live, 'No live points.');
+      case 'capacity': return payloadRows(t.capacity, 'No capacity rows.');
+      case 'deps': {
+        var html = '';
+        (t.deps.upstream || []).forEach(function (d) { html += depCardPayload('Upstream', d); });
+        (t.deps.downstream || []).forEach(function (d) { html += depCardPayload('Downstream', d); });
+        (p.actions && p.actions.related || []).forEach(function (id) { html += depCardPayload('Related', { id: id, label: id }); });
+        return html || '<div class="rz-inspector-empty">No dependencies declared.</div>';
+      }
+      case 'alarms': {
+        if (!t.alarms || !t.alarms.length) { return '<div class="rz-inspector-empty">No active alarms for the selected scenario.</div>'; }
+        return t.alarms.map(function (a) {
+          return '<div class="rz-inspector-alarm" data-rz-authored-basis="simulated alarm record from the selected scenario (quality: simulated), never a field event (Track A §A5)">' +
+            '<div class="rz-inspector-dep-k">' + esc(a.severity) + ' · ' + esc(a.lifecycle) + '</div>' +
+            '<div class="rz-inspector-dep-v">' + esc(a.tag) + ' / ' + esc(a.point) + '</div><div>' + esc(a.message) + '</div></div>';
+        }).join('');
+      }
+      case 'trend': {
+        if (!t.trend) { return '<div class="rz-inspector-empty">No trend point declared.</div>'; }
+        var last = t.trend.series[t.trend.series.length - 1];
+        return '<div data-rz-authored-basis="' + esc(t.trend.declared) + '">' + row(t.trend.label, (last == null ? '—' : last) + (t.trend.unit ? ' ' + t.trend.unit : '')) + sparkline(t.trend) +
+          '<div class="rz-inspector-empty">' + esc(t.trend.series.length + ' ticks · ' + t.trend.declared) + '</div></div>';
+      }
+      case 'maint': return payloadRows(t.maint, 'No maintenance rows.');
+    }
+    return '';
+  }
+  function depCardPayload(k, d) {
+    return '<div class="rz-inspector-dep" data-rz-depid="' + esc(d.id) + '" tabindex="0" role="button">' +
+      '<div class="rz-inspector-dep-k">' + esc(k) + '</div><div class="rz-inspector-dep-v">' + esc(d.label || d.id) + '</div></div>';
+  }
+  function renderPayload() {
+    var p = currentPayload; if (!p || !inspectorEl) { return; }
+    inspectorEl.querySelector('[data-slot="kind"]').textContent = String(p.kind || 'equipment').toUpperCase() + ' · ' + String(p.label || '');
+    inspectorEl.querySelector('[data-slot="id"]').textContent = p.title;
+    var chip = p.statusChip || { label: 'NORMAL', state: 'normal' };
+    inspectorEl.querySelector('[data-slot="chip"]').innerHTML = '<span class="rz-inspector-chip is-' + esc(chip.state) + '">' + esc(chip.label) + '</span>';
+    var actions = inspectorEl.querySelector('[data-slot="actions"]');
+    /* the button element survives the 4 s refresh: a modal that opened from it returns focus to it */
+    var wantAction = !!(p.actions && p.actions.openHmi), btn = actions.querySelector('[data-rz-open-hmi]');
+    if (wantAction !== !!btn) {
+      actions.innerHTML = wantAction ? '<button type="button" class="rz-inspector-action" data-rz-open-hmi="1">Open equipment HMI</button>' : '';
+      btn = actions.querySelector('[data-rz-open-hmi]');
+    }
+    if (btn) { btn.onclick = function (e) { e.stopPropagation(); if (payloadOpts && payloadOpts.onOpenHmi) { payloadOpts.onOpenHmi(currentPayload || p, btn); } }; }
+    var body = inspectorEl.querySelector('[data-slot="body"]');
+    body.innerHTML = renderPayloadTab(p, currentTab) +
+      '<div class="rz-inspector-prov">engine ' + esc(p.provenance.engineVersion) + ' · scenario ' + esc(p.provenance.scenarioId) + ' / ' + esc(p.provenance.coolingScenarioId) + ' · tick ' + esc(p.provenance.tick) +
+      ' · ' + esc(p.provenance.counts.derived + (p.provenance.counts.published || 0)) + ' engine · ' + esc(p.provenance.counts.simulated) + ' simulated · ' + esc(p.provenance.counts.state) + ' state</div>';
+    var deps = body.querySelectorAll('[data-rz-depid]');
+    for (var i = 0; i < deps.length; i++) {
+      deps[i].addEventListener('click', function (e) { e.stopPropagation(); var id = e.currentTarget.getAttribute('data-rz-depid'); if (payloadOpts && payloadOpts.onNavigate) { payloadOpts.onNavigate(id); } });
+      deps[i].addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.currentTarget.click(); } });
+    }
+    var cells = body.querySelectorAll('.rz-inspector-v[data-basis-param]');
+    for (var j = 0; j < cells.length; j++) {
+      cells[j].addEventListener('click', function (e) { e.stopPropagation(); e.preventDefault(); openBasisFromPayload(e.currentTarget.getAttribute('data-basis-param')); });
+      cells[j].addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); openBasisFromPayload(e.currentTarget.getAttribute('data-basis-param')); } });
+    }
+  }
+  function openBasisFromPayload(id) {
+    var back = currentPayload, opts = payloadOpts;
+    openBasis(id);
+    var body = inspectorEl.querySelector('[data-slot="body"]');
+    var b = doc.createElement('button'); b.type = 'button'; b.className = 'rz-inspector-back'; b.textContent = '← back to ' + (back ? back.title : 'equipment');
+    b.addEventListener('click', function (e) { e.stopPropagation(); openPayload(back, opts); });
+    body.insertBefore(b, body.firstChild);
+  }
+  function leavePayloadMode() {
+    if (!payloadMode || !inspectorEl) { return; }
+    payloadMode = false; currentPayload = null;
+    inspectorEl.classList.remove('rz-inspector-payload');
+    inspectorEl.querySelector('[data-slot="chip"]').innerHTML = '';
+    inspectorEl.querySelector('[data-slot="actions"]').innerHTML = '';
+  }
+  /** openPayload(payload, { trigger, onOpenHmi(payload, button), onNavigate(id), tab }) */
+  function openPayload(payload, opts) {
+    if (!payload || payload.unavailable || !payload.tabs) { return false; }
+    buildShell();
+    leaveBasisMode();
+    payloadMode = true; currentPayload = payload; payloadOpts = opts || {}; currentEl = null;
+    if (payloadOpts.trigger) { lastTrigger = payloadOpts.trigger; }
+    if (payloadOpts.tab) { currentTab = payloadOpts.tab; }
+    var tabs = inspectorEl.querySelectorAll('.rz-inspector-tab');
+    for (var i = 0; i < tabs.length; i++) { tabs[i].classList.toggle('active', tabs[i].getAttribute('data-tab') === currentTab); }
+    inspectorEl.querySelector('.rz-inspector-tabs').hidden = false;
+    inspectorEl.classList.add('rz-inspector-payload');
+    renderPayload();
+    var wasOpen = inspectorEl.classList.contains('open');
+    inspectorEl.classList.add('open');
+    if (doc.body && doc.body.getAttribute('data-rz-inspector-dock') === '1' && root.matchMedia && root.matchMedia('(min-width:1440px)').matches) { doc.body.classList.add('rz-inspector-docked'); }
+    if (!wasOpen || !payloadOpts.keepFocus) { var idEl = inspectorEl.querySelector('[data-slot="id"]'); if (idEl && idEl.focus) { idEl.focus({ preventScroll: true }); } }
+    return true;
+  }
+  /** refresh the current payload (same equipment, new tick) without moving focus */
+  function refreshPayload(payload) {
+    if (!payloadMode || !payload || payload.unavailable) { return false; }
+    currentPayload = payload; renderPayload(); return true;
+  }
+  function currentPayloadId() { return payloadMode && currentPayload ? currentPayload.classId + ':' + currentPayload.id : null; }
+
   function close() {
     if (inspectorEl) { inspectorEl.classList.remove('open'); }
+    if (doc.body) { doc.body.classList.remove('rz-inspector-docked'); }
     leaveBasisMode();
+    var trig = lastTrigger; lastTrigger = null;
+    leavePayloadMode();
     currentEl = null;
+    if (trig && trig.focus) { try { if (!trig.hasAttribute('tabindex')) { trig.setAttribute('tabindex', '-1'); } trig.focus({ preventScroll: true }); } catch (e) { /* SVG focus is best-effort */ } }
   }
 
   function isOpen() {
@@ -425,7 +594,10 @@
     }, false);
     /* ESC to close. */
     doc.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && isOpen()) { close(); }
+      if (e.key !== 'Escape' || !isOpen()) { return; }
+      /* a centre modal above the inspector owns ESC first (DHModal on the AI cockpit) */
+      if (root.DHModal && typeof root.DHModal.isOpen === 'function' && root.DHModal.isOpen()) { return; }
+      close();
     });
     /* Outside-click to close. */
     doc.addEventListener('click', function (e) {
@@ -435,7 +607,9 @@
         if (t === inspectorEl) { return; }
         if (t.getAttribute && (t.getAttribute('data-rz-line') === '1' ||
                                t.getAttribute('data-rz-breaker') === '1' ||
-                               t.getAttribute('data-basis-param'))) { return; }
+                               t.getAttribute('data-basis-param') ||
+                               t.getAttribute('data-rz-equipment') ||
+                               t.hasAttribute('data-rz-inspector-keep'))) { return; }
         t = t.parentNode;
       }
       close();
@@ -450,7 +624,7 @@
   }
 
   /* Export. */
-  var API = { open: open, openBasis: openBasis, basisIdOf: basisIdOf, close: close, isOpen: isOpen, version: '1.44.0' };
+  var API = { open: open, openBasis: openBasis, basisIdOf: basisIdOf, openPayload: openPayload, refreshPayload: refreshPayload, currentPayloadId: currentPayloadId, close: close, isOpen: isOpen, version: '1.45.0' };
   if (root) { root.RZInspector = API; }
 
 })(typeof window !== 'undefined' ? window : null,

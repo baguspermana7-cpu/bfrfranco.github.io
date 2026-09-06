@@ -152,15 +152,20 @@ surgical/additive scope:
   desaturation remains queued because semantic process colors are load-bearing.
 - **doc-24 #5** — Convert all-green data-hall/network blocks into
   heatmap/outlier views (per-tab render-tree restructuring).
-- **doc-24 #6** — Right object-inspector consistency across all 9 tabs
-  (would mean adding shell inspector to each panel + click resolvers).
+- **doc-24 #6 — SHIPPED v2.2.0** — one right-side inspector for every equipment block on every
+  diagram (hall, room, rack, cooling, per-hall SLD, network, fire, BMS, roof, floors): a single click on
+  any `[data-rz-equipment]` block opens `RZInspector.openPayload()` with the six tabs; the deep mimic
+  is the explicit second tier (`Open equipment HMI` / double-click / Shift+Enter). See INSPECTOR.md
+  "Payload mode" and DATAHALL_AI_STANDARD.md "Two-tier equipment inspection".
 - **doc-24 #7** — Demote Seismic / Wind / Floor structural callouts
   from `dcCallouts` on `#p-dash`. **DEFERRED-OWNER-EXCLUDED**.
 - **doc-24 #8** — Per-tab primary question hint in panel headers.
 - **doc-24 #9** — Layer toggles on Room Layout / Cooling / Electrical
   SLD / Network / BMS diagrams.
-- **doc-24 #10** — Make selected-object workflow consistent across all
-  in-scope panels.
+- **doc-24 #10 — SHIPPED v2.2.0** — the selected-object workflow is the same on every panel:
+  click = inspector (`.rz-equipment-selected` glow), Deps card = navigate, right-click = Deps tab,
+  `Open equipment HMI` = modal with focus trap / ESC / focus return, gated by
+  `tools/test-datahall-ai-inspector-runtime.mjs`.
 - **doc-14 §4 v1.23.2 deferred** — chiller-plant view-mode `body[data-bms-mode]`
   show/hide section rules (currently UI scaffold only).
 - **doc-14 §7 v1.23.4 deferred** — water-system threshold bands on WUE

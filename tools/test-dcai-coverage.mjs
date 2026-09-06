@@ -17,6 +17,10 @@
  *   node tools/test-dcai-coverage.mjs --strict-rows=a,b   only the named rows (selector ids / HTML) are strict
  *   node tools/test-dcai-coverage.mjs --json=path     write the full result (samples included)
  *   node tools/test-dcai-coverage.mjs --only=hSvg,HTML  measure a subset while sweeping
+ *   node tools/test-dcai-coverage.mjs --modals       v2.2.0: also open the right-side inspector for one block of
+ *                                                     every equipment class (rows inspector:<class>) and, where the
+ *                                                     inspector offers "Open equipment HMI", the tier-2 panel it opens
+ *                                                     (rows modal:<class>) — walked at the pinned sim tick 4242
  *
  * Flip condition (written here so it is a rule, not a mood): a row enters --strict-rows in
  * ship-gate.sh the commit it first reads 0/0; the page moves to --strict when all 14 do.
@@ -38,6 +42,8 @@ const JSON_OUT = (ARGS.find((a) => a.startsWith('--json=')) || '').split('=')[1]
 const ONLY = new Set(((ARGS.find((a) => a.startsWith('--only=')) || '').split('=')[1] || '').split(',').filter(Boolean));
 /* --settle=ms waits before measuring so every ticker has fired: a hook whose value a die roll
    overwrites shows up as MISMATCH here — that is the Rule 2 check for the live page. */
+const MODALS = ARGS.includes('--modals');
+const sleep = (ms) => new Promise((accept) => setTimeout(accept, ms));
 const SETTLE = Number((ARGS.find((a) => a.startsWith('--settle=')) || '').split('=')[1] || 0);
 const SAMPLES = Number((ARGS.find((a) => a.startsWith('--samples=')) || '').split('=')[1] || 12);
 const PAGE = 'datahallAI.html';
@@ -66,6 +72,8 @@ try {
     const tab = await browser.newPage();
     await primeCockpitAuditDocument(tab, 'dark');
     await tab.setViewport({ width: 1680, height: 1000 });
+    /* the simulated telemetry is tick-bucketed; pinning the tick makes every walk reproducible */
+    await tab.evaluateOnNewDocument(() => { window.__rzSimTick = 4242; });
     await tab.goto(`${base}/${PAGE}`, { waitUntil: 'domcontentloaded', timeout: 45000 });
     await new Promise((accept) => setTimeout(accept, 2600));
     await enterAuthorizedAuditState(tab, set.cockpit);
@@ -78,6 +86,56 @@ try {
         (src, sel, o) => (new Function('return ' + src)())(document.querySelector(sel), o),
         WALKER_SOURCE, selector, { registryGlobal: REGISTRY_GLOBAL, sampleLimit: SAMPLES, ...opts },
     );
+
+
+    /* --modals: tier 1 (inspector) for one block per class inside `scope`, tier 2 (panel) when offered */
+    const seenClasses = new Set(), seenModals = new Set();
+    const INSPECTOR_TABS = ['live', 'capacity', 'deps', 'alarms', 'trend', 'maint'];
+    const empty = () => ({ numerals: 0, hooked: 0, mismatch: 0, declared: 0, untraced: 0, valueMatchUnhooked: 0, samples: [], mismatches: [] });
+    const addTo = (acc, r) => { for (const k of ['numerals', 'hooked', 'mismatch', 'declared', 'untraced', 'valueMatchUnhooked']) acc[k] += r[k]; acc.samples.push(...r.samples); acc.mismatches.push(...r.mismatches); return acc; };
+    const unmeasured = (row, label, why) => ({ row, label, numerals: 0, hooked: 0, declared: 0, mismatch: 0, untraced: 1, valueMatchUnhooked: 0, samples: [{ svg: '', id: '', text: `UNMEASURED: ${why}`, num: '', valueMatch: false }], mismatches: [] });
+    const inspectClasses = async (scope, viewLabel) => {
+        if (!MODALS) return;
+        const refs = await tab.evaluate((sel) => { const out = {}; document.querySelectorAll(sel + ' [data-rz-equipment]').forEach((el) => { const ref = el.getAttribute('data-rz-equipment'); const cls = ref.split(':')[0]; if (!out[cls]) out[cls] = ref; }); return out; }, scope);
+        for (const [cls, ref] of Object.entries(refs)) {
+            if (seenClasses.has(cls)) continue;
+            seenClasses.add(cls);
+            const opened = await tab.evaluate((r) => {
+                const el = document.querySelector('[data-rz-equipment="' + r + '"]');
+                if (!el) return 'block vanished';
+                el.scrollIntoView({ block: 'center', inline: 'center' });
+                el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+                const a = document.querySelector('aside.rz-inspector.open');
+                return a ? (a.getAttribute('data-rz-mode') === 'payload' || a.querySelector('.rz-inspector-tab') ? 'ok' : 'inspector open but not in payload mode') : 'inspector did not open';
+            }, ref);
+            if (opened !== 'ok') { rows.push(unmeasured(`inspector:${cls}`, `inspector ${ref}`, opened)); continue; }
+            await sleep(250);
+            const agg = empty();
+            for (const t of INSPECTOR_TABS) {
+                await tab.evaluate((k) => { const b = document.querySelector('.rz-inspector-tab[data-tab="' + k + '"]'); if (b) b.click(); }, t);
+                await sleep(60);
+                addTo(agg, await run('aside.rz-inspector', { includeInspector: true }));
+            }
+            rows.push({ row: `inspector:${cls}`, label: `inspector ${ref} (${viewLabel})`, ...agg });
+            await tab.evaluate(() => { const b = document.querySelector('.rz-inspector-tab[data-tab="live"]'); if (b) b.click(); });
+            const btn = await tab.$('.rz-inspector [data-rz-open-hmi]');
+            if (btn && !seenModals.has(cls)) {
+                seenModals.add(cls);
+                await btn.click();
+                await sleep(1500);                                   /* first 4 s ticker pass is not needed: tick is pinned */
+                const top = await tab.evaluate(() => { const t = window.DHModal && window.DHModal.top ? window.DHModal.top() : null; return t ? '#' + t.id : ''; });
+                if (!top) { rows.push(unmeasured(`modal:${cls}`, `panel via ${ref}`, 'panel did not open')); }
+                else {
+                    const r = await run(top, {});
+                    rows.push({ row: `modal:${cls}`, label: `${top} via ${ref}`, ...r });
+                    await tab.keyboard.press('Escape');
+                    await sleep(200);
+                }
+            }
+            await tab.keyboard.press('Escape');
+            await sleep(100);
+        }
+    };
 
     /* HTML row: walk every tab's panel + the chrome outside the panels, dedup by tab activation. */
     const html = { numerals: 0, hooked: 0, mismatch: 0, declared: 0, untraced: 0, valueMatchUnhooked: 0, samples: [], mismatches: [] };
@@ -112,6 +170,7 @@ try {
                     await tab.waitForFunction(() => { const t = document.querySelector('#floorSvg text'); return !!t && t.getBoundingClientRect().height > 0; }, { timeout: 10000 });
                     const rf = await run(entry.selector, { svgOnly: true });
                     rows.push({ row: `floorSvg:${floor}`, label: `floor plan ${floor}`, ...rf });
+                    await inspectClasses(entry.selector, `floor ${floor}`);
                 } catch (err) {
                     /* a floor that cannot be opened is an UNMEASURED row, reported as such — never a silent CLEAN */
                     rows.push({ row: `floorSvg:${floor}`, label: `floor plan ${floor}`, numerals: 0, hooked: 0, declared: 0, mismatch: 0, untraced: 1, valueMatchUnhooked: 0, samples: [{ svg: 'floorSvg', id: '', text: `UNMEASURED: ${err.message}`, num: '', valueMatch: false }], mismatches: [] });
@@ -122,6 +181,7 @@ try {
         }
         const r = await run(entry.selector, { svgOnly: true });
         rows.push({ row: entry.selector.slice(1), label: entry.label, ...r });
+        await inspectClasses(entry.selector, entry.label);
     }
     if (!ONLY.size || ONLY.has('HTML')) rows.push({ row: 'HTML', label: 'HTML cells, all tabs', ...html });
 } finally {
@@ -131,15 +191,19 @@ try {
 
 /* ---- report ---------------------------------------------------------------------------- */
 const pad = (s, n, right) => (right ? String(s).padStart(n) : String(s).padEnd(n));
+const COL = Math.max(12, ...rows.map((r) => r.row.length + 1));
 console.log(`DCAI COVERAGE — ${PAGE} · registry ${registry.parameters.length} params · hook-aware (a number counts only under a resolving hook or a declared reason)`);
-console.log(`${pad('row', 12)} ${pad('numerals', 9, 1)} ${pad('hooked', 7, 1)} ${pad('declared', 9, 1)} ${pad('mismatch', 9, 1)} ${pad('untraced', 9, 1)}  ${pad('(value-only)', 12, 1)}  status`);
+console.log(`${pad('row', COL)} ${pad('numerals', 9, 1)} ${pad('hooked', 7, 1)} ${pad('declared', 9, 1)} ${pad('mismatch', 9, 1)} ${pad('untraced', 9, 1)}  ${pad('(value-only)', 12, 1)}  status`);
 let failures = 0;
 for (const r of rows) {
     const strictRow = STRICT || STRICT_ROWS.has(r.row);
     const open = r.untraced + r.mismatch;
     const status = open === 0 ? 'CLEAN' : strictRow ? 'FAIL' : 'monitor';
     if (open > 0 && strictRow) failures++;
-    console.log(`${pad(r.row, 12)} ${pad(r.numerals, 9, 1)} ${pad(r.hooked, 7, 1)} ${pad(r.declared, 9, 1)} ${pad(r.mismatch, 9, 1)} ${pad(r.untraced, 9, 1)}  ${pad(r.valueMatchUnhooked, 12, 1)}  ${status}`);
+    console.log(`${pad(r.row, COL)} ${pad(r.numerals, 9, 1)} ${pad(r.hooked, 7, 1)} ${pad(r.declared, 9, 1)} ${pad(r.mismatch, 9, 1)} ${pad(r.untraced, 9, 1)}  ${pad(r.valueMatchUnhooked, 12, 1)}  ${status}`);
+    if (r.untraced > 0 && (strictRow || ARGS.includes('--samples-all'))) {
+        for (const smp of r.samples.slice(0, 10)) console.log(`${pad('', COL)}   untraced ${smp.svg ? smp.svg + ' ' : ''}${smp.id ? '#' + smp.id + ' ' : ''}"${String(smp.text).slice(0, 90)}"${smp.valueMatch ? '  (value matches a registry value — hook it)' : ''}`);
+    }
 }
 const tot = rows.reduce((a, r) => { for (const k of ['numerals', 'hooked', 'declared', 'mismatch', 'untraced']) a[k] += r[k]; return a; }, { numerals: 0, hooked: 0, declared: 0, mismatch: 0, untraced: 0 });
 console.log(`${pad('TOTAL', 12)} ${pad(tot.numerals, 9, 1)} ${pad(tot.hooked, 7, 1)} ${pad(tot.declared, 9, 1)} ${pad(tot.mismatch, 9, 1)} ${pad(tot.untraced, 9, 1)}`);

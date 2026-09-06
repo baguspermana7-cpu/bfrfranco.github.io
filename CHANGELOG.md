@@ -11,6 +11,86 @@ release sections rather than semver.
 
 ---
 
+## v2.2.0 — 2026-09-07
+
+### Two-tier equipment inspection on the AI cockpit (Track A §A5)
+
+Review doc-27 §3.2 asked, verbatim, that a click on equipment open the right-side inspector and that a
+centre modal be reserved for a heavy action; doc-24 #6 and #10 (one inspector across every tab, one
+selected-object workflow) had sat DEFERRED in BMS_SHELL.md since v1.134. Until now `datahallAI.html`
+had one tier only: eleven centre modals over a blurred scrim, reachable from 5 of the 13 diagrams,
+while Network, Fire, BMS, the roof and floors 2–3 had no click handler at all. Now every equipment
+block on every diagram carries `data-rz-equipment="<class>:<id>"` (about 210 blocks across 13
+diagrams and two floor views; 46 classes): a **single click opens the right-side inspector** in a new
+**payload mode** (`js/rz-inspector.js` 1.45.0 — six tabs, status chip, dependency cards that navigate,
+a sparkline, a provenance line naming the engine version, the scenario and the tick); **the deep
+mimic is the explicit second tier** (`Open equipment HMI`, double-click or Shift+Enter, through named
+openers in `window.RZDatahallAIHmiOpeners`). Network, fire, BMS, room and roof classes get tier 1 only
+and say so. The inspector docks at ≥ 1440 px (`<body data-rz-inspector-dock="1">`, the page keeps its
+content clear of it), overlays at 1024–1439, becomes a 55 vh bottom sheet at 768–1023 and a full sheet
+below — the owner's 2026-08-26 ladder. Both tiers read ONE payload: `js/datahall-ai/hmi-payloads.js`
+is DOM-free, every row is either registry-hooked at parity or declared with a reason, and
+`js/datahall-ai/equipment-inspector.js` is the only click resolver (capture phase; clicks on a
+traceability mark keep the §A3 basis mode). `DHModal` gained a panel stack, `onClose` hooks that run
+on every close path, a timer registry (`activeTimers()` must read `{}` when the stack is empty),
+`inert` on the background and a focus return that survives a re-rendered invoker — the mimic ticker
+that kept running after ESC, and the battery-panel timer leak, are closed by construction.
+
+### Rule 2 at full depth: 741 die rolls, zero left
+
+The page rolled `Math.random` 741 times: 351 `R(` + 357 `RI(` + 33 direct, about 600 of them inside
+the 22 HMI renderers — 11 of which re-rolled engine quantities (TCS and FWS temperatures from the
+retired GB200 planes, a chiller COP of 6.5–7.2, a transformer load bar at 72–84 % against an engine
+99.9 %, per-rack kW at 126–138 against 142) and 6 of which coin-flipped a **state** (alarm badges,
+UPS mode, leak zones, the fill pump, the STP blower). Every renderer now starts with
+`var P=RZ_HMI_P(class,id,hall,renderer)` and prints `P.v()` / `P.n()`; states come from the
+electrical scenario, the new `#coolingScenario` select (`normal`, `cdu-pump-fail`, `chiller-trip`,
+`leak-z07`) or the fire engine; alarm badges come from `RZ_ALM(P, point)`. Sensor-class values are
+**seeded**: `js/datahall-ai/sim-telemetry.js` derives them from `(point, 4 s tick)` around an engine
+plane or a declared rating, identical on every reload within a tick (`window.__rzSimTick` pins it for
+the gates), declared on every cell, never hooked — no SIMULATED registry record is minted. The
+generated manifest `js/datahall-ai/hmi-points.js` names the extra points each renderer prints. The
+page-level `R()` / `RI()` helpers are deleted; the 68 declared page-ticker sites go through
+`RZ_SIM(site, lo, hi, digits)`, the same seeded law. Found on the way and fixed: the SLD cooling mimic
+hooked per-bank glyph counts (79) to the facility ids (593 / 1,000); the floor-2 room wrappers had lost
+their hooks to a missing `>`; the SLD results panel rendered table rows into a `<div>`; the rack modal
+title still said GB200; the UPS mimic threw on its own feed variable; and the STP, AHU and dry-cooler
+panels called `.toFixed` on text.
+
+### Gates
+
+`tools/test-datahall-ai-hmi-payloads.mjs` (Node): every class returns a frozen payload with six tabs;
+every hooked row equals the registry value at the printed precision or carries a declared reason of
+40+ characters; no NaN; identical at the same tick, only simulated rows move at the next; `ups_a_bypass`,
+`cdu-pump-fail` and `leak-z07` produce their states; no `Math.random`, `R(` or `RI(` inside any
+`@rz-hmi` marker block (26 blocks) or in the modules; fail-closed without an engine.
+`tools/test-datahall-ai-inspector-runtime.mjs` (Puppeteer, tick pinned): a real click on the first
+block of each of the 15 views opens the inspector in payload mode with six tabs and no scrim; Deps
+navigation and the basis-cell round trip; `Open equipment HMI` on cdu / chiller / sld-tx / rack-psu
+opens the panel with focus inside, background `inert`, Tab trapped, ESC closes with `activeTimers()`
+`{}` and focus returned, the inspector still open beneath; the `sldMimic` → `batHmi` stack closes in
+order; three reloads give identical inspector text; the ladder at 1440 / 1200 / 900 / 390; and with
+`--strict-rule2` a `Math.random` counter that must read 0 while each modal is open (it does: 4 / 4).
+`tools/test-dcai-coverage.mjs --modals` opens the inspector for one block per class and every panel it
+offers and walks them as rows: **4,757 numerals · 2,520 hooked · 2,237 declared · 0 mismatch · 0
+untraced** across 13 diagrams, 2 floor views, HTML, 41 inspector rows and 29 modal rows — STRICT in
+the ship gate from this commit. The walker gained `includeInspector` (header names and dependency
+titles are labels). `bldgSvg` (floors are navigation) and `elecOvSvg` (an aggregate) are reported as
+MONITOR rows in the runtime gate, never as clean. Registry regenerated (223 parameters, R7/R8 STRICT;
+`design.electrical.dry_cooler_fans_kwe` now adapted as `pbF_dryCoolerFans` for the dry-cooler kW/ton
+identity).
+
+### Docs
+
+INSPECTOR.md "Payload mode" + adoption row; BMS_SHELL.md doc-24 #6 / #10 → SHIPPED; DATAHALL_AI_STANDARD
+"Two-tier equipment inspection"; ACCURACY_VALIDATION Rule 2 "at full depth" (seeded simulated points
++ the trap gate); `prd/datahallai.html` FR-29 widened to every equipment block. `rz-inspector.js` is
+served under one token (`?v=2.2.0`) on all nine pages that load it. Not done: INSPECTOR.md still cites
+conv review doc-17 §3.2 as a second source — that section is about EPMS symbols and status, not the
+inspector; the citation is left in place and flagged here rather than silently rewritten.
+
+---
+
 ## v2.1.0 — 2026-09-06
 
 ### Traceability symbols on every drawing of the AI cockpit (Track A §A3)

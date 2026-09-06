@@ -1,4 +1,4 @@
-# Inspector standard — v1.43.0+
+# Inspector standard — v1.43.0+ (payload mode v1.45.0)
 
 Companion to [`LINE_MODEL.md`](LINE_MODEL.md) + [`BREAKER_SYMBOLS.md`](BREAKER_SYMBOLS.md). Responds to team review docs:
 
@@ -38,6 +38,9 @@ Companion to [`LINE_MODEL.md`](LINE_MODEL.md) + [`BREAKER_SYMBOLS.md`](BREAKER_S
 window.RZInspector.open(element);       /* manually open inspector for an element */
 window.RZInspector.openBasis(target);   /* v1.44.0 — basis mode: target is a [data-basis-param] element (or an ancestor of one) or a registry id string */
 window.RZInspector.basisIdOf(element);  /* the registry id an element resolves to, or null */
+window.RZInspector.openPayload(payload, {trigger, onOpenHmi, onNavigate, tab, keepFocus}); /* v1.45.0 — payload mode (a DOM-free equipment payload, see below) */
+window.RZInspector.refreshPayload(payload); /* re-render the open payload in place (tickers); keeps tab, scroll and the action button */
+window.RZInspector.currentPayloadId();      /* "<classId>:<id>" of the open payload, or null */
 window.RZInspector.close();             /* close */
 window.RZInspector.isOpen();            /* boolean */
 ```
@@ -54,6 +57,37 @@ navigate within the panel. Outside-click treats `[data-basis-param]` elements as
 mark re-renders instead of closing. A pan on the zoom wrapper sets `window.__rzSvgPanMoved` and is
 never treated as a click.
 
+## Payload mode (v1.45.0, Track A §A5)
+
+A page that owns equipment classes builds a **payload** with no DOM in it and hands it to
+`openPayload()`. The renderer is page-agnostic; nothing DC-AI-specific lives in `js/rz-inspector.js`.
+
+```
+payload = { classId, id, hall, title, label, kind, statusChip:{label,state},
+            tabs:{ live:[Point], capacity:[Point], deps:{upstream,downstream,edges}, alarms:[…], trend:{series}, maint:[Point] },
+            actions:{ openHmi:{opener,args}|null, related:[…] }, provenance:{engineVersion,scenarioId,coolingScenarioId,tick,counts} }
+Point   = { point, label, value, text, unit, quality: published|derived|simulated|state|label|authored,
+            basis:'<registry id>'  XOR  declared:'<reason ≥ 40 chars>' }
+```
+
+Every value cell carries exactly ONE of `data-basis-param` (a hooked cell — click opens basis mode in
+the same panel with a "← back" link) or `data-rz-authored-basis` (a declared cell with a violet
+SIMULATED dot). Never both, never neither: the coverage walker counts a cell with neither as
+untraced. The header offers `Open equipment HMI` only when `actions.openHmi` is set — that is the
+explicit second tier; the panel itself never opens a modal on its own. ESC closes the inspector only
+while no `DHModal` panel is open; outside-click treats `[data-rz-equipment]` and
+`[data-rz-inspector-keep]` as inside. `close()` returns focus to the trigger.
+
+**Responsive ladder (owner ledger 2026-08-26).** ≥ 1440 px: docked — the page opts in with
+`<body data-rz-inspector-dock="1">` and the content gets `padding-right`, so the inspector never covers
+the topology; 1024–1439: overlay drawer; 768–1023: bottom sheet 55 vh; < 768: full sheet with a 44 px
+close target. Pages that do not opt in keep the overlay everywhere (the Conventional adopters are
+untouched).
+
+The DC-AI page's producer is `js/datahall-ai/hmi-payloads.js` (classes, points, cooling scenarios) with
+`js/datahall-ai/equipment-inspector.js` as the click resolver and `js/datahall-ai/sim-telemetry.js`
+as the seeded simulator; DATAHALL_AI_STANDARD.md "Two-tier equipment inspection" is the page-side rule.
+
 ## Authoring guidelines
 
 1. **Just add the script tag.** `<script src="js/rz-inspector.js?v=1.43.0" defer></script>` after `js/rz-line-model.js` + `js/rz-breaker-symbols.js`. The inspector auto-initialises on `DOMContentLoaded`.
@@ -69,6 +103,7 @@ never treated as a click.
 | v1.43.0 | `datahallAI.html` | Loaded. Verified via probe — clicks open inspector. |
 | **v1.43.1** | `chiller-plant.html`, `water-system.html`, `fire-system.html` | **Loaded.** Each verified via probe (27/27 pass — 4 inspector assertions). |
 | v1.43.2 (planned) | `datahall.html`, `ict.html` | Pending — datahall standalone + ict on standard track. EPMS still deferred per owner mandate. |
+| **v2.2.0** | `datahallAI.html` | **Payload mode live on every diagram.** ~210 equipment blocks across 13 diagrams + 2 floor views open here on a single click (six tabs, engine-hooked or declared cells); 11 deep mimics are the second tier. Gated by `tools/test-datahall-ai-inspector-runtime.mjs` (click → inspector, no scrim; Open HMI → focus trap, ESC, timers {}, focus return; 3 reloads identical at a pinned tick; ladder at 1440/1200/900/390) and `tools/test-dcai-coverage.mjs --modals`. |
 | **v2.1.0** | `datahallAI.html` | **Basis mode live.** 2,281 hooked numerals across 13 diagrams open the record here; `tools/test-dcai-basis-hooks.mjs` clicks one mark per diagram and asserts the panel, not the modal, opens with the registry value. |
 
 ## Visual

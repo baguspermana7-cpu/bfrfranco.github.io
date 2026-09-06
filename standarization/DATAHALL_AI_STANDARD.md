@@ -499,6 +499,51 @@ labels the walker scrubs; anything else with a digit is counted.
 untraced across 13 diagrams + HTML. After the sweep: 2,926 numerals, 2,281 hooked, 644 declared,
 0 mismatch, 0 untraced → the gate went `--strict` in the same commit.
 
+## Two-tier equipment inspection (Track A §A5, v2.2.0)
+
+Review doc-27 §3.2 asked that a click on equipment open the right-side inspector, never a centre
+modal, and that the modal be reserved for a heavy action. That is now the rule for every diagram:
+
+1. **Every clickable block carries `data-rz-equipment="<classId>:<id>"`** plus `tabindex="0"
+   role="button"` and a `<title>`. The class inventory lives in `js/datahall-ai/hmi-payloads.js`
+   (`classList()`); the hall comes from `data-rz-hall` / `data-dh` on an ancestor or the active
+   `.dh-btn`. Legacy `*-click` / `data-rack` / `data-sld-click` hooks stay for tier 2 only.
+2. **Single click = tier 1.** `js/datahall-ai/equipment-inspector.js` is a capture-phase `document`
+   listener: it builds the payload and calls `RZInspector.openPayload()`. Clicks whose target sits
+   inside `[data-basis-param]` keep the §A3 behaviour (basis mode). Right-click opens the Deps tab.
+3. **Tier 2 is explicit.** `Open equipment HMI`, double-click, or Shift+Enter calls a named opener
+   in `window.RZDatahallAIHmiOpeners` (`cdu, chiller, dryCooler, eq, stp, ahu, crah, corr, rack,
+   mimic, bat`). Network, fire, BMS, room and roof classes have no tier 2 (§A6/§A7 own their
+   workstations) and the inspector says so by offering no action.
+4. **One payload, both tiers.** Every deep mimic starts with `var P=RZ_HMI_P(classId,id,hall,renderer)`
+   and prints `P.v(point)` / `P.n(point)`; `P.state(point)` drives every state flip; `RZ_ALM(P,point)`
+   decides an alarm badge. The renderer's extra points (the ones a die roll used to produce) are
+   declared in the generated manifest `js/datahall-ai/hmi-points.js`, each anchored to an engine field,
+   a plane, or a declared rating with a band. The renderer bodies are bounded by
+   `/* @rz-hmi:begin X */ … /* @rz-hmi:end X */` markers so the static Rule 2 scan can see them.
+5. **Simulated means seeded.** `js/datahall-ai/sim-telemetry.js` derives every sensor-class value
+   from `(point id, 4 s tick)` — identical on every reload inside a tick, moving slowly between
+   ticks, overridable with `window.__rzSimTick` so a gate can pin it. No SIMULATED registry record is
+   minted: a simulated cell is declared (`data-rz-authored-basis="simulated: … (Track A §A5)"`),
+   never hooked. The page-level `R()` / `RI()` helpers are deleted; `RZ_SIM(site,lo,hi,digits)` is
+   the only jitter source left outside the renderers and it is a seeded reading too.
+6. **States come from scenarios.** Electrical states read `RZDatahallAIElectrical.evaluateScenario`
+   (`#electricalScenario`); cooling states read the `COOLING_SCENARIOS` table through the new
+   `#coolingScenario` select (`normal`, `cdu-pump-fail`, `chiller-trip`, `leak-z07`); fire states
+   read the FACP cause-and-effect engine. A coin flip is never a state.
+7. **Modal lifecycle.** `DHModal` keeps a panel stack; `DHModal.onClose(panel, fn)` runs on every
+   close path (ESC, scrim, close button, programmatic); `DHModal.timer(panel, fn, ms)` is the only
+   way a panel may tick, so `DHModal.activeTimers()` must read `{}` once the stack is empty; the
+   background is `inert` while a panel is open; focus is trapped on the top panel and returned to
+   the invoker (falling back to the inspector's action if the invoker was re-rendered).
+
+Gates: `tools/test-datahall-ai-hmi-payloads.mjs` (Node: every class, parity or declared, determinism,
+scenario states, static Rule 2 scan of the marker blocks and the modules, fail-closed),
+`tools/test-datahall-ai-inspector-runtime.mjs` (Puppeteer, `--strict-rule2` arms a `Math.random`
+counter per open modal), `tools/test-dcai-coverage.mjs --strict --settle=9000 --modals` (inspector
+and modal rows walk like diagrams). Views without equipment blocks are reported as MONITOR rows,
+never as clean: today `bldgSvg` (floors are navigation, not equipment) and `elecOvSvg` (an aggregate).
+
 ## Zoom & Pan System
 
 SVG containers use CSS classes:

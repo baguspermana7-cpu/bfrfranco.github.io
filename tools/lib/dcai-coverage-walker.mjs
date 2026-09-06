@@ -84,7 +84,11 @@ export const WALKER_SOURCE = String.raw`
     if (!el) { continue; }
     var tag = el.tagName.toLowerCase();
     if (tag === 'script' || tag === 'style' || tag === 'title' || tag === 'noscript') { continue; }
-    if (el.closest('.isa-bubble-txt, .rz-basis-legend, .rz-inspector, .rz-basis-drawer, [data-rz-coverage-ignore]')) { continue; }
+    if (el.closest('.isa-bubble-txt, .rz-basis-legend, .rz-basis-drawer, [data-rz-coverage-ignore]')) { continue; }
+    /* the inspector is excluded from page rows (its basis record repeats the registry) and walked on its own with includeInspector */
+    if (!opts.includeInspector && el.closest('.rz-inspector')) { continue; }
+    /* header slots and dependency-card titles are names ('48 VDC bus bar', 'PLN 150 kV grid'), not quantities */
+    if (opts.includeInspector && el.closest('.rz-inspector-prov, .rz-inspector-tabs, .rz-inspector-back, .rz-inspector-kind, .rz-inspector-id, [data-rz-depid] .rz-inspector-dep-v, [data-rz-depid] .rz-inspector-dep-k')) { continue; }
     if (opts.svgOnly && !el.closest('svg')) { continue; }
     if (opts.htmlOnly && el.closest('svg')) { continue; }
     if (!visible(el)) { continue; }

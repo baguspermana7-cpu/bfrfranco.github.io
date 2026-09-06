@@ -44,8 +44,10 @@ gate "datahall engine — 57/57 doc-21 examples" node tools/test-datahall-calc.m
 gate "DC AI GB300 engine — identities, balance, cliff, perturbation" node tools/test-dcai-engine.mjs
 gate "DC AI GB300 parameter registry — schema, staleness, provenance, wiring" node tools/test-dcai-parameter-registry.mjs
 gate "DC AI basis map — DH_BASIS ids resolve, every bo() field mapped, adapter at parity" node tools/test-dcai-basis-map.mjs
-gate "DC AI traceability coverage — every drawn number hooked or declared (hook-aware, settled)" node tools/test-dcai-coverage.mjs --strict --settle=9000
+gate "DC AI traceability coverage — every drawn, inspector and modal number hooked or declared (hook-aware, settled)" node tools/test-dcai-coverage.mjs --strict --settle=9000 --modals
 gate "DC AI basis hooks — marks well-formed, a real click per diagram opens the inspector" node tools/test-dcai-basis-hooks.mjs
+gate "DC AI HMI payloads — every class hooked-at-parity or declared, deterministic, scenario states, Rule 2 static scan" node --test tools/test-datahall-ai-hmi-payloads.mjs
+gate "DC AI equipment inspector — click=inspector, Open HMI=modal lifecycle, pinned-tick determinism, ladder, Rule 2 counter" node tools/test-datahall-ai-inspector-runtime.mjs --strict-rule2
 gate "conv engine — 26/26 DoD identities"      node tools/test-conv-calc.mjs
 gate "CDU engine — worked examples"            node tools/test-cdu-calc.mjs
 gate "Fire engine — worked examples"           node tools/test-fire-calc.mjs

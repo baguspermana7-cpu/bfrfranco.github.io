@@ -39,6 +39,18 @@ Random IS allowed for:
 callouts + per-hall metrics + facility totals MUST be identical every
 time. Only outdoor weather values change.
 
+**v2.2.0 (Track A §A5) — the rule at full depth.** `datahallAI.html` no longer defines `R()` /
+`RI()`, and the 22 deep-mimic renderers read every value from their equipment payload
+(`RZ_HMI_P`). The "random IS allowed" list above now means *seeded*: a sensor-class value comes from
+`js/datahall-ai/sim-telemetry.js` as a function of `(point id, 4 s tick)`, anchored to an engine
+plane or a declared rating with a stated band, and is declared on the cell as simulated. Reloading
+inside one tick gives identical values everywhere — including inside every open modal — which is
+what `tools/test-datahall-ai-inspector-runtime.mjs` asserts with `window.__rzSimTick` pinned; the
+same gate counts `Math.random` calls while each modal is open and requires zero. A state (alarm
+badge, pump running, bypass, dry/wet) is never a die roll: it comes from the electrical, cooling or
+fire scenario engine. The static half of the rule: `tools/test-datahall-ai-hmi-payloads.mjs` fails
+on any `Math.random`, `R(` or `RI(` inside a `@rz-hmi` marker block or in the payload modules.
+
 ### Rule 3 — Every metric carries a denominator
 
 PUE, WUE, CUE, CUE_IT, kVA loading, autonomy, flow rate — every
