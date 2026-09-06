@@ -41,6 +41,8 @@ gate "audit-mobile-responsive --strict" python3 tools/audit-mobile-responsive.py
 
 # 5-6: engine acceptance suites
 gate "datahall engine — 57/57 doc-21 examples" node tools/test-datahall-calc.mjs
+gate "DC AI GB300 engine — identities, balance, cliff, perturbation" node tools/test-dcai-engine.mjs
+gate "DC AI GB300 parameter registry — schema, staleness, provenance, wiring" node tools/test-dcai-parameter-registry.mjs
 gate "conv engine — 26/26 DoD identities"      node tools/test-conv-calc.mjs
 gate "CDU engine — worked examples"            node tools/test-cdu-calc.mjs
 gate "Fire engine — worked examples"           node tools/test-fire-calc.mjs

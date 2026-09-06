@@ -12,6 +12,58 @@ Last updated: 2026-08-30 (truthful first paint and responsive operator priority)
 
 ---
 
+## v1.136.0 GB300 basis engine — built ALONGSIDE, page not yet switched
+
+**Owner decisions (2026-09-05):** IT 300–500 MW, four halls, NVL72-class racks at 100–140 kW or
+newer; "500 MW" is RACK IT, not the total envelope; cooling basis "yang terbaik" = warm TCS,
+dry-only heat rejection, so the `WUE 0.00` the cockpit already shows becomes true; nothing may be
+tuned to reach a PUE ("jangan dibuat-buat").
+
+**Files.** `js/dcai-model.js` (authored leaves only, every one with a `// source:` line and an
+evidence class) + `js/dcai-engine.js` (pure; `window.DCAI_CALC.snapshot`, `meta.version 1.0.0`).
+The GB200 pair `js/datahall-model.js` + `js/datahall-calculations.js` is **RETIRED, FROZEN and
+STILL TESTED** — the ship gate refuses any byte change to them and `test-datahall-calc.mjs` keeps
+proving 57/57. `datahallAI.html` still loads the GB200 pair; Track A §A2b switches it. Until then
+the AI page's on-screen numbers are the OLD basis, deliberately.
+
+**Basis.** `facility.racksPerHall 880` × 4 halls × `facility.rackItKw 142` → `power.rack_it_facility_mw`
+499.84 (`power.it_envelope` = `rack-only`; `power.nameplate_it_mw_label` 500 is a LABEL, never a
+denominator — Rule 4). `power.total_it_mw` 539.05 adds fabric (`fabric.switchKw` 4 kW × 2/rack,
+ASSUMED — the softest electrical input), OOB and a 2 % storage/management allowance.
+
+**Why 142 kW is ADOPTED, not official.** The public GB300 NVL72 page prints no rack power. The
+DGX SuperPOD GB300 RA publishes two bounds: 8 power shelves × 33 kW = 264 kW installed, and a
+1.2 MW Scalable Unit of 8 racks = 150 kW/rack all-in. 142 kW sits inside both. With 33 kW shelves
+`power.shelves_duty` is 5 and `power.shelf_redundancy_label` is **N+3**; `4+4` symmetric redundancy
+is arithmetically unachievable (4 × 33 = 132 < 142) and `power.shelf_symmetric_redundancy_achievable`
+says so rather than the page asserting it.
+
+**Thermal chain (planes P00–P20, `design.planes.*`).** The economiser inequality is published on
+BOTH sides: `p03_htw_required_c` = TCS supply − CDU approach (keyed to the SUPPLY plane, not the
+return — using the return over-reports free cooling by ~10 K), `p02_dry_cooler_leaving_c` = ambient
++ dry-cooler approach, and `p04_free_cooling_margin_k` is their difference. At the adopted Jakarta
+design day (34 °C DB) the margin is **exactly 0.0 K** — the design point sits ON the cliff
+(`pue.free_cooling_cliff_ambient_c` 34). The 36 °C bin loses free cooling, the liquid path lands on
+the chiller, and `equipment.chillers_running_worst_bin` is 142 against 36 at design. That is stated,
+not averaged away.
+
+**PUE, honestly.** `pue.design_day` **1.165**, `pue.annual_bin_weighted` 1.158, `pue.worst_bin`
+1.250, `pue.gap_to_target` +0.045 against the 1.12 target. The largest non-IT term at design is the
+AIR-path chiller (`pue.largest_non_it_term`), because everything outside the rack — fabric, OOB,
+storage, UPS and distribution losses, aux — is air-cooled and routed through a chiller at a 46 °C
+dry-cooled condenser. `meta.annual_evidence_class` is ASSUMED: `weather.bins` are shaped, not a TMY.
+
+**Registry.** `data/dcai-parameters.json` (176 parameters: 131 derived, 0 slack, 45 authored) from
+`tools/build-dcai-parameter-registry.mjs`, which perturbs every model leaf in BOTH directions
+(×1.37 and ×0.73) at TWO operating points (design and half a kelvin past the cliff) and reads
+provenance from the model file's own comments rather than a second hand-maintained copy. A third
+kind `slack` exists for parameters no leaf moves at design but one moves past the cliff; it measured
+zero here because the design point is on the cliff, so bidirectional probing reaches the regime
+everywhere. Gates: `tools/test-dcai-engine.mjs` (181 assertions — identities, energy balance at
+every bin, positive approach at every bin, the cliff step, perturbation response) and
+`tools/test-dcai-parameter-registry.mjs` (schema, staleness, provenance, wiring, scope, semantics;
+R7 "every parameter asserted" STRICT from day one; R8 "rendered" REPORTED until §A2b).
+
 ## v1.134.15 First-paint and mobile-foreground contract
 
 - PUE, WUE, CUE, IT load, GPU count and NVL72-domain count render their exact governed value on

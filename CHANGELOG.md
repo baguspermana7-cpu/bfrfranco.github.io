@@ -11,6 +11,96 @@ release sections rather than semver.
 
 ---
 
+## v1.136.0 — 2026-09-06
+
+### Added — a GB300 / 500 MW basis engine for the AI campus, built alongside the retired GB200 one
+
+The owner asked (2026-09-05) for the AI/HPC facility at **300–500 MW IT, four halls, NVL72-class
+racks at 100–140 kW or newer**, and ruled that **500 MW means rack IT**, that the cooling basis
+should be "the best", and that nothing may be invented to reach a PUE. That is a different basis,
+not a parameter change, so it ships as a new engine pair — `js/dcai-model.js` (authored leaves,
+every one with a `// source:` line and an evidence class) and `js/dcai-engine.js` (pure functions,
+one frozen snapshot) — while `js/datahall-model.js` + `js/datahall-calculations.js` stay
+byte-frozen under the ship gate and keep proving 57/57 against their own worked examples. They are
+**retired**, the way `conv-engine.js` retired the 1.85 MW hall. `datahallAI.html` still loads them;
+switching the page is the next ship (Track A §A2b) because it touches ~150 literal sites and ten
+gate fixtures.
+
+**Basis:** 880 racks/hall × 4 × 142 kW = **499.84 MW rack IT**; fabric (7,040 switches at an
+ASSUMED 4 kW), OOB and a 2 % storage/management allowance take the **total IT to 539.05 MW**.
+Inventory follows the DGX SuperPOD GB300 reference architecture: 18 compute trays × (4 Blackwell
+Ultra + 2 Grace), 9 NVLink switch trays × 2, 4 ConnectX-8 @ 800 Gb/s and 1 BlueField-3 per tray —
+**253,440 GPUs, 253,440 NICs at ~203 Pb/s, 63,360 DPUs**. One GB300 rack **is** the NVL72 domain;
+the GB200 page split a domain over two.
+
+**Why 142 kW is ADOPTED, not "official".** The public GB300 NVL72 page prints no rack power. The
+RA gives two bounds — 8 × 33 kW power shelves = 264 kW installed, and a 1.2 MW / 8-rack Scalable
+Unit = 150 kW/rack all-in — and 142 sits inside both. Consequence the arithmetic states on its own:
+duty is 5 shelves, redundancy is **N+3**, and 4+4 symmetric redundancy is **unachievable**
+(4 × 33 = 132 < 142). The engine publishes that as a boolean rather than the page asserting it.
+
+### The thermal chain now has an outdoors
+
+The GB200 engine charged a nameplate COP against 100 % of the heat with no economiser term, so its
+PUE could not respond to weather and landed at 1.30 regardless. This engine free-cools the liquid
+path whenever `ambient + dry-cooler approach ≤ TCS supply − CDU approach`, publishes **both sides
+of that inequality and their margin**, and states the **cliff** — the ambient at which the liquid
+path lands on a chiller.
+
+Honest result on the adopted basis (TCS 40/50 °C, CoolIT CHx1000's published 3 K approach, a 3 K
+dry-cooler approach, Jakarta 34 °C design dry-bulb): the margin at the design day is **exactly
+0.0 K**. The design point sits on the cliff. The 36 °C bin loses free cooling and needs **142
+chillers against 36** at design. **Design-day PUE 1.165, annual 1.158, worst bin 1.250, gap to
+the 1.12 target +0.045** — inside the 1.12–1.25 band, and not 1.12. The largest non-IT term is the
+**air-path chiller**, not UPS as the plan estimated: everything outside the rack (fabric, OOB,
+storage, UPS and distribution losses, aux) is air-cooled through a chiller on a 46 °C dry-cooled
+condenser. The one lever the engine names: a warmer TCS moves the cliff one kelvin per kelvin
+(asserted by perturbation), and NVIDIA publishes no inlet envelope to say how far that may go.
+
+Nothing is a typed kW: pumps are ρgQH/η over flows the heat sets, fans are Q·Δp/η over airflows the
+heat sets, the chiller COP is a Carnot fraction over the actual lift with a ceiling, and every count
+is ceil(duty/unit) plus a declared redundancy rule. WUE is **zero by construction** — no
+evaporative term exists — so the dashboard's `WUE 0.00` and free cooling are for the first time
+the same statement.
+
+### A design finding the first run produced
+
+The first snapshot sized UPS frames at **99.8 % loading**, which no Basis-of-Design accepts. The
+missing input was a design-loading ceiling; it is now an ASSUMED 80 % leaf, and the frame count
+follows it. A model that reports its own bad answer is the point of building one.
+
+### Added — the parameter registry, second generation
+
+`data/dcai-parameters.json` — **176 parameters (131 derived, 0 slack, 45 authored)** — from
+`tools/build-dcai-parameter-registry.mjs`. Four changes over the Conventional generator, because
+this engine is not affine: every leaf is perturbed in **both directions** (×1.37 and ×0.73), at
+**two operating points** (design and half a kelvin past the cliff); a third kind **`slack`** exists
+for a parameter no leaf moves at design but one moves past the cliff (it measured zero here — the
+design point is on the cliff, so bidirectional probing reaches the regime everywhere; the kind and
+its gate stay); and **provenance is read from the model file's own comments** — a second
+hand-maintained copy of the same source lines is where the six fictional CDUs found room to live.
+
+Gates: `tools/test-dcai-engine.mjs` — **181 assertions**, none a memorised output: identities,
+energy balance at every weather bin, a positive dry-cooler approach at every bin, the cliff as a
+step, and the snapshot following its inputs under perturbation. `tools/test-dcai-parameter-registry.mjs`
+— schema, staleness, provenance (an authored number with no `// source:` comment fails), measured
+wiring, scope, semantics; **R7 "every parameter asserted by a gate" is STRICT from day one at
+176/176** — the Conventional registry carried 77 untested for four releases because its gate
+reported instead of failing. R8 "rendered by a cockpit" is REPORTED with the flip condition written:
+it goes strict in the commit that switches `datahallAI.html`.
+
+### Boundaries stated
+
+A simulated teaching model. The climate bins are shaped, not a TMY — annual figures carry
+`ASSUMED` and say so. Switch power (4 kW) is the softest electrical input and alone decides ~28 MW
+of the total. Dry-cooler fan static (150 Pa) is the softest cooling input and moves PUE by ~0.03
+across its credible range. Every equipment nameplate is ASSUMED pending Basis-of-Design.
+
+Standards: `DATAHALL_AI_STANDARD.md` §v1.136.0 (basis, planes, registry, the flip condition);
+`ACCURACY_VALIDATION.md` (Rule 5 status note and the retirement record). Ship gate: 56 gates.
+
+---
+
 ## v1.135.2 — 2026-09-06
 
 ### Seven more §A rules, and what running them actually taught

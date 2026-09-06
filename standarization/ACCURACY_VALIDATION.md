@@ -96,6 +96,17 @@ For DC Conv, separate:
 - `Secondary loop SP` (follows the primary CHWS floor: 19.4 °C at the
   current governed point and may be raised for bypass; NEVER labelled "CHWS SP")
 
+### Rule 5 — status note (v1.136.0)
+
+Rule 5's GB200 vocabulary (`NVL72 domain` / `physical rack position`, 132 / 66 kW) is still what
+`datahallAI.html` renders, because the page still loads the GB200 pair. A GB300 basis engine now
+exists alongside it (`js/dcai-model.js` + `js/dcai-engine.js`; see DATAHALL_AI_STANDARD §v1.136.0),
+in which **one rack IS the NVL72 domain** (`compute.racks_per_nvl72_domain` = 1, PUBLISHED from the
+reference architecture). When Track A §A2b switches the page, Rule 5 must be rewritten: at GB300 the
+142 kW rack is the domain, so "never call a 66 kW position an NVL72 rack" would fail the probe on
+correct text. The GB200 pair is RETIRED the way `conv-engine.js` retired the 1.85 MW hall — frozen
+byte-identical by the ship gate, still reproducing its own 57 worked examples, no longer the basis.
+
 ### Rule 6 — Basis chip on every critical KPI (v1.32.2+)
 
 Each critical KPI carries one of these chips:
