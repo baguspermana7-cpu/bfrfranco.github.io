@@ -142,13 +142,17 @@
       "id": "design.electrical.chiller_air_kwe",
       "label": "chiller air kW",
       "unit": "kW",
-      "scope": "site"
+      "scope": "site",
+      "display": "internal",
+      "displayReason": "Component of design.electrical.chillers_kwe, which the page renders as the per-hall chiller input (DHE.pb_chiller); the air/liquid split is shown on the cooling cliff panel only past the cliff."
     },
     {
       "id": "design.electrical.chiller_liquid_kwe",
       "label": "chiller liquid kW",
       "unit": "kW",
-      "scope": "site"
+      "scope": "site",
+      "display": "internal",
+      "displayReason": "Zero while free cooling holds at the design point; the page shows the liquid-path chiller input on the cooling cliff panel through operatingPoint() when the regime flips."
     },
     {
       "id": "design.electrical.chillers_kwe",
@@ -226,7 +230,9 @@
       "id": "design.electrical.total_it_kwe",
       "label": "total it kW",
       "unit": "kW",
-      "scope": "site"
+      "scope": "site",
+      "display": "internal",
+      "displayReason": "Republishes power.total_it_kwe inside the operating point; the page renders that value (dkIt, DHE.itFacilityKw). The leaf name is shared across two branches so the source token cannot be attributed by grep."
     },
     {
       "id": "design.electrical.ups_loss_kwe",
@@ -274,7 +280,9 @@
       "id": "design.heat.air_kwth",
       "label": "air kW th",
       "unit": "kW (thermal)",
-      "scope": "plant"
+      "scope": "plant",
+      "display": "internal",
+      "displayReason": "Facility-level twin of heat.air_hall_kwth, which the telemetry spine renders per hall; the leaf name is shared with heat.air_kwth."
     },
     {
       "id": "design.heat.condenser_kwth",
@@ -292,7 +300,9 @@
       "id": "design.heat.liquid_kwth",
       "label": "liquid kW th",
       "unit": "kW (thermal)",
-      "scope": "plant"
+      "scope": "plant",
+      "display": "internal",
+      "displayReason": "Facility-level twin of heat.liquid_hall_kwth, which the telemetry spine renders per hall; the leaf name is shared with heat.liquid_kwth."
     },
     {
       "id": "design.liquid_free_cooling",
@@ -358,7 +368,9 @@
       "id": "design.planes.p10_rack_inlet_c",
       "label": "rack inlet °C",
       "unit": "°C",
-      "scope": "plant"
+      "scope": "plant",
+      "display": "internal",
+      "displayReason": "Identical to p09_air_supply_c under the adopted 0 K supply-path mixing (contained cold aisle); rendering both would show one number twice."
     },
     {
       "id": "design.planes.p11_air_return_c",
@@ -412,13 +424,17 @@
       "id": "design.planes.p19_cop_liquid_path",
       "label": "cop liquid path",
       "unit": null,
-      "scope": "plant"
+      "scope": "plant",
+      "display": "internal",
+      "displayReason": "Null while free cooling holds at the design point; the cooling cliff panel shows the liquid-path COP through operatingPoint() past the cliff."
     },
     {
       "id": "design.planes.p20_liquid_evap_refrig_c",
       "label": "liquid evap refrig °C",
       "unit": "°C",
-      "scope": "plant"
+      "scope": "plant",
+      "display": "internal",
+      "displayReason": "Null while free cooling holds at the design point; shown on the cooling cliff panel through operatingPoint() past the cliff."
     },
     {
       "id": "design.pue",
@@ -439,12 +455,16 @@
     {
       "id": "distribution.busway_trunk_fits_group",
       "label": "busway trunk fits group",
-      "unit": null
+      "unit": null,
+      "display": "internal",
+      "displayReason": "A consistency flag the engine gate asserts (tools/test-dcai-engine.mjs); the page renders the loading percentage it summarises (DHE.buswayLoadPct)."
     },
     {
       "id": "distribution.gensets_facility_shared",
       "label": "gensets facility shared",
-      "unit": null
+      "unit": null,
+      "display": "internal",
+      "displayReason": "A declared topology fact rendered as the word \"facility\" beside every genset count on the page rather than as a value cell."
     },
     {
       "id": "distribution.group_current_a",
@@ -460,7 +480,9 @@
       "id": "distribution.hall_group_kw_check",
       "label": "hall group kw check",
       "unit": null,
-      "scope": "hall"
+      "scope": "hall",
+      "display": "internal",
+      "displayReason": "A closure flag the engine gate asserts (groups x group kW = hall rack IT); the page renders the group kW and the hall rack IT it reconciles."
     },
     {
       "id": "distribution.power_factor",
@@ -475,18 +497,24 @@
     {
       "id": "distribution.rack_feed_current_per_cord_a",
       "label": "rack feed current per cord a",
-      "unit": null
+      "unit": null,
+      "display": "internal",
+      "displayReason": "Half of distribution.rack_feed_current_a, which the rack architecture view renders; kept for the per-cord breaker sizing in the Tech Spec."
     },
     {
       "id": "distribution.rack_feed_dual_corded",
       "label": "rack feed dual corded",
       "unit": null,
-      "scope": "rack"
+      "scope": "rack",
+      "display": "internal",
+      "displayReason": "A declared topology fact rendered as the words \"dual-corded\" beside the rack feed current rather than as a value cell."
     },
     {
       "id": "distribution.rpp_groups_per_hall",
       "label": "rpp groups per hall",
-      "unit": null
+      "unit": null,
+      "display": "internal",
+      "displayReason": "Republishes geometry.rack_groups_per_hall (rendered on the SLD and hall mimic) under the distribution branch for the LV consumers."
     },
     {
       "id": "distribution.rpp_per_hall",
@@ -524,7 +552,9 @@
       "id": "equipment.cdu_flow_check_m3h",
       "label": "cdu flow check m3h",
       "unit": "m³/h",
-      "scope": "plant"
+      "scope": "plant",
+      "display": "internal",
+      "displayReason": "Cross-check of the engine TCS flow against the vendor-published 1.5 LPM/kW rule, asserted within 3 % by tools/test-dcai-engine.mjs; an audit figure, not an operating value."
     },
     {
       "id": "equipment.cdu_installed_facility",
@@ -548,7 +578,9 @@
       "id": "equipment.cdu_published_flow_m3h",
       "label": "cdu published flow m3h",
       "unit": "m³/h",
-      "scope": "plant"
+      "scope": "plant",
+      "display": "internal",
+      "displayReason": "The vendor flow rule applied to the hall liquid heat, used only as the comparator for equipment.cdu_flow_check_m3h in the engine gate."
     },
     {
       "id": "equipment.cdu_unit_kwth",
@@ -704,7 +736,9 @@
       "id": "geometry.groups_per_row",
       "label": "groups per row",
       "unit": null,
-      "scope": "hall"
+      "scope": "hall",
+      "display": "internal",
+      "displayReason": "Auxiliary layout ratio (racks per row / racks per group = 4); the page renders rows, racks per row and RPP groups, from which it follows."
     },
     {
       "id": "geometry.hall_area_m2",
@@ -740,7 +774,9 @@
       "id": "geometry.integer_layout",
       "label": "integer layout",
       "unit": null,
-      "scope": "hall"
+      "scope": "hall",
+      "display": "internal",
+      "displayReason": "A layout-consistency flag the engine gate asserts; the page renders the rows, racks per row and groups it certifies."
     },
     {
       "id": "geometry.it_density_kw_per_m2",
@@ -752,7 +788,9 @@
       "id": "geometry.rack_footprint_fraction",
       "label": "rack footprint fraction",
       "unit": null,
-      "scope": "hall"
+      "scope": "hall",
+      "display": "internal",
+      "displayReason": "Auxiliary geometry ratio behind geometry.it_density_kw_per_m2, which the page renders; kept for the floor re-grid work (Track A)."
     },
     {
       "id": "geometry.rack_footprint_m2_per_hall",
@@ -794,7 +832,9 @@
       "id": "heat.air_kwth",
       "label": "air kW th",
       "unit": "kW (thermal)",
-      "scope": "campus"
+      "scope": "campus",
+      "display": "internal",
+      "displayReason": "Facility-level twin of heat.air_hall_kwth (rendered per hall); the four halls are identical so the facility figure is exactly four times the rendered one."
     },
     {
       "id": "heat.liquid_capture_ratio",
@@ -812,13 +852,17 @@
       "id": "heat.liquid_kwth",
       "label": "liquid kW th",
       "unit": "kW (thermal)",
-      "scope": "campus"
+      "scope": "campus",
+      "display": "internal",
+      "displayReason": "Facility-level twin of heat.liquid_hall_kwth (rendered per hall); the four halls are identical so the facility figure is exactly four times the rendered one."
     },
     {
       "id": "meta.annual_evidence_class",
       "label": "annual evidence class",
       "unit": null,
-      "scope": "meta"
+      "scope": "meta",
+      "display": "internal",
+      "displayReason": "A label consumed by the PUE tooltip text (\"weather bins ASSUMED\"), not a value cell; pue.annual_basis carries the rendered wording."
     },
     {
       "id": "meta.authority",
@@ -848,7 +892,9 @@
       "id": "meta.nameplate_evidence_class",
       "label": "nameplate evidence class",
       "unit": null,
-      "scope": "meta"
+      "scope": "meta",
+      "display": "internal",
+      "displayReason": "A label consumed by the Tech Spec equipment tables (\"ASSUMED pending Basis of Design\"), not a value cell."
     },
     {
       "id": "meta.retired_basis",
@@ -878,7 +924,9 @@
       "id": "network.gpu_downlinks_per_hall",
       "label": "gpu downlinks per hall",
       "unit": null,
-      "scope": "network"
+      "scope": "network",
+      "display": "internal",
+      "displayReason": "Link count behind network.leaves_per_hall, which the page renders; the Network tab redesign (Track A §A7) renders the link tiers."
     },
     {
       "id": "network.integer_topology",
@@ -896,7 +944,9 @@
       "id": "network.leaf_spine_links_per_hall",
       "label": "leaf spine links per hall",
       "unit": null,
-      "scope": "network"
+      "scope": "network",
+      "display": "internal",
+      "displayReason": "Link count behind network.spines_per_hall, which the page renders; rendered by the Network tab redesign (Track A §A7)."
     },
     {
       "id": "network.leaves_per_hall",
@@ -908,7 +958,9 @@
       "id": "network.spine_core_links_per_hall",
       "label": "spine core links per hall",
       "unit": null,
-      "scope": "network"
+      "scope": "network",
+      "display": "internal",
+      "displayReason": "Link count behind network.cores_per_hall, which the page renders; rendered by the Network tab redesign (Track A §A7)."
     },
     {
       "id": "network.spines_per_hall",
@@ -1034,7 +1086,9 @@
       "id": "power.total_it_kwe",
       "label": "total it kW",
       "unit": "kW",
-      "scope": "campus"
+      "scope": "campus",
+      "display": "internal",
+      "displayReason": "Rendered through the adapter alias DHE.itFacilityKw and the IT Load card (power.total_it_mw); the leaf name is shared with design.electrical.total_it_kwe so the two-part token is required and the adapter reads it once."
     },
     {
       "id": "power.total_it_mw",
@@ -1082,7 +1136,9 @@
       "id": "pue.design_day_rack_it_basis",
       "label": "design day rack it basis",
       "unit": null,
-      "scope": "site"
+      "scope": "site",
+      "display": "internal",
+      "displayReason": "A different-denominator twin of pue.design_day kept for datasheet comparison; rendering it beside the total-IT PUE would invite the Rule 3 denominator confusion."
     },
     {
       "id": "pue.design_in_band",
@@ -1173,7 +1229,9 @@
         "ref": "js/dcai-model.js thermal (dry-only heat rejection) — owner decision \"yang terbaik\" 2026-09-05",
         "method": "Structural zero. The adopted basis is dry-only heat rejection, so no evaporative term exists anywhere in the engine and no leaf can move this value. Its class is that of the decision it follows from (ADOPTED), not a measurement.",
         "asOf": "2026-09-06"
-      }
+      },
+      "display": "internal",
+      "displayReason": "Structural zero, twin of wue.l_per_kwh which the page renders with its dry-only mode text."
     },
     {
       "id": "wue.consistent_with_free_cooling",

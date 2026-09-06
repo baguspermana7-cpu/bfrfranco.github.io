@@ -16,9 +16,8 @@
  *                  cliff is either derived (bidirectional probing reached the regime) or slack
  *                  — never authored.
  *   R7 TESTED      REPORTED. Flip to strict when the count reaches zero.
- *   R8 RENDERED    REPORTED. datahallAI.html does not read this engine until Track A §A2b
- *                  switches its authority; until then zero consumers is the expected state.
- *                  Flip to strict in the same commit that switches the page.
+ *   R8 RENDERED    STRICT since v2.0.0 (the commit that switched datahallAI.html): every
+ *                  parameter is read by the page or declared internal with a written reason.
  *   R9 DOCS        REPORTED.
  *
  * Run: node tools/test-dcai-parameter-registry.mjs
@@ -155,5 +154,15 @@ assert.equal(untested.length, 0,
   'parameters with no gate asserting them: ' + untested.map((p) => p.id).join(', ')
   + '. Add an identity to tools/test-dcai-engine.mjs — not an exemption.');
 console.log(`     R7 tested: ${registry.parameters.length}/${registry.parameters.length} asserted by a gate (STRICT)`);
-console.log(`     R8 rendered: ${registry.parameters.length - unread.length}/${registry.parameters.length} read by a cockpit (REPORTED — flips to strict in the commit that switches datahallAI.html to this engine, Track A §A2b)`);
+/* R8 flipped STRICT in v2.0.0 — the commit that switched datahallAI.html to this engine, as the
+   flip condition written in v1.136.0 required. */
+assert.equal(unread.length, 0,
+  'parameters no cockpit renders and which are not declared internal: ' + unread.map((p) => p.id).join(', ')
+  + '. Render it, or mark display: internal with a reason in data/dcai-parameters.curated.json.');
+for (const p of registry.parameters) {
+  if (p.display !== 'internal') continue;
+  assert.ok(p.displayReason && p.displayReason.length >= 40, `${p.id}: declared internal but the reason is missing or too short`);
+}
+const internal = registry.parameters.filter((p) => p.display === 'internal').length;
+console.log(`     R8 rendered: ${registry.parameters.length - internal}/${registry.parameters.length} read by datahallAI.html, ${internal} declared internal with a reason (STRICT)`);
 console.log(`     R9 docs: ${registry.parameters.length - undocumented.length}/${registry.parameters.length} named by a file under manual/ or standarization/ (REPORTED)`);

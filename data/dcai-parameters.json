@@ -333,7 +333,7 @@
       "consumers": [
         {
           "page": "datahallAI.html",
-          "reads": 6
+          "reads": 8
         }
       ],
       "tests": [
@@ -857,6 +857,8 @@
       "kind": "derived",
       "value": 25811.481565279366,
       "formula": null,
+      "display": "internal",
+      "displayReason": "Component of design.electrical.chillers_kwe, which the page renders as the per-hall chiller input (DHE.pb_chiller); the air/liquid split is shown on the cooling cliff panel only past the cliff.",
       "deps": [],
       "scope": "site",
       "evidenceClass": "DERIVED",
@@ -918,6 +920,8 @@
       "kind": "derived",
       "value": 0,
       "formula": null,
+      "display": "internal",
+      "displayReason": "Zero while free cooling holds at the design point; the page shows the liquid-path chiller input on the cooling cliff panel through operatingPoint() when the regime flips.",
       "deps": [],
       "scope": "site",
       "evidenceClass": "DERIVED",
@@ -1856,6 +1860,8 @@
       "kind": "derived",
       "value": 539052.8,
       "formula": null,
+      "display": "internal",
+      "displayReason": "Republishes power.total_it_kwe inside the operating point; the page renders that value (dkIt, DHE.itFacilityKw). The leaf name is shared across two branches so the source token cannot be attributed by grep.",
       "deps": [],
       "scope": "site",
       "evidenceClass": "DERIVED",
@@ -2277,6 +2283,8 @@
       "kind": "derived",
       "value": 142036.5778238343,
       "formula": null,
+      "display": "internal",
+      "displayReason": "Facility-level twin of heat.air_hall_kwth, which the telemetry spine renders per hall; the leaf name is shared with heat.air_kwth.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -2460,6 +2468,8 @@
       "kind": "derived",
       "value": 424864,
       "formula": null,
+      "display": "internal",
+      "displayReason": "Facility-level twin of heat.liquid_hall_kwth, which the telemetry spine renders per hall; the leaf name is shared with heat.liquid_kwth.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -2628,7 +2638,7 @@
       "consumers": [
         {
           "page": "datahallAI.html",
-          "reads": 10
+          "reads": 12
         }
       ],
       "tests": [
@@ -2807,6 +2817,8 @@
       "kind": "authored",
       "value": 25,
       "formula": null,
+      "display": "internal",
+      "displayReason": "Identical to p09_air_supply_c under the adopted 0 K supply-path mixing (contained cold aisle); rendering both would show one number twice.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ADOPTED",
@@ -3097,6 +3109,8 @@
       "kind": "derived",
       "value": null,
       "formula": null,
+      "display": "internal",
+      "displayReason": "Null while free cooling holds at the design point; the cooling cliff panel shows the liquid-path COP through operatingPoint() past the cliff.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -3124,6 +3138,8 @@
       "kind": "derived",
       "value": null,
       "formula": null,
+      "display": "internal",
+      "displayReason": "Null while free cooling holds at the design point; shown on the cooling cliff panel through operatingPoint() past the cliff.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -3240,7 +3256,7 @@
       "consumers": [
         {
           "page": "datahallAI.html",
-          "reads": 99
+          "reads": 104
         }
       ],
       "tests": [
@@ -3296,7 +3312,7 @@
       "consumers": [
         {
           "page": "datahallAI.html",
-          "reads": 3
+          "reads": 4
         }
       ],
       "tests": [
@@ -3317,6 +3333,8 @@
       "kind": "derived",
       "value": true,
       "formula": null,
+      "display": "internal",
+      "displayReason": "A consistency flag the engine gate asserts (tools/test-dcai-engine.mjs); the page renders the loading percentage it summarises (DHE.buswayLoadPct).",
       "deps": [],
       "scope": "hall",
       "evidenceClass": "DERIVED",
@@ -3342,6 +3360,8 @@
       "kind": "authored",
       "value": true,
       "formula": null,
+      "display": "internal",
+      "displayReason": "A declared topology fact rendered as the word \"facility\" beside every genset count on the page rather than as a value cell.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "LABEL",
@@ -3422,6 +3442,8 @@
       "kind": "derived",
       "value": true,
       "formula": null,
+      "display": "internal",
+      "displayReason": "A closure flag the engine gate asserts (groups x group kW = hall rack IT); the page renders the group kW and the hall rack IT it reconciles.",
       "deps": [],
       "scope": "hall",
       "evidenceClass": "DERIVED",
@@ -3503,6 +3525,8 @@
       "kind": "derived",
       "value": 106.74965914704019,
       "formula": null,
+      "display": "internal",
+      "displayReason": "Half of distribution.rack_feed_current_a, which the rack architecture view renders; kept for the per-cord breaker sizing in the Tech Spec.",
       "deps": [],
       "scope": "rack",
       "evidenceClass": "DERIVED",
@@ -3526,6 +3550,8 @@
       "kind": "authored",
       "value": true,
       "formula": null,
+      "display": "internal",
+      "displayReason": "A declared topology fact rendered as the words \"dual-corded\" beside the rack feed current rather than as a value cell.",
       "deps": [],
       "scope": "rack",
       "evidenceClass": "LABEL",
@@ -3550,6 +3576,8 @@
       "kind": "derived",
       "value": 40,
       "formula": null,
+      "display": "internal",
+      "displayReason": "Republishes geometry.rack_groups_per_hall (rendered on the SLD and hall mimic) under the distribution branch for the LV consumers.",
       "deps": [],
       "scope": "hall",
       "evidenceClass": "DERIVED",
@@ -3774,6 +3802,8 @@
       "kind": "derived",
       "value": 9612.307692307691,
       "formula": null,
+      "display": "internal",
+      "displayReason": "Cross-check of the engine TCS flow against the vendor-published 1.5 LPM/kW rule, asserted within 3 % by tools/test-dcai-engine.mjs; an audit figure, not an operating value.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -3889,6 +3919,8 @@
       "kind": "derived",
       "value": 9559.44,
       "formula": null,
+      "display": "internal",
+      "displayReason": "The vendor flow rule applied to the hall liquid heat, used only as the comparator for equipment.cdu_flow_check_m3h in the engine gate.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -4897,6 +4929,8 @@
       "kind": "derived",
       "value": 4,
       "formula": null,
+      "display": "internal",
+      "displayReason": "Auxiliary layout ratio (racks per row / racks per group = 4); the page renders rows, racks per row and RPP groups, from which it follows.",
       "deps": [],
       "scope": "hall",
       "evidenceClass": "DERIVED",
@@ -5068,6 +5102,8 @@
       "kind": "derived",
       "value": true,
       "formula": null,
+      "display": "internal",
+      "displayReason": "A layout-consistency flag the engine gate asserts; the page renders the rows, racks per row and groups it certifies.",
       "deps": [],
       "scope": "hall",
       "evidenceClass": "DERIVED",
@@ -5120,6 +5156,8 @@
       "kind": "derived",
       "value": 0.3296566077003122,
       "formula": null,
+      "display": "internal",
+      "displayReason": "Auxiliary geometry ratio behind geometry.it_density_kw_per_m2, which the page renders; kept for the floor re-grid work (Track A).",
       "deps": [],
       "scope": "hall",
       "evidenceClass": "DERIVED",
@@ -5183,7 +5221,7 @@
       "consumers": [
         {
           "page": "datahallAI.html",
-          "reads": 2
+          "reads": 3
         }
       ],
       "tests": [
@@ -5211,7 +5249,7 @@
       "consumers": [
         {
           "page": "datahallAI.html",
-          "reads": 1
+          "reads": 4
         }
       ],
       "tests": [
@@ -5243,7 +5281,7 @@
       "consumers": [
         {
           "page": "datahallAI.html",
-          "reads": 3
+          "reads": 4
         }
       ],
       "tests": [
@@ -5328,6 +5366,8 @@
       "kind": "derived",
       "value": 142036.5778238343,
       "formula": null,
+      "display": "internal",
+      "displayReason": "Facility-level twin of heat.air_hall_kwth (rendered per hall); the four halls are identical so the facility figure is exactly four times the rendered one.",
       "deps": [],
       "scope": "campus",
       "evidenceClass": "DERIVED",
@@ -5420,6 +5460,8 @@
       "kind": "derived",
       "value": 424864,
       "formula": null,
+      "display": "internal",
+      "displayReason": "Facility-level twin of heat.liquid_hall_kwth (rendered per hall); the four halls are identical so the facility figure is exactly four times the rendered one.",
       "deps": [],
       "scope": "campus",
       "evidenceClass": "DERIVED",
@@ -5444,6 +5486,8 @@
       "kind": "authored",
       "value": "ASSUMED",
       "formula": null,
+      "display": "internal",
+      "displayReason": "A label consumed by the PUE tooltip text (\"weather bins ASSUMED\"), not a value cell; pue.annual_basis carries the rendered wording.",
       "deps": [],
       "scope": "meta",
       "evidenceClass": "LABEL",
@@ -5590,6 +5634,8 @@
       "kind": "authored",
       "value": "ASSUMED",
       "formula": null,
+      "display": "internal",
+      "displayReason": "A label consumed by the Tech Spec equipment tables (\"ASSUMED pending Basis of Design\"), not a value cell.",
       "deps": [],
       "scope": "meta",
       "evidenceClass": "LABEL",
@@ -5741,6 +5787,8 @@
       "kind": "derived",
       "value": 63360,
       "formula": null,
+      "display": "internal",
+      "displayReason": "Link count behind network.leaves_per_hall, which the page renders; the Network tab redesign (Track A §A7) renders the link tiers.",
       "deps": [],
       "scope": "network",
       "evidenceClass": "DERIVED",
@@ -5828,6 +5876,8 @@
       "kind": "derived",
       "value": 63360,
       "formula": null,
+      "display": "internal",
+      "displayReason": "Link count behind network.spines_per_hall, which the page renders; rendered by the Network tab redesign (Track A §A7).",
       "deps": [],
       "scope": "network",
       "evidenceClass": "DERIVED",
@@ -5882,6 +5932,8 @@
       "kind": "derived",
       "value": 31680,
       "formula": null,
+      "display": "internal",
+      "displayReason": "Link count behind network.cores_per_hall, which the page renders; rendered by the Network tab redesign (Track A §A7).",
       "deps": [],
       "scope": "network",
       "evidenceClass": "DERIVED",
@@ -6492,7 +6544,7 @@
       "consumers": [
         {
           "page": "datahallAI.html",
-          "reads": 8
+          "reads": 10
         }
       ],
       "tests": [
@@ -6507,6 +6559,8 @@
       "kind": "derived",
       "value": 539052.8,
       "formula": null,
+      "display": "internal",
+      "displayReason": "Rendered through the adapter alias DHE.itFacilityKw and the IT Load card (power.total_it_mw); the leaf name is shared with design.electrical.total_it_kwe so the two-part token is required and the adapter reads it once.",
       "deps": [],
       "scope": "campus",
       "evidenceClass": "DERIVED",
@@ -6874,6 +6928,8 @@
       "kind": "derived",
       "value": 1.2565764954433358,
       "formula": null,
+      "display": "internal",
+      "displayReason": "A different-denominator twin of pue.design_day kept for datasheet comparison; rendering it beside the total-IT PUE would invite the Rule 3 denominator confusion.",
       "deps": [],
       "scope": "site",
       "evidenceClass": "DERIVED",
@@ -6980,7 +7036,7 @@
       "consumers": [
         {
           "page": "datahallAI.html",
-          "reads": 9
+          "reads": 11
         }
       ],
       "tests": [
@@ -7487,6 +7543,8 @@
       "value": 0,
       "formula": null,
       "formulaNotExpressible": "Structurally zero by the adopted dry-only basis: there is no evaporative term to evaluate. The absence of the term is the derivation.",
+      "display": "internal",
+      "displayReason": "Structural zero, twin of wue.l_per_kwh which the page renders with its dry-only mode text.",
       "deps": [],
       "scope": "site",
       "evidenceClass": "ADOPTED",
@@ -7581,7 +7639,7 @@
       "consumers": [
         {
           "page": "datahallAI.html",
-          "reads": 51
+          "reads": 56
         }
       ],
       "tests": [
