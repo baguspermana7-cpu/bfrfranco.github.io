@@ -359,6 +359,7 @@ export function scopeFor(id) {
   if (branch === 'meta') return 'meta';
   if (branch === 'network') return 'network';
   if (branch === 'geometry') return 'hall';
+  if (branch === 'distribution') return /rack_feed|voltage|power_factor/.test(id) ? 'rack' : (/per_hall|group|rpp|busway/.test(id) ? 'hall' : 'plant');
   if (branch === 'compute') return /per_rack|per_nvl72|nvlink/.test(id) ? 'rack' : (/per_hall/.test(id) ? 'hall' : 'campus');
   if (branch === 'power') return /^power\.(rack_it_kw|shelf|shelves|psu)/.test(id) ? 'rack' : (/hall/.test(id) ? 'hall' : 'campus');
   if (branch === 'heat') return /hall/.test(id) ? 'hall' : 'campus';

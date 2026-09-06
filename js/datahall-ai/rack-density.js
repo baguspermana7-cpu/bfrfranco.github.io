@@ -170,32 +170,40 @@
 
   function resolveCanonicalModel() {
     var model;
+    /* v2.0.0 — canonical basis is the GB300 model (js/dcai-model.js). The GB200 model this
+       module was written against is retired; it survives below as a named REFERENCE study
+       so the platform selector can still teach the split-domain comparison. */
     if (typeof module !== 'undefined' && module.exports && typeof require === 'function') {
-      model = require('../datahall-model.js');
+      model = require('../dcai-model.js');
     } else if (root) {
-      model = root.DATAHALL_MODEL;
+      model = root.DCAI_MODEL;
     }
     if (!isObject(model) || !isObject(model.facility) ||
-        !isObject(model.locked) || !isObject(model.geometry)) {
-      throw new TypeError('DATAHALL_MODEL with facility, locked, and geometry is required');
+        !isObject(model.gb300) || !isObject(model.geometry)) {
+      throw new TypeError('DCAI_MODEL with facility, gb300, and geometry is required');
     }
     return model;
   }
 
   function buildBaselineInput(model) {
     var hallAreaM2 = model.geometry.lengthM * model.geometry.widthM;
+    var itPerHallKW = model.facility.racksPerHall * model.facility.rackItKw;
+    /* One GB300 NVL72 rack IS the logical domain (racksPerDomain 1, PUBLISHED from the
+       reference architecture), so domain kW = rack kW and domains/hall = racks/hall. The
+       "claimed" values are the same arithmetic stated independently, so reconcile() has
+       something to check rather than an identity with itself. */
     return {
-      architectureId: 'project-gb200-nvl72-split-domain',
+      architectureId: 'gb300-nvl72-one-rack-one-domain',
       halls: model.facility.halls,
-      logicalDomainKW: model.locked.kwPerNVL72,
-      rackPositionsPerDomain: model.facility.racksPerNVL72,
-      logicalDomainsPerHall: model.facility.nvl72PerHall,
+      logicalDomainKW: model.facility.rackItKw * model.gb300.racksPerDomain,
+      rackPositionsPerDomain: model.gb300.racksPerDomain,
+      logicalDomainsPerHall: model.facility.racksPerHall / model.gb300.racksPerDomain,
       hallAreaM2: hallAreaM2,
-      claimedRackPositionKW: model.locked.kwPerRack,
+      claimedRackPositionKW: model.facility.rackItKw,
       claimedRackPositionsPerHall: model.facility.racksPerHall,
-      claimedItPerHallKW: model.locked.itPerHall_kW,
-      claimedHallItDensityKWPerM2: model.locked.itPerHall_kW / hallAreaM2,
-      claimedItPerFacilityKW: model.locked.itPerFacility_kW
+      claimedItPerHallKW: itPerHallKW,
+      claimedHallItDensityKWPerM2: itPerHallKW / hallAreaM2,
+      claimedItPerFacilityKW: itPerHallKW * model.facility.halls
     };
   }
 
@@ -204,11 +212,11 @@
 
   var baselineValues = reconcile(BASELINE_INPUT);
   if (!baselineValues.allChecksPass) {
-    throw new RangeError('DATAHALL_MODEL rack-density identities do not reconcile');
+    throw new RangeError('DCAI_MODEL rack-density identities do not reconcile');
   }
   var BASELINE = deepFreeze({
     architectureId: baselineValues.architectureId,
-    architectureName: 'Project GB200 NVL72 split-domain basis',
+    architectureName: 'GB300 NVL72 — one rack, one domain (adopted 2026-09-05)',
     halls: baselineValues.halls,
     logicalDomainKW: baselineValues.logicalDomainKW,
     rackPositionsPerDomain: baselineValues.rackPositionsPerDomain,
@@ -220,23 +228,29 @@
     hallItDensityKWPerM2: baselineValues.hallItDensityKWPerM2,
     itPerFacilityKW: baselineValues.itPerFacilityKW,
     modelSpecVersion: CANONICAL_MODEL.specVersion,
-    status: 'BOD_LOCKED',
-    basis: CANONICAL_MODEL.authority || 'DATAHALL_MODEL locked Scenario A'
+    status: 'ADOPTED',
+    basis: CANONICAL_MODEL.authority || 'DCAI_MODEL adopted GB300 basis'
   });
 
+  /* The retired GB200 basis, kept as a REFERENCE so the platform comparison still shows the
+     split-domain topology it replaced. A study may carry its OWN domain count and hall area:
+     the GB200 project hall was 32 x 20 m with 27 domains; applying 880 domains to it would
+     describe a plant nobody designed. */
   var REFERENCES = deepFreeze({
-    'gb300-nvl72-142kw-study': {
-      id: 'gb300-nvl72-142kw-study',
-      name: 'NVIDIA GB300 NVL72 reference study',
-      referenceKW: 142,
-      rackPositionsPerDomain: 1,
-      referenceScope: 'logical NVL72 system planning study',
-      adoptionStatus: 'REFERENCE_STUDY',
+    'gb200-nvl72-split-domain-retired': {
+      id: 'gb200-nvl72-split-domain-retired',
+      name: 'Project GB200 NVL72 split-domain basis (retired 2026-09-06)',
+      referenceKW: 132,
+      rackPositionsPerDomain: 2,
+      logicalDomainsPerHall: 27,
+      hallAreaM2: 640,
+      referenceScope: 'retired project basis — js/datahall-model.js, frozen and still tested',
+      adoptionStatus: 'RETIRED_REFERENCE',
       baselineImpact: 'NONE',
       provenance: {
-        authority: 'owner planning input',
-        asOf: '2026-08-26',
-        verification: 'confirm vendor configuration and project BoD before adoption'
+        authority: 'BASELINE-DECISION.md (locked 2026-05-17), superseded by owner decision 2026-09-05',
+        asOf: '2026-09-06',
+        verification: 'tools/test-datahall-calc.mjs keeps the retired engine at 57/57'
       }
     }
   });
@@ -264,8 +278,8 @@
       halls: BASELINE.halls,
       logicalDomainKW: reference.referenceKW,
       rackPositionsPerDomain: reference.rackPositionsPerDomain,
-      logicalDomainsPerHall: BASELINE.logicalDomainsPerHall,
-      hallAreaM2: BASELINE.hallAreaM2
+      logicalDomainsPerHall: reference.logicalDomainsPerHall || BASELINE.logicalDomainsPerHall,
+      hallAreaM2: reference.hallAreaM2 || BASELINE.hallAreaM2
     });
     var deltaKW = study.itPerHallKW - BASELINE.itPerHallKW;
     return immutableCopy({
@@ -295,7 +309,7 @@
     getBaseline: getBaseline,
     getReference: getReference,
     studyReference: studyReference,
-    version: '1.1.0'
+    version: '2.0.0'
   });
 
   if (root) { root.RZDataHallRackDensity = API; }

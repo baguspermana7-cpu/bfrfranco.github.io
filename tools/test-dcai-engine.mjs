@@ -272,6 +272,37 @@ approx(S.heat.liquid_hall_kwth * M.facility.halls, S.heat.liquid_kwth, 1e-6, 'ha
   ok(/^\[7 items\]/.test(`[${S.bins.length} items]`) && S.bins.length === M.weather.bins.length, 'bins.digest covers every weather bin');
 }
 
+/* ── 14. rack layout + LV distribution (A2b) ─────────────────────────────── */
+{
+  const Ge = S.geometry, Di = S.distribution, El = S.design.electrical;
+  ok(Ge.integer_layout === true, 'rack layout is integer on the shipped model');
+  ok(Ge.rack_rows === M.geometry.rows, 'rack_rows republishes geometry.rows');
+  ok(Ge.racks_per_row === M.facility.racksPerHall / M.geometry.rows, 'racks_per_row = racks/hall ÷ rows');
+  ok(Ge.racks_per_group === M.electrical.racksPerRppGroup, 'racks_per_group republishes electrical.racksPerRppGroup');
+  ok(Ge.rack_groups_per_hall === M.facility.racksPerHall / M.electrical.racksPerRppGroup, 'rack_groups_per_hall = racks/hall ÷ racks/group');
+  ok(Ge.groups_per_row === Ge.racks_per_row / Ge.racks_per_group, 'groups_per_row = racks/row ÷ racks/group');
+  ok(Ge.rack_rows * Ge.racks_per_row === M.facility.racksPerHall && Ge.rack_groups_per_hall * Ge.racks_per_group === M.facility.racksPerHall, 'rows × racks/row = groups × racks/group = racks/hall');
+
+  const SQ3 = Math.sqrt(3);
+  ok(Di.voltage_ll_v === M.electrical.voltageLL && Di.power_factor === M.electrical.powerFactor, 'distribution republishes V and PF');
+  approx(Di.group_kw, Ge.racks_per_group * M.facility.rackItKw, 1e-9, 'group_kw = racks/group × kW/rack');
+  approx(Di.group_current_a, Di.group_kw * 1000 / (SQ3 * Di.voltage_ll_v * Di.power_factor), 1e-6, 'group_current_a = kW·1000/(√3·V·PF)');
+  approx(Di.rack_feed_current_a, M.facility.rackItKw * 1000 / (SQ3 * Di.voltage_ll_v * Di.power_factor), 1e-6, 'rack_feed_current_a from rack kW');
+  approx(Di.rack_feed_current_per_cord_a, Di.rack_feed_current_a / 2, 1e-9, 'per-cord current = half (dual-corded)');
+  ok(Di.busway_trunk_a === M.electrical.buswayTrunkA, 'busway_trunk_a republishes the trunk class');
+  approx(Di.busway_loading_pct, Di.group_current_a / Di.busway_trunk_a * 100, 1e-9, 'busway_loading_pct = group A / trunk A');
+  ok(Di.busway_trunk_fits_group === (Di.group_current_a <= Di.busway_trunk_a), 'busway_trunk_fits_group is arithmetic');
+  ok(Di.busway_trunk_fits_group === true, 'the adopted 22-rack group fits the adopted trunk (a 44-rack group would not)');
+  ok(Di.rpp_groups_per_hall === Ge.rack_groups_per_hall && Di.rpp_per_hall === 2 * Ge.rack_groups_per_hall, 'RPP A+B per group');
+  ok(Di.transformers_per_hall_per_feed === Math.ceil(E.transformers / (M.facility.halls * 2)), 'transformers_per_hall_per_feed = ceil(total / (halls×2))');
+  ok(Di.ups_frames_per_hall_per_feed === Math.ceil(E.ups_frames_per_feed / M.facility.halls), 'ups_frames_per_hall_per_feed = ceil(per feed / halls)');
+  ok(Di.gensets_facility_shared === true, 'gensets are declared facility-shared (no per-hall split exists)');
+
+  ok(S.pue.grid_kg_co2_per_kwh === M.electrical.gridKgCo2PerKwh, 'grid_kg_co2_per_kwh republishes the one named grid factor');
+  approx(S.pue.cue_it_kg_per_kwh, M.electrical.gridKgCo2PerKwh * S.pue.design_day, 1e-12, 'CUE_IT = grid factor × design PUE');
+  ok(!/0\.69/.test(ENGINE_SRC.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/[^\n]*/g, '')), 'the grid factor is not a literal inside the engine CODE (comments may name it)');
+}
+
 /* ── report ──────────────────────────────────────────────────────────────── */
 console.log(`\nDCAI ENGINE GATE — ${passed} passed, ${failed} failed`);
 if (failed) { console.log(out.join('\n')); process.exit(1); }

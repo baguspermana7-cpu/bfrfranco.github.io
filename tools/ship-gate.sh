@@ -49,7 +49,9 @@ gate "Fire engine — worked examples"           node tools/test-fire-calc.mjs
 
 # DC operator workspaces: semantic state, current/study separation, and post-tick parity.
 gate "DC AI alarms — query and first-out" node tools/test-datahall-ai-alarm-query.mjs
-gate "DC AI rack density — current and study" node tools/test-datahall-ai-rack-density.mjs
+gate "DC AI rack density — GB300 baseline, GB200 retired reference" node --test tools/test-datahall-ai-rack-density.mjs
+gate "DC AI engine pin — page pins == engine version (fails closed otherwise)" node tools/test-dcai-engine-version-pin.mjs
+gate "DC AI page — zero retired GB200 numerals" node tools/test-datahall-ai-no-retired-literals.mjs
 gate "DC AI CDU — 9 running / 12 installed" node tools/test-datahall-ai-cdu-basis.mjs
 gate "DC AI electrical — topology" node tools/test-datahall-ai-electrical-topology.mjs
 gate "DC AI electrical — visual projection" node tools/test-datahall-ai-electrical-visual-map.mjs

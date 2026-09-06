@@ -308,6 +308,16 @@
       // source: BASELINE-DECISION.md (GB200) 400 V / PF 0.96 — carried. ADOPTED
       voltageLL: 400,
       powerFactor: 0.96,
+      // source: LV distribution group = a quarter-row of 22 racks. 22 x 142 kW = 3.12 MW ->
+      //         3,124 / (sqrt3 x 400 x 0.96) = 4,697 A, which one 5,000 A trunk carries. A
+      //         half-row (44 racks, 9.4 kA) does not fit any LV busway; the plan agent flagged
+      //         that gap on 2026-09-06 and this is the resolution. 880 = 10 rows x 4 x 22. ADOPTED
+      racksPerRppGroup: 22,
+      // source: 5,000 A LV busway trunk class (Canalis KTA / Starline T5 range). ADOPTED
+      buswayTrunkA: 5000,
+      // source: PLN Java-Bali grid emission factor 0.69 kgCO2/kWh (2025), the figure the page
+      //         already used in nine separate literals. Named once here. ADOPTED
+      gridKgCo2PerKwh: 0.69,
       // source: auxiliary + balance-of-plant as a fraction of IT (lighting, controls,
       //         security, offices). ASSUMED
       auxFractionOfIt: 0.0035
@@ -322,6 +332,9 @@
       lengthM: 62,
       widthM: 31,
       heightM: 5.5,
+      // source: 10 rack rows at a 3.1 m row pitch fill the 31 m width; 88 racks x 0.6 m = 52.8 m
+      //         of the 62 m length with a cross-aisle. 10 x 88 = 880 exactly. ADOPTED
+      rows: 10,
       // source: NVIDIA GB300 NVL72 design guide rack footprint class 600 x 1200 mm. ADOPTED
       rackFootprintM2: 0.72
     },

@@ -106,6 +106,7 @@ for (const p of registry.parameters) {
 const BRANCH_SCOPE = Object.freeze({
   meta: ['meta'], compute: ['rack', 'hall', 'campus'], power: ['rack', 'hall', 'campus'], heat: ['hall', 'campus'],
   design: ['plant', 'site'], bins: ['site'], equipment: ['hall', 'plant'], network: ['network'], geometry: ['hall'],
+  distribution: ['rack', 'hall', 'plant'],
   pue: ['site'], wue: ['site'],
 });
 for (const p of registry.parameters) {

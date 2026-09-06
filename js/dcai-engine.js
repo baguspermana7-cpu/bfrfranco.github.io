@@ -413,13 +413,48 @@
 
     /* --- geometry --- */
     var hallArea = geo.lengthM * geo.widthM;
+    var racksPerRow = div(f.racksPerHall, geo.rows, 'racks per row');
+    var racksPerGroup = el.racksPerRppGroup;
+    var groupsPerHall = div(f.racksPerHall, racksPerGroup, 'groups per hall');
+    /* Published as a FLAG, not a throw: the registry generator perturbs every leaf by x1.37 and
+       x0.73 to measure dependencies, and a throw there would erase the edges of everything
+       downstream of racksPerHall. The gate asserts the flag is true on the shipped model. */
+    var integerLayout = Number.isInteger(racksPerRow) && Number.isInteger(groupsPerHall);
     var geometry = {
+      integer_layout: integerLayout,
       hall_length_m: geo.lengthM, hall_width_m: geo.widthM, hall_height_m: geo.heightM,
+      rack_rows: geo.rows,
+      racks_per_row: racksPerRow,
+      rack_groups_per_hall: groupsPerHall,
+      racks_per_group: racksPerGroup,
+      groups_per_row: div(racksPerRow, racksPerGroup, 'groups per row'),
       hall_area_m2: hallArea,
       hall_volume_m3: hallArea * geo.heightM,
       rack_footprint_m2_per_hall: f.racksPerHall * geo.rackFootprintM2,
       rack_footprint_fraction: div(f.racksPerHall * geo.rackFootprintM2, hallArea),
       it_density_kw_per_m2: div(rackItHall_kwe, hallArea)
+    };
+
+    /* --- LV distribution: the group a busway trunk actually carries --- */
+    var SQRT3 = 1.7320508075688772;   // STANDARD
+    var groupKw = racksPerGroup * f.rackItKw;
+    var groupCurrentA = div(groupKw * 1000, SQRT3 * el.voltageLL * el.powerFactor, 'group current');
+    var rackFeedA = div(f.rackItKw * 1000, SQRT3 * el.voltageLL * el.powerFactor, 'rack feed current');
+    var distribution = {
+      voltage_ll_v: el.voltageLL,
+      power_factor: el.powerFactor,
+      rack_feed_current_a: rackFeedA,
+      rack_feed_current_per_cord_a: div(rackFeedA, 2),        // dual-corded A/B, each cord sized for the full load
+      group_kw: groupKw,
+      group_current_a: groupCurrentA,
+      busway_trunk_a: el.buswayTrunkA,
+      busway_loading_pct: div(groupCurrentA, el.buswayTrunkA) * 100,
+      busway_trunk_fits_group: groupCurrentA <= el.buswayTrunkA,
+      rpp_groups_per_hall: groupsPerHall,
+      rpp_per_hall: groupsPerHall * 2,                         // A + B per group
+      transformers_per_hall_per_feed: Math.ceil(div(transformers, f.halls * 2)),
+      ups_frames_per_hall_per_feed: Math.ceil(div(upsFramesPerFeed, f.halls)),
+      gensets_facility_shared: true                            // the engine has no per-hall genset split
     };
 
     /* --- PUE, honestly --- */
@@ -440,6 +475,9 @@
       free_cooling_fraction: div(freeHours, hoursTotal),
       /* the rack-IT-basis figure some datasheets quote; a DIFFERENT denominator, labelled */
       design_day_rack_it_basis: div(design.electrical.facility_kwe, rackIt_kwe),
+      /* CUE_IT (ISO/IEC 30134-8) = grid factor x PUE; the 0.69 was nine page literals */
+      grid_kg_co2_per_kwh: el.gridKgCo2PerKwh,
+      cue_it_kg_per_kwh: el.gridKgCo2PerKwh * design.pue,
       annual_basis: m.weather.basis,
       largest_non_it_term: largestTerm(design.electrical)
     };
@@ -471,6 +509,7 @@
       design: design,
       bins: bins,
       equipment: equipment,
+      distribution: distribution,
       network: network,
       geometry: geometry,
       pue: pue,
