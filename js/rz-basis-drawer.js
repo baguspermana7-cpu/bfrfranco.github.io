@@ -21,11 +21,39 @@
  * Any element with data-basis-param opens the drawer on click or Enter/Space.
  * RZBasisDrawer.open(id) does the same programmatically.
  *
+ * WHICH REGISTRY
+ * The site now has two generated registries — RZ_CONV_PARAMETERS (the eight Conventional
+ * cockpits) and RZ_DCAI_PARAMETERS (the GB300 AI campus). The drawer used to name the
+ * Conventional global in its own source, which meant a second cockpit family could only
+ * adopt it by forking the file — and a forked drawer is exactly the hand-copied provenance
+ * this module exists to delete. The global is therefore CONFIGURABLE, and the default is
+ * the Conventional one so the eight existing adopters need no change:
+ *   <script src="js/dcai-parameters.js" defer></script>
+ *   <script src="js/rz-basis-drawer.js" data-rz-registry="RZ_DCAI_PARAMETERS" defer></script>
+ * or, if the tag cannot carry an attribute, set window.RZBasisDrawerRegistry = 'RZ_DCAI_PARAMETERS'
+ * BEFORE this file loads. A named global that does not exist at open time is a missing
+ * registry, and the drawer says so rather than rendering an empty shell.
+ *
  * ES5 only (this site is zero-build and its cockpits are ES5).
  * ==========================================================================*/
 (function (root) {
     'use strict';
     if (root.RZBasisDrawer) return;
+
+    /* Read the registry global's NAME once, at parse time, while document.currentScript
+       still points at this tag. Order of precedence: the script tag's own attribute, then
+       a page-set global, then the Conventional default. */
+    var REGISTRY_GLOBAL = (function () {
+        try {
+            var tag = document.currentScript;
+            var attr = tag && tag.getAttribute('data-rz-registry');
+            if (attr) return attr;
+        } catch (error) { /* currentScript is unavailable in some embedding contexts */ }
+        if (typeof root.RZBasisDrawerRegistry === 'string' && root.RZBasisDrawerRegistry) {
+            return root.RZBasisDrawerRegistry;
+        }
+        return 'RZ_CONV_PARAMETERS';
+    }());
 
     var EVIDENCE_NOTE = {
         MEASURED: 'Read from a calibrated instrument.',
@@ -46,7 +74,7 @@
     var index = null;
 
     function registry() {
-        return root.RZ_CONV_PARAMETERS || null;
+        return root[REGISTRY_GLOBAL] || null;
     }
 
     /* A generated registry is design evidence, not proof that the host cockpit

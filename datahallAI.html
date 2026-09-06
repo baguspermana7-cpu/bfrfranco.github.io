@@ -661,6 +661,7 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
     <!-- generated registry twin: the authority block validates the live snapshot against
          every id the registry publishes, so the allow-list is generated, never typed -->
     <script src="js/dcai-parameters.js?v=1.0.0" data-datahall-registry></script>
+    <script src="js/rz-basis-drawer.js?v=2.0.0" data-rz-registry="RZ_DCAI_PARAMETERS" defer></script>
     <!-- v1.130.0 operator decision-support modules. Pure deterministic models
          load before the page renderer; the DOM controller is deferred. -->
     <script src="js/datahall-ai/alarm-query.js?v=1.130.0"></script>
@@ -772,36 +773,46 @@ Requested model/calculation versions and the complete locked schema must validat
 </div>
 <button type="button" class="dh-sidetog" id="sideTog" aria-label="Collapse sidebar to widen diagram" title="Collapse sidebar to widen diagram">&#9666;</button>
 </div>
+<!-- v2.0.0 (Track A §A2b WP4) — every numeral in the telemetry spine is an ENGINE READ.
+     A row carries data-basis-param (the registry id the drawer explains) plus data-dcai-fill
+     (RZDCAIBasis writes its text at first paint), so a value and the basis behind it can
+     never be two different things. A cell with no engine source at all carries a written
+     data-rz-authored-basis instead — "nobody bound this yet" and "this is not an engine
+     quantity" are different problems and the page says which. Fallback text is an em dash:
+     a dead binding must never show a plausible retired constant. -->
 <div class="sb"><h4><i style="background:var(--g)"></i>Compute</h4>
-<div class="rw"><span class="l" title="NVIDIA GB200 NVL36×2 — 2 racks form one NVL72 domain">Platform</span><span class="v vg">GB200 NVL36&#215;2</span></div>
-<div class="rw"><span class="l" title="NVL72 domains — each domain = 72 GPUs, 36 Grace CPUs, 1 rack pair">Domains</span><span class="v vg" id="sDom">27/27</span></div>
-<div class="rw"><span class="l" title="NVIDIA Blackwell B200 GPU — 4th gen data center GPU architecture">Blackwell</span><span class="v">1,944 GPU</span></div>
-<div class="rw"><span class="l" title="NVIDIA Grace ARM-based CPU — paired with Blackwell GPU">Grace</span><span class="v">972 CPU</span></div>
-<div class="rw"><span class="l" title="GPU power basis — TDP alone is not rack power; included in the per-rack kW">GPU Power Basis</span><span class="v vo">1.0-1.2 kW/GPU</span></div>
-<div class="rw"><span class="l" title="High Bandwidth Memory 3e — stacked on-package GPU memory, 192GB per GPU">HBM3e</span><span class="v">373 TB</span></div>
-<div class="rw"><span class="l" title="AI precision formats — FP4: 1,400 EFLOPS, FP8: 720 EFLOPS, BF16: 360 EFLOPS per NVL72">FP4/FP8/BF16</span><span class="v vo">1400/720/360 EF</span></div>
-<div class="rw"><span class="l" title="NVLink5 bandwidth per domain — 130 TB/s all-to-all between 72 GPUs">NVLink/dom</span><span class="v">130 TB/s</span></div></div>
+<div class="rw"><span class="l" title="NVIDIA GB300 NVL72 — one integrated rack IS one 72-GPU NVLink domain; there is no rack pair and no split domain on this basis">Platform</span><span class="v vg" data-rz-authored-basis="A vendor product name, not an engine quantity. The engine publishes this platform's counts, power and geometry; it does not publish its marketing name, so the label is authored on the page and declared here.">GB300 NVL72</span></div>
+<div class="rw"><span class="l" title="Racks per data hall — one rack, one NVL72 domain (DCAI_CALC.snapshot.compute.racks_per_hall)">Racks / hall</span><span class="v vg" id="sRacks" data-basis-param="compute.racks_per_hall" data-dcai-fill tabindex="0" role="button">&#8212;</span></div>
+<div class="rw"><span class="l" title="Racks across the four halls (DCAI_CALC.snapshot.compute.racks_facility)">Racks / campus</span><span class="v vg" id="sDom" data-basis-param="compute.racks_facility" data-dcai-fill tabindex="0" role="button">&#8212;</span></div>
+<div class="rw"><span class="l" title="Blackwell Ultra GPUs per hall (DCAI_CALC.snapshot.compute.gpu_per_hall)">GPU / hall</span><span class="v" id="sGpuHall" data-basis-param="compute.gpu_per_hall" data-dcai-fill tabindex="0" role="button">&#8212;</span></div>
+<div class="rw"><span class="l" title="Blackwell Ultra GPUs across the campus (DCAI_CALC.snapshot.compute.gpu_facility)">GPU / campus</span><span class="v" id="sGpuFac" data-basis-param="compute.gpu_facility" data-dcai-fill tabindex="0" role="button">&#8212;</span></div>
+<div class="rw"><span class="l" title="Grace CPUs across the campus (DCAI_CALC.snapshot.compute.cpu_facility)">Grace / campus</span><span class="v" id="sCpuFac" data-basis-param="compute.cpu_facility" data-dcai-fill tabindex="0" role="button">&#8212;</span></div>
+<div class="rw"><span class="l" title="Per-rack IT power — the adopted GB300 NVL72 rack figure (DCAI_CALC.snapshot.power.rack_it_kw)">Rack power</span><span class="v vo" id="sPerNVL" data-basis-param="power.rack_it_kw" data-dcai-fill data-dcai-suffix=" kW" tabindex="0" role="button">&#8212;</span></div>
+<div class="rw"><span class="l" title="HBM3e on-package GPU memory across the campus (DCAI_CALC.snapshot.compute.gpu_memory_pb_facility)">HBM3e</span><span class="v" id="sHbm" data-basis-param="compute.gpu_memory_pb_facility" data-dcai-fill data-dcai-suffix=" PB" tabindex="0" role="button">&#8212;</span></div>
+<div class="rw"><span class="l" title="NVLink5 all-to-all bandwidth inside one 72-GPU domain (DCAI_CALC.snapshot.compute.nvlink_domain_tbs)">NVLink/dom</span><span class="v" id="sNvl" data-basis-param="compute.nvlink_domain_tbs" data-dcai-fill data-dcai-suffix=" TB/s" tabindex="0" role="button">&#8212;</span></div></div>
 <div class="sb"><h4><i style="background:var(--o)"></i>Power</h4>
-<div class="rw"><span class="l" title="Total IT compute power consumption per hall (GPUs + CPUs + NICs + switches) — 27 NVL72 × 132 kW">IT Load</span><span class="v vo" id="sPit">3,564 kW</span></div>
-<div class="rw"><span class="l" title="Mechanical + Auxiliary — cooling electrical + UPS/dist loss + aux (engine-derived non-IT)">Mech+Aux</span><span class="v" id="sMechAux">1,074 kW</span></div>
-<div class="rw"><span class="l" title="Total facility power draw per hall — IT + non-IT (engine-derived, basis on Electrical SLD)">Total</span><span class="v vo" id="sTotal">4,638 kW</span></div>
-<div class="rw"><span class="l" title="Power per NVL72 domain — 132 kW per NVL72 pair (= 66 kW per physical rack)">Per NVL72</span><span class="v vr" id="sPerNVL">132 kW</span></div>
-<div class="rw"><span class="l" title="UPS Feed A — 4.5 MW modular, 2N A/B. Normal sharing: 50/50 load split across A+B (each carries ~40% of rated). Failover: one side picks up full protected load (~79% of rated).">UPS A</span><span class="v vg" id="sUA">40% nrm / 79% fail</span></div>
-<div class="rw"><span class="l" title="UPS Feed B — 4.5 MW modular, 2N A/B. Normal sharing: 50/50 load split across A+B (each carries ~40% of rated). Failover: one side picks up full protected load (~79% of rated).">UPS B</span><span class="v vg" id="sUB">40% nrm / 79% fail</span></div>
-<div class="rw"><span class="l" title="Diesel Generator Set — Caterpillar 3516E 2.75 MW each, N+1, <10s auto-start">GenSet</span><span class="v vg">Standby OK</span></div></div>
+<div class="rw"><span class="l" title="Rack IT per hall — racks x rack kW, the owner's 500 MW envelope (DCAI_CALC.snapshot.power.rack_it_hall_kwe)">Rack IT / hall</span><span class="v vo" id="sPit" data-basis-param="power.rack_it_hall_kwe" data-dcai-fill data-dcai-suffix=" kW" tabindex="0" role="button">&#8212;</span></div>
+<div class="rw"><span class="l" title="Total IT per hall — rack IT plus fabric, out-of-band and storage/management (DCAI_CALC.snapshot.power.total_it_hall_kwe)">Total IT / hall</span><span class="v vo" id="sItHall" data-basis-param="power.total_it_hall_kwe" data-dcai-fill data-dcai-suffix=" kW" tabindex="0" role="button">&#8212;</span></div>
+<div class="rw"><span class="l" title="Non-IT electrical for the whole campus — cooling plant + UPS loss + distribution loss + auxiliary (DCAI_CALC.snapshot.design.electrical.non_it_kwe). CAMPUS scope, not per hall: the chiller plant is shared.">Mech+Aux / campus</span><span class="v" id="sMechAux" data-basis-param="design.electrical.non_it_kwe" data-dcai-fill data-dcai-suffix=" kW" tabindex="0" role="button">&#8212;</span></div>
+<div class="rw"><span class="l" title="Total campus facility draw — IT plus non-IT, the PUE numerator (DCAI_CALC.snapshot.design.electrical.facility_kwe)">Facility / campus</span><span class="v vo" id="sTotal" data-basis-param="design.electrical.facility_kwe" data-dcai-fill data-dcai-suffix=" kW" tabindex="0" role="button">&#8212;</span></div>
+<div class="rw"><span class="l" title="UPS Feed A — modular frames in a 2N A/B pair. Normal sharing: 50/50 across A+B, each side carrying half the loading shown. Failover: one side picks up the full protected load.">UPS A</span><span class="v vg" id="sUA">&#8212;</span></div>
+<div class="rw"><span class="l" title="UPS Feed B — modular frames in a 2N A/B pair. Normal sharing: 50/50 across A+B, each side carrying half the loading shown. Failover: one side picks up the full protected load.">UPS B</span><span class="v vg" id="sUB">&#8212;</span></div>
+<div class="rw"><span class="l" title="Standby generation — facility-shared pool; unit rating, duty count and redundancy from DCAI_CALC.snapshot.equipment.generator_unit_kw / .gensets_duty / .gensets_installed">GenSet</span><span class="v vg" id="sGen">&#8212;</span></div></div>
 <div class="sb"><h4><i style="background:var(--c)"></i>Cooling</h4>
-<div class="rw"><span class="l" title="Direct Liquid Cooling — 85% of IT heat via cold plates (engine-derived)">DLC 85%</span><span class="v vc" id="sDLC">3,029 kW</span></div>
-<div class="rw"><span class="l" title="Air cooling — 15% residual heat (VRM, DIMM, SSD, NIC), engine-derived">Air 15%</span><span class="v" id="sAir">535 kW</span></div>
-<div class="rw"><span class="l" title="Technology Cooling System Supply — coolant temperature to racks (35°C nominal)">TCS Sup</span><span class="v vc" id="sTS">35.2&#176;C</span></div>
-<div class="rw"><span class="l" title="Technology Cooling System Return — heated coolant from racks (45°C nominal)">TCS Ret</span><span class="v vo" id="sTR">44.8&#176;C</span></div>
-<div class="rw"><span class="l" title="TCS temperature differential — Return minus Supply, target ~10°C">TCS &#916;T</span><span class="v vc" id="sDT">9.6&#176;C</span></div>
-<div class="rw"><span class="l" title="Coolant Distribution Units — 350 kW EoR units; running count sized to liquid heat (engine-derived)">CDUs</span><span class="v vg" id="sCDU">9/12 N+2</span></div>
-<div class="rw"><span class="l" title="Water-cooled centrifugal (mag bearing) chillers — nameplate COP 6.8">Chillers</span><span class="v vg" id="sCH">3/4 Run</span></div>
-<div class="rw"><span class="l" title="Computer Room Air Handlers — CW fan-wall units for 15% residual air (engine-derived)">CRAHs</span><span class="v vg" id="sCRAH">5 Act</span></div></div>
+<div class="rw"><span class="l" title="Direct liquid cooling — heat captured at the cold plate, per hall (DCAI_CALC.snapshot.heat.liquid_hall_kwth)">DLC / hall</span><span class="v vc" id="sDLC" data-basis-param="heat.liquid_hall_kwth" data-dcai-fill data-dcai-suffix=" kW" tabindex="0" role="button">&#8212;</span></div>
+<div class="rw"><span class="l" title="Residual air heat per hall — VRM, DIMM, SSD, NIC (DCAI_CALC.snapshot.heat.air_hall_kwth)">Air / hall</span><span class="v" id="sAir" data-basis-param="heat.air_hall_kwth" data-dcai-fill data-dcai-suffix=" kW" tabindex="0" role="button">&#8212;</span></div>
+<div class="rw"><span class="l" title="Technology cooling system supply — the warm-water plane delivered to the racks (DCAI_CALC.snapshot.design.planes.p07_tcs_supply_c)">TCS Sup</span><span class="v vc" id="sTS" data-basis-param="design.planes.p07_tcs_supply_c" data-dcai-fill data-dcai-suffix="&#176;C" tabindex="0" role="button">&#8212;</span></div>
+<div class="rw"><span class="l" title="Technology cooling system return — coolant leaving the racks (DCAI_CALC.snapshot.design.planes.p08_tcs_return_c)">TCS Ret</span><span class="v vo" id="sTR" data-basis-param="design.planes.p08_tcs_return_c" data-dcai-fill data-dcai-suffix="&#176;C" tabindex="0" role="button">&#8212;</span></div>
+<div class="rw"><span class="l" title="TCS differential — return minus supply, both planes published by the engine (p08 - p07)">TCS &#916;T</span><span class="v vc" id="sDT">&#8212;</span></div>
+<div class="rw"><span class="l" title="Coolant distribution units per hall — duty count sized to the hall liquid heat, plus one standby (DCAI_CALC.snapshot.equipment.cdu_duty_per_hall / .cdu_installed_per_hall)">CDUs / hall</span><span class="v vg" id="sCDU">&#8212;</span></div>
+<div class="rw"><span class="l" title="Chillers — facility-shared plant; design-day running count against installed (DCAI_CALC.snapshot.equipment.chillers_running_design / .chillers_installed)">Chillers</span><span class="v vg" id="sCH">&#8212;</span></div>
+<div class="rw"><span class="l" title="Computer room air handlers per hall — duty plus one standby, sized to the residual air heat (DCAI_CALC.snapshot.equipment.crah_duty_per_hall / .crah_installed_per_hall)">CRAHs / hall</span><span class="v vg" id="sCRAH">&#8212;</span></div></div>
 <div class="sb"><h4><i style="background:var(--b)"></i>Network</h4>
-<div class="rw"><span class="l" title="NVLink 5th gen — 130 TB/s intra-domain GPU-to-GPU interconnect">NVLink5</span><span class="v vg">All Up</span></div>
-<div class="rw"><span class="l" title="InfiniBand Extended Data Rate — 800 Gb/s per port, 4-Rail Fat-Tree topology">IB XDR</span><span class="v vg">800G Online</span></div>
-<div class="rw"><span class="l" title="Out-of-Band / Baseboard Management Controller — 25GbE management network">OOB/BMC</span><span class="v vg">Active</span></div></div>
+<div class="rw"><span class="l" title="Leaf + spine + core switches in one hall's 4-rail fat tree (DCAI_CALC.snapshot.network.switches_per_hall)">Switches / hall</span><span class="v" id="sSw" data-basis-param="network.switches_per_hall" data-dcai-fill tabindex="0" role="button">&#8212;</span></div>
+<div class="rw"><span class="l" title="Leaf switch radix — ports per leaf, the divisor the fat tree is built on (DCAI_CALC.snapshot.network.leaf_radix)">Leaf radix</span><span class="v" id="sRadix" data-basis-param="network.leaf_radix" data-dcai-fill tabindex="0" role="button">&#8212;</span></div>
+<div class="rw"><span class="l" title="NVLink 5th gen — intra-domain GPU-to-GPU interconnect health">NVLink5</span><span class="v vg" data-rz-authored-basis="A simulated equipment STATUS, not an engine quantity. The engine sizes the fabric; it does not model link health, and no telemetry source stands behind this cockpit.">All Up</span></div>
+<div class="rw"><span class="l" title="InfiniBand Extended Data Rate scale-out fabric status">IB XDR</span><span class="v vg" data-rz-authored-basis="A simulated equipment STATUS, not an engine quantity. The engine sizes the fabric; it does not model link health, and no telemetry source stands behind this cockpit.">Online</span></div>
+<div class="rw"><span class="l" title="Out-of-band / baseboard management controller network status">OOB/BMC</span><span class="v vg" data-rz-authored-basis="A simulated equipment STATUS, not an engine quantity. The engine sizes the out-of-band network; it does not model its availability, and no telemetry source exists here.">Active</span></div></div>
 <div class="sb"><h4><i style="background:var(--o)"></i>Safety</h4><!-- v1.20.2 Stage 6: category dot amber not alarm-red (doc-13 §11: red is alarm-only) -->
 <div class="rw"><span class="l" title="VESDA: Very Early Smoke Detection Apparatus — aspirating laser detector">Fire/VESDA</span><span class="v vg" id="sbFire">Normal</span></div>
 <div class="rw"><span class="l" title="Emergency Power Off — dual-confirm shunt-trip, cuts all electrical power">EPO</span><span class="v vg">Armed</span></div>
@@ -846,16 +857,23 @@ Requested model/calculation versions and the complete locked schema must validat
 </div>
 
 <div class="pn on" id="p-dash">
-<!-- KPI Strip at Top — v1.32.7: each card clickable for basis drawer (Rule 6) -->
+<!-- KPI Strip — v2.0.0 (Track A §A2b WP4). The eight cards used to open a hand-written
+     `basisFor` dictionary that restated a formula, an input list and a `source:` string by
+     hand; nothing checked any of it against the engine, and that is exactly how a drawer
+     ends up explaining a number it never derived. Each card now names a REGISTRY ID and the
+     shared js/rz-basis-drawer.js renders the generated record — value, unit, evidence class,
+     formula and the dependency edges MEASURED by perturbing the engine. Two cards have no
+     registry id because the engine has no model for them, and they say so in writing rather
+     than borrowing a neighbour's provenance. -->
 <div class="ai-kpi-strip" style="display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin-bottom:6px">
-<div class="k" data-basis="pue" tabindex="0" role="button" aria-label="PUE — click for basis" style="cursor:pointer"><div class="kl" title="Click for full basis drawer">PUE</div><div class="kv" style="color:var(--c)" id="dkPue">1.30</div><div class="ks">Derived | Target ≤1.12</div></div>
-<div class="k" data-basis="wue" tabindex="0" role="button" aria-label="WUE — click for basis" style="cursor:pointer"><div class="kl" title="Click for full basis drawer">WUE</div><div class="kv" style="color:var(--t2)" id="dkWue">0.00</div><div class="ks">L/kWh · Dry-only</div></div>
-<div class="k" data-basis="cue" tabindex="0" role="button" aria-label="CUE_IT — click for basis" style="cursor:pointer"><div class="kl" title="Click for full basis drawer">CUE</div><div class="kv" style="color:var(--p)" id="dkCue">0.90</div><div class="ks">kgCO₂/kWh IT</div></div>
-<div class="k" data-basis="it" tabindex="0" role="button" aria-label="IT Load — click for basis" style="cursor:pointer"><div class="kl" title="Click for full basis drawer">IT Load</div><div class="kv" style="color:var(--o)" id="dkIt">14.26</div><div class="ks">MW · Scenario A locked</div></div>
-<div class="k" data-basis="gpu" tabindex="0" role="button" aria-label="GPUs — click for basis" style="cursor:pointer"><div class="kl" title="Click for full basis drawer">GPUs</div><div class="kv" style="color:var(--g)" id="dkGpu">7,776</div><div class="ks">Blackwell</div></div>
-<div class="k" data-basis="dom" tabindex="0" role="button" aria-label="NVL72 domains — click for basis" style="cursor:pointer"><div class="kl" title="Click for full basis drawer">NVL72</div><div class="kv" style="color:var(--pk)" id="dkDom">108</div><div class="ks">Domains</div></div>
-<div class="k" data-basis="uptime" tabindex="0" role="button" aria-label="Uptime — click for basis" style="cursor:pointer"><div class="kl" title="Click for full basis drawer">Uptime</div><div class="kv" style="color:var(--g)">99.99</div><div class="ks">% YTD</div></div>
-<div class="k" data-basis="alarms" tabindex="0" role="button" aria-label="Alarms — click for basis" style="cursor:pointer"><div class="kl" title="Click for full basis drawer">Alarms</div><div class="kv" style="color:var(--g)" id="dkAlm">0</div><div class="ks">Active</div></div>
+<div class="k" data-basis-param="pue.design_day" tabindex="0" role="button" aria-label="PUE — click for basis" style="cursor:pointer"><div class="kl" title="Click for full basis drawer">PUE</div><div class="kv" style="color:var(--c)" id="dkPue">&#8212;</div><div class="ks" id="dkPueSub">design day &#183; derived</div></div>
+<div class="k" data-basis-param="wue.l_per_kwh" tabindex="0" role="button" aria-label="WUE — click for basis" style="cursor:pointer"><div class="kl" title="Click for full basis drawer">WUE</div><div class="kv" style="color:var(--t2)" id="dkWue">&#8212;</div><div class="ks" id="dkWueSub">L/kWh IT</div></div>
+<div class="k" data-basis-param="pue.cue_it_kg_per_kwh" tabindex="0" role="button" aria-label="CUE_IT — click for basis" style="cursor:pointer"><div class="kl" title="Click for full basis drawer">CUE</div><div class="kv" style="color:var(--p)" id="dkCue">&#8212;</div><div class="ks" id="dkCueSub">kgCO&#8322;/kWh IT</div></div>
+<div class="k" data-basis-param="power.total_it_mw" tabindex="0" role="button" aria-label="IT Load — click for basis" style="cursor:pointer"><div class="kl" title="Click for full basis drawer">IT Load</div><div class="kv" style="color:var(--o)" id="dkIt">&#8212;</div><div class="ks" id="dkItSub">MW total IT</div></div>
+<div class="k" data-basis-param="compute.gpu_facility" tabindex="0" role="button" aria-label="GPUs — click for basis" style="cursor:pointer"><div class="kl" title="Click for full basis drawer">GPUs</div><div class="kv" style="color:var(--g)" id="dkGpu">&#8212;</div><div class="ks" id="dkGpuSub">Blackwell Ultra</div></div>
+<div class="k" data-basis-param="compute.racks_facility" tabindex="0" role="button" aria-label="NVL72 racks — click for basis" style="cursor:pointer"><div class="kl" title="Click for full basis drawer">NVL72</div><div class="kv" style="color:var(--pk)" id="dkDom">&#8212;</div><div class="ks" id="dkDomSub">NVL72 racks</div></div>
+<div class="k" tabindex="0" role="button" aria-label="Uptime — design intent, not a measurement" style="cursor:default" data-rz-authored-basis="Tier-IV design INTENT, not a measurement and not an engine quantity. A real availability figure comes from a logged outage record; this cockpit has no event source, so the number is authored on the page and declared here rather than dressed up as derived."><div class="kl" title="Design intent — no event log is bound to this cockpit">Uptime</div><div class="kv" style="color:var(--g)">99.99</div><div class="ks">% design intent</div></div>
+<div class="k" tabindex="0" role="button" aria-label="Active alarms — simulated state" style="cursor:default" data-rz-authored-basis="A simulated alarm count, not an engine quantity. The GB300 basis engine sizes plant; it does not model alarm state, and no SCADA or event source is bound to this page, so the NORMAL state is authored here and declared rather than implied."><div class="kl" title="Simulated state — no alarm engine is bound to this cockpit">Alarms</div><div class="kv" style="color:var(--g)" id="dkAlm">0</div><div class="ks">active &#183; simulated</div></div>
 </div>
 <!-- Main Dashboard Area -->
 <div class="ai-dashboard-grid" style="display:grid;grid-template-columns:1fr 280px;gap:6px;height:calc(100% - 80px)">
@@ -866,22 +884,32 @@ Requested model/calculation versions and the complete locked schema must validat
 </div>
 <!-- Right: Status Panels -->
 <div class="ai-dashboard-rail" style="display:flex;flex-direction:column;gap:4px;overflow-y:auto">
+<!-- Rail cards — v2.0.0 (Track A §A2b WP4). Every cell here is either an engine read with
+     a registry id behind it, or a declared status. The old rows quoted equipment ratings
+     ("5MVA", "4.5MW", "2×4,000A", "350 kW each") that no engine published: they were typed
+     once and then survived a whole change of basis without anyone noticing, which is the
+     failure mode this work package exists to close. Busway ampacity has NO parameter in this
+     registry — the engine sizes plant, not distribution gear — so the row was replaced by the
+     facility apparent power the engine does publish rather than kept as a plausible number. -->
 <div class="cd"><h4><b style="background:var(--o)"></b>Electrical</h4><table>
-<tr><td title="Transformer A/B — 5MVA cast-resin dry-type, 20kV→400V">TX-A/B</td><td style="color:var(--g)">5MVA Online</td></tr>
-<tr><td title="Uninterruptible Power Supply A/B — 4.5MW Li-Ion double conversion">UPS-A/B</td><td style="color:var(--g)">4.5MW Online</td></tr>
-<tr><td title="Overhead copper busduct — 4,000A per feed, tap-off per rack pair">Busway</td><td>2×4,000A</td></tr>
-<tr><td title="Diesel Generator Set — backup power, <10s auto-start on utility fail">GenSet</td><td style="color:var(--g)">4×2.5MW Standby</td></tr>
+<tr><td title="Cast-resin transformers across the campus at the engine's unit rating (DCAI_CALC.snapshot.equipment.transformers / .transformer_unit_mva)">TX</td><td style="color:var(--g)" id="dkTx" data-basis-param="equipment.transformers" tabindex="0" role="button">&#8212;</td></tr>
+<tr><td title="Modular UPS frames per feed at the engine's frame rating, with the topology and loading it derives (DCAI_CALC.snapshot.equipment.ups_frames_per_feed / .ups_frame_kw / .ups_topology / .ups_loading_pct)">UPS</td><td style="color:var(--g)" id="dkUps" data-basis-param="equipment.ups_frames_per_feed" tabindex="0" role="button">&#8212;</td></tr>
+<tr><td title="Facility apparent power — the campus kVA the engine derives from the facility kW and the design power factor (DCAI_CALC.snapshot.equipment.facility_kva)">Facility kVA</td><td style="color:var(--o)" id="dkKva" data-basis-param="equipment.facility_kva" tabindex="0" role="button">&#8212;</td></tr>
+<tr><td title="Standby generation — a facility-shared pool, duty against installed at the engine's unit rating (DCAI_CALC.snapshot.equipment.gensets_duty / .gensets_installed / .generator_unit_kw / .generator_redundancy)">GenSet</td><td style="color:var(--g)" id="dkGen" data-basis-param="equipment.gensets_installed" tabindex="0" role="button">&#8212;</td></tr>
+<tr><td title="UPS battery energy at the design autonomy (DCAI_CALC.snapshot.equipment.battery_kwh)">Battery</td><td style="color:var(--p)" id="dkBatt" data-basis-param="equipment.battery_kwh" data-dcai-fill data-dcai-suffix=" kWh" tabindex="0" role="button">&#8212;</td></tr>
 </table></div>
 <div class="cd"><h4><b style="background:var(--c)"></b>Cooling</h4><table>
-<tr><td title="Technology Cooling System Supply — coolant to racks (35°C nominal)">TCS Sup</td><td style="color:var(--c)" id="dkTcs">35.2°C</td></tr>
-<tr><td title="Technology Cooling System Return — heated coolant from racks (45°C nominal)">TCS Ret</td><td style="color:var(--o)" id="dkTcr">44.8°C</td></tr>
-<tr><td title="Coolant Distribution Units — end-of-row L2L heat exchangers, 350 kW each. Engine: ceil(3,029 kW liquid heat ÷ 350) = 9 running per hall, 12 installed per hall (N+3). 4 halls → 36 running / 48 installed.">CDUs</td><td style="color:var(--g)" id="dkCdu">36/48 fac · 9/12 hall</td></tr>
-<tr><td title="Water-cooled centrifugal (mag bearing) chillers — Carrier 19DV, nameplate COP 6.8. Count is design placeholder — not yet bound to engine.">Chillers</td><td style="color:var(--g)">12/16 Run · design</td></tr>
+<tr><td title="Technology cooling system supply plane — a DESIGN plane the engine publishes, not a sensor reading (DCAI_CALC.snapshot.design.planes.p07_tcs_supply_c)">TCS Sup</td><td style="color:var(--c)" id="dkTcs" data-basis-param="design.planes.p07_tcs_supply_c" data-dcai-fill data-dcai-suffix="&#176;C" tabindex="0" role="button">&#8212;</td></tr>
+<tr><td title="Technology cooling system return plane — a DESIGN plane the engine publishes, not a sensor reading (DCAI_CALC.snapshot.design.planes.p08_tcs_return_c)">TCS Ret</td><td style="color:var(--o)" id="dkTcr" data-basis-param="design.planes.p08_tcs_return_c" data-dcai-fill data-dcai-suffix="&#176;C" tabindex="0" role="button">&#8212;</td></tr>
+<tr><td title="Row coolant distribution units — duty count is ceil(hall liquid heat / unit duty), installed is duty + 1 standby (DCAI_CALC.snapshot.equipment.cdu_duty_per_hall / .cdu_installed_per_hall / .cdu_installed_facility)">CDUs</td><td style="color:var(--g)" id="dkCdu" data-basis-param="equipment.cdu_installed_facility" tabindex="0" role="button">&#8212;</td></tr>
+<tr><td title="Chillers — facility-shared plant. Design-day running count, worst weather bin, and installed (DCAI_CALC.snapshot.equipment.chillers_running_design / .chillers_running_worst_bin / .chillers_installed)">Chillers</td><td style="color:var(--g)" id="dkChl" data-basis-param="equipment.chillers_installed" tabindex="0" role="button">&#8212;</td></tr>
+<tr><td title="Dry coolers — the facility heat-rejection field, design-day running against installed (DCAI_CALC.snapshot.equipment.dry_coolers_running_design / .dry_coolers_installed)">Dry coolers</td><td style="color:var(--g)" id="dkDry" data-basis-param="equipment.dry_coolers_installed" tabindex="0" role="button">&#8212;</td></tr>
+<tr><td title="Computer room air handlers per hall — duty plus one standby, sized to the residual air heat (DCAI_CALC.snapshot.equipment.crah_duty_per_hall / .crah_installed_per_hall / .crah_installed_facility)">CRAHs</td><td style="color:var(--g)" id="dkCrah" data-basis-param="equipment.crah_installed_facility" tabindex="0" role="button">&#8212;</td></tr>
 </table></div>
 <div class="cd"><h4><b style="background:var(--b)"></b>Network</h4><table>
-<tr><td title="NVLink 5th gen — 130 TB/s intra-domain GPU interconnect">NVLink5</td><td style="color:var(--g)">All Up</td></tr>
-<tr><td title="InfiniBand Extended Data Rate — 800 Gb/s per port, Fat-Tree topology">IB XDR</td><td style="color:var(--g)">800G Online</td></tr>
-<tr><td title="Out-of-Band / Baseboard Management Controller — 25GbE management network">OOB/BMC</td><td style="color:var(--g)">Active</td></tr>
+<tr><td title="NVLink 5th gen — intra-domain GPU interconnect health">NVLink5</td><td style="color:var(--g)">All Up</td></tr>
+<tr><td title="InfiniBand Extended Data Rate scale-out fabric — per-port line rate">IB XDR</td><td style="color:var(--g)" data-rz-authored-basis="A vendor port line rate and a link status, neither of which this engine models. The engine derives leaf, spine and core COUNTS from the radix; the signalling rate of a port is a product specification authored on the page and declared here.">800G Online</td></tr>
+<tr><td title="Out-of-Band / Baseboard Management Controller management network">OOB/BMC</td><td style="color:var(--g)">Active</td></tr>
 </table></div>
 <div class="cd"><h4><b style="background:var(--r)"></b>Safety</h4><table>
 <tr><td title="VESDA: Very Early Smoke Detection Apparatus — aspirating laser detector">Fire/VESDA</td><td style="color:var(--g)">Normal</td></tr>
@@ -892,6 +920,18 @@ Requested model/calculation versions and the complete locked schema must validat
 <tr><td>Personnel</td><td style="color:var(--c)" id="dkPpl">3 Inside</td></tr>
 <tr><td>Last Entry</td><td id="dkEntry">12:34</td></tr>
 </table></div>
+<!-- ENGINE BASIS INDEX — v2.0.0 (Track A §A2b WP4). Registry rule R8 asks that every one
+     of the engine's published parameters is either RENDERED by the cockpit or declared
+     internal with a written reason. A cockpit that renders a headline and hides the other
+     hundred-and-something numbers is not traceable; it is selective. This panel therefore
+     lists every published parameter, reads each one through a real property access on
+     DCAI_CALC.snapshot (so the registry generator MEASURES the read instead of taking a
+     declaration's word for it), and hangs the shared basis drawer off each row. It is
+     collapsed by default: it is the audit trail, not the operating picture. -->
+<details class="cd" id="dkBasisIndex" style="padding:0">
+<summary style="cursor:pointer;padding:6px 8px;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--t3)">Engine basis index &mdash; every published parameter</summary>
+<div id="dkBasisIndexBody" style="max-height:340px;overflow-y:auto;padding:0 8px 8px"></div>
+</details>
 </div>
 </div>
 </div>
@@ -925,7 +965,8 @@ Requested model/calculation versions and the complete locked schema must validat
 </defs>
 <rect width="960" height="480" fill="url(#gd)"/>
 <rect x="10" y="8" width="940" height="464" rx="3" fill="none" stroke="var(--bd2)" stroke-width="1"/>
-<text x="22" y="21" fill="var(--t3)" font-family="JetBrains Mono" font-size="7" font-weight="600">DATA HALL &#8212; 32m&#215;20m &#8212; 640m&#178; &#8212; &#8805;3,500kg/m&#178; &#8212; 4.2m clear &#8212; Zone 4</text>
+<text x="22" y="21" fill="var(--t3)" font-family="JetBrains Mono" font-size="7" font-weight="600" id="hallGeomTitle" data-basis-param="geometry.hall_area_m2" tabindex="0" role="button">DATA HALL &#8212; &#8212;</text>
+<text x="22" y="31" fill="var(--t3)" font-family="JetBrains Mono" font-size="6" data-rz-authored-basis="Structural floor loading, seismic zone and the raised-floor clear height are SITE and CIVIL properties. The GB300 basis engine models power, heat, flow and equipment counts; it has no structural model, so these are authored on the page and declared rather than dressed as engine output.">&#8805;3,500 kg/m&#178; &#8212; 4.2 m clear &#8212; Seismic Zone 4 &#8212; site basis, authored</text>
 <g id="hc"></g></svg>
 <div class="lg"><span><i style="background:#22c55e;box-shadow:0 0 3px rgba(34,197,94,.5)"></i>AI Rack</span><span><i style="background:#3b82f6"></i>Network</span><span><i style="background:#555"></i>Passive</span><span><i style="background:var(--c)"></i>CDU (EoR)</span><span><i style="background:rgba(100, 116, 139,.6)"></i>In-Rack CDU</span><span style="color:var(--o)">&#9650;Hot</span><span style="color:var(--c)">&#9660;Cold</span><span style="color:var(--o)">&#9670;TTHT</span><span style="color:rgba(6,182,212,.4)">&#8213; OH Pipe</span></div>
 </div>
@@ -936,20 +977,27 @@ Requested model/calculation versions and the complete locked schema must validat
 <details class="dh-specwrap" open><summary>Specifications &amp; detail panels<span class="dh-spec-cv" aria-hidden="true">&#9656;</span></summary><div class="gr" id="rackCards"></div></details>
 <section class="rz-ops-section" aria-labelledby="rackDensityTitle">
   <div class="rz-ops-section__head">
-    <div><div class="rz-ops-eyebrow">Capacity reconciliation</div><h3 id="rackDensityTitle">Rack density &amp; platform study</h3><p class="rz-ops-caption">The locked project basis remains authoritative; manufacturer references are comparison studies only.</p></div>
-    <div class="rz-ops-field rz-ops-field--wide"><label for="platformProfile">Platform profile</label><select id="platformProfile" disabled><option value="locked">Adopted GB300 NVL72 basis — 880 racks × 142 kW per hall</option><option value="gb200-nvl72-split-domain-retired">Retired GB200 split-domain basis — 27 × 132 kW (reference only)</option></select></div>
+    <div><div class="rz-ops-eyebrow">Capacity reconciliation</div><h3 id="rackDensityTitle">Rack density &amp; platform study</h3><p class="rz-ops-caption">The adopted GB300 basis is authoritative. The retired split-domain basis is kept as a named comparison study so the change of platform can be read, never as a number this page still computes.</p></div>
+    <div class="rz-ops-field rz-ops-field--wide"><label for="platformProfile">Platform profile</label><select id="platformProfile" disabled><option value="locked">Adopted GB300 NVL72 project basis</option><option value="gb200-nvl72-split-domain-retired">Retired GB200 split-domain reference</option></select></div>
   </div>
+  <!-- v2.0.0 (Track A §A2b WP4) — every cell below is written from DCAI_CALC.snapshot at
+       first paint. The retired GB200 figures (27 domains, 54 positions, 66 kW, 3,564 kW,
+       5.57 kW/m²) are NOT typed here: they come from
+       RZDataHallRackDensity.studyReference('gb200-nvl72-split-domain-retired') once WP2
+       re-points that module, and until then the comparison row renders em dashes and says
+       why. A retired constant hand-copied into a table is exactly the failure this ship is
+       correcting; it must not be re-introduced as a "temporary" placeholder. -->
   <div class="rz-ops-summary" id="rackDensitySummary" aria-live="polite">
-    <div class="rz-ops-metric" data-tone="ok"><div class="rz-ops-metric__label">Basis status</div><div class="rz-ops-metric__value">LOCKED</div></div>
-    <div class="rz-ops-metric"><div class="rz-ops-metric__label">Logical domains / hall</div><div class="rz-ops-metric__value">27 NVL72</div></div>
-    <div class="rz-ops-metric"><div class="rz-ops-metric__label">Physical positions / hall</div><div class="rz-ops-metric__value">54 racks</div></div>
-    <div class="rz-ops-metric"><div class="rz-ops-metric__label">IT load / hall</div><div class="rz-ops-metric__value">3.564 MW</div></div>
-    <div class="rz-ops-metric"><div class="rz-ops-metric__label">Power / position</div><div class="rz-ops-metric__value">66 kW</div></div>
-    <div class="rz-ops-metric"><div class="rz-ops-metric__label">Gross IT density</div><div class="rz-ops-metric__value">5.57 kW/m²</div></div>
+    <div class="rz-ops-metric" data-tone="ok"><div class="rz-ops-metric__label">Basis status</div><div class="rz-ops-metric__value" data-rz-authored-basis="A status word, not a quantity. It states that the GB300 snapshot is the adopted project basis for this cockpit; the engine publishes numbers, not its own adoption status.">ADOPTED</div></div>
+    <div class="rz-ops-metric"><div class="rz-ops-metric__label">NVL72 racks / hall</div><div class="rz-ops-metric__value" id="rdRacksHall" data-basis-param="compute.racks_per_hall" data-dcai-fill data-dcai-suffix=" NVL72" tabindex="0" role="button">&#8212;</div></div>
+    <div class="rz-ops-metric"><div class="rz-ops-metric__label">Racks / NVL72 domain</div><div class="rz-ops-metric__value" id="rdRacksPerDomain" data-basis-param="compute.racks_per_nvl72_domain" data-dcai-fill data-dcai-suffix=" rack" tabindex="0" role="button">&#8212;</div></div>
+    <div class="rz-ops-metric"><div class="rz-ops-metric__label">Rack IT / hall</div><div class="rz-ops-metric__value" id="rdItHall" data-basis-param="power.rack_it_hall_kwe" tabindex="0" role="button">&#8212;</div></div>
+    <div class="rz-ops-metric"><div class="rz-ops-metric__label">Power / rack</div><div class="rz-ops-metric__value" id="rdRackKw" data-basis-param="power.rack_it_kw" data-dcai-fill data-dcai-suffix=" kW" tabindex="0" role="button">&#8212;</div></div>
+    <div class="rz-ops-metric"><div class="rz-ops-metric__label">Gross IT density</div><div class="rz-ops-metric__value" id="rdDensity" data-basis-param="geometry.it_density_kw_per_m2" tabindex="0" role="button">&#8212;</div></div>
   </div>
   <div class="rz-ops-platform-grid">
-    <div class="rz-ops-table-wrap" tabindex="0" aria-label="Scrollable rack platform comparison"><table class="rz-ops-table" id="platformComparison"><caption>Current locked rack basis and non-adopted platform study</caption><thead><tr><th scope="col">Profile</th><th scope="col">Status</th><th scope="col">Form</th><th scope="col">Rack kW</th><th scope="col">Racks / hall</th><th scope="col">IT MW / hall</th><th scope="col">Gross kW/m²</th></tr></thead><tbody id="platformComparisonBody"><tr><td>Project baseline</td><td><span class="rz-ops-status rz-ops-status--normal">Locked</span></td><td>27 logical domains × 2 positions</td><td>66</td><td>54</td><td>3.564</td><td>5.57</td></tr><tr><td>GB300 NVL72</td><td><span class="rz-ops-status rz-ops-status--warning">Study</span></td><td>72×1 integrated rack</td><td>142 max</td><td>27</td><td>3.834</td><td>5.99</td></tr></tbody></table></div>
-    <div><div class="rz-ops-detail" id="platformStudyDetail"><div class="rz-ops-eyebrow">Decision boundary</div><p class="rz-ops-caption">Selecting a study profile never changes the locked engine, displayed simulated KPI, electrical sizing, cooling sizing, or generated current-design document.</p></div><p class="rz-ops-note">References: NVIDIA DGX GB200 hardware and NVIDIA Enterprise Reference Architecture for GB300 NVL72. Values remain subject to vendor configuration and Engineer-of-Record validation.</p></div>
+    <div class="rz-ops-table-wrap" tabindex="0" aria-label="Scrollable rack platform comparison"><table class="rz-ops-table" id="platformComparison"><caption>Adopted GB300 rack basis and the retired split-domain reference</caption><thead><tr><th scope="col">Profile</th><th scope="col">Status</th><th scope="col">Form</th><th scope="col">Rack kW</th><th scope="col">Racks / hall</th><th scope="col">IT MW / hall</th><th scope="col">Gross kW/m²</th></tr></thead><tbody id="platformComparisonBody"><tr><td colspan="7">Awaiting the rack-density module.</td></tr></tbody></table></div>
+    <div><div class="rz-ops-detail" id="platformStudyDetail"><div class="rz-ops-eyebrow">Decision boundary</div><p class="rz-ops-caption">Selecting a reference profile never changes the adopted engine, the displayed simulated KPI, the electrical sizing, the cooling sizing, or the generated current-design document.</p></div><p class="rz-ops-note">References: NVIDIA Enterprise Reference Architecture for GB300 NVL72 (adopted basis) and NVIDIA DGX GB200 hardware (retired basis, kept for comparison). Values remain subject to vendor configuration and Engineer-of-Record validation.</p></div>
   </div>
 </section></div>
 <div class="pn" id="p-cool">
@@ -3335,10 +3383,11 @@ if(DH){$('kP').textContent=DH.pue.toFixed(2);}
 $('kG').textContent=RI(88,98);
 if(DH){$('kD').textContent=DH.tcsDeltaT.toFixed(1);$('kC').textContent=DH.liquidCapturePct+'%';}
 $('kW').textContent=RI(980,1180);
-/* TCS supply/return are live sensors oscillating around the engine setpoint
- * (35/45 \u00B0C); \u0394T stays ~10 K per the locked basis. */
-var dhTS=DH?DH.tcsSupply:null,dhTR=DH?DH.tcsReturn:null;
-const ts=+(dhTS+(Math.random()*0.6-0.3)).toFixed(1),tr=+(dhTR+(Math.random()*0.6-0.3)).toFixed(1);$('sTS').textContent=ts+'\u00B0C';$('sTR').textContent=tr+'\u00B0C';$('sDT').textContent=(tr-ts).toFixed(1)+'\u00B0C';
+/* v2.0.0 (Track A §A2b WP4) — the TCS supply/return/deltaT rows in the telemetry spine
+ * used to oscillate around the setpoint with Math.random(). They are now labelled as what
+ * they are: DESIGN PLANES the engine publishes (p07/p08). A design plane does not jitter,
+ * and ACCURACY_VALIDATION Rule 2 forbids Math.random on a basis quantity. RZDCAIBasis
+ * paints #sTS / #sTR / #sDT from the snapshot. */
 /* v1.32.2 (AI-ACC-09) — UPS A/B engine-derived: normal sharing = upsLoadPct/2,
    failover = upsLoadPct. No jitter on basis values — deterministic. */
 if(DH){var nrm=(DH.upsLoadPct/2).toFixed(0),fail=DH.upsLoadPct.toFixed(0);
@@ -7942,26 +7991,28 @@ callEl.innerHTML=ch;
 // random per reviewer's explicit allowance (doc-26 §AI-ACC-07 "Allowed behavior").
 function updateDashKPI(){
 const el=id=>$(id);
-/* --- BASIS / DERIVED (deterministic, engine-bound) --- */
-var PUE=(DHE?DHE.pue.toFixed(2):'—');
-var IT_MW=(DHE?DHE.itFacilityMW.toFixed(2):'—');
-/* WUE: dry-only baseline per BASELINE-DECISION.md — engine reports 0.00. */
-var WUE='0.00';
-/* CUE: grid factor (PLN Java 0.69 kgCO2/kWh, 2025 published) × PUE → CUE_IT.
-   Hardcoded grid factor is cited; CUE_IT recomputes from engine PUE. */
-var GRID_KG_PER_KWH=0.69;
-var CUE_IT=(DHE?(GRID_KG_PER_KWH*DHE.pue).toFixed(2):'—');
+/* --- BASIS / DERIVED (deterministic, engine-bound; Rule 4: 3 dp, cyan) --- */
+var PUE=(DHE?DHE.pue.toFixed(3):'\u2014');
+var IT_MW=(DHE?DHE.itFacilityMW.toFixed(2):'\u2014');
+/* WUE is structurally zero on the dry-only basis — the engine has no evaporative term. */
+var WUE=(DHE?DHE.wue.toFixed(2):'\u2014');
+/* CUE_IT = grid factor x PUE; both published by the engine (pue.grid_kg_co2_per_kwh / pue.cue_it_kg_per_kwh). */
+var GRID_KG_PER_KWH=(DHE?DHE.gridFactor:null);
+var CUE_IT=(DHE?DHE.cueIt.toFixed(2):'\u2014');
 if(el('dkPue'))el('dkPue').textContent=PUE;
 if(el('dkWue'))el('dkWue').textContent=WUE;
 if(el('dkCue'))el('dkCue').textContent=CUE_IT;
 if(el('dkIt'))el('dkIt').textContent=IT_MW;
-/* --- SENSOR-CLASS JITTER (random allowed) --- */
-if(el('dkTcs'))el('dkTcs').textContent=R(34.5,35.8)+'°C';
-if(el('dkTcr'))el('dkTcr').textContent=R(44.2,45.5)+'°C';
+if(el('dkGpu')&&DHE)el('dkGpu').textContent=String(DHE.gpuPerFacility).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+if(el('dkDom')&&DHE)el('dkDom').textContent=String(DHE.racksFacility).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+/* --- TCS planes are DESIGN planes the engine publishes (p07/p08), not sensors — Rule 2 --- */
+if(el('dkTcs')&&DHE)el('dkTcs').textContent=DHE.tcsSupply.toFixed(1)+'\u00B0C';
+if(el('dkTcr')&&DHE)el('dkTcr').textContent=DHE.tcsReturn.toFixed(1)+'\u00B0C';
+/* --- SENSOR-CLASS JITTER (random allowed: people, weather) --- */
 if(el('dkPpl'))el('dkPpl').textContent=RI(0,8)+' Inside';
 if(el('dkEntry')){const now=new Date();el('dkEntry').textContent=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')}
 if(el('dkAlm'))el('dkAlm').textContent='0';  /* deterministic: alarm count is not a sensor jitter — must match engine state */
-if(el('dkCdu')&&DHE)el('dkCdu').textContent=(DHE.cduRunning*DHE.halls)+'/'+(DHE.cduInstalled*DHE.halls)+' fac · '+DHE.cduRunning+'/'+DHE.cduInstalled+' hall';
+if(el('dkCdu')&&DHE)el('dkCdu').textContent=String(DHE.cduInstalledFacility).replace(/\B(?=(\d{3})+(?!\d))/g,',')+' inst \u00B7 '+DHE.cduRunning+'/'+DHE.cduInstalled+' per hall';
 /* --- DC IMAGE CALLOUTS (engine-bound) --- */
 if(el('dcPUE'))el('dcPUE').textContent=PUE;
 if(el('dcWUE'))el('dcWUE').textContent=WUE;
@@ -7982,13 +8033,15 @@ if(el('dcWind'))el('dcWind').textContent=RI(8,15)+'m/s';
     var e=el(id);if(!e)return;
     e.setAttribute('title',formula+'\nSource: '+source+'\nUpdated: '+stamp+' (engine-derived, SIM)');
   }
-  tip('dkPue','PUE = Total facility kW ÷ IT kW','DATAHALL_CALC.pueBasis() · bottom-up loss model');
-  tip('dkWue','WUE = water L ÷ IT kWh = 0 (dry-cooler closed loop, zero evaporation)','BASELINE-DECISION.md dry-only baseline');
-  tip('dkCue','CUE_IT = grid factor × PUE = '+GRID_KG_PER_KWH+' × '+PUE,'PLN Java grid 0.69 kgCO2/kWh (2025) × engine PUE');
-  tip('dkIt','IT Load = 4 halls × 27 NVL72 × 132 kW = 14.256 MW','DATAHALL_MODEL Scenario A (locked)');
-  tip('dkGpu','GPUs = 108 NVL72 domains × 72 GPU = 7,776','DATAHALL_MODEL.gpusPerDomain × domains');
-  tip('dkDom','NVL72 domains = 4 halls × 27 = 108','DATAHALL_MODEL.nvl72PerHall × halls');
-  tip('dkCdu','CDU = ceil(3,029 kW liquid ÷ 350 kW) = 9 run / 12 installed per hall × 4','DATAHALL_CALC.lockedState().cdu');
+  if(!DHE)return;
+  var g=function(n){return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,',');};
+  tip('dkPue','PUE (design day) = facility '+g(DHE.pb_facility*DHE.halls)+' kW \u00F7 total IT '+g(DHE.itFacilityKw)+' kW = '+DHE.pue.toFixed(3)+' \u00B7 annual '+DHE.pueAnnual+' (bins ASSUMED) \u00B7 worst '+DHE.pueWorst+' @ '+DHE.pueWorstAmbientC+'\u00B0C \u00B7 target '+DHE.pueTarget+' gap '+(DHE.pueGap>=0?'+':'')+DHE.pueGap+'\nFree-cooling margin at the design day '+DHE.freeCoolingMarginK+' K \u2014 every hour above '+DHE.cliffAmbientC+'\u00B0C DB runs the liquid path on chillers','DCAI_CALC.snapshot.pue.design_day \u00B7 derived bottom-up, nothing tuned');
+  tip('dkWue','WUE = site water L \u00F7 IT kWh = '+DHE.wue.toFixed(2)+' \u2014 '+DHE.wueMode,'DCAI_CALC.snapshot.wue.l_per_kwh (structural: no evaporative term exists)');
+  tip('dkCue','CUE_IT = grid factor \u00D7 PUE = '+DHE.gridFactor+' \u00D7 '+DHE.pue.toFixed(3)+' = '+DHE.cueIt.toFixed(2)+' kgCO\u2082/kWh_IT','DCAI_CALC.snapshot.pue.cue_it_kg_per_kwh \u00B7 grid factor PLN Java-Bali 2025 (ADOPTED)');
+  tip('dkIt','Total IT = rack IT '+DHE.rackItMW+' MW ('+DHE.halls+' halls \u00D7 '+g(DHE.racksPerHall)+' racks \u00D7 '+DHE.kwPerRack+' kW) + fabric + OOB + storage/mgmt = '+DHE.itFacilityMW+' MW \u00B7 nameplate '+DHE.nameplateItMW+' MW is a LABEL','DCAI_CALC.snapshot.power.total_it_mw \u00B7 it_envelope '+DHE.itEnvelope);
+  tip('dkGpu','GPUs = '+g(DHE.racksFacility)+' racks \u00D7 '+DHE.gpuPerRack+' Blackwell Ultra = '+g(DHE.gpuPerFacility),'DCAI_CALC.snapshot.compute.gpu_facility');
+  tip('dkDom','NVL72 racks = '+DHE.halls+' halls \u00D7 '+g(DHE.racksPerHall)+' = '+g(DHE.racksFacility)+' \u2014 one rack IS one 72-GPU NVLink domain','DCAI_CALC.snapshot.compute.racks_facility');
+  tip('dkCdu','CDU per hall = ceil('+DHE.liquidHeatFmt+' kW liquid \u00F7 '+g(DHE.cduRating)+' kW) = '+DHE.cduRunning+' duty + 1 standby = '+DHE.cduInstalled+' \u00B7 '+DHE.cduModel,'DCAI_CALC.snapshot.equipment.cdu_duty_per_hall / cdu_installed_per_hall');
 })();
 }
 updateDashKPI();
@@ -7997,187 +8050,87 @@ setInterval(updateDashKPI,4000);
    paint and every runtime frame on the exact engine-derived value. */
 
 /* =========================================================================
- * v1.32.7 — KPI Basis Drawer (ACCURACY_VALIDATION.md Rule 6).
- * Click any top-strip KPI to see formula, inputs, output, scope, denominator,
- * source object, data mode, last update. Engine-bound; no hardcoded math.
+ * v2.0.0 — RZDCAIBasis: the ONE painter for every engine-read cell.
+ * -------------------------------------------------------------------------
+ * The v1.32.7 KPI Basis Drawer this replaces held a hand-written `basisFor`
+ * dictionary (formula, inputs and a `source:` string restated by hand) that
+ * nothing checked against the engine. Provenance now comes from the shared
+ * js/rz-basis-drawer.js reading the GENERATED registry (window.RZ_DCAI_PARAMETERS),
+ * and VALUES come from here: every cell with data-basis-param + data-dcai-fill is
+ * written from DCAI_CALC.snapshot by the same dotted path the drawer explains, so a
+ * value and the basis behind it cannot be two different numbers. Composite cells
+ * (a count against an installed count, a rating times a count) are written from the
+ * DHE adapter, which is itself a pure projection of the snapshot. No literal here.
  * =======================================================================*/
-(function(){
-var d=document;
-function el(tag,attrs,html){var e=d.createElement(tag);if(attrs)for(var k in attrs)e.setAttribute(k,attrs[k]);if(html!=null)e.innerHTML=html;return e;}
-function nowStamp(){var t=new Date();return t.getFullYear()+'-'+('0'+(t.getMonth()+1)).slice(-2)+'-'+('0'+t.getDate()).slice(-2)+' '+t.toLocaleTimeString('en-GB');}
-function basisFor(id){
-  var D=window.DHE;
-  if(!D) return null;
-  var dict={
-    pue:{
-      title:'PUE — Power Usage Effectiveness',
-      formula:'PUE = (IT + cooling + UPS_dist_loss + aux) / IT',
-      inputs:[
-        ['IT (per hall)',D.pb_it+' kW'],
-        ['Cooling (chiller + pumps + fans + CDU + CRAH)',D.pb_cooling+' kW'],
-        ['Chiller compressor (Q/COP, COP '+D.chillerCOP+')',D.pb_chiller+' kW'],
-        ['UPS + distribution loss',D.pb_upsDist+' kW'],
-        ['Auxiliary',D.pb_aux+' kW'],
-        ['Non-IT subtotal',D.pb_nonIT+' kW'],
-        ['Facility (IT + non-IT)',D.pb_facilityFmt+' kW']
-      ],
-      output:D.pue.toFixed(2)+' (derived)',
-      scope:'Per hall — Scenario A locked',
-      denominator:'IT kW',
-      source:'DATAHALL_CALC.pueBasis()',
-      mode:'DERIVED',
-      note:'Chiller COP is the NAMEPLATE value, not back-solved. Marketing target ≤1.12 is shown separately as TARGET, never as result.'
-    },
-    wue:{
-      title:'WUE — Water Usage Effectiveness',
-      formula:'WUE = L water / IT kWh',
-      inputs:[
-        ['Cooling mode','Dry-only cooler baseline'],
-        ['Evaporative make-up',D.wue+' L (model carries 0)'],
-        ['Domestic / process water','Excluded from WUE scope']
-      ],
-      output:D.wue.toFixed(2)+' L/kWh',
-      scope:'Cooling makeup only (Green Grid WP #35)',
-      denominator:'IT kWh',
-      source:'DATAHALL_MODEL.cooling',
-      mode:'BOD LOCKED',
-      note:'Dry-only baseline per BASELINE-DECISION.md. If hybrid/adiabatic cooling were adopted, this rebinds to the make-up flow meter.'
-    },
-    cue:{
-      title:'CUE_IT — Carbon Usage Effectiveness',
-      formula:'CUE_IT = grid_factor × PUE  (ISO/IEC 30134-8)',
-      inputs:[
-        ['Grid emission factor','0.69 kgCO₂/kWh facility (PLN Java 2025)'],
-        ['PUE',D.pue.toFixed(2)+' (engine derived)']
-      ],
-      output:(0.69*D.pue).toFixed(2)+' kgCO₂/kWh IT',
-      scope:'Facility-wide',
-      denominator:'IT kWh',
-      source:'DATAHALL_CALC.pueBasis().pue × grid factor',
-      mode:'DERIVED',
-      note:'Grid factor varies by region and year as the grid decarbonises. PPAs and renewable offsets reduce the effective factor on a net-annual basis.'
-    },
-    it:{
-      title:'IT Load (Facility)',
-      formula:'IT = halls × NVL72/hall × kW/NVL72',
-      inputs:[
-        ['Halls',D.halls],
-        ['NVL72 domains per hall',D.nvl72PerHall],
-        ['kW per NVL72 domain (Scenario A)',D.kwPerNVL72+' kW'],
-        ['IT per hall',D.itHallFmt+' kW']
-      ],
-      output:D.itFacilityMW.toFixed(2)+' MW',
-      scope:'Whole facility — Scenario A locked',
-      denominator:'kW (sum)',
-      source:'DATAHALL_CALC.lockedState().itPerFacility_kW',
-      mode:'BOD LOCKED',
-      note:'Scenario A: 132 kW per NVL72 domain (logical), split across 2 physical rack-positions @ 66 kW each. Scenario B (132 kW per physical rack) is exposed in the engine for labelling but NOT adopted.'
-    },
-    gpu:{
-      title:'GPUs (Facility)',
-      formula:'GPUs = halls × NVL72/hall × GPUs/NVL72',
-      inputs:[
-        ['Halls',D.halls],
-        ['NVL72 domains per hall',D.nvl72PerHall],
-        ['GPUs per NVL72 (Blackwell)','72']
-      ],
-      output:D.gpuPerFacility.toLocaleString()+' GPU',
-      scope:'Whole facility',
-      denominator:'GPU count',
-      source:'DATAHALL_MODEL.facility.gpuPerFacility',
-      mode:'BOD LOCKED',
-      note:'NVIDIA GB200 NVL72 reference architecture: 72 GPUs per NVL72 domain (18 compute trays × 4 GPUs).'
-    },
-    dom:{
-      title:'NVL72 Domains (Facility)',
-      formula:'Domains = halls × NVL72/hall',
-      inputs:[
-        ['Halls',D.halls],
-        ['NVL72 per hall',D.nvl72PerHall]
-      ],
-      output:(D.halls*D.nvl72PerHall)+' NVL72 domains',
-      scope:'Whole facility',
-      denominator:'count',
-      source:'DATAHALL_MODEL.facility',
-      mode:'BOD LOCKED',
-      note:'One NVL72 domain = one logical 72-GPU NVLink fabric. Engineered as 2 physical rack-positions per domain (weight ~1,360 kg, cable mgmt + serviceability).'
-    },
-    uptime:{
-      title:'Uptime (YTD)',
-      formula:'Uptime % = (8760 hr − downtime hr) / 8760 × 100',
-      inputs:[
-        ['Target (Tier-IV)','99.995 % (≤26 min/yr)'],
-        ['Reported YTD','99.99 % (placeholder)']
-      ],
-      output:'99.99 % YTD',
-      scope:'Facility-wide',
-      denominator:'hours per year',
-      source:'design placeholder — not yet bound to event log',
-      mode:'DESIGN PLACEHOLDER',
-      note:'A real BMS would bind this to logged outage events. The 99.99 % shown is illustrative of Tier-IV intent.'
-    },
-    alarms:{
-      title:'Active Alarms',
-      formula:'count(events where severity ≥ WARNING and state = ACTIVE)',
-      inputs:[
-        ['Critical alarms','0 (engine state)'],
-        ['Warning alarms','0 (engine state)'],
-        ['Maintenance flags','0 (engine state)']
-      ],
-      output:'0 active',
-      scope:'Whole facility',
-      denominator:'count',
-      source:'design placeholder — no alarm engine bound',
-      mode:'DESIGN PLACEHOLDER',
-      note:'Live BMS would bind to an event-source-of-truth (e.g. SCADA OPC UA event log). The simulated value is 0 (NORMAL state).'
-    }
-  };
-  return dict[id]||null;
-}
-function showBasisDrawer(id){
-  var b=basisFor(id);if(!b)return;
-  var ex=d.getElementById('kpiBasisDrawer');if(ex)ex.remove();
-  var ov=el('div',{id:'kpiBasisDrawer',role:'dialog','aria-modal':'true','aria-labelledby':'kbdTitle'});
-  ov.style.cssText='position:fixed;inset:0;background:rgba(8,15,27,.82);backdrop-filter:blur(4px);z-index:10000;display:flex;align-items:center;justify-content:center;padding:18px;';
-  var box=el('div');
-  box.style.cssText='background:#0f1729;border:1px solid #2b3a52;border-radius:10px;max-width:720px;width:100%;max-height:90vh;display:flex;flex-direction:column;color:#dbe5f0;font-family:IBM Plex Sans,sans-serif;';
-  var hdr='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;border-bottom:1px solid #2b3a52;">'+
-    '<h3 id="kbdTitle" style="margin:0;font-size:14px;color:#67e8f9;letter-spacing:.05em;text-transform:uppercase;">'+b.title+'</h3>'+
-    '<span style="font-size:10px;background:rgba(56,189,248,.12);color:#67e8f9;padding:3px 8px;border-radius:4px;border:1px solid rgba(56,189,248,.3);letter-spacing:.06em;">'+b.mode+'</span>'+
-    '<button id="kbdClose" type="button" aria-label="Close" style="background:none;border:1px solid #8f6161;color:#e7bcbc;width:28px;height:28px;border-radius:5px;cursor:pointer;font-size:14px;">×</button>'+
-    '</div>';
-  var body='<div style="padding:14px 18px 18px;overflow-y:auto;font-size:12.5px;line-height:1.55;">';
-  body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Formula</span><div style="font-family:JetBrains Mono,monospace;background:#162033;border:1px solid #2b3a52;border-radius:6px;padding:8px 11px;margin-top:4px;color:#fbbf24;font-size:12px;">'+b.formula+'</div></div>';
-  body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Inputs</span><table style="width:100%;border-collapse:collapse;margin-top:4px;font-size:12px;">';
-  for(var i=0;i<b.inputs.length;i++){body+='<tr><td style="padding:5px 6px;border-bottom:1px solid rgba(43,58,82,.5);color:#94a3b8;">'+b.inputs[i][0]+'</td><td style="padding:5px 6px;border-bottom:1px solid rgba(43,58,82,.5);font-family:JetBrains Mono,monospace;color:#dbe5f0;text-align:right;">'+b.inputs[i][1]+'</td></tr>';}
-  body+='</table></div>';
-  body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Output</span><div style="font-family:JetBrains Mono,monospace;background:#0a7d28;color:#fff;border-radius:6px;padding:8px 11px;margin-top:4px;font-size:13px;font-weight:700;">'+b.output+'</div></div>';
-  body+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">';
-  body+='<div><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Scope</span><div style="color:#dbe5f0;margin-top:3px;">'+b.scope+'</div></div>';
-  body+='<div><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Denominator</span><div style="color:#dbe5f0;margin-top:3px;font-family:JetBrains Mono,monospace;">'+b.denominator+'</div></div>';
-  body+='</div>';
-  body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Source object</span><div style="font-family:JetBrains Mono,monospace;color:#C3B0FA;margin-top:3px;font-size:12px;">'+b.source+'</div></div>';
-  body+='<div style="margin-bottom:12px;"><span style="color:#94a3b8;font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Last update</span><div style="font-family:JetBrains Mono,monospace;color:#dbe5f0;margin-top:3px;font-size:12px;">'+nowStamp()+' (deterministic; engine snapshot does not drift)</div></div>';
-  if(b.note){body+='<div style="border-left:3px solid #fbbf24;padding:8px 11px;background:rgba(245,158,11,.06);color:#fde68a;font-size:12px;line-height:1.5;">'+b.note+'</div>';}
-  body+='</div>';
-  box.innerHTML=hdr+body;
-  ov.appendChild(box);
-  d.body.appendChild(ov);
-  ov.addEventListener('click',function(e){if(e.target===ov){ov.remove();}});
-  d.getElementById('kbdClose').addEventListener('click',function(){ov.remove();});
-  d.addEventListener('keydown',function esc(e){if(e.key==='Escape'){ov.remove();d.removeEventListener('keydown',esc);}});
-}
-/* Delegated click on the KPI strip */
-d.addEventListener('click',function(e){
-  var card=e.target.closest('.k[data-basis]');
-  if(card){showBasisDrawer(card.getAttribute('data-basis'));}
-});
-d.addEventListener('keydown',function(e){
-  if(e.key==='Enter'||e.key===' '){
-    var card=e.target.closest('.k[data-basis]');
-    if(card){e.preventDefault();showBasisDrawer(card.getAttribute('data-basis'));}
+var RZDCAIBasis=(function(){
+  var d=document;
+  function at(obj,path){var parts=path.split('.'),v=obj;for(var i=0;i<parts.length;i++){if(v==null)return undefined;v=v[parts[i]];}return v;}
+  function grp(n){return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
+  function fmtBy(id,v){
+    if(v==null||v===undefined)return '—';
+    if(typeof v==='boolean')return v?'yes':'no';
+    if(typeof v!=='number')return String(v);
+    if(!isFinite(v))return '—';
+    if(/^pue\.(design_day|annual_bin_weighted|worst_bin|target|band_min|band_max|design_day_rack_it_basis)$/.test(id))return v.toFixed(3);
+    if(/gap_to_target/.test(id))return (v>=0?'+':'')+v.toFixed(3);
+    if(/_mw$|_mva$|_pbs$|l_per_kwh|cue_it|grid_kg|_fraction$|_ratio$|cop_|_pct$/.test(id))return v.toFixed(2);
+    if(/_c$|_k$/.test(id))return v.toFixed(1);
+    if(Number.isInteger(v))return grp(v);
+    return Math.abs(v)>=1000?grp(Math.round(v)):v.toFixed(1);
   }
-});
+  function fill(){
+    var auth=window.RZDatahallCurrentAuthority?window.RZDatahallCurrentAuthority():null;
+    if(!auth||!window.DHE)return false;
+    var S=auth.snapshot,D=window.DHE;
+    var cells=d.querySelectorAll('[data-dcai-fill][data-basis-param]');
+    for(var i=0;i<cells.length;i++){
+      var c=cells[i],id=c.getAttribute('data-basis-param');
+      var v=at(S,id),suf=c.getAttribute('data-dcai-suffix')||'';
+      c.innerHTML=fmtBy(id,v)+suf;
+    }
+    var set=function(id,txt){var e=d.getElementById(id);if(e&&txt!=null)e.textContent=txt;};
+    var pct=function(x){return (Math.round(x*10)/10)+'%';};
+    /* telemetry spine composites */
+    set('sUA',D.upsFramesPerFeedHall+' × '+D.upsRatingMW+' MW · '+D.upsTopology+' · ≤'+pct(D.upsLoadPct));
+    set('sUB',D.upsFramesPerFeedHall+' × '+D.upsRatingMW+' MW · '+D.upsTopology+' · ≤'+pct(D.upsLoadPct));
+    set('sGen',D.gensetFacNplus1+' × '+D.gensetMW+' MW ('+D.gensetFacN+' duty, '+D.gensetRedundancy+') — facility');
+    set('sDT',D.tcsDeltaT+' K');
+    set('sCDU',D.cduRunning+' / '+D.cduInstalled+' · '+D.cduModel);
+    set('sCH',D.chillersRunning+' run · '+D.chillersInstalled+' inst — facility');
+    set('sCRAH',D.crahActive+' / '+D.crahInstalled);
+    /* dashboard strip */
+    set('dkPue',D.pue.toFixed(3));
+    set('dkWue',D.wue.toFixed(2));
+    set('dkCue',D.cueIt.toFixed(2));
+    set('dkIt',D.itFacilityMW.toFixed(2));
+    set('dkGpu',grp(D.gpuPerFacility));
+    set('dkDom',grp(D.racksFacility));
+    /* rail composites */
+    set('dkTx',grp(D.txTotal)+' × '+D.txRatingMVA+' MVA · '+D.txPerFeedHall+'/feed/hall');
+    set('dkUps',grp(D.upsFramesTotal/2)+'/feed × '+D.upsRatingMW+' MW · '+D.upsTopology+' · '+pct(D.upsLoadPct));
+    set('dkKva',grp(Math.round(S.equipment.facility_kva))+' kVA');
+    set('dkGen',D.gensetFacNplus1+' × '+D.gensetMW+' MW · '+D.gensetFacN+' duty · '+D.gensetRedundancy+' — facility');
+    set('dkCdu',grp(D.cduInstalledFacility)+' inst · '+D.cduRunning+'/'+D.cduInstalled+' per hall');
+    set('dkChl',D.chillersRunning+' run · '+D.chillersWorst+' @ '+D.pueWorstAmbientC+'°C · '+D.chillersInstalled+' inst');
+    set('dkDry',D.dryCoolersRunning+' run · '+D.dryCoolersInstalled+' inst · '+D.dryCoolerRating+' kW');
+    set('dkCrah',grp(S.equipment.crah_installed_facility)+' inst · '+D.crahActive+'/'+D.crahInstalled+' per hall');
+    /* engine basis index — every published parameter, read by path, drawer on each row */
+    var body=d.getElementById('dkBasisIndexBody');
+    if(body&&auth.registry&&!body.getAttribute('data-built')){
+      var params=auth.registry.parameters,rows=[];
+      for(var k=0;k<params.length;k++){
+        var pr=params[k];if(/\.digest$/.test(pr.id))continue;
+        rows.push('<div class="rw" style="display:flex;justify-content:space-between;gap:8px;font-size:10px;padding:1px 0;border-bottom:1px dashed var(--bd)">'
+          +'<span class="l" style="color:var(--t3);font-family:JetBrains Mono,monospace;font-size:9px">'+pr.id+'</span>'
+          +'<span class="v" data-basis-param="'+pr.id+'" tabindex="0" role="button" style="cursor:pointer;color:var(--c);font-family:JetBrains Mono,monospace">'
+          +fmtBy(pr.id,at(S,pr.id))+(pr.unit?' '+pr.unit:'')+'</span></div>');
+      }
+      body.innerHTML=rows.join('');body.setAttribute('data-built','1');
+    }
+    return true;
+  }
+  if(d.readyState==='loading')d.addEventListener('DOMContentLoaded',fill);else fill();
+  return {fill:fill,format:fmtBy,valueAt:function(id){var a=window.RZDatahallCurrentAuthority&&window.RZDatahallCurrentAuthority();return a?at(a.snapshot,id):undefined;}};
 })();
 })();
 
