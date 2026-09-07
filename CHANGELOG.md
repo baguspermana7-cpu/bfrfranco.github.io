@@ -11,6 +11,50 @@ release sections rather than semver.
 
 ---
 
+## v2.4.0 — 2026-09-07
+
+### Changed — the Data Hall plan is drawn per rack again: 40 rows × 22 racks in two banks (owner 2026-09-07)
+
+The v2.0.0 rebase drew the 880-rack hall as ten strips of 88 ticks; the owner's verdict was blunt —
+*"ini harusnya per rack … per row itu cukup max 24 rack … distribusi CDU ke rack juga nggak ada
+garis-garisnya."* The hall geometry leaf is re-adopted from the engineering, not the drawing: **one row =
+one RPP group of 22 racks (13.2 m at 0.6 m pitch), two banks of 20 rows at a 3.1 m row pitch fill the
+62 m length, and 2 × 13.2 m + a 4.6 m cross aisle fill the 31 m width** — `geometry.rows` 10 → 40,
+new `geometry.banks` 2, engine publishes `rows_per_bank` and `racks_per_bank` (integer by construction,
+gated). The plan view now draws every rack as its own clickable block (a plain click opens the rack HMI,
+Shift+click the inspector; new `rack-unit` payload class with the rack's IT load, feed current, TCS flow
+and planes, its RPP group and fire zone), hot-aisle containment in pairs, the central cross aisle
+carrying the **TCS supply and return headers with one branch and isolation valve per row** feeding a row
+manifold with a QD pair per rack — the CDU-to-rack distribution lines that were missing — four **CDU
+galleries** at the short walls (every one of the 108 CHx1000 units drawn and clickable, duty/standby from
+the engine), and **CRAH walls** along both long sides (40 clickable banks, 179 units per hall). Floor plans,
+the fire zone template (rows 1–10 / 11–20 / 21–30 / 31–40) and the electrical topology follow the same
+geometry. In-rack: the manifold and QDs are drawn per rack; a second CDU inside the rack is not part of
+the GB300 basis (CHx1000 end-of-row), so none is drawn — the CoolChip HMI stays reachable from the rack
+manifold.
+
+### Changed — a click on a block opens its HMI modal again (owner decision 2026-09-07)
+
+The v2.2.0 two-tier order (click → inspector, modal on demand) is reversed at the owner's request: a
+plain click on any equipment block opens its HMI modal directly, as before v2.2.0; Shift+click,
+right-click and Shift+Enter open the right-side inspector; classes without a deep mimic (fire points
+and zones, network, BMS, rooms, roof) still open the inspector on a plain click. Payload mode, the
+actions, the modal lifecycle and every gate stay; the runtime gates use Shift+click for the inspector
+and assert that a plain CDU click opens `#cduHmi`.
+
+### Fixed — the data-mode notice no longer covers the tab buttons (owner comment 7)
+
+Measured in dark theme at 1080–1680 px: `css/rz-cockpit-instrument.css` forced `.hdr` and `.tabs` to
+`position:relative; z-index:1` for its flat-field intent, but the page's base rule `.tabs{position:sticky;
+top:44px}` kept `top:44px` — as a RELATIVE offset. The tab bar slid 44 px down over the content and the
+"DATA MODE: SIMULATED · Legal & methodology notice" strip sat under the tab buttons on every cockpit in the
+instrument register. Light theme was unaffected, which is why the earlier survey measured a 31 px overlap
+"in dark only". `.hdr` and `.tabs` are removed from that rule; the two keep their sticky positions and
+z-index on every cockpit. Also fixed: the v2.3.0 fire banner's `display:flex` beat the `hidden` attribute, so
+a 41 px empty band sat above the tab bar on every tab while nothing was impaired; `[hidden]` now wins.
+
+---
+
 ## v2.3.0 — 2026-09-07
 
 ### The Fire & Safety workstation: a list before a drawing (Track A §A6)

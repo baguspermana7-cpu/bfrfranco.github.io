@@ -49,8 +49,8 @@ is fully rewritten and carries none of the retired vocabulary. See
 (`AI-Test-3a`, `TS-AI-1`).
 
 **LV electrical grouping (new at GB300 — 880 racks/hall will not fit a per-rack SLD).** Each
-1,922 m² hall (62 × 31 m) is laid out as **10 rows × 88 racks**. Each row is fed as **4 RPP groups
-of 22 racks** (`geometry.racks_per_row` 88, `geometry.rack_rows` 10, `geometry.racks_per_group` 22,
+1,922 m² hall (62 × 31 m) is laid out as **40 rows × 22 racks in two banks of 20** (v2.4.0). Each row IS one **RPP group
+of 22 racks** (`geometry.racks_per_row` 22, `geometry.rack_rows` 40, `geometry.rack_banks` 2, `geometry.rows_per_bank` 20, `geometry.racks_per_group` 22,
 `geometry.rack_groups_per_hall` 40 → RG-01..RG-40 per hall, fed A+B). One group is
 22 × 142 kW = **3.12 MW ≈ 4.7 kA at 400 V / PF 0.96** (`distribution.group_kw`,
 `distribution.group_current_a`), which a **5,000 A busway trunk** carries
@@ -556,10 +556,14 @@ modal, and that the modal be reserved for a heavy action. That is now the rule f
    role="button"` and a `<title>`. The class inventory lives in `js/datahall-ai/hmi-payloads.js`
    (`classList()`); the hall comes from `data-rz-hall` / `data-dh` on an ancestor or the active
    `.dh-btn`. Legacy `*-click` / `data-rack` / `data-sld-click` hooks stay for tier 2 only.
-2. **Single click = tier 1.** `js/datahall-ai/equipment-inspector.js` is a capture-phase `document`
-   listener: it builds the payload and calls `RZInspector.openPayload()`. Clicks whose target sits
-   inside `[data-basis-param]` keep the §A3 behaviour (basis mode). Right-click opens the Deps tab.
-3. **Tier 2 is explicit.** `Open equipment HMI`, double-click, or Shift+Enter calls a named opener
+2. **Single click = the HMI modal when the class has one (owner decision 2026-09-07, v2.3.1).**
+   `js/datahall-ai/equipment-inspector.js` is a capture-phase `document` listener: a plain click builds
+   the payload and, when `actions.openHmi` is set, calls its named opener directly; classes without a deep
+   mimic open the inspector instead. **Shift+click, right-click and Shift+Enter open the right-side
+   inspector** (six tabs). Clicks whose target sits inside `[data-basis-param]` keep the §A3 behaviour
+   (basis mode). This reverses the v2.2.0 "inspector first" order at the owner's request; the inspector
+   and every payload rule stay.
+3. **Tier 2 is also reachable from the inspector.** `Open equipment HMI` or double-click calls a named opener
    in `window.RZDatahallAIHmiOpeners` (`cdu, chiller, dryCooler, eq, stp, ahu, crah, corr, rack,
    mimic, bat`). Network, BMS, room and roof classes have no tier 2 (§A7 owns the network
    workstation) and the inspector says so by offering no action; fire classes have no deep mimic either —

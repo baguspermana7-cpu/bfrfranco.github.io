@@ -104,7 +104,7 @@ try {
                 const el = document.querySelector('[data-rz-equipment="' + r + '"]');
                 if (!el) return 'block vanished';
                 el.scrollIntoView({ block: 'center', inline: 'center' });
-                el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+                el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window, shiftKey: true }));   /* v2.3.1: Shift+click = inspector */
                 const a = document.querySelector('aside.rz-inspector.open');
                 return a ? (a.getAttribute('data-rz-mode') === 'payload' || a.querySelector('.rz-inspector-tab') ? 'ok' : 'inspector open but not in payload mode') : 'inspector did not open';
             }, ref);

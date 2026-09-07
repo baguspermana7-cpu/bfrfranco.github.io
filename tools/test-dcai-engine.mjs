@@ -56,7 +56,7 @@ const S = C.snapshot;
 /* ── 0. sources and hygiene ─────────────────────────────────────────────── */
 ok(!/Math\.random/.test(ENGINE_SRC) && !/Math\.random/.test(MODEL_SRC), 'no Math.random in model or engine');
 ok(Object.isFrozen(S) && Object.isFrozen(S.design) && Object.isFrozen(M.thermal), 'snapshot and model are deep-frozen');
-ok(S.meta.version === '1.1.0' && S.meta.spec_version === M.specVersion, 'meta carries version and spec_version');
+ok(S.meta.version === '1.2.0' && S.meta.spec_version === M.specVersion, 'meta carries version and spec_version');
 ok(!/MEASURED/.test(MODEL_SRC.replace(/nothing may claim MEASURED[^\n]*/,'')), 'nothing in the model claims MEASURED');
 {
   /* every numeric leaf in the model has a `// source:` line within the 6 lines above it */
@@ -309,6 +309,8 @@ approx(S.heat.liquid_hall_kwth * M.facility.halls, S.heat.liquid_kwth, 1e-6, 'ha
   const Ge = S.geometry, Di = S.distribution, El = S.design.electrical;
   ok(Ge.integer_layout === true, 'rack layout is integer on the shipped model');
   ok(Ge.rack_rows === M.geometry.rows, 'rack_rows republishes geometry.rows');
+  ok(Ge.rack_banks === M.geometry.banks && Ge.rows_per_bank === M.geometry.rows / M.geometry.banks, 'rows_per_bank = rows ÷ banks');
+  ok(Ge.racks_per_bank === Ge.rows_per_bank * Ge.racks_per_row && Ge.racks_per_bank * Ge.rack_banks === M.facility.racksPerHall, 'racks_per_bank × banks = racks per hall');
   ok(Ge.racks_per_row === M.facility.racksPerHall / M.geometry.rows, 'racks_per_row = racks/hall ÷ rows');
   ok(Ge.racks_per_group === M.electrical.racksPerRppGroup, 'racks_per_group republishes electrical.racksPerRppGroup');
   ok(Ge.rack_groups_per_hall === M.facility.racksPerHall / M.electrical.racksPerRppGroup, 'rack_groups_per_hall = racks/hall ÷ racks/group');

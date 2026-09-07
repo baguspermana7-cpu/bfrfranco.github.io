@@ -97,7 +97,8 @@ try {
         note(!malformed.length, `${row.view}: ${malformed.length} equipment blocks without tabindex="0" role="button"`);
         if (hooks.length) {
             const handle = await tab.$(`${entry.selector} [data-rz-equipment]`);
-            await handle.evaluate((el) => { el.scrollIntoView({ block: 'center', inline: 'center' }); el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window })); });
+            /* v2.3.1: Shift+click is the inspector gesture; a plain click opens the HMI modal when the class has one */
+            await handle.evaluate((el) => { el.scrollIntoView({ block: 'center', inline: 'center' }); el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window, shiftKey: true })); });
             await sleep(300);
             const st = await inspectorState(tab);
             const ok = st.open && st.payload && st.tabs === 6 && !st.modalOpen && !st.scrim && st.rows > 0 && st.both === 0 && /engine|scenario/.test(st.prov);
@@ -135,6 +136,22 @@ try {
     }
     note(errors.length === 0, `page errors: ${errors.slice(0, 3).join(' | ')}`);
 
+    /* T0 — v2.3.1 owner decision: a PLAIN click on a block with a deep mimic opens the modal directly */
+    {
+        const t0 = await newTab();
+        await activateTab(t0.tab, set, set.diagrams[2]);
+        const h0 = await t0.tab.$(`${set.diagrams[2].selector} [data-rz-equipment^="cdu:"]`);
+        await h0.evaluate((el) => { el.scrollIntoView({ block: 'center' }); el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window })); }); await sleep(500);
+        const m0 = await t0.tab.evaluate(() => ({ modal: [...document.querySelectorAll('.dh-modal-host.show')].map((e) => e.id), inspector: !!document.querySelector('aside.rz-inspector.open') }));
+        note(m0.modal.includes('cduHmi'), `T0 plain click on a CDU opens its HMI modal directly (${JSON.stringify(m0)})`);
+        await t0.tab.keyboard.press('Escape'); await sleep(250);
+        const h1 = await t0.tab.$(`${set.diagrams[2].selector} [data-rz-equipment^="cdu:"]`);
+        await h1.evaluate((el) => { el.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, view: window })); }); await sleep(300);
+        const m1 = await t0.tab.evaluate(() => ({ modal: [...document.querySelectorAll('.dh-modal-host.show')].map((e) => e.id), inspector: !!document.querySelector('aside.rz-inspector.open') }));
+        note(m1.inspector && !m1.modal.length, `T0 right-click opens the inspector, not a modal (${JSON.stringify(m1)})`);
+        await t0.tab.close();
+    }
+
     /* T3 — tier 2 from the inspector action, a11y contract, timers, focus return */
     const t3 = await newTab();
     const T3 = [{ entry: set.diagrams[2], ref: 'cdu' }, { entry: set.diagrams[4], ref: 'chiller' }, { entry: set.diagrams[6], ref: 'sld-tx' }, { entry: set.diagrams[3], ref: 'rack-psu' }];
@@ -142,7 +159,7 @@ try {
         await activateTab(t3.tab, set, c.entry);
         const handle = await t3.tab.$(`${c.entry.selector} [data-rz-equipment^="${c.ref}:"]`);
         if (!handle) { note(false, `T3 ${c.ref}: no block on ${c.entry.selector}`); continue; }
-        await handle.evaluate((el) => { el.scrollIntoView({ block: 'center', inline: 'center' }); el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window })); }); await sleep(250);
+        await handle.evaluate((el) => { el.scrollIntoView({ block: 'center', inline: 'center' }); el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window, shiftKey: true })); }); await sleep(250);
         const btn = await t3.tab.$('.rz-inspector [data-rz-open-hmi]');
         note(!!btn, `T3 ${c.ref}: inspector offers Open equipment HMI`);
         if (!btn) continue;
@@ -173,7 +190,7 @@ try {
     await activateTab(t3.tab, set, set.diagrams[6]);
     const txHandle = await t3.tab.$(`${set.diagrams[6].selector} [data-rz-equipment^="sld-ups-a:"]`);
     if (txHandle) {
-        await txHandle.evaluate((el) => { el.scrollIntoView({ block: 'center' }); el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window })); }); await sleep(250);
+        await txHandle.evaluate((el) => { el.scrollIntoView({ block: 'center' }); el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window, shiftKey: true })); }); await sleep(250);
         const b1 = await t3.tab.$('.rz-inspector [data-rz-open-hmi]'); if (b1) { await b1.click(); await sleep(500); }
         const bat = await t3.tab.$('#sldMimicSvg [data-bat]');
         if (bat) {
@@ -197,7 +214,7 @@ try {
         const { tab: t } = await newTab();
         await activateTab(t, set, set.diagrams[2]);
         const h = await t.$(`${set.diagrams[2].selector} [data-rz-equipment^="cdu:"]`);
-        await h.evaluate((el) => { el.scrollIntoView({ block: 'center' }); el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window })); }); await sleep(300);
+        await h.evaluate((el) => { el.scrollIntoView({ block: 'center' }); el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window, shiftKey: true })); }); await sleep(300);
         texts.push(await t.evaluate(() => document.querySelector('.rz-inspector [data-slot="body"]').textContent));
         await t.close();
     }
@@ -208,7 +225,7 @@ try {
         const { tab: t } = await newTab(w);
         await activateTab(t, set, set.diagrams[2]);
         const h = await t.$(`${set.diagrams[2].selector} [data-rz-equipment]`);
-        await h.evaluate((el) => { el.scrollIntoView({ block: 'center' }); el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window })); }); await sleep(350);
+        await h.evaluate((el) => { el.scrollIntoView({ block: 'center' }); el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window, shiftKey: true })); }); await sleep(350);
         const g = await t.evaluate(() => { const el = document.querySelector('aside.rz-inspector'); const r = el.getBoundingClientRect(); const cs = getComputedStyle(el); return { x: r.x, y: r.y, w: r.width, h: r.height, vw: innerWidth, vh: innerHeight, pad: getComputedStyle(document.body).paddingRight, close: (document.querySelector('.rz-inspector-close') || {}).getBoundingClientRect ? document.querySelector('.rz-inspector-close').getBoundingClientRect().height : 0, overflowX: document.documentElement.scrollWidth > innerWidth + 1, docked: document.body.classList.contains('rz-inspector-docked') }; });
         let ok = false;
         if (expect === 'docked') ok = g.docked && parseInt(g.pad, 10) >= 360 && g.x + g.w <= g.vw + 1;

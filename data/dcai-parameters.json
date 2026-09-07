@@ -1,6 +1,6 @@
 {
   "generatedBy": "tools/build-dcai-parameter-registry.mjs",
-  "engineVersion": "1.1.0",
+  "engineVersion": "1.2.0",
   "note": "GENERATED — do not hand-edit. Curated metadata lives in data/dcai-parameters.curated.json; authored-leaf provenance is read from js/dcai-model.js.",
   "parameters": [
     {
@@ -6177,7 +6177,7 @@
       "label": "groups per row",
       "unit": null,
       "kind": "derived",
-      "value": 4,
+      "value": 1,
       "formula": null,
       "display": "internal",
       "displayReason": "Auxiliary layout ratio (racks per row / racks per group = 4); the page renders rows, racks per row and RPP groups, from which it follows.",
@@ -6365,6 +6365,7 @@
       "dependsOnInputs": [
         "electrical.racksPerRppGroup",
         "facility.racksPerHall",
+        "geometry.banks",
         "geometry.rows"
       ],
       "dependsOnInputsAtCliff": [],
@@ -6404,6 +6405,39 @@
       "docs": [
         "manual/datahallai.html"
       ]
+    },
+    {
+      "id": "geometry.rack_banks",
+      "unit": null,
+      "kind": "authored",
+      "value": 2,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "geometry.banks"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [
+        "standarization/DATAHALL_AI_STANDARD.md"
+      ],
+      "source": {
+        "ref": "js/dcai-model.js geometry.banks",
+        "method": "the two banks face the central cross aisle that carries the TCS headers from the CDU galleries at both ends; rows per bank = rows / banks must be an integer. ADOPTED",
+        "asOf": "2026-09-06"
+      }
     },
     {
       "id": "geometry.rack_footprint_fraction",
@@ -6493,7 +6527,7 @@
       "label": "rack it row kW",
       "unit": "kW",
       "kind": "derived",
-      "value": 12496,
+      "value": 3124,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -6521,7 +6555,7 @@
       "label": "rack rows",
       "unit": null,
       "kind": "authored",
-      "value": 10,
+      "value": 40,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -6534,7 +6568,7 @@
       "consumers": [
         {
           "page": "datahallAI.html",
-          "reads": 7
+          "reads": 6
         }
       ],
       "tests": [
@@ -6546,9 +6580,35 @@
       ],
       "source": {
         "ref": "js/dcai-model.js geometry.rows",
-        "method": "10 rack rows at a 3.1 m row pitch fill the 31 m width; 88 racks x 0.6 m = 52.8 m of the 62 m length with a cross-aisle. 10 x 88 = 880 exactly. ADOPTED",
+        "method": "one row = one RPP group of 22 racks (13.2 m at 0.6 m pitch); two banks of 20 rows at a 3.1 m row pitch fill the 62 m length (20 x 3.1 = 62), and 2 x 13.2 m + a 4.6 m cross aisle fill the 31 m width. 40 x 22 = 880 exactly; a row is a readable object (owner 2026-09-07: \"per row max 24 racks\"). ADOPTED",
         "asOf": "2026-09-06"
       }
+    },
+    {
+      "id": "geometry.racks_per_bank",
+      "unit": null,
+      "kind": "derived",
+      "value": 440,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "facility.racksPerHall",
+        "geometry.banks"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
     },
     {
       "id": "geometry.racks_per_group",
@@ -6589,7 +6649,7 @@
       "label": "racks per row",
       "unit": null,
       "kind": "derived",
-      "value": 88,
+      "value": 22,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -6597,6 +6657,34 @@
       "explainKey": null,
       "dependsOnInputs": [
         "facility.racksPerHall",
+        "geometry.rows"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": [
+        "standarization/DATAHALL_AI_STANDARD.md"
+      ]
+    },
+    {
+      "id": "geometry.rows_per_bank",
+      "unit": null,
+      "kind": "derived",
+      "value": 20,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "geometry.banks",
         "geometry.rows"
       ],
       "dependsOnInputsAtCliff": [],
@@ -7027,7 +7115,7 @@
       "label": "version",
       "unit": null,
       "kind": "authored",
-      "value": "1.1.0",
+      "value": "1.2.0",
       "formula": null,
       "deps": [],
       "scope": "meta",

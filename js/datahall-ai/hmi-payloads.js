@@ -498,6 +498,34 @@
     b.trend('util_pct', 'NVLink utilisation', '%', { value: 80 }, 8, { digits: 0 });
     b.tier2('rack', ['ns']);
   });
+  /* one rack of the hall plan (v2.4.0): R<row>-<position>, a row = one RPP group */
+  def('rack-unit', { kind: 'engine', label: 'Rack', system: 'compute', tier2: 'rack' }, function (b, ctx, id) {
+    var A = ctx.adapter, m = /^R(\d\d)-(\d\d)$/.exec(String(id)) || (String(id) === '1' || /^dh/i.test(String(id)) ? ['', '01', '01'] : null);
+    if (!m) { throw new Error('hmi-payloads: rack-unit id must be R<row>-<pos>: ' + id); }
+    var row = Number(m[1]), pos = Number(m[2]), rpb = finite(A.rowsPerBank) ? A.rowsPerBank : null, bank = rpb ? (row <= rpb ? 'A' : 'B') : '—';
+    var hp = 'DH-0' + b.hall;
+    b.title = 'Rack R' + m[1] + '-' + m[2] + ' — RG-' + m[1] + ' · bank ' + bank + ' — ' + hp;
+    b.E('live', 'it_kw', 'Design IT load', 'kwPerRack', 'kW', { digits: 0 });
+    b.E('live', 'gpus', 'GPUs', 'gpuPerRack', '', { digits: 0 });
+    b.E('live', 'feed_a', 'Rack feed', 'rackFeedA', 'A', { digits: 0 });
+    b.E('live', 'tcs_lpm', 'TCS flow (row manifold)', 'tcsFlowRackLpm', 'L/min', { digits: 0 });
+    b.P('live', 'tcs_in_c', 'TCS inlet', 'p07_tcs_supply_c'); b.P('live', 'tcs_out_c', 'TCS outlet', 'p08_tcs_return_c');
+    b.S('live', 'gpu_util', 'GPU utilisation', { value: 92, text: '92 % training load' }, 5, '%', { digits: 0, min: 0, max: 100 });
+    b.S('live', 'inlet_air_c', 'Cold-aisle inlet', { plane: 'p10_rack_inlet_c' }, 0.8, '°C');
+    var leak = coolingScenario(ctx).leakWetZones || [];
+    b.ST('live', 'manifold', 'Rack manifold', leak.length && leak.indexOf(((row - 1) % 24) + 1) >= 0 ? 'wet' : 'dry', 'manifold leak state from the cooling scenario leak zones mapped onto the row (Track A §A2b/§A6)');
+    b.E('capacity', 'racks_per_row', 'Racks in this row (RPP group)', 'racksPerRow', '', { digits: 0 });
+    b.E('capacity', 'group_kw', 'Row / RPP group load', 'groupKw', 'kW', { digits: 0 });
+    b.E('capacity', 'group_a', 'Row LV current', 'reqCurrentA', 'A', { digits: 0 });
+    b.D('capacity', 'position', 'Position', 'row ' + row + ' of ' + (finite(A.rackRows) ? A.rackRows : '—') + ', bank ' + bank + ', position ' + pos + ' from the cross aisle', 'plan position from the engine hall geometry (geometry.rack_rows, geometry.rows_per_bank); a label (Track A §A2b)');
+    var gal = rpb ? (row <= rpb ? (pos <= 11 ? 1 : 3) : (pos <= 11 ? 2 : 4)) : 1;
+    b.dep('upstream', 'cdu:' + (finite(A.cduInstalled) ? Math.min(A.cduInstalled, (gal - 1) * Math.ceil(A.cduInstalled / 4) + 1) : 1), 'CDU gallery ' + gal + ' (TCS header)');
+    b.dep('upstream', 'sld-busway:dh0' + b.hall, 'Busway / RPP group RG-' + m[1]);
+    b.dep('upstream', 'fire-zone:' + hp + '-Z' + (row <= 10 ? '05' : row <= 20 ? '06' : row <= 30 ? '07' : '08'), 'Fire zone');
+    b.dep('downstream', 'rack-manifold:1', 'Rack liquid manifold');
+    b.trend('gpu_util', 'GPU utilisation', '%', { value: 92 }, 5, { digits: 0 });
+    b.tier2('rack', ['manifold', String(pos)]);
+  });
   def('rack-manifold', { kind: 'engine', label: 'Rack manifold', system: 'cooling', tier2: 'rack' }, function (b, ctx) {
     b.title = 'Rack liquid manifold — GB300 NVL72 rack';
     b.P('live', 'tcs_supply_c', 'TCS supply', 'p07_tcs_supply_c'); b.P('live', 'tcs_return_c', 'TCS return', 'p08_tcs_return_c');

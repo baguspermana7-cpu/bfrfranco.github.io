@@ -441,12 +441,16 @@
     /* Published as a FLAG, not a throw: the registry generator perturbs every leaf by x1.37 and
        x0.73 to measure dependencies, and a throw there would erase the edges of everything
        downstream of racksPerHall. The gate asserts the flag is true on the shipped model. */
-    var integerLayout = Number.isInteger(racksPerRow) && Number.isInteger(groupsPerHall);
+    var rowsPerBank = div(geo.rows, geo.banks, 'rows per bank');
+    var integerLayout = Number.isInteger(racksPerRow) && Number.isInteger(groupsPerHall) && Number.isInteger(rowsPerBank);
     var geometry = {
       integer_layout: integerLayout,
       hall_length_m: geo.lengthM, hall_width_m: geo.widthM, hall_height_m: geo.heightM,
       rack_rows: geo.rows,
       racks_per_row: racksPerRow,
+      rack_banks: geo.banks,
+      rows_per_bank: rowsPerBank,
+      racks_per_bank: rowsPerBank * racksPerRow,
       rack_it_row_kwe: racksPerRow * (f.rackItKw),                       /* one row strip on the hall mimic */
       rack_groups_per_hall: groupsPerHall,
       racks_per_group: racksPerGroup,
@@ -517,7 +521,7 @@
     return deepFreeze({
       meta: {
         engine: 'dcai-engine.js',
-        version: '1.1.0',   /* v2.1.0: per-hall slices, per-unit duties, row kW, 2N normal loading published for the drawings */
+        version: '1.2.0',   /* v2.4.0: hall geometry re-adopted as 40 rows × 22 racks in two banks (rows_per_bank, racks_per_bank) */
         spec_version: m.specVersion,
         authority: m.authority,
         evidence_class: 'SIMULATED/ADOPTED',

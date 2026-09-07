@@ -332,9 +332,14 @@
       lengthM: 62,
       widthM: 31,
       heightM: 5.5,
-      // source: 10 rack rows at a 3.1 m row pitch fill the 31 m width; 88 racks x 0.6 m = 52.8 m
-      //         of the 62 m length with a cross-aisle. 10 x 88 = 880 exactly. ADOPTED
-      rows: 10,
+      // source: one row = one RPP group of 22 racks (13.2 m at 0.6 m pitch); two banks of 20 rows at a
+      //         3.1 m row pitch fill the 62 m length (20 x 3.1 = 62), and 2 x 13.2 m + a 4.6 m cross aisle
+      //         fill the 31 m width. 40 x 22 = 880 exactly; a row is a readable object (owner 2026-09-07:
+      //         "per row max 24 racks"). ADOPTED
+      rows: 40,
+      // source: the two banks face the central cross aisle that carries the TCS headers from the CDU
+      //         galleries at both ends; rows per bank = rows / banks must be an integer. ADOPTED
+      banks: 2,
       // source: NVIDIA GB300 NVL72 design guide rack footprint class 600 x 1200 mm. ADOPTED
       rackFootprintM2: 0.72
     },

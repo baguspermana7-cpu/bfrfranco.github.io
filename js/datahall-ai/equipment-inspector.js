@@ -104,11 +104,17 @@
     if (!payloads() || !inspector()) { return; }
     if (!context()) { doc.body.setAttribute('data-rz-equipment-inspector', 'unavailable'); return; }
     doc.body.setAttribute('data-rz-equipment-inspector', 'ready');
+    /* v2.3.1 — owner decision 2026-09-07: a single click opens the equipment HMI MODAL when the class has one
+       (as before v2.2.0); Shift+click, right-click, Shift+Enter open the right-side inspector. Classes without a
+       deep mimic (fire points and zones, network, BMS, rooms, roof) open the inspector on a plain click. */
     doc.addEventListener('click', function (e) {
       var el = equipmentTarget(e); if (!el) { return; }
       if (win.__rzSvgPanMoved) { return; }
-      if (e.detail >= 2) { return; }                               /* the dblclick listener owns tier 2 */
+      if (e.detail >= 2) { return; }                               /* the dblclick listener owns the repeat */
       e.stopPropagation(); e.preventDefault();
+      if (e.shiftKey) { openTier1(el); return; }
+      var p = build(el.getAttribute('data-rz-equipment'), hallOf(el));
+      if (p && !p.unavailable && p.actions && p.actions.openHmi && openTier2(p, el)) { return; }
       openTier1(el);
     }, true);
     doc.addEventListener('dblclick', function (e) {
@@ -122,13 +128,15 @@
       var el = e.target && e.target.closest ? e.target.closest('[data-rz-equipment]') : null;
       if (!el || e.target.closest('[data-basis-param]')) { return; }
       e.stopPropagation(); e.preventDefault();
-      if (e.shiftKey) { var p = build(el.getAttribute('data-rz-equipment'), hallOf(el)); if (p && !p.unavailable) { openTier2(p, el); } return; }
+      if (e.shiftKey) { openTier1(el); return; }
+      var kp = build(el.getAttribute('data-rz-equipment'), hallOf(el));
+      if (kp && !kp.unavailable && kp.actions && kp.actions.openHmi && openTier2(kp, el)) { return; }
       openTier1(el);
     }, true);
     doc.addEventListener('contextmenu', function (e) {
       var el = equipmentTarget(e); if (!el || e.target.closest('#sldMimicSvg')) { return; }
       e.preventDefault(); e.stopPropagation();
-      openTier1(el, { tab: 'deps' });
+      openTier1(el);
     }, true);
     var cool = doc.getElementById('coolingScenario');
     if (cool) { cool.addEventListener('change', function () { if (current) { var p = build(current.ref, current.hall); if (p && !p.unavailable && inspector().isOpen()) { inspector().refreshPayload(p); } } }); }
@@ -136,7 +144,7 @@
     if (elec) { elec.addEventListener('change', function () { if (current) { var p = build(current.ref, current.hall); if (p && !p.unavailable && inspector().isOpen()) { inspector().refreshPayload(p); } } }); }
   }
 
-  var API = { version: '2.2.0', init: init, open: function (ref, hall) { var el = doc.querySelector('[data-rz-equipment="' + ref + '"]'); return el ? openTier1(el) : false; }, context: context, build: build, openTier2: openTier2, stopRefresh: stopRefresh };
+  var API = { version: '2.3.1', init: init, open: function (ref, hall) { var el = doc.querySelector('[data-rz-equipment="' + ref + '"]'); return el ? openTier1(el) : false; }, context: context, build: build, openTier2: openTier2, stopRefresh: stopRefresh };
   win.RZDatahallAIEquipmentInspector = API;
   if (doc.readyState === 'loading') { doc.addEventListener('DOMContentLoaded', init); } else { init(); }
 })(typeof window !== 'undefined' ? window : null, typeof document !== 'undefined' ? document : null);

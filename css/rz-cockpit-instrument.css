@@ -23,8 +23,9 @@ html[data-rz-register="instrument"]:not([data-theme="light"]){
 
 /* Keep cockpit surfaces on a flat field. Decorative grids and scanlines are
    intentionally absent so only semantic process lines carry visual signal. */
-html[data-rz-register="instrument"]:not([data-theme="light"]) .hdr,
-html[data-rz-register="instrument"]:not([data-theme="light"]) .tabs,
+/* v2.3.1 — .hdr and .tabs are NOT in this list: they are position:sticky (top:0 / top:44px) on every cockpit,
+   and forcing position:relative here kept the base `top:44px` as a relative OFFSET — in dark theme the tab bar
+   slid 44 px down over the content and the data-mode notice sat under the tab buttons (owner comment 7). */
 html[data-rz-register="instrument"]:not([data-theme="light"]) .mn,
 html[data-rz-register="instrument"]:not([data-theme="light"]) .sb{position:relative;z-index:1;}
 
