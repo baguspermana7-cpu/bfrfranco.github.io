@@ -71,6 +71,7 @@ try {
     await new Promise((accept) => setTimeout(accept, 150));
 
     for (const entry of set.diagrams) {
+        if (entry.kind === 'html') continue;
         await activateTab(tab, set, entry);
         const hooks = await tab.evaluate((sel) => {
             const svg = document.querySelector(sel);

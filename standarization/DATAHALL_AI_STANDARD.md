@@ -210,6 +210,54 @@ Density means `IT load per hall / gross hall floor area`. The public field is
   permissives, abort/inhibit state, and reset authority are explicit data.
 - A generic global building shutdown is forbidden; the engineered event/zone matrix decides.
 
+### Fire workstation (Track A §A6, v2.3.0)
+
+The fire tab is a WORKSTATION whose home screen is a point list, not a drawing (owner comment (5),
+doc-27 §5.6, doc-24 §8, doc-08). Sub-tabs `points → zones → mimic → cause & effect` under one scoped
+strip (`.fire-tabs .ft`, panels `.fp` — never `.et` / `.ep`: the electrical strip's handler is
+document-global). Ids `fire*` / `fp-*` are reserved.
+
+- **Content lives in `js/datahall-ai/fire-points.js`** (DOM-free, deep-frozen, no clock, no die roll):
+  the point inventory is generated from the engine hall geometry × ADOPTED NFPA 72 spacing (9.1 m spot
+  smoke on two cross-zoned loops, 15.2 m listed heat, 7.5 m aspirating port) for every hall — counts are
+  formulas and are DECLARED, never hooked: the engine publishes no fire quantity. Ids are
+  `DH-01-Z05-SD1-03`, `DH-01-VD-2`, `DH-01-MCP-N`, `DH-01-Z09-EPO`; a VESDA unit is one point serving
+  three zones. EPO exists only in electrical-room zones (Tech Spec §6.9); the exits carry manual call points.
+- **Isolation rules are the content.** `isolate / restore / extend` are pure functions on a register:
+  life-safety points (MCP, EPO, release, abort) are never isolable; nothing is isolated while the FACP
+  is in alarm; owner, a reason ≥ 10 characters and an explicit expiry (2h/8h/24h/72h) are required; an
+  isolation may be extended twice. Dropping a clean-agent zone below **two independent detection means**
+  is not refused — it is a consequence the operator must acknowledge, after which the zone is IMPAIRED,
+  its release is inhibited (`CE-SUPPRESSION-ARMED` row inhibited, the `inhibited` release interlock set)
+  and a FIRE WATCH is raised page-wide. An expired isolation stays isolated and raises its own record.
+- **Every action is a record** in the alarm-query schema (`system:'fire'`, `quality:'simulated'`,
+  `scenario:'training'`), appended to the Alarms workspace through
+  `RZDatahallAIAlarmWorkspace.appendEvents()` — the workspace IS the isolation log (saved view Fire).
+- **One snapshot per 4 s tick.** `evaluate(inventory, register, run, tick)` feeds the point list, the
+  zone tiles, the summary strip, the page-wide banner (`#fireImpairmentBanner`, outside `.mn`, above the
+  tab bar — doc-27: fire/leak alarm overlays every page), the sidebar counters, the alarm-strip terms
+  (`rules()`: confirmed fire / discharge / EPO active / wet leak = critical; impaired zone or expired
+  isolation = warning; maintenance = isolated count), the mimic painter (`RZDatahallAIFireMimic.paint`),
+  the equipment payloads (`ctx.fire`) and the cause-and-effect input (`elapsedSeconds`, `runtimeRows`,
+  `interlocks`). The tick is the sim tick, so `window.__rzSimTick` pins everything.
+- **The register is a TRAINING register in this browser** (localStorage `dhFireIsolationRegister`,
+  versioned, discarded with a record when it fails validation; `Clear register` empties it with a
+  record). No command leaves the page (FR-40); the FACP stays the authority.
+- **The isolation dialog is the only modal** (`#fireIsoDialog`, a DHModal panel): owner, reason, expiry,
+  the consequence preview from `previewIsolate`, an acknowledgement checkbox. Restore is a one-click
+  action with a confirm line in the inspector. Life-safety points show the action DISABLED with the
+  reason, never hidden. Inspector actions beyond "Open equipment HMI" are `payload.actions.custom[]`
+  resolved through `window.RZDatahallAIInspectorActions` (see INSPECTOR.md).
+- **Agent label** follows doc-30 §10.5: `clean-agent suppression — project selection pending`
+  (`RZDatahallAIFirePoints.AGENT_LABEL`); no design concentration is printed on an operator surface.
+
+Gates: `tools/test-datahall-ai-fire-points.mjs` (F1–F12: formula counts, refusals, the two-means chain,
+record validity with the workspace fixture, tick expiry, static clock/random scan, purity, C&E plumbing,
+stage model, persistence validation) and `tools/test-datahall-ai-fire-runtime.mjs` (R1–R12: scoped
+sub-tabs, isolate through inspector + dialog, life-safety refusal, impairment → banner on another tab +
+strip + sidebar, C&E BLOCKED, restore, determinism, staged run, ESC, no random, persistence, walker
+clean). The workstation views are `kind:'html'` entries of the tab set: coverage walks them as rows.
+
 ### Shared Design Studio
 
 - `js/rz-design-studio.js` and `css/rz-design-studio.css` provide one accessible modal
@@ -244,7 +292,7 @@ focus return; internal table scrolling; zero document overflow; and no uncaught 
 1. A data-model field rename can silently render `NaN`; integration tests must assert the
    public property name and a real rendered number.
 2. Monolithic SVG pages can contain duplicate DOM IDs across unrelated panels. New
-   workspaces must reserve unique prefixes (`alarm*`, `electrical*`, `fireCauseEffect*`).
+   workspaces must reserve unique prefixes (`alarm*`, `electrical*`, `fireCauseEffect*`, `fire*` / `fp-*`).
 3. A sticky header can cover a non-sticky tab rail after the page scrolls. Desktop stacks
    header + rail; narrow layouts keep a bounded horizontally scrollable rail.
 4. Hardware-generation comparisons are reference studies until the owner/EoR adopts a new
@@ -513,8 +561,9 @@ modal, and that the modal be reserved for a heavy action. That is now the rule f
    inside `[data-basis-param]` keep the §A3 behaviour (basis mode). Right-click opens the Deps tab.
 3. **Tier 2 is explicit.** `Open equipment HMI`, double-click, or Shift+Enter calls a named opener
    in `window.RZDatahallAIHmiOpeners` (`cdu, chiller, dryCooler, eq, stp, ahu, crah, corr, rack,
-   mimic, bat`). Network, fire, BMS, room and roof classes have no tier 2 (§A6/§A7 own their
-   workstations) and the inspector says so by offering no action.
+   mimic, bat`). Network, BMS, room and roof classes have no tier 2 (§A7 owns the network
+   workstation) and the inspector says so by offering no action; fire classes have no deep mimic either —
+   their second tier is the fire WORKSTATION (§A6) and their inspector actions are isolate / restore / extend.
 4. **One payload, both tiers.** Every deep mimic starts with `var P=RZ_HMI_P(classId,id,hall,renderer)`
    and prints `P.v(point)` / `P.n(point)`; `P.state(point)` drives every state flip; `RZ_ALM(P,point)`
    decides an alarm badge. The renderer's extra points (the ones a die roll used to produce) are
@@ -530,7 +579,8 @@ modal, and that the modal be reserved for a heavy action. That is now the rule f
 6. **States come from scenarios.** Electrical states read `RZDatahallAIElectrical.evaluateScenario`
    (`#electricalScenario`); cooling states read the `COOLING_SCENARIOS` table through the new
    `#coolingScenario` select (`normal`, `cdu-pump-fail`, `chiller-trip`, `leak-z07`); fire states
-   read the FACP cause-and-effect engine. A coin flip is never a state.
+   read the fire workstation snapshot (`fire-points.evaluate`: isolation register + training run, mapped
+   onto the FACP cause-and-effect engine). A coin flip is never a state.
 7. **Modal lifecycle.** `DHModal` keeps a panel stack; `DHModal.onClose(panel, fn)` runs on every
    close path (ESC, scrim, close button, programmatic); `DHModal.timer(panel, fn, ms)` is the only
    way a panel may tick, so `DHModal.activeTimers()` must read `{}` once the stack is empty; the

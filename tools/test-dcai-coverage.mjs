@@ -153,7 +153,14 @@ try {
             seenTabs.add(entry.tab);
             addHtml(await run(`#${set.panelPrefix}${entry.tab}`, { htmlOnly: true }));
         }
-        if (wantHtml && entry.sub) { addHtml(await run(`#${set.subPanelPrefix}${entry.sub}`, { htmlOnly: true })); }
+        if (wantHtml && entry.sub) { addHtml(await run(`#${entry.subPanelPrefix || set.subPanelPrefix}${entry.sub}`, { htmlOnly: true })); }
+        if (entry.kind === 'html') {
+            /* v2.3.0: an HTML workstation view is its own row (walked as HTML), then its equipment classes */
+            const rh = await run(entry.selector, { htmlOnly: true });
+            rows.push({ row: entry.selector.slice(1), label: entry.label, ...rh });
+            await inspectClasses(entry.selector, entry.label);
+            continue;
+        }
         if (!wantSvg) continue;
         if (entry.selector === '#floorSvg') {
             /* the floor plan is drawn on a floor click in the isometric; two floors carry engine numbers */

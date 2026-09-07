@@ -61,7 +61,7 @@ const DIAGRAMS = Object.freeze([
      at all, so every render gate measured an empty set and reported the page clean while it
      carried ~2,050 sub-floor labels and ~200 overlapping pairs. Expanded from the declared tab
      set rather than re-typed, so the two lists cannot drift. */
-  ...TAB_SETS['datahallAI.html'].diagrams.map((entry) => ({
+  ...TAB_SETS['datahallAI.html'].diagrams.filter((entry) => entry.kind !== 'html').map((entry) => ({
     page: 'datahallAI.html',
     selector: entry.selector,
     label: `DC AI ${entry.label}`,

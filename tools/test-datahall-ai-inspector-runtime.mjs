@@ -81,6 +81,7 @@ try {
     const { tab, errors } = await newTab();
     const views = [];
     for (const entry of set.diagrams) {
+        if (entry.kind === 'html') continue;                      /* the fire workstation's HTML views have their own gate */
         if (entry.selector === '#floorSvg') { views.push({ ...entry, floor: 'gf', label: 'floor gf' }, { ...entry, floor: 'f2', label: 'floor f2' }); continue; }
         views.push(entry);
     }

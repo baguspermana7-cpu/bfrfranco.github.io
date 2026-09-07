@@ -1,4 +1,4 @@
-# Inspector standard — v1.43.0+ (payload mode v1.45.0)
+# Inspector standard — v1.43.0+ (payload mode v1.45.0, custom actions v1.46.0)
 
 Companion to [`LINE_MODEL.md`](LINE_MODEL.md) + [`BREAKER_SYMBOLS.md`](BREAKER_SYMBOLS.md). Responds to team review docs:
 
@@ -41,6 +41,7 @@ window.RZInspector.basisIdOf(element);  /* the registry id an element resolves t
 window.RZInspector.openPayload(payload, {trigger, onOpenHmi, onNavigate, tab, keepFocus}); /* v1.45.0 — payload mode (a DOM-free equipment payload, see below) */
 window.RZInspector.refreshPayload(payload); /* re-render the open payload in place (tickers); keeps tab, scroll and the action button */
 window.RZInspector.currentPayloadId();      /* "<classId>:<id>" of the open payload, or null */
+/* v1.46.0 — payload.actions.custom[] buttons dispatch to window.RZDatahallAIInspectorActions[handler](payload, button, ...args) */
 window.RZInspector.close();             /* close */
 window.RZInspector.isOpen();            /* boolean */
 ```
@@ -88,6 +89,19 @@ The DC-AI page's producer is `js/datahall-ai/hmi-payloads.js` (classes, points, 
 `js/datahall-ai/equipment-inspector.js` as the click resolver and `js/datahall-ai/sim-telemetry.js`
 as the seeded simulator; DATAHALL_AI_STANDARD.md "Two-tier equipment inspection" is the page-side rule.
 
+**Custom actions (v1.46.0, Track A §A6).** A payload may carry `actions.custom[]` —
+`{id, label, handler, args, tone:'default'|'warn', disabled, title}` — rendered as buttons after
+`Open equipment HMI`. `handler` is a NAME resolved at click time against
+`window.RZDatahallAIInspectorActions` (the page registers `fireIsolate / fireRestore / fireExtend`), so
+payloads stay frozen and serialisable. The slot rebuilds only when its signature (ids + disabled flags)
+changes, and a focused button is re-focused on its successor — a modal that opened from an action
+returns focus to the inspector. A disabled action stays visible with its `title` as the reason (a
+life-safety point says why it cannot be isolated). Clicks inside a `DHModal` panel or on its scrim are
+never treated as outside clicks.
+
+A `data-rz-equipment` ref may be carried by more than one node (the leak controller is drawn on the hall
+mimic and on the fire mimic); `navigate()` resolves the first in document order.
+
 ## Authoring guidelines
 
 1. **Just add the script tag.** `<script src="js/rz-inspector.js?v=1.43.0" defer></script>` after `js/rz-line-model.js` + `js/rz-breaker-symbols.js`. The inspector auto-initialises on `DOMContentLoaded`.
@@ -103,6 +117,7 @@ as the seeded simulator; DATAHALL_AI_STANDARD.md "Two-tier equipment inspection"
 | v1.43.0 | `datahallAI.html` | Loaded. Verified via probe — clicks open inspector. |
 | **v1.43.1** | `chiller-plant.html`, `water-system.html`, `fire-system.html` | **Loaded.** Each verified via probe (27/27 pass — 4 inspector assertions). |
 | v1.43.2 (planned) | `datahall.html`, `ict.html` | Pending — datahall standalone + ict on standard track. EPMS still deferred per owner mandate. |
+| **v2.3.0** | `datahallAI.html` | **Fire workstation rows and tiles.** Point-list rows (`fire-point:<id>`) and zone tiles (`fire-zone:<id>`) open here with isolate / restore / extend actions; the isolation dialog is the workstation's only modal. Gated by `tools/test-datahall-ai-fire-runtime.mjs`. |
 | **v2.2.0** | `datahallAI.html` | **Payload mode live on every diagram.** ~210 equipment blocks across 13 diagrams + 2 floor views open here on a single click (six tabs, engine-hooked or declared cells); 11 deep mimics are the second tier. Gated by `tools/test-datahall-ai-inspector-runtime.mjs` (click → inspector, no scrim; Open HMI → focus trap, ESC, timers {}, focus return; 3 reloads identical at a pinned tick; ladder at 1440/1200/900/390) and `tools/test-dcai-coverage.mjs --modals`. |
 | **v2.1.0** | `datahallAI.html` | **Basis mode live.** 2,281 hooked numerals across 13 diagrams open the record here; `tools/test-dcai-basis-hooks.mjs` clicks one mark per diagram and asserts the panel, not the modal, opens with the registry value. |
 

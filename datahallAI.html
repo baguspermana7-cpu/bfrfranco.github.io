@@ -167,7 +167,7 @@ svg text{user-select:none}
 @keyframes wR{0%{transform:translateX(0);opacity:.25}100%{transform:translateX(42px);opacity:0}}.wr{animation:wR 1.6s ease-out infinite}
 @keyframes wL{0%{transform:translateX(0);opacity:.25}100%{transform:translateX(-42px);opacity:0}}.wl{animation:wL 1.6s ease-out infinite}
 @keyframes sh{0%{opacity:.02}50%{opacity:.07}100%{opacity:.02}}.sh{animation:sh 2.5s ease infinite}
-@keyframes ep{0%,100%{opacity:.4}50%{opacity:.9}}svg .ep{animation:ep 1.5s ease infinite}
+@keyframes ep{0%,100%{opacity:.4}50%{opacity:.9}}svg .ep,svg .fire-ep{animation:ep 1.5s ease infinite}
 @keyframes lv{0%,100%{fill-opacity:.6}50%{fill-opacity:1}}.lv{animation:lv 2s ease infinite}
 /* v1.25.4 owner-feedback: ISA pump triangle no longer spins. Green fill is the ON indicator — rotation looked like a UI bug. */
 .pmp{animation:none;transform-origin:center}
@@ -678,10 +678,11 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
     <script src="js/datahall-ai/electrical-topology.js?v=2.1.0"></script>
     <script src="js/datahall-ai/electrical-live.js?v=2.1.0"></script>
     <script src="js/datahall-ai/sim-telemetry.js?v=2.2.0"></script>
-    <script src="js/datahall-ai/hmi-payloads.js?v=2.2.0"></script>
+    <script src="js/datahall-ai/hmi-payloads.js?v=2.3.0"></script>
     <script src="js/datahall-ai/hmi-points.js?v=2.2.0"></script>
     <script src="js/datahall-ai/electrical-visual-map.js?v=2.1.0"></script>
     <script src="js/datahall-ai/fire-cause-effect.js?v=2.0.0"></script>
+    <script src="js/datahall-ai/fire-points.js?v=2.3.0"></script>
     <script src="js/rz-design-studio.js?v=2.0.0"></script>
     <!-- v1.42.0 — Semantic line model. Foundation for review docs 27/28 §3.1
          "setiap line wajib punya from_id/to_id/medium/direction/state/capacity
@@ -701,7 +702,7 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
          before the inspector so RZAlarmState is available when the Alarms tab
          renders. Closes review doc-27 §3.3 P0 + §4.3 P1. -->
     <script src="js/rz-alarm-state.js?v=1.43.4" defer></script>
-    <script src="js/rz-inspector.js?v=2.2.0" defer></script>
+    <script src="js/rz-inspector.js?v=2.3.0" defer></script>
     <!-- v1.43.2 — Data-quality service. Loaded before the inspector script so
          body[data-rz-data-mode] banner renders + RZTelemetryQuality is
          available when the inspector's Live tab renders its chip. Closes
@@ -719,10 +720,11 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
          touches SVG semantic colours or engine values (#p-dash byte-identical;
          75/75 accuracy probe stays green). Spec: standarization/COCKPIT_RESKIN_PLAN.md -->
     <link rel="stylesheet" href="css/rz-cockpit-instrument.css?v=1.134.15">
-    <link rel="stylesheet" href="css/datahall-ai-operator.css?v=2.1.0">
+    <link rel="stylesheet" href="css/datahall-ai-operator.css?v=2.3.0">
     <link rel="stylesheet" href="css/rz-design-studio.css?v=1.130.0">
-    <script src="js/datahall-ai/operator-ui.js?v=2.1.0" defer></script>
+    <script src="js/datahall-ai/operator-ui.js?v=2.3.0" defer></script>
     <script src="js/datahall-ai/equipment-inspector.js?v=2.2.0" defer></script>
+    <script src="js/datahall-ai/fire-workstation.js?v=2.3.0" defer></script>
 <style id="rz-skiplink-v1">
 .skip-link{position:absolute;top:-50px;left:0;background:#1e3a5f;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 8px 0;transition:top .2s ease}
 .skip-link:focus{top:0}
@@ -757,6 +759,7 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
 <strong>AI DATA HALL ENGINE AUTHORITY — UNAVAILABLE</strong>
 Requested model/calculation versions and the complete locked schema must validate before telemetry, process studies, FAQs, or generated documents are exposed.
 </section>
+<section id="fireImpairmentBanner" class="rz-fire-banner" role="status" aria-live="polite" hidden data-tone="warn" data-rz-authored-basis="page-wide fire, impairment and fire-watch banner from the workstation snapshot: training register and selected scenario, never a field alarm (Track A §A6)"><strong data-slot="head">FIRE &amp; SAFETY</strong> <span data-slot="text">—</span> <button type="button" class="rz-fire-banner__btn" data-rz-open-fire="1">Open fire workstation</button></section>
 <nav class="tabs" id="tabs">
 <button class="on" data-t="dash">DC Dashboard</button>
 <button data-t="hall">Data Hall</button>
@@ -820,17 +823,17 @@ Requested model/calculation versions and the complete locked schema must validat
 <div class="rw"><span class="l" title="InfiniBand Extended Data Rate scale-out fabric status">IB XDR</span><span class="v vg" data-rz-authored-basis="A simulated equipment STATUS, not an engine quantity. The engine sizes the fabric; it does not model link health, and no telemetry source stands behind this cockpit.">Online</span></div>
 <div class="rw"><span class="l" title="Out-of-band / baseboard management controller network status">OOB/BMC</span><span class="v vg" data-rz-authored-basis="A simulated equipment STATUS, not an engine quantity. The engine sizes the out-of-band network; it does not model its availability, and no telemetry source exists here.">Active</span></div></div>
 <div class="sb"><h4><i style="background:var(--o)"></i>Safety</h4><!-- v1.20.2 Stage 6: category dot amber not alarm-red (doc-13 §11: red is alarm-only) -->
-<div class="rw"><span class="l" title="VESDA: Very Early Smoke Detection Apparatus — aspirating laser detector">Fire/VESDA</span><span class="v vg" id="sbFire">Normal</span></div>
-<div class="rw"><span class="l" title="Emergency Power Off — dual-confirm shunt-trip, cuts all electrical power">EPO</span><span class="v vg">Armed</span></div>
-<div class="rw"><span class="l" title="Liquid leak detection system — TTK/RLE rope sensors, 24 zones">Leak</span><span class="v vg" id="sbLeak">Clear</span></div></div>
+<div class="rw"><span class="l" title="VESDA: Very Early Smoke Detection Apparatus — aspirating laser detector">Fire/VESDA</span><span class="v vg" id="sbFire" data-rz-authored-basis="fire workstation summary: inventory arithmetic over the point list and the training isolation register of this browser, never a field reading (Track A §A6)">Normal</span></div>
+<div class="rw"><span class="l" title="Emergency Power Off — dual-confirm shunt-trip, cuts all electrical power">EPO</span><span class="v vg" id="sbEpo" data-rz-authored-basis="fire workstation summary: inventory arithmetic over the point list and the training isolation register of this browser, never a field reading (Track A §A6)">Armed</span></div>
+<div class="rw"><span class="l" title="Liquid leak detection system — TTK/RLE rope sensors, 24 zones">Leak</span><span class="v vg" id="sbLeak" data-rz-authored-basis="fire workstation summary: inventory arithmetic over the point list and the training isolation register of this browser, never a field reading (Track A §A6)">Clear</span></div></div>
 <div class="sb"><h4><i style="background:var(--p)"></i>Alarms</h4>
 <div class="rw"><span class="l" title="Addressable photoelectric smoke detectors — point-type ceiling mounted">Smoke Det</span><span class="v vg" id="sbSmoke" data-rz-authored-basis="simulated detector health count for the fire sidebar; never a field reading (Track A section A6)">&#8212;</span></div>
-<div class="rw"><span class="l" title="Rate-of-rise + fixed-temp heat detectors — 57°C alarm threshold">Heat Det</span><span class="v vg" id="sbHeat">24 OK</span></div>
-<div class="rw"><span class="l" title="Very Early Smoke Detection Apparatus — LaserPLUS aspirating, pre-fire alert">VESDA</span><span class="v vg" id="sbVesda">4 OK</span></div>
-<div class="rw"><span class="l" title="Continuous leak detection rope sensor — under raised floor and rack manifolds">Leak Rope</span><span class="v vg" id="sbRope">24z OK</span></div>
-<div class="rw"><span class="l" title="Number of fire/safety devices currently disabled or bypassed">Disabled</span><span class="v vo" id="sbDisabled">0</span></div>
-<div class="rw"><span class="l" title="Number of devices currently in active alarm state">In Alarm</span><span class="v vg" id="sbInAlarm">0</span></div>
-<div class="rw"><span class="l" title="Devices in scheduled maintenance mode — temporarily suppressed from alarms">Maint</span><span class="v vc" id="sbMaint">2 sched</span></div></div>
+<div class="rw"><span class="l" title="Rate-of-rise + fixed-temp heat detectors — 57°C alarm threshold">Heat Det</span><span class="v vg" id="sbHeat" data-rz-authored-basis="fire workstation summary: inventory arithmetic over the point list and the training isolation register of this browser, never a field reading (Track A §A6)">24 OK</span></div>
+<div class="rw"><span class="l" title="Very Early Smoke Detection Apparatus — LaserPLUS aspirating, pre-fire alert">VESDA</span><span class="v vg" id="sbVesda" data-rz-authored-basis="fire workstation summary: inventory arithmetic over the point list and the training isolation register of this browser, never a field reading (Track A §A6)">4 OK</span></div>
+<div class="rw"><span class="l" title="Continuous leak detection rope sensor — under raised floor and rack manifolds">Leak Rope</span><span class="v vg" id="sbRope" data-rz-authored-basis="fire workstation summary: inventory arithmetic over the point list and the training isolation register of this browser, never a field reading (Track A §A6)">24z OK</span></div>
+<div class="rw"><span class="l" title="Number of fire/safety devices currently disabled or bypassed">Disabled</span><span class="v vg" id="sbDisabled" data-rz-authored-basis="fire workstation summary: inventory arithmetic over the point list and the training isolation register of this browser, never a field reading (Track A §A6)">0</span></div>
+<div class="rw"><span class="l" title="Number of devices currently in active alarm state">In Alarm</span><span class="v vg" id="sbInAlarm" data-rz-authored-basis="fire workstation summary: inventory arithmetic over the point list and the training isolation register of this browser, never a field reading (Track A §A6)">0</span></div>
+<div class="rw"><span class="l" title="Devices in scheduled maintenance mode — temporarily suppressed from alarms">Maint</span><span class="v vc" id="sbMaint" data-rz-authored-basis="fire workstation summary: inventory arithmetic over the point list and the training isolation register of this browser, never a field reading (Track A §A6)">—</span></div></div>
 </aside>
 <main class="mn" id="main-content">
 
@@ -1060,17 +1063,22 @@ Requested model/calculation versions and the complete locked schema must validat
 <svg id="netSvg" viewBox="0 0 960 520" preserveAspectRatio="xMidYMid meet" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="netC"></g></svg></div>
 <details class="dh-specwrap" open><summary>Specifications &amp; detail panels<span class="dh-spec-cv" aria-hidden="true">&#9656;</span></summary><div class="gr" id="netCards"></div></details></div>
 <div class="pn" id="p-fire">
-<div class="bx"><h3>Fire Detection & Suppression P&ID</h3><div class="dh-primary-q" style="font-size:10px;color:var(--t3);margin:2px 0 4px;font-style:italic;letter-spacing:.03em;">Primary read: <span style="color:var(--t2);">what is the current protection state — and what is bypassed?</span></div><div class="su" id="fireSu"></div>
-<svg id="fireSvg" viewBox="0 0 960 580" preserveAspectRatio="xMidYMid meet" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g data-rz-authored-basis="fire-protection design selections (detector and nozzle counts, agent volumes and pressures, loop lengths, setpoints) are page-authored to NFPA 72 / NFPA 2001 — the engine publishes no fire quantity; VESDA obscuration is simulated telemetry (Track A section A6)" id="fireC"></g></svg></div>
+<div class="fire-tabs" id="fireTabs" role="tablist" aria-label="Fire workstation views"><button class="ft on" role="tab" id="fireTabPoints" data-fp="points" aria-selected="true" aria-controls="fp-points" tabindex="0">Point list</button><button class="ft" role="tab" id="fireTabZones" data-fp="zones" aria-selected="false" aria-controls="fp-zones" tabindex="-1">Zones</button><button class="ft" role="tab" id="fireTabMimic" data-fp="mimic" aria-selected="false" aria-controls="fp-mimic" tabindex="-1">Mimic</button><button class="ft" role="tab" id="fireTabCE" data-fp="cause-effect" aria-selected="false" aria-controls="fp-cause-effect" tabindex="-1">Cause &amp; effect</button></div>
+<div class="rz-ops-summary rz-fire-summary" id="fireSummary" role="status" aria-live="polite" aria-label="Fire and safety summary" data-rz-authored-basis="facility fire summary computed from the point inventory, the training isolation register and the selected scenario: inventory arithmetic and operator input, never sensor readings (Track A §A6)"></div>
+<section class="fp on" id="fp-points" role="tabpanel" aria-labelledby="fireTabPoints"><section class="rz-ops-section" aria-labelledby="firePointsTitle"><div class="rz-ops-section__head"><div><div class="rz-ops-eyebrow">Workstation home</div><h3 id="firePointsTitle">Fire &amp; safety point list</h3><p class="rz-ops-caption">Every addressable point of the selected hall with its state and isolation. Click a row for the inspector; isolate from there. <span class="rz-fire-sub">TRAINING REGISTER — kept in this browser, no command leaves the page.</span></p></div></div><div class="rz-ops-toolbar"><div class="rz-ops-toolbar__group"><div class="rz-ops-field"><label for="firePointsHall">Hall</label><select id="firePointsHall" disabled></select></div><div class="rz-ops-field"><label for="firePointsZone">Zone</label><select id="firePointsZone" disabled></select></div><div class="rz-ops-field"><label for="firePointsType">Type</label><select id="firePointsType" disabled></select></div><div class="rz-ops-field"><label for="firePointsState">State</label><select id="firePointsState" disabled></select></div><div class="rz-ops-field rz-ops-field--wide"><label for="firePointsSearch">Search</label><input id="firePointsSearch" type="search" placeholder="address, label, room" disabled></div></div><div class="rz-ops-toolbar__group rz-ops-actions"><button class="rz-ops-button" id="firePointsIsolatedOnly" type="button" aria-pressed="false" disabled>Isolated only</button><button class="rz-ops-button" id="firePointsReset" type="button" disabled>Reset filters</button><button class="rz-ops-button" id="firePointsClear" type="button" disabled title="Empties the training isolation register of this browser (two clicks)">Clear register</button></div></div><div class="rz-ops-caption" id="firePointsCount" aria-live="polite" data-rz-authored-basis="row count of the filtered point list — inventory arithmetic, not a measurement (Track A §A6)">—</div><div class="rz-ops-table-wrap rz-fire-table-wrap" tabindex="0" aria-label="Scrollable fire and safety point list"><table class="rz-ops-table rz-fire-table" id="firePointsTable" data-rz-hall="1" data-rz-authored-basis="fire point inventory derived from the engine hall geometry × ADOPTED NFPA 72 spacing; states and isolation fields come from the training isolation register of this browser and the selected scenario — design selections and operator input, never sensor readings (Track A §A6)"><caption>Addressable fire, suppression, leak, EPO and FACP points of the selected hall</caption><thead><tr><th scope="col">Address</th><th scope="col">Type</th><th scope="col">Zone / room</th><th scope="col">Detection means</th><th scope="col">State</th><th scope="col">Isolation</th><th scope="col">Last test</th><th scope="col">Quality</th></tr></thead><tbody id="firePointsBody"></tbody></table></div><div class="rz-ops-section__head" style="margin-top:10px"><div><div class="rz-ops-eyebrow">Isolation log</div><h3>Recent isolation actions</h3><p class="rz-ops-caption">The last five records; the complete log is the Alarms workspace (saved view Fire).</p></div><div class="rz-ops-toolbar__group"><button class="rz-ops-button" id="fireIsoLogOpen" type="button">Open in Alarms</button></div></div><ul class="rz-ops-timeline rz-fire-log" id="fireIsoLog" data-rz-authored-basis="isolation log entries of the training register in this browser — operator input echoed back, never a site record (Track A §A6)"></ul></section></section>
+<section class="fp" id="fp-zones" role="tabpanel" aria-labelledby="fireTabZones"><section class="rz-ops-section" aria-labelledby="fireZonesTitle"><div class="rz-ops-section__head"><div><div class="rz-ops-eyebrow">Protection state per zone</div><h3 id="fireZonesTitle">Zones — what is protected, what is impaired, what happens next</h3><p class="rz-ops-caption">A clean-agent zone needs two independent detection means for its double-interlock release. Below two it is IMPAIRED: release inhibited, fire watch required. Click a tile for the inspector; its points are listed under Related.</p></div></div><div class="rz-fire-zones" id="fireZonesGrid" data-rz-hall="1" data-rz-authored-basis="zone tiles: detection means available vs total from the isolation register, impairment by the two-means rule, states from the selected training scenario — derived, never measured (Track A §A6)"></div></section></section>
+<section class="fp" id="fp-mimic" role="tabpanel" aria-labelledby="fireTabMimic"><div class="bx"><h3>Fire Detection & Suppression P&ID</h3><div class="dh-primary-q" style="font-size:10px;color:var(--t3);margin:2px 0 4px;font-style:italic;letter-spacing:.03em;">Primary read: <span style="color:var(--t2);">what is the current protection state — and what is bypassed?</span></div><div class="su" id="fireSu"></div>
+<svg id="fireSvg" viewBox="0 0 960 580" preserveAspectRatio="xMidYMid meet" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g data-rz-authored-basis="fire-protection design selections (detector and nozzle counts, agent volumes and pressures, loop lengths, setpoints) are page-authored to NFPA 72 / NFPA 2001 — the engine publishes no fire quantity; VESDA obscuration is simulated telemetry (Track A section A6); detector counts derived from the engine hall geometry × ADOPTED NFPA 72 spacing (js/datahall-ai/fire-points.js) and zone / device states from the workstation snapshot (Track A §A6)" id="fireC" data-rz-hall="1"></g></svg></div>
 <details class="dh-specwrap" open><summary>Specifications &amp; detail panels<span class="dh-spec-cv" aria-hidden="true">&#9656;</span></summary><div class="gr" id="fireCards"></div></details>
-<section class="rz-ops-section" aria-labelledby="fireCauseEffectTitle">
+</section>
+<section class="fp" id="fp-cause-effect" role="tabpanel" aria-labelledby="fireTabCE"><section class="rz-ops-section" aria-labelledby="fireCauseEffectTitle">
   <div class="rz-ops-section__head">
     <div><div class="rz-ops-eyebrow">Life-safety sequence</div><h3 id="fireCauseEffectTitle">Fire cause &amp; effect matrix</h3><p class="rz-ops-caption">FACP is the controlling authority; BMS/DCIM is monitor-only. Effects are zoned and require field proof.</p></div>
-    <div class="rz-ops-toolbar__group"><div class="rz-ops-field rz-ops-field--wide"><label for="fireScenario">Initiating event</label><select id="fireScenario" disabled><option value="vesda_alert">VESDA alert</option><option value="vesda_action">VESDA action</option><option value="vesda_fire_2">VESDA Fire 2 confirmed</option><option value="multi_sensor_confirmation">Smoke + heat confirmation</option><option value="confirmed_fire">Two-source confirmed fire</option><option value="manual_call_point">Manual call point</option><option value="preaction_or_sprinkler">Pre-action / sprinkler</option><option value="suppression_armed">Suppression armed</option><option value="suppression_release">Suppression release</option><option value="epo">Authorized zoned EPO</option><option value="water_leak">Water leak input</option></select></div><div class="rz-ops-field"><label for="fireZone">Event zone</label><select id="fireZone" disabled><option value="DH-01-Z01">DH-01 Zone 01</option><option value="DH-01-Z02">DH-01 Zone 02</option><option value="DH-01-Z03">DH-01 Zone 03</option><option value="DH-01-ELEC-A">Electrical A</option><option value="DH-01-MDF">MDF / Network</option></select></div><button class="rz-ops-button rz-ops-button--warn" id="fireEvaluate" type="button" disabled>Evaluate sequence</button></div>
+    <div class="rz-ops-toolbar__group"><div class="rz-ops-field rz-ops-field--wide"><label for="fireScenario">Initiating event</label><select id="fireScenario" disabled><option value="vesda_alert">VESDA alert</option><option value="vesda_action">VESDA action</option><option value="vesda_fire_1">VESDA Fire 1</option><option value="vesda_fire_2">VESDA Fire 2 confirmed</option><option value="multi_sensor_confirmation">Smoke + heat confirmation</option><option value="confirmed_fire">Two-source confirmed fire</option><option value="manual_call_point">Manual call point</option><option value="preaction_or_sprinkler">Pre-action / sprinkler</option><option value="suppression_armed">Suppression armed</option><option value="suppression_abort">Suppression abort</option><option value="suppression_release">Suppression release</option><option value="suppression_discharged">Suppression discharged</option><option value="epo">Authorized zoned EPO</option><option value="water_leak">Water leak input</option></select></div><div class="rz-ops-field"><label for="fireZone">Event zone</label><select id="fireZone" disabled><option value="DH-01-Z01">DH-01 Z01 CDU gallery 1</option><option value="DH-01-Z02">DH-01 Z02 CDU gallery 2</option><option value="DH-01-Z03">DH-01 Z03 CDU gallery 3</option><option value="DH-01-Z04">DH-01 Z04 CDU gallery 4</option><option value="DH-01-Z05">DH-01 Z05 Rack rows 1-3</option><option value="DH-01-Z06">DH-01 Z06 Rack rows 4-5</option><option value="DH-01-Z07">DH-01 Z07 Rack rows 6-8</option><option value="DH-01-Z08">DH-01 Z08 Rack rows 9-10</option><option value="DH-01-Z09">DH-01 Z09 Elec room A</option><option value="DH-01-Z10">DH-01 Z10 Elec room B</option><option value="DH-01-Z11">DH-01 Z11 UPS + battery</option><option value="DH-01-Z12">DH-01 Z12 MDF / network</option></select></div><button class="rz-ops-button rz-ops-button--warn" id="fireEvaluate" type="button" disabled>Evaluate sequence</button><button class="rz-ops-button" id="fireStart" type="button" disabled aria-pressed="false" title="Starts a staged training run of the selected event in the selected zone — elapsed time advances with the 4 s tick; nothing leaves the page">Start staged run (training)</button><button class="rz-ops-button" id="fireStop" type="button" disabled hidden>Stop run</button><span class="rz-fire-elapsed" id="fireElapsed" aria-live="polite" data-rz-authored-basis="elapsed seconds of a SIMULATED training run, derived from the 4 s sim tick; no command leaves the page (Track A §A6)">no run · T+0 s</span></div>
   </div>
-  <div class="rz-ops-detail" id="fireCauseEffectSummary" aria-live="polite">Select an initiating event to inspect staged commands, feedback, inhibit, and reset authority.</div>
-  <div class="rz-ops-table-wrap rz-ops-table-wrap--matrix" tabindex="0" aria-label="Scrollable fire cause and effect matrix"><table class="rz-ops-table"><caption>FACP-authoritative cause, action, proof, failure, inhibit, and reset sequence</caption><thead><tr><th scope="col">Stage</th><th scope="col">Initiating event</th><th scope="col">Delay</th><th scope="col">System / action</th><th scope="col">Scope</th><th scope="col">Authority</th><th scope="col">Required feedback</th><th scope="col">Failure state</th><th scope="col">Inhibit / reset</th></tr></thead><tbody id="fireCauseEffectBody"></tbody></table></div>
-</section></div>
+  <div class="rz-ops-detail" id="fireCauseEffectSummary" aria-live="polite" data-rz-authored-basis="cause-and-effect evaluation summary from RZDatahallAIFireCauseEffect for the selected event, zone, elapsed training time and the isolation register; counts of commands, not measurements (Track A §A6)">Select an initiating event to inspect staged commands, feedback, inhibit, and reset authority.</div>
+  <div class="rz-ops-table-wrap rz-ops-table-wrap--matrix" tabindex="0" aria-label="Scrollable fire cause and effect matrix"><table class="rz-ops-table" data-rz-authored-basis="FACP cause-and-effect matrix rows from js/datahall-ai/fire-cause-effect.js: stage numbers, engineered delays and proof lists are the immutable training matrix, not measurements (Track A §A6)"><caption>FACP-authoritative cause, action, proof, failure, inhibit, and reset sequence</caption><thead><tr><th scope="col">Stage</th><th scope="col">Initiating event</th><th scope="col">Delay</th><th scope="col">System / action</th><th scope="col">Scope</th><th scope="col">Authority</th><th scope="col">Required feedback</th><th scope="col">Failure state</th><th scope="col">Inhibit / reset</th><th scope="col">Status</th></tr></thead><tbody id="fireCauseEffectBody"></tbody></table></div>
+</section></section></div>
 <div class="pn" id="p-alarms">
 <section class="rz-ops-section" aria-labelledby="alarmWorkspaceTitle">
   <div class="rz-ops-section__head">
@@ -1164,6 +1172,15 @@ Requested model/calculation versions and the complete locked schema must validat
 <div class="corr-hmi-hdr"><h4 id="corrHmiTitle">Corridor Service</h4><span class="mode" id="corrHmiMode">Online</span><button class="corr-hmi-close" onclick="$('corrHmi').classList.remove('show')">&times;</button></div>
 <div class="corr-hmi-body"><svg id="corrHmiSvg" viewBox="0 0 780 480" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" data-rz-authored-basis="tier-2 HMI mimic: every value comes from the equipment payload (js/datahall-ai/hmi-payloads.js) — engine rows hooked, simulated and state rows declared; per-point provenance in the inspector (Track A §A5)"></svg></div>
 </div>
+<div class="fire-iso" id="fireIsoDialog" aria-labelledby="fireIsoTitle" data-rz-inspector-keep="1">
+<div class="fire-iso-hdr"><h4 id="fireIsoTitle">Isolate point</h4><span class="mode" id="fireIsoMode">SIMULATED · TRAINING REGISTER</span><button class="fire-iso-close" type="button" aria-label="Close">&times;</button></div>
+<form id="fireIsoForm" class="fire-iso-body" novalidate data-rz-authored-basis="isolation request form: owner, reason, expiry and the consequence preview from the two-means rule are operator input and register arithmetic, never measurements (Track A §A6)">
+<dl class="fire-iso-point rz-ops-detail" id="fireIsoPoint"></dl>
+<div class="rz-ops-grid"><div class="rz-ops-field"><label for="fireIsoOwner">Owner</label><select id="fireIsoOwner" disabled></select></div><div class="rz-ops-field"><label for="fireIsoExpiry">Expiry</label><select id="fireIsoExpiry" disabled></select></div><div class="rz-ops-field rz-ops-field--full"><label for="fireIsoReason" id="fireIsoReasonLabel">Reason (at least 10 characters)</label><textarea id="fireIsoReason" rows="2" minlength="10" required disabled></textarea><span class="rz-fire-sub" id="fireIsoReasonCount" aria-live="polite">0 / 10 characters</span></div></div>
+<div class="fire-iso-consequence rz-ops-detail" id="fireIsoConsequence" role="status" aria-live="polite" data-state="ok">—</div>
+<label class="fire-iso-ack" id="fireIsoAckWrap" hidden><input type="checkbox" id="fireIsoAck" disabled> I acknowledge the consequence above: the zone becomes IMPAIRED, its release is inhibited and a fire watch is required</label>
+<div class="rz-ops-toolbar__group rz-ops-actions"><button class="rz-ops-button rz-ops-button--warn" id="fireIsoSubmit" type="submit" disabled>Isolate</button><button class="rz-ops-button" id="fireIsoCancel" type="button" disabled>Cancel</button></div>
+</form></div>
 <div class="bat-hmi" id="batHmi">
 <div class="bat-hmi-hdr"><h4 id="batHmiTitle">SCiB ESS 480VDC — System View</h4><span class="mode" id="batHmiMode">Normal</span><button class="bat-hmi-close" onclick="$('batHmi').classList.remove('show')">&times;</button></div>
 <div class="bat-hmi-body"><svg id="batHmiSvg" viewBox="0 0 740 520" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" data-rz-authored-basis="tier-2 HMI mimic: every value comes from the equipment payload (js/datahall-ai/hmi-payloads.js) — engine rows hooked, simulated and state rows declared; per-point provenance in the inspector (Track A §A5)"></svg></div>
@@ -1180,7 +1197,9 @@ var DATAHALL_CURRENT_SPEC_VERSION='gb300-500mw-2026-09-06';  /* = DCAI_MODEL.spe
    covered the day it exists and a renamed one fails closed, with nothing to maintain here. */
 var DATAHALL_REGISTRY_MIN_PARAMETERS=150;
 var DATAHALL_AUTHORITY_ACTION_SELECTOR='#bodTrig,#bodDrawerPdf,#genDesignTrig,#faqTrig,'+
-  '#platformProfile,#electricalScenario,#fireScenario,#fireZone,#fireEvaluate,'+
+  '#platformProfile,#electricalScenario,#fireScenario,#fireZone,#fireEvaluate,#fireStart,#fireStop,'+
+  '#firePointsHall,#firePointsZone,#firePointsType,#firePointsState,#firePointsSearch,#firePointsIsolatedOnly,#firePointsReset,#firePointsClear,'+
+  '#fireIsoForm,#fireIsoForm button,#fireIsoForm input,#fireIsoForm select,#fireIsoForm textarea,'+
   '#alarmFilterForm,#alarmFilterForm button,#alarmFilterForm input,#alarmFilterForm select';
 
 function datahallValueAt(source,path){
@@ -2191,11 +2210,11 @@ s+=eq(1,2,3,2,'rgba(120,113,108,.15)','Dock',4,'Loading Platform: 3m\u00D72m, 12
 s+=eq(5,2,3,2,'rgba(120,113,108,.15)','Lift',4,'Freight Lift: 2000kg capacity, 3.5\u00D72.5m car, hydraulic, 4-stop');
 
 // Fire Suppression Storage
-s+=rm(10,0,10,10,'rgba(239,68,68,.1)','rgba(239,68,68,.35)','Fire Supp.','10m\u00D710m','Novec 1230','Fire Suppression: 4\u00D7 180L Novec 1230 42bar N\u2082, manifold, pipe network');
-s+=eq(11,2,2,1.8,'rgba(239,68,68,.15)','N1',3.5,'Novec 1230 Cylinder N1: 180L @ 42bar N\u2082, 3M\u2122, 500\u00D7500\u00D71800mm, auto/manual discharge, \u2192 Fire Tab');
-s+=eq(14,2,2,1.8,'rgba(239,68,68,.15)','N2',3.5,'Novec 1230 Cylinder N2: 180L @ 42bar N\u2082, 3M\u2122, 500\u00D7500\u00D71800mm, auto/manual discharge, \u2192 Fire Tab');
-s+=eq(11,5,2,1.8,'rgba(239,68,68,.15)','N3',3.5,'Novec 1230 Cylinder N3: 180L @ 42bar N\u2082, 3M\u2122, 500\u00D7500\u00D71800mm, auto/manual discharge, \u2192 Fire Tab');
-s+=eq(14,5,2,1.8,'rgba(239,68,68,.15)','N4',3.5,'Novec 1230 Cylinder N4: 180L @ 42bar N\u2082, 3M\u2122, 500\u00D7500\u00D71800mm, auto/manual discharge, \u2192 Fire Tab');
+s+=rm(10,0,10,10,'rgba(239,68,68,.1)','rgba(239,68,68,.35)','Fire Supp.','10m\u00D710m','Clean agent (pending)','Fire Suppression: 4\u00D7 180L clean-agent (selection pending) — formerly Novec 1230 42bar N\u2082, manifold, pipe network');
+s+=eq(11,2,2,1.8,'rgba(239,68,68,.15)','N1',3.5,'Clean-agent cylinder N1 (selection pending): 180L @ 42bar N\u2082, 500\u00D7500\u00D71800mm, auto/manual discharge, \u2192 Fire Tab');
+s+=eq(14,2,2,1.8,'rgba(239,68,68,.15)','N2',3.5,'Clean-agent cylinder N2 (selection pending): 180L @ 42bar N\u2082, 500\u00D7500\u00D71800mm, auto/manual discharge, \u2192 Fire Tab');
+s+=eq(11,5,2,1.8,'rgba(239,68,68,.15)','N3',3.5,'Clean-agent cylinder N3 (selection pending): 180L @ 42bar N\u2082, 500\u00D7500\u00D71800mm, auto/manual discharge, \u2192 Fire Tab');
+s+=eq(14,5,2,1.8,'rgba(239,68,68,.15)','N4',3.5,'Clean-agent cylinder N4 (selection pending): 180L @ 42bar N\u2082, 500\u00D7500\u00D71800mm, auto/manual discharge, \u2192 Fire Tab');
 
 // Generator Room — facility genset pool from the engine: unit MW, duty + standby, redundancy (DHE); six representative glyphs
 s+=rmLive(20,0,30,10,'rgba(59,130,246,.1)','rgba(59,130,246,.4)','Generator Room','30m\u00D710m',(DH?(DH.gensetFacNplus1+'\u00D7 '+DH.gensetMW+' MW '+DH.gensetRedundancy+' (facility)'):'—'),(DH?('Generator: '+DH.gensetFacNplus1+'\u00D7 '+DH.gensetMW+' MW class MV diesel ('+DH.gensetKW+' kW), facility pool: '+DH.gensetFacN+' duty + '+(DH.gensetFacNplus1-DH.gensetFacN)+' standby, '+DH.gensetRedundancy+' \u2014 6 of '+DH.gensetFacNplus1+' shown'+DH.gensetMW+'MW (2,500-2,750 ekW @60Hz), <10s start, '+DH.gensetFacN+' running + 1 standby (N+1) for '+DH.facTotalMW+' MW facility, 48hr fuel'):'—'),28,null,'Running',0,0,0,0,0,0,0,{equip:bo('gensetFacNplus1',{also:['gensetMW']})});
@@ -3531,7 +3550,7 @@ s+=bx(752,28,190,105,'rgba(245,158,11,.12)',4)+tx(847,39,'ELECTRICAL','var(--o)'
  'GenSet pool \u2014 facility-shared',
  ['ATS-LV <100ms',{declared:'transfer time is a page-authored design target, not an engine quantity'}]].forEach((l,i)=>{var it=Array.isArray(l)?l:[l];s+=tx(847,50+i*9.5,it[0],'var(--t2)',4,'middle',0,it[1])});
 s+=bx(752,140,190,55,'rgba(59,130,246,.12)',4)+tx(847,152,'NETWORK MDF','var(--b)',6,'middle',1);[['IB leaf '+em(bn('leavesPerHall'))+' spine '+em(bn('spinesPerHall')),bo('leavesPerHall',{also:['spinesPerHall']})],['OOB 25G BMC 1G',{declared:'out-of-band link speeds are page-authored design choices, not engine quantities'}],['DWDM ODF Patch']].forEach((l,i)=>{s+=tx(847,163+i*10,l[0],'var(--t2)',4,'middle',0,l[1])});
-s+=bx(752,202,90,42,'rgba(239,68,68,.12)',4)+tx(797,214,'FIRE','var(--r)',6,'middle',1)+tx(797,225,'Novec 1230','var(--t3)',4,'middle')+tx(797,238,'\u25CF NORMAL','var(--g)',4,'middle',1);
+s+=bx(752,202,90,42,'rgba(239,68,68,.12)',4)+tx(797,214,'FIRE','var(--r)',6,'middle',1)+tx(797,225,'Clean agent','var(--t3)',4,'middle')+tx(797,238,'\u25CF NORMAL','var(--g)',4,'middle',1);
 s+=bx(852,202,90,42,'rgba(34,197,94,.12)',4)+tx(897,214,'BMS','var(--g)',6,'middle',1)+tx(897,225,'DCIM','var(--t3)',4,'middle')+tx(897,238,'\u25CF ONLINE','var(--g)',4,'middle',1);
 // ===== ACCESS CONTROL =====
 s+=`<rect x="752" y="252" width="190" height="55" rx="4" fill="rgba(100, 116, 139,.03)" stroke="rgba(100, 116, 139,.2)" stroke-width=".8"/>`;
@@ -3576,12 +3595,7 @@ $('sUB').textContent=nrm+'% nrm / '+fail+'% fail';}
 const ppl=$('pplCount');if(ppl)ppl.textContent=RZ_SIM('page7',0,6,0);
 const le=$('lastEntry');if(le){const now=new Date();le.textContent=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')}
 // Sidebar alarm status updates
-const sbSmk=$('sbSmoke');if(sbSmk)sbSmk.textContent=RZ_SIM('page8',46,48,0)+' OK';
-const sbHt=$('sbHeat');if(sbHt)sbHt.textContent='24 OK';
-const sbVd=$('sbVesda');if(sbVd)sbVd.textContent='4 OK';
-const sbRp=$('sbRope');if(sbRp)sbRp.textContent='24z OK';
-const sbDis=$('sbDisabled');if(sbDis)sbDis.textContent=RZ_SIM('page9',0,2,0);
-const sbMt=$('sbMaint');if(sbMt)sbMt.textContent=RZ_SIM('page10',1,4,0)+' sched';
+/* v2.3.0 §A6: the fire sidebar counters (#sbFire … #sbMaint) are written by js/datahall-ai/fire-workstation.js from the point inventory and the isolation register — no roll, no literal */
 // CDU status updates
 for(let c=1;c<=((DHE&&typeof DHE.rackRows==='number'&&isFinite(DHE.rackRows))?DHE.rackRows:0);c++){const el=$('cduSt'+c);if(el)el.textContent=RZ_SIM('page11',1.5,2.5,1)+'bar '+(DHE&&DHE.cduFlowPerUnitLpm!=null?Math.round(DHE.cduFlowPerUnitLpm):'\u2014')+'L/m'}
 // FWS corridor instruments
@@ -7991,16 +8005,20 @@ mc('var(--p)','IB XDR 800G Scale-Out','Inter-Domain Fabric',[['Standard','Infini
 mc('var(--b)','Structured Cabling','Physical Layer (DLC-Adapted)',[['SM fiber','OS2 9/125\u00B5m LC/APC'],['MM fiber','OM5 50/125\u00B5m MPO-16'],['Fiber count','~4,200 LC/MPO per hall'],['Cu','~540 Cat6A drops (OOB+BMC)'],['Coax','~135K NVLink lanes total'],['Tray','3-tier overhead SS ladder'],['Power tray','Left 300mm (A+B sep)'],['Fiber tray','Center 450mm'],['Cu tray','Right 300mm + NVLink'],['TCS pipe','OH DN150 SS316L \u2192 EoR CDU \u2192 rack'],['Slab','Solid slab-on-grade (no raised floor)'],['Labeling','TIA-606-C structured']],{declared:'cabling quantities and fibre classes are page-authored estimates for the drawing, not engine quantities; superseded by the network redesign (Track A section A7)'}),
 mc('var(--g)','Management OOB','BMC / Storage / Telemetry',[['OOB','25GbE ToR per rack'],['BMC','1GbE/tray mgmt VLAN'],['HMC','Host Mgmt Controller'],['Storage','100GbE NVMe-oF RDMA'],['NTP','Stratum 2 GPS-synced'],['DNS','Redundant internal'],['Syslog','rsyslog \u2192 ELK'],['SNMP','v3 encrypted to NMS'],['Prometheus','dcgm_exporter/GPU'],['Grafana','Real-time dashboards'],['IP-KVM','1/rack pair (console)'],['Firmware','Centralized FOTA']],{declared:'out-of-band management link speeds and services are page-authored design choices, not engine quantities'})
 ].join('');
-// FIRE
+// FIRE — the inventory the workstation uses (js/datahall-ai/fire-points.js); counts on the cards and the mimic come from it
+function fireInv(){ if(window.__rzFireInv!==undefined)return window.__rzFireInv; var F=window.RZDatahallAIFirePoints; try{ window.__rzFireInv=(F&&DHE&&isFinite(DHE.hallLengthM))?F.buildInventory({halls:isFinite(DHE.halls)?DHE.halls:4,hallLengthM:DHE.hallLengthM,hallWidthM:DHE.hallWidthM,rackRows:DHE.rackRows,leakZonesPerHall:24}):null; }catch(e){ window.__rzFireInv=null; } return window.__rzFireInv; }
+function fireCount(type,hall){ var inv=fireInv(); if(!inv)return null; return inv.points.filter(function(p){return p.type===type&&p.hall===(hall||1);}).length; }
+function fireN(type,hall){ var n=fireCount(type,hall); return n==null?'\u2014':String(n); }
+var FIRE_AGENT=(window.RZDatahallAIFirePoints?window.RZDatahallAIFirePoints.AGENT_LABEL:'clean-agent suppression \u2014 project selection pending');
 $('fireCards').innerHTML=[
-mc('var(--r)','Novec 1230 Suppression','NFPA 2001 / ISO 14520',[['Agent','3M Novec 1230 FK-5-1-12'],['Design','5.3% at 21\u00B0C (NOAEL 10%)'],['Discharge','\u226410s full flood'],['Hold','\u226510 min (integrity tested)'],['Nozzle','360\u00B0 ceiling SS \u00D712'],['Cylinder','180L \u00D74 (N\u2082 42bar)'],['Actuation','Double-interlock 2-zone'],['Abort','30s delay + manual \u00D72'],['HVAC','Damper close + fan stop'],['Post','Exhaust ventilation seq'],['Pipe','SS Sch40 hydraulic calc'],['Annual','Cylinder weigh + nozzle inspect']],{declared:'fire-protection and life-safety design selections are page-authored to NFPA 72 / NFPA 2001 — the engine publishes no fire quantity (Track A section A6)'}),
-mc('var(--o)','Detection Multi-Layer','Aspirating + Spot + Linear',[['VESDA','LaserPLUS aspirating ASD'],['Zones','Alert/Action/Fire1/Fire2'],['Sensitivity','0.005% obs/m (Alert)'],['Spot smoke','Photoelectric \u00D748'],['Spot heat','RoR + 57\u00B0C fixed \u00D724'],['Linear heat','DTS fiber under tray'],['Beam','Reflected \u00D72 (high ceiling)'],['Manual call','At exits + EPO stations'],['FACP','Addressable (Notifier/Simplex)'],['Zone map','12 zones hall+elec+MDF'],['Annunciation','Strobe+horn+BMS+SMS'],['Testing','Quarterly det + annual full']],{declared:'fire-protection and life-safety design selections are page-authored to NFPA 72 / NFPA 2001 — the engine publishes no fire quantity (Track A section A6)'}),
+mc('var(--r)','Clean-Agent Suppression','NFPA 2001 / ISO 14520 \u2014 selection pending',[['Agent',FIRE_AGENT],['Design','per NFPA 2001 for the selected agent \u2014 pending AHJ basis'],['Discharge','\u226410s full flood'],['Hold','\u226510 min (integrity tested)'],['Nozzle','360\u00B0 ceiling SS \u00D712'],['Cylinder','180L \u00D74 (N\u2082 42bar)'],['Actuation','Double-interlock 2-zone'],['Abort','30s delay + manual \u00D72'],['HVAC','Damper close + fan stop'],['Post','Exhaust ventilation seq'],['Pipe','SS Sch40 hydraulic calc'],['Annual','Cylinder weigh + nozzle inspect']],{declared:'fire-protection and life-safety design selections are page-authored to NFPA 72 / NFPA 2001 — the engine publishes no fire quantity (Track A section A6)'}),
+mc('var(--o)','Detection Multi-Layer','Aspirating + Spot + Linear',[['VESDA','LaserPLUS aspirating ASD'],['Zones','Alert/Action/Fire1/Fire2'],['Sensitivity','0.005% obs/m (Alert)'],['Spot smoke','Photoelectric \u00D7'+fireN('smoke_spot')+' per hall (2 cross-zoned loops)'],['Spot heat','RoR + 57\u00B0C fixed \u00D7'+fireN('heat_spot')+' per hall'],['Linear heat','DTS fiber under tray'],['Beam','Reflected \u00D72 (high ceiling)'],['Manual call','At exits + EPO stations'],['FACP','Addressable (Notifier/Simplex)'],['Zone map','12 zones hall+elec+MDF'],['Annunciation','Strobe+horn+BMS+SMS'],['Testing','Quarterly det + annual full']],{declared:'fire-protection and life-safety design selections are page-authored to NFPA 72 / NFPA 2001 — the engine publishes no fire quantity (Track A section A6)'}),
 mc('var(--c)','Leak Detection','Water Protection',[['Rope','800m total all piping'],['Point','180 probes at QD/valve'],['Panel','TTK/RLE dedicated controller'],['Zones','24 detection zones: 12 CDU + 12 rack/manifold'],['Response','<3s alarm to BMS'],['Shutoff','Motorized valve <3s'],['Containment','SS drip + membrane'],['Drain','1:100 slope + 500L/min pump'],['Sump','200L capacity per zone'],['Testing','Monthly + quarterly wet']],{declared:'fire-protection and life-safety design selections are page-authored to NFPA 72 / NFPA 2001 — the engine publishes no fire quantity (Track A section A6)'}),
-mc('var(--g)','Emergency EPO/Egress','Life Safety',[['EPO','Dual-confirmed (key+button)'],['Location','4 stations at exits+NOC'],['Scope','IT pwr + CDU pumps + CRAH'],['Lighting','Battery LED 90min \u226510lux'],['Exit','Illuminated + photoluminescent'],['Access','Biometric + card + PIN'],['Mantrap','Airlock entry to hall'],['CCTV','16\u00D7 IP 4MP PTZ 90-day NVR'],['PA','Zoned evacuation announce'],['Drill','Quarterly fire + leak drill']],{declared:'fire-protection and life-safety design selections are page-authored to NFPA 72 / NFPA 2001 — the engine publishes no fire quantity (Track A section A6)'})
+mc('var(--g)','Emergency EPO/Egress','Life Safety',[['EPO','Dual-confirmed (key+button), zoned'],['Location',fireN('epo')+' stations \u2014 electrical rooms only (NFPA 75 \u00A79.4)'],['Scope','electrical-room feeds of the zone \u2014 never a hall-wide IT trip'],['Lighting','Battery LED 90min \u226510lux'],['Exit','Illuminated + photoluminescent'],['Access','Biometric + card + PIN'],['Mantrap','Airlock entry to hall'],['CCTV','16\u00D7 IP 4MP PTZ 90-day NVR'],['PA','Zoned evacuation announce'],['Drill','Quarterly fire + leak drill']],{declared:'fire-protection and life-safety design selections are page-authored to NFPA 72 / NFPA 2001 — the engine publishes no fire quantity (Track A section A6)'})
 ].join('');
 
 // FIRE P&ID COMPREHENSIVE SVG
-$('fireSu').textContent='Comprehensive Fire P&ID: VESDA Aspirating + Addressable FACP + Novec 1230 Suppression + Leak Detection + EPO Integration';
+$('fireSu').textContent='Fire P&ID \u2014 DH-01: VESDA aspirating + addressable FACP + clean-agent suppression (selection pending) + leak detection + zoned EPO \u2014 states from the workstation snapshot';
 (function(){const el=$('fireC');if(!el)return;let s='';
 // Background with grid
 s+=`<rect width="960" height="580" fill="var(--bg2)"/>`;
@@ -8011,11 +8029,12 @@ s+=tx(480,16,'FIRE DETECTION & SUPPRESSION P&ID — DATA HALL + ELECTRICAL + MDF
 s+=`<rect x="10" y="25" width="620" height="135" rx="4" fill="rgba(100, 116, 139,.03)" stroke="rgba(100, 116, 139,.2)" stroke-width="1"/>`;
 s+=tx(320,40,'VESDA ASPIRATING DETECTION SYSTEM','var(--p)',7,'middle',1);
 // VESDA Detectors
-const vesdas=[{x:30,id:'VD-1',zone:'Z1-Z3'},{x:170,id:'VD-2',zone:'Z4-Z6'},{x:310,id:'VD-3',zone:'Z7-Z9'},{x:450,id:'VD-4',zone:'Z10-Z12'}];
+const fInv=fireInv();
+const vesdas=[{x:30,id:'VD-1',zone:'Z01-Z03'},{x:170,id:'VD-2',zone:'Z04-Z06'},{x:310,id:'VD-3',zone:'Z07-Z09'},{x:450,id:'VD-4',zone:'Z10-Z12'}].map(v=>{const r=fInv?fInv.byId['DH-01-'+v.id]:null;return Object.assign({},v,{pid:'DH-01-'+v.id,ports:r?r.ports:null,zone:r?r.zoneIds.map(z=>z.replace(/^DH-01-/,'')).join(', '):v.zone});});
 vesdas.forEach(v=>{
-s+=`<g data-rz-equipment="fire-vesda:${v.id}" tabindex="0" role="button" data-tip="VESDA ${v.id}: LaserPLUS aspirating smoke detector, ~100 sample points, 4-tier sensitivity (Alert/Action/Fire1/Fire2), pre-fire warning, zones ${v.zone}">`;
+s+=`<g data-rz-equipment="fire-vesda:${v.pid}" tabindex="0" role="button" data-tip="VESDA ${v.id}: LaserPLUS aspirating smoke detector, ${v.ports==null?'~100':v.ports} sampling ports over zones ${v.zone}, 4-tier sensitivity (Alert/Action/Fire1/Fire2), pre-fire warning">`;
 s+=`<rect x="${v.x}" y="50" width="120" height="55" rx="3" fill="rgba(100, 116, 139,.1)" stroke="var(--p)" stroke-width=".8"/>`;
-s+=`<circle cx="${v.x+20}" cy="${v.y||70}" r="6" fill="rgba(100, 116, 139,.2)" stroke="var(--p)" stroke-width=".5" class="ep"/>`;
+s+=`<circle cx="${v.x+20}" cy="${v.y||70}" r="6" fill="rgba(100, 116, 139,.2)" stroke="var(--p)" stroke-width=".5" class="fire-ep"/>`;   /* A6: not .ep — that class is the electrical sub-panel switch and is display:none */
 s+=tx(v.x+60,62,v.id,'var(--p)',6,'middle',1);
 s+=tx(v.x+60,75,'LaserPLUS','var(--t2)',5,'middle');
 s+=tx(v.x+60,87,'Zones: '+v.zone,'var(--t3)',4,'middle');
@@ -8025,7 +8044,7 @@ for(let i=0;i<4;i++){
 s+=`<line x1="${v.x+30+i*22}" y1="105" x2="${v.x+30+i*22}" y2="125" stroke="var(--p)" stroke-width=".5" stroke-dasharray="3 2"/>`;
 s+=`<circle cx="${v.x+30+i*22}" cy="128" r="2" fill="none" stroke="var(--p)" stroke-width=".4"/>`;
 }
-s+=tx(v.x+60,140,'~100 sample pts','var(--t3)',4,'middle');
+s+=tx(v.x+60,140,(v.ports==null?'\u2014':v.ports)+' sampling ports','var(--t3)',4,'middle');
 s+='</g>'});
 // VESDA Panel
 s+=`<rect x="580" y="50" width="40" height="90" rx="3" fill="rgba(100, 116, 139,.15)" stroke="var(--p)" stroke-width=".8"/>`;
@@ -8041,7 +8060,7 @@ s+=tx(628,90,'SLC','var(--t3)',4,'middle');
 s+=`<rect x="640" y="25" width="310" height="135" rx="4" fill="rgba(245,158,11,.03)" stroke="rgba(245,158,11,.2)" stroke-width="1"/>`;
 s+=tx(795,40,'FIRE ALARM CONTROL PANEL','var(--o)',7,'middle',1);
 // Main FACP
-s+=`<g data-rz-equipment="fire-facp:1" tabindex="0" role="button" data-tip="Fire Alarm Control Panel: Notifier NFS2-3030, 640 addressable points, 12 SLC loops, integrates smoke/heat/beam/VESDA detectors, BMS/SCADA interface">`;
+s+=`<g data-rz-equipment="fire-facp:DH-01" tabindex="0" role="button" data-tip="Fire Alarm Control Panel: Notifier NFS2-3030, 640 addressable points, 12 SLC loops, integrates smoke/heat/beam/VESDA detectors, BMS/SCADA interface">`;
 s+=`<rect x="660" y="50" width="100" height="100" rx="4" fill="rgba(245,158,11,.12)" stroke="var(--o)" stroke-width="1"/>`;
 s+=tx(710,68,'NOTIFIER','var(--o)',6,'middle',1);
 s+=tx(710,80,'NFS2-3030','var(--o)',5,'middle');
@@ -8055,27 +8074,27 @@ s+='</g>';
 s+=`<rect x="770" y="50" width="85" height="48" rx="3" fill="rgba(245,158,11,.06)" stroke="rgba(245,158,11,.3)" stroke-width=".6"/>`;
 s+=symSmokeDet(790,70,'var(--o)');
 s+=tx(835,65,'SMOKE','var(--o)',5,'middle',1);
-s+=tx(835,78,'48× Photo','var(--t2)',4,'middle');
+s+=tx(835,78,fireN('smoke_spot')+'× Photo','var(--t2)',4,'middle');
 s+=tx(835,90,'Addressable','var(--t3)',3.5,'middle');
 s+=`<rect x="860" y="50" width="85" height="48" rx="3" fill="rgba(239,68,68,.06)" stroke="rgba(239,68,68,.3)" stroke-width=".6"/>`;
 s+=symHeatDet(880,70,'var(--r)');
 s+=tx(922,65,'HEAT','var(--r)',5,'middle',1);
-s+=tx(922,78,'24× RoR/Fix','var(--t2)',4,'middle');
+s+=tx(922,78,fireN('heat_spot')+'× RoR/Fix','var(--t2)',4,'middle');
 s+=tx(922,90,'57°C setpt','var(--t3)',3.5,'middle');
 s+=`<rect x="770" y="102" width="85" height="48" rx="3" fill="rgba(6,182,212,.06)" stroke="rgba(6,182,212,.3)" stroke-width=".6"/>`;
 s+=symBeamDet(810,122,'var(--c)');
-s+=tx(835,140,'2× Reflect','var(--t2)',4,'middle');
+s+=tx(835,140,fireN('beam')+'× Reflect','var(--t2)',4,'middle');
 s+=`<rect x="860" y="102" width="85" height="48" rx="3" fill="rgba(236,72,153,.06)" stroke="rgba(236,72,153,.3)" stroke-width=".6"/>`;
 // Linear Heat Cable symbol
 s+=`<path d="M875 115 Q885 120 895 115 Q905 110 915 115 Q925 120 935 115" fill="none" stroke="var(--pk)" stroke-width="1.5" stroke-dasharray="none"/>`;
 s+=`<circle cx="875" cy="115" r="2" fill="var(--pk)"/><circle cx="935" cy="115" r="2" fill="var(--pk)"/>`;
 s+=tx(905,132,'LHC/DTS','var(--pk)',5,'middle',1);
-s+=tx(905,142,'400m fiber','var(--t2)',4,'middle');
+s+=tx(905,142,fireN('lhd')+'× loops','var(--t2)',4,'middle');
 // ===== SUPPRESSION SYSTEM =====
 s+=`<rect x="10" y="165" width="470" height="200" rx="4" fill="rgba(239,68,68,.03)" stroke="rgba(239,68,68,.2)" stroke-width="1"/>`;
-s+=tx(245,180,'NOVEC 1230 SUPPRESSION SYSTEM — NFPA 2001 / ISO 14520','var(--r)',7,'middle',1);
+s+=tx(245,180,'CLEAN-AGENT SUPPRESSION — SELECTION PENDING — NFPA 2001 / ISO 14520','var(--r)',7,'middle',1);
 // Cylinder bank
-s+=`<g data-rz-equipment="fire-cylinder-bank:1" tabindex="0" role="button" data-tip="Novec 1230 Cylinder Bank: 4\u00D7180L at 42bar N\u2082 superpressurization, 5.3% design concentration at 21\u00B0C, total 720L agent, NFPA 2001 / ISO 14520 compliant">`;
+s+=`<g data-rz-equipment="fire-cylinder-bank:DH-01" tabindex="0" role="button" data-tip="Cylinder bank DH-01: ${FIRE_AGENT}; 4\u00D7180 L at 42 bar N\u2082 superpressurisation (indicative for a superpressurised clean-agent bank); design concentration per NFPA 2001 for the selected agent is pending">`;
 s+=`<rect x="25" y="195" width="130" height="155" rx="4" fill="rgba(239,68,68,.08)" stroke="var(--r)" stroke-width=".8"/>`;
 s+=tx(90,210,'CYLINDER BANK','var(--r)',6,'middle',1);
 for(let i=0;i<4;i++){
@@ -8090,7 +8109,7 @@ s+=tx(cx,cy+25,'N₂','var(--c)',4,'middle');
 s+=`<circle cx="${cx}" cy="${cy+40}" r="5" fill="none" stroke="var(--g)" stroke-width=".5"/>`;
 s+=tx(cx,cy+42,'P','var(--g)',4,'middle');
 }
-s+=tx(90,340,'Total: 720L | 5.3% design','var(--t2)',5,'middle');
+s+=tx(90,340,'720L indicative | conc. pending','var(--t2)',5,'middle');
 s+='</g>';
 // Piping network
 s+=`<rect x="165" y="195" width="305" height="155" rx="4" fill="rgba(239,68,68,.05)" stroke="rgba(239,68,68,.15)" stroke-width=".5"/>`;
@@ -8141,15 +8160,13 @@ s+=`<rect x="490" y="165" width="460" height="200" rx="4" fill="rgba(34,197,94,.
 s+=tx(720,180,'PROTECTION ZONE MAP — 12 ZONES','var(--g)',7,'middle',1);
 // Zone grid 4x3
 const zW=105,zH=52,zX=500,zY=190;
-const zones=[
-{id:'Z1',eq:'CDU 1-3',det:'V+4S',st:1},{id:'Z2',eq:'CDU 4-6',det:'V+4S',st:1},{id:'Z3',eq:'CDU 7-9',det:'V+4S',st:1},{id:'Z4',eq:'CDU 10-12',det:'V+4S',st:1},
-{id:'Z5',eq:'Rack Row A-B',det:'V+S+H+L',st:1},{id:'Z6',eq:'Rack Row C-D',det:'V+S+H+L',st:1},{id:'Z7',eq:'Rack Row E-F',det:'V+S+H+L',st:1},{id:'Z8',eq:'Rack Row G-H',det:'V+S+H+L',st:1},
-{id:'Z9',eq:'Elec Room A',det:'V+B+S',st:1},{id:'Z10',eq:'Elec Room B',det:'V+B+S',st:1},{id:'Z11',eq:'UPS+Batt',det:'V+H₂+S',st:1},{id:'Z12',eq:'MDF/Network',det:'V+6S',st:1}
-];
+const MEANS_ABBR={vesda:'V',smoke_l1:'S1',smoke_l2:'S2',heat:'H',lhd:'L',beam:'B'};
+const zones=(fInv?fInv.zones.filter(z=>z.hall===1):[]).map(z=>({id:'Z'+String(z.n).padStart(2,'0'),zid:z.id,eq:z.name,det:z.means.map(m=>MEANS_ABBR[m]||m).join('+')+(z.release?' · CA':'')+(z.epo?' · EPO':''),st:1}));
 zones.forEach((z,i)=>{
 const col=i%4,row=Math.floor(i/4);
 const x=zX+col*(zW+5),y=zY+row*(zH+4);
 const stCol=z.st===1?'var(--g)':z.st===2?'var(--o)':'var(--r)';
+s+=`<g data-rz-equipment="fire-zone:${z.zid}" tabindex="0" role="button" data-tip="Zone ${z.id} ${z.eq}: detection means ${z.det} — click for the inspector; isolate a detector from the point list">`;
 s+=`<rect x="${x}" y="${y}" width="${zW}" height="${zH}" rx="3" fill="rgba(34,197,94,.06)" stroke="${stCol}" stroke-width=".7" id="zn${i}box"/>`;
 s+=`<circle cx="${x+12}" cy="${y+12}" r="6" fill="rgba(34,197,94,.15)" stroke="${stCol}" stroke-width=".5" id="zn${i}circ"/>`;
 s+=`<text x="${x+12}" y="${y+14}" fill="${stCol}" font-family="${J}" font-size="5" text-anchor="middle" font-weight="600" id="zn${i}id">${z.id}</text>`;
@@ -8157,6 +8174,7 @@ s+=tx(x+60,y+18,z.eq,'var(--t2)',5,'middle');
 s+=tx(x+60,y+32,z.det,'var(--c)',4.5,'middle');
 s+=`<rect x="${x+zW-35}" y="${y+zH-16}" width="30" height="11" rx="2" fill="rgba(34,197,94,.15)" stroke="${stCol}" stroke-width=".3" id="zn${i}stbox"/>`;
 s+=`<text x="${x+zW-20}" y="${y+zH-8}" fill="${stCol}" font-family="${J}" font-size="4" text-anchor="middle" font-weight="600" id="zn${i}st">OK</text>`;
+s+='</g>';
 });
 // ===== LEAK DETECTION =====
 s+=`<rect x="10" y="370" width="310" height="130" rx="4" fill="rgba(6,182,212,.03)" stroke="rgba(6,182,212,.2)" stroke-width="1"/>`;
@@ -8187,19 +8205,20 @@ s+=tx(265,470,'QD + valve pts','var(--t3)',4,'middle');
 s+=`<rect x="330" y="370" width="310" height="130" rx="4" fill="rgba(239,68,68,.03)" stroke="rgba(239,68,68,.2)" stroke-width="1"/>`;
 s+=tx(485,385,'EMERGENCY POWER OFF & SAFETY','var(--r)',7,'middle',1);
 // EPO stations with proper symbols
-const epos=[{x:350,id:'EPO-1',loc:'Exit N'},{x:410,id:'EPO-2',loc:'Exit S'},{x:470,id:'EPO-3',loc:'NOC'},{x:530,id:'EPO-4',loc:'Elec'},{x:590,id:'MCP-1',loc:'Hall'}];
-epos.forEach((e,ei)=>{
-if(ei<4){
-s+=`<g data-rz-equipment="fire-epo:${e.id}" tabindex="0" role="button" data-tip="Emergency Power Off ${e.id}: Dual-confirm (key + button), shunt-trips all breakers, location: ${e.loc}">`;
+/* Tech Spec §6.9: EPO stations sit in the electrical-room zones only; the exits and the NOC carry manual call points */
+const epos=[{x:340,pid:'DH-01-MCP-N',kind:'mcp',loc:'MCP Exit N'},{x:390,pid:'DH-01-MCP-S',kind:'mcp',loc:'MCP Exit S'},{x:440,pid:'DH-01-MCP-NOC',kind:'mcp',loc:'MCP NOC'},{x:490,pid:'DH-01-Z09-EPO',kind:'epo',loc:'EPO Elec A'},{x:540,pid:'DH-01-Z10-EPO',kind:'epo',loc:'EPO Elec B'},{x:590,pid:'DH-01-Z11-EPO',kind:'epo',loc:'EPO UPS'}];
+epos.forEach((e)=>{
+if(e.kind==='epo'){
+s+=`<g data-rz-equipment="fire-epo:${e.pid}" tabindex="0" role="button" data-tip="Zoned EPO ${e.pid}: dual-confirm (key + button), trips the electrical-room feeds of its zone only (NFPA 75 §9.4), logged — life-safety point, never isolable">`;
 s+=symEPO(e.x+25,418,'var(--r)');
 s+=tx(e.x+25,445,e.loc,'var(--t3)',3.5,'middle');s+='</g>';
 }else{
-s+=`<g data-rz-equipment="fire-mcp:${e.id}" tabindex="0" role="button" data-tip="Manual Call Point ${e.id}: Break-glass fire alarm activation, direct FACP zone trigger, location: ${e.loc}">`;
+s+=`<g data-rz-equipment="fire-mcp:${e.pid}" tabindex="0" role="button" data-tip="Manual call point ${e.pid}: break-glass fire alarm, direct FACP zone trigger — life-safety point, never isolable">`;
 s+=symMCP(e.x+25,418,'var(--r)');
 s+=tx(e.x+25,445,e.loc,'var(--t3)',3.5,'middle');s+='</g>';
 }
 });
-s+=tx(485,458,'Dual-Confirm: Key + Button | Shunt trip breakers','var(--t2)',4.5,'middle');
+s+=tx(485,458,'EPO: dual-confirm, zoned to electrical rooms | MCP: exits + NOC','var(--t2)',4.5,'middle');
 // Safety integration with symbols
 s+=`<rect x="345" y="468" width="135" height="28" rx="2" fill="rgba(34,197,94,.08)" stroke="var(--g)" stroke-width=".5"/>`;
 s+=`<polygon points="355,482 365,475 365,489" fill="var(--g)" opacity=".4"/>`;
@@ -8258,55 +8277,45 @@ s+=tx(365,565,'Agent','var(--t2)',5);
 s+=`<line x1="400" y1="562" x2="440" y2="562" stroke="var(--p)" stroke-width="1" stroke-dasharray="3 2"/>`;
 s+=tx(450,565,'Sample','var(--t2)',5);
 el.innerHTML=s;
-// FIRE SYSTEM LIVE DATA
-let fireAlarmActive=false;
-setInterval(()=>{
-// Update VESDA detectors with varying sensitivity levels
+// FIRE SYSTEM LIVE STATE — painted by the workstation from ONE snapshot per tick (js/datahall-ai/fire-workstation.js);
+// the mimic owns no timer and rolls nothing. VESDA obscuration stays seeded telemetry (RZ_SIM) and reads ISOLATED when the unit is.
+const ZONE_FILL={ok:['var(--g)','rgba(34,197,94,.06)','rgba(34,197,94,.15)'],warn:['var(--o)','rgba(245,158,11,.1)','rgba(245,158,11,.2)'],crit:['var(--r)','rgba(239,68,68,.12)','rgba(239,68,68,.22)']};
+function zoneTone(z){ if(z.inEvent&&/confirmed|suppression_armed|discharged|lockout|epo_active|leak_wet/.test(z.state))return 'crit'; if(z.impaired)return 'crit'; if((z.inEvent&&z.state==='prealarm')||z.isolatedCount||z.fireWatch)return 'warn'; return 'ok'; }
+function zoneText(z){ if(z.inEvent&&z.state!=='normal')return ({prealarm:'ALERT',confirmed:'ALARM',suppression_armed:'ARMED',discharged:'DISCH',lockout:'LOCK',epo_active:'EPO',leak_wet:'WET'})[z.state]||'ALARM'; if(z.impaired)return 'IMPAIRED'; if(z.isolatedCount)return 'ISO '+z.isolatedCount; return 'OK'; }
+window.RZDatahallAIFireMimic={paint:function(snap,hall){
+if(!snap)return;
+const sm=snap.summary, byId={}; snap.points.forEach(p=>{byId[p.id]=p;});
 for(let i=0;i<4;i++){
-const vdst=$('vd'+i+'st');
-if(vdst){
-const obs=RZ_SIM('vesda'+i,0.0002,0.0028,4);
-vdst.textContent='Obs: '+obs+'%/m';
-vdst.style.fill=parseFloat(obs)<0.002?'var(--g)':'var(--c)';
+const vdst=$('vd'+i+'st'); if(!vdst)continue;
+const p=byId['DH-01-VD-'+(i+1)];
+if(p&&p.isolation){ vdst.textContent='ISOLATED — '+p.isolation.owner; vdst.style.fill='var(--o)'; }
+else if(p&&(p.state==='alarm'||p.state==='prealarm')){ vdst.textContent=p.state==='alarm'?'FIRE — zone in alarm':'ALERT — obscuration rising'; vdst.style.fill=p.state==='alarm'?'var(--r)':'var(--o)'; }
+else { const obs=RZ_SIM('vesda'+i,0.0002,0.0028,4); vdst.textContent='Obs: '+obs+'%/m'; vdst.style.fill=parseFloat(obs)<0.002?'var(--g)':'var(--c)'; }
 }
-}
-// Occasional fire alarm simulation (2% chance)
-if(false){   /* Rule 2: no random zone alarm */
-fireAlarmActive=true;
-const alertZone=RZ_SIM('page40',0,11,0);
-const zbox=$('zn'+alertZone+'box'),zcirc=$('zn'+alertZone+'circ'),zid=$('zn'+alertZone+'id'),zstbox=$('zn'+alertZone+'stbox'),zst=$('zn'+alertZone+'st');
+snap.zones.filter(z=>z.hall===1).forEach((z,i)=>{
+const tone=ZONE_FILL[zoneTone(z)], zbox=$('zn'+i+'box'),zcirc=$('zn'+i+'circ'),zid=$('zn'+i+'id'),zstbox=$('zn'+i+'stbox'),zst=$('zn'+i+'st');
+if(zbox){zbox.style.stroke=tone[0];zbox.style.fill=tone[1];}
+if(zcirc){zcirc.style.stroke=tone[0];zcirc.style.fill=tone[2];}
+if(zid)zid.style.fill=tone[0];
+if(zstbox){zstbox.style.stroke=tone[0];zstbox.style.fill=tone[2];}
+if(zst){const t=zoneText(z); if(zst.textContent!==t)zst.textContent=t; zst.style.fill=tone[0];}
+});
 const facp=$('facpSt'),facpB=$('facpBox');
-if(zbox){zbox.style.stroke='var(--o)';zbox.style.fill='rgba(245,158,11,.1)';}
-if(zcirc){zcirc.style.stroke='var(--o)';zcirc.style.fill='rgba(245,158,11,.2)';}
-if(zid)zid.style.fill='var(--o)';
-if(zstbox){zstbox.style.stroke='var(--o)';zstbox.style.fill='rgba(245,158,11,.2)';}
-if(zst){zst.textContent='ALERT';zst.style.fill='var(--o)';}
-if(facp){facp.textContent='ALERT Z'+(alertZone+1);facp.style.fill='var(--o)';}
-if(facpB){facpB.style.stroke='var(--o)';facpB.style.fill='rgba(245,158,11,.2)';}
-// Auto-recover after 5 seconds
-setTimeout(()=>{
-if(zbox){zbox.style.stroke='var(--g)';zbox.style.fill='rgba(34,197,94,.06)';}
-if(zcirc){zcirc.style.stroke='var(--g)';zcirc.style.fill='rgba(34,197,94,.15)';}
-if(zid)zid.style.fill='var(--g)';
-if(zstbox){zstbox.style.stroke='var(--g)';zstbox.style.fill='rgba(34,197,94,.15)';}
-if(zst){zst.textContent='OK';zst.style.fill='var(--g)';}
-if(facp){facp.textContent='NORMAL';facp.style.fill='var(--g)';}
-if(facpB){facpB.style.stroke='var(--g)';facpB.style.fill='rgba(34,197,94,.2)';}
-fireAlarmActive=false;
-},5000);
-}
-// Leak detection occasional alert (1% chance)
+const stg=sm.stage, fTone=/confirmed|suppression_armed|discharged|lockout/.test(stg)?ZONE_FILL.crit:(stg==='prealarm'||sm.fireWatch)?ZONE_FILL.warn:ZONE_FILL.ok;
+if(facp){facp.textContent=stg==='normal'?(sm.fireWatch?'FIRE WATCH':'NORMAL'):sm.fire.split(' ')[0];facp.style.fill=fTone[0];}
+if(facpB){facpB.style.stroke=fTone[0];facpB.style.fill=fTone[2];}
 const leakB=$('leakBox'),leakS=$('leakSt');
-if(false){   /* Rule 2: no random leak alert */
-leakB.style.stroke='var(--o)';leakB.style.fill='rgba(245,158,11,.2)';
-leakS.textContent='CHECK';leakS.style.fill='var(--o)';
-setTimeout(()=>{
-leakB.style.stroke='var(--g)';leakB.style.fill='rgba(34,197,94,.2)';
-leakS.textContent='CLEAR';leakS.style.fill='var(--g)';
-},4000);
-}
-},3000);
+if(leakS){leakS.textContent=/WET/.test(sm.leak)?'WET':'CLEAR';leakS.style.fill=/WET/.test(sm.leak)?'var(--r)':'var(--g)';}
+if(leakB){leakB.style.stroke=/WET/.test(sm.leak)?'var(--r)':'var(--g)';leakB.style.fill=/WET/.test(sm.leak)?'rgba(239,68,68,.22)':'rgba(34,197,94,.2)';}
+const inhibited=snap.zones.some(z=>z.hall===1&&z.releaseInhibited), discharged=/discharged|lockout/.test(stg);
+const rel=$('fireReleaseG'), dis=$('fireDischargeG'), il=$('fireInterlockG');
+[[rel,inhibited?'INHIBITED':discharged?'RELEASED':'ARMED'],[dis,inhibited?'INHIBITED':discharged?'DISCHARGED':'READY'],[il,inhibited?'BROKEN':'INTERLOCK']].forEach(([g,t])=>{
+if(!g)return; const txt=g.querySelector('text:last-of-type'); if(txt&&txt.textContent!==t)txt.textContent=t;
+const col=inhibited?'var(--o)':discharged?'var(--r)':'var(--g)'; g.querySelectorAll('rect,circle,text').forEach(n=>{ if(n.tagName==='rect'){n.style.stroke=col;} else if(n.tagName==='text'){n.style.fill=col;} else {n.style.stroke=col;} });
+});
+}};
 })();
+
 // DC DASHBOARD — 4× DATA HALLS with DC Image + Callouts
 // v1.32.0 — subtitle + callouts now engine-bound (AI-ACC-01/02/03 per accuracy review doc-26).
 if($('dashSu'))$('dashSu').textContent=(DHE?('4× AI Data Halls | '+DHE.itFacilityMW.toFixed(2)+' MW total IT (GB300 basis) | '+DHE.gpuPerFacility.toLocaleString()+' GPU | PUE '+DHE.pue.toFixed(3)+' design / '+DHE.pueAnnual+' annual | WUE '+DHE.wue.toFixed(2)+' dry-only | CUE_IT '+DHE.cueIt.toFixed(2)+' (grid '+DHE.gridFactor+' × PUE)'):'—');
@@ -11697,7 +11706,7 @@ inner.addEventListener('touchend',function(){lastDist=0},{passive:true});
   });
   window.addEventListener('resize',schedule);
   document.addEventListener('click',function(e){
-    if(e.target&&(e.target.closest('.tabs')||e.target.closest('.elec-tabs')||e.target.closest('.svg-zb')||e.target.id==='sideTog'||e.target.id==='sideReopen'))schedule();
+    if(e.target&&(e.target.closest('.tabs')||e.target.closest('.elec-tabs')||e.target.closest('.fire-tabs')||e.target.closest('.svg-zb')||e.target.id==='sideTog'||e.target.id==='sideReopen'))schedule();
   },true);
   /* initial pass after first render settles */
   setTimeout(applyAll,300);setTimeout(applyAll,1200);
@@ -11804,6 +11813,7 @@ var MODALS=[
   {panel:'crahHmi',title:'crahHmiTitle'},
   {panel:'corrHmi',title:'corrHmiTitle'},
   {panel:'batHmi',title:'batHmiTitle'},
+  {panel:'fireIsoDialog',title:'fireIsoTitle'},   /* v2.3.0 §A6 — the isolation dialog, the only modal in the fire workstation */
   {panel:'sldMimic',title:'sldMimicTitle'},
   {panel:'bodDrawer',title:'bodDrawerTitle'}   /* v1.20.3 Stage 9 — P3 drawer */
 ];
@@ -11935,7 +11945,7 @@ function onClose(panel){
   }
   if(lastTrigger&&typeof lastTrigger.focus==='function'){
     var trg=lastTrigger;
-    if(trg.isConnected===false){ trg=d.querySelector('.rz-inspector [data-rz-open-hmi]')||d.querySelector('aside.rz-inspector.open [tabindex="0"],aside.rz-inspector.open button')||d.querySelector('.rz-equipment-selected')||trg; }
+    if(trg.isConnected===false){ trg=d.querySelector('.rz-inspector [data-rz-open-hmi]')||d.querySelector('.rz-inspector [data-rz-action]')||d.querySelector('aside.rz-inspector.open [tabindex="0"],aside.rz-inspector.open button')||d.querySelector('.rz-equipment-selected')||trg; }
     returnFocus(trg);
     /* re-assert after the close-frame settles (some handlers blur late) */
     if(typeof requestAnimationFrame==='function')requestAnimationFrame(function(){returnFocus(trg);});
@@ -12011,7 +12021,11 @@ function rules(){
   /* doc-22 BMS/DCIM: stale points >1% warn / >5% crit (nominal 0, quiet) */
   var stalePct=0;
   var stale=stalePct>5?2:(stalePct>1?1:0);
-  return {crit:c, warn:w, maint:2 /* matches sidebar "Maint 2 sched" */, stale:stale, comms:true};
+  /* v2.3.0 §A6 fire terms: a confirmed fire / discharge / EPO / wet leak is critical; an impaired zone or an expired
+     isolation is a warning; maintenance = isolated points — all from the workstation snapshot, never a roll */
+  var FW=window.RZDatahallAIFireWorkstation, F=FW&&FW.summary?FW.summary():null, m=0;
+  if(F){ if(/ALARM|DISCHARGED|LOCKOUT/.test(F.fire)||/ACTIVE/.test(F.epo)||/WET/.test(F.leak))c++; w+=F.impairedZones.length+F.expiredIsolations.length; m=F.maint; }
+  return {crit:c, warn:w, maint:m, stale:stale, comms:true};
 }
 function fmtState(a){
   if(a.crit>0)return {t:'CRITICAL',cls:'s-crit'};

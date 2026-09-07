@@ -16,6 +16,10 @@ includes(html, 'js/datahall-ai/alarm-query.js', 'AI cockpit must load the alarm 
 includes(html, 'js/datahall-ai/rack-density.js', 'AI cockpit must load the rack-density model');
 includes(html, 'js/datahall-ai/electrical-topology.js', 'AI cockpit must load the electrical topology model');
 includes(html, 'js/datahall-ai/fire-cause-effect.js', 'AI cockpit must load the fire cause-and-effect model');
+includes(html, 'js/datahall-ai/fire-points.js', 'AI cockpit must load the fire point inventory / isolation module (§A6)');
+includes(html, 'js/datahall-ai/fire-workstation.js', 'AI cockpit must load the fire workstation controller (§A6)');
+assert.equal((html.match(/<select id="fireScenario"[^>]*>([\s\S]*?)<\/select>/) || ['', ''])[1].split('<option').length - 1, 14, 'the fire scenario select must offer every cause-and-effect initiating event (14)');
+assert.doesNotMatch(html, /<button class="ft[^>]*data-ep=|class="fire-tabs[^"]*elec-tabs/, 'the fire sub-tab strip must not reuse the electrical strip classes (its handler is document-global)');
 includes(html, 'js/datahall-ai/operator-ui.js', 'AI cockpit must load the operator UI controller');
 assert.match(html, /<title>[^<]*Simulated Operations[^<]*<\/title>/,
   'AI search title must disclose simulated operations');
@@ -42,6 +46,9 @@ includes(html, 'aria-live="polite"', 'dynamic alarm results must be announced wi
 for (const id of [
   'rackDensitySummary', 'platformProfile', 'platformComparison',
   'electricalScenario', 'electricalPathSummary', 'fireCauseEffectBody',
+  /* v2.3.0 §A6 — the fire workstation */
+  'fireTabs', 'fp-points', 'fp-zones', 'fp-mimic', 'fp-cause-effect', 'firePointsBody', 'firePointsTable', 'fireZonesGrid', 'fireSummary',
+  'fireImpairmentBanner', 'fireIsoDialog', 'fireIsoForm', 'fireStart', 'fireStop', 'fireElapsed', 'firePointsIsolatedOnly', 'firePointsClear',
 ]) {
   includes(html, `id="${id}"`, `operator cockpit is missing #${id}`);
 }

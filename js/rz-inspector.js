@@ -89,6 +89,7 @@
     '.rz-inspector-chip.is-fault{color:#fca5a5;border-color:rgba(252,165,165,0.5)}' +
     '.rz-inspector-action{margin:8px 0 0;padding:6px 10px;border:1px solid rgba(56,189,248,0.35);background:rgba(56,189,248,0.08);color:#7dd3fc;' +
       'font-family:IBM Plex Sans,sans-serif;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;border-radius:4px;cursor:pointer}' +
+    '.rz-inspector-action--warn{border-color:rgba(245,158,11,.55);color:#fbbf24}.rz-inspector-action[aria-disabled="true"]{opacity:.45;cursor:not-allowed}' +
     '.rz-inspector-action:hover,.rz-inspector-action:focus-visible{background:rgba(56,189,248,0.18);outline:2px solid #38bdf8;outline-offset:1px}' +
     '.rz-inspector-v[data-basis-param]{cursor:pointer;text-decoration:underline dotted rgba(255,255,255,0.3)}' +
     '.rz-inspector-v[data-basis-param]::after,.rz-inspector-v[data-rz-authored-basis]::after{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;margin-left:5px;vertical-align:middle;background:var(--rz-ev,#8fa2b8)}' +
@@ -496,12 +497,36 @@
     inspectorEl.querySelector('[data-slot="chip"]').innerHTML = '<span class="rz-inspector-chip is-' + esc(chip.state) + '">' + esc(chip.label) + '</span>';
     var actions = inspectorEl.querySelector('[data-slot="actions"]');
     /* the button element survives the 4 s refresh: a modal that opened from it returns focus to it */
-    var wantAction = !!(p.actions && p.actions.openHmi), btn = actions.querySelector('[data-rz-open-hmi]');
-    if (wantAction !== !!btn) {
-      actions.innerHTML = wantAction ? '<button type="button" class="rz-inspector-action" data-rz-open-hmi="1">Open equipment HMI</button>' : '';
-      btn = actions.querySelector('[data-rz-open-hmi]');
+    var wantAction = !!(p.actions && p.actions.openHmi), custom = (p.actions && p.actions.custom) || [];
+    /* v1.46.0 — the slot rebuilds only when its SIGNATURE changes, so every button element survives a refresh */
+    var sig = (wantAction ? 'hmi' : '') + '|' + custom.map(function (a) { return a.id + ':' + (a.disabled ? 0 : 1); }).join(',');
+    if (actions.getAttribute('data-rz-sig') !== sig) {
+      /* a rebuilt slot must not drop keyboard focus: remember which action had it and re-focus its successor */
+      var focused = doc.activeElement && actions.contains(doc.activeElement) ? (doc.activeElement.getAttribute('data-rz-action') || 'hmi') : null;
+      var html = wantAction ? '<button type="button" class="rz-inspector-action" data-rz-open-hmi="1">Open equipment HMI</button>' : '';
+      for (var ci = 0; ci < custom.length; ci++) {
+        html += '<button type="button" class="rz-inspector-action rz-inspector-action--' + esc(custom[ci].tone || 'default') + '" data-rz-action="' + esc(custom[ci].id) + '" data-rz-handler="' + esc(custom[ci].handler) + '"' +
+          (custom[ci].disabled ? ' aria-disabled="true"' : '') + (custom[ci].title ? ' title="' + esc(custom[ci].title) + '"' : '') + '>' + esc(custom[ci].label) + '</button>';
+      }
+      actions.innerHTML = html; actions.setAttribute('data-rz-sig', sig);
+      if (focused) { var again = actions.querySelector(focused === 'hmi' ? '[data-rz-open-hmi]' : '[data-rz-action="' + focused + '"]') || actions.querySelector('button'); if (again) { try { again.focus({ preventScroll: true }); } catch (e) { /* best effort */ } } }
     }
+    var btn = actions.querySelector('[data-rz-open-hmi]');
     if (btn) { btn.onclick = function (e) { e.stopPropagation(); if (payloadOpts && payloadOpts.onOpenHmi) { payloadOpts.onOpenHmi(currentPayload || p, btn); } }; }
+    var cbs = actions.querySelectorAll('[data-rz-action]');
+    for (var cj = 0; cj < cbs.length; cj++) {
+      (function (b) {
+        var a = null; for (var k = 0; k < custom.length; k++) { if (custom[k].id === b.getAttribute('data-rz-action')) { a = custom[k]; } }
+        if (a && a.title) { b.title = a.title; }
+        b.onclick = function (e) {
+          e.stopPropagation();
+          if (!a || a.disabled) { return; }
+          var reg = root.RZDatahallAIInspectorActions || {}, fn = reg[a.handler];
+          if (typeof fn !== 'function') { if (root.console) { root.console.warn('[rz-inspector] no action handler ' + a.handler); } return; }
+          fn.apply(null, [currentPayload || p, b].concat(a.args || []));
+        };
+      })(cbs[cj]);
+    }
     var body = inspectorEl.querySelector('[data-slot="body"]');
     body.innerHTML = renderPayloadTab(p, currentTab) +
       '<div class="rz-inspector-prov">engine ' + esc(p.provenance.engineVersion) + ' · scenario ' + esc(p.provenance.scenarioId) + ' / ' + esc(p.provenance.coolingScenarioId) + ' · tick ' + esc(p.provenance.tick) +
@@ -530,7 +555,7 @@
     payloadMode = false; currentPayload = null;
     inspectorEl.classList.remove('rz-inspector-payload');
     inspectorEl.querySelector('[data-slot="chip"]').innerHTML = '';
-    inspectorEl.querySelector('[data-slot="actions"]').innerHTML = '';
+    var acts = inspectorEl.querySelector('[data-slot="actions"]'); acts.innerHTML = ''; acts.removeAttribute('data-rz-sig');
   }
   /** openPayload(payload, { trigger, onOpenHmi(payload, button), onNavigate(id), tab }) */
   function openPayload(payload, opts) {
@@ -610,6 +635,9 @@
                                t.getAttribute('data-basis-param') ||
                                t.getAttribute('data-rz-equipment') ||
                                t.hasAttribute('data-rz-inspector-keep'))) { return; }
+        /* v1.46.0 — a click inside a DHModal panel or on its scrim is never an "outside" intent: the panel
+           was opened FROM the inspector and the inspector must still be there when it closes */
+        if (t.classList && (t.classList.contains('dh-modal-host') || t.classList.contains('dh-scrim'))) { return; }
         t = t.parentNode;
       }
       close();
@@ -624,7 +652,7 @@
   }
 
   /* Export. */
-  var API = { open: open, openBasis: openBasis, basisIdOf: basisIdOf, openPayload: openPayload, refreshPayload: refreshPayload, currentPayloadId: currentPayloadId, close: close, isOpen: isOpen, version: '1.45.0' };
+  var API = { open: open, openBasis: openBasis, basisIdOf: basisIdOf, openPayload: openPayload, refreshPayload: refreshPayload, currentPayloadId: currentPayloadId, close: close, isOpen: isOpen, version: '1.46.0' };
   if (root) { root.RZInspector = API; }
 
 })(typeof window !== 'undefined' ? window : null,

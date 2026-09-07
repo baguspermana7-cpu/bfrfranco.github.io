@@ -150,6 +150,7 @@ try {
                 await enterAuthorizedAuditState(tab, tabSet.cockpit);
                 const seenTabs = new Set();
                 for (const entry of tabSet.diagrams) {
+                    if (entry.kind === 'html') continue;                 /* v2.3.0: HTML workstation views carry no SVG labels */
                     const key = `${entry.tab}/${entry.sub || ''}`;
                     if (seenTabs.has(key)) continue;
                     seenTabs.add(key);

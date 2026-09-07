@@ -50,7 +50,12 @@ export const TAB_SETS = Object.freeze({
             { tab: 'elec', sub: 'dh03', selector: '#elecDH3Svg', label: 'DH-03 SLD' },
             { tab: 'elec', sub: 'dh04', selector: '#elecDH4Svg', label: 'DH-04 SLD' },
             { tab: 'net', selector: '#netSvg', label: 'network fabric' },
-            { tab: 'fire', selector: '#fireSvg', label: 'fire mimic' },
+            /* v2.3.0 §A6 — the fire workstation: three HTML views and the mimic behind one scoped sub-bar.
+               Points is listed FIRST so the panel's HTML is measured with its default view visible. */
+            { tab: 'fire', sub: 'points', kind: 'html', selector: '#fp-points', label: 'fire point list', subBar: '#fireTabs', subAttr: 'data-fp', subPanelPrefix: 'fp-' },
+            { tab: 'fire', sub: 'zones', kind: 'html', selector: '#fp-zones', label: 'fire zones', subBar: '#fireTabs', subAttr: 'data-fp', subPanelPrefix: 'fp-' },
+            { tab: 'fire', sub: 'cause-effect', kind: 'html', selector: '#fp-cause-effect', label: 'fire cause & effect', subBar: '#fireTabs', subAttr: 'data-fp', subPanelPrefix: 'fp-' },
+            { tab: 'fire', sub: 'mimic', selector: '#fireSvg', label: 'fire mimic', subBar: '#fireTabs', subAttr: 'data-fp', subPanelPrefix: 'fp-' },
             { tab: 'bms', selector: '#bmsSvg', label: 'BMS architecture' },
         ]),
     }),
@@ -95,6 +100,7 @@ export async function activateTab(page, set, entry) {
     }
 
     if (entry.sub) {
+        /* v2.3.0: an entry may name its own sub-bar (the fire workstation strip) — the set's is the default */
         const outcome = await page.evaluate((spec) => {
             const btn = document.querySelector(`${spec.bar} [${spec.attr}="${spec.key}"]`);
             if (!btn) return { ok: false, why: `no ${spec.attr}="${spec.key}" button in ${spec.bar}` };
@@ -105,18 +111,20 @@ export async function activateTab(page, set, entry) {
                 return { ok: false, why: `#${spec.panelId} did not become .on after click` };
             }
             return { ok: true };
-        }, { bar: set.subBar, attr: set.subAttr, key: entry.sub, panelId: set.subPanelPrefix + entry.sub });
+        }, { bar: entry.subBar || set.subBar, attr: entry.subAttr || set.subAttr, key: entry.sub, panelId: (entry.subPanelPrefix || set.subPanelPrefix) + entry.sub });
         if (!outcome.ok) throw new Error(`activateTab(${entry.tab}/${entry.sub}): ${outcome.why}`);
     }
 
-    /* Rule 2 — the diagram must have text with a real box before anything measures it. */
-    await page.waitForFunction((selector) => {
-        const svg = document.querySelector(selector);
-        if (!svg) return false;
-        const text = svg.querySelector('text');
+    /* Rule 2 — the diagram must have text with a real box before anything measures it.
+       An HTML entry (kind:'html') waits for its container to have a box instead. */
+    await page.waitForFunction((selector, kind) => {
+        const el = document.querySelector(selector);
+        if (!el) return false;
+        if (kind === 'html') { const b = el.getBoundingClientRect(); return b.width > 2 && b.height > 2; }
+        const text = el.querySelector('text');
         if (!text) return true;                     // a diagram with no labels is legitimately ready
         return text.getBoundingClientRect().height > 0;
-    }, { timeout: 10000 }, entry.selector);
+    }, { timeout: 10000 }, entry.selector, entry.kind || 'svg');
 
     /* Rule 3 — two frames, so any level-of-detail pass triggered by the tab change has applied. */
     await page.evaluate(() => new Promise((resolve) => {

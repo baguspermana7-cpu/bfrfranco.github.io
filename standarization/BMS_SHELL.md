@@ -166,6 +166,16 @@ surgical/additive scope:
   click = inspector (`.rz-equipment-selected` glow), Deps card = navigate, right-click = Deps tab,
   `Open equipment HMI` = modal with focus trap / ESC / focus return, gated by
   `tools/test-datahall-ai-inspector-runtime.mjs`.
+- **doc-27 §5.6 / doc-24 §8 / doc-08 (Fire & Safety) — SHIPPED v2.3.0** — the fire tab is a
+  workstation: point list home (`#fp-points`, every addressable point of the selected hall with state,
+  detection means, isolation owner/reason/expiry), zone tiles (`#fp-zones`, means available vs total,
+  IMPAIRED / RELEASE INHIBITED / FIRE WATCH badges), the mimic with clickable zones, and the cause &
+  effect matrix with a staged training timer and a status column (DUE / PENDING / BLOCKED). Timer and
+  inhibit state are shown; manual stations are points; the fire / leak / impairment banner overlays every
+  tab (`#fireImpairmentBanner`); bypassed devices are counted with a strong warning (DISABLED tile,
+  sidebar, alarm strip); FACP comms + last poll are on the summary strip. Isolation is an operator act
+  with rules (see DATAHALL_AI_STANDARD "Fire workstation"). Gates: `tools/test-datahall-ai-fire-points.mjs`,
+  `tools/test-datahall-ai-fire-runtime.mjs`.
 - **doc-14 §4 v1.23.2 deferred** — chiller-plant view-mode `body[data-bms-mode]`
   show/hide section rules (currently UI scaffold only).
 - **doc-14 §7 v1.23.4 deferred** — water-system threshold bands on WUE

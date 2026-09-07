@@ -75,6 +75,7 @@
     this.statusChip = { label: 'NORMAL', state: 'normal' };
     this.related = [];
     this.openHmi = null;
+    this.custom = [];
   }
   Builder.prototype.push = function (tab, pt) {
     if (pt.basis && pt.declared) { throw new Error('hmi-payloads: a point carries basis OR declared, never both: ' + pt.point); }
@@ -161,13 +162,18 @@
   Builder.prototype.edge = function (id) { this.tabs.deps.edges.push(id); };
   Builder.prototype.chip = function (label, state) { this.statusChip = { label: label, state: state }; };
   Builder.prototype.tier2 = function (opener, args) { this.openHmi = { opener: opener, args: args }; };
+  /* a named page action beyond "Open equipment HMI" (v2.3.0): resolved at click time against window.RZDatahallAIInspectorActions */
+  Builder.prototype.action = function (id, label, handler, args, o) {
+    o = o || {};
+    this.custom.push(deepFreeze({ id: id, label: label, handler: handler, args: args || [], tone: o.tone || 'default', disabled: !!o.disabled, title: o.title || null }));
+  };
 
   Builder.prototype.build = function () {
     var self = this, index = this.index, ctx = this.ctx;
     var payload = {
       classId: this.classId, id: this.id, hall: this.hall, title: this.title, kind: this.meta.kind, label: this.meta.label,
       statusChip: this.statusChip, tabs: this.tabs,
-      actions: { openHmi: this.openHmi, related: this.related },
+      actions: { openHmi: this.openHmi, related: this.related, custom: this.custom },
       provenance: {
         engineVersion: ctx.snapshot && ctx.snapshot.meta ? ctx.snapshot.meta.version : null,
         registryVersion: ctx.registryVersion || null,
@@ -788,56 +794,145 @@
   /* fire */
   function fireState(ctx, zone) {
     var f = ctx.fire; if (!f) { return 'normal'; }
+    if (f.zones && zone != null && f.zones[zone]) { return f.zones[zone].state || 'normal'; }
     if (f.zoneId && (zone == null || String(f.zoneId) === String(zone))) { return f.stage || 'alarm'; }
-    return 'normal';
+    return zone == null && f.stage ? f.stage : 'normal';
   }
+  function firePointsApi() {
+    if (root && root.RZDatahallAIFirePoints) { return root.RZDatahallAIFirePoints; }
+    if (typeof require === 'function') { try { return require('./fire-points.js'); } catch (e) { return null; } }
+    return null;
+  }
+  var INV_CACHE = { key: null, inv: null };
+  function fireInventory(ctx) {
+    var F = firePointsApi(); if (!F) { return null; }
+    var A = ctx.adapter || {};
+    var g = { halls: finite(A.halls) ? A.halls : 4, hallLengthM: A.hallLengthM, hallWidthM: A.hallWidthM, rackRows: A.rackRows, leakZonesPerHall: 24 };
+    var key = JSON.stringify(g);
+    if (INV_CACHE.key !== key) { INV_CACHE.key = key; INV_CACHE.inv = F.buildInventory(g); }
+    return INV_CACHE.inv;
+  }
+  function hallPrefix(ctx, id) { var m = /^DH-(\d\d)/.exec(String(id)); return m ? 'DH-' + m[1] : 'DH-' + (ctx.hall < 10 ? '0' : '') + ctx.hall; }
+  function firePointOf(ctx, id) { var f = ctx.fire; return f && f.points && f.points[id] ? f.points[id] : null; }
+  var AGENT_LABEL_FALLBACK = 'clean-agent suppression — project selection pending (FK-5-1-12 candidate)';
+  function agentLabel() { var F = firePointsApi(); return F && F.AGENT_LABEL ? F.AGENT_LABEL : AGENT_LABEL_FALLBACK; }
   var FIRE_REASON = 'state from the fire cause-and-effect engine (RZDatahallAIFireCauseEffect) for the selected event; normal when no event is set (Track A §A6)';
   var FIRE_SPEC = 'fire-protection design selections are page-authored to NFPA 72 / NFPA 2001 — the engine publishes no fire quantity (Track A §A6)';
-  def('fire-facp', { kind: 'scenario', label: 'FACP', system: 'fire', tier2: null }, function (b, ctx) {
-    b.title = 'Fire alarm control panel';
+  def('fire-facp', { kind: 'scenario', label: 'FACP', system: 'fire', tier2: null }, function (b, ctx, id) {
+    var hp = hallPrefix(ctx, id);
+    b.title = 'Fire alarm control panel ' + hp;
     b.ST('live', 'panel', 'Panel', fireState(ctx, null), FIRE_REASON);
+    var fs = ctx.fire && ctx.fire.summary ? ctx.fire.summary : null;
+    if (fs) {
+      b.D('live', 'isolated', 'Isolated points (facility)', String(fs.disabled), 'count of isolated points in the training isolation register of this browser; operator input, not a field reading (Track A §A6)', fs.disabled);
+      b.D('live', 'impaired_zones', 'Impaired zones', fs.impairedZones.length ? fs.impairedZones.join(', ') : 'none', 'zones below two independent detection means, derived from the isolation register by the two-means rule (Track A §A6)', fs.impairedZones.length);
+      b.ST('live', 'fire_watch', 'Fire watch', fs.fireWatch ? 'active' : 'normal', 'fire watch is raised when a zone is impaired or an isolation expired unrestored (Track A §A6)');
+      if (fs.fireWatch) { b.alarm({ severity: 'high', point: 'fire_watch', text: 'Fire watch required — ' + fs.impairedZones.length + ' impaired zone(s), ' + fs.expiredIsolations.length + ' expired isolation(s)', state: 'active' }); b.chip('FIRE WATCH', 'warning'); }
+    }
     b.D('capacity', 'model', 'Panel', 'NFS2-3030 class, 640 points, 12 SLC loops', FIRE_SPEC);
     b.S('live', 'batt_v', 'Standby battery', { value: 26.8, text: '26.8 V float' }, 0.2, 'V', { digits: 1 });
-    b.dep('downstream', 'fire-zone:1', 'Detection zones');
+    b.dep('downstream', 'fire-zone:' + hp + '-Z01', 'Detection zones');
     b.trend('batt_v', 'Standby battery', 'V', { value: 26.8 }, 0.2);
   });
   def('fire-vesda', { kind: 'scenario', label: 'VESDA', system: 'fire', tier2: null }, function (b, ctx, id) {
-    b.title = 'Aspirating detector VD-' + id;
+    var hp = hallPrefix(ctx, id), pid = /VD-\d/.test(String(id)) ? (/^DH-/.test(String(id)) ? String(id) : hp + '-' + id) : hp + '-VD-' + id;
+    var fp = firePointOf(ctx, pid), inv = fireInventory(ctx), rec = inv ? inv.byId[pid] : null;
+    b.title = 'Aspirating detector ' + pid.replace(/^DH-\d\d-/, '') + ' — ' + hp;
     b.S('live', 'obscuration', 'Obscuration', { value: 0.001, text: '0.001 %/m clean-air baseline' }, 0.0008, '%/m', { digits: 4, min: 0 });
-    b.ST('live', 'stage', 'Stage', fireState(ctx, null), FIRE_REASON);
-    b.D('capacity', 'sampling', 'Sampling', '~100 sample points per unit', FIRE_SPEC);
-    b.dep('upstream', 'fire-facp:1', 'FACP');
+    b.ST('live', 'stage', 'Stage', fp ? fp.state : fireState(ctx, null), FIRE_REASON);
+    if (fp && fp.isolation) { b.chip(fp.isolation.expired ? 'EXPIRED' : 'ISOLATED', 'warning'); b.alarm({ severity: 'medium', point: 'isolation', text: 'Isolated by ' + fp.isolation.owner + ' — ' + fp.isolation.reason, state: 'inhibited' }); }
+    b.D('capacity', 'sampling', 'Sampling', rec ? rec.ports + ' sampling ports over ' + rec.zoneIds.length + ' zones' : '~100 sample points per unit', FIRE_SPEC);
+    if (rec) { b.related = rec.zoneIds.map(function (z) { return 'fire-zone:' + z; }); }
+    b.dep('upstream', 'fire-facp:' + hp, 'FACP');
     b.trend('obscuration', 'Obscuration', '%/m', { value: 0.001 }, 0.0008, { digits: 4 });
   });
   def('fire-zone', { kind: 'scenario', label: 'Fire zone', system: 'fire', tier2: null }, function (b, ctx, id) {
-    b.title = 'Fire zone ' + id;
-    b.ST('live', 'state', 'Zone', fireState(ctx, id), FIRE_REASON);
-    b.D('capacity', 'detection', 'Detection', 'photo + heat + aspirating, double-interlock release', FIRE_SPEC);
-    b.dep('upstream', 'fire-facp:1', 'FACP'); b.dep('downstream', 'fire-cylinder-bank:1', 'Agent cylinders');
+    var inv = fireInventory(ctx), hp = hallPrefix(ctx, id);
+    var zid = /^DH-\d\d-Z\d\d$/.test(String(id)) ? String(id) : hp + '-Z' + (String(id).length < 2 ? '0' : '') + String(id).replace(/^Z/i, '');
+    var zone = inv ? inv.zoneById[zid] : null, zs = ctx.fire && ctx.fire.zones ? ctx.fire.zones[zid] : null;
+    b.title = zone ? 'Zone ' + zid.replace(/^DH-\d\d-/, '') + ' ' + zone.name + ' — ' + hp : 'Fire zone ' + id;
+    b.ST('live', 'state', 'Zone', zs ? zs.state : fireState(ctx, zid), FIRE_REASON);
+    if (zone) {
+      b.D('capacity', 'detection', 'Detection means', zone.means.length + ' independent: ' + zone.means.join(', ') + (zone.release ? ' · double-interlock clean-agent release' : ''), FIRE_SPEC, zone.means.length);
+      b.D('capacity', 'area', 'Protected area', zone.areaM2 + ' m²', 'zone floor area: a share of the engine hall floor (geometry.hall_length_m × geometry.hall_width_m) or the stated ancillary-room area (Track A §A6)', zone.areaM2);
+      if (zs) {
+        b.D('live', 'means_available', 'Means available', zs.meansAvailable + ' of ' + zs.meansTotal, 'independent detection means not isolated, from the isolation register by the two-means rule (Track A §A6)', zs.meansAvailable);
+        b.ST('live', 'impaired', 'Impairment', zs.impaired ? 'impaired' : 'protected', 'a release zone is IMPAIRED below two independent detection means (Track A §A6)');
+        b.ST('live', 'release', 'Release', zs.releaseInhibited ? 'inhibited' : 'armed', 'clean-agent release is inhibited while the zone is impaired; armed otherwise (Track A §A6)');
+        b.D('live', 'isolated', 'Isolated points', String(zs.isolatedCount), 'isolated points in this zone from the training isolation register (Track A §A6)', zs.isolatedCount);
+        if (zs.impaired) { b.chip('IMPAIRED', 'critical'); b.alarm({ severity: 'high', point: 'impaired', text: 'Zone below two detection means — release inhibited, fire watch required', state: 'active' }); }
+        else if (zs.isolatedCount) { b.chip(zs.isolatedCount + ' ISOLATED', 'warning'); }
+      }
+      b.related = inv.points.filter(function (p) { return p.zoneIds.indexOf(zid) >= 0; }).slice(0, 40).map(function (p) { return 'fire-point:' + p.id; });
+    } else {
+      b.D('capacity', 'detection', 'Detection', 'photo + heat + aspirating, double-interlock release', FIRE_SPEC);
+    }
+    b.dep('upstream', 'fire-facp:' + hp, 'FACP'); b.dep('downstream', 'fire-cylinder-bank:' + hp, 'Agent cylinders');
     b.S('live', 'temp_c', 'Zone ceiling temperature', { plane: 'p11_air_return_c' }, 1, '°C');
     b.trend('temp_c', 'Ceiling temperature', '°C', { plane: 'p11_air_return_c' }, 1);
   });
-  def('fire-cylinder-bank', { kind: 'scenario', label: 'Agent cylinders', system: 'fire', tier2: null }, function (b, ctx) {
-    b.title = 'Novec 1230 cylinder bank';
+  def('fire-cylinder-bank', { kind: 'scenario', label: 'Agent cylinders', system: 'fire', tier2: null }, function (b, ctx, id) {
+    var hp = hallPrefix(ctx, id), fs = ctx.fire && ctx.fire.summary ? ctx.fire.summary : null;
+    b.title = 'Cylinder bank ' + hp + ' — ' + agentLabel();
     b.S('live', 'pressure_bar', 'Cylinder pressure', { value: 42, text: '42 bar charged' }, 0.5, 'bar', { digits: 1 });
-    b.ST('live', 'release', 'Release', 'armed', FIRE_REASON);
-    b.D('capacity', 'agent', 'Agent', '4 × 180 L, 5.3 % design concentration', FIRE_SPEC);
-    b.dep('upstream', 'fire-zone:1', 'Zones');
+    var rel = fs && fs.releaseInhibitedZones.length ? 'inhibited' : fs && /DISCHARGED|LOCKOUT/.test(fs.fire) ? 'discharged' : 'armed';
+    b.ST('live', 'release', 'Release', rel, 'release state from the workstation snapshot: inhibited while any zone is impaired, discharged after a release run (Track A §A6)');
+    b.D('capacity', 'agent', 'Agent', agentLabel() + ' — 4 × 180 L superpressurised cylinders (indicative); design concentration per NFPA 2001 for the selected agent is pending', FIRE_SPEC);
+    b.dep('upstream', 'fire-zone:' + hp + '-Z01', 'Zones');
     b.trend('pressure_bar', 'Cylinder pressure', 'bar', { value: 42 }, 0.5);
   });
   def('fire-mcp', { kind: 'scenario', label: 'Manual call point', system: 'fire', tier2: null }, function (b, ctx, id) {
-    b.title = 'Manual call point ' + id;
-    b.ST('live', 'state', 'Call point', 'normal', FIRE_REASON);
+    var hp = hallPrefix(ctx, id), pid = /^DH-/.test(String(id)) ? String(id) : hp + '-MCP-' + id, fp = firePointOf(ctx, pid), inv = fireInventory(ctx), rec = inv ? inv.byId[pid] : null;
+    b.title = (rec ? rec.label : 'Manual call point ' + id) + ' — ' + hp;
+    b.ST('live', 'state', 'Call point', fp ? fp.state : 'normal', FIRE_REASON);
     b.S('live', 'loop_v', 'SLC loop voltage', { value: 24, text: '24 VDC addressable loop' }, 0.3, 'V', { digits: 1 });
     b.D('capacity', 'class', 'Device', 'addressable, life-safety point (never isolable)', FIRE_SPEC);
-    b.dep('upstream', 'fire-facp:1', 'FACP');
+    b.action('isolate', 'Isolate…', 'fireIsolate', [pid], { tone: 'warn', disabled: true, title: 'life-safety point — never isolable' });
+    b.dep('upstream', 'fire-facp:' + hp, 'FACP');
   });
-  def('fire-epo', { kind: 'scenario', label: 'EPO', system: 'fire', tier2: null }, function (b, ctx) {
-    b.title = 'Emergency power off';
-    b.ST('live', 'state', 'EPO', 'normal', FIRE_REASON);
+  def('fire-epo', { kind: 'scenario', label: 'EPO', system: 'fire', tier2: null }, function (b, ctx, id) {
+    var hp = hallPrefix(ctx, id), pid = /^DH-/.test(String(id)) ? String(id) : hp + '-Z09-EPO', fp = firePointOf(ctx, pid), inv = fireInventory(ctx), rec = inv ? inv.byId[pid] : null;
+    b.title = (rec ? 'Zoned EPO ' + pid.replace(/^DH-\d\d-/, '') + ' ' + rec.room : 'Emergency power off') + ' — ' + hp;
+    b.ST('live', 'state', 'EPO', fp ? fp.state : 'normal', FIRE_REASON);
     b.S('live', 'loop_v', 'Supervised loop', { value: 24, text: '24 VDC supervised loop' }, 0.3, 'V', { digits: 1 });
-    b.D('capacity', 'scope', 'Scope', 'hall IT feeds A + B, logged activation', FIRE_SPEC);
-    b.dep('downstream', 'sld-msb:dh01', 'MSB feeds');
+    b.D('capacity', 'scope', 'Scope', 'electrical-room feeds of the zone only (NFPA 75 §9.4); dual-confirm, logged activation — never a hall-wide IT trip', FIRE_SPEC);
+    b.action('isolate', 'Isolate…', 'fireIsolate', [pid], { tone: 'warn', disabled: true, title: 'life-safety point — never isolable' });
+    if (rec) { b.dep('upstream', 'fire-zone:' + rec.zoneId, 'Zone'); }
+    b.dep('downstream', 'sld-msb:dh' + hp.slice(3), 'MSB feeds');
+  });
+  /* one addressable point of the workstation inventory (Track A §A6) */
+  def('fire-point', { kind: 'scenario', label: 'Fire point', system: 'fire', tier2: null }, function (b, ctx, id) {
+    var inv = fireInventory(ctx); if (!inv) { throw new Error('hmi-payloads: fire-points.js not loaded'); }
+    var rec = inv.byId[id] || null;
+    if (!rec) {
+      /* a class probe (id '1' / 'dh01') resolves to the first point of that hall; a real unknown id fails closed */
+      var hm = /^(?:dh0?(\d)|(\d))$/i.exec(String(id)), hn = hm ? Number(hm[1] || hm[2]) : NaN;
+      if (isFinite(hn) && hn >= 1) { rec = inv.points.filter(function (p) { return p.hall === hn; })[0] || null; }
+    }
+    if (!rec) { throw new Error('hmi-payloads: unknown fire point ' + id); }
+    var F = firePointsApi(), fp = firePointOf(ctx, rec.id), iso = fp ? fp.isolation : null, hp = 'DH-' + (rec.hall < 10 ? '0' : '') + rec.hall;
+    b.title = rec.id.replace(/^DH-\d\d-/, '') + ' · ' + rec.label + ' — ' + hp;
+    b.ST('live', 'state', 'Point', fp ? fp.state : 'normal', 'point state from the workstation snapshot: isolation register first, then the training scenario stage of its zone (Track A §A6)');
+    b.ST('live', 'isolation', 'Isolation', iso ? (iso.expired ? 'expired' : 'isolated') : 'in-service', 'from the training isolation register of this browser (Track A §A6)');
+    if (iso) {
+      b.D('live', 'owner', 'Isolated by', iso.owner, F.declare('register')); b.D('live', 'reason', 'Reason', iso.reason, F.declare('register'));
+      b.D('live', 'expires', 'Expires', iso.expiryId + ' from isolation (tick ' + iso.expiresAtTick + ')' + (iso.expired ? ' — EXPIRED, still isolated' : ''), F.declare('register'), iso.expiresAtTick);
+      b.D('live', 'extensions', 'Extensions', iso.extensions + ' of ' + F.MAX_EXTENSIONS, F.declare('register'), iso.extensions);
+      b.chip(iso.expired ? 'EXPIRED' : 'ISOLATED', iso.expired ? 'critical' : 'warning');
+      b.alarm({ severity: iso.expired ? 'high' : 'medium', point: 'isolation', text: (iso.expired ? 'Isolation expired and not restored — ' : 'Isolated — ') + iso.owner + ': ' + iso.reason, state: iso.expired ? 'active' : 'inhibited' });
+    }
+    b.D('capacity', 'type', 'Type', rec.typeLabel || F.TYPES[rec.type].label + (rec.means ? ' · ' + F.MEANS[rec.means] : ''), F.declare('inventory'));
+    b.D('capacity', 'address', 'Address', rec.loop + ' · ' + rec.address, F.declare('inventory'));
+    b.D('capacity', 'room', 'Zone / room', (rec.zoneId ? rec.zoneId.replace(/^DH-\d\d-/, '') + ' ' : '') + rec.room, F.declare('inventory'));
+    b.D('capacity', 'life_safety', 'Class', rec.lifeSafety ? 'life-safety point — never isolable' : 'isolable with owner, reason and expiry', F.declare('register'));
+    b.S('live', 'loop_v', 'Loop voltage', { value: 24, text: '24 VDC addressable loop' }, 0.3, 'V', { digits: 1 });
+    b.D('maint', 'last_test', 'Last functional test', rec.lastTestAt, F.declare('lastTest'));
+    if (rec.zoneId) { b.dep('upstream', 'fire-zone:' + rec.zoneId, 'Zone ' + rec.zoneId.replace(/^DH-\d\d-/, '')); }
+    b.dep('upstream', 'fire-facp:' + hp, 'FACP ' + hp);
+    if (rec.isolable && !iso) { b.action('isolate', 'Isolate…', 'fireIsolate', [rec.id], { tone: 'warn' }); }
+    else if (iso) { b.action('restore', 'Restore', 'fireRestore', [rec.id]); b.action('extend', 'Extend…', 'fireExtend', [rec.id], { disabled: iso.extensions >= F.MAX_EXTENSIONS, title: iso.extensions >= F.MAX_EXTENSIONS ? 'extension limit reached — restore and re-isolate' : null }); }
+    else { b.action('isolate', 'Isolate…', 'fireIsolate', [rec.id], { tone: 'warn', disabled: true, title: 'life-safety point — never isolable' }); }
+    b.trend('loop_v', 'Loop voltage', 'V', { value: 24 }, 0.3, { digits: 1 });
   });
   /* BMS */
   var BMS_SPEC = 'BMS point counts, protocol labels and controller ratings are page-authored architecture figures, not engine quantities (Track A §A5)';
@@ -932,12 +1027,12 @@
     var cool = win.document && win.document.getElementById('coolingScenario');
     return {
       snapshot: auth.snapshot, adapter: win.DHE, basisMap: win.DH_BASIS, registryIndex: idx, registryVersion: reg ? reg.engineVersion : null,
-      scenario: scenario, live: null, fire: opts.fire || null, cooling: { scenarioId: cool && cool.value ? cool.value : 'normal' },
+      scenario: scenario, live: null, fire: opts.fire || (win.RZDatahallAIFireWorkstation && win.RZDatahallAIFireWorkstation.fireContext ? win.RZDatahallAIFireWorkstation.fireContext() : null), cooling: { scenarioId: cool && cool.value ? cool.value : 'normal' },
       tick: finite(opts.tick) ? opts.tick : undefined, hall: finite(opts.hall) ? opts.hall : 1, sim: win.RZDatahallAISimTelemetry
     };
   }
 
-  var API = { version: '2.2.0', CLASSES: Object.freeze(classList()), COOLING_SCENARIOS: COOLING_SCENARIOS, payload: payload, safePayload: safePayload, stubPayload: stubPayload, points: points, classList: classList, buildContext: buildContext };
+  var API = { version: '2.3.0', CLASSES: Object.freeze(classList()), COOLING_SCENARIOS: COOLING_SCENARIOS, payload: payload, safePayload: safePayload, stubPayload: stubPayload, points: points, classList: classList, buildContext: buildContext };
   if (root) { root.RZDatahallAIHmiPayloads = API; }
   if (typeof module !== 'undefined' && module.exports) { module.exports = API; }
 })(typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : this));

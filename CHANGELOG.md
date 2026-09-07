@@ -11,6 +11,83 @@ release sections rather than semver.
 
 ---
 
+## v2.3.0 — 2026-09-07
+
+### The Fire & Safety workstation: a list before a drawing (Track A §A6)
+
+The owner's words on the fire tab were *"harus ada yang bentuk list … interlock ke lift, ke pintu2, ke
+AHU, ke building"* and *"cannot isolate one detector in one room, reads as a process diagram"*; doc-27
+§5.6, doc-24 §8 and doc-08 asked for the same things in detail (zone map, action chain, timer and inhibit
+state, bypassed devices shown prominently, a fire/leak overlay on every page). Measured before this ship:
+the panel's own primary read — *"what is bypassed?"* — had nothing behind it (`#sbDisabled` was a die
+roll, `#sbInAlarm` / `#sbFire` / `#sbLeak` were never written), no point object existed, the twelve zone
+rectangles carried no equipment hook, every fire state was frozen at `normal` because nobody passed a fire
+context, the cause-and-effect engine's `applyRuntime` had no caller and `evaluateFire()` hardcoded
+`elapsedSeconds: 0`, the alarm workspace held a private fixture with no append path, and the four VESDA
+status circles had never rendered (`class="ep"` is the electrical sub-panel switch and is `display:none`).
+
+The fire tab is now a **workstation whose home screen is a point list**. Four scoped sub-tabs
+(`points → zones → mimic → cause & effect`, new classes — the electrical strip's handler is
+document-global). **`js/datahall-ai/fire-points.js`** (DOM-free, deep-frozen, no clock, no die roll)
+generates the point inventory for all four halls from the engine hall geometry × ADOPTED NFPA 72 spacing
+(9.1 m spot smoke on two cross-zoned loops, 15.2 m listed heat, 7.5 m aspirating port): about 1,100 points
+in 15 types — counts are formulas and are declared, never hooked, because the engine publishes no fire
+quantity. **Isolation is an operator act with rules, and the rules are the content:** life-safety points
+(manual call points, EPO, release and abort circuits) are never isolable; nothing is isolated while the
+FACP is in alarm; an owner, a reason of ten characters and an explicit expiry are required; two extensions
+at most. Dropping a clean-agent zone below **two independent detection means** is not refused — it is a
+consequence the operator must acknowledge, after which the zone is IMPAIRED, its release is inhibited
+(the `CE-SUPPRESSION-ARMED` row and the release interlock) and a **fire watch** is raised on every tab.
+An expired isolation stays isolated, flagged, with its own record. Every act is an alarm-query record
+(`system:'fire'`, `quality:'simulated'`, `scenario:'training'`) appended to the Alarms workspace through
+the new `RZDatahallAIAlarmWorkspace.appendEvents()` — the workspace **is** the isolation log (saved view
+Fire). The register is a training register kept in this browser (`localStorage`, versioned, discarded
+with a record when it fails validation, cleared with a record); no command leaves the page.
+
+One snapshot per 4 s tick (`evaluate(inventory, register, run, tick)`, pinned by `window.__rzSimTick`)
+feeds everything: the point list (`fire-point:<id>` rows open the inspector with **Isolate… / Restore /
+Extend…** actions — `payload.actions.custom[]`, `js/rz-inspector.js` 1.46.0, named handlers in
+`window.RZDatahallAIInspectorActions`; life-safety points show the action disabled with the reason), the
+zone tiles (means available vs total, IMPAIRED / RELEASE INHIBITED / FIRE WATCH), the summary strip
+(FIRE · VESDA · LEAK · EPO · DISABLED · MAINT · FACP COMMS · LAST POLL), the **page-wide banner above
+the tab bar** (doc-27: fire/leak alarm overlays every page), the sidebar counters, the alarm-strip terms
+(confirmed fire / discharge / EPO / wet leak = critical; impaired zone or expired isolation = warning;
+maintenance = isolated count — the hardcoded `maint:2` is gone), the mimic (zone rectangles are now
+`fire-zone` blocks, ids in inventory format, chips print inventory counts, the exit stations became
+manual call points and EPO sits in the electrical rooms per Tech Spec §6.9, the dead ticker became
+`RZDatahallAIFireMimic.paint(snapshot)`), the equipment payloads (`ctx.fire` finally populated; a new
+`fire-point` class; `fire-zone` reads means / impairment / release) and the cause-and-effect matrix (a
+**staged training run** supplies real elapsed seconds, `applyRuntime` + release interlocks finally have a
+caller, all 14 initiating events and 12 zones are selectable, and a status column reads DUE / PENDING
+T-n s / BLOCKED). The isolation dialog is the workstation's only modal. The agent label follows doc-30
+§10.5: *clean-agent suppression — project selection pending*.
+
+### Gates
+
+`tools/test-datahall-ai-fire-points.mjs` (Node, 12): inventory is a formula (a smaller hall carries
+fewer detectors) and deterministic; everything frozen; every refusal code; the two-means chain
+(consequence → acknowledge → IMPAIRED + release inhibited + fire watch → restore clears); every record
+valid alone and concatenated with the workspace fixture; tick-based expiry with an idempotent record;
+static scan for `Math.random` / `Date.now` / bare `new Date()`; purity; `ctxFire` shape; `ROW_INHIBITED`
+and a blocked release through the real engine; the stage model; persistence round trip that fails closed.
+`tools/test-datahall-ai-fire-runtime.mjs` (Puppeteer, 12): scoped sub-tabs both ways; isolate through
+the inspector and the dialog (focus trapped, submit gated, focus returned, record in the Alarms
+workspace); a manual call point refuses with the reason; impairing Z12 shows FIRE WATCH on the cooling
+tab with the strip and sidebar agreeing; suppression_release + the impaired zone reads BLOCKED; restore
+clears; three reloads identical; a staged run turns pending rows DUE at T+60 s; ESC leaves no timer or
+inert; zero `Math.random` calls; the register survives a reload and clears with a record; the coverage
+walker finds no untraced numeral in the new views with an isolation applied. Coverage
+`--strict --settle=9000 --modals` now walks the workstation views as rows: **5,010 numerals · 2,520 hooked
+· 2,490 declared · 0 mismatch · 0 untraced**. Both gates are in `tools/ship-gate.sh`.
+
+### Docs
+
+DATAHALL_AI_STANDARD "Fire workstation (§A6)"; BMS_SHELL doc-27 §5.6 / doc-24 §8 / doc-08 → SHIPPED;
+ACCURACY_VALIDATION Rule 2 "states that are operator acts"; INSPECTOR.md custom actions + the duplicate
+`leak:dh01` note; PRD FR-45 – FR-48. `rz-inspector.js` served under one token (`?v=2.3.0`) everywhere.
+
+---
+
 ## v2.2.0 — 2026-09-07
 
 ### Two-tier equipment inspection on the AI cockpit (Track A §A5)

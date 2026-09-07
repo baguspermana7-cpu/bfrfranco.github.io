@@ -214,6 +214,26 @@
     detail.appendChild(node('p', 'rz-ops-caption', error && error.message ? error.message : String(error)));
   }
 
+  /* v2.3.0 (Track A §A6) — the Alarms workspace is also the fire isolation log: records are validated
+     against the same schema as the fixture, appended, and the current query re-runs. Never mutates callers. */
+  function appendAlarmEvents(records) {
+    if (!alarmApi) { throw new Error('alarm workspace unavailable'); }
+    var incoming = Array.isArray(records) ? records.slice() : [];
+    if (!incoming.length) { return alarmEvents.length; }
+    var known = Object.create(null);
+    alarmEvents.forEach(function (e) { known[e.id] = true; });
+    var fresh = incoming.filter(function (r) { return r && !known[r.id]; });
+    if (!fresh.length) { return alarmEvents.length; }
+    var next = alarmEvents.concat(fresh);
+    var verdict = alarmApi.validateEvents(next);
+    if (!verdict.valid) {
+      throw new Error('alarm append rejected: ' + verdict.errors.map(function (e) { return (e.path || e.field || '') + ' ' + (e.code || e.message || ''); }).join('; '));
+    }
+    alarmEvents = next;
+    if (byId('alarmResultsBody')) { runAlarmQuery(); }
+    return alarmEvents.length;
+  }
+
   function runAlarmQuery() {
     try {
       var filter = buildAlarmFilter();
@@ -404,6 +424,8 @@
     appendCell(row, outputItem.requiredFeedback.join(', '));
     appendCell(row, rowItem.failureState.join(', '));
     appendCell(row, (rowItem.overrideInhibit.allowed ? 'Authorized inhibit' : 'No inhibit') + ' / ' + rowItem.resetAuthority);
+    row.setAttribute('data-fire-row', rowItem.id);
+    appendCell(row, '—').setAttribute('data-fire-status', '1');
     return row;
   }
 
@@ -419,12 +441,26 @@
     if (!fireApi) { return; }
     try {
       var eventId = byId('fireScenario').value;
-      var result = fireApi.evaluateEvent({ eventId: eventId, zoneId: byId('fireZone').value, elapsedSeconds: 0 });
+      /* v2.3.0 (Track A §A6): elapsed seconds, runtime rows and release interlocks come from the fire workstation's
+         snapshot when it is loaded (a staged training run + the isolation register); without it, T+0 on the base rows */
+      var W = root.RZDatahallAIFireWorkstation, ce = W && W.causeEffectInput ? W.causeEffectInput() : null;
+      var ev = { eventId: eventId, zoneId: byId('fireZone').value, elapsedSeconds: ce && isFinite(ce.elapsedSeconds) ? ce.elapsedSeconds : 0 };
+      if (ce && ce.runtimeRows) { ev.runtimeRows = ce.runtimeRows; }
+      if (ce && ce.interlocks) { ev.interlocks = ce.interlocks; }
+      var result = fireApi.evaluateEvent(ev);
+      var status = Object.create(null);
+      result.commands.forEach(function (c) { status[c.rowId] = 'DUE'; });
+      result.pending.forEach(function (c) { status[c.rowId] = 'PENDING T-' + Math.max(0, c.delaySeconds - ev.elapsedSeconds) + ' s'; });
+      result.blocked.forEach(function (c) { status[c.rowId] = 'BLOCKED ' + c.reason; });
       Array.prototype.forEach.call(byId('fireCauseEffectBody').children, function (row) {
-        row.setAttribute('aria-selected', String(row.getAttribute('data-fire-event') === eventId));
+        var mine = row.getAttribute('data-fire-event') === eventId;
+        row.setAttribute('aria-selected', String(mine));
+        var cell = row.querySelector('[data-fire-status]');
+        if (cell) { cell.textContent = mine ? (status[row.getAttribute('data-fire-row')] || '—') : '—'; cell.setAttribute('data-state', mine ? (status[row.getAttribute('data-fire-row')] || '').split(' ')[0].toLowerCase() : ''); }
       });
-      text('fireCauseEffectSummary', 'Stage ' + result.stage + ' · FACP authority · ' + result.commands.length +
-        ' commands due now · ' + result.pending.length + ' pending by engineered delay · BMS monitor-only.');
+      var blockedNote = result.blocked.length ? ' · ' + result.blocked.length + ' blocked (' + result.blocked.map(function (b) { return b.reason; }).filter(function (v, i, a) { return a.indexOf(v) === i; }).join(', ') + ')' : '';
+      text('fireCauseEffectSummary', 'Stage ' + result.stage + ' · T+' + ev.elapsedSeconds + ' s' + (ce && ce.running ? ' SIMULATED run' : '') + ' · FACP authority · ' + result.commands.length +
+        ' commands due now · ' + result.pending.length + ' pending by engineered delay' + blockedNote + ' · BMS monitor-only.');
     } catch (error) {
       text('fireCauseEffectSummary', 'Cause-and-effect evaluation failed: ' + error.message);
     }
@@ -454,6 +490,9 @@
     }
     wireFire();
   }
+
+  root.RZDatahallAIAlarmWorkspace = { appendEvents: appendAlarmEvents, events: function () { return alarmEvents.slice(); }, refresh: function () { if (byId('alarmResultsBody')) { runAlarmQuery(); } } };
+  root.RZDatahallAIOperatorUI = { evaluateFire: evaluateFire, renderFireTable: renderFireTable };
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initialize);

@@ -62,6 +62,8 @@ gate "DC AI electrical — topology" node tools/test-datahall-ai-electrical-topo
 gate "DC AI electrical — visual projection" node tools/test-datahall-ai-electrical-visual-map.mjs
 gate "DC AI electrical — four-second live parity" node tools/test-datahall-ai-electrical-live.mjs
 gate "DC AI fire — FACP cause and effect" node tools/test-datahall-ai-fire-cause-effect.mjs
+gate "DC AI fire workstation — inventory formula, isolation refusals, two-means rule, records, expiry, purity" node --test tools/test-datahall-ai-fire-points.mjs
+gate "DC AI fire workstation — runtime: scoped sub-tabs, isolate via inspector, impairment banner + strip, C&E block, persistence" node tools/test-datahall-ai-fire-runtime.mjs
 gate "DC AI operator UI — markup contract" node tools/test-datahall-ai-operator-ui.mjs
 gate "DC AI operator UI — runtime contract" node tools/test-datahall-ai-operator-runtime.mjs
 gate "EPMS — ATS-to-rack source colour" node tools/test-epms-ats-rack-color.mjs

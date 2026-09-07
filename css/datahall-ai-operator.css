@@ -567,3 +567,78 @@
 .cd td[data-basis-param]{cursor:pointer}
 .cd td[data-basis-param]::after{content:'';display:inline-block;width:5px;height:5px;border-radius:50%;margin-left:5px;vertical-align:middle;background:var(--rz-ev,#8fa2b8)}
 .cd td[data-basis-param]:hover{text-decoration:underline dotted}
+
+
+/* ------------------------------------------------------------------------
+ * Track A §A6 — the Fire & Safety workstation (v2.3.0)
+ * ---------------------------------------------------------------------- */
+.fire-tabs { display: flex; gap: 2px; padding: 4px 6px; background: var(--bg3); border: 1px solid var(--bd); border-radius: 4px; margin-bottom: 6px; }
+.fire-tabs .ft { font-family: "JetBrains Mono", monospace; font-size: 10px; font-weight: 500; padding: 5px 12px; border: 1px solid transparent; border-bottom: 2px solid transparent; background: transparent; color: var(--t3); cursor: pointer; border-radius: 3px; transition: color .15s, border-color .15s; }
+.fire-tabs .ft:hover { color: var(--t2); }
+.fire-tabs .ft.on { color: var(--o); border-bottom-color: var(--o); }
+.fire-tabs .ft:focus-visible { outline: 2px solid var(--c, #67e8f9); outline-offset: 1px; }
+#p-fire .fp { display: none; }
+#p-fire .fp.on { display: block; }
+.rz-fire-summary { grid-template-columns: repeat(8, minmax(96px, 1fr)); margin: 0 0 var(--rz-ops-space-2); }
+.rz-fire-summary .rz-ops-metric__value { font-size: 12px; }
+.rz-fire-sub { display: block; color: var(--rz-ops-muted); font: 500 9px/1.3 "JetBrains Mono", monospace; letter-spacing: .02em; }
+.rz-fire-table tbody tr[data-rz-equipment] { cursor: pointer; }
+.rz-fire-table tbody tr[data-rz-equipment]:hover { background: rgba(56, 189, 248, 0.06); }
+.rz-fire-table tbody tr[data-rz-equipment]:focus-visible { outline: 2px solid var(--c, #67e8f9); outline-offset: -2px; }
+.rz-fire-table tbody tr.rz-equipment-selected { background: rgba(56, 189, 248, 0.10); }
+.rz-fire-table tbody tr[data-state="isolated"] td[data-col="iso"] { color: var(--o); }
+.rz-fire-table .rz-fire-addr { font-family: "JetBrains Mono", monospace; white-space: nowrap; }
+.rz-fire-table .rz-fire-q { color: var(--rz-ops-muted); }
+.rz-fire-table-wrap { max-height: 60vh; }
+.rz-fire-log li { padding: 3px 0; border-bottom: 1px solid var(--bd); font-size: 11px; }
+.rz-fire-zones { display: grid; gap: var(--rz-ops-space-1); grid-template-columns: repeat(4, minmax(150px, 1fr)); }
+.rz-fire-tile { background: var(--rz-ops-surface-raised); border: 1px solid var(--bd); border-left: 3px solid var(--rz-ops-green); padding: var(--rz-ops-space-2); cursor: pointer; min-width: 0; }
+.rz-fire-tile[data-state="isolated"] { border-left-color: var(--rz-ops-amber); }
+.rz-fire-tile[data-state="impaired"], .rz-fire-tile[data-state="confirmed"], .rz-fire-tile[data-state="suppression_armed"], .rz-fire-tile[data-state="discharged"], .rz-fire-tile[data-state="lockout"], .rz-fire-tile[data-state="epo_active"], .rz-fire-tile[data-state="leak_wet"] { border-left-color: var(--rz-ops-red); }
+.rz-fire-tile[data-state="prealarm"] { border-left-color: var(--rz-ops-amber); }
+.rz-fire-tile:hover { background: rgba(56, 189, 248, 0.06); }
+.rz-fire-tile:focus-visible { outline: 2px solid var(--c, #67e8f9); outline-offset: 1px; }
+.rz-fire-tile.rz-equipment-selected { background: rgba(56, 189, 248, 0.10); }
+.rz-fire-tile__id { font: 700 11px/1.3 "JetBrains Mono", monospace; color: var(--rz-ops-text); }
+.rz-fire-tile__means { color: var(--rz-ops-muted); font-size: 10px; margin: 3px 0; overflow-wrap: anywhere; }
+.rz-fire-tile__state { display: flex; flex-wrap: wrap; gap: 3px; }
+.rz-fire-badge { font: 600 9px/1.3 "JetBrains Mono", monospace; letter-spacing: .04em; padding: 1px 6px; border: 1px solid; border-radius: 2px; }
+.rz-fire-badge.is-ok { color: var(--rz-ops-green); border-color: rgba(34, 197, 94, 0.35); }
+.rz-fire-badge.is-warn { color: var(--rz-ops-amber); border-color: rgba(245, 158, 11, 0.4); }
+.rz-fire-badge.is-crit { color: var(--rz-ops-red); border-color: rgba(239, 68, 68, 0.45); }
+.rz-fire-banner { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0; padding: 6px 12px; border-bottom: 1px solid var(--bd); font: 500 11px/1.4 "JetBrains Mono", monospace; background: rgba(245, 158, 11, 0.10); color: var(--o); }
+.rz-fire-banner[data-tone="critical"] { background: rgba(239, 68, 68, 0.14); color: var(--r); }
+.rz-fire-banner strong { letter-spacing: .06em; }
+.rz-fire-banner__btn { margin-left: auto; font: inherit; font-size: 10px; padding: 3px 10px; border: 1px solid currentColor; border-radius: 3px; background: transparent; color: inherit; cursor: pointer; min-height: 28px; }
+.rz-fire-banner__btn:focus-visible { outline: 2px solid var(--c, #67e8f9); outline-offset: 1px; }
+.rz-fire-elapsed { align-self: center; font: 600 10px/1.4 "JetBrains Mono", monospace; color: var(--rz-ops-muted); padding: 0 8px; }
+#fireCauseEffectBody [data-fire-status][data-state="due"] { color: var(--rz-ops-green); font-weight: 600; }
+#fireCauseEffectBody [data-fire-status][data-state="pending"] { color: var(--rz-ops-amber); }
+#fireCauseEffectBody [data-fire-status][data-state="blocked"] { color: var(--rz-ops-red); font-weight: 600; }
+.fire-iso { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(600px, 94vw); max-height: 90vh; overflow: auto; display: none; z-index: 1002; background: var(--bg2); border: 1px solid var(--bd); border-radius: 4px; box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45); }
+.fire-iso.show { display: block; }
+.fire-iso-hdr { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--bd); }
+.fire-iso-hdr h4 { margin: 0; font: 600 12px/1.3 "JetBrains Mono", monospace; color: var(--t1); flex: 1; }
+.fire-iso-hdr .mode { font: 600 9px/1.3 "JetBrains Mono", monospace; letter-spacing: .06em; color: var(--o); border: 1px solid rgba(245, 158, 11, 0.4); padding: 2px 8px; border-radius: 3px; }
+.fire-iso-close { background: transparent; border: 1px solid var(--bd); color: var(--t2); width: 28px; height: 28px; border-radius: 3px; cursor: pointer; font-size: 16px; line-height: 1; }
+.fire-iso-body { padding: 10px 12px 12px; display: grid; gap: var(--rz-ops-space-2); }
+.fire-iso-point { margin: 0; }
+.fire-iso-consequence[data-state="impair"] { border-left: 3px solid var(--rz-ops-red); color: var(--rz-ops-text); }
+.fire-iso-consequence[data-state="refused"] { border-left: 3px solid var(--rz-ops-red); color: var(--rz-ops-red); }
+.fire-iso-consequence[data-state="ok"] { border-left: 3px solid var(--rz-ops-green); }
+.fire-iso-ack { display: flex; gap: 8px; align-items: flex-start; font-size: 11px; color: var(--rz-ops-text); }
+.fire-iso-ack input { margin-top: 2px; }
+/* the operator-ui alarm-row action button and cell never had a rule */
+.rz-ops-button--compact { padding: 2px 8px; min-height: 24px; font-size: 10px; }
+.rz-ops-actions-cell { white-space: nowrap; }
+@media (max-width: 1024px) {
+  .rz-fire-summary { grid-template-columns: repeat(4, minmax(96px, 1fr)); }
+  .rz-fire-zones { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
+}
+@media (max-width: 767px) {
+  .rz-fire-summary { grid-template-columns: repeat(2, minmax(96px, 1fr)); }
+  .rz-fire-zones { grid-template-columns: 1fr; }
+  .fire-tabs { overflow-x: auto; }
+  .fire-tabs .ft { min-height: 44px; }
+  .rz-fire-banner__btn { min-height: 44px; }
+}

@@ -51,6 +51,15 @@ badge, pump running, bypass, dry/wet) is never a die roll: it comes from the ele
 fire scenario engine. The static half of the rule: `tools/test-datahall-ai-hmi-payloads.mjs` fails
 on any `Math.random`, `R(` or `RI(` inside a `@rz-hmi` marker block or in the payload modules.
 
+**v2.3.0 (Track A §A6) — states that are operator acts.** The fire workstation's point states come from
+an isolation REGISTER (owner, reason, expiry — operator input in this browser) and a staged training run,
+evaluated by `js/datahall-ai/fire-points.js` on the sim tick. Zone impairment, release inhibit and fire
+watch are derived by one rule (a clean-agent zone needs two independent detection means), never chosen;
+detector counts are formulas of the engine hall geometry × ADOPTED NFPA 72 spacing and are declared,
+never hooked. `tools/test-datahall-ai-fire-points.mjs` scans both new modules for `Math.random`,
+`Date.now` and a bare `new Date()` and asserts purity; `tools/test-datahall-ai-fire-runtime.mjs` counts
+`Math.random` calls through the whole isolate → impair → restore flow and requires zero.
+
 ### Rule 3 — Every metric carries a denominator
 
 PUE, WUE, CUE, CUE_IT, kVA loading, autonomy, flow rate — every
