@@ -99,6 +99,12 @@ normal, not a warning. Power density remains a separate explicitly selected laye
 CHWS/CHWR, delta-T, labeled reference/measured-flow state, plant load, available capacity, N+1 margin,
 COP/kW-per-ton basis, DP, valve/pump states, lead-lag sequence, current/study separation,
 Hall A–D selector and equipment diagnostics.
+  **v2.5.0 — the drawing continues to the air side.** The primary CHWS/CHWR headers are drawn and continue
+  into a distribution band with the secondary header, a secondary pump station and one CRAH bank per hall
+  carrying the engine's air-side values (`cooling.crah_*`, supply/return air, air-side ΔT, coil approach, CHW
+  ΔT), the hall snapshot's IT load, and the hall's CHW share as a declared identity. Per equipment: pump flow
+  (branch reference) + DP, chiller condenser-water flow (identity) + evaporator DP. One chilled-water palette:
+  supply cyan, return amber, condenser water violet (the line-model's); status colours from tokens only.
 Every simulation branch uses the current engine-derived CHWS/CHWR/flow envelope. Initial paint
 and the first timed update are separate acceptance states; a tick may not clamp values back to a
 retired operating range.

@@ -36,8 +36,12 @@
   --line2:#7f93ab;
   --txt:#dbe5f0;
   --muted:#8fa0b4;
-  --chws:#628cb7;
-  --chwr:#5da095;
+  /* v2.5.0 colour-discipline pass (owner comment 13): ONE chilled-water palette, the line-model's —
+     supply cyan, return amber, condenser water violet — shared with every cockpit. */
+  --c:#06b6d4; --o:#f59e0b; --p:#64748b; --g:#38b56d; --r:#c25a5a; --t3:#8fa0b4;   /* --p is the site slate, never the banned purple */
+  --chws:var(--c);
+  --chwr:var(--o);
+  --cdw:var(--p);
   --sec:#8a7fa8;
   --run:#38b56d;
   --ok:#8ea0b6;
@@ -342,6 +346,10 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
 .flow-arrow.return{fill:var(--chwr)}
 .pipe-label{font-family:"JetBrains Mono",monospace;font-size:10px;fill:#6b8199;text-anchor:middle}
 .signal-line{fill:none;stroke:#5a7490;stroke-width:.8;stroke-dasharray:3 2}
+/* v2.5.0 air-side block */
+.coil{fill:none;stroke:var(--chws);stroke-width:1.6;stroke-linejoin:round}
+.fan{fill:#1f2d3f;stroke:var(--line2);stroke-width:1.2}
+.fan-blade{fill:none;stroke:var(--run);stroke-width:1.4}
 
 /* Interactivity */
 .svg-tooltip{position:fixed;z-index:200;pointer-events:none;background:#1a2a3c;border:1px solid #5e7188;border-radius:6px;padding:4px 8px;font-family:"JetBrains Mono",monospace;font-size:10px;color:#dbe5f0;white-space:nowrap;display:none;box-shadow:0 4px 12px rgba(0,0,0,.4)}
@@ -682,7 +690,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
            per-machine share: cooling.flow_lps / cooling.chillers_running. The coverage gate
            verifies that every drawn loop sits at the share before excluding these readouts from
            its denominator — the exclusion is bought with a check, not asserted. -->
-      <svg id="pidSvg" viewBox="0 0 1460 1400" aria-label="Chiller P&ID mimic"
+      <svg id="pidSvg" viewBox="0 0 1460 1930" aria-label="Chiller P&ID mimic"
            data-rz-distribution="cooling.flow_lps"
            data-rz-distribution-mode="per-item"
            data-rz-distribution-divisor="cooling.chillers_running"
@@ -1004,7 +1012,7 @@ const PLANT = (function () {
   const s = engineSnap();
   const c = (s && s.cooling) ? s.cooling : null;
   if (!c) return { type:null, inputKw:null, cop:null, kwPerRt:null, cdws:null, cdwr:null,
-                   towerKw:null, dutyRt:null, capacityKw:null, n1CapacityKw:null,
+                   towerKw:null, cdwRange:null, dutyRt:null, capacityKw:null, n1CapacityKw:null,
                    inputPerMachineKw:null, runningChillers:null, totalChillers:null };
   const running = c.chillers_running || null;
   return {
@@ -1019,6 +1027,7 @@ const PLANT = (function () {
     cdws: c.cdw_supply_c != null ? c.cdw_supply_c : null,
     cdwr: c.cdw_return_c != null ? c.cdw_return_c : null,
     towerKw: c.tower_rejection_kw_th != null ? c.tower_rejection_kw_th : null,
+    cdwRange: c.cdw_range_k != null ? c.cdw_range_k : null,
     dutyRt: c.duty_rt != null ? c.duty_rt : null,
     capacityKw: c.chiller_capacity_kw_th != null ? c.chiller_capacity_kw_th : null,
     runningChillers: c.chillers_running != null ? c.chillers_running : null,
@@ -1278,6 +1287,7 @@ function valveSym(x,y,size,orient){
    superheat panel and the pump mechanicals sat outside the declaring group, so 20-odd
    readings that this text already explains were being counted as untraced work. A
    constant rather than three copies, because three copies drift. */
+const AUTHORED_IDENTITY_BASIS = "Condenser-water flow per machine is an identity over marked parameters (cooling.tower_rejection_kw_th over 4.186 x cooling.cdw_range_k over cooling.chillers_running), printed for the operator; the evaporator differential pressure is simulated equipment state — conv-engine.js publishes no pressure";
 const AUTHORED_MECHANICAL_BASIS = "The refrigeration cycle, the secondary loop and the pump mechanicals are simulated operating state: conv-engine.js models the primary chilled-water side (CHWS, CHWR, delta-T, flow, heat rejection, chiller count) and publishes no compressor, refrigerant, secondary-loop or pump-vibration quantity, so these readings have no engine parameter to trace to. The primary-side values on this drawing are engine-derived and remain in the denominator.";
 
 function loopMetrics(loop){
@@ -1371,6 +1381,10 @@ function loopSvg(loop, pos){
   const supY = y + 82;
   const retY = y + 142;
   const portX = x + w - 18;
+  /* v2.5.0 — condenser-water flow per machine is an identity over marked parameters:
+     cooling.tower_rejection_kw_th ÷ (4.186 × cooling.cdw_range_k) ÷ cooling.chillers_running */
+  const cdwFlowLps = (PLANT.towerKw != null && PLANT.cdwRange != null && PLANT.cdwRange > 0 && ENGINE_CHILLERS_RUNNING) ? PLANT.towerKw / (4.186 * PLANT.cdwRange) / ENGINE_CHILLERS_RUNNING : null;
+  const cdwFlowTxt = cdwFlowLps == null ? '\u2014' : `${conv.f(cdwFlowLps,ui.unit)} ${conv.fu(ui.unit)}`;
 
   let lvlBg = "#2b3d55";
   let lvlBd = "#6f849f";
@@ -1392,7 +1406,7 @@ function loopSvg(loop, pos){
   const EVAP_APPROACH_K = 2.8;
   const approachT = dis ? 0 : EVAP_APPROACH_K;
   const approachTxt = `${ui.unit==="ip"?r1(approachT*9/5):approachT}${conv.tu(ui.unit)}`;
-  const appColor = approachT < 3 ? "#38b56d" : (approachT < 5 ? "#c08f46" : "#c25a5a");
+  const appColor = approachT < 3 ? "var(--run)" : (approachT < 5 ? "var(--warn)" : "var(--alarm)");
 
   return `
   <g data-loop-id="${loop.id}" style="cursor:pointer">
@@ -1420,12 +1434,13 @@ function loopSvg(loop, pos){
     <!-- v1.134.8 — this was "Fans n/6", the condenser fans of an AIR-COOLED machine. The owner
          adopted the study's basis (evaporative cooling tower = water-cooled), so the machine
          rejects to a condenser-water circuit, not to ambient air. Engine-published CDWS/CDWR. -->
-    <text x="${acc.x+14}" y="${y+158}" class="label">CDW ${PLANT.cdws != null ? PLANT.cdws.toFixed(1) : "\u2014"}/${PLANT.cdwr != null ? PLANT.cdwr.toFixed(1) : "\u2014"}&#176;C <tspan fill="${dis?"#6e6460":"var(--run)"}">\u25CF</tspan></text>
+    <text x="${acc.x+14}" y="${y+158}" class="label">CDW ${PLANT.cdws != null ? PLANT.cdws.toFixed(1) : "\u2014"}/${PLANT.cdwr != null ? PLANT.cdwr.toFixed(1) : "\u2014"}&#176;C <tspan fill="${dis?"var(--muted)":"var(--run)"}">\u25CF</tspan></text>
     ${text(acc.x+14,y+180,"unit",PLANT.inputPerMachineKw != null ? `${PLANT.inputPerMachineKw} kW` : "\u2014 kW")}
+    <g data-rz-authored-basis="${AUTHORED_IDENTITY_BASIS}">${text(acc.x+14,y+200,"unit",`CDW ${cdwFlowTxt}  \u2022  EVAP DP ${conv.p(loop.dp2,ui.unit)} ${conv.pu(ui.unit)}`)}</g>
 
-    <line x1="${acc.x+acc.w}" y1="${supY}" x2="${portX}" y2="${supY}" class="pipe" stroke="rgba(98,140,183,.25)" />
+    <line x1="${acc.x+acc.w}" y1="${supY}" x2="${portX}" y2="${supY}" class="pipe" stroke="rgba(6,182,212,.25)" />
     <line x1="${acc.x+acc.w}" y1="${supY}" x2="${portX}" y2="${supY}" class="${fClsS}" style="animation-duration:${flowDur}s" />
-    <line x1="${portX}" y1="${retY}" x2="${acc.x+acc.w}" y2="${retY}" class="pipe" stroke="rgba(93,160,149,.25)" />
+    <line x1="${portX}" y1="${retY}" x2="${acc.x+acc.w}" y2="${retY}" class="pipe" stroke="rgba(245,158,11,.25)" />
     <line x1="${portX}" y1="${retY}" x2="${acc.x+acc.w}" y2="${retY}" class="${fClsR}" style="animation-duration:${flowDur*1.05}s" />
 
     <rect x="${ref.x}" y="${y+56}" width="${ref.w}" height="156" rx="10" class="equip-shell" />
@@ -1452,25 +1467,25 @@ function loopSvg(loop, pos){
     ${text(ref.x+126,y+196,"unit",`SC ${scTxt}`)}
     </g>
 
-    <rect x="${pmp.x}" y="${y+56}" width="${pmp.w}" height="156" rx="10" class="equip-shell"><title>CHWP-${String(loop.id).padStart(2,"0")}A/B • ${m.runA?"A DUTY":"B DUTY"} • SPD ${m.runA?Math.round(loop.spdA):Math.round(loop.spdB)}%</title></rect>
-    ${text(pmp.x+12,y+68,"unit","PRIMARY PUMP PACKAGE")}  <!-- v1.134.6: was y+76, colliding with DUTY/SPD -->
+    <rect x="${pmp.x}" y="${y+56}" width="${pmp.w}" height="156" rx="10" class="equip-shell"><title>CHWP-${String(loop.id).padStart(2,"0")}A/B • ${m.runA?"A DUTY":"B DUTY"} • SPD ${m.runA?Math.round(loop.spdA):Math.round(loop.spdB)}% • Q ${flowTxt} (branch ref) • VIB A ${m.vibA} / B ${m.vibB} mm/s</title></rect>
+    <g data-rz-loop-flow="1">${text(pmp.x+12,y+68,"unit",`PRIMARY PUMPS  \u2022  Q ${flowTxt}`)}</g>  <!-- v1.134.6: was y+76, colliding with DUTY/SPD -->
     <circle cx="${pmp.x+52}" cy="${supY}" r="18" class="pump ${m.runA?"pump-run":"pump-off"}" />
     <polygon points="${pmp.x+44},${supY-10} ${pmp.x+64},${supY} ${pmp.x+44},${supY+10}" class="${m.runA?"pump-run":"pump-off"}" />
     <circle cx="${pmp.x+52}" cy="${supY}" r="5" class="${m.runA?"status-run":"status-stdby"}" />
-    <text x="${pmp.x+20}" y="${supY+4}" class="unit" fill="${m.runA?"var(--run)":"#7b8ca3"}" style="font-weight:700">${m.runA?"DUTY":"STBY"}</text>
+    <text x="${pmp.x+20}" y="${supY+4}" class="unit" fill="${m.runA?"var(--run)":"var(--muted)"}" style="font-weight:700">${m.runA?"DUTY":"STBY"}</text>
     <circle cx="${pmp.x+52}" cy="${retY}" r="18" class="pump ${m.runB?"pump-run":"pump-off"}" />
     <polygon points="${pmp.x+44},${retY-10} ${pmp.x+64},${retY} ${pmp.x+44},${retY+10}" class="${m.runB?"pump-run":"pump-off"}" />
     <circle cx="${pmp.x+52}" cy="${retY}" r="5" class="${m.runB?"status-run":"status-stdby"}" />
-    <text x="${pmp.x+20}" y="${retY+4}" class="unit" fill="${m.runB?"var(--run)":"#7b8ca3"}" style="font-weight:700">${m.runB?"DUTY":"STBY"}</text>
+    <text x="${pmp.x+20}" y="${retY+4}" class="unit" fill="${m.runB?"var(--run)":"var(--muted)"}" style="font-weight:700">${m.runB?"DUTY":"STBY"}</text>
     <g data-rz-authored-basis="${AUTHORED_MECHANICAL_BASIS}">
     <rect x="${pmp.x+80}" y="${y+68}" width="124" height="22" rx="5" class="field-box" />
     ${text(pmp.x+86,y+83,"unit",`SPD ${Math.round(loop.spdA)}%  AMP ${m.ampA} A`)}
     <rect x="${pmp.x+80}" y="${y+92}" width="124" height="22" rx="5" class="field-box" />
-    ${text(pmp.x+86,y+107,"unit",`HEAD ${headAU}  VIB ${m.vibA}`)}
+    ${text(pmp.x+86,y+107,"unit",`H ${headAU}  DP ${conv.p(loop.dp1,ui.unit)} ${conv.pu(ui.unit)}`)}
     <rect x="${pmp.x+80}" y="${y+128}" width="124" height="22" rx="5" class="field-box" />
     ${text(pmp.x+86,y+143,"unit",`SPD ${Math.round(loop.spdB)}%  AMP ${m.ampB} A`)}
     <rect x="${pmp.x+80}" y="${y+152}" width="124" height="22" rx="5" class="field-box" />
-    ${text(pmp.x+86,y+167,"unit",`HEAD ${headBU}  VIB ${m.vibB}`)}
+    ${text(pmp.x+86,y+167,"unit",`H ${headBU}  DP ${m.runB ? conv.p(loop.dp1,ui.unit) : 0} ${conv.pu(ui.unit)}`)}
     </g>
 
     <rect x="${ins.x}" y="${y+56}" width="${ins.w}" height="156" rx="10" class="equip-shell"><title>Simulated loop state CH-${loop.id} • calculated branch reference: ${flowTxt} • T1: ${t1Txt} • T2: ${t2Txt}</title></rect>
@@ -1563,9 +1578,10 @@ function drawPid(){
     return;
   }
   $("pidSvg").setAttribute("aria-label", "Chiller P&ID mimic");
+  $("pidSvg").setAttribute("viewBox", "0 0 1460 1930");   /* v2.5.0 — the canvas grew downward for the air-side band; VH below must match */
   // v1.42.4 — bind line-model for cross-page semantic adoption (review docs 27/28 + 17/18).
   const RZL = window.RZLineModel;
-  const VW = 1460, VH = 1400;   // v1.134.17: trimmed to the drawing (content ends at HDR_X2 = 1396)
+  const VW = 1460, VH = 1930;   // v2.5.0: the distribution & air-side band lives below the trains (y 1340..1900)
   const PZ_X = 36, PZ_Y = 100, PZ_W = 1280;
   const LOOP_X = 50, LOOP_W = 1060, LOOP_H = 240, LOOP_GAP = 40;
   const HDR_CHWS_Y = 148, HDR_CHWR_Y = 256;
@@ -1591,7 +1607,7 @@ function drawPid(){
     const e = evalLoop(lp);
     const fs = e.disconnected?"flow chws broken":"flow chws";
     const fr = e.disconnected?"flow chwr broken":"flow chwr";
-    const sC = e.level==="ALARM"?"#c25a5a":(e.level==="WARNING"?"#c08f46":"#38b56d");
+    const sC = e.level==="ALARM"?"var(--alarm)":(e.level==="WARNING"?"var(--warn)":"var(--run)");
     const loopId = lp.id || ('LOOP-'+(i+1));
     const loopState = !CHW_AUTHORITY_AVAILABLE ? 'unavailable'
       : (e.disconnected ? 'fault' : (e.level === 'ALARM' ? 'fault' : 'energized'));
@@ -1620,6 +1636,108 @@ function drawPid(){
       ${flowArrow(bxR, retY-20, "up", "return")}
     `;
   }).join("");
+
+  /* ============================================================================
+   * v2.5.0 (Track B §B3, owner comment 13) — THE OUTLET NO LONGER STOPS.
+   * The two primary headers the branch drops always pointed at are drawn; they
+   * continue down the right margin as risers into a DISTRIBUTION & AIR-SIDE band
+   * where the chilled water reaches the four hall CRAH banks — with the performance
+   * conv-engine.js already publishes for them (crah_* counts, unit sensible duty,
+   * available / N+1 capacity, supply-return air planes, air-side ΔT, coil approach,
+   * CHW coil ΔT) and per-hall IT load from getHallSnapshot(). Hall CHW flow is the
+   * IT-reference flow shared over the halls (an identity, declared); the coil valve
+   * position and the unit run state are simulated and declared as such.
+   * ========================================================================== */
+  const ES = engineSnap();
+  const CR = ES ? ES.cooling : null;
+  const HALLS = ['A','B','C','D'];
+  const hallSnap = (code) => (window.CONV_CALC && typeof window.CONV_CALC.getHallSnapshot === 'function') ? window.CONV_CALC.getHallSnapshot(code) : null;
+  const num1 = (v, d) => (v == null || !isFinite(v)) ? '—' : Number(v).toFixed(d == null ? 1 : d);
+  const numG = (v) => (v == null || !isFinite(v)) ? '—' : Math.round(v).toLocaleString('en-US');
+  const AIR_SIDE_BASIS = 'Air-side block: CRAH counts, unit sensible duty, available and N+1 capacity, supply and return air, hot-aisle, air-side delta-T, coil approach and CHW delta-T are conv-engine.js cooling.* values (the engine sizes CRAH from the campus-average hall load, so the counts are per-hall averages, not a per-hall allocation); hall IT load and racks are the hall snapshot; hall CHW flow = cooling.flow_lps shared over the halls (an identity over marked parameters); coil valve position and unit run state are simulated equipment state — conv-engine.js publishes no per-CRAH quantity';
+  const SEC_PUMP_BASIS = 'Secondary pump station and its speed, head and differential pressure are simulated equipment state: conv-engine.js publishes no pump quantity; the flow on the header is the IT-reference flow (cooling.flow_lps), calculated, not metered';
+  const DIST_Y = VH - 590;                 // distribution band top
+  const SUP_HDR_Y = DIST_Y + 60, RET_HDR_Y = VH - 80;
+  const RISER_S_X = HDR_X2 + 16, RISER_R_X = HDR_X2 + 36;
+  const HALL_W = 316, HALL_GAP = 24, HALL_X0 = 60, HALL_Y = DIST_Y + 100, HALL_H = RET_HDR_Y - 50 - HALL_Y;
+  const hdrState = CHW_AUTHORITY_AVAILABLE ? 'energized' : 'unavailable';
+  const hdrTxt = (t) => `${conv.t(t,ui.unit)}${conv.tu(ui.unit)}`;
+  const flowShare = CR ? CR.flow_lps / HALLS.length : null;
+  const lineSpec = (id, from, to, medium, dir, cap, cur, x1, y1, x2, y2, tag) => RZL ? RZL.line({id, from, to, medium, direction:dir, state:hdrState, capacity:cap, current:cur, redundancy:'duty', tag, geometry:{x1,y1,x2,y2}, style:{stroke:'currentColor', strokeWidth:1.5, cssClass:'pipe'}}) : '';
+  const headers = `
+    <!-- primary collection headers (the branch drops above always pointed at these coordinates) -->
+    ${lineSpec('chw-header-supply','CHILLER-PLANT','SECONDARY-DISTRIBUTION','chws','forward','DN300', CHW_AUTHORITY_AVAILABLE ? `${lineTemperatureFlow(st.header.chws)} plant` : 'UNAVAILABLE', HDR_X1, HDR_CHWS_Y, RISER_S_X, HDR_CHWS_Y, 'primary header')}
+    <line x1="${HDR_X1}" y1="${HDR_CHWS_Y}" x2="${RISER_S_X}" y2="${HDR_CHWS_Y}" class="flow chws" />
+    ${lineSpec('chw-header-return','SECONDARY-DISTRIBUTION','CHILLER-PLANT','chwr','reverse','DN300', CHW_AUTHORITY_AVAILABLE ? `${lineTemperatureFlow(st.header.chwr)} plant` : 'UNAVAILABLE', RISER_R_X, HDR_CHWR_Y, HDR_X1, HDR_CHWR_Y, 'primary header')}
+    <line x1="${RISER_R_X}" y1="${HDR_CHWR_Y}" x2="${HDR_X1}" y2="${HDR_CHWR_Y}" class="flow chwr" />
+    ${text(HDR_X1+6, HDR_CHWS_Y-14, "hdr-pipe-label supply", `CHWS HEADER ${hdrTxt(st.header.chws)}`)}
+    ${text(HDR_X1+6, HDR_CHWR_Y+24, "hdr-pipe-label return", `CHWR HEADER ${hdrTxt(st.header.chwr)}`)}
+    <!-- risers: the headers leave the train zone down the right margin into the distribution band -->
+    ${lineSpec('chw-riser-supply','CHWS-HEADER','DIST-SUPPLY-HEADER','chws','forward','DN300', hdrTxt(st.header.chws), RISER_S_X, HDR_CHWS_Y, RISER_S_X, SUP_HDR_Y, 'riser')}
+    <line x1="${RISER_S_X}" y1="${HDR_CHWS_Y}" x2="${RISER_S_X}" y2="${SUP_HDR_Y}" class="flow chws" />
+    ${lineSpec('chw-riser-return','DIST-RETURN-HEADER','CHWR-HEADER','chwr','reverse','DN300', hdrTxt(st.header.chwr), RISER_R_X, RET_HDR_Y, RISER_R_X, HDR_CHWR_Y, 'riser')}
+    <line x1="${RISER_R_X}" y1="${RET_HDR_Y}" x2="${RISER_R_X}" y2="${HDR_CHWR_Y}" class="flow chwr" />
+    <circle cx="${RISER_S_X}" cy="${HDR_CHWS_Y}" r="7" class="tee" /><circle cx="${RISER_R_X}" cy="${HDR_CHWR_Y}" r="7" class="tee" />
+  `;
+  const halls = HALLS.map((code, i) => {
+    const hx = HALL_X0 + i*(HALL_W+HALL_GAP), hy = HALL_Y, h = hallSnap(code);
+    const crahN = CR ? CR.crah_running : null, crahI = CR ? CR.crah_installed : null;
+    const unitKw = CR ? CR.crah_unit_sensible_kw : null;
+    const util = h && h.it_design_kw ? h.it_load_kw / h.it_design_kw : null;
+    const valvePct = util == null ? null : Math.round(45 + util * 40);          // simulated coil valve position, declared
+    const inX = hx - 6, outX = hx + HALL_W + 6;                                    // branch risers run in the gaps, never through text
+    const coilY = hy + 113, coilL = hx + 30, coilR = hx + HALL_W - 30;
+    const rowY = (k) => hy + 152 + k*24;
+    let zig = `M${coilL},${coilY}`;
+    for (let k = 0; k < 10; k++) { const x0 = coilL + k*((coilR-coilL)/10); zig += ` L${x0 + (coilR-coilL)/20},${coilY - 13} L${x0 + (coilR-coilL)/10},${coilY + (k===9 ? 0 : 13)}`; }
+    return `
+    <g data-hall-block="${code}" data-rz-authored-basis="${AIR_SIDE_BASIS}">
+      <rect x="${hx}" y="${hy}" width="${HALL_W}" height="${HALL_H}" rx="12" class="panel panel-normal" filter="url(#fShadow)" />
+      <rect x="${hx+12}" y="${hy+12}" width="${HALL_W-24}" height="28" rx="7" class="field-box" />
+      ${text(hx+24, hy+31, "section-title", `HALL ${code}  •  CRAH BANK  •  CRAH-${code}01..${code}${String(crahI == null ? '—' : crahI).padStart(2,'0')}`)}
+      <!-- supply: header tee → down the left gap → into the coil; return: coil → right gap → down to the return header -->
+      ${lineSpec('chw-hall-supply-'+code,'DIST-SUPPLY-HEADER','CRAH-BANK-'+code,'chws','forward','DN150', flowShare == null ? '—' : `${conv.f(flowShare,ui.unit)} ${conv.fu(ui.unit)} ref`, inX, SUP_HDR_Y, inX, coilY, 'hall '+code)}
+      <line x1="${inX}" y1="${SUP_HDR_Y}" x2="${inX}" y2="${coilY}" class="flow chws" />
+      <line x1="${inX}" y1="${coilY}" x2="${coilL}" y2="${coilY}" class="flow chws" />
+      ${valveSym(inX, SUP_HDR_Y+24, 7, "v")}
+      <circle cx="${inX}" cy="${SUP_HDR_Y}" r="7" class="tee" />
+      <path d="${zig}" class="coil" />
+      <line x1="${coilR}" y1="${coilY}" x2="${outX}" y2="${coilY}" class="flow chwr" />
+      ${lineSpec('chw-hall-return-'+code,'CRAH-BANK-'+code,'DIST-RETURN-HEADER','chwr','reverse','DN150', hdrTxt(st.header.chwr), outX, coilY, outX, RET_HDR_Y, 'hall '+code)}
+      <line x1="${outX}" y1="${coilY}" x2="${outX}" y2="${RET_HDR_Y}" class="flow chwr" />
+      ${valveSym(outX, hy+HALL_H+22, 7, "v")}
+      ${text(hx+HALL_W-4, hy+HALL_H+26, "unit", `CV ${valvePct == null ? '—' : valvePct + '%'}`, "end")}
+      <circle cx="${outX}" cy="${RET_HDR_Y}" r="7" class="tee" />
+      <circle cx="${hx+HALL_W/2}" cy="${hy+78}" r="12" class="fan" /><path d="M${hx+HALL_W/2-7},${hy+73} q7,-6 14,0 q-7,6 -14,0 M${hx+HALL_W/2},${hy+71} q6,7 0,14 q-6,-7 0,-14" class="fan-blade" />
+      ${text(hx+HALL_W/2, hy+58, "unit", `EC FAN WALL  •  ${crahN == null ? '—' : crahN} RUN / ${crahI == null ? '—' : crahI} INST`, "middle")}
+      ${text(hx+16, rowY(0), "metric-row", `Unit sensible  <tspan class="metric-val-inline">${numG(unitKw)} kW</tspan>  •  ${crahN == null ? '—' : crahN} duty`)}
+      ${text(hx+16, rowY(1), "metric-row", `Avail  <tspan class="metric-val-inline">${numG(CR ? CR.crah_available_kw : null)} kW</tspan>  •  N+1  <tspan class="metric-val-inline">${numG(CR ? CR.crah_n1_available_kw : null)} kW</tspan>`)}
+      ${text(hx+16, rowY(2), "metric-row", `Hall IT  <tspan class="metric-val-inline">${numG(h ? h.it_load_kw : null)} kW</tspan>  •  ${numG(h ? h.racks : null)} racks`)}
+      ${text(hx+16, rowY(3), "metric-row", `Supply air  <tspan class="metric-val-inline">${num1(CR ? CR.crah_supply_air_c : null)}°C</tspan>  •  Return  <tspan class="metric-val-inline">${num1(CR ? CR.crah_return_air_c : null)}°C</tspan>`)}
+      ${text(hx+16, rowY(4), "metric-row", `Air ΔT  <tspan class="metric-val-inline">${num1(CR ? CR.airside_delta_t_k : null)} K</tspan>  •  Hot aisle  <tspan class="metric-val-inline">${num1(CR ? CR.hot_aisle_c : null)}°C</tspan>`)}
+      ${text(hx+16, rowY(5), "metric-row", `CHW coil ΔT  <tspan class="metric-val-inline">${num1(CR ? CR.chw_delta_t : null)} K</tspan>  •  Approach  <tspan class="metric-val-inline">${num1(CR ? CR.chw_coil_approach_k : null)} K</tspan>`)}
+      ${text(hx+16, rowY(6), "metric-row", `Hall CHW  <tspan class="metric-val-inline">${flowShare == null ? '—' : conv.f(flowShare,ui.unit) + ' ' + conv.fu(ui.unit)}</tspan>  (IT-ref ÷ ${HALLS.length})`)}
+      ${text(hx+16, rowY(7), "metric-row", `CHWS in  <tspan class="metric-val-inline">${hdrTxt(st.header.chws)}</tspan>  •  CHWR out  <tspan class="metric-val-inline">${hdrTxt(st.header.chwr)}</tspan>`)}
+    </g>`;
+  }).join('');
+  const secPumpX = RISER_S_X - 40;   // secondary pump station on the supply header, beside the riser
+  const airSide = `
+    <rect x="${PZ_X}" y="${DIST_Y}" width="${RISER_R_X + 24 - PZ_X}" height="${VH - DIST_Y - 36}" rx="10" class="frame" />
+    ${text(PZ_X+16, DIST_Y+24, "zone-label", `DISTRIBUTION & AIR SIDE  —  CHW TO ${HALLS.length} HALL CRAH BANKS  —  ${CR ? CR.crah_running : '—'} OF ${CR ? CR.crah_installed : '—'} CRAH RUNNING PER HALL (ENGINE, CAMPUS-AVERAGE)`)}
+    ${lineSpec('chw-dist-supply','DIST-SUPPLY-HEADER','CRAH-BANKS','chws','forward','DN300', CHW_AUTHORITY_AVAILABLE ? `${lineTemperatureFlow(st.header.chws)} ref` : 'UNAVAILABLE', RISER_S_X, SUP_HDR_Y, HALL_X0, SUP_HDR_Y, 'distribution header')}
+    <line x1="${RISER_S_X}" y1="${SUP_HDR_Y}" x2="${HALL_X0}" y2="${SUP_HDR_Y}" class="flow chws" />
+    ${lineSpec('chw-dist-return','CRAH-BANKS','DIST-RETURN-HEADER','chwr','reverse','DN300', hdrTxt(st.header.chwr), HALL_X0, RET_HDR_Y, RISER_R_X, RET_HDR_Y, 'distribution header')}
+    <line x1="${HALL_X0}" y1="${RET_HDR_Y}" x2="${RISER_R_X}" y2="${RET_HDR_Y}" class="flow chwr" />
+    ${text(HALL_X0+8, SUP_HDR_Y-14, "hdr-pipe-label supply", `SECONDARY CHWS DISTRIBUTION HEADER  ${hdrTxt(st.header.chws)}  •  IT-REFERENCE FLOW ${conv.f(st.header.flow,ui.unit)} ${conv.fu(ui.unit)}  •  CALCULATED • NOT METERED`)}
+    ${text(HALL_X0+8, RET_HDR_Y+24, "hdr-pipe-label return", `SECONDARY CHWR RETURN HEADER  ${hdrTxt(st.header.chwr)}`)}
+    <g data-rz-authored-basis="${SEC_PUMP_BASIS}">
+      <circle cx="${secPumpX}" cy="${SUP_HDR_Y}" r="16" class="pump pump-run" /><polygon points="${secPumpX-8},${SUP_HDR_Y-9} ${secPumpX+10},${SUP_HDR_Y} ${secPumpX-8},${SUP_HDR_Y+9}" class="pump-run" />
+      <circle cx="${secPumpX-44}" cy="${SUP_HDR_Y}" r="16" class="pump pump-off" /><polygon points="${secPumpX-52},${SUP_HDR_Y-9} ${secPumpX-34},${SUP_HDR_Y} ${secPumpX-52},${SUP_HDR_Y+9}" class="pump-off" />
+      ${text(RISER_S_X-14, SUP_HDR_Y-26, "unit", "CHWP-S1 DUTY  •  S2 STBY", "end")}
+      ${text(RISER_S_X-14, SUP_HDR_Y-42, "unit", `SPD 82%  •  H 28.4 m  •  DP 145 kPa`, "end")}
+    </g>
+    ${halls}
+  `;
 
   const loops = st.loops.map((lp,i)=>loopSvg(lp,pos[i])).join("");
   const itRefFlow = `${conv.f(st.header.flow,ui.unit)} ${conv.fu(ui.unit)}`;
@@ -1659,7 +1777,7 @@ function drawPid(){
   const nPlus1MarginKw = postOneFailureCapacityKw - coolDemandKw;
   const redundancy = postOneFailureCapacityKw >= coolDemandKw
     ? "N+1" : (runningCapacityKw >= coolDemandKw ? "N" : "DEGRADED");
-  const redColor = redundancy==="N+1"?"#38b56d":(redundancy==="N"?"#c08f46":"#c25a5a");
+  const redColor = redundancy==="N+1"?"var(--run)":(redundancy==="N"?"var(--warn)":"var(--alarm)");
 
   const alarmBg = st.alarm.level==="ALARM"?"rgba(194,90,90,.15)":(st.alarm.level==="WARNING"?"rgba(192,143,70,.12)":"rgba(56,181,109,.08)");
   const alarmBd = st.alarm.level==="ALARM"?"rgba(194,90,90,.6)":(st.alarm.level==="WARNING"?"rgba(192,143,70,.5)":"rgba(56,181,109,.3)");
@@ -1733,7 +1851,9 @@ function drawPid(){
          nothing removed. -->
 
     ${branches}
+    ${headers}
     ${loops}
+    ${airSide}
   `;
 }
 

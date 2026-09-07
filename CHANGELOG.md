@@ -11,6 +11,43 @@ release sections rather than semver.
 
 ---
 
+## v2.5.0 — 2026-09-07
+
+### Chiller plant: the outlet reaches the CRAH coils (Track B §B3, owner comment 13)
+
+Owner: *"chiller-plant colouring inconsistent, mimic poor, outlet stops — should continue to DAHU/CRAH
+with their performance and flow on the same screen, add per-equipment pressure/flow."* Measured: the
+drawing had **no headers at all** — the four branch drops rose to coordinates of headers that were never
+drawn (`HDR_CHWS_Y/HDR_CHWR_Y` consumed, never rendered), so every train ended in a `SEC OUT / SEC IN`
+box in empty space; 153 distinct hex colours and 39 rgba values against 16 tokens, the same red and amber
+authored in two tones each, and the line-model's chilled-water palette overridden to grey `currentColor`
+at all four call sites; the air side — which `conv-engine.js` already publishes (`crah_running/installed`,
+`crah_unit_sensible_kw`, available and N+1 capacity, supply/return air, hot aisle, air-side ΔT, coil
+approach, CHW ΔT) — was rendered nowhere.
+
+Now the two primary collection headers are drawn (CHWS 19.4 °C / CHWR 27.0 °C, tagged line-model
+lines), continue as risers down the right margin into a **DISTRIBUTION & AIR-SIDE band**: a secondary CHWS
+distribution header (IT-reference flow, *calculated · not metered*), a secondary pump station (duty /
+standby, declared simulated), and **four hall CRAH banks** — each with its branch and isolation valve
+from the supply header, an EC fan wall, a coil, a control valve on the return, and the engine's numbers:
+unit sensible duty, available and N+1 capacity, hall IT load and racks (hall snapshot), supply / return
+air, air ΔT, hot aisle, CHW coil ΔT and approach, the hall's CHW share (IT-reference flow ÷ halls, an
+identity) and the header temperatures in and out — then the return header back to the plant. The canvas
+grows downward (viewBox 1460 × 1930) so nothing shrinks. Per equipment: each primary pump now prints its
+flow (the branch reference, under the same distribution declaration) and differential pressure, each
+chiller its condenser-water flow (an identity over tower rejection ÷ 4.186 × range ÷ running machines,
+declared) and evaporator DP. Colour: one chilled-water palette — supply cyan, return amber, condenser
+water violet — the line-model's, shared with every cockpit; status colours in the builder come from the
+tokens and are never re-typed. Tagged semantic lines on the page: 16 → **30** (`probe-line-model`
+target 18). Gates: conventional coverage STRICT, geometry STRICT (0 collisions, 0 clipped at 8 passes),
+legibility STRICT, operator-cockpit regressions, cooling/water UI, alarm runtime, basis drawer, hall
+scope, document parity — all green.
+
+Known, not in this ship: `probe-line-model` (not a ship gate) reports the AI page's SLD semantic lines
+(`dh1-semantic-*`, v2.0.0) without from/to/medium — a Track A follow-up.
+
+---
+
 ## v2.4.0 — 2026-09-07
 
 ### Changed — the Data Hall plan is drawn per rack again: 40 rows × 22 racks in two banks (owner 2026-09-07)
