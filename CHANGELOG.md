@@ -11,6 +11,28 @@ release sections rather than semver.
 
 ---
 
+## v2.11.0 — 2026-09-08
+
+### One navigation language for both cockpit hubs (Track C, owner comment 18)
+
+Owner: *"align the DC AI and DC Conventional navigation menus."* Measured: the AI hub used a horizontal
+`nav.tabs` with a **filled green pill** for the active module (design.md: "active = 2px amber underline,
+never a filled tab"); the Conventional hub used a vertical sidebar of gradient-backed 8 px cards with
+tinted icon tiles, a hover `translateX(3px)` slide and **emoji icons (⚡ ❄) mixed with Font Awesome**
+(anti-vibecode §A 5). Two hubs of one suite, two vocabularies.
+
+Now `css/rz-cockpit-nav.css` states the one vocabulary from `documentation/design.md` §Tab strip — mono,
+uppercase, 0.06 em, a tier-2 hairline, active = a 2 px signal-amber stripe, no fill, no gradient, no
+slide — in two variants: `--strip` (the AI hub's module tabs: amber underline) and `--rail` (the
+Conventional hub's subsystem links: amber left rail, which becomes an underline strip below 900 px so both
+hubs read the same on a tablet). Icons are one thin-line set (Font Awesome, `aria-hidden`); the emoji are
+gone. Both pages keep their own ids, classes, handlers and the verbatim tab CSS the operator-ui gate pins —
+the sheet only restates the look. The dark-theme `position` regression that let the AI tab bar overlap the
+data-mode strip was closed in v2.4.0 and stays closed.
+
+Gates: anti-vibecode strict, DC AI operator-UI contract, dark coverage strict, a11y strict, responsive
+layout strict, full ship gate.
+
 ## v2.10.0 — 2026-09-08
 
 ### Data hall: a continuous heat-map ramp, min / avg / max per row and per hall (Track B, owner comment 12)

@@ -1,0 +1,64 @@
+/* ============================================================================
+ * rz-cockpit-nav.css — ONE navigation language for the two cockpit hubs (v2.11.0, Track C / owner comment 18)
+ * ----------------------------------------------------------------------------
+ * documentation/design.md §Tab strip: mono, uppercase, 0.06em, active = a 2px signal-amber stripe,
+ * a tier-2 hairline under the strip — never a filled pill, never a gradient, never an emoji icon.
+ * Two variants, one vocabulary:
+ *   .rz-cockpit-nav--strip  horizontal module tabs (datahallAI.html `nav.tabs`)
+ *   .rz-cockpit-nav--rail   vertical subsystem rail (dc-conventional.html `nav.nav-sidebar`), which
+ *                           becomes a strip below 900 px so both hubs read the same on a tablet.
+ * The pages keep their own ids, classes and handlers (gates and probes pin them); this sheet only
+ * restates the look. Tokens fall back to the page's own palette so no page has to be re-tokenised.
+ * ==========================================================================*/
+.rz-cockpit-nav {
+  --rzn-accent: var(--rz-accent-signal, var(--o, var(--accent-orange, #f59e0b)));
+  --rzn-line: var(--bd, var(--border, #1e293b));
+  --rzn-text: var(--t3, var(--text-secondary, #94a3b8));
+  --rzn-text-on: var(--t1, var(--text-primary, #e2e8f0));
+  --rzn-bg: var(--bg1, var(--bg-card, #0f172a));
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* ---- strip (module tabs) ---- */
+.rz-cockpit-nav--strip { gap: 0; padding: 0 8px; border-bottom: 1px solid var(--rzn-line); scrollbar-width: none; }
+.rz-cockpit-nav--strip::-webkit-scrollbar { display: none; }
+.rz-cockpit-nav--strip button {
+  font-family: inherit; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--rzn-text); background: transparent; border: 0; border-bottom: 2px solid transparent; border-radius: 0;
+  padding: 8px 12px; min-height: 36px; white-space: nowrap; cursor: pointer;
+  transition: color .2s ease, border-color .2s ease;
+}
+.rz-cockpit-nav--strip button:hover { color: var(--rzn-text-on); background: transparent; }
+.rz-cockpit-nav--strip button.on,
+.rz-cockpit-nav--strip button[aria-selected="true"] { color: var(--rzn-accent); border: 0; border-bottom: 2px solid var(--rzn-accent); background: transparent; }
+.rz-cockpit-nav--strip button:focus-visible { outline: 2px solid var(--rzn-accent); outline-offset: -2px; }
+
+/* ---- rail (subsystem links) ---- */
+.rz-cockpit-nav--rail { background: var(--rzn-bg); border-right: 1px solid var(--rzn-line); padding: 10px 8px; gap: 2px; }
+.rz-cockpit-nav--rail .nav-section-title {
+  font-family: inherit; font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--rzn-text); border-bottom: 1px solid var(--rzn-line); padding: 6px 10px 8px; margin-bottom: 4px;
+}
+.rz-cockpit-nav--rail .nav-menu-item {
+  background: transparent; border: 0; border-left: 2px solid transparent; border-radius: 0;
+  padding: 9px 10px; gap: 10px; font-family: inherit; font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .06em; color: var(--rzn-text); text-decoration: none;
+  transition: color .2s ease, border-color .2s ease; transform: none; min-height: 40px;
+}
+.rz-cockpit-nav--rail .nav-menu-item::before { display: none; }
+.rz-cockpit-nav--rail .nav-menu-item:hover,
+.rz-cockpit-nav--rail .nav-menu-item:focus-visible { background: transparent; border-color: transparent; border-left-color: var(--rzn-accent); color: var(--rzn-text-on); transform: none; outline: none; }
+.rz-cockpit-nav--rail .nav-menu-item.is-active,
+.rz-cockpit-nav--rail .nav-menu-item[aria-current="page"] { border-left-color: var(--rzn-accent); color: var(--rzn-accent); }
+.rz-cockpit-nav--rail .nav-menu-item .icon { width: 18px; height: 18px; border-radius: 0; background: transparent; color: inherit; font-size: 12px; }
+.rz-cockpit-nav--rail .nav-menu-item .label { font-weight: inherit; }
+.rz-cockpit-nav--rail .nav-menu-item .arrow { display: none; }
+
+@media (max-width: 900px) {
+  .rz-cockpit-nav--rail { border-right: 0; border-bottom: 1px solid var(--rzn-line); }
+  .rz-cockpit-nav--rail .nav-menu-item { border-left: 0; border-bottom: 2px solid transparent; white-space: nowrap; }
+  .rz-cockpit-nav--rail .nav-menu-item:hover,
+  .rz-cockpit-nav--rail .nav-menu-item:focus-visible,
+  .rz-cockpit-nav--rail .nav-menu-item.is-active { border-left: 0; border-bottom-color: var(--rzn-accent); }
+}
+@media (prefers-reduced-motion: reduce) { .rz-cockpit-nav * { transition: none !important; } }

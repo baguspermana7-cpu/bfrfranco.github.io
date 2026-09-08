@@ -1935,3 +1935,13 @@ width of the page's content container. Shared self-injecting module **`js/rz-her
 Adoption: one `<script src="js/rz-hero-fit.js?v=…" defer>` + mark the hero img. Rolled to the
 7 image-hero calculators (opex/capex/roi/carbon-footprint/pue/tier-advisor/tia-942-checklist).
 Guard: `tools/audit-hero-images.mjs` (ship-suite) fails any hero-image page missing the module.
+
+## Cockpit navigation (v2.11.0)
+
+Both cockpit hubs — `datahallAI.html` (module tabs) and `dc-conventional.html` (subsystem rail) — adopt
+`css/rz-cockpit-nav.css`, the design-system tab-strip pattern: JetBrains Mono, uppercase, 0.06 em,
+tier-2 hairline, active = a 2 px signal-amber stripe (underline on the strip, left rail on the vertical
+rail, underline again below 900 px). No filled active pill, no gradient, no hover slide, no emoji icons —
+one thin-line icon set with `aria-hidden`. A page adopts it by adding `rz-cockpit-nav rz-cockpit-nav--strip`
+or `rz-cockpit-nav rz-cockpit-nav--rail` to its existing `<nav>`; ids, classes and handlers stay, so the
+gates that pin them (`test-datahall-ai-operator-ui.mjs` asserts the AI `.tabs{…}` rule verbatim) are untouched.
