@@ -157,6 +157,7 @@ Used by `tools/probe-line-model.mjs` to enforce the per-page adoption schedule.
 | v1.42.3 (pending) | `dc-conventional.html` chiller plant + EPMS | +25 | bump `ADOPTION_TARGETS` |
 | **v2.7.0** | `fuel-system.html` first process diagram (`#fuel-svg`) | **+14** (fill · suction · P-101/P-102 discharge · transfer header · 3 day-tank feeds · 3 genset supplies · polishing side-stream + return · DT overflow return), medium `fuel`, hand-written attributes in the water/fire idiom, driven by `renderPid()`. | `ADOPTION_TARGETS['fuel-system.html'] = 14` |
 | **v2.8.0** | `water-system.html` recomposed (`#water-svg`) | **12** (10 re-routed + `ws-cdw-supply` / `ws-cdw-return`, mediums `cw_supply` / `cw_return`) — the make-up branch now ends in the cooling-tower basin (`CT-501-BASIN`). | `ADOPTION_TARGETS['water-system.html'] = 12` |
+| **v2.9.0** | `ict.html` architecture canvas (`svg.ict-arch`, rebuilt per segment) | **+19** on the default IT segment (edges tagged `ict-<seg>-<n>`, mediums `fiber` / `copper` / `signal`, `conduit` edges as `signal`); the link table's `↔` rows now split both endpoints. | `ADOPTION_TARGETS['ict.html'] = 19` |
 | v1.42.4 (pending) | `water-system.html` + `chiller-plant.html` | +30 | bump `ADOPTION_TARGETS` |
 | v1.45.x | full coverage target | 80–90 % of major-loop lines tagged | coverage ≥ 80 % |
 

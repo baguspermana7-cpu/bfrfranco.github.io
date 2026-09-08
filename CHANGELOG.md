@@ -11,6 +11,39 @@ release sections rather than semver.
 
 ---
 
+## v2.9.0 — 2026-09-08
+
+### ICT: the architecture canvas that did not exist (Track B, owner comment 17)
+
+Owner: *"ict.html — no architecture/flow diagram at all"*; ledger DCUI-011: *"rancang dengan proper schematic, atau
+architecture … dengan sangat accurate dan detail."* Measured: thirteen `<svg>` elements on the page, all icons; the
+"Architecture / Topology" panel was four columns of text cards; six operational segments, deterministic alarms
+and a link table existed with no drawing that related any of them.
+
+Now every segment renders a **Network Architecture** canvas (`svg.ict-arch`, 1180 wide) above the layer grid:
+four bands (External / DCI · Edge / Core · Fabric / Access · Racks / Services), zone frames (campus IT fabric;
+OT zone *segmented with controlled conduits, not an air gap*; security zone; OOB plane), orthogonal edges routed
+so a path that skips a layer runs down the margin and a same-row link that passes a neighbour runs above it.
+The IT view draws ISP-1/2 → DDoS scrubbing → RTR-BKS01 → SW-CORE-A duty / SW-CORE-B hot standby (MLAG peer)
+→ SPINE 1-4 → ToR groups per Hall A–D → hall rack groups (the governed study's 500 racks · 42 groups) and the
+customer L3 edge; WAN, BMS/OT (DMZ, OT firewall pair, BMS-GW-01, OT access pair, six facility gateways),
+Security, Management/OOB and Monitoring have their own. Nodes and edges come from the SAME authored inventory
+the services strip, layer grid and link table already state — no count was invented. Every edge with a link
+row is bound to it: clicking an edge selects the row and opens the link inspector, clicking a row highlights
+the edge (cyan, packet animation only while selected — doc-08 "too much neon"; reduced motion static). Clicking
+a node opens a node inspector with role, layer, state, upstream, downstream and its **fault domain** (the live
+downstream set — standby paths, peer links and upward edges are not walked), and dims everything outside it.
+A **Scenario** control (Normal · Core A fail · WAN primary loss · BMS gateway offline · Camera VLAN degraded ·
+Historian unreachable) re-states node and edge states on the drawing with an impact note; the panel says the
+authored alarm register is not rewritten by a drawing scenario. Nineteen tagged lines on the default segment
+(`data-rz-line`, medium fiber / copper / signal), registered in the geometry gate, the tab-set table and the
+line-model probe; the link table's `↔` rows now tag both endpoints. Every gated string and id is preserved
+(layer labels, `.network-topology`, alarm-query controls, capacity basis).
+
+Gates: ICT operator architecture, ICT/data-hall runtime, secondary authority, geometry 0/0 (default segment),
+legibility strict, conv coverage STRICT (4/4 traced), alarm runtime, explain wiring, basis drawer,
+anti-vibecode strict, line-model 19/19.
+
 ## v2.8.0 — 2026-09-08
 
 ### Water system: the make-up path, a real booster train, and traceability on the drawing (Track B, owner comment 16)

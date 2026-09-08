@@ -71,7 +71,7 @@ export const NO_TAB_SET = Object.freeze({
     'water-system.html': 'single #water-svg, no tab system',
     'EPMS_Telemetry.html': 'single svg#viewport, no tab system',
     'fuel-system.html': 'single #fuel-svg (v2.7.0), no tab system',
-    'ict.html': 'no architecture diagram exists yet',
+    'ict.html': 'svg.ict-arch is rebuilt per segment by selectSegment(); the default IT segment is measured (v2.9.0)',
     'datahall.html': 'rack field is HTML; no SVG process diagram exists',
 });
 

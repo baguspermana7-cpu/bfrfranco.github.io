@@ -262,6 +262,59 @@
     .cap-card.ok { border-left: 3px solid var(--st-ok); }
     .cap-card.warn { border-left: 3px solid var(--st-warn); }
 
+    /* v2.9.0 — the architecture canvas (owner comment 17, DCUI-011, ledger §18): an SVG schematic of the
+       selected segment, layered External / Edge / Fabric / Racks, edges bound to the link table, nodes
+       drillable into the inspector. Muted by default (doc-08 "too much neon"): normal links slate, the
+       selected path cyan, warning amber, critical red; packet animation only on the selected edge. */
+    .arch-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; background: rgba(2,6,23,.42); border: 1px solid var(--line-soft); }
+    svg.ict-arch { display: block; width: 100%; min-width: 1180px; font-family: 'JetBrains Mono', monospace; }
+    svg.ict-arch .band { fill: rgba(255,255,255,.015); stroke: var(--line-soft); stroke-width: 1; }
+    svg.ict-arch .band-lbl { fill: var(--text-mute); font-size: 10px; letter-spacing: .6px; text-transform: uppercase; font-weight: 700; }
+    svg.ict-arch .zone { fill: none; stroke: var(--line); stroke-width: 1; stroke-dasharray: 5 4; }
+    svg.ict-arch .zone-lbl { fill: var(--text-dim); font-size: 10px; font-weight: 700; letter-spacing: .4px; }
+    svg.ict-arch .node { cursor: pointer; }
+    svg.ict-arch .node rect { fill: #0f1a2c; stroke: var(--line); stroke-width: 1.2; }
+    svg.ict-arch .node:hover rect, svg.ict-arch .node:focus rect { stroke: var(--st-sel); }
+    svg.ict-arch .node:focus { outline: none; }
+    svg.ict-arch .node.sel rect { stroke: var(--st-sel); stroke-width: 2; }
+    svg.ict-arch .node.dim { opacity: .35; }
+    svg.ict-arch .node .n-lbl { fill: var(--text-main); font-size: 11px; font-weight: 700; }
+    svg.ict-arch .node .n-sub { fill: var(--text-dim); font-size: 10px; }
+    svg.ict-arch .node .n-st { font-size: 10px; font-weight: 700; fill: var(--st-ok); }
+    svg.ict-arch .node.stby .n-st { fill: var(--st-stby); }
+    svg.ict-arch .node.warn .n-st { fill: var(--st-warn); }
+    svg.ict-arch .node.warn rect { stroke: var(--st-warn); }
+    svg.ict-arch .node.bad .n-st { fill: var(--st-bad); }
+    svg.ict-arch .node.bad rect { stroke: var(--st-bad); }
+    svg.ict-arch .node.off .n-st { fill: var(--st-off); }
+    svg.ict-arch .node .n-dot { fill: var(--st-ok); }
+    svg.ict-arch .node.stby .n-dot { fill: var(--st-stby); }
+    svg.ict-arch .node.warn .n-dot { fill: var(--st-warn); }
+    svg.ict-arch .node.bad .n-dot { fill: var(--st-bad); }
+    svg.ict-arch .node.off .n-dot { fill: var(--st-off); }
+    svg.ict-arch .edge { fill: none; stroke: #4a6a8a; stroke-width: 2; stroke-linejoin: round; cursor: pointer; }
+    svg.ict-arch .edge.stby { stroke: #3b5570; stroke-dasharray: 6 5; }
+    svg.ict-arch .edge.warn { stroke: var(--st-warn); }
+    svg.ict-arch .edge.bad { stroke: var(--st-bad); stroke-dasharray: 3 4; }
+    svg.ict-arch .edge.conduit { stroke: var(--text-mute); stroke-dasharray: 2 5; stroke-width: 1.5; }
+    svg.ict-arch .edge.dim { opacity: .25; }
+    svg.ict-arch .edge.sel { stroke: var(--st-sel); stroke-width: 3; stroke-dasharray: 8 10; animation: ictPacket 1s linear infinite; }
+    svg.ict-arch .edge-hit { fill: none; stroke: transparent; stroke-width: 14; cursor: pointer; }
+    svg.ict-arch .edge-lbl { fill: var(--text-mute); font-size: 10px; }
+    svg.ict-arch .edge-lbl.sel { fill: var(--st-sel); }
+    @keyframes ictPacket { to { stroke-dashoffset: -36; } }
+    @media (prefers-reduced-motion: reduce) { svg.ict-arch .edge.sel { animation: none; stroke-dasharray: none; } }
+    .arch-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 10px; font-size: 11px; color: var(--text-dim); }
+    .arch-toolbar select { background: var(--panel-bg); color: var(--text-main); border: 1px solid var(--line); border-radius: 3px; padding: 5px 8px; font: 600 11px 'JetBrains Mono', monospace; min-height: 32px; }
+    .arch-toolbar .legend { display: inline-flex; gap: 12px; margin-left: auto; }
+    .arch-toolbar .legend i { display: inline-block; width: 18px; height: 0; border-top: 2px solid #4a6a8a; vertical-align: middle; margin-right: 4px; }
+    .arch-toolbar .legend i.stby { border-top-style: dashed; border-top-color: #3b5570; }
+    .arch-toolbar .legend i.warn { border-top-color: var(--st-warn); }
+    .arch-toolbar .legend i.bad { border-top-color: var(--st-bad); }
+    .arch-toolbar .legend i.sel { border-top-color: var(--st-sel); border-top-width: 3px; }
+    .arch-scn-note { margin-top: 8px; color: var(--st-warn); font-size: 10.5px; line-height: 1.45; }
+    .arch-scn-note b { color: var(--text-main); }
+
     /* Operator architecture: functional layers, not a decorative network map. */
     .network-topology {
         display: grid; grid-template-columns: repeat(4, minmax(150px, 1fr));
@@ -1283,6 +1336,308 @@
             ]
         };
 
+        /* ---- v2.9.0 Architecture canvas ------------------------------------------------
+         * One data-driven schematic per segment, drawn from the SAME authored inventory the
+         * services strip, the layer grid and the link table already state (no new counts):
+         * node = [id, layer 0-3, label, sub, state, zone], edge = [from, to, linkIdx|null, state, kind].
+         * linkIdx binds an edge to a row of seg.links so the drawing, the table and the
+         * inspector select together. Everything inside #canvas stays under its declaration.
+         */
+        var ARCH = {
+            it: {
+                zones: [{ label: 'CAMPUS IT / DATA FABRIC', from: 'RTR-BKS01', to: 'HALL-D' }],
+                nodes: [
+                    ['ISP-1', 0, 'ISP-1', 'transit · BGP', 'up'], ['ISP-2', 0, 'ISP-2', 'transit · standby', 'stby'],
+                    ['DDOS', 0, 'DDoS scrubbing', 'armed', 'up'], ['DCI', 0, 'DCI BKS01-MKS', 'tertiary path', 'warn', 'DEGRADED'],
+                    ['RTR-BKS01', 1, 'RTR-BKS01', 'edge router', 'up'], ['SW-CORE-A', 1, 'SW-CORE-A', 'core · DUTY', 'up', 'DUTY'], ['SW-CORE-B', 1, 'SW-CORE-B', 'core · hot standby', 'stby', 'STANDBY'],
+                    ['SPINE', 2, 'SPINE 1-4', 'ECMP 4-way', 'up', '4 / 4 UP'],
+                    ['TOR-A', 2, 'ToR 01-05 · Hall A', 'access', 'up', '5 / 5 UP'], ['TOR-B', 2, 'ToR 06-10 · Hall B', 'access', 'up', '5 / 5 UP'], ['TOR-C', 2, 'ToR 11-15 · Hall C', 'access', 'up', '5 / 5 UP'], ['TOR-D', 2, 'ToR 16-20 · Hall D', 'access', 'up', '5 / 5 UP'],
+                    ['HALL-A', 3, 'Hall A racks', 'study 500 racks · 42 grp', 'up'], ['HALL-B', 3, 'Hall B racks', 'study 500 racks · 42 grp', 'up'], ['HALL-C', 3, 'Hall C racks', 'study 500 racks · 42 grp', 'up'], ['HALL-D', 3, 'Hall D racks', 'study 500 racks · 42 grp', 'up'],
+                    ['CUST', 3, 'Customer L3 edge', 'BGP dual-homed', 'up', 'BGP UP']
+                ],
+                edges: [
+                    ['ISP-1', 'DDOS', null, 'up'], ['ISP-2', 'DDOS', null, 'stby'], ['DDOS', 'RTR-BKS01', null, 'up'], ['DCI', 'RTR-BKS01', null, 'warn'],
+                    ['RTR-BKS01', 'SW-CORE-A', 0, 'up'], ['RTR-BKS01', 'SW-CORE-B', 1, 'stby'], ['SW-CORE-A', 'SW-CORE-B', null, 'up', 'peer'],
+                    ['SW-CORE-A', 'SPINE', 2, 'up'], ['SW-CORE-B', 'SPINE', null, 'stby'],
+                    ['SPINE', 'TOR-A', null, 'up'], ['SPINE', 'TOR-B', null, 'up'], ['SPINE', 'TOR-C', null, 'up'], ['SPINE', 'TOR-D', null, 'up'],
+                    ['TOR-A', 'HALL-A', null, 'up'], ['TOR-B', 'HALL-B', null, 'up'], ['TOR-C', 'HALL-C', null, 'up'], ['TOR-D', 'HALL-D', null, 'up'],
+                    ['SW-CORE-A', 'CUST', 3, 'up'], ['CUST', 'ISP-2', 4, 'stby']
+                ]
+            },
+            bms: {
+                zones: [{ label: 'OT ZONE · segmented, controlled conduits (not an air gap)', from: 'OTFW', to: 'WATER-GW' }],
+                nodes: [
+                    ['DMZ', 0, 'Industrial DMZ', 'IT↔OT conduit · RO', 'up'], ['HIST', 0, 'NTP / Historian', 'read-only aggregation', 'up'],
+                    ['OTFW', 1, 'OT firewall pair', 'policy enforcement', 'up'], ['BMS-GW-01', 1, 'BMS-GW-01', 'polling master', 'up', 'POLL OK'],
+                    ['OTACC', 2, 'OT access pair', 'facility switching', 'up'],
+                    ['EPMS-GW', 3, 'EPMS-GW', 'Modbus / IEC', 'up'], ['CHILLER-GW', 3, 'CHILLER-GW', 'BACnet', 'up'], ['DATAHALL-GW', 3, 'DATAHALL-GW', 'BACnet', 'up'],
+                    ['FIRE-GW', 3, 'FIRE-GW', 'supervised · LS', 'up'], ['FUEL-GW', 3, 'FUEL-GW', 'Modbus', 'up'], ['WATER-GW', 3, 'WATER-GW', 'Modbus', 'up']
+                ],
+                edges: [
+                    ['DMZ', 'OTFW', null, 'up', 'conduit'], ['HIST', 'OTFW', null, 'up', 'conduit'], ['OTFW', 'BMS-GW-01', null, 'up'], ['BMS-GW-01', 'OTACC', null, 'up'],
+                    ['OTACC', 'EPMS-GW', 0, 'up'], ['OTACC', 'CHILLER-GW', 1, 'up'], ['OTACC', 'DATAHALL-GW', 2, 'up'], ['OTACC', 'FIRE-GW', 3, 'up'], ['OTACC', 'FUEL-GW', 4, 'up'], ['OTACC', 'WATER-GW', 5, 'up']
+                ]
+            },
+            sec: {
+                zones: [{ label: 'SECURITY ZONE · isolated from IT and OT', from: 'SECFW', to: 'PIR' }],
+                nodes: [
+                    ['SOC', 0, 'SOC off-site', 'live feed', 'up'], ['MN', 0, 'Mass notification', 'PA / strobe', 'up'],
+                    ['SECFW', 1, 'Security firewall', 'zone boundary', 'up'], ['VMS', 1, 'VMS core', 'retention 14 d / 30 d', 'warn', 'WARN'],
+                    ['SW-SEC-A', 2, 'SW-SEC-A', 'camera access · DUTY', 'up'], ['SW-SEC-B', 2, 'SW-SEC-B', 'failover trunk', 'stby', 'STANDBY'],
+                    ['NVR-01', 3, 'NVR-01', '64 cameras', 'up'], ['NVR-02', 3, 'NVR-02', '32 cameras', 'up'], ['ACS-01', 3, 'ACS-01', 'doors 1-24', 'up'], ['ACS-02', 3, 'ACS-02', 'doors 25-48', 'up'], ['IDS-01', 3, 'IDS-01', '24 zones', 'up'], ['PIR', 3, 'PIR fence', '12 sectors', 'up']
+                ],
+                edges: [
+                    ['SW-SEC-A', 'SOC', 7, 'up'], ['SW-SEC-A', 'MN', 8, 'up'], ['SECFW', 'SW-SEC-A', null, 'up'], ['VMS', 'SW-SEC-A', null, 'warn'], ['SW-SEC-A', 'SW-SEC-B', 6, 'stby', 'peer'],
+                    ['NVR-01', 'SW-SEC-A', 0, 'up'], ['NVR-02', 'SW-SEC-A', 1, 'up'], ['ACS-01', 'SW-SEC-A', 2, 'up'], ['ACS-02', 'SW-SEC-A', 3, 'up'], ['IDS-01', 'SW-SEC-A', 4, 'up'], ['PIR', 'SW-SEC-A', 5, 'up']
+                ]
+            },
+            mgmt: {
+                zones: [{ label: 'OOB / MANAGEMENT PLANE · isolated', from: 'OOBFW', to: 'ILO' }],
+                nodes: [
+                    ['SRA', 0, 'Secure remote access', 'MFA', 'up'],
+                    ['OOBFW', 1, 'OOB firewall', 'zone boundary', 'up'], ['JUMP', 1, 'Jump host', 'MFA enforced', 'up'],
+                    ['SW-MGMT-A', 2, 'SW-MGMT-A', 'OOB · DUTY', 'up'], ['SW-MGMT-B', 2, 'SW-MGMT-B', 'standby OOB', 'stby', 'STANDBY'], ['CONS', 2, 'Console server', '32 ports', 'up'],
+                    ['ILO', 3, 'BMC / iLO / iDRAC', 'all hosts reachable', 'up', '100 %']
+                ],
+                edges: [
+                    ['SRA', 'OOBFW', null, 'up', 'conduit'], ['OOBFW', 'JUMP', null, 'up'], ['SW-MGMT-A', 'JUMP', 0, 'up'], ['SW-MGMT-B', 'JUMP', 2, 'stby'],
+                    ['SW-MGMT-A', 'ILO', 1, 'up'], ['SW-MGMT-A', 'CONS', null, 'up'], ['CONS', 'ILO', null, 'up']
+                ]
+            },
+            wan: {
+                zones: [],
+                nodes: [
+                    ['ISP-1', 0, 'ISP-1', 'transit · BGP UP', 'up'], ['ISP-2', 0, 'ISP-2', 'AS-path prepend', 'stby', 'STANDBY'], ['SBY01', 0, 'DCI SBY01', 'protected lambda', 'up', 'LAMBDA UP'], ['MKS', 0, 'DCI MKS (3rd)', 'tertiary path', 'stby', 'STANDBY'],
+                    ['RTR-A', 1, 'WAN router A', 'RTR-BKS01', 'up'], ['RTR-B', 1, 'WAN router B', 'RTR-BKS01', 'up'],
+                    ['VRF', 2, 'Transit VRF', 'route policy', 'up'], ['NTP', 2, 'NTP Stratum-1', 'locked', 'up', 'LOCKED'],
+                    ['ROUTES', 3, 'Customer / OT routes', 'to SW-CORE-A/B', 'up']
+                ],
+                edges: [
+                    ['ISP-1', 'RTR-A', 0, 'up'], ['ISP-2', 'RTR-B', 1, 'stby'], ['SBY01', 'RTR-A', 2, 'up'], ['MKS', 'RTR-B', 3, 'stby'],
+                    ['RTR-A', 'RTR-B', null, 'up', 'peer'], ['RTR-A', 'VRF', null, 'up'], ['RTR-B', 'VRF', null, 'stby'], ['NTP', 'VRF', null, 'up', 'conduit'], ['VRF', 'ROUTES', null, 'up']
+                ]
+            },
+            mon: {
+                zones: [],
+                nodes: [
+                    ['RELAY', 0, 'Notification relay', 'e-mail / SMS', 'up'],
+                    ['MONSRV', 1, 'Monitoring server', 'healthy 99.7 %', 'up', 'HEALTHY'], ['ENGINE', 1, 'Notification engine', 'active', 'up'],
+                    ['PROBE-B', 2, 'Remote probe BKS01', 'connected', 'up'], ['PROBE-S', 2, 'Remote probe SBY01', 'connected', 'up'], ['COLL', 2, 'Polling collectors', '2 UP', 'up'],
+                    ['SENS', 3, 'Sensors', '2 WARN · 1 stale', 'warn', '2 WARN'], ['HIST', 3, 'Historian', 'write OK', 'up'], ['UPSB', 3, 'UPS-B input bank', 'stale > 60 s', 'warn', 'STALE']
+                ],
+                edges: [
+                    ['MONSRV', 'RELAY', null, 'up'], ['MONSRV', 'ENGINE', null, 'up'], ['MONSRV', 'PROBE-B', null, 'up'], ['MONSRV', 'PROBE-S', null, 'up'], ['PROBE-B', 'COLL', null, 'up'],
+                    ['COLL', 'SENS', null, 'warn'], ['COLL', 'HIST', null, 'up'], ['COLL', 'UPSB', null, 'warn']
+                ]
+            }
+        };
+        /* Simulated scenarios (doc-19 §10): they change the DRAWING and the inspector impact text only; the
+           authored alarm register is not rewritten, and the panel says so. */
+        var ARCH_SCENARIOS = {
+            normal: { label: 'Normal (authored state)', note: '' },
+            'core-a-fail': { label: 'Core A fail', note: 'SW-CORE-A FAULT → SW-CORE-B takes DUTY; fabric survives on the N+1 path (40 Gbps survivable); customer L3 edge re-homes.',
+                it: { nodes: { 'SW-CORE-A': ['bad', 'FAULT'], 'SW-CORE-B': ['up', 'FAILOVER DUTY', 'core'] }, edges: { '4': 'bad', '5': 'up', '7': 'bad', '8': 'up', '17': 'bad' } } },
+            'wan-primary-loss': { label: 'WAN primary loss', note: 'ISP-1 DOWN → ISP-2 becomes active under AS-path policy; DCI lambda unaffected; transit capacity 10 Gbps single path.',
+                wan: { nodes: { 'ISP-1': ['bad', 'DOWN'], 'ISP-2': ['up', 'FAILOVER ACTIVE', 'transit'] }, edges: { '0': 'bad', '1': 'up' } }, it: { nodes: { 'ISP-1': ['bad', 'DOWN'], 'ISP-2': ['up', 'FAILOVER ACTIVE', 'transit'] }, edges: { '0': 'bad', '1': 'up' } } },
+            'bms-gw-offline': { label: 'BMS gateway offline', note: 'BMS-GW-01 OFFLINE → all six facility gateways go STALE (no polling); fire panel supervision continues on its own loop.',
+                bms: { nodes: { 'BMS-GW-01': ['bad', 'OFFLINE'], 'EPMS-GW': ['warn', 'STALE'], 'CHILLER-GW': ['warn', 'STALE'], 'DATAHALL-GW': ['warn', 'STALE'], 'FIRE-GW': ['warn', 'STALE'], 'FUEL-GW': ['warn', 'STALE'], 'WATER-GW': ['warn', 'STALE'] }, edges: { '2': 'bad', '3': 'bad', '4': 'warn', '5': 'warn', '6': 'warn', '7': 'warn', '8': 'warn', '9': 'warn' } } },
+            'camera-vlan-degraded': { label: 'Camera VLAN degraded', note: 'SW-SEC-A DEGRADED → NVR streams drop frames; SW-SEC-B trunk ready but not preferred; SOC feed at risk.',
+                sec: { nodes: { 'SW-SEC-A': ['warn', 'DEGRADED'], 'NVR-01': ['warn', 'FRAME LOSS'], 'NVR-02': ['warn', 'FRAME LOSS'] }, edges: { '5': 'warn', '6': 'warn', '0': 'warn' } } },
+            'historian-unreachable': { label: 'Historian unreachable', note: 'Historian UNREACHABLE → OT trend writes buffer at the gateway; monitoring collectors mark stale.',
+                mon: { nodes: { 'HIST': ['bad', 'UNREACHABLE'] }, edges: { '6': 'bad' } }, bms: { nodes: { 'HIST': ['bad', 'UNREACHABLE'] }, edges: { '1': 'bad' } } }
+        };
+        var archScenario = 'normal';
+        var ARCH_LAYERS = ['External / DCI', 'Edge / Core', 'Fabric / Access', 'Racks / Services'];
+        var ARCH_W = 1180, ARCH_BAND = 118, ARCH_TOP = 16, NODE_W = 178, NODE_H = 46, ARCH_LBL_W = 96;
+        function archModel(key) {
+            var spec = ARCH[key] || ARCH.it;
+            var scn = ARCH_SCENARIOS[archScenario] || ARCH_SCENARIOS.normal;
+            var ov = scn[key] || { nodes: {}, edges: {} };
+            var perLayer = [[], [], [], []], nodes = {}, list = [];
+            for (var i = 0; i < spec.nodes.length; i++) {
+                var n = spec.nodes[i];
+                var st = n[4], stTxt = n[5] || n[4].toUpperCase();
+                var sub = n[3];
+                if (ov.nodes && ov.nodes[n[0]]) { st = ov.nodes[n[0]][0]; stTxt = ov.nodes[n[0]][1]; if (ov.nodes[n[0]][2]) sub = ov.nodes[n[0]][2]; }
+                var node = { id: n[0], layer: n[1], label: n[2], sub: sub, state: st, stateText: stTxt };
+                perLayer[n[1]].push(node); nodes[n[0]] = node; list.push(node);
+            }
+            for (var L = 0; L < 4; L++) {
+                var row = perLayer[L], span = ARCH_W - ARCH_LBL_W - 24, step = span / row.length;
+                for (var c = 0; c < row.length; c++) {
+                    row[c].x = ARCH_LBL_W + 12 + step * c + step / 2;
+                    row[c].y = ARCH_TOP + ARCH_BAND * L + ARCH_BAND / 2;
+                    row[c].w = Math.min(NODE_W, Math.floor(step) - 10);
+                }
+            }
+            var edges = [];
+            for (var e = 0; e < spec.edges.length; e++) {
+                var d = spec.edges[e];
+                edges.push({ i: e, from: nodes[d[0]], to: nodes[d[1]], link: d[2], state: (ov.edges && ov.edges[String(e)]) || d[3], kind: d[4] || 'link' });
+            }
+            return { key: key, nodes: list, byId: nodes, edges: edges, zones: spec.zones || [], scenario: scn };
+        }
+        function archEdgePath(ed, m) {
+            var a = ed.from, b = ed.to;
+            if (a.layer === b.layer) {
+                var l = a.x < b.x ? a : b, r = a.x < b.x ? b : a, skips = false;
+                for (var q = 0; m && q < m.nodes.length; q++) {
+                    var o = m.nodes[q];
+                    if (o.layer === a.layer && o.x > l.x && o.x < r.x) { skips = true; break; }
+                }
+                if (skips) {
+                    var yy = l.y - NODE_H / 2 - 12;
+                    return 'M' + l.x + ' ' + (l.y - NODE_H / 2) + ' V' + yy + ' H' + r.x + ' V' + (r.y - NODE_H / 2);
+                }
+                return 'M' + (l.x + l.w / 2) + ' ' + l.y + ' H' + (r.x - r.w / 2);
+            }
+            var top = a.layer < b.layer ? a : b, bot = a.layer < b.layer ? b : a;
+            var y1 = top.y + NODE_H / 2, y2 = bot.y - NODE_H / 2, mid = Math.round((y1 + y2) / 2);
+            if (bot.layer - top.layer > 1) {
+                /* a path that skips a layer runs down the right margin so it never cuts through the fabric */
+                var mx = ARCH_W - 14;
+                return 'M' + top.x + ' ' + y1 + ' V' + (y1 + 14) + ' H' + mx + ' V' + (y2 - 14) + ' H' + bot.x + ' V' + y2;
+            }
+            if (Math.abs(top.x - bot.x) < 1) return 'M' + top.x + ' ' + y1 + ' V' + y2;
+            return 'M' + top.x + ' ' + y1 + ' V' + mid + ' H' + bot.x + ' V' + y2;
+        }
+        function esc(str) { return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+        function renderArchitecture(key) {
+            var m = archModel(key), seg = SEGMENTS[key];
+            var H = ARCH_TOP + ARCH_BAND * 4 + 8;
+            var svg = '<svg class="ict-arch" viewBox="0 0 ' + ARCH_W + ' ' + H + '" role="group" aria-label="' + esc(seg.title) + ' network architecture">';
+            for (var L = 0; L < 4; L++) {
+                var y = ARCH_TOP + ARCH_BAND * L;
+                svg += '<rect class="band" x="4" y="' + y + '" width="' + (ARCH_W - 8) + '" height="' + ARCH_BAND + '"/>'
+                    + '<text class="band-lbl" x="14" y="' + (y + 18) + '">' + esc(ARCH_LAYERS[L]) + '</text>';
+            }
+            for (var z = 0; z < m.zones.length; z++) {
+                var zn = m.zones[z], A = m.byId[zn.from], B = m.byId[zn.to];
+                if (!A || !B) continue;
+                var zx1 = Math.min(A.x - A.w / 2, B.x - B.w / 2) - 10, zx2 = Math.max(A.x + A.w / 2, B.x + B.w / 2) + 10;
+                var zy1 = Math.min(A.y, B.y) - NODE_H / 2 - 22, zy2 = Math.max(A.y, B.y) + NODE_H / 2 + 8;
+                svg += '<rect class="zone" x="' + zx1 + '" y="' + zy1 + '" width="' + (zx2 - zx1) + '" height="' + (zy2 - zy1) + '" rx="4"/>'
+                    + '<text class="zone-lbl" x="' + (zx1 + 8) + '" y="' + (zy1 - 5) + '">' + esc(zn.label) + '</text>';
+            }
+            for (var e = 0; e < m.edges.length; e++) {
+                var ed = m.edges[e], d = archEdgePath(ed, m), lk = ed.link !== null && seg.links ? seg.links[ed.link] : null;
+                var medium = key === 'bms' ? 'signal' : (ed.kind === 'conduit' ? 'signal' : (lk && lk[2] >= 10 ? 'fiber' : 'copper'));
+                var lineState = ed.state === 'up' ? 'energized' : ed.state === 'stby' ? 'standby' : ed.state === 'bad' ? 'fault' : ed.state === 'warn' ? 'fault' : 'de-energized';
+                var current = lk ? (lk[7] === 'up' ? lk[3].toFixed(2) + ' Gbps / ' + lk[2] + ' Gbps' : 'standby') : (ed.kind === 'conduit' ? 'controlled conduit' : ed.state.toUpperCase());
+                svg += '<path class="edge-hit" d="' + d + '" data-edge="' + e + '"/>'
+                    + '<path class="edge ' + esc(ed.state) + (ed.kind === 'conduit' ? ' conduit' : '') + '" d="' + d + '" data-edge="' + e + '"'
+                    + (ed.link !== null ? ' data-link="' + ed.link + '"' : '')
+                    + ' data-rz-line="1" data-id="ict-' + key + '-' + e + '" data-from="' + esc(ed.from.id) + '" data-to="' + esc(ed.to.id) + '" data-medium="' + medium + '"'
+                    + ' data-direction="' + (ed.kind === 'peer' ? 'bidirectional' : 'forward') + '" data-state="' + lineState + '"'
+                    + (lk ? ' data-capacity="' + lk[2] + ' Gbps"' : '') + ' data-current="' + esc(current) + '"'
+                    + ' data-redundancy="' + (ed.state === 'stby' ? 'standby' : ed.kind === 'peer' ? 'redundant_a' : 'duty') + '"/>';
+                if (lk) {
+                    var top = ed.from.layer <= ed.to.layer ? ed.from : ed.to, bot = top === ed.from ? ed.to : ed.from;
+                    var mx, my;
+                    if (ed.from.layer === ed.to.layer) { mx = (ed.from.x + ed.to.x) / 2 - 30; my = /V/.test(d) ? ed.from.y - NODE_H / 2 - 16 : ed.from.y - 6; }
+                    else if (Math.abs(ed.to.layer - ed.from.layer) > 1) { mx = top.x; my = top.y + NODE_H / 2 + 12; }
+                    else { mx = bot.x - bot.w / 2 + 2; my = bot.y - NODE_H / 2 - 5; }
+                    var flow = lk[7] !== 'up' ? 'stby' : (lk[3] < 1 ? Math.round(lk[3] * 1000) + ' Mbps' : lk[3].toFixed(1) + ' Gbps');
+                    var capTxt = lk[2] < 1 ? Math.round(lk[2] * 1000) + 'M' : lk[2] + 'G';
+                    svg += '<text class="edge-lbl" data-edge-lbl="' + e + '" x="' + mx + '" y="' + my + '">' + esc(capTxt + ' · ' + flow) + '</text>';
+                }
+            }
+            for (var n = 0; n < m.nodes.length; n++) {
+                var nd = m.nodes[n], x = nd.x - nd.w / 2, y0 = nd.y - NODE_H / 2;
+                svg += '<g class="node ' + esc(nd.state) + '" data-node="' + esc(nd.id) + '" tabindex="0" role="button" aria-label="' + esc(nd.label + ' ' + nd.stateText) + '">'
+                    + '<rect x="' + x + '" y="' + y0 + '" width="' + nd.w + '" height="' + NODE_H + '" rx="3"/>'
+                    + '<circle class="n-dot" cx="' + (x + 11) + '" cy="' + (y0 + 14) + '" r="3.5"/>'
+                    + '<text class="n-lbl" x="' + (x + 20) + '" y="' + (y0 + 18) + '">' + esc(nd.label) + '</text>'
+                    + '<text class="n-sub" x="' + (x + 8) + '" y="' + (y0 + 35) + '">' + esc(nd.sub) + '</text>'
+                    + '<text class="n-st" x="' + (x + nd.w - 8) + '" y="' + (y0 + 35) + '" text-anchor="end">' + esc(nd.stateText) + '</text>'
+                    + '</g>';
+            }
+            svg += '</svg>';
+            var opts = '';
+            for (var k in ARCH_SCENARIOS) if (ARCH_SCENARIOS.hasOwnProperty(k)) opts += '<option value="' + k + '"' + (k === archScenario ? ' selected' : '') + '>' + esc(ARCH_SCENARIOS[k].label) + '</option>';
+            var note = m.scenario.note ? '<div class="arch-scn-note"><b>SIMULATED SCENARIO · ' + esc(m.scenario.label) + ':</b> ' + esc(m.scenario.note) + ' The authored alarm register is not rewritten by a drawing scenario.</div>' : '';
+            return '<div class="panel"><div class="panel-head">Network Architecture'
+                + '<span class="ph-meta">campus schematic · click a node for its fault domain, an edge for its link</span></div>'
+                + '<div class="panel-body"><div class="arch-toolbar"><label for="arch-scenario">Scenario</label><select id="arch-scenario">' + opts + '</select>'
+                + '<span class="legend"><span><i></i>up</span><span><i class="stby"></i>standby</span><span><i class="warn"></i>warning</span><span><i class="bad"></i>fault</span><span><i class="sel"></i>selected</span></span></div>'
+                + '<div class="arch-wrap">' + svg + '</div>' + note + '</div></div>';
+        }
+        function archDownstream(m, id) {
+            var seen = {}, stack = [id];
+            while (stack.length) {
+                var cur = stack.pop(); if (seen[cur]) continue; seen[cur] = true;
+                for (var e = 0; e < m.edges.length; e++) {
+                    var ed = m.edges[e];
+                    /* fault domain = what sits BELOW this node on a live path: never walk a standby path,
+                       a peer link, or back up towards the edge (a customer edge failing over to ISP-2 is
+                       not ISP-2 depending on the customer edge) */
+                    if (ed.from.id === cur && ed.kind !== 'peer' && ed.state !== 'stby' && ed.to.layer >= ed.from.layer) stack.push(ed.to.id);
+                }
+            }
+            return seen;
+        }
+        function archHighlightEdge(idx) {
+            var svgEl = document.querySelector('#canvas svg.ict-arch'); if (!svgEl) return;
+            var edges = svgEl.querySelectorAll('.edge'), lbls = svgEl.querySelectorAll('.edge-lbl');
+            for (var i = 0; i < edges.length; i++) edges[i].classList.toggle('sel', edges[i].getAttribute('data-edge') === String(idx));
+            for (var j = 0; j < lbls.length; j++) lbls[j].classList.toggle('sel', lbls[j].getAttribute('data-edge-lbl') === String(idx));
+            svgEl.querySelectorAll('.node.sel,.node.dim,.edge.dim').forEach(function (el) { el.classList.remove('sel', 'dim'); });
+        }
+        function showNodeDetail(key, id) {
+            var m = archModel(key), nd = m.byId[id]; if (!nd) return;
+            var down = archDownstream(m, id), up = [], dn = [];
+            for (var e = 0; e < m.edges.length; e++) {
+                if (m.edges[e].to.id === id) up.push(m.edges[e].from.label);
+                if (m.edges[e].from.id === id) dn.push(m.edges[e].to.label);
+            }
+            var affected = [];
+            for (var n = 0; n < m.nodes.length; n++) if (down[m.nodes[n].id] && m.nodes[n].id !== id) affected.push(m.nodes[n].label);
+            var stCls = nd.state === 'up' ? 'ok' : (nd.state === 'stby' ? '' : nd.state === 'bad' ? 'bad' : 'warn');
+            document.getElementById('insp-title').textContent = SEGMENTS[key].title;
+            document.getElementById('insp-sub').textContent = nd.label;
+            document.getElementById('insp-detail').innerHTML =
+                '<h4>Node</h4>' + kv('Device', nd.label) + kv('Role', nd.sub) + kv('Layer', ARCH_LAYERS[nd.layer])
+              + kv('State', nd.stateText, stCls) + kv('Upstream', up.length ? up.join(', ') : '—') + kv('Downstream', dn.length ? dn.join(', ') : '—')
+              + kv('Fault domain', affected.length ? affected.length + ' downstream: ' + affected.join(', ') : 'local (no downstream dependency)')
+              + kv('Scenario', m.scenario.label) + kv('Source', 'Authored architecture (basis)');
+            var svgEl = document.querySelector('#canvas svg.ict-arch'); if (!svgEl) return;
+            svgEl.querySelectorAll('.edge.sel,.edge-lbl.sel').forEach(function (el) { el.classList.remove('sel'); });
+            svgEl.querySelectorAll('.node').forEach(function (g) {
+                var nid = g.getAttribute('data-node');
+                g.classList.toggle('sel', nid === id);
+                g.classList.toggle('dim', !down[nid]);
+            });
+            svgEl.querySelectorAll('.edge').forEach(function (p) {
+                var fromId = p.getAttribute('data-from'), toId = p.getAttribute('data-to');
+                p.classList.toggle('dim', !(down[fromId] && down[toId]));
+            });
+        }
+        function bindArchitecture(key) {
+            var svgEl = document.querySelector('#canvas svg.ict-arch'); if (!svgEl) return;
+            svgEl.querySelectorAll('.node').forEach(function (g) {
+                g.addEventListener('click', function () { showNodeDetail(key, g.getAttribute('data-node')); });
+                g.addEventListener('keydown', function (ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); g.click(); } });
+            });
+            svgEl.querySelectorAll('.edge-hit,.edge').forEach(function (p) {
+                p.addEventListener('click', function () {
+                    var idx = parseInt(p.getAttribute('data-edge'), 10);
+                    var edge = svgEl.querySelector('.edge[data-edge="' + idx + '"]');
+                    archHighlightEdge(idx);
+                    var link = edge ? edge.getAttribute('data-link') : null;
+                    var rows = document.querySelectorAll('#canvas tr.linkrow');
+                    for (var x = 0; x < rows.length; x++) rows[x].classList.toggle('sel', link !== null && rows[x].getAttribute('data-i') === link);
+                    if (link !== null) { showLinkDetail(key, parseInt(link, 10)); }
+                    else {
+                        document.getElementById('insp-sub').textContent = edge.getAttribute('data-from') + ' → ' + edge.getAttribute('data-to');
+                        document.getElementById('insp-detail').innerHTML = '<h4>Path</h4>' + kv('From', edge.getAttribute('data-from')) + kv('To', edge.getAttribute('data-to'))
+                            + kv('Medium', edge.getAttribute('data-medium')) + kv('State', edge.getAttribute('data-current')) + kv('Redundancy', edge.getAttribute('data-redundancy')) + kv('Source', 'Authored architecture (basis)');
+                    }
+                });
+            });
+            var sel = document.getElementById('arch-scenario');
+            if (sel) sel.addEventListener('change', function () { archScenario = sel.value; renderSegment(key); });
+        }
+
         function renderNetworkTopology(key) {
             var layers = NETWORK_TOPOLOGY[key] || NETWORK_TOPOLOGY.it;
             var html = '<div class="panel"><div class="panel-head">Architecture / Topology'
@@ -1320,6 +1675,7 @@
                       + sv.n + '</span><span class="sval">' + sv.v + '</span></div>';
             }
             html += '</div>';
+            html += renderArchitecture(key);
             html += renderNetworkTopology(key);
 
             if (key === 'mon') {
@@ -1373,7 +1729,7 @@
                     var stLabel = st === 'up' ? 'UP' : (st === 'stby' ? 'STANDBY' : (st === 'warn' ? 'WARN' : 'DOWN'));
                     // v1.43.21 — semantic line-model metadata (ADDITIVE: hidden data-* only,
                     // derived from the existing row data; the displayed table is unchanged).
-                    var _ep = String(lk[0]).split('→');   // "FROM -> TO"
+                    var _ep = String(lk[0]).split(/→|↔/);   // "FROM -> TO" or "A <-> B"
                     var _from = (_ep[0] || '').trim(), _to = (_ep[1] || '').trim();
                     var _med = (cap >= 10 ? 'fiber' : 'copper');
                     var _state = up ? 'energized' : (st === 'stby' ? 'standby' : (st === 'warn' ? 'fault' : 'de-energized'));
@@ -1406,15 +1762,19 @@
             }
 
             document.getElementById('canvas').innerHTML = html;
+            bindArchitecture(key);
 
-            // Wire row selection
+            // Wire row selection (and the matching edge on the architecture canvas)
             var rows = document.querySelectorAll('#canvas tr.linkrow');
             for (var r = 0; r < rows.length; r++) {
                 rows[r].addEventListener('click', function () {
                     var rs = document.querySelectorAll('#canvas tr.linkrow');
                     for (var x = 0; x < rs.length; x++) rs[x].classList.remove('sel');
                     this.classList.add('sel');
-                    showLinkDetail(this.getAttribute('data-seg'), parseInt(this.getAttribute('data-i'), 10));
+                    var idx = parseInt(this.getAttribute('data-i'), 10);
+                    var edge = document.querySelector('#canvas svg.ict-arch .edge[data-link="' + idx + '"]');
+                    if (edge) archHighlightEdge(parseInt(edge.getAttribute('data-edge'), 10));
+                    showLinkDetail(this.getAttribute('data-seg'), idx);
                 });
             }
         }

@@ -156,6 +156,11 @@ metering exists; an equal division is not telemetry.
   equipment group opens the right-side inspector payload. Tank capacities are declared design selections.
 
 ### ICT / OT
+  **v2.9.0 — the architecture canvas.** Each segment draws `svg.ict-arch`: four layer bands, zone frames (OT =
+  segmented with controlled conduits, never "air-gapped"), nodes and edges built from the same authored
+  inventory the link table states; edges bound to link rows both ways; node inspector with fault domain (live
+  downstream set only); drawing-only scenarios with an impact note that says the alarm register is untouched.
+  Nothing on the drawing is a new count.
 
 Core/distribution/access/BMS-OT topology, installed/usable/N+1 capacity, traffic, utilization,
 latency, loss, jitter, redundancy, gateway reachability, cyber boundary and point quality.

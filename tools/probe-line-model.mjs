@@ -39,6 +39,7 @@ const ADOPTION_TARGETS = {
   'chiller-plant.html': 18,
   'water-system.html': 12,   /* v2.8.0 + cdw supply/return */
   'fire-system.html': 14,
+  'ict.html': 19,          /* v2.9.0 architecture canvas, default IT segment: 19 tagged edges */
   'fuel-system.html': 14   /* v2.7.0 fuel P&ID: fill/suction/2 discharge/header/3 DT feed/3 gen supply/polish side+return/DT return */
 };
 
@@ -49,7 +50,8 @@ const BREAKER_TARGETS = {
   'chiller-plant.html': 0,  /* P&ID has no breakers */
   'water-system.html': 0,
   'fire-system.html': 0,
-  'fuel-system.html': 0
+  'fuel-system.html': 0,
+  'ict.html': 0
 };
 
 let pass = 0, fail = 0;

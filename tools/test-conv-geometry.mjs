@@ -54,6 +54,7 @@ const DIAGRAMS = Object.freeze([
   { page: 'fire-system.html', selector: '#fire-svg', label: 'fire mimic' },
   { page: 'water-system.html', selector: '#water-svg', label: 'water process' },
   { page: 'fuel-system.html', selector: '#fuel-svg', label: 'fuel P&ID' },
+  { page: 'ict.html', selector: 'svg.ict-arch', label: 'ICT architecture (default segment)' },
   /* EPMS: the root SVG (viewBox 0 0 3600 2600) holds every layer — wires, flow, devices, breakers and
      the telemetry text. Targeting a single layer (e.g. #l-wires) reports texts=0 and measures nothing. */
   { page: 'EPMS_Telemetry.html', selector: 'svg#viewport', label: 'EPMS single-line' },
