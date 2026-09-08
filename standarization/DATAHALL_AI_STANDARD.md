@@ -607,3 +607,12 @@ SVG containers use CSS classes:
 - Max height: `calc(100vh - 160px)`
 
 The zoom system is initialized in the main script (line ~5920+) and applies to all SVG IDs.
+
+## Rack architecture drawing (v2.12.0)
+
+`#rackSvg` is a front elevation at three label tiers (9 / 7.5 / 7 user units) on a sheet that never
+renders below 1,200 px (`#p-rack #rackSvg { min-width: 1200px }`; it scrolls inside `.svg-zi`). No
+`<animate>` on a rack — risers are static with arrowheads. Glyphs: AC/DC shelf, GPU / CPU / NIC / DPU
+tray, port-row switch. Spec tables live in the HTML cards below the drawing, not in the SVG. Published
+per-tray leaves the registry does not carry (`gb300.cpuPerTray`, `nvswitchPerTray`, `cx8Gbps`) are drawn
+with a declaration, never with a hook. Every equipment hook and modal opener from §A5 is preserved.

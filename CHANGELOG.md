@@ -11,6 +11,36 @@ release sections rather than semver.
 
 ---
 
+## v2.12.0 — 2026-09-08
+
+### DC AI rack architecture redrawn (Track A, owner comment 2) + the SLD line-model follow-up
+
+Owner: *"Rack Architecture overlaps, animation, responsiveness, non-standard symbols."* Measured: 136
+labels, 75 of them under the 8.5 px legibility floor at 1,680 px and all 136 under it at 1,024 px (type
+authored at 3–4 user units); three published per-tray figures rendered as `—` because the adapter never
+carried them (Grace per tray, NVSwitch chips per tray, the 800 G port speed); evidence marks overlapping
+text; pulsing `<animate>` risers and rail lines; three spec panels drawn inside the SVG at 5-unit type.
+
+Now `#rackSvg` (960 × 690, never rendered below 1,200 px — it scrolls inside its zoom wrapper instead of
+shrinking) draws the rack as a front elevation with three label tiers (9 / 7.5 / 7 units; minimum 8.8 px
+at a 1,024 px viewport, 11 px at 1,680): eight power shelves with an AC/DC glyph, PSU modules and the
+shelf-level duty / spare rule; eighteen compute trays with GPU / CPU / NIC / DPU glyphs; nine NVSwitch
+trays; manifold, 48 VDC bus, leak detection and NVLink backplane rows; the power chip (rack kW, installed
+kW, shelf rule, feed current at line voltage); static coolant risers with arrowheads. The rail group shows
+four rack elevations, the leaf switch as a port-row switch symbol, the per-tray NIC / DPU line and the
+hall's rack / rail-group counts; the network rack is a stack of port-row blocks. The three spec panels
+moved to legible HTML cards under the drawing (`#rackCards`), hooks preserved. The adapter now carries
+`cpuPerTray`, `nvswitchPerTray` and `cx8Gbps` from the model's published GB300 leaves (declared as such —
+no registry id exists for them). Every `data-rz-equipment` hook (`rack-psu/ct/ns/manifold/busbar/leak/
+backplane`) and every modal opener is unchanged.
+
+Also in this ship: every SLD semantic line carries `data-from / to / medium / state` parsed from its
+topology edge id, and the runtime projection re-states `data-state` beside `data-semantic-state`, so
+`tools/probe-line-model.mjs` is green on `datahallAI.html` for the first time since v2.0.0.
+
+Gates: basis map (163 fields), inspector runtime, HMI payloads, basis hooks, no retired literals,
+operator UI, coverage `--strict --settle=9000 --modals` (rackSvg 21 numerals · 0 untraced), full ship gate.
+
 ## v2.11.0 — 2026-09-08
 
 ### One navigation language for both cockpit hubs (Track C, owner comment 18)

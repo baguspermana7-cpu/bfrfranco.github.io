@@ -378,6 +378,9 @@
       line.classList.toggle('rz-flow-partial', projection.partial);
       line.setAttribute('data-energized', String(projection.active));
       line.setAttribute('data-semantic-state', projection.semanticState);
+      /* v2.11.1 — the line-model state vocabulary, kept in step with the projection */
+      line.setAttribute('data-state', projection.active ? (projection.partial ? 'fault' : 'energized')
+        : (line.getAttribute('data-redundancy') === 'standby' ? 'standby' : 'de-energized'));
       line.setAttribute('data-source-ids', projection.sourceIds.join(' '));
       line.setAttribute('data-topology-edge-ids', projection.edgeIds.join(' '));
     });

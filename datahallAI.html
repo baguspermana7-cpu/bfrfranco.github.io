@@ -108,6 +108,8 @@ body>.rz-manual-link,.scroll-top-btn{display:none!important}
 .svg-zw{position:relative}.svg-zi{overflow:auto;cursor:grab;max-height:calc(100vh - 160px)}
 .svg-zi:active{cursor:grabbing}
 .svg-zi svg{display:block}
+/* v2.12.0 — the rack elevation is drawn at label tiers that need >= 1200 px of sheet; it scrolls inside .svg-zi, never shrinks */
+#p-rack #rackSvg{min-width:1200px;max-width:none}
 .svg-zb{position:sticky;top:0;float:right;display:flex;gap:3px;z-index:5;margin:4px 4px 0 0}
 .svg-zb button{width:28px;height:28px;border:1px solid var(--bd2);border-radius:5px;background:var(--bg2);color:var(--t1);cursor:pointer;font-family:'JetBrains Mono';font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:.15s;opacity:.7}
 .svg-zb button:hover{background:var(--bg3);opacity:1}
@@ -724,7 +726,7 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
     <link rel="stylesheet" href="css/rz-cockpit-nav.css?v=2.11.0">
     <link rel="stylesheet" href="css/datahall-ai-operator.css?v=2.3.1">
     <link rel="stylesheet" href="css/rz-design-studio.css?v=1.130.0">
-    <script src="js/datahall-ai/operator-ui.js?v=2.3.0" defer></script>
+    <script src="js/datahall-ai/operator-ui.js?v=2.11.1" defer></script>
     <script src="js/datahall-ai/equipment-inspector.js?v=2.3.1" defer></script>
     <script src="js/datahall-ai/fire-workstation.js?v=2.3.0" defer></script>
 <style id="rz-skiplink-v1">
@@ -983,7 +985,7 @@ Requested model/calculation versions and the complete locked schema must validat
 
 <div class="pn" id="p-rack">
 <div class="bx"><h3>Rack Architecture</h3><div class="dh-primary-q" style="font-size:10px;color:var(--t3);margin:2px 0 4px;font-style:italic;letter-spacing:.03em;">Primary read: <span style="color:var(--t2);">how is an NVL72 built — and what is the current risk on the selected rack?</span></div><div class="su" id="rackSu" data-basis-param="compute.gpu_per_rack" data-basis-params="compute.gpu_per_rack power.rack_it_kw compute.nvswitch_per_rack compute.cpu_per_rack power.shelf_kw power.shelf_installed_kw distribution.rack_feed_current_a compute.nvlink_domain_tbs power.shelves_duty power.shelves_spare" tabindex="0" role="button" style="cursor:pointer"></div>
-<svg id="rackSvg" viewBox="0 0 960 470" preserveAspectRatio="xMidYMid meet" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="rackC"></g></svg></div>
+<svg id="rackSvg" viewBox="0 0 960 690" preserveAspectRatio="xMidYMid meet" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="rackC"></g></svg></div>
 <details class="dh-specwrap" open><summary>Specifications &amp; detail panels<span class="dh-spec-cv" aria-hidden="true">&#9656;</span></summary><div class="gr" id="rackCards"></div></details>
 <section class="rz-ops-section" aria-labelledby="rackDensityTitle">
   <div class="rz-ops-section__head">
@@ -1355,6 +1357,7 @@ var DH=(function(){
     cpuPerRack:Cm.cpu_per_rack,
     nvswitchTrays:M.gb300.nvswitchTrays,                  /* 9 */
     cx8PerTray:M.gb300.cx8PerTray, bf3PerTray:M.gb300.bf3PerTray,
+    cpuPerTray:M.gb300.cpuPerTray, nvswitchPerTray:M.gb300.nvswitchPerTray, cx8Gbps:M.gb300.cx8Gbps,   /* PUBLISHED per-tray leaves (rack view) */
     nicsFacility:Cm.cx8_nics_facility, dpusFacility:Cm.bf3_dpus_facility,
     fabricPbs:rd(Cm.cx8_bandwidth_pbs,1),
     /* ---- power (owner: 500 MW = RACK IT; total IT is published alongside, Rule 4) ---- */
@@ -4101,6 +4104,16 @@ var DEAD='rgba(107,114,128,.35)',DEAD_BG='rgba(107,114,128,.06)',DEAD_DASH='4 3'
 // Engine-bound flow lines. Geometry never decides state; every segment carries
 // an explicit topology edge (or rack-edge prefix) and fails closed if unmapped.
 var semanticLineSeq=0;
+/* v2.11.1 — every semantic line names its endpoints, medium and first-paint state so the
+   line-model probe (from / to / medium / state) can audit the SLD; the runtime projection in
+   operator-ui.js re-states data-state on every scenario paint. Endpoints are parsed from the
+   topology edge id, never typed a second time. */
+var SEM_NODE_RE=/(GEN-BUS|GENSET|RMU-[AB]|TX-[AB]|ATS-[AB]|MSB-[AB]|UPS-[AB]|BUSWAY-[AB]|RPP-[AB]-\d\d|RPP-[AB]|RG-\d\d)/g;
+function semAttrs(edgeId,prefix,standby){
+var src=edgeId||prefix||'',m=src.replace(/^EDGE-/,'').match(SEM_NODE_RE)||[],from=m[0]||'',to=m[1]||(prefix?'RG':'');
+var head=from.replace(/-.*$/,''),medium=head==='RMU'?'power_mv':head==='UPS'?'ups_feed':head==='BUSWAY'?'busway':'power_lv';
+return' data-from="'+from+'" data-to="'+to+'" data-medium="'+medium+'" data-direction="forward" data-state="'+(standby?'standby':'energized')+'"';
+}
 function lineBinding(y1,y2,c){
 var feed=c===CA?'A':c===CG?'B':'',bottom=Math.max(y1,y2);
 if(!feed)return null;
@@ -4116,7 +4129,7 @@ return{prefix:'EDGE-RPP-'+feed+'-',role:'redundant_'+feed.toLowerCase()};
 }
 function fLine(x1,y1,x2,y2,c,ani,op,sw){
 var binding=lineBinding(y1,y2,c),attrs='';semanticLineSeq++;
-if(binding){attrs=' data-rz-line="1" data-id="dh'+n+'-semantic-'+semanticLineSeq+'" data-hall="dh0'+n+'" data-redundancy="'+binding.role+'"'+(binding.edge?' data-topology-edge="'+binding.edge+'"':' data-topology-prefix="'+binding.prefix+'"');}
+if(binding){attrs=' data-rz-line="1" data-id="dh'+n+'-semantic-'+semanticLineSeq+'" data-hall="dh0'+n+'" data-redundancy="'+binding.role+'"'+(binding.edge?' data-topology-edge="'+binding.edge+'"':' data-topology-prefix="'+binding.prefix+'"')+semAttrs(binding.edge,binding.prefix,false);}
 return'<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+c+'" stroke-width="'+(sw||1.4)+'" class="'+(ani||'fD')+'" opacity="'+(op||.5)+'"'+attrs+'/>';
 }
 function pad2(i){return(i<10?'0':'')+i;}
@@ -4125,17 +4138,17 @@ function pad2(i){return(i<10?'0':'')+i;}
    instead of falling through lineBinding's generic band. */
 function groupLine(x1,y1,x2,y2,c,feed,gid,ani){
 semanticLineSeq++;
-return'<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+c+'" stroke-width="1" class="'+(ani||'fL')+'" opacity=".4" data-rz-line="1" data-id="dh'+n+'-semantic-'+semanticLineSeq+'" data-hall="dh0'+n+'" data-redundancy="redundant_'+feed.toLowerCase()+'" data-topology-edge="EDGE-BUSWAY-'+feed+'-RPP-'+feed+'-'+gid+'"/>';
+return'<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+c+'" stroke-width="1" class="'+(ani||'fL')+'" opacity=".4" data-rz-line="1" data-id="dh'+n+'-semantic-'+semanticLineSeq+'" data-hall="dh0'+n+'" data-redundancy="redundant_'+feed.toLowerCase()+'" data-topology-edge="EDGE-BUSWAY-'+feed+'-RPP-'+feed+'-'+gid+'"'+semAttrs('EDGE-BUSWAY-'+feed+'-RPP-'+feed+'-'+gid,null,false)+'/>';
 }
 /* RPP -> rack_group edge (EDGE-RPP-A-07-RG-07) with the group tick. */
 function rgStub(x1,y1,x2,y2,c,feed,gid){
 semanticLineSeq++;
-return'<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+c+'" stroke-width=".8" opacity=".45" data-rz-line="1" data-id="dh'+n+'-semantic-'+semanticLineSeq+'" data-hall="dh0'+n+'" data-redundancy="redundant_'+feed.toLowerCase()+'" data-topology-edge="EDGE-RPP-'+feed+'-'+gid+'-RG-'+gid+'"/>'
+return'<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+c+'" stroke-width=".8" opacity=".45" data-rz-line="1" data-id="dh'+n+'-semantic-'+semanticLineSeq+'" data-hall="dh0'+n+'" data-redundancy="redundant_'+feed.toLowerCase()+'" data-topology-edge="EDGE-RPP-'+feed+'-'+gid+'-RG-'+gid+'"'+semAttrs('EDGE-RPP-'+feed+'-'+gid+'-RG-'+gid,null,false)+'/>'
 +'<circle cx="'+x2+'" cy="'+y1+'" r="2" fill="none" stroke="'+c+'" stroke-width=".6" opacity=".7"/>';
 }
 // Dead/standby line (gray dashed, no animation)
 function deadLine(x1,y1,x2,y2,sw){return'<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+DEAD+'" stroke-width="'+(sw||1)+'" stroke-dasharray="'+DEAD_DASH+'" opacity=".5"/>'}
-function semanticStandbyLine(id,edgeId,x1,y1,x2,y2){return'<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="var(--o)" stroke-width="1.2" stroke-dasharray="4 3" opacity=".55" data-rz-line="1" data-id="'+id+'" data-hall="dh0'+n+'" data-topology-edge="'+edgeId+'" data-redundancy="standby"/>'}
+function semanticStandbyLine(id,edgeId,x1,y1,x2,y2){return'<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="var(--o)" stroke-width="1.2" stroke-dasharray="4 3" opacity=".55" data-rz-line="1" data-id="'+id+'" data-hall="dh0'+n+'" data-topology-edge="'+edgeId+'" data-redundancy="standby"'+semAttrs(edgeId,null,true)+'/>'}
 
 // CB with label BESIDE it — side='R' (right) or 'L' (left)
 function cblSide(x,y,id,sp,c,side){
@@ -7614,6 +7627,11 @@ var pb=$('pueBadgeV');if(pb)pb.textContent=pue2;
  * invented here — it is simply absent.
  * ==========================================================================*/
 (function(){const el=$('rackC');if(!el)return;let s='';
+/* v2.12.0 — REDRAWN (owner comment 2: overlaps, animation, responsiveness, non-standard symbols).
+   Label tiers only (9 / 7.5 / 7 user units on a 960-wide sheet that never renders below 1200 px,
+   so nothing sits under the 8.5 px legibility floor); no <animate> pulses (a rack is not a pump);
+   IEC-style glyphs for the AC/DC shelf, the tray and the switch; the three spec panels moved to
+   the HTML cards below the drawing where they are legible. Every number is hooked (bo) or declared. */
 const DASH='—';
 function bn(k){var v=DHE?DHE[k]:null;return (typeof v==='number'&&isFinite(v))?v:null}
 function bs(k){var v=DHE?DHE[k]:null;return (typeof v==='string'&&v)?v:null}
@@ -7623,133 +7641,117 @@ function pad2(n){return String(n).padStart(2,'0')}
 const CT=bn('computeTrays'),NS=bn('nvswitchTrays'),SH=bn('powerShelves');
 const SHD=bn('shelvesDuty'),SHS=bn('shelvesSpare'),SHKW=bn('shelfKw'),PSU=bn('psuPerRack');
 const GPU=bn('gpuPerRack'),KW=bn('kwPerRack'),FEED=bn('rackFeedA');
-const CX8=bn('cx8PerTray'),BF3=bn('bf3PerTray');
+const CX8=bn('cx8PerTray'),BF3=bn('bf3PerTray'),CX8G=bn('cx8Gbps'),NSPT=bn('nvswitchPerTray');
 const gpuTray=(GPU!=null&&CT)?GPU/CT:null;
 const cpuTray=bn('cpuPerTray');
 const psuShelf=(PSU!=null&&SH)?PSU/SH:null;
-const psuKw=(SHKW!=null&&psuShelf)?SHKW/psuShelf:null;
 const instKw=(SH!=null&&SHKW!=null)?SH*SHKW:null;
 const REDN=bs('shelfRedundancy');
+const PUB='per-tray GPU / CPU / NIC / DPU counts, the 800 Gb/s port speed and the 2 NVSwitch chips per tray are PUBLISHED GB300 NVL72 figures (model leaves gb300.*), drawn as labels — not engine quantities';
 const trayTxt=em(gpuTray)+'× B300 + '+em(cpuTray)+'× Grace';
 $('rackSu').textContent='GB300 NVL72 — one rack = one NVLink domain of '+em(GPU)+' GPU | '
  +em(CT)+'× compute tray (2U) + '+em(NS)+'× NVSwitch tray (1U) + '+em(SH)+'× power shelf ('
  +em(SHD)+' duty + '+em(SHS)+' spare, '+em(REDN)+') + manifold + bus bar + backplane';
-const RK=440;
-/* ---- RACK A — the whole NVL72 domain ---------------------------------- */
-s+=bx(15,10,190,RK,'rgba(34,197,94,.3)',4)+tx(110,6,'GB300 NVL72 RACK — '+em(GPU)+' GPU DOMAIN','var(--g)',7,'middle',1,bo('gpuPerRack'));
-/* power shelves: duty/spare is a SHELF-level rule (N+3), not a PSU-level one */
-if(SH!=null){for(let i=0;i<SH;i++){const y=16+i*7,duty=(SHD==null)||(i<SHD);
-s+=`<g data-tip="Power shelf PS-${i+1}: ${em(psuShelf)}× ${em(psuKw)} kW rectifier modules = ${em(SHKW)} kW per shelf, 400VAC→48VDC. Rack has ${em(SH)} shelves (${em(SHD)} duty + ${em(SHS)} spare, ${em(REDN)}) = ${em(instKw)} kW installed for a ${em(KW)} kW rack." data-rack="psu" data-rz-equipment="rack-psu:1" tabindex="0" role="button" data-id="${i+1}" style="cursor:pointer">`;
-s+=`<rect x="23" y="${y}" width="175" height="6" rx="1" fill="rgba(245,158,11,${duty?.14:.05})" stroke="rgba(245,158,11,${duty?.45:.2})" stroke-width=".4"/>`;
-s+=tx(110,y+4.6,'PS-'+(i+1)+' '+em(SHKW)+' kW · '+em(psuShelf)+' PSU · '+(duty?'DUTY':'SPARE'),duty?'var(--o)':'var(--t3)',3.2,'middle',0,bo('shelfKw',{nomark:i>0}));
-s+='</g>';}}
-/* compute trays — 11 px pitch */
-if(CT!=null){for(let i=0;i<CT;i++){const y=76+i*11;
-s+=`<g data-tip="Compute tray CT-${pad2(i+1)}: ${trayTxt} on blind-mate hot-swap rails, ${em(CX8)}× ConnectX-8 800G + ${em(BF3)}× BlueField-3, Cu microchannel cold plates on GPU and CPU." data-rack="ct" data-rz-equipment="rack-ct:1" tabindex="0" role="button" data-id="${i+1}" style="cursor:pointer">`;
-s+=`<rect x="23" y="${y}" width="175" height="9" rx="1.5" fill="rgba(34,197,94,${(.13-.004*i).toFixed(3)})" stroke="rgba(34,197,94,${(.34-.011*i).toFixed(3)})" stroke-width=".45"/>`;
-for(let g=0;g<(gpuTray||0);g++)s+=`<rect x="${25+g*11}" y="${y+1.5}" width="9" height="2.4" rx=".3" fill="rgba(34,197,94,.38)"/>`;
-for(let c=0;c<(cpuTray||0);c++)s+=`<rect x="${70+c*13}" y="${y+1.5}" width="11" height="2.4" rx=".3" fill="rgba(6,182,212,.32)"/>`;
-s+=`<rect x="99" y="${y+1.5}" width="16" height="2.4" rx=".3" fill="rgba(59,130,246,.28)"/>`;
-s+=tx(158,y+7,'CT-'+pad2(i+1)+' [2U] '+trayTxt,'var(--g)',3.2,'middle');
-s+=`<circle cx="192" cy="${y+4.5}" r=".9" fill="var(--g)" opacity=".7"/>`;
-s+='</g>';}}
-/* NVSwitch trays — 8 px pitch */
-if(NS!=null){for(let i=0;i<NS;i++){const y=278+i*8;
-s+=`<g data-tip="NVSwitch tray NS-${i+1}: NVLink switch chips serving the ${em(GPU)} GPU domain inside this one rack, Cu microchannel cold plate per ASIC." data-rack="ns" data-rz-equipment="rack-ns:1" tabindex="0" role="button" data-id="${i+1}" style="cursor:pointer">`;
-s+=`<rect x="23" y="${y}" width="175" height="6.5" rx="1" fill="rgba(236,72,153,${(.11-.005*i).toFixed(3)})" stroke="rgba(236,72,153,${(.26-.018*i).toFixed(3)})" stroke-width=".4"/>`;
-s+=`<rect x="26" y="${y+1.4}" width="40" height="2" rx=".3" fill="rgba(236,72,153,.22)"/><rect x="70" y="${y+1.4}" width="40" height="2" rx=".3" fill="rgba(236,72,153,.22)"/>`;
-s+=tx(158,y+5,'NS-'+(i+1)+' [1U] NVLink switch','var(--pk)',3.2,'middle');
-s+='</g>';}}
-/* bottom infrastructure */
-s+=`<g data-tip="DLC Manifold: blind-mate SS316L quick disconnects, isolation valve per rack, TCS supply ${em(bn('tcsSupply'))}°C / return ${em(bn('tcsReturn'))}°C" data-rack="manifold" data-rz-equipment="rack-manifold:1" tabindex="0" role="button" style="cursor:pointer">`+bx(23,356,175,10,'rgba(6,182,212,.12)',2)+tx(110,363,'MANIFOLD QD SS316L — TCS '+em(bn('tcsSupply'))+'/'+em(bn('tcsReturn'))+'°C','var(--c)',3.5,'middle',0,bo('tcsSupply',{also:['tcsReturn']}))+'</g>';
-s+=`<g data-tip="48VDC bus bar: vertical copper, every power shelf feeds it and every tray taps it through a semiconductor fuse." data-rack="busbar" data-rz-equipment="rack-busbar:1" tabindex="0" role="button" style="cursor:pointer">`+bx(23,369,175,8,'rgba(245,158,11,.08)',2)+tx(110,375,'48 VDC BUS — Cu vertical + semi-fuse/tray','var(--o)',3.5,'middle',0,{declared:'the 48 VDC rack bus is the PUBLISHED GB300 power-shelf output; page-authored label, not an engine quantity'})+'</g>';
-s+=`<g data-tip="Leak detection: continuous rope over the manifold run + point sensors at the quick disconnects, SS drip tray." data-rack="leak" data-rz-equipment="rack-leak:1" tabindex="0" role="button" style="cursor:pointer">`+bx(23,380,175,8,'rgba(239,68,68,.07)',2)+tx(110,386,'LEAK ROPE + POINT + DRIP TRAY','var(--r)',3.5,'middle')+'</g>';
-s+=`<g data-tip="NVLink backplane: passive copper cable cartridge, blind-mate, joins all ${em(CT)} compute trays to all ${em(NS)} NVSwitch trays inside this rack." data-rack="backplane" data-rz-equipment="rack-backplane:1" tabindex="0" role="button" style="cursor:pointer">`+bx(23,391,175,8,'rgba(100, 116, 139,.07)',2)+tx(110,397,'NVLINK BACKPLANE — passive Cu','var(--p)',3.5,'middle')+'</g>';
+const T1=9,T2=7.5,T3=7;                       /* label tiers (user units) */
+const AX=15,AW=330,AR=AX+AW;                  /* column A — rack elevation */
+const RK=640;
+/* ---- COLUMN A — the rack: elevation, top to bottom ------------------------------ */
+s+=bx(AX,10,AW,RK,'var(--bd2)',3)+tx(AX+AW/2,24,'GB300 NVL72 RACK — '+em(GPU)+' GPU DOMAIN','var(--g)',T1,'middle',1,bo('gpuPerRack'));
+s+=tx(AX+AW/2,36,'one rack = one NVLink domain · 48U · front elevation','var(--t3)',T3,'middle',0,{declared:'48U is the rack form factor (OCP Open Rack v3, 48U usable) — a page-authored mechanical label, not an engine quantity'});
+/* power shelves — AC/DC glyph, duty/spare at SHELF level (N+3) */
+let y=46;
+s+=tx(AX+8,y+7,'POWER SHELVES','var(--o)',T3,0,1);y+=12;
+if(SH!=null){for(let i=0;i<SH;i++){const duty=(SHD==null)||(i<SHD),yy=y+i*11;
+s+=`<g data-tip="Power shelf PS-${i+1}: ${em(psuShelf)}× rectifier modules = ${em(SHKW)} kW per shelf, 400 VAC → 48 VDC. Rack has ${em(SH)} shelves (${em(SHD)} duty + ${em(SHS)} spare, ${em(REDN)}) = ${em(instKw)} kW installed for a ${em(KW)} kW rack." data-rack="psu" data-rz-equipment="rack-psu:1" tabindex="0" role="button" data-id="${i+1}" style="cursor:pointer">`;
+s+=`<rect x="${AX+8}" y="${yy}" width="${AW-16}" height="9" rx="1" fill="${duty?'rgba(245,158,11,.10)':'rgba(255,255,255,.015)'}" stroke="${duty?'rgba(245,158,11,.5)':'var(--bd2)'}" stroke-width=".6"/>`;
+/* AC~ / DC= glyph */
+s+=`<path d="M${AX+14},${yy+4.5} q2,-3 4,0 t4,0" fill="none" stroke="${duty?'var(--o)':'var(--t3)'}" stroke-width=".8"/><line x1="${AX+26}" y1="${yy+3.2}" x2="${AX+32}" y2="${yy+3.2}" stroke="${duty?'var(--o)':'var(--t3)'}" stroke-width=".8"/><line x1="${AX+26}" y1="${yy+5.8}" x2="${AX+32}" y2="${yy+5.8}" stroke="${duty?'var(--o)':'var(--t3)'}" stroke-width=".8"/>`;
+for(let m=0;m<(psuShelf||0);m++)s+=`<rect x="${AX+40+m*13}" y="${yy+2}" width="11" height="5" rx=".6" fill="${duty?'rgba(245,158,11,.35)':'rgba(255,255,255,.06)'}"/>`;
+s+=tx(AR-10,yy+7,'PS-'+(i+1)+' · '+em(SHKW)+' kW · '+em(psuShelf)+' PSU · '+(duty?'DUTY':'SPARE'),duty?'var(--o)':'var(--t3)',T3,'end',0,bo('shelfKw',{nomark:i>0}));
+s+='</g>';}
+y+=SH*11+4;}
+/* compute trays */
+s+=tx(AX+8,y+7,'COMPUTE TRAYS (2U)','var(--g)',T3,0,1);y+=12;
+const ctY0=y;
+if(CT!=null){for(let i=0;i<CT;i++){const yy=y+i*15;
+s+=`<g data-tip="Compute tray CT-${pad2(i+1)}: ${trayTxt} on blind-mate hot-swap rails, ${em(CX8)}× ConnectX-8 ${em(CX8G)}G + ${em(BF3)}× BlueField-3, Cu microchannel cold plates on GPU and CPU." data-rack="ct" data-rz-equipment="rack-ct:1" tabindex="0" role="button" data-id="${i+1}" style="cursor:pointer">`;
+s+=`<rect x="${AX+8}" y="${yy}" width="${AW-16}" height="12" rx="1" fill="rgba(34,197,94,.08)" stroke="rgba(34,197,94,.35)" stroke-width=".6"/>`;
+for(let g=0;g<(gpuTray||0);g++)s+=`<rect x="${AX+14+g*15}" y="${yy+2.5}" width="12" height="7" rx=".6" fill="rgba(34,197,94,.42)"/>`;
+for(let c=0;c<(cpuTray||0);c++)s+=`<rect x="${AX+78+c*17}" y="${yy+2.5}" width="14" height="7" rx=".6" fill="rgba(6,182,212,.38)"/>`;
+for(let n=0;n<(CX8||0);n++)s+=`<rect x="${AX+116+n*8}" y="${yy+3.5}" width="6" height="5" rx=".4" fill="rgba(59,130,246,.45)"/>`;
+s+=`<rect x="${AX+150}" y="${yy+3.5}" width="10" height="5" rx=".4" fill="rgba(236,72,153,.45)"/>`;
+s+=tx(AR-10,yy+8.5,'CT-'+pad2(i+1)+' · '+trayTxt,'var(--g)',T3,'end');
+s+='</g>';}
+y+=CT*15+4;}
+/* NVSwitch trays */
+s+=tx(AX+8,y+7,'NVSWITCH TRAYS (1U)','var(--pk)',T3,0,1);y+=12;
+if(NS!=null){for(let i=0;i<NS;i++){const yy=y+i*11;
+s+=`<g data-tip="NVSwitch tray NS-${i+1}: ${em(NSPT)}× NVLink switch chip serving the ${em(GPU)} GPU domain inside this one rack, Cu microchannel cold plate per ASIC." data-rack="ns" data-rz-equipment="rack-ns:1" tabindex="0" role="button" data-id="${i+1}" style="cursor:pointer">`;
+s+=`<rect x="${AX+8}" y="${yy}" width="${AW-16}" height="9" rx="1" fill="rgba(236,72,153,.08)" stroke="rgba(236,72,153,.32)" stroke-width=".6"/>`;
+for(let a=0;a<(NSPT||0);a++)s+=`<rect x="${AX+14+a*40}" y="${yy+2}" width="34" height="5" rx=".6" fill="rgba(236,72,153,.3)"/>`;
+s+=tx(AR-10,yy+7,'NS-'+(i+1)+' · '+em(NSPT)+'× NVSwitch5','var(--pk)',T3,'end');
+s+='</g>';}
+y+=NS*11+4;}
+const ctY1=y-4;
+/* bottom infrastructure rows */
+const infra=[
+['manifold','rack-manifold:1','DLC MANIFOLD · QD SS316L · TCS '+em(bn('tcsSupply'))+' → '+em(bn('tcsReturn'))+' °C  ','var(--c)','DLC Manifold: blind-mate SS316L quick disconnects, isolation valve per rack, TCS supply '+em(bn('tcsSupply'))+'°C / return '+em(bn('tcsReturn'))+'°C',bo('tcsSupply',{also:['tcsReturn']})],
+['busbar','rack-busbar:1','48 VDC BUS BAR · Cu vertical · semiconductor fuse per tray tap','var(--o)','48VDC bus bar: vertical copper, every power shelf feeds it and every tray taps it through a semiconductor fuse.',{declared:'the 48 VDC rack bus is the PUBLISHED GB300 power-shelf output; page-authored label, not an engine quantity'}],
+['leak','rack-leak:1','LEAK DETECTION · rope over the manifold + point sensors + drip tray','var(--r)','Leak detection: continuous rope over the manifold run + point sensors at the quick disconnects, SS drip tray.',null],
+['backplane','rack-backplane:1','NVLINK BACKPLANE · passive Cu cartridge · '+em(CT)+' CT ↔ '+em(NS)+' NS','var(--p)','NVLink backplane: passive copper cable cartridge, blind-mate, joins all '+em(CT)+' compute trays to all '+em(NS)+' NVSwitch trays inside this rack.',null]];
+infra.forEach(function(r){s+=`<g data-tip="${r[4]}" data-rack="${r[0]}" data-rz-equipment="${r[1]}" tabindex="0" role="button" style="cursor:pointer">`+bx(AX+8,y,AW-16,11,r[3],1)+tx(AX+14,y+8,r[2],r[3],T3,0,0,r[5])+'</g>';y+=14;});
 /* power chip */
-s+=bx(23,403,175,17,'rgba(245,158,11,.25)',2);
-s+=tx(110,410,em(KW)+' kW · '+em(instKw)+' kW installed','var(--o)',4,'middle',1,bo('kwPerRack',{also:['shelfInstalledKw']}));
-s+=tx(110,417,em(FEED)+' A dual-corded (A+B)','var(--t2)',3.6,'middle',0,bo('rackFeedA'));
-/* coolant risers alongside the trays */
-s+=`<line x1="20" y1="76" x2="20" y2="350" stroke="var(--c)" stroke-width="2" opacity=".45"><animate attributeName="stroke-width" values="1.6;2.6;1.6" dur="2s" repeatCount="indefinite"/></line>`;
-s+=`<line x1="201" y1="76" x2="201" y2="350" stroke="var(--o)" stroke-width="2" opacity=".35"><animate attributeName="stroke-width" values="1.6;2.6;1.6" dur="2.2s" repeatCount="indefinite"/></line>`;
-/* ---- RAIL GROUP — 4 racks, one per fabric rail ------------------------- */
-const rails=CX8;                                   /* one ConnectX-8 per rail */
+y+=4;
+s+=`<rect x="${AX+8}" y="${y}" width="${AW-16}" height="30" rx="2" fill="rgba(245,158,11,.06)" stroke="rgba(245,158,11,.45)" stroke-width=".8"/>`;
+s+=tx(AX+AW/2,y+12,em(KW)+' kW rack · '+em(instKw)+' kW installed ('+em(SHD)+' duty + '+em(SHS)+' spare, '+em(REDN)+')','var(--o)',T2,'middle',1,bo('kwPerRack',{also:['shelfInstalledKw','shelvesDuty','shelvesSpare']}));
+s+=tx(AX+AW/2,y+24,em(FEED)+' A dual-corded (A + B) at '+em(bn('voltageLL'))+' V','var(--t2)',T3,'middle',0,bo('rackFeedA',{also:['voltageLL']}));
+/* coolant risers — static (no pulse): supply left, return right, arrowheads */
+s+=`<line x1="${AX+3}" y1="${ctY0}" x2="${AX+3}" y2="${ctY1}" stroke="var(--c)" stroke-width="1.6" opacity=".7"/><path d="M${AX+1},${ctY1-5} L${AX+3},${ctY1} L${AX+5},${ctY1-5} Z" fill="var(--c)" opacity=".8"/>`;
+s+=`<line x1="${AR-3}" y1="${ctY0}" x2="${AR-3}" y2="${ctY1}" stroke="var(--o)" stroke-width="1.6" opacity=".6"/><path d="M${AR-5},${ctY0+5} L${AR-3},${ctY0} L${AR-1},${ctY0+5} Z" fill="var(--o)" opacity=".8"/>`;
+/* ---- COLUMN B — the rail group: 4 racks, one per fabric rail ------------------------ */
+const rails=CX8;
 const racksHall=bn('racksPerHall');
 const groupsHall=(racksHall!=null&&rails)?(racksHall%rails===0?racksHall/rails:null):null;
-s+=bx(225,10,135,RK,'rgba(59,130,246,.18)',4)+tx(292,6,'RAIL GROUP — '+em(rails)+' RACKS','var(--b)',7,'middle',1);
-s+=tx(292,24,'one rack per fabric rail','var(--t3)',4,'middle');
-if(rails!=null){for(let i=0;i<rails;i++){const x=232+i*32;
-s+=`<rect x="${x}" y="34" width="26" height="240" rx="2" fill="rgba(34,197,94,.07)" stroke="rgba(34,197,94,.3)" stroke-width=".5"/>`;
-s+=`<rect x="${x+3}" y="40" width="20" height="8" rx="1" fill="rgba(245,158,11,.18)"/>`;
-s+=tx(x+13,46,'PWR','var(--o)',3,'middle');
-s+=`<rect x="${x+3}" y="52" width="20" height="150" rx="1" fill="rgba(34,197,94,.14)"/>`;
-s+=tx(x+13,130,em(CT)+'× CT','var(--g)',3.4,'middle');
-s+=`<rect x="${x+3}" y="206" width="20" height="60" rx="1" fill="rgba(236,72,153,.14)"/>`;
-s+=tx(x+13,240,em(NS)+'× NS','var(--pk)',3.4,'middle');
-s+=tx(x+13,282,'RACK '+(i+1),'var(--t2)',3.6,'middle',1);
-s+=`<line x1="${x+13}" y1="288" x2="${x+13}" y2="316" stroke="var(--b)" stroke-width=".8" stroke-dasharray="3 2" opacity=".55"><animate attributeName="stroke-opacity" values="0.25;0.7;0.25" dur="${(1.2+i*0.2).toFixed(1)}s" repeatCount="indefinite"/></line>`;
-s+=tx(x+13,300,'rail '+(i+1),'var(--b)',3,'middle');}}
-s+=bx(232,316,120,34,'rgba(59,130,246,.3)',3);
-s+=tx(292,328,'LEAF SWITCH — 1 PER RAIL','var(--b)',4.2,'middle',1);
-s+=tx(292,337,em(CX8)+'× ConnectX-8 '+em(bn('cx8Gbps'))+'G + '+em(BF3)+'× BlueField-3 / tray','var(--t2)',3.4,'middle',0,{declared:'per-tray NIC and DPU counts and the 800 Gb/s port speed are PUBLISHED GB300 NVL72 figures (model leaves gb300.cx8PerTray, bf3PerTray, cx8Gbps)'});
-s+=tx(292,346,'per compute tray — one NIC on each rail','var(--t3)',3.2,'middle');
-s+=bx(232,356,120,26,'rgba(100, 116, 139,.08)',3);
-s+=tx(292,366,em(racksHall)+' racks / hall','var(--t2)',4,'middle',1,bo('racksPerHall'));
-s+=tx(292,376,groupsHall==null?'rail groups — '+DASH:(grp(groupsHall)+' rail groups of '+em(rails)),'var(--t3)',3.6,'middle',0,{declared:'rail groups per hall = racks per hall / racks per rail group (4), an identity over a marked parameter (compute.racks_per_hall)'});
-s+=tx(292,398,'The domain is ONE rack — the group is a','var(--t3)',3.4,'middle');
-s+=tx(292,406,'FABRIC unit, not an NVLink one.','var(--t3)',3.4,'middle');
-/* ---- RACK C — network / passive (unchanged basis) ---------------------- */
-s+=bx(375,10,135,RK,'rgba(59,130,246,.22)',4)+tx(442,6,'NETWORK RACK','var(--b)',7,'middle',1);
-s+=bx(380,16,125,40,'rgba(59,130,246,.1)',2)+tx(442,38,'IB LEAF','var(--b)',5,'middle');
-s+=bx(380,62,125,40,'rgba(100, 116, 139,.1)',2)+tx(442,84,'IB SPINE','var(--p)',5,'middle');
-s+=bx(380,108,125,45,'rgba(6,182,212,.1)',2)+tx(442,128,'ODF/PATCH','var(--c)',5,'middle')+tx(442,142,'LC/MPO','var(--t3)',4,'middle');
-s+=bx(380,160,125,45,'rgba(245,158,11,.1)',2)+tx(442,180,'PDU/METER','var(--o)',5,'middle')+tx(442,194,'kWh/PF','var(--t3)',4,'middle');
-s+=bx(380,212,125,55,'rgba(34,197,94,.1)',2)+tx(442,232,'OOB SWITCH','var(--g)',5,'middle')+tx(442,248,'25GbE ToR','var(--t3)',4,'middle',0,{declared:'25 GbE top-of-rack OOB uplink is a page-authored design choice, not an engine quantity'})+tx(442,260,'BMC 1GbE','var(--t3)',4,'middle');
-s+=bx(380,274,125,55,'rgba(236,72,153,.1)',2)+tx(442,294,'STORAGE','var(--pk)',5,'middle')+tx(442,310,'NVMe-oF','var(--t3)',4,'middle');
-s+=bx(380,336,125,RK-336,'rgba(107,114,128,.1)',2)+tx(442,360,'SPARE','var(--t3)',5,'middle')+tx(442,376,'Patch/Tools','var(--t3)',4,'middle');
-/* ---- Detail panels ------------------------------------------------------ */
-const rP=[
-{y:5,c:'var(--g)',t:'COMPUTE TRAY (2U)',r:[
-['Per rack',em(CT)+' compute trays'],
-['GPU',em(gpuTray)+'× B300 per tray = '+em(GPU)+'/rack',bo('gpuPerRack')],
-['CPU',em(cpuTray)+'× Grace per tray'],
-['NIC',em(CX8)+'× ConnectX-8 '+em(bn('cx8Gbps'))+'G + '+em(BF3)+'× BlueField-3',{declared:'per-tray NIC and DPU counts and the 800 Gb/s port speed are PUBLISHED GB300 NVL72 figures (model leaves gb300.cx8PerTray, bf3PerTray, cx8Gbps)'}],
-['NVLink','Blind-mate backplane (rear)'],
-['Cold plate','Cu µchannel on GPU + CPU'],
-['Air side','Axial fans for the non-liquid remainder'],
-['BMC','Per-tray Redfish T/P/FW'],
-['Hot-swap','Front-load blind-mate power + liquid'],
-['Not in basis','Per-device TDP / HBM capacity — not published here'],
-]},
-{y:130,c:'var(--pk)',t:'NVSwitch TRAY (1U)',r:[
-['Per rack',em(NS)+' NVSwitch trays'],
-['ASIC',em(bn('nvswitchPerTray'))+'× NVLink switch chip per tray'],
-['Domain',em(GPU)+' GPU in ONE rack (NVL72)',bo('gpuPerRack')],
-['Domain BW',em(bn('nvlinkDomainTBs'))+' TB/s all-to-all',bo('nvlinkDomainTBs')],
-['Per GPU',em(bn('nvlinkPerGpuGBs'))+' GB/s NVLink',bo('nvlinkPerGpuGBs')],
-['Cold plate','Cu µchannel per switch ASIC'],
-]},
-{y:230,c:'var(--o)',t:'POWER IN-RACK',r:[
-['Input',em(bn('voltageLL'))+' V 3ph via RPP whip, feeds A + B',bo('voltageLL')],
-['Shelves',em(SH)+'× '+em(SHKW)+' kW = '+em(instKw)+' kW installed',bo('shelfKw',{also:['shelfInstalledKw']})],
-['Redundancy',em(SHD)+' duty + '+em(SHS)+' spare ('+em(REDN)+')'],
-['PSU',em(PSU)+' total — '+em(psuShelf)+' per shelf',bo('psuPerRack')],
-['Bus bar','48 VDC Cu vertical, semi-fuse per tray tap',{declared:'the 48 VDC rack bus is the PUBLISHED GB300 power-shelf output; page-authored label, not an engine quantity'}],
-['Rack load',em(KW)+' kW design',bo('kwPerRack')],
-['Rack feed',em(FEED)+' A dual-corded',bo('rackFeedA')],
-['Monitor','V / I / kW per shelf + BMC'],
-]},
-];
-rP.forEach(p=>{
-const h=16+p.r.length*11;
-s+=`<rect x="530" y="${p.y}" width="425" height="${h}" rx="4" fill="var(--bg3)" stroke="var(--bd2)" stroke-width=".5"/>`;
-s+=tx(542,p.y+13,p.t,p.c,6,0,1);
-p.r.forEach((r,i)=>{s+=tx(542,p.y+24+i*11,r[0],'var(--t3)',5);s+=tx(640,p.y+24+i*11,r[1],'var(--t2)',5,0,0,r[2])})});
+const BX0=365,BW=250,BR=BX0+BW;
+s+=bx(BX0,10,BW,RK,'var(--bd2)',3)+tx(BX0+BW/2,24,'RAIL GROUP — '+em(rails)+' RACKS','var(--b)',T1,'middle',1);
+s+=tx(BX0+BW/2,36,'one rack per fabric rail · the group is a FABRIC unit','var(--t3)',T3,'middle');
+if(rails!=null){for(let i=0;i<rails;i++){const x=BX0+12+i*58,w=48;
+s+=`<rect x="${x}" y="52" width="${w}" height="250" rx="2" fill="rgba(255,255,255,.015)" stroke="var(--bd2)" stroke-width=".7"/>`;
+s+=`<rect x="${x+4}" y="58" width="${w-8}" height="22" rx="1" fill="rgba(245,158,11,.14)" stroke="rgba(245,158,11,.4)" stroke-width=".5"/>`+tx(x+w/2,72,'PWR ×'+em(SH),'var(--o)',T3,'middle');
+s+=`<rect x="${x+4}" y="86" width="${w-8}" height="150" rx="1" fill="rgba(34,197,94,.10)" stroke="rgba(34,197,94,.3)" stroke-width=".5"/>`+tx(x+w/2,164,'CT ×'+em(CT),'var(--g)',T3,'middle');
+s+=`<rect x="${x+4}" y="242" width="${w-8}" height="54" rx="1" fill="rgba(236,72,153,.10)" stroke="rgba(236,72,153,.3)" stroke-width=".5"/>`+tx(x+w/2,272,'NS ×'+em(NS),'var(--pk)',T3,'middle');
+s+=tx(x+w/2,314,'RACK '+(i+1),'var(--t2)',T2,'middle',1);
+s+=`<line x1="${x+w/2}" y1="318" x2="${x+w/2}" y2="352" stroke="var(--b)" stroke-width="1" stroke-dasharray="3 2" opacity=".7"/>`;
+s+=tx(x+w/2,332,'rail '+(i+1),'var(--b)',T3,'middle');}}
+/* leaf switch — IEC-style: box with a port row */
+s+=`<rect x="${BX0+12}" y="352" width="${BW-24}" height="46" rx="2" fill="rgba(59,130,246,.08)" stroke="var(--b)" stroke-width=".8"/>`;
+for(let pp=0;pp<8;pp++)s+=`<rect x="${BX0+22+pp*27}" y="357" width="20" height="6" rx=".6" fill="none" stroke="var(--b)" stroke-width=".6"/>`;
+s+=tx(BX0+BW/2,378,'LEAF SWITCH — 1 PER RAIL','var(--b)',T2,'middle',1);
+s+=tx(BX0+BW/2,391,em(CX8)+'× ConnectX-8 '+em(CX8G)+'G + '+em(BF3)+'× BlueField-3 per tray','var(--t2)',T3,'middle',0,{declared:PUB});
+s+=bx(BX0+12,410,BW-24,44,'var(--bd2)',2);
+s+=tx(BX0+BW/2,426,em(racksHall)+' racks / hall','var(--t2)',T2,'middle',1,bo('racksPerHall'));
+s+=tx(BX0+BW/2,441,groupsHall==null?'rail groups — '+DASH:(grp(groupsHall)+' rail groups of '+em(rails)),'var(--t3)',T3,'middle',0,{declared:'rail groups per hall = racks per hall / racks per rail group (4), an identity over a marked parameter and a PUBLISHED NIC count'});
+s+=tx(BX0+BW/2,476,'The NVLink domain is ONE rack. The rail group','var(--t3)',T3,'middle');
+s+=tx(BX0+BW/2,488,'is a fabric unit: each tray puts one NIC on each rail.','var(--t3)',T3,'middle');
+/* ---- COLUMN C — network / passive rack (unchanged basis) ------------------------------ */
+const CX0=640,CW=305,CR=CX0+CW;
+s+=bx(CX0,10,CW,RK,'var(--bd2)',3)+tx(CX0+CW/2,24,'NETWORK RACK','var(--b)',T1,'middle',1);
+s+=tx(CX0+CW/2,36,'row-level leaf / spine, patching, OOB, storage','var(--t3)',T3,'middle');
+const nb=[['IB LEAF','row leaf switches · 4 rails','var(--b)',60,60],['IB SPINE','spine pair · ECMP','var(--p)',128,60],['ODF / PATCH','LC / MPO fibre distribution','var(--c)',196,54],['PDU / METER','kWh · PF per rack feed','var(--o)',258,54],['OOB SWITCH','BMC / iLO management · 25 GbE ToR','var(--g)',320,60,{declared:'25 GbE top-of-rack OOB uplink is a page-authored design choice, not an engine quantity'}],['STORAGE','NVMe-oF over the fabric','var(--pk)',388,60],['SPARE','patching / tools','var(--t3)',456,RK-456]];
+nb.forEach(function(b){s+=bx(CX0+10,b[3],CW-20,b[4],b[2],2);
+for(let pp=0;pp<10;pp++)s+=`<rect x="${CX0+18+pp*28}" y="${b[3]+6}" width="20" height="5" rx=".5" fill="none" stroke="${b[2]}" stroke-width=".5" opacity=".7"/>`;
+s+=tx(CX0+CW/2,b[3]+28,b[0],b[2],T2,'middle',1)+tx(CX0+CW/2,b[3]+41,b[1],'var(--t3)',T3,'middle',0,b[5]||null);});
+/* legend */
+s+=tx(AX,RK+30,'Trays: green = B300 GPU · cyan = Grace CPU · blue = ConnectX-8 · pink = BlueField-3 / NVSwitch · orange = power shelf · risers: TCS supply (cyan) / return (amber). Click any row for its HMI.','var(--t3)',T3);
 el.innerHTML=s})();
 
 
 // RACK CARDS
 $('rackCards').innerHTML=[
+/* v2.12.0 — the three spec panels that used to sit inside the SVG at 5-unit type */
+mc('var(--g)','Compute Tray (2U)','GB300 NVL72 tray',[['Per rack',(DHE?DHE.computeTrays:'\u2014')+' compute trays'],['GPU',(DHE&&DHE.gpuPerRack!=null&&DHE.computeTrays?DHE.gpuPerRack/DHE.computeTrays:'\u2014')+'\u00d7 B300 per tray = '+(DHE?DHE.gpuPerRack:'\u2014')+' / rack',bo('gpuPerRack')],['CPU',(DHE?DHE.cpuPerTray:'\u2014')+'\u00d7 Grace per tray'],['NIC',(DHE?DHE.cx8PerTray:'\u2014')+'\u00d7 ConnectX-8 '+(DHE?DHE.cx8Gbps:'\u2014')+'G + '+(DHE?DHE.bf3PerTray:'\u2014')+'\u00d7 BlueField-3',{declared:'per-tray NIC and DPU counts and the 800 Gb/s port speed are PUBLISHED GB300 NVL72 figures (model leaves gb300.cx8PerTray, bf3PerTray, cx8Gbps)'}],['NVLink','Blind-mate backplane (rear)'],['Cold plate','Cu \u00b5channel on GPU + CPU'],['Air side','Axial fans for the non-liquid remainder'],['BMC','Per-tray Redfish T/P/FW'],['Hot-swap','Front-load blind-mate power + liquid'],['Not in basis','Per-device TDP / HBM capacity \u2014 not published here']]),
+mc('var(--pk)','NVSwitch Tray (1U)','NVLink5 switch tray',[['Per rack',(DHE?DHE.nvswitchTrays:'\u2014')+' NVSwitch trays'],['ASIC',(DHE?DHE.nvswitchPerTray:'\u2014')+'\u00d7 NVLink switch chip per tray',{declared:'two NVSwitch chips per tray is a PUBLISHED GB300 NVL72 figure (model leaf gb300.nvswitchPerTray), not an engine quantity'}],['Domain',(DHE?DHE.gpuPerRack:'\u2014')+' GPU in ONE rack (NVL72)',bo('gpuPerRack')],['Domain BW',(DHE?DHE.nvlinkDomainTBs:'\u2014')+' TB/s all-to-all',bo('nvlinkDomainTBs')],['Per GPU',(DHE?DHE.nvlinkPerGpuGBs:'\u2014')+' GB/s NVLink',bo('nvlinkPerGpuGBs')],['Cold plate','Cu \u00b5channel per switch ASIC']]),
+mc('var(--o)','Power In-Rack','Shelves, bus and feed',[['Input',(DHE?DHE.voltageLL:'\u2014')+' V 3ph via RPP whip, feeds A + B',bo('voltageLL')],['Shelves',(DHE?DHE.powerShelves:'\u2014')+'\u00d7 '+(DHE?DHE.shelfKw:'\u2014')+' kW = '+(DHE?DHE.shelfInstalledKw:'\u2014')+' kW installed',bo('shelfKw',{also:['shelfInstalledKw']})],['Redundancy',(DHE?DHE.shelvesDuty:'\u2014')+' duty + '+(DHE?DHE.shelvesSpare:'\u2014')+' spare ('+(DHE?DHE.shelfRedundancy:'\u2014')+')'],['PSU',(DHE?DHE.psuPerRack:'\u2014')+' total \u2014 '+(DHE&&DHE.psuPerRack!=null&&DHE.powerShelves?DHE.psuPerRack/DHE.powerShelves:'\u2014')+' per shelf',bo('psuPerRack')],['Bus bar','48 VDC Cu vertical, semi-fuse per tray tap',{declared:'the 48 VDC rack bus is the PUBLISHED GB300 power-shelf output; page-authored label, not an engine quantity'}],['Rack load',(DHE?DHE.kwPerRack:'\u2014')+' kW design',bo('kwPerRack')],['Rack feed',(DHE?DHE.rackFeedA:'\u2014')+' A dual-corded',bo('rackFeedA')],['Monitor','V / I / kW per shelf + BMC']]),
 mc('var(--c)','Liquid Cooling Per Rack','DLC Cold Plate Circuit',[['Path','OH TCS \u2192 EoR CDU \u2192 rack manifold \u2192 cold plates'],['Supply',(DHE?DHE.tcsSupply+'\u00B0C from CDU (TCS plane p07)':'\u2014'),bo('tcsSupply')],['Return',(DHE?DHE.tcsReturn+'\u00B0C to CDU (TCS plane p08)':'\u2014'),bo('tcsReturn')],['\u0394T','10\u00B0C nominal design'],['Flow',(DHE&&DHE.tcsFlowRackLpm!=null?Math.round(DHE.tcsFlowRackLpm)+' LPM per rack':'\u2014'),bo('tcsFlowRackLpm')],['Plates/rack',(DHE?(DHE.gpuPerRack+' GPU + '+DHE.cpuPerRack+' Grace + '+DHE.nvswitchPerRack+' NVSwitch cold plates'):'\u2014'),bo('gpuPerRack',{also:['cpuPerRack','nvswitchPerRack']})],['Plate type','Cu microchannel brazed'],['Manifold','SS316L + QD drip-free'],['Hose','DN25 flex EPDM 6 bar rated'],['Coolant','DI water <5\u00B5S/cm pH 7-9'],['Pressure','2-3 bar at rack inlet'],['Filter','25\u00B5m inline per branch'],['Leak','Rope full length + 2\u00D7point at QD'],['Drip tray','SS under manifold'],['TIM','Indium/graphite on cold plate'],['Test','Annual thermal resistance check']],{declared:'rack liquid-cooling hardware (hose class, filtration, inlet pressure) is a page-authored specification; the planes, flow and plate counts are engine-marked'}),
 mc('var(--p)','NVLink Cable System','Passive Cu Interconnect',[['Type','Passive coaxial copper'],['Count','5,000+ per NVL72 rack'],['Cartridge','Pre-assembled blind-mate module'],['Mating','~6,000 lbs per rack'],['Lane speed','200 Gb/s NRZ (NVLink5)'],['Lanes/GPU','36 Tx + 36 Rx bidirectional'],['Cross-rack','18\u00D71.6T OSFP front NVS'],['Insertion loss','<20 dB at 56 GHz'],['BER','<1E-12 post-FEC target'],['Retimer','None (passive direct)'],['Maintenance','Cartridge hot-swap as unit'],['Spare','1 cartridge per 9 domains'],['Bend radius','Per NVIDIA mech spec'],['Shielding','Individual coax + tray EMI']],{declared:'NVLink cable-system figures (cartridge count, mating force, lane speed, lanes per GPU, insertion loss) are PUBLISHED NVIDIA GB300 NVL72 mechanical and electrical specifications used as labels'}),
 mc('var(--t2)','Physical Rack','Mechanical Specs',[['Standard','48U OCP Open Rack v3'],['Width','600mm (19\" EIA)'],['Depth','1,200mm + rear extension'],['Height','2,200mm (48U usable)'],['Weight empty','~350 kg steel frame'],['Weight loaded','~2,700 kg operational'],['Anchor','4\u00D7 M16 expansion \u226550kN shear'],['Seismic brace','Top-of-rack tie to grid'],['ESD','Bonded to building ground bus'],['Leveling','\u00B120mm adjustable feet'],['Door','Perforated front 65% open'],['Rear','Open + cable cartridge mount'],['Entry','Top (overhead tray) + rear'],['Paint','RAL 7016 powder coat']],{declared:'rack mechanical specification (OCP ORV3 48U dimensions, weights, anchors) is page-authored from the published rack class, not an engine quantity'}),
