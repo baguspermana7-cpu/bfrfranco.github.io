@@ -110,11 +110,22 @@ body>.rz-manual-link,.scroll-top-btn{display:none!important}
 .svg-zi svg{display:block}
 /* v2.12.0 — the rack elevation is drawn at label tiers that need >= 1200 px of sheet; it scrolls inside .svg-zi, never shrinks */
 #p-rack #rackSvg{min-width:1200px;max-width:none}
+#p-net #netSvg,#p-net #wanSvg,#p-net #secSvg{min-width:1200px;max-width:none}
 .svg-zb{position:sticky;top:0;float:right;display:flex;gap:3px;z-index:5;margin:4px 4px 0 0}
 .svg-zb button{width:28px;height:28px;border:1px solid var(--bd2);border-radius:5px;background:var(--bg2);color:var(--t1);cursor:pointer;font-family:'JetBrains Mono';font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:.15s;opacity:.7}
 .svg-zb button:hover{background:var(--bg3);opacity:1}
 .svg-zb .zlv{font-size:9px;font-weight:500;padding:0 4px;min-width:38px;cursor:default;justify-content:center}
 [data-theme="light"] .svg-zb button{background:var(--bg2);border-color:var(--bd);color:var(--t1)}
+/* v2.13.0 §A7 — network sub-tabs. SCOPED class names and a scoped handler: the .elec-tabs
+   handler is document-global, so a second strip sharing .et/.ep would cross-deactivate it. */
+.net-tabs{display:flex;gap:2px;padding:4px 6px;background:var(--bg3);border:1px solid var(--bd);border-radius:4px;margin-bottom:6px;overflow-x:auto}
+.net-tabs .nt{font-family:'JetBrains Mono';font-size:10px;font-weight:500;padding:5px 12px;border:1px solid transparent;border-bottom:2px solid transparent;background:0;color:var(--t3);cursor:pointer;border-radius:4px 4px 0 0;transition:.2s;white-space:nowrap;min-height:32px}
+.net-tabs .nt:hover{color:var(--t2)}
+.net-tabs .nt.on{color:var(--o);border-bottom-color:var(--o)}
+.net-tabs .nt:focus-visible{outline:2px solid var(--c,#67e8f9);outline-offset:1px}
+#p-net .np{display:none}
+#p-net .np.on{display:block}
+@media (max-width:900px){.net-tabs .nt{min-height:44px}}
 .elec-tabs{display:flex;gap:2px;padding:4px 6px;background:var(--bg3);border:1px solid var(--bd);border-radius:6px;margin-bottom:4px}
 .elec-tabs .et{font-family:'JetBrains Mono';font-size:10px;font-weight:500;padding:5px 12px;border:1px solid transparent;background:0;color:var(--t3);cursor:pointer;border-radius:4px;transition:.2s}
 .elec-tabs .et:hover{color:var(--t1);background:rgba(255,255,255,.03)}
@@ -395,6 +406,22 @@ svg text{user-select:none}
 .rack-modal-close{background:none;border:1px solid var(--bd2);border-radius:4px;color:var(--t2);cursor:pointer;font-size:16px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;transition:.2s}
 .rack-modal-close:hover{background:rgba(255,255,255,.08);color:var(--t1)}
 .rack-modal-body{padding:10px 14px}
+/* v2.13.0 §A7 — network detail modal. The owner's rule: a drawing stays a drawing, the detail lives
+   in a pop-up. Rows are label / value / basis, one section per subject. */
+#netModal{border-radius:4px;border:1px solid var(--bd2);background:var(--bg1);backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:0 10px 28px rgba(0,0,0,.55)}
+#netModal .rack-modal-hdr{background:transparent;border-bottom:1px solid var(--bd2)}
+#netModal .rack-modal-hdr h4{color:var(--t1)}
+#netModal .rack-modal-hdr .mode{background:transparent;border:1px solid var(--bd2);color:var(--t3)}
+.nm-sec{margin:0 0 10px}
+.nm-h{font-family:'JetBrains Mono';font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--t3);padding:6px 0 4px;border-bottom:1px solid var(--bd2)}
+.nm-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:11px}
+.nm-row:last-child{border-bottom:0}
+.nm-k{color:var(--t3)}
+.nm-v{font-family:'JetBrains Mono';font-weight:600;color:var(--t1);text-align:right}
+.nm-v[data-basis-param]{cursor:pointer;border-bottom:1px dotted var(--bd2)}
+.nm-note{font-size:10px;line-height:1.5;color:var(--t3);padding:6px 0 0}
+.nm-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:820px){.nm-grid{grid-template-columns:1fr}}
 .rack-modal svg{width:100%;border-radius:4px;background:#080e1a}
 [data-theme="light"] .rack-modal{background:linear-gradient(180deg,#f1f5f9,#e2e8f0);border-color:rgba(34,197,94,.5)}
 [data-theme="light"] .rack-modal-hdr{background:linear-gradient(90deg,rgba(34,197,94,.1),rgba(6,182,212,.06))}
@@ -481,6 +508,7 @@ svg text{user-select:none}
 .dh-modal-alarmline .am-maint{color:var(--p);border-color:rgba(100, 116, 139,.28);background:rgba(100, 116, 139,.08)}
 .dh-modal-alarmline .am-ok{color:var(--g);border-color:rgba(34,197,94,.28);background:rgba(34,197,94,.07)}
 .dh-modal-alarmline .am-stale{color:var(--t3);border-color:var(--bd2)}
+.dh-modal-alarmline .am-scope{color:var(--t3);border-color:var(--bd2);letter-spacing:.06em;font-weight:600}
 [data-theme="light"] .dh-modal-alarmline{background:rgba(0,0,0,.02);border-bottom-color:rgba(0,0,0,.06)}
 /* ============================================================================
  * v1.20.2 Stage 6 — alarm-first top strip (doc-00 P1 / doc-22). Added to every
@@ -680,7 +708,7 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
     <script src="js/datahall-ai/electrical-topology.js?v=2.1.0"></script>
     <script src="js/datahall-ai/electrical-live.js?v=2.1.0"></script>
     <script src="js/datahall-ai/sim-telemetry.js?v=2.2.0"></script>
-    <script src="js/datahall-ai/hmi-payloads.js?v=2.4.0"></script>
+    <script src="js/datahall-ai/hmi-payloads.js?v=2.13.0"></script>
     <script src="js/datahall-ai/hmi-points.js?v=2.2.0"></script>
     <script src="js/datahall-ai/electrical-visual-map.js?v=2.1.0"></script>
     <script src="js/datahall-ai/fire-cause-effect.js?v=2.0.0"></script>
@@ -1063,9 +1091,23 @@ Requested model/calculation versions and the complete locked schema must validat
 </div>
 <div class="gr" id="elecCards"></div></div>
 <div class="pn" id="p-net">
+<div class="net-tabs" id="netTabs" role="tablist" aria-label="Network views"><button class="nt on" role="tab" id="netTabFabric" data-np="fabric" aria-selected="true" aria-controls="np-fabric" tabindex="0">Compute fabric</button><button class="nt" role="tab" id="netTabWan" data-np="wan" aria-selected="false" aria-controls="np-wan" tabindex="-1">Corporate &amp; DC internet</button><button class="nt" role="tab" id="netTabSec" data-np="sec" aria-selected="false" aria-controls="np-sec" tabindex="-1">Security network</button></div>
+<section class="np on" id="np-fabric" role="tabpanel" aria-labelledby="netTabFabric">
 <div class="bx"><h3>Network Fabric Topology</h3><div class="dh-primary-q" style="font-size:10px;color:var(--t3);margin:2px 0 4px;font-style:italic;letter-spacing:.03em;">Primary read: <span style="color:var(--t2);">what is the fabric health — congestion, packet loss, degraded redundancy?</span></div><div class="su" id="netSu" data-basis-param="compute.nvlink_domain_tbs" data-basis-params="compute.nvlink_domain_tbs compute.racks_per_hall network.leaves_per_hall network.spines_per_hall network.cores_per_hall compute.gpu_per_hall compute.cx8_bandwidth_pbs" tabindex="0" role="button" style="cursor:pointer"></div>
-<svg id="netSvg" viewBox="0 0 960 520" preserveAspectRatio="xMidYMid meet" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="netC"></g></svg></div>
-<details class="dh-specwrap" open><summary>Specifications &amp; detail panels<span class="dh-spec-cv" aria-hidden="true">&#9656;</span></summary><div class="gr" id="netCards"></div></details></div>
+<svg id="netSvg" viewBox="0 0 960 480" preserveAspectRatio="xMidYMid meet" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="netC"></g></svg></div>
+<details class="dh-specwrap" open><summary>Specifications &amp; detail panels<span class="dh-spec-cv" aria-hidden="true">&#9656;</span></summary><div class="gr" id="netCards"></div></details>
+</section>
+<section class="np" id="np-wan" role="tabpanel" aria-labelledby="netTabWan">
+<div class="bx"><h3>Corporate &amp; DC Internet</h3><div class="dh-primary-q" style="font-size:10px;color:var(--t3);margin:2px 0 4px;font-style:italic;letter-spacing:.03em;">Primary read: <span style="color:var(--t2);">is the committed transit enough for the training pipeline, and what fails if a carrier drops?</span></div><div class="su" id="wanSu" data-rz-authored-basis="the corporate / DC-internet headline restates this view's page-authored traffic study (modelled peak, committed transit, installed ports); dcai-engine.js publishes no WAN quantity (Track A section A7)"></div>
+<svg id="wanSvg" viewBox="0 0 960 290" preserveAspectRatio="xMidYMid meet" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="wanC"></g></svg></div>
+<details class="dh-specwrap" open><summary>Specifications &amp; detail panels<span class="dh-spec-cv" aria-hidden="true">&#9656;</span></summary><div class="gr" id="wanCards"></div></details>
+</section>
+<section class="np" id="np-sec" role="tabpanel" aria-labelledby="netTabSec">
+<div class="bx"><h3>Security Network — zones &amp; conduits</h3><div class="dh-primary-q" style="font-size:10px;color:var(--t3);margin:2px 0 4px;font-style:italic;letter-spacing:.03em;">Primary read: <span style="color:var(--t2);">which zone is a flow crossing, through which conduit, and what enforces it?</span></div><div class="su" id="secSu" data-rz-authored-basis="the security headline restates this view's page-authored IEC 62443 zoning design (zone and conduit counts, target security levels); the engine publishes no security quantity (Track A section A7)"></div>
+<svg id="secSvg" viewBox="0 0 960 560" preserveAspectRatio="xMidYMid meet" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="secC"></g></svg></div>
+<details class="dh-specwrap" open><summary>Specifications &amp; detail panels<span class="dh-spec-cv" aria-hidden="true">&#9656;</span></summary><div class="gr" id="secCards"></div></details>
+</section>
+</div>
 <div class="pn" id="p-fire">
 <div class="fire-tabs" id="fireTabs" role="tablist" aria-label="Fire workstation views"><button class="ft on" role="tab" id="fireTabPoints" data-fp="points" aria-selected="true" aria-controls="fp-points" tabindex="0">Point list</button><button class="ft" role="tab" id="fireTabZones" data-fp="zones" aria-selected="false" aria-controls="fp-zones" tabindex="-1">Zones</button><button class="ft" role="tab" id="fireTabMimic" data-fp="mimic" aria-selected="false" aria-controls="fp-mimic" tabindex="-1">Mimic</button><button class="ft" role="tab" id="fireTabCE" data-fp="cause-effect" aria-selected="false" aria-controls="fp-cause-effect" tabindex="-1">Cause &amp; effect</button></div>
 <div class="rz-ops-summary rz-fire-summary" id="fireSummary" role="status" aria-live="polite" aria-label="Fire and safety summary" data-rz-authored-basis="facility fire summary computed from the point inventory, the training isolation register and the selected scenario: inventory arithmetic and operator input, never sensor readings (Track A §A6)"></div>
@@ -1143,6 +1185,10 @@ Requested model/calculation versions and the complete locked schema must validat
 <div class="rack-modal" id="rackModal">
 <div class="rack-modal-hdr"><h4 id="rackModalTitle" data-rz-authored-basis="label: the panel title names the component (48 VDC bus bar, PSU shelf n) — a designation, never a quantity (Track A §A5)">Component Detail</h4><span class="mode" id="rackModalType">Block Diagram</span><button class="rack-modal-close" id="rackModalClose">&times;</button></div>
 <div class="rack-modal-body"><svg id="rackModalSvg" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" data-rz-authored-basis="tier-2 HMI mimic: every value comes from the equipment payload (js/datahall-ai/hmi-payloads.js) — engine rows hooked, simulated and state rows declared; per-point provenance in the inspector (Track A §A5)"></svg></div>
+</div>
+<div class="rack-modal" id="netModal">
+<div class="rack-modal-hdr"><h4 id="netModalTitle" data-rz-authored-basis="label: the panel title names the network element (core switch, zone, carrier edge) — a designation, never a quantity (Track A §A7)">Network Detail</h4><span class="mode" id="netModalType">Detail</span><button class="rack-modal-close" id="netModalClose" aria-label="Close">&times;</button></div>
+<div class="rack-modal-body" id="netModalBody"></div>
 </div>
 <div class="sld-mimic-overlay" id="sldMimic">
 <div class="sld-mimic-panel">
@@ -1491,6 +1537,14 @@ var DH=(function(){
     /* ---- fabric ---- */
     leavesPerHall:N.leaves_per_hall, spinesPerHall:N.spines_per_hall, coresPerHall:N.cores_per_hall,
     switchesPerHall:N.switches_per_hall,
+    /* v2.13.0 §A7 — the radix arithmetic the fabric view draws */
+    leafRadix:N.leaf_radix, gpuDownlinksPerHall:N.gpu_downlinks_per_hall,
+    leafSpineLinks:N.leaf_spine_links_per_hall, spineCoreLinks:N.spine_core_links_per_hall,
+    switchesPerRackCheck:N.switches_per_rack_check, integerTopology:N.integer_topology,
+    /* port splits are MODEL leaves (fabric.*) with no registry id — drawn as declared labels */
+    leafDownPorts:M.fabric.leafDownPorts, leafUpPorts:M.fabric.leafUpPorts,
+    spineDownPorts:M.fabric.spineDownPorts, spineUpPorts:M.fabric.spineUpPorts,
+    computeTraysFacility:Cm.compute_trays_facility,
     /* ---- meta ---- */
     specVersion:S.meta.spec_version, engineVersion:S.meta.version, retiredBasis:S.meta.retired_basis,
     pueBasisText:''
@@ -1545,7 +1599,8 @@ window.DH_BASIS={
 "txRatingMVA":"equipment.transformer_unit_mva","txPerFeedHall":"distribution.transformers_per_hall_per_feed","txTotal":"equipment.transformers","txLoadPct":"equipment.transformer_loading_pct","facilityKva":"equipment.facility_kva",
 "gensetKW":"equipment.generator_unit_kw","gensetMW":"equipment.generator_unit_kw","gensetFacN":"equipment.gensets_duty","gensetFacNplus1":"equipment.gensets_installed",
 "hallLengthM":"geometry.hall_length_m","hallWidthM":"geometry.hall_width_m","hallHeightM":"geometry.hall_height_m","hallAreaM2":"geometry.hall_area_m2","hallVolM3":"geometry.hall_volume_m3","itDensityKwM2":"geometry.it_density_kw_per_m2",
-"leavesPerHall":"network.leaves_per_hall","spinesPerHall":"network.spines_per_hall","coresPerHall":"network.cores_per_hall","switchesPerHall":"network.switches_per_hall","switchesFacility":"power.fabric_switches_facility",
+"leavesPerHall":"network.leaves_per_hall","spinesPerHall":"network.spines_per_hall","coresPerHall":"network.cores_per_hall","switchesPerHall":"network.switches_per_hall",
+"leafRadix":"network.leaf_radix","gpuDownlinksPerHall":"network.gpu_downlinks_per_hall","leafSpineLinks":"network.leaf_spine_links_per_hall","spineCoreLinks":"network.spine_core_links_per_hall","switchesPerRackCheck":"network.switches_per_rack_check","computeTraysFacility":"compute.compute_trays_facility","switchesFacility":"power.fabric_switches_facility",
 "batteryPerHall":"equipment.battery_hall_kwh","gensetStandby":"equipment.gensets_standby",
 "rowItKw":"geometry.rack_it_row_kwe","tcsFlowRackLpm":"design.flows.tcs_rack_lpm","cpuPerRack":"compute.cpu_per_rack","cduDutyPerUnit":"equipment.cdu_duty_per_unit_kwth","cduFlowPerUnitLpm":"equipment.cdu_flow_per_unit_lpm","htwFlowM3h":"design.flows.htw_hall_m3h","chwFlowM3h":"design.flows.chw_hall_m3h","nvlinkPerGpuGBs":"compute.nvlink_per_gpu_gbs","nvlinkDomainTBs":"compute.nvlink_domain_tbs","gpuMemoryPb":"compute.gpu_memory_pb_facility","computeTraysFacility":"compute.compute_trays_facility","nvswitchFacility":"compute.nvswitch_facility"
 };
@@ -1583,6 +1638,25 @@ function bp(key,extra){var o={basis:'design.planes.'+key};if(extra)for(var k in 
 
 setInterval(()=>{$('clk').textContent=new Date().toLocaleTimeString('en-GB')},1000);
 $('tabs').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')return;document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('on'));e.target.classList.add('on');document.querySelectorAll('.pn').forEach(p=>p.classList.remove('on'));const el=$('p-'+e.target.dataset.t);if(el)el.classList.add('on')});
+/* v2.13.0 §A7 — network sub-tabs: own bar, own class names, own handler (never .et/.ep). */
+(function(){var bar=$('netTabs');if(!bar)return;
+function show(key){
+  var btns=bar.querySelectorAll('.nt'),i;
+  for(i=0;i<btns.length;i++){var on=btns[i].getAttribute('data-np')===key;
+    btns[i].classList.toggle('on',on);btns[i].setAttribute('aria-selected',on?'true':'false');btns[i].setAttribute('tabindex',on?'0':'-1');}
+  var pans=document.querySelectorAll('#p-net .np');
+  for(i=0;i<pans.length;i++)pans[i].classList.toggle('on',pans[i].id==='np-'+key);
+}
+bar.addEventListener('click',function(e){var b=e.target.closest('.nt');if(b&&bar.contains(b))show(b.getAttribute('data-np'));});
+bar.addEventListener('keydown',function(e){
+  if(e.key!=='ArrowLeft'&&e.key!=='ArrowRight')return;
+  var btns=Array.prototype.slice.call(bar.querySelectorAll('.nt'));
+  var cur=btns.indexOf(document.activeElement);if(cur<0)return;
+  var nxt=btns[(cur+(e.key==='ArrowRight'?1:btns.length-1))%btns.length];
+  e.preventDefault();show(nxt.getAttribute('data-np'));nxt.focus();
+});
+window.RZDatahallAINetTabs={show:show};
+})();
 $('elecTabs').addEventListener('click',function(e){if(!e.target.classList.contains('et'))return;document.querySelectorAll('.elec-tabs .et').forEach(function(b){b.classList.remove('on')});e.target.classList.add('on');document.querySelectorAll('.ep').forEach(function(p){p.classList.remove('on')});var el=$('ep-'+e.target.dataset.ep);if(el)el.classList.add('on')});
 /* Operator telemetry-spine collapse. Desktop opens by default; compact
    viewports close by default so the active schematic owns the first screen.
@@ -7779,9 +7853,12 @@ mc('var(--c)','Metering & SCADA','Power Monitoring',[['Branch','Schneider PM5xxx
 // NETWORK TOPOLOGY SVG - LIVE with laser animations and alarm simulation
 $('netSu').textContent='NVLink5 Intra-Domain ('+(DHE&&DHE.nvlinkDomainTBs!=null?DHE.nvlinkDomainTBs:'\u2014')+' TB/s per rack) + InfiniBand XDR Scale-Out ('+(DHE?DHE.leavesPerHall+' leaves / '+DHE.spinesPerHall+' spines / '+DHE.coresPerHall+' cores per hall':'\u2014')+', 4-rail fat-tree) + OOB Management';
 (function(){const el=$('netC');if(!el)return;let s='';
-// v1.42.3 — bind line-model for network fabric link semantics port (review doc-27 §5.5).
+/* v2.13.0 §A7 — COMPUTE FABRIC at hall scale. The drawing used to show 4 spines, 8 leaves and
+   27 representative racks — a GB200-era sketch beside an engine that computes 880 leaves,
+   660 spines and 220 cores from radix arithmetic. Now every tier prints the ENGINE count,
+   the glyph bank is declared as a representative sample, and the arithmetic that produced the
+   counts is on the sheet so an operator can check it. */
 var RZL=window.RZLineModel;
-// Laser animation definition
 s+=`<defs>
 <linearGradient id="laserG" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="rgba(100, 116, 139,0)"/><stop offset="50%" stop-color="rgba(100, 116, 139,.8)"/><stop offset="100%" stop-color="rgba(100, 116, 139,0)"/></linearGradient>
 <filter id="glow"><feGaussianBlur stdDeviation="1" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
@@ -7873,126 +7950,132 @@ s+=`<style>.laser{stroke:url(#laserG);stroke-width:2;stroke-dasharray:15 85;anim
             h1 { font-size: 1.4rem !important; }
         }
     </style>`;
-s+=`<rect width="960" height="520" fill="var(--bg2)"/>`;
+const SIMTEL=`simulated fabric telemetry (per-switch throughput and utilisation) — a training-load class, never a field reading (Track A §A7)`;
+const REPBANK=`the tier banks draw a REPRESENTATIVE sample of each tier; the count beside every band is the engine figure and is hooked to it (Track A §A7)`;
+const PORTSPLIT=`leaf and spine port splits are ADOPTED model leaves (fabric.leafDownPorts / leafUpPorts / spineDownPorts / spineUpPorts) that the registry does not carry as ids of their own; the counts they produce are hooked (Track A §A7)`;
+const NCORE_G=10,NSPINE_G=12,NLEAF_G=14,NRACK_G=14;
+const T1=9,T2=7.5,T3=7;
+const LX=20,LW=676,LR=LX+LW;            /* left column — the tiers */
+const PX=708,PW=242;                    /* right column — radix arithmetic */
+function bn(k){var v=DHE?DHE[k]:null;return (typeof v==='number'&&isFinite(v))?v:null}
+function em(v){return (v==null||v==='')?'—':v}
+function grp(n){return n==null?'—':String(n).replace(/\B(?=(\d{3})+(?!\d))/g,',')}
+s+=`<rect width="960" height="480" fill="var(--bg2)"/>`;
 s+=`<pattern id="netGrid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0L0 0 0 20" fill="none" stroke="rgba(255,255,255,.02)" stroke-width=".3"/></pattern>`;
-s+=`<rect width="960" height="520" fill="url(#netGrid)"/>`;
-// Title with live status
-s+=tx(480,18,(DHE?('NETWORK FABRIC TOPOLOGY \u2014 '+DHE.racksPerHall+' NVL72 RACKS / HALL \u2014 '+DHE.gpuPerHall.toLocaleString()+' GPU'):'—'),'var(--t3)',8,'middle',1,bo('racksPerHall',{also:['gpuPerHall']}));
-s+=tx(480,27,'27 representative racks shown','var(--t3)',5,'middle',0,{declared:'the drawing shows 27 representative racks of the hall count marked above; a drawing convention until the network redesign (Track A section A7)'});
-// Alarm indicator
-s+=`<rect x="850" y="8" width="100" height="18" rx="3" fill="rgba(34,197,94,.1)" stroke="var(--g)" stroke-width=".5" id="netAlarmBox"/>`;
-s+=`<text x="900" y="20" fill="var(--g)" font-family="${J}" font-size="6" text-anchor="middle" font-weight="600" id="netAlarm">ALL LINKS UP</text>`;
-// SPINE LAYER with live ports
-s+=`<rect x="200" y="38" width="560" height="52" rx="4" fill="rgba(100, 116, 139,.08)" stroke="rgba(100, 116, 139,.3)" stroke-width="1"/>`;
-s+=tx(480,33,'SPINE LAYER — 4× QX800 Q3400 (64-port 800G each)','var(--p)',6.5,'middle',1,{declared:'switch model and radix (Quantum-X800 Q3400, 64 x 800G) are PUBLISHED vendor figures used as a label until the network redesign (Track A section A7)'});
-const spines=[{x:250,id:'SP-1'},{x:380,id:'SP-2'},{x:520,id:'SP-3'},{x:650,id:'SP-4'}];
-spines.forEach((sp,si)=>{
-s+=`<g data-rz-equipment="net-spine:${si}" tabindex="0" role="button" data-tip="Spine Switch ${sp.id}: QX800 Q3400, 64\u00D7800G IB XDR ports, 51.2 Tb/s switching capacity, SHARP in-network allreduce">`;
-s+=`<rect x="${sp.x}" y="55" width="80" height="28" rx="3" fill="rgba(100, 116, 139,.15)" stroke="var(--p)" stroke-width=".6"/>`;
-s+=tx(sp.x+40,66,sp.id,'var(--p)',6,'middle',1);
-s+=`<g data-rz-authored-basis="simulated fabric telemetry (link throughput and utilisation), illustrative until the network redesign (Track A section A7); never a field reading"><text x="${sp.x+40}" y="78" fill="var(--g)" font-family="${J}" font-size="4" text-anchor="middle" id="sp${si}bw">782 Gb/s</text></g>`;
-s+='</g>'});
-// LEAF LAYER with live ports
-s+=`<rect x="50" y="100" width="860" height="58" rx="4" fill="rgba(59,130,246,.08)" stroke="rgba(59,130,246,.3)" stroke-width="1"/>`;
-s+=`<rect x="362" y="160" width="236" height="11" rx="2" fill="var(--bg)" stroke="rgba(59,130,246,.3)" stroke-width=".4"/>`;
-s+=tx(480,168,'LEAF LAYER — 8× QX800 Q3400 — 4-Rail FT 1:1','var(--b)',6,'middle',1);
-const leaves=[];
-for(let i=0;i<8;i++){leaves.push({x:70+i*108,id:'LF-'+(i+1)})}
-leaves.forEach((lf,li)=>{
-s+=`<g data-rz-equipment="net-leaf:${li}" tabindex="0" role="button" data-tip="Leaf Switch ${lf.id}: QX800 Q3400, 64\u00D7800G IB XDR ports, connects to compute NICs via 800G OSFP, 4-Rail Fat-Tree 1:1">`;
-s+=`<rect x="${lf.x}" y="125" width="88" height="28" rx="3" fill="rgba(59,130,246,.15)" stroke="var(--b)" stroke-width=".6"/>`;
-s+=tx(lf.x+44,136,lf.id,'var(--b)',5,'middle',1);
-s+=`<g data-rz-authored-basis="simulated fabric telemetry (link throughput and utilisation), illustrative until the network redesign (Track A section A7); never a field reading"><text x="${lf.x+44}" y="148" fill="var(--g)" font-family="${J}" font-size="4" text-anchor="middle" id="lf${li}bw">756 Gb/s</text></g>`;
-s+='</g>'});
-// Spine-Leaf connections — doc-07: quiet bundled lane by default; bright
-// individual lasers reveal only when the spine/leaf band is hovered.
-// Base quiet links (opacity .15) are the always-on bundled lane.
-spines.forEach((sp,si)=>{
-leaves.forEach((lf,li)=>{
-const x1=sp.x+40,y1=83,x2=lf.x+44,y2=125;
-const linkId='sl'+si+''+li;
-// Quiet bundled lane: explicit low stroke-opacity (.15 ≤ 0.2) marks this
-// as the sanctioned quiet lane (not a full-opacity hairball stroke).
-// v1.42.3 — ported to semantic line model (review doc-27 §5.5: speed +
-// utilization + failure_domain). Rail = si (spine index 0-3) per 4-rail FT 1:1.
-s+=RZL?RZL.line({id:linkId,from:sp.id,to:lf.id,medium:'fiber',direction:'bidirectional',state:'energized',capacity:'800 Gb/s IB XDR',current:'782 Gb/s',redundancy:'redundant_a',tag:'rail-'+(si+1)+' / dom-pod-'+(li+1),geometry:{x1:x1,y1:y1,x2:x2,y2:y2},style:{stroke:'var(--p)',strokeWidth:.6,opacity:'.15'}}):`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--p)" stroke-opacity=".15" stroke-width=".6" id="${linkId}"/>`;
-});});
-// invisible hover target over the spine↔leaf band (sibling of .netSL group)
-s+=`<rect class="netSLzone" x="50" y="38" width="860" height="120" fill="transparent"/>`;
-s+=`<g class="netSL">`;
-spines.forEach((sp,si)=>{
-leaves.forEach((lf,li)=>{
-const x1=sp.x+40,y1=83,x2=lf.x+44,y2=125;
-s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="laser" style="animation-delay:${(si*8+li)*0.06}s"/>`;
-});});
-s+=`</g>`;
-// NVL72 DOMAIN LAYER with live stats
-s+=`<rect x="10" y="170" width="940" height="175" rx="4" fill="rgba(34,197,94,.05)" stroke="rgba(34,197,94,.2)" stroke-width="1"/>`;
-s+=`<rect x="232" y="178" width="496" height="13" rx="2" fill="var(--bg)" stroke="rgba(34,197,94,.25)" stroke-width=".4"/>`;
-s+=tx(480,187,(DHE?('NVL72 RACKS \u2014 '+DHE.racksPerHall+' \u00D7 '+DHE.gpuPerRack+' GPU = '+DHE.gpuPerHall.toLocaleString()+' GPU / HALL \u2014 NVLink5 130 TB/s per rack \u2014 27 of '+DHE.racksPerHall+' shown'):'—'),'var(--g)',6.5,'middle',1,bo('racksPerHall',{also:['gpuPerRack','gpuPerHall','nvlinkDomainTBs']}));
-// Draw 27 representative racks in 3 rows of 9 (the hall has DHE.racksPerHall; the Network tab redesign is Track A §A7)
-const domRows=[[],[],[]];
-for(let d=0;d<27;d++){domRows[Math.floor(d/9)].push(d+1)}
-domRows.forEach((row,ri)=>{
-row.forEach((dom,di)=>{
-const x=25+di*103,y=198+ri*48;
-// Connect to leaf \u2014 quiet base line always on (bundled lane, opacity .12).
-const lfIdx=di%8;
-const lfX=leaves[lfIdx].x+44;
-// v1.42.3 — domain-to-leaf bundled lane ported. 800G OSFP per NIC, 4-rail FT 1:1.
-s+=RZL?RZL.line({id:'dom'+dom+'-to-'+leaves[lfIdx].id,from:'DOM-'+dom,to:leaves[lfIdx].id,medium:'fiber',direction:'bidirectional',state:'energized',capacity:'4× 800 Gb/s NIC',current:'756 Gb/s',redundancy:'redundant_a',tag:'leaf-row-'+ri+' / pod-'+(lfIdx+1),geometry:{x1:x+48,y1:y,x2:lfX,y2:153},style:{stroke:'var(--b)',strokeWidth:.5,opacity:'.12'}}):`<line x1="${x+48}" y1="${y}" x2="${lfX}" y2="153" stroke="var(--b)" stroke-opacity=".12" stroke-width=".5"/>`;
-// doc-07: bright individual link shown ONLY when this domain is selected/hovered.
-s+=`<g class="netDom" data-rz-equipment="net-domain:${dom}" tabindex="0" role="button" data-tip="NVL72 Domain DOM-${dom}: 72 GPUs (one rack = one domain), 130 TB/s NVLink5, 18\u00D7NVSwitch5, full-mesh all-to-all, ${DHE?DHE.kwPerRack:'\u2014'} kW">`;
-s+=`<rect x="${x}" y="${y}" width="95" height="40" rx="3" fill="rgba(34,197,94,.1)" stroke="rgba(34,197,94,.35)" stroke-width=".6" class="rg domBox"/>`;
-s+=tx(x+48,y+11,'DOM-'+dom,'var(--g)',5.5,'middle',1);
-s+=`<g data-rz-authored-basis="simulated fabric telemetry (link throughput and utilisation), illustrative until the network redesign (Track A section A7); never a field reading"><text x="${x+48}" y="${y+23}" fill="var(--c)" font-family="${J}" font-size="4" text-anchor="middle" id="dom${dom-1}nvl">128 TB/s</text></g>`;
-s+=`<g data-rz-authored-basis="simulated fabric telemetry (link throughput and utilisation), illustrative until the network redesign (Track A section A7); never a field reading"><text x="${x+48}" y="${y+33}" fill="var(--o)" font-family="${J}" font-size="4" text-anchor="middle" id="dom${dom-1}util">87%</text></g>`;
-s+=`<line x1="${x+48}" y1="${y}" x2="${lfX}" y2="153" class="laser" style="animation-delay:${(dom*0.1)}s;stroke-width:1"/>`;
-s+='</g>';
-});});
+s+=`<rect width="960" height="480" fill="url(#netGrid)"/>`;
+s+=tx(480,16,'COMPUTE FABRIC — ONE HALL — THREE-TIER FAT TREE','var(--t2)',T1,'middle',1);
+s+=tx(480,27,'leaf 1:1 non-blocking at the rack · 2:1 at tier 3 · counts are the engine’s, glyphs are a representative sample','var(--t3)',T3,'middle',0,{declared:REPBANK});
+/* ---- tier bands ------------------------------------------------------------------ */
+function band(y,h,label,count,basisOpt,color,fill){
+  let b=`<rect x="${LX}" y="${y}" width="${LW}" height="${h}" rx="3" fill="${fill}" stroke="${color}" stroke-width=".8"/>`;
+  b+=tx(LX+10,y+13,label,color,T2,0,1);
+  b+=rzB(basisOpt,LR-10,y+13,count,color,T2,'end',1,T2)||tx(LR-10,y+13,count,color,T2,'end',1);
+  return b;
+}
+function glyphs(y,n,w,h,color,fillA,idPrefix,eq,tipFn){
+  let g='',step=(LW-40)/n;
+  for(let i=0;i<n;i++){const x=LX+20+step*i+(step-w)/2;
+    g+=`<g data-rz-equipment="${eq}:${i+1}" tabindex="0" role="button" data-tip="${tipFn(i)}">`;
+    g+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="2" fill="${fillA}" stroke="${color}" stroke-width=".6"/>`;
+    for(let pp=0;pp<4;pp++)g+=`<rect x="${x+3+pp*(w-6)/4}" y="${y+3}" width="${(w-6)/4-1.5}" height="2.5" rx=".4" fill="${color}" opacity=".45"/>`;
+    g+=`<g data-rz-authored-basis="${SIMTEL}"><text id="${idPrefix}${i}bw" x="${x+w/2}" y="${y+h-4}" fill="var(--g)" font-family="${J}" font-size="${T3}" text-anchor="middle">—</text></g>`;
+    g+='</g>';}
+  return g;
+}
+/* CORE */
+s+=band(34,52,'TIER 3 · CORE SWITCHES',em(bn('coresPerHall')),bo('coresPerHall'),'var(--p)','rgba(100,116,139,.07)');
+s+=glyphs(52,NCORE_G,44,28,'var(--p)','rgba(100,116,139,.14)','cr','net-core',i=>`Core switch CR-${i+1} of ${em(bn('coresPerHall'))}: tier-3 switch, ${em(bn('leafRadix'))}-port class, carries the spine uplinks of this hall`);
+s+=tx(LX+10,96,'spine → core links','var(--t3)',T3);
+s+=rzB(bo('spineCoreLinks'),LX+110,96,grp(bn('spineCoreLinks')),'var(--t2)',T3,'start',1,T3)||'';
+s+=tx(LR-10,96,`${NCORE_G} of ${em(bn('coresPerHall'))} drawn`,'var(--t3)',T3,'end',0,{declared:REPBANK});
+/* SPINE */
+s+=band(104,52,'TIER 2 · SPINE SWITCHES',em(bn('spinesPerHall')),bo('spinesPerHall'),'var(--b)','rgba(59,130,246,.07)');
+s+=glyphs(122,NSPINE_G,40,28,'var(--b)','rgba(59,130,246,.14)','sp','net-spine',i=>`Spine switch SP-${i+1} of ${em(bn('spinesPerHall'))}: ${em(bn('spineDownPorts'))} ports down to leaves, ${em(bn('spineUpPorts'))} up to core (2:1)`);
+s+=tx(LX+10,166,'leaf → spine links','var(--t3)',T3);
+s+=rzB(bo('leafSpineLinks'),LX+110,166,grp(bn('leafSpineLinks')),'var(--t2)',T3,'start',1,T3)||'';
+s+=tx(LR-10,166,`${NSPINE_G} of ${em(bn('spinesPerHall'))} drawn`,'var(--t3)',T3,'end',0,{declared:REPBANK});
+/* LEAF */
+s+=band(174,52,'TIER 1 · LEAF · ONE PER RACK',em(bn('leavesPerHall')),bo('leavesPerHall'),'var(--c)','rgba(6,182,212,.07)');
+s+=glyphs(192,NLEAF_G,38,28,'var(--c)','rgba(6,182,212,.14)','lf','net-leaf',i=>`Leaf switch LF-${i+1} of ${em(bn('leavesPerHall'))}: ${em(bn('leafDownPorts'))} ports down to the rack NICs, ${em(bn('leafUpPorts'))} up to spine (1:1)`);
+s+=tx(LX+10,236,'GPU downlinks','var(--t3)',T3);
+s+=rzB(bo('gpuDownlinksPerHall'),LX+110,236,grp(bn('gpuDownlinksPerHall')),'var(--t2)',T3,'start',1,T3)||'';
+s+=tx(LR-10,236,`${NLEAF_G} of ${em(bn('leavesPerHall'))} drawn`,'var(--t3)',T3,'end',0,{declared:REPBANK});
+/* RACKS */
+s+=band(244,46,'ENDPOINTS · NVL72 RACKS · ONE RACK = ONE NVLINK DOMAIN',em(bn('racksPerHall')),bo('racksPerHall'),'var(--g)','rgba(34,197,94,.06)');
+(function(){let step=(LW-40)/NRACK_G;
+for(let i=0;i<NRACK_G;i++){const x=LX+20+step*i+(step-36)/2;
+ s+=`<g class="netDom" data-rz-equipment="net-domain:${i+1}" tabindex="0" role="button" data-tip="NVL72 domain DOM-${i+1} of ${em(bn('racksPerHall'))}: ${em(bn('gpuPerRack'))} GPU in one rack, ${em(bn('nvlinkDomainTBs'))} TB/s NVLink5, ${em(bn('kwPerRack'))} kW">`;
+ s+=`<rect x="${x}" y="262" width="36" height="20" rx="2" fill="rgba(34,197,94,.12)" stroke="rgba(34,197,94,.4)" stroke-width=".6" class="domBox"/>`;
+ s+=`<g data-rz-authored-basis="${SIMTEL}"><text id="dom${i}util" x="${x+18}" y="276" fill="var(--c)" font-family="${J}" font-size="${T3}" text-anchor="middle">—</text></g>`;
+ s+='</g>';}})();
+/* ---- radix arithmetic ------------------------------------------------------------- */
+s+=`<rect x="${PX}" y="34" width="${PW}" height="256" rx="3" fill="var(--bg3)" stroke="var(--bd2)" stroke-width=".6"/>`;
+s+=tx(PX+PW/2,50,'RADIX ARITHMETIC','var(--t2)',T2,'middle',1);
+s+=tx(PX+PW/2,61,'every division below is exact','var(--t3)',T3,'middle',0,{declared:PORTSPLIT});
+const rr=[
+ ['Leaf radix (published)',em(bn('leafRadix')),bo('leafRadix')],
+ ['Leaf ports down / up',em(bn('leafDownPorts'))+' / '+em(bn('leafUpPorts'))+' → 1:1',{declared:PORTSPLIT}],
+ ['Spine ports down / up',em(bn('spineDownPorts'))+' / '+em(bn('spineUpPorts'))+' → 2:1',{declared:PORTSPLIT}],
+ ['GPU downlinks / hall',grp(bn('gpuDownlinksPerHall')),bo('gpuDownlinksPerHall')],
+ ['Leaves = downlinks ÷ down',grp(bn('leavesPerHall')),bo('leavesPerHall')],
+ ['Leaf uplinks = leaves × up',grp(bn('leafSpineLinks')),bo('leafSpineLinks')],
+ ['Spines = uplinks ÷ down',grp(bn('spinesPerHall')),bo('spinesPerHall')],
+ ['Spine uplinks = spines × up',grp(bn('spineCoreLinks')),bo('spineCoreLinks')],
+ ['Cores = uplinks ÷ radix',grp(bn('coresPerHall')),bo('coresPerHall')],
+ ['Switches / hall — all tiers',grp(bn('switchesPerHall')),bo('switchesPerHall')],
+ ['Switches / rack — all tiers',em(bn('switchesPerRackCheck')),bo('switchesPerRackCheck')],
+ ['Integer topology',(bn('integerTopology')===null?(DHE&&DHE.integerTopology?'exact':'—'):'exact'),{declared:'the engine asserts every tier division is an integer; a non-integer topology fails its own gate (Track A §A7)'}]
+];
+rr.forEach((r,i)=>{const y=78+i*17;
+ s+=tx(PX+10,y,r[0],'var(--t3)',T3);
+ s+=rzB(r[2]&&r[2].basis?r[2]:null,PX+PW-10,y,r[1],'var(--t2)',T3,'end',1,T3)||rzD(r[2]&&r[2].declared?r[2]:null,`<text x="${PX+PW-10}" y="${y}" fill="var(--t2)" font-family="${J}" font-size="${T3}" text-anchor="end" font-weight="600">${r[1]}</text>`);
+});
 // NVLink Detail Panel with live values
-s+=`<rect x="10" y="355" width="310" height="155" rx="4" fill="var(--bg3)" stroke="var(--bd2)" stroke-width=".5"/>`;
-s+=tx(165,372,'NVLINK5 INTRA-DOMAIN','var(--pk)',7,'middle',1);
+s+=`<rect x="10" y="300" width="310" height="155" rx="4" fill="var(--bg3)" stroke="var(--bd2)" stroke-width=".5"/>`;
+s+=tx(165,317,'NVLINK5 INTRA-DOMAIN','var(--pk)',7,'middle',1);
 const nvlSpec=[
 ['Generation','5th Gen NVLink5'],['BW per GPU',(DHE&&DHE.nvlinkPerGpuGBs!=null?(DHE.nvlinkPerGpuGBs/1000).toFixed(1):'\u2014')+' TB/s',bo('nvlinkPerGpuGBs')],['Domain BW','var(--c)','nvlTot',(DHE&&DHE.nvlinkDomainTBs!=null?DHE.nvlinkDomainTBs:'\u2014')+' TB/s per rack',bo('nvlinkDomainTBs')],
 ['Active Links','var(--g)','nvlAct','\u2014',{declared:'simulated fabric telemetry, illustrative until the network redesign (Track A section A7); never a field reading'}],['Lane Errors','var(--g)','nvlErr','0',{declared:'simulated fabric telemetry, illustrative until the network redesign (Track A section A7); never a field reading'}],['Retrains/hr','var(--g)','nvlRet','2',{declared:'simulated fabric telemetry, illustrative until the network redesign (Track A section A7); never a field reading'}],
 ['Avg Latency','var(--c)','nvlLat','0.42 µs',{declared:'simulated fabric telemetry, illustrative until the network redesign (Track A section A7); never a field reading'}],['BER','var(--g)','nvlBer','<1E-15',{declared:'simulated fabric telemetry, illustrative until the network redesign (Track A section A7); never a field reading'}],['NVSwitch Util','var(--o)','nvlNvs','78%',{declared:'simulated fabric telemetry, illustrative until the network redesign (Track A section A7); never a field reading'}],['Temp Max','var(--o)','nvlTmp','72°C',{declared:'simulated fabric telemetry, illustrative until the network redesign (Track A section A7); never a field reading'}]
 ];
 nvlSpec.forEach((r,i)=>{
-s+=tx(20,388+i*13,r[0],'var(--t3)',5);
-if(r.length>3){s+=lv(r[2],300,388+i*13,r[3],r[1],5.5,'end',r[4])}
-else{s+=tx(300,388+i*13,r[1],'var(--t2)',5,'end',0,r[2])}
+s+=tx(20,333+i*13,r[0],'var(--t3)',5);
+if(r.length>3){s+=lv(r[2],300,333+i*13,r[3],r[1],5.5,'end',r[4])}
+else{s+=tx(300,333+i*13,r[1],'var(--t2)',5,'end',0,r[2])}
 });
 // IB XDR Detail Panel with live values
-s+=`<rect x="330" y="355" width="310" height="155" rx="4" fill="var(--bg3)" stroke="var(--bd2)" stroke-width=".5"/>`;
-s+=tx(485,372,'INFINIBAND XDR 800G','var(--p)',7,'middle',1,{declared:'InfiniBand XDR 800G is the PUBLISHED link class of the ConnectX-8 fabric, a label not a derived quantity'});
+s+=`<rect x="330" y="300" width="310" height="155" rx="4" fill="var(--bg3)" stroke="var(--bd2)" stroke-width=".5"/>`;
+s+=tx(485,317,'INFINIBAND XDR 800G','var(--p)',7,'middle',1,{declared:'InfiniBand XDR 800G is the PUBLISHED link class of the ConnectX-8 fabric, a label not a derived quantity'});
 const ibSpec=[
 ['Port Speed','800 Gb/s',{declared:'800 Gb/s port speed is the PUBLISHED ConnectX-8 / Quantum-X800 figure (model leaf gb300.cx8Gbps), a label not a derived quantity'}],['Fabric BW','var(--p)','ibTot',(DHE&&DHE.fabricPbs!=null?DHE.fabricPbs.toFixed(1):'\u2014')+' Pb/s facility',bo('fabricPbs')],
 ['Leaf/Spine/Core','var(--g)','ibAct',(DHE?DHE.leavesPerHall+'/'+DHE.spinesPerHall+'/'+DHE.coresPerHall:'\u2014')+' per hall',bo('leavesPerHall',{also:['spinesPerHall','coresPerHall']})],['Link Errors','var(--g)','ibErr','0',{declared:'simulated fabric telemetry, illustrative until the network redesign (Track A section A7); never a field reading'}],['Congestion','var(--g)','ibCong','0.2%',{declared:'simulated fabric telemetry, illustrative until the network redesign (Track A section A7); never a field reading'}],
 ['RDMA Ops/s','var(--c)','ibRdma','12.4M',{declared:'simulated fabric telemetry, illustrative until the network redesign (Track A section A7); never a field reading'}],['Allreduce/s','var(--c)','ibAll','847K',{declared:'simulated fabric telemetry, illustrative until the network redesign (Track A section A7); never a field reading'}],['Avg Latency','var(--c)','ibLat','1.2 µs',{declared:'simulated fabric telemetry, illustrative until the network redesign (Track A section A7); never a field reading'}],['Spine Util','var(--o)','ibSpn','65%',{declared:'simulated fabric telemetry, illustrative until the network redesign (Track A section A7); never a field reading'}],['Leaf Util','var(--o)','ibLf','72%',{declared:'simulated fabric telemetry, illustrative until the network redesign (Track A section A7); never a field reading'}]
 ];
 ibSpec.forEach((r,i)=>{
-s+=tx(340,388+i*13,r[0],'var(--t3)',5);
-if(r.length>3){s+=lv(r[2],630,388+i*13,r[3],r[1],5.5,'end',r[4])}
-else{s+=tx(630,388+i*13,r[1],'var(--t2)',5,'end',0,r[2])}
+s+=tx(340,333+i*13,r[0],'var(--t3)',5);
+if(r.length>3){s+=lv(r[2],630,333+i*13,r[3],r[1],5.5,'end',r[4])}
+else{s+=tx(630,333+i*13,r[1],'var(--t2)',5,'end',0,r[2])}
 });
 // OOB Management Panel
-s+=`<rect x="650" y="355" width="300" height="155" rx="4" fill="var(--bg3)" stroke="var(--bd2)" stroke-width=".5"/>`;
-s+=tx(800,372,'OOB MANAGEMENT NETWORK','var(--c)',7,'middle',1);
+s+=`<rect x="650" y="300" width="300" height="155" rx="4" fill="var(--bg3)" stroke="var(--bd2)" stroke-width=".5"/>`;
+s+=tx(800,317,'OOB MANAGEMENT NETWORK','var(--c)',7,'middle',1);
 const oobSpec=[['ToR Switch','25GbE per rack pair'],['BMC','1GbE/tray IPMI/Redfish'],['Storage','100GbE NVMe-oF RDMA'],['Protocol','SNMP v3 + syslog + REST'],['NTP','Stratum 2 GPS-synced'],['DNS','Redundant internal'],['Telemetry','Prometheus + dcgm_exporter'],['Dashboard','Grafana real-time'],['Alerting','PagerDuty + SMS'],['KVM','IP-KVM 1/rack pair']];
 s+='<g data-rz-authored-basis="out-of-band management link speeds and services are page-authored design choices, not engine quantities">';
-oobSpec.forEach((r,i)=>{s+=tx(660,388+i*13,r[0],'var(--t3)',5);s+=tx(940,388+i*13,r[1],'var(--t2)',5,'end')});
+oobSpec.forEach((r,i)=>{s+=tx(660,333+i*13,r[0],'var(--t3)',5);s+=tx(940,333+i*13,r[1],'var(--t2)',5,'end')});
 s+='</g>';
+
+s+=tx(LX,470,'Click any switch or rack for its inspector. Tier counts, link counts and the arithmetic are engine values; the glyph banks are a representative sample and the per-switch readings are simulated.','var(--t3)',T3,0,0,{declared:REPBANK});
 el.innerHTML=s;
-// Live network updates
-setInterval(()=>{
+// Live network updates. v2.13.0 — painted ONCE immediately as well as on the 4 s tick, so the
+// first frame never shows a field of em dashes where a simulated reading belongs.
+function netTick(){
 // Spine bandwidth
-for(let i=0;i<4;i++){const e=$('sp'+i+'bw');if(e)e.textContent=RZ_SIM('page28',750,795,0)+' Gb/s'}
+for(let i=0;i<NSPINE_G;i++){const e=$('sp'+i+'bw');if(e)e.textContent=RZ_SIM('page28',750,795,0)+' Gb/s'}
 // Leaf bandwidth
-for(let i=0;i<8;i++){const e=$('lf'+i+'bw');if(e)e.textContent=RZ_SIM('page29',720,780,0)+' Gb/s'}
-// Domain stats
-for(let i=0;i<27;i++){
-const nvl=$('dom'+i+'nvl');if(nvl)nvl.textContent=RZ_SIM('page30',120,130,0)+' TB/s';
+for(let i=0;i<NLEAF_G;i++){const e=$('lf'+i+'bw');if(e)e.textContent=RZ_SIM('page29',720,780,0)+' Gb/s'}
+// Core + rack glyph stats
+for(let i=0;i<NCORE_G;i++){const e=$('cr'+i+'bw');if(e)e.textContent=RZ_SIM('page40',52,66,0)+'%'}
+for(let i=0;i<NRACK_G;i++){
 const ut=$('dom'+i+'util');if(ut)ut.textContent=RZ_SIM('page31',75,95,0)+'%';
 }
 // NVLink panel
@@ -8012,14 +8095,329 @@ const ab=$('netAlarmBox'),at=$('netAlarm');
 if(ab&&at){ab.style.fill='rgba(245,158,11,.15)';ab.style.stroke='var(--o)';at.style.fill='var(--o)';at.textContent='LINK WARN: LF-'+RZ_SIM('page39',1,8,0)}
 setTimeout(()=>{if(ab&&at){ab.style.fill='rgba(34,197,94,.1)';ab.style.stroke='var(--g)';at.style.fill='var(--g)';at.textContent='ALL LINKS UP'}},3000);
 }
-},4000);
+}
+netTick();setInterval(netTick,4000);
 })();
+
 $('netCards').innerHTML=[
 mc('var(--pk)','NVLink5 Intra-Domain','72-GPU All-to-All',[['Generation','5th Gen NVLink5'],['BW/GPU',(DHE&&DHE.nvlinkPerGpuGBs!=null?(DHE.nvlinkPerGpuGBs/1000).toFixed(1):'\u2014')+' TB/s bidirectional',bo('nvlinkPerGpuGBs')],['Lane speed','200 Gb/s NRZ per lane'],['Lanes/GPU','36 Tx + 36 Rx'],['Domain BW',(DHE&&DHE.nvlinkDomainTBs!=null?DHE.nvlinkDomainTBs:'\u2014')+' TB/s all-to-all',bo('nvlinkDomainTBs')],['NVSwitch5','18\u00D7 per domain (28.8 Tb/s ea)'],['Topology','Full-mesh all-to-all'],['Cable','Passive coax Cu 5,000+'],['Backplane','Cable cartridge blind-mate'],['Cross-rack','18\u00D71.6T OSFP (NVS front)'],['Latency','<1\u00B5s intra-domain'],['BER','<1E-12 post-FEC'],['Error','Auto-retrain + lane remap'],['Telemetry','NVOS 2.0 per-port counters']],{declared:'NVLink5 published specifications (lane speed, lanes per GPU, NVSwitch5 throughput, cable count) used as labels; the two bandwidth rows are engine-marked'}),
 mc('var(--p)','IB XDR 800G Scale-Out','Inter-Domain Fabric',[['Standard','InfiniBand XDR'],['Speed','800 Gb/s per port'],['NIC',(DHE?(DHE.cx8PerTray+'\u00D7 CX-8 per compute tray (800G)'):'—'),{declared:'per-tray NIC count is a PUBLISHED GB300 NVL72 figure (model leaf gb300.cx8PerTray)'}],['Optics','800G DR4/SR4 OSFP'],['Leaf',(DHE?(DHE.leavesPerHall+' leaf switches per hall'):'—'),bo('leavesPerHall')],['Spine',(DHE?(DHE.spinesPerHall+' spines + '+DHE.coresPerHall+' cores per hall'):'—'),bo('spinesPerHall',{also:['coresPerHall']})],['Topology','4-Rail Fat-Tree 1:1'],['RDMA','GPUDirect RDMA v3'],['SHARP','In-network allreduce'],['Congestion','DCQCN + adaptive routing'],['WJH','What Just Happened telemetry'],['Firmware','MLNX-OS / NVOS 2.0']],{declared:'InfiniBand XDR published link class, optics and NIC-per-tray figures are labels; switch counts are engine-marked (network.leaves_per_hall etc.)'}),
 mc('var(--b)','Structured Cabling','Physical Layer (DLC-Adapted)',[['SM fiber','OS2 9/125\u00B5m LC/APC'],['MM fiber','OM5 50/125\u00B5m MPO-16'],['Fiber count','~4,200 LC/MPO per hall'],['Cu','~540 Cat6A drops (OOB+BMC)'],['Coax','~135K NVLink lanes total'],['Tray','3-tier overhead SS ladder'],['Power tray','Left 300mm (A+B sep)'],['Fiber tray','Center 450mm'],['Cu tray','Right 300mm + NVLink'],['TCS pipe','OH DN150 SS316L \u2192 EoR CDU \u2192 rack'],['Slab','Solid slab-on-grade (no raised floor)'],['Labeling','TIA-606-C structured']],{declared:'cabling quantities and fibre classes are page-authored estimates for the drawing, not engine quantities; superseded by the network redesign (Track A section A7)'}),
 mc('var(--g)','Management OOB','BMC / Storage / Telemetry',[['OOB','25GbE ToR per rack'],['BMC','1GbE/tray mgmt VLAN'],['HMC','Host Mgmt Controller'],['Storage','100GbE NVMe-oF RDMA'],['NTP','Stratum 2 GPS-synced'],['DNS','Redundant internal'],['Syslog','rsyslog \u2192 ELK'],['SNMP','v3 encrypted to NMS'],['Prometheus','dcgm_exporter/GPU'],['Grafana','Real-time dashboards'],['IP-KVM','1/rack pair (console)'],['Firmware','Centralized FOTA']],{declared:'out-of-band management link speeds and services are page-authored design choices, not engine quantities'})
 ].join('');
+
+/* ============================================================================
+ * §A7 — CORPORATE & DC INTERNET. The owner asked for the network to be split into
+ * rack fabric / corporate internet / security. This view answers one question: is
+ * the committed transit enough for the training pipeline, and what fails if a
+ * carrier drops. Every figure is authored and shows its arithmetic.
+ * ==========================================================================*/
+(function(){const el=$('wanC');if(!el)return;let s='';
+const WANB=`corporate and DC-internet sizing is a page-authored TRAFFIC STUDY for this campus: the dataset-refresh rate, the diurnal peak factor, the replication, distribution and ops terms, the committed transit and the installed port count are design selections, not engine quantities. dcai-engine.js publishes compute, fabric, power and thermal figures and no WAN demand of any kind; every figure in this view is stated with the arithmetic that produced it so it can be checked and replaced (Track A section A7)`;
+const T1=9,T2=7.5,T3=7;
+const J2=J;
+function box(x,y,w,h,c,fill){return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="${fill||'rgba(255,255,255,.015)'}" stroke="${c}" stroke-width=".8"/>`}
+function arrow(x1,y,x2){return `<line x1="${x1}" y1="${y}" x2="${x2-6}" y2="${y}" stroke="var(--t3)" stroke-width="1"/><path d="M${x2-6},${y-3} L${x2},${y} L${x2-6},${y+3} Z" fill="var(--t3)"/>`}
+s+=`<rect width="960" height="290" fill="var(--bg2)"/>`;
+s+=tx(480,16,'CORPORATE & DC INTERNET — DEMAND, COMMITTED, INSTALLED','var(--t2)',T1,'middle',1);
+s+=tx(480,27,'two carriers, diverse entry, always-on scrubbing · the demand below is a modelled training pipeline, not a measurement','var(--t3)',T3,'middle',0,{declared:WANB});
+/* ---- the path ---- */
+s+='<g data-rz-authored-basis="'+WANB.replace(/"/g,'&quot;')+'">';
+const path=[
+ ['CARRIER A','ISP-1 · 800G port · 400 Gb/s committed','var(--b)'],
+ ['CARRIER B','ISP-2 · 800G port · 400 Gb/s committed','var(--b)'],
+ ['DDoS SCRUB','always-on, carrier side','var(--p)'],
+ ['BORDER RTR','RTR-A / RTR-B · BGP','var(--c)'],
+ ['NGFW PAIR','stateful + IPS, active/standby','var(--p)'],
+ ['CAMPUS CORE','to the fabric core tier','var(--c)']
+];
+path.forEach((n,i)=>{const x=24+i*152;
+ s+=`<g data-rz-equipment="net-wan:${i+1}" tabindex="0" role="button" data-tip="${n[0]} — ${n[1]}">`;
+ s+=box(x,44,132,54,n[2],'rgba(255,255,255,.02)');
+ s+=`<text x="${x+66}" y="66" fill="${n[2]}" font-family="${J2}" font-size="${T2}" text-anchor="middle" font-weight="600">${n[0]}</text>`;
+ s+=`<text x="${x+66}" y="80" fill="var(--t3)" font-family="${J2}" font-size="${T3}" text-anchor="middle">${n[1]}</text>`;
+ s+='</g>';
+ if(i<path.length-1)s+=arrow(x+132,71,x+152);
+});
+s+='</g>';
+/* ---- headline only: the arithmetic lives in the block modals (owner 2026-09-08) ---- */
+/* identity colours are slate/cyan; amber appears once, on the one figure that IS an adverse
+   design finding (the surviving commitment is below the modelled peak). Alarm colours stay for
+   live abnormal state — ANTI_VIBECODE §A and design.md severity discipline. */
+const tiles=[['MODELLED PEAK','576 Gb/s','training pipeline at diurnal peak','var(--t1)'],
+ ['COMMITTED','800 Gb/s','2 carriers × 400 Gb/s committed each','var(--t1)'],
+ ['INSTALLED','4.8 Tb/s','6 × 800G ports of capacity — design selection, not a commitment','var(--t1)'],
+ ['ONE CARRIER LOST','400 Gb/s','below the modelled peak — replication sheds first','var(--o)']];
+tiles.forEach((t,i)=>{const x=24+i*232;
+ s+=`<g data-rz-equipment="net-wan:${i+1}" tabindex="0" role="button" data-tip="${t[0]} — ${t[2]}. Click for the full demand arithmetic.">`;
+ s+=box(x,130,212,84,'var(--bd2)','rgba(255,255,255,.02)');
+ s+=`<text x="${x+16}" y="152" fill="var(--t3)" font-family="${J2}" font-size="${T3}">${t[0]}</text>`;
+ s+=`<g data-rz-authored-basis="${WANB.replace(/"/g,'&quot;')}"><text x="${x+16}" y="180" fill="${t[3]}" font-family="${J2}" font-size="16" font-weight="600">${t[1]}</text></g>`;
+ s+=`<g data-rz-authored-basis="${WANB.replace(/"/g,'&quot;')}"><text x="${x+16}" y="200" fill="var(--t3)" font-family="${J2}" font-size="${T3}">${t[2]}</text></g>`;
+ s+='</g>';});
+s+=tx(480,248,'Click any block above for its detail — design, role, failure behaviour and the full demand arithmetic.','var(--t3)',T3,'middle');
+s+=tx(480,264,'Nothing on this view is measured. It is a modelled pipeline for a training campus of this size.','var(--t3)',T3,'middle',0,{declared:WANB});
+
+el.innerHTML=s;
+if($('wanSu'))$('wanSu').textContent='Modelled peak 576 Gb/s against 800 Gb/s committed and 4.8 Tb/s installed — page-authored traffic study, not a measurement';
+})();
+$('wanCards').innerHTML=[
+mc('var(--b)','Carrier & Entry','Diverse physical entry',[['Carriers','2 (ISP-1 / ISP-2)'],['Entry','diverse duct, opposite building faces'],['Handoff','800G coherent per carrier'],['Routing','eBGP, AS-path prepend on the standby'],['Scrubbing','always-on carrier-side DDoS'],['Boundary','NGFW pair, stateful + IPS']],{declared:'corporate and DC-internet sizing is a page-authored TRAFFIC STUDY for this campus: the dataset-refresh rate, the diurnal peak factor, the replication, distribution and ops terms, the committed transit and the installed port count are design selections, not engine quantities. dcai-engine.js publishes compute, fabric, power and thermal figures and no WAN demand of any kind; every figure in this view is stated with the arithmetic that produced it so it can be checked and replaced (Track A section A7)'}),
+mc('var(--o)','Demand Model','Training pipeline',[['Dataset refresh','10 PB / week'],['Sustained','132.3 Gb/s'],['Peak factor','×3 diurnal'],['Replication','120 Gb/s to DR'],['Distribution','40 Gb/s egress'],['Ops','19 Gb/s'],['Modelled peak','576 Gb/s']],{declared:'corporate and DC-internet sizing is a page-authored TRAFFIC STUDY for this campus: the dataset-refresh rate, the diurnal peak factor, the replication, distribution and ops terms, the committed transit and the installed port count are design selections, not engine quantities. dcai-engine.js publishes compute, fabric, power and thermal figures and no WAN demand of any kind; every figure in this view is stated with the arithmetic that produced it so it can be checked and replaced (Track A section A7)'}),
+mc('var(--c)','Failure Cases','What breaks first',[['One carrier lost','400 Gb/s committed remains'],['Verdict','modelled peak exceeds it'],['First to shed','checkpoint replication queue'],['Protected','ops, telemetry, control plane'],['Not modelled','carrier restoration time'],['Not modelled','per-flow QoS proof']],{declared:'corporate and DC-internet sizing is a page-authored TRAFFIC STUDY for this campus: the dataset-refresh rate, the diurnal peak factor, the replication, distribution and ops terms, the committed transit and the installed port count are design selections, not engine quantities. dcai-engine.js publishes compute, fabric, power and thermal figures and no WAN demand of any kind; every figure in this view is stated with the arithmetic that produced it so it can be checked and replaced (Track A section A7)'})
+].join('');
+
+/* ============================================================================
+ * §A7 — NETWORK DETAIL MODAL. Owner, 2026-09-08: "jangan banyak tulisan — setiap block
+ * atau gambar itu pop up modal yang sangat detail dan presisi". The sheets stay drawings;
+ * every block opens here with its identity, the arithmetic behind every figure, its
+ * dependencies and failure domain, and the basis of every number.
+ * ==========================================================================*/
+(function(){
+var modal=$('netModal'),body=$('netModalBody'),titleEl=$('netModalTitle'),typeEl=$('netModalType'),closeBtn=$('netModalClose');
+if(!modal||!body)return;
+const WANB=`corporate / DC-internet sizing is a page-authored traffic study for this campus; dcai-engine.js publishes no WAN demand of any kind. Every figure below shows the arithmetic that produced it so it can be checked and replaced (Track A section A7)`;
+const SECB=`the security architecture below — zones, target security levels, conduit protocols and directions, enforcement placement and SIEM sizing — is a page-authored IEC 62443 design for this campus. The engine publishes no security quantity; SL-T is a design TARGET, never a verified achieved level (Track A section A7)`;
+const FABB=`per-switch and per-domain readings are simulated training-load telemetry, never a field reading; port maps and optic counts follow the ADOPTED model port split (fabric.leafDownPorts / leafUpPorts / spineDownPorts / spineUpPorts) whose derived counts are hooked on the rows above (Track A section A7)`;
+function bn(k){var v=DHE?DHE[k]:null;return (typeof v==='number'&&isFinite(v))?v:null}
+function grp(n){return n==null?'—':String(n).replace(/\B(?=(\d{3})+(?!\d))/g,',')}
+function esc(t){return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
+/* row(label, value, opt) — opt {basis:'registry.id'} hooks it, {declared:'why'} declares it,
+   null means the value carries no numeral of its own. */
+function row(k,v,o){
+ var attr='';
+ if(o&&o.basis){var ev=(window.RZSvgBasis?RZSvgBasis.evidenceOf(o.basis):'DERIVED');
+  attr=' data-basis-param="'+esc(o.basis)+'"'+(o.params?' data-basis-params="'+esc([o.basis].concat(o.params).join(' '))+'"':'')+' data-evidence="'+esc(ev)+'" tabindex="0" role="button" title="'+esc(o.basis+' · '+ev)+'"';}
+ else if(o&&o.declared){attr=' data-rz-authored-basis="'+esc(o.declared)+'"';}
+ var lab=' data-rz-authored-basis="row labels on this panel state the arithmetic or the source of the value beside them (for example 100,000 x 86,400 s); they are prose, not quantities of their own — the value cell carries its own hook or declaration (Track A section A7)"';
+ return '<div class="nm-row"'+lab+'><span class="nm-k">'+esc(k)+'</span><span class="nm-v"'+attr+'>'+esc(v)+'</span></div>';
+}
+function sec(title,rows,note,decl){
+ return '<div class="nm-sec"'+(decl?' data-rz-authored-basis="'+esc(decl)+'"':'')+'><div class="nm-h">'+esc(title)+'</div>'+rows.join('')
+  +(note?'<div class="nm-note">'+esc(note)+'</div>':'')+'</div>';
+}
+/* ---- the authored architecture the WAN and security views draw, in one place ---- */
+var WAN_NODES={
+ '1':{tag:'ISP-1',name:'Carrier A',mode:'Primary transit',rows:[
+   ['Handoff port','800G coherent, diverse duct'],['Committed rate','400 Gb/s — the contracted share of that port'],
+   ['Session','eBGP, full table + default'],['Role','primary — carries the modelled peak'],['Scrubbing','always-on, carrier side'],['Loss of this carrier','peak exceeds the 400 Gb/s that remains']]},
+ '2':{tag:'ISP-2',name:'Carrier B',mode:'Standby transit',rows:[
+   ['Handoff port','800G coherent, opposite building face'],['Committed rate','400 Gb/s — the contracted share of that port'],
+   ['Session','eBGP with AS-path prepend'],['Role','standby — takes the load on carrier A loss'],['Scrubbing','always-on, carrier side'],['Loss of this carrier','no traffic impact while A is up']]},
+ '3':{tag:'SCRUB',name:'DDoS scrubbing',mode:'Carrier-side mitigation',rows:[
+   ['Placement','upstream of the campus edge, both carriers'],['Mode','always-on, not on-demand'],['Trigger','carrier telemetry, not campus telemetry'],
+   ['Campus visibility','post-scrub flows only'],['Not modelled here','mitigation capacity and time-to-mitigate']]},
+ '4':{tag:'RTR-A / RTR-B',name:'Border routers',mode:'Redundant pair',rows:[
+   ['Pair','two chassis, independent power feeds A and B'],['Protocol','eBGP to carriers, iBGP inside'],['Convergence','sub-second BFD on the carrier sessions'],
+   ['Failure domain','one chassis loss keeps one carrier path'],['Not modelled here','route-table size and memory headroom']]},
+ '5':{tag:'NGFW-A / NGFW-B',name:'Perimeter firewalls',mode:'Active / standby',rows:[
+   ['Inspection','stateful + IPS on north-south only'],['East-west','not inspected here — DPU policy owns it'],['Failover','stateful session sync between the pair'],
+   ['Placement','between the border routers and the campus core'],['Not modelled here','inspection throughput at full IPS depth']]},
+ '6':{tag:'CORE',name:'Campus core',mode:'Fabric attachment',rows:[
+   ['Attachment','to the fabric core tier'],['Separation','tenant traffic never transits the OT zones'],['Path','core → spine → leaf → rack NIC'],
+   ['Failure domain','core loss is covered by the fabric, not by this view']]}
+};
+var WAN_DEMAND=[['Training dataset refresh','10 PB / week','the ingest the training fleet consumes'],
+ ['Sustained average','132.3 Gb/s','10 PB × 8 bits ÷ 604,800 s in a week'],
+ ['Diurnal peak factor','× 3','ingest is not flat across the day'],
+ ['Dataset refresh at peak','396.8 Gb/s','132.3 × 3'],
+ ['Checkpoint replication to DR','120.0 Gb/s','continuous, rate-limited'],
+ ['Artifact / model distribution','40.0 Gb/s','egress to consumers'],
+ ['Ops, telemetry, backup','19.0 Gb/s','monitoring + config + offsite'],
+ ['MODELLED PEAK','576.0 Gb/s','the sum of the four terms above'],
+ ['Committed transit','800 Gb/s','two carriers, 400 Gb/s each'],
+ ['Installed capacity','4.8 Tb/s','6 × 800G ports: 2 carrier handoffs + 4 for growth and maintenance — a design selection, not a purchased rate'],
+ ['Peak ÷ committed','72 %','576 ÷ 800'],
+ ['Peak ÷ installed','12 %','576 ÷ 4,800'],
+ ['One carrier lost','400 Gb/s committed','peak exceeds it — the replication queue sheds first']];
+var ZONES={
+ 'Z-EXT':{name:'Internet / carrier edge',slt:'SL-T 1',holds:'carrier handoff, scrubbing, public addresses',
+   inb:'— (untrusted origin)',outb:'C1 · HTTPS in/out · NGFW pair, scrubbed',
+   enf:'NGFW pair, stateful + IPS',never:'no direct path to any zone below Z4'},
+ 'Z4':{name:'Enterprise / corporate IT',slt:'SL-T 2',holds:'staff endpoints, e-mail, SaaS, identity',
+   inb:'C1 from Z-EXT',outb:'C2 · HTTPS + SSH · initiated from Z4 only, brokered by the jump host',
+   enf:'NGFW pair + 802.1X on the corporate access layer',never:'never reaches ZF, ZM, Z2, Z1 or Z0 directly'},
+ 'Z3':{name:'DMZ · jump + artifact',slt:'SL-T 2',holds:'jump host, artifact registry, build cache',
+   inb:'C2 from Z4',outb:'C3 · gRPC / cluster API · one-way into ZF, no return path',
+   enf:'MFA on the jump host, signed artifacts only',never:'no interactive session initiated from ZF back into Z3'},
+ 'ZF':{name:'Compute fabric (tenant)',slt:'SL-T 2',holds:'training traffic, east-west, storage over the fabric',
+   inb:'C3 from Z3',outb:'C4 · Redfish + SNMP · read-only into ZM',
+   enf:'BlueField-3 DPU policy at every host boundary',never:'no path into Z2, Z1 or Z0'},
+ 'ZM':{name:'Management / OOB',slt:'SL-T 3',holds:'BMC, switch management, telemetry collectors',
+   inb:'C4 from ZF (read-only)',outb:'C5 · BACnet/IP · read-only supervisory into Z2',
+   enf:'802.1X on trays and fabric switches, out-of-band physical separation',never:'no tenant traffic, no internet route'},
+ 'Z2':{name:'BMS / OT supervisory',slt:'SL-T 3',holds:'EPMS, cooling supervisory, historian',
+   inb:'C5 from ZM (read-only)',outb:'C6 · BACnet MS/TP · write stays inside OT',
+   enf:'OT-protocol aware IDS on the ring SPAN',never:'no write command originates outside OT'},
+ 'Z1':{name:'OT control',slt:'SL-T 3',holds:'controllers, field devices, cooling and power sequences',
+   inb:'C6 from Z2',outb:'C7 · dry contact / read · monitor path only',
+   enf:'physical control panels, no remote write path',never:'no external write, ever'},
+ 'Z0':{name:'Life safety',slt:'SL-T 4',holds:'FACP, VESDA, EPO, suppression release',
+   inb:'C7 monitor only',outb:'— (terminal zone)',
+   enf:'FACP is the authority; BMS and DCIM are monitor-only',never:'NO write path into life safety from any zone'}};
+var SIEM=[['Sustained rate','100,000 EPS','design selection for a campus of this size'],
+ ['Events per day','8.64 G','100,000 × 86,400 s'],['Average event','350 B','mixed syslog / flow / identity'],
+ ['Raw per day','3.02 TB','8.64 G × 350 B'],['Compression','10 : 1','typical for structured log stores'],
+ ['Stored per day','302 GB','3.02 TB ÷ 10'],['Retention','not sized here','a policy decision, not a network one']];
+function fabricSection(kind,id){
+ var out='',tag,tier,down,up,over,peers,fail;
+ if(kind==='core'){tag='CR-'+id;tier='Tier 3 · core';down=bn('leafRadix');up=null;over='terminates the fabric';
+  peers='spine switches';fail='one core loss removes 1 of '+grp(bn('coresPerHall'))+' equal paths';}
+ else if(kind==='spine'){tag='SP-'+id;tier='Tier 2 · spine';down=bn('spineDownPorts');up=bn('spineUpPorts');over='2:1 towards the core';
+  peers='leaf switches below, core switches above';fail='one spine loss removes 1 of '+grp(bn('spinesPerHall'))+' equal paths';}
+ else {tag='LF-'+id;tier='Tier 1 · leaf (one per rack)';down=bn('leafDownPorts');up=bn('leafUpPorts');over='1:1 — non-blocking at the rack';
+  peers='the rack NICs below, spine switches above';fail='one leaf loss isolates the NICs of its own rack only';}
+ out+=sec('IDENTITY',[row('Tag',tag),row('Tier',tier),row('Class','Quantum-X800 Q3400 (published radix)',{declared:'switch model and radix class are PUBLISHED vendor figures used as a label (Track A section A5)'}),
+   row('Radix',grp(bn('leafRadix'))+' ports',{basis:'network.leaf_radix'})]);
+ out+=sec('PORT MAP',[row('Ports down',down==null?'—':grp(down),{declared:FABB}),row('Ports up',up==null?'terminal tier':grp(up),{declared:FABB}),
+   row('Oversubscription',over,null),row('Port speed','800 Gb/s per port',{declared:'800 Gb/s is the PUBLISHED ConnectX-8 / Quantum-X800 port class (model leaf gb300.cx8Gbps)'})]);
+ out+=sec('THIS TIER, AND THE HALL TOTAL',[row('Switches at this tier',grp(kind==='core'?bn('coresPerHall'):kind==='spine'?bn('spinesPerHall'):bn('leavesPerHall')),
+    {basis:kind==='core'?'network.cores_per_hall':kind==='spine'?'network.spines_per_hall':'network.leaves_per_hall'}),
+   row('Links to the tier below',grp(kind==='core'?bn('spineCoreLinks'):kind==='spine'?bn('leafSpineLinks'):bn('gpuDownlinksPerHall')),
+    {basis:kind==='core'?'network.spine_core_links_per_hall':kind==='spine'?'network.leaf_spine_links_per_hall':'network.gpu_downlinks_per_hall'}),
+   row('Switches in the hall — all three tiers',grp(bn('switchesPerHall')),{basis:'network.switches_per_hall'}),
+   row('Switches per rack — all tiers, not this one',bn('switchesPerRackCheck'),{basis:'network.switches_per_rack_check'}),
+   row('Of which, at the rack','1 leaf; the spine and core switches are shared',null)]);
+ out+=sec('DEPENDENCIES & FAILURE DOMAIN',[row('Connects',peers,null),row('On loss',fail,null),
+   row('Redundancy','equal-cost paths across the tier',null),row('Not modelled here','optics inventory, cable lengths, port-level errors',null)],
+   'Every count on this panel is the engine’s. The port split that produced them is an ADOPTED model leaf; the readings on the drawing are simulated.');
+ return out;
+}
+function domainSection(id){
+ var out='';
+ out+=sec('IDENTITY',[row('Tag','DOM-'+id+' (rack)'),row('Platform','GB300 NVL72 — one rack is one NVLink domain',null),
+   row('GPU in the domain',grp(bn('gpuPerRack')),{basis:'compute.gpu_per_rack'}),row('Racks in the hall',grp(bn('racksPerHall')),{basis:'compute.racks_per_hall'})]);
+ out+=sec('INTRA-DOMAIN (NVLINK)',[row('Domain bandwidth',grp(bn('nvlinkDomainTBs'))+' TB/s',{basis:'compute.nvlink_domain_tbs'}),
+   row('Per GPU',grp(bn('nvlinkPerGpuGBs'))+' GB/s',{basis:'compute.nvlink_per_gpu_gbs'}),
+   row('Switch trays',grp(bn('nvswitchTrays'))+' per rack',{declared:'NVSwitch tray count is a PUBLISHED GB300 NVL72 figure (model leaf gb300.nvswitchTrays)'}),
+   row('Topology','full mesh, all-to-all inside the rack',null)]);
+ out+=sec('SCALE-OUT (FABRIC)',[row('NICs per compute tray',bn('cx8PerTray'),{declared:'per-tray NIC count is a PUBLISHED GB300 NVL72 figure (model leaf gb300.cx8PerTray)'}),
+   row('Rails','one NIC on each of the four rails',null),
+   row('Leaf attachment','one leaf switch per rack, 1:1 non-blocking',null),
+   row('Fabric bandwidth (facility)',bn('fabricPbs')+' Pb/s',{basis:'compute.cx8_bandwidth_pbs'})]);
+ out+=sec('POWER & FAILURE DOMAIN',[row('Rack load',grp(bn('kwPerRack'))+' kW',{basis:'power.rack_it_kw'}),
+   row('On leaf loss','this rack loses its fabric attachment; the NVLink domain inside it is unaffected',null),
+   row('On rack loss','one domain out of the hall count above',null)],
+   'The NVLink domain is intra-rack: losing fabric does not split it, and losing a GPU does not split the fabric.');
+ return out;
+}
+function wanSection(id){
+ var n=WAN_NODES[id]||WAN_NODES['1'],out='';
+ out+=sec('IDENTITY',[row('Tag',n.tag),row('Element',n.name),row('Role',n.mode)]);
+ out+=sec('DESIGN',n.rows.map(function(r){return row(r[0],r[1],{declared:WANB})}),null,WANB);
+ out+=sec('DEMAND MODEL — THE ARITHMETIC',WAN_DEMAND.map(function(r){return row(r[0]+' — '+r[2],r[1],{declared:WANB})}),
+   'Nothing on this panel is measured. Replace the refresh rate and the carrier contract and every figure re-derives.',WANB);
+ return out;
+}
+function zoneSection(id){
+ var z=ZONES[id]||ZONES['Z-EXT'],out='';
+ out+=sec('IDENTITY',[row('Zone',id),row('Purpose',z.name),row('Target security level',z.slt),row('What it holds',z.holds)]);
+ out+=sec('CONDUITS',[row('Inbound',z.inb),row('Outbound',z.outb),row('Enforcement',z.enf),row('Never',z.never)],null,SECB);
+ out+=sec('ENFORCEMENT POINTS (FACILITY)',[
+   row('Host-boundary DPUs',grp(bn('dpusFacility')),{basis:'compute.bf3_dpus_facility'}),
+   row('Fabric switches under 802.1X',grp(bn('switchesFacility')),{basis:'power.fabric_switches_facility'}),
+   row('Compute trays under 802.1X',grp(bn('computeTraysFacility')),{basis:'compute.compute_trays_facility'}),
+   row('Managed endpoints',grp((bn('computeTraysFacility')||0)+(bn('switchesFacility')||0)),
+    {declared:'managed 802.1X endpoints = compute trays + fabric switches, an identity over two hooked engine counts; the engine publishes no endpoint total of its own'})]);
+ out+=sec('MONITORING — SIEM SIZING',SIEM.map(function(r){return row(r[0]+' — '+r[2],r[1],{declared:SECB})}),
+   'SL-T states what the zone must withstand. Proving the achieved level (SL-A) needs a live assessment and is out of scope for this cockpit.',SECB);
+ return out;
+}
+function openNetModal(kind,id){
+ id=id==null?'':String(id);
+ var title,mode,html;
+ if(kind==='core'||kind==='spine'||kind==='leaf'){
+  title=(kind==='core'?'CORE SWITCH CR-':kind==='spine'?'SPINE SWITCH SP-':'LEAF SWITCH LF-')+id+' — compute fabric';
+  mode='Fabric element';html=fabricSection(kind,id);}
+ else if(kind==='domain'){title='NVL72 DOMAIN DOM-'+id+' — one rack, one domain';mode='Endpoint';html=domainSection(id);}
+ else if(kind==='wan'){var n=WAN_NODES[id]||WAN_NODES['1'];title=n.tag+' — '+n.name;mode='Corporate / DC internet';html=wanSection(id);}
+ else {var z=ZONES[id]||ZONES['Z-EXT'];title='ZONE '+id+' — '+z.name;mode='Security zone';html=zoneSection(id);}
+ titleEl.textContent=title;typeEl.textContent=mode;body.innerHTML=html;
+ modal.style.left=Math.max(10,(window.innerWidth-820)/2)+'px';
+ modal.style.top=Math.max(10,(window.innerHeight-560)/2)+'px';
+ modal.classList.add('show');
+}
+closeBtn.addEventListener('click',function(){modal.classList.remove('show')});
+document.addEventListener('click',function(e){
+ if(modal.classList.contains('show')&&!modal.contains(e.target)&&!e.target.closest('[data-rz-equipment^="net-"]'))modal.classList.remove('show');
+});
+window.RZDatahallAIHmiOpeners=window.RZDatahallAIHmiOpeners||{};
+window.RZDatahallAIHmiOpeners.net=function(kind,id){openNetModal(kind,id==null?'1':id);};
+})();
+
+/* ============================================================================
+ * §A7 — SECURITY NETWORK. IEC 62443 zones and conduits: what a flow crosses, through
+ * which conduit, and what enforces it. Zones and SL-T are page-authored design; the
+ * enforcement-point and endpoint counts come from the engine and carry hooks.
+ * ==========================================================================*/
+(function(){const el=$('secC');if(!el)return;let s='';
+const SECB=`the security architecture on this view — zone list, target security levels, conduit protocols and directions, firewall and IDS placement, 802.1X scope and the SIEM sizing — is a page-authored IEC 62443 zoning design for this campus. The engine publishes no security quantity; the only engine values here are the enforcement-point and endpoint counts, which carry their own hooks. Target security levels are design TARGETS (SL-T), never a verified achieved level (SL-A) (Track A section A7)`;
+const T1=9,T2=7.5,T3=7;
+function bn(k){var v=DHE?DHE[k]:null;return (typeof v==='number'&&isFinite(v))?v:null}
+function grp(n){return n==null?'—':String(n).replace(/\B(?=(\d{3})+(?!\d))/g,',')}
+s+=`<rect width="960" height="560" fill="var(--bg2)"/>`;
+s+=tx(480,16,'SECURITY NETWORK — ZONES & CONDUITS (IEC 62443)','var(--t2)',T1,'middle',1);
+s+=tx(480,27,'every crossing is a named conduit with a protocol and a direction · SL-T is a design target, never a verified achieved level','var(--t3)',T3,'middle',0,{declared:SECB});
+const ZW=596,ZX=20;
+const zones=[
+ ['Z-EXT','Internet / carrier edge','SL-T 1','untrusted','var(--r)'],
+ ['Z4','Enterprise / corporate IT','SL-T 2','staff, e-mail, SaaS','var(--o)'],
+ ['Z3','DMZ · jump + artifact','SL-T 2','brokered admin, no direct path','var(--o)'],
+ ['ZF','Compute fabric (tenant)','SL-T 2','training traffic, east-west','var(--b)'],
+ ['ZM','Management / OOB','SL-T 3','BMC, switch mgmt, telemetry','var(--c)'],
+ ['Z2','BMS / OT supervisory','SL-T 3','EPMS, cooling, historian','var(--c)'],
+ ['Z1','OT control','SL-T 3','controllers, no external write','var(--g)'],
+ ['Z0','Life safety','SL-T 4','FACP, EPO — monitor only','var(--pk)']
+];
+const conduits=[
+ 'C1 · HTTPS · scrubbed',
+ 'C2 · HTTPS + SSH · brokered',
+ 'C3 · cluster API · one-way',
+ 'C4 · Redfish + SNMP · read-only',
+ 'C5 · BACnet/IP · read-only',
+ 'C6 · BACnet MS/TP · inside OT',
+ 'C7 · monitor only · NO write'
+];
+zones.forEach((z,i)=>{const y=44+i*60;
+ s+=`<g data-rz-equipment="net-zone:${z[0]}" tabindex="0" role="button" data-tip="${z[0]} ${z[1]} — target ${z[2]}, ${z[3]}">`;
+ s+=`<rect x="${ZX}" y="${y}" width="${ZW}" height="42" rx="3" fill="rgba(255,255,255,.02)" stroke="${z[4]}" stroke-width=".8"/>`;
+ s+=`<rect x="${ZX}" y="${y}" width="2" height="42" fill="${z[4]}"/>`;
+ s+=`<text x="${ZX+16}" y="${y+18}" fill="${z[4]}" font-family="${J}" font-size="${T2}" font-weight="600">${z[0]}</text>`;
+ s+=`<text x="${ZX+56}" y="${y+18}" fill="var(--t2)" font-family="${J}" font-size="${T3}" font-weight="600">${z[1]}</text>`;
+ s+=`<text x="${ZX+56}" y="${y+32}" fill="var(--t3)" font-family="${J}" font-size="${T3}">${z[3]}</text>`;
+ s+=`<text x="${ZX+ZW-14}" y="${y+18}" fill="var(--t2)" font-family="${J}" font-size="${T3}" text-anchor="end" font-weight="600">${z[2]}</text>`;
+ s+='</g>';
+ if(i<conduits.length){const cy=y+52;
+  s+=`<line x1="${ZX+40}" y1="${y+42}" x2="${ZX+40}" y2="${cy+4}" stroke="var(--t3)" stroke-width=".8" stroke-dasharray="3 2"/>`;
+  s+=`<path d="M${ZX+37},${cy} L${ZX+40},${cy+5} L${ZX+43},${cy} Z" fill="var(--t3)"/>`;
+  s+=`<g data-rz-authored-basis="${SECB.replace(/"/g,'&quot;')}"><text x="${ZX+52}" y="${cy+4}" fill="var(--t3)" font-family="${J}" font-size="${T3}">${conduits[i]}</text></g>`;}
+});
+/* ---- headline tiles only: enforcement detail and SIEM sizing live in the zone modals ---- */
+const PX2=632,PW2=308;
+const stiles=[['HOST-BOUNDARY DPUs',grp(bn('dpusFacility')),'BlueField-3, one per compute tray','var(--c)',{basis:'compute.bf3_dpus_facility'}],
+ ['MANAGED ENDPOINTS',grp((bn('computeTraysFacility')||0)+(bn('switchesFacility')||0)),'802.1X on trays + fabric switches','var(--g)',{declared:'managed 802.1X endpoints = compute trays + fabric switches, an identity over two hooked engine counts; the engine publishes no endpoint total of its own'}],
+ ['ZONES / CONDUITS','8 / 7','IEC 62443 zoning, targets only','var(--o)',{declared:SECB}],
+ ['SIEM','100,000 EPS','302 GB/day stored at 10:1','var(--p)',{declared:SECB}]];
+stiles.forEach((t,i)=>{const y=44+i*100;
+ s+=`<g data-rz-equipment="net-zone:${['ZM','ZF','Z-EXT','Z2'][i]}" tabindex="0" role="button" data-tip="${t[0]} — ${t[2]}. Click for the zone detail, conduits and enforcement.">`;
+ s+=`<rect x="${PX2}" y="${y}" width="${PW2}" height="84" rx="3" fill="rgba(255,255,255,.02)" stroke="${t[3]}" stroke-width=".8"/>`;
+ s+=`<text x="${PX2+16}" y="${y+22}" fill="var(--t3)" font-family="${J}" font-size="${T3}">${t[0]}</text>`;
+ s+=(t[4]&&t[4].basis?(rzB(t[4],PX2+16,y+50,t[1],t[3],16,'start',1,16)||''):`<g data-rz-authored-basis="${String(t[4].declared).replace(/"/g,'&quot;')}"><text x="${PX2+16}" y="${y+50}" fill="${t[3]}" font-family="${J}" font-size="16" font-weight="600">${t[1]}</text></g>`);
+ s+=`<g data-rz-authored-basis="${SECB.replace(/"/g,'&quot;')}"><text x="${PX2+16}" y="${y+70}" fill="var(--t3)" font-family="${J}" font-size="${T3}">${t[2]}</text></g>`;
+ s+='</g>';});
+s+=tx(PX2,468,'Click any zone or tile for its detail:','var(--t3)',T3);
+s+=tx(PX2,484,'purpose, target level, inbound and outbound','var(--t3)',T3);
+s+=tx(PX2,500,'conduits, enforcement and what is never allowed.','var(--t3)',T3);
+s+=tx(ZX,540,'Zone list, SL-T and conduit policy are page-authored; the enforcement counts are engine values.','var(--t3)',T3,0,0,{declared:SECB});
+el.innerHTML=s;
+if($('secSu'))$('secSu').textContent='8 zones · 7 named conduits · IEC 62443 zoning targets — page-authored architecture, enforcement counts from the engine';
+})();
+$('secCards').innerHTML=[
+mc('var(--r)','Zoning Model','IEC 62443 zones & conduits',[['Zones','8 (ZI, Z4, Z3, ZF, ZM, Z2, Z1, Z0)'],['Conduits','7, each with protocol + direction'],['Highest target','SL-T 4 (life safety)'],['Rule','no write path into life safety'],['Rule','OT reachable only through read-only conduits'],['Status','targets only — SL-A not assessed']],{declared:'the security architecture on this view — zone list, target security levels, conduit protocols and directions, firewall and IDS placement, 802.1X scope and the SIEM sizing — is a page-authored IEC 62443 zoning design for this campus. The engine publishes no security quantity; the only engine values here are the enforcement-point and endpoint counts, which carry their own hooks. Target security levels are design TARGETS (SL-T), never a verified achieved level (SL-A) (Track A section A7)'}),
+mc('var(--c)','Enforcement','Where policy is applied',[['Host boundary','BlueField-3 DPU per compute tray'],['North-south','NGFW pair, stateful + IPS'],['East-west','DPU policy, per host'],['Identity','802.1X on trays and fabric switches'],['Admin','jump host + MFA, brokered only'],['Detection','OT-protocol aware IDS on the ring SPAN']],{declared:'the security architecture on this view — zone list, target security levels, conduit protocols and directions, firewall and IDS placement, 802.1X scope and the SIEM sizing — is a page-authored IEC 62443 zoning design for this campus. The engine publishes no security quantity; the only engine values here are the enforcement-point and endpoint counts, which carry their own hooks. Target security levels are design TARGETS (SL-T), never a verified achieved level (SL-A) (Track A section A7)'}),
+mc('var(--o)','Monitoring','SIEM and retention',[['Sustained','100,000 EPS'],['Raw/day','3.02 TB'],['Stored/day','302 GB at 10:1'],['Sources','fabric, OOB, OT, firewall, identity'],['Not sized','retention window'],['Not sized','SOC staffing and response time']],{declared:'the security architecture on this view — zone list, target security levels, conduit protocols and directions, firewall and IDS placement, 802.1X scope and the SIEM sizing — is a page-authored IEC 62443 zoning design for this campus. The engine publishes no security quantity; the only engine values here are the enforcement-point and endpoint counts, which carry their own hooks. Target security levels are design TARGETS (SL-T), never a verified achieved level (SL-A) (Track A section A7)'})
+].join('');
+
 // FIRE — the inventory the workstation uses (js/datahall-ai/fire-points.js); counts on the cards and the mimic come from it
 function fireInv(){ if(window.__rzFireInv!==undefined)return window.__rzFireInv; var F=window.RZDatahallAIFirePoints; try{ window.__rzFireInv=(F&&DHE&&isFinite(DHE.hallLengthM))?F.buildInventory({halls:isFinite(DHE.halls)?DHE.halls:4,hallLengthM:DHE.hallLengthM,hallWidthM:DHE.hallWidthM,rackRows:DHE.rackRows,leakZonesPerHall:24}):null; }catch(e){ window.__rzFireInv=null; } return window.__rzFireInv; }
 function fireCount(type,hall){ var inv=fireInv(); if(!inv)return null; return inv.points.filter(function(p){return p.type===type&&p.hall===(hall||1);}).length; }
@@ -11721,7 +12119,7 @@ inner.addEventListener('touchend',function(){lastDist=0},{passive:true});
   });
   window.addEventListener('resize',schedule);
   document.addEventListener('click',function(e){
-    if(e.target&&(e.target.closest('.tabs')||e.target.closest('.elec-tabs')||e.target.closest('.fire-tabs')||e.target.closest('.svg-zb')||e.target.id==='sideTog'||e.target.id==='sideReopen'))schedule();
+    if(e.target&&(e.target.closest('.tabs')||e.target.closest('.elec-tabs')||e.target.closest('.fire-tabs')||e.target.closest('.net-tabs')||e.target.closest('.svg-zb')||e.target.id==='sideTog'||e.target.id==='sideReopen'))schedule();
   },true);
   /* initial pass after first render settles */
   setTimeout(applyAll,300);setTimeout(applyAll,1200);
@@ -11821,6 +12219,7 @@ function byId(x){return d.getElementById(x);}
 var MODALS=[
   {panel:'cduHmi',title:'cduHmiTitle'},
   {panel:'rackModal',title:'rackModalTitle'},
+  {panel:'netModal',title:'netModalTitle'},   /* v2.13.0 §A7 — every network block opens here */
   {panel:'chHmi',title:'chHmiTitle'},
   {panel:'ctHmiModal',title:'ctHmiTitle'},
   {panel:'eqHmi',title:'eqHmiTitle'},
@@ -12082,7 +12481,8 @@ for(var pi=0;pi<PANELS.length;pi++){
 /* Per-modal alarm summary line (doc-10 "summary first": status/alarms first) */
 function modalAlarmLine(){
   var a=rules(); var st=fmtState(a);
-  return '<div class="dh-modal-alarmline" role="status" aria-label="Equipment alarm summary">'+
+  return '<div class="dh-modal-alarmline" role="status" aria-label="Campus-wide alarm summary — not the state of the selected equipment">'+
+    '<span class="am am-scope">CAMPUS · ALL HALLS</span>'+
     '<span class="am '+(a.crit>0?'am-crit':a.warn>0?'am-warn':'am-ok')+'">'+st.t+'</span>'+
     '<span class="am am-crit">Critical '+a.crit+'</span>'+
     '<span class="am am-warn">Warning '+a.warn+'</span>'+

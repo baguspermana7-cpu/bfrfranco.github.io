@@ -11,6 +11,57 @@ release sections rather than semver.
 
 ---
 
+## v2.13.0 — 2026-09-08
+
+### Network split into compute fabric / corporate internet / security (Track A, owner comment 4)
+
+Owner: *"Network: modal per block, split into rack-fabric / corporate-internet / security sub-tabs, most
+scalable and advanced, firewall + cyber architecture."* Measured: one flat drawing of 4 spines, 8 leaves and
+27 "representative racks" — a GB200-era sketch sitting beside an engine that computes **880 leaves, 660
+spines and 220 cores** per hall from radix arithmetic; no corporate/DC-internet view at all; security
+present only as a line of text.
+
+The tab is now three views behind a scoped sub-bar (`#netTabs`, `data-np`, `np-*` — its own class names and
+its own handler, because the electrical strip's handler is document-global):
+
+**Compute fabric** redraws at hall scale: four tier bands (core, spine, leaf, NVL72 endpoints) each printing
+the engine's count, the link counts between them (63,360 leaf→spine, 31,680 spine→core, 63,360 GPU
+downlinks), and a **radix arithmetic panel** that shows every division that produced them — leaf radix 144,
+72 down / 72 up (1:1), spine 96 down / 48 up (2:1), leaves = downlinks ÷ down, spines = uplinks ÷ down,
+cores = uplinks ÷ radix, 1,760 switches = exactly 2 per rack, integer by construction. The glyph banks are
+declared as a representative sample and say how many of how many are drawn; per-switch readings are
+simulated and say so, and are painted on the first frame instead of after the first 4 s tick.
+
+**Corporate & DC internet** is new: carrier A/B → diverse entry → always-on scrubbing → border routers →
+NGFW pair → campus core, with the demand **build-up shown as arithmetic** (10 PB/week dataset refresh →
+132.3 Gb/s sustained → ×3 diurnal = 396.8, + 120 replication + 40 distribution + 19 ops = **576 Gb/s peak**)
+against 800 Gb/s committed and 4.8 Tb/s installed, the single-carrier verdict (400 Gb/s survives, peak
+exceeds it, the replication queue sheds first) and an honest-boundary note that nothing here is measured.
+
+**Security network** is new: eight IEC 62443 zones (ZI, Z4, Z3, ZF, ZM, Z2, Z1, Z0) with SL-T targets and
+seven named conduits carrying a protocol and a direction (no write path into life safety), enforcement
+points (BlueField-3 DPUs and 802.1X scope from the engine, hooked), and SIEM sizing shown as arithmetic
+(100,000 EPS → 8.64 G events/day → 3.02 TB raw → 302 GB stored at 10:1). SL-T is labelled a target, never a
+verified achieved level.
+
+**Every block opens a detail modal.** The owner's rule for this ship — *"jangan banyak tulisan, setiap block
+atau gambar itu pop up modal yang sangat detail dan presisi"* — is why the two new sheets carry a drawing and
+four headline tiles instead of tables: the detail moved into `#netModal`, a per-block pop-up reached by a
+plain click (Shift/right-click still opens the right-side inspector, the v2.4.0 gesture order). A fabric
+element's modal states its tag, tier, class and radix, its port map and oversubscription, the tier and link
+counts it belongs to, and its dependencies and failure domain; a domain's modal separates intra-rack NVLink
+from the scale-out fabric; a WAN block's modal carries the full demand arithmetic term by term; a zone's
+modal carries its purpose, target level, inbound and outbound conduits with protocol and direction, the
+enforcement points and the SIEM sizing, and what is never allowed. Six inspector payload classes now carry a
+tier-2 opener (`net-core`, `net-spine`, `net-leaf`, `net-domain`, `net-wan`, `net-zone` — the last three
+new). Registered in the tab set as three entries with the fire workstation's per-entry
+sub-bar override. Every drawn numeral is hooked to the registry or carries a written declaration; the two
+new views are page-authored architecture and say so on the sheet, in the cards and in the inspector.
+
+Gates: coverage `--strict --settle=9000 --modals` clean on all rows (netSvg 82 numerals, wanSvg 13, secSvg
+11, 0 untraced), inspector runtime, operator UI, basis map (168 fields), basis hooks, no retired literals,
+anti-vibecode strict, full ship gate.
+
 ## v2.12.0 — 2026-09-08
 
 ### DC AI rack architecture redrawn (Track A, owner comment 2) + the SLD line-model follow-up

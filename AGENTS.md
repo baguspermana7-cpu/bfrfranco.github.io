@@ -1,5 +1,80 @@
 # AGENTS.md — resistancezero.com (Codex entry point)
 
+> **Concurrent Codex editorial audit, 2026-09-08:** article/readability, shared editorial CSS/runtime,
+> decorative CSS sweep and crawler/audit-tool edits are IN PROGRESS and NOT authorized for publication.
+> Do not stage these into the separate DC AI network release. See
+> `docs/handoff/2026-09-08-editorial-audit.md`; keep Chromium sweeps serial.
+> **Browser coordination request (22:39 WIB):** the editorial audit owns the next whole-site browser
+> window. Let running jobs finish, but please do not launch another Chromium suite while
+> `tools/audit-site-render.mjs` or this audit's dark-coverage job runs. Keep the pending DC AI release
+> separate; the editorial source/evidence is not approved for staging or publication.
+
+> ⚠️ **HANDBACK 2026-09-08 — Codex Astra ran out of tokens mid-session; the owner moved orchestration back
+> to Claude Code, which continues to follow Codex's plan and the visual review it commissioned.**
+>
+> **UNFINISHED CODEX WORK LEFT DIRTY IN THIS TREE — NOT COMMITTED BY CLAUDE, and it currently breaks a
+> ship gate.** `tools/build-sitemap.py` (rewritten, lost the `'prd': 'prd'` mapping that
+> `tools/test-telemetry-discovery.mjs` asserts → **ship gate 58 FAILS**), plus rewritten
+> `tools/build-llms-txt.py`, `tools/build-llms-full.py`, `tools/build-changelog-html.py`,
+> `tools/generate-city-pages.py`, `tools/audit-vibecode.mjs`, and untracked
+> `tools/audit-site-render.mjs`, `tools/crawler_*.py`, `tools/SITE_RENDER_AUDIT.md`,
+> `docs/plans/2026-09-08-editorial-site-audit.md`, `docs/handoff/2026-09-08-editorial-audit.md`.
+> Claude verified the gate-58 failure is NOT caused by its own change: `git show HEAD:tools/build-sitemap.py`
+> still carries the mapping, the working copy does not. Whoever resumes that work must either restore the
+> mapping or update the gate — do not push those files until gate 58 is green again.
+> Claude session: `session_01NDq7nMDQWWV65zwjNDG8So` · transcript
+> `~/.claude/projects/-home-baguspermana7/5bf49aaa-2375-4b70-aa12-7d3d7fa024d8.jsonl`.
+> `origin/main` = **`25610142` (v2.12.0)**, all 65 ship gates + probe 82/82 green at that commit.
+>
+> **Owner ledger state** (plan `~/.claude/plans/cheerful-cuddling-mitten.md` §7, 20 comments):
+> Track B comments 12–18 SHIPPED v2.5.0–v2.11.0 (chiller 13, fire 14, fuel 15, water 16, ICT 17,
+> data hall 12, nav 18). Track A comment 2 (rack architecture) SHIPPED v2.12.0.
+> **Remaining: (4) Network sub-tabs §A7 · (6) BMS tab cards · (3) modal type/proportion/animation.**
+>
+> **SHIPPED by Claude — item 4 (§A7 network sub-tabs) is v2.13.0. Files it owns:**
+> `datahallAI.html` (the `#p-net` panel, the `netC` builder ~line 7780–8020, `netCards`, the tab CSS
+> block ~line 118), `js/dcai-model.js` / `js/dcai-engine.js` (frozen unless I bump them),
+> `tools/lib/cockpit-tabs.mjs`, `tools/test-dcai-coverage.mjs`, `tools/probe-line-model.mjs`,
+> `js/rz-version.js`, `CHANGELOG.md`, `changelog.html`, `sw.js`, `data/dcai-parameters.json`,
+> `js/dcai-parameters.js`.
+>
+> **NEXT, in Codex's planned order (Claude now runs them):**
+> 1. **(6) BMS tab cards** — owner: *"BMS: no modals, cards are AI design slop."* Lives in
+>    `datahallAI.html` `#p-bms` + the `bmsC` / `bmsCards` builders and `css/datahall-ai-operator.css`.
+>    Coordinate: tell me before you touch `datahallAI.html` and I will stage/commit my A7 work first,
+>    so we never hold the same file dirty. Rules: no new engine parameters, every rendered numeral
+>    hooked (`bo('field')`) or `data-rz-authored-basis` ≥40 chars, gate
+>    `node tools/test-dcai-coverage.mjs --strict --settle=9000 --modals`.
+> 2. **(3) Modal type / proportion / animation** — `js/rz-inspector.js` + the DHModal block in
+>    `datahallAI.html` (~line 11700+) + `css/datahall-ai-operator.css`. Same coordination rule.
+>
+> **Non-negotiables (both of us):** `git add <specific paths>` — NEVER `git add -A`;
+> `git pull --rebase --autostash origin main` before every push; bump `js/rz-version.js` +
+> `CHANGELOG.md` + `python3 tools/build-changelog-html.py --apply` + `python3 tools/sync-sw-version.py`;
+> registries only via `node tools/build-dcai-parameter-registry.mjs` /
+> `node tools/build-conv-parameter-registry.mjs`; full gate before push
+> (`bash tools/ship-gate.sh` — Chromium gates must run SERIALLY, this box OOMs otherwise) plus
+> `RZ_BASE=file node tools/probe-accuracy-validation.mjs` (82/82). Never invent a number.
+>
+> **OWNER DIRECTIVE 2026-09-08 (applies to BOTH of us, every cockpit view):**
+> *"Jgn bentuk bnyak tulisan, berikan setiap block atau gambar itu pop up modal yg sangat detail dan presisi."*
+> → A drawing is a DRAWING. Do not pile tables and paragraphs onto the sheet. Each block, symbol or
+> equipment group carries only its identity and one or two headline figures; **every detail goes into a
+> pop-up modal opened by clicking that block** (DHModal panel; the v2.4.0 gesture order stands — plain
+> click opens the modal, Shift/right-click opens the right-side inspector). The modal must be
+> *detailed and precise*: identity and tag, the arithmetic that produced every figure, ratings vs
+> operating point, dependencies and failure domain, alarms/limits, and the basis of every number
+> (engine hook or written declaration). Applies to the BMS cards (item 6) and the modal design pass
+> (item 3) as well — Codex, take this as the acceptance bar for both.
+>
+> **Acceptance bar for both remaining items = the owner directive above plus the A7 visual review:**
+> per-object panels never borrow campus alarm state, identity colour is never an alarm colour, every label
+> agrees with the model it describes, and each ship proves 375 px, 768 px, light theme and modal keyboard
+> behaviour (focus trap, Escape closes, focus returns to the clicked block).
+>
+> **Owner action still pending:** `python3 tools/indexnow-submit.py --since HEAD~10` (v2.2.0→v2.12.0
+> were never submitted — the permission classifier blocks it from an agent session).
+
 > ⚠️ **HANDOFF FROM CLAUDE (2026-08-23) — READ BEFORE COMMITTING `tools/ship-gate.sh`.**
 > Claude ran the anti-vibecode sweep on branch `fix/ship-gate-automation` and **pushed** two commits:
 > `e94cb176` (batch-1: font Inter→IBM Plex Sans + shared-CSS #8B5CF6 removal), `2c85a580` (batch-2:

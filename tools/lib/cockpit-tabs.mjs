@@ -49,7 +49,11 @@ export const TAB_SETS = Object.freeze({
             { tab: 'elec', sub: 'dh02', selector: '#elecDH2Svg', label: 'DH-02 SLD' },
             { tab: 'elec', sub: 'dh03', selector: '#elecDH3Svg', label: 'DH-03 SLD' },
             { tab: 'elec', sub: 'dh04', selector: '#elecDH4Svg', label: 'DH-04 SLD' },
-            { tab: 'net', selector: '#netSvg', label: 'network fabric' },
+            /* v2.13.0 §A7 — the Network tab is three views behind one scoped sub-bar (#netTabs,
+               data-np, np-*), the same entry-level override the fire workstation uses. */
+            { tab: 'net', sub: 'fabric', selector: '#netSvg', label: 'network compute fabric', subBar: '#netTabs', subAttr: 'data-np', subPanelPrefix: 'np-' },
+            { tab: 'net', sub: 'wan', selector: '#wanSvg', label: 'corporate and DC internet', subBar: '#netTabs', subAttr: 'data-np', subPanelPrefix: 'np-' },
+            { tab: 'net', sub: 'sec', selector: '#secSvg', label: 'security zones and conduits', subBar: '#netTabs', subAttr: 'data-np', subPanelPrefix: 'np-' },
             /* v2.3.0 §A6 — the fire workstation: three HTML views and the mimic behind one scoped sub-bar.
                Points is listed FIRST so the panel's HTML is measured with its default view visible. */
             { tab: 'fire', sub: 'points', kind: 'html', selector: '#fp-points', label: 'fire point list', subBar: '#fireTabs', subAttr: 'data-fp', subPanelPrefix: 'fp-' },

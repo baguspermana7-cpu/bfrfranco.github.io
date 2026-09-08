@@ -779,33 +779,36 @@
     b.E('capacity', 'switches', 'Switches per hall', 'switchesPerHall', '', { digits: 0 });
     b.E('capacity', 'fabric_pbs', 'Fabric bandwidth (facility)', 'fabricPbs', 'Pb/s', { digits: 1 });
   }
-  def('net-spine', { kind: 'engine', label: 'Spine switch', system: 'network', tier2: null }, function (b, ctx, id) {
+  def('net-spine', { kind: 'engine', label: 'Spine switch', system: 'network', tier2: 'net' }, function (b, ctx, id) {
     b.title = 'Spine ' + id + ' — Quantum-X800 class';
     b.S('live', 'util_pct', 'Uplink utilisation', { value: 72, text: '72 % training-load class' }, 10, '%', { digits: 0, min: 0, max: 100 });
     b.S('live', 'link_gbps', 'Busiest port', { value: 780, text: '780 Gb/s on an 800G port' }, 15, 'Gb/s', { digits: 0, max: 800 });
     b.ST('live', 'links', 'Links', 'up', 'link state is declared all-up for the training fabric until the network redesign adds a fault table (Track A §A7)');
     b.D('capacity', 'radix', 'Radix', '64 × 800G ports', 'switch radix is the PUBLISHED Quantum-X800 Q3400 figure used as a label (Track A §A5)');
     netCommon(b, ctx);
+    b.tier2('net', ['spine', String(id)]);
     b.dep('downstream', 'net-leaf:1', 'Leaf switches');
     b.trend('util_pct', 'Uplink utilisation', '%', { value: 72 }, 10, { digits: 0 });
     b.S('maint', 'optic_c', 'Optics temperature', { value: 52, text: '52 °C OSFP class' }, 3, '°C');
   });
-  def('net-leaf', { kind: 'engine', label: 'Leaf switch', system: 'network', tier2: null }, function (b, ctx, id) {
+  def('net-leaf', { kind: 'engine', label: 'Leaf switch', system: 'network', tier2: 'net' }, function (b, ctx, id) {
     b.title = 'Leaf ' + id + ' — rail-aligned';
     b.S('live', 'util_pct', 'Downlink utilisation', { value: 68, text: '68 % training-load class' }, 10, '%', { digits: 0, min: 0, max: 100 });
     b.ST('live', 'links', 'Links', 'up', 'link state is declared all-up for the training fabric until the network redesign adds a fault table (Track A §A7)');
     netCommon(b, ctx);
+    b.tier2('net', ['leaf', String(id)]);
     b.dep('upstream', 'net-spine:1', 'Spines'); b.dep('downstream', 'rack-ns:1', 'Rack NIC rail');
     b.trend('util_pct', 'Downlink utilisation', '%', { value: 68 }, 10, { digits: 0 });
     b.S('maint', 'optic_c', 'Optics temperature', { value: 50, text: '50 °C OSFP class' }, 3, '°C');
   });
-  def('net-domain', { kind: 'engine', label: 'NVLink domain', system: 'network', tier2: null }, function (b, ctx, id) {
+  def('net-domain', { kind: 'engine', label: 'NVLink domain', system: 'network', tier2: 'net' }, function (b, ctx, id) {
     b.title = 'NVLink domain (rack) ' + id;
     b.E('live', 'domain_tbs', 'Domain bandwidth', 'nvlinkDomainTBs', 'TB/s', { digits: 0 });
     b.E('live', 'gpu_per_rack', 'GPUs', 'gpuPerRack', '', { digits: 0 });
     b.S('live', 'util_pct', 'NVLink utilisation', { value: 82, text: '82 % all-reduce class' }, 8, '%', { digits: 0, min: 0, max: 100 });
     b.ST('live', 'links', 'Lanes', 'up', 'lane state is declared all-up until the network redesign adds a fault table (Track A §A7)');
     netCommon(b, ctx);
+    b.tier2('net', ['domain', String(id)]);
     b.dep('upstream', 'net-leaf:1', 'Leaf rail'); b.dep('downstream', 'rack-ns:1', 'NVSwitch trays');
     b.trend('util_pct', 'NVLink utilisation', '%', { value: 82 }, 8, { digits: 0 });
   });
@@ -817,6 +820,47 @@
     b.ST('live', 'reach', 'Reachability', 'up', 'declared all-reachable in the simulation (Track A §A7 network redesign pending)');
     netCommon(b, ctx);
     b.trend('cpu_pct', 'Controller CPU', '%', { value: 22 }, 6, { digits: 0 });
+  });
+
+  /* v2.13.0 §A7 — the three views the Network tab was split into. Core switches complete the
+     three-tier fabric the engine already computes; WAN edge and security zones are page-authored
+     architecture (no engine parameter exists for either) and every row says so. */
+  var WAN_SPEC = 'corporate / DC-internet sizing is a page-authored traffic study for this campus — conv of dataset refresh, checkpoint replication, artifact distribution and ops telemetry; dcai-engine.js publishes compute and fabric quantities, never a WAN demand (Track A §A7)';
+  var ZONE_SPEC = 'security zoning, conduit policy and SL-T targets are a page-authored IEC 62443 architecture for this campus; the engine publishes no security quantity (Track A §A7)';
+  def('net-core', { kind: 'engine', label: 'Core switch', system: 'network', tier2: 'net' }, function (b, ctx, id) {
+    b.title = 'Core ' + id + ' — tier-3 switch';
+    b.E('live', 'cores', 'Core switches per hall', 'coresPerHall', '', { digits: 0 });
+    b.S('live', 'util_pct', 'Uplink utilisation', { value: 58, text: '58 % training-load class' }, 10, '%', { digits: 0, min: 0, max: 100 });
+    b.ST('live', 'links', 'Links', 'up', 'link state is declared all-up for the training fabric until a fault table exists (Track A §A7)');
+    b.E('capacity', 'spine_core_links', 'Spine to core links', 'spineCoreLinks', '', { digits: 0 });
+    b.E('capacity', 'radix', 'Leaf-class radix', 'leafRadix', 'ports', { digits: 0 });
+    b.D('capacity', 'oversub', 'Tier-3 oversubscription', '2:1 (spine 96 down / 48 up)', 'the port split is an ADOPTED model leaf (fabric.spineDownPorts / spineUpPorts) with no registry id of its own (Track A §A7)');
+    netCommon(b, ctx);
+    b.tier2('net', ['core', String(id)]);
+    b.dep('downstream', 'net-spine:1', 'Spine switches');
+    b.trend('util_pct', 'Uplink utilisation', '%', { value: 58 }, 10, { digits: 0 });
+  });
+  def('net-wan', { kind: 'authored', label: 'WAN / internet edge', system: 'network', tier2: 'net' }, function (b, ctx, id) {
+    b.title = 'WAN edge — ' + (id || 'border');
+    b.D('live', 'committed', 'Committed transit', '800 Gb/s (2 carriers, diverse entry)', WAN_SPEC);
+    b.D('live', 'installed', 'Installed capacity', '4.8 Tb/s (6 × 800G)', WAN_SPEC);
+    b.D('live', 'peak', 'Modelled peak demand', '576 Gb/s', WAN_SPEC);
+    b.ST('live', 'state', 'Session state', 'up', 'BGP session state is declared established in the simulation (Track A §A7)');
+    b.D('capacity', 'survivable', 'Single-carrier loss', '400 Gb/s committed survives — demand exceeds it, so peak sheds to the replication queue', WAN_SPEC);
+    b.D('capacity', 'scrub', 'DDoS scrubbing', 'always-on, carrier-side', WAN_SPEC);
+    b.tier2('net', ['wan', String(id || '1')]);
+    b.trend('util_pct', 'Committed utilisation', '%', { value: 72 }, 6, { digits: 0 });
+    b.D('maint', 'review', 'Contract review', 'demand model re-run per training-fleet change', WAN_SPEC);
+  });
+  def('net-zone', { kind: 'authored', label: 'Security zone', system: 'network', tier2: 'net' }, function (b, ctx, id) {
+    b.title = 'Security zone ' + (id || '');
+    b.D('live', 'model', 'Zoning model', 'IEC 62443 zones and conduits', ZONE_SPEC);
+    b.ST('live', 'state', 'Policy state', 'up', 'conduit policy is declared enforced in the simulation; no live firewall telemetry exists (Track A §A7)');
+    b.E('live', 'dpus', 'Host-boundary enforcement points', 'dpusFacility', '', { digits: 0 });
+    b.D('capacity', 'slt', 'Target security level', 'SL-T per zone, drawn on the zone block', ZONE_SPEC);
+    b.D('capacity', 'conduits', 'Conduits', 'every crossing is a named conduit with a protocol and a direction', ZONE_SPEC);
+    b.D('maint', 'review', 'Zone review', 'per architecture change; SL-A verification is out of scope here', ZONE_SPEC);
+    b.tier2('net', ['zone', String(id || 'ZI')]);
   });
 
   /* fire */
@@ -1060,7 +1104,7 @@
     };
   }
 
-  var API = { version: '2.3.0', CLASSES: Object.freeze(classList()), COOLING_SCENARIOS: COOLING_SCENARIOS, payload: payload, safePayload: safePayload, stubPayload: stubPayload, points: points, classList: classList, buildContext: buildContext };
+  var API = { version: '2.13.0', CLASSES: Object.freeze(classList()), COOLING_SCENARIOS: COOLING_SCENARIOS, payload: payload, safePayload: safePayload, stubPayload: stubPayload, points: points, classList: classList, buildContext: buildContext };
   if (root) { root.RZDatahallAIHmiPayloads = API; }
   if (typeof module !== 'undefined' && module.exports) { module.exports = API; }
 })(typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : this));

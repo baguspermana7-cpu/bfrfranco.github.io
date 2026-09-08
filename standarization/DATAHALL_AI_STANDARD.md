@@ -616,3 +616,17 @@ renders below 1,200 px (`#p-rack #rackSvg { min-width: 1200px }`; it scrolls ins
 tray, port-row switch. Spec tables live in the HTML cards below the drawing, not in the SVG. Published
 per-tray leaves the registry does not carry (`gb300.cpuPerTray`, `nvswitchPerTray`, `cx8Gbps`) are drawn
 with a declaration, never with a hook. Every equipment hook and modal opener from §A5 is preserved.
+
+## Network views (v2.13.0, §A7)
+
+The Network tab is three views behind `#netTabs` (`.net-tabs .nt` / `#p-net .np`, `data-np`, panels `np-*`)
+with its own scoped handler — never `.et` / `.ep`, whose handler is document-global. Compute fabric prints
+the engine's tier and link counts and the radix arithmetic that produced them; the glyph banks are a
+declared representative sample. Corporate/DC internet and Security are page-authored architecture: every
+figure shows the arithmetic that produced it and carries a declaration naming what the engine does and does
+not publish. SL-T is always labelled a target, never an achieved level. Every block opens a
+**detail modal** (`#netModal`) on a plain click — the owner's rule is that a drawing stays a drawing and the
+detail lives in a pop-up: identity, the arithmetic behind every figure, dependencies and failure domain, and
+the basis of every number. Shift/right-click still opens the right-side inspector. The six `net-*` payload
+classes carry `tier2: 'net'`; a class whose META keeps `tier2: null` has its `b.tier2()` stripped at build
+time, so both places must agree.
