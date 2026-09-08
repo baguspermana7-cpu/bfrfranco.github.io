@@ -148,6 +148,12 @@ maintenance state. Current WUE-equivalent flow is not relabeled as a measured in
 Municipal/raw-water treatment is a site utility in this topology, not four duplicated hall plants.
 It has no Hall A–D selector. A per-hall allocation remains `UNAVAILABLE` unless governed branch
 metering exists; an equal division is not telemetry.
+  **v2.8.0 — the make-up path is drawn to the tower.** `#water-svg` ends in CT-501 (cell, fan, basin) with the
+  engine's evaporation / blowdown / drift / make-up balance on the drawing and the condenser-water loop to the
+  chiller plant at the engine's CDW planes; a two-pump booster train with role (DUTY / STANDBY) and state
+  (RUNNING / AVAILABLE) stated separately, isolation + check valves, PI/DP/PT/FM/FT/LIT instruments, one drain
+  header. Engine values inside the SVG carry `data-basis-param` + an evidence mark (rz-svg-basis idiom); every
+  equipment group opens the right-side inspector payload. Tank capacities are declared design selections.
 
 ### ICT / OT
 

@@ -37,7 +37,7 @@ const ADOPTION_TARGETS = {
   'datahallAI.html': 171,
   'dc-conventional.html': 0,
   'chiller-plant.html': 18,
-  'water-system.html': 10,
+  'water-system.html': 12,   /* v2.8.0 + cdw supply/return */
   'fire-system.html': 14,
   'fuel-system.html': 14   /* v2.7.0 fuel P&ID: fill/suction/2 discharge/header/3 DT feed/3 gen supply/polish side+return/DT return */
 };

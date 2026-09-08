@@ -11,6 +11,40 @@ release sections rather than semver.
 
 ---
 
+## v2.8.0 — 2026-09-08
+
+### Water system: the make-up path, a real booster train, and traceability on the drawing (Track B, owner comment 16)
+
+Owner: *"mimic poor, parameters must be wired with traceability, cards are AI design slop"*; ledger DCUI-010:
+*"pump harusnya ada 2 ada duty dan running, make up waternya juga nggak jelas, rancang modalnya dengan proper …
+sangat accurat dan HD dan engineering."* Measured: the drawing ended in a black "Make-up Water System" box
+although `conv-engine.js` adopts water-cooled centrifugal chillers rejecting to an **evaporative cooling tower**
+(`cooling.chiller_type`) and publishes the tower balance (evaporation 447.8, blowdown 149.3, drift 3.00,
+make-up 600.0 L/min at 4 cycles); the two pumps were play-button glyphs without valves; no valve, check valve or
+instrument existed; not one number inside the SVG carried a registry hook; the KPI hero, scope pills, severity
+chips and note boxes used tinted washes, dashed frames and 3–4 px rails.
+
+Now `#water-svg` (1180 × 520) draws: FM-101 meter + isolation valve → TK-101 raw tank (LIT; 150 m³, sized as
+4 h of the engine's total treated flow and declared as such; autonomy printed from the engine flow) → FLT-201
+with inlet/outlet PI and DP, XV-202 backwash to the drain header → booster train P-301A DUTY · RUNNING /
+P-301B STANDBY · AVAILABLE as ISA centrifugal-pump symbols with suction isolation, discharge check + isolation
+valves, PT-301 → DOS-302 dosing pump injecting at the tee → UV-401 → treated header → TK-402 (FT-402 service
+branch, autonomy) and the **cooling make-up branch** (FM-501, LCV-501) into **CT-501 cooling tower cell + basin**
+with evaporation and drift leaving the cell, XV-502 blowdown to drain, and the condenser-water loop to the
+chiller plant at the engine's 32.0 / 37.0 °C rejecting 31,250 kW; one drain header carries backwash and
+blowdown. Twelve tagged lines (two new, `cw_supply` / `cw_return`). **Traceability on the drawing:** ten values
+(treated total, make-up, evaporation, blowdown, drift, domestic, cycles, CDW supply/return, heat rejected) are
+`data-basis-param` hooks with an evidence mark coloured from the registry through `rz-evidence.js`, placed from
+the text's own bbox after layout, hidden when authority is missing; a BASIS legend is drawn once. Click on any
+equipment opens the shared right-side inspector with the A5 payload shape (Live / Capacity / Deps / Alarms /
+Trend / Maint), engine rows hooked, simulated and authored rows declared. Cards: 2 px semantic rails, 1 px
+hairlines, no washes, no dashed frames, outline chips. Fail-closed contract unchanged (every gated id and
+string kept).
+
+Gates: cooling/water UI, geometry 0/0, legibility strict, conv coverage STRICT (22/22 traced), basis drawer
+(108 hooks), line-model 12/12, hall scope, alarm runtime, explain wiring, document parity, snapshot binding,
+cockpit regressions, anti-vibecode strict.
+
 ## v2.7.0 — 2026-09-08
 
 ### Fuel system: a process diagram where there was none (Track B, owner comment 15)

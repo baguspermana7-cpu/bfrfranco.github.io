@@ -88,6 +88,11 @@
          the static SVG pipes tagged with data-rz-line / data-from / data-to
          / data-medium / data-state / etc. Loaded for validator parity. -->
     <script src="js/rz-line-model.js?v=1.42.0"></script>
+    <!-- v2.8.0 — traceability marks on the drawing (owner comment 16): the same emitter the DC AI diagrams use,
+         pointed at the Conventional registry twin. -->
+    <script>window.RZSvgBasisRegistry = 'RZ_CONV_PARAMETERS';</script>
+    <script src="js/rz-evidence.js?v=2.1.0"></script>
+    <script src="js/rz-svg-basis.js?v=2.1.0"></script>
     <!-- v1.43.1 — Right-side inspector. Click any tagged water-system pipe
          to see its medium / state / capacity / flow / etc. tabs. Additive. -->
     <!-- v1.43.4 — alarm state machine + color discipline (review §3.3 + §4.3). -->
@@ -121,6 +126,8 @@
             --medium-water: #38bdf8;/* potable / makeup water pipe */
             --medium-treated:#2dd4bf;/* treated water pipe */
             --medium-drain: #a16207;/* blowdown / drain */
+            --medium-cw: #64748b;   /* condenser water (site slate, the line-model's --p) */
+            --p: #64748b; --c: #06b6d4; --o: #f59e0b; --g: #22c55e; --r: #ef4444; --t3: #9aa3af; --bg2: #0c1423;
             --sel: #06b6d4;         /* governed instrument-cyan selection */
         }
         * { box-sizing: border-box; }
@@ -151,7 +158,7 @@
         .nav-btn:hover { background: rgba(255,255,255,.07); color: #fff; }
         .alarm-strip { display: flex; align-items: center; flex-wrap: wrap; gap: 18px;
             background: var(--panel-bg); border: 1px solid var(--panel-line);
-            border-left: 4px solid var(--st-ok); border-radius: 4px;
+            border-left: 2px solid var(--st-ok); border-radius: 4px;
             padding: 10px 18px; margin-bottom: 12px; }
         .alarm-strip.has-alarm { border-left-color: var(--st-bad); }
         .alarm-strip.has-warn { border-left-color: var(--st-warn); }
@@ -173,8 +180,8 @@
         .btn:focus-visible, .zoom-btn:focus-visible, .nav-btn:focus-visible {
             outline: 2px solid #8bd8f4; outline-offset: 2px; }
         .basis-card { display: flex; flex-direction: column; justify-content: center; }
-        .basis-card.current { border-left: 3px solid var(--medium-water); }
-        .basis-card.study { border-left: 3px solid var(--st-warn); }
+        .basis-card.current { border-left: 2px solid var(--medium-water); }
+        .basis-card.study { border-left: 2px solid var(--st-warn); }
         .basis-title { color: #dce7f2; font: 700 10px/1.3 'JetBrains Mono', monospace;
             letter-spacing: .04em; text-transform: uppercase; }
         .basis-value { margin-top: 3px; color: var(--text-dim); font: 10px/1.4 'JetBrains Mono', monospace; }
@@ -190,10 +197,8 @@
             gap: 10px; margin-bottom: 12px; }
         .kpi { background: var(--panel-bg); border: 1px solid var(--panel-line);
             border-radius: 4px; padding: 12px 14px; }
-        .kpi.hero {
-            border-color: rgba(45,212,191,0.45);
-            background: #0d1827;
-        }
+        /* v2.8.0 — the hero is ranked by size and a 2px semantic rail, not by a tinted wash (anti-vibecode §A 10/11) */
+        .kpi.hero { border-left: 2px solid var(--medium-treated); }
         .kpi.hero h3 { font-size: 11px; color: var(--medium-treated); letter-spacing: 0.7px; }
         .kpi.hero .v { font-size: 36px; color: #fff; }
         .kpi.hero .v small { font-size: 14px; }
@@ -232,9 +237,29 @@
         .flow.water { stroke: var(--medium-water); }
         .flow.treated { stroke: var(--medium-treated); }
         .flow.drain { stroke: var(--medium-drain); stroke-dasharray: 6 12; }
+        .flow.cw { stroke: var(--medium-cw); }
+        #water-svg .pipe[data-state="unavailable"] { stroke-width: 1.2; stroke-dasharray: 2 6; }
+        /* v2.8.0 — ISA-style symbols: one stroke weight, no glow */
+        #water-svg .sym { stroke: #8fa3bf; stroke-width: 1.4; fill: none; }
+        #water-svg .eqf { fill: #14213a; }
+        #water-svg .bub { fill: #0c1423; }
+        #water-svg .symfill { fill: #8fa3bf; }
+        #water-svg .bubtxt { font-size: 10px; font-weight: 700; font-family: 'JetBrains Mono', monospace; fill: var(--text-dim); }
+        #water-svg .pid-pump.running .pump-body { stroke: var(--st-ok); }
+        #water-svg .pid-pump.running .pid-impeller, #water-svg .pid-fan.running .pid-impeller { animation: wSpin 2.4s linear infinite; transform-origin: 0 0; }
+        #water-svg .pid-pump.running .symfill, #water-svg .pid-fan.running .symfill { fill: var(--st-ok); }
+        @keyframes wSpin { to { transform: rotate(360deg); } }
+        /* traceability marks on the drawing (A3 idiom): hook + evidence dot, one group, click opens the registry record */
+        #water-svg .rz-basis { cursor: pointer; }
+        #water-svg .rz-basis text { pointer-events: all; }
+        #water-svg .rz-basis:hover text { text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 2px; }
+        #water-svg .rz-basis:focus { outline: none; }
+        #water-svg .rz-basis:focus-visible .rz-basis-mark, #water-svg .rz-basis:hover .rz-basis-mark { r: 4; stroke: var(--sel); stroke-width: 1; }
+        #water-svg .rz-basis-mark[hidden] { display: none; }
+        #water-svg .rz-basis-legend text { font-size: 10px; }
         .flow.stopped { animation: none; opacity: .25; stroke: #475569; }
         @keyframes flowmove { to { stroke-dashoffset: -23; } }
-        @media (prefers-reduced-motion: reduce) { .flow { animation: none; } }
+        @media (prefers-reduced-motion: reduce) { .flow { animation: none; } #water-svg .pid-impeller { animation: none !important; } }
         .junction { fill: #33415a; }
         .pump-symbol { animation: none !important; }
         .pump-branch { fill: none; stroke: #33415a; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
@@ -267,14 +292,14 @@
         .insp-row .vv.warn { color: var(--st-warn); }
         .insp-row .vv.bad { color: var(--st-bad); }
         .balance-note { font-size: 11px; line-height: 1.6; color: var(--text-dim);
-            background: rgba(255,255,255,.03); border: 1px dashed var(--panel-line);
-            border-radius: 4px; padding: 10px 12px; margin-top: 10px; }
+            border: 1px solid var(--panel-line); border-radius: 3px; padding: 10px 12px; margin-top: 10px; }
         .balance-note b { color: var(--text-main); }
         .scope-tag { display: inline-block; font-size: 9px; font-weight: 700;
             padding: 2px 7px; border-radius: 3px; text-transform: uppercase;
             letter-spacing: .5px; }
-        .scope-tag.incl { background: rgba(45,212,191,.18); color: #5eead4; }
-        .scope-tag.excl { background: rgba(148,163,184,.15); color: #cbd5e1; }
+        .scope-tag { border: 1px solid currentColor; border-radius: 2px; font-family: 'JetBrains Mono', monospace; }
+        .scope-tag.incl { color: #5eead4; }
+        .scope-tag.excl { color: #94a3b8; }
 
         .alarm-list { list-style: none; margin: 0; padding: 0; }
         .alarm-list li { display: flex; gap: 9px; align-items: flex-start;
@@ -282,9 +307,10 @@
         .alarm-list li:last-child { border-bottom: 0; }
         .sev { flex: 0 0 auto; font-size: 9px; font-weight: 800; padding: 2px 6px;
             border-radius: 3px; text-transform: uppercase; }
-        .sev.ok { background: rgba(34,197,94,.18); color: #4ade80; }
-        .sev.warn { background: rgba(234,179,8,.18); color: #facc15; }
-        .sev.bad { background: rgba(239,68,68,.2); color: #f87171; }
+        .sev { border: 1px solid currentColor; border-radius: 2px; font-family: 'JetBrains Mono', monospace; }
+        .sev.ok { color: #4ade80; }
+        .sev.warn { color: #facc15; }
+        .sev.bad { color: #f87171; }
         .alarm-list .msg { color: var(--text-dim); }
         .alarm-list .msg b { color: var(--text-main); }
 
@@ -314,7 +340,7 @@
         .trend-chart-frame { height: 220px; min-height: 220px; position: relative; }
         .trend-chart-frame canvas { height: 100% !important; width: 100% !important; }
         .trend-unavailable { position: absolute; inset: 0; display: flex; align-items: center;
-            justify-content: center; border: 1px dashed #526173; color: #94a3b8;
+            justify-content: center; border: 1px solid var(--panel-line); color: #94a3b8;
             background: #0a111d; font: 600 11px/1.5 'JetBrains Mono', monospace;
             letter-spacing: .04em; text-align: center; padding: 18px; }
         .trend-unavailable[hidden] { display: none; }
@@ -342,9 +368,9 @@
         .pump-pair { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
         .pump-unit { display: grid; grid-template-columns: 36px minmax(0,1fr) auto; gap: 9px; align-items: center;
             min-width: 0; border: 1px solid #34465f; border-radius: 4px; padding: 8px; background: #101b2c; }
-        .pump-unit[data-state="running"] { border-left: 3px solid var(--st-ok); }
-        .pump-unit[data-state="available"] { border-left: 3px solid #64748b; }
-        .pump-unit[data-state="unavailable"] { border-left: 3px solid #64748b; opacity: .72; }
+        .pump-unit[data-state="running"] { border-left: 2px solid var(--st-ok); }
+        .pump-unit[data-state="available"] { border-left: 2px solid #64748b; }
+        .pump-unit[data-state="unavailable"] { border-left: 2px solid #64748b; opacity: .72; }
         .pump-icon { position: relative; width: 32px; height: 32px; border: 1.5px solid #7c92ad; border-radius: 50%; }
         .pump-icon::after { content: ""; position: absolute; left: 9px; top: 7px; border-top: 8px solid transparent;
             border-bottom: 8px solid transparent; border-left: 14px solid #7c92ad; }
@@ -519,162 +545,189 @@
                 <span class="sub">— raw &rarr; filtration &rarr; treatment &rarr; cooling makeup / domestic / blowdown</span>
             </div>
             <div class="diagram-wrap">
-            <svg class="pid" id="water-svg" data-rz-authored-basis="The water treatment train — raw and domestic tank levels, filter differential pressure, chlorine dosing and residual, UV intensity, treated TDS and the line pressures — is simulated plant state. conv-engine.js models the site water BALANCE (WUE, cooling makeup, domestic draw, treated total) and publishes no treatment-process quantity, so these readings have no engine parameter to trace to. The balance figures on this page are engine-bound and stay in the denominator." viewBox="0 0 1180 460" width="100%"
+            <svg class="pid" id="water-svg" data-rz-authored-basis="The water treatment train and the cooling-tower cell — raw and domestic tank levels, basin level, filter differential pressure, line pressures, chlorine dosing and residual, UV intensity, treated TDS, pump role/state — are simulated plant state; tank and basin capacities are page-authored design selections (raw storage sized for four hours of the engine's total treated flow, 608 L/min → 146 m³ → 150 m³ nominal; domestic 30 m³). conv-engine.js models the site water BALANCE (WUE, cooling makeup, evaporation, blowdown, drift, domestic draw, treated total, condenser-water temperatures and heat rejection) — those values carry their registry hook and evidence mark on the drawing; everything else has no engine parameter to trace to." viewBox="0 0 1180 520" width="100%"
                  preserveAspectRatio="xMidYMid meet" role="img"
-                 aria-label="Water treatment process and instrumentation diagram"
+                 aria-label="Water treatment and cooling-tower make-up process and instrumentation diagram"
                  style="transition:transform .25s; transform-origin:top left;">
+                <defs><marker id="wArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#64748b"/></marker></defs>
+                <text class="lbl" x="16" y="22">WATER P&amp;ID &middot; solid = flowing &middot; dim = stopped &middot; hairline = unavailable</text>
 
-                <!-- ===== Pipes (muted base) ===== v1.42.5 — tagged with line-model metadata.
-                     data-rz-line + from / to / medium / state / capacity / current / sensor. -->
-                <!-- Mains in -> raw tank -->
-                <path class="pipe" d="M40 90 H150" data-rz-line="1" data-id="ws-mains-in" data-from="MAINS-FM-101" data-to="TK-101-RAW" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN50" data-current="UNAVAILABLE" data-redundancy="duty" data-sensor="FM-101"/>
-                <!-- Raw tank -> filter -->
-                <path class="pipe" d="M250 130 H300" data-rz-line="1" data-id="ws-raw-to-filter" data-from="TK-101-RAW" data-to="FLT-201" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN50" data-current="UNAVAILABLE" data-redundancy="duty"/>
-                <!-- Filter -> booster pump -->
-                <path class="pipe" d="M400 130 H470" data-rz-line="1" data-id="ws-filter-to-pump" data-from="FLT-201" data-to="P-301-BOOSTER" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN50" data-current="UNAVAILABLE" data-redundancy="duty/standby"/>
-                <!-- Pump -> dosing tee -> UV -->
-                <path class="pipe" d="M540 130 H660" data-rz-line="1" data-id="ws-pump-to-uv" data-from="P-301-BOOSTER" data-to="UV-401" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN50 / 2 × 7.5 kW" data-current="UNAVAILABLE" data-redundancy="duty/standby" data-sensor="DOS-302"/>
-                <!-- P-301B standby branch. Untagged because the semantic line model
-                     represents the booster station as one duty/standby train. -->
-                <path class="pump-branch" d="M440 130 V225 H470"/>
-                <path class="pump-branch" d="M540 225 H600 V130"/>
-                <!-- UV -> treated header tee -->
-                <path class="pipe" d="M760 130 H850 V210" data-rz-line="1" data-id="ws-uv-to-treated-header" data-from="UV-401" data-to="TREATED-HEADER-TEE" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN50" data-current="UNAVAILABLE" data-redundancy="duty" data-sensor="UV-401"/>
-                <!-- Treated header split: -> domestic tank (v1.41.5 — straight down, no Z-routing that visually appeared as 2 pipes) -->
+                <!-- ===== Pipes (muted base) — v1.42.5 line-model metadata, v2.8.0 recomposed geometry; first paint fails closed ===== -->
+                <path class="pipe" d="M110 100 H170" data-rz-line="1" data-id="ws-mains-in" data-from="MAINS-FM-101" data-to="TK-101-RAW" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN50" data-current="UNAVAILABLE" data-redundancy="duty" data-sensor="FM-101"/>
+                <path class="pipe" d="M270 130 H320" data-rz-line="1" data-id="ws-raw-to-filter" data-from="TK-101-RAW" data-to="FLT-201" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN50" data-current="UNAVAILABLE" data-redundancy="duty"/>
+                <path class="pipe" d="M420 130 H460" data-rz-line="1" data-id="ws-filter-to-pump" data-from="FLT-201" data-to="P-301-BOOSTER" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN50" data-current="UNAVAILABLE" data-redundancy="duty/standby"/>
+                <path class="pipe" d="M590 130 H710" data-rz-line="1" data-id="ws-pump-to-uv" data-from="P-301-BOOSTER" data-to="UV-401" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN50 / 2 × 7.5 kW" data-current="UNAVAILABLE" data-redundancy="duty/standby" data-sensor="DOS-302"/>
+                <path class="pipe" d="M770 130 H850 V210" data-rz-line="1" data-id="ws-uv-to-treated-header" data-from="UV-401" data-to="TREATED-HEADER-TEE" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN50" data-current="UNAVAILABLE" data-redundancy="duty" data-sensor="UV-401"/>
                 <path class="pipe" d="M850 210 V250" data-rz-line="1" data-id="ws-treated-to-domtank" data-from="TREATED-HEADER-TEE" data-to="TK-402-DOM" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN50" data-current="UNAVAILABLE" data-redundancy="duty"/>
-                <!-- Treated header -> cooling makeup -->
-                <path class="pipe" d="M850 210 V300 H980" data-rz-line="1" data-id="ws-treated-to-makeup" data-from="TREATED-HEADER-TEE" data-to="MK-501-MAKEUP" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN50" data-current="UNAVAILABLE" data-redundancy="duty"/>
-                <!-- Domestic tank -> service header -->
-                <path class="pipe" d="M760 360 H700" data-rz-line="1" data-id="ws-domtank-to-service" data-from="TK-402-DOM" data-to="SERVICE-HEADER" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN50" data-current="UNAVAILABLE" data-redundancy="duty"/>
-                <!-- Filter backwash -> drain -->
-                <path class="pipe" d="M350 180 V250 H260" data-rz-line="1" data-id="ws-bw-to-drain" data-from="FLT-201" data-to="DRAIN" data-medium="drain" data-direction="forward" data-state="unavailable" data-capacity="DN50 backwash" data-current="UNAVAILABLE" data-redundancy="maintenance" data-sensor="XV-202"/>
-                <!-- Make-up system blowdown / discharge -> drain (v1.41.5) -->
-                <path class="pipe" d="M1075 360 V410 H40" data-rz-line="1" data-id="ws-makeup-blowdown" data-from="MK-501-MAKEUP" data-to="DRAIN" data-medium="drain" data-direction="forward" data-state="unavailable" data-capacity="DN50 blowdown" data-current="UNAVAILABLE" data-redundancy="duty"/>
+                <path class="pipe" d="M850 210 V300 H960" data-rz-line="1" data-id="ws-treated-to-makeup" data-from="TREATED-HEADER-TEE" data-to="CT-501-BASIN" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN50" data-current="UNAVAILABLE" data-redundancy="duty"/>
+                <path class="pipe" d="M760 360 H680" data-rz-line="1" data-id="ws-domtank-to-service" data-from="TK-402-DOM" data-to="SERVICE-HEADER" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN50" data-current="UNAVAILABLE" data-redundancy="duty"/>
+                <path class="pipe" d="M370 180 V470" data-rz-line="1" data-id="ws-bw-to-drain" data-from="FLT-201" data-to="DRAIN" data-medium="drain" data-direction="forward" data-state="unavailable" data-capacity="DN50 backwash" data-current="UNAVAILABLE" data-redundancy="maintenance" data-sensor="XV-202"/>
+                <path class="pipe" d="M965 380 V470 H60" data-rz-line="1" data-id="ws-makeup-blowdown" data-from="CT-501-BASIN" data-to="DRAIN" data-medium="drain" data-direction="forward" data-state="unavailable" data-capacity="DN50 blowdown" data-current="UNAVAILABLE" data-redundancy="duty"/>
+                <path class="pipe" d="M1010 380 V420" data-rz-line="1" data-id="ws-cdw-supply" data-from="CT-501-BASIN" data-to="CH-PLANT-CONDENSERS" data-medium="cw_supply" data-direction="forward" data-state="unavailable" data-capacity="condenser water · plant" data-current="UNAVAILABLE" data-redundancy="common" data-sensor="TE-CDW-S"/>
+                <path class="pipe" d="M1060 420 V300" data-rz-line="1" data-id="ws-cdw-return" data-from="CH-PLANT-CONDENSERS" data-to="CT-501-HOT-DECK" data-medium="cw_return" data-direction="forward" data-state="unavailable" data-capacity="condenser water · plant" data-current="UNAVAILABLE" data-redundancy="common" data-sensor="TE-CDW-R"/>
+                <!-- P-301B standby branch and the suction manifold. Untagged: the semantic line model represents the booster station as one duty/standby train. -->
+                <path class="pump-branch" d="M460 130 H482"/><path class="pump-branch" d="M460 130 V240 H482"/>
+                <path class="pump-branch" d="M518 130 H590"/><path class="pump-branch" d="M518 240 H590 V130"/>
+                <path class="pump-branch" d="M660 100 V130"/>
 
                 <!-- ===== Animated flow (medium-coloured) ===== -->
-                <path class="flow water stopped" id="f-in"     d="M40 90 H150"/>
-                <path class="flow water stopped" id="f-raw"    d="M250 130 H300"/>
-                <path class="flow water stopped" id="f-filt"   d="M400 130 H470"/>
-                <path class="flow treated stopped" id="f-pump" d="M540 130 H660"/>
-                <path class="flow treated stopped" id="f-uv"   d="M760 130 H850 V210"/>
-                <path class="flow treated stopped" id="f-dom"  d="M850 210 V250"/>
-                <path class="flow treated stopped" id="f-mk"   d="M850 210 V300 H980"/>
-                <path class="flow treated stopped" id="f-svc"  d="M760 360 H700"/>
-                <path class="flow drain stopped" id="f-bw" d="M350 180 V250 H260"/>
-                <path class="flow drain stopped" id="f-bd"     d="M1075 360 V410 H40"/>
+                <path class="flow water stopped" id="f-in" d="M110 100 H170"/>
+                <path class="flow water stopped" id="f-raw" d="M270 130 H320"/>
+                <path class="flow water stopped" id="f-filt" d="M420 130 H460"/>
+                <path class="flow treated stopped" id="f-pump" d="M590 130 H710"/>
+                <path class="flow treated stopped" id="f-uv" d="M770 130 H850 V210"/>
+                <path class="flow treated stopped" id="f-dom" d="M850 210 V250"/>
+                <path class="flow treated stopped" id="f-mk" d="M850 210 V300 H960"/>
+                <path class="flow treated stopped" id="f-svc" d="M760 360 H680"/>
+                <path class="flow drain stopped" id="f-bw" d="M370 180 V470"/>
+                <path class="flow drain stopped" id="f-bd" d="M965 380 V470 H60"/>
+                <path class="flow cw stopped" id="f-cdws" d="M1010 380 V420"/>
+                <path class="flow cw stopped" id="f-cdwr" d="M1060 420 V300"/>
 
                 <!-- junctions / tees -->
-                <circle class="junction" cx="850" cy="210" r="4"/>
-                <circle class="junction" cx="660" cy="130" r="4"/>
-                <circle class="junction" cx="350" cy="130" r="4"/>
-
-                <!-- flow arrows -->
-                <polygon class="arrow" points="148,86 158,90 148,94"/>
-                <polygon class="arrow" points="468,126 478,130 468,134"/>
-                <polygon class="arrow" points="978,296 988,300 978,304"/>
-                <polygon class="arrow" points="262,254 252,250 262,246"/>
+                <circle class="junction" cx="850" cy="210" r="4"/><circle class="junction" cx="660" cy="130" r="4"/><circle class="junction" cx="460" cy="130" r="4"/><circle class="junction" cx="590" cy="130" r="4"/>
+                <circle class="junction" cx="370" cy="470" r="4"/><circle class="junction" cx="965" cy="470" r="4"/>
+                <!-- flow arrows on the segments where direction matters -->
+                <path class="pipe" d="M158 100 H168" marker-end="url(#wArrow)"/><path class="pipe" d="M308 130 H318" marker-end="url(#wArrow)"/>
+                <path class="pipe" d="M698 130 H708" marker-end="url(#wArrow)"/><path class="pipe" d="M948 300 H958" marker-end="url(#wArrow)"/>
+                <path class="pipe" d="M850 238 V248" marker-end="url(#wArrow)"/><path class="pipe" d="M692 360 H682" marker-end="url(#wArrow)"/>
+                <path class="pipe" d="M72 470 H62" marker-end="url(#wArrow)"/><path class="pipe" d="M1010 408 V418" marker-end="url(#wArrow)"/><path class="pipe" d="M1060 312 V302" marker-end="url(#wArrow)"/>
 
                 <!-- ===== Equipment ===== -->
-                <!-- Mains supply / meter -->
-                <g class="eq-grp" data-eq="meter">
-                    <rect class="eq" x="40" y="50" width="90" height="78" rx="4"/>
-                    <text class="tag" x="46" y="42">FM-101</text>
-                    <text class="lbl" x="46" y="70">Mains / Meter</text>
-                    <text class="val" id="m-mains" x="46" y="90">UNAVAILABLE</text>
-                    <text class="val" id="m-mains-p" x="46" y="108">UNAVAILABLE</text>
+                <g class="eq-grp" data-eq="meter" tabindex="0" role="button" aria-label="FM-101 mains meter">
+                    <rect class="eq" x="30" y="60" width="80" height="78" rx="3"/>
+                    <text class="tag" x="36" y="52">FM-101</text>
+                    <text class="lbl" x="36" y="80">Mains / Meter</text>
+                    <g class="rz-basis" data-basis-param="water.total_treated_lpm" data-rz-text-group="basis" tabindex="0" role="button"><title>water.total_treated_lpm</title><text class="val" id="m-mains" x="36" y="100" text-anchor="start">UNAVAILABLE</text><circle class="rz-basis-mark" r="3" cx="36" cy="100" hidden/></g>
+                    <text class="val" id="m-mains-p" x="36" y="118">UNAVAILABLE</text>
                 </g>
+                <g transform="translate(140,100)"><polygon points="-8,-6 8,6 8,-6 -8,6" class="sym eqf"/><line x1="0" y1="-7" x2="0" y2="-14" class="sym"/><circle cy="-16" r="3" class="sym"/></g>
 
                 <!-- Raw water tank -->
-                <g class="eq-grp" data-eq="rawtank">
-                    <rect class="eq" x="150" y="60" width="100" height="150" rx="3"/>
-                    <rect class="tank-fill" id="rawFill" x="153" y="207" width="94" height="0"/>
-                    <text class="tag" x="156" y="52">TK-101</text>
-                    <text class="lbl" x="156" y="230">Raw Tank 25 m&sup3;</text>
-                    <text class="val" id="m-raw-pct" x="178" y="145" style="font-size:14px;">UNAVAILABLE</text>
-                    <text class="val" id="m-raw-vol" x="166" y="165">UNAVAILABLE</text>
+                <g class="eq-grp" data-eq="rawtank" tabindex="0" role="button" aria-label="TK-101 raw water tank">
+                    <rect class="eq" x="170" y="60" width="100" height="150" rx="3"/>
+                    <rect class="tank-fill" id="rawFill" x="173" y="207" width="94" height="0"/>
+                    <text class="tag" x="176" y="52">TK-101</text>
+                    <line x1="240" y1="53" x2="240" y2="60" class="sym"/><g transform="translate(240,40)"><circle r="13" class="sym bub"/><text y="4" text-anchor="middle" class="lbl bubtxt">LIT</text></g>
+                    <text class="val" id="m-raw-pct" x="198" y="140" style="font-size:14px;">UNAVAILABLE</text>
+                    <text class="val" id="m-raw-vol" x="186" y="160">UNAVAILABLE</text>
+                    <text class="lbl" id="m-raw-aut" x="186" y="178">UNAVAILABLE</text>
+                    <text class="lbl" x="176" y="230">Raw Tank 150 m&sup3; &middot; 4 h store</text>
                 </g>
 
-                <!-- Multimedia / carbon filter -->
-                <g class="eq-grp" data-eq="filter">
-                    <rect class="eq" x="300" y="80" width="100" height="100" rx="3"/>
-                    <text class="tag" x="306" y="72">FLT-201</text>
-                    <text class="lbl" x="306" y="105">Media Filter</text>
-                    <text class="val" id="m-flt-in" x="306" y="125">UNAVAILABLE</text>
-                    <text class="val" id="m-flt-out" x="306" y="143">UNAVAILABLE</text>
-                    <text class="val" id="m-flt-dp" x="306" y="161">UNAVAILABLE</text>
+                <!-- Media filter with inlet/outlet PI and DP -->
+                <line x1="295" y1="117" x2="295" y2="130" class="sym"/><g transform="translate(295,104)"><circle r="13" class="sym bub"/><text y="4" text-anchor="middle" class="lbl bubtxt">PI</text></g><line x1="445" y1="117" x2="445" y2="130" class="sym"/><g transform="translate(445,104)"><circle r="13" class="sym bub"/><text y="4" text-anchor="middle" class="lbl bubtxt">PI</text></g>
+                <g class="eq-grp" data-eq="filter" tabindex="0" role="button" aria-label="FLT-201 media filter">
+                    <rect class="eq" x="320" y="80" width="100" height="100" rx="3"/>
+                    <line x1="326" y1="174" x2="414" y2="86" class="sym" opacity=".45"/>
+                    <text class="tag" x="326" y="72">FLT-201</text>
+                    <text class="lbl" x="326" y="104">Media Filter</text>
+                    <text class="val" id="m-flt-in" x="326" y="122">UNAVAILABLE</text>
+                    <text class="val" id="m-flt-out" x="326" y="140">UNAVAILABLE</text>
+                    <text class="val" id="m-flt-dp" x="326" y="158">UNAVAILABLE</text>
+                </g>
+                <!-- Backwash valve to drain -->
+                <g class="eq-grp" data-eq="backwash" tabindex="0" role="button" aria-label="XV-202 backwash valve">
+                    <g transform="translate(370,215)"><polygon points="-6,-8 6,8 -6,8 6,-8" class="sym eqf"/><line x1="6" y1="0" x2="13" y2="0" class="sym"/><circle cx="15" cy="0" r="3" class="sym"/></g>
+                    <text class="tag" x="392" y="205">XV-202</text>
+                    <text class="lbl" x="392" y="221" id="m-bw-st">Backwash UNAVAILABLE</text>
                 </g>
 
-                <!-- Backwash valve -->
-                <g class="eq-grp" data-eq="backwash">
-                    <rect class="eq" x="220" y="232" width="40" height="36" rx="3"/>
-                    <text class="tag" x="200" y="290">XV-202</text>
-                    <text class="lbl" x="200" y="308" id="m-bw-st">Backwash UNAVAILABLE</text>
+                <!-- Booster train: two pumps, role and state separately (DCUI-010) -->
+                <g transform="translate(471,130)"><polygon points="-8,-6 8,6 8,-6 -8,6" class="sym eqf"/><line x1="0" y1="-7" x2="0" y2="-14" class="sym"/><circle cy="-16" r="3" class="sym"/></g><g transform="translate(471,240)"><polygon points="-8,-6 8,6 8,-6 -8,6" class="sym eqf"/><line x1="0" y1="-7" x2="0" y2="-14" class="sym"/><circle cy="-16" r="3" class="sym"/></g>
+                <g transform="translate(535,130)"><circle r="8" class="sym eqf"/><path d="M-4,-5 L5,0 L-4,5 Z" class="symfill"/></g><g transform="translate(535,240)"><circle r="8" class="sym eqf"/><path d="M-4,-5 L5,0 L-4,5 Z" class="symfill"/></g><g transform="translate(565,130)"><polygon points="-8,-6 8,6 8,-6 -8,6" class="sym eqf"/><line x1="0" y1="-7" x2="0" y2="-14" class="sym"/><circle cy="-16" r="3" class="sym"/></g><g transform="translate(565,240)"><polygon points="-8,-6 8,6 8,-6 -8,6" class="sym eqf"/><line x1="0" y1="-7" x2="0" y2="-14" class="sym"/><circle cy="-16" r="3" class="sym"/></g>
+                <g class="eq-grp" data-eq="pump-duty" tabindex="0" role="button" aria-label="P-301A duty pump authority unavailable">
+                    <g transform="translate(500,130)" id="pid-p301a" class="pid-pump"><circle r="18" class="sym eqf pump-body"/><line x1="-14" y1="20" x2="14" y2="20" class="sym"/><line x1="-10" y1="18" x2="-10" y2="20" class="sym"/><line x1="10" y1="18" x2="10" y2="20" class="sym"/><g class="pid-impeller"><path d="M0-12C7-10 11-5 11 0C6-2 2-1 0 2Z M-9 7C-10-1-8-8-3-10C-3-5-1-1 2 0Z M9 7C2 11-4 11-8 8C-2 7 1 5 1 1Z" class="symfill"/></g></g>
+                    <text class="tag" x="500" y="98" text-anchor="middle">P-301A &middot; DUTY</text>
+                    <text class="val" id="m-pump-st" x="500" y="172" text-anchor="middle">UNAVAILABLE</text>
+                    <text class="val" id="m-pump-kw" x="500" y="186" text-anchor="middle">UNAVAILABLE</text>
+                </g>
+                <g class="eq-grp" data-eq="pump-standby" tabindex="0" role="button" aria-label="P-301B standby pump authority unavailable">
+                    <g transform="translate(500,240)" id="pid-p301b" class="pid-pump"><circle r="18" class="sym eqf pump-body"/><line x1="-14" y1="20" x2="14" y2="20" class="sym"/><line x1="-10" y1="18" x2="-10" y2="20" class="sym"/><line x1="10" y1="18" x2="10" y2="20" class="sym"/><g class="pid-impeller"><path d="M0-12C7-10 11-5 11 0C6-2 2-1 0 2Z M-9 7C-10-1-8-8-3-10C-3-5-1-1 2 0Z M9 7C2 11-4 11-8 8C-2 7 1 5 1 1Z" class="symfill"/></g></g>
+                    <text class="tag" x="500" y="206" text-anchor="middle">P-301B &middot; STANDBY</text>
+                    <text class="val" id="m-pump-b-st" x="500" y="282" text-anchor="middle">UNAVAILABLE</text>
+                    <text class="val" id="m-pump-b-kw" x="500" y="296" text-anchor="middle">UNAVAILABLE</text>
+                </g>
+                <line x1="612" y1="117" x2="612" y2="130" class="sym"/><g transform="translate(612,104)"><circle r="13" class="sym bub"/><text y="4" text-anchor="middle" class="lbl bubtxt">PT</text></g>
+                <text class="val" id="m-pt301" x="598" y="84" text-anchor="end">UNAVAILABLE</text>
+
+                <!-- Cl2 dosing pump injecting at the tee -->
+                <g class="eq-grp" data-eq="dosing" tabindex="0" role="button" aria-label="DOS-302 chlorine dosing">
+                    <rect class="eq" x="630" y="36" width="64" height="64" rx="3"/>
+                    <text class="tag" x="636" y="28">DOS-302</text>
+                    <text class="lbl" x="636" y="56">Cl&#8322; dosing</text>
+                    <text class="val" id="m-cl2" x="636" y="74">UNAVAILABLE</text>
+                    <text class="val" id="m-cl2-res" x="636" y="92">UNAVAILABLE</text>
+                </g>
+                <g transform="translate(660,116)"><circle r="8" class="sym eqf"/><path d="M-5,-4 L0,5 L5,-4 Z" class="symfill"/></g>
+
+                <!-- UV steriliser -->
+                <g class="eq-grp" data-eq="uv" tabindex="0" role="button" aria-label="UV-401 steriliser">
+                    <rect class="eq" x="710" y="105" width="60" height="50" rx="6"/>
+                    <text class="tag" x="716" y="97">UV-401</text>
+                    <text class="lbl" x="716" y="125">UV Steril.</text>
+                    <text class="val" id="m-uv" x="716" y="146">UNAVAILABLE</text>
                 </g>
 
-                <!-- Booster pump pair — static ISA-style centrifugal symbols. -->
-                <g class="eq-grp" data-eq="pump-duty" aria-label="P-301A duty pump authority unavailable">
-                    <circle class="eq" cx="505" cy="130" r="35"/>
-                    <path class="pump-symbol" d="M491 112 L526 130 L491 148 Z" fill="#718096" stroke="#8ca0b8" stroke-width="1.5"/>
-                    <text class="tag" x="466" y="80">P-301A · DUTY</text>
-                    <text class="lbl" x="552" y="118">Booster Pump A</text>
-                    <text class="val" id="m-pump-st" x="552" y="136">UNAVAILABLE</text>
-                    <text class="val" id="m-pump-kw" x="552" y="154">UNAVAILABLE</text>
-                </g>
-                <g class="eq-grp" data-eq="pump-standby" aria-label="P-301B standby pump authority unavailable">
-                    <circle class="eq" cx="505" cy="225" r="35"/>
-                    <path class="pump-symbol" d="M491 207 L526 225 L491 243 Z" fill="#718096" stroke="#8ca0b8" stroke-width="1.5"/>
-                    <text class="tag" x="448" y="276">P-301B · STANDBY</text>
-                    <text class="lbl" x="552" y="213">Booster Pump B</text>
-                    <text class="val" id="m-pump-b-st" x="552" y="231">UNAVAILABLE</text>
-                    <text class="val" id="m-pump-b-kw" x="552" y="249">UNAVAILABLE</text>
-                </g>
-
-                <!-- Cl2 dosing -->
-                <g class="eq-grp" data-eq="dosing">
-                    <rect class="eq" x="630" y="92" width="60" height="76" rx="3"/>
-                    <text class="tag" x="636" y="84">DOS-302</text>
-                    <text class="lbl" x="636" y="120">Cl&#8322; Dose</text>
-                    <text class="val" id="m-cl2" x="636" y="140">UNAVAILABLE</text>
-                    <text class="val" id="m-cl2-res" x="636" y="158">UNAVAILABLE</text>
-                </g>
-
-                <!-- UV steriliser (v1.41.5 — relocated past DOS-302 rect to fix label overlap) -->
-                <g class="eq-grp" data-eq="uv">
-                    <rect class="eq" x="700" y="105" width="60" height="50" rx="6"/>
-                    <text class="tag" x="706" y="97">UV-401</text>
-                    <text class="lbl" x="706" y="125">UV Steril.</text>
-                    <text class="val" id="m-uv" x="706" y="146">UNAVAILABLE</text>
-                </g>
-
-                <!-- Treated / domestic tank -->
-                <g class="eq-grp" data-eq="domtank">
+                <!-- Treated / domestic tank + service branch -->
+                <g class="eq-grp" data-eq="domtank" tabindex="0" role="button" aria-label="TK-402 domestic tank">
                     <rect class="eq" x="760" y="250" width="100" height="150" rx="3"/>
                     <rect class="tank-fill treated" id="domFill" x="763" y="397" width="94" height="0"/>
                     <text class="tag" x="766" y="242">TK-402</text>
-                    <text class="lbl" x="766" y="420">Domestic Tank 30 m&sup3;</text>
-                    <text class="val" id="m-dom-pct" x="788" y="320" style="font-size:14px;">UNAVAILABLE</text>
-                    <text class="val" id="m-dom-vol" x="776" y="340">UNAVAILABLE</text>
+                    <text class="val" id="m-dom-pct" x="788" y="318" style="font-size:14px;">UNAVAILABLE</text>
+                    <text class="val" id="m-dom-vol" x="776" y="338">UNAVAILABLE</text>
+                    <text class="lbl" id="m-dom-aut" x="776" y="356">UNAVAILABLE</text>
+                    <text class="lbl" x="766" y="418">Domestic Tank 30 m&sup3;</text>
+                </g>
+                <line x1="732" y1="351" x2="732" y2="360" class="sym"/><g transform="translate(732,338)"><circle r="13" class="sym bub"/><text y="4" text-anchor="middle" class="lbl bubtxt">FT</text></g>
+                <g class="eq-grp" data-eq="service" tabindex="0" role="button" aria-label="Domestic and process service header">
+                    <text class="lbl" x="752" y="322" text-anchor="end">Domestic / Service &middot; WUE excluded</text>
+                    <g class="rz-basis" data-basis-param="water.domestic_lpm" data-rz-text-group="basis" tabindex="0" role="button"><title>water.domestic_lpm</title><text class="val" id="m-svc" x="612" y="340" text-anchor="start">UNAVAILABLE</text><circle class="rz-basis-mark" r="3" cx="612" cy="372" hidden/></g>
                 </g>
 
-                <!-- Make-up Water System (v1.41.5 — renamed from "Cooling Tower" per dry-only design; no evaporative tower in this baseline) -->
-                <g class="eq-grp" data-eq="makeup">
-                    <rect class="eq" x="980" y="270" width="120" height="90" rx="3"/>
-                    <text class="tag" x="986" y="262">MK-501</text>
-                    <text class="lbl" x="986" y="295">Make-up Water</text>
-                    <text class="lbl" x="986" y="311">System</text>
-                    <text class="val treated" id="m-mk" x="986" y="331">UNAVAILABLE</text>
-                    <text class="val" id="m-mk-bd" x="986" y="349">BD UNAVAILABLE</text>
-                </g>
+                <!-- Cooling make-up branch: flow meter + level-control valve into the tower basin -->
+                <line x1="890" y1="291" x2="890" y2="300" class="sym"/><g transform="translate(890,278)"><circle r="13" class="sym bub"/><text y="4" text-anchor="middle" class="lbl bubtxt">FM</text></g><g transform="translate(930,300)"><polygon points="-8,-6 8,6 8,-6 -8,6" class="sym eqf"/><line x1="0" y1="-7" x2="0" y2="-14" class="sym"/><circle cy="-16" r="3" class="sym"/></g>
+                <g class="rz-basis" data-basis-param="water.flow_lpm_for_wue" data-rz-text-group="basis" tabindex="0" role="button"><title>water.flow_lpm_for_wue</title><text class="val treated" id="m-mk" x="858" y="240" text-anchor="start">UNAVAILABLE</text><circle class="rz-basis-mark" r="3" cx="855" cy="270" hidden/></g>
+                <text class="lbl" x="858" y="254">cooling make-up &middot; WUE included</text>
 
-                <!-- Service / domestic header label -->
-                <g>
-                    <text class="lbl" x="610" y="356">Domestic /</text>
-                    <text class="lbl" x="610" y="372">Service</text>
-                    <text class="val" id="m-svc" x="610" y="392">UNAVAILABLE</text>
+                <!-- CT-501 cooling tower cell (engine: water-cooled centrifugal chillers reject to an evaporative tower) -->
+                <g class="eq-grp" data-eq="makeup" tabindex="0" role="button" aria-label="CT-501 cooling tower cell and basin">
+                    <text class="tag" x="960" y="216">CT-501 &middot; COOLING TOWER</text>
+                    <g transform="translate(1035,236)" class="pid-fan"><circle r="15" class="sym eqf"/><g class="pid-impeller"><path d="M0-11C6-9 9-4 9 0C5-2 2-1 0 2Z M-8 6C-9-1-7-7-3-9C-3-4-1-1 2 0Z M8 6C2 10-4 10-7 7C-2 6 1 4 1 1Z" class="symfill"/></g></g>
+                    <rect class="eq" x="972" y="252" width="126" height="88" rx="2"/>
+                    <line x1="980" y1="268" x2="1090" y2="268" class="sym" opacity=".5"/><line x1="980" y1="284" x2="1090" y2="284" class="sym" opacity=".5"/><line x1="980" y1="300" x2="1090" y2="300" class="sym" opacity=".5"/>
+                    <rect class="eq" x="960" y="340" width="150" height="40" rx="2"/>
+                    <rect class="tank-fill" id="basinFill" x="963" y="377" width="144" height="0"/>
+                    <text class="lbl" x="984" y="322">hot deck</text>
+                    <text class="lbl" x="1090" y="320" text-anchor="end">COC</text>
+                    <text class="val" id="m-basin" x="1035" y="366" text-anchor="middle">UNAVAILABLE</text>
                 </g>
+                <!-- evaporation / drift leaving the cell (engine balance) -->
+                <path class="pipe" d="M1100 300 H1118 V200" marker-end="url(#wArrow)"/>
+                <text class="lbl" x="1112" y="248" text-anchor="start">EVAP</text>
+                <g class="rz-basis" data-basis-param="water.evaporation_lpm" data-rz-text-group="basis" tabindex="0" role="button"><title>water.evaporation_lpm</title><text class="val" id="m-ev" x="1112" y="262" text-anchor="start">UNAVAILABLE</text><circle class="rz-basis-mark" r="3" cx="1112" cy="262" hidden/></g>
+                <text class="lbl" x="1112" y="276">L/min</text>
+                <text class="lbl" x="1112" y="300">DRIFT</text>
+                <g class="rz-basis" data-basis-param="water.drift_lpm" data-rz-text-group="basis" tabindex="0" role="button"><title>water.drift_lpm</title><text class="val" id="m-dr" x="1112" y="314" text-anchor="start">UNAVAILABLE</text><circle class="rz-basis-mark" r="3" cx="1112" cy="314" hidden/></g>
+                <text class="lbl" x="1112" y="328">L/min</text>
+                <!-- blowdown from the basin -->
+                <g transform="translate(965,415)"><polygon points="-6,-8 6,8 -6,8 6,-8" class="sym eqf"/><line x1="6" y1="0" x2="13" y2="0" class="sym"/><circle cx="15" cy="0" r="3" class="sym"/></g>
+                <text class="tag" x="940" y="410" text-anchor="end">XV-502</text>
+                <text class="lbl" x="940" y="426" text-anchor="end">blowdown</text>
+                <g class="rz-basis" data-basis-param="water.blowdown_lpm" data-rz-text-group="basis" tabindex="0" role="button"><title>water.blowdown_lpm</title><text class="val" id="m-mk-bd" x="940" y="442" text-anchor="end">UNAVAILABLE</text><circle class="rz-basis-mark" r="3" cx="940" cy="442" hidden/></g>
+                <!-- condenser-water loop to the chiller plant (engine cooling.* planes) -->
+                <g class="eq-grp" data-eq="chplant" tabindex="0" role="button" aria-label="Chiller plant condensers">
+                    <rect class="eq" x="975" y="420" width="122" height="38" rx="3"/>
+                    <text class="lbl" x="1035" y="435" text-anchor="middle">CH PLANT &middot; condensers</text>
+                    <g class="rz-basis" data-basis-param="cooling.heat_rejection_kw" data-rz-text-group="basis" tabindex="0" role="button"><title>cooling.heat_rejection_kw</title><text class="val" id="m-hr" x="1035" y="450" text-anchor="middle">UNAVAILABLE</text><circle class="rz-basis-mark" r="3" cx="1035" cy="450" hidden/></g>
+                </g>
+                <g class="rz-basis" data-basis-param="cooling.cdw_supply_c" data-rz-text-group="basis" tabindex="0" role="button"><title>cooling.cdw_supply_c</title><text class="val" id="m-cdw-s" x="1002" y="404" text-anchor="end">UNAVAILABLE</text><circle class="rz-basis-mark" r="3" cx="1002" cy="404" hidden/></g>
+                <g class="rz-basis" data-basis-param="cooling.cdw_return_c" data-rz-text-group="basis" tabindex="0" role="button"><title>cooling.cdw_return_c</title><text class="val" id="m-cdw-r" x="1068" y="404" text-anchor="start">UNAVAILABLE</text><circle class="rz-basis-mark" r="3" cx="1068" cy="404" hidden/></g>
+                <g class="rz-basis" data-basis-param="water.tower_cycles_of_concentration" data-rz-text-group="basis" tabindex="0" role="button"><title>water.tower_cycles_of_concentration</title><text class="val" id="m-coc" x="1090" y="334" text-anchor="end">UNAVAILABLE</text><circle class="rz-basis-mark" r="3" cx="1035" cy="406" hidden/></g>
 
-                <!-- Drain / blowdown label -->
-                <text class="lbl" x="430" y="404">Blowdown &amp; Backwash &rarr; Drain</text>
+                <!-- Drain header -->
+                <text class="lbl" x="560" y="462" text-anchor="middle">BACKWASH + BLOWDOWN &rarr; DRAIN / SEWER</text>
+                <g id="basisLegend"></g>
             </svg>
             </div>
 
@@ -907,8 +960,17 @@
                 : null;
 
             // Static treatment-quality basis (no PRNG; plausible operating point)
-            var rawPct = 82, rawVol = (rawPct / 100) * 25;          // TK-101 25 m3
-            var domPct = 88, domVol = (domPct / 100) * 30;          // TK-402 30 m3
+            /* v2.8.0 — tank capacities are page-authored design selections, declared on the drawing:
+               raw storage = 4 h of the engine's total treated flow (608 L/min × 240 min = 146 m³ → 150 m³
+               nominal); domestic 30 m³. The AUTONOMY printed beside each level is derived from the engine flow. */
+            var RAW_TANK_M3 = 150, DOM_TANK_M3 = 30, BASIN_PCT = 62;
+            var rawPct = 82, rawVol = (rawPct / 100) * RAW_TANK_M3;   // TK-101
+            var domPct = 88, domVol = (domPct / 100) * DOM_TANK_M3;   // TK-402
+            var COOL = (currentEngineAuthority && S && S.cooling) ? S.cooling : {};
+            var cdwSupplyC = ok(COOL.cdw_supply_c) ? COOL.cdw_supply_c : null;
+            var cdwReturnC = ok(COOL.cdw_return_c) ? COOL.cdw_return_c : null;
+            var heatRejKw = ok(COOL.heat_rejection_kw) ? COOL.heat_rejection_kw : null;
+            var pt301Bar = 4.2;   // simulated discharge pressure, declared on the drawing
             var filterDp = 0.40, tds = 140, cl2 = 0.85, cl2Res = 0.6, uvInt = 99.8;
             var pumpKw = 7.5;
 
@@ -940,6 +1002,154 @@
                 if (wueComputed > WUE_TARGET) warn++;
                 return { crit: crit, warn: warn, unavailable: false };
             }
+
+            // ---- v2.8.0 traceability marks on the drawing -----------------------
+            /* Each engine value drawn in the SVG sits in a .rz-basis group (hook + mark). The
+               mark's colour is the registry evidence class through RZEvidence; the circle is
+               placed after layout from the text's own bbox, so anchor changes cannot misplace it.
+               Marks hide with the value when authority is missing. */
+            function placeBasisMarks() {
+                var groups = document.querySelectorAll('#water-svg .rz-basis');
+                for (var i = 0; i < groups.length; i++) {
+                    var g = groups[i], t = g.querySelector('text'), c = g.querySelector('.rz-basis-mark');
+                    if (!t || !c) continue;
+                    var id = g.getAttribute('data-basis-param');
+                    var ev = window.RZSvgBasis ? window.RZSvgBasis.evidenceOf(id) : 'DERIVED';
+                    var unavailable = !siteBalanceAvailable || /UNAVAILABLE/.test(t.textContent);
+                    if (unavailable) { c.setAttribute('hidden', ''); continue; }
+                    c.removeAttribute('hidden');
+                    try {
+                        var b = t.getBBox();
+                        c.setAttribute('cx', (b.x + b.width + 6).toFixed(1));
+                        c.setAttribute('cy', (parseFloat(t.getAttribute('y')) - 4).toFixed(1));
+                    } catch (e) { /* not laid out yet — the fonts.ready pass repeats */ }
+                    c.setAttribute('fill', window.RZEvidence ? window.RZEvidence.color(ev) : '#8fa2b8');
+                    g.setAttribute('data-evidence', ev);
+                    var title = g.querySelector('title');
+                    if (title) title.textContent = id + ' · ' + ev;
+                }
+                var legend = document.getElementById('basisLegend');
+                if (legend && window.RZSvgBasis) {
+                    legend.innerHTML = siteBalanceAvailable
+                        ? window.RZSvgBasis.legend(16, 508, { size: 10, gap: 112, only: ['DERIVED', 'ADOPTED', 'ASSUMED', 'SIMULATED'] })
+                        : '';
+                }
+            }
+            if (document.fonts && document.fonts.ready) { document.fonts.ready.then(function () { placeBasisMarks(); }); }
+
+            // ---- v2.8.0 equipment inspector (DCUI-010 "rancang modalnya dengan proper") -------
+            /* Click on any equipment group opens the shared right-side inspector (doc-27 §3.2 —
+               never a centre modal) with the A5 payload shape: Live / Capacity / Deps / Alarms /
+               Trend / Maint. Engine rows carry the registry hook; every simulated or authored row
+               carries its declaration; nothing is invented. */
+            function eRow(label, text, unit, basis) { return { label: label, text: text, unit: unit || '', basis: basis }; }
+            function sRow(label, text, unit, quality) { return { label: label, text: text, unit: unit || '', quality: quality || 'simulated', declared: TREATMENT_STATE_BASIS }; }
+            function dRow(label, text, unit) { return { label: label, text: text, unit: unit || '', quality: 'declared', declared: 'Page-authored design selection or alarm-philosophy threshold for this installation; conv-engine.js publishes no treatment-train schedule (v2.8.0 water inspector).' }; }
+            function dailyShape(base, amp, phase) { var out = []; for (var i = 0; i < 24; i++) out.push(Math.round((base + amp * Math.sin((i + (phase || 0)) / 24 * Math.PI * 2)) * 100) / 100); return out; }
+            var WATER_EQUIPMENT = {
+                meter:   { title: 'FM-101 · Mains meter', kind: 'instrument', up: [], down: ['rawtank'] },
+                rawtank: { title: 'TK-101 · Raw water tank', kind: 'vessel', up: ['meter'], down: ['filter'] },
+                filter:  { title: 'FLT-201 · Media filter', kind: 'equipment', up: ['rawtank'], down: ['pump-duty', 'pump-standby', 'backwash'] },
+                backwash:{ title: 'XV-202 · Backwash valve', kind: 'valve', up: ['filter'], down: [] },
+                'pump-duty':    { title: 'P-301A · Booster pump (DUTY)', kind: 'pump', up: ['filter'], down: ['dosing', 'uv'] },
+                'pump-standby': { title: 'P-301B · Booster pump (STANDBY)', kind: 'pump', up: ['filter'], down: ['dosing', 'uv'] },
+                dosing:  { title: 'DOS-302 · Chlorine dosing', kind: 'equipment', up: ['pump-duty'], down: ['uv'] },
+                uv:      { title: 'UV-401 · UV steriliser', kind: 'equipment', up: ['dosing'], down: ['domtank', 'makeup'] },
+                domtank: { title: 'TK-402 · Domestic / treated tank', kind: 'vessel', up: ['uv'], down: ['service'] },
+                service: { title: 'Domestic / process service header', kind: 'header', up: ['domtank'], down: [] },
+                makeup:  { title: 'CT-501 · Cooling tower cell + basin', kind: 'equipment', up: ['uv'], down: ['chplant'] },
+                chplant: { title: 'Chiller plant condensers (CDW loop)', kind: 'equipment', up: ['makeup'], down: ['makeup'] }
+            };
+            function waterPayload(eq) {
+                var d = WATER_EQUIPMENT[eq]; if (!d || !siteBalanceAvailable) return null;
+                var th = evalThresholds();
+                var live = [], cap = [], alarms = [], maint = [], trend = null, chip = { label: 'NORMAL', state: 'normal' };
+                var dep = function (ids) { return ids.map(function (k) { return { id: k, label: WATER_EQUIPMENT[k].title }; }); };
+                switch (eq) {
+                    case 'meter':
+                        live.push(eRow('Total treated flow · site', f1(totalLpm), 'L/min', 'water.total_treated_lpm'), sRow('Mains pressure', '2.1', 'bar'), eRow('Cooling make-up share', f1(makeupLpm), 'L/min', 'water.flow_lpm_for_wue'), eRow('Domestic / process share', f1(DOMESTIC_LPM), 'L/min', 'water.domestic_lpm'));
+                        cap.push(dRow('Meter class', 'DN50 turbine, pulse output'), dRow('Balance', 'raw inflow = treated production + backwash/reject + storage change'));
+                        maint.push(dRow('Verification', 'annual volumetric check against the utility meter'));
+                        break;
+                    case 'rawtank':
+                        live.push(sRow('Level LIT-101', rawPct + '', '%'), sRow('Volume', f1(rawVol), 'm³'), eRow('Draw (total treated)', f1(totalLpm), 'L/min', 'water.total_treated_lpm'), sRow('Autonomy at total flow', f1(rawVol * 1000 / totalLpm / 60), 'h', 'state'));
+                        cap.push(dRow('Nominal capacity', RAW_TANK_M3 + '', 'm³'), dRow('Sizing rule', '4 h of total treated flow (608 L/min → 146 m³ → 150 m³ nominal)'), dRow('Low / low-low alarm', '40 % / 30 %'));
+                        if (rawPct < 30) { alarms.push({ severity: 'CRITICAL', lifecycle: 'active', tag: 'TK-101', point: 'LIT-101', message: 'raw tank low-low ' + rawPct + ' %' }); chip = { label: 'ALARM', state: 'alarm' }; }
+                        else if (rawPct < 40) { alarms.push({ severity: 'WARNING', lifecycle: 'active', tag: 'TK-101', point: 'LIT-101', message: 'raw tank low ' + rawPct + ' %' }); chip = { label: 'WARNING', state: 'warn' }; }
+                        maint.push(dRow('Inspection', 'internal clean and level-transmitter calibration, annual'));
+                        break;
+                    case 'filter':
+                        live.push(sRow('Inlet pressure PI', '2.4', 'bar'), sRow('Outlet pressure PI', f1(2.4 - filterDp), 'bar'), sRow('Differential DPT-201', f2(filterDp), 'bar'), sRow('Backwash state', 'INHIBIT', '', 'state'));
+                        cap.push(dRow('Backwash trigger', 'DP > 0.80 bar'), dRow('Pre-alarm', 'DP > 0.65 bar'), dRow('Media', 'multimedia + activated carbon'));
+                        if (filterDp > 0.80) { alarms.push({ severity: 'CRITICAL', lifecycle: 'active', tag: 'FLT-201', point: 'DPT-201', message: 'filter DP ' + f2(filterDp) + ' bar — backwash required' }); chip = { label: 'ALARM', state: 'alarm' }; }
+                        else if (filterDp > 0.65) { alarms.push({ severity: 'WARNING', lifecycle: 'active', tag: 'FLT-201', point: 'DPT-201', message: 'filter DP approaching backwash' }); chip = { label: 'WARNING', state: 'warn' }; }
+                        trend = { label: 'Filter DP', unit: 'bar', series: dailyShape(0.38, 0.06, 0), declared: 'deterministic 24 h daily shape of the simulated filter DP — not a historian record' };
+                        maint.push(dRow('Media change', 'on DP recovery failure after backwash'));
+                        break;
+                    case 'backwash':
+                        live.push(sRow('Valve XV-202', 'CLOSED', '', 'state'), sRow('Backwash', 'INHIBIT', '', 'state'), sRow('Drain header', 'to sewer', '', 'state'));
+                        cap.push(dRow('Cycle', 'auto on DP > 0.80 bar, 5 min, inhibit while domestic tank < 40 %'));
+                        break;
+                    case 'pump-duty':
+                    case 'pump-standby': {
+                        var duty = eq === 'pump-duty';
+                        live.push(sRow('Role', duty ? 'DUTY (lead)' : 'STANDBY (lag)', '', 'state'), sRow('State', duty ? 'RUNNING · run feedback proven' : 'AVAILABLE · auto', '', 'state'), sRow('Electrical', duty ? pumpKw + '' : '0.0', 'kW'), sRow('Discharge PT-301', f1(pt301Bar), 'bar'));
+                        cap.push(dRow('Rated duty', '2 × 7.5 kW, one running carries the treated flow'), dRow('Lead-lag', 'weekly rotation; lag starts on fail-to-run or low header pressure'), dRow('Protection', 'suction isolation, discharge check + isolation, min-flow bypass'));
+                        maint.push(dRow('Rotation', 'lead/lag swap weekly'), dRow('Seal inspection', 'quarterly'));
+                        break;
+                    }
+                    case 'dosing':
+                        live.push(sRow('Dose rate', cl2 + '', 'L/h'), sRow('Residual', cl2Res + '', 'ppm'), sRow('Run feedback', 'cmd ON · run OK', '', 'state'));
+                        cap.push(dRow('Residual band', '0.2 – 1.0 ppm'), dRow('Injection', 'at the booster header tee, flow-paced'));
+                        break;
+                    case 'uv':
+                        live.push(sRow('Intensity', uvInt + '', '%'), sRow('Lamp', 'healthy', '', 'state'));
+                        cap.push(dRow('Alarm', 'intensity < 70 % fail, < 85 % pre-alarm'));
+                        if (uvInt < 70) { alarms.push({ severity: 'CRITICAL', lifecycle: 'active', tag: 'UV-401', point: 'UV-INT', message: 'UV intensity low' }); chip = { label: 'ALARM', state: 'alarm' }; }
+                        maint.push(dRow('Lamp replacement', 'on intensity < 70 % or 9,000 h'));
+                        break;
+                    case 'domtank':
+                        live.push(sRow('Level', domPct + '', '%'), sRow('Volume', f1(domVol), 'm³'), eRow('Service draw', f1(DOMESTIC_LPM), 'L/min', 'water.domestic_lpm'), sRow('Autonomy at service draw', f1(domVol * 1000 / DOMESTIC_LPM / 60), 'h', 'state'));
+                        cap.push(dRow('Nominal capacity', DOM_TANK_M3 + '', 'm³'), dRow('Low / low-low alarm', '50 % / 40 %'));
+                        if (domPct < 40) { alarms.push({ severity: 'CRITICAL', lifecycle: 'active', tag: 'TK-402', point: 'LIT-402', message: 'domestic tank low-low' }); chip = { label: 'ALARM', state: 'alarm' }; }
+                        break;
+                    case 'service':
+                        live.push(eRow('Domestic / process draw', f1(DOMESTIC_LPM), 'L/min', 'water.domestic_lpm'), eRow('Scope', 'excluded from WUE', '', 'water.domestic_lpm'));
+                        break;
+                    case 'makeup':
+                        live.push(eRow('Make-up FM-501', f1(makeupLpm), 'L/min', 'water.flow_lpm_for_wue'), eRow('Evaporation', f1(evapLpm), 'L/min', 'water.evaporation_lpm'), eRow('Blowdown XV-502', f1(blowdownLpm), 'L/min', 'water.blowdown_lpm'), eRow('Drift', f2(driftLpm), 'L/min', 'water.drift_lpm'), sRow('Basin level', BASIN_PCT + '', '%'), eRow('Cycles of concentration', COC + '', '', 'water.tower_cycles_of_concentration'));
+                        cap.push(eRow('Heat rejected', nfmt(heatRejKw), 'kW', 'cooling.heat_rejection_kw'), eRow('Balance check', f1(evapLpm + blowdownLpm + driftLpm) + ' = make-up ' + f1(makeupLpm), 'L/min', 'water.flow_lpm_for_wue'), eRow('Instant WUE', f2(wueComputed), 'L/kWh', 'water.wue_l_per_kwh'));
+                        trend = { label: 'Cooling make-up', unit: 'L/min', series: dailyShape(makeupLpm, 3, 3), declared: 'deterministic 24 h daily shape around the engine make-up flow — not a historian record' };
+                        maint.push(dRow('Basin', 'blowdown on conductivity, monthly biocide, quarterly basin clean'));
+                        break;
+                    case 'chplant':
+                        live.push(eRow('CDW supply to condensers', f1(cdwSupplyC), '°C', 'cooling.cdw_supply_c'), eRow('CDW return to hot deck', f1(cdwReturnC), '°C', 'cooling.cdw_return_c'), eRow('Heat rejected', nfmt(heatRejKw), 'kW', 'cooling.heat_rejection_kw'));
+                        cap.push(dRow('Machine type', 'water-cooled centrifugal (engine cooling.chiller_type)'));
+                        break;
+                }
+                var counts = { derived: 0, published: 0, simulated: 0, state: 0 };
+                live.concat(cap).forEach(function (r) { if (r.basis) counts.derived++; else if (r.quality === 'state') counts.state++; else counts.simulated++; });
+                return {
+                    classId: 'water', id: eq, hall: null, title: d.title, kind: d.kind, label: 'site-wide plant', statusChip: chip,
+                    tabs: { live: live, capacity: cap, deps: { upstream: dep(d.up), downstream: dep(d.down), edges: [] }, alarms: alarms, trend: trend, maint: maint },
+                    actions: { openHmi: null, related: [] },
+                    provenance: { engineVersion: S && S.meta ? S.meta.version : '—', registryVersion: '—', scenarioId: S && S.meta ? S.meta.scenario : '—', coolingScenarioId: 'site', tick: uptimeSec, counts: counts }
+                };
+            }
+            function openWaterInspector(eq, trigger) {
+                if (!window.RZInspector || typeof window.RZInspector.openPayload !== 'function') return;
+                var payload = waterPayload(eq); if (!payload) return;
+                window.RZInspector.openPayload(payload, { trigger: trigger, onNavigate: function (id) { var el = document.querySelector('#water-svg [data-eq="' + id + '"]'); openWaterInspector(id, el || trigger); } });
+            }
+            document.querySelectorAll('#water-svg .eq-grp[data-eq]').forEach(function (g) {
+                g.addEventListener('click', function (e) {
+                    if (e.target && e.target.closest && e.target.closest('[data-basis-param]')) return;   /* the basis hook opens its own record */
+                    if (!siteBalanceAvailable) return;
+                    e.stopPropagation();
+                    openWaterInspector(g.getAttribute('data-eq'), g);
+                });
+                g.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); g.click(); } });
+            });
 
             // ---- Render once (deterministic) ------------------------------
             function render() {
@@ -1002,6 +1212,22 @@
                 set('m-mains-p', siteBalanceAvailable ? '2.1 bar' : 'UNAVAILABLE');
                 set('m-raw-pct', siteBalanceAvailable ? rawPct + '%' : 'UNAVAILABLE');
                 set('m-raw-vol', siteBalanceAvailable ? f1(rawVol) + ' m³' : 'UNAVAILABLE');
+                set('m-raw-aut', siteBalanceAvailable ? f1(rawVol * 1000 / totalLpm / 60) + ' h @ total flow' : 'UNAVAILABLE');
+                set('m-dom-aut', siteBalanceAvailable ? f1(domVol * 1000 / DOMESTIC_LPM / 60) + ' h @ service draw' : 'UNAVAILABLE');
+                set('m-pt301', siteBalanceAvailable ? f1(pt301Bar) + ' bar' : 'UNAVAILABLE');
+                set('m-basin', siteBalanceAvailable ? 'basin ' + BASIN_PCT + '%' : 'UNAVAILABLE');
+                set('m-ev', metric(evapLpm, 1, ''));
+                set('m-dr', metric(driftLpm, 2, ''));
+                set('m-cdw-s', siteBalanceAvailable && ok(cdwSupplyC) ? f1(cdwSupplyC) + ' °C' : 'UNAVAILABLE');
+                set('m-cdw-r', siteBalanceAvailable && ok(cdwReturnC) ? f1(cdwReturnC) + ' °C' : 'UNAVAILABLE');
+                set('m-hr', siteBalanceAvailable && ok(heatRejKw) ? nfmt(heatRejKw) + ' kW' : 'UNAVAILABLE');
+                set('m-coc', siteBalanceAvailable ? COC + ' cycles' : 'UNAVAILABLE');
+                var basinF = document.getElementById('basinFill');
+                if (basinF) { var bh = siteBalanceAvailable ? 34 * (BASIN_PCT / 100) : 0; basinF.setAttribute('y', 377 - bh); basinF.setAttribute('height', bh); }
+                var pA = document.getElementById('pid-p301a'), pB = document.getElementById('pid-p301b'), fan = document.querySelector('#water-svg .pid-fan');
+                if (pA) pA.setAttribute('class', 'pid-pump' + (siteBalanceAvailable ? ' running' : ''));
+                if (pB) pB.setAttribute('class', 'pid-pump');
+                if (fan) fan.setAttribute('class', 'pid-fan' + (siteBalanceAvailable ? ' running' : ''));
                 set('m-flt-in', siteBalanceAvailable ? 'In 2.4 bar' : 'UNAVAILABLE');
                 set('m-flt-out', siteBalanceAvailable ? 'Out ' + f1(2.4 - filterDp) + ' bar' : 'UNAVAILABLE');
                 set('m-flt-dp', siteBalanceAvailable ? 'DP ' + f2(filterDp) + ' bar' : 'UNAVAILABLE');
@@ -1016,12 +1242,13 @@
                 set('m-dom-pct', siteBalanceAvailable ? domPct + '%' : 'UNAVAILABLE');
                 set('m-dom-vol', siteBalanceAvailable ? f1(domVol) + ' m³' : 'UNAVAILABLE');
                 set('m-mk', metric(makeupLpm, 1, 'L/min'));
-                set('m-mk-bd', siteBalanceAvailable ? 'BD ' + f1(blowdownLpm) + ' L/min' : 'BD UNAVAILABLE');
+                set('m-mk-bd', metric(blowdownLpm, 1, 'L/min'));
                 set('m-svc', metric(DOMESTIC_LPM, 1, 'L/min'));
 
                 // Tank fill heights (SVG): TK-101 rect y=60 h=150 (3..207 usable)
                 var rawF = document.getElementById('rawFill');
                 if (rawF) { var rh = siteBalanceAvailable ? 147 * (rawPct / 100) : 0; rawF.setAttribute('y', 207 - rh); rawF.setAttribute('height', rh); }
+                placeBasisMarks();
                 var domF = document.getElementById('domFill');
                 if (domF) { var dh = siteBalanceAvailable ? 147 * (domPct / 100) : 0; domF.setAttribute('y', 397 - dh); domF.setAttribute('height', dh); }
 
@@ -1123,7 +1350,9 @@
                     'ws-treated-to-makeup': ['energized', metric(makeupLpm, 1, 'L/min') + ' cooling makeup'],
                     'ws-domtank-to-service': ['energized', metric(DOMESTIC_LPM, 1, 'L/min') + ' service supply'],
                     'ws-bw-to-drain': ['de-energized', 'INHIBIT (state machine)'],
-                    'ws-makeup-blowdown': ['energized', metric(blowdownLpm, 1, 'L/min') + ' blowdown']
+                    'ws-makeup-blowdown': ['energized', metric(blowdownLpm, 1, 'L/min') + ' blowdown'],
+                    'ws-cdw-supply': ['energized', (ok(cdwSupplyC) ? f1(cdwSupplyC) + ' °C' : '—') + ' to condensers · ' + (ok(heatRejKw) ? nfmt(heatRejKw) + ' kW rejected' : '—')],
+                    'ws-cdw-return': ['energized', (ok(cdwReturnC) ? f1(cdwReturnC) + ' °C' : '—') + ' to hot deck']
                 };
                 document.querySelectorAll('#water-svg [data-rz-line]').forEach(function (line) {
                     var operating = processLineOperating[line.getAttribute('data-id')];

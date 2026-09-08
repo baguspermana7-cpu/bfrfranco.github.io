@@ -116,6 +116,7 @@ mimic and on the fire mimic); `navigate()` resolves the first in document order.
 |---|---|---|
 | v1.43.0 | `datahallAI.html` | Loaded. Verified via probe — clicks open inspector. |
 | **v1.43.1** | `chiller-plant.html`, `water-system.html`, `fire-system.html` | **Loaded.** Each verified via probe (27/27 pass — 4 inspector assertions). |
+| **v2.8.0** | `water-system.html` | **First Conventional payload adopter.** Every `.eq-grp[data-eq]` on `#water-svg` opens this panel in payload mode with a page-built payload (`waterPayload()` — Live / Capacity / Deps / Alarms / Trend / Maint; engine rows carry `data-basis-param`, simulated and authored rows carry a declaration; provenance footer from the conv snapshot). A click on a hooked SVG value still opens the registry record (basis mode) — the equipment handler yields to `[data-basis-param]`. |
 | v1.43.2 (planned) | `datahall.html`, `ict.html` | Pending — datahall standalone + ict on standard track. EPMS still deferred per owner mandate. |
 | **v2.3.1** | `datahallAI.html` | **Gesture order reversed at the owner's request:** a plain click on a block opens its HMI modal directly; Shift+click / right-click / Shift+Enter open this panel. Payload mode, actions and gates unchanged. |
 | **v2.3.0** | `datahallAI.html` | **Fire workstation rows and tiles.** Point-list rows (`fire-point:<id>`) and zone tiles (`fire-zone:<id>`) open here with isolate / restore / extend actions; the isolation dialog is the workstation's only modal. Gated by `tools/test-datahall-ai-fire-runtime.mjs`. |
