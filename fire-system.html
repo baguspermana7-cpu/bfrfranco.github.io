@@ -169,12 +169,19 @@
         .pipe-base { fill: none; stroke: var(--pipe-idle); stroke-width: 5; stroke-linecap: round; }
         .pipe-charged { stroke: #475569; }            /* pressurised standby — neutral, NOT red */
         .pipe-label-box { fill: rgba(10,15,24,0.85); stroke: var(--panel-line); }
-        .pipe-label { fill: var(--text-dim); font-size: 9px; font-weight: 700; }
+        .pipe-label { fill: var(--text-dim); font-size: 10px; font-weight: 700; }
 
         /* Flow animations — only shown when a flow is genuinely active */
         .flow-fire   { stroke: var(--st-alarm);   stroke-dasharray: 4,12; animation: flowMove .5s linear infinite; filter: drop-shadow(0 0 5px var(--st-alarm)); }
         .flow-supply { stroke: var(--supply-blue); stroke-dasharray: 3,11; animation: flowMove .8s linear infinite; }
         .flow-n2     { stroke: var(--n2-amber);   stroke-dasharray: 3,13; animation: flowMove 1.3s linear infinite; }
+        /* v2.6.0 — a live system is never static: the jockey line breathes while pressure is maintained (stage 0) */
+        .flow-idle   { stroke: var(--st-normal); stroke-dasharray: 2,16; animation: flowMove 2.6s linear infinite; opacity: .55; }
+        .pid-valve, .pid-check, .pid-bubble { pointer-events: none; }
+        .det-chip.is-warn > rect:first-of-type { stroke: var(--st-warn); }
+        .det-chip.is-alarm > rect:first-of-type { stroke: var(--st-alarm); fill: rgba(239,68,68,.12); }
+        @keyframes vesdaPulse { 0%,100% { stroke-opacity: .5; } 50% { stroke-opacity: 1; } }
+        .vesda-live { animation: vesdaPulse 2.2s ease-in-out infinite; }
         @keyframes flowMove { to { stroke-dashoffset: -24; } }
 
         .impeller { transform-box: fill-box; transform-origin: center; }
@@ -379,7 +386,7 @@
                 -webkit-overflow-scrolling: touch; padding-left: 12px; padding-right: 12px; }
         }
         @media (prefers-reduced-motion: reduce) {
-            .flow-fire, .flow-supply, .flow-n2, .spinning, .as-dot.alarm { animation: none !important; }
+            .flow-fire, .flow-supply, .flow-n2, .flow-idle, .vesda-live, .spinning, .as-dot.alarm { animation: none !important; }
         }
     /* a11y (v1.52.2): dark-only cockpit — dim tailwind-ish grays brightened (unscoped on purpose) */
 .text-slate-500 { color:#9aa3af !important; }
@@ -494,23 +501,94 @@
                 <div id="tooltip-content"></div>
             </div>
 
-            <svg id="fire-svg" viewBox="0 0 1400 660" class="w-full h-full" style="transition: transform 0.3s;" role="group" aria-label="Fire water and inert gas process diagram">
+            <svg id="fire-svg" viewBox="0 0 1400 770" class="w-full h-full" style="transition: transform 0.3s;" role="group" aria-label="Fire detection, fire water and inert gas process diagram">
+                <defs>
+                    <marker id="mArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="11" markerHeight="11" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="var(--text-dim)" /></marker>
+                </defs>
+                <!-- ===== LAYER 1 — DETECTION & CONTROL (v2.6.0, doc-17 §3.4 / owner ledger §15): FACP, VESDA, zones, MCP/abort ===== -->
+                <g id="layer-detection" data-layer="detection">
+                <rect x="20" y="18" width="1360" height="100" rx="8" fill="rgba(15,22,36,.35)" stroke="var(--panel-line)" stroke-dasharray="6 5" />
+                <text x="36" y="36" class="eq-tag">DETECTION &amp; CONTROL — FACP · VESDA · ZONES · MANUAL STATIONS</text>
+                <g transform="translate(36, 48)" id="grp-facp" tabindex="0" role="button" aria-label="Fire alarm control panel FACP-01">
+                    <rect width="184" height="56" rx="5" fill="#16203a" stroke="#475569" />
+                    <rect x="8" y="8" width="168" height="12" rx="2" fill="rgba(0,0,0,.35)" />
+                    <circle id="led-facp" cx="18" cy="38" r="6" fill="#64748b" />
+                    <text x="32" y="30" class="eq-name">FACP-01 · addressable</text>
+                    <text id="label-facp-state" x="32" y="46" class="eq-tag">FACP · UNAVAILABLE</text>
+                </g>
+                <g transform="translate(232, 48)" id="grp-vesda" tabindex="0" role="button" aria-label="Aspirating smoke detection VESDA">
+                    <rect width="170" height="56" rx="5" fill="#16203a" stroke="#475569" />
+                    <circle id="vesda-pulse" cx="22" cy="28" r="10" fill="#0c1424" stroke="#64748b" stroke-width="1.4" stroke-dasharray="3 2" />
+                    <circle cx="22" cy="28" r="3" fill="#64748b" />
+                    <text x="44" y="24" class="eq-name">VESDA-01/02 · aspirating</text>
+                    <text id="label-vesda-state" x="44" y="42" class="eq-tag">VESDA · UNAVAILABLE</text>
+                </g>
+                <g transform="translate(420, 48)" id="zone-chip-1" class="det-chip" tabindex="0" role="button" aria-label="Detection zone 1 Hall A">
+                    <rect width="136" height="56" rx="5" fill="#16203a" stroke="#475569" />
+                    <circle id="zsd-1" cx="18" cy="20" r="8" fill="#0c1424" stroke="#64748b" stroke-width="1.4" /><path d="M13,22 Q18,15 23,22" fill="none" stroke="#94a3b8" stroke-width="1.2" />
+                    <path id="zhd-1" d="M37,27 L44,13 L51,27 Z" fill="#0c1424" stroke="#64748b" stroke-width="1.4" />
+                    <text x="62" y="18" class="eq-name">ZONE 1 · Hall A</text>
+                    <text x="62" y="32" class="eq-tag" font-size="10">SD · HD · VESDA</text>
+                    <text id="label-zone1-state" x="12" y="49" class="eq-tag">UNAVAILABLE</text>
+                </g>
+                <g transform="translate(570, 48)" id="zone-chip-2" class="det-chip" tabindex="0" role="button" aria-label="Detection zone 2 Hall B">
+                    <rect width="136" height="56" rx="5" fill="#16203a" stroke="#475569" />
+                    <circle id="zsd-2" cx="18" cy="20" r="8" fill="#0c1424" stroke="#64748b" stroke-width="1.4" /><path d="M13,22 Q18,15 23,22" fill="none" stroke="#94a3b8" stroke-width="1.2" />
+                    <path id="zhd-2" d="M37,27 L44,13 L51,27 Z" fill="#0c1424" stroke="#64748b" stroke-width="1.4" />
+                    <text x="62" y="18" class="eq-name">ZONE 2 · Hall B</text>
+                    <text x="62" y="32" class="eq-tag" font-size="10">SD · HD · VESDA</text>
+                    <text id="label-zone2-state" x="12" y="49" class="eq-tag">UNAVAILABLE</text>
+                </g>
+                <g transform="translate(720, 48)" id="zone-chip-3" class="det-chip" tabindex="0" role="button" aria-label="Detection zone 3 Hall C">
+                    <rect width="136" height="56" rx="5" fill="#16203a" stroke="#475569" />
+                    <circle id="zsd-3" cx="18" cy="20" r="8" fill="#0c1424" stroke="#64748b" stroke-width="1.4" /><path d="M13,22 Q18,15 23,22" fill="none" stroke="#94a3b8" stroke-width="1.2" />
+                    <path id="zhd-3" d="M37,27 L44,13 L51,27 Z" fill="#0c1424" stroke="#64748b" stroke-width="1.4" />
+                    <text x="62" y="18" class="eq-name">ZONE 3 · Hall C</text>
+                    <text x="62" y="32" class="eq-tag" font-size="10">SD · HD · VESDA</text>
+                    <text id="label-zone3-state" x="12" y="49" class="eq-tag">UNAVAILABLE</text>
+                </g>
+                <g transform="translate(870, 48)" id="zone-chip-4" class="det-chip" tabindex="0" role="button" aria-label="Detection zone 4 Hall D">
+                    <rect width="136" height="56" rx="5" fill="#16203a" stroke="#475569" />
+                    <circle id="zsd-4" cx="18" cy="20" r="8" fill="#0c1424" stroke="#64748b" stroke-width="1.4" /><path d="M13,22 Q18,15 23,22" fill="none" stroke="#94a3b8" stroke-width="1.2" />
+                    <path id="zhd-4" d="M37,27 L44,13 L51,27 Z" fill="#0c1424" stroke="#64748b" stroke-width="1.4" />
+                    <text x="62" y="18" class="eq-name">ZONE 4 · Hall D</text>
+                    <text x="62" y="32" class="eq-tag" font-size="10">SD · HD · VESDA</text>
+                    <text id="label-zone4-state" x="12" y="49" class="eq-tag">UNAVAILABLE</text>
+                </g>
+                <g transform="translate(1020, 48)" id="zone-chip-5" class="det-chip" tabindex="0" role="button" aria-label="Detection zone 5 Electrical">
+                    <rect width="136" height="56" rx="5" fill="#16203a" stroke="#475569" />
+                    <circle id="zsd-5" cx="18" cy="20" r="8" fill="#0c1424" stroke="#64748b" stroke-width="1.4" /><path d="M13,22 Q18,15 23,22" fill="none" stroke="#94a3b8" stroke-width="1.2" />
+                    <path id="zhd-5" d="M37,27 L44,13 L51,27 Z" fill="#0c1424" stroke="#64748b" stroke-width="1.4" />
+                    <text x="62" y="18" class="eq-name">ZONE 5 · Electrical</text>
+                    <text x="62" y="32" class="eq-tag" font-size="10">SD · HD · VESDA</text>
+                    <text id="label-zone5-state" x="12" y="49" class="eq-tag">UNAVAILABLE</text>
+                </g>
+                <g transform="translate(1190, 48)" id="grp-mcp" tabindex="0" role="button" aria-label="Manual call point and abort station">
+                    <rect width="170" height="56" rx="5" fill="#16203a" stroke="#475569" />
+                    <rect x="10" y="12" width="18" height="24" rx="2" fill="rgba(239,68,68,.25)" stroke="#94a3b8" stroke-width="1.2" /><rect x="14" y="17" width="10" height="10" fill="rgba(239,68,68,.35)" />
+                    <circle cx="48" cy="24" r="10" fill="rgba(245,158,11,.18)" stroke="#94a3b8" stroke-width="1.2" /><rect x="44" y="20" width="8" height="8" fill="#94a3b8" />
+                    <text x="66" y="24" class="eq-name">MCP-01 · ABORT-01</text>
+                    <text id="label-mcp-state" x="66" y="42" class="eq-tag">UNAVAILABLE</text>
+                </g>
+                </g>
+
+                <!-- ===== LAYER 2 — FIRE WATER: source → reserve tank → pumps → monitored header → zone banks ===== -->
+                <g id="layer-water" data-layer="water">
                 <!-- Landlord make-up supply. v1.42.5 — tagged with line-model metadata. -->
-                <path id="path-landlord" d="M 0 520 L 150 520 L 150 200 L 250 200" class="pipe-base" data-rz-line="1" data-id="fs-landlord-makeup" data-from="LANDLORD-SUPPLY" data-to="TK-FW-01" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN150 make-up" data-current="auto-refill on tank low" data-redundancy="duty"/>
-                <g transform="translate(110, 268)">
+                <path id="path-landlord" d="M 0 630 L 150 630 L 150 310 L 250 310" class="pipe-base" data-rz-line="1" data-id="fs-landlord-makeup" data-from="LANDLORD-SUPPLY" data-to="TK-FW-01" data-medium="fws" data-direction="forward" data-state="energized" data-capacity="DN150 make-up" data-current="auto-refill on tank low" data-redundancy="duty"/>
+                <g transform="translate(110, 378)">
                     <rect id="v-landlord" width="40" height="25" fill="#16203a" stroke="#475569" rx="2" />
                     <text x="20" y="44" text-anchor="middle" class="eq-tag">TK-FW-01 Make-up</text>
                     <text id="landlord-flow" x="20" y="58" text-anchor="middle" class="font-tech" fill="#38bdf8" font-size="10" font-weight="bold" style="opacity:0; transition:opacity .3s;">0.0 m³/h</text>
                 </g>
 
                 <!-- Fire reserve tank -->
-                <g transform="translate(250, 100)">
+                <g transform="translate(250, 210)" id="grp-tank" tabindex="0" role="button" aria-label="Fire reserve tank TK-FW-01">
                     <rect width="300" height="420" fill="#0c1424" stroke="#475569" stroke-width="3" rx="10" />
                     <clipPath id="tankClip"><rect x="3" y="3" width="294" height="414" rx="8" /></clipPath>
                     <g clip-path="url(#tankClip)">
                         <rect id="tank-water" x="0" y="420" width="300" height="0" fill="var(--st-offline)" class="liquid-anim" />
                     </g>
-                    <!-- low / low-low alarm reference lines -->
                     <line x1="0" y1="124" x2="300" y2="124" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="6 5" opacity="0.55" />
                     <text x="296" y="119" text-anchor="end" fill="#f59e0b" font-size="10" font-weight="bold" data-rz-authored-basis="Tank LOW and LOW-LOW reference lines are ALARM SETPOINTS for the reserve tank, chosen for this installation. conv-engine.js publishes the fire reserve VOLUME and the demand it must cover - both traced on this page - but not the level at which an operator should be warned, which is a local alarm-philosophy decision no engine parameter carries.">LOW 80%</text>
                     <line x1="0" y1="198" x2="300" y2="198" stroke="#fb923c" stroke-width="1.5" stroke-dasharray="6 5" opacity="0.55" />
@@ -523,12 +601,16 @@
                 </g>
 
                 <!-- Suction header. v1.42.5 — tagged with line-model metadata. -->
-                <path id="path-suction" d="M 550 400 L 680 400 L 680 150 L 750 150 M 680 400 L 750 400 M 680 400 L 680 540 L 750 540" class="pipe-base" data-rz-line="1" data-id="fs-suction-header" data-from="TK-FW-01" data-to="FP-SUCTION-MANIFOLD" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN300 suction" data-current="UNAVAILABLE" data-redundancy="common"/>
-                <rect class="pipe-label-box" x="585" y="388" width="74" height="16" rx="3" />
-                <text x="622" y="400" text-anchor="middle" class="pipe-label">SUCTION HDR</text>
+                <path id="path-suction" d="M 550 510 L 680 510 L 680 260 L 750 260 M 680 510 L 750 510 M 680 510 L 680 650 L 750 650" class="pipe-base" data-rz-line="1" data-id="fs-suction-header" data-from="TK-FW-01" data-to="FP-SUCTION-MANIFOLD" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN300 suction" data-current="UNAVAILABLE" data-redundancy="common"/>
+                <rect class="pipe-label-box" x="585" y="498" width="74" height="16" rx="3" />
+                <text x="622" y="510" text-anchor="middle" class="pipe-label">SUCTION HDR</text>
+                <g data-rz-authored-basis="Instrument tags, pipe sizes, valve arrangement and the supervised-device labels on this drawing are page-authored design selections for the installation (NFPA 20 / NFPA 13 practice): conv-engine.js publishes the fire reserve, the pump demand and the duration, not hydraulic sizing or per-device state">
+                <g transform="translate(712,260)" class="pid-valve"><polygon points="-9,-7 9,7 9,-7 -9,7" fill="#16203a" stroke="var(--text-dim)" stroke-width="1.6"/><line x1="0" y1="-7" x2="0" y2="-14" stroke="var(--text-dim)" stroke-width="1.6"/><circle cx="0" cy="-16" r="3" fill="none" stroke="var(--text-dim)" stroke-width="1.2"/></g><g transform="translate(712,510)" class="pid-valve"><polygon points="-9,-7 9,7 9,-7 -9,7" fill="#16203a" stroke="var(--text-dim)" stroke-width="1.6"/><line x1="0" y1="-7" x2="0" y2="-14" stroke="var(--text-dim)" stroke-width="1.6"/><circle cx="0" cy="-16" r="3" fill="none" stroke="var(--text-dim)" stroke-width="1.2"/></g><g transform="translate(712,650)" class="pid-valve"><polygon points="-9,-7 9,7 9,-7 -9,7" fill="#16203a" stroke="var(--text-dim)" stroke-width="1.6"/><line x1="0" y1="-7" x2="0" y2="-14" stroke="var(--text-dim)" stroke-width="1.6"/><circle cx="0" cy="-16" r="3" fill="none" stroke="var(--text-dim)" stroke-width="1.2"/></g>
+                <g transform="translate(640,470)" class="pid-bubble"><circle r="14" fill="#0c1424" stroke="var(--text-dim)" stroke-width="1.4"/><text y="4" text-anchor="middle" fill="var(--text-dim)" font-size="10" font-weight="700" class="font-tech">PI</text></g>
+                </g>
 
                 <!-- Main fire pump 1 -->
-                <g transform="translate(750, 150)" id="grp-main1" tabindex="0" role="button" aria-label="Main Fire Pump 1 FP-01">
+                <g transform="translate(750, 260)" id="grp-main1" tabindex="0" role="button" aria-label="Main Fire Pump 1 FP-01">
                     <!-- RZ Engineering Symbol Atlas PP001A: centrifugal-pump casing + base. -->
                     <g id="node-m1" transform="translate(-40 -34) scale(.8333)"
                        data-symbol-source="assets/ltc/src/PP001A.svg" fill="#020a16" stroke="#475569" stroke-width="2.4">
@@ -539,12 +621,12 @@
                         <path d="M0-10C7-8 11-4 11 0C6-2 2-1 0 2Z M-8 6C-9-1-7-7-3-9C-3-4-1-1 2 0Z M8 6C2 10-4 10-7 7C-2 6 1 4 1 1Z" fill="#64748b" />
                     </g>
                     <circle id="led-m1" cx="0" cy="-52" r="6" fill="#64748b" />
-                    <text x="55" y="-22" class="eq-name">Main Fire Pump 1</text>
-                    <text id="label-m1-state" x="55" y="-8" class="eq-tag">FP-01 · UNAVAILABLE</text>
+                    <text x="55" y="-36" class="eq-name">Main Fire Pump 1 · electric</text>
+                    <text id="label-m1-state" x="55" y="-22" class="eq-tag">FP-01 · UNAVAILABLE</text>
                 </g>
 
                 <!-- Jockey pump -->
-                <g transform="translate(750, 400)" id="grp-jockey" tabindex="0" role="button" aria-label="Jockey Pump JP-01">
+                <g transform="translate(750, 510)" id="grp-jockey" tabindex="0" role="button" aria-label="Jockey Pump JP-01">
                     <g id="node-j" transform="translate(-25 -21) scale(.5208)"
                        data-symbol-source="assets/ltc/src/PP001A.svg" fill="#020a16" stroke="#475569" stroke-width="3.8">
                         <path d="M83 40.5C83 21.17 67.33 5.5 48 5.5C28.67 5.5 13 21.17 13 40.5C13 50.9622 17.5904 60.3522 24.8671 66.7659L13 90.5H83L71.1329 66.7659C78.4096 60.3522 83 50.9622 83 40.5ZM48 74.5C29.2223 74.5 14 59.2777 14 40.5C14 21.7223 29.2223 6.5 48 6.5C66.7777 6.5 82 21.7223 82 40.5C82 59.2777 66.7777 74.5 48 74.5ZM48 75.5C56.4973 75.5 64.2874 72.4719 70.3499 67.4359L81.382 89.5H14.618L25.6501 67.4359C31.7126 72.4719 39.5027 75.5 48 75.5Z" />
@@ -554,12 +636,12 @@
                         <path d="M0-7C5-5 7-3 7 0C4-1 1-1 0 1Z M-5 4C-6-1-4-5-2-6C-2-3-1-1 1 0Z M5 4C1 7-3 7-5 5C-1 4 1 3 1 1Z" fill="#64748b" />
                     </g>
                     <circle id="led-j" cx="0" cy="-37" r="5" fill="#64748b" />
-                    <text x="42" y="-21" class="eq-name">Jockey Pump</text>
-                    <text id="label-j-state" x="42" y="-8" class="eq-tag">JP-01 · UNAVAILABLE</text>
+                    <text x="42" y="-48" class="eq-name">Jockey Pump · pressure maintenance</text>
+                    <text id="label-j-state" x="42" y="-34" class="eq-tag">JP-01 · UNAVAILABLE</text>
                 </g>
 
                 <!-- Main fire pump 2 (diesel standby) -->
-                <g transform="translate(750, 540)" id="grp-main2" tabindex="0" role="button" aria-label="Main Fire Pump 2 FP-02 diesel standby">
+                <g transform="translate(750, 650)" id="grp-main2" tabindex="0" role="button" aria-label="Main Fire Pump 2 FP-02 diesel standby">
                     <g id="node-m2" transform="translate(-40 -34) scale(.8333)"
                        data-symbol-source="assets/ltc/src/PP001A.svg" fill="#020a16" stroke="#475569" stroke-width="2.4">
                         <path d="M83 40.5C83 21.17 67.33 5.5 48 5.5C28.67 5.5 13 21.17 13 40.5C13 50.9622 17.5904 60.3522 24.8671 66.7659L13 90.5H83L71.1329 66.7659C78.4096 60.3522 83 50.9622 83 40.5ZM48 74.5C29.2223 74.5 14 59.2777 14 40.5C14 21.7223 29.2223 6.5 48 6.5C66.7777 6.5 82 21.7223 82 40.5C82 59.2777 66.7777 74.5 48 74.5ZM48 75.5C56.4973 75.5 64.2874 72.4719 70.3499 67.4359L81.382 89.5H14.618L25.6501 67.4359C31.7126 72.4719 39.5027 75.5 48 75.5Z" />
@@ -569,42 +651,43 @@
                         <path d="M0-10C7-8 11-4 11 0C6-2 2-1 0 2Z M-8 6C-9-1-7-7-3-9C-3-4-1-1 2 0Z M8 6C2 10-4 10-7 7C-2 6 1 4 1 1Z" fill="#64748b" />
                     </g>
                     <circle id="led-m2" cx="0" cy="-52" r="6" fill="#64748b" />
-                    <text x="55" y="-22" class="eq-name">Main Fire Pump 2</text>
-                    <text id="label-m2-state" x="55" y="-8" class="eq-tag">FP-02 · UNAVAILABLE</text>
+                    <text x="55" y="-36" class="eq-name">Main Fire Pump 2 · diesel standby</text>
+                    <text id="label-m2-state" x="55" y="-22" class="eq-tag">FP-02 · UNAVAILABLE</text>
                 </g>
 
-                <!-- N2 / inert gas generator -->
-                <g transform="translate(845, 558)" id="grp-n2" tabindex="0" role="button" aria-label="Inert gas generator N2-GEN-01">
-                    <rect width="150" height="76" fill="#16203a" stroke="#475569" rx="5" />
-                    <circle cx="30" cy="38" r="20" fill="#020a16" stroke="#475569" id="node-n2" />
-                    <g id="spin-n2" class="impeller"><line x1="-12" y1="0" x2="12" y2="0" stroke="#64748b" stroke-width="2" /><line x1="0" y1="-12" x2="0" y2="12" stroke="#64748b" stroke-width="2" /></g>
-                    <text x="60" y="26" fill="#cbd5e1" font-size="10" font-weight="800">N2 INERT GEN</text>
-                    <text x="60" y="40" class="eq-tag">N2-GEN-01</text>
-                    <text id="label-n2-state" x="60" y="55" fill="#94a3b8" font-size="9" font-weight="bold" data-rz-authored-basis="Header pressure is simulated hydraulic state. conv-engine.js models the fire-water demand and the stored reserve, not the pressure the ring main happens to be sitting at, so this reading has no engine parameter to trace to.">Hdr · UNAVAILABLE</text>
+                <!-- Discharge headers. v1.42.5 — tagged. v2.6.0 — check + isolation valve per pump, PS on the jockey line, test header with flow element -->
+                <path id="path-discharge" d="M 820 260 L 1000 260 L 1000 510 L 1150 510" class="pipe-base" data-rz-line="1" data-id="fs-fp01-discharge" data-from="FP-01" data-to="DISCHARGE-HEADER" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN250 main fire pump" data-current="UNAVAILABLE" data-redundancy="duty" data-sensor="FP-01" marker-end="url(#mArrow)"/>
+                <path id="path-j-discharge" d="M 790 510 L 1000 510" class="pipe-base" data-rz-line="1" data-id="fs-jp-discharge" data-from="JP-01" data-to="DISCHARGE-HEADER" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN80 jockey" data-current="UNAVAILABLE" data-redundancy="duty" data-sensor="JP-01" marker-end="url(#mArrow)"/>
+                <path id="path-m2-discharge" d="M 820 650 L 1000 650 L 1000 510" class="pipe-base" data-rz-line="1" data-id="fs-fp02-discharge" data-from="FP-02" data-to="DISCHARGE-HEADER" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN250 diesel standby" data-current="UNAVAILABLE" data-redundancy="redundant_b" data-sensor="FP-02" marker-end="url(#mArrow)"/>
+                <g data-rz-authored-basis="Instrument tags, pipe sizes, valve arrangement and the supervised-device labels on this drawing are page-authored design selections for the installation (NFPA 20 / NFPA 13 practice): conv-engine.js publishes the fire reserve, the pump demand and the duration, not hydraulic sizing or per-device state">
+                <g transform="translate(948,260)" class="pid-check"><circle r="9" fill="#16203a" stroke="var(--text-dim)" stroke-width="1.6"/><path d="M-5,-6 L6,0 L-5,6 Z" fill="var(--text-dim)"/></g><g transform="translate(982,260)" class="pid-valve"><polygon points="-9,-7 9,7 9,-7 -9,7" fill="#16203a" stroke="var(--text-dim)" stroke-width="1.6"/><line x1="0" y1="-7" x2="0" y2="-14" stroke="var(--text-dim)" stroke-width="1.6"/><circle cx="0" cy="-16" r="3" fill="none" stroke="var(--text-dim)" stroke-width="1.2"/></g>
+                <g transform="translate(830,510)" class="pid-check"><circle r="9" fill="#16203a" stroke="var(--text-dim)" stroke-width="1.6"/><path d="M-5,-6 L6,0 L-5,6 Z" fill="var(--text-dim)"/></g><g transform="translate(866,510)" class="pid-valve"><polygon points="-9,-7 9,7 9,-7 -9,7" fill="#16203a" stroke="var(--text-dim)" stroke-width="1.6"/><line x1="0" y1="-7" x2="0" y2="-14" stroke="var(--text-dim)" stroke-width="1.6"/><circle cx="0" cy="-16" r="3" fill="none" stroke="var(--text-dim)" stroke-width="1.2"/></g>
+                <g transform="translate(948,650)" class="pid-check"><circle r="9" fill="#16203a" stroke="var(--text-dim)" stroke-width="1.6"/><path d="M-5,-6 L6,0 L-5,6 Z" fill="var(--text-dim)"/></g><g transform="translate(982,650)" class="pid-valve"><polygon points="-9,-7 9,7 9,-7 -9,7" fill="#16203a" stroke="var(--text-dim)" stroke-width="1.6"/><line x1="0" y1="-7" x2="0" y2="-14" stroke="var(--text-dim)" stroke-width="1.6"/><circle cx="0" cy="-16" r="3" fill="none" stroke="var(--text-dim)" stroke-width="1.2"/></g>
+                <g transform="translate(838,538)" class="pid-bubble"><circle r="14" fill="#0c1424" stroke="var(--text-dim)" stroke-width="1.4"/><text y="4" text-anchor="middle" fill="var(--text-dim)" font-size="10" font-weight="700" class="font-tech">PSL</text></g><g transform="translate(878,538)" class="pid-bubble"><circle r="14" fill="#0c1424" stroke="var(--text-dim)" stroke-width="1.4"/><text y="4" text-anchor="middle" fill="var(--text-dim)" font-size="10" font-weight="700" class="font-tech">PSH</text></g>
+                <path d="M 1000 380 L 1090 380" class="pipe-base" stroke-width="3" /><line x1="1090" y1="372" x2="1090" y2="388" stroke="var(--text-dim)" stroke-width="2" />
+                <g transform="translate(1045,380)" class="pid-bubble"><circle r="14" fill="#0c1424" stroke="var(--text-dim)" stroke-width="1.4"/><text y="4" text-anchor="middle" fill="var(--text-dim)" font-size="10" font-weight="700" class="font-tech">FE</text></g>
+                <text x="1100" y="384" class="eq-tag" font-size="10">TEST HDR · DRAIN</text>
+                <path d="M 1000 320 L 1022 320" class="pipe-base" stroke-width="3" /><g transform="translate(1036,320)" class="pid-bubble"><circle r="14" fill="#0c1424" stroke="var(--text-dim)" stroke-width="1.4"/><text y="4" text-anchor="middle" fill="var(--text-dim)" font-size="10" font-weight="700" class="font-tech">PRV</text></g>
+                <path d="M 1150 440 L 1188 440" class="pipe-base" stroke-width="3" /><g transform="translate(1172,440)" class="pid-valve"><polygon points="-9,-7 9,7 9,-7 -9,7" fill="#16203a" stroke="var(--text-dim)" stroke-width="1.6"/><line x1="0" y1="-7" x2="0" y2="-14" stroke="var(--text-dim)" stroke-width="1.6"/><circle cx="0" cy="-16" r="3" fill="none" stroke="var(--text-dim)" stroke-width="1.2"/></g>
+                <text x="1196" y="444" class="eq-tag" font-size="10">FH / HR RISER DN100</text>
                 </g>
-                <path id="path-n2" d="M 912 558 L 912 348 L 1262 348" class="pipe-base" data-rz-line="1" data-id="fs-n2-supply" data-from="N2-GEN-01" data-to="N2-DIST-HEADER" data-medium="fire" data-direction="forward" data-state="unavailable" data-capacity="N2 2.4 bar" data-current="UNAVAILABLE" data-redundancy="duty"/>
-
-                <!-- Discharge headers. v1.42.5 — tagged. -->
-                <path id="path-discharge" d="M 820 150 L 1000 150 L 1000 400 L 1150 400" class="pipe-base" data-rz-line="1" data-id="fs-fp01-discharge" data-from="FP-01" data-to="DISCHARGE-HEADER" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN250 main fire pump" data-current="UNAVAILABLE" data-redundancy="duty" data-sensor="FP-01"/>
-                <path id="path-j-discharge" d="M 790 400 L 1000 400" class="pipe-base" data-rz-line="1" data-id="fs-jp-discharge" data-from="JP-01" data-to="DISCHARGE-HEADER" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN80 jockey" data-current="UNAVAILABLE" data-redundancy="duty" data-sensor="JP-01"/>
-                <path id="path-m2-discharge" d="M 820 540 L 1000 540 L 1000 400" class="pipe-base" data-rz-line="1" data-id="fs-fp02-discharge" data-from="FP-02" data-to="DISCHARGE-HEADER" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN250 diesel standby" data-current="UNAVAILABLE" data-redundancy="redundant_b" data-sensor="FP-02"/>
-                <rect class="pipe-label-box" x="1052" y="392" width="86" height="16" rx="3" />
-                <text x="1095" y="404" text-anchor="middle" class="pipe-label">DISCHARGE HDR</text>
+                <rect class="pipe-label-box" x="1052" y="502" width="86" height="16" rx="3" />
+                <text x="1095" y="514" text-anchor="middle" class="pipe-label">DISCHARGE HDR</text>
 
                 <!-- Discharge pressure gauge -->
-                <g transform="translate(1018, 360)" id="grp-gauge" tabindex="0" role="button" aria-label="Discharge header pressure and flow">
-                    <rect width="46" height="28" fill="#16203a" stroke="#475569" />
+                <g transform="translate(1018, 470)" id="grp-gauge" tabindex="0" role="button" aria-label="Discharge header pressure and flow">
+                    <circle cx="30" cy="14" r="14" fill="#0c1424" stroke="var(--text-dim)" stroke-width="1.4" /><text x="30" y="18" text-anchor="middle" fill="var(--text-dim)" font-size="10" font-weight="700" class="font-tech">PT</text>
                     <circle cx="84" cy="14" r="22" fill="#0c1424" stroke="#64748b" />
                     <line id="gauge-pin" x1="84" y1="14" x2="84" y2="-2" stroke="#cbd5e1" stroke-width="3" style="transform-origin:84px 14px; transform:rotate(45deg); transition:.5s;" />
                     <text x="84" y="58" text-anchor="middle" fill="#94a3b8" font-size="10" font-weight="bold">Header flow</text>
                     <text id="flow-val" x="84" y="74" text-anchor="middle" fill="#cbd5e1" font-size="12" class="font-tech" font-weight="bold">UNAVAILABLE</text>
                 </g>
 
-                <path id="path-to-wet" d="M 1150 400 L 1150 110 L 1200 110" class="pipe-base" data-rz-line="1" data-id="fs-to-wet-zone" data-from="DISCHARGE-HEADER" data-to="WAV-ZONE-BANK" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN150 wet sprinkler" data-current="UNAVAILABLE" data-redundancy="duty"/>
-                <path id="path-to-pre" d="M 1150 400 L 1150 520 L 1200 520" class="pipe-base" data-rz-line="1" data-id="fs-to-preaction-zone" data-from="DISCHARGE-HEADER" data-to="PACV-ZONE-BANK" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN150 pre-action" data-current="UNAVAILABLE" data-redundancy="duty"/>
+                <path id="path-to-wet" d="M 1150 510 L 1150 220 L 1200 220" class="pipe-base" data-rz-line="1" data-id="fs-to-wet-zone" data-from="DISCHARGE-HEADER" data-to="WAV-ZONE-BANK" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN150 wet sprinkler" data-current="UNAVAILABLE" data-redundancy="duty" marker-end="url(#mArrow)"/>
+                <path id="path-to-pre" d="M 1150 510 L 1150 630 L 1200 630" class="pipe-base" data-rz-line="1" data-id="fs-to-preaction-zone" data-from="DISCHARGE-HEADER" data-to="PACV-ZONE-BANK" data-medium="fws" data-direction="forward" data-state="unavailable" data-capacity="DN150 pre-action" data-current="UNAVAILABLE" data-redundancy="duty" marker-end="url(#mArrow)"/>
 
-                <!-- Wet alarm / zone control valves -->
-                <g transform="translate(1200, 70)">
+                <!-- Wet alarm / zone control valves — alarm check valve + flow switch + tamper per zone -->
+                <g transform="translate(1200, 180)" id="grp-wav" tabindex="0" role="button" aria-label="Wet-pipe sprinkler zone valves">
                     <text x="80" y="-12" text-anchor="middle" class="eq-tag">Wet-Pipe Zone Valves (sprinkler)</text>
                     <rect id="wv-1" x="0" y="0" width="48" height="64" fill="#16203a" stroke="#475569" rx="4" />
                     <text x="24" y="36" text-anchor="middle" class="valve-label">WAV-01</text>
@@ -612,21 +695,37 @@
                     <text x="82" y="36" text-anchor="middle" class="valve-label">WAV-02</text>
                     <rect id="wv-3" x="116" y="0" width="48" height="64" fill="#16203a" stroke="#475569" rx="4" />
                     <text x="140" y="36" text-anchor="middle" class="valve-label">WAV-03</text>
+                    <g data-rz-authored-basis="Instrument tags, pipe sizes, valve arrangement and the supervised-device labels on this drawing are page-authored design selections for the installation (NFPA 20 / NFPA 13 practice): conv-engine.js publishes the fire reserve, the pump demand and the duration, not hydraulic sizing or per-device state">
+                    <polygon points="16,12 32,20 16,28" fill="none" stroke="#94a3b8" stroke-width="1.2" /><polygon points="74,12 90,20 74,28" fill="none" stroke="#94a3b8" stroke-width="1.2" /><polygon points="132,12 148,20 132,28" fill="none" stroke="#94a3b8" stroke-width="1.2" />
+                    <circle cx="14" cy="52" r="5" fill="none" stroke="#94a3b8" stroke-width="1.2" /><circle cx="34" cy="52" r="5" fill="none" stroke="#94a3b8" stroke-width="1.2" />
+                    <circle cx="72" cy="52" r="5" fill="none" stroke="#94a3b8" stroke-width="1.2" /><circle cx="92" cy="52" r="5" fill="none" stroke="#94a3b8" stroke-width="1.2" />
+                    <circle cx="130" cy="52" r="5" fill="none" stroke="#94a3b8" stroke-width="1.2" /><circle cx="150" cy="52" r="5" fill="none" stroke="#94a3b8" stroke-width="1.2" />
+                    <text x="82" y="82" text-anchor="middle" class="eq-tag" font-size="10">FS + TS supervised per zone</text>
+                    </g>
                 </g>
 
-                <!-- N2 distribution header to pre-action zone valves. v1.42.5 — tagged. -->
-                <path id="path-n2-header" d="M 1200 348 L 1400 348" class="pipe-base" data-rz-line="1" data-id="fs-n2-distribution-header" data-from="N2-GEN-01" data-to="PV-N2-MANIFOLD" data-medium="fire" data-direction="forward" data-state="unavailable" data-capacity="N2 2.4 bar header" data-current="UNAVAILABLE" data-redundancy="duty"/>
-                <path id="path-n2-pv1" d="M 1218 348 L 1218 480" class="pipe-base" data-rz-line="1" data-id="fs-n2-pv1" data-from="PV-N2-MANIFOLD" data-to="PACV-01" data-medium="fire" data-direction="forward" data-state="unavailable" data-capacity="N2 zone branch" data-current="UNAVAILABLE" data-redundancy="duty"/>
-                <path id="path-n2-pv2" d="M 1262 348 L 1262 480" class="pipe-base" data-rz-line="1" data-id="fs-n2-pv2" data-from="PV-N2-MANIFOLD" data-to="PACV-02" data-medium="fire" data-direction="forward" data-state="unavailable" data-capacity="N2 zone branch" data-current="UNAVAILABLE" data-redundancy="duty"/>
-                <path id="path-n2-pv3" d="M 1306 348 L 1306 480" class="pipe-base" data-rz-line="1" data-id="fs-n2-pv3" data-from="PV-N2-MANIFOLD" data-to="PACV-03" data-medium="fire" data-direction="forward" data-state="unavailable" data-capacity="N2 zone branch" data-current="UNAVAILABLE" data-redundancy="duty"/>
-                <path id="path-n2-pv4" d="M 1350 348 L 1350 480" class="pipe-base" data-rz-line="1" data-id="fs-n2-pv4" data-from="PV-N2-MANIFOLD" data-to="PACV-04" data-medium="fire" data-direction="forward" data-state="unavailable" data-capacity="N2 zone branch" data-current="UNAVAILABLE" data-redundancy="duty"/>
-                <path id="path-n2-pv5" d="M 1394 348 L 1394 480" class="pipe-base" data-rz-line="1" data-id="fs-n2-pv5" data-from="PV-N2-MANIFOLD" data-to="PACV-05" data-medium="fire" data-direction="forward" data-state="unavailable" data-capacity="N2 zone branch" data-current="UNAVAILABLE" data-redundancy="duty"/>
+                <!-- N2 / inert gas generator -->
+                <g transform="translate(845, 678)" id="grp-n2" tabindex="0" role="button" aria-label="Inert gas generator N2-GEN-01">
+                    <rect width="150" height="76" fill="#16203a" stroke="#475569" rx="5" />
+                    <circle cx="30" cy="38" r="20" fill="#020a16" stroke="#475569" id="node-n2" />
+                    <g id="spin-n2" class="impeller"><line x1="-12" y1="0" x2="12" y2="0" stroke="#64748b" stroke-width="2" /><line x1="0" y1="-12" x2="0" y2="12" stroke="#64748b" stroke-width="2" /></g>
+                    <text x="60" y="26" fill="#cbd5e1" font-size="10" font-weight="800">N2 INERT GEN</text>
+                    <text x="60" y="40" class="eq-tag">N2-GEN-01</text>
+                    <text id="label-n2-state" x="60" y="55" fill="#94a3b8" font-size="10" font-weight="bold" data-rz-authored-basis="Header pressure is simulated hydraulic state. conv-engine.js models the fire-water demand and the stored reserve, not the pressure the ring main happens to be sitting at, so this reading has no engine parameter to trace to.">Hdr · UNAVAILABLE</text>
+                </g>
+                </g>
 
-                <!-- v1.134.6 — the valve bank was translated to x=1200 and its fifth valve
-                     (x=176, width 36) ended at 1412 against a 1400 viewBox, so PACV-05 and its
-                     label were drawn outside the mimic entirely. Shifted left to fit. -->
-                <g transform="translate(1176, 480)">
-                    <text x="100" y="-12" text-anchor="middle" class="eq-tag">Pre-Action Zone Valves (data hall)</text>
+                <!-- ===== LAYER 3 — PRE-ACTION / INERT GAS ===== -->
+                <g id="layer-n2" data-layer="n2">
+                <path id="path-n2" d="M 912 678 L 912 458 L 1262 458" class="pipe-base" data-rz-line="1" data-id="fs-n2-supply" data-from="N2-GEN-01" data-to="N2-DIST-HEADER" data-medium="fire" data-direction="forward" data-state="unavailable" data-capacity="N2 2.4 bar" data-current="UNAVAILABLE" data-redundancy="duty"/>
+                <path id="path-n2-header" d="M 1200 458 L 1400 458" class="pipe-base" data-rz-line="1" data-id="fs-n2-distribution-header" data-from="N2-GEN-01" data-to="PV-N2-MANIFOLD" data-medium="fire" data-direction="forward" data-state="unavailable" data-capacity="N2 2.4 bar header" data-current="UNAVAILABLE" data-redundancy="duty"/>
+                <path id="path-n2-pv1" d="M 1218 458 L 1218 590" class="pipe-base" data-rz-line="1" data-id="fs-n2-pv1" data-from="PV-N2-MANIFOLD" data-to="PACV-01" data-medium="fire" data-direction="forward" data-state="unavailable" data-capacity="N2 zone branch" data-current="UNAVAILABLE" data-redundancy="duty"/>
+                <path id="path-n2-pv2" d="M 1262 458 L 1262 590" class="pipe-base" data-rz-line="1" data-id="fs-n2-pv2" data-from="PV-N2-MANIFOLD" data-to="PACV-02" data-medium="fire" data-direction="forward" data-state="unavailable" data-capacity="N2 zone branch" data-current="UNAVAILABLE" data-redundancy="duty"/>
+                <path id="path-n2-pv3" d="M 1306 458 L 1306 590" class="pipe-base" data-rz-line="1" data-id="fs-n2-pv3" data-from="PV-N2-MANIFOLD" data-to="PACV-03" data-medium="fire" data-direction="forward" data-state="unavailable" data-capacity="N2 zone branch" data-current="UNAVAILABLE" data-redundancy="duty"/>
+                <path id="path-n2-pv4" d="M 1350 458 L 1350 590" class="pipe-base" data-rz-line="1" data-id="fs-n2-pv4" data-from="PV-N2-MANIFOLD" data-to="PACV-04" data-medium="fire" data-direction="forward" data-state="unavailable" data-capacity="N2 zone branch" data-current="UNAVAILABLE" data-redundancy="duty"/>
+                <path id="path-n2-pv5" d="M 1394 458 L 1394 590" class="pipe-base" data-rz-line="1" data-id="fs-n2-pv5" data-from="PV-N2-MANIFOLD" data-to="PACV-05" data-medium="fire" data-direction="forward" data-state="unavailable" data-capacity="N2 zone branch" data-current="UNAVAILABLE" data-redundancy="duty"/>
+                <g transform="translate(1176, 590)" id="grp-pacv" tabindex="0" role="button" aria-label="Pre-action zone valves">
+                    <text x="100" y="-12" text-anchor="middle" class="eq-tag">Pre-Action Zone Valves · N2 supervised</text>
                     <rect id="pv-1" x="0"   y="0" width="36" height="60" fill="#16203a" stroke="#475569" rx="4" />
                     <text x="18"  y="34" text-anchor="middle" class="valve-label">PACV-01</text>
                     <rect id="pv-2" x="44"  y="0" width="36" height="60" fill="#16203a" stroke="#475569" rx="4" />
@@ -637,6 +736,11 @@
                     <text x="150" y="34" text-anchor="middle" class="valve-label">PACV-04</text>
                     <rect id="pv-5" x="176" y="0" width="36" height="60" fill="#16203a" stroke="#475569" rx="4" />
                     <text x="194" y="34" text-anchor="middle" class="valve-label">PACV-05</text>
+                    <g data-rz-authored-basis="Instrument tags, pipe sizes, valve arrangement and the supervised-device labels on this drawing are page-authored design selections for the installation (NFPA 20 / NFPA 13 practice): conv-engine.js publishes the fire reserve, the pump demand and the duration, not hydraulic sizing or per-device state">
+                    <rect x="11" y="8" width="14" height="9" rx="1" fill="none" stroke="#94a3b8" stroke-width="1.1" /><circle cx="18" cy="50" r="4" fill="none" stroke="#94a3b8" stroke-width="1.1" /><rect x="55" y="8" width="14" height="9" rx="1" fill="none" stroke="#94a3b8" stroke-width="1.1" /><circle cx="62" cy="50" r="4" fill="none" stroke="#94a3b8" stroke-width="1.1" /><rect x="99" y="8" width="14" height="9" rx="1" fill="none" stroke="#94a3b8" stroke-width="1.1" /><circle cx="106" cy="50" r="4" fill="none" stroke="#94a3b8" stroke-width="1.1" /><rect x="143" y="8" width="14" height="9" rx="1" fill="none" stroke="#94a3b8" stroke-width="1.1" /><circle cx="150" cy="50" r="4" fill="none" stroke="#94a3b8" stroke-width="1.1" /><rect x="187" y="8" width="14" height="9" rx="1" fill="none" stroke="#94a3b8" stroke-width="1.1" /><circle cx="194" cy="50" r="4" fill="none" stroke="#94a3b8" stroke-width="1.1" />
+                    <text x="106" y="78" text-anchor="middle" class="eq-tag" font-size="10">SOL · PS · FS per valve — double interlock</text>
+                    </g>
+                </g>
                 </g>
             </svg>
         </div>
@@ -1045,6 +1149,57 @@
             $('label-j-state').textContent = HAS_FIRE_AUTHORITY ? 'JP-01 · pressure maintain · AUTO' : 'JP-01 · ' + UNAVAILABLE;
             $('label-m2-state').textContent = HAS_FIRE_AUTHORITY ? 'FP-02 · diesel · STANDBY' : 'FP-02 · ' + UNAVAILABLE;
             $('label-n2-state').textContent = HAS_FIRE_AUTHORITY ? 'Hdr 2.4 bar · STANDBY' : 'Hdr · ' + UNAVAILABLE;
+            renderDetectionLayer();
+        }
+
+        // ---- v2.6.0 Detection layer (FACP · VESDA · zones · MCP): state follows the same stage machine as the water train ----
+        var ZONE_CHIP_IDS = ['1', '2', '3', '4', '5'];
+        function setDetChip(id, tone, text) {
+            var g = $('zone-chip-' + id), lab = $('label-zone' + id + '-state'), sd = $('zsd-' + id), hd = $('zhd-' + id);
+            if (!g) return;
+            g.classList.remove('is-warn', 'is-alarm');
+            if (tone === 'warn') g.classList.add('is-warn');
+            if (tone === 'alarm') g.classList.add('is-alarm');
+            var fill = tone === 'alarm' ? 'var(--st-alarm)' : (tone === 'warn' ? 'var(--st-warn)' : (tone === 'normal' ? '#0c1424' : '#0c1424'));
+            var stroke = tone === 'alarm' ? 'var(--st-alarm)' : (tone === 'warn' ? 'var(--st-warn)' : (tone === 'normal' ? 'var(--st-normal)' : '#64748b'));
+            if (sd) { sd.setAttribute('fill', tone === 'normal' || tone === 'unavailable' ? '#0c1424' : fill); sd.setAttribute('stroke', stroke); }
+            if (hd) { hd.setAttribute('fill', tone === 'alarm' ? fill : '#0c1424'); hd.setAttribute('stroke', stroke); }
+            if (lab) { lab.textContent = text; lab.style.fill = tone === 'alarm' ? 'var(--st-alarm)' : (tone === 'warn' ? 'var(--st-warn)' : ''); }
+        }
+        function renderDetectionLayer() {
+            var facp = $('label-facp-state'), vesda = $('label-vesda-state'), mcp = $('label-mcp-state'), led = $('led-facp'), pulse = $('vesda-pulse');
+            if (!facp || !vesda || !mcp) return;
+            if (!HAS_FIRE_AUTHORITY) {
+                facp.textContent = 'FACP · ' + UNAVAILABLE; vesda.textContent = 'VESDA · ' + UNAVAILABLE; mcp.textContent = UNAVAILABLE;
+                facp.style.fill = ''; vesda.style.fill = '';
+                if (led) led.setAttribute('fill', '#64748b');
+                if (pulse) { pulse.classList.remove('vesda-live'); pulse.setAttribute('stroke', '#64748b'); }
+                ZONE_CHIP_IDS.forEach(function (id) { setDetChip(id, 'unavailable', UNAVAILABLE); });
+                return;
+            }
+            var st = state.stage;
+            // FACP
+            var facpTxt = st >= 6 ? 'LOCKOUT · RESET REQUIRED' : st >= 3 ? 'FIRE ALARM · ZONE 1' : st >= 1 ? 'PRE-ALARM · ZONE 1' : 'NORMAL · SUPERVISORY OK';
+            facp.textContent = facpTxt;
+            facp.style.fill = st >= 3 ? 'var(--st-alarm)' : (st >= 1 ? 'var(--st-warn)' : '');
+            if (led) led.setAttribute('fill', st >= 3 ? 'var(--st-alarm)' : (st >= 1 ? 'var(--st-warn)' : 'var(--st-normal)'));
+            // VESDA — alert at stage 1, action at stage 2+, sampling pulse whenever the panel is live
+            var vTxt = st >= 2 ? 'VESDA · ACTION · ZONE 1' : st >= 1 ? 'VESDA · ALERT · ZONE 1' : 'VESDA · NORMAL · sampling';
+            vesda.textContent = vTxt;
+            vesda.style.fill = st >= 2 ? 'var(--st-alarm)' : (st >= 1 ? 'var(--st-warn)' : '');
+            if (pulse) { pulse.classList.add('vesda-live'); pulse.setAttribute('stroke', st >= 2 ? 'var(--st-alarm)' : (st >= 1 ? 'var(--st-warn)' : 'var(--st-normal)')); }
+            // Zones — the staged scenario is written against Zone 1 (Hall A); the others stay NORMAL
+            ZONE_CHIP_IDS.forEach(function (id) {
+                if (id !== '1') { setDetChip(id, 'normal', 'NORMAL'); return; }
+                if (st >= 6) setDetChip(id, 'alarm', 'DISCHARGED · LOCKOUT');
+                else if (st >= 5) setDetChip(id, 'alarm', 'RELEASE · N2');
+                else if (st >= 4) setDetChip(id, 'alarm', 'FIRE · ARMED · 30 s');
+                else if (st >= 3) setDetChip(id, 'alarm', 'FIRE · CONFIRMED');
+                else if (st >= 2) setDetChip(id, 'warn', 'SMOKE · PRE-ALARM');
+                else if (st >= 1) setDetChip(id, 'warn', 'VESDA ALERT');
+                else setDetChip(id, 'normal', 'NORMAL');
+            });
+            mcp.textContent = st >= 4 ? 'ABORT LIVE · hold inhibits' : 'NORMAL · supervised';
         }
 
         function setPump(node, spin, led, on, alarm, authorityAvailable) {
@@ -1070,7 +1225,7 @@
         function applyStageVisuals() {
             renderEquipmentAuthority();
             // reset flow classes first
-            firePaths.forEach(function (id) { var e = $(id); if (e) e.classList.remove('flow-fire'); });
+            firePaths.forEach(function (id) { var e = $(id); if (e) e.classList.remove('flow-fire', 'flow-idle'); });
             n2Paths.forEach(function (id) { var e = $(id); if (e) e.classList.remove('flow-n2'); });
             pacv.forEach(function (id) { var e = $(id); if (e) { e.style.fill = '#16203a'; e.style.stroke = '#475569'; } });
             wav.forEach(function (id) { var e = $(id); if (e) { e.style.fill = '#16203a'; e.style.stroke = '#475569'; } });
@@ -1084,6 +1239,11 @@
             setPump('node-j', 'spin-j', 'led-j', jOn, false, pressureAvailable);
             setPump('node-m1', 'spin-m1', 'led-m1', m1On, m1On, pressureAvailable);
             setPump('node-m2', 'spin-m2', 'led-m2', m2On, m2On, pressureAvailable);
+            if (pressureAvailable) {
+                $('label-j-state').textContent = jOn ? 'JP-01 · RUNNING · low header' : 'JP-01 · pressure maintain · AUTO';
+                $('label-m1-state').textContent = m1On ? 'FP-01 · RUNNING · demand' : 'FP-01 · electric · AUTO';
+                $('label-m2-state').textContent = m2On ? 'FP-02 · RUNNING · backup' : 'FP-02 · diesel · STANDBY';
+            }
 
             if (!pressureAvailable) {
                 flowTxt.textContent = UNAVAILABLE;
@@ -1096,6 +1256,8 @@
                 flowTxt.textContent = (m1On ? '227.0' : (jOn ? '18.0' : '0.0')) + ' m³/h';
             } else {
                 flowTxt.textContent = '0.0 m³/h';
+                // pressure maintained: the jockey line breathes so a live system never looks frozen (v2.6.0)
+                $('path-j-discharge').classList.add('flow-idle');
             }
 
             // N2 / pre-action discharge only at stage 5
@@ -1495,6 +1657,33 @@
                 ['Protected zones', HAS_FIRE_AUTHORITY && ZONE_COUNT ? ZONE_COUNT + ' pre-action zones' : UNAVAILABLE],
                 ['Abort station', authorityState('Live')],
                 ['Hold time target', '600 s'], ['Cause-effect', 'Discharge at Stage 5 only'] ] },
+            'grp-facp': { title: 'FACP-01 · Fire Alarm Control Panel', rows: [
+                ['Type', 'Addressable, networked'], ['Loops', authorityState('SLC loops supervised')],
+                ['Detection', 'Spot smoke + heat per zone, VESDA per hall'],
+                ['Two-means rule', 'Release needs 2 independent detections (cross-zoned)'],
+                ['Stage', authorityState(String(state.stage))], ['Cause-effect', 'See matrix below the drawing'] ] },
+            'grp-vesda': { title: 'VESDA-01/02 · Aspirating Smoke Detection', rows: [
+                ['Type', 'Aspirating, laser chamber'], ['Sampling', authorityState('Pipe network, continuous')],
+                ['Alert / Action', 'Stage 1 / Stage 2 of the stage machine'],
+                ['Airflow supervision', authorityState('Healthy')], ['Cause-effect', 'Alert = pre-alarm, Action = first detection means'] ] },
+            'grp-mcp': { title: 'MCP-01 · Manual Call Point / ABORT-01', rows: [
+                ['Manual call point', 'Break-glass, raises confirmed alarm (Stage 3)'],
+                ['Abort station', 'Hold-to-inhibit during pre-action countdown (Stage 4)'],
+                ['Life safety', 'Never isolable'], ['State', authorityState('Supervised')] ] },
+            'grp-tank': { title: 'TK-FW-01 · Fire Reserve Tank', rows: [
+                ['Reserve', TANK_CAP_M3 ? TANK_CAP_M3 + ' m³' : UNAVAILABLE],
+                ['Level', authorityState($('tank-level-txt').textContent)],
+                ['Make-up', 'Landlord supply via float valve'], ['Low / Low-Low', 'Setpoints drawn on the tank'],
+                ['Duration', authorityState($('tank-dur-txt').textContent)] ] },
+            'grp-wav': { title: 'Wet-Pipe Zone Valves (WAV-01..03)', rows: [
+                ['Service', 'Sprinkler zones — offices, corridors, plant'],
+                ['Per zone', 'Alarm check valve + flow switch (FS) + tamper switch (TS)'],
+                ['Supervision', authorityState('FS/TS supervised')], ['Cause-effect', 'Sprinkler flow = confirmed alarm'] ] },
+            'grp-pacv': { title: 'Pre-Action Zone Valves (PACV-01..05)', rows: [
+                ['Service', HAS_FIRE_AUTHORITY && ZONE_COUNT ? ZONE_COUNT + ' data-hall zones, double interlock' : UNAVAILABLE],
+                ['Per valve', 'Solenoid (SOL) + supervisory pressure switch (PS) + flow switch (FS)'],
+                ['Pipe supervision', 'N2 supervised dry pipe'],
+                ['Cause-effect', 'Armed at Stage 4, released at Stage 5 (detection AND sprinkler fusing)'] ] },
             'grp-gauge': { title: 'Discharge Header', rows: [
                 ['Static pressure', P_STATIC ? P_STATIC + ' bar' : UNAVAILABLE], ['Low alarm', P_LOW_ALM + ' bar'],
                 ['Jockey on/off', P_JOCKEY_ON + ' / ' + P_JOCKEY_OFF + ' bar'],
@@ -1519,7 +1708,7 @@
             tooltip.classList.add('visible');
         }
         function hideTooltip() { tooltip.classList.remove('visible'); }
-        document.querySelectorAll('#grp-main1, #grp-main2, #grp-jockey, #grp-n2, #grp-gauge').forEach(function (el) {
+        document.querySelectorAll('#grp-main1, #grp-main2, #grp-jockey, #grp-n2, #grp-gauge, #grp-facp, #grp-vesda, #grp-mcp, #grp-tank, #grp-wav, #grp-pacv').forEach(function (el) {
             el.style.cursor = 'pointer';
             el.addEventListener('mouseenter', function (e) { showTooltip(e, this.id); });
             el.addEventListener('mousemove', function (e) {

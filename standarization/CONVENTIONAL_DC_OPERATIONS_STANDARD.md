@@ -120,6 +120,12 @@ If the current engine authority is absent, invalid or legacy, every dependent FA
 pump, tank, N₂, wet-pipe, pre-action, interlock and path annotation fails closed together.
 No residual `NORMAL`, `STANDBY`, `CHARGED` or pressure-maintain label may survive on a path whose
 authority is unavailable.
+  **v2.6.0 — a readable P&ID.** Three layers on one sheet: detection & control (FACP, VESDA with sampling
+  pulse, five zone chips with smoke/heat symbols, MCP/abort) driven by the same stage machine as the water
+  train; fire water with isolation and check valves, PI/PSL/PSH/PT/PRV/FE instruments, a test header and
+  the hydrant riser; pre-action with N2-supervised PACVs (SOL/PS/FS). Arrowheads on every pipe end, an idle
+  pressure-maintenance flow at stage 0, pump labels that follow the pump. Instrument tags and setpoints are
+  declared page basis — the engine publishes reserve, demand and duration only.
 
 ### Fuel
 

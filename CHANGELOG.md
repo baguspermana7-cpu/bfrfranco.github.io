@@ -11,6 +11,34 @@ release sections rather than semver.
 
 ---
 
+## v2.6.0 — 2026-09-08
+
+### Fire system: a readable P&ID with a detection layer (Track B, owner comment 14)
+
+Owner: *"fire-system mimic poor, flow animation lacking, not a readable P&ID."* Measured: the drawing was a
+tank, three pumps and thirteen bare pipes with no valves, no check valves, no instruments, no arrowheads and
+no detection side at all — the FACP, VESDA, zones and manual stations the cause-and-effect matrix talks
+about were words in a table; at stage 0 nothing on the screen moved, so a live system and a dead one
+rendered identically; every pipe label was 9 px.
+
+Now `#fire-svg` is recomposed in three layers on a 1400 × 770 sheet. **Detection & control** (top band):
+FACP-01, VESDA-01/02 with a sampling pulse, five zone chips (Hall A–D, Electrical) each with spot smoke
+and heat symbols and a state line, MCP-01 / ABORT-01 — all driven by the same stage machine as the water
+train (NORMAL → VESDA ALERT → SMOKE PRE-ALARM → FIRE CONFIRMED → ARMED → RELEASE → LOCKOUT on Zone 1;
+`UNAVAILABLE` at first paint and whenever fire authority is missing). **Fire water**: landlord make-up →
+TK-FW-01 → suction header with isolation valves and a PI → FP-01 / JP-01 / FP-02 each with check valve and
+isolation valve → PSL/PSH on the jockey line → discharge header with PT, PRV, a test header (FE) to drain
+and an FH/HR riser branch → wet-pipe zone valves (alarm check + FS + TS per zone). **Pre-action / inert
+gas**: N2 generator → supervised header → five PACVs with solenoid, PS and FS (double interlock). Every
+pipe end carries an arrowhead; the jockey line breathes at stage 0 (pressure maintained), the fire paths
+run red from confirmed, the N2 paths amber at release; pump state labels follow the pump (RUNNING / AUTO /
+STANDBY) instead of a static string. Tooltips for FACP, VESDA, MCP, tank, WAV and PACV banks. All 13
+tagged lines, the three centrifugal-pump symbols, every `label-*-state` id and the staged simulation
+contract are unchanged; every new numeral sits under a declared authored basis (the engine publishes no
+hydraulic sizing or per-device state). Gates: fire runtime authority, fire/fuel operator, conv coverage
+STRICT (27/27 traced), geometry 0/0, legibility, line-model ≥14, alarm runtime, basis drawer, document
+parity, anti-vibecode strict.
+
 ## v2.5.0 — 2026-09-07
 
 ### Chiller plant: the outlet reaches the CRAH coils (Track B §B3, owner comment 13)
