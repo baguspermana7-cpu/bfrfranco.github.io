@@ -94,6 +94,18 @@ normal, not a warning. Power density remains a separate explicitly selected laye
 
 ## 6. Subsystem minimums
 
+### Data hall
+
+Cabinet field reconciled by sum to the hall IT load, thermal chain read from the engine planes
+(rack inlet → hot aisle → CRAH return), CRAH fleet and N+1 from the engine, hall selector that
+re-scopes the field without moving the adopted totals, fail-closed everything.
+  **v2.10.0 — continuous ramp + statistics.** The cabinet field paints a continuous severity ramp whose
+  stops sit on the alarm thresholds (red only at breach); rack inlet is per cabinet (row cold aisle + a
+  declared simulated aisle-end allowance); each row footer carries min–max / avg of its cabinets beside
+  the reconciled row planes; the Environment panel carries hall-level rack, row and inlet ranges. The
+  statistics are aggregates of the simulated field and are declared as such — the engine publishes hall
+  totals and planes only.
+
 ### Chiller
 
 CHWS/CHWR, delta-T, labeled reference/measured-flow state, plant load, available capacity, N+1 margin,

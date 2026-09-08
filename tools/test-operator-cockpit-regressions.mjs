@@ -239,7 +239,13 @@ try {
   });
   assert.equal(hall.activeMode, 'temp', 'rack-inlet temperature must be the default operator heatmap');
   assert.match(hall.rackValue, /^25\./, 'default rack field must expose the current 25.x C inlet plane');
-  assert.equal(hall.rackFill, 'rgb(47, 94, 70)', '25.x C is inside 18-27 C and must render NORMAL green');
+  /* v2.10.0 — the cabinet field paints a CONTINUOUS severity ramp (owner comment 12), so a 25.x C
+     inlet is no longer one fixed green: it sits between the 25.4 C target stop and the 27 C warning
+     stop. The invariant this pinned is semantic — inside the recommended envelope must read on the
+     normal (green) side, never amber or red — so assert the channel order, not a literal swatch. */
+  const rampRgb = (hall.rackFill.match(/\d+/g) || []).map(Number);
+  assert.ok(rampRgb.length === 3 && rampRgb[1] >= rampRgb[0] && rampRgb[1] > rampRgb[2],
+    `25.x C is inside 18-27 C and must render on the normal (green) side of the ramp, got ${hall.rackFill}`);
   assert.equal(hall.balanceLabel, 'Hall IT reconciliation');
   assert.equal(hall.balance, 'UNAVAILABLE', 'no hall EPMS submeter must fail closed');
   assert.match(hall.balanceBasis, /planning reference only/i);

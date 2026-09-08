@@ -11,6 +11,35 @@ release sections rather than semver.
 
 ---
 
+## v2.10.0 — 2026-09-08
+
+### Data hall: a continuous heat-map ramp, min / avg / max per row and per hall (Track B, owner comment 12)
+
+Owner: *"datahall.html rack-grid gradient + min/max/avg per row and in the sidebar."* Measured: the field
+painted 463 occupied cabinets with four flat tiers, and in the default rack-inlet mode every cabinet in a row
+shared one row value — one uniform green, the differences a heat map exists to show invisible (doc-03 "too
+much uniform green"); no row or hall statistic existed anywhere.
+
+Now every colour mode with a continuous quantity paints a **continuous severity ramp** between stops that sit
+exactly on the thresholds the tiers used (the thresholds are the alarm philosophy, the ramp is presentation):
+power — muted slate → green → amber at 70 % → orange at 85 % → red at 95 % of the cabinet rating; rack inlet
+— 18 → 22 → 25.4 target → 27 recommended max → 30 °C; cooling margin — 0 → 1 → 3 → 5 → 7 K. Red remains
+reserved for breach. The legend is one ramp bar with threshold ticks instead of swatches. Rack inlet is now
+per cabinet: the row's cold-aisle temperature plus a declared **simulated aisle-end recirculation allowance**
+(+0.6 K at the two end positions, +0.3 K at the next), so the field shows the aisle-end gradient a contained
+row actually has; the row footer keeps the row plane the coverage gate reconciles and gains **min–max / avg**
+of the row's cabinets (kW in power mode, °C in temperature modes), declared as an aggregate of the simulated
+field. The Environment panel gains hall-level **rack load min / avg / max**, **row load min / max (row
+letter)** and **rack-inlet min / avg / max**; the tooltip and the selected-cabinet inspector show the
+cabinet inlet beside its row value. The cabinet field still sums to the engine's hall IT load (463 cells →
+7,500.6 kW) and every gated id, label and fail-closed string is preserved; the cockpit-regressions gate now
+asserts the *side* of the ramp (green channel dominant inside 18–27 °C) instead of one literal swatch.
+
+Gates: data-hall operator engineering, data-hall authority fan-out, ICT/data-hall runtime, hall scope
+(field re-scopes per hall, sum reconciles), conv coverage STRICT (36/36 traced, four distributions
+reconcile), alarm runtime, basis drawer, explain wiring, snapshot binding, cockpit regressions, telemetry
+e2e, anti-vibecode strict.
+
 ## v2.9.0 — 2026-09-08
 
 ### ICT: the architecture canvas that did not exist (Track B, owner comment 17)

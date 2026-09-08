@@ -280,6 +280,13 @@
         .legend { display: flex; align-items: center; gap: 12px; margin-left: auto; font-size: 10px; color: var(--txt-faint); flex-wrap: wrap; }
         .lg-item { display: flex; align-items: center; gap: 5px; }
         .lg-sw { width: 11px; height: 11px; border-radius: 2px; border: 1px solid rgba(255,255,255,0.12); }
+        /* v2.10.0 — continuous ramp legend (owner comment 12): one bar, threshold ticks, no discrete swatches */
+        .lg-ramp { display: flex; align-items: center; gap: 6px; }
+        .lg-bar { position: relative; width: 220px; height: 10px; border-radius: 2px; border: 1px solid rgba(255,255,255,0.14); }
+        .lg-tick { position: absolute; top: -3px; width: 1px; height: 16px; background: rgba(255,255,255,0.55); }
+        .lg-tick span { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); font-size: 9px; white-space: nowrap; color: var(--txt-faint); }
+        .lg-ramp .lg-end { font-size: 9px; color: var(--txt-faint); }
+        .mode-bar { padding-bottom: 10px; }
 
         /* Floor — CRAH rows top/bottom, rack zones center */
         .floor {
@@ -349,6 +356,9 @@
         }
         /* Rack fill set inline by JS from utilization tier — no neon */
         .zone-foot { font-size: 9px; color: var(--txt-faint); text-align: center; padding: 2px; border-top: 1px solid var(--border-soft); white-space: nowrap; }
+        /* v2.10.0 — per-row min / avg / max under the row heat (owner comment 12) */
+        .zone-foot .zf-stats { display: block; margin-top: 1px; color: var(--txt-dim); letter-spacing: -0.2px; font-size: 8.5px; line-height: 1.2; white-space: normal; }
+        .zone-foot .zf-stats b { font-weight: 700; color: var(--txt-main, #e2e8f0); }
 
         /* --- CRAH POPOVER (v1.41.4 — replaces full-screen modal for CRAH details) --- */
         .crah-pop {
@@ -865,6 +875,11 @@
                 <div class="kv"><span class="k">CRAH Return</span><span class="v num" id="env-return">UNAVAILABLE</span></div>
                 <div class="kv"><span class="k">Avg RH</span><span class="v num" id="env-rh">UNAVAILABLE</span></div>
                 <div class="kv"><span class="k">Dew Point</span><span class="v num" id="env-dewpoint" data-rz-authored-basis="Dew point and the hottest measured rack inlet are simulated hall environment: conv-engine.js publishes the design thermal PLANES (rack inlet target, hot aisle, CRAH supply and return) and a site annual average humidity, but no instantaneous per-hall psychrometric state. Binding a simulated instantaneous reading to a design plane would be the wrong-plane defect this programme exists to remove.">UNAVAILABLE</span></div>
+                <!-- v2.10.0 — hall-level min / avg / max (owner comment 12): the same simulated cabinet field the
+                     floor draws, aggregated; declared as such on each cell. -->
+                <div class="kv" data-rz-authored-basis="Rack-load and rack-inlet minimum / average / maximum are aggregates of the SIMULATED cabinet field this page draws (deterministic, seeded per hall, reconciled by sum to the engine's hall IT load); conv-engine.js publishes the hall totals and the thermal planes, not per-cabinet statistics."><span class="k">Rack load min / avg / max</span><span class="v num" id="env-rack-range">UNAVAILABLE</span></div>
+                <div class="kv" data-rz-authored-basis="Rack-load and rack-inlet minimum / average / maximum are aggregates of the SIMULATED cabinet field this page draws (deterministic, seeded per hall, reconciled by sum to the engine's hall IT load); conv-engine.js publishes the hall totals and the thermal planes, not per-cabinet statistics."><span class="k">Row load min / max</span><span class="v num" id="env-row-range">UNAVAILABLE</span></div>
+                <div class="kv" data-rz-authored-basis="Rack-load and rack-inlet minimum / average / maximum are aggregates of the SIMULATED cabinet field this page draws (deterministic, seeded per hall, reconciled by sum to the engine's hall IT load); conv-engine.js publishes the hall totals and the thermal planes, not per-cabinet statistics."><span class="k">Rack-inlet min / avg / max</span><span class="v num" id="env-inlet-range">UNAVAILABLE</span></div>
                 <div class="kv"><span class="k">Hottest Rack-Inlet</span><span class="v num v-na" id="env-hot" data-rz-authored-basis="Dew point and the hottest measured rack inlet are simulated hall environment: conv-engine.js publishes the design thermal PLANES (rack inlet target, hot aisle, CRAH supply and return) and a site annual average humidity, but no instantaneous per-hall psychrometric state. Binding a simulated instantaneous reading to a design plane would be the wrong-plane defect this programme exists to remove.">UNAVAILABLE</span></div>
                 <div class="kv-sub">Rack-inlet design 25.4&deg;C · recommended envelope 18&ndash;27&deg;C · humidity interpreted with dew point / non-condensing constraints · CRAH return assumes contained hot-aisle path (0 K mixing adjustment).</div>
             </div>
@@ -1026,7 +1041,7 @@
                 'chdt','chflow','f-flow','bb-itload','bb-itsub','bb-facsub','bb-racks',
                 'bb-avg','bb-util','bb-design','bb-balance','bb-balsub','bb-cool',
                 'bb-coolsub','bb-np1','bb-np1sub','env-temp','env-hot-aisle','env-return',
-                'env-rh','env-dewpoint','env-hot','density-current','density-study',
+                'env-rh','env-dewpoint','env-hot','env-rack-range','env-row-range','env-inlet-range','density-current','density-study',
                 'density-peak','sel-detail','crah-list','crah-air-note','m-sub','m-grid',
                 'm-source','cp-state','cp-grid'
             ];
@@ -1548,6 +1563,23 @@
             document.getElementById('env-return').textContent = averageZoneField('returnAirC').toFixed(1) + ' °C';
             document.getElementById('env-rh').textContent = averageZoneField('rhPct').toFixed(1) + ' % RH';
             document.getElementById('env-dewpoint').textContent = averageZoneField('dewPointC').toFixed(1) + ' °Cdp';
+            /* v2.10.0 — hall-level min / avg / max of the cabinet field and of the rows */
+            var kwMin = Infinity, kwMax = -Infinity, kwSum = 0, kwN = 0, inMin = Infinity, inMax = -Infinity, inSum = 0;
+            racks.forEach(function (rk) {
+                if (!rk.occupied) return;
+                var t = rackInletFor(rk.idx);
+                kwN++; kwSum += rk.kw; if (rk.kw < kwMin) kwMin = rk.kw; if (rk.kw > kwMax) kwMax = rk.kw;
+                inSum += t; if (t < inMin) inMin = t; if (t > inMax) inMax = t;
+            });
+            var rowMin = zones.reduce(function (m, zn) { return Math.min(m, zn.heat); }, Infinity);
+            var rowMax = zones.reduce(function (m, zn) { return Math.max(m, zn.heat); }, -Infinity);
+            var rowMinZ = zones.filter(function (zn) { return zn.heat === rowMin; })[0], rowMaxZ = zones.filter(function (zn) { return zn.heat === rowMax; })[0];
+            document.getElementById('env-rack-range').textContent = kwN
+                ? kwMin.toFixed(1) + ' / ' + (kwSum / kwN).toFixed(1) + ' / ' + kwMax.toFixed(1) + ' kW' : 'UNAVAILABLE';
+            document.getElementById('env-row-range').textContent = zones.length
+                ? rowMin.toFixed(0) + ' kW (' + String.fromCharCode(65 + rowMinZ.z) + ') / ' + rowMax.toFixed(0) + ' kW (' + String.fromCharCode(65 + rowMaxZ.z) + ')' : 'UNAVAILABLE';
+            document.getElementById('env-inlet-range').textContent = kwN
+                ? inMin.toFixed(1) + ' / ' + (inSum / kwN).toFixed(1) + ' / ' + inMax.toFixed(1) + ' °C' : 'UNAVAILABLE';
             var hot = zones.slice().sort(function (a, b) { return b.rackInletC - a.rackInletC; })[0];
             var hotEl = document.getElementById('env-hot');
             hotEl.textContent = zoneAisleTag(hot.z) + ' ' + hot.rackInletC.toFixed(1) + ' °C';
@@ -1622,23 +1654,20 @@
                the host rather than left to read as untraced engineering values. */
             lg.setAttribute('data-rz-authored-basis', LEGEND_BAND_BASIS);
             var items;
-            if (mode === 'power') {
-                items = [
-                    ['#1b2436', 'Spare'], ['#2f5e46', '<70%'],
-                    ['#7a5a1f', '70–85%'], ['#9a5026', '85–95%'], ['#9a342f', '>95%']
-                ];
-            } else if (mode === 'temp') {
-                items = [
-                    ['#7a5a1f', '<18°C below recommended'],
-                    ['#2f5e46', '18–27°C recommended'],
-                    ['#9a5026', '>27–30°C high'], ['#9a342f', '>30°C critical']
-                ];
-            } else if (mode === 'cooling-margin') {
-                items = [
-                    ['#2f5e46', '>5°C margin'], ['#3f6f4e', '3–5°C'],
-                    ['#7a5a1f', '1–3°C'], ['#9a5026', '<1°C'], ['#9a342f', 'over (ASHRAE A1 27°C)']
-                ];
-            } else if (mode === 'alarms') {
+            var ramp = mode === 'power' ? { stops: RAMP_POWER, lo: '0 %', hi: '>105 %', ticks: [[0.70, '70'], [0.85, '85'], [0.95, '95']], title: 'utilisation of the 20 kW rating (%)' }
+                : mode === 'temp' ? { stops: RAMP_TEMP, lo: '18 °C', hi: '30 °C', ticks: [[25.4, '25.4'], [27, '27']], title: 'rack inlet (°C) · recommended 18–27 °C' }
+                : mode === 'cooling-margin' ? { stops: RAMP_MARGIN, lo: '0 K', hi: '7 K', ticks: [[1, '1'], [3, '3'], [5, '5']], title: 'margin (K) to the 27 °C recommended maximum' }
+                : null;
+            if (ramp) {
+                var lo = ramp.stops[0][0], hi = ramp.stops[ramp.stops.length - 1][0];
+                lg.innerHTML = '<span class="lg-item"><span class="lg-sw" style="background:#1b2436"></span>Spare</span>'
+                    + '<span class="lg-ramp" title="' + ramp.title + '"><span class="lg-end">' + ramp.lo + '</span>'
+                    + '<span class="lg-bar" style="background:' + rampCss(ramp.stops) + '">'
+                    + ramp.ticks.map(function (tk) { return '<span class="lg-tick" style="left:' + (((tk[0] - lo) / (hi - lo)) * 100).toFixed(1) + '%"><span>' + tk[1] + '</span></span>'; }).join('')
+                    + '</span><span class="lg-end">' + ramp.hi + '</span></span>';
+                return;
+            }
+            if (mode === 'alarms') {
                 items = [['#1b2436', 'Normal'], ['#7a5a1f', 'Warning'], ['#9a342f', 'Critical']];
             } else {
                 items = [['#1b2436', 'Spare slot'], ['#2f5e46', 'Occupied']];
@@ -1648,18 +1677,78 @@
             }).join('');
         }
 
+        /* v2.10.0 — CONTINUOUS RAMP (owner comment 12: "rack-grid gradient"). The discrete tiers
+           painted 463 cabinets one flat green; the differences between them — which are the point
+           of a heat map — were invisible. Colour now interpolates between severity stops whose
+           POSITIONS are the same thresholds the tiers used (the thresholds are the alarm philosophy,
+           the ramp is presentation): normal sits on a muted slate → green band (doc-03: "muted
+           neutral rack blocks for normal"), amber begins where the warning threshold begins, red
+           where the breach threshold begins. Red is still reserved for breach. */
+        var RAMP_POWER = [[0.00, '#1f2a3c'], [0.40, '#2b4a5e'], [0.70, '#3f7a58'], [0.85, '#b0892a'], [0.95, '#c05a2a'], [1.05, '#c0392b']];
+        var RAMP_TEMP  = [[18, '#2b4a5e'], [22, '#2f5e46'], [25.4, '#3f7a58'], [27, '#b0892a'], [30, '#c0392b']];
+        var RAMP_MARGIN = [[0, '#c0392b'], [1, '#c05a2a'], [3, '#b0892a'], [5, '#3f7a58'], [7, '#2b4a5e']];
+        function hexLerp(a, b, t) {
+            var ah = parseInt(a.slice(1), 16), bh = parseInt(b.slice(1), 16);
+            var r = Math.round(((ah >> 16) & 255) + (((bh >> 16) & 255) - ((ah >> 16) & 255)) * t);
+            var g = Math.round(((ah >> 8) & 255) + (((bh >> 8) & 255) - ((ah >> 8) & 255)) * t);
+            var bl = Math.round((ah & 255) + ((bh & 255) - (ah & 255)) * t);
+            return '#' + ((1 << 24) + (r << 16) + (g << 8) + bl).toString(16).slice(1);
+        }
+        function rampColor(stops, v) {
+            if (v <= stops[0][0]) return stops[0][1];
+            for (var i = 1; i < stops.length; i++) {
+                if (v <= stops[i][0]) {
+                    var t = (v - stops[i - 1][0]) / (stops[i][0] - stops[i - 1][0]);
+                    return hexLerp(stops[i - 1][1], stops[i][1], t);
+                }
+            }
+            return stops[stops.length - 1][1];
+        }
+        function rampCss(stops) {
+            var lo = stops[0][0], hi = stops[stops.length - 1][0];
+            return 'linear-gradient(90deg,' + stops.map(function (st) { return st[1] + ' ' + (((st[0] - lo) / (hi - lo)) * 100).toFixed(1) + '%'; }).join(',') + ')';
+        }
+        /* Per-cabinet inlet: the row's cold-aisle temperature plus a SIMULATED aisle-end
+           recirculation allowance (cabinets at the ends of a contained aisle see the most
+           bypass). Declared on the field; the row footer keeps the row plane the gate checks. */
+        var AISLE_END_ALLOWANCE_K = [0.6, 0.3, 0, 0, 0, 0, 0, 0, 0.3, 0.6];
+        function rackInletFor(gi) {
+            var zn = zones[Math.floor(gi / RACKS_PER_ZONE)];
+            var pos = (gi % RACKS_PER_ZONE) % 10;
+            return Math.round((zn.rackInletC + AISLE_END_ALLOWANCE_K[pos]) * 10) / 10;
+        }
+        function rowStats(z) {
+            var kws = [], ins = [];
+            for (var r = 0; r < RACKS_PER_ZONE; r++) {
+                var gi = z * RACKS_PER_ZONE + r, rk = racks[gi];
+                if (!rk.occupied) continue;
+                kws.push(rk.kw); ins.push(rackInletFor(gi));
+            }
+            var agg = function (arr) {
+                if (!arr.length) return { min: 0, avg: 0, max: 0 };
+                var mn = Infinity, mx = -Infinity, sum = 0;
+                arr.forEach(function (v) { if (v < mn) mn = v; if (v > mx) mx = v; sum += v; });
+                return { min: mn, avg: sum / arr.length, max: mx };
+            };
+            return { kw: agg(kws), inlet: agg(ins), n: kws.length };
+        }
+        var ROW_STATS_BASIS = 'Per-row minimum / average / maximum are aggregates of the SIMULATED cabinet field (deterministic, seeded per hall, reconciled by sum to the engine hall IT load); the row heat, inlet and hot-aisle spans beside them are the values the coverage gate reconciles. conv-engine.js publishes no per-cabinet statistics.';
+        function rowStatsText(z) {
+            var st = rowStats(z);
+            if (!st.n) return 'no occupied cabinets';
+            /* three figures in a 40 px column: "min–max" on one line, "avg" on the next */
+            if (currentMode === 'temp' || currentMode === 'cooling-margin') {
+                return '<b>' + st.inlet.min.toFixed(1) + '</b>–<b>' + st.inlet.max.toFixed(1) + '</b><br>avg <b>' + st.inlet.avg.toFixed(1) + '</b>';
+            }
+            return '<b>' + st.kw.min.toFixed(1) + '</b>–<b>' + st.kw.max.toFixed(1) + '</b><br>avg <b>' + st.kw.avg.toFixed(1) + '</b>';
+        }
         function rackFill(rk, zone) {
             if (currentMode === 'space') return rk.occupied ? '#2f5e46' : '#1b2436';
-            if (currentMode === 'temp')  return rk.occupied ? tempFill(zone.rackInletC) : '#1b2436';
+            if (currentMode === 'temp')  return rk.occupied ? rampColor(RAMP_TEMP, rackInletFor(rk.idx)) : '#1b2436';
             if (currentMode === 'cooling-margin') {
                 /* Tint by rack-inlet margin to the declared 27C recommended maximum. */
                 if (!rk.occupied) return '#1b2436';
-                var m = RACK_INLET_RECOMMENDED_MAX_C - zone.rackInletC;
-                if (m > 5)  return '#2f5e46';
-                if (m > 3)  return '#3f6f4e';
-                if (m > 1)  return '#7a5a1f';
-                if (m > 0)  return '#9a5026';
-                return '#9a342f';
+                return rampColor(RAMP_MARGIN, RACK_INLET_RECOMMENDED_MAX_C - rackInletFor(rk.idx));
             }
             if (currentMode === 'alarms') {
                 if (!rk.occupied) return '#1b2436';
@@ -1667,7 +1756,7 @@
                 if (rk.util > 0.85) return '#7a5a1f';
                 return '#1b2436';
             }
-            return tierOf(rk.util, rk.occupied).fill; // power density (default)
+            return rk.occupied ? rampColor(RAMP_POWER, rk.util) : '#1b2436'; // power density (default) — continuous ramp
         }
 
         function renderFloor() {
@@ -1723,6 +1812,7 @@
                       '<span class="zf-kw">' + zn.heat.toFixed(0) + ' kW</span> · ' +
                       '<span class="zf-in">IN ' + zn.rackInletC.toFixed(1) + '°C</span> · ' +
                       '<span class="zf-hot">HOT ' + zn.hotAisleC.toFixed(1) + '°C</span>' +
+                      '<span class="zf-stats" id="zs-' + z + '" data-rz-authored-basis="' + ROW_STATS_BASIS + '"></span>' +
                     '</div>' +
                     '</div>';
             }
@@ -1775,8 +1865,8 @@
                     var valTxt = '';
                     if (rk.occupied) {
                         if (currentMode === 'power') valTxt = rk.kw.toFixed(1) + ' kW';
-                        else if (currentMode === 'temp') valTxt = zn.rackInletC.toFixed(1) + '°C';
-                        else if (currentMode === 'cooling-margin') valTxt = (RACK_INLET_RECOMMENDED_MAX_C - zn.rackInletC).toFixed(1) + '°C';
+                        else if (currentMode === 'temp') valTxt = rackInletFor(gi).toFixed(1) + '°C';
+                        else if (currentMode === 'cooling-margin') valTxt = (RACK_INLET_RECOMMENDED_MAX_C - rackInletFor(gi)).toFixed(1) + '°C';
                         else if (currentMode === 'alarms') valTxt = Math.round(rk.util * 100) + '%';
                         else valTxt = 'IT';
                     } else {
@@ -1785,6 +1875,8 @@
                     el.innerHTML = '<span class="rk-id">' + idShort + '</span><span class="rk-val">' + valTxt + '</span>';
                     el.classList.toggle('excursion', !!(zn.excursionUntil && zn.excursionUntil > Date.now()));
                 }
+                var zs = document.getElementById('zs-' + z);
+                if (zs) zs.innerHTML = rowStatsText(z);
             }
             legendFor(currentMode);
         }
@@ -1811,7 +1903,8 @@
                     ? '<div class="tt-row"><span class="tt-k">Load</span><span class="num">' + rk.kw.toFixed(2) + ' kW</span></div>' +
                       '<div class="tt-row"><span class="tt-k">Utilization</span><span class="num">' + Math.round(rk.util * 100) + '% of ' + RACK_RATING_KW + ' kW</span></div>' +
                       '<div class="tt-row"><span class="tt-k">State</span><span>' + t.name + '</span></div>' +
-                      '<div class="tt-row"><span class="tt-k">Rack inlet</span><span class="num">' + zn.rackInletC.toFixed(1) + ' °C</span></div>' +
+                      '<div class="tt-row"><span class="tt-k">Rack inlet</span><span class="num">' + rackInletFor(idx).toFixed(1) + ' °C</span></div>' +
+                      '<div class="tt-row"><span class="tt-k">Row cold aisle</span><span class="num">' + zn.rackInletC.toFixed(1) + ' °C</span></div>' +
                       '<div class="tt-row"><span class="tt-k">Hot aisle</span><span class="num">' + zn.hotAisleC.toFixed(1) + ' °C</span></div>'
                     : '<div class="tt-row"><span class="tt-k">State</span><span>Spare / unoccupied</span></div>');
             TT.style.display = 'block';
@@ -1846,7 +1939,7 @@
                     row('Rating', RACK_RATING_KW + ' kW') +
                     row('Utilization', Math.round(rk.util * 100) + ' %') +
                     row('Row / Aisle', String.fromCharCode(65 + zn.z) + ' / ' + zoneAisleTag(zn.z)) +
-                    row('Rack-inlet / cold-aisle', zn.rackInletC.toFixed(1) + ' °C') +
+                    row('Rack-inlet / cold-aisle', rackInletFor(idx).toFixed(1) + ' °C (row ' + zn.rackInletC.toFixed(1) + ' + aisle-end allowance)') +
                     row('Hot-aisle temperature', zn.hotAisleC.toFixed(1) + ' °C') +
                     row('Air-side ΔT', zn.airsideDeltaTC.toFixed(1) + ' K') +
                     row('Relative humidity', zn.rhPct.toFixed(1) + ' % RH') +
