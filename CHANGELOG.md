@@ -11,6 +11,37 @@ release sections rather than semver.
 
 ---
 
+## v2.7.0 — 2026-09-08
+
+### Fuel system: a process diagram where there was none (Track B, owner comment 15)
+
+Owner: *"fuel-system same"* (mimic poor, not a readable P&ID). Reviews doc-17 §3.5, doc-18, doc-19 §8 and the
+ledger's DCUI-009 (*preserve the visual baseline, improve the engineering content*). Measured: the page had **no
+process drawing at all** — the only `<svg>` was a 200 × 56 sparkline; the "flow path" was five Font Awesome
+glyphs joined by four arrow icons; no pipe, valve, header, return line, containment geometry or genset symbol
+existed anywhere; zero line-model adoption.
+
+Now a full-width **Fuel Process** panel heads the cockpit with `#fuel-svg` (1180 × 452, water-system idiom:
+muted base pipe + medium-coloured flow overlay + junction dots + arrowheads): fill coupling XV-101 → UST-01 in
+its bund (LIT/TIT, level fill, usable reserve, LDS-101 interstitial and LS-102 sump leak points) → strainer →
+P-101 duty / P-102 standby with isolation and check valves → PT-101 / FT-101 → transfer header → XV-A/B/C
+solenoids → DT-GEN-A/B/C day tanks (level fill, LS) → GEN-A/B/C with drip-tray leak points; FPU-01 side-stream
+(prefilter → coalescer → fine filter, DPT-201 / WIF-201) returning to UST-01 on a return header that also
+carries the day-tank overflow. Fourteen lines carry line-model metadata (`fs-*`), fail closed at first paint
+(`data-state="unavailable"`, hairline dashes) and are re-stated every second by `renderPid()` from the same
+deterministic state the cards use: pump run → suction, discharge, header and the running day tank's feed
+flow; running genset → its supply line flows at the engine's facility burn; polishing loop follows the FPU
+interlock; leak points follow the containment interlocks. `renderUnavailable()` blanks the drawing with the
+page. The existing flow-path ribbon and every gated id are kept under the drawing. Registered in the
+geometry gate (`#fuel-svg`), the tab-set table and the line-model probe (`fuel-system.html: 14`). Reduced
+motion keeps the state readable (flowing solid, stopped dim). Every drawn value is either the engine's
+bulk-tank level/usable reserve or declared simulated state (one declaration on the drawing root); the engine
+still publishes no pump schedule, day-tank sizing or instrument reading, and the page says so.
+
+Gates: fire/fuel operator, conv coverage STRICT (26/26 traced), geometry 0/0 on the new drawing, legibility
+strict, line-model 14/14, alarm runtime, basis drawer, explain wiring, document parity, snapshot binding,
+cockpit regressions, anti-vibecode strict.
+
 ## v2.6.0 — 2026-09-08
 
 ### Fire system: a readable P&ID with a detection layer (Track B, owner comment 14)

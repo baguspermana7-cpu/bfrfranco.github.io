@@ -70,7 +70,7 @@ export const NO_TAB_SET = Object.freeze({
     'fire-system.html': 'single #fire-svg, no tab system',
     'water-system.html': 'single #water-svg, no tab system',
     'EPMS_Telemetry.html': 'single svg#viewport, no tab system',
-    'fuel-system.html': 'HTML/CSS mimic — no SVG process diagram exists to measure',
+    'fuel-system.html': 'single #fuel-svg (v2.7.0), no tab system',
     'ict.html': 'no architecture diagram exists yet',
     'datahall.html': 'rack field is HTML; no SVG process diagram exists',
 });

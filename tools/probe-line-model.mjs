@@ -38,7 +38,8 @@ const ADOPTION_TARGETS = {
   'dc-conventional.html': 0,
   'chiller-plant.html': 18,
   'water-system.html': 10,
-  'fire-system.html': 14
+  'fire-system.html': 14,
+  'fuel-system.html': 14   /* v2.7.0 fuel P&ID: fill/suction/2 discharge/header/3 DT feed/3 gen supply/polish side+return/DT return */
 };
 
 /* Breaker symbol library — verify pilot ports tagged. */
@@ -47,7 +48,8 @@ const BREAKER_TARGETS = {
   'dc-conventional.html': 0,
   'chiller-plant.html': 0,  /* P&ID has no breakers */
   'water-system.html': 0,
-  'fire-system.html': 0
+  'fire-system.html': 0,
+  'fuel-system.html': 0
 };
 
 let pass = 0, fail = 0;

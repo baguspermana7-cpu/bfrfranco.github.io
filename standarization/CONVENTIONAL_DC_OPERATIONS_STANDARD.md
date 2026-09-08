@@ -133,6 +133,12 @@ Bulk/day tank gross and usable inventory, consumption/autonomy basis, transfer d
 polishing state and differential pressure, water-in-fuel, delivery/fill state, leak/sump zones,
 isolation and N+1 consequence. A fixed burn rate is a declared current assumption, never a
 vendor-curve substitute for the 40 MW study.
+  **v2.7.0 — the process picture exists.** `#fuel-svg` in the water-system idiom: fill point → UST-01 in its bund
+  with interstitial and sump leak points → strainer → duty/standby transfer pumps with isolation + check valves →
+  PT/FT → transfer header → solenoid-fed day tanks → gensets; FPU-01 side-stream (prefilter, coalescer, fine
+  filter, DPT, WIF) returning on a header shared with the day-tank overflow. Fourteen tagged lines, fail-closed
+  first paint, one `renderPid()` from the page's deterministic state; every drawn value is engine-traced or
+  declared simulated — no pump schedule, day-tank sizing or instrument reading is invented.
 
 ### Water
 

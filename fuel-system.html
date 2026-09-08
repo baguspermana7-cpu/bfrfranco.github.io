@@ -100,6 +100,7 @@
             --diesel-main: #b4791f;
             --diesel-bright: #d9a441;
             --flow-blue: #4f9bd9;
+            --o: var(--diesel-bright);   /* rz-line-model "fuel" medium resolves to --o */
         }
 
         * { box-sizing: border-box; }
@@ -314,6 +315,41 @@
         .mini-bar { display: inline-block; width: 46px; height: 6px; background: #1d2836;
             border-radius: 3px; overflow: hidden; vertical-align: middle; margin-left: 6px; }
         .mini-bar > i { display: block; height: 100%; background: var(--diesel-main); }
+
+        /* ---- FUEL P&ID (v2.7.0) — water-system idiom: muted base pipe, medium-coloured flow overlay ---- */
+        .pid-panel { grid-column: 1 / -1; min-width: 0; }
+        .pid-wrap { overflow-x: auto; overflow-y: hidden; border: 1px solid var(--border-soft); background: #0c141e; }
+        #fuel-svg { display: block; width: 100%; min-width: 1180px; }
+        #fuel-svg .pipe { fill: none; stroke: #33415a; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+        #fuel-svg .pipe[data-state="unavailable"] { stroke-width: 1.2; stroke-dasharray: 2 6; }
+        #fuel-svg .flow { fill: none; stroke-width: 3; stroke-dasharray: 9 14; stroke-linecap: round; animation: fuelFlow 1.1s linear infinite; opacity: .9; }
+        #fuel-svg .flow.fuel { stroke: var(--diesel-bright); }
+        #fuel-svg .flow.stopped { animation: none; opacity: 0; }
+        @keyframes fuelFlow { to { stroke-dashoffset: -23; } }
+        #fuel-svg .junction { fill: #33415a; }
+        #fuel-svg .bund { fill: none; stroke: #4a5a70; stroke-width: 1.2; stroke-dasharray: 5 4; }
+        #fuel-svg .eq { fill: #14213a; stroke: #6c84a8; stroke-width: 1.5; }
+        #fuel-svg .eq-grp:hover .eq { stroke: var(--sel); }
+        #fuel-svg .sym { stroke: #8fa3bf; stroke-width: 1.4; fill: none; }
+        #fuel-svg .eqf { fill: #14213a; }
+        #fuel-svg .bub { fill: #0c141e; }
+        #fuel-svg .symfill { fill: #8fa3bf; }
+        #fuel-svg .tag { fill: #fbbf24; font-size: 11px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+        #fuel-svg .lbl { fill: var(--text-dim); font-size: 10px; font-weight: 600; }
+        #fuel-svg .bubtxt { font-size: 10px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+        #fuel-svg .val { fill: #fff; font-size: 11px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+        #fuel-svg .val.big { font-size: 18px; }
+        #fuel-svg .val.warn { fill: var(--warn); } #fuel-svg .val.crit { fill: var(--crit); }
+        #fuel-svg .tank-fill { fill: rgba(180,121,31,.42); transition: height .5s, y .5s; }
+        #fuel-svg .pid-pump.running .pump-body { stroke: var(--ok); }
+        #fuel-svg .pid-pump.running .pid-impeller { animation: fuelSpin 1.1s linear infinite; transform-origin: 0 0; }
+        #fuel-svg .pid-pump.running .pid-impeller .symfill { fill: var(--ok); }
+        @keyframes fuelSpin { to { transform: rotate(360deg); } }
+        #fuel-svg .gen-body.running { stroke: var(--ok); fill: rgba(86,176,126,.12); }
+        #fuel-svg .leak-pt { fill: #0c141e; }
+        #fuel-svg .leak-pt.ok { fill: var(--ok); stroke: var(--ok); }
+        #fuel-svg .leak-pt.crit { fill: var(--crit); stroke: var(--crit); }
+        #fuel-svg .pid-unit.running .eq { stroke: var(--ok); }
 
         /* ---- FUEL FLOW PATH (clear direction) ---- */
         .flow-path {
@@ -590,12 +626,15 @@
             .tb-brand h1 { font-size: 0.88rem; }
         }
         @media (prefers-reduced-motion: reduce) {
-            .fp-arrow.active, .pump-ic.running i, .as-state.alarm, .ilk.alarm .ilk-dot { animation: none !important; }
+            .fp-arrow.active, .pump-ic.running i, .as-state.alarm, .ilk.alarm .ilk-dot, #fuel-svg .flow, #fuel-svg .pid-impeller { animation: none !important; }
+            /* reduced motion keeps the STATE readable: flowing stays solid, stopped stays dim (v2.7.0) */
+            #fuel-svg .flow { stroke-dasharray: none; }
         }
     [data-theme="dark"] #cookieAccept{background:#1d4ed8 !important}
 #cookieAccept{background:#1d4ed8 !important}
 </style>
     <script src="js/conv-engine.js?v=2.2.0"></script>
+    <script src="js/rz-line-model.js?v=1.42.0"></script>
     <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
          Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
     <script src="js/conv-parameters.js?v=1.134.3"></script>
@@ -720,6 +759,117 @@
     <!-- ============ 3. MAIN GRID ============ -->
     <main class="main-grid" data-rz-cockpit-root="fuel-system">
 
+        <!-- v2.7.0 — the process picture is the primary storytelling element (doc-14 §6, doc-19 §8) -->
+        <div class="panel pid-panel">
+                <div class="panel-header"><span>Fuel Process &mdash; bulk storage &rarr; transfer &rarr; conditioning &rarr; day tanks &rarr; gensets</span><i class="fas fa-project-diagram ph-ic"></i></div>
+                <div class="pid-wrap">
+                <svg id="fuel-svg" class="pid" viewBox="0 0 1180 452" width="100%" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Diesel fuel process and instrumentation diagram: fill point, bulk tank, transfer pumps, polishing loop, day tanks and gensets" data-rz-authored-basis="Every value drawn on this process diagram is either the engine's bulk-tank level, capacity and usable reserve (traced on the cards above) or SIMULATED local operating state — day-tank levels, pump flow and pressure, valve, genset and leak-point states — which conv-engine.js does not publish: it carries the fuel reserve, the burn rate and the autonomy figure, not a pump schedule, day-tank sizing, instrument readings or per-device state. Pipe sizes and instrument tags are page-authored design selections.">
+                    <defs><marker id="fuelArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto"><path d="M0,0 L10,5 L0,10 Z" fill="#64748b"/></marker></defs>
+                    <!-- base pipes: tagged with line-model metadata, fail-closed at first paint -->
+                    <path class="pipe" d="M 74 313 L 110 313 L 110 262" data-rz-line="1" data-id="fs-fill" data-from="XV-101 fill coupling" data-to="UST-01" data-medium="fuel" data-direction="forward" data-state="unavailable" data-capacity="DN80" data-current="UNAVAILABLE" data-redundancy="duty" data-sensor="XV-101" />
+                    <path class="pipe" d="M 340 317 L 400 317 M 400 317 L 400 290 L 424 290 M 400 317 L 400 344 L 424 344" data-rz-line="1" data-id="fs-suction" data-from="UST-01" data-to="P-101 / P-102 suction manifold" data-medium="fuel" data-direction="forward" data-state="unavailable" data-capacity="DN50" data-current="UNAVAILABLE" data-redundancy="common" data-sensor="LIT-101" />
+                    <path class="pipe" d="M 486 290 L 560 290 L 560 317" data-rz-line="1" data-id="fs-p101-discharge" data-from="P-101" data-to="transfer header" data-medium="fuel" data-direction="forward" data-state="unavailable" data-capacity="DN50" data-current="UNAVAILABLE" data-redundancy="duty" data-sensor="PT-101" />
+                    <path class="pipe" d="M 486 344 L 560 344 L 560 317" data-rz-line="1" data-id="fs-p102-discharge" data-from="P-102" data-to="transfer header" data-medium="fuel" data-direction="forward" data-state="unavailable" data-capacity="DN50" data-current="UNAVAILABLE" data-redundancy="standby" data-sensor="PT-101" />
+                    <path class="pipe" d="M 560 317 L 700 317 L 700 52 L 1062 52" data-rz-line="1" data-id="fs-transfer-header" data-from="transfer header" data-to="day-tank feed header" data-medium="fuel" data-direction="forward" data-state="unavailable" data-capacity="DN50" data-current="UNAVAILABLE" data-redundancy="common" data-sensor="FT-101" />
+                    <path class="pipe" d="M 782 52 L 782 96" data-rz-line="1" data-id="fs-dt-a-feed" data-from="XV-A" data-to="DT-GEN-A" data-medium="fuel" data-direction="forward" data-state="unavailable" data-capacity="DN25" data-current="UNAVAILABLE" data-redundancy="duty" data-sensor="LS-A" />
+                    <path class="pipe" d="M 922 52 L 922 96" data-rz-line="1" data-id="fs-dt-b-feed" data-from="XV-B" data-to="DT-GEN-B" data-medium="fuel" data-direction="forward" data-state="unavailable" data-capacity="DN25" data-current="UNAVAILABLE" data-redundancy="duty" data-sensor="LS-B" />
+                    <path class="pipe" d="M 1062 52 L 1062 96" data-rz-line="1" data-id="fs-dt-c-feed" data-from="XV-C" data-to="DT-GEN-C" data-medium="fuel" data-direction="forward" data-state="unavailable" data-capacity="DN25" data-current="UNAVAILABLE" data-redundancy="duty" data-sensor="LS-C" />
+                    <path class="pipe" d="M 782 166 L 782 204" data-rz-line="1" data-id="fs-gen-a-supply" data-from="DT-GEN-A" data-to="GEN-A" data-medium="fuel" data-direction="forward" data-state="unavailable" data-capacity="DN20" data-current="UNAVAILABLE" data-redundancy="duty" data-sensor="none" />
+                    <path class="pipe" d="M 922 166 L 922 204" data-rz-line="1" data-id="fs-gen-b-supply" data-from="DT-GEN-B" data-to="GEN-B" data-medium="fuel" data-direction="forward" data-state="unavailable" data-capacity="DN20" data-current="UNAVAILABLE" data-redundancy="duty" data-sensor="none" />
+                    <path class="pipe" d="M 1062 166 L 1062 204" data-rz-line="1" data-id="fs-gen-c-supply" data-from="DT-GEN-C" data-to="GEN-C" data-medium="fuel" data-direction="forward" data-state="unavailable" data-capacity="DN20" data-current="UNAVAILABLE" data-redundancy="duty" data-sensor="none" />
+                    <path class="pipe" d="M 660 317 L 660 380 L 695 380 M 745 380 L 755 380 M 805 380 L 815 380" data-rz-line="1" data-id="fs-polish-side" data-from="transfer header" data-to="FPU-01 prefilter" data-medium="fuel" data-direction="forward" data-state="unavailable" data-capacity="DN25" data-current="UNAVAILABLE" data-redundancy="bypass" data-sensor="DPT-201" />
+                    <path class="pipe" d="M 865 380 L 980 380 L 980 428 L 120 428 L 120 372" data-rz-line="1" data-id="fs-polish-return" data-from="FPU-01 fine filter" data-to="UST-01 return" data-medium="fuel" data-direction="forward" data-state="unavailable" data-capacity="DN25" data-current="UNAVAILABLE" data-redundancy="bypass" data-sensor="WIF-201" />
+                    <path class="pipe" d="M 1084 128 L 1104 128 L 1104 428 L 980 428" data-rz-line="1" data-id="fs-dt-return" data-from="DT-GEN-C overflow" data-to="UST-01 return header" data-medium="fuel" data-direction="forward" data-state="unavailable" data-capacity="DN25" data-current="UNAVAILABLE" data-redundancy="common" data-sensor="none" />
+                    <!-- animated flow overlay (same geometry) -->
+                    <path class="flow fuel stopped" id="f-fs-fill" d="M 74 313 L 110 313 L 110 262" />
+                    <path class="flow fuel stopped" id="f-fs-suction" d="M 340 317 L 400 317 M 400 317 L 400 290 L 424 290 M 400 317 L 400 344 L 424 344" />
+                    <path class="flow fuel stopped" id="f-fs-p101-discharge" d="M 486 290 L 560 290 L 560 317" />
+                    <path class="flow fuel stopped" id="f-fs-p102-discharge" d="M 486 344 L 560 344 L 560 317" />
+                    <path class="flow fuel stopped" id="f-fs-transfer-header" d="M 560 317 L 700 317 L 700 52 L 1062 52" />
+                    <path class="flow fuel stopped" id="f-fs-dt-a-feed" d="M 782 52 L 782 96" />
+                    <path class="flow fuel stopped" id="f-fs-dt-b-feed" d="M 922 52 L 922 96" />
+                    <path class="flow fuel stopped" id="f-fs-dt-c-feed" d="M 1062 52 L 1062 96" />
+                    <path class="flow fuel stopped" id="f-fs-gen-a-supply" d="M 782 166 L 782 204" />
+                    <path class="flow fuel stopped" id="f-fs-gen-b-supply" d="M 922 166 L 922 204" />
+                    <path class="flow fuel stopped" id="f-fs-gen-c-supply" d="M 1062 166 L 1062 204" />
+                    <path class="flow fuel stopped" id="f-fs-polish-side" d="M 660 317 L 660 380 L 695 380 M 745 380 L 755 380 M 805 380 L 815 380" />
+                    <path class="flow fuel stopped" id="f-fs-polish-return" d="M 865 380 L 980 380 L 980 428 L 120 428 L 120 372" />
+                    <path class="flow fuel stopped" id="f-fs-dt-return" d="M 1084 128 L 1104 128 L 1104 428 L 980 428" />
+                    <!-- arrowheads on the pipe ends that matter to direction -->
+                    <path d="M 690 317 L 700 317" class="pipe" marker-end="url(#fuelArrow)"/>
+                    <path d="M 1040 52 L 1050 52" class="pipe" marker-end="url(#fuelArrow)"/>
+                    <path d="M 782 190 L 782 200" class="pipe" marker-end="url(#fuelArrow)"/><path d="M 922 190 L 922 200" class="pipe" marker-end="url(#fuelArrow)"/><path d="M 1062 190 L 1062 200" class="pipe" marker-end="url(#fuelArrow)"/>
+                    <path d="M 140 428 L 128 428" class="pipe" marker-end="url(#fuelArrow)"/>
+                    <path d="M 660 340 L 660 350" class="pipe" marker-end="url(#fuelArrow)"/>
+                    <circle class="junction" cx="400" cy="317" r="4"/><circle class="junction" cx="560" cy="317" r="4"/><circle class="junction" cx="660" cy="317" r="4"/><circle class="junction" cx="980" cy="428" r="4"/>
+                    <circle class="junction" cx="782" cy="52" r="4"/><circle class="junction" cx="922" cy="52" r="4"/>
+
+                    <text x="16" y="22" class="lbl">FUEL P&amp;ID &middot; medium: diesel &middot; solid = flowing, dim dashes = stopped, hairline = unavailable</text>
+                    <text x="880" y="40" text-anchor="middle" class="lbl">TRANSFER HDR &middot; UST-01 &rarr; DAY TANKS</text>
+
+                    <!-- fill point -->
+                    <g class="eq-grp" data-eq="XV-101">
+                        <rect x="30" y="300" width="44" height="26" rx="3" class="eq"/><text x="52" y="317" text-anchor="middle" class="tag">XV</text>
+                        <text x="52" y="290" text-anchor="middle" class="lbl">FILL XV-101</text>
+                        <text id="pid-fill" x="52" y="342" text-anchor="middle" class="lbl">&mdash;</text>
+                    </g>
+
+                    <!-- bulk tank UST-01 inside its bund -->
+                    <path d="M 92 262 L 92 392 L 348 392 L 348 262" class="bund"/>
+                    <g class="eq-grp" data-eq="UST-01">
+                        <rect x="100" y="262" width="240" height="110" rx="22" class="eq"/>
+                        <clipPath id="clip-ust"><rect x="102" y="264" width="236" height="106" rx="20"/></clipPath>
+                        <rect id="pid-ust-fill" x="102" y="370" width="236" height="0" class="tank-fill" clip-path="url(#clip-ust)"/>
+                        <text x="220" y="214" text-anchor="middle" class="tag">UST-01 &middot; BULK STORAGE</text>
+                        <line x1="140" y1="257" x2="140" y2="262" class="sym"/><g transform="translate(140,244)"><circle r="13" class="sym bub"/><text y="4" text-anchor="middle" class="lbl bubtxt">TIT</text></g><line x1="300" y1="257" x2="300" y2="262" class="sym"/><g transform="translate(300,244)"><circle r="13" class="sym bub"/><text y="4" text-anchor="middle" class="lbl bubtxt">LIT</text></g>
+                        <text id="pid-ust-lvl" x="220" y="312" text-anchor="middle" class="val big">&mdash;</text>
+                        <text id="pid-ust-usable" x="220" y="334" text-anchor="middle" class="lbl">&mdash;</text>
+                        <text id="pid-ust-state" x="220" y="352" text-anchor="middle" class="lbl">UNAVAILABLE</text>
+                    </g>
+                    <g transform="translate(220,382)"><polygon id="pid-leak-lds" points="0,-7 7,0 0,7 -7,0" class="sym leak-pt"/><text y="20" text-anchor="middle" class="lbl">LDS-101 interstitial</text></g>
+                    <g transform="translate(330,382)"><polygon id="pid-leak-bund" points="0,-7 7,0 0,7 -7,0" class="sym leak-pt"/><text y="20" text-anchor="middle" class="lbl">LS-102 bund sump</text></g>
+
+                    <!-- transfer pumps: duty / standby -->
+                    <g transform="translate(372,317)"><line x1="-12" y1="0" x2="12" y2="0" class="sym"/><path d="M-6,0 L0,12 L6,0" class="sym" fill="none"/><line x1="0" y1="12" x2="0" y2="18" class="sym" stroke-dasharray="2 2"/></g>
+                    <g transform="translate(440,290)"><polygon points="-8,-6 8,6 8,-6 -8,6" class="sym eqf"/><line x1="0" y1="-7" x2="0" y2="-14" class="sym"/><circle cy="-16" r="3" class="sym" fill="none"/></g><g transform="translate(440,344)"><polygon points="-8,-6 8,6 8,-6 -8,6" class="sym eqf"/><line x1="0" y1="-7" x2="0" y2="-14" class="sym"/><circle cy="-16" r="3" class="sym" fill="none"/></g>
+                    <g transform="translate(470,290)" id="pid-p101" class="pid-pump"><circle r="16" class="sym eqf pump-body"/><g class="pid-impeller"><path d="M0-11C6-9 10-5 10 0C5-2 2-1 0 2Z M-8 6C-9-1-7-7-3-9C-3-4-1-1 2 0Z M8 6C2 10-4 10-7 7C-2 6 1 4 1 1Z" class="symfill"/></g></g><g transform="translate(470,344)" id="pid-p102" class="pid-pump"><circle r="16" class="sym eqf pump-body"/><g class="pid-impeller"><path d="M0-11C6-9 10-5 10 0C5-2 2-1 0 2Z M-8 6C-9-1-7-7-3-9C-3-4-1-1 2 0Z M8 6C2 10-4 10-7 7C-2 6 1 4 1 1Z" class="symfill"/></g></g>
+                    <g transform="translate(512,290)"><circle r="8" class="sym eqf"/><path d="M-4,-5 L5,0 L-4,5 Z" class="symfill"/></g><g transform="translate(512,344)"><circle r="8" class="sym eqf"/><path d="M-4,-5 L5,0 L-4,5 Z" class="symfill"/></g><g transform="translate(540,290)"><polygon points="-8,-6 8,6 8,-6 -8,6" class="sym eqf"/><line x1="0" y1="-7" x2="0" y2="-14" class="sym"/><circle cy="-16" r="3" class="sym" fill="none"/></g><g transform="translate(540,344)"><polygon points="-8,-6 8,6 8,-6 -8,6" class="sym eqf"/><line x1="0" y1="-7" x2="0" y2="-14" class="sym"/><circle cy="-16" r="3" class="sym" fill="none"/></g>
+                    <text id="pid-p101-txt" x="470" y="262" text-anchor="middle" class="lbl">P-101 &middot; DUTY &middot; &mdash;</text>
+                    <text id="pid-p102-txt" x="470" y="376" text-anchor="middle" class="lbl">P-102 &middot; STANDBY &middot; &mdash;</text>
+                    <line x1="590" y1="303" x2="590" y2="317" class="sym"/><g transform="translate(590,290)"><circle r="13" class="sym bub"/><text y="4" text-anchor="middle" class="lbl bubtxt">PT</text></g><line x1="630" y1="303" x2="630" y2="317" class="sym"/><g transform="translate(630,290)"><circle r="13" class="sym bub"/><text y="4" text-anchor="middle" class="lbl bubtxt">FT</text></g>
+                    <text id="pid-hdr-txt" x="712" y="300" text-anchor="start" class="lbl">&mdash;</text>
+
+                    <!-- FPU-01 conditioning side-stream -->
+                    <text x="780" y="350" text-anchor="middle" class="lbl">FPU-01 &middot; CONDITIONING SIDE-STREAM</text>
+                    <g transform="translate(720,380)" id="pid-fpu-pf" class="pid-unit"><rect x="-25.0" y="-20" width="50" height="40" class="eq"/><line x1="-19.0" y1="14" x2="19.0" y2="-14" class="sym" opacity=".55"/><text y="-4" text-anchor="middle" class="tag">PF</text><text y="12" text-anchor="middle" class="lbl">prefilter</text></g><g transform="translate(780,380)" id="pid-fpu-cs" class="pid-unit"><rect x="-25.0" y="-20" width="50" height="40" class="eq"/><line x1="-19.0" y1="14" x2="19.0" y2="-14" class="sym" opacity=".55"/><text y="-4" text-anchor="middle" class="tag">CS</text><text y="12" text-anchor="middle" class="lbl">coalescer</text></g><g transform="translate(840,380)" id="pid-fpu-ff" class="pid-unit"><rect x="-25.0" y="-20" width="50" height="40" class="eq"/><line x1="-19.0" y1="14" x2="19.0" y2="-14" class="sym" opacity=".55"/><text y="-4" text-anchor="middle" class="tag">FF</text><text y="12" text-anchor="middle" class="lbl">fine filter</text></g>
+                    <line x1="905" y1="369" x2="905" y2="380" class="sym"/><g transform="translate(905,356)"><circle r="13" class="sym bub"/><text y="4" text-anchor="middle" class="lbl bubtxt">DPT</text></g><line x1="950" y1="369" x2="950" y2="380" class="sym"/><g transform="translate(950,356)"><circle r="13" class="sym bub"/><text y="4" text-anchor="middle" class="lbl bubtxt">WIF</text></g>
+                    <text id="pid-fpu-txt" x="780" y="416" text-anchor="middle" class="lbl">&mdash;</text>
+                    <text x="380" y="421" text-anchor="middle" class="lbl">RETURN HDR &rarr; UST-01 &middot; conditioned fuel + DT overflow</text>
+
+                    <!-- day tanks and gensets -->
+                    <g class="eq-grp" data-eq="DT-GEN-A"><g transform="translate(782,74)"><polygon points="-6,-8 6,8 6,-8 -6,8" class="sym eqf"/><rect x="8" y="-7" width="10" height="8" class="sym eqf"/><line x1="6" y1="-3" x2="8" y2="-3" class="sym"/><text x="22" y="1" class="lbl">XV-A</text></g><rect x="760" y="96" width="44" height="70" rx="4" class="eq"/><clipPath id="clip-pid-dt-A-fill"><rect x="761" y="97" width="42" height="68" rx="3"/></clipPath><rect id="pid-dt-A-fill" x="761" y="165" width="42" height="0" class="tank-fill" clip-path="url(#clip-pid-dt-A-fill)"/><text x="754" y="110" text-anchor="end" class="tag">DT-GEN-A</text><text id="pid-dt-A" x="782" y="135" text-anchor="middle" class="val">&mdash;</text><g transform="translate(824,150)"><circle r="13" class="sym bub"/><text y="4" text-anchor="middle" class="lbl bubtxt">LS</text></g><g transform="translate(782,186)"><polygon points="-8,-6 8,6 8,-6 -8,6" class="sym eqf"/></g></g>
+                    <g class="eq-grp" data-eq="DT-GEN-B"><g transform="translate(922,74)"><polygon points="-6,-8 6,8 6,-8 -6,8" class="sym eqf"/><rect x="8" y="-7" width="10" height="8" class="sym eqf"/><line x1="6" y1="-3" x2="8" y2="-3" class="sym"/><text x="22" y="1" class="lbl">XV-B</text></g><rect x="900" y="96" width="44" height="70" rx="4" class="eq"/><clipPath id="clip-pid-dt-B-fill"><rect x="901" y="97" width="42" height="68" rx="3"/></clipPath><rect id="pid-dt-B-fill" x="901" y="165" width="42" height="0" class="tank-fill" clip-path="url(#clip-pid-dt-B-fill)"/><text x="894" y="110" text-anchor="end" class="tag">DT-GEN-B</text><text id="pid-dt-B" x="922" y="135" text-anchor="middle" class="val">&mdash;</text><g transform="translate(964,150)"><circle r="13" class="sym bub"/><text y="4" text-anchor="middle" class="lbl bubtxt">LS</text></g><g transform="translate(922,186)"><polygon points="-8,-6 8,6 8,-6 -8,6" class="sym eqf"/></g></g>
+                    <g class="eq-grp" data-eq="DT-GEN-C"><g transform="translate(1062,74)"><polygon points="-6,-8 6,8 6,-8 -6,8" class="sym eqf"/><rect x="8" y="-7" width="10" height="8" class="sym eqf"/><line x1="6" y1="-3" x2="8" y2="-3" class="sym"/><text x="22" y="1" class="lbl">XV-C</text></g><rect x="1040" y="96" width="44" height="70" rx="4" class="eq"/><clipPath id="clip-pid-dt-C-fill"><rect x="1041" y="97" width="42" height="68" rx="3"/></clipPath><rect id="pid-dt-C-fill" x="1041" y="165" width="42" height="0" class="tank-fill" clip-path="url(#clip-pid-dt-C-fill)"/><text x="1034" y="110" text-anchor="end" class="tag">DT-GEN-C</text><text id="pid-dt-C" x="1062" y="135" text-anchor="middle" class="val">&mdash;</text><g transform="translate(1104,150)"><circle r="13" class="sym bub"/><text y="4" text-anchor="middle" class="lbl bubtxt">LS</text></g><g transform="translate(1062,186)"><polygon points="-8,-6 8,6 8,-6 -8,6" class="sym eqf"/></g></g>
+                    <g class="eq-grp" data-eq="GEN-A"><circle id="pid-gen-A" cx="782" cy="222" r="18" class="eq gen-body"/><text x="782" y="227" text-anchor="middle" class="tag">G</text><text id="pid-gen-A-txt" x="782" y="256" text-anchor="middle" class="lbl">GEN-A &middot; &mdash;</text><text id="pid-gen-A-kw" x="782" y="270" text-anchor="middle" class="val">&mdash;</text><polygon id="pid-gen-A-leak" points="812,215 818,222 812,229 806,222" class="sym leak-pt"/></g>
+                    <g class="eq-grp" data-eq="GEN-B"><circle id="pid-gen-B" cx="922" cy="222" r="18" class="eq gen-body"/><text x="922" y="227" text-anchor="middle" class="tag">G</text><text id="pid-gen-B-txt" x="922" y="256" text-anchor="middle" class="lbl">GEN-B &middot; &mdash;</text><text id="pid-gen-B-kw" x="922" y="270" text-anchor="middle" class="val">&mdash;</text><polygon id="pid-gen-B-leak" points="952,215 958,222 952,229 946,222" class="sym leak-pt"/></g>
+                    <g class="eq-grp" data-eq="GEN-C"><circle id="pid-gen-C" cx="1062" cy="222" r="18" class="eq gen-body"/><text x="1062" y="227" text-anchor="middle" class="tag">G</text><text id="pid-gen-C-txt" x="1062" y="256" text-anchor="middle" class="lbl">GEN-C &middot; &mdash;</text><text id="pid-gen-C-kw" x="1062" y="270" text-anchor="middle" class="val">&mdash;</text><polygon id="pid-gen-C-leak" points="1092,215 1098,222 1092,229 1086,222" class="sym leak-pt"/></g>
+                    <text x="1140" y="300" text-anchor="middle" class="lbl">DT RETURN</text>
+                </svg>
+                </div>
+                <div class="flow-path" style="margin-top:10px;">
+                    <div class="fp-node"><i class="fas fa-database fn-ic"></i><strong>UST-01</strong><span id="fp-ust">UNAVAILABLE</span></div>
+                    <i class="fas fa-arrow-right fp-arrow" id="fp-a1"></i>
+                    <div class="fp-node" id="fp-pump-node"><i class="fas fa-fan fn-ic"></i><strong>P-101</strong><span id="fp-pump">UNAVAILABLE</span></div>
+                    <i class="fas fa-arrow-right fp-arrow" id="fp-a2"></i>
+                    <div class="fp-node"><i class="fas fa-filter fn-ic"></i><strong>FPU-01</strong><span id="fp-fpu">UNAVAILABLE</span></div>
+                    <i class="fas fa-arrow-right fp-arrow" id="fp-a3"></i>
+                    <div class="fp-node"><i class="fas fa-oil-can fn-ic"></i><strong>Day Tks</strong><span id="fp-dt">&mdash;</span></div>
+                    <i class="fas fa-arrow-right fp-arrow" id="fp-a4"></i>
+                    <div class="fp-node"><i class="fas fa-bolt fn-ic"></i><strong>Gensets</strong><span id="fp-gen">UNAVAILABLE</span></div>
+                </div>
+                <div class="data-row" style="margin-top:6px;"><span class="data-lbl">Transfer Direction</span><span class="data-val" id="transfer-direction" style="font-size:0.7rem;color:var(--text-secondary)">UNAVAILABLE</span></div>
+            </div>
+
         <!-- COLUMN 1 — Bulk storage + inventory + fill -->
         <div class="col">
             <div class="panel">
@@ -763,22 +913,6 @@
 
         <!-- COLUMN 2 — Flow path + pump + gensets/day-tanks -->
         <div class="col">
-            <div class="panel">
-                <div class="panel-header"><span>Fuel Flow Path</span><i class="fas fa-route ph-ic"></i></div>
-                <div class="flow-path">
-                    <div class="fp-node"><i class="fas fa-database fn-ic"></i><strong>UST-01</strong><span id="fp-ust">UNAVAILABLE</span></div>
-                    <i class="fas fa-arrow-right fp-arrow" id="fp-a1"></i>
-                    <div class="fp-node" id="fp-pump-node"><i class="fas fa-fan fn-ic"></i><strong>P-101</strong><span id="fp-pump">UNAVAILABLE</span></div>
-                    <i class="fas fa-arrow-right fp-arrow" id="fp-a2"></i>
-                    <div class="fp-node"><i class="fas fa-filter fn-ic"></i><strong>FPU-01</strong><span id="fp-fpu">UNAVAILABLE</span></div>
-                    <i class="fas fa-arrow-right fp-arrow" id="fp-a3"></i>
-                    <div class="fp-node"><i class="fas fa-oil-can fn-ic"></i><strong>Day Tks</strong><span id="fp-dt">&mdash;</span></div>
-                    <i class="fas fa-arrow-right fp-arrow" id="fp-a4"></i>
-                    <div class="fp-node"><i class="fas fa-bolt fn-ic"></i><strong>Gensets</strong><span id="fp-gen">UNAVAILABLE</span></div>
-                </div>
-                <div class="data-row" style="margin-top:6px;"><span class="data-lbl">Transfer Direction</span><span class="data-val" id="transfer-direction" style="font-size:0.7rem;color:var(--text-secondary)">UNAVAILABLE</span></div>
-            </div>
-
             <div class="panel">
                 <div class="panel-header"><span>Transfer Pump &amp; Fuel Quality</span><i class="fas fa-cogs ph-ic"></i></div>
                 <div class="pump-unit" id="pump-unit" tabindex="0">
@@ -1391,6 +1525,94 @@
             $('containment-action').innerHTML = '<strong>UNAVAILABLE</strong> · engine authority required';
             $('alarm-list').innerHTML = '<div class="alarm-empty">UNAVAILABLE — alarm authority required</div>';
             $('ust-trend').setAttribute('points', '');
+            renderPidUnavailable();
+        }
+
+        /* ---- v2.7.0 Fuel P&ID binding — one function paints every line, vessel and device
+           from the same deterministic state the cards use; fails closed with the page. ---- */
+        var PID_LINE_IDS = ['fs-fill', 'fs-suction', 'fs-p101-discharge', 'fs-p102-discharge', 'fs-transfer-header',
+            'fs-dt-a-feed', 'fs-dt-b-feed', 'fs-dt-c-feed', 'fs-gen-a-supply', 'fs-gen-b-supply', 'fs-gen-c-supply',
+            'fs-polish-side', 'fs-polish-return', 'fs-dt-return'];
+        function pidLine(id, stateName, current, flowing) {
+            var base = document.querySelector('#fuel-svg [data-id="' + id + '"]');
+            var flow = $('f-' + id);
+            if (base) {
+                base.setAttribute('data-state', stateName);
+                if (current === null || current === undefined) base.removeAttribute('data-current');
+                else base.setAttribute('data-current', current);
+            }
+            if (flow) flow.classList.toggle('stopped', !flowing);
+        }
+        function pidFill(id, pct, top, height) {
+            var el = $(id); if (!el) return;
+            var p = Math.max(0, Math.min(100, pct));
+            var h = height * p / 100;
+            el.setAttribute('height', h.toFixed(1));
+            el.setAttribute('y', (top + height - h).toFixed(1));
+        }
+        function pidSet(id, text, cls) {
+            var el = $(id); if (!el) return;
+            el.textContent = text;
+            if (cls !== undefined) el.setAttribute('class', cls);
+        }
+        function renderPidUnavailable() {
+            if (!$('fuel-svg')) return;
+            PID_LINE_IDS.forEach(function (id) { pidLine(id, 'unavailable', 'UNAVAILABLE', false); });
+            pidFill('pid-ust-fill', 0, 264, 106);
+            ['A', 'B', 'C'].forEach(function (k) {
+                pidFill('pid-dt-' + k + '-fill', 0, 97, 68);
+                pidSet('pid-dt-' + k, 'UNAVAILABLE', 'val');
+                pidSet('pid-gen-' + k + '-txt', 'GEN-' + k + ' \u00b7 UNAVAILABLE');
+                pidSet('pid-gen-' + k + '-kw', DASH);
+                var g = $('pid-gen-' + k); if (g) g.setAttribute('class', 'eq gen-body');
+                var lk = $('pid-gen-' + k + '-leak'); if (lk) lk.setAttribute('class', 'sym leak-pt');
+            });
+            pidSet('pid-ust-lvl', 'UNAVAILABLE', 'val big'); pidSet('pid-ust-usable', DASH); pidSet('pid-ust-state', 'UNAVAILABLE');
+            pidSet('pid-fill', 'UNAVAILABLE'); pidSet('pid-p101-txt', 'P-101 \u00b7 UNAVAILABLE'); pidSet('pid-p102-txt', 'P-102 \u00b7 UNAVAILABLE');
+            pidSet('pid-hdr-txt', 'PT-101 / FT-101 \u00b7 UNAVAILABLE'); pidSet('pid-fpu-txt', 'UNAVAILABLE');
+            ['pid-p101', 'pid-p102'].forEach(function (id) { var e = $(id); if (e) e.setAttribute('class', 'pid-pump'); });
+            ['pid-fpu-pf', 'pid-fpu-cs', 'pid-fpu-ff'].forEach(function (id) { var e = $(id); if (e) e.setAttribute('class', 'pid-unit'); });
+            ['pid-leak-lds', 'pid-leak-bund'].forEach(function (id) { var e = $(id); if (e) e.setAttribute('class', 'sym leak-pt'); });
+        }
+        function renderPid() {
+            if (!$('fuel-svg')) return;
+            var run = state.pumpRunning, flowTxt = Math.round(state.flow) + ' L/min';
+            var runKey = state.genRunning, polish = !!state.interlocks.polish;
+            var leak = !!(state.interlocks.leak || state.interlocks.bund);
+            pidLine('fs-fill', state.filling ? 'energized' : 'standby', state.filling ? 'tanker connected \u00b7 210 L/min' : 'coupling closed', state.filling);
+            pidLine('fs-suction', run ? 'energized' : 'standby', run ? flowTxt : '0 L/min (pump standby)', run);
+            pidLine('fs-p101-discharge', leak ? 'isolated' : (run ? 'energized' : 'standby'), run ? flowTxt + ' \u00b7 ' + fmt1(state.dp) + ' bar' : 'P-101 standby', run);
+            pidLine('fs-p102-discharge', 'standby', 'P-102 standby (lag)', false);
+            pidLine('fs-transfer-header', run ? 'energized' : 'standby', run ? flowTxt + ' \u00b7 ' + fmt1(state.dp) + ' bar' : 'charged \u00b7 0 L/min', run);
+            ['A', 'B', 'C'].forEach(function (k) {
+                var isRun = runKey === k, pct = state['dt' + k];
+                var feeding = run && isRun;
+                pidLine('fs-dt-' + k.toLowerCase() + '-feed', feeding ? 'energized' : 'standby', feeding ? 'XV-' + k + ' OPEN \u00b7 ' + flowTxt : 'XV-' + k + ' CLOSED', feeding);
+                pidLine('fs-gen-' + k.toLowerCase() + '-supply', isRun ? 'energized' : 'standby', isRun ? 'burn ' + grp(GEN_LPH) + ' L/h (facility)' : 'genset standby', isRun);
+                pidFill('pid-dt-' + k + '-fill', pct, 97, 68);
+                pidSet('pid-dt-' + k, fmt1(pct) + '%', 'val' + (pct < DT_LOWLOW ? ' crit' : (pct < DT_LOW ? ' warn' : '')));
+                pidSet('pid-gen-' + k + '-txt', 'GEN-' + k + ' \u00b7 ' + (isRun ? 'RUNNING' : 'STANDBY'));
+                pidSet('pid-gen-' + k + '-kw', isRun ? fmt1(FACILITY_MW) + ' MW' : '0.00 MW');
+                var g = $('pid-gen-' + k); if (g) g.setAttribute('class', 'eq gen-body' + (isRun ? ' running' : ''));
+                var lk = $('pid-gen-' + k + '-leak'); if (lk) lk.setAttribute('class', 'sym leak-pt ok');
+            });
+            pidLine('fs-polish-side', polish ? 'energized' : 'fault', polish ? 'side-stream \u00b7 conditioning' : 'FPU-01 FAULT', polish);
+            pidLine('fs-polish-return', polish ? 'energized' : 'fault', polish ? 'conditioned fuel \u2192 UST-01' : 'FPU-01 FAULT', polish);
+            pidLine('fs-dt-return', 'standby', 'overflow return \u00b7 no flow', false);
+            pidFill('pid-ust-fill', state.ustPct, 264, 106);
+            pidSet('pid-ust-lvl', fmt1(state.ustPct) + '%', 'val big' + (state.ustPct < FUEL.level_low_low_pct ? ' crit' : (state.ustPct < FUEL.level_low_pct ? ' warn' : '')));
+            pidSet('pid-ust-usable', grp(usableL(state.ustPct)) + ' L usable');
+            pidSet('pid-ust-state', state.filling ? 'FILLING' : (run ? 'DRAWING \u00b7 P-101' : 'STATIC'));
+            pidSet('pid-fill', state.filling ? 'CONNECTED \u00b7 210 L/min' : 'CLOSED');
+            pidSet('pid-p101-txt', 'P-101 \u00b7 DUTY \u00b7 ' + (run ? (state.manualPump ? 'MANUAL RUN' : 'AUTO RUN') : 'AUTO STBY'));
+            pidSet('pid-p102-txt', 'P-102 \u00b7 STANDBY \u00b7 ' + (state.interlocks.pumpfail ? 'LAG START' : 'READY'));
+            pidSet('pid-hdr-txt', 'PT-101 ' + fmt1(state.dp) + ' bar \u00b7 FT-101 ' + Math.round(state.flow) + ' L/min');
+            pidSet('pid-fpu-txt', polish ? 'RUNNING \u00b7 DP ' + DASH + ' \u00b7 WIF ' + DASH + ' \u00b7 no instrument source' : 'FAULT \u00b7 conditioning stopped');
+            var p1 = $('pid-p101'); if (p1) p1.setAttribute('class', 'pid-pump' + (run ? ' running' : ''));
+            var p2 = $('pid-p102'); if (p2) p2.setAttribute('class', 'pid-pump');
+            ['pid-fpu-pf', 'pid-fpu-cs', 'pid-fpu-ff'].forEach(function (id) { var e = $(id); if (e) e.setAttribute('class', 'pid-unit' + (polish ? ' running' : '')); });
+            var lds = $('pid-leak-lds'); if (lds) lds.setAttribute('class', 'sym leak-pt ' + (state.interlocks.leak ? 'crit' : 'ok'));
+            var bund = $('pid-leak-bund'); if (bund) bund.setAttribute('class', 'sym leak-pt ' + (state.interlocks.bund ? 'crit' : 'ok'));
         }
 
         function render() {
@@ -1459,6 +1681,7 @@
 
             buildTankTable();
             buildGensetRows();
+            renderPid();
             bindKpis();
             var alarms = evalAlarms();
             renderAlarms(alarms);
