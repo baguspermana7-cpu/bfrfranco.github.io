@@ -167,10 +167,14 @@ body>.rz-manual-link,.scroll-top-btn{display:none!important}
 .lg{display:flex;flex-wrap:wrap;gap:6px;padding:3px 0;font-size:9px;color:var(--t2)}
 .lg span{display:flex;align-items:center;gap:2px}.lg i{width:5px;height:5px;border-radius:1px;display:inline-block}
 svg text{user-select:none}
-@keyframes fR{0%{stroke-dashoffset:24}100%{stroke-dashoffset:0}}
-@keyframes fL{0%{stroke-dashoffset:-24}100%{stroke-dashoffset:0}}
-@keyframes fU{0%{stroke-dashoffset:16}100%{stroke-dashoffset:0}}
-@keyframes fD{0%{stroke-dashoffset:-16}100%{stroke-dashoffset:0}}
+/* v2.18.0 — a dash cycle only closes when the offset travelled is a WHOLE number of dash periods.
+   These ran 24 against a 10+5 period (1.6 periods) and 16 against 6+4 (also 1.6), so every flow line
+   on the page visibly snapped back 0.6 of a dash every 4 s. 30 and 20 are exactly two periods.
+   The operator stylesheet already had this right: rzOpsPowerFlow goes 28 -> 0 against 9+5. */
+@keyframes fR{0%{stroke-dashoffset:30}100%{stroke-dashoffset:0}}
+@keyframes fL{0%{stroke-dashoffset:-30}100%{stroke-dashoffset:0}}
+@keyframes fU{0%{stroke-dashoffset:20}100%{stroke-dashoffset:0}}
+@keyframes fD{0%{stroke-dashoffset:-20}100%{stroke-dashoffset:0}}
 .fR{stroke-dasharray:10 5;animation:fR 4s linear infinite}.fL{stroke-dasharray:10 5;animation:fL 4s linear infinite}
 .fU{stroke-dasharray:6 4;animation:fU 4s linear infinite}.fD{stroke-dasharray:6 4;animation:fD 4s linear infinite}
 @keyframes rG{0%,100%{opacity:.72}50%{opacity:1}}.rg{animation:rG 3s ease infinite}
@@ -530,6 +534,9 @@ svg text{user-select:none}
 @media(prefers-reduced-motion:reduce){
   .dot,.fR,.fL,.fU,.fD,.rg,.ircdu-pulse,.hp,.cp,.wr,.wl,.sh,svg .ep,.lv,.laser,
   .dh-alarmbar .ab-state.s-crit{animation:none!important}
+  /* v2.18.0 — `animation:none` alone leaves the dash frozen at whatever offset the animation had
+     reached, so a stopped line kept an arbitrary phase. Settle it. */
+  .fR,.fL,.fU,.fD{stroke-dashoffset:0!important}
 }
 .dh-alarmbar .ab-crit{color:var(--r)}
 .dh-alarmbar .ab-crit.hot{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.10)}
@@ -3557,7 +3564,12 @@ s+=`<g class="cdu-click" data-cdu="${n}" data-rz-equipment="cdu:${n}" tabindex="
 s+=`<line x1="${gx+GAL_W/2}" y1="${(gy+bankH+2).toFixed(1)}" x2="${gx+GAL_W/2}" y2="${SUP_Y}" stroke="rgba(6,182,212,.5)" stroke-width="1.2"/>`;
 s+=`<g data-rz-authored-basis="drawing aggregation: equipment.cdu_installed_per_hall spread over four CDU galleries (ceil of installed ÷ 4 per gallery) — a split of the registry value, not a registry value (Track A §A2b)"><text x="${gx+GAL_W/2}" y="${(gy+bankH/2).toFixed(1)}" fill="var(--c)" font-family="${J}" font-size="3" text-anchor="middle" font-weight="600" transform="rotate(-90,${gx+GAL_W/2},${(gy+bankH/2).toFixed(1)})">CDU GALLERY ${g+1} · ${perGal==null?DASH:perGal}× ${cduShort()}</text></g>`;
 });
-s+=`<g data-rz-authored-basis="simulated gallery supply-header pressure (1.5-2.5 bar); flow per unit beside it is the engine equipment.cdu_flow_per_unit_lpm"><text x="${GAL_LX+GAL_W/2}" y="${SUP_Y+12}" fill="var(--c)" font-family="${J}" font-size="2.8" text-anchor="middle" id="cduG1">—</text><text x="${GAL_RX+GAL_W/2}" y="${SUP_Y+12}" fill="var(--c)" font-family="${J}" font-size="2.8" text-anchor="middle" id="cduG2">—</text></g>`;
+/* v2.18.0 — these two read the TCS supply header, and were centred on the CDU gallery strips at
+   x=39 and x=693. At 2.8 px monospace the ~28-character string spans about 47 units, so the left
+   one ran from x=15.5 to x=62.5: outside the drawing margin (LX=32), across the gallery rect and
+   its rotated label, and on into the first rack row. Anchor them to the ends of the header they
+   describe instead, inside the hall body, so neither can grow back over the galleries. */
+s+=`<g data-rz-authored-basis="simulated gallery supply-header pressure (1.5-2.5 bar); flow per unit beside it is the engine equipment.cdu_flow_per_unit_lpm"><text x="${HX0+2}" y="${SUP_Y+12}" fill="var(--c)" font-family="${J}" font-size="2.8" text-anchor="start" id="cduG1">—</text><text x="${HX1-2}" y="${SUP_Y+12}" fill="var(--c)" font-family="${J}" font-size="2.8" text-anchor="end" id="cduG2">—</text></g>`;
 }
 /* === MECHANICAL BANK CHIPS — the counts a per-glyph drawing cannot show */
 s+=`<g class="cdu-click" data-cdu="1" data-rz-equipment="cdu:1" tabindex="0" role="button">`;
@@ -3672,7 +3684,7 @@ renderHall();
 /* One TTHT hot + cold readout per ROW (was: 4 per row-pair). The id scheme
    'H'+row+sensor+'t|h' is unchanged \u2014 only the row count moved with the basis. */
 function upd(){const SR=(DHE&&typeof DHE.rowsPerBank==='number'&&isFinite(DHE.rowsPerBank))?Math.ceil(DHE.rowsPerBank/2):0;   /* one readout pair per containment pair */
-for(let r=0;r<SR;r++)for(let si=0;si<1;si++){const ht=$('H'+r+si+'t'),hh=$('H'+r+si+'h'),ct=$('C'+r+si+'t'),ch=$('C'+r+si+'h');if(ht)ht.textContent=RZ_SIM('page1',32,40,1)+'\u00B0C';if(hh)hh.textContent=RZ_SIM('page2',40,65,1)+'%';if(ct)ct.textContent=RZ_SIM('page3',25.3+r*0.05,25.8+r*0.05,5)+'\u00B0C';if(ch)ch.textContent=RZ_SIM('page4',45,70,1)+'%'}
+for(let r=0;r<SR;r++)for(let si=0;si<1;si++){const ht=$('H'+r+si+'t'),hh=$('H'+r+si+'h'),ct=$('C'+r+si+'t'),ch=$('C'+r+si+'h');if(ht)ht.textContent=RZ_SIM('page1',32,40,1)+'\u00B0C';if(hh)hh.textContent=RZ_SIM('page2',40,65,1)+'%';if(ct)ct.textContent=RZ_SIM('page3',25.3+r*0.05,25.8+r*0.05,1)+'\u00B0C';   /* v2.18.0: was 5 digits — 25.78698 C on a 2.8 px glyph; its three siblings all pass 1 */if(ch)ch.textContent=RZ_SIM('page4',45,70,1)+'%'}
 /* PUE/IT/DLC are ENGINE-DERIVED (not random). GPU% and W/GPU remain live
  * telemetry jitter (genuine sensor readings, not basis-of-design values). */
 if(DH){$('kP').textContent=DH.pue.toFixed(2);}
@@ -9358,7 +9370,12 @@ var F='JetBrains Mono',W=720,H=440;
 var t1=P.v('htw_return_c'),t2=P.v('htw_supply_c'),t3=P.v('tcs_supply_c'),t4=P.v('tcs_return_c');
 var ps1=P.v('ps1'),dp=P.v('dp_bar');
 var flow=P.n('flow_lpm'),fan=P.n('fan'),p1pct=P.n('p1pct'),p2pct=P.n('p2pct'),p3pct=0;
+/* v2.18.0 — P.n() is the RAW engine number and is for arithmetic only; P.v() is the payload's
+   own text at its declared precision. Printing P.n() put 1497.2441888329738 on the panel and
+   overflowed the box. Every display site below uses the *Txt twin. */
+var flowTxt=P.v('flow_lpm');
 var rpm=P.n('pump_rpm'),amps=P.v('pump_amps');
+var hxDutyTxt=P.v('duty_kwth');
 var hxDuty=P.n('duty_kwth'),glycol=30,valvePct=P.n('valve_pct'),expLvl=P.n('expansion_level'),strDP=P.v('strainer_dp');
 var s='';
 // Background
@@ -9376,9 +9393,9 @@ var iy=30,bw=108;
 var kpis=[
 {l:'Fan Speed',v:fan+'%',c:'var(--o)',bg:'rgba(245,158,11,.06)',bc:'var(--o)'},
 {l:'Mode',v:'Online',c:'var(--g)',bg:'rgba(34,197,94,.06)',bc:'var(--g)'},
-{l:'Sec Flow',v:flow+' L/m',c:'var(--c)',bg:'rgba(6,182,212,.06)',bc:'var(--c)'},
+{l:'Sec Flow',v:flowTxt+' L/m',c:'var(--c)',bg:'rgba(6,182,212,.06)',bc:'var(--c)'},
 {l:'Supply T3',v:t3+'\u00B0C',c:'var(--c)',bg:'rgba(6,182,212,.06)',bc:'var(--c)'},
-{l:'HX Duty',v:hxDuty+' kW',c:'var(--p)',bg:'rgba(100, 116, 139,.06)',bc:'var(--p)'},
+{l:'HX Duty',v:hxDutyTxt+' kW',c:'var(--p)',bg:'rgba(100, 116, 139,.06)',bc:'var(--p)'},
 {l:'Glycol',v:glycol+'%',c:'var(--pk)',bg:'rgba(236,72,153,.06)',bc:'var(--pk)'}
 ];
 for(var k=0;k<kpis.length;k++){var kx=10+k*(bw+4);
@@ -9398,7 +9415,7 @@ for(var i=0;i<3;i++){var ty=hxY+40+i*50;s+=`<polygon points="${hxX-2},${ty} ${hx
 // Blue triangles (cold side RIGHT — FWS in)
 for(var i=0;i<3;i++){var ty=hxY+40+i*50;s+=`<polygon points="${hxX+hxW+2},${ty} ${hxX+hxW-10},${ty-7} ${hxX+hxW-10},${ty+7}" fill="var(--b)" opacity=".6"/>`}
 // HX Duty label
-s+=rzD(P.optAll(["duty_kwth"]),`<text x="${hxX+hxW/2}" y="${hxY+hxH-8}" fill="var(--c)" font-family="${F}" font-size="9" text-anchor="middle" font-weight="600">${hxDuty} kW</text>`);
+s+=rzD(P.optAll(["duty_kwth"]),`<text x="${hxX+hxW/2}" y="${hxY+hxH-8}" fill="var(--c)" font-family="${F}" font-size="9" text-anchor="middle" font-weight="600">${hxDutyTxt} kW</text>`);
 s+=`<text x="${hxX+hxW/2}" y="${hxY+hxH+10}" fill="var(--c)" font-family="${F}" font-size="6" text-anchor="middle">Heat Exchanger</text>`;
 // Flow particles through HX plates (primary + secondary)
 for(var pi=0;pi<4;pi++){var py=hxY+30+pi*40;
@@ -9457,7 +9474,7 @@ s+=rzD(P.optAll(["tcs_supply_c"]),`<text x="${pmpX+125}" y="${supY+20}" fill="va
 // ===== SEC FLOW METER (on supply line, right of pump) =====
 s+=`<rect x="500" y="${supY-22}" width="68" height="44" rx="3" fill="rgba(6,182,212,.06)" stroke="var(--c)" stroke-width=".6"/>`;
 s+=rzD(P.optAll(["tcs_supply_c"]),`<text x="534" y="${supY-9}" fill="var(--t3)" font-family="${F}" font-size="6" text-anchor="middle">Sec Flow [FM]</text>`);
-s+=rzD(P.optAll(["flow_lpm"]),`<text x="534" y="${supY+5}" fill="var(--c)" font-family="${F}" font-size="12" text-anchor="middle" font-weight="600">${flow}</text>`);
+s+=rzD(P.optAll(["flow_lpm"]),`<text x="534" y="${supY+5}" fill="var(--c)" font-family="${F}" font-size="12" text-anchor="middle" font-weight="600">${flowTxt}</text>`);
 s+=rzD(P.optAll(["tcs_supply_c"]),`<text x="534" y="${supY+16}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">L/min</text>`);
 // ===== AAV (Automatic Air Vent) =====
 s+=`<rect x="275" y="120" width="50" height="22" rx="2" fill="rgba(107,114,128,.06)" stroke="var(--t3)" stroke-width=".5"/>`;
@@ -9541,7 +9558,7 @@ s+=`<defs><linearGradient id="hxTemp${cduId}" x1="0" y1="0" x2="1" y2="0"><stop 
 s+=`<rect x="${dtX+10}" y="${dtY+18}" width="${dtW-20}" height="8" rx="2" fill="url(#hxTemp${cduId})"/>`;
 s+=rzD(P.optAll(["htw_return_c", "htw_supply_c"]),`<text x="${dtX+12}" y="${dtY+40}" fill="var(--c)" font-family="${F}" font-size="5">FWS \u0394T: ${(t1-t2).toFixed(1)}\u00B0C</text>`);
 s+=rzD(P.optAll(["tcs_supply_c", "tcs_return_c"]),`<text x="${dtX+dtW-12}" y="${dtY+40}" fill="var(--pk)" font-family="${F}" font-size="5" text-anchor="end">TCS \u0394T: ${(t4-t3).toFixed(1)}\u00B0C</text>`);
-s+=rzD(P.optAll(["duty_kwth"]),`<text x="${dtX+dtW/2}" y="${dtY+55}" fill="var(--g)" font-family="${F}" font-size="5.5" text-anchor="middle" font-weight="600">HX Duty: ${hxDuty} kW</text>`);
+s+=rzD(P.optAll(["duty_kwth"]),`<text x="${dtX+dtW/2}" y="${dtY+55}" fill="var(--g)" font-family="${F}" font-size="5.5" text-anchor="middle" font-weight="600">HX Duty: ${hxDutyTxt} kW</text>`);
 // Leak sensor status
 var lkX=530,lkY=395,lkW=170,lkH=28;
 s+=`<rect x="${lkX}" y="${lkY}" width="${lkW}" height="${lkH}" rx="3" fill="rgba(34,197,94,.04)" stroke="var(--g)" stroke-width=".5"/>`;
@@ -9551,7 +9568,7 @@ s+=rzD(P.optAll(["tcs_supply_c"]),`<text x="${lkX+dtW-10}" y="${lkY+17}" fill="v
 // ===== BOTTOM STATUS BAR =====
 s+=`<rect x="0" y="${H-24}" width="${W}" height="24" fill="rgba(6,182,212,.06)"/>`;
 s+=rzD(P.optAll(["tcs_supply_c"]),`<text x="10" y="${H-9}" fill="var(--t3)" font-family="${F}" font-size="7">IP: 192.168.11.${170+cduId} (A) | 192.168.11.${170+cduId+1} (B)</text>`);
-s+=rzD(P.optAll(["flow_lpm", "tcs_supply_c", "tcs_return_c", "dp_bar"]),`<text x="${W-10}" y="${H-9}" fill="var(--c)" font-family="${F}" font-size="7" text-anchor="end">\u0394P ${dp}bar | ${flow}L/m | ${t3}/${t4}\u00B0C</text>`);
+s+=rzD(P.optAll(["flow_lpm", "tcs_supply_c", "tcs_return_c", "dp_bar"]),`<text x="${W-10}" y="${H-9}" fill="var(--c)" font-family="${F}" font-size="7" text-anchor="end">\u0394P ${dp}bar | ${flowTxt}L/m | ${t3}/${t4}\u00B0C</text>`);
 el.innerHTML=s;
 
 /* @rz-hmi:end renderCduHmi */}
@@ -9921,6 +9938,9 @@ var fanBrgNDE=[parseFloat(P.v('auto_10')),parseFloat(P.v('auto_11')),parseFloat(
 var fanVib=[parseFloat(P.v('auto_13')),parseFloat(P.v('auto_14')),parseFloat(P.v('auto_15'))];
 var fanRPM=[P.n('auto_16'),P.n('auto_17'),P.n('auto_18')];
 var glycolConc=30,glycolPH=parseFloat(P.v('auto_19')),glycolFP=-15;
+/* v2.18.0 — this point is an authored identity: its text already carries the unit, so the
+   display twin is printed WITHOUT a second unit suffix. P.n stays for arithmetic. */
+var cwFlowTxt=P.v('unit_flow_m3h');
 var cwFlow=P.n('unit_flow_m3h'),totalFanPwr=P.n('unit_fans_kwe')!=null?Math.round(P.n('unit_fans_kwe')):'\u2014';   /* Rule 2: fan power per running unit from the payload identity */
 var runHrs=P.n('runHrs'),starts=P.n('starts');
 var s='';
@@ -9940,7 +9960,7 @@ var kpis=[
 {l:'Ambient DB',v:ambT+'\u00B0C',c:'var(--o)',bg:'rgba(245,158,11,.06)',bc:'var(--o)'},
 {l:'Fluid In',v:fldIn+'\u00B0C',c:'var(--o)',bg:'rgba(245,158,11,.06)',bc:'var(--o)'},
 {l:'Fluid Out',v:fldOut+'\u00B0C',c:'var(--c)',bg:'rgba(6,182,212,.06)',bc:'var(--c)'},
-{l:'CW Flow',v:cwFlow+' m\u00B3/h',c:'var(--c)',bg:'rgba(6,182,212,.06)',bc:'var(--c)'},
+{l:'CW Flow',v:cwFlowTxt,c:'var(--c)',bg:'rgba(6,182,212,.06)',bc:'var(--c)'},
 {l:'WUE',v:'0.00',c:'var(--g)',bg:'rgba(34,197,94,.06)',bc:'var(--g)'}
 ];
 for(var k=0;k<kpis.length;k++){var kx=10+k*(bw+5);
@@ -10045,9 +10065,9 @@ s+=`<text x="375" y="${pmY+42}" fill="var(--t3)" font-family="${F}" font-size="5
 s+=`<text x="455" y="${pmY+42}" fill="var(--o)" font-family="${F}" font-size="6" font-weight="600">${totalFanPwr} kW</text>`;
 s+=`<text x="510" y="${pmY+42}" fill="var(--t3)" font-family="${F}" font-size="5">kW/ton:</text>`;
 var kwTon=P.n('kw_ton')!=null?+P.n('kw_ton').toFixed(4):null;   /* Rule 2: plant kW/ton is the payload identity over marked parameters */
-s+=`<text x="550" y="${pmY+42}" fill="var(--c)" font-family="${F}" font-size="6" font-weight="600">${kwTon.toFixed(3)}</text>`;
+s+=`<text x="550" y="${pmY+42}" fill="var(--c)" font-family="${F}" font-size="6" font-weight="600">${kwTon!=null?kwTon.toFixed(3):"\u2014"}</text>`;
 s+=`<text x="600" y="${pmY+42}" fill="var(--t3)" font-family="${F}" font-size="5">CW Flow:</text>`;
-s+=rzD(P.optAll(["unit_flow_m3h"]),`<text x="648" y="${pmY+42}" fill="var(--c)" font-family="${F}" font-size="6" font-weight="600">${cwFlow} m\u00B3/h</text>`);
+s+=rzD(P.optAll(["unit_flow_m3h"]),`<text x="648" y="${pmY+42}" fill="var(--c)" font-family="${F}" font-size="6" font-weight="600">${cwFlowTxt}</text>`);
 var heatRej=P.n('heatRej');
 s+=`<text x="375" y="${pmY+55}" fill="var(--t3)" font-family="${F}" font-size="5">Heat Rejection:</text>`;
 s+=rzD(P.optAll(["heatRej"]),`<text x="452" y="${pmY+55}" fill="var(--o)" font-family="${F}" font-size="6" font-weight="600">${heatRej} kW</text>`);
@@ -10103,7 +10123,7 @@ s+=rzD(P.optAll(["auto_22"]),`<text x="290" y="${ftY+77}" fill="var(--t3)" font-
 s+=rzD(P.optAll(["auto_23"]),`<text x="390" y="${ftY+77}" fill="var(--t3)" font-family="${F}" font-size="5">Noise: <tspan fill="var(--c)">${P.n('auto_23')} dBA</tspan></text>`);
 // Bottom status bar
 s+=`<rect x="0" y="${H-24}" width="${W}" height="24" fill="rgba(100, 116, 139,.06)"/>`;
-s+=rzD(P.optAll(["unit_flow_m3h"]),`<text x="10" y="${H-9}" fill="var(--t3)" font-family="${F}" font-size="7">Closed-Loop | 30% PG Glycol | WUE 0.00 | No Make-up | CW Flow ${cwFlow}m\u00B3/h</text>`);
+s+=rzD(P.optAll(["unit_flow_m3h"]),`<text x="10" y="${H-9}" fill="var(--t3)" font-family="${F}" font-size="7">Closed-Loop | 30% PG Glycol | WUE 0.00 | No Make-up | CW Flow ${cwFlowTxt}</text>`);
 s+=rzD(P.optAll(["heatRej"]),`<text x="${W-10}" y="${H-9}" fill="var(--p)" font-family="${F}" font-size="7" text-anchor="end">Approach ${approach}\u00B0C | Range ${range}\u00B0C | \u03B7 ${eff}% | Heat Rej ${heatRej}kW</text>`);
 el.innerHTML=s;
 
@@ -11031,6 +11051,9 @@ var cwFlow=P.v('cwFlow');
 var coolKw=parseFloat((cwFlow/3.6*4.18*cwDt).toFixed(1));
 var supT=P.v('air_supply_c');
 var airflow=P.n('unit_air_m3h');
+/* v2.18.0 — airflow stays numeric for the dT identity below; airflowTxt is what gets drawn.
+   Its text already carries the unit. */
+var airflowTxt=P.v('unit_air_m3h');
 var airDt=parseFloat((coolKw/(airflow/3600*1.2*1.006)).toFixed(1));
 var retT=parseFloat((parseFloat(supT)+airDt).toFixed(1));
 var fanSpd=P.n('fan_pct');
@@ -11044,7 +11067,7 @@ s+=`<text x="10" y="17" fill="var(--c)" font-family="${F}" font-size="11" font-w
 s+=`<circle cx="380" cy="13" r="4" fill="var(--g)" opacity=".8"/><text x="388" y="17" fill="var(--g)" font-family="${F}" font-size="9">Active</text>`;
 s+=rzD(P.optAll(["auto_1"]),`<text x="${W-10}" y="17" fill="var(--t3)" font-family="${F}" font-size="8" text-anchor="end">IP: 10.1.4.${P.n('auto_1')}</text>`);
 // === KPI STRIP (y=30-62) ===
-var kpis=[{l:'Supply Air',v:supT+'\u00B0C',c:'var(--c)'},{l:'Return Air',v:retT+'\u00B0C',c:'var(--o)'},{l:'Fan Speed',v:fanSpd+'%',c:'var(--g)'},{l:'Airflow',v:airflow+' m\u00B3/h',c:'var(--c)'},{l:'CHWS/CHWR',v:cwIn+'/'+cwOut+'\u00B0C',c:'var(--b)'},{l:'Cooling',v:coolKw+' kW',c:'var(--o)'}];
+var kpis=[{l:'Supply Air',v:supT+'\u00B0C',c:'var(--c)'},{l:'Return Air',v:retT+'\u00B0C',c:'var(--o)'},{l:'Fan Speed',v:fanSpd+'%',c:'var(--g)'},{l:'Airflow',v:airflowTxt,c:'var(--c)'},{l:'CHWS/CHWR',v:cwIn+'/'+cwOut+'\u00B0C',c:'var(--b)'},{l:'Cooling',v:coolKw+' kW',c:'var(--o)'}];
 for(var k=0;k<kpis.length;k++){var kx=10+k*117;
 s+=`<rect x="${kx}" y="30" width="112" height="30" rx="3" fill="rgba(6,182,212,.04)" stroke="var(--c)" stroke-width=".4"/>`;
 s+=`<text x="${kx+56}" y="42" fill="var(--t3)" font-family="${F}" font-size="6" text-anchor="middle">${kpis[k].l}</text>`;
@@ -11096,7 +11119,7 @@ s+=`<text x="115" y="260" fill="var(--g)" font-family="${F}" font-size="6" text-
 // Supply Air Output (y=298-348)
 s+=`<rect x="10" y="298" width="210" height="50" rx="4" fill="rgba(6,182,212,.05)" stroke="var(--c)" stroke-width=".6"/>`;
 s+=`<text x="115" y="314" fill="var(--c)" font-family="${F}" font-size="7" text-anchor="middle" font-weight="600">SUPPLY AIR TO RAISED FLOOR</text>`;
-s+=rzD(P.optAll(["air_supply_c", "unit_air_m3h", "supply_rh"]),`<text x="115" y="328" fill="var(--c)" font-family="${F}" font-size="7" text-anchor="middle">${supT}\u00B0C | ${supRH}% RH | ${airflow} m\u00B3/h</text>`);
+s+=rzD(P.optAll(["air_supply_c", "unit_air_m3h", "supply_rh"]),`<text x="115" y="328" fill="var(--c)" font-family="${F}" font-size="7" text-anchor="middle">${supT}\u00B0C | ${supRH}% RH | ${airflowTxt}</text>`);
 s+=`<circle cx="40" cy="342" r="6" fill="none" stroke="var(--o)" stroke-width=".5"/>`;
 s+=`<text x="40" y="345" fill="var(--o)" font-family="${F}" font-size="5" text-anchor="middle">TI</text>`;
 s+=`<circle cx="100" cy="342" r="6" fill="none" stroke="var(--c)" stroke-width=".5"/>`;
@@ -11122,7 +11145,7 @@ s+=`</g>`;
 s+=rzD(P.optAll(["fan_pct", "rpm"]),`<text x="${fx+41}" y="${fy+56}" fill="var(--g)" font-family="${F}" font-size="5.5" text-anchor="middle">${rpm}rpm ${fanSpd}%</text>`);
 s+=rzD(P.optAll(["fkw"]),`<text x="${fx+41}" y="${fy+64}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">${fkw}kW | F${fr*3+fc+1}</text>`);
 }}
-s+=rzD(P.optAll(["unit_air_m3h"]),`<text x="369" y="286" fill="var(--g)" font-family="${F}" font-size="6" text-anchor="middle">Total: ${totalFanKw.toFixed(1)} kW | ${airflow} m\u00B3/h</text>`);
+s+=rzD(P.optAll(["unit_air_m3h"]),`<text x="369" y="286" fill="var(--g)" font-family="${F}" font-size="6" text-anchor="middle">Total: ${totalFanKw.toFixed(1)} kW | ${airflowTxt}</text>`);
 // Air Temp Differential (y=296-348, below fan wall)
 s+=`<rect x="228" y="296" width="282" height="52" rx="4" fill="rgba(6,182,212,.04)" stroke="var(--c)" stroke-width=".5"/>`;
 s+=`<text x="369" y="310" fill="var(--c)" font-family="${F}" font-size="7" text-anchor="middle" font-weight="600">AIR TEMPERATURE DIFFERENTIAL</text>`;
@@ -12256,6 +12279,46 @@ inner.addEventListener('touchend',function(){lastDist=0},{passive:true});
     setTimeout(applyGate, 60);
     setTimeout(applyGate, 550);
     setTimeout(applyGate, 1600);
+})();
+
+/* ============================================================================
+ * v2.18.0 — prefers-reduced-motion has to reach SMIL, and CSS cannot do it.
+ * ----------------------------------------------------------------------------
+ * The @media(prefers-reduced-motion:reduce) block above stops every CSS animation on this page,
+ * but a media query has no authority over SVG SMIL. This drawing carries 71 <animate>, 4
+ * <animateMotion> and 11 <animateTransform> elements — the two TCS header dashes on the hall
+ * drawing, the heat-exchanger flow particles in the CDU HMI, the rotating CRAH fans, the leak
+ * blink — and every one of them kept running for a viewer who had asked the whole system to stop
+ * moving. SVGSVGElement.pauseAnimations() is the only control that reaches them.
+ *
+ * The listener is live: a viewer who changes the setting while the page is open gets the change
+ * without a reload, and modals opened later are covered because DHModal mutations re-apply it.
+ * ==========================================================================*/
+(function(){
+  if (typeof window.matchMedia !== 'function') { return; }
+  var q = window.matchMedia('(prefers-reduced-motion: reduce)');
+  function apply(){
+    var stop = q.matches, svgs = document.querySelectorAll('svg');
+    for (var i = 0; i < svgs.length; i++) {
+      var el = svgs[i];
+      if (typeof el.pauseAnimations !== 'function') { continue; }
+      try { stop ? el.pauseAnimations() : el.unpauseAnimations(); } catch (e) {}
+    }
+    document.documentElement.setAttribute('data-rz-smil', stop ? 'paused' : 'running');
+  }
+  if (typeof q.addEventListener === 'function') { q.addEventListener('change', apply); }
+  else if (typeof q.addListener === 'function') { q.addListener(apply); }
+  /* SVG injected later (every mimic renders into its panel on open) must inherit the setting */
+  if (typeof MutationObserver === 'function') {
+    var pending = null;
+    new MutationObserver(function(){
+      if (!q.matches || pending) { return; }
+      pending = setTimeout(function(){ pending = null; apply(); }, 60);
+    }).observe(document.body, { childList: true, subtree: true });
+  }
+  if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', apply); }
+  else { apply(); }
+  window.RZDatahallAIMotion = { apply: apply, reduced: function(){ return q.matches; } };
 })();
 </script>
 <script src="rz-tracker.js?v=2026-08-30-local-runtime" defer></script>

@@ -335,6 +335,19 @@
   opacity: .95 !important;
 }
 
+/* v2.18.0 — `rz-flow-partial` has been toggled by operator-ui.js since the state machine landed
+   and never had a rule, so a path carrying load with its redundancy LOST rendered identically to a
+   healthy 2N path. That is the one distinction an operator needs from this drawing.
+   It keeps its feed colour — identity must never borrow the alarm palette — and is separated by
+   TEXTURE and weight instead: a short, fast dash reads as "flowing, but no longer redundant". */
+#p-elec [data-rz-line].rz-flow-partial {
+  animation: rzOpsPowerFlow 1.4s linear infinite !important;
+  /* period 7 divides the keyframe's 28-unit travel exactly 4 times, so this cycle closes too */
+  stroke-dasharray: 4 3 !important;
+  stroke-width: var(--rz-ops-line-active) !important;
+  opacity: .6 !important;
+}
+
 #p-elec [data-rz-line].rz-flow-inactive {
   animation: none !important;
   opacity: .18 !important;
@@ -546,7 +559,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #p-elec [data-rz-line].rz-flow-active { animation: none !important; }
+  /* Kept as two rules, not one selector list: tools/test-rz-design-studio.mjs asserts the
+     `.rz-flow-active { animation: none !important;` shape verbatim, and a gate that pins a shape
+     is a gate that must be honoured rather than reworded around. */
+  #p-elec [data-rz-line].rz-flow-active { animation: none !important; stroke-dashoffset: 0 !important; }
+  #p-elec [data-rz-line].rz-flow-partial { animation: none !important; stroke-dashoffset: 0 !important; }
 }
 
 /* ── v2.1.0 Track A §A3 — traceability marks inside SVG diagrams ────────────

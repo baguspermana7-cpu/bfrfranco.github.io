@@ -11,6 +11,82 @@ release sections rather than semver.
 
 ---
 
+## v2.18.0 — 2026-09-09
+
+### Raw floats stop reaching the panels, and the flow animation closes its own cycle
+
+Owner, from the live page: *"angka belakang koma banyak sekali spill semua"*, and *"garis-garis dan
+animasinya nggak tepat"*. Both were real, and each had one root cause.
+
+#### The numbers
+
+`js/datahall-ai/hmi-payloads.js` publishes two accessors per point. `P.v()` returns the payload's
+own text at its declared precision; `P.n()` returns the **raw engine number**, for arithmetic. Only
+simulated points round their stored value — engine, authored and plane points do not. Every spill
+was a renderer printing `P.n()` with a unit concatenated onto it.
+
+| rendered | should read |
+|---|---|
+| `1497.2441888329738 L/m` | `1,497 L/m` |
+| `992.6728971962617 kW` | `993 kW` |
+| `40.57080803089242 m³/h` | `41 m³/h` |
+| `55634.09443753011 m³/h` | `55,634 m³/h` |
+
+Display sites now use a `*Txt` twin from `P.v()`; the numeric variable stays where arithmetic needs
+it, such as the CRAH air-side ΔT identity. The hall drawing's cold-aisle sensors were a separate
+one-character bug: `RZ_SIM('page3', …, 5)` asked for **five** decimals where its three siblings ask
+for one, printing `25.78698 °C` on a 2.8 px glyph. And `kwTon` was null-guarded on assignment then
+dereferenced unguarded by `.toFixed(3)`, which threw whenever that point was unpublished.
+
+#### The animation
+
+A dash cycle only closes when the offset travels a whole number of dash periods. The page ran
+**24 against a 10+5 period and 16 against 6+4 — 1.60 periods each**, so every flow line on every
+diagram snapped back six tenths of a dash every four seconds. Now 30 and 20, exactly two periods.
+Under reduced motion the dashes also settle to offset 0 instead of freezing at an arbitrary phase.
+
+Two more, found while measuring:
+
+- **`rz-flow-partial` had no rule.** `operator-ui.js` has toggled it since the electrical state
+  machine landed, so a path carrying load with its **redundancy lost rendered identically to a
+  healthy 2N path** — the one distinction that drawing exists to show. It now separates by texture
+  and weight while keeping its feed colour, because identity must never borrow the alarm palette.
+- **Reduced motion could not reach SMIL.** A CSS media query has no authority over SVG animation,
+  and this page carries 135 `<animate>` / `<animateMotion>` / `<animateTransform>` elements — the
+  TCS header dashes, the heat-exchanger particles, the rotating CRAH fans, the leak blink — all of
+  which kept moving for a viewer who had asked the system to stop. A `matchMedia` listener now
+  calls `pauseAnimations()` on every SVG root and re-applies to panels rendered later. Measured:
+  26 roots running normally, 26 paused under reduce.
+
+The `2.1 bar · 1,497 L/min per CDU` annotation was centred on the CDU gallery at x=39, so at 2.8 px
+monospace it spanned x 15.5 to 62.5 — outside the drawing margin, across the gallery rectangle and
+its rotated label, into the first rack row. It is now anchored to the ends of the header it
+describes.
+
+#### Gated
+
+Two new gates, both proven RED against the pre-fix tree in a detached worktree and GREEN after.
+
+- `tools/test-dcai-rendered-precision.mjs` walks every tab, sub-tab and tier-2 modal. **14 distinct
+  over-precise values across 4 views → 0.** The test is **significant digits, not decimal places**,
+  and that distinction is load-bearing: a first cut flagged four VESDA obscuration readings at
+  `0.0024 %/m`, which are correct — an aspirating detector is specified in the 0.0015–0.02 %/m band,
+  so four decimals there carry two significant digits. `1497.2441888329738` carries seventeen. The
+  ceiling is six.
+- `tools/test-dcai-flow-animation.mjs` checks dash-cycle closure from the stylesheet source, that
+  every class the runtime toggles is styled, and that reduced motion reaches SMIL. **7 failures → 0.**
+
+#### Recorded, not fixed
+
+2,880 of the 9,630 tagged lines that carry both a declared direction and a flow class carry a class
+whose travel **opposes** that direction, nearly all in the `dh1-semantic-*` family on the building
+isometric. The cause is structural: direction is a hand-written `cssClass` literal kept in sync with
+the model's own field by hand, and `styleAttrs()` in `js/rz-line-model.js` never reads
+`spec.direction`. The gate carries this as a MONITOR with the count and a written flip condition —
+it becomes a gate when the class is derived rather than typed.
+
+---
+
 ## v2.17.0 — 2026-09-09
 
 ### A bar does not need a gradient (owner comment 21, deferred backlog)
