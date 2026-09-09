@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-build-llms-txt.py — generate llms.txt from filesystem walk.
+build-llms-txt.py — generate llms.txt from the shared publication inventory.
 Per https://llmstxt.org spec: Markdown content map for LLM discovery.
 Idempotent (overwrites llms.txt each run).
 
@@ -8,17 +8,11 @@ Usage:
   python3 tools/build-llms-txt.py
 """
 
-import os
 import re
+from pathlib import Path
+import sys
 
-SITE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SITE_URL = "https://resistancezero.com"
-OUTPUT = os.path.join(SITE_ROOT, "llms.txt")
-
-EXCLUDE_FILES = {
-    "article-9-paper.html", "rz-ops-p7x3k9m.html",
-    "google1b98e0817bd5aa88.html", "404.html", "future-forward-1.html",
-}
+from crawler_llms import extract_meta, markdown_label, publication_pages, run_builder
 
 # Hardcoded category map: filename -> category
 CATEGORY_MAP = {
@@ -106,20 +100,12 @@ CATEGORY_MAP = {
 }
 
 
-def extract_meta(path):
-    import html as html_mod
-    with open(path, encoding="utf-8", errors="ignore") as fh:
-        content = fh.read(5000)
-    title = re.search(r'<title>(.*?)</title>', content, re.DOTALL | re.IGNORECASE)
-    desc = re.search(r'<meta[^>]+name=["\']description["\'][^>]+content=["\'](.*?)["\']', content, re.IGNORECASE)
-    if not desc:
-        desc = re.search(r'<meta[^>]+content=["\'](.*?)["\'][^>]+name=["\']description["\']', content, re.IGNORECASE)
-    t = html_mod.unescape(title.group(1).strip()) if title else os.path.basename(path)
-    d = html_mod.unescape(desc.group(1).strip()) if desc else ""
-    return t, d
-
-
 def categorize(fname):
+    directory = Path(fname).parts[0]
+    nested = {"manual": "Technical Manuals", "prd": "Product Requirements",
+              "network": "Network Guides", "id": "Bahasa Indonesia", "dc-market": "Reports"}
+    if directory in nested:
+        return nested[directory]
     if fname in CATEGORY_MAP:
         return CATEGORY_MAP[fname]
     if re.match(r'^article-\d+\.html$', fname):
@@ -127,49 +113,12 @@ def categorize(fname):
     return "Other"
 
 
-def main():
-    # Collect all html files at root level
+def build_content(root, inventory=None):
     files = []
-    for fname in os.listdir(SITE_ROOT):
-        if not fname.endswith(".html"):
-            continue
-        if fname in EXCLUDE_FILES:
-            continue
-        filepath = os.path.join(SITE_ROOT, fname)
-        if not os.path.isfile(filepath):
-            continue
-        title, desc = extract_meta(filepath)
-        category = categorize(fname)
-        url = f"{SITE_URL}/{fname}"
-        files.append((category, fname, title, desc, url))
-
-    # Collect the manual/ subfolder (per-calculator methodology pages)
-    manual_dir = os.path.join(SITE_ROOT, "manual")
-    if os.path.isdir(manual_dir):
-        for fname in os.listdir(manual_dir):
-            if not fname.endswith(".html") or fname in EXCLUDE_FILES:
-                continue
-            filepath = os.path.join(manual_dir, fname)
-            if not os.path.isfile(filepath):
-                continue
-            title, desc = extract_meta(filepath)
-            url = f"{SITE_URL}/manual/" if fname == "index.html" else f"{SITE_URL}/manual/{fname}"
-            # sort key "manual/<fname>" keeps the index first (empty stem sorts before names)
-            files.append(("Technical Manuals", f"manual/{fname}", title, desc, url))
-
-    # Collect public product requirements. Restricted cockpit access never
-    # makes its engineering contract private.
-    prd_dir = os.path.join(SITE_ROOT, "prd")
-    if os.path.isdir(prd_dir):
-        for fname in os.listdir(prd_dir):
-            if not fname.endswith(".html") or fname in EXCLUDE_FILES:
-                continue
-            filepath = os.path.join(prd_dir, fname)
-            if not os.path.isfile(filepath):
-                continue
-            title, desc = extract_meta(filepath)
-            url = f"{SITE_URL}/prd/" if fname == "index.html" else f"{SITE_URL}/prd/{fname}"
-            files.append(("Product Requirements", f"prd/{fname}", title, desc, url))
+    for page in publication_pages(root, inventory):
+        title, desc = extract_meta(Path(root) / page["path"])
+        files.append((categorize(page["path"]), page["path"], markdown_label(title),
+                      desc, page["loc"]))
 
     # Group by category
     categories = {}
@@ -191,12 +140,13 @@ def main():
         "> and operator-grade simulations by Bagus Dwi Permana. 12+ years experience in hyperscale",
         "> DC operations, electrical infrastructure, and industrial automation.",
         "> CDFOM + Ahli K3 Listrik certified.",
+        "Links describe indexable pages, not access grants. Access-controlled bodies are omitted from llms-full.txt.",
         "",
     ]
 
     CATEGORY_ORDER = [
         "About", "Calculators", "Product Requirements", "Technical Manuals", "Technical Articles", "Comparisons",
-        "Tools", "Simulations", "Insight Series", "Reports",
+        "Tools", "Simulations", "Insight Series", "Reports", "Network Guides", "Bahasa Indonesia",
         "Pillar Pages", "Hubs", "Legal", "Other",
     ]
 
@@ -205,7 +155,7 @@ def main():
         "Calculators": "Decision support tools — free, no signup required",
         "Technical Manuals": "Per-calculator methodology — inputs, formulas, constants, worked examples, references",
         "Product Requirements": "Deterministic cockpit scope, telemetry provenance, functional requirements, and acceptance evidence",
-        "Technical Articles": "27 deep-dive engineering articles (Operations Journal series)",
+        "Technical Articles": "Deep-dive engineering articles (Operations Journal series)",
         "Comparisons": "Side-by-side infrastructure technology analysis",
         "Tools": "Interactive monitors, checklists, and labs",
         "Simulations": "Operator-grade BMS + infrastructure dashboards",
@@ -239,13 +189,8 @@ def main():
 
         lines.append("")
 
-    content = "\n".join(lines)
-
-    with open(OUTPUT, "w", encoding="utf-8") as fh:
-        fh.write(content)
-
-    print(f"Written: {OUTPUT} ({len(lines)} lines, {len(files)} pages)")
+    return "\n".join(lines)
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(run_builder(build_content, "llms.txt"))

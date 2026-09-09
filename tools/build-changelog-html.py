@@ -461,7 +461,7 @@ def build_html(entries):
   <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
   <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 
-  <link rel="stylesheet" href="styles.min.css?v=20260509-share-fix">
+  <link rel="stylesheet" href="styles.min.css?v=20260908-editorial">
   <script src="js/rz-version.js?v=2026-05-09" defer></script>
 
   <style>

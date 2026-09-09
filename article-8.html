@@ -83,13 +83,13 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
     <!-- v1.43.12 editorial register (RZ Dark System v1) — dark-only, scoped. -->
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
-    <link rel="stylesheet" href="css/rz-article-dark.css?v=1.99-light">
+    <link rel="stylesheet" href="css/rz-article-dark.css?v=20260908-editorial">
     <script src="js/rz-explain-db.js?v=2026-07-24-w" defer></script>
 <script src="js/rz-explain.js?v=2026-07-16" defer></script>
-<script src="js/rz-article-editorial.js?v=1.51.8" defer></script>
+<script src="js/rz-article-editorial.js?v=20260908-editorial" defer></script>
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
-    <link rel="stylesheet" href="styles.min.css?v=2026-09-06-slop">
+    <link rel="stylesheet" href="styles.min.css?v=20260908-editorial">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preload" as="image" href="assets/article-8-cover.jpg">
 
@@ -237,7 +237,7 @@
             background: rgba(100, 116, 139, 0.2);
             color: #C3B0FA;
             padding: 0.5rem 1rem;
-            border-radius: 20px;
+            border-radius: 4px;
             font-size: 0.8rem;
             font-weight: 600;
             margin-bottom: 1.5rem;
@@ -307,8 +307,8 @@
         .toc-item {
             background: #fff;
             padding: 0.75rem 1rem;
-            border-radius: 10px;
-            border-left: 4px solid var(--accent-purple);
+            border-radius: 4px;
+            border-left: 2px solid var(--accent-purple);
             transition: all 0.2s ease;
             text-decoration: none;
             color: var(--text-primary);
@@ -335,7 +335,7 @@
         .toc-item.toc-calculator {
             background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
             border-left-color: #64748b;
-            border-left-width: 5px;
+            border-left-width: 2px;
         }
         .toc-item.toc-calculator .toc-item-number { display: flex; align-items: center; gap: 6px; }
         .toc-item.toc-calculator .toc-calc-badge {
@@ -473,9 +473,9 @@
         /* Key Insight Boxes */
         .key-insight {
             background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
-            border-left: 4px solid var(--accent-purple);
+            border-left: 2px solid var(--accent-purple);
             padding: 1.5rem;
-            border-radius: 0 12px 12px 0;
+            border-radius: 0 4px 4px 0;
             margin: 1.5rem 0;
         }
 
@@ -498,9 +498,9 @@
         /* Info Boxes */
         .info-box {
             background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            border-left: 4px solid var(--accent-cyan);
+            border-left: 2px solid var(--accent-cyan);
             padding: 1.5rem;
-            border-radius: 0 12px 12px 0;
+            border-radius: 0 4px 4px 0;
             margin: 1.5rem 0;
         }
 
@@ -599,7 +599,7 @@
 
         .comparison-card {
             background: #fff;
-            border-radius: 16px;
+            border-radius: 4px;
             padding: 1.5rem;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
             border: 1px solid #e2e8f0;
@@ -715,7 +715,7 @@
 
         .callout-card {
             background: rgba(30, 58, 95, 0.3);
-            border-radius: 10px;
+            border-radius: 4px;
             padding: 1rem;
             text-align: center;
             border: 1px solid rgba(100, 116, 139, 0.15);
@@ -907,7 +907,7 @@
         .culture-badge {
             display: inline-flex;
             padding: 0.5rem 1.25rem;
-            border-radius: 20px;
+            border-radius: 4px;
             font-weight: 700;
             font-size: 0.9rem;
             margin-top: 0.5rem;
@@ -939,7 +939,7 @@
         .conclusion-box {
             background: linear-gradient(135deg, #faf5ff 0%, #ede9fe 100%);
             border: 2px solid #c4b5fd;
-            border-radius: 16px;
+            border-radius: 4px;
             padding: 2rem;
             margin: 2rem 0;
         }
@@ -965,6 +965,8 @@
         }
 
         ol.ref-list {
+            display: grid;
+            grid-template-columns: minmax(0,1fr);
             list-style: none;
             padding: 0;
             margin: 0;
@@ -973,8 +975,11 @@
 
         ol.ref-list li {
             counter-increment: ref-counter;
-            display: flex;
-            gap: 0.75rem;
+            display: block;
+            position: relative;
+            min-width: 0;
+            overflow-wrap: anywhere;
+            padding-inline-start: 2.5rem;
             font-size: 0.85rem;
             margin-bottom: 0.75rem;
             line-height: 1.6;
@@ -982,10 +987,11 @@
         }
 
         ol.ref-list li::before {
+            position: absolute;
+            inset-inline-start: 0;
             content: "[" counter(ref-counter) "]";
             color: var(--accent-purple);
             font-weight: 700;
-            flex-shrink: 0;
             min-width: 28px;
         }
 
@@ -1021,14 +1027,14 @@
         .shi-evidence-block {
             margin: 2rem auto; max-width: 900px; padding: 2rem;
             background: linear-gradient(135deg, rgba(100, 116, 139,0.08) 0%, rgba(167,139,250,0.04) 100%);
-            border: 1px solid rgba(100, 116, 139,0.25); border-radius: 16px;
+            border: 1px solid rgba(100, 116, 139,0.25); border-radius: 4px;
         }
         .shi-evidence-grid {
             display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 1rem;
         }
         .shi-evidence-card {
             text-align: center; padding: 1rem 0.5rem;
-            background: rgba(100, 116, 139,0.06); border-radius: 10px;
+            background: rgba(100, 116, 139,0.06); border-radius: 4px;
         }
         .shi-evidence-value {
             font-size: 1.5rem; font-weight: 800; color: #C3B0FA;
@@ -1043,7 +1049,7 @@
         .shi-cta-block {
             margin: 2rem 0; padding: 2rem; text-align: center;
             background: linear-gradient(135deg, rgba(100, 116, 139,0.12), rgba(167,139,250,0.06));
-            border: 1px solid rgba(100, 116, 139,0.3); border-radius: 16px;
+            border: 1px solid rgba(100, 116, 139,0.3); border-radius: 4px;
         }
         .shi-cta-headline {
             font-size: 1.4rem; font-weight: 800; color: #e2e8f0; margin-bottom: 0.5rem;
@@ -1079,7 +1085,7 @@
         .shi-pro-panel {
             margin-bottom: 1.5rem; padding: 1.5rem;
             background: rgba(100, 116, 139,0.06); border: 1px solid rgba(100, 116, 139,0.2);
-            border-radius: 14px; position: relative; overflow: hidden;
+            border-radius: 4px; position: relative; overflow: hidden;
         }
         .shi-pro-panel.gated .shi-panel-content { filter: blur(6px); pointer-events: none; user-select: none; }
         .shi-gate-overlay {
@@ -1095,7 +1101,7 @@
         }
         .shi-kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
         .shi-kpi-card {
-            padding: 0.75rem; background: rgba(100, 116, 139,0.08); border-radius: 10px;
+            padding: 0.75rem; background: rgba(100, 116, 139,0.08); border-radius: 4px;
             text-align: center;
         }
         .shi-kpi-value {
@@ -1108,7 +1114,7 @@
         .shi-narrative-box {
             margin-top: 1rem; padding: 1rem; font-size: 0.85rem; line-height: 1.6;
             color: #cbd5e1; background: rgba(100, 116, 139,0.05);
-            border-left: 3px solid #64748b; border-radius: 0 8px 8px 0;
+            border-left: 2px solid #64748b; border-radius: 0 4px 4px 0;
         }
         .shi-sensitivity-bar {
             display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;
@@ -1460,7 +1466,7 @@
     <div class="series-nav" style="margin-top: 1rem;">
         <div class="series-badge">
             <span class="series-badge-icon">08</span>
-            Engineering Journal &mdash; Article 8 of 18
+            Engineering Journal &mdash; Article 8 of 28
         </div>
         <span class="series-title"></span>
         <div class="series-links">
@@ -1552,7 +1558,7 @@
                     <p>The absence of incidents is not evidence of safety. It is evidence that boundaries have not yet been crossed. In complex socio-technical systems, extended incident-free periods without corresponding leading indicator health create a false sense of security that actively increases systemic risk through normalized drift, suppressed reporting, and eroded safety margins.</p>
                 </div>
 
-                <p>For operators of critical facilities&mdash;from data centers managing <span class="tip" data-tip="Uninterruptible Power Supply: Battery-backed power system that provides emergency power when utility power fails">UPS</span> and <span class="tip" data-tip="Power Distribution Unit: Device that distributes electric power to rack-mounted equipment in data centers">PDU</span> systems to those overseeing <span class="tip" data-tip="Building Management System: Centralized system controlling and monitoring mechanical, electrical, fire, and security systems">BMS</span> and <span class="tip" data-tip="Heating, Ventilation, and Air Conditioning: Climate control systems maintaining proper temperature and humidity in data centers">HVAC</span> infrastructure&mdash;the implications are profound. A green dashboard does not mean the system is safe. It means the system has not yet failed. These are fundamentally different propositions, and confusing them is the first step toward catastrophe.</p>
+                <p>For operators of critical facilities, including data centers managing <span class="tip" data-tip="Uninterruptible Power Supply: Battery-backed power system that provides emergency power when utility power fails">UPS</span> and <span class="tip" data-tip="Power Distribution Unit: Device that distributes electric power to rack-mounted equipment in data centers">PDU</span> systems to those overseeing <span class="tip" data-tip="Building Management System: Centralized system controlling and monitoring mechanical, electrical, fire, and security systems">BMS</span> and <span class="tip" data-tip="Heating, Ventilation, and Air Conditioning: Climate control systems maintaining proper temperature and humidity in data centers">HVAC</span> infrastructure, a green dashboard needs context. Read it alongside evidence about equipment condition, procedural deviations, and unresolved hazards.</p>
 
                 <p>This analysis draws from 16 foundational references spanning safety science, reliability engineering, high-reliability organization (<span class="tip" data-tip="High Reliability Organization: Organizations that operate in hazardous conditions with fewer than expected accidents through mindful practices">HRO</span>) theory, and international standards from <span class="tip" data-tip="International Atomic Energy Agency: The world's central intergovernmental forum for scientific and technical cooperation in the nuclear field">IAEA</span> and <span class="tip" data-tip="International Civil Aviation Organization: UN specialized agency managing the administration and governance of international civil aviation">ICAO</span>. The paper concludes with actionable frameworks for transitioning from lagging-indicator complacency to leading-indicator vigilance.</p>
 
@@ -2423,7 +2429,7 @@
 
                     <p>For data center operators managing <span class="tip" data-tip="Uninterruptible Power Supply: Battery-backed power system that provides emergency power when utility power fails">UPS</span>, <span class="tip" data-tip="Power Distribution Unit: Device that distributes electric power to rack-mounted equipment in data centers">PDU</span>, <span class="tip" data-tip="Heating, Ventilation, and Air Conditioning: Climate control systems maintaining proper temperature and humidity in data centers">HVAC</span>, <span class="tip" data-tip="Building Management System: Centralized system controlling and monitoring mechanical, electrical, fire, and security systems">BMS</span>, and associated infrastructure, the practical implication is clear: <strong>celebrate incident-free periods cautiously, and complement them with rigorous leading indicator programs that measure the conditions under which the next incident becomes possible.</strong></p>
 
-                    <p>Safety lives in signals that precede failure, not in the absence of visible harm. Organizations that learn to see weak signals trade false confidence for true resilience. Those that do not will continue to be surprised by failures that, in retrospect, were always visible&mdash;just not measured.</p>
+                    <p>Review weak signals alongside incident totals. Give each unresolved hazard an owner and a follow-up date, and check whether corrective work restores the intended safety margin.</p>
                 </div>
 
                 
@@ -2474,7 +2480,7 @@
                     <div class="author-bio-content">
                         <h4>Bagus Dwi Permana</h4>
                         <p class="author-bio-title">Engineering Operations Manager | Ahli K3 Listrik</p>
-                        <p>12+ years professional experience in critical infrastructure and operations. CDFOM certified. Transforming operations through systematic excellence and safety-first engineering.</p>
+                        <p>12+ years professional experience in critical infrastructure and operations. CDFOM certified. Focuses on facility reliability, maintenance, and electrical safety.</p>
                         <div class="author-bio-links">
                             <a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>

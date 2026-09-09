@@ -11,6 +11,93 @@ release sections rather than semver.
 
 ---
 
+## v2.16.0 — 2026-09-09
+
+### Whole-site editorial and anti-vibecode sweep, one crawler inventory, and a robots.txt that actually restricts
+
+The owner asked for a whole-site anti-vibecode and article-readability pass covering containers,
+whitespace, sitemap and robots. This lands that work: 215 pages, 7 stylesheets, the three discovery
+builders and the design gate itself.
+
+#### The design gate now gates
+
+`tools/audit-vibecode.mjs` carried three rules as MONITORS that failed only on `index.html` and two
+stylesheets, because landing them strict site-wide would have turned main red on 220 files. The tail
+is now swept, so they are **gating everywhere**. Measured, with the new gate run against the
+pre-sweep tree:
+
+| rule | findings before | after |
+|---|---:|---:|
+| large-radius | 166 files | 0 |
+| colored-left-stripe | 85 files | 0 |
+| shadow-sole-affordance | 6 files | 0 |
+
+That is 257 gating findings across 167 files reduced to none, by editing the pages: decorative radii
+moved to the 4 px instrument scale and coloured rails from 3–4 px to the 2 px semantic rail. The
+exemptions the rules gained are narrow and named (functional geometry, safety rails, printed paper,
+circles, the aurora), each with a fixture. The gate also stops printing "safe to push" from a static
+scan, gained a `--json` inventory, and its block parser no longer breaks on braces inside strings or
+skips selectors over 400 characters.
+
+#### One publication inventory behind all three discovery builders
+
+`tools/build-sitemap.py`, `build-llms-txt.py` and `build-llms-full.py` each kept their own copy of
+the public-directory list, and none of them recursed. `tools/crawler_inventory.py` is now the single
+publication policy for all three. The sitemap grows **155 to 180 URLs** — the 25 additions are the
+entire `/network/` protocol library, which no builder had ever seen. Nothing was removed, no noindex
+page entered, and the private pages stay out.
+
+#### robots.txt was permitting what it meant to forbid
+
+A named user-agent group does not inherit the wildcard group's rules. `ClaudeBot`, `anthropic-ai`,
+`PerplexityBot`, `CCBot`, `Applebot`, `Bingbot` and six more each had `Allow: /` with **no Disallow
+lines at all**, so `/tools/`, `/prompts/`, `/Data/`, `/standarization/`, `/Apps/` and `/dcmoc/` were
+open to them; `GPTBot` had four of the eleven. Every agent now shares one group carrying the full
+list, and Yandex repeats it in full beside its crawl delay. `llms.txt` is no longer declared as a
+`Sitemap:`, which is not a format that directive accepts.
+
+#### Fixed while integrating: the export withheld 40 public pages
+
+The new inventory treated any `pro` / `gated` / `locked` class as page-level access control. Forty
+public pages carry one for a calculator's paid tier, so the first build exported the **entire article
+corpus as metadata-only** while `sitemap.xml` and `llms.txt` published the same URLs as public in the
+same run. Where the marker sits now decides what it means: on `<html>`, `<body>` or `<main>` it
+withholds the page; anywhere nested it strips that region from the exported body and leaves a stated
+notice. Four pages are genuinely access-controlled and stay metadata-only. `llms-full.txt` settles at
+90,107 lines, down from 104,399 — the difference is the four gated cockpit bodies, which a public
+export should never have carried, plus 150 stripped tier-gated regions.
+
+#### Also in this ship
+
+- 35 article-family files received an editorial pass on openings, headings and endings, and meta and
+  Open Graph descriptions were rewritten from atmosphere to what the page actually does.
+- A reading-text floor of 16 px with sufficient leading across every `.article-body`, outside
+  instrument, chart, caption and navigation contexts. Observed RED at 14 px, GREEN at 16 px.
+- Article 1 no longer presents UPS bypass as the default reliable operating state.
+- Article 9's related-rail thumbnail pointed at two URLs that do not exist; it now uses the asset it
+  has. Articles 2–8 had unrelated historic titles in the search index. Article 19 linked to article 5
+  as cybersecurity, which it is not.
+- Seven serious contrast failures in articles 13 and 26 were corrected; the rerun passed all eight
+  representative pages in both themes with zero critical or serious findings.
+- Shared asset references consolidated on one `20260908-editorial` token, including the
+  `css/rz-bms-shell.css` reference on `datahallAI.html`, which was the last page still on the
+  retired token after that stylesheet changed.
+- New tooling, each with its own fixtures: a site-render audit harness, an article-series
+  synchroniser, and regression suites for the design gate, editorial reading, prose styles and the
+  crawler. 36 crawler tests and 8 Node suites pass.
+- `output/` and `tools/.site-render-audit/` are gitignored — 401 MB of per-run evidence that is not
+  source.
+
+#### Honest boundary
+
+A clean static design scan is not a visual approval, and this ship does not claim one. The route
+audit remains diagnostic: its own report says filtered pages, gate-blocked content and environment
+failures cannot be merged into a pass. Article prose received an editorial pass, not full fact
+verification. The crawler workstream owns discovery only — it does not certify deployed HTTP headers,
+auth enforcement or search-engine indexing.
+
+---
+
 ## v2.15.0 — 2026-09-09
 
 ### One modal system: two declared types, one proportion, one entrance (Track A, owner comment 3)

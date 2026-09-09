@@ -78,20 +78,30 @@
       setCounters(counters[i], instant);
     }
 
-    activate(0, true);
-
-    if ('IntersectionObserver' in window) {
-      var io = new IntersectionObserver(function (entries) {
-        entries.forEach(function (en) {
-          if (!en.isIntersecting) return;
-          var i = [].indexOf.call(steps, en.target);
-          if (i >= 0) activate(i, false);
+    var compactMedia = window.matchMedia && window.matchMedia('(max-width:767px)');
+    var observer = null;
+    function configurePresentation() {
+      if (observer) { observer.disconnect(); observer = null; }
+      var compact = compactMedia && compactMedia.matches;
+      if (compact || !('IntersectionObserver' in window)) {
+        root.setAttribute('data-rz-scrolly-static', '');
+        activate(steps.length - 1, true);
+        return;
+      }
+      root.removeAttribute('data-rz-scrolly-static');
+      activate(0, true);
+      observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          var stepIndex = [].indexOf.call(steps, entry.target);
+          if (stepIndex >= 0) activate(stepIndex, false);
         });
       }, { rootMargin: '-42% 0px -42% 0px', threshold: 0 });
-      [].forEach.call(steps, function (s) { io.observe(s); });
-    } else {
-      activate(steps.length - 1, true); /* no IO: show final state */
+      [].forEach.call(steps, function (step) { observer.observe(step); });
     }
+    configurePresentation();
+    if (compactMedia && compactMedia.addEventListener) compactMedia.addEventListener('change', configurePresentation);
+    else if (compactMedia && compactMedia.addListener) compactMedia.addListener(configurePresentation);
   }
 
   function init() {

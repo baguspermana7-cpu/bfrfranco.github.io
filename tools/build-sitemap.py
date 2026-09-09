@@ -1,47 +1,22 @@
 #!/usr/bin/env python3
-"""
-build-sitemap.py — regenerate sitemap.xml from filesystem walk.
-Idempotent. Run with --apply to write sitemap.xml, --dry-run to print only.
-Usage:
-  python3 tools/build-sitemap.py --apply
-  python3 tools/build-sitemap.py --dry-run
-"""
+"""Regenerate the sitemap from reviewed, tracked publication paths."""
 
+import argparse
 import os
+from pathlib import Path
 import re
 import subprocess
-import argparse
-from datetime import datetime, timezone
+import sys
+from xml.sax.saxutils import escape
+
+from crawler_inventory import (
+    SITE_URL, EXCLUDE_DIRS, EXCLUDE_FILES, collect_inventory,
+    local_url_path, read_metadata,
+)
 
 SITE_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SITE_URL = "https://resistancezero.com"
 OUTPUT_FILE = os.path.join(SITE_ROOT, "sitemap.xml")
 
-# Directories to exclude (relative to SITE_ROOT)
-EXCLUDE_DIRS = {
-    "node_modules", ".git", "archive", "dcmoc", "Dunia-Emosi", "Apps",
-    "Automation", "Article", ".qa-screens", "embed", "prompts", "Data",
-    "standarization", "tools", "js", "assets", "css", "images", "fonts",
-    "games", "documentation", "scripts", "shared", "pokemondb_hd_alt2",
-}
-
-# Subdirectories to INCLUDE (relative to SITE_ROOT) with their URL prefix
-INCLUDE_SUBDIRS = {
-    "id": "id",
-    "manual": "manual",
-    "prd": "prd",
-}
-
-# Files to exclude
-EXCLUDE_FILES = {
-    "article-9-paper.html",  # print variant with noindex
-    "rz-ops-p7x3k9m.html",   # admin console
-    "google1b98e0817bd5aa88.html",  # google verification
-    "changelog.html",        # noindex — changelog is internal; excluded per Item 26 (v1.9.3)
-    "404.html",              # 404 error page should never be in sitemap
-}
-
-# Priority and changefreq by path pattern
 PRIORITY_MAP = [
     ({"index.html", "datacenter-solutions.html", "datahallAI.html",
       "dc-conventional.html", "dc-market-tracker.html"}, 1.0, "weekly"),
@@ -76,53 +51,24 @@ def get_priority_changefreq(filename):
 
 
 def get_lastmod(filepath):
-    """Get lastmod from git log, fall back to file mtime."""
-    try:
-        result = subprocess.run(
-            ["git", "-C", SITE_ROOT, "log", "-1", "--format=%cI", "--", filepath],
-            capture_output=True, text=True, timeout=10
-        )
-        ts = result.stdout.strip()
-        if ts:
-            # Normalize to date only for cleaner output
-            return ts[:10]
-    except Exception:
-        pass
-    # Fallback to file mtime
-    mtime = os.path.getmtime(filepath)
-    return datetime.fromtimestamp(mtime, tz=timezone.utc).strftime("%Y-%m-%d")
-
-
-def get_canonical(filepath):
-    """Extract canonical URL from file, or construct from path."""
-    try:
-        with open(filepath, encoding="utf-8", errors="ignore") as fh:
-            head = fh.read(3000)
-        m = re.search(r'<link[^>]+rel=["\']canonical["\'][^>]+href=["\']([^"\']+)["\']', head, re.IGNORECASE)
-        if not m:
-            m = re.search(r'<link[^>]+href=["\']([^"\']+)["\'][^>]+rel=["\']canonical["\']', head, re.IGNORECASE)
-        if m:
-            url = m.group(1).strip()
-            if url.startswith("https://resistancezero.com"):
-                return url
-    except Exception:
-        pass
+    """Omit dates: Git commits and checkout mtimes do not prove significant updates."""
     return None
 
 
-def is_noindex(filepath):
-    """Check if page has noindex robots meta."""
+def get_canonical(filepath):
+    metadata = read_metadata(filepath)
+    if len(metadata.canonicals) != 1:
+        return None
+    canonical = metadata.canonicals[0]
     try:
-        with open(filepath, encoding="utf-8", errors="ignore") as fh:
-            head = fh.read(3000)
-        m = re.search(r'<meta[^>]+name=["\']robots["\'][^>]+content=["\']([^"\']+)["\']', head, re.IGNORECASE)
-        if not m:
-            m = re.search(r'<meta[^>]+content=["\']([^"\']+)["\'][^>]+name=["\']robots["\']', head, re.IGNORECASE)
-        if m and "noindex" in m.group(1).lower():
-            return True
-    except Exception:
-        pass
-    return False
+        local_url_path(canonical)
+    except ValueError:
+        return None
+    return canonical
+
+
+def is_noindex(filepath):
+    return read_metadata(filepath).noindex
 
 
 def get_priority_changefreq_subdir(subdir, fname):
@@ -142,107 +88,62 @@ def get_priority_changefreq_subdir(subdir, fname):
     return 0.7, "monthly"
 
 
-def walk_html_files():
-    """Walk SITE_ROOT for HTML files, applying exclusion rules."""
-    results = []
-
-    # Walk root-level files
-    for fname in os.listdir(SITE_ROOT):
-        if not fname.endswith(".html"):
+def walk_html_files(inventory=None):
+    inventory = inventory if inventory is not None else collect_inventory(SITE_ROOT)
+    if inventory["errors"]:
+        raise ValueError("\n".join(inventory["errors"]))
+    entries = []
+    for page in inventory["pages"]:
+        if page["status"] != "included":
             continue
-        if fname in EXCLUDE_FILES:
-            continue
-        filepath = os.path.join(SITE_ROOT, fname)
-        if not os.path.isfile(filepath):
-            continue
-
-        if is_noindex(filepath):
-            print(f"  [skip noindex] {fname}")
-            continue
-
-        canonical = get_canonical(filepath)
-        if canonical:
-            url = canonical
-        else:
-            url = f"{SITE_URL}/{fname}"
-
-        lastmod = get_lastmod(filepath)
-        priority, changefreq = get_priority_changefreq(fname)
-        results.append((url, lastmod, changefreq, priority, fname))
-
-    # Walk included subdirectories
-    for subdir, url_prefix in INCLUDE_SUBDIRS.items():
-        subdir_path = os.path.join(SITE_ROOT, subdir)
-        if not os.path.isdir(subdir_path):
-            continue
-        for fname in sorted(os.listdir(subdir_path)):
-            if not fname.endswith(".html"):
-                continue
-            filepath = os.path.join(subdir_path, fname)
-            if not os.path.isfile(filepath):
-                continue
-            if is_noindex(filepath):
-                print(f"  [skip noindex] {subdir}/{fname}")
-                continue
-
-            canonical = get_canonical(filepath)
-            if canonical:
-                url = canonical
-            else:
-                url = f"{SITE_URL}/{url_prefix}/{fname}"
-
-            lastmod = get_lastmod(filepath)
-            priority, changefreq = get_priority_changefreq_subdir(subdir, fname)
-            results.append((url, lastmod, changefreq, priority, f"{subdir}/{fname}"))
-
-    results.sort(key=lambda x: (-x[3], x[4]))  # sort by priority desc, then name
-    return results
+        parts = Path(page["path"]).parts
+        priority, frequency = (get_priority_changefreq(parts[0]) if len(parts) == 1
+                               else get_priority_changefreq_subdir(parts[0], parts[-1]))
+        entries.append((page["loc"], get_lastmod(page["path"]), frequency, priority, page["path"]))
+    return sorted(entries, key=lambda entry: (-entry[3], entry[4]))
 
 
 def build_sitemap(entries):
-    """Build sitemap XML string."""
-    lines = [
-        '<?xml version="1.0" encoding="UTF-8"?>',
-        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"',
-        '        xmlns:xhtml="http://www.w3.org/1999/xhtml"',
-        '        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">',
-    ]
+    lines = ['<?xml version="1.0" encoding="UTF-8"?>',
+             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for url, lastmod, changefreq, priority, _ in entries:
-        lines.append("  <url>")
-        lines.append(f"    <loc>{url}</loc>")
-        lines.append(f"    <lastmod>{lastmod}</lastmod>")
-        lines.append(f"    <changefreq>{changefreq}</changefreq>")
-        lines.append(f"    <priority>{priority:.2f}</priority>")
-        lines.append("  </url>")
-    lines.append("</urlset>")
-    return "\n".join(lines) + "\n"
+        lines.extend(["  <url>", f"    <loc>{escape(url)}</loc>"])
+        if lastmod is not None:
+            lines.append(f"    <lastmod>{escape(lastmod)}</lastmod>")
+        lines.extend([f"    <changefreq>{changefreq}</changefreq>",
+                      f"    <priority>{priority:.2f}</priority>", "  </url>"])
+    return "\n".join(lines + ["</urlset>"]) + "\n"
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Regenerate sitemap.xml")
-    parser.add_argument("--apply", action="store_true", help="Write sitemap.xml")
-    parser.add_argument("--dry-run", action="store_true", help="Print URLs only")
+    parser = argparse.ArgumentParser(description=__doc__)
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--apply", action="store_true", help="Write sitemap.xml")
+    mode.add_argument("--dry-run", action="store_true", help="Print URLs only")
+    mode.add_argument("--check", action="store_true", help="Fail if sitemap.xml is stale")
     args = parser.parse_args()
-
-    print(f"Walking {SITE_ROOT} for HTML files...")
-    entries = walk_html_files()
-    print(f"Found {len(entries)} indexable URLs")
-
-    if args.dry_run:
-        for url, lastmod, changefreq, priority, fname in entries:
-            print(f"  [{priority:.2f}] {url} ({lastmod})")
-        return
-
-    xml = build_sitemap(entries)
-
-    if args.apply:
-        with open(OUTPUT_FILE, "w", encoding="utf-8") as fh:
-            fh.write(xml)
-        print(f"Written: {OUTPUT_FILE} ({len(entries)} URLs)")
-    else:
-        print(xml)
-        print(f"\n({len(entries)} URLs — use --apply to write)")
+    try:
+        inventory = collect_inventory(SITE_ROOT)
+        entries = walk_html_files(inventory)
+        xml = build_sitemap(entries)
+        if args.apply:
+            Path(OUTPUT_FILE).write_text(xml, encoding="utf-8")
+            print(f"Written sitemap.xml: {len(entries)} URLs; lastmod omitted without verified dates")
+        elif args.check:
+            if Path(OUTPUT_FILE).read_text(encoding="utf-8") != xml:
+                raise ValueError("sitemap.xml is stale; run tools/build-sitemap.py --apply")
+            print(f"Sitemap current: {len(entries)} URLs")
+        elif args.dry_run:
+            print("\n".join(entry[0] for entry in entries))
+        else:
+            print(xml, end="")
+        for warning in inventory["warnings"]:
+            print(f"WARNING: {warning}", file=sys.stderr)
+    except (OSError, ValueError, subprocess.SubprocessError) as error:
+        print(f"Crawler build failed: {error}", file=sys.stderr)
+        return 1
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

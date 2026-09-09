@@ -10,9 +10,9 @@ import { join, extname } from "node:path";
 
 const ROOT = process.cwd();
 const STRICT = process.argv.includes("--strict");
-// Scope = the PUBLISHED site (root pages, articles, calculators, css). Excludes sub-apps with their
-// own design systems (Apps/*, dca-app, finance-terminal), scraped/generated artifacts (Automation/*,
-// tools/dc-corpus/raw), and non-shipped dirs.
+const JSON_OUTPUT = process.argv.includes("--json");
+const OWNER_HOLDS = process.argv.filter(argument => argument.startsWith('--hold='))
+  .flatMap(argument => argument.slice('--hold='.length).split(',')).filter(Boolean);
 const SKIP = ["node_modules", ".git", "dcmoc", ".next", "games", "Dunia-Emosi", "obsidian-knowledge-vault",
   ".claude", "review", "Documents", "cf-worker", "result", "Article", "02.02.26",
   "Apps", "Automation", "dc-corpus", "my-video", "TestEA", "worktrees", "backups", ".qa-screens",
@@ -20,7 +20,7 @@ const SKIP = ["node_modules", ".git", "dcmoc", ".next", "games", "Dunia-Emosi", 
   // tokens (`#8b5cf6`, old tier colors) as before/after illustration of the very purges it documents.
   // It is not a live-design surface; its real styling is governed by CHANGELOG.md + the generator, so
   // the ban is enforced there, not on the rendered archive. Excluded to avoid documentary false-positives.
-  "changelog.html"];
+  "changelog.html", "Audit result"];
 
 function walk(dir, out = []) {
   for (const name of readdirSync(dir)) {
@@ -54,8 +54,14 @@ function cssBlocks(t) {
      `@media (max-width: 600px)` was reported as living inside it. A gate whose exemption
      leaks forward is worse than no exemption: it goes quiet exactly where a page has the most
      rules. Depth is tracked properly here and `at` names only true ancestors. */
-  const out = []; const stack = []; let selStart = 0;
+  const out = []; const stack = []; let selStart = 0; let quote = '';
   for (let i = 0; i < t.length; i++) {
+    if (quote) {
+      if (t[i] === '\\') i++;
+      else if (t[i] === quote) quote = '';
+      continue;
+    }
+    if (t[i] === '"' || t[i] === "'") { quote = t[i]; continue; }
     const c = t.charCodeAt(i);
     if (c === 123 /* { */) {
       if (stack.length) stack[stack.length - 1].hadChild = true;
@@ -63,7 +69,7 @@ function cssBlocks(t) {
       selStart = i + 1;
     } else if (c === 125 /* } */) {
       const frame = stack.pop();
-      if (frame && !frame.hadChild && frame.sel && frame.sel.length < 400) {
+      if (frame && !frame.hadChild && frame.sel) {
         out.push({
           sel: frame.sel,
           body: t.slice(frame.start, i),
@@ -89,7 +95,72 @@ const DECOR_SEL = /(card|panel|tile|bento|hero|badge|chip|widget|item|box|callou
 const FUNC_SEL = /(nav|navbar|modal|overlay|gate|search|palette|ticker|dropdown|tooltip|sticky|header|drawer|sheet|toast|banner|menu|btn|button|input|select|field|form|dialog|popover|inspector|hmi|tab|scroll|cursor|marquee|share)/i;
 
 function decorBlocks(t) {
-  return cssBlocks(t).filter((b) => /^[.#]/.test(b.sel) && DECOR_SEL.test(b.sel) && !FUNC_SEL.test(b.sel));
+  return cssBlocks(t).filter((b) => /^(?:[.#[:]|html\b|body\b)/.test(b.sel) && DECOR_SEL.test(b.sel) && !FUNC_SEL.test(b.sel));
+}
+
+const PIXELS_PER_REM = 16;
+const DECORATIVE_RULES = new Set(['colored-left-stripe', 'shadow-sole-affordance', 'large-radius']);
+const GEOMETRY_SEL = /(?:mimic|flow-box|flow-block|control-block|logic-seq-block|trace-block|pipeline-stage|fullmap-block|target-block|sankey|iso-stage|mc-svg|mode-svg)\b/i;
+const SAFETY_RAIL_SEL = /\.(?:rz-fire-tile\b|fire-iso-consequence\[data-state=|status-box\.(?:active|warning|error)\b|alarm-strip\.state-(?:normal|warn|alarm)\b|alarm-item\b|(?:cap-card|sb-box)\.(?:ok|warn|bad)\b|basis-card\.(?:current|study)\b)/;
+const PAPER_DOCUMENTS = new Set(['article-9-paper.html']);
+
+function lengths(value) {
+  return [...value.matchAll(/(\d*\.?\d+)(px|rem)\b/gi)]
+    .map(match => Number(match[1]) * (match[2].toLowerCase() === 'rem' ? PIXELS_PER_REM : 1));
+}
+
+function declarations(body, property) {
+  return [...body.matchAll(new RegExp(`(?:^|;)\\s*(?:${property})\\s*:\\s*([^;{}]+)`, 'gi'))]
+    .map(match => match[1].trim());
+}
+
+function resolvedLengths(value, tokens, visited = new Set()) {
+  const references = [...value.matchAll(/var\(\s*(--[\w-]+)/g)]
+    .filter(match => !visited.has(match[1]));
+  return lengths(value).concat(references.flatMap(match =>
+    resolvedLengths(tokens.get(match[1]) || '', tokens, new Set([...visited, match[1]]))));
+}
+
+function decorativeFindings(text, file, rule) {
+  const css = stylesheetText(text, file);
+  if (!css || PAPER_DOCUMENTS.has(file.split('/').at(-1))) return [];
+  const allBlocks = cssBlocks(css);
+  const hasRootGate = allBlocks.some(block => block.sel === '.root-gate' &&
+    declarations(block.body, 'position').includes('fixed') && declarations(block.body, 'inset').includes('0'));
+  const tokens = new Map();
+  for (const match of css.matchAll(/(--[\w-]+)\s*:\s*([^;{}]+)/g)) {
+    tokens.set(match[1], (tokens.get(match[1]) || '') + ' ' + match[2]);
+  }
+  return decorBlocks(css).filter(block => {
+    if (hasRootGate && /^\.root-card(?:$|[\s.:\[])/.test(block.sel)) return false;
+    if (/print|keyframes/i.test(block.at)) return false;
+    if (GEOMETRY_SEL.test(block.sel)) return false;
+    if (/aurora|image|img|photo|avatar|logo|thumb|portrait|figure/i.test(block.sel)) return false;
+    const ancestors = allBlocks.filter(candidate => candidate.at === block.at &&
+      candidate.sel.split(',').some(selector => block.sel === selector.trim() ||
+        block.sel.endsWith(' ' + selector.trim()) ||
+        block.sel.replace(/\.(?:warning|critical|error|warn|alarm)(?=[:.\s]|$)/g, '') === selector.trim() ||
+        block.sel.startsWith(selector.trim() + '.') || block.sel.startsWith(selector.trim() + '[')));
+    const inheritedBody = ancestors.map(candidate => candidate.body).join(';');
+    const radii = declarations(inheritedBody, 'border-radius');
+    if (radii.some(value => /^(50%|100%)\s*(?:!important)?$/.test(value))) return false;
+    if (/(?:login-box|tipbox|tt-box|side-panel)\b/i.test(block.sel)) return false;
+    if (rule === 'large-radius') {
+      return declarations(block.body, 'border(?:-(?:top|bottom)-(?:left|right))?-radius')
+        .some(value => resolvedLengths(value, tokens).some(length => length >= 8));
+    }
+    if (rule === 'colored-left-stripe') {
+      if (SAFETY_RAIL_SEL.test(block.sel)) return false;
+      return declarations(block.body, 'border-(?:left|inline-start)(?:-width)?')
+        .some(value => resolvedLengths(value, tokens).some(length => length >= 3));
+    }
+    if (/:(hover|focus|focus-visible|active|visited|target)\b/.test(block.sel)) return false;
+    const shadows = declarations(block.body, 'box-shadow');
+    if (!shadows.some(value => !/^none\b/i.test(value))) return false;
+    if (declarations(block.body, 'position').some(value => /^(sticky|fixed)$/.test(value))) return false;
+    const border = declarations(inheritedBody, 'border').at(-1);
+    return !border || /^(?:none|0(?:px)?)(?:\s|$)|\b(?:transparent|none)\b/i.test(border);
+  });
 }
 
 /* Rule 22 scans STYLESHEET text only — a <style> block or a .css file. A print stylesheet
@@ -234,19 +305,6 @@ const RULES = [
     test: (t) => /\b(pricing-tier|price-card|pricing-table|plan-card|tier-price)\b/i.test(t)
       ? "pricing-tier template markup — this site sells nothing" : null },
 
-  /* ── v1.135.2 — DECORATIVE-SURFACE RULES ───────────────────────────────────
-     §A rules 7, 10, 11, 12, 22, 23 and 24. Four of them measure ZERO on today's tree and
-     ship strict on arrival. Three carry a real backlog and ship as MONITORS that are
-     STRICT on the flagship surfaces — the same monitor-then-flip discipline that took the
-     Conventional coverage gate from 24 % to 100 %. Baselines, measured before any edit:
-       rule 7  standalone orbs .............   0 blocks /   0 files   → strict
-       rule 22 pure-white body ............    0 blocks /   0 files   → strict
-       rule 23 animated CTA ...............    0 blocks /   0 files   → strict
-       rule 24 excessive hover ............    0 blocks /   0 files   → strict
-       rule 10 coloured left-stripe .......  259 blocks /  95 files   → monitor
-       rule 11 shadow as sole affordance ..  131 blocks /  93 files   → monitor
-       rule 12 large corner radius ........ 1058 blocks / 169 files   → monitor  */
-
   { id: "standalone-orbs",                                           // §A rule 7
     /* The aurora-mesh hero is §B PROTECTED and is a gradient WASH on a container, not a
        circle. What this bans is the free-floating glowing disc: a round element that is
@@ -273,10 +331,7 @@ const RULES = [
     test: (t, f) => {
       const css = stylesheetText(t, f);
       if (!css) return null;
-      /* A stylesheet that declares `@page` is a PAPER document — article-9-paper.html sets
-         A4 with 2 cm margins. Printed paper is white; demanding a token background there
-         would produce grey PDFs to satisfy a screen rule. */
-      if (/@page\b/.test(css)) return null;
+      if (PAPER_DOCUMENTS.has(f.split('/').at(-1))) return null;
       const hits = cssBlocks(css).filter((b) =>
         !/print/i.test(b.at)
         && /(^|,)\s*(html\s+)?body\s*(,|$)/i.test(b.sel)
@@ -309,59 +364,8 @@ const RULES = [
       return hits.length ? `${hits.length} decorative hover(s) moving on \`transition: all\`: ${hits.slice(0, 3).map((h) => h.sel).join(', ')}` : null;
     } },
 
-  { id: "colored-left-stripe",                                       // §A rule 10  [MONITOR]
-    test: (t) => {
-      const hits = decorBlocks(t).filter((b) => {
-        const m = b.body.match(/border-left:\s*(\d+)px/);
-        return m && +m[1] >= 3;
-      });
-      return hits.length ? `${hits.length} coloured left-stripe rail(s) ≥3px (the language is a 2px semantic rail + 1px hairline): ${hits.slice(0, 3).map((h) => h.sel).join(', ')}` : null;
-    } },
-
-  { id: "shadow-sole-affordance",                                    // §A rule 11  [MONITOR]
-    /* design.md:645 — "cards are delineated by their border, not their shadow". The
-       measurable form is a shadow with NO border anywhere in the same block. */
-    test: (t) => {
-      const hits = decorBlocks(t).filter((b) =>
-        /box-shadow:\s*(?!none)/.test(b.body)
-        /* A STATE block lists only what changes. `.card:hover { box-shadow: … }` has its
-           border in the base rule, so reading the state block alone reports every correctly
-           built card as shadow-only — 9 of this rule's first 15 flagship findings were that.
-           The rule is about how a surface is delineated AT REST. */
-        && !/:(hover|focus|focus-visible|active|visited|target)\b/.test(b.sel)
-        /* A circle is a shape, not a rounded panel. "Cards are delineated by their border,
-           not their shadow" is about cards; a status dot's glow ring IS its signal. */
-        && !/border-radius:\s*50%/.test(b.body)
-        /* Rule 11 as written is "drop-shadows as the primary CARD affordance". A photograph,
-           a logo or an avatar is not a card and has no border to be delineated by; asking one
-           to grow a hairline is asking for a framed picture nobody wanted. */
-        && !/(image|img|photo|avatar|logo|thumb|portrait|figure)/i.test(b.sel)
-        && !/(^|;|\s)border(-(top|right|bottom|left|color|width|style))?\s*:/.test(b.body));
-      return hits.length ? `${hits.length} decorative surface(s) delineated by shadow with no border: ${hits.slice(0, 3).map((h) => h.sel).join(', ')}` : null;
-    } },
-
-  { id: "large-radius",                                              // §A rule 12  [MONITOR]
-    test: (t) => {
-      const hits = decorBlocks(t).filter((b) => {
-        const m = b.body.match(/border-radius:\s*(\d+)px/);
-        return m && +m[1] >= 8;
-      });
-      return hits.length ? `${hits.length} decorative surface(s) at ≥8px radius (the instrument scale is 4px): ${hits.slice(0, 3).map((h) => h.sel).join(', ')}` : null;
-    } },
+  ...Array.from(DECORATIVE_RULES, id => ({ id })),
 ];
-
-
-/* ── v1.135.2 — MONITOR RULES AND STRICT SCOPE ─────────────────────────────────────────
-   Three of the seven new rules carry a real backlog (259 / 131 / 1058 blocks). Landing them
-   strict site-wide would turn main red on 220 files and the only available response would be
-   to weaken or mute them — which is how this tool ended up wired as `; true` in the first
-   place. So they REPORT everywhere and FAIL on the flagship surfaces: the homepage and the
-   two stylesheets that reach it. Those are what the owner is actually looking at, they are
-   top-three in every category the sweep measured, and a rule that gates somewhere real is a
-   gate. Each file family moves into STRICT_SCOPE as it is swept; when the tail reaches zero
-   the monitor set empties and this block goes away. */
-const MONITOR_RULES = new Set(["colored-left-stripe", "shadow-sole-affordance", "large-radius"]);
-const STRICT_SCOPE = new Set(["index.html", "styles.css", "styles-index.css"]);
 
 const files = walk(ROOT);
 const findings = [];
@@ -388,10 +392,11 @@ function decodeEntities(t) {
 for (const f of files) {
   let t; try { t = decodeEntities(stripDocProse(readFileSync(f, "utf8"))); } catch { continue; }
   for (const r of RULES) {
-    const m = r.test(t, f);
+    const blocks = DECORATIVE_RULES.has(r.id) ? decorativeFindings(t, f, r.id) : undefined;
+    const m = blocks ? (blocks.length ? `${blocks.length} decorative block(s): ${blocks.map(block => block.sel).join(', ')}` : null) : r.test(t, f);
     if (!m) continue;
     const rel = f.replace(ROOT + "/", "");
-    findings.push({ file: rel, rule: r.id, msg: m, monitor: MONITOR_RULES.has(r.id) && !STRICT_SCOPE.has(rel) });
+    findings.push({ file: rel, rule: r.id, msg: m, blocks, monitor: false });
   }
 }
 
@@ -399,28 +404,42 @@ for (const f of files) {
 for (const req of ["terms.html", "privacy.html"]) {
   if (!existsSync(join(ROOT, req))) findings.push({ file: req, rule: "missing-legal", msg: `${req} missing (required)` });
 }
+for (const file of OWNER_HOLDS) {
+  findings.push({ file, rule: 'active-owner-hold', msg: 'UNVERIFIED — active owner hold; coordination and a post-owner rescan are required.', monitor: false });
+}
 
 const gating = findings.filter((f) => !f.monitor);
 const monitored = findings.filter((f) => f.monitor);
+const inventory = {
+  files: files.map(file => file.replace(ROOT + '/', '')),
+  excludedNames: SKIP,
+  generatedTwinsExcluded: '*.min.*',
+  activeOwnerHolds: OWNER_HOLDS.map(file => ({ file, status: 'UNVERIFIED', reason: 'Active owner hold; read-only scan does not certify the evolving source.' })),
+  historicalEvidenceExcluded: ['changelog.html', 'standarization/Audit result/'],
+  paperDocuments: [...PAPER_DOCUMENTS],
+  functionalRailSelectors: SAFETY_RAIL_SEL.source,
+  protectedGeometrySelectors: GEOMETRY_SEL.source,
+  decorativeCoverage: 'Static CSS files and HTML style elements; runtime JS CSS and inline style attributes require separate review. Explicit paper documents, print media and functional geometry are protected.',
+  generatorParity: 'Generation is not executed by this static audit; source ownership must be established separately.',
+  limitation: 'Static detectors are not proof that all 26 design tells are absent; visual and content judgement remain required.',
+};
+if (JSON_OUTPUT) {
+  console.log(JSON.stringify({ findings, inventory, summary: { gating: gating.length, monitored: monitored.length, filesWithFindings: new Set(findings.map(finding => finding.file)).size } }, null, 2));
+  process.exit(STRICT && gating.length ? 1 : 0);
+}
 const group = (list) => {
   const by = {};
   for (const f of list) (by[f.rule] ||= []).push(f.file);
   return by;
 };
 console.log("── ANTI-VIBECODE AUDIT ──");
-if (!findings.length) { console.log("CLEAN — no vibecode tells."); process.exit(0); }
+console.log(`Scanned ${files.length} source files. Excluded names: ${SKIP.join(', ')}; generated *.min.* twins. Use --json for inventory and all findings.`);
+console.log(inventory.decorativeCoverage);
+if (!findings.length) { console.log("No detected findings in this static scope; visual review still required. Not a ship clearance."); process.exit(0); }
 
 for (const [rule, fs] of Object.entries(group(gating))) {
   console.log(`  ✗ ${rule}: ${fs.length} file(s) — ${fs.slice(0, 4).join(", ")}${fs.length > 4 ? " …" : ""}`);
 }
-const mon = group(monitored);
-if (Object.keys(mon).length) {
-  console.log("  ── monitor (reports everywhere, fails on the flagship surfaces) ──");
-  for (const [rule, fs] of Object.entries(mon)) {
-    console.log(`    · ${rule}: ${fs.length} file(s) — ${fs.slice(0, 4).join(", ")}${fs.length > 4 ? " …" : ""}`);
-  }
-  console.log(`    flip condition: a monitor rule goes strict when its count reaches 0, or when the files it still flags are added to STRICT_SCOPE.`);
-}
 console.log(`── ${gating.length} gating + ${monitored.length} monitored finding(s) across ${new Set(findings.map((f) => f.file)).size} file(s). See standarization/ANTI_VIBECODE_STANDARD.md`);
-if (!gating.length) console.log("── no GATING findings — safe to push.");
+if (!gating.length) console.log("── no gating findings in this scope; monitored findings and visual review remain unresolved. Not a ship clearance.");
 process.exit(STRICT && gating.length ? 1 : 0);

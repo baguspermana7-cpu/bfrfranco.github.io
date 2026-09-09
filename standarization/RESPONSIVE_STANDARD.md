@@ -200,6 +200,16 @@ Marker variants by page category:
 
 ## Article reading column (wide-screen) + responsive tables (v1.49.8)
 
+### Editorial reading refinement (2026-09-08, local audit)
+
+- One gutter owner: the inner content container. Editorial `.article-content` and `.article-body` must not each add mobile inline padding. At phone widths the container owns 20px on each side; verify computed geometry across article-28 and geopolitics, whose older responsive patches use `!important`.
+- Hero and content use the same left edge, including the `.hero-container` variant and pages with a related-article rail. Maintain a fixed-rem prose measure; never center each paragraph independently.
+- Body prose has a 16px minimum and 1.75 leading. Mobile text is left aligned without automatic hyphenation; existing desktop justification remains. Figures, technical tables and instrument labels retain their own geometry and scale.
+- Reading must not wait for an entrance animation or an IntersectionObserver threshold. Large paragraphs remain visible immediately, including when reduced motion is requested.
+- Native contents disclosures collapse on initial mobile load and remain keyboard operable. Without JavaScript, the original complete contents stays available. Do not remove deep links or section IDs.
+- Validate both themes. A neutral light hero requires matching title, subtitle, category and backlink ink; a dark-authored gradient must not survive beneath light-theme dark text.
+- Regression command: `node tools/test-editorial-reading.mjs`. Route coverage: `node tools/audit-site-render.mjs --help`. Filtered, blocked or unmeasured states are not whole-site approval.
+
 **Problem this fixes:** articles relied on per-page inline styles for layout width, and most never set
 one — so on a wide screen (e.g. a browser zoomed out to a ~2400px effective viewport) `.article-body` kept
 growing with the viewport, the 68ch paragraph cap held text **left-aligned** instead of centered, and tables

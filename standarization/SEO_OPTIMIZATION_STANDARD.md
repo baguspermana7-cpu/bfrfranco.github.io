@@ -1,7 +1,7 @@
 # SEO Optimization Standard
 
 > **Created**: 2026-02-24
-> **Applies to**: All HTML pages in rz-work root
+> **Applies to**: Published HTML at the root and reviewed nested publication directories
 > **Batch**: Ideas 31-38 + 43 from Improvement Plan
 
 ---
@@ -261,7 +261,7 @@ All new growth pages follow these standards:
 
 ### AI bot directives in robots.txt
 
-Explicit `Allow: /` blocks for: GPTBot, ClaudeBot, anthropic-ai, ChatGPT-User, OAI-SearchBot, PerplexityBot, Google-Extended, cohere-ai, Diffbot, Bingbot. Signals consent + improves crawl priority.
+Named crawlers and `*` share one rule group. Yandex keeps its separate crawl delay with the complete same disallow list. A specific group does not inherit the wildcard group's restrictions. Permission does not improve crawl priority or guarantee indexing. `llms.txt` is an AI discovery map, not a sitemap, and must not appear in a `Sitemap:` directive.
 
 ### ai-content-declaration meta
 
@@ -295,3 +295,57 @@ Run before every push:
 ```bash
 python3 tools/audit-seo.py --strict
 ```
+
+## Crawler publication contract (2026-09-08)
+
+Owner request: total site/article anti-vibecode and readability coverage with no sitemap/robots omissions. This workstream owns crawler discovery only; it does not certify rendered readability, auth enforcement, deployed HTTP headers, or search-engine indexing. Release/version/changelog/service-worker work belongs to the coordinating owner.
+
+### One inventory, three exports
+
+`tools/crawler_inventory.py` is the publication-policy source for `build-sitemap.py`, `build-llms-txt.py`, and `build-llms-full.py`.
+
+- Enumerate all Git-tracked HTML recursively, including staged additions. Report nonignored untracked HTML as `untracked`; local previews are not publication approval. Ignored local artifacts are outside the deployed inventory.
+- Root pages and reviewed `id/`, `manual/`, `prd/`, `network/`, and `dc-market/` paths are candidates at every depth. Unknown tracked directories fail with `unreviewed-directory`, never silently enter the sitemap. The `dc-market/` category is historical publication policy, not evidence that those files currently exist.
+- Preserve explicit internal/source-directory and file exclusions. In particular, `/Apps/` and `/dcmoc/` remain disallowed for every named crawler. Never remove exclusions merely to make URL counts match.
+- Parse the complete HTML head, not the first 3,000 bytes: attribute order/case, repeated directives, `none`, and Googlebot/Bingbot-specific noindex are handled. Comments and script text cannot supply fake metadata. Noindex pages and refresh redirects do not enter any export.
+- Require a clean exact-origin canonical, resolving relative canonicals against the source URL. Multiple/empty/off-origin canonicals fail closed. Aliases cannot create duplicate URLs; their target must independently be an included self-canonical page. Missing canonicals use the existing file URL and produce a warning for the page owner.
+- Check both file URLs and canonical URLs against wildcard and named crawler groups. A public indexable page blocked by robots is an error. A blocked noindex page produces a warning: crawlers cannot read its noindex, but this audit never unblocks it automatically.
+- Every tracked HTML path has an explicit disposition. Inclusion counts are generated, never hardcoded as a pass criterion.
+
+### Truthful modification dates
+
+`lastmod` is optional and is currently omitted for every URL. A Git commit can represent a shared footer/style update, and a checkout mtime is not publication history; neither proves a significant page update. Do not substitute the build date, silently fall back to mtime, or label an unverified commit date as content freshness. Introducing dates requires a reviewed significant-change evidence source plus new regression tests and audit support. Existing `priority`/`changefreq` values are retained for compatibility, not treated as Google ranking signals.
+
+### LLM discovery and access boundaries
+
+- Both LLM maps use exactly the same canonical URL set as the sitemap. Noindex incident dossiers, admin/design helpers, excluded directories, aliases, and local previews must never become full-text side doors.
+- An indexable landing page can have an access-controlled body. `llms.txt` contains only its public head metadata; listing the URL is not permission to access the body.
+- `llms-full.txt` conservatively emits a clearly marked **metadata-only** section when static markup indicates a root/pro/premium/gated/locked area, runtime access checks are present, or `auth.js` declares a matching `ROOT_ONLY_PATHS` entry. This also withholds public prose on some mixed public/premium pages rather than risk exporting protected analysis. Public manual/PRD pages remain independently eligible.
+- Static gate detection is not a proof of arbitrary JavaScript authorization. Any new access-control convention must add a fail-closed export test before release. Restoring full prose from mixed-access pages requires verified anonymous-content extraction, not a blanket override.
+- Export failures stop before writing; errors never become public `[ERROR ...]` body text. Content beyond 20 MB or an existing `llms-archive.txt` requires explicit archive/privacy review rather than creating, retaining, or deleting an unreviewed overflow silently.
+- `--check` verifies deterministic exact output without writing. Both LLM builders retain their historical no-argument write behavior and accept explicit `--apply` and non-writing `--dry-run`.
+
+### Required offline checks
+
+```bash
+python3 tools/test-crawler-seo.py
+python3 tools/build-sitemap.py --apply
+python3 tools/build-llms-txt.py --apply
+python3 tools/build-llms-full.py --apply
+python3 tools/build-sitemap.py --check
+python3 tools/build-llms-txt.py --check
+python3 tools/build-llms-full.py --check
+python3 tools/crawler_audit.py --strict
+python3 tools/crawler_audit.py --json
+```
+
+The crawler audit always exits nonzero for errors, including with `--json`; unavailable input is not a passing empty inventory. JSON includes all path dispositions, content-export policy, counts, duplicate/missing/unexpected URLs, warnings, and verification limits. It compares XML structurally and LLM exports both by URL coverage and exact expected content, including metadata-only protection. Keep generated evidence local, not in public discovery maps.
+
+The earlier Content Linkage Playbook note about manually adding nested Network Hub sitemap entries is superseded by this recursive builder contract; do not hand-edit generated URL lists. Search-index and article/rendered-content maintenance remain separate workstreams.
+
+### Official crawler references
+
+- [Google robots.txt interpretation](https://developers.google.com/crawling/docs/robots-txt/robots-txt-spec): specific groups, shared agent groups, longest-path rules, and sitemap declarations.
+- [Google sitemap guidance](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap): canonical URLs, optional accurate significant-update `lastmod`, and ignored priority/change frequency signals.
+- [Google noindex guidance](https://developers.google.com/search/docs/crawling-indexing/block-indexing): crawling must be allowed to observe noindex; robots is not authentication.
+- [llms.txt proposal](https://llmstxt.org/): an LLM discovery map complements but does not replace robots/sitemaps or grant access.

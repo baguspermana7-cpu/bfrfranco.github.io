@@ -52,7 +52,7 @@
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://resistancezero.com/article-9.html">
     <meta property="og:title" content="The HVAC Shock: No Chillers Doesn't Mean No Cooling">
-    <meta property="og:description" content="Deep technical analysis of chiller-free cooling revolution in data centers, with tropical climate implementation guide and fault scenario analysis.">
+    <meta property="og:description" content="Chiller-free data center cooling: tropical climate limits, hybrid operation, and liquid-cooling fault scenarios.">
     <meta property="og:image" content="https://resistancezero.com/assets/og/article-9.webp">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
@@ -82,14 +82,14 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
     <!-- v1.43.12 editorial register (RZ Dark System v1) — dark-only, scoped. -->
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
-    <link rel="stylesheet" href="css/rz-article-dark.css?v=1.99-light">
+    <link rel="stylesheet" href="css/rz-article-dark.css?v=20260908-editorial">
     <script src="js/rz-explain-db.js?v=2026-07-24-w" defer></script>
 <script src="js/rz-explain.js?v=2026-07-16" defer></script>
-<script src="js/rz-article-editorial.js?v=1.51.8" defer></script>
+<script src="js/rz-article-editorial.js?v=20260908-editorial" defer></script>
     <script src="js/rz-article-diagram.js?v=1.50.37" defer></script>
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
-    <link rel="stylesheet" href="styles.min.css?v=2026-09-06-slop">
+    <link rel="stylesheet" href="styles.min.css?v=20260908-editorial">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preload" as="image" href="assets/article-9-cover_.jpg">
 
@@ -324,10 +324,10 @@
         }
         .article-body blockquote {
             background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-            border-left: 4px solid #3b82f6;
+            border-left: 2px solid #3b82f6;
             padding: var(--spacing-lg) var(--spacing-xl);
             margin: var(--spacing-lg) 0;
-            border-radius: 0 12px 12px 0;
+            border-radius: 0 4px 4px 0;
             font-style: italic;
             color: #1e40af;
         }
@@ -342,10 +342,10 @@
         /* Key Insight Box */
         .key-insight {
             background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            border-radius: 12px;
+            border-radius: 4px;
             padding: var(--spacing-lg) var(--spacing-xl);
             margin: var(--spacing-lg) 0;
-            border-left: 4px solid #f59e0b;
+            border-left: 2px solid #f59e0b;
         }
         .key-insight h4 {
             color: #92400e;
@@ -378,7 +378,7 @@
         .market-impact .stock-item {
             background: rgba(255,255,255,0.7);
             padding: var(--spacing-md);
-            border-radius: 8px;
+            border-radius: 4px;
             text-align: center;
         }
         .market-impact .stock-name {
@@ -394,7 +394,7 @@
         /* Enhanced Technical Box */
         .tech-box {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            border-radius: 16px;
+            border-radius: 4px;
             padding: var(--spacing-xl);
             margin: var(--spacing-lg) 0;
             color: #e2e8f0;
@@ -418,7 +418,7 @@
             width: 32px;
             height: 32px;
             background: rgba(59, 130, 246, 0.2);
-            border-radius: 8px;
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -431,7 +431,7 @@
         .tech-box pre {
             background: rgba(0,0,0,0.4);
             padding: var(--spacing-lg);
-            border-radius: 8px;
+            border-radius: 4px;
             overflow-x: auto;
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.8125rem;
@@ -531,8 +531,8 @@
             margin-top: var(--spacing-md);
             padding: var(--spacing-sm) var(--spacing-md);
             background: rgba(239, 68, 68, 0.1);
-            border-left: 3px solid #ef4444;
-            border-radius: 0 8px 8px 0;
+            border-left: 2px solid #ef4444;
+            border-radius: 0 4px 4px 0;
             font-size: 0.85rem;
             color: #f87171;
         }
@@ -556,7 +556,7 @@
         }
         .temp-card {
             background: rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
+            border-radius: 4px;
             padding: var(--spacing-md);
             border: 1px solid rgba(148, 163, 184, 0.1);
         }
@@ -700,7 +700,7 @@
             gap: var(--spacing-sm);
             padding: var(--spacing-sm) var(--spacing-md);
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
+            border-radius: 4px;
             margin-bottom: var(--spacing-sm);
             font-size: 0.875rem;
         }
@@ -743,7 +743,7 @@
         }
         .failure-mode-card {
             background: rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
+            border-radius: 4px;
             padding: var(--spacing-lg);
             border: 1px solid rgba(148, 163, 184, 0.15);
             transition: all 0.3s ease;
@@ -755,7 +755,7 @@
         .failure-mode-card .mode-icon {
             width: 40px;
             height: 40px;
-            border-radius: 10px;
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -881,9 +881,9 @@
         }
         .pros-box {
             background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-            border-radius: 12px;
+            border-radius: 4px;
             padding: var(--spacing-lg);
-            border-left: 4px solid #10b981;
+            border-left: 2px solid #10b981;
         }
         .pros-box h4 {
             color: #065f46;
@@ -899,9 +899,9 @@
         }
         .cons-box {
             background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-            border-radius: 12px;
+            border-radius: 4px;
             padding: var(--spacing-lg);
-            border-left: 4px solid #ef4444;
+            border-left: 2px solid #ef4444;
         }
         .cons-box h4 {
             color: #991b1b;
@@ -926,7 +926,7 @@
         }
         .verdict-box {
             background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-            border-radius: 12px;
+            border-radius: 4px;
             padding: var(--spacing-lg);
             color: #fff;
             text-align: center;
@@ -1066,7 +1066,7 @@
         /* Tropical Climate Box */
         .tropical-box {
             background: linear-gradient(135deg, #064e3b 0%, #065f46 100%);
-            border-radius: 12px;
+            border-radius: 4px;
             padding: var(--spacing-xl);
             margin: var(--spacing-lg) 0;
             color: #d1fae5;
@@ -1084,7 +1084,7 @@
         .climate-card {
             background: rgba(255,255,255,0.1);
             padding: var(--spacing-md);
-            border-radius: 8px;
+            border-radius: 4px;
             text-align: center;
         }
         .climate-city {
@@ -1198,7 +1198,7 @@
         }
         .callout-card {
             background: rgba(30, 58, 95, 0.3);
-            border-radius: 10px;
+            border-radius: 4px;
             padding: var(--spacing-md);
             text-align: center;
             border: 1px solid rgba(59, 130, 246, 0.15);
@@ -1271,7 +1271,7 @@
         /* TL;DR Box */
         .tldr-box {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            border-radius: 16px;
+            border-radius: 4px;
             padding: var(--spacing-xl);
             margin: var(--spacing-xl) 0;
             color: #fff;
@@ -1343,10 +1343,10 @@
 
         .highlight-box {
             background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-            border-radius: 12px;
+            border-radius: 4px;
             padding: var(--spacing-lg) var(--spacing-xl);
             margin: var(--spacing-lg) 0;
-            border-left: 4px solid #ef4444;
+            border-left: 2px solid #ef4444;
         }
         .highlight-box p {
             margin: 0;
@@ -1355,10 +1355,10 @@
         }
         .warning-box {
             background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
-            border-radius: 12px;
+            border-radius: 4px;
             padding: var(--spacing-lg) var(--spacing-xl);
             margin: var(--spacing-lg) 0;
-            border-left: 4px solid #eab308;
+            border-left: 2px solid #eab308;
         }
         .warning-box p {
             margin: 0;
@@ -1367,10 +1367,10 @@
         }
         .result-box {
             background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
-            border-radius: 12px;
+            border-radius: 4px;
             padding: var(--spacing-lg) var(--spacing-xl);
             margin: var(--spacing-lg) 0;
-            border-left: 4px solid #10b981;
+            border-left: 2px solid #10b981;
         }
         .result-box h4 {
             color: #065f46;
@@ -1438,14 +1438,14 @@
         .hvac-evidence-block {
             margin: 2rem auto; max-width: 900px; padding: 2rem;
             background: linear-gradient(135deg, rgba(59,130,246,0.08) 0%, rgba(96,165,250,0.04) 100%);
-            border: 1px solid rgba(59,130,246,0.25); border-radius: 16px;
+            border: 1px solid rgba(59,130,246,0.25); border-radius: 4px;
         }
         .hvac-evidence-grid {
             display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 1rem;
         }
         .hvac-evidence-card {
             text-align: center; padding: 1rem 0.5rem;
-            background: rgba(59,130,246,0.06); border-radius: 10px;
+            background: rgba(59,130,246,0.06); border-radius: 4px;
         }
         .hvac-evidence-value {
             font-size: 1.5rem; font-weight: 800; color: #60a5fa;
@@ -1460,7 +1460,7 @@
         .hvac-cta-block {
             margin: 2rem 0; padding: 2rem; text-align: center;
             background: linear-gradient(135deg, rgba(59,130,246,0.12), rgba(96,165,250,0.06));
-            border: 1px solid rgba(59,130,246,0.3); border-radius: 16px;
+            border: 1px solid rgba(59,130,246,0.3); border-radius: 4px;
         }
         .hvac-cta-headline {
             font-size: 1.4rem; font-weight: 800; color: #e2e8f0; margin-bottom: 0.5rem;
@@ -1496,7 +1496,7 @@
         .hvac-pro-panel {
             margin-bottom: 1.5rem; padding: 1.5rem;
             background: rgba(59,130,246,0.06); border: 1px solid rgba(59,130,246,0.2);
-            border-radius: 14px; position: relative; overflow: hidden;
+            border-radius: 4px; position: relative; overflow: hidden;
         }
         .hvac-pro-panel.gated .hvac-panel-content { filter: blur(6px); pointer-events: none; user-select: none; }
         .hvac-gate-overlay {
@@ -1512,7 +1512,7 @@
         }
         .hvac-kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
         .hvac-kpi-card {
-            padding: 0.75rem; background: rgba(59,130,246,0.08); border-radius: 10px;
+            padding: 0.75rem; background: rgba(59,130,246,0.08); border-radius: 4px;
             text-align: center;
         }
         .hvac-kpi-value {
@@ -1525,7 +1525,7 @@
         .hvac-narrative-box {
             margin-top: 1rem; padding: 1rem; font-size: 0.85rem; line-height: 1.6;
             color: #cbd5e1; background: rgba(59,130,246,0.05);
-            border-left: 3px solid #3b82f6; border-radius: 0 8px 8px 0;
+            border-left: 2px solid #3b82f6; border-radius: 0 4px 4px 0;
         }
         .hvac-sensitivity-bar {
             display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;
@@ -1728,6 +1728,9 @@
             .verdict-container { grid-template-columns: 1fr; }
             .verdict-box { position: static; }
             .comparison-flow { grid-template-columns: 1fr; }
+            .humidity-bar-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .humidity-bar-track { grid-column: 1 / -1; grid-row: 2; }
+            .humidity-bar-fill { justify-content: flex-start; white-space: nowrap; padding-right: 0; }
             .flow-arrow { transform: rotate(90deg); padding: var(--spacing-md) 0; }
             .timeline-header, .timeline-row { grid-template-columns: 60px 70px 1fr; font-size: 0.75rem; }
             .timeline-header > :last-child, .timeline-row > :last-child { display: none; }
@@ -1952,7 +1955,7 @@
             </div>
             <span class="article-category">Critical Infrastructure</span>
             <h1 class="article-title">The HVAC Shock No One Priced In: "No Chillers" Doesn't Mean "No Cooling"</h1>
-            <p class="article-subtitle">A comprehensive technical analysis of chiller-free cooling for data centers, with tropical climate implementation guide, fault scenario analysis, and operational considerations.</p>
+            <p class="article-subtitle">How chiller-free data center cooling works, where tropical conditions limit it, and what operators need to check when a liquid-cooling loop fails.</p>
             <div class="article-meta">
                 <span class="article-meta-item">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1996,7 +1999,7 @@
     <div class="series-nav" style="margin-top: 1rem;">
         <div class="series-badge">
             <span class="series-badge-icon">09</span>
-            Engineering Journal &mdash; Article 9 of 18
+            Engineering Journal &mdash; Article 9 of 28
         </div>
         <span class="series-title"></span>
         <div class="series-links">
@@ -2986,7 +2989,7 @@ Where LMTD (Log Mean Temperature Difference) requires:
 
                 <h2 id="section-9">9. Conclusion</h2>
 
-                <p>The market panic-sold HVAC stocks after one line about "no chillers". Rubin doesn't kill cooling; it reprices the cooling stack. Heat still flows; investors and operators just need to follow it into pumps, CDUs, and control loops.</p>
+                <p>The reaction to "no chillers" obscured the plant-room question: how will the facility reject heat? Warm-water cooling changes the balance of chiller, pump, and CDU requirements; it does not remove the cooling load.</p>
 
                 <blockquote>
                     "The edge is knowing where the new bottleneck sits — inside the plant room, not on a silicon slide."
@@ -3053,7 +3056,7 @@ Where LMTD (Log Mean Temperature Difference) requires:
                     <div class="author-bio-content">
                         <h4>Bagus Dwi Permana</h4>
                         <p class="author-bio-title">Engineering Operations Manager | Ahli K3 Listrik</p>
-                        <p>12+ years professional experience in critical infrastructure and operations. CDFOM certified. Transforming operations through systematic excellence and safety-first engineering.</p>
+                        <p>12+ years professional experience in critical infrastructure and operations. CDFOM certified. Focuses on facility reliability, maintenance, and electrical safety.</p>
                         <div class="author-bio-links">
                             <a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>

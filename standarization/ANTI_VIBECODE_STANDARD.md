@@ -10,6 +10,37 @@ radial orbs, emoji, 3-card rows, sparkle icons). resistancezero.com has a **deli
 instrument aesthetic** (thin hairlines, oscilloscope tokens, considered type). Any drift toward the
 generic set reads as "vibecoded" and must be removed.
 
+## Current audit contract (2026-09-08, local work)
+
+The owner renewed the whole-site requirement, explicitly naming article readability, containers,
+whitespace, sitemap/robots and regression prevention. The historical monitor/flagship-only tables below
+describe earlier releases, not current clearance. The baseline for this work was **273 monitored
+file/rule findings across 172 files despite exit 0**.
+
+- Rails, resting shadows and decorative radii now participate in strict scanning across the declared
+  source scope. The tool prints that scope and provides `--json` inventory and findings. It must never
+  print “safe to push” from a static design scan.
+- Respect functional boundaries: alarm-state rails, process geometry, circles, images, focus states,
+  real controls, printed paper and the approved aurora are not disposable decoration. Any exemption
+  needs a regression fixture and an identifiable reason, not a broad keyword that hides other rules.
+- A source scan is not rendered evidence. Inline/runtime styles, generated assets, sub-apps, keyboard
+  journeys, both themes and mobile/desktop states require separate checks. Palette coherence, generic
+  grids, hype, invented experience and editorial quality also need human review; do not label an
+  unimplemented heuristic an executable monitor.
+- `tools/audit-site-render.mjs` records every tracked HTML path and requested theme/viewport row.
+  `FILTERED`, `PENDING`, `UNVERIFIED`, unavailable resources and blocked authentication are not passes.
+  A superseded probe report must not drive product changes after a false-positive detector is fixed.
+- Editorial paragraphs are immediately readable. Suppress decorative heading numbering and drop caps;
+  use readable ink, restrained surfaces, consistent container gutters and compact mobile contents.
+- Surface classification samples actual browser colors, including modern color spaces and opaque dark
+  gradient ancestors. Theme changes must reclassify without sampling an in-flight background transition.
+  Preserve nested instrument surfaces rather than flattening every class named `card`.
+- New safeguards: `tools/test-audit-vibecode.mjs`, `tools/test-editorial-reading.mjs`, and
+  `tools/test-site-render-audit.mjs`. Browser fixtures are separately enabled by
+  `RZ_RENDER_BROWSER_TEST=1 node --test tools/test-site-render-browser.mjs`.
+- Review and measurement do not establish that the entire site is bug-free. Keep open findings in the
+  task handoff until reproduced, repaired and re-tested. Do not publish while verification is incomplete.
+
 ## A. HARD-BANNED — never ship (audit-vibecode --strict fails on these)
 | # | Sign | RZ rule / correct alternative |
 |---|---|---|
@@ -54,6 +85,64 @@ An over-eager de-slop pass must not remove these; they are the site's identity, 
 - **Terms of Service** (`terms.html`) and **Privacy Policy** (`privacy.html`) — must exist + be linked.
 - **Real product demos** — live calculators / virtual labs / cockpits (not screenshots of a fake app).
 - **Skeleton loaders** on genuinely async surfaces.
+
+## D. UX LAWS — required BEHAVIOUR (owner mandate, 2026-09-08)
+
+§A says what the site must never **look** like. This section says how it must **behave**. Every new or
+changed surface is reviewed against these 19 laws (the owner's list named Postel twice; deduped).
+
+| # | Law | Principle | RZ application |
+|---|---|---|---|
+| 1 | **Hick's** | More choices → slower decision | Cap what is visible at once. Cockpit tab bars stay within one row; calculators keep advanced parameters behind a disclosure instead of showing every field on load. |
+| 2 | **Fitts's** | Big + near targets are faster to hit | Primary actions get real size and reach. Touch targets ≥44px (already gate-backed, `audit-mobile-responsive.py`). A primary action is never an icon-only 20px hit box. |
+| 3 | **Jakob's** | Users expect your site to work like the others they use | Use the familiar pattern for a familiar job — Ctrl/Cmd+K palette, standard nav, breadcrumb, back-link. Never invent a novel control for a standard task. |
+| 4 | **Proximity** | Things placed near each other read as one group | A KPI, its unit and its basis chip sit as one block. Separate groups with space first, borders second. |
+| 5 | **Miller's** | ~7±2 items held in short-term memory | Chunk. Long spec tables get sub-headers; cockpit KPI rows group by system, not one flat wall. |
+| 6 | **Doherty threshold** | Under ~400 ms feels instant | Anything slower shows a skeleton loader (§C), never a blank panel. Their ABSENCE is itself a tell. |
+| 7 | **Von Restorff** | The one that differs is the one remembered | Exactly ONE primary accent per view. Distinction comes from the semantic token and hierarchy — never from neon (§A14) or rainbow (§A9). |
+| 8 | **Minimize target distance** | Shorten travel between sequential actions | Controls used in sequence sit adjacent. A confirm sits next to the thing it confirms, not across the viewport. |
+| 9 | **Serial position** | First and last items are remembered best | The first and last nav slots are reserved for the highest-value destinations; the same for list ordering. |
+| 10 | **Peak-end** | An experience is judged by its peak and its ending | A calculator ends on a clear result + export, never on a dead state or a spinner. Fix the ending before polishing the middle. |
+| 11 | **Zeigarnik** | Unfinished tasks stay on the mind | Multi-step flows show where the user is and what remains (step indicator / progress), so an interruption is recoverable. |
+| 12 | **Pragnanz** | The eye resolves to the simplest orderly form | Consistent gutters, aligned grids, restrained radii (§A12). Visual noise is cognitive cost. |
+| 13 | **Similarity** | Same appearance implies same function | One button family, one KPI treatment, site-wide. If two things look alike they must behave alike — and the reverse. |
+| 14 | **Uniform connectedness** | Visually connected elements read as related | Group with a panel + 1px hairline (§A10/§A11) — never with a decorative wash or a coloured stripe. |
+| 15 | **Tesler's** | Irreducible complexity must live somewhere | It lives in the system, not the user. The engine computes; a reader never hand-derives a number to use the page. |
+| 16 | **Postel's** | Liberal in what you accept, conservative in what you emit | Calculator inputs tolerate messy formats; every output carries its unit and its basis. |
+| 17 | **Parkinson's** | Work expands to fill the time allowed | Do not pad a flow with optional steps. Default to the shortest path that is still correct. |
+| 18 | **Occam's razor** | The simplest adequate solution wins | If an element carries no information, delete it. This is the same instinct §A enforces visually. |
+| 19 | **Pareto (80/20)** | ~80% of the effect comes from ~20% of causes | The most-used cockpits and calculators get the polish budget first. |
+
+### Honest enforcement status
+Consistent with the audit contract above: **do not label an unimplemented heuristic an executable monitor.**
+
+- **Gate-backed today (each verified 2026-09-09, not assumed):** **#6** Doherty — `audit-ux-laws.mjs`
+  (wired into `ship-gate.sh`) fails any page that performs a non-beacon async data load without a
+  loading affordance, resolving shared-module loads to the CONSUMER page. Scope caveat: it gates the
+  PRESENCE of the affordance, **not** the 400 ms threshold itself — that still needs a real render.
+  Proven RED→GREEN by `tools/test-audit-ux-laws.mjs` (5 cases incl. a beacon false-positive guard);
+  **#2** touch targets —
+  `audit-mobile-responsive.py --strict` asserts `min-height: 44px` on `button|a.btn|[role="button"]`;
+  **#12** radii — rule `large-radius`; **#14** rails and resting shadows — rules `colored-left-stripe`
+  and `shadow-sole-affordance` (all three registered in `DECORATIVE_RULES`, `tools/audit-vibecode.mjs`).
+- **Human design review only:** #1, #3, #4, #5, #7, #8, #9, #10, #11, #13, #15, #16, #17, #18, #19.
+  These are review criteria for any visual/IA change — not something the static scan can decide. Claiming
+  otherwise would be exactly the false-assurance this document warns against.
+- **Gap CLOSED 2026-09-09.** An earlier revision of this section recorded #6 as unenforced — correctly
+  at the time: nothing checked skeleton presence, and the only `skeleton` strings in the tool tree were
+  `probe-finance-terminal.mjs` (which REJECTS a stuck skeleton — the opposite check, unwired) and an
+  unrelated staffing phenotype in `test-rz-engine.mjs`. A sweep then found the SITE already complied
+  (0 pages async-without-affordance; `js/pln-energy-dashboard.js` is the one async module and all three
+  of its consumer pages carry one), so the gap was the missing gate, not missing skeletons. That gate
+  now exists.
+- **Scope coverage is now ASSERTED, not assumed** (`tools/test-audit-coverage.mjs`, wired into
+  `ship-gate.sh`). The design gates walk the filesystem with a SKIP list; the sitemap is what the site
+  publishes. One added SKIP entry would silently drop a live page out of every design gate. The test
+  proves, both directions: every sitemap URL resolves to a file and sits inside BOTH audit scopes
+  (180/180 today), and no crawlable page is orphaned from the sitemap unless it is gated, `noindex` or a
+  known utility (85 absent today — 75 gated/noindex, 10 utility, 0 unexplained). It also asserts every
+  `robots.txt` group carries the identical `Disallow` set: robots groups do NOT inherit, so a rule added
+  to one group and forgotten in another leaks that directory to whichever crawler owns the thinner group.
 
 ## Enforcement
 `tools/audit-vibecode.mjs --strict` — static scan of HTML/CSS for the hard-banned tells with

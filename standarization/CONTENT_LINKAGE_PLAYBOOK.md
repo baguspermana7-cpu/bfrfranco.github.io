@@ -17,6 +17,14 @@ right column in the SAME change. Verify, then tick it in the CHANGELOG entry.
 
 ## 1. New / updated ARTICLE (`article-N.html`, geopolitics, FF series)
 
+### Editorial consistency gate (2026-09-08)
+
+- A title or topic correction includes search keywords, landing/sibling labels, section-search titles, social metadata and generated LLM maps, not only the H1.
+- Publication dates must agree with the article's supported publication record. Do not stamp today's date to hide disagreement. Search reading times may mirror a displayed estimate; do not silently calculate a different rate from widget-heavy page text.
+- Run `python3 tools/sync-article-series.py` and `python3 tools/test-article-series.py` after changing the publication inventory. Counts and Prev/Next links must include the former final article and independent FF/geopolitics series.
+- Baked-in infographic/cover counts are rendered consumers too. If an obsolete image cannot be corrected safely, remove it from active display and use a verified semantic summary or count-free existing artwork; retain the source asset without presenting it as current evidence.
+- After source changes run the sitemap/LLM builders and `python3 tools/crawler_audit.py --strict`, then refresh `search-sections.json`. A source-only pass is not visual acceptance.
+
 | Touch | Update (same commit) |
 |---|---|
 | `insights.html` | "Latest Publications" feed — prepend newest with **real** `datePublished` (read from the article's JSON-LD/meta — never fabricate dates), real `<title>`, correct `feed-category` (`engineering` / `global` / `future-forward`). Keep ~8 most-recent. |
@@ -54,7 +62,7 @@ right column in the SAME change. Verify, then tick it in the CHANGELOG entry.
 | `js/network-anim/topics/<slug>.js` audit | `python3 tools/audit-network-anim.py --strict` MUST pass (palette / banned-CSS / timbre fields / variation budget / pairwise-within-lane anti-monotony). |
 | `tools/test-network-anim-determinism.py` | Must pass for Network Hub topics (`seek(N) ≡ reset() + seek(N)`). |
 | `js/rz-feature-flags.js` | `network-<slug>` `page-access` entry (public-tier default). |
-| `sitemap.xml`, `llms.txt` | Manual entry (sitemap builder doesn't scan subdirectories yet). |
+| `sitemap.xml`, `llms.txt` | Regenerate from the shared recursive crawler inventory; nested routes are no longer maintained by hand. Run the crawler strict audit and all three builder freshness checks. |
 | OG image | `python3 tools/build-og-images.py --apply` (use `--force` for regeneration). |
 | `Article/Post Draft/<Topic Name>/` | At minimum: `linkedin.md`, `x-post-1.md`, `mastodon-1.md`. |
 

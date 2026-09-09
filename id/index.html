@@ -1,6 +1,37 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <script id="rz-id-theme">
+    (function () {
+        var root = document.documentElement;
+        var theme = 'light';
+        try {
+            if (localStorage.getItem('theme') === 'dark') theme = 'dark';
+        } catch (error) {
+            console.warn('Theme preference unavailable; using light mode.', error);
+        }
+        function applyTheme(value, toggle) {
+            root.setAttribute('data-theme', value);
+            root.style.colorScheme = value;
+            if (toggle) toggle.setAttribute('aria-pressed', String(value === 'dark'));
+        }
+        applyTheme(theme);
+        document.addEventListener('DOMContentLoaded', function () {
+            var toggle = document.getElementById('themeToggle');
+            if (!toggle) return;
+            applyTheme(root.getAttribute('data-theme'), toggle);
+            toggle.addEventListener('click', function () {
+                var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                applyTheme(next, toggle);
+                try {
+                    localStorage.setItem('theme', next);
+                } catch (error) {
+                    console.warn('Theme changed for this page; preference could not be saved.', error);
+                }
+            });
+        });
+    })();
+    </script>
     <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -258,7 +289,7 @@
         .hero-badge {
             display: inline-flex; align-items: center; gap: 0.5rem;
             background: rgba(6,182,212,0.15); border: 1px solid rgba(6,182,212,0.3);
-            border-radius: 30px; padding: 0.4rem 1rem; font-size: 0.8rem;
+            border-radius: 4px; padding: 0.4rem 1rem; font-size: 0.8rem;
             color: #22d3ee; margin-bottom: 1.5rem; backdrop-filter: blur(8px);
         }
         .hero h1 {
@@ -313,7 +344,7 @@
         }
         .feature-card {
             background: var(--rz-card-bg); border: 1px solid var(--rz-card-border);
-            border-radius: 12px; padding: 1.75rem; transition: all 0.3s;
+            border-radius: 4px; padding: 1.75rem; transition: all 0.3s;
             display: flex; flex-direction: column;
         }
         .feature-card:hover {
@@ -321,7 +352,7 @@
             border-color: var(--rz-accent);
         }
         .feature-icon {
-            width: 48px; height: 48px; border-radius: 12px;
+            width: 48px; height: 48px; border-radius: 4px;
             display: flex; align-items: center; justify-content: center;
             font-size: 1.5rem; margin-bottom: 1rem; flex-shrink: 0;
         }
@@ -346,7 +377,7 @@
         }
         .about-highlight {
             background: var(--rz-card-bg); border: 1px solid var(--rz-card-border);
-            border-radius: 10px; padding: 1.25rem; text-align: center;
+            border-radius: 4px; padding: 1.25rem; text-align: center;
         }
         .about-highlight-value { font-size: 1.5rem; font-weight: 800; color: var(--rz-accent); }
         .about-highlight-label { font-size: 0.8rem; color: var(--rz-text-muted); margin-top: 0.25rem; }
@@ -396,7 +427,7 @@
         @media (max-width: 768px) {
             .hamburger { display: flex; }
             .nav-menu { display: none; }
-            .nav-menu.open {
+            body.rz-nav-open .nav-menu {
                 display: flex; flex-direction: column; position: absolute;
                 top: 100%; left: 0; right: 0; background: var(--rz-card-bg);
                 padding: 1rem 2rem; border-bottom: 1px solid var(--rz-card-border);

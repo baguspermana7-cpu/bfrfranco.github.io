@@ -83,17 +83,17 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
     <!-- v1.43.11 editorial register (RZ Dark System v1) — dark-only, scoped. -->
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
-    <link rel="stylesheet" href="css/rz-article-dark.css?v=1.99-light">
+    <link rel="stylesheet" href="css/rz-article-dark.css?v=20260908-editorial">
     <script src="js/rz-explain-db.js?v=2026-07-24-w" defer></script>
 <script src="js/rz-explain.js?v=2026-07-16" defer></script>
-<script src="js/rz-article-editorial.js?v=1.51.8" defer></script>
+<script src="js/rz-article-editorial.js?v=20260908-editorial" defer></script>
     <script src="js/rz-article-diagram.js?v=1.50.37" defer></script>
     <script src="js/rz-command-palette.js?v=2026-09-05-mint" defer></script>
     <script src="js/rz-article-chart.js?v=1.50.19" defer></script>
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="styles.min.css?v=2026-09-06-slop">
+    <link rel="stylesheet" href="styles.min.css?v=20260908-editorial">
     <link rel="preload" as="image" href="assets/article-25-hero.webp">
 
     <!-- Structured Data: TechnicalArticle -->
@@ -267,7 +267,7 @@
         .pjm-evidence-card {
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(252,211,77,0.2);
-            border-radius: 12px;
+            border-radius: 4px;
             padding: 1.25rem;
             text-align: center;
         }
@@ -304,10 +304,10 @@
         /* Quote callout */
         .quote-callout {
             background: var(--pjm-bg);
-            border-left: 4px solid var(--pjm-primary);
+            border-left: 2px solid var(--pjm-primary);
             padding: 1.5rem 2rem;
             margin: 2rem 0;
-            border-radius: 0 12px 12px 0;
+            border-radius: 0 4px 4px 0;
         }
         .quote-callout blockquote {
             font-size: 1.1rem;
@@ -332,7 +332,7 @@
         .pjm-insight-box {
             background: rgba(232,181,99,0.07);
             border: 1px solid rgba(180,83,9,0.3);
-            border-radius: 12px;
+            border-radius: 4px;
             padding: 1.5rem;
             margin: 1.5rem 0;
         }
@@ -380,24 +380,23 @@
         [data-theme="dark"] .pjm-table-container .highlight-row { background: rgba(180,83,9,0.1); }
 
         /* Stat callout inline */
-        .pjm-stat {
-            display: inline-block;
-            background: rgba(232,181,99,0.06);
-            border: 1px solid rgba(180,83,9,0.3);
-            padding: 0.15rem 0.5rem;
-            border-radius: 6px;
+        .article-body :is(p,li) span.pjm-stat {
+            display: inline;
+            background: transparent;
+            border: 0;
+            padding: 0;
+            font: inherit;
             font-weight: 700;
-            color: #b45309;
-            font-size: 0.95em;
+            color: inherit;
+            white-space: normal;
         }
-        [data-theme="dark"] .pjm-stat { background: rgba(180,83,9,0.15); color: #fcd34d; }
 
         /* Warning box */
         .pjm-warning-box {
             background: rgba(232,181,99,0.12);
             border: 1px solid #f59e0b;
-            border-left: 4px solid #d97706;
-            border-radius: 0 12px 12px 0;
+            border-left: 2px solid #d97706;
+            border-radius: 0 4px 4px 0;
             padding: 1.25rem 1.5rem;
             margin: 1.5rem 0;
         }
@@ -411,8 +410,8 @@
         .pjm-danger-box {
             background: rgba(232,181,99,0.06);
             border: 1px solid #d97706;
-            border-left: 4px solid #b45309;
-            border-radius: 0 12px 12px 0;
+            border-left: 2px solid #b45309;
+            border-radius: 0 4px 4px 0;
             padding: 1.25rem 1.5rem;
             margin: 1.5rem 0;
         }
@@ -432,7 +431,7 @@
         .pjm-card {
             background: #fff;
             border: 1px solid #e5e7eb;
-            border-radius: 12px;
+            border-radius: 4px;
             padding: 1.5rem;
             border-top: 3px solid var(--pjm-primary);
         }
@@ -533,7 +532,7 @@
             display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin-bottom: 0.75rem;
         }
         .pjm-kpi-card {
-            background: white; border: 1px solid #e5e7eb; border-radius: 8px;
+            background: white; border: 1px solid #e5e7eb; border-radius: 4px;
             padding: 0.65rem; text-align: center; transition: transform 0.2s;
         }
         .pjm-kpi-card:hover { transform: translateY(-2px); }
@@ -546,7 +545,7 @@
         }
         .pjm-kpi-unit { font-size: 0.7rem; color: #9ca3af; }
         .pjm-risk-badge {
-            display: inline-block; padding: 0.25rem 0.75rem; border-radius: 20px;
+            display: inline-block; padding: 0.25rem 0.75rem; border-radius: 4px;
             font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
         }
         .pjm-risk-low { background: #dcfce7; color: #166534; }
@@ -584,7 +583,7 @@
         .pjm-pro-panels.active { display: flex; }
         .pjm-pro-panel {
             position: relative; background: white; border: 1px solid #e5e7eb;
-            border-radius: 12px; overflow: hidden;
+            border-radius: 4px; overflow: hidden;
         }
         .pjm-pro-panel-inner {
             padding: 0.75rem;
@@ -907,7 +906,7 @@
 <div class="series-nav" style="margin-top: 1rem;">
     <div class="series-badge">
         <span class="series-badge-icon">25</span>
-        Global Analysis &mdash; Energy &amp; Policy
+        Global Analysis &mdash; Energy &amp; Policy &mdash; Article 25 of 28
     </div>
     <span class="series-title"></span>
     <div class="series-links">
@@ -928,9 +927,9 @@
     </figure>
 
     <!-- Section 1 -->
-    <h2 id="section-1">The Grid Nobody Talks About</h2>
+    <h2 id="section-1">How PJM Coordinates the Grid</h2>
 
-    <p>Somewhere in Valley Forge, Pennsylvania, a control room monitors the heartbeat of the largest power grid in North America. Most Americans have never heard of Pennsylvania-New Jersey-Maryland Interconnection (PJM) &mdash; yet it keeps the lights on for <span class="pjm-stat">65 million people</span> across 13 states and Washington DC. From the suburbs of Chicago to the skyscrapers of Northern Virginia, from the steel mills of Ohio to the government buildings of the National Capital Region, PJM dispatches approximately <span class="pjm-stat">180 GW</span> of generation capacity across a territory that stretches from Illinois to New Jersey.</p>
+    <p>From its control room in Valley Forge, Pennsylvania, PJM coordinates a large share of the eastern US electricity system. Most Americans have never heard of Pennsylvania-New Jersey-Maryland Interconnection (PJM) &mdash; yet it keeps the lights on for <span class="pjm-stat">65 million people</span> across 13 states and Washington DC. From the suburbs of Chicago to the skyscrapers of Northern Virginia, from the steel mills of Ohio to the government buildings of the National Capital Region, PJM dispatches approximately <span class="pjm-stat">180 GW</span> of generation capacity across a territory that stretches from Illinois to New Jersey.</p>
 
     <p>PJM is not a utility. It does not own a single power plant, transmission tower, or distribution wire. It is a Regional Transmission Organization (RTO) &mdash; essentially the air traffic controller for electrons. PJM coordinates the dispatch of generation, manages the wholesale electricity market, plans transmission expansion, and administers the capacity market that is supposed to guarantee that enough power plants exist to meet future demand. Over 1,000 generation owners, transmission owners, and load-serving entities participate in PJM's market. In 2023, PJM facilitated over $40 billion in wholesale electricity transactions.</p>
 
@@ -940,7 +939,7 @@
 
     <div class="pjm-danger-box">
         <h4><i class="fas fa-exclamation-triangle"></i> The Central Problem</h4>
-        <p>PJM's own analysis projects a capacity shortfall scenario emerging by 2027-2028. Demand is growing faster than at any point in the grid's modern history, while generation is retiring faster than it can be replaced. The reserve margin &mdash; the safety buffer between available supply and peak demand &mdash; is eroding. The largest grid in North America is running a race it is currently losing.</p>
+        <p>PJM's own analysis projects a capacity shortfall scenario emerging by 2027-2028. Demand is growing faster than at any point in the grid's modern history, while generation is retiring faster than it can be replaced. The reserve margin &mdash; the safety buffer between available supply and peak demand &mdash; is eroding. The planning question is whether new dependable capacity can arrive before those margins fall below the required level.</p>
     </div>
 
     <p>Understanding what is happening inside PJM is not optional for anyone working in data center infrastructure, energy policy, or critical facilities engineering. The decisions being made right now &mdash; about capacity markets, interconnection queues, plant retirements, and behind-the-meter generation &mdash; will determine whether the Eastern United States has enough electricity to power the AI revolution, or whether it stumbles into rolling blackouts within the next three to five years.</p>
@@ -1296,7 +1295,7 @@
     <!-- Section 7 -->
     <h2 id="section-7">The Political Battlefield</h2>
 
-    <p>The PJM capacity crisis is not merely a technical problem. It is a political war fought on multiple fronts, with utilities, data center operators, environmentalists, grid operators, federal regulators, state commissions, and local communities all pulling in different directions. The fundamental tension is brutally simple: everyone wants reliable power, nobody wants to pay for it, and nobody wants to live next to the infrastructure that provides it.</p>
+    <p>The PJM capacity crisis is not merely a technical problem. It is a political war fought on multiple fronts, with utilities, data center operators, environmentalists, grid operators, federal regulators, state commissions, and local communities all pulling in different directions. The disagreements concern who funds additional capacity, where new infrastructure is built, and how its local impacts are managed.</p>
 
     <p>Utilities like Dominion Energy and American Electric Power sit on one side of the battlefield. They want data centers to pay for the grid upgrades their massive load growth demands. When a single hyperscale campus requires 300 MW of dedicated transmission capacity, the cost of substation upgrades, new transmission lines, and interconnection infrastructure can exceed $500 million. Utilities argue that these costs should fall on the customers creating the demand, not be socialized across millions of residential ratepayers. Data center operators counter that they already pay billions in property taxes and energy bills, and that forcing them to fund grid infrastructure creates a competitive disadvantage against regions with faster, cheaper interconnection processes.</p>
 
@@ -1570,7 +1569,7 @@
     <!-- Section 11 -->
     <h2 id="section-11">The Engineer's View</h2>
 
-    <p>I write this analysis not as an outside observer but as someone who operates critical infrastructure that depends on the grid every second of every day. My facility runs on PJM power. My UPS systems, my generators, my cooling plants, my network infrastructure &mdash; all of it ultimately traces back to the transmission lines and generation resources that PJM coordinates. When PJM's reserve margin shrinks, my operational risk grows. This is not abstract to me.</p>
+    <p>For a facility supplied through PJM, grid capacity is an operating dependency. UPS systems and generators provide backup, but the facility still needs a plan for prolonged supply constraints. Reserve-margin trends belong in that risk assessment.</p>
 
     <p>UPS systems and backup generators buy you hours, not days. A typical data center can ride through a brief grid disturbance on battery backup and sustain operations for 24-48 hours on diesel generators, assuming fuel deliveries continue. But if PJM enters a prolonged shortage event &mdash; multiple days of extreme weather combined with insufficient generation &mdash; no amount of on-site backup makes you immune. Grid reliability is our reliability. There is no version of "resilient data center operations" that survives a fundamentally unreliable grid over the medium term. We can harden our facilities, stockpile fuel, and test our failover procedures, but we cannot generate 50 MW of continuous power from a rooftop solar array or a battery room designed for 15 minutes of ride-through.</p>
 
@@ -1677,7 +1676,7 @@
         <div class="author-bio-content">
             <h4>Bagus Dwi Permana</h4>
             <p class="author-bio-title">Engineering Operations Manager | Ahli K3 Listrik</p>
-            <p>12+ years professional experience in critical infrastructure and operations. CDFOM certified. Transforming operations through systematic excellence and safety-first engineering.</p>
+            <p>12+ years professional experience in critical infrastructure and operations. CDFOM certified. Focuses on facility reliability, maintenance, and electrical safety.</p>
             <div class="author-bio-links">
                 <a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
@@ -1727,7 +1726,7 @@
     <div class="article-nav">
         <a href="article-24.html"><i class="fas fa-arrow-left"></i> Previous Article</a>
         <a href="articles.html">All Articles</a>
-        <span style="color: #64748b; cursor: default;">Latest Article</span>
+        <a href="article-26.html">Next Article <i class="fas fa-arrow-right"></i></a>
     </div>
 
 </div>

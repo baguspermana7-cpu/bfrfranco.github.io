@@ -21,7 +21,7 @@ html[data-rz-register="editorial"][data-theme="dark"]{
   --rz-art-panel:#16181D;
   --rz-art-text:#CFD3DA;
   --rz-art-strong:#F6F7F9;
-  --rz-art-muted:#7E8590;
+  --rz-art-muted:#969eaa;
   --rz-art-line:rgba(160,168,180,.14);
   --rz-art-serif:'Fraunces',Georgia,'Times New Roman',serif;
   --rz-art-sans:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
@@ -105,8 +105,8 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-body p{
 /* drop-cap on the first paragraph of the body */
 html[data-rz-register="editorial"][data-theme="dark"] .article-body > p:first-of-type::first-letter{
   font-family:var(--rz-art-serif);
-  font-size:3.1rem;font-weight:600;float:left;line-height:.82;
-  padding:6px 10px 0 0;color:var(--rz-art-accent);
+  font-size:inherit;font-weight:inherit;float:none;line-height:inherit;
+  padding:0;color:inherit;
 }
 
 /* ---- CALLOUTS / QUOTES → editorial accent rail ---- */
@@ -201,8 +201,11 @@ html[data-rz-register="editorial"][data-theme="dark"] [data-rz-enter].rz-in{opac
 html[data-rz-register="editorial"]:not([data-theme="dark"]){
   /* !important beats the inline style="--rz-art-accent:#E8B563" each article sets on <html>:
      #E8B563 is the DARK accent (≈1.7:1 on white, fails) — day needs the readable gold #b45309. */
-  --rz-art-accent:#b45309 !important;            /* amber-700 — readable gold on white */
+  --rz-art-accent:#92400e !important;            /* readable amber across light editorial surfaces */
   --rz-art-accent2:#6FBF9A;
+  --rz-art-bg:#f8f9fa;
+  --rz-art-panel:#f1f3f5;
+  --rz-art-text:#343a40;
   --rz-art-strong:#1a1d23;
   --rz-art-muted:#6b7280;
   --rz-art-line:rgba(40,44,52,.12);
@@ -252,8 +255,8 @@ html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-body h3{
   font-family:var(--rz-art-serif) !important;font-weight:500 !important;color:var(--rz-art-strong) !important;
 }
 html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-body > p:first-of-type::first-letter{
-  font-family:var(--rz-art-serif);font-size:3.1rem;font-weight:600;float:left;line-height:.82;
-  padding:6px 10px 0 0;color:var(--rz-art-accent);
+  font-family:inherit;font-size:inherit;font-weight:inherit;float:none;line-height:inherit;
+  padding:0;color:inherit;
 }
 /* ---- CALLOUTS / QUOTES ---- */
 html[data-rz-register="editorial"]:not([data-theme="dark"]) .quote-callout{
@@ -424,7 +427,7 @@ html[data-rz-register="editorial"] .article-body > .article-bleed{
    column so it lines up with the hero image edge (W-C). ---- */
 html[data-rz-register="editorial"] .article-body > h2{
   border-top: 1px solid var(--rz-art-line, rgba(160,168,180,.14));
-  padding-top: 2.1rem;
+  padding-top: 1.25rem;
 }
 html[data-rz-register="editorial"] .article-body > h2:first-child{
   border-top: 0; padding-top: 0;
@@ -516,16 +519,16 @@ html[data-rz-register="editorial"] .rz-scrolly-step{
   min-height:66vh; display:flex; align-items:center; justify-content:flex-start;
 }
 html[data-rz-register="editorial"] .rz-scrolly-step-inner{
-  max-width:34rem; padding:1.05rem 1.3rem; border-radius:8px;
+  max-width:34rem; padding:1.05rem 1.3rem; border-radius:4px;
   border:1px solid var(--rz-art-line, rgba(160,168,180,.14));
   border-left:2px solid var(--rz-art-accent, #b45309);
-  background:color-mix(in srgb, var(--rz-art-panel, #16181D) 92%, transparent);
-  opacity:.45; transition:opacity .35s;
+  background:var(--rz-art-panel, #16181D);
+  opacity:1; transition:border-color .2s;
 }
 html[data-rz-register="editorial"]:not([data-theme="dark"]) .rz-scrolly-step-inner{
-  background:color-mix(in srgb, #ffffff 94%, transparent);
+  background:var(--rz-art-panel);
 }
-html[data-rz-register="editorial"] .rz-scrolly-step.active .rz-scrolly-step-inner{ opacity:1; }
+html[data-rz-register="editorial"] .rz-scrolly-step.active .rz-scrolly-step-inner{ border-color:var(--rz-art-accent); }
 html[data-rz-register="editorial"] .rz-scrolly-step-kicker{
   font-family:'IBM Plex Mono',ui-monospace,monospace; font-size:.64rem;
   letter-spacing:.14em; text-transform:uppercase; color:var(--rz-art-accent, #b45309);
@@ -546,6 +549,17 @@ html[data-rz-register="editorial"] .rz-scrolly-step-inner p{
 @media (prefers-reduced-motion: reduce){
   .rz-scrolly .st-layer{ transition:none; }
   html[data-rz-register="editorial"] .rz-scrolly-step-inner{ transition:none; }
+}
+html[data-rz-register="editorial"] [data-rz-scrolly-static] .rz-scrolly-canvas{
+  position:static;
+}
+html[data-rz-register="editorial"] [data-rz-scrolly-static] .rz-scrolly-step{
+  min-height:0;
+  margin-block:1rem;
+}
+html[data-rz-register="editorial"] [data-rz-scrolly-static] .rz-scrolly-step-inner{
+  max-width:none;
+  width:100%;
 }
 
 /* ---- READING POLISH (v1.50.24) ---- */
@@ -583,7 +597,7 @@ html[data-rz-register="editorial"] .article-rail-head{
 }
 html[data-rz-register="editorial"] .rz-rail-card{
   display: flex; gap: .6rem; align-items: flex-start;
-  text-decoration: none; padding: .5rem; border-radius: 8px;
+  text-decoration: none; padding: .5rem; border-radius: 4px;
   border: 1px solid transparent; transition: border-color .2s, background .2s;
 }
 html[data-rz-register="editorial"] .rz-rail-card:hover{
@@ -595,8 +609,8 @@ html[data-rz-register="editorial"] .rz-rail-thumb{
   border-radius: 5px; border: 1px solid var(--rz-art-line, rgba(160,168,180,.14));
 }
 html[data-rz-register="editorial"] .rz-rail-title{
-  font-size: .82rem; line-height: 1.3; color: var(--rz-art-text, #334155);
-  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  font-size: .875rem; line-height: 1.5; color: var(--rz-art-text, #334155);
+  display: block; overflow-wrap: anywhere;
 }
 html[data-rz-register="editorial"] .rz-rail-card:hover .rz-rail-title{ color: var(--rz-art-strong, #0f172a); }
 /* on wide screens the rail replaces the bottom grid; on narrow the grid returns */
@@ -625,7 +639,7 @@ html[data-rz-register="editorial"] .pfas-engineer-note{
   background-image: none !important;                 /* kill the gradient fill */
   border: 1px solid color-mix(in srgb, var(--cl) 24%, transparent) !important;
   border-left: 2px solid var(--cl) !important;       /* thin accent rail (was 3–4px) */
-  border-radius: 8px !important;
+  border-radius: 4px !important;
   box-shadow: none !important;
   padding: 1.15rem 1.35rem !important;
 }
@@ -692,7 +706,7 @@ html[data-rz-register="editorial"] .article-body [class*="-note"]{
   background-image: none !important;
   border: 1px solid color-mix(in srgb, var(--cl) 22%, transparent) !important;
   border-left: 2px solid var(--cl) !important;
-  border-radius: 8px !important;
+  border-radius: 4px !important;
   box-shadow: none !important;
 }
 /* semantic accent via class-name hint (these come AFTER the base so --cl wins) */
@@ -746,7 +760,7 @@ html[data-rz-register="editorial"] .article-body p{
 html[data-rz-register="editorial"] .article-body h2{
   font-size:clamp(1.75rem,3vw,2.25rem) !important;
   line-height:1.18 !important;
-  margin:2.4em 0 .55em !important;
+  margin:clamp(2rem,4vw,3rem) 0 .75em !important;
 }
 html[data-rz-register="editorial"] .article-body h3{
   font-size:clamp(1.2rem,2vw,1.45rem) !important;
@@ -764,7 +778,7 @@ html[data-rz-register="editorial"] .article-title{
 html[data-rz-register="editorial"] .article-body{ counter-reset:rz-h2; }
 html[data-rz-register="editorial"] .article-body h2{ counter-increment:rz-h2; }
 html[data-rz-register="editorial"] .article-body h2::before{
-  content:counter(rz-h2,decimal-leading-zero) !important;
+  content:none !important;
   display:inline-block !important;
   font-family:'IBM Plex Mono',ui-monospace,monospace !important;
   font-size:.5em !important;font-weight:600 !important;line-height:1 !important;
@@ -835,11 +849,11 @@ html[data-rz-register="editorial"] .article-body [data-rz-flat]{
   background-color:var(--rz-art-panel,#16181D) !important;
   background-image:none !important;
   border:1px solid var(--rz-art-line,rgba(160,168,180,.14)) !important;
-  border-radius:8px !important;
+  border-radius:4px !important;
   box-shadow:none !important;
 }
 html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-body [data-rz-flat]{
-  background-color:#ffffff !important;
+  background-color:var(--rz-art-panel) !important;
   border:1px solid rgba(40,44,52,.12) !important;
 }
 
@@ -872,5 +886,185 @@ html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-body [data-
   color:var(--rz-art-strong,#1a1d23) !important;
 }
 html[data-rz-register="editorial"]:not([data-theme="dark"]) .article-body [data-rz-flat] :is(p,li,blockquote){
-  color:var(--rz-art-muted,#6b7280) !important;
+  color:var(--rz-art-text,#343a40) !important;
+}
+
+html[data-rz-register="editorial"] .article-hero{
+  background:var(--rz-art-bg) !important;
+  padding-block:clamp(6rem,10vw,8rem) clamp(2rem,4vw,3rem) !important;
+  padding-inline:0 !important;
+  text-align:left;
+}
+html[data-rz-register="editorial"] .article-hero::before,
+html[data-rz-register="editorial"] .article-hero::after{
+  content:none !important;
+}
+html[data-rz-register="editorial"] :is(body,main) > [class$="-evidence-block"]{
+  background:var(--rz-art-panel) !important;
+  border-block:1px solid var(--rz-art-line);
+  padding:1.5rem 1.25rem;
+}
+html[data-rz-register="editorial"] :is(body,main) > [class$="-evidence-block"] [class$="-evidence-card"]{
+  background:transparent !important;
+  border:0;
+  border-radius:0;
+  padding:.5rem;
+  text-align:left;
+  box-shadow:none;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+html[data-rz-register="editorial"] :is(body,main) > [class$="-evidence-block"] [class$="-evidence-value"]{
+  color:var(--rz-art-strong) !important;
+}
+html[data-rz-register="editorial"] :is(body,main) > [class$="-evidence-block"] :is([class$="-evidence-label"],[class$="-evidence-sub"]){
+  color:var(--rz-art-text) !important;
+  font-size:.875rem;
+  line-height:1.5;
+}
+html[data-rz-register="editorial"] .article-hero :is(.container,.hero-container){
+  max-width:820px;
+  margin-inline:auto;
+  padding-inline:clamp(1.25rem,3vw,2rem);
+}
+html[data-rz-register="editorial"] .article-hero.rz-has-rail :is(.container,.hero-container){
+  max-width:1160px;
+}
+html[data-rz-register="editorial"] .article-title{
+  max-width:var(--rz-measure);
+  margin-inline:0;
+  text-align:left;
+}
+html[data-rz-register="editorial"] .article-subtitle{
+  max-width:var(--rz-measure);
+  margin-inline:0;
+  color:var(--rz-art-text) !important;
+  text-align:left;
+  line-height:1.65;
+}
+html[data-rz-register="editorial"] .article-hero .article-meta{
+  justify-content:flex-start;
+  gap:.75rem 1.5rem;
+  margin-top:1.5rem;
+}
+html[data-rz-register="editorial"] .article-hero :is(.article-badge,.article-category){
+  background:transparent;
+  border:0;
+  border-radius:0;
+  padding:0;
+  color:var(--rz-art-accent);
+}
+html[data-rz-register="editorial"] .article-hero .back-link{
+  color:var(--rz-art-muted);
+}
+html[data-rz-register="editorial"] .article-hero a[href$="articles.html"]{
+  color:var(--rz-art-muted) !important;
+}
+html[data-rz-register="editorial"] .article-content{
+  padding:clamp(2rem,4vw,3rem) 0;
+  padding-inline:0 !important;
+}
+html[data-rz-register="editorial"] .article-body{
+  padding-inline:0 !important;
+}
+html[data-rz-register="editorial"] .article-body h2{
+  border-bottom:0;
+  padding-bottom:0;
+}
+html[data-rz-register="editorial"] .article-body h2 .section-number{
+  display:none;
+}
+html[data-rz-register="editorial"] .article-body > blockquote{
+  background:transparent !important;
+  border:0 !important;
+  border-block:1px solid var(--rz-art-line) !important;
+  border-radius:0;
+  padding:1.25rem 0;
+  color:var(--rz-art-text) !important;
+  box-shadow:none;
+}
+html[data-rz-register="editorial"] .article-body > :is(.info-box,.key-insight,.summary-box,.conclusion-box){
+  background:var(--rz-art-panel) !important;
+  border:1px solid var(--rz-art-line) !important;
+  border-radius:4px;
+  box-shadow:none;
+}
+html[data-rz-register="editorial"] .article-body > p,
+html[data-rz-register="editorial"] .article-body > :is(ul,ol) > li,
+html[data-rz-register="editorial"] .article-body > section > p,
+html[data-rz-register="editorial"] .article-body > blockquote,
+html[data-rz-register="editorial"] .article-body :is(.info-box,.key-insight,.summary-box,.quote-callout,.market-impact,.fact-check-box,[class$="-insight-box"],[data-rz-flat]) > p,
+html[data-rz-register="editorial"] .article-body :is(.info-box,.key-insight,.summary-box,.market-impact,.references,.references-section) :is(p,li){
+  font-size:clamp(1rem,.95rem + .2vw,1.125rem) !important;
+  line-height:1.75 !important;
+  overflow-wrap:break-word;
+}
+html[data-rz-register="editorial"] .article-body [data-rz-enter]{
+  opacity:1 !important;
+  transform:none !important;
+  transition:none !important;
+}
+html[data-rz-register="editorial"] .article-body [data-rz-small-prose]{
+  font-size:16px !important;
+}
+html[data-rz-register="editorial"] .article-body [data-rz-tight-prose]{
+  line-height:1.75 !important;
+}
+html[data-rz-register="editorial"] .article-body .references-list{
+  grid-template-columns:minmax(0,1fr);
+}
+html[data-rz-register="editorial"] .article-body .reference-item,
+html[data-rz-register="editorial"] .article-body .reference-item > :not(.reference-number){
+  min-width:0;
+  overflow-wrap:anywhere;
+}
+html[data-rz-register="editorial"] .article-body .comparison-card-icon{
+  background:transparent !important;
+  border:0;
+  box-shadow:none;
+}
+html[data-rz-register="editorial"][data-rz-sampling] .article-body *{
+  transition:none !important;
+}
+html[data-rz-register="editorial"] .toc-section{
+  padding:1.5rem 0;
+  background:var(--rz-art-bg);
+}
+html[data-rz-register="editorial"] .toc-container{
+  padding-inline:clamp(1.25rem,3vw,2rem);
+}
+html[data-rz-register="editorial"] [data-rz-toc] summary{
+  padding-block:.75rem;
+  min-height:44px;
+  cursor:pointer;
+  font-family:var(--rz-art-sans);
+  font-weight:600;
+  color:var(--rz-art-strong);
+}
+html[data-rz-register="editorial"] [data-rz-toc] summary:focus-visible{
+  outline:2px solid var(--rz-art-accent);
+  outline-offset:4px;
+}
+html[data-rz-register="editorial"] [data-rz-toc] > [hidden]{
+  display:none !important;
+}
+@media (max-width:1023px){
+  html[data-rz-register="editorial"] .article-hero.rz-has-rail :is(.container,.hero-container){
+    max-width:820px;
+  }
+}
+@media (max-width:767px){
+  html[data-rz-register="editorial"] .article-content > .container,
+  html[data-rz-register="editorial"] .article-hero :is(.container,.hero-container){
+    padding-inline:1.25rem !important;
+  }
+  html[data-rz-register="editorial"] .article-hero .article-title{
+    font-size:clamp(2rem,7.5vw,2.6rem) !important;
+    line-height:1.15 !important;
+  }
+  html[data-rz-register="editorial"] .article-body > p,
+  html[data-rz-register="editorial"] .article-body li{
+    text-align:left;
+    hyphens:manual;
+  }
 }

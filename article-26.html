@@ -73,7 +73,7 @@
     <meta name="twitter:site" content="@BagusDPermana">
     <meta name="twitter:creator" content="@BagusDPermana">
     <meta name="twitter:title" content="The Invisible Leak: PFAS in Data Centers, What Nobody Is Measuring">
-    <meta name="twitter:description" content="Every PFAS article asks 'is it in your data center?' I've opened these tanks hundreds of times. Here's the question nobody is asking.">
+    <meta name="twitter:description" content="How maintenance opens a vapor-loss pathway in two-phase cooling, and how operators can measure working-fluid losses.">
     <meta name="twitter:image" content="https://resistancezero.com/assets/og/article-26.webp">
     <meta name="twitter:image:alt" content="Two-phase immersion cooling system open for maintenance in a data center">
 
@@ -85,15 +85,15 @@
          the editorial article skin (scoped to data-rz-register=editorial + dark),
          and the read-progress/entrance runtime. Light mode + structure untouched. -->
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
-    <link rel="stylesheet" href="css/rz-article-dark.css?v=1.99-light">
+    <link rel="stylesheet" href="css/rz-article-dark.css?v=20260908-editorial">
     <script src="js/rz-explain-db.js?v=2026-07-24-w" defer></script>
 <script src="js/rz-explain.js?v=2026-07-16" defer></script>
-<script src="js/rz-article-editorial.js?v=1.51.8" defer></script>
+<script src="js/rz-article-editorial.js?v=20260908-editorial" defer></script>
     <script src="js/rz-command-palette.js?v=2026-09-05-mint" defer></script>
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="styles.min.css?v=2026-09-06-slop">
+    <link rel="stylesheet" href="styles.min.css?v=20260908-editorial">
     <link rel="preload" as="image" href="assets/article-26-hero.webp">
 
     <!-- Structured Data: TechnicalArticle -->
@@ -272,7 +272,7 @@
         .pfas-evidence-card {
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(252,211,77,0.2);
-            border-radius: 12px;
+            border-radius: 4px;
             padding: 1.25rem;
             text-align: center;
         }
@@ -309,10 +309,10 @@
         /* Quote callout */
         .quote-callout {
             background: var(--pfas-bg);
-            border-left: 4px solid var(--pfas-primary);
+            border-left: 2px solid var(--pfas-primary);
             padding: 1.5rem 2rem;
             margin: 2rem 0;
-            border-radius: 0 12px 12px 0;
+            border-radius: 0 4px 4px 0;
         }
         .quote-callout blockquote {
             font-size: 1.1rem;
@@ -337,7 +337,7 @@
         .pfas-insight-box {
             background: rgba(232,181,99,0.07);
             border: 1px solid rgba(180,83,9,0.3);
-            border-radius: 12px;
+            border-radius: 4px;
             padding: 1.5rem;
             margin: 1.5rem 0;
         }
@@ -355,8 +355,8 @@
         .pfas-warning-box {
             background: rgba(232,181,99,0.12);
             border: 1px solid #92400e;
-            border-left: 4px solid #d97706;
-            border-radius: 0 12px 12px 0;
+            border-left: 2px solid #d97706;
+            border-radius: 0 4px 4px 0;
             padding: 1.25rem 1.5rem;
             margin: 1.5rem 0;
         }
@@ -370,8 +370,8 @@
         .pfas-danger-box {
             background: rgba(232,181,99,0.06);
             border: 1px solid #d97706;
-            border-left: 4px solid #b45309;
-            border-radius: 0 12px 12px 0;
+            border-left: 2px solid #b45309;
+            border-radius: 0 4px 4px 0;
             padding: 1.25rem 1.5rem;
             margin: 1.5rem 0;
         }
@@ -382,18 +382,16 @@
         [data-theme="dark"] .pfas-danger-box p { color: #fde68a; }
 
         /* Inline stat */
-        .pfas-stat {
-            display: inline-block;
-            background: rgba(232,181,99,0.06);
-            border: 1px solid rgba(180,83,9,0.3);
-            padding: 0.15rem 0.5rem;
-            border-radius: 6px;
+        .article-body :is(p,li) span.pfas-stat {
+            display: inline;
+            background: transparent;
+            border: 0;
+            padding: 0;
+            font: inherit;
             font-weight: 700;
-            color: #b45309;
-            font-size: 0.95em;
-            font-variant-numeric: tabular-nums; font-feature-settings:"zero" 1;
+            color: inherit;
+            white-space: normal;
         }
-        [data-theme="dark"] .pfas-stat { background: rgba(180,83,9,0.15); color: #fcd34d; }
         /* v1.19.1 light-contrast: dark-red in light, bright-red kept for dark */
         .pfas-cell-alert { color: #b45309; }
         [data-theme="dark"] .pfas-cell-alert { color: #fbbf24; }
@@ -436,7 +434,7 @@
         .pfas-chem-block {
             background: #0f172a;
             border: 1px solid rgba(217,119,6,0.25);
-            border-radius: 10px;
+            border-radius: 4px;
             padding: 1.25rem 1.5rem;
             margin: 1.5rem 0;
             font-family: 'JetBrains Mono', monospace;
@@ -468,7 +466,7 @@
         .pfas-card {
             background: #fff;
             border: 1px solid #e5e7eb;
-            border-radius: 12px;
+            border-radius: 4px;
             padding: 1.5rem;
             border-top: 3px solid var(--pfas-primary);
         }
@@ -496,8 +494,8 @@
         /* Engineer note — first-person callout */
         .pfas-engineer-note {
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            border-left: 4px solid #d97706;
-            border-radius: 0 12px 12px 0;
+            border-left: 2px solid #d97706;
+            border-radius: 0 4px 4px 0;
             padding: 1.5rem 2rem;
             margin: 2rem 0;
             color: #e2e8f0;
@@ -565,7 +563,7 @@
 
         /* Results grid */
         .pfas-results-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0.75rem; margin:1.25rem 0; }
-        .pfas-kpi-card { background:#f9fafb; border:1px solid #e5e7eb; border-top:3px solid #b45309; border-radius:10px; padding:0.875rem; }
+        .pfas-kpi-card { background:#f9fafb; border:1px solid #e5e7eb; border-top:3px solid #b45309; border-radius:4px; padding:0.875rem; }
         [data-theme="dark"] .pfas-kpi-card { background:#111827; border-color:#374151; }
         .pfas-kpi-label { font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:#64748b; margin-bottom:0.4rem; }
         [data-theme="dark"] .pfas-kpi-label { color:#9ca3af; }
@@ -585,7 +583,7 @@
         /* Pro panels */
         .pfas-pro-panels { display:none; margin-top:1.5rem; }
         .pfas-pro-panels.active { display:block; }
-        .pfas-pro-panel { background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; margin-bottom:1rem; overflow:hidden; position:relative; }
+        .pfas-pro-panel { background:#f9fafb; border:1px solid #e5e7eb; border-radius:4px; margin-bottom:1rem; overflow:hidden; position:relative; }
         [data-theme="dark"] .pfas-pro-panel { background:#111827; border-color:#374151; }
         .pfas-pro-panel-header { padding:0.875rem 1.25rem; border-bottom:1px solid #e5e7eb; display:flex; align-items:center; justify-content:space-between; }
         [data-theme="dark"] .pfas-pro-panel-header { border-color:#374151; }
@@ -878,7 +876,7 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-warnin
 <div class="series-nav" role="navigation" aria-label="Article series" style="margin-top: 1rem;">
     <div class="series-badge">
         <span class="series-badge-icon">26</span>
-        Global Analysis &mdash; Environmental Investigation
+        Global Analysis &mdash; Environmental Investigation &mdash; Article 26 of 28
     </div>
     <span class="series-title"></span>
     <div class="series-links">
@@ -901,9 +899,9 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-warnin
     <!-- Section 1 -->
     <h2 id="section-1">What Are Per- and Polyfluoroalkyl Substances &mdash; and Why Are They in Your Data Center&rsquo;s Cooling Loop?</h2>
 
-    <p>Before we get to the part that nobody in the data center industry is talking about, let me give you the chemistry. PFAS &mdash; Per- and Polyfluoroalkyl Substances &mdash; is not a single chemical. It is a family of more than <span class="pfas-stat">12,000 synthetic compounds</span>, all sharing a common structural feature: chains of carbon atoms bonded to fluorine atoms. That carbon-fluorine (C-F) bond is the entire problem, and also the entire point.</p>
+    <p>Fluid-loss accounting starts with the chemistry of the working fluid. PFAS &mdash; Per- and Polyfluoroalkyl Substances &mdash; is not a single chemical. It is a family of more than <span class="pfas-stat">12,000 synthetic compounds</span>, all sharing a common structural feature: chains of carbon atoms bonded to fluorine atoms. The carbon-fluorine (C-F) bond helps explain both their useful properties and their environmental persistence.</p>
 
-    <p>The C-F bond has a dissociation energy of approximately <span class="pfas-stat">544 kJ/mol</span> &mdash; the strongest bond in organic chemistry. Nothing in the natural world breaks it down efficiently. Not UV radiation, not biological enzymes, not soil bacteria, not the acidic environment of a human gut. This bond energy is why PFAS bioaccumulates across food chains, why it has been detected in the blood of polar bears in the Arctic and in the tissue of fish in remote mountain lakes with no industrial activity for hundreds of kilometers. Once a PFAS molecule is released into the environment, it persists. The phrase the scientific community uses is "environmentally persistent" &mdash; which is the polite way of saying it does not go away, ever, on any timescale that matters to human civilization.</p>
+    <p>The C-F bond has a dissociation energy of approximately <span class="pfas-stat">544 kJ/mol</span> &mdash; the strongest bond in organic chemistry. Nothing in the natural world breaks it down efficiently. Not UV radiation, not biological enzymes, not soil bacteria, not the acidic environment of a human gut. This bond energy is why PFAS bioaccumulates across food chains, why it has been detected in the blood of polar bears in the Arctic and in the tissue of fish in remote mountain lakes with no industrial activity for hundreds of kilometers. Once a PFAS molecule is released into the environment, it persists. This persistence makes the amount released during operation and maintenance important to measure.</p>
 
     <div class="pfas-chem-block">
         <span class="chem-label">PFAS Bond Chemistry &mdash; Why Persistence Is the Problem</span>
@@ -2095,7 +2093,7 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-warnin
     <div class="article-nav">
         <a href="article-25.html"><i class="fas fa-arrow-left"></i> PJM Is 6 GW Short by 2027</a>
         <a href="articles.html">All Articles</a>
-        <span style="color: #64748b; cursor: default;">Latest Article</span>
+        <a href="article-27.html">Next Article <i class="fas fa-arrow-right"></i></a>
     </div>
 
 </div>

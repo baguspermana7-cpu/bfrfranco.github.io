@@ -84,13 +84,13 @@
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="styles.min.css?v=2026-09-06-slop">
+    <link rel="stylesheet" href="styles.min.css?v=20260908-editorial">
     <!-- v1.43.x — editorial register (RZ Dark System v1, §08 article skin). Adds Fraunces + Plex fonts, editorial dark chrome + read-progress/stagger. -->
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
-    <link rel="stylesheet" href="css/rz-article-dark.css?v=1.99-light">
+    <link rel="stylesheet" href="css/rz-article-dark.css?v=20260908-editorial">
     <script src="js/rz-explain-db.js?v=2026-07-24-w" defer></script>
 <script src="js/rz-explain.js?v=2026-07-16" defer></script>
-<script src="js/rz-article-editorial.js?v=1.51.8" defer></script>
+<script src="js/rz-article-editorial.js?v=20260908-editorial" defer></script>
     <script src="js/rz-command-palette.js?v=2026-09-05-mint" defer></script>
     <link rel="preload" as="image" href="assets/article-27-hero.webp">
 
@@ -260,7 +260,7 @@
         .ws-evidence-card {
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(252,211,77,0.2);
-            border-radius: 12px;
+            border-radius: 4px;
             padding: 1.25rem;
             text-align: center;
         }
@@ -297,10 +297,10 @@
         /* Quote callout */
         .quote-callout {
             background: var(--ws-bg);
-            border-left: 4px solid var(--ws-primary);
+            border-left: 2px solid var(--ws-primary);
             padding: 1.5rem 2rem;
             margin: 2rem 0;
-            border-radius: 0 12px 12px 0;
+            border-radius: 0 4px 4px 0;
         }
         .quote-callout blockquote {
             font-size: 1.1rem;
@@ -324,8 +324,8 @@
         .ws-insight-box {
             background: rgba(232,181,99,0.06);
             border: 1px solid rgba(232,181,99,0.28);
-            border-left: 3px solid #E8B563;
-            border-radius: 8px;
+            border-left: 2px solid #E8B563;
+            border-radius: 4px;
             padding: 1.25rem 1.5rem;
             margin: 1.5rem 0;
         }
@@ -336,19 +336,22 @@
         [data-theme="dark"] .ws-insight-box p { color: #d1d5db; }
 
         /* Stat inline */
-        .ws-stat {
+        .article-body :is(p,li) span.ws-stat {
+            display: inline;
+            background: transparent;
+            border: 0;
+            padding: 0;
+            font: inherit;
             font-weight: 700;
-            color: #b45309;
-            border-bottom: 2px solid rgba(232,181,99,0.6);
-            white-space: nowrap;
+            color: inherit;
+            white-space: normal;
         }
-        [data-theme="dark"] .ws-stat { color: #fcd34d; border-bottom-color: rgba(232,181,99,0.5); }
 
         /* Engineer note */
         .ws-engineer-note {
             background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-            border-left: 4px solid #d97706;
-            border-radius: 0 12px 12px 0;
+            border-left: 2px solid #d97706;
+            border-radius: 0 4px 4px 0;
             padding: 1.5rem 2rem;
             margin: 2rem 0;
             color: #e2e8f0;
@@ -440,9 +443,9 @@
             gap: 1rem;
             background: #fff;
             border: 1px solid #e5e7eb;
-            border-radius: 10px;
+            border-radius: 4px;
             padding: 1rem 1.25rem;
-            border-left: 4px solid #b45309;
+            border-left: 2px solid #b45309;
         }
         [data-theme="dark"] .ws-strat-card { background: #1e293b; border-color: #374151; }
         .ws-strat-num {
@@ -556,7 +559,7 @@
         [data-theme="dark"] .ws-select, [data-theme="dark"] .ws-num { background:#1f2937; border-color:#374151; color:#f3f4f6; }
 
         .ws-results-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0.75rem; margin:1.25rem 0; }
-        .ws-kpi-card { background:#f9fafb; border:1px solid #e5e7eb; border-top:3px solid #b45309; border-radius:10px; padding:0.875rem; }
+        .ws-kpi-card { background:#f9fafb; border:1px solid #e5e7eb; border-top:3px solid #b45309; border-radius:4px; padding:0.875rem; }
         [data-theme="dark"] .ws-kpi-card { background:#111827; border-color:#374151; }
         .ws-kpi-label { font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:#64748b; margin-bottom:0.4rem; }
         [data-theme="dark"] .ws-kpi-label { color:#9ca3af; }
@@ -569,7 +572,7 @@
 
         .ws-pro-panels { display:none; margin-top:1.5rem; }
         .ws-pro-panels.active { display:block; }
-        .ws-pro-panel { background:#f9fafb; border:1px solid #e5e7eb; border-radius:10px; margin-bottom:1rem; overflow:hidden; position:relative; }
+        .ws-pro-panel { background:#f9fafb; border:1px solid #e5e7eb; border-radius:4px; margin-bottom:1rem; overflow:hidden; position:relative; }
         [data-theme="dark"] .ws-pro-panel { background:#111827; border-color:#374151; }
         .ws-pro-panel-header { padding:0.875rem 1.25rem; border-bottom:1px solid #e5e7eb; display:flex; align-items:center; justify-content:space-between; }
         [data-theme="dark"] .ws-pro-panel-header { border-color:#374151; }
@@ -863,12 +866,12 @@
 <div class="series-nav" style="margin-top: 1rem;">
     <div class="series-badge">
         <span class="series-badge-icon">27</span>
-        Global Analysis &mdash; Workforce Analysis
+        Global Analysis &mdash; Workforce Analysis &mdash; Article 27 of 28
     </div>
     <span class="series-title"></span>
     <div class="series-links">
         <a href="article-26.html" class="series-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>Prev</a>
-        <a href="#" class="series-link" style="opacity:0.4;pointer-events:none;">Next<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
+        <a href="article-28.html" class="series-link">Next<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></a>
     </div>
 </div>
 
@@ -886,7 +889,7 @@
     <!-- Section 1 -->
     <h2 id="section-1">The 2026 Workforce Cliff</h2>
 
-    <p>In twelve years of data center operations, I have watched the industry struggle with many things: power density constraints, cooling efficiency chasing, grid interconnection delays, land-use opposition, water rights disputes. Every one of those problems has a clear technical pathway to a solution. This one is different. The workforce crisis facing the data center industry is not a problem that engineering can solve faster than it is growing. It is a structural collapse of supply against demand that is unfolding in real time, and the numbers behind it are more alarming than most of the industry is willing to say publicly.</p>
+    <p>Data center capacity plans need a staffing plan alongside power and cooling design. Recruiting, qualifying, and retaining operators takes time, and a completed facility cannot meet its operating commitments without them.</p>
 
     <p>The headline figure is <span class="ws-stat">467,000&ndash;498,000 unfilled operational positions</span> across the global data center sector, per research from the 7x24 Exchange and the Mission Critical Global Alliance (MCGA). That gap is not a forecast. It is the current shortfall, as of 2024&ndash;2026, in a sector that is simultaneously expanding capacity at <span class="ws-stat">30% per year</span> driven by AI infrastructure demand. The Uptime Institute&rsquo;s 2024 Global Data Center Survey found that more than <span class="ws-stat">65% of operators</span> report significant difficulty finding qualified candidates. To understand what that means operationally: if you are an enterprise or colocation operator, there is a better than even chance that your next critical hire is not on the market today.</p>
 
@@ -1579,7 +1582,7 @@
 
     <p>The good news is that this is a solvable problem. The strategies documented here have working examples &mdash; operators who have meaningfully improved their staffing pipelines by applying 3&ndash;5 strategies simultaneously, starting with the fastest levers (retention restructuring, adjacent cross-training, <a href="glossary.html#term-nocaas">NOCaaS</a>) and layering in longer-term pipelines in parallel. The mistake is waiting until the shortage is acute before acting. Community college programs take 2&ndash;4 years to produce their first cohort. <a href="glossary.html#term-apprenticeship">Apprenticeship</a> pipelines take 1&ndash;4 years to mature. If you start those programs when you feel the pain, you are already 3 years behind.</p>
 
-    <p>Use the calculator above to model your organization&rsquo;s specific situation. The right strategy mix depends on your facility size, budget, and which half of the workforce problem (physical ops vs. remote ops) is your primary constraint. But the most important decision is simply to treat workforce development as infrastructure investment &mdash; not an HR function, not a background cost, but a critical path item that determines whether your facility can operate at the capacity your customers are paying for.</p>
+    <p>Use the calculator above to model your organization&rsquo;s specific situation. The right strategy mix depends on your facility size, budget, and which half of the workforce problem (physical ops vs. remote ops) is your primary constraint. Treat workforce development as part of the infrastructure delivery schedule. Assign funding, qualification milestones, and owners so staffing readiness can be checked before capacity is committed to customers.</p>
 
     <!-- References -->
     <div class="references-section">
@@ -1814,7 +1817,7 @@
     <div class="article-nav">
         <a href="article-26.html"><i class="fas fa-arrow-left"></i> The Invisible Leak</a>
         <a href="articles.html">All Articles</a>
-        <span style="color:#64748b;cursor:default;">Latest Article</span>
+        <a href="article-28.html">Next Article <i class="fas fa-arrow-right"></i></a>
     </div>
 
 </div>

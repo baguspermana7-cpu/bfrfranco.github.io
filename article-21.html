@@ -83,17 +83,17 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
     <!-- v1.43.10 editorial register (RZ Dark System v1) — dark-only, scoped. -->
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
-    <link rel="stylesheet" href="css/rz-article-dark.css?v=1.99-light">
+    <link rel="stylesheet" href="css/rz-article-dark.css?v=20260908-editorial">
     <script src="js/rz-explain-db.js?v=2026-07-24-w" defer></script>
 <script src="js/rz-explain.js?v=2026-07-16" defer></script>
-<script src="js/rz-article-editorial.js?v=1.51.8" defer></script>
+<script src="js/rz-article-editorial.js?v=20260908-editorial" defer></script>
     <script src="js/rz-command-palette.js?v=2026-09-05-mint" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
     <script src="js/rz-article-chart.js?v=1.50.19" defer></script>
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="styles.min.css?v=2026-09-06-slop">
+    <link rel="stylesheet" href="styles.min.css?v=20260908-editorial">
     <link rel="preload" as="image" href="assets/article-21-hero.webp">
 
     <!-- Structured Data: TechnicalArticle -->
@@ -267,7 +267,7 @@
         .a21-evidence-card {
             background: rgba(255,255,255,0.05);
             border: 1px solid rgba(52,211,153,0.2);
-            border-radius: 12px;
+            border-radius: 4px;
             padding: 1.25rem;
             text-align: center;
         }
@@ -305,10 +305,10 @@
         /* Quote callout */
         .quote-callout {
             background: var(--a21-bg);
-            border-left: 4px solid var(--a21-green);
+            border-left: 2px solid var(--a21-green);
             padding: 1.5rem 2rem;
             margin: 2rem 0;
-            border-radius: 0 12px 12px 0;
+            border-radius: 0 4px 4px 0;
         }
         .quote-callout blockquote {
             font-size: 1.1rem;
@@ -332,7 +332,7 @@
         .a21-insight-box {
             background: linear-gradient(135deg, #ecfdf5, #d1fae5);
             border: 1px solid rgba(5,150,105,0.3);
-            border-radius: 12px;
+            border-radius: 4px;
             padding: 1.5rem;
             margin: 1.5rem 0;
         }
@@ -422,17 +422,16 @@
         [data-theme="dark"] .a21-timeline-text { color: #d1d5db; }
 
         /* Stat callout inline */
-        .a21-stat {
-            display: inline-block;
-            background: #ecfdf5;
-            border: 1px solid rgba(5,150,105,0.3);
-            padding: 0.15rem 0.5rem;
-            border-radius: 6px;
+        .article-body :is(p,li) span.a21-stat {
+            display: inline;
+            background: transparent;
+            border: 0;
+            padding: 0;
+            font: inherit;
             font-weight: 700;
-            color: #059669;
-            font-size: 0.95em;
+            color: inherit;
+            white-space: normal;
         }
-        [data-theme="dark"] .a21-stat { background: rgba(5,150,105,0.15); color: #34d399; }
 
         /* Company card grid */
         .a21-company-grid {
@@ -444,7 +443,7 @@
         .a21-company-card {
             background: #fff;
             border: 1px solid #e5e7eb;
-            border-radius: 12px;
+            border-radius: 4px;
             padding: 1.5rem;
             border-top: 3px solid var(--a21-green);
         }
@@ -475,8 +474,8 @@
         .a21-warning-box {
             background: #fef3c7;
             border: 1px solid #f59e0b;
-            border-left: 4px solid #d97706;
-            border-radius: 0 12px 12px 0;
+            border-left: 2px solid #d97706;
+            border-radius: 0 4px 4px 0;
             padding: 1.25rem 1.5rem;
             margin: 1.5rem 0;
         }
@@ -844,7 +843,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
 <div class="series-nav" style="margin-top: 1rem;">
     <div class="series-badge">
         <span class="series-badge-icon">21</span>
-        Engineering Journal &mdash; Article 21
+        Engineering Journal &mdash; Article 21 of 28
     </div>
     <span class="series-title"></span>
     <div class="series-links">
@@ -868,13 +867,13 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
     <!-- SECTION 1 -->
     <h2 id="section-1">1. The Nuclear Gold Rush</h2>
 
-    <p>Something extraordinary happened in the data center industry in 2024-2025. Five of the world's largest technology companies &mdash; Microsoft, Amazon, Google, Meta, and Oracle &mdash; simultaneously turned to nuclear energy as the answer to AI's insatiable power demands. Not wind. Not solar. Not batteries. Nuclear.</p>
+    <p>In 2024-2025, Microsoft, Amazon, Google, Meta, and Oracle pursued nuclear energy to supply growing AI loads. Their plans include existing reactors, restarts, and small modular reactors, with different delivery risks.</p>
 
     <p>The numbers tell the story. Microsoft signed a <span class="a21-stat">$1.6 billion</span> deal to restart Three Mile Island Unit 1, rebranded as the Crane Clean Energy Center. Amazon locked in a <span class="a21-stat">1,920 MW</span> power purchase agreement with Talen Energy's Susquehanna nuclear plant running through 2042. Google partnered with Kairos Power for <span class="a21-stat">500 MW</span> of advanced reactors by 2035. Meta announced nuclear deals totaling <span class="a21-stat">6.6 GW</span> with three separate providers. And Oracle's CEO casually mentioned they'd already secured building permits for three small modular reactors.</p>
 
     <p>As a data center engineer who has spent years optimizing facility power and cooling systems, I find this nuclear pivot both entirely logical and deeply uncertain. The logic is clear: AI training clusters consume megawatts around the clock, and nothing matches nuclear's combination of density, reliability, and carbon-free output. The uncertainty is equally clear: no commercial SMR has ever powered a data center, costs have a history of spiraling, and timelines measure in years, not months.</p>
 
-    <p>This article examines the technology, the deals, the economics, and the engineering reality behind the biggest energy bet in data center history.</p>
+    <p>This article compares the reactor technologies, announced deals, costs, and delivery constraints relevant to data center operators.</p>
 
     <!-- SECTION 2 -->
     <h2 id="section-2">2. The Power Crisis No One Predicted</h2>
@@ -1337,7 +1336,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
 
     <p><strong>5. Second-order costs.</strong> Security, waste management, decommissioning, insurance, and regulatory compliance costs that may not appear in headline LCOE figures but will appear in real facility operating budgets.</p>
 
-    <p>The nuclear bet is enormous, unprecedented, and not guaranteed to work on the timeline or at the cost that Big Tech needs. But the alternative &mdash; a future where AI progress is constrained by power availability &mdash; is a risk these companies have decided they cannot accept. Whether the engineering delivers will be one of the defining infrastructure stories of the next decade.</p>
+    <p>The nuclear bet is enormous, unprecedented, and not guaranteed to work on the timeline or at the cost that Big Tech needs. But the alternative &mdash; a future where AI progress is constrained by power availability &mdash; is a risk these companies have decided they cannot accept. The practical test is whether licensed, financed projects deliver firm power when the facilities need it.</p>
 
     <!-- References -->
     <div class="references-section">
@@ -1460,7 +1459,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
     <div class="author-bio-content">
         <h4>Bagus Dwi Permana</h4>
         <p class="author-bio-title">Engineering Operations Manager | Ahli K3 Listrik</p>
-        <p>12+ years professional experience in critical infrastructure and operations. CDFOM certified. Transforming operations through systematic excellence and safety-first engineering.</p>
+        <p>12+ years professional experience in critical infrastructure and operations. CDFOM certified. Focuses on facility reliability, maintenance, and electrical safety.</p>
         <div class="author-bio-links">
             <a href="https://www.linkedin.com/in/bagus-dwi-permana-ba90b092" target="_blank" rel="noopener noreferrer">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>

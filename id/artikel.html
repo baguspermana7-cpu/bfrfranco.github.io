@@ -1,6 +1,37 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <script id="rz-id-theme">
+    (function () {
+        var root = document.documentElement;
+        var theme = 'light';
+        try {
+            if (localStorage.getItem('theme') === 'dark') theme = 'dark';
+        } catch (error) {
+            console.warn('Theme preference unavailable; using light mode.', error);
+        }
+        function applyTheme(value, toggle) {
+            root.setAttribute('data-theme', value);
+            root.style.colorScheme = value;
+            if (toggle) toggle.setAttribute('aria-pressed', String(value === 'dark'));
+        }
+        applyTheme(theme);
+        document.addEventListener('DOMContentLoaded', function () {
+            var toggle = document.getElementById('themeToggle');
+            if (!toggle) return;
+            applyTheme(root.getAttribute('data-theme'), toggle);
+            toggle.addEventListener('click', function () {
+                var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                applyTheme(next, toggle);
+                try {
+                    localStorage.setItem('theme', next);
+                } catch (error) {
+                    console.warn('Theme changed for this page; preference could not be saved.', error);
+                }
+            });
+        });
+    })();
+    </script>
     <!-- Google tag (gtag.js) - deferred until user interaction for faster FCP -->
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -246,7 +277,7 @@
         .article-card {
             display: flex; flex-direction: column;
             background: var(--rz-card-bg); border: 1px solid var(--rz-card-border);
-            border-radius: 12px; overflow: hidden; transition: all 0.3s;
+            border-radius: 4px; overflow: hidden; transition: all 0.3s;
         }
         .article-card:hover {
             box-shadow: var(--rz-card-shadow); transform: translateY(-4px);
@@ -317,7 +348,7 @@
         @media (max-width: 768px) {
             .hamburger { display: flex; }
             .nav-menu { display: none; }
-            .nav-menu.open {
+            body.rz-nav-open .nav-menu {
                 display: flex; flex-direction: column; position: absolute;
                 top: 100%; left: 0; right: 0; background: var(--rz-card-bg);
                 padding: 1rem 2rem; border-bottom: 1px solid var(--rz-card-border); gap: 0.5rem;
@@ -423,7 +454,7 @@
             <!-- Article 18 - AI Factories -->
             <a href="../article-18.html" class="article-card" data-category="teknik">
                 <div class="article-card-image" style="background: linear-gradient(135deg, #1e1b4b 0%, #3730a3 50%, #6366f1 100%);">
-                    <img loading="lazy" src="../assets/article-18-hero.webp" alt="AI Factories" onerror="this.style.display='none'">
+                    <img loading="lazy" src="../assets/article-18-cover.webp" alt="AI Factories" onerror="this.style.display='none'">
                     <span class="article-card-number" style="background: linear-gradient(135deg, #3730a3, #6366f1);">18</span>
                 </div>
                 <div class="article-card-content">
@@ -441,7 +472,7 @@
             <!-- Article 13 - Power Distribution -->
             <a href="../article-13.html" class="article-card" data-category="teknik">
                 <div class="article-card-image" style="background: linear-gradient(135deg, #0c0a09 0%, #292524 50%, #a16207 100%);">
-                    <img loading="lazy" src="../assets/article-13-hero.webp" alt="Power Distribution" onerror="this.style.display='none'">
+                    <img loading="lazy" src="../assets/article-13-cover.webp" alt="Power Distribution" onerror="this.style.display='none'">
                     <span class="article-card-number" style="background: linear-gradient(135deg, #78350f, #a16207);">13</span>
                 </div>
                 <div class="article-card-content">
@@ -477,7 +508,7 @@
             <!-- Article 10 - Water Stress -->
             <a href="../article-10.html" class="article-card" data-category="global">
                 <div class="article-card-image" style="background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 50%, #0ea5e9 100%);">
-                    <img loading="lazy" src="../assets/article-10-hero.webp" alt="Water Stress" onerror="this.style.display='none'">
+                    <img loading="lazy" src="../assets/article-10-cover.webp" alt="Water Stress" onerror="this.style.display='none'">
                     <span class="article-card-number" style="background: linear-gradient(135deg, #0369a1, #0ea5e9);">10</span>
                 </div>
                 <div class="article-card-content">
@@ -495,7 +526,7 @@
             <!-- Article 14 - Community Opposition -->
             <a href="../article-14.html" class="article-card" data-category="global">
                 <div class="article-card-image" style="background: linear-gradient(135deg, #1c1917 0%, #44403c 50%, #a8a29e 100%);">
-                    <img loading="lazy" src="../assets/article-14-hero.webp" alt="Community Opposition" onerror="this.style.display='none'">
+                    <img loading="lazy" src="../assets/article-14-cover.webp" alt="Community Opposition" onerror="this.style.display='none'">
                     <span class="article-card-number" style="background: linear-gradient(135deg, #44403c, #78716c);">14</span>
                 </div>
                 <div class="article-card-content">
@@ -513,7 +544,7 @@
             <!-- Article 19 - Singapore vs Batam -->
             <a href="../article-19.html" class="article-card" data-category="global">
                 <div class="article-card-image" style="background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 50%, #3a7ca5 100%);">
-                    <img loading="lazy" src="../assets/article-19-hero.webp" alt="Singapore vs Batam" onerror="this.style.display='none'">
+                    <img loading="lazy" src="../assets/article-19-cover.webp" alt="Singapore vs Batam" onerror="this.style.display='none'">
                     <span class="article-card-number" style="background: linear-gradient(135deg, #1e3a5f, #2d5a87);">19</span>
                 </div>
                 <div class="article-card-content">

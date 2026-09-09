@@ -20,6 +20,8 @@
   function thumbFor(href){
     var m=/article-(\d+)/.exec(href||''); if(!m) return null;
     var n=+m[1];
+    if(n===9) return {primary:'assets/article-9-cover_.webp',alt:'assets/article-9-cover_.webp'};
+    if(n===15) return {primary:'assets/og/index.webp',alt:'assets/og/index.webp'};
     return { primary:'assets/article-'+n+'-'+(n>=20?'hero':'cover')+'.webp',
              alt:'assets/article-'+n+'-'+(n>=20?'cover':'hero')+'.webp' };
   }
@@ -67,6 +69,8 @@
     }
     container.appendChild(rail);
     document.querySelector('.article-content').classList.add('rz-has-rail');
+    var hero=document.querySelector('.article-hero');
+    if(hero) hero.classList.add('rz-has-rail');
   }
 
   /* heading anchor links — hover a section h2 to copy its deep link (v1.50.24) */
@@ -138,38 +142,106 @@
      background is a TRANSLUCENT wash (0 < alpha < .9) so rz-article-dark.css can
      flatten them to the editorial panel. Opaque instrument embeds (dark
      calculator panels etc.) measure alpha 1 and are left alone. */
+  function colorSampler(){
+    var canvas=document.createElement('canvas');
+    canvas.width=1; canvas.height=1;
+    var context=canvas.getContext('2d',{willReadFrequently:true});
+    if(!context) throw new Error('Canvas color sampling is unavailable');
+    return function(color){
+      context.clearRect(0,0,1,1);
+      context.fillStyle=color||'transparent';
+      context.fillRect(0,0,1,1);
+      var pixel=context.getImageData(0,0,1,1).data;
+      return {a:pixel[3]/255,lum:0.299*pixel[0]+0.587*pixel[1]+0.114*pixel[2]};
+    };
+  }
+  function gradientColors(element){
+    return (getComputedStyle(element).backgroundImage||'').match(/(?:rgba?|hsla?|color|oklch|oklab|lab|lch)\([^)]*\)/g)||[];
+  }
+  function darkSurface(element,parseColor){
+    var background=parseColor(getComputedStyle(element).backgroundColor);
+    if(background.a>=0.5 && background.lum<120) return true;
+    var stops=gradientColors(element);
+    return stops.length>0 && stops.every(function(color){
+      var stop=parseColor(color); return stop.a>=0.5 && stop.lum<120;
+    });
+  }
   function flattenWashes(){
     var body=document.querySelector('.article-body'); if(!body) return;
     var sel='[class*="-card"],[class*="-panel"],[class*="-block"]';
-    function parseBg(el){
-      var m=(getComputedStyle(el).backgroundColor||'').match(/rgba?\(([\d.]+)[, ]+([\d.]+)[, ]+([\d.]+)(?:[,/ ]+([\d.]+))?\)/);
-      if(!m) return null;
-      return { a:m[4]===undefined?1:parseFloat(m[4]),
-               lum:0.299*m[1]+0.587*m[2]+0.114*m[3] };
-    }
+    var parseColor=colorSampler();
+    [].forEach.call(body.querySelectorAll('[data-rz-flat]'),function(element){
+      element.removeAttribute('data-rz-flat');
+    });
     [].forEach.call(body.querySelectorAll(sel),function(el){
       if(el.hasAttribute('data-rz-flat')) return;
       var c=el.className||'';
       if(/rz-|code|formula|terminal|evidence|pro-|related/.test(c)) return;
-      var bg=parseBg(el); if(!bg) return;
+      var bg=parseColor(getComputedStyle(el).backgroundColor);
       var img=getComputedStyle(el).backgroundImage||'';
       var isWash=(bg.a>0.02 && bg.a<0.5);
       if(!isWash && bg.a<=0.02 && img.indexOf('gradient')>-1){
         /* transparent bg-color + gradient fill: slop if the first stop is a
            low-alpha tint; an opaque dark gradient is an instrument surface */
-        var gm=img.match(/rgba?\(([\d.]+)[, ]+([\d.]+)[, ]+([\d.]+)(?:[,/ ]+([\d.]+))?\)/);
-        if(gm && gm[4]!==undefined && parseFloat(gm[4])<0.5) isWash=true;
+        var stops=gradientColors(el);
+        if(stops.length && stops.every(function(color){ return parseColor(color).a<0.5; })) isWash=true;
       }
       if(!isWash) return;
       /* a wash INSIDE an opaque dark container (instrument embed, diagram
          panel) composites correctly as authored — leave it alone */
       var p=el.parentElement;
       while(p && p!==body){
-        var pb=parseBg(p);
-        if(pb && pb.a>=0.5 && pb.lum<120) return;
+        if(darkSurface(p,parseColor)) return;
         p=p.parentElement;
       }
       el.setAttribute('data-rz-flat','');
+    });
+  }
+
+  function readingContext(element,body){
+    var excluded='nav,aside,header,footer,figure,figcaption,table,button,code,pre,svg,canvas,[data-rz-chart],[data-rz-diagram],[data-rz-instrument]';
+    for(var parent=element;parent && parent!==body;parent=parent.parentElement){
+      if(parent.matches(excluded)) return false;
+      var identity=(parent.id||'')+' '+(typeof parent.className==='string'?parent.className:'');
+      if(/(?:^|[\s_-])(?:calc|calculator|instrument|widget|diagram|chart|caption|metric|kpi|gauge|meter|verdict|legend|toc|author|related|newsletter|subscribe|share)(?:[\s_-]|$)/i.test(identity)) return false;
+    }
+    return true;
+  }
+
+  function normalizeReadingText(){
+    var minimumSize=16;
+    [].forEach.call(document.querySelectorAll('.article-body'),function(body){
+      [].forEach.call(body.querySelectorAll('[data-rz-small-prose],[data-rz-tight-prose]'),function(element){
+        element.removeAttribute('data-rz-small-prose');
+        element.removeAttribute('data-rz-tight-prose');
+      });
+      var readings=[];
+      [].forEach.call(body.querySelectorAll('p,li,blockquote'),function(element){
+        if(!readingContext(element,body)) return;
+        var style=getComputedStyle(element),size=parseFloat(style.fontSize);
+        readings.push({element:element,small:size<minimumSize,
+          tight:style.lineHeight==='normal'||parseFloat(style.lineHeight)/Math.max(size,minimumSize)<1.5});
+      });
+      readings.forEach(function(reading){
+        if(reading.small) reading.element.setAttribute('data-rz-small-prose','');
+        if(reading.tight) reading.element.setAttribute('data-rz-tight-prose','');
+      });
+    });
+  }
+
+  function compactContents(){
+    [].forEach.call(document.querySelectorAll('.toc-section .toc-container'),function(container){
+      if(container.querySelector('[data-rz-toc]')) return;
+      var title=container.querySelector('.toc-title');
+      var details=document.createElement('details');
+      details.setAttribute('data-rz-toc','');
+      details.open=!window.matchMedia('(max-width:767px)').matches;
+      var summary=document.createElement('summary');
+      summary.textContent=title?title.textContent.trim():'Contents';
+      if(title) title.hidden=true;
+      while(container.firstChild) details.appendChild(container.firstChild);
+      details.insertBefore(summary,details.firstChild);
+      container.appendChild(details);
     });
   }
 
@@ -185,7 +257,25 @@
   function init(){
     if('requestIdleCallback' in window) requestIdleCallback(explainTerms,{timeout:3000});
     else setTimeout(explainTerms,1200);
-    try{ flattenWashes(); }catch(e){}
+    function refreshSurfaces(){
+      root.setAttribute('data-rz-sampling','');
+      try{
+        flattenWashes();
+        normalizeReadingText();
+        getComputedStyle(root).opacity;
+      }catch(error){ console.warn('Editorial surface refresh failed',error); }
+      finally{ root.removeAttribute('data-rz-sampling'); }
+    }
+    refreshSurfaces();
+    var resizeTimer;
+    window.addEventListener('resize',function(){
+      clearTimeout(resizeTimer);
+      resizeTimer=setTimeout(refreshSurfaces,120);
+    });
+    compactContents();
+    if('MutationObserver' in window){
+      new MutationObserver(refreshSurfaces).observe(root,{attributes:true,attributeFilter:['data-theme']});
+    }
     try{ buildRail(); }catch(e){}
     try{ buildAnchors(); }catch(e){}
     try{ focusableScrollers(); }catch(e){}
@@ -219,8 +309,6 @@
       var auto=[];
       var hero=document.querySelector('.article-hero');
       if(hero){[].push.apply(auto,hero.children);}
-      var body=document.querySelector('.article-body');
-      if(body){[].forEach.call(body.children,function(c){var t=c.tagName;if(t==='H2'||t==='H3'||t==='P'||c.className.indexOf('callout')>-1||c.className.indexOf('quote')>-1||c.className.indexOf('box')>-1){auto.push(c);}});}
       auto.forEach(function(el){el.setAttribute('data-rz-enter','');});
       els=document.querySelectorAll('[data-rz-enter]');
     }
