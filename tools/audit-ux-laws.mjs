@@ -15,6 +15,7 @@ import { join, extname, basename } from "node:path";
 
 const ROOT = process.cwd();
 const STRICT = process.argv.includes("--strict");
+const JSON_OUTPUT = process.argv.includes("--json");
 
 const SKIP = new Set(["node_modules", ".git", "dcmoc", ".next", "games", "Dunia-Emosi",
   "obsidian-knowledge-vault", ".claude", "review", "Documents", "cf-worker", "result",
@@ -82,6 +83,13 @@ for (const m of modules) {
   }
 }
 
+if (JSON_OUTPUT) {
+  /* Inventory is published so a coverage test can PROVE every sitemap URL sits inside this
+     scope, instead of trusting that the SKIP list and the sitemap happen to agree. */
+  console.log(JSON.stringify({ inventory: { pages: pages.map(rel), modules: modules.map(rel) },
+                               findings }, null, 2));
+  process.exit(findings.length && STRICT ? 1 : 0);
+}
 console.log("── UX LAWS AUDIT (§D, mechanizable subset) ──");
 console.log(`Scanned ${pages.length} pages + ${modules.length} shared modules.`);
 console.log("CHECKED here: #6 Doherty (loading affordance on async surfaces).");

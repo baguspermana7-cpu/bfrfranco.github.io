@@ -147,6 +147,10 @@ gate "anti-vibecode — hard-banned design tokens" node tools/audit-vibecode.mjs
 # §D UX LAWS: only the mechanizable subset (#6 loading affordance on async surfaces).
 # The other 15 laws are human design review — this gate does not and cannot decide them.
 gate "ux-laws — §D mechanizable subset" node tools/audit-ux-laws.mjs --strict
+# COVERAGE. The design gates walk the filesystem; the sitemap is what the site publishes.
+# One added SKIP entry silently drops a live page out of every design gate, and a page
+# missing from the sitemap is never indexed. Both directions are asserted here.
+gate "audit coverage — sitemap/robots vs audit scope" node --test tools/test-audit-coverage.mjs
 # LEGIBILITY. Rendered label height across every page: a label below the floor is not small text,
 # it is texture that looks like information. 848 findings on the first run, all from one root
 # cause — the incident timelines' viewBox grew with the event count while max-width squeezed them
