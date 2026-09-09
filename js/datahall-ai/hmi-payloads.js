@@ -1008,20 +1008,29 @@
   });
   /* BMS */
   var BMS_SPEC = 'BMS point counts, protocol labels and controller ratings are page-authored architecture figures, not engine quantities (Track A §A5)';
-  function bmsClass(label) {
+  /* v2.14.0 §item-6 — the BMS tab had four clickable classes and a drawing whose servers, ring
+     switches and application tiles carried no hook at all, so most of the architecture opened
+     nothing. Every layer now has a class, and every class opens a tier-2 detail modal. */
+  var BMS_MONITOR_ONLY = 'the BMS/DCIM layer on this cockpit is MONITOR-ONLY: it reads the facility, it issues no command. Control authority stays with the FACP, the PLC/DDC layer and the plant controllers themselves (Track A §A5)';
+  function bmsClass(label, kind) {
     return function (b, ctx, id) {
       b.title = label + ' ' + id;
       b.S('live', 'cpu_pct', 'CPU', { value: 28, text: '28 % class' }, 8, '%', { digits: 0, min: 0, max: 100 });
       b.S('live', 'uptime_d', 'Uptime', { value: 180, text: '180 d since last restart' }, 0, 'd', { digits: 0 });
       b.ST('live', 'state', 'Node', 'up', 'node state is declared up in the simulation (Track A §A5)');
       b.D('capacity', 'protocols', 'Protocols', 'BACnet/IP · Modbus TCP · IEC 61850 · SNMP v3', BMS_SPEC);
+      b.D('capacity', 'authority', 'Command authority', 'monitor-only — no write path from this cockpit', BMS_MONITOR_ONLY);
       b.trend('cpu_pct', 'CPU', '%', { value: 28 }, 8, { digits: 0 });
+      b.tier2('bms', [kind, String(id)]);
     };
   }
-  def('bms-server', { kind: 'authored', label: 'BMS server', system: 'bms', tier2: null }, bmsClass('BMS server'));
-  def('bms-controller', { kind: 'authored', label: 'DDC controller', system: 'bms', tier2: null }, bmsClass('Controller'));
-  def('bms-network', { kind: 'authored', label: 'BMS network', system: 'bms', tier2: null }, bmsClass('Network segment'));
-  def('bms-gateway', { kind: 'authored', label: 'Protocol gateway', system: 'bms', tier2: null }, bmsClass('Gateway'));
+  def('bms-server', { kind: 'authored', label: 'BMS server', system: 'bms', tier2: 'bms' }, bmsClass('BMS server', 'server'));
+  def('bms-controller', { kind: 'authored', label: 'DDC controller', system: 'bms', tier2: 'bms' }, bmsClass('Controller', 'controller'));
+  def('bms-network', { kind: 'authored', label: 'BMS network', system: 'bms', tier2: 'bms' }, bmsClass('Network segment', 'network'));
+  def('bms-gateway', { kind: 'authored', label: 'Protocol gateway', system: 'bms', tier2: 'bms' }, bmsClass('Gateway', 'gateway'));
+  def('bms-field', { kind: 'authored', label: 'Field device group', system: 'bms', tier2: 'bms' }, bmsClass('Field group', 'field'));
+  def('bms-ldc', { kind: 'authored', label: 'Local display controller', system: 'bms', tier2: 'bms' }, bmsClass('LDC', 'ldc'));
+  def('bms-app', { kind: 'authored', label: 'Monitoring application', system: 'bms', tier2: 'bms' }, bmsClass('Application', 'app'));
 
   /* ------------------------------------------------------------------------
    * Public API
@@ -1104,7 +1113,7 @@
     };
   }
 
-  var API = { version: '2.13.0', CLASSES: Object.freeze(classList()), COOLING_SCENARIOS: COOLING_SCENARIOS, payload: payload, safePayload: safePayload, stubPayload: stubPayload, points: points, classList: classList, buildContext: buildContext };
+  var API = { version: '2.14.0', CLASSES: Object.freeze(classList()), COOLING_SCENARIOS: COOLING_SCENARIOS, payload: payload, safePayload: safePayload, stubPayload: stubPayload, points: points, classList: classList, buildContext: buildContext };
   if (root) { root.RZDatahallAIHmiPayloads = API; }
   if (typeof module !== 'undefined' && module.exports) { module.exports = API; }
 })(typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : this));

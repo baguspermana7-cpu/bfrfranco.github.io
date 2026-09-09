@@ -630,3 +630,12 @@ detail lives in a pop-up: identity, the arithmetic behind every figure, dependen
 the basis of every number. Shift/right-click still opens the right-side inspector. The six `net-*` payload
 classes carry `tier2: 'net'`; a class whose META keeps `tier2: null` has its `b.tier2()` stripped at build
 time, so both places must agree.
+
+## BMS view (v2.14.0, owner comment 6)
+
+One shared `BMS_MODEL` feeds the drawing and the detail panels, so a count on the sheet and the same count in
+a modal cannot drift. Six labelled layers at the standard three label tiers on a sheet that never renders
+below 1,200 px; no decorative animation on a monitoring diagram. Every block carries a `bms-*` hook and a
+tier-2 modal (`#bmsModal`): identity, protocol and transport with port, points and poll interval, what it
+serves, failure domain, alarm-priority mapping, and an AUTHORITY section on every panel stating that the
+cockpit is monitor-only. Specification cards state the monitoring contract, never a list of vendor names.

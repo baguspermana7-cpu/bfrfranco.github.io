@@ -11,6 +11,44 @@ release sections rather than semver.
 
 ---
 
+## v2.14.0 — 2026-09-09
+
+### BMS tab: every block opens a detail modal, and the vendor-name cards are gone (Track A, owner comment 6)
+
+Owner: *"BMS: no modals, cards are AI design slop."* Three faults, measured: most of the drawing carried no
+equipment hook at all — the redundant servers, the seven ring switches and the four application tiles opened
+nothing, so "no modals" was literally true for the majority of the architecture; the label tier ran 2.8–6
+user units, so almost every string on the sheet sat under the 8.5 px legibility floor; and the four
+specification cards were lists of vendor names (*"Schneider EcoStruxure / Nlyte"*, *"Maximo/Fiix/eMaint"*)
+with no engineering in them.
+
+The tab is redrawn from one shared model (`BMS_MODEL`) that feeds both the drawing and the detail panels, so
+the sheet and the modal cannot drift. Six labelled layers — L0 field, L1 gateways, L1 controllers, L2 local
+display controllers, the ring, L3 operations — at the same three label tiers the rack and network views use
+(minimum 10.9 px rendered, 0 strings under the floor, down from most of them). All 35 decorative animations
+are gone: no pulsing LED on every block, no five competing dash-flows. The ring is drawn flat with a real
+return path instead of a 400-unit decorative ellipse, so it still reads as a ring and stays legible.
+
+**Every block now opens `#bmsModal` on a plain click** (Shift/right-click still opens the right-side
+inspector). Three new payload classes cover the layers that had none — `bms-field`, `bms-ldc`, `bms-app` —
+and all seven `bms-*` classes carry a tier-2 opener; the sheet went from 28 hooks to 46. Each panel states
+identity, protocol and transport with its port, points and poll interval, what the element serves, its
+failure domain (*a gateway loss makes its segment STALE, not dark*), the alarm-priority mapping, and — on
+every panel — the authority section: this cockpit is monitor-only, the FACP is the authority for life
+safety, plant sequences run on the L1 controllers, and local override happens at the L2 panel, never here.
+
+The four slop cards are replaced by three that carry the monitoring **contract** instead of brand names:
+what this layer may and may not do, the field-to-operations data path, and how the view fails honestly
+(stale marking, retention, and what is explicitly not modelled). Protocol and platform detail moved into
+the modals where it can be stated precisely.
+
+Proven: 375 px and 768 px with zero page-level overflow, light theme, and modal keyboard behaviour — focus
+lands inside, Tab stays trapped, Escape closes and focus returns to the clicked block.
+
+Gates: coverage `--strict --settle=9000 --modals` clean on every row (bmsSvg 14 numerals, seven inspector
+rows, seven modal rows, 0 untraced), inspector runtime, operator UI, basis map, basis hooks, no retired
+literals, anti-vibecode strict.
+
 ## v2.13.0 — 2026-09-08
 
 ### Network split into compute fabric / corporate internet / security (Track A, owner comment 4)
