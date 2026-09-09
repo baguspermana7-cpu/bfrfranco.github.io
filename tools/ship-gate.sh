@@ -144,6 +144,7 @@ gate "telemetry docs — browser, a11y, mobile, and gate safety" node tools/test
 # in both stylesheets) were fixed in v1.135.0, so there is nothing left to defer behind.
 # A monitor that is read as a gate is worse than no gate: it is a green light nobody earned.
 gate "anti-vibecode — hard-banned design tokens" node tools/audit-vibecode.mjs --strict
+gate "data-fill gradients — a bar takes one flat colour" node tools/test-data-fill-gradients.mjs
 # §D UX LAWS: only the mechanizable subset (#6 loading affordance on async surfaces).
 # The other 15 laws are human design review — this gate does not and cannot decide them.
 gate "ux-laws — §D mechanizable subset" node tools/audit-ux-laws.mjs --strict

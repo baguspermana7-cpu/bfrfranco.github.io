@@ -11,6 +11,67 @@ release sections rather than semver.
 
 ---
 
+## v2.17.0 — 2026-09-09
+
+### A bar does not need a gradient (owner comment 21, deferred backlog)
+
+Owner comment (21) named the tell: *"saturated red/amber/green bar charts"* still on the article and
+calculator family after earlier reskins. A bar, gauge, meter or score fill **encodes a value** — its
+length is the datum, its colour the severity. A two-stop gradient across it adds a second visual axis
+that carries no information, and that is what produces the glossy-pill look. The site's own cockpits
+already get this right: `.bar-fill` in `datahall.html` declares no background at all and takes one
+flat colour from the engine.
+
+#### The distinction is structural, not taste
+
+| stops | meaning | action |
+|---|---|---|
+| 2 | decoration — both ends say the same thing | flatten to the first stop |
+| 3 or more | a scale axis — the green-amber-red track a marker is read against | left alone |
+
+Four multi-stop scales exist and were deliberately kept: `.gauge-bar` on articles 16, 17 and 18, and
+`.risk-gauge-bar` on article 5. Flattening those would have destroyed the gauge.
+
+#### Measured
+
+| | before | after |
+|---|---:|---:|
+| two-stop gradient fills on value-encoding elements | 53 | 0 |
+| pages carrying one | 19 | 0 |
+
+No colour was invented: each fill takes its own gradient's first stop. One side effect worth naming —
+`.tco-inline-bar-fill.cloud` ran `#64748b → #C3B0FA`, so flattening removed a lavender the palette
+does not contain. A white-to-transparent gloss overlay on `.ig-bar-fill::after`, which also carried an
+8 px radius, was removed rather than flattened: a sheen laid over an encoded value is the same defect
+wearing a pseudo-element.
+
+#### Gated
+
+`tools/test-data-fill-gradients.mjs` is new and wired into the ship gate. Proven RED at 53 findings
+against the pre-sweep tree in a detached worktree, GREEN at 0 after. It also catches the pseudo-element
+gloss case.
+
+#### Also on main between v2.16.0 and this release
+
+`0b4e9115` removed decorative glassmorphism from 19 blocks across 16 files and retokened three
+calculators whose `--glass-blur: blur(20px)` fed the same effect through `var()` indirection. It also
+rewrote the `glass-decoration` detector: the old rule matched selectors with a regex that could not
+tell a selector from CSS comment text and only fired at three or more glass surfaces per file, so it
+read clean site-wide while `[data-theme="dark"] .article-card` carried `blur(8px)` on live pages. One
+decorative glass surface is now a finding, and `backdrop` joined the functional exemptions with a
+fixture. That commit carried no version of its own; it is recorded here so this release covers
+everything shipped since v2.16.0.
+
+#### Honest boundary
+
+This closes the bar-chart half of comment (21). The other two classes it names — filled gradient
+severity pills and card washes — remain: 178 saturated multi-stop gradients sit on non-instrument
+pages, mostly button and hero surfaces, which the existing gate exempts as functional. Those are a
+separate judgement and a separate ship. The rule lives in its own file rather than inside
+`tools/audit-vibecode.mjs` because that file was under concurrent edit when this landed.
+
+---
+
 ## v2.16.0 — 2026-09-09
 
 ### Whole-site editorial and anti-vibecode sweep, one crawler inventory, and a robots.txt that actually restricts
