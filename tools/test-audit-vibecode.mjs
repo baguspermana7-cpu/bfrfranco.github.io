@@ -131,3 +131,28 @@ test('neutral editorial blockquotes and visible scrolly cards remain valid', () 
   `);
   assert.equal(result.status, 0);
 });
+
+/* Regression fixtures for the v1.135.3 glass-decoration rewrite. The previous rule counted
+   selectors with a naive regex and only fired at >= 3 decorative surfaces per file, so it read
+   0 findings site-wide while live pages carried decorative blur. */
+
+test('ONE decorative glass surface is a finding — the >=3 threshold licensed real slop', () => {
+  const result = scan('.evidence-card { background: rgba(30,41,59,0.6); backdrop-filter: blur(12px); }');
+  assert.equal(result.status, 1);
+  const finding = result.report.findings.find(f => f.rule === 'glass-decoration');
+  assert.ok(finding, 'a single decorative glass surface must be reported');
+});
+
+test('a modal backdrop is functional, not decorative glass', () => {
+  /* `.block-detail-backdrop` is position:absolute; inset:0 behind a detail panel. Blur there
+     pushes context back, exactly as `modal` and `overlay` already do. Exempting it is why
+     `backdrop` sits in FUNC_SEL; without this fixture that keyword would be unexplained. */
+  const result = scan('.block-detail-backdrop { position: absolute; inset: 0; background: rgba(2,6,23,0.62); backdrop-filter: blur(2px); }');
+  assert.ok(!result.report.findings.some(f => f.rule === 'glass-decoration'),
+    'a dialog backdrop must not be reported as decorative glassmorphism');
+});
+
+test('functional blur on a sticky header stays exempt', () => {
+  const result = scan('.navbar.scrolled { backdrop-filter: saturate(180%) blur(14px); }');
+  assert.ok(!result.report.findings.some(f => f.rule === 'glass-decoration'));
+});

@@ -92,7 +92,12 @@ const DECOR_SEL = /(card|panel|tile|bento|hero|badge|chip|widget|item|box|callou
 /* Functional UI is exempt everywhere. A drawer needs a radius, a dropdown needs a shadow,
    a focus ring needs a transition. Banning those would push authors to break real controls
    in order to satisfy a design rule that was never aimed at them. */
-const FUNC_SEL = /(nav|navbar|modal|overlay|gate|search|palette|ticker|dropdown|tooltip|sticky|header|drawer|sheet|toast|banner|menu|btn|button|input|select|field|form|dialog|popover|inspector|hmi|tab|scroll|cursor|marquee|share)/i;
+/* `backdrop` added v1.135.3 with a named reason, not as a convenience keyword: a BACKDROP is by
+   definition the dimming layer BEHIND a dialog — `.block-detail-backdrop` is `position:absolute;
+   inset:0` over the page. Blur there is the standard way to push context back, the same class of
+   functional use as `modal` and `overlay` already on this list. Fixture: test-audit-vibecode.mjs
+   'a modal backdrop is functional, not decorative glass'. */
+const FUNC_SEL = /(nav|navbar|modal|overlay|backdrop|gate|search|palette|ticker|dropdown|tooltip|sticky|header|drawer|sheet|toast|banner|menu|btn|button|input|select|field|form|dialog|popover|inspector|hmi|tab|scroll|cursor|marquee|share)/i;
 
 function decorBlocks(t) {
   return cssBlocks(t).filter((b) => /^(?:[.#[:]|html\b|body\b)/.test(b.sel) && DECOR_SEL.test(b.sel) && !FUNC_SEL.test(b.sel));
@@ -249,25 +254,30 @@ const RULES = [
     } },
   { id: "lucide-icons",
     test: (t) => /lucide(-|\.|\/)/i.test(t) ? "Lucide icon library (use the site's Font Awesome idiom)" : null },
-  { id: "glass-decoration",
-    // Selector-aware: backdrop-blur on nav/modal/overlay/palette/sticky-header is standard FUNCTIONAL UI
-    // (not slop). Only DECORATIVE surfaces (card/panel/tile/bento/hero/badge/chip/widget) count as
-    // glassmorphism. Flag when ≥3 decorative surfaces carry blur.
-    test: (t) => {
-      const DECOR = /(card|panel|tile|bento|hero|badge|chip|widget|glass-(?!bg|blur))/i;
-      const FUNC = /(nav|navbar|modal|overlay|gate|search|palette|ticker|dropdown|tooltip|sticky|header|drawer|sheet|toast|banner|menu)/i;
-      // Resolve `backdrop-filter: var(--glass-blur)` indirection: if --glass-blur is DEFINED as a real
-      // blur(...) anywhere in the file, substitute so token-glass can't hide from the blur( scan below.
-      const def = t.match(/--glass-blur:\s*(blur\([^;]*\))/i);
-      if (def) t = t.replace(/backdrop-filter:\s*var\(--glass-blur\)/gi, "backdrop-filter: " + def[1]);
-      let decor = 0;
-      const re = /([.#][^{}]{1,120}?)\{[^{}]*backdrop-filter:\s*[^;}]*blur\([^{}]*\}/gi;
-      let m;
-      while ((m = re.exec(t))) {
-        const sel = m[1];
-        if (DECOR.test(sel) && !FUNC.test(sel)) decor++;
-      }
-      return decor >= 3 ? `glassmorphism blur on ${decor} decorative surface(s)` : null;
+  { id: "glass-decoration",                                          // §A rule 6
+    /* Rewritten after a live render audit contradicted this rule. The first cut used a naive
+       `([.#]…)\{…\}` regex plus a ">= 3 decorative surfaces per file" threshold, and BOTH were
+       wrong. The regex could not tell a selector from CSS COMMENT TEXT, and the threshold was a
+       false-positive guard that silently licensed one or two REAL glass surfaces per file: the
+       rule read 0 findings site-wide while `[data-theme="dark"] .article-card`, two `.sea-*`
+       panels on article-17 and the shared `.bento-photo-logo` all carried decorative blur on
+       live pages. It now uses the same block parser and decorative vocabulary as the other §A
+       surface rules, and ONE decorative glass surface is a finding. Functional blur — nav,
+       modal, overlay, sticky header, drawer — stays exempt via FUNC_SEL, which is why the
+       threshold was never the right instrument for suppressing noise. */
+    test: (t, f) => {
+      const css = stylesheetText(t, f);
+      if (!css) return null;
+      /* Resolve `backdrop-filter: var(--glass-blur)`, or token-glass hides from a literal scan. */
+      const def = css.match(/--glass-blur:\s*(blur\([^;]*\))/i);
+      const src = def
+        ? css.replace(/backdrop-filter:\s*var\(--glass-blur\)/gi, `backdrop-filter: ${def[1]}`)
+        : css;
+      const hits = decorBlocks(src).filter((b) =>
+        /backdrop-filter:\s*[^;}]*blur\(/i.test(b.body) && !/print|keyframes/i.test(b.at));
+      if (!hits.length) return null;
+      return `glassmorphism blur on ${hits.length} decorative surface(s): `
+        + hits.slice(0, 3).map((b) => b.sel.trim().slice(0, 48)).join(" · ");
     } },
 
   /* ── v1.135.0 — GUARD RULES ────────────────────────────────────────────────
