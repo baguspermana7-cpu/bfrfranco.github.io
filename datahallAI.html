@@ -756,7 +756,7 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
     <link rel="stylesheet" href="css/rz-cockpit-instrument.css?v=2.3.1">
     <!-- v2.11.0 — the one navigation language shared with the Conventional hub (owner comment 18) -->
     <link rel="stylesheet" href="css/rz-cockpit-nav.css?v=2.11.0">
-    <link rel="stylesheet" href="css/datahall-ai-operator.css?v=2.3.1">
+    <link rel="stylesheet" href="css/datahall-ai-operator.css?v=2.15.0">
     <link rel="stylesheet" href="css/rz-design-studio.css?v=1.130.0">
     <script src="js/datahall-ai/operator-ui.js?v=2.11.1" defer></script>
     <script src="js/datahall-ai/equipment-inspector.js?v=2.3.1" defer></script>
@@ -12411,8 +12411,25 @@ function decorate(panel,titleId){
   var cb=panel.querySelector('[class$="-close"]');
   if(cb){ if(!cb.getAttribute('aria-label'))cb.setAttribute('aria-label','Close dialog'); cb.setAttribute('type','button'); }
 }
+/* v2.15.0 — one centring rule. Each opener positions its panel from a width it
+   hard-codes (760 / 780 / 800 / 820 / 960), and the one modal system in
+   css/datahall-ai-operator.css gives every panel one width, so those constants are
+   now wrong by up to 60 px. Re-centre from the box the browser actually laid out,
+   which is also correct for height (the openers guess that too). Only panels an
+   opener positions inline are touched: the drawer, the full-screen overlay and the
+   transform-centred dialog position themselves and are skipped by id. */
+var NO_RECENTRE={bodDrawer:1,sldMimic:1,fireIsoDialog:1};
+function recentre(panel){
+  if(!panel||NO_RECENTRE[panel.id])return;
+  if(!panel.style||!panel.style.left)return;
+  var w=panel.offsetWidth,h=panel.offsetHeight;
+  if(!w||!h)return;
+  panel.style.left=Math.max(10,Math.round((window.innerWidth-w)/2))+'px';
+  panel.style.top=Math.max(10,Math.round((window.innerHeight-h)/2))+'px';
+}
 function onOpen(panel){
   activePanel=panel;
+  recentre(panel);
   if(stack.indexOf(panel)<0)stack.push(panel);
   if(window.__rzLastEquipmentTrigger){ lastTrigger=makeFocusable(window.__rzLastEquipmentTrigger); window.__rzLastEquipmentTrigger=null; }
   for(var si=0;si<stack.length-1;si++){ stack[si].setAttribute('aria-hidden','true'); stack[si].removeAttribute('aria-modal'); }

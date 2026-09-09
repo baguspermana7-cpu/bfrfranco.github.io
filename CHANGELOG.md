@@ -11,6 +11,62 @@ release sections rather than semver.
 
 ---
 
+## v2.15.0 — 2026-09-09
+
+### One modal system: two declared types, one proportion, one entrance (Track A, owner comment 3)
+
+Owner: *"modals: type, proportion, animation."* All three were measured on the eleven centred HMI panels of
+`datahallAI.html` before a line was changed, and all three were real:
+
+| axis | before |
+|---|---|
+| proportion | **five** widths (760 / 780 / 800 / 820 / 960 px) and two max-heights (88 vh, 90 vh) |
+| type | each panel sized its own header and status pill |
+| surface | a `linear-gradient(180deg,#0a1628,#050c18)` wash and an 8 px radius on **nine of eleven**, two z-index tiers (200, and 310 for `batHmi`) |
+| animation | computed `animation-name` was **`none` on all eleven** — no entrance existed at all |
+
+#### Added
+
+- A modal system block in `css/datahall-ai-operator.css`, applied through the `.dh-modal-host` class that
+  `DHModal` already puts on every registered panel, so no panel markup changed.
+- **Type is now declared, not accidental, and there are two.** A PANEL is a centred equipment read-out
+  (eleven of them: 820 px, or 960 px for `#irCduHmi`, whose in-rack mimic genuinely needs the column). A
+  DIALOG is a centred short form (`#fireIsoDialog`: 600 px, because a four-field form set 820 px wide reads
+  as a panel with a hole in it). The two widths are the only difference between them; every other token is
+  shared.
+- **One entrance**, 160 ms. PANELs rise (`dhmRise`, opacity + a 4 px translate) because their opener
+  positions them with inline `left`/`top`. `#fireIsoDialog` centres itself with `translate(-50%,-50%)`, so a
+  second transform would throw it off centre — it fades (`dhmFade`). The scrim fades with it. Under
+  `prefers-reduced-motion: reduce` every one of them is `animation-name: none`, proven.
+
+#### Changed
+
+- Surface follows the instrument language for all twelve: opaque `var(--bg1)` ground with the gradient wash
+  removed, one 1 px `var(--bd2)` hairline, 4 px radius, one elevation, and system identity carried by a 2 px
+  top rail (`--dhm-accent`) instead of a coloured box. Blur stays on the dim layer, never on the panel.
+- Header and body type normalised: one 12 px mono header, one uppercase outline status pill, one 10/14 px
+  header padding and 12/14 px body padding, tabular figures throughout.
+- `DHModal.onOpen()` gained one centring rule. Each opener positioned its panel from a width it hard-coded
+  (760 / 780 / 800 / 820 / 960), which the one proportion made wrong by up to 60 px, and each also guessed
+  its own height. The panel is now re-centred from the box the browser actually laid out. The drawer, the
+  full-screen overlay and the transform-centred dialog position themselves and are skipped by id.
+
+#### Not changed, deliberately
+
+`#bodDrawer` (a 560 px full-height right drawer) and `#sldMimic` (a full-screen overlay) carry
+`.dh-modal-host` for the focus trap but are not modals. Every rule in the system excludes them by id, and
+both were measured unchanged after the sweep (560 px / 1500 px, radius 0, `animation-name: none`).
+
+#### Verified
+
+Measured open, not just in source: twelve panels at one width tier each, one 90 vh max-height, one 4 px
+radius, one 2 px rail, one flat opaque surface, one header font. Real opener path at 1500 px — every panel
+centres to **0 px horizontal and ≤ 1 px vertical** error once the entrance settles. 375 px and 768 px — all
+twelve fit with no sideways page scroll. Light theme — all twelve opaque and flat. Reduced motion — all
+twelve plus the scrim still.
+
+---
+
 ## v2.14.0 — 2026-09-09
 
 ### BMS tab: every block opens a detail modal, and the vendor-name cards are gone (Track A, owner comment 6)

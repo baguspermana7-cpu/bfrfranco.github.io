@@ -643,3 +643,101 @@
   .fire-tabs .ft { min-height: 44px; }
   .rz-fire-banner__btn { min-height: 44px; }
 }
+
+/* ============================================================================
+ * v2.15.0 — ONE MODAL SYSTEM (owner comment 3: "modals: type, proportion, animation")
+ * ----------------------------------------------------------------------------
+ * Measured across the eleven centred HMI panels before this block:
+ *   proportion — five widths (760 / 780 / 800 / 820 / 960 px) and two max-heights
+ *                (88 vh, 90 vh), so no two panels framed their content alike;
+ *   type       — each panel sized its own header and status pill;
+ *   surface    — nine of eleven painted a linear-gradient wash behind the content
+ *                and carried an 8 px radius with a full-perimeter accent border;
+ *   animation  — computed animation-name was `none` on all eleven. Every panel
+ *                snapped from display:none to display:block with no entrance.
+ *
+ * TYPE is now declared rather than accidental. There are two, and only two:
+ *   PANEL  — a centred equipment read-out. Eleven of them. 820 px, or 960 px where
+ *            the mimic inside genuinely needs the extra column (#irCduHmi).
+ *   DIALOG — a centred short form the operator must complete. One: #fireIsoDialog.
+ *            600 px, because a four-field form set 820 px wide reads as a panel
+ *            with a hole in it.
+ * Both share every other token, so the two widths are the whole difference.
+ *
+ * #bodDrawer (a 560 px full-height right drawer) and #sldMimic (a full-screen
+ * overlay) carry .dh-modal-host for the focus trap but are not modals, so the
+ * system does not reach them. They are excluded by id on every rule below.
+ *
+ * Surface follows the instrument language: opaque ground, one 1 px hairline, 4 px
+ * radius, one elevation, and system identity carried by a 2 px top rail instead of
+ * a coloured box. Blur stays on the dim layer (.dh-scrim), never on the panel.
+ * ==========================================================================*/
+
+/* --- proportion + surface ------------------------------------------------- */
+.dh-modal-host:not(#bodDrawer):not(#sldMimic) {
+  width: var(--dhm-w, 820px);
+  max-width: min(92vw, var(--dhm-w, 820px));
+  max-height: 90vh;
+  background: var(--bg1);
+  background-image: none;
+  border: 1px solid var(--bd2);
+  border-top: 2px solid var(--dhm-accent, var(--t3));
+  border-radius: 4px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, .55);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+#irCduHmi { --dhm-w: 960px; }   /* PANEL, wide: the in-rack mimic needs the column */
+#fireIsoDialog { --dhm-w: 600px; }  /* DIALOG */
+
+/* system identity — the rail, not the whole box */
+#cduHmi, #chHmi, #ctHmiModal, #crahHmi, #irCduHmi, #eqHmi { --dhm-accent: var(--c); }
+#rackModal, #corrHmi { --dhm-accent: var(--g); }
+#netModal { --dhm-accent: var(--b); }
+#bmsModal { --dhm-accent: var(--p); }
+#batHmi   { --dhm-accent: var(--o); }
+#fireIsoDialog { --dhm-accent: var(--r); }
+
+/* --- type ----------------------------------------------------------------- */
+.dh-modal-host:not(#bodDrawer):not(#sldMimic) { font-variant-numeric: tabular-nums slashed-zero; }
+.dh-modal-host:not(#bodDrawer):not(#sldMimic) > [class$="-hdr"] {
+  padding: 10px 14px;
+  gap: 10px;
+  background: var(--bg1);
+  background-image: none;
+  border-bottom: 1px solid var(--bd2);
+}
+.dh-modal-host:not(#bodDrawer):not(#sldMimic) > [class$="-hdr"] h3,
+.dh-modal-host:not(#bodDrawer):not(#sldMimic) > [class$="-hdr"] h4 {
+  margin: 0;
+  font: 600 12px/1.35 "JetBrains Mono", monospace;
+  letter-spacing: .02em;
+}
+.dh-modal-host:not(#bodDrawer):not(#sldMimic) > [class$="-hdr"] .mode {
+  font: 600 9px/1 "JetBrains Mono", monospace;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 3px;
+  background: transparent;
+  border: 1px solid var(--bd2);
+}
+.dh-modal-host:not(#bodDrawer):not(#sldMimic) > [class$="-body"] { padding: 12px 14px; }
+
+/* --- animation ------------------------------------------------------------ */
+/* One entrance, 160 ms. PANELs are positioned by their opener with inline
+   left/top, so they can carry a translate. #fireIsoDialog centres itself with
+   translate(-50%,-50%) and would be thrown off-centre by a second transform, so
+   the DIALOG fades only. */
+@keyframes dhmRise { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@keyframes dhmFade { from { opacity: 0; } to { opacity: 1; } }
+.dh-modal-host:not(#bodDrawer):not(#sldMimic):not(#fireIsoDialog).show {
+  animation: dhmRise .16s cubic-bezier(.2, .8, .2, 1) both;
+}
+#fireIsoDialog.show { animation: dhmFade .16s ease-out both; }
+.dh-scrim.show { animation: dhmFade .16s ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  .dh-modal-host:not(#bodDrawer):not(#sldMimic):not(#fireIsoDialog).show,
+  #fireIsoDialog.show,
+  .dh-scrim.show { animation: none; }
+}

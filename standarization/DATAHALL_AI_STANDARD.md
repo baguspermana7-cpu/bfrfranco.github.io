@@ -590,6 +590,22 @@ modal, and that the modal be reserved for a heavy action. That is now the rule f
    way a panel may tick, so `DHModal.activeTimers()` must read `{}` once the stack is empty; the
    background is `inert` while a panel is open; focus is trapped on the top panel and returned to
    the invoker (falling back to the inspector's action if the invoker was re-rendered).
+8. **One modal system, two declared types (v2.15.0, owner comment 3).** The system lives in one block
+   in `css/datahall-ai-operator.css` and is applied through `.dh-modal-host`, the class `DHModal` adds
+   to every registered panel, so a new panel joins the system by being registered and by nothing else.
+   A **PANEL** is a centred equipment read-out: `--dhm-w` 820 px, or 960 px only where the mimic inside
+   needs the extra column. A **DIALOG** is a centred short form: 600 px, because a four-field form set
+   panel-width reads as a panel with a hole in it. Those two widths are the whole difference; max-height
+   (90 vh), surface (opaque `--bg1`, no gradient wash), hairline (1 px `--bd2`), radius (4 px), elevation,
+   header type and body rhythm are shared. System identity is a 2 px `--dhm-accent` top rail, never a
+   coloured perimeter or a filled box. Blur belongs to the dim layer, never to the panel.
+   **One entrance**, 160 ms: a PANEL rises (opacity + 4 px translate) because its opener positions it with
+   inline `left`/`top`; a transform-centred DIALOG fades, because a second transform would throw it off
+   centre. Under `prefers-reduced-motion: reduce` every panel and the scrim must compute
+   `animation-name: none`. A panel that is not a centred modal — the BoD drawer, the full-screen SLD
+   overlay — carries `.dh-modal-host` for the focus trap only and is excluded from every rule by id.
+   Because the system owns the width, **an opener may not position a panel from a hard-coded width**:
+   `DHModal.onOpen()` re-centres each inline-positioned panel from its laid-out box.
 
 Gates: `tools/test-datahall-ai-hmi-payloads.mjs` (Node: every class, parity or declared, determinism,
 scenario states, static Rule 2 scan of the marker blocks and the modules, fail-closed),
