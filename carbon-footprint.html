@@ -401,7 +401,13 @@
         .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
         .chart-card { background: var(--glass-bg); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-border); border-radius: 4px; padding: 1.5rem; }
         .chart-title { font-size: 0.85rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
-        .chart-container { position: relative; height: 280px; }
+        /* A <canvas> carries intrinsic width from its width= attribute, and that width is the
+           element's min-content contribution. The PRO charts (600px) are never instantiated for
+           a free reader, so Chart.js never resizes them: the grid track resolved to 450-600px
+           on a 390px screen and the whole calculator column was cut off with no way to scroll
+           to it (body clips overflow-x, so the responsive-layout gate read scrollX = 0). */
+        .chart-container { position: relative; height: 280px; width: 100%; }
+        .chart-container canvas { max-width: 100%; }
 
         /* ═══ RECOMMENDATIONS ═══ */
         .rec-section { margin-top: 1.25rem; }
@@ -503,7 +509,11 @@
             .cf-toolbar { flex-direction: column; align-items: stretch; gap: 0.5rem; }
             .cf-mode-bar { width: 100%; }
             .cf-toolbar-btn { flex: 1; justify-content: center; }
-            .cf-toolbar-actions { justify-content: center; }
+            /* The toolbar carries an INLINE `padding: 0 2rem`, so a media-query padding needs
+               !important to reach it: 64px of gutter left 326px for a 378px button row that
+               could not wrap, and the row ran 20px past a 390px screen. */
+            .cf-toolbar { padding: 0 1rem !important; }
+            .cf-toolbar-actions { justify-content: center; flex-wrap: wrap; }
             .cf-tab-bar { flex-direction: column; }
             .cf-tab-btn { justify-content: center; }
             .preset-btn { padding: 4px 8px; font-size: 0.68rem; }
@@ -901,7 +911,10 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#6d28d9 !imp
                             <i class="fas fa-snowflake" style="color:#06b6d4;"></i> Cooling System
                         </div>
 
-        // NOTE: refrigerant GWP values mirror the shared DB (rz-engine.js DATA.refrigerants, AR4) — keep in sync; full alignment = consume the engine directly.
+                        <!-- NOTE: refrigerant GWP values mirror the shared DB (rz-engine.js
+                             DATA.refrigerants, AR4) — keep in sync; full alignment = consume the
+                             engine directly. Was a bare `//` line in the MARKUP, so it rendered
+                             as visible body text above the Cooling Type field. -->
                         <label class="input-label">Cooling Type <span class="tooltip-trigger">?<div class="tooltip-content"><div class="tooltip-title"><i class="fas fa-snowflake"></i> Cooling Technology</div><div class="tooltip-desc">Primary cooling method used in the facility. Different cooling types use different refrigerants with varying Global Warming Potential. Direct liquid cooling systems use low-GWP refrigerants like R-1234ze (GWP=7) vs traditional R-410A (GWP=2088).</div></div></span></label>
                         <select class="input-field" id="coolingType" onchange="calculate()" aria-label="Cooling Type">
                             <option value="air_crac">Air / CRAC (R-410A)</option>
@@ -2500,7 +2513,7 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#6d28d9 !imp
         // Footer
         html += '<div class="pdf-footer">resistancezero.com \u00b7 Generated ' + dateStr + ' \u00b7 All calculations performed client-side \u00b7 No data transmitted to any server<br>Carbon Footprint Calculator v1.0 \u2014 Bagus Dwi Permana Portfolio</div>';
 
-        html += '<script src="auth.js?v=2026-08-26-h1h2" defer><\/script>';
+        html += '<script src="auth.js?v=2026-09-05-mint" defer><\/script>';
         html += '<script src="rz-engine.min.js?v=2026-09-06-cdu" defer><\/script>';
         html += '</body></html>';
         w.document.write(html);

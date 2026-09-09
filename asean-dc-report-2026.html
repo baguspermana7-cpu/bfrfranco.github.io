@@ -124,6 +124,15 @@
     .bar-f{height:100%;background:linear-gradient(90deg,var(--rpt-accent),var(--rpt-accent-light));border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px}
     .bar-v{font-size:.73rem;font-weight:700;color:#fff;white-space:nowrap}
     .bar-vo{font-size:.73rem;font-weight:600;color:var(--text-secondary);margin-left:8px;white-space:nowrap}
+    /* The value is printed INSIDE the coloured fill. On a 390px screen the track is ~200px, so a
+       15.7% bar is 32px and "$0.8B" was cut. Below 560px the value sits just after the fill
+       instead — the bar keeps its true length, which a min-width would have falsified. */
+    @media(max-width:560px){
+      .bar-l{width:64px;font-size:.72rem}
+      .bar-t{overflow:visible;margin-right:48px}
+      .bar-f{position:relative;padding-right:0}
+      .bar-v{position:absolute;left:100%;margin-left:6px;color:var(--text-primary)}
+    }
     .rpt-hl{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin:1.25rem 0}
     .rpt-hl-card{background:var(--rpt-card-bg);border:1px solid var(--border-color);border-radius:4px;padding:1.2rem;border-left:2px solid var(--rpt-accent)}
     .rpt-hl-card .num{font-size:1.5rem;font-weight:800;color:var(--rpt-accent-text);display:block;margin-bottom:.2rem}
@@ -722,7 +731,7 @@
     </footer>
 
     <script src="script.min.js?v=2026-09-06-cards"></script>
-<script src="auth.js?v=2026-08-26-h1h2" defer></script>
+<script src="auth.js?v=2026-09-05-mint" defer></script>
 <script src="rz-engine.min.js?v=2026-09-06-cdu" defer></script>
 <script src="rz-tracker.js" defer></script>
 

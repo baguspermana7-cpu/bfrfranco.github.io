@@ -144,8 +144,15 @@
             display: flex; align-items: center; gap: 0; flex: 1;
             min-width: 320px; max-width: 760px;
             border: 1px solid var(--border-color); border-radius: 6px;
-            background: var(--panel-bg-2); overflow: hidden;
+            /* The cells are `white-space: nowrap` and the strip is capped at 760px, so in DARK
+               (where the state label runs longer) the last cell's value — "Simulated" — was cut
+               by 17px. A scenario name cut mid-word names a different scenario; the strip scrolls
+               rather than hiding its own last reading. */
+            background: var(--panel-bg-2); overflow-x: auto; overscroll-behavior-x: contain;
+            scrollbar-width: thin;
         }
+        .alarm-strip::-webkit-scrollbar { height: 4px; }
+        .alarm-strip::-webkit-scrollbar-thumb { background: var(--border-soft); border-radius: 2px; }
         .as-cell {
             display: flex; align-items: center; gap: 6px;
             padding: 7px 13px; font-size: 0.72rem;
@@ -1841,7 +1848,7 @@
         }
     })();
     </script>
-<script src="auth.js?v=2026-08-26-h1h2" defer></script>
+<script src="auth.js?v=2026-09-05-mint" defer></script>
 <script src="rz-tracker.js?v=2026-08-30-local-runtime" defer></script>
 
 <style id="rz-cookie-banner-style">

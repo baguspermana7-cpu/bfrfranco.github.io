@@ -15,7 +15,7 @@ body{background:#05080B;color:#cbd5e1;font-family:'IBM Plex Mono',monospace;padd
 .h{font-family:'JetBrains Mono',monospace;font-size:.74rem;letter-spacing:.16em;text-transform:uppercase;color:#5E8472;margin-bottom:6px;}
 .sub{font-size:.78rem;color:#475569;margin-bottom:18px;max-width:80ch;line-height:1.5;}
 .cmp{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;}
-@media(max-width:900px){.cmp{grid-template-columns:1fr;}}
+@media(max-width:900px){.cmp{grid-template-columns:minmax(0,1fr);}}
 .col-label{font-family:'JetBrains Mono',monospace;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
 .col-label .dot{width:8px;height:8px;border-radius:50%;}
 .before .col-label{color:#64748b;} .before .dot{background:#64748b;}
@@ -23,6 +23,9 @@ body{background:#05080B;color:#cbd5e1;font-family:'IBM Plex Mono',monospace;padd
 
 /* shared cockpit slice layout */
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px;}
+/* Four KPI tracks in a 312px column pushed the last value ("36/48") past a 390px screen, and the
+   column caption is a one-line flex row. This block must sit AFTER the base rule to win. */
+@media(max-width:560px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr));}.col-label{flex-wrap:wrap;}}
 .k{padding:11px 12px;}
 .kl{font-size:.6rem;letter-spacing:.08em;text-transform:uppercase;}
 .kv{font-size:1.45rem;font-weight:700;margin-top:3px;font-variant-numeric:tabular-nums;}

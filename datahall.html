@@ -291,11 +291,28 @@
         /* Floor — CRAH rows top/bottom, rack zones center */
         .floor {
             flex: 1; min-height: 0; display: grid;
-            grid-template-rows: 30px 1fr 30px;
+            grid-template-rows: auto minmax(0, 1fr) auto;
             gap: 6px; background: var(--bg-panel);
             border: 1px solid var(--border); border-radius: 5px; padding: 8px;
+            /* v1.134.26 — the floor used to absorb every squeeze itself: at 768 the 1fr
+               field row shrank until a zone head measured 6px tall for 17px of text.
+               Heads and footers hold their size now and the floor scrolls instead. */
+            overflow-y: auto; scrollbar-width: thin;
         }
-        .crah-rail { display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; }
+        /* v1.134.26 — the rail used to divide the WHOLE fleet across the panel width
+           (repeat(30, 1fr) set inline). At 1440 that left 23px per cell for a 26px tag,
+           at 768 18px, at 390 five: every "CRAH-A01" rendered as "A0" — a unit tag cut
+           mid-digit names a DIFFERENT unit. Hold a legible track minimum and let the
+           rail scroll sideways instead; the north/south floor-plan metaphor survives. */
+        .crah-rail {
+            display: grid; gap: 5px;
+            grid-auto-flow: column; grid-auto-columns: minmax(38px, 1fr);
+            overflow-x: auto; overscroll-behavior-x: contain;
+            scrollbar-width: thin; padding-bottom: 2px;
+        }
+        .crah-rail::-webkit-scrollbar { height: 5px; }
+        .crah-rail::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        .crah-rail > * { min-height: 30px; }
         .crah-cell {
             border: 1px solid var(--border-soft); border-radius: 3px;
             display: flex; align-items: center; justify-content: center; gap: 5px;
@@ -311,13 +328,28 @@
         .crah-cell.alarm { background: rgba(228,86,74,0.15); color: var(--st-alarm); border-color: rgba(228,86,74,0.5); }
         .crah-cell.alarm .cc-dot { background: var(--st-alarm); animation: blink 1s steps(1) infinite; }
 
-        .zone-field { display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; min-height: 0; }
+        /* v1.134.26 — the field divided the whole 25-row hall across the panel width, so a
+           zone column was 28px at 1440 and 21px at 768 while its own footer ("322 kW ·
+           IN 25.1°C · HOT 36.9°C", the owner's v2.10.0 per-row readings) measures 169px.
+           Every one of those 75 numbers was drawn and none could be read. Hold a track
+           minimum wide enough for the footer and let the field scroll sideways — the same
+           treatment the CRAH rail gets, and the same doctrine as the cabinet LOD rule:
+           a number too small to read is not a smaller number, it is noise. */
+        .zone-field {
+            display: grid; gap: 6px; min-height: 0;
+            grid-auto-flow: column; grid-auto-columns: minmax(64px, 1fr);
+            overflow-x: auto; overscroll-behavior-x: contain;
+            scrollbar-width: thin;
+        }
+        .zone-field::-webkit-scrollbar { height: 5px; }
+        .zone-field::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
         .zone {
             display: flex; flex-direction: column; min-width: 0;
             border: 1px solid var(--border-soft); border-radius: 3px; overflow: hidden;
             background: rgba(255,255,255,0.012);
         }
         .zone-head {
+            flex: 0 0 auto;
             font-size: 9px; font-weight: 700; color: var(--txt-dim); text-align: center;
             padding: 3px 2px; background: rgba(255,255,255,0.03);
             border-bottom: 1px solid var(--border-soft); white-space: nowrap;
@@ -355,7 +387,10 @@
             50% { box-shadow: inset 0 0 0 2px rgba(255,80,80,0.85); }
         }
         /* Rack fill set inline by JS from utilization tier — no neon */
-        .zone-foot { font-size: 9px; color: var(--txt-faint); text-align: center; padding: 2px; border-top: 1px solid var(--border-soft); white-space: nowrap; }
+        /* v1.134.26 — nowrap forced the three readings onto one 169px line inside a 28px column.
+           They stack instead — each fits its own line at the 64px track minimum. */
+        .zone-foot { flex: 0 0 auto; font-size: 9px; color: var(--txt-faint); text-align: center; padding: 2px; border-top: 1px solid var(--border-soft); white-space: normal; line-height: 1.25; }
+        .zone-foot > .zf-kw, .zone-foot > .zf-in, .zone-foot > .zf-hot { display: block; }
         /* v2.10.0 — per-row min / avg / max under the row heat (owner comment 12) */
         .zone-foot .zf-stats { display: block; margin-top: 1px; color: var(--txt-dim); letter-spacing: -0.2px; font-size: 8.5px; line-height: 1.2; white-space: normal; }
         .zone-foot .zf-stats b { font-weight: 700; color: var(--txt-main, #e2e8f0); }
@@ -455,6 +490,15 @@
             .sidebar-right { display: none; }
             .panel { min-width: 150px; flex: 1; }
             .center-stage { min-height: 60vh; }
+            /* v1.134.26 — the cockpit shell is a 100vh app frame with overflow hidden. Once
+               the layout stacks (sidebar on top, right rail dropped) the stage no longer fits
+               that frame: at 390 the balance band alone took 543px of it, the floor plan was
+               handed 18px, and the bottom 123px of the stage was cut with no way to reach it.
+               A stacked layout scrolls; only the desktop frame stays viewport-locked. */
+            body { height: auto; min-height: 100vh; overflow-y: auto; }
+            .center-stage { overflow: visible; }
+            .floor { overflow: visible; }
+            .zone-field { min-height: 220px; }
         }
         @media (max-width: 768px) {
             html, body { overflow-x: hidden; max-width: 100vw; }
@@ -1784,14 +1828,16 @@
             var railSplit = Math.ceil(CRAH_TOTAL / 2);
             var railTop = document.getElementById('crah-top');
             var railBottom = document.getElementById('crah-bottom');
-            railTop.style.gridTemplateColumns = 'repeat(' + railSplit + ', 1fr)';
-            railBottom.style.gridTemplateColumns = 'repeat(' + (CRAH_TOTAL - railSplit) + ', 1fr)';
+            /* v1.134.26 — no inline column count. Forcing repeat(N, 1fr) across the panel
+               squeezed every cell below its own tag width; .crah-rail now holds a 38px
+               track minimum and scrolls. */
             railTop.innerHTML = rail(1, railSplit);
             railBottom.innerHTML = rail(railSplit + 1, CRAH_TOTAL);
 
             var field = document.getElementById('zone-field');
             // Row count is derived from the hall's rack count — the grid must follow it.
-            field.style.gridTemplateColumns = 'repeat(' + ZONES + ', 1fr)';
+            /* v1.134.26 — no inline column count; .zone-field holds a 64px track minimum
+               and scrolls. Forcing repeat(ZONES, 1fr) squeezed every row footer to 28px. */
             var fh = '';
             for (var z = 0; z < ZONES; z++) {
                 var zn = zones[z];
@@ -1809,8 +1855,10 @@
                        hall's IT load, the inlet and hot-aisle temperatures sit PER ROW on the
                        engine's published planes. */
                     '<div class="zone-foot num">' +
-                      '<span class="zf-kw">' + zn.heat.toFixed(0) + ' kW</span> · ' +
-                      '<span class="zf-in">IN ' + zn.rackInletC.toFixed(1) + '°C</span> · ' +
+                      /* v1.134.26 — the " · " separators went with the single-line layout;
+                         the three readings are their own lines now. */
+                      '<span class="zf-kw">' + zn.heat.toFixed(0) + ' kW</span>' +
+                      '<span class="zf-in">IN ' + zn.rackInletC.toFixed(1) + '°C</span>' +
                       '<span class="zf-hot">HOT ' + zn.hotAisleC.toFixed(1) + '°C</span>' +
                       '<span class="zf-stats" id="zs-' + z + '" data-rz-authored-basis="' + ROW_STATS_BASIS + '"></span>' +
                     '</div>' +
@@ -2196,7 +2244,7 @@
         else log('All racks within rating; rack-inlet temperatures remain inside the recommended envelope. State NORMAL.', 'info');
     })();
     </script>
-<script src="auth.js?v=2026-08-26-h1h2" defer></script>
+<script src="auth.js?v=2026-09-05-mint" defer></script>
 <script src="rz-tracker.js?v=2026-08-30-local-runtime" defer></script>
 
 <style id="rz-cookie-banner-style">

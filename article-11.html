@@ -759,6 +759,10 @@
 
         /* Responsive */
         @media (max-width: 768px) {
+            /* The forecast bar prints its figure INSIDE the fill AND again in `.value` beside it.
+               At 390px a 44% fill is 39px and cut "415 TWh"; the outside copy is the legible one,
+               so drop the duplicate rather than clip a number. */
+            .forecast-bar .bar span { display: none; }
             .article-hero { padding: 6rem 1rem 3rem; }
             .article-content { padding: 3rem 1rem; }
             .article-body { font-size: 1rem; }
@@ -858,6 +862,8 @@
             font-size: 0.95rem; font-weight: 700; color: #e2e8f0; margin-bottom: 0.75rem;
             display: flex; align-items: center; gap: 8px;
         }
+        /* A one-line flex row cut "Strategic Resilience Scorecard" at 390px. */
+        .eeq-pro-panel .eeq-panel-title { flex-wrap: wrap; }
         .eeq-pro-panel .eeq-panel-title .eeq-panel-icon { color: #f59e0b; font-size: 1.1rem; }
         .eeq-gate-overlay {
             position: absolute; inset: 0; background: rgba(15,23,42,0.85); border-radius: 14px;
@@ -3411,7 +3417,7 @@
 
 <!-- Search: shared js/rz-command-palette.js -->
 <script src="js/rz-command-palette.js?v=2026-09-05-mint" defer></script>
-<script src="auth.js?v=2026-08-26-h1h2" defer></script>
+<script src="auth.js?v=2026-09-05-mint" defer></script>
 <script src="rz-engine.min.js?v=2026-09-06-cdu" defer></script>
 <script src="rz-tracker.js" defer></script>
 

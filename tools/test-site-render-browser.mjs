@@ -27,9 +27,26 @@ test('real DOM fixture: clipped text, prose, gap, missing image and protected co
       nav.navbar { position:fixed; top:0; left:0; width:100%; height:80px; z-index:20; }
       .hero-category { position:absolute; top:40px; left:20px; }
       .aurora-mesh .pill { background:rgb(139,92,246); } .pill { background:rgb(139,92,246); }
+      details { overflow: hidden; } #expanded { height: 20px; }
+      @keyframes tick { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+      .ticker-wrapper { width: 200px; overflow: hidden; }
+      #ticker-track { display: inline-block; white-space: nowrap; animation: tick 20s linear infinite; }
+      #ellipsised { width: 80px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      #clamped { width: 120px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+      .offcanvas-drawer { position: fixed; top: 0; left: 100%; width: 260px; }
+      #stranded { display: inline-block; margin-left: 600px; white-space: nowrap; }
+      #srlive { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+      #prewrap { width: 200px; overflow-x: auto; white-space: pre-wrap; font-family: monospace; }
+      #naked-wash { background: rgba(232,181,99,0.15); }
+      #editorial-wash { background: rgba(232,181,99,0.08); border: 1px solid rgba(180,83,9,0.26); }
+      #tinted-chip { background: rgba(16,185,129,0.125); }
+      #status-chip { display: inline-block; padding: 2px 8px; border-radius: 4px; background: rgba(8,145,178,0.1); }
+      #highlight-wash { background: rgba(253,224,71,0.45); }
       </style><body><div class="evidence-block dark-gradient" id="statistics-band">Decorative statistics</div><nav class="navbar"><div role="toolbar"><h1 id="toolbar-title">Toolbar</h1></div></nav><main><section class="hero"><span class="hero-category" id="overlapped-category">Obscured category</span><p id="hero">This hero lead must not be counted as article body prose.</p></section></main><nav><ul class="nav-menu"><li id="closed">Intentionally closed off canvas navigation</li></ul></nav><a class="skip-link" href="#prose">Skip to content</a>
       <h1 id="clipped">Long heading is clipped</h1><div class="scrollable"><div class="wide" id="scroll-text">Accessible horizontally scrollable text must not be reported as clipped</div></div><div class="gap"></div><article>
       <p id="prose">This is actual body prose with enough words to exercise the editorial checks.</p>
+      <p id="chip-host">Readiness for this milestone is <span id="status-chip">In preparation</span> as of the last review.</p>
+      <p id="wash-host">The operator then noticed <span id="highlight-wash">the tinted highlighter run</span> across the sentence.</p>
       <div class="calculator-section"><p id="instrument">This instrument help text has enough words but is not editorial body prose.</p></div>
       <div class="author-bio"><p id="author">This author biography has enough words but is not editorial body prose.</p></div>
       <div class="water-calculator"><p id="water">This calculator contains a long instrument description and must not be classified as body prose.</p></div>
@@ -40,12 +57,25 @@ test('real DOM fixture: clipped text, prose, gap, missing image and protected co
       <p class="figure-caption" id="standalone-caption">This standalone figure caption describes the illustration rather than the article narrative.</p>
       <div class="reading-note"><blockquote id="reading-quote">This quoted reading note remains editorial prose and must meet the minimum font size.</blockquote></div>
       <div class="flowchart-discussion"><p id="chart-discussion">This narrative discussion of flowcharts is not itself a chart or diagram instrument.</p></div>
+      <div class="fact-card" id="naked-wash">A translucent card wash with no hairline sitting in reading prose</div>
+      <div class="fact-card" id="editorial-wash">The sanctioned editorial treatment: the same tint plus a 1px hairline</div>
+      <span class="tier-pill" id="tinted-chip">MAJOR</span>
       <div class="dark-gradient"><div class="nested-card" id="dark-instrument">Composited instrument wash</div></div>
       <div class="light-gradient"><div class="nested-card" id="light-wash">Naked decorative wash</div></div>
       <div class="service-row"><span class="revenue-badge rev-high nested-card" id="revenue-status">HIGH</span></div>
       <span class="revenue-badge rev-high nested-card" id="unscoped-badge">Decorative revenue badge</span>
       <img id="broken" src="data:image/png;base64,invalid" width="100" height="100">
       <div class="pill" id="banned">Banned pill</div><div class="aurora-mesh"><div class="pill">Protected aurora</div></div>
+      <div class="ticker-wrapper"><div id="ticker-track"><span id="ticker-item">Queued marquee headline waiting off screen to scroll in</span></div></div>
+      <div id="ellipsised">A long single line truncated by an authored ellipsis affordance</div>
+      <div class="offcanvas-drawer"><h2 id="drawer-title">Closed off canvas drawer title</h2></div>
+      <div id="stranded">Stranded in flow past the clipped viewport edge</div>
+      <p id="srlive" aria-live="polite">Map contains 744 markers announced only to a screen reader</p>
+      <div id="prewrap">HFO-1336mzz-Z decomposition
+                                                                         (Trifluoroacetic Acid / TFA)</div>
+      <div id="clamped">A card excerpt clamped to two lines by webkit line clamp which draws its own ellipsis at the cut.</div>
+      <details id="collapsed"><summary>Collapsed summary</summary><p id="collapsed-body">Hidden checklist body inside a closed details element.</p></details>
+      <details open id="expanded"><summary>Expanded summary</summary><p id="expanded-body">Visible body inside an open details that really is clipped.</p></details>
       <svg><text fill="#8b5cf6">Semantic color</text></svg><p id="below">This paragraph is below the viewport but it is not vertically clipped by overflow x hidden.</p></article></body></html>`);
     const measurements = await page.evaluate(collectMeasurements);
     const findings = evaluateMeasurements(measurements);
@@ -57,6 +87,59 @@ test('real DOM fixture: clipped text, prose, gap, missing image and protected co
     assert.ok(measurements.layout.articleStartY > 800);
     assert.equal(measurements.layout.proseBoxes[0].width, 358);
     assert.ok(!findings.some(finding => finding.rule === 'text-overflow' && ['#below', '#scroll-text'].includes(finding.target)));
+    /* A CLOSED <details> hides its own body by design — the checklist pages carry five of
+       them and every span inside was reported as clipped text. Only an OPEN one that really
+       cuts its content is a defect. */
+    assert.ok(!findings.some(finding => finding.rule === 'text-overflow' && finding.target === '#collapsed-body'),
+      'closed <details> body must not be reported as clipped text');
+    assert.ok(findings.some(finding => finding.rule === 'text-overflow' && finding.target === '#expanded-body'),
+      'open <details> that clips its body must still be reported');
+    /* A marquee queues its next items OUTSIDE the window it scrolls through — that is the
+       mechanism, not a defect. The homepage ticker and the site marquee accounted for every
+       text-overflow finding on index.html, articles.html and datacenter-solutions.html. */
+    assert.ok(!findings.some(finding => finding.rule === 'text-overflow' && finding.target === '#ticker-item'),
+      'text queued outside a marquee window must not be reported as clipped');
+    /* `text-overflow: ellipsis` IS the authored truncation affordance: the cut is declared and
+       the reader can see it happened. A box that clips with no ellipsis (#clipped) still is. */
+    assert.ok(!findings.some(finding => finding.rule === 'text-overflow' && finding.target === '#ellipsised'),
+      'an ellipsised single line must not be reported as clipped');
+    /* `-webkit-line-clamp` is the multi-line form of the same affordance and draws its own
+       ellipsis at the cut — the articles-grid card excerpts are clamped to three lines. */
+    assert.ok(!findings.some(finding => finding.rule === 'text-overflow' && finding.target === '#clamped'),
+      'a line-clamped excerpt must not be reported as clipped');
+    /* An OFF-CANVAS panel is parked outside the viewport on purpose and paints nothing until it
+       opens (cx-calculator's .cx-drawer sits at translateX(377px) on a 390px screen). Content
+       stranded outside the viewport by ordinary FLOW is a different thing and stays a finding. */
+    assert.ok(!findings.some(finding => finding.rule === 'text-overflow' && finding.target === '#drawer-title'),
+      'a parked off-canvas panel must not be reported as clipped');
+    assert.ok(findings.some(finding => finding.rule === 'text-overflow' && finding.target === '#stranded'),
+      'in-flow content pushed past the clipped viewport edge must still be reported');
+    /* The visually-hidden live-region idiom (1x1 box, clip rect(0,0,0,0)) paints no ink at all —
+       pln-java-grid's "Map contains N markers" announcement uses it via inline styles, so a
+       class-name exemption could never have caught it. */
+    assert.ok(!findings.some(finding => finding.rule === 'text-overflow' && finding.target === '#srlive'),
+      'a 1x1 visually-hidden live region must not be reported as clipped');
+    /* A box with `overflow-x: auto` either scrolls (the ink is reachable) or its content fits.
+       Preserved trailing spaces in a `pre-wrap` block widen the measured RANGE without widening
+       scrollWidth, and article-26's chemistry blocks were blamed on <body> because of it. */
+    assert.ok(!findings.some(finding => finding.rule === 'text-overflow' && finding.target === '#prewrap'),
+      'a fitting overflow-x:auto block must not be reported as clipped');
+    /* §A bans TRANSLUCENT CARD WASHES in article bodies. The site's own replacement — a flat tint
+       plus a 1px hairline (css/rz-article-dark.css `.quote-callout`) — is the APPROVED pattern,
+       and a tinted instrument chip is a different idiom entirely. Only the naked wash is slop. */
+    assert.ok(findings.some(finding => finding.rule === 'editorial-translucent-wash' && finding.target === '#naked-wash'),
+      'a naked translucent card wash in prose must be reported');
+    assert.ok(!findings.some(finding => finding.rule === 'editorial-translucent-wash' && finding.target === '#editorial-wash'),
+      'the tint-plus-hairline editorial treatment must not be reported as a wash');
+    assert.ok(!findings.some(finding => finding.rule === 'editorial-translucent-wash' && finding.target === '#tinted-chip'),
+      'a tinted instrument chip must not be reported as a card wash');
+    /* Same distinction one level down: §A bans TINTED HIGHLIGHT SPANS over running prose. A status
+       chip is `display: inline-block` with its own padding and radius; a highlighter is plain
+       `inline` text with neither, and only the highlighter is the banned tell. */
+    assert.ok(!findings.some(finding => finding.rule === 'prose-highlight-wash' && finding.target === '#status-chip'),
+      'an inline-block status chip must not be reported as a prose highlight');
+    assert.ok(findings.some(finding => finding.rule === 'prose-highlight-wash' && finding.target === '#highlight-wash'),
+      'a tinted highlighter run over prose must be reported');
     assert.ok(!measurements.elements.some(element => element.target.includes('skip-link')));
     assert.ok(!measurements.elements.some(element => element.prose && ['#hero', '#instrument', '#author'].includes(element.target)));
     assert.ok(!measurements.elements.some(element => element.target === '#closed'));

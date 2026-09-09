@@ -522,6 +522,10 @@ button[onclick^="setITLoad"] { background:#0e7490 !important; border-color:#0e74
 /* v1.8.0 — mobile responsive patch */
 @media (max-width: 768px) {
   html, body { overflow-x: hidden; max-width: 100vw; }
+  /* The toolbar carries an INLINE `padding: 0 2rem`, so a media-query padding needs !important
+     to reach it: 64px of gutter left a button row that could not wrap running past 390px. */
+  .pue-toolbar { padding: 0 1rem !important; }
+  .pue-toolbar-actions { flex-wrap: wrap; justify-content: center; }
   img, picture, video { max-width: 100%; height: auto; display: block; }
   .nav-menu, .nav-links { display: none; }
   .footer-grid { grid-template-columns: 1fr; gap: 1.25rem; padding: 1rem; }
@@ -2311,7 +2315,7 @@ html:not([data-theme="dark"]) .pue-toolbar-btn.pue-btn-free { color:#475569 !imp
 
 
 
-<script src="auth.js?v=2026-08-26-h1h2" defer></script>
+<script src="auth.js?v=2026-09-05-mint" defer></script>
 <script src="rz-engine.min.js?v=2026-09-06-cdu" defer></script>
 <!-- Supabase save/reload scenario (additive) -->
 <script src="js/rz-config.js?v=2026-07-11"></script>

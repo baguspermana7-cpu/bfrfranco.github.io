@@ -166,6 +166,12 @@ gate "agent harness standard — privacy and release parity" node tools/test-age
 # where the twin still carried the Anthropic purple the same release had just removed from the
 # source. terser -c -m is byte-reproducible for every twin here, so the check is exact.
 gate "min-twin freshness — no page runs a stale minified build" node tools/audit-min-twins.mjs --strict
+# CACHE-KEY DRIFT is the min-twin bug's sibling: one shared asset requested under two `?v=`
+# tokens sits in two cache entries, so a fix reaches a page only if that page's own token moved.
+# Reporting only — `--apply` converges on the NEWEST token. The predecessor of this tool parsed no
+# arguments and hardcoded an old token, so running it walked 294 tokens across 155 files BACKWARDS.
+gate "cache-key drift — one shared asset, one token" python3 tools/normalize-cache-bust.py
+gate "cache-bust normalizer — reports without writing, never picks an older token" python3 tools/test-normalize-cache-bust.py
 # ENGINE VERSION PINS. Every Conventional cockpit fails CLOSED on an engine it does not
 # recognise — correct behaviour, and the reason bumping the engine 2.0.0 -> 2.1.0 in v1.134.23
 # blanked all eight at once: no page threw, nothing logged, the authority check just returned

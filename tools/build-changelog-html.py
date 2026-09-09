@@ -255,7 +255,9 @@ def parse_changelog(path):
 
 # ── Render entry card ──────────────────────────────────────────────────────────
 TIER_COLOR = {
-    'major': '#8b5cf6',   # violet
+    # Anthropic-default violet #8b5cf6 is a hard-banned AI-design-slop tell (§A / CLAUDE.md
+    # rejected pattern 3). Amber reads as the highest of the three tiers without it.
+    'major': '#d97706',   # amber
     'minor': '#06b6d4',   # cyan
     'patch': '#10b981',   # emerald
 }
@@ -676,6 +678,10 @@ def build_html(entries):
       color: #cbd5e1;
       font-size: 0.92rem;
       line-height: 1.7;
+      /* Entries quote slash-joined identifier runs (a v1.115.x line lists 17 panel names
+         joined by "/"), which Chrome offers no break opportunity inside: one line ran past
+         the viewport on the published page. Long tokens wrap; ordinary prose is unaffected. */
+      overflow-wrap: anywhere;
     }}
     .changelog-body p {{
       margin: 0.5rem 0;
@@ -897,7 +903,7 @@ def build_html(entries):
           <ul class="dropdown-menu" role="menu">
             <li role="menuitem"><a href="datacenter-solutions.html" style="color:#06b6d4;font-weight:600;">DC Solutions Hub</a></li>
             <li role="separator" style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
-            <li role="menuitem"><a href="datahallAI.html" style="color:#8b5cf6;">DC AI/HPC</a></li>
+            <li role="menuitem"><a href="datahallAI.html" style="color:#64748b;">DC AI/HPC</a></li>
             <li role="menuitem"><a href="dc-conventional.html">DC Conventional</a></li>
             <li role="separator" style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
             <li role="menuitem"><a href="tco-calculator.html" style="color:#4f46e5;font-weight:600;">TCO Calculator</a></li>
@@ -923,7 +929,7 @@ def build_html(entries):
             <li role="menuitem"><a href="geopolitics.html" style="color:#dc2626;">Global Analysis</a></li>
             <li role="menuitem"><a href="future-forward.html" style="color:#7c3aed;">Future Forward</a></li>
             <li role="menuitem"><a href="glossary.html" style="color:#14b8a6;">Glossary</a></li>
-            <li role="menuitem"><a href="Apps/second brain/index.html" style="color:#8b5cf6;font-weight:600;">&#x2022; Second Brain</a></li>
+            <li role="menuitem"><a href="Apps/second brain/index.html" style="color:#64748b;font-weight:600;">&#x2022; Second Brain</a></li>
             <li role="separator" style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
             <li role="menuitem"><a href="changelog.html" style="color:#f59e0b;font-weight:600;">Changelog <span style="background:#f59e0b;color:#0f172a;font-size:0.58rem;font-weight:800;letter-spacing:0.1em;padding:1px 5px;border-radius:4px;vertical-align:middle;margin-left:3px;">NEW</span></a></li>
             <li role="menuitem"><a href="insights.html" style="color:#64748b;font-size:0.85rem;">All Insights</a></li>
@@ -1032,7 +1038,7 @@ def build_html(entries):
     </div>
   </footer>
 
-  <script src="script.min.js?v=20260509-share-fix" defer></script>
+  <script src="script.min.js?v=2026-09-06-cards" defer></script>
 
   {filter_js}
 

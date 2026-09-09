@@ -836,7 +836,17 @@
             .article-body { font-size: 1rem; }
             .value-calculator { padding: 1.5rem; }
             .calc-grid { grid-template-columns: 1fr; }
-            .comparison-grid { grid-template-columns: 1fr; }
+            /* One instance carries an INLINE `grid-template-columns: repeat(3, 1fr)` which beats
+               this rule, so that grid kept three tracks on a 390px screen: 465px of columns in a
+               350px column, and the third card ("ByteDance/TikTok") sat entirely outside the
+               viewport behind `body { overflow-x: hidden }`. */
+            .comparison-grid { grid-template-columns: 1fr !important; }
+            /* The economic-impact bars print their value INSIDE the coloured fill. A 120px label
+               left a 118px track, so a 30% bar was 36px and cut "$1.0B" in half — a currency
+               figure clipped mid-glyph reads as a different figure. Stack the label above a
+               full-width track; the inline `display:flex` needs !important to be overridden. */
+            #economicBars > div { flex-direction: column !important; align-items: stretch !important; gap: 0.25rem !important; }
+            #economicBars > div > span { width: auto !important; }
             .toc-grid { grid-template-columns: 1fr; }
         }
 
@@ -4192,7 +4202,7 @@
 
 <!-- Search: shared js/rz-command-palette.js -->
 <script src="js/rz-command-palette.js?v=2026-09-05-mint" defer></script>
-<script src="auth.js?v=2026-08-26-h1h2" defer></script>
+<script src="auth.js?v=2026-09-05-mint" defer></script>
 <script src="rz-engine.min.js?v=2026-09-06-cdu" defer></script>
 <script src="rz-tracker.js" defer></script>
 

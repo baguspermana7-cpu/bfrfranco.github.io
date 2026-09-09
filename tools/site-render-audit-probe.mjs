@@ -87,8 +87,39 @@ export function collectMeasurements() {
     return result;
   };
   const visible = element => {
-    if (!element.getClientRects().length) return false;
+    /* This runs for EVERY element on the page, so each check below is ordered cheapest-first and
+       the expensive ones (getComputedStyle, an ancestor walk) are reached only by the elements
+       whose geometry already looks suspicious. Doing them unconditionally cost minutes per page. */
+    const rects = element.getClientRects();
+    if (!rects.length) return false;
     if (element.closest('.skip-link,.skip-to-content,.sr-only,.visually-hidden') && !element.matches(':focus')) return false;
+    /* The visually-hidden idiom is a 1x1 box with `clip: rect(0,0,0,0)` — it paints NO ink, and
+       pln-java-grid applies it through inline styles on its live region, so a class-name list can
+       never catch it. A box that thin cannot show a reader anything either way. */
+    const ownBox = rects[0];
+    if (ownBox.width <= 1 || ownBox.height <= 1) {
+      const ownStyle = getComputedStyle(element);
+      if (/hidden|clip/.test(ownStyle.overflowX) || /hidden|clip/.test(ownStyle.overflowY)
+        || ownStyle.clip !== 'auto') return false;
+    }
+    /* A CLOSED <details> hides its body BY DESIGN; only its <summary> is on screen. Pages that
+       author `details { overflow: hidden }` (the CDU checklists, the compare FAQs) still lay the
+       hidden body out, so every span inside it read as text clipped by an ancestor — 121 findings
+       on cdu-checklist.html alone, none of them a defect a reader could ever see. */
+    if (element.closest('details:not([open])') && !element.closest('summary')) return false;
+    /* An OFF-CANVAS panel is parked outside the viewport ON PURPOSE and paints nothing until it
+       opens — cx-calculator's .cx-drawer sits at translateX(377px) on a 390px screen. The nearest
+       POSITIONED host decides; content stranded outside the viewport by ordinary flow is a
+       different thing and stays a finding. Only an element already off-screen can be in one. */
+    if (ownBox.right <= 0 || ownBox.left >= innerWidth) {
+      for (let parent = element; parent; parent = parent.parentElement) {
+        const position = getComputedStyle(parent).position;
+        if (position !== 'fixed' && position !== 'absolute') continue;
+        const host = parent.getBoundingClientRect();
+        if (host.right <= 0 || host.left >= innerWidth) return false;
+        break;
+      }
+    }
     const menu = element.closest('.nav-menu,.nav-links');
     if (menu && !document.body.classList.contains('rz-nav-open') && !menu.classList.contains('active')) {
       const box = menu.getBoundingClientRect();
@@ -115,6 +146,22 @@ export function collectMeasurements() {
     for (const rect of rectangles) {
       let scrollableX = false;
       let scrollableY = false;
+      /* A MARQUEE queues its next items outside the window it scrolls them through: that is the
+         mechanism, not a defect. Once the walk passes an element a keyframe animation is moving,
+         every clipping box above it is that window (index.html's news ticker, .rz-marquee). */
+      let marquee = false;
+      /* `text-overflow: ellipsis` is the authored truncation affordance — the cut is declared and
+         the reader can SEE it happened. Only the horizontal axis it governs is exempt; a box that
+         clips with no ellipsis (datahall's CRAH tags) is still a finding. */
+      let ellipsised = false;
+      /* `-webkit-line-clamp` is the multi-line form of the same affordance: it draws its own
+         ellipsis at the cut, so it exempts BOTH axes — the clamp is what makes the box short. */
+      let clamped = false;
+      /* Text a non-root box already clips CANNOT reach past the viewport — the rect measured here
+         is the UNCLIPPED range, so a truncated line was reporting viewport-horizontal for ink that
+         is never painted. Only the root's own overflow is excluded: suppressing on that would gut
+         the rule on every page carrying `html, body { overflow-x: hidden }`. */
+      let clippedX = false;
       for (let parent = element; parent; parent = parent.parentElement) {
         const style = getComputedStyle(parent);
         const box = parent.getBoundingClientRect();
@@ -123,12 +170,21 @@ export function collectMeasurements() {
         const clipY = /hidden|clip/.test(style.overflowY);
         const horizontal = rect.left < box.left - 2 || rect.right > box.right + 2;
         const vertical = rect.top < box.top - 2 || rect.bottom > box.bottom + 2;
-        if (!root && /auto|scroll/.test(style.overflowX) && parent.scrollWidth > parent.clientWidth) scrollableX = true;
-        if (!root && /auto|scroll/.test(style.overflowY) && parent.scrollHeight > parent.clientHeight) scrollableY = true;
-        if (clipX && horizontal && !scrollableX) reasons.add(`ancestor-clipping-x:${target(parent)}`);
-        if (!root && clipY && vertical && !scrollableY) reasons.add(`ancestor-clipping-y:${target(parent)}`);
+        if (/ellipsis/.test(style.textOverflow)) ellipsised = true;
+        if ((style.webkitLineClamp || style.getPropertyValue('-webkit-line-clamp')) !== 'none') clamped = true;
+        /* A box that CAN scroll on an axis is never the reason ink is unreachable: either it
+           scrolls (the reader gets there) or its content fits and nothing is hidden. The second
+           case matters — `white-space: pre-wrap` HANGS preserved indentation, so article-26's
+           chemistry blocks measured a 504px range inside a 347px box that scrollWidth (rightly)
+           reports as fitting, and <body> was blamed for whitespace that paints nothing. */
+        if (!root && /auto|scroll/.test(style.overflowX)) scrollableX = true;
+        if (!root && /auto|scroll/.test(style.overflowY)) scrollableY = true;
+        if (!root && clipX && horizontal) clippedX = true;
+        if (clipX && horizontal && !scrollableX && !marquee && !ellipsised && !clamped) reasons.add(`ancestor-clipping-x:${target(parent)}`);
+        if (!root && clipY && vertical && !scrollableY && !marquee && !clamped) reasons.add(`ancestor-clipping-y:${target(parent)}`);
+        if (style.animationName !== 'none' && style.transform !== 'none') marquee = true;
       }
-      if (!scrollableX && (rect.right > innerWidth + 2 || rect.left < -2)) reasons.add('viewport-horizontal');
+      if (!scrollableX && !marquee && !clippedX && (rect.right > innerWidth + 2 || rect.left < -2)) reasons.add('viewport-horizontal');
     }
     return [...reasons];
   };
@@ -144,11 +200,25 @@ export function collectMeasurements() {
       && /\b[1-9](?:\.\d+)?px\b/.test(style.backgroundSize)) rules.push('decorative-dot-grid');
     if (/callout|info-box|insight-box|engineer-note/.test(identity) && /gradient/.test(style.backgroundImage)) rules.push('gradient-callout');
     if (surface && /blur\(/.test(style.backdropFilter)) rules.push('decorative-glass');
-    if (surface && element.closest(proseSelector)) {
+    /* §A bans TRANSLUCENT CARD WASHES in article bodies (CLAUDE.md rejected pattern 7, and the
+       `flattenWashes()` runtime that enforces it). Two things are NOT that: the site's own
+       replacement — a flat tint plus a 1px hairline, which is what `.quote-callout` renders
+       under css/rz-article-dark.css — and a tinted instrument chip, which is a different idiom
+       and carries no card/panel/block token at all. Chips were 1,332 of the 1,988 findings this
+       rule raised; a badge that ALSO calls itself a card stays in scope. */
+    const washSurface = /card|panel|block|callout|info-box|insight-box|engineer-note/.test(identity);
+    const hairline = style.borderTopStyle === 'solid' && parseFloat(style.borderTopWidth) > 0
+      && parseFloat(style.borderTopWidth) <= 2;
+    if (washSurface && !hairline && element.closest(proseSelector)) {
       const alpha = style.backgroundColor.match(/^rgba\([^,]+,[^,]+,[^,]+,\s*([\d.]+)\)/)?.[1];
       if (alpha && Number(alpha) >= 0.02 && Number(alpha) <= 0.5) rules.push('editorial-translucent-wash');
     }
-    if (element.tagName === 'SPAN' && element.closest('p') && element.closest(proseSelector)
+    /* §A bans TINTED HIGHLIGHT SPANS over running prose. A status chip is not one: it is
+       `display: inline-block` carrying its own padding and radius, and it labels the sentence
+       rather than tinting it (geopolitics-2's `.confidence-badge`, the manual pages'
+       `.mn-status`). A highlighter is plain `inline` text with neither. */
+    const chip = style.display !== 'inline' && parseFloat(style.paddingLeft) > 0;
+    if (element.tagName === 'SPAN' && !chip && element.closest('p') && element.closest(proseSelector)
       && style.backgroundColor !== 'rgba(0, 0, 0, 0)' && style.backgroundColor !== 'transparent') rules.push('prose-highlight-wash');
     return rules;
   };

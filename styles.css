@@ -3960,6 +3960,10 @@ section {
 
 .newsletter-form {
     display: flex;
+    /* The article rail is 288px wide at EVERY viewport, so the viewport-keyed stack at 600px
+       never reached it and the Subscribe button was clipped by `.newsletter-signup`'s overflow.
+       Wrapping is container-driven: it stacks exactly when the row does not fit. */
+    flex-wrap: wrap;
     gap: 0.75rem;
     max-width: 500px;
     margin: 0 auto;
@@ -3967,6 +3971,7 @@ section {
 
 .newsletter-form input[type="email"] {
     flex: 1;
+    min-width: 0;
     padding: 0.875rem 1.25rem;
     border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: 10px;
@@ -6261,6 +6266,9 @@ section {
     }
     .series-title { display: none; }
     .series-links { align-self: flex-end; }
+    /* The badge is `white-space: nowrap`, so "26 · Global Analysis — Environmental…" measured
+       424px inside a 390px screen and ran off the page behind body's overflow-x clip. */
+    .series-badge { white-space: normal; }
 }
 
 /* ===== Cookie Consent Banner ===== */

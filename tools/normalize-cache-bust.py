@@ -1,16 +1,35 @@
 #!/usr/bin/env python3
-"""v1.10.12 — normalize cache-bust query strings on script/link tags only.
+"""v2.19.0 — one shared asset, one cache-bust token.
 
-Targets actual <script src=> and <link href=> tags, not documentation prose.
+Reports (default) or repairs (--apply) `?v=` drift on real `<script src=>` and
+`<link href=>` tags, never on documentation prose.
+
+WHY THIS WAS REWRITTEN
+----------------------
+The v1.10.12 version hardcoded ``NEW_BUST = "2026-05-09-v1"`` and always wrote,
+with no argument parsing at all — so ``--check`` was accepted silently and the
+tool rewrote 294 tokens across 155 files, reverting every cache-bust bump made
+since May, ``index.html``'s ``styles-index.min.css?v=2026-09-06-slop`` included.
+A normalizer that walks tokens BACKWARDS is a regression generator: the stale
+`.min` twin it is supposed to prevent is exactly what it causes.
+
+Two rules follow from that:
+
+* the target token is the NEWEST one already in the tree for that asset, chosen
+  by how the tokens sort, never a constant baked into this file;
+* writing requires ``--apply``. ``--check`` is the default and exits 1 on drift
+  so a gate can call it.
 """
-import re
+import argparse
 import glob
+import re
+import sys
 from pathlib import Path
 
-ROOT = Path("/home/baguspermana7/rz-work")
-NEW_BUST = "2026-05-09-v1"
+ROOT = Path(__file__).resolve().parent.parent
 
-# These files participate in cache normalization
+# Assets served to more than one page. One token each, or a fix reaches only
+# some of the pages that load it.
 NORMALIZE_TARGETS = {
     'styles.min.css',
     'styles-index.min.css',
@@ -22,51 +41,85 @@ NORMALIZE_TARGETS = {
     'rz-engine.js',
 }
 
+TAG = re.compile(r'\b(src|href)="([^"?]+)\?v=([^"]+)"', re.IGNORECASE)
 
-def normalize_in_html(content: str) -> tuple[str, int]:
-    """Normalize cache-bust on script/link tags only.
 
-    Pattern: src="<file>?v=<old>" or href="<file>?v=<old>"
+def scan(pages):
+    """{asset: {token: [file, ...]}} across every tag that loads a shared asset."""
+    seen = {}
+    for path in pages:
+        content = path.read_text(encoding='utf-8')
+        for _attr, ref, token in TAG.findall(content):
+            name = ref.split('/')[-1]
+            if name not in NORMALIZE_TARGETS:
+                continue
+            seen.setdefault(name, {}).setdefault(token, []).append(path)
+    return seen
+
+
+def newest(tokens):
+    """The token to converge on.
+
+    Tokens are date-led (`2026-09-06-slop`, `20260908-editorial`), so the digits
+    order them. Comparing on the digit run alone keeps `2026-09-06-slop` ahead of
+    `2026-05-09-v1` whatever the suffix says, and a token carrying no digits at
+    all sorts last so it never wins by accident.
     """
-    count = 0
+    def key(token):
+        digits = ''.join(re.findall(r'\d', token))
+        return (len(digits) > 0, digits, token)
+    return sorted(tokens, key=key)[-1]
 
-    def replace_src(m):
-        nonlocal count
-        attr = m.group(1)
-        path = m.group(2)
-        bust = m.group(3)
-        # Extract just the filename
-        fname = path.split('/')[-1]
-        if fname not in NORMALIZE_TARGETS:
-            return m.group(0)
-        if bust == NEW_BUST:
-            return m.group(0)
-        count += 1
-        return f'{attr}="{path}?v={NEW_BUST}"'
 
-    pattern = re.compile(
-        r'\b(src|href)="([^"?]+)\?v=([^"]+)"',
-        re.IGNORECASE
-    )
-    new_content = pattern.sub(replace_src, content)
-    return new_content, count
+def rewrite(content, asset, token):
+    def sub(m):
+        attr, ref, current = m.group(1), m.group(2), m.group(3)
+        if ref.split('/')[-1] != asset or current == token:
+            return m.group(0)
+        return f'{attr}="{ref}?v={token}"'
+    return TAG.sub(sub, content)
 
 
 def main():
-    pages = sorted(glob.glob(str(ROOT / '*.html')))
-    total_files = 0
-    total_replacements = 0
-    for p in pages:
-        path = Path(p)
-        content = path.read_text(encoding='utf-8')
-        new_content, count = normalize_in_html(content)
-        if count > 0:
-            path.write_text(new_content, encoding='utf-8')
-            total_files += 1
-            total_replacements += count
-            print(f"[norm] {path.name}: {count} replacements")
-    print(f"\nDone. {total_replacements} cache-bust strings normalized across {total_files} files.")
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--apply', action='store_true',
+                        help='write the repair; without it nothing is modified')
+    args = parser.parse_args()
+
+    pages = sorted(Path(p) for p in glob.glob(str(ROOT / '*.html')))
+    seen = scan(pages)
+
+    drift = {a: t for a, t in seen.items() if len(t) > 1}
+    if not drift:
+        print(f'CACHE-BUST — CLEAN. {len(seen)} shared asset(s), one token each '
+              f'across {len(pages)} root pages.')
+        return 0
+
+    written = 0
+    for asset, tokens in sorted(drift.items()):
+        target = newest(tokens)
+        print(f'\n{asset}: {len(tokens)} different tokens — converge on {target}')
+        for token, files in sorted(tokens.items()):
+            if token == target:
+                continue
+            print(f'    {token}  ({len(files)} file(s)): '
+                  + ', '.join(f.name for f in files[:4])
+                  + (' …' if len(files) > 4 else ''))
+        if args.apply:
+            for token, files in tokens.items():
+                if token == target:
+                    continue
+                for path in files:
+                    path.write_text(rewrite(path.read_text(encoding='utf-8'), asset, target),
+                                    encoding='utf-8')
+                    written += 1
+
+    if args.apply:
+        print(f'\nRepaired {written} file reference(s). Re-run to confirm CLEAN.')
+        return 0
+    print('\nDrift only reported. Re-run with --apply to converge on the newest token.')
+    return 1
 
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())

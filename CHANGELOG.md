@@ -11,6 +11,111 @@ release sections rather than semver.
 
 ---
 
+## v2.19.0 — 2026-09-10
+
+### Text that was drawn but could not be read, and the detector that was blaming the wrong things
+
+The render audit had been reporting `text-overflow` on 46 pages and `editorial-translucent-wash` on
+11. Every finding was opened and looked at before a line was changed. Roughly half were real, and
+about half of what the tool reported was the tool's own fault — both halves are fixed here.
+
+#### The real defects
+
+**`datahall.html` — the CRAH rail and the row footers.** The rail set
+`gridTemplateColumns = repeat(N, 1fr)` inline across the whole 59-unit fleet, so a cell was 23px
+wide at 1440, 18px at 768 and **5px at 390** for a 26px tag: every `CRAH-A01` rendered as `A0`,
+every `A11` as `A1`. A unit tag cut mid-digit names a *different* unit. The zone footers were worse
+— the owner's v2.10.0 per-row readings (`322 kW · IN 25.1°C · HOT 36.9°C`) measure 169px and the
+column was 28px, so all 75 numbers were drawn and none could be read. Rail and field now hold a
+legible track minimum (38px / 64px) and scroll sideways; the footers stack; the zone head and foot
+stop being squeezed. Below 1024 the 100vh app frame unlocks, because on a 390px phone the balance
+band alone took 543px of it and the floor plan was handed **18px** with the bottom of the stage cut
+off and unreachable. Measured 284 → 0 clipped text elements per render.
+
+**`dc-market-tracker.html` — one line, the whole page.** `body` is a column flex container (the
+sticky-footer guard), which makes `.dmt-main` a flex item whose auto cross size is fit-content,
+floored by its own min-content. The market table's `white-space: nowrap` headers set that to
+1,294px, so on a 390px screen the page laid out **1,329px wide** and `overflow-x: hidden` cut it
+off with nothing to scroll. 624 findings at 390 and 454 at 768 went to zero on `width: 100%`.
+
+**Calculators with locked PRO charts.** A `<canvas>` carries intrinsic width from its `width=`
+attribute, and Chart.js never resizes a chart it never instantiates — so the 600px PRO canvases on
+`carbon-footprint.html` and `roi-calculator.html` set the grid track and pushed the calculator
+column off a 390px screen. Their toolbars carried an inline `padding: 0 2rem` that a media query
+could not reach without `!important`.
+
+The rest, each verified on the page: `pln-java-grid.html`'s generation-mix bar was a 28px-tall flex
+**row** sharing its line with the legend it should sit above (the bar rendered 84px wide and the
+legend's three lines were cut to 17px); `article-12`'s comparison grid kept three inline tracks on
+a phone and put the third card off-screen; `article-10`'s stress chart held `180px 1fr 60px`;
+`article-11` and `asean-dc-report-2026` printed values *inside* bar fills too narrow to hold them;
+`article-26`'s series badge and PFAS KPI grid; the shared `.newsletter-form`, which stacked at a
+600px **viewport** while the article rail is 288px wide at every viewport; `changelog.html` and the
+manual pages, where slash-joined identifier runs offer Chrome no break opportunity; 43 incident
+pages whose `nowrap` chips carry a full operator name; `Apps/second brain`'s fixed nav, whose own
+controls sat past the right edge at 1440. `article-9-paper.html` and the internal audit reports had
+no responsive block at all.
+
+One page defect was found by eye rather than by the audit: `carbon-footprint.html` carried a bare
+`// NOTE:` line **in its markup**, rendering a developer comment as body text above the Cooling
+Type field.
+
+#### The detector
+
+Five classes of finding were the tool, not the site. Each is now fixed with a fixture that fails
+first:
+
+- **A closed `<details>` hides its body by design.** The CDU checklists author
+  `details { overflow: hidden }`, and every span inside was reported as clipped — 121 findings on
+  `cdu-checklist.html` alone, none of them visible to any reader.
+- **A marquee queues its next items outside the window it scrolls them through.** That is the
+  mechanism. It accounted for *every* `text-overflow` finding on `index.html`, `articles.html` and
+  `datacenter-solutions.html` — the homepage needed no change at all.
+- **`text-overflow: ellipsis` and `-webkit-line-clamp` are authored truncation.** The cut is
+  declared and the reader can see it happened. A box that clips with no ellipsis still counts.
+- **Off-canvas panels, 1×1 live regions, and boxes that can scroll.** A parked drawer paints
+  nothing; the visually-hidden idiom paints nothing; and a box with `overflow-x: auto` either
+  scrolls or its content fits. `white-space: pre-wrap` *hangs* preserved indentation, so
+  `article-26`'s chemistry blocks measured a 504px range inside a 347px box that scrollWidth
+  correctly reports as fitting.
+- **`editorial-translucent-wash` was flagging the site's own replacement pattern.** §A bans
+  translucent card washes; the approved alternative is a flat tint plus a 1px hairline, which is
+  exactly what `.quote-callout` renders. Tinted instrument chips were 1,332 of the 1,988 findings.
+  The rule now needs a card/panel/block surface and no hairline.
+
+Each exemption was checked against the *unfixed* `datahall.html`: the new probe still reports all
+284 findings there, so none of this laundered a real defect away.
+
+Two more the sweep surfaced once the noise was gone: `fuel-system.html`'s alarm strip cut its own
+last reading — the scenario name `Simulated` — by 17px **in dark theme only**, where the state label
+runs longer; and `embed/index.html` still carried decorative `backdrop-filter: blur(10px)` on
+`.info-card`, outside the scope of the 22-file glass sweep at `0b4e9115`. A sixth detector class
+went with them: `prose-highlight-wash` was reporting status chips (`.confidence-badge`,
+`.mn-status`) as banned highlighter runs. A chip is `display: inline-block` with its own padding
+and radius and it *labels* the sentence; a highlighter is plain `inline` text that tints it. Only
+the second is the §A tell.
+
+#### The cache-bust normalizer was itself a regression generator
+
+Found while running the ship gates. `tools/normalize-cache-bust.py` parsed **no arguments** and
+hardcoded `NEW_BUST = "2026-05-09-v1"`, so `--check` was swallowed silently and the tool **wrote**:
+294 tokens across 155 files walked *backwards* to a May value, `index.html`'s
+`styles-index.min.css?v=2026-09-06-slop` included. A normalizer that moves tokens backwards causes
+exactly the stale-asset bug it exists to prevent. Rewritten: `--check` is the default and exits 1
+on drift, `--apply` writes, and the target is the newest token already in the tree, chosen by its
+digit run — never a constant baked into the file. Four tests pin it, including "prose quoting an
+old token is documentation, not a load".
+
+It then found a real one: `auth.js` was requested under `2026-08-26-h1h2` on 151 pages and
+`2026-08-27-contract-tab-order` elsewhere, while the file itself last changed **2026-09-05** — both
+tokens stale. All 150 pages now carry `2026-09-05-mint`, the token its own `auth.min.js` twin
+already used. Both checks are wired into `ship-gate.sh`.
+
+#### One banned colour
+
+`tools/build-changelog-html.py` still emitted Anthropic-default violet `#8b5cf6` — the MAJOR tier
+pill and two nav links. §A bans it and the rest of the site uses `#64748b` for those links.
+
 ## v2.18.0 — 2026-09-09
 
 ### Raw floats stop reaching the panels, and the flow animation closes its own cycle

@@ -946,7 +946,9 @@
         [data-theme="light"] .ws-login-box input { background: #f1f5f9; border-color: #e2e8f0; color: #1e293b; }
 
         /* Privacy Badge + Benchmark Meta */
-        .ws-privacy-badge { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.72rem; color: #64748b; margin-top: 0.5rem; padding: 6px 0; }
+        /* One line at 0.72rem does not fit a 318px column: the sentence ran past the calculator
+           and `body { overflow-x: hidden }` cut it. Let the badge wrap. */
+        .ws-privacy-badge { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; text-align: center; gap: 6px; font-size: 0.72rem; color: #64748b; margin-top: 0.5rem; padding: 6px 0; }
         .ws-privacy-badge i { color: #10b981; font-size: 0.8rem; }
         .ws-benchmark-meta { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(255,255,255,0.08); }
         .ws-benchmark-tag { font-size: 0.65rem; color: #64748b; background: rgba(255,255,255,0.04); padding: 3px 8px; border-radius: 4px; display: flex; align-items: center; gap: 4px; }
@@ -996,6 +998,14 @@
         [data-theme="dark"] .table-note-row{background:#1e293b !important;color:#cbd5e1 !important;}
 
         @media (max-width: 768px) {
+            /* The stress chart's 11 rows are INLINE `grid-template-columns: 180px 1fr 60px`, so a
+               326px column left ~50px for the bar and its band label ("Extremely High (>80%)")
+               was cut. The tracks are inline, so the override has to be too — an attribute match
+               on the inline style is the only hook these hand-authored rows offer. */
+            .stress-chart-container { padding: 1.25rem !important; }
+            .stress-chart-container div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
+            .stress-chart-container div[style*="text-align: right"] { text-align: left !important; }
+            .stress-chart-container div[style*="justify-content: flex-end"] { flex-wrap: wrap !important; justify-content: flex-start !important; }
             .article-hero { padding: 6rem 1rem 3rem; }
             .article-meta { flex-direction: column; gap: 1rem; }
             .article-content { padding: 3rem 1rem; }
@@ -3689,7 +3699,7 @@
 
 <!-- Search: shared js/rz-command-palette.js -->
 <script src="js/rz-command-palette.js?v=2026-09-05-mint" defer></script>
-<script src="auth.js?v=2026-08-26-h1h2" defer></script>
+<script src="auth.js?v=2026-09-05-mint" defer></script>
 <script src="rz-engine.min.js?v=2026-09-06-cdu" defer></script>
 <script src="rz-tracker.js" defer></script>
 

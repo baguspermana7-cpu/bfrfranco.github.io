@@ -131,7 +131,13 @@
   .ppanel.on{display:block;animation:fade .25s ease;}
   @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
   .ppanel-grid{display:grid;grid-template-columns:1fr 300px;gap:1.3rem;align-items:start;border:1px solid var(--line);border-left:2px solid var(--accent,var(--cyan));border-radius:4px;background:var(--panel);padding:1.3rem 1.4rem;}
-  @media(max-width:780px){.ppanel-grid{grid-template-columns:1fr;}}
+  /* `1fr` floors at the track's MIN-CONTENT, and these panels quote identifiers like
+     `rz-skill.schema.json` that offer no break opportunity — the single column resolved to
+     443px inside a 345px panel and ran off a 390px screen. minmax(0,…) drops that floor and
+     the long tokens wrap instead of pushing the layout. */
+  @media(max-width:780px){.ppanel-grid{grid-template-columns:minmax(0,1fr);}
+    .ppanel-grid .pintro,.tbp .sv{overflow-wrap:anywhere;}
+    .tbp .seg{grid-template-columns:minmax(0,1fr);gap:0.15rem;}}
   .ppanel-grid h3{font-size:1.25rem;display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;margin-bottom:0.3rem;}
   .ppanel-grid .eccfrom{font-family:var(--mono);font-size:0.6rem;color:var(--dim);border:1px solid var(--line);border-radius:5px;padding:0.15rem 0.45rem;letter-spacing:0.04em;text-transform:uppercase;}
   .ppanel-grid .pintro{font-size:0.92rem;color:var(--text);margin:0.2rem 0 0.9rem;line-height:1.55;}

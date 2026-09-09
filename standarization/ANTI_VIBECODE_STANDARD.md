@@ -135,6 +135,18 @@ Consistent with the audit contract above: **do not label an unimplemented heuris
   (0 pages async-without-affordance; `js/pln-energy-dashboard.js` is the one async module and all three
   of its consumer pages carry one), so the gap was the missing gate, not missing skeletons. That gate
   now exists.
+- **A rule that over-reports is NOT the safe direction** (v2.19.0, 2026-09-10). The render audit's
+  `editorial-translucent-wash` matched any surface whose class contained `card|callout|…|pill|badge`
+  and whose background alpha sat in .02–.5. That caught two things §A does not ban: the site's OWN
+  replacement pattern — a flat tint **plus a 1px hairline**, which is what `.quote-callout` renders
+  under `css/rz-article-dark.css` and what rejected-pattern #7 prescribes — and tinted instrument
+  chips, which carry no card/panel/block token at all and were **1,332 of the 1,988 findings**. The
+  rule now requires a card/panel/block/callout surface with **no** hairline. Same session, five
+  `text-overflow` exemptions (closed `<details>`, marquee queues, authored ellipsis / line-clamp,
+  off-canvas + 1×1 live regions, scroll-capable boxes) removed roughly half the remaining noise.
+  **Every one was re-checked against the UNFIXED page** — the new probe still reports all 284
+  findings on `git show HEAD:datahall.html`. An exemption that also silences the RED baseline is
+  laundering, not calibration; that check is the price of narrowing any rule in this document.
 - **Scope coverage is now ASSERTED, not assumed** (`tools/test-audit-coverage.mjs`, wired into
   `ship-gate.sh`). The design gates walk the filesystem with a SKIP list; the sitemap is what the site
   publishes. One added SKIP entry would silently drop a live page out of every design gate. The test

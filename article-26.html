@@ -563,6 +563,10 @@
 
         /* Results grid */
         .pfas-results-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0.75rem; margin:1.25rem 0; }
+        /* Three tracks in a 350px column put the third card entirely off a 390px screen, behind
+           body's overflow-x clip — the KPI it carries could not be reached at all. */
+        @media (max-width: 768px) { .pfas-results-grid { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 480px) { .pfas-results-grid { grid-template-columns: 1fr; } }
         .pfas-kpi-card { background:#f9fafb; border:1px solid #e5e7eb; border-top:3px solid #b45309; border-radius:4px; padding:0.875rem; }
         [data-theme="dark"] .pfas-kpi-card { background:#111827; border-color:#374151; }
         .pfas-kpi-label { font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:#64748b; margin-bottom:0.4rem; }
@@ -2912,7 +2916,7 @@ function copyLink() {
 })();
 </script>
 
-<script src="auth.js?v=2026-08-26-h1h2" defer></script>
+<script src="auth.js?v=2026-09-05-mint" defer></script>
 <script src="rz-engine.min.js?v=2026-09-06-cdu" defer></script>
 </body>
 </html>

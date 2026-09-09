@@ -894,8 +894,14 @@
         }
         .pjg-live-toggles { display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap; }
         .pjg-live-toggle-label { font-size: 0.7rem; color: var(--pjg-text3); letter-spacing: 0.06em; }
+        /* EDB.renderBarSegment() appends TWO children — the stacked bar row and its legend — and
+           this box was a 28px-tall flex ROW, so the two shared the line: the bar itself rendered
+           84px wide at 390 and the legend's three wrapped lines were cut to 17px, taking
+           "Geothermal" and "Biomass" with them. Stack them; the module's own bar row keeps the
+           rounded clip. */
         .pjg-live-bar {
-            display: flex; width: 100%; height: 28px; border-radius: 6px; overflow: hidden;
+            display: flex; flex-direction: column; gap: 6px; width: 100%;
+            min-height: 28px; border-radius: 6px;
             background: var(--pjg-bg3); border: 1px solid var(--pjg-border);
         }
         .pjg-chart-wrap {
@@ -1484,7 +1490,7 @@
     <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" crossorigin defer></script>
     <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js" defer></script>
     <script src="script.min.js?v=2026-09-06-cards" defer></script>
-    <script src="auth.js?v=2026-08-26-h1h2" defer></script>
+    <script src="auth.js?v=2026-09-05-mint" defer></script>
     <script src="rz-engine.min.js?v=2026-09-06-cdu" defer></script>
     <script src="js/rz-map.js?v=2026-05-02-v2" defer></script>
     <script src="js/pln-tooltip.js?v=2026-04-29-v3" defer></script>

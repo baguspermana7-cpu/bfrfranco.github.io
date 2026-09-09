@@ -293,7 +293,13 @@
         .dmt-ev-source { font-size: 0.62rem; color: rgba(255,255,255,0.4); font-style: italic; }
 
         /* MAIN CONTENT */
-        .dmt-main { max-width: 1400px; margin: 0 auto; padding: 1.25rem; }
+        /* `body` is a COLUMN flex container (the sticky-footer guard above), so this block is a
+           flex item whose auto cross size is fit-content — floored by its own min-content. The
+           market table's `white-space: nowrap` headers make that 1,294px, so on a 390px screen
+           the whole page laid out 1,329px wide and `body { overflow-x: hidden }` cut it off with
+           nothing to scroll (the responsive gate reads scrollX = 0 and saw nothing). A definite
+           width stops fit-content sizing; the table keeps its own `.dmt-table-wrap` scroller. */
+        .dmt-main { max-width: 1400px; width: 100%; min-width: 0; box-sizing: border-box; margin: 0 auto; padding: 1.25rem; }
         .dmt-section { margin-bottom: 1.5rem; }
         .dmt-section-title {
             font-size: 1.2rem; font-weight: 800; margin-bottom: 0.35rem; color: var(--dmt-text);
@@ -2161,7 +2167,7 @@
     </script>
 
     <script src="rz-tracker.js" defer></script>
-    <script src="auth.js?v=2026-08-26-h1h2" defer></script>
+    <script src="auth.js?v=2026-09-05-mint" defer></script>
 <script src="rz-engine.min.js?v=2026-09-06-cdu" defer></script>
 
 <!-- Root-only Gate Overlay -->

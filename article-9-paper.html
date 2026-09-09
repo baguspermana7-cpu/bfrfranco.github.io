@@ -188,6 +188,13 @@
             margin: 15px 0;
             font-size: 9pt;
         }
+        /* This paper page carries no responsive block at all, and its comparison tables are wider
+           than a 390px screen — `body { overflow-x: hidden }` made the last column ("Trend")
+           unreachable rather than scrollable. Print output is untouched: screen only. */
+        @media screen and (max-width: 768px) {
+            html, body { overflow-x: hidden; max-width: 100vw; }
+            table { display: block; overflow-x: auto; }
+        }
         th {
             background: #1e3a5f;
             color: #fff;
