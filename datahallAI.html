@@ -687,6 +687,12 @@ body[data-datahall-authority="unavailable"] .hdr-r>.dot{background:#64748b !impo
 body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:none}
 </style>    <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-07-22-navfix" defer></script>
+    <!-- v3.5.0 — hold the 8.5px legibility floor by SCALE, not by font size. Five of this page's
+         fifteen diagrams were already clear; the dense ones (cooling P&ID, the four SLDs, the hall
+         plan, the building isometric, the fire mimic) could not take a font lift without a new
+         overlap, which is why the page's own lift pass carries FLOOR:1 for them. Scaling moves the
+         glyph and the geometry by the same factor, so no overlap can appear that was not there. -->
+    <script src="js/rz-svg-legible.js?v=1.0.0" defer></script>
     <script src="js/rz-cookie-consent.js?v=2026-07-14" defer></script>
     <!-- Basis engine — single source of truth for every displayed kW/MW/flow/temp/
          PUE/WUE. Loaded synchronously (NOT defer) so window.DCAI_MODEL /
@@ -15712,4 +15718,25 @@ if(faqBtn){ faqBtn.addEventListener('click',openFaqDialog); }
 </script>
 
     <div class="rz-manual-link" style="text-align:center; padding:0.9rem 1rem 1.3rem;"><style>.rz-manual-link a{display:inline-block;font-family:'JetBrains Mono','Courier New',monospace;font-size:0.72rem;letter-spacing:0.04em;text-decoration:none;border:1px solid;border-radius:6px;padding:0.45rem 0.85rem;color:#475569;border-color:rgba(71,85,105,0.4)}.rz-manual-link a:hover{color:#0891b2;border-color:rgba(8,145,178,0.5)}[data-theme="dark"] .rz-manual-link a{color:#94a3b8;border-color:rgba(148,163,184,0.35)}[data-theme="dark"] .rz-manual-link a:hover{color:#67e8f9;border-color:rgba(103,232,249,0.45)}</style><a href="manual/datahallai.html">Technical Manual &amp; Methodology &#8599;</a></div>
+<script>
+/* v3.5.0 — the diagrams that measured below the legibility floor, each with the scale budget its
+   density needs. A diagram not listed here measured clear and is left exactly as it was. */
+(function(){
+  function go(){
+    if(!window.RZSvgLegible) return false;
+    var R=window.RZSvgLegible.register;
+    R('#coolSvg',   {maxScale:2.4});   /* 493 of 524 labels under floor, smallest 3.70 px */
+    R('#hSvg',      {maxScale:2.3});   /* 136 of 202, smallest 3.89 px */
+    R('#elecOvSvg', {maxScale:2.0});   /* 306 of 333, smallest 4.42 px */
+    R('#elecDH1Svg',{maxScale:2.05});   /* 309 of 316, smallest 4.74 px — same shape on all four */
+    R('#elecDH2Svg',{maxScale:2.05});
+    R('#elecDH3Svg',{maxScale:2.05});
+    R('#elecDH4Svg',{maxScale:2.05});
+    R('#bldgSvg',   {maxScale:1.6});   /* 42 of 200, smallest 6.17 px */
+    R('#fireSvg',   {maxScale:1.6});   /* 31 of 209, smallest 6.94 px */
+    return true;
+  }
+  if(!go()) window.addEventListener('load', go);
+})();
+</script>
 </body></html>
