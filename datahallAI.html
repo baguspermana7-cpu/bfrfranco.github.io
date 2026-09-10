@@ -3615,7 +3615,7 @@ s+=`<rect x="${x1.toFixed(1)}" y="${y}" width="${(x2-x1).toFixed(1)}" height="${
    else is drawn. */
 [[0,BA_Y,'BANK A'],[1,BB_Y,'BANK B']].forEach(([bi,byv,nm])=>{
 const cy=byv+bankH/2, tag=nm+' — ROWS '+pad2(bi*rpb+1)+'–'+pad2((bi+1)*rpb)+' · '+grp(bn('racksPerBank'))+' racks';
-s+=`<g data-basis-param="${(window.DH_BASIS&&window.DH_BASIS.racksPerBank)||'compute.racks_per_bank'}"><text x="${(HX0-7).toFixed(1)}" y="${cy.toFixed(1)}" fill="rgba(6,182,212,.4)" font-family="${J}" font-size="3.8" text-anchor="middle" transform="rotate(-90 ${(HX0-7).toFixed(1)} ${cy.toFixed(1)})">${tag}</text></g>`;});
+s+=`<g data-basis-param="${(window.DH_BASIS&&window.DH_BASIS.racksPerBank)||'compute.racks_per_bank'}"><text x="${(HX0-12).toFixed(1)}" y="${cy.toFixed(1)}" fill="rgba(6,182,212,.4)" font-family="${J}" font-size="3.8" text-anchor="middle" transform="rotate(-90 ${(HX0-12).toFixed(1)} ${cy.toFixed(1)})">${tag}</text></g>`;});
 /* === ROWS — one RPP group each; every rack is its own block =============== */
 for(let b=0;b<banks;b++){for(let r=0;r<rpb;r++){
 const rowNo=b*rpb+r+1,id=pad2(rowNo),x=rowX(r),y=bankY(b),mx=x-1.6;
@@ -3633,7 +3633,7 @@ s+=`<rect x="${x.toFixed(1)}" y="${(ry+.7).toFixed(1)}" width="${RACK_W}" height
 s+=`<line x1="${mx.toFixed(1)}" y1="${(ry+RACK_H/2).toFixed(1)}" x2="${(x+2).toFixed(1)}" y2="${(ry+RACK_H/2).toFixed(1)}" stroke="rgba(6,182,212,.6)" stroke-width=".5"/>`;   /* QD pair to the rack manifold */
 s+='</g>';}
 s+='</g>';
-s+=tx(x+RACK_W/2,b===0?y-3:y+bankH+5.2,'R'+id,'var(--g)',3.4,'middle',1,bo('racksPerRow',{also:['kwPerRack','rowItKw'],nomark:rowNo>1}));
+s+=tx(x+RACK_W/2,b===0?y-3:y+bankH+5.2,'R'+id,'var(--g)',5.2,'middle',1,bo('racksPerRow',{also:['kwPerRack','rowItKw'],nomark:rowNo>1}));
 }}
 /* === CROSS AISLE — TCS headers from the CDU galleries, one branch per row === */
 s+=`<rect x="${HX0}" y="${XA_Y}" width="${HW}" height="${BB_Y-XA_Y-3}" fill="rgba(100,116,139,.04)" stroke="rgba(100,116,139,.12)" stroke-width=".4"/>`;
@@ -3654,9 +3654,9 @@ for(let r=0;r<rpb;r+=2){
 const pairIdx=b*Math.ceil(rpb/2)+r/2, id=pad2(pairIdx+1);
 const hx=(rowX(r)+RACK_W+rowX(r+1))/2;                       /* contained hot aisle of this pair */
 const cxL=rowX(r)-gap/4;                                     /* cold aisle feeding the pair's west face */
-s+=tx(hx,by+4.2,'HAC-'+id,'var(--o)',2.6,'middle');   /* inside the aisle it names: above it, it sat on the row labels */
+s+=tx(hx,by+5.2,'HAC-'+id,'var(--o)',3.6,'middle');   /* inside the aisle it names: above it, it sat on the row labels */
 for(let si=0;si<SENS_PTS;si++){const fy=by+bankH*(si+1)/(SENS_PTS+1);
-s+=`<g data-rz-authored-basis="simulated aisle sensor: temperature jitter around the engine air planes (design.planes.p09 supply / p11 return); never a field reading"><text x="${hx.toFixed(1)}" y="${fy.toFixed(1)}" fill="var(--o)" font-family="${J}" font-size="2.9" text-anchor="middle" font-weight="600" id="H${pairIdx}${si}t">—</text><text x="${cxL.toFixed(1)}" y="${fy.toFixed(1)}" fill="var(--c)" font-family="${J}" font-size="2.9" text-anchor="middle" font-weight="600" id="C${pairIdx}${si}t">—</text></g>`;}
+s+=`<g data-rz-authored-basis="simulated aisle sensor: temperature jitter around the engine air planes (design.planes.p09 supply / p11 return); never a field reading"><text x="${hx.toFixed(1)}" y="${fy.toFixed(1)}" fill="var(--o)" font-family="${J}" font-size="6.5" text-anchor="middle" font-weight="600" id="H${pairIdx}${si}t">—</text><text x="${cxL.toFixed(1)}" y="${fy.toFixed(1)}" fill="var(--c)" font-family="${J}" font-size="6.5" text-anchor="middle" font-weight="600" id="C${pairIdx}${si}t">—</text></g>`;}
 }}
 /* === CRAH WALLS — the long sides; one clickable bank per row pitch ========= */
 const crahPer=(crahInst!=null&&rpb)?crahInst/(2*rpb):null;
@@ -3669,8 +3669,8 @@ for(let r=0;r<rpb;r++){const x=HX0+r*pitch+1,id=tag+pad2(r+1);
 const nBanks=2*rpb,base=(crahInst!=null)?Math.floor(crahInst/nBanks):null,rem=(crahInst!=null)?crahInst%nBanks:0;
 const bankIdx=side*rpb+r,units=(base==null)?null:base+(bankIdx<rem?1:0);
 s+=`<g class="crah-unit crah-click" data-crah="CRAH-${id}" data-rz-equipment="crah:${id}" tabindex="0" role="button" data-tip="CRAH wall ${id} — ${em(units)} unit(s) of ${em(crahInst)} installed per hall (${em(crahAct)} duty + 1) · ${em(bn('crahRating'))} kW air path per unit · draws the contained hot aisle through the ceiling plenum, returns cold to the aisles it faces · planes p09/p11"><rect x="${x.toFixed(1)}" y="${y}" width="${(pitch-2).toFixed(1)}" height="${CRAH_H}" rx="1.5" fill="rgba(59,130,246,.10)" stroke="var(--b)" stroke-width=".5"/>`;
-s+=`<text x="${(x+(pitch-2)/2).toFixed(1)}" y="${y+5.4}" fill="var(--b)" font-family="${J}" font-size="3.2" text-anchor="middle" font-weight="600">${id}</text>`;
-s+=`<text x="${(x+(pitch-2)/2).toFixed(1)}" y="${y+10.2}" fill="var(--b)" font-family="${J}" font-size="3" text-anchor="middle" opacity=".8">×${em(units)}</text></g>`;}
+/* id and unit count on ONE line: stacked, the count sat where the row label above it lands. */
+s+=`<text x="${(x+(pitch-2)/2).toFixed(1)}" y="${y+8}" fill="var(--b)" font-family="${J}" font-size="5.2" text-anchor="middle" font-weight="600">${id} ×${em(units)}</text></g>`;}
 s+=tx(HX0+HW/2,side===0?CRAH_T-4:CRAH_B+CRAH_H+7,'CRAH WALL '+(side===0?'NORTH':'SOUTH')+' — '+em(crahInst)+' units per hall ('+em(crahAct)+' duty + '+((crahInst!=null&&crahAct!=null)?(crahInst-crahAct):DASH)+') · '+em(bn('crahRating'))+' kW each · hot aisle returns overhead, cold air to every cold aisle','var(--b)',3.6,'middle',0,bo('crahInstalled',{also:['crahActive','crahRating'],nomark:side>0}));}
 /* === HOT-AISLE RETURN — owner: "memang nggak perlu crah utk hot aislenya?" ===
    It is needed, and the drawing never said where the heat went. Each contained aisle returns

@@ -11,6 +11,73 @@ release sections rather than semver.
 
 ---
 
+## v3.3.0 — 2026-09-10
+
+### The CDUs move to the end of the rows they serve, and the hall says what it is doing
+
+Owner, on the live drawing: *"Kok masih sama? Nggak proper positioning rack, cdu dan jumlah dan
+aliran simulasi air cdu ke row tidak ada. Tidak ada crah dll"*, then *"No hac temp indication in
+several point across row, and cdu weird positioning"*.
+
+**The first answer was not in any diff.** Production serves `origin/main`, and two releases sat
+unpushed — v2.19.0 and the whole v3.0.0 hall rebasing. Nothing the owner was looking at had ever
+been deployed. Deploy lag looks exactly like a broken fix; check
+`git rev-parse origin/main HEAD` and curl the live URL for a marker before diagnosing a rendering
+complaint. What follows is what was still open once it *was* deployed.
+
+#### CDU positioning
+
+A CoolIT CHx1000 is an **end-of-row** CDU. The drawing put four galleries on the *short* walls —
+which are the ends of the **cross aisle**, not the ends of the rows. Rows run top to bottom on this
+plan, so a row's end *is* the cross aisle: a row's coolant used to leave the drawing sideways,
+travel the length of the hall and come back. All 55 installed CDUs now stand in the cross aisle,
+spread across the same span the rows occupy, and the row directly above or below each one drops
+straight into it. One glyph per installed unit — no aggregation divisor, so the count on the
+drawing is the count in the registry.
+
+#### The water, animated, at the engine's own rate
+
+Three animations existed on this plan: two header trunks and one blink. The twenty row branches
+were static and nothing moved out of a CDU at all. The supply path now flows end to end — CDU band,
+row drop, row riser, and the return — **61 animations in place of 3**. The dash *period* is not
+decorative: it comes from the row flow the engine publishes (`tcsFlowRackLpm × racksPerRow`, clamped
+to 1.2–6 s), so a row moving more litres a minute visibly moves faster. Motion that encodes a
+number is a reading, not decoration.
+
+#### CRAH
+
+They were drawn. They just said nothing: twenty banks whose only number was `≈ 4.5 units`, which
+reads as noise. A bank is an integer of real machines, so the remainder is spread one per bank and
+each bank now carries its own count on its face (`T01 ×5`). The owner's other question — *"memang
+nggak perlu crah utk hot aislenya?"* — had no answer anywhere on the drawing: each contained aisle
+now shows its return path overhead to the CRAH wall it faces, drawn as a path because a ceiling
+plenum takes no floor.
+
+#### HAC temperature, and the legibility floor
+
+There was **one** readout pair per containment pair, parked in the cross aisle, bank A only: five
+numbers for a hall of twenty rows, none of them standing in the aisle it measured. Each aisle now
+carries three points at a quarter, a half and three quarters of the row, in **both** banks — 30 hot
+and 30 cold, all reading. The id scheme (`H{pair}{point}t`) already allowed it; the loop bound in
+`upd()` was capped at `si<1` and the drawing emitted only `b===0`. The seed key now carries the
+aisle *and* the point too, because all three used to read `'page1'` and printed the same number
+three times.
+
+Then the sizes. `audit-legibility` reports this page rather than gating it, and it was reporting
+584 sub-floor labels: the aisle temperatures rendered at **3.8 px** against an 8.5 px floor, which
+is why they read as absent. Raising them was previously blocked by overlap, so the space came
+first — the bank captions turned 90° into the left margin (they had run across the top *inside* the
+north CRAH band, under the row labels: three strings on one line), the CDU caption moved to the
+clear strip east of the band, and the CRAH id and its count merged onto one line. With that room,
+the readouts go to **8.5 px — the floor itself** — row and bank ids to 6.8, and the **measured
+text/text overlap count is unchanged at 2**, both of them pre-existing corridor-services labels.
+
+Verified on production after deploy: 440 racks, 20 CRAH banks, 56 CDU glyphs, 61 animations,
+30 + 30 aisle readouts with none left showing an em dash, no page errors, and the render-audit rule
+set clean at 390/768/1440 in both themes.
+
+---
+
 ## v3.2.0 — 2026-09-10
 
 ### The missing voltage level, and the array that blanked the page
