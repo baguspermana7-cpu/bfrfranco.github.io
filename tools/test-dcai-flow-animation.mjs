@@ -20,19 +20,32 @@
  *    <animateMotion> and 11 <animateTransform> elements, and all of them kept moving for a viewer
  *    who had asked the system to stop. Only `SVGSVGElement.pauseAnimations()` reaches them.
  *
- * MONITOR, not gated, with the number recorded: 2,880 of the 9,630 tagged lines that carry both a
- * `data-direction` and a flow class carry a class whose travel OPPOSES their declared direction
- * (measured 2026-09-09; almost all are the `dh1-semantic-*` family on the building isometric,
- * which `tools/probe-line-model.mjs` already reports separately). Direction is a hand-written
- * `cssClass` literal kept in sync with the model's own `direction` field by hand —
- * `js/rz-line-model.js:138-160` `styleAttrs()` never reads `spec.direction`. FLIP CONDITION: this
- * becomes a gate when `styleAttrs()` derives the class from the direction and the count reaches 0.
+ * A CORRECTION, recorded rather than quietly dropped. v2.18.0 shipped a MONITOR here claiming
+ * "2,880 of 9,630 tagged lines carry a flow class opposing their declared direction". That number
+ * was WRONG, and the error was mine: it assumed fR/fD mean "forward" and fL/fU mean "reverse", so
+ * every leftward-drawn line whose logical direction is forward counted as a defect. Re-measured
+ * against the geometry the lines actually carry, the pairing is exact:
+ *
+ *     fD -> drawn downward   3,744        fR -> drawn rightward   1,512
+ *     fL -> drawn leftward   1,494        exceptions                  0
+ *
+ * The two attributes are orthogonal and both were right all along. The CLASS names which way the
+ * dashes travel across the screen; `data-direction` names the logical from -> to of the line in the
+ * process. A pipe drawn right-to-left whose flow is logically forward correctly carries fL.
+ *
+ * So the monitor is replaced by the invariant that does hold, asserted at runtime as a GATE (check
+ * 4 below): a line's flow class must match the direction its own endpoints run. That catches the
+ * defect the monitor was reaching for — dashes travelling backwards along their own pipe — without
+ * inventing a conflict between two attributes that never disagreed.
  *
  * Usage: node tools/test-dcai-flow-animation.mjs
  */
 import { readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import puppeteer from 'puppeteer';
+import { primeCockpitAuditDocument, enterAuthorizedAuditState } from './lib/cockpit-audit-state.mjs';
+import { TAB_SETS, activateTab } from './lib/cockpit-tabs.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(resolve(ROOT, p), 'utf8');
@@ -93,10 +106,50 @@ if (!/pauseAnimations\(\)/.test(page)) {
   failures.push('datahallAI.html never calls pauseAnimations() — its 86 SMIL animations ignore reduced motion');
 }
 
+/* ---- 4. a line's dashes must travel the way the line is drawn --------------
+   The class names the screen direction of dash travel, so it has to agree with the direction the
+   line's own endpoints run. A line drawn leftward carrying fR animates its dashes back up its own
+   pipe — the defect that reads, on a mimic, as flow going the wrong way. Measured across every
+   diagram: 6,750 tagged lines, 0 exceptions. */
+const EXPECT = { fR: 'right', fL: 'left', fD: 'down', fU: 'up' };
+const browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox'] });
+const tab = await browser.newPage();
+await tab.setViewport({ width: 1500, height: 1000 });
+await primeCockpitAuditDocument(tab, 'dark');
+await tab.goto(pathToFileURL(resolve(ROOT, 'datahallAI.html')).href, { waitUntil: 'networkidle0' });
+await enterAuthorizedAuditState(tab, 'dc-ai');
+const set = TAB_SETS['datahallAI.html'];
+const seen = new Map();
+for (const entry of set.diagrams) {
+  await activateTab(tab, set, entry);
+  await new Promise((r) => setTimeout(r, 90));
+  const found = await tab.evaluate((view) => Array.from(document.querySelectorAll('[data-rz-line="1"]')).map((el) => {
+    const cls = (el.getAttribute('class') || '').match(/\b(fR|fL|fU|fD)\b/);
+    const n = (a) => Number(el.getAttribute(a));
+    return { view, id: el.getAttribute('data-id') || '', cls: cls ? cls[1] : '',
+      dx: n('x2') - n('x1'), dy: n('y2') - n('y1') };
+  }), entry.label);
+  for (const row of found) { if (row.cls) { seen.set(row.view + '|' + row.id, row); } }
+}
+await browser.close();
+
+let checked = 0;
+for (const row of seen.values()) {
+  if (!isFinite(row.dx) || !isFinite(row.dy)) { continue; }   /* a path, not a straight line */
+  const drawn = Math.abs(row.dx) >= Math.abs(row.dy)
+    ? (row.dx > 0 ? 'right' : 'left')
+    : (row.dy > 0 ? 'down' : 'up');
+  checked += 1;
+  if (EXPECT[row.cls] !== drawn) {
+    failures.push(`${row.view} ${row.id || '(unnamed)'}: class ${row.cls} animates ${EXPECT[row.cls]} `
+      + `but the line is drawn ${drawn} — its dashes run back up its own pipe`);
+  }
+}
+
 console.log('── FLOW ANIMATION INVARIANTS ──');
+console.log(`flow-class direction agreement: ${checked} tagged line(s) checked against their own endpoints`);
 console.log(`dash cycles checked: ${cyclesChecked}; runtime flow classes: ${[...toggled].join(', ')}`);
-console.log('MONITOR — 2,880 of 9,630 tagged lines carry a flow class opposing their declared direction '
-  + '(the dh1-semantic-* family); flips to a gate when rz-line-model styleAttrs() derives the class.');
+
 if (failures.length) {
   for (const f of failures) console.error(`  ✗ ${f}`);
   console.error(`── ${failures.length} failure(s)`);
