@@ -162,6 +162,18 @@ function decorativeFindings(text, file, rule) {
     if (/:(hover|focus|focus-visible|active|visited|target)\b/.test(block.sel)) return false;
     const shadows = declarations(block.body, 'box-shadow');
     if (!shadows.some(value => !/^none\b/i.test(value))) return false;
+    /* A box-shadow with NO BLUR AND NO SPREAD is not a shadow — it is a positioned copy of the
+       box, i.e. a drawing primitive. styles.css uses three of them to draw the four-dot scale on a
+       level chip, which is geometry the reader reads, not elevation. An elevation shadow always
+       carries blur; this exemption asks for exactly that and nothing else. Every offset in the
+       declaration must be blur-free for the block to qualify, so one real shadow in a list still
+       reports. */
+    const drawnDots = shadows.every(value => value.split(',').every(part => {
+      /* offsets and blur may be written unitless when zero: `5px 0 0 currentColor`. */
+      const nums = [...part.matchAll(/(-?\d*\.?\d+)(?:px|rem)?\b/gi)].map(m => Number(m[1]));
+      return nums.length >= 2 && (nums[2] === undefined || nums[2] === 0);
+    }));
+    if (drawnDots) return false;
     if (declarations(block.body, 'position').some(value => /^(sticky|fixed)$/.test(value))) return false;
     const border = declarations(inheritedBody, 'border').at(-1);
     return !border || /^(?:none|0(?:px)?)(?:\s|$)|\b(?:transparent|none)\b/i.test(border);

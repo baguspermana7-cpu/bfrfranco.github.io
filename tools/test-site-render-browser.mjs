@@ -41,6 +41,8 @@ test('real DOM fixture: clipped text, prose, gap, missing image and protected co
       #naked-wash { background: rgba(232,181,99,0.15); }
       #editorial-wash { background: rgba(232,181,99,0.08); border: 1px solid rgba(180,83,9,0.26); }
       #tinted-chip { background: rgba(16,185,129,0.125); }
+      #framework-chip { background: #dbeafe; color: #1d4ed8; border-radius: 4px; padding: 2px 8px; }
+      #rail-tag { border-left: 2px solid #0e7490; color: #0e7490; padding: 2px 8px; font-family: monospace; }
       #status-chip { display: inline-block; padding: 2px 8px; border-radius: 4px; background: rgba(8,145,178,0.1); }
       #highlight-wash { background: rgba(253,224,71,0.45); }
       </style><body><div class="evidence-block dark-gradient" id="statistics-band">Decorative statistics</div><nav class="navbar"><div role="toolbar"><h1 id="toolbar-title">Toolbar</h1></div></nav><main><section class="hero"><span class="hero-category" id="overlapped-category">Obscured category</span><p id="hero">This hero lead must not be counted as article body prose.</p></section></main><nav><ul class="nav-menu"><li id="closed">Intentionally closed off canvas navigation</li></ul></nav><a class="skip-link" href="#prose">Skip to content</a>
@@ -65,6 +67,8 @@ test('real DOM fixture: clipped text, prose, gap, missing image and protected co
       <div class="fact-card" id="naked-wash">A translucent card wash with no hairline sitting in reading prose</div>
       <div class="fact-card" id="editorial-wash">The sanctioned editorial treatment: the same tint plus a 1px hairline</div>
       <span class="tier-pill" id="tinted-chip">MAJOR</span>
+      <span class="status-badge" id="framework-chip">SUBSTITUTE</span>
+      <span class="status-badge" id="rail-tag">SUBSTITUTE</span>
       <div class="dark-gradient"><div class="nested-card" id="dark-instrument">Composited instrument wash</div></div>
       <div class="light-gradient"><div class="nested-card" id="light-wash">Naked decorative wash</div></div>
       <div class="service-row"><span class="revenue-badge rev-high nested-card" id="revenue-status">HIGH</span></div>
@@ -145,6 +149,14 @@ test('real DOM fixture: clipped text, prose, gap, missing image and protected co
       'the tint-plus-hairline editorial treatment must not be reported as a wash');
     assert.ok(!findings.some(finding => finding.rule === 'editorial-translucent-wash' && finding.target === '#tinted-chip'),
       'a tinted instrument chip must not be reported as a card wash');
+    /* v3.6.0 — the owner overruled an earlier call of mine. Exempting every `pill|badge` as "a
+       different idiom" let DEFAULT FRAMEWORK SWATCHES ride: #dcfce7 #dbeafe #f0fdf4 #ecfdf5 #fff7ed
+       and friends, one hue per category, filled — which is the §A tell itself. A filled chip in a
+       framework swatch is a finding wherever it appears; the site's own rail tag is not. */
+    assert.ok(findings.some(finding => finding.rule === 'framework-swatch' && finding.target === '#framework-chip'),
+      'a chip filled with a default framework swatch must be reported');
+    assert.ok(!findings.some(finding => finding.rule === 'framework-swatch' && finding.target === '#rail-tag'),
+      'the rail tag that replaced it must not be');
     /* Same distinction one level down: §A bans TINTED HIGHLIGHT SPANS over running prose. A status
        chip is `display: inline-block` with its own padding and radius; a highlighter is plain
        `inline` text with neither, and only the highlighter is the banned tell. */

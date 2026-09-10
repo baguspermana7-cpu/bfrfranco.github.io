@@ -135,6 +135,33 @@ Consistent with the audit contract above: **do not label an unimplemented heuris
   (0 pages async-without-affordance; `js/pln-energy-dashboard.js` is the one async module and all three
   of its consumer pages carry one), so the gap was the missing gate, not missing skeletons. That gate
   now exists.
+- **The chip idiom, and an over-correction of mine reversed** (v3.6.0, 2026-09-10). Owner, on
+  `article-27.html` in LIGHT mode: *"masih banyak ai design slop lihat itu kotak highlight biru,
+  orange dll"*. They were right, and the rule above cut the wrong way here: when calibrating
+  `editorial-translucent-wash` I exempted every `pill|badge` as "a different idiom", and that
+  exemption is what let **default framework swatches** ride — `#dcfce7 #dbeafe #f0fdf4 #ecfdf5
+  #fff7ed #fef3c7 #86efac #6ee7b7 #fdba74 #fcd34d`, one hue per category, filled. Fifty files
+  carried them. **Narrowing a rule is only safe when the thing you exempt is defined by what it IS,
+  not by what it is called.** "Badge" is a name; "filled with a utility-palette swatch" is a fact,
+  and `framework-swatch` now gates on the fact.
+
+  It survived because the sanctioned replacement — flat tint + 1px hairline + 2px rail — lived only
+  in `css/rz-article-dark.css`, which needs `[data-theme="dark"][data-rz-register="editorial"]`.
+  The complaint came from light mode, where the fix could never reach. **A standard that only
+  applies in one theme is not a standard.**
+
+  THE CHIP CONTRACT, now in `styles.css` §INSTRUMENT CHIPS: a category chip's job is IDENTITY, a
+  duration or cost chip's job is MAGNITUDE. Drawing both as the same coloured pill tells the reader
+  identity twice and magnitude never, and puts the message on hue — which fails in greyscale, in
+  print, and for a colour-blind reader. So:
+  - **identity → rail tag**: no fill, a 2px accent rail, mono uppercase, radius ≤2px;
+  - **magnitude → scale tag**: hairline box, mono value, and a four-dot scale where the filled
+    count IS the level. Verified by screenshotting the page under `grayscale(1)`: `IMMEDIATE ●○○○`
+    through `3–10 YR ●●●●` all still read with the colour taken away.
+  - the dots are drawn with a **blur-free `box-shadow`**, which is geometry, not elevation — the
+    `shadow-sole-affordance` rule now says so rather than reporting a drawing as a decoration.
+  - a control's ACTIVE state may still be filled (`.cat-pill`): a selected filter is an affordance,
+    not a category sticker.
 - **A rule that over-reports is NOT the safe direction** (v2.19.0, 2026-09-10). The render audit's
   `editorial-translucent-wash` matched any surface whose class contained `card|callout|…|pill|badge`
   and whose background alpha sat in .02–.5. That caught two things §A does not ban: the site's OWN

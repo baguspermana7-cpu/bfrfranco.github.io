@@ -191,9 +191,24 @@ export function collectMeasurements() {
     }
     return [...reasons];
   };
+  /* DEFAULT FRAMEWORK SWATCHES. One hue per category, filled, straight out of a utility-CSS
+     palette — the §A tell in its plainest form. Listed as rendered rgb() because that is what
+     getComputedStyle returns, and a page can write the same colour as a hex, an rgb() or a var().
+     The owner called these out by eye on article-27 after an earlier calibration of mine exempted
+     every `pill|badge` as "a different idiom"; that exemption is what let them ride. */
+  const FRAMEWORK_SWATCHES = new Set([
+    'rgb(220, 252, 231)',  /* #dcfce7 */ 'rgb(219, 234, 254)',  /* #dbeafe */
+    'rgb(240, 253, 244)',  /* #f0fdf4 */ 'rgb(236, 253, 245)',  /* #ecfdf5 */
+    'rgb(255, 247, 237)',  /* #fff7ed */ 'rgb(254, 243, 199)',  /* #fef3c7 */
+    'rgb(254, 226, 226)',  /* #fee2e2 */ 'rgb(224, 231, 255)',  /* #e0e7ff */
+    'rgb(252, 231, 243)',  /* #fce7f3 */ 'rgb(237, 233, 254)',  /* #ede9fe */
+    'rgb(134, 239, 172)',  /* #86efac */ 'rgb(110, 231, 183)',  /* #6ee7b7 */
+    'rgb(253, 186, 116)',  /* #fdba74 */ 'rgb(252, 211, 77)'    /* #fcd34d */
+  ]);
   const decoration = (element, style) => {
     const rules = [];
     const identity = `${element.id} ${element.className}`;
+    if (FRAMEWORK_SWATCHES.has(style.backgroundColor)) rules.push('framework-swatch');
     if (/evidence-block/.test(identity) && element.parentElement?.matches('body,main')
       && !element.querySelector('input,select,button,canvas,svg') && /gradient\(/.test(style.backgroundImage)) rules.push('top-level-statistics-gradient');
     const surface = /card|callout|info-box|insight-box|engineer-note|bento|pill|badge/.test(identity);

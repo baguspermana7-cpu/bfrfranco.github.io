@@ -8052,3 +8052,269 @@ p a[href$="terms.html"], p a[href$="privacy.html"] {
   font-size: var(--mn-reading-size);
   line-height: var(--mn-reading-leading);
 }
+
+/* ============================================================================
+   INSTRUMENT CHIPS AND CALLOUTS (v3.6.0)
+   ----------------------------------------------------------------------------
+   Owner, on article-27 in LIGHT mode: "masih banyak ai design slop lihat itu kotak highlight biru,
+   orange dll". They were right. The chips were filled pills in default framework swatches —
+   #dcfce7 #dbeafe #f0fdf4 #ecfdf5 #fff7ed #fef3c7 #86efac #6ee7b7 #fdba74 #fcd34d — one hue per
+   category, which is the tell §A bans. Fifty files carried those swatches.
+
+   WHY IT SURVIVED: the sanctioned replacement (flat tint + 1px hairline + 2px accent rail) lives in
+   css/rz-article-dark.css, which activates only under [data-theme="dark"][data-rz-register=
+   "editorial"]. The complaint comes from light mode, where the fix could never reach.
+
+   THE IDEA: a category chip's job is IDENTITY; a duration or cost chip's job is MAGNITUDE. Drawing
+   both as the same coloured pill tells the reader identity twice and magnitude never, and puts the
+   whole message on hue — which fails in greyscale, in print, and for a colour-blind reader. So the
+   two jobs get two marks:
+
+     identity  -> RAIL TAG    no fill, a 2px accent rail, mono uppercase. A label on a drawing.
+     magnitude -> SCALE TAG   hairline box + a four-dot scale; filled dots = level. Readable with
+                              no colour at all, which is the entire point.
+
+   Rules are prefixed `html` so specificity (0,1,1) beats each page's own `.ws-badge-create` (0,1,0)
+   without !important and without editing fifty files. index.html uses none of these classes and
+   styles-index.css names .info-box only inside a transition, so the homepage is untouched by
+   construction — no mirror needed.
+   ==========================================================================*/
+:root {
+  /* the site's own semantic set, replacing the framework defaults */
+  --rz-chip-info:   #0e7490;   /* instrument cyan, light-readable */
+  --rz-chip-good:   #2f855a;   /* oscilloscope green, light-readable */
+  --rz-chip-warn:   #a16207;   /* signal amber, light-readable */
+  --rz-chip-alert:  #b42318;   /* fault red, light-readable */
+  --rz-chip-quiet:  #64748b;   /* slate — the neutral this site already uses */
+  --rz-chip-track:  color-mix(in srgb, currentColor 20%, transparent);
+  --rz-chip-mono:   'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+[data-theme="dark"] {
+  --rz-chip-info:   #00DDFF;
+  --rz-chip-good:   #00FF88;
+  --rz-chip-warn:   #FFAA00;
+  --rz-chip-alert:  #FF6B6B;
+  --rz-chip-quiet:  #94a3b8;
+}
+
+/* ---- 1 · the chip base: a tag, not a sticker ---------------------------- */
+html .ws-badge,
+html .article-category {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  background: none;
+  border: 0;
+  border-radius: 2px;
+  font-family: var(--rz-chip-mono);
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  box-shadow: none;
+}
+
+/* ---- 2 · identity: the rail tag ---------------------------------------- */
+html .ws-badge-create,
+html .ws-badge-sub,
+html .ws-badge-extend,
+html .article-category {
+  padding: .16rem .5rem;
+  border-left: 2px solid currentColor;
+  border-radius: 0 2px 2px 0;
+  background: none;
+}
+html .ws-badge-create   { color: var(--rz-chip-good); }
+html .ws-badge-sub      { color: var(--rz-chip-info); }
+html .ws-badge-extend   { color: var(--rz-chip-warn); }
+html .article-category  { color: var(--rz-chip-good); font-size: .74rem; padding: .2rem .55rem; }
+
+/* ---- 3 · magnitude: the scale tag --------------------------------------
+   Four dots drawn with box-shadow, not with text: a CSS `content` tick bar is announced by a
+   screen reader as "square square white square", which is noise. The filled count IS the level, so
+   the ordering survives greyscale, print and colour blindness — the reason this exists at all. */
+html .ws-badge-immediate, html .ws-badge-fast, html .ws-badge-medium,
+html .ws-badge-slow, html .ws-badge-vslow,
+html .ws-badge-cost1, html .ws-badge-cost2, html .ws-badge-cost3, html .ws-badge-cost4 {
+  padding: .16rem .45rem;
+  border: 1px solid color-mix(in srgb, currentColor 34%, transparent);
+  border-radius: 2px;
+  background: none;
+}
+html .ws-badge-immediate, html .ws-badge-fast, html .ws-badge-cost1 { color: var(--rz-chip-good); }
+html .ws-badge-medium, html .ws-badge-cost2                          { color: var(--rz-chip-warn); }
+html .ws-badge-slow, html .ws-badge-cost3                            { color: var(--rz-chip-warn); }
+html .ws-badge-vslow, html .ws-badge-cost4                           { color: var(--rz-chip-alert); }
+
+html .ws-badge-immediate::after, html .ws-badge-fast::after, html .ws-badge-medium::after,
+html .ws-badge-slow::after, html .ws-badge-vslow::after,
+html .ws-badge-cost1::after, html .ws-badge-cost2::after,
+html .ws-badge-cost3::after, html .ws-badge-cost4::after {
+  content: '';
+  width: 3px; height: 3px; border-radius: 1px;
+  margin-left: .45rem;
+  flex: 0 0 auto;
+  background: currentColor;
+  box-shadow: 5px 0 0 var(--rz-t2), 10px 0 0 var(--rz-t3), 15px 0 0 var(--rz-t4);
+  margin-right: 15px;   /* the three shadowed dots sit outside the box model */
+}
+html .ws-badge-immediate, html .ws-badge-cost1 {
+  --rz-t2: var(--rz-chip-track); --rz-t3: var(--rz-chip-track); --rz-t4: var(--rz-chip-track);
+}
+html .ws-badge-fast, html .ws-badge-cost2 {
+  --rz-t2: currentColor; --rz-t3: var(--rz-chip-track); --rz-t4: var(--rz-chip-track);
+}
+html .ws-badge-medium, html .ws-badge-slow, html .ws-badge-cost3 {
+  --rz-t2: currentColor; --rz-t3: currentColor; --rz-t4: var(--rz-chip-track);
+}
+html .ws-badge-vslow, html .ws-badge-cost4 {
+  --rz-t2: currentColor; --rz-t3: currentColor; --rz-t4: currentColor;
+}
+
+/* ---- 4 · callouts: the treatment this site already prescribes -----------
+   Flat tint + 1px hairline + a 2px semantic rail, which is what .quote-callout renders in dark.
+   Extended here to BOTH themes and to the whole family, so the light-mode reader gets the same
+   editorial register the dark-mode reader already had. */
+html .info-box,
+html .key-insight,
+html .positive-box,
+html .alert-box {
+  --rz-callout: var(--rz-chip-info);
+  background: color-mix(in srgb, var(--rz-callout) 7%, transparent);
+  border: 1px solid color-mix(in srgb, var(--rz-callout) 26%, transparent);
+  border-left: 2px solid var(--rz-callout);
+  border-radius: 0 4px 4px 0;
+  box-shadow: none;
+  background-image: none;
+}
+html .info-box.success, html .positive-box { --rz-callout: var(--rz-chip-good); }
+html .info-box.warning, html .alert-box    { --rz-callout: var(--rz-chip-warn); }
+html .info-box.danger, html .alert-box.danger { --rz-callout: var(--rz-chip-alert); }
+html .key-insight                          { --rz-callout: var(--rz-chip-warn); }
+
+/* ---- 5 · the contents list stops being a highlighter -------------------- */
+html .toc-item.toc-calculator {
+  background: none;
+  border-left: 2px solid var(--rz-chip-info);
+  border-radius: 0 2px 2px 0;
+}
+
+/* ---- 6 · the same two marks, everywhere the site draws a chip -----------
+   A rendered scan of all 36 article / FF / geopolitics pages found the pill idiom in five more
+   families, three of them SOLID fills with white text — the loudest form of the tell:
+
+     .toc-calc-badge      20 pages, five hues incl. a violet #6d28d9 next door to the banned one
+     .series-badge-icon   10 pages, solid navy
+     .confidence-badge     framework mint #ecfdf5 — and it is a LEVEL, so it gets ticks
+     .revenue-badge / .risk-chip / .service-rank / .c-rank   level and rank marks, filled
+
+   Identity keeps the rail; anything that encodes a LEVEL gets the four-dot scale, so high/medium/low
+   is readable with the colour taken away. .rz-chart-chip is deliberately untouched: it is the chart
+   module's provenance mark (PUBLISHED / ILLUSTRATIVE), which is a different job with its own gate. */
+html .toc-calc-badge,
+html .series-badge-icon,
+html .confidence-badge,
+html .revenue-badge,
+html .risk-chip,
+html .service-rank,
+html .c-rank {
+  background: none;
+  background-image: none;
+  border-radius: 2px;
+  font-family: var(--rz-chip-mono);
+  font-weight: 600;
+  letter-spacing: .06em;
+  box-shadow: none;
+}
+html .toc-calc-badge {
+  color: var(--rz-chip-info);
+  border: 0; border-left: 2px solid currentColor;
+  border-radius: 0 2px 2px 0;
+  padding: .14rem .45rem;
+  text-transform: uppercase;
+}
+html .series-badge-icon,
+html .service-rank,
+html .c-rank {
+  color: var(--rz-chip-quiet);
+  border: 1px solid color-mix(in srgb, currentColor 34%, transparent);
+  padding: .1rem .34rem;
+}
+
+/* level marks: the value stays, the hue stops being the message */
+html .confidence-badge,
+html .revenue-badge,
+html .risk-chip {
+  display: inline-flex; align-items: center;
+  border: 1px solid color-mix(in srgb, currentColor 34%, transparent);
+  padding: .14rem .42rem;
+  text-transform: uppercase;
+}
+html .confidence-high, html .revenue-badge.rev-low, html .risk-chip.low     { color: var(--rz-chip-good); }
+html .confidence-medium, html .revenue-badge.rev-medium, html .risk-chip.med { color: var(--rz-chip-warn); }
+html .confidence-low, html .revenue-badge.rev-high, html .risk-chip.high     { color: var(--rz-chip-alert); }
+
+html .confidence-badge::after,
+html .revenue-badge::after,
+html .risk-chip::after {
+  content: '';
+  width: 3px; height: 3px; border-radius: 1px;
+  margin-left: .42rem; margin-right: 10px;
+  flex: 0 0 auto;
+  background: currentColor;
+  box-shadow: 5px 0 0 var(--rz-t2), 10px 0 0 var(--rz-t3);
+}
+html .confidence-low, html .revenue-badge.rev-low, html .risk-chip.low {
+  --rz-t2: var(--rz-chip-track); --rz-t3: var(--rz-chip-track);
+}
+html .confidence-medium, html .revenue-badge.rev-medium, html .risk-chip.med {
+  --rz-t2: currentColor; --rz-t3: var(--rz-chip-track);
+}
+html .confidence-high, html .revenue-badge.rev-high, html .risk-chip.high {
+  --rz-t2: currentColor; --rz-t3: currentColor;
+}
+
+/* ---- 7 · the fill comes off, whatever a page says ----------------------
+   Pages write these chips with compound selectors of their own — article-11 has
+   `.toc-item.toc-calculator .toc-calc-badge { background:#1d4ed8 }` at (0,3,0), which outranks a
+   sane `html .toc-calc-badge` (0,1,1). Chasing every page's selector shape across twenty files is
+   unbounded and would break the next time one is edited, so the FILL — and only the fill — is
+   forced off here. It is the same reason css/rz-article-dark.css carries !important on the callout
+   family: one shared sheet against fifty pages of local CSS. Colour, border and layout above stay
+   overridable, so a page can still say something specific about its own chip. */
+html .ws-badge,
+html .article-category,
+html .toc-calc-badge,
+html .series-badge-icon,
+html .confidence-badge,
+html .revenue-badge,
+html .risk-chip,
+html .service-rank,
+html .c-rank {
+  background: none !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+/* white-on-fill text is unreadable once the fill is gone: give the mark its own semantic colour */
+html .toc-calc-badge   { color: var(--rz-chip-info) !important; }
+html .series-badge-icon,
+html .service-rank,
+html .c-rank           { color: var(--rz-chip-quiet) !important; }
+html .confidence-high  { color: var(--rz-chip-good) !important; }
+html .confidence-medium{ color: var(--rz-chip-warn) !important; }
+html .confidence-low   { color: var(--rz-chip-alert) !important; }
+
+/* ---- 8 · the last two filled families the rendered scan turned up ------- */
+html .status-badge,
+html .failure-step-number {
+  background: none !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border: 1px solid color-mix(in srgb, currentColor 34%, transparent);
+  border-radius: 2px;
+  font-family: var(--rz-chip-mono);
+  font-weight: 600;
+  padding: .1rem .38rem;
+}
+html .status-badge         { color: var(--rz-chip-quiet) !important; text-transform: uppercase; letter-spacing: .06em; }
+html .status-badge.active  { color: var(--rz-chip-good) !important; }
+html .failure-step-number  { color: var(--rz-chip-alert) !important; }
