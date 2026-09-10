@@ -103,6 +103,12 @@
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
          Loaded for cross-page consistency; body does NOT carry rz-bms-shell
          class. Spec: standarization/BMS_SHELL.md ; conv/review/14 §7. -->
+    <!-- v3.4.1 — owner comment (22): the shared PDF shell, not a raw browser print. This page's
+         "Export PDF" button called window.print(); the export it promised is now the one the
+         readiness reviews and the checklists issue. -->
+    <link rel="stylesheet" href="css/rz-design-studio.css?v=3.4.0">
+    <script src="js/rz-pdf-export.js?v=1.1.0" defer></script>
+    <script src="js/rz-design-studio.js?v=3.4.0" defer></script>
     <link rel="stylesheet" href="css/rz-bms-shell.css?v=20260908-editorial">
     <link rel="stylesheet" href="css/rz-conv-alarm-workspace.css?v=1.131.0">
     <script src="js/datahall-ai/alarm-query.js?v=1.0.0" defer></script>
@@ -477,7 +483,7 @@
             <button class="zoom-btn active" onclick="setZoom(1)" id="z-100" data-rz-authored-basis="Zoom buttons state a VIEWPORT SCALE - how large the mimic is drawn - not a plant quantity. The same drawing at 75 percent and at 120 percent shows the same system.">100%</button>
             <button class="zoom-btn" onclick="setZoom(1.25)" id="z-125" data-rz-authored-basis="Zoom buttons state a VIEWPORT SCALE - how large the mimic is drawn - not a plant quantity. The same drawing at 75 percent and at 120 percent shows the same system.">125%</button>
             <button class="zoom-btn" onclick="toggleFullscreen()" id="btn-fullscreen">Fullscreen</button>
-            <button class="zoom-btn" onclick="window.print()">Export PDF</button>
+            <button class="zoom-btn" id="waterSystemTrig" type="button">Export PDF &mdash; choose sections</button>
         </div>
     </div>
     <div data-rz-telemetry-banner-slot></div>
@@ -508,7 +514,7 @@
 
     <!-- KPI strip — value | unit | threshold (doc-07 §"KPI Cards")
          v1.23.4 doc-14 §7: WUE is the visual hero (page-purpose KPI). -->
-    <div class="kpi-grid">
+    <div class="kpi-grid" data-rz-doc-section="ws-kpi" data-rz-doc-label="Water KPI band — WUE, make-up, treatment flow, filter DP">
         <div class="kpi hero">
             <h3>Instant WUE</h3>
             <div class="v"><span id="kWue" data-basis-param="water.wue_l_per_kwh" tabindex="0" role="button">&mdash;</span> <small>L/kWh</small></div>
@@ -539,7 +545,7 @@
 
     <div class="layout">
         <!-- Process flow (P&ID) -->
-        <div class="panel">
+        <div class="panel" data-rz-doc-section="ws-pid" data-rz-doc-label="Water treatment and cooling-tower P&amp;ID">
             <div class="panel-title">
                 Water Treatment Process Flow
                 <span class="sub">— raw &rarr; filtration &rarr; treatment &rarr; cooling makeup / domestic / blowdown</span>
@@ -770,7 +776,7 @@
 
         <!-- Right inspector: WUE balance + scope + alarms -->
         <div>
-            <div class="panel">
+            <div class="panel" data-rz-doc-section="ws-wue" data-rz-doc-label="WUE reconciliation">
                 <div class="panel-title">WUE Reconciliation</div>
                 <div class="insp-row"><span class="k">IT Load · site</span><span class="vv unavailable" id="iIt" data-basis-param="site.it_load_kw" tabindex="0" role="button">UNAVAILABLE</span></div>
                 <div class="insp-row"><span class="k">IT Energy · site (1 h)</span><span class="vv unavailable" id="iItE">UNAVAILABLE</span></div>
@@ -783,7 +789,7 @@
                 </div>
             </div>
 
-            <div class="panel">
+            <div class="panel" data-rz-doc-section="ws-scope" data-rz-doc-label="Site water scope">
                 <div class="panel-title">Site Water Scope</div>
                 <div class="insp-row">
                     <span class="k">Cooling makeup <span class="scope-tag incl">WUE</span></span>
@@ -818,7 +824,7 @@
                 </div>
             </div>
 
-            <div class="panel">
+            <div class="panel" data-rz-doc-section="ws-alarms" data-rz-doc-label="Active alarms and status">
                 <div class="panel-title">Active Alarms &amp; Status</div>
                 <ul class="alarm-list" id="alarmList">
                     <li><span class="sev unavailable">UNAVAILABLE</span><span class="msg"><b>Process telemetry</b> &mdash; current authority has not been established.</span></li>
@@ -828,7 +834,7 @@
     </div>
 
     <!-- Bottom trend strip -->
-    <div class="chart-card" style="margin-bottom:14px;">
+    <div class="chart-card" data-rz-doc-section="ws-trend" data-rz-doc-label="Filter DP and cooling make-up flow — 24 h trend" style="margin-bottom:14px;">
         <div class="panel-title">Filter DP &amp; Cooling Makeup Flow — 24 h Trend
             <span class="sub">— thresholds shown; current marker right edge</span>
         </div>
@@ -1689,5 +1695,36 @@
 
 
     <div class="rz-manual-link" style="display:flex;justify-content:center;gap:.5rem;flex-wrap:wrap;padding:0.9rem 1rem 1.3rem;"><style>.rz-manual-link a{display:inline-block;font-family:'JetBrains Mono','Courier New',monospace;font-size:0.72rem;letter-spacing:0.04em;text-decoration:none;border:1px solid;border-radius:6px;padding:0.45rem 0.85rem;color:#94a3b8;border-color:rgba(148,163,184,0.35)}.rz-manual-link a:hover{color:#67e8f9;border-color:rgba(103,232,249,0.45)}</style><a href="prd/dc-conventional.html#water-contract">Master PRD &#8599;</a><a href="manual/water-system.html">Technical Manual &amp; Methodology &#8599;</a></div>
+<script>
+/* ============================================================================
+ * v3.4.1 — owner comment (22): the mature PDF template across the engines.
+ * ----------------------------------------------------------------------------
+ * This page's "Export PDF" button called window.print(): it PROMISED an export and delivered a
+ * browser print of the screen, cockpit chrome and all. It issues a document through the shared
+ * shell now, section by section, like the checklists and the readiness reviews. Nothing that is
+ * not a fact about THIS page lives here — the palette and the skeleton are in js/rz-pdf-export.js.
+ * ==========================================================================*/
+(function(){
+  function go(){
+    if(!window.RZPdfExport) return false;
+    window.RZPdfExport.adopt({
+      id:'water-system-export', triggerId:'waterSystemTrig',
+      title:'Water System — Cooling Make-up and Treatment',
+      subtitle:'P&ID, WUE reconciliation and treatment train \u2014 conventional data hall',
+      accent:'#0891b2', sectionSelector:'[data-rz-doc-section]',
+      provenance:'Sections are read from this page at export time. Every KPI on it is bound to the conventional engine (js/conv-engine.js) and carries its own basis marker on screen; simulated instrument jitter is declared as such where it appears and is never a field reading.',
+      snapshot:function(){
+        var pick=function(id){ var el=document.getElementById(id); return el?el.textContent.replace(/\s+/g,' ').trim():'\u2014'; };
+        return { 'Instant WUE':pick('kWue'), 'Cooling make-up':pick('kMakeup'),
+                 'Basis':'conv-engine.js — one locked reference scenario per hall',
+                 'Values':'Engine-derived where a basis marker is shown; simulated jitter where declared' };
+      },
+      footerNote:'Engine-derived reference figures — not a commissioning record and not a field measurement'
+    });
+    return true;
+  }
+  if(!go()) window.addEventListener('load', go);
+})();
+</script>
 </body>
 </html>

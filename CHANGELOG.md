@@ -11,6 +11,36 @@ release sections rather than semver.
 
 ---
 
+## v3.4.1 — 2026-09-10
+
+### Two cockpits that promised an export and printed the screen
+
+v3.4.0 moved six pages onto the shared shell and left twelve still calling `window.print()`. Reading
+what each of those twelve actually does, they are not one group:
+
+* **Seven are honest print buttons.** The six article pages and `geopolitics-1.html` offer to print
+  a reading page, `ict.html`'s button says *"Print this view"* and carries a printer icon, and
+  `rz-ops-p7x3k9m.html` says *"Print / Save PDF"*. A page that says print and prints is not a defect.
+* **Two promised a document and delivered a screenshot.** `water-system.html` had a button labelled
+  **Export PDF** and `fire-system.html` one labelled **EXPORT PDF**; both called `window.print()`,
+  so what came out was the cockpit as it sat on screen, chrome and all.
+* **One builds its own.** `cdu-calculator.html` assembles a document string and opens a print
+  window — a working hand-built builder, and the third one this codebase has had. Migrating it is a
+  consolidation worth doing, but it needs its output compared against the shell's side by side
+  rather than swapped in on the way past, so it is not in this release.
+
+The two that promised are adopted. Each declares its sections in its own markup and gets the dialog,
+the picker and the document shell from one `RZPdfExport.adopt()` call: water-system offers six
+sections (KPI band, P&ID, WUE reconciliation, site water scope, active alarms, 24-hour trend),
+fire-system five (P&ID, cause and effect, pump set, water reserve, alarm and event log). Both state
+on the cover what their numbers are and are not — engine-derived where a basis marker is shown,
+simulated and declared where it is not, and in fire-system's case that the detection state is a
+stage machine and not a fire-alarm record.
+
+Adopters now **9**; pages printing directly **10**, and seven of those ten are meant to.
+
+---
+
 ## v3.4.0 — 2026-09-10
 
 ### Six more engines issue their PDF through the shared shell
