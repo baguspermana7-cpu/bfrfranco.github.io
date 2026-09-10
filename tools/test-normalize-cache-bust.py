@@ -69,6 +69,21 @@ class NormalizeCacheBust(unittest.TestCase):
                       (self.root / 'old.html').read_text(encoding='utf-8'),
                       'prose quoting an old token is documentation, not a load')
 
+    def test_check_is_a_word_this_tool_answers_to(self):
+        """Every ship gate on this site types --check. The v1.10.12 tool accepted it and WROTE;
+        the rewrite refused it with 'unrecognized arguments'. Both are wrong in the same way — the
+        caller's word and the tool's behaviour have to be the same thing."""
+        before = (self.root / 'old.html').read_text(encoding='utf-8')
+        result = run(self.root, '--check')
+        self.assertEqual(result.returncode, 1, result.stdout)
+        self.assertIn('2 different tokens', result.stdout)
+        self.assertEqual((self.root / 'old.html').read_text(encoding='utf-8'), before,
+                         '--check may never modify the tree')
+
+    def test_check_and_apply_together_are_refused(self):
+        result = run(self.root, '--check', '--apply')
+        self.assertEqual(result.returncode, 2, result.stdout)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

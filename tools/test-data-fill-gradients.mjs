@@ -35,6 +35,20 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
+/* v3.6.0 — the gate now holds all three classes owner comment (21) named. The bar charts were
+   v2.17.0; these two are the rest of that sentence.
+
+   A FILLED SEVERITY PILL is a badge that states a level — pro, gated, risk-high, tier-2 — painted
+   with a saturated gradient. The instrument language for a chip is a flat low-alpha tint, a 1 px
+   hairline and the accent as ink, which is what every cockpit chip on this site already does. A
+   gradient-filled pill reads as a button that cannot be pressed.
+
+   A CARD WASH is the same gradient on a surface that holds content rather than states a level.
+   Both are decoration on a surface whose job is to be read. */
+const PILL_SEL = /(badge|pill|chip|tag|-flag|severity|status|rank|risk|tier|level)/i;
+const SURFACE_SEL = /(card|panel|tile|box|callout|bento|insight|feature|note|stat|widget|block|highlight|swing-bar|gauge)/i;
+const FUNCTIONAL_SEL = /(nav|navbar|modal|overlay|backdrop|gate|search|palette|ticker|dropdown|tooltip|sticky|header|drawer|sheet|toast|menu|btn|button|input|select|field|form|dialog|popover|inspector|hmi|tab|scroll|cursor|marquee|share)/i;
+
 /* An element whose length encodes a value. */
 const DATA_FILL_SEL =
   /(bar-fill|score-bar|gauge-bar|risk-gauge|tornado-bar|sensitivity-fill|progress-fill|meter-fill|rank-(?:high|med|mid|low)|-fill\b)/i;
@@ -53,19 +67,37 @@ function stops(gradient) {
 const findings = [];
 for (const file of readdirSync(ROOT).filter((n) => n.endsWith('.html') && !INSTRUMENT.has(n))) {
   const text = readFileSync(resolve(ROOT, file), 'utf8');
-  for (const block of text.matchAll(/([.#][A-Za-z0-9_.:\[\]="'-]+)\s*\{([^}]*)\}/g)) {
+  /* the selector class must admit DESCENDANT selectors: `.sa-level-3 .sa-badge` and
+   `.article-title .highlight` are exactly the shape this rule is for, and a class without
+   a space silently skipped every one of them. */
+  for (const block of text.matchAll(/([.#][A-Za-z0-9_.:\[\]="'>~+ -]{1,90})\s*\{([^}]{0,600}?)\}/g)) {
     const [, selector, body] = block;
-    if (!DATA_FILL_SEL.test(selector)) continue;
-    for (const gradient of body.match(/linear-gradient\([^)]*\)/gi) || []) {
-      if (stops(gradient) === 2) {
-        findings.push({ file, selector, gradient: gradient.slice(0, 64) });
+    const isDataFill = DATA_FILL_SEL.test(selector);
+
+    if (isDataFill) {
+      for (const gradient of body.match(/linear-gradient\([^)]*\)/gi) || []) {
+        if (stops(gradient) === 2) {
+          findings.push({ file, selector, gradient: gradient.slice(0, 64) });
+        }
       }
+      /* A white-to-transparent sheen laid over a data fill is the same defect wearing a
+         pseudo-element: it is decoration on top of an encoded value. */
+      if (/::(?:after|before)/.test(selector)
+          && /linear-gradient\([^)]*rgba?\(\s*255\s*,\s*255\s*,\s*255/i.test(body)) {
+        findings.push({ file, selector, gradient: 'white gloss overlay' });
+      }
+      continue;
     }
-    /* A white-to-transparent sheen laid over a data fill is the same defect wearing a
-       pseudo-element: it is decoration on top of an encoded value. */
-    if (/::(?:after|before)/.test(selector)
-        && /linear-gradient\([^)]*rgba?\(\s*255\s*,\s*255\s*,\s*255/i.test(body)) {
-      findings.push({ file, selector, gradient: 'white gloss overlay' });
+
+    /* the other two classes: a level stated in a gradient, and a reading surface washed in one */
+    if (FUNCTIONAL_SEL.test(selector) || !/background/.test(body)) { continue; }
+    for (const gradient of body.match(/linear-gradient\([^)]*\)/gi) || []) {
+      if (stops(gradient) !== 2) { continue; }          /* 3+ stops is a scale axis */
+      if (PILL_SEL.test(selector)) {
+        findings.push({ file, selector, gradient: 'filled severity pill: ' + gradient.slice(0, 44) });
+      } else if (SURFACE_SEL.test(selector)) {
+        findings.push({ file, selector, gradient: 'card wash: ' + gradient.slice(0, 44) });
+      }
     }
   }
 }
@@ -73,7 +105,8 @@ for (const file of readdirSync(ROOT).filter((n) => n.endsWith('.html') && !INSTR
 if (findings.length) {
   console.error(`── DATA-FILL GRADIENTS ── ${findings.length} finding(s)`);
   for (const f of findings) console.error(`  ✗ ${f.file}  ${f.selector}  ${f.gradient}`);
-  console.error('A data fill takes one flat colour. Three or more stops is a scale axis and is allowed.');
+  console.error('A data fill, a severity pill and a reading surface each take one flat colour.\n'
+  + 'Three or more stops is a scale axis and is allowed. A chip is a flat tint, a hairline and accent ink.');
   process.exit(1);
 }
-console.log('data-fill gradients — PASS (0 two-stop gradients or gloss overlays on value-encoding fills)');
+console.log('decorative gradients — PASS (0 two-stop gradients on value fills, severity pills or reading surfaces)');

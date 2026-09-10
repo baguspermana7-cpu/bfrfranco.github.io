@@ -135,6 +135,24 @@ Consistent with the audit contract above: **do not label an unimplemented heuris
   (0 pages async-without-affordance; `js/pln-energy-dashboard.js` is the one async module and all three
   of its consumer pages carry one), so the gap was the missing gate, not missing skeletons. That gate
   now exists.
+- **The violet family, finished** (v3.6.0, 2026-09-10). §A bans the Anthropic-default purple, and
+  the ban had been applied to `#8b5cf6` only. Its neighbours were still live: **303 occurrences of
+  `#6d28d9` / `#7c3aed` across 62 files.** This was not a design decision to make — it was a sweep
+  someone had already started and not finished, and the tree said so: of twenty `--accent-purple`
+  definitions, **fourteen were already `#64748b`**, and of the `terms.html` link colours 35 pages
+  used the slate against 9 that used the violet. So the majority WAS the answer; the violets were
+  stragglers. All 300 page-level occurrences now carry `#64748b`, and the two compare pages whose
+  `--cmp-b` was violet take `#0e7490`, which `compare-fm200-vs-novec.html` already used for the same
+  series.
+  - **Ten dead patches went with them.** Rules of the shape
+    `[data-theme="dark"] [style*="color: #6d28d9"] { color:#a5b4fc !important }` existed only to
+    rescue the violet in dark mode. A blanket find-and-replace turns such a rule into a rule that
+    repaints EVERY slate inline colour periwinkle — worse than what it replaced. When a colour
+    sweep touches a value, look for the patches keyed on that value in the same pass.
+  - **Left for the owner:** `css/rz-finance-suite.css` still carries `--fs-acc:#6d28d9` /
+    `--fs-acc2:#7c3aed`. That file re-skins five app surfaces at once, and the value has a written
+    AA rationale behind it. Replacing a design-system accent is a decision, not a straggler.
+
 - **The chip idiom, and an over-correction of mine reversed** (v3.6.0, 2026-09-10). Owner, on
   `article-27.html` in LIGHT mode: *"masih banyak ai design slop lihat itu kotak highlight biru,
   orange dll"*. They were right, and the rule above cut the wrong way here: when calibrating

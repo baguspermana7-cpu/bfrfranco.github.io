@@ -11,6 +11,47 @@ release sections rather than semver.
 
 ---
 
+## v3.6.0 — 2026-09-11
+
+### The violet family, the two-stop washes, and the last framework swatches
+
+The owner pointed at `article-27.html` and said the highlight boxes were still slop. Three sweeps
+came out of that, and this release closes all three across the whole tree.
+
+### Changed
+
+- **Violet is gone from the reading surfaces.** `#6d28d9` and `#7c3aed` were the AI-default purple
+  family under a different name — 300 occurrences across 62 pages, mostly inline `style` on links and
+  headings. They are now `#64748b`, which is not a taste call: 14 of the tree's 20 `--accent-purple`
+  definitions already resolved to that slate, and 35 pages already drew their terms links with it
+  against 9 that did not. The sweep made the majority the rule instead of leaving two colours for one
+  job. The two comparison pages' `--cmp-b` moves to `#0e7490`, matching
+  `compare-fm200-vs-novec.html`, which had already made that choice.
+- **Ten dark-mode patches removed.** They were written as
+  `[style*="color: #6d28d9"] { color: #a5b4fc !important }` — a repair keyed on the exact string the
+  sweep was about to delete. Left in place with the search text updated they would have repainted
+  *every* slate inline colour periwinkle, so they went out with the colour they were patching.
+- **357 two-stop gradients flattened to their first stop** across 81 pages. Two stops on a data fill,
+  a severity pill or a reading surface is decoration wearing the clothes of a scale; three or more
+  stops is an actual axis and is untouched. `tools/test-data-fill-gradients.mjs` now holds that line —
+  it reports 60+ findings against the previous tree and none against this one.
+
+### Fixed
+
+- **`tools/normalize-cache-bust.py --check` is a flag the tool answers to.** Its docstring has
+  described `--check` as the default since the v2.19.0 rewrite, but argparse only ever declared
+  `--apply`, so a gate typing the documented word got `unrecognized arguments: --check` and exit 2.
+  The version before the rewrite was worse in the same place: it accepted `--check` silently and
+  *wrote*, converging 294 tokens onto a hardcoded May constant. Both readings are now pinned by
+  behavioural tests, and `--check --apply` together is refused rather than resolved.
+
+### Documentation
+
+- `standarization/ANTI_VIBECODE_STANDARD.md` records the violet sweep with the count that justified
+  the target colour, so the next change to that palette argues with evidence rather than preference.
+
+---
+
 ## v3.5.0 — 2026-09-10
 
 ### Every page that issues a document now issues it through the shared shell

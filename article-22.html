@@ -253,7 +253,7 @@
 
         /* Evidence Block */
         .a22-evidence-block {
-            background: linear-gradient(135deg, #155e75 0%, #083344 100%);
+            background: #155e75;
             padding: 2rem 1.5rem;
             margin: 0;
         }
@@ -329,7 +329,7 @@
 
         /* Insight box */
         .a22-insight-box {
-            background: linear-gradient(135deg, #ecfeff, #cffafe);
+            background: #ecfeff;
             border: 1px solid rgba(8,145,178,0.3);
             border-radius: 4px;
             padding: 1.5rem;
@@ -727,7 +727,7 @@
             transition: width 0.8s cubic-bezier(0.25,0.46,0.45,0.94);
         }
         .a22-bar-fill.copper { background: #d97706; }
-        .a22-bar-fill.pluggable { background: #7c3aed; }
+        .a22-bar-fill.pluggable { background: #64748b; }
         .a22-bar-fill.cpo { background: #0891b2; }
         .a22-bar-value {
             font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;
@@ -845,14 +845,14 @@
         :root:not([data-theme="dark"]) .a22-metric-label { color: #64748b; }
         :root:not([data-theme="dark"]) .a22-metric-value { color: #334155; }
         :root:not([data-theme="dark"]) .a22-tech-card.copper .a22-tech-name { color: #92400e; }
-        :root:not([data-theme="dark"]) .a22-tech-card.pluggable .a22-tech-name { color: #6d28d9; }
+        :root:not([data-theme="dark"]) .a22-tech-card.pluggable .a22-tech-name { color: #64748b; }
         :root:not([data-theme="dark"]) .a22-tech-card.cpo .a22-tech-name { color: #155e75; }
         :root:not([data-theme="dark"]) .a22-metric-value[style*="rgb(245, 158, 11)"] { color: #92400e !important; }
         :root:not([data-theme="dark"]) .a22-metric-value[style*="rgb(239, 68, 68)"] { color: #b91c1c !important; }
-        :root:not([data-theme="dark"]) .a22-metric-value[style*="rgb(168, 85, 247)"] { color: #6d28d9 !important; }
+        :root:not([data-theme="dark"]) .a22-metric-value[style*="rgb(168, 85, 247)"] { color: #64748b !important; }
         :root:not([data-theme="dark"]) .a22-metric-value[style*="rgb(34, 211, 238)"] { color: #155e75 !important; }
         [data-theme="dark"] .a22-reset-btn { color: #94a3b8; }
-        :root:not([data-theme="dark"]) a[href$="terms.html"][style*="#64748b"] { color: #6d28d9 !important; }
+        :root:not([data-theme="dark"]) a[href$="terms.html"][style*="#64748b"] { color: #64748b !important; }
         .reference-item a { color: #0e7490; text-decoration: none; }
         [data-theme="dark"] .reference-item a { color: #67e8f9; }
         .reference-item a:hover { text-decoration: underline; }
@@ -2012,7 +2012,7 @@
             html += '<div class="a22-tco-row">';
             html += '<div class="a22-tco-label">Y' + r.yr + ' Plug</div>';
             html += '<div class="a22-tco-track">';
-            html += '<div class="a22-tco-seg" style="width:' + plugEP + '%;background:#7c3aed;"></div>';
+            html += '<div class="a22-tco-seg" style="width:' + plugEP + '%;background:#64748b;"></div>';
             html += '<div class="a22-tco-seg" style="width:' + plugHP + '%;background:#a855f7;opacity:0.6;"></div>';
             html += '<div class="a22-tco-seg" style="width:' + plugMP + '%;background:#c084fc;opacity:0.4;"></div>';
             html += '</div>';
@@ -2115,7 +2115,7 @@
             if (copperFeasible && r.copper > 0) {
                 html += '<div class="a22-scale-seg" style="width:' + copperPct + '%;background:linear-gradient(90deg,#d97706,#f59e0b);opacity:' + (r.gpus > 32000 ? '0.3' : '1') + ';" title="Copper: ' + fP(r.copper) + '"></div>';
             }
-            html += '<div class="a22-scale-seg" style="width:' + plugPct + '%;background:linear-gradient(90deg,#7c3aed,#a855f7);" title="Pluggable: ' + fP(r.plug) + '"></div>';
+            html += '<div class="a22-scale-seg" style="width:' + plugPct + '%;background:linear-gradient(90deg,#64748b,#a855f7);" title="Pluggable: ' + fP(r.plug) + '"></div>';
             html += '<div class="a22-scale-seg" style="width:' + cpoPct + '%;background:linear-gradient(90deg,#0891b2,#22d3ee);" title="CPO: ' + fP(r.cpo) + '"></div>';
             html += '</div>';
             html += '<div class="a22-scale-value">' + fP(r.plug) + '</div>';
@@ -2377,10 +2377,10 @@
 
         // Technology Comparison Table
         html += '<h2>Technology Comparison</h2><table>';
-        html += '<tr><th scope="col">Metric</th><th style="color:#d97706;"  scope="col">Copper DAC</th><th style="color:#7c3aed;"  scope="col">Pluggable Optics</th><th style="color:#0891b2;"  scope="col">Co-Packaged Optics</th></tr>';
+        html += '<tr><th scope="col">Metric</th><th style="color:#d97706;"  scope="col">Copper DAC</th><th style="color:#64748b;"  scope="col">Pluggable Optics</th><th style="color:#0891b2;"  scope="col">Co-Packaged Optics</th></tr>';
         html += '<tr><td style="font-weight:600;">Power / Link</td><td>' + (copperViable ? copperPower.toFixed(1) + ' W' : 'N/A') + '</td><td>' + (plugViable ? plugPower.toFixed(1) + ' W' : 'N/A') + '</td><td>' + (cpoViable ? cpoPower.toFixed(1) + ' W' : 'N/A') + '</td></tr>';
         html += '<tr><td style="font-weight:600;">Max Reach</td><td>' + (copperMaxReach > 0 ? copperMaxReach + ' m' : 'N/A') + '</td><td>' + plugMaxReach + ' m</td><td>' + cpoMaxReach + ' m</td></tr>';
-        html += '<tr><td style="font-weight:600;">Feasibility</td><td style="color:' + (copperViable ? '#d97706' : '#ef4444') + ';font-weight:700;">' + (copperViable ? 'Viable' : 'Out of Range') + '</td><td style="color:' + (plugViable ? '#7c3aed' : '#ef4444') + ';font-weight:700;">' + (plugViable ? 'Viable' : 'Out of Range') + '</td><td style="color:' + (cpoViable ? '#0891b2' : '#ef4444') + ';font-weight:700;">' + (cpoViable ? 'Optimal' : 'Out of Range') + '</td></tr>';
+        html += '<tr><td style="font-weight:600;">Feasibility</td><td style="color:' + (copperViable ? '#d97706' : '#ef4444') + ';font-weight:700;">' + (copperViable ? 'Viable' : 'Out of Range') + '</td><td style="color:' + (plugViable ? '#64748b' : '#ef4444') + ';font-weight:700;">' + (plugViable ? 'Viable' : 'Out of Range') + '</td><td style="color:' + (cpoViable ? '#0891b2' : '#ef4444') + ';font-weight:700;">' + (cpoViable ? 'Optimal' : 'Out of Range') + '</td></tr>';
         html += '<tr><td style="font-weight:600;">Annual Energy Cost</td><td>' + (copperViable ? fC(copperAnnual) : 'N/A') + '</td><td>' + (plugViable ? fC(plugAnnual) : 'N/A') + '</td><td>' + (cpoViable ? fC(cpoAnnual) : 'N/A') + '</td></tr>';
         html += '<tr><td style="font-weight:600;">Latency</td><td>' + (copperViable ? copperLatency.toFixed(1) + ' ns' : 'N/A') + '</td><td>' + (plugViable ? plugLatency.toFixed(1) + ' ns' : 'N/A') + '</td><td>' + (cpoViable ? cpoLatency.toFixed(1) + ' ns' : 'N/A') + '</td></tr>';
         html += '</table>';
@@ -2388,22 +2388,22 @@
         // SVG Charts — Side by Side
         var powerData = [
             { label: 'Copper DAC', value: copperViable ? copperPower : 0, display: copperViable ? copperPower.toFixed(1) + ' W' : 'N/A', color: '#d97706' },
-            { label: 'Pluggable', value: plugViable ? plugPower : 0, display: plugViable ? plugPower.toFixed(1) + ' W' : 'N/A', color: '#7c3aed' },
+            { label: 'Pluggable', value: plugViable ? plugPower : 0, display: plugViable ? plugPower.toFixed(1) + ' W' : 'N/A', color: '#64748b' },
             { label: 'CPO', value: cpoViable ? cpoPower : 0, display: cpoViable ? cpoPower.toFixed(1) + ' W' : 'N/A', color: '#0891b2' }
         ];
         var costData = [
             { label: 'Copper DAC', value: copperViable ? copperAnnual : 0, display: copperViable ? fC(copperAnnual) : 'N/A', color: '#d97706' },
-            { label: 'Pluggable', value: plugViable ? plugAnnual : 0, display: plugViable ? fC(plugAnnual) : 'N/A', color: '#7c3aed' },
+            { label: 'Pluggable', value: plugViable ? plugAnnual : 0, display: plugViable ? fC(plugAnnual) : 'N/A', color: '#64748b' },
             { label: 'CPO', value: cpoViable ? cpoAnnual : 0, display: cpoViable ? fC(cpoAnnual) : 'N/A', color: '#0891b2' }
         ];
         var reachData = [
             { label: 'Copper DAC', value: copperMaxReach > 0 ? copperMaxReach : 0, display: copperMaxReach > 0 ? copperMaxReach + ' m' : 'N/A', color: '#d97706' },
-            { label: 'Pluggable', value: plugMaxReach, display: plugMaxReach + ' m', color: '#7c3aed' },
+            { label: 'Pluggable', value: plugMaxReach, display: plugMaxReach + ' m', color: '#64748b' },
             { label: 'CPO', value: cpoMaxReach, display: cpoMaxReach + ' m', color: '#0891b2' }
         ];
         var latencyData = [
             { label: 'Copper DAC', value: copperViable ? copperLatency : 0, display: copperViable ? copperLatency.toFixed(1) + ' ns' : 'N/A', color: '#d97706' },
-            { label: 'Pluggable', value: plugViable ? plugLatency : 0, display: plugViable ? plugLatency.toFixed(1) + ' ns' : 'N/A', color: '#7c3aed' },
+            { label: 'Pluggable', value: plugViable ? plugLatency : 0, display: plugViable ? plugLatency.toFixed(1) + ' ns' : 'N/A', color: '#64748b' },
             { label: 'CPO', value: cpoViable ? cpoLatency : 0, display: cpoViable ? cpoLatency.toFixed(1) + ' ns' : 'N/A', color: '#0891b2' }
         ];
 
@@ -2454,7 +2454,7 @@
                     plugE: plugViable ? plugAnnual * yr : 0, plugH: plugViable ? links * 15 * hwF : 0, plugM: plugViable ? plugAnnual * 0.12 * yr : 0
                 });
             }
-            html += '<table><tr><th scope="col">Year</th><th style="color:#0891b2;"  scope="col">CPO Energy</th><th style="color:#0891b2;"  scope="col">CPO HW</th><th style="color:#0891b2;"  scope="col">CPO Total</th><th style="color:#7c3aed;"  scope="col">Plug Energy</th><th style="color:#7c3aed;"  scope="col">Plug HW</th><th style="color:#7c3aed;"  scope="col">Plug Total</th></tr>';
+            html += '<table><tr><th scope="col">Year</th><th style="color:#0891b2;"  scope="col">CPO Energy</th><th style="color:#0891b2;"  scope="col">CPO HW</th><th style="color:#0891b2;"  scope="col">CPO Total</th><th style="color:#64748b;"  scope="col">Plug Energy</th><th style="color:#64748b;"  scope="col">Plug HW</th><th style="color:#64748b;"  scope="col">Plug Total</th></tr>';
             tcoTableData.forEach(function(r) {
                 var cT = r.cpoE + r.cpoH + r.cpoM;
                 var pT = r.plugE + r.plugH + r.plugM;

@@ -84,7 +84,15 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--apply', action='store_true',
                         help='write the repair; without it nothing is modified')
+    # --check is what every ship gate on this site types, and the v1.10.12 tool ACCEPTED it while
+    # writing 294 tokens backwards. Reporting is already the default, so this flag changes nothing —
+    # it exists so the word a caller types is a word this tool answers to rather than an error or,
+    # worse, a silent write. Naming it and refusing --check --apply keeps both readings honest.
+    parser.add_argument('--check', action='store_true',
+                        help='report drift and exit 1 on any (the default; accepted explicitly)')
     args = parser.parse_args()
+    if args.check and args.apply:
+        parser.error('--check reports and --apply writes: pick one')
 
     pages = sorted(Path(p) for p in glob.glob(str(ROOT / '*.html')))
     seen = scan(pages)
