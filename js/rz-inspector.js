@@ -67,7 +67,7 @@
     '.rz-inspector-v.state-energized{color:#86efac}' +
     '.rz-inspector-v.state-fault,.rz-inspector-v.state-tripped{color:#fca5a5}' +
     '.rz-inspector-v.state-standby,.rz-inspector-v.state-open{color:#fbbf24}' +
-    '.rz-inspector-v.state-maintenance,.rz-inspector-v.state-isolated{color:#c4b5fd}' +
+    '.rz-inspector-v.state-maintenance,.rz-inspector-v.state-isolated{color:#67e8f9}' +
     '.rz-inspector-pill{display:inline-block;padding:2px 8px;border-radius:999px;' +
       'font-family:JetBrains Mono,monospace;font-size:10px;font-weight:600;letter-spacing:.04em;' +
       'background:rgba(56,189,248,0.12);color:#7dd3fc;border:1px solid rgba(56,189,248,0.28)}' +
@@ -435,7 +435,7 @@
       return ' data-basis-param="' + esc(r.basis) + '"' + (r.params ? ' data-basis-params="' + esc([r.basis].concat(r.params).join(' ')) + '"' : '')
         + ' data-evidence="' + esc(evOf(r.basis)) + '" tabindex="0" role="button" style="--rz-ev:' + evColor(evOf(r.basis)) + '" title="' + esc(r.basis + ' · ' + evOf(r.basis)) + '"';
     }
-    var col = r.quality === 'simulated' ? '#8b7bd0' : r.quality === 'state' ? '#7dd3fc' : '#8fa2b8';
+    var col = r.quality === 'simulated' ? '#b0678f' : r.quality === 'state' ? '#7dd3fc' : '#8fa2b8';
     return ' data-rz-authored-basis="' + esc(r.declared || '') + '" style="--rz-ev:' + col + '" title="' + esc((r.quality || 'declared').toUpperCase() + ' · ' + (r.declared || '')) + '"';
   }
   function payloadRow(r) {

@@ -152,6 +152,41 @@ Consistent with the audit contract above: **do not label an unimplemented heuris
   - **Left for the owner:** `css/rz-finance-suite.css` still carries `--fs-acc:#6d28d9` /
     `--fs-acc2:#7c3aed`. That file re-skins five app surfaces at once, and the value has a written
     AA rationale behind it. Replacing a design-system accent is a decision, not a straggler.
+    **Closed in v3.6.1** — see below; the rationale turned out to be arithmetically wrong.
+
+- **A colour is not a string** (v3.6.1, 2026-09-11). The v3.6.0 sweep above was still the same
+  mistake it was fixing, one rung up: it chased the hexes it had a list of. The list was never the
+  problem. **1,238 literals across the tree were in the banned hue band** after v3.6.0 shipped —
+  `#a855f7`, `#4f46e5`, `#6366f1`, `#c4b5fd`, `#C3B0FA`, `#a5b4fc`, `#7B4FE0`, `#5b21b6`, `#4c1d95`,
+  `#581c87`, `#e9d5ff`, `#f5f3ff`, every one of their `rgb()`/`rgba()` forms, and a token named
+  `--prep-green` holding violet-800. A grep for `#8b5cf6` sees none of them.
+
+  `tools/test-purple-family.mjs` reads the **hue**. Any literal landing in [238°, 310°] with enough
+  saturation to be seen and enough lightness not to read as near-black is a finding, in `.html`,
+  `.css` and `.js` alike. Indigo-600 is inside the band on purpose: 243° is where the family hides
+  when someone says they have moved away from purple.
+
+  Four exemptions, each naming meaning that a different hue would destroy — **ISA-18.2 / EEMUA 191
+  alarm states** (shelved / suppressed / out-of-service / trouble live in the magenta-violet band by
+  standard, so an operator cannot confuse them with an active alarm), **the aurora mesh** (named in
+  CLAUDE.md as mint + gold + violet + blue + pink), **literal spectra** (a rainbow without its violet
+  end is wrong about physics), and **published perceptually-uniform colormaps** (viridis starts at
+  `#440154`; you may decline to use it, you may not edit its first stop).
+
+  Three things the sweep taught that the hex lists never could:
+  1. **A categorical palette stays distinguishable first and on-brand second.** Mapping every purple
+     onto the cyan family gave `rz-engine.js` a six-colour palette with three cyans in it. Where a
+     chart genuinely needs an eighth hue, it takes a real eighth hue (`#be185d`, 333°), not a fourth
+     shade of the site accent. Where the extra colour was never carrying data — a sixth donut slice
+     — it takes slate and stops pretending.
+  2. **A hue can be information.** Pump drive in the LTC lab was five shades of violet against a
+     teal liquid loop, which said "unrelated domain". It is a BRANCH of that loop, so it is now five
+     lightness steps of the same teal: same family, different member.
+  3. **The AA rationale was wrong.** The finance-suite comment said white on `#64748b` is "~3.9:1
+     (fails AA)" and used that to mandate violet-700. Measured, it is **4.76:1**. The pinning was
+     right for a different reason (no margin under semibold .82rem type) and cyan-800 gives 7.3:1,
+     so the violet was carrying an argument that did not hold. A number in a comment is a claim;
+     re-measure it before it justifies a colour.
 
 - **The chip idiom, and an over-correction of mine reversed** (v3.6.0, 2026-09-10). Owner, on
   `article-27.html` in LIGHT mode: *"masih banyak ai design slop lihat itu kotak highlight biru,

@@ -81,7 +81,7 @@ If an article could fit two series, use the **primary lens**:
 
 ---
 
-### 3. Future Forward (violet #a855f7)
+### 3. Future Forward (slate #64748b — v3.6.1; was violet #a855f7)
 
 **Landing page**: `future-forward.html`
 **File naming**: `FF-[N].html`

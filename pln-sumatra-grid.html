@@ -69,8 +69,8 @@
         .sg-tbl td { padding:.5rem .8rem; border-bottom:1px solid var(--sg-border); font-variant-numeric:tabular-nums slashed-zero; }
         .sg-tbl tr:last-child td { border-bottom:none; }
         .sg-tag { font-family:'JetBrains Mono',monospace; font-size:.56rem; font-weight:700; padding:1px 5px; border-radius:4px; text-transform:uppercase; }
-        .sg-tag.s { background:rgba(59,130,246,.16); color:#1d4ed8; } .sg-tag.p { background:rgba(239,68,68,.16); color:#b91c1c; } .sg-tag.dc { background:rgba(168,85,247,.16); color:#64748b; }
-        [data-theme="dark"] .sg-tag.s{color:#60a5fa}[data-theme="dark"] .sg-tag.p{color:#f87171}[data-theme="dark"] .sg-tag.dc{color:#c084fc}
+        .sg-tag.s { background:rgba(59,130,246,.16); color:#1d4ed8; } .sg-tag.p { background:rgba(239,68,68,.16); color:#b91c1c; } .sg-tag.dc { background:rgba(8,145,178,.16); color:#64748b; }
+        [data-theme="dark"] .sg-tag.s{color:#60a5fa}[data-theme="dark"] .sg-tag.p{color:#f87171}[data-theme="dark"] .sg-tag.dc{color:#22d3ee}
         .sg-tag[style*="color:#0891b2"], .sg-tag[style*="color: #0891b2"] { color:#155e75 !important; }
         [data-theme="dark"] .sg-tag[style*="color:#0891b2"], [data-theme="dark"] .sg-tag[style*="color: #0891b2"] { color:#22d3ee !important; }
         .sg-note { border:1px dashed var(--sg-border); border-radius:4px; background:var(--sg-inset); padding:.9rem 1.1rem; font-size:.8rem; color:var(--sg-muted); line-height:1.6; margin:1.2rem 0; }
@@ -134,7 +134,7 @@
             <span><i class="sg-line" style="border-top-color:#22d3ee;border-top-style:dashed;"></i> Batam island (separate)</span>
             <span><i class="sg-dot" style="background:#2563eb;"></i> Substation</span>
             <span><i class="sg-dot" style="background:#dc2626;"></i> Plant</span>
-            <span><i class="sg-dot" style="background:#a855f7;"></i> Data center</span>
+            <span><i class="sg-dot" style="background:#0891b2;"></i> Data center</span>
         </div>
 
         <div class="sg-note"><b>Batam is islanded.</b> The Batam-Bintan-Rempang-Galang (Barelang) 150 kV grid is <em>not</em> synchronously tied to the mainland Sumatra interconnection — it is its own system run by b'right PLN Batam, with <b>Medco Power's Panaran gas plants</b> and PLTU Tanjung Kasam as base-load, and the Nongsa Digital Park subsea-cable DC hub as a fast-growing, Singapore-adjacent AI/edge load.</div>
@@ -193,14 +193,14 @@
                 if(e.island) return { color:'#22d3ee', weight:2, opacity:.85, dashArray:'5 4' };
                 if(e.voltage===275) return { color:'#1d4ed8', weight:4, opacity:.9 };
                 if(e.voltage===150) return { color:'#3b82f6', weight:2.2, opacity:.8 };
-                return { color:'#a855f7', weight:1.5, opacity:.7, dashArray:'2 3' };
+                return { color:'#0891b2', weight:1.5, opacity:.7, dashArray:'2 3' };
             }
             G.edges.forEach(function(e){
                 var a=byId[e.from], b=byId[e.to]; if(!a||!b) return;
                 L.polyline([[a.lat,a.lng],[b.lat,b.lng]], edgeStyle(e)).addTo(map);
             });
             function nodeColor(n){
-                if(n.kind==='dc') return '#a855f7';
+                if(n.kind==='dc') return '#0891b2';
                 if(n.kind==='plant'){ return n.fuel==='hydro'?'#06b6d4':(n.fuel==='gas'?'#f59e0b':'#dc2626'); }
                 return n.voltage===275?'#1d4ed8':'#2563eb';
             }

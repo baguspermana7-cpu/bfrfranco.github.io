@@ -523,7 +523,7 @@
             '.rz-login-btn:hover{background:linear-gradient(135deg,rgba(125,221,180,0.25),rgba(125,221,180,0.15));transform:translateY(-1px);box-shadow:0 4px 15px rgba(125,221,180,0.2);}',
             '.rz-login-btn i{font-size:1rem;}',
             /* User button (logged in) */
-            '.rz-user-btn{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:10px;border:1px solid rgba(125,221,180,0.3);background:rgba(125,221,180,0.08);color:#c4b5fd;cursor:pointer;font-family:inherit;font-size:0.82rem;transition:all 0.3s;}',
+            '.rz-user-btn{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:10px;border:1px solid rgba(125,221,180,0.3);background:rgba(125,221,180,0.08);color:#7DDDB4;cursor:pointer;font-family:inherit;font-size:0.82rem;transition:all 0.3s;}',
             '.rz-user-btn:hover{background:rgba(125,221,180,0.15);}',
             '.rz-user-avatar{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#7DDDB4,#A8ECCF);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:#fff;}',
             '.rz-user-email{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}',
@@ -583,7 +583,7 @@
             '[data-theme="light"] .rz-demo-hint code{background:rgba(125,221,180,0.1) !important;color:#146B4A !important;}',
             '[data-theme="light"] .rz-demo-hint .rz-demo-label{color:#4FBF92 !important;}',
             '[data-theme="light"] .rz-pro-link{color:#4FBF92 !important;}',
-            '[data-theme="light"] .rz-pro-link:hover{color:#6d28d9 !important;}',
+            '[data-theme="light"] .rz-pro-link:hover{color:#2F7F63 !important;}',   /* v3.6.1 — was #6d28d9: the v1.134.20 mint sweep left the HOVER purple, so the one state a reader reaches by pointing at the link was the banned colour. A darker mint keeps the hover a deepening of the same hue rather than a jump to another one. */
             /* Pro link */
             '.rz-pro-link:hover{color:#A8ECCF !important;text-decoration:underline !important;}',
             '.rz-root-link .rz-lock-icon{font-size:.7em;margin-right:5px;opacity:.65;}',
@@ -641,8 +641,8 @@
                     '</div>' +
                     '<div class="rz-demo-hint" style="text-align:center;margin-top:14px;padding:10px 12px;border-radius:8px;background:rgba(125,221,180,0.12);border:1px solid rgba(125,221,180,0.25);font-size:0.78rem;color:#94a3b8;line-height:1.5;">' +
                         '<span class="rz-demo-label" style="color:#A8ECCF;font-weight:600;">Demo Account:</span><br>' +
-                        '<code style="background:rgba(125,221,180,0.15);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#c4b5fd;">demo@resistancezero.com</code> / ' +
-                        '<code style="background:rgba(125,221,180,0.15);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#c4b5fd;">demo2026</code>' +
+                        '<code style="background:rgba(125,221,180,0.15);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#7DDDB4;">demo@resistancezero.com</code> / ' +
+                        '<code style="background:rgba(125,221,180,0.15);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#7DDDB4;">demo2026</code>' +
                     '</div>' +
                 '</div>' +
                 '<div class="rz-success" id="rzModalSuccess">' +

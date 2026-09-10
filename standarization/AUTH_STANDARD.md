@@ -122,7 +122,7 @@ Each article with Pro Mode has its OWN login modal (separate from auth.js global
 </div>
 ```
 
-> **IMPORTANT**: The Terms & Privacy Policy line is **mandatory** on ALL login modals — both the shared auth.js modal and every page-specific inline modal. Use the page's accent color for link styling (e.g., `#8b5cf6` purple, `#dc2626` red, `#991b1b` dark red). This was a recurring issue found in FF-1, geopolitics-2/3, cx-calculator, rfs-readiness-workbench, and articles 19-21 (March 2026).
+> **IMPORTANT**: The Terms & Privacy Policy line is **mandatory** on ALL login modals — both the shared auth.js modal and every page-specific inline modal. Use the page's accent color for link styling (e.g., `#0e7490` instrument cyan, `#dc2626` red, `#991b1b` dark red — v3.6.1 replaced the `#8b5cf6` example: the whole violet family is banned and `tools/test-purple-family.mjs` enforces it by hue, so an example in that band would be an instruction to fail the gate). This was a recurring issue found in FF-1, geopolitics-2/3, cx-calculator, rfs-readiness-workbench, and articles 19-21 (March 2026).
 
 ### Login Handler Pattern
 

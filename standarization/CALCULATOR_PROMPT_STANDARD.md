@@ -37,7 +37,8 @@ Every article calculator on ResistanceZero follows a **unified architecture** do
 ```
 Article title:      [Full article title]
 Series:             [Future Forward | Engineering Journal | Global Analysis]
-Theme color:        [hex, e.g. #a855f7 for violet]
+Theme color:        [hex from the site palette, e.g. #0891b2 instrument cyan or #0f766e teal.
+                    NOT the 238-310 degree hue band: tools/test-purple-family.mjs fails any build in it.]
 Theme color RGB:    [e.g. 168, 85, 247]
 CSS prefix:         [e.g. ff1- or tgs- or hfx-]
 File name:          [e.g. future-forward-1.html]

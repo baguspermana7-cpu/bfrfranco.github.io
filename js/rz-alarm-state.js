@@ -34,9 +34,13 @@
     'unack':      { label: 'Unacknowledged alarm',    abbr: 'UNACK', alarmActive: true,  color: '#fca5a5' },
     'ack':        { label: 'Acknowledged alarm',      abbr: 'ACK',   alarmActive: true,  color: '#fbbf24' },
     'rtn_unack':  { label: 'Returned-to-normal (unack)', abbr: 'RTN', alarmActive: false, color: '#7dd3fc' },
+    /* Violet on SHLV/OOS is not decoration and does not go out with the purple sweeps: ISA-18.2 and
+       EEMUA 191 both put shelved and out-of-service states in the magenta/violet band precisely so
+       they cannot be read as one of the active-alarm colours above. Changing it would make this
+       page disagree with every real alarm system an operator has used. */
     'shelved':    { label: 'Shelved (operator)',      abbr: 'SHLV',  alarmActive: false, color: '#c4b5fd' },
     'suppressed': { label: 'Suppressed by design',    abbr: 'SUPP',  alarmActive: false, color: '#94a3b8' },
-    'oos':        { label: 'Out-of-service (maint.)', abbr: 'OOS',   alarmActive: false, color: '#C3B0FA' }
+    'oos':        { label: 'Out-of-service (maint.)', abbr: 'OOS',   alarmActive: false, color: '#94a3b8' }
   };
 
   /* ------------------------------------------------------------------ */

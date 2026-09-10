@@ -18,7 +18,9 @@ every surface re-skins** (the owner's "auto update ini semua" contract).
 1. **Tokens live in ONE file**: `css/rz-finance-suite.css` §1 (`--fs-bg0…--fs-cyn`,
    `--fs-sans/--fs-mono`, `--fs-r/rs/rx`). Palette = the Finance Terminal vocabulary
    (deep-slate surfaces, 1px hairlines, tabular JetBrains Mono numerics — the RZ
-   instrument aesthetic per `documentation/design.md`). Accent `#8b5cf6` (suite identity).
+   instrument aesthetic per `documentation/design.md`). Accent **cyan-800 `#155e75` / cyan-700
+   `#0e7490`** (v3.6.1 — was `#8b5cf6`, then `#6d28d9`/`#7c3aed`; the whole violet family is
+   banned and `tools/test-purple-family.mjs` now enforces it by hue).
 2. **A surface opts in** with `data-rz-suite` on `<html>` and loading the suite file.
    §2 remaps that surface's LOCAL var names onto `--fs-*` — `html[data-rz-suite]`
    (specificity 0,1,1) outranks the page's own `:root` (0,1,0), so the remap wins
@@ -32,8 +34,12 @@ every surface re-skins** (the owner's "auto update ini semua" contract).
 
 ## Accessibility notes
 
-- `.fs-btn.primary` uses `#6d28d9` (violet-700), NOT `--fs-acc`: white on `#8b5cf6`
-  is ~3.9:1 and fails WCAG AA. Keep any white-text-on-accent at ≥ violet-700.
+- `.fs-btn.primary` pins **`#155e75`** (cyan-800) rather than reading `--fs-acc`, and the reason
+  is worth stating exactly, because the version of this note that stood until v3.6.1 got the
+  arithmetic wrong. Measured on white: `#8b5cf6` **4.23:1** (fails AA), `#64748b` — what `--fs-acc`
+  resolves to in dark — **4.76:1** (passes AA, but with no margin at all under the semibold .82rem
+  this button sets), `#0e7490` **5.36:1**, `#155e75` **7.27:1**. The pin is about the missing
+  margin, not about a failure. Keep any white-text-on-accent at ≥ 7:1 here.
 - Signal colors (`--fs-grn/red/amb/blu/cyn`) signal STATE, never decoration (design.md).
 
 ## Terminal keyboard map (C2)

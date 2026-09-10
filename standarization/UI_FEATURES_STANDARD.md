@@ -701,7 +701,7 @@ The TIA-942 checklist supports 5 facility types alongside 4 tier levels. Each ch
 | ID | Label | Icon | Color |
 |---|---|---|---|
 | `ent` | Enterprise | `fa-building` | `#3b82f6` |
-| `colo` | Colocation | `fa-city` | `#8b5cf6` |
+| `colo` | Colocation | `fa-city` | `#64748b` |   <!-- v3.6.1: was #8b5cf6 -->
 | `hyper` | Hyperscale/Cloud | `fa-cloud` | `#06b6d4` |
 | `edge` | Edge/Micro | `fa-microchip` | `#f59e0b` |
 | `mod` | Modular/Prefab | `fa-cube` | `#10b981` |
@@ -769,7 +769,7 @@ All features support dark mode via `[data-theme="dark"]` selectors:
 
 | Component | Description |
 |-----------|-------------|
-| **Achievement Page** | 17 badges across 5 categories (Explorer, Calculator Pro, Knowledge Seeker, Standards Expert, Community). Purple #8b5cf6 theme. Responsive grid with lock/unlock animations. |
+| **Achievement Page** | 17 badges across 5 categories (Explorer, Calculator Pro, Knowledge Seeker, Standards Expert, Community). Slate #64748b theme (v3.6.1 — the purple #8b5cf6 it was written against is banned). Responsive grid with lock/unlock animations. |
 | **Tracker Script** | `rz-gamification.js` — lightweight vanilla JS loaded after auth.js. Auto-tracks page visits, calculator usage, article reads, shares. Toast notifications on unlock. |
 | **Knowledge Levels** | Novice (0-3) → Technician (4-6) → Engineer (7-10) → Architect (11-14) → Master (15-17) |
 | **localStorage Keys** | `rz_pages_visited`, `rz_calcs_used`, `rz_articles_read`, `rz_shares`, `rz_achievements`, `rz_used_dark` |

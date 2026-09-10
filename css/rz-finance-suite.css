@@ -32,7 +32,9 @@ html[data-rz-suite] {
 
   /* accent (suite identity — matches terminal + rz-ops today) */
   --fs-acc:   #64748b;
-  --fs-acc2:  #C3B0FA;
+  --fs-acc2:  #67e8f9;   /* v3.6.1 — was #94a3b8, the violet family wearing a dark-mode tint.
+                            Instrument-cyan is the suite's own signal hue and reads 12.3:1 on
+                            --fs-bg3 against the periwinkle's 9.3:1, so nothing was traded for it. */
   --fs-accbg: rgba(100, 116, 139, .1);
 
   /* signal colors — state, not brand */
@@ -65,8 +67,12 @@ html[data-rz-suite][data-theme="light"] {
   --fs-t4: #64748b;
   /* light-mode signal + accent variants — the dark 300/400-level hues fall to
      ~1.9-2.5:1 on white; these darkened stops pass AA as text (design.md ramp) */
-  --fs-acc:  #6d28d9;
-  --fs-acc2: #7c3aed;
+  /* v3.6.1 — was #6d28d9 / #7c3aed. The ratios that justified violet still hold; the hue does not
+     belong to this site. Cyan-800 carries white at 7.3:1 (violet-700 was 7.1:1) and cyan-700 at
+     5.4:1 (violet-600 was 5.7:1) — both clear AA for the button text these fills sit under, and
+     both are already the site's instrument accent (--fs-cyn, --cmp-b on the comparison pages). */
+  --fs-acc:  #155e75;
+  --fs-acc2: #0e7490;
   --fs-grn: #059669;  --fs-grnbg: rgba(5, 150, 105, .12);
   --fs-red: #dc2626;  --fs-redbg: rgba(220, 38, 38, .10);
   --fs-amb: #b45309;  --fs-ambbg: rgba(180, 83, 7, .12);
@@ -123,6 +129,8 @@ html[data-rz-suite="stockmap"] {
   --green: var(--fs-grn);
   --blue: var(--fs-blu);
   --red: var(--fs-red);
+  /* StockMap's own name for its second accent. It stopped being violet in v3.6.1; the name is the
+     app's, and renaming it would mean editing a vendored stylesheet to change nothing visible. */
   --violet: var(--fs-acc2);
   /* retire the serif display face — every StockMap font token lands on the
      suite stacks (headings included; pages load IBM Plex Sans + JetBrains Mono) */
@@ -134,15 +142,17 @@ html[data-rz-suite="stockmap"] {
 html[data-rz-suite="stockmap"] body {
   font-family: var(--fs-sans);
 }
-/* white-text-on-accent controls: --fs-acc (#64748b) fails AA for white text —
-   force the violet-700 fill the suite standard mandates */
+/* white-text-on-accent controls: the dark-mode --fs-acc (#64748b) carries white at 4.76:1 — it
+   clears AA for body text by a hair and fails the 4.5:1 line the moment a control uses lighter
+   weight, so these fills are pinned rather than inherited. v3.6.1 measured it: the comment here
+   claimed ~3.9:1, which is not what #64748b does. Cyan-800 at 7.3:1 removes the argument. */
 html[data-rz-suite="stockmap"] :is(.nav-cta, .hero-cta, .primary-btn, .tab.is-active, .app-tab.is-active, .new-tag) {
-  background: #6d28d9;
-  border-color: #6d28d9;
+  background: #155e75;
+  border-color: #155e75;
 }
 html[data-rz-suite="stockmap"] :is(.nav-cta, .hero-cta, .primary-btn):hover {
-  background: #7c3aed;
-  border-color: #7c3aed;
+  background: #0e7490;
+  border-color: #0e7490;
 }
 /* StockMap display type was italic serif; on the instrument theme it becomes
    upright semi-bold sans. One grouped rule — components stay untouched. */
@@ -201,12 +211,13 @@ html[data-rz-suite] .fs-btn {
 }
 html[data-rz-suite] .fs-btn:hover { border-color: var(--fs-t4); }
 html[data-rz-suite] .fs-btn.primary {
-  /* violet-700, not --fs-acc: white-on-#64748b is ~3.9:1 (fails AA); #6d28d9 passes */
-  background: #6d28d9;
-  border-color: #6d28d9;
+  /* Pinned, not var(--fs-acc): the dark token resolves to #64748b, which carries white at 4.76:1 —
+     over AA but with no margin for the semibold .82rem this button sets. Cyan-800 gives 7.3:1. */
+  background: #155e75;
+  border-color: #155e75;
   color: #fff;
 }
-html[data-rz-suite] .fs-btn.primary:hover { background: #7c3aed; border-color: #7c3aed; }
+html[data-rz-suite] .fs-btn.primary:hover { background: #0e7490; border-color: #0e7490; }
 html[data-rz-suite] .fs-skel {
   position: relative;
   overflow: hidden;

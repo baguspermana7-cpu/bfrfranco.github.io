@@ -32,7 +32,7 @@
       green: token("--green", "#1a8754"),
       blue: token("--blue", "#2563eb"),
       red: token("--red", "#dc2626"),
-      violet: token("--violet", "#7c3aed"),
+      violet: token("--violet", "#0e7490"),
       edge: dark ? "rgba(148, 163, 184, 0.28)" : "rgba(0, 0, 0, 0.12)",
       neutral: dark ? "rgba(148, 163, 184, 0.45)" : "rgba(92, 88, 80, 0.45)"
     };

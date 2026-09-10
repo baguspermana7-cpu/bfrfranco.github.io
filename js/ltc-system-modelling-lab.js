@@ -3396,7 +3396,7 @@
                             sensitivityCandidate('liquidCapture', 'Liquid Capture (%)', '#14b8a6', 'Shifts burden between liquid and air branches.', 1.2),
                             sensitivityCandidate('upsEff', 'UPS Efficiency (%)', '#f59e0b', 'Electrical conversion loss sensitivity.', 1.15),
                             sensitivityCandidate('distLoss', 'Distribution Loss (%)', '#d97706', 'Distribution chain loss overhead.', 1.1),
-                            sensitivityCandidate('controlQuality', 'Control Quality (%)', '#7B4FE0', 'Control quality impact on cooling efficiency realization.', 0.95),
+                            sensitivityCandidate('controlQuality', 'Control Quality (%)', '#be185d', 'Control quality impact on cooling efficiency realization.', 0.95),
                             sensitivityCandidate('airCop', 'Air Path COP', '#0284c7', 'Residual air branch efficiency response.', 0.9),
                             sensitivityCandidate('fanPower', 'Fan Power Budget (%IT)', '#16a34a', 'Configured airflow demand envelope.', 0.9)
                         ];
@@ -3413,10 +3413,10 @@
                         return [
                             sensitivityCandidate('liquidCapture', 'Liquid Capture (%)', '#0d9488', 'Primary thermal split between liquid and air.', 1.4),
                             sensitivityCandidate('airCop', 'Air Path COP', '#0284c7', 'Residual air-cooling efficiency burden.', 1.2),
-                            sensitivityCandidate('pumpEff', 'Pump Efficiency (%)', '#7c3aed', 'Hydraulic conversion efficiency.', 1.05),
+                            sensitivityCandidate('pumpEff', 'Pump Efficiency (%)', '#115e59', 'Hydraulic conversion efficiency.', 1.05),
                             sensitivityCandidate('fanPower', 'Fan Power Budget (%IT)', '#16a34a', 'Airflow fan branch demand.', 1.0),
                             sensitivityCandidate('economizerHours', 'Economizer Availability (%)', '#0ea5e9', 'Free-cooling effect on thermal branch.', 0.95),
-                            sensitivityCandidate('controlQuality', 'Control Quality (%)', '#7B4FE0', 'Control-led thermal optimization response.', 0.9)
+                            sensitivityCandidate('controlQuality', 'Control Quality (%)', '#be185d', 'Control-led thermal optimization response.', 0.9)
                         ];
                     }
                     if (nodeId === 'elec') {
@@ -3431,7 +3431,7 @@
                         return [
                             sensitivityCandidate('itLoadMw', 'IT Load (MW)', '#64748b', 'Aux baseline scales with facility size.', 1.2),
                             sensitivityCandidate('monitoring', 'Monitoring Coverage (%)', '#475569', 'Monitoring quality affects auxiliary overhead.', 1.1),
-                            sensitivityCandidate('controlQuality', 'Control Quality (%)', '#7B4FE0', 'Control maturity impact on support burden.', 0.95),
+                            sensitivityCandidate('controlQuality', 'Control Quality (%)', '#be185d', 'Control maturity impact on support burden.', 0.95),
                             sensitivityCandidate('coefFutureTech', 'Future Tech Multiplier (%)', '#0ea5e9', 'Future efficiency drift on support load.', 0.8)
                         ];
                     }
@@ -3440,18 +3440,18 @@
                             sensitivityCandidate('liquidCapture', 'Liquid Capture (%)', '#0d9488', 'Captured heat fraction feeding liquid loop.', 1.5),
                             sensitivityCandidate('coefCduLoss', 'CDU Loss Coefficient (%)', '#14b8a6', 'CDU parasitic term contribution.', 1.25),
                             sensitivityCandidate('coefHeatTransfer', 'Heat Transfer Effectiveness (%)', '#06b6d4', 'Heat-transfer efficiency in liquid domain.', 1.05),
-                            sensitivityCandidate('controlQuality', 'Control Quality (%)', '#7B4FE0', 'Control effect on liquid COP realization.', 0.95),
+                            sensitivityCandidate('controlQuality', 'Control Quality (%)', '#be185d', 'Control effect on liquid COP realization.', 0.95),
                             sensitivityCandidate('supplyTemp', 'Liquid Supply Temp (C)', '#0284c7', 'Supply setpoint shift affecting liquid COP.', 0.9),
                             sensitivityCandidate('returnTemp', 'Liquid Return Temp (C)', '#0369a1', 'Return setpoint shift affecting deltaT and flow.', 0.9)
                         ];
                     }
                     if (nodeId === 'pump') {
                         return [
-                            sensitivityCandidate('pumpHead', 'Pump Head (m)', '#7c3aed', 'Direct hydraulic work requirement.', 1.5),
-                            sensitivityCandidate('pumpEff', 'Pump Efficiency (%)', '#7B4FE0', 'Efficiency loss amplification on pump kW.', 1.45),
-                            sensitivityCandidate('hydraulicMargin', 'Hydraulic Margin (%)', '#a855f7', 'Design safety margin overhead.', 1.2),
-                            sensitivityCandidate('coefPipeLoss', 'Pipe Loss Multiplier', '#9333ea', 'Pressure-drop multiplier impact.', 1.15),
-                            sensitivityCandidate('highDensityShare', 'High-Density Share (%)', '#6d28d9', 'Density-driven hydraulic stress influence.', 0.95)
+                            sensitivityCandidate('pumpHead', 'Pump Head (m)', '#0f766e', 'Direct hydraulic work requirement.', 1.5),
+                            sensitivityCandidate('pumpEff', 'Pump Efficiency (%)', '#115e59', 'Efficiency loss amplification on pump kW.', 1.45),
+                            sensitivityCandidate('hydraulicMargin', 'Hydraulic Margin (%)', '#134e4a', 'Design safety margin overhead.', 1.2),
+                            sensitivityCandidate('coefPipeLoss', 'Pipe Loss Multiplier', '#0d9488', 'Pressure-drop multiplier impact.', 1.15),
+                            sensitivityCandidate('highDensityShare', 'High-Density Share (%)', '#14b8a6', 'Density-driven hydraulic stress influence.', 0.95)
                         ];
                     }
                     if (nodeId === 'air') {
@@ -3459,7 +3459,7 @@
                             sensitivityCandidate('liquidCapture', 'Liquid Capture (%)', '#0284c7', 'Residual uncaptured heat moved to air path.', 1.45),
                             sensitivityCandidate('airCop', 'Air Path COP', '#0ea5e9', 'Air-side COP impact on electrical demand.', 1.35),
                             sensitivityCandidate('economizerHours', 'Economizer Availability (%)', '#1d4ed8', 'Outdoor-air/economizer relief factor.', 1.1),
-                            sensitivityCandidate('controlQuality', 'Control Quality (%)', '#7B4FE0', 'Control-induced air branch efficiency shift.', 0.95),
+                            sensitivityCandidate('controlQuality', 'Control Quality (%)', '#be185d', 'Control-induced air branch efficiency shift.', 0.95),
                             sensitivityCandidate('supplyTemp', 'Liquid Supply Temp (C)', '#0369a1', 'Setpoint coupling to residual thermal burden.', 0.8)
                         ];
                     }
@@ -3474,7 +3474,7 @@
                     }
                     return [
                         sensitivityCandidate('itLoadMw', 'IT Load (MW)', '#2563eb', 'Primary load scaling term.', 1.1),
-                        sensitivityCandidate('controlQuality', 'Control Quality (%)', '#7B4FE0', 'Control quality effect.', 1.0),
+                        sensitivityCandidate('controlQuality', 'Control Quality (%)', '#be185d', 'Control quality effect.', 1.0),
                         sensitivityCandidate('airCop', 'Air Path COP', '#0284c7', 'Cooling efficiency influence.', 0.9)
                     ];
                 }
@@ -3711,7 +3711,7 @@
                     focus = flows.thermal;
                     var thermalParts = [
                         { label: 'Liquid Loop', value: flows.liquidCore, color: '#0d9488', note: 'Liquid cooling power excluding pump drive.' },
-                        { label: 'Pump Drive', value: flows.pump, color: '#7c3aed', note: 'Hydraulic pumping electrical demand.' },
+                        { label: 'Pump Drive', value: flows.pump, color: '#115e59', note: 'Hydraulic pumping electrical demand.' },
                         { label: 'Air Path', value: flows.air, color: '#0284c7', note: 'Residual heat air-cooling burden.' },
                         { label: 'Fan Power', value: flows.fan, color: '#16a34a', note: 'CRAH/CRAC and airflow power share.' }
                     ];
@@ -3720,7 +3720,7 @@
                     spec.nodes = [
                         { id: 't_total', label: 'Thermal Management', col: 0, color: '#0891b2' },
                         { id: 't_liq', label: 'Liquid Loop', col: 1, color: '#0d9488' },
-                        { id: 't_pump', label: 'Pump Drive', col: 1, color: '#7c3aed' },
+                        { id: 't_pump', label: 'Pump Drive', col: 1, color: '#115e59' },
                         { id: 't_air', label: 'Air Path', col: 1, color: '#0284c7' },
                         { id: 't_fan', label: 'Fan Power', col: 1, color: '#16a34a' }
                     ];
@@ -3836,23 +3836,28 @@
                     ];
                 } else if (nodeId === 'pump') {
                     focus = flows.pump;
+                    /* v3.6.1 — this whole breakdown used to be five shades of violet, which is the
+                       banned family and also the wrong information: pump drive is a BRANCH of the
+                       liquid loop, not a separate domain. It is now five lightness steps of the same
+                       teal the liquid loop draws in, so the chart says "same family, different
+                       member" instead of "unrelated thing that happens to be purple". */
                     var pumpFactors = scaleDetailParts([
-                        { label: 'Static Head Requirement', value: Math.max(input.pumpHead || 1, 1), color: '#7c3aed', note: 'Nominal vertical/lift and base hydraulic head.' },
-                        { label: 'Pipe Friction Multiplier', value: Math.max((input.coefPipeLoss || 1) - 0.85, 0.15), color: '#7B4FE0', note: 'Pipe complexity and pressure-drop multiplier.' },
-                        { label: 'Hydraulic Margin', value: Math.max((input.hydraulicMargin || 0) / 100, 0.05), color: '#a855f7', note: 'Design safety margin for uncertain operating envelope.' },
-                        { label: 'Redundancy Overhead', value: Math.max(redundancyFactor - 1, 0.05), color: '#9333ea', note: 'N+1 / 2N redundancy circulation overhead.' },
-                        { label: 'Density Stress Effect', value: Math.max((internals.densityStress || 1) - 1, 0.05), color: '#6d28d9', note: 'Rack density impact on effective pumping requirement.' }
+                        { label: 'Static Head Requirement', value: Math.max(input.pumpHead || 1, 1), color: '#0f766e', note: 'Nominal vertical/lift and base hydraulic head.' },
+                        { label: 'Pipe Friction Multiplier', value: Math.max((input.coefPipeLoss || 1) - 0.85, 0.15), color: '#115e59', note: 'Pipe complexity and pressure-drop multiplier.' },
+                        { label: 'Hydraulic Margin', value: Math.max((input.hydraulicMargin || 0) / 100, 0.05), color: '#134e4a', note: 'Design safety margin for uncertain operating envelope.' },
+                        { label: 'Redundancy Overhead', value: Math.max(redundancyFactor - 1, 0.05), color: '#0d9488', note: 'N+1 / 2N redundancy circulation overhead.' },
+                        { label: 'Density Stress Effect', value: Math.max((internals.densityStress || 1) - 1, 0.05), color: '#14b8a6', note: 'Rack density impact on effective pumping requirement.' }
                     ], focus);
                     spec.title = 'Pump Drive | Hydraulic Driver Detail';
                     spec.subtitle = 'Pump branch decomposition by hydraulic design and reliability drivers.';
                     spec.nodes = [
-                        { id: 'p_h1', label: 'Static Head', col: 0, color: '#7c3aed' },
-                        { id: 'p_h2', label: 'Pipe Friction', col: 0, color: '#7B4FE0' },
-                        { id: 'p_h3', label: 'Hydraulic Margin', col: 0, color: '#a855f7' },
-                        { id: 'p_h4', label: 'Redundancy', col: 0, color: '#9333ea' },
-                        { id: 'p_h5', label: 'Density Stress', col: 0, color: '#6d28d9' },
-                        { id: 'p_solver', label: 'Hydraulic Solver', col: 1, color: '#7c3aed' },
-                        { id: 'p_out', label: 'Pump Drive', col: 2, color: '#7c3aed' }
+                        { id: 'p_h1', label: 'Static Head', col: 0, color: '#0f766e' },
+                        { id: 'p_h2', label: 'Pipe Friction', col: 0, color: '#115e59' },
+                        { id: 'p_h3', label: 'Hydraulic Margin', col: 0, color: '#134e4a' },
+                        { id: 'p_h4', label: 'Redundancy', col: 0, color: '#0d9488' },
+                        { id: 'p_h5', label: 'Density Stress', col: 0, color: '#14b8a6' },
+                        { id: 'p_solver', label: 'Hydraulic Solver', col: 1, color: '#0f766e' },
+                        { id: 'p_out', label: 'Pump Drive', col: 2, color: '#115e59' }
                     ];
                     spec.links = [
                         { from: 'p_h1', to: 'p_solver', value: pumpFactors[0].value, color: pumpFactors[0].color, label: pumpFactors[0].label },
@@ -3860,7 +3865,7 @@
                         { from: 'p_h3', to: 'p_solver', value: pumpFactors[2].value, color: pumpFactors[2].color, label: pumpFactors[2].label },
                         { from: 'p_h4', to: 'p_solver', value: pumpFactors[3].value, color: pumpFactors[3].color, label: pumpFactors[3].label },
                         { from: 'p_h5', to: 'p_solver', value: pumpFactors[4].value, color: pumpFactors[4].color, label: pumpFactors[4].label },
-                        { from: 'p_solver', to: 'p_out', value: focus, color: '#7c3aed', label: 'Pump drive net power' }
+                        { from: 'p_solver', to: 'p_out', value: focus, color: '#115e59', label: 'Pump drive net power' }
                     ];
                     spec.rows = rowsFromParts(pumpFactors, focus);
                     spec.formulas = [
@@ -4551,7 +4556,7 @@
                 var specs = [
                     { key: 'pue', label: 'PUE', digits: 3, color: '#2563eb' },
                     { key: 'cop', label: 'COP', digits: 2, color: '#0891b2' },
-                    { key: 'opex', label: 'Net OPEX', digits: 0, color: '#7c3aed' },
+                    { key: 'opex', label: 'Net OPEX', digits: 0, color: '#115e59' },
                     { key: 'carbon', label: 'Carbon', digits: 0, color: '#d97706' },
                     { key: 'risk', label: 'Risk', digits: 1, color: '#dc2626' }
                 ];
@@ -4913,7 +4918,7 @@
                 var thermal = mids[1];
                 var rights = [
                     { id: 'liq', label: 'Liquid', value: flows.liquidCore, x: rightX, y: 104, h: 20, color: '#0d9488' },
-                    { id: 'pump', label: 'Pump', value: flows.pump, x: rightX, y: 136, h: 14, color: '#7c3aed' },
+                    { id: 'pump', label: 'Pump', value: flows.pump, x: rightX, y: 136, h: 14, color: '#115e59' },
                     { id: 'air', label: 'Air', value: flows.air, x: rightX, y: 164, h: 14, color: '#0284c7' },
                     { id: 'fan', label: 'Fan', value: flows.fan, x: rightX, y: 192, h: 14, color: '#16a34a' }
                 ];
@@ -5058,7 +5063,7 @@
                 var dist = mcState.dist;
                 var specs = [
                     { key: 'pue', label: 'PUE Distribution', digits: 3, color: '#2563eb' },
-                    { key: 'opex', label: 'Net OPEX Distribution', digits: 0, color: '#7c3aed' }
+                    { key: 'opex', label: 'Net OPEX Distribution', digits: 0, color: '#115e59' }
                 ];
                 var w = 680;
                 var h = 250;
@@ -8049,7 +8054,7 @@
                         ];
                         var partB = [
                             { key: 'liquidCore', color: '#0d9488', label: 'Liquid' },
-                            { key: 'pump', color: '#7c3aed', label: 'Pump' },
+                            { key: 'pump', color: '#115e59', label: 'Pump' },
                             { key: 'air', color: '#0284c7', label: 'Air' },
                             { key: 'fan', color: '#16a34a', label: 'Fan' }
                         ];
@@ -8123,7 +8128,7 @@
                 var thermalNode = midNodes[1];
                 var rightNodes = [
                     { id: 'liq', label: 'Liquid Loop', value: flows.liquidCore, x: rightX, y: 150, h: 30, color: '#0d9488' },
-                    { id: 'pump', label: 'Pump Drive', value: flows.pump, x: rightX, y: 198, h: 20, color: '#7c3aed' },
+                    { id: 'pump', label: 'Pump Drive', value: flows.pump, x: rightX, y: 198, h: 20, color: '#115e59' },
                     { id: 'air', label: 'Air Path', value: flows.air, x: rightX, y: 234, h: 20, color: '#0284c7' },
                     { id: 'fan', label: 'Fan Power', value: flows.fan, x: rightX, y: 270, h: 20, color: '#16a34a' }
                 ];

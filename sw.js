@@ -200,7 +200,7 @@ function offlineHTML() {
     '<style>' +
       'body{font-family:IBM Plex Sans,-apple-system,sans-serif;display:flex;align-items:center;' +
       'justify-content:center;min-height:100vh;margin:0;' +
-      'background:linear-gradient(180deg,#0f172a 0%,#1e1b4b 50%,#0f172a 100%);' +
+      'background:linear-gradient(180deg,#0f172a 0%,#0f2a33 50%,#0f172a 100%);' +
       'color:#f1f5f9;text-align:center;padding:2rem}' +
       'h1{background:linear-gradient(120deg,#7DDDB4 0%,#fbbf24 100%);' +
       '-webkit-background-clip:text;background-clip:text;color:transparent;' +

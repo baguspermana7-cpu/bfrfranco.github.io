@@ -2465,7 +2465,7 @@ section {
 }
 
 .exp-number.gradient-text {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #667eea;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -2830,7 +2830,7 @@ section {
 
 /* Gradient Text Effect */
 .gradient-text {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #667eea;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -4166,7 +4166,7 @@ section {
 .search-result-icon.geopolitics { background: #ef4444; }
 .search-result-icon.analysis { background: #f97316; }
 .search-result-icon.leadership { background: #14b8a6; }
-.search-result-icon.business { background: #6366f1; }
+.search-result-icon.business { background: #0284c7; }   /* v3.6.1 — was indigo #6366f1; the eight category hues had no blue and one banned family */
 
 /* Search: Match Highlighting */
 .search-highlight {
@@ -5638,7 +5638,7 @@ html.rz-rainbow .case-card::after { opacity: .95; }
 .metric-card:nth-child(4n+2), .oe-card:nth-child(6n+2), .case-card:nth-child(3n+2) { --card-accent: rgba(16,185,129,0.5); }
 .metric-card:nth-child(4n+3), .oe-card:nth-child(6n+3), .case-card:nth-child(3n+3) { --card-accent: rgba(245,158,11,0.5); }
 .metric-card:nth-child(4n),   .oe-card:nth-child(6n+4) { --card-accent: rgba(100, 116, 139,0.5); }
-.oe-card:nth-child(6n+5) { --card-accent: rgba(217,70,239,0.5); }
+.oe-card:nth-child(6n+5) { --card-accent: rgba(244,114,182,0.5); }
 .oe-card:nth-child(6n)   { --card-accent: rgba(45,212,191,0.5); }
 
 /* -- Gradient text on H1 with slow hue shift (linear.app style) -- */
@@ -6384,7 +6384,7 @@ p a[href$="terms.html"], p a[href$="privacy.html"], .footer p a { text-decoratio
    "privileged / withheld" beside the mint that marks granted access — and unlike
    the purple it replaces, both values clear WCAG AA on the surface they actually
    sit on: 7.6:1 on the light dropdown's white, 9.7:1 on the dark #12121f. The old
-   #C3B0FA measured 2.7:1 on white, so this was an accessibility defect as much as
+   #94a3b8 measured 2.7:1 on white, so this was an accessibility defect as much as
    a brand one. Light is written as :root:not([data-theme="dark"]) — a bare :root
    would out-cascade the dark block (see CLAUDE.md, the v1.47.x cascade bug). */
 :root:not([data-theme="dark"]) { --rz-restricted: #7A4800; }
@@ -6394,10 +6394,16 @@ p a[href$="terms.html"], p a[href$="privacy.html"], .footer p a { text-decoratio
    .oe-*-violet is one slot in an eight-hue CATEGORICAL family (emerald / blue /
    amber / violet / cyan / red / teal / orange), so the colour carries data, not
    brand — but its two values were exactly the retired Anthropic pair (#7C3AED
-   light, #C3B0FA dark). ANTI_VIBECODE_STANDARD §A rule 3 allows the semantic to
+   light, #94a3b8 dark). ANTI_VIBECODE_STANDARD §A rule 3 allows the semantic to
    survive and requires the raw pill colour to go, so the slot keeps its identity
    through a named token whose value was re-chosen: deeper on light, lighter on
    dark, both a clear step off the banned pair and both better contrast than what
    they replace (7.7:1 vs 5.7:1 on white; 9.3:1 vs 6.6:1 on #0F172A). */
-:root:not([data-theme="dark"]) { --oe-violet: #5B34C4; }
-[data-theme="dark"]            { --oe-violet: #C3B0FA; }
+/* v3.6.1 — the slot's hue moved again, and this time out of the family entirely. #5B34C4 was
+   chosen in v1.134.21 as "a clear step off the banned pair", but a step inside violet is still
+   violet: tools/test-purple-family.mjs reads the HUE, and 262° is 262° whichever hex spells it.
+   The eight-hue categorical family needs eight DISTINGUISHABLE hues, not eight approved ones, so
+   the slot takes rose — 333°, clear of the red slot at 0° and of every other member. The class
+   name stays `.oe-*-violet` because it is written into pages; the token is what carries colour. */
+:root:not([data-theme="dark"]) { --oe-violet: #be185d; }
+[data-theme="dark"]            { --oe-violet: #f9a8d4; }

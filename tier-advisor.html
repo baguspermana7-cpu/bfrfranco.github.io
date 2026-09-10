@@ -90,11 +90,11 @@
 
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #5b21b6 0%, #64748b 50%, #C3B0FA 100%);
-            --secondary-gradient: linear-gradient(135deg, #64748b 0%, #5b21b6 100%);
-            --dark-purple: #5b21b6;
+            --primary-gradient: linear-gradient(135deg, #155e75 0%, #64748b 50%, #94a3b8 100%);
+            --secondary-gradient: #64748b;
+            --deep-ink: #155e75;   /* v3.6.1 — was --dark-purple #155e75 */
             --medium-purple: #64748b;
-            --light-purple: #C3B0FA;
+            --light-purple: #94a3b8;
             --accent-purple: #64748b;
             --accent-gold: #f59e0b;
             --accent-emerald: #10b981;
@@ -107,7 +107,7 @@
             --text-secondary: #495057;
             --text-muted: #6c757d;
             --glass-bg: rgba(255,255,255,0.85);
-            --glass-bg-dark: rgba(91,33,182,0.95);
+            --glass-bg-dark: rgba(21,94,117,0.95);
             --glass-border: rgba(100, 116, 139,0.1);
             --glass-blur: none;
             --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
@@ -137,24 +137,24 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
         body { font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; line-height: 1.6; }
-        .page-background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background: radial-gradient(ellipse at top right, rgba(100, 116, 139,0.08) 0%, transparent 50%), radial-gradient(ellipse at bottom left, rgba(91,33,182,0.05) 0%, transparent 50%), linear-gradient(rgba(100, 116, 139,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(100, 116, 139,0.02) 1px, transparent 1px); background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px; }
+        .page-background { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background: radial-gradient(ellipse at top right, rgba(100, 116, 139,0.08) 0%, transparent 50%), radial-gradient(ellipse at bottom left, rgba(21,94,117,0.05) 0%, transparent 50%), linear-gradient(rgba(100, 116, 139,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(100, 116, 139,0.02) 1px, transparent 1px); background-size: 100% 100%, 100% 100%, 50px 50px, 50px 50px; }
         .navbar { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: var(--glass-bg); backdrop-filter: var(--glass-blur); border-bottom: 1px solid var(--glass-border); box-shadow: var(--shadow-md); }
         .nav-container { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; max-width: 1400px; margin: 0 auto; }
-        .nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--dark-purple); }
-        .nav-logo { width: 44px; height: 44px; background: linear-gradient(135deg, #64748b 0%, #C3B0FA 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; color: white; box-shadow: 0 4px 12px rgba(100, 116, 139,0.3); letter-spacing: -0.5px; }
+        .nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--deep-ink); }
+        .nav-logo { width: 44px; height: 44px; background: #64748b; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 11px; color: white; box-shadow: 0 4px 12px rgba(100, 116, 139,0.3); letter-spacing: -0.5px; }
         .nav-title { font-weight: 700; font-size: 1.1rem; color: var(--text-primary); }
         .nav-subtitle { font-size: 0.75rem; color: var(--text-muted); }
         .nav-links { display: flex; gap: 1.5rem; align-items: center; }
         .nav-link { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; font-weight: 500; padding: 8px 0; transition: color 0.3s; }
-        .nav-link:hover { color: var(--dark-purple); }
+        .nav-link:hover { color: var(--deep-ink); }
         .nav-back { display: flex; align-items: center; gap: 8px; padding: 10px 20px; background: var(--primary-gradient); border: none; border-radius: 8px; color: white; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: all 0.3s; box-shadow: 0 4px 12px rgba(100, 116, 139,0.25); }
         .nav-back:hover { transform: translateY(-2px); }
         .nav-auth-wrap { position: relative; margin-left: 0.5rem; }
-        .nav-login-btn { display: flex; align-items: center; gap: 6px; padding: 8px 18px; background: linear-gradient(135deg, #64748b, #a855f7); border: none; border-radius: 8px; color: white; font-size: 0.82rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.3s; box-shadow: 0 3px 10px rgba(100, 116, 139,0.3); white-space: nowrap; }
+        .nav-login-btn { display: flex; align-items: center; gap: 6px; padding: 8px 18px; background: #64748b; border: none; border-radius: 8px; color: white; font-size: 0.82rem; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.3s; box-shadow: 0 3px 10px rgba(100, 116, 139,0.3); white-space: nowrap; }
         .nav-login-btn:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(100, 116, 139,0.4); }
         .nav-user-btn { display: flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; background: rgba(100, 116, 139,0.08); border: 1px solid rgba(100, 116, 139,0.25); border-radius: 50px; cursor: pointer; transition: all 0.3s; font-family: inherit; color: var(--text-primary); }
         .nav-user-btn:hover { background: rgba(100, 116, 139,0.14); }
-        .nav-user-avatar { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #64748b, #a855f7); display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem; font-weight: 700; }
+        .nav-user-avatar { width: 30px; height: 30px; border-radius: 50%; background: #64748b; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem; font-weight: 700; }
         .nav-user-email { font-size: 0.8rem; font-weight: 500; color: var(--text-secondary); max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .nav-user-chevron { font-size: 0.6rem; color: var(--text-muted); transition: transform 0.3s; }
         .nav-user-btn.open .nav-user-chevron { transform: rotate(180deg); }
@@ -162,7 +162,7 @@
         .nav-user-dropdown.show { display: block; }
         .nav-dd-header { padding: 14px 16px; border-bottom: 1px solid #f1f5f9; }
         .nav-dd-tier-badge { display: inline-flex; padding: 3px 10px; border-radius: 50px; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 6px; }
-        .nav-dd-tier-badge.pro { background: linear-gradient(135deg,#64748b,#a855f7); color: white; }
+        .nav-dd-tier-badge.pro { background: #64748b; color: white; }
         .nav-dd-email { font-size: 0.78rem; color: #64748b; word-break: break-all; }
         .nav-dd-logout { display: flex; align-items: center; gap: 8px; width: 100%; padding: 12px 16px; border: none; background: none; font-size: 0.82rem; font-weight: 500; color: #ef4444; cursor: pointer; font-family: inherit; transition: background 0.2s; }
         .nav-dd-logout:hover { background: #fef2f2; }
@@ -173,7 +173,7 @@
         .main-content { position: relative; z-index: 10; padding-top: 80px; }
         .hero { padding: 3rem 2rem 2rem; text-align: center; max-width: 900px; margin: 0 auto; }
         .hero-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: linear-gradient(135deg, rgba(100, 116, 139,0.1), rgba(100, 116, 139,0.05)); border: 1px solid rgba(100, 116, 139,0.3); border-radius: 4px; font-size: 0.8rem; color: var(--accent-purple); font-weight: 600; margin-bottom: 1.5rem; }
-        .hero h1 { font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 800; background: linear-gradient(135deg, #64748b 0%, #5b21b6 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 1rem; }
+        .hero h1 { font-size: clamp(2rem, 4vw, 2.8rem); font-weight: 800; background: #64748b; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 1rem; }
         .hero p { font-size: 1.05rem; color: var(--text-secondary); max-width: 700px; margin: 0 auto; }
         .quick-stats { display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem; flex-wrap: wrap; }
         .quick-stat { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--text-muted); }
@@ -239,10 +239,10 @@
         .pue-mode-bar { display: flex; gap: 0; background: #f1f5f9; border-radius: 10px; padding: 3px; border: 1px solid #e2e8f0; }
         .pue-toolbar-btn { padding: 0.55rem 1.2rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 700; font-size: 0.82rem; font-family: inherit; transition: all 0.25s; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
         .pue-btn-free { background: transparent; color: #64748b; }
-        .pue-btn-free.active { background: linear-gradient(135deg, #64748b, #C3B0FA); color: white; box-shadow: 0 2px 8px rgba(100, 116, 139,0.3); }
+        .pue-btn-free.active { background: #64748b; color: white; box-shadow: 0 2px 8px rgba(100, 116, 139,0.3); }
         .pue-btn-free:not(.active):hover { background: rgba(100, 116, 139,0.08); color: #64748b; }
         .pue-btn-pro { background: transparent; color: #64748b; }
-        .pue-btn-pro.active { background: linear-gradient(135deg, #64748b, #a855f7); color: white; box-shadow: 0 2px 8px rgba(100, 116, 139,0.3); }
+        .pue-btn-pro.active { background: #64748b; color: white; box-shadow: 0 2px 8px rgba(100, 116, 139,0.3); }
         .pue-btn-pro:not(.active):hover { background: rgba(100, 116, 139,0.08); color: #64748b; }
         .pue-btn-pro.locked-hint { position: relative; }
         .pue-btn-pro.locked-hint::after { content: ''; position: absolute; top: -2px; right: -2px; width: 8px; height: 8px; background: #f59e0b; border-radius: 50%; border: 2px solid #f1f5f9; }
@@ -254,7 +254,7 @@
         .pue-btn-pdf.disabled { opacity: 0.45; pointer-events: none; }
         .pue-mode-indicator { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px; padding: 3px 10px; border-radius: 50px; display: none; }
         .pue-mode-indicator.free-active { display: inline-flex; background: rgba(100, 116, 139,0.1); color: #64748b; }
-        .pue-mode-indicator.pro-active { display: inline-flex; background: rgba(124,58,237,0.1); color: #64748b; }
+        .pue-mode-indicator.pro-active { display: inline-flex; background: rgba(14,116,144,0.1); color: #64748b; }
         .pro-section { position: relative; }
         .pro-section.locked > *:not(.pro-overlay) { filter: blur(6px); user-select: none; pointer-events: none; }
         .pro-overlay { display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 10; background: rgba(255,255,255,0.7); backdrop-filter: blur(2px); border-radius: 16px; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem; pointer-events: all; cursor: pointer; }
@@ -262,7 +262,7 @@
         .pro-overlay i { font-size: 2rem; color: var(--accent-purple); }
         .pro-overlay-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); }
         .pro-overlay-desc { font-size: 0.8rem; color: var(--text-muted); text-align: center; max-width: 260px; }
-        .pro-overlay-btn { padding: 8px 20px; background: linear-gradient(135deg, #64748b, #a855f7); border: none; border-radius: 8px; color: white; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .pro-overlay-btn { padding: 8px 20px; background: #64748b; border: none; border-radius: 8px; color: white; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.3s; }
         .pro-overlay-btn:hover { transform: translateY(-1px); }
         .pro-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; background: rgba(100,116,139,.12);border:1px solid rgba(100,116,139,.42); color:#64748b; font-size: 0.6rem; font-weight: 700; border-radius: 4px; letter-spacing: 0.5px; vertical-align: middle; }
         @keyframes modalSlideIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
@@ -329,7 +329,7 @@
 :root:not([data-theme="dark"]) div > p > a[href$="terms.html"], :root:not([data-theme="dark"]) div > p > a[href$="privacy.html"] { color:#64748b !important; }
 :root:not([data-theme="dark"]) .disc-fine a { color:#1d4ed8 !important; }
 [data-theme="dark"] #btnProMode { color:#94a3b8 !important; }
-[data-theme="dark"] #modeIndicator, [data-theme="dark"] button[onclick^="setPreset"] { color:#C3B0FA !important; }
+[data-theme="dark"] #modeIndicator, [data-theme="dark"] button[onclick^="setPreset"] { color:#94a3b8 !important; }
 #btnExportPDF { color:#f8b4b4 !important; }
 :root:not([data-theme="dark"]) #btnExportPDF { color:#b91c1c !important; }
 [data-theme="dark"] .disc-text strong { color:#e2e8f0 !important; }
@@ -348,7 +348,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#64748b !important; 
 [data-theme="dark"] div > p { color:#94a3b8 !important; }
 [data-theme="dark"] .disc-title { color:#e2e8f0 !important; }
 [data-theme="dark"] .disc-fine { color:#94a3b8 !important; }
-[data-theme="dark"] div > p > a[href$="terms.html"], [data-theme="dark"] div > p > a[href$="privacy.html"] { color:#a5b4fc !important; }
+[data-theme="dark"] div > p > a[href$="terms.html"], [data-theme="dark"] div > p > a[href$="privacy.html"] { color:#67e8f9 !important; }
 </style>
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-07-22-navfix" defer></script>
@@ -662,7 +662,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#64748b !important; 
                             <button class="pro-overlay-btn"><i class="fas fa-crown" style="margin-right:6px;"></i>Unlock PRO</button>
                         </div>
                         <div class="section-header">
-                            <div class="section-icon" style="background:rgba(99,102,241,0.1);color:#6366f1;"><i class="fas fa-globe"></i></div>
+                            <div class="section-icon" style="background:rgba(8,145,178,0.1);color:#0891b2;"><i class="fas fa-globe"></i></div>
                             <div><div class="section-title">Regional Compliance <span class="pro-badge"><i class="fas fa-crown"></i> PRO</span></div><div class="section-subtitle">Jurisdiction-specific requirements</div></div>
                         </div>
                         <div class="input-group">
@@ -722,7 +722,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#64748b !important; 
                             <div class="subsystem-row"><span class="subsystem-label">Cooling</span><div class="subsystem-bar-bg"><div class="subsystem-bar-fill" id="coolingBar" style="width:65%;background:#3b82f6;"></div></div><span class="subsystem-val" id="coolingVal">65</span></div>
                             <div class="subsystem-row"><span class="subsystem-label">Network</span><div class="subsystem-bar-bg"><div class="subsystem-bar-fill" id="networkBar" style="width:72%;background:#10b981;"></div></div><span class="subsystem-val" id="networkVal">72</span></div>
                             <div class="subsystem-row"><span class="subsystem-label">Physical</span><div class="subsystem-bar-bg"><div class="subsystem-bar-fill" id="physicalBar" style="width:55%;background:#ef4444;"></div></div><span class="subsystem-val" id="physicalVal">55</span></div>
-                            <div class="subsystem-row"><span class="subsystem-label">Monitoring</span><div class="subsystem-bar-bg"><div class="subsystem-bar-fill" id="monitorBar" style="width:65%;background:#6366f1;"></div></div><span class="subsystem-val" id="monitorVal">65</span></div>
+                            <div class="subsystem-row"><span class="subsystem-label">Monitoring</span><div class="subsystem-bar-bg"><div class="subsystem-bar-fill" id="monitorBar" style="width:65%;background:#0891b2;"></div></div><span class="subsystem-val" id="monitorVal">65</span></div>
                         </div>
                         <div class="gap-section" id="gapSection">
                             <div class="gap-title"><i class="fas fa-arrow-up" style="color:#64748b;"></i> Gap Analysis</div>
@@ -803,7 +803,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#64748b !important; 
                     </div>
                 </div>
                 <div class="chart-card">
-                    <div class="chart-title"><i class="fas fa-clipboard-check" style="color:#6366f1;"></i> Regional Compliance <span class="pro-badge"><i class="fas fa-crown"></i> PRO</span></div>
+                    <div class="chart-title"><i class="fas fa-clipboard-check" style="color:#0891b2;"></i> Regional Compliance <span class="pro-badge"><i class="fas fa-crown"></i> PRO</span></div>
                     <div id="regionalComplianceContent" style="font-size:0.82rem;color:var(--text-secondary);">
                         <p>Select a region in the Regional Compliance section to see jurisdiction-specific requirements.</p>
                     </div>
@@ -955,7 +955,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#64748b !important; 
         document.getElementById('en50600Class').textContent = en;
         document.getElementById('bicsiClass').textContent = bicsi;
 
-        var bars = [{id:'power',score:powerScore,color:'#f59e0b'},{id:'cooling',score:coolingScore,color:'#3b82f6'},{id:'network',score:networkScore,color:'#10b981'},{id:'physical',score:physicalScore,color:'#ef4444'},{id:'monitor',score:monitoringScore,color:'#6366f1'}];
+        var bars = [{id:'power',score:powerScore,color:'#f59e0b'},{id:'cooling',score:coolingScore,color:'#3b82f6'},{id:'network',score:networkScore,color:'#10b981'},{id:'physical',score:physicalScore,color:'#ef4444'},{id:'monitor',score:monitoringScore,color:'#0891b2'}];
         bars.forEach(function(b){
             document.getElementById(b.id+'Bar').style.width = Math.round(b.score)+'%';
             document.getElementById(b.id+'Val').textContent = Math.round(b.score);
@@ -1030,7 +1030,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#64748b !important; 
             else if (item.sub === 'cooling') { icon='snowflake'; color='#3b82f6'; desc='Improve cooling redundancy: add N+1 or 2N cooling capacity and dual distribution loops.'; }
             else if (item.sub === 'network') { icon='network-wired'; color='#10b981'; desc='Enhance network resilience: add diverse entry paths, multiple carriers, or redundant meet-me rooms.'; }
             else if (item.sub === 'physical') { icon='shield-alt'; color='#ef4444'; desc='Strengthen physical security: upgrade to biometric access, clean agent fire suppression, or VESDA.'; }
-            else { icon='desktop'; color='#6366f1'; desc='Upgrade monitoring: implement full DCIM + BMS for comprehensive visibility and alerting.'; }
+            else { icon='desktop'; color='#0891b2'; desc='Upgrade monitoring: implement full DCIM + BMS for comprehensive visibility and alerting.'; }
             recs.push('<div class="rec-card"><div class="rec-icon" style="background:'+color+'1a;color:'+color+';"><i class="fas fa-'+icon+'"></i></div><div class="rec-text"><h4>'+item.n+' (Score: '+Math.round(item.s)+')</h4><p>'+desc+'</p><span class="rec-priority '+pClass+'">['+priority+'-'+(priority==='P1'?'Critical':priority==='P2'?'High':'Medium')+']</span></div></div>');
         });
         if (recs.length === 0) recs.push('<div style="text-align:center;padding:1rem;color:#10b981;font-size:0.82rem;"><i class="fas fa-check-circle" style="margin-right:6px;"></i>All subsystems scoring well. No critical improvements needed.</div>');
@@ -1072,7 +1072,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#64748b !important; 
             });
         }
 
-        var barColors = ['#f59e0b','#3b82f6','#10b981','#ef4444','#6366f1'];
+        var barColors = ['#f59e0b','#3b82f6','#10b981','#ef4444','#0891b2'];
         if (barChart) {
             barChart.data.datasets[0].data = [pwr,cool,net,phys,mon];
             barChart.options.scales.x.grid.color = gridColor;
@@ -1272,7 +1272,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#64748b !important; 
                 type: 'bar',
                 data: {
                     labels: newLabels,
-                    datasets: [{label:'Weighted Impact',data:newData,backgroundColor:['#64748b','#64748b','#64748b','#5b21b6','#4c1d95','#3b0764'],borderRadius:4,barThickness:22}]
+                    datasets: [{label:'Weighted Impact',data:newData,backgroundColor:['#64748b','#64748b','#64748b','#155e75','#164e63','#0f3a4a'],borderRadius:4,barThickness:22}]
                 },
                 options: {
                     indexAxis:'y',responsive:true,interaction:{mode:'index',intersect:false},maintainAspectRatio:false,
@@ -1294,7 +1294,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#64748b !important; 
         var startAngle = Math.PI, endAngle = 0, cx = 160, cy = 140, r = 100;
         var zones = [
             {from:0,to:25,color:'#ef4444'},{from:25,to:45,color:'#f97316'},{from:45,to:60,color:'#f59e0b'},
-            {from:60,to:75,color:'#3b82f6'},{from:75,to:90,color:'#6366f1'},{from:90,to:100,color:'#10b981'}
+            {from:60,to:75,color:'#3b82f6'},{from:75,to:90,color:'#0891b2'},{from:90,to:100,color:'#10b981'}
         ];
         var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" style="width:100%;height:auto;">';
         // Zone arcs
@@ -1372,7 +1372,8 @@ button[onclick="setPreset(2000,'colocation')"] { background:#64748b !important; 
         var h = top.length * 28 + 30;
         var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 '+h+'" style="width:100%;height:auto;">';
         svg += '<text x="180" y="12" text-anchor="middle" font-size="10" fill="#1e3a5f" font-weight="700">Sensitivity Analysis (Weighted Impact)</text>';
-        var purples = ['#64748b','#64748b','#64748b','#5b21b6','#4c1d95','#3b0764','#2e1065','#1e0a3e'];
+        /* v3.6.1 — was a violet deepening ramp; same idea, the site's own hue. */
+        var purples = ['#64748b','#64748b','#64748b','#155e75','#164e63','#0f3a4a','#0b2b37','#071d26'];
         top.forEach(function(f,i) {
             var y = 24 + i*28, bw = Math.max(4,(f.impact/maxImpact)*180);
             svg += '<text x="110" y="'+(y+15)+'" text-anchor="end" font-size="9" fill="#374151" font-weight="600">'+f.label+'</text>';
@@ -1479,7 +1480,7 @@ button[onclick="setPreset(2000,'colocation')"] { background:#64748b !important; 
             {label:'Cooling (20%)',score:cool,color:'#3b82f6'},
             {label:'Network (15%)',score:net,color:'#10b981'},
             {label:'Physical (10%)',score:phys,color:'#ef4444'},
-            {label:'Monitoring (5%)',score:mon,color:'#6366f1'},
+            {label:'Monitoring (5%)',score:mon,color:'#0891b2'},
             {label:'Compliance (15%)',score:reg,color:'#64748b'}
         ];
         var svgDetail = pdfSubsystemDetailSVG(barItems);
@@ -1743,8 +1744,8 @@ button[onclick="setPreset(2000,'colocation')"] { background:#64748b !important; 
         html+='<div class="sub-narr" style="border-left-color:#10b981;">'+netNarr+'</div>';
         html+='<h3><span class="section-badge" style="background:#ef444422;color:#ef4444;">PHYSICAL SECURITY — '+Math.round(phys)+'/100</span></h3>';
         html+='<div class="sub-narr" style="border-left-color:#ef4444;">'+physNarr+'</div>';
-        html+='<h3><span class="section-badge" style="background:#6366f122;color:#6366f1;">MONITORING — '+Math.round(mon)+'/100</span></h3>';
-        html+='<div class="sub-narr" style="border-left-color:#6366f1;">'+monNarr+'</div>';
+        html+='<h3><span class="section-badge" style="background:#0891b222;color:#0891b2;">MONITORING — '+Math.round(mon)+'/100</span></h3>';
+        html+='<div class="sub-narr" style="border-left-color:#0891b2;">'+monNarr+'</div>';
 
         // Gap Analysis
         html+='<h2>Tier Gap Analysis</h2>';

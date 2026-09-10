@@ -52,12 +52,12 @@ Every article with an interactive calculator follows a **unified Pro Enhancement
 | 5 | Technical Debt Risk | (generic) | `#f59e0b` gold | `#fbbf24` | Full (upgraded Feb 2026) |
 | 6 | RCA Effectiveness | `.rca-` | `#06b6d4` cyan | `#22d3ee` | Full (upgraded Feb 2026) |
 | 7 | Emergency Response | `.res-` | `#10b981` emerald | `#34d399` | Full (upgraded Feb 2026) |
-| 8 | Safety Health Index | `.shi-` | `#8b5cf6` purple | `#a78bfa` | Full |
+| 8 | Safety Health Index | `.shi-` | `#64748b` slate | `#94a3b8` | Full |
 | 9 | HVAC/Cooling Strategy | `.hvac-` | `#3b82f6` blue | `#60a5fa` | Full |
 | 10 | Water Stress Assessment | `.ws-` | `#0891b2` teal | `#06b6d4` | Full |
 | 11 | Energy Equity | `.eeq-` | `#f59e0b` amber | `#fbbf24` | Full |
 | 12 | Operational Maturity | `.opm-` | `#10b981` emerald | `#34d399` | Full (Feb 2026) |
-| 13 | AI Governance | `.aig-` | `#6366f1` indigo | `#818cf8` | Full (Feb 2026) |
+| 13 | AI Governance | `.aig-` | `#0891b2` instrument cyan | `#67e8f9` | Full (Feb 2026) |
 | 14 | Maintenance Staffing | `.msf-` | `#f97316` orange | `#fb923c` | Full (Feb 2026) |
 | 15 | Mission Critical Leadership | `.mcl-` | `#ec4899` pink | `#f472b6` | Full (Feb 2026) |
 | PUE | PUE Calculator (standalone) | `.pue-` | `#06b6d4` cyan | `#22d3ee` | Full (Feb 2026) |

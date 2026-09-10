@@ -108,7 +108,7 @@
         .cc-mode button { font-family:'JetBrains Mono',monospace; font-size:.74rem; font-weight:600; padding:6px 16px; border:none; background:var(--cdu-card); color:var(--cdu-muted); cursor:pointer; }
         .cc-mode button.active { color:#fff; }
         .cc-mode button.free.active { background:var(--cdu-primary); }
-        .cc-mode button.pro.active { background:linear-gradient(135deg,#64748b,#a855f7); }
+        .cc-mode button.pro.active { background:#64748b; }
         .cc-pdf { font-family:'JetBrains Mono',monospace; font-size:.74rem; padding:6px 14px; border-radius:8px; border:1px solid var(--cdu-border); background:transparent; color:var(--cdu-muted); cursor:pointer; }
         .cc-pdf:hover { color:var(--cdu-text); border-color:var(--cdu-primary); }
         /* pro section + gate */
@@ -116,13 +116,13 @@
         .cc-pro.locked > .cc-pro-inner { filter:blur(6px); user-select:none; pointer-events:none; }
         .cc-pro-overlay { display:none; position:absolute; inset:0; z-index:10; flex-direction:column; align-items:center; justify-content:center; gap:.6rem; background:rgba(15,23,42,.78); border-radius:12px; cursor:pointer; }
         .cc-pro.locked .cc-pro-overlay { display:flex; }
-        .cc-pro-overlay i { font-size:1.8rem; color:#a855f7; }
+        .cc-pro-overlay i { font-size:1.8rem; color:#0891b2; }
         .cc-pro-overlay .t { font-weight:700; color:#fff; }
         .cc-pro-overlay .d { font-size:.8rem; color:#cbd5e1; max-width:300px; text-align:center; }
-        .cc-pro-overlay .b { padding:8px 18px; background:linear-gradient(135deg,#64748b,#a855f7); border:none; border-radius:8px; color:#fff; font-weight:600; font-size:.8rem; cursor:pointer; }
+        .cc-pro-overlay .b { padding:8px 18px; background:#64748b; border:none; border-radius:8px; color:#fff; font-weight:600; font-size:.8rem; cursor:pointer; }
         .cc-pro-inner { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:.9rem; }
-        .cc-pro-panel { background:var(--cdu-card); border:1px solid var(--cdu-border); border-top:2px solid #a855f7; border-radius:4px; padding:1rem 1.1rem; }
-        .cc-pro-panel h3 { font-size:.8rem; font-family:'JetBrains Mono',monospace; letter-spacing:.05em; text-transform:uppercase; color:#a855f7; margin:0 0 .7rem; }
+        .cc-pro-panel { background:var(--cdu-card); border:1px solid var(--cdu-border); border-top:2px solid #0891b2; border-radius:4px; padding:1rem 1.1rem; }
+        .cc-pro-panel h3 { font-size:.8rem; font-family:'JetBrains Mono',monospace; letter-spacing:.05em; text-transform:uppercase; color:#0891b2; margin:0 0 .7rem; }
         .cc-pp-grid { display:grid; grid-template-columns:1fr 1fr; gap:.6rem; }
         .cc-pp-kpi { background:var(--cdu-inset); border:1px solid var(--cdu-border); border-radius:4px; padding:.55rem .7rem; }
         .cc-pp-kpi .l { font-size:.62rem; font-family:'JetBrains Mono',monospace; text-transform:uppercase; letter-spacing:.05em; color:var(--cdu-muted); }
@@ -137,7 +137,7 @@
         .cc-modal-box h3 { margin:0 0 .3rem; font-size:1.1rem; }
         .cc-modal-box p { font-size:.82rem; color:var(--cdu-muted); margin:0 0 1rem; }
         .cc-modal-box input { width:100%; padding:9px 11px; margin-bottom:.6rem; border:1px solid var(--cdu-border); border-radius:8px; background:var(--cdu-inset); color:var(--cdu-text); font-size:.9rem; }
-        .cc-modal-box .sub { width:100%; padding:10px; background:linear-gradient(135deg,#64748b,#a855f7); border:none; border-radius:8px; color:#fff; font-weight:600; cursor:pointer; }
+        .cc-modal-box .sub { width:100%; padding:10px; background:#64748b; border:none; border-radius:8px; color:#fff; font-weight:600; cursor:pointer; }
         .cc-modal-box .demo { font-size:.72rem; color:var(--cdu-muted); margin-top:.7rem; text-align:center; }
         .cc-modal-box .demo code { color:var(--cdu-primary); }
         .cc-modal-x { position:absolute; top:.7rem; right:.9rem; background:none; border:none; font-size:1.3rem; color:var(--cdu-muted); cursor:pointer; }
@@ -605,7 +605,7 @@
             var n=24, min=vals[0], max=vals[vals.length-1], bw=(max-min)/n||1, c=new Array(n).fill(0);
             vals.forEach(function(v){ var b=Math.min(n-1,Math.floor((v-min)/bw)); c[b]++; });
             var mx=Math.max.apply(null,c), bar=w/n, s='';
-            for(var i=0;i<n;i++){ var bh=(c[i]/mx)*(h-18); s+='<rect x="'+(i*bar+1)+'" y="'+(h-18-bh)+'" width="'+(bar-1.5)+'" height="'+bh+'" fill="#a855f7" opacity="0.85"></rect>'; }
+            for(var i=0;i<n;i++){ var bh=(c[i]/mx)*(h-18); s+='<rect x="'+(i*bar+1)+'" y="'+(h-18-bh)+'" width="'+(bar-1.5)+'" height="'+bh+'" fill="#0891b2" opacity="0.85"></rect>'; }
             function px(v){ return ((v-min)/(max-min))*w; }
             var p50=vals[Math.floor(vals.length*0.5)];
             s+='<line x1="'+px(p50)+'" y1="0" x2="'+px(p50)+'" y2="'+(h-18)+'" stroke="#06b6d4" stroke-width="1.5" stroke-dasharray="3 2"></line>';

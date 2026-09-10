@@ -5922,10 +5922,10 @@
         /* Market-viz mapping — single source for the map/cards/charts across DC pages (maturity + region →
          * accent colour, CAGR thresholds). UI-layer constants live here so "edit once → re-flows everywhere". */
         marketViz: {
-            maturityColors: { established: '#0d9488', growing: '#f59e0b', emerging: '#7B4FE0' },
+            maturityColors: { established: '#0d9488', growing: '#f59e0b', emerging: '#be185d' },
             regionColors: {
                 'North America': '#3b82f6', 'Europe': '#0d9488', 'Asia Pacific': '#f59e0b',
-                'Latin America': '#10b981', 'Middle East & Africa': '#7B4FE0'
+                'Latin America': '#10b981', 'Middle East & Africa': '#be185d'
             },
             cagrHigh: 0.20, cagrMid: 0.10, fallback: '#64748b'
         },
@@ -12740,7 +12740,7 @@
                     var rd = R.redundancy[rich.input.redundancy] || R.redundancy['N+1'];
                     var eq = rich.equip;
                     var fatUnits = (eq.switchgear || 0) + (eq.transformers || 0) + (eq.generators || 0) + (eq.chillers || 0) + Math.ceil((eq.ups_modules || 0) / 4);
-                    var colors = { L0: '#64748b', L1: '#0ea5e9', L2: '#14b8a6', L3: '#10b981', L4: '#f59e0b', L5: '#7B4FE0', L6: '#ec4899' };
+                    var colors = { L0: '#64748b', L1: '#0ea5e9', L2: '#14b8a6', L3: '#10b981', L4: '#f59e0b', L5: '#1d4ed8', L6: '#ec4899' };
                     var sched = rich.schedule || [];
                     var ovl = DATA.construction.wbsFastTrackOverlap;
                     function distribute(tpl, s, e, color) {
@@ -15394,7 +15394,10 @@
             costStackedBar: function (series, legend, opts) {
                 opts = opts || {}; var w = opts.width || 480, h = opts.height || 220, pad = 34;
                 if (!series || !series.length) return RZEngine.charts._svg(w, h, '');
-                var palette = opts.palette || ['#dc2626', '#0891b2', '#f59e0b', '#16a34a', '#7B4FE0', '#d946ef'];
+                /* v3.6.1 — the fifth and sixth entries were '#7B4FE0' and '#d946ef'. Mapping both onto
+                   the cyan family would have given this palette three cyans no reader can tell apart:
+                   a categorical palette stays distinguishable first and on-brand second. */
+                var palette = opts.palette || ['#dc2626', '#0891b2', '#f59e0b', '#16a34a', '#1d4ed8', '#be185d'];
                 var totals = series.map(function (s) { return s.parts.reduce(function (a, b) { return a + b; }, 0); });
                 var maxT = Math.max.apply(null, totals) || 1, bw = (w - 2 * pad) / series.length * 0.6, gap = (w - 2 * pad) / series.length, inner = '';
                 series.forEach(function (s, i) {

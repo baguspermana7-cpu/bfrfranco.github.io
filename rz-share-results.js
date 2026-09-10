@@ -12,7 +12,7 @@
  * Configuration (optional, via data attributes on <script> tag):
  * - data-calc-name="TCO Calculator"
  * - data-calc-id="tco"
- * - data-accent-color="#4f46e5"
+ * - data-accent-color="#0369a1"
  */
 (function() {
     'use strict';
@@ -21,7 +21,7 @@
     var scriptTag = document.currentScript;
     var calcName = scriptTag ? scriptTag.getAttribute('data-calc-name') || document.title.split('|')[0].trim() : document.title;
     var calcId = scriptTag ? scriptTag.getAttribute('data-calc-id') || 'calc' : 'calc';
-    var accentColor = scriptTag ? scriptTag.getAttribute('data-accent-color') || '#4f46e5' : '#4f46e5';
+    var accentColor = scriptTag ? scriptTag.getAttribute('data-accent-color') || '#0369a1' : '#0369a1';
 
     // Helper: hex to rgb string
     function hexToRgb(hex) {

@@ -11,6 +11,74 @@ release sections rather than semver.
 
 ---
 
+## v3.6.1 — 2026-09-11
+
+### A colour is not a string
+
+v3.6.0, earlier today, swept `#6d28d9` and `#7c3aed` out of 62 files and called the violet family
+finished. It was not. The sweep chased the hexes it had a list of, and the list was never the
+problem: **1,238 literals across the tree were still in the banned hue band**, arriving as
+`#a855f7`, `#4f46e5`, `#6366f1`, `#c4b5fd`, `#C3B0FA`, `#a5b4fc`, `#7B4FE0`, `#5b21b6`, `#4c1d95`,
+`#581c87`, `#e9d5ff`, `#f5f3ff`, every one of their `rgb()`/`rgba()` forms, inside `.js` files no
+string grep ever opened, and once as a token named `--prep-green` holding violet-800.
+
+### Added
+
+- **`tools/test-purple-family.mjs`** — a gate that reads the HUE, not the spelling. Any literal
+  landing in [238°, 310°] with enough saturation to be seen and enough lightness not to read as
+  near-black is a finding, in HTML, CSS and JS alike. Indigo-600 is inside the band deliberately:
+  243° is where the family hides when someone says they have moved away from purple. It reports
+  1,238 findings against the previous tree and none against this one.
+  - Four exemptions, each naming meaning that no other hue can carry: **ISA-18.2 / EEMUA 191 alarm
+    states** (shelved / suppressed / out-of-service / trouble are magenta-violet *by standard*, so an
+    operator cannot confuse them with an active alarm), **the aurora mesh hero** (named in CLAUDE.md
+    as mint + gold + violet + blue + pink), **literal spectra**, and **published perceptually-uniform
+    colormaps** (viridis starts at `#440154`).
+
+### Changed
+
+- **Seven page identities reskinned off the purple family, each to a hue the site already owns.**
+  `FF-1.html` becomes the green its `--prep-green` token always claimed (FF-2 is amber, FF-3 cyan);
+  `tco-calculator.html` goes from indigo-600 to teal; `article-13.html`'s AI-gauge widget to
+  instrument cyan; `tier-advisor.html`'s violet deepening ramp to the same ramp in cyan;
+  `article-1.html`, `datacenter-solutions.html` and `opex-calculator.html` follow their pages' own
+  accents.
+- **`css/rz-finance-suite.css` closed the item v3.6.0 left open** — `--fs-acc` / `--fs-acc2` move
+  from violet-700/600 to cyan-800/700, and the dark `--fs-acc2` from the periwinkle `#C3B0FA` to
+  instrument cyan. The AA rationale that had mandated violet was **arithmetically wrong**: the
+  comment claimed white on `#64748b` is "~3.9:1 (fails AA)"; measured it is 4.76:1. The pinning was
+  right for a different reason — no margin under semibold .82rem type — and cyan-800 gives 7.3:1.
+- **219 periwinkle `#C3B0FA` occurrences across 50 files** become slate `#94a3b8`. That colour was
+  itself an earlier sweep's replacement; a periwinkle chosen to pair with slate is still the family.
+- **125 nav links** (`Future Forward` in purple, `TCO Calculator` in indigo) take the slate the rest
+  of the dropdown already used, and the seven pages carrying contrast patches keyed on those two
+  hexes drop the rules that no longer match anything.
+- **118 two-stop gradients with a purple stop** flatten to their non-purple stop.
+- **Chart palettes were fixed for legibility, not only for brand.** Mapping every purple onto cyan
+  gave `rz-engine.js` a six-colour categorical palette containing three cyans; it now carries
+  `#1d4ed8` and `#be185d` in those slots. The LTC lab's pump-drive breakdown was five shades of
+  violet against a teal liquid loop — it is a BRANCH of that loop, so it is now five lightness steps
+  of the same teal. The sixth donut slice, which was violet only because the palette ran out, takes
+  slate.
+- **The `--oe-violet` categorical slot** moves to rose (333°). v1.134.21 had already moved it once,
+  to `#5B34C4`, described as "a clear step off the banned pair" — but a step inside violet is still
+  violet, and this gate reads the angle.
+
+### Fixed
+
+- **A footer link that was never styled, on 72 pages.** `<a href="glossary.html">Glossary</a>` sat
+  among four siblings that each carry an inline colour, and rendered in the browser's default
+  `#0000EE`. Found by a render scan looking for something else entirely.
+- **The version stamp rendered as a default blue link on every bespoke page.** `script.js` injects
+  the stamp site-wide, but its skin lived only in `styles.css`, which `tco-calculator.html` and the
+  other own-stylesheet builds do not load. The module now carries its own baseline, inserted first
+  in `<head>` so any real stylesheet still outranks it.
+- **`.rz-pro-link:hover` was still Anthropic violet.** The v1.134.20 mint sweep converted the auth
+  component's base colours and left the hover state — the one state a reader reaches by pointing at
+  the link.
+
+---
+
 ## v3.6.0 — 2026-09-11
 
 ### The violet family, the two-stop washes, and the last framework swatches

@@ -67,7 +67,7 @@
         DERIVED:     { color: '#3f9d6b', note: 'Computed by the engine from other parameters; nothing typed.' },
         ADOPTED:     { color: '#d99a2b', note: 'A project or owner design decision, stated as such.' },
         ASSUMED:     { color: '#d99a2b', note: 'A textbook or mid-band value chosen before the result was looked at; pending Basis-of-Design.' },
-        SIMULATED:   { color: '#8b7bd0', note: 'A modelled operating value or a simulated sensor; never a field reading.' },
+        SIMULATED:   { color: '#b0678f', note: 'A modelled operating value or a simulated sensor; never a field reading.' },
         MEASURED:    { color: '#3f9d6b', note: 'A real instrument reading.' },
         LABEL:       { color: '#8fa2b8', note: 'A name, a version or a nameplate figure used as a label — never a denominator.' },
         UNAVAILABLE: { color: '#e4564a', note: 'Not published by the source and not derivable here.' }

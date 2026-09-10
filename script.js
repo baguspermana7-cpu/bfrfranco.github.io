@@ -9,8 +9,28 @@
    (loaded as a separate <script defer> in each page).
    ========================================== */
 (function(){
+  /* v3.6.1 — the stamp is injected on EVERY page, but its skin lived only in styles.css, and the
+     bespoke pages (tco-calculator and the other own-stylesheet builds) never load that file. On
+     those pages the changelog link rendered in the browser's default #0000EE, which is the one
+     colour on this site nobody chose. The module now carries its own baseline, inserted FIRST in
+     <head> so any real stylesheet still outranks it and nothing that already looked right moves. */
+  function injectStampStyle(){
+    if (document.getElementById('rzVersionStampStyle')) return;
+    var head = document.head || document.getElementsByTagName('head')[0];
+    if (!head) return;
+    var s = document.createElement('style');
+    s.id = 'rzVersionStampStyle';
+    s.textContent =
+      '.rz-version-link{text-decoration:none;border:none;color:inherit}' +
+      '.rz-version-num{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Consolas,monospace;' +
+        'background:rgba(125,221,180,0.12);color:#047857;padding:2px 8px;border-radius:4px;' +
+        'font-size:0.7rem;font-weight:600}' +
+      '[data-theme="dark"] .rz-version-num{background:rgba(16,185,129,0.14);color:#34d399}';
+    head.insertBefore(s, head.firstChild);
+  }
   function injectVersionStamp(){
     if (document.getElementById('rzVersionStamp')) return;
+    injectStampStyle();
     var anchor = document.getElementById('rzVersionAnchor') || document.body;
     if (!anchor) return;
     var v = window.RZ_VERSION || '1.0.0';
@@ -1582,7 +1602,7 @@ window.subscribeNewsletter = window.subscribeNewsletter || function(e) {
         if (statusEl) { statusEl.textContent = msg; }
         else if (form) {
             var p = document.createElement('p');
-            p.style.cssText = 'color:#C3B0FA;font-size:0.85rem;margin-top:0.5rem;';
+            p.style.cssText = 'color:#94a3b8;font-size:0.85rem;margin-top:0.5rem;';
             p.textContent = msg;
             form.appendChild(p);
         }
@@ -1597,7 +1617,7 @@ window.subscribeNewsletter = window.subscribeNewsletter || function(e) {
     var body = encodeURIComponent('Hi,\n\nPlease add me to the Resistance Zero newsletter.\n\nMy email: ' + email + '\n\nThanks!');
     window.open('mailto:bagusdpermana7@gmail.com?subject=' + subject + '&body=' + body, '_blank');
     if (form) {
-        form.innerHTML = '<p style="color:#C3B0FA;font-weight:600;padding:1rem 0;">&#10003; Email client opened — send the message to confirm your subscription.</p>';
+        form.innerHTML = '<p style="color:#94a3b8;font-weight:600;padding:1rem 0;">&#10003; Email client opened — send the message to confirm your subscription.</p>';
     }
     return false;
 };

@@ -28,7 +28,11 @@
     ];
 
     // ── Donut colours ────────────────────────────────────────
-    var DONUT_COLORS = ['#0b5fea','#337eea','#e5484d','#f59e0b','#12a150','#7B4FE0'];
+    /* Six slices, five instrument hues. The sixth was #0e7490, which is the banned violet doing the
+       job of "one more colour"; a categorical palette that runs out of hues should extend by
+       LIGHTNESS inside the hues it already has, not by borrowing a family the site bans. Slate is
+       the site's neutral and reads as the remainder slice it usually is. */
+    var DONUT_COLORS = ['#0b5fea','#337eea','#e5484d','#f59e0b','#12a150','#64748b'];
 
     // ── Init ─────────────────────────────────────────────────
     function init() {
