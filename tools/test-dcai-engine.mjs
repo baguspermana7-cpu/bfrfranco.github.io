@@ -72,7 +72,13 @@ ok(!/MEASURED/.test(MODEL_SRC.replace(/nothing may claim MEASURED[^\n]*/,'')), '
 }
 
 /* ── 1. owner decisions (plan Track A, 2026-09-05) ───────────────────────── */
-ok(M.facility.halls === 4, '4 data halls');
+/* v3.0.0 — the hall COUNT is no longer the invariant; the hall BUDGET is. Four halls of 880
+   racks was arithmetically impossible (racks + aisles = the whole room, and the air needed more
+   fan-wall face than the envelope had), so pinning the number would pin the defect. What must
+   hold is that the facility rack count and the published IT envelope are unchanged by however
+   the racks are partitioned, and that each hall closes its own floor and air budget. */
+ok(M.facility.halls >= 1 && Number.isInteger(M.facility.halls), 'hall count is a positive integer');
+ok(M.facility.halls * M.facility.racksPerHall === 3520, 'halls x racks per hall = 3,520 racks');
 ok(S.power.rack_it_facility_mw >= 300 && S.power.rack_it_facility_mw <= 500, 'rack IT inside the 300-500 MW owner envelope', S.power.rack_it_facility_mw);
 approx(S.power.rack_it_facility_mw, 499.84, 1e-9, 'rack IT = 880 x 4 x 142 kW = 499.84 MW');
 ok(S.power.it_envelope === 'rack-only', 'it_envelope declared rack-only');
@@ -237,12 +243,20 @@ approx(S.heat.liquid_hall_kwth * M.facility.halls, S.heat.liquid_kwth, 1e-6, 'ha
   approx(S.power.rack_it_hall_kwe, M.facility.racksPerHall * M.facility.rackItKw, 1e-9, 'rack_it_hall_kwe = racks/hall x kW/rack');
   ok(S.power.shelves_spare === M.gb300.powerShelves - S.power.shelves_duty, 'shelves_spare = installed - duty');
 
-  ok(E.cdu_installed_facility === E.cdu_installed_per_hall * 4, 'cdu_installed_facility = per hall x 4');
-  ok(E.crah_installed_per_hall === E.crah_duty_per_hall + 1 && E.crah_installed_facility === E.crah_installed_per_hall * 4, 'CRAH N+1 per hall, x4');
+  ok(E.cdu_installed_facility === E.cdu_installed_per_hall * M.facility.halls, 'cdu_installed_facility = per hall x halls');
+  ok(E.crah_installed_per_hall === E.crah_duty_per_hall + 1 && E.crah_installed_facility === E.crah_installed_per_hall * M.facility.halls, 'CRAH N+1 per hall, x halls');
   ok(E.dry_coolers_running_design === D.counts.dry_coolers_running, 'dry_coolers_running_design republishes the design count');
   ok(E.dry_coolers_installed === Math.max(...S.bins.map((b) => Math.ceil((C.operatingPoint(b.ambient_db_c).heat.dry_cooler_duty_kwth) / 1000))) + 1, 'dry_coolers_installed = worst bin + 1');
   approx(E.facility_kva, El.facility_kwe / M.electrical.powerFactor, 1e-6, 'facility_kva = facility kW / PF');
-  ok(E.transformers === Math.ceil(E.facility_kva / (M.equipment.transformer.unitMva * 1000)), 'transformers = ceil(kVA / unit)');
+  /* v3.0.0 — 2N is a contingency rule, not a division. Each feed must carry the WHOLE hall when
+     the other is lost. The retired form, ceil(facility kVA / unit), was a 1N total that the page
+     divided by halls x 2 for display: it printed "33x 2.5 MVA/feed" beside a "true 2N" claim
+     while covering half the hall, and ran every transformer at 99.9 % with no design ceiling. */
+  ok(E.unit_subs_per_feed_per_hall === Math.ceil(E.hall_kva / E.unit_sub_kva), 'unit subs per feed = ceil(hall kVA / unit)');
+  ok(E.transformers === E.unit_subs_per_feed_per_hall * 2 * M.facility.halls, 'transformers = per feed x 2 feeds x halls');
+  ok(E.unit_sub_feed_carries_whole_hall === true, 'one feed carries the whole hall — that is what 2N means');
+  ok(E.unit_sub_loading_contingency_pct <= 100, 'contingency loading is within the installed capacity');
+  ok(Math.abs(E.unit_sub_loading_normal_pct - E.unit_sub_loading_contingency_pct / 2) < 1e-9, 'normal loading is half the contingency loading');
   ok(typeof E.cdu_model === 'string' && /CHx1000/.test(E.cdu_model), 'cdu_model names the published sizing unit');
   ok(typeof E.generator_model === 'string' && !/3516E/.test(E.generator_model), 'generator_model is not the 2.75 MW machine the arithmetic rejected');
 
@@ -252,6 +266,55 @@ approx(S.heat.liquid_hall_kwth * M.facility.halls, S.heat.liquid_kwth, 1e-6, 'ha
   approx(Ge.rack_footprint_m2_per_hall, M.facility.racksPerHall * M.geometry.rackFootprintM2, 1e-9, 'rack_footprint_m2_per_hall = racks x footprint');
   approx(Ge.rack_footprint_fraction, Ge.rack_footprint_m2_per_hall / Ge.hall_area_m2, 1e-12, 'rack_footprint_fraction = footprint / area');
   approx(Ge.it_density_kw_per_m2, S.power.rack_it_hall_kwe / Ge.hall_area_m2, 1e-9, 'it_density_kw_per_m2 = hall rack IT / area');
+
+  /* --- v3.0.0 THE FLOOR BUDGET ------------------------------------------------------------
+     Hall area used to be asserted and never spent. Adding it up is what proved the four-hall
+     basis impossible: 880 racks plus their aisles came to exactly the room, leaving the CDUs
+     and CRAHs the same engine specified with no floor. These identities make that check
+     permanent — the budget must be the sum of its named terms, and it must fit. */
+  approx(Ge.rack_pitch_m, M.geometry.rackPitchM, 1e-9, 'rack_pitch_m republishes the model leaf');
+  approx(Ge.rack_depth_m, M.geometry.rackDepthM, 1e-9, 'rack_depth_m republishes the model leaf');
+  approx(Ge.cold_aisle_m, M.geometry.coldAisleM, 1e-9, 'cold_aisle_m republishes the model leaf');
+  approx(Ge.hot_aisle_m, M.geometry.hotAisleM, 1e-9, 'hot_aisle_m republishes the model leaf');
+  approx(Ge.cross_aisle_m, M.geometry.crossAisleM, 1e-9, 'cross_aisle_m republishes the model leaf');
+  ok(Ge.cold_aisle_m + Ge.hot_aisle_m > Ge.rack_depth_m, 'a row gets more aisle than rack — the mimic drew the inverse for three releases');
+  approx(Ge.row_pitch_m, M.geometry.rackDepthM + M.geometry.coldAisleM + M.geometry.hotAisleM, 1e-9,
+    'row_pitch_m = rack depth + cold aisle + hot aisle (it was prose in a comment before)');
+  approx(Ge.row_length_m, Ge.racks_per_row * M.geometry.rackPitchM, 1e-9, 'row_length_m = racks per row x rack pitch');
+  approx(Ge.rack_field_m2, S.compute.racks_per_hall * M.geometry.rackPitchM * Ge.row_pitch_m, 1e-9,
+    'rack_field_m2 = racks x rack pitch x row pitch');
+  approx(Ge.cross_aisle_m2, M.geometry.crossAisleM * M.geometry.lengthM, 1e-9, 'cross_aisle_m2 = cross aisle width x hall length');
+  approx(Ge.cdu_gallery_m2, E.cdu_installed_per_hall * M.geometry.cduServiceM2, 1e-9, 'cdu_gallery_m2 = installed CDUs x serviced floor each');
+  approx(Ge.air_plant_m2, E.crah_installed_per_hall * M.geometry.crahServiceM2, 1e-9, 'air_plant_m2 = installed CRAHs x serviced floor each');
+  approx(Ge.floor_used_m2, Ge.rack_field_m2 + Ge.cross_aisle_m2 + Ge.cdu_gallery_m2 + Ge.air_plant_m2, 1e-9,
+    'floor_used_m2 is the sum of its four named terms and nothing else');
+  approx(Ge.floor_spare_m2, Ge.hall_area_m2 - Ge.floor_used_m2, 1e-9, 'floor_spare_m2 = hall area - floor used');
+  approx(Ge.floor_spare_fraction, Ge.floor_spare_m2 / Ge.hall_area_m2, 1e-9, 'floor_spare_fraction = spare / hall area');
+  ok(Ge.floor_budget_closes === (Ge.floor_used_m2 <= Ge.hall_area_m2) && Ge.floor_budget_closes === true,
+    'floor_budget_closes: the equipment this engine specifies fits the hall it specifies', Ge.floor_used_m2.toFixed(0) + ' of ' + Ge.hall_area_m2);
+  ok(Ge.floor_spare_m2 > 0, 'a hall with zero spare floor has no egress route', Ge.floor_spare_m2.toFixed(0) + ' m2');
+
+  /* --- v3.0.0 THE AIR PATH ----------------------------------------------------------------
+     The second impossibility: 35,509 kWth of air heat in one hall is 2,677 m3/s, and at a
+     2.5 m/s coil face that needed 1,071 m2 of fan wall against a 1,023 m2 envelope. */
+  approx(Ge.air_delta_t_k, S.design.planes.p11_air_return_c - S.design.planes.p09_air_supply_c, 1e-9,
+    'air_delta_t_k = return plane - supply plane');
+  approx(Ge.air_flow_m3s_per_hall, S.heat.air_hall_kwth / (M.geometry.airDensityKgM3 * M.geometry.airCpKjKgK * Ge.air_delta_t_k), 1e-9,
+    'air_flow_m3s_per_hall = hall air heat / (rho x cp x dT)');
+  approx(Ge.fan_wall_face_m2, Ge.air_flow_m3s_per_hall / M.geometry.fanWallFaceVelocityMs, 1e-9,
+    'fan_wall_face_m2 = airflow / face velocity');
+  approx(Ge.air_plant_frontage_m, Ge.air_plant_m2 / M.geometry.airPlantDepthM, 1e-9,
+    'air_plant_frontage_m = gallery floor / gallery depth');
+  approx(Ge.hall_perimeter_m, 2 * (M.geometry.lengthM + M.geometry.widthM), 1e-9, 'hall_perimeter_m = 2 x (length + width)');
+  ok(Ge.air_plant_frontage_fits === (Ge.air_plant_frontage_m <= Ge.hall_perimeter_m) && Ge.air_plant_frontage_fits === true,
+    'air_plant_frontage_fits: the air gallery fits around the room, not only inside its area',
+    Ge.air_plant_frontage_m.toFixed(0) + ' m of ' + Ge.hall_perimeter_m + ' m perimeter');
+  approx(Ge.air_plant_face_available_m2, Ge.air_plant_frontage_m * M.geometry.heightM, 1e-9,
+    'air_plant_face_available_m2 = frontage x hall height');
+  approx(Ge.fan_wall_face_fraction, Ge.fan_wall_face_m2 / Ge.air_plant_face_available_m2, 1e-9, 'fan_wall_face_fraction = needed / available');
+  ok(Ge.fan_wall_fits === (Ge.fan_wall_face_m2 <= Ge.air_plant_face_available_m2) && Ge.fan_wall_fits === true,
+    'fan_wall_fits: the coil face the airflow needs is within what the gallery presents',
+    Ge.fan_wall_face_m2.toFixed(0) + ' of ' + Ge.air_plant_face_available_m2.toFixed(0));
 
   /* --- floor grid and the LV grouping that hangs off it (WP2 electrical scaling) --- */
   ok(S.geometry.racks_per_row === M.facility.racksPerHall / M.geometry.rows, 'geometry.racks_per_row = racks per hall / rows');
@@ -276,8 +339,9 @@ approx(S.heat.liquid_hall_kwth * M.facility.halls, S.heat.liquid_kwth, 1e-6, 'ha
   ok(S.distribution.hall_group_kw_check === true && Di.group_kw * Ge.rack_groups_per_hall === S.power.rack_it_hall_kwe,
      'distribution.hall_group_kw_check: groups x group kW = hall rack IT');
 
-  ok(S.distribution.transformers_per_hall_per_feed === Math.ceil(E.facility_kva / (M.facility.halls * 2) / (M.equipment.transformer.unitMva * 1000)),
-     'equipment.transformers_per_hall_per_feed = ceil(kVA per hall per feed / unit)');
+  /* the drawing's per-feed count IS the 2N sizing, not the 1N total split for display */
+  ok(S.distribution.transformers_per_hall_per_feed === E.unit_subs_per_feed_per_hall,
+     'distribution.transformers_per_hall_per_feed republishes the 2N per-feed sizing');
   ok(S.distribution.ups_frames_per_hall_per_feed === Math.ceil(S.power.total_it_kwe / M.facility.halls / (M.equipment.ups.unitKw * M.equipment.ups.designLoadingMax)),
      'equipment.ups_frames_per_hall_per_feed = ceil(hall IT / (frame x design loading))');
   ok(S.distribution.gensets_facility_shared === true, 'equipment.gensets_facility_shared: the pool is sized on the facility load, with no per-hall split');

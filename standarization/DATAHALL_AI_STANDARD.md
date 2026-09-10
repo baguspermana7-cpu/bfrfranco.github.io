@@ -48,17 +48,19 @@ is fully rewritten and carries none of the retired vocabulary. See
 `standarization/ACCURACY_VALIDATION.md` Rule 5 status note for the probe evidence
 (`AI-Test-3a`, `TS-AI-1`).
 
-**LV electrical grouping (new at GB300 — 880 racks/hall will not fit a per-rack SLD).** Each
-1,922 m² hall (62 × 31 m) is laid out as **40 rows × 22 racks in two banks of 20** (v2.4.0). Each row IS one **RPP group
+**LV electrical grouping (new at GB300 — a per-rack SLD will not fit a hall of this size).** Each
+1,922 m² hall (62 × 31 m) is laid out as **20 rows × 22 racks in two banks of 10** (v3.0.0; it was
+40 rows of 880 racks until the floor budget showed that hall could not hold its own CDUs and CRAHs).
+Each row IS one **RPP group
 of 22 racks** (`geometry.racks_per_row` 22, `geometry.rack_rows` 40, `geometry.rack_banks` 2, `geometry.rows_per_bank` 20, `geometry.racks_per_group` 22,
 `geometry.rack_groups_per_hall` 40 → RG-01..RG-40 per hall, fed A+B). One group is
 22 × 142 kW = **3.12 MW ≈ 4.7 kA at 400 V / PF 0.96** (`distribution.group_kw`,
 `distribution.group_current_a`), which a **5,000 A busway trunk** carries
 (`distribution.busway_trunk_a`, `distribution.busway_loading_pct`). This is the aggregation unit
 every diagram (SLD L6, hall mimic row strips, BoD PDF per-group table) now draws instead of a
-per-rack node — 880 per-rack edges would not fit any diagram legibly.
+per-rack node — per-rack edges at this count would not fit any diagram legibly.
 
-**Basis.** `facility.racksPerHall 880` × 4 halls × `facility.rackItKw 142` → `power.rack_it_facility_mw`
+**Basis.** `facility.racksPerHall 440` × 8 halls × `facility.rackItKw 142` → `power.rack_it_facility_mw`
 499.84 (`power.it_envelope` = `rack-only`; `power.nameplate_it_mw_label` 500 is a LABEL, never a
 denominator — Rule 4). `power.total_it_mw` 539.05 adds fabric (`fabric.switchKw` 4 kW × 2/rack,
 ASSUMED — the softest electrical input), OOB and a 2 % storage/management allowance.
@@ -133,7 +135,7 @@ P&IDs, SLD, rack diagrams, engineering model, or Scenario A calculations.
 
 | Scope | Current/adopted basis | Study-only basis |
 |---|---|---|
-| DC AI/HPC | `DCAI_CALC v1.0.0` (spec `gb300-500mw-2026-09-06`): 4 halls × 880 GB300 NVL72 racks/hall = 3,520 racks; one rack IS one NVLink domain at **142 kW/rack**; rack IT 499.84 MW facility (`power.rack_it_facility_mw`, LABEL "500 MW" never a denominator), total IT 539.05 MW facility (the PUE denominator); 253,440 GPUs; PUE 1.165 design day; hall 62×31 m, 1,922 m², 65.0 kW/m² gross IT density | GB200 split-domain reference (RETIRED, frozen, `baselineImpact: NONE`): 4 halls × 3.564 MW IT; 27 logical NVL72 domains/hall, 2 physical rack positions/domain, 54 positions/hall, 66 kW/position, 14.256 MW facility IT. Kept only as a named comparison in the platform selector — it can never move the adopted GB300 numbers. |
+| DC AI/HPC | `DCAI_CALC v1.0.0` (spec `gb300-500mw-2026-09-06`): 8 halls × 440 GB300 NVL72 racks/hall = 3,520 racks; one rack IS one NVLink domain at **142 kW/rack**; rack IT 499.84 MW facility (`power.rack_it_facility_mw`, LABEL "500 MW" never a denominator), total IT 539.05 MW facility (the PUE denominator); 253,440 GPUs; PUE 1.165 design day; hall 62×31 m, 1,922 m², 32.5 kW/m² gross IT density, floor budget and air path both closed (`geometry.floor_budget_closes`, `geometry.fan_wall_fits`) | GB200 split-domain reference (RETIRED, frozen, `baselineImpact: NONE`): 4 halls × 3.564 MW IT; 27 logical NVL72 domains/hall, 2 physical rack positions/domain, 54 positions/hall, 66 kW/position, 14.256 MW facility IT. Kept only as a named comparison in the platform selector — it can never move the adopted GB300 numbers. |
 | DC Conventional | `CONV_CALC v2.0.0`: 4 halls × 7.500 MW = 30.000 MW current simulated IT; 43.500 MW facility at PUE 1.45; 2,000 installed positions (500/hall) | 4 halls × 10 MW IT = 40 MW planning/design capacity. It is not current load or telemetry and requires Engineer-of-Record validation. |
 
 Density means `IT load per hall / gross hall floor area`. The public field is

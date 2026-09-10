@@ -322,7 +322,7 @@
       "label": "gpu per hall",
       "unit": null,
       "kind": "derived",
-      "value": 63360,
+      "value": 31680,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -529,7 +529,7 @@
       "label": "racks per hall",
       "unit": null,
       "kind": "authored",
-      "value": 880,
+      "value": 440,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -546,6 +546,7 @@
         }
       ],
       "tests": [
+        "test-dcai-engine.mjs",
         "test-dcai-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [
@@ -554,7 +555,7 @@
       ],
       "source": {
         "ref": "js/dcai-model.js facility.racksPerHall",
-        "method": "plan Track A §A2 — 880 keeps all four halls identical AND divides by the 4-rack rail group, so the fabric arithmetic stays integer. 3,522 (the figure that lands exactly on 500.1 MW) does neither. ADOPTED",
+        "method": "440 = 20 rows x 22, and 22 is the RPP group the busway ampacity fixes (electrical.racksPerRppGroup). It divides by the 4-rack rail group so the fabric arithmetic stays integer, and 8 x 440 = 3,520 keeps the facility rack count and the 500 MW envelope exactly as they were. ADOPTED",
         "asOf": "2026-09-06"
       }
     },
@@ -753,7 +754,7 @@
       "label": "aux hall kW",
       "unit": "kW",
       "kind": "derived",
-      "value": 437.36,
+      "value": 218.68,
       "formula": null,
       "deps": [],
       "scope": "site",
@@ -995,7 +996,7 @@
       "label": "chillers hall kW",
       "unit": "kW",
       "kind": "derived",
-      "value": 6452.8703913198415,
+      "value": 3226.4351956599207,
       "formula": null,
       "deps": [],
       "scope": "site",
@@ -1195,7 +1196,7 @@
       "label": "cooling hall kW",
       "unit": "kW",
       "kind": "derived",
-      "value": 15296.654414640667,
+      "value": 7648.327207320333,
       "formula": null,
       "deps": [],
       "scope": "site",
@@ -1596,7 +1597,7 @@
       "label": "facility hall kW",
       "unit": "kW",
       "kind": "derived",
-      "value": 157021.79887059925,
+      "value": 78510.89943529962,
       "formula": null,
       "deps": [],
       "scope": "site",
@@ -1811,7 +1812,7 @@
       "label": "fans hall kW",
       "unit": "kW",
       "kind": "derived",
-      "value": 5137.786745031432,
+      "value": 2568.893372515716,
       "formula": null,
       "deps": [],
       "scope": "site",
@@ -2027,7 +2028,7 @@
       "label": "non it hall kW",
       "unit": "kW",
       "kind": "derived",
-      "value": 22258.598870599235,
+      "value": 11129.299435299617,
       "formula": null,
       "deps": [],
       "scope": "site",
@@ -2240,7 +2241,7 @@
       "label": "pumps hall kW",
       "unit": "kW",
       "kind": "derived",
-      "value": 3705.9972782893938,
+      "value": 1852.9986391446969,
       "formula": null,
       "deps": [],
       "scope": "site",
@@ -2507,7 +2508,7 @@
       "label": "ups dist loss hall kW",
       "unit": "kW",
       "kind": "derived",
-      "value": 6524.584455958568,
+      "value": 3262.292227979284,
       "formula": null,
       "deps": [],
       "scope": "site",
@@ -2716,7 +2717,7 @@
       "label": "chw hall m3h",
       "unit": "m³/h",
       "kind": "derived",
-      "value": 3817.2754431871376,
+      "value": 1908.6377215935688,
       "formula": null,
       "deps": [],
       "scope": "plant",
@@ -2961,7 +2962,7 @@
       "label": "htw hall m3h",
       "unit": "m³/h",
       "kind": "derived",
-      "value": 11418.346870520783,
+      "value": 5709.173435260392,
       "formula": null,
       "deps": [],
       "scope": "plant",
@@ -3039,7 +3040,7 @@
       "label": "tcs hall lpm",
       "unit": null,
       "kind": "derived",
-      "value": 160205.1282051282,
+      "value": 80102.5641025641,
       "formula": null,
       "deps": [],
       "scope": "plant",
@@ -3079,7 +3080,7 @@
       "label": "tcs hall m3h",
       "unit": "m³/h",
       "kind": "derived",
-      "value": 9612.307692307691,
+      "value": 4806.153846153846,
       "formula": null,
       "deps": [],
       "scope": "plant",
@@ -4520,7 +4521,7 @@
       "label": "rpp groups per hall",
       "unit": null,
       "kind": "derived",
-      "value": 40,
+      "value": 20,
       "formula": null,
       "display": "internal",
       "displayReason": "Republishes geometry.rack_groups_per_hall (rendered on the SLD and hall mimic) under the distribution branch for the LV consumers.",
@@ -4544,7 +4545,7 @@
       "label": "rpp per hall",
       "unit": null,
       "kind": "derived",
-      "value": 80,
+      "value": 40,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -4617,7 +4618,7 @@
       "label": "ups frames per hall per feed",
       "unit": null,
       "kind": "derived",
-      "value": 135,
+      "value": 68,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -4626,7 +4627,6 @@
       "dependsOnInputs": [
         "equipment.ups.designLoadingMax",
         "equipment.ups.unitKw",
-        "fabric.storageMgmtFraction",
         "fabric.switchKw",
         "fabric.switchesPerRack",
         "facility.rackItKw",
@@ -4683,7 +4683,7 @@
       "label": "battery hall kwh",
       "unit": "kWh",
       "kind": "derived",
-      "value": 14776.666666666666,
+      "value": 7388.333333333333,
       "formula": null,
       "deps": [],
       "scope": "plant",
@@ -4754,7 +4754,7 @@
       "label": "cdu duty per hall",
       "unit": null,
       "kind": "derived",
-      "value": 107,
+      "value": 54,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -4786,7 +4786,7 @@
       "label": "cdu duty per unit kW th",
       "unit": "kW (thermal)",
       "kind": "derived",
-      "value": 992.6728971962617,
+      "value": 983.4814814814815,
       "formula": null,
       "deps": [],
       "scope": "plant",
@@ -4816,7 +4816,7 @@
       "label": "cdu flow check m3h",
       "unit": "m³/h",
       "kind": "derived",
-      "value": 9612.307692307691,
+      "value": 4806.153846153846,
       "formula": null,
       "display": "internal",
       "displayReason": "Cross-check of the engine TCS flow against the vendor-published 1.5 LPM/kW rule, asserted within 3 % by tools/test-dcai-engine.mjs; an audit figure, not an operating value.",
@@ -4845,7 +4845,7 @@
       "label": "cdu flow per unit lpm",
       "unit": null,
       "kind": "derived",
-      "value": 1497.2441888329738,
+      "value": 1483.38081671415,
       "formula": null,
       "deps": [],
       "scope": "plant",
@@ -4878,7 +4878,7 @@
       "label": "cdu installed facility",
       "unit": null,
       "kind": "derived",
-      "value": 432,
+      "value": 440,
       "formula": null,
       "deps": [],
       "scope": "plant",
@@ -4911,7 +4911,7 @@
       "label": "cdu installed per hall",
       "unit": null,
       "kind": "derived",
-      "value": 108,
+      "value": 55,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -4974,7 +4974,7 @@
       "label": "cdu published flow m3h",
       "unit": "m³/h",
       "kind": "derived",
-      "value": 9559.44,
+      "value": 4779.72,
       "formula": null,
       "display": "internal",
       "displayReason": "The vendor flow rule applied to the hall liquid heat, used only as the comparator for equipment.cdu_flow_check_m3h in the engine gate.",
@@ -5181,7 +5181,7 @@
       "label": "crah duty per hall",
       "unit": null,
       "kind": "derived",
-      "value": 178,
+      "value": 89,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -5256,7 +5256,7 @@
       "label": "crah installed facility",
       "unit": null,
       "kind": "derived",
-      "value": 716,
+      "value": 720,
       "formula": null,
       "deps": [],
       "scope": "plant",
@@ -5296,7 +5296,7 @@
       "label": "crah installed per hall",
       "unit": null,
       "kind": "derived",
-      "value": 179,
+      "value": 90,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -5802,11 +5802,75 @@
       }
     },
     {
+      "id": "equipment.hall_kva",
+      "label": "hall kva",
+      "unit": "kVA",
+      "kind": "derived",
+      "value": 81782.18691177045,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "An intermediate between equipment.facility_kva, which is rendered, and the per-feed sizing, which is rendered as the transformer count per feed.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.auxFractionOfIt",
+        "electrical.powerFactor",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "fabric.oobKw",
+        "fabric.oobPerRack",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "hydraulics.airCpKjPerKgK",
+        "hydraulics.airRhoKgPerM3",
+        "hydraulics.cdwPumpHeadM",
+        "hydraulics.chwPumpHeadM",
+        "hydraulics.crahFanStaticPa",
+        "hydraulics.dryCoolerFanStaticPa",
+        "hydraulics.fanEfficiency",
+        "hydraulics.fanMotorEfficiency",
+        "hydraulics.htwPumpHeadM",
+        "hydraulics.pumpEfficiency",
+        "hydraulics.pumpMotorEfficiency",
+        "hydraulics.tcsFluidCpKjPerKgK",
+        "hydraulics.tcsPumpHeadM",
+        "hydraulics.waterCpKjPerKgK",
+        "thermal.airSupplyC",
+        "thermal.airsideDeltaTK",
+        "thermal.carnotFraction",
+        "thermal.cduApproachK",
+        "thermal.cdwDeltaTK",
+        "thermal.chwCoilApproachK",
+        "thermal.chwDeltaTK",
+        "thermal.condApproachK",
+        "thermal.designAmbientDbC",
+        "thermal.dryCoolerAirDeltaTK",
+        "thermal.dryCoolerApproachK",
+        "thermal.evapApproachK",
+        "thermal.htwDeltaTK",
+        "thermal.tcsDeltaTK",
+        "thermal.tcsSupplyC"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
       "id": "equipment.transformer_loading_pct",
       "label": "transformer loading pct",
       "unit": "%",
       "kind": "derived",
-      "value": 99.88664050292574,
+      "value": 49.564961764709366,
       "formula": null,
       "deps": [],
       "scope": "plant",
@@ -5907,7 +5971,103 @@
       "label": "transformers",
       "unit": null,
       "kind": "derived",
-      "value": 262,
+      "value": 528,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.powerFactor",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.transformer.unitMva",
+        "equipment.ups.efficiency",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "hydraulics.airCpKjPerKgK",
+        "hydraulics.airRhoKgPerM3",
+        "hydraulics.dryCoolerFanStaticPa",
+        "hydraulics.fanEfficiency",
+        "hydraulics.fanMotorEfficiency",
+        "thermal.airSupplyC",
+        "thermal.carnotFraction",
+        "thermal.cduApproachK",
+        "thermal.designAmbientDbC",
+        "thermal.dryCoolerAirDeltaTK",
+        "thermal.dryCoolerApproachK",
+        "thermal.tcsSupplyC"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 23
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "equipment.unit_sub_feed_carries_whole_hall",
+      "label": "unit sub feed carries whole hall",
+      "unit": null,
+      "kind": "authored",
+      "value": true,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "A pass/fail flag that tools/test-dcai-engine.mjs asserts; the electrical panel renders the contingency loading percentage it summarises.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "LABEL",
+      "explainKey": null,
+      "dependsOnInputs": [],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js",
+        "method": "text label or identifier republished from the model",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
+      "id": "equipment.unit_sub_kva",
+      "label": "unit sub kva",
+      "unit": "kVA",
+      "kind": "derived",
+      "value": 2500,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "A unit restatement in kVA of equipment.transformer_unit_mva, which the electrical drawing already renders in MVA at every transformer symbol.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "equipment.transformer.unitMva"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "equipment.unit_sub_loading_contingency_pct",
+      "label": "unit sub loading contingency pct",
+      "unit": "%",
+      "kind": "derived",
+      "value": 99.12992352941873,
       "formula": null,
       "deps": [],
       "scope": "plant",
@@ -5919,6 +6079,8 @@
         "equipment.transformer.distributionEfficiency",
         "equipment.transformer.unitMva",
         "equipment.ups.efficiency",
+        "fabric.oobKw",
+        "fabric.oobPerRack",
         "fabric.storageMgmtFraction",
         "fabric.switchKw",
         "fabric.switchesPerRack",
@@ -5960,7 +6122,121 @@
       "consumers": [
         {
           "page": "datahallAI.html",
-          "reads": 23
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "equipment.unit_sub_loading_normal_pct",
+      "label": "unit sub loading normal pct",
+      "unit": "%",
+      "kind": "derived",
+      "value": 49.564961764709366,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.auxFractionOfIt",
+        "electrical.powerFactor",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.transformer.unitMva",
+        "equipment.ups.efficiency",
+        "fabric.oobKw",
+        "fabric.oobPerRack",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "hydraulics.airCpKjPerKgK",
+        "hydraulics.airRhoKgPerM3",
+        "hydraulics.cdwPumpHeadM",
+        "hydraulics.chwPumpHeadM",
+        "hydraulics.crahFanStaticPa",
+        "hydraulics.dryCoolerFanStaticPa",
+        "hydraulics.fanEfficiency",
+        "hydraulics.fanMotorEfficiency",
+        "hydraulics.htwPumpHeadM",
+        "hydraulics.pumpEfficiency",
+        "hydraulics.pumpMotorEfficiency",
+        "hydraulics.tcsFluidCpKjPerKgK",
+        "hydraulics.tcsPumpHeadM",
+        "hydraulics.waterCpKjPerKgK",
+        "thermal.airSupplyC",
+        "thermal.airsideDeltaTK",
+        "thermal.carnotFraction",
+        "thermal.cduApproachK",
+        "thermal.cdwDeltaTK",
+        "thermal.chwCoilApproachK",
+        "thermal.chwDeltaTK",
+        "thermal.condApproachK",
+        "thermal.designAmbientDbC",
+        "thermal.dryCoolerAirDeltaTK",
+        "thermal.dryCoolerApproachK",
+        "thermal.evapApproachK",
+        "thermal.htwDeltaTK",
+        "thermal.tcsDeltaTK",
+        "thermal.tcsSupplyC"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "equipment.unit_subs_per_feed_per_hall",
+      "label": "unit subs per feed per hall",
+      "unit": null,
+      "kind": "derived",
+      "value": 33,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.powerFactor",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.transformer.unitMva",
+        "equipment.ups.efficiency",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "hydraulics.airCpKjPerKgK",
+        "hydraulics.airRhoKgPerM3",
+        "hydraulics.dryCoolerFanStaticPa",
+        "hydraulics.fanEfficiency",
+        "hydraulics.fanMotorEfficiency",
+        "thermal.airSupplyC",
+        "thermal.carnotFraction",
+        "thermal.cduApproachK",
+        "thermal.designAmbientDbC",
+        "thermal.dryCoolerAirDeltaTK",
+        "thermal.dryCoolerApproachK",
+        "thermal.tcsSupplyC"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
         }
       ],
       "tests": [
@@ -6173,6 +6449,620 @@
       }
     },
     {
+      "id": "geometry.air_delta_t_k",
+      "label": "air delta t K",
+      "unit": "K",
+      "kind": "authored",
+      "value": 11,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "The difference between design planes p09 and p11, both of which are already rendered with their own basis hooks on the cooling diagram.",
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "thermal.airsideDeltaTK"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js thermal.airsideDeltaTK",
+        "method": "rack airside rise, contained aisle (conv-engine.js AIRSIDE_DELTA_T_K). ADOPTED",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
+      "id": "geometry.air_flow_m3s_per_hall",
+      "label": "air flow m3s per hall",
+      "unit": null,
+      "kind": "derived",
+      "value": 1338.3515926412854,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.auxFractionOfIt",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "fabric.oobKw",
+        "fabric.oobPerRack",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "geometry.airCpKjKgK",
+        "geometry.airDensityKgM3",
+        "thermal.airsideDeltaTK"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 4
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "geometry.air_plant_face_available_m2",
+      "label": "air plant face available m2",
+      "unit": "m²",
+      "kind": "derived",
+      "value": 825,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "The gallery frontage multiplied by the hall height; the hall panel renders the frontage itself, which is the dimension a floor plan is read in.",
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.auxFractionOfIt",
+        "equipment.crah.unitKwTh",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "fabric.oobKw",
+        "fabric.oobPerRack",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "geometry.airPlantDepthM",
+        "geometry.crahServiceM2",
+        "geometry.heightM"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "geometry.air_plant_frontage_fits",
+      "label": "air plant frontage fits",
+      "unit": null,
+      "kind": "derived",
+      "value": true,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "A pass/fail flag that tools/test-dcai-engine.mjs asserts; the hall panel renders the gallery frontage and the hall perimeter it is compared against.",
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "equipment.crah.unitKwTh",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "geometry.airPlantDepthM",
+        "geometry.crahServiceM2"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "geometry.air_plant_frontage_m",
+      "label": "air plant frontage m",
+      "unit": "m",
+      "kind": "derived",
+      "value": 150,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.auxFractionOfIt",
+        "equipment.crah.unitKwTh",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "fabric.oobKw",
+        "fabric.oobPerRack",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "geometry.airPlantDepthM",
+        "geometry.crahServiceM2"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 4
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "geometry.air_plant_m2",
+      "label": "air plant m2",
+      "unit": "m²",
+      "kind": "derived",
+      "value": 450,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.auxFractionOfIt",
+        "equipment.crah.unitKwTh",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "fabric.oobKw",
+        "fabric.oobPerRack",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "geometry.crahServiceM2"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 4
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "geometry.cdu_gallery_m2",
+      "label": "cdu gallery m2",
+      "unit": "m²",
+      "kind": "derived",
+      "value": 220,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "equipment.cdu.unitKwTh",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "geometry.cduServiceM2"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 4
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "geometry.cold_aisle_m",
+      "label": "cold aisle m",
+      "unit": "m",
+      "kind": "authored",
+      "value": 1.2,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "geometry.coldAisleM"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 1
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js geometry.coldAisleM",
+        "method": "two 600 mm floor tiles of cold aisle (the ASHRAE-conventional minimum for a serviceable front), and a contained hot aisle at 0.7 m — enough for a door swing and a technician, not for two. Row pitch is DERIVED from these, and lands on the 3.1 m that the retired four-hall comment asserted as prose: 1.2 + 1.2 + 0.7. Aisles are NOT shared between back-to-back rows here, because overhead TCS manifolds and containment doors need the full clearance on both faces. ADOPTED",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
+      "id": "geometry.cross_aisle_m",
+      "label": "cross aisle m",
+      "unit": "m",
+      "kind": "authored",
+      "value": 4.6,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "geometry.crossAisleM"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js geometry.crossAisleM",
+        "method": "the central aisle carries the TCS supply and return headers, the cable tray spine and the fire egress route; 4.6 m is what a 31 m hall has left after two 13.2 m row banks. ADOPTED",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
+      "id": "geometry.cross_aisle_m2",
+      "label": "cross aisle m2",
+      "unit": "m²",
+      "kind": "derived",
+      "value": 285.2,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "geometry.crossAisleM",
+        "geometry.lengthM"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 4
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "geometry.fan_wall_face_fraction",
+      "label": "fan wall face fraction",
+      "unit": null,
+      "kind": "derived",
+      "value": 0.6488977418866839,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "The percentage form of the face-area check; the hall panel renders both the required face and the available wall face, so the ratio adds no information.",
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.auxFractionOfIt",
+        "equipment.crah.unitKwTh",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "fabric.oobKw",
+        "fabric.oobPerRack",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "geometry.airCpKjKgK",
+        "geometry.airDensityKgM3",
+        "geometry.airPlantDepthM",
+        "geometry.crahServiceM2",
+        "geometry.fanWallFaceVelocityMs",
+        "geometry.heightM",
+        "thermal.airsideDeltaTK"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "geometry.fan_wall_face_m2",
+      "label": "fan wall face m2",
+      "unit": "m²",
+      "kind": "derived",
+      "value": 535.3406370565142,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.auxFractionOfIt",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "fabric.oobKw",
+        "fabric.oobPerRack",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "geometry.airCpKjKgK",
+        "geometry.airDensityKgM3",
+        "geometry.fanWallFaceVelocityMs",
+        "thermal.airsideDeltaTK"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "geometry.fan_wall_fits",
+      "label": "fan wall fits",
+      "unit": null,
+      "kind": "derived",
+      "value": true,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "A pass/fail flag that tools/test-dcai-engine.mjs asserts; the hall panel renders the required face area and the available wall face, which is what an engineer checks.",
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "equipment.ups.efficiency",
+        "gb300.liquidCaptureRatio"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": [
+        "standarization/DATAHALL_AI_STANDARD.md"
+      ]
+    },
+    {
+      "id": "geometry.floor_budget_closes",
+      "label": "floor budget closes",
+      "unit": null,
+      "kind": "derived",
+      "value": true,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "A pass/fail flag that tools/test-dcai-engine.mjs asserts; the hall panel renders the four budget terms and the spare area it summarises, which is the operator-legible form.",
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "equipment.crah.unitKwTh",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "geometry.crahServiceM2",
+        "geometry.lengthM",
+        "geometry.rackPitchM",
+        "geometry.widthM"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": [
+        "standarization/DATAHALL_AI_STANDARD.md"
+      ]
+    },
+    {
+      "id": "geometry.floor_spare_fraction",
+      "label": "floor spare fraction",
+      "unit": null,
+      "kind": "derived",
+      "value": 0.07721123829344438,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "The percentage form of geometry.floor_spare_m2, which the hall panel renders in square metres because a floor plan is read in area, not in percent.",
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.auxFractionOfIt",
+        "equipment.cdu.unitKwTh",
+        "equipment.crah.unitKwTh",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "fabric.oobKw",
+        "fabric.oobPerRack",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "geometry.cduServiceM2",
+        "geometry.coldAisleM",
+        "geometry.crahServiceM2",
+        "geometry.crossAisleM",
+        "geometry.hotAisleM",
+        "geometry.lengthM",
+        "geometry.rackDepthM",
+        "geometry.rackPitchM",
+        "geometry.widthM"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "geometry.floor_spare_m2",
+      "label": "floor spare m2",
+      "unit": "m²",
+      "kind": "derived",
+      "value": 148.4000000000001,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.auxFractionOfIt",
+        "equipment.cdu.unitKwTh",
+        "equipment.crah.unitKwTh",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "fabric.oobKw",
+        "fabric.oobPerRack",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "geometry.cduServiceM2",
+        "geometry.coldAisleM",
+        "geometry.crahServiceM2",
+        "geometry.crossAisleM",
+        "geometry.hotAisleM",
+        "geometry.lengthM",
+        "geometry.rackDepthM",
+        "geometry.rackPitchM",
+        "geometry.widthM"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 4
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "geometry.floor_used_m2",
+      "label": "floor used m2",
+      "unit": "m²",
+      "kind": "derived",
+      "value": 1773.6,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.auxFractionOfIt",
+        "equipment.cdu.unitKwTh",
+        "equipment.crah.unitKwTh",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "fabric.oobKw",
+        "fabric.oobPerRack",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "geometry.cduServiceM2",
+        "geometry.coldAisleM",
+        "geometry.crahServiceM2",
+        "geometry.crossAisleM",
+        "geometry.hotAisleM",
+        "geometry.lengthM",
+        "geometry.rackDepthM",
+        "geometry.rackPitchM"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 4
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
       "id": "geometry.groups_per_row",
       "label": "groups per row",
       "unit": null,
@@ -6251,7 +7141,7 @@
       "docs": [],
       "source": {
         "ref": "js/dcai-model.js geometry.heightM",
-        "method": "880 racks x 0.6 x 1.2 m = 634 m2 of rack footprint; a 1:3 footprint-to- floor ratio for hot/cold aisles, CDUs, CRAHs and egress. ADOPTED",
+        "method": "the room is unchanged from the four-hall basis. What changed is that its floor is now BUDGETED rather than asserted: see geometry.floor_* in the engine, which adds the rack field, the aisles, the CDU gallery and the air plant and requires the total to fit. ADOPTED",
         "asOf": "2026-09-06"
       }
     },
@@ -6284,9 +7174,36 @@
       ],
       "source": {
         "ref": "js/dcai-model.js geometry.lengthM",
-        "method": "880 racks x 0.6 x 1.2 m = 634 m2 of rack footprint; a 1:3 footprint-to- floor ratio for hot/cold aisles, CDUs, CRAHs and egress. ADOPTED",
+        "method": "the room is unchanged from the four-hall basis. What changed is that its floor is now BUDGETED rather than asserted: see geometry.floor_* in the engine, which adds the rack field, the aisles, the CDU gallery and the air plant and requires the total to fit. ADOPTED",
         "asOf": "2026-09-06"
       }
+    },
+    {
+      "id": "geometry.hall_perimeter_m",
+      "label": "hall perimeter m",
+      "unit": "m",
+      "kind": "derived",
+      "value": 186,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "geometry.lengthM",
+        "geometry.widthM"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 2
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
     },
     {
       "id": "geometry.hall_volume_m3",
@@ -6345,7 +7262,39 @@
       "docs": [],
       "source": {
         "ref": "js/dcai-model.js geometry.widthM",
-        "method": "880 racks x 0.6 x 1.2 m = 634 m2 of rack footprint; a 1:3 footprint-to- floor ratio for hot/cold aisles, CDUs, CRAHs and egress. ADOPTED",
+        "method": "the room is unchanged from the four-hall basis. What changed is that its floor is now BUDGETED rather than asserted: see geometry.floor_* in the engine, which adds the rack field, the aisles, the CDU gallery and the air plant and requires the total to fit. ADOPTED",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
+      "id": "geometry.hot_aisle_m",
+      "label": "hot aisle m",
+      "unit": "m",
+      "kind": "authored",
+      "value": 0.7,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "geometry.hotAisleM"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 1
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js geometry.hotAisleM",
+        "method": "two 600 mm floor tiles of cold aisle (the ASHRAE-conventional minimum for a serviceable front), and a contained hot aisle at 0.7 m — enough for a door swing and a technician, not for two. Row pitch is DERIVED from these, and lands on the 3.1 m that the retired four-hall comment asserted as prose: 1.2 + 1.2 + 0.7. Aisles are NOT shared between back-to-back rows here, because overhead TCS manifolds and containment doors need the full clearance on both faces. ADOPTED",
         "asOf": "2026-09-06"
       }
     },
@@ -6380,7 +7329,7 @@
       "label": "it density kw per m2",
       "unit": "m²",
       "kind": "derived",
-      "value": 65.0156087408949,
+      "value": 32.50780437044745,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -6396,7 +7345,7 @@
       "consumers": [
         {
           "page": "datahallAI.html",
-          "reads": 8
+          "reads": 11
         }
       ],
       "tests": [
@@ -6408,6 +7357,7 @@
     },
     {
       "id": "geometry.rack_banks",
+      "label": "rack banks",
       "unit": null,
       "kind": "authored",
       "value": 2,
@@ -6435,16 +7385,78 @@
       ],
       "source": {
         "ref": "js/dcai-model.js geometry.banks",
-        "method": "the two banks face the central cross aisle that carries the TCS headers from the CDU galleries at both ends; rows per bank = rows / banks must be an integer. ADOPTED",
+        "method": "two banks facing a central cross aisle that carries the TCS headers; rows per bank = rows / banks must be an integer. ADOPTED",
         "asOf": "2026-09-06"
       }
+    },
+    {
+      "id": "geometry.rack_depth_m",
+      "label": "rack depth m",
+      "unit": "m",
+      "kind": "authored",
+      "value": 1.2,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "geometry.rackDepthM"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 1
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js geometry.rackDepthM",
+        "method": "the same 600 x 1200 mm class, stated as the two dimensions the floor plan needs rather than only their product. ADOPTED",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
+      "id": "geometry.rack_field_m2",
+      "label": "rack field m2",
+      "unit": "m²",
+      "kind": "derived",
+      "value": 818.3999999999999,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "facility.racksPerHall",
+        "geometry.coldAisleM",
+        "geometry.hotAisleM",
+        "geometry.rackDepthM",
+        "geometry.rackPitchM"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 4
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
     },
     {
       "id": "geometry.rack_footprint_fraction",
       "label": "rack footprint fraction",
       "unit": null,
       "kind": "derived",
-      "value": 0.3296566077003122,
+      "value": 0.1648283038501561,
       "formula": null,
       "display": "internal",
       "displayReason": "Auxiliary geometry ratio behind geometry.it_density_kw_per_m2, which the page renders; kept for the floor re-grid work (Track A).",
@@ -6459,7 +7471,12 @@
         "geometry.widthM"
       ],
       "dependsOnInputsAtCliff": [],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
       "tests": [
         "test-dcai-engine.mjs"
       ],
@@ -6470,7 +7487,7 @@
       "label": "rack footprint m2 per hall",
       "unit": null,
       "kind": "derived",
-      "value": 633.6,
+      "value": 316.8,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -6497,7 +7514,7 @@
       "label": "rack groups per hall",
       "unit": null,
       "kind": "derived",
-      "value": 40,
+      "value": 20,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -6551,11 +7568,43 @@
       "docs": []
     },
     {
+      "id": "geometry.rack_pitch_m",
+      "label": "rack pitch m",
+      "unit": "m",
+      "kind": "authored",
+      "value": 0.6,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "geometry.rackPitchM"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 1
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js geometry.rackPitchM",
+        "method": "the same 600 x 1200 mm class, stated as the two dimensions the floor plan needs rather than only their product. ADOPTED",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
       "id": "geometry.rack_rows",
       "label": "rack rows",
       "unit": null,
       "kind": "authored",
-      "value": 40,
+      "value": 20,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -6580,15 +7629,16 @@
       ],
       "source": {
         "ref": "js/dcai-model.js geometry.rows",
-        "method": "one row = one RPP group of 22 racks (13.2 m at 0.6 m pitch); two banks of 20 rows at a 3.1 m row pitch fill the 62 m length (20 x 3.1 = 62), and 2 x 13.2 m + a 4.6 m cross aisle fill the 31 m width. 40 x 22 = 880 exactly; a row is a readable object (owner 2026-09-07: \"per row max 24 racks\"). ADOPTED",
+        "method": "440 racks / 22 per row. A row is one RPP group, so the electrical unit of account and the floor unit of account are the same object. ADOPTED",
         "asOf": "2026-09-06"
       }
     },
     {
       "id": "geometry.racks_per_bank",
+      "label": "racks per bank",
       "unit": null,
       "kind": "derived",
-      "value": 440,
+      "value": 220,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -6640,7 +7690,7 @@
       ],
       "source": {
         "ref": "js/dcai-model.js electrical.racksPerRppGroup",
-        "method": "LV distribution group = a quarter-row of 22 racks. 22 x 142 kW = 3.12 MW -> 3,124 / (sqrt3 x 400 x 0.96) = 4,697 A, which one 5,000 A trunk carries. A half-row (44 racks, 9.4 kA) does not fit any LV busway; the plan agent flagged that gap on 2026-09-06 and this is the resolution. 880 = 10 rows x 4 x 22. ADOPTED",
+        "method": "LV distribution group = a quarter-row of 22 racks. 22 x 142 kW = 3.12 MW -> 3,124 / (sqrt3 x 400 x 0.96) = 4,697 A, which one 5,000 A trunk carries. A half-row (44 racks, 9.4 kA) does not fit any LV busway; the plan agent flagged that gap on 2026-09-06 and this is the resolution. One row IS one group: 440 = 20 rows x 22. (This comment previously said \"880 = 10 rows x 4 x 22\", which contradicted geometry.rows outright; both shipped for three releases.) ADOPTED",
         "asOf": "2026-09-06"
       }
     },
@@ -6674,10 +7724,67 @@
       ]
     },
     {
+      "id": "geometry.row_length_m",
+      "label": "row length m",
+      "unit": "m",
+      "kind": "derived",
+      "value": 13.2,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "facility.racksPerHall",
+        "geometry.rackPitchM",
+        "geometry.rows"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 4
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "geometry.row_pitch_m",
+      "label": "row pitch m",
+      "unit": "m",
+      "kind": "derived",
+      "value": 3.0999999999999996,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "geometry.coldAisleM",
+        "geometry.hotAisleM",
+        "geometry.rackDepthM"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 4
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
       "id": "geometry.rows_per_bank",
+      "label": "rows per bank",
       "unit": null,
       "kind": "derived",
-      "value": 20,
+      "value": 10,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -6706,7 +7813,7 @@
       "label": "air hall kW th",
       "unit": "kW (thermal)",
       "kind": "derived",
-      "value": 35509.14445595857,
+      "value": 17754.572227979286,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -6730,7 +7837,7 @@
       "consumers": [
         {
           "page": "datahallAI.html",
-          "reads": 15
+          "reads": 17
         }
       ],
       "tests": [
@@ -6818,7 +7925,7 @@
       "label": "liquid hall kW th",
       "unit": "kW (thermal)",
       "kind": "derived",
-      "value": 106216,
+      "value": 53108,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -7149,7 +8256,7 @@
       "label": "cores per hall",
       "unit": null,
       "kind": "derived",
-      "value": 220,
+      "value": 110,
       "formula": null,
       "deps": [],
       "scope": "network",
@@ -7182,7 +8289,7 @@
       "label": "gpu downlinks per hall",
       "unit": null,
       "kind": "derived",
-      "value": 63360,
+      "value": 31680,
       "formula": null,
       "display": "internal",
       "displayReason": "Link count behind network.leaves_per_hall, which the page renders; the Network tab redesign (Track A §A7) renders the link tiers.",
@@ -7276,7 +8383,7 @@
       "label": "leaf spine links per hall",
       "unit": null,
       "kind": "derived",
-      "value": 63360,
+      "value": 31680,
       "formula": null,
       "display": "internal",
       "displayReason": "Link count behind network.spines_per_hall, which the page renders; rendered by the Network tab redesign (Track A §A7).",
@@ -7308,7 +8415,7 @@
       "label": "leaves per hall",
       "unit": null,
       "kind": "derived",
-      "value": 880,
+      "value": 440,
       "formula": null,
       "deps": [],
       "scope": "network",
@@ -7337,7 +8444,7 @@
       "label": "spine core links per hall",
       "unit": null,
       "kind": "derived",
-      "value": 31680,
+      "value": 15840,
       "formula": null,
       "display": "internal",
       "displayReason": "Link count behind network.cores_per_hall, which the page renders; rendered by the Network tab redesign (Track A §A7).",
@@ -7371,7 +8478,7 @@
       "label": "spines per hall",
       "unit": null,
       "kind": "derived",
-      "value": 660,
+      "value": 330,
       "formula": null,
       "deps": [],
       "scope": "network",
@@ -7402,7 +8509,7 @@
       "label": "switches per hall",
       "unit": null,
       "kind": "derived",
-      "value": 1760,
+      "value": 880,
       "formula": null,
       "deps": [],
       "scope": "network",
@@ -7707,7 +8814,7 @@
       "label": "rack it hall kW",
       "unit": "kW",
       "kind": "derived",
-      "value": 124960,
+      "value": 62480,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -7976,7 +9083,7 @@
       "label": "total it hall kW",
       "unit": "kW",
       "kind": "derived",
-      "value": 134763.2,
+      "value": 67381.6,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -7996,7 +9103,7 @@
       "consumers": [
         {
           "page": "datahallAI.html",
-          "reads": 36
+          "reads": 38
         }
       ],
       "tests": [

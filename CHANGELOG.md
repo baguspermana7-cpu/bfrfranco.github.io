@@ -11,6 +11,112 @@ release sections rather than semver.
 
 ---
 
+## v3.0.0 — 2026-09-10
+
+### The hall was not buildable. Its own numbers proved it twice.
+
+Owner, from the live drawing: *"antara row dan cdu nggak match konsepnya, positioning"*, *"memang
+nggak perlu crah utk hot aislenya?"*, *"kacau"*, and *"racknya kan bisa pakai nvl72 itu 140an kw,
+harusnya kan nggak sebanyak itu datahallnya"*. Then, asked to choose the partition: *"atur yang
+terbaik, super accurate"*.
+
+MAJOR, because the published hall count and per-hall capacity both change. The facility does not:
+still 3,520 GB300 NVL72 racks at 142 kW, still 499.84 MW rack IT.
+
+#### Two proofs, both from the engine's own published numbers
+
+```
+FLOOR   880 racks x 0.72 m2                          =   634 m2
+        aisles, 40 rows at the declared 3.1 m pitch  = 1,288 m2
+                                                       ---------
+                                                       1,922 m2   = the entire hall
+```
+So the 108 CDUs and 179 CRAHs the same engine specified had **zero floor**.
+
+```
+AIR     35,509 kWth of air heat per hall at 25 -> 36 C  =  2,677 m3/s
+        coil face at 2.5 m/s                            =  1,071 m2
+        the whole hall envelope                         =  1,023 m2
+```
+The air could not pass through the room's own walls. Stated the way the layout actually works —
+a perimeter gallery 3 m deep — 179 CRAH cells needed **298 m of frontage against a 186 m perimeter**.
+
+#### One change fixes both, and a third defect with them
+
+Eight halls of 440 racks. **No room dimension changes**: 62 x 31 m is the right room for half the
+racks it was given.
+
+| | four halls x 880 | eight halls x 440 |
+|---|---|---|
+| floor used of 1,922 m² | 1,922 with the plant homeless | **1,774, with 148 m² spare for egress** |
+| air gallery frontage vs perimeter | 298 m vs 186 m | **150 m vs 186 m** |
+| IT density | 65.0 kW/m² | **32.5 kW/m²** |
+| unit substations per feed | 33 covering **half** the hall | **33 covering all of it** |
+
+That last row is the one worth reading twice. The page already printed `33× 2.5 MVA/feed` beside a
+"true 2N" claim. It was a **1N total divided by halls × 2 for display**, so each feed covered half
+its hall and every transformer ran at 99.9 % with no design ceiling — unlike the UPS, which has one.
+2N is a contingency rule, not a division: each feed must carry the whole hall when the other is
+lost. Sized that way at eight halls, the printed 33 becomes true, loading falls to **49.6 % normal
+and 99.1 % on one feed**, and the facility count moves 262 → 528.
+
+#### The floor is now budgeted, not asserted
+
+New engine outputs, each with an identity in `tools/test-dcai-engine.mjs`: `rack_field_m2`,
+`cross_aisle_m2`, `cdu_gallery_m2`, `air_plant_m2`, `floor_used_m2`, `floor_spare_m2`,
+`floor_budget_closes`, `air_flow_m3s_per_hall`, `fan_wall_face_m2`, `air_plant_frontage_m`,
+`fan_wall_fits`. **Row pitch stops being prose**: it was 3.1 m asserted inside one model comment and
+is now derived as rack depth + cold aisle + hot aisle = 1.2 + 1.2 + 0.7, landing on the same 3.1 m
+the comment claimed. The rack pitch, depth and both aisle widths are published parameters for the
+first time, so nothing can draw a 2.37 m rack against a 0.73 m aisle again without failing a gate.
+
+A model contradiction went with them: `electrical.racksPerRppGroup` justified itself with
+*"880 = 10 rows × 4 × 22"* while `geometry.rows` said 40 rows of 22. Both shipped for three releases.
+One row is one group.
+
+#### The hall drawing, redrawn
+
+Measured before: **10.13 px/m along the hall and 17.67 px/m across it — a 1.74× stretch**, so
+nothing was comparable between axes; 2.37 m of rack against 0.73 m of aisle, inverted; a cross aisle
+drawn at 1.7 m where the model declared 4.6 m; 179 CRAH units drawn as **40 boxes** with the divisor
+hidden in a tooltip; **no hot-aisle return path anywhere**; and CDU galleries as side strips while
+the model, the PDF and the layout card all said end-of-row.
+
+Now one isotropic scale, and every band is the engine's floor budget divided by the hall width:
+
+```
+air plant W | row column A | cross aisle | CDU gallery | row column B | air plant E
+```
+
+Rows run along the aisles, so a cold aisle is a straight 13.2 m throw from the gallery feeding it.
+Each row is drawn as cold aisle, rack, contained hot aisle at the engine's own dimensions. One glyph
+per CRAH unit and one per CDU — no aggregation divisor. Aisle sensors sit in the aisles they measure
+instead of in a row down the middle of the hall.
+
+#### A new panel answers the question directly
+
+The hall tab gains **Floor and air budget**, printing every term with its basis hook, plus the air
+share of hall IT — which is **26.3 %, not the 15 % two places on the page still claimed**. Fifteen
+per cent is the rack-only share; the fabric tier, OOB, storage, UPS loss, distribution loss and
+auxiliaries are all air cooled, and that is why the CRAH count is what it is.
+
+#### Verified
+
+`tools/test-dcai-engine.mjs` 287 assertions green (was 250). Registry 256 parameters, R7 256/256
+gated and R8 strict. Coverage strict: the hall drawing reads 47 numerals, 26 hooked, 21 declared,
+**0 untraced, 0 mismatched**. Electrical topology re-pinned to 58 nodes / 97 edges per hall, from
+the same formula.
+
+#### Honest boundary
+
+The 4 m² serviced floor per CDU, 5 m² per CRAH cell, 3 m gallery depth and 2.5 m/s coil face
+velocity are ADOPTED engineering allowances, not vendor data, and ship declared as such. A 200 kW
+CRAH at an 11 K rise moves 54,000 m³/h, which is AHU class rather than CRAH class; the model keeps
+the label it had and the number is now checkable. The eight-hall count supersedes the owner's
+2026-09-05 request for four, and the model comment says so rather than quietly overwriting it.
+
+---
+
 ## v2.19.0 — 2026-09-10
 
 ### Text that was drawn but could not be read, and the detector that was blaming the wrong things

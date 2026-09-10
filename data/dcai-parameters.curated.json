@@ -812,6 +812,14 @@
       }
     },
     {
+      "id": "equipment.hall_kva",
+      "label": "hall kva",
+      "unit": "kVA",
+      "scope": "plant",
+      "display": "internal",
+      "displayReason": "An intermediate between equipment.facility_kva, which is rendered, and the per-feed sizing, which is rendered as the transformer count per feed."
+    },
+    {
       "id": "equipment.transformer_loading_pct",
       "label": "transformer loading pct",
       "unit": "%",
@@ -828,6 +836,40 @@
       "label": "transformers",
       "unit": null,
       "scope": "plant"
+    },
+    {
+      "id": "equipment.unit_sub_feed_carries_whole_hall",
+      "label": "unit sub feed carries whole hall",
+      "unit": null,
+      "scope": "plant",
+      "display": "internal",
+      "displayReason": "A pass/fail flag that tools/test-dcai-engine.mjs asserts; the electrical panel renders the contingency loading percentage it summarises."
+    },
+    {
+      "id": "equipment.unit_sub_kva",
+      "label": "unit sub kva",
+      "unit": "kVA",
+      "scope": "plant",
+      "display": "internal",
+      "displayReason": "A unit restatement in kVA of equipment.transformer_unit_mva, which the electrical drawing already renders in MVA at every transformer symbol."
+    },
+    {
+      "id": "equipment.unit_sub_loading_contingency_pct",
+      "label": "unit sub loading contingency pct",
+      "unit": "%",
+      "scope": "plant"
+    },
+    {
+      "id": "equipment.unit_sub_loading_normal_pct",
+      "label": "unit sub loading normal pct",
+      "unit": "%",
+      "scope": "plant"
+    },
+    {
+      "id": "equipment.unit_subs_per_feed_per_hall",
+      "label": "unit subs per feed per hall",
+      "unit": null,
+      "scope": "hall"
     },
     {
       "id": "equipment.ups_frame_kw",
@@ -866,6 +908,122 @@
       "scope": "plant"
     },
     {
+      "id": "geometry.air_delta_t_k",
+      "label": "air delta t K",
+      "unit": "K",
+      "scope": "hall",
+      "display": "internal",
+      "displayReason": "The difference between design planes p09 and p11, both of which are already rendered with their own basis hooks on the cooling diagram."
+    },
+    {
+      "id": "geometry.air_flow_m3s_per_hall",
+      "label": "air flow m3s per hall",
+      "unit": null,
+      "scope": "hall"
+    },
+    {
+      "id": "geometry.air_plant_face_available_m2",
+      "label": "air plant face available m2",
+      "unit": "m²",
+      "scope": "hall",
+      "display": "internal",
+      "displayReason": "The gallery frontage multiplied by the hall height; the hall panel renders the frontage itself, which is the dimension a floor plan is read in."
+    },
+    {
+      "id": "geometry.air_plant_frontage_fits",
+      "label": "air plant frontage fits",
+      "unit": null,
+      "scope": "hall",
+      "display": "internal",
+      "displayReason": "A pass/fail flag that tools/test-dcai-engine.mjs asserts; the hall panel renders the gallery frontage and the hall perimeter it is compared against."
+    },
+    {
+      "id": "geometry.air_plant_frontage_m",
+      "label": "air plant frontage m",
+      "unit": "m",
+      "scope": "hall"
+    },
+    {
+      "id": "geometry.air_plant_m2",
+      "label": "air plant m2",
+      "unit": "m²",
+      "scope": "hall"
+    },
+    {
+      "id": "geometry.cdu_gallery_m2",
+      "label": "cdu gallery m2",
+      "unit": "m²",
+      "scope": "hall"
+    },
+    {
+      "id": "geometry.cold_aisle_m",
+      "label": "cold aisle m",
+      "unit": "m",
+      "scope": "hall"
+    },
+    {
+      "id": "geometry.cross_aisle_m",
+      "label": "cross aisle m",
+      "unit": "m",
+      "scope": "hall"
+    },
+    {
+      "id": "geometry.cross_aisle_m2",
+      "label": "cross aisle m2",
+      "unit": "m²",
+      "scope": "hall"
+    },
+    {
+      "id": "geometry.fan_wall_face_fraction",
+      "label": "fan wall face fraction",
+      "unit": null,
+      "scope": "hall",
+      "display": "internal",
+      "displayReason": "The percentage form of the face-area check; the hall panel renders both the required face and the available wall face, so the ratio adds no information."
+    },
+    {
+      "id": "geometry.fan_wall_face_m2",
+      "label": "fan wall face m2",
+      "unit": "m²",
+      "scope": "hall"
+    },
+    {
+      "id": "geometry.fan_wall_fits",
+      "label": "fan wall fits",
+      "unit": null,
+      "scope": "hall",
+      "display": "internal",
+      "displayReason": "A pass/fail flag that tools/test-dcai-engine.mjs asserts; the hall panel renders the required face area and the available wall face, which is what an engineer checks."
+    },
+    {
+      "id": "geometry.floor_budget_closes",
+      "label": "floor budget closes",
+      "unit": null,
+      "scope": "hall",
+      "display": "internal",
+      "displayReason": "A pass/fail flag that tools/test-dcai-engine.mjs asserts; the hall panel renders the four budget terms and the spare area it summarises, which is the operator-legible form."
+    },
+    {
+      "id": "geometry.floor_spare_fraction",
+      "label": "floor spare fraction",
+      "unit": null,
+      "scope": "hall",
+      "display": "internal",
+      "displayReason": "The percentage form of geometry.floor_spare_m2, which the hall panel renders in square metres because a floor plan is read in area, not in percent."
+    },
+    {
+      "id": "geometry.floor_spare_m2",
+      "label": "floor spare m2",
+      "unit": "m²",
+      "scope": "hall"
+    },
+    {
+      "id": "geometry.floor_used_m2",
+      "label": "floor used m2",
+      "unit": "m²",
+      "scope": "hall"
+    },
+    {
       "id": "geometry.groups_per_row",
       "label": "groups per row",
       "unit": null,
@@ -892,6 +1050,20 @@
       "scope": "hall"
     },
     {
+      "id": "geometry.hall_long_wall_face_m2",
+      "label": "hall long wall face m2",
+      "unit": "m²",
+      "scope": "hall",
+      "display": "internal",
+      "displayReason": "The denominator of the fan-wall face check, rendered on the hall panel as part of the required-versus-available pair rather than on its own."
+    },
+    {
+      "id": "geometry.hall_perimeter_m",
+      "label": "hall perimeter m",
+      "unit": "m",
+      "scope": "hall"
+    },
+    {
       "id": "geometry.hall_volume_m3",
       "label": "hall volume m3",
       "unit": "m³",
@@ -900,6 +1072,12 @@
     {
       "id": "geometry.hall_width_m",
       "label": "hall width m",
+      "unit": "m",
+      "scope": "hall"
+    },
+    {
+      "id": "geometry.hot_aisle_m",
+      "label": "hot aisle m",
       "unit": "m",
       "scope": "hall"
     },
@@ -914,6 +1092,24 @@
     {
       "id": "geometry.it_density_kw_per_m2",
       "label": "it density kw per m2",
+      "unit": "m²",
+      "scope": "hall"
+    },
+    {
+      "id": "geometry.rack_banks",
+      "label": "rack banks",
+      "unit": null,
+      "scope": "hall"
+    },
+    {
+      "id": "geometry.rack_depth_m",
+      "label": "rack depth m",
+      "unit": "m",
+      "scope": "hall"
+    },
+    {
+      "id": "geometry.rack_field_m2",
+      "label": "rack field m2",
       "unit": "m²",
       "scope": "hall"
     },
@@ -944,8 +1140,20 @@
       "scope": "hall"
     },
     {
+      "id": "geometry.rack_pitch_m",
+      "label": "rack pitch m",
+      "unit": "m",
+      "scope": "hall"
+    },
+    {
       "id": "geometry.rack_rows",
       "label": "rack rows",
+      "unit": null,
+      "scope": "hall"
+    },
+    {
+      "id": "geometry.racks_per_bank",
+      "label": "racks per bank",
       "unit": null,
       "scope": "hall"
     },
@@ -958,6 +1166,24 @@
     {
       "id": "geometry.racks_per_row",
       "label": "racks per row",
+      "unit": null,
+      "scope": "hall"
+    },
+    {
+      "id": "geometry.row_length_m",
+      "label": "row length m",
+      "unit": "m",
+      "scope": "hall"
+    },
+    {
+      "id": "geometry.row_pitch_m",
+      "label": "row pitch m",
+      "unit": "m",
+      "scope": "hall"
+    },
+    {
+      "id": "geometry.rows_per_bank",
+      "label": "rows per bank",
       "unit": null,
       "scope": "hall"
     },

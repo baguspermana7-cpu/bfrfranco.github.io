@@ -110,8 +110,11 @@ console.log('\n=== DC AI accuracy probes (datahallAI.html) ===');
   assert(kpis.it === '539.05', 'AI-Test-1d: IT Load = 539.05 MW (GB300 total IT, rack IT 499.84 is a separate published figure)', `got ${kpis.it}`);
   assert(kpis.gpu === '253,440', 'AI-Test-1e: GPUs = 253,440', `got ${kpis.gpu}`);
   assert(kpis.dom === '3,520', 'AI-Test-1f: NVL72 racks = 3,520 (one rack = one NVL72 domain at GB300)', `got ${kpis.dom}`);
-  assert(/\b432\b/.test(kpis.cdu||'') && /\b107\/108\b/.test(kpis.cdu||''),
-    'AI-Test-4: CDU count 432 installed facility-wide, 107/108 duty/installed per hall', `got ${kpis.cdu}`);
+  /* v3.0.0 — re-pinned with the eight-hall basis. 432/107/108 belonged to four halls of 880 racks,
+     a layout retired for failing its own floor and air budgets (the CDUs it specified had no floor,
+     and its air gallery needed 298 m of frontage around a 186 m perimeter). */
+  assert(/\b440\b/.test(kpis.cdu||'') && /\b54\/55\b/.test(kpis.cdu||''),
+    'AI-Test-4: CDU count 440 installed facility-wide, 54/55 duty/installed per hall', `got ${kpis.cdu}`);
 
   /* ---- Test 2: No random basis values (reload N times) ---- */
   const samples = [{pue:kpis.pue, it:kpis.it, wue:kpis.wue, cue:kpis.cue}];

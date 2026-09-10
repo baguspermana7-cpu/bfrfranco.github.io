@@ -1022,6 +1022,54 @@ Requested model/calculation versions and the complete locked schema must validat
 <div class="lg"><span><i style="background:#22c55e;box-shadow:0 0 3px rgba(34,197,94,.5)"></i>AI Rack</span><span><i style="background:#3b82f6"></i>Network</span><span><i style="background:#555"></i>Passive</span><span><i style="background:var(--c)"></i>Row CDU</span><span style="color:var(--o)">&#9650;Hot</span><span style="color:var(--c)">&#9660;Cold</span><span style="color:var(--o)">&#9670;TTHT</span><span style="color:rgba(6,182,212,.4)">&#8213; OH Pipe</span></div>
 </div>
 
+<!-- ============================================================================
+     v3.0.0 — THE FLOOR AND AIR BUDGET
+     ----------------------------------------------------------------------------
+     Owner, from the live drawing: the hall layout is "kacau" — rows and CDUs do not match,
+     and does the hot aisle not need CRAHs. Adding the floor up is what answered it. On the
+     retired four-hall basis the racks and their aisles came to 1,922 m2, which was the whole
+     room, so the 108 CDUs and 179 CRAHs the same engine specified had nowhere to stand; and
+     the 35,509 kWth of air heat needed 1,071 m2 of coil face against a 1,023 m2 envelope.
+     Both are now engine outputs with their own gate, and both are printed here so the claim
+     is checkable on the page rather than asserted in a caption.
+     Every value carries a basis hook: click one to see the formula it came from.
+============================================================================= -->
+<section class="rz-ops-section" aria-labelledby="hallBudgetTitle">
+  <div class="rz-ops-section__head">
+    <div>
+      <div class="rz-ops-eyebrow">Buildability</div>
+      <h3 id="hallBudgetTitle">Floor and air budget — one hall</h3>
+      <p class="rz-ops-caption">A hall is only a design if what it contains fits inside it and the air it must move can leave it. Both are computed, not asserted.</p>
+    </div>
+  </div>
+  <div class="gr">
+    <div class="bx">
+      <h3>Floor</h3>
+      <div class="rw"><span class="l" title="Racks x rack pitch x row pitch. Row pitch is derived: rack depth + cold aisle + hot aisle.">Rack field</span><span class="v vg" data-basis-param="geometry.rack_field_m2" data-dcai-fill data-dcai-suffix=" m&#178;" tabindex="0" role="button">&mdash;</span></div>
+      <div class="rw"><span class="l" title="The central aisle carrying the TCS headers, the cable tray spine and the egress route.">Cross aisle</span><span class="v" data-basis-param="geometry.cross_aisle_m2" data-dcai-fill data-dcai-suffix=" m&#178;" tabindex="0" role="button">&mdash;</span></div>
+      <div class="rw"><span class="l" title="Installed CDUs x serviced floor each — the end-of-row liquid plant.">CDU gallery</span><span class="v" data-basis-param="geometry.cdu_gallery_m2" data-dcai-fill data-dcai-suffix=" m&#178;" tabindex="0" role="button">&mdash;</span></div>
+      <div class="rw"><span class="l" title="Installed CRAH cells x serviced floor each — the fan wall along the long walls.">Air plant</span><span class="v" data-basis-param="geometry.air_plant_m2" data-dcai-fill data-dcai-suffix=" m&#178;" tabindex="0" role="button">&mdash;</span></div>
+      <div class="rw"><span class="l" title="The sum of the four terms above, and nothing else.">Used</span><span class="v" data-basis-param="geometry.floor_used_m2" data-dcai-fill data-dcai-suffix=" m&#178;" tabindex="0" role="button">&mdash;</span></div>
+      <div class="rw"><span class="l" title="Hall area minus floor used. A hall with no spare floor has no egress route.">Spare for egress</span><span class="v vg" data-basis-param="geometry.floor_spare_m2" data-dcai-fill data-dcai-suffix=" m&#178;" tabindex="0" role="button">&mdash;</span></div>
+    </div>
+    <div class="bx">
+      <h3>Row geometry</h3>
+      <div class="rw"><span class="l" title="Rack depth + cold aisle + hot aisle. Aisles are not shared between back-to-back rows: overhead TCS manifolds and containment doors need the clearance on both faces.">Row pitch</span><span class="v vg" data-basis-param="geometry.row_pitch_m" data-dcai-fill data-dcai-suffix=" m" tabindex="0" role="button">&mdash;</span></div>
+      <div class="rw"><span class="l" title="Racks per row x rack pitch. One row is one RPP group, so the electrical and floor units of account are the same object.">Row length</span><span class="v" data-basis-param="geometry.row_length_m" data-dcai-fill data-dcai-suffix=" m" tabindex="0" role="button">&mdash;</span></div>
+      <div class="rw"><span class="l" title="Rack IT per hall divided by gross hall area.">IT density</span><span class="v" data-basis-param="geometry.it_density_kw_per_m2" data-dcai-fill data-dcai-suffix=" kW/m&#178;" tabindex="0" role="button">&mdash;</span></div>
+      <div class="rw"><span class="l" title="Rack footprint as a fraction of the gross hall floor.">Rack footprint</span><span class="v" data-basis-param="geometry.rack_footprint_fraction" data-dcai-fill tabindex="0" role="button">&mdash;</span></div>
+    </div>
+    <div class="bx">
+      <h3>Air path</h3>
+      <div class="rw"><span class="l" title="Hall air heat divided by (density x specific heat x the supply-to-return temperature rise).">Airflow</span><span class="v vg" data-basis-param="geometry.air_flow_m3s_per_hall" data-dcai-fill data-dcai-suffix=" m&#179;/s" tabindex="0" role="button">&mdash;</span></div>
+      <div class="rw"><span class="l" title="Airflow divided by the coil face velocity. Above about 3 m/s a coil carries moisture off the fins and the static penalty climbs steeply.">Face area needed</span><span class="v" data-basis-param="geometry.fan_wall_face_m2" data-dcai-fill data-dcai-suffix=" m&#178;" tabindex="0" role="button">&mdash;</span></div>
+      <div class="rw"><span class="l" title="Gallery floor divided by gallery depth. Frontage, not area, is what a hall perimeter can or cannot supply — the check the retired four-hall basis failed at 298 m of gallery against a 186 m perimeter.">Gallery frontage</span><span class="v" data-basis-param="geometry.air_plant_frontage_m" data-dcai-fill data-dcai-suffix=" m" tabindex="0" role="button">&mdash;</span></div>
+      <div class="rw"><span class="l" title="Twice the hall length plus width. The gallery has to fit around the room, not only inside its area.">of a hall perimeter</span><span class="v" id="hbWall" data-rz-authored-basis="hall perimeter in metres, twice the sum of the hall length and width the engine publishes">&mdash;</span></div>
+      <div class="rw"><span class="l" title="Air heat is not 15%. That is the rack-only share; the fabric tier, OOB, storage, UPS loss, distribution loss and auxiliaries are all air cooled.">Air share of hall IT</span><span class="v" id="hbAirShare" data-rz-authored-basis="air heat per hall as a percentage of total hall IT, both engine quantities, printed as their ratio">&mdash;</span></div>
+    </div>
+  </div>
+</section>
+
 <div class="pn" id="p-rack">
 <div class="bx"><h3>Rack Architecture</h3><div class="dh-primary-q" style="font-size:10px;color:var(--t3);margin:2px 0 4px;font-style:italic;letter-spacing:.03em;">Primary read: <span style="color:var(--t2);">how is an NVL72 built — and what is the current risk on the selected rack?</span></div><div class="su" id="rackSu" data-basis-param="compute.gpu_per_rack" data-basis-params="compute.gpu_per_rack power.rack_it_kw compute.nvswitch_per_rack compute.cpu_per_rack power.shelf_kw power.shelf_installed_kw distribution.rack_feed_current_a compute.nvlink_domain_tbs power.shelves_duty power.shelves_spare" tabindex="0" role="button" style="cursor:pointer"></div>
 <svg id="rackSvg" viewBox="0 0 960 690" preserveAspectRatio="xMidYMid meet" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="rackC"></g></svg></div>
@@ -1506,7 +1554,8 @@ var DH=(function(){
     airHeat:H.air_hall_kwth, liquidHeatFacility:H.liquid_kwth, airHeatFacility:H.air_kwth,
     tcsFlowHallM3h:Fl.tcs_hall_m3h, htwFlowHallM3h:Fl.htw_hall_m3h, chwFlowHallM3h:Fl.chw_hall_m3h,
     tcsFlowFacilityM3h:Fl.tcs_m3h, htwFlowFacilityM3h:Fl.htw_m3h, chwFlowFacilityM3h:Fl.chw_m3h, cdwFlowFacilityM3h:Fl.cdw_m3h,
-    txRatingMVA:E.transformer_unit_mva,                   /* 2.5 */
+    unitSubsPerFeed:E.unit_subs_per_feed_per_hall, unitSubNormalPct:E.unit_sub_loading_normal_pct, unitSubContingencyPct:E.unit_sub_loading_contingency_pct,
+txRatingMVA:E.transformer_unit_mva,                   /* 2.5 */
     txPerFeedHall:Di.transformers_per_hall_per_feed,      /* 33 */
     txTotal:E.transformers,
     txLoadPct:rd(E.facility_kva/(E.transformers*E.transformer_unit_mva*1000)*100,1),
@@ -1549,6 +1598,13 @@ var DH=(function(){
     hallLengthM:G.hall_length_m, hallWidthM:G.hall_width_m, hallHeightM:G.hall_height_m,   /* 62 × 31 × 5.5 */
     hallAreaM2:rd(G.hall_area_m2,0), hallVolM3:fmt(G.hall_volume_m3),
     itDensityKwM2:rd(G.it_density_kw_per_m2,1),
+    /* v3.0.0 — the floor budget, in metres, so the hall mimic can be drawn to ONE scale
+       instead of the 1.74x anisotropic stretch it carried since v2.4.0 */
+    rowPitchM:G.row_pitch_m, rowLengthM:G.row_length_m, rackPitchM:G.rack_pitch_m, rackDepthM:G.rack_depth_m,
+    coldAisleM:G.cold_aisle_m, hotAisleM:G.hot_aisle_m, crossAisleM:G.cross_aisle_m,
+    rackFieldM2:rd(G.rack_field_m2,0), crossAisleM2:rd(G.cross_aisle_m2,0), cduGalleryM2:rd(G.cdu_gallery_m2,0),
+    airPlantM2:rd(G.air_plant_m2,0), floorSpareM2:rd(G.floor_spare_m2,0), floorUsedM2:rd(G.floor_used_m2,0),
+    airFlowM3s:rd(G.air_flow_m3s_per_hall,0), airPlantFrontageM:rd(G.air_plant_frontage_m,0),
     /* ---- fabric ---- */
     leavesPerHall:N.leaves_per_hall, spinesPerHall:N.spines_per_hall, coresPerHall:N.cores_per_hall,
     switchesPerHall:N.switches_per_hall,
@@ -1611,7 +1667,7 @@ window.DH_BASIS={
 "racksPerGroup":"geometry.racks_per_group","rackGroups":"geometry.rack_groups_per_hall","rackRows":"geometry.rack_rows","rackBanks":"geometry.rack_banks","rowsPerBank":"geometry.rows_per_bank","racksPerBank":"geometry.racks_per_bank","racksPerRow":"geometry.racks_per_row",
 "groupKw":"distribution.group_kw","reqCurrentA":"distribution.group_current_a","buswayA":"distribution.busway_trunk_a","buswayAFmt":"distribution.busway_trunk_a","buswayLoadPct":"distribution.busway_loading_pct","rppPerHall":"distribution.rpp_per_hall",
 "upsRatingKW":"equipment.ups_frame_kw","upsRatingMW":"equipment.ups_frame_kw","upsFramesPerFeedHall":"distribution.ups_frames_per_hall_per_feed","upsFramesTotal":"equipment.ups_frames_total","upsLoadPct":"equipment.ups_loading_pct","upsLoadNormalPct":"equipment.ups_loading_normal_pct","batteryKWh":"equipment.battery_kwh",
-"txRatingMVA":"equipment.transformer_unit_mva","txPerFeedHall":"distribution.transformers_per_hall_per_feed","txTotal":"equipment.transformers","txLoadPct":"equipment.transformer_loading_pct","facilityKva":"equipment.facility_kva",
+"unitSubsPerFeed":"equipment.unit_subs_per_feed_per_hall","unitSubNormalPct":"equipment.unit_sub_loading_normal_pct","unitSubContingencyPct":"equipment.unit_sub_loading_contingency_pct","txRatingMVA":"equipment.transformer_unit_mva","txPerFeedHall":"distribution.transformers_per_hall_per_feed","txTotal":"equipment.transformers","txLoadPct":"equipment.transformer_loading_pct","facilityKva":"equipment.facility_kva",
 "gensetKW":"equipment.generator_unit_kw","gensetMW":"equipment.generator_unit_kw","gensetFacN":"equipment.gensets_duty","gensetFacNplus1":"equipment.gensets_installed",
 "hallLengthM":"geometry.hall_length_m","hallWidthM":"geometry.hall_width_m","hallHeightM":"geometry.hall_height_m","hallAreaM2":"geometry.hall_area_m2","hallVolM3":"geometry.hall_volume_m3","itDensityKwM2":"geometry.it_density_kw_per_m2",
 "leavesPerHall":"network.leaves_per_hall","spinesPerHall":"network.spines_per_hall","coresPerHall":"network.cores_per_hall","switchesPerHall":"network.switches_per_hall",
@@ -3490,7 +3546,18 @@ function cduShort(){var m=bs('cduModel');return m?m.replace(/\s*\(.*\)\s*$/,''):
    both ends of the hall and feed the headers; CRAH walls run along the long sides.   */
 const LX=32,HX0=52,HX1=680,HW=HX1-HX0;          /* hall drawing area */
 const CRAH_T=34,CRAH_B=556,CRAH_H=12;            /* CRAH strips (long walls) */
-const BA_Y=52,BB_Y=316,RACK_H=10.6,RACK_W=24;    /* bank A / bank B row tops, rack pitch */
+const BA_Y=52,BB_Y=316;                          /* bank A / bank B row tops */
+/* v3.0.0 — rack and pitch sizes are DERIVED from the engine's metres at one scale, not typed as
+   pixels. The typed pair (RACK_H 10.6, RACK_W 24) was fixed while the row count was not, so the
+   plan ran 10.13 px/m along the hall against 17.67 px/m across it — a 1.74x stretch — and inside
+   the 3.1 m row pitch it drew 2.37 m of rack against 0.73 m of aisle, the inverse of the real
+   1.2 m and 1.9 m. Deriving both from one px-per-metre keeps the drawing proportional at any rack
+   count: add racks and every element shrinks together instead of the aisles being squeezed out. */
+const _rowPitchM=bn('rowPitchM'),_rowLenM=bn('rowLengthM'),_rackWM=bn('rackPitchM'),_rackDM=bn('rackDepthM');
+const _rpb0=bn('rowsPerBank');
+const SC=(_rowPitchM&&_rowLenM&&_rpb0)?Math.min(HW/(_rpb0*_rowPitchM),234/_rowLenM):17.67;   /* px per metre, both axes */
+const RACK_H=(_rackWM!=null?_rackWM*SC:10.6);    /* rack WIDTH along the row */
+const RACK_W=(_rackDM!=null?_rackDM*SC:24);      /* rack DEPTH across the row */
 const XA_Y=286,SUP_Y=291,RET_Y=296,SENS_Y=307;   /* cross aisle: headers + sensor readouts */
 const GAL_W=14,GAL_LX=LX,GAL_RX=HX1+6;           /* CDU galleries (short walls) */
 const TW=HX1-LX;                                  /* corridor / network sections below reuse this width */
@@ -3508,7 +3575,9 @@ cap.textContent='DATA HALL — '+em(L)+' m × '+em(W)+' m — '+grp(A)+' m² —
 if(rows==null||perRow==null||banks==null||rpb==null||rpb*banks!==rows){
 s+=tx(HX0,72,'ROW LAYOUT UNAVAILABLE — engine basis (rackRows / racksPerRow / rackBanks) not loaded','var(--r)',7,0,1);
 }else{
-const pitch=HW/rpb, gap=pitch-RACK_W;
+/* the pitch is the engine's row pitch at the same scale, so the gap that remains IS the real
+   cold + hot aisle rather than whatever was left over after a fixed-width rack */
+const pitch=(_rowPitchM!=null?_rowPitchM*SC:HW/rpb), gap=pitch-RACK_W;
 const rowX=r=>HX0+r*pitch+gap/2;                                  /* r = row index within a bank (0..rpb-1) */
 const bankY=b=>b===0?BA_Y:BB_Y, bankH=perRow*RACK_H;
 const rowKw=(kwRack!=null)?perRow*kwRack:null;
@@ -7860,7 +7929,7 @@ mc('var(--o)','Performance Targets','Design & Operating KPIs',[['Total cooling',
 // ELECTRICAL CARDS
 $('elecCards').innerHTML=[
 mc('var(--o)','MV Switchgear','SM6 24kV + 4\u00D7 RM6 RMU (True 2N)',[['Central','Schneider SM6 24kV gas-insulated 11 panels'],['Incomers','2\u00D7 VCB-INC 630A/25kA (PLN A+B)'],['Bus Tie','1\u00D7 VCB-TIE N.O. (auto/manual)'],['Feeders','8\u00D7 VCB: 4 from Bus A + 4 from Bus B'],['Per-DH RMU','Schneider RM6 24kV 2-panel per DH'],['2N Path','Each DH receives independent A+B feeds'],['Protection','IDMT OC 50/51, E/F 50N/51N, U/V 27'],['CT/VT','200/5A cl.0.5 + 20/0.1kV cl.0.5'],['Standard','IEC 62271 / SNI 0225']],{declared:'MV switchgear selection (SM6/RM6 gear, 630 A / 25 kA ratings, CT/VT ratios) is page-authored, not engine quantities'}),
-mc('var(--o)','Transformers',(DHE?(DHE.txTotal+'\u00D7 cast-resin '+DHE.txRatingMVA+' MVA ('+DHE.txPerFeedHall+' per feed per hall)'):'—'),[['Rating',(DHE?((DHE.txRatingMVA*1000).toLocaleString()+' kVA per unit ('+DHE.txTotal+' total), '+DHE.txLoadPct.toFixed(0)+'% load'):'—'),bo('txRatingMVA',{also:['txTotal','txLoadPct']})],['Type','ABB RESIBLOC cast-resin dry Dyn11'],['Voltage','20kV/0.4kV | Ik=14.4kA secondary',{declared:'transformer ratio and secondary fault level are page-authored specification figures, not engine quantities'}],['Impedance','Zk=6% | AN/AF cooling'],['Tap','\u00B12.5% \u00D72 OCTC (off-circuit)',{declared:'tap-changer range is a page-authored transformer specification, not an engine quantity'}],['ACBs',(DHE?(DHE.buswayAFmt+' A trunk ACB per feed (ABB Emax2 class)'):'—'),bo('buswayA')],['Capacity',(DHE?((DHE.txTotal*DHE.txRatingMVA).toFixed(0)+' MVA installed (2N)'):'—'),{declared:'installed transformer capacity = unit count x unit rating (equipment.transformers x transformer_unit_mva), an identity over marked parameters'}],['Facility',(DHE?(Math.round(DHE.facilityKva).toLocaleString()+' kVA at the design power factor'):'—'),bo('facilityKva')]],bo('txTotal',{also:['txRatingMVA','txPerFeedHall']})),
+mc('var(--o)','Transformers',(DHE?(DHE.txTotal+'\u00D7 cast-resin '+DHE.txRatingMVA+' MVA ('+DHE.txPerFeedHall+' per feed per hall)'):'—'),[['Rating',(DHE?((DHE.txRatingMVA*1000).toLocaleString()+' kVA per unit ('+DHE.txTotal+' total), '+DHE.txLoadPct.toFixed(0)+'% load'):'—'),bo('txRatingMVA',{also:['txTotal','txLoadPct']})],['Type','ABB RESIBLOC cast-resin dry Dyn11'],['Voltage','20kV/0.4kV | Ik=14.4kA secondary',{declared:'transformer ratio and secondary fault level are page-authored specification figures, not engine quantities'}],['Impedance','Zk=6% | AN/AF cooling'],['Tap','\u00B12.5% \u00D72 OCTC (off-circuit)',{declared:'tap-changer range is a page-authored transformer specification, not an engine quantity'}],['ACBs',(DHE?(DHE.buswayAFmt+' A trunk ACB per feed (ABB Emax2 class)'):'—'),bo('buswayA')],['Capacity',(DHE?((DHE.txTotal*DHE.txRatingMVA).toFixed(0)+' MVA installed (2N)'):'—'),{declared:'installed transformer capacity = unit count x unit rating (equipment.transformers x transformer_unit_mva), an identity over marked parameters'}],['Facility',(DHE?(Math.round(DHE.facilityKva).toLocaleString()+' kVA at the design power factor'):'\u2014'),bo('facilityKva')],['2N sizing',(DHE?(DHE.unitSubsPerFeed+' per feed \u00D7 '+DHE.txRatingMVA+' MVA carries the whole hall'):'\u2014'),bo('unitSubsPerFeed',{also:['txRatingMVA']})],['Loading',(DHE&&DHE.unitSubNormalPct!=null?(DHE.unitSubNormalPct.toFixed(1)+'% with both feeds, '+DHE.unitSubContingencyPct.toFixed(1)+'% on one'):'\u2014'),bo('unitSubNormalPct',{also:['unitSubContingencyPct']})]],bo('txTotal',{also:['txRatingMVA','txPerFeedHall']})),
 mc('var(--b)','Generator Pool',(DHE?(DHE.gensetFacNplus1+'\u00D7 '+DHE.gensetMW+' MW '+DHE.gensetRedundancy+' \u2014 facility pool'):'—'),[['Units',(DHE?(DHE.gensetFacNplus1+'\u00D7 '+DHE.gensetKW.toLocaleString()+' kW MV diesel ('+DHE.gensetFacN+' duty, '+DHE.gensetRedundancy+')'):'—'),bo('gensetFacNplus1',{also:['gensetKW','gensetFacN']})],['Engine',(DHE?(DHE.gensetModel+' \u2014 MV machine'):'—')],['Step-up TX','MV machines paralleled at the 20 kV bus (no LV step-up)'],['APS','ASCO 7000 auto-paralleling switchgear',{declared:'paralleling-switchgear model is a page-authored selection, not an engine quantity'}],['Start','Auto <10s on MV bus undervoltage'],['Capacity',(DHE?(DHE.gensetFacN+' running = '+(DHE.gensetFacN*DHE.gensetMW).toFixed(0)+' MW duty for '+DHE.facTotalMW+' MW facility'):'—'),{declared:'duty capacity = duty count x unit rating (equipment.gensets_duty x generator_unit_kw), an identity over marked parameters; the facility MW is design.electrical.facility_kwe'}],['Fuel','48hr base tank + 500L day tank per unit',{declared:'fuel autonomy and day-tank volume are page-authored design selections, not engine quantities'}],['Exhaust','SCR/DPF emission (Jakarta reg)'],['Maintenance','250hr: oil/filter | 1000hr: major',{declared:'service intervals are page-authored maintenance figures, not engine quantities'}]],bo('gensetFacNplus1',{also:['gensetMW']})),
 mc('var(--g)','UPS System',(DHE?(DHE.upsFramesPerFeedHall+'\u00D7 modular UPS '+DHE.upsRatingMW+' MW frames per feed per hall (2N)'):'—'),[['Rating',(DHE?(DHE.upsRatingKW.toLocaleString()+' kW per frame ('+DHE.upsFramesTotal.toLocaleString()+' total), '+DHE.upsLoadPct.toFixed(0)+'% load'):'—'),bo('upsRatingKW',{also:['upsFramesTotal','upsLoadPct']})],['Type','VFI-SS-111 double-conversion online'],['Modules','hot-swap power modules per frame'],['Battery',(DHE?(DHE.batteryPerHall.toLocaleString()+' kWh per hall, Li-Ion NMC'):'—'),bo('batteryPerHall')],['STS','NOT REQUIRED (dual-corded racks)'],['Efficiency','\u03B7>96% double-conv | >99% eco',{declared:'UPS efficiency and harmonic figures are page-authored vendor-class values, not engine quantities'}],['THDi/THDv','<3% / <1% at rated load'],['Total UPS',(DHE?((DHE.upsFramesTotal*DHE.upsRatingMW).toFixed(0)+' MW installed (2N)'):'—'),{declared:'installed UPS capacity = frame count x frame rating (equipment.ups_frames_total x ups_frame_kw), an identity over marked parameters'}],['Standard','IEC 62040-3 VFI-SS-111']],bo('upsFramesPerFeedHall',{also:['upsRatingMW']})),
 mc('var(--o)','Distribution',(DHE?('Busway '+DHE.buswayAFmt+' A trunk per feed + '+DHE.rppPerHall+' RPP per hall'):'—'),[['Busway',(DHE?('Canalis KTA class '+DHE.buswayAFmt+' A Cu overhead, '+DHE.buswayLoadPct+'% loaded'):'—'),bo('buswayA',{also:['buswayLoadPct']})],['Per DH','2 busways (Feed A + Feed B)'],['RPP groups',(DHE?(DHE.rackGroups+' per feed \u00D7 '+DHE.racksPerGroup+' racks = '+DHE.groupKw.toLocaleString()+' kW'):'—'),bo('rackGroups',{also:['racksPerGroup','groupKw']})],['Total RPP',(DHE?(DHE.rppPerHall+' per hall'):'—'),bo('rppPerHall')],['Rack PSU','2\u00D7 OCP ORV3 per rack (dual-corded)'],['Conversion',(DHE?(DHE.voltageLL+' V AC \u2192 rack DC bus'):'—'),bo('voltageLL')],['PSU efficiency','\u03B7>97% (vendor class)',{declared:'rack PSU efficiency is a page-authored vendor-class figure, not an engine quantity'}],['Bus Bar','48 VDC Cu vertical in-rack',{declared:'the 48 VDC rack bus is the PUBLISHED GB300 power-shelf output; page-authored label, not an engine quantity'}],['Whip',(DHE?(DHE.rackFeedA+' A dual-corded whip at '+DHE.voltageLL+' V'):'—'),bo('rackFeedA',{also:['voltageLL']})]],bo('buswayA',{also:['rppPerHall']})),
@@ -8889,6 +8958,12 @@ var RZDCAIBasis=(function(){
     set('sUA',D.upsFramesPerFeedHall+' × '+D.upsRatingMW+' MW · '+D.upsTopology+' · ≤'+pct(D.upsLoadPct));
     set('sUB',D.upsFramesPerFeedHall+' × '+D.upsRatingMW+' MW · '+D.upsTopology+' · ≤'+pct(D.upsLoadPct));
     set('sGen',D.gensetFacNplus1+' × '+D.gensetMW+' MW ('+D.gensetFacN+' duty, '+D.gensetRedundancy+') — facility');
+    /* v3.0.0 hall budget: the wall face available, and the air share that is NOT 15 % */
+    (function(){
+      var g=S&&S.geometry, h=S&&S.heat, pw=S&&S.power;
+      if(g&&g.hall_perimeter_m!=null)set('hbWall',Math.round(g.hall_perimeter_m).toLocaleString('en-US')+' m');
+      if(h&&pw&&h.air_hall_kwth!=null&&pw.total_it_hall_kwe)set('hbAirShare',(h.air_hall_kwth/pw.total_it_hall_kwe*100).toFixed(1)+'% of hall IT');
+    })();
     set('sDT',D.tcsDeltaT+' K');
     set('sCDU',D.cduRunning+' / '+D.cduInstalled+' · '+D.cduModel);
     set('sCH',D.chillersRunning+' run · '+D.chillersInstalled+' inst — facility');

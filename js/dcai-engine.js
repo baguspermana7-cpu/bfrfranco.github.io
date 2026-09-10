@@ -365,7 +365,14 @@
     /* frames per feed at or below the design-loading ceiling; 2N doubles it */
     var upsFramesPerFeed = ceilCount(totalIt_kwe, eq.ups.unitKw * eq.ups.designLoadingMax);
     var facilityKva = div(design.electrical.facility_kwe, el.powerFactor);
-    var transformers = ceilCount(facilityKva, eq.transformer.unitMva * 1000);
+    /* 2N is a CONTINGENCY rule, not a division. Each feed must carry the whole hall when the
+       other feed is lost, so the unit substations are sized against the hall load and then
+       doubled. The previous form was ceil(facility kVA / unit) — a 1N total, divided by
+       halls x 2 for display, which printed "33x 2.5 MVA/feed" beside a "true 2N" claim while
+       covering half the hall, and ran the transformers at 99.9 % with no design ceiling. */
+    var hallKva = div(facilityKva, f.halls);
+    var unitSubsPerFeed = ceilCount(hallKva, eq.transformer.unitMva * 1000);
+    var transformers = unitSubsPerFeed * 2 * f.halls;
     var gensetsDuty = ceilCount(worst ? worst.electrical.facility_kwe : design.electrical.facility_kwe, eq.generator.unitKw);
     var battery_kwh = div(div(totalIt_kwe * eq.ups.runtimeMin, 60), eq.ups.usableDoD * eq.ups.inverterEfficiency);
     var equipment = {
@@ -400,6 +407,13 @@
       facility_kva: facilityKva,
       transformers: transformers,
       transformer_loading_pct: div(facilityKva, transformers * eq.transformer.unitMva * 1000) * 100,
+      unit_sub_kva: eq.transformer.unitMva * 1000,
+      unit_subs_per_feed_per_hall: unitSubsPerFeed,
+      hall_kva: hallKva,
+      /* what one feed carries in normal 2N operation, and what it carries alone */
+      unit_sub_loading_normal_pct: div(hallKva / 2, unitSubsPerFeed * eq.transformer.unitMva * 1000) * 100,
+      unit_sub_loading_contingency_pct: div(hallKva, unitSubsPerFeed * eq.transformer.unitMva * 1000) * 100,
+      unit_sub_feed_carries_whole_hall: unitSubsPerFeed * eq.transformer.unitMva * 1000 >= hallKva,
       ups_loading_normal_pct: div(totalIt_kwe, upsFramesPerFeed * eq.ups.unitKw) * 50,   /* 2N: each side carries half in normal operation */
       battery_hall_kwh: div(battery_kwh, f.halls),                  /* the SLD draws one hall's share */
       gensets_standby: (gensetsDuty + 2) - gensetsDuty,          /* the same +2 the installed count carries (N+2) */
@@ -443,6 +457,25 @@
        downstream of racksPerHall. The gate asserts the flag is true on the shipped model. */
     var rowsPerBank = div(geo.rows, geo.banks, 'rows per bank');
     var integerLayout = Number.isInteger(racksPerRow) && Number.isInteger(groupsPerHall) && Number.isInteger(rowsPerBank);
+    /* Every row carries its own full cold and hot aisle: back-to-back sharing is not assumed,
+       because overhead TCS manifolds and containment doors need the clearance on both faces. */
+    var rowPitchM = geo.rackDepthM + geo.coldAisleM + geo.hotAisleM;
+    var rackFieldM2 = f.racksPerHall * geo.rackPitchM * rowPitchM;
+    var crossAisleM2 = geo.crossAisleM * geo.lengthM;
+    var cduGalleryM2 = (cduDutyHall + 1) * geo.cduServiceM2;
+    var airPlantM2 = (crahDutyHall + 1) * geo.crahServiceM2;
+    var floorUsedM2 = rackFieldM2 + crossAisleM2 + cduGalleryM2 + airPlantM2;
+    var airDeltaTK = design.planes.p11_air_return_c - design.planes.p09_air_supply_c;
+    var airFlowM3s = div(airHeatHall_kwth, geo.airDensityKgM3 * geo.airCpKjKgK * airDeltaTK, 'hall airflow');
+    var fanWallFaceM2 = div(airFlowM3s, geo.fanWallFaceVelocityMs, 'fan wall face');
+    /* The air plant is a perimeter gallery, so its FLOOR area and its DEPTH decide its FRONTAGE,
+       and frontage is what a hall perimeter can or cannot supply. This is the test the retired
+       four-hall basis failed and the reason it is written this way rather than as "the two long
+       walls": 179 CRAH cells needed 895 m2 of gallery, which at 3 m deep is 298 m of frontage
+       against a 186 m perimeter — the plant did not fit around the room, let alone in it. */
+    var airPlantFrontageM = div(airPlantM2, geo.airPlantDepthM, 'air plant frontage');
+    var hallPerimeterM = 2 * (geo.lengthM + geo.widthM);
+    var airPlantFaceM2 = airPlantFrontageM * geo.heightM;
     var geometry = {
       integer_layout: integerLayout,
       hall_length_m: geo.lengthM, hall_width_m: geo.widthM, hall_height_m: geo.heightM,
@@ -459,7 +492,49 @@
       hall_volume_m3: hallArea * geo.heightM,
       rack_footprint_m2_per_hall: f.racksPerHall * geo.rackFootprintM2,
       rack_footprint_fraction: div(f.racksPerHall * geo.rackFootprintM2, hallArea),
-      it_density_kw_per_m2: div(rackItHall_kwe, hallArea)
+      it_density_kw_per_m2: div(rackItHall_kwe, hallArea),
+
+      /* --- THE FLOOR BUDGET (v3.0.0) -------------------------------------------------
+         Until this release the hall area was asserted and never spent. Adding it up showed
+         the four-hall basis was impossible: 880 racks (634 m2) plus their aisles at the
+         declared 3.1 m pitch (1,288 m2) came to 1,922 m2 — exactly the whole hall — which
+         left the 108 CDUs and 179 CRAHs the same engine specified with nowhere to stand.
+         The budget is now published term by term and has to close. Row pitch stops being
+         prose in a comment and becomes arithmetic: rack depth + cold aisle + hot aisle. */
+      /* the layout facts themselves, published rather than left in a model comment: until
+         v3.0.0 the 0.6 m rack pitch, the 1.2 m depth and the aisle widths existed ONLY inside
+         the prose of one comment, so nothing could check them and the mimic drew a 2.37 m rack
+         against a 0.73 m aisle without contradicting anything. */
+      rack_pitch_m: geo.rackPitchM,
+      rack_depth_m: geo.rackDepthM,
+      cold_aisle_m: geo.coldAisleM,
+      hot_aisle_m: geo.hotAisleM,
+      cross_aisle_m: geo.crossAisleM,
+      row_pitch_m: rowPitchM,
+      row_length_m: racksPerRow * geo.rackPitchM,
+      rack_field_m2: rackFieldM2,
+      cross_aisle_m2: crossAisleM2,
+      cdu_gallery_m2: cduGalleryM2,
+      air_plant_m2: airPlantM2,
+      floor_used_m2: floorUsedM2,
+      floor_spare_m2: hallArea - floorUsedM2,
+      floor_spare_fraction: div(hallArea - floorUsedM2, hallArea),
+      floor_budget_closes: floorUsedM2 <= hallArea,
+
+      /* --- THE AIR PATH (v3.0.0) -----------------------------------------------------
+         The second thing the four-hall basis could not do. A hall carrying 35,509 kWth of
+         air heat has to move 2,677 m3/s; at a 2.5 m/s coil face that needs 1,071 m2 of fan
+         wall, and the whole hall envelope is 1,023 m2. The air could not pass through the
+         room's own walls. The check is now an engine output, not an afterthought. */
+      air_delta_t_k: airDeltaTK,
+      air_flow_m3s_per_hall: airFlowM3s,
+      fan_wall_face_m2: fanWallFaceM2,
+      air_plant_frontage_m: airPlantFrontageM,
+      hall_perimeter_m: hallPerimeterM,
+      air_plant_frontage_fits: airPlantFrontageM <= hallPerimeterM,
+      air_plant_face_available_m2: airPlantFaceM2,
+      fan_wall_face_fraction: div(fanWallFaceM2, airPlantFaceM2),
+      fan_wall_fits: fanWallFaceM2 <= airPlantFaceM2
     };
 
     /* --- LV distribution: the group a busway trunk actually carries --- */
@@ -481,7 +556,7 @@
       rack_feed_dual_corded: true,                             // A + B cord per rack, each sized for full load
       hall_group_kw_check: groupKw * groupsPerHall === rackItHall_kwe,   // groups x group kW closes to the hall rack IT
       rpp_per_hall: groupsPerHall * 2,                         // A + B per group
-      transformers_per_hall_per_feed: Math.ceil(div(transformers, f.halls * 2)),
+      transformers_per_hall_per_feed: unitSubsPerFeed,
       ups_frames_per_hall_per_feed: Math.ceil(div(upsFramesPerFeed, f.halls)),
       gensets_facility_shared: true                            // the engine has no per-hall genset split
     };

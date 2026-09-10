@@ -106,7 +106,7 @@ For DC AI's **GB300 NVL72** topology (adopted 2026-09-06, live since v2.0.0), **
 NVLink domain** — there is no split-domain footprint any more. Use:
 
 - `NVL72 rack` (one physical rack = one 72-GPU NVLink domain; **142 kW** per rack)
-- `rack row` (a physical aggregation unit for the hall plan and floor plan; **22 racks = one RPP group**; 40 rows in two banks per hall since v2.4.0)
+- `rack row` (a physical aggregation unit for the hall plan and floor plan; **22 racks = one RPP group**; 20 rows in two banks of 10 per hall since v3.0.0, when the four-hall/880-rack layout was retired for failing its own floor and air budgets)
 - `RPP group` (the electrical aggregation unit fed by one busway trunk; **22 racks**, ≈3.12 MW,
   ≈4.7 kA at 400 V — four groups per row, 40 groups per hall)
 

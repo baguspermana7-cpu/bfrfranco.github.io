@@ -57,12 +57,28 @@
      * FACILITY SCALE
      * ----------------------------------------------------------------------*/
     facility: {
-      // source: owner 2026-09-05 "datahallnya dibuat 4 aja" — ADOPTED
-      halls: 4,
-      // source: plan Track A §A2 — 880 keeps all four halls identical AND divides by
-      //         the 4-rack rail group, so the fabric arithmetic stays integer. 3,522
-      //         (the figure that lands exactly on 500.1 MW) does neither. ADOPTED
-      racksPerHall: 880,
+      // source: owner 2026-09-05 asked for four halls ("datahallnya dibuat 4 aja") and on
+      //         2026-09-09 reopened it from the live drawing — "harusnya kan nggak sebanyak
+      //         itu datahallnya" — then delegated the choice: "atur yang terbaik, super
+      //         accurate". Eight, because four is not buildable and the engine's own numbers
+      //         proved it twice over:
+      //           FLOOR  880 racks (634 m2) + their aisles at the declared 3.1 m pitch
+      //                  (1,288 m2) = 1,922 m2, which IS the whole hall — so the 108 CDUs
+      //                  and 179 CRAHs this same model specifies had zero floor.
+      //           AIR    35,509 kWth of air heat per hall is 2,677 m3/s; at a 2.5 m/s face
+      //                  velocity that needs 1,071 m2 of fan wall against a 1,023 m2 total
+      //                  hall envelope. The air could not pass through the room's own walls.
+      //         Halving the hall population fixes both and changes no room dimension: the
+      //         62 x 31 m hall is the right room for 440 racks. It also makes the 2N claim
+      //         true — see distribution.transformers_per_hall_per_feed.
+      // source: owner 2026-09-09 "atur yang terbaik, super accurate", against the floor and air
+      //         arithmetic above. ADOPTED, superseding the 2026-09-05 count of four.
+      halls: 8,
+      // source: 440 = 20 rows x 22, and 22 is the RPP group the busway ampacity fixes
+      //         (electrical.racksPerRppGroup). It divides by the 4-rack rail group so the
+      //         fabric arithmetic stays integer, and 8 x 440 = 3,520 keeps the facility rack
+      //         count and the 500 MW envelope exactly as they were. ADOPTED
+      racksPerHall: 440,
       // source: NVIDIA GB300 NVL72 public page states no rack power. Bounds that ARE
       //         published: 8 power shelves x 33 kW = 264 kW installed (DGX GB300 RA
       //         "Power Shelves"); one Scalable Unit of 8 racks = 1.2 MW TDP incl. fabric
@@ -311,7 +327,10 @@
       // source: LV distribution group = a quarter-row of 22 racks. 22 x 142 kW = 3.12 MW ->
       //         3,124 / (sqrt3 x 400 x 0.96) = 4,697 A, which one 5,000 A trunk carries. A
       //         half-row (44 racks, 9.4 kA) does not fit any LV busway; the plan agent flagged
-      //         that gap on 2026-09-06 and this is the resolution. 880 = 10 rows x 4 x 22. ADOPTED
+      //         that gap on 2026-09-06 and this is the resolution. One row IS one group:
+      //         440 = 20 rows x 22. (This comment previously said "880 = 10 rows x 4 x 22",
+      //         which contradicted geometry.rows outright; both shipped for three releases.)
+      //         ADOPTED
       racksPerRppGroup: 22,
       // source: 5,000 A LV busway trunk class (Canalis KTA / Starline T5 range). ADOPTED
       buswayTrunkA: 5000,
@@ -327,21 +346,58 @@
      * HALL GEOMETRY
      * ----------------------------------------------------------------------*/
     geometry: {
-      // source: 880 racks x 0.6 x 1.2 m = 634 m2 of rack footprint; a 1:3 footprint-to-
-      //         floor ratio for hot/cold aisles, CDUs, CRAHs and egress. ADOPTED
+      // source: the room is unchanged from the four-hall basis. What changed is that its floor
+      //         is now BUDGETED rather than asserted: see geometry.floor_* in the engine, which
+      //         adds the rack field, the aisles, the CDU gallery and the air plant and requires
+      //         the total to fit. ADOPTED
       lengthM: 62,
       widthM: 31,
       heightM: 5.5,
-      // source: one row = one RPP group of 22 racks (13.2 m at 0.6 m pitch); two banks of 20 rows at a
-      //         3.1 m row pitch fill the 62 m length (20 x 3.1 = 62), and 2 x 13.2 m + a 4.6 m cross aisle
-      //         fill the 31 m width. 40 x 22 = 880 exactly; a row is a readable object (owner 2026-09-07:
-      //         "per row max 24 racks"). ADOPTED
-      rows: 40,
-      // source: the two banks face the central cross aisle that carries the TCS headers from the CDU
-      //         galleries at both ends; rows per bank = rows / banks must be an integer. ADOPTED
+      // source: 440 racks / 22 per row. A row is one RPP group, so the electrical unit of
+      //         account and the floor unit of account are the same object. ADOPTED
+      rows: 20,
+      // source: two banks facing a central cross aisle that carries the TCS headers; rows per
+      //         bank = rows / banks must be an integer. ADOPTED
       banks: 2,
       // source: NVIDIA GB300 NVL72 design guide rack footprint class 600 x 1200 mm. ADOPTED
-      rackFootprintM2: 0.72
+      rackFootprintM2: 0.72,
+      // source: the same 600 x 1200 mm class, stated as the two dimensions the floor plan needs
+      //         rather than only their product. ADOPTED
+      rackPitchM: 0.6,
+      rackDepthM: 1.2,
+      // source: two 600 mm floor tiles of cold aisle (the ASHRAE-conventional minimum for a
+      //         serviceable front), and a contained hot aisle at 0.7 m — enough for a door swing
+      //         and a technician, not for two. Row pitch is DERIVED from these, and lands on the
+      //         3.1 m that the retired four-hall comment asserted as prose: 1.2 + 1.2 + 0.7.
+      //         Aisles are NOT shared between back-to-back rows here, because overhead TCS
+      //         manifolds and containment doors need the full clearance on both faces. ADOPTED
+      coldAisleM: 1.2,
+      hotAisleM: 0.7,
+      // source: the central aisle carries the TCS supply and return headers, the cable tray
+      //         spine and the fire egress route; 4.6 m is what a 31 m hall has left after two
+      //         13.2 m row banks. ADOPTED
+      crossAisleM: 4.6,
+      // source: CoolIT CHx1000 class, about 0.9 x 1.9 m on plan, plus 1 m of access at each end
+      //         = 0.9 x 3.9. Rounded to 4 m2 of serviced floor per unit. ADOPTED
+      cduServiceM2: 4,
+      // source: large-frame CRAH class, about 1.0 x 2.6 m on plan, plus 1 m front and rear
+      //         access = 1.0 x 4.6. Rounded to 5 m2 of serviced floor per unit. ADOPTED
+      crahServiceM2: 5,
+      // source: coil face velocity for a CHW air handler. Above roughly 3 m/s the coil carries
+      //         moisture off the fins and the static penalty climbs steeply; 2.5 m/s is the
+      //         conventional design point. It is the number that decides whether the air a hall
+      //         must move can physically pass through the wall it has. ADOPTED
+      fanWallFaceVelocityMs: 2.5,
+      // source: standard air at the supply plane, for the volumetric flow the fan wall must pass.
+      //         STANDARD
+      airDensityKgM3: 1.2,
+      airCpKjKgK: 1.005,
+      // source: a CRAH/AHU gallery is about 1 m of unit plus 1 m of front access and 1 m of rear
+      //         pipe and coil-pull space. 3 m is the depth that lets a unit be serviced and pulled
+      //         without shutting the row next to it. The number matters because it converts the
+      //         gallery's FLOOR area into its FRONTAGE, and frontage is what a hall perimeter can
+      //         or cannot supply — the check that the retired four-hall basis failed. ADOPTED
+      airPlantDepthM: 3
     },
 
     /* ------------------------------------------------------------------------

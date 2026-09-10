@@ -115,14 +115,17 @@ function testTopologyContract() {
      spine; the rack_group aggregates are the loads that hang off it. */
   const spineNodes = nodes.filter((node) => node.type !== 'rack_group').length;
   assert.equal(spineNodes, 4 + (2 * 7) + (2 * GROUP_COUNT), 'distribution spine node count');
-  assert.equal(spineNodes, 98, 'per hall: 98 distribution nodes at the published basis');
+  /* v3.0.0 — the hall moved from 880 racks in 40 groups to 440 in 20, so the spine halves its
+     RPP pairs: 4 sources/bus + 14 per-feed devices + 2 x 20 RPPs = 58. The formula above is the
+     real invariant; this literal is the cross-check that the published basis is what we think. */
+  assert.equal(spineNodes, 58, 'per hall: 58 distribution nodes at the published basis');
   assert.equal(nodes.length, spineNodes + GROUP_COUNT, 'total nodes = spine + rack groups');
   assert.equal(
     Electrical.BASE_TOPOLOGY.edges.length,
     1 + (2 * (8 + (2 * GROUP_COUNT))),
     'edges = genset tie + per feed (8 spine + one busway-RPP and one RPP-group edge per group)'
   );
-  assert.equal(Electrical.BASE_TOPOLOGY.edges.length, 177, 'per hall: 177 edges at the published basis');
+  assert.equal(Electrical.BASE_TOPOLOGY.edges.length, 97, 'per hall: 97 edges at the published basis');
   assert.equal(
     Electrical.BASE_TOPOLOGY.edges.filter((item) => /RACK-\d/.test(item.id)).length,
     0,
