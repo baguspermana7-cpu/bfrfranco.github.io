@@ -14,7 +14,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-  <title>Changelog — Resistance Zero (v3.3.2 latest)</title>
+  <title>Changelog — Resistance Zero (v3.4.0 latest)</title>
   <meta name="description" content="Live release notes for resistancezero.com — every shipped version, Plan v12 → v15+, with Awwwards uplift, dark-mode coverage, and SEO/AI-search work.">
   <meta name="author" content="Bagus Dwi Permana">
   <meta name="robots" content="index, follow">
@@ -50,7 +50,7 @@
         "@id": "https://resistancezero.com/changelog.html",
         "url": "https://resistancezero.com/changelog.html",
         "name": "Changelog — Resistance Zero",
-        "description": "Live release notes for resistancezero.com — 762 shipped versions.",
+        "description": "Live release notes for resistancezero.com — 763 shipped versions.",
         "dateModified": "2026-09-10",
         "author": {
           "@type": "Person",
@@ -73,18 +73,18 @@
       {
         "@type": "ItemList",
         "name": "Release history",
-        "numberOfItems": 762,
+        "numberOfItems": 763,
         "itemListElement": [
-        {"@type":"ListItem","position":1,"name":"v3.3.2 — 2026-09-10","url":"https://resistancezero.com/changelog.html#v3.3.2"},
-        {"@type":"ListItem","position":2,"name":"v3.3.1 — 2026-09-10","url":"https://resistancezero.com/changelog.html#v3.3.1"},
-        {"@type":"ListItem","position":3,"name":"v3.3.0 — 2026-09-10","url":"https://resistancezero.com/changelog.html#v3.3.0"},
-        {"@type":"ListItem","position":4,"name":"v3.2.0 — 2026-09-10","url":"https://resistancezero.com/changelog.html#v3.2.0"},
-        {"@type":"ListItem","position":5,"name":"v3.1.0 — 2026-09-10","url":"https://resistancezero.com/changelog.html#v3.1.0"},
-        {"@type":"ListItem","position":6,"name":"v3.0.0 — 2026-09-10","url":"https://resistancezero.com/changelog.html#v3.0.0"},
-        {"@type":"ListItem","position":7,"name":"v2.19.0 — 2026-09-10","url":"https://resistancezero.com/changelog.html#v2.19.0"},
-        {"@type":"ListItem","position":8,"name":"v2.18.0 — 2026-09-09","url":"https://resistancezero.com/changelog.html#v2.18.0"},
-        {"@type":"ListItem","position":9,"name":"v2.17.0 — 2026-09-09","url":"https://resistancezero.com/changelog.html#v2.17.0"},
-        {"@type":"ListItem","position":10,"name":"v2.16.0 — 2026-09-09","url":"https://resistancezero.com/changelog.html#v2.16.0"}
+        {"@type":"ListItem","position":1,"name":"v3.4.0 — 2026-09-10","url":"https://resistancezero.com/changelog.html#v3.4.0"},
+        {"@type":"ListItem","position":2,"name":"v3.3.2 — 2026-09-10","url":"https://resistancezero.com/changelog.html#v3.3.2"},
+        {"@type":"ListItem","position":3,"name":"v3.3.1 — 2026-09-10","url":"https://resistancezero.com/changelog.html#v3.3.1"},
+        {"@type":"ListItem","position":4,"name":"v3.3.0 — 2026-09-10","url":"https://resistancezero.com/changelog.html#v3.3.0"},
+        {"@type":"ListItem","position":5,"name":"v3.2.0 — 2026-09-10","url":"https://resistancezero.com/changelog.html#v3.2.0"},
+        {"@type":"ListItem","position":6,"name":"v3.1.0 — 2026-09-10","url":"https://resistancezero.com/changelog.html#v3.1.0"},
+        {"@type":"ListItem","position":7,"name":"v3.0.0 — 2026-09-10","url":"https://resistancezero.com/changelog.html#v3.0.0"},
+        {"@type":"ListItem","position":8,"name":"v2.19.0 — 2026-09-10","url":"https://resistancezero.com/changelog.html#v2.19.0"},
+        {"@type":"ListItem","position":9,"name":"v2.18.0 — 2026-09-09","url":"https://resistancezero.com/changelog.html#v2.18.0"},
+        {"@type":"ListItem","position":10,"name":"v2.17.0 — 2026-09-09","url":"https://resistancezero.com/changelog.html#v2.17.0"}
         ]
       }
     ]
@@ -308,7 +308,10 @@
     /* Body content */
     .changelog-body {
       color: #cbd5e1;
-      font-size: 0.92rem;
+      /* v3.3.x — was 0.92rem, which is 14.72px on a phone: the whole public changelog sat below
+         the 16px reading floor (7,722 elements at 390 and 768). This is running prose, so it gets
+         reading size and grows a little on a wide screen rather than shrinking on a narrow one. */
+      font-size: clamp(1rem, .96rem + .12vw, 1.06rem);
       line-height: 1.7;
       /* Entries quote slash-joined identifier runs (a v1.115.x line lists 17 panel names
          joined by "/"), which Chrome offers no break opportunity inside: one line ran past
@@ -495,7 +498,9 @@
     @media (max-width: 768px) {
       html, body { overflow-x: hidden; max-width: 100vw; }
       img { max-width: 100%; height: auto; display: block; }
-      .changelog-hero { padding: 4rem 1rem 2rem !important; }
+      /* v3.3.x — 4rem is 64px and the wrapped mobile navbar is 93px tall, so "Changelog" sat
+         29px UNDER the fixed nav. Same defect the 18-page sweep at a8d65a9e fixed elsewhere. */
+      .changelog-hero { padding: 6.5rem 1rem 2rem !important; }
       .changelog-hero h1 { font-size: clamp(1.8rem, 7vw, 2.5rem) !important; }
       .changelog-list { padding: 0 1rem 3rem !important; }
       .changelog-entry { padding: 1.25rem !important; }
@@ -611,10 +616,10 @@
       <h1 id="cl-heading">Changelog</h1>
       <p class="cl-subtitle">Live release notes &mdash; every shipped version</p>
       <p class="cl-meta">
-        Latest: <strong style="color:#7dd5b4;">v3.3.2</strong>
+        Latest: <strong style="color:#7dd5b4;">v3.4.0</strong>
         &nbsp;&bull;&nbsp;
         <span id="rzVersionAnchor"></span>
-        <span class="cl-count-badge">762 releases</span>
+        <span class="cl-count-badge">763 releases</span>
       </p>
 
       <div class="filter-chips" role="group" aria-label="Filter by version tier">
@@ -628,7 +633,89 @@
     <!-- ── Entry list ── -->
     <section class="changelog-list" aria-label="Release history">
 
-    <article class="changelog-entry is-current" id="v3.3.2" data-version-tier="patch" data-version="v3.3.2">
+    <article class="changelog-entry is-current" id="v3.4.0" data-version-tier="minor" data-version="v3.4.0">
+      <div class="changelog-meta">
+        <span class="changelog-version-badge" style="--tier-color:#06b6d4;">v3.4.0</span>
+        <span class="changelog-tier-pill" style="--tier-color:#06b6d4;background:#06b6d420;color:#06b6d4;border:1px solid #06b6d440;">MINOR</span>
+        <time class="changelog-date" datetime="2026-09-10">September 10, 2026</time>
+      </div>
+      
+      <div class="changelog-body">
+        <h3 class="cl-subhead">Six more engines issue their PDF through the shared shell</h3>
+<p>Owner comment (22) said the mature template was <em>"required across all the engines"</em>. v3.1.0 built the</p>
+<p>shell and adopted one page; one adopter is a start, not the deliverable.</p>
+<div class="cl-table-wrap"><table class="cl-table">
+<tr><th></th><th>v3.1.0</th><th>now</th></tr>
+<tr><td>pages issuing through the shared shell</td><td>1</td><td><strong>7</strong></td></tr>
+<tr><td>pages still calling <code>window.print()</code> directly</td><td>18</td><td><strong>12</strong></td></tr>
+</table></div>
+<p>Adopted: <code>fire-checklist.html</code> and the five LTC readiness reviews — Uptime tier alignment, NFPA fire</p>
+<p>risk, ANSI/TIA topology, ASHRAE thermal control, ISO energy governance. Each discovers its own</p>
+<p>sections from its own markup: 9, 12, 12, 12, 13 and 12 respectively, every label taken from the</p>
+<p>heading that is already on the page.</p>
+<h4 class="cl-subhead">Adoption is now one call</h4>
+<p>Wiring a page used to be about sixty lines of registration copied into it — which is exactly how the</p>
+<p>site ended up with three hand-built PDF builders before any of this. <code>RZPdfExport.adopt()</code> is the</p>
+<p>whole of it now: a page says which of its elements are sections and what its provenance is, and gets</p>
+<p>the dialog, the section picker and the document shell. The first adopter was refactored onto it, so</p>
+<p>there is one wiring path and not two.</p>
+<p>What stays a parameter is what a shared module must not invent: each page's own title, accent, and</p>
+<p><strong>what its numbers are and are not</strong>. Every one of the six states plainly that it runs no engine, so</p>
+<p>nothing in it is a computed quantity, and each readiness review states that it is a reading against</p>
+<p>published criteria and not a certification — the LTC pages cannot award a tier, an approval or an</p>
+<p>ISO registration, and their exports say so on the cover.</p>
+<h4 class="cl-subhead">The gate was reading its own release notes</h4>
+<p><code>tools/test-rz-pdf-export.mjs</code> decided adoption by whether a page's <strong>source text</strong> contained</p>
+<p><code>RZPdfExport</code>. <code>changelog.html</code> quotes the API in these very notes, inside <code>&lt;code&gt;</code>, so the public</p>
+<p>changelog was asserted against as though it shipped the feature — it slid past two assertions on</p>
+<p>quoted strings and failed the third, and it would have done so for every module this site ever</p>
+<p>documents. Documentation is stripped before the scan now, and adoption is decided by an actual</p>
+<p><code>&lt;script src&gt;</code> tag rather than a mention anywhere in the file.</p>
+<p>That miscount is also why the table above first read 19 → 13: <code>changelog.html</code> was counted among the</p>
+<p>pages calling <code>window.print()</code> directly because the string appears in its prose. The real figures,</p>
+<p>measured on both trees, are <strong>18 → 12</strong> — six pages moved, which is the six adopted.</p>
+<h4 class="cl-subhead">Read before shipped: what the six actually discover</h4>
+<p>Verified rather than asserted — the section counts in the paragraph above were re-measured on the</p>
+<p>rendered pages, from each page's own <code>sectionSelector</code>: 9, 12, 12, 12, 13, 12.</p>
+<h4 class="cl-subhead">Text a reader could not read</h4>
+<p>Separately, the render-audit sweep finished its remaining rule classes.</p>
+<ul>
+  <li><strong>The public changelog body was 14.72 px on a phone.</strong> <code>.changelog-body</code> was <code>0.92rem</code>: 7,722</li>
+</ul>
+<p>elements below the 16 px reading floor at 390 and 768, on the page whose whole purpose is reading.</p>
+<p>It now takes reading size and grows slightly on a wide screen instead of shrinking on a narrow one.</p>
+<ul>
+  <li><strong>39 manual pages</strong> had four families of body text just under the floor, every one of them read</li>
+</ul>
+<p>rather than skimmed: citations (13.8 px — the editorial stylesheet already sets <code>.references</code> at</p>
+<p>reading size), worked examples, link-list descriptions, and the sentence that says what a paper</p>
+<p>argues.</p>
+<ul>
+  <li><strong>Four pages still buried their own H1 under the fixed nav at 390</strong> — the defect the 18-page sweep</li>
+</ul>
+<p>at <code>a8d65a9e</code> fixed elsewhere. Measured: changelog 29 px under, <code>future-forward</code> <strong>61 px</strong> (its H1</p>
+<p>was almost entirely hidden), <code>network-visualization-hub</code> 5 px, <code>network-compare</code> 4 px; the last two</p>
+<p>had been raised by that sweep and still did not clear the bar.</p>
+<p>And two rules were reporting the browser working correctly. <code>missing-image</code> raised 1,255 findings</p>
+<p>across 69 pages, every one a <code>loading=&quot;lazy&quot;</code> image below the fold — not fetched because it is not</p>
+<p>needed yet. Proof rather than argument: 20 incomplete images on <code>articles.html</code> before scrolling,</p>
+<p><strong>zero</strong> after. <code>prose-font-size</code> counted site chrome — the cookie-consent sentence and the footer</p>
+<p>copyright line appear on every page at their own size on purpose, so every page carried a finding it</p>
+<p>could never legitimately fix.</p>
+<p>Not acted on, and why: <code>large-blank-gap</code> findings on article pages sit <strong>inside</strong></p>
+<p><code>[data-rz-scrolly]</code> (article-16's root spans y 7577–10453; the reported gaps start at 8416) — that</p>
+<p>runway is the mechanism, and only the full runner's <code>verifyScrollingGaps()</code> can judge it;</p>
+<p><code>document-overflow</code> is entirely archive and build output, including <code>.qa-screens/overflow-check.html</code>,</p>
+<p>which overflows because it is the fixture for that check.</p>
+<h4 class="cl-subhead">A cache-token drift, caught before it shipped</h4>
+<p>Adding the section picker changed <code>js/rz-design-studio.js</code> and its stylesheet, and the two existing</p>
+<p>adopters — <code>datahallAI.html</code> and <code>dc-conventional.html</code> — still referenced them at <code>?v=1.130.0</code> and</p>
+<p><code>?v=2.0.0</code>. Both would have kept serving the previous file from cache while the six new pages served</p>
+<p>the new one: the same asset live under three URLs. All nine references now carry one token.</p>
+      </div>
+    </article>
+
+    <article class="changelog-entry" id="v3.3.2" data-version-tier="patch" data-version="v3.3.2">
       <div class="changelog-meta">
         <span class="changelog-version-badge" style="--tier-color:#10b981;">v3.3.2</span>
         <span class="changelog-tier-pill" style="--tier-color:#10b981;background:#10b98120;color:#10b981;border:1px solid #10b98140;">PATCH</span>

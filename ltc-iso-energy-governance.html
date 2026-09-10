@@ -413,6 +413,10 @@ html:not([data-theme="dark"]) #rzModalForm a[href$="privacy.html"] { color:#146B
 [data-theme="dark"] #rzModalForm > div[style*="color:#475569"] { color:#94a3b8 !important; }
 html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
 </style>
+
+    <link rel="stylesheet" href="css/rz-design-studio.css?v=3.4.0">
+    <script src="js/rz-pdf-export.js?v=1.1.0" defer></script>
+    <script src="js/rz-design-studio.js?v=3.4.0" defer></script>
 </head>
 <body class="locked">
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -552,7 +556,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
                 <button class="toolbar-btn" id="searchBtn" title="Search (Ctrl+K)"><i class="fas fa-search"></i> Search</button>
                 <button class="toolbar-btn" id="studyModeBtn" title="Toggle study mode"><i class="fas fa-graduation-cap"></i> Study</button>
                 <button class="toolbar-btn" id="flashcardBtn" title="Flashcard mode"><i class="fas fa-clone"></i> Cards</button>
-                <button class="toolbar-btn" id="printBtn" title="Print / PDF"><i class="fas fa-print"></i> Print</button>
+                <button class="toolbar-btn" id="ltc-isoTrig" title="Print / PDF"><i class="fas fa-print"></i> Print</button>
             </div>
             <span class="reading-time" id="readingTime"><i class="fas fa-clock"></i> ~35 min read</span>
         </div>
@@ -1593,7 +1597,8 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
     })();
 
     /* ===== Print ===== */
-    (function(){var b=document.getElementById('printBtn');if(b)b.addEventListener('click',function(){window.print();});})();
+    /* v3.4.0 — the toolbar button now opens the shared export dialog (js/rz-pdf-export.js);
+   the bare window.print() it used to call had no cover, no provenance and no section choice. */
 
     /* ===== Flashcard Mode ===== */
     (function(){
@@ -1802,5 +1807,31 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
         }
     })();
     </script>
+
+<script>
+/* ============================================================================
+ * v3.4.0 — owner comment (22): a mature PDF template, partial or whole, across the engines.
+ * ----------------------------------------------------------------------------
+ * Everything that is not a fact about THIS page lives in js/rz-pdf-export.js, whose palette and
+ * skeleton come from standarization/PDF_EXPORT_STANDARD.md. Sections are discovered from this
+ * page's own markup, so a renamed heading renames the export option.
+ * ==========================================================================*/
+(function(){
+  function go(){
+    if(!window.RZPdfExport) return false;
+    window.RZPdfExport.adopt({
+      id:'ltc-iso-export', triggerId:'ltc-isoTrig',
+      title:'ISO Energy Governance',
+      subtitle:'Readiness review against the ISO energy-management requirements',
+      accent:'#4d7c0f', sectionSelector:'section.section',
+      provenance:'Sections are read from this page at export time. The review states published ISO requirements and this page\u2019s own reading of them; it is not a certification and no value here is engine-derived.',
+      snapshot:function(){ return { 'Basis':'ISO energy-management requirements as stated on this page', 'Status':'A readiness reading, not a certified management system' }; },
+      footerNote:'Readiness reading only \u2014 not an ISO certification'
+    });
+    return true;
+  }
+  if(!go()) window.addEventListener('load', go);
+})();
+</script>
 </body>
 </html>

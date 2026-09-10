@@ -34,7 +34,7 @@
 (function (root) {
   'use strict';
 
-  var VERSION = '1.0.0';
+  var VERSION = '1.1.0';   /* v1.1.0 adds adopt() */
 
   /* standarization/PDF_EXPORT_STANDARD.md "Color Palette". Body text is fixed at the
      primary ink on purpose: the standard bans the muted greys for body copy. */
@@ -199,8 +199,72 @@
     return win;
   }
 
+  /* ---- adoption ------------------------------------------------------------
+     Wiring a page used to mean ~60 lines of registration copied into it, which is how the site
+     ended up with three hand-built PDF builders in the first place. adopt() is the whole of it:
+     the page says which of its elements are sections and what its provenance is, and gets the
+     dialog, the picker and the shell. Anything a page needs to say for itself — its title, its
+     accent, what its numbers are and are not — stays a parameter, because that is the part a
+     shared module must not invent. */
+  function adopt(config) {
+    var cfg = config || {};
+    function sections() {
+      return discoverSections(root.document, cfg.sectionSelector).map(function (sec) {
+        return { id: sec.id, label: sec.label, selected: true };
+      });
+    }
+    function snapshot() {
+      var found = discoverSections(root.document, cfg.sectionSelector);
+      var base = { 'Document': cfg.subtitle || cfg.title, 'Sections available': String(found.length) };
+      var extra = typeof cfg.snapshot === 'function' ? cfg.snapshot(found) : (cfg.snapshot || {});
+      for (var k in extra) { if (Object.prototype.hasOwnProperty.call(extra, k)) { base[k] = extra[k]; } }
+      return base;
+    }
+    function generate(issue) {
+      var found = discoverSections(root.document, cfg.sectionSelector);
+      var byId = {};
+      for (var i = 0; i < found.length; i++) { byId[found[i].id] = found[i]; }
+      var chosen = (issue && issue.sections && issue.sections.length) ? issue.sections : found;
+      var snap = snapshot(), meta = [];
+      for (var key in snap) { if (Object.prototype.hasOwnProperty.call(snap, key)) { meta.push([key, snap[key]]); } }
+      if (issue && issue.revisionNote) { meta.push(['Revision note', issue.revisionNote]); }
+      var html = buildDocument({
+        title: cfg.title,
+        subtitle: cfg.subtitle,
+        accent: cfg.accent,
+        meta: meta,
+        sections: chosen.map(function (choice) {
+          var src = byId[choice.id];
+          return { id: choice.id, label: choice.label || (src ? src.label : choice.id),
+            html: src ? escapeScript(src.el.innerHTML) : '' };
+        }),
+        omitted: (issue && issue.omittedSections) || [],
+        footerNote: cfg.footerNote
+      });
+      open(html, { onBlocked: function () {
+        try { root.alert('Pop-up blocked \u2014 allow pop-ups for this site to export the PDF.'); } catch (e) {}
+      } });
+    }
+    function register() {
+      if (!root.RZDesignStudio || !root.document.getElementById(cfg.triggerId)) { return false; }
+      root.RZDesignStudio.register({
+        id: cfg.id, triggerId: cfg.triggerId,
+        title: cfg.title + ' \u2014 PDF export',
+        subtitle: cfg.dialogSubtitle || 'Issue the whole document, or only the sections you need.',
+        provenance: cfg.provenance,
+        documentTypes: cfg.documentTypes || ['technical-specification'],
+        scopes: cfg.scopes || ['current'],
+        sections: sections, snapshot: snapshot, generate: generate
+      });
+      return true;
+    }
+    if (!register()) { root.addEventListener('load', register); }
+    return { sections: sections, snapshot: snapshot, generate: generate };
+  }
+
   var API = {
     version: VERSION,
+    adopt: adopt,
     PALETTE: PALETTE,
     escapeScript: escapeScript,
     discoverSections: discoverSections,

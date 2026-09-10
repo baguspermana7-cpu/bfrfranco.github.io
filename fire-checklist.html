@@ -100,6 +100,10 @@
 :root:not([data-theme="dark"]) { --fc-primary:#b91c1c; }
 [data-theme="dark"] .src.std { color:#34d399; }
 </style>
+
+    <link rel="stylesheet" href="css/rz-design-studio.css?v=3.4.0">
+    <script src="js/rz-pdf-export.js?v=1.1.0" defer></script>
+    <script src="js/rz-design-studio.js?v=3.4.0" defer></script>
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to content</a>
@@ -297,7 +301,7 @@
                 </ul>
                 <div><label>Findings / next service date</label><input type="text" aria-label="Service record entry"></div>
                 <div class="form-grid" style="margin-top:.5rem;"><div><label>Technician signature</label><input type="text" aria-label="Service record entry"></div><div><label>Supervisor sign-off</label><input type="text" aria-label="Service record entry"></div></div>
-                <button class="btn-print" onclick="window.print()">Print / Save as PDF</button>
+                <button class="btn-print" id="fire-checklistTrig" type="button">Export PDF&nbsp;&mdash; choose sections</button>
                 <button class="btn-print ghost" onclick="document.querySelectorAll('.form-card input').forEach(function(i){i.type==='checkbox'?i.checked=false:i.value='';})">Clear form</button>
             </div>
         </section>
@@ -332,5 +336,31 @@ if(t)cb.setAttribute('aria-label',t.slice(0,140));});}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',n);else n();})();
 </script>
     <script src="js/rz-manual-fab.js?v=2026-08-26" defer></script>
+
+<script>
+/* ============================================================================
+ * v3.4.0 — owner comment (22): a mature PDF template, partial or whole, across the engines.
+ * ----------------------------------------------------------------------------
+ * Everything that is not a fact about THIS page lives in js/rz-pdf-export.js, whose palette and
+ * skeleton come from standarization/PDF_EXPORT_STANDARD.md. Sections are discovered from this
+ * page's own markup, so a renamed heading renames the export option.
+ * ==========================================================================*/
+(function(){
+  function go(){
+    if(!window.RZPdfExport) return false;
+    window.RZPdfExport.adopt({
+      id:'fire-checklist-export', triggerId:'fire-checklistTrig',
+      title:'Fire System Checklist',
+      subtitle:'Detection, suppression and interlock \u2014 inspection and acceptance',
+      accent:'#b45309', sectionSelector:'section.ck-sec',
+      provenance:'Sections are read from this page at export time. The checklist states reference limits from published standards; it performs no calculation, so no value here is engine-derived.',
+      snapshot:function(){ return { 'Basis':'NFPA 72 and NFPA 2001 acceptance criteria as stated on this page', 'Values':'Static reference limits \u2014 this page runs no engine, so nothing here is a computed quantity', 'Completion':'Any boxes ticked on screen are the reader\u2019s own and are not carried into the export' }; },
+      footerNote:'Reference limits only \u2014 not a substitute for the authority having jurisdiction'
+    });
+    return true;
+  }
+  if(!go()) window.addEventListener('load', go);
+})();
+</script>
 </body>
 </html>

@@ -11,6 +11,93 @@ release sections rather than semver.
 
 ---
 
+## v3.4.0 — 2026-09-10
+
+### Six more engines issue their PDF through the shared shell
+
+Owner comment (22) said the mature template was *"required across all the engines"*. v3.1.0 built the
+shell and adopted one page; one adopter is a start, not the deliverable.
+
+| | v3.1.0 | now |
+|---|---:|---:|
+| pages issuing through the shared shell | 1 | **7** |
+| pages still calling `window.print()` directly | 18 | **12** |
+
+Adopted: `fire-checklist.html` and the five LTC readiness reviews — Uptime tier alignment, NFPA fire
+risk, ANSI/TIA topology, ASHRAE thermal control, ISO energy governance. Each discovers its own
+sections from its own markup: 9, 12, 12, 12, 13 and 12 respectively, every label taken from the
+heading that is already on the page.
+
+#### Adoption is now one call
+
+Wiring a page used to be about sixty lines of registration copied into it — which is exactly how the
+site ended up with three hand-built PDF builders before any of this. `RZPdfExport.adopt()` is the
+whole of it now: a page says which of its elements are sections and what its provenance is, and gets
+the dialog, the section picker and the document shell. The first adopter was refactored onto it, so
+there is one wiring path and not two.
+
+What stays a parameter is what a shared module must not invent: each page's own title, accent, and
+**what its numbers are and are not**. Every one of the six states plainly that it runs no engine, so
+nothing in it is a computed quantity, and each readiness review states that it is a reading against
+published criteria and not a certification — the LTC pages cannot award a tier, an approval or an
+ISO registration, and their exports say so on the cover.
+
+#### The gate was reading its own release notes
+
+`tools/test-rz-pdf-export.mjs` decided adoption by whether a page's **source text** contained
+`RZPdfExport`. `changelog.html` quotes the API in these very notes, inside `<code>`, so the public
+changelog was asserted against as though it shipped the feature — it slid past two assertions on
+quoted strings and failed the third, and it would have done so for every module this site ever
+documents. Documentation is stripped before the scan now, and adoption is decided by an actual
+`<script src>` tag rather than a mention anywhere in the file.
+
+That miscount is also why the table above first read 19 → 13: `changelog.html` was counted among the
+pages calling `window.print()` directly because the string appears in its prose. The real figures,
+measured on both trees, are **18 → 12** — six pages moved, which is the six adopted.
+
+#### Read before shipped: what the six actually discover
+
+Verified rather than asserted — the section counts in the paragraph above were re-measured on the
+rendered pages, from each page's own `sectionSelector`: 9, 12, 12, 12, 13, 12.
+
+#### Text a reader could not read
+
+Separately, the render-audit sweep finished its remaining rule classes.
+
+* **The public changelog body was 14.72 px on a phone.** `.changelog-body` was `0.92rem`: 7,722
+  elements below the 16 px reading floor at 390 and 768, on the page whose whole purpose is reading.
+  It now takes reading size and grows slightly on a wide screen instead of shrinking on a narrow one.
+* **39 manual pages** had four families of body text just under the floor, every one of them read
+  rather than skimmed: citations (13.8 px — the editorial stylesheet already sets `.references` at
+  reading size), worked examples, link-list descriptions, and the sentence that says what a paper
+  argues.
+* **Four pages still buried their own H1 under the fixed nav at 390** — the defect the 18-page sweep
+  at `a8d65a9e` fixed elsewhere. Measured: changelog 29 px under, `future-forward` **61 px** (its H1
+  was almost entirely hidden), `network-visualization-hub` 5 px, `network-compare` 4 px; the last two
+  had been raised by that sweep and still did not clear the bar.
+
+And two rules were reporting the browser working correctly. `missing-image` raised 1,255 findings
+across 69 pages, every one a `loading="lazy"` image below the fold — not fetched because it is not
+needed yet. Proof rather than argument: 20 incomplete images on `articles.html` before scrolling,
+**zero** after. `prose-font-size` counted site chrome — the cookie-consent sentence and the footer
+copyright line appear on every page at their own size on purpose, so every page carried a finding it
+could never legitimately fix.
+
+Not acted on, and why: `large-blank-gap` findings on article pages sit **inside**
+`[data-rz-scrolly]` (article-16's root spans y 7577–10453; the reported gaps start at 8416) — that
+runway is the mechanism, and only the full runner's `verifyScrollingGaps()` can judge it;
+`document-overflow` is entirely archive and build output, including `.qa-screens/overflow-check.html`,
+which overflows because it is the fixture for that check.
+
+#### A cache-token drift, caught before it shipped
+
+Adding the section picker changed `js/rz-design-studio.js` and its stylesheet, and the two existing
+adopters — `datahallAI.html` and `dc-conventional.html` — still referenced them at `?v=1.130.0` and
+`?v=2.0.0`. Both would have kept serving the previous file from cache while the six new pages served
+the new one: the same asset live under three URLs. All nine references now carry one token.
+
+---
+
 ## v3.3.2 — 2026-09-10
 
 ### A retraction, and the flow-direction invariant that does hold

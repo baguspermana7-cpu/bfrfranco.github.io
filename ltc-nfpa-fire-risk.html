@@ -415,6 +415,10 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
 .skip-link:focus{top:0}
 [data-theme="dark"] .skip-link{background:#60a5fa;color:#0f172a}
 </style>
+
+    <link rel="stylesheet" href="css/rz-design-studio.css?v=3.4.0">
+    <script src="js/rz-pdf-export.js?v=1.1.0" defer></script>
+    <script src="js/rz-design-studio.js?v=3.4.0" defer></script>
 </head>
 <body class="locked">
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -548,7 +552,7 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
                 <button class="toolbar-btn" id="searchBtn" title="Search (Ctrl+K)"><i class="fas fa-search"></i> Search</button>
                 <button class="toolbar-btn" id="studyModeBtn" title="Toggle study mode"><i class="fas fa-graduation-cap"></i> Study</button>
                 <button class="toolbar-btn" id="flashcardBtn" title="Flashcard mode"><i class="fas fa-clone"></i> Cards</button>
-                <button class="toolbar-btn" id="printBtn" title="Print / PDF"><i class="fas fa-print"></i> Print</button>
+                <button class="toolbar-btn" id="ltc-nfpaTrig" title="Print / PDF"><i class="fas fa-print"></i> Print</button>
             </div>
             <span class="reading-time" id="readingTime"><i class="fas fa-clock"></i> ~30 min read</span>
         </div>
@@ -1463,7 +1467,8 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
     /* 13. Search */
     (function(){var overlay=document.getElementById('searchOverlay'),input=document.getElementById('searchInput'),results=document.getElementById('searchResults'),btn=document.getElementById('searchBtn');if(!overlay||!input)return;function open(){overlay.classList.add('active');input.focus();input.value='';}function close(){overlay.classList.remove('active');results.innerHTML='';}if(btn)btn.addEventListener('click',open);overlay.addEventListener('click',function(e){if(e.target===overlay)close();});document.addEventListener('keydown',function(e){if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();open();}if(e.key==='Escape')close();});input.addEventListener('input',function(){var q=this.value.trim().toLowerCase();results.innerHTML='';if(q.length<2)return;var sections=document.querySelectorAll('.accordion-content,.section-intro');var found=0;sections.forEach(function(sec){if(found>=10)return;var text=sec.textContent;var idx=text.toLowerCase().indexOf(q);if(idx===-1)return;found++;var start=Math.max(0,idx-40);var end=Math.min(text.length,idx+q.length+60);var snippet='...'+text.slice(start,end).replace(new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark>$1</mark>')+'...';var parent=sec.closest('.section');var secTitle=parent?parent.querySelector('.section-title'):null;var div=document.createElement('div');div.className='search-result';div.innerHTML=snippet+'<div class="sr-section">'+(secTitle?secTitle.textContent.trim():'')+'</div>';div.addEventListener('click',function(){close();sec.scrollIntoView({behavior:'smooth',block:'center'});});results.appendChild(div);});if(found===0)results.innerHTML='<div class="search-result" style="color:var(--muted)">No results found</div>';});})();
     /* 14. Print */
-    (function(){var b=document.getElementById('printBtn');if(b)b.addEventListener('click',function(){window.print();});})();
+    /* v3.4.0 — the toolbar button now opens the shared export dialog (js/rz-pdf-export.js);
+   the bare window.print() it used to call had no cover, no provenance and no section choice. */
     /* 15. Flashcards */
     (function(){var overlay=document.getElementById('flashcardOverlay'),card=document.getElementById('flashcard');var frontText=document.getElementById('fcFrontText'),backText=document.getElementById('fcBackText');var counter=document.getElementById('fcCounter'),stats=document.getElementById('fcStats');var progressFill=document.getElementById('fcProgressFill');var btn=document.getElementById('flashcardBtn'),closeBtn=document.getElementById('fcClose');var prevBtn=document.getElementById('fcPrev'),nextBtn=document.getElementById('fcNext');var knowBtn=document.getElementById('fcKnow'),learnBtn=document.getElementById('fcLearning');var shuffleBtn=document.getElementById('fcShuffle');if(!overlay||!card)return;var items=[],idx=0,STORE_KEY='nfpa-fc-mastered';var mastered={};try{var s=localStorage.getItem(STORE_KEY);if(s)mastered=JSON.parse(s);}catch(e){}document.querySelectorAll('.abbr-item').forEach(function(el){var k=el.querySelector('.abbr-key'),v=el.querySelector('.abbr-val');if(k&&v)items.push({q:k.textContent.trim(),a:v.textContent.trim()});});function saveMastered(){try{localStorage.setItem(STORE_KEY,JSON.stringify(mastered));}catch(e){}}function masteredCount(){var c=0;items.forEach(function(it){if(mastered[it.q])c++;});return c;}function updateProgress(){var m=masteredCount(),total=items.length;if(stats)stats.textContent=m+' mastered of '+total;if(progressFill)progressFill.style.width=total?(m/total*100).toFixed(1)+'%':'0%';}function show(){if(!items.length)return;card.classList.remove('flipped');if(frontText)frontText.textContent=items[idx].q;if(backText)backText.textContent=items[idx].a;if(counter)counter.textContent=(idx+1)+' / '+items.length;updateProgress();}function advance(){idx=(idx+1)%items.length;show();}function shuffle(){for(var i=items.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=items[i];items[i]=items[j];items[j]=t;}idx=0;show();}if(btn)btn.addEventListener('click',function(){overlay.classList.add('active');idx=0;show();});if(closeBtn)closeBtn.addEventListener('click',function(){overlay.classList.remove('active');});overlay.addEventListener('click',function(e){if(e.target===overlay)overlay.classList.remove('active');});if(card)card.addEventListener('click',function(e){if(e.target.closest('.fc-hint'))return;card.classList.toggle('flipped');});if(prevBtn)prevBtn.addEventListener('click',function(){idx=(idx-1+items.length)%items.length;show();});if(nextBtn)nextBtn.addEventListener('click',function(){idx=(idx+1)%items.length;show();});if(knowBtn)knowBtn.addEventListener('click',function(){if(items.length)mastered[items[idx].q]=true;saveMastered();advance();});if(learnBtn)learnBtn.addEventListener('click',function(){if(items.length)delete mastered[items[idx].q];saveMastered();advance();});if(shuffleBtn)shuffleBtn.addEventListener('click',shuffle);document.addEventListener('keydown',function(e){if(!overlay.classList.contains('active'))return;if(e.key===' '||e.code==='Space'){e.preventDefault();card.classList.toggle('flipped');}else if(e.key==='ArrowLeft'){e.preventDefault();idx=(idx-1+items.length)%items.length;show();}else if(e.key==='ArrowRight'){e.preventDefault();advance();}else if(e.key==='1'){e.preventDefault();if(items.length){mastered[items[idx].q]=true;saveMastered();advance();}}else if(e.key==='2'){e.preventDefault();if(items.length){delete mastered[items[idx].q];saveMastered();advance();}}else if(e.key==='Escape'){overlay.classList.remove('active');}});})();
     /* 16. Deep Link Copy */
@@ -1482,5 +1487,31 @@ html:not([data-theme="dark"]) #rzModalError { color:#b91c1c !important; }
     /* 23. Hash Scroll */
     (function(){if(window.location.hash){var id=window.location.hash.slice(1);var target=document.getElementById(id)||document.querySelector('[data-nav-id="'+id+'"]');if(target)setTimeout(function(){target.scrollIntoView({behavior:'smooth',block:'start'});},600);}})();
     </script>
+
+<script>
+/* ============================================================================
+ * v3.4.0 — owner comment (22): a mature PDF template, partial or whole, across the engines.
+ * ----------------------------------------------------------------------------
+ * Everything that is not a fact about THIS page lives in js/rz-pdf-export.js, whose palette and
+ * skeleton come from standarization/PDF_EXPORT_STANDARD.md. Sections are discovered from this
+ * page's own markup, so a renamed heading renames the export option.
+ * ==========================================================================*/
+(function(){
+  function go(){
+    if(!window.RZPdfExport) return false;
+    window.RZPdfExport.adopt({
+      id:'ltc-nfpa-export', triggerId:'ltc-nfpaTrig',
+      title:'NFPA Fire Risk Readiness',
+      subtitle:'Readiness review against the NFPA fire-protection standards',
+      accent:'#b45309', sectionSelector:'section.section',
+      provenance:'Sections are read from this page at export time. The review states published NFPA criteria and this page\u2019s own reading of them; it is not an approval and no value here is engine-derived.',
+      snapshot:function(){ return { 'Basis':'NFPA criteria as stated on this page', 'Status':'A readiness reading, not an approval \u2014 the authority having jurisdiction decides' }; },
+      footerNote:'Readiness reading only \u2014 not an approval by any authority having jurisdiction'
+    });
+    return true;
+  }
+  if(!go()) window.addEventListener('load', go);
+})();
+</script>
 </body>
 </html>

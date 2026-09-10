@@ -110,9 +110,16 @@ const adopters = [];
 let barePrint = 0;
 const bareList = [];
 for (const page of pages) {
-  const text = read(page);
-  const usesStudio = text.includes('RZDesignStudio.register');
-  const usesShell = text.includes('RZPdfExport');
+  const raw = read(page);
+  /* v3.4.1 — SCAN CODE, NOT PROSE. This ran on the raw source and treated any page whose text
+     contained "RZPdfExport" as an adopter, so `changelog.html` — which QUOTES the API in its
+     release notes, inside <code> — was asserted against as if it shipped the feature. It slid past
+     two assertions on quoted strings and failed the third, and it would have done so for every
+     module this site ever documents. Documentation is stripped, and adoption is decided by an
+     actual <script src> tag rather than by a mention anywhere in the file. */
+  const text = raw.replace(/<code\b[^>]*>[\s\S]*?<\/code>/gi, ' ').replace(/<pre\b[^>]*>[\s\S]*?<\/pre>/gi, ' ');
+  const usesStudio = text.includes('RZDesignStudio.register') || text.includes('RZPdfExport.adopt');
+  const usesShell = /<script\b[^>]*\bsrc\s*=\s*["'][^"']*rz-pdf-export\.js/i.test(text);
   if (usesShell) {
     adopters.push(page);
     assert.match(text, /js\/rz-pdf-export\.js/, `${page} uses RZPdfExport and must load the module`);
@@ -124,6 +131,9 @@ for (const page of pages) {
   }
 }
 assert.ok(adopters.length >= 1, 'at least one page must issue through the shared shell');
+/* adopt() is the sanctioned wiring, so it must itself go through the shared dialog */
+assert.match(source, /RZDesignStudio\.register\(/, 'RZPdfExport.adopt() must register with the shared Design Studio dialog');
+assert.match(source, /discoverSections\(/, 'adopt() must discover sections from the page rather than take a hand-kept list');
 
 console.log('── SHARED PDF EXPORT ──');
 console.log(`shell v${API.version}; adopters: ${adopters.join(', ')}`);
