@@ -1099,6 +1099,9 @@
 }
 </style>
     <script>(function(){var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t);})();</script>
+    <link rel="stylesheet" href="css/rz-design-studio.css?v=3.5.0">
+    <script src="js/rz-pdf-export.js?v=1.2.0" defer></script>
+    <script src="js/rz-design-studio.js?v=3.5.0" defer></script>
 </head>
 <body>
     <!-- Reading Progress Bar -->
@@ -1268,7 +1271,7 @@
             </div>
             <div class="paper-actions">
                 <!-- v1.9.1: exportToPDF stub removed (was alert placeholder); use Print instead -->
-                <button class="paper-btn secondary" onclick="window.print()">
+                <button class="paper-btn secondary" id="a10ExportTrig" type="button">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="6 9 6 2 18 2 18 9"/>
                         <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
@@ -3712,5 +3715,36 @@
 
 
 
+
+<script>
+/* ============================================================================
+ * v3.5.0 — owner comment (22): a mature PDF template, partial or whole.
+ * ----------------------------------------------------------------------------
+ * This page is heading-structured rather than section-wrapped, which is an ordinary way to write a
+ * document and should not force markup changes just to be exportable. js/rz-pdf-export.js slices
+ * the body at each <h2>, taking the id from the heading's own anchor so a table-of-contents link
+ * and an export option are the same handle, and the label from the heading text so the two cannot
+ * drift. Palette and skeleton come from standarization/PDF_EXPORT_STANDARD.md.
+ * ==========================================================================*/
+(function(){
+  function go(){
+    if(!window.RZPdfExport) return false;
+    window.RZPdfExport.adopt({
+      id:'a10-export', triggerId:'a10ExportTrig',
+      title:'Water & Data Centres', subtitle:'Water stress, cooling demand and the WUE arithmetic', accent:'#0ea5e9',
+      headingContainer:'.article-body', headingSelector:'h2',
+      provenance:'Sections are sliced from this page at export time, one per heading. The article states its own sources inline; any calculator on the page runs client-side and its inputs are the reader\u2019s, so no figure here is a certified or measured quantity.',
+      snapshot:function(found){ return {
+        'Structure':'Sliced at each heading of the article body \u2014 ' + found.length + ' section(s)',
+        'Sources':'Cited inline in the text; the export carries the citations as written',
+        'Calculators':'Any interactive result reflects inputs entered on screen and is not carried as a claim'
+      };},
+      footerNote:'Editorial article \u2014 cited sources are the author\u2019s, not a standards body\u2019s'
+    });
+    return true;
+  }
+  if(!go()) window.addEventListener('load', go);
+})();
+</script>
 </body>
 </html>

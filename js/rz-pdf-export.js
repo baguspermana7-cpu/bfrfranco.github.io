@@ -34,7 +34,7 @@
 (function (root) {
   'use strict';
 
-  var VERSION = '1.1.0';   /* v1.1.0 adds adopt() */
+  var VERSION = '1.2.0';   /* v1.2.0 adds heading-structured discovery */
 
   /* standarization/PDF_EXPORT_STANDARD.md "Color Palette". Body text is fixed at the
      primary ink on purpose: the standard bans the muted greys for body copy. */
@@ -86,7 +86,49 @@
       var declared = el.getAttribute('data-rz-doc-label');
       var head = el.querySelector('h2, h3, h1');
       var label = declared || (head ? head.textContent : id);
-      out.push({ id: id, label: String(label).replace(/\s+/g, ' ').trim(), el: el });
+      out.push({ id: id, label: cleanLabel(label), el: el });
+    }
+    return out;
+  }
+
+  /* ---- heading-structured documents ----------------------------------------
+     Not every document wraps its sections. The article family and the calculators run a flat
+     sequence of <h2> siblings inside one body container, which is a perfectly ordinary way to
+     write a document and should not force markup changes on nine pages just to be exportable.
+     Here a section starts at a heading and ends at the next one. The id comes from the heading's
+     own id where it has one, so a table-of-contents anchor and an export option are the same
+     handle, and the label comes from the heading text, so the two cannot drift. */
+  /* Headings often carry a self-link glyph — a trailing '#' or pilcrow rendered by an anchor.
+     It belongs to the page's navigation, not to the section's name. */
+  function cleanLabel(text) {
+    return String(text == null ? '' : text)
+      .replace(/\s+/g, ' ')
+      .replace(/\s*[#¶§]\s*$/, '')
+      .trim();
+  }
+
+  function slug(text) {
+    return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 48);
+  }
+
+  function discoverHeadingSections(containerSelector, headingSelector) {
+    var doc = root.document;
+    if (!doc || !doc.querySelector) { return []; }
+    var host = doc.querySelector(containerSelector);
+    if (!host) { return []; }
+    var heading = headingSelector || 'h2';
+    var out = [], current = null;
+    var kids = host.children;
+    for (var i = 0; i < kids.length; i++) {
+      var node = kids[i];
+      if (node.matches && node.matches(heading)) {
+        var label = cleanLabel(node.textContent);
+        if (!label) { continue; }
+        current = { id: node.id || slug(label) || ('section-' + out.length), label: label, markup: '' };
+        out.push(current);
+        continue;
+      }
+      if (current) { current.markup += node.outerHTML || ''; }
     }
     return out;
   }
@@ -208,20 +250,30 @@
      shared module must not invent. */
   function adopt(config) {
     var cfg = config || {};
+    /* a page declares EITHER wrapped sections or a heading-structured body; nothing else changes */
+    function find() {
+      return cfg.headingContainer
+        ? discoverHeadingSections(cfg.headingContainer, cfg.headingSelector)
+        : discoverSections(root.document, cfg.sectionSelector);
+    }
+    function markupOf(sec) {
+      if (!sec) { return ''; }
+      return escapeScript(typeof sec.markup === 'string' ? sec.markup : (sec.el ? sec.el.innerHTML : ''));
+    }
     function sections() {
-      return discoverSections(root.document, cfg.sectionSelector).map(function (sec) {
+      return find().map(function (sec) {
         return { id: sec.id, label: sec.label, selected: true };
       });
     }
     function snapshot() {
-      var found = discoverSections(root.document, cfg.sectionSelector);
+      var found = find();
       var base = { 'Document': cfg.subtitle || cfg.title, 'Sections available': String(found.length) };
       var extra = typeof cfg.snapshot === 'function' ? cfg.snapshot(found) : (cfg.snapshot || {});
       for (var k in extra) { if (Object.prototype.hasOwnProperty.call(extra, k)) { base[k] = extra[k]; } }
       return base;
     }
     function generate(issue) {
-      var found = discoverSections(root.document, cfg.sectionSelector);
+      var found = find();
       var byId = {};
       for (var i = 0; i < found.length; i++) { byId[found[i].id] = found[i]; }
       var chosen = (issue && issue.sections && issue.sections.length) ? issue.sections : found;
@@ -236,7 +288,7 @@
         sections: chosen.map(function (choice) {
           var src = byId[choice.id];
           return { id: choice.id, label: choice.label || (src ? src.label : choice.id),
-            html: src ? escapeScript(src.el.innerHTML) : '' };
+            html: markupOf(src) };
         }),
         omitted: (issue && issue.omittedSections) || [],
         footerNote: cfg.footerNote
@@ -268,6 +320,7 @@
     PALETTE: PALETTE,
     escapeScript: escapeScript,
     discoverSections: discoverSections,
+    discoverHeadingSections: discoverHeadingSections,
     buildDocument: buildDocument,
     open: open
   };

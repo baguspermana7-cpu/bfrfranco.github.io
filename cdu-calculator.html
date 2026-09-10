@@ -172,6 +172,9 @@
 [data-theme="dark"] .chip.warn { color:#fbbf24; }
 [data-theme="dark"] .chip.alarm { color:#f87171; }
 </style>
+    <link rel="stylesheet" href="css/rz-design-studio.css?v=3.5.0">
+    <script src="js/rz-pdf-export.js?v=1.2.0" defer></script>
+    <script src="js/rz-design-studio.js?v=3.5.0" defer></script>
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to content</a>
@@ -686,33 +689,88 @@
         }
         window.__cduProRefresh = function(){ if(mode==='pro' && isPremium()){ computePro(); } };
 
-        function exportPDF(){
-            var w=window.open('','_blank'); if(!w) return;       // open FIRST, before heavy work
-            var o=window.__cdu||{}, pro=lastPro;
-            var kpis=document.getElementById('ccKpis').innerText.replace(/\n+/g,' · ');
-            var rows='';
+        /* ====================================================================
+         * v3.5.0 — owner comment (22): this engine issues through the shared shell.
+         * --------------------------------------------------------------------
+         * The retired version of this function built a whole document by hand: its own inline
+         * CSS, its own header and footer, its own page rules — and it embedded a <script> into
+         * the template to trigger printing, which is the exact construction that terminated the
+         * parent script block and broke five calculator pages on 2026-05-09. All of that now
+         * comes from js/rz-pdf-export.js, whose palette and skeleton are
+         * standarization/PDF_EXPORT_STANDARD.md, and printing is the shell's job, so no script
+         * is embedded at all.
+         *
+         * The report's sections are BUILT from the live calculation rather than discovered in
+         * the page, so this registers its own section list instead of calling adopt().
+         * ==================================================================== */
+        function ccReportSections(){
+            var pro=lastPro, rows='';
             document.querySelectorAll('#ccKpis .kpi').forEach(function(k){
-                rows+='<tr><td>'+k.querySelector('.kpi-label').textContent.replace('Derived','').trim()+'</td><td>'+k.querySelector('.kpi-val').textContent.trim()+'</td><td>'+k.querySelector('.kpi-sub').textContent.trim()+'</td></tr>'; });
-            var proHtml='';
-            if(pro){ proHtml='<h2>Pro analysis</h2><table><tr><td>Capex</td><td>'+usd(pro.capex)+'</td></tr><tr><td>Annual energy</td><td>'+usd(pro.annEnergy)+'</td></tr><tr><td>Annual opex</td><td>'+usd(pro.annOpex)+'</td></tr><tr><td>10-yr NPV cost</td><td>'+usd(pro.ownership)+'</td></tr><tr><td>$/kW-year</td><td>'+usd(pro.perKwYr)+'</td></tr><tr><td>Monte-Carlo energy P5 / P50 / P95</td><td>'+usd(pro.mcP5)+' / '+usd(pro.mcP50)+' / '+usd(pro.mcP95)+'</td></tr></table>'
-                +'<div style="display:flex;gap:12px;flex-wrap:wrap;">'+pro.mcSvg+pro.tornSvg+'</div>'+pro.narr; }
-            var html='<!DOCTYPE html><html><head><meta charset="utf-8"><title>CDU Sizing Report</title><style>'
-                +'body{font-family:Arial,sans-serif;color:#1f2937;margin:24px;font-size:12px;}h1{color:#0e3a52;font-size:20px;margin:0 0 2px;}h2{color:#0e3a52;font-size:14px;margin:16px 0 6px;border-bottom:1px solid #ddd;padding-bottom:3px;}'
-                +'table{border-collapse:collapse;width:100%;margin:4px 0;}td{border:1px solid #e5e7eb;padding:5px 8px;}tr td:first-child{color:#374151;font-weight:600;width:40%;}'
-                +'.sub{color:#6b7280;font-size:11px;}svg{max-width:300px;border:1px solid #eee;}@media print{@page{margin:15mm;}body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}</style></head><body>'
-                +'<h1>CDU Sizing &amp; Thermohydraulic Report</h1><div class="sub">resistancezero.com — CDU calculator · engine v'+(window.CDU_ENGINE?window.CDU_ENGINE.version:'')+' · '+(o.fluid||'').toUpperCase()+' @ '+(o.supply||'')+'°C · load '+(o.load||'')+' kW</div>'
-                +'<h2>Sizing results (derived)</h2><table><tr><td>Metric</td><td>Value</td><td>Basis</td></tr>'+rows+'</table>'
-                +proHtml
-                +'<p class="sub">Educational estimate. Computed by a validated engine (40/40 tests) anchored to ASHRAE TC9.9 + OCP. PG-25 properties and TCO defaults are illustrative — confirm with the manufacturer. Not procurement or safety advice.</p>'
-                +'<script>window.onload=function(){setTimeout(function(){window.print();},250);};<\/script></body></html>';
-            w.document.write(html); w.document.close();
+                rows+='<tr><td>'+k.querySelector('.kpi-label').textContent.replace('Derived','').trim()+'</td><td>'+k.querySelector('.kpi-val').textContent.trim()+'</td><td>'+(k.getAttribute('data-basis')||'derived')+'</td></tr>';
+            });
+            var out=[{ id:'sizing', label:'Sizing results (derived)',
+                html:'<table><tr><th>Metric</th><th>Value</th><th>Basis</th></tr>'+rows+'</table>' }];
+            if(pro){
+                out.push({ id:'pro', label:'Pro analysis',
+                    html:'<table><tr><td>Capex</td><td>'+usd(pro.capex)+'</td></tr>'
+                        +'<tr><td>Annual energy</td><td>'+usd(pro.annEnergy)+'</td></tr></table>'
+                        +'<div style="display:flex;gap:12px;flex-wrap:wrap;">'+(pro.mcSvg||'')+(pro.tornSvg||'')+'</div>'
+                        +(pro.narr||'') });
+            }
+            return out;
+        }
+        function ccReportMeta(){
+            var o=window.__cdu||{};
+            var meta=[['Engine', (window.CDU_ENGINE&&window.CDU_ENGINE.version)?('CDU engine v'+window.CDU_ENGINE.version):'CDU engine'],
+                      ['Basis','ASHRAE TC9.9 envelopes and OCP quick-disconnect limits; PG-25 fluid properties'],
+                      ['Status','Educational estimate computed client-side from the inputs on screen \u2014 not a vendor selection and not a measured result'],
+                      ['Tier', lastPro ? 'Pro analysis included' : 'Free tier \u2014 the Pro analysis section is not available on this export']];
+            Object.keys(o).forEach(function(k){ if(typeof o[k]==='number'||typeof o[k]==='string') meta.push(['Input \u2014 '+k, String(o[k])]); });
+            return meta;
+        }
+        function exportPDF(issue){
+            var api=window.RZPdfExport;
+            if(!api){ try{ window.alert('The export module did not load \u2014 reload the page and retry.'); }catch(e){} return; }
+            var built=ccReportSections(), byId={};
+            built.forEach(function(sec){ byId[sec.id]=sec; });
+            var chosen=(issue&&issue.sections&&issue.sections.length)?issue.sections:built;
+            var meta=ccReportMeta();
+            if(issue&&issue.revisionNote) meta.push(['Revision note', issue.revisionNote]);
+            api.open(api.buildDocument({
+                title:'CDU Sizing & Thermohydraulic Report',
+                subtitle:'Coolant distribution unit sizing, hydraulics and cost',
+                accent:'#0e3a52',
+                meta:meta,
+                sections:chosen.map(function(c){ var src=byId[c.id];
+                    return { id:c.id, label:c.label||(src?src.label:c.id), html:src?api.escapeScript(src.html):'' }; }),
+                omitted:(issue&&issue.omittedSections)||[],
+                footerNote:'Educational estimate \u2014 not a vendor selection'
+            }), { onBlocked:function(){ try{ window.alert('Pop-up blocked \u2014 allow pop-ups for this site to export the PDF.'); }catch(e){} } });
         }
 
         function init(){
             $('ccFree').addEventListener('click',function(){ setMode('free'); });
             $('ccPro').addEventListener('click',function(){ setMode('pro'); });
             $('ccProOverlay').addEventListener('click',function(){ setMode('pro'); });
-            $('ccPdf').addEventListener('click', exportPDF);
+            /* v3.5.0 — the button opens the shared Design Studio dialog, which offers the
+               section choice and then calls exportPDF() with the operator's selection. */
+            (function(){
+              function reg(){
+                if(!window.RZDesignStudio||!document.getElementById('ccPdf')) return false;
+                window.RZDesignStudio.register({
+                  id:'cdu-calculator-export', triggerId:'ccPdf',
+                  title:'CDU Sizing Report \u2014 PDF export',
+                  subtitle:'Issue the whole report, or only the sections you need.',
+                  provenance:'Every figure is computed client-side by the CDU engine from the inputs on screen. It is an educational estimate anchored to ASHRAE TC9.9 and OCP limits, not a vendor selection and not a measured result.',
+                  documentTypes:['technical-specification'], scopes:['current'],
+                  sections:function(){ return ccReportSections().map(function(s){ return {id:s.id,label:s.label,selected:true}; }); },
+                  snapshot:function(){ var m={}; ccReportMeta().forEach(function(r){ m[r[0]]=r[1]; }); return m; },
+                  generate:exportPDF
+                });
+                return true;
+              }
+              if(!reg()) window.addEventListener('load', reg);
+            })();
             $('ccModalX').addEventListener('click',function(){ $('ccModal').classList.remove('show'); });
             $('ccModal').addEventListener('click',function(e){ if(e.target===$('ccModal')) $('ccModal').classList.remove('show'); });
             // Shared Supabase-aware modal writes rz_premium_session + dispatches rz-auth-change → re-gate here.

@@ -11,6 +11,65 @@ release sections rather than semver.
 
 ---
 
+## v3.5.0 — 2026-09-10
+
+### Every page that issues a document now issues it through the shared shell
+
+Owner comment (22) asked for a mature PDF template *"required across all the engines"*. The monitor
+that has run since v3.1.0 is now a **gate**, because the count it was watching reached zero.
+
+| | v3.1.0 | v3.4.0 | now |
+|---|---:|---:|---:|
+| pages issuing through the shared shell | 1 | 9 | **15** |
+| pages printing directly, undeclared | 19 | 10 | **0** |
+
+#### Heading-structured documents, without touching their markup
+
+The last nine pages had no `<section>` wrappers at all — the article family and the calculators run
+a flat sequence of `<h2>` siblings, which is an ordinary way to write a document and should not force
+markup changes on nine pages just to be exportable. `discoverHeadingSections()` slices the body at
+each heading: the id comes from the heading's own anchor, so a table-of-contents link and an export
+option are the same handle, and the label comes from the heading text, so the two cannot drift.
+Adopted this way: articles 10, 11, 12, 13 and `geopolitics-1.html` — 10, 12, 12, 11 and 9 sections
+respectively, discovered live.
+
+#### The last hand-built report moved onto the shell
+
+`cdu-calculator.html` built its whole document by hand: its own inline CSS, its own header and
+footer, its own page rules — **and it embedded a `<script>` into the template to trigger printing**,
+which is the exact construction that terminated the parent script block and broke five calculator
+pages on 2026-05-09. All of it now comes from the shell, and printing is the shell's job, so no
+script is embedded at all. Its report sections are built from the live calculation rather than read
+from the page, so it registers its own list and still gets the picker: a free-tier export offers
+Sizing results, a Pro session also offers the Pro analysis.
+
+#### Four pages are declared, not converted
+
+A bare `window.print()` is not automatically a defect, and treating it as one would have pushed four
+pages into a shape that does not fit them. Each is named in the gate with its reason:
+
+- **`article-9-paper.html`** — a paper document with A4 `@page` rules where printing **is** the
+  deliverable; the standard already exempts it from the screen palette.
+- **`rz-ops-p7x3k9m.html`** — an internal operations page, in no sitemap and no export; its print is
+  a working printout for one operator.
+- **`ict.html`** — its button is titled *"Print this view"* and prints the cockpit screen as it
+  stands. That is a screenshot by printer, not a document with sections and provenance.
+- **`article-15.html`** — `exportQuotePDF()` prints a generated **quotation** composed from the
+  reader's own inputs, not the article; there are no page sections to choose between.
+
+The gate rejects any other page, and rejects a declaration whose page no longer exists. *"It would
+take work to convert"* is not a reason the list accepts.
+
+#### Provenance is the part the shared module must not invent
+
+Every adopter states what its numbers are and are not, on the export cover. The readiness reviews
+say they are a reading against published criteria and **not** a certification — those pages cannot
+award a tier, an approval or an ISO registration. The articles say their calculators reflect inputs
+entered on screen and carry no claim. The calculator says it is an educational estimate anchored to
+ASHRAE TC9.9 and OCP, not a vendor selection and not a measurement.
+
+---
+
 ## v3.4.2 — 2026-09-10
 
 ### The mobile patch was shrinking the reading column

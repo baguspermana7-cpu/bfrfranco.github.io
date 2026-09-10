@@ -26,11 +26,15 @@
  *      `</script>` inside a JS-built print template terminated the PARENT document's script block
  *      and broke five calculator pages.
  *
- * MONITOR, with the number recorded: 19 pages still call window.print() directly rather than
- * issuing through the shared shell. FLIP CONDITION: this becomes a gate when that count reaches
- * zero. It is not a gate today because converting a page is a per-page design decision — the
- * shell needs to know that page's sections and provenance — and a gate that fails on twenty
- * pages would be answered by weakening it.
+ *   4. EVERY PAGE THAT OFFERS A DOCUMENT EXPORT USES THE SHELL. This began as a MONITOR at 19
+ *      pages calling window.print() directly; it is now a gate, because the count is zero.
+ *
+ *      A bare window.print() is not automatically a defect, and pretending it was would have
+ *      pushed four pages into a shape that does not fit them. Four are DECLARED below with their
+ *      reasons: a document written to print (A4 @page rules, where printing IS the deliverable),
+ *      an internal operations page that is not published at all, a cockpit whose button prints
+ *      the screen rather than issuing a document, and a quote modal, which exports a generated
+ *      quotation rather than the page. Everything else issues through the shell.
  *
  * Usage: node tools/test-rz-pdf-export.mjs
  */
@@ -105,6 +109,26 @@ const hostile = API.buildDocument({
 assert.ok(!/<\/script/i.test(hostile), 'no document this module builds may contain an unescaped </script>');
 
 /* ---- 5. adopters -------------------------------------------------------- */
+/* Pages whose window.print() is correct, each with the reason. A page joins this list only when
+   printing is genuinely not a document export; "it would take work to convert" is not a reason. */
+const DECLARED_DIRECT_PRINT = new Map([
+  ['article-9-paper.html',
+    'A paper document: it sets A4 @page rules and prints as its deliverable. PDF_EXPORT_STANDARD.md '
+    + 'names it a PAPER DOCUMENT and exempts it from the screen palette; wrapping it in the shell '
+    + 'would put a second cover on a document that already has one.'],
+  ['rz-ops-p7x3k9m.html',
+    'An internal operations page. It is not in the sitemap, not in the LLM exports and not linked '
+    + 'from the site; its print is a working printout for one operator, not a document issued to a reader.'],
+  ['ict.html',
+    'The button is titled "Print this view" and prints the cockpit screen as it stands. That is a '
+    + 'screenshot-by-printer, not a document with sections and provenance. A cockpit issues documents '
+    + 'through its Design Studio, which this page does not have yet.'],
+  ['article-15.html',
+    'exportQuotePDF() prints a generated QUOTATION modal, not the article. The quotation is composed '
+    + 'from inputs the reader entered, so it has no page sections to choose between; the article body '
+    + 'itself offers no print affordance.'],
+]);
+
 const pages = readdirSync(ROOT).filter((n) => n.endsWith('.html'));
 const adopters = [];
 let barePrint = 0;
@@ -126,8 +150,9 @@ for (const page of pages) {
     assert.ok(usesStudio, `${page} builds documents with the shared shell and must issue them through the shared dialog`);
     assert.match(text, /css\/rz-design-studio\.css/, `${page} must load the dialog stylesheet it depends on`);
   }
-  if (/onclick="window\.print\(\)"/.test(text) || /\bwindow\.print\(\)/.test(text)) {
-    if (!usesShell) { barePrint += 1; bareList.push(page); }
+  if (/\bwindow\.print\(\)/.test(text) && !usesShell && !DECLARED_DIRECT_PRINT.has(page)) {
+    barePrint += 1;
+    bareList.push(page);
   }
 }
 assert.ok(adopters.length >= 1, 'at least one page must issue through the shared shell');
@@ -137,7 +162,11 @@ assert.match(source, /discoverSections\(/, 'adopt() must discover sections from 
 
 console.log('── SHARED PDF EXPORT ──');
 console.log(`shell v${API.version}; adopters: ${adopters.join(', ')}`);
-console.log(`MONITOR — ${barePrint} page(s) still print directly instead of issuing through the shell: `
-  + bareList.slice(0, 6).join(', ') + (bareList.length > 6 ? ' …' : ''));
-console.log('  flip condition: this becomes a gate when that count reaches 0.');
+assert.deepEqual(bareList, [],
+  'a page that offers a document export must issue it through the shared shell, or be declared in '
+  + 'DECLARED_DIRECT_PRINT with the reason its print is not a document export');
+for (const [page] of DECLARED_DIRECT_PRINT) {
+  assert.ok(pages.includes(page), `DECLARED_DIRECT_PRINT names ${page}, which no longer exists — drop the entry`);
+}
+console.log(`declared direct-print pages (print is not a document export): ${[...DECLARED_DIRECT_PRINT.keys()].join(', ')}`);
 console.log('PASS — palette follows the standard, the skeleton is complete, a partial export names what it dropped, and no built document carries an unescaped closing script tag');
