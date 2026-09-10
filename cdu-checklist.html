@@ -26,6 +26,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.min.css?v=20260908-editorial">
+    <link rel="stylesheet" href="css/rz-design-studio.css?v=3.1.0">
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
     <script src="js/rz-mobile-nav.js?v=2026-07-22-navfix" defer></script>
     <script src="js/rz-cookie-consent.js?v=2026-07-14" defer></script>
@@ -671,7 +672,7 @@
                 <div><label>Reviewed by</label><input type="text" aria-label="Service record entry" placeholder="Supervisor"></div>
             </div>
             <div class="form-actions">
-                <button class="btn-print" onclick="window.print()">Print / Save as PDF</button>
+                <button class="btn-print" id="ckExportTrig" type="button">Export PDF&nbsp;&mdash; choose sections</button>
                 <button class="btn-print ghost" onclick="document.querySelectorAll('.form-card input').forEach(function(i){if(i.type!=='date')i.value='';});">Clear form</button>
             </div>
         </div>
@@ -711,6 +712,84 @@
 if(t)cb.setAttribute('aria-label',t.slice(0,140));});}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',n);else n();})();
 </script>
+    <script src="js/rz-pdf-export.js?v=1.0.0" defer></script>
+    <script src="js/rz-design-studio.js?v=3.1.0" defer></script>
     <script src="js/rz-manual-fab.js?v=2026-08-26" defer></script>
+
+<script>
+/* ============================================================================
+ * v3.1.0 — owner comment (22): a mature PDF template, partial or whole.
+ * ----------------------------------------------------------------------------
+ * This page used to offer `onclick="window.print()"`: no cover, no provenance, no way
+ * to issue part of the document, and whatever the screen stylesheet did at print size.
+ * It is the first adopter of the shared pair — js/rz-design-studio.js for the dialog and
+ * js/rz-pdf-export.js for the document shell, whose palette and skeleton come from
+ * standarization/PDF_EXPORT_STANDARD.md rather than from this page.
+ *
+ * Sections are discovered from THIS page's own markup, so a renamed heading renames the
+ * export option and the two cannot drift apart.
+ * ==========================================================================*/
+(function(){
+  function sections(){
+    if(!window.RZPdfExport) return [];
+    return window.RZPdfExport.discoverSections(document, 'section.ck-sec').map(function(s){
+      return { id: s.id, label: s.label, selected: true };
+    });
+  }
+  function snapshot(){
+    var all = window.RZPdfExport ? window.RZPdfExport.discoverSections(document, 'section.ck-sec') : [];
+    return {
+      'Document': 'CDU installation, inspection and maintenance checklist',
+      'Sections available': String(all.length),
+      'Basis': 'ASHRAE facility-water classes, OCP UQD/UQDB quick-disconnect limits, and the page\u2019s own stated acceptance criteria',
+      'Values': 'Static reference limits \u2014 this page runs no engine, so nothing here is a computed quantity',
+      'Completion': 'Any boxes ticked on screen are the reader\u2019s own and are not carried into the export'
+    };
+  }
+  function generate(issue){
+    var api = window.RZPdfExport;
+    if(!api){ window.alert('The export module did not load \u2014 reload the page and retry.'); return; }
+    var found = api.discoverSections(document, 'section.ck-sec');
+    var byId = {}; found.forEach(function(s){ byId[s.id] = s; });
+    var chosen = (issue.sections && issue.sections.length) ? issue.sections : found;
+    var meta = [];
+    Object.keys(snapshot()).forEach(function(k){ meta.push([k, snapshot()[k]]); });
+    if(issue.revisionNote) meta.push(['Revision note', issue.revisionNote]);
+    var html = api.buildDocument({
+      title: 'CDU Checklist',
+      subtitle: 'Installation, inspection and maintenance \u2014 liquid-cooling coolant distribution units',
+      accent: '#0ea5e9',
+      meta: meta,
+      sections: chosen.map(function(c){
+        var src = byId[c.id];
+        return { id: c.id, label: c.label || (src ? src.label : c.id),
+          html: src ? api.escapeScript(src.el.innerHTML) : '' };
+      }),
+      omitted: issue.omittedSections || [],
+      footerNote: 'Reference limits only \u2014 not a substitute for the manufacturer\u2019s IOM'
+    });
+    api.open(html, { onBlocked: function(){
+      window.alert('Pop-up blocked \u2014 allow pop-ups for this site to export the PDF.');
+    }});
+  }
+  function register(){
+    if(!window.RZDesignStudio || !document.getElementById('ckExportTrig')) return false;
+    window.RZDesignStudio.register({
+      id: 'cdu-checklist-export',
+      triggerId: 'ckExportTrig',
+      title: 'CDU Checklist \u2014 PDF export',
+      subtitle: 'Issue the whole checklist, or only the sections you need.',
+      provenance: 'Sections are read from this page at export time. The checklist states reference limits from published standards; it performs no calculation, so no value here is engine-derived.',
+      documentTypes: ['technical-specification'],
+      scopes: ['current'],
+      sections: sections,
+      snapshot: snapshot,
+      generate: generate
+    });
+    return true;
+  }
+  if(!register()) window.addEventListener('load', register);
+})();
+</script>
 </body>
 </html>

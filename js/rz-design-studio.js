@@ -80,6 +80,17 @@
     controls.appendChild(field('Issue scope', scope));
     controls.appendChild(field('Revision note', note));
 
+    /* v3.1.0 — owner comment (22): "partial or whole". A registration that declares
+       sections gets a picker; one that does not is untouched, so the two existing
+       adopters keep their exact dialog. */
+    var sectionsWrap = element('section', 'rz-design-studio__section rz-design-studio__section--full');
+    sectionsWrap.id = 'rzDesignSectionsWrap';
+    sectionsWrap.appendChild(element('h3', '', 'Sections to include'));
+    var sectionList = element('div', 'rz-design-studio__sections');
+    sectionList.id = 'rzDesignSections';
+    sectionsWrap.appendChild(sectionList);
+    sectionsWrap.hidden = true;
+
     var snapshotSection = element('section', 'rz-design-studio__section');
     snapshotSection.appendChild(element('h3', '', 'Bound engineering snapshot'));
     var snapshot = element('dl', 'rz-design-studio__snapshot');
@@ -91,10 +102,12 @@
     var trace = element('div', 'rz-design-studio__trace');
     provenance.appendChild(trace);
     body.appendChild(controls);
+    body.appendChild(sectionsWrap);
     body.appendChild(snapshotSection);
     body.appendChild(provenance);
     dialog.appendChild(body);
-    return { documentType: documentType, scope: scope, note: note, snapshot: snapshot, trace: trace };
+    return { documentType: documentType, scope: scope, note: note, snapshot: snapshot, trace: trace,
+      sectionsWrap: sectionsWrap, sectionList: sectionList };
   }
 
   function buildFooter(dialog) {
@@ -128,6 +141,7 @@
       overlay: overlay, dialog: dialog, title: header.title, subtitle: header.subtitle,
       close: header.close, documentType: body.documentType, scope: body.scope,
       note: body.note, snapshot: body.snapshot, trace: body.trace,
+      sectionsWrap: body.sectionsWrap, sectionList: body.sectionList,
       error: footer.error, generate: footer.generate
     };
   }
@@ -199,15 +213,51 @@
     }
   }
 
+  function readSections() {
+    var chosen = [], omitted = [];
+    var boxes = nodes.sectionList.querySelectorAll('input[type="checkbox"]');
+    for (var i = 0; i < boxes.length; i++) {
+      var row = { id: boxes[i].value, label: boxes[i].getAttribute('data-label') || boxes[i].value };
+      (boxes[i].checked ? chosen : omitted).push(row);
+    }
+    return { chosen: chosen, omitted: omitted };
+  }
+
   function requestPayload(config) {
     var snapshot = typeof config.snapshot === 'function' ? config.snapshot() : {};
+    var picked = readSections();
     return Object.freeze({
       documentType: nodes.documentType.value,
       scope: nodes.scope.value,
       revisionNote: nodes.note.value.trim(),
+      /* empty arrays when the registration declared no sections — a caller that does not
+         use them sees exactly what it saw before */
+      sections: Object.freeze(picked.chosen),
+      omittedSections: Object.freeze(picked.omitted),
       snapshot: snapshot,
       capturedAt: new Date().toISOString()
     });
+  }
+
+  /* Rebuilt on every open so a page whose sections are rendered late still offers them. */
+  function renderSections(config) {
+    var list = nodes.sectionList;
+    while (list.firstChild) { list.removeChild(list.firstChild); }
+    var items = typeof config.sections === 'function' ? config.sections() : [];
+    if (!items || !items.length) { nodes.sectionsWrap.hidden = true; return; }
+    for (var i = 0; i < items.length; i++) {
+      var item = items[i];
+      var row = element('label', 'rz-design-studio__section-row');
+      var box = document.createElement('input');
+      box.type = 'checkbox';
+      box.value = String(item.id);
+      box.checked = item.selected !== false;
+      box.setAttribute('data-label', String(item.label || item.id));
+      row.appendChild(box);
+      row.appendChild(element('span', '', String(item.label || item.id)));
+      list.appendChild(row);
+    }
+    nodes.sectionsWrap.hidden = false;
   }
 
   function configureSelect(select, allowed, fallback) {
@@ -252,6 +302,7 @@
     }
     wasOpen = nodes.overlay.getAttribute('data-open') === 'true';
     active = id;
+    renderSections(config);
     if (!wasOpen) {
       previousFocus = document.activeElement;
       previousOverflow = document.body.style.overflow;
@@ -307,6 +358,8 @@
       documentTypes: normalizeChoices(config.documentTypes || ['technical-specification'], DOCUMENT_TYPES, 'document type'),
       scopes: normalizeChoices(config.scopes || (config.studyAvailable ? ['current', 'current-plus-study'] : ['current']), SCOPES, 'scope'),
       snapshot: config.snapshot,
+      /* optional: () -> [{id, label, selected}] */
+      sections: typeof config.sections === 'function' ? config.sections : null,
       generate: config.generate
     });
     registry[safe.id] = safe;

@@ -137,7 +137,29 @@ assert.equal(dialog.getAttribute('aria-modal'), 'true');
 assert.equal(dialog.getAttribute('aria-labelledby'), 'rzDesignStudioTitle');
 assert.equal(dialog.getAttribute('aria-describedby'), 'rzDesignStudioDescription');
 assert.equal(subtitle.id, 'rzDesignStudioDescription');
-assert.equal(dialog.querySelectorAll('h3').length, 3, 'dialog sections follow its h2 with h3 headings');
+/* v3.1.0 — this pinned the COUNT at three, which is the shape the dialog happened to have
+   before the section picker was added. The invariant it was protecting is that every dialog
+   section carries exactly one h3 under the dialog's h2, so a screen reader gets a heading
+   tree rather than a flat list. Asserted directly, it survives a fourth section. */
+function collectByClass(root, className) {
+  const out = [];
+  const visit = (node) => {
+    node.children.forEach((child) => {
+      if (String(child.className || '').split(/\s+/).includes(className)) { out.push(child); }
+      visit(child);
+    });
+  };
+  visit(root);
+  return out;
+}
+const studioSections = collectByClass(dialog, 'rz-design-studio__section');
+assert.ok(studioSections.length >= 3, 'the dialog has its issue, snapshot and provenance sections');
+for (const studioSection of studioSections) {
+  assert.equal(studioSection.querySelectorAll('h3').length, 1,
+    'every dialog section follows the dialog h2 with exactly one h3');
+}
+assert.equal(dialog.querySelectorAll('h3').length, studioSections.length,
+  'no h3 sits outside a dialog section');
 assert.equal(header.hasAttribute('inert'), true, 'background header is inert while open');
 assert.equal(header.getAttribute('aria-hidden'), 'true');
 assert.equal(main.hasAttribute('inert'), true, 'background main is inert while open');

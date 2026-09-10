@@ -11,6 +11,75 @@ release sections rather than semver.
 
 ---
 
+## v3.1.0 — 2026-09-10
+
+### One PDF shell, and a document can now be issued partial or whole
+
+Owner backlog item (22): *"export to PDF with a mature template, partial or whole"*, starting from
+`cdu-checklist.html` but required across all the engines.
+
+#### What was there
+
+| | count |
+|---|---:|
+| pages offering a PDF | 24 |
+| of those, a bare `onclick="window.print()"` | **21** |
+| pages building a real document | 3, each building it again from scratch |
+| shared document code | **none** |
+
+`js/rz-design-studio.js` already shared the **dialog** half — document type, issue scope, revision
+note, bound snapshot, provenance — and then handed off to a per-page `generate()`. The document
+half was never shared, so `datahallAI.html`, `dc-conventional.html` and `changelog.html` each carry
+their own builder, and the other twenty-one pages have no template at all: no cover, no provenance,
+no section choice, and whatever the screen stylesheet happens to do at print size.
+
+#### What landed
+
+- **`js/rz-pdf-export.js`** — the document half, shared. Its palette is the table in
+  `standarization/PDF_EXPORT_STANDARD.md` and its skeleton is that document's structure template.
+  An accent colour is configurable; **body ink is not**, because the standard marks it CRITICAL
+  never to set body copy to the muted greys and a shared shell is the place to make that
+  impossible.
+- **Partial or whole.** `discoverSections()` reads a page's sections from that page's own markup,
+  taking each label from its first heading, so a renamed heading renames the export option and the
+  two cannot drift. The dialog gained a section picker, shown **only** when a registration declares
+  sections — the two existing adopters see no change.
+- **A partial export declares itself.** A document issued with sections removed carries a notice
+  naming every section that is missing, not merely a count. Partial is only safe if the part and
+  the whole are distinguishable afterwards.
+- **First adopter: `cdu-checklist.html`.** Eleven sections, discovered live. Its snapshot states
+  plainly that the page runs no engine, so nothing in it is a computed quantity, and that ticked
+  boxes are the reader's own and are not carried into the export.
+
+#### The escape rule is enforced by construction
+
+`PDF_EXPORT_STANDARD.md` records the 2026-05-09 incident where an unescaped `</script>` inside a
+JS-built print template terminated the **parent** document's script block and broke five calculator
+pages. Every string the shell emits passes through `escapeScript()`, and the gate feeds the builder
+a hostile section containing a script tag and asserts none survives.
+
+#### Gated
+
+`tools/test-rz-pdf-export.mjs` is new and wired into the ship gate: the palette still matches the
+standard's own table, the skeleton is complete (doctype, charset, 15 mm page margin, both
+print-colour-adjust properties, the prescribed footer line), body copy is never a muted grey, a
+partial export names what it dropped, and no built document carries an unescaped closing script tag.
+Adopters must load both modules and issue through the shared dialog.
+
+Carried as a **MONITOR** with the count: **19 pages still print directly** instead of issuing through
+the shell. It is not a gate today because converting a page is a per-page design decision — the
+shell needs that page's sections and provenance — and a gate failing on nineteen pages would be
+answered by weakening it. It flips when the count reaches zero.
+
+#### Also
+
+`tools/test-rz-design-studio.mjs` pinned the dialog's `h3` count at three, which was the shape it
+happened to have. The invariant it protected is that every dialog section carries exactly one `h3`
+under the dialog's `h2`, so a screen reader gets a heading tree. Asserted directly, it survives a
+fourth section.
+
+---
+
 ## v3.0.0 — 2026-09-10
 
 ### The hall was not buildable. Its own numbers proved it twice.

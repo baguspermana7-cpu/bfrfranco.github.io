@@ -179,3 +179,40 @@
 @media (prefers-reduced-motion: reduce) {
   .rz-design-studio * { scroll-behavior: auto !important; }
 }
+
+/* ============================================================================
+ * v3.1.0 — section picker (owner comment 22: "partial or whole")
+ * ----------------------------------------------------------------------------
+ * Rendered only when a registration declares sections, so the two existing adopters
+ * see no change. Two columns because a document with a dozen sections becomes a
+ * scrolling list otherwise, and the point of the picker is to be read at a glance.
+ * ==========================================================================*/
+.rz-design-studio__sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 4px 14px;
+}
+
+.rz-design-studio__section-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  padding: 3px 0;
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--t2, #cbd5e1);
+  cursor: pointer;
+}
+
+.rz-design-studio__section-row input {
+  margin: 2px 0 0;
+  flex: 0 0 auto;
+  accent-color: var(--c, #06b6d4);
+}
+
+.rz-design-studio__section-row:hover { color: var(--t1, #e2e8f0); }
+
+.rz-design-studio__section-row input:focus-visible {
+  outline: 2px solid var(--c, #06b6d4);
+  outline-offset: 2px;
+}

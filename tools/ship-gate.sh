@@ -147,6 +147,7 @@ gate "anti-vibecode — hard-banned design tokens" node tools/audit-vibecode.mjs
 gate "data-fill gradients — a bar takes one flat colour" node tools/test-data-fill-gradients.mjs
 gate "rendered precision — no raw float reaches a panel" node tools/test-dcai-rendered-precision.mjs
 gate "flow animation — cycles close, states styled, reduced motion reaches SMIL" node tools/test-dcai-flow-animation.mjs
+gate "shared PDF export — one shell, partial exports say so" node tools/test-rz-pdf-export.mjs
 # §D UX LAWS: only the mechanizable subset (#6 loading affordance on async surfaces).
 # The other 15 laws are human design review — this gate does not and cannot decide them.
 gate "ux-laws — §D mechanizable subset" node tools/audit-ux-laws.mjs --strict
