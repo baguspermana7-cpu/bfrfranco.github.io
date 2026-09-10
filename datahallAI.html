@@ -3711,13 +3711,13 @@ s+=tx(capX,CDU_Y+17.2,em(bn('cduRating'))+' kWth · '+(bn('cduFlowPerUnitLpm')==
    rather than under it: the cross aisle below the header belongs to bank B. */
 s+=`<g data-rz-authored-basis="simulated gallery supply-header pressure (1.5-2.5 bar); flow per unit beside it is the engine equipment.cdu_flow_per_unit_lpm"><text x="${(HX0+cduSpan+6).toFixed(1)}" y="${(CDU_Y+21.8).toFixed(1)}" fill="var(--c)" font-family="${J}" font-size="3" text-anchor="start" id="cduG1">—</text><text x="${(HX0+cduSpan+6).toFixed(1)}" y="${(CDU_Y+26.4).toFixed(1)}" fill="var(--c)" font-family="${J}" font-size="3" text-anchor="start" id="cduG2">—</text></g>`;
 }
-/* === MECHANICAL BANK CHIPS — the counts a per-glyph drawing cannot show */
-s+=`<g class="cdu-click" data-cdu="1" data-rz-equipment="cdu:1" tabindex="0" role="button">`;
-s+=bx(752,312,190,15,'rgba(6,182,212,.3)',3);
-s+=tx(847,322,'CDU '+em(cduInst)+' × '+cduShort()+' ('+em(cduRun)+' + '+((cduInst!=null&&cduRun!=null)?(cduInst-cduRun):DASH)+')','var(--c)',4.2,'middle',1,bo('cduInstalled',{also:['cduRunning']}));
-s+='</g>';
-s+=bx(752,331,190,15,'rgba(59,130,246,.25)',3);
-s+=tx(847,341,'CRAH '+em(crahInst)+' ('+em(crahAct)+' + '+((crahInst!=null&&crahAct!=null)?(crahInst-crahAct):DASH)+')','var(--b)',4.2,'middle',1,bo('crahInstalled',{also:['crahActive']}));
+/* v3.3.0 — the two MECHANICAL BANK CHIPS are gone. They existed for "the counts a per-glyph
+   drawing cannot show", and the drawing shows them now: the CDU count stands on its own gallery
+   and every CRAH bank carries its unit count on its face. The CDU chip also wrapped a SECOND
+   `data-rz-equipment="cdu:1"` around itself, 190 px away from CDU-01, so the hall had 56 CDU
+   targets for 55 installed units and one of them was not where any CDU stands. */
+s+=tx(847,322,'CRAH '+em(crahInst)+' ('+em(crahAct)+' duty + '+((crahInst!=null&&crahAct!=null)?(crahInst-crahAct):DASH)+') · '+em(bn('crahRating'))+' kW each','var(--b)',4.2,'middle',1,bo('crahInstalled',{also:['crahActive','crahRating']}));
+s+=bx(752,312,190,15,'rgba(59,130,246,.25)',3);
 const nwY=590;s+=tx(LX,nwY-4,'NETWORK / DWDM','var(--b)',5,0,1);['IB-Leaf','IB-Spine','ODF','DWDM','OOB','Storage'].forEach((l,i)=>{const x=LX+i*78;s+=`<g filter="url(#gB)"><rect x="${x}" y="${nwY}" width="62" height="18" rx="2" fill="rgba(59,130,246,.1)" stroke="rgba(59,130,246,.4)" stroke-width=".6"/>`+tx(x+31,nwY+8,l,'var(--b)',5,'middle',1)+tx(x+31,nwY+15,'N.0'+(i+1),'var(--t3)',3.5,'middle')+'</g>'});
 s+=tx(LX+480,nwY-4,'PASSIVE','var(--t3)',5,0,1);['CblMgmt','PDU/Mtr','Patch','Spare'].forEach((l,i)=>{const x=LX+480+i*60;s+=`<rect x="${x}" y="${nwY}" width="52" height="18" rx="2" fill="rgba(107,114,128,.06)" stroke="rgba(107,114,128,.2)" stroke-width=".5"/>`+tx(x+27,nwY+8,l,'var(--t3)',4.5,'middle')+tx(x+27,nwY+15,'P.0'+(i+1),'var(--t3)',3.5,'middle')});
 const pY=616;s+=tx(LX,pY,'CORRIDOR SERVICES','var(--t1)',5,0,1);

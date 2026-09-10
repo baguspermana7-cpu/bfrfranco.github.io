@@ -179,6 +179,12 @@ gate "cache-bust normalizer — reports without writing, never picks an older to
 # blanked all eight at once: no page threw, nothing logged, the authority check just returned
 # false and nineteen unrelated gates timed out waiting for elements that were never drawn.
 gate "engine version pins — pages agree with the engine they load" node tools/test-conv-engine-version-pins.mjs
+# THE HALL PLAN says what it draws. Three owner rejections in a row were the same class of defect
+# and no gate saw any of them: the mimic renders, the engine tests pass, the numbers are traceable,
+# and the drawing still puts the CDUs on the wrong wall, animates nothing out of them, prints one
+# temperature for a twenty-row hall and leaves the CRAH banks unlabelled. Run against the build the
+# owner rejected it reports 7 broken contracts; against the fix, none.
+gate "data hall plan — equipment, counts and flow are on the drawing" node tools/test-datahall-ai-hall-plan.mjs
 
 
 

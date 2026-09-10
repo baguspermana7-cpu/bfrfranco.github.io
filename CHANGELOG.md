@@ -11,6 +11,90 @@ release sections rather than semver.
 
 ---
 
+## v3.3.2 — 2026-09-10
+
+### A retraction, and the flow-direction invariant that does hold
+
+v2.18.0 shipped a MONITOR on this line, printed on every ship-gate run since:
+
+> 2,880 of 9,630 tagged lines carry a flow class opposing their declared direction.
+
+**That number was wrong, and the error was mine.** It assumed the `fR` / `fD` classes mean *forward*
+and `fL` / `fU` mean *reverse*, so every leftward-drawn pipe whose logical flow is forward counted as
+a defect. Re-measured against the geometry the lines actually carry, the pairing is exact and has no
+exceptions at all:
+
+| class | direction the line is drawn | count |
+|---|---|---:|
+| `fD` | downward | 3,744 |
+| `fR` | rightward | 1,512 |
+| `fL` | leftward | 1,494 |
+| | **exceptions** | **0** |
+
+The two attributes are orthogonal and both were right the whole time. The **class** names which way
+the dashes travel across the screen; **`data-direction`** names the logical from-to of the line in
+the process. A pipe drawn right-to-left whose flow is logically forward correctly carries `fL`.
+
+#### What replaces it
+
+The monitor is gone and the invariant that does hold is now a gate, checked at runtime across every
+diagram: **a line's flow class must match the direction its own endpoints run.** That catches the
+defect the monitor was reaching for — dashes travelling backwards up their own pipe, which on a
+mimic reads as flow going the wrong way — without inventing a conflict between two attributes that
+never disagreed.
+
+6,750 tagged lines are checked. Proven red by injecting one reversed class into a detached copy: the
+gate names the line, the view, the class, and the direction the line is actually drawn.
+
+#### Why this is in the changelog rather than quietly deleted
+
+A wrong number printed on every gate run is worse than no number, and a number that is retracted
+without saying so is worse still. The retraction is recorded in the four places the original was
+published: the gate's own output, this changelog, the plan file and the project memory.
+
+---
+
+## v3.3.1 — 2026-09-10
+
+### A gate for the hall plan — and it caught a duplicate CDU on its first run
+
+Three owner rejections in a row on `datahallAI.html` were the same class of defect, and **no gate
+saw any of them**: the mimic renders, the engine tests pass, the numbers are traceable, and the
+drawing still puts the CDUs on the wrong wall, animates nothing out of them, prints one temperature
+for a twenty-row hall and leaves the CRAH banks unlabelled. A drawing can be entirely correct by
+every existing check and still say the wrong thing.
+
+`tools/test-datahall-ai-hall-plan.mjs` asserts what the owner actually asked for, measured on the
+rendered DOM and counted against the **engine at run time** (never a literal, so a basis change
+moves the test with it rather than breaking it):
+
+* one CDU glyph per *installed* unit — no aggregation divisor;
+* the CDUs stand between the two banks, i.e. in the cross aisle, at the end of the rows they serve;
+* every row carries its own flow animation, not just the two header trunks;
+* every aisle reports temperature at several points, in both banks, all of them reading;
+* the points along one aisle do not all print the same number;
+* every CRAH bank states how many units it stands for.
+
+Run against `01488121` — the build the owner was looking at — it reports **7 broken contracts**.
+Against the fix, none. Wired into `ship-gate.sh`.
+
+#### What it caught
+
+The hall had **56 CDU targets for 55 installed units**. The extra one was a legacy "mechanical bank
+chip" at x=752 that wrapped a second `data-rz-equipment="cdu:1"` around itself — a clickable CDU-01
+sitting 190 px from where CDU-01 actually stands, opening its HMI from a place no CDU occupies.
+Both chips existed for *"the counts a per-glyph drawing cannot show"*, and after v3.3.0 the drawing
+shows them: the CDU count stands on its own gallery, and every CRAH bank carries its unit count on
+its face. The CDU chip is removed; the CRAH one stays as a single hall-level summary.
+
+`standarization/DATAHALL_AI_STANDARD.md` gains the hall-plan contract: where each band stands and
+why, the flow-animation binding, the aisle-instrumentation rule (and the trap that three readouts
+sharing one `RZ_SIM` seed key print one number three times), and how to measure legibility here —
+effective px rather than the `font-size` attribute, `getBoundingClientRect()` rather than
+`getBBox()`, which ignores `transform` and reported 34 collisions where the reader sees 2.
+
+---
+
 ## v3.3.0 — 2026-09-10
 
 ### The CDUs move to the end of the rows they serve, and the hall says what it is doing

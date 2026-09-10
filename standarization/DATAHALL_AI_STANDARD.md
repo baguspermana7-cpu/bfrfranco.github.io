@@ -367,6 +367,57 @@ $('tabSu').textContent = 'Summary text...';
 | Fire (fireSvg) | 960 580 | Detection & suppression |
 | BMS (bmsSvg) | 960 480 | BMS/DCIM architecture |
 
+## Hall plan contract (v3.3.0)
+
+The DATA HALL mimic is a **plan view**: the hall length runs left-right, rows run top-bottom, one
+row = one RPP group of `racksPerRow` racks. Everything below exists because the owner rejected an
+earlier drawing with *"antara row dan cdu nggak match konsepnya"*, *"cdu weird positioning"*,
+*"Tidak ada crah"* and *"No hac temp indication in several point across row"*.
+
+### Where the equipment stands
+
+| band | position | why |
+|---|---|---|
+| CRAH walls | the two LONG sides (`CRAH_T` / `CRAH_B`) | the fan wall faces the aisles it feeds |
+| row columns | between them, at the engine's `rowPitchM` | pitch = rack depth + cold aisle + hot aisle, from the engine, never typed |
+| CDU gallery | **IN the cross aisle** | a CoolIT CHx1000 is an END-OF-ROW CDU, and with rows running top-bottom the row's end IS the cross aisle |
+
+Putting the CDUs on the SHORT walls is the mistake that was shipped twice: those are the ends of
+the *cross aisle*, not of the rows, so a row's coolant left the drawing sideways, ran the length of
+the hall and came back. One glyph per **installed** unit, spread across the same span the rows
+occupy — no aggregation divisor, so the count on the drawing is the count in the registry.
+
+### The water path must be one continuous animation
+
+CDU band → TCS supply header → row drop → row riser → return. The dash **period** carries the row
+flow the engine publishes (`tcsFlowRackLpm × racksPerRow`), clamped to 1.2–6 s, so a row moving
+more litres a minute visibly moves faster. Motion that encodes a number is a reading; motion that
+encodes nothing is decoration and §A bans it. Reduced motion is handled once, by the page's
+existing `matchMedia` → `pauseAnimations()` path — never add a second one.
+
+### Aisle instrumentation
+
+A contained hot aisle has a gradient ALONG its length; that is the whole reason to instrument it.
+Three points per aisle at ¼, ½ and ¾ of the row, in **both** banks. Ids are
+`H{pair}{point}t` / `C{pair}{point}t` and the `upd()` loop bound must be
+`pairs = ceil(rowsPerBank/2) × rackBanks` by `points`, derived from the engine — it was hardcoded
+`si<1` with `b===0` and printed five numbers for a twenty-row hall. **Give every sensor its own
+`RZ_SIM` seed key** (`'hac'+pair+'-'+point`): three readouts that share one key print the same
+number three times and the drawing claims several points while showing one.
+
+### Measuring legibility on this page
+
+* The gate floor is **8.5 effective px** — authored viewBox units × the render scale, not the
+  `font-size` attribute. At the hall's 1.304 scale a `font-size="2.9"` label renders 3.8 px.
+* `audit-legibility` lists `datahallAI.html` in `MONITOR_PAGES`: reported, **not gating**. Treat a
+  clean run as no signal for this page; read the NOTE line.
+* Overlap must be measured with **`getBoundingClientRect()`**, never `getBBox()`. getBBox ignores
+  `transform`, so it reads a rotated label at its unrotated position — it reported 34 collisions
+  where the reader sees 2.
+* Density is the defect, not font size. Space came first (bank captions rotated into the left
+  margin, CDU caption moved east of its band, CRAH id merged onto one line with its unit count);
+  only then could the readouts reach the floor **with the overlap count unchanged**.
+
 ## CRITICAL: SVG Layout Anti-Overlap Rules
 
 When building complex SVGs with multiple columns (like the 4-DH electrical SLD):
