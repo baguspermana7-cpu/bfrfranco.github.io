@@ -11,6 +11,36 @@ release sections rather than semver.
 
 ---
 
+## v3.4.2 — 2026-09-10
+
+### The mobile patch was shrinking the reading column
+
+Closing out the render-audit sweep. The one that matters most: eight article pages carried a
+`@media (max-width: 768px)` rule setting `.article-body, .article-content, article` to
+`font-size: 0.95rem !important` — **15.2 px on a phone**. A mobile patch that makes body text
+*smaller* on the one screen where reading is hardest is the wrong direction, and the `!important`
+meant nothing downstream could recover it. Reading size does not go down on a phone.
+
+The rest were single families, each read rather than glanced at, each raised to reading size: the
+sentence that says what each LTC lab covers (`.detail-card p`, 12.5 px), the verdict boxes on
+article-19, the section-header descriptions and hero subtitle on `standards-ltc-lab`, the paper
+titles on the research roadmap, and four more `.mn-*` families on the manual pages that a minified
+copy of the same rule had kept at `.86rem` after the expanded copy was fixed.
+
+Two more families of site chrome joined the non-prose list for the same reason as the cookie banner
+and the copyright line before them: `.legal-disclaimer` — which is what `.article-disclaimer` and
+`.calc-disclaimer`, already excluded, are — and `.newsletter-box`, the sibling of the already
+excluded `.newsletter-signup`.
+
+#### Left alone, on purpose
+
+`Article/Article_9 02.02.26/` is a dated snapshot of the site copied into a subfolder: 10 of its 10
+images are broken and 13 assets 404, `styles.css` among them, because its relative paths only
+resolve at the site root. It is not in the sitemap, nothing links to it, and the audit classifies
+`Article/` as internal. Repairing paths in an archive nobody serves is work with no reader.
+
+---
+
 ## v3.4.1 — 2026-09-10
 
 ### Two cockpits that promised an export and printed the screen

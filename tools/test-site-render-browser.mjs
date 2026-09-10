@@ -52,6 +52,8 @@ test('real DOM fixture: clipped text, prose, gap, missing image and protected co
       <div class="author-bio"><p id="author">This author biography has enough words but is not editorial body prose.</p></div>
       <div class="rz-cookie-banner"><p id="cookie-line">We use cookies for analytics to improve your experience and to remember your choices.</p></div>
       <div class="footer-brand"><p class="footer-copyright" id="copyright-line">Copyright 2026 the site owner. All rights reserved, and every trademark stays with its holder.</p></div>
+      <div class="legal-disclaimer"><p id="legal-line">Outputs are for educational and planning use only and are not professional engineering advice.</p></div>
+      <div class="newsletter-box"><p class="newsletter-desc" id="newsletter-line">Get the next analysis in your inbox, roughly once a month, and nothing else at all.</p></div>
       <div class="water-calculator"><p id="water">This calculator contains a long instrument description and must not be classified as body prose.</p></div>
       <div class="verdict-container"><div class="verdict-box"><p id="computed-verdict">This calculated result describes the selected engineering scenario rather than the article narrative.</p></div></div>
       <div class="reading-note"><p id="editorial-verdict">This editorial verdict remains normal reading prose rather than a calculated instrument result.</p></div>
@@ -170,7 +172,7 @@ test('real DOM fixture: clipped text, prose, gap, missing image and protected co
     /* Site chrome is not reading prose. A cookie-consent sentence and a copyright line appear on
        EVERY page at their own size on purpose; counting them made every page in the site report a
        prose-font-size finding it could never legitimately fix. */
-    for (const selector of ['#cookie-line', '#copyright-line']) {
+    for (const selector of ['#cookie-line', '#copyright-line', '#legal-line', '#newsletter-line']) {
       assert.ok(!findings.some(finding => finding.rule.startsWith('prose-') && finding.target === selector),
         `${selector} is site chrome, not body prose`);
     }

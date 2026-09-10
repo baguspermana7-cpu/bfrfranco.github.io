@@ -45,7 +45,7 @@ export function collectMeasurements() {
   /* Site CHROME is not reading prose. The cookie-consent sentence and the copyright line appear on
      every page at their own size by design, so counting them made every page report a
      prose-font-size finding it could never legitimately fix. */
-  const nonProseSelector = 'nav,header,footer,button,aside,.caption,figcaption,.kpi,.metric,.toc,.table-source,.chart-source,.article-disclaimer,.calc-disclaimer,.newsletter-signup,.author-bio,.related-articles,.rz-cookie-banner,.cookie-banner,.footer-brand,.footer-copyright,.footer-legal';
+  const nonProseSelector = 'nav,header,footer,button,aside,.caption,figcaption,.kpi,.metric,.toc,.table-source,.chart-source,.article-disclaimer,.calc-disclaimer,.newsletter-signup,.author-bio,.related-articles,.rz-cookie-banner,.cookie-banner,.footer-brand,.footer-copyright,.footer-legal,.legal-disclaimer,.newsletter-box';
   const contextCache = new WeakMap();
   const roleContext = element => {
     if (contextCache.has(element)) return contextCache.get(element);
