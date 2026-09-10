@@ -339,7 +339,53 @@
       gridKgCo2PerKwh: 0.69,
       // source: auxiliary + balance-of-plant as a fraction of IT (lighting, controls,
       //         security, offices). ASSUMED
-      auxFractionOfIt: 0.0035
+      auxFractionOfIt: 0.0035,
+
+      /* ----------------------------------------------------------------------
+       * THE MEDIUM- AND HIGH-VOLTAGE CHAIN (v3.2.0)
+       * ----------------------------------------------------------------------
+       * Owner, from the live SLD: the source box read "PLN 20kV" with the subtitle
+       * "150kV Substation" — two voltages at once — and the chain then went straight
+       * from it to a 2.5 MVA transformer and 400 V. "Harusnya memang 150kv", and
+       * "aneh masak 150kv di step-down ke 400v pakai trafo". Both halves were right.
+       *
+       * Until this release `voltageLL: 400` was the ONLY voltage in the whole engine —
+       * dcai-engine.js even labelled its own block "LV distribution" — so every kV
+       * string on the page was page-authored prose inside a declared-basis escape
+       * hatch, and no gate could contradict it. That is why the contradiction survived.
+       *
+       * Why the drawing could not be right at 20 kV, in one line: the facility draws
+       *   654 MVA / (sqrt3 x 20 kV) = 18,887 A,
+       * and the Schneider SM6 ring main the drawing showed carrying it is rated 630 A.
+       * Thirty times over. And a 2.5 MVA cast-resin unit substation is a 20 kV machine:
+       * at 150 kV the impulse withstand is 650-750 kV BIL, so the device the drawing
+       * implied cannot be built.
+       * -------------------------------------------------------------------- */
+
+      // source: PLN Java-Bali subtransmission voltage, and the owner's decision
+      //         2026-09-09 ("harusnya memang 150kv"). ADOPTED
+      hvIntakeKv: 150,
+      // source: PLN standard distribution voltage in Indonesia; the campus MV level. ADOPTED
+      mvKv: 20,
+      // source: thermal rating of one 150 kV double-circuit line on ACSR "Zebra" class
+      //         conductor, the usual Java 150 kV build. ADOPTED — this states what the
+      //         intake REQUIRES, not that PLN has granted it.
+      hvCircuitMva: 250,
+      // source: 150/20 kV ONAF power transformer, one per hall per feed. 100 MVA is the
+      //         size that aligns one machine to one hall feed (16 machines, 16 HV bays)
+      //         instead of 32 at 60 MVA, while its 2,887 A secondary still lands on a
+      //         catalogue 3,150 A board. ADOPTED
+      mainTxMva: 100,
+      // source: typical short-circuit impedance for a 100 MVA 150/20 kV unit. It is what
+      //         decides the fault level the 20 kV switchgear must clear. ADOPTED
+      mainTxImpedancePct: 14,
+      // source: 20 kV metal-clad indoor switchgear, standard busbar and short-time ratings.
+      //         The bus tie runs NORMALLY OPEN so two mains never parallel onto one
+      //         section: paralleled, the fault level doubles past the gear. ADOPTED
+      mvBoardRatedA: 3150,
+      mvBoardKaRating: 31.5,
+      // source: 20 kV feeder circuit-breaker class serving a group of unit substations. ADOPTED
+      mvFeederRatedA: 630
     },
 
     /* ------------------------------------------------------------------------

@@ -49,7 +49,10 @@ export const RETIRED = [
   ['CDU 350 kW',               /\b350\s*kW/gi],
   ['CDU 9 run / 12 installed', /\b(?:9\s*run|12\s*installed|cduInstalled\s*:\s*12\b|:\s*12\)?\s*\/\/\s*doc-21)/gi],
   ['UPS 4.5 MW / 4,500 kW',    /\b4[.,]5(?:00)?\s*(?:MW|kW)/gi],
-  ['Transformer 5 MVA',        /\b5\s*MVA\b/gi],
+  /* `\b5` matches the tail of "2.5 MVA", which is the CURRENT unit substation rating — the
+     detector was blaming the live basis for the retired one. A digit or a decimal point to the
+     left means this is not the retired 5 MVA machine. */
+  ['Transformer 5 MVA',        /(?<![\d.])5\s*MVA\b/gi],
   ['Busway 6300 A',            /\b6,?300\s*A\b|\b6300\b/g],
   ['Cat 3516E',                /3516E/g],
   ['Genset 2,750 kW / 2.75 MW', /\b2,?750\s*kW|\b2\.75\s*MW/gi],

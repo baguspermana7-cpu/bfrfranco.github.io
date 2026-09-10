@@ -11,6 +11,83 @@ release sections rather than semver.
 
 ---
 
+## v3.2.0 — 2026-09-10
+
+### The missing voltage level, and the array that blanked the page
+
+Owner, from the live single-line: *"ini gimana sih tulisannya 20kv dan 150kv secara bersamaan. Ini
+harusnya memang 150kv dan ini juga aneh masak 150kv di step-down ke 400v pakai trafo."* Both halves
+were right, and both are arithmetic.
+
+| check | number |
+|---|---|
+| facility at the worst weather bin | 702 MVA |
+| current if that were fed at 20 kV | **18,887 A** |
+| the ring main the drawing showed carrying it | **630 A** — thirty times over |
+| current at 150 kV | 2,702 A |
+
+And a 2.5 MVA cast-resin unit substation is a 20 kV machine. At 150 kV the impulse withstand is
+650–750 kV BIL, so the device the drawing implied cannot be built.
+
+#### Why no gate caught it
+
+`electrical.voltageLL` (400) was the **only voltage in the whole engine** — `js/dcai-engine.js`
+labelled its own block *"LV distribution"* — so every kV string on the page was page-authored prose
+inside a declared-basis escape hatch, and a search of `tools/` found **zero** tests asserting any
+voltage anywhere. A contradiction between two prose strings is not something a numeric gate can see.
+
+#### The chain, now four levels
+
+```
+PLN 150 kV      4 × 250 MVA circuits (3 duty + 1) from two independent substations · 2,702 A
+   ↓
+150/20 kV       16 × 100 MVA ONAF — one per hall per feed
+   ↓            secondary 2,887 A on a 3,150 A busbar · 41 % normal, 82 % carrying the hall alone
+20 kV board     fault 20.6 kA into 31.5 kA gear · BUS TIE NORMALLY OPEN, because two mains
+   ↓            paralleled would deliver 41 kA and exceed it
+20 kV feeders   5 per hall per feed at 630 A, each carrying 8 unit substations
+   ↓
+20/0.4 kV       2.5 MVA drawing 72 A at 20 kV
+```
+
+Every figure is an engine parameter with its own basis hook, printed on a new **MV & HV chain**
+card. The source boxes now read one voltage, taken from the engine, on all six drawings that carried
+the contradiction.
+
+#### Gated — the complaint made executable
+
+`tools/test-dcai-voltage-chain.mjs` is new: three descending levels, **every drawn transformer ratio
+must step exactly one of them** (a `150 kV → 400 V` label fails), every rendered kV must be a
+published level, a reading within 10 % of one, or a declared gear class, and no source box may state
+two different voltages. Proven RED against the pre-fix tree, where it stops at the first assertion
+because the engine published no level above 400 V at all.
+
+#### Found while shipping: an array in the snapshot blanks the whole page
+
+Publishing the three levels as a convenience array alongside the scalars took the entire cockpit to
+**AUTHORITY UNAVAILABLE with nothing logged anywhere**. The registry generator digests a nested array
+to a string (`"[3 items] sha1:…"`), the page's authority check compares `typeof` registry value
+against `typeof` live value, and `string !== object` made `datahallSnapshotValid()` reject the whole
+snapshot. This is the same class as the engine-version pin that once blanked eight cockpits: a
+silent, total failure from a change that looked purely additive. The array is gone — the three
+scalars already said everything it said — and `tools/test-dcai-engine.mjs` now walks every snapshot
+branch and fails on a nested array, so the next one fails a gate instead of a page.
+
+#### Also corrected
+
+Four transformer mimic sites hardcoded **10 MVA** against the engine's 2.5, and a VCB spec claimed
+**12.6 MVA** where 20 kV × 630 A is 21.8. Both now read the engine.
+
+#### Honest boundary
+
+250 MVA per 150 kV circuit is an ADOPTED thermal rating for an ACSR double-circuit line, not a PLN
+grid study: the page states what the intake **requires**, not that it has been granted. Sixteen
+150 kV transformer bays plus four line bays is a very large switchyard, and that is what 628 MW at
+150 kV costs. The single-line still draws the 20 kV level and below; the 150 kV switchyard is
+published in figures and named on the source boxes, not yet drawn as its own band.
+
+---
+
 ## v3.1.0 — 2026-09-10
 
 ### One PDF shell, and a document can now be issued partial or whole

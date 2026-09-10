@@ -4404,6 +4404,769 @@
       "docs": []
     },
     {
+      "id": "distribution.hv_circuit_mva",
+      "label": "hv circuit mva",
+      "unit": "MVA",
+      "kind": "authored",
+      "value": 250,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.hvCircuitMva"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-voltage-chain.mjs",
+        "test-dcai-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js electrical.hvCircuitMva",
+        "method": "thermal rating of one 150 kV double-circuit line on ACSR \"Zebra\" class conductor, the usual Java 150 kV build. ADOPTED — this states what the intake REQUIRES, not that PLN has granted it.",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
+      "id": "distribution.hv_circuits_duty",
+      "label": "hv circuits duty",
+      "unit": null,
+      "kind": "derived",
+      "value": 3,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.hvCircuitMva",
+        "electrical.powerFactor",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "distribution.hv_circuits_installed",
+      "label": "hv circuits installed",
+      "unit": null,
+      "kind": "derived",
+      "value": 4,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.hvCircuitMva",
+        "electrical.powerFactor",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-voltage-chain.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "distribution.hv_current_a",
+      "label": "hv current a",
+      "unit": null,
+      "kind": "derived",
+      "value": 2702.124988140838,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.auxFractionOfIt",
+        "electrical.hvIntakeKv",
+        "electrical.powerFactor",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "fabric.oobKw",
+        "fabric.oobPerRack",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "hydraulics.airCpKjPerKgK",
+        "hydraulics.airRhoKgPerM3",
+        "hydraulics.cdwPumpHeadM",
+        "hydraulics.chwPumpHeadM",
+        "hydraulics.crahFanStaticPa",
+        "hydraulics.dryCoolerFanStaticPa",
+        "hydraulics.fanEfficiency",
+        "hydraulics.fanMotorEfficiency",
+        "hydraulics.htwPumpHeadM",
+        "hydraulics.pumpEfficiency",
+        "hydraulics.pumpMotorEfficiency",
+        "hydraulics.tcsFluidCpKjPerKgK",
+        "hydraulics.tcsPumpHeadM",
+        "hydraulics.waterCpKjPerKgK",
+        "thermal.airSupplyC",
+        "thermal.airsideDeltaTK",
+        "thermal.carnotFraction",
+        "thermal.cduApproachK",
+        "thermal.cdwDeltaTK",
+        "thermal.chwCoilApproachK",
+        "thermal.chwDeltaTK",
+        "thermal.condApproachK",
+        "thermal.copMax",
+        "thermal.dryCoolerAirDeltaTK",
+        "thermal.dryCoolerApproachK",
+        "thermal.evapApproachK",
+        "thermal.htwDeltaTK",
+        "thermal.tcsDeltaTK",
+        "thermal.tcsSupplyC",
+        "weather.bins.2.ambientDbC",
+        "weather.bins.3.ambientDbC",
+        "weather.bins.4.ambientDbC",
+        "weather.bins.5.ambientDbC",
+        "weather.bins.6.ambientDbC"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-voltage-chain.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "distribution.hv_intake_kv",
+      "label": "hv intake kv",
+      "unit": null,
+      "kind": "authored",
+      "value": 150,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.hvIntakeKv"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-voltage-chain.mjs",
+        "test-dcai-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js electrical.hvIntakeKv",
+        "method": "PLN Java-Bali subtransmission voltage, and the owner's decision 2026-09-09 (\"harusnya memang 150kv\"). ADOPTED",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
+      "id": "distribution.main_tx_loading_contingency_pct",
+      "label": "main tx loading contingency pct",
+      "unit": "%",
+      "kind": "derived",
+      "value": 81.78218691177045,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.auxFractionOfIt",
+        "electrical.mainTxMva",
+        "electrical.powerFactor",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "fabric.oobKw",
+        "fabric.oobPerRack",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "hydraulics.airCpKjPerKgK",
+        "hydraulics.airRhoKgPerM3",
+        "hydraulics.cdwPumpHeadM",
+        "hydraulics.chwPumpHeadM",
+        "hydraulics.crahFanStaticPa",
+        "hydraulics.dryCoolerFanStaticPa",
+        "hydraulics.fanEfficiency",
+        "hydraulics.fanMotorEfficiency",
+        "hydraulics.htwPumpHeadM",
+        "hydraulics.pumpEfficiency",
+        "hydraulics.pumpMotorEfficiency",
+        "hydraulics.tcsFluidCpKjPerKgK",
+        "hydraulics.tcsPumpHeadM",
+        "hydraulics.waterCpKjPerKgK",
+        "thermal.airSupplyC",
+        "thermal.airsideDeltaTK",
+        "thermal.carnotFraction",
+        "thermal.cduApproachK",
+        "thermal.cdwDeltaTK",
+        "thermal.chwCoilApproachK",
+        "thermal.chwDeltaTK",
+        "thermal.condApproachK",
+        "thermal.designAmbientDbC",
+        "thermal.dryCoolerAirDeltaTK",
+        "thermal.dryCoolerApproachK",
+        "thermal.evapApproachK",
+        "thermal.htwDeltaTK",
+        "thermal.tcsDeltaTK",
+        "thermal.tcsSupplyC"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "distribution.main_tx_loading_normal_pct",
+      "label": "main tx loading normal pct",
+      "unit": "%",
+      "kind": "derived",
+      "value": 40.891093455885226,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.auxFractionOfIt",
+        "electrical.mainTxMva",
+        "electrical.powerFactor",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "fabric.oobKw",
+        "fabric.oobPerRack",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "hydraulics.airCpKjPerKgK",
+        "hydraulics.airRhoKgPerM3",
+        "hydraulics.cdwPumpHeadM",
+        "hydraulics.chwPumpHeadM",
+        "hydraulics.crahFanStaticPa",
+        "hydraulics.dryCoolerFanStaticPa",
+        "hydraulics.fanEfficiency",
+        "hydraulics.fanMotorEfficiency",
+        "hydraulics.htwPumpHeadM",
+        "hydraulics.pumpEfficiency",
+        "hydraulics.pumpMotorEfficiency",
+        "hydraulics.tcsFluidCpKjPerKgK",
+        "hydraulics.tcsPumpHeadM",
+        "hydraulics.waterCpKjPerKgK",
+        "thermal.airSupplyC",
+        "thermal.airsideDeltaTK",
+        "thermal.carnotFraction",
+        "thermal.cduApproachK",
+        "thermal.cdwDeltaTK",
+        "thermal.chwCoilApproachK",
+        "thermal.chwDeltaTK",
+        "thermal.condApproachK",
+        "thermal.designAmbientDbC",
+        "thermal.dryCoolerAirDeltaTK",
+        "thermal.dryCoolerApproachK",
+        "thermal.evapApproachK",
+        "thermal.htwDeltaTK",
+        "thermal.tcsDeltaTK",
+        "thermal.tcsSupplyC"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "distribution.main_tx_mva",
+      "label": "main tx mva",
+      "unit": "MVA",
+      "kind": "authored",
+      "value": 100,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.mainTxMva"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-voltage-chain.mjs",
+        "test-dcai-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js electrical.mainTxMva",
+        "method": "150/20 kV ONAF power transformer, one per hall per feed. 100 MVA is the size that aligns one machine to one hall feed (16 machines, 16 HV bays) instead of 32 at 60 MVA, while its 2,887 A secondary still lands on a catalogue 3,150 A board. ADOPTED",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
+      "id": "distribution.main_tx_per_hall_per_feed",
+      "label": "main tx per hall per feed",
+      "unit": null,
+      "kind": "derived",
+      "value": 1,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.mainTxMva",
+        "electrical.powerFactor",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "facility.rackItKw",
+        "facility.racksPerHall"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "distribution.main_tx_secondary_a",
+      "label": "main tx secondary a",
+      "unit": null,
+      "kind": "derived",
+      "value": 2886.751345948129,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.mainTxMva",
+        "electrical.mvKv"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "distribution.main_tx_total",
+      "label": "main tx total",
+      "unit": null,
+      "kind": "derived",
+      "value": 16,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.mainTxMva",
+        "electrical.powerFactor",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-voltage-chain.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "distribution.mv_board_fits_secondary",
+      "label": "mv board fits secondary",
+      "unit": null,
+      "kind": "derived",
+      "value": true,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "A pass/fail flag that tools/test-dcai-engine.mjs asserts; the MV and HV chain card renders the secondary current and the busbar rating it is compared against.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.mainTxMva",
+        "electrical.mvBoardRatedA",
+        "electrical.mvKv"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "distribution.mv_board_ka_rating",
+      "label": "mv board ka rating",
+      "unit": null,
+      "kind": "authored",
+      "value": 31.5,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.mvBoardKaRating"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-voltage-chain.mjs",
+        "test-dcai-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js electrical.mvBoardKaRating",
+        "method": "20 kV metal-clad indoor switchgear, standard busbar and short-time ratings. The bus tie runs NORMALLY OPEN so two mains never parallel onto one section: paralleled, the fault level doubles past the gear. ADOPTED",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
+      "id": "distribution.mv_board_rated_a",
+      "label": "mv board rated a",
+      "unit": null,
+      "kind": "authored",
+      "value": 3150,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.mvBoardRatedA"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js electrical.mvBoardRatedA",
+        "method": "20 kV metal-clad indoor switchgear, standard busbar and short-time ratings. The bus tie runs NORMALLY OPEN so two mains never parallel onto one section: paralleled, the fault level doubles past the gear. ADOPTED",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
+      "id": "distribution.mv_bus_tie_normally_open",
+      "label": "mv bus tie normally open",
+      "unit": null,
+      "kind": "authored",
+      "value": true,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "A boolean the chain card states in words on its fault-level row, together with the reason two paralleled mains would exceed the gear.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "LABEL",
+      "explainKey": null,
+      "dependsOnInputs": [],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js",
+        "method": "text label or identifier republished from the model",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
+      "id": "distribution.mv_fault_ka_per_section",
+      "label": "mv fault ka per section",
+      "unit": null,
+      "kind": "derived",
+      "value": 20.61965247105806,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.mainTxImpedancePct",
+        "electrical.mainTxMva",
+        "electrical.mvKv"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-voltage-chain.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "distribution.mv_fault_within_gear",
+      "label": "mv fault within gear",
+      "unit": null,
+      "kind": "authored",
+      "value": true,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "A pass/fail flag that tools/test-dcai-engine.mjs asserts; the chain card renders the fault level and the gear rating, which is what an engineer checks.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "LABEL",
+      "explainKey": null,
+      "dependsOnInputs": [],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js",
+        "method": "text label or identifier republished from the model",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
+      "id": "distribution.mv_feeder_rated_a",
+      "label": "mv feeder rated a",
+      "unit": null,
+      "kind": "authored",
+      "value": 630,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.mvFeederRatedA"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js electrical.mvFeederRatedA",
+        "method": "20 kV feeder circuit-breaker class serving a group of unit substations. ADOPTED",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
+      "id": "distribution.mv_feeder_unit_subs",
+      "label": "mv feeder unit subs",
+      "unit": null,
+      "kind": "derived",
+      "value": 8,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.mvFeederRatedA",
+        "electrical.mvKv",
+        "equipment.transformer.unitMva"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "distribution.mv_feeders_per_hall_per_feed",
+      "label": "mv feeders per hall per feed",
+      "unit": null,
+      "kind": "derived",
+      "value": 5,
+      "formula": null,
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.mvFeederRatedA",
+        "electrical.mvKv",
+        "electrical.powerFactor",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.transformer.unitMva",
+        "equipment.ups.efficiency",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "distribution.mv_kv",
+      "label": "mv kv",
+      "unit": null,
+      "kind": "authored",
+      "value": 20,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.mvKv"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-voltage-chain.mjs",
+        "test-dcai-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js electrical.mvKv",
+        "method": "PLN standard distribution voltage in Indonesia; the campus MV level. ADOPTED",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
       "id": "distribution.power_factor",
       "label": "power factor",
       "unit": null,
@@ -4614,6 +5377,33 @@
       "docs": []
     },
     {
+      "id": "distribution.unit_sub_mv_current_a",
+      "label": "unit sub mv current a",
+      "unit": null,
+      "kind": "derived",
+      "value": 72.16878364870323,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.mvKv",
+        "equipment.transformer.unitMva"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
       "id": "distribution.ups_frames_per_hall_per_feed",
       "label": "ups frames per hall per feed",
       "unit": null,
@@ -4667,6 +5457,7 @@
       ],
       "tests": [
         "test-dcai-engine.mjs",
+        "test-dcai-voltage-chain.mjs",
         "test-dcai-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [
@@ -4927,7 +5718,7 @@
       "consumers": [
         {
           "page": "datahallAI.html",
-          "reads": 12
+          "reads": 11
         }
       ],
       "tests": [

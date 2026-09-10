@@ -371,6 +371,9 @@
        halls x 2 for display, which printed "33x 2.5 MVA/feed" beside a "true 2N" claim while
        covering half the hall, and ran the transformers at 99.9 % with no design ceiling. */
     var hallKva = div(facilityKva, f.halls);
+    /* the intake is sized on the WORST weather bin, not the design day: the grid connection
+       has to carry the hour the chillers pick up the liquid path, not the average one */
+    var facilityWorstKva = div((worst ? worst.electrical.facility_kwe : design.electrical.facility_kwe), el.powerFactor);
     var unitSubsPerFeed = ceilCount(hallKva, eq.transformer.unitMva * 1000);
     var transformers = unitSubsPerFeed * 2 * f.halls;
     var gensetsDuty = ceilCount(worst ? worst.electrical.facility_kwe : design.electrical.facility_kwe, eq.generator.unitKw);
@@ -537,6 +540,28 @@
       fan_wall_fits: fanWallFaceM2 <= airPlantFaceM2
     };
 
+    /* --- the MV/HV chain above the unit substations (v3.2.0) -------------------
+       Four levels, because a transformer steps ONE level and the drawing had it stepping
+       from a 150 kV subtitle to 400 V in a single 2.5 MVA machine:
+
+         150 kV intake  ->  150/20 kV main transformer  ->  20 kV board  ->  20/0.4 kV unit sub
+
+       Each derived value below is the arithmetic that decides a real piece of gear: the HV
+       current decides how many circuits, the secondary current decides the board rating, and
+       the transformer impedance decides the fault level the board must clear. */
+    var SQRT3_HV = 1.7320508075688772;   // STANDARD
+    var hvCurrentA = div(facilityWorstKva * 1000, SQRT3_HV * el.hvIntakeKv * 1000, 'HV intake current');
+    var hvCircuitsDuty = ceilCount(facilityWorstKva / 1000, el.hvCircuitMva);
+    var mainTxPerHallPerFeed = ceilCount(hallKva / 1000, el.mainTxMva);
+    var mainTxTotal = mainTxPerHallPerFeed * 2 * f.halls;
+    var mainTxSecondaryA = div(el.mainTxMva * 1e6, SQRT3_HV * el.mvKv * 1000, 'main transformer secondary current');
+    /* one section is fed by ONE main transformer with the bus tie open, so the fault the board
+       must clear is that machine's alone: Isc = MVA / (sqrt3 x kV x Zk) */
+    var mvFaultKa = div(el.mainTxMva, SQRT3_HV * el.mvKv * (el.mainTxImpedancePct / 100), 'MV fault level');
+    var unitSubCurrentA = div(eq.transformer.unitMva * 1e6, SQRT3_HV * el.mvKv * 1000, 'unit substation MV current');
+    var mvFeederUnitSubs = Math.floor(div(el.mvFeederRatedA, unitSubCurrentA, 'unit subs per MV feeder'));
+    var mvFeedersPerHallPerFeed = ceilCount(unitSubsPerFeed, mvFeederUnitSubs);
+
     /* --- LV distribution: the group a busway trunk actually carries --- */
     var SQRT3 = 1.7320508075688772;   // STANDARD
     var groupKw = racksPerGroup * f.rackItKw;
@@ -545,6 +570,36 @@
     var distribution = {
       voltage_ll_v: el.voltageLL,
       power_factor: el.powerFactor,
+      /* --- the four voltage levels, published so a drawing cannot invent one --- */
+      hv_intake_kv: el.hvIntakeKv,
+      mv_kv: el.mvKv,
+      hv_current_a: hvCurrentA,
+      hv_circuit_mva: el.hvCircuitMva,
+      hv_circuits_duty: hvCircuitsDuty,
+      hv_circuits_installed: hvCircuitsDuty + 1,            /* N+1 on the intake */
+      main_tx_mva: el.mainTxMva,
+      main_tx_per_hall_per_feed: mainTxPerHallPerFeed,
+      main_tx_total: mainTxTotal,
+      main_tx_secondary_a: mainTxSecondaryA,
+      main_tx_loading_normal_pct: div(hallKva / 2, mainTxPerHallPerFeed * el.mainTxMva * 1000) * 100,
+      main_tx_loading_contingency_pct: div(hallKva, mainTxPerHallPerFeed * el.mainTxMva * 1000) * 100,
+      mv_board_rated_a: el.mvBoardRatedA,
+      mv_board_fits_secondary: mainTxSecondaryA <= el.mvBoardRatedA,
+      mv_fault_ka_per_section: mvFaultKa,
+      mv_board_ka_rating: el.mvBoardKaRating,
+      mv_fault_within_gear: mvFaultKa <= el.mvBoardKaRating,
+      mv_bus_tie_normally_open: true,   /* paralleled sections double the fault past the gear */
+      mv_feeder_rated_a: el.mvFeederRatedA,
+      unit_sub_mv_current_a: unitSubCurrentA,
+      mv_feeder_unit_subs: mvFeederUnitSubs,
+      mv_feeders_per_hall_per_feed: mvFeedersPerHallPerFeed,
+      /* The three levels are hv_intake_kv, mv_kv and voltage_ll_v above; they were briefly also
+         published as an ARRAY here, and that blanked the entire page. The registry generator
+         digests a nested array to a string ("[3 items] sha1:..."), the page's authority check
+         compares typeof registry value against typeof live value, and string !== object made
+         datahallSnapshotValid() return false — so every bound view on datahallAI.html went to
+         AUTHORITY UNAVAILABLE with no error anywhere. A snapshot branch must hold scalars.
+         tools/test-dcai-engine.mjs now asserts that rule so the next one fails a gate instead. */
       rack_feed_current_a: rackFeedA,
       rack_feed_current_per_cord_a: div(rackFeedA, 2),        // dual-corded A/B, each cord sized for the full load
       group_kw: groupKw,

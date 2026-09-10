@@ -339,6 +339,63 @@ approx(S.heat.liquid_hall_kwth * M.facility.halls, S.heat.liquid_kwth, 1e-6, 'ha
   ok(S.distribution.hall_group_kw_check === true && Di.group_kw * Ge.rack_groups_per_hall === S.power.rack_it_hall_kwe,
      'distribution.hall_group_kw_check: groups x group kW = hall rack IT');
 
+  /* --- v3.2.0 THE FOUR-LEVEL CHAIN --------------------------------------------------------
+     Until this release voltage_ll_v (400) was the only voltage in the engine, so every kV string
+     on the SLD was page-authored prose and nothing could contradict "PLN 20kV" sitting above the
+     subtitle "150kV Substation". These identities are what make that impossible to reintroduce. */
+  const SQ3 = Math.sqrt(3);
+  approx(Di.hv_intake_kv, M.electrical.hvIntakeKv, 1e-9, 'hv_intake_kv republishes the model leaf');
+  approx(Di.mv_kv, M.electrical.mvKv, 1e-9, 'mv_kv republishes the model leaf');
+  /* --- a snapshot branch holds SCALARS ------------------------------------------------------
+     Publishing the three levels as an array here blanked the whole page: the registry generator
+     digests a nested array to a string, the page's authority check compares typeof registry value
+     against typeof live value, and string !== object made datahallSnapshotValid() return false —
+     so every bound view went to AUTHORITY UNAVAILABLE with no error logged anywhere. This is the
+     same class as the engine-version pin that blanked eight cockpits: a silent whole-page failure
+     from a change that looked additive. Asserted here so the next one fails a gate instead. */
+  (function () {
+    const scalar = (v) => v === null || ['number', 'string', 'boolean'].includes(typeof v);
+    for (const [branch, body] of Object.entries(S)) {
+      if (!body || typeof body !== 'object' || Array.isArray(body)) { continue; }
+      for (const [key, value] of Object.entries(body)) {
+        if (branch === 'design' || branch === 'bins' || branch === 'meta') { continue; }
+        ok(scalar(value) || (value && typeof value === 'object' && !Array.isArray(value)),
+          `snapshot.${branch}.${key} must not be an array — the registry digests it to a string and the page's authority check then rejects the whole snapshot`);
+      }
+    }
+  }());
+  ok(Di.hv_intake_kv > Di.mv_kv && Di.mv_kv * 1000 > Di.voltage_ll_v,
+    'the levels descend: a transformer steps ONE of them, never two');
+  ok(Math.abs(Di.hv_current_a * SQ3 * Di.hv_intake_kv * 1000 / 1000
+      - (S.pue.worst_bin * S.power.total_it_kwe) / M.electrical.powerFactor) < 1,
+    'hv_current_a x sqrt3 x 150 kV = the worst-bin facility kVA — the intake is sized on the worst hour, not the design day');
+  ok(Di.hv_circuits_installed === Di.hv_circuits_duty + 1, 'the HV intake is N+1 at the circuit');
+  ok(Di.hv_circuits_duty * Di.hv_circuit_mva * 1000 >= (S.pue.worst_bin * S.power.total_it_kwe) / M.electrical.powerFactor,
+    'the duty circuits carry the worst-bin load');
+  approx(Di.main_tx_secondary_a, M.electrical.mainTxMva * 1e6 / (SQ3 * M.electrical.mvKv * 1000), 1e-6,
+    'main_tx_secondary_a = MVA / (sqrt3 x MV kV)');
+  ok(Di.mv_board_fits_secondary === (Di.main_tx_secondary_a <= Di.mv_board_rated_a) && Di.mv_board_fits_secondary === true,
+    'the main transformer secondary fits the 20 kV board it feeds', Di.main_tx_secondary_a.toFixed(0) + ' A of ' + Di.mv_board_rated_a);
+  approx(Di.mv_fault_ka_per_section, M.electrical.mainTxMva / (SQ3 * M.electrical.mvKv * (M.electrical.mainTxImpedancePct / 100)), 1e-6,
+    'mv_fault_ka_per_section = MVA / (sqrt3 x kV x Zk) for ONE transformer on the section');
+  ok(Di.mv_fault_within_gear === (Di.mv_fault_ka_per_section <= Di.mv_board_ka_rating) && Di.mv_fault_within_gear === true,
+    'the fault one section can deliver is inside the gear rating', Di.mv_fault_ka_per_section.toFixed(1) + ' kA of ' + Di.mv_board_ka_rating);
+  ok(2 * Di.mv_fault_ka_per_section > Di.mv_board_ka_rating && Di.mv_bus_tie_normally_open === true,
+    'two mains paralleled would exceed the gear — which is WHY the bus tie is normally open, not a preference');
+  approx(Di.unit_sub_mv_current_a, M.equipment.transformer.unitMva * 1e6 / (SQ3 * M.electrical.mvKv * 1000), 1e-6,
+    'unit_sub_mv_current_a = unit MVA / (sqrt3 x MV kV)');
+  ok(Di.mv_feeder_unit_subs === Math.floor(Di.mv_feeder_rated_a / Di.unit_sub_mv_current_a),
+    'a 630 A MV feeder carries as many unit substations as its rating allows, rounded DOWN');
+  ok(Di.mv_feeders_per_hall_per_feed === Math.ceil(E.unit_subs_per_feed_per_hall / Di.mv_feeder_unit_subs),
+    'MV feeders per hall per feed = ceil(unit subs per feed / unit subs per feeder)');
+  ok(Di.main_tx_per_hall_per_feed === Math.ceil(E.hall_kva / 1000 / Di.main_tx_mva),
+    'main transformers per hall per feed = ceil(hall MVA / unit MVA)');
+  ok(Di.main_tx_total === Di.main_tx_per_hall_per_feed * 2 * M.facility.halls, 'main_tx_total = per feed x 2 feeds x halls');
+  ok(Di.main_tx_loading_contingency_pct <= 100, 'one main transformer carries its whole hall when the other feed is lost',
+    Di.main_tx_loading_contingency_pct.toFixed(1) + '%');
+  approx(Di.main_tx_loading_normal_pct, Di.main_tx_loading_contingency_pct / 2, 1e-9,
+    'normal loading is half the contingency loading at 2N');
+
   /* the drawing's per-feed count IS the 2N sizing, not the 1N total split for display */
   ok(S.distribution.transformers_per_hall_per_feed === E.unit_subs_per_feed_per_hall,
      'distribution.transformers_per_hall_per_feed republishes the 2N per-feed sizing');

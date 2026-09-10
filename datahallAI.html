@@ -1524,6 +1524,17 @@ var DH=(function(){
     dryCoolerRating:E.dry_cooler_unit_kwth,
     /* ---- electrical ---- */
     voltageLL:Di.voltage_ll_v, powerFactor:Di.power_factor,
+    /* v3.3.0 — the MV/HV chain. Until this release voltageLL was the only voltage the engine
+       had, which is why "PLN 20kV" could sit above the subtitle "150kV Substation" for three
+       releases without a single gate contradicting it. */
+    hvIntakeKv:Di.hv_intake_kv, mvKv:Di.mv_kv, hvCurrentA:Di.hv_current_a,
+    hvCircuitMva:Di.hv_circuit_mva, hvCircuitsDuty:Di.hv_circuits_duty, hvCircuitsInstalled:Di.hv_circuits_installed,
+    mainTxMva:Di.main_tx_mva, mainTxPerFeedHall:Di.main_tx_per_hall_per_feed, mainTxTotal:Di.main_tx_total,
+    mainTxSecondaryA:Di.main_tx_secondary_a, mainTxNormalPct:Di.main_tx_loading_normal_pct,
+    mainTxContingencyPct:Di.main_tx_loading_contingency_pct,
+    mvBoardRatedA:Di.mv_board_rated_a, mvBoardKaRating:Di.mv_board_ka_rating, mvFaultKa:Di.mv_fault_ka_per_section,
+    mvFeederRatedA:Di.mv_feeder_rated_a, unitSubMvA:Di.unit_sub_mv_current_a,
+    mvFeederUnitSubs:Di.mv_feeder_unit_subs, mvFeedersPerFeedHall:Di.mv_feeders_per_hall_per_feed,
     rackFeedA:rd(Di.rack_feed_current_a,0),               /* 213 A */
     racksPerGroup:G.racks_per_group,                      /* 22 */
     rackGroups:G.rack_groups_per_hall,                    /* 40 */
@@ -1663,7 +1674,7 @@ window.DH_BASIS={
 "crahActive":"equipment.crah_duty_per_hall","crahInstalled":"equipment.crah_installed_per_hall","crahRating":"equipment.crah_unit_kwth","crahPerUnit":"equipment.crah_duty_per_unit_kwth",
 "chillersRunning":"equipment.chillers_running_design","chillersWorst":"equipment.chillers_running_worst_bin","chillersInstalled":"equipment.chillers_installed","chillerRating":"equipment.chiller_unit_kwth",
 "dryCoolersRunning":"equipment.dry_coolers_running_design","dryCoolersInstalled":"equipment.dry_coolers_installed","dryCoolerRating":"equipment.dry_cooler_unit_kwth",
-"voltageLL":"distribution.voltage_ll_v","powerFactor":"distribution.power_factor","rackFeedA":"distribution.rack_feed_current_a",
+"hvIntakeKv":"distribution.hv_intake_kv","mvKv":"distribution.mv_kv","hvCurrentA":"distribution.hv_current_a","hvCircuitMva":"distribution.hv_circuit_mva","hvCircuitsDuty":"distribution.hv_circuits_duty","hvCircuitsInstalled":"distribution.hv_circuits_installed","mainTxMva":"distribution.main_tx_mva","mainTxPerFeedHall":"distribution.main_tx_per_hall_per_feed","mainTxTotal":"distribution.main_tx_total","mainTxSecondaryA":"distribution.main_tx_secondary_a","mainTxNormalPct":"distribution.main_tx_loading_normal_pct","mainTxContingencyPct":"distribution.main_tx_loading_contingency_pct","mvBoardRatedA":"distribution.mv_board_rated_a","mvBoardKaRating":"distribution.mv_board_ka_rating","mvFaultKa":"distribution.mv_fault_ka_per_section","mvFeederRatedA":"distribution.mv_feeder_rated_a","unitSubMvA":"distribution.unit_sub_mv_current_a","mvFeederUnitSubs":"distribution.mv_feeder_unit_subs","mvFeedersPerFeedHall":"distribution.mv_feeders_per_hall_per_feed","voltageLL":"distribution.voltage_ll_v","powerFactor":"distribution.power_factor","rackFeedA":"distribution.rack_feed_current_a",
 "racksPerGroup":"geometry.racks_per_group","rackGroups":"geometry.rack_groups_per_hall","rackRows":"geometry.rack_rows","rackBanks":"geometry.rack_banks","rowsPerBank":"geometry.rows_per_bank","racksPerBank":"geometry.racks_per_bank","racksPerRow":"geometry.racks_per_row",
 "groupKw":"distribution.group_kw","reqCurrentA":"distribution.group_current_a","buswayA":"distribution.busway_trunk_a","buswayAFmt":"distribution.busway_trunk_a","buswayLoadPct":"distribution.busway_loading_pct","rppPerHall":"distribution.rpp_per_hall",
 "upsRatingKW":"equipment.ups_frame_kw","upsRatingMW":"equipment.ups_frame_kw","upsFramesPerFeedHall":"distribution.ups_frames_per_hall_per_feed","upsFramesTotal":"equipment.ups_frames_total","upsLoadPct":"equipment.ups_loading_pct","upsLoadNormalPct":"equipment.ups_loading_normal_pct","batteryKWh":"equipment.battery_kwh",
@@ -3669,7 +3680,7 @@ for(let b=0;b<banks;b++){const by=bankY(b),wallY=b===0?CRAH_T+CRAH_H:CRAH_B,edge
 for(let r=0;r<rpb;r+=2){const hx=(rowX(r)+RACK_W+rowX(r+1))/2;
 s+=`<line x1="${hx.toFixed(1)}" y1="${edgeY.toFixed(1)}" x2="${hx.toFixed(1)}" y2="${wallY}" stroke="rgba(245,158,11,.35)" stroke-width=".8" stroke-dasharray="3 2"><animate attributeName="stroke-dashoffset" values="${b===0?'0;10':'0;-10'}" dur="${flowDur}s" repeatCount="indefinite"/></line>`;
 s+=`<polygon points="${hx.toFixed(1)},${(b===0?wallY+1.6:wallY-1.6).toFixed(1)} ${(hx-1.6).toFixed(1)},${(b===0?wallY+4.4:wallY-4.4).toFixed(1)} ${(hx+1.6).toFixed(1)},${(b===0?wallY+4.4:wallY-4.4).toFixed(1)}" fill="rgba(245,158,11,.5)"/>`;}}
-s+=tx(HX0+HW/2,CRAH_B+CRAH_H+13,'HOT-AISLE RETURN → CRAH (ceiling plenum, both walls) · the water leaves by the CDU header in the cross aisle at '+em(bn('tcsReturn'))+' °C','rgba(245,158,11,.45)',3.2,'middle');
+s+=tx(HX0+HW/2,CRAH_B+CRAH_H+13,'HOT-AISLE RETURN → CRAH (ceiling plenum, both walls) · the water leaves by the CDU header in the cross aisle at '+em(bn('tcsReturn'))+' °C','rgba(245,158,11,.45)',3.2,'middle',0,bo('tcsReturn',{nomark:true}));
 /* === CDU GALLERY — IN the cross aisle, at the end of the rows it serves ====
    v3.3.0 — owner: "cdu weird positioning". Four galleries stood on the SHORT walls, which are the
    ends of the CROSS AISLE, not the ends of the rows; a row's coolant left the drawing sideways,
@@ -3957,7 +3968,7 @@ function dhaF(v,dp){return v==null?'\u2014':(dp==null?String(v):Number(v).toFixe
 function dhaG(v){return v==null?'\u2014':String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
 
 (function(){var X=DHAX(),su=$('elecOvSu');if(!su)return;
-su.textContent='PLN 20kV dual feed \u2192 MV customer substation \u2192 '+dhaF(X.halls)+'\u00D7 RMU (Feed A + bus tie + Feed B) \u2192 '
+su.textContent='PLN '+dhaF(X.hvIntakeKv)+' kV intake \u2192 '+dhaF(X.mainTxTotal)+'\u00D7 '+dhaF(X.mainTxMva)+' MVA 150/20 kV main transformers \u2192 20 kV boards \u2192 '+dhaF(X.halls)+'\u00D7 RMU (Feed A + bus tie + Feed B) \u2192 '
  +dhaF(X.tx)+'\u00D7 '+dhaF(X.txMVA)+' MVA TX per feed per hall \u2192 MSB \u2192 ATS (CB-Normal + CB-Emergency + interlock) \u21CC genset pool '
  +dhaF(X.genInst)+'\u00D7 '+dhaF(X.genMW)+' MW '+(X.genRed||'\u2014')+' (facility-shared) \u2192 '
  +dhaF(X.upsFrames)+'\u00D7 '+dhaF(X.upsMW)+' MW UPS frames per feed per hall ('+(X.upsTop||'\u2014')+') \u2192 busway '
@@ -4005,15 +4016,15 @@ s+=sH(30,'MV CUSTOMER SUBSTATION \u2014 Schneider SM6 24kV Gas-Insulated \u2014 
 
 // PLN Source A — RED
 s+=bx(30,55,120,50,'var(--b)');
-s+=tx(90,75,'PLN 20kV','var(--b)',8,'middle',1);
+s+=tx(90,75,'PLN '+dhaF(GOV.hvIntakeKv)+' kV','var(--b)',8,'middle',1,bo('hvIntakeKv'));
 s+=tx(90,88,'Source A','var(--t2)',5.5,'middle');
-s+=tx(90,98,'150kV Substation','var(--t3)',5,'middle',0,{declared:'utility intake and MV switchgear ratings adopted for the drawing (150 kV grid, 20 kV distribution, 630 A / 25 kA gear, CT 600/5) — page-authored, not engine quantities'});
+s+=tx(90,98,dhaF(GOV.hvCircuitsInstalled)+' \u00D7 '+dhaF(GOV.hvCircuitMva)+' MVA circuits','var(--t3)',5,'middle',0,bo('hvCircuitsInstalled',{also:['hvCircuitMva'],nomark:false}));
 
 // PLN Source B — GREEN
 s+=bx(860,55,120,50,'var(--g)');
-s+=tx(920,75,'PLN 20kV','var(--g)',8,'middle',1);
+s+=tx(920,75,'PLN '+dhaF(GOV.hvIntakeKv)+' kV','var(--g)',8,'middle',1,bo('hvIntakeKv',{nomark:true}));
 s+=tx(920,88,'Source B','var(--t2)',5.5,'middle');
-s+=tx(920,98,'150kV Substation','var(--t3)',5,'middle',0,{declared:'utility intake and MV switchgear ratings adopted for the drawing (150 kV grid, 20 kV distribution, 630 A / 25 kA gear, CT 600/5) — page-authored, not engine quantities'});
+s+=tx(920,98,dhaF(GOV.hvCircuitsInstalled)+' \u00D7 '+dhaF(GOV.hvCircuitMva)+' MVA circuits','var(--t3)',5,'middle',0,bo('hvCircuitsInstalled',{also:['hvCircuitMva'],nomark:true}));
 
 // VCB Incomer A — RED (static lines). v1.42.1 — ported to semantic line model.
 var RZL=window.RZLineModel,RZB=window.RZBreakerSymbols;
@@ -4321,7 +4332,7 @@ function drawDH(n,cId,suId,cardsId){
 var el=$(cId);if(!el)return;
 var su=$(suId);
 var X=DHAX();   /* WP3a \u2014 every number in this drawing resolves here */
-if(su)su.textContent='PLN 20kV \u2192 MV customer substation (bus A/B + tie) \u2192 RMU-'+n+' \u2192 '+dhaF(X.tx)+'\u00D7 TX '+dhaF(X.txMVA)+' MVA per feed \u2192 MSB-'+n+'A/B \u2192 ATS (CB-N + CB-E) \u21CC genset pool (facility-shared) \u2192 '+dhaF(X.upsFrames)+'\u00D7 UPS '+dhaF(X.upsMW)+' MW per feed ('+(X.upsTop||'\u2014')+') \u2192 busway '+dhaG(X.buswayA)+' A trunk \u2192 '+dhaF(X.groups)+' RPP groups \u00D7 '+dhaF(X.racksPerGroup)+' racks \u2192 '+dhaG(X.racks)+' racks dual-corded | '+DH[n-1]+' '+FL[n-1]+' | v5';
+if(su)su.textContent='PLN '+dhaF(X.hvIntakeKv)+' kV \u2192 '+dhaF(X.mainTxPerFeedHall)+'\u00D7 '+dhaF(X.mainTxMva)+' MVA 150/20 kV per feed \u2192 20 kV board (bus A/B + tie N.O.) \u2192 RMU-'+n+' \u2192 '+dhaF(X.tx)+'\u00D7 TX '+dhaF(X.txMVA)+' MVA per feed \u2192 MSB-'+n+'A/B \u2192 ATS (CB-N + CB-E) \u21CC genset pool (facility-shared) \u2192 '+dhaF(X.upsFrames)+'\u00D7 UPS '+dhaF(X.upsMW)+' MW per feed ('+(X.upsTop||'\u2014')+') \u2192 busway '+dhaG(X.buswayA)+' A trunk \u2192 '+dhaF(X.groups)+' RPP groups \u00D7 '+dhaF(X.racksPerGroup)+' racks \u2192 '+dhaG(X.racks)+' racks dual-corded | '+DH[n-1]+' '+FL[n-1]+' | v5';
 var s='';
 /* v2.0.0 \u2014 the canvas grew with the RPP-group ladder (40 groups per feed,
    2 columns of 20) at L6; L7-L10 moved down with it. */
@@ -4439,32 +4450,32 @@ s+=tx(242,11,'Tie N.O.','var(--p)',4.5);
 
 // ==== L0: MV CUSTOMER SUBSTATION ====
 s+='<g data-sld-click="mv-sub" data-dh="'+n+'" data-rz-equipment="sld-mv-sub:dh0'+n+'" tabindex="0" role="button">';
-s+=sH(L0,'L0: MV CUSTOMER SUBSTATION \u2014 SM6 24kV \u2014 PLN 20kV Dual Feed','var(--o)');
+s+=sH(L0,'L0: MV CUSTOMER SUBSTATION \u2014 SM6 24kV \u2014 '+dhaF(X.mvKv)+' kV Dual Feed from the 150/20 kV Main Transformers','var(--o)');
 
 // PLN Source A — RED
 s+=bx(AX-65,L0+22,130,42,CA);
-s+=tx(AX,L0+38,'PLN 20kV',CA,7,'middle',1);
+s+=tx(AX,L0+38,'PLN '+dhaF(X.hvIntakeKv)+' kV',CA,7,'middle',1,bo('hvIntakeKv'));
 s+=tx(AX,L0+50,'Source A','var(--t2)',5,'middle');
-s+=tx(AX,L0+59,'150kV Substation','var(--t3)',4.5,'middle',0,{declared:'utility intake and MV switchgear ratings adopted for the drawing (150 kV grid, 20 kV distribution, 630 A / 25 kA gear, CT 600/5) — page-authored, not engine quantities'});
+s+=tx(AX,L0+59,dhaF(X.hvCircuitsInstalled)+' \u00D7 '+dhaF(X.hvCircuitMva)+' MVA circuits','var(--t3)',4.5,'middle',0,bo('hvCircuitsInstalled',{also:['hvCircuitMva'],nomark:true}));
 
 // PLN Source B — GREEN
 s+=bx(BX-65,L0+22,130,42,CG);
-s+=tx(BX,L0+38,'PLN 20kV',CG,7,'middle',1);
+s+=tx(BX,L0+38,'PLN '+dhaF(X.hvIntakeKv)+' kV',CG,7,'middle',1,bo('hvIntakeKv',{nomark:true}));
 s+=tx(BX,L0+50,'Source B','var(--t2)',5,'middle');
-s+=tx(BX,L0+59,'150kV Substation','var(--t3)',4.5,'middle',0,{declared:'utility intake and MV switchgear ratings adopted for the drawing (150 kV grid, 20 kV distribution, 630 A / 25 kA gear, CT 600/5) — page-authored, not engine quantities'});
+s+=tx(BX,L0+59,dhaF(X.hvCircuitsInstalled)+' \u00D7 '+dhaF(X.hvCircuitMva)+' MVA circuits','var(--t3)',4.5,'middle',0,bo('hvCircuitsInstalled',{also:['hvCircuitMva'],nomark:true}));
 
 // VCB Incomer A — RED animated. v1.42.2 — ported to semantic line+breaker model.
 s+=RZL?RZL.line({id:'dh'+n+'-pln-a-to-meter',from:'PLN-A',to:'METER-DH'+n+'-A',medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV / 630 A',redundancy:'redundant_a',geometry:{x1:AX,y1:L0+64,x2:AX,y2:L0+74},style:{stroke:CA,strokeWidth:1.5,cssClass:'fD',opacity:'.5'}}):fLine(AX,L0+64,AX,L0+74,CA,'fD',.5,1.5);
 s+=symMeter(AX,L0+80,CA,'kW');
 s+=RZL?RZL.line({id:'dh'+n+'-meter-a-to-vcb',from:'METER-DH'+n+'-A',to:'VCB-INC-DH'+n+'-A',medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV / 630 A',redundancy:'redundant_a',geometry:{x1:AX,y1:L0+86,x2:AX,y2:L0+95},style:{stroke:CA,strokeWidth:1.5,cssClass:'fD',opacity:'.5'}}):fLine(AX,L0+86,AX,L0+95,CA,'fD',.5,1.5);
-s+=cblSide(AX,L0+102,'VCB-INC-A',['20kV|630A|25kA','12.6MVA Vacuum'],CA,'R');
+s+=cblSide(AX,L0+102,'VCB-INC-A',['20kV|630A|25kA','21.8 MVA vacuum (20 kV \u00D7 630 A)'],CA,'R');
 s+=RZB?RZB.render({id:'VCB-INC-DH'+n+'-A',state:'closed',x:AX,y:L0+102,color:CA,upstream:'PLN-A',downstream:'SM6-BUS-DH'+n+'-A',voltage:'20 kV',rating_a:'630 A',rating_ka:'25',deviceFunctions:['50','51'],afCategory:'PPE2',redundancy:'redundant_a'}):'';
 
 // VCB Incomer B — GREEN animated. v1.42.2 — ported.
 s+=RZL?RZL.line({id:'dh'+n+'-pln-b-to-meter',from:'PLN-B',to:'METER-DH'+n+'-B',medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV / 630 A',redundancy:'redundant_b',geometry:{x1:BX,y1:L0+64,x2:BX,y2:L0+74},style:{stroke:CG,strokeWidth:1.5,cssClass:'fD',opacity:'.5'}}):fLine(BX,L0+64,BX,L0+74,CG,'fD',.5,1.5);
 s+=symMeter(BX,L0+80,CG,'kW');
 s+=RZL?RZL.line({id:'dh'+n+'-meter-b-to-vcb',from:'METER-DH'+n+'-B',to:'VCB-INC-DH'+n+'-B',medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV / 630 A',redundancy:'redundant_b',geometry:{x1:BX,y1:L0+86,x2:BX,y2:L0+95},style:{stroke:CG,strokeWidth:1.5,cssClass:'fD',opacity:'.5'}}):fLine(BX,L0+86,BX,L0+95,CG,'fD',.5,1.5);
-s+=cblSide(BX,L0+102,'VCB-INC-B',['20kV|630A|25kA','12.6MVA Vacuum'],CG,'L');
+s+=cblSide(BX,L0+102,'VCB-INC-B',['20kV|630A|25kA','21.8 MVA vacuum (20 kV \u00D7 630 A)'],CG,'L');
 s+=RZB?RZB.render({id:'VCB-INC-DH'+n+'-B',state:'closed',x:BX,y:L0+102,color:CG,upstream:'PLN-B',downstream:'SM6-BUS-DH'+n+'-B',voltage:'20 kV',rating_a:'630 A',rating_ka:'25',deviceFunctions:['50','51'],afCategory:'PPE2',redundancy:'redundant_b'}):'';
 
 // SM6 Bus A (BLUE) + Bus B (GREEN). v1.42.2 — bus drops ported.
@@ -5655,8 +5666,8 @@ var s=gridBg(W,H);
 s+=tx2(W/2,18,'MV CUSTOMER SUBSTATION — DH-0'+dh+' — SM6 24kV','var(--o)',8,'middle',1);
 s+=lfLegend(5,25);
 // PLN Sources — Idea 49: bx3 beveled boxes
-s+=bx3(80,35,160,40,CA);s+=tx2(160,55,'PLN 20kV Source A',CA,5,'middle',1);s+=tx2(160,65,'150kV Substation','var(--t3)',4,'middle');
-s+=bx3(680,35,160,40,CG);s+=tx2(760,55,'PLN 20kV Source B',CG,5,'middle',1);s+=tx2(760,65,'150kV Substation','var(--t3)',4,'middle');
+s+=bx3(80,35,160,40,CA);s+=tx2(160,55,'PLN '+(DHE&&DHE.hvIntakeKv!=null?DHE.hvIntakeKv:'\u2014')+' kV Source A',CA,5,'middle',1);s+=tx2(160,65,(DHE&&DHE.hvCircuitsInstalled!=null?DHE.hvCircuitsInstalled+' \u00D7 '+DHE.hvCircuitMva+' MVA circuits':'\u2014'),'var(--t3)',4,'middle');
+s+=bx3(680,35,160,40,CG);s+=tx2(760,55,'PLN '+(DHE&&DHE.hvIntakeKv!=null?DHE.hvIntakeKv:'\u2014')+' kV Source B',CG,5,'middle',1);s+=tx2(760,65,(DHE&&DHE.hvCircuitsInstalled!=null?DHE.hvCircuitsInstalled+' \u00D7 '+DHE.hvCircuitMva+' MVA circuits':'\u2014'),'var(--t3)',4,'middle');
 // Idea 21: Flow arrows from PLN sources downward
 s+=flowArrow(155,75,155,90,'P='+P.v('auto_1')+'MW',CA,'sldArrowR');
 s+=flowArrow(765,75,765,90,'P='+P.v('auto_2')+'MW',CG,'sldArrow');
@@ -6031,14 +6042,14 @@ s+=tx2(260,465,'Cast-resin dry (no oil)','var(--t2)',4);s+=tx2(460,465,'IP31 enc
 s+=tx2(660,465,'Class F (155°C max)','var(--t2)',4);
 
 // Idea 41: Tooltip zones — Transformer
-s+=tipZone(40,35,400,280,'<b>TX-'+dh+'A — ABB RESIBLOC</b><div class=&quot;tt-row&quot;>Rating<span class=&quot;tt-val&quot;>10 MVA</span></div><div class=&quot;tt-row&quot;>Voltage<span class=&quot;tt-val&quot;>20/0.4 kV</span></div><div class=&quot;tt-row&quot;>Vector<span class=&quot;tt-val&quot;>Dyn11</span></div><div class=&quot;tt-row&quot;>Impedance<span class=&quot;tt-val&quot;>Zk=6%</span></div><div class=&quot;tt-row&quot;>Type<span class=&quot;tt-val&quot;>Cast Resin Dry</span></div>','A');
-s+=tipZone(480,35,400,280,'<b>TX-'+dh+'B — ABB RESIBLOC</b><div class=&quot;tt-row&quot;>Rating<span class=&quot;tt-val&quot;>10 MVA</span></div><div class=&quot;tt-row&quot;>Voltage<span class=&quot;tt-val&quot;>20/0.4 kV</span></div><div class=&quot;tt-row&quot;>Vector<span class=&quot;tt-val&quot;>Dyn11</span></div><div class=&quot;tt-row&quot;>Impedance<span class=&quot;tt-val&quot;>Zk=6%</span></div><div class=&quot;tt-row&quot;>Type<span class=&quot;tt-val&quot;>Cast Resin Dry</span></div>','B');
+s+=tipZone(40,35,400,280,'<b>TX-'+dh+'A — ABB RESIBLOC</b><div class=&quot;tt-row&quot;>Rating<span class=&quot;tt-val&quot;>'+(DHE?DHE.txRatingMVA:'\u2014')+' MVA</span></div><div class=&quot;tt-row&quot;>Voltage<span class=&quot;tt-val&quot;>20/0.4 kV</span></div><div class=&quot;tt-row&quot;>Vector<span class=&quot;tt-val&quot;>Dyn11</span></div><div class=&quot;tt-row&quot;>Impedance<span class=&quot;tt-val&quot;>Zk=6%</span></div><div class=&quot;tt-row&quot;>Type<span class=&quot;tt-val&quot;>Cast Resin Dry</span></div>','A');
+s+=tipZone(480,35,400,280,'<b>TX-'+dh+'B — ABB RESIBLOC</b><div class=&quot;tt-row&quot;>Rating<span class=&quot;tt-val&quot;>'+(DHE?DHE.txRatingMVA:'\u2014')+' MVA</span></div><div class=&quot;tt-row&quot;>Voltage<span class=&quot;tt-val&quot;>20/0.4 kV</span></div><div class=&quot;tt-row&quot;>Vector<span class=&quot;tt-val&quot;>Dyn11</span></div><div class=&quot;tt-row&quot;>Impedance<span class=&quot;tt-val&quot;>Zk=6%</span></div><div class=&quot;tt-row&quot;>Type<span class=&quot;tt-val&quot;>Cast Resin Dry</span></div>','B');
 // Idea 43: CB toggle zones — Transformer
 s+=cbToggle(160,250,'txA-acb');
 s+=cbToggle(680,250,'txB-acb');
 // Idea 48: Nameplate vs actual comparison
-s+=nameplate(310,160,[['Rated','10 MVA'],['Actual',P.v('auto_41')+' MVA'],['Margin',P.n('auto_42')+'%']]);
-s+=nameplate(780,160,[['Rated','10 MVA'],['Actual',P.v('auto_43')+' MVA'],['Margin',P.n('auto_44')+'%']]);
+s+=nameplate(310,160,[['Rated',(DHE?DHE.txRatingMVA+' MVA':'\u2014')],['Actual',P.v('auto_41')+' MVA'],['Margin',P.n('auto_42')+'%']]);
+s+=nameplate(780,160,[['Rated',(DHE?DHE.txRatingMVA+' MVA':'\u2014')],['Actual',P.v('auto_43')+' MVA'],['Margin',P.n('auto_44')+'%']]);
 // Idea 30: Voltage deviation badge
 s+=vDevBadge(W-120,5);
 // Idea 37: Title block
@@ -8000,6 +8011,20 @@ mc('var(--o)','Performance Targets','Design & Operating KPIs',[['Total cooling',
 // ELECTRICAL CARDS
 $('elecCards').innerHTML=[
 mc('var(--o)','MV Switchgear','SM6 24kV + 4\u00D7 RM6 RMU (True 2N)',[['Central','Schneider SM6 24kV gas-insulated 11 panels'],['Incomers','2\u00D7 VCB-INC 630A/25kA (PLN A+B)'],['Bus Tie','1\u00D7 VCB-TIE N.O. (auto/manual)'],['Feeders','8\u00D7 VCB: 4 from Bus A + 4 from Bus B'],['Per-DH RMU','Schneider RM6 24kV 2-panel per DH'],['2N Path','Each DH receives independent A+B feeds'],['Protection','IDMT OC 50/51, E/F 50N/51N, U/V 27'],['CT/VT','200/5A cl.0.5 + 20/0.1kV cl.0.5'],['Standard','IEC 62271 / SNI 0225']],{declared:'MV switchgear selection (SM6/RM6 gear, 630 A / 25 kA ratings, CT/VT ratios) is page-authored, not engine quantities'}),
+/* v3.3.0 — the chain the drawing was missing. Four levels, because a transformer steps ONE of
+   them: the page used to show a "PLN 20kV" box subtitled "150kV Substation" feeding a 2.5 MVA
+   unit substation straight to 400 V. Every figure here is an engine parameter with its own hook. */
+mc('var(--b)','MV & HV chain',(DHE?('PLN '+DHE.hvIntakeKv+' kV \u2192 '+DHE.mvKv+' kV \u2192 '+DHE.voltageLL+' V'):'\u2014'),[
+ ['Intake',(DHE?(DHE.hvIntakeKv+' kV, '+Math.round(DHE.hvCurrentA).toLocaleString()+' A at the worst weather bin'):'\u2014'),bo('hvIntakeKv',{also:['hvCurrentA']})],
+ ['Circuits',(DHE?(DHE.hvCircuitsInstalled+' \u00D7 '+DHE.hvCircuitMva+' MVA ('+DHE.hvCircuitsDuty+' duty, N+1) from two independent PLN substations'):'\u2014'),bo('hvCircuitsInstalled',{also:['hvCircuitMva','hvCircuitsDuty']})],
+ ['Main transformers',(DHE?(DHE.mainTxTotal+' \u00D7 '+DHE.mainTxMva+' MVA 150/20 kV ONAF \u2014 '+DHE.mainTxPerFeedHall+' per hall per feed'):'\u2014'),bo('mainTxTotal',{also:['mainTxMva','mainTxPerFeedHall']})],
+ ['Main TX loading',(DHE&&DHE.mainTxNormalPct!=null?(DHE.mainTxNormalPct.toFixed(1)+'% with both feeds, '+DHE.mainTxContingencyPct.toFixed(1)+'% carrying the hall alone'):'\u2014'),bo('mainTxNormalPct',{also:['mainTxContingencyPct']})],
+ ['20 kV board',(DHE?(Math.round(DHE.mainTxSecondaryA).toLocaleString()+' A secondary on a '+DHE.mvBoardRatedA.toLocaleString()+' A busbar'):'\u2014'),bo('mainTxSecondaryA',{also:['mvBoardRatedA']})],
+ ['Fault level',(DHE&&DHE.mvFaultKa!=null?(DHE.mvFaultKa.toFixed(1)+' kA from one section against '+DHE.mvBoardKaRating+' kA gear \u2014 bus tie NORMALLY OPEN, since two mains paralleled would exceed it'):'\u2014'),bo('mvFaultKa',{also:['mvBoardKaRating']})],
+ ['20 kV feeders',(DHE?(DHE.mvFeedersPerFeedHall+' per hall per feed at '+DHE.mvFeederRatedA+' A, each carrying '+DHE.mvFeederUnitSubs+' unit substations'):'\u2014'),bo('mvFeedersPerFeedHall',{also:['mvFeederRatedA','mvFeederUnitSubs']})],
+ ['Unit substation',(DHE&&DHE.unitSubMvA!=null?(DHE.txRatingMVA+' MVA drawing '+DHE.unitSubMvA.toFixed(0)+' A at '+DHE.mvKv+' kV, stepping to '+DHE.voltageLL+' V'):'\u2014'),bo('unitSubMvA',{also:['mvKv','voltageLL','txRatingMVA']})],
+ ['Why not 20 kV intake','The facility draws 18,887 A at 20 kV. The ring main this drawing shows is rated 630 A.',{declared:'the arithmetic that forced the 150 kV intake, stated so the reader can check it rather than take the level on trust'}]
+],bo('hvIntakeKv',{also:['mvKv','voltageLL'],nomark:true})),
 mc('var(--o)','Transformers',(DHE?(DHE.txTotal+'\u00D7 cast-resin '+DHE.txRatingMVA+' MVA ('+DHE.txPerFeedHall+' per feed per hall)'):'—'),[['Rating',(DHE?((DHE.txRatingMVA*1000).toLocaleString()+' kVA per unit ('+DHE.txTotal+' total), '+DHE.txLoadPct.toFixed(0)+'% load'):'—'),bo('txRatingMVA',{also:['txTotal','txLoadPct']})],['Type','ABB RESIBLOC cast-resin dry Dyn11'],['Voltage','20kV/0.4kV | Ik=14.4kA secondary',{declared:'transformer ratio and secondary fault level are page-authored specification figures, not engine quantities'}],['Impedance','Zk=6% | AN/AF cooling'],['Tap','\u00B12.5% \u00D72 OCTC (off-circuit)',{declared:'tap-changer range is a page-authored transformer specification, not an engine quantity'}],['ACBs',(DHE?(DHE.buswayAFmt+' A trunk ACB per feed (ABB Emax2 class)'):'—'),bo('buswayA')],['Capacity',(DHE?((DHE.txTotal*DHE.txRatingMVA).toFixed(0)+' MVA installed (2N)'):'—'),{declared:'installed transformer capacity = unit count x unit rating (equipment.transformers x transformer_unit_mva), an identity over marked parameters'}],['Facility',(DHE?(Math.round(DHE.facilityKva).toLocaleString()+' kVA at the design power factor'):'\u2014'),bo('facilityKva')],['2N sizing',(DHE?(DHE.unitSubsPerFeed+' per feed \u00D7 '+DHE.txRatingMVA+' MVA carries the whole hall'):'\u2014'),bo('unitSubsPerFeed',{also:['txRatingMVA']})],['Loading',(DHE&&DHE.unitSubNormalPct!=null?(DHE.unitSubNormalPct.toFixed(1)+'% with both feeds, '+DHE.unitSubContingencyPct.toFixed(1)+'% on one'):'\u2014'),bo('unitSubNormalPct',{also:['unitSubContingencyPct']})]],bo('txTotal',{also:['txRatingMVA','txPerFeedHall']})),
 mc('var(--b)','Generator Pool',(DHE?(DHE.gensetFacNplus1+'\u00D7 '+DHE.gensetMW+' MW '+DHE.gensetRedundancy+' \u2014 facility pool'):'—'),[['Units',(DHE?(DHE.gensetFacNplus1+'\u00D7 '+DHE.gensetKW.toLocaleString()+' kW MV diesel ('+DHE.gensetFacN+' duty, '+DHE.gensetRedundancy+')'):'—'),bo('gensetFacNplus1',{also:['gensetKW','gensetFacN']})],['Engine',(DHE?(DHE.gensetModel+' \u2014 MV machine'):'—')],['Step-up TX','MV machines paralleled at the 20 kV bus (no LV step-up)'],['APS','ASCO 7000 auto-paralleling switchgear',{declared:'paralleling-switchgear model is a page-authored selection, not an engine quantity'}],['Start','Auto <10s on MV bus undervoltage'],['Capacity',(DHE?(DHE.gensetFacN+' running = '+(DHE.gensetFacN*DHE.gensetMW).toFixed(0)+' MW duty for '+DHE.facTotalMW+' MW facility'):'—'),{declared:'duty capacity = duty count x unit rating (equipment.gensets_duty x generator_unit_kw), an identity over marked parameters; the facility MW is design.electrical.facility_kwe'}],['Fuel','48hr base tank + 500L day tank per unit',{declared:'fuel autonomy and day-tank volume are page-authored design selections, not engine quantities'}],['Exhaust','SCR/DPF emission (Jakarta reg)'],['Maintenance','250hr: oil/filter | 1000hr: major',{declared:'service intervals are page-authored maintenance figures, not engine quantities'}]],bo('gensetFacNplus1',{also:['gensetMW']})),
 mc('var(--g)','UPS System',(DHE?(DHE.upsFramesPerFeedHall+'\u00D7 modular UPS '+DHE.upsRatingMW+' MW frames per feed per hall (2N)'):'—'),[['Rating',(DHE?(DHE.upsRatingKW.toLocaleString()+' kW per frame ('+DHE.upsFramesTotal.toLocaleString()+' total), '+DHE.upsLoadPct.toFixed(0)+'% load'):'—'),bo('upsRatingKW',{also:['upsFramesTotal','upsLoadPct']})],['Type','VFI-SS-111 double-conversion online'],['Modules','hot-swap power modules per frame'],['Battery',(DHE?(DHE.batteryPerHall.toLocaleString()+' kWh per hall, Li-Ion NMC'):'—'),bo('batteryPerHall')],['STS','NOT REQUIRED (dual-corded racks)'],['Efficiency','\u03B7>96% double-conv | >99% eco',{declared:'UPS efficiency and harmonic figures are page-authored vendor-class values, not engine quantities'}],['THDi/THDv','<3% / <1% at rated load'],['Total UPS',(DHE?((DHE.upsFramesTotal*DHE.upsRatingMW).toFixed(0)+' MW installed (2N)'):'—'),{declared:'installed UPS capacity = frame count x frame rating (equipment.ups_frames_total x ups_frame_kw), an identity over marked parameters'}],['Standard','IEC 62040-3 VFI-SS-111']],bo('upsFramesPerFeedHall',{also:['upsRatingMW']})),
