@@ -257,12 +257,17 @@
         /* Worked example */
         .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
         .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
-        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        /* v3.3.x — was 0.88rem. A worked example is READ line by line; it is the densest prose on
+           the page, not a caption, so it gets reading size like the rest of the body. */
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 1rem; }
         .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
 
         /* References */
         .mn-refs { list-style: none; margin: 0; padding: 0; }
-        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        /* v3.3.x — was 0.86rem (13.8px). A citation is read, not skimmed past: the site's editorial
+           stylesheet already sets `.references` p/li at reading size, and this list is the manual's
+           equivalent. */
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 1rem; color: var(--mn-muted); }
         .mn-refs li:last-child { border-bottom: none; }
         .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
 
@@ -521,7 +526,7 @@
         <section class="mn-section" id="limitations">
             <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
             <p class="mn-lead">The cockpit is a <strong>demonstration and engineering-education tool</strong>, not a live SNMP/SIEM feed. Device counts, alarm states, capacity and link traffic are authored network values; IT load is context only. In production these would be replaced by SNMP/streaming telemetry, CMDB and DCIM sources. Key limitations:</p>
-            <ul style="color:var(--mn-muted);font-size:0.88rem;line-height:1.7;padding-left:1.2rem;margin:0;">
+            <ul style="color:var(--mn-muted);font-size:1rem;line-height:1.7;padding-left:1.2rem;margin:0;">
                 <li>Traffic values are authored deterministic scenarios, not measured counters and not derived from IT power. Actual traffic depends on workload mix.</li>
                 <li>The 42 logical access groups per hall do not define physical switch count, port speed, uplink oversubscription, optics or dual-ToR policy.</li>
                 <li>Uptime% is a ratio of authored downtime hours to 8760 — not computed from a real event log or CMDB.</li>

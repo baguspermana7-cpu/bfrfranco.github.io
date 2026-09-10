@@ -33,6 +33,7 @@ test('real DOM fixture: clipped text, prose, gap, missing image and protected co
       #ticker-track { display: inline-block; white-space: nowrap; animation: tick 20s linear infinite; }
       #ellipsised { width: 80px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       #clamped { width: 120px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+      #lazy-below { display: block; width: 100px; height: 100px; margin-top: 1600px; }
       .offcanvas-drawer { position: fixed; top: 0; left: 100%; width: 260px; }
       #stranded { display: inline-block; margin-left: 600px; white-space: nowrap; }
       #srlive { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
@@ -49,6 +50,8 @@ test('real DOM fixture: clipped text, prose, gap, missing image and protected co
       <p id="wash-host">The operator then noticed <span id="highlight-wash">the tinted highlighter run</span> across the sentence.</p>
       <div class="calculator-section"><p id="instrument">This instrument help text has enough words but is not editorial body prose.</p></div>
       <div class="author-bio"><p id="author">This author biography has enough words but is not editorial body prose.</p></div>
+      <div class="rz-cookie-banner"><p id="cookie-line">We use cookies for analytics to improve your experience and to remember your choices.</p></div>
+      <div class="footer-brand"><p class="footer-copyright" id="copyright-line">Copyright 2026 the site owner. All rights reserved, and every trademark stays with its holder.</p></div>
       <div class="water-calculator"><p id="water">This calculator contains a long instrument description and must not be classified as body prose.</p></div>
       <div class="verdict-container"><div class="verdict-box"><p id="computed-verdict">This calculated result describes the selected engineering scenario rather than the article narrative.</p></div></div>
       <div class="reading-note"><p id="editorial-verdict">This editorial verdict remains normal reading prose rather than a calculated instrument result.</p></div>
@@ -65,6 +68,7 @@ test('real DOM fixture: clipped text, prose, gap, missing image and protected co
       <div class="service-row"><span class="revenue-badge rev-high nested-card" id="revenue-status">HIGH</span></div>
       <span class="revenue-badge rev-high nested-card" id="unscoped-badge">Decorative revenue badge</span>
       <img id="broken" src="data:image/png;base64,invalid" width="100" height="100">
+      <img id="lazy-below" loading="lazy" src="https://example.invalid/not-fetched-yet.png" width="100" height="100" alt="a lazy image far below the fold">
       <div class="pill" id="banned">Banned pill</div><div class="aurora-mesh"><div class="pill">Protected aurora</div></div>
       <div class="ticker-wrapper"><div id="ticker-track"><span id="ticker-item">Queued marquee headline waiting off screen to scroll in</span></div></div>
       <div id="ellipsised">A long single line truncated by an authored ellipsis affordance</div>
@@ -82,7 +86,13 @@ test('real DOM fixture: clipped text, prose, gap, missing image and protected co
     assert.ok(findings.some(finding => finding.rule === 'text-overflow' && finding.target === '#clipped'));
     assert.ok(findings.some(finding => finding.rule === 'prose-font-size' && finding.target === '#prose'));
     assert.ok(findings.some(finding => finding.rule === 'large-blank-gap'));
-    assert.ok(findings.some(finding => finding.rule === 'missing-image'));
+    assert.ok(findings.some(finding => finding.rule === 'missing-image' && finding.target === '#broken'),
+      'an image the browser finished with and got nothing from is missing');
+    /* A `loading="lazy"` image below the fold is not loaded BECAUSE IT IS NOT NEEDED YET. Reporting
+       it says the page is broken when the browser is doing exactly what the page asked. All 20
+       findings on articles.html were this, and every one resolved after a scroll. */
+    assert.ok(!findings.some(finding => finding.rule === 'missing-image' && finding.target === '#lazy-below'),
+      'a lazy image below the fold must not be reported as missing');
     assert.equal(findings.filter(finding => finding.rule === 'purple-pill').length, 1);
     assert.ok(measurements.layout.articleStartY > 800);
     assert.equal(measurements.layout.proseBoxes[0].width, 358);
@@ -157,6 +167,13 @@ test('real DOM fixture: clipped text, prose, gap, missing image and protected co
     assert.equal(measurements.roleExclusions.find(element => element.target === '#diagram-caption').context.role, 'caption');
     assert.equal(measurements.roleExclusions.find(element => element.target === '#chart-footnote').context.role, 'instrument');
     assert.ok(findings.some(finding => finding.rule === 'prose-font-size' && finding.target === '#chart-discussion'));
+    /* Site chrome is not reading prose. A cookie-consent sentence and a copyright line appear on
+       EVERY page at their own size on purpose; counting them made every page in the site report a
+       prose-font-size finding it could never legitimately fix. */
+    for (const selector of ['#cookie-line', '#copyright-line']) {
+      assert.ok(!findings.some(finding => finding.rule.startsWith('prose-') && finding.target === selector),
+        `${selector} is site chrome, not body prose`);
+    }
     assert.ok(measurements.elements.some(element => element.target === '#reading-quote' && element.prose));
     assert.ok(!findings.some(finding => finding.rule === 'editorial-translucent-wash' && finding.target === '#revenue-status'));
     assert.ok(findings.some(finding => finding.rule === 'editorial-translucent-wash' && finding.target === '#unscoped-badge'));

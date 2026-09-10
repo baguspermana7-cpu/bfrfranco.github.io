@@ -256,12 +256,17 @@
         /* Worked example */
         .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
         .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
-        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        /* v3.3.x — was 0.88rem. A worked example is READ line by line; it is the densest prose on
+           the page, not a caption, so it gets reading size like the rest of the body. */
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 1rem; }
         .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
 
         /* References */
         .mn-refs { list-style: none; margin: 0; padding: 0; }
-        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        /* v3.3.x — was 0.86rem (13.8px). A citation is read, not skimmed past: the site's editorial
+           stylesheet already sets `.references` p/li at reading size, and this list is the manual's
+           equivalent. */
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 1rem; color: var(--mn-muted); }
         .mn-refs li:last-child { border-bottom: none; }
         .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
 
@@ -491,7 +496,7 @@
         <section class="mn-section">
             <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
             <p class="mn-lead">This comparison is an <strong>editorial pre-design reference</strong>, not an engineering calculation or a project specification. Key assumptions and limitations:</p>
-            <ul style="margin:0.5rem 0 0 1.2rem;line-height:1.7;font-size:0.88rem;color:var(--mn-muted);">
+            <ul style="margin:0.5rem 0 0 1.2rem;line-height:1.7;font-size:1rem;color:var(--mn-muted);">
                 <li>All cost ranges are cited from published industry benchmarks (TechAmerica, JLL, Cushman &amp; Wakefield) indexed to approximate 2022–2023 USD. Construction cost inflation, regional labour differentials, and project-specific scope will move actual costs materially outside these ranges.</li>
                 <li>The 15–20 % cooling efficiency gain assumes a controlled comparison between (a) an unsealed raised-floor plenum with typical aged cable congestion and (b) a slab facility with overhead CRAH delivery and hard cold-aisle containment. Facilities with well-sealed raised floors and blanking panels may show a smaller delta.</li>
                 <li>The worked example in §06 uses midpoint benchmark values and a flat $0.10 / kWh energy tariff. Actual energy pricing varies by region and tariff structure.</li>

@@ -42,7 +42,10 @@ export function collectMeasurements() {
   const protectedSelector = 'svg,canvas,pre,code,[data-rz-diagram],[data-rz-chart],[data-rz-instrument],.aurora-mesh,[class^="aurora-"],[class*=" aurora-"]';
   const instrumentSelector = '[data-rz-cockpit-root],.instrument,.instrument-panel,.calculator,.calculator-section,.calculator-container,.calc-container,.calc-panel,[role="grid"],table';
   const proseSelector = 'article,.article-body,.article-content,.prose,.manual-content,.prd-content,.mn-wrap';
-  const nonProseSelector = 'nav,header,footer,button,aside,.caption,figcaption,.kpi,.metric,.toc,.table-source,.chart-source,.article-disclaimer,.calc-disclaimer,.newsletter-signup,.author-bio,.related-articles';
+  /* Site CHROME is not reading prose. The cookie-consent sentence and the copyright line appear on
+     every page at their own size by design, so counting them made every page report a
+     prose-font-size finding it could never legitimately fix. */
+  const nonProseSelector = 'nav,header,footer,button,aside,.caption,figcaption,.kpi,.metric,.toc,.table-source,.chart-source,.article-disclaimer,.calc-disclaimer,.newsletter-signup,.author-bio,.related-articles,.rz-cookie-banner,.cookie-banner,.footer-brand,.footer-copyright,.footer-legal';
   const contextCache = new WeakMap();
   const roleContext = element => {
     if (contextCache.has(element)) return contextCache.get(element);
@@ -331,8 +334,14 @@ export function collectMeasurements() {
       articleStartY: proseBoxes.length ? Math.min(...proseBoxes.map(box => box.top)) : null,
       proseBoxes, blankGaps },
     bodyTextLength: document.body.innerText.trim().length,
+    /* `deferred` marks an image the browser has not fetched YET because the page told it not to:
+       loading="lazy" and still outside the viewport. That is the page working as written, not a
+       broken image — all 20 findings on articles.html were this, and every one resolved on scroll. */
     images: [...document.images].filter(visible).map(element => ({ target: target(element),
-      src: element.currentSrc || element.src, complete: element.complete, naturalWidth: element.naturalWidth })),
+      src: element.currentSrc || element.src, complete: element.complete, naturalWidth: element.naturalWidth,
+      deferred: element.loading === 'lazy' && !element.complete
+        && (() => { const box = element.getBoundingClientRect();
+          return box.bottom < -200 || box.top > innerHeight + 200; })() })),
     frames: [...document.querySelectorAll('iframe')].filter(visible).map(element => element.src),
     documentOverflow: document.documentElement.scrollWidth > innerWidth + 2 ? document.documentElement.scrollWidth - innerWidth : false };
 }

@@ -76,6 +76,7 @@ export function evaluateMeasurements(measurements) {
     if (!element.protected) for (const rule of element.decoration || []) add(rule, element, element.text);
   }
   for (const image of measurements.images) {
+    if (image.deferred) continue;   /* lazy, below the fold, not fetched yet — see the probe */
     if (!image.complete || image.naturalWidth === 0) add('missing-image', image, image.src);
   }
   const uncontained = measurements.layout?.uncontainedOverflowBoxes;

@@ -676,7 +676,10 @@ def build_html(entries):
     /* Body content */
     .changelog-body {{
       color: #cbd5e1;
-      font-size: 0.92rem;
+      /* v3.3.x — was 0.92rem, which is 14.72px on a phone: the whole public changelog sat below
+         the 16px reading floor (7,722 elements at 390 and 768). This is running prose, so it gets
+         reading size and grows a little on a wide screen rather than shrinking on a narrow one. */
+      font-size: clamp(1rem, .96rem + .12vw, 1.06rem);
       line-height: 1.7;
       /* Entries quote slash-joined identifier runs (a v1.115.x line lists 17 panel names
          joined by "/"), which Chrome offers no break opportunity inside: one line ran past
@@ -863,7 +866,9 @@ def build_html(entries):
     @media (max-width: 768px) {{
       html, body {{ overflow-x: hidden; max-width: 100vw; }}
       img {{ max-width: 100%; height: auto; display: block; }}
-      .changelog-hero {{ padding: 4rem 1rem 2rem !important; }}
+      /* v3.3.x — 4rem is 64px and the wrapped mobile navbar is 93px tall, so "Changelog" sat
+         29px UNDER the fixed nav. Same defect the 18-page sweep at a8d65a9e fixed elsewhere. */
+      .changelog-hero {{ padding: 6.5rem 1rem 2rem !important; }}
       .changelog-hero h1 {{ font-size: clamp(1.8rem, 7vw, 2.5rem) !important; }}
       .changelog-list {{ padding: 0 1rem 3rem !important; }}
       .changelog-entry {{ padding: 1.25rem !important; }}

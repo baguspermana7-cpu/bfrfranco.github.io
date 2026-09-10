@@ -256,12 +256,17 @@
         /* Worked example */
         .mn-worked { background: var(--mn-surface); border: 1px solid var(--mn-border); border-radius: 9px; padding: 1.2rem 1.3rem; }
         .mn-worked ol { margin: 0.4rem 0 0; padding-left: 1.2rem; }
-        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 0.88rem; }
+        /* v3.3.x — was 0.88rem. A worked example is READ line by line; it is the densest prose on
+           the page, not a caption, so it gets reading size like the rest of the body. */
+        .mn-worked li { margin: 0.5rem 0; line-height: 1.55; font-size: 1rem; }
         .mn-worked .mn-result { font-family: var(--mn-mono); color: var(--mn-cyan); }
 
         /* References */
         .mn-refs { list-style: none; margin: 0; padding: 0; }
-        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 0.86rem; color: var(--mn-muted); }
+        /* v3.3.x — was 0.86rem (13.8px). A citation is read, not skimmed past: the site's editorial
+           stylesheet already sets `.references` p/li at reading size, and this list is the manual's
+           equivalent. */
+        .mn-refs li { padding: 0.55rem 0; border-bottom: 1px solid var(--mn-border); font-size: 1rem; color: var(--mn-muted); }
         .mn-refs li:last-child { border-bottom: none; }
         .mn-refs b { color: var(--mn-text); font-family: var(--mn-mono); font-size: 0.8rem; }
 
@@ -491,7 +496,7 @@
         <section class="mn-section">
             <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
             <p class="mn-lead">The comparison page is an editorial summary of industry-sourced ranges. The following boundaries define what it does and does not represent:</p>
-            <ul style="color:var(--mn-muted);font-size:0.88rem;line-height:1.7;padding-left:1.25rem;margin:0 0 0.9rem;">
+            <ul style="color:var(--mn-muted);font-size:1rem;line-height:1.7;padding-left:1.25rem;margin:0 0 0.9rem;">
                 <li><strong style="color:var(--mn-text);">Cited ranges, not prescriptive values.</strong> Every figure is a range from a published source. No single facility is guaranteed to land at any specific point within that range.</li>
                 <li><strong style="color:var(--mn-text);">No user inputs.</strong> The comparison page does not compute site-specific outcomes. It is a reference page, not a calculator.</li>
                 <li><strong style="color:var(--mn-text);">Technology snapshot.</strong> Ranges reflect published data as of 2024–2025. Cooling technology is evolving; specific numbers from next-generation GPU platforms (beyond GB200) may shift the density ceiling upward.</li>
