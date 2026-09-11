@@ -11,6 +11,40 @@ release sections rather than semver.
 
 ---
 
+## v3.6.6 — 2026-09-11
+
+### A diagram is not "fine"; it is fine at a width
+
+Two gates disagreed about the same page. `tools/audit-legibility.mjs --strict` passed 179 pages
+with zero findings while `tools/test-conv-geometry.mjs` reported **944 labels under the 8.5 px
+floor** on `datahallAI.html`. Neither was wrong: **they measure at different widths.** Desktop and
+laptop were clean; tablet and phone were not. Every diagram had correctly applied the scale it was
+told to apply — the instruction was in the wrong unit.
+
+### Fixed
+
+- **`js/rz-svg-legible.js` takes `minWidth`, and it overrides the cap.** `maxScale` is a multiple of
+  the PANE; the floor is an absolute number of pixels. So the multiple a drawing needs grows as the
+  viewport shrinks: the data-hall plan wanted 3.11× at a 1240 px pane, 3.84× at 1004 px and 9.8× on
+  a phone — all three the same ~3,840 px drawing. A cap tuned on a laptop therefore fits exactly one
+  viewport and fails every other, which is precisely the shape of the survey's findings. `minWidth`
+  states the requirement in the unit it is actually in. The cap stays as a guard against a runaway
+  multiplier; the width is the design value.
+- **All fifteen diagrams now carry a measured width**, each taken from the rendered width at which
+  that drawing's smallest label crosses the floor, carried up ~8 % so a rounding difference on
+  another engine does not put it back under.
+- **Five diagrams were registered for the first time** — rack architecture, network fabric, WAN,
+  security zones and the BMS architecture. On a desktop they were always clear, which is why they
+  had never been listed; a 340 px phone pane renders them at 1:1 and their smallest labels land at
+  8 px. Being clear on the machine the author happens to use is not the same as being clear.
+
+Measured after the change at 1680, 1440, 1024 and 360 px, every diagram on the page: **no label
+under the floor, no page overflow, and no diagram whose note reports a shortfall.** Before it, the
+same sweep reported sub-floor labels on nine diagrams at tablet and on fourteen at phone — including
+`electrical overview` at 333 of 333 and the four hall SLDs at 316 of 316 each.
+
+---
+
 ## v3.6.5 — 2026-09-11
 
 ### An argument JavaScript throws away leaves no evidence anywhere

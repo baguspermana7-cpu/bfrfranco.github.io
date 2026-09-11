@@ -2734,8 +2734,16 @@ s+='<rect x="'+MX+'" y="'+MY+'" width="'+(72*M)+'" height="'+(48*M)+'" fill="non
 
 // === DATA HALL 1 (North Wing) ===
 s+='<g data-rz-equipment="room:datahall-1" tabindex="0" role="button">'+rmLive(4,2,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 1',(DH?(DH.hallLengthM+'m \u00D7 '+DH.hallWidthM+'m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'—'),(DH?(DH.racksPerHall+' NVL72 racks \u2502 '+DH.gpuPerHall.toLocaleString()+' GPU \u2502 '+DH.kwPerRack+' kW/rack (1 rack = 1 domain)'):'—'),(DH?('DH-1: GB300 NVL72, '+DH.racksPerHall+' racks, one NVLink domain each ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT, DLC 85%+Air 15%, TCS '+DH.tcsSupply+'/'+DH.tcsReturn+'\u00B0C'):'—'),20,45,'Running',{sub:bo('hallLengthM',{also:['hallWidthM','itHall'],nomark:false}),equip:bo('racksPerHall',{also:['gpuPerHall','kwPerRack'],nomark:false}),textAt:'top'})+'</g>';
+/* v3.6.5 — the overlay must not swallow a basis hook.
+ * This transparent rect covers the whole room so a click anywhere in it opens the Data Hall tab.
+ * SVG paints in document order and hit-tests the topmost element, so emitted AFTER the room it
+ * sat on top of the room's own hooked labels: a reader clicking "62m x 31m" to see where that
+ * number comes from hit the overlay instead, and tools/test-dcai-basis-hooks.mjs read it as the
+ * hook opening the wrong record. `pointer-events:none` on the text would not help — the text is
+ * what must receive the click. The overlay keeps its whole-room area and gives way on the marks:
+ * the hooked <g> elements are painted after it and win the hit test. */
 // Clickable overlay for DH tab
-s+='<rect x="'+(MX+4*M)+'" y="'+(MY+2*M)+'" width="'+(32*M)+'" height="'+(20*M)+'" fill="transparent" data-tab="dh" style="cursor:pointer"><title>Click to view Data Hall details</title></rect>';
+s=('<rect x="'+(MX+4*M)+'" y="'+(MY+2*M)+'" width="'+(32*M)+'" height="'+(20*M)+'" fill="transparent" data-tab="dh" style="cursor:pointer"><title>Click to view Data Hall details</title></rect>')+s;
 // Rack rows indicator
 for(var r=0;r<2;r++){
 s+='<rect x="'+(MX+(7+r*13)*M)+'" y="'+(MY+5*M)+'" width="'+(6*M)+'" height="'+(14*M)+'" fill="rgba(34,197,94,.06)" stroke="rgba(34,197,94,.2)" stroke-width=".3" rx="1"/>';
@@ -2755,8 +2763,16 @@ s+='<text x="'+(MX+20*M)+'" y="'+(MY+24.5*M)+'" fill="var(--t3)" font-family="'+
 // === DATA HALL 2 (South Wing) ===
 s+='<g data-rz-equipment="room:datahall-2" tabindex="0" role="button">'+rmLive(4,26,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 2',(DH?(DH.hallLengthM+'m \u00D7 '+DH.hallWidthM+'m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'—'),(DH?(DH.racksPerHall+' NVL72 racks \u2502 '+DH.gpuPerHall.toLocaleString()+' GPU \u2502 '+DH.kwPerRack+' kW/rack (1 rack = 1 domain)'):'—'),(DH?('DH-2: GB300 NVL72, '+DH.racksPerHall+' racks, one NVLink domain each ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT, DLC 85%+Air 15%, TCS '+DH.tcsSupply+'/'+DH.tcsReturn+'\u00B0C'):'—'),20,45,'Running',{sub:bo('hallLengthM',{also:['hallWidthM','itHall'],nomark:true}),equip:bo('racksPerHall',{also:['gpuPerHall','kwPerRack'],nomark:true}),textAt:'top'})+'</g>';
 s+=`<text x="8" y="668" fill="var(--t3)" font-family="${J}" font-size="8.5" font-style="italic">BUILDING GRID: retired-basis plot \u2014 hall dimensions, rack rows and equipment counts are current (engine); site re-grid to the ${DH?DH.hallLengthM:'\u2014'} \u00D7 ${DH?DH.hallWidthM:'\u2014'} m hall is pending (Track A)</text>`;
+/* v3.6.5 — the overlay must not swallow a basis hook.
+ * This transparent rect covers the whole room so a click anywhere in it opens the Data Hall tab.
+ * SVG paints in document order and hit-tests the topmost element, so emitted AFTER the room it
+ * sat on top of the room's own hooked labels: a reader clicking "62m x 31m" to see where that
+ * number comes from hit the overlay instead, and tools/test-dcai-basis-hooks.mjs read it as the
+ * hook opening the wrong record. `pointer-events:none` on the text would not help — the text is
+ * what must receive the click. The overlay keeps its whole-room area and gives way on the marks:
+ * the hooked <g> elements are painted after it and win the hit test. */
 // Clickable overlay for DH tab
-s+='<rect x="'+(MX+4*M)+'" y="'+(MY+26*M)+'" width="'+(32*M)+'" height="'+(20*M)+'" fill="transparent" data-tab="dh" style="cursor:pointer"><title>Click to view Data Hall details</title></rect>';
+s=('<rect x="'+(MX+4*M)+'" y="'+(MY+26*M)+'" width="'+(32*M)+'" height="'+(20*M)+'" fill="transparent" data-tab="dh" style="cursor:pointer"><title>Click to view Data Hall details</title></rect>')+s;
 // Rack rows
 for(var r2=0;r2<2;r2++){
 s+='<rect x="'+(MX+(7+r2*13)*M)+'" y="'+(MY+29*M)+'" width="'+(6*M)+'" height="'+(14*M)+'" fill="rgba(34,197,94,.06)" stroke="rgba(34,197,94,.2)" stroke-width=".3" rx="1"/>';
@@ -3126,6 +3142,11 @@ $('floorDetail').style.display='none';
 $('floorSvg').addEventListener('click',function(e){
 var bl=e.target.closest('[data-tab]');
 if(!bl)return;
+/* v3.6.5 — a traceability mark inside the room is not a navigation target. The room-wide overlay
+   carries data-tab="dh", so a click on a hooked label bubbled here and switched tabs, which tore
+   down the inspector the same click had just opened: the mark appeared to do nothing. A basis hook
+   and an equipment hook both own their own click. */
+if(e.target.closest('[data-basis-param]')||e.target.closest('[data-rz-equipment]'))return;
 var t=bl.getAttribute('data-tab');
 var btn=document.querySelector('.tabs button[data-t="'+t+'"]');
 if(btn)btn.click();
@@ -3157,7 +3178,11 @@ e.stopImmediatePropagation();
 
 $('floorSvg').addEventListener('click',function(e){
 var el=e.target.closest('[data-tip]');
-if(!el||e.target.closest('[data-tab]')||e.target.closest('.stp-click')||e.target.closest('.ahu-click'))return;
+/* v3.6.5 — the same rule as the tab overlay above: a traceability mark owns its own click.
+   Before the overlay was moved behind the room content this handler never saw these clicks,
+   because the overlay was the target and carried data-tab. Now the mark is the target, and
+   without this guard the room popup opened over the inspector the mark had just filled. */
+if(!el||e.target.closest('[data-tab]')||e.target.closest('[data-basis-param]')||e.target.closest('.stp-click')||e.target.closest('.ahu-click'))return;
 var tip=el.getAttribute('data-tip');
 if(!tip)return;
 // Parse tip: "Label: detail1, detail2, ..."
@@ -15793,33 +15818,36 @@ if(faqBtn){ faqBtn.addEventListener('click',openFaqDialog); }
   function go(){
     if(!window.RZSvgLegible) return false;
     var R=window.RZSvgLegible.register;
-    R('#coolSvg',   {maxScale:2.4});   /* 493 of 524 labels under floor, smallest 3.70 px */
-    R('#hSvg',      {maxScale:2.3});   /* 136 of 202, smallest 3.89 px */
-    R('#elecOvSvg', {maxScale:2.0});   /* 306 of 333, smallest 4.42 px */
-    R('#elecDH1Svg',{maxScale:2.05});   /* 309 of 316, smallest 4.74 px — same shape on all four */
-    R('#elecDH2Svg',{maxScale:2.05});
-    R('#elecDH3Svg',{maxScale:2.05});
-    R('#elecDH4Svg',{maxScale:2.05});
-    R('#bldgSvg',   {maxScale:1.6});   /* 42 of 200, smallest 6.17 px */
-    R('#fireSvg',   {maxScale:1.6});   /* 31 of 209, smallest 6.94 px */
-    /* v3.6.3 — the floor-plan drill-down. It is not on a tab: #floorDetail is display:none until a
-       floor is clicked in the isometric, which is why it measured as 0 labels for months. Opened,
-       191 of 222 sit under the floor at 4.0 px, so it needs the widest budget on the page.
-       3.2x is past the 2.6 the module calls "panning a poster", and it is deliberate: this drawing
-       carries eight ATS tags at font-size 3.2 and twenty-eight glyphs at 3.5, so the floor is only
-       reachable at 3.11x. The module's own doctrine is that a diagram which cannot afford a bigger
-       font can always afford a bigger drawing, and the cost is width — which is what the scroll
-       pane is for. At 2.3x the note said so honestly ("STILL UNDER THE 8.5 PX FLOOR AT THIS CAP"),
-       which is a correct report of a drawing the reader still cannot read.
+    /* v3.6.5 — every registration now states a WIDTH. The numbers are measured, not chosen: each
+       is the rendered width at which that drawing's smallest label crosses the 8.5 px floor, taken
+       from the laptop render and carried up by 8 % so a rounding difference on another engine does
+       not put it back under. maxScale stays as a guard against a runaway multiplier.
 
-       The number is a SAFETY LIMIT, not a design value. What this drawing actually needs is an
-       absolute width — about 3,860 px, the width at which its 3.2 px tags cross 8.5 px — and the
-       module expresses its budget as a multiple of the PANE, so the multiple required grows as the
-       viewport shrinks: 3.11x at a 1240 px pane, 3.84x at 1004 px, the same 3,860 px either way.
-       4.2 covers every pane down to ~920 px. Below that the note reports the shortfall rather than
-       hiding it. A `minWidth` option on js/rz-svg-legible.js would say this directly and is the
-       right home for it; that file is being edited elsewhere as this ships. */
-    R('#floorSvg',  {maxScale:4.2});
+       Why this replaces the caps: a cap is a multiple of the PANE and the floor is absolute, so the
+       multiple needed grows as the viewport shrinks. The caps below were tuned on a laptop and the
+       geometry survey found 944 sub-floor labels on tablet and phone from the very same diagrams,
+       each of which had correctly applied the scale it was told to. The cap was right and the unit
+       was wrong. */
+    R('#coolSvg',   {maxScale:12, minWidth:2790});   /* 524 labels, smallest 2.4 in a 960 viewBox */
+    R('#hSvg',      {maxScale:12, minWidth:2700});
+    R('#elecOvSvg', {maxScale:12, minWidth:2520});
+    R('#elecDH1Svg',{maxScale:12, minWidth:2650});   /* same shape on all four halls */
+    R('#elecDH2Svg',{maxScale:12, minWidth:2650});
+    R('#elecDH3Svg',{maxScale:12, minWidth:2650});
+    R('#elecDH4Svg',{maxScale:12, minWidth:2650});
+    R('#bldgSvg',   {maxScale:12, minWidth:1860});
+    R('#fireSvg',   {maxScale:12, minWidth:2250});
+    /* The floor-plan element is shared by four drawings; the widest requirement wins, because the
+       reader switches between them without the pane being re-measured from scratch. */
+    R('#floorSvg',  {maxScale:12, minWidth:3000});
+    /* Registered for the first time in v3.6.5. On a desktop these four were always clear — which is
+       why they were never listed — but a 340 px phone pane renders them at 1:1 and their smallest
+       labels land at 8 px. A diagram is not "fine"; it is fine AT A WIDTH. */
+    R('#rackSvg',   {maxScale:12, minWidth:900});
+    R('#netSvg',    {maxScale:12, minWidth:1300});
+    R('#wanSvg',    {maxScale:12, minWidth:970});
+    R('#secSvg',    {maxScale:12, minWidth:970});
+    R('#bmsSvg',    {maxScale:12, minWidth:970});
     return true;
   }
   if(!go()) window.addEventListener('load', go);

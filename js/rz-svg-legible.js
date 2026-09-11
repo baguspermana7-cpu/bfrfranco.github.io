@@ -138,6 +138,24 @@
     var want = (floor + 0.15) / smallest;
     var applied = Math.min(Math.max(want, 1), cap);
     var width = Math.round(available * applied);
+
+    /* v3.6.5 — THE BUDGET IS A WIDTH, NOT A MULTIPLE.
+     *
+     * `maxScale` is a multiple of the PANE, and the floor is an absolute number of pixels, so the
+     * multiple a diagram needs grows as the viewport shrinks: the data-hall plan wanted 3.11x at a
+     * 1240 px pane, 3.84x at 1004 px and 9.8x on a phone — all of them the same ~3,840 px drawing.
+     * A cap expressed as a multiple therefore fits one viewport and fails every other, which is
+     * exactly what the survey found: clean on desktop and laptop, 944 sub-floor labels on tablet
+     * and phone, from diagrams whose notes claimed a scale they had indeed applied.
+     *
+     * `minWidth` states the requirement in the units it is actually in. It OVERRIDES the cap, and
+     * it has to: the cap is a guard against a runaway multiplier, while this is the measured width
+     * at which the smallest label in THIS drawing crosses the floor. Where both are set the cap
+     * still bounds anything the measurement did not anticipate. */
+    if (opts.minWidth && width < opts.minWidth) {
+      width = Math.round(opts.minWidth);
+      applied = width / available;
+    }
     svg.style.width = width + 'px';
     svg.style.maxWidth = 'none';
     svg.setAttribute(MARK, applied.toFixed(2));
