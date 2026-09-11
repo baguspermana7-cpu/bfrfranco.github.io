@@ -15734,9 +15734,37 @@ if(faqBtn){ faqBtn.addEventListener('click',openFaqDialog); }
     R('#elecDH4Svg',{maxScale:2.05});
     R('#bldgSvg',   {maxScale:1.6});   /* 42 of 200, smallest 6.17 px */
     R('#fireSvg',   {maxScale:1.6});   /* 31 of 209, smallest 6.94 px */
+    /* v3.6.3 — the floor-plan drill-down. It is not on a tab: #floorDetail is display:none until a
+       floor is clicked in the isometric, which is why it measured as 0 labels for months. Opened,
+       191 of 222 sit under the floor at 4.0 px, so it needs the widest budget on the page. */
+    R('#floorSvg',  {maxScale:2.3});
     return true;
   }
   if(!go()) window.addEventListener('load', go);
+
+  /* v3.6.3 — the scale has to land in the SAME task as the tab flip.
+   *
+   * RZSvgLegible watches for class changes and rescales on a 120 ms debounce, which is right for a
+   * window resize and wrong for a tab click: the panel becomes visible immediately, so for those
+   * 120 ms the reader is looking at the drawing at 1:1 — labels at 5-6 px — and then it jumps.
+   * tools/audit-legibility.mjs measures in exactly that window and reported 130 sub-floor labels on
+   * hSvg and elecOvSvg that a human sees for an eighth of a second and then never again. Both the
+   * flash and the finding are the same defect, and neither is fixed by making the gate wait.
+   *
+   * The tab bars know when a panel has been switched, so they say so instead of being detected.
+   * Bubble phase, on the document: the bar's own handler has already flipped `.on` by the time this
+   * runs, so the pane is measurable and apply() is synchronous against the real layout. The
+   * observer stays as the safety net for every path that is not a click (the ?elec= deep link). */
+  /* #bldgSvg and #floorBack are here for the same reason as the tab bars: clicking a floor opens
+     #floorDetail, and going Back closes it — both are view switches that happen to live inside a
+     drawing rather than on a strip of buttons. */
+  var BARS = '#tabs,#elecTabs,#netTabs,#fireTabs,#bldgSvg,#floorBack';
+  document.addEventListener('click', function(e){
+    if(!window.RZSvgLegible) return;
+    var t = e.target;
+    if(!t || !t.closest || !t.closest(BARS)) return;
+    window.RZSvgLegible.apply();
+  });
 })();
 </script>
 </body></html>

@@ -40,7 +40,8 @@ export const TAB_SETS = Object.freeze({
         subPanelPrefix: 'ep-',
         diagrams: Object.freeze([
             { tab: 'over', selector: '#bldgSvg', label: 'building isometric' },
-            { tab: 'over', selector: '#floorSvg', label: 'floor plan' },
+            { tab: 'over', selector: '#floorSvg', label: 'floor plan',
+              reveal: { click: '#bldgSvg [data-floor]', expect: '#floorDetail' } },
             { tab: 'hall', selector: '#hSvg', label: 'data hall' },
             { tab: 'rack', selector: '#rackSvg', label: 'rack architecture' },
             { tab: 'cool', selector: '#coolSvg', label: 'cooling P&ID' },
@@ -117,6 +118,28 @@ export async function activateTab(page, set, entry) {
             return { ok: true };
         }, { bar: entry.subBar || set.subBar, attr: entry.subAttr || set.subAttr, key: entry.sub, panelId: (entry.subPanelPrefix || set.subPanelPrefix) + entry.sub });
         if (!outcome.ok) throw new Error(`activateTab(${entry.tab}/${entry.sub}): ${outcome.why}`);
+    }
+
+    /* v3.6.3 — RULE 4: A VIEW REACHED BY A CLICK INSIDE A DIAGRAM IS STILL A VIEW.
+       #floorSvg sits in #floorDetail, which is display:none until the reader clicks a floor in the
+       building isometric. It was listed here and measured for months as a 0x0 box with 0 labels —
+       a clean row that meant "never looked". Opened, it carries 191 of 222 labels under the floor,
+       the smallest at 4 px. A drill-down declares how it is reached, and the reveal ASSERTS like
+       every other activation here: a selector that matches nothing, or a container that does not
+       become visible, throws rather than silently measuring the closed state. */
+    if (entry.reveal) {
+        const outcome = await page.evaluate((spec) => {
+            const trigger = document.querySelector(spec.click);
+            if (!trigger) return { ok: false, why: `no reveal trigger ${spec.click}` };
+            trigger.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+            const shown = document.querySelector(spec.expect);
+            if (!shown) return { ok: false, why: `no reveal target ${spec.expect}` };
+            if (getComputedStyle(shown).display === 'none') {
+                return { ok: false, why: `${spec.expect} is still display:none after clicking ${spec.click}` };
+            }
+            return { ok: true };
+        }, entry.reveal);
+        if (!outcome.ok) throw new Error(`activateTab(${entry.tab}/${entry.label || entry.selector}) reveal: ${outcome.why}`);
     }
 
     /* Rule 2 — the diagram must have text with a real box before anything measures it.

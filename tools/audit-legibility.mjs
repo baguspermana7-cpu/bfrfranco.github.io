@@ -151,7 +151,11 @@ try {
                 const seenTabs = new Set();
                 for (const entry of tabSet.diagrams) {
                     if (entry.kind === 'html') continue;                 /* v2.3.0: HTML workstation views carry no SVG labels */
-                    const key = `${entry.tab}/${entry.sub || ''}`;
+                    /* v3.6.3 — a REVEALED view is not the same view as its parent tab. Keyed on
+                       tab/sub alone, #floorSvg collapsed into the same `over/` key as #bldgSvg and
+                       was skipped every run: the drill-down that holds 191 sub-floor labels was
+                       never opened. A reveal earns its own key. */
+                    const key = `${entry.tab}/${entry.sub || ''}/${entry.reveal ? entry.selector : ''}`;
                     if (seenTabs.has(key)) continue;
                     seenTabs.add(key);
                     await activateTab(tab, tabSet, entry);

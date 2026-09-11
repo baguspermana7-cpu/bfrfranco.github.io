@@ -1,0 +1,118 @@
+#!/usr/bin/env node
+/**
+ * A view reached by a click inside a drawing is still a view.
+ *
+ * WHAT WENT WRONG
+ *
+ * `tools/lib/cockpit-tabs.mjs` exists because datahallAI.html's default tab holds no SVG, so the
+ * legibility and geometry gates were measuring an empty panel and reporting clean. That file fixed
+ * the tabs. It did not fix the views that are not on a tab at all.
+ *
+ * `#floorSvg` lives inside `#floorDetail`, which is `display:none` until the reader clicks a floor
+ * in the building isometric. It has been listed in TAB_SETS for months and measured every run as a
+ * 0x0 box holding 0 labels — a clean row that meant "never opened". Opened, it carries **191 of 222
+ * labels under the 8.5 px floor, the smallest at 4.0 px**: the worst single view on the page, hidden
+ * behind the one thing the harness could not do.
+ *
+ * Two failures produced that, and this test pins both:
+ *
+ *   1. A DRILL-DOWN NEEDS A DECLARED WAY IN. `reveal: { click, expect }` says how the view is
+ *      reached, and activateTab performs it. Rule 1 of cockpit-tabs.mjs applies unchanged — ASSERT,
+ *      NEVER ATTEMPT. A trigger selector that matches nothing, or a container that stays
+ *      `display:none` after the click, throws. If it merely returned, the gate would go back to
+ *      measuring the closed state and reporting the same clean zero.
+ *
+ *   2. THE DEDUPE KEY HAS TO KNOW. audit-legibility keyed visited views on `tab/sub`, so #floorSvg
+ *      collapsed into the same `over/` key as #bldgSvg and was skipped before the reveal could even
+ *      run. A revealed view earns its own key.
+ *
+ * Usage: node tools/test-cockpit-reveal.mjs
+ */
+import assert from 'node:assert/strict';
+import http from 'node:http';
+import puppeteer from 'puppeteer';
+import { readFileSync, existsSync } from 'node:fs';
+import { extname, resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { TAB_SETS, activateTab } from './lib/cockpit-tabs.mjs';
+import { primeCockpitAuditDocument, enterAuthorizedAuditState } from './lib/cockpit-audit-state.mjs';
+
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const FLOOR_PX = 8.5;                       /* tools/audit-legibility.mjs MIN_PX */
+const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json',
+  '.svg': 'image/svg+xml', '.png': 'image/png', '.webp': 'image/webp', '.jpg': 'image/jpeg',
+  '.ico': 'image/x-icon', '.woff2': 'font/woff2' };
+
+const server = http.createServer((req, res) => {
+  const path = resolve(ROOT, decodeURIComponent(req.url.split('?')[0]).replace(/^\/+/, ''));
+  if (!path.startsWith(ROOT) || !existsSync(path)) { res.writeHead(404); res.end(); return; }
+  res.writeHead(200, { 'content-type': MIME[extname(path)] || 'application/octet-stream' });
+  res.end(readFileSync(path));
+});
+await new Promise((accept) => server.listen(0, accept));
+const base = `http://127.0.0.1:${server.address().port}`;
+
+const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
+try {
+  const set = TAB_SETS['datahallAI.html'];
+  const floor = set.diagrams.find((d) => d.selector === '#floorSvg');
+  assert.ok(floor, 'TAB_SETS must still list the floor-plan drill-down');
+  assert.ok(floor.reveal && floor.reveal.click && floor.reveal.expect,
+    '#floorSvg is hidden behind a click in the isometric — it must declare reveal:{click,expect}');
+
+  /* The dedupe that skipped it. Keyed on tab/sub alone, #bldgSvg and #floorSvg are one view. */
+  const plain = (e) => `${e.tab}/${e.sub || ''}`;
+  const keyed = (e) => `${e.tab}/${e.sub || ''}/${e.reveal ? e.selector : ''}`;
+  const bldg = set.diagrams.find((d) => d.selector === '#bldgSvg');
+  assert.equal(plain(bldg), plain(floor), 'the two share a tab — that is why the old key collided');
+  assert.notEqual(keyed(bldg), keyed(floor), 'a revealed view must not collide with its parent tab');
+  const gate = readFileSync(resolve(ROOT, 'tools/audit-legibility.mjs'), 'utf8');
+  assert.match(gate, /entry\.reveal \? entry\.selector : ''/,
+    'audit-legibility must key visited views so a revealed one is not skipped');
+
+  const page = await browser.newPage();
+  await page.setViewport({ width: 1680, height: 1050 });
+  await primeCockpitAuditDocument(page, 'dark');
+  await page.goto(`${base}/datahallAI.html`, { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await enterAuthorizedAuditState(page, set.cockpit);
+
+  /* GREEN — the declared reveal opens the drill-down, and what it opens is legible. */
+  await activateTab(page, set, floor);
+  const shown = await page.evaluate(() => {
+    const svg = document.getElementById('floorSvg');
+    let min = Infinity, under = 0, total = 0;
+    for (const node of svg.querySelectorAll('text')) {
+      if (!(node.textContent || '').trim()) continue;
+      const h = node.getBoundingClientRect().height;
+      if (h <= 0) continue;
+      total += 1;
+      if (h < min) min = h;
+      if (h < 8.5) under += 1;
+    }
+    return { display: getComputedStyle(document.getElementById('floorDetail')).display,
+             total, under, min: Number(min.toFixed(2)),
+             scale: svg.getAttribute('data-rz-legible-scale') };
+  });
+  assert.equal(shown.display, 'block', 'the reveal must actually open #floorDetail');
+  assert.ok(shown.total > 100, `the opened floor plan should carry its labels, saw ${shown.total}`);
+  assert.equal(shown.under, 0, `${shown.under} of ${shown.total} floor-plan labels are under ${FLOOR_PX}px`);
+  assert.ok(shown.min >= FLOOR_PX, `smallest floor-plan label is ${shown.min}px`);
+  assert.ok(Number(shown.scale) > 1, 'the drill-down must be registered with RZSvgLegible');
+
+  /* RED — a reveal that cannot be performed must throw. Both halves, because both were possible
+     ways to go on silently measuring a closed panel. */
+  await assert.rejects(
+    () => activateTab(page, set, { ...floor, reveal: { click: '#bldgSvg [data-floor-nope]', expect: '#floorDetail' } }),
+    /no reveal trigger/, 'a reveal whose trigger matches nothing must throw');
+  await assert.rejects(
+    () => activateTab(page, set, { ...floor, reveal: { click: '#bldgSvg [data-floor]', expect: '#rzNoSuchPanel' } }),
+    /no reveal target/, 'a reveal whose target does not exist must throw');
+
+  console.log('── COCKPIT REVEAL ──');
+  console.log(`floor plan opens via ${floor.reveal.click} -> ${floor.reveal.expect}; `
+    + `${shown.total} labels, smallest ${shown.min}px at ${shown.scale}x, none under ${FLOOR_PX}px`);
+  console.log('PASS — the drill-down is reached, is measured, and a reveal that cannot be performed throws.');
+} finally {
+  await browser.close();
+  await new Promise((accept) => server.close(accept));
+}
