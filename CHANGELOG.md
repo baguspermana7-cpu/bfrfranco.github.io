@@ -11,6 +11,68 @@ release sections rather than semver.
 
 ---
 
+## v3.6.3 — 2026-09-11
+
+### A clean row meant "never opened"
+
+`tools/audit-legibility.mjs` reported 130 sub-floor labels on `datahallAI.html`. Neither cause was
+a font size, and chasing them turned up a third defect that no gate had ever been in a position to
+see.
+
+### Fixed
+
+- **A 120 ms race on every tab change.** `RZSvgLegible` rescales on a MutationObserver with a 120 ms
+  debounce — correct for a window resize, wrong for a tab click, because the panel becomes visible
+  immediately. For those 120 ms the reader looks at the drawing at 1:1, labels at 5–6 px, and then
+  it jumps. Measured with no settle delay: `hSvg` 79 of 202 under the floor, `elecOvSvg` 114 of 333;
+  with 600 ms, zero. The fix is not to make the gate wait — the tab bars now say when a panel has
+  switched, calling `RZSvgLegible.apply()` synchronously in bubble phase after `.on` is flipped. The
+  observer stays as the safety net for paths that are not a click.
+- **A drill-down nobody had ever measured.** `#floorSvg` lives in `#floorDetail`, `display:none`
+  until a floor is clicked in the building isometric. It has been listed in `TAB_SETS` for months
+  and measured every run as a 0×0 box holding 0 labels. Opened: **191 of 222 labels under the 8.5 px
+  floor, the smallest at 4.0 px** — the worst single view on the page, behind the one thing the
+  harness could not do. `tools/lib/cockpit-tabs.mjs` gains `reveal: {click, expect}`, performed
+  under that file's own Rule 1 (ASSERT, NEVER ATTEMPT): a trigger matching nothing, or a container
+  still `display:none` after the click, throws rather than measuring the closed state. The
+  visited-view key now includes the reveal, because keyed on `tab/sub` alone `#floorSvg` collided
+  with `#bldgSvg`'s `over/` and was skipped before the reveal could run.
+- **The legibility scaler never worked on a phone — on any diagram.** `datahallAI.html`'s responsive
+  patch carries `svg { max-width: 100% !important }` under 768 px so a wide drawing cannot push the
+  page sideways. That `!important` also beat the inline width the module sets, so **all nine
+  registered diagrams rendered at 1:1 below 768 px**. The floor plan asked for 4.2×, drew 640 px in
+  a 362 px pane, and printed a note naming the scale it had asked for rather than the one it got.
+  The exception is safe for the same reason the clamp exists: a scaled diagram sits in
+  `[data-rz-legible-pane]`, which is `max-width:100%` with `overflow-x:auto`, so the overflow is the
+  pane's and the document never scrolls. Verified across all 15 views at 390, 768 and 1024 —
+  zero page scroll — with `audit-responsive-layout --strict` CLEAN on 160 pages.
+
+### Changed
+
+- **The floor plan's scale budget was the wrong shape.** At `maxScale: 2.3` its smallest label was
+  still 6.4 px at 1440, and the note said so. Raising the cap to 3.2 fixed 1440 and not 1024, which
+  is the tell: the module states its budget as a multiple of the PANE while the 8.5 px floor is
+  absolute, so the multiple needed grows as the viewport shrinks — 3.11× at a 1240 px pane, 3.84× at
+  1004 px, the same ~3,840 px either way. The cap is now 4.2 and documented as a **safety limit, not
+  a design value**; below a ~920 px pane the note reports the shortfall instead of hiding it. A
+  `minWidth` option on `js/rz-svg-legible.js` would state this directly and is where it belongs.
+
+### Added
+
+- **`tools/test-cockpit-reveal.mjs`** — GREEN opens the drill-down and checks the floor; two REDs
+  prove a bad trigger and a missing target each throw; an assertion on the dedupe key stops anyone
+  collapsing a revealed view back into its parent tab; and two more pin both halves of the mobile
+  contract at 390 and 768 (the drawing must widen past its pane, the page must not scroll). Proven
+  RED — with the exception removed it reports *"asked for 2.3x but rendered 374px in a 374px pane"*.
+
+`audit-legibility --strict`: PASS, 179 pages, 130 findings to 0.
+
+**Made visible, not created**: `tools/test-conv-geometry.mjs` now opens the floor plan too, so its
+`datahallAI` monitor goes from ~1,598 to 1,776. Those 178 are label collisions inside that
+drill-down — pre-existing overlaps that were never measured. They stay on the monitor list.
+
+---
+
 ## v3.6.2 — 2026-09-11
 
 ### The footer in dark theme: a ground in the middle, where no ink can reach
