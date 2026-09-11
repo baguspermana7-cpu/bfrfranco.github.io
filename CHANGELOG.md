@@ -11,6 +11,55 @@ release sections rather than semver.
 
 ---
 
+## v3.6.4 — 2026-09-11
+
+### Thirty-nine contrast failures to zero, and the audit that found them is now a gate
+
+`tools/audit-a11y.mjs --strict` reported **39 critical or serious axe violations** across the sampled
+pages in both themes, and it was **not wired into the ship gate** — so nothing was watching it. It is
+wired now, and it reads CLEAN.
+
+| ground | before | cause |
+|---|---:|---|
+| `#64748b` | 12 | the slate token painted as a **surface** |
+| `#0c1117` | 11 | a light-theme accent forced onto a **dark** chip |
+| `#f2e9e3` / `#f8f4f1` / `#f1f5f9` | 15 | the slate token used as **body ink** |
+| `#e6f4f7` | 1 | a cyan chip too light on its own tint |
+
+#### One colour, two opposite mistakes
+
+`#64748b` is a mark colour. Its luminance sits almost exactly in the middle, which makes it the worst
+possible value to get wrong in either direction, and the site managed both:
+
+- **As a ground** it carried dark-theme ink. The author-bio card and the newsletter panel painted
+  it as a surface while their text stayed `#e2e8f0`, `#cbd5e1`, `#94a3b8` and `#60a5fa` — inks
+  chosen for a dark background. Measured 1.85 to 3.86. White ink would have passed at 4.77, but
+  these elements are styled for a dark ground, so the **ground** moved: `rgba(15,23,42,0.8)`, the
+  same dark card surface the article-body catch-all already uses.
+- **As body ink** it sat on warm near-white grounds and reached 3.97 to 4.35 against the 4.5 its
+  sizes require. `#475569` is the same family one step darker and reaches 6.33 to 6.93 on exactly
+  those grounds.
+
+Neither is a token that is wrong; it is a token used where it does not belong. A mid-luminance
+colour cannot be a ground for light ink or ink on a light ground, and no amount of adjusting the
+other side fixes it — one of the two has to leave the middle.
+
+#### The eleven-card failure was a register override
+
+`css/rz-article-dark.css` pushes a readable light-surface amber (`#92400e`) into
+`.article-card-number` whenever the editorial register is on and the theme is light. But that chip
+is a **dark** chip in both themes — `articles.html` paints it `rgba(13,16,20,.72)` — so the override
+put dark amber on a dark ground, once per card, eleven times. The chip now takes only the mono
+family from the register and keeps the light ink its own rule sets.
+
+#### Also
+
+The CTA on article 13 is an `<a>`, so the dark-theme link colour was overriding the white ink its
+own rule sets and landing at 1.87 on a slate ground; its own white reads 4.76 there. Every
+replacement in this release was measured before and after, not chosen by eye.
+
+---
+
 ## v3.6.3 — 2026-09-11
 
 ### A clean row meant "never opened"

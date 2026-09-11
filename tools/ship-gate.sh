@@ -126,6 +126,7 @@ gate "Conventional data hall/ICT — runtime state" node --test tools/test-ict-d
 gate "Conventional ICT — operator architecture" node --test tools/test-ict-operator-architecture.mjs
 gate "DC Design Studio — shared workflow" node tools/test-rz-design-studio.mjs
 gate "Dark coverage — fail-closed confirmation verdict" node --test tools/test-dark-coverage-verdict.mjs
+gate "accessibility — zero critical or serious axe violations, both themes" node tools/audit-a11y.mjs --strict
 
 # Public telemetry documentation is a shipped cockpit contract, not an optional audit.
 gate "telemetry docs — structure, contract links, and sourced-manual preservation" node tools/test-telemetry-docs.mjs

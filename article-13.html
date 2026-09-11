@@ -504,9 +504,12 @@
             font-family: 'JetBrains Mono', monospace;
         }
 
-        .formula-box-title {
+        /* v3.6.3 — #64748b is a MARK colour, not body ink. On the warm near-white grounds these
+   boxes use it reaches 3.97-4.35 against the 4.5 their sizes require. #475569 is the same
+   family one step darker and reaches 6.33-6.93 on the same grounds. */
+.formula-box-title {
             font-weight: 700;
-            color: #64748b;
+            color: #475569;
             margin-bottom: 0.75rem;
             font-family: "IBM Plex Sans", sans-serif;
         }
@@ -865,6 +868,21 @@
         }
         .aig-cta-btn:hover { opacity: 0.9; transform: translateY(-1px); }
 
+        /* v3.6.3 — contrast repairs, each measured rather than guessed.
+           The CTA is an <a>, so the dark-theme link colour (#60a5fa) was overriding the white ink
+           this rule sets and landing at 1.87 on the slate ground. Its own white reads 4.76 there.
+           #64748b as INK is a mark colour: on the warm near-white grounds these blocks use it
+           reaches only 4.34-4.35 against the 4.5 their sizes require; #475569 is the same family
+           one step darker and reaches 6.9 on the same grounds. */
+        [data-theme="dark"] a.aig-cta-btn,
+        [data-theme="dark"] .aig-cta-btn { color: #fff !important; }
+        .code-block .comment,
+        :root:not([data-theme="dark"]) .code-block .comment { color: #475569; }
+        :root:not([data-theme="dark"]) .disc-text a,
+        :root:not([data-theme="dark"]) .disc-fine a,
+        :root:not([data-theme="dark"]) .calc-disclaimer .disc-text a,
+        :root:not([data-theme="dark"]) .calc-disclaimer .disc-fine a { color: #1d4ed8 !important; }
+
         /* Toolbar */
         .aig-toolbar-row {
             display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
@@ -1093,6 +1111,11 @@
 :root:not([data-theme="dark"]) .code-block .variable { color:#0e7490; }
 :root:not([data-theme="dark"]) .formula-box pre span.keyword { color:#be185d; }
 :root:not([data-theme="dark"]) .formula-box pre span.variable { color:#0e7490; }
+/* v3.6.3 — the comment span inside a formula block still inherited the slate mark colour, which
+   reads 4.35 on the #f8f4f1 inset. Same family, one step darker, 6.93 on the same ground. */
+:root:not([data-theme="dark"]) .formula-box pre span.comment,
+:root:not([data-theme="dark"]) .formula-box pre span[style*="#64748b"],
+:root:not([data-theme="dark"]) .formula-box pre .comment { color:#475569 !important; }
 :root:not([data-theme="dark"]){--formula-google:#1d4ed8;--formula-azure:#0369a1;--formula-data:#0e7490;--formula-example:#92400e;}
 [data-theme="dark"]{--formula-google:#93c5fd;--formula-azure:#7dd3fc;--formula-data:#a5f3fc;--formula-example:#fbbf24;}
 .formula-google{color:var(--formula-google);font-weight:600;}
