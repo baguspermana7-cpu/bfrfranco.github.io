@@ -1,4 +1,4 @@
 /* Single source of truth for site version. Bump on every release per VERSIONING_STANDARD.md. */
-window.RZ_VERSION = '3.6.4';
+window.RZ_VERSION = '3.6.5';
 window.RZ_VERSION_DATE = '2026-09-11';
-window.RZ_VERSION_CODENAME = 'A Clean Row Meant Never Opened';
+window.RZ_VERSION_CODENAME = 'An Argument JavaScript Throws Away';

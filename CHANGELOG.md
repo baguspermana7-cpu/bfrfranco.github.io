@@ -11,6 +11,57 @@ release sections rather than semver.
 
 ---
 
+## v3.6.5 — 2026-09-11
+
+### An argument JavaScript throws away leaves no evidence anywhere
+
+The `reveal` step added in v3.6.3 opened the floor-plan drill-down for the first time. This is what
+was behind it.
+
+### Fixed
+
+- **Eleven calls overran their arity and lost their options object.** `rmLive()` takes 14 parameters
+  and `rm()` takes 11; eleven call sites passed **21 and 18** — seven filler zeros and then the
+  options object. JavaScript discards extra arguments silently, so the object never arrived, and
+  what it carried was not decoration: `sub:bo(...)` and `equip:bo(...)`, the basis marks this site
+  treats as mandatory. **Eleven rooms across the floor plans rendered their numbers with no trace of
+  where they came from.** Normalised to the real arity, the marks appear — 12 on the ground floor,
+  13 on level 2, 11 on level 3.
+  - This was also why the first attempt to move a room's name did nothing. The option was correct;
+    it was never delivered. There is no error, no warning and no visible difference to distinguish
+    "the option is wrong" from "the option never arrived" — only the absence of an effect.
+- **Sixty-three label collisions across the four floor plans, from three causes.**
+  1. **A symbol drawn on top of its own tag.** `symFloorGEN(23,3.5)` and
+     `eqLive(21,2,4,3,…,'G1 4MW')` name the SAME point, so the IEC "G in a circle" was painted
+     directly over the tag — six generators, eight transformers. `eq()`/`eqLive()` take
+     `labelBelow`, which puts the tag under the box and leaves the interior to the symbol, the way
+     a floor plan is drawn on paper.
+  2. **A room's name printed through its own contents.** `rm()` centred the name stack vertically,
+     which is exactly where this plan lays out equipment: "MSB-A / ATS-A" over ATS-2A, "Comms Room"
+     over IDF, "Fuel Storage" over T2, "Video wall + Ops" over OPS. `textAt:'top'|'bottom'` stacks
+     the rows from an edge instead. Both stay options — an empty room reads better centred.
+  3. **A frame that stopped at the plan.** The upper floors and the roof draw their dimension
+     strings and stat rows OUTSIDE the plan, which is where dimensions belong on a drawing, but the
+     viewBox ended at the plan — so 32 elements were counted painted past the frame. The margin is
+     part of the drawing; the box now says so.
+
+### Changed
+
+- **`TAB_SETS` lists all four floors, not just the one the first polygon opens.** They share
+  `#floorSvg` and are redrawn per floor, so each is its own view: ground 222 labels, level 2 78,
+  level 3 64, roof 84. Listing one left three as unmeasured as the drill-down itself had been. The
+  visited-view key is now keyed on *how* a view is reached, since all four share a selector.
+
+Measured by `tools/test-conv-geometry.mjs` across all 8 viewport/theme combinations, all four
+floors: **0 collisions, 0 clipped**. The `datahallAI` monitor goes **1,776 → 1,674** (collisions
+846 → 694) *while three new views entered measurement*.
+
+One read count moved with it — `pue.target` on `datahallAI.html`, 91 → 92 — because the restored
+options objects now actually render their basis marks. `test-dcai-parameter-registry` stays green
+(R7 278/278 STRICT, R8 236/278 STRICT).
+
+---
+
 ## v3.6.4 — 2026-09-11
 
 ### Thirty-nine contrast failures to zero, and the audit that found them is now a gate
