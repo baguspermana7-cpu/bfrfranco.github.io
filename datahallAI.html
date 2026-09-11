@@ -2734,16 +2734,8 @@ s+='<rect x="'+MX+'" y="'+MY+'" width="'+(72*M)+'" height="'+(48*M)+'" fill="non
 
 // === DATA HALL 1 (North Wing) ===
 s+='<g data-rz-equipment="room:datahall-1" tabindex="0" role="button">'+rmLive(4,2,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 1',(DH?(DH.hallLengthM+'m \u00D7 '+DH.hallWidthM+'m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'—'),(DH?(DH.racksPerHall+' NVL72 racks \u2502 '+DH.gpuPerHall.toLocaleString()+' GPU \u2502 '+DH.kwPerRack+' kW/rack (1 rack = 1 domain)'):'—'),(DH?('DH-1: GB300 NVL72, '+DH.racksPerHall+' racks, one NVLink domain each ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT, DLC 85%+Air 15%, TCS '+DH.tcsSupply+'/'+DH.tcsReturn+'\u00B0C'):'—'),20,45,'Running',{sub:bo('hallLengthM',{also:['hallWidthM','itHall'],nomark:false}),equip:bo('racksPerHall',{also:['gpuPerHall','kwPerRack'],nomark:false}),textAt:'top'})+'</g>';
-/* v3.6.5 — the overlay must not swallow a basis hook.
- * This transparent rect covers the whole room so a click anywhere in it opens the Data Hall tab.
- * SVG paints in document order and hit-tests the topmost element, so emitted AFTER the room it
- * sat on top of the room's own hooked labels: a reader clicking "62m x 31m" to see where that
- * number comes from hit the overlay instead, and tools/test-dcai-basis-hooks.mjs read it as the
- * hook opening the wrong record. `pointer-events:none` on the text would not help — the text is
- * what must receive the click. The overlay keeps its whole-room area and gives way on the marks:
- * the hooked <g> elements are painted after it and win the hit test. */
 // Clickable overlay for DH tab
-s=('<rect x="'+(MX+4*M)+'" y="'+(MY+2*M)+'" width="'+(32*M)+'" height="'+(20*M)+'" fill="transparent" data-tab="dh" style="cursor:pointer"><title>Click to view Data Hall details</title></rect>')+s;
+s+='<rect x="'+(MX+4*M)+'" y="'+(MY+2*M)+'" width="'+(32*M)+'" height="'+(20*M)+'" fill="transparent" data-tab="dh" style="cursor:pointer"><title>Click to view Data Hall details</title></rect>';
 // Rack rows indicator
 for(var r=0;r<2;r++){
 s+='<rect x="'+(MX+(7+r*13)*M)+'" y="'+(MY+5*M)+'" width="'+(6*M)+'" height="'+(14*M)+'" fill="rgba(34,197,94,.06)" stroke="rgba(34,197,94,.2)" stroke-width=".3" rx="1"/>';
@@ -2763,16 +2755,8 @@ s+='<text x="'+(MX+20*M)+'" y="'+(MY+24.5*M)+'" fill="var(--t3)" font-family="'+
 // === DATA HALL 2 (South Wing) ===
 s+='<g data-rz-equipment="room:datahall-2" tabindex="0" role="button">'+rmLive(4,26,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 2',(DH?(DH.hallLengthM+'m \u00D7 '+DH.hallWidthM+'m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'—'),(DH?(DH.racksPerHall+' NVL72 racks \u2502 '+DH.gpuPerHall.toLocaleString()+' GPU \u2502 '+DH.kwPerRack+' kW/rack (1 rack = 1 domain)'):'—'),(DH?('DH-2: GB300 NVL72, '+DH.racksPerHall+' racks, one NVLink domain each ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT, DLC 85%+Air 15%, TCS '+DH.tcsSupply+'/'+DH.tcsReturn+'\u00B0C'):'—'),20,45,'Running',{sub:bo('hallLengthM',{also:['hallWidthM','itHall'],nomark:true}),equip:bo('racksPerHall',{also:['gpuPerHall','kwPerRack'],nomark:true}),textAt:'top'})+'</g>';
 s+=`<text x="8" y="668" fill="var(--t3)" font-family="${J}" font-size="8.5" font-style="italic">BUILDING GRID: retired-basis plot \u2014 hall dimensions, rack rows and equipment counts are current (engine); site re-grid to the ${DH?DH.hallLengthM:'\u2014'} \u00D7 ${DH?DH.hallWidthM:'\u2014'} m hall is pending (Track A)</text>`;
-/* v3.6.5 — the overlay must not swallow a basis hook.
- * This transparent rect covers the whole room so a click anywhere in it opens the Data Hall tab.
- * SVG paints in document order and hit-tests the topmost element, so emitted AFTER the room it
- * sat on top of the room's own hooked labels: a reader clicking "62m x 31m" to see where that
- * number comes from hit the overlay instead, and tools/test-dcai-basis-hooks.mjs read it as the
- * hook opening the wrong record. `pointer-events:none` on the text would not help — the text is
- * what must receive the click. The overlay keeps its whole-room area and gives way on the marks:
- * the hooked <g> elements are painted after it and win the hit test. */
 // Clickable overlay for DH tab
-s=('<rect x="'+(MX+4*M)+'" y="'+(MY+26*M)+'" width="'+(32*M)+'" height="'+(20*M)+'" fill="transparent" data-tab="dh" style="cursor:pointer"><title>Click to view Data Hall details</title></rect>')+s;
+s+='<rect x="'+(MX+4*M)+'" y="'+(MY+26*M)+'" width="'+(32*M)+'" height="'+(20*M)+'" fill="transparent" data-tab="dh" style="cursor:pointer"><title>Click to view Data Hall details</title></rect>';
 // Rack rows
 for(var r2=0;r2<2;r2++){
 s+='<rect x="'+(MX+(7+r2*13)*M)+'" y="'+(MY+29*M)+'" width="'+(6*M)+'" height="'+(14*M)+'" fill="rgba(34,197,94,.06)" stroke="rgba(34,197,94,.2)" stroke-width=".3" rx="1"/>';
@@ -3143,10 +3127,20 @@ $('floorSvg').addEventListener('click',function(e){
 var bl=e.target.closest('[data-tab]');
 if(!bl)return;
 /* v3.6.5 — a traceability mark inside the room is not a navigation target. The room-wide overlay
-   carries data-tab="dh", so a click on a hooked label bubbled here and switched tabs, which tore
-   down the inspector the same click had just opened: the mark appeared to do nothing. A basis hook
-   and an equipment hook both own their own click. */
+   carries data-tab="dh" and is painted LAST, so it wins the hit test over the room's own hooked
+   labels: clicking "62 m" navigated to the Data Hall tab instead of opening the basis record.
+   Paint order cannot be reversed without killing the overlay itself (the grid and the room fill
+   would then swallow it), so the overlay hit-tests through: it lifts its own pointer-events for
+   one call and forwards the click to the mark under the pointer. A mark or an equipment block
+   that is the direct target owns its click outright. */
 if(e.target.closest('[data-basis-param]')||e.target.closest('[data-rz-equipment]'))return;
+if(bl.hasAttribute('data-tab')&&typeof e.clientX==='number'&&document.elementFromPoint){
+var prevPE=bl.style.pointerEvents;bl.style.pointerEvents='none';
+var under=document.elementFromPoint(e.clientX,e.clientY);
+bl.style.pointerEvents=prevPE;
+var hook=under&&under.closest?under.closest('[data-basis-param],[data-rz-equipment]'):null;
+if(hook&&$('floorSvg').contains(hook)){hook.dispatchEvent(new MouseEvent('click',{bubbles:true,clientX:e.clientX,clientY:e.clientY}));return;}
+}
 var t=bl.getAttribute('data-tab');
 var btn=document.querySelector('.tabs button[data-t="'+t+'"]');
 if(btn)btn.click();
@@ -3179,9 +3173,8 @@ e.stopImmediatePropagation();
 $('floorSvg').addEventListener('click',function(e){
 var el=e.target.closest('[data-tip]');
 /* v3.6.5 — the same rule as the tab overlay above: a traceability mark owns its own click.
-   Before the overlay was moved behind the room content this handler never saw these clicks,
-   because the overlay was the target and carried data-tab. Now the mark is the target, and
-   without this guard the room popup opened over the inspector the mark had just filled. */
+   The overlay forwards a click that lands on a mark, so this handler now does see those clicks,
+   and without this guard the room popup opened over the inspector the mark had just filled. */
 if(!el||e.target.closest('[data-tab]')||e.target.closest('[data-basis-param]')||e.target.closest('.stp-click')||e.target.closest('.ahu-click'))return;
 var tip=el.getAttribute('data-tip');
 if(!tip)return;

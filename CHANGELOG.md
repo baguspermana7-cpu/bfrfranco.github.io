@@ -11,6 +11,34 @@ release sections rather than semver.
 
 ---
 
+## v3.6.7 — 2026-09-11
+
+### The overlay gives way, and a fixture stops counting
+
+Two DC AI cockpit gates went red on `main` when the floor-plan work landed: the floor plans grew
+from one tab entry to four, and nothing that depended on the old shape was told.
+
+### Fixed
+
+- **`datahallAI.html` — the room overlay hit-tests through to a traceability mark.** Each data hall
+  on the floor plans carries a transparent room-wide `<rect data-tab="dh">` so a click anywhere in
+  the room opens the Data Hall tab. SVG hit-tests the topmost painted element, and the overlay is
+  painted last, so it also swallowed the room's own hooked labels: clicking `62 m` to ask where the
+  number comes from navigated away instead of opening the basis record. Paint order cannot simply be
+  reversed — behind the room the grid pattern and the room fill would swallow the overlay in turn, and
+  the navigation affordance would die. The overlay now lifts its own `pointer-events` for one call,
+  reads what is under the pointer, and forwards the click to a `[data-basis-param]` or
+  `[data-rz-equipment]` group when it finds one. `tools/test-dcai-basis-hooks.mjs`: floor level 3
+  FAIL → CLICK-OK, all fifteen hooked diagrams click-verified.
+- **`tools/test-datahall-ai-inspector-runtime.mjs` addresses diagrams by label, not by index.** The
+  floor plan became four entries (ground / level 2 / level 3 / roof) and every `set.diagrams[n]` in
+  the fixture list silently moved one diagram left: the gate looked for a CDU on the level-2 floor
+  plan, found none, and **died on `Cannot read properties of null` instead of reporting a finding** —
+  a crash is not a test result. Named lookups (`data hall`, `rack architecture`, `cooling P&ID`,
+  `DH-01 SLD`) now throw a sentence naming the missing label if the tab set changes again.
+
+---
+
 ## v3.6.6 — 2026-09-11
 
 ### A diagram is not "fine"; it is fine at a width
