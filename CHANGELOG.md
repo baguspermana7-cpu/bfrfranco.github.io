@@ -43,6 +43,14 @@ under the floor, no page overflow, and no diagram whose note reports a shortfall
 same sweep reported sub-floor labels on nine diagrams at tablet and on fourteen at phone — including
 `electrical overview` at 333 of 333 and the four hall SLDs at 316 of 316 each.
 
+**The geometry survey, run after the commit:** `datahallAI` monitor **1,674 → 786**, with
+`G5-illegible` **944 → 0**. Collisions moved the other way, 694 → 746, and the reason is worth
+stating rather than smoothing over: the overlap tolerance is an absolute number of rendered pixels,
+so a pair of labels that genuinely overlapped by a fraction of a pixel in a drawing rendered at 1:1
+crosses the threshold once the same drawing is rendered three times larger. Those 52 are not new
+defects — they are the same defect the floor exposed, measured at a size where it counts. The
+building isometric on a phone went from 100 reported collisions to 120 for exactly this reason.
+
 ---
 
 ## v3.6.5 — 2026-09-11
