@@ -40,8 +40,19 @@ export const TAB_SETS = Object.freeze({
         subPanelPrefix: 'ep-',
         diagrams: Object.freeze([
             { tab: 'over', selector: '#bldgSvg', label: 'building isometric' },
-            { tab: 'over', selector: '#floorSvg', label: 'floor plan',
-              reveal: { click: '#bldgSvg [data-floor]', expect: '#floorDetail' } },
+            /* v3.6.3 — all FOUR floors, not just the one the first polygon opens. They share
+               #floorSvg and are redrawn per floor, so each is its own view with its own labels:
+               the ground floor carries 222, floor 2 78, floor 3 64 and the roof 84. Listing only
+               the first meant three of them stayed exactly as unmeasured as the drill-down itself
+               had been. */
+            { tab: 'over', selector: '#floorSvg', label: 'floor plan — ground',
+              reveal: { click: '#bldgSvg [data-floor="gf"]', expect: '#floorDetail' } },
+            { tab: 'over', selector: '#floorSvg', label: 'floor plan — level 2',
+              reveal: { click: '#bldgSvg [data-floor="f2"]', expect: '#floorDetail' } },
+            { tab: 'over', selector: '#floorSvg', label: 'floor plan — level 3',
+              reveal: { click: '#bldgSvg [data-floor="f3"]', expect: '#floorDetail' } },
+            { tab: 'over', selector: '#floorSvg', label: 'floor plan — roof',
+              reveal: { click: '#bldgSvg [data-floor="roof"]', expect: '#floorDetail' } },
             { tab: 'hall', selector: '#hSvg', label: 'data hall' },
             { tab: 'rack', selector: '#rackSvg', label: 'rack architecture' },
             { tab: 'cool', selector: '#coolSvg', label: 'cooling P&ID' },

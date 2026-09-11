@@ -55,19 +55,22 @@ const base = `http://127.0.0.1:${server.address().port}`;
 const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
 try {
   const set = TAB_SETS['datahallAI.html'];
-  const floor = set.diagrams.find((d) => d.selector === '#floorSvg');
-  assert.ok(floor, 'TAB_SETS must still list the floor-plan drill-down');
+  const floors = set.diagrams.filter((d) => d.selector === '#floorSvg');
+  assert.equal(floors.length, 4, 'the building has four floor views and each is its own drill-down');
+  const floor = floors[0];
   assert.ok(floor.reveal && floor.reveal.click && floor.reveal.expect,
     '#floorSvg is hidden behind a click in the isometric — it must declare reveal:{click,expect}');
 
   /* The dedupe that skipped it. Keyed on tab/sub alone, #bldgSvg and #floorSvg are one view. */
   const plain = (e) => `${e.tab}/${e.sub || ''}`;
-  const keyed = (e) => `${e.tab}/${e.sub || ''}/${e.reveal ? e.selector : ''}`;
+  const keyed = (e) => `${e.tab}/${e.sub || ''}/${e.reveal ? e.reveal.click : ''}`;
   const bldg = set.diagrams.find((d) => d.selector === '#bldgSvg');
   assert.equal(plain(bldg), plain(floor), 'the two share a tab — that is why the old key collided');
   assert.notEqual(keyed(bldg), keyed(floor), 'a revealed view must not collide with its parent tab');
   const gate = readFileSync(resolve(ROOT, 'tools/audit-legibility.mjs'), 'utf8');
-  assert.match(gate, /entry\.reveal \? entry\.selector : ''/,
+  assert.equal(new Set(floors.map(keyed)).size, 4,
+    'the four floors share #floorSvg, so the key has to separate them by how each is reached');
+  assert.match(gate, /entry\.reveal \? entry\.reveal\.click : ''/,
     'audit-legibility must key visited views so a revealed one is not skipped');
 
   const page = await browser.newPage();

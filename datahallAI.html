@@ -2249,14 +2249,52 @@ var MX=48,MY=20; // offset
 function rm(x,y,w,h,fill,stroke,label,sub,equip,tip,o){
 var px=MX+x*M,py=MY+y*M,pw=w*M,ph=h*M;o=o||{};
 var s='<rect x="'+px+'" y="'+py+'" width="'+pw+'" height="'+ph+'" fill="'+fill+'" stroke="'+stroke+'" stroke-width="1" rx="2"'+(tip?' data-tip="'+escT(tip)+'"':'')+'/>';
-if(label){
-var fs=Math.min(9,Math.max(6,pw/label.length*1.2));
-s+='<text x="'+(px+pw/2)+'" y="'+(py+ph/2-(sub?4:0))+'" fill="var(--t1)" font-family="'+J+'" font-size="'+fs+'" font-weight="700" text-anchor="middle">'+label+'</text>';
+/* v3.6.3 — where the room's name stack sits.
+ *
+ * The default is the vertical centre, which is also where this plan lays out the equipment inside
+ * a room, so a room with kit in it printed its name straight through that kit: "MSB-A / ATS-A" over
+ * ATS-2A and ATS-3A, "Comms Room" over IDF, "Fuel Storage" over T2, "Video wall + Ops" over OPS.
+ * Thirteen of those, and all of them invisible until the drill-down they live in was first opened.
+ *
+ * `textAt:'bottom'` stacks the three rows upward from the room's bottom edge instead, which is
+ * where a draughtsman puts a room name when the middle is occupied. It is an option, not the new
+ * default: an empty room reads better with its name centred, and moving every room's text would
+ * trade these overlaps for new ones against the rooms below. */
+var rows=[];
+if(label){ rows.push({txt:label,fs:Math.min(9,Math.max(6,pw/label.length*1.2)),col:'var(--t1)',bold:1}); }
+if(sub){ rows.push({txt:sub,fs:6,col:'var(--t3)',o:o.sub||(o.subBasis?{basis:o.subBasis}:o.subDeclared?{declared:o.subDeclared}:null)}); }
+if(equip){ rows.push({txt:equip,fs:5.5,col:'var(--t2)',o:o.equip||(o.equipBasis?{basis:o.equipBasis}:o.equipDeclared?{declared:o.equipDeclared}:null)}); }
+var bottom=(o.textAt==='bottom');   /* 'top' is the mirror, for a room whose kit sits low */
+for(var ri=0;ri<rows.length;ri++){
+  var r=rows[ri];
+  var ry = bottom
+    ? (py+ph-5-(rows.length-1-ri)*9)
+    : (o.textAt==='top')
+      ? (py+12+ri*9)
+      : (ri===0 ? (py+ph/2-(sub?4:0)) : ri===1 ? (py+ph/2+8) : (py+ph/2+(sub?18:10)));
+  if(r.bold){
+    s+='<text x="'+(px+pw/2)+'" y="'+ry+'" fill="'+r.col+'" font-family="'+J+'" font-size="'+r.fs+'" font-weight="700" text-anchor="middle">'+r.txt+'</text>';
+  } else {
+    s+=tx2(px+pw/2,ry,r.txt,r.col,r.fs,'middle',0,r.o);
+  }
 }
-if(sub){s+=tx2(px+pw/2,py+ph/2+8,sub,'var(--t3)',6,'middle',0,o.sub||(o.subBasis?{basis:o.subBasis}:o.subDeclared?{declared:o.subDeclared}:null));}
-if(equip){s+=tx2(px+pw/2,py+ph/2+(sub?18:10),equip,'var(--t2)',5.5,'middle',0,o.equip||(o.equipBasis?{basis:o.equipBasis}:o.equipDeclared?{declared:o.equipDeclared}:null));}
 return s;
 }
+
+/* v3.6.3 — where an equipment tag sits.
+ *
+ * The default is the box centre, which is right for a box that holds nothing else. It is wrong for
+ * the ones a symFloor* symbol is drawn over: symFloorGEN(23,3.5) and eqLive(21,2,4,3,...,'G1 4MW')
+ * name the SAME point, so the IEC "G in a circle" was rendered directly on top of the tag — not a
+ * near miss, two marks in one place. The geometry survey counted 14 of those on the floor plan
+ * (six generators, eight transformers) and they had never been looked at, because the drill-down
+ * they live in was never opened.
+ *
+ * `labelBelow` puts the tag under the box and leaves the interior to the symbol, which is how a
+ * floor plan is drawn on paper. It is an option rather than the default because most equipment
+ * boxes here carry no symbol, and moving every tag would trade these collisions for new ones
+ * against whatever sits below. */
+function labelY(py,ph,o){ return (o && o.labelBelow) ? (py+ph+5) : (py+ph/2+2); }
 
 // Equipment symbol — small labeled rect (optional data-tip for click tooltip)
 function escT(t){return t.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -2264,7 +2302,7 @@ function eq(x,y,w,h,fill,label,sz,tip,o){
 var px=MX+x*M,py=MY+y*M,pw=w*M,ph=h*M;
 var s='';if(tip)s+='<g data-tip="'+escT(tip)+'" style="cursor:pointer">';
 s+='<rect x="'+px+'" y="'+py+'" width="'+pw+'" height="'+ph+'" fill="'+fill+'" stroke="rgba(255,255,255,.2)" stroke-width=".5" rx="1"/>';
-if(label){s+=tx2(px+pw/2,py+ph/2+2,label,'var(--t1)',sz||5,'middle',0,o);}
+if(label){s+=tx2(px+pw/2,labelY(py,ph,o),label,'var(--t1)',sz||5,'middle',0,o);}
 if(tip)s+='</g>';
 return s;
 }
@@ -2291,7 +2329,7 @@ function eqLive(x,y,w,h,fill,label,sz,status,tip,o){
 var px=MX+x*M,py=MY+y*M,pw=w*M,ph=h*M;
 var s='';if(tip)s+='<g data-tip="'+escT(tip)+'" style="cursor:pointer">';
 s+='<rect x="'+px+'" y="'+py+'" width="'+pw+'" height="'+ph+'" fill="'+fill+'" stroke="rgba(255,255,255,.2)" stroke-width=".5" rx="1"/>';
-if(label){s+=tx2(px+pw/2,py+ph/2+2,label,'var(--t1)',sz||5,'middle',0,o);}
+if(label){s+=tx2(px+pw/2,labelY(py,ph,o),label,'var(--t1)',sz||5,'middle',0,o);}
 var stColor=status==='running'?'var(--g)':status==='standby'?'var(--o)':status==='alarm'?'var(--r)':'var(--t3)';
 var pulse=(status==='running'||status==='alarm');
 s+='<circle cx="'+(px+pw-4)+'" cy="'+(py+4)+'" r="2" fill="'+stColor+'"';
@@ -2379,25 +2417,25 @@ s+=eq(1,2,3,2,'rgba(120,113,108,.15)','Dock',4,'Loading Platform: 3m\u00D72m, 12
 s+=eq(5,2,3,2,'rgba(120,113,108,.15)','Lift',4,'Freight Lift: 2000kg capacity, 3.5\u00D72.5m car, hydraulic, 4-stop');
 
 // Fire Suppression Storage
-s+=rm(10,0,10,10,'rgba(239,68,68,.1)','rgba(239,68,68,.35)','Fire Supp.','10m\u00D710m','Clean agent (pending)','Fire Suppression: 4\u00D7 180L clean-agent (selection pending) — formerly Novec 1230 42bar N\u2082, manifold, pipe network');
+s+=rm(10,0,10,10,'rgba(239,68,68,.1)','rgba(239,68,68,.35)','Fire Supp.','10m\u00D710m','Clean agent (pending)','Fire Suppression: 4\u00D7 180L clean-agent (selection pending) — formerly Novec 1230 42bar N\u2082, manifold, pipe network',{textAt:'bottom'});
 s+=eq(11,2,2,1.8,'rgba(239,68,68,.15)','N1',3.5,'Clean-agent cylinder N1 (selection pending): 180L @ 42bar N\u2082, 500\u00D7500\u00D71800mm, auto/manual discharge, \u2192 Fire Tab');
 s+=eq(14,2,2,1.8,'rgba(239,68,68,.15)','N2',3.5,'Clean-agent cylinder N2 (selection pending): 180L @ 42bar N\u2082, 500\u00D7500\u00D71800mm, auto/manual discharge, \u2192 Fire Tab');
 s+=eq(11,5,2,1.8,'rgba(239,68,68,.15)','N3',3.5,'Clean-agent cylinder N3 (selection pending): 180L @ 42bar N\u2082, 500\u00D7500\u00D71800mm, auto/manual discharge, \u2192 Fire Tab');
 s+=eq(14,5,2,1.8,'rgba(239,68,68,.15)','N4',3.5,'Clean-agent cylinder N4 (selection pending): 180L @ 42bar N\u2082, 500\u00D7500\u00D71800mm, auto/manual discharge, \u2192 Fire Tab');
 
 // Generator Room — facility genset pool from the engine: unit MW, duty + standby, redundancy (DHE); six representative glyphs
-s+=rmLive(20,0,30,10,'rgba(59,130,246,.1)','rgba(59,130,246,.4)','Generator Room','30m\u00D710m',(DH?(DH.gensetFacNplus1+'\u00D7 '+DH.gensetMW+' MW '+DH.gensetRedundancy+' (facility)'):'—'),(DH?('Generator: '+DH.gensetFacNplus1+'\u00D7 '+DH.gensetMW+' MW class MV diesel ('+DH.gensetKW+' kW), facility pool: '+DH.gensetFacN+' duty + '+(DH.gensetFacNplus1-DH.gensetFacN)+' standby, '+DH.gensetRedundancy+' \u2014 6 of '+DH.gensetFacNplus1+' shown'+DH.gensetMW+'MW (2,500-2,750 ekW @60Hz), <10s start, '+DH.gensetFacN+' running + 1 standby (N+1) for '+DH.facTotalMW+' MW facility, 48hr fuel'):'—'),28,null,'Running',0,0,0,0,0,0,0,{equip:bo('gensetFacNplus1',{also:['gensetMW']})});
-s+=eqLive(21,2,4,3,'rgba(59,130,246,.18)',(DH?('G1 '+DH.gensetMW+'MW'):'—'),4,'running','Generator G1: '+(DH?DH.gensetMW:'—')+' MW class MV diesel ('+(DH?DH.gensetKW:'—')+' kW), facility pool, Status: RUNNING, \u2192 Electrical Tab');
+s+=rmLive(20,0,30,10,'rgba(59,130,246,.1)','rgba(59,130,246,.4)','Generator Room','30m\u00D710m',(DH?(DH.gensetFacNplus1+'\u00D7 '+DH.gensetMW+' MW '+DH.gensetRedundancy+' (facility)'):'—'),(DH?('Generator: '+DH.gensetFacNplus1+'\u00D7 '+DH.gensetMW+' MW class MV diesel ('+DH.gensetKW+' kW), facility pool: '+DH.gensetFacN+' duty + '+(DH.gensetFacNplus1-DH.gensetFacN)+' standby, '+DH.gensetRedundancy+' \u2014 6 of '+DH.gensetFacNplus1+' shown'+DH.gensetMW+'MW (2,500-2,750 ekW @60Hz), <10s start, '+DH.gensetFacN+' running + 1 standby (N+1) for '+DH.facTotalMW+' MW facility, 48hr fuel'):'—'),28,null,'Running',{equip:bo('gensetFacNplus1',{also:['gensetMW']})});
+s+=eqLive(21,2,4,3,'rgba(59,130,246,.18)',(DH?('G1 '+DH.gensetMW+'MW'):'—'),4,'running','Generator G1: '+(DH?DH.gensetMW:'—')+' MW class MV diesel ('+(DH?DH.gensetKW:'—')+' kW), facility pool, Status: RUNNING, \u2192 Electrical Tab',{labelBelow:1});
 s+=symFloorGEN(23,3.5);
-s+=eqLive(25.8,2,4,3,'rgba(59,130,246,.18)',(DH?('G2 '+DH.gensetMW+'MW'):'—'),4,'running','Generator G2: '+(DH?DH.gensetMW:'—')+' MW class MV diesel ('+(DH?DH.gensetKW:'—')+' kW), facility pool, Status: RUNNING, \u2192 Electrical Tab');
+s+=eqLive(25.8,2,4,3,'rgba(59,130,246,.18)',(DH?('G2 '+DH.gensetMW+'MW'):'—'),4,'running','Generator G2: '+(DH?DH.gensetMW:'—')+' MW class MV diesel ('+(DH?DH.gensetKW:'—')+' kW), facility pool, Status: RUNNING, \u2192 Electrical Tab',{labelBelow:1});
 s+=symFloorGEN(27.8,3.5);
-s+=eqLive(30.6,2,4,3,'rgba(59,130,246,.18)',(DH?('G3 '+DH.gensetMW+'MW'):'—'),4,'running','Generator G3: '+(DH?DH.gensetMW:'—')+' MW class MV diesel ('+(DH?DH.gensetKW:'—')+' kW), facility pool, Status: RUNNING, \u2192 Electrical Tab');
+s+=eqLive(30.6,2,4,3,'rgba(59,130,246,.18)',(DH?('G3 '+DH.gensetMW+'MW'):'—'),4,'running','Generator G3: '+(DH?DH.gensetMW:'—')+' MW class MV diesel ('+(DH?DH.gensetKW:'—')+' kW), facility pool, Status: RUNNING, \u2192 Electrical Tab',{labelBelow:1});
 s+=symFloorGEN(32.6,3.5);
-s+=eqLive(35.4,2,4,3,'rgba(59,130,246,.18)',(DH?('G4 '+DH.gensetMW+'MW'):'—'),4,'running','Generator G4: '+(DH?DH.gensetMW:'—')+' MW class MV diesel ('+(DH?DH.gensetKW:'—')+' kW), facility pool, Status: RUNNING, \u2192 Electrical Tab');
+s+=eqLive(35.4,2,4,3,'rgba(59,130,246,.18)',(DH?('G4 '+DH.gensetMW+'MW'):'—'),4,'running','Generator G4: '+(DH?DH.gensetMW:'—')+' MW class MV diesel ('+(DH?DH.gensetKW:'—')+' kW), facility pool, Status: RUNNING, \u2192 Electrical Tab',{labelBelow:1});
 s+=symFloorGEN(37.4,3.5);
-s+=eqLive(40.2,2,4,3,'rgba(59,130,246,.18)',(DH?('G5 '+DH.gensetMW+'MW'):'—'),4,'running','Generator G5: '+(DH?DH.gensetMW:'—')+' MW class MV diesel ('+(DH?DH.gensetKW:'—')+' kW), facility pool, Status: RUNNING, \u2192 Electrical Tab');
+s+=eqLive(40.2,2,4,3,'rgba(59,130,246,.18)',(DH?('G5 '+DH.gensetMW+'MW'):'—'),4,'running','Generator G5: '+(DH?DH.gensetMW:'—')+' MW class MV diesel ('+(DH?DH.gensetKW:'—')+' kW), facility pool, Status: RUNNING, \u2192 Electrical Tab',{labelBelow:1});
 s+=symFloorGEN(42.2,3.5);
-s+=eqLive(45,2,4,3,'rgba(59,130,246,.18)','G6 STBY',4,'standby','Generator G6 (standby unit of the '+(DH?DH.gensetRedundancy:'—')+' pool): '+(DH?DH.gensetMW:'—')+' MW class MV diesel, Status: STANDBY (Reserve), \u2192 Electrical Tab');
+s+=eqLive(45,2,4,3,'rgba(59,130,246,.18)','G6 STBY',4,'standby','Generator G6 (standby unit of the '+(DH?DH.gensetRedundancy:'—')+' pool): '+(DH?DH.gensetMW:'—')+' MW class MV diesel, Status: STANDBY (Reserve), \u2192 Electrical Tab',{labelBelow:1});
 s+=symFloorGEN(47,3.5);
 // Day tanks (6× matching generators)
 s+=eq(21,6.5,3.5,2,'rgba(245,158,11,.15)','DT-1',3.5,'Day Tank DT-1: 2000L diesel, 1200\u00D7800\u00D71000mm, auto-fill from Fuel Farm, level sensor, 4hr@50% load');
@@ -2408,9 +2446,9 @@ s+=eq(40.2,6.5,3.5,2,'rgba(245,158,11,.15)','DT-5',3.5,'Day Tank DT-5: 2000L die
 s+=eq(45,6.5,3.5,2,'rgba(245,158,11,.15)','DT-6',3.5,'Day Tank DT-6: 2000L diesel, 1200\u00D7800\u00D71000mm, auto-fill from Fuel Farm, level sensor, 4hr@50% load');
 
 // Fuel Storage
-s+=rm(50,0,12,10,'rgba(245,158,11,.08)','rgba(245,158,11,.3)','Fuel Storage','12m\u00D710m','4\u00D7 20,000L diesel','Fuel Storage: 4\u00D7 20,000L diesel, bunded, leak detection, 48hr autonomy',0,0,0,0,0,0,0,{equipDeclared:'bulk fuel storage (4 x 20,000 L, 48 h autonomy) is a page-authored design selection, not an engine quantity'});
-s+=eq(51,3,4,3,'rgba(245,158,11,.12)','T1',4,'Bulk Tank T1: 20000L diesel, 2400\u00D72400\u00D74000mm, double-wall steel, leak detection, bunded 110%, \u2192 Electrical Tab');
-s+=eq(56,3,4,3,'rgba(245,158,11,.12)','T2',4,'Bulk Tank T2: 20000L diesel, 2400\u00D72400\u00D74000mm, double-wall steel, leak detection, bunded 110%, \u2192 Electrical Tab');
+s+=rm(50,0,12,10,'rgba(245,158,11,.08)','rgba(245,158,11,.3)','Fuel Storage','12m\u00D710m','4\u00D7 20,000L diesel','Fuel Storage: 4\u00D7 20,000L diesel, bunded, leak detection, 48hr autonomy',{equipDeclared:'bulk fuel storage (4 x 20,000 L, 48 h autonomy) is a page-authored design selection, not an engine quantity',textAt:'top'});
+s+=eq(51,6,4,3,'rgba(245,158,11,.12)','T1',4,'Bulk Tank T1: 20000L diesel, 2400\u00D72400\u00D74000mm, double-wall steel, leak detection, bunded 110%, \u2192 Electrical Tab');
+s+=eq(56,6,4,3,'rgba(245,158,11,.12)','T2',4,'Bulk Tank T2: 20000L diesel, 2400\u00D72400\u00D74000mm, double-wall steel, leak detection, bunded 110%, \u2192 Electrical Tab');
 
 // WTP
 s+=rm(62,0,10,10,'rgba(6,182,212,.12)','rgba(6,182,212,.4)','WTP','10m\u00D710m','RO + DI Polisher','WTP: 10m\u00D710m, RO system 5m\u00B3/hr, DI polisher <5\u00B5S/cm, dosing');
@@ -2427,19 +2465,19 @@ s+='<text x="'+(MX+BW/2)+'" y="'+(MY+11.2*M)+'" fill="var(--t3)" font-family="'+
 s+='<text x="'+(MX+BW/2)+'" y="'+(MY+11.5*M+4)+'" fill="var(--o)" font-family="'+J+'" font-size="5" text-anchor="middle" opacity=".4">SYMMETRIC ELECTRICAL ZONE \u2014 Feed A (West) | Feed B (East)</text>';
 
 // TX-A Room (left — Feed A) — engine-derived TX MVA
-s+=rmLive(0,12,16,12,'rgba(245,158,11,.12)','rgba(245,158,11,.4)','TX-A Room','16m\u00D712m',(DH?(DH.txPerFeedHall+'\u00D7 TX '+DH.txRatingMVA+'MVA'):'—'),(DH?('Transformer A: '+DH.txPerFeedHall+'\u00D7 cast-resin '+DH.txRatingMVA+'MVA, 20kV\u2192400V, \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%'):'—'),35,null,'Normal',0,0,0,0,0,0,0,{equip:bo('txPerFeedHall',{also:['txRatingMVA'],nomark:false})});
-s+=eqLive(1.5,13.5,5,3.5,'rgba(245,158,11,.2)','TX-1A',4.5,'running',(DH?('Transformer TX-1A: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'—')+'\u2192 Electrical Tab');
+s+=rmLive(0,12,16,12,'rgba(245,158,11,.12)','rgba(245,158,11,.4)','TX-A Room','16m\u00D712m',(DH?(DH.txPerFeedHall+'\u00D7 TX '+DH.txRatingMVA+'MVA'):'—'),(DH?('Transformer A: '+DH.txPerFeedHall+'\u00D7 cast-resin '+DH.txRatingMVA+'MVA, 20kV\u2192400V, \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%'):'—'),35,null,'Normal',{equip:bo('txPerFeedHall',{also:['txRatingMVA'],nomark:false})});
+s+=eqLive(1.5,13.5,5,3.5,'rgba(245,158,11,.2)','TX-1A',4.5,'running',(DH?('Transformer TX-1A: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'—')+'\u2192 Electrical Tab',{labelBelow:1});
 s+=symFloorTX(4,15.2);
-s+=eqLive(8.5,13.5,5,3.5,'rgba(245,158,11,.2)','TX-2A',4.5,'running',(DH?('Transformer TX-2A: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'—')+'\u2192 Electrical Tab');
+s+=eqLive(8.5,13.5,5,3.5,'rgba(245,158,11,.2)','TX-2A',4.5,'running',(DH?('Transformer TX-2A: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'—')+'\u2192 Electrical Tab',{labelBelow:1});
 s+=symFloorTX(11,15.2);
-s+=eqLive(1.5,18.5,5,3.5,'rgba(245,158,11,.2)','TX-3A',4.5,'running',(DH?('Transformer TX-3A: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'—')+'\u2192 Electrical Tab');
+s+=eqLive(1.5,18.5,5,3.5,'rgba(245,158,11,.2)','TX-3A',4.5,'running',(DH?('Transformer TX-3A: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'—')+'\u2192 Electrical Tab',{labelBelow:1});
 s+=symFloorTX(4,20.2);
-s+=eqLive(8.5,18.5,5,3.5,'rgba(245,158,11,.2)','TX-4A',4.5,'running',(DH?('Transformer TX-4A: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'—')+'\u2192 Electrical Tab');
+s+=eqLive(8.5,18.5,5,3.5,'rgba(245,158,11,.2)','TX-4A',4.5,'running',(DH?('Transformer TX-4A: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'—')+'\u2192 Electrical Tab',{labelBelow:1});
 s+=symFloorTX(11,20.2);
 s+='<text x="'+(MX+8*M)+'" y="'+(MY+23*M)+'" fill="var(--o)" font-family="'+J+'" font-size="5" text-anchor="middle" opacity=".6">20kV/0.4kV | '+(DH?DH.txRatingMVA:null)+'MVA each | 4 units</text>';
 
 // MSB-A / ATS-A (Feed A) — 2× MSB + 4× ATS
-s+=rmLive(16,12,14,12,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','MSB-A / ATS-A','14m\u00D712m','2\u00D7 MSB + 4\u00D7 ATS','MSB-A: LV switchboard '+(DH?DH.buswayAFmt:'—')+' A trunk class, 4\u00D7 ATS, <100ms transfer',null,null,'Normal');
+s+=rmLive(16,12,14,12,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','MSB-A / ATS-A','14m\u00D712m','2\u00D7 MSB + 4\u00D7 ATS','MSB-A: LV switchboard '+(DH?DH.buswayAFmt:'—')+' A trunk class, 4\u00D7 ATS, <100ms transfer',null,null,'Normal',{textAt:'bottom'});
 s+=eq(17,13.5,5,2.5,'rgba(245,158,11,.15)','MSB-1A',4,'MSB-1A: LV switchboard '+(DH?DH.buswayAFmt:'—')+' A class, Form 4b, 2200\u00D7800\u00D72000mm/section, IP54, 65kA Icw, \u2192 Electrical Tab');
 s+=eq(23,13.5,5,2.5,'rgba(245,158,11,.15)','MSB-2A',4,'MSB-2A: LV switchboard '+(DH?DH.buswayAFmt:'—')+' A class, Form 4b, 2200\u00D7800\u00D72000mm/section, IP54, 65kA Icw, \u2192 Electrical Tab');
 s+=eq(17,16.5,2.8,2,'rgba(245,158,11,.12)','ATS-1A',3.2,'ATS-1A: Schneider Masterpact MTZ 4000A, <100ms transfer, 1200\u00D7600\u00D72000mm, motorized, 4-pole, \u2192 Electrical Tab');
@@ -2450,14 +2488,14 @@ s+=eq(17,19.5,5,2,'rgba(245,158,11,.1)','DB-NC-A',4,'DB-NC-A: Non-Critical Distr
 s+=eq(23,19.5,5,2,'rgba(245,158,11,.1)','DB-CL-A',4,'DB-CL-A: Cooling Distribution, 800A, Chillers/Pumps/Fans, 800\u00D7600\u00D72000mm, \u2192 Electrical Tab');
 
 // BMS / EPMS (Center)
-s+=rmLive(30,12,12,12,'rgba(100, 116, 139,.1)','rgba(100, 116, 139,.35)','BMS / EPMS','12m\u00D712m','EcoStruxure DCIM','BMS: Schneider EcoStruxure IT, redundant servers, EPMS, BACnet/IP, Modbus/TCP, OPC-UA',21,null,'Normal');
+s+=rmLive(30,12,12,12,'rgba(100, 116, 139,.1)','rgba(100, 116, 139,.35)','BMS / EPMS','12m\u00D712m','EcoStruxure DCIM','BMS: Schneider EcoStruxure IT, redundant servers, EPMS, BACnet/IP, Modbus/TCP, OPC-UA',21,null,'Normal',{textAt:'bottom'});
 s+=eq(31,14,4,3,'rgba(100, 116, 139,.15)','SVR-1',4,'Server SVR-1: Dell PowerEdge R760 2U, DCIM Primary, EcoStruxure BMS, 482\u00D7750\u00D789mm, redundant PSU, \u2192 BMS Tab');
 s+=eq(36,14,4,3,'rgba(100, 116, 139,.15)','SVR-2',4,'Server SVR-2: Dell PowerEdge R760 2U, DCIM Standby, EcoStruxure BMS, 482\u00D7750\u00D789mm, hot-standby failover, \u2192 BMS Tab');
 s+=eq(31,18,4,2,'rgba(100, 116, 139,.12)','EPMS',4,'EPMS: Schneider ION9000, Revenue-grade power analyzer, Accuracy 0.1%, RS485+Ethernet, DIN-rail, \u2192 BMS Tab');
 s+=eq(36,18,4,2,'rgba(100, 116, 139,.12)','BACnet',4,'BACnet Gateway: BACnet/IP to Modbus/TCP converter, 8-port, DIN-rail mount, OPC-UA capable, \u2192 BMS Tab');
 
 // MSB-B / ATS-B (Feed B) — 2× MSB + 4× ATS
-s+=rmLive(42,12,14,12,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','MSB-B / ATS-B','14m\u00D712m','2\u00D7 MSB + 4\u00D7 ATS','MSB-B: LV switchboard '+(DH?DH.buswayAFmt:'—')+' A trunk class, 4\u00D7 ATS, <100ms transfer',null,null,'Normal');
+s+=rmLive(42,12,14,12,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','MSB-B / ATS-B','14m\u00D712m','2\u00D7 MSB + 4\u00D7 ATS','MSB-B: LV switchboard '+(DH?DH.buswayAFmt:'—')+' A trunk class, 4\u00D7 ATS, <100ms transfer',null,null,'Normal',{textAt:'bottom'});
 s+=eq(43,13.5,5,2.5,'rgba(245,158,11,.15)','MSB-1B',4,'MSB-1B: LV switchboard '+(DH?DH.buswayAFmt:'—')+' A class, Form 4b, 2200\u00D7800\u00D72000mm/section, IP54, 65kA Icw, \u2192 Electrical Tab');
 s+=eq(49,13.5,5,2.5,'rgba(245,158,11,.15)','MSB-2B',4,'MSB-2B: LV switchboard '+(DH?DH.buswayAFmt:'—')+' A class, Form 4b, 2200\u00D7800\u00D72000mm/section, IP54, 65kA Icw, \u2192 Electrical Tab');
 s+=eq(43,16.5,2.8,2,'rgba(245,158,11,.12)','ATS-1B',3.2,'ATS-1B: Schneider Masterpact MTZ 4000A, <100ms transfer, 1200\u00D7600\u00D72000mm, motorized, 4-pole, \u2192 Electrical Tab');
@@ -2468,14 +2506,14 @@ s+=eq(43,19.5,5,2,'rgba(245,158,11,.1)','DB-NC-B',4,'DB-NC-B: Non-Critical Distr
 s+=eq(49,19.5,5,2,'rgba(245,158,11,.1)','DB-CL-B',4,'DB-CL-B: Cooling Distribution, 800A, Chillers/Pumps/Fans, 800\u00D7600\u00D72000mm, \u2192 Electrical Tab');
 
 // TX-B Room (right — Feed B) — engine-derived TX MVA
-s+=rmLive(56,12,16,12,'rgba(245,158,11,.12)','rgba(245,158,11,.4)','TX-B Room','16m\u00D712m',(DH?(DH.txPerFeedHall+'\u00D7 TX '+DH.txRatingMVA+'MVA'):'—'),(DH?('Transformer B: '+DH.txPerFeedHall+'\u00D7 cast-resin '+DH.txRatingMVA+'MVA, 20kV\u2192400V, \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%'):'—'),35,null,'Normal',0,0,0,0,0,0,0,{equip:bo('txPerFeedHall',{also:['txRatingMVA'],nomark:true})});
-s+=eqLive(57.5,13.5,5,3.5,'rgba(245,158,11,.2)','TX-1B',4.5,'running',(DH?('Transformer TX-1B: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'—')+'\u2192 Electrical Tab');
+s+=rmLive(56,12,16,12,'rgba(245,158,11,.12)','rgba(245,158,11,.4)','TX-B Room','16m\u00D712m',(DH?(DH.txPerFeedHall+'\u00D7 TX '+DH.txRatingMVA+'MVA'):'—'),(DH?('Transformer B: '+DH.txPerFeedHall+'\u00D7 cast-resin '+DH.txRatingMVA+'MVA, 20kV\u2192400V, \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%'):'—'),35,null,'Normal',{equip:bo('txPerFeedHall',{also:['txRatingMVA'],nomark:true})});
+s+=eqLive(57.5,13.5,5,3.5,'rgba(245,158,11,.2)','TX-1B',4.5,'running',(DH?('Transformer TX-1B: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'—')+'\u2192 Electrical Tab',{labelBelow:1});
 s+=symFloorTX(60,15.2);
-s+=eqLive(64.5,13.5,5,3.5,'rgba(245,158,11,.2)','TX-2B',4.5,'running',(DH?('Transformer TX-2B: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'—')+'\u2192 Electrical Tab');
+s+=eqLive(64.5,13.5,5,3.5,'rgba(245,158,11,.2)','TX-2B',4.5,'running',(DH?('Transformer TX-2B: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'—')+'\u2192 Electrical Tab',{labelBelow:1});
 s+=symFloorTX(67,15.2);
-s+=eqLive(57.5,18.5,5,3.5,'rgba(245,158,11,.2)','TX-3B',4.5,'running',(DH?('Transformer TX-3B: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'—')+'\u2192 Electrical Tab');
+s+=eqLive(57.5,18.5,5,3.5,'rgba(245,158,11,.2)','TX-3B',4.5,'running',(DH?('Transformer TX-3B: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'—')+'\u2192 Electrical Tab',{labelBelow:1});
 s+=symFloorTX(60,20.2);
-s+=eqLive(64.5,18.5,5,3.5,'rgba(245,158,11,.2)','TX-4B',4.5,'running',(DH?('Transformer TX-4B: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'—')+'\u2192 Electrical Tab');
+s+=eqLive(64.5,18.5,5,3.5,'rgba(245,158,11,.2)','TX-4B',4.5,'running',(DH?('Transformer TX-4B: cast-resin '+DH.txRatingMVA+'MVA, 20kV/400V \u0394-Y11, Zk=6%, load '+DH.txLoadPct.toFixed(1)+'%, Cast-resin dry AN/AF, Status: ONLINE'):'—')+'\u2192 Electrical Tab',{labelBelow:1});
 s+=symFloorTX(67,20.2);
 s+='<text x="'+(MX+64*M)+'" y="'+(MY+23*M)+'" fill="var(--o)" font-family="'+J+'" font-size="5" text-anchor="middle" opacity=".6">20kV/0.4kV | '+(DH?DH.txRatingMVA:null)+'MVA each | 4 units</text>';
 
@@ -2510,7 +2548,7 @@ s+=eq(31,32,4,3,'rgba(148,163,184,.1)','Lockers',4,'Locker Area: 20 personal loc
 s+=eq(36,32,4,3,'rgba(239,68,68,.1)','First Aid',3.5,'First Aid Station: AED, burn kit, eye wash, stretcher, emergency shower');
 
 // Chiller Plant Hall (East) \u2014 8\u00D7 water-cooled centrifugal chillers + CW risers up to roof manifold
-s+=rmLive(42,26,24,10,'rgba(6,182,212,.12)','rgba(6,182,212,.45)','Chiller Plant Hall','24m \u00D7 10m',(DH?(DH.chillersInstalled+'\u00D7 '+(DH.chillerRating/1000)+' MW class \u2014 facility'):'—'),'Chiller Plant Hall: '+(DH?DH.chillersInstalled:'—')+'\u00D7 water-cooled centrifugal, '+(DH?DH.chillerRating/1000:'—')+' MW class, COP '+(DH?DH.chillerCOP:'—')+' DERIVED (Carnot fraction), '+(DH?DH.chillersRunning:'—')+' running at design \u2014 8 of '+(DH?DH.chillersInstalled:'—')+' shown, R-1234ze(E) refrigerant, mag-bearing oil-free. CW supply/return DN500 risers route up to dry-cooler array on roof. 7+1 N+1 redundancy at 32 MW nameplate.',35,null,'Running',0,0,0,0,0,0,0,{equip:bo('chillersInstalled',{also:['chillerRating']})});
+s+=rmLive(42,26,24,10,'rgba(6,182,212,.12)','rgba(6,182,212,.45)','Chiller Plant Hall','24m \u00D7 10m',(DH?(DH.chillersInstalled+'\u00D7 '+(DH.chillerRating/1000)+' MW class \u2014 facility'):'—'),'Chiller Plant Hall: '+(DH?DH.chillersInstalled:'—')+'\u00D7 water-cooled centrifugal, '+(DH?DH.chillerRating/1000:'—')+' MW class, COP '+(DH?DH.chillerCOP:'—')+' DERIVED (Carnot fraction), '+(DH?DH.chillersRunning:'—')+' running at design \u2014 8 of '+(DH?DH.chillersInstalled:'—')+' shown, R-1234ze(E) refrigerant, mag-bearing oil-free. CW supply/return DN500 risers route up to dry-cooler array on roof. 7+1 N+1 redundancy at 32 MW nameplate.',35,null,'Running',{equip:bo('chillersInstalled',{also:['chillerRating']})});
 // 8 chillers in 2 rows of 4 (compact footprint 2.8m \u00D7 4m each \u2014 actual 19XR Frame 70-74 has 5x2.5m footprint, packed)
 for(var chx=0;chx<4;chx++){
 s+=eqLive(43+chx*5.5,27,4.5,3.5,'rgba(6,182,212,.2)','CH-'+(chx+1),4.2,'running','Chiller CH-'+(chx+1)+': water-cooled centrifugal, '+(DH?DH.chillerRating/1000:'—')+' MW class @ COP '+(DH?DH.chillerCOP:'—')+' derived, R-1234ze(E), mag bearing, oil-free. Evap LWT '+(DH?DH.chwSupplyC:'—')+'\u00B0C, CW Out '+(DH?DH.cdwReturnC:'—')+'\u00B0C. Status: ONLINE. \u2192 Cooling Tab');
@@ -2546,19 +2584,19 @@ s+=rm(12,37.5,10,10.5,'rgba(239,68,68,.1)','rgba(239,68,68,.35)','Fire Control',
 s+=eq(13,39.5,3,2.5,'rgba(239,68,68,.15)','FACP',4,'FACP: Notifier NFS2-3030, 640 addressable points, 19\u2033 rack mount, VESDA LaserPLUS integration, \u2192 Fire Tab');
 
 // NOC
-s+=rmLive(22,37.5,14,10.5,'rgba(20,184,166,.1)','rgba(20,184,166,.35)','NOC','14m\u00D710.5m','Video wall + Ops','NOC: 3\u00D73 video wall, 8 operator positions, DCIM dashboards, 24/7',22,null,'Running');
+s+=rmLive(22,37.5,14,10.5,'rgba(20,184,166,.1)','rgba(20,184,166,.35)','NOC','14m\u00D710.5m','Video wall + Ops','NOC: 3\u00D73 video wall, 8 operator positions, DCIM dashboards, 24/7',22,null,'Running',{textAt:'bottom'});
 s+=eq(23,39.5,6,2,'rgba(20,184,166,.2)','V-Wall',4,'Video Wall: 3\u00D73 NEC UN552VS 55\u2033, 4K UHD, Datapath controller, 6000\u00D72000mm total, \u2192 BMS Tab');
 s+=eq(23,42.5,4,2.5,'rgba(20,184,166,.12)','OPS',4,'Operator Station: Dual 27\u2033 monitors, KVM switch, DCIM/BMS/EPMS client, \u2192 BMS Tab');
 s+=eq(29,42.5,4,2.5,'rgba(20,184,166,.12)','OPS',4,'Operator Station: Dual 27\u2033 monitors, KVM switch, DCIM/BMS/EPMS client, \u2192 BMS Tab');
 
 // Comms Room
-s+=rm(36,37.5,12,10.5,'rgba(236,72,153,.1)','rgba(236,72,153,.35)','Comms Room','12m\u00D710.5m','MDF + IDF','Comms: Main distribution frame, IDF, fiber patch, OOB switches');
+s+=rm(36,37.5,12,10.5,'rgba(236,72,153,.1)','rgba(236,72,153,.35)','Comms Room','12m\u00D710.5m','MDF + IDF','Comms: Main distribution frame, IDF, fiber patch, OOB switches',{textAt:'bottom'});
 s+=eq(37,40,4,3,'rgba(236,72,153,.12)','MDF',4,'MDF: Main Distribution Frame, 42U rack 600\u00D71200mm, fiber/copper patch, core switches, \u2192 Network Tab');
 s+=eq(42,40,4,3,'rgba(236,72,153,.12)','IDF',4,'IDF: Intermediate Distribution Frame, 24U rack 600\u00D7800mm, floor distribution, access switches, \u2192 Network Tab');
 
 // AHU Room (clickable)
 s+='<g class="ahu-click" data-rz-equipment="ahu:1" tabindex="0" role="button"><title>AHU — click for inspector, double-click for HMI</title>';
-s+=rm(48,37.5,12,10.5,'rgba(6,182,212,.1)','rgba(6,182,212,.35)','AHU Room','12m\u00D710.5m','2\u00D7 AHU 150kW','AHU: 2\u00D7 Carrier 39HQ 150kW, supply/return for office & support \u25B6 Click for P&ID');
+s+=rm(48,37.5,12,10.5,'rgba(6,182,212,.1)','rgba(6,182,212,.35)','AHU Room','12m\u00D710.5m','2\u00D7 AHU 150kW','AHU: 2\u00D7 Carrier 39HQ 150kW, supply/return for office & support \u25B6 Click for P&ID',{textAt:'top'});
 s+=eq(49,40,4,3,'rgba(6,182,212,.18)','AHU-1',4,'AHU-1: Carrier 39HQ 150kW, 24000m\u00B3/h, 5000\u00D72200\u00D72800mm, G4+F7 filters, CHW coil 7/12\u00B0C, VFD fan, \u2192 HVAC Tab');
 s+=eq(54,40,4,3,'rgba(6,182,212,.18)','AHU-2',4,'AHU-2: Carrier 39HQ 150kW, 24000m\u00B3/h, 5000\u00D72200\u00D72800mm, G4+F7 filters, CHW coil 7/12\u00B0C, VFD fan, \u2192 HVAC Tab');
 s+='<text x="'+(MX+54*M)+'" y="'+(MY+47*M)+'" fill="var(--c)" font-family="'+J+'" font-size="4.5" text-anchor="middle" opacity=".7">\u25B6 Click: P&ID</text>';
@@ -2583,11 +2621,14 @@ s+='<text x="'+(mvAx+mvAw/2)+'" y="'+(mvAy+14)+'" fill="var(--o)" font-family="'
 s+='<text x="'+(mvAx+mvAw/2)+'" y="'+(mvAy+32)+'" fill="var(--t2)" font-family="'+J+'" font-size="6" text-anchor="middle">SM6 20kV Ring Main</text>';
 s+='<text x="'+(mvAx+mvAw/2)+'" y="'+(mvAy+44)+'" fill="var(--t3)" font-family="'+J+'" font-size="5.5" text-anchor="middle">VCB 630A | 25kA</text>';
 s+='<text x="'+(mvAx+mvAw/2)+'" y="'+(mvAy+56)+'" fill="var(--t3)" font-family="'+J+'" font-size="5" text-anchor="middle">Feeds TX-1A..4A</text>';
-s+=eq(-17,15,4,3,'rgba(245,158,11,.15)','RMU',5,'RMU: Schneider SM6 Ring Main Unit, 20kV, 3-panel (2\u00D7load break + 1\u00D7fuse), 1800\u00D7800\u00D71800mm, SF6 insulated, \u2192 Electrical Tab');
-s+=eq(-12,15,4,3,'rgba(245,158,11,.15)','VCB',5,'VCB: Vacuum Circuit Breaker, 20kV 630A 25kA, 800\u00D7800\u00D71800mm, motorized close/trip, protection relay, \u2192 Electrical Tab');
+s+=eq(-17,16.4,4,3,'rgba(245,158,11,.15)','RMU',5,'RMU: Schneider SM6 Ring Main Unit, 20kV, 3-panel (2\u00D7load break + 1\u00D7fuse), 1800\u00D7800\u00D71800mm, SF6 insulated, \u2192 Electrical Tab');
+s+=eq(-12,16.4,4,3,'rgba(245,158,11,.15)','VCB',5,'VCB: Vacuum Circuit Breaker, 20kV 630A 25kA, 800\u00D7800\u00D71800mm, motorized close/trip, protection relay, \u2192 Electrical Tab');
 // Cable tray MV-A to TX-A
 s+='<line x1="'+(mvAx+mvAw)+'" y1="'+(mvAy+mvAh/2)+'" x2="'+MX+'" y2="'+(MY+18*M)+'" stroke="var(--o)" stroke-width="2" stroke-dasharray="8 4" opacity=".5"/>';
-s+='<text x="'+(mvAx+mvAw+10)+'" y="'+(mvAy+mvAh/2-5)+'" fill="var(--o)" font-family="'+J+'" font-size="4.5" opacity=".7">20kV XLPE 3\u00D7(1\u00D7240mm\u00B2)</text>';
+/* v3.6.3 — lifted clear of the TX-A row. The transformer tags moved below their boxes so the IEC
+   symbol could have the box interior, and this cable note was sitting exactly where TX-1A's tag
+   landed. A route annotation belongs on its route, not across the equipment it feeds. */
+s+='<text x="'+(mvAx+mvAw+10)+'" y="'+(mvAy+mvAh/2-13)+'" fill="var(--o)" font-family="'+J+'" font-size="4.5" opacity=".7">20kV XLPE 3\u00D7(1\u00D7240mm\u00B2)</text>';
 
 // --- MV SWITCHGEAR B (East side, aligned with TX-B) ---
 var mvBx=MX+BW+2*M,mvBy=MY+12*M,mvBw=16*M,mvBh=12*M;
@@ -2692,13 +2733,13 @@ s+=tx(480,14,'FLOOR 2 PLAN \u2014 DATAHALL 1 + DATAHALL 2','var(--t1)',10,'middl
 s+='<rect x="'+MX+'" y="'+MY+'" width="'+(72*M)+'" height="'+(48*M)+'" fill="none" stroke="var(--t2)" stroke-width="2" rx="2"/>';
 
 // === DATA HALL 1 (North Wing) ===
-s+='<g data-rz-equipment="room:datahall-1" tabindex="0" role="button">'+rmLive(4,2,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 1',(DH?(DH.hallLengthM+'m \u00D7 '+DH.hallWidthM+'m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'—'),(DH?(DH.racksPerHall+' NVL72 racks \u2502 '+DH.gpuPerHall.toLocaleString()+' GPU \u2502 '+DH.kwPerRack+' kW/rack (1 rack = 1 domain)'):'—'),(DH?('DH-1: GB300 NVL72, '+DH.racksPerHall+' racks, one NVLink domain each ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT, DLC 85%+Air 15%, TCS '+DH.tcsSupply+'/'+DH.tcsReturn+'\u00B0C'):'—'),20,45,'Running',0,0,0,0,0,0,0,{sub:bo('hallLengthM',{also:['hallWidthM','itHall'],nomark:false}),equip:bo('racksPerHall',{also:['gpuPerHall','kwPerRack'],nomark:false})})+'</g>';
+s+='<g data-rz-equipment="room:datahall-1" tabindex="0" role="button">'+rmLive(4,2,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 1',(DH?(DH.hallLengthM+'m \u00D7 '+DH.hallWidthM+'m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'—'),(DH?(DH.racksPerHall+' NVL72 racks \u2502 '+DH.gpuPerHall.toLocaleString()+' GPU \u2502 '+DH.kwPerRack+' kW/rack (1 rack = 1 domain)'):'—'),(DH?('DH-1: GB300 NVL72, '+DH.racksPerHall+' racks, one NVLink domain each ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT, DLC 85%+Air 15%, TCS '+DH.tcsSupply+'/'+DH.tcsReturn+'\u00B0C'):'—'),20,45,'Running',{sub:bo('hallLengthM',{also:['hallWidthM','itHall'],nomark:false}),equip:bo('racksPerHall',{also:['gpuPerHall','kwPerRack'],nomark:false}),textAt:'top'})+'</g>';
 // Clickable overlay for DH tab
 s+='<rect x="'+(MX+4*M)+'" y="'+(MY+2*M)+'" width="'+(32*M)+'" height="'+(20*M)+'" fill="transparent" data-tab="dh" style="cursor:pointer"><title>Click to view Data Hall details</title></rect>';
 // Rack rows indicator
 for(var r=0;r<2;r++){
 s+='<rect x="'+(MX+(7+r*13)*M)+'" y="'+(MY+5*M)+'" width="'+(6*M)+'" height="'+(14*M)+'" fill="rgba(34,197,94,.06)" stroke="rgba(34,197,94,.2)" stroke-width=".3" rx="1"/>';
-s+='<text x="'+(MX+(10+r*13)*M)+'" y="'+(MY+12*M)+'" fill="rgba(34,197,94,.4)" font-family="'+J+'" font-size="7" text-anchor="middle" transform="rotate(-90,'+(MX+(10+r*13)*M)+','+(MY+12*M)+')">BANK '+(r===0?'A R01-20':'B R21-40')+'</text>';
+s+='<text x="'+(MX+(10+r*13)*M)+'" y="'+(MY+13.5*M)+'" fill="rgba(34,197,94,.4)" font-family="'+J+'" font-size="7" text-anchor="middle" transform="rotate(-90,'+(MX+(10+r*13)*M)+','+(MY+13.5*M)+')">BANK '+(r===0?'A R01-20':'B R21-40')+'</text>';
 }
 // CDU units
 s+='<rect x="'+(MX+33*M)+'" y="'+(MY+4*M)+'" width="'+(2*M)+'" height="'+(16*M)+'" fill="rgba(6,182,212,.12)" stroke="rgba(6,182,212,.3)" stroke-width=".5" rx="1"/>';
@@ -2712,14 +2753,14 @@ s+='<rect x="'+MX+'" y="'+(MY+22*M)+'" width="'+(72*M)+'" height="'+(4*M)+'" fil
 s+='<text x="'+(MX+20*M)+'" y="'+(MY+24.5*M)+'" fill="var(--t3)" font-family="'+J+'" font-size="6" text-anchor="middle">MAIN CORRIDOR + OVERHEAD BUSWAY</text>';
 
 // === DATA HALL 2 (South Wing) ===
-s+='<g data-rz-equipment="room:datahall-2" tabindex="0" role="button">'+rmLive(4,26,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 2',(DH?(DH.hallLengthM+'m \u00D7 '+DH.hallWidthM+'m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'—'),(DH?(DH.racksPerHall+' NVL72 racks \u2502 '+DH.gpuPerHall.toLocaleString()+' GPU \u2502 '+DH.kwPerRack+' kW/rack (1 rack = 1 domain)'):'—'),(DH?('DH-2: GB300 NVL72, '+DH.racksPerHall+' racks, one NVLink domain each ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT, DLC 85%+Air 15%, TCS '+DH.tcsSupply+'/'+DH.tcsReturn+'\u00B0C'):'—'),20,45,'Running',0,0,0,0,0,0,0,{sub:bo('hallLengthM',{also:['hallWidthM','itHall'],nomark:true}),equip:bo('racksPerHall',{also:['gpuPerHall','kwPerRack'],nomark:true})})+'</g>';
-s+=`<text x="8" y="752" fill="var(--t3)" font-family="${J}" font-size="8.5" font-style="italic">BUILDING GRID: retired-basis plot \u2014 hall dimensions, rack rows and equipment counts are current (engine); site re-grid to the ${DH?DH.hallLengthM:'\u2014'} \u00D7 ${DH?DH.hallWidthM:'\u2014'} m hall is pending (Track A)</text>`;
+s+='<g data-rz-equipment="room:datahall-2" tabindex="0" role="button">'+rmLive(4,26,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 2',(DH?(DH.hallLengthM+'m \u00D7 '+DH.hallWidthM+'m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'—'),(DH?(DH.racksPerHall+' NVL72 racks \u2502 '+DH.gpuPerHall.toLocaleString()+' GPU \u2502 '+DH.kwPerRack+' kW/rack (1 rack = 1 domain)'):'—'),(DH?('DH-2: GB300 NVL72, '+DH.racksPerHall+' racks, one NVLink domain each ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT, DLC 85%+Air 15%, TCS '+DH.tcsSupply+'/'+DH.tcsReturn+'\u00B0C'):'—'),20,45,'Running',{sub:bo('hallLengthM',{also:['hallWidthM','itHall'],nomark:true}),equip:bo('racksPerHall',{also:['gpuPerHall','kwPerRack'],nomark:true}),textAt:'top'})+'</g>';
+s+=`<text x="8" y="668" fill="var(--t3)" font-family="${J}" font-size="8.5" font-style="italic">BUILDING GRID: retired-basis plot \u2014 hall dimensions, rack rows and equipment counts are current (engine); site re-grid to the ${DH?DH.hallLengthM:'\u2014'} \u00D7 ${DH?DH.hallWidthM:'\u2014'} m hall is pending (Track A)</text>`;
 // Clickable overlay for DH tab
 s+='<rect x="'+(MX+4*M)+'" y="'+(MY+26*M)+'" width="'+(32*M)+'" height="'+(20*M)+'" fill="transparent" data-tab="dh" style="cursor:pointer"><title>Click to view Data Hall details</title></rect>';
 // Rack rows
 for(var r2=0;r2<2;r2++){
 s+='<rect x="'+(MX+(7+r2*13)*M)+'" y="'+(MY+29*M)+'" width="'+(6*M)+'" height="'+(14*M)+'" fill="rgba(34,197,94,.06)" stroke="rgba(34,197,94,.2)" stroke-width=".3" rx="1"/>';
-s+='<text x="'+(MX+(10+r2*13)*M)+'" y="'+(MY+36*M)+'" fill="rgba(34,197,94,.4)" font-family="'+J+'" font-size="7" text-anchor="middle" transform="rotate(-90,'+(MX+(10+r2*13)*M)+','+(MY+36*M)+')">BANK '+(r2===0?'A R01-20':'B R21-40')+'</text>';
+s+='<text x="'+(MX+(10+r2*13)*M)+'" y="'+(MY+37.5*M)+'" fill="rgba(34,197,94,.4)" font-family="'+J+'" font-size="7" text-anchor="middle" transform="rotate(-90,'+(MX+(10+r2*13)*M)+','+(MY+37.5*M)+')">BANK '+(r2===0?'A R01-20':'B R21-40')+'</text>';
 }
 // CDU
 s+='<rect x="'+(MX+33*M)+'" y="'+(MY+28*M)+'" width="'+(2*M)+'" height="'+(16*M)+'" fill="rgba(6,182,212,.12)" stroke="rgba(6,182,212,.3)" stroke-width=".5" rx="1"/>';
@@ -2729,13 +2770,13 @@ s+='<rect x="'+(MX+4.5*M)+'" y="'+(MY+29*M)+'" width="'+(1.5*M)+'" height="'+(14
 s+='<text x="'+(MX+5.2*M)+'" y="'+(MY+36*M)+'" fill="rgba(59,130,246,.4)" font-family="'+J+'" font-size="4" text-anchor="middle" transform="rotate(-90,'+(MX+5.2*M)+','+(MY+36*M)+')">CRAH \u00D76</text>';
 
 // === Electrical Wing (East side) ===
-s+=rm(38,2,16,9,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','UPS Room A','16m \u00D7 9m',(DH?(DH.upsFramesPerFeedHall+'\u00D7 '+DH.upsRatingMW+' MW frames'):'—'),'UPS-A: '+(DH?DH.upsFramesPerFeedHall:'—')+'\u00D7 '+(DH?DH.upsRatingMW:'—')+' MW modular frames ('+(DH?DH.upsTopology:'—')+'), double-conversion, Li-Ion 10min',0,0,0,0,0,0,0,{equip:bo('upsFramesPerFeedHall',{also:['upsRatingMW'],nomark:false})});
+s+=rm(38,2,16,9,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','UPS Room A','16m \u00D7 9m',(DH?(DH.upsFramesPerFeedHall+'\u00D7 '+DH.upsRatingMW+' MW frames'):'—'),'UPS-A: '+(DH?DH.upsFramesPerFeedHall:'—')+'\u00D7 '+(DH?DH.upsRatingMW:'—')+' MW modular frames ('+(DH?DH.upsTopology:'—')+'), double-conversion, Li-Ion 10min',{equip:bo('upsFramesPerFeedHall',{also:['upsRatingMW'],nomark:false})});
 s+=eq(39,4,6,4,'rgba(245,158,11,.15)','UPS-1A',4.5);
 s+=eq(46,4,6,4,'rgba(245,158,11,.15)','UPS-2A',4.5);
 
 s+=rm(38,11,16,9,'rgba(245,158,11,.08)','rgba(245,158,11,.3)','Battery Room A','16m \u00D7 9m','Li-Ion NMC Racks');
 
-s+=rm(54,2,6,20,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','Busway Riser','6m \u00D7 20m',(DH?DH.buswayAFmt+'A Cu busduct':'\u2014'),'Busway: 2\u00D7 '+(DH?DH.buswayAFmt:'\u2014')+' A Cu overhead busduct vertical riser (trunk per feed)',{equip:bo('buswayA',{nomark:true})});
+s+=rm(54,2,6,20,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','Busway Riser','6m \u00D7 20m',(DH?DH.buswayAFmt+'A Cu busduct':'\u2014'),'Busway: 2\u00D7 '+(DH?DH.buswayAFmt:'\u2014')+' A Cu overhead busduct vertical riser (trunk per feed)',{equip:bo('buswayA',{nomark:true}),textAt:'top'});
 // Busway lines
 s+='<line x1="'+(MX+55.5*M)+'" y1="'+(MY+3*M)+'" x2="'+(MX+55.5*M)+'" y2="'+(MY+21*M)+'" stroke="rgba(245,158,11,.3)" stroke-width="2" stroke-dasharray="6 3"/>';
 s+='<line x1="'+(MX+58.5*M)+'" y1="'+(MY+3*M)+'" x2="'+(MX+58.5*M)+'" y2="'+(MY+21*M)+'" stroke="rgba(245,158,11,.3)" stroke-width="2" stroke-dasharray="6 3"/>';
@@ -2743,13 +2784,13 @@ s+='<text x="'+(MX+57*M)+'" y="'+(MY+12*M)+'" fill="rgba(245,158,11,.4)" font-fa
 s+=rm(60,2,12,10,'rgba(245,158,11,.08)','rgba(245,158,11,.3)','RPP Room','12m \u00D7 10m',(DH?DH.rppPerHall+'\u00D7 RPP ('+DH.rackGroups+' groups/feed)':'\u2014'),'RPP: '+(DH?DH.rppPerHall:'\u2014')+' panels per hall, one per RPP group and feed, cable terminations',{equip:bo('rppPerHall',{also:['rackGroups'],nomark:true})});
 s+=rm(60,12,12,10,'rgba(120,113,108,.06)','rgba(120,113,108,.25)','Cable Mgmt','12m \u00D7 10m','Cable trays + fire stops','Cable Mgmt: Cable trays, ladder rack, fire stops, cable routing');
 
-s+=rm(38,26,16,9,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','UPS Room B','16m \u00D7 9m',(DH?(DH.upsFramesPerFeedHall+'\u00D7 '+DH.upsRatingMW+' MW frames'):'—'),0,0,0,0,0,0,0,0,{equip:bo('upsFramesPerFeedHall',{also:['upsRatingMW'],nomark:true})});
+s+=rm(38,26,16,9,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','UPS Room B','16m \u00D7 9m',(DH?(DH.upsFramesPerFeedHall+'\u00D7 '+DH.upsRatingMW+' MW frames'):'—'),0,{equip:bo('upsFramesPerFeedHall',{also:['upsRatingMW'],nomark:true})});
 s+=eq(39,28,6,4,'rgba(245,158,11,.15)','UPS-1B',4.5);
 s+=eq(46,28,6,4,'rgba(245,158,11,.15)','UPS-2B',4.5);
 
 s+=rm(38,35,16,11,'rgba(245,158,11,.08)','rgba(245,158,11,.3)','Battery Room B','16m \u00D7 11m','Li-Ion NMC Racks');
 
-s+=rm(54,26,6,22,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','Busway Riser','6m \u00D7 22m',(DH?DH.buswayAFmt+'A Cu busduct':'\u2014'),'Busway: 2\u00D7 '+(DH?DH.buswayAFmt:'\u2014')+' A Cu overhead busduct vertical riser (trunk per feed)',{equip:bo('buswayA',{nomark:true})});
+s+=rm(54,26,6,22,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','Busway Riser','6m \u00D7 22m',(DH?DH.buswayAFmt+'A Cu busduct':'\u2014'),'Busway: 2\u00D7 '+(DH?DH.buswayAFmt:'\u2014')+' A Cu overhead busduct vertical riser (trunk per feed)',{equip:bo('buswayA',{nomark:true}),textAt:'top'});
 s+='<line x1="'+(MX+55.5*M)+'" y1="'+(MY+27*M)+'" x2="'+(MX+55.5*M)+'" y2="'+(MY+47*M)+'" stroke="rgba(245,158,11,.3)" stroke-width="2" stroke-dasharray="6 3"/>';
 s+='<line x1="'+(MX+58.5*M)+'" y1="'+(MY+27*M)+'" x2="'+(MX+58.5*M)+'" y2="'+(MY+47*M)+'" stroke="rgba(245,158,11,.3)" stroke-width="2" stroke-dasharray="6 3"/>';
 s+='<text x="'+(MX+57*M)+'" y="'+(MY+37*M)+'" fill="rgba(245,158,11,.4)" font-family="'+J+'" font-size="4" text-anchor="middle" transform="rotate(-90,'+(MX+57*M)+','+(MY+37*M)+')">Bus A  Bus B</text>';
@@ -2807,11 +2848,11 @@ s+=tx(480,14,'FLOOR 3 PLAN \u2014 DATAHALL 3 + DATAHALL 4','var(--t1)',10,'middl
 s+='<rect x="'+MX+'" y="'+MY+'" width="'+(72*M)+'" height="'+(48*M)+'" fill="none" stroke="var(--t2)" stroke-width="2" rx="2"/>';
 
 // DH3 (North)
-s+='<g data-rz-equipment="room:datahall-3" tabindex="0" role="button">'+rmLive(4,2,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 3',(DH?(DH.hallLengthM+'m \u00D7 '+DH.hallWidthM+'m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'—'),(DH?(DH.racksPerHall+' NVL72 racks \u2502 '+DH.gpuPerHall.toLocaleString()+' GPU \u2502 '+DH.kwPerRack+' kW/rack (1 rack = 1 domain)'):'—'),(DH?('DH-3: GB300 NVL72, '+DH.racksPerHall+' racks, one NVLink domain each ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT'):'—'),20,45,'Running',0,0,0,0,0,0,0,{sub:bo('hallLengthM',{also:['hallWidthM','itHall'],nomark:false}),equip:bo('racksPerHall',{also:['gpuPerHall','kwPerRack'],nomark:false})})+'</g>';
+s+='<g data-rz-equipment="room:datahall-3" tabindex="0" role="button">'+rmLive(4,2,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 3',(DH?(DH.hallLengthM+'m \u00D7 '+DH.hallWidthM+'m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'—'),(DH?(DH.racksPerHall+' NVL72 racks \u2502 '+DH.gpuPerHall.toLocaleString()+' GPU \u2502 '+DH.kwPerRack+' kW/rack (1 rack = 1 domain)'):'—'),(DH?('DH-3: GB300 NVL72, '+DH.racksPerHall+' racks, one NVLink domain each ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT'):'—'),20,45,'Running',{sub:bo('hallLengthM',{also:['hallWidthM','itHall'],nomark:false}),equip:bo('racksPerHall',{also:['gpuPerHall','kwPerRack'],nomark:false}),textAt:'top'})+'</g>';
 s+='<rect x="'+(MX+4*M)+'" y="'+(MY+2*M)+'" width="'+(32*M)+'" height="'+(20*M)+'" fill="transparent" data-tab="dh" style="cursor:pointer"><title>Click to view Data Hall details</title></rect>';
 for(var r=0;r<2;r++){
 s+='<rect x="'+(MX+(7+r*13)*M)+'" y="'+(MY+5*M)+'" width="'+(6*M)+'" height="'+(14*M)+'" fill="rgba(34,197,94,.06)" stroke="rgba(34,197,94,.2)" stroke-width=".3" rx="1"/>';
-s+='<text x="'+(MX+(10+r*13)*M)+'" y="'+(MY+12*M)+'" fill="rgba(34,197,94,.4)" font-family="'+J+'" font-size="7" text-anchor="middle" transform="rotate(-90,'+(MX+(10+r*13)*M)+','+(MY+12*M)+')">BANK '+(r===0?'A R01-20':'B R21-40')+'</text>';
+s+='<text x="'+(MX+(10+r*13)*M)+'" y="'+(MY+13.5*M)+'" fill="rgba(34,197,94,.4)" font-family="'+J+'" font-size="7" text-anchor="middle" transform="rotate(-90,'+(MX+(10+r*13)*M)+','+(MY+13.5*M)+')">BANK '+(r===0?'A R01-20':'B R21-40')+'</text>';
 }
 s+='<rect x="'+(MX+33*M)+'" y="'+(MY+4*M)+'" width="'+(2*M)+'" height="'+(16*M)+'" fill="rgba(6,182,212,.12)" stroke="rgba(6,182,212,.3)" stroke-width=".5" rx="1"/>';
 s+='<text x="'+(MX+34*M)+'" y="'+(MY+12*M)+'" fill="rgba(6,182,212,.5)" font-family="'+J+'" font-size="5" text-anchor="middle" transform="rotate(-90,'+(MX+34*M)+','+(MY+12*M)+')">CDU galleries</text>';
@@ -2823,12 +2864,12 @@ s+='<rect x="'+MX+'" y="'+(MY+22*M)+'" width="'+(72*M)+'" height="'+(4*M)+'" fil
 s+='<text x="'+(MX+20*M)+'" y="'+(MY+24.5*M)+'" fill="var(--t3)" font-family="'+J+'" font-size="6" text-anchor="middle">MAIN CORRIDOR + OVERHEAD BUSWAY</text>';
 
 // DH4 (South)
-s+='<g data-rz-equipment="room:datahall-4" tabindex="0" role="button">'+rmLive(4,26,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 4',(DH?(DH.hallLengthM+'m \u00D7 '+DH.hallWidthM+'m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'—'),(DH?(DH.racksPerHall+' NVL72 racks \u2502 '+DH.gpuPerHall.toLocaleString()+' GPU \u2502 '+DH.kwPerRack+' kW/rack (1 rack = 1 domain)'):'—'),(DH?('DH-4: GB300 NVL72, '+DH.racksPerHall+' racks, one NVLink domain each ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT'):'—'),20,45,'Running',0,0,0,0,0,0,0,{sub:bo('hallLengthM',{also:['hallWidthM','itHall'],nomark:true}),equip:bo('racksPerHall',{also:['gpuPerHall','kwPerRack'],nomark:true})})+'</g>';
-s+=`<text x="8" y="752" fill="var(--t3)" font-family="${J}" font-size="8.5" font-style="italic">BUILDING GRID: retired-basis plot \u2014 hall dimensions, rack rows and equipment counts are current (engine); site re-grid to the ${DH?DH.hallLengthM:'\u2014'} \u00D7 ${DH?DH.hallWidthM:'\u2014'} m hall is pending (Track A)</text>`;
+s+='<g data-rz-equipment="room:datahall-4" tabindex="0" role="button">'+rmLive(4,26,32,20,'rgba(34,197,94,.1)','rgba(34,197,94,.5)','DATAHALL 4',(DH?(DH.hallLengthM+'m \u00D7 '+DH.hallWidthM+'m \u2502 '+(DH.itHall/1000).toFixed(2)+' MW'):'—'),(DH?(DH.racksPerHall+' NVL72 racks \u2502 '+DH.gpuPerHall.toLocaleString()+' GPU \u2502 '+DH.kwPerRack+' kW/rack (1 rack = 1 domain)'):'—'),(DH?('DH-4: GB300 NVL72, '+DH.racksPerHall+' racks, one NVLink domain each ('+DH.racksPerHall+' racks), '+DH.itHallFmt+'kW IT'):'—'),20,45,'Running',{sub:bo('hallLengthM',{also:['hallWidthM','itHall'],nomark:true}),equip:bo('racksPerHall',{also:['gpuPerHall','kwPerRack'],nomark:true}),textAt:'top'})+'</g>';
+s+=`<text x="8" y="668" fill="var(--t3)" font-family="${J}" font-size="8.5" font-style="italic">BUILDING GRID: retired-basis plot \u2014 hall dimensions, rack rows and equipment counts are current (engine); site re-grid to the ${DH?DH.hallLengthM:'\u2014'} \u00D7 ${DH?DH.hallWidthM:'\u2014'} m hall is pending (Track A)</text>`;
 s+='<rect x="'+(MX+4*M)+'" y="'+(MY+26*M)+'" width="'+(32*M)+'" height="'+(20*M)+'" fill="transparent" data-tab="dh" style="cursor:pointer"><title>Click to view Data Hall details</title></rect>';
 for(var r2=0;r2<2;r2++){
 s+='<rect x="'+(MX+(7+r2*13)*M)+'" y="'+(MY+29*M)+'" width="'+(6*M)+'" height="'+(14*M)+'" fill="rgba(34,197,94,.06)" stroke="rgba(34,197,94,.2)" stroke-width=".3" rx="1"/>';
-s+='<text x="'+(MX+(10+r2*13)*M)+'" y="'+(MY+36*M)+'" fill="rgba(34,197,94,.4)" font-family="'+J+'" font-size="7" text-anchor="middle" transform="rotate(-90,'+(MX+(10+r2*13)*M)+','+(MY+36*M)+')">BANK '+(r2===0?'A R01-20':'B R21-40')+'</text>';
+s+='<text x="'+(MX+(10+r2*13)*M)+'" y="'+(MY+37.5*M)+'" fill="rgba(34,197,94,.4)" font-family="'+J+'" font-size="7" text-anchor="middle" transform="rotate(-90,'+(MX+(10+r2*13)*M)+','+(MY+37.5*M)+')">BANK '+(r2===0?'A R01-20':'B R21-40')+'</text>';
 }
 s+='<rect x="'+(MX+33*M)+'" y="'+(MY+28*M)+'" width="'+(2*M)+'" height="'+(16*M)+'" fill="rgba(6,182,212,.12)" stroke="rgba(6,182,212,.3)" stroke-width=".5" rx="1"/>';
 s+='<text x="'+(MX+34*M)+'" y="'+(MY+36*M)+'" fill="rgba(6,182,212,.5)" font-family="'+J+'" font-size="5" text-anchor="middle" transform="rotate(-90,'+(MX+34*M)+','+(MY+36*M)+')">CDU galleries</text>';
@@ -2840,7 +2881,7 @@ s+=rm(38,2,16,9,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','UPS Room C','16m \
 s+=eq(39,4,6,4,'rgba(245,158,11,.15)','UPS-1C',4.5);
 s+=eq(46,4,6,4,'rgba(245,158,11,.15)','UPS-2C',4.5);
 s+=rm(38,11,16,9,'rgba(245,158,11,.08)','rgba(245,158,11,.3)','Battery Room C','16m \u00D7 9m','Li-Ion NMC Racks');
-s+=rm(54,2,6,20,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','Busway Riser','6m \u00D7 20m',(DH?DH.buswayAFmt+'A Cu busduct':'\u2014'),'Busway: 2\u00D7 '+(DH?DH.buswayAFmt:'\u2014')+' A Cu overhead busduct vertical riser (trunk per feed)',{equip:bo('buswayA',{nomark:true})});
+s+=rm(54,2,6,20,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','Busway Riser','6m \u00D7 20m',(DH?DH.buswayAFmt+'A Cu busduct':'\u2014'),'Busway: 2\u00D7 '+(DH?DH.buswayAFmt:'\u2014')+' A Cu overhead busduct vertical riser (trunk per feed)',{equip:bo('buswayA',{nomark:true}),textAt:'top'});
 s+='<line x1="'+(MX+55.5*M)+'" y1="'+(MY+3*M)+'" x2="'+(MX+55.5*M)+'" y2="'+(MY+21*M)+'" stroke="rgba(245,158,11,.3)" stroke-width="2" stroke-dasharray="6 3"/>';
 s+='<line x1="'+(MX+58.5*M)+'" y1="'+(MY+3*M)+'" x2="'+(MX+58.5*M)+'" y2="'+(MY+21*M)+'" stroke="rgba(245,158,11,.3)" stroke-width="2" stroke-dasharray="6 3"/>';
 s+='<text x="'+(MX+57*M)+'" y="'+(MY+12*M)+'" fill="rgba(245,158,11,.4)" font-family="'+J+'" font-size="4" text-anchor="middle" transform="rotate(-90,'+(MX+57*M)+','+(MY+12*M)+')">Bus A  Bus B</text>';
@@ -2851,7 +2892,7 @@ s+=rm(38,26,16,9,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','UPS Room D','16m 
 s+=eq(39,28,6,4,'rgba(245,158,11,.15)','UPS-1D',4.5);
 s+=eq(46,28,6,4,'rgba(245,158,11,.15)','UPS-2D',4.5);
 s+=rm(38,35,16,11,'rgba(245,158,11,.08)','rgba(245,158,11,.3)','Battery Room D','16m \u00D7 11m','Li-Ion NMC Racks');
-s+=rm(54,26,6,22,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','Busway Riser','6m \u00D7 22m',(DH?DH.buswayAFmt+'A Cu busduct':'\u2014'),'Busway: 2\u00D7 '+(DH?DH.buswayAFmt:'\u2014')+' A Cu overhead busduct vertical riser (trunk per feed)',{equip:bo('buswayA',{nomark:true})});
+s+=rm(54,26,6,22,'rgba(245,158,11,.1)','rgba(245,158,11,.35)','Busway Riser','6m \u00D7 22m',(DH?DH.buswayAFmt+'A Cu busduct':'\u2014'),'Busway: 2\u00D7 '+(DH?DH.buswayAFmt:'\u2014')+' A Cu overhead busduct vertical riser (trunk per feed)',{equip:bo('buswayA',{nomark:true}),textAt:'top'});
 s+='<line x1="'+(MX+55.5*M)+'" y1="'+(MY+27*M)+'" x2="'+(MX+55.5*M)+'" y2="'+(MY+47*M)+'" stroke="rgba(245,158,11,.3)" stroke-width="2" stroke-dasharray="6 3"/>';
 s+='<line x1="'+(MX+58.5*M)+'" y1="'+(MY+27*M)+'" x2="'+(MX+58.5*M)+'" y2="'+(MY+47*M)+'" stroke="rgba(245,158,11,.3)" stroke-width="2" stroke-dasharray="6 3"/>';
 s+='<text x="'+(MX+57*M)+'" y="'+(MY+37*M)+'" fill="rgba(245,158,11,.4)" font-family="'+J+'" font-size="4" text-anchor="middle" transform="rotate(-90,'+(MX+57*M)+','+(MY+37*M)+')">Bus A  Bus B</text>';
@@ -2889,21 +2930,29 @@ s+='<rect width="960" height="620" fill="var(--bg2)"/>';
 s+='<defs><pattern id="rfGrid" width="'+M+'" height="'+M+'" patternUnits="userSpaceOnUse"><path d="M'+M+' 0L0 0 0 '+M+'" fill="none" stroke="rgba(255,255,255,.02)" stroke-width=".2"/></pattern></defs>';
 s+='<rect x="'+MX+'" y="'+MY+'" width="'+(72*M)+'" height="'+(48*M)+'" fill="url(#rfGrid)"/>';
 
-s+=tx(480,14,'ROOF PLAN \u2014 HEAT REJECTION & DRY COOLERS','var(--t1)',10,'middle',1);
-s+=tx(480,26,'Chillers housed on Ground Floor (Chiller Plant Hall) \u2014 only heat-rejection equipment lives on roof','var(--t3)',4.5,'middle');
+s+=tx(480,11,'ROOF PLAN \u2014 HEAT REJECTION & DRY COOLERS','var(--t1)',10,'middle',1);
+/* v3.6.3 — the roof caption reads from the left margin. Centred under the title it was ~440 px
+   wide and reached the SAF facade tags on the north wall; moving it up or down only changed which
+   neighbour it met. A note this long is a margin note. */
+/* v3.6.3 — the caption was 100 characters wide and reached the SAF facade tags on the north wall
+   from any vertical position; shortened rather than shuffled, because the sentence was carrying
+   the same fact twice. */
+s+=tx(480,21,'Chillers live on the Ground Floor \u2014 the roof carries heat rejection only','var(--t3)',4.5,'middle');
 
 // Building outline
 s+='<rect x="'+MX+'" y="'+MY+'" width="'+(72*M)+'" height="'+(48*M)+'" fill="none" stroke="var(--t2)" stroke-width="2" rx="2"/>';
 
 // === CW Riser & Distribution Manifold (NW quadrant) \u2014 Chillers moved to Ground Floor ===
-s+=rm(2,1,28,19,'rgba(100, 116, 139,.12)','rgba(100, 116, 139,.45)','CW DISTRIBUTION MANIFOLD','28m \u00D7 19m','Risers from Chiller Plant (GF)','CW Distribution Manifold: Supply/Return risers from 8\u00D7 4MW chillers housed on Ground Floor up to dry-cooler array. DN500 carbon-steel insulated, 30% PG glycol, ~600 m\u00B3/h per chiller line.');
+s+=rm(2,1,28,19,'rgba(100, 116, 139,.12)','rgba(100, 116, 139,.45)','CW DISTRIBUTION MANIFOLD','28m \u00D7 19m','Risers from Chiller Plant (GF)','CW Distribution Manifold: Supply/Return risers from 8\u00D7 4MW chillers housed on Ground Floor up to dry-cooler array. DN500 carbon-steel insulated, 30% PG glycol, ~600 m\u00B3/h per chiller line.',{textAt:'top'});
 // 8 supply + return riser pairs (correspond to the 8 chillers on Ground Floor)
 for(var ri=0;ri<8;ri++){
 var rix=4+ri*3,riy=6;
 s+='<rect x="'+(MX+rix*M)+'" y="'+(MY+riy*M)+'" width="'+(M*1)+'" height="'+(M*4)+'" rx="1" fill="rgba(6,182,212,.18)" stroke="var(--c)" stroke-width=".6"/>';
-s+='<text x="'+(MX+(rix+0.5)*M)+'" y="'+(MY+(riy+5.2)*M)+'" fill="var(--c)" font-family="'+J+'" font-size="3" text-anchor="middle">S-'+(ri+1)+'</text>';
+/* v3.6.3 — riser tags above their pipes. Below, at riy+5.2, they sat on the CW SUPPLY HEADER
+   caption that runs across the manifold at 11.5 m. */
+s+='<text x="'+(MX+(rix+0.5)*M)+'" y="'+(MY+(riy-0.8)*M)+'" fill="var(--c)" font-family="'+J+'" font-size="3" text-anchor="middle">S-'+(ri+1)+'</text>';
 s+='<rect x="'+(MX+(rix+1.3)*M)+'" y="'+(MY+riy*M)+'" width="'+(M*1)+'" height="'+(M*4)+'" rx="1" fill="rgba(245,158,11,.18)" stroke="var(--o)" stroke-width=".6"/>';
-s+='<text x="'+(MX+(rix+1.8)*M)+'" y="'+(MY+(riy+5.2)*M)+'" fill="var(--o)" font-family="'+J+'" font-size="3" text-anchor="middle">R-'+(ri+1)+'</text>';
+s+='<text x="'+(MX+(rix+1.8)*M)+'" y="'+(MY+(riy-0.8)*M)+'" fill="var(--o)" font-family="'+J+'" font-size="3" text-anchor="middle">R-'+(ri+1)+'</text>';
 }
 // Manifold cross-headers (supply + return)
 s+='<line x1="'+(MX+4*M)+'" y1="'+(MY+12*M)+'" x2="'+(MX+28*M)+'" y2="'+(MY+12*M)+'" stroke="var(--c)" stroke-width="2.5" opacity=".7"/>';
@@ -2928,7 +2977,7 @@ s+='<circle cx="'+(MX+(37.5+dc2*8.5)*M)+'" cy="'+(MY+12.5*M)+'" r="'+(1.8*M)+'" 
 }
 
 // === CW Pump Station (Center) ===
-s+=rm(2,20,18,8,'rgba(100, 116, 139,.1)','rgba(100, 116, 139,.35)','CW Pump Station','18m \u00D7 8m','4\u00D7 Grundfos NB 100-200 VFD','CW Pumps: 4\u00D7 Grundfos NB 100-200, VFD, 30% PG glycol, closed-loop');
+s+=rm(2,20,18,8,'rgba(100, 116, 139,.1)','rgba(100, 116, 139,.35)','CW Pump Station','18m \u00D7 8m','4\u00D7 Grundfos NB 100-200 VFD','CW Pumps: 4\u00D7 Grundfos NB 100-200, VFD, 30% PG glycol, closed-loop',{textAt:'top'});
 s+=eq(4,22,3,3,'rgba(100, 116, 139,.2)','P1',5);
 s+=eq(8,22,3,3,'rgba(100, 116, 139,.2)','P2',5);
 s+=eq(12,22,3,3,'rgba(100, 116, 139,.2)','P3',5);
@@ -2952,7 +3001,9 @@ var sfx=MX+(28+saf*8)*M;
 s+='<rect x="'+(sfx-3*M)+'" y="'+(MY-0.5*M)+'" width="'+(6*M)+'" height="'+(1.5*M)+'" rx="1" fill="rgba(245,158,11,.1)" stroke="rgba(245,158,11,.4)" stroke-width=".6"/>';
 // Louver lines
 for(var lv2=0;lv2<4;lv2++){s+='<line x1="'+(sfx-2.5*M)+'" y1="'+(MY-0.2*M+lv2*0.35*M)+'" x2="'+(sfx+2.5*M)+'" y2="'+(MY-0.2*M+lv2*0.35*M)+'" stroke="rgba(245,158,11,.25)" stroke-width=".3"/>';}
-s+='<text x="'+sfx+'" y="'+(MY-1.2*M)+'" fill="rgba(245,158,11,.6)" font-family="'+J+'" font-size="4" text-anchor="middle">SAF-'+(saf+1)+' Facade</text>';
+/* v3.6.3 — beside the grille, not above it. Centred above, the caption sat on the outward arrow
+   and reached the roof-plan title in the top margin; a facade tag belongs next to its louvre. */
+s+='<text x="'+(sfx+3.4*M)+'" y="'+(MY+0.6*M)+'" fill="rgba(245,158,11,.6)" font-family="'+J+'" font-size="4" text-anchor="start">SAF-'+(saf+1)+' Facade</text>';
 // Arrow pointing outward (up)
 s+='<polygon points="'+sfx+','+(MY-2*M)+' '+(sfx-1.5*M)+','+(MY-1*M)+' '+(sfx+1.5*M)+','+(MY-1*M)+'" fill="rgba(245,158,11,.3)"/>';
 // Dashed duct routing from interior
@@ -2963,7 +3014,7 @@ for(var sef=0;sef<2;sef++){
 var sefx=MX+(28+sef*8)*M;
 s+='<rect x="'+(sefx-3*M)+'" y="'+(MY+47*M)+'" width="'+(6*M)+'" height="'+(1.5*M)+'" rx="1" fill="rgba(245,158,11,.1)" stroke="rgba(245,158,11,.4)" stroke-width=".6"/>';
 for(var lv3=0;lv3<4;lv3++){s+='<line x1="'+(sefx-2.5*M)+'" y1="'+(MY+47.2*M+lv3*0.35*M)+'" x2="'+(sefx+2.5*M)+'" y2="'+(MY+47.2*M+lv3*0.35*M)+'" stroke="rgba(245,158,11,.25)" stroke-width=".3"/>';}
-s+='<text x="'+sefx+'" y="'+(MY+49.5*M)+'" fill="rgba(245,158,11,.6)" font-family="'+J+'" font-size="4" text-anchor="middle">SEF-'+(sef+1)+' Facade</text>';
+s+='<text x="'+(sefx+3.4*M)+'" y="'+(MY+48.1*M)+'" fill="rgba(245,158,11,.6)" font-family="'+J+'" font-size="4" text-anchor="start">SEF-'+(sef+1)+' Facade</text>';
 // Arrow pointing outward (down)
 s+='<polygon points="'+sefx+','+(MY+50.5*M)+' '+(sefx-1.5*M)+','+(MY+49.5*M)+' '+(sefx+1.5*M)+','+(MY+49.5*M)+'" fill="rgba(245,158,11,.3)"/>';
 // Dashed duct routing from interior
@@ -3052,7 +3103,11 @@ $('floorDetail').style.display='block';
 $('floorTitle').textContent=floorNames[key]||key;
 var fc=$('floorC');
 var fs=$('floorSvg');
-fs.setAttribute('viewBox',key==='gf'?'-230 -100 1420 880':'0 0 960 620');
+fs./* v3.6.3 — the upper floors and the roof draw their dimension strings and stat rows OUTSIDE the
+           plan, which is where dimensions belong on a drawing — but the viewBox stopped at the plan, so
+           the geometry survey counted 32 elements painted past the frame. The margin is part of the
+           drawing; the box now says so. Ground keeps its own box, which already carries one. */
+        setAttribute('viewBox',key==='gf'?'-230 -100 1420 880':'-20 -40 1000 720');
 switch(key){
 case 'gf':renderGroundFloor(fc);break;
 case 'f2':renderFloor2(fc);break;

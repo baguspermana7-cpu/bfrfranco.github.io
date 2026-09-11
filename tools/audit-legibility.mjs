@@ -155,7 +155,7 @@ try {
                        tab/sub alone, #floorSvg collapsed into the same `over/` key as #bldgSvg and
                        was skipped every run: the drill-down that holds 191 sub-floor labels was
                        never opened. A reveal earns its own key. */
-                    const key = `${entry.tab}/${entry.sub || ''}/${entry.reveal ? entry.selector : ''}`;
+                    const key = `${entry.tab}/${entry.sub || ''}/${entry.reveal ? entry.reveal.click : ''}`;
                     if (seenTabs.has(key)) continue;
                     seenTabs.add(key);
                     await activateTab(tab, tabSet, entry);
