@@ -8068,6 +8068,19 @@ s+=`<style>.laser{stroke:url(#laserG);stroke-width:2;stroke-dasharray:15 85;anim
             .hero, .lab-hero, .sim-hero { padding: 1rem !important; }
             h1 { font-size: 1.6rem !important; line-height: 1.2 !important; }
             svg { max-width: 100% !important; height: auto !important; }
+            /* v3.6.3 — the one exception, and it is the whole point of the legibility scaler.
+               The clamp above exists so a wide drawing cannot push the PAGE sideways on a phone.
+               A diagram RZSvgLegible has widened cannot do that: the module puts it inside
+               [data-rz-legible-pane], which is itself max-width:100% with overflow-x:auto, so the
+               overflow is the pane's and the page never scrolls. Without this exception the clamp
+               won at every width <= 768 and silently undid the scaling on ALL nine registered
+               diagrams — measured: the floor plan asked for 4.2x and rendered at 1.0x, labels at
+               6.1 px, while the note printed the scale it had asked for. Mobile was the one place
+               the v3.5.0 work never reached, and nothing said so. */
+            [data-rz-legible-pane] > svg[data-rz-legible-scale] {
+                max-width: none !important;
+                width: auto;
+            }
             .sld-svg, .pid-svg, .topology-svg, .architecture-svg, [data-diagram] {
                 width: 100% !important;
                 height: auto !important;
@@ -15736,8 +15749,22 @@ if(faqBtn){ faqBtn.addEventListener('click',openFaqDialog); }
     R('#fireSvg',   {maxScale:1.6});   /* 31 of 209, smallest 6.94 px */
     /* v3.6.3 — the floor-plan drill-down. It is not on a tab: #floorDetail is display:none until a
        floor is clicked in the isometric, which is why it measured as 0 labels for months. Opened,
-       191 of 222 sit under the floor at 4.0 px, so it needs the widest budget on the page. */
-    R('#floorSvg',  {maxScale:2.3});
+       191 of 222 sit under the floor at 4.0 px, so it needs the widest budget on the page.
+       3.2x is past the 2.6 the module calls "panning a poster", and it is deliberate: this drawing
+       carries eight ATS tags at font-size 3.2 and twenty-eight glyphs at 3.5, so the floor is only
+       reachable at 3.11x. The module's own doctrine is that a diagram which cannot afford a bigger
+       font can always afford a bigger drawing, and the cost is width — which is what the scroll
+       pane is for. At 2.3x the note said so honestly ("STILL UNDER THE 8.5 PX FLOOR AT THIS CAP"),
+       which is a correct report of a drawing the reader still cannot read.
+
+       The number is a SAFETY LIMIT, not a design value. What this drawing actually needs is an
+       absolute width — about 3,860 px, the width at which its 3.2 px tags cross 8.5 px — and the
+       module expresses its budget as a multiple of the PANE, so the multiple required grows as the
+       viewport shrinks: 3.11x at a 1240 px pane, 3.84x at 1004 px, the same 3,860 px either way.
+       4.2 covers every pane down to ~920 px. Below that the note reports the shortfall rather than
+       hiding it. A `minWidth` option on js/rz-svg-legible.js would say this directly and is the
+       right home for it; that file is being edited elsewhere as this ships. */
+    R('#floorSvg',  {maxScale:4.2});
     return true;
   }
   if(!go()) window.addEventListener('load', go);

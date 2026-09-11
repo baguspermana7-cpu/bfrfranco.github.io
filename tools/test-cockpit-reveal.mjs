@@ -108,6 +108,39 @@ try {
     () => activateTab(page, set, { ...floor, reveal: { click: '#bldgSvg [data-floor]', expect: '#rzNoSuchPanel' } }),
     /no reveal target/, 'a reveal whose target does not exist must throw');
 
+  /* THE MOBILE CLAMP. datahallAI.html's responsive patch carries
+     `svg { max-width: 100% !important }` so a wide drawing cannot push the PAGE sideways on a
+     phone. That rule also beat the inline width RZSvgLegible sets, so under 768 px every
+     registered diagram quietly rendered at 1:1 — the floor plan asked for 4.2x, drew at 1.0x, and
+     printed a note claiming the scale it had asked for. The page has an exception now, and the
+     exception has to keep holding BOTH halves: the drawing widens, and the page still does not
+     scroll, because the overflow belongs to the pane. */
+  for (const width of [390, 768]) {
+    const small = await browser.newPage();
+    await small.setViewport({ width, height: 850 });
+    await primeCockpitAuditDocument(small, 'dark');
+    await small.goto(`${base}/datahallAI.html`, { waitUntil: 'domcontentloaded', timeout: 60000 });
+    await enterAuthorizedAuditState(small, set.cockpit);
+    await activateTab(small, set, set.diagrams.find((d) => d.selector === '#hSvg'));
+    const m = await small.evaluate(() => {
+      const svg = document.querySelector('#hSvg');
+      const pane = svg.parentElement;
+      return { svgW: Math.round(svg.getBoundingClientRect().width),
+               paneW: pane.clientWidth,
+               paneOverflowX: getComputedStyle(pane).overflowX,
+               asked: Number(svg.getAttribute('data-rz-legible-scale')),
+               pageScroll: document.documentElement.scrollWidth - document.documentElement.clientWidth };
+    });
+    await small.close();
+    assert.ok(m.asked > 1, `at ${width}px the hall diagram should still ask for a scale`);
+    assert.ok(m.svgW > m.paneW * 1.2,
+      `at ${width}px the hall diagram asked for ${m.asked}x but rendered ${m.svgW}px in a ${m.paneW}px pane `
+      + '— the mobile max-width clamp is beating the scaler again');
+    assert.equal(m.paneOverflowX, 'auto', 'the widened drawing must sit in a scrolling pane');
+    assert.ok(m.pageScroll <= 2,
+      `at ${width}px the PAGE scrolls ${m.pageScroll}px — the pane must own the overflow, not the document`);
+  }
+
   console.log('── COCKPIT REVEAL ──');
   console.log(`floor plan opens via ${floor.reveal.click} -> ${floor.reveal.expect}; `
     + `${shown.total} labels, smallest ${shown.min}px at ${shown.scale}x, none under ${FLOOR_PX}px`);
