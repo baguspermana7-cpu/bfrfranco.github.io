@@ -1,6 +1,6 @@
 {
   "generatedBy": "tools/build-dcai-parameter-registry.mjs",
-  "engineVersion": "1.2.0",
+  "engineVersion": "1.3.0",
   "note": "GENERATED — do not hand-edit. Curated metadata lives in data/dcai-parameters.curated.json; authored-leaf provenance is read from js/dcai-model.js.",
   "parameters": [
     {
@@ -4593,11 +4593,12 @@
       "consumers": [
         {
           "page": "datahallAI.html",
-          "reads": 3
+          "reads": 8
         }
       ],
       "tests": [
         "test-dcai-engine.mjs",
+        "test-dcai-hv-switchyard.mjs",
         "test-dcai-voltage-chain.mjs",
         "test-dcai-parameter-registry.mjs (provenance + evidence class)"
       ],
@@ -4605,6 +4606,134 @@
       "source": {
         "ref": "js/dcai-model.js electrical.hvIntakeKv",
         "method": "PLN Java-Bali subtransmission voltage, and the owner's decision 2026-09-09 (\"harusnya memang 150kv\"). ADOPTED",
+        "asOf": "2026-09-06"
+      }
+    },
+    {
+      "id": "distribution.hv_line_bays",
+      "unit": null,
+      "kind": "derived",
+      "value": 4,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.hvCircuitMva",
+        "electrical.powerFactor",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-hv-switchyard.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "distribution.hv_switchyard_bays",
+      "unit": null,
+      "kind": "derived",
+      "value": 20,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.hvCircuitMva",
+        "electrical.mainTxMva",
+        "electrical.powerFactor",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "distribution.hv_transformer_bays",
+      "unit": null,
+      "kind": "derived",
+      "value": 16,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.mainTxMva",
+        "electrical.powerFactor",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-hv-switchyard.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "distribution.main_tx_impedance_pct",
+      "unit": "%",
+      "kind": "authored",
+      "value": 14,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.mainTxImpedancePct"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs",
+        "test-dcai-hv-switchyard.mjs",
+        "test-dcai-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js electrical.mainTxImpedancePct",
+        "method": "typical short-circuit impedance for a 100 MVA 150/20 kV unit. It is what decides the fault level the 20 kV switchgear must clear. ADOPTED",
         "asOf": "2026-09-06"
       }
     },
@@ -4762,11 +4891,12 @@
       "consumers": [
         {
           "page": "datahallAI.html",
-          "reads": 3
+          "reads": 8
         }
       ],
       "tests": [
         "test-dcai-engine.mjs",
+        "test-dcai-hv-switchyard.mjs",
         "test-dcai-voltage-chain.mjs",
         "test-dcai-parameter-registry.mjs (provenance + evidence class)"
       ],
@@ -4795,6 +4925,32 @@
         "equipment.ups.efficiency",
         "facility.rackItKw",
         "facility.racksPerHall"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 7
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "distribution.main_tx_primary_a",
+      "unit": null,
+      "kind": "derived",
+      "value": 384.9001794597505,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.hvIntakeKv",
+        "electrical.mainTxMva"
       ],
       "dependsOnInputsAtCliff": [],
       "consumers": [
@@ -4859,7 +5015,7 @@
       "consumers": [
         {
           "page": "datahallAI.html",
-          "reads": 3
+          "reads": 4
         }
       ],
       "tests": [
@@ -5151,11 +5307,12 @@
       "consumers": [
         {
           "page": "datahallAI.html",
-          "reads": 3
+          "reads": 8
         }
       ],
       "tests": [
         "test-dcai-engine.mjs",
+        "test-dcai-hv-switchyard.mjs",
         "test-dcai-voltage-chain.mjs",
         "test-dcai-parameter-registry.mjs (provenance + evidence class)"
       ],
@@ -9013,7 +9170,7 @@
       "label": "version",
       "unit": null,
       "kind": "authored",
-      "value": "1.2.0",
+      "value": "1.3.0",
       "formula": null,
       "deps": [],
       "scope": "meta",

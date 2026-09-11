@@ -555,6 +555,10 @@
     var mainTxPerHallPerFeed = ceilCount(hallKva / 1000, el.mainTxMva);
     var mainTxTotal = mainTxPerHallPerFeed * 2 * f.halls;
     var mainTxSecondaryA = div(el.mainTxMva * 1e6, SQRT3_HV * el.mvKv * 1000, 'main transformer secondary current');
+    /* The HV side of the same machine. Published because the switchyard drawing has to state a
+       primary current to size its CT ratio and its conductor, and a drawn number that is not an
+       engine number is exactly the prose the four-level chain was built to retire. */
+    var mainTxPrimaryA = div(el.mainTxMva * 1e6, SQRT3_HV * el.hvIntakeKv * 1000, 'main transformer primary current');
     /* one section is fed by ONE main transformer with the bus tie open, so the fault the board
        must clear is that machine's alone: Isc = MVA / (sqrt3 x kV x Zk) */
     var mvFaultKa = div(el.mainTxMva, SQRT3_HV * el.mvKv * (el.mainTxImpedancePct / 100), 'MV fault level');
@@ -581,6 +585,8 @@
       main_tx_per_hall_per_feed: mainTxPerHallPerFeed,
       main_tx_total: mainTxTotal,
       main_tx_secondary_a: mainTxSecondaryA,
+      main_tx_primary_a: mainTxPrimaryA,
+      main_tx_impedance_pct: el.mainTxImpedancePct,
       main_tx_loading_normal_pct: div(hallKva / 2, mainTxPerHallPerFeed * el.mainTxMva * 1000) * 100,
       main_tx_loading_contingency_pct: div(hallKva, mainTxPerHallPerFeed * el.mainTxMva * 1000) * 100,
       mv_board_rated_a: el.mvBoardRatedA,
@@ -593,6 +599,12 @@
       unit_sub_mv_current_a: unitSubCurrentA,
       mv_feeder_unit_subs: mvFeederUnitSubs,
       mv_feeders_per_hall_per_feed: mvFeedersPerHallPerFeed,
+      /* What the intake actually costs in civil terms: one bay per line circuit plus one per main
+         transformer. At 628 MW taken at 150 kV that is a very large switchyard, and the drawing
+         says so rather than showing two boxes and a sentence. */
+      hv_line_bays: hvCircuitsDuty + 1,
+      hv_transformer_bays: mainTxTotal,
+      hv_switchyard_bays: (hvCircuitsDuty + 1) + mainTxTotal,
       /* The three levels are hv_intake_kv, mv_kv and voltage_ll_v above; they were briefly also
          published as an ARRAY here, and that blanked the entire page. The registry generator
          digests a nested array to a string ("[3 items] sha1:..."), the page's authority check
@@ -651,7 +663,7 @@
     return deepFreeze({
       meta: {
         engine: 'dcai-engine.js',
-        version: '1.2.0',   /* v2.4.0: hall geometry re-adopted as 40 rows × 22 racks in two banks (rows_per_bank, racks_per_bank) */
+        version: '1.3.0',   /* v3.7.0: the HV side of the main transformer is published — primary current, impedance and the switchyard bay count */
         spec_version: m.specVersion,
         authority: m.authority,
         evidence_class: 'SIMULATED/ADOPTED',

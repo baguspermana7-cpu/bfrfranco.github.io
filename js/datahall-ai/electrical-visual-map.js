@@ -59,14 +59,30 @@
     var feed = feedFromId(id);
     if (!feed || /(?:^|-)bus-tie$/.test(id) || /-rmu-bus-tie$/.test(id)) { return null; }
 
-    if (/^elec-(?:pln-[ab]-to-meter|meter-[ab]-to-vcb-inc-[ab]|vcb-inc-[ab]-to-bus-[ab]|bus-[ab]-drop-vert)$/.test(id)) {
-      return edgeId(feed, 'UTILITY-{F}-MV-BUS-{F}');
+    /* v3.7.0 — the utility no longer touches a 20 kV board. Everything drawn on the 150 kV side
+       of the main transformer binds to an HV edge; everything on its 20 kV side binds to the
+       transformer's own outgoing edge. A segment that used to say UTILITY-x-MV-BUS-x was
+       claiming a hop that does not exist in a four-level chain. */
+    if (/^(?:elec|dh[1-4])-pln-[ab]-to-meter$/.test(id)) {
+      return edgeId(feed, 'UTILITY-{F}-HV-INTAKE-{F}');
+    }
+    if (/^(?:elec|dh[1-4])-hv-(?:meter-[ab]-to-cb|cb-[ab]-to-bus)$/.test(id)) {
+      return edgeId(feed, 'HV-INTAKE-{F}-HV-BUS-{F}');
+    }
+    if (/^(?:elec|dh[1-4])-hv-bus-[ab]-to-tx$/.test(id)) {
+      return edgeId(feed, 'HV-BUS-{F}-MAIN-TX-{F}');
+    }
+    if (/^(?:elec|dh[1-4])-main-tx-[ab]-to-mv$/.test(id)) {
+      return edgeId(feed, 'MAIN-TX-{F}-MV-BUS-{F}');
+    }
+    if (/^elec-(?:meter-[ab]-to-vcb-inc-[ab]|vcb-inc-[ab]-to-bus-[ab]|bus-[ab]-drop-vert)$/.test(id)) {
+      return edgeId(feed, 'MAIN-TX-{F}-MV-BUS-{F}');
     }
     if (/^elec-feeder-[ab][1-4]-(?:drop|exit)$/.test(id)) {
       return edgeId(feed, 'MV-BUS-{F}-RMU-{F}');
     }
-    if (/^dh[1-4]-(?:pln-[ab]-to-meter|meter-[ab]-to-vcb|vcb-inc-[ab]-to-bus)$/.test(id)) {
-      return edgeId(feed, 'UTILITY-{F}-MV-BUS-{F}');
+    if (/^dh[1-4]-(?:meter-[ab]-to-vcb|vcb-inc-[ab]-to-bus)$/.test(id)) {
+      return edgeId(feed, 'MAIN-TX-{F}-MV-BUS-{F}');
     }
     if (/^dh[1-4]-(?:bus-to-f[ab]|f[ab]-to-rmu-drop|rmu-input-[ab]|rmu-meter-[ab]-to-vcb|rmu-vcb-[ab]-to-bus)$/.test(id)) {
       return edgeId(feed, 'MV-BUS-{F}-RMU-{F}');

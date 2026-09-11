@@ -79,4 +79,24 @@ for (const f of fields) {
     if (!ok) parity.push(`${f}=${v} vs ${map[f]}=${reg}`);
 }
 assert.deepEqual(parity, [], `adapter value differs from its registry record:\n  ${parity.join('\n  ')}`);
+/* v3.7.0 — the SECOND adapter has to resolve too. DHAX() is the drawing-side view every SLD and
+ * the electrical overview read through (`var X=DHAX()`), and it is hand-maintained: when the
+ * four-level chain landed in v3.2.0 the seven MV/HV fields went into DHE and nobody added them
+ * here, so `X.hvIntakeKv` was undefined and the per-hall single-line printed "PLN — kV" and
+ * "— kV Dual Feed from the 150/20 kV Main Transformers" for five releases. Failing closed to an
+ * em dash is correct behaviour; an em dash no gate ever looked at is how a whole voltage level
+ * goes missing in plain sight. This assertion is static: every X.<field> the page reads must be
+ * assigned by DHAX. */
+{
+    const lines = src.split('\n');
+    const start = lines.findIndex((l) => l.startsWith('function DHAX()'));
+    assert.ok(start >= 0, 'DHAX() must exist — the drawings read every number through it');
+    const end = lines.findIndex((l, i) => i > start && /^\/\* number -> fixed-decimal/.test(l));
+    const body = lines.slice(start, end).join('\n');
+    const defined = new Set([...body.matchAll(/\bo\.([A-Za-z0-9_]+)\s*=/g)].map((m) => m[1]));
+    const reads = new Set([...src.matchAll(/\bX\.([A-Za-z0-9_]+)/g)].map((m) => m[1]));
+    const undefinedReads = [...reads].filter((f) => !defined.has(f)).sort();
+    assert.deepEqual(undefinedReads, [], `the drawings read DHAX fields the adapter never assigns (they render as em dashes): ${undefinedReads.join(', ')}`);
+}
+
 console.log(`PASS DCAI basis map — ${fields.length} fields mapped, ${numeric} numeric at parity, ${read.size} bo() reads all mapped`);

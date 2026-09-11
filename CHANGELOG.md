@@ -11,6 +11,79 @@ release sections rather than semver.
 
 ---
 
+## v3.7.0 — 2026-09-12
+
+### The step is drawn where the voltage changes
+
+v3.2.0 answered the owner's arithmetic — *"aneh masak 150kv di step-down ke 400v pakai trafo"* — by
+giving the engine three published levels and a gate that checks every transformer ratio against
+adjacent ones. It did not answer the **drawing**. The per-hall single-line still opened with a
+`PLN 150 kV` box wired straight into a 20 kV vacuum breaker, and the 150/20 kV machine that makes
+that legal existed only inside a section header's sentence. A transformer a reader cannot click and
+a scenario cannot fault is not on the drawing.
+
+### Added
+
+- **A 150 kV switchyard band on all four hall single-lines and on the facility overview.** Two
+  independent PLN intakes (4 × 250 MVA circuits, N-1, 3 duty), a line bay per circuit — surge
+  arrester, 89-L isolator, 150 kV circuit breaker — a 150 kV bus per intake with **no tie** (the 2N
+  split starts at the grid, not at the 20 kV board), then the transformer bay and **MAIN-TX:
+  100 MVA, 150/20 kV, YNyn0 with a buried delta tertiary, Z 14 %**, one machine per feed per hall.
+  The band prints what the machine costs either side — 385 A primary, 2,887 A secondary, 40.9 %
+  loaded with both feeds and 81.8 % when one is lost — and what the switchyard costs in civil
+  terms: 4 line + 16 transformer = 20 bays. L0 is now honestly labelled: a 20 kV incomer **from**
+  MAIN-TX, not a grid box.
+- **`HV-INTAKE`, `HV-BUS` and `MAIN-TX` nodes per feed in the electrical state engine**
+  (84 nodes / 103 edges per hall, was 58 / 97 counting the old spine). The chain is a path —
+  utility → intake → bus → transformer → board — so a utility loss now darkens it in that order,
+  and the transformer is an inspectable block with its own payload class (`sld-main-tx`).
+- **`tools/test-dcai-hv-switchyard.mjs`** — asserts, per sheet, that a main-transformer block is
+  drawn, states the engine's ratio / rating / impedance, sits **between** the 150 kV label and the
+  20 kV bus, binds its conductors to HV topology edges, states the bay count, and opens an
+  inspector naming both levels. Proven RED against the pre-change page in a detached worktree.
+
+### Fixed
+
+- **`DHAX()` never assigned the seven MV/HV fields the drawings read.** Since v3.2.0 the per-hall
+  single-line printed **"PLN — kV"** and **"— kV Dual Feed from the 150/20 kV Main Transformers"**,
+  and the electrical overview subtitle the same. Failing closed to an em dash is the correct
+  behaviour for a dead binding; an em dash no gate ever looked at is how a whole voltage level goes
+  missing in plain sight. `tools/test-dcai-basis-map.mjs` now fails on **any** `X.<field>` the
+  adapter does not assign — the class, not the instance. Also proven RED first.
+- **The transformer symbol drew the vector group backwards.** `symTX` put Y over Δ while every
+  label on the page says Dyn11. The letters are now read from the IEC designation, so the upper
+  (primary) winding follows the group and a YNd machine cannot keep a Dyn symbol.
+- **The rack mimic said 50 VDC** where the rack detail, the payload rows and the inspector all say
+  48 VDC — one page disagreeing with itself about the bus every rack hangs on.
+- **The transformer-room caption said "4 units"** against an engine that sizes 33 per feed per
+  hall. It now prints the engine count and says four are drawn, the rule the CRAH and CDU banks
+  already follow, with the 20/0.4 kV winding ratio declared separately from the counts it is not.
+
+### Changed
+
+- Engine 1.2.0 → **1.3.0**: publishes `main_tx_primary_a`, `main_tx_impedance_pct`, `hv_line_bays`,
+  `hv_transformer_bays` and `hv_switchyard_bays`, each with its identity in the engine gate
+  (primary A × 150 kV = secondary A × 20 kV is the same machine measured twice). Registry 278 → 283
+  parameters, R7 and R8 still STRICT.
+- `standarization/DATAHALL_AI_STANDARD.md`: the SLD hierarchy was still written against the retired
+  GB200 basis (5 MVA transformers, 54 rack positions, 27 NVL72 domains, 6,300 A busway, 50 VDC).
+  Rewritten to twelve levels starting at L-HV, against the current engine.
+
+### Measurement note — the geometry monitor
+
+The new band cost nothing in label collisions and the first draft of it cost ten. Measured against
+this page at HEAD across four viewports and both themes: **collisions 746 before, 746 after.** The
+first layout put the 150 kV breaker's rating text through the 150 kV bus label and the floor-plan
+transformer caption through the TX-4A glyph (+80 findings); the band was re-spaced and the caption
+made one line with two claims side by side rather than two stacked lines.
+
+The clipped-element count is **not** a usable signal on this page and is reported here rather than
+claimed either way: three runs of the same tree gave 24, 38 and 28, and every finding is an animated
+`<circle>` on `coolSvg` — a diagram this release does not touch. A metric whose value moves by 14 on
+an unchanged tree cannot tell anyone whether a change made the page worse.
+
+---
+
 ## v3.6.7 — 2026-09-11
 
 ### The overlay gives way, and a fixture stops counting

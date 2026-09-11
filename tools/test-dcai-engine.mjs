@@ -56,7 +56,7 @@ const S = C.snapshot;
 /* ── 0. sources and hygiene ─────────────────────────────────────────────── */
 ok(!/Math\.random/.test(ENGINE_SRC) && !/Math\.random/.test(MODEL_SRC), 'no Math.random in model or engine');
 ok(Object.isFrozen(S) && Object.isFrozen(S.design) && Object.isFrozen(M.thermal), 'snapshot and model are deep-frozen');
-ok(S.meta.version === '1.2.0' && S.meta.spec_version === M.specVersion, 'meta carries version and spec_version');
+ok(S.meta.version === '1.3.0' && S.meta.spec_version === M.specVersion, 'meta carries version and spec_version');
 ok(!/MEASURED/.test(MODEL_SRC.replace(/nothing may claim MEASURED[^\n]*/,'')), 'nothing in the model claims MEASURED');
 {
   /* every numeric leaf in the model has a `// source:` line within the 6 lines above it */
@@ -374,6 +374,17 @@ approx(S.heat.liquid_hall_kwth * M.facility.halls, S.heat.liquid_kwth, 1e-6, 'ha
     'the duty circuits carry the worst-bin load');
   approx(Di.main_tx_secondary_a, M.electrical.mainTxMva * 1e6 / (SQ3 * M.electrical.mvKv * 1000), 1e-6,
     'main_tx_secondary_a = MVA / (sqrt3 x MV kV)');
+  approx(Di.main_tx_primary_a, M.electrical.mainTxMva * 1e6 / (SQ3 * M.electrical.hvIntakeKv * 1000), 1e-6,
+    'main_tx_primary_a = MVA / (sqrt3 x HV kV)');
+  approx(Di.main_tx_primary_a * Di.hv_intake_kv, Di.main_tx_secondary_a * Di.mv_kv, 1e-6,
+    'the same machine either side: primary A x 150 kV = secondary A x 20 kV');
+  ok(Di.main_tx_impedance_pct === M.electrical.mainTxImpedancePct,
+    'main_tx_impedance_pct is the authored machine impedance the fault level is computed from',
+    Di.main_tx_impedance_pct + '%');
+  ok(Di.hv_line_bays === Di.hv_circuits_installed && Di.hv_transformer_bays === Di.main_tx_total
+    && Di.hv_switchyard_bays === Di.hv_line_bays + Di.hv_transformer_bays,
+    'the switchyard is one bay per line circuit plus one per main transformer',
+    Di.hv_line_bays + ' line + ' + Di.hv_transformer_bays + ' transformer = ' + Di.hv_switchyard_bays + ' bays');
   ok(Di.mv_board_fits_secondary === (Di.main_tx_secondary_a <= Di.mv_board_rated_a) && Di.mv_board_fits_secondary === true,
     'the main transformer secondary fits the 20 kV board it feeds', Di.main_tx_secondary_a.toFixed(0) + ' A of ' + Di.mv_board_rated_a);
   approx(Di.mv_fault_ka_per_section, M.electrical.mainTxMva / (SQ3 * M.electrical.mvKv * (M.electrical.mainTxImpedancePct / 100)), 1e-6,

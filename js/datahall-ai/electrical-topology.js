@@ -140,6 +140,16 @@
       buswayTrunkA: readNumber(snapshot, 'distribution.busway_trunk_a'),
       buswayLoadingPct: readNumber(snapshot, 'distribution.busway_loading_pct'),
       rppPerHall: readPositiveInteger(snapshot, 'distribution.rpp_per_hall'),
+      hvIntakeKv: readNumber(snapshot, 'distribution.hv_intake_kv'),
+      mvKv: readNumber(snapshot, 'distribution.mv_kv'),
+      hvCircuitMva: readNumber(snapshot, 'distribution.hv_circuit_mva'),
+      hvCircuitsInstalled: readPositiveInteger(snapshot, 'distribution.hv_circuits_installed'),
+      mainTxPerFeed: readPositiveInteger(snapshot, 'distribution.main_tx_per_hall_per_feed'),
+      mainTxMva: readNumber(snapshot, 'distribution.main_tx_mva'),
+      mainTxImpedancePct: readNumber(snapshot, 'distribution.main_tx_impedance_pct'),
+      mainTxPrimaryA: readNumber(snapshot, 'distribution.main_tx_primary_a'),
+      mainTxSecondaryA: readNumber(snapshot, 'distribution.main_tx_secondary_a'),
+      mainTxLoadingContingencyPct: readNumber(snapshot, 'distribution.main_tx_loading_contingency_pct'),
       transformerCount: readPositiveInteger(snapshot, 'distribution.transformers_per_hall_per_feed'),
       transformerUnitMva: readNumber(snapshot, 'equipment.transformer_unit_mva'),
       upsFrameCount: readPositiveInteger(snapshot, 'distribution.ups_frames_per_hall_per_feed'),
@@ -190,6 +200,23 @@
 
     function addFeedNodes(nodes, feed, suffix) {
       var i;
+      /* v3.7.0 — the chain starts at the 150 kV intake, not at the 20 kV board. Until now the
+         topology's first hop was SRC-UTILITY -> MV-BUS, so the main transformer that actually
+         makes the 20 kV existed only as a sentence in the SLD's section header: a reader could
+         not click it, and a scenario could not fault it. */
+      nodes.push({
+        id: 'HV-INTAKE' + suffix, type: 'hv_intake', feed: feed,
+        kv: BASIS.hvIntakeKv, circuitsInstalled: BASIS.hvCircuitsInstalled, circuitMva: BASIS.hvCircuitMva
+      });
+      nodes.push({ id: 'HV-BUS' + suffix, type: 'hv_bus', feed: feed, kv: BASIS.hvIntakeKv });
+      nodes.push({
+        id: 'MAIN-TX' + suffix, type: 'main_transformer', feed: feed,
+        unitCount: BASIS.mainTxPerFeed, unitMva: BASIS.mainTxMva,
+        primaryKv: BASIS.hvIntakeKv, secondaryKv: BASIS.mvKv,
+        impedancePct: BASIS.mainTxImpedancePct,
+        primaryA: BASIS.mainTxPrimaryA, secondaryA: BASIS.mainTxSecondaryA,
+        contingencyLoadingPct: BASIS.mainTxLoadingContingencyPct
+      });
       nodes.push({ id: 'MV-BUS' + suffix, type: 'mv_bus', feed: feed });
       nodes.push({ id: 'RMU' + suffix, type: 'ring_main_unit', feed: feed });
       nodes.push({
@@ -218,7 +245,10 @@
       var role = feed === 'A' ? 'redundant_a' : 'redundant_b';
       var rackFeed = 'feed' + feed;
       var i;
-      addTopologyEdge(edges, 'EDGE-UTILITY' + suffix + '-MV-BUS' + suffix, 'SRC-UTILITY' + suffix, 'MV-BUS' + suffix, feed, 'BR-UTILITY' + suffix, role);
+      addTopologyEdge(edges, 'EDGE-UTILITY' + suffix + '-HV-INTAKE' + suffix, 'SRC-UTILITY' + suffix, 'HV-INTAKE' + suffix, feed, 'BR-UTILITY' + suffix, role);
+      addTopologyEdge(edges, 'EDGE-HV-INTAKE' + suffix + '-HV-BUS' + suffix, 'HV-INTAKE' + suffix, 'HV-BUS' + suffix, feed, 'BR-HV-LINE' + suffix, role);
+      addTopologyEdge(edges, 'EDGE-HV-BUS' + suffix + '-MAIN-TX' + suffix, 'HV-BUS' + suffix, 'MAIN-TX' + suffix, feed, 'BR-HV-TX' + suffix, role);
+      addTopologyEdge(edges, 'EDGE-MAIN-TX' + suffix + '-MV-BUS' + suffix, 'MAIN-TX' + suffix, 'MV-BUS' + suffix, feed, 'BR-MV-INCOMER' + suffix, role);
       addTopologyEdge(edges, 'EDGE-MV-BUS' + suffix + '-RMU' + suffix, 'MV-BUS' + suffix, 'RMU' + suffix, feed, 'BR-RMU' + suffix, role);
       addTopologyEdge(edges, 'EDGE-RMU' + suffix + '-TX' + suffix, 'RMU' + suffix, 'TX' + suffix, feed, 'BR-TX' + suffix, role);
       addTopologyEdge(edges, 'EDGE-TX' + suffix + '-ATS' + suffix, 'TX' + suffix, 'ATS' + suffix, feed, 'BR-ATS-NORMAL' + suffix, role, 'utility');

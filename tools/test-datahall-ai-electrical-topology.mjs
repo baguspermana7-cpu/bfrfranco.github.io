@@ -111,21 +111,55 @@ function testTopologyContract() {
   });
   assert.equal(groups[6].rackIdRange, `${Electrical.rackId(6 * RACKS_PER_GROUP + 1)}..${Electrical.rackId(7 * RACKS_PER_GROUP)}`);
 
-  /* 4 sources/bus + 7 devices per feed + one RPP per group per feed = the distribution
+  /* 4 sources/bus + 10 devices per feed + one RPP per group per feed = the distribution
      spine; the rack_group aggregates are the loads that hang off it. */
   const spineNodes = nodes.filter((node) => node.type !== 'rack_group').length;
-  assert.equal(spineNodes, 4 + (2 * 7) + (2 * GROUP_COUNT), 'distribution spine node count');
+  assert.equal(spineNodes, 4 + (2 * 10) + (2 * GROUP_COUNT), 'distribution spine node count');
   /* v3.0.0 — the hall moved from 880 racks in 40 groups to 440 in 20, so the spine halves its
-     RPP pairs: 4 sources/bus + 14 per-feed devices + 2 x 20 RPPs = 58. The formula above is the
-     real invariant; this literal is the cross-check that the published basis is what we think. */
-  assert.equal(spineNodes, 58, 'per hall: 58 distribution nodes at the published basis');
+     RPP pairs. v3.7.0 — the chain now starts where the power does: HV-INTAKE, HV-BUS and MAIN-TX
+     per feed sit above MV-BUS, so the per-feed device count is 10, not 7, and the spine is
+     4 + 20 + 2 x 20 = 64. The formula above is the real invariant; this literal is the
+     cross-check that the published basis is what we think. */
+  assert.equal(spineNodes, 64, 'per hall: 64 distribution nodes at the published basis');
   assert.equal(nodes.length, spineNodes + GROUP_COUNT, 'total nodes = spine + rack groups');
   assert.equal(
     Electrical.BASE_TOPOLOGY.edges.length,
-    1 + (2 * (8 + (2 * GROUP_COUNT))),
-    'edges = genset tie + per feed (8 spine + one busway-RPP and one RPP-group edge per group)'
+    1 + (2 * (11 + (2 * GROUP_COUNT))),
+    'edges = genset tie + per feed (11 spine + one busway-RPP and one RPP-group edge per group)'
   );
-  assert.equal(Electrical.BASE_TOPOLOGY.edges.length, 97, 'per hall: 97 edges at the published basis');
+  assert.equal(Electrical.BASE_TOPOLOGY.edges.length, 103, 'per hall: 103 edges at the published basis');
+
+  /* v3.7.0 — the four-level chain is a PATH, not a set of names: utility -> 150 kV intake ->
+     150 kV bus -> main transformer -> 20 kV board. A transformer that is only a section header
+     cannot be faulted by a scenario and cannot be clicked by a reader. */
+  ['A', 'B'].forEach((feed) => {
+    const chain = [
+      [`SRC-UTILITY-${feed}`, `HV-INTAKE-${feed}`],
+      [`HV-INTAKE-${feed}`, `HV-BUS-${feed}`],
+      [`HV-BUS-${feed}`, `MAIN-TX-${feed}`],
+      [`MAIN-TX-${feed}`, `MV-BUS-${feed}`],
+    ];
+    chain.forEach(([from, to]) => {
+      assert.ok(
+        Electrical.BASE_TOPOLOGY.edges.some((edge) => edge.from === from && edge.to === to),
+        `the HV chain carries ${from} -> ${to}`
+      );
+    });
+    const tx = nodes.find((node) => node.id === `MAIN-TX-${feed}`);
+    assert.equal(tx.type, 'main_transformer');
+    assert.equal(tx.primaryKv, SNAPSHOT.distribution.hv_intake_kv, 'the main transformer primary is the published intake level');
+    assert.equal(tx.secondaryKv, SNAPSHOT.distribution.mv_kv, 'the main transformer secondary is the published MV level');
+    assert.equal(tx.unitMva, SNAPSHOT.distribution.main_tx_mva);
+    assert.equal(tx.impedancePct, SNAPSHOT.distribution.main_tx_impedance_pct);
+    const intake = nodes.find((node) => node.id === `HV-INTAKE-${feed}`);
+    assert.equal(intake.kv, SNAPSHOT.distribution.hv_intake_kv);
+    assert.equal(intake.circuitsInstalled, SNAPSHOT.distribution.hv_circuits_installed);
+  });
+  assert.equal(
+    Electrical.BASE_TOPOLOGY.edges.filter((edge) => edge.from.indexOf('SRC-UTILITY') === 0 && edge.to.indexOf('MV-BUS') === 0).length,
+    0,
+    'no utility feeds a 20 kV board directly — that was the owner\'s 150 kV-to-400 V complaint in topology form'
+  );
   assert.equal(
     Electrical.BASE_TOPOLOGY.edges.filter((item) => /RACK-\d/.test(item.id)).length,
     0,
@@ -158,7 +192,10 @@ function testTopologyContract() {
     Electrical.BASE_TOPOLOGY.edges.map((item) => `${item.from}>${item.to}`)
   );
   [
-    'SRC-UTILITY-A>MV-BUS-A',
+    'SRC-UTILITY-A>HV-INTAKE-A',
+    'HV-INTAKE-A>HV-BUS-A',
+    'HV-BUS-A>MAIN-TX-A',
+    'MAIN-TX-A>MV-BUS-A',
     'MV-BUS-A>RMU-A',
     'RMU-A>TX-A',
     'TX-A>ATS-A',

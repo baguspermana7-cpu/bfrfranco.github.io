@@ -435,18 +435,36 @@ When building complex SVGs with multiple columns (like the 4-DH electrical SLD):
 
 ## Electrical SLD Architecture (4 Data Halls) — v5
 
-### Hierarchy (11 Levels, L0-L10)
-1. **L0 MV Switchgear**: PLN 20kV dual feed → SM6 24kV 11-panel (2 Inc + 1 Tie + 8 Fdr) + GenSet APS
+### Hierarchy (12 Levels, L-HV then L0-L10)
+
+Every count below is an ENGINE value (`DCAI_CALC.snapshot`), reached on the drawing through
+`DHAX()` and hooked with `bo()`. The figures in this table are the current basis at the time of
+writing; the drawing reads the engine, never this table.
+
+0. **L-HV 150 kV switchyard** (v3.7.0): two independent PLN intakes, 4× 250 MVA circuits (N-1,
+   3 duty), one line bay per circuit — surge arrester, 89-L isolator, 150 kV CB — a 150 kV bus per
+   intake with **no tie**, then the transformer bay (89-T) and **16× 100 MVA 150/20 kV YNyn0(d),
+   Z 14 %**, one machine per feed per hall. 4 line + 16 transformer = 20 bays.
+1. **L0 MV Switchgear**: the 20 kV board, fed from MAIN-TX above — SM6 24kV 11-panel
+   (2 Inc + 1 Tie + 8 Fdr). The board incomer is the transformer secondary (2,887 A rated into a
+   3,150 A board), never the grid.
 2. **L1 RMU**: Per-DH Schneider RM6 3-panel (Feed A VCB + Bus Tie + Feed B VCB)
-3. **L2 Transformers**: 8× 5 MVA cast-resin dry Dyn11, 2 per DH
-4. **L3 LV Distribution**: 8× MSB 6300A Form 4b + LV Tie N.O. + outgoing feeders
+3. **L2 Unit substations**: 2.5 MVA cast-resin dry Dyn11, **33 per feed per hall**, 20/0.4 kV
+4. **L3 LV Distribution**: MSB Form 4b + LV Tie N.O. + outgoing feeders
 5. **L4 ATS**: CB-Normal (CLOSED) + CB-Emergency (OPEN/STANDBY) + Interlock
-6. **L5 UPS & Battery**: 8× 4.5 MW modular UPS + 8× Li-Ion NMC 1,333 kWh (no STS, dual-corded)
-7. **L6 Busway & RPP**: 8× Canalis KTA 6,300A Cu → 88× RPP 800A MCCB tap-off
-8. **L7 Rack Power**: 4 halls × 54 physical rack positions / 27 logical NVL72 domains; dual-corded PSU 400V→50VDC η>97%
+6. **L5 UPS & Battery**: **68× 1.25 MW** modular UPS per feed per hall + Li-Ion (no STS, dual-corded)
+7. **L6 Busway & RPP**: Canalis KTA **5,000 A** Cu → **40 RPP** per hall, tap-off per RPP group
+8. **L7 Rack Power**: 8 halls × **440 GB300 NVL72 racks** (one rack = one domain, 142 kW), aggregated
+   as **20 RPP groups × 22 racks**; dual-corded PSU 400V→**48VDC** η>97%
 9. **L8 Mech/NC/Cooling**: ATS-backed non-critical + cooling loads
 10. **L9 Protection**: SPD, earthing, arc flash, metering, standards
 11. **L10 KPI Dashboard**: Per-DH live values, 4-sec refresh
+
+**A transformer steps ONE level, and the step is DRAWN.** `tools/test-dcai-voltage-chain.mjs`
+holds the page to the three published levels; `tools/test-dcai-hv-switchyard.mjs` holds the SLD to
+drawing the 150/20 kV machine between them — a section header that names a transformer is not a
+transformer. The second gate exists because the first one passed while the drawing still ran a
+150 kV source box straight into 20 kV gear.
 
 ### Color-Coded Flow System (v5)
 | Path | Color | CSS Var | Animation | Usage |

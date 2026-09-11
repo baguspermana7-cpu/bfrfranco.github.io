@@ -590,6 +590,35 @@
     b.S('maint', 'sf6_bar', 'SF6 pressure', { value: 1.5, text: '1.5 bar rated fill' }, 0.05, 'bar', { digits: 2 });
     b.tier2('mimic', ['mv-sub', b.hall]);
   });
+  /* v3.7.0 — the 150/20 kV machine. It is the first transformer in the chain and it was the one
+     piece of plant the drawing named without drawing: the SLD went from a 150 kV source box
+     straight into 20 kV gear. Its state follows the HV edge the topology now carries, so a
+     utility loss darkens the intake, the bus, the transformer and the board in that order. */
+  def('sld-main-tx', { kind: 'engine', label: 'Main transformer', system: 'electrical' }, function (b, ctx) {
+    var feed = String(b.id || '').slice(-1).toUpperCase() === 'B' ? 'B' : 'A';
+    b.title = 'MAIN-TX-' + b.hall + feed + ' — 150/20 kV — DH-0' + b.hall;
+    var state = feedEdgeState(ctx, feed, 'MAIN-TX');
+    b.ST('live', 'feed', 'Feed ' + feed, state, SCEN_REASON);
+    b.E('live', 'loading_normal_pct', 'Loading, both feeds', 'mainTxNormalPct', '%', { digits: 1 });
+    b.E('live', 'loading_contingency_pct', 'Loading, one feed lost', 'mainTxContingencyPct', '%', { digits: 1 });
+    b.E('capacity', 'unit_mva', 'Rating', 'mainTxMva', 'MVA', { digits: 0 });
+    b.E('capacity', 'primary_kv', 'Primary', 'hvIntakeKv', 'kV', { digits: 0 });
+    b.E('capacity', 'secondary_kv', 'Secondary', 'mvKv', 'kV', { digits: 0 });
+    b.E('capacity', 'primary_a', 'Rated primary current', 'mainTxPrimaryA', 'A', { digits: 0 });
+    b.E('capacity', 'secondary_a', 'Rated secondary current', 'mainTxSecondaryA', 'A', { digits: 0 });
+    b.E('capacity', 'impedance_pct', 'Impedance', 'mainTxImpedancePct', '%', { digits: 0 });
+    b.E('capacity', 'per_feed', 'Machines per feed per hall', 'mainTxPerFeedHall', '', { digits: 0 });
+    b.E('capacity', 'total', 'Campus total', 'mainTxTotal', '', { digits: 0 });
+    b.E('capacity', 'fault_ka', 'Fault it can deliver to one section', 'mvFaultKa', 'kA', { digits: 1 });
+    b.D('capacity', 'group', 'Vector group', 'YNyn0 with a buried delta tertiary — the HV star point is earthed for the 150 kV effectively-earthed network', SPEC('transformer vector group'));
+    b.S('live', 'winding_c', 'Winding temperature', { value: 78, text: '78 °C top-oil at design load' }, 7, '°C');
+    b.S('maint', 'tap', 'OLTC tap position', { value: 0, text: 'tap 0 (±9 × 1.25 % on-load)' }, 0.6, '', { digits: 0 });
+    b.chip(state === 'energized' ? 'ENERGIZED' : state === 'fault' ? 'FAULT' : 'DE-ENERGIZED', state === 'energized' ? 'normal' : state === 'fault' ? 'fault' : 'standby');
+    if (state === 'fault') { b.alarm({ tag: 'MAIN-TX-' + b.hall + feed, point: 'PROT', severity: 'critical', message: 'Main transformer protection trip — the 20 kV section it feeds is dead', system: 'electrical', currentState: 'fault' }); }
+    b.dep('upstream', 'sld-mv-sub:dh0' + b.hall, '150 kV intake');
+    b.dep('downstream', 'sld-rmu:dh0' + b.hall, 'RMU-' + b.hall);
+    b.trend('winding_c', 'Winding temperature', '°C', { value: 78 }, 7);
+  });
   def('sld-rmu', { kind: 'engine', label: 'Ring main unit', system: 'electrical', tier2: 'mimic' }, function (b, ctx) {
     b.title = 'RMU-' + b.hall + ' — DH-0' + b.hall;
     var ea = feedEdgeState(ctx, 'A', 'RMU'), eb = feedEdgeState(ctx, 'B', 'RMU');

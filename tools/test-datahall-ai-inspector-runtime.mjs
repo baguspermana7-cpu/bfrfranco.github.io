@@ -124,7 +124,18 @@ try {
                 await sleep(100);
                 const depCount = await tab.evaluate(() => document.querySelectorAll('.rz-inspector [data-rz-depid]').length);
                 if (depCount) {
-                    await tab.click('.rz-inspector [data-rz-depid]');
+                    /* v3.7.0 — find and click in ONE evaluate. The inspector re-renders every 4 s,
+                       so a handle taken in one call and clicked in the next can be detached by the
+                       repaint in between: the gate died with "Node is detached from document"
+                       instead of reporting a finding. */
+                    const clicked = await tab.evaluate(() => {
+                        const card = document.querySelector('.rz-inspector [data-rz-depid]');
+                        if (!card) return false;
+                        card.scrollIntoView({ block: 'center' });
+                        card.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+                        return true;
+                    });
+                    note(clicked, `${row.view}: a dependency card was still in the DOM when the click landed`);
                     await sleep(250);
                     const afterNav = await inspectorState(tab);
                     note(afterNav.open && afterNav.payload && !afterNav.modalOpen, `${row.view}: deps navigation keeps the inspector open in payload mode`);
