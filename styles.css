@@ -4492,9 +4492,32 @@ section {
     box-shadow: 0 0 0 4px rgba(74, 144, 184, 0.2);
 }
 
+/* v3.6.2 — axe reported four SERIOUS contrast failures on the footer of manual/index.html in dark
+   theme: .footer-tagline-main, .footer-tagline-sub, .footer-copyright and .footer-nav > h4, at
+   4.00, 4.00, 4.00 and 4.31 against the 4.5 their sizes require.
+
+   The ground was #64748b — the slate token — used as a SURFACE. At that mid luminance neither
+   near-black nor near-white ink can reach 4.5:1, so raising the ink could never fix it; one of the
+   two has to leave the middle. The likely origin is a colour swapped by family (a banned purple
+   replaced with the slate) without checking that this particular use was a background, not a mark.
+
+   The footer takes a solid dark surface, which is what every other dark surface here already does. */
 [data-theme="dark"] .footer {
-    background: #64748b;
+    background: var(--gray-200, #16213e);
+    background-image: none;
+    border-top: 1px solid var(--gray-300, #1f2b47);
+    /* NOT var(--white): dark theme redefines that token to #0f0f1a, so it means the page GROUND
+       here, not white ink. A token whose name says one thing and whose value says the other is
+       exactly how a contrast fix goes backwards. */
+    color: #f0f4f8;
 }
+
+/* These three carry no colour of their own and dim themselves with opacity, which was survivable
+   on a light ground and is not on a dark one: at 0.5 and 0.4 the effective ink lands back in the
+   middle. They take an explicit muted-light ink instead, and the dimming comes out. */
+[data-theme="dark"] .footer-tagline-main { color: #f0f4f8; opacity: 1; }
+[data-theme="dark"] .footer-tagline-sub,
+[data-theme="dark"] .footer-copyright { color: #cbd5e1; opacity: 1; }
 
 [data-theme="dark"] .share-btn {
     background: var(--card-bg);

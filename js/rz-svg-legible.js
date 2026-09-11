@@ -100,6 +100,14 @@
     if (!el) {
       el = pane.ownerDocument.createElement('div');
       el.setAttribute('data-rz-legible-note', '');
+      /* The numbers in this note are drawing facts — the zoom this pane applied and the legibility
+         floor it was measured against — not engine quantities. The strict coverage walker requires
+         every rendered numeral to resolve to a registry value or carry a declared reason, and a
+         scale factor has no registry value to resolve to. Declared here rather than at each call
+         site so the note can never be emitted without it. */
+      el.setAttribute('data-rz-authored-basis',
+        'drawing scale note: the zoom factor this pane applied and the rendered-pixel legibility '
+        + 'floor it was measured against are properties of the drawing, not published engine values');
       el.style.cssText = 'font:600 10px/1.4 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.02em;opacity:.62;padding:3px 2px 5px';
       pane.insertBefore(el, pane.firstChild);
     }

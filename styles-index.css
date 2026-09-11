@@ -6407,3 +6407,35 @@ p a[href$="terms.html"], p a[href$="privacy.html"], .footer p a { text-decoratio
    name stays `.oe-*-violet` because it is written into pages; the token is what carries colour. */
 :root:not([data-theme="dark"]) { --oe-violet: #be185d; }
 [data-theme="dark"]            { --oe-violet: #f9a8d4; }
+
+/* ============================================================================
+ * v3.6.2 — the footer ground in dark theme
+ * ----------------------------------------------------------------------------
+ * axe reported four SERIOUS contrast failures on the footer of manual/index.html in dark theme:
+ * .footer-tagline-main, .footer-tagline-sub, .footer-copyright and .footer-nav > h4, measured at
+ * 4.00, 4.00, 4.00 and 4.31 against the 4.5 the text sizes require.
+ *
+ * The cause is the ground, not the ink. In dark theme --primary-gradient resolves LIGHTER than in
+ * light theme (#3a7ca5 -> #5ba3cb against #1e3a5f -> #3a7ca5), so the footer lands at a mid
+ * luminance where neither near-black nor near-white ink can reach 4.5:1. Raising the ink alone
+ * cannot fix a mid-tone ground; one of the two has to leave the middle.
+ *
+ * The footer takes a solid dark surface in dark theme, which is what every other dark surface on
+ * the site already does, and keeps its light ink. The gradient stays where it belongs — the hero.
+ * ==========================================================================*/
+[data-theme="dark"] .footer {
+    background: var(--gray-200, #16213e);
+    background-image: none;
+    border-top: 1px solid var(--gray-300, #1f2b47);
+    /* NOT var(--white): dark theme redefines that token to #0f0f1a, so it means the page GROUND
+       here, not white ink. A token whose name says one thing and whose value says the other is
+       exactly how a contrast fix goes backwards. */
+    color: #f0f4f8;
+}
+
+/* These three carry no colour of their own and dim themselves with opacity, which was survivable
+   on a light ground and is not on a dark one: at 0.5 and 0.4 the effective ink lands back in the
+   middle. They take an explicit muted-light ink instead, and the dimming comes out. */
+[data-theme="dark"] .footer-tagline-main { color: #f0f4f8; opacity: 1; }
+[data-theme="dark"] .footer-tagline-sub,
+[data-theme="dark"] .footer-copyright { color: #cbd5e1; opacity: 1; }

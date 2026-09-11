@@ -11,6 +11,57 @@ release sections rather than semver.
 
 ---
 
+## v3.6.2 — 2026-09-11
+
+### The footer in dark theme: a ground in the middle, where no ink can reach
+
+axe reported four **serious** contrast failures on the footer of `manual/index.html` in dark theme,
+and the gate that catches them (`tools/test-telemetry-e2e.mjs`) was red on main.
+
+| element | measured | required |
+|---|---:|---:|
+| `.footer-tagline-main` | 4.00 | 4.5 |
+| `.footer-tagline-sub` | 4.00 | 4.5 |
+| `.footer-copyright` | 4.00 | 4.5 |
+| `.footer-nav > h4` | 4.31 | 4.5 |
+
+#### The cause was the ground, not the ink
+
+`[data-theme="dark"] .footer` painted `#64748b` — the slate token — as a **surface**. At that mid
+luminance neither near-black nor near-white ink can reach 4.5:1, so raising the ink could never have
+fixed it: one of the two has to leave the middle. The likely origin is a colour swapped by family,
+a banned purple replaced with the slate, without checking that this particular use was a background
+rather than a mark.
+
+Two more things were in the way, and both are worth naming because they are the kind of trap that
+makes a contrast fix go backwards:
+
+- **`var(--white)` does not mean white here.** Dark theme redefines that token to `#0f0f1a`, so a
+  first attempt that set the footer ink to `var(--white)` made it *darker*. A token whose name says
+  one thing and whose value says the other cannot be used on trust.
+- **Three of the four elements carry no colour at all** and dim themselves with `opacity: 0.9`,
+  `0.5` and `0.4`. That was survivable on a light ground; on a dark one the effective ink lands
+  back in the middle. They now take an explicit muted-light ink and the dimming comes out.
+
+Measured after: **14.38, 10.71, 10.71 and 14.38.**
+
+#### Also
+
+`js/rz-svg-legible.js` emits a zoom note whose numerals — the scale it applied and the pixel floor
+it measured against — are properties of the drawing, not engine values. It carried no declared
+basis, so the strict coverage walker counted three untraced numerals on every page that uses it. The
+declaration is now set where the note element is created, so the note cannot be emitted without it.
+
+#### Recorded, not fixed
+
+`tools/audit-a11y.mjs --strict` reports **39 critical or serious violations** site-wide, and it is
+**not wired into the ship gate**. The footer four were a subset. Grouped by the ground they sit on:
+12 on `#64748b`, 12 on `#f2e9e3`, 11 on `#0c1117`. The `#64748b` dozen look like the same
+slate-as-a-surface substitution this release fixes in one place. That is a measured backlog with a
+named cause, not a claim that the site is accessible.
+
+---
+
 ## v3.6.1 — 2026-09-11
 
 ### A colour is not a string
