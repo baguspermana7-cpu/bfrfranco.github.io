@@ -11,6 +11,68 @@ release sections rather than semver.
 
 ---
 
+## v3.10.0 — 2026-09-20
+
+### Measured, not guessed — a diagram engine for the cockpit drawings
+
+The block diagrams on this site are built by concatenating SVG strings with coordinates
+typed by hand. That works exactly once. The moment a panel gains a row, a title gains a
+word, or an engine value goes from 54 to 108, the coordinate is wrong — and nothing says
+so. Three separate collisions shipped in v3.9.9 were all that one defect.
+
+The cause is not carelessness. **The drawing code cannot ask how wide a label is.** This
+release gives it a way to ask.
+
+### Added
+
+- **`js/rz-diagram-metrics.js`** — a per-character width budget. A wide or full-width
+  character costs 1em, every other character costs its face's Latin advance (0.58em IBM Plex
+  Sans, 0.60em JetBrains Mono), and combining marks cost nothing. Tracking is counted per
+  character, which is why an 0.18em eyebrow overruns a box sized from its untracked twin.
+  `overlap()` reports per axis and names the cheaper separation, because a boolean is what
+  made two attempts nudge a label down when the overlap was 27px horizontal and 2px vertical.
+- **`js/rz-diagram-layout.js`** — placement by search and orthogonal routing. A label takes
+  the first candidate position that collides with nothing: preferred slot at 8px clearance,
+  then the 6px floor, then slid along the connector in 8-unit steps. **If every candidate is
+  blocked the engine reports `placed:false` and draws nothing** — a silent overlap is the
+  defect being removed. Connectors are orthogonal only, elbows are quarter-arcs at r=8
+  shrinking to 6 on a short leg, and a route around an intervening box is preferred to a
+  route through it; when no route clears, the stroke comes back `transit` and dashed.
+- **`js/rz-diagram.js`** — the surface pages draw through. Nodes size themselves from their
+  own content; an explicit width too small for its text warns rather than overrunning.
+  `fit()` shrinks the frame to what was drawn. Labels are painted last, so a label can never
+  be clipped by a node painted after it — the failure is removed by construction rather than
+  detected afterwards. No literal hex leaves the engine: colours resolve to the page's own
+  custom properties, so one edit to a cockpit's `:root` re-skins every diagram on it in both
+  themes.
+- **`tools/test-rz-diagram-engine.mjs`** — 63 geometry assertions, now a ship gate. Disabling
+  the placement search, the router's obstacle test, or the attach-point formula each turns
+  three assertions red.
+- **`tools/demo-rz-diagram.mjs`** — draws the liquid cooling chain through the engine and
+  exits non-zero on any collision. Also a ship gate. 30 boxes measured, 0 collisions.
+- **`standarization/DIAGRAM_ENGINE_STANDARD.md`** — what the engine guarantees and what an
+  author is still responsible for.
+
+### Changed
+
+- The project adopts the `diagram-design` skill's §6 connector rules as its diagram
+  standard, under a resistancezero skin selected by a `.diagram-design` marker. Two of that
+  skill's shipped anti-patterns are deliberately overridden and the reasons are written
+  down: the dark ground with instrument cyan is an ISA-18.2 alarm palette rather than a
+  glow, and JetBrains Mono is this site's data face for its slashed zero. Names still go in
+  IBM Plex Sans and mono is still technical-only.
+- Contrast for the diagram skin is measured against each face's own paper, never inverted.
+  Signal amber `#FFAA00` reads 1.82:1 on paper and fails outright, so the light face carries
+  `#8A5A00` at 5.7:1. No role sits below 4.5:1.
+
+### Not yet migrated
+
+The engine is built, gated and proven on one real diagram. `datahallAI.html` and the Track B
+cockpits still draw with hand-typed coordinates. Migration is per diagram, each with its own
+geometry re-measurement.
+
+---
+
 ## v3.9.9 — 2026-09-20
 
 ### Two blocks pinned to the same corner, and two panels drawn on their own lines

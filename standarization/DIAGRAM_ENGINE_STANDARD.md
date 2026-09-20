@@ -1,0 +1,188 @@
+# Diagram Engine Standard
+
+> Every block diagram on resistancezero.com is drawn through the RZ diagram engine.
+> This document says why the engine exists, what it guarantees, and what an author
+> is still responsible for.
+
+Adopted v3.10.0 (2026-09-20). Gate: `node tools/test-rz-diagram-engine.mjs`.
+
+---
+
+## 1. The defect this removes
+
+The cockpit pages build SVG by concatenating strings with coordinates typed by hand:
+
+```js
+s += tx(860, RY - 5, 'TCS Return ' + d1(gv('tcsReturn')) + '°C', 'var(--o)', 4, 'middle');
+```
+
+That line was correct the day it was written. It is not correct now, and nothing in the
+page said so. Three failures from one week, all the same shape:
+
+| What broke | Why |
+|---|---|
+| The ISA-5.1 legend and the PUE badge overlapped by 50 units | Both were pinned to the top-right corner of a 960-wide viewBox. Neither measured the other. |
+| The TCS and CDU parameter panels were painted on top of the return lines they annotate | Each panel grew rows over time; the `height` did not, and then did, past the line. |
+| The CDU header bar carried a title about 170 units wide in a bar 148 units wide | Nothing measured the title before centring it. |
+
+The common cause is not carelessness. **It is that the drawing code cannot ask how wide a
+label is.** Every fix by hand is a fix for one render of one diagram at one viewport, and
+survives until the next engine value changes length.
+
+The geometry survey (`tools/test-conv-geometry.mjs`) measures the result: at adoption,
+`datahallAI.html` reported 218 findings across four viewports and two themes, dominated by
+the building isometric.
+
+---
+
+## 2. What the engine guarantees
+
+Three modules, all DOM-free so the ship gate asserts the same numbers the browser draws.
+
+### `js/rz-diagram-metrics.js` — measurement
+
+A per-character width budget, from the `resistancezero` diagram-design profile:
+
+- every Unicode wide or full-width character costs **1em**;
+- every other character costs its face's Latin advance — **0.58em** IBM Plex Sans,
+  **0.60em** JetBrains Mono (exact: it is monospaced);
+- nonspacing and enclosing marks cost **nothing**;
+- tracking is added **per character**, including after the last one, because that is how
+  every SVG renderer applies `letter-spacing`. An 0.18em eyebrow is far wider than its
+  untracked twin, which is why tracked labels collide.
+
+Counting by script is the trap. `주문 v2.1` is two full-width syllables and five narrow
+characters; a formula that tallies "Hangul plus Latin letters plus spaces" silently drops
+`2`, `.` and `1` and sizes the box for four of its seven characters.
+
+The sans budget carries a proportional correction — caps and digits cost more than the
+mixed-case average, i-stems and punctuation less. All-caps eyebrows and tags are the common
+case on this site, not an edge case, and a flat average undersizes exactly them.
+
+`overlap()` reports **per axis**, not a boolean, and names the cheaper separation axis.
+A boolean is what made one afternoon expensive: two attempts were spent nudging a label
+down when the overlap was 27px horizontal and 2px vertical.
+
+### `js/rz-diagram-layout.js` — placement and routing
+
+`placeLabel()` **searches**: the preferred slot at 8px clearance, the same slot at the 6px
+floor, then slid along the connector in 8-unit steps, taking the first position that hits
+nothing already on the canvas. If every candidate is blocked it returns `placed:false`.
+
+> **The engine never draws a label it could not place.** A silent overlap is the defect
+> being removed; a caller that gets `placed:false` has a real layout problem and is told.
+
+`route()` produces orthogonal connectors only, with quarter-arc elbows at r=8 that shrink to
+6 when a leg is too short to carry them. It reroutes around any box that is not one of its
+endpoints. When no route clears, it returns the shortest one with `transit:true`, and the
+facade draws that dashed with no arrowhead on the intervening box.
+
+`fanPoints()` spreads N connectors on one edge at `L · k / (N+1)`, and sets `crowded` when
+the edge cannot hold them 12px apart.
+
+A **zone is not an obstacle**. Zones are painted before labels, so a label over a container
+is readable and is the normal case. Counting zones as obstacles makes every position inside
+a container look occupied — it made a wide-open canvas report "no room" for four labels the
+first time this engine drew a real diagram.
+
+### `js/rz-diagram.js` — the surface pages call
+
+`create()` → `zone()`, `node()`, `text()`, `edge()`, `fit()`, `render()`.
+
+- A node is **sized from its own content** unless a width is passed; an explicit width too
+  small for the content warns.
+- `fit()` shrinks the frame to what was drawn. A viewBox typed in advance is defended until
+  it stops being true.
+- Paint order is **zones, connectors, nodes, labels**. Labels last means a label can never
+  be clipped by a node painted after it — the failure is removed by construction rather
+  than detected by a verifier afterwards.
+- Colours resolve to the page's own CSS custom properties. **No literal hex leaves the
+  engine**, so one edit to a cockpit's `:root` re-skins every diagram on it, both themes.
+
+---
+
+## 3. The design system it implements
+
+Geometry and structure follow the `diagram-design` skill (installed at
+`~/.claude/skills/diagram-design`), whose §6 connector rules this project adopted verbatim.
+The skin is the `resistancezero` profile at `~/.diagram-design/profiles/resistancezero.md`,
+selected by the `.diagram-design` marker at the repo root.
+
+### Two of the skill's anti-patterns are deliberately overridden
+
+`SKILL.md` §4 lists "dark mode + cyan/purple glow" and "never JetBrains Mono" as AI slop.
+Both are documented decisions in `documentation/design.md`, and onboarding is the mechanism
+for exactly this override:
+
+- **Dark + instrument cyan is not a glow.** There is no glow, shadow or bloom anywhere in
+  this system — §4's real complaint is decoration standing in for decisions. Here the
+  palette is ISA-18.2: amber is caution, green is in-parameters, red is fault, cyan is
+  informational. Each hue is a *channel*. The ban on glow stands.
+- **JetBrains Mono is the data face**, chosen for its slashed zero and tabular figures; a
+  0/O ambiguity is unacceptable in engineering data. §4's rule against blanket mono holds
+  in full — names go in IBM Plex Sans, mono is numbers, units, ports and tags only.
+
+Everything else — the six connector rules, the 4px grid, the complexity budget, the
+focal-accent rule, the accessible-SVG contract — applies unchanged. **The skin is brand.
+The geometry is not negotiable.**
+
+### Contrast is measured, never inverted
+
+Signal amber `#FFAA00` reads **1.82:1** on `#f8fafc` and fails every threshold. The light
+face carries `#8A5A00` (5.7:1) instead. No role in the profile sits below 4.5:1 against its
+own paper. Purple is banned by **hue band** (HSL 238–310), gated by
+`tools/test-purple-family.mjs` — a hex grep left 1,238 same-hue literals live.
+
+---
+
+## 4. Authoring rules
+
+1. **New block diagrams go through the engine.** Do not add hand-typed coordinates.
+2. **Treat `warnings` as failures.** `node-overflow`, `label-unplaced` and `transit` each
+   mean the layout is wrong, not that the engine is fussy. Fix the layout.
+3. **Derive spacing from content.** The demo's gap is computed from the widest arrow label.
+   Picking a number by eye is what produced four unplaceable labels on the first run.
+4. **Specification prose belongs in HTML cards, not in the SVG.** This predates the engine
+   (`DATAHALL_AI_STANDARD.md`: *"Spec tables live in the HTML cards below the drawing"*) and
+   still holds — the engine makes a dense drawing legible, it does not make it correct to
+   put a spec table inside one.
+5. **Every `bo(...)` that leaves a drawing must land in a card row.** The parameter registry
+   counts rendered reads; R8 is STRICT.
+6. **Fill in `title` and `desc`.** They are the accessible-figure contract, not decoration.
+
+---
+
+## 5. Verification
+
+```bash
+node tools/test-rz-diagram-engine.mjs    # 63 geometry assertions — SHIP GATE
+node tools/demo-rz-diagram.mjs           # renders one real diagram, exits 1 on any collision
+node tools/test-conv-geometry.mjs --page=<file>   # measures the rendered page
+```
+
+The engine test is mutation-checked: disabling the placement search, the router's obstacle
+test, or the attach-point formula each turns three assertions red.
+
+---
+
+## 6. Migration status
+
+| Surface | State |
+|---|---|
+| Engine + gate | **shipped** v3.10.0 |
+| `tools/demo-rz-diagram.mjs` — cooling chain | **drawn by the engine**, 30 boxes, 0 collisions |
+| `datahallAI.html` — 15 diagrams | hand-typed coordinates; 218 reported findings |
+| `dc-conventional.html` and the 8 Track B cockpits | hand-typed coordinates |
+
+Migration is per diagram, and each one is a separate ship with its own geometry
+re-measurement. The isometric `#bldgSvg` is the largest single block and has its own plan;
+its zone captions are the case the placement search was written for.
+
+---
+
+## Related
+
+- `standarization/DATAHALL_AI_STANDARD.md` — spec tables live in cards, not in the SVG
+- `standarization/ACCURACY_VALIDATION.md` — basis chips and denominators on every KPI
+- `documentation/design.md` — the palette, the type pairing, the three stroke tiers
+- `~/.diagram-design/profiles/resistancezero.md` — the active skin
