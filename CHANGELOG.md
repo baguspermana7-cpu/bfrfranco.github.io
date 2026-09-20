@@ -11,6 +11,42 @@ release sections rather than semver.
 
 ---
 
+## v3.10.11 — 2026-09-20
+
+### Nine pairs, nine reasons
+
+Every remaining overlapping label pair outside the isometric, fixed at its cause. None of these is
+a crowded drawing; each is a coordinate that was right when it was typed.
+
+### Fixed — cooling P&ID
+
+- **The chiller grid's value column met its own labels.** Values are end-anchored at `px+55`, and
+  the widest label in that grid — `Air duty (fac)`, fourteen characters at 3.5 — runs to `px+29.4`
+  while `142,037 kW` at 4.5 starts at `px+28`. `px+60` clears the longest label by 3.6 units and
+  still leaves 5 before the next column.
+- **Four labels shared fifteen units** on the CDW return line. They now own separate rows:
+  `CDW Return` 197–201, the flow figure 203.75–207, `CLOSED LOOP` 209–213.5, `DN300 CS` 216.75–220.
+- **A pressure tap sat inside a label it was not part of.** The `P` sensor at x=584 was within the
+  span of `HTW Return 45.0 °C`, which is centred on 585 and runs 564–605. Moved along the same run
+  to 545, where it still reads as a tap on that line.
+- **A BACnet bullet rode above its own circle.** Drawn at y=22 while its circle is centred on 24,
+  so it sat outside the glyph it belongs to *and* clipped the ISA-5.1 legend subtitle overhead.
+  Centred in its circle it is both correct and clear.
+- `3.8 bar` moved clear of the `BFV` tag above it.
+
+### Fixed — elsewhere
+
+- **Electrical overview:** the genset bank captions end at y=193 and `→ LV 400V via ATS` began at
+  194.25. Both ATS lines drop four units.
+- **Floor plan:** a chiller-bank caption sat at 37.9 grid units — *inside* the AHU room, which
+  starts at 37.5 — so it landed on that room's own name. Raised to 36.6.
+- **Fire mimic:** `symNozzle()` draws its own `NZ` caption at `cy+20`, so nozzles at `cy=322` put
+  `NZ` at y=342 and the block's `READY` caption sits at 343 — the middle nozzle's label was
+  directly underneath it. The glyph row moves up six units; everything stays inside the block's
+  310–348 box and `READY` keeps the baseline its two sibling blocks also use.
+
+---
+
 ## v3.10.10 — 2026-09-20
 
 ### The mask moved, the text did not

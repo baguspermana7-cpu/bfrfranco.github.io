@@ -2731,7 +2731,9 @@ s+=eqLive(43+chy*5.5,31.5,4.5,3.5,'rgba(6,182,212,.2)','CH-'+(chy+5),4.2,'runnin
 // CH-8 standby (N+1)
 s+=eqLive(43+3*5.5,31.5,4.5,3.5,'rgba(6,182,212,.12)','CH-BANK 8',4,'standby','Chiller bank 8 of 8 drawn: the engine sizes '+dhaG(DHAX().chillersInstalled)+' machines of '+dhaF(DHAX().chKwTh!=null?DHAX().chKwTh/1000:null,1)+' MW \u2014 '+dhaG(DHAX().chillersRun)+' run on the design day and '+dhaG(DHAX().chillersWorst)+' in the worst weather bin, so the installed spare is '+dhaG((DHAX().chillersInstalled!=null&&DHAX().chillersWorst!=null)?DHAX().chillersInstalled-DHAX().chillersWorst:null)+'. Status: STANDBY BANK. \u2192 Cooling Tab');
 s+=tx(MX+54*M,MY+36.9*M,dhaG(DHAX().chillersInstalled)+' installed \u00B7 '+dhaG(DHAX().chillersRun)+' duty at design \u00B7 '+dhaG(DHAX().chillersWorst)+' at the worst bin','var(--c)',4,'middle',0,bo('chillersInstalled',{also:['chillersRunning','chillersWorst']}));
-s+=tx(MX+54*M,MY+37.9*M,'8 glyphs drawn \u00D7 '+dhaG(DHAX().chillersInstalled!=null?Math.ceil(DHAX().chillersInstalled/8):null)+' machines per bank','var(--t3)',3.6,'middle',0,{declared:'drawing aggregation: an identity over the marked installed count divided by the eight glyphs drawn, printed so the reader can check the drawing against the engine; not itself an engine quantity'});
+/* v3.10.11 — this chiller-bank caption sat at 37.9 grid units, inside the AHU room which
+   starts at 37.5, so it landed on that room's own name. Raised to 36.6, above the room band. */
+s+=tx(MX+54*M,MY+36.6*M,'8 glyphs drawn \u00D7 '+dhaG(DHAX().chillersInstalled!=null?Math.ceil(DHAX().chillersInstalled/8):null)+' machines per bank','var(--t3)',3.6,'middle',0,{declared:'drawing aggregation: an identity over the marked installed count divided by the eight glyphs drawn, printed so the reader can check the drawing against the engine; not itself an engine quantity'});
 // CW supply + return risers indicator (rising to roof)
 s+='<text x="'+(MX+54*M)+'" y="'+(MY+35.7*M)+'" fill="var(--c)" font-family="'+J+'" font-size="4.5" text-anchor="middle" opacity=".75">\u2191 CW Supply/Return Risers to Roof Dry-Cooler Array (DN500, 30% PG)</text>';
 
@@ -4457,8 +4459,11 @@ s+=symGen(gx+15,gy+15,'rgba(107,114,128,.4)');
 s+=tx(gx+15,gy+32,'BANK-'+(gi+1),'var(--t3)',4.5,'middle');
 s+=tx(gx+15,gy+40,'\u2248'+dhaF(genPerBank)+'\u00D7'+dhaF(GOV.genMW)+'MW','rgba(107,114,128,.5)',4.5,'middle',1,bo('gensetMW'));
 }
-s+=tx(1105,198,'\u2192 LV '+dhaF(GOV.V)+'V via ATS','var(--t3)',5,'middle',0,bo('voltageLL'));
-s+=tx(1105,208,'\u2297 Interlock w/ MSB Incomers','var(--b)',5,'middle');
+/* v3.10.11 — the genset bank captions end at y=193 (gy+40 on the second row), and this line
+   started at 194.25. Both lines drop four units so the caption band and the ATS note own
+   separate rows. */
+s+=tx(1105,202,'\u2192 LV '+dhaF(GOV.V)+'V via ATS','var(--t3)',5,'middle',0,bo('voltageLL'));
+s+=tx(1105,212,'\u2297 Interlock w/ MSB Incomers','var(--b)',5,'middle');
 
 // ======== 4 DH COLUMNS (220-680) ========
 s+=sH(215,'4 DATA HALLS \u2014 TRUE 2N POWER PATH \u2014 CLICK COLUMN FOR DETAIL','var(--g)');
@@ -7652,7 +7657,10 @@ s+=symSensor(285,193,'var(--t3)','P');
 s+=tx(285,203,'— no engine source','var(--t3)',2.8,'middle');
 // Flow meter at discharge — facility-scope HTW loop flow
 s+=symSensor(255,193,'var(--p)','F');
-s+=tx(255,203,i0(gv('htwFlowM3h'))+' m³/h fac','var(--p)',3,'middle',0,bo('htwFlowM3h'));
+/* v3.10.11 — this label sat at 203 under "CDW Return" at 200, and the two overlapped by 4
+   units. The band from 197 to 220 carries four labels; they are now spaced so each one owns
+   its own rows: CDW Return 197-201, this 203.75-207, CLOSED LOOP 209-213.5, DN300 CS 216.75-220. */
+s+=tx(255,206,i0(gv('htwFlowM3h'))+' m³/h fac','var(--p)',3,'middle',0,bo('htwFlowM3h'));
 s+=`</g>`;
 // Flow to chillers. v1.42.0 — ported to semantic line model.
 s+=window.RZLineModel?window.RZLineModel.line({id:'cool-cw-pump-to-chiller',from:'CW-PUMP-STATION',to:'CHILLER-PLANT',medium:'cw_supply',direction:'forward',state:'energized',capacity:'DN300',current:(d1(gv('cdwSupplyC'))+'°C to the condensers'),redundancy:'duty',sensor:'PT-CW-205',geometry:{x1:295,y1:95,x2:305,y2:95},style:{stroke:'var(--p)',strokeWidth:2.5,cssClass:'fR'}}):'<line x1="295" y1="95" x2="305" y2="95" stroke="var(--p)" stroke-width="2.5" class="fR"/>';
@@ -7724,9 +7732,13 @@ const chParams=[
 ['Air duty (fac)','var(--o)',i0(chDutyFac)+' kW','',bo('airHeatFacility')],['Liquid path','var(--g)','free-cools','',null]
 ];
 chParams.forEach((p,i)=>{
+/* v3.10.11 — the value column was end-anchored at px+55, and the widest label in this grid
+   ("Air duty (fac)", 14 characters at 3.5) runs to px+29.4 while "142,037 kW" at 4.5 starts at
+   px+28. They met. px+60 clears the longest label by 3.6 units and still leaves 5 before the
+   next column starts at px+65. */
 const px=320+(i%3)*65,py=143+Math.floor(i/3)*14;
 s+=tx2(px,py,p[0],'var(--t3)',3.5);
-s+=lv(p[3],px+55,py,p[2],p[1],4.5,'end',p[4]);
+s+=lv(p[3],px+60,py,p[2],p[1],4.5,'end',p[4]);
 });
 // Flow from chillers (FWS circuit = cyan)
 s+=`<line x1="520" y1="90" x2="525" y2="90" stroke="var(--c)" stroke-width="2.5" class="fR"/>`;
@@ -7786,7 +7798,10 @@ s+=tx(631,165,'Str','var(--t3)',3,'middle');
 s+=symSensor(610,195,'var(--c)','F');
 s+=lv('fwsFlow',614,199,i0(gv('htwFlowM3h')),'var(--c)',3.4,0,bo('htwFlowM3h'));   /* v2.1.0: the hall HTW flow — the old /halls divided a per-hall figure a second time */
 s+=tx(640,199,'m³/h hall','var(--t3)',2.6);
-s+=symSensor(584,195,'var(--t3)','P');
+/* v3.10.11 — this pressure tap sat at x=584, inside the span of "HTW Return 45.0 C" which is
+   centred on 585 and runs 564 to 605. Moved along the same run to 545, where it still reads as
+   a tap on that line and is clear of the label. */
+s+=symSensor(545,195,'var(--t3)','P');
 s+=tx(584,205,'—','var(--t3)',3,'middle');
 // Expansion tank indicator
 s+=`<rect x="530" y="155" width="28" height="22" rx="2" fill="rgba(6,182,212,.06)" stroke="var(--c)" stroke-width=".4"/>`;
@@ -7954,7 +7969,7 @@ s+=tx(585,RY+10,'DN250 CS insulated','var(--t3)',3,'middle');
 // CW Return: Chiller → CW Pump Station → CT/DC. v1.42.0 — ported to semantic line model.
 s+=window.RZLineModel?window.RZLineModel.line({id:'cool-cw-return',from:'CHILLER-PLANT',to:'DC-ARRAY',medium:'cw_return',direction:'reverse',state:'energized',capacity:'DN300 CS',current:(d1(gv('cdwReturnC'))+'°C'),redundancy:'duty',sensor:'TT-CW-251',geometry:{x1:305,y1:RY,x2:190,y2:RY},style:{stroke:'var(--o)',strokeWidth:2.5,cssClass:'fL'}}):`<line x1="305" y1="${RY}" x2="190" y2="${RY}" stroke="var(--o)" stroke-width="2.5" class="fL"/>`;
 s+=tx(245,RY-5,'CDW Return '+d1(gv('cdwReturnC'))+'°C','var(--o)',4,'middle',0,bo('cdwReturnC'));
-s+=tx(245,RY+10,'DN300 CS','var(--t3)',3,'middle');
+s+=tx(245,RY+14,'DN300 CS','var(--t3)',3,'middle');/* v3.10.11 — clear of CLOSED LOOP at 212 */
 // Temperature indicator badges on return lines (with prefix labels for clarity \u2014 v1.41.3)
 // FWS Return (CDU back to chiller)
 s+=`<rect x="640" y="${RY-7}" width="42" height="10" rx="2" fill="rgba(245,158,11,.12)" stroke="var(--o)" stroke-width=".3"/>`;
@@ -7996,7 +8011,7 @@ s+=flange(195,90,true);s+=flange(300,90,true);s+=flange(525,90,true);s+=flange(6
 s+=`<rect x="278" y="162" width="38" height="10" rx="2" fill="rgba(245,158,11,.1)" stroke="var(--o)" stroke-width=".3"/>`;
 s+=tx(297,169,'4.5 bar','var(--o)',3.5,'middle',1,{declared:'design pressure setpoints for the pump station are page-authored hydraulic allowances, not engine quantities'});
 s+=`<rect x="588" y="162" width="38" height="10" rx="2" fill="rgba(34,197,94,.1)" stroke="var(--g)" stroke-width=".3"/>`;
-s+=tx(607,169,'3.8 bar','var(--g)',3.5,'middle',1,{declared:'design pressure setpoints for the pump station are page-authored hydraulic allowances, not engine quantities'});
+s+=tx(607,173,'3.8 bar','var(--g)',3.5,'middle',1,{declared:'design pressure setpoints for the pump station are page-authored hydraulic allowances, not engine quantities'});
 // Phase 2: CW Closed Loop label
 s+=`<rect x="198" y="204" width="96" height="12" rx="2" fill="rgba(100, 116, 139,.1)" stroke="var(--p)" stroke-width=".5"/>`;
 s+=tx(246,212,'CLOSED LOOP','var(--p)',5,'middle',1);
@@ -8009,7 +8024,10 @@ s+=tx(50,23,'BACnet/IP','var(--p)',3.5,0);
 var ddcs=[{x:180,t:'DDC-CW'},{x:350,t:'DDC-CH'},{x:520,t:'DDC-FW'},{x:700,t:'DDC-CDU'},{x:860,t:'DDC-TCS'}];
 ddcs.forEach(function(d){
 s+=`<circle cx="${d.x}" cy="24" r="3" fill="rgba(100, 116, 139,.12)" stroke="var(--p)" stroke-width=".4"/>`;
-s+=tx(d.x,22,'\u2022','var(--p)',3,'middle');
+/* v3.10.11 — the bullet sat at 22 while its own circle is centred on 24, so it rode above the
+   glyph it belongs to and clipped the ISA-5.1 legend subtitle overhead (which ends at 20.2).
+   Centred in its circle it is both correct and clear. */
+s+=tx(d.x,25,'\u2022','var(--p)',3,'middle');
 s+=tx(d.x,31,d.t,'var(--p)',3.5,'middle');
 });
 // ===== ANCILLARY SYSTEMS STRIP (y=232-290, avoids main equipment overlap) =====
@@ -9238,9 +9256,13 @@ s+=`</g>`;
 // DISCHARGE nozzle array symbol
 s+=`<g id="fireDischargeG">`;
 s+=`<rect x="380" y="310" width="85" height="38" rx="3" fill="rgba(34,197,94,.08)" stroke="var(--g)" stroke-width=".8"/>`;
-s+=symNozzle(400,322,'var(--g)');
-s+=symNozzle(422,322,'var(--g)');
-s+=symNozzle(444,322,'var(--g)');
+/* v3.10.11 — symNozzle() draws its own "NZ" caption at cy+20, so nozzles at cy=322 put NZ at
+   y=342 and the block's READY caption sits at 343: the middle nozzle's label was underneath it.
+   The glyph row moves up six units; everything still sits inside the block's 310-348 box, and
+   READY keeps the y=343 baseline its two sibling blocks (ARMED, INTERLOCK) also use. */
+s+=symNozzle(400,316,'var(--g)');
+s+=symNozzle(422,316,'var(--g)');
+s+=symNozzle(444,316,'var(--g)');
 s+=tx(422,343,'READY','var(--g)',4,'middle',1);
 s+=`</g>`;
 // ===== ZONE MAP =====
