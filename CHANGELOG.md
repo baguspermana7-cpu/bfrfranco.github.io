@@ -11,6 +11,43 @@ release sections rather than semver.
 
 ---
 
+## v3.9.8 — 2026-09-20
+
+### Every public page shares as itself
+
+The share card work continued past the homepage. Measured against `sitemap.xml` — the site's own
+definition of what is public — **15 public pages had a broken card**: ten advertised the generic
+profile photo or another page's card, one pointed at a file that was never generated, and nine
+carried no `og:image:alt` and no `twitter:image` at all. Shared to LinkedIn or WhatsApp, ten of the
+CDU and fire toolkits all previewed as the same picture.
+
+### Fixed
+
+- **11 pages got their own card, one got the file it had been advertising for months**
+  (`ai-engineering-maintenance`), and 8 more had their tag set completed. Public-page failures in
+  `tools/audit-og-images.py`: **15 → 0**. The remaining 60 failures are pages the sitemap does not
+  publish — the root-gated incident dossier and internal tools — and they are correctly left alone.
+- **The generic card layout.** It was a title hanging in the top third over an empty lower half,
+  with the description sliced mid-word (*"a deep all-aspects comp"*). Now: a mono family label in
+  the family's own accent (LIQUID COOLING TOOLKIT / FIRE SAFETY TOOLKIT / CALCULATOR / INCIDENT CASE
+  FILE …) derived from the slug, the block centred in the card, and text that ends on a word.
+  Three semantic accent slots — fault red, instrument cyan, brand amber — not one hue per page.
+- **`js/rz-version.js` was left on a stale token on 175 pages** by the release before this one.
+  Swept, which is what `tools/test-asset-cache-tokens.mjs` is for.
+
+### Added to the builder, so this cannot silently rot again
+
+- `--discover`: every public page that advertises no card — or advertises one that is not on disk,
+  or points at somebody else's — is derived from its own `<title>` and description. `TARGETS` was a
+  hand-kept list, which is why 15 pages fell out of it.
+- The completeness pass: `--update-html` now walks every public page that owns a card and fills
+  whatever is missing from the tag set. It used to return early the moment `og:image` was already
+  correct, which is precisely why nine pages kept an incomplete one.
+- Stale entries in `HTML_FILES` (five pages that no longer exist) are reported instead of crashing
+  the run half-way through patching.
+
+---
+
 ## v3.9.7 — 2026-09-20
 
 ### Dot left, title centre, count right

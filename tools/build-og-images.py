@@ -762,7 +762,12 @@ def _wrapped_lines(text: str, font, max_width: int, max_lines: int) -> list[str]
             current = test
     if current:
         lines.append(current)
-    return lines[:max_lines]
+    if len(lines) > max_lines:
+        # v3.9.7 — end on a word, not mid-syllable: the old cap sliced "comparison" to "comp".
+        kept = lines[:max_lines]
+        kept[-1] = kept[-1].rstrip(" ,;:") + "\u2026"
+        return kept
+    return lines
 
 
 def _hero_stats() -> list[tuple[str, str]]:
@@ -861,6 +866,31 @@ def _identity_card(title: str, subtitle: str) -> Image.Image:
     return img
 
 
+def _FAMILY_LABEL(slug: str) -> str:
+    """What kind of page this is, from the slug. One label per family, never one per page."""
+    table = [
+        ("incident-", "INCIDENT CASE FILE"),
+        ("cdu-", "LIQUID COOLING TOOLKIT"),
+        ("fire-", "FIRE SAFETY TOOLKIT"),
+        ("ltc-", "LIQUID-TO-CHIP LAB"),
+        ("compare-", "COMPARISON"),
+        ("article-", "ARTICLE"),
+        ("standards-", "STANDARDS LAB"),
+        ("pln-", "GRID MONITOR"),
+        ("spares", "SPARES READINESS"),
+    ]
+    for prefix, label in table:
+        if slug.startswith(prefix):
+            return label
+    if slug.endswith("-calculator") or slug.endswith("calculator"):
+        return "CALCULATOR"
+    if slug.endswith("-checklist"):
+        return "CHECKLIST"
+    if slug.endswith("-dashboard") or slug.endswith("-tracker") or slug.endswith("-monitor"):
+        return "MONITOR"
+    return ""
+
+
 def build_og_image(slug: str, title: str, subtitle: str, accent_hex: str) -> Image.Image:
     """Render a 1200×630 OG card and return the PIL Image."""
     # Photo slugs (index + profile fallback) get the index-hero base + avatar.
@@ -900,6 +930,12 @@ def build_og_image(slug: str, title: str, subtitle: str, accent_hex: str) -> Ima
     if avatar is not None:
         text_x = avatar_x + AVATAR_DIAMETER + 56
 
+    # ---- Family label: what KIND of page this is, one line, mono, in the family accent.
+    # v3.9.7 — the generic card was a title over an empty lower half. The label costs one line and
+    # tells a reader scrolling LinkedIn whether they are looking at a calculator, a checklist or a
+    # monitor. It is derived from the slug, never typed per page. ----
+    family = _FAMILY_LABEL(slug)
+
     # ---- Brand mark "RZ" ----
     draw.text((text_x, pad_y_top), "RZ", font=font_brand_sm, fill=BRAND_COLOR)
 
@@ -925,8 +961,14 @@ def build_og_image(slug: str, title: str, subtitle: str, accent_hex: str) -> Ima
         + 20  # gap title→subtitle
         + len(subtitle_lines) * subtitle_line_h
     )
-    text_area_h = int(H * 0.68)
-    text_y = pad_y_top + 70 + max(0, (text_area_h - pad_y_top - 70 - total_text_h) // 2)
+    font_family_lbl = _load_font("mono", 19)
+    label_h = 42 if family else 0
+    total_text_h += label_h
+    # centre the block in the card rather than hanging it from the top third
+    text_y = max(pad_y_top + 70, (H - total_text_h) // 2)
+    if family:
+        draw.text((text_x, text_y), family, font=font_family_lbl, fill=accent_hex)
+        text_y += label_h
 
     # Title
     for line in title_lines:
@@ -954,18 +996,143 @@ def build_og_image(slug: str, title: str, subtitle: str, accent_hex: str) -> Ima
 # ---------------------------------------------------------------------------
 # HTML meta-tag patcher
 # ---------------------------------------------------------------------------
+def _public_slugs() -> set:
+    """Slugs sitemap.xml publishes. Cached; empty set when the sitemap is unreadable."""
+    if not hasattr(_public_slugs, "_cache"):
+        import re as _re
+        try:
+            xml = (REPO_ROOT / "sitemap.xml").read_text(encoding="utf-8")
+        except OSError:
+            _public_slugs._cache = set()
+            return _public_slugs._cache
+        slugs = set()
+        for loc in _re.findall(r"<loc>([^<]+)</loc>", xml):
+            name = loc.rstrip("/").split("/")[-1]
+            if name.endswith(".html"):
+                slugs.add(name[:-5])
+            elif not name or "." not in name:
+                slugs.add("index")
+        _public_slugs._cache = slugs
+    return _public_slugs._cache
+
+
+def _discover_targets(include_existing: bool = False) -> list[tuple[str, str, str, str, Path]]:
+    """Every root page that advertises NO card, derived from the page itself.
+
+    v3.9.7 — TARGETS is a hand-kept list, so 61 pages (the whole incident dossier among them) went
+    out with no og:image at all: shared on LinkedIn or WhatsApp they showed a bare link. A hand list
+    is why; the pages already carry a <title> and a description, so the card can be derived instead
+    of transcribed.
+    """
+    import re as _re
+    out = []
+    for path in sorted(REPO_ROOT.glob("*.html")):
+        slug = path.stem
+        if slug in {h[:-5] for h in HTML_FILES.values()} and slug in {t[0] for t in TARGETS}:
+            continue
+        text = path.read_text(encoding="utf-8", errors="ignore")
+        og = _re.search(r'<meta\s+property="og:image"\s+content="([^"]+)"', text, _re.I)
+        # A page "has" a card only when it points at its OWN card. Ten public pages advertised the
+        # generic profile photo or another page's card, which is the same thing as having none:
+        # every one of them shares as the same picture.
+        if og and _re.search(rf"/assets/og/{_re.escape(slug)}(?:-\d{{8}})?\.webp", og.group(1)):
+            # ...unless the card it points at is not on disk: a 404 preview is a missing card with
+            # extra steps (ai-engineering-maintenance advertised one for months without the file).
+            # --force means "rebuild what you know how to build", including these
+            if (OUTPUT_DIR / f"{slug}.webp").exists() and not include_existing:
+                continue
+        # a redirect stub has nothing to preview, and a page the sitemap does not publish is not
+        # a page anyone shares — sitemap.xml is the site's own definition of "public"
+        if _re.search(r'http-equiv=["\']refresh', text, _re.I):
+            continue
+        if _public_slugs() and slug not in _public_slugs():
+            continue
+        title_m = _re.search(r"<title>(.*?)</title>", text, _re.S | _re.I)
+        desc_m = _re.search(r'<meta\s+name="description"\s+content="(.*?)"', text, _re.S | _re.I)
+        if not title_m:
+            continue
+        import html as _html
+        title = _html.unescape(_re.sub(r"\s+", " ", title_m.group(1)).strip())
+        title = _re.split(r"\s+[|\u2014\u00b7-]\s+", title)[0][:72]
+        subtitle = _html.unescape(_re.sub(r"\s+", " ", desc_m.group(1)).strip()) if desc_m else "resistancezero.com"
+        if len(subtitle) > 150:
+            subtitle = subtitle[:150].rsplit(" ", 1)[0].rstrip(" ,;:\u2014-") + "\u2026"
+        accent = ACCENT_FOR_FAMILY(slug)
+        out.append((slug, title, subtitle, accent, path))
+    return out
+
+
+def ACCENT_FOR_FAMILY(slug: str) -> str:
+    """One hue per FAMILY, never one per page (§A9 bans the rainbow).
+
+    incidents are faults, calculators and labs are instrument-cyan, everything else takes the brand
+    amber — three semantic slots, not a palette.
+    """
+    if slug.startswith("incident-") or slug.startswith("dc-incidents"):
+        return "#ef4444"
+    if slug.startswith("fire-"):
+        return "#ef4444"
+    if any(slug.startswith(prefix) for prefix in ("cdu-", "calc", "ltc-", "compare-", "spares", "standards-")):
+        return "#22d3ee"
+    return "#fbbf24"
+
+
+def _ensure_card_meta(slug: str, html_path: Path, alt: str) -> bool:
+    """Write the full card meta block into a page that has none."""
+    import re as _re
+    text = html_path.read_text(encoding="utf-8")
+    if _re.search(r'<meta\s+property="og:image"\s+content="[^"]+"', text, _re.I):
+        return _patch_html(slug, html_path)
+    url = f"https://resistancezero.com/assets/og/{slug}.webp"
+    esc = alt.replace('"', "&quot;")
+    block = (
+        f'    <meta property="og:image" content="{url}">\n'
+        f'    <meta property="og:image:width" content="1200">\n'
+        f'    <meta property="og:image:height" content="630">\n'
+        f'    <meta property="og:image:alt" content="{esc}">\n'
+        f'    <meta name="twitter:card" content="summary_large_image">\n'
+        f'    <meta name="twitter:image" content="{url}">\n'
+    )
+    anchor = _re.search(r'[ \t]*<meta\s+property="og:(?:title|description|url|type)"[^>]*>\n', text, _re.I)
+    if anchor:
+        at = anchor.end()
+    else:
+        head = _re.search(r"</title>\n", text, _re.I)
+        if not head:
+            return False
+        at = head.end()
+    text = text[:at] + block + text[at:]
+    # a page may carry twitter:card already; do not duplicate it
+    if text.count('name="twitter:card"') > 1:
+        first = text.index('<meta name="twitter:card"')
+        second = text.index('name="twitter:card"', first + 40)
+        line_start = text.rindex("\n", 0, second) + 1
+        line_end = text.index("\n", second) + 1
+        text = text[:line_start] + text[line_end:]
+    html_path.write_text(text, encoding="utf-8")
+    return True
+
+
 def _patch_html(slug: str, html_path: Path) -> bool:
     """
     Replace og:image and twitter:image tags, ensure width/height metas exist.
     Returns True if the file was modified.
+
+    v3.9.7 — a hand-kept list outlives its pages: HTML_FILES still named
+    network-osi-tcp-ip-models.html, which no longer exists, and the whole run died on it mid-way
+    through patching. A stale entry is a finding, not a crash.
     """
+    if not html_path.exists():
+        print(f"  [STALE]  {slug}: {html_path.name} is listed in HTML_FILES but not on disk")
+        return False
     new_url = f"https://resistancezero.com/assets/og/{slug}.webp"
     text = html_path.read_text(encoding="utf-8")
 
-    # Skip if already patched
+    # v3.9.7 — DO NOT return early when og:image already points at the card. Nine pages reached
+    # that state with no og:image:alt and no twitter:image, and this early return is why the
+    # completeness fills below could never run on them.
     if new_url in text:
-        print(f"  [SKIP HTML] {html_path.name} — already has og/{slug}.webp")
-        return False
+        print(f"  [CHECK]  {html_path.name} — card already linked; completing the tag set")
 
     orig = text
 
@@ -1010,6 +1177,26 @@ def _patch_html(slug: str, html_path: Path) -> bool:
             flags=re.IGNORECASE,
         )
 
+    # og:image:alt — a preview without alt text is unreadable to a screen reader and to a crawler
+    if 'property="og:image:alt"' not in text:
+        import re as _re2
+        title_m = _re2.search(r"<title>(.*?)</title>", text, _re2.S | _re2.I)
+        import html as _html2
+        alt = _html2.unescape(_re2.sub(r"\s+", " ", title_m.group(1)).strip()) if title_m else slug
+        alt = alt.replace('"', "&quot;")[:180]
+        text = _re.sub(
+            r'(<meta\s+property="og:image:height"\s+content="[^"]*">)',
+            rf'\1\n    <meta property="og:image:alt" content="{alt}">',
+            text, count=1, flags=_re.IGNORECASE,
+        )
+    # twitter:image — X renders its own tag; without it the card falls back to a bare link
+    if 'name="twitter:image"' not in text:
+        text = _re.sub(
+            r'(<meta\s+property="og:image"\s+content="[^"]*">)',
+            rf'\1\n    <meta name="twitter:image" content="{new_url}">',
+            text, count=1, flags=_re.IGNORECASE,
+        )
+
     if text == orig:
         print(f"  [WARN HTML] {html_path.name} — no og:image tag found, skipping")
         return False
@@ -1033,6 +1220,10 @@ def main() -> None:
         "--force", action="store_true", help="Regenerate even if file already exists"
     )
     parser.add_argument(
+        "--discover", action="store_true",
+        help="Also build a card for every root page that advertises none, derived from its own head",
+    )
+    parser.add_argument(
         "--update-html",
         action="store_true",
         help="Patch og:image / twitter:image meta tags in HTML files",
@@ -1048,7 +1239,13 @@ def main() -> None:
     generated = []
     skipped = []
 
-    for slug, title, subtitle, accent in TARGETS:
+    work = [(slug, title, subtitle, accent, None) for slug, title, subtitle, accent in TARGETS]
+    if args.discover:
+        found = _discover_targets(include_existing=args.force)
+        print(f"  [DISCOVER] {len(found)} page(s) advertise no card; deriving from their own <title> + description")
+        work += found
+
+    for slug, title, subtitle, accent, page_path in work:
         out_path = OUTPUT_DIR / f"{slug}.webp"
 
         if out_path.exists() and not args.force:
@@ -1057,6 +1254,8 @@ def main() -> None:
             skipped.append((slug, size_kb))
             if args.update_html and slug in HTML_FILES:
                 _patch_html(slug, REPO_ROOT / HTML_FILES[slug])
+            elif args.update_html and page_path is not None:
+                _ensure_card_meta(slug, page_path, title)
             continue
 
         print(f"  [GEN]    {slug}.webp  title={title!r} accent={accent}")
@@ -1071,8 +1270,30 @@ def main() -> None:
 
             if args.update_html and slug in HTML_FILES:
                 _patch_html(slug, REPO_ROOT / HTML_FILES[slug])
+            elif args.update_html and page_path is not None:
+                _ensure_card_meta(slug, page_path, title)
         else:
             print(f"           (dry run, not writing)")
+
+    # v3.9.7 — the completeness pass. Discovery only returns pages that LACK a card, so pages that
+    # already linked one were never re-examined — and nine of them carried no og:image:alt and no
+    # twitter:image for as long as the card existed. With --update-html, walk every public page
+    # that advertises its own card and fill whatever the tag set is missing.
+    if args.update_html:
+        completed = 0
+        for path in sorted(REPO_ROOT.glob("*.html")):
+            slug = path.stem
+            if _public_slugs() and slug not in _public_slugs():
+                continue
+            if not (OUTPUT_DIR / f"{slug}.webp").exists():
+                continue
+            text = path.read_text(encoding="utf-8", errors="ignore")
+            if 'property="og:image:alt"' in text and 'name="twitter:image"' in text:
+                continue
+            if _patch_html(slug, path):
+                completed += 1
+        if completed:
+            print(f"  [COMPLETE] filled the missing tag set on {completed} page(s)")
 
     print()
     if generated:
