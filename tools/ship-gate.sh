@@ -170,6 +170,7 @@ gate "agent harness standard — privacy and release parity" node tools/test-age
 # one — silently. That shipped twice: once caught by hand in v1.126.x, and again by v1.134.20,
 # where the twin still carried the Anthropic purple the same release had just removed from the
 # source. terser -c -m is byte-reproducible for every twin here, so the check is exact.
+gate "index portrait — right face per theme, whole photo, sharp at every dpr" node tools/test-index-profile-photo.mjs
 gate "min-twin freshness — no page runs a stale minified build" node tools/audit-min-twins.mjs --strict
 # CACHE-KEY DRIFT is the min-twin bug's sibling: one shared asset requested under two `?v=`
 # tokens sits in two cache entries, so a fix reaches a page only if that page's own token moved.

@@ -1920,6 +1920,37 @@ ABOVE the footer, never below (prevents an empty scrollable band under the foote
 Applied to `dc-market-tracker.html` (v1.99.x).
 
 
+## Feature 35: Portrait frame — `.rz-photo-frame` (v3.9.0, index)
+
+The owner's own photo, on his terms: *"jangan sampai terpotong atau tidak proportional … jangan
+sampai pecah utk display laptop atau mobile."* The frames it sits in do not agree on a shape — the
+bento hero card takes its height from the bento row (315x431 desktop, 205x399 tablet, 310x224
+phone) against a 0.949 portrait, so `object-fit:cover` cut **31% of the height on a phone and 46%
+of the width on a tablet**. The rule, CSS-only (no module — `js/rz-hero-fit.js` owns calculator
+heroes; this is the same contract inside an existing card):
+
+- `.rz-photo-frame` — `position:relative; overflow:hidden; isolation:isolate`. Inside a bento photo
+  card it claims the card (`position:absolute; inset:0`) because the card, not the frame, is what
+  the grid sizes.
+- `.rz-photo-fill` — the smallest rung of the SAME photo, `object-fit:cover`, `scale(1.18)`,
+  `blur(22px)`, `aria-hidden="true"` + empty `alt`. It fills the letterbox; it is never the subject.
+- the sharp layer — `object-fit:contain`, `z-index:1`. The WHOLE photo, never stretched.
+- **give the frame a shape close to the photo.** Contain in a box far from the source aspect means
+  a blurred band taller than the photo. The photo card is `aspect-ratio: 4/5; align-self:start`,
+  which holds the band under ~16% at every width instead of 55% on a tablet.
+- theme pairs switch on `[data-theme="dark"]`, which `html.rz-rainbow` always carries — rainbow
+  needs no rule of its own.
+- ladder: AVIF + WebP + JPEG at 320/480/640/960/master, `sizes` on every `<source>`, no rung wider
+  than the master. Built by `tools/build-profile-photos.py`; the avatar is the one deliberate crop
+  (a face-centred square, because a 40 px circle IS a crop), cut with an OpenCV face box.
+
+Gate: `tools/test-index-profile-photo.mjs` — right face per theme at 4 viewports x
+{light, dark, rainbow}, `object-fit:contain` with a blur sibling, rendered aspect within 1% of the
+master, the rung the browser actually picked at least as wide as box x dpr, per-rung byte budget,
+and width/height attrs that match what loads (no layout shift).
+
+---
+
 ## Feature 34: Hero image blur-letterbox — SHARED ENGINE (v1.99.x)
 
 Calculator hero/OG images must never stretch or distort, and must sit in a clean frame the

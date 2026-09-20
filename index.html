@@ -253,7 +253,7 @@
 </style>
 
     <!-- Index-only stylesheet — 83KB vs 121KB full, sync to prevent CLS -->
-    <link rel="stylesheet" href="styles-index.min.css?v=2026-09-06-slop">
+    <link rel="stylesheet" href="styles-index.min.css?v=2026-09-20-photo">
 
     <!-- prefetch removed: 20KB fetch on every page load, low hit rate -->
     <script src="js/rz-version.js?v=2026-05-09" defer></script>
@@ -310,7 +310,7 @@
     <nav class="navbar">
         <div class="nav-container">
             <a href="index.html" class="nav-logo">
-                <img src="assets/profile-photo-sm.webp" alt="Bagus Dwi Permana - Engineering Operations Manager and Ahli K3 Listrik Expert" class="nav-avatar" width="40" height="40" decoding="async">
+                <img src="assets/profile-photo-sm.webp?v=20260920" alt="Bagus Dwi Permana - Engineering Operations Manager and Ahli K3 Listrik Expert" class="nav-avatar" width="40" height="40" decoding="async">
             </a>
             <ul class="nav-menu">
                 <li><a href="#home" class="nav-link">Home</a></li>
@@ -458,14 +458,28 @@
                 </div>
                 <div class="bento-card bento-photo-card">
                     <div class="bento-photo-gradient"></div>
-                    <picture class="hero-photo-day">
-                        <source srcset="assets/profile-light.webp" type="image/webp">
-                        <img src="assets/profile-light.jpg" alt="Bagus Dwi Permana - Data Center Engineering Professional" class="bento-photo-img" fetchpriority="high" width="400" height="519">
-                    </picture>
-                    <picture class="hero-photo-dark">
-                        <source srcset="assets/profile-dark.webp" type="image/webp">
-                        <img src="assets/profile-dark.jpg" alt="Bagus Dwi Permana - Data Center Engineering Professional" class="bento-photo-img" loading="lazy" decoding="async" width="400" height="481">
-                    </picture>
+                    <!-- v3.9.0 — blur-letterbox portrait. The card's shape is set by the bento row,
+                         not by the photo: 315x431 on desktop, 205x399 on tablet, 310x224 on a phone,
+                         against a 0.949 portrait. object-fit:cover would cut 31% of the height on a
+                         phone and 46% of the width on a tablet, so the sharp layer is CONTAIN (whole
+                         photo, never stretched) and the empty sides are filled with a blurred copy of
+                         the same photo — the house blur-letterbox (js/rz-hero-fit.js, UI_FEATURES). -->
+                    <div class="hero-photo-day rz-photo-frame">
+                        <img class="rz-photo-fill" src="assets/profile-light-320.webp?v=20260920" alt="" aria-hidden="true" width="320" height="337" decoding="async">
+                        <picture>
+                            <source type="image/avif" srcset="assets/profile-light-320.avif?v=20260920 320w, assets/profile-light-480.avif?v=20260920 480w, assets/profile-light-640.avif?v=20260920 640w, assets/profile-light-960.avif?v=20260920 960w, assets/profile-light-1222.avif?v=20260920 1222w" sizes="(max-width: 768px) 80vw, (max-width: 1500px) 24vw, 320px">
+                            <source type="image/webp" srcset="assets/profile-light-320.webp?v=20260920 320w, assets/profile-light-480.webp?v=20260920 480w, assets/profile-light-640.webp?v=20260920 640w, assets/profile-light-960.webp?v=20260920 960w, assets/profile-light-1222.webp?v=20260920 1222w" sizes="(max-width: 768px) 80vw, (max-width: 1500px) 24vw, 320px">
+                            <img src="assets/profile-light-640.jpg?v=20260920" srcset="assets/profile-light-320.jpg?v=20260920 320w, assets/profile-light-480.jpg?v=20260920 480w, assets/profile-light-640.jpg?v=20260920 640w, assets/profile-light-960.jpg?v=20260920 960w, assets/profile-light-1222.jpg?v=20260920 1222w" sizes="(max-width: 768px) 80vw, (max-width: 1500px) 24vw, 320px" alt="Bagus Dwi Permana - Data Center Engineering Professional" class="bento-photo-img" fetchpriority="high" width="1222" height="1287">
+                        </picture>
+                    </div>
+                    <div class="hero-photo-dark rz-photo-frame">
+                        <img class="rz-photo-fill" src="assets/profile-dark-320.webp?v=20260920" alt="" aria-hidden="true" width="320" height="337" loading="lazy" decoding="async">
+                        <picture>
+                            <source type="image/avif" srcset="assets/profile-dark-320.avif?v=20260920 320w, assets/profile-dark-480.avif?v=20260920 480w, assets/profile-dark-640.avif?v=20260920 640w, assets/profile-dark-960.avif?v=20260920 960w, assets/profile-dark-1010.avif?v=20260920 1010w" sizes="(max-width: 768px) 80vw, (max-width: 1500px) 24vw, 320px">
+                            <source type="image/webp" srcset="assets/profile-dark-320.webp?v=20260920 320w, assets/profile-dark-480.webp?v=20260920 480w, assets/profile-dark-640.webp?v=20260920 640w, assets/profile-dark-960.webp?v=20260920 960w, assets/profile-dark-1010.webp?v=20260920 1010w" sizes="(max-width: 768px) 80vw, (max-width: 1500px) 24vw, 320px">
+                            <img src="assets/profile-dark-640.jpg?v=20260920" srcset="assets/profile-dark-320.jpg?v=20260920 320w, assets/profile-dark-480.jpg?v=20260920 480w, assets/profile-dark-640.jpg?v=20260920 640w, assets/profile-dark-960.jpg?v=20260920 960w, assets/profile-dark-1010.jpg?v=20260920 1010w" sizes="(max-width: 768px) 80vw, (max-width: 1500px) 24vw, 320px" alt="Bagus Dwi Permana - Data Center Engineering Professional" class="bento-photo-img" loading="lazy" decoding="async" width="1010" height="1064">
+                        </picture>
+                    </div>
                     <div class="bento-photo-info">
                         <p class="bento-status-title">Data Center Engineering Professional</p>
                     </div>
@@ -1075,10 +1089,24 @@
                     </div>
                 </div>
                 <div class="about-visual fade-in delay-1">
-                    <div class="about-image-wrapper">
+                    <!-- v3.9.0 — same blur-letterbox rule in a square frame, and theme-aware like
+                         the hero card: the day portrait in light, the studio portrait in dark and
+                         rainbow. Nothing is cropped; the 0.949 portrait letterboxes by ~5% in a 1:1
+                         frame and the blurred copy fills it. -->
+                    <div class="about-image-wrapper rz-photo-frame about-photo-day">
+                        <img class="rz-photo-fill" src="assets/profile-light-320.webp?v=20260920" alt="" aria-hidden="true" width="320" height="337" loading="lazy" decoding="async">
                         <picture>
-                            <source srcset="assets/profile-photo.webp" type="image/webp">
-                            <img loading="lazy" decoding="async" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana - Certified Ahli K3 Listrik with 12+ Years Professional Experience in Critical Infrastructure" class="about-image" width="400" height="400">
+                            <source type="image/avif" srcset="assets/profile-light-320.avif?v=20260920 320w, assets/profile-light-480.avif?v=20260920 480w, assets/profile-light-640.avif?v=20260920 640w" sizes="(max-width: 1000px) 200px, (max-width: 1400px) 20vw, 280px">
+                            <source type="image/webp" srcset="assets/profile-light-320.webp?v=20260920 320w, assets/profile-light-480.webp?v=20260920 480w, assets/profile-light-640.webp?v=20260920 640w" sizes="(max-width: 1000px) 200px, (max-width: 1400px) 20vw, 280px">
+                            <img loading="lazy" decoding="async" src="assets/profile-light-640.jpg?v=20260920" srcset="assets/profile-light-320.jpg?v=20260920 320w, assets/profile-light-480.jpg?v=20260920 480w, assets/profile-light-640.jpg?v=20260920 640w" sizes="(max-width: 1000px) 200px, (max-width: 1400px) 20vw, 280px" alt="Bagus Dwi Permana - Certified Ahli K3 Listrik with 12+ Years Professional Experience in Critical Infrastructure" class="about-image" width="1222" height="1287">
+                        </picture>
+                    </div>
+                    <div class="about-image-wrapper rz-photo-frame about-photo-dark">
+                        <img class="rz-photo-fill" src="assets/profile-dark-320.webp?v=20260920" alt="" aria-hidden="true" width="320" height="337" loading="lazy" decoding="async">
+                        <picture>
+                            <source type="image/avif" srcset="assets/profile-dark-320.avif?v=20260920 320w, assets/profile-dark-480.avif?v=20260920 480w, assets/profile-dark-640.avif?v=20260920 640w" sizes="(max-width: 1000px) 200px, (max-width: 1400px) 20vw, 280px">
+                            <source type="image/webp" srcset="assets/profile-dark-320.webp?v=20260920 320w, assets/profile-dark-480.webp?v=20260920 480w, assets/profile-dark-640.webp?v=20260920 640w" sizes="(max-width: 1000px) 200px, (max-width: 1400px) 20vw, 280px">
+                            <img loading="lazy" decoding="async" src="assets/profile-dark-640.jpg?v=20260920" srcset="assets/profile-dark-320.jpg?v=20260920 320w, assets/profile-dark-480.jpg?v=20260920 480w, assets/profile-dark-640.jpg?v=20260920 640w" sizes="(max-width: 1000px) 200px, (max-width: 1400px) 20vw, 280px" alt="Bagus Dwi Permana - Certified Ahli K3 Listrik with 12+ Years Professional Experience in Critical Infrastructure" class="about-image" width="1010" height="1064">
                         </picture>
                     </div>
                     <div class="experience-card">

@@ -8354,3 +8354,55 @@ html .failure-step-number {
 html .status-badge         { color: var(--rz-chip-quiet) !important; text-transform: uppercase; letter-spacing: .06em; }
 html .status-badge.active  { color: var(--rz-chip-good) !important; }
 html .failure-step-number  { color: var(--rz-chip-alert) !important; }
+
+/* ============================================================================
+   v3.9.0 — blur-letterbox portrait frame (.rz-photo-frame)
+   ----------------------------------------------------------------------------
+   The owner's rule for his own photo: never cropped, never out of proportion,
+   sharp on a laptop and on a phone. The frames it sits in do not agree on a
+   shape — the bento hero card is 315x431 on desktop, 205x399 on tablet and
+   310x224 on a phone (the bento row sets its height), while the portrait is
+   0.949. object-fit:cover would cut 31% of the height on a phone and 46% of
+   the width on a tablet. So the sharp layer is CONTAIN — the whole photo, never
+   stretched — and the space around it is filled with a blurred copy of the same
+   photo, which is the pattern js/rz-hero-fit.js already established for hero
+   images (standarization/UI_FEATURES_STANDARD.md, Hero blur-letterbox).
+   ==========================================================================*/
+.rz-photo-frame {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+/* The hero frames REPLACE the old <picture> elements inside .bento-photo-card, whose children
+   were positioned against the card itself. A plain relative div has no height of its own, so the
+   frame has to claim the card the way the image used to. */
+.bento-photo-card > .rz-photo-frame {
+    position: absolute;
+    inset: 0;
+}
+
+.rz-photo-fill {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.18);
+    filter: blur(22px) brightness(0.94) saturate(1.05);
+    z-index: 0;
+    pointer-events: none;
+    user-select: none;
+}
+
+[data-theme="dark"] .rz-photo-fill {
+    filter: blur(22px) brightness(0.72) saturate(1.02);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rz-photo-fill { transition: none; }
+}
+
+@media print {
+    .rz-photo-fill { display: none; }
+}

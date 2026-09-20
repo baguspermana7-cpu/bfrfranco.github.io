@@ -1085,6 +1085,21 @@ a {
     display: block;
 }
 
+/* v3.9.0 — the About portrait follows the same theme rule as the hero card.
+   html.rz-rainbow always carries data-theme="dark", so rainbow gets the studio
+   portrait too without a rule of its own. */
+.about-photo-dark {
+    display: none;
+}
+
+[data-theme="dark"] .about-photo-day {
+    display: none;
+}
+
+[data-theme="dark"] .about-photo-dark {
+    display: block;
+}
+
 [data-theme="dark"] .hero-profile-status {
     background: rgba(16, 185, 129, 0.1);
     border-color: rgba(16, 185, 129, 0.25);
@@ -1339,7 +1354,14 @@ html.rz-rainbow .bento-cta-row .btn-bento-primary { border-color: rgba(148,163,2
 /* ROW 1: Photo Card */
 .bento-photo-card {
     position: relative;
-    min-height: 16rem;
+    /* v3.9.0 — a portrait frame, not whatever shape the row happens to leave. The bento row used
+       to stretch this card to its neighbour's height (203x474 on a tablet against a 0.949
+       portrait), and "never crop" in a box that far from the photo means a blurred band taller
+       than the photo itself. A 4:5 frame keeps the letterbox under ~16% at every width while the
+       whole portrait stays visible. */
+    aspect-ratio: 4 / 5;
+    align-self: start;
+    min-height: 0;
     padding: 0;
     background: var(--gray-200);
 }
@@ -1360,13 +1382,15 @@ html.rz-rainbow .bento-cta-row .btn-bento-primary { border-color: rgba(148,163,2
     background: linear-gradient(to top, #0f172a 0%, transparent 60%);
 }
 
+/* v3.9.0 — the sharp layer of the blur-letterbox: the WHOLE portrait, centred. */
 .bento-photo-img {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    object-position: top center;
+    object-fit: contain;
+    object-position: center center;
+    z-index: 1;
 }
 
 .bento-photo-logo {
@@ -1734,7 +1758,8 @@ html.rz-rainbow .bento-cta-row .btn-bento-primary { border-color: rgba(148,163,2
         font-size: 0.95rem;
     }
     .bento-photo-card {
-        min-height: 14rem;
+        /* full-width on a phone, same portrait frame */
+        min-height: 0;
     }
     .bento-governance {
         min-height: auto;
@@ -2430,9 +2455,11 @@ section {
 }
 
 .about-image {
+    position: relative;
+    z-index: 1;
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     border-radius: 20px;
     box-shadow: 0 20px 40px rgba(30, 58, 95, 0.2);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -6439,3 +6466,55 @@ p a[href$="terms.html"], p a[href$="privacy.html"], .footer p a { text-decoratio
 [data-theme="dark"] .footer-tagline-main { color: #f0f4f8; opacity: 1; }
 [data-theme="dark"] .footer-tagline-sub,
 [data-theme="dark"] .footer-copyright { color: #cbd5e1; opacity: 1; }
+
+/* ============================================================================
+   v3.9.0 — blur-letterbox portrait frame (.rz-photo-frame)
+   ----------------------------------------------------------------------------
+   The owner's rule for his own photo: never cropped, never out of proportion,
+   sharp on a laptop and on a phone. The frames it sits in do not agree on a
+   shape — the bento hero card is 315x431 on desktop, 205x399 on tablet and
+   310x224 on a phone (the bento row sets its height), while the portrait is
+   0.949. object-fit:cover would cut 31% of the height on a phone and 46% of
+   the width on a tablet. So the sharp layer is CONTAIN — the whole photo, never
+   stretched — and the space around it is filled with a blurred copy of the same
+   photo, which is the pattern js/rz-hero-fit.js already established for hero
+   images (standarization/UI_FEATURES_STANDARD.md, Hero blur-letterbox).
+   ==========================================================================*/
+.rz-photo-frame {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+/* The hero frames REPLACE the old <picture> elements inside .bento-photo-card, whose children
+   were positioned against the card itself. A plain relative div has no height of its own, so the
+   frame has to claim the card the way the image used to. */
+.bento-photo-card > .rz-photo-frame {
+    position: absolute;
+    inset: 0;
+}
+
+.rz-photo-fill {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.18);
+    filter: blur(22px) brightness(0.94) saturate(1.05);
+    z-index: 0;
+    pointer-events: none;
+    user-select: none;
+}
+
+[data-theme="dark"] .rz-photo-fill {
+    filter: blur(22px) brightness(0.72) saturate(1.02);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rz-photo-fill { transition: none; }
+}
+
+@media print {
+    .rz-photo-fill { display: none; }
+}

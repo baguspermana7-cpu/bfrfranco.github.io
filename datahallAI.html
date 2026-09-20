@@ -3163,9 +3163,12 @@ function renderOverviewCards(){
       ['Facility pool',dhaF(X.genInst)+'\u00D7 '+dhaF(X.genMW)+' MW '+(X.genRed||'\u2014'),bo('gensetFacNplus1',{also:['gensetMW']})],
       ['Glyphs drawn','6 banks stand for the pool; the count above is the engine figure',{declared:'the isometric draws six representative generator banks, not one glyph per installed set'}]
     ]),
-    mc('#fde68a','Transformer Rooms A / B','Ground floor — 20 kV to 400 V',[
+    mc('#fde68a','Transformer Rooms A / B','Ground floor \u2014 unit substations step MV down to LV',[
       ['Feed A',dhaF(X.tx)+'\u00D7 '+dhaF(X.txMVA)+' MVA per hall',bo('txPerFeedHall',{also:['txRatingMVA']})],
-      ['Feed B',dhaF(X.tx)+'\u00D7 '+dhaF(X.txMVA)+' MVA per hall',bo('txPerFeedHall',{also:['txRatingMVA'],nomark:true})]
+      ['Feed B',dhaF(X.tx)+'\u00D7 '+dhaF(X.txMVA)+' MVA per hall',bo('txPerFeedHall',{also:['txRatingMVA'],nomark:true})],
+      /* the levels belong in a hooked row, not in the subtitle: the card subtitle is prose and a
+         numeral in prose is a numeral no walker can trace back to the engine. */
+      ['Ratio',dhaF(X.mvKv)+' kV \u2192 '+dhaF(X.V)+' V',bo('mvKv',{also:['voltageLL']})]
     ]),
     mc('#cbd5e1','Ground-floor support zones','Workshop, MMR, NOC, AHU',[
       ['Workshop / Storage','Support &amp; maintenance'],
@@ -3183,7 +3186,10 @@ function renderOverviewCards(){
     ]),
     mc('#67e8f9','Heat rejection','Roof \u2014 chiller plant and dry coolers',[
       ['Chillers',dhaF(X.chillersRun)+' run design / '+dhaF(X.chillersInstalled)+' installed',bo('chillersRunning',{also:['chillersInstalled']})],
-      ['Dry coolers',dhaF(X.dryCoolers)+'\u00D7 V-bank, dry-only']
+      /* v3.9.0 — X.dryCoolers does not exist: the adapter publishes dryCoolersInstalled /
+         dryCoolersRunning, and DHAX stopped assigning the old name in v3.8.0 precisely because it
+         resolved to null. This card printed an em dash where the count belongs. */
+      ['Dry coolers',dhaG(X.dryCoolersInstalled)+' installed / '+dhaG(X.dryCoolersRunning)+' duty \u00B7 V-bank, dry-only',bo('dryCoolersInstalled',{also:['dryCoolersRunning']})]
     ])
   ].join('');
 }
