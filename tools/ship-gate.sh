@@ -177,6 +177,33 @@ gate "audit coverage — sitemap/robots vs audit scope" node --test tools/test-a
 # cause — the incident timelines' viewBox grew with the event count while max-width squeezed them
 # into the column, so the more an incident had to say the smaller it printed. Now zero.
 gate "site legibility — no unreadable SVG labels, no clipped text" node tools/audit-legibility.mjs --strict
+
+# ---------------------------------------------------------------------------
+# The six render audits CLAUDE.md has listed under "Audit before push" since
+# v1.49.8 — and which this gate did not run until 2026-09-20. Running them by
+# hand works exactly as long as somebody remembers; test-gate-wiring.mjs below
+# now asserts the two lists agree, so this cannot drift apart again silently.
+#
+# dark-coverage is the one that earns the 356 s it costs: CLAUDE.md's own
+# history records the white-body-in-dark-mode defect shipping THREE separate
+# times in one session, because a rule with no [data-theme="dark"] override is
+# invisible until someone opens the page in the other theme.
+# page-gates is the cheapest insurance here (1 s): it caught root-gated LTC labs
+# staying locked for root in v1.99.x.
+# ---------------------------------------------------------------------------
+gate "dark coverage — no white body or content block in dark mode, both themes" node tools/audit-dark-coverage.mjs --strict
+gate "responsive layout — no real mobile/tablet overflow, tables inside the column" node tools/audit-responsive-layout.mjs --strict
+gate "article charts — every chart carries a source and a basisTag" node tools/audit-article-charts.mjs --strict
+gate "hero images — every hero page loads the blur-letterbox fitter" node tools/audit-hero-images.mjs --strict
+gate "page access gates — every gated page enforces its tier and wires its login" node tools/audit-page-gates.mjs --strict
+gate "interactions — palette, living diagrams, scrolly and reading polish under real input" node tools/audit-interactions.mjs --strict
+
+# An audit that exists but is not wired is a habit, not a gate. This asserts
+# every command in CLAUDE.md's "Audit before push" block is invoked above, or is
+# named with a reason for being out. Its parsers are proven on synthetic input
+# separately, because the whole check rests on them.
+gate "gate wiring — every mandatory audit is actually in this file" node tools/test-gate-wiring.mjs
+gate "gate wiring parsers — a tool named in a comment is not a gate" node tools/test-gate-wiring-parsers.mjs
 gate "agent harness standard — privacy and release parity" node tools/test-agent-harness-standard.mjs
 # MIN-TWIN FRESHNESS. index.html is one of two pages that load auth.min.js instead of auth.js,
 # so a stale twin means the HOMEPAGE runs old auth code while every other page runs the fixed
