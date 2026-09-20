@@ -11,6 +11,45 @@ release sections rather than semver.
 
 ---
 
+## v3.7.1 — 2026-09-20
+
+### Sixteen of the isometric's collisions were a caption overlapping its own subtitle
+
+The building isometric carries 127 label collisions per view — the single worst diagram on
+`datahallAI.html`. Sorting them by what actually overlaps shows they are not one problem:
+
+- **16 were a zone caption colliding with its own second line.** Every stack was written as a title
+  at `f.z+FH+N` and a spec line at `f.z+FH+N-1.5`, and 1.5 floor-units renders as roughly 10 px —
+  less than the two text boxes are tall. `isoLabel()` paints an opaque mask behind each label so
+  structural edges never cross the text, so the second line's mask was eating the first line's
+  descenders. "MV SWGR-A" over "SM6 20kV" was not a crowded drawing; it was one label drawn through
+  another.
+- The rest are captions over equipment and equipment over equipment, which is a layout question,
+  not a spacing bug. Left alone deliberately — see below.
+
+### Fixed
+
+- **The gap in all sixteen caption stacks is now 3 units rather than 1.5**, applied by raising the
+  title rather than lowering the subtitle, so nothing moved down into the equipment field. The
+  exploded view has 12 units of headroom above each slab (`FH` 6, `GAP` 18), so the highest caption
+  now sits at `+8.5` with room to spare.
+- Collisions on the isometric **127 → 111**; stack self-overlaps **16 → 1**. The one that remains is
+  the "BMS / EPMS" zone caption over the "BMS" equipment chip — a caption-over-equipment case, not a
+  stack. Verified at 1680, 1440, 1024 and 360 px, with clipping still 0 and no label under the
+  legibility floor.
+
+### Not done, and why
+
+The remaining 111 are the saturated-layout problem. Measured: moving three of the worst-placed zone
+captions (`AHU / AIR HANDLING`, `VRF CONDENSING`, `CW PUMP STATION`) onto the floor plane and
+forward took 127 → 124 and put each of them into a **new** collision — `LOADING`, `BAT-A`, `R1·7`.
+There is no free strip; in an isometric a 3-unit-tall equipment box projects up-screen into exactly
+the band a floating zone caption occupies. That change was reverted rather than shipped. Clearing it
+needs a decision about the drawing — level-of-detail that drops chip labels while a zone caption is
+shown, leader lines outside the footprint, or fewer labels at this zoom — not more nudging.
+
+---
+
 ## v3.7.0 — 2026-09-12
 
 ### The step is drawn where the voltage changes
