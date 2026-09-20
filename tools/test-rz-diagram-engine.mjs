@@ -774,6 +774,21 @@ const D = sandbox.RZDiagram;
   }
 }
 
+/* U6: an unrecognised option is a typo, and dropping it in silence is how a
+ *     node quietly loses a line. `sub` instead of `sublabel` did exactly that
+ *     in an article figure: nothing logged, nothing thrown, the figure just
+ *     came out missing a fact. */
+{
+  const c = D.create({ slug: 'u6', title: 'T', desc: 'D' });
+  c.node(0, 0, { name: 'A', sub: 'meant sublabel' });
+  const w = c.warnings.filter(x => x.kind === 'unknown-option');
+  ok('U6a', w.length === 1, `an unknown option must warn: got ${w.length}`);
+  ok('U6b', /"sub"/.test(w[0] ? w[0].message : ''), 'the warning must name the offending key');
+  const clean = D.create({ slug: 'u6b', title: 'T', desc: 'D' });
+  clean.node(0, 0, { name: 'A', sublabel: 'B', tag: 'C', legend: 'D', tier: 2 });
+  ok('U6c', clean.warnings.length === 0, 'every documented option is accepted silently');
+}
+
 /* ==========================================================================
  * TOKEN CONTRACT — a missing custom property fails silently, in one theme
  * ======================================================================== */

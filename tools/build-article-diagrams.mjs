@@ -58,6 +58,97 @@ const { RZDiagram: D, RZDiagramMetrics: M, RZDiagramLayout: L } = sandbox;
  * ======================================================================== */
 const FIGURES = [
   {
+    id: 'heat-path-ceilings',
+    page: 'article-18.html',
+    caption:
+      'The same heat, two paths. Air carries it through the room, so the room becomes the ' +
+      'bottleneck and the path tops out near 30 kW per rack. A cold plate carries it in liquid ' +
+      'from the die, and the room stops being in the way. GB300 NVL72 at 132-140 kW per rack sits ' +
+      'above the air ceiling by a factor of four — which is why the transition is not a preference.',
+    because:
+      'the article tabulates rack density by platform, and separately tabulates cooling technology ' +
+      'by ceiling. Neither table connects them, and the connection is the section\'s argument: the ' +
+      'density trajectory crossed the air ceiling, so the heat path had to change SHAPE. A table ' +
+      'cannot show a change of shape.',
+    build() {
+      const ctx = D.create({
+        slug: 'heat-path',
+        title: 'Two heat paths, and where each one runs out',
+        desc: 'In an air-cooled rack, heat leaves the die through a heatsink into room air, is ' +
+              'collected by a CRAH and passed to chilled water. That path is limited by what room ' +
+              'air can carry, roughly 30 kW per rack. In a liquid-cooled rack, heat leaves the die ' +
+              'into a cold plate and passes through a CDU directly to facility water; the room is ' +
+              'no longer in the path, and direct-to-chip reaches roughly 200 kW per rack. Both ' +
+              'paths end at the same heat rejection plant.'
+      });
+
+      const COL_A = 40, COL_B = 470, W = 330;
+      const Y0 = 78, PITCH = 104;
+
+      function chain(x, rows, strokeFor) {
+        const out = [];
+        rows.forEach((r, i) => {
+          out.push(ctx.node(x, Y0 + i * PITCH, {
+            id: r.id, tag: r.tag, name: r.name, sublabel: r.sub, w: W,
+            stroke: strokeFor(i), fill: 'paper', tier: 2,
+            legend: r.legend
+          }));
+        });
+        return out;
+      }
+
+      const air = chain(COL_A, [
+        { id: 'a-die', tag: 'source', name: 'GPU die', sub: 'heat flux to 1,000 W/cm\u00B2' },
+        { id: 'a-room', tag: 'air', name: 'Heatsink \u2192 room air', sub: 'the room is in the path' },
+        { id: 'a-crah', tag: 'crah', name: 'CRAH \u2192 chilled water', sub: 'PUE 1.4\u20131.8' }
+      ], () => 'rule-solid');
+
+      const liq = chain(COL_B, [
+        { id: 'l-die', tag: 'source', name: 'GPU die', sub: 'same heat, same flux' },
+        { id: 'l-plate', tag: 'liquid', name: 'Cold plate', sub: 'liquid at the die' },
+        { id: 'l-cdu', tag: 'cdu', name: 'CDU \u2192 facility water', sub: 'PUE 1.10\u20131.35' }
+      ], (i) => (i === 1 ? 'accent' : 'rule-solid'));
+
+      [[air, 'Air path'], [liq, 'Liquid path']].forEach(function (pair) {
+        const col = pair[0];
+        for (let i = 0; i < col.length - 1; i++) {
+          ctx.edge({ x: col[i].x + col[i].w / 2, y: col[i].y + col[i].h },
+                   { x: col[i + 1].x + col[i + 1].w / 2, y: col[i + 1].y }, {
+            fromId: col[i].id, toId: col[i + 1].id, stroke: 'muted', tier: 2, pattern: 'solid'
+          });
+        }
+      });
+
+      /* Both paths end in the same plant. Drawing it once, below and between,
+       * is what makes them two routes to one place rather than two systems. */
+      const last = air[air.length - 1];
+      const reject = ctx.node(COL_A + (COL_B + W - COL_A) / 2 - W / 2,
+                              last.y + last.h + 96, {
+        id: 'reject', tag: 'shared', name: 'Heat rejection', sublabel: 'the same plant, either way',
+        w: W, stroke: 'rule-solid', fill: 'paper-2', tier: 2
+      });
+      [air[2], liq[2]].forEach(function (n, i) {
+        ctx.edge({ x: n.x + n.w / 2, y: n.y + n.h },
+                 { x: reject.x + reject.w * (i ? 0.72 : 0.28), y: reject.y }, {
+          fromId: n.id, toId: 'reject', stroke: 'muted', tier: 2, pattern: 'solid'
+        });
+      });
+
+      /* The ceilings. These are the point, so they are containers rather than
+       * captions: Common Region ties the number to the whole path it limits. */
+      ctx.zone(COL_A - 18, Y0 - 44, W + 36, (air[2].y + air[2].h + 20) - (Y0 - 44), {
+        label: 'air path \u2014 ceiling about 30 kW per rack', tier: 3, dashed: true
+      });
+      ctx.zone(COL_B - 18, Y0 - 44, W + 36, (liq[2].y + liq[2].h + 20) - (Y0 - 44), {
+        label: 'direct-to-chip \u2014 about 200 kW per rack', tier: 3, dashed: true,
+        stroke: 'accent'
+      });
+
+      ctx.legend();
+      return ctx.fit(28);
+    }
+  },
+  {
     id: 'pfas-loss-zones',
     page: 'article-26.html',
     caption:

@@ -79,6 +79,11 @@
    * legend()). These are named rather than raw dasharrays so the legend can say
    * what they mean.
    */
+  /* Every option node() honours. Anything else is a typo — see the check in
+   * node() for why that matters. */
+  var NODE_OPTS = ['id', 'tag', 'name', 'sublabel', 'w', 'h', 'pad', 'stroke', 'fill',
+                   'tier', 'dashed', 'focal', 'radius', 'legend', 'vAlign', 'nameFill'];
+
   var PATTERN = {
     solid: '',
     dashed: '6,4',
@@ -185,6 +190,21 @@
        */
       node: function (x, y, o) {
         o = o || {};
+        /* An unknown option is a typo, and a silently dropped one is the worst
+         * kind: `sub` instead of `sublabel` cost a node its second line with
+         * nothing logged and nothing thrown — the figure simply came out
+         * missing a fact. Name what is accepted, and say so when something else
+         * arrives. */
+        for (var k in o) {
+          if (!Object.prototype.hasOwnProperty.call(o, k)) continue;
+          if (NODE_OPTS.indexOf(k) === -1) {
+            warnings.push({
+              kind: 'unknown-option', id: o.id || o.name,
+              message: 'node option "' + k + '" is not recognised and was ignored; ' +
+                       'accepted options are ' + NODE_OPTS.join(', ')
+            });
+          }
+        }
         var pad = o.pad == null ? 12 : o.pad;
         var nameW = o.name ? M.textWidth(o.name, TYPE['node-name'].size, 'sans') : 0;
         var subW = o.sublabel ? M.textWidth(o.sublabel, TYPE.sublabel.size, 'mono') : 0;
