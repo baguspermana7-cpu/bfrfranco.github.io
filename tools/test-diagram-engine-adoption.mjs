@@ -37,12 +37,21 @@
  *
  * SCOPE
  *
- * Every cockpit page, not only the ones the geometry survey reaches. TAB_SETS
- * lists `datahallAI.html` and nothing else, so the survey measures that page's
- * twenty-one drawings and none of the Track B instrument pages — and those are
- * not clean: fire-system carries 137 raw coordinate literals, water-system 121,
- * fuel-system 97. The cockpit list is therefore named in full below and unioned
- * with TAB_SETS, so this ratchet does not inherit the survey's blind spot.
+ * Every cockpit page.
+ *
+ * CORRECTION (v3.10.7): an earlier version of this comment claimed the geometry
+ * survey reaches only `datahallAI.html`, because TAB_SETS names only that page.
+ * That was wrong. TAB_SETS is the *tab-activation* registry — which drawings sit
+ * behind which tab — and `test-conv-geometry.mjs` keeps a separate `DIAGRAMS`
+ * list that already covers chiller-plant, fire-system, water-system,
+ * fuel-system, ict and EPMS_Telemetry. Those pages are measured, and they
+ * measure clean.
+ *
+ * The wider scope here is still right, for a narrower reason: this gate holds
+ * cockpit surfaces the survey's list does NOT name — `all-in-one-dashboard`,
+ * `rz-cockpit-mockup`, `js/ltc-system-modelling-lab.js` — and it holds every
+ * page against a rise even where a drawing is currently collision-free, since
+ * clean today says nothing about the next hand-typed coordinate.
  *
  * Article illustrations and incident diagrams stay out of scope: they are
  * one-off editorial figures, not instrument drawings, and sweeping them in
@@ -72,16 +81,14 @@ const PRIMITIVES = [
 const PRIM_RE = new RegExp(`\\b(?:${PRIMITIVES.join('|')})\\s*\\(`, 'g');
 const RAW_RE = /<(?:rect|circle|line|text|path|polyline|polygon|ellipse)\b[^>]*?\b(?:x|cx|x1|d|points)="[-0-9]/g;
 
-/* The cockpit set.
+/* The cockpit set, named in full.
  *
- * TAB_SETS holds only `datahallAI.html` — the geometry survey measures that one
- * page's twenty-one drawings and NOTHING on the Track B cockpits, even though
- * `fire-system.html` carries 137 raw coordinate literals and `water-system.html`
- * 121. That is a hole in the survey, not a sign those pages are clean, and this
- * gate refuses to inherit it: the cockpit list is named here in full so the
- * ratchet holds on every instrument page whether or not the survey reaches it.
- *
- * Adding a page to TAB_SETS later changes nothing here — the union is taken. */
+ * TAB_SETS holds only `datahallAI.html`, but that is a tab-activation registry,
+ * not the survey's coverage: `test-conv-geometry.mjs` has its own `DIAGRAMS`
+ * list which already includes the Track B P&IDs. Naming the cockpits here keeps
+ * the ratchet independent of both lists, and picks up the surfaces neither one
+ * mentions. Adding a page to TAB_SETS later changes nothing — the union is
+ * taken. */
 const COCKPITS = [
   'dc-conventional.html', 'datahall.html', 'chiller-plant.html', 'water-system.html',
   'fire-system.html', 'fuel-system.html', 'ict.html', 'EPMS_Telemetry.html',

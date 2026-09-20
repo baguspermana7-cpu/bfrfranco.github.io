@@ -222,10 +222,19 @@ no excuse. Both failure paths were injected and observed.
 | Adoption ratchet | **shipped** v3.10.3 — baseline 3,114, may fall, never rise |
 | Basis marks (every cockpit) | **measured** v3.10.2 — no longer `length × size × 0.6` |
 
-**The geometry survey does not reach the Track B cockpits.** `TAB_SETS` lists `datahallAI.html`
-and nothing else, so `fire-system.html` (137 raw coordinates), `water-system.html` (121) and
-`fuel-system.html` (97) are unmeasured — which is a hole in the survey, not evidence they are
-clean. The ratchet holds them anyway; extending the survey is separate work.
+**Correction (v3.10.7).** An earlier revision of this section claimed the geometry survey does
+not reach the Track B cockpits, on the grounds that `TAB_SETS` names only `datahallAI.html`.
+That was wrong, and the conclusion drawn from it was wrong too. `TAB_SETS` is the
+*tab-activation* registry; `test-conv-geometry.mjs` keeps a separate `DIAGRAMS` list that
+already covers `chiller-plant`, `fire-system`, `water-system`, `fuel-system`, `ict` and
+`EPMS_Telemetry`. **Those pages are measured, and they measure clean** — the census found
+defects only on `#bldgSvg`, `#coolSvg`, one floor plan, the data hall, the electrical overview
+and the fire mimic.
+
+The adoption ratchet still names every cockpit itself, for a narrower reason: it holds
+surfaces the survey's list does not name (`all-in-one-dashboard`, `rz-cockpit-mockup`,
+`js/ltc-system-modelling-lab.js`), and a drawing that is collision-free today says nothing
+about the next hand-typed coordinate added to it.
 
 Migration is per diagram, and each one is a separate ship with its own geometry
 re-measurement. The isometric `#bldgSvg` is the largest single block and has its own plan;

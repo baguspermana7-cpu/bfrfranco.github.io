@@ -11,6 +11,38 @@ release sections rather than semver.
 
 ---
 
+## v3.10.7 — 2026-09-20
+
+### A registry is not a coverage list
+
+A correction. v3.10.3 and v3.10.4 both stated that the geometry survey does not reach the Track B
+cockpits, reasoning from the fact that `TAB_SETS` names only `datahallAI.html`.
+
+That reasoning was wrong. `TAB_SETS` is the **tab-activation** registry — it records which drawing
+sits behind which tab, so a gate can open it. Coverage is a different list:
+`test-conv-geometry.mjs` keeps its own `DIAGRAMS` array, and it has covered `chiller-plant`,
+`fire-system`, `water-system`, `fuel-system`, `ict` and `EPMS_Telemetry` all along.
+
+**So those pages are measured, and they measure clean.** The census bears that out: every defect it
+found sits on `#bldgSvg`, `#coolSvg`, one floor plan, the data hall, the electrical overview and the
+fire mimic. The claimed 462 unmeasured coordinates across nine files were measured, and were fine.
+
+### Fixed
+
+- The false claim is corrected at all three places it was published: the `SCOPE` docstring and the
+  `COCKPITS` comment in `tools/test-diagram-engine-adoption.mjs`, and §6 of
+  `standarization/DIAGRAM_ENGINE_STANDARD.md`.
+
+### Unchanged
+
+- **The adoption ratchet still names every cockpit itself**, for a narrower and true reason: it
+  holds surfaces the survey's list does not name — `all-in-one-dashboard.html`,
+  `rz-cockpit-mockup.html`, `js/ltc-system-modelling-lab.js` — and a drawing that is
+  collision-free today says nothing about the next hand-typed coordinate added to it. The baseline
+  of 3,114 across fourteen files stands.
+
+---
+
 ## v3.10.6 — 2026-09-20
 
 ### The caption yields, the tag does not
