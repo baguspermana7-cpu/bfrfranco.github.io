@@ -11,6 +11,55 @@ release sections rather than semver.
 
 ---
 
+## v3.10.8 — 2026-09-20
+
+### The generator is where the banned colour was hiding
+
+`tools/test-purple-family.mjs` reads the hue of every literal in `*.html`, `*.css` and `*.js`, so a
+regression cannot rename its way past it. It still could not see a violet that was never written in
+one of those files — it was written by a **Python generator** that prints the page.
+
+Four generators were still emitting the AI-default violet family into pages a sweep had already
+cleaned by hand:
+
+- `tools/build-changelog-html.py` — the MAJOR filter chip painted `rgba(139,92,246)` / `#a78bfa`
+  while its own `TIER_COLOR` table says amber, a commit-link code chip in the same violet, and a
+  navigation copy still carrying `#4f46e5` on TCO Calculator and `#7c3aed` on Future Forward.
+  `index.html` and `articles.html` have carried `#64748b` on both links since the nav sweep; the
+  generator did not. `changelog.html` is in the gate's SKIP_FILE list *because* it is generated —
+  so the live page kept the violet and nothing could report it.
+- `tools/generate-city-pages.py` — the same two stale nav links plus two disclaimer rules.
+- `Apps/second brain/rebuild-codebase-graph.py` — a root-gate login button and a nav link at
+  `#8b5cf6`, where the shipped page beside it reads `#0e7490`. A regenerate would have undone that
+  sweep silently.
+- `tools/build-og-images.py` — three social cards keyed to `#8b5cf6`.
+
+### Changed
+
+- The purple gate scans `*.py`, and strips Python line comments the way it already stripped `//`
+  ones: a `#` opening a comment is followed by whitespace, a `#` opening a colour literal by a hex
+  digit inside quotes. Without that, the gate would flag its own ban being explained in a comment.
+- MAJOR changelog chip amber (`rgba(217,119,6,·)` / `#f59e0b`), matching the tier colour it labels;
+  commit-link chip neutral slate; both stale nav links `#64748b`.
+- City-page nav and disclaimer links to `#64748b` / `#06b6d4`; Second Brain generator to `#0e7490`.
+- OG accents: PUE Calculator `#14b8a6`, ICT `#0d9488`, Global PUE Benchmarks `#f59e0b`; those three
+  cards rebuilt. A pixel scan of all 127 cards for the banned hue band returns zero.
+
+### Standard
+
+`standarization/ANTI_VIBECODE_STANDARD.md` — "A colour gate must read the GENERATOR, not only what a
+browser loads". Four clauses: generators are in scope whatever their extension; comment stripping is
+per-language; a page swept by hand has its generator swept in the same commit, or the sweep has a
+half-life of one rebuild; and source scanning cannot see pixels.
+
+### Honest boundary
+
+The pixel scan was run by hand, not wired as a gate. A colour ban that reads source can never see a
+rendered image; that remains an open hole for any artwork a generator paints, and the standard says
+so rather than leaving it to be rediscovered.
+
+---
+
 ## v3.10.7 — 2026-09-20
 
 ### A registry is not a coverage list

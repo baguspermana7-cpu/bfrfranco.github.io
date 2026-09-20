@@ -24,7 +24,7 @@ import textwrap
 from pathlib import Path
 
 try:
-    from PIL import Image, ImageDraw, ImageFont, ImageFilter
+    from PIL import Image, ImageEnhance, ImageDraw, ImageFont, ImageFilter
 except ImportError:
     print("ERROR: Pillow not installed. Run: pip3 install Pillow", file=sys.stderr)
     sys.exit(1)
@@ -68,7 +68,7 @@ TARGETS = [
         "pue-calculator",
         "PUE Calculator",
         "Power Usage Effectiveness modelling — climate, tier, cooling-system inputs.",
-        "#8b5cf6",
+        "#14b8a6",
     ),
     (
         "capex-calculator",
@@ -98,7 +98,7 @@ TARGETS = [
         "cx-calculator",
         "CX Calculator",
         "L0–L6 commissioning cost + Gantt + Monte Carlo simulation.",
-        "#a855f7",
+        "#06b6d4",
     ),
     (
         "carbon-footprint",
@@ -158,7 +158,7 @@ TARGETS = [
         "ict",
         "ICT Infrastructure",
         "Structured cabling, network fabric, ODF, fiber pathways for data centers.",
-        "#8b5cf6",
+        "#0d9488",
     ),
     (
         "EPMS_Telemetry",
@@ -188,7 +188,7 @@ TARGETS = [
         "infographic-pue-global",
         "Global PUE Benchmarks",
         "Power Usage Effectiveness by region, climate, and operator class.",
-        "#8b5cf6",
+        "#f59e0b",
     ),
     (
         "achievements",
@@ -225,7 +225,7 @@ TARGETS = [
         "datahallAI",
         "AI Data Hall Dashboard",
         "Live telemetry for AI/HPC infrastructure — Blackwell GPUs, DLC cooling, power distribution, and BMS monitoring.",
-        "#a855f7",
+        "#06b6d4",
     ),
     (
         "dc-conventional",
@@ -237,7 +237,7 @@ TARGETS = [
         "future-forward",
         "Future Forward",
         "Research series on the future of the web, AI interfaces, platform power, and the next decade of the internet.",
-        "#a855f7",
+        "#06b6d4",
     ),
     (
         "privacy",
@@ -472,7 +472,7 @@ for fname in ["FF-1.html", "FF-2.html", "FF-3.html"]:
         title, desc = _extract_title_and_desc(p)
         if title and desc:
             slug = fname.replace(".html", "")
-            TARGETS.append((slug, title[:80], desc[:160], "#a855f7"))
+            TARGETS.append((slug, title[:80], desc[:160], "#06b6d4"))
 
 # Geopolitics — red accent
 for fname in ["geopolitics.html", "geopolitics-1.html", "geopolitics-2.html", "geopolitics-3.html"]:
@@ -891,6 +891,63 @@ def _FAMILY_LABEL(slug: str) -> str:
     return ""
 
 
+def _hero_for(slug: str) -> "Path | None":
+    """A slice of the page's own hero image, when it has one.
+
+    v3.10.2 — owner: "OG per halaman ya jangan tulisan aja, kasih sedikit potongan hero image dari
+    page itu kan bisa." A text-only card is honest but it is also anonymous; the page's own artwork
+    is the one image guaranteed to be about the page. Prefer an element the page itself marks as a
+    hero, fall back to its first content image, and never take a logo, badge, icon or avatar — those
+    are chrome, not subject.
+    """
+    import re as _re
+    path = REPO_ROOT / f"{slug}.html"
+    if not path.exists():
+        return None
+    text = path.read_text(encoding="utf-8", errors="ignore")
+    marked = _re.search(
+        r'<img[^>]+?(?:class="[^"]*(?:hero|brief-hero|sp-hero|article-hero)[^"]*"|data-rz-hero)[^>]*?src="([^"?]+)"',
+        text, _re.I,
+    )
+    candidates = [marked.group(1)] if marked else []
+    candidates += _re.findall(r'<img[^>]+src="((?!data:|https?:)[^"?]+\.(?:webp|jpg|jpeg|png))"', text, _re.I)
+    for candidate in candidates:
+        if _re.search(r"(logo|badge|favicon|avatar|profile-photo|icon|og/)", candidate, _re.I):
+            continue
+        resolved = REPO_ROOT / candidate
+        if resolved.exists():
+            return resolved
+    return None
+
+
+def _hero_panel(img: "Image.Image", hero_path: "Path", panel_w: int = 430) -> "Image.Image":
+    """Paste a hero slice down the right edge, feathered into the card."""
+    hero = Image.open(hero_path).convert("RGB")
+    scale = max(panel_w / hero.width, H / hero.height)
+    hero = hero.resize((max(1, int(hero.width * scale)), max(1, int(hero.height * scale))), Image.LANCZOS)
+    left = max(0, (hero.width - panel_w) // 2)
+    # from the TOP: the opening of a hero is what a reader recognises; a centre crop of a tall
+    # infographic lands in the middle of a chart and reads as noise at thumbnail size.
+    hero = hero.crop((left, 0, left + panel_w, min(hero.height, H)))
+    if hero.height < H:
+        hero = hero.resize((panel_w, H), Image.LANCZOS)
+    # a page's artwork is usually bright; sit it back a little so the card reads as one surface
+    hero = ImageEnhance.Brightness(hero).enhance(0.92)
+    x0 = W - panel_w
+    img.paste(hero, (x0, 0))
+
+    fade_w = 190
+    base = img.crop((x0, 0, x0 + fade_w, H))
+    dark = _make_gradient_bg().crop((x0, 0, x0 + fade_w, H))
+    mask = Image.new("L", (fade_w, H))
+    for x in range(fade_w):
+        value = int(255 * (1 - x / (fade_w - 1)) ** 0.85)
+        mask.paste(value, (x, 0, x + 1, H))
+    img.paste(Image.composite(dark, base, mask), (x0, 0))
+    ImageDraw.Draw(img).line([(x0, 0), (x0, H)], fill="#243244", width=1)
+    return img
+
+
 def build_og_image(slug: str, title: str, subtitle: str, accent_hex: str) -> Image.Image:
     """Render a 1200×630 OG card and return the PIL Image."""
     # Photo slugs (index + profile fallback) get the index-hero base + avatar.
@@ -903,6 +960,14 @@ def build_og_image(slug: str, title: str, subtitle: str, accent_hex: str) -> Ima
     else:
         img = _make_gradient_bg()
         _add_radial_blob(img, accent_hex)
+
+    hero_path = _hero_for(slug) if avatar is None else None
+    if hero_path is not None:
+        try:
+            img = _hero_panel(img, hero_path)
+        except Exception as exc:                      # a broken asset must not fail the card
+            print(f"  [HERO?]  {slug}: {hero_path.name} unusable ({exc}); text-only card")
+            hero_path = None
 
     _add_grain(img)
     _add_bottom_border(img)
@@ -949,7 +1014,7 @@ def build_og_image(slug: str, title: str, subtitle: str, accent_hex: str) -> Ima
         draw.point((x, line_y), fill=(ar, ag, ab))
 
     # ---- Title block (vertically centered in upper 70% of card) ----
-    max_text_w = W - text_x - pad_x
+    max_text_w = (W - 430 - 40 if hero_path is not None else W - pad_x) - text_x
     title_lines = _wrapped_lines(title, font_title, max_text_w, 2)
     title_line_h = 74  # approx line height for 64px
 
@@ -986,7 +1051,9 @@ def build_og_image(slug: str, title: str, subtitle: str, accent_hex: str) -> Ima
     brand_text = "resistancezero.com"
     mono_bbox = draw.textbbox((0, 0), brand_text, font=font_mono)
     brand_w = mono_bbox[2] - mono_bbox[0]
-    brand_x = W - brand_w - pad_x
+    # v3.10.2 — bottom-LEFT when a hero panel owns the right edge: the first cut printed the URL
+    # over the artwork, where it was unreadable.
+    brand_x = pad_x if hero_path is not None else W - brand_w - pad_x
     brand_y = H - 46
     draw.text((brand_x, brand_y), brand_text, font=font_mono, fill=STRIP_COLOR)
 
@@ -1262,7 +1329,11 @@ def main() -> None:
 
         if args.apply or args.force:
             img = build_og_image(slug, title, subtitle, accent)
-            img.save(str(out_path), "WEBP", quality=85, method=4)
+            # a card carrying photographic artwork costs more bytes than a flat one; 80 keeps the
+            # hero cards under the platform-friendly budget without a visible difference at the
+            # size anyone ever sees them.
+            quality = 80 if (slug not in PHOTO_SLUGS and _hero_for(slug) is not None) else 85
+            img.save(str(out_path), "WEBP", quality=quality, method=4)
             size_kb = out_path.stat().st_size / 1024
             total_bytes += out_path.stat().st_size
             generated.append((slug, size_kb))

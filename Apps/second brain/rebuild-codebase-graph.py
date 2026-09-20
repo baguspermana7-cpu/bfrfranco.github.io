@@ -48,10 +48,10 @@ def inject_gate(graph_html, out_path):
             '  .root-gate-card h2{margin:0 0 .5rem;font-size:1.15rem;color:#f6f7f9}\n'
             '  .root-gate-card p{margin:0 0 1.2rem;font-size:.82rem;color:#93a1b0;line-height:1.5}\n'
             '  .root-gate-actions{display:flex;gap:.6rem;justify-content:center}\n'
-            '  .root-gate-actions .login{background:#8b5cf6;color:#fff;border:none;border-radius:8px;padding:.55rem 1.1rem;cursor:pointer;font:inherit;font-weight:600}\n'
+            '  .root-gate-actions .login{background:#0e7490;color:#fff;border:none;border-radius:8px;padding:.55rem 1.1rem;cursor:pointer;font:inherit;font-weight:600}\n'
             '  .root-gate-actions .back{color:#93a1b0;border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:.55rem 1.1rem;text-decoration:none}\n'
             '  .cbg-nav{position:fixed;top:0;left:0;right:0;z-index:8000;display:flex;align-items:center;gap:.8rem;padding:.5rem 1rem;background:rgba(3,7,16,.9);border-bottom:1px solid rgba(255,255,255,.1);font-family:\'JetBrains Mono\',monospace;font-size:.78rem;color:#93a1b0}\n'
-            '  .cbg-nav a{color:#8b5cf6;text-decoration:none} .cbg-nav b{color:#e7edf3}\n'
+            '  .cbg-nav a{color:#0e7490;text-decoration:none} .cbg-nav b{color:#e7edf3}\n'
             '</style>\n'
             '<script src="../../js/rz-feature-flags.js?v=2026-07-21" defer></script>\n'
             '<script src="../../auth.js?v=2026-07-24a" defer></script>')

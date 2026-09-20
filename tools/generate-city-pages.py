@@ -633,7 +633,7 @@ def generate_city_page(city):
             margin: 0;
         }}
 
-        .dcm-disclaimer a {{ color: #8b5cf6; }}
+        .dcm-disclaimer a {{ color: #06b6d4; }}
 
         /* Responsive */
         @media (max-width: 768px) {{
@@ -672,7 +672,7 @@ def generate_city_page(city):
                     <ul class="dropdown-menu">
                         <li><a href="../datacenter-solutions.html" style="color: #06b6d4; font-weight: 600;">DC Solutions Hub</a></li>
                         <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
-                        <li><a href="../datahallAI.html" style="color: #8b5cf6;"><i class="fas fa-lock" style="font-size:.7em;margin-right:5px;opacity:.6"></i>DC AI/HPC</a></li>
+                        <li><a href="../datahallAI.html" style="color: #64748b;"><i class="fas fa-lock" style="font-size:.7em;margin-right:5px;opacity:.6"></i>DC AI/HPC</a></li>
                         <li><a href="../dc-conventional.html"><i class="fas fa-lock" style="font-size:.7em;margin-right:5px;opacity:.6"></i>DC Conventional</a></li>
                         <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
                         <li><a href="../capex-calculator.html" style="color: #f59e0b;">CAPEX Calculator</a></li>
@@ -691,7 +691,7 @@ def generate_city_page(city):
                     <ul class="dropdown-menu">
                         <li><a href="../articles.html" style="color: #06b6d4; font-weight: 600;">Engineering Journal</a></li>
                         <li><a href="../geopolitics.html" style="color: #ef4444;">Global Analysis</a></li>
-                        <li><a href="../future-forward.html" style="color: #a855f7;">Future Forward</a></li>
+                        <li><a href="../future-forward.html" style="color: #64748b;">Future Forward</a></li>
                         <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
                         <li><a href="../insights.html" style="color: #64748b; font-size: 0.85rem;">All Insights</a></li>
                     </ul>
@@ -1458,7 +1458,7 @@ def generate_hub_page(cities):
             margin: 0;
         }}
 
-        .hub-disclaimer a {{ color: #8b5cf6; }}
+        .hub-disclaimer a {{ color: #06b6d4; }}
 
         @media (max-width: 768px) {{
             .hub-hero {{ padding: 6rem 1.5rem 3rem; }}
@@ -1489,7 +1489,7 @@ def generate_hub_page(cities):
                     <ul class="dropdown-menu">
                         <li><a href="../datacenter-solutions.html" style="color: #06b6d4; font-weight: 600;">DC Solutions Hub</a></li>
                         <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
-                        <li><a href="../datahallAI.html" style="color: #8b5cf6;"><i class="fas fa-lock" style="font-size:.7em;margin-right:5px;opacity:.6"></i>DC AI/HPC</a></li>
+                        <li><a href="../datahallAI.html" style="color: #64748b;"><i class="fas fa-lock" style="font-size:.7em;margin-right:5px;opacity:.6"></i>DC AI/HPC</a></li>
                         <li><a href="../dc-conventional.html"><i class="fas fa-lock" style="font-size:.7em;margin-right:5px;opacity:.6"></i>DC Conventional</a></li>
                         <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
                         <li><a href="../capex-calculator.html" style="color: #f59e0b;">CAPEX Calculator</a></li>
@@ -1508,7 +1508,7 @@ def generate_hub_page(cities):
                     <ul class="dropdown-menu">
                         <li><a href="../articles.html" style="color: #06b6d4; font-weight: 600;">Engineering Journal</a></li>
                         <li><a href="../geopolitics.html" style="color: #ef4444;">Global Analysis</a></li>
-                        <li><a href="../future-forward.html" style="color: #a855f7;">Future Forward</a></li>
+                        <li><a href="../future-forward.html" style="color: #64748b;">Future Forward</a></li>
                         <li style="border-bottom: 1px solid rgba(255,255,255,0.1); margin: 4px 0;"></li>
                         <li><a href="../insights.html" style="color: #64748b; font-size: 0.85rem;">All Insights</a></li>
                     </ul>

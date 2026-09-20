@@ -88,7 +88,13 @@ function hue(r, g, b) {
 const isFamily = ({ h, s, l }) =>
   h >= 238 && h <= 310 && s > 0.12 && l > 0.16 && l < 0.97 && !(l < 0.30 && s < 0.45);
 
-const files = execFileSync('git', ['ls-files', '*.html', '*.css', '*.js'], { cwd: ROOT, encoding: 'utf8' })
+/* v3.10.8 — *.py too. See ANTI_VIBECODE_STANDARD.md, "A colour gate must read the GENERATOR,
+   not only what a browser loads": a file that emits markup or CSS is in scope whatever its
+   extension, and an output skipped for being generated is only honestly skipped if the thing that
+   writes it is read. tools/build-og-images.py painted four social cards with #a855f7 for months:
+   a colour ban that stops at the file extensions a browser loads cannot see the generator that
+   writes the pixels. */
+const files = execFileSync('git', ['ls-files', '*.html', '*.css', '*.js', '*.py'], { cwd: ROOT, encoding: 'utf8' })
   .split('\n').filter(Boolean)
   .filter((f) => !SKIP_DIR.test(f) && !SKIP_FILE.test(f.split('/').pop()) && !SKIP_FILE.test(f));
 
@@ -110,7 +116,12 @@ for (const file of files) {
   const lines = text.split('\n');
   blanked.split('\n').forEach((raw, i) => {
     const line = lines[i] || raw;
-    const code = raw.replace(/(^|\s)\/\/\s.*$/, ' ');
+    /* A `#` that opens a Python comment is followed by whitespace; a `#` that opens a colour
+       literal is followed by a hex digit and sits inside quotes. The space is what tells them
+       apart, which is the same test the `//` rule above already relies on. */
+    const code = raw
+      .replace(/(^|\s)\/\/\s.*$/, ' ')
+      .replace(file.endsWith('.py') ? /(^|\s)#\s.*$/ : /(?!)/, ' ');
     LITERAL.lastIndex = 0;
     let m;
     while ((m = LITERAL.exec(code))) {

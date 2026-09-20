@@ -227,6 +227,37 @@ Consistent with the audit contract above: **do not label an unimplemented heuris
   **Every one was re-checked against the UNFIXED page** — the new probe still reports all 284
   findings on `git show HEAD:datahall.html`. An exemption that also silences the RED baseline is
   laundering, not calibration; that check is the price of narrowing any rule in this document.
+- **A colour gate must read the GENERATOR, not only what a browser loads** (v3.10.8, 2026-09-20).
+  The hue gate above scanned `*.html`, `*.css` and `*.js` — the three extensions a browser fetches.
+  Four violets were never written in any of them. They were written by **Python generators that
+  print the page**, and they had survived every hand sweep the site has run:
+
+  | generator | what it painted | what the swept page beside it already said |
+  |---|---|---|
+  | `tools/build-changelog-html.py` | MAJOR filter chip `rgba(139,92,246)` / `#a78bfa`, a commit-link code chip in the same violet, nav links `#4f46e5` and `#7c3aed` | its own `TIER_COLOR` table says the MAJOR tier is amber; `index.html` and `articles.html` have carried `#64748b` on both nav links since the nav sweep |
+  | `tools/generate-city-pages.py` | the same two nav links, two disclaimer rules | — |
+  | `Apps/second brain/rebuild-codebase-graph.py` | root-gate login button and nav link at `#8b5cf6` | the shipped page beside it reads `#0e7490` |
+  | `tools/build-og-images.py` | three social cards keyed to `#8b5cf6` | — |
+
+  **`changelog.html` is a live page, and it kept its violet for the whole life of the gate —
+  because the gate's SKIP_FILE list skips it for being generated.** Skipping an output is only
+  honest if the gate reads the thing that writes it. Otherwise "generated" is a hiding place, and
+  every hand sweep is undone by the next `--apply`.
+
+  THE RULE, for this gate and every design gate after it:
+  1. **Scan the generators.** Any file that emits markup or CSS is in scope, whatever its
+     extension. `test-purple-family.mjs` now includes `*.py`.
+  2. **Comment syntax is per-language.** The gate strips `//` comments so its own prose may name
+     what it bans; it now strips Python `#` comments the same way. The test is the space: a `#`
+     opening a comment is followed by whitespace, a `#` opening a colour literal by a hex digit
+     inside quotes.
+  3. **A generator is a page that has not rendered yet.** When a page is swept by hand, its
+     generator is swept in the same commit, or the sweep has a half-life of one rebuild.
+  4. **Source scanning cannot see pixels.** No text gate can read an image a generator paints. OG
+     cards and any other generated artwork are checked by sampling the rendered pixels for the
+     banned band — done by hand at v3.10.8 (127 cards, zero hits), and NOT yet a gate. That hole is
+     named here rather than left to be rediscovered.
+
 - **Scope coverage is now ASSERTED, not assumed** (`tools/test-audit-coverage.mjs`, wired into
   `ship-gate.sh`). The design gates walk the filesystem with a SKIP list; the sitemap is what the site
   publishes. One added SKIP entry would silently drop a live page out of every design gate. The test
