@@ -38,6 +38,7 @@ window.RZ_VERSION_CODENAME = 'Pixel Rise';
 python3 tools/audit-script-tags.py --strict        # </script> in JS strings
 python3 tools/audit-js-syntax.py --strict          # unterminated strings / CSS-in-JS (v1.19.0)
 python3 tools/audit-version-stamp.py --strict      # version stamp on all pages
+node   tools/test-asset-cache-tokens.mjs           # a token changes when its file does — RUN AFTER ANY VERSION BUMP (v3.10.0 shipped a stale rz-version.js token on 175 pages; returning visitors read the old stamp)
 python3 tools/audit-mobile-responsive.py --strict  # responsive checkpoints (static scorer)
 node   tools/audit-responsive-layout.mjs --strict  # render gate: real horizontal-scroll + wide article tables (v1.49.8)
 python3 tools/audit-seo.py                         # SEO meta + JSON-LD
