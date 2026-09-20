@@ -1354,16 +1354,45 @@ html.rz-rainbow .bento-cta-row .btn-bento-primary { border-color: rgba(148,163,2
 /* ROW 1: Photo Card */
 .bento-photo-card {
     position: relative;
-    /* v3.9.0 — a portrait frame, not whatever shape the row happens to leave. The bento row used
+    /* v3.9.0 — a portrait frame, not whatever shape the row happens to leave: the bento row used
        to stretch this card to its neighbour's height (203x474 on a tablet against a 0.949
        portrait), and "never crop" in a box that far from the photo means a blurred band taller
-       than the photo itself. A 4:5 frame keeps the letterbox under ~16% at every width while the
-       whole portrait stays visible. */
-    aspect-ratio: 4 / 5;
-    align-self: start;
-    min-height: 0;
+       than the photo itself.
+       v3.9.1 — but a card that stops short leaves the row empty under it (143 px at 900 px wide).
+       So the CARD still fills the row; the PHOTO keeps its 4:5 frame at the top and the strip
+       below absorbs whatever height is left. No crop, no empty column. */
+    display: flex;
+    flex-direction: column;
+    /* height:0 + min-height:100% is the "do not size the row" trick: the card still stretches to
+       the row height the identity card sets, but contributes nothing to it. Without it the 4:5
+       photo plus a real strip made the photo card the tallest item and the whole hero grew. */
+    height: 0;
+    min-height: 100%;
     padding: 0;
     background: var(--gray-200);
+}
+
+.bento-photo-card > .rz-photo-frame {
+    /* takes whatever the strip does not: the portrait is object-fit:contain over a blurred fill,
+       so any leftover shape is safe — only the size of the blurred band changes. */
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    /* stacked: nothing else sizes the row, so the card sizes itself from a 4:5 portrait */
+    .bento-photo-card {
+        height: auto;
+        min-height: 0;
+    }
+    .bento-photo-card > .rz-photo-frame {
+        flex: 0 0 auto;
+        aspect-ratio: 4 / 5;
+    }
+    .bento-photo-gradient {
+        aspect-ratio: 4 / 5;
+    }
 }
 
 [data-theme="dark"] .bento-photo-card {
@@ -1372,6 +1401,8 @@ html.rz-rainbow .bento-cta-row .btn-bento-primary { border-color: rgba(148,163,2
 
 .bento-photo-gradient {
     position: absolute;
+    /* v3.9.1 — over the photo frame only: below it sits the info strip, which is text on the card
+       surface and must not be faded into the page. */
     inset: 0;
     background: linear-gradient(to top, var(--body-bg) 0%, transparent 60%);
     z-index: 2;
@@ -1408,10 +1439,69 @@ html.rz-rainbow .bento-cta-row .btn-bento-primary { border-color: rgba(148,163,2
 }
 
 .bento-photo-info {
-    position: absolute;
-    bottom: 1.25rem;
-    left: 1.25rem;
+    position: relative;
     z-index: 3;
+    /* the strip takes only what it needs; the portrait takes the rest */
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.15rem;
+    padding: 0.6rem 1rem 0.75rem;
+    min-height: 0;
+}
+
+/* the portrait keeps the lion's share of the card: the strip is a caption, not a panel */
+.bento-photo-card > .rz-photo-frame {
+    min-height: 58%;
+}
+
+.bento-status-role {
+    font-size: 0.66rem;
+    color: var(--body-color, #475569);
+    line-height: 1.35;
+}
+
+.bento-status-where {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 0.625rem;
+    letter-spacing: 0.04em;
+    color: var(--muted-color, #64748b);
+}
+
+.bento-status-creds {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin: 0.15rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.bento-status-creds li {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    font-size: 0.5625rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border: 1px solid rgba(100, 116, 139, 0.35);
+    border-radius: 4px;
+    color: var(--muted-color, #475569);
+    white-space: nowrap;
+}
+
+[data-theme="dark"] .bento-status-role {
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .bento-status-where,
+[data-theme="dark"] .bento-status-creds li {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .bento-status-creds li {
+    border-color: rgba(148, 163, 184, 0.3);
 }
 
 .bento-status-label {
@@ -1425,8 +1515,9 @@ html.rz-rainbow .bento-cta-row .btn-bento-primary { border-color: rgba(148,163,2
 }
 
 .bento-status-title {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 700;
+    line-height: 1.25;
     color: var(--heading-color);
     text-transform: uppercase;
 }
@@ -6486,13 +6577,7 @@ p a[href$="terms.html"], p a[href$="privacy.html"], .footer p a { text-decoratio
     isolation: isolate;
 }
 
-/* The hero frames REPLACE the old <picture> elements inside .bento-photo-card, whose children
-   were positioned against the card itself. A plain relative div has no height of its own, so the
-   frame has to claim the card the way the image used to. */
-.bento-photo-card > .rz-photo-frame {
-    position: absolute;
-    inset: 0;
-}
+
 
 .rz-photo-fill {
     position: absolute;

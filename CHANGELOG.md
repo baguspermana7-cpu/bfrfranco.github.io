@@ -11,6 +11,36 @@ release sections rather than semver.
 
 ---
 
+## v3.9.1 — 2026-09-20
+
+### The space under the portrait is a card, not a hole
+
+The owner, on his phone, on the shipped page: *"Ada area kosong dibiarkan atau apa ya yg bagus utk
+white space ini yg di bawah foto saya."* Measured, he was right and it was worst exactly where he
+was looking: the photo card stopped at its own 4:5 height while the bento row kept the height of
+the identity card beside it, leaving **143 px of empty column at 900 px wide**, 81 px at 1024, 37 px
+on a desktop, 11 px on a laptop.
+
+### Fixed
+
+- **The card fills the row again, and the portrait keeps its share.** `height: 0; min-height: 100%`
+  is the "do not size the row" trick — the card stretches to the height the identity card sets but
+  contributes nothing to it. Without that pair, a 4:5 portrait plus a real caption strip made the
+  photo card the tallest thing in the row and the whole hero grew by 180 px. The portrait frame
+  takes what the strip does not (`flex: 1 1 auto`, floor of 58% of the card) and stays
+  `object-fit: contain` over its blurred fill, so a changing frame shape only changes the width of
+  the band — it never crops. Below 768px the row stacks and nothing else sizes it, so there the
+  frame goes back to a fixed 4:5.
+- **The strip carries facts instead of air**: role and employer, location and timezone, and the
+  three credentials the rest of the page already claims (AK3L, SKTTK L6, SAP HV & LV). All of it is
+  already true elsewhere on this page — the card states it next to the face, which is where a
+  visitor looks first.
+
+Empty column below the photo: **143 px → 0 at every width measured**, no text overflow in the strip
+at any of them.
+
+---
+
 ## v3.9.0 — 2026-09-20
 
 ### The whole portrait, on every screen, in every theme
