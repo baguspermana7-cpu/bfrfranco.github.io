@@ -11,6 +11,39 @@ release sections rather than semver.
 
 ---
 
+## v3.9.7 — 2026-09-20
+
+### Dot left, title centre, count right
+
+The cooling P&ID goes **16 → 12** collisions per view. Two causes, both of them a layout the panel
+was fighting rather than a crowded drawing.
+
+### Fixed
+
+- **Four panel headers put the status dot AND its count on the left, then centred the panel title
+  in the same band** — so each count ran into the title it belongs to. The count moves to the
+  panel's right edge, anchored `end`. Dot left, title centre, count right.
+- **The COP derivation left the drawing.** `COP 5.5 DERIVED from the lift 17.0 → 46.0 °C — not a
+  nameplate. The liquid path bypasses this plant at the design day.` was drawn at 3.2 units across
+  the full width of the plant and crossed the `EVAP` and `COND` labels of the machine it describes.
+  The drawing keeps `COP 5.5 — derived, not a nameplate`; the sentence is now a **Chiller Basis**
+  card with its own declared basis, beside the two cooling cards that already existed.
+
+### What the harness caught
+
+`tools/ship-gate.sh` failed 1 of 80 on the first run after this change, and the failure was mine:
+the new card printed `19 °C CHW → 43 °C CDW` with no registry hook — *"value matches a registry
+value — hook it"*. Moving prose into a card is only half the move; **the numbers that travel with
+it still need their provenance**. Hooked to `chwSupplyC` + `cdwReturnC`; coverage is clean again at
+633 hooked numerals, 0 untraced.
+
+A second run then reported `elecDH1Svg` clicking through to the wrong basis record while DH-02/03/04
+— identical drawings, identical counts — passed. Run solo, twice, the gate is **PASS with all four
+CLICK-OK**. That is the flake this repo already has on record: a browser gate driven while another
+session drives Chrome in the same checkout. Reproduced solo before touching anything, per that note.
+
+---
+
 ## v3.9.6 — 2026-09-20
 
 ### Fifteen framework swatches the sweep could not reach

@@ -685,7 +685,7 @@ body[data-datahall-authority="unavailable"] #tabs,
 body[data-datahall-authority="unavailable"] .wrap{display:none !important}
 body[data-datahall-authority="unavailable"] .hdr-r>.dot{background:#64748b !important;box-shadow:none !important;animation:none !important}
 body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:none}
-</style>    <script src="js/rz-version.js?v=20260920-0b7fe3f5" defer></script>
+</style>    <script src="js/rz-version.js?v=20260920-4260ad76" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260920-b64c1545" defer></script>
     <!-- v3.5.0 — hold the 8.5px legibility floor by SCALE, not by font size. Five of this page's
          fifteen diagrams were already clear; the dense ones (cooling P&ID, the four SLDs, the hall
@@ -7239,7 +7239,9 @@ s+=symHX(cx,90,cOn?'var(--c)':'var(--t3)');s+=tx2(cx,110,'CH-BANK '+(i+1),cOn?'v
 s+=lv('mc-ch'+(i+1),cx,120,(cRun==null?'—':(cRun>0?cRun+' RUN':'STBY')),cOn?'var(--g)':'var(--t3)',3.5,'middle');
 s+=tx2(cx,128,'of '+(chPer==null?'—':chPer),'var(--t3)',3,'middle')}
 s+=tx2(240,143,i0(gv('chillersRunning'))+' RUN design · '+i0(gv('chillersWorst'))+' in the '+i0(gv('pueWorstAmbientC'))+' °C bin · '+i0(gv('chillersInstalled'))+' installed — facility plant','var(--t3)',4,'middle');
-s+=tx2(240,152,'Centrifugal · COP '+d1(gv('chillerCOP'))+' DERIVED from the refrigerant lift (CHW '+d1(gv('chwSupplyC'))+' °C → CDW '+d1(gv('cdwReturnC'))+' °C) — not a nameplate','var(--t3)',3.6,'middle');
+/* v3.9.5 — the derivation sentence moved to the Chiller Basis card; the drawing keeps the value.
+   At 3.6 units and full width it crossed the EVAP and COND labels of the machine it describes. */
+s+=tx2(240,152,'Centrifugal \u00B7 COP '+d1(gv('chillerCOP')),'var(--t3)',3.6,'middle');
 s+=tx2(240,161,'Duty = the air path only ('+sv(E&&E.airHeatFmt)+' kW per hall). The liquid path free-cools at the design day.','var(--t3)',3.6,'middle');
 
 // CDW pumps — the pump COUNT is an authored arrangement; only the loop
@@ -7458,7 +7460,10 @@ s+=`<g class="cw-pump-click" data-rz-equipment="cw-pump-station:1" tabindex="0" 
 s+=`<rect x="195" y="28" width="100" height="210" rx="4" fill="rgba(100, 116, 139,.25)" stroke="rgba(100, 116, 139,.55)" stroke-width="1"/>`;
 s+=`<rect x="196" y="29" width="98" height="18" rx="3" fill="rgba(100, 116, 139,.35)"/>`;
 s+=`<circle cx="205" cy="38" r="3" fill="var(--g)"><animate attributeName="opacity" values=".5;1;.5" dur="2s" repeatCount="indefinite"/></circle>`;
-s+=tx(213,41,'2 + 1','var(--g)',3.5);
+/* v3.9.5 — the running/standby count moves to the panel's right edge. Every one of these four
+   headers put a status dot and its count at the LEFT, then centred the panel title in the same
+   band, so the count ran into the title it belongs to. Dot left, title centre, count right. */
+s+=tx(289,41,'2 + 1','var(--g)',3.5,'end');
 s+=tx(245,42,'CDW / HTW PUMPS','var(--p)',6,'middle',1);
 s+=tx(245,52,'CDW '+d1(gv('cdwSupplyC'))+'\u2192'+d1(gv('cdwReturnC'))+'°C · HTW '+d1(gv('htwSupplyC'))+'\u2192'+d1(gv('htwReturnC'))+'°C','var(--t3)',3.4,'middle',0,bo('cdwSupplyC',{also:['cdwReturnC','htwSupplyC','htwReturnC']}));
 // 3 individual pumps (P1 run, P2 run, P3 standby)
@@ -7510,10 +7515,13 @@ s+=tx(300,105,'to the condensers','var(--t3)',3,'middle');
 s+=`<rect x="305" y="28" width="215" height="210" rx="4" fill="rgba(6,182,212,.25)" stroke="rgba(6,182,212,.55)" stroke-width="1"/>`;
 s+=`<rect x="306" y="29" width="213" height="18" rx="3" fill="rgba(6,182,212,.35)"/>`;
 s+=`<circle cx="316" cy="38" r="3" fill="var(--g)"><animate attributeName="opacity" values=".5;1;.5" dur="2s" repeatCount="indefinite"/></circle>`;
-s+=tx(324,41,i0(gv('chillersRunning'))+'/'+i0(gv('chillersInstalled')),'var(--g)',3.5,0,0,bo('chillersRunning',{also:['chillersInstalled']}));
+s+=tx(514,41,i0(gv('chillersRunning'))+'/'+i0(gv('chillersInstalled')),'var(--g)',3.5,'end',0,bo('chillersRunning',{also:['chillersInstalled']}));
 s+=tx(412,42,'CHILLER PLANT — AIR PATH ONLY — 8 BANKS × '+(perBankOf(gv('chillersInstalled'),8)||'—'),'var(--c)',6.5,'middle',1,bo('chillersInstalled'));
 s+=tx(412,50,i0(gv('chillersRunning'))+' RUN design · '+i0(gv('chillersWorst'))+' in the '+i0(gv('pueWorstAmbientC'))+' °C bin · '+i0(gv('chillersInstalled'))+' installed — facility plant','var(--t3)',3.4,'middle',0,bo('chillersRunning',{also:['chillersWorst','pueWorstAmbientC','chillersInstalled']}));
-s+=tx(412,57,'COP '+d1(chillerCOP)+' DERIVED from the lift '+d1(pl('p14_air_evap_refrig_c'))+' → '+d1(pl('p17_cond_refrig_c'))+' °C — not a nameplate. The liquid path bypasses this plant at the design day.','var(--t3)',3.2,'middle',0,bo('chillerCOP',{also:['design.planes.p14_air_evap_refrig_c','design.planes.p17_cond_refrig_c']}));
+/* v3.9.5 — the drawing keeps the number and the word that matters; the sentence that explains
+   where it comes from is in the Chiller Basis card. At 3.2 units and the full width of the
+   plant it crossed the EVAP and COND labels of the machine it was describing. */
+s+=tx(412,57,'COP '+d1(chillerCOP)+' \u2014 derived, not a nameplate','var(--t3)',3.2,'middle',0,bo('chillerCOP',{also:['design.planes.p14_air_evap_refrig_c','design.planes.p17_cond_refrig_c']}));
 // Evap/Cond side labels
 s+=tx(318,60,'EVAP','var(--c)',3.5);s+=tx(488,60,'COND','var(--o)',3.5,'end');
 // Chiller BANKS. 143 installed facility chillers cannot be eight glyphs, so a
@@ -7582,7 +7590,7 @@ s+=`<g class="fws-pump-click" data-rz-equipment="fws-pump-station:dh01" tabindex
 s+=`<rect x="525" y="28" width="120" height="210" rx="4" fill="rgba(6,182,212,.25)" stroke="rgba(6,182,212,.55)" stroke-width="1"/>`;
 s+=`<rect x="526" y="29" width="118" height="18" rx="3" fill="rgba(6,182,212,.35)"/>`;
 s+=`<circle cx="536" cy="38" r="3" fill="var(--g)"><animate attributeName="opacity" values=".5;1;.5" dur="2s" repeatCount="indefinite"/></circle>`;
-s+=tx(544,41,'2 + 1','var(--g)',3.5);
+s+=tx(639,41,'2 + 1','var(--g)',3.5,'end');
 s+=tx(585,42,'HTW PUMP STATION','var(--c)',6,'middle',1);
 s+=tx(585,52,'Facility water '+d1(gv('htwSupplyC'))+' → '+d1(gv('htwReturnC'))+' °C to the CDUs','var(--t3)',3.2,'middle',0,bo('htwSupplyC',{also:['htwReturnC']}));
 // 3 individual pumps
@@ -7650,7 +7658,7 @@ const cduLoadPct=(cduDutyKW!=null&&cduRating)?Math.round(cduDutyKW/cduRating*100
 s+=`<rect x="650" y="28" width="150" height="210" rx="4" fill="rgba(6,182,212,.25)" stroke="rgba(6,182,212,.55)" stroke-width="1" data-tip="Selected-hall CDU array: ${i0(cduRunning)} duty / ${i0(cduInstalled)} installed ${E&&E.cduModel?E.cduModel:'—'}, ${i0(cduRating)} kW rated and ${i0(cduDutyKW)} kW actual per duty CDU (liquid heat per hall ÷ duty count). SS316L plate counter-flow HX. Primary: HTW ${d1(gv('htwSupplyC'))}→${d1(gv('htwReturnC'))}°C from the dry coolers. Secondary: TCS ${d1(gv('tcsSupply'))}→${d1(gv('tcsReturn'))}°C (DI water). Approach ${d1(gv('cduApproachK'))} K. Each glyph is a bank of ${cduPer==null?'—':cduPer}. Click any bank for the CDU HMI."/>`;
 s+=`<rect x="651" y="29" width="148" height="18" rx="3" fill="rgba(6,182,212,.35)"/>`;
 s+=`<circle cx="661" cy="38" r="3" fill="var(--g)"><animate attributeName="opacity" values=".5;1;.5" dur="2s" repeatCount="indefinite"/></circle>`;
-s+=tx(669,41,i0(cduRunning)+'/'+i0(cduInstalled),'var(--g)',3.5,0,0,bo('cduRunning',{also:['cduInstalled']}));
+s+=tx(794,41,i0(cduRunning)+'/'+i0(cduInstalled),'var(--g)',3.5,'end',0,bo('cduRunning',{also:['cduInstalled']}));
 s+=tx(725,42,'CDU ARRAY — '+i0(cduInstalled)+' × '+(E&&E.cduModel?E.cduModel:'—'),'var(--c)',5,'middle',1,bo('cduInstalled'));
 s+=tx(725,49,i0(cduRunning)+' duty + '+((cduInstalled==null||cduRunning==null)?'—':(cduInstalled-cduRunning))+' stby · 12 banks × '+(cduPer==null?'—':cduPer),'var(--t3)',3.4,'middle',0,bo('cduRunning',{also:['cduInstalled']}));
 s+=tx(725,55,'L2L '+i0(cduRating)+' kW @ '+d1(gv('cduApproachK'))+' K approach','var(--t3)',3.2,'middle',0,bo('cduRating'));
@@ -8310,6 +8318,7 @@ mc('var(--t2)','Physical Rack','Mechanical Specs',[['Standard','48U OCP Open Rac
 // COOLING CARDS
 $('coolCards').innerHTML=[
 mc('var(--g)','Water Treatment','Chemical & Filtration',[['FWS','Closed-loop: inhibitor + biocide'],['FWS glycol','30% PG (freeze protection)'],['TCS purity','DI <5\u00B5S/cm conductivity'],['TCS pH','7.0-9.0 range'],['Filtration','25\u00B5m inline per CDU'],['Side-stream','5\u00B5m bag filter FWS header'],['Monitoring','Inline cond + pH + ORP'],['Lab test','Monthly: pH, cond, bacteria, TSS'],['Blowdown','CT auto on conductivity SP'],['Make-up','RO + DI polisher for TCS']],{declared:'water-treatment and filtration specification (micron ratings, pH window, sampling) is page-authored, not an engine quantity'}),
+mc('var(--c)','Chiller Basis','Where the COP comes from',[['COP',(DHE&&DHE.chillerCOP!=null?DHE.chillerCOP:'\u2014')+' \u2014 DERIVED from the refrigerant lift, not a nameplate',{declared:'chiller COP is derived from the modelled refrigerant lift at the design day; it is not a manufacturer nameplate figure'}],['Lift',(DHE&&DHE.chwSupplyC!=null?DHE.chwSupplyC:'\u2014')+' \u00B0C CHW \u2192 '+(DHE&&DHE.cdwReturnC!=null?DHE.cdwReturnC:'\u2014')+' \u00B0C CDW',bo('chwSupplyC',{also:['cdwReturnC']})],['At the design day','the liquid path bypasses this plant \u2014 it carries the residual air load',{declared:'DLC heat leaves through the TCS/CDU path; the chiller plant carries the residual air load'}]]),
 mc('var(--o)','Performance Targets','Design & Operating KPIs',[['Total cooling',(DH?(DH.itHallFmt+' kW (DLC + air)'):'—'),bo('itHallFmt')],['DLC capacity',(DH?(DH.liquidHeatFmt+' kW ('+DH.liquidCapturePct+'%)'):'—'),bo('liquidHeatFmt',{also:['liquidCapturePct']})],['Air capacity',(DH?(DH.airHeatFmt+' kW'):'—'),bo('airHeatFmt')],['PUE cooling',(DH?((DH.pb_cooling/DH.itHall).toFixed(3)+' of PUE (hall cooling kWe / IT kWe)'):'—'),{declared:'cooling share of PUE = hall cooling kWe / hall IT kWe, an identity over marked parameters (design.electrical.cooling_hall_kwe, power.total_it_hall_kwe)'}],['Approach \u0394T','3\u00B0C CDU (HTW\u2192TCS)'],['Dry-cooler approach',(DHE?DHE.dryCoolerApproachK+' K to ambient DB':'—'),{declared:'dry-cooler approach is the PUBLISHED unit approach (model leaf thermal.dryCoolerApproachK), printed as authored'}],['Pump energy',(DH?(DH.pb_pumps.toLocaleString()+' kW per hall (all pumps)'):'—'),bo('pb_pumps')],['Fan energy',(DH?(DH.pb_fans.toLocaleString()+' kW per hall (dry coolers + CRAH)'):'—'),bo('pb_fans')],['WUE',(DH?(DH.wue.toFixed(2)+' L/kWh (dry-only)'):'—'),bo('wue')],['Availability','99.999% (N+1 all paths)',{declared:'availability is a page-authored design target, not an engine quantity'}]])
 ].join('');
 
