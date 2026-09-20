@@ -5,7 +5,8 @@
  *   H1 every literal data-basis-param="…" in the page source resolves in the registry
  *   H2 after activation, each of the 13 diagrams carries >= MIN_PER_DIAGRAM SVG hooks
  *      (<g class="rz-basis" data-basis-param tabindex="0" role="button"> with a mark circle)
- *      — diagrams still at zero are listed as MONITOR until the sweep reaches them
+ *      — zero hooks is MONITOR (work owed) unless the diagram declares
+ *        data-rz-authored-basis, which is AUTHORED (exempt, with the reason printed)
  *   H3 a REAL click on one SVG hook per diagram opens the right-side inspector in basis mode
  *      (aside.rz-inspector.open.rz-inspector-basis) whose Value row equals the registry value,
  *      and does NOT open the centre modal — review doc-27 §3.2
@@ -82,7 +83,25 @@ try {
                 text: (g.querySelector('text') || {}).textContent || '',
             }));
         }, entry.selector);
-        const row = { diagram: entry.selector.slice(1), hooks: hooks.length, clicked: null, status: 'MONITOR' };
+        /* v3.10.14 — a diagram can legitimately carry zero engine hooks. wanSvg is a declared
+           TRAFFIC STUDY and fireSvg a set of fire-protection design selections; both state that
+           at their SVG root with data-rz-authored-basis, and neither reads a registry parameter.
+           Reporting them as "not yet hooked" made an absence read as a backlog, and left a
+           monitor set that could never empty — the same shape the geometry gate carried until
+           its rows reached zero. AUTHORED is an exemption with a stated reason; MONITOR is work
+           still owed. */
+        const authored = await tab.evaluate((sel) => {
+            const svg = document.querySelector(sel);
+            if (!svg) return null;
+            const node = svg.matches('[data-rz-authored-basis]') ? svg
+                : svg.querySelector('[data-rz-authored-basis]');
+            return node ? String(node.getAttribute('data-rz-authored-basis')).slice(0, 120) : null;
+        }, entry.selector);
+        const row = {
+            diagram: entry.selector.slice(1), hooks: hooks.length, clicked: null,
+            authored: hooks.length === 0 ? authored : null,
+            status: hooks.length === 0 && authored ? 'AUTHORED' : 'MONITOR'
+        };
         const malformed = hooks.filter((h) => h.tabindex !== '0' || h.role !== 'button' || !h.mark || !byId.has(h.id));
         if (malformed.length) failures.push(`${row.diagram}: ${malformed.length} malformed hooks (tabindex/role/mark/id) e.g. ${JSON.stringify(malformed[0])}`);
         /* H5 */
@@ -116,7 +135,11 @@ try {
 
 console.log(`DCAI BASIS HOOKS — ${PAGE} · ${literal.length} literal hooks in source, all resolve`);
 for (const r of report) console.log(`  ${r.diagram.padEnd(12)} hooks ${String(r.hooks).padStart(4)}  ${r.status}${r.clicked ? ' (' + r.clicked + ')' : ''}`);
-const zero = report.filter((r) => r.hooks === 0).map((r) => r.diagram);
+const zero = report.filter((r) => r.hooks === 0 && !r.authored).map((r) => r.diagram);
+const exempt = report.filter((r) => r.authored);
 if (failures.length) { console.error('\nFAIL\n  ' + failures.join('\n  ')); process.exit(1); }
 if (STRICT && zero.length) { console.error(`\nFAIL diagrams with no SVG hooks: ${zero.join(', ')}`); process.exit(1); }
-console.log(zero.length ? `\nPASS (monitor) — ${zero.length} diagram(s) not yet hooked: ${zero.join(', ')}` : '\nPASS — every diagram hooked and click-verified');
+for (const r of exempt) console.log(`  ${r.diagram.padEnd(12)} authored basis — ${r.authored}`);
+console.log(zero.length
+    ? `\nPASS (monitor) — ${zero.length} diagram(s) not yet hooked: ${zero.join(', ')}`
+    : `\nPASS — every diagram hooked and click-verified${exempt.length ? `, ${exempt.length} declared authored-basis` : ''}`);
