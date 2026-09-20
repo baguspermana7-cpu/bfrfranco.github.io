@@ -44,6 +44,10 @@ gate "datahall engine — 57/57 doc-21 examples" node tools/test-datahall-calc.m
 # The diagram engine measures text before it draws, places labels by search, and routes
 # connectors around boxes. Both gates are DOM-free, so they cost milliseconds and run
 # before the Chromium audits rather than alongside them.
+# The geometry survey only measures the pages it names. This asserts that list is still
+# complete, from the filesystem, so a new cockpit cannot escape measurement by being absent
+# — absence reads exactly like clean.
+gate "diagram survey coverage — every cockpit measured, declared, or excused" node tools/test-diagram-survey-coverage.mjs
 gate "diagram engine — metrics, placement, routing, facade" node tools/test-rz-diagram-engine.mjs
 gate "diagram engine — adoption ratchet (hand-authored geometry may fall, never rise)" node tools/test-diagram-engine-adoption.mjs
 gate "diagram engine — one real diagram renders with zero collisions" node tools/demo-rz-diagram.mjs
