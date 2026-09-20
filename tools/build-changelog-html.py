@@ -27,12 +27,48 @@ def _asset_token(relpath: str) -> str:
     This template used to carry hardcoded tokens (`?v=20260908-editorial`, `?v=2026-09-06-cards`),
     so every regenerated changelog.html silently reverted the tokens the rest of the site had moved
     on from — exactly the staleness tools/test-asset-cache-tokens.mjs now fails on.
+
+    v3.10.19 — the DATE half used to be `datetime.date.today()`, and that made this
+    generator non-deterministic across midnight. The digest is content-derived and stable,
+    so on any day after a release `--check` compared yesterday's committed artifact against
+    a token stamped with today's date and reported the artifact stale when nothing had
+    changed. The ship gate then failed every day, for a file nobody had touched.
+
+    Worse, the obvious remedy was a trap. `styles.min.css?v=20260920-544ad99b` is on 74
+    pages, `js/rz-version.js?v=20260920-abd0285c` on 176 and `script.min.js` on 66;
+    regenerating with today's date would have left changelog.html as the ONLY page with a
+    different token for three shared assets — the "one asset served under two tokens" defect
+    that tools/test-asset-cache-tokens.mjs exists to catch, introduced while satisfying a
+    different gate.
+
+    So the token follows the SITE, not the clock: adopt the date already in use for this
+    asset wherever its digest still matches, and mint today's date only when the digest
+    shows the asset has genuinely changed.
     """
     import hashlib
     import datetime
+    import glob
+    import re
     path = os.path.join(ROOT_DIR, relpath)
     with open(path, "rb") as handle:
         digest = hashlib.sha256(handle.read()).hexdigest()[:8]
+
+    # The date the rest of the site already carries for THIS digest, most common first.
+    pattern = re.compile(re.escape(relpath) + r"\?v=(\d{8})-" + re.escape(digest) + r"\b")
+    seen = {}
+    for page in glob.glob(os.path.join(ROOT_DIR, "*.html")):
+        if os.path.basename(page) == "changelog.html":
+            continue                      # never take the date from the file we are writing
+        try:
+            with open(page, "r", encoding="utf-8", errors="ignore") as handle:
+                for stamp in pattern.findall(handle.read()):
+                    seen[stamp] = seen.get(stamp, 0) + 1
+        except OSError:
+            continue
+    if seen:
+        # most used, then newest, so one asset keeps one token across the whole site
+        best = sorted(seen.items(), key=lambda kv: (-kv[1], kv[0]))[0][0]
+        return "{}-{}".format(best, digest)
     return "{:%Y%m%d}-{}".format(datetime.date.today(), digest)
 CHANGELOG  = os.path.join(ROOT_DIR, 'CHANGELOG.md')
 OUTPUT     = os.path.join(ROOT_DIR, 'changelog.html')
