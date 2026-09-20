@@ -102,6 +102,11 @@
     eyebrow: { size: 8, face: 'mono', weight: 500, tracking: 0.18, upper: true },
     'arrow-label': { size: 8, face: 'mono', weight: 400, tracking: 0.06, upper: true },
     datum: { size: 11, face: 'mono', weight: 500, tracking: 0 },
+    /* Legend entries are prose, not values, so they take the sans face. They
+     * used to borrow `sublabel`, which is MONO — and the width was budgeted in
+     * sans, so every entry rendered about 13 % wider than it was measured and
+     * the strip overlapped itself. */
+    'legend-label': { size: 9, face: 'sans', weight: 400, tracking: 0 },
     title: { size: 14, face: 'sans', weight: 600, tracking: -0.02 }
   };
 
@@ -505,10 +510,11 @@
         var lx = left;
         var ly = top + 34;
         items.forEach(function (it) {
-          var w = M.textWidth(it.legend, 9, 'sans') + 26;
+          var w = M.textWidth(it.legend, TYPE['legend-label'].size,
+                              TYPE['legend-label'].face) + 26;
           /* wrap rather than run off the sheet — a legend that leaves the page
            * is the same defect as a label that does */
-          if (lx > left && lx + w > right) { lx = left; ly += 20; }
+          if (lx > left && lx + w > right) { lx = left; ly += 22; }
           if (it.kind === 'node') {
             layers.labels.push('<rect x="' + lx + '" y="' + (ly - 8) + '" width="14" height="10" rx="2" fill="' +
               (it.fill ? tok(it.fill) : 'none') + '" stroke="' + tok(it.stroke) +
@@ -518,8 +524,11 @@
             layers.labels.push('<line x1="' + lx + '" y1="' + (ly - 3) + '" x2="' + (lx + 16) +
               '" y2="' + (ly - 3) + '" stroke="' + tok(it.stroke) + '" stroke-width="1.4"' + d + '/>');
           }
-          ctx.text(it.legend, lx + 22, ly, { role: 'sublabel', size: 9, fill: 'muted' });
-          lx += w + 20;
+          /* Advance from the box the text ACTUALLY registered, never from a
+           * second measurement of the same string: two measurements can
+           * disagree, and this one did — sans here, mono in the renderer. */
+          var tb = ctx.text(it.legend, lx + 22, ly, { role: 'legend-label', fill: 'muted' });
+          lx = tb.x + tb.w + 22;
         });
         return ctx;
       },

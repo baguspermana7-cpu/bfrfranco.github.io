@@ -58,6 +58,103 @@ const { RZDiagram: D, RZDiagramMetrics: M, RZDiagramLayout: L } = sandbox;
  * ======================================================================== */
 const FIGURES = [
   {
+    id: 'cpo-trace-collapse',
+    page: 'article-22.html',
+    caption:
+      'Drawn to the trace lengths the article quotes: the electrical run is 24 times shorter in ' +
+      'the lower arrangement. Moving the conversion from the front panel to the package is not a ' +
+      'packaging preference \u2014 it is what removes the retimers, because at half an inch there ' +
+      'is no longer a signal to recover.',
+    because:
+      'the article already tabulates pluggable against co-packaged across seven characteristics, ' +
+      'including the two trace lengths as numbers. What the table cannot show is that this is a ' +
+      'question of GEOMETRY: the argument is about distance on a board, and the retimers exist ' +
+      'only to pay for that distance. Draw the distance and their removal explains itself.',
+    build() {
+      const ctx = D.create({
+        slug: 'cpo',
+        title: 'Where the electrical-to-optical conversion happens, and how far the signal travels to reach it',
+        desc: 'In the pluggable arrangement the switch ASIC drives 12 to 18 inches of printed ' +
+              'circuit board trace to a front-panel cage, and retimers, clock-and-data recovery ' +
+              'and DSP sit in that path to recover the signal. In co-packaged optics the optical ' +
+              'engine sits on the same package substrate as the ASIC, the electrical run falls ' +
+              'below half an inch, and the recovery circuits are no longer needed. The two rows ' +
+              'are drawn to the same scale.'
+      });
+
+      /* The drawing is to scale on the one axis that carries the argument.
+       * 12 inches against 0.5 is 24:1, so at 16 units for the short run the
+       * long one is 384. An illustrative ratio would have been easier to lay
+       * out and would have quietly overstated or understated the point; the
+       * whole claim IS the ratio, so the ratio is drawn. */
+      const SHORT = 16, LONG = 384;
+      const X0 = 40, ASIC_W = 170, CONV_W = 210;
+      const ROW_A = 66, ROW_B = 250;
+
+      const asicA = ctx.node(X0, ROW_A, {
+        id: 'asic-a', tag: 'asic', name: 'Switch ASIC', sublabel: '224G PAM4 SerDes',
+        w: ASIC_W, stroke: 'rule-solid', fill: 'paper', tier: 2, legend: 'Silicon'
+      });
+      const retimer = ctx.node(X0 + ASIC_W + LONG / 2 - 92, ROW_A, {
+        id: 'retimer', tag: 'in path', name: 'Retimers · CDR · DSP',
+        sublabel: 'several W per lane, 64 lanes',
+        w: 184, stroke: 'accent', fill: 'paper-2', tier: 2,
+        legend: 'Exists only to pay for the distance'
+      });
+      const plug = ctx.node(X0 + ASIC_W + LONG, ROW_A, {
+        id: 'plug', tag: 'front panel', name: 'Pluggable optic', sublabel: 'QSFP-DD / OSFP',
+        w: CONV_W, stroke: 'rule-solid', fill: 'paper', tier: 2,
+        legend: 'Electrical \u2192 optical conversion'
+      });
+
+      const asicB = ctx.node(X0, ROW_B, {
+        id: 'asic-b', tag: 'asic', name: 'Switch ASIC', sublabel: 'same silicon',
+        w: ASIC_W, stroke: 'rule-solid', fill: 'paper', tier: 2
+      });
+      const engine = ctx.node(X0 + ASIC_W + SHORT, ROW_B, {
+        id: 'engine', tag: 'on package', name: 'Optical engine', sublabel: 'silicon photonics',
+        w: CONV_W, stroke: 'rule-solid', fill: 'paper', tier: 2
+      });
+
+      const mid = (n) => n.y + n.h / 2;
+      ctx.edge({ x: asicA.x + asicA.w, y: mid(asicA) }, { x: retimer.x, y: mid(retimer) }, {
+        fromId: 'asic-a', toId: 'retimer', stroke: 'ink', tier: 1, pattern: 'solid',
+        /* the segment is 100 units and the full phrase needs 117, so the
+           description lives in the caption and the number on the line */
+        label: '12\u201318 in', legend: 'Electrical, lossy at 224G'
+      });
+      ctx.edge({ x: retimer.x + retimer.w, y: mid(retimer) }, { x: plug.x, y: mid(plug) }, {
+        fromId: 'retimer', toId: 'plug', stroke: 'ink', tier: 1, pattern: 'solid'
+      });
+      ctx.edge({ x: asicB.x + asicB.w, y: mid(asicB) }, { x: engine.x, y: mid(engine) }, {
+        /* No label on this one: the run is 16 units and the shortest honest
+           label is 37, so it cannot sit beside the line without covering it.
+           The zone below carries the number instead. The engine refused to
+           place it rather than drawing it over the stroke. */
+        fromId: 'asic-b', toId: 'engine', stroke: 'ink', tier: 1, pattern: 'solid'
+      });
+
+      /* The fibre is the same on both rows: what changes is everything before
+       * it. Drawn short and identical so the eye compares the copper, not this. */
+      [[plug, 'fibre-a'], [engine, 'fibre-b']].forEach(function (pair) {
+        const n = pair[0];
+        ctx.edge({ x: n.x + n.w, y: mid(n) }, { x: n.x + n.w + 64, y: mid(n) }, {
+          fromId: n.id, toId: pair[1], stroke: 'muted', tier: 2, pattern: 'dashed',
+          label: 'fibre', legend: 'Optical, out of the switch'
+        });
+      });
+
+      ctx.zone(X0 - 18, ROW_B - 40, ASIC_W + SHORT + CONV_W + 36,
+               (engine.y + engine.h + 20) - (ROW_B - 40), {
+        label: 'one package substrate \u2014 under 0.5 in of electrical run, and no retimers', tier: 3, dashed: true,
+        stroke: 'accent'
+      });
+
+      ctx.legend();
+      return ctx.fit(28);
+    }
+  },
+  {
     id: 'heat-path-ceilings',
     page: 'article-18.html',
     caption:

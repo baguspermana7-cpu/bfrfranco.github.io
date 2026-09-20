@@ -789,6 +789,32 @@ const D = sandbox.RZDiagram;
   ok('U6c', clean.warnings.length === 0, 'every documented option is accepted silently');
 }
 
+/* U7: the legend must MEASURE WHAT IT RENDERS. It budgeted each entry in the
+ *     sans face and drew it in mono, so every entry came out about 13 % wider
+ *     than its slot and the strip overlapped itself — with the geometry audit
+ *     silent, because the swatches that covered the text are not text. The fix
+ *     was structural: advance from the box the text actually registered rather
+ *     than from a second measurement of the same string. */
+{
+  const c = D.create({ slug: 'u7', title: 'T', desc: 'D' });
+  c.edge({ x: 0, y: 0 }, { x: 200, y: 0 },
+    { stroke: 'ink', pattern: 'solid', legend: 'Exists only to pay for the distance' });
+  c.edge({ x: 0, y: 60 }, { x: 200, y: 60 },
+    { stroke: 'muted', pattern: 'dashed', legend: 'Electrical to optical conversion' });
+  c.edge({ x: 0, y: 120 }, { x: 200, y: 120 },
+    { stroke: 'soft', pattern: 'dotted', legend: 'Optical, out of the switch' });
+  c.legend();
+  const texts = c.occupancy.items.filter(i => i.meta.kind === 'text');
+  let clash = 0;
+  for (let i = 0; i < texts.length; i++) {
+    for (let j = i + 1; j < texts.length; j++) {
+      const ov = M.overlap(texts[i].box, texts[j].box);
+      if (ov && ov.ox > 0.5 && ov.oy > 0.5) clash++;
+    }
+  }
+  ok('U7', clash === 0, `legend entries must not overlap each other: ${clash} pair(s) do`);
+}
+
 /* ==========================================================================
  * TOKEN CONTRACT — a missing custom property fails silently, in one theme
  * ======================================================================== */
