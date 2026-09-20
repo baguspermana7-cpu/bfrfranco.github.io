@@ -11,6 +11,38 @@ release sections rather than semver.
 
 ---
 
+## v3.9.3 — 2026-09-20
+
+### A riser is one object and gets named once
+
+The building isometric goes **30 → 12** collisions per view (111 before this sequence started),
+labels **114 → 91**. The page's geometry monitor falls **427 → 313** (collisions 410 → 266).
+
+Everything removed was a name printed more times than the thing it names exists:
+
+| removed | why it said nothing | where the fact lives |
+|---|---|---|
+| `R1·7 R2·7 R3·7`, both halls | three strips *stand for* the rows; they are not rows 1–3 | the hall card prints "20 rows × 22" |
+| `FWS-1/2/3` | three identical pumps under one caption | the `FWS PUMP STATION` caption |
+| `RPP` ×2 per floor | one word printed twice on two identical boxes | the electrical-wing card prints the group count |
+| `BD` 6× → 2× | the same two letters up two vertical risers, once per floor junction | one tag per riser, at the middle junction |
+
+### Measured, and reverted
+
+With the specification sub-lines now in cards (v3.8.1), each zone has a single caption line, so
+lowering the captions back toward their own slab looked free. It was not: **14 → 15**, because the
+captions then met their own floor's equipment. Reverted. That is the third measured demonstration
+that this drawing is saturated — the first two were in v3.8.1 — and it is why the remaining 12 are
+documented rather than nudged.
+
+### Still open
+
+Cooling P&ID 126 collisions and 39 of the 47 clipped findings (untouched here; its clipped count is
+known to vary between runs on an unchanged tree), the WAN view 16, the data hall 8, the electrical
+overview 4, and the isometric's own 12.
+
+---
+
 ## v3.9.2 — 2026-09-20
 
 ### The overlap was horizontal
