@@ -2584,7 +2584,10 @@ s+=eq(36,32,4,3,'rgba(239,68,68,.1)','First Aid',3.5,'First Aid Station: AED, bu
 
 // Chiller Plant Hall (East) \u2014 8\u00D7 water-cooled centrifugal chillers + CW risers up to roof manifold
 s+=rmLive(42,26,24,10,'rgba(6,182,212,.12)','rgba(6,182,212,.45)','Chiller Plant Hall','24m \u00D7 10m',(DH?(DH.chillersInstalled+'\u00D7 '+(DH.chillerRating/1000)+' MW class \u2014 facility'):'—'),'Chiller Plant Hall: '+(DH?DH.chillersInstalled:'—')+'\u00D7 water-cooled centrifugal, '+(DH?DH.chillerRating/1000:'—')+' MW class, COP '+(DH?DH.chillerCOP:'—')+' DERIVED (Carnot fraction), '+(DH?DH.chillersRunning:'—')+' running at design \u2014 8 of '+(DH?DH.chillersInstalled:'—')+' shown, R-1234ze(E) refrigerant, mag-bearing oil-free. CW supply/return DN500 risers route up to dry-cooler array on roof. 7+1 N+1 redundancy at 32 MW nameplate.',35,null,'Running',{equip:bo('chillersInstalled',{also:['chillerRating']})});
-// 8 chillers in 2 rows of 4 (compact footprint 2.8m \u00D7 4m each \u2014 actual 19XR Frame 70-74 has 5x2.5m footprint, packed)
+/* v3.8.0 — eight glyphs, not eight machines. The engine sizes 143 chillers (36 running on the
+   design day, 142 in the worst weather bin, one spare), so a drawing that showed "CH-1..CH-7 +
+   CH-8 STANDBY" was telling an N+1 story about a plant that is N+1 on 142, not on 7. The glyphs
+   stay as banks and the caption carries the arithmetic. */
 for(var chx=0;chx<4;chx++){
 s+=eqLive(43+chx*5.5,27,4.5,3.5,'rgba(6,182,212,.2)','CH-'+(chx+1),4.2,'running','Chiller CH-'+(chx+1)+': water-cooled centrifugal, '+(DH?DH.chillerRating/1000:'—')+' MW class @ COP '+(DH?DH.chillerCOP:'—')+' derived, R-1234ze(E), mag bearing, oil-free. Evap LWT '+(DH?DH.chwSupplyC:'—')+'\u00B0C, CW Out '+(DH?DH.cdwReturnC:'—')+'\u00B0C. Status: ONLINE. \u2192 Cooling Tab');
 }
@@ -2592,7 +2595,9 @@ for(var chy=0;chy<3;chy++){
 s+=eqLive(43+chy*5.5,31.5,4.5,3.5,'rgba(6,182,212,.2)','CH-'+(chy+5),4.2,'running','Chiller CH-'+(chy+5)+': water-cooled centrifugal, '+(DH?DH.chillerRating/1000:'—')+' MW class @ COP '+(DH?DH.chillerCOP:'—')+' derived, R-1234ze(E), mag bearing, oil-free. Evap LWT '+(DH?DH.chwSupplyC:'—')+'\u00B0C, CW Out '+(DH?DH.cdwReturnC:'—')+'\u00B0C. Status: ONLINE. \u2192 Cooling Tab');
 }
 // CH-8 standby (N+1)
-s+=eqLive(43+3*5.5,31.5,4.5,3.5,'rgba(6,182,212,.12)','CH-8 STB',4,'standby','Chiller CH-8 (N+1 standby): Carrier 19XR water-cooled centrifugal, 4MW reserve. Status: STANDBY. \u2192 Cooling Tab');
+s+=eqLive(43+3*5.5,31.5,4.5,3.5,'rgba(6,182,212,.12)','CH-BANK 8',4,'standby','Chiller bank 8 of 8 drawn: the engine sizes '+dhaG(DHAX().chillersInstalled)+' machines of '+dhaF(DHAX().chKwTh!=null?DHAX().chKwTh/1000:null,1)+' MW \u2014 '+dhaG(DHAX().chillersRun)+' run on the design day and '+dhaG(DHAX().chillersWorst)+' in the worst weather bin, so the installed spare is '+dhaG((DHAX().chillersInstalled!=null&&DHAX().chillersWorst!=null)?DHAX().chillersInstalled-DHAX().chillersWorst:null)+'. Status: STANDBY BANK. \u2192 Cooling Tab');
+s+=tx(MX+54*M,MY+36.9*M,dhaG(DHAX().chillersInstalled)+' installed \u00B7 '+dhaG(DHAX().chillersRun)+' duty at design \u00B7 '+dhaG(DHAX().chillersWorst)+' at the worst bin','var(--c)',4,'middle',0,bo('chillersInstalled',{also:['chillersRunning','chillersWorst']}));
+s+=tx(MX+54*M,MY+37.9*M,'8 glyphs drawn \u00D7 '+dhaG(DHAX().chillersInstalled!=null?Math.ceil(DHAX().chillersInstalled/8):null)+' machines per bank','var(--t3)',3.6,'middle',0,{declared:'drawing aggregation: an identity over the marked installed count divided by the eight glyphs drawn, printed so the reader can check the drawing against the engine; not itself an engine quantity'});
 // CW supply + return risers indicator (rising to roof)
 s+='<text x="'+(MX+54*M)+'" y="'+(MY+35.7*M)+'" fill="var(--c)" font-family="'+J+'" font-size="4.5" text-anchor="middle" opacity=".75">\u2191 CW Supply/Return Risers to Roof Dry-Cooler Array (DN500, 30% PG)</text>';
 
@@ -2978,7 +2983,7 @@ s+=tx(480,21,'Chillers live on the Ground Floor \u2014 the roof carries heat rej
 s+='<rect x="'+MX+'" y="'+MY+'" width="'+(72*M)+'" height="'+(48*M)+'" fill="none" stroke="var(--t2)" stroke-width="2" rx="2"/>';
 
 // === CW Riser & Distribution Manifold (NW quadrant) \u2014 Chillers moved to Ground Floor ===
-s+=rm(2,1,28,19,'rgba(100, 116, 139,.12)','rgba(100, 116, 139,.45)','CW DISTRIBUTION MANIFOLD','28m \u00D7 19m','Risers from Chiller Plant (GF)','CW Distribution Manifold: Supply/Return risers from 8\u00D7 4MW chillers housed on Ground Floor up to dry-cooler array. DN500 carbon-steel insulated, 30% PG glycol, ~600 m\u00B3/h per chiller line.',{textAt:'top'});
+s+=rm(2,1,28,19,'rgba(100, 116, 139,.12)','rgba(100, 116, 139,.45)','CW DISTRIBUTION MANIFOLD','28m \u00D7 19m','Risers from Chiller Plant (GF)','CW distribution manifold: supply/return risers from the '+dhaG(DHAX().chillersInstalled)+' chillers of '+dhaF(DHAX().chKwTh!=null?DHAX().chKwTh/1000:null,1)+' MW housed on the Ground Floor, up to the dry-cooler array. DN500 carbon-steel insulated, 30% PG glycol. Eight riser pairs are drawn as an aggregation \u2014 the plant is not eight machines.',{textAt:'top'});
 // 8 supply + return riser pairs (correspond to the 8 chillers on Ground Floor)
 for(var ri=0;ri<8;ri++){
 var rix=4+ri*3,riy=6;
@@ -2996,10 +3001,23 @@ s+='<text x="'+(MX+16*M)+'" y="'+(MY+11.5*M)+'" fill="var(--c)" font-family="'+J
 s+='<text x="'+(MX+16*M)+'" y="'+(MY+14*M)+'" fill="var(--o)" font-family="'+J+'" font-size="4.5" text-anchor="middle">CW RETURN HEADER DN500</text>';
 // Engineering callout
 s+='<rect x="'+(MX+4*M)+'" y="'+(MY+16*M)+'" width="'+(24*M)+'" height="'+(3*M)+'" rx="1.5" fill="rgba(245,158,11,.06)" stroke="rgba(245,158,11,.25)" stroke-width=".4" stroke-dasharray="3 2"/>';
-s+='<text x="'+(MX+16*M)+'" y="'+(MY+18*M)+'" fill="var(--o)" font-family="'+J+'" font-size="3.8" text-anchor="middle" opacity=".85">Chillers ('+(DHE?(DHE.chillersInstalled+'× '+(DHE.chillerRating/1000)+' MW class water-cooled, facility plant'):'—')+') located in Chiller Plant Hall on Ground Floor</text>';
+s+=tx(MX+16*M,MY+17.4*M,'Chillers: '+dhaG(DHAX().chillersInstalled)+'\u00D7 '+dhaF(DHAX().chKwTh!=null?DHAX().chKwTh/1000:null,1)+' MW water-cooled \u2014 Ground Floor plant, not on this roof','var(--o)',3.8,'middle',0,bo('chillersInstalled',{also:['chillerRating']}));
+s+=tx(MX+16*M,MY+18.6*M,'8 riser pairs drawn for '+dhaG(DHAX().chillersInstalled)+' machines \u2014 one pair per bank of '+dhaG(DHAX().chillersInstalled!=null?Math.ceil(DHAX().chillersInstalled/8):null),'var(--t3)',3.5,'middle',0,bo('chillersInstalled',{nomark:true}));
 
 // === Dry Cooler Array (NE quadrant) ===
-s+=rm(32,2,38,16,'rgba(34,197,94,.1)','rgba(34,197,94,.4)','DRY COOLER ARRAY','38m \u00D7 16m','8\u00D7 BAC TrilliumSeries\u2122 Adiabatic','Dry Cooler: 8\u00D7 BAC Trillium adiabatic, closed-loop glycol, WUE 0.00, zero water evap');
+/* v3.8.0 — the roof was the last drawing still on the retired plant. It drew EIGHT dry coolers
+   against an engine that sizes 631, and called them "BAC TrilliumSeries Adiabatic" in the same
+   tooltip that claimed "WUE 0.00, zero water evap". An adiabatic cooler spends water by design;
+   the reason this facility runs a 40 °C cold-plate inlet is to reject heat DRY, which is what
+   makes the published WUE of 0.00 true rather than flattering. Eight glyphs stay — they are an
+   aggregation — but the divisor is now ON the drawing. */
+var rfDcInst=DHAX().dryCoolersInstalled,rfDcRun=DHAX().dryCoolersRunning,rfDcBanks=8;
+var rfPerBank=(rfDcInst!=null)?Math.ceil(rfDcInst/rfDcBanks):null;
+s+=rm(32,2,38,16,'rgba(34,197,94,.1)','rgba(34,197,94,.4)','DRY COOLER ARRAY','38m \u00D7 16m',dhaG(rfDcInst)+' V-bank units \u2014 dry only','Dry-cooler array: '+dhaG(rfDcInst)+' installed V-bank dry coolers ('+dhaG(rfDcRun)+' duty on the design day) of '+dhaG(DHAX().dcKwTh)+' kW each, closed-loop 30% PG glycol. DRY ONLY \u2014 no adiabatic pre-cooling, no spray: that is what makes the published WUE of 0.00 true. '+rfDcBanks+' glyphs drawn, one per bank of '+dhaG(rfPerBank)+'.');
+s+=tx(MX+51*M,MY+1.4*M,dhaG(rfDcInst)+' installed \u00B7 '+dhaG(rfDcRun)+' duty at design','var(--g)',4.4,'middle',0,bo('dryCoolersInstalled',{also:['dryCoolersRunning']}));
+/* the divisor is an identity over the two hooked counts, not a registry value of its own —
+   hooking it would claim the registry publishes 79, which it does not. */
+s+=tx(MX+51*M,MY+2.5*M,rfDcBanks+' glyphs drawn \u00D7 '+dhaG(rfPerBank)+' units per bank','var(--t3)',4,'middle',0,{declared:'drawing aggregation: an identity over the marked installed count divided by the eight glyphs drawn, printed so the reader can check the drawing against the engine; not itself an engine quantity'});
 // Dry cooler units (2 rows of 4)
 for(var dc=0;dc<4;dc++){
 s+='<g data-rz-equipment="roof-dry-cooler-bank:'+(dc+1)+'" tabindex="0" role="button"><title>Dry-cooler bank DC-'+(dc+1)+' — click for inspector</title>'+eq(34+dc*8.5,4,7,5,'rgba(34,197,94,.18)','DC-'+(dc+1),5)+'</g>';
@@ -4047,7 +4065,7 @@ function DHAX(){
   if(!d){DHAX._c=o;return o;}
   /* facility / compute */
   o.halls=n(d.halls); o.racks=n(d.racksPerHall); o.rackKw=n(d.kwPerRack);
-  o.rows=n(d.rowsPerHall); o.racksPerRow=n(d.racksPerRow);
+  o.rows=n(d.rackRows); o.racksPerRow=n(d.racksPerRow);
   o.itHall=n(d.itHall); o.itHallFmt=t(d.itHallFmt); o.facMW=n(d.facTotalMW);
   /* electrical \u2014 the RPP group (22 racks) is the aggregation unit */
   o.groups=n(d.rackGroups); o.racksPerGroup=n(d.racksPerGroup);
@@ -4062,7 +4080,14 @@ function DHAX(){
   o.genN=n(d.gensetFacN); o.genInst=n(d.gensetFacNplus1); o.genMW=n(d.gensetMW);
   o.genRed=t(d.gensetRedundancy);
   /* cooling counts the site labels need */
-  o.dryCoolers=n(d.dryCoolers); o.chillersRun=n(d.chillersRunning);
+  /* v3.8.0 — `d.dryCoolers` and `d.rowsPerHall` were read here and published by NOTHING: the
+     adapter's names are dryCoolersInstalled / dryCoolersRunning and rackRows. o.rows survived on
+     the identity below; o.dryCoolers was simply null, waiting for the first drawing to print an
+     em dash where a count belongs. tools/test-dcai-basis-map.mjs now fails on any d.<field> DHAX
+     reads that the live adapter does not publish. */
+  o.dryCoolersInstalled=n(d.dryCoolersInstalled); o.dryCoolersRunning=n(d.dryCoolersRunning);
+  o.dcKwTh=n(d.dryCoolerRating); o.chKwTh=n(d.chillerRating);
+  o.chillersRun=n(d.chillersRunning);
   o.chillersWorst=n(d.chillersWorst); o.chillersInstalled=n(d.chillersInstalled);
   o.cduRun=n(d.cduRunning); o.cduInst=n(d.cduInstalled); o.cduKwTh=n(d.cduRating);
   /* MV/HV chain — v3.7.0. These seven fields were read by the per-hall SLD and by the electrical

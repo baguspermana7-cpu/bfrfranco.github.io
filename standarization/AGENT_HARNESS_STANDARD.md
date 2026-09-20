@@ -1,7 +1,7 @@
 # Long-Running Agent Harness Standard
 
 > Status: required for governed local agent loops
-> Last updated: 2026-09-11
+> Last updated: 2026-09-20
 > Public scope: lifecycle, verification, privacy, and handoff rules only
 
 ## 1. Purpose and boundary

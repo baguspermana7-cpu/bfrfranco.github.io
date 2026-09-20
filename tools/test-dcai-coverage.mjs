@@ -144,6 +144,7 @@ try {
     addHtml(await run('body', { htmlOnly: true }));            // default tab (dash) + sidebar + KPI strip
     seenTabs.add('dash');
 
+    let floorsWalked = false;
     for (const entry of set.diagrams) {
         const wantSvg = !ONLY.size || ONLY.has(entry.selector.slice(1)) || (entry.selector === '#floorSvg' && ONLY.has('floorSvg'));
         const wantHtml = !ONLY.size || ONLY.has('HTML');
@@ -163,8 +164,15 @@ try {
         }
         if (!wantSvg) continue;
         if (entry.selector === '#floorSvg') {
-            /* the floor plan is drawn on a floor click in the isometric; two floors carry engine numbers */
-            for (const floor of ['f2', 'gf']) {
+            /* v3.8.0 — walk EVERY floor, once. This loop used to run ['f2','gf'] with the note
+               "two floors carry engine numbers", and it ran once per floorSvg entry in TAB_SETS —
+               so when the floor plan grew to four entries the gate measured the same two floors
+               four times and never measured level 3 or the roof at all, while printing four rows
+               that looked like coverage. Level 3 has carried engine numbers since the hall redraw
+               and the roof since v3.8.0. */
+            if (floorsWalked) continue;
+            floorsWalked = true;
+            for (const floor of ['gf', 'f2', 'f3', 'roof']) {
                 const opened = await tab.evaluate((key) => {
                     const poly = document.querySelector('#bldgSvg [data-floor="' + key + '"]');
                     if (!poly) return 'no polygon';

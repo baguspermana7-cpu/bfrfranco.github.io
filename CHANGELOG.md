@@ -11,6 +11,59 @@ release sections rather than semver.
 
 ---
 
+## v3.8.0 — 2026-09-20
+
+### The roof spends no water it does not have
+
+The roof plan was the last drawing still on the retired plant, and it was not merely stale. It
+drew **eight** dry coolers against an engine that sizes **631**, said its risers served "8× 4MW
+chillers" against an engine that sizes **143**, and named the array *"BAC TrilliumSeries
+Adiabatic"* in the same tooltip that claimed *"WUE 0.00, zero water evap"*.
+
+That last pair is not a stale number, it is a contradiction. An adiabatic cooler spends water by
+design; the whole reason this facility runs a 40 °C cold-plate inlet is to reject heat **dry**, so
+that the published WUE of 0.00 is true rather than flattering. The drawing was describing a
+different machine from the one the engine sizes and the dashboard reports.
+
+### Fixed
+
+- **The roof draws the engine's plant.** 631 installed dry coolers, 593 duty on the design day,
+  eight glyphs kept as an aggregation with the divisor printed on the drawing (8 banks × 79), and
+  every count hooked. "Adiabatic" is gone: the array is described as dry-only V-bank, which is what
+  makes WUE 0.00 true.
+- **The ground-floor chiller hall tells the same story.** It drew CH-1…CH-7 plus a "CH-8 (N+1
+  standby)" — an N+1 story about a plant that is N+1 on 142, not on 7. The glyphs are now banks
+  carrying the engine's installed / design-duty / worst-bin counts (143 / 36 / 142).
+- **The coverage gate was measuring two floors four times and two floors never.** The floor walk
+  ran `['f2','gf']` once per `#floorSvg` entry in `TAB_SETS`; when the floor plan grew to four
+  entries it repeated the same two floors four times and never opened level 3 or the roof — while
+  printing four rows that looked like coverage. It now walks `gf, f2, f3, roof` exactly once. Level
+  3 has carried engine numbers since the hall redraw; the roof carries them from this release.
+- **Two more dead adapter reads.** `DHAX()` read `d.dryCoolers` and `d.rowsPerHall`, and the live
+  adapter publishes neither (`dryCoolersInstalled` / `rackRows`). `o.rows` survived on an identity
+  further down; `o.dryCoolers` was simply null, waiting for the first drawing that printed a count
+  to print an em dash instead. `tools/test-dcai-basis-map.mjs` now fails on any `d.<field>` DHAX
+  reads that `window.DHE` does not publish — the mirror of the v3.7.0 rule, and the same defect
+  from the other side.
+
+### Added
+
+- **`tools/test-dcai-roof-plan.mjs`** — the roof must state the engine's dry-cooler counts with a
+  visible aggregation divisor; a sentence that counts chillers must state the engine's count; **no
+  water-spending rejection technology may be claimed while the engine publishes WUE 0**; the roof
+  must carry real hooks rather than one wholesale declaration; and the chiller hall must carry the
+  installed / duty / worst-bin figures instead of an "N+1 of 8". Proven RED against the pre-change
+  page — nine findings — and green after.
+
+### Note on what a declaration is for
+
+`wanSvg` and `fireSvg` still carry zero traceability hooks and that is correct, not a gap: the
+engine publishes no corporate-internet quantity and no fire quantity at all, so those numbers are
+page-authored design selections and declared as such. A hook there would claim a provenance that
+does not exist. The monitor rows stay, and this is why they will not flip.
+
+---
+
 ## v3.7.1 — 2026-09-20
 
 ### Sixteen of the isometric's collisions were a caption overlapping its own subtitle

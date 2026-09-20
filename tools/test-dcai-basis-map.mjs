@@ -55,7 +55,7 @@ try {
     await tab.goto(`http://127.0.0.1:${server.address().port}/${PAGE}`, { waitUntil: 'domcontentloaded', timeout: 45000 });
     await new Promise((accept) => setTimeout(accept, 2000));
     await enterAuthorizedAuditState(tab, 'dc-ai');
-    adapter = await tab.evaluate((fs) => { const D = window.DHE; if (!D) return null; const o = {}; for (const f of fs) o[f] = { has: f in D, value: D[f] }; return o; }, fields);
+    adapter = await tab.evaluate((fs) => { const D = window.DHE; if (!D) return null; const o = { __all: {} }; for (const k of Object.keys(D)) o.__all[k] = true; for (const f of fs) o[f] = { has: f in D, value: D[f] }; return o; }, fields);
 } finally { await browser.close(); server.close(); }
 assert.ok(adapter, 'window.DHE adapter must be live on the page');
 
@@ -92,11 +92,26 @@ assert.deepEqual(parity, [], `adapter value differs from its registry record:\n 
     const start = lines.findIndex((l) => l.startsWith('function DHAX()'));
     assert.ok(start >= 0, 'DHAX() must exist — the drawings read every number through it');
     const end = lines.findIndex((l, i) => i > start && /^\/\* number -> fixed-decimal/.test(l));
-    const body = lines.slice(start, end).join('\n');
+    /* strip comments before scanning: this very file's fix note names `d.dryCoolers` in prose,
+       and a gate that reads its own explanation as code fails forever after it is fixed. */
+    const decomment = (text) => text.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/(^|[^:])\/\/[^\n]*/g, '$1 ');
+    const body = decomment(lines.slice(start, end).join('\n'));
     const defined = new Set([...body.matchAll(/\bo\.([A-Za-z0-9_]+)\s*=/g)].map((m) => m[1]));
-    const reads = new Set([...src.matchAll(/\bX\.([A-Za-z0-9_]+)/g)].map((m) => m[1]));
+    const reads = new Set([...decomment(src).matchAll(/\bX\.([A-Za-z0-9_]+)/g)].map((m) => m[1]));
     const undefinedReads = [...reads].filter((f) => !defined.has(f)).sort();
     assert.deepEqual(undefinedReads, [], `the drawings read DHAX fields the adapter never assigns (they render as em dashes): ${undefinedReads.join(', ')}`);
+
+    /* v3.8.0 — and the mirror rule. DHAX assigns from DHE by name, and two of those names were
+     * published by nothing: `d.dryCoolers` (the adapter calls it dryCoolersInstalled) and
+     * `d.rowsPerHall` (rackRows). o.rows survived on an identity further down; o.dryCoolers was
+     * simply null, waiting for the first drawing that printed a count to print an em dash. A
+     * silent null in an adapter is the same defect as a silent em dash in a drawing. */
+    const liveFields = new Set(Object.keys(adapter.__all || {}));
+    if (liveFields.size) {
+        const deadAssignments = [...new Set([...body.matchAll(/\bd\.([A-Za-z0-9_]+)/g)].map((m) => m[1]))]
+            .filter((f) => !liveFields.has(f)).sort();
+        assert.deepEqual(deadAssignments, [], `DHAX reads adapter fields window.DHE does not publish (they resolve to null): ${deadAssignments.join(', ')}`);
+    }
 }
 
 console.log(`PASS DCAI basis map — ${fields.length} fields mapped, ${numeric} numeric at parity, ${read.size} bo() reads all mapped`);

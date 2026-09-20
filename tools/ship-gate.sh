@@ -151,6 +151,7 @@ gate "flow animation — cycles close, states styled, reduced motion reaches SMI
 gate "shared PDF export — one shell, partial exports say so" node tools/test-rz-pdf-export.mjs
 gate "voltage chain — a transformer steps one level" node tools/test-dcai-voltage-chain.mjs
 gate "HV switchyard — the 150/20 kV step is drawn where the voltage changes" node tools/test-dcai-hv-switchyard.mjs
+gate "roof + chiller hall — the drawing carries the plant the engine sizes" node tools/test-dcai-roof-plan.mjs
 # §D UX LAWS: only the mechanizable subset (#6 loading affordance on async surfaces).
 # The other 15 laws are human design review — this gate does not and cannot decide them.
 gate "ux-laws — §D mechanizable subset" node tools/audit-ux-laws.mjs --strict
