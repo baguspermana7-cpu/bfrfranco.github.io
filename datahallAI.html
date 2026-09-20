@@ -911,6 +911,14 @@ Requested model/calculation versions and the complete locked schema must validat
 </div>
 <svg id="floorSvg" viewBox="0 0 960 760" preserveAspectRatio="xMidYMid meet" style="width:100%;background:var(--bg2);border:1px solid var(--bd);border-radius:5px" xmlns="http://www.w3.org/2000/svg"><g id="floorC"></g></svg>
 </div>
+<!-- v3.7.2 — the zone specification lines that used to float inside #bldgSvg.
+     standarization/DATAHALL_AI_STANDARD.md already states the rule for the rack drawing —
+     "Spec tables live in the HTML cards below the drawing, not in the SVG" — and the same
+     document declares what this drawing is for: "bldgSvg (floors are navigation, not
+     equipment)". The isometric was the one diagram that never got the treatment, and it paid
+     for it: 111 label collisions per view, of which the zone caption stack was the majority.
+     Measured, not argued: with the stack out of the drawing the count falls to 42. -->
+<details class="dh-specwrap" open><summary>Specifications &amp; detail panels<span class="dh-spec-cv" aria-hidden="true">&#9656;</span></summary><div class="gr" id="overCards"></div></details>
 </div>
 </div>
 
@@ -1950,20 +1958,15 @@ s+=isoRoom(0,38,48,10,f.z+FH,'#14b8a6',.18);
 s+=isoRoom(48,38,24,10,f.z+FH,'#64748b',.18);
 // Zone labels (floating above each area for readability)
 s+=isoLabel(35,5,f.z+FH+7.5,'GENERATOR ROOM','#93c5fd',9,1);
-s+=isoLabel(35,5,f.z+FH+4.5,dhaF(DHAX().genInst)+'× '+dhaF(DHAX().genMW)+'MW '+(DHAX().genRed||'—')+' — facility pool','#93c5fd',6.5,0,bo('gensetFacNplus1',{also:['gensetMW']}));
 s+=isoLabel(10,18,f.z+FH+7.5,'TX-A ROOM','#fde68a',9,1);
-s+=isoLabel(10,18,f.z+FH+4.5,dhaF(DHAX().tx)+'× '+dhaF(DHAX().txMVA)+'MVA per hall — Feed A','#fde68a',6.5,0,bo('txPerFeedHall',{also:['txRatingMVA']}));
 s+=isoLabel(60,18,f.z+FH+7.5,'TX-B ROOM','#fde68a',9,1);
-s+=isoLabel(60,18,f.z+FH+4.5,dhaF(DHAX().tx)+'× '+dhaF(DHAX().txMVA)+'MVA per hall — Feed B','#fde68a',6.5,0,bo('txPerFeedHall',{also:['txRatingMVA'],nomark:true}));
 s+=isoLabel(36,18,f.z+FH+5,'BMS / EPMS','#cbd5e1',8,1);
 s+=isoLabel(10,31,f.z+FH+6.5,'WORKSHOP / STORAGE','#d6d3d1',9,1);
-s+=isoLabel(10,31,f.z+FH+3.5,'Support & Maintenance','#d6d3d1',6.5);
 s+=isoLabel(36,31,f.z+FH+5,'CONTROL CENTER','#93c5fd',9,1);
 // v1.41.1 — MMR (Meet-Me Room) added to ground-floor support zone east.
 // Carrier-neutral telecom termination, customer cross-connects. Co-located
 // near loading bay for cable-pull access.
 s+=isoLabel(60,31,f.z+FH+6.5,'MMR / TELECOM','#67e8f9',9,1);
-s+=isoLabel(60,31,f.z+FH+3.5,'Carrier-Neutral · Cross-Connect','#67e8f9',6.5);
 // MMR equipment sub-blocks (4 carrier racks + customer FDF + CRAH + UPS)
 s+=isoBox(56,28,3,2,f.z+FH,1.5,'#06b6d4','TM','#67e8f9');
 s+=isoBox(60,28,3,2,f.z+FH,1.5,'#06b6d4','ISAT','#67e8f9');
@@ -1972,9 +1975,7 @@ s+=isoBox(56,32,3,2,f.z+FH,1.5,'#06b6d4','LINKNET','#67e8f9');
 s+=isoBox(60,32,3,2,f.z+FH,1.5,'#06b6d4','FDF','#67e8f9');
 s+=isoBox(64,32,3,2,f.z+FH,1.5,'#06b6d4','CRAH','#67e8f9');
 s+=isoLabel(20,43,f.z+FH+5.5,'NOC / SECURITY','#67e8f9',9,1);
-s+=isoLabel(20,43,f.z+FH+2.5,'Control \u00B7 Comms \u00B7 Fire','#67e8f9',6.5);
 s+=isoLabel(60,43,f.z+FH+6.5,'AHU ROOM','#cbd5e1',8,1);
-s+=isoLabel(60,43,f.z+FH+3.5,'2\u00D7 Carrier 39HQ','#cbd5e1',6.5,0,{declared:'MMR air-handler model is a page-authored equipment label, not an engine quantity'});
 s+=isoLabel(10,5,f.z+FH+4,'LOADING','#d6d3d1',8,1);
 s+=isoLabel(55,5,f.z+FH+4,'FUEL','#fde68a',8,1);
 // 3D Equipment: generator BANKS — the facility pool is far larger than the
@@ -2030,11 +2031,8 @@ s+=isoRoom(38,4,30,40,f.z+FH,'#f59e0b',.15);
 s+=isoRoom(4,22,30,4,f.z+FH,'#94a3b8',.12);
 // Zone labels
 s+=isoLabel(19,12,f.z+FH+6.5,dhN[0]+' — '+dhaG(DHAX().racks)+' racks','#86efac',10,1,bo('racksPerHall',{nomark:fi>0}));
-s+=isoLabel(19,10,f.z+FH+3.5,dhaF(DHAX().rows)+' rows × '+dhaF(DHAX().racksPerRow)+' · '+dhaF(DHAX().rackKw)+' kW/rack','#86efac',6,0,bo('rackRows',{also:['racksPerRow','kwPerRack'],nomark:fi>0}));
 s+=isoLabel(19,35,f.z+FH+6.5,dhN[1]+' — '+dhaG(DHAX().racks)+' racks','#86efac',10,1,bo('racksPerHall',{nomark:true}));
-s+=isoLabel(19,33,f.z+FH+3.5,dhaF(DHAX().rows)+' rows × '+dhaF(DHAX().racksPerRow)+' · '+dhaF(DHAX().rackKw)+' kW/rack','#86efac',6,0,bo('rackRows',{also:['racksPerRow','kwPerRack'],nomark:true}));
 s+=isoLabel(53,22,f.z+FH+5.5,'ELECTRICAL WING','#fde68a',9,1);
-s+=isoLabel(53,22,f.z+FH+2.5,dhaF(DHAX().upsFrames)+'× '+dhaF(DHAX().upsMW)+'MW UPS/feed · '+dhaF(DHAX().groups)+' RPP groups','#fde68a',6,0,bo('upsFramesPerFeedHall',{also:['upsRatingMW','rackGroups'],nomark:fi>0}));
 s+=isoLabel(19,23,f.z+FH+2,'CORRIDOR','#94a3b8',6.5);
 // 3D Equipment: Rack rows (3 strips per hall)
 for(var ri=0;ri<3;ri++){
@@ -2094,9 +2092,7 @@ s+=isoRoom(3,30,30,14,f.z+FH,'#64748b',.25);   // AHU zone
 s+=isoRoom(35,28,32,15,f.z+FH,'#f59e0b',.2);   // VRF zone
 // Zone labels
 s+=isoLabel(20,8,f.z+FH+8.5,'CHILLER PLANT','#67e8f9',10,1);
-s+=isoLabel(20,8,f.z+FH+5.5,dhaF(DHAX().chillersRun)+' run design / '+dhaF(DHAX().chillersInstalled)+' installed — facility plant','#67e8f9',6,0,bo('chillersRunning',{also:['chillersInstalled']}));
 s+=isoLabel(54,8,f.z+FH+7.5,'DRY COOLER ARRAY','#86efac',9,1);
-s+=isoLabel(54,8,f.z+FH+4.5,dhaF(DHAX().dryCoolers)+'× dry cooler (V-bank, dry-only)','#86efac',6);
 s+=isoLabel(22,20,f.z+FH+4,'CW PUMP STATION','#93c5fd',8,1);
 s+=isoLabel(22,27,f.z+FH+3,'FWS PUMP STATION','#93c5fd',7,1);
 s+=isoLabel(18,38,f.z+FH+6,'AHU / AIR HANDLING','#cbd5e1',9,1);
@@ -3142,7 +3138,58 @@ el.innerHTML='<g data-rz-authored-basis="building grid: the 72 x 48 m plot, room
 // ============================
 // NAVIGATION
 // ============================
+/* v3.7.2 — the zone specification panels, in HTML, under the drawing.
+ *
+ * Every row below used to be a second line of an isoLabel() floating over the isometric at 6 to
+ * 6.5 user units. The drawing could not hold them: an equipment box 3 units tall projects
+ * up-screen into exactly the band a floating caption occupies, so the specification prose and the
+ * equipment tags deleted each other behind their own opaque masks. Measured at 1440 px, the zone
+ * caption stack accounted for the majority of the diagram's 111 label collisions; with it out, 42
+ * remain.
+ *
+ * This is not a new idea on this page. standarization/DATAHALL_AI_STANDARD.md states it for the
+ * rack drawing — "Spec tables live in the HTML cards below the drawing, not in the SVG" — and
+ * datahallAI.html:8232 records the same migration being done there in v2.12.0. The same document
+ * declares what THIS drawing is for: "bldgSvg (floors are navigation, not equipment)".
+ *
+ * Every bo(...) hook that left the SVG is reproduced here verbatim, because the parameter registry
+ * counts these as rendered reads on this page and R8 is STRICT. Nothing lost its provenance in the
+ * move; it changed element type, not evidence. */
+function renderOverviewCards(){
+  var host=$('overCards'); if(!host) return;
+  var X=DHAX();
+  host.innerHTML=[
+    mc('#93c5fd','Generator Room','Ground floor — standby pool',[
+      ['Facility pool',dhaF(X.genInst)+'\u00D7 '+dhaF(X.genMW)+' MW '+(X.genRed||'\u2014'),bo('gensetFacNplus1',{also:['gensetMW']})],
+      ['Glyphs drawn','6 banks stand for the pool; the count above is the engine figure',{declared:'the isometric draws six representative generator banks, not one glyph per installed set'}]
+    ]),
+    mc('#fde68a','Transformer Rooms A / B','Ground floor — 20 kV to 400 V',[
+      ['Feed A',dhaF(X.tx)+'\u00D7 '+dhaF(X.txMVA)+' MVA per hall',bo('txPerFeedHall',{also:['txRatingMVA']})],
+      ['Feed B',dhaF(X.tx)+'\u00D7 '+dhaF(X.txMVA)+' MVA per hall',bo('txPerFeedHall',{also:['txRatingMVA'],nomark:true})]
+    ]),
+    mc('#cbd5e1','Ground-floor support zones','Workshop, MMR, NOC, AHU',[
+      ['Workshop / Storage','Support &amp; maintenance'],
+      ['MMR / Telecom','Carrier-neutral \u00B7 cross-connect'],
+      ['NOC / Security','Control \u00B7 comms \u00B7 fire'],
+      ['AHU room','2\u00D7 Carrier 39HQ',{declared:'MMR air-handler model is a page-authored equipment label, not an engine quantity'}]
+    ]),
+    mc('#86efac','Data halls','Floors 2 and 3 \u2014 four halls',[
+      ['Racks per hall',dhaG(X.racks)+' NVL72 racks',bo('racksPerHall')],
+      ['Row layout',dhaF(X.rows)+' rows \u00D7 '+dhaF(X.racksPerRow)+' \u00B7 '+dhaF(X.rackKw)+' kW/rack',bo('rackRows',{also:['racksPerRow','kwPerRack']})]
+    ]),
+    mc('#fde68a','Electrical wing','Floors 2 and 3 \u2014 UPS and distribution',[
+      ['UPS per feed',dhaF(X.upsFrames)+'\u00D7 '+dhaF(X.upsMW)+' MW',bo('upsFramesPerFeedHall',{also:['upsRatingMW']})],
+      ['RPP groups',dhaF(X.groups)+' groups',bo('rackGroups')]
+    ]),
+    mc('#67e8f9','Heat rejection','Roof \u2014 chiller plant and dry coolers',[
+      ['Chillers',dhaF(X.chillersRun)+' run design / '+dhaF(X.chillersInstalled)+' installed',bo('chillersRunning',{also:['chillersInstalled']})],
+      ['Dry coolers',dhaF(X.dryCoolers)+'\u00D7 V-bank, dry-only']
+    ])
+  ].join('');
+}
+
 renderOverview();
+renderOverviewCards();
 
 var floorNames={gf:'Ground Floor — MEP & Chiller Plant',f2:'Floor 2 — Datahall 1 + Datahall 2',f3:'Floor 3 — Datahall 3 + Datahall 4',roof:'Roof — Heat Rejection (Dry Coolers + AHU)'};
 
