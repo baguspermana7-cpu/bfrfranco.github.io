@@ -25,7 +25,7 @@
  *
  *   Run:  node tools/test-rz-diagram-engine.mjs   (from rz-work/)
  * ==========================================================================*/
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import vm from 'node:vm';
@@ -699,6 +699,55 @@ const D = sandbox.RZDiagram;
     const out = sb.isoResolvePlacement(sb.isoLabel(10, 10, 20, 'GENERATOR ROOM', '#93c5fd', 9, 1));
     ok('I3a', out.includes('GENERATOR ROOM'), 'the engine-less path must still draw the label');
     ok('I3b', out.indexOf('<!--ISOFLEX') === -1, 'and must not leave a token behind');
+  }
+}
+
+/* ==========================================================================
+ * TOKEN CONTRACT — a missing custom property fails silently, in one theme
+ * ======================================================================== */
+
+/* The engine emits no literal hex: every colour resolves to a custom property,
+ * which is what lets one edit to a page's :root re-skin every diagram on it.
+ * The other half of that bargain is that an adopting page must define the whole
+ * set.
+ *
+ * The demo page called its panel colour --panel while the engine asked for
+ * --bg3. The variable did not exist, fill="var(--bg3)" resolved to an invalid
+ * value, and the focal node looked correct against dark paper while rendering
+ * solid black with unreadable text against light. Nothing logged and nothing
+ * threw. A dark-only screenshot showed no defect.
+ *
+ * So: enumerate what the engine demands, and check every page that adopts it. */
+{
+  const facade = readFileSync(join(root, 'js/rz-diagram.js'), 'utf8');
+  const required = [...facade.matchAll(/var\((--[a-z0-9-]+)\)/g)].map((m) => m[1]);
+  const uniq = [...new Set(required)].sort();
+
+  ok('T1', uniq.length >= 8,
+    `the engine should resolve a full palette, found ${uniq.length}: ${uniq.join(' ')}`);
+
+  /* T2: no literal hex may leave the engine — the whole re-skin promise rests
+   *     on this, and it is the sort of thing a hurried patch quietly breaks. */
+  const hex = facade.match(/["'#]#[0-9a-fA-F]{3,8}\b/g) || [];
+  ok('T2', hex.length === 0, `engine must emit no literal hex, found: ${hex.join(',')}`);
+
+  /* T3: every page that loads the facade must define every property it asks
+   *     for. Today no page has adopted it, so this asserts nothing and says so
+   *     rather than reporting a pass it did not earn — it arms for the first
+   *     adopter, which is precisely when the bug bites. */
+  const pages = readdirSync(root).filter((f) => f.endsWith('.html'));
+  const adopters = pages.filter((f) =>
+    /<script[^>]+src="[^"]*js\/rz-diagram\.js/.test(readFileSync(join(root, f), 'utf8')));
+
+  for (const page of adopters) {
+    const html = readFileSync(join(root, page), 'utf8');
+    const missing = uniq.filter((v) => !new RegExp(`${v}\\s*:`).test(html));
+    ok(`T3:${page}`, missing.length === 0,
+      `${page} loads the diagram engine but never defines ${missing.join(', ')} — ` +
+      `an undefined property renders as an invalid value in one theme only`);
+  }
+  if (adopters.length === 0) {
+    console.log('     note: no page loads js/rz-diagram.js yet, so T3 asserted nothing');
   }
 }
 
