@@ -45,6 +45,7 @@ gate "datahall engine — 57/57 doc-21 examples" node tools/test-datahall-calc.m
 # connectors around boxes. Both gates are DOM-free, so they cost milliseconds and run
 # before the Chromium audits rather than alongside them.
 gate "diagram engine — metrics, placement, routing, facade" node tools/test-rz-diagram-engine.mjs
+gate "diagram engine — adoption ratchet (hand-authored geometry may fall, never rise)" node tools/test-diagram-engine-adoption.mjs
 gate "diagram engine — one real diagram renders with zero collisions" node tools/demo-rz-diagram.mjs
 gate "DC AI GB300 engine — identities, balance, cliff, perturbation" node tools/test-dcai-engine.mjs
 gate "DC AI GB300 parameter registry — schema, staleness, provenance, wiring" node tools/test-dcai-parameter-registry.mjs

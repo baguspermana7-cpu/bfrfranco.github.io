@@ -11,6 +11,43 @@ release sections rather than semver.
 
 ---
 
+## v3.10.3 — 2026-09-20
+
+### A ratchet, not an ultimatum
+
+The instruction when the engine shipped was plain: when you make a block diagram, use this engine.
+This is how that survives contact with a codebase that already contains **3,114 hand-typed
+coordinates** across fourteen cockpit files.
+
+A gate that failed on any hand-typed coordinate would fail on day one and stay failed, and a gate
+that is always red teaches people to ignore it. So `tools/test-diagram-engine-adoption.mjs` forbids
+only the count from **rising**. That is enforceable today, and it makes the migration monotonic:
+every release either leaves a drawing alone or moves it toward the engine.
+
+### Added
+
+- **`tools/test-diagram-engine-adoption.mjs`** — counts two proxies per file: calls to the page's
+  own coordinate-taking draw helpers (`tx`, `tx2`, `lv`, `bx2`, `eq`, `rm`, `symGen`, …) and SVG
+  elements positioned by a numeric literal in source. A **new** cockpit file with any hand-authored
+  geometry fails outright — a new diagram has no excuse, the engine exists. Wired into
+  `ship-gate.sh`; baseline committed as `tools/diagram-adoption-baseline.json`.
+
+### Fixed
+
+- **The ratchet does not inherit the geometry survey's blind spot.** `TAB_SETS` lists
+  `datahallAI.html` and nothing else, so `test-conv-geometry` measures that page's twenty-one
+  drawings and **none of the Track B instrument pages** — which are not clean: `fire-system.html`
+  carries 137 raw coordinate literals, `water-system.html` 121, `fuel-system.html` 97. The cockpit
+  list is named in full in the gate and unioned with `TAB_SETS`, so those pages are held even
+  though nothing measures them yet. Extending the survey to reach them is separate work.
+
+### Verified
+
+- Both failure paths were injected and observed: one added coordinate on `ict.html` (11 → 12) and
+  an unseen cockpit file each fail with the file named.
+
+---
+
 ## v3.10.2 — 2026-09-20
 
 ### The width is knowable now
