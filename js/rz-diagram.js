@@ -197,8 +197,28 @@
             message: '"' + o.name + '" needs ' + need + ' units, box is ' + o.w
           });
         }
-        var lines = (o.name ? 1 : 0) + (o.sublabel ? 1 : 0) + (o.tag ? 1 : 0);
-        var h = o.h || M.grid4(lines * 16 + pad);
+        /* Height, measured the same way width is. The tag chip is 18 tall, a
+         * name line 16, a sublabel 14, plus padding top and bottom.
+         *
+         * This used to trust o.h without checking it, while the width path
+         * warned — an asymmetry that let a caller force h:52 onto a node
+         * needing 64 and get a sublabel drawn across its own bottom border. A
+         * box too short clips its text exactly as a box too narrow does. */
+        var needH = M.grid4((o.tag ? 18 : 0) + (o.name ? 16 : 0) +
+                            (o.sublabel ? 14 : 0) + pad * 2);
+        var h = o.h || needH;
+        if (o.h && needH > o.h) {
+          warnings.push({
+            kind: 'node-overflow', id: o.id || o.name,
+            message: '"' + (o.name || o.id) + '" needs ' + needH +
+                     ' units of height, box is ' + o.h + ' — its text will cross its own border'
+          });
+        }
+        /* A vessel drawn tall to span its ports should not wear its label like
+         * a hat. Centre the block when the box is much taller than its text. */
+        var vPad = (o.vAlign === 'middle' || (o.h && o.h > needH + 24))
+          ? Math.round((h - (needH - pad * 2)) / 2) - pad
+          : 0;
 
         var stroke = tok(o.stroke || (o.focal ? 'accent' : 'rule-solid'));
         var fill = tok(o.fill || (o.focal ? 'paper-2' : 'paper'));
@@ -214,7 +234,7 @@
                (o.dashed ? ' stroke-dasharray="4,3"' : '') + '/>');
         layers.nodes.push(g.join(''));
 
-        var cy = y + pad;
+        var cy = y + pad + (vPad > 0 ? vPad : 0);
         if (o.tag) {
           /* A type tag is a rectangular chip at rx=2, never a pill and never bare
            * text: the outline is what separates a classification from a label.
@@ -285,6 +305,32 @@
           '>' + esc(content) + '</text>');
         occ.add(box, { id: o.id || id('text'), kind: 'text' });
         return box;
+      },
+
+      /* ---- ports ------------------------------------------------------- */
+      /**
+       * Attach points along one edge of a node, per connector rule 4.
+       *
+       * This wraps RZDiagramLayout.fanPoints only to READ its `crowded` flag.
+       * The flag was computed from the start and nothing consumed it, so a node
+       * 56 units tall could carry five connectors at 9-unit spacing — under the
+       * 12-unit minimum — and the only symptom was a drawing whose lines
+       * bunched and detoured. A computed warning nobody reads is not a warning.
+       */
+      ports: function (box, n, side, o) {
+        var pts = L.fanPoints(box, n, side);
+        if (pts.crowded) {
+          warnings.push({
+            kind: 'ports-crowded',
+            id: (o && o.id) || '',
+            message: n + ' connectors on a ' +
+                     ((side === 'left' || side === 'right') ? box.h : box.w) +
+                     '-unit edge leaves ' + pts.spacing.toFixed(1) +
+                     ' units between them; rule 4 wants at least ' + L.FAN_MIN +
+                     '. Make the node taller, or send fewer connectors to one edge'
+          });
+        }
+        return pts;
       },
 
       /* ---- connectors ------------------------------------------------- */

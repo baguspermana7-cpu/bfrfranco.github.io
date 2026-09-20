@@ -353,6 +353,21 @@ html[data-rz-register="editorial"] ::selection{
   background:color-mix(in srgb,var(--rz-art-accent) 26%,transparent);
 }
 
+/* --- explanatory figures (v3.11) — built by tools/build-article-diagrams.mjs.
+   The drawing carries its own type scale and its own hairlines, so the figure
+   adds only room to breathe and a scroll track: a schematic is one of the three
+   things allowed to be wider than the reading measure, and it gets its own
+   overflow container so the PAGE never scrolls sideways because of it. --- */
+html[data-rz-register="editorial"] .rz-figure{
+  margin:2.25rem 0;padding:0;max-width:100%;overflow-x:auto;
+}
+html[data-rz-register="editorial"] .rz-figure svg{
+  display:block;width:100%;height:auto;min-width:640px;
+}
+html[data-rz-register="editorial"] .rz-figcaption{
+  margin-top:.85rem;max-width:68ch;line-height:1.6;
+}
+
 /* --- figure captions → mono, muted (matches the instrument-grade meta).
    !important + font-style:normal beat the inline italic/#64748b articles hardcode. --- */
 html[data-rz-register="editorial"] figcaption{

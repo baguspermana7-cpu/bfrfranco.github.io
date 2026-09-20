@@ -47,6 +47,9 @@ gate "datahall engine — 57/57 doc-21 examples" node tools/test-datahall-calc.m
 # The geometry survey only measures the pages it names. This asserts that list is still
 # complete, from the filesystem, so a new cockpit cannot escape measurement by being absent
 # — absence reads exactly like clean.
+# Article figures are built, not hand-maintained. --check fails if a figure in the HTML has
+# drifted from its definition, and the builder audits its own geometry before writing.
+gate "article diagrams — figures current, and free of collisions" node tools/build-article-diagrams.mjs --check
 gate "diagram survey coverage — every cockpit measured, declared, or excused" node tools/test-diagram-survey-coverage.mjs
 gate "diagram engine — metrics, placement, routing, facade" node tools/test-rz-diagram-engine.mjs
 gate "diagram engine — adoption ratchet (hand-authored geometry may fall, never rise)" node tools/test-diagram-engine-adoption.mjs
@@ -185,6 +188,8 @@ gate "asset cache tokens — a token changes when its file does" node tools/test
 gate "min-twin freshness — no page runs a stale minified build" node tools/audit-min-twins.mjs --strict
 gate "OG card freshness — every card matches a fresh render of its generator" python3 tools/test-og-card-freshness.py
 gate "generator freshness — every generated artefact matches a fresh build" python3 tools/test-generator-freshness.py
+gate "WAN traffic study — every printed figure follows from the view's own inputs" node tools/test-dcai-wan-study.mjs
+gate "commercial surface — no newsletter capture, no paid tier, no e-mail collection" node tools/test-no-commercial-surface.mjs
 # CACHE-KEY DRIFT is the min-twin bug's sibling: one shared asset requested under two `?v=`
 # tokens sits in two cache entries, so a fix reaches a page only if that page's own token moved.
 # Reporting only — `--apply` converges on the NEWEST token. The predecessor of this tool parsed no
