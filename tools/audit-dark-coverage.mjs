@@ -60,7 +60,35 @@ const errorResult = (f, error) => ({
   renderError: `${f}  render-error=${error && error.name ? error.name : 'UnknownError'}`
 });
 const hasFinding = result => Boolean(result.darkFailure || result.lightFailure || result.renderError);
+/* v3.10.20 — kill the transitions before flipping the theme.
+ *
+ * The body carries `transition: background-color 0.3s`, so a theme flip ANIMATES white to
+ * dark, and getComputedStyle during a transition returns the INTERPOLATED value. The settle
+ * below (two rAFs, then 700 ms) covers that when the machine is idle. Under CPU contention
+ * the rAF callbacks are starved, the transition starts late, and the audit measures it still
+ * at its start value — pure white. That is the `body-lum=255 light-block=has-share-buttons`
+ * false positive: it has cost three separate investigations, shifts to a different page set
+ * every run, and every page it has ever named renders correctly in isolation.
+ *
+ * Reproduced directly: article-27.html read 255, 15, 15 across three identical runs, with
+ * sheets 5/5 parsed, data-theme=dark and readyState complete on the failing one — so nothing
+ * was unloaded and nothing had reset the attribute. Only the animation clock was behind.
+ *
+ * With transitions suppressed the new value is computed immediately and the reading no longer
+ * depends on how busy the box is. This does not weaken the audit: it asserts the SETTLED
+ * colour, which is exactly what the transition was delaying. */
+async function suppressTransitions(pg) {
+  await pg.evaluate(() => {
+    const style = document.createElement('style');
+    style.id = 'rz-audit-no-transition';
+    style.textContent =
+      '*,*::before,*::after{transition:none !important;animation:none !important}';
+    document.head.appendChild(style);
+  });
+}
+
 async function applyThemeAndSettle(pg, theme, transitionMs) {
+  await suppressTransitions(pg);
   await pg.evaluate(async nextTheme => {
     try { localStorage.setItem('theme', nextTheme); } catch (e) {}
     document.documentElement.setAttribute('data-theme', nextTheme);
