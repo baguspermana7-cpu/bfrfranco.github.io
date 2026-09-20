@@ -11,6 +11,55 @@ release sections rather than semver.
 
 ---
 
+## v3.10.13 — 2026-09-20
+
+### The rows read zero
+
+`datahallAI.html` now **gates on geometry**, like every other page in the survey.
+
+```
+PASS Conventional geometry: no label collisions, no clipped elements,
+     no degenerate labels, no phone overflow
+```
+
+Twenty-one drawings, four viewports, both themes. The page entered that gate in v1.135.0 carrying
+**2,678 findings** — 812 collisions, 1,780 sub-floor labels, 86 clipped — because before that
+release no render gate had ever opened eight of its ten tabs. Failing the build on day one would
+have got the whole gate muted, which is exactly how the page went unmeasured for so long, so its
+findings were reported rather than enforced, on one condition written into the gate itself:
+
+> *flip to strict once its rows read zero, and do not widen the tolerance to get there.*
+
+**Both halves hold.** The tolerances are unchanged from the day the page arrived — 1.5 px overlap,
+1.0 px clip, 8.5 px legibility floor. The sweep was paid, not the threshold.
+
+### Changed
+
+- **`MONITOR_PAGES` is empty.** The comment left in its place says what it costs to get a page back
+  out of that set, because a page added to it is a page that stops being enforced.
+
+### Fixed
+
+- **The last pair, on the floor plan** — and it took three trades to stop nudging and read the
+  band. The chiller status caption was moved off the AHU room in v3.10.11, onto the glyph note in
+  v3.10.12, and onto the CW riser caption after that. Dumping every label's coordinate in that
+  column showed **five** elements sharing it, and showed that the corridor strip assumed to be in
+  the way is only 72 px wide at the far left — it never reaches this column. With the band actually
+  mapped, both captions fit between 450.4 and 470 with real clearance: the status line at grid
+  36.3, the glyph note at 36.9.
+- **The isometric's last pair** was not a placement failure. `DH-4 — 440 racks` kept meeting `BD`
+  however the search moved it, because the caption was *authored* at `f.z+FH+6.5` — inside the band
+  the equipment tags project into, where every nearby slot is contested. `FH+10` puts it above that
+  plane. **Placement catches what an author misses; it cannot excuse where the author starts.**
+
+### Verified
+
+A collision was injected (the status caption returned to grid 35.8) and the gate reported it with
+the drawing named and **no "REPORTED, not gating" note** — the findings now count as `blocking`,
+and the exit expression is `blocking.length === 0 ? 0 : 1`.
+
+---
+
 ## v3.10.12 — 2026-09-20
 
 ### The hue gate could not see the pixels, so it asserts freshness instead

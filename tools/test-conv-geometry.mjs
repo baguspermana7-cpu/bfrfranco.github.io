@@ -343,15 +343,23 @@ try {
   await new Promise((accept) => server.close(accept));
 }
 
-/* v1.135.0 — MONITOR SCOPE. datahallAI.html's thirteen diagrams entered this gate for the first
-   time in this release; before it, no render gate had ever opened eight of its ten tabs, so it
-   arrives with a real backlog (2,678 findings at entry: 812 collisions, 1,780 sub-floor labels,
-   86 clipped). Failing the build on day one would get the whole gate muted, which is how the
-   page went unmeasured this long in the first place. Its findings are REPORTED every run and the
-   rest of the suite stays strict.
-   FLIP TO STRICT: delete this page from MONITOR_PAGES once its rows read zero. Do not widen the
-   tolerance to get there — pay the sweep. Everything else in DIAGRAMS gates today. */
-const MONITOR_PAGES = new Set(['datahallAI.html']);
+/* v3.10.12 — MONITOR SCOPE IS NOW EMPTY. Every page in DIAGRAMS gates.
+
+   datahallAI.html entered this gate in v1.135.0 with 2,678 findings (812 collisions, 1,780
+   sub-floor labels, 86 clipped), because before that release no render gate had ever opened
+   eight of its ten tabs. Failing the build on day one would have got the whole gate muted,
+   which is exactly how the page went unmeasured for so long — so its findings were REPORTED
+   while the rest of the suite stayed strict, with one condition written here: flip to strict
+   once its rows read zero, and do not widen the tolerance to get there.
+
+   They read zero. The sweep was paid, not the tolerance: v3.5.0 scale-not-font legibility,
+   v3.9.x header and panel layout, v3.10.6-.12 placement by search on the isometric plus
+   twenty-seven distinct defects fixed at their causes. The tolerances are unchanged from the
+   day the page arrived (1.5px overlap, 1.0px clip, 8.5px legibility floor).
+
+   Keep this set empty. A page added here is a page that stops being enforced, and the comment
+   above is what it costs to get it back out. */
+const MONITOR_PAGES = new Set();
 const blocking = findings.filter((f) => !MONITOR_PAGES.has(f.page));
 const monitored = findings.length - blocking.length;
 if (monitored) {

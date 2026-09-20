@@ -217,10 +217,49 @@ no excuse. Both failure paths were injected and observed.
 |---|---|
 | Engine + gate | **shipped** v3.10.0 |
 | `tools/demo-rz-diagram.mjs` — cooling chain | **drawn by the engine**, 30 boxes, 0 collisions |
-| `datahallAI.html` — 21 measured drawings | hand-typed coordinates; 2,652 of them |
+| `datahallAI.html` — 21 measured drawings | **geometry CLEAN and STRICT** since v3.10.13 — 2,678 findings at entry → 0 |
 | `dc-conventional.html` and the Track B cockpits | hand-typed coordinates; 462 across 9 files |
 | Adoption ratchet | **shipped** v3.10.3 — baseline 3,114, may fall, never rise |
 | Basis marks (every cockpit) | **measured** v3.10.2 — no longer `length × size × 0.6` |
+
+### The gate is strict on this page
+
+`MONITOR_PAGES` in `test-conv-geometry.mjs` is **empty**. Every page in `DIAGRAMS` gates.
+
+`datahallAI.html` entered that gate in v1.135.0 carrying 2,678 findings, and was reported rather
+than enforced on one written condition: *flip to strict once its rows read zero, and do not widen
+the tolerance to get there.* They read zero, and the tolerances are unchanged from the day the page
+arrived — 1.5 px overlap, 1.0 px clip, 8.5 px legibility floor. The sweep was paid, not the
+threshold.
+
+Keep that set empty. A page added to it is a page that stops being enforced.
+
+### What the sweep actually taught
+
+Twenty-seven distinct defects, and **not one was a crowded drawing**. Each was a coordinate that
+was correct when it was typed and stopped being correct when something near it changed. The
+recurring shapes, in the order they cost the most time:
+
+1. **A helper drew a label the author never wrote.** `symNozzle()` emits its own `NZ` caption at
+   `cy+20`; the BACnet bullet was drawn above its own circle. Neither is visible when reading the
+   diagram code, because the diagram code does not mention them.
+2. **A container outgrew its frame by one unit.** A pipe-rack frame ended at y=691 in a 690-tall
+   viewBox. Its contents were fine.
+3. **An element parked at the origin.** Flow dots with a *positive* `animateMotion begin` sit at
+   `(0,0)` until their delay elapses, because `animateMotion` translates from the element's own
+   position and they carry no `cx`/`cy`.
+4. **A column that fit until the widest value arrived.** The chiller grid's value column met its
+   longest label at `px+28` vs `px+29.4`.
+5. **Moving one label onto another.** Raising the AHU caption off a room put it on the line above.
+   This is why placement is a *search over the occupancy index*, not an offset: a nudge chosen by
+   hand only knows about the collision it was asked to fix.
+
+`getBBox` will not find any of these — it excludes stroke and ignores the transform
+`animateMotion` applies, and it reported **zero** while the gate reported three. Use
+`tools/probe-clipped-elements.mjs`, which asks the browser the same question the gate does and
+then names the element.
+
+---
 
 **Correction (v3.10.7).** An earlier revision of this section claimed the geometry survey does
 not reach the Track B cockpits, on the grounds that `TAB_SETS` names only `datahallAI.html`.
