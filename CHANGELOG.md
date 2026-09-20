@@ -11,6 +11,117 @@ release sections rather than semver.
 
 ---
 
+## v3.9.0 — 2026-09-20
+
+### The whole portrait, on every screen, in every theme
+
+New photographs on the homepage: the studio portrait in **dark and rainbow**, the office portrait
+in **day**. The owner's constraint was the interesting part — *"jangan sampai terpotong atau tidak
+proportional … bisa di compressed cdn tapi jangan sampai pecah utk display laptop atau mobile"* —
+because the frames the photo sits in do not agree on a shape.
+
+Measured before touching anything: the bento photo card takes its height from the bento row, so it
+renders **315x431 on desktop, 205x399 on tablet and 310x224 on a phone** while both new portraits
+are 0.949. The card's `object-fit: cover` would therefore have cut **31% of the height on a phone
+and 46% of the width on a tablet** — and the old photos, being taller, had been hiding how much
+that rule actually cuts.
+
+### Changed
+
+- **The card is a portrait frame now** (`aspect-ratio: 4/5`, `align-self: start`) instead of
+  whatever shape the row left over. Contain inside a box far from the source aspect means a blurred
+  band taller than the photo itself — on a tablet that was 55% of the card. At 4:5 it is under 16%
+  at every width, and the face is the biggest thing on the card.
+- **`.rz-photo-frame` — the house blur-letterbox, in CSS** (`js/rz-hero-fit.js` owns calculator
+  heroes; this is the same contract inside an existing card). The sharp layer is `object-fit:
+  contain` — the whole photo, never stretched — and the space around it is filled by a blurred copy
+  of the same photo, `aria-hidden` with an empty alt. Both stylesheets, per the 2-stylesheet rule.
+- **The About portrait is theme-aware too**, and the site-wide avatar (180 pages) plus the share
+  card now carry the new face.
+
+### Added
+
+- **`tools/build-profile-photos.py`** — one place where the derivation lives. AVIF + WebP + JPEG at
+  320/480/640/960/master, never upscaled, Lanczos + a light unsharp so a 1,200 px portrait reduced
+  to 320 px does not go soft on a phone. The avatar is the one deliberate crop — a 40 px circle IS
+  a crop — cut as a face-centred square from an OpenCV face box, not by eye.
+- **`tools/test-index-profile-photo.mjs`** — the brief, made executable. At 4 viewports x {light,
+  dark, rainbow}: the right face per theme (rainbow rides `data-theme="dark"`, so it needs no rule
+  of its own), `object-fit: contain` with a blur sibling, rendered aspect within 1% of the master,
+  **the rung the browser actually picked at least as wide as box x dpr**, a byte budget per rung,
+  and width/height attributes that match what loads. Proven RED against the pre-change page.
+- `standarization/UI_FEATURES_STANDARD.md` Feature 35 records the pattern.
+
+### Note on measuring the right thing
+
+The gate's first draft read `naturalWidth` to decide whether the browser had picked a sharp enough
+file, and failed every viewport: with `w` descriptors the UA reports a **density-corrected**
+intrinsic size, so a 640 px file chosen at 2.08x reports 307. `naturalWidth` measures the layout,
+not the pixels delivered — the rung has to be read from the file the browser fetched.
+
+Delivered: phone at dpr 3 takes the 960 rung at **16 KB** (AVIF), tablet the 480 rung, desktop and
+laptop the 640 rung.
+
+---
+
+## v3.8.1 — 2026-09-20
+
+### Floors are navigation, not equipment
+
+`#bldgSvg` carried **111 label collisions per view**, the worst diagram on the site. It is now
+**30**, with nothing lost: every label that left is either reproduced in a spec card under the
+drawing, already drawn on the floor plan one click away, or an ordinal on a glyph the drawing
+declares representative.
+
+The decomposition was measured before anything moved:
+
+| measurement | result | what it ruled out |
+|---|---|---|
+| collisions within one floor vs across floors | **111 / 0** | per-floor level-of-detail |
+| collisions if the zone caption stack leaves | **111 → 42** | — this was the lever |
+| collisions between members of a repeated array | **2** | "label only the ends of a run" |
+| free margin inside the viewBox | **1 px** | leader lines outside the footprint |
+| three captions moved onto the floor plane, forward | **127 → 124**, each into a *new* collision | nudging |
+
+The cause is projection: an equipment box three units tall projects up-screen into exactly the band
+a floating zone caption occupies. There is no free position inside the drawing, which is why two
+separate nudging experiments traded collisions instead of removing them — both were reverted rather
+than shipped.
+
+### Changed
+
+- **Twelve zone specification lines left the SVG and became six spec cards below it.** This is not a
+  new idea on this page: `standarization/DATAHALL_AI_STANDARD.md` states the rule for the rack
+  drawing — *"Spec tables live in the HTML cards below the drawing, not in the SVG"* — and
+  `datahallAI.html:8232` records the same migration being done there in v2.12.0. The cards reuse the
+  existing `mc()` helper and the existing `dh-specwrap` markup; no new card system was written.
+  Every `bo(...)` hook moved with its line, verified rather than assumed: the registry's R8 rendered
+  reads are **241/283 before and 241/283 after**.
+- **Forty-three equipment tags left the isometric.** Each one is drawn on the floor plan that the
+  same drawing links to — `ATS-*`, `BAT-*`, `TX-*`, `MSB-*`, `UPS-*`, `DT-*`, `AHU-*`, `N1–N4`,
+  `IDF`, `OPS`, `RMU`, `VCB` — at 12 px instead of 7. The 3D boxes stay; only the duplicate text
+  goes. The standard already said what this drawing is for: *"bldgSvg (floors are navigation, not
+  equipment)"*.
+- **Representative glyph ordinals dropped** — `BANK1–6`, `CH-B1–8`, `DC-B1–8`, `VRF×4`. The drawing
+  never had one glyph per installed unit, and the card now says so in writing; an ordinal on a
+  glyph that stands for a pool names nothing.
+
+Labels on the isometric: **200 → 114**. Clipping 0, no label under the legibility floor, smallest
+12 px.
+
+`tools/test-conv-geometry.mjs` reports 30 on the isometric in every one of its eight
+viewport/theme combinations, and the page's monitor total falls **786 → 723** (collisions 746 →
+674). `audit-legibility --strict` stays PASS across 179 pages.
+
+### Not done
+
+30 is not 0. The remainder is a long tail with no dominant offender — the worst is `BD`, a 10 px
+label, at 8 hits — and it is zone titles meeting the few tags that exist only here (`BT`, `BD`,
+`RPP`). Clearing it means re-laying out the isometric, which is a drawing decision rather than a
+defect fix, and two measured attempts show that moving a label in a saturated drawing buys nothing.
+
+---
+
 ## v3.8.0 — 2026-09-20
 
 ### The roof spends no water it does not have
