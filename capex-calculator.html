@@ -930,7 +930,7 @@ button[onclick^="setPreset"] { background:#166534 !important; border-color:#1665
 :root:not([data-theme="dark"]) #uncertaintyPanel > div { color:#495057 !important; }
 [data-theme="dark"] #uncP90 { color:#f87171 !important; }
 </style>
-    <script src="js/rz-version.js?v=20260920-be4a4559" defer></script>
+    <script src="js/rz-version.js?v=20260920-b4790053" defer></script>
     <script src="js/rz-calc-utils.js?v=20260920-ef3425ae" defer></script>
     <script src="js/rz-explain-db.js?v=20260920-726727d9" defer></script>
     <script src="js/rz-explain.js?v=20260920-d0317658" defer></script>
@@ -3201,11 +3201,11 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                         '<div style="flex:1;">' +
                             '<div style="font-size:10px;font-weight:700;color:#059669;margin-bottom:6px;">SCENARIO B</div>' +
                             '<div style="display:flex;gap:8px;">' +
-                                '<div style="' + cardS + 'background:#ecfdf5;border:1px solid #a7f3d0;"><div style="' + lblS + 'color:#065f46;">Racks</div><div style="' + valS + 'color:#059669;">' + racks + '</div><div style="' + subS + '">' + result.itLoad.toLocaleString() + ' kW</div></div>' +
-                                '<div style="' + cardS + 'background:#ecfdf5;border:1px solid #a7f3d0;"><div style="' + lblS + 'color:#065f46;">White Space</div><div style="' + valS + 'color:#059669;">' + floorM2.toLocaleString() + ' m²</div><div style="' + subS + '">~' + Math.ceil(floorM2*1.8).toLocaleString() + ' m² gross</div></div>' +
-                                '<div style="' + cardS + 'background:#ecfdf5;border:1px solid #a7f3d0;"><div style="' + lblS + 'color:#065f46;">Build Time</div><div style="' + valS + 'color:#059669;">' + totalMonths + ' mo</div><div style="' + subS + '">Design to COD</div></div>' +
-                                '<div style="' + cardS + 'background:#ecfdf5;border:1px solid #a7f3d0;"><div style="' + lblS + 'color:#065f46;">$/kW</div><div style="' + valS + 'color:#059669;">$' + Math.round(result.total/result.itLoad).toLocaleString() + '</div><div style="' + subS + '">' + (result.total/1e6).toFixed(1) + 'M total</div></div>' +
-                                '<div style="' + cardS + 'background:#ecfdf5;border:1px solid #a7f3d0;"><div style="' + lblS + 'color:#065f46;">Energy</div><div style="' + valS + 'color:#059669;">' + (annualMWh/1000).toFixed(1) + ' GWh</div><div style="' + subS + '">PUE ' + result.pue.toFixed(2) + '</div></div>' +
+                                '<div style="' + cardS + 'background: rgba(16, 185, 129, 0.10);border:1px solid #a7f3d0;"><div style="' + lblS + 'color:#065f46;">Racks</div><div style="' + valS + 'color:#059669;">' + racks + '</div><div style="' + subS + '">' + result.itLoad.toLocaleString() + ' kW</div></div>' +
+                                '<div style="' + cardS + 'background: rgba(16, 185, 129, 0.10);border:1px solid #a7f3d0;"><div style="' + lblS + 'color:#065f46;">White Space</div><div style="' + valS + 'color:#059669;">' + floorM2.toLocaleString() + ' m²</div><div style="' + subS + '">~' + Math.ceil(floorM2*1.8).toLocaleString() + ' m² gross</div></div>' +
+                                '<div style="' + cardS + 'background: rgba(16, 185, 129, 0.10);border:1px solid #a7f3d0;"><div style="' + lblS + 'color:#065f46;">Build Time</div><div style="' + valS + 'color:#059669;">' + totalMonths + ' mo</div><div style="' + subS + '">Design to COD</div></div>' +
+                                '<div style="' + cardS + 'background: rgba(16, 185, 129, 0.10);border:1px solid #a7f3d0;"><div style="' + lblS + 'color:#065f46;">$/kW</div><div style="' + valS + 'color:#059669;">$' + Math.round(result.total/result.itLoad).toLocaleString() + '</div><div style="' + subS + '">' + (result.total/1e6).toFixed(1) + 'M total</div></div>' +
+                                '<div style="' + cardS + 'background: rgba(16, 185, 129, 0.10);border:1px solid #a7f3d0;"><div style="' + lblS + 'color:#065f46;">Energy</div><div style="' + valS + 'color:#059669;">' + (annualMWh/1000).toFixed(1) + ' GWh</div><div style="' + subS + '">PUE ' + result.pue.toFixed(2) + '</div></div>' +
                             '</div>' +
                         '</div>' +
                     '</div>';
@@ -3563,7 +3563,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                 const delta = ((total - savedA.total) / savedA.total * 100);
                 const sign = delta >= 0 ? '+' : '';
                 const perKwA = savedA.total / savedA.itLoad;
-                compNarrative = '<div style="background:#f0fdf4;border:1px solid #a7f3d0;border-radius:10px;padding:14px;margin-bottom:14px;">' +
+                compNarrative = '<div style="background: rgba(16, 185, 129, 0.08);border:1px solid #a7f3d0;border-radius:10px;padding:14px;margin-bottom:14px;">' +
                     '<div style="font-size:12px;font-weight:700;color:#065f46;margin-bottom:6px;">Scenario Comparison Insight</div>' +
                     '<p style="font-size:11px;line-height:1.6;color:#374151;margin:0 0 6px;">' +
                     'Scenario B (' + formatCurrency(total) + ', $' + Math.round(perKW).toLocaleString() + '/kW) is <strong>' + sign + delta.toFixed(1) + '%</strong> (' + sign + formatCurrency(total - savedA.total) + ') ' + (delta >= 0 ? 'higher' : 'lower') + ' than Scenario A (' + formatCurrency(savedA.total) + ', $' + Math.round(perKwA).toLocaleString() + '/kW).</p>' +
@@ -4152,7 +4152,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
                     </div>
                     ${savedScenario ? `
                     <div style="display:flex;gap:12px;text-align:right;">
-                        <div style="padding:6px 12px;background:#fef3c7;border-radius:8px;"><div style="font-size:9px;color:#92400e;text-transform:uppercase;font-weight:700;">Scenario A</div><div style="font-size:18px;font-weight:700;color:#d97706;font-family:monospace;">${formatCurrency(savedScenario.total)}</div><div style="font-size:10px;color:#94a3b8;">${formatCurrency(savedScenario.total/savedScenario.itLoad)}/kW</div></div>
+                        <div style="padding:6px 12px;background: rgba(245, 158, 11, 0.12);border-radius:8px;"><div style="font-size:9px;color:#92400e;text-transform:uppercase;font-weight:700;">Scenario A</div><div style="font-size:18px;font-weight:700;color:#d97706;font-family:monospace;">${formatCurrency(savedScenario.total)}</div><div style="font-size:10px;color:#94a3b8;">${formatCurrency(savedScenario.total/savedScenario.itLoad)}/kW</div></div>
                         <div style="padding:6px 12px;background:#d1fae5;border-radius:8px;"><div style="font-size:9px;color:#065f46;text-transform:uppercase;font-weight:700;">Scenario B</div><div style="font-size:18px;font-weight:700;color:#059669;font-family:monospace;">${formatCurrency(result.total)}</div><div style="font-size:10px;color:#94a3b8;">${formatCurrency(result.total/result.itLoad)}/kW</div></div>
                     </div>` : `
                     <div style="text-align:right;">

@@ -230,6 +230,23 @@ const RULES = [
       return (/#8b5cf6|#a78bfa|rgba?\(\s*139\s*,\s*92\s*,\s*246\s*[,)]|rgba?\(\s*167\s*,\s*139\s*,\s*250\s*[,)]/i.test(scrubbed))
         ? "Anthropic-purple (#8B5CF6 / #A78BFA, in any notation) — use a semantic token / mint #7DDDB4" : null;
     } },
+  { id: "framework-swatch-fill",
+    /* v3.9.9 — §A15's default palette, as a FILL. v3.6.0 swept these out of fifty files, but only
+       where they lived in a rule that sweep looked at: 236 survived in page-level <style> blocks
+       and inline attributes across 46 pages, article-27 among them — the page the owner had open
+       when he said "masih banyak ai design slop lihat itu kotak highlight biru, orange dll".
+       The render audit only sees them once a browser paints them; this sees them in the source.
+       A TEXT colour is not the offence (light green ink on a dark ground is legitimate and the
+       contrast work depends on it) — the banned thing is the filled tint box, so the rule reads
+       only background and border declarations. */
+    test: (t) => {
+      const BANNED = "dcfce7|dbeafe|f0fdf4|ecfdf5|fff7ed|fef3c7|fee2e2|e0e7ff|fce7f3|ede9fe|86efac|6ee7b7|fdba74|fcd34d";
+      const re = new RegExp(String.raw`(background(?:-color)?|border(?:-color|-top|-bottom|-left|-right)?)\s*:\s*[^;"'}]*?#(${BANNED})\b`, "i");
+      const hit = re.exec(String(t));
+      return hit
+        ? `default framework swatch #${hit[2]} as a ${hit[1].toLowerCase()} fill — use a low-alpha tint of the page's own semantic token`
+        : null;
+    } },
   { id: "emoji-ui-icon",
     // Decorative PICTOGRAPH emoji as UI icons/headings/badges (sign #5). Whitelisted (kept): 🔒/🔓 lock
     // (gated-feature affordance), ⚠ warn, ⚡ energy, ★☆⭐ rating, regional-indicator FLAGS (country data),

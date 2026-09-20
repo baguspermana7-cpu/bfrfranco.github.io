@@ -80,7 +80,7 @@
       'margin-bottom:2px}' +
     '.rz-inspector-dep-v{font-family:JetBrains Mono,monospace;font-size:12px;color:#e2e8f0;font-weight:600}' +
     '.rz-inspector-pulse{display:inline-block;width:6px;height:6px;border-radius:50%;' +
-      'background:#86efac;margin-right:6px;vertical-align:middle;animation:rzPulse 1.8s ease-in-out infinite}' +
+      'background: rgba(16, 185, 129, 0.28);margin-right:6px;vertical-align:middle;animation:rzPulse 1.8s ease-in-out infinite}' +
     '@keyframes rzPulse{0%,100%{opacity:.4}50%{opacity:1}}' +
     /* v1.45.0 — payload mode (Track A §A5) */
     '.rz-inspector-chip{display:inline-block;margin:6px 0 0;padding:2px 8px;border-radius:999px;font-family:JetBrains Mono,monospace;font-size:10px;font-weight:600;letter-spacing:.04em;border:1px solid rgba(255,255,255,0.18);color:#e2e8f0}' +

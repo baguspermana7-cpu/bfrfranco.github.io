@@ -94,7 +94,7 @@
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="styles.min.css?v=20260920-ef49449f">
+    <link rel="stylesheet" href="styles.min.css?v=20260920-37a46bce">
     <link rel="preload" as="image" href="assets/article-23-hero.webp">
 
     <!-- Structured Data: TechnicalArticle -->
@@ -299,7 +299,7 @@
             margin-top: 2.5rem;
         }
         .article-body h3 { color: #78350f; }
-        [data-theme="dark"] .article-body h2 { color: #fcd34d; border-color: #b45309; border-bottom:none; padding-bottom:0; }
+        [data-theme="dark"] .article-body h2 { color: #fcd34d; border-color: #b45309; border-bottom: none; padding-bottom:0; }
         [data-theme="dark"] .article-body h3 { color: #fde68a; }
 
         /* Quote callout */
@@ -435,7 +435,7 @@
             top: 0;
             bottom: 0;
             width: 3px;
-            background: linear-gradient(to bottom, #b45309, #fcd34d);
+            background: linear-gradient(to bottom, #b45309, rgba(245, 158, 11, 0.30));
             border-radius: 2px;
         }
         .col-timeline-item {
@@ -453,7 +453,7 @@
             height: 12px;
             border-radius: 50%;
             background: #b45309;
-            border: 2px solid #fcd34d;
+            border: 2px solid rgba(245, 158, 11, 0.48);
         }
         .col-timeline-date {
             font-weight: 700;
@@ -694,7 +694,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
 [data-theme="dark"] .col-card-stat span:last-child { color:#fbbf24 !important; }
 [data-theme="dark"] .col-card-stat span:first-child { color:#94a3b8 !important; }
 </style>
-    <script src="js/rz-version.js?v=20260920-be4a4559" defer></script>
+    <script src="js/rz-version.js?v=20260920-b4790053" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260920-b64c1545" defer></script>
     <script src="js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
     <script>(function(){var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t);})();</script>
@@ -703,7 +703,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
 <!-- Scroll Progress Bar -->
-<div class="scroll-progress-container"><div class="scroll-progress-bar" id="scrollProgress" style="background: linear-gradient(90deg, #b45309, #fcd34d);"></div></div>
+<div class="scroll-progress-container"><div class="scroll-progress-bar" id="scrollProgress" style="background: linear-gradient(90deg, #b45309, rgba(245, 158, 11, 0.30));"></div></div>
 
 <!-- TOC Sidebar -->
 <aside class="toc-sidebar" id="tocSidebar"><ul class="toc-sidebar-list" id="tocSidebarList"></ul></aside>
@@ -1282,26 +1282,26 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
 
         <div class="col-calc-grid">
             <!-- Input Panel -->
-            <div class="col-input-panel" style="background:#0f172a;border-radius:12px;padding:1.25rem;display:grid;grid-template-columns:repeat(4,1fr);gap:0.6rem;">
+            <div class="col-input-panel" style="background: #0f172a;border-radius:12px;padding:1.25rem;display:grid;grid-template-columns:repeat(4,1fr);gap:0.6rem;">
                 <div class="col-input-group">
                     <label style="color:#94a3b8;font-size:0.7rem;font-weight:600;display:block;margin-bottom:0.2rem;">GPU Count <span class="col-tip" title="Total number of GPUs in your cluster" style="cursor:help;color:#64748b;">?</span></label>
-                    <input type="number" id="colGpuCount" value="100000" min="1000" max="1000000" step="1000" style="width:100%;padding:0.45rem 0.6rem;background:#1e293b;border:1px solid #334155;border-radius:8px;color:#f1f5f9;font-size:0.82rem;" aria-label="Col GPU Count">
+                    <input type="number" id="colGpuCount" value="100000" min="1000" max="1000000" step="1000" style="width:100%;padding:0.45rem 0.6rem;background: #1e293b;border: 1px solid #334155;border-radius:8px;color:#f1f5f9;font-size:0.82rem;" aria-label="Col GPU Count">
                 </div>
                 <div class="col-input-group">
                     <label style="color:#94a3b8;font-size:0.7rem;font-weight:600;display:block;margin-bottom:0.2rem;">Target Power Capacity (MW) <span class="col-tip" title="Total facility power draw in megawatts" style="cursor:help;color:#64748b;">?</span></label>
-                    <input type="number" id="colPowerMW" value="150" min="10" max="2000" step="10" style="width:100%;padding:0.45rem 0.6rem;background:#1e293b;border:1px solid #334155;border-radius:8px;color:#f1f5f9;font-size:0.82rem;" aria-label="Col Power MW">
+                    <input type="number" id="colPowerMW" value="150" min="10" max="2000" step="10" style="width:100%;padding:0.45rem 0.6rem;background: #1e293b;border: 1px solid #334155;border-radius:8px;color:#f1f5f9;font-size:0.82rem;" aria-label="Col Power MW">
                 </div>
                 <div class="col-input-group">
                     <label style="color:#94a3b8;font-size:0.7rem;font-weight:600;display:block;margin-bottom:0.2rem;">Build Timeline (Days) <span class="col-tip" title="Total construction + commissioning time" style="cursor:help;color:#64748b;">?</span></label>
-                    <input type="number" id="colBuildDays" value="365" min="30" max="1095" step="1" style="width:100%;padding:0.45rem 0.6rem;background:#1e293b;border:1px solid #334155;border-radius:8px;color:#f1f5f9;font-size:0.82rem;" aria-label="Col Build Days">
+                    <input type="number" id="colBuildDays" value="365" min="30" max="1095" step="1" style="width:100%;padding:0.45rem 0.6rem;background: #1e293b;border: 1px solid #334155;border-radius:8px;color:#f1f5f9;font-size:0.82rem;" aria-label="Col Build Days">
                 </div>
                 <div class="col-input-group">
                     <label style="color:#94a3b8;font-size:0.7rem;font-weight:600;display:block;margin-bottom:0.2rem;">Cost per GPU (USD) <span class="col-tip" title="Unit cost per GPU including installation" style="cursor:help;color:#64748b;">?</span></label>
-                    <input type="number" id="colCostPerGPU" value="30000" min="10000" max="100000" step="1000" style="width:100%;padding:0.45rem 0.6rem;background:#1e293b;border:1px solid #334155;border-radius:8px;color:#f1f5f9;font-size:0.82rem;" aria-label="Col Cost Per GPU">
+                    <input type="number" id="colCostPerGPU" value="30000" min="10000" max="100000" step="1000" style="width:100%;padding:0.45rem 0.6rem;background: #1e293b;border: 1px solid #334155;border-radius:8px;color:#f1f5f9;font-size:0.82rem;" aria-label="Col Cost Per GPU">
                 </div>
                 <div class="col-input-group">
                     <label style="color:#94a3b8;font-size:0.7rem;font-weight:600;display:block;margin-bottom:0.2rem;">Cooling Type <span class="col-tip" title="Primary cooling methodology" style="cursor:help;color:#64748b;">?</span></label>
-                    <select id="colCoolingType" style="width:100%;padding:0.45rem 0.6rem;background:#1e293b;border:1px solid #334155;border-radius:8px;color:#f1f5f9;font-size:0.82rem;" aria-label="Col Cooling Type">
+                    <select id="colCoolingType" style="width:100%;padding:0.45rem 0.6rem;background: #1e293b;border: 1px solid #334155;border-radius:8px;color:#f1f5f9;font-size:0.82rem;" aria-label="Col Cooling Type">
                         <option value="air">Air Only</option>
                         <option value="liquid">Liquid Only</option>
                         <option value="hybrid" selected>Hybrid</option>
@@ -1309,7 +1309,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
                 </div>
                 <div class="col-input-group">
                     <label style="color:#94a3b8;font-size:0.7rem;font-weight:600;display:block;margin-bottom:0.2rem;">Building Type <span class="col-tip" title="Construction approach" style="cursor:help;color:#64748b;">?</span></label>
-                    <select id="colBuildingType" style="width:100%;padding:0.45rem 0.6rem;background:#1e293b;border:1px solid #334155;border-radius:8px;color:#f1f5f9;font-size:0.82rem;" aria-label="Col Building Type">
+                    <select id="colBuildingType" style="width:100%;padding:0.45rem 0.6rem;background: #1e293b;border: 1px solid #334155;border-radius:8px;color:#f1f5f9;font-size:0.82rem;" aria-label="Col Building Type">
                         <option value="new">New Construction</option>
                         <option value="retrofit" selected>Retrofit Existing</option>
                         <option value="modular">Modular</option>
@@ -1317,53 +1317,53 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
                 </div>
                 <div class="col-input-group">
                     <label style="color:#94a3b8;font-size:0.7rem;font-weight:600;display:block;margin-bottom:0.2rem;">Location Power Cost ($/kWh) <span class="col-tip" title="Local electricity rate" style="cursor:help;color:#64748b;">?</span></label>
-                    <input type="number" id="colPowerCost" value="0.06" min="0.02" max="0.30" step="0.01" style="width:100%;padding:0.45rem 0.6rem;background:#1e293b;border:1px solid #334155;border-radius:8px;color:#f1f5f9;font-size:0.82rem;" aria-label="Col Power Cost">
+                    <input type="number" id="colPowerCost" value="0.06" min="0.02" max="0.30" step="0.01" style="width:100%;padding:0.45rem 0.6rem;background: #1e293b;border: 1px solid #334155;border-radius:8px;color:#f1f5f9;font-size:0.82rem;" aria-label="Col Power Cost">
                 </div>
                 <div class="col-input-group">
                     <label style="color:#94a3b8;font-size:0.7rem;font-weight:600;display:block;margin-bottom:0.2rem;">Cooling PUE <span class="col-tip" title="Power Usage Effectiveness ratio" style="cursor:help;color:#64748b;">?</span></label>
-                    <input type="number" id="colPUE" value="1.3" min="1.05" max="2.0" step="0.05" style="width:100%;padding:0.45rem 0.6rem;background:#1e293b;border:1px solid #334155;border-radius:8px;color:#f1f5f9;font-size:0.82rem;" aria-label="Col PUE">
+                    <input type="number" id="colPUE" value="1.3" min="1.05" max="2.0" step="0.05" style="width:100%;padding:0.45rem 0.6rem;background: #1e293b;border: 1px solid #334155;border-radius:8px;color:#f1f5f9;font-size:0.82rem;" aria-label="Col PUE">
                 </div>
-                <button class="col-calc-btn" onclick="colCalculate()" style="width:100%;padding:0.75rem;background:linear-gradient(135deg,#b45309,#b45309);color:#fff;border:none;border-radius:8px;font-weight:700;font-size:0.95rem;cursor:pointer;margin-top:0.5rem;transition:opacity 0.2s;"><i class="fas fa-bolt"></i> Analyze Build</button>
-                <button class="col-reset-btn" onclick="colReset()" style="width:100%;padding:0.6rem;background:transparent;color:#94a3b8;border:1px solid #334155;border-radius:8px;font-size:0.85rem;cursor:pointer;transition:border-color 0.2s;">Reset to Defaults</button>
+                <button class="col-calc-btn" onclick="colCalculate()" style="width:100%;padding:0.75rem;background: linear-gradient(135deg,#b45309,#b45309);color:#fff;border: none;border-radius:8px;font-weight:700;font-size:0.95rem;cursor:pointer;margin-top:0.5rem;transition:opacity 0.2s;"><i class="fas fa-bolt"></i> Analyze Build</button>
+                <button class="col-reset-btn" onclick="colReset()" style="width:100%;padding:0.6rem;background: transparent;color:#94a3b8;border: 1px solid #334155;border-radius:8px;font-size:0.85rem;cursor:pointer;transition:border-color 0.2s;">Reset to Defaults</button>
             </div>
 
             <!-- Results Panel -->
             <div class="col-results-panel" style="display:grid;gap:0.75rem;">
                 <div class="col-kpi-grid" id="colKpiGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;">
-                    <div class="col-kpi-card" style="background:#1e293b;border-radius:8px;padding:0.65rem;text-align:center;border:1px solid #334155;">
+                    <div class="col-kpi-card" style="background: #1e293b;border-radius:8px;padding:0.65rem;text-align:center;border: 1px solid #334155;">
                         <div class="col-kpi-label" style="color:#94a3b8;font-size:0.6rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Total GPU Cost</div>
                         <div class="col-kpi-value" id="colKpiGpuCost" style="color:#d97706;font-size:1.15rem;font-weight:800;margin:0.25rem 0;">--</div>
                     </div>
-                    <div class="col-kpi-card" style="background:#1e293b;border-radius:8px;padding:0.65rem;text-align:center;border:1px solid #334155;">
+                    <div class="col-kpi-card" style="background: #1e293b;border-radius:8px;padding:0.65rem;text-align:center;border: 1px solid #334155;">
                         <div class="col-kpi-label" style="color:#94a3b8;font-size:0.6rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Annual Power Cost</div>
                         <div class="col-kpi-value" id="colKpiAnnualPower" style="color:#d97706;font-size:1.15rem;font-weight:800;margin:0.25rem 0;">--</div>
                     </div>
-                    <div class="col-kpi-card" style="background:#1e293b;border-radius:8px;padding:0.65rem;text-align:center;border:1px solid #334155;">
+                    <div class="col-kpi-card" style="background: #1e293b;border-radius:8px;padding:0.65rem;text-align:center;border: 1px solid #334155;">
                         <div class="col-kpi-label" style="color:#94a3b8;font-size:0.6rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Speed vs Colossus</div>
                         <div class="col-kpi-value" id="colKpiSpeed" style="color:#d97706;font-size:1.15rem;font-weight:800;margin:0.25rem 0;">--</div>
                     </div>
-                    <div class="col-kpi-card" style="background:#1e293b;border-radius:8px;padding:0.65rem;text-align:center;border:1px solid #334155;">
+                    <div class="col-kpi-card" style="background: #1e293b;border-radius:8px;padding:0.65rem;text-align:center;border: 1px solid #334155;">
                         <div class="col-kpi-label" style="color:#94a3b8;font-size:0.6rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Power per GPU</div>
                         <div class="col-kpi-value" id="colKpiPowerPerGpu" style="color:#d97706;font-size:1.15rem;font-weight:800;margin:0.25rem 0;">--</div>
                     </div>
-                    <div class="col-kpi-card" style="background:#1e293b;border-radius:8px;padding:0.65rem;text-align:center;border:1px solid #334155;">
+                    <div class="col-kpi-card" style="background: #1e293b;border-radius:8px;padding:0.65rem;text-align:center;border: 1px solid #334155;">
                         <div class="col-kpi-label" style="color:#94a3b8;font-size:0.6rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">Total IT Power</div>
                         <div class="col-kpi-value" id="colKpiITPower" style="color:#d97706;font-size:1.15rem;font-weight:800;margin:0.25rem 0;">--</div>
                     </div>
-                    <div class="col-kpi-card" style="background:#1e293b;border-radius:8px;padding:0.65rem;text-align:center;border:1px solid #334155;">
+                    <div class="col-kpi-card" style="background: #1e293b;border-radius:8px;padding:0.65rem;text-align:center;border: 1px solid #334155;">
                         <div class="col-kpi-label" style="color:#94a3b8;font-size:0.6rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;">5-Year TCO</div>
                         <div class="col-kpi-value" id="colKpiTCO" style="color:#d97706;font-size:1.15rem;font-weight:800;margin:0.25rem 0;">--</div>
                     </div>
                 </div>
 
                 <!-- Dynamic Narrative -->
-                <div class="col-narrative" id="colNarrative" style="background:#1e293b;border-radius:8px;padding:0.75rem;border-left:4px solid #b45309;color:#cbd5e1;font-size:0.8rem;line-height:1.6;">
+                <div class="col-narrative" id="colNarrative" style="background: #1e293b;border-radius:8px;padding:0.75rem;border-left: 4px solid #b45309;color:#cbd5e1;font-size:0.8rem;line-height:1.6;">
                     <p>Configure your build parameters and click <strong>Analyze Build</strong> to compare against the xAI Colossus benchmark. The analyzer will calculate total costs, power efficiency, and build speed relative to the 122-day reference point.</p>
                 </div>
             </div>
         </div>
 
-        <div class="col-disclaimer" style="margin-top:0.75rem;padding:0.75rem;background:#0f172a;border-radius:8px;color:#64748b;font-size:0.75rem;line-height:1.5;">
+        <div class="col-disclaimer" style="margin-top:0.75rem;padding:0.75rem;background: #0f172a;border-radius:8px;color:#64748b;font-size:0.75rem;line-height:1.5;">
             <strong>Disclaimer:</strong> This calculator provides engineering estimates based on publicly available data and industry benchmarks. Actual costs vary significantly by vendor negotiations, site conditions, labor market, and regulatory environment. GPU costs reflect approximate H100/H200 pricing at scale. Infrastructure cost estimate uses $8M per MW as an industry average. Not intended for financial or procurement decisions &mdash; consult engineering firms and vendors for production estimates.
         </div>
     </div>
@@ -1536,7 +1536,7 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
 </article>
 
                 <!-- Independence Disclaimer -->
-                <div style="margin:2rem 0 0;padding:1rem 0;border-top:1px solid rgba(255,255,255,0.06);text-align:center;">
+                <div style="margin:2rem 0 0;padding:1rem 0;border-top: 1px solid rgba(255,255,255,0.06);text-align:center;">
                     <p style="font-size:0.72rem;color:#64748b;font-style:italic;line-height:1.6;margin:0;">All content on ResistanceZero is independent personal research derived from publicly available sources. This site does not represent any current or former employer. <a href="terms.html" style="color:#64748b;">Terms &amp; Disclaimer</a></p>
                 </div>
 

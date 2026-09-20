@@ -11,6 +11,52 @@ release sections rather than semver.
 
 ---
 
+## v3.10.1 — 2026-09-20
+
+### 240 framework swatches the v3.6.0 sweep could not reach
+
+A full render audit of the representative page set turned up the owner's oldest complaint again, on
+a page he had already named. `article-27.html` — the page he had open when he said *"masih banyak
+ai design slop lihat itu kotak highlight biru, orange dll"* — still carried nine of the banned
+default tints. So did 45 other pages.
+
+The v3.6.0 sweep cleared `#dcfce7 #dbeafe #f0fdf4 #ecfdf5 #fff7ed #fef3c7 #86efac #6ee7b7 #fdba74
+#fcd34d` from fifty files, but **only where they lived in a stylesheet rule that sweep looked at**.
+240 survived: in page-level `<style>` blocks, inside gradient stops, and in two modules that author
+their CSS as a JavaScript string.
+
+### Changed
+
+- **Every banned swatch used as a FILL is now a low-alpha tint of the page's own semantic token** —
+  green stays green, amber stays amber, red stays red — so a severity ramp keeps its meaning and
+  only the framework default disappears. An alpha tint also repairs these pills in **dark mode**,
+  where a fixed light hex was a bright box on a dark ground; that is the half v3.6.0's editorial
+  fix could never reach, because it activates only under `[data-theme="dark"]`.
+- A **text** colour is deliberately left alone. Light green ink on a dark ground is legitimate and
+  the contrast work depends on it; the banned thing is the filled tint box.
+
+### Added
+
+- **`tools/sweep-framework-swatches.py`** — the mapping, written down and repeatable.
+- **`audit-vibecode.mjs` gains `framework-swatch-fill`**, reading `background`/`border`
+  declarations in source. The render audit only sees these once a browser paints them, which is why
+  they survived two sweeps; this one sees them in the file. STRICT, and green.
+
+### Also
+
+- `account.html` pointed its favicon at `assets/favicon.ico`, which does not exist — repointed at
+  `assets/favicon-32.png`, the file the rest of the site uses. A scan for broken local references
+  found exactly one other, and it is deliberate: the spares hero image is an optional slot whose
+  `onerror` removes its own band.
+
+### A note on the first cut
+
+The sweep's first pass rebuilt every `background`/`border` declaration it matched, whitespace and
+all, which rewrote 52 lines of `js/rz-inspector.js` to change one colour. A diff that large hides
+the edit inside it. It now leaves a declaration that carries no banned swatch byte-identical.
+
+---
+
 ## v3.10.0 — 2026-09-20
 
 ### Measured, not guessed — a diagram engine for the cockpit drawings
