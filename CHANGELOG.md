@@ -11,6 +11,76 @@ release sections rather than semver.
 
 ---
 
+## v3.10.18 — 2026-09-20
+
+### Four of my own audit findings were measurement artifacts
+
+Working the SEO ledger down, four rows did not survive being re-measured. They are recorded because
+the mistakes are the same class the site's gates exist to prevent — a count taken without asking
+what it counts:
+
+| claimed | truth | what was wrong |
+|---|---|---|
+| 7 orphan pages | **0** | hrefs compared as raw strings instead of resolved against the linking page's directory, and sitemap URLs in directory form (`manual/`) excluded from the source list — which is where all of them are linked from |
+| 41 pages with multiple `<h1>` | **0** | `<h1>` inside `<script>` string literals counted as markup; one calculator holds 11 report templates for its PDF export |
+| 94 titles out of band | **2** | a generic 30–60 char rule applied to titles that deliberately carry `\| ResistanceZero`. The question that matters is whether the SUBJECT survives the ~60-char display cut: 174 of 176 do |
+| 96 descriptions out of band | **90, cosmetic** | length is not the defect, truncation is. 86 end on a complete clause; the rest are keyword lists cut mid-item, which loses no meaning |
+
+**A count is not a finding.** Each needed a question about what the number means.
+
+### Added
+
+- `tools/test-page-metadata.mjs`, wired into `ship-gate.sh` — the gate the ledger carried as OPEN-7
+  because v3.10.17 brought metadata to 100% with ad-hoc scripts and left nothing holding it there.
+  It requires eleven signals of every page `sitemap.xml` publishes, **parses** every JSON-LD block
+  rather than counting them, checks each advertised `og:image` is on disk, and requires a
+  publication date on every article-type node. Proven RED against the pre-v3.10.17 tree: **193
+  missing signals across 34 pages**.
+
+### Fixed
+
+- **Every published page now has exactly one `<h1>`.** Five cockpits had none — `chiller-plant`,
+  `datahall`, `ict`, `water-system`, `EPMS_Telemetry` — because their identity sits in instrument
+  chrome. Each page's single `.title`/`.brand` element was promoted to `<h1>`, keeping its class and
+  therefore its styling. Their mobile hero rules (`h1 { font-size: 1.6rem !important }`) are written
+  for article headings and would have jumped an instrument header to 1.6rem on a phone, so those
+  rules are now scoped `h1:not(.brand)`. a11y audit clean after, both themes.
+- **111 article-type nodes carry `datePublished`; 76 pages had none.** The date is the commit that
+  ADDED the page — when it was published here, which git records exactly. That is a different claim
+  from sitemap `<lastmod>`, which `tools/build-sitemap.py:53` refuses because a commit does not
+  prove a CONTENT update. First appearance is not an update; it is a publication. Spot-checked
+  against known history: `manual/pue.html` 2026-07-20 matches the manuals programme,
+  `network/industrial-ot/modbus-tcp.html` 2026-05-24 matches its own asset token.
+  **`dateModified` is deliberately absent** — nothing in this repository can prove one.
+
+### Score
+
+78 → **88 / 100**, with the same caveat as before: these are static source measurements, not
+Lighthouse runs and not Search Console data. Core Web Vitals are inferred from page weight, never
+measured, and an SEO score is a proxy for discoverability, never a ranking prediction.
+
+### Also measured and found clean, so no row was opened
+
+0 pages carry more than one `<title>` in `<head>` (the apparent duplicates are PDF-export templates
+inside JS strings, well past `</head>`), and 0 titles are duplicated across pages.
+
+### The two title rows, judged rather than left hanging
+
+`geopolitics-1.html` is **one character** over the display cut and `article-28.html`'s colon-led
+hook — "The Compression Horizon:", 24 characters — survives it intact. Shortening either would cost
+the question the article is about, so this is closed as judged, not left implying pending work.
+
+### Still open, and each says why
+
+**96 descriptions truncate mid-clause**, and re-measuring says it cannot be swept: **70 are a single
+list with no sentence boundary inside the window** — there is nothing to trim *to* — and the other
+26 could end at a boundary only by discarding the text after it. Both paths delete authored content
+to fix a cosmetic SERP issue, so it stays open. Plus `datahallAI.html` at 1,375 KB against a 55 KB
+median, and the commercial artefacts in a public repository where deleting the files would not
+remove them from git history. Ledger: `standarization/Audit result/SEO_AUDIT_LEDGER.md`.
+
+---
+
 ## v3.10.17 — 2026-09-20
 
 ### A gate that walks one directory reports a clean site by not looking at it
