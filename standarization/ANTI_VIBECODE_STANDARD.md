@@ -253,10 +253,25 @@ Consistent with the audit contract above: **do not label an unimplemented heuris
      inside quotes.
   3. **A generator is a page that has not rendered yet.** When a page is swept by hand, its
      generator is swept in the same commit, or the sweep has a half-life of one rebuild.
-  4. **Source scanning cannot see pixels.** No text gate can read an image a generator paints. OG
-     cards and any other generated artwork are checked by sampling the rendered pixels for the
-     banned band — done by hand at v3.10.8 (127 cards, zero hits), and NOT yet a gate. That hole is
-     named here rather than left to be rediscovered.
+  4. **Source scanning cannot see pixels — so check FRESHNESS, not hue** (closed v3.10.11,
+     `tools/test-og-card-freshness.py`). No text gate can read an image a generator paints. The
+     obvious answer, scanning the rendered cards for the banned hue band, was tried and MEASURED,
+     and it does not work: a pre-fix `pue-calculator.webp` whose only violet was a 4px accent rule
+     carries **943 band pixels of 756,000**, while a clean `FF-1.webp` carrying a hero photograph
+     carries **851**. WebP at quality 80 smears a flat 4px rule into ~750 distinct near-colours, so
+     neither the total nor the longest same-colour run separates an accent from a photograph. Any
+     threshold there either misses the accent or condemns the photo.
+
+     The invariant that DOES hold is the one `audit-min-twins.mjs` already enforces for minified
+     twins: **a derived artefact that no longer matches its source is stale.** Every card is
+     re-rendered in memory through `build_og_image()`, re-encoded at the quality the builder would
+     use, and compared per-pixel. On a clean tree 135 of 139 cards measure exactly 0.000 and a
+     repeat render measures 0.000, so the 1.0-of-255 tolerance is toolchain insurance, not noise
+     absorption. The pre-v3.10.8 violet card measures 33.6. Its first run found four genuinely
+     stale hero cards nobody had noticed.
+
+     **The general rule: when a generated artefact cannot be inspected for the property you care
+     about, assert that it is a current rendering of the thing you CAN inspect.**
 
 - **Scope coverage is now ASSERTED, not assumed** (`tools/test-audit-coverage.mjs`, wired into
   `ship-gate.sh`). The design gates walk the filesystem with a SKIP list; the sitemap is what the site

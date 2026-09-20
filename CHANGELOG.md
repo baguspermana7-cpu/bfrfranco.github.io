@@ -11,6 +11,57 @@ release sections rather than semver.
 
 ---
 
+## v3.10.12 — 2026-09-20
+
+### The hue gate could not see the pixels, so it asserts freshness instead
+
+v3.10.8 taught the colour ban to read the Python generators that print the pages, and named the
+half it still could not reach: *source scanning cannot see pixels.* Fixing a violet literal in
+`tools/build-og-images.py` does not repaint a card already written — three cards had to be
+rebuilt by hand, and nothing but memory would have caught a fourth.
+
+**The obvious gate was tried and it does not work.** Scanning the rendered cards for the banned
+hue band was written, measured, and abandoned:
+
+| card | pixels in the banned band, of 756,000 |
+|---|---|
+| pre-fix `pue-calculator.webp` — one 4px violet accent rule | 943 |
+| clean `FF-1.webp` — a hero photograph | 851 |
+
+WebP at quality 80 smears a flat 4px rule into roughly 750 distinct near-colours, so neither the
+total nor the longest same-colour run tells an accent apart from a photograph that happens to hold
+violet-ish tones. Any threshold there either misses the accent or condemns the photo.
+
+### Added
+
+- `tools/test-og-card-freshness.py`, wired into `ship-gate.sh` beside `audit-min-twins.mjs`, whose
+  rule it borrows: **a derived artefact that no longer matches its source is stale.** Every card is
+  re-rendered in memory through `build_og_image()`, re-encoded at the quality the builder would
+  use, and compared per-pixel across 8 worker processes (about two minutes).
+
+### Fixed
+
+- **Six stale cards, found by the gate on its first runs and invisible until then.** `datahallAI`
+  and `FF-3` at 2.07 and 2.22 of 255; then `FF-1`, `FF-2`, `cx-calculator` and `future-forward` at
+  1.55–1.89 once the tolerance was tightened. All six were hero-panel cards rendered before a later
+  change to the panel, all six rebuilt.
+
+### The numbers behind the tolerance
+
+On a clean tree **135 of 139 cards measure exactly 0.000**, and rendering the same target twice also
+measures 0.000 — the render is deterministic and the encoder reproducible, so the 1.0-of-255
+tolerance is insurance against a future Pillow or libwebp change, not absorption of run-to-run
+noise. It was first written at 2.0; at 2.0 four of the six stale cards would have passed. The RED
+proof is the card the gate exists for: the pre-v3.10.8 violet `pue-calculator.webp` measures **33.6**.
+
+### Standard
+
+`standarization/ANTI_VIBECODE_STANDARD.md` clause 4 is closed, with the general rule it produced:
+**when a generated artefact cannot be inspected for the property you care about, assert that it is
+a current rendering of the thing you CAN inspect.**
+
+---
+
 ## v3.10.11 — 2026-09-20
 
 ### Nine pairs, nine reasons
