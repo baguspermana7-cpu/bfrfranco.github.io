@@ -190,8 +190,20 @@
 
         var cy = y + pad;
         if (o.tag) {
-          ctx.text(o.tag, x + pad, cy + 7, { role: 'eyebrow', fill: o.stroke || 'soft' });
-          cy += 14;
+          /* A type tag is a rectangular chip at rx=2, never a pill and never bare
+           * text: the outline is what separates a classification from a label.
+           * Its width is measured from the tag itself, so a three-letter tag and
+           * a six-letter one each get a box that fits. */
+          var tagTxt = String(o.tag).toUpperCase();
+          var tw = M.textWidth(tagTxt, TYPE.eyebrow.size, 'mono', { tracking: TYPE.eyebrow.tracking });
+          var tagBoxW = Math.round(tw + 10);
+          layers.nodes.push(
+            '<rect x="' + (x + pad) + '" y="' + cy + '" width="' + tagBoxW +
+            '" height="12" rx="2" fill="none" stroke="' + stroke +
+            '" stroke-width="0.8" opacity="0.5"/>');
+          ctx.text(tagTxt, x + pad + tagBoxW / 2, cy + 8.5,
+            { role: 'eyebrow', anchor: 'middle', fill: o.stroke || 'soft' });
+          cy += 18;
         }
         if (o.name) {
           ctx.text(o.name, x + w / 2, cy + 10, { role: 'node-name', anchor: 'middle', fill: o.nameFill || 'ink' });

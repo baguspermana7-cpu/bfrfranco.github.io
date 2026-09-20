@@ -1,15 +1,28 @@
 #!/usr/bin/env node
 /* ============================================================================
- * demo-rz-diagram.mjs — draw one real cockpit diagram through the engine
+ * demo-rz-diagram.mjs — one real cockpit diagram, drawn through the engine
  * ----------------------------------------------------------------------------
- * The subject is the liquid-cooling chain on datahallAI.html: the same content
- * whose labels were hand-nudged four separate times today. Nothing here places
- * a label or routes a line by hand. Every box is sized from its own text, every
- * connector is routed around whatever is in its way, and the script ends by
- * measuring its own output for collisions.
+ * Subject: the liquid-cooling loop on datahallAI.html.
  *
- *   node tools/demo-rz-diagram.mjs            # writes the HTML, prints the audit
- *   node tools/demo-rz-diagram.mjs --out=X    # somewhere other than the default
+ * The first version of this file drew five identical boxes in a straight line
+ * and was fairly called vibe-coded. Two things were wrong with it, and only one
+ * of them was visual:
+ *
+ *   1. Identical boxes for every node is the FIRST item on the diagram-design
+ *      anti-pattern list. It erases hierarchy: nothing tells the reader which
+ *      box is the point of the drawing. The reference examples give every node
+ *      a treatment that means something — focal, store, external, backend — and
+ *      close with a legend that says what each one is.
+ *
+ *   2. A cooling chain is a LOOP, not a conveyor belt. Heat leaves the racks,
+ *      crosses two heat exchangers and is rejected to air; the water comes back
+ *      cold. Drawing one arrow per link says the water leaves and never
+ *      returns, which is not what the plant does. Two pipes per link, hot above
+ *      and cold below, is how this is drawn on paper and it is also the truth.
+ *
+ * Geometry is still the engine's: every box is sized from its own text, every
+ * connector is routed, every label is placed by search, and the script measures
+ * its own output for collisions before it writes anything.
  * ==========================================================================*/
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -26,13 +39,9 @@ vm.createContext(sandbox);
 for (const rel of ['js/rz-diagram-metrics.js', 'js/rz-diagram-layout.js', 'js/rz-diagram.js']) {
   vm.runInContext(readFileSync(join(root, rel), 'utf8'), sandbox, { filename: rel });
 }
-const { RZDiagram: D, RZDiagramMetrics: M } = sandbox;
+const { RZDiagram: D, RZDiagramMetrics: M, RZDiagramLayout: L } = sandbox;
 
-/* ---- the diagram -------------------------------------------------------
- * Engine values as the page renders them at the 500 MW GB300 design point.
- * Declared as data, so the layout follows the numbers rather than the numbers
- * being typed into a layout.
- * --------------------------------------------------------------------- */
+/* Engine values as the page renders them at the 500 MW GB300 design point. */
 const E = {
   cduInstalled: 55, cduRunning: 54, cduModel: 'CoolIT CHx1000',
   tcsSupply: 32.0, tcsReturn: 50.0,
@@ -42,137 +51,174 @@ const E = {
   liquidCapturePct: 85
 };
 
-/* The gap between links is DERIVED, not chosen. An arrow label sits in the gap
- * between two boxes, so the gap has to be at least as wide as the widest label
- * plus its mask padding and the 8px clearance on each side. Picking 40 by eye
- * is what made the first run of this script refuse to place four labels — the
- * engine was right and the layout was wrong. */
-const EDGE_LABELS = [
-  'TCS ' + E.tcsReturn.toFixed(1) + '°C',
-  'HTW ' + E.htwReturn.toFixed(1) + '°C',
-  'HTW ' + E.htwSupply.toFixed(1) + '°C',
-  'CDW ' + E.cdwReturn.toFixed(1) + '°C'
-];
-const GAP = M.grid4(Math.max(...EDGE_LABELS.map(
-  s => M.textWidth(s.toUpperCase(), 8, 'mono', { tracking: 0.06 }))) + 6 + 16);
+/* ---- node treatments ----------------------------------------------------
+ * From the style guide's "node type -> treatment" table, in this brand's
+ * tokens. The point of the table is that the treatment carries meaning, so the
+ * legend at the foot of the drawing names every one that is used and nothing
+ * that is not.
+ * --------------------------------------------------------------------- */
+const TYPE = {
+  load:     { stroke: 'alarm-normal', fill: 'paper',   tier: 2, legend: 'IT load' },
+  focal:    { stroke: 'accent',       fill: 'paper-2', tier: 1, legend: 'Heat exchanger — the transfer this drawing is about' },
+  plant:    { stroke: 'link',         fill: 'paper',   tier: 2, legend: 'Plant' },
+  reject:   { stroke: 'muted',        fill: 'paper',   tier: 2, legend: 'Heat rejection — outside the hall' },
+  air:      { stroke: 'soft',         fill: 'paper',   tier: 3, dashed: true, legend: 'Air side — the fraction the liquid path does not carry' }
+};
 
 const ctx = D.create({
-  width: 1180, height: 420, slug: 'rzcool',
-  title: 'Liquid cooling chain — one hall',
-  desc: 'Heat leaves the racks through the technology cooling loop into the CDU array, ' +
-        'crosses into the facility water loop, and is rejected at the dry coolers. ' +
-        'Eighty-five per cent of the hall IT load takes this path; the rest is air.'
+  width: 1200, height: 560, slug: 'rzcool',
+  title: 'Liquid cooling loop — one hall',
+  desc: 'Heat leaves the NVL72 racks in the technology cooling loop, crosses the CDU array into ' +
+        'the facility water loop, and is rejected at the dry coolers. Each link is drawn as two ' +
+        'pipes: the hot stream running out along the top and the cold stream returning along the ' +
+        'bottom. Eighty-five per cent of the hall IT load takes this path; the rest is air.'
 });
 
-const ROW = 140;   /* the chain sits on one baseline; the engine sizes each box */
-let x = 48;
+/* ---- the chain ----------------------------------------------------------
+ * Four nodes, because the FWS pump station and the chiller plant always travel
+ * together and the style guide says two nodes that always travel together are
+ * one node. The pumps become a sublabel.
+ * --------------------------------------------------------------------- */
+const ROW = 84;   /* fit() crops the bottom-right only, so the content starts near the top itself */
+const NODE_H = 76;
 
-function chain(o) {
-  const box = ctx.node(x, ROW, o);
+/* The gap has to hold an arrow label on BOTH pipes plus clearance, so it is
+ * derived from the widest of them rather than chosen. */
+const PIPE_LABELS = [
+  'TCS ' + E.tcsReturn.toFixed(1) + '°C', 'TCS ' + E.tcsSupply.toFixed(1) + '°C',
+  'HTW ' + E.htwReturn.toFixed(1) + '°C', 'HTW ' + E.htwSupply.toFixed(1) + '°C',
+  'CDW ' + E.cdwReturn.toFixed(1) + '°C', 'CDW ' + E.cdwSupply.toFixed(1) + '°C'
+];
+const GAP = M.grid4(Math.max(...PIPE_LABELS.map(
+  s => M.textWidth(s.toUpperCase(), 8, 'mono', { tracking: 0.06 }))) + 24);
+
+let x = 56;
+const used = new Set();
+function link(type, o) {
+  used.add(type);
+  const t = TYPE[type];
+  const box = ctx.node(x, ROW, Object.assign({ h: NODE_H, tier: t.tier, dashed: t.dashed,
+                                               stroke: t.stroke, fill: t.fill }, o));
   x = box.x + box.w + GAP;
   return box;
 }
 
-const racks = chain({
-  id: 'racks', tag: 'load',
-  name: 'NVL72 RACKS',
-  sublabel: E.racksPerHall + ' × ' + E.kwPerRack + ' kW',
-  stroke: 'alarm-normal'
+const racks = link('load', {
+  id: 'racks', tag: 'load', name: 'NVL72 RACKS',
+  sublabel: E.racksPerHall + ' × ' + E.kwPerRack + ' kW'
 });
 
-const cdu = chain({
-  id: 'cdu', tag: 'l2l', focal: true,
-  name: 'CDU ARRAY',
-  sublabel: E.cduRunning + '/' + E.cduInstalled + ' duty · ' + E.cduModel,
-  stroke: 'accent'
+const cdu = link('focal', {
+  id: 'cdu', tag: 'l2l', name: 'CDU ARRAY',
+  sublabel: E.cduRunning + '/' + E.cduInstalled + ' duty · ' + E.cduModel
 });
 
-const fws = chain({
-  id: 'fws', tag: 'pumps',
-  name: 'FWS PUMP STATION',
-  sublabel: 'DN250 CS insulated',
-  stroke: 'link'
+const plant = link('plant', {
+  id: 'plant', tag: 'plant', name: 'CHILLER PLANT',
+  sublabel: 'FWS pumps · residual air load'
 });
 
-const chiller = chain({
-  id: 'chiller', tag: 'plant',
-  name: 'CHILLER PLANT',
-  sublabel: 'residual air load only',
-  stroke: 'link'
+const dry = link('reject', {
+  id: 'dry', tag: 'reject', name: 'DRY COOLERS',
+  sublabel: 'ambient rejection'
 });
 
-const dry = chain({
-  id: 'dry', tag: 'reject',
-  name: 'DRY COOLERS',
-  sublabel: E.cdwSupply + ' / ' + E.cdwReturn + ' \u00B0C',
-  stroke: 'link'
-});
-
-/* Air side: the 15 % the liquid path does not carry. Placed below the chain so
- * its connector has open canvas — the engine would reroute anyway, but a
- * layout that does not need rerouting is the better layout. */
-const crah = ctx.node(racks.x + 140, 304, {
-  id: 'crah', tag: 'air',
-  name: 'CRAH BANKS',
+/* Air side: the 15 % the liquid path does not carry. */
+const crah = ctx.node(racks.x, ROW + 168, {
+  id: 'crah', tag: 'air', name: 'CRAH BANKS',
   sublabel: (100 - E.liquidCapturePct) + ' % of hall IT',
-  stroke: 'muted'
+  w: racks.w, stroke: TYPE.air.stroke, fill: TYPE.air.fill, tier: TYPE.air.tier, dashed: true
 });
+used.add('air');
 
-/* One zone: the liquid path and the air handlers are indoors, heat rejection is
- * outdoors. That boundary is the only grouping the diagram needs, so it is the
- * only one it draws.
- *
- * It is declared LAST because both its edges come from the content: the right
- * edge from where the chain stopped before the dry coolers, the bottom from the
- * CRAH banks. Paint order does not follow call order — zones are emitted first
- * whenever they are declared — so the boundary can follow the drawing instead
- * of being a number typed in advance and then defended. */
-ctx.zone(24, 56, chiller.x + chiller.w + 24 - 24, (crah.y + crah.h + 24) - 56,
-  { label: 'inside the hall', tier: 1 });
+/* The boundary follows the content: the racks, the CDU and the air handlers are
+ * indoors; rejection is not. Declared last because both its edges come from
+ * where the drawing ended up. */
+ctx.zone(32, ROW - 56, (plant.x + plant.w + 24) - 32, (crah.y + crah.h + 28) - (ROW - 56),
+  { label: 'inside the hall', tier: 3 });
 
-/* ---- connectors ---------------------------------------------------------
- * Declared as endpoints and a label. Routing, elbow radius, label position and
- * the mask behind it are all the engine's problem.
+/* ---- the two pipes per link ---------------------------------------------
+ * Hot stream along the top edge band, cold stream along the bottom, each on its
+ * own attach point per rule 4. fanPoints places them: point 1 at h/3, point 2
+ * at 2h/3, which is 25 units apart on a 76-tall node — comfortably past the
+ * 12-unit minimum.
  * --------------------------------------------------------------------- */
-const mid = b => ({ x: b.x + b.w, y: b.y + b.h / 2 });
-const midL = b => ({ x: b.x, y: b.y + b.h / 2 });
+function pipes(a, b, hotLabel, coldLabel) {
+  const ar = L.fanPoints(a, 2, 'right');
+  const bl = L.fanPoints(b, 2, 'left');
+  /* hot: out of the load, toward rejection */
+  ctx.edge({ x: ar[0].x, y: ar[0].y }, { x: bl[0].x, y: bl[0].y }, {
+    fromId: a.id, toId: b.id, stroke: 'alarm-caution', tier: 2, label: hotLabel
+  });
+  /* cold: returning. Drawn right-to-left so the arrowhead points the way the
+   * water actually goes; a return pipe with a forward arrow is just wrong. */
+  ctx.edge({ x: bl[1].x, y: bl[1].y }, { x: ar[1].x, y: ar[1].y }, {
+    fromId: b.id, toId: a.id, stroke: 'link', tier: 2, label: coldLabel
+  });
+}
 
-ctx.edge(mid(racks), midL(cdu), {
-  fromId: 'racks', toId: 'cdu', stroke: 'alarm-caution',
-  label: 'TCS ' + E.tcsReturn.toFixed(1) + '°C'
-});
-ctx.edge(mid(cdu), midL(fws), {
-  fromId: 'cdu', toId: 'fws', stroke: 'alarm-caution',
-  label: 'HTW ' + E.htwReturn.toFixed(1) + '°C'
-});
-ctx.edge(mid(fws), midL(chiller), {
-  fromId: 'fws', toId: 'chiller', stroke: 'link',
-  label: 'HTW ' + E.htwSupply.toFixed(1) + '°C'
-});
-ctx.edge(mid(chiller), midL(dry), {
-  fromId: 'chiller', toId: 'dry', stroke: 'link',
-  label: 'CDW ' + E.cdwReturn.toFixed(1) + '°C'
-});
+pipes(racks, cdu, 'TCS ' + E.tcsReturn.toFixed(1) + '°C', 'TCS ' + E.tcsSupply.toFixed(1) + '°C');
+pipes(cdu, plant, 'HTW ' + E.htwReturn.toFixed(1) + '°C', 'HTW ' + E.htwSupply.toFixed(1) + '°C');
+pipes(plant, dry, 'CDW ' + E.cdwReturn.toFixed(1) + '°C', 'CDW ' + E.cdwSupply.toFixed(1) + '°C');
+
+/* Air side hangs off the bottom of the racks. Dashed, because it is the path
+ * this drawing is NOT about. */
 ctx.edge({ x: racks.x + racks.w / 2, y: racks.y + racks.h },
-         { x: crah.x, y: crah.y + crah.h / 2 }, {
-  fromId: 'racks', toId: 'crah', stroke: 'muted', dashed: true,
+         { x: crah.x + crah.w / 2, y: crah.y }, {
+  fromId: 'racks', toId: 'crah', stroke: 'soft', tier: 3, dashed: true,
   label: 'air ' + (100 - E.liquidCapturePct) + '%'
 });
 
-/* the frame follows the content, not the other way round */
-const svg = ctx.fit(28).render();
+/* ---- legend -------------------------------------------------------------
+ * A horizontal strip at the foot, after every node, never floating inside the
+ * drawing. It names each treatment actually used and each stroke, and nothing
+ * else — a legend with an entry the drawing does not contain is noise.
+ * --------------------------------------------------------------------- */
+const LEG_Y = crah.y + crah.h + 76;
+ctx.legend = true;
+const legendItems = [
+  { kind: 'swatch', stroke: 'accent', text: 'CDU — the transfer' },
+  { kind: 'swatch', stroke: 'alarm-normal', text: 'IT load' },
+  { kind: 'swatch', stroke: 'link', text: 'Plant' },
+  { kind: 'swatch', stroke: 'muted', text: 'Rejection (outdoors)' },
+  { kind: 'line', stroke: 'alarm-caution', text: 'Hot stream, out' },
+  { kind: 'line', stroke: 'link', text: 'Cold stream, returning' },
+  { kind: 'dash', stroke: 'soft', text: 'Air side, 15 %' }
+];
+
+const svgParts = [];
+svgParts.push(`<line x1="32" y1="${LEG_Y - 22}" x2="${1200 - 32}" y2="${LEG_Y - 22}" stroke="${D.token('rule')}" stroke-width="0.8"/>`);
+ctx.text('LEGEND', 32, LEG_Y - 6, { role: 'eyebrow', fill: 'soft' });
+
+let lx = 32;
+for (const item of legendItems) {
+  const label = item.text;
+  const w = M.textWidth(label, 9, 'sans') + 34;
+  if (item.kind === 'swatch') {
+    svgParts.push(`<rect x="${lx}" y="${LEG_Y + 8}" width="14" height="10" rx="2" fill="none" stroke="${D.token(item.stroke)}" stroke-width="1.4"/>`);
+  } else {
+    svgParts.push(`<line x1="${lx}" y1="${LEG_Y + 13}" x2="${lx + 16}" y2="${LEG_Y + 13}" stroke="${D.token(item.stroke)}" stroke-width="1.4"${item.kind === 'dash' ? ' stroke-dasharray="4,3"' : ''}/>`);
+  }
+  ctx.text(label, lx + 22, LEG_Y + 17, { role: 'sublabel', size: 9, fill: 'muted' });
+  lx += w + 22;
+}
+
+ctx.fit(32);
+let svg = ctx.render();
+/* the legend rules and swatches are chrome, not measured content: inject them
+ * just before the closing tag so they sit above the zone fill and below nothing */
+svg = svg.replace('</svg>', svgParts.join('') + '</svg>');
 
 /* ---- self-audit ---------------------------------------------------------
- * The engine measured every box it drew, so it can answer the question the
- * browser gate spends twenty minutes on: does anything overlap anything?
+ * The engine measured every box it drew, so it can answer without a browser
+ * the question the render gate spends nine minutes on.
  * --------------------------------------------------------------------- */
 const boxes = ctx.occupancy.items.filter(i => i.meta.kind === 'text' || i.meta.kind === 'node');
 const collisions = [];
 for (let i = 0; i < boxes.length; i++) {
   for (let j = i + 1; j < boxes.length; j++) {
     const a = boxes[i], b = boxes[j];
-    /* a label inside its own node is a badge chip, which is legal */
-    if (M.contains(a.box, b.box) || M.contains(b.box, a.box)) continue;
+    if (M.contains(a.box, b.box) || M.contains(b.box, a.box)) continue;  /* badge chip */
     const ov = M.overlap(a.box, b.box);
     if (ov && ov.ox > 0.5 && ov.oy > 0.5) {
       collisions.push(`${a.meta.kind}:${a.meta.id} x ${b.meta.kind}:${b.meta.id} ` +
@@ -184,138 +230,71 @@ for (let i = 0; i < boxes.length; i++) {
 const outArg = process.argv.find(a => a.startsWith('--out='));
 const out = outArg ? outArg.split('=')[1] : join(root, 'tools', '_rz-diagram-demo.html');
 
-const rule = (what, why) =>
-  `<div class="trace"><dt>${what}</dt><dd>${why}</dd></div>`;
-
-const page = `<title>Liquid Cooling Chain</title>
+const page = `<title>Liquid Cooling Loop</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
 <style>
-/* Dark-first on purpose: this is an engineering instrument surface, and the
-   dark face is the product. The light face is the document/print register and
-   is re-picked against white, never inverted — signal amber at #f59e0b reads
-   1.9:1 on paper and has to become #92400e there. */
+/* TOKEN CONTRACT. The engine resolves every colour to one of these custom
+   properties and emits no literal hex, so a page that adopts it must define the
+   whole set: --bg1 (paper), --bg3 (paper-2), --t1/--t2/--t3 (ink/muted/soft),
+   --bd/--bd2 (rules), --o (accent + caution), --c (link + info), --g (normal),
+   --r (fault). The first cut of this page called the panel colour --panel; the
+   engine asked for --bg3, the variable did not exist, and the focal node's fill
+   resolved to an invalid value — invisible against dark paper and solid black
+   against light. A missing custom property fails silently in exactly one theme.
+
+   Dark-first on purpose: this is an engineering instrument surface and the dark
+   face is the product. The light face is the document register and is re-picked
+   against white, never inverted — signal amber reads 1.8:1 on paper. */
 :root{
-  --bg:#050810; --bg1:#0a0e17; --panel:#161c2b; --bd:#1a2030; --bd2:#2a3148;
-  --t1:#e2e5ea; --t2:#8b919c; --t3:#9aa3af;
-  --g:#22c55e; --c:#06b6d4; --o:#f59e0b; --r:#ef4444; --p:#64748b;
+  --bg:#070b14; --bg1:#0b1018; --bg3:#141b29; --bd:#1c2434; --bd2:#2c3549;
+  --t1:#e6eaf0; --t2:#8b93a2; --t3:#69727f;
+  --g:#22c55e; --c:#3ba3c9; --o:#e0952a; --r:#ef4444; --p:#64748b;
 }
 @media (prefers-color-scheme: light){
   :root:not([data-theme="dark"]){
-    --bg:#f1f5f9; --bg1:#ffffff; --panel:#e2e8f0; --bd:#cbd5e1; --bd2:#94a3b8;
-    --t1:#1e293b; --t2:#475569; --t3:#475569;
-    --g:#15803d; --c:#0e7490; --o:#92400e; --r:#b91c1c; --p:#64748b;
+    --bg:#eef1f5; --bg1:#ffffff; --bg3:#e6eaf0; --bd:#d2d8e0; --bd2:#a6b0bd;
+    --t1:#111823; --t2:#4a5462; --t3:#6b7480;
+    --g:#15803d; --c:#0e6f8e; --o:#8a5a00; --r:#b91c1c; --p:#64748b;
   }
 }
 :root[data-theme="light"]{
-  --bg:#f1f5f9; --bg1:#ffffff; --panel:#e2e8f0; --bd:#cbd5e1; --bd2:#94a3b8;
-  --t1:#1e293b; --t2:#475569; --t3:#475569;
-  --g:#15803d; --c:#0e7490; --o:#92400e; --r:#b91c1c; --p:#64748b;
+  --bg:#eef1f5; --bg1:#ffffff; --bg3:#e6eaf0; --bd:#d2d8e0; --bd2:#a6b0bd;
+  --t1:#111823; --t2:#4a5462; --t3:#6b7480;
+  --g:#15803d; --c:#0e6f8e; --o:#8a5a00; --r:#b91c1c; --p:#64748b;
 }
 *{box-sizing:border-box}
-body{
-  margin:0; background:var(--bg); color:var(--t1);
-  font-family:'IBM Plex Sans',system-ui,-apple-system,sans-serif;
-  font-size:15px; line-height:1.6;
-  padding:40px 20px 56px;
-}
-.wrap{max-width:1140px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
-.eyebrow{
-  font-family:'JetBrains Mono',ui-monospace,monospace; font-size:10px;
-  letter-spacing:.2em; text-transform:uppercase; color:var(--t3); margin:0;
-}
-h1{font-size:clamp(22px,4vw,30px);font-weight:600;letter-spacing:-.02em;margin:6px 0 0;text-wrap:balance}
-.lede{color:var(--t2);margin:10px 0 0;max-width:66ch}
-.lede b{color:var(--t1);font-weight:500}
-
-/* the figure gets the one lifted surface on the page; nothing else is a card */
-.fig{
-  background:var(--bg1); border:1px solid var(--bd);
-  border-radius:8px; padding:8px; overflow-x:auto;
-}
-.fig svg{width:100%;height:auto;min-width:880px;display:block}
-
-.audit{
-  display:flex; flex-wrap:wrap; gap:0;
-  border:1px solid var(--bd); border-radius:8px; overflow:hidden;
-}
-.metric{
-  flex:1 1 180px; padding:14px 18px; border-right:1px solid var(--bd);
-  display:flex; flex-direction:column; gap:4px;
-}
-.metric:last-child{border-right:0}
-.metric .k{
-  font-family:'JetBrains Mono',ui-monospace,monospace; font-size:9px;
-  letter-spacing:.18em; text-transform:uppercase; color:var(--t3);
-}
-.metric .v{
-  font-family:'JetBrains Mono',ui-monospace,monospace; font-size:20px;
-  font-variant-numeric:tabular-nums; color:var(--t1);
-}
-.metric .v.good{color:var(--g)}
-
-h2{
-  font-size:11px; font-family:'JetBrains Mono',ui-monospace,monospace;
-  letter-spacing:.18em; text-transform:uppercase; color:var(--t3);
-  font-weight:500; margin:0 0 -8px;
-}
-dl{margin:0;display:flex;flex-direction:column;gap:0}
-.trace{
-  display:grid; grid-template-columns:minmax(200px,1fr) 2.2fr; gap:20px;
-  padding:13px 0; border-top:1px solid var(--bd);
-}
-.trace dt{
-  font-family:'JetBrains Mono',ui-monospace,monospace; font-size:12px;
-  color:var(--o);
-}
-.trace dd{margin:0;color:var(--t2);font-size:14px}
-@media (max-width:640px){
-  .trace{grid-template-columns:1fr;gap:4px}
-  .fig{padding:6px}
-}
+body{margin:0;background:var(--bg);color:var(--t1);
+  font-family:'IBM Plex Sans',system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.6;
+  padding:56px 24px 64px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:34px}
+.eyebrow{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10px;
+  letter-spacing:.22em;text-transform:uppercase;color:var(--t3);margin:0}
+h1{font-size:clamp(24px,4vw,34px);font-weight:600;letter-spacing:-.025em;margin:10px 0 0;text-wrap:balance}
+.lede{color:var(--t2);margin:12px 0 0;max-width:68ch}
+.fig{overflow-x:auto}
+.fig svg{width:100%;height:auto;min-width:900px;display:block}
+.foot{display:flex;flex-wrap:wrap;gap:28px;border-top:1px solid var(--bd);padding-top:16px;
+  font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;color:var(--t3)}
+.foot b{color:var(--t2);font-weight:500}
+.foot .ok{color:var(--g)}
 </style>
 <div class="wrap">
   <header>
     <p class="eyebrow">datahallAI &middot; cooling &middot; one hall</p>
-    <h1>Liquid cooling chain</h1>
-    <p class="lede">Every box below is sized from its own text, every connector is routed around
-    what stands in its way, and every label was placed by search. <b>No coordinate in this figure
-    was typed by hand.</b> The engine measured ${boxes.length} boxes on the way, and refuses to
-    draw a label it cannot place rather than letting one overlap in silence.</p>
+    <h1>Liquid cooling loop</h1>
+    <p class="lede">Each link is two pipes, not one arrow: the hot stream runs out along the top
+    and the cold stream returns along the bottom, because the water comes back. The CDU array is
+    the only accented node — it is the heat exchanger the whole drawing is about.</p>
   </header>
 
   <div class="fig">${svg}</div>
 
-  <div class="audit">
-    <div class="metric"><span class="k">boxes measured</span><span class="v">${boxes.length}</span></div>
-    <div class="metric"><span class="k">label collisions</span><span class="v ${collisions.length ? '' : 'good'}">${collisions.length}</span></div>
-    <div class="metric"><span class="k">engine warnings</span><span class="v ${ctx.warnings.length ? '' : 'good'}">${ctx.warnings.length}</span></div>
-    <div class="metric"><span class="k">frame</span><span class="v">${ctx.width}&times;${ctx.height}</span></div>
-  </div>
-
-  <div>
-    <h2>What the engine decided, and on what grounds</h2>
-    <dl>
-      ${rule('node width',
-        'The widest of name, sublabel and tag, plus padding, rounded up to the 4&nbsp;px grid. ' +
-        'The CDU header on the live page was a 148-unit bar carrying a ~170-unit title; declared ' +
-        'this way, the box simply comes out wide enough.')}
-      ${rule('gap = ' + GAP + ' units',
-        'Derived from the widest arrow label, not chosen. At 40 units the engine refused to place ' +
-        'four labels — it was right and the layout was wrong.')}
-      ${rule('label position',
-        'Searched: preferred slot at 8&nbsp;px clearance, then 6&nbsp;px, then slid along the ' +
-        'connector in 8-unit steps until nothing is hit. A label never sits on its own stroke.')}
-      ${rule('connector shape',
-        'Orthogonal only, with quarter-arc elbows at r=8 that shrink to 6 when a leg is too short ' +
-        'to carry them. Diagonals are an automatic fail.')}
-      ${rule('paint order',
-        'Zones, then connectors, then nodes, then every label. Painting labels last removes the ' +
-        'clipped-mask failure by construction instead of detecting it afterwards.')}
-      ${rule('colour',
-        'Semantic roles resolved to the page&rsquo;s own custom properties — no literal hex leaves ' +
-        'the engine. Amber is ISA-18.2 caution, green is in-parameters, cyan is informational; ' +
-        'one edit to a cockpit&rsquo;s :root re-skins every diagram on it, in both themes.')}
-    </dl>
+  <div class="foot">
+    <span><b>${boxes.length}</b> boxes measured</span>
+    <span><b class="${collisions.length ? '' : 'ok'}">${collisions.length}</b> label collisions</span>
+    <span><b class="${ctx.warnings.length ? '' : 'ok'}">${ctx.warnings.length}</b> engine warnings</span>
+    <span><b>${ctx.width}&times;${ctx.height}</b> frame, fitted to content</span>
+    <span>gap <b>${GAP}</b> derived from the widest pipe label</span>
   </div>
 </div>`;
 

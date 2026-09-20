@@ -170,6 +170,59 @@ Gated by `B1`–`B3` in `tools/test-rz-diagram-engine.mjs`.
 
 ---
 
+## 3c. The token contract, and how it fails
+
+The engine emits **no literal hex**. Every colour resolves to a custom property, which is what
+lets one edit to a cockpit's `:root` re-skin every diagram on it in both themes. The other half
+of that bargain is that the adopting page must define the whole set:
+
+| role | property |
+|---|---|
+| `paper` | `--bg1` |
+| `paper-2` | `--bg3` |
+| `ink` / `muted` / `soft` | `--t1` / `--t2` / `--t3` |
+| `rule` / `rule-solid` | `--bd` / `--bd2` |
+| `accent`, `alarm-caution` | `--o` |
+| `link`, `alarm-info` | `--c` |
+| `alarm-normal` | `--g` |
+| `alarm-fault` | `--r` |
+
+> **A missing custom property fails silently, and it fails in exactly one theme.**
+>
+> The demo page called its panel colour `--panel`. The engine asked for `--bg3`, the variable did
+> not exist, and `fill="var(--bg3)"` resolved to an invalid value. Against dark paper the focal
+> node looked correct. Against light paper it rendered solid black with unreadable text. Nothing
+> logged, nothing threw, and the dark screenshot that had already been taken showed no defect.
+>
+> **Check both themes by rendering both**, not by reasoning about the palette. This is the same
+> class as the `:root, [data-theme="light"]` cascade bug in `CLAUDE.md`: a colour that is wrong
+> in one theme only is invisible to anyone working in the other.
+
+---
+
+## 3d. Geometry is not composition
+
+The engine guarantees that nothing overlaps. It does not make a drawing good, and the first demo
+proved the gap: zero collisions, zero warnings, and still a bad diagram.
+
+Two faults, and only one of them was visual:
+
+- **Five identical boxes in a row.** "Identical boxes for every node" is the first entry on the
+  skill's §4 anti-pattern list, because it erases hierarchy — nothing tells the reader which box
+  the drawing is about. Give each node the treatment its `type` earns (focal, load, plant,
+  rejection, air), cap `accent` at one or two, and close with a legend naming every treatment
+  used and none that is not.
+- **A loop drawn as a line.** A cooling chain returns: hot out, cold back. One arrow per link says
+  the water leaves and never comes home, which is not what the plant does. Two pipes per link —
+  hot along the top, cold along the bottom with its arrowhead pointing the way the water actually
+  travels — is both the drawing convention and the truth. `fanPoints(box, 2, side)` places the
+  two ports.
+
+Before drawing, also apply the deletion rule: the FWS pump station and the chiller plant always
+travel together, so they are one node with the pumps as a sublabel. Six nodes became five.
+
+---
+
 ## 4. Authoring rules
 
 1. **New block diagrams go through the engine.** Do not add hand-typed coordinates.
