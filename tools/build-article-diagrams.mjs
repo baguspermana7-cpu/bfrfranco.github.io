@@ -58,6 +58,87 @@ const { RZDiagram: D, RZDiagramMetrics: M, RZDiagramLayout: L } = sandbox;
  * ======================================================================== */
 const FIGURES = [
   {
+    id: 'cooling-water-loop',
+    page: 'article-10.html',
+    caption:
+      'The loop the mitigation list acts on. Evaporation is the loss that does the work \u2014 it ' +
+      'is how the heat leaves \u2014 so it cannot be engineered away, only reduced by rejecting ' +
+      'less heat. Blowdown is a deliberate discharge that keeps dissolved solids in check, which ' +
+      'is what raising the cycles of concentration reduces. Leaks return nothing at all.',
+    because:
+      'section 8.1 tells the reader to raise the cycles of concentration to cut blowdown, and to ' +
+      'raise supply setpoints. Both instructions assume a loop the article never draws, and ' +
+      '"blowdown" is meaningless to a reader who does not already know it is deliberate. The ' +
+      'figure makes the list legible; it adds no number the article does not carry.',
+    build() {
+      const ctx = D.create({
+        slug: 'cw-loop',
+        title: 'Where cooling water leaves the loop, and which lever acts on each path',
+        desc: 'Make-up water enters a cooling tower basin. It leaves by three paths. Evaporation ' +
+              'carries the heat away and is the reason the tower works, so it is reduced only by ' +
+              'rejecting less heat, which is what raising supply setpoints does. Blowdown is a ' +
+              'deliberate discharge controlled by the cycles of concentration. Leaks are pure ' +
+              'loss and are addressed by detection. Water use effectiveness measures the whole.'
+      });
+
+      const X_IN = 40, X_MID = 300, X_OUT = 700;
+      const W_IN = 200, W_MID = 250, W_OUT = 290;
+      /* The basin is drawn tall enough that its three ports are spaced for the
+       * nodes they feed, not merely for the 12-unit rule-4 minimum. Ports sit
+       * at L*k/(N+1), so three outputs on a 384-unit edge land 96 apart, which
+       * clears a 72-unit node with 24 to spare. The first cut used a 128-unit
+       * basin: the ports passed rule 4 at 32 apart and the nodes still
+       * overlapped by 40. Spacing that satisfies the connector rule is not the
+       * same as spacing that fits the content. */
+      const BASIN_TOP = 40, BASIN_H = 384;
+
+      const makeup = ctx.node(X_IN, BASIN_TOP + BASIN_H / 2 - 36, {
+        id: 'makeup', tag: 'in', name: 'Make-up water', sublabel: 'drawn from the local supply',
+        w: W_IN, stroke: 'rule-solid', fill: 'paper', tier: 2, legend: 'Water entering'
+      });
+
+      const basin = ctx.node(X_MID, BASIN_TOP, {
+        id: 'basin', tag: 'tower', name: 'Cooling tower basin', sublabel: 'circulating loop',
+        w: W_MID, h: BASIN_H, vAlign: 'middle',
+        stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'The loop itself'
+      });
+
+      const outs = [
+        { id: 'evap', tag: 'does the work', name: 'Evaporation',
+          sub: 'this is how the heat leaves', lever: 'raise setpoints',
+          stroke: 'rule-solid', dashed: false, legend: 'Loss that carries the heat' },
+        { id: 'blow', tag: 'deliberate', name: 'Blowdown',
+          sub: 'discharged to control dissolved solids', lever: 'raise cycles',
+          stroke: 'rule-solid', dashed: false },
+        { id: 'leak', tag: 'pure loss', name: 'Leaks',
+          sub: 'returns nothing, compounds annually', lever: 'leak detection',
+          stroke: 'soft', dashed: true, legend: 'Loss that does no work' }
+      ];
+
+      const ports = ctx.ports(basin, 3, 'right', { id: 'basin' });
+      outs.forEach(function (o, i) {
+        const n = ctx.node(X_OUT, ports[i].y - 36, {
+          id: o.id, tag: o.tag, name: o.name, sublabel: o.sub, w: W_OUT,
+          stroke: o.stroke, fill: 'paper', tier: 2, dashed: o.dashed, legend: o.legend
+        });
+        ctx.edge({ x: ports[i].x, y: ports[i].y }, { x: n.x, y: ports[i].y }, {
+          fromId: 'basin', toId: o.id,
+          stroke: o.dashed ? 'soft' : 'ink', tier: 2,
+          pattern: o.dashed ? 'dotted' : 'solid',
+          label: o.lever, legend: o.dashed ? undefined : 'The lever that acts on it'
+        });
+      });
+
+      ctx.edge({ x: makeup.x + makeup.w, y: makeup.y + makeup.h / 2 },
+               { x: basin.x, y: basin.y + basin.h / 2 }, {
+        fromId: 'makeup', toId: 'basin', stroke: 'ink', tier: 2, pattern: 'solid'
+      });
+
+      ctx.legend();
+      return ctx.fit(28);
+    }
+  },
+  {
     id: 'cpo-trace-collapse',
     page: 'article-22.html',
     caption:
