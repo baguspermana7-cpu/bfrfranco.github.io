@@ -685,7 +685,7 @@ body[data-datahall-authority="unavailable"] #tabs,
 body[data-datahall-authority="unavailable"] .wrap{display:none !important}
 body[data-datahall-authority="unavailable"] .hdr-r>.dot{background:#64748b !important;box-shadow:none !important;animation:none !important}
 body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:none}
-</style>    <script src="js/rz-version.js?v=20260920-b4790053" defer></script>
+</style>    <script src="js/rz-version.js?v=20260920-1f40e0de" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260920-b64c1545" defer></script>
     <!-- v3.5.0 — hold the 8.5px legibility floor by SCALE, not by font size. Five of this page's
          fifteen diagrams were already clear; the dense ones (cooling P&ID, the four SLDs, the hall
@@ -1896,11 +1896,66 @@ return '<polygon points="'+isoTop(fx,fy,fw,fd,fz)+'" fill="'+fill+'" fill-opacit
 
 // Text on isometric surface — with opaque label-mask (P&ID text-break) so
 // structural iso edges/grid never visually cross the label (doc-14 §3, doc-13 §4).
-function isoLabel(x,y,z,label,color,sz,bold,o){
-var fs=sz||8,cx=iX(x,y),cy=iY(x,y,z);
-var w=String(label).length*fs*0.62+8,h=fs+5;
-return'<rect x="'+(cx-w/2)+'" y="'+(cy-fs+1)+'" width="'+w+'" height="'+h+'" rx="2" fill="rgba(8,12,20,.78)"/>'+
+/* v3.10.5 — placement, not a fixed offset.
+ *
+ * Twelve of this drawing's collisions were the same shape: a floating ZONE CAPTION
+ * ("GENERATOR ROOM", "CW PUMP STATION", "GROUND FLOOR") landing on an EQUIPMENT TAG
+ * ("BD", "P2", "SM6 20kV"). Nothing was crowded — the caption simply did not know the
+ * tag was there, because an isometric projects a 3-unit-tall box up-screen into exactly
+ * the band a caption occupies, and both were placed by hand.
+ *
+ * Who yields is not arbitrary. An equipment tag names ONE box; moved, it points at the
+ * wrong thing. A zone caption names a region and reads correctly a few units away. So
+ * tags are rigid and captions are flexible, and because a caption may be emitted before
+ * the tag it must avoid, flexible labels are DEFERRED: they emit a token, and
+ * isoResolvePlacement() substitutes real markup once every rigid box is registered.
+ *
+ * The width comes from RZDiagramMetrics rather than length*0.62 — see
+ * standarization/DIAGRAM_ENGINE_STANDARD.md. Both fall back to the old estimate when the
+ * engine is absent, so this file still renders without it. */
+var ISO_OCC=null,ISO_FLEX=[],ISO_SEQ=0,ISO_UNPLACED=0;
+
+function isoBeginPlacement(){
+ISO_OCC=(window.RZDiagramLayout&&window.RZDiagramLayout.occupancy)?window.RZDiagramLayout.occupancy():null;
+ISO_FLEX=[];ISO_SEQ=0;ISO_UNPLACED=0;
+}
+
+function isoLabelBox(cx,cy,label,fs){
+var M=window.RZDiagramMetrics;
+var w=(M&&M.textWidth)?M.textWidth(label,fs,'mono')+8:String(label).length*fs*0.62+8;
+return{x:cx-w/2,y:cy-fs+1,w:w,h:fs+5};
+}
+
+function isoLabelMarkup(box,cx,cy,label,color,fs,bold,o){
+return'<rect x="'+box.x+'" y="'+box.y+'" width="'+box.w+'" height="'+box.h+'" rx="2" fill="rgba(8,12,20,.78)"/>'+
 tx(cx,cy,label,color,fs,'middle',bold,o);
+}
+
+function isoLabel(x,y,z,label,color,sz,bold,o,rigid){
+var fs=sz||8,cx=iX(x,y),cy=iY(x,y,z);
+var box=isoLabelBox(cx,cy,label,fs);
+if(!ISO_OCC)return isoLabelMarkup(box,cx,cy,label,color,fs,bold,o);
+if(rigid){ISO_OCC.add(box,{id:'iso-eq-'+(++ISO_SEQ),kind:'text'});return isoLabelMarkup(box,cx,cy,label,color,fs,bold,o);}
+var token='<!--ISOFLEX'+(++ISO_SEQ)+'-->';
+ISO_FLEX.push({token:token,box:box,cx:cx,cy:cy,label:label,color:color,fs:fs,bold:bold,o:o});
+return token;
+}
+
+/* Substitute every deferred caption. Vertical only: an isometric caption slid sideways
+   stops sitting over the room it names, so `axis:'y'` keeps it on its own column. */
+function isoResolvePlacement(svg){
+if(!ISO_OCC||!ISO_FLEX.length)return svg;
+var L=window.RZDiagramLayout;
+for(var i=0;i<ISO_FLEX.length;i++){
+var f=ISO_FLEX[i];
+var pl=L.placeBox(f.box,{occupancy:ISO_OCC,axis:'y',step:5,rings:10});
+if(!pl.placed)ISO_UNPLACED++;
+ISO_OCC.add(pl.box,{id:'iso-zone-'+i,kind:'text'});
+var dy=pl.box.y-f.box.y;
+svg=svg.split(f.token).join(isoLabelMarkup(pl.box,f.cx,f.cy+dy,f.label,f.color,f.fs,f.bold,f.o));
+}
+ISO_FLEX=[];
+return svg;
 }
 
 // 3D equipment box: isoBox(x,y,w,d,z,h,fill,label)
@@ -1908,7 +1963,7 @@ function isoBox(x,y,w,d,z,h,fill,label,labelColor,o){
 var s='<g filter="url(#eqSh)">';
 s+=drawSlab(x,y,w,d,z,h,fill,'rgba(255,255,255,.3)',.6);
 s+='</g>';
-if(label)s+=isoLabel(x+w/2,y+d/2,z+h+0.8,label,labelColor||'#fff',7,1,o);
+if(label)s+=isoLabel(x+w/2,y+d/2,z+h+0.8,label,labelColor||'#fff',7,1,o,true);/* rigid: a tag names THIS box */
 return s;
 }
 // Building dimensions
@@ -1925,6 +1980,7 @@ var floors=[
 ];
 
 function renderOverview(){
+isoBeginPlacement();
 var s='';
 // Defs
 s+='<defs><filter id="bSh" x="-5%" y="-5%" width="120%" height="130%"><feDropShadow dx="2" dy="4" stdDeviation="4" flood-opacity=".15"/></filter>';
@@ -2257,7 +2313,7 @@ ky+=15;
 // Click hint
 s+=tx(600,810,'Click any floor layer to explore detailed room layout','var(--t3)',8,'middle');
 
-bC.innerHTML=s;
+bC.innerHTML=isoResolvePlacement(s);
 
 // Hover effect
 var isoFloors=document.querySelectorAll('.iso-floor');

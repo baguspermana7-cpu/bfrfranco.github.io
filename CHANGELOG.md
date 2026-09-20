@@ -11,6 +11,27 @@ release sections rather than semver.
 
 ---
 
+## v3.10.5 — 2026-09-20
+
+### Which way is short
+
+v3.10.2 taught the geometry survey to dedupe a defect across the four viewports and two themes
+it appears in, because a pair that collides in all eight is one thing to fix. The dedup key was
+the pair without its overlap numbers — and the numbers went with them.
+
+That reading is the whole diagnosis. A `27.0x2.0px` overlap is a **horizontal** problem, and no
+amount of moving the label down will clear it; two attempts earlier this week were spent taking
+the vertical lever on exactly that shape before the geometry was read. `2.0x27.0px` is the same
+pair and the opposite remedy.
+
+### Fixed
+
+- **The per-drawing listing keeps one representative overlap per defect**, preferring the
+  desktop row, instead of printing the pair with its measurements stripped. Deduped counts are
+  unchanged; the reading is back.
+
+---
+
 ## v3.10.4 — 2026-09-20
 
 ### Say the deduped number

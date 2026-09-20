@@ -317,10 +317,15 @@ try {
     const byDiagram = new Map();
     for (const f of findings) {
       const key = `${f.page} · ${f.diagram || '(unnamed)'}`;
-      if (!byDiagram.has(key)) byDiagram.set(key, { rows: 0, pairs: new Set() });
+      if (!byDiagram.has(key)) byDiagram.set(key, { rows: 0, pairs: new Map() });
       const e = byDiagram.get(key);
       e.rows++;
-      e.pairs.add(`[${f.check}] ${f.detail.replace(/ overlap [\d.]+x[\d.]+px$/, '')}`);
+      /* Dedupe on the pair, but KEEP one representative overlap. Which AXIS is short is the
+       * whole diagnostic — a 27x2 overlap is a horizontal problem and no amount of moving the
+       * label down will clear it. Stripping the numbers to dedupe throws that away. */
+      const bare = f.detail.replace(/ overlap [\d.]+x[\d.]+px$/, '');
+      const pairKey = `[${f.check}] ${bare}`;
+      if (!e.pairs.has(pairKey) || /desktop/.test(f.viewport)) e.pairs.set(pairKey, f.detail);
     }
     console.log('\n  BY DRAWING — distinct defects, and the rows they produce:');
     for (const [key, e] of [...byDiagram.entries()].sort((a, b) => b[1].pairs.size - a[1].pairs.size)) {
@@ -330,7 +335,7 @@ try {
     console.log('');
     for (const [key, e] of [...byDiagram.entries()].sort((a, b) => b[1].pairs.size - a[1].pairs.size)) {
       console.log(`  ${key}`);
-      for (const pair of [...e.pairs].sort()) console.log(`    ${pair}`);
+      for (const [, detail] of [...e.pairs.entries()].sort()) console.log(`    ${detail}`);
     }
   }
 } finally {
