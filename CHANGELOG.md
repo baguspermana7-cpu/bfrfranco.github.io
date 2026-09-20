@@ -11,6 +11,31 @@ release sections rather than semver.
 
 ---
 
+## v3.10.4 — 2026-09-20
+
+### Say the deduped number
+
+Housekeeping, but two of these were wrong in a way that would have been quoted.
+
+### Fixed
+
+- **`DIAGRAM_ENGINE_STANDARD.md` carried three stale facts** — 63 assertions (now 68),
+  "15 diagrams" on `datahallAI.html` (`TAB_SETS` registers 21), and the raw **218** geometry
+  findings. That last one is inflated by roughly a factor of eight: v3.10.2 taught the survey to
+  name the drawing and deduplicate across 4 viewports × 2 themes, because a pair that collides in
+  all eight combinations is **one** thing to fix. The standard now records what each surface
+  actually contains — 2,652 hand-authored coordinates on `datahallAI.html`, 462 across the Track B
+  cockpits — and states plainly that the survey does not reach those cockpits at all.
+- **`llms-full.txt` was stale.** Regenerated: 2.88 MB. `sitemap.xml`, `llms.txt` and
+  `search-sections.json` were checked the same way and were already current.
+
+### Added
+
+- The standard's §5 now lists the adoption ratchet alongside the engine test, with the
+  `--baseline` re-record step, so a migration does not leave the gate stuck on an old count.
+
+---
+
 ## v3.10.3 — 2026-09-20
 
 ### A ratchet, not an ultimatum

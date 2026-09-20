@@ -190,13 +190,24 @@ Gated by `B1`–`B3` in `tools/test-rz-diagram-engine.mjs`.
 ## 5. Verification
 
 ```bash
-node tools/test-rz-diagram-engine.mjs    # 63 geometry assertions — SHIP GATE
+node tools/test-rz-diagram-engine.mjs         # 68 geometry assertions — SHIP GATE
+node tools/test-diagram-engine-adoption.mjs   # adoption ratchet — SHIP GATE
 node tools/demo-rz-diagram.mjs           # renders one real diagram, exits 1 on any collision
 node tools/test-conv-geometry.mjs --page=<file>   # measures the rendered page
 ```
 
 The engine test is mutation-checked: disabling the placement search, the router's obstacle
 test, or the attach-point formula each turns three assertions red.
+
+The **adoption ratchet** counts hand-authored geometry per cockpit file and fails when it
+RISES. A falling count is the point, and asks for a re-record:
+
+```bash
+node tools/test-diagram-engine-adoption.mjs --baseline   # after a migration
+```
+
+A new cockpit file carrying any hand-authored geometry fails outright — a new diagram has
+no excuse. Both failure paths were injected and observed.
 
 ---
 
@@ -206,8 +217,15 @@ test, or the attach-point formula each turns three assertions red.
 |---|---|
 | Engine + gate | **shipped** v3.10.0 |
 | `tools/demo-rz-diagram.mjs` — cooling chain | **drawn by the engine**, 30 boxes, 0 collisions |
-| `datahallAI.html` — 15 diagrams | hand-typed coordinates; 218 reported findings |
-| `dc-conventional.html` and the 8 Track B cockpits | hand-typed coordinates |
+| `datahallAI.html` — 21 measured drawings | hand-typed coordinates; 2,652 of them |
+| `dc-conventional.html` and the Track B cockpits | hand-typed coordinates; 462 across 9 files |
+| Adoption ratchet | **shipped** v3.10.3 — baseline 3,114, may fall, never rise |
+| Basis marks (every cockpit) | **measured** v3.10.2 — no longer `length × size × 0.6` |
+
+**The geometry survey does not reach the Track B cockpits.** `TAB_SETS` lists `datahallAI.html`
+and nothing else, so `fire-system.html` (137 raw coordinates), `water-system.html` (121) and
+`fuel-system.html` (97) are unmeasured — which is a hole in the survey, not evidence they are
+clean. The ratchet holds them anyway; extending the survey is separate work.
 
 Migration is per diagram, and each one is a separate ship with its own geometry
 re-measurement. The isometric `#bldgSvg` is the largest single block and has its own plan;
