@@ -710,7 +710,7 @@
         body.light-mode .map-popup-row .val{color:#1e293b}
         body.light-mode #dcGlobalMap{background:#f8fafc}
     </style>
-    <script src="js/rz-version.js?v=20260920-c35dc44c" defer></script>
+    <script src="js/rz-version.js?v=20260920-10a50683" defer></script>
     <script src="js/rz-explain-db.js?v=20260920-726727d9" defer></script>
     <script src="js/rz-explain.js?v=20260920-d0317658" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260920-b64c1545" defer></script>
@@ -976,7 +976,7 @@
             <div class="card-title" style="margin:0"><i class="fas fa-user-cog" style="color:#94a3b8"></i> All Users</div>
             <div class="tbl-controls" style="margin:0">
                 <div class="tbl-search"><i class="fas fa-search"></i><input id="userSearch" placeholder="Search email or name..." oninput="filterUsers()" aria-label="Search email or name..."></div>
-                <select class="tbl-select" id="tierFilter" onchange="filterUsers()" aria-label="Tier Filter"><option value="all">All Tiers</option><option value="pro">Pro</option><option value="free">Free</option><option value="demo">Demo</option><option value="educator">Educator</option><option value="root">Root</option></select>
+                <select class="tbl-select" id="tierFilter" onchange="filterUsers()" aria-label="Tier Filter"><option value="all">All Tiers</option><option value="pro">Full access</option><option value="free">Free</option><option value="demo">Demo</option><option value="educator">Educator</option><option value="root">Root</option></select>
                 <select class="tbl-select" id="statusFilter" onchange="filterUsers()" aria-label="Status Filter"><option value="all">All Status</option><option value="active">Active</option><option value="inactive">Inactive</option><option value="suspended">Suspended</option></select>
                 <button class="btn btn-green" onclick="exportCSV()"><i class="fas fa-download"></i> Export CSV</button>
                 <button class="btn btn-purple" onclick="openCreateModal()" style="background:linear-gradient(135deg,rgba(100, 116, 139,0.2),rgba(8,145,178,0.1));border:1px solid rgba(100, 116, 139,0.4);color:#94a3b8;"><i class="fas fa-user-plus"></i> Create Account</button>
@@ -1018,7 +1018,7 @@
             </div>
         </div>
         <div class="tbl-overflow" id="credentialsList"></div>
-        <p style="font-size:0.72rem;color:#94a3b8;margin:0.6rem 0 0;">These are the legacy hardcoded accounts (used for the site's Pro-gating). Passwords shown here are placeholders — the real Supabase accounts are below.</p>
+        <p style="font-size:0.72rem;color:#94a3b8;margin:0.6rem 0 0;">These are the legacy hardcoded accounts (used for the site's Full access-gating). Passwords shown here are placeholders — the real Supabase accounts are below.</p>
     </div>
 
     <!-- Supabase Accounts (live, RLS root-only) -->
@@ -1051,7 +1051,7 @@
 <!-- ══════════════════════════════════════ FEATURES ══════════════════════════════════════ -->
 <div class="section" id="sec-features">
     <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div><h1>Feature Flags</h1><p>Per-page 4-tier feature matrix — FREE | DEMO | PRO | ROOT. Changes persist immediately.</p></div>
+        <div><h1>Feature Flags</h1><p>Per-page 4-tier feature matrix — FREE | DEMO | FULL | ROOT. Changes persist immediately.</p></div>
         <div style="display:flex;gap:0.5rem;flex-shrink:0">
             <button class="btn btn-green btn-sm" onclick="exportFeaturesCSV()"><i class="fas fa-download"></i> CSV</button>
             <button class="btn btn-purple btn-sm" onclick="openReport('features')"><i class="fas fa-file-alt"></i> Report</button>
@@ -1072,11 +1072,11 @@
                         <select id="featurePresetSelect" style="background:#0f172a;border:1px solid #334155;border-radius:6px;color:#e2e8f0;font-size:0.72rem;padding:4px 8px;font-family:inherit;cursor:pointer;outline:none" onchange="applyFeaturePreset(this.value)" aria-label="Apply feature preset">
                             <option value="">Apply preset...</option>
                             <option value="all_free">All tiers on</option>
-                            <option value="all_demo+">Demo + Pro + Root</option>
-                            <option value="all_pro+">Pro + Root</option>
+                            <option value="all_demo+">Demo + Full access + Root</option>
+                            <option value="all_pro+">Full access + Root</option>
                             <option value="all_root_only">Root only</option>
-                            <option value="pro_only">Pro only (free + demo off)</option>
-                            <option value="demo_up">Demo + Pro enabled</option>
+                            <option value="pro_only">Full access only (free + demo off)</option>
+                            <option value="demo_up">Demo + Full access enabled</option>
                             <option value="all_off">All tiers off</option>
                         </select>
                         <button class="btn btn-ghost btn-sm" onclick="resetFeaturePage(window._selectedFeaturePage || '')"><i class="fas fa-undo"></i> Reset to defaults</button>
@@ -1089,7 +1089,7 @@
                                 <th>Feature</th>
                                 <th>FREE</th>
                                 <th>DEMO</th>
-                                <th>PRO</th>
+                                <th>FULL</th>
                                 <th>ROOT</th>
                                 <th>Default</th>
                             </tr>
@@ -1814,7 +1814,7 @@
                     <div><label class="mayar-label">Customer Name *</label><input class="mayar-input" id="mayarInvName" placeholder="John Doe" aria-label="John Doe"></div>
                     <div><label class="mayar-label">Email *</label><input class="mayar-input" id="mayarInvEmail" placeholder="john@example.com" type="email" aria-label="john@example.com"></div>
                     <div><label class="mayar-label">Mobile</label><input class="mayar-input" id="mayarInvMobile" placeholder="+628123456789" aria-label="+628123456789"></div>
-                    <div><label class="mayar-label">Description *</label><input class="mayar-input" id="mayarInvDesc" placeholder="Pro subscription" aria-label="Pro subscription"></div>
+                    <div><label class="mayar-label">Description *</label><input class="mayar-input" id="mayarInvDesc" placeholder="Full access subscription" aria-label="Full access subscription"></div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
                         <div><label class="mayar-label">Quantity</label><input class="mayar-input" id="mayarInvQty" type="number" value="1" min="1" aria-label="Mayar Inv Qty"></div>
                         <div><label class="mayar-label">Rate (IDR) *</label><input class="mayar-input" id="mayarInvRate" type="number" placeholder="99000" aria-label="99000"></div>
@@ -1861,7 +1861,7 @@
 <!-- ══════════════════════════════════════ USER ACTIVITY ══════════════════════════════════════ -->
 <div class="section" id="sec-activity">
     <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div><h1>User Activity</h1><p>Real-time tracking — Pro clicks, demo logins, PDF exports, CV downloads, calculator usage <span id="uaDataSource" style="font-size:0.68rem;color:#475569;margin-left:6px"></span></p></div>
+        <div><h1>User Activity</h1><p>Real-time tracking — Full access clicks, demo logins, PDF exports, CV downloads, calculator usage <span id="uaDataSource" style="font-size:0.68rem;color:#475569;margin-left:6px"></span></p></div>
         <button class="btn btn-purple btn-sm" onclick="openReport('activity')"><i class="fas fa-file-alt"></i> Report</button>
     </div>
 
@@ -1882,7 +1882,7 @@
         <label>Category:</label>
         <select class="tbl-select" id="uaCatFilter" onchange="renderActivity()" style="min-width:140px" aria-label="Ua Cat Filter">
             <option value="all">All Categories</option>
-            <option value="pro_click">Pro Mode Click</option>
+            <option value="pro_click">Full access Mode Click</option>
             <option value="demo_login">Demo Login</option>
             <option value="pdf_export">PDF Export</option>
             <option value="cv_download">CV Download</option>
@@ -2068,7 +2068,7 @@
                         <label style="display:block;font-size:0.72rem;font-weight:600;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Access Tier *</label>
                         <select id="createTier" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;" aria-label="Create Tier">
                             <option value="free" selected>Free</option>
-                            <option value="pro">Pro</option>
+                            <option value="pro">Full access</option>
                         </select>
                     </div>
                     <div>
@@ -2705,7 +2705,7 @@ function renderRevenue(){
     new Chart(document.getElementById('chartChurn'),{type:'doughnut',data:{labels:['Retained','Churned'],datasets:[{data:[97.9,2.1],backgroundColor:['#34d399','#f87171'],borderColor:'#1e293b',borderWidth:3}]},options:{responsive:true,cutout:'70%',plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:10},padding:14,usePointStyle:true}}}}});
     // Revenue table
     const payingUsers=allUsers.filter(u=>u.tier==='pro').sort((a,b)=>b.amountPaid-a.amountPaid);
-    document.getElementById('revenueTableWrap').innerHTML=`<table class="data-tbl"><thead><tr><th scope="col">Account</th><th scope="col">Tier</th><th scope="col">Last Payment</th><th scope="col">Amount</th><th scope="col">Est. LTV</th></tr></thead><tbody>${payingUsers.map(u=>`<tr><td style="font-weight:500">${u.name}<br><span style="font-size:0.7rem;color:#64748b">${u.email}</span></td><td><span class="tier-badge pro">PRO</span></td><td>${u.lastPayment||'—'}</td><td style="color:#34d399;font-weight:600">$${u.amountPaid.toFixed(2)}</td><td style="color:#fbbf24">$${(u.amountPaid*rand(6,18)).toFixed(0)}</td></tr>`).join('')}</tbody></table>`;
+    document.getElementById('revenueTableWrap').innerHTML=`<table class="data-tbl"><thead><tr><th scope="col">Account</th><th scope="col">Tier</th><th scope="col">Last Payment</th><th scope="col">Amount</th><th scope="col">Est. LTV</th></tr></thead><tbody>${payingUsers.map(u=>`<tr><td style="font-weight:500">${u.name}<br><span style="font-size:0.7rem;color:#64748b">${u.email}</span></td><td><span class="tier-badge pro">FULL</span></td><td>${u.lastPayment||'—'}</td><td style="color:#34d399;font-weight:600">$${u.amountPaid.toFixed(2)}</td><td style="color:#fbbf24">$${(u.amountPaid*rand(6,18)).toFixed(0)}</td></tr>`).join('')}</tbody></table>`;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -2933,12 +2933,12 @@ function openReport(section){
         var countries={};allUsers.forEach(u=>{countries[u.country]=(countries[u.country]||0)+1});
         body+='<div class="kpi-row">';
         body+='<div class="kpi-box"><div class="label">Total Users</div><div class="value">'+allUsers.length+'</div><div class="sub">All accounts</div></div>';
-        body+='<div class="kpi-box"><div class="label">Pro Users</div><div class="value">'+pro+'</div><div class="sub">'+Math.round(pro/allUsers.length*100)+'% of total</div></div>';
+        body+='<div class="kpi-box"><div class="label">Full access Users</div><div class="value">'+pro+'</div><div class="sub">'+Math.round(pro/allUsers.length*100)+'% of total</div></div>';
         body+='<div class="kpi-box"><div class="label">Active</div><div class="value">'+active+'</div><div class="sub">'+Math.round(active/allUsers.length*100)+'% active rate</div></div>';
         body+='<div class="kpi-box"><div class="label">Calculations</div><div class="value">'+totalCalcs.toLocaleString()+'</div><div class="sub">All time</div></div>';
         body+='</div>';
         body+='<h2>Tier Distribution</h2><div class="stats-grid"><div class="stat-card"><h3>By Tier</h3>';
-        body+='<div class="bar"><span class="bar-label">Pro</span><div style="flex:1;background:#f1f5f9;border-radius:3px;height:6px"><div class="bar-fill" style="width:'+Math.round(pro/allUsers.length*100)+'%"></div></div><span class="bar-val">'+pro+'</span></div>';
+        body+='<div class="bar"><span class="bar-label">Full access</span><div style="flex:1;background:#f1f5f9;border-radius:3px;height:6px"><div class="bar-fill" style="width:'+Math.round(pro/allUsers.length*100)+'%"></div></div><span class="bar-val">'+pro+'</span></div>';
         body+='<div class="bar"><span class="bar-label">Free</span><div style="flex:1;background:#f1f5f9;border-radius:3px;height:6px"><div class="bar-fill" style="width:'+Math.round(free/allUsers.length*100)+'%;background:#64748b"></div></div><span class="bar-val">'+free+'</span></div>';
         body+='</div><div class="stat-card"><h3>By Status</h3>';
         ['active','inactive','suspended'].forEach(function(s){var c=allUsers.filter(u=>u.status===s).length;
@@ -2984,7 +2984,7 @@ function openReport(section){
         var active=allUsers.filter(u=>u.status==='active').length;
         body+='<div class="kpi-row">';
         body+='<div class="kpi-box"><div class="label">Total</div><div class="value">'+allUsers.length+'</div><div class="sub">All accounts</div></div>';
-        body+='<div class="kpi-box"><div class="label">Pro</div><div class="value">'+pro+'</div><div class="sub">'+Math.round(pro/allUsers.length*100)+'%</div></div>';
+        body+='<div class="kpi-box"><div class="label">Full access</div><div class="value">'+pro+'</div><div class="sub">'+Math.round(pro/allUsers.length*100)+'%</div></div>';
         body+='<div class="kpi-box"><div class="label">Active</div><div class="value">'+active+'</div><div class="sub">'+Math.round(active/allUsers.length*100)+'%</div></div>';
         body+='<div class="kpi-box"><div class="label">Avg Calcs</div><div class="value">'+Math.round(allUsers.reduce((s,u)=>s+u.usage,0)/allUsers.length)+'</div><div class="sub">Per user</div></div>';
         body+='</div>';
@@ -3000,10 +3000,10 @@ function openReport(section){
         var freeEnabled=keys.filter(k=>featureFlags[k].free).length;
         body+='<div class="kpi-row" style="grid-template-columns:repeat(3,1fr)">';
         body+='<div class="kpi-box"><div class="label">Total Features</div><div class="value">'+keys.length+'</div></div>';
-        body+='<div class="kpi-box"><div class="label">Pro Enabled</div><div class="value">'+proEnabled+'</div><div class="sub">of '+keys.length+'</div></div>';
+        body+='<div class="kpi-box"><div class="label">Full access Enabled</div><div class="value">'+proEnabled+'</div><div class="sub">of '+keys.length+'</div></div>';
         body+='<div class="kpi-box"><div class="label">Free Enabled</div><div class="value">'+freeEnabled+'</div><div class="sub">of '+keys.length+'</div></div>';
         body+='</div>';
-        body+='<h2>Feature Matrix</h2><table><thead><tr><th scope="col">Feature</th><th scope="col">Description</th><th scope="col">Free</th><th scope="col">Pro</th></tr></thead><tbody>';
+        body+='<h2>Feature Matrix</h2><table><thead><tr><th scope="col">Feature</th><th scope="col">Description</th><th scope="col">Free</th><th scope="col">Full access</th></tr></thead><tbody>';
         keys.forEach(k=>{var f=featureFlags[k];
             body+='<tr><td style="font-weight:600">'+f.label+'</td><td style="color:#64748b">'+f.desc+'</td><td style="text-align:center;color:'+(f.free?'#059669':'#dc2626')+';font-weight:700">'+(f.free?'ON':'OFF')+'</td><td style="text-align:center;color:'+(f.pro?'#059669':'#dc2626')+';font-weight:700">'+(f.pro?'ON':'OFF')+'</td></tr>';
         });
@@ -3563,7 +3563,7 @@ function renderFeatures() {
         proUsers.map(function(u) {
             return '<div style="background:#0f172a;border:1px solid #334155;border-radius:10px;padding:1rem;display:flex;align-items:center;gap:12px">' +
                 '<div class="cred-avatar" style="background:#64748b;width:32px;height:32px;font-size:0.6rem">' + u.name.charAt(0) + '<\/div>' +
-                '<div style="flex:1;min-width:0"><div style="font-size:0.78rem;font-weight:600;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + u.email + '<\/div><span class="tier-badge pro" style="margin-top:4px">PRO<\/span><\/div>' +
+                '<div style="flex:1;min-width:0"><div style="font-size:0.78rem;font-weight:600;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + u.email + '<\/div><span class="tier-badge pro" style="margin-top:4px">FULL<\/span><\/div>' +
                 '<button class="btn btn-ghost btn-sm" onclick="(window.showToast||alert)(\'Override panel for ' + u.email + ' — coming with Supabase integration\')"><i class="fas fa-sliders-h"><\/i><\/button>' +
                 '<\/div>';
         }).join('') + '<\/div>';

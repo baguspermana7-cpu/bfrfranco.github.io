@@ -83,13 +83,13 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
     <!-- v1.43.11 editorial register (RZ Dark System v1) — dark-only, scoped. -->
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
-    <link rel="stylesheet" href="css/rz-article-dark.css?v=20260920-d8476844">
+    <link rel="stylesheet" href="css/rz-article-dark.css?v=20260920-63c1e3d7">
     <script src="js/rz-explain-db.js?v=20260920-726727d9" defer></script>
 <script src="js/rz-explain.js?v=20260920-d0317658" defer></script>
 <script src="js/rz-article-editorial.js?v=20260920-10bc5a1a" defer></script>
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
-    <link rel="stylesheet" href="styles.min.css?v=20260920-37a46bce">
+    <link rel="stylesheet" href="styles.min.css?v=20260920-544ad99b">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preload" as="image" href="assets/article-1-cover.jpg">
 
@@ -1493,7 +1493,7 @@
     </style>
     <link rel="preload" as="image" href="assets/article-1-cover.jpg">
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
-    <script src="js/rz-version.js?v=20260920-c35dc44c" defer></script>
+    <script src="js/rz-version.js?v=20260920-10a50683" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260920-b64c1545" defer></script>
     <script src="js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
     <script>(function(){var t=localStorage.getItem("theme")||"light";document.documentElement.setAttribute("data-theme",t);})();</script>
@@ -2672,7 +2672,7 @@
                     <div class="maturity-toolbar-row">
                         <div class="maturity-mode-bar">
                             <button class="maturity-mode-btn active" id="maturityModeFree" onclick="switchMaturityMode('free')"><i class="fas fa-chart-simple"></i> Free Assessment</button>
-                            <button class="maturity-mode-btn" id="maturityModePro" onclick="switchMaturityMode('pro')"><i class="fas fa-microscope"></i> Pro Analysis <span class="gated-badge" id="maturityProBadge">PRO</span></button>
+                            <button class="maturity-mode-btn" id="maturityModePro" onclick="switchMaturityMode('pro')"><i class="fas fa-microscope"></i> Full analysis <span class="gated-badge" id="maturityProBadge">FULL</span></button>
                         </div>
                         <div class="maturity-toolbar-actions">
                             <button class="maturity-export-btn" onclick="exportMaturityPDF()" style="padding:8px 14px;font-size:0.78rem;margin:0;">
@@ -2774,7 +2774,7 @@
                                         <label class="calc-label" style="display:flex;align-items:center;">Capacity (MW)
                                             <span class="tooltip-trigger" style="margin-left:4px;">?<span class="tooltip-content"><div class="tooltip-title">IT Capacity</div><div class="tooltip-desc">Total IT power capacity. Larger facilities (10+ MW) need higher operational maturity due to complexity, blast radius, and regulatory scrutiny.</div></span></span>
                                         </label>
-                                        <select class="calc-select" id="pro-capacity" onchange="calculateMaturity()" aria-label="Pro capacity">
+                                        <select class="calc-select" id="pro-capacity" onchange="calculateMaturity()" aria-label="Full access capacity">
                                             <option value="1">1 MW</option><option value="2">2 MW</option><option value="5" selected>5 MW</option><option value="10">10 MW</option><option value="20">20 MW</option><option value="50">50 MW</option><option value="100">100+ MW</option>
                                         </select>
                                     </div>
@@ -2782,7 +2782,7 @@
                                         <label class="calc-label" style="display:flex;align-items:center;">Facility Type
                                             <span class="tooltip-trigger" style="margin-left:4px;">?<span class="tooltip-content"><div class="tooltip-title">Facility Type</div><div class="tooltip-desc"><strong>Enterprise:</strong> Single-tenant, internal IT<br><strong>Colocation:</strong> Multi-tenant, shared infrastructure<br><strong>Hyperscale:</strong> 50+ MW, cloud provider-grade<br><strong>Edge:</strong> Distributed, remote, unmanned</div></span></span>
                                         </label>
-                                        <select class="calc-select" id="pro-type" onchange="calculateMaturity()" aria-label="Pro type">
+                                        <select class="calc-select" id="pro-type" onchange="calculateMaturity()" aria-label="Full access type">
                                             <option value="enterprise">Enterprise</option><option value="colocation" selected>Colocation</option><option value="hyperscale">Hyperscale</option><option value="edge">Edge</option>
                                         </select>
                                     </div>
@@ -2790,7 +2790,7 @@
                                         <label class="calc-label" style="display:flex;align-items:center;">Redundancy Tier
                                             <span class="tooltip-trigger" style="margin-left:4px;">?<span class="tooltip-content"><div class="tooltip-title">Uptime Tier Level</div><div class="tooltip-desc"><strong>Tier I:</strong> Basic, no redundancy (99.671%)<br><strong>Tier II:</strong> Redundant components (99.741%)<br><strong>Tier III:</strong> Concurrently maintainable (99.982%)<br><strong>Tier IV:</strong> Fault tolerant (99.995%)</div></span></span>
                                         </label>
-                                        <select class="calc-select" id="pro-tier" onchange="calculateMaturity()" aria-label="Pro tier">
+                                        <select class="calc-select" id="pro-tier" onchange="calculateMaturity()" aria-label="Full access tier">
                                             <option value="1">Tier I</option><option value="2">Tier II</option><option value="3" selected>Tier III</option><option value="4">Tier IV</option>
                                         </select>
                                     </div>
@@ -2798,7 +2798,7 @@
                                         <label class="calc-label" style="display:flex;align-items:center;">Operating Model
                                             <span class="tooltip-trigger" style="margin-left:4px;">?<span class="tooltip-content"><div class="tooltip-title">Operating Model</div><div class="tooltip-desc"><strong>In-House:</strong> All staff employed directly<br><strong>Managed Services:</strong> Outsourced to FM provider<br><strong>Hybrid:</strong> Core team in-house, specialists outsourced</div></span></span>
                                         </label>
-                                        <select class="calc-select" id="pro-model" onchange="calculateMaturity()" aria-label="Pro model">
+                                        <select class="calc-select" id="pro-model" onchange="calculateMaturity()" aria-label="Full access model">
                                             <option value="inhouse" selected>In-House</option><option value="managed">Managed Services</option><option value="hybrid">Hybrid</option>
                                         </select>
                                     </div>
@@ -2806,7 +2806,7 @@
                                         <label class="calc-label" style="display:flex;align-items:center;">Region
                                             <span class="tooltip-trigger" style="margin-left:4px;">?<span class="tooltip-content"><div class="tooltip-title">Geographic Region</div><div class="tooltip-desc">Affects benchmark comparison. APAC, Americas, and EMEA have different regulatory environments and maturity baselines.</div></span></span>
                                         </label>
-                                        <select class="calc-select" id="pro-region" onchange="calculateMaturity()" aria-label="Pro region">
+                                        <select class="calc-select" id="pro-region" onchange="calculateMaturity()" aria-label="Full access region">
                                             <option value="apac" selected>Asia Pacific</option><option value="americas">Americas</option><option value="emea">EMEA</option>
                                         </select>
                                     </div>
@@ -2907,7 +2907,7 @@
                     <!-- ─── PRO ANALYSIS PANELS (appear after results/charts) ─── -->
                     <div id="maturityProPanels" style="display:none;">
 
-                        <h4 style="color: #22d3ee; margin: 2rem 0 1rem; font-size: 1rem; font-weight: 700; display:flex;align-items:center;gap:8px;"><i class="fas fa-microscope" style="font-size:0.85rem;"></i> Pro Analysis</h4>
+                        <h4 style="color: #22d3ee; margin: 2rem 0 1rem; font-size: 1rem; font-weight: 700; display:flex;align-items:center;gap:8px;"><i class="fas fa-microscope" style="font-size:0.85rem;"></i> Full analysis</h4>
 
                         <!-- 4. Sensitivity Tornado -->
                         <div class="pro-panel" id="proSensitivity">
@@ -3132,16 +3132,6 @@
                     </div>
                 </div>
 
-                <!-- Newsletter Signup -->
-                <div class="newsletter-signup">
-                    <h3>Stay Updated</h3>
-                    <p>Get notified when new articles on data center operations and engineering excellence are published.</p>
-                    <form class="newsletter-form" onsubmit="return subscribeNewsletter(event)">
-                        <input type="email" placeholder="Enter your email" required>
-                        <button type="submit">Subscribe</button>
-                    </form>
-                    <p class="newsletter-privacy">No spam. Unsubscribe anytime.</p>
-                </div>
 
                 <!-- Author Bio -->
                 <div class="author-bio">
@@ -3272,7 +3262,7 @@
         </button>
     </aside>
 
-    <script src="script.min.js?v=20260920-06a132bf"></script>
+    <script src="script.min.js?v=20260920-0e1dd953"></script>
 
     <!-- Share Buttons Functionality -->
     <script>
@@ -4859,7 +4849,6 @@ article h2:hover::before { opacity: 1; transform: translateX(0); }
     })();
     </script>
 <script>
-/* v1.9.1: subscribeNewsletter() moved to script.js (global, mailto: based) */
 </script>
 <script src="auth.js?v=20260920-040a6c54" defer></script>
 <script src="rz-engine.min.js?v=20260920-ab37c012" defer></script>

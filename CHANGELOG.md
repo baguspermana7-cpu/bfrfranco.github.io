@@ -11,6 +11,235 @@ release sections rather than semver.
 
 ---
 
+## v3.10.17 — 2026-09-20
+
+### A gate that walks one directory reports a clean site by not looking at it
+
+Two findings from the SEO audit, and they are the same bug twice: a tool that enumerates pages with
+`readdir(ROOT)` or `glob("*.html")` sees the repository root and nothing else. Half this site's
+public surface lives in `network/`, `manual/`, `id/` and `prd/`.
+
+**A — 79 of 90 sub-directory pages were serving a shared asset under a stale or legacy token.**
+`tools/test-asset-cache-tokens.mjs` has been green on every ship while never opening those
+directories:
+
+| asset | pages carrying a stale token |
+|---|---:|
+| `js/rz-version.js` | 78 |
+| `styles.min.css` | 76 — still `?v=20260908-editorial`, twelve days and many rebuilds old |
+| `js/rz-mobile-nav.js` | 53 |
+| `js/rz-cookie-consent.js` | 53 |
+| `auth.js` | 43 |
+| `js/rz-command-palette.js` | 40 |
+
+`auth.js` on 43 pages is the same class as the stale `auth.min.js` that once made the HOMEPAGE run
+old code.
+
+The gate now enumerates `git ls-files '*.html'` and **keys every asset by its path from the
+repository root**, because a sub-directory page writes `../../styles.min.css` for the file a root
+page calls `styles.min.css` — treating those as two assets would have split every pin and every
+token check down the middle even after the walk was fixed. 266 pages scanned, up from 179;
+118 pages retokened; version pins still exempt, since hashing those blanks the cockpits fail-closed.
+
+**B — the 25 `network/**` protocol explainers had no social or structured metadata at all.**
+Modbus TCP and RTU, BACnet/IP and MS/TP, OPC UA, DNP3, PROFINET, EtherCAT, EtherNet/IP, TLS, mTLS,
+OAuth/JWT, WireGuard, SNMP, syslog, IPMI/Redfish, gRPC, GraphQL, REST, MCP tool-call, DHCP/DNS,
+IPv4 vs IPv6, subnetting/CIDR, the TCP handshake and the OSI model — no `og:*`, no `twitter:card`,
+no JSON-LD. For an answer engine those are the most citable pages on the site and they were the
+least marked up. `tools/build-og-images.py` had the identical root-only glob, which is why.
+
+Each page now carries the full Open Graph block, a Twitter summary card, and `TechArticle` JSON-LD
+built from its own `<h1>`, description and canonical — authored values, nothing invented. Their
+cards already existed on disk as `assets/og/network-*.webp`; no page had ever pointed at one.
+
+The slug is `network-<stem>`, not the bare stem: **27 stems collide across this sitemap**
+(`datahall`, `ict`, `fire-system`, `pue`, `cdu-mini-bms`…), so a bare stem is not a safe card name
+for a page that lives in a sub-directory.
+
+### Metadata coverage, measured over the 176 sitemap pages
+
+| signal | before | after |
+|---|---:|---:|
+| `og:title` | 152 (86%) | **176 (100%)** |
+| `og:image` | 152 (86%) | **176 (100%)** |
+| JSON-LD | 152 (86%) | **176 (100%)** |
+| `twitter:card` | 143 (81%) | **176 (100%)** |
+
+The last nine were `prd/` and `manual/` pages that had an `og:image` and no Twitter card.
+
+### A recommendation I withdrew after reading the code
+
+The audit's first recommendation was to add `<lastmod>` to the sitemap — 180 `priority` and 180
+`changefreq` values ship today, both of which Google ignores, and zero `lastmod`, which it uses.
+`tools/build-sitemap.py:53` omits it **deliberately**: *"Omit dates: Git commits and checkout
+mtimes do not prove significant updates."* That is a considered position, not an oversight, and I
+had recommended overriding it without reading it. A checkout mtime or a cache-token commit is not a
+content update, and Google discards a `lastmod` it finds unreliable. If it is ever wanted, the only
+honest source is the page's own authored `dateModified`, omitted where the page makes no claim.
+
+### Also in this ship — the security zone ladder is checked
+
+`tools/test-dcai-security-zones.mjs` (written alongside the WAN gate in v3.10.15, wired here).
+The Security Network view is page-authored like the WAN sheet, so its one structural claim — the
+IEC 62443 ladder — is checked rather than asserted: one conduit per adjacent pair (8 zones,
+7 conduits), SL-T never decreasing inward (1 → 2 → 2 → 2 → 3 → 3 → 3 → 4), life safety innermost at
+the highest level, its conduit monitor-only with no write, and no zone claiming a verified SL-A.
+
+**How far it is proven.** S1, S2, S4 and S5 were each triggered on their own by injecting the
+matching fault. **S3 could not be violated independently** — every way of moving life safety off the
+inner end also trips S1 or S2 first. It is kept because it states the ladder's endpoint explicitly,
+but it is a redundant guard, not an independent check, and the gate's own header says so.
+
+### Still open, and not mechanical
+
+94 titles outside 30–60 characters and 96 descriptions outside 70–160; 137 of 176 pages carry no
+`datePublished`/`dateModified`; 41 pages with more than one `<h1>` and 4 with none; 7 orphan pages
+with no internal inbound link. Every one of those needs authored judgement, not a sweep.
+
+---
+
+## v3.10.16 — 2026-09-20
+
+### The site stops asking for money and for e-mail addresses
+
+Owner, on a "Stay Updated / Subscribe" box at the foot of an article: *"Jangan ada tulisan
+subscribe atau apapun. Ini bukti klw saya mengkomersilkan ini. Delete atau ganti aja. Audit total
+pastikan tidak ada."* The site is an engineering portfolio and a teaching model; a newsletter
+capture and a PRO tier read as a business, and that reading is the defect.
+
+**The audit found far more than the one box he was looking at.** Measured across the public pages:
+
+| surface | found |
+|---|---|
+| newsletter capture forms | **22** — 19 `.newsletter-signup`, 3 `.newsletter-box` |
+| global `subscribeNewsletter()` opening a mailto to the owner | 1, in `script.js` |
+| PRO / Premium tier copy — crowns, "Upgrade to PRO", "Unlock PRO", "Premium Access", PRO badges | **~40 pages** |
+| privacy policy clauses describing newsletter data collection | 2 |
+
+### The tier was never a paywall
+
+`dc-market-tracker.html` grants access on `rz-auth-change` at login and from an
+`rz_premium_session` key. **There is no payment check anywhere in any page.** The words were the
+only commercial thing about it — so the words changed and the gating did not: "Upgrade to PRO"
+became "Sign in for the full analysis", "Premium Access" became "Full access", "Unlock PRO" became
+"Sign in", `PRO` badges became `FULL`. Class names and JS identifiers were deliberately left alone;
+renaming live identifiers to satisfy a text rule is how a sweep breaks a page.
+
+### Removed
+
+- All 22 capture forms and their wrappers, `subscribeNewsletter()` from `script.js`, the 20 dead
+  `.newsletter-*` CSS rules from `styles.css` / `styles-index.css`, and the orphaned
+  `<!-- Newsletter Script -->` comments. `styles.min.css`, `styles-index.min.css` and
+  `script.min.js` rebuilt.
+- The two privacy-policy rows describing newsletter collection. A privacy policy may not describe
+  collection that no longer happens.
+
+### Fixed — a thumbnail of the owner's own face
+
+`articles.html` drew article-15's card from `assets/og/index.webp`, borrowed as a placeholder since
+v2.16.0. v3.9.0 repainted `index.webp` into the portrait identity card, so the borrowed placeholder
+silently became the owner's photograph on an article about a service catalog. Repointed to
+`assets/article-15-cover.webp`, which existed all along, with its real 800×1433 dimensions declared
+instead of the inherited 1200×630.
+
+### Added
+
+- `tools/test-no-commercial-surface.mjs`, wired into `ship-gate.sh`. **91 findings on 41 pages
+  before the sweep, 0 after** — and 114 once the structural rule was repaired (see below).
+
+### Two gate mistakes, both caught by testing the gate instead of trusting it
+
+1. **The first rules banned WORDS** — premium, pricing, unlock, upgrade — and reported **254
+   findings on 71 pages, every one false**: "OpenAI pricing" in an article about the AI market,
+   "CAPEX premium" in a Tier comparison, "resilience upgrade to Cloudflare's Multi-Colo", and
+   "Log in to unlock", which is the correct access wording this very sweep introduced. A `$N/month`
+   rule was written and deleted for the same reason — its 27 findings were all electricity bills
+   ("$17/month increase already; $70/month projected by 2028"). The rules now match the **ask**: a
+   tier CTA's exact phrasing, or a form that collects an address. No word is banned on its own.
+2. **The structural rule did not fire at all.** It read a 600-character window around each
+   `type="email"` input and excused it if the word "account" appeared — and every page carries an
+   Account link in its navigation, so it excused everything. Proven by injecting a bare mailing-list
+   form, which it failed to catch. Scoped to the form's own opening tag, it now reports all 23.
+
+### Honest boundary
+
+Two things were found and deliberately NOT removed, because they are the owner's to decide, not a
+typo to fix:
+
+- `rz-ops-p7x3k9m.html` — a root-gated, `noindex`, sitemap-absent admin console with Revenue
+  Analytics, Mayar Payments, Tier Manager and a Newsletter Subscribers panel. No reader can reach
+  it; it is excluded by name in the gate so the exclusion is on the record.
+- `Data/Freemium Scheme/` — 56 tracked files including a Mayar payment webhook and Pro-Mode plans.
+  Not in the sitemap, `Disallow`ed in robots.txt, but **tracked in a public repository**. Deleting
+  the files would not remove them from git history, so deletion alone would not achieve what it
+  looks like it achieves.
+
+Archived audit reports under `standarization/Audit result/` were swept by mistake and reverted:
+they are records of past state, not site copy.
+
+---
+
+## v3.10.15 — 2026-09-20
+
+### A declared number is honest; it is not checked
+
+The Corporate & DC Internet view (§A7) is the one sheet on `datahallAI.html` the engine does not
+feed, and it says so on every figure: the dataset-refresh rate, the diurnal peak factor, the
+replication / distribution / ops terms, the committed transit and the installed port count are
+DESIGN SELECTIONS, not engine quantities. That declaration is what ACCURACY_VALIDATION asks for,
+the coverage walker counts those figures as accounted, and the row reads CLEAN.
+
+None of which makes the arithmetic true. **A page-authored study is exactly where a number drifts
+unseen** — change the dataset rate in the card and the headline keeps the old peak, and no gate on
+this site would notice, precisely because every figure is already `declared`.
+
+### Added
+
+- `tools/test-dcai-wan-study.mjs`, wired into `ship-gate.sh`. It re-derives the study from its own
+  stated inputs and checks that every printed figure follows:
+
+  | | identity | measured |
+  |---|---|---|
+  | W1 | sustained = dataset × 8 ÷ 604,800 s | 10 PB/week → 132.3 Gb/s |
+  | W2 | peak = sustained × factor + replication + distribution + ops | 132.3 × 3 + 120 + 40 + 19 = 575.9 |
+  | W3 | headline tile = the Demand Model card's peak | 576 = 576 |
+  | W4 | committed = carriers × per-carrier commitment | 2 × 400 = 800 |
+  | W5 | one carrier lost = committed ÷ carriers | 800 ÷ 2 = 400 |
+  | W6 | the adverse finding is drawn in the adverse token | 400 < 576, tile is amber |
+  | W7 | installed ≥ committed | 4.8 Tb/s ≥ 800 Gb/s |
+
+  It asserts the ARITHMETIC and never the choice of inputs — changing a design selection is not a
+  failure; publishing a figure that does not follow from it is.
+
+### Every identity proven RED, one at a time
+
+A gate that has only ever passed is decoration. Each of the seven was injected with its own fault
+and reported its own finding: dataset rate raised without the sustained figure, peak factor raised
+without the peak, headline drifted from the card, committed drifted from the carrier count,
+one-carrier figure wrong, the adverse tile repainted in an identity colour, installed dropped below
+committed. The page was restored byte-identical after every injection.
+
+W6 is the one worth naming: **an adverse finding rendered in an identity colour is a finding nobody
+reads.** The surviving commitment after a carrier loss (400 Gb/s) is below the modelled peak
+(576 Gb/s), and the gate now requires that comparison and the amber token to agree in both
+directions — if the design ever stops being adverse, the amber must go too.
+
+### Changed
+
+- The §A7 ledger entry is corrected. Owner comment (4) — "Network: modal per block, split into
+  rack-fabric / corporate-internet / security sub-tabs, firewall + cyber architecture" — is
+  **shipped**: `netSvg`, `wanSvg` and `secSvg` exist as three scoped sub-tabs, all three coverage
+  rows read CLEAN, and each block opens its own detail modal. The plan file still listed it as
+  outstanding.
+
+### Honest boundary
+
+`wanSvg` carries 0 engine hooks and is a MONITOR row in the basis-hooks gate. That is correct, not
+a gap: the engine publishes no WAN quantity, so there is nothing to hook. This gate is what stands
+in for hooking — the figures answer to each other instead of to the engine.
+
+---
+
 ## v3.10.14 — 2026-09-20
 
 ### A check nothing runs is a comment

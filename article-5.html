@@ -83,7 +83,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
     <!-- v1.43.12 editorial register (RZ Dark System v1) — dark-only, scoped. -->
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
-    <link rel="stylesheet" href="css/rz-article-dark.css?v=20260920-d8476844">
+    <link rel="stylesheet" href="css/rz-article-dark.css?v=20260920-63c1e3d7">
     <script src="js/rz-explain-db.js?v=20260920-726727d9" defer></script>
 <script src="js/rz-explain.js?v=20260920-d0317658" defer></script>
 <script src="js/rz-article-editorial.js?v=20260920-10bc5a1a" defer></script>
@@ -91,7 +91,7 @@
     <script src="js/rz-article-chart.js?v=20260920-9ee6a2c2" defer></script>
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
-    <link rel="stylesheet" href="styles.min.css?v=20260920-37a46bce">
+    <link rel="stylesheet" href="styles.min.css?v=20260920-544ad99b">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preload" as="image" href="assets/article-5-cover.jpg">
 
@@ -1208,7 +1208,7 @@
 </style>
     <link rel="preload" as="image" href="assets/article-5-cover.jpg">
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0" defer></script>
-    <script src="js/rz-version.js?v=20260920-c35dc44c" defer></script>
+    <script src="js/rz-version.js?v=20260920-10a50683" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260920-b64c1545" defer></script>
     <script src="js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
 <style id="rz-mobile-v18">
@@ -2245,7 +2245,7 @@
                     <div class="debt-toolbar-row">
                         <div class="debt-mode-bar">
                             <button class="debt-mode-btn active" id="debtModeFree" onclick="switchDebtMode('free')"><i class="fas fa-chart-simple"></i> Free Assessment</button>
-                            <button class="debt-mode-btn" id="debtModePro" onclick="switchDebtMode('pro')"><i class="fas fa-microscope"></i> Pro Analysis <span class="gated-badge" id="debtProBadge">PRO</span></button>
+                            <button class="debt-mode-btn" id="debtModePro" onclick="switchDebtMode('pro')"><i class="fas fa-microscope"></i> Full analysis <span class="gated-badge" id="debtProBadge">FULL</span></button>
                         </div>
                         <div class="debt-toolbar-actions">
                             <button class="debt-action-btn" onclick="debtResetDefaults()" style="padding:8px 14px;font-size:0.78rem;"><i class="fas fa-rotate-left"></i> Reset</button>
@@ -2386,7 +2386,7 @@
                                 </div>
                                 <canvas id="debtMCHistogram" width="800" height="280" style="width:100%;margin:1rem 0;display:block;"></canvas>
                             </div>
-                            <div class="gated-overlay" onclick="debtShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Monte Carlo uncertainty quantification</div></div>
+                            <div class="gated-overlay" onclick="debtShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Full analysis Required</div><div class="gated-sub">Monte Carlo uncertainty quantification</div></div>
                         </div>
 
                         <!-- Panel 2: Cost & ROI Deep Dive -->
@@ -2399,10 +2399,10 @@
                                     <div class="result-card"><div class="result-card-label">Break-Even Timeline <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Break-Even Timeline</div><div class="rtd">When the cost of remediation equals the cost of continued deferral.</div></span></span></div><div class="result-card-value" id="proBreakEven">--</div><div class="result-card-sub">Remediation pays for itself</div></div>
                                     <div class="result-card"><div class="result-card-label">ROI at 3 Years <span class="res-tip">?<span class="res-tip-body"><div class="rtt">3-Year ROI</div><div class="rtd">Return on investment if deferred items are remediated now, measured over 3 years.</div></span></span></div><div class="result-card-value" id="proROI3yr">--</div><div class="result-card-sub">Return on remediation invest</div></div>
                                     <div class="result-card"><div class="result-card-label">SLA Penalty Exposure <span class="res-tip">?<span class="res-tip-body"><div class="rtt">SLA Penalty Exposure</div><div class="rtd">Maximum potential SLA penalties from deferred maintenance failures.</div></span></span></div><div class="result-card-value" id="proSLAPenalty">--</div><div class="result-card-sub">Annual penalty risk estimate</div></div>
-                                    <div class="result-card"><div class="result-card-label">Insurance Premium Impact <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Insurance Impact</div><div class="rtd">Estimated insurance premium increase due to deferred maintenance risk profile.</div></span></span></div><div class="result-card-value" id="proInsurance">--</div><div class="result-card-sub">Est. premium delta</div></div>
+                                    <div class="result-card"><div class="result-card-label">Insurance Full access Impact <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Insurance Impact</div><div class="rtd">Estimated insurance premium increase due to deferred maintenance risk profile.</div></span></span></div><div class="result-card-value" id="proInsurance">--</div><div class="result-card-sub">Est. premium delta</div></div>
                                 </div>
                             </div>
-                            <div class="gated-overlay" onclick="debtShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">NPV, ROI &amp; financial exposure modeling</div></div>
+                            <div class="gated-overlay" onclick="debtShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Full analysis Required</div><div class="gated-sub">NPV, ROI &amp; financial exposure modeling</div></div>
                         </div>
 
                         <!-- Panel 3: Weibull Parameter Analysis -->
@@ -2418,7 +2418,7 @@
                                     <div class="result-card"><div class="result-card-label">B10 Life Estimate <span class="res-tip">?<span class="res-tip-body"><div class="rtt">B10 Life</div><div class="rtd">Age at which 10% of components are expected to have failed. Key for spare planning.</div></span></span></div><div class="result-card-value" id="proB10">--</div><div class="result-card-sub">Age at 10% failure probability</div></div>
                                 </div>
                             </div>
-                            <div class="gated-overlay" onclick="debtShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Weibull reliability parameters &amp; curves</div></div>
+                            <div class="gated-overlay" onclick="debtShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Full analysis Required</div><div class="gated-sub">Weibull reliability parameters &amp; curves</div></div>
                         </div>
 
                         <!-- Panel 4: Remediation Capacity Planner -->
@@ -2432,7 +2432,7 @@
                                     <div class="result-card"><div class="result-card-label">Throughput / Quarter <span class="res-tip">?<span class="res-tip-body"><div class="rtt">Quarterly Throughput</div><div class="rtd">Number of deferred items that can be remediated per quarter.</div></span></span></div><div class="result-card-value" id="proThroughput">--</div><div class="result-card-sub">Achievable items per quarter</div></div>
                                 </div>
                             </div>
-                            <div class="gated-overlay" onclick="debtShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">Erlang-C staffing &amp; phased remediation</div></div>
+                            <div class="gated-overlay" onclick="debtShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Full analysis Required</div><div class="gated-sub">Erlang-C staffing &amp; phased remediation</div></div>
                         </div>
 
                         <!-- Panel 5: Scenario Sensitivity -->
@@ -2447,7 +2447,7 @@
                                 </div>
                                 <canvas id="debtTornadoChart" width="800" height="280" style="width:100%;margin:1rem 0;display:block;"></canvas>
                             </div>
-                            <div class="gated-overlay" onclick="debtShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Pro Analysis Required</div><div class="gated-sub">What-if scenario modeling</div></div>
+                            <div class="gated-overlay" onclick="debtShowLogin()"><div class="gated-icon"><i class="fas fa-lock"></i></div><div class="gated-text">Full analysis Required</div><div class="gated-sub">What-if scenario modeling</div></div>
                         </div>
 
                         <!-- Executive Risk Narrative -->
@@ -2564,16 +2564,6 @@
                     </ol>
                 </div>
 
-                <!-- Newsletter Signup -->
-                <div class="newsletter-signup">
-                    <h3>Stay Updated</h3>
-                    <p>Get notified when new articles on data center operations and engineering excellence are published.</p>
-                    <form class="newsletter-form" onsubmit="return subscribeNewsletter(event)">
-                        <input type="email" placeholder="Enter your email" required>
-                        <button type="submit">Subscribe</button>
-                    </form>
-                    <p class="newsletter-privacy">No spam. Unsubscribe anytime.</p>
-                </div>
 
                 <!-- Author Bio -->
                 <div class="author-bio">
@@ -2649,8 +2639,8 @@
     <div class="login-overlay" id="debtLoginOverlay">
         <div class="login-box" style="position:relative;">
             <button class="login-close" onclick="debtHideLogin()">&times;</button>
-            <h3 style="font-size:1.3rem;font-weight:700;color:#f1f5f9;margin:0 0 0.25rem;"><i class="fas fa-microscope" style="color:#f59e0b;margin-right:8px;"></i> Pro Analysis Access</h3>
-            <p style="font-size:0.82rem;color:#94a3b8;margin:0 0 1.5rem;">Unlock Monte Carlo distributions, Weibull analysis, cost modeling, capacity planner &amp; PDF export</p>
+            <h3 style="font-size:1.3rem;font-weight:700;color:#f1f5f9;margin:0 0 0.25rem;"><i class="fas fa-microscope" style="color:#f59e0b;margin-right:8px;"></i> Full analysis Access</h3>
+            <p style="font-size:0.82rem;color:#94a3b8;margin:0 0 1.5rem;">Sign in for Monte Carlo distributions, Weibull analysis, cost modeling, capacity planner &amp; PDF export</p>
             <input type="email" class="login-input" id="debtLoginEmail" placeholder="Email address" aria-label="Email address">
             <input type="password" class="login-input" id="debtLoginPass" placeholder="Password" aria-label="Password">
             <button class="login-submit" onclick="debtHandleLogin()"><i class="fas fa-unlock" style="margin-right:8px;"></i>Sign In</button>
@@ -2706,7 +2696,7 @@
         </button>
     </aside>
 
-    <script src="script.min.js?v=20260920-06a132bf"></script>
+    <script src="script.min.js?v=20260920-0e1dd953"></script>
 
     <!-- Share Buttons JS -->
     <script>
@@ -3707,7 +3697,7 @@
             // Header
             html += '<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #f59e0b;padding-bottom:16px;margin-bottom:24px;">';
             html += '<div><div style="font-size:22px;font-weight:800;color:#1e3a5f;">Technical Debt Risk Report</div><div style="font-size:11px;color:#64748b;margin-top:4px;">Generated ' + dateStr + '</div></div>';
-            html += '<div style="text-align:right;"><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;">RESISTANCEZERO</div><div style="font-size:9px;color:#94a3b8;">Pro Analysis Report</div></div></div>';
+            html += '<div style="text-align:right;"><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;">RESISTANCEZERO</div><div style="font-size:9px;color:#94a3b8;">Full analysis Report</div></div></div>';
 
             // Risk Score hero
             html += '<div style="text-align:center;margin:24px 0;padding:24px;background:#f8fafc;border-radius:12px;border:2px solid ' + riskColor + '33;">';
@@ -3739,7 +3729,7 @@
             });
             html += '</div></div>';
 
-            // Pro data tables if available
+            // Full access data tables if available
             if (_proCache.mc) {
                 html += '<div style="margin-bottom:20px;"><div style="font-size:12px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Monte Carlo Analysis (10,000 Iterations)</div>';
                 html += '<table style="width:100%;font-size:11px;border-collapse:collapse;color:#1e293b;">';
@@ -3870,7 +3860,6 @@ document.querySelectorAll('.tooltip-trigger').forEach(function(trigger) {
 </script>
 
 <script>
-/* v1.9.1: subscribeNewsletter() moved to script.js (global, mailto: based) */
 </script>
 <script src="auth.js?v=20260920-040a6c54" defer></script>
 <script src="rz-engine.min.js?v=20260920-ab37c012" defer></script>

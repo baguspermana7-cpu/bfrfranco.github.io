@@ -1051,7 +1051,7 @@ html:not([data-theme="dark"]) .rfs-mode-btn.active {
 :root:not([data-theme="dark"]) .rfs-hero-kpi-label { color:#64748b !important; }
 [data-theme="dark"] .rfs-hero-kpi-label { color:#94a3b8 !important; }
 </style>
-    <script src="js/rz-version.js?v=20260920-c35dc44c" defer></script>
+    <script src="js/rz-version.js?v=20260920-10a50683" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260920-b64c1545" defer></script>
     <script src="js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>    <meta property="og:image:width" content="1200">    <meta property="og:image:height" content="630">    <meta property="og:image:alt" content="RFS Readiness Workbench | Data Center Ready-for-Service Planning">    <meta name="twitter:image" content="https://resistancezero.com/assets/og/rfs-readiness-workbench.webp">
 
@@ -1152,7 +1152,7 @@ html:not([data-theme="dark"]) .rfs-mode-btn.active {
         <button style="background:none;border:none;cursor:pointer;font-size:0.75rem;color:var(--rfs-text3);padding:4px;" onclick="document.body.classList.toggle('rfs-fullscreen')" title="Fullscreen"><i class="fas fa-expand"></i></button>
         <button style="background:none;border:none;cursor:pointer;font-size:0.75rem;color:var(--rfs-text3);padding:4px;" onclick="document.documentElement.toggleAttribute('data-cbmode',document.documentElement.getAttribute('data-cbmode')!=='on');document.documentElement.setAttribute('data-cbmode',document.documentElement.getAttribute('data-cbmode')==='on'?'on':'off')" title="Color-blind mode"><i class="fas fa-eye"></i></button>
         <button class="rfs-btn-free active" id="rfsBtnFree" onclick="handleFreeMode()">FREE</button>
-        <button class="rfs-btn-pro" id="rfsBtnPro" onclick="handleProMode()"><i class="fas fa-crown"></i> PRO</button>
+        <button class="rfs-btn-pro" id="rfsBtnPro" onclick="handleProMode()"><i class="fas fa-crown"></i> FULL</button>
     </div>
 </nav>
 
@@ -1793,8 +1793,8 @@ html:not([data-theme="dark"]) .rfs-mode-btn.active {
 <!-- LOGIN MODAL -->
 <div class="rfs-modal" id="rfsLoginModal">
     <div class="rfs-modal-content">
-        <div class="rfs-modal-title"><i class="fas fa-crown" style="color:var(--rfs-purple);margin-right:8px;"></i>Premium Access</div>
-        <p style="font-size:0.82rem;color:var(--rfs-text2);margin-bottom:1rem;">Unlock Tests, Overlay, advanced Forecast, and full Report exports.</p>
+        <div class="rfs-modal-title"><i class="fas fa-crown" style="color:var(--rfs-purple);margin-right:8px;"></i>Full access</div>
+        <p style="font-size:0.82rem;color:var(--rfs-text2);margin-bottom:1rem;">Sign in for Tests, Overlay, advanced Forecast, and full Report exports.</p>
         <div class="rfs-form-group" style="margin-bottom:0.75rem;">
             <label class="rfs-label">Email</label>
             <input type="email" class="rfs-input" id="rfsLoginEmail" placeholder="demo@resistancezero.com" aria-label="demo@resistancezero.com">
@@ -5121,7 +5121,7 @@ var RfsUI = {
             '<em>Understanding status:</em> Not Started → Open → Blocked → Approved. Hard blockers (red) prevent approval.'
         ]},
         { title: 'Test Packages', icon: 'fa-vial', steps: [
-            'Navigate to the <strong>Tests</strong> tab (Pro feature) to manage commissioning test campaigns.',
+            'Navigate to the <strong>Tests</strong> tab (Full access feature) to manage commissioning test campaigns.',
             'Click <strong>Generate Defaults</strong> to create 115 test packages across L0-L6 levels, correlated with CX Calculator.',
             'Filter tests by <strong>level</strong> (L0-L6), <strong>discipline</strong>, or <strong>status</strong>.',
             'Click the <strong>status badge</strong> on each test to cycle: Planned → Scheduled → In Progress → Passed/Failed.',
@@ -5143,7 +5143,7 @@ var RfsUI = {
             '<em>Critical defects open >3 days trigger notification bell alerts.</em>'
         ]},
         { title: 'Customer Overlay', icon: 'fa-layer-group', steps: [
-            'Navigate to the <strong>Overlay</strong> tab (Pro feature) to add customer-specific requirements.',
+            'Navigate to the <strong>Overlay</strong> tab (Full access feature) to add customer-specific requirements.',
             'Overlay items are <strong>Source C</strong> (customer requirement) or <strong>Source D</strong> (best practice).',
             'Assign each overlay item to a specific gate, discipline, and weight class (W1/W2/W3).',
             'Source C/D items can only <strong>soft-block</strong> gates — they cannot hard-block like Source A/B items.',
@@ -5186,8 +5186,8 @@ var RfsUI = {
             'localStorage has a ~5MB limit per domain. Monitor storage usage — export regularly.',
             '<em>Warning:</em> Clearing browser data deletes all projects. Always maintain JSON backups.'
         ]},
-        { title: 'Free vs Pro Features', icon: 'fa-crown', steps: [
-            '<table class="rfs-table" style="font-size:0.75rem;"><thead><tr><th scope="col">Feature</th><th scope="col">Free</th><th scope="col">Pro</th></tr></thead><tbody>' +
+        { title: 'Free vs Full-access features', icon: 'fa-crown', steps: [
+            '<table class="rfs-table" style="font-size:0.75rem;"><thead><tr><th scope="col">Feature</th><th scope="col">Free</th><th scope="col">Full access</th></tr></thead><tbody>' +
             '<tr><td>Projects</td><td>1</td><td>Unlimited</td></tr>' +
             '<tr><td>Gate Board & Checklist</td><td>Yes</td><td>Yes</td></tr>' +
             '<tr><td>Defect Register</td><td>Yes</td><td>Yes</td></tr>' +
@@ -5214,7 +5214,7 @@ var RfsUI = {
         { title: 'Troubleshooting', icon: 'fa-wrench', steps: [
             '<strong>Data not saving?</strong> Check if localStorage is full (>5MB). Export and clear old projects.',
             '<strong>Gate stuck on blocked?</strong> Check for open Critical/Major defects, missing mandatory evidence, or unsigned sign-offs.',
-            '<strong>Tests tab locked?</strong> Tests require Pro mode. Click PRO and enter credentials.',
+            '<strong>Tests tab locked?</strong> Tests require Full access mode. Click FULL and enter credentials.',
             '<strong>Forecast shows no date?</strong> Ensure you have at least one unit and have set a target RFS date in Setup.',
             '<strong>Import failed?</strong> Verify the JSON is valid and contains a core.id field.',
             '<strong>Page slow?</strong> Too many defects or tests. Export old completed items and clear them.',

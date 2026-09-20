@@ -130,7 +130,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../styles.min.css?v=20260908-editorial">
+    <link rel="stylesheet" href="../styles.min.css?v=20260920-544ad99b">
 
     <style>
         /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
@@ -345,7 +345,7 @@
         <!-- 2. INPUTS -->
         <section class="mn-section">
             <h2><span class="mn-num">02</span> Inputs</h2>
-            <p class="mn-lead">Twenty inputs across six groups — facility profile, power, cooling, network, physical security, and optional regional compliance (PRO). All inputs are enumerated categorical or continuous numeric values; ranges are enforced client-side.</p>
+            <p class="mn-lead">Twenty inputs across six groups — facility profile, power, cooling, network, physical security, and optional regional compliance (FULL). All inputs are enumerated categorical or continuous numeric values; ranges are enforced client-side.</p>
             <div class="mn-tablewrap">
             <table class="mn-table">
                 <thead><tr><th>Field (DOM id)</th><th>Type</th><th>Options / range</th><th>Group</th><th>Meaning</th></tr></thead>
@@ -373,7 +373,7 @@
                 </tbody>
             </table>
             </div>
-            <div class="mn-note"><strong>Regional compliance inputs (PRO):</strong> <code>regionSelect</code> (12 jurisdictions) and <code>verticalSelect</code> (5 industry verticals) are evaluated only in PRO mode and contribute to the regional score (weight 15%) via the <code>calcRegional()</code> function documented in §03.</div>
+            <div class="mn-note"><strong>Regional compliance inputs (FULL):</strong> <code>regionSelect</code> (12 jurisdictions) and <code>verticalSelect</code> (5 industry verticals) are evaluated only in FULL mode and contribute to the regional score (weight 15%) via the <code>calcRegional()</code> function documented in §03.</div>
         </section>
 
         <!-- 3. METHODOLOGY -->
@@ -408,7 +408,7 @@
                 <span class="mn-eq">WEIGHTS = { power:0.35, cooling:0.20, network:0.15, physical:0.10, monitoring:0.05, regional:0.15 }</span>
                 <span class="mn-eq">compositeRaw = powerScore·0.35 + coolingScore·0.20 + networkScore·0.15</span>
                 <span class="mn-eq">             + physicalScore·0.10 + monitorScore·0.05 + regionalScore·0.15</span>
-                <span class="mn-where">Power carries the largest weight (35%) reflecting that electrical failure is the leading cause of data center outages (Uptime Institute Annual Outage Analysis). <code>regionalScore</code> defaults to 50 (neutral baseline) in free mode; in PRO mode it is computed by <code>calcRegional()</code>. <span class="mn-src">UPTIME OUTAGE ANALYSIS · ENGINE</span></span>
+                <span class="mn-where">Power carries the largest weight (35%) reflecting that electrical failure is the leading cause of data center outages (Uptime Institute Annual Outage Analysis). <code>regionalScore</code> defaults to 50 (neutral baseline) in free mode; in FULL mode it is computed by <code>calcRegional()</code>. <span class="mn-src">UPTIME OUTAGE ANALYSIS · ENGINE</span></span>
             </div>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 3 — Floor constraints (prescriptive topology checks)</h3>
@@ -453,7 +453,7 @@
                 <span class="mn-where">Confidence measures internal consistency: a facility where all subsystems score similarly to the composite carries high confidence; one with extreme outliers (e.g. excellent power but critically deficient network) carries lower confidence. In <code>calculate()</code>. <span class="mn-src">ENGINE</span></span>
             </div>
 
-            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Regional compliance overlay — <code>calcRegional()</code> [PRO]</h3>
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Regional compliance overlay — <code>calcRegional()</code> [FULL]</h3>
             <div class="mn-formula">
                 <span class="mn-eq">regionalScore starts at 50 (neutral baseline)</span>
                 <span class="mn-eq">Each satisfied jurisdiction-specific requirement adds a bonus (typically +8 to +15 pts)</span>
@@ -557,7 +557,7 @@
             </table>
             </div>
 
-            <p class="mn-lead" style="margin-top:0.9rem;">Regional compliance bonus matrix (PRO mode — partial excerpt; each region has 4–5 checks, starting baseline 50):</p>
+            <p class="mn-lead" style="margin-top:0.9rem;">Regional compliance bonus matrix (FULL mode — partial excerpt; each region has 4–5 checks, starting baseline 50):</p>
             <div class="mn-tablewrap">
             <table class="mn-table">
                 <thead><tr><th>Region / Framework</th><th>Key requirement checks</th><th>Bonus per check</th><th>Governing document</th></tr></thead>
@@ -596,13 +596,13 @@
                     <tr><td>BICSI 002 class</td><td><code>bicsiClass</code></td><td>"Class F" + tierNum</td><td>BICSI 002 data center design and implementation classification.</td></tr>
                     <tr><td>Subsystem scores (×5)</td><td><code>powerVal</code> …</td><td>Per-subsystem weighted scores (0–100)</td><td>Bar chart + radar chart source. Identifies the limiting subsystem.</td></tr>
                     <tr><td>Gap analysis</td><td><code>gapContent</code></td><td>Conditional inspection of input values vs next-tier floor requirements</td><td>Specific action list: what must change to reach the next tier.</td></tr>
-                    <tr><td>Upgrade cost estimate [PRO]</td><td><code>upgradeCostVal</code></td><td>Per-upgrade cost bands summed, ×0.8–1.5 range</td><td>Indicative CapEx range in USD thousands to reach next tier.</td></tr>
-                    <tr><td>Regional compliance score [PRO]</td><td><code>regionalScoreVal</code></td><td><code>calcRegional()</code> — 50 + jurisdiction bonuses</td><td>How well the facility meets the selected jurisdiction's specific requirements.</td></tr>
+                    <tr><td>Upgrade cost estimate [FULL]</td><td><code>upgradeCostVal</code></td><td>Per-upgrade cost bands summed, ×0.8–1.5 range</td><td>Indicative CapEx range in USD thousands to reach next tier.</td></tr>
+                    <tr><td>Regional compliance score [FULL]</td><td><code>regionalScoreVal</code></td><td><code>calcRegional()</code> — 50 + jurisdiction bonuses</td><td>How well the facility meets the selected jurisdiction's specific requirements.</td></tr>
                 </tbody>
             </table>
             </div>
 
-            <p class="mn-lead" style="margin-top:0.9rem;">Upgrade cost bands (PRO cost estimator):</p>
+            <p class="mn-lead" style="margin-top:0.9rem;">Upgrade cost bands (FULL cost estimator):</p>
             <div class="mn-tablewrap">
             <table class="mn-table">
                 <thead><tr><th>Upgrade action</th><th>Trigger condition</th><th>Cost band (USD)</th><th>Score impact</th></tr></thead>
@@ -762,10 +762,10 @@
         });
     })();
     </script>
-    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
-    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
-    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
-    <script src="../js/rz-command-palette.js?v=2026-09-05-mint" defer></script>
-    <script src="../auth.js?v=2026-08-26-h1h2" defer></script>
+    <script src="../js/rz-version.js?v=20260920-10a50683" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=20260920-b64c1545" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
+    <script src="../js/rz-command-palette.js?v=20260920-cf005f60" defer></script>
+    <script src="../auth.js?v=20260920-040a6c54" defer></script>
 </body>
 </html>

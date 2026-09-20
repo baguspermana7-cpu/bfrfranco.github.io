@@ -129,7 +129,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../styles.min.css?v=20260908-editorial">
+    <link rel="stylesheet" href="../styles.min.css?v=20260920-544ad99b">
 
     <style>
         /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
@@ -353,7 +353,7 @@
                 </tbody>
             </table>
             </div>
-            <div class="mn-note"><strong>Site-score weighting sliders (Pro panel):</strong> the 10-factor weight vector defaults to <code>DATA.site.weights</code> (see Section 03). Pro-tier users can drag individual factor weights; the tracker renormalizes and recomputes all site scores live. Weight changes are session-only — they do not persist or alter the engine constants.</div>
+            <div class="mn-note"><strong>Site-score weighting sliders (Full access panel):</strong> the 10-factor weight vector defaults to <code>DATA.site.weights</code> (see Section 03). Full access-tier users can drag individual factor weights; the tracker renormalizes and recomputes all site scores live. Weight changes are session-only — they do not persist or alter the engine constants.</div>
         </section>
 
         <!-- 3. METHODOLOGY -->
@@ -552,7 +552,7 @@
                         = 0.096 + 0.126 + 0.079 + 0.100 + 0.046 + 0.049 + 0.044 + 0.011 + 0.046 + 0.056<br>
                         = <span class="mn-result">0.653 → score 65.3 / 100 → Grade C "Viable"</span>
                     </li>
-                    <li><strong>Reading:</strong> Singapore scores strongly on grid, seismic, and latency factors, but the high electricity tariff, tropical climate (minimal free-cooling hours), and moderate carbon intensity pull the composite to grade C. Premium positioning shows in the colo rate ($390/kW·mo) and near-zero vacancy (0.8%).</li>
+                    <li><strong>Reading:</strong> Singapore scores strongly on grid, seismic, and latency factors, but the high electricity tariff, tropical climate (minimal free-cooling hours), and moderate carbon intensity pull the composite to grade C. Full access positioning shows in the colo rate ($390/kW·mo) and near-zero vacancy (0.8%).</li>
                 </ol>
             </div>
             <div class="mn-note"><strong>Verify via node:</strong> <code>node -e "var e=require('./rz-engine.js'); var f=e.models.site.deriveFactors('SG'); console.log(e.models.site.score(f));"</code> — the live engine result should match within rounding of the worked values above.</div>
@@ -587,7 +587,7 @@
                     <tr><td>Carbon intensity</td><td>Grid-average intensity. Does not model 24/7 carbon-free energy (CFE) contracts, Power Purchase Agreements, or regional dispatch mix.</td><td>Operators with CFE contracts (Google, Microsoft, Meta) experience effective carbon intensities well below the listed grid averages.</td></tr>
                     <tr><td>Vacancy rate</td><td>Market-level vacancy from broker research. Definition varies: some sources report pre-committed but not yet occupied space as vacant; others do not.</td><td>Use vacancy as a directionality signal (tight vs. loose), not as a precise availability figure for procurement.</td></tr>
                     <tr><td>CAGR projection</td><td>2025-2030 CAGR from broker research. Projections reflect demand-side scenarios (AI inference, sovereign cloud, enterprise migration) that carry material uncertainty.</td><td>High-CAGR markets (N. Virginia 25%, Dubai 25%, Nairobi 25%) reflect strong pipeline confidence; realized growth depends on power availability, permitting, and capital formation.</td></tr>
-                    <tr><td>Site Score neutrality</td><td>Default factor weights are a transparent heuristic informed by published DC site-selection frameworks. They are not calibrated to any single operator's proprietary weighting.</td><td>Users with different priorities (e.g., carbon-first, lowest-cost-power) should adjust the Pro-panel weight sliders to reflect their actual criteria.</td></tr>
+                    <tr><td>Site Score neutrality</td><td>Default factor weights are a transparent heuristic informed by published DC site-selection frameworks. They are not calibrated to any single operator's proprietary weighting.</td><td>Users with different priorities (e.g., carbon-first, lowest-cost-power) should adjust the Full access-panel weight sliders to reflect their actual criteria.</td></tr>
                     <tr><td>Not investment advice</td><td>This tool is an engineering education and pre-screening aid. It does not constitute investment advice, real-estate advice, or site-acquisition recommendation.</td><td>Any site-acquisition or investment decision requires independent due diligence, utility studies, and qualified professional advice.</td></tr>
                 </tbody>
             </table>
@@ -646,10 +646,10 @@
         });
     })();
     </script>
-    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
-    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
-    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
-    <script src="../js/rz-command-palette.js?v=2026-09-05-mint" defer></script>
-    <script src="../auth.js?v=2026-08-26-h1h2" defer></script>
+    <script src="../js/rz-version.js?v=20260920-10a50683" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=20260920-b64c1545" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
+    <script src="../js/rz-command-palette.js?v=20260920-cf005f60" defer></script>
+    <script src="../auth.js?v=20260920-040a6c54" defer></script>
 </body>
 </html>

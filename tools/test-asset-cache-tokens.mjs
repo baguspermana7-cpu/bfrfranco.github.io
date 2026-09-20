@@ -22,8 +22,9 @@
  * Usage: node tools/test-asset-cache-tokens.mjs [--strict-all]
  */
 import { createHash } from 'node:crypto';
-import { readFile, readdir, stat } from 'node:fs/promises';
-import { join, resolve, dirname } from 'node:path';
+import { readFile, stat } from 'node:fs/promises';
+import { execFileSync } from 'node:child_process';
+import { join, resolve, dirname, relative } from 'node:path';
 
 const ROOT = process.cwd();
 const STRICT_ALL = process.argv.includes('--strict-all');
@@ -47,7 +48,16 @@ const hashOf = async (file) => createHash('sha256').update(await readFile(file))
 const TAG_RE = /<(?:link|script)\b[^>]*?(?:href|src)="([^"?]+\.(?:css|js))\?v=([^"]+)"[^>]*>/g;
 
 const pinned = new Set();
-const pages = (await readdir(ROOT)).filter((f) => f.endsWith('.html')).sort();
+/* v3.10.17 — every tracked page, not just the repository root.
+   This used to be `readdir(ROOT)`, which reads ONE directory. Half the public surface lives in
+   `network/`, `manual/`, `id/` and `prd/`, and the gate could not see any of it: 79 of those 90
+   pages were serving a shared asset under a stale or legacy token, `styles.min.css` still at
+   `?v=20260908-editorial` on 76 of them and `auth.js` on 43 — the same class of defect as the
+   stale auth.min.js that once made the HOMEPAGE run old code. A gate that walks one directory
+   reports a clean site by not looking at it. */
+const VENDORED = /^(standarization|prompts|Automation|Article|Apps|Data|dcmoc|games|Dunia-Emosi|worktrees|backups|node_modules|my-video|TestEA|Documents|cf-worker|obsidian-knowledge-vault)\//;
+const pages = execFileSync('git', ['ls-files', '*.html'], { cwd: ROOT, encoding: 'utf8' })
+    .split('\n').filter(Boolean).filter((f) => !VENDORED.test(f)).sort();
 
 /* First pass: an asset is a version pin if ANY page loads it under an authority attribute (or the
    gate-pinned list). The attribute marks the contract, and the contract belongs to the FILE — seven
@@ -56,9 +66,18 @@ const pages = (await readdir(ROOT)).filter((f) => f.endsWith('.html')).sort();
    the pin the other page declares. */
 const sources = new Map();
 for (const page of pages) { sources.set(page, await readFile(join(ROOT, page), 'utf8')); }
-for (const html of sources.values()) {
+/* Keyed by the asset's path from the repository root: a sub-directory page writes
+   `../../styles.min.css` for the file a root page calls `styles.min.css`, and treating those as
+   two assets would split every pin and every token check down the middle. */
+const assetKey = (page, href) => {
+    const file = resolve(dirname(join(ROOT, page)), href);
+    return file.startsWith(ROOT) ? relative(ROOT, file) : null;
+};
+for (const [page, html] of sources.entries()) {
     for (const [tag, href] of html.matchAll(TAG_RE)) {
-        if (AUTHORITY_ATTR.test(tag) || PINNED_BY_GATE.has(href)) { pinned.add(href); }
+        const key = assetKey(page, href);
+        if (!key) { continue; }
+        if (AUTHORITY_ATTR.test(tag) || PINNED_BY_GATE.has(key)) { pinned.add(key); }
     }
 }
 const strict = [];
@@ -70,16 +89,17 @@ for (const page of pages) {
     const html = sources.get(page);
     for (const [, href, token] of html.matchAll(TAG_RE)) {
         if (/^https?:/.test(href)) { continue; }
-        if (pinned.has(href)) { continue; }
-        const file = resolve(dirname(join(ROOT, page)), href);
-        if (!file.startsWith(ROOT)) { continue; }
+        const key = assetKey(page, href);
+        if (!key) { continue; }
+        if (pinned.has(key)) { continue; }
+        const file = join(ROOT, key);
         try { await stat(file); } catch { missing.push(`${page} -> ${href} (referenced, not on disk)`); continue; }
-        const name = href.split('/').pop();
+        const name = key.split('/').pop();
         const want = await hashOf(file);
         const carries = token.split('-').pop();
-        const row = { page, href, token, want, name };
-        if (!seen.has(href)) { seen.set(href, new Set()); }
-        seen.get(href).add(token);
+        const row = { page, href: key, token, want, name };
+        if (!seen.has(key)) { seen.set(key, new Set()); }
+        seen.get(key).add(token);
         if (carries === want) { continue; }
         strict.push(row);
     }

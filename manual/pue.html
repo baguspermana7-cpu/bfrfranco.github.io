@@ -129,7 +129,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../styles.min.css?v=20260908-editorial">
+    <link rel="stylesheet" href="../styles.min.css?v=20260920-544ad99b">
 
     <style>
         /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
@@ -325,7 +325,7 @@
                 <span class="mn-chip">Engine <strong>RZEngine v2.0</strong></span>
                 <span class="mn-chip">Basis <strong>ISO/IEC 30134-2 · Green Grid</strong></span>
                 <span class="mn-chip">Free inputs <strong>9</strong></span>
-                <span class="mn-chip">Pro inputs <strong>5</strong></span>
+                <span class="mn-chip">Full access inputs <strong>5</strong></span>
                 <span class="mn-chip">Outputs <strong>8+</strong></span>
             </div>
             <a class="mn-toollink" href="../pue-calculator.html">&#9654; Open the live PUE Calculator</a>
@@ -347,7 +347,7 @@
         <!-- 2. INPUTS -->
         <section class="mn-section">
             <h2><span class="mn-num">02</span> Inputs</h2>
-            <p class="mn-lead">Fourteen inputs across five groups — IT infrastructure, cooling system, power distribution, facility loads, and PRO advanced parameters. Ranges are enforced client-side; defaults reflect a typical Tier III colocation at 1 MW IT load.</p>
+            <p class="mn-lead">Fourteen inputs across five groups — IT infrastructure, cooling system, power distribution, facility loads, and FULL advanced parameters. Ranges are enforced client-side; defaults reflect a typical Tier III colocation at 1 MW IT load.</p>
             <div class="mn-tablewrap">
             <table class="mn-table">
                 <thead><tr><th>Field</th><th>ID</th><th>Unit</th><th>Default</th><th>Tier</th><th>Meaning</th></tr></thead>
@@ -363,11 +363,11 @@
                     <tr><td>Lighting</td><td><code>lighting</code></td><td>W/m²</td><td>8</td><td>Free</td><td>Lighting power density. Floor area = rack count × 3 m²/rack. Lighting kW = W/m² × area / 1000.</td></tr>
                     <tr><td>Security</td><td><code>security</code></td><td>kW/rack</td><td>0.5</td><td>Free</td><td>Physical security load (CCTV, access control, NVR). Security kW = rate × rack count.</td></tr>
                     <tr><td>Fire Suppression</td><td><code>fire</code></td><td>kW/rack</td><td>0.1</td><td>Free</td><td>Detection + suppression standby power. Fire kW = rate × rack count.</td></tr>
-                    <tr><td>Economizer Mode</td><td><code>economizer</code></td><td>enum</td><td>none</td><td>PRO</td><td>Reduces cooling kW by 15% (air-side) or 25% (water-side). Driven by free-cooling hours in climate data.</td></tr>
-                    <tr><td>Supply Air Temp</td><td><code>supplyTemp</code></td><td>°C</td><td>20</td><td>PRO</td><td>Each °C above 20 saves 3% cooling energy (ASHRAE TC 9.9 range 18–27°C).</td></tr>
-                    <tr><td>Transformer Loss</td><td><code>transformerLoss</code></td><td>%</td><td>1.5</td><td>PRO</td><td>Voltage-transformation losses. Transformer kW = IT load × tx%.</td></tr>
-                    <tr><td>PDU Type</td><td><code>pduType</code></td><td>enum</td><td>metered</td><td>PRO</td><td>PDU efficiency: basic 98%, metered 98.5%, monitored/switched 99%. PDU loss = IT × (1 − eff).</td></tr>
-                    <tr><td>Energy Cost</td><td><code>energyCost</code></td><td>$/kWh</td><td>0.10</td><td>PRO</td><td>Blended electricity rate for annual cost calculation. Compare with <code>DATA.regions[*].powerKwh</code>.</td></tr>
+                    <tr><td>Economizer Mode</td><td><code>economizer</code></td><td>enum</td><td>none</td><td>FULL</td><td>Reduces cooling kW by 15% (air-side) or 25% (water-side). Driven by free-cooling hours in climate data.</td></tr>
+                    <tr><td>Supply Air Temp</td><td><code>supplyTemp</code></td><td>°C</td><td>20</td><td>FULL</td><td>Each °C above 20 saves 3% cooling energy (ASHRAE TC 9.9 range 18–27°C).</td></tr>
+                    <tr><td>Transformer Loss</td><td><code>transformerLoss</code></td><td>%</td><td>1.5</td><td>FULL</td><td>Voltage-transformation losses. Transformer kW = IT load × tx%.</td></tr>
+                    <tr><td>PDU Type</td><td><code>pduType</code></td><td>enum</td><td>metered</td><td>FULL</td><td>PDU efficiency: basic 98%, metered 98.5%, monitored/switched 99%. PDU loss = IT × (1 − eff).</td></tr>
+                    <tr><td>Energy Cost</td><td><code>energyCost</code></td><td>$/kWh</td><td>0.10</td><td>FULL</td><td>Blended electricity rate for annual cost calculation. Compare with <code>DATA.regions[*].powerKwh</code>.</td></tr>
                 </tbody>
             </table>
             </div>
@@ -389,7 +389,7 @@
                 <span class="mn-eq">P_cool = itLoad × ( coolingOverhead[type] × climateMult[zone] − containmentReduction[containment] )</span>
                 <span class="mn-eq">if econMode === 'airside':   P_cool × 0.85</span>
                 <span class="mn-eq">if econMode === 'waterside': P_cool × 0.75</span>
-                <span class="mn-eq">if PRO supplyTemp ≠ 20°C:   P_cool × ( 1 − (supplyTemp − 20) × 0.03 )</span>
+                <span class="mn-eq">if FULL supplyTemp ≠ 20°C:   P_cool × ( 1 − (supplyTemp − 20) × 0.03 )</span>
                 <span class="mn-eq">P_cool = max( P_cool, itLoad × 0.02 )    (floor: 2% of IT)</span>
                 <span class="mn-where"><code>coolingOverhead</code> is a type-keyed fraction approximating 1/COP × overhead share (see constants §4). <code>climateMult</code> adjusts for ambient cooling penalty. Containment reduces mixing losses. Economizer applies free cooling. Each °C above 20°C cuts cooling 3% via higher chiller efficiency and extended economizer hours (ASHRAE TC 9.9).<span class="mn-src">ASHRAE TC 9.9 · STANDARD</span></span>
             </div>
@@ -401,7 +401,7 @@
                 <span class="mn-where">Efficiency is load-dependent (curves per type, §4). Double-conversion at 50% load = 92% → loss = 8.7%. Redundancy overhead multiplier scales losses for standby capacity.<span class="mn-src">IEEE 1100 / UPS vendor data</span></span>
             </div>
 
-            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 4 — Transformer &amp; PDU losses (PRO)</h3>
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">Step 4 — Transformer &amp; PDU losses (FULL)</h3>
             <div class="mn-formula">
                 <span class="mn-eq">P_tx  = itLoad × txLoss                (default 1.5%)</span>
                 <span class="mn-eq">P_pdu = itLoad × ( 1 − pduEfficiency[type] )    (metered: 0.5%)</span>
@@ -425,7 +425,7 @@
                 <span class="mn-eq">DCiE         = 1 / PUE              ← RZEngine.models.pue.dcie(PUE)</span>
                 <span class="mn-eq">annualEnergy = P_total × 8 760       [kWh/yr]</span>
                 <span class="mn-eq">annualCost   = annualEnergy × energyCostPerKWh</span>
-                <span class="mn-eq">CO2_tyr      = annualEnergy × gridFactor / 1 000    [t CO₂e/yr]  (PRO; default 0.5 kg/kWh)</span>
+                <span class="mn-eq">CO2_tyr      = annualEnergy × gridFactor / 1 000    [t CO₂e/yr]  (FULL; default 0.5 kg/kWh)</span>
                 <span class="mn-where">Engine functions <code>pueFromInputs</code> and <code>dcie</code> are in <code>RZEngine.models.pue</code> (rz-engine.js §S4). Grid carbon factor defaults to 0.5 kg CO₂/kWh blended; pro mode uses <code>DATA.carbon.gridFactor[region]</code> per climate/region.<span class="mn-src">ISO/IEC 30134-2 · STANDARD; DATA.carbon.gridFactor · rz-engine.js</span></span>
             </div>
 
@@ -525,9 +525,9 @@
                     <tr><td>Cooling Load</td><td><code>P_cool</code></td><td>kW</td><td>Free</td><td>Largest non-IT load. Use to size chiller plant and cooling-tower capacity.</td></tr>
                     <tr><td>UPS Loss</td><td><code>P_ups</code></td><td>kW</td><td>Free</td><td>AC-DC-AC conversion loss. Shrinks with higher-efficiency topology or higher load factor.</td></tr>
                     <tr><td>Annual Energy</td><td><code>P_total × 8 760</code></td><td>MWh / GWh</td><td>Free</td><td>Total facility electricity consumption per year (8 760 h/yr = <code>DATA.hoursPerYear</code>).</td></tr>
-                    <tr><td>Annual Cost</td><td><code>annualEnergy × $/kWh</code></td><td>USD</td><td>PRO</td><td>Estimated annual electricity spend (excludes demand charges and ToU variations).</td></tr>
-                    <tr><td>CO2/Year</td><td><code>annualEnergy × gridFactor / 1 000</code></td><td>t CO₂e</td><td>PRO</td><td>Scope 2 emissions. Uses 0.5 kg/kWh default blended or <code>DATA.carbon.gridFactor[region]</code>.</td></tr>
-                    <tr><td>Free Cooling Hours</td><td>climate lookup</td><td>hrs/yr</td><td>PRO</td><td>Estimated annual hours when ambient enables economizer operation. From <code>climateData[zone].freeCoolingHrs</code>.</td></tr>
+                    <tr><td>Annual Cost</td><td><code>annualEnergy × $/kWh</code></td><td>USD</td><td>FULL</td><td>Estimated annual electricity spend (excludes demand charges and ToU variations).</td></tr>
+                    <tr><td>CO2/Year</td><td><code>annualEnergy × gridFactor / 1 000</code></td><td>t CO₂e</td><td>FULL</td><td>Scope 2 emissions. Uses 0.5 kg/kWh default blended or <code>DATA.carbon.gridFactor[region]</code>.</td></tr>
+                    <tr><td>Free Cooling Hours</td><td>climate lookup</td><td>hrs/yr</td><td>FULL</td><td>Estimated annual hours when ambient enables economizer operation. From <code>climateData[zone].freeCoolingHrs</code>.</td></tr>
                     <tr><td>Partial-load PUE</td><td><code>RZEngine.models.pue.partialLoadPUE(PUE, 0.50)</code></td><td>ratio</td><td>Free panel</td><td>PUE at 50% IT utilisation — shows efficiency degradation at partial load.</td></tr>
                     <tr><td>WUE</td><td><code>DATA.water.wueByType[cooling]</code></td><td>L/kWh</td><td>Free panel</td><td>Water Use Effectiveness companion: air 1.80, rear-door 1.10, DLC 0.50, immersion 0.10 L/kWh.</td></tr>
                     <tr><td>Annual Water</td><td><code>WUE × IT_kWh / 1 000</code></td><td>m³/yr</td><td>Free panel</td><td>Total water consumption for cooling per year.</td></tr>
@@ -547,7 +547,7 @@
                         <code>1 000 × (0.38 × 1.00 − 0.12) = 1 000 × 0.26 =</code> <span class="mn-result">260 kW</span></li>
                     <li><strong>UPS efficiency (double-conversion, 50% load):</strong> interpolate curve → <span class="mn-result">92%</span><br>
                         <code>P_ups = 1 000 × (1/0.92 − 1) × 1.10 = 1 000 × 0.0870 × 1.10 =</code> <span class="mn-result">95.7 kW</span></li>
-                    <li><strong>Transformer losses (PRO default 1.5%):</strong> <code>1 000 × 0.015 =</code> <span class="mn-result">15 kW</span></li>
+                    <li><strong>Transformer losses (FULL default 1.5%):</strong> <code>1 000 × 0.015 =</code> <span class="mn-result">15 kW</span></li>
                     <li><strong>PDU losses (metered, 98.5% eff):</strong> <code>1 000 × (1 − 0.985) =</code> <span class="mn-result">15 kW</span></li>
                     <li><strong>Floor area:</strong> <code>125 × 3 =</code> <span class="mn-result">375 m²</span><br>
                         Lighting: <code>8 × 375 / 1 000 =</code> <span class="mn-result">3.0 kW</span><br>
@@ -559,8 +559,8 @@
                     <li><strong>PUE:</strong> <code>1 463.7 / 1 000 =</code> <span class="mn-result">1.464</span> → rating: A — Very Good</li>
                     <li><strong>DCiE:</strong> <code>1 / 1.464 × 100 =</code> <span class="mn-result">68.3%</span></li>
                     <li><strong>Annual energy:</strong> <code>1 463.7 × 8 760 =</code> <span class="mn-result">12 822 MWh/yr (12.8 GWh)</span></li>
-                    <li><strong>Annual cost (PRO, $0.10/kWh):</strong> <code>12 822 000 × 0.10 =</code> <span class="mn-result">$1.28M/yr</span></li>
-                    <li><strong>CO2 (PRO, blended 0.5 kg/kWh):</strong> <code>12 822 000 × 0.5 / 1 000 =</code> <span class="mn-result">6 411 t CO₂e/yr</span></li>
+                    <li><strong>Annual cost (FULL, $0.10/kWh):</strong> <code>12 822 000 × 0.10 =</code> <span class="mn-result">$1.28M/yr</span></li>
+                    <li><strong>CO2 (FULL, blended 0.5 kg/kWh):</strong> <code>12 822 000 × 0.5 / 1 000 =</code> <span class="mn-result">6 411 t CO₂e/yr</span></li>
                     <li><strong>Partial-load PUE at 50% IT:</strong><br>
                         overhead = 1.464 − 1 = 0.464 · PUE(0.50) = 1 + 0.464 × (0.55/0.50 + 0.45) = 1 + 0.464 × 1.55 =<span class="mn-result"> 1.719</span></li>
                     <li><strong>WUE (CRAH → air key):</strong> <code>DATA.water.wueByType.air =</code> <span class="mn-result">1.80 L/kWh</span><br>
@@ -575,7 +575,7 @@
             <h2><span class="mn-num">07</span> References &amp; standards</h2>
             <ul class="mn-refs">
                 <li><b>ISO/IEC 30134-2:2016</b> — Information technology — Data centres key performance indicators — Part 2: Power usage effectiveness (PUE). Definitive normative basis for the PUE formula and measurement boundary.</li>
-                <li><b>Green Grid PUE White Papers</b> — WP#6 (PUE: A comprehensive examination of the metric), WP#49 (Measuring &amp; managing data center energy use), WP#66 (PUE measurement granularity L1–L3). Source of the L1/L2/L3 measurement levels implemented in the PRO Seasonal panel.</li>
+                <li><b>Green Grid PUE White Papers</b> — WP#6 (PUE: A comprehensive examination of the metric), WP#49 (Measuring &amp; managing data center energy use), WP#66 (PUE measurement granularity L1–L3). Source of the L1/L2/L3 measurement levels implemented in the FULL Seasonal panel.</li>
                 <li><b>ASHRAE TC 9.9 (2021 ed.)</b> — Thermal Guidelines for Data Processing Environments. Basis for supply air temperature range (18–27°C, A1 class), each-degree-Celsius cooling savings, and ASHRAE class definitions A1–A4.</li>
                 <li><b>Uptime Institute Global Survey 2024 / 2026</b> — Primary benchmark for global average PUE 1.58, tier x cooling PUE matrix, and the Tier I–IV availability / redundancy standard. Cited in <code class="mn-mono">DATA.sources['pueDefaults']</code> and <code class="mn-mono">DATA.sources['pueMatrix']</code> in <code class="mn-mono">rz-engine.js</code>.</li>
                 <li><b>IEEE 1100 (Emerald Book)</b> — Recommended practice for powering and grounding electronic equipment. Basis for UPS efficiency topology descriptions and load-curve behavior.</li>
@@ -645,10 +645,10 @@
         });
     })();
     </script>
-    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
-    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
-    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
-    <script src="../js/rz-command-palette.js?v=2026-09-05-mint" defer></script>
-    <script src="../auth.js?v=2026-08-26-h1h2" defer></script>
+    <script src="../js/rz-version.js?v=20260920-10a50683" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=20260920-b64c1545" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
+    <script src="../js/rz-command-palette.js?v=20260920-cf005f60" defer></script>
+    <script src="../auth.js?v=20260920-040a6c54" defer></script>
 </body>
 </html>

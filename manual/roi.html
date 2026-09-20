@@ -130,7 +130,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../styles.min.css?v=20260908-editorial">
+    <link rel="stylesheet" href="../styles.min.css?v=20260920-544ad99b">
 
     <style>
         /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
@@ -340,14 +340,14 @@
                 <li><strong style="color:var(--mn-text);">Internal Rate of Return (IRR)</strong> — the discount rate that makes NPV exactly zero. Compare to the WACC: if IRR &gt; WACC, the project creates value.</li>
                 <li><strong style="color:var(--mn-text);">Payback &amp; Profitability Index</strong> — complementary liquidity and ranking metrics that do not require a single discount-rate judgment.</li>
             </ul>
-            <p class="mn-lead">The model operates in two modes. <strong>Free Analysis</strong> runs the deterministic DCF and displays NPV, IRR, payback, PI, yield on cost, and ROIC. <strong>Pro Analysis</strong> additionally runs Monte Carlo simulation (10,000 iterations), sensitivity tornado, five-scenario comparison, and a full year-by-year cashflow table with debt service and tax lines.</p>
+            <p class="mn-lead">The model operates in two modes. <strong>Free Analysis</strong> runs the deterministic DCF and displays NPV, IRR, payback, PI, yield on cost, and ROIC. <strong>Full analysis</strong> additionally runs Monte Carlo simulation (10,000 iterations), sensitivity tornado, five-scenario comparison, and a full year-by-year cashflow table with debt service and tax lines.</p>
             <div class="mn-note"><strong>Industry calibration:</strong> revenue benchmarks, WACC ranges, and occupancy ramp profiles are drawn from Uptime Institute Benchmarking Reports, JLL Data Center Outlook, and CBRE market analytics. Construction period and staffing ratios follow conventional industry practice. All defaults are configurable.</div>
         </section>
 
         <!-- 2. INPUTS -->
         <section class="mn-section">
             <h2><span class="mn-num">02</span> Inputs</h2>
-            <p class="mn-lead">Twenty-six inputs across six groups. Free-mode inputs drive the deterministic model; Pro-mode adds financing and tax/depreciation parameters. All inputs are validated client-side with out-of-range warnings via <code class="mn-mono">RZCalc.validateNumbers()</code> in <code class="mn-mono">js/rz-calc-utils.js</code>.</p>
+            <p class="mn-lead">Twenty-six inputs across six groups. Free-mode inputs drive the deterministic model; Full access-mode adds financing and tax/depreciation parameters. All inputs are validated client-side with out-of-range warnings via <code class="mn-mono">RZCalc.validateNumbers()</code> in <code class="mn-mono">js/rz-calc-utils.js</code>.</p>
 
             <h3 style="font-size:1rem;margin:1.1rem 0 0.3rem;color:var(--mn-text);">Group 1 — Investment Parameters</h3>
             <div class="mn-tablewrap">
@@ -403,7 +403,7 @@
             </table>
             </div>
 
-            <h3 style="font-size:1rem;margin:1.1rem 0 0.3rem;color:var(--mn-text);">Group 5 — Financing (Pro)</h3>
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.3rem;color:var(--mn-text);">Group 5 — Financing (Full access)</h3>
             <div class="mn-tablewrap">
             <table class="mn-table">
                 <thead><tr><th>Field / ID</th><th>Unit</th><th>Default</th><th>Meaning</th></tr></thead>
@@ -416,7 +416,7 @@
             </table>
             </div>
 
-            <h3 style="font-size:1rem;margin:1.1rem 0 0.3rem;color:var(--mn-text);">Group 6 — Tax &amp; Depreciation (Pro)</h3>
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.3rem;color:var(--mn-text);">Group 6 — Tax &amp; Depreciation (Full access)</h3>
             <div class="mn-tablewrap">
             <table class="mn-table">
                 <thead><tr><th>Field / ID</th><th>Unit</th><th>Default</th><th>Meaning</th></tr></thead>
@@ -544,7 +544,7 @@
                 <span class="mn-where">Yield on cost is the unleveraged stabilised NOI yield on development cost — a 150–300 bps spread above the prevailing cap rate indicates a value-creation development margin. ROIC uses a simple (undiscounted) annual average net cashflow divided by total invested capital. <span class="mn-src">inline · calculate()</span></span>
             </div>
 
-            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">L · Monte Carlo simulation (Pro)</h3>
+            <h3 style="font-size:1rem;margin:1.1rem 0 0.2rem;">L · Monte Carlo simulation (Full access)</h3>
             <div class="mn-formula">
                 <span class="mn-eq">N  =  10 000 iterations</span>
                 <span class="mn-eq"></span>
@@ -731,10 +731,10 @@
         });
     })();
     </script>
-    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
-    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
-    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
-    <script src="../js/rz-command-palette.js?v=2026-09-05-mint" defer></script>
-    <script src="../auth.js?v=2026-08-26-h1h2" defer></script>
+    <script src="../js/rz-version.js?v=20260920-10a50683" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=20260920-b64c1545" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
+    <script src="../js/rz-command-palette.js?v=20260920-cf005f60" defer></script>
+    <script src="../auth.js?v=20260920-040a6c54" defer></script>
 </body>
 </html>

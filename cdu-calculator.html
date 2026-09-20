@@ -29,9 +29,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.min.css?v=20260920-37a46bce">
+    <link rel="stylesheet" href="styles.min.css?v=20260920-544ad99b">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="js/rz-version.js?v=20260920-c35dc44c" defer></script>
+    <script src="js/rz-version.js?v=20260920-10a50683" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260920-b64c1545" defer></script>
     <script src="js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
     <script src="js/cdu-model.js?v=20260920-13afdfe3" defer></script>
@@ -234,7 +234,7 @@
         <div class="cc-actionbar">
             <div class="cc-mode">
                 <button class="free active" id="ccFree">Free</button>
-                <button class="pro" id="ccPro">Pro ★</button>
+                <button class="pro" id="ccPro">Full access ★</button>
             </div>
             <button class="cc-pdf" id="ccPdf"><i class="fas fa-file-pdf"></i> Export PDF</button>
             <button class="cc-pdf" id="ccCsv"><i class="fas fa-file-csv"></i> Export CSV</button>
@@ -312,7 +312,7 @@
             <div class="cc-validation" id="ccValidation" role="alert" aria-live="polite" hidden></div>
             <div class="cc-kpis" id="ccKpis"></div>
             <div class="cc-note" style="margin-top:1rem;">
-                <b>How to read this.</b> Every figure is <span class="chip derived">Derived</span> by the validated CDU engine (<code>js/cdu-engine.js</code>, 40/40 tests) from your inputs and the bands in <a href="cdu-checklist.html">the checklist</a>. A cyan rail = within band, amber = watch, red = out of band. Flow uses Q&nbsp;=&nbsp;ṁ·cp·ΔT; pressure drop uses Darcy-Weisbach with Haaland friction; approach uses &epsilon;-NTU; dew point uses the Magnus formula; NPSH per the Hydraulic Institute. PG-25 properties are handbook-class (ILLUSTRATIVE) — confirm against your fluid's datasheet. <b>Pro analysis</b> (TCO/NPV, Monte-Carlo, sensitivity and a PDF tech-spec) is coming next. Not procurement or safety advice.
+                <b>How to read this.</b> Every figure is <span class="chip derived">Derived</span> by the validated CDU engine (<code>js/cdu-engine.js</code>, 40/40 tests) from your inputs and the bands in <a href="cdu-checklist.html">the checklist</a>. A cyan rail = within band, amber = watch, red = out of band. Flow uses Q&nbsp;=&nbsp;ṁ·cp·ΔT; pressure drop uses Darcy-Weisbach with Haaland friction; approach uses &epsilon;-NTU; dew point uses the Magnus formula; NPSH per the Hydraulic Institute. PG-25 properties are handbook-class (ILLUSTRATIVE) — confirm against your fluid's datasheet. <b>Full access analysis</b> (TCO/NPV, Monte-Carlo, sensitivity and a PDF tech-spec) is coming next. Not procurement or safety advice.
             </div>
             <figure class="rz-chart" data-rz-chart>
                 <div class="rz-chart-canvas"><canvas></canvas></div>
@@ -326,9 +326,9 @@
         <div class="cc-pro locked" id="ccProSection">
             <div class="cc-pro-overlay" id="ccProOverlay">
                 <i class="fas fa-lock"></i>
-                <div class="t">Pro Analysis</div>
+                <div class="t">Full analysis</div>
                 <div class="d">Lifecycle TCO &amp; NPV, a 10,000-run Monte-Carlo on pump energy, sensitivity ranking, and a PDF tech-spec.</div>
-                <button class="b">Unlock Pro</button>
+                <button class="b">Sign in</button>
             </div>
             <div class="cc-pro-inner">
                 <div class="cc-pro-panel">
@@ -357,12 +357,12 @@
     <div class="cc-modal" id="ccModal">
         <div class="cc-modal-box">
             <button class="cc-modal-x" id="ccModalX">&times;</button>
-            <h3>Pro Analysis</h3>
-            <p>Unlock TCO/NPV, Monte-Carlo, sensitivity and the PDF tech-spec.</p>
+            <h3>Full analysis</h3>
+            <p>Sign in for TCO/NPV, Monte-Carlo, sensitivity and the PDF tech-spec.</p>
             <div class="cc-err" id="ccErr">Invalid credentials. Try the demo below.</div>
             <input type="email" id="ccEmail" placeholder="Email" autocomplete="email">
             <input type="password" id="ccPass" placeholder="Password">
-            <button class="sub" id="ccLogin">Unlock Pro</button>
+            <button class="sub" id="ccLogin">Sign in</button>
             <div class="demo">Demo: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>
         </div>
     </div>
@@ -714,7 +714,7 @@
             var out=[{ id:'sizing', label:'Sizing results (derived)',
                 html:'<table><tr><th>Metric</th><th>Value</th><th>Basis</th></tr>'+rows+'</table>' }];
             if(pro){
-                out.push({ id:'pro', label:'Pro analysis',
+                out.push({ id:'pro', label:'Full access analysis',
                     html:'<table><tr><td>Capex</td><td>'+usd(pro.capex)+'</td></tr>'
                         +'<tr><td>Annual energy</td><td>'+usd(pro.annEnergy)+'</td></tr></table>'
                         +'<div style="display:flex;gap:12px;flex-wrap:wrap;">'+(pro.mcSvg||'')+(pro.tornSvg||'')+'</div>'

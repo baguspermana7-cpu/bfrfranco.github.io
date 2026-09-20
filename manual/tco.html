@@ -129,7 +129,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../styles.min.css?v=20260908-editorial">
+    <link rel="stylesheet" href="../styles.min.css?v=20260920-544ad99b">
 
     <style>
         /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
@@ -335,8 +335,8 @@
         <section class="mn-section">
             <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
             <p class="mn-lead">The calculator answers one question at two horizons (5 or 10 years): for a given IT load and region, which deployment model — owning your own facility (<strong>Build</strong>), renting power-and-space in a third-party data hall (<strong>Colo</strong>), or consuming compute from a hyperscaler (<strong>Cloud</strong>) — delivers the lowest total cost of ownership?</p>
-            <p class="mn-lead">The comparison is <strong>user-driven</strong>: you supply the IT load (MW), region, Uptime Institute tier, PUE, cooling type, utilisation rate, and annual growth rate. The calculator returns deterministic CAPEX+OPEX totals for all three paths, a breakeven year where Build crosses below Colo, an effective $/kW/yr metric, and (for Pro users) a scenario-weighted Monte Carlo risk distribution and a WACC-adjusted NPV table.</p>
-            <p class="mn-lead">The model is a <strong>financial pre-feasibility aid</strong> — not a substitute for a full techno-economic study. Market data reflects publicly available pricing surveys; individual project costs will vary. The calculation is fully deterministic given fixed inputs; the only stochastic element is the Monte Carlo risk simulation accessed via the Pro panel.</p>
+            <p class="mn-lead">The comparison is <strong>user-driven</strong>: you supply the IT load (MW), region, Uptime Institute tier, PUE, cooling type, utilisation rate, and annual growth rate. The calculator returns deterministic CAPEX+OPEX totals for all three paths, a breakeven year where Build crosses below Colo, an effective $/kW/yr metric, and (for Full access users) a scenario-weighted Monte Carlo risk distribution and a WACC-adjusted NPV table.</p>
+            <p class="mn-lead">The model is a <strong>financial pre-feasibility aid</strong> — not a substitute for a full techno-economic study. Market data reflects publicly available pricing surveys; individual project costs will vary. The calculation is fully deterministic given fixed inputs; the only stochastic element is the Monte Carlo risk simulation accessed via the Full access panel.</p>
         </section>
 
         <!-- 2. INPUTS -->
@@ -358,7 +358,7 @@
                 </tbody>
             </table>
             </div>
-            <p class="mn-lead" style="margin-top:0.9rem;">Three additional inputs are available to Pro (authenticated) users: power rate override ($/kWh), staff headcount override (FTE), colo escalation override (%), cloud reserved-instance discount (%), and debt-to-equity ratio for the WACC computation.</p>
+            <p class="mn-lead" style="margin-top:0.9rem;">Three additional inputs are available to Full access (authenticated) users: power rate override ($/kWh), staff headcount override (FTE), colo escalation override (%), cloud reserved-instance discount (%), and debt-to-equity ratio for the WACC computation.</p>
         </section>
 
         <!-- 3. METHODOLOGY -->
@@ -389,7 +389,7 @@
                 <span class="mn-eq">annualOther    = (power + staff + maint + ins + net) &times; 0.04                              [USD/yr]</span>
                 <span class="mn-eq">yr1Opex        = power + staff + maint + ins + net + other</span>
                 <span class="mn-where">
-                    <code>powerRate</code> = $/kWh from MARKET_DATA (Pro: overridable). <code>staffCount</code> = ceil(staffPerMW &times; IT_MW); staffPerMW: Tier II = 3, III = 5, IV = 8 (INLINE). <code>staffSalary</code> = $/FTE/yr from MARKET_DATA. Maintenance 3% of CAPEX, insurance 0.7% of CAPEX, network $20k/MW/month, other 4% of all other OPEX items — all INLINE constants.
+                    <code>powerRate</code> = $/kWh from MARKET_DATA (Full access: overridable). <code>staffCount</code> = ceil(staffPerMW &times; IT_MW); staffPerMW: Tier II = 3, III = 5, IV = 8 (INLINE). <code>staffSalary</code> = $/FTE/yr from MARKET_DATA. Maintenance 3% of CAPEX, insurance 0.7% of CAPEX, network $20k/MW/month, other 4% of all other OPEX items — all INLINE constants.
                     <span class="mn-src">power · MARKET_DATA</span>
                     <span class="mn-src">maint/ins/net/other · INLINE</span>
                 </span>
@@ -426,7 +426,7 @@
                 <span class="mn-eq">  yColoOther  = (yColo + yColoStaff + yColoNet) &times; 0.03                   [USD/yr]  INLINE</span>
                 <span class="mn-eq">  coloTotal  += coloSetup + &sum;(yColo + yColoStaff + yColoNet + yColoOther)</span>
                 <span class="mn-where">
-                    <code>coloKW</code> = $/kW/month from MARKET_DATA. <code>coloStaffCount</code> = ceil(1.5 &times; IT_MW) — reduced headcount vs own-build (INLINE). <code>coloEsc</code> = colo escalation rate, default 3%/yr (INLINE; Pro: overridable). Network $15k/MW/month (INLINE). Growth scale is applied to the colo lease only (workload grows, you rent more kW). Setup fees do not escalate.
+                    <code>coloKW</code> = $/kW/month from MARKET_DATA. <code>coloStaffCount</code> = ceil(1.5 &times; IT_MW) — reduced headcount vs own-build (INLINE). <code>coloEsc</code> = colo escalation rate, default 3%/yr (INLINE; Full access: overridable). Network $15k/MW/month (INLINE). Growth scale is applied to the colo lease only (workload grows, you rent more kW). Setup fees do not escalate.
                     <span class="mn-src">coloKW · MARKET_DATA</span>
                     <span class="mn-src">setup/staffing/net/other · INLINE</span>
                 </span>
@@ -448,7 +448,7 @@
                 <span class="mn-eq">  yCloudOther  = yCloud &times; 0.02                                          INLINE</span>
                 <span class="mn-eq">  cloudTotal  += &sum;(yCloud + yEgress + ySupport + yCloudOther)</span>
                 <span class="mn-where">
-                    <code>cloudDiscount</code> = reserved-instance/committed-use discount, default 30% (INLINE; Pro: overridable). <code>PROJECTIONS.cloudPricingByYear</code>: 0.0% (2025), −5% (2026), −8% (2027), −3% (2028), −2% (2029), −1% (2030) — cloud pricing is modelled as declining year-on-year (INLINE). Egress 15%, support 10%, other 2% — INLINE multiples on the compute line. No CAPEX for Cloud.
+                    <code>cloudDiscount</code> = reserved-instance/committed-use discount, default 30% (INLINE; Full access: overridable). <code>PROJECTIONS.cloudPricingByYear</code>: 0.0% (2025), −5% (2026), −8% (2027), −3% (2028), −2% (2029), −1% (2030) — cloud pricing is modelled as declining year-on-year (INLINE). Egress 15%, support 10%, other 2% — INLINE multiples on the compute line. No CAPEX for Cloud.
                     <span class="mn-src">CLOUD_BASE · INLINE</span>
                     <span class="mn-src">cloudPricingByYear · INLINE/PROJECTIONS</span>
                 </span>
@@ -475,7 +475,7 @@
             </div>
 
             <!-- 3h. WACC and NPV (Pro) -->
-            <h3 style="font-size:1rem;margin:1.4rem 0 0.2rem;">3h — WACC-adjusted NPV (Pro)</h3>
+            <h3 style="font-size:1rem;margin:1.4rem 0 0.2rem;">3h — WACC-adjusted NPV (Full access)</h3>
             <div class="mn-formula">
                 <span class="mn-eq">WACC = D/V &times; kd &times; (1 - T) + E/V &times; ke</span>
                 <span class="mn-eq">  kd = 0.06 (cost of debt),  ke = 0.12 (cost of equity),  T = 0.25 (tax rate)  INLINE</span>
@@ -487,13 +487,13 @@
                 <span class="mn-eq">NPV_Cloud = &sum;(Cloud_OPEX_y / (1 + WACC)^(y+1))</span>
                 <span class="mn-eq">NPV_diff  = max(NPV_Build, NPV_Colo, NPV_Cloud) - min(...)</span>
                 <span class="mn-where">
-                    The NPV spread is displayed as the "NPV advantage" of the cheapest option over the most expensive one. The WACC uses the Modigliani–Miller tax-shield form for the debt term. All rates are INLINE (not from FINEngine — the TCO calculator does not call <code>FINEngine</code>). D/V is the Pro user's debt/equity input, defaulting to 60%.
+                    The NPV spread is displayed as the "NPV advantage" of the cheapest option over the most expensive one. The WACC uses the Modigliani–Miller tax-shield form for the debt term. All rates are INLINE (not from FINEngine — the TCO calculator does not call <code>FINEngine</code>). D/V is the Full access user's debt/equity input, defaulting to 60%.
                     <span class="mn-src">INLINE · Modigliani–Miller</span>
                 </span>
             </div>
 
             <!-- 3i. Monte Carlo -->
-            <h3 style="font-size:1rem;margin:1.4rem 0 0.2rem;">3i — Monte Carlo risk simulation (Pro)</h3>
+            <h3 style="font-size:1rem;margin:1.4rem 0 0.2rem;">3i — Monte Carlo risk simulation (Full access)</h3>
             <div class="mn-formula">
                 <span class="mn-eq">N = 10,000 iterations</span>
                 <span class="mn-eq">Each iteration draws:</span>
@@ -560,7 +560,7 @@
                     <tr><td>Colo network cost</td><td>$15,000/MW/month</td><td>inline</td><td>INLINE</td></tr>
                     <tr><td>Colo setup fees</td><td>$50,000/MW</td><td>inline</td><td>INLINE</td></tr>
                     <tr><td>Cloud list-price base</td><td>$420/kW/month</td><td><code>CLOUD_BASE</code></td><td>INLINE</td></tr>
-                    <tr><td>Cloud reserved discount</td><td>30% (Pro: overridable)</td><td>inline default</td><td>INLINE</td></tr>
+                    <tr><td>Cloud reserved discount</td><td>30% (Full access: overridable)</td><td>inline default</td><td>INLINE</td></tr>
                     <tr><td>Egress as % of compute</td><td>15%</td><td>inline</td><td>INLINE</td></tr>
                     <tr><td>Cloud support as % of compute</td><td>10%</td><td>inline</td><td>INLINE</td></tr>
                     <tr><td>Cloud other</td><td>2% of compute</td><td>inline</td><td>INLINE</td></tr>
@@ -593,9 +593,9 @@
                     <tr><td>Annual OPEX (Year 1)</td><td>§3b yr1Opex</td><td>USD/yr</td><td>Year-1 run cost for own-build; useful for budget planning.</td></tr>
                     <tr><td>Effective $/kW/yr</td><td>§3g</td><td>USD/kW/yr</td><td>Winner TCO amortised per installed kW over the analysis period.</td></tr>
                     <tr><td>Breakeven year</td><td>§3f</td><td>year (1–15)</td><td>First year Build cumulative total falls below Colo. N/A if never crosses within 15 yr.</td></tr>
-                    <tr><td>P5 / P50 / P95 (MC)</td><td>§3i sorted array</td><td>USD</td><td>Risk distribution of the winning option's TCO across 10 000 stochastic scenarios. Pro only.</td></tr>
-                    <tr><td>WACC-adjusted NPV spread</td><td>§3h</td><td>USD</td><td>Present-value advantage of cheapest vs most expensive option at the computed WACC. Pro only.</td></tr>
-                    <tr><td>Breakeven (NPV projection)</td><td>§3h year loop</td><td>year (1–10)</td><td>Year Build NPV cumulative crosses below Colo NPV cumulative in the 10-year WACC projection. Pro only.</td></tr>
+                    <tr><td>P5 / P50 / P95 (MC)</td><td>§3i sorted array</td><td>USD</td><td>Risk distribution of the winning option's TCO across 10 000 stochastic scenarios. Full access only.</td></tr>
+                    <tr><td>WACC-adjusted NPV spread</td><td>§3h</td><td>USD</td><td>Present-value advantage of cheapest vs most expensive option at the computed WACC. Full access only.</td></tr>
+                    <tr><td>Breakeven (NPV projection)</td><td>§3h year loop</td><td>year (1–10)</td><td>Year Build NPV cumulative crosses below Colo NPV cumulative in the 10-year WACC projection. Full access only.</td></tr>
                 </tbody>
             </table>
             </div>
@@ -656,7 +656,7 @@
             <p class="mn-lead">The model assumes a <strong>greenfield build</strong> at the stated IT load from Year 0 (no phased capacity expansion within the horizon). Power consumption is modelled as flat at <code>IT_MW × PUE × utilisation</code> throughout; the growth rate only scales the Colo lease and Cloud compute spend — it does not model incremental Build CAPEX for new capacity. This is conservative for Build (no expansion CAPEX) and aggressive for Colo/Cloud (full growth-rate escalation of the lease/compute line).</p>
             <p class="mn-lead">Colo pricing uses market-specific year-by-year arrays where available (2025–2030). Beyond 2030 the 2030 value is clamped. Mean-reversion and S-curve capacity models exist in the code (<code>predictColoPrice</code>, <code>predictCapacity</code>) but are display-only for market intelligence chips and do not feed into the TCO accumulator.</p>
             <p class="mn-lead">The Cloud base rate of $420/kW/month is a list-price equivalent for IaaS compute-intensive workloads; storage, managed databases, and other services are not separately modelled. Reserved-instance / committed-use discounts default to 30% (a typical 1-year commitment discount from the major hyperscalers as of 2025). The 15% egress charge is a mid-market estimate; egress costs vary substantially by provider and architecture.</p>
-            <p class="mn-lead">WACC parameters (6% debt, 12% equity, 25% tax) are illustrative defaults for a mid-market infrastructure borrower. Real projects should compute the WACC from their actual capital structure and jurisdiction tax rate via the Pro override fields. <strong>This calculator is an engineering education and pre-feasibility aid — not a substitute for a full financial model or independent techno-economic study.</strong></p>
+            <p class="mn-lead">WACC parameters (6% debt, 12% equity, 25% tax) are illustrative defaults for a mid-market infrastructure borrower. Real projects should compute the WACC from their actual capital structure and jurisdiction tax rate via the Full access override fields. <strong>This calculator is an engineering education and pre-feasibility aid — not a substitute for a full financial model or independent techno-economic study.</strong></p>
         </section>
 
         <a class="mn-toollink" href="../tco-calculator.html">&#9654; Open the live TCO Calculator</a>
@@ -711,10 +711,10 @@
         });
     })();
     </script>
-    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
-    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
-    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
-    <script src="../js/rz-command-palette.js?v=2026-09-05-mint" defer></script>
-    <script src="../auth.js?v=2026-08-26-h1h2" defer></script>
+    <script src="../js/rz-version.js?v=20260920-10a50683" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=20260920-b64c1545" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
+    <script src="../js/rz-command-palette.js?v=20260920-cf005f60" defer></script>
+    <script src="../auth.js?v=20260920-040a6c54" defer></script>
 </body>
 </html>

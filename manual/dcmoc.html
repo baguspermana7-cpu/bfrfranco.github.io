@@ -131,7 +131,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../styles.min.css?v=20260908-editorial">
+    <link rel="stylesheet" href="../styles.min.css?v=20260920-544ad99b">
 
     <style>
         /* ==== Technical-manual design tokens — dark-first, instrument aesthetic ====
@@ -322,13 +322,13 @@
         <header class="mn-hero">
             <p class="mn-eyebrow">Technical Manual · Ops Cost Engine</p>
             <h1>DC MOC — Methodology &amp; Formulas</h1>
-            <p>Every input, equation, constant, output, and reference behind the DC MOC PRO SPA: CAPEX build-up, OPEX (energy + staffing + maintenance), shift/staffing optimisation, Monte Carlo P-value bands, and executive PDF export. The engine delegates most of its maths to <code class="mn-mono">RZEngine v2.5.1</code> (<code class="mn-mono">rz-engine.min.js</code>) while DCMOC-finer CAPEX bases live in <code class="mn-mono">dcmoc/src/lib/capex-data.ts</code> (A7 2025 rates) and the Cx program in <code class="mn-mono">RZEngine.models.commissioning.programRich/monteCarlo</code>.</p>
+            <p>Every input, equation, constant, output, and reference behind the DC MOC FULL SPA: CAPEX build-up, OPEX (energy + staffing + maintenance), shift/staffing optimisation, Monte Carlo P-value bands, and executive PDF export. The engine delegates most of its maths to <code class="mn-mono">RZEngine v2.5.1</code> (<code class="mn-mono">rz-engine.min.js</code>) while DCMOC-finer CAPEX bases live in <code class="mn-mono">dcmoc/src/lib/capex-data.ts</code> (A7 2025 rates) and the Cx program in <code class="mn-mono">RZEngine.models.commissioning.programRich/monteCarlo</code>.</p>
             <div class="mn-meta">
                 <span class="mn-chip">Engine <strong>RZEngine v2.5.1</strong></span>
                 <span class="mn-chip">CAPEX basis <strong>T&amp;T DCCI 2025</strong></span>
                 <span class="mn-chip">Key inputs <strong>14+</strong></span>
                 <span class="mn-chip">Output surfaces <strong>CAPEX · OPEX · Shift · MonteCarlo · PDF</strong></span>
-                <span class="mn-chip">SPA <strong>Next.js static-export PRO</strong></span>
+                <span class="mn-chip">SPA <strong>Next.js static-export FULL</strong></span>
             </div>
             <a class="mn-toollink" href="../dcmoc/">&#9654; Open the live DC MOC</a>
         </header>
@@ -336,7 +336,7 @@
         <!-- 1. PURPOSE -->
         <section class="mn-section">
             <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
-            <p class="mn-lead">DC MOC (Data-Centre Management &amp; Ops Cost) is a PRO-tier Next.js static-export SPA that answers five operator questions in a single instrument surface: <em>what will this facility cost to build</em> (CAPEX), <em>what will it cost to run per year</em> (OPEX), <em>how should operations be staffed across shifts</em>, <em>what is the probabilistic range of commissioning cost</em> (Monte Carlo), and <em>how is this summarised for executive sign-off</em> (PDF export). Access is governed by the site-wide auth-tier matrix at the PRO level.</p>
+            <p class="mn-lead">DC MOC (Data-Centre Management &amp; Ops Cost) is a FULL-tier Next.js static-export SPA that answers five operator questions in a single instrument surface: <em>what will this facility cost to build</em> (CAPEX), <em>what will it cost to run per year</em> (OPEX), <em>how should operations be staffed across shifts</em>, <em>what is the probabilistic range of commissioning cost</em> (Monte Carlo), and <em>how is this summarised for executive sign-off</em> (PDF export). Access is governed by the site-wide auth-tier matrix at the FULL level.</p>
             <p class="mn-lead">The mathematical basis is <strong>deterministic-by-default</strong>: every KPI is sourced from a locked constant or a formula anchored to a published standard, cost index, or RZEngine DATA entry. Monte Carlo randomness is seeded where stochastic output is needed and produces reproducible results. The tool is an <strong>engineering pre-design aid</strong> and Class 4 budgetary estimate (AACE 18R-97); detailed engineering procurement must follow.</p>
             <p class="mn-lead">The SPA consumes two shared engines loaded at page root as deferred scripts: <code class="mn-mono">/rz-engine.min.js</code> (exposes <code class="mn-mono">window.RZEngine</code> + <code class="mn-mono">window.RZEngine.DATA</code>) and the DCMOC TypeScript bundle. During Next.js SSR prerender, <code class="mn-mono">dcmoc/src/lib/rz-engine.ts</code> eval-requires the CommonJS engine from the repo root so that server-rendered and client values agree with zero hydration mismatch.</p>
             <div class="mn-note"><strong>Cross-reference:</strong> the CAPEX engine and methodology also power the standalone <a class="mn-inline" href="capex.html">capex.html manual</a> and the OPEX engine powers <a class="mn-inline" href="opex.html">opex.html</a>. This document covers the DCMOC orchestration layer — how those models are wired together with the shift-staffing and Monte Carlo layers that do not appear in the standalone calculators.</div>
@@ -345,7 +345,7 @@
         <!-- 2. INPUTS -->
         <section class="mn-section">
             <h2><span class="mn-num">02</span> Inputs</h2>
-            <p class="mn-lead">Fourteen primary inputs span five groups — project identity, site/location, electrical system, cooling/mechanical, and staffing. Additional advanced fields (seismic zone, substation type, green certification, renewable option, deep-sea cooling parameters) unlock in PRO mode. All ranges are enforced client-side; missing optional fields fall back to engine defaults.</p>
+            <p class="mn-lead">Fourteen primary inputs span five groups — project identity, site/location, electrical system, cooling/mechanical, and staffing. Additional advanced fields (seismic zone, substation type, green certification, renewable option, deep-sea cooling parameters) unlock in FULL mode. All ranges are enforced client-side; missing optional fields fall back to engine defaults.</p>
             <div class="mn-tablewrap">
             <table class="mn-table">
                 <thead><tr><th>Field</th><th>Symbol / key</th><th>Unit</th><th>Range / default</th><th>Meaning &amp; engine path</th></tr></thead>
@@ -531,7 +531,7 @@
                 <thead><tr><th>Output</th><th>Formula / source</th><th>Unit</th><th>Surface in DC MOC</th></tr></thead>
                 <tbody>
                     <tr><td>CAPEX total</td><td><code>CAPEX_total = Σ costs[c] + soft + contingency [+FOM]</code></td><td>USD</td><td>CAPEX module KPI card + PDF §1</td></tr>
-                    <tr><td>CAPEX $/kW</td><td><code>CAPEX_total / itLoad</code></td><td>$/kW</td><td>CAPEX efficiency chip; narrative band (Low &lt;$8 k · Standard &lt;$15 k · Premium)</td></tr>
+                    <tr><td>CAPEX $/kW</td><td><code>CAPEX_total / itLoad</code></td><td>$/kW</td><td>CAPEX efficiency chip; narrative band (Low &lt;$8 k · Standard &lt;$15 k · Full access)</td></tr>
                     <tr><td>CAPEX by category</td><td>All 14 <code>costs[c]</code></td><td>USD each</td><td>Waterfall / donut chart</td></tr>
                     <tr><td>PUE</td><td><code>getPUE(coolingType)</code></td><td>ratio</td><td>PUE chip; drives energy and OPEX</td></tr>
                     <tr><td>Timeline (months)</td><td><code>computeTimeline()</code></td><td>months</td><td>Gantt timeline module</td></tr>
@@ -544,7 +544,7 @@
                     <tr><td>Cx program cost (P50)</td><td><code>models.commissioning.programRich().grand</code></td><td>USD</td><td>Commissioning module cost band</td></tr>
                     <tr><td>Cx Monte Carlo P5/P25/P50/P75/P95</td><td><code>models.commissioning.monteCarlo()</code>, N=10 000</td><td>USD</td><td>Histogram with marker lines; CVaR95 shown</td></tr>
                     <tr><td>Cx sensitivity tornado</td><td><code>models.commissioning.sensitivity()</code>, 7 params</td><td>USD swing</td><td>Tornado chart sorted by |swing|</td></tr>
-                    <tr><td>Executive PDF</td><td>ReportNarrative engine (16-family) → browser print-window</td><td>multi-page PDF</td><td>PRO export button — all KPIs + charts + provenance</td></tr>
+                    <tr><td>Executive PDF</td><td>ReportNarrative engine (16-family) → browser print-window</td><td>multi-page PDF</td><td>FULL export button — all KPIs + charts + provenance</td></tr>
                 </tbody>
             </table>
             </div>
@@ -563,7 +563,7 @@
                     <li><strong>Building cost</strong>: <code>1 050 × 2 000 × 1.00 × 2.411 × 1.03 ≈</code> <span class="mn-result">$5.22 M</span>.</li>
                     <li><strong>Total hard cost (all 14 categories aggregated)</strong>: approximately <span class="mn-result">~$32–34 M</span> (sum of 14 category lines with their respective multipliers).</li>
                     <li><strong>Soft costs</strong> at design 6% + PM 3%: <code>totalHard × 0.09 ≈</code> <span class="mn-result">~$2.9–3.1 M</span>.</li>
-                    <li><strong>Contingency</strong> at 10%: <code>(totalHard + soft) × 0.10 ≈</code> <span class="mn-result">~$3.5 M</span>. CAPEX total <span class="mn-result">~$38–40 M</span> → <span class="mn-result">~$19–20 k/kW</span> (Premium bracket — driven by Jakarta city anchor and N+1 redundancy).</li>
+                    <li><strong>Contingency</strong> at 10%: <code>(totalHard + soft) × 0.10 ≈</code> <span class="mn-result">~$3.5 M</span>. CAPEX total <span class="mn-result">~$38–40 M</span> → <span class="mn-result">~$19–20 k/kW</span> (Full access bracket — driven by Jakarta city anchor and N+1 redundancy).</li>
                     <li><strong>PUE</strong> (in-row cooling): <code>getPUE('inrow') ≈</code> <span class="mn-result">1.35</span>.</li>
                     <li><strong>Annual energy</strong>: <code>2 000 kW × 1.35 × 8 760 h × 0.099 $/kWh (ID grid rate) ≈</code> <span class="mn-result">$2.35 M/yr</span>.</li>
                     <li><strong>Staffing OPEX</strong>: in-house, base FTE = <code>ceil(2 MW × 4.2) = 9</code>; shift FTE = <code>ceil(9 × 4.2) = 38</code>; burdened rate ~$17 k/FTE (ID rate $12 k × 1.35); labor budget ≈ <code>38 × 17 000 × 1.00 =</code> <span class="mn-result">~$0.65 M/yr</span>.</li>
@@ -659,10 +659,10 @@
         });
     })();
     </script>
-    <script src="../js/rz-version.js?v=2026-07-20" defer></script>
-    <script src="../js/rz-mobile-nav.js?v=2026-07-20" defer></script>
-    <script src="../js/rz-cookie-consent.js?v=2026-07-20" defer></script>
-    <script src="../js/rz-command-palette.js?v=2026-09-05-mint" defer></script>
-    <script src="../auth.js?v=2026-08-26-h1h2" defer></script>
+    <script src="../js/rz-version.js?v=20260920-10a50683" defer></script>
+    <script src="../js/rz-mobile-nav.js?v=20260920-b64c1545" defer></script>
+    <script src="../js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
+    <script src="../js/rz-command-palette.js?v=20260920-cf005f60" defer></script>
+    <script src="../auth.js?v=20260920-040a6c54" defer></script>
 </body>
 </html>

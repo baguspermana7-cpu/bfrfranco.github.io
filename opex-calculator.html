@@ -1372,7 +1372,7 @@
    halves every child's effective contrast (axe blends parent opacity) */
 .charts-grid[aria-hidden="true"], .scenario-section[aria-hidden="true"], #opexCompareGrid[aria-hidden="true"] { opacity:.9 !important; }
 </style>
-    <script src="js/rz-version.js?v=20260920-c35dc44c" defer></script>
+    <script src="js/rz-version.js?v=20260920-10a50683" defer></script>
     <script src="js/rz-calc-utils.js?v=20260920-ef3425ae" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260920-b64c1545" defer></script>
     <script src="js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
@@ -1573,7 +1573,7 @@ html:not([data-theme="dark"]) td[style*="color:#0e7490"] { color:#64748b !import
                         <i class="fas fa-chevron-down" style="font-size:0.6rem;color:#64748b;"></i>
                         <div class="nav-user-dropdown" id="opexNavUserDropdown">
                             <div class="nav-dd-header">
-                                <div class="nav-dd-tier-badge pro" id="opexNavDdTierBadge">PRO</div>
+                                <div class="nav-dd-tier-badge pro" id="opexNavDdTierBadge">FULL</div>
                                 <div class="nav-dd-email" id="opexNavDdEmail">user@email.com</div>
                             </div>
                             <button class="nav-dd-logout" onclick="opexLogout()">
@@ -1623,7 +1623,7 @@ html:not([data-theme="dark"]) td[style*="color:#0e7490"] { color:#64748b !import
                 <i class="fas fa-cogs" style="margin-right:6px;"></i>Advanced
             </button>
             <button type="button" id="opexPremiumTabBtn" onclick="opexHandlePremiumTab()" style="padding:0.6rem 1.2rem;border-radius:10px;border:1px solid rgba(100, 116, 139,0.4);background:linear-gradient(135deg,rgba(100, 116, 139,0.15),rgba(100, 116, 139,0.05));color:#94a3b8;cursor:pointer;font-weight:600;font-size:0.9rem;font-family:inherit;transition:all 0.3s;margin-left:auto;">
-                <i class="fas fa-crown" style="margin-right:6px;"></i>Premium
+                <i class="fas fa-crown" style="margin-right:6px;"></i>Full access
             </button>
             <span id="opexPremiumBadge"></span>
         </div>
@@ -2183,16 +2183,16 @@ html:not([data-theme="dark"]) td[style*="color:#0e7490"] { color:#64748b !import
                             <i class="fas fa-users-cog"></i> Staffing Details
                         </div>
                         <div class="input-group">
-                            <label class="input-label">Overtime & Holiday Premium: <span id="overtimeVal" style="color:#64748b;font-family:'JetBrains Mono',monospace;">15%</span>
+                            <label class="input-label">Overtime & Holiday Full access: <span id="overtimeVal" style="color:#64748b;font-family:'JetBrains Mono',monospace;">15%</span>
                                 <span class="info-tooltip"><i class="fas fa-question"></i>
                                     <span class="tooltip-content">
-                                        <div class="tooltip-title"><i class="fas fa-clock"></i> Overtime Premium</div>
+                                        <div class="tooltip-title"><i class="fas fa-clock"></i> Overtime Full access</div>
                                         <div class="tooltip-desc">Additional labor cost for overtime, holiday, and shift differentials. Applied as a multiplier on total staffing cost.</div>
                                         <div class="tooltip-note">Indonesia labor law: overtime = 1.5x first hour, 2x subsequent hours. Holiday premium = 2x base. Typical DC average: 10-20% of base staffing.</div>
                                     </span>
                                 </span>
                             </label>
-                            <input type="range" class="slider" id="overtimePremium" min="0" max="30" value="15" step="5" oninput="document.getElementById('overtimeVal').textContent=this.value+'%';updateCalculation();" style="accent-color:#64748b;" aria-label="Overtime Premium">
+                            <input type="range" class="slider" id="overtimePremium" min="0" max="30" value="15" step="5" oninput="document.getElementById('overtimeVal').textContent=this.value+'%';updateCalculation();" style="accent-color:#64748b;" aria-label="Overtime Full access">
                         </div>
                         <div class="input-group">
                             <label class="input-label">Contract Type
@@ -3933,7 +3933,7 @@ html:not([data-theme="dark"]) td[style*="color:#0e7490"] { color:#64748b !import
                             ${data.name}
                         </td>
                         <td class="amount">${formatCurrency(data.cost)}</td>
-                        <td>Insurance Premium</td>
+                        <td>Insurance Full access</td>
                         <td>${data.renewal}</td>
                         <td>
                             <span style="font-size: 0.75rem; color: var(--accent-emerald);">
@@ -4897,7 +4897,7 @@ html:not([data-theme="dark"]) td[style*="color:#0e7490"] { color:#64748b !import
                 sec9 = secTitle('Insurance & Compliance — A vs B', '#64748b') + `
                 <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px;">Insurance Coverage</div>
                 <table style="width:100%;border-collapse:collapse;font-size:10.5px;margin-bottom:10px;">
-                    <tr style="background:#64748b;color:white;"><th style="${tH}"  scope="col">Type</th><th style="${tH}text-align:right;color:#cffafe;"  scope="col">A Premium</th><th style="${tH}text-align:right;color:#cffafe;"  scope="col">B Premium</th><th style="${tH}text-align:right;"  scope="col">Delta</th></tr>
+                    <tr style="background:#64748b;color:white;"><th style="${tH}"  scope="col">Type</th><th style="${tH}text-align:right;color:#cffafe;"  scope="col">A Full access</th><th style="${tH}text-align:right;color:#cffafe;"  scope="col">B Full access</th><th style="${tH}text-align:right;"  scope="col">Delta</th></tr>
                     ${cmpInsRows}
                 </table>
                 <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px;">Compliance & Certifications</div>
@@ -4917,7 +4917,7 @@ html:not([data-theme="dark"]) td[style*="color:#0e7490"] { color:#64748b !import
                     <div style="flex:1;">
                         <div style="font-size:11px;font-weight:700;color:#64748b;margin-bottom:6px;">Insurance Coverage</div>
                         <table style="width:100%;border-collapse:collapse;font-size:10.5px;">
-                            <tr style="background:#64748b;color:white;"><th style="${tH}"  scope="col">Type</th><th style="${tH}text-align:right;"  scope="col">Premium</th><th style="${tH}text-align:center;"  scope="col">Renewal</th></tr>
+                            <tr style="background:#64748b;color:white;"><th style="${tH}"  scope="col">Type</th><th style="${tH}text-align:right;"  scope="col">Full access</th><th style="${tH}text-align:center;"  scope="col">Renewal</th></tr>
                             ${insRows}
                         </table>
                     </div>
@@ -5338,7 +5338,7 @@ html:not([data-theme="dark"]) td[style*="color:#0e7490"] { color:#64748b !import
 
     <!-- Free Watermark -->
     <div id="opexFreeWatermark" onclick="opexShowLogin()">
-        <i class="fas fa-lock" style="margin-right:6px;"></i>Free estimate &middot; Upgrade to PRO &mdash; Rp 199K/bulan
+        <i class="fas fa-lock" style="margin-right:6px;"></i>Free estimate &middot; Sign in for the full analysis &mdash; Rp 199K/bulan
     </div>
 
     <!-- Premium Gating Script -->

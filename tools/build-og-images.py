@@ -1083,6 +1083,44 @@ def _public_slugs() -> set:
     return _public_slugs._cache
 
 
+def _network_targets(include_existing: bool = False) -> list[tuple[str, str, str, str, Path]]:
+    """The network/** protocol explainers — the family the root-only glob never saw.
+
+    v3.10.17. `_discover_targets` globs `REPO_ROOT.glob("*.html")`: one directory. Every protocol
+    page under `network/` — Modbus, BACnet, OPC UA, DNP3, PROFINET, EtherCAT, TLS, mTLS, OAuth/JWT,
+    WireGuard, SNMP, syslog, IPMI/Redfish, gRPC, GraphQL, REST, MCP tool-call, DHCP/DNS, IPv4/IPv6,
+    subnetting, the TCP handshake and the OSI model — therefore had no og:image, no twitter:card
+    and no JSON-LD at all. For an answer engine those are the most citable pages on the site, and
+    they were the least marked up.
+
+    Slug is `network-<stem>`, not the bare stem: 27 stems collide across this sitemap
+    (`datahall`, `ict`, `fire-system`, `pue`…), so a bare stem is not a safe card name for a page
+    that lives in a sub-directory.
+    """
+    import re as _re
+    accents = {
+        "foundations": "#0ea5e9",
+        "industrial-ot": "#d97706",
+        "dc-management": "#0d9488",
+        "security": "#dc2626",
+        "apis-agents": "#64748b",
+    }
+    out = []
+    for path in sorted((REPO_ROOT / "network").rglob("*.html")):
+        slug = f"network-{path.stem}"
+        if (OUTPUT_DIR / f"{slug}.webp").exists() and not include_existing:
+            continue
+        text = path.read_text(encoding="utf-8", errors="ignore")
+        h1 = _re.search(r"<h1[^>]*>([^<]*)", text)
+        desc = _re.search(r'name="description"\s+content="([^"]*)"', text)
+        if not h1 or not desc:
+            continue
+        title = _re.sub(r"\s+", " ", h1.group(1)).strip()
+        subtitle = _re.sub(r"\s+", " ", desc.group(1)).strip()
+        out.append((slug, title, subtitle, accents.get(path.parent.name, "#64748b"), path))
+    return out
+
+
 def _discover_targets(include_existing: bool = False) -> list[tuple[str, str, str, str, Path]]:
     """Every root page that advertises NO card, derived from the page itself.
 
@@ -1308,6 +1346,10 @@ def main() -> None:
 
     work = [(slug, title, subtitle, accent, None) for slug, title, subtitle, accent in TARGETS]
     if args.discover:
+        net = _network_targets(include_existing=args.force)
+        if net:
+            print(f"  [NETWORK]  {len(net)} protocol page(s) under network/ — the root-only glob never saw these")
+        work += net
         found = _discover_targets(include_existing=args.force)
         print(f"  [DISCOVER] {len(found)} page(s) advertise no card; deriving from their own <title> + description")
         work += found

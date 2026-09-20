@@ -83,7 +83,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
     <!-- v1.43.11 editorial register (RZ Dark System v1) — dark-only, scoped. -->
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
-    <link rel="stylesheet" href="css/rz-article-dark.css?v=20260920-d8476844">
+    <link rel="stylesheet" href="css/rz-article-dark.css?v=20260920-63c1e3d7">
     <script src="js/rz-explain-db.js?v=20260920-726727d9" defer></script>
 <script src="js/rz-explain.js?v=20260920-d0317658" defer></script>
 <script src="js/rz-article-editorial.js?v=20260920-10bc5a1a" defer></script>
@@ -93,7 +93,7 @@
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="apple-touch-icon" href="assets/Favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="styles.min.css?v=20260920-37a46bce">
+    <link rel="stylesheet" href="styles.min.css?v=20260920-544ad99b">
     <link rel="preload" as="image" href="assets/article-25-hero.webp">
 
     <!-- Structured Data: TechnicalArticle -->
@@ -726,7 +726,7 @@
 :root:not([data-theme="dark"]) .derived, :root:not([data-theme="dark"]) .rz-chart-chip.derived { color:#065f46 !important; }
 [data-theme="dark"] [style*="color: #3b82f6"], [data-theme="dark"] [style*="color:#3b82f6"] { color:#93c5fd !important; }
 </style>
-    <script src="js/rz-version.js?v=20260920-c35dc44c" defer></script>
+    <script src="js/rz-version.js?v=20260920-10a50683" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260920-b64c1545" defer></script>
     <script src="js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
 <style id="rz-mobile-v18">
@@ -1362,12 +1362,12 @@
 
     <div class="calculator-section pjm-calculator" id="pjmCalc">
         <h3><i class="fas fa-chart-bar"></i> Grid Reliability &amp; DC Power Impact Analyzer</h3>
-        <p class="calc-subtitle">Model how data center load growth affects grid reliability margins, capacity auction prices, and consumer costs. Free mode calculates 8 KPIs. Pro mode adds Monte Carlo simulation, 10-year projection, sensitivity analysis, and strategic roadmap.</p>
+        <p class="calc-subtitle">Model how data center load growth affects grid reliability margins, capacity auction prices, and consumer costs. Free mode calculates 8 KPIs. Full access mode adds Monte Carlo simulation, 10-year projection, sensitivity analysis, and strategic roadmap.</p>
 
         <div class="pjm-toolbar-row">
             <div class="pjm-mode-bar">
                 <button class="pjm-mode-btn active" id="pjmFreeBtn" type="button"><i class="fas fa-chart-bar"></i> Free Analysis</button>
-                <button class="pjm-mode-btn" id="pjmProBtn" type="button"><i class="fas fa-lock"></i> Pro Analysis</button>
+                <button class="pjm-mode-btn" id="pjmProBtn" type="button"><i class="fas fa-lock"></i> Full analysis</button>
             </div>
             <div class="pjm-toolbar-actions">
                 <button class="pjm-toolbar-btn" type="button" id="pjmBtnReset"><i class="fas fa-rotate-left"></i> Reset Defaults</button>
@@ -1513,7 +1513,7 @@
                     <div id="pjmMonteCarloKPIs" style="display:flex;gap:1rem;flex-wrap:wrap;font-size:0.82rem;color:#475569;"></div>
                     <p style="margin:0.5rem 0 0;color:#475569;font-size:0.78rem;line-height:1.6;">10,000 simulations varying capacity (&plusmn;10%), retirements (&plusmn;20%), DC growth (&plusmn;25%), forced outage (&plusmn;50%), and ELCC (&plusmn;30%) using Box-Muller normal distribution.</p>
                 </div>
-                <div class="pjm-gate-overlay" data-gate="1"><i class="fas fa-lock"></i><span>Unlock Pro Analysis</span></div>
+                <div class="pjm-gate-overlay" data-gate="1"><i class="fas fa-lock"></i><span>Sign in for the full analysis</span></div>
             </div>
 
             <!-- Panel 2: 10-Year Projection -->
@@ -1524,7 +1524,7 @@
                     <div id="pjmProjectionKPIs" style="display:flex;gap:1rem;flex-wrap:wrap;font-size:0.82rem;color:#475569;"></div>
                     <p style="margin:0.5rem 0 0;color:#475569;font-size:0.78rem;line-height:1.6;">Year-by-year calculation with retirement schedule, demand compounding, queue completion rate, battery deployment, and demand response growth.</p>
                 </div>
-                <div class="pjm-gate-overlay" data-gate="2"><i class="fas fa-lock"></i><span>Unlock Pro Analysis</span></div>
+                <div class="pjm-gate-overlay" data-gate="2"><i class="fas fa-lock"></i><span>Sign in for the full analysis</span></div>
             </div>
 
             <!-- Panel 3: Sensitivity Tornado -->
@@ -1534,7 +1534,7 @@
                     <div class="pjm-chart-container"><canvas id="pjmTornadoChart" height="300"></canvas></div>
                     <p style="margin:0.5rem 0 0;color:#475569;font-size:0.78rem;line-height:1.6;">Tests 7 variables at &plusmn;20% to determine which input has the greatest impact on reserve margin. Prioritize interventions by leverage.</p>
                 </div>
-                <div class="pjm-gate-overlay" data-gate="3"><i class="fas fa-lock"></i><span>Unlock Pro Analysis</span></div>
+                <div class="pjm-gate-overlay" data-gate="3"><i class="fas fa-lock"></i><span>Sign in for the full analysis</span></div>
             </div>
 
             <!-- Panel 4: Strategic Roadmap -->
@@ -1543,7 +1543,7 @@
                     <h4><i class="fas fa-route"></i> Strategic Risk Assessment &amp; Roadmap</h4>
                     <div id="pjmRoadmap" style="font-size:0.85rem;line-height:1.75;color:#374151;">Generating personalized recommendations based on your inputs and grid conditions...</div>
                 </div>
-                <div class="pjm-gate-overlay" data-gate="4"><i class="fas fa-lock"></i><span>Unlock Pro Analysis</span></div>
+                <div class="pjm-gate-overlay" data-gate="4"><i class="fas fa-lock"></i><span>Sign in for the full analysis</span></div>
             </div>
         </div>
 
@@ -1556,11 +1556,11 @@
     <div class="pjm-login-overlay" id="pjmLoginOverlay">
         <div class="pjm-login-box">
             <button class="pjm-login-close" id="pjmLoginClose" type="button">&times;</button>
-            <h3><i class="fas fa-lock"></i> Pro Analysis</h3>
+            <h3><i class="fas fa-lock"></i> Full analysis</h3>
             <p>Enter your ResistanceZero credentials to unlock Monte Carlo simulation, 10-year projections, sensitivity analysis, and strategic roadmap.</p>
             <input type="email" id="pjmLoginEmail" placeholder="Email address" autocomplete="email" aria-label="Email address">
             <input type="password" id="pjmLoginPass" placeholder="Password" autocomplete="current-password" aria-label="Password">
-            <button class="pjm-login-submit" id="pjmLoginSubmit" type="button">Unlock Pro Analysis</button>
+            <button class="pjm-login-submit" id="pjmLoginSubmit" type="button">Sign in for the full analysis</button>
             <div class="pjm-login-error" id="pjmLoginError">Invalid credentials.</div>
             <div style="text-align:center;margin-top:10px;font-size:0.68rem;color:#475569;line-height:1.5;">By signing in, you agree to our <a href="terms.html" style="color:#b45309;text-decoration:none;">Terms</a> &amp; <a href="privacy.html" style="color:#b45309;text-decoration:none;">Privacy Policy</a></div>
         </div>
@@ -1790,7 +1790,7 @@
     </div>
 </footer>
 
-<script src="script.min.js?v=20260920-06a132bf"></script>
+<script src="script.min.js?v=20260920-0e1dd953"></script>
 
 <!-- Chart.js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -2286,7 +2286,7 @@
 
         document.getElementById('pjmFreeBtn').classList.toggle('active', !isPro);
         document.getElementById('pjmProBtn').classList.toggle('active', isPro);
-        document.getElementById('pjmProBtn').innerHTML = isPro && unlocked ? '<i class="fas fa-unlock"></i> Pro Analysis' : '<i class="fas fa-lock"></i> Pro Analysis';
+        document.getElementById('pjmProBtn').innerHTML = isPro && unlocked ? '<i class="fas fa-unlock"></i> Full analysis' : '<i class="fas fa-lock"></i> Pro Analysis';
 
         document.getElementById('pjmProInputs').classList.toggle('active', isPro);
         document.getElementById('pjmProPanels').classList.toggle('active', isPro);

@@ -653,7 +653,7 @@ a[href$="opex-calculator.html"][href] { color:#34d399 !important; }
 .cx-disc-fine[class] { color:#94a3b8 !important; }
 .cx-disc-fine a { text-decoration:underline !important; text-underline-offset:2px; color:#93c5fd !important; }
 </style>
-    <script src="js/rz-version.js?v=20260920-c35dc44c" defer></script>
+    <script src="js/rz-version.js?v=20260920-10a50683" defer></script>
     <script src="js/rz-calc-utils.js?v=20260920-ef3425ae" defer></script>
     <script src="js/rz-explain-db.js?v=20260920-726727d9" defer></script>
     <script src="js/rz-explain.js?v=20260920-d0317658" defer></script>
@@ -749,8 +749,8 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
   <div class="cx-toolbar">
     <div class="cx-mode-bar">
       <button type="button" class="cx-toolbar-btn cx-btn-free active" onclick="cxSwitchMode('free')"><i class="fas fa-chart-bar" style="margin-right:6px;"></i>Free Assessment</button>
-      <button type="button" class="cx-toolbar-btn cx-btn-pro" onclick="cxSwitchMode('pro')"><i class="fas fa-crown" style="margin-right:6px;"></i>Pro Analysis</button>
-      <span id="cxPremiumBadge" class="cx-premium-badge">PRO ACTIVE</span>
+      <button type="button" class="cx-toolbar-btn cx-btn-pro" onclick="cxSwitchMode('pro')"><i class="fas fa-crown" style="margin-right:6px;"></i>Full analysis</button>
+      <span id="cxPremiumBadge" class="cx-premium-badge">FULL ACCESS</span>
       <div style="width:1px;height:24px;background:rgba(148,163,184,0.15);margin:0 4px;"></div>
       <button type="button" class="cx-toolbar-btn cx-btn-manual" onclick="cxSwitchMode('manual')"><i class="fas fa-book" style="margin-right:6px;"></i>Manual</button>
       <button type="button" class="cx-toolbar-btn cx-btn-faq" onclick="cxSwitchMode('faq')"><i class="fas fa-circle-question" style="margin-right:6px;"></i>FAQ</button>
@@ -770,7 +770,7 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
       <button type="button" class="cx-btn-reset" onclick="cxReset()"><i class="fas fa-undo" style="margin-right:6px;"></i>Reset</button>
       <button type="button" class="cx-btn-pdf" onclick="cxExportPDF()" id="cxExportBtn"><i class="fas fa-file-pdf" style="margin-right:6px;"></i>Export PDF</button>
       <button type="button" id="btnSaveAccount" onclick="rzScenario&&rzScenario.saveToAccount('cx',{msgEl:'acctSaveMsg'})" style="padding:12px 20px;border-radius:12px;border:1px solid rgba(59,130,246,0.5);background:linear-gradient(135deg,rgba(59,130,246,0.16),rgba(37,99,235,0.06));color:#93c5fd;font-weight:700;font-size:0.88rem;font-family:inherit;cursor:pointer;"><i class="fas fa-cloud" style="margin-right:6px;"></i>Save to my account</button>
-      <button type="button" id="cxPremiumBtn" class="cx-premium-btn" onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:6px;"></i>Unlock Pro</button>
+      <button type="button" id="cxPremiumBtn" class="cx-premium-btn" onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:6px;"></i>Sign in</button>
     </div>
     <div id="acctSaveMsg" style="display:none;margin-top:6px;font-size:0.72rem;text-align:center;"></div>
   </div>
@@ -914,7 +914,7 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
 
     <!-- Pro Inputs (9-14) -->
     <div class="cx-input-group cx-pro-input" id="cxProInput9">
-      <label class="cx-input-label" data-explain="generator-type"><i class="fas fa-gas-pump" style="color:#94a3b8;"></i> Generator Type <span class="cx-pro-tag">PRO</span></label>
+      <label class="cx-input-label" data-explain="generator-type"><i class="fas fa-gas-pump" style="color:#94a3b8;"></i> Generator Type <span class="cx-pro-tag">FULL</span></label>
       <select id="cxGeneratorType" class="cx-input-field" aria-label="CX Generator Type">
         <option value="diesel" selected>Diesel</option>
         <option value="gas">Natural Gas</option>
@@ -923,7 +923,7 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
       </select>
     </div>
     <div class="cx-input-group cx-pro-input" id="cxProInput10">
-      <label class="cx-input-label" data-explain="seismic-zone"><i class="fas fa-mountain" style="color:#94a3b8;"></i> Seismic Zone <span class="cx-pro-tag">PRO</span></label>
+      <label class="cx-input-label" data-explain="seismic-zone"><i class="fas fa-mountain" style="color:#94a3b8;"></i> Seismic Zone <span class="cx-pro-tag">FULL</span></label>
       <select id="cxSeismicZone" class="cx-input-field" aria-label="CX Seismic Zone">
         <option value="0">Zone 0 — No Risk</option>
         <option value="1" selected>Zone 1 — Low</option>
@@ -933,7 +933,7 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
       </select>
     </div>
     <div class="cx-input-group cx-pro-input" id="cxProInput11">
-      <label class="cx-input-label" data-explain="cx-scope"><i class="fas fa-list-check" style="color:#94a3b8;"></i> Cx Scope <span class="cx-pro-tag">PRO</span></label>
+      <label class="cx-input-label" data-explain="cx-scope"><i class="fas fa-list-check" style="color:#94a3b8;"></i> Cx Scope <span class="cx-pro-tag">FULL</span></label>
       <select id="cxScope" class="cx-input-field" aria-label="CX Scope">
         <option value="new_build" selected>New Build (Full L1-L5)</option>
         <option value="retrofit">Retrofit / Upgrade</option>
@@ -942,7 +942,7 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
       </select>
     </div>
     <div class="cx-input-group cx-pro-input" id="cxProInput12">
-      <label class="cx-input-label" data-explain="substation-type"><i class="fas fa-plug-circle-bolt" style="color:#94a3b8;"></i> Substation <span class="cx-pro-tag">PRO</span></label>
+      <label class="cx-input-label" data-explain="substation-type"><i class="fas fa-plug-circle-bolt" style="color:#94a3b8;"></i> Substation <span class="cx-pro-tag">FULL</span></label>
       <select id="cxSubstation" class="cx-input-field" aria-label="CX Substation">
         <option value="utility_fed">Utility-Fed (No HV)</option>
         <option value="single_sub" selected>Single Substation</option>
@@ -951,7 +951,7 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
       </select>
     </div>
     <div class="cx-input-group cx-pro-input" id="cxProInput13">
-      <label class="cx-input-label" data-explain="cx-bms-dcim"><i class="fas fa-network-wired" style="color:#94a3b8;"></i> BMS/DCIM <span class="cx-pro-tag">PRO</span></label>
+      <label class="cx-input-label" data-explain="cx-bms-dcim"><i class="fas fa-network-wired" style="color:#94a3b8;"></i> BMS/DCIM <span class="cx-pro-tag">FULL</span></label>
       <select id="cxBmsComplexity" class="cx-input-field" aria-label="CX Bms Complexity">
         <option value="basic">Basic BMS</option>
         <option value="standard" selected>Standard BMS + Head-End</option>
@@ -960,7 +960,7 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
       </select>
     </div>
     <div class="cx-input-group cx-pro-input" id="cxProInput14">
-      <label class="cx-input-label" data-explain="delivery-method"><i class="fas fa-truck-fast" style="color:#94a3b8;"></i> Delivery Method <span class="cx-pro-tag">PRO</span></label>
+      <label class="cx-input-label" data-explain="delivery-method"><i class="fas fa-truck-fast" style="color:#94a3b8;"></i> Delivery Method <span class="cx-pro-tag">FULL</span></label>
       <select id="cxDeliveryMethod" class="cx-input-field" aria-label="CX Delivery Method">
         <option value="traditional" selected>Traditional (DBB)</option>
         <option value="design_build">Design-Build</option>
@@ -1042,51 +1042,51 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
     <div class="cx-pro-section" id="cxProSection">
       <!-- Panel 1: Cost by Discipline -->
       <div class="cx-pro-panel gated" id="cxPanelDiscipline">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Pro Feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Unlock</button></div>
+        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
         <h3><i class="fas fa-crown"></i> Cost Breakdown by Discipline</h3>
         <div class="cx-kpi-grid-6" id="cxDisciplineKpis"></div>
         <div class="cx-chart-box" style="background:transparent;border:none;padding:0;"><canvas id="cxChartDiscipline"></canvas></div>
       </div>
       <!-- Panel 2: Resource Loading -->
       <div class="cx-pro-panel gated" id="cxPanelResources">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Pro Feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Unlock</button></div>
+        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
         <h3><i class="fas fa-crown"></i> Resource Loading &amp; Personnel</h3>
         <div class="cx-kpi-grid-6" id="cxResourceKpis"></div>
       </div>
       <!-- Panel 3: Monte Carlo -->
       <div class="cx-pro-panel gated" id="cxPanelMC">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Pro Feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Unlock</button></div>
+        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
         <h3><i class="fas fa-crown"></i> Monte Carlo Distribution (n=10,000)</h3>
         <div class="cx-kpi-grid-6" id="cxMcKpis"></div>
         <div class="cx-chart-box" style="background:transparent;border:none;padding:0;"><canvas id="cxChartMC"></canvas></div>
       </div>
       <!-- Panel 4: Sensitivity Tornado -->
       <div class="cx-pro-panel gated" id="cxPanelTornado">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Pro Feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Unlock</button></div>
+        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
         <h3><i class="fas fa-crown"></i> Sensitivity Analysis — Top Drivers</h3>
         <div class="cx-chart-box" style="background:transparent;border:none;padding:0;"><canvas id="cxChartTornado"></canvas></div>
       </div>
       <!-- Panel 5: Executive Assessment -->
       <div class="cx-pro-panel gated" id="cxPanelExec">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Pro Feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Unlock</button></div>
+        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
         <h3><i class="fas fa-crown"></i> Executive Intelligence Brief</h3>
         <div class="cx-narrative" id="cxExecNarrative" style="border-left-color:#0891b2;background:rgba(100, 116, 139,0.04);"></div>
       </div>
       <!-- Panel 6: Equipment Summary -->
       <div class="cx-pro-panel gated" id="cxPanelEquip">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Pro Feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Unlock</button></div>
+        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
         <h3><i class="fas fa-crown"></i> Equipment Count Summary</h3>
         <div class="cx-equip-grid" id="cxEquipGrid"></div>
       </div>
       <!-- Panel 7: Commissioning Risk Score -->
       <div class="cx-pro-panel gated" id="cxPanelRisk">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Pro Feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Unlock</button></div>
+        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
         <h3><i class="fas fa-crown"></i> Commissioning Risk Assessment</h3>
         <div id="cxRiskContent"></div>
       </div>
       <!-- Panel 8: Resource Loading Table -->
       <div class="cx-pro-panel gated" id="cxPanelResTable">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Pro Feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Unlock</button></div>
+        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
         <h3><i class="fas fa-crown"></i> Resource Loading by Phase</h3>
         <table class="cx-resource-table" id="cxResTable">
           <thead><tr><th scope="col">Phase</th><th scope="col">CxA Days</th><th scope="col">Field Tech Days</th><th scope="col">OEM Days</th><th scope="col">Witness Days</th><th scope="col">Est. Cost</th></tr></thead>
@@ -1095,75 +1095,75 @@ a[href$="opex-calculator.html"] { color:#34d399 !important; }
       </div>
       <!-- Panel 9: Phase Gate Readiness -->
       <div class="cx-pro-panel gated" id="cxPanelGates">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Pro Feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Unlock</button></div>
+        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
         <h3><i class="fas fa-crown"></i> Phase Gate Checklist Preview</h3>
         <div class="cx-phase-gates" id="cxPhaseGates"></div>
       </div>
       <!-- Panel 10: Resource Histogram -->
       <div class="cx-pro-panel gated" id="cxPanelHistogram">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Pro Feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Unlock</button></div>
+        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
         <h3><i class="fas fa-crown"></i> Resource Histogram — Person-Days/Week</h3>
         <div class="cx-chart-box" style="background:transparent;border:none;padding:0;"><canvas id="cxChartHistogram"></canvas></div>
       </div>
       <!-- Panel 11: Witness Hold Point Matrix -->
       <div class="cx-pro-panel gated" id="cxPanelWitness">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Pro Feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Unlock</button></div>
+        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
         <h3><i class="fas fa-crown"></i> Witness / Hold Point Matrix</h3>
         <div id="cxWitnessMatrix" style="overflow-x:auto;"></div>
       </div>
       <!-- Panel 12: Cost Adjustment Factors -->
       <div class="cx-pro-panel gated" id="cxPanelAdjust">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Pro Feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Unlock</button></div>
+        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
         <h3><i class="fas fa-crown"></i> Cost Adjustment Factors</h3>
         <div class="cx-kpi-grid-6" id="cxAdjustKpis"></div>
         <div id="cxAdjustNarrative" style="font-size:0.78rem;color:#94a3b8;line-height:1.7;margin-top:0.75rem;"></div>
       </div>
       <!-- Panel 13: Test Instrument Inventory -->
       <div class="cx-pro-panel gated" id="cxPanelInstruments">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Pro Feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Unlock</button></div>
+        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
         <h3><i class="fas fa-crown"></i> Required Test Instruments</h3>
         <div id="cxInstrumentsList" style="overflow-x:auto;"></div>
       </div>
       <!-- Panel 14: Commissioning KPI Dashboard -->
       <div class="cx-pro-panel gated" id="cxPanelDashboard">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Pro Feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Unlock</button></div>
+        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
         <h3><i class="fas fa-crown"></i> Commissioning Program KPI Dashboard</h3>
         <div class="cx-kpi-grid-6" id="cxDashboardKpis"></div>
       </div>
       <!-- Panel 15: Scenario Comparison -->
       <div class="cx-pro-panel gated" id="cxPanelComparison">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Pro Feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Unlock</button></div>
+        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
         <h3><i class="fas fa-crown"></i> Scenario Comparison</h3>
         <p style="font-size:0.8rem;color:#64748b;margin:0.5rem 0;">Compare your current configuration against preset archetypes</p>
         <div id="cxComparisonContent"></div>
       </div>
       <!-- Panel 16: Cost Waterfall -->
       <div class="cx-pro-panel gated" id="cxPanelWaterfall">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Pro Feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Unlock</button></div>
+        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
         <h3><i class="fas fa-crown"></i> Cost Waterfall Analysis</h3>
         <div id="cxWaterfallContent"></div>
       </div>
       <!-- Panel 17: Timeline Milestones -->
       <div class="cx-pro-panel gated" id="cxPanelMilestones">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Pro Feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Unlock</button></div>
+        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
         <h3><i class="fas fa-crown"></i> Key Milestones &amp; Decision Points</h3>
         <div id="cxMilestonesContent"></div>
       </div>
       <!-- Panel 18: Team Org Chart -->
       <div class="cx-pro-panel gated" id="cxPanelTeam">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Pro Feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Unlock</button></div>
+        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
         <h3><i class="fas fa-crown"></i> Recommended CxA Team Composition</h3>
         <div id="cxTeamContent"></div>
       </div>
       <!-- Panel 19: Regional Benchmark -->
       <div class="cx-pro-panel gated" id="cxPanelBenchmark">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Pro Feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Unlock</button></div>
+        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
         <h3><i class="fas fa-crown"></i> Regional Benchmark Comparison</h3>
         <div id="cxBenchmarkContent"></div>
       </div>
       <!-- Panel 20: Environmental Impact -->
       <div class="cx-pro-panel gated" id="cxPanelEnvironmental">
-        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Pro Feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Unlock</button></div>
+        <div class="cx-gate-overlay"><i class="fas fa-lock"></i><span>Full-access feature</span><button onclick="cxHandlePremium()"><i class="fas fa-crown" style="margin-right:4px;"></i>Sign in</button></div>
         <h3><i class="fas fa-crown"></i> Commissioning Environmental Impact</h3>
         <div id="cxEnvironmentalContent"></div>
       </div>
@@ -4640,7 +4640,7 @@ function cxExportPDF(){
   h+='<p style="font-size:9px;color:#94a3b8;margin-top:4px;">Regional multiplier: '+rate.mult.toFixed(2)+' (base: Northern Virginia = 1.00). Sources: RSMeans 2025, BSRIA regional surveys, local engineering cost data.</p>';
   h+='</div>';
 
-  // ===== PRO-ONLY SECTIONS =====
+  // ===== FULL-ONLY SECTIONS =====
   if(isPro){
     h+='<div class="page-break"></div>';
 
@@ -4809,7 +4809,7 @@ function cxExportPDF(){
     h+='<p style="font-size:9px;color:#94a3b8;margin-top:4px;">Note: Schedule assumes sequential execution. Parallel work streams (e.g., L1 overlapping late L0, L6 overlapping late L5) can compress total duration by 15–25% but require additional coordination resources.</p>';
     h+='</div>';
 
-    // 18. Recommendations (Pro)
+    // 18. Recommendations (Full access)
     h+='<div class="sect"><h2>18. Recommendations</h2>';
     var recs=cxGenRecommendations(inp,res);
     recs.forEach(function(r){h+='<div class="pdf-rec"><span class="pdf-rec-badge pdf-rec-'+r.priority+'">'+r.priority.toUpperCase()+'</span><span>'+r.text+'</span></div>';});
@@ -4857,7 +4857,7 @@ function cxExportPDF(){
     // 11. Methodology (Free)
     h+='<div class="sect"><h2>11. Methodology &amp; Sources</h2>';
     h+='<p style="font-size:9.5px;color:#374151;line-height:1.6;">L0-L6 full lifecycle commissioning model (v2.0, March 2026). ASHRAE Guideline 0-2019 provides the lifecycle commissioning process backbone; L0-L6 are project-delivery levels used in practice, not ASHRAE-defined hierarchy. Base costs derived from BSRIA BG 49:2023, Uptime Institute Annual Survey, and industry benchmarks (n=50+, 2021-2026). Duration estimates per NETA ECS/ATS-2025. Regional rates combine RSMeans 2025, BSRIA, and local engineering surveys.</p>';
-    h+='<p style="font-size:9px;color:#94a3b8;margin-top:6px;">For Monte Carlo simulation, sensitivity analysis, risk assessment, multiplier impact analysis, phase gate requirements, benchmark comparison, team composition, and Gantt schedule — upgrade to Pro Analysis mode.</p>';
+    h+='<p style="font-size:9px;color:#94a3b8;margin-top:6px;">For Monte Carlo simulation, sensitivity analysis, risk assessment, multiplier impact analysis, phase gate requirements, benchmark comparison, team composition, and Gantt schedule — upgrade to Full analysis mode.</p>';
     h+='</div>';
 
     // 12. Disclaimer (Free)
@@ -4871,7 +4871,7 @@ function cxExportPDF(){
   if(!isPro)h+='</div>';
 
   // Footer
-  h+='<div class="pdf-foot">resistancezero.com &middot; Cx Assessment Report &middot; Generated '+dt+' &middot; Model v2.0 L0-L6 &middot; '+(isPro?'Pro Analysis':'Free Assessment')+'<br>';
+  h+='<div class="pdf-foot">resistancezero.com &middot; Cx Assessment Report &middot; Generated '+dt+' &middot; Model v2.0 L0-L6 &middot; '+(isPro?'Full analysis':'Free Assessment')+'<br>';
   h+='All calculations client-side &middot; No data transmitted &middot; &copy; 2026 Bagus Dwi Permana</div>';
 
   h+='</body></html>';
@@ -5553,8 +5553,8 @@ function cxRenderFaq(){
       {q:'What standards does this calculator reference?',a:'The calculator is grounded in:<ul><li><strong>ASHRAE Guideline 0-2019</strong> — Lifecycle commissioning process</li><li><strong>NETA ECS/ATS-2025</strong> — Electrical testing standards</li><li><strong>BSRIA BG 49:2023</strong> — Commissioning benchmarks</li><li><strong>Uptime Institute Tier Standard 2024</strong></li><li><strong>IEEE 519-2022</strong> — Harmonic limits</li><li><strong>NFPA 72/75/76/2001</strong> — Fire protection</li><li><strong>RSMeans 2025</strong> — Cost data</li></ul>'},
       {q:'How accurate are the estimates?',a:'These are <strong>budgetary estimates</strong> suitable for planning and benchmarking. Actual costs vary based on local conditions, contractor availability, regulatory requirements, and project complexity. Source confidence is clearly labeled — some values are publicly sourced (BSRIA, RSMeans, Uptime surveys), others are expert assumptions based on industry experience.'},
       {q:'Can I use this for contract pricing?',a:'<strong>No.</strong> This tool provides directional estimates only. It should not be used for contractual pricing, procurement, or binding financial commitments. Always obtain formal quotes from qualified commissioning firms for actual project pricing.'},
-      {q:'What is the difference between Free and Pro?',a:'<strong>Free</strong> includes: 4 KPI cards, cost/schedule bar charts, auto-generated narrative, interactive Gantt chart with 7 levels of depth, activity procedures, acceptance criteria, logsheets, and basic PDF export.<br><br><strong>Pro</strong> adds: 6 additional inputs, Monte Carlo simulation (10,000 iterations), sensitivity tornado analysis, cost breakdown by discipline, resource loading histogram, witness/hold point matrix, risk assessment, equipment inventory, KPI dashboard, and an enhanced 20-section PDF report.'},
-      {q:'Is this tool free to use?',a:'The <strong>Free Assessment</strong> mode is completely free with no registration required. The <strong>Pro Analysis</strong> mode requires a login and provides advanced analytics. A demo account is available: <code>demo@resistancezero.com</code> / <code>demo2026</code>.'},
+      {q:'What is the difference between Free and Full access?',a:'<strong>Free</strong> includes: 4 KPI cards, cost/schedule bar charts, auto-generated narrative, interactive Gantt chart with 7 levels of depth, activity procedures, acceptance criteria, logsheets, and basic PDF export.<br><br><strong>Full access</strong> adds: 6 additional inputs, Monte Carlo simulation (10,000 iterations), sensitivity tornado analysis, cost breakdown by discipline, resource loading histogram, witness/hold point matrix, risk assessment, equipment inventory, KPI dashboard, and an enhanced 20-section PDF report.'},
+      {q:'Is this tool free to use?',a:'The <strong>Free Assessment</strong> mode is completely free with no registration required. The <strong>Full analysis</strong> mode requires a login and provides advanced analytics. A demo account is available: <code>demo@resistancezero.com</code> / <code>demo2026</code>.'},
       {q:'What browsers are supported?',a:'Any modern browser: Chrome 90+, Firefox 90+, Safari 15+, Edge 90+. The calculator uses standard JavaScript (ES5 compatible) and Chart.js for visualizations. No frameworks or build tools required.'},
       {q:'Can I bookmark or share my configuration?',a:'Your inputs are auto-saved in browser localStorage. To share a configuration with a colleague, use the <strong>Export PDF</strong> feature which includes all input parameters, or manually copy your scenario settings.'}
     ]},
@@ -5564,19 +5564,19 @@ function cxRenderFaq(){
       {q:'What do the Redundancy levels mean?',a:'Redundancy is the <strong>biggest cost driver</strong> — going from N+1 to 2N roughly doubles commissioning scope.<ul><li><strong>N</strong> — No redundancy (single path)</li><li><strong>N+1</strong> — One extra component per group (Tier II/III)</li><li><strong>2N</strong> — Fully redundant parallel paths (Tier III/IV)</li><li><strong>2N+1</strong> — Dual path plus spare (Tier IV+)</li></ul>Higher redundancy means every failure scenario must be tested for both paths.'},
       {q:'What is Rack Density and why does it matter?',a:'Rack density is the average IT power per rack:<ul><li><strong>Standard</strong>: 4-8 kW/rack — traditional enterprise</li><li><strong>Medium</strong>: 8-15 kW/rack — modern enterprise/colo</li><li><strong>High</strong>: 15-30 kW/rack — GPU compute, HPC</li><li><strong>Ultra-High</strong>: 50-100+ kW/rack — AI factory, dense GPU clusters</li></ul>Higher density increases cooling system complexity, thermal testing scope, and the consequence of single-rack failures during IST.'},
       {q:'What are the Scenario Presets?',a:'Eight pre-configured archetypes with industry-standard parameters:<ol><li><strong>Enterprise 2MW</strong> — Tier III, N+1, air cooling</li><li><strong>Colocation 10MW</strong> — Tier III+, 2N, in-row</li><li><strong>Hyperscale 50MW</strong> — 2N+1, DLC</li><li><strong>AI Factory 100MW</strong> — 2N+1, DLC, ultra-high density (2026)</li><li><strong>Edge 500kW</strong> — Tier II, N+1, modular</li><li><strong>Modular 5MW</strong> — Prefab pods, RDHX</li><li><strong>Fast-Track 10MW</strong> — Repurposed warehouse</li><li><strong>Recommissioning 3MW</strong> — Existing facility upgrade</li></ol>Load a preset to auto-fill all inputs, then customize as needed.'},
-      {q:'What Pro inputs are available?',a:'Pro mode adds 6 additional parameters:<ul><li><strong>Generator Type</strong> — Diesel, gas, dual-fuel, BESS (affects FAT and startup testing)</li><li><strong>Seismic Zone</strong> — 0 to 4 (adds anchor bolt, rack seismic, isolation testing)</li><li><strong>Cx Scope</strong> — New build, retrofit, expansion, recommissioning</li><li><strong>Substation Config</strong> — Utility-fed, ring bus, dual sub (ring bus adds 80-110%)</li><li><strong>BMS/DCIM Complexity</strong> — Basic to AI-driven (doubles controls Cx scope)</li><li><strong>Delivery Method</strong> — Traditional, design-build, EPC, fast-track</li></ul>'},
+      {q:'What Full access inputs are available?',a:'Full access mode adds 6 additional parameters:<ul><li><strong>Generator Type</strong> — Diesel, gas, dual-fuel, BESS (affects FAT and startup testing)</li><li><strong>Seismic Zone</strong> — 0 to 4 (adds anchor bolt, rack seismic, isolation testing)</li><li><strong>Cx Scope</strong> — New build, retrofit, expansion, recommissioning</li><li><strong>Substation Config</strong> — Utility-fed, ring bus, dual sub (ring bus adds 80-110%)</li><li><strong>BMS/DCIM Complexity</strong> — Basic to AI-driven (doubles controls Cx scope)</li><li><strong>Delivery Method</strong> — Traditional, design-build, EPC, fast-track</li></ul>'},
       {q:'What does Region selection affect?',a:'Region determines <strong>labor day rates</strong> for 5 role types: CxA (Commissioning Authority), Field Technician, OEM Specialist, Witness Engineer, and Per Diem. 30 regions are available spanning North America, Europe, Asia-Pacific, Middle East, and emerging markets. Example: Northern Virginia CxA rate ~$2,400/day vs Jakarta ~$800/day.'},
-      {q:'Why do some inputs show a lock icon?',a:'Inputs marked with <i class="fas fa-crown" style="color:#0891b2;"></i> are Pro-only features. They are visible but locked in Free mode. Sign in with a Pro account to unlock them. Pro inputs significantly affect cost accuracy for complex facilities.'}
+      {q:'Why do some inputs show a lock icon?',a:'Inputs marked with <i class="fas fa-crown" style="color:#0891b2;"></i> are Full access-only features. They are visible but locked in Free mode. Sign in with a Full access account to unlock them. Full access inputs significantly affect cost accuracy for complex facilities.'}
     ]},
     {cat:'Calculation & Results',icon:'fa-calculator',items:[
-      {q:'How is the total commissioning cost calculated?',a:'The calculator uses a <strong>parametric model</strong>:<ol><li>Base cost per kW per discipline (electrical, mechanical, controls, fire, building) from BSRIA/RSMeans data</li><li>Scaled by IT load capacity</li><li>Multiplied by 12+ adjustment factors: cooling type, redundancy, building type, seismic zone, substation, BMS, delivery method, fire suppression, UPS type, generator type, density, scope</li><li>Distributed across 7 phases (L0-L6) using phase allocation percentages</li><li>Regional labor rates applied to person-day estimates</li></ol>Pro mode adds: overtime premium, weather delay, learning curve, travel cost, instrument rental, and escalation factors.'},
+      {q:'How is the total commissioning cost calculated?',a:'The calculator uses a <strong>parametric model</strong>:<ol><li>Base cost per kW per discipline (electrical, mechanical, controls, fire, building) from BSRIA/RSMeans data</li><li>Scaled by IT load capacity</li><li>Multiplied by 12+ adjustment factors: cooling type, redundancy, building type, seismic zone, substation, BMS, delivery method, fire suppression, UPS type, generator type, density, scope</li><li>Distributed across 7 phases (L0-L6) using phase allocation percentages</li><li>Regional labor rates applied to person-day estimates</li></ol>Full access mode adds: overtime premium, weather delay, learning curve, travel cost, instrument rental, and escalation factors.'},
       {q:'What are the 4 KPI cards?',a:'<ul><li><strong>Total Cx Cost</strong> — Estimated total commissioning cost in USD</li><li><strong>Duration (Weeks)</strong> — Total estimated program duration</li><li><strong>Cost per kW</strong> — Cx cost divided by IT load ($/kW)</li><li><strong>% of CAPEX</strong> — Cx cost as percentage of total facility CAPEX</li></ul>Each card includes a sub-label showing the range context (e.g., "Industry range: $120-300/kW").'},
-      {q:'What does the narrative section explain?',a:'The auto-generated narrative provides 3 paragraphs of context:<ol><li>Overview of the facility type, scale, and key cost drivers</li><li>Phase-by-phase breakdown with duration and percentage allocation</li><li>Recommendations for CxA firm selection and risk mitigation</li></ol>Pro mode generates an extended intelligence brief with additional insights on regional benchmarks, team composition, and program management recommendations.'},
+      {q:'What does the narrative section explain?',a:'The auto-generated narrative provides 3 paragraphs of context:<ol><li>Overview of the facility type, scale, and key cost drivers</li><li>Phase-by-phase breakdown with duration and percentage allocation</li><li>Recommendations for CxA firm selection and risk mitigation</li></ol>Full access mode generates an extended intelligence brief with additional insights on regional benchmarks, team composition, and program management recommendations.'},
       {q:'What is Monte Carlo simulation?',a:'Monte Carlo runs <strong>10,000 random iterations</strong> varying the IT load using a normal distribution (±7.5% standard deviation). Each iteration produces a different total cost. The results show:<ul><li><strong>P5</strong> — 5th percentile (optimistic low)</li><li><strong>P25</strong> — 25th percentile</li><li><strong>P50</strong> — Median (most likely)</li><li><strong>P75</strong> — 75th percentile</li><li><strong>P95</strong> — 95th percentile (conservative high)</li><li><strong>CVaR-95</strong> — Expected cost if costs exceed P95 (tail risk)</li></ul>This helps quantify cost uncertainty and set appropriate contingency budgets.'},
       {q:'What is Sensitivity Analysis?',a:'The sensitivity tornado chart tests <strong>7 parameters</strong> individually by varying each between its extreme low and high values while holding all others constant. Parameters tested: IT Load (±20%), Cooling Type (air vs DLC), Redundancy (N vs 2N+1), Building Type, Seismic Zone, Substation Config, BMS Complexity. The chart shows which parameters have the largest impact on total cost — helping you focus risk management on the biggest drivers.'},
       {q:'How is commissioning duration estimated?',a:'Duration uses a base-weeks-per-kW model scaled by:<ul><li>Phase allocation (L0 gets 8%, L5 gets 22%, etc.)</li><li>Cooling type duration multiplier</li><li>Redundancy duration multiplier</li><li>Delivery method (fast-track compresses by 20%)</li><li>Scope type (recommissioning shorter than new build)</li></ul>The Gantt chart shows the detailed breakdown with overlapping phases where applicable. Duration does not include pre-commissioning construction time.'},
       {q:'What does "% of CAPEX" mean?',a:'The commissioning cost expressed as a percentage of the total facility capital expenditure. Industry benchmarks:<ul><li>Enterprise: 3-4% of CAPEX</li><li>Colocation: 3-5%</li><li>Hyperscale: 2-4% (economies of scale)</li><li>AI Factory: 2-4% (higher $/kW but massive scale)</li></ul>This metric helps validate whether the estimate is within expected industry ranges.'},
-      {q:'What is the Risk Score?',a:'A Pro feature that calculates a <strong>0-100 risk score</strong> based on facility complexity factors: redundancy level, cooling type, facility scale, substation configuration, building type, BMS complexity, seismic zone, and delivery method. Scores are categorized as Low (&lt;30), Moderate (30-55), High (55-75), or Very High (&gt;75). Higher scores warrant more experienced CxA firms and larger contingency budgets.'}
+      {q:'What is the Risk Score?',a:'A Full access feature that calculates a <strong>0-100 risk score</strong> based on facility complexity factors: redundancy level, cooling type, facility scale, substation configuration, building type, BMS complexity, seismic zone, and delivery method. Scores are categorized as Low (&lt;30), Moderate (30-55), High (55-75), or Very High (&gt;75). Higher scores warrant more experienced CxA firms and larger contingency budgets.'}
     ]},
     {cat:'Gantt Chart & Schedule',icon:'fa-diagram-project',items:[
       {q:'How does the interactive Gantt chart work?',a:'The Gantt chart visualizes the commissioning schedule across all 7 phases (L0-L6) with up to <strong>7 levels of hierarchical depth</strong>: Phase → Discipline → System → Detail → Sub-detail. Click any row to expand/collapse children. Click a leaf activity to open the Activity Detail Drawer with procedure, acceptance criteria, logsheet, and tools.'},
@@ -5584,17 +5584,17 @@ function cxRenderFaq(){
       {q:'What is an Activity Detail Drawer?',a:'When you click a leaf-level activity in the Gantt chart, a slide-out drawer opens with <strong>4 tabs</strong>:<ol><li><strong>Procedure</strong> — Step-by-step commissioning procedure with standards references</li><li><strong>Acceptance</strong> — Pass/fail criteria with industry standard and justification</li><li><strong>Logsheet</strong> — Data capture fields for test records</li><li><strong>Tools &amp; Safety</strong> — Required instruments, PPE, and safety precautions</li></ol>Each tab includes witness classification (Hold / Witness / Review) and can be exported as PDF.'},
       {q:'What are Hold, Witness, and Review points?',a:'Quality inspection classifications per ASHRAE Guideline 0:<ul><li><strong>Hold (H)</strong> — Work stops until the witness is present. Cannot proceed without sign-off. Used for critical safety systems (e.g., generator first start, MV switchgear energization).</li><li><strong>Witness (W)</strong> — Witness should be present but work can proceed if notified. Used for important but non-critical tests (e.g., UPS load testing, chiller startup).</li><li><strong>Review (R)</strong> — Documentation review only. Witness reviews records after completion. Used for routine verifications (e.g., cable labeling, visual inspections).</li></ul>'},
       {q:'How are activity durations calculated?',a:'Durations are calculated based on equipment quantities derived from IT load. For example, a 10MW facility might have 5 HV transformers — each requiring 2 days for FAT. The <code>cxEquipScale()</code> function calculates 24 equipment types from the IT load, and each Gantt activity uses these quantities to determine person-days. Phase-level durations are aggregated and adjusted by cooling, redundancy, and delivery multipliers.'},
-      {q:'Can I export the Gantt schedule?',a:'Yes, two export options:<ul><li><strong>CSV Export</strong> — Downloads a spreadsheet-compatible file with activity ID, name, level, duration, start/end weeks</li><li><strong>PDF Export</strong> — Pro PDF includes a tabular Gantt schedule section with week-by-week breakdown</li></ul>Individual activities can also be exported as procedure PDFs from the Activity Detail Drawer.'}
+      {q:'Can I export the Gantt schedule?',a:'Yes, two export options:<ul><li><strong>CSV Export</strong> — Downloads a spreadsheet-compatible file with activity ID, name, level, duration, start/end weeks</li><li><strong>PDF Export</strong> — Full access PDF includes a tabular Gantt schedule section with week-by-week breakdown</li></ul>Individual activities can also be exported as procedure PDFs from the Activity Detail Drawer.'}
     ]},
-    {cat:'Pro Features',icon:'fa-crown',items:[
-      {q:'What are the 14 Pro panels?',a:'<ol><li>Cost Breakdown by Discipline (doughnut chart + 6 KPIs)</li><li>Resource Loading &amp; Personnel (6 KPIs)</li><li>Monte Carlo Distribution (n=10,000, histogram + percentiles)</li><li>Sensitivity Tornado (top 7 cost drivers)</li><li>Executive Intelligence Brief (extended narrative)</li><li>Equipment Count Summary (24 equipment types)</li><li>Commissioning Risk Assessment (0-100 score)</li><li>Resource Loading Table (phase × role matrix)</li><li>Phase Gate Checklist Preview</li><li>Resource Histogram (stacked bar, person-days/week)</li><li>Witness / Hold Point Matrix (H/W/R by phase)</li><li>Cost Adjustment Factors (overtime, weather, learning, escalation, travel, instruments)</li><li>Test Instrument Inventory (ranked by usage)</li><li>Commissioning Program KPI Dashboard (9 metrics)</li></ol>'},
-      {q:'How do I access Pro mode?',a:'Click the <strong>"Unlock Pro"</strong> button or the <strong>"Pro Analysis"</strong> tab. Enter your credentials in the login dialog. A demo account is available: <code>demo@resistancezero.com</code> / <code>demo2026</code>. Sessions persist for 30 days via localStorage.'},
-      {q:'What additional PDF sections does Pro include?',a:'Pro PDF adds 8 sections beyond Free:<ul><li>Monte Carlo Risk Simulation (percentiles + algorithm)</li><li>Sensitivity Analysis (tornado chart + data table)</li><li>Risk Assessment (score + factor breakdown)</li><li>Multiplier Impact Analysis (12 multipliers)</li><li>Phase Gate Requirements</li><li>Industry Benchmark Comparison (6 archetypes)</li><li>Team Composition Recommendation</li><li>Algorithm &amp; Methodology Documentation</li></ul>Total: 20 sections vs 12 in Free.'},
-      {q:'What are Cost Adjustment Factors?',a:'Pro Panel 12 shows 6 real-world cost modifiers:<ul><li><strong>Learning Curve</strong> — Wright\'s 85% model: productivity improves with repetition on campus-scale projects</li><li><strong>Overtime Premium</strong> — Premium rates for compressed timelines (1.2-1.5x)</li><li><strong>Weather Factor</strong> — Regional weather delay probability (0.02-0.12)</li><li><strong>Travel Cost</strong> — Full-team travel estimate based on region and team size</li><li><strong>Escalation</strong> — Annual CPI escalation at 3.5% per year</li><li><strong>Instrument Rental</strong> — Calibrated test equipment rental cost</li></ul>'},
-      {q:'What is the KPI Dashboard?',a:'Pro Panel 14 displays 9 program-level metrics:<ul><li>Test Coverage % (activities with mapped procedures)</li><li>Avg Duration/Activity (person-days)</li><li>Cost/MW ratio</li><li>Person-days per MW</li><li>IST as % of total cost</li><li>Equipment-to-test ratio</li><li>Disciplines covered</li><li>Total Gantt activities</li><li>Unique procedure templates used</li></ul>'}
+    {cat:'Full-access features',icon:'fa-crown',items:[
+      {q:'What are the 14 Full access panels?',a:'<ol><li>Cost Breakdown by Discipline (doughnut chart + 6 KPIs)</li><li>Resource Loading &amp; Personnel (6 KPIs)</li><li>Monte Carlo Distribution (n=10,000, histogram + percentiles)</li><li>Sensitivity Tornado (top 7 cost drivers)</li><li>Executive Intelligence Brief (extended narrative)</li><li>Equipment Count Summary (24 equipment types)</li><li>Commissioning Risk Assessment (0-100 score)</li><li>Resource Loading Table (phase × role matrix)</li><li>Phase Gate Checklist Preview</li><li>Resource Histogram (stacked bar, person-days/week)</li><li>Witness / Hold Point Matrix (H/W/R by phase)</li><li>Cost Adjustment Factors (overtime, weather, learning, escalation, travel, instruments)</li><li>Test Instrument Inventory (ranked by usage)</li><li>Commissioning Program KPI Dashboard (9 metrics)</li></ol>'},
+      {q:'How do I access Full access mode?',a:'Click the <strong>"Sign in"</strong> button or the <strong>"Full analysis"</strong> tab. Enter your credentials in the login dialog. A demo account is available: <code>demo@resistancezero.com</code> / <code>demo2026</code>. Sessions persist for 30 days via localStorage.'},
+      {q:'What additional PDF sections does Full access include?',a:'Full access PDF adds 8 sections beyond Free:<ul><li>Monte Carlo Risk Simulation (percentiles + algorithm)</li><li>Sensitivity Analysis (tornado chart + data table)</li><li>Risk Assessment (score + factor breakdown)</li><li>Multiplier Impact Analysis (12 multipliers)</li><li>Phase Gate Requirements</li><li>Industry Benchmark Comparison (6 archetypes)</li><li>Team Composition Recommendation</li><li>Algorithm &amp; Methodology Documentation</li></ul>Total: 20 sections vs 12 in Free.'},
+      {q:'What are Cost Adjustment Factors?',a:'Full access Panel 12 shows 6 real-world cost modifiers:<ul><li><strong>Learning Curve</strong> — Wright\'s 85% model: productivity improves with repetition on campus-scale projects</li><li><strong>Overtime Full access</strong> — Full access rates for compressed timelines (1.2-1.5x)</li><li><strong>Weather Factor</strong> — Regional weather delay probability (0.02-0.12)</li><li><strong>Travel Cost</strong> — Full-team travel estimate based on region and team size</li><li><strong>Escalation</strong> — Annual CPI escalation at 3.5% per year</li><li><strong>Instrument Rental</strong> — Calibrated test equipment rental cost</li></ul>'},
+      {q:'What is the KPI Dashboard?',a:'Full access Panel 14 displays 9 program-level metrics:<ul><li>Test Coverage % (activities with mapped procedures)</li><li>Avg Duration/Activity (person-days)</li><li>Cost/MW ratio</li><li>Person-days per MW</li><li>IST as % of total cost</li><li>Equipment-to-test ratio</li><li>Disciplines covered</li><li>Total Gantt activities</li><li>Unique procedure templates used</li></ul>'}
     ]},
     {cat:'PDF Export',icon:'fa-file-pdf',items:[
-      {q:'What does the PDF contain?',a:'<strong>Free PDF (12 sections):</strong> Executive Summary, Input Parameters, Cost by Level, Visualizations (SVG charts), Per-Level Analysis (L0-L6 with algorithm boxes), Discipline Breakdown, Equipment Scale, Resource Loading, Regional Rates, Recommendations, Methodology, Disclaimer.<br><br><strong>Pro PDF (20 sections):</strong> All of the above plus Monte Carlo, Sensitivity, Risk Assessment, Multipliers, Phase Gates, Benchmarks, Team Composition, Tabular Gantt, and Algorithm Documentation.'},
+      {q:'What does the PDF contain?',a:'<strong>Free PDF (12 sections):</strong> Executive Summary, Input Parameters, Cost by Level, Visualizations (SVG charts), Per-Level Analysis (L0-L6 with algorithm boxes), Discipline Breakdown, Equipment Scale, Resource Loading, Regional Rates, Recommendations, Methodology, Disclaimer.<br><br><strong>Full access PDF (20 sections):</strong> All of the above plus Monte Carlo, Sensitivity, Risk Assessment, Multipliers, Phase Gates, Benchmarks, Team Composition, Tabular Gantt, and Algorithm Documentation.'},
       {q:'Can I export individual activity procedures?',a:'Yes. Click any leaf activity in the Gantt chart to open the drawer. Use the footer buttons:<ul><li><strong>Export Procedure</strong> — Procedure steps + acceptance criteria</li><li><strong>Export Logsheet</strong> — Data capture form for field use</li><li><strong>Full Package</strong> — Combined procedure + acceptance + logsheet + tools</li></ul>Each exports as a print-ready PDF in a new window.'},
       {q:'Why are charts shown as SVG in the PDF?',a:'PDF is generated via <code>window.open()</code> with inline HTML/CSS. Canvas-based charts (Chart.js) cannot be transferred to a new window, so the calculator uses custom <strong>inline SVG generators</strong> to recreate bar charts, horizontal bars, and tornado charts. This ensures charts render correctly in the print dialog without depending on external libraries.'},
       {q:'Can I customize the PDF branding?',a:'Currently the PDF uses the Resistance Zero branding. For custom branding or white-label reports, contact us directly. The PDF generation code is entirely client-side, so no server modifications are needed.'}
@@ -5662,7 +5662,7 @@ function cxRenderManual(){
     {id:'getting-started',title:'Getting Started',icon:'fa-rocket',desc:'First steps with the Cx Calculator',body:function(){
       return s(1,'Open the calculator','Navigate to <code>cx-calculator.html</code>. The calculator loads with default Enterprise 2MW parameters. All inputs are immediately editable.')+
       s(2,'Select a Scenario Preset (optional)','Choose one of 8 predefined archetypes from the <strong>Scenario Preset</strong> dropdown and click <strong>Load</strong>. This auto-fills all input parameters for a typical facility of that type. You can then customize individual inputs.')+
-      s(3,'Adjust input parameters','Modify the 8 free inputs (or 14 with Pro) to match your project. The <strong>IT Load</strong> slider is the primary scaling factor. Hover over the <strong>?</strong> icons for detailed descriptions of each parameter.')+
+      s(3,'Adjust input parameters','Modify the 8 free inputs (or 14 with Full access) to match your project. The <strong>IT Load</strong> slider is the primary scaling factor. Hover over the <strong>?</strong> icons for detailed descriptions of each parameter.')+
       s(4,'View results','Results appear automatically after any input change. Scroll down to see KPI cards, charts, narrative, and the interactive Gantt chart.')+
       s(5,'Explore the Gantt chart','Click phase headers to expand/collapse. Click any leaf activity to see its detailed commissioning procedure, acceptance criteria, logsheet, and required tools.')+
       s(6,'Export your results','Click <strong>Export PDF</strong> to generate a comprehensive report. Pro users get a 20-section report; Free users get 12 sections.')+
@@ -5678,14 +5678,14 @@ function cxRenderManual(){
       '<tr><td>6</td><td><strong>Fire Suppression</strong></td><td>6 types (clean agent to dual system)</td><td>Determines fire testing scope and IST integration</td><td>Free</td></tr>'+
       '<tr><td>7</td><td><strong>UPS Type</strong></td><td>Static / Rotary / Flywheel / Li-ion</td><td>Affects battery testing and disposal procedures</td><td>Free</td></tr>'+
       '<tr><td>8</td><td><strong>Region</strong></td><td>30 global regions</td><td>Labor day rates (3x variation globally)</td><td>Free</td></tr>'+
-      '<tr><td>9</td><td><strong>Generator Type</strong></td><td>Diesel / Gas / Dual-fuel / BESS</td><td>FAT and startup testing scope</td><td>Pro</td></tr>'+
-      '<tr><td>10</td><td><strong>Seismic Zone</strong></td><td>Zone 0–4</td><td>Adds anchor bolt, rack seismic, isolation testing</td><td>Pro</td></tr>'+
-      '<tr><td>11</td><td><strong>Cx Scope</strong></td><td>New / Retrofit / Expansion / Recommission</td><td>Baseline scope and approach</td><td>Pro</td></tr>'+
-      '<tr><td>12</td><td><strong>Substation Config</strong></td><td>Utility-fed / Ring bus / Dual sub / Onsite gen</td><td>Ring bus adds 80-110% to electrical Cx</td><td>Pro</td></tr>'+
-      '<tr><td>13</td><td><strong>BMS/DCIM</strong></td><td>Basic / Standard / Advanced / AI-driven</td><td>Doubles controls Cx scope for AI-driven</td><td>Pro</td></tr>'+
-      '<tr><td>14</td><td><strong>Delivery Method</strong></td><td>Traditional / Design-build / EPC / Fast-track</td><td>Fast-track compresses duration ~20%</td><td>Pro</td></tr>'+
+      '<tr><td>9</td><td><strong>Generator Type</strong></td><td>Diesel / Gas / Dual-fuel / BESS</td><td>FAT and startup testing scope</td><td>Full access</td></tr>'+
+      '<tr><td>10</td><td><strong>Seismic Zone</strong></td><td>Zone 0–4</td><td>Adds anchor bolt, rack seismic, isolation testing</td><td>Full access</td></tr>'+
+      '<tr><td>11</td><td><strong>Cx Scope</strong></td><td>New / Retrofit / Expansion / Recommission</td><td>Baseline scope and approach</td><td>Full access</td></tr>'+
+      '<tr><td>12</td><td><strong>Substation Config</strong></td><td>Utility-fed / Ring bus / Dual sub / Onsite gen</td><td>Ring bus adds 80-110% to electrical Cx</td><td>Full access</td></tr>'+
+      '<tr><td>13</td><td><strong>BMS/DCIM</strong></td><td>Basic / Standard / Advanced / AI-driven</td><td>Doubles controls Cx scope for AI-driven</td><td>Full access</td></tr>'+
+      '<tr><td>14</td><td><strong>Delivery Method</strong></td><td>Traditional / Design-build / EPC / Fast-track</td><td>Fast-track compresses duration ~20%</td><td>Full access</td></tr>'+
       '</tbody></table>'+
-      note('Parameters 9-14 require Pro mode. Free mode uses industry-standard defaults for these parameters.');
+      note('Parameters 9-14 require Full access mode. Free mode uses industry-standard defaults for these parameters.');
     }},
     {id:'scenarios',title:'Scenario Presets',icon:'fa-layer-group',desc:'Understanding the 8 facility archetypes',body:function(){
       return '<table class="cx-manual-table"><thead><tr><th scope="col">Preset</th><th scope="col">IT Load</th><th scope="col">Cooling</th><th scope="col">Redundancy</th><th scope="col">Typical Cx Cost</th><th scope="col">Duration</th></tr></thead><tbody>'+
@@ -5738,8 +5738,8 @@ function cxRenderManual(){
       s(6,'Export options','Three export buttons in the drawer footer:<ul><li><strong>Export Procedure</strong> — Procedure + acceptance criteria only</li><li><strong>Export Logsheet</strong> — Logsheet form for field use</li><li><strong>Full Package</strong> — All 4 tabs combined into one PDF</li></ul>')+
       tip('Use "Full Package" export to generate complete test documentation for each commissioning activity. This can be used as a starting template for actual project commissioning procedures.');
     }},
-    {id:'pro-features',title:'Pro Features',icon:'fa-crown',desc:'Advanced analytics, Monte Carlo, sensitivity, and more',body:function(){
-      return '<p style="color:#94a3b8;font-size:0.85rem;margin-bottom:1rem;">Pro mode unlocks 6 additional input parameters and 14 advanced analysis panels. Access with demo credentials: <code>demo@resistancezero.com</code> / <code>demo2026</code></p>'+
+    {id:'pro-features',title:'Full-access features',icon:'fa-crown',desc:'Advanced analytics, Monte Carlo, sensitivity, and more',body:function(){
+      return '<p style="color:#94a3b8;font-size:0.85rem;margin-bottom:1rem;">Full access mode unlocks 6 additional input parameters and 14 advanced analysis panels. Access with demo credentials: <code>demo@resistancezero.com</code> / <code>demo2026</code></p>'+
       s(1,'Monte Carlo Simulation','Runs 10,000 random iterations varying IT load by ±7.5% standard deviation. Produces a probability distribution of commissioning costs with P5/P25/P50/P75/P95 percentiles and CVaR-95 tail risk metric.')+
       s(2,'Sensitivity Analysis','Tests 7 parameters individually between extreme values. The tornado chart shows which parameters have the largest impact on total cost — crucial for risk-focused budgeting.')+
       s(3,'Cost by Discipline','Doughnut chart breaking down costs into 5 disciplines: Electrical, Mechanical, Controls/BMS, Fire/Life Safety, and Building/Architectural.')+

@@ -629,7 +629,7 @@ button[onclick^="setPreset"] { background:#166534 !important; border-color:#1665
 :root:not([data-theme="dark"]) .tabs-group-label { color:#64748b !important; }
 [data-theme="dark"] .tabs-group-label { color:#8b98ac !important; }
 </style>
-    <script src="js/rz-version.js?v=20260920-c35dc44c" defer></script>
+    <script src="js/rz-version.js?v=20260920-10a50683" defer></script>
     <script src="js/rz-calc-utils.js?v=20260920-ef3425ae" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260920-b64c1545" defer></script>
     <script src="js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
@@ -724,7 +724,7 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#64748b !imp
                     </button>
                     <div class="nav-user-dropdown" id="navUserDropdown">
                         <div class="nav-dd-header">
-                            <div class="nav-dd-tier-badge pro" id="navDdTierBadge">PRO</div>
+                            <div class="nav-dd-tier-badge pro" id="navDdTierBadge">FULL</div>
                             <div class="nav-dd-email" id="navDdEmail"></div>
                         </div>
                         <button class="nav-dd-logout" onclick="logoutPremium()"><i class="fas fa-sign-out-alt"></i> Logout</button>
@@ -789,7 +789,7 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#64748b !imp
                 <i class="fas fa-chart-bar"></i> Free Assessment
             </button>
             <button class="cf-toolbar-btn cf-btn-pro locked-hint" id="btnProMode" onclick="setMode('pro')">
-                <i class="fas fa-crown"></i> Pro Analysis
+                <i class="fas fa-crown"></i> Full analysis
             </button>
         </div>
         <span class="cf-mode-indicator free-active" id="modeIndicator">FREE MODE</span>
@@ -1310,14 +1310,14 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#64748b !imp
     <section class="charts-section pro-section locked" id="proPanelsSection" style="max-width:1400px;margin:2rem auto;padding:0 2rem;">
         <div class="pro-overlay" onclick="handlePremiumTab()">
             <i class="fas fa-crown"></i>
-            <div class="pro-overlay-title">PRO Analysis Panels</div>
+            <div class="pro-overlay-title">Full analysis Panels</div>
             <div class="pro-overlay-desc">Monte Carlo simulation, sensitivity tornado, reduction scenarios, and compliance assessment</div>
-            <button class="pro-overlay-btn"><i class="fas fa-lock-open" style="margin-right:6px;"></i>Unlock PRO</button>
+            <button class="pro-overlay-btn"><i class="fas fa-lock-open" style="margin-right:6px;"></i>Sign in</button>
         </div>
         <div class="charts-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
             <!-- Panel 1: Monte Carlo -->
             <div class="cf-pro-panel" id="panelMonteCarlo">
-                <div style="font-weight:700;margin-bottom:0.75rem;"><i class="fas fa-dice" style="color:#64748b;margin-right:6px;"></i>Monte Carlo Risk Distribution <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> PRO</span></div>
+                <div style="font-weight:700;margin-bottom:0.75rem;"><i class="fas fa-dice" style="color:#64748b;margin-right:6px;"></i>Monte Carlo Risk Distribution <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> FULL</span></div>
                 <div class="cf-kpi-grid" id="mcKpiGrid">
                     <div class="cf-kpi-card"><div class="cf-kpi-value" id="mcP5">--</div><div class="cf-kpi-label">P5 (Best)</div></div>
                     <div class="cf-kpi-card"><div class="cf-kpi-value" id="mcP50">--</div><div class="cf-kpi-label">P50 (Median)</div></div>
@@ -1328,18 +1328,18 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#64748b !imp
             </div>
             <!-- Panel 2: Sensitivity Tornado -->
             <div class="cf-pro-panel" id="panelTornado">
-                <div style="font-weight:700;margin-bottom:0.75rem;"><i class="fas fa-wind" style="color:#f59e0b;margin-right:6px;"></i>Sensitivity Tornado <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> PRO</span></div>
+                <div style="font-weight:700;margin-bottom:0.75rem;"><i class="fas fa-wind" style="color:#f59e0b;margin-right:6px;"></i>Sensitivity Tornado <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> FULL</span></div>
                 <div class="chart-container"><canvas id="tornadoChart" width="600" height="350"></canvas></div>
             </div>
             <!-- Panel 3: Reduction Scenarios -->
             <div class="cf-pro-panel" id="panelScenarios">
-                <div style="font-weight:700;margin-bottom:0.75rem;"><i class="fas fa-route" style="color:#22c55e;margin-right:6px;"></i>Reduction Scenarios <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> PRO</span></div>
+                <div style="font-weight:700;margin-bottom:0.75rem;"><i class="fas fa-route" style="color:#22c55e;margin-right:6px;"></i>Reduction Scenarios <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> FULL</span></div>
                 <div id="scenarioResults"></div>
                 <div class="chart-container"><canvas id="scenarioChart" width="600" height="280"></canvas></div>
             </div>
             <!-- Panel 4: Financial & Compliance -->
             <div class="cf-pro-panel" id="panelCompliance">
-                <div style="font-weight:700;margin-bottom:0.75rem;"><i class="fas fa-balance-scale" style="color:#ef4444;margin-right:6px;"></i>Financial Impact &amp; Compliance <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> PRO</span></div>
+                <div style="font-weight:700;margin-bottom:0.75rem;"><i class="fas fa-balance-scale" style="color:#ef4444;margin-right:6px;"></i>Financial Impact &amp; Compliance <span class="pro-badge"><i class="fas fa-crown" style="font-size:0.5rem;"></i> FULL</span></div>
                 <div class="cf-kpi-grid" id="complianceKpiGrid">
                     <div class="cf-kpi-card"><div class="cf-kpi-value" id="compOffset">--</div><div class="cf-kpi-label">Offset Cost/yr</div></div>
                     <div class="cf-kpi-card"><div class="cf-kpi-value" id="compTax">--</div><div class="cf-kpi-label">EU ETS Exposure</div></div>
@@ -2457,7 +2457,7 @@ html:not([data-theme="dark"]) .cf-mode-indicator.pro-active { color:#64748b !imp
         html += '.pdf-footer { margin-top: 20px; padding-top: 10px; border-top: 2px solid #22c55e; text-align: center; font-size: 8px; color: #94a3b8; }';
         html += '</style></head><body>';
         // Header
-        html += '<div class="pdf-header"><div><h1>DC Carbon Footprint Report</h1><div class="pdf-brand"><span>RESISTANCE</span>ZERO \u2014 Pro Analysis</div></div>';
+        html += '<div class="pdf-header"><div><h1>DC Carbon Footprint Report</h1><div class="pdf-brand"><span>RESISTANCE</span>ZERO \u2014 Full analysis</div></div>';
         html += '<div class="pdf-date">Generated ' + dateStr + '<br>resistancezero.com</div></div>';
 
         // Score

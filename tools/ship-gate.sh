@@ -189,6 +189,7 @@ gate "min-twin freshness — no page runs a stale minified build" node tools/aud
 gate "OG card freshness — every card matches a fresh render of its generator" python3 tools/test-og-card-freshness.py
 gate "generator freshness — every generated artefact matches a fresh build" python3 tools/test-generator-freshness.py
 gate "WAN traffic study — every printed figure follows from the view's own inputs" node tools/test-dcai-wan-study.mjs
+gate "security zone ladder — SL-T never drops inward, life safety is monitor-only" node tools/test-dcai-security-zones.mjs
 gate "commercial surface — no newsletter capture, no paid tier, no e-mail collection" node tools/test-no-commercial-surface.mjs
 # CACHE-KEY DRIFT is the min-twin bug's sibling: one shared asset requested under two `?v=`
 # tokens sits in two cache entries, so a fix reaches a page only if that page's own token moved.

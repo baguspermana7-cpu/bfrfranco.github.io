@@ -13,8 +13,12 @@
     <meta property="og:description" content="Traceable product contract for the conventional facility power, cooling, environment, resilience and alarm overview.">
     <meta property="og:url" content="https://resistancezero.com/prd/dc-conventional.html">
     <meta property="og:image" content="https://resistancezero.com/assets/DC_Conventional.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Conventional DC Dashboard — Product Requirements">
+<meta name="twitter:description" content="Traceable product contract for the conventional facility power, cooling, environment, resilience and alarm overview.">
+<meta name="twitter:image" content="https://resistancezero.com/assets/DC_Conventional.jpg">
     <link rel="icon" href="../assets/Favicon.png" type="image/png">
-    <link rel="stylesheet" href="../styles.min.css?v=20260908-editorial">
+    <link rel="stylesheet" href="../styles.min.css?v=20260920-544ad99b">
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://resistancezero.com/"},{"@type":"ListItem","position":2,"name":"Product Requirements","item":"https://resistancezero.com/prd/"},{"@type":"ListItem","position":3,"name":"Conventional DC Dashboard"}]}
     </script>
@@ -33,8 +37,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/rz-documentation-ui.css?v=1.129.0">
-    <script src="../js/rz-documentation-ui.js?v=1.129.0" defer></script>
+    <link rel="stylesheet" href="../css/rz-documentation-ui.css?v=20260920-948c056d">
+    <script src="../js/rz-documentation-ui.js?v=20260920-3d2aec78" defer></script>
 </head>
 <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
@@ -75,7 +79,7 @@
         <section class="mn-section" id="scope"><h2><span class="mn-num">03</span> Scope &amp; non-goals</h2><div class="mn-grid"><article class="mn-card"><h3>In scope</h3><ul><li>Facility alarm/quality summary.</li><li>Site power, cooling, water, carbon, environment, safety, network and fuel overview.</li><li>Locked <code>CONV_MODEL</code> and derived <code>CONV_CALC.snapshot</code>.</li><li>Seven subsystem navigation routes, KPI basis drawers, shared Design Studio, FAQ and theme.</li><li>The adopted four-hall campus: 10 MW IT design and 7.5 MW adopted load per hall, 500 racks/hall, 15 kW/rack current average, chilled-water CRAH thermal contract and design-point dPUE.</li><li>Tier-gated cockpit with separate public documentation.</li></ul></article><article class="mn-card"><h3>Non-goals</h3><ul><li>No live BMS/EPMS/DCIM acquisition or control.</li><li>No configurable field setpoint editor.</li><li>No inferred off-design PUE or facility load beyond the adopted 30 MW operating point and declared 40 MW/58 MW design point without an approved part-load curve.</li><li>No stamped engineering, procurement, safety or regulatory conclusion.</li><li>No claim that static “Normal/Online” rows are measured values.</li><li>No claim that the adopted 30 MW campus scenario is installed, energized, commissioned or measured telemetry.</li></ul></article></div></section>
 
         <section class="mn-section" id="functional"><h2><span class="mn-num">04</span> Functional requirements</h2><div class="mn-tablewrap"><table class="mn-table"><thead><tr><th>ID</th><th>Visible element / requirement</th><th>Acceptance</th></tr></thead><tbody>
-            <tr><td>FR-01</td><td>Preserve the cockpit tier gate while PRD and Manual remain public.</td><td>Pro/Educator/Root policy remains owned by shared auth; docs contain no gate.</td></tr>
+            <tr><td>FR-01</td><td>Preserve the cockpit tier gate while PRD and Manual remain public.</td><td>Full access/Educator/Root policy remains owned by shared auth; docs contain no gate.</td></tr>
             <tr><td>FR-02</td><td>Provide Portfolio, DC Solutions, PRD and Manual links.</td><td>All are visible in <code>.header-left</code> and keyboard reachable.</td></tr>
             <tr><td>FR-03</td><td>Show title, modeled status indicator and WIB clock.</td><td>Clock changes only time; “LIVE” styling does not override simulated disclosure.</td></tr>
             <tr><td>FR-04</td><td>Provide Generate Design, FAQ and Theme controls.</td><td>Each control opens/toggles the intended surface without changing the locked model.</td></tr>
@@ -252,13 +256,13 @@
             <tr><td>Warm-water CHW level is assumed.</td><td>CHWS 19.4°C derives from the 25.4°C rack inlet target minus a 6.0 K assumed coil approach; CHWR is 27.0°C at the adopted 7.6 K rise.</td><td>Replace the approach only with an approved coil selection and re-run every dependent cooling gate.</td></tr>
             <tr><td>Per-hall chiller allocation is unavailable.</td><td>The 7/10 N+1 plant is central and the engine intentionally returns no hall allocation.</td><td>Provide the hydronic distribution topology and isolation philosophy before allocating units to halls.</td></tr>
             <tr><td>Generated design breadth exceeds validated snapshot.</td><td>Report includes fire, water chemistry and cost assumptions beyond primary dashboard points.</td><td>Maintain section-level source/assumption tags and independent calculation tests.</td></tr>
-            <tr><td>Access policy wording may drift.</td><td>Comments, overlay and shared feature flags have changed historically between Pro/Educator/Root descriptions.</td><td>Test the canonical policy; docs must not become an alternate access path.</td></tr>
+            <tr><td>Access policy wording may drift.</td><td>Comments, overlay and shared feature flags have changed historically between Full access/Educator/Root descriptions.</td><td>Test the canonical policy; docs must not become an alternate access path.</td></tr>
             <tr><td>Design capacity may be mistaken for current load.</td><td>The adopted operating point is 4 × 7.5 MW = 30 MW IT; 4 × 10 MW = 40 MW IT and 58 MW facility are the declared 100% design point.</td><td>Keep current/design-point scope labels and require discipline-specific sizing before procurement or commissioning use.</td></tr>
             <tr><td>EPMS color can drift from topology truth.</td><td>A final ATS-to-rack segment previously used a fixed green class even when energized from the red/A path.</td><td>Derive the final segment from actual source state and keep the four-scenario regression test mandatory.</td></tr>
         </tbody></table></div><div class="mn-actions"><a class="mn-action primary" href="../dc-conventional.html">Open cockpit</a><a class="mn-action" href="../manual/dc-conventional.html">Read technical manual</a></div></section>
     </main>
 
     <script>(function(){var t=document.getElementById('themeToggle');var s=localStorage.getItem('theme')||localStorage.getItem('rz_theme')||'light';document.documentElement.setAttribute('data-theme',s);if(t)t.addEventListener('click',function(){var n=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('theme',n);localStorage.setItem('rz_theme',n);});var a=document.querySelectorAll('.mn-tablewrap,.mn-formula');for(var i=0;i<a.length;i++)a[i].setAttribute('tabindex','0');})();</script>
-    <script src="../js/rz-version.js?v=2026-07-20" defer></script><script src="../js/rz-mobile-nav.js?v=1.129.0" defer></script><script src="../js/rz-cookie-consent.js?v=1.129.0" defer></script><script src="../js/rz-explain-db.js?v=2026-07-27" defer></script><script src="../js/rz-explain.js?v=2026-07-27" defer></script>
+    <script src="../js/rz-version.js?v=20260920-10a50683" defer></script><script src="../js/rz-mobile-nav.js?v=20260920-b64c1545" defer></script><script src="../js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script><script src="../js/rz-explain-db.js?v=20260920-726727d9" defer></script><script src="../js/rz-explain.js?v=20260920-d0317658" defer></script>
 </body>
 </html>
