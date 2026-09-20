@@ -15,9 +15,25 @@ import os
 import html as html_mod
 from datetime import datetime
 
+
+
 # ── Paths ──────────────────────────────────────────────────────────────────────
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR   = os.path.dirname(SCRIPT_DIR)
+
+def _styles_token() -> str:
+    """The stylesheet's cache token is derived from the file it busts (v3.9.4).
+
+    This template used to carry a hardcoded `?v=20260908-editorial`, so every regenerated
+    changelog.html silently reverted the token the rest of the site had moved on from — exactly
+    the staleness tools/test-asset-cache-tokens.mjs now fails on.
+    """
+    import hashlib
+    import datetime
+    css = os.path.join(ROOT_DIR, "styles.min.css")
+    with open(css, "rb") as handle:
+        digest = hashlib.sha256(handle.read()).hexdigest()[:8]
+    return "{:%Y%m%d}-{}".format(datetime.date.today(), digest)
 CHANGELOG  = os.path.join(ROOT_DIR, 'CHANGELOG.md')
 OUTPUT     = os.path.join(ROOT_DIR, 'changelog.html')
 
@@ -463,7 +479,7 @@ def build_html(entries):
   <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
   <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 
-  <link rel="stylesheet" href="styles.min.css?v=20260908-editorial">
+  <link rel="stylesheet" href="styles.min.css?v={_styles_token()}">
   <script src="js/rz-version.js?v=2026-05-09" defer></script>
 
   <style>

@@ -24,6 +24,12 @@
  *   P5 a real ladder: AVIF + WebP + JPEG, every rung on disk, `sizes` on every source, no rung
  *      wider than its master (upscaling is bytes for nothing), and a byte budget per rung
  *   P6 no layout shift: width/height on every <img> matches the aspect of what it loads
+ *   P7 the caption NEVER touches the portrait, at any width the owner can reach. He found this one
+ *      himself, on his phone: "Kacau sekali tulisannya menutupi foto ... position harus sangat
+ *      accurate utk semua display resolution." The cause was a stale stylesheet (see
+ *      tools/test-asset-cache-tokens.mjs), but the invariant it broke belongs here — caption top at
+ *      or below the portrait's bottom, nothing outside the card, and the portrait never squeezed
+ *      below 55% of the card, swept across twelve widths x three themes.
  *
  * Usage: node tools/test-index-profile-photo.mjs
  */
@@ -52,6 +58,7 @@ await new Promise((accept) => server.listen(0, '127.0.0.1', accept));
 
 const failures = [];
 const rows = [];
+const sweep = [];
 const fail = (m) => failures.push(m);
 
 /* ---- P5, statically: the ladder the markup promises must exist on disk ---- */
@@ -153,9 +160,57 @@ try {
     }
 } finally { await browser.close(); server.close(); }
 
-console.log(`INDEX PROFILE PHOTO — ${rungs.length} ladder rungs, ${rows.length} rendered checks`);
+/* ---- P7: the caption never touches the portrait, swept wide ---- */
+{
+    const browser2 = await puppeteer.launch({ args: ['--no-sandbox'] });
+    const server2 = createServer(async (req, res) => {
+        const pathname = new URL(req.url, 'http://localhost').pathname;
+        const full = resolve(ROOT, decodeURIComponent(pathname.slice(1) || 'index.html'));
+        if (full !== ROOT && !full.startsWith(ROOT + sep)) { res.writeHead(403).end(); return; }
+        try { res.writeHead(200, { 'content-type': MIME[extname(full)] || 'application/octet-stream' }).end(await readFile(full)); } catch { res.writeHead(404).end(); }
+    });
+    await new Promise((accept) => server2.listen(0, '127.0.0.1', accept));
+    try {
+        for (const width of [320, 360, 390, 414, 768, 820, 900, 1024, 1280, 1440, 1680, 1920]) {
+            for (const theme of ['light', 'dark', 'rainbow']) {
+                const tab = await browser2.newPage();
+                await tab.setViewport({ width, height: 900 });
+                await tab.evaluateOnNewDocument((t) => {
+                    try {
+                        localStorage.setItem('theme', t === 'rainbow' ? 'dark' : t);
+                        if (t === 'rainbow') { localStorage.setItem('rzRainbow', '1'); } else { localStorage.removeItem('rzRainbow'); }
+                    } catch (e) { /* storage disabled */ }
+                }, theme);
+                await tab.goto(`http://127.0.0.1:${server2.address().port}/${PAGE}`, { waitUntil: 'networkidle0', timeout: 45000 });
+                const geo = await tab.evaluate(() => {
+                    const card = document.querySelector('.bento-photo-card');
+                    const info = document.querySelector('.bento-photo-info');
+                    const frame = [...document.querySelectorAll('.bento-photo-card > .rz-photo-frame')].find((el) => el.getClientRects().length > 0);
+                    const box = (el) => { const r = el.getBoundingClientRect(); return { top: r.top, bottom: r.bottom, left: r.left, right: r.right, w: r.width, h: r.height }; };
+                    return { card: box(card), info: box(info), frame: frame ? box(frame) : null };
+                });
+                await tab.close();
+                const tag = `${width}px/${theme}`;
+                if (!geo.frame) { fail(`P7 ${tag}: no visible portrait frame`); continue; }
+                if (geo.info.top < geo.frame.bottom - 1) {
+                    fail(`P7 ${tag}: the caption starts ${(geo.frame.bottom - geo.info.top).toFixed(1)}px INSIDE the portrait — text over the photo`);
+                }
+                if (geo.info.bottom > geo.card.bottom + 1 || geo.info.left < geo.card.left - 1 || geo.info.right > geo.card.right + 1) {
+                    fail(`P7 ${tag}: the caption leaves the card`);
+                }
+                if (geo.frame.h < geo.card.h * 0.55) {
+                    fail(`P7 ${tag}: the portrait is squeezed to ${(100 * geo.frame.h / geo.card.h).toFixed(0)}% of the card — the caption is eating the face`);
+                }
+                sweep.push({ width, theme, frame: Math.round(geo.frame.h), info: Math.round(geo.info.h) });
+            }
+        }
+    } finally { await browser2.close(); server2.close(); }
+}
+
+console.log(`INDEX PROFILE PHOTO — ${rungs.length} ladder rungs, ${rows.length} rendered checks, ${sweep.length} position checks`);
 for (const r of rows.filter((x) => x.vp === 'phone' || x.slot === 'hero')) {
     console.log(`  ${r.vp.padEnd(8)} ${r.theme.padEnd(8)} ${r.slot.padEnd(6)} ${r.file.padEnd(26)} box ${r.box.padEnd(12)} ${r.fit}`);
 }
+if (sweep.length) { const n = sweep[0]; console.log(`  narrowest: ${n.width}px portrait ${n.frame}px + caption ${n.info}px`); }
 if (failures.length) { console.error(`\nFAIL\n  ${failures.join('\n  ')}`); process.exit(1); }
 console.log('\nPASS — right face per theme, whole photo at every width, sharp at every dpr');

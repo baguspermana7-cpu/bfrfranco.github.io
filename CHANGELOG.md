@@ -11,6 +11,58 @@ release sections rather than semver.
 
 ---
 
+## v3.9.4 — 2026-09-20
+
+### The caption over his face was a stale stylesheet, and it was not just one page
+
+Two reports, minutes apart. *"Kotak dan tulisan di bawah foto saya terlalu ai design slop kan saya
+bilang itu rule yg g boleh lakukan anti-vibe code dan ux law."* Then, with a screenshot of the
+caption printed across his own face: *"Kacau sekali tulisannya menutupi foto. Tolol sekali. Position
+harus sangat accurate utk semua display resolution."*
+
+Both correct, and the second was mine. **v3.9.1 rewrote the photo card from an absolutely-positioned
+caption to a flex column and did not change the stylesheet's cache token.** Every browser holding
+the v3.9.0 stylesheet then rendered v3.9.1's four-element caption under v3.9.0's rule —
+`position:absolute; bottom:1.25rem; left:1.25rem` — stacking it upward from the card's corner,
+straight over the portrait. No gate could see it: every gate here starts with a cold cache and can
+never reproduce a stale one.
+
+**The same defect was site-wide and three releases old.** `styles.min.css` has carried
+`?v=20260908-editorial` across 74 pages since 2026-09-09 while the file changed in v3.6.2, v3.6.4
+and v3.9.0 — including the 39 contrast fixes, which never reached a returning visitor.
+
+### Fixed
+
+- **A cache token is now derived from the file it busts** — `?v=<yyyymmdd>-<first 8 of the sha256>`
+  — on both stylesheets across all 75 pages that load them. "Did I remember to bump it" stops being
+  a question a human answers.
+- **The caption is one line again, and the chips are gone.** The three bordered credential badges
+  (AK3L / SKTTK L6 / SAP HV & LV) repeated the governance row further down the same page, so they
+  carried no information — §D18 Occam, §D13 Similarity — and a row of three mini-badges is the §A
+  badge-row tell. A 1px hairline separates the caption from the portrait, which is how §D14 says to
+  group. The height the chips used went back to the face.
+
+### Added
+
+- **`tools/test-asset-cache-tokens.mjs`** — for every `?v=` asset on every page, recompute the
+  file's hash and compare. STRICT for `styles.min.css` and `styles-index.min.css`; the remaining 115
+  assets are REPORTED with their expected token, and 13 assets served under more than one token are
+  listed, so the backlog is visible instead of blocking a caption fix. Proven RED on both stylesheets
+  before the fix.
+- **`tools/test-index-profile-photo.mjs` gained P7**, the owner's sentence as an invariant: the
+  caption's top edge at or below the portrait's bottom, nothing outside the card, and the portrait
+  never squeezed below 55% of the card — swept across **twelve widths × three themes** (320 … 1920,
+  light / dark / rainbow). Proven RED by reconstructing exactly what he saw: v3.9.1's markup with
+  v3.9.0's stylesheet, which reports *"the caption starts 259.9px INSIDE the portrait"*.
+
+### Honest boundary
+
+The token repairs what browsers fetch from now on. A cache that already holds the old file under the
+old URL keeps it until its own TTL expires — on GitHub Pages there is no purge to call. Anyone still
+seeing the old card can hard-reload once.
+
+---
+
 ## v3.9.3 — 2026-09-20
 
 ### A riser is one object and gets named once
