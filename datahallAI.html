@@ -1917,11 +1917,13 @@ return '<polygon points="'+isoTop(fx,fy,fw,fd,fz)+'" fill="'+fill+'" fill-opacit
  * The width comes from RZDiagramMetrics rather than length*0.62 — see
  * standarization/DIAGRAM_ENGINE_STANDARD.md. Both fall back to the old estimate when the
  * engine is absent, so this file still renders without it. */
-var ISO_OCC=null,ISO_FLEX=[],ISO_SEQ=0,ISO_UNPLACED=0;
+var ISO_OCC=null,ISO_FLEX=[],ISO_SEQ=0,ISO_UNPLACED=0,ISO_MOVED=0,ISO_RIGID=0;
+
+function L_ISO(){return (typeof window!=='undefined'&&window.RZDiagramLayout&&window.RZDiagramLayout.placeBox)?window.RZDiagramLayout:null;}
 
 function isoBeginPlacement(){
 ISO_OCC=(window.RZDiagramLayout&&window.RZDiagramLayout.occupancy)?window.RZDiagramLayout.occupancy():null;
-ISO_FLEX=[];ISO_SEQ=0;ISO_UNPLACED=0;
+ISO_FLEX=[];ISO_SEQ=0;ISO_UNPLACED=0;ISO_MOVED=0;ISO_RIGID=0;
 }
 
 function isoLabelBox(cx,cy,label,fs){
@@ -1948,7 +1950,23 @@ function isoLabel(x,y,z,label,color,sz,bold,o,rigid){
 var fs=sz||8,cx=iX(x,y),cy=iY(x,y,z);
 var box=isoLabelBox(cx,cy,label,fs);
 if(!ISO_OCC)return isoLabelMarkup(box,cx,cy,label,color,fs,bold,o);
-if(rigid){ISO_OCC.add(box,{id:'iso-eq-'+(++ISO_SEQ),kind:'text'});return isoLabelMarkup(box,cx,cy,label,color,fs,bold,o);}
+if(rigid){
+/* v3.10.10 — SEMI-rigid, not immovable.
+ *
+ * A tag names one box, so it cannot wander: moved far, it points at the wrong equipment. But
+ * "cannot wander" was written as "cannot move", and two tags then sat on top of each other —
+ * MV SWGR-B and SM6 20kV both landed on the 80,000L tank tag, which only became visible once
+ * the floor caption stopped covering them. A tag nudged three or six units still plainly
+ * belongs to its box; a tag buried under another tag reads as nothing.
+ *
+ * So: a tight budget (three rings of three units, nine units at most) against the tags already
+ * placed. First one to claim a spot keeps it. Beyond that budget it stays put and the drawing
+ * has a real layout problem, which is the honest outcome. */
+var rb=box;
+if(L_ISO()){var rp=L_ISO().placeBox(box,{occupancy:ISO_OCC,step:3,rings:4,pad:2});if(rp.placed){rb=rp.box;if(rp.ring>0)ISO_MOVED++;}else ISO_UNPLACED++;ISO_RIGID++;}
+ISO_OCC.add(rb,{id:'iso-eq-'+(++ISO_SEQ),kind:'text'});
+return isoLabelMarkup(rb,cx+(rb.x-box.x),cy+(rb.y-box.y),label,color,fs,bold,o);
+}
 var token='<!--ISOFLEX'+(++ISO_SEQ)+'-->';
 ISO_FLEX.push({token:token,box:box,cx:cx,cy:cy,label:label,color:color,fs:fs,bold:bold,o:o});
 return token;
@@ -1961,20 +1979,33 @@ if(!ISO_OCC||!ISO_FLEX.length)return svg;
 var L=window.RZDiagramLayout;
 for(var i=0;i<ISO_FLEX.length;i++){
 var f=ISO_FLEX[i];
-var pl=L.placeBox(f.box,{occupancy:ISO_OCC,axis:f.axis||'y',step:f.step||5,rings:f.rings||10});
+var pl=L.placeBox(f.box,{occupancy:ISO_OCC,axis:f.axis||'y',step:f.step||5,rings:f.rings||10,pad:2});
 /* v3.10.8 — escalate rather than give up. The preferred move keeps the caption in its own
    column (or its own row), which is what keeps it reading as the name of the thing under it.
    In a dense corner — the FWS pump station has three pumps, a header and a tank in one band —
    every candidate on that one axis can be occupied. A caption nudged diagonally still names
    its room; a caption sitting ON an equipment tag names nothing. Take the lesser move. */
-if(!pl.placed)pl=L.placeBox(f.box,{occupancy:ISO_OCC,step:f.step||5,rings:(f.rings||10)+4});
-if(!pl.placed)ISO_UNPLACED++;
+if(!pl.placed)pl=L.placeBox(f.box,{occupancy:ISO_OCC,step:f.step||5,rings:(f.rings||10)+4,pad:2});
+if(!pl.placed)ISO_UNPLACED++;else if(pl.ring>0)ISO_MOVED++;
 ISO_OCC.add(pl.box,{id:'iso-zone-'+i,kind:'text'});
 var markup;
 if(f.make){markup=f.make(pl.box);}
-else{var dy=pl.box.y-f.box.y;markup=isoLabelMarkup(pl.box,f.cx,f.cy+dy,f.label,f.color,f.fs,f.bold,f.o);}
+else{
+/* v3.10.10 — BOTH axes. This read `f.cx` with only a dy applied, which was correct while
+   placement was vertical-only. Escalation to the full ladder and the outward axis made
+   horizontal moves possible, and then the MASK moved while the TEXT stayed where it was
+   authored: CW PUMP STATION's mask ended up 36 px right of its own label, so the label went
+   on colliding while the search reported it placed. A displaced box moves everything it
+   draws, or it has moved nothing. */
+var dx=pl.box.x-f.box.x,dy=pl.box.y-f.box.y;
+markup=isoLabelMarkup(pl.box,f.cx+dx,f.cy+dy,f.label,f.color,f.fs,f.bold,f.o);}
 svg=svg.split(f.token).join(markup);
 }
+/* A diagnostic hook, not a debug leftover. The isometric's placement runs inside a closure, so
+   a gate finding "GROUND FLOOR x SM6 20kV" has no way to ask whether the caption was moved, was
+   left where it was authored, or was never in the pass at all — three very different defects
+   that look identical from outside. This publishes the counts. */
+if(typeof window!=='undefined')window.ISO_DIAG={flex:ISO_FLEX.length,unplaced:ISO_UNPLACED,moved:ISO_MOVED,rigid:ISO_RIGID};
 ISO_FLEX=[];
 /* Close the pass. Every isoLabel() call today is inside renderOverview(), but a future one
    placed after it would otherwise defer into a queue nobody drains — and an unresolved token

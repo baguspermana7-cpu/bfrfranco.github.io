@@ -11,6 +11,55 @@ release sections rather than semver.
 
 ---
 
+## v3.10.10 — 2026-09-20
+
+### The mask moved, the text did not
+
+The building isometric goes **4 overlapping label pairs → 1**. One of the three fixes below was a
+bug I shipped two releases ago, and it is the reason the other two looked like they were not
+working.
+
+### Fixed
+
+- **A displaced caption moved its mask and left its text behind.** `isoResolvePlacement()` applied
+  only `dy` when re-rendering a placed label. That was correct while placement was vertical-only;
+  escalation to the full ladder and the outward axis (both v3.10.9) made *horizontal* moves
+  possible, and from then on the opaque mask moved while the words stayed where they were
+  authored. `CW PUMP STATION`'s mask ended up **36 px right of its own label**. The search
+  reported every one of these as `placed`, because by its own reckoning the box it moved was
+  clear — so the diagnosis kept pointing at the search when the defect was in the rendering.
+  A displaced box now moves everything it draws, or it has moved nothing.
+- **Equipment tags are semi-rigid, not immovable.** A tag names one box, so it cannot wander —
+  but "cannot wander" had been written as "cannot move", and two tags then sat on each other:
+  `MV SWGR-B` and `SM6 20kV` both landed on the `80,000L` tank tag, visible only once the floor
+  caption stopped covering them. A tag now gets a **12-unit budget** against the tags already
+  placed; beyond that it stays put and the drawing has a real layout problem, which is the honest
+  outcome.
+
+### Changed
+
+- **Placement pads every hit test by 2 units.** A text box computed from a width budget is an
+  *approximation* of what a font engine draws. Treating the estimate as exact declares a near-miss
+  clear, and the browser then measures a two-unit overlap the search never saw.
+
+### Added
+
+- `I1e`, `I1f` and a displacement assertion — **99/99**. `I1f` is the regression test for the
+  `dx` bug: reverting to `dy`-only puts the text 70 units from the centre of its own mask.
+- A **diagnostic hook**, `window.ISO_DIAG`, publishing `{flex, rigid, moved, unplaced}`. The
+  isometric's placement runs inside a closure, so a gate finding `GROUND FLOOR x SM6 20kV` could
+  not distinguish "the caption was moved and still collides", "it was left where it was authored"
+  and "it was never in the pass at all" — three different defects that look identical from
+  outside. Current reading: 41 flex, 20 rigid, 26 moved, **0 unplaced**.
+
+### Honest residue
+
+`DH-4 — 440 racks` × `BD` still overlaps by roughly 3 × 5 units. One pair of twelve. The
+drawing is dense enough that the remedy for the last one is the one
+`DATAHALL_AI_STANDARD.md` already prescribes — fewer labels in the SVG — not a wider search.
+
+---
+
 ## v3.10.9 — 2026-09-20
 
 ### Parked at the origin

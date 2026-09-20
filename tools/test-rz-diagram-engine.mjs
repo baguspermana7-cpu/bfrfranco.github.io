@@ -592,6 +592,69 @@ const D = sandbox.RZDiagram;
       `an unobstructed caption must stay exactly where it was authored: expected y=${want.y}`);
   }
 
+  /* I1e: two EQUIPMENT TAGS must not sit on each other either. A tag names one
+   *      box so it cannot wander, but "cannot wander" is not "cannot move": a
+   *      nudge of a few units still plainly belongs to its box, while a tag
+   *      buried under another tag reads as nothing. MV SWGR-B and SM6 20kV both
+   *      landed on the 80,000L tank tag, visible only once the floor caption
+   *      stopped covering them. */
+  {
+    const sb = run(true);
+    sb.isoBeginPlacement();
+    /* Two tags on NEARBY boxes, partly overlapping — the real shape of the
+     * defect (MV SWGR-B x 80,000L overlapped by 5.2px vertically). Two tags at
+     * an IDENTICAL anchor would need a nudge larger than a tag should ever
+     * make, and that is an authoring problem, not a placement one. */
+    const a = sb.isoLabel(10, 10, 22, 'SM6 20kV', '#fff', 7, 1, null, true);
+    const b = sb.isoLabel(10, 10, 20, '80,000L', '#fff', 7, 1, null, true);
+    const out = sb.isoResolvePlacement(a + b);
+    const masks = [...out.matchAll(/<rect x="([-\d.]+)" y="([-\d.]+)" width="([\d.]+)" height="([\d.]+)"/g)]
+      .map(m => ({ x: +m[1], y: +m[2], w: +m[3], h: +m[4] }));
+    ok('I1e0', masks.length === 2, `two tags expected, got ${masks.length}`);
+    ok('I1e', M.overlap(masks[0], masks[1]) === null,
+      'two equipment tags must not overlap: ' +
+      masks.map(x => `(${x.x},${x.y})`).join(' vs '));
+    /* And the nudge must stay SMALL — a tag that travels stops naming its box.
+     * Measure DISPLACEMENT from where each was authored, not the gap between
+     * them: two correctly separated tags are naturally far apart, so the gap
+     * says nothing about how far either one moved. */
+    const authored = [
+      sb.isoLabelBox(sb.iX(10, 10), sb.iY(10, 10, 22), 'SM6 20kV', 7),
+      sb.isoLabelBox(sb.iX(10, 10), sb.iY(10, 10, 20), '80,000L', 7)
+    ];
+    const moves = masks.map((m, i) =>
+      Math.abs(m.x - authored[i].x) + Math.abs(m.y - authored[i].y));
+    ok('I1e2', Math.max(...moves) <= 12,
+      `a tag may be nudged, never relocated: displacements ${moves.map(n => n.toFixed(1)).join(', ')}`);
+  }
+
+  /* I1f: a displaced caption moves its MASK and its TEXT together.
+   *
+   *      This shipped broken: the flex path applied only `dy`, which was right
+   *      while placement was vertical-only. Once escalation could move a label
+   *      sideways, the mask moved and the text stayed where it was authored —
+   *      so the search reported "placed" while the label went on colliding, and
+   *      the mask sat 36px away from the words it was supposed to back. */
+  {
+    const sb = run(true);
+    sb.isoBeginPlacement();
+    const caption = sb.isoLabel(10, 10, 20, 'CW PUMP STATION', '#93c5fd', 8, 1);
+    const cx = sb.iX(10, 10), cy = sb.iY(10, 10, 20);
+    /* wall the vertical column so placement is forced sideways */
+    sb.ISO_OCC.add({ x: cx - 22, y: cy - 200, w: 44, h: 400 }, { id: 'wall', kind: 'text' });
+    const out = sb.isoResolvePlacement(caption);
+    const mask = [...out.matchAll(/<rect x="([-\d.]+)" y="([-\d.]+)" width="([\d.]+)" height="([\d.]+)"/g)]
+      .map(m => ({ x: +m[1], y: +m[2], w: +m[3], h: +m[4] }))[0];
+    const tx = [...out.matchAll(/<text x="([-\d.]+)" y="([-\d.]+)"/g)]
+      .map(m => ({ x: +m[1], y: +m[2] }))[0];
+    ok('I1f0', !!mask && !!tx, 'the caption must render a mask and a text');
+    ok('I1f1', Math.abs(mask.x - cx) > 1,
+      `placement must actually have moved it sideways: mask.x=${mask.x} cx=${cx}`);
+    /* the text is middle-anchored, so its x is the mask's centre */
+    ok('I1f2', Math.abs(tx.x - (mask.x + mask.w / 2)) < 0.01,
+      `text must sit at the centre of its own mask: text.x=${tx.x} mask centre=${mask.x + mask.w / 2}`);
+  }
+
   /* I2b: the pass CLOSES. A label emitted after the resolve must draw immediately rather
    *      than defer into a queue nobody drains — an unresolved token renders as a missing
    *      label, not as an error. */

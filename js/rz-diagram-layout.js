@@ -216,6 +216,7 @@
    * @param {object} want  { x, y, w, h } — the box where it would like to sit
    * @param {object} opts  { occupancy, ignore, step, rings, axis }
    *   `axis` — 'y' vertical only, 'x' horizontal only (outward first), else all eight
+   *   `pad`  — extra clearance applied to every hit test, in the same units
    * @returns {{placed:boolean, box:object, dx:number, dy:number, ring:number}}
    */
   function placeBox(want, opts) {
@@ -225,7 +226,13 @@
     var step = o.step == null ? 6 : o.step;
     var rings = o.rings == null ? 8 : o.rings;
 
-    function free(b) { return occ.hits(b, { ignore: ignore }).length === 0; }
+    /* `pad` is the honest admission that a text box computed from a width budget
+     * is an APPROXIMATION of what a font engine will draw. Placement that treats
+     * the estimate as exact declares a near-miss clear, and the browser then
+     * measures a two-unit overlap the search never saw. Padding the test makes
+     * a near-miss count as a hit, so the label is separated rather than parked
+     * on the boundary. */
+    function free(b) { return occ.hits(b, { ignore: ignore, pad: o.pad || 0 }).length === 0; }
     function at(dx, dy) { return { x: want.x + dx, y: want.y + dy, w: want.w, h: want.h }; }
 
     if (free(want)) return { placed: true, box: want, dx: 0, dy: 0, ring: 0 };
