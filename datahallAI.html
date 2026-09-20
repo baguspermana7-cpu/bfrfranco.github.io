@@ -685,7 +685,7 @@ body[data-datahall-authority="unavailable"] #tabs,
 body[data-datahall-authority="unavailable"] .wrap{display:none !important}
 body[data-datahall-authority="unavailable"] .hdr-r>.dot{background:#64748b !important;box-shadow:none !important;animation:none !important}
 body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:none}
-</style>    <script src="js/rz-version.js?v=20260920-4260ad76" defer></script>
+</style>    <script src="js/rz-version.js?v=20260920-be4a4559" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260920-b64c1545" defer></script>
     <!-- v3.5.0 — hold the 8.5px legibility floor by SCALE, not by font size. Five of this page's
          fifteen diagrams were already clear; the dense ones (cooling P&ID, the four SLDs, the hall
@@ -3915,7 +3915,8 @@ s+=tx(LX+480,nwY-4,'PASSIVE','var(--t3)',5,0,1);['CblMgmt','PDU/Mtr','Patch','Sp
 const pY=616;s+=tx(LX,pY,'CORRIDOR SERVICES','var(--t1)',5,0,1);
 // Pipe rack frame
 s+=`<rect x="${LX}" y="${pY+3}" width="${TW}" height="72" rx="2" fill="rgba(107,114,128,.01)" stroke="rgba(107,114,128,.06)" stroke-width=".3" stroke-dasharray="4 3"/>`;
-s+=tx(LX+TW-2,pY+8,'PIPE RACK','var(--t3)',3,'end');
+/* v3.9.9 — clear of the valve tag that sits at the rack's right end */
+s+=tx(LX+TW-30,pY+8,'PIPE RACK','var(--t3)',3,'end');
 // === FWS SUPPLY DN250 CS (insulated double-line, green) ===
 const sY=pY+12,ej1=LX+Math.round(TW/3),ej2=LX+Math.round(2*TW/3);
 s+=`<g class="fws-pipe-click" data-rz-equipment="fws-piping:dh01" tabindex="0" role="button">`;
@@ -3950,7 +3951,9 @@ s+=symSensor(ipX+88,pY+24,'var(--g)','F');s+=lv('fwsFM',ipX+88,pY+34,grp(bn('htw
 s+=fl(LX+TW-8,sY,ipX,sY,'rgba(34,197,94,.12)','','.3',1);
 s+=`</g>`;
 // === TCS NOTE (overhead) ===
-s+=tx(LX+TW/2,pY+38,'TCS SUP/RET DN150 SS316L \u2192 OVERHEAD (see top)','rgba(6,182,212,.2)',3,'middle');
+/* v3.9.9 — 4 units up: at pY+38 this annotation and the condensate-drain label at pY+42 were one
+   pixel apart, so two pipe notes read as one line of text. */
+s+=tx(LX+TW/2,pY+33,'TCS SUP/RET DN150 SS316L \u2192 OVERHEAD (see top)','rgba(6,182,212,.2)',3,'middle');
 // === CONDENSATE DRAIN DN50 CPVC ===
 const cdY=pY+45;
 s+=fl(LX,cdY,LX+TW,cdY,'rgba(100, 116, 139,.3)','fR',.25,1.5);
@@ -6334,7 +6337,9 @@ s+=flowParticle(680,168,240,1.5,CG);
 // GenSet + ATS
 s+=sectionSep(330,'GENSET / BACKUP');
 s+=bx2(200,340,520,80,'rgba(107,114,128,.4)');s+=tx2(460,355,'GENSET POOL + ATS','var(--t3)',5,'middle',1);
-s+=symGen(300,385,'rgba(107,114,128,.5)');s+=tx2(300,405,(DHE?(DHE.gensetFacNplus1+'×'+DHE.gensetMW+' MW class'):'—'),'var(--t3)',4,'middle');
+/* v3.9.9 — the genset caption drops to its own line: at y=405 it shared a row with the ATS
+   interlock note beside it and the two ran together on a narrow viewport. */
+s+=symGen(300,385,'rgba(107,114,128,.5)');s+=tx2(300,418,(DHE?(DHE.gensetFacNplus1+'×'+DHE.gensetMW+' MW class'):'—'),'var(--t3)',4,'middle');
 s+=tx2(460,375,'ATS: ASCO 7000 <10s auto-transfer','var(--t3)',4,'middle');
 s+=tx2(460,390,'CB-Emergency OPEN (standby)','var(--t3)',4,'middle');
 s+=tx2(460,405,'Connects at LV 400V via ATS interlock','var(--t3)',4,'middle');
@@ -7381,18 +7386,20 @@ s+=`<filter id="shimmer" x="-5%" y="-5%" width="110%" height="110%"><feTurbulenc
 s+=tx(480,16,'COOLING & PIPING P&ID \u2014 LIQUID '+(capPct==null?'\u2014':capPct)+'% ('+gs('liquidHeatFmt')+' kW) + AIR '+(capPct==null?'\u2014':(100-capPct))+'% ('+gs('airHeatFmt')+' kW) = '+gs('itHallFmt')+' kW PER HALL','var(--t3)',8,'middle',1,bo('liquidHeatFmt',{also:['airHeatFmt','itHallFmt','liquidCapturePct']}));
 // ===== HEADER STATUS STRIP — ASHRAE class + free-cooling state + ISA-5.1 tag legend =====
 // ASHRAE TC 9.9 thermal class label (W4 = facility-water inlet up to 27 °C)
-s+=`<rect x="700" y="6" width="80" height="16" rx="3" fill="rgba(34,197,94,.10)" stroke="var(--g)" stroke-width=".5"/>`;
-s+=tx(740,13,'ASHRAE W4','var(--g)',4.5,'middle',1);
-s+=tx(740,19,'HTW '+d1(gv('htwSupplyC'))+'°C class','var(--g)',3,'middle',0,bo('htwSupplyC'));
+s+=`<rect x="640" y="6" width="80" height="16" rx="3" fill="rgba(34,197,94,.10)" stroke="var(--g)" stroke-width=".5"/>`;
+s+=tx(680,13,'ASHRAE W4','var(--g)',4.5,'middle',1);
+s+=tx(680,19,'HTW '+d1(gv('htwSupplyC'))+'°C class','var(--g)',3,'middle',0,bo('htwSupplyC'));
 // Free-cooling state pill (subtle pulse — restrained per audit visual style)
-s+=`<rect x="784" y="6" width="78" height="16" rx="3" fill="rgba(6,182,212,.10)" stroke="var(--c)" stroke-width=".5"/>`;
-s+=`<circle cx="794" cy="14" r="2.2" fill="var(--c)"><animate attributeName="opacity" values=".4;1;.4" dur="2.2s" repeatCount="indefinite"/></circle>`;
-s+=tx(823,13,regime,'var(--c)',4.2,'middle',1);
-s+=tx(823,19,'OAT '+d1(gv('designAmbientC'))+'°C · margin '+d1(marginK)+' K','var(--c)',2.8,'middle',0,bo('designAmbientC'));
+s+=`<rect x="726" y="6" width="78" height="16" rx="3" fill="rgba(6,182,212,.10)" stroke="var(--c)" stroke-width=".5"/>`;
+s+=`<circle cx="736" cy="14" r="2.2" fill="var(--c)"><animate attributeName="opacity" values=".4;1;.4" dur="2.2s" repeatCount="indefinite"/></circle>`;
+s+=tx(765,13,regime,'var(--c)',4.2,'middle',1);
+s+=tx(765,19,'OAT '+d1(gv('designAmbientC'))+'°C · margin '+d1(marginK)+' K','var(--c)',2.8,'middle',0,bo('designAmbientC'));
 // ISA-5.1 instrument-tag prefix legend
-s+=`<rect x="866" y="6" width="84" height="16" rx="3" fill="rgba(148, 163, 184,.08)" stroke="var(--p)" stroke-width=".5"/>`;
-s+=tx(908,13,'ISA-5.1 TAGS','var(--p)',4.2,'middle',1);
-s+=tx(908,19,'TT/PT/FT/AT/BTU','var(--p)',2.8,'middle');
+s+=`<rect x="810" y="6" width="84" height="16" rx="3" fill="rgba(148, 163, 184,.08)" stroke="var(--p)" stroke-width=".5"/>`;
+/* v3.9.9 — the header strip is laid out in sequence now. The ISA legend spanned 866-950 and the
+   PUE badge 900-955: two blocks pinned to the same corner, overlapping by 50 units. */
+s+=tx(852,13,'ISA-5.1 TAGS','var(--p)',4.2,'middle',1);
+s+=tx(852,19,'TT/PT/FT/AT/BTU','var(--p)',2.8,'middle');
 // ===== OUTDOOR / DRY COOLER ARRAY SECTION =====
 s+=`<rect x="10" y="28" width="180" height="210" rx="4" fill="rgba(100, 116, 139,.25)" stroke="rgba(100, 116, 139,.55)" stroke-width="1"/>`;
 // Gradient header band
@@ -7659,9 +7666,12 @@ s+=`<rect x="650" y="28" width="150" height="210" rx="4" fill="rgba(6,182,212,.2
 s+=`<rect x="651" y="29" width="148" height="18" rx="3" fill="rgba(6,182,212,.35)"/>`;
 s+=`<circle cx="661" cy="38" r="3" fill="var(--g)"><animate attributeName="opacity" values=".5;1;.5" dur="2s" repeatCount="indefinite"/></circle>`;
 s+=tx(794,41,i0(cduRunning)+'/'+i0(cduInstalled),'var(--g)',3.5,'end',0,bo('cduRunning',{also:['cduInstalled']}));
-s+=tx(725,42,'CDU ARRAY — '+i0(cduInstalled)+' × '+(E&&E.cduModel?E.cduModel:'—'),'var(--c)',5,'middle',1,bo('cduInstalled'));
+/* v3.9.9 — this header bar is 148 units wide and the title was about 170: the model name and the
+   installed count both sat in it, and the count chip is already anchored to the right edge. The
+   title keeps the identity; the model moved down to the rating line, which had room. */
+s+=tx(725,42,'CDU ARRAY','var(--c)',5,'middle',1);
 s+=tx(725,49,i0(cduRunning)+' duty + '+((cduInstalled==null||cduRunning==null)?'—':(cduInstalled-cduRunning))+' stby · 12 banks × '+(cduPer==null?'—':cduPer),'var(--t3)',3.4,'middle',0,bo('cduRunning',{also:['cduInstalled']}));
-s+=tx(725,55,'L2L '+i0(cduRating)+' kW @ '+d1(gv('cduApproachK'))+' K approach','var(--t3)',3.2,'middle',0,bo('cduRating'));
+s+=tx(725,55,(E&&E.cduModel?E.cduModel:'—')+' · L2L '+i0(cduRating)+' kW @ '+d1(gv('cduApproachK'))+' K approach','var(--t3)',3.2,'middle',0,bo('cduRating'));
 // FWS supply header (left vertical pipe — FWS circuit = cyan)
 s+=`<line x1="657" y1="60" x2="657" y2="122" stroke="var(--c)" stroke-width="2" stroke-dasharray="6 3"><animate attributeName="stroke-dashoffset" values="0;-18" dur="3s" repeatCount="indefinite"/></line>`;
 s+=tx(654,60,'HTW▶','var(--c)',3,'end');
@@ -7701,7 +7711,10 @@ s+=tx(ux+9,uy+28,'×'+(cduPer==null?'—':cduPer),'var(--t3)',2.6,'middle');
 s+=`</g>`;
 }}
 // CDU parameters — expanded with 12 params
-s+=`<rect x="655" y="125" width="140" height="98" rx="2" fill="var(--bg3)" stroke="var(--bd)" stroke-width=".4"/>`;
+/* v3.9.9 — same cause as the TCS panel below: 98 units tall, ending at y=223, sat on the HTW
+   return line at RY=205 and its badge. The four per-unit rows are CDU specification, not loop
+   topology, so they moved to the "CDU Unit Data" card and the panel now clears the line. */
+s+=`<rect x="655" y="125" width="140" height="65" rx="2" fill="var(--bg3)" stroke="var(--bd)" stroke-width=".4"/>`;
 const htwDT=(gv('htwReturnC')!=null&&gv('htwSupplyC')!=null)?(gv('htwReturnC')-gv('htwSupplyC')):null;
 const tcsDT=(gv('tcsReturn')!=null&&gv('tcsSupply')!=null)?(gv('tcsReturn')-gv('tcsSupply')):null;
 const cduP=[
@@ -7709,8 +7722,6 @@ const cduP=[
 ['TCS Supply',d1(gv('tcsSupply'))+'°C','var(--c)','cduTCSo',bo('tcsSupply')],['TCS Return',d1(gv('tcsReturn'))+'°C','var(--o)','cduTCSi',bo('tcsReturn')],
 ['HTW ΔT',d1(htwDT)+' K','var(--g)','cduFWSdT',bo('htwReturnC',{also:['htwSupplyC']})],['TCS ΔT',d1(tcsDT)+' K','var(--g)','cduTCSdT',bo('tcsReturn',{also:['tcsSupply']})],
 ['Heat Xfer',gs('liquidHeatFmt')+' kW','var(--o)','cduHeatX',bo('liquidHeatFmt')],['TCS Flow',i0(tcsLpmHall)+' LPM','var(--c)','cduTCSflow',bo('tcsFlowTotal')],
-['Per CDU',i0(gv('cduDutyPerUnit'))+' kW','var(--o)','',bo('cduDutyPerUnit')],['Flow/CDU',i0(gv('cduFlowPerUnitLpm'))+' LPM','var(--c)','',bo('cduFlowPerUnitLpm')],
-['Active',i0(cduRunning)+'/'+i0(cduInstalled),'var(--g)','cduActive',bo('cduRunning',{also:['cduInstalled']})],['Approach',d1(gv('cduApproachK'))+' K','var(--g)','cduEff',{declared:'CDU approach is the PUBLISHED CoolIT CHx1000 approach (model leaf thermal.cduApproachK), printed as authored'}]
 ];
 cduP.forEach((p,i)=>{
 const px=i%2===0?660:730,py=138+Math.floor(i/2)*13;
@@ -7774,15 +7785,18 @@ s+=`<line x1="908" y1="${ry}" x2="938" y2="${ry}" stroke="var(--o)" stroke-width
 s+=`<line x1="835" y1="153" x2="945" y2="153" stroke="var(--g)" stroke-width=".6" stroke-dasharray="2 2" opacity=".4"/>`;
 s+=tx(890,158,'LEAK ROPE — authored','var(--g)',3,'middle');
 // TCS parameters — expanded
-s+=`<rect x="835" y="160" width="105" height="65" rx="2" fill="var(--bg3)" stroke="var(--bd)" stroke-width=".4"/>`;
+/* v3.9.9 — this panel was 65 units tall and ended at y=225, which put it directly on top of the
+   TCS return line at RY=205 and its two captions. The panel is annotation; the line is topology,
+   so the panel gives way. Four of the eight rows were specification rather than topology and have
+   moved to the "TCS Loop — rack side" card, per the rule this page already follows for the rack
+   drawing: spec tables live in the HTML cards below the drawing, not in the SVG. */
+s+=`<rect x="835" y="160" width="105" height="32" rx="2" fill="var(--bg3)" stroke="var(--bd)" stroke-width=".4"/>`;
 const tcsP=[
 ['ΔT Rack',d1(tcsDT)+' K','var(--c)','rackDT',bo('tcsReturn',{also:['tcsSupply']})],['Flow/rack',i0(gv('tcsFlowRackLpm'))+' LPM','var(--c)','',bo('tcsFlowRackLpm')],
-['Rack IT',i0(gv('kwPerRack'))+' kW','var(--g)','',bo('kwPerRack')],['Total flow',i0(tcsLpmHall)+' LPM','var(--c)','tcsTotFlow',bo('tcsFlowTotal')],
-['Racks',i0(racksHall)+'/'+i0(racksHall),'var(--g)','tcsRacks',bo('racksPerHall')],['Shown','6 branches','var(--t2)','tcsLeak',null],
-['QD Type','SS316L BM','var(--t2)','',null],['Scope','per hall','var(--t3)','',null]
+['Total flow',i0(tcsLpmHall)+' LPM','var(--c)','tcsTotFlow',bo('tcsFlowTotal')],['Racks',i0(racksHall)+'/'+i0(racksHall),'var(--g)','tcsRacks',bo('racksPerHall')]
 ];
 tcsP.forEach((p,i)=>{
-const px=i%2===0?840:895,py=172+Math.floor(i/2)*13;
+const px=i%2===0?840:895,py=170+Math.floor(i/2)*12;
 s+=tx2(px,py,p[0],'var(--t3)',3.2);
 s+=lv(p[3],px+48,py,p[1],p[2],4,'end',p[4]);
 });
@@ -8319,6 +8333,8 @@ mc('var(--t2)','Physical Rack','Mechanical Specs',[['Standard','48U OCP Open Rac
 $('coolCards').innerHTML=[
 mc('var(--g)','Water Treatment','Chemical & Filtration',[['FWS','Closed-loop: inhibitor + biocide'],['FWS glycol','30% PG (freeze protection)'],['TCS purity','DI <5\u00B5S/cm conductivity'],['TCS pH','7.0-9.0 range'],['Filtration','25\u00B5m inline per CDU'],['Side-stream','5\u00B5m bag filter FWS header'],['Monitoring','Inline cond + pH + ORP'],['Lab test','Monthly: pH, cond, bacteria, TSS'],['Blowdown','CT auto on conductivity SP'],['Make-up','RO + DI polisher for TCS']],{declared:'water-treatment and filtration specification (micron ratings, pH window, sampling) is page-authored, not an engine quantity'}),
 mc('var(--c)','Chiller Basis','Where the COP comes from',[['COP',(DHE&&DHE.chillerCOP!=null?DHE.chillerCOP:'\u2014')+' \u2014 DERIVED from the refrigerant lift, not a nameplate',{declared:'chiller COP is derived from the modelled refrigerant lift at the design day; it is not a manufacturer nameplate figure'}],['Lift',(DHE&&DHE.chwSupplyC!=null?DHE.chwSupplyC:'\u2014')+' \u00B0C CHW \u2192 '+(DHE&&DHE.cdwReturnC!=null?DHE.cdwReturnC:'\u2014')+' \u00B0C CDW',bo('chwSupplyC',{also:['cdwReturnC']})],['At the design day','the liquid path bypasses this plant \u2014 it carries the residual air load',{declared:'DLC heat leaves through the TCS/CDU path; the chiller plant carries the residual air load'}]]),
+mc('var(--o)','CDU Unit Data','Per-unit specification, moved off the drawing so the return line is readable',[['Per CDU',(DHE&&DHE.cduDutyPerUnit!=null?DHE.cduDutyPerUnit:'\u2014')+' kW thermal duty',bo('cduDutyPerUnit')],['Flow per CDU',(DHE&&DHE.cduFlowPerUnitLpm!=null?DHE.cduFlowPerUnitLpm:'\u2014')+' LPM',bo('cduFlowPerUnitLpm')],['Active',(DHE&&DHE.cduRunning!=null?DHE.cduRunning:'\u2014')+' duty of '+(DHE&&DHE.cduInstalled!=null?DHE.cduInstalled:'\u2014')+' installed per hall',bo('cduRunning',{also:['cduInstalled']})],['Approach',(DHE&&DHE.cduApproachK!=null?DHE.cduApproachK:'\u2014')+' K \u2014 the PUBLISHED CoolIT CHx1000 approach, printed as authored',{declared:'CDU approach is the published CoolIT CHx1000 approach (model leaf thermal.cduApproachK), printed as authored'}]]),
+mc('var(--pk)','TCS Loop \u2014 rack side','What the rack-side panel used to print inside the drawing',[['Rack IT',(DH&&DH.kwPerRack!=null?DH.kwPerRack:'\u2014')+' kW per rack',bo('kwPerRack')],['Branches shown','6 of the hall\u2019s racks are drawn \u2014 the drawing samples the run, it does not enumerate it',{declared:'the TCS detail draws six representative rack branches; the rack count is carried by the Racks row in the drawing'}],['QD type','SS316L blind-mate quick disconnect',{declared:'stainless blind-mate quick disconnect is the authored rack-side coupling for this design'}],['Scope','per hall \u2014 every figure on this card is one hall, not the campus',{declared:'the TCS rack-side figures are scoped to a single hall'}]]),
 mc('var(--o)','Performance Targets','Design & Operating KPIs',[['Total cooling',(DH?(DH.itHallFmt+' kW (DLC + air)'):'—'),bo('itHallFmt')],['DLC capacity',(DH?(DH.liquidHeatFmt+' kW ('+DH.liquidCapturePct+'%)'):'—'),bo('liquidHeatFmt',{also:['liquidCapturePct']})],['Air capacity',(DH?(DH.airHeatFmt+' kW'):'—'),bo('airHeatFmt')],['PUE cooling',(DH?((DH.pb_cooling/DH.itHall).toFixed(3)+' of PUE (hall cooling kWe / IT kWe)'):'—'),{declared:'cooling share of PUE = hall cooling kWe / hall IT kWe, an identity over marked parameters (design.electrical.cooling_hall_kwe, power.total_it_hall_kwe)'}],['Approach \u0394T','3\u00B0C CDU (HTW\u2192TCS)'],['Dry-cooler approach',(DHE?DHE.dryCoolerApproachK+' K to ambient DB':'—'),{declared:'dry-cooler approach is the PUBLISHED unit approach (model leaf thermal.dryCoolerApproachK), printed as authored'}],['Pump energy',(DH?(DH.pb_pumps.toLocaleString()+' kW per hall (all pumps)'):'—'),bo('pb_pumps')],['Fan energy',(DH?(DH.pb_fans.toLocaleString()+' kW per hall (dry coolers + CRAH)'):'—'),bo('pb_fans')],['WUE',(DH?(DH.wue.toFixed(2)+' L/kWh (dry-only)'):'—'),bo('wue')],['Availability','99.999% (N+1 all paths)',{declared:'availability is a page-authored design target, not an engine quantity'}]])
 ].join('');
 
@@ -8636,8 +8652,8 @@ s+=tx(480,27,'two carriers, diverse entry, always-on scrubbing · the demand bel
 /* ---- the path ---- */
 s+='<g data-rz-authored-basis="'+WANB.replace(/"/g,'&quot;')+'">';
 const path=[
- ['CARRIER A','ISP-1 · 800G port · 400 Gb/s committed','var(--b)'],
- ['CARRIER B','ISP-2 · 800G port · 400 Gb/s committed','var(--b)'],
+ ['CARRIER A','ISP-1 · 800G · 400 committed','var(--b)'],
+ ['CARRIER B','ISP-2 · 800G · 400 committed','var(--b)'],
  ['DDoS SCRUB','always-on, carrier side','var(--p)'],
  ['BORDER RTR','RTR-A / RTR-B · BGP','var(--c)'],
  ['NGFW PAIR','stateful + IPS, active/standby','var(--p)'],
@@ -8658,7 +8674,7 @@ s+='</g>';
    live abnormal state — ANTI_VIBECODE §A and design.md severity discipline. */
 const tiles=[['MODELLED PEAK','576 Gb/s','training pipeline at diurnal peak','var(--t1)'],
  ['COMMITTED','800 Gb/s','2 carriers × 400 Gb/s committed each','var(--t1)'],
- ['INSTALLED','4.8 Tb/s','6 × 800G ports of capacity — design selection, not a commitment','var(--t1)'],
+ ['INSTALLED','4.8 Tb/s','6 × 800G ports — capacity, not a commitment','var(--t1)'],
  ['ONE CARRIER LOST','400 Gb/s','below the modelled peak — replication sheds first','var(--o)']];
 tiles.forEach((t,i)=>{const x=24+i*232;
  s+=`<g data-rz-equipment="net-wan:${i+1}" tabindex="0" role="button" data-tip="${t[0]} — ${t[2]}. Click for the full demand arithmetic.">`;

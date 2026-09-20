@@ -11,6 +11,40 @@ release sections rather than semver.
 
 ---
 
+## v3.9.9 — 2026-09-20
+
+### Two blocks pinned to the same corner, and two panels drawn on their own lines
+
+Three collisions on the cooling P&ID, and none of them was a crowded drawing. Each was a
+layout that had stopped being true and had nothing to say so.
+
+### Fixed
+
+- **The ISA-5.1 tag legend and the PUE badge were both pinned to the top-right corner** of a
+  960-wide viewBox and overlapped by 50 units — the legend spanning 866–950, the badge
+  900–955. Neither block measured the other. The four header blocks now lay out in sequence:
+  ASHRAE 640–720, free-cooling pill 726–804, legend 810–894, PUE badge 900–955.
+- **The CDU parameter panel was painted on top of the HTW return line.** 140 × 98 ending at
+  y=223, over a line at y=205 and its temperature badge. Four of its twelve rows — Per CDU,
+  Flow/CDU, Active, Approach — are per-unit specification rather than loop topology, so they
+  moved to a new **CDU Unit Data** card and the panel now ends at 190. The panel is
+  annotation; the line is topology, so the panel gives way.
+- **The TCS parameter panel had the same defect**, 105 × 65 ending at y=225 over the TCS
+  return line. Four rows moved to a new **TCS Loop — rack side** card; the panel ends at 192.
+- **The CDU header bar carried a title wider than itself.** The bar is 148 units;
+  `CDU ARRAY — 55 × CoolIT CHx1000` needs about 170, and the `54/55` count chip was already
+  anchored to its right edge. The title keeps the identity and the model name moved down to
+  the rating line, which had room. This is the panel header the v3.9.7 dot/title/count sweep
+  missed.
+
+Every `bo(...)` that left the drawing landed in a card row: the parameter registry holds at
+**R8 241/283 STRICT**, unchanged.
+
+Follows `standarization/DATAHALL_AI_STANDARD.md` — *"Spec tables live in the HTML cards below
+the drawing, not in the SVG."*
+
+---
+
 ## v3.9.8 — 2026-09-20
 
 ### Every public page shares as itself
