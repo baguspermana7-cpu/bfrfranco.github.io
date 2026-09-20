@@ -4247,7 +4247,7 @@ s+='</g>';
 s+=RZL?RZL.line({id:'elec-main-tx-a-to-mv',from:'MAIN-TX-A',to:'METER-A',medium:'power_mv',direction:'forward',state:'energized',capacity:dhaF(GOV.mvKv)+' kV / '+dhaG(GOV.mainTxSecondaryA)+' A',redundancy:'redundant_a',geometry:{x1:188,y1:80,x2:200,y2:80},style:{stroke:'var(--b)',strokeWidth:2,opacity:'.7'}}):'<line x1="188" y1="80" x2="200" y2="80" stroke="var(--b)" stroke-width="2" opacity=".7"/>';
 s+=symMeter(215,80,'var(--b)','kW');
 s+=RZL?RZL.line({id:'elec-meter-a-to-vcb-inc-a',from:'METER-A',to:'VCB-INC-A',medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV / 630 A',redundancy:'redundant_a',geometry:{x1:225,y1:80,x2:265,y2:80},style:{stroke:'var(--b)',strokeWidth:2,opacity:'.6'}}):'<line x1="225" y1="80" x2="265" y2="80" stroke="var(--b)" stroke-width="2" opacity=".6"/>';
-s+=cbl(285,80,'VCB-INC-A',['630A/25kA','ANSI 50/51/67N','CT 600/5 / PT 24kV/110V','AF 8.4 cal/cm² PPE2'],'var(--b)');
+s+=cbl(285,80,'VCB-INC-A',['630A/25kA','ANSI 50/51/67N'],'var(--b)');
 s+=RZB?RZB.render({id:'VCB-INC-A',state:'closed',x:285,y:80,color:'var(--b)',upstream:'PLN-A',downstream:'SM6-BUS-A',voltage:'20 kV',rating_a:'630 A',rating_ka:'25',deviceFunctions:['50','51','67N'],afCategory:'PPE2',ctRatio:'600/5',interlock:'permissive_ok',redundancy:'redundant_a'}):'';
 s+=RZL?RZL.line({id:'elec-vcb-inc-a-to-bus-a',from:'VCB-INC-A',to:'SM6-BUS-A',medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV bus drop',redundancy:'redundant_a',geometry:{x1:293,y1:80,x2:320,y2:80},style:{stroke:'var(--b)',strokeWidth:1.5,opacity:'.5'}}):'<line x1="293" y1="80" x2="320" y2="80" stroke="var(--b)" stroke-width="1.5" opacity=".5"/>';
 s+=RZL?RZL.line({id:'elec-bus-a-drop-vert',from:'VCB-INC-A',to:'SM6-BUS-A',medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV bus drop',redundancy:'redundant_a',geometry:{x1:320,y1:80,x2:320,y2:120},style:{stroke:'var(--b)',strokeWidth:1.5,opacity:'.5'}}):'<line x1="320" y1="80" x2="320" y2="120" stroke="var(--b)" stroke-width="1.5" opacity=".5"/>';
@@ -4262,7 +4262,7 @@ s+='</g>';
 s+=RZL?RZL.line({id:'elec-main-tx-b-to-mv',from:'MAIN-TX-B',to:'METER-B',medium:'power_mv',direction:'forward',state:'energized',capacity:dhaF(GOV.mvKv)+' kV / '+dhaG(GOV.mainTxSecondaryA)+' A',redundancy:'redundant_b',geometry:{x1:810,y1:80,x2:822,y2:80},style:{stroke:'var(--g)',strokeWidth:2,opacity:'.7'}}):'<line x1="810" y1="80" x2="822" y2="80" stroke="var(--g)" stroke-width="2" opacity=".7"/>';
 s+=symMeter(795,80,'var(--g)','kW');
 s+=RZL?RZL.line({id:'elec-meter-b-to-vcb-inc-b',from:'METER-B',to:'VCB-INC-B',medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV / 630 A',redundancy:'redundant_b',geometry:{x1:740,y1:80,x2:785,y2:80},style:{stroke:'var(--g)',strokeWidth:2,opacity:'.6'}}):'<line x1="740" y1="80" x2="785" y2="80" stroke="var(--g)" stroke-width="2" opacity=".6"/>';
-s+=cbl(720,80,'VCB-INC-B',['630A/25kA','ANSI 50/51/67N','CT 600/5 / PT 24kV/110V','AF 8.4 cal/cm² PPE2'],'var(--g)');
+s+=cbl(720,80,'VCB-INC-B',['630A/25kA','ANSI 50/51/67N'],'var(--g)');
 s+=RZB?RZB.render({id:'VCB-INC-B',state:'closed',x:720,y:80,color:'var(--g)',upstream:'PLN-B',downstream:'SM6-BUS-B',voltage:'20 kV',rating_a:'630 A',rating_ka:'25',deviceFunctions:['50','51','67N'],afCategory:'PPE2',ctRatio:'600/5',interlock:'permissive_ok',redundancy:'redundant_b'}):'';
 s+=RZL?RZL.line({id:'elec-vcb-inc-b-to-bus-b',from:'VCB-INC-B',to:'SM6-BUS-B',medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV bus drop',redundancy:'redundant_b',geometry:{x1:690,y1:80,x2:712,y2:80},style:{stroke:'var(--g)',strokeWidth:1.5,opacity:'.5'}}):'<line x1="690" y1="80" x2="712" y2="80" stroke="var(--g)" stroke-width="1.5" opacity=".5"/>';
 s+=RZL?RZL.line({id:'elec-bus-b-drop-vert',from:'VCB-INC-B',to:'SM6-BUS-B',medium:'power_mv',direction:'forward',state:'energized',capacity:'20 kV bus drop',redundancy:'redundant_b',geometry:{x1:690,y1:80,x2:690,y2:120},style:{stroke:'var(--g)',strokeWidth:1.5,opacity:'.5'}}):'<line x1="690" y1="80" x2="690" y2="120" stroke="var(--g)" stroke-width="1.5" opacity=".5"/>';
@@ -4415,7 +4415,10 @@ var ncI=[
 ['Authority: DCAI_CALC.snapshot (design day)',null]
 ];
 for(var ni=0;ni<ncI.length;ni++){
-s+=tx(65+(ni%4)*108,755+Math.floor(ni/4)*18,ncI[ni][0],'var(--t2)',5,0,0,ncI[ni][1]);
+/* v3.9.1 — two columns of two, not four of one. At 108 px per column the longer strings
+   ("UPS/distribution loss: N kW/hall (upstream)") ran straight into their neighbour; the box is
+   440 wide and 140 tall, so the width was never there and the height always was. */
+s+=tx(65+(ni%2)*225,755+Math.floor(ni/2)*18,ncI[ni][0],'var(--t2)',5,0,0,ncI[ni][1]);
 }
 
 // DB-COOL
@@ -4535,7 +4538,7 @@ var ep=$('ep-dh0'+n);if(ep)ep.classList.add('on');
 
 // Overview cards
 $('elecOvCards').innerHTML=[
-mc('var(--o)','MV Customer Substation','20 kV dual feed',[['Central','MV switchboard, two bus sections + tie'],['Incomers','VCB-INC-A/B (PLN A + B)'],['Bus Tie','VCB-TIE N.O. motorized'],['Feeders',dhaF(GOV.halls!=null?GOV.halls*2:null)+'\u00D7 VCB ('+dhaF(GOV.halls)+' from bus A + '+dhaF(GOV.halls)+' from bus B)'],['Per-DH RMU','3-panel (A VCB + tie + B VCB)'],['Protection','IDMT OC 50/51, E/F 50N/51N, U/V 27'],['Standard','IEC 62271 / SNI 0225']],{declared:'MV substation configuration and protection functions are page-authored design choices (IEC 62271 gear); not engine quantities'}),
+mc('var(--o)','MV Customer Substation','20 kV dual feed',[['Instrument transformers','CT 600/5 \u00B7 PT 24 kV/110 V at each incomer',{declared:'instrument-transformer ratios are adopted for the drawing, not an engine quantity'}],['Arc flash','8.4 cal/cm\u00B2 incident energy at the 20 kV incomers \u2014 PPE category 2',{declared:'arc-flash incident energy and PPE category are adopted for the drawing (IEC 62271 MV frame sizes), not an engine quantity and not a site study'}],['Central','MV switchboard, two bus sections + tie'],['Incomers','VCB-INC-A/B (PLN A + B)'],['Bus Tie','VCB-TIE N.O. motorized'],['Feeders',dhaF(GOV.halls!=null?GOV.halls*2:null)+'\u00D7 VCB ('+dhaF(GOV.halls)+' from bus A + '+dhaF(GOV.halls)+' from bus B)'],['Per-DH RMU','3-panel (A VCB + tie + B VCB)'],['Protection','IDMT OC 50/51, E/F 50N/51N, U/V 27'],['Standard','IEC 62271 / SNI 0225']],{declared:'MV substation configuration and protection functions are page-authored design choices (IEC 62271 gear); not engine quantities'}),
 mc('var(--o)','Transformers',dhaF(GOV.tx)+'\u00D7 cast-resin '+dhaF(GOV.txMVA)+' MVA per feed per hall',[['Rating',dhaF(GOV.txMVA)+' MVA per unit',bo('txRatingMVA')],['Count',dhaF(GOV.tx)+' per feed \u00D7 2 feeds \u00D7 '+dhaF(GOV.halls)+' halls',bo('txPerFeedHall')],['Type','Cast-resin dry Dyn11 20/0.4kV'],['Impedance','Zk=6%'],['Loading',dhaF(GOV.txPct,1)+'% at '+dhaG(GOV.itHall)+' kW/hall',bo('txLoadPct',{also:['itHall']})],['Tap','\u00B12.5%\u00D72 OCTC',{declared:'tap-changer range is a page-authored transformer specification, not an engine quantity'}],['Basis','DCAI_CALC.snapshot.equipment']],bo('txPerFeedHall',{also:['txRatingMVA']})),
 mc('var(--b)','Generator Pool',dhaF(GOV.genInst)+'\u00D7 '+dhaF(GOV.genMW)+' MW '+(GOV.genRed||'\u2014')+' \u2014 facility pool',[['Units',dhaF(GOV.genInst)+'\u00D7 '+dhaF(GOV.genMW!=null?GOV.genMW*1000:null)+' kW ('+dhaF(GOV.genN)+' duty + '+dhaF(GOV.genStby)+' standby)',bo('gensetFacNplus1',{also:['gensetKW','gensetFacN','gensetStandby']})],['Sharing','ONE facility-shared pool \u2014 not split per hall'],['Class','MV diesel generating set'],['ATS','CB-Normal + CB-Emergency at MSB'],['Control','Auto-paralleling switchgear'],['Start','Auto <10s on utility fail'],['Capacity',dhaF(GOV.genN!=null&&GOV.genMW!=null?GOV.genN*GOV.genMW:null,0)+' MW duty for '+dhaF(GOV.facMW,2)+' MW facility',{declared:'duty capacity = duty count x unit rating (equipment.gensets_duty x generator_unit_kw), an identity over marked parameters; the facility MW is design.electrical.facility_kwe'}],['Drawn','8 banks of \u2248'+dhaF(GOV.genInst!=null?Math.ceil(GOV.genInst/8):null)+' \u2014 glyphs are banks, not machines',bo('gensetFacNplus1')]],bo('gensetFacNplus1',{also:['gensetMW']})),
 mc('var(--g)','UPS System',dhaF(GOV.upsFrames)+'\u00D7 '+dhaF(GOV.upsMW)+' MW frames per feed per hall',[['Rating',dhaG(GOV.upsMW!=null?GOV.upsMW*1000:null)+' kW per frame',bo('upsRatingKW')],['Count',dhaF(GOV.upsFrames)+' per feed \u00D7 2 feeds ('+(GOV.upsTop||'\u2014')+') per hall',bo('upsFramesPerFeedHall')],['Type','Double-conversion VFI'],['Loading',dhaF(GOV.upsPct,1)+'% at '+dhaG(GOV.itHall)+' kW/hall',bo('upsLoadPct',{also:['itHall']})],['Battery',dhaG(GOV.batteryPerHall)+' kWh per hall',bo('batteryPerHall')],['STS','NOT REQUIRED (dual-corded racks)'],['Standard','IEC 62040-3']],bo('upsFramesPerFeedHall',{also:['upsRatingMW']})),
@@ -4626,7 +4629,11 @@ function semanticStandbyLine(id,edgeId,x1,y1,x2,y2){return'<line x1="'+x1+'" y1=
 // CB with label BESIDE it — side='R' (right) or 'L' (left)
 function cblSide(x,y,id,sp,c,side){
 var o='<g data-tip="'+id+': '+sp.join(', ')+'" data-rz-authored-basis="protective-device and switchgear ratings adopted for the drawing (IEC 62271 MV, IEC 61439 LV frame sizes) — page-authored design choices, not engine quantities">'+symCB(x,y,c||'var(--o)',true);
-var lx=side==='L'?x-14:x+14,an=side==='L'?'end':'start';
+/* v3.9.1 — 26 out from the pole, not 14. Every one of this drawing's device-to-bus collisions
+   overlapped by 27 px HORIZONTALLY and only 2 to 16 px vertically: a side label reached into the
+   span of the bus bar's centred title. Vertical nudges just move which pair collides — measured
+   twice, both reverted — because the horizontal reach is the shared cause. */
+var lx=side==='L'?x-26:x+26,an=side==='L'?'end':'start';
 o+=tx(lx,y-4,id,c||'var(--o)',5,an,1);
 for(var i=0;i<sp.length;i++)o+=tx(lx,y+6+i*9,sp[i],'var(--t3)',4.5,an);
 o+='</g>';return o}
@@ -4845,7 +4852,9 @@ s+=fLine(AX,L2+85,AX,L2+98,CA,'fD',.5,1.5);
 
 // GenSet incomer A — GRAY standby (beside ACB-nA, as MSB incomer)
 var GXA=180;
-s+=symGen(GXA-60,L2+75,DEAD);
+/* v3.9.1 — 95 clear of the breaker, not 60: cbOpenSide hangs its 'V genset incomer' line
+   leftward from GXA-14, and at -60 the machine symbol sat on that line. */
+s+=symGen(GXA-95,L2+75,DEAD);
 s+=tx(GXA-60,L2+62,'GenSet',DEAD,4.5,'middle');
 s+=semanticStandbyLine('dh'+n+'-genset-a-source','EDGE-GENSET-GEN-BUS',GXA-48,L2+75,GXA-8,L2+75);
 s+=cbOpenSide(GXA,L2+75,'ACB-GEN-'+n+'A',[dhaF(X.V)+'V genset incomer','facility pool'],DEAD,'L');
@@ -4867,7 +4876,7 @@ s+=fLine(BX,L2+85,BX,L2+98,CG,'fD',.5,1.5);
 
 // GenSet incomer B — GRAY standby (beside ACB-nB, as MSB incomer)
 var GXB=820;
-s+=symGen(GXB+60,L2+75,DEAD);
+s+=symGen(GXB+95,L2+75,DEAD);
 s+=tx(GXB+60,L2+62,'GenSet',DEAD,4.5,'middle');
 s+=semanticStandbyLine('dh'+n+'-genset-b-source','EDGE-GENSET-GEN-BUS',GXB+8,L2+75,GXB+48,L2+75);
 s+=cbOpenSide(GXB,L2+75,'ACB-GEN-'+n+'B',[dhaF(X.V)+'V genset incomer','facility pool'],DEAD,'R');

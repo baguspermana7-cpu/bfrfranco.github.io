@@ -11,6 +11,47 @@ release sections rather than semver.
 
 ---
 
+## v3.9.2 — 2026-09-20
+
+### The overlap was horizontal
+
+The four hall SLDs carried 8 label collisions each — 240 of the page's geometry findings, one shape
+repeated four times. They are now **0**, and so is the electrical overview. The page's monitor falls
+**723 → 427** (collisions 674 → 410, clipped 49 → 17).
+
+What made this quick was reading the overlap geometry instead of guessing at it. Every one of the
+six device-to-bus collisions overlapped by **27 px horizontally and only 2–16 px vertically**: a
+`cblSide()` device label hung 14 px out from its pole and reached into the span of the bus bar's
+centred title. Two vertical nudges were tried first and both **traded** which pair collided rather
+than removing any — lowering the rating stack (8 → 8, different names), then raising the bus titles
+(8 → 8, larger overlaps). Both were reverted. Moving the side labels to 26 px out cleared all six at
+once.
+
+### Fixed
+
+- **`cblSide()` hangs its labels 26 px from the pole, not 14.** The horizontal reach was the shared
+  cause; the vertical position never was.
+- **The genset machine symbol sits 95 px from its breaker, not 60.** `cbOpenSide()` hangs
+  `"400 V genset incomer"` leftward from the breaker, and at 60 the `G` circle sat on that line —
+  the same defect class as v3.7.1's `symFloorGEN`, where a symbol and its own tag named the same
+  point.
+- **The auxiliary summary is two columns of two, not four of one.** Four strings shared a 440 px box
+  at 108 px per column, so the longer ones ran into their neighbour. The width was never there; the
+  height always was.
+
+### Changed
+
+- **Two ratings that would not fit moved to the MV card rather than being deleted** —
+  `CT 600/5 · PT 24 kV/110 V` and the 8.4 cal/cm² arc-flash figure, each with a declared basis,
+  because the card did not previously carry either. Registry R8 reads **241/283 before and after**.
+
+### Still open
+
+The isometric holds 240 of the remaining 410 collisions (30 per view, unchanged from v3.8.1 and
+documented there as needing a re-layout), the cooling P&ID 126, and the WAN view 16.
+
+---
+
 ## v3.9.1 — 2026-09-20
 
 ### The space under the portrait is a card, not a hole
