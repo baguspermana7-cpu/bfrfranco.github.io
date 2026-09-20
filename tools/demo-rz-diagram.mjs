@@ -58,11 +58,21 @@ const E = {
  * that is not.
  * --------------------------------------------------------------------- */
 const TYPE = {
-  load:     { stroke: 'alarm-normal', fill: 'paper',   tier: 2, legend: 'IT load' },
-  focal:    { stroke: 'accent',       fill: 'paper-2', tier: 1, legend: 'Heat exchanger — the transfer this drawing is about' },
-  plant:    { stroke: 'link',         fill: 'paper',   tier: 2, legend: 'Plant' },
-  reject:   { stroke: 'muted',        fill: 'paper',   tier: 2, legend: 'Heat rejection — outside the hall' },
-  air:      { stroke: 'soft',         fill: 'paper',   tier: 3, dashed: true, legend: 'Air side — the fraction the liquid path does not carry' }
+  /* Three treatments, not five — and the engine's colour-only check is what
+   * forced the reduction. The first cut gave the racks green, the plant cyan
+   * and rejection grey, which read as three classes but differed by HUE ALONE:
+   * identical fill, identical solid outline. Worse, it misused the palette.
+   * Green and cyan are ISA-18.2 alarm channels on this site, and the brand
+   * profile says so in as many words — a node is amber because it is in
+   * caution, never because it is the third item in a list.
+   *
+   * What those hues were encoding, the drawing already says without them: the
+   * zone boundary says which equipment is outdoors, and the node's own name
+   * says whether it is a plant. So the classes collapse to what actually
+   * differs, and each one differs by more than colour. */
+  equipment: { stroke: 'rule-solid', fill: 'paper',   tier: 2, legend: 'Equipment' },
+  focal:     { stroke: 'accent',     fill: 'paper-2', tier: 1, legend: 'CDU — the transfer' },
+  air:       { stroke: 'soft',       fill: 'paper',   tier: 3, dashed: true, legend: 'Air handling (CRAH)' }
 };
 
 const ctx = D.create({
@@ -98,12 +108,13 @@ function link(type, o) {
   used.add(type);
   const t = TYPE[type];
   const box = ctx.node(x, ROW, Object.assign({ h: NODE_H, tier: t.tier, dashed: t.dashed,
-                                               stroke: t.stroke, fill: t.fill }, o));
+                                               stroke: t.stroke, fill: t.fill,
+                                               legend: t.legend }, o));
   x = box.x + box.w + GAP;
   return box;
 }
 
-const racks = link('load', {
+const racks = link('equipment', {
   id: 'racks', tag: 'load', name: 'NVL72 RACKS',
   sublabel: E.racksPerHall + ' × ' + E.kwPerRack + ' kW'
 });
@@ -113,12 +124,12 @@ const cdu = link('focal', {
   sublabel: E.cduRunning + '/' + E.cduInstalled + ' duty · ' + E.cduModel
 });
 
-const plant = link('plant', {
+const plant = link('equipment', {
   id: 'plant', tag: 'plant', name: 'CHILLER PLANT',
   sublabel: 'FWS pumps · residual air load'
 });
 
-const dry = link('reject', {
+const dry = link('equipment', {
   id: 'dry', tag: 'reject', name: 'DRY COOLERS',
   sublabel: 'ambient rejection'
 });
@@ -127,7 +138,8 @@ const dry = link('reject', {
 const crah = ctx.node(racks.x, ROW + 168, {
   id: 'crah', tag: 'air', name: 'CRAH BANKS',
   sublabel: (100 - E.liquidCapturePct) + ' % of hall IT',
-  w: racks.w, stroke: TYPE.air.stroke, fill: TYPE.air.fill, tier: TYPE.air.tier, dashed: true
+  w: racks.w, stroke: TYPE.air.stroke, fill: TYPE.air.fill, tier: TYPE.air.tier, dashed: true,
+  legend: TYPE.air.legend
 });
 used.add('air');
 
@@ -148,12 +160,18 @@ function pipes(a, b, hotLabel, coldLabel) {
   const bl = L.fanPoints(b, 2, 'left');
   /* hot: out of the load, toward rejection */
   ctx.edge({ x: ar[0].x, y: ar[0].y }, { x: bl[0].x, y: bl[0].y }, {
-    fromId: a.id, toId: b.id, stroke: 'alarm-caution', tier: 2, label: hotLabel
+    fromId: a.id, toId: b.id, stroke: 'alarm-caution', tier: 2, label: hotLabel,
+    pattern: 'solid', legend: 'Hot stream, out'
   });
   /* cold: returning. Drawn right-to-left so the arrowhead points the way the
    * water actually goes; a return pipe with a forward arrow is just wrong. */
+  /* Colour is NOT the only thing separating supply from return: the cold line
+   * carries a dash-dot pattern too. Hue alone disappears in greyscale print, in
+   * this site's PDF export, and for a reader with colour-vision deficiency —
+   * WCAG 1.4.1. The engine's legend() refuses to draw a hue-only distinction. */
   ctx.edge({ x: bl[1].x, y: bl[1].y }, { x: ar[1].x, y: ar[1].y }, {
-    fromId: b.id, toId: a.id, stroke: 'link', tier: 2, label: coldLabel
+    fromId: b.id, toId: a.id, stroke: 'link', tier: 2, label: coldLabel,
+    pattern: 'dash-dot', legend: 'Cold stream, returning'
   });
 }
 
@@ -165,49 +183,19 @@ pipes(plant, dry, 'CDW ' + E.cdwReturn.toFixed(1) + '°C', 'CDW ' + E.cdwSupply.
  * this drawing is NOT about. */
 ctx.edge({ x: racks.x + racks.w / 2, y: racks.y + racks.h },
          { x: crah.x + crah.w / 2, y: crah.y }, {
-  fromId: 'racks', toId: 'crah', stroke: 'soft', tier: 3, dashed: true,
-  label: 'air ' + (100 - E.liquidCapturePct) + '%'
+  fromId: 'racks', toId: 'crah', stroke: 'soft', tier: 3, pattern: 'dotted',
+  label: 'air ' + (100 - E.liquidCapturePct) + '%', legend: 'Air heat path, 15 %'
 });
 
 /* ---- legend -------------------------------------------------------------
- * A horizontal strip at the foot, after every node, never floating inside the
- * drawing. It names each treatment actually used and each stroke, and nothing
- * else — a legend with an entry the drawing does not contain is noise.
+ * Derived, not typed. ctx.legend() reads back what was actually drawn, so the
+ * strip cannot list a treatment the drawing does not use or omit one it does —
+ * and it refuses a distinction carried by colour alone.
  * --------------------------------------------------------------------- */
-const LEG_Y = crah.y + crah.h + 76;
-ctx.legend = true;
-const legendItems = [
-  { kind: 'swatch', stroke: 'accent', text: 'CDU — the transfer' },
-  { kind: 'swatch', stroke: 'alarm-normal', text: 'IT load' },
-  { kind: 'swatch', stroke: 'link', text: 'Plant' },
-  { kind: 'swatch', stroke: 'muted', text: 'Rejection (outdoors)' },
-  { kind: 'line', stroke: 'alarm-caution', text: 'Hot stream, out' },
-  { kind: 'line', stroke: 'link', text: 'Cold stream, returning' },
-  { kind: 'dash', stroke: 'soft', text: 'Air side, 15 %' }
-];
-
-const svgParts = [];
-svgParts.push(`<line x1="32" y1="${LEG_Y - 22}" x2="${1200 - 32}" y2="${LEG_Y - 22}" stroke="${D.token('rule')}" stroke-width="0.8"/>`);
-ctx.text('LEGEND', 32, LEG_Y - 6, { role: 'eyebrow', fill: 'soft' });
-
-let lx = 32;
-for (const item of legendItems) {
-  const label = item.text;
-  const w = M.textWidth(label, 9, 'sans') + 34;
-  if (item.kind === 'swatch') {
-    svgParts.push(`<rect x="${lx}" y="${LEG_Y + 8}" width="14" height="10" rx="2" fill="none" stroke="${D.token(item.stroke)}" stroke-width="1.4"/>`);
-  } else {
-    svgParts.push(`<line x1="${lx}" y1="${LEG_Y + 13}" x2="${lx + 16}" y2="${LEG_Y + 13}" stroke="${D.token(item.stroke)}" stroke-width="1.4"${item.kind === 'dash' ? ' stroke-dasharray="4,3"' : ''}/>`);
-  }
-  ctx.text(label, lx + 22, LEG_Y + 17, { role: 'sublabel', size: 9, fill: 'muted' });
-  lx += w + 22;
-}
+ctx.legend();
 
 ctx.fit(32);
-let svg = ctx.render();
-/* the legend rules and swatches are chrome, not measured content: inject them
- * just before the closing tag so they sit above the zone fill and below nothing */
-svg = svg.replace('</svg>', svgParts.join('') + '</svg>');
+const svg = ctx.render();
 
 /* ---- self-audit ---------------------------------------------------------
  * The engine measured every box it drew, so it can answer without a browser

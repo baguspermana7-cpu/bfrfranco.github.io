@@ -703,6 +703,78 @@ const D = sandbox.RZDiagram;
 }
 
 /* ==========================================================================
+ * UX LAWS — the checks that make a drawing readable, not just non-overlapping
+ * ======================================================================== */
+
+/* A diagram can have zero collisions and still fail its reader. These encode
+ * three rules the engine now enforces rather than hopes for. */
+{
+  /* U1: WCAG 1.4.1, Use of Color. Two classes may not differ by hue alone —
+   *     hue is lost in greyscale print, in this site's PDF export, and for a
+   *     reader with colour-vision deficiency. The engine caught three real
+   *     violations in its own demo the first time this ran. */
+  {
+    const c = D.create({ slug: 'u1', title: 'T', desc: 'D' });
+    c.edge({ x: 0, y: 0 }, { x: 100, y: 0 }, { stroke: 'accent', pattern: 'solid', legend: 'Hot' });
+    c.edge({ x: 0, y: 40 }, { x: 100, y: 40 }, { stroke: 'link', pattern: 'solid', legend: 'Cold' });
+    c.legend();
+    ok('U1a', c.warnings.some(w => w.kind === 'colour-only'),
+      'two edges differing only in hue must warn');
+  }
+  {
+    const c = D.create({ slug: 'u1b', title: 'T', desc: 'D' });
+    c.edge({ x: 0, y: 0 }, { x: 100, y: 0 }, { stroke: 'accent', pattern: 'solid', legend: 'Hot' });
+    c.edge({ x: 0, y: 40 }, { x: 100, y: 40 }, { stroke: 'link', pattern: 'dash-dot', legend: 'Cold' });
+    c.legend();
+    ok('U1b', !c.warnings.some(w => w.kind === 'colour-only'),
+      'a second channel (pattern) clears the warning');
+  }
+
+  /* U2: Miller's ~7±2, which the skill fixes at nine nodes. Past that the
+   *     reader stops seeing a structure and starts reading a list. */
+  {
+    const c = D.create({ slug: 'u2', title: 'T', desc: 'D' });
+    for (let i = 0; i < 9; i++) c.node(i * 4, 0, { name: 'N' + i });
+    ok('U2a', !c.warnings.some(w => w.kind === 'over-budget'), 'nine nodes is within budget');
+    c.node(99, 0, { name: 'N9' });
+    const over = c.warnings.filter(w => w.kind === 'over-budget');
+    ok('U2b', over.length === 1, `the tenth node warns, once: got ${over.length}`);
+  }
+
+  /* U3: one label, one meaning. The demo shipped the same legend text on a node
+   *     swatch and on a line, which reads as one entry drawn twice. */
+  {
+    const c = D.create({ slug: 'u3', title: 'T', desc: 'D' });
+    c.node(0, 0, { name: 'A', legend: 'Air side' });
+    c.edge({ x: 0, y: 80 }, { x: 100, y: 80 }, { stroke: 'soft', pattern: 'dotted', legend: 'Air side' });
+    c.legend();
+    ok('U3', c.warnings.some(w => w.kind === 'legend-duplicate'),
+      'the same label on two channels must warn');
+  }
+
+  /* U4: the legend is DERIVED. It cannot list a treatment the drawing does not
+   *     use, because the drawing wrote it. */
+  {
+    const c = D.create({ slug: 'u4', title: 'T', desc: 'D' });
+    c.node(0, 0, { name: 'A', legend: 'Equipment' });
+    c.node(0, 100, { name: 'B' });                    /* no legend: not classified */
+    c.legend();
+    const svg = c.render();
+    ok('U4a', svg.includes('Equipment'), 'a declared class appears in the legend');
+    ok('U4b', (svg.match(/LEGEND/g) || []).length === 1, 'exactly one legend strip');
+  }
+
+  /* U5: an empty legend draws nothing rather than an empty strip with a rule
+   *     and a heading over blank space. */
+  {
+    const c = D.create({ slug: 'u5', title: 'T', desc: 'D' });
+    c.node(0, 0, { name: 'A' });
+    c.legend();
+    ok('U5', !c.render().includes('LEGEND'), 'nothing classified, no legend drawn');
+  }
+}
+
+/* ==========================================================================
  * TOKEN CONTRACT — a missing custom property fails silently, in one theme
  * ======================================================================== */
 

@@ -66,6 +66,26 @@
     return Object.prototype.hasOwnProperty.call(TOKENS, name) ? TOKENS[name] : name;
   }
 
+  /* ======================================================================
+   * Stroke patterns — the SECOND channel
+   * ====================================================================
+   * WCAG 1.4.1 (Use of Color): colour may never be the only visual means of
+   * conveying information. A diagram that separates supply from return by hue
+   * alone disappears for a reader with colour-vision deficiency, in greyscale
+   * print, and in this site's own PDF export.
+   *
+   * So every semantic class carries a pattern as well as a hue, and the engine
+   * refuses to let two classes differ by hue alone (see the redundancy check in
+   * legend()). These are named rather than raw dasharrays so the legend can say
+   * what they mean.
+   */
+  var PATTERN = {
+    solid: '',
+    dashed: '6,4',
+    dotted: '1.5,3',
+    'dash-dot': '8,3,1.5,3'
+  };
+
   /* Stroke tiers, from documentation/design.md. Three weights, never four —
    * on a dark ground with no shadows, stroke weight is what carries hierarchy. */
   var TIER = { 1: 1.4, 2: 1.0, 3: 0.6 };
@@ -118,6 +138,12 @@
     var layers = { zones: [], edges: [], nodes: [], labels: [] };
     var warnings = [];
     var seq = 0;
+    /* What was actually drawn, so the legend is DERIVED rather than typed. A
+     * legend that lists an entry the drawing does not contain is noise; one that
+     * omits a treatment the drawing uses is worse. Neither can happen if the
+     * drawing writes the legend. */
+    var drawn = { nodes: [], edges: [] };
+    var nodeCount = 0;
 
     function id(prefix) { return slug + '-' + prefix + (++seq); }
 
@@ -214,6 +240,23 @@
         }
 
         var box = { x: x, y: y, w: w, h: h };
+        /* Complexity budget. Miller's ~7±2 is why the skill caps a diagram at
+         * nine nodes: past that a reader stops seeing a structure and starts
+         * reading a list, and the answer is two diagrams, not a bigger one.
+         * Reported once, with the count, rather than on every node after. */
+        nodeCount++;
+        if (nodeCount === 10) {
+          warnings.push({
+            kind: 'over-budget',
+            message: 'this diagram now has 10 nodes; the budget is 9. Past that the reader ' +
+                     'stops seeing a structure and starts reading a list — split it into an ' +
+                     'overview and a detail rather than making this one bigger'
+          });
+        }
+        if (o.legend) {
+          drawn.nodes.push({ legend: o.legend, stroke: o.stroke || (o.focal ? 'accent' : 'rule-solid'),
+                             fill: o.fill || 'paper', dashed: !!o.dashed });
+        }
         occ.add(box, { id: o.id || id('node'), kind: 'node' });
         return box;
       },
@@ -264,7 +307,13 @@
 
         var r = L.route(from, to, { obstacles: obstacles, clearance: o.clearance });
         var stroke = tok(o.stroke || 'muted');
-        var dash = r.transit ? ' stroke-dasharray="4,3"' : (o.dashed ? ' stroke-dasharray="5,4"' : '');
+        /* `pattern` is the second channel. A transit stroke is always dashed —
+         * that is rule 5's signal and it outranks the caller's choice. */
+        var pat = r.transit ? 'dashed' : (o.pattern || (o.dashed ? 'dashed' : 'solid'));
+        var dash = PATTERN[pat] ? ' stroke-dasharray="' + PATTERN[pat] + '"' : '';
+        if (o.legend) {
+          drawn.edges.push({ legend: o.legend, stroke: o.stroke || 'muted', pattern: pat });
+        }
         layers.edges.push(
           '<path d="' + r.d + '" fill="none" stroke="' + stroke +
           '" stroke-width="' + TIER[o.tier || 2] + '"' + dash +
@@ -300,6 +349,113 @@
           }
         }
         return r;
+      },
+
+      /* ---- legend ------------------------------------------------------ */
+      /**
+       * Draw the legend from what was actually drawn.
+       *
+       * Three rules the skill states and this makes structural rather than
+       * hopeful:
+       *
+       *   - the legend covers every treatment used and nothing else. It cannot
+       *     drift, because the drawing wrote it.
+       *   - it is a horizontal strip at the foot, never floating inside the
+       *     diagram area where it would collide with nodes.
+       *   - no two entries may differ by COLOUR ALONE. That is WCAG 1.4.1, and
+       *     it is also just legibility: a reader with colour-vision deficiency,
+       *     a greyscale print and this site's PDF export all lose a hue-only
+       *     distinction. The engine reports it rather than drawing it.
+       *
+       * Call after the last node and edge; it places itself below everything.
+       */
+      legend: function (o) {
+        o = o || {};
+        var items = [];
+        var seen = {};
+        function push(kind, e) {
+          var key = kind + '|' + e.legend;
+          if (seen[key]) return;
+          seen[key] = 1;
+          items.push({ kind: kind, legend: e.legend, stroke: e.stroke,
+                       pattern: e.pattern, fill: e.fill, dashed: e.dashed });
+        }
+        drawn.nodes.forEach(function (n) { push('node', n); });
+        drawn.edges.forEach(function (e) { push('edge', e); });
+        if (!items.length) return ctx;
+
+        /* One label, one meaning. The demo shipped "Air side, 15 %" on both a
+         * node swatch and a line, which reads as one entry drawn twice rather
+         * than two different things — the box is the air handlers, the line is
+         * the heat path. Same text on two channels is a defect. */
+        var byText = {};
+        items.forEach(function (i) { (byText[i.legend] = byText[i.legend] || []).push(i.kind); });
+        Object.keys(byText).forEach(function (txt) {
+          if (byText[txt].length > 1) {
+            warnings.push({
+              kind: 'legend-duplicate',
+              message: '"' + txt + '" labels both a ' + byText[txt].join(' and a ') +
+                       ' — one label must mean one thing; name them separately'
+            });
+          }
+        });
+
+        /* redundancy check, per channel kind */
+        ['node', 'edge'].forEach(function (kind) {
+          var group = items.filter(function (i) { return i.kind === kind; });
+          for (var i = 0; i < group.length; i++) {
+            for (var j = i + 1; j < group.length; j++) {
+              var a = group[i], b = group[j];
+              var sameShape = kind === 'edge'
+                ? a.pattern === b.pattern
+                : (!!a.dashed === !!b.dashed && a.fill === b.fill);
+              if (sameShape && a.stroke !== b.stroke) {
+                warnings.push({
+                  kind: 'colour-only',
+                  message: '"' + a.legend + '" and "' + b.legend + '" differ only by colour — ' +
+                           'give one of them a different ' +
+                           (kind === 'edge' ? 'pattern' : 'fill or outline') +
+                           ' so the distinction survives greyscale and colour-vision deficiency'
+                });
+              }
+            }
+          }
+        });
+
+        /* geometry: a strip under everything drawn so far */
+        var maxY = 0, maxX = 0;
+        occ.items.forEach(function (it) {
+          if (it.box.y + it.box.h > maxY) maxY = it.box.y + it.box.h;
+          if (it.box.x + it.box.w > maxX) maxX = it.box.x + it.box.w;
+        });
+        var left = o.x == null ? 32 : o.x;
+        var top = M.grid4(maxY + (o.gap == null ? 48 : o.gap));
+        var right = Math.max(maxX, left + 200);
+
+        layers.labels.push('<line x1="' + left + '" y1="' + top + '" x2="' + right +
+          '" y2="' + top + '" stroke="' + tok('rule') + '" stroke-width="0.8"/>');
+        ctx.text('LEGEND', left, top + 16, { role: 'eyebrow', fill: 'soft' });
+
+        var lx = left;
+        var ly = top + 34;
+        items.forEach(function (it) {
+          var w = M.textWidth(it.legend, 9, 'sans') + 26;
+          /* wrap rather than run off the sheet — a legend that leaves the page
+           * is the same defect as a label that does */
+          if (lx > left && lx + w > right) { lx = left; ly += 20; }
+          if (it.kind === 'node') {
+            layers.labels.push('<rect x="' + lx + '" y="' + (ly - 8) + '" width="14" height="10" rx="2" fill="' +
+              (it.fill ? tok(it.fill) : 'none') + '" stroke="' + tok(it.stroke) +
+              '" stroke-width="1.4"' + (it.dashed ? ' stroke-dasharray="3,2"' : '') + '/>');
+          } else {
+            var d = PATTERN[it.pattern] ? ' stroke-dasharray="' + PATTERN[it.pattern] + '"' : '';
+            layers.labels.push('<line x1="' + lx + '" y1="' + (ly - 3) + '" x2="' + (lx + 16) +
+              '" y2="' + (ly - 3) + '" stroke="' + tok(it.stroke) + '" stroke-width="1.4"' + d + '/>');
+          }
+          ctx.text(it.legend, lx + 22, ly, { role: 'sublabel', size: 9, fill: 'muted' });
+          lx += w + 20;
+        });
+        return ctx;
       },
 
       /* ---- output ----------------------------------------------------- */
