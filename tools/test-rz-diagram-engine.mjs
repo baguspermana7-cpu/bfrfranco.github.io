@@ -483,6 +483,34 @@ const D = sandbox.RZDiagram;
   ok('Q4', p.placed === true && p.dx === 0, `axis y must never move sideways: dx=${p.dx}`);
 }
 
+/* Q5: `axis:"x"` restricts the ladder to horizontal and tries OUTWARD first. A
+ *     label parked beside a drawing has open canvas on the far side and the
+ *     drawing itself on the near one. */
+{
+  const occ = L.occupancy();
+  /* a narrow blocker clipping the label's left end — the case a floor caption
+     meets when an equipment tag reaches into its column */
+  occ.add({ x: 90, y: 100, w: 20, h: 12 }, { id: 'tag', kind: 'text' });
+  const p = L.placeBox({ x: 100, y: 100, w: 60, h: 12 }, { occupancy: occ, axis: 'x' });
+  ok('Q5a', p.placed === true && p.dy === 0, `axis x must never move vertically: dy=${p.dy}`);
+  ok('Q5b', p.dx > 0, `and must try outward first: dx=${p.dx}`);
+  ok('Q5c', M.overlap(p.box, { x: 90, y: 100, w: 20, h: 12 }) === null,
+    'and must actually clear the blocker');
+
+  /* The ladder has a REACH. Clearing a blocker as wide as the label itself needs
+   * dx >= its width, and the default eight rings of six units reach 48 — so a
+   * 60-wide obstruction is correctly reported unplaceable rather than quietly
+   * left overlapping. The caller widens step/rings when its labels are wide. */
+  const occ2 = L.occupancy();
+  occ2.add({ x: 100, y: 100, w: 60, h: 12 }, { id: 'wide', kind: 'text' });
+  const tight = L.placeBox({ x: 100, y: 100, w: 60, h: 12 }, { occupancy: occ2, axis: 'x' });
+  ok('Q5d', tight.placed === false, 'a blocker wider than the ladder reaches must report failure');
+  const roomy = L.placeBox({ x: 100, y: 100, w: 60, h: 12 },
+    { occupancy: occ2, axis: 'x', step: 12, rings: 8 });
+  ok('Q5e', roomy.placed === true && roomy.dx >= 60,
+    `and a wider ladder must find it: dx=${roomy.dx}`);
+}
+
 /* ==========================================================================
  * ISOMETRIC WIRING — the deferred-caption pass on datahallAI.html
  * ======================================================================== */
@@ -562,6 +590,41 @@ const D = sandbox.RZDiagram;
     const want = sb.isoLabelBox(sb.iX(0, 0), sb.iY(0, 0, 0), 'CHILLER PLANT', 9);
     ok('I2', out.includes('y="' + want.y + '"'),
       `an unobstructed caption must stay exactly where it was authored: expected y=${want.y}`);
+  }
+
+  /* I2b: the pass CLOSES. A label emitted after the resolve must draw immediately rather
+   *      than defer into a queue nobody drains — an unresolved token renders as a missing
+   *      label, not as an error. */
+  {
+    const sb = run(true);
+    sb.isoBeginPlacement();
+    const out = sb.isoResolvePlacement(sb.isoLabel(0, 0, 0, 'FIRST', '#fff', 8, 1));
+    const late = sb.isoLabel(5, 5, 5, 'LATE', '#fff', 8, 1);
+    ok('I2b1', late.indexOf('<!--ISOFLEX') === -1,
+      `a label emitted after the pass must not defer: ${late.slice(0, 40)}`);
+    ok('I2b2', late.includes('LATE'), 'and must carry its own text');
+    void out;
+  }
+
+  /* I2c: a caption boxed in on its preferred axis ESCALATES to the full ladder
+   *      rather than giving up and overlapping. Preferred keeps it in its own
+   *      column; a diagonal nudge still names its room, an overlap names
+   *      nothing. */
+  {
+    const sb = run(true);
+    sb.isoBeginPlacement();
+    const caption = sb.isoLabel(10, 10, 20, 'PUMP STATION', '#93c5fd', 7, 1);
+    /* wall off the whole vertical column the caption would climb */
+    const cx = sb.iX(10, 10), cy = sb.iY(10, 10, 20);
+    /* Tall and narrow, like a stack of equipment in one band: the vertical
+     * ladder is walled off for its whole reach, but a sideways step escapes.
+     * A wall wider than the ladder reaches is correctly unplaceable — that is
+     * the caller's layout problem, not something the search should paper over. */
+    sb.ISO_OCC.add({ x: cx - 20, y: cy - 200, w: 40, h: 400 }, { id: 'wall', kind: 'text' });
+    const out = sb.isoResolvePlacement(caption);
+    ok('I2c1', out.indexOf('<!--ISOFLEX') === -1, 'the caption must still be substituted');
+    ok('I2c2', sb.ISO_UNPLACED === 0,
+      `escalation must find a diagonal: unplaced=${sb.ISO_UNPLACED}`);
   }
 
   /* I3: without the engine the page still renders. This file is loaded by pages

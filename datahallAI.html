@@ -685,7 +685,7 @@ body[data-datahall-authority="unavailable"] #tabs,
 body[data-datahall-authority="unavailable"] .wrap{display:none !important}
 body[data-datahall-authority="unavailable"] .hdr-r>.dot{background:#64748b !important;box-shadow:none !important;animation:none !important}
 body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:none}
-</style>    <script src="js/rz-version.js?v=20260920-1f40e0de" defer></script>
+</style>    <script src="js/rz-version.js?v=20260920-905c2a38" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260920-b64c1545" defer></script>
     <!-- v3.5.0 — hold the 8.5px legibility floor by SCALE, not by font size. Five of this page's
          fifteen diagrams were already clear; the dense ones (cooling P&ID, the four SLDs, the hall
@@ -717,7 +717,7 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
     <!-- v3.10.5 — the placement search, for the isometric's zone captions. Synchronous and
          beside metrics: renderOverview() runs during page render and looks both up at call
          time, falling back to hand-placement when either is missing. -->
-    <script src="js/rz-diagram-layout.js?v=20260920-47746398"></script>
+    <script src="js/rz-diagram-layout.js?v=20260920-ecf86a73"></script>
     <script src="js/rz-svg-basis.js?v=20260920-b3fb44bd"></script>
     <script src="js/rz-basis-drawer.js?v=20260920-94a197f5" data-rz-registry="RZ_DCAI_PARAMETERS" defer></script>
     <!-- v1.130.0 operator decision-support modules. Pure deterministic models
@@ -1935,6 +1935,15 @@ return'<rect x="'+box.x+'" y="'+box.y+'" width="'+box.w+'" height="'+box.h+'" rx
 tx(cx,cy,label,color,fs,'middle',bold,o);
 }
 
+/* Deferral for a block that is not an isoLabel — the floor caption is two <text> lines that
+   belong together and must move as one. `make(box)` re-renders it wherever placement lands it. */
+function isoDefer(box,make,axis,step,rings){
+if(!ISO_OCC)return make(box);
+var token='<!--ISOFLEX'+(++ISO_SEQ)+'-->';
+ISO_FLEX.push({token:token,box:box,make:make,axis:axis,step:step,rings:rings});
+return token;
+}
+
 function isoLabel(x,y,z,label,color,sz,bold,o,rigid){
 var fs=sz||8,cx=iX(x,y),cy=iY(x,y,z);
 var box=isoLabelBox(cx,cy,label,fs);
@@ -1952,13 +1961,26 @@ if(!ISO_OCC||!ISO_FLEX.length)return svg;
 var L=window.RZDiagramLayout;
 for(var i=0;i<ISO_FLEX.length;i++){
 var f=ISO_FLEX[i];
-var pl=L.placeBox(f.box,{occupancy:ISO_OCC,axis:'y',step:5,rings:10});
+var pl=L.placeBox(f.box,{occupancy:ISO_OCC,axis:f.axis||'y',step:f.step||5,rings:f.rings||10});
+/* v3.10.8 — escalate rather than give up. The preferred move keeps the caption in its own
+   column (or its own row), which is what keeps it reading as the name of the thing under it.
+   In a dense corner — the FWS pump station has three pumps, a header and a tank in one band —
+   every candidate on that one axis can be occupied. A caption nudged diagonally still names
+   its room; a caption sitting ON an equipment tag names nothing. Take the lesser move. */
+if(!pl.placed)pl=L.placeBox(f.box,{occupancy:ISO_OCC,step:f.step||5,rings:(f.rings||10)+4});
 if(!pl.placed)ISO_UNPLACED++;
 ISO_OCC.add(pl.box,{id:'iso-zone-'+i,kind:'text'});
-var dy=pl.box.y-f.box.y;
-svg=svg.split(f.token).join(isoLabelMarkup(pl.box,f.cx,f.cy+dy,f.label,f.color,f.fs,f.bold,f.o));
+var markup;
+if(f.make){markup=f.make(pl.box);}
+else{var dy=pl.box.y-f.box.y;markup=isoLabelMarkup(pl.box,f.cx,f.cy+dy,f.label,f.color,f.fs,f.bold,f.o);}
+svg=svg.split(f.token).join(markup);
 }
 ISO_FLEX=[];
+/* Close the pass. Every isoLabel() call today is inside renderOverview(), but a future one
+   placed after it would otherwise defer into a queue nobody drains — and an unresolved token
+   renders as a MISSING LABEL, not as an error. Clearing the index makes the late call draw
+   immediately instead. */
+ISO_OCC=null;
 return svg;
 }
 
@@ -2200,8 +2222,21 @@ s+=isoBox(32,18,4,4,f.z+FH,2.5,'#3b82f6','MWT','#93c5fd');
 // Floor label (right side)
 var lx=iX(BW+4,BD*0.5);
 var ly=iY(BW+4,BD*0.5,f.z+FH/2);
-s+='<text x="'+lx+'" y="'+(ly-2)+'" fill="'+f.color+'" font-family="'+J+'" font-size="13" font-weight="700">'+f.label+'</text>';
-s+='<text x="'+lx+'" y="'+(ly+14)+'" fill="var(--t3)" font-family="'+J+'" font-size="9">'+f.sub+'</text>';
+/* v3.10.8 — the floor caption was two raw <text> elements, so it never entered the placement
+   pass and kept landing on the ground-floor switchgear tags (GROUND FLOOR x SM6 20kV, x MV
+   SWGR-B, and the FLOOR 2 subtitle on the water tank). It is ONE block of two lines and moves
+   as one. Horizontally: it is parked to the right of the building, so the open canvas is
+   further right, and sliding it up or down would walk it into the floor above or below. */
+(function(fl,fx,fy){
+var M=window.RZDiagramMetrics;
+var wl=M?M.textWidth(fl.label,13,'mono'):String(fl.label).length*13*0.62;
+var ws=M?M.textWidth(fl.sub,9,'mono'):String(fl.sub).length*9*0.62;
+var fbox={x:fx,y:fy-15,w:Math.max(wl,ws),h:31};
+s+=isoDefer(fbox,function(b){
+return'<text x="'+b.x+'" y="'+(b.y+13)+'" fill="'+fl.color+'" font-family="'+J+'" font-size="13" font-weight="700">'+fl.label+'</text>'+
+'<text x="'+b.x+'" y="'+(b.y+29)+'" fill="var(--t3)" font-family="'+J+'" font-size="9">'+fl.sub+'</text>';
+},'x',10,12);
+})(f,lx,ly);
 
 // Clickable overlay (transparent polygon over top face)
 s+='<polygon points="'+isoTop(0,0,BW,BD,f.z+FH)+'" fill="transparent" data-floor="'+f.key+'" style="cursor:pointer" class="iso-floor"><title>Click to view '+f.label+'</title></polygon>';
@@ -3979,7 +4014,11 @@ const nwY=590;s+=tx(LX,nwY-4,'NETWORK / DWDM','var(--b)',5,0,1);['IB-Leaf','IB-S
 s+=tx(LX+480,nwY-4,'PASSIVE','var(--t3)',5,0,1);['CblMgmt','PDU/Mtr','Patch','Spare'].forEach((l,i)=>{const x=LX+480+i*60;s+=`<rect x="${x}" y="${nwY}" width="52" height="18" rx="2" fill="rgba(107,114,128,.06)" stroke="rgba(107,114,128,.2)" stroke-width=".5"/>`+tx(x+27,nwY+8,l,'var(--t3)',4.5,'middle')+tx(x+27,nwY+15,'P.0'+(i+1),'var(--t3)',3.5,'middle')});
 const pY=616;s+=tx(LX,pY,'CORRIDOR SERVICES','var(--t1)',5,0,1);
 // Pipe rack frame
-s+=`<rect x="${LX}" y="${pY+3}" width="${TW}" height="72" rx="2" fill="rgba(107,114,128,.01)" stroke="rgba(107,114,128,.06)" stroke-width=".3" stroke-dasharray="4 3"/>`;
+/* v3.10.8 — 72 put the frame's bottom edge at y=691 in a 690-tall viewBox, so it was clipped
+   by one unit (2.5px on screen). Its deepest content sits at pY+65 = 681, so 68 encloses
+   everything with six units to spare and stays inside the frame. The drawing was never the
+   problem — the box around it was one unit too tall. */
+s+=`<rect x="${LX}" y="${pY+3}" width="${TW}" height="68" rx="2" fill="rgba(107,114,128,.01)" stroke="rgba(107,114,128,.06)" stroke-width=".3" stroke-dasharray="4 3"/>`;
 /* v3.9.9 — clear of the valve tag that sits at the rack's right end */
 s+=tx(LX+TW-30,pY+8,'PIPE RACK','var(--t3)',3,'end');
 // === FWS SUPPLY DN250 CS (insulated double-line, green) ===
@@ -7902,7 +7941,14 @@ s+=arrowPts(250,90,1);s+=arrowPts(460,90,1);s+=arrowPts(620,90,1);s+=arrowPts(76
 const arrowL=(x,y)=>`<polygon points="${x-4},${y-3} ${x-8},${y} ${x-4},${y+3}" fill="var(--o)" opacity=".5"/>`;
 s+=arrowL(550,RY);s+=arrowL(400,RY);s+=arrowL(750,RY);
 // Phase 2: Multi-particle flow dots on supply pipes
-function pDots(x1,y1,x2,y2,n,c,dur){var r='';for(var pi=0;pi<n;pi++){var dl=pi*(dur/n);r+=`<circle r="1.5" fill="${c}" opacity=".5"><animateMotion dur="${dur}s" begin="${dl}s" repeatCount="indefinite" path="M${x1},${y1} L${x2},${y2}"/></circle>`;}return r;}
+/* v3.10.8 — a POSITIVE begin parks the dot at the SVG origin until its delay elapses.
+   animateMotion translates the element from its own position, and the circle has no cx/cy,
+   so before the animation starts every delayed dot sits at (0,0) with its radius hanging
+   1.5 units outside the viewBox — which is what the geometry gate kept reporting as two
+   clipped <circle>s on the cooling P&ID. A NEGATIVE begin starts the animation already in
+   progress, so the dot is on its own path at the first painted frame. The visual is
+   identical: the dots are still evenly spread around the cycle. */
+function pDots(x1,y1,x2,y2,n,c,dur){var r='';for(var pi=0;pi<n;pi++){var dl=pi*(dur/n);r+=`<circle r="1.5" fill="${c}" opacity=".5"><animateMotion dur="${dur}s" begin="-${dl}s" repeatCount="indefinite" path="M${x1},${y1} L${x2},${y2}"/></circle>`;}return r;}
 // Supply flow dots (circuit-colored: CW=purple, FWS=cyan, TCS=pink)
 s+=pDots(195,90,295,90,4,'var(--p)',2.5);
 s+=pDots(300,95,520,95,5,'var(--c)',3);
@@ -8403,7 +8449,7 @@ mc('var(--t2)','Physical Rack','Mechanical Specs',[['Standard','48U OCP Open Rac
 $('coolCards').innerHTML=[
 mc('var(--g)','Water Treatment','Chemical & Filtration',[['FWS','Closed-loop: inhibitor + biocide'],['FWS glycol','30% PG (freeze protection)'],['TCS purity','DI <5\u00B5S/cm conductivity'],['TCS pH','7.0-9.0 range'],['Filtration','25\u00B5m inline per CDU'],['Side-stream','5\u00B5m bag filter FWS header'],['Monitoring','Inline cond + pH + ORP'],['Lab test','Monthly: pH, cond, bacteria, TSS'],['Blowdown','CT auto on conductivity SP'],['Make-up','RO + DI polisher for TCS']],{declared:'water-treatment and filtration specification (micron ratings, pH window, sampling) is page-authored, not an engine quantity'}),
 mc('var(--c)','Chiller Basis','Where the COP comes from',[['COP',(DHE&&DHE.chillerCOP!=null?DHE.chillerCOP:'\u2014')+' \u2014 DERIVED from the refrigerant lift, not a nameplate',{declared:'chiller COP is derived from the modelled refrigerant lift at the design day; it is not a manufacturer nameplate figure'}],['Lift',(DHE&&DHE.chwSupplyC!=null?DHE.chwSupplyC:'\u2014')+' \u00B0C CHW \u2192 '+(DHE&&DHE.cdwReturnC!=null?DHE.cdwReturnC:'\u2014')+' \u00B0C CDW',bo('chwSupplyC',{also:['cdwReturnC']})],['At the design day','the liquid path bypasses this plant \u2014 it carries the residual air load',{declared:'DLC heat leaves through the TCS/CDU path; the chiller plant carries the residual air load'}]]),
-mc('var(--o)','CDU Unit Data','Per-unit specification, moved off the drawing so the return line is readable',[['Per CDU',(DHE&&DHE.cduDutyPerUnit!=null?DHE.cduDutyPerUnit:'\u2014')+' kW thermal duty',bo('cduDutyPerUnit')],['Flow per CDU',(DHE&&DHE.cduFlowPerUnitLpm!=null?DHE.cduFlowPerUnitLpm:'\u2014')+' LPM',bo('cduFlowPerUnitLpm')],['Active',(DHE&&DHE.cduRunning!=null?DHE.cduRunning:'\u2014')+' duty of '+(DHE&&DHE.cduInstalled!=null?DHE.cduInstalled:'\u2014')+' installed per hall',bo('cduRunning',{also:['cduInstalled']})],['Approach',(DHE&&DHE.cduApproachK!=null?DHE.cduApproachK:'\u2014')+' K \u2014 the PUBLISHED CoolIT CHx1000 approach, printed as authored',{declared:'CDU approach is the published CoolIT CHx1000 approach (model leaf thermal.cduApproachK), printed as authored'}]]),
+mc('var(--o)','CDU Unit Data','Per-unit specification, moved off the drawing so the return line is readable',[['Per CDU',(DHE&&DHE.cduDutyPerUnit!=null?Math.round(DHE.cduDutyPerUnit):'\u2014')+' kW thermal duty',bo('cduDutyPerUnit')],['Flow per CDU',(DHE&&DHE.cduFlowPerUnitLpm!=null?Math.round(DHE.cduFlowPerUnitLpm):'\u2014')+' LPM',bo('cduFlowPerUnitLpm')],['Active',(DHE&&DHE.cduRunning!=null?DHE.cduRunning:'\u2014')+' duty of '+(DHE&&DHE.cduInstalled!=null?DHE.cduInstalled:'\u2014')+' installed per hall',bo('cduRunning',{also:['cduInstalled']})],['Approach',(DHE&&DHE.cduApproachK!=null?DHE.cduApproachK:'\u2014')+' K \u2014 the PUBLISHED CoolIT CHx1000 approach, printed as authored',{declared:'CDU approach is the published CoolIT CHx1000 approach (model leaf thermal.cduApproachK), printed as authored'}]]),
 mc('var(--pk)','TCS Loop \u2014 rack side','What the rack-side panel used to print inside the drawing',[['Rack IT',(DH&&DH.kwPerRack!=null?DH.kwPerRack:'\u2014')+' kW per rack',bo('kwPerRack')],['Branches shown','6 of the hall\u2019s racks are drawn \u2014 the drawing samples the run, it does not enumerate it',{declared:'the TCS detail draws six representative rack branches; the rack count is carried by the Racks row in the drawing'}],['QD type','SS316L blind-mate quick disconnect',{declared:'stainless blind-mate quick disconnect is the authored rack-side coupling for this design'}],['Scope','per hall \u2014 every figure on this card is one hall, not the campus',{declared:'the TCS rack-side figures are scoped to a single hall'}]]),
 mc('var(--o)','Performance Targets','Design & Operating KPIs',[['Total cooling',(DH?(DH.itHallFmt+' kW (DLC + air)'):'—'),bo('itHallFmt')],['DLC capacity',(DH?(DH.liquidHeatFmt+' kW ('+DH.liquidCapturePct+'%)'):'—'),bo('liquidHeatFmt',{also:['liquidCapturePct']})],['Air capacity',(DH?(DH.airHeatFmt+' kW'):'—'),bo('airHeatFmt')],['PUE cooling',(DH?((DH.pb_cooling/DH.itHall).toFixed(3)+' of PUE (hall cooling kWe / IT kWe)'):'—'),{declared:'cooling share of PUE = hall cooling kWe / hall IT kWe, an identity over marked parameters (design.electrical.cooling_hall_kwe, power.total_it_hall_kwe)'}],['Approach \u0394T','3\u00B0C CDU (HTW\u2192TCS)'],['Dry-cooler approach',(DHE?DHE.dryCoolerApproachK+' K to ambient DB':'—'),{declared:'dry-cooler approach is the PUBLISHED unit approach (model leaf thermal.dryCoolerApproachK), printed as authored'}],['Pump energy',(DH?(DH.pb_pumps.toLocaleString()+' kW per hall (all pumps)'):'—'),bo('pb_pumps')],['Fan energy',(DH?(DH.pb_fans.toLocaleString()+' kW per hall (dry coolers + CRAH)'):'—'),bo('pb_fans')],['WUE',(DH?(DH.wue.toFixed(2)+' L/kWh (dry-only)'):'—'),bo('wue')],['Availability','99.999% (N+1 all paths)',{declared:'availability is a page-authored design target, not an engine quantity'}]])
 ].join('');

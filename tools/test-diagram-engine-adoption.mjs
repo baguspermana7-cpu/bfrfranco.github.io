@@ -99,10 +99,31 @@ const COCKPITS = [
 const EXTRA = ['js/dcai-render.js', 'js/dcai-fire-points.js', 'js/conv-render.js',
                'js/dcai-engine.js', 'js/conv-engine.js', 'js/ltc-system-modelling-lab.js'];
 
+/**
+ * Strip comments before counting.
+ *
+ * v3.10.9: this gate failed its own author for writing the sentence "every
+ * isoLabel() call today is inside renderOverview()" in a code comment. Counting
+ * a mention as a call is the same defect the purple gate fixed one release
+ * earlier — a gate that flags its own rule being explained teaches people to
+ * work around it, and the workaround is to stop writing the comment.
+ *
+ * Block and line comments only. A primitive named inside a STRING still counts:
+ * this file cannot tell a template that emits a call from prose, and counting
+ * it is the safe direction for a ratchet.
+ */
+function stripComments(text) {
+  return text
+    .replace(/\/\*[\s\S]*?\*\//g, ' ')
+    .replace(/(^|[^:])\/\/[^\n]*/g, '$1 ')   /* not a URL's // */
+    .replace(/<!--[\s\S]*?-->/g, ' ');
+}
+
 function countIn(text) {
+  const src = stripComments(text);
   return {
-    primitives: (text.match(PRIM_RE) || []).length,
-    rawSvg: (text.match(RAW_RE) || []).length
+    primitives: (src.match(PRIM_RE) || []).length,
+    rawSvg: (src.match(RAW_RE) || []).length
   };
 }
 

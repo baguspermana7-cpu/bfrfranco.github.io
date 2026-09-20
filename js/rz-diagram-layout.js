@@ -215,6 +215,7 @@
    *
    * @param {object} want  { x, y, w, h } — the box where it would like to sit
    * @param {object} opts  { occupancy, ignore, step, rings, axis }
+   *   `axis` — 'y' vertical only, 'x' horizontal only (outward first), else all eight
    * @returns {{placed:boolean, box:object, dx:number, dy:number, ring:number}}
    */
   function placeBox(want, opts) {
@@ -232,7 +233,11 @@
     /* offsets per ring, in preference order */
     var dirs = o.axis === 'y'
       ? [[0, -1], [0, 1]]
-      : [[0, -1], [0, 1], [-1, 0], [1, 0], [-1, -1], [1, -1], [-1, 1], [1, 1]];
+      : o.axis === 'x'
+        /* outward first: a label parked beside a drawing has open canvas on the
+           far side and the drawing on the near one */
+        ? [[1, 0], [-1, 0]]
+        : [[0, -1], [0, 1], [-1, 0], [1, 0], [-1, -1], [1, -1], [-1, 1], [1, 1]];
 
     for (var r = 1; r <= rings; r++) {
       for (var i = 0; i < dirs.length; i++) {

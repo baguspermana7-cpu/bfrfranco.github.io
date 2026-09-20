@@ -11,6 +11,75 @@ release sections rather than semver.
 
 ---
 
+## v3.10.9 — 2026-09-20
+
+### Parked at the origin
+
+Three clipped elements on `datahallAI.html`, and neither cause was findable by reading the source.
+Both fell out of a probe that names the offending element instead of its tag.
+
+### Fixed
+
+- **`#coolSvg` — two flow dots parked at the SVG origin.** `pDots()` gives each dot a *positive*
+  `animateMotion begin` so the dots spread around the cycle. But `animateMotion` translates an
+  element from its own position, and these circles carry no `cx`/`cy` — so until its delay elapsed,
+  every delayed dot sat at `(0,0)` with its 1.5-unit radius hanging outside the frame. A **negative**
+  `begin` starts the animation already in progress: identical spread, no parked frame.
+- **`#hSvg` — a frame one unit too tall.** The pipe-rack frame was 72 units from `y=619` in a
+  690-tall viewBox, so its bottom edge sat at 691. Its deepest content is at 681, so 68 encloses
+  everything with six units to spare. The drawing was never the problem; the box around it was.
+- **Three isometric floor captions never entered the placement pass**, because they were two raw
+  `<text>` elements rather than an `isoLabel` — which is why `GROUND FLOOR` kept landing on
+  `SM6 20kV` and `MV SWGR-B`, and the `FLOOR 2` subtitle on the water tank. The caption is now one
+  deferred block of two lines that moves as one.
+
+### Changed
+
+- **Placement escalates rather than giving up.** A zone caption prefers to move along one axis —
+  that is what keeps it reading as the name of the thing beneath it. In a dense corner (the FWS
+  pump station has three pumps, a header and a tank in one band) every candidate on that axis can
+  be occupied. It now falls back to the full ladder: a caption nudged diagonally still names its
+  room; a caption sitting on an equipment tag names nothing.
+- **`placeBox()` gains a horizontal axis**, outward-first. The floor caption is parked beside the
+  building, so its open canvas is further out — and sliding it vertically would walk it into the
+  floor above.
+
+### Added
+
+- **`tools/probe-clipped-elements.mjs`** — the gate reports *that* a `<circle>` is clipped and by
+  how much, which is right for a gate and useless for a fix when the drawing holds hundreds of
+  circles. This prints the element's attributes, the edge it crosses and its basis hook. Two traps
+  are written into it: activate a tab and measure **that** tab before moving on, or the first one
+  is still hidden at zero width; and use `getBoundingClientRect`, not `getBBox` — `getBBox`
+  excludes stroke and ignores the transform `animateMotion` applies, so it reported **zero** while
+  the gate reported three.
+- `Q5`, `I2b`, `I2c` in the engine suite — 93/93.
+
+### The gate failed its own author, and it was right to be fixed rather than worked around
+
+`test-diagram-engine-adoption.mjs` rejected this release for a **comment**. The sentence *"every
+`isoLabel()` call today is inside `renderOverview()`"* was counted as a call, so explaining the rule
+tripped the rule.
+
+That is the same defect the purple gate fixed one release earlier, and it has the same remedy:
+**strip comments before counting**, rather than reword the comment. A gate that flags its own rule
+being explained teaches people to stop writing the explanation. Block, line and HTML comments are
+now stripped; a primitive named inside a *string* still counts, because this gate cannot tell a
+template that emits a call from prose, and counting it is the safe direction for a ratchet.
+
+Baseline re-recorded at **3,111** (from 3,114 — the three it had been miscounting). Verified by
+injection: a real `<rect x=… y=…>` added to `ict.html` fails; the identical markup inside an HTML
+comment does not.
+
+### A weak test, caught twice
+
+`Q5`'s first scenario put a blocker exactly as wide as the label, needing `dx ≥ 60` from a ladder
+that reaches 48 — the failure was the test's, not the search's. It now asserts both halves: a
+narrow blocker is cleared, and one wider than the ladder reaches is correctly reported
+**unplaceable** rather than quietly left overlapping.
+
+---
+
 ## v3.10.8 — 2026-09-20
 
 ### The generator is where the banned colour was hiding
