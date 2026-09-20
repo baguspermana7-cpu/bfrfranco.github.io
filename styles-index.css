@@ -1625,11 +1625,19 @@ html.rz-rainbow .bento-cta-row .btn-bento-primary { border-color: rgba(148,163,2
     padding: 2px 0;
 }
 [data-theme="dark"] .bexp-skill { color: #94a3b8; }
+/* v3.9.6 — the dot takes the card's own accent, not a framework swatch. Fifteen of these carried
+   an inline hex from the default Tailwind ramp (#6ee7b7 #34d399 #10b981 #60a5fa #93c5fd #3b82f6
+   #f59e0b #fbbf24 #fcd34d #f97316 #fb923c #fdba74 …) — one hue per skill, which is the rainbow §A9
+   bans and the default-palette tell §A15 bans, and the same complaint the owner already made about
+   article-27 ("kotak highlight biru, orange dll"). The v3.6.0 sweep could not reach them because
+   they were inline attributes, not stylesheet rules. The card already declares --bexp-accent for
+   its glow; the dot now reads the same token, so the grouping survives and the rainbow does not. */
 .bexp-dot {
     width: 6px; height: 6px;
     border-radius: 50%;
     flex-shrink: 0;
-    opacity: 0.7;
+    background: var(--bexp-accent, var(--p, #64748b));
+    opacity: 0.85;
     transition: opacity 0.2s ease, transform 0.2s ease;
 }
 .bento-exp-card:hover .bexp-dot { opacity: 1; transform: none; }
@@ -2142,8 +2150,11 @@ section {
     margin-bottom: 0.5rem;
 }
 
+/* v3.9.6 — 0.8rem was 12.8 px, the smallest body copy on the homepage, in a card the render
+   audit reads as prose (it is a <p> inside an <article>). Raised to the same tier the case-study
+   summaries already use, so the two card families that do the same job look the same (UX §D13). */
 .oe-desc {
-    font-size: 0.8rem;
+    font-size: 0.9375rem;
     line-height: 1.55;
     color: var(--gray-600);
     margin-bottom: 0.75rem;

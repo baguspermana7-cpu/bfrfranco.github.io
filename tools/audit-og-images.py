@@ -118,8 +118,15 @@ def _is_fallback(url: str) -> bool:
 
 
 def _is_per_page_og(url: str, slug: str) -> bool:
-    """Return True if URL points to assets/og/<slug>.webp."""
-    return f"/assets/og/{slug}.webp" in url
+    """Return True if URL points to this page's own card.
+
+    v3.9.7 — a dated suffix counts. Social platforms cache a scraped card by URL, so the only way
+    to make LinkedIn or WhatsApp show a REBUILT card is to publish it under a new name; the rule
+    this audit exists to enforce is "each page points at its own card", not "the filename is
+    exactly the slug".
+    """
+    import re as _re
+    return _re.search(rf"/assets/og/{_re.escape(slug)}(?:-\d{{8}})?\.webp", url) is not None
 
 
 # ---------------------------------------------------------------------------

@@ -11,6 +11,64 @@ release sections rather than semver.
 
 ---
 
+## v3.9.6 — 2026-09-20
+
+### Fifteen framework swatches the sweep could not reach
+
+A full render audit of the homepage (`tools/audit-site-render.mjs`, 390 / 1440 px × both themes)
+returned four classes of finding. One of them was real, and it was the owner's oldest complaint
+wearing a different hat.
+
+### Fixed
+
+- **`.bexp-dot` — fifteen inline framework swatches on the career cards.** Each skill bullet carried
+  an inline hex straight off the default Tailwind ramp — `#6ee7b7 #34d399 #10b981 #60a5fa #93c5fd
+  #3b82f6 #f59e0b #fbbf24 #fcd34d #f97316 #fb923c #fdba74` — one hue per skill. That is the rainbow
+  §A9 bans and the default-palette tell §A15 bans, and it is the same thing the owner already
+  objected to on article-27 (*"masih banyak ai design slop lihat itu kotak highlight biru, orange
+  dll"*). The v3.6.0 sweep that cleared those swatches from fifty files could not reach these: they
+  were **inline attributes, not stylesheet rules**. Each card already declares `--bexp-accent` for
+  its own glow, so the dot now reads that token — the per-card grouping survives, the rainbow does
+  not. Render audit: 9 `framework-swatch` findings → **0**.
+- **`.oe-desc` was 0.8rem** — 12.8 px, the smallest body copy on the page, in a `<p>` inside an
+  `<article>`. Raised to the 0.9375 rem tier the case-study summaries already use, so the two card
+  families doing the same job now look the same (§D13 Similarity). `prose-font-size` findings 22 → 14.
+
+### The share card
+
+The owner, on the card the site hands to LinkedIn and WhatsApp: *"og website resistancezero.com
+kurang bagus terlalu biasa. Dan fotonya belum diupdate utk OG nya."*
+
+The photo on the deployed card **was** current — v3.9.0 rebuilt it — but the platforms had cached
+the old scrape, and a scraper caches by URL. So the card is now published under a dated filename
+(`assets/og/index-20260920.webp`) and `og:image` / `twitter:image` point at it: that is the only
+thing that makes a platform fetch again without a manual re-scrape.
+`tools/audit-og-images.py` accepts a dated suffix now — the rule it enforces is "each page points
+at its own card", not "the filename is exactly the slug".
+
+**And the card itself was thin.** A 224 px circular avatar on an empty dark rectangle: two thirds
+of the canvas carried nothing, and it said who he is without saying what the site holds. The new
+composer (`_identity_card`) gives the portrait a real half-bleed panel feathered into the card,
+keeps the instrument language (hairlines, mono figures, one amber accent — no glass, no orbs, no
+gradient wash), and spends the rest on the four figures the homepage already publishes: **12+ years
+ops · 40+ tools built · 27 articles · 100+ pages**. Those are read from `index.html`'s own hero
+counters at build time, so the card cannot drift from the page the next time an article lands.
+
+### Measured and NOT changed — stated rather than swept
+
+- **`text-overflow` × 88 is the LATEST ticker.** Every target resolves to `.ticker-item-title` inside
+  the marquee, whose content is meant to run past its box; the repo already has this recorded as a
+  render-audit false positive. Not a defect, not "fixed".
+- **`large-blank-gap` × 4 is section rhythm**, verified by measuring the neighbours: `.metrics-grid`
+  ends at y 2077, `#metrics` closes at 2185, `#operational-excellence` opens at 2263 and its header
+  starts at 2371 — ~300 px of section padding at 1440 px, identical in both themes. Deliberate, not
+  missing content.
+- **`prose-font-size` × 14 remains** at 15 px against the audit's 16 px floor. One consistent card
+  tier; raising the whole homepage type scale is a design decision, not a bug fix, and it is not
+  being made silently here.
+
+---
+
 ## v3.9.5 — 2026-09-20
 
 ### The rest of the backlog the last release exposed

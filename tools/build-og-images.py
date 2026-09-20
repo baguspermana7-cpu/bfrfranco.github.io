@@ -39,6 +39,8 @@ PROFILE_PHOTO = REPO_ROOT / "assets" / "profile-photo.jpg"
 
 # Slugs that get the owner-photo hero treatment (index card + profile fallback).
 PHOTO_SLUGS = {"index", "profile"}
+PORTRAIT_DARK = REPO_ROOT / "assets" / "profile-dark-960.jpg"   # studio portrait: grey ground, reads on a dark card
+ROOT_DIR_PATH = REPO_ROOT
 
 # ---------------------------------------------------------------------------
 # Per-page targets: (slug, title, subtitle, accent_hex)
@@ -763,12 +765,108 @@ def _wrapped_lines(text: str, font, max_width: int, max_lines: int) -> list[str]
     return lines[:max_lines]
 
 
+def _hero_stats() -> list[tuple[str, str]]:
+    """The four figures the homepage already shows, read from index.html at build time.
+
+    Hardcoding them here would let the card drift from the page the moment an article lands;
+    the hero counters carry them as data-cu attributes, so the card can just read them.
+    """
+    import re as _re
+    html = (ROOT_DIR_PATH / "index.html").read_text(encoding="utf-8")
+    block = html[html.find('class="bento-stats"'):] if 'class="bento-stats"' in html else html
+    pairs = _re.findall(
+        r'data-cu="(\d+)"[^>]*>\d+</span>(?:<span class="sfx">([^<]*)</span>)?\s*</span>\s*<span class="k">([^<]+)</span>',
+        block,
+    )
+    out = []
+    for value, suffix, label in pairs[:4]:
+        out.append((f"{value}{suffix or ''}", label.strip().upper()))
+    return out
+
+
+def _identity_card(title: str, subtitle: str) -> Image.Image:
+    """The site's own card: a half-bleed portrait, the name, and the proof strip.
+
+    v3.9.7 — the previous one was a 224 px circle on an empty dark rectangle: it said who he is and
+    nothing about what the site holds, and two thirds of the canvas carried no information. Owner:
+    "og website resistancezero.com kurang bagus terlalu biasa". This one gives the portrait a real
+    panel, keeps the instrument language (hairlines, mono figures, one amber accent — no glass, no
+    orbs, no gradient wash), and spends the empty half on the four figures the homepage already
+    publishes.
+    """
+    img = _make_hero_bg()
+    _add_grain(img)
+
+    panel_w = 430
+    portrait = Image.open(PORTRAIT_DARK).convert("RGB")
+    scale = max(panel_w / portrait.width, H / portrait.height)
+    portrait = portrait.resize((max(1, int(portrait.width * scale)), max(1, int(portrait.height * scale))), Image.LANCZOS)
+    left = max(0, (portrait.width - panel_w) // 2)
+    top = max(0, int(portrait.height * 0.04))
+    portrait = portrait.crop((left, top, left + panel_w, min(portrait.height, top + H)))
+    if portrait.height < H:
+        portrait = portrait.resize((panel_w, H), Image.LANCZOS)
+    img.paste(portrait, (0, 0))
+
+    # feather the portrait's right edge into the card instead of cutting it with a hard line
+    fade_w = 190
+    base = img.crop((panel_w - fade_w, 0, panel_w, H))
+    dark = _make_hero_bg().crop((panel_w - fade_w, 0, panel_w, H))
+    mask = Image.new("L", (fade_w, H))
+    for x in range(fade_w):
+        for_y = int(255 * (x / (fade_w - 1)) ** 0.85)
+        mask.paste(for_y, (x, 0, x + 1, H))
+    img.paste(Image.composite(dark, base, mask), (panel_w - fade_w, 0))
+
+    draw = ImageDraw.Draw(img)
+    # a 1px instrument hairline down the seam
+    draw.line([(panel_w, 0), (panel_w, H)], fill="#243244", width=1)
+
+    text_x = panel_w + 64
+    max_w = W - text_x - 64
+
+    font_brand = _load_font("mono", 22)
+    font_title = _load_font("bold", 60)
+    font_role = _load_font("regular", 25)
+    font_fig = _load_font("bold", 34)
+    font_lbl = _load_font("mono", 15)
+    font_url = _load_font("mono", 20)
+
+    draw.text((text_x, 62), "RZ", font=font_brand, fill=BRAND_COLOR)
+    draw.line([(text_x + 34, 74), (text_x + 96, 74)], fill=BRAND_COLOR, width=2)
+
+    y = 150
+    for line in _wrapped_lines(title, font_title, max_w, 2):
+        draw.text((text_x, y), line, font=font_title, fill=TITLE_COLOR)
+        y += 70
+    y += 8
+    for line in _wrapped_lines(subtitle, font_role, max_w, 2):
+        draw.text((text_x, y), line, font=font_role, fill=SUBTITLE_COLOR)
+        y += 34
+
+    stats = _hero_stats()
+    if stats:
+        rule_y = y + 34
+        draw.line([(text_x, rule_y), (W - 64, rule_y)], fill="#243244", width=1)
+        col_w = (W - 64 - text_x) // max(1, len(stats))
+        for i, (value, label) in enumerate(stats):
+            cx = text_x + i * col_w
+            draw.text((cx, rule_y + 26), value, font=font_fig, fill=TITLE_COLOR)
+            draw.text((cx, rule_y + 70), label, font=font_lbl, fill=SUBTITLE_COLOR)
+
+    url = "resistancezero.com"
+    ubox = draw.textbbox((0, 0), url, font=font_url)
+    draw.text((W - (ubox[2] - ubox[0]) - 64, H - 52), url, font=font_url, fill=STRIP_COLOR)
+    _add_bottom_border(img)
+    return img
+
+
 def build_og_image(slug: str, title: str, subtitle: str, accent_hex: str) -> Image.Image:
     """Render a 1200×630 OG card and return the PIL Image."""
     # Photo slugs (index + profile fallback) get the index-hero base + avatar.
-    avatar = None
     if slug in PHOTO_SLUGS:
-        avatar = _circular_avatar(PROFILE_PHOTO, AVATAR_DIAMETER, AVATAR_RING)
+        return _identity_card(title, subtitle)
+    avatar = None
 
     if avatar is not None:
         img = _make_hero_bg()
