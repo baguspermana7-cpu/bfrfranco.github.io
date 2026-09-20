@@ -195,6 +195,59 @@
     return { placed: false, slot: null, box: null, gap: 0, shift: 0, rotate: false };
   }
 
+  /**
+   * Place a free-floating box as near as possible to where it wants to be.
+   *
+   * `placeLabel` answers "where on this connector?". This answers "somewhere
+   * around here" — the case a floating caption presents: a zone name on an
+   * isometric, a title over a room, an annotation beside a symbol. It has a
+   * preferred position and no line to hang from.
+   *
+   * The search is a ladder, not a spiral: straight up first, then down, then
+   * the diagonals, at increasing distance. Up leads because on an exploded
+   * isometric the space above a room is the reliably empty direction — below it
+   * is the floor slab, and beside it is the next room.
+   *
+   * Caller decides who yields. Register the labels that must not move (an
+   * equipment tag identifies a specific box; moving it makes it point at the
+   * wrong thing) BEFORE calling this for the ones that may (a zone caption
+   * names a region and reads correctly a few units away).
+   *
+   * @param {object} want  { x, y, w, h } — the box where it would like to sit
+   * @param {object} opts  { occupancy, ignore, step, rings, axis }
+   * @returns {{placed:boolean, box:object, dx:number, dy:number, ring:number}}
+   */
+  function placeBox(want, opts) {
+    var o = opts || {};
+    var occ = o.occupancy || occupancy();
+    var ignore = o.ignore || [];
+    var step = o.step == null ? 6 : o.step;
+    var rings = o.rings == null ? 8 : o.rings;
+
+    function free(b) { return occ.hits(b, { ignore: ignore }).length === 0; }
+    function at(dx, dy) { return { x: want.x + dx, y: want.y + dy, w: want.w, h: want.h }; }
+
+    if (free(want)) return { placed: true, box: want, dx: 0, dy: 0, ring: 0 };
+
+    /* offsets per ring, in preference order */
+    var dirs = o.axis === 'y'
+      ? [[0, -1], [0, 1]]
+      : [[0, -1], [0, 1], [-1, 0], [1, 0], [-1, -1], [1, -1], [-1, 1], [1, 1]];
+
+    for (var r = 1; r <= rings; r++) {
+      for (var i = 0; i < dirs.length; i++) {
+        var dx = dirs[i][0] * step * r;
+        var dy = dirs[i][1] * step * r;
+        var cand = at(dx, dy);
+        if (free(cand)) return { placed: true, box: cand, dx: dx, dy: dy, ring: r };
+      }
+    }
+    /* Nothing within reach. Report it — the caller decides whether to drop the
+     * label or accept the overlap, and either way it is a decision rather than
+     * an accident. */
+    return { placed: false, box: want, dx: 0, dy: 0, ring: -1 };
+  }
+
   /* ======================================================================
    * Attach points — rule 4
    * ==================================================================== */
@@ -375,6 +428,7 @@
     ELBOW_R: ELBOW_R,
     occupancy: occupancy,
     placeLabel: placeLabel,
+    placeBox: placeBox,
     fanPoints: fanPoints,
     route: route,
     segmentHitsRect: segmentHitsRect,

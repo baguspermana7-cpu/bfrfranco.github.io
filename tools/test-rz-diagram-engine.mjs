@@ -438,6 +438,145 @@ const D = sandbox.RZDiagram;
 }
 
 /* ==========================================================================
+ * PLACE-BOX — a floating caption with no connector to hang from
+ * ======================================================================== */
+
+/* Q1: if the wanted position is clear, nothing moves. A search that shifts a
+ *     label that was already fine is a search that makes drawings worse. */
+{
+  const occ = L.occupancy();
+  const p = L.placeBox({ x: 100, y: 100, w: 60, h: 12 }, { occupancy: occ });
+  ok('Q1a', p.placed === true && p.ring === 0, `a clear slot must not move: ring ${p.ring}`);
+  ok('Q1b', p.dx === 0 && p.dy === 0, 'no displacement when none is needed');
+}
+
+/* Q2: blocked at the wanted position, it steps UP first. On an exploded
+ *     isometric the space above a room is the reliably empty direction — below
+ *     is the floor slab and beside it is the next room. */
+{
+  const occ = L.occupancy();
+  occ.add({ x: 90, y: 95, w: 80, h: 20 }, { id: 'tag', kind: 'text' });
+  const p = L.placeBox({ x: 100, y: 100, w: 60, h: 12 }, { occupancy: occ });
+  ok('Q2a', p.placed === true, 'a blocked caption must still place');
+  ok('Q2b', p.dy < 0 && p.dx === 0, `first move is straight up: dx=${p.dx} dy=${p.dy}`);
+  ok('Q2c', M.overlap(p.box, { x: 90, y: 95, w: 80, h: 20 }) === null,
+    'the placed box must actually clear the blocker');
+}
+
+/* Q3: whoever registers first wins. An equipment tag identifies one box and
+ *     must not move; a zone caption names a region and reads fine a few units
+ *     away. The caller encodes that by registering the rigid labels first. */
+{
+  const occ = L.occupancy();
+  occ.add({ x: 0, y: 0, w: 400, h: 200 }, { id: 'rigid', kind: 'text' });
+  const p = L.placeBox({ x: 100, y: 100, w: 60, h: 12 }, { occupancy: occ, rings: 3, step: 6 });
+  ok('Q3', p.placed === false,
+    'out of reach must be reported, not silently overlapped');
+}
+
+/* Q4: `axis:"y"` restricts the ladder to vertical. An isometric caption slid
+ *     sideways stops sitting over the room it names. */
+{
+  const occ = L.occupancy();
+  occ.add({ x: 100, y: 100, w: 60, h: 12 }, { id: 'x', kind: 'text' });
+  const p = L.placeBox({ x: 100, y: 100, w: 60, h: 12 }, { occupancy: occ, axis: 'y' });
+  ok('Q4', p.placed === true && p.dx === 0, `axis y must never move sideways: dx=${p.dx}`);
+}
+
+/* ==========================================================================
+ * ISOMETRIC WIRING — the deferred-caption pass on datahallAI.html
+ * ======================================================================== */
+
+/* The building isometric defers its floating zone captions and substitutes them
+ * once every rigid equipment tag is registered. Two things can go wrong in a way
+ * that renders as damage rather than as an error: a token can survive into the
+ * DOM, and the pass can crash a page that has not loaded the engine. Both are
+ * exercised here against the real source, extracted from the page. */
+{
+  const pageSrc = readFileSync(join(root, 'datahallAI.html'), 'utf8');
+  const block = pageSrc.slice(
+    pageSrc.indexOf('var ISO_OCC=null'),
+    pageSrc.indexOf('// 3D equipment box:')
+  );
+  ok('I0', block.length > 400 && block.includes('isoResolvePlacement'),
+    `the isometric placement block must be extractable: ${block.length} chars`);
+
+  /* iX/iY project iso space to screen; tx emits the text element. Stubbed to the
+   * shapes the real page uses, so the block under test is the page's own code. */
+  const harness = `
+    function iX(x,y){ return 300 + (x - y) * 4; }
+    function iY(x,y,z){ return 400 + (x + y) * 2 - z * 3; }
+    function tx(x,y,label,color,fs,anchor,bold,o){
+      return '<text x="'+x+'" y="'+y+'">'+label+'</text>';
+    }
+  `;
+
+  function run(withEngine) {
+    const sb = { module: { exports: {} }, console };
+    sb.globalThis = sb; sb.window = sb;
+    vm.createContext(sb);
+    if (withEngine) {
+      for (const rel of ['js/rz-diagram-metrics.js', 'js/rz-diagram-layout.js']) {
+        vm.runInContext(readFileSync(join(root, rel), 'utf8'), sb, { filename: rel });
+      }
+    }
+    vm.runInContext(harness + '\n' + block, sb);
+    return sb;
+  }
+
+  /* I1: with the engine, a caption that lands on an equipment tag is displaced,
+   *     and the placeholder is fully substituted. */
+  {
+    const sb = run(true);
+    sb.isoBeginPlacement();
+    /* caption first, tag second — the emission order that makes deferral necessary */
+    const caption = sb.isoLabel(10, 10, 20, 'GENERATOR ROOM', '#93c5fd', 9, 1);
+    const tag = sb.isoLabel(10, 10, 20, 'BD', '#fff', 7, 1, null, true);
+    const out = sb.isoResolvePlacement(caption + tag);
+    ok('I1a', out.indexOf('<!--ISOFLEX') === -1,
+      'every deferred token must be substituted — a survivor renders as a missing label');
+    ok('I1b', out.includes('GENERATOR ROOM') && out.includes('BD'),
+      'both labels must still be present');
+    /* Assert the masks do not OVERLAP, not merely that their y values differ.
+     * Two boxes 2 units apart have different y and still sit on top of each
+     * other — an earlier version of this assertion passed while the captions
+     * were being drawn rigid, which is exactly the bug it exists to catch. */
+    const masks = [...out.matchAll(/<rect x="([-\d.]+)" y="([-\d.]+)" width="([\d.]+)" height="([\d.]+)"/g)]
+      .map(m => ({ x: +m[1], y: +m[2], w: +m[3], h: +m[4] }));
+    ok('I1c0', masks.length === 2, `two masks expected, got ${masks.length}`);
+    ok('I1c', M.overlap(masks[0], masks[1]) === null,
+      `the caption must clear the tag, not merely differ from it: ` +
+      masks.map(b => `(${b.x},${b.y},${b.w}x${b.h})`).join(' vs '));
+    ok('I1d', sb.ISO_UNPLACED === 0, `nothing should be left unplaceable: ${sb.ISO_UNPLACED}`);
+  }
+
+  /* I2: a clear caption is NOT moved. A search that shifts a label that was
+   *     already fine makes drawings worse, not better. */
+  {
+    const sb = run(true);
+    sb.isoBeginPlacement();
+    const a = sb.isoLabel(0, 0, 0, 'CHILLER PLANT', '#93c5fd', 9, 1);
+    const b = sb.isoLabel(40, 40, 0, 'FAR AWAY', '#fff', 7, 1, null, true);
+    const out = sb.isoResolvePlacement(a + b);
+    /* the authored box, computed through the same projection the page uses */
+    const want = sb.isoLabelBox(sb.iX(0, 0), sb.iY(0, 0, 0), 'CHILLER PLANT', 9);
+    ok('I2', out.includes('y="' + want.y + '"'),
+      `an unobstructed caption must stay exactly where it was authored: expected y=${want.y}`);
+  }
+
+  /* I3: without the engine the page still renders. This file is loaded by pages
+   *     that have not adopted the engine, and a hard dependency would blank them —
+   *     the failure mode the version-pin incident already cost us once. */
+  {
+    const sb = run(false);
+    sb.isoBeginPlacement();
+    const out = sb.isoResolvePlacement(sb.isoLabel(10, 10, 20, 'GENERATOR ROOM', '#93c5fd', 9, 1));
+    ok('I3a', out.includes('GENERATOR ROOM'), 'the engine-less path must still draw the label');
+    ok('I3b', out.indexOf('<!--ISOFLEX') === -1, 'and must not leave a token behind');
+  }
+}
+
+/* ==========================================================================
  * verdict
  * ======================================================================== */
 const total = pass + fails.length;

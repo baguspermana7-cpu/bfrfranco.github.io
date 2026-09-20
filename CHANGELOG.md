@@ -11,6 +11,54 @@ release sections rather than semver.
 
 ---
 
+## v3.10.6 — 2026-09-20
+
+### The caption yields, the tag does not
+
+The building isometric carries twelve collisions, and all twelve are the same shape: a floating
+**zone caption** landing on an **equipment tag** — `GENERATOR ROOM` × `BD`, `GROUND FLOOR` ×
+`SM6 20kV`, `CW PUMP STATION` × `P2`, `TX-A ROOM` × `DH-2`, and eight more.
+
+Nothing here is crowded. An isometric projects a three-unit-tall equipment box *up-screen* into
+exactly the band a floating caption occupies, and both were placed by hand, so neither knew the
+other existed.
+
+> The approved plan for this drawing assumed **111** collisions and proposed a re-layout. It
+> carries **12**. Earlier sweeps paid the rest down, the plan's premise is stale, and a re-layout
+> is no longer the right remedy — placement is.
+
+### Changed
+
+- **`isoLabel()` places by search instead of by offset.** Which label yields is not arbitrary: an
+  equipment tag names **one** box and points at the wrong thing if it moves, so tags are **rigid**;
+  a zone caption names a region and reads correctly a few units away, so captions are **flexible**.
+- **Flexible captions are deferred.** A caption is often emitted *before* the tag it must avoid, so
+  it emits a token and `isoResolvePlacement()` substitutes real markup once every rigid box is
+  registered. Displacement is vertical only — a caption slid sideways stops sitting over the room
+  it names.
+- Mask width now comes from `RZDiagramMetrics` rather than `length × 0.62`. These labels are
+  JetBrains Mono, so the 0.60 em budget is **exact**, not an estimate.
+
+### Added
+
+- **`RZDiagramLayout.placeBox()`** — placement near a desired point, for a caption with no
+  connector to hang from. A ladder, not a spiral: straight up first, because on an exploded
+  isometric the space above a room is the reliably empty direction. Returns `placed:false` when
+  nothing is within reach rather than overlapping silently.
+- `Q1`–`Q4` and `I0`–`I3` in `tools/test-rz-diagram-engine.mjs` — 84/84. The `I` set runs the
+  **page's own** placement code, extracted from `datahallAI.html`, and covers the two failures that
+  would render as damage rather than as an error: a token surviving into the DOM, and a page that
+  has not loaded the engine.
+
+### A weak assertion, caught
+
+The first version of `I1c` checked that the two mask `y` values **differed**. Two boxes two units
+apart differ and still sit on top of each other — and the assertion duly passed while the captions
+were being drawn rigid, which is the exact bug it exists to catch. It now asserts the masks do not
+overlap. Both mutations are caught.
+
+---
+
 ## v3.10.5 — 2026-09-20
 
 ### Which way is short
