@@ -685,15 +685,15 @@ body[data-datahall-authority="unavailable"] #tabs,
 body[data-datahall-authority="unavailable"] .wrap{display:none !important}
 body[data-datahall-authority="unavailable"] .hdr-r>.dot{background:#64748b !important;box-shadow:none !important;animation:none !important}
 body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:none}
-</style>    <script src="js/rz-version.js?v=2026-05-09" defer></script>
-    <script src="js/rz-mobile-nav.js?v=2026-07-22-navfix" defer></script>
+</style>    <script src="js/rz-version.js?v=20260920-0b7fe3f5" defer></script>
+    <script src="js/rz-mobile-nav.js?v=20260920-b64c1545" defer></script>
     <!-- v3.5.0 — hold the 8.5px legibility floor by SCALE, not by font size. Five of this page's
          fifteen diagrams were already clear; the dense ones (cooling P&ID, the four SLDs, the hall
          plan, the building isometric, the fire mimic) could not take a font lift without a new
          overlap, which is why the page's own lift pass carries FLOOR:1 for them. Scaling moves the
          glyph and the geometry by the same factor, so no overlap can appear that was not there. -->
-    <script src="js/rz-svg-legible.js?v=1.0.0" defer></script>
-    <script src="js/rz-cookie-consent.js?v=2026-07-14" defer></script>
+    <script src="js/rz-svg-legible.js?v=20260920-8a2270ee" defer></script>
+    <script src="js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
     <!-- Basis engine — single source of truth for every displayed kW/MW/flow/temp/
          PUE/WUE. Loaded synchronously (NOT defer) so window.DCAI_MODEL /
          window.DCAI_CALC are available before the non-deferred main inline script
@@ -708,39 +708,39 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
     <!-- generated registry twin: the authority block validates the live snapshot against
          every id the registry publishes, so the allow-list is generated, never typed -->
     <script src="js/dcai-parameters.js?v=1.3.0" data-datahall-registry></script>
-    <script src="js/rz-evidence.js?v=2.1.0"></script>
-    <script src="js/rz-svg-basis.js?v=2.1.0"></script>
-    <script src="js/rz-basis-drawer.js?v=2.1.0" data-rz-registry="RZ_DCAI_PARAMETERS" defer></script>
+    <script src="js/rz-evidence.js?v=20260920-3f7c72db"></script>
+    <script src="js/rz-svg-basis.js?v=20260920-79f07a9c"></script>
+    <script src="js/rz-basis-drawer.js?v=20260920-94a197f5" data-rz-registry="RZ_DCAI_PARAMETERS" defer></script>
     <!-- v1.130.0 operator decision-support modules. Pure deterministic models
          load before the page renderer; the DOM controller is deferred. -->
-    <script src="js/datahall-ai/alarm-query.js?v=2.0.0"></script>
+    <script src="js/datahall-ai/alarm-query.js?v=20260920-4d06f77a"></script>
     <script>
     /* Rack-density reconciles against DCAI_MODEL at module load. Keep a
        missing engine fail-closed instead of allowing that optional workspace
        model to throw before the page authority guard can take control. */
     if (window.DCAI_MODEL && window.DCAI_CALC) {
-      document.write('<script src="js/datahall-ai/rack-density.js?v=2.0.0"><\/script>');
+      document.write('<script src="js/datahall-ai/rack-density.js?v=20260920-6cdbb0d2"><\/script>');
     }
     </script>
     <script src="js/datahall-ai/electrical-topology.js?v=3.7.0"></script>
     <script src="js/datahall-ai/electrical-live.js?v=3.7.0"></script>
-    <script src="js/datahall-ai/sim-telemetry.js?v=2.2.0"></script>
-    <script src="js/datahall-ai/hmi-payloads.js?v=3.7.0"></script>
-    <script src="js/datahall-ai/hmi-points.js?v=2.2.0"></script>
+    <script src="js/datahall-ai/sim-telemetry.js?v=20260920-61df5c2d"></script>
+    <script src="js/datahall-ai/hmi-payloads.js?v=20260920-f6f5cf81"></script>
+    <script src="js/datahall-ai/hmi-points.js?v=20260920-d82032ae"></script>
     <script src="js/datahall-ai/electrical-visual-map.js?v=3.7.0"></script>
-    <script src="js/datahall-ai/fire-cause-effect.js?v=2.0.0"></script>
-    <script src="js/datahall-ai/fire-points.js?v=2.4.0"></script>
-    <script src="js/rz-design-studio.js?v=3.5.0"></script>
+    <script src="js/datahall-ai/fire-cause-effect.js?v=20260920-964e57d6"></script>
+    <script src="js/datahall-ai/fire-points.js?v=20260920-080f8e3b"></script>
+    <script src="js/rz-design-studio.js?v=20260920-6a4d3c17"></script>
     <!-- v1.42.0 — Semantic line model. Foundation for review docs 27/28 §3.1
          "setiap line wajib punya from_id/to_id/medium/direction/state/capacity
          /current_value/redundancy_role". Non-deferred so coolSvg IIFE can call
          RZLineModel.line() at parse-time. -->
-    <script src="js/rz-line-model.js?v=1.42.0"></script>
+    <script src="js/rz-line-model.js?v=20260920-c4511df5"></script>
     <!-- v1.42.1 — IEC/ANSI breaker symbol library. Foundation for review docs
          27/28 §3.1/§5.3 + 17/18 §3.2: "Gunakan simbol breaker open/closed/
          tripped, bukan hanya warna". 7 states + IEEE C37.2 device-function
          badges + NFPA 70E arc-flash PPE categories. -->
-    <script src="js/rz-breaker-symbols.js?v=1.42.1"></script>
+    <script src="js/rz-breaker-symbols.js?v=20260920-d428580e"></script>
     <!-- v1.43.0 — Right-side inspector. Click any [data-rz-line] or
          [data-rz-breaker] element to see Live / Capacity / Deps / Alarms /
          Trend / Maintenance tabs without occluding topology. Closes review
@@ -748,32 +748,32 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
     <!-- v1.43.4 — ISA-18.2 alarm state machine + color discipline. Loaded
          before the inspector so RZAlarmState is available when the Alarms tab
          renders. Closes review doc-27 §3.3 P0 + §4.3 P1. -->
-    <script src="js/rz-alarm-state.js?v=1.43.4" defer></script>
-    <script src="js/rz-inspector.js?v=2.3.0" defer></script>
+    <script src="js/rz-alarm-state.js?v=20260920-a912ad23" defer></script>
+    <script src="js/rz-inspector.js?v=20260920-76c2d117" defer></script>
     <!-- v1.43.2 — Data-quality service. Loaded before the inspector script so
          body[data-rz-data-mode] banner renders + RZTelemetryQuality is
          available when the inspector's Live tab renders its chip. Closes
          review doc-27 §3.4 + §5.7. -->
-    <script src="js/rz-telemetry-quality.js?v=1.134.14" defer></script>
+    <script src="js/rz-telemetry-quality.js?v=20260920-90aca1fe" defer></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
          Loaded for cross-page consistency; body does NOT carry rz-bms-shell
          class (preserves the page's existing palette + 10k-line render tree).
          #p-dash owner-excluded — every adoption ship leaves it byte-identical.
          Spec: standarization/BMS_SHELL.md ; dc ai/review/24. -->
-    <link rel="stylesheet" href="css/rz-bms-shell.css?v=20260908-editorial">
-    <script src="js/rz-bms-shell.js?v=1.24.3" defer></script>
+    <link rel="stylesheet" href="css/rz-bms-shell.css?v=20260920-f27e7fd1">
+    <script src="js/rz-bms-shell.js?v=20260920-1c0de861" defer></script>
     <!-- v1.43.19 — instrument register (RZ Dark System v1). CHROME-ONLY: page
          atmosphere + mono headings + panel borders. Dark-only, scoped. Never
          touches SVG semantic colours or engine values (#p-dash byte-identical;
          75/75 accuracy probe stays green). Spec: standarization/COCKPIT_RESKIN_PLAN.md -->
-    <link rel="stylesheet" href="css/rz-cockpit-instrument.css?v=2.3.1">
+    <link rel="stylesheet" href="css/rz-cockpit-instrument.css?v=20260920-3bc27665">
     <!-- v2.11.0 — the one navigation language shared with the Conventional hub (owner comment 18) -->
-    <link rel="stylesheet" href="css/rz-cockpit-nav.css?v=2.11.0">
-    <link rel="stylesheet" href="css/datahall-ai-operator.css?v=2.15.0">
-    <link rel="stylesheet" href="css/rz-design-studio.css?v=3.5.0">
-    <script src="js/datahall-ai/operator-ui.js?v=2.11.1" defer></script>
-    <script src="js/datahall-ai/equipment-inspector.js?v=2.3.1" defer></script>
-    <script src="js/datahall-ai/fire-workstation.js?v=2.3.0" defer></script>
+    <link rel="stylesheet" href="css/rz-cockpit-nav.css?v=20260920-8e948f05">
+    <link rel="stylesheet" href="css/datahall-ai-operator.css?v=20260920-9fecc127">
+    <link rel="stylesheet" href="css/rz-design-studio.css?v=20260920-972eff8b">
+    <script src="js/datahall-ai/operator-ui.js?v=20260920-b2c6eda7" defer></script>
+    <script src="js/datahall-ai/equipment-inspector.js?v=20260920-bb3a33be" defer></script>
+    <script src="js/datahall-ai/fire-workstation.js?v=20260920-e46cfa71" defer></script>
 <style id="rz-skiplink-v1">
 .skip-link{position:absolute;top:-50px;left:0;background:#1e3a5f;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 8px 0;transition:top .2s ease}
 .skip-link:focus{top:0}
@@ -12715,9 +12715,9 @@ inner.addEventListener('touchend',function(){lastDist=0},{passive:true});
   setTimeout(applyAll,300);setTimeout(applyAll,1200);
 })();
 
-</script><script src="js/rz-feature-flags.js?v=2026-05-14" defer></script>
-<script src="auth.js?v=2026-09-05-mint" defer></script>
-<script src="rz-engine.min.js?v=2026-09-06-cdu" defer></script>
+</script><script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
+<script src="auth.js?v=20260920-040a6c54" defer></script>
+<script src="rz-engine.min.js?v=20260920-ab37c012" defer></script>
 <script>
 (function(){
     /* Tier-feature gate. Replaces the legacy ROOT_ONLY hard block with the
@@ -12810,7 +12810,7 @@ inner.addEventListener('touchend',function(){lastDist=0},{passive:true});
   window.RZDatahallAIMotion = { apply: apply, reduced: function(){ return q.matches; } };
 })();
 </script>
-<script src="rz-tracker.js?v=2026-08-30-local-runtime" defer></script>
+<script src="rz-tracker.js?v=20260920-180645d6" defer></script>
 
 
 

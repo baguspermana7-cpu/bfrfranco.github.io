@@ -27,23 +27,50 @@ import { join, resolve, dirname } from 'node:path';
 
 const ROOT = process.cwd();
 const STRICT_ALL = process.argv.includes('--strict-all');
-/* flip condition: when the MONITOR list below reaches zero mismatches, move the asset into
-   STRICT_ASSETS (or pass --strict-all in the ship gate and delete this note). */
-const STRICT_ASSETS = new Set(['styles.min.css', 'styles-index.min.css']);
+/* v3.9.5 — the monitor reached zero, so the rule is now STRICT for every asset EXCEPT the version
+   pins below. A pin is not a cache-bust: `js/conv-engine.js?v=2.2.0` is compared at runtime against
+   CONV_CURRENT_ENGINE_VERSION (dc-conventional.html:1430) and datahallAI does the same for its
+   model / engine / registry through datahallRequestedVersion(); the electrical trio's shared token
+   is pinned by tools/test-datahall-ai-electrical-visual-map.mjs. Hashing those would break the
+   authority contract they exist to enforce, and their correctness is already gate-backed. The tag's
+   own authority attribute is the machine-readable half of this rule — the three electrical modules
+   carry no attribute, so they are listed. */
+const PINNED_BY_GATE = new Set([
+    'js/datahall-ai/electrical-topology.js',
+    'js/datahall-ai/electrical-live.js',
+    'js/datahall-ai/electrical-visual-map.js',
+]);
+const AUTHORITY_ATTR = /data-(?:conv-engine|datahall-model|datahall-calc|datahall-registry)[-a-z]*/;
 
 const hashOf = async (file) => createHash('sha256').update(await readFile(file)).digest('hex').slice(0, 8);
-const TOKEN_RE = /(?:href|src)="([^"?]+\.(?:css|js))\?v=([^"]+)"/g;
+/* match the whole tag so the authority attribute beside the src is visible to the rule */
+const TAG_RE = /<(?:link|script)\b[^>]*?(?:href|src)="([^"?]+\.(?:css|js))\?v=([^"]+)"[^>]*>/g;
 
+const pinned = new Set();
 const pages = (await readdir(ROOT)).filter((f) => f.endsWith('.html')).sort();
+
+/* First pass: an asset is a version pin if ANY page loads it under an authority attribute (or the
+   gate-pinned list). The attribute marks the contract, and the contract belongs to the FILE — seven
+   conventional cockpits load js/conv-engine.js without the attribute while comparing the same
+   version constant in their own script, so a per-tag rule would demand a hash token there and break
+   the pin the other page declares. */
+const sources = new Map();
+for (const page of pages) { sources.set(page, await readFile(join(ROOT, page), 'utf8')); }
+for (const html of sources.values()) {
+    for (const [tag, href] of html.matchAll(TAG_RE)) {
+        if (AUTHORITY_ATTR.test(tag) || PINNED_BY_GATE.has(href)) { pinned.add(href); }
+    }
+}
 const strict = [];
 const monitor = [];
 const missing = [];
 const seen = new Map();          /* asset -> Set(tokens) */
 
 for (const page of pages) {
-    const html = await readFile(join(ROOT, page), 'utf8');
-    for (const [, href, token] of html.matchAll(TOKEN_RE)) {
+    const html = sources.get(page);
+    for (const [, href, token] of html.matchAll(TAG_RE)) {
         if (/^https?:/.test(href)) { continue; }
+        if (pinned.has(href)) { continue; }
         const file = resolve(dirname(join(ROOT, page)), href);
         if (!file.startsWith(ROOT)) { continue; }
         try { await stat(file); } catch { missing.push(`${page} -> ${href} (referenced, not on disk)`); continue; }
@@ -54,7 +81,7 @@ for (const page of pages) {
         if (!seen.has(href)) { seen.set(href, new Set()); }
         seen.get(href).add(token);
         if (carries === want) { continue; }
-        if (STRICT_ALL || STRICT_ASSETS.has(name)) { strict.push(row); } else { monitor.push(row); }
+        strict.push(row);
     }
 }
 
@@ -63,9 +90,8 @@ for (const page of pages) {
    REPORTED for everything else: js/ carries a real backlog of multi-token assets that predates
    this gate, and blocking a caption fix on it would only teach the next author to weaken the gate. */
 const splitAll = [...seen.entries()].filter(([, tokens]) => tokens.size > 1);
-const isStrict = (href) => STRICT_ALL || STRICT_ASSETS.has(href.split('/').pop());
-const split = splitAll.filter(([href]) => isStrict(href));
-const splitMonitor = splitAll.filter(([href]) => !isStrict(href));
+const split = splitAll;
+const splitMonitor = [];
 
 const byAsset = (rows) => {
     const out = new Map();
@@ -76,7 +102,7 @@ const byAsset = (rows) => {
     return [...out.values()];
 };
 
-console.log(`ASSET CACHE TOKENS — ${pages.length} pages scanned`);
+console.log(`ASSET CACHE TOKENS — ${pages.length} pages scanned, ${pinned.size} version pin(s) exempt`);
 const strictAssets = byAsset(strict);
 const monitorAssets = byAsset(monitor);
 for (const row of monitorAssets.sort((a, b) => b.pages - a.pages).slice(0, 12)) {

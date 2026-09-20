@@ -11,6 +11,46 @@ release sections rather than semver.
 
 ---
 
+## v3.9.5 — 2026-09-20
+
+### The rest of the backlog the last release exposed
+
+v3.9.4 made a cache token a function of the file it busts, held that rule STRICT for the two
+stylesheets, and **reported the rest honestly: 115 assets whose token no longer matched their file,
+13 of them served under more than one token.** That list is the same defect that printed a caption
+across the owner's face — a fix that ships but never reaches a returning visitor — so it is not a
+backlog to admire.
+
+### Changed
+
+- **108 assets retokenised to `<yyyymmdd>-<first 8 of sha256>` across 177 pages.** The worst
+  offenders were the files every page loads: `js/rz-version.js` (176 pages), `js/rz-mobile-nav.js`
+  and `js/rz-cookie-consent.js` (159 each), `auth.js` (153), `js/rz-explain-db.js` (102). The 13
+  multi-token assets — `js/rz-bms-shell.js` alone was served under **nine** different tokens —
+  collapse to one token each, because one file under nine URLs is nine caches of the same thing and
+  a fix that reaches roughly none of them.
+- **`tools/test-asset-cache-tokens.mjs` is STRICT for every asset now**, with one declared
+  exemption class: **a version pin is not a cache-bust.** `js/conv-engine.js?v=2.2.0` is compared at
+  runtime against `CONV_CURRENT_ENGINE_VERSION` (`dc-conventional.html:1430`), datahallAI does the
+  same for its model, engine and registry through `datahallRequestedVersion()`, and the three
+  electrical modules share a token pinned by `tools/test-datahall-ai-electrical-visual-map.mjs`.
+  Hashing those would break the authority contract they exist to enforce. The gate reads the tag's
+  own authority attribute, so the exemption is machine-readable rather than a list to maintain —
+  and it is a property of the FILE, not the tag: seven cockpits load `conv-engine.js` without the
+  attribute while comparing the same constant themselves.
+
+Proven RED against the pre-sweep tree at STRICT (108 assets listed, ending with
+`js/spares-parts-catalog.js ?v=2026-05-12 but the file hashes to 1487b6d8`), green after.
+
+### Honest boundary
+
+Retokenising 108 assets at once means every returning visitor re-downloads them on their next visit
+— roughly one site-wide cache flush. That is the correct outcome for files whose old copies are
+genuinely out of date; it is a cost paid once, and the alternative is the state that shipped the
+caption over his face. The service worker precaches by path with no token, so it is unaffected.
+
+---
+
 ## v3.9.4 — 2026-09-20
 
 ### The caption over his face was a stale stylesheet, and it was not just one page

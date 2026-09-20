@@ -21,17 +21,17 @@ from datetime import datetime
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR   = os.path.dirname(SCRIPT_DIR)
 
-def _styles_token() -> str:
-    """The stylesheet's cache token is derived from the file it busts (v3.9.4).
+def _asset_token(relpath: str) -> str:
+    """A cache token derived from the file it busts (v3.9.4, generalised v3.9.5).
 
-    This template used to carry a hardcoded `?v=20260908-editorial`, so every regenerated
-    changelog.html silently reverted the token the rest of the site had moved on from — exactly
-    the staleness tools/test-asset-cache-tokens.mjs now fails on.
+    This template used to carry hardcoded tokens (`?v=20260908-editorial`, `?v=2026-09-06-cards`),
+    so every regenerated changelog.html silently reverted the tokens the rest of the site had moved
+    on from — exactly the staleness tools/test-asset-cache-tokens.mjs now fails on.
     """
     import hashlib
     import datetime
-    css = os.path.join(ROOT_DIR, "styles.min.css")
-    with open(css, "rb") as handle:
+    path = os.path.join(ROOT_DIR, relpath)
+    with open(path, "rb") as handle:
         digest = hashlib.sha256(handle.read()).hexdigest()[:8]
     return "{:%Y%m%d}-{}".format(datetime.date.today(), digest)
 CHANGELOG  = os.path.join(ROOT_DIR, 'CHANGELOG.md')
@@ -479,8 +479,8 @@ def build_html(entries):
   <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin>
   <link rel="dns-prefetch" href="https://www.googletagmanager.com">
 
-  <link rel="stylesheet" href="styles.min.css?v={_styles_token()}">
-  <script src="js/rz-version.js?v=2026-05-09" defer></script>
+  <link rel="stylesheet" href="styles.min.css?v={_asset_token('styles.min.css')}">
+  <script src="js/rz-version.js?v={_asset_token('js/rz-version.js')}" defer></script>
 
   <style>
     /* ── Changelog page-scoped styles ── */
@@ -1059,7 +1059,7 @@ def build_html(entries):
     </div>
   </footer>
 
-  <script src="script.min.js?v=2026-09-06-cards" defer></script>
+  <script src="script.min.js?v={_asset_token('script.min.js')}" defer></script>
 
   {filter_js}
 
