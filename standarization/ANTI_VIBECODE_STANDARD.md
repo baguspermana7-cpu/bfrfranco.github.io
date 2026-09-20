@@ -273,6 +273,21 @@ Consistent with the audit contract above: **do not label an unimplemented heuris
      **The general rule: when a generated artefact cannot be inspected for the property you care
      about, assert that it is a current rendering of the thing you CAN inspect.**
 
+     That rule is not about colour, so it is applied to every generated artefact, not only the
+     images (`tools/test-generator-freshness.py`, v3.10.14): sitemap, `llms.txt`, `llms-full.txt`,
+     `search-sections.json`, `rz-explain-db.js` + `search-terms.json`, and the Search Console
+     indexing list. It was written because the last of those had drifted **four months** in plain
+     sight — generated 2026-05-14, listing 102 URLs where the sitemap publishes 180, still naming
+     "GB200 NVL72 Live Operations", a title retired in v2.0.0. Three of those builders already had
+     a `--check` mode; it was wired into no gate, and two more had no check mode at all. **A check
+     nothing runs is a comment.**
+
+     One design note that decides whether such a gate survives: the indexing list carries a
+     generation DATE in its header, so a byte compare would report drift every single day and be
+     switched off within a week. Its check compares the URL rows and their titles and ignores the
+     header. **A check that cries wolf is a check that gets disabled** — compare the thing that
+     must not drift, not the whole file.
+
 - **Scope coverage is now ASSERTED, not assumed** (`tools/test-audit-coverage.mjs`, wired into
   `ship-gate.sh`). The design gates walk the filesystem with a SKIP list; the sitemap is what the site
   publishes. One added SKIP entry would silently drop a live page out of every design gate. The test

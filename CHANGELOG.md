@@ -11,6 +11,56 @@ release sections rather than semver.
 
 ---
 
+## v3.10.14 — 2026-09-20
+
+### A check nothing runs is a comment
+
+v3.10.12 closed the pixel half of the colour ban by asserting that every OG card is a current
+rendering of its generator, and wrote the general rule into the standard: *when a generated
+artefact cannot be inspected for the property you care about, assert that it is a current
+rendering of the thing you CAN inspect.*
+
+That rule is not about colour. Applied to the site's text artefacts, it immediately found one that
+had drifted **four months in plain sight**:
+
+    standarization/Indexing gconsole/top-urls-request-indexing.txt
+      generated 2026-05-14 · 102 URLs · the sitemap publishes 180
+      still naming "GB200 NVL72 Live Operations", a title retired in v2.0.0
+
+**78 public pages had never been on the list a person works down when requesting indexing in
+Search Console.** Nothing reported it: `--check` existed on three of these builders and was wired
+into no gate at all, and two more builders had no check mode to wire.
+
+### Added
+
+- `tools/test-generator-freshness.py`, wired into `ship-gate.sh` beside the OG-card and min-twin
+  freshness gates. Runs each builder's check mode over `sitemap.xml`, `llms.txt`, `llms-full.txt`,
+  `search-sections.json`, `rz-explain-db.js` + `search-terms.json`, and the indexing list.
+- `--check` on `tools/build-indexing-list.py`, `tools/build-search-sections.py` and
+  `tools/build-explain-db.py`, which had none.
+
+### Fixed
+
+- The indexing list regenerated: 102 → **180 URLs**, retired titles gone.
+- `build-indexing-list.py` now unescapes the `<title>` it reads. A title is HTML; this file is
+  plain text a person pastes into Search Console, and it had been shipping
+  "Live Capacity &amp;amp; Growth Dashboard".
+
+### The design note that decides whether such a gate survives
+
+The indexing list carries a generation DATE in its header, so a byte compare would report drift
+every single day and be switched off within a week. Its check compares the URL rows and their
+titles — the thing that must not drift — and ignores the header. **A check that cries wolf is a
+check that gets disabled.**
+
+### Honest boundary
+
+`tools/build-profile-photos.py` is NOT covered: it needs OpenCV for the face-centred crop and
+`cv2` is not installed on this machine, so a freshness check for the portrait ladder would fail on
+a missing dependency rather than on staleness. Named in the gate rather than silently skipped.
+
+---
+
 ## v3.10.13 — 2026-09-20
 
 ### The rows read zero

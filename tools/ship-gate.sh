@@ -184,6 +184,7 @@ gate "index portrait — right face per theme, whole photo, sharp at every dpr" 
 gate "asset cache tokens — a token changes when its file does" node tools/test-asset-cache-tokens.mjs
 gate "min-twin freshness — no page runs a stale minified build" node tools/audit-min-twins.mjs --strict
 gate "OG card freshness — every card matches a fresh render of its generator" python3 tools/test-og-card-freshness.py
+gate "generator freshness — every generated artefact matches a fresh build" python3 tools/test-generator-freshness.py
 # CACHE-KEY DRIFT is the min-twin bug's sibling: one shared asset requested under two `?v=`
 # tokens sits in two cache entries, so a fix reaches a page only if that page's own token moved.
 # Reporting only — `--apply` converges on the NEWEST token. The predecessor of this tool parsed no

@@ -40,9 +40,21 @@ for f in pages:
         entries.append({'t': heading[:110], 'u': f + '#' + hid, 'a': title[:80]})
 
 print(f'{len(entries)} section entries from {len(pages)} pages')
+PAYLOAD = json.dumps(entries, ensure_ascii=False, separators=(',', ':'))
+if '--check' in sys.argv:
+    try:
+        current = io.open('search-sections.json', encoding='utf-8').read()
+    except OSError:
+        print('FAIL search-sections.json is missing; run with --apply')
+        sys.exit(1)
+    if current != PAYLOAD:
+        print('FAIL search-sections.json is stale against the pages it indexes; '
+              'regenerate with --apply')
+        sys.exit(1)
+    print(f'Current: search-sections.json ({len(entries)} entries)')
+    sys.exit(0)
 if APPLY:
-    io.open('search-sections.json', 'w', encoding='utf-8').write(
-        json.dumps(entries, ensure_ascii=False, separators=(',', ':')))
+    io.open('search-sections.json', 'w', encoding='utf-8').write(PAYLOAD)
     print('wrote search-sections.json')
 else:
     for e in entries[:5]:

@@ -10,6 +10,7 @@ Usage:
 
 Per mandate feedback_standarization_freshness.md (2026-05-14).
 """
+import html
 import os
 import sys
 import re
@@ -70,7 +71,9 @@ def title_from_html(url: str) -> str:
             content = f.read(8192)
         m = re.search(r'<title>([^<]+)</title>', content, re.IGNORECASE)
         if m:
-            title = m.group(1).strip()
+            # A <title> is HTML, this file is plain text a person reads and pastes into
+            # Search Console; "Live Capacity &amp; Growth Dashboard" shipped for four months.
+            title = html.unescape(m.group(1).strip())
             title = re.sub(r' \| ResistanceZero.*$', '', title)
             title = re.sub(r' — ResistanceZero.*$', '', title)
             return title[:80]
@@ -130,8 +133,28 @@ def build_output(urls):
 
 def main():
     apply = '--apply' in sys.argv
+    check = '--check' in sys.argv
     urls = read_sitemap()
     out = build_output(urls)
+    if check:
+        # The header carries a generation date, so a byte compare would report drift every
+        # day. What must not drift is the URL SET and the titles beside them — this file sat
+        # four months behind the sitemap (102 URLs of 180, naming a retired product) because
+        # nothing compared them.
+        try:
+            current = open(OUT_FILE, encoding='utf-8').read()
+        except OSError:
+            print(f'FAIL {OUT_FILE} is missing; run with --apply')
+            return 1
+        def body(text):
+            return [l for l in text.split('\n')
+                    if l.startswith('[ ] ') or l.strip().startswith('Priority:')]
+        if body(current) != body(out):
+            print(f'FAIL {os.path.basename(OUT_FILE)} is stale against sitemap.xml '
+                  f'({len(urls)} URLs); regenerate with --apply')
+            return 1
+        print(f'Current: {os.path.basename(OUT_FILE)} ({len(urls)} URLs)')
+        return 0
     if apply:
         os.makedirs(os.path.dirname(OUT_FILE), exist_ok=True)
         with open(OUT_FILE, 'w', encoding='utf-8') as f:
@@ -141,7 +164,8 @@ def main():
         print(out[:2000])
         print('\n... (truncated)')
         print(f'\nDry-run complete. Total URLs: {len(urls)}. Use --apply to write.')
+    return 0
 
 
 if __name__ == '__main__':
-    main()
+    sys.exit(main())
