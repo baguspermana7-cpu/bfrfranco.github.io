@@ -11,6 +11,52 @@ release sections rather than semver.
 
 ---
 
+## v3.10.2 — 2026-09-20
+
+### The width is knowable now
+
+v3.10.0 shipped a diagram engine and said, honestly, that it was not yet wired into any cockpit
+page. One piece of it reaches every cockpit immediately, and this ships that piece.
+
+`js/rz-svg-basis.js` draws the provenance mark that sits just past the end of a label. To find
+that end it measured the label as `String(text).length * size * 0.6`, and the constant beside it
+admitted what that was:
+
+```js
+var MARK_GAP = 2.4;  // gap between the text end and the mark centre (approx; text width unknown at build time)
+```
+
+### Changed
+
+- **`approxWidth()` asks `RZDiagramMetrics`** when the engine is on the page. A flat per-character
+  estimate puts the mark about 10 units *inside* a tracked eyebrow (`PIPE RACK` at 0.18em budgets
+  32.4 and draws 42.1), 7 inside a CJK label (`主控室` budgets 10.8, draws 18.0), and 10 units
+  adrift of a narrow one (`iiiiii` budgets 21.6, draws 11.5).
+- **`datahallAI.html` loads `rz-diagram-metrics.js` synchronously, before `rz-svg-basis.js`.**
+  `rz-svg-basis` looks the engine up at *call* time rather than capturing it at load time, so a
+  `defer` or a later tag would leave every mark on the old approximation — which looks identical
+  to working.
+- **The fallback is the old estimate.** A page that has not adopted the engine keeps exactly the
+  behaviour it had. This is an improvement where the engine is present, never a new dependency.
+
+### Fixed
+
+- **`test-conv-geometry.mjs` now names the drawing, not just the page.** A page carries up to
+  eighteen diagrams, and a finding attributed only to the page cannot be assigned to any of them:
+  three collisions fixed on the cooling P&ID moved the printed sample by nothing visible, because
+  it was already full of the isometric's. Findings are also deduplicated across viewport and theme
+  — a pair that collides in all eight combinations is **one** thing to fix, not eight, which is how
+  one page read as a 218-item backlog.
+
+### Added
+
+- `B1`–`B3` in `tools/test-rz-diagram-engine.mjs`: the CJK label is measured rather than counted,
+  the engine-less fallback still draws and still hooks its parameter, and the lookup is asserted to
+  live inside the function rather than at module scope. 68/68.
+- `DIAGRAM_ENGINE_STANDARD.md` §3b documents the hand-off and the three rules that hold it.
+
+---
+
 ## v3.10.1 — 2026-09-20
 
 ### 240 framework swatches the v3.6.0 sweep could not reach

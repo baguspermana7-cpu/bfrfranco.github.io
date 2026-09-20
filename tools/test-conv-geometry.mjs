@@ -104,8 +104,12 @@ const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
 const findings = [];
 const stats = [];
 
-function record(page, viewport, theme, check, detail) {
-  findings.push({ page, viewport, theme, check, detail });
+/* `diagram` is the label from TAB_SETS, not the page. A page carries up to eighteen drawings
+ * and a finding that names only the page cannot be attributed to any of them: three collisions
+ * fixed on the cooling P&ID moved the page total by nothing visible, because the printed sample
+ * was already full of the isometric's. Name the drawing. */
+function record(page, diagram, viewport, theme, check, detail) {
+  findings.push({ page, diagram, viewport, theme, check, detail });
 }
 
 try {
@@ -269,15 +273,15 @@ try {
         });
 
         for (const c of result.collisions) {
-          record(diagram.page, viewport.name, theme, 'G1-collision',
+          record(diagram.page, diagram.label, viewport.name, theme, 'G1-collision',
             `"${c.a}" x "${c.b}" overlap ${c.overlapX}x${c.overlapY}px`);
         }
         for (const c of result.clipped) {
-          record(diagram.page, viewport.name, theme, 'G2-clipped',
+          record(diagram.page, diagram.label, viewport.name, theme, 'G2-clipped',
             `<${c.tag}> ${c.label ? `"${c.label}" ` : ''}outside the SVG box by ${c.overflowPx}px`);
         }
         for (const d of (result.illegible || [])) {
-          record(diagram.page, viewport.name, theme, 'G5-illegible',
+          record(diagram.page, diagram.label, viewport.name, theme, 'G5-illegible',
             `label renders below ${8.5}px: ${d}`);
         }
         for (const d of result.degenerate) {
@@ -306,10 +310,28 @@ try {
       return acc;
     }, {});
     console.log(`\n${MEASURE_ONLY ? 'MEASURED' : 'FAIL'} — ${findings.length} geometry findings: ${JSON.stringify(grouped)}`);
-    for (const f of findings.slice(0, 60)) {
-      console.log(`  [${f.check}] ${f.page} ${f.viewport}/${f.theme}: ${f.detail}`);
+
+    /* Per drawing, and per distinct defect. A pair that collides in all eight viewport/theme
+     * combinations is ONE thing to fix, not eight, and the raw finding count says otherwise —
+     * which is how a page reads as a 218-item backlog when twenty-three pairs are wrong. */
+    const byDiagram = new Map();
+    for (const f of findings) {
+      const key = `${f.page} · ${f.diagram || '(unnamed)'}`;
+      if (!byDiagram.has(key)) byDiagram.set(key, { rows: 0, pairs: new Set() });
+      const e = byDiagram.get(key);
+      e.rows++;
+      e.pairs.add(`[${f.check}] ${f.detail.replace(/ overlap [\d.]+x[\d.]+px$/, '')}`);
     }
-    if (findings.length > 60) console.log(`  ... and ${findings.length - 60} more`);
+    console.log('\n  BY DRAWING — distinct defects, and the rows they produce:');
+    for (const [key, e] of [...byDiagram.entries()].sort((a, b) => b[1].pairs.size - a[1].pairs.size)) {
+      console.log(`    ${String(e.pairs.size).padStart(3)} distinct  (${String(e.rows).padStart(4)} rows)  ${key}`);
+    }
+
+    console.log('');
+    for (const [key, e] of [...byDiagram.entries()].sort((a, b) => b[1].pairs.size - a[1].pairs.size)) {
+      console.log(`  ${key}`);
+      for (const pair of [...e.pairs].sort()) console.log(`    ${pair}`);
+    }
   }
 } finally {
   await browser.close();

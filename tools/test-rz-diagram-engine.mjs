@@ -387,6 +387,57 @@ const D = sandbox.RZDiagram;
 }
 
 /* ==========================================================================
+ * BASIS MARKS — the engine's metrics reach the existing cockpit drawings
+ * ======================================================================== */
+
+/* The provenance marks on every cockpit were positioned with
+ * `length * size * 0.6`, and rz-svg-basis.js said so in a comment: "text width
+ * unknown at build time". It is knowable now. These assertions are the contract
+ * for that hand-off, including the fallback that keeps pages which do not load
+ * the engine working exactly as before. */
+{
+  const basisSrc = readFileSync(join(root, 'js/rz-svg-basis.js'), 'utf8');
+
+  /* B1: with the engine present, a CJK label is measured, not counted. Under the
+   *     flat 0.6 estimate three ideographs budget 10.8 at size 6 and actually
+   *     draw 18 — the mark landed six units inside the text. */
+  {
+    const sb = { module: { exports: {} }, console };
+    sb.globalThis = sb; sb.window = sb;
+    vm.createContext(sb);
+    vm.runInContext(readFileSync(join(root, 'js/rz-evidence.js'), 'utf8'), sb);
+    vm.runInContext(readFileSync(join(root, 'js/rz-diagram-metrics.js'), 'utf8'), sb);
+    vm.runInContext(basisSrc, sb);
+    const B = sb.RZSvgBasis;
+    ok('B1a', !!B && typeof B.tag === 'function', 'rz-svg-basis must expose tag()');
+    const wide = B.tag({ x: 0, y: 20, text: '主控室', param: 'x', size: 6 });
+    const cx = Number((wide.match(/rz-basis-mark[^>]*cx="([\d.]+)"/) || [])[1]);
+    ok('B1b', cx > 10.8 + 4.6,
+      `a CJK label's mark must clear the measured end, not the counted one: cx=${cx}`);
+  }
+
+  /* B2: without the engine, the module still works and still places a mark. A page
+   *     that has not adopted the engine must not regress or throw. */
+  {
+    const sb = { module: { exports: {} }, console };
+    sb.globalThis = sb; sb.window = sb;
+    vm.createContext(sb);
+    vm.runInContext(readFileSync(join(root, 'js/rz-evidence.js'), 'utf8'), sb);
+    vm.runInContext(basisSrc, sb);
+    const B = sb.RZSvgBasis;
+    const out = B.tag({ x: 0, y: 20, text: 'ABC', param: 'x', size: 6 });
+    ok('B2a', out.includes('rz-basis-mark'), 'the fallback must still draw a mark');
+    ok('B2b', out.includes('data-basis-param="x"'), 'the fallback must still hook the parameter');
+  }
+
+  /* B3: the lookup is at CALL time, not load time. rz-svg-basis is a synchronous
+   *     script on 2 pages and the engine is loaded beside it; a load-time capture
+   *     would freeze whichever happened to be parsed first. */
+  ok('B3', /function approxWidth[\s\S]{0,400}?window\.RZDiagramMetrics/.test(basisSrc),
+    'approxWidth must look the engine up inside the function');
+}
+
+/* ==========================================================================
  * verdict
  * ======================================================================== */
 const total = pass + fails.length;

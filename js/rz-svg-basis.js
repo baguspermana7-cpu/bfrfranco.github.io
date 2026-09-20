@@ -28,7 +28,7 @@
   'use strict';
 
   var MARK_R = 2.2;            // user units — sized for the 960-wide sheets
-  var MARK_GAP = 2.4;          // gap between the text end and the mark centre (approx; text width unknown at build time)
+  var MARK_GAP = 2.4;          // gap between the text end and the mark centre (the end is MEASURED — see approxWidth)
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -60,7 +60,27 @@
 
   /* Approximate rendered text width in user units for JetBrains Mono at size s:
      ~0.6 em per glyph. Used only to place the mark; the group exempts any slip. */
-  function approxWidth(text, size) { return String(text).length * (size || 6) * 0.6; }
+  /**
+   * Width of the label, so the mark can sit just past its end.
+   *
+   * This used to be `length * size * 0.6` and the MARK_GAP comment said so out loud:
+   * "text width unknown at build time". It is knowable now. RZDiagramMetrics measures per
+   * character — a CJK glyph costs a full em rather than 0.6, an all-caps tracked eyebrow
+   * costs its tracking, and an i-stem costs less than a W. Under the flat estimate the mark
+   * on a wide or tracked label landed inside the text or floated away from it.
+   *
+   * Looked up at call time, not at load time, so this module keeps working on any page that
+   * has not loaded the diagram engine — and falls back to the old estimate there, which is
+   * what those pages were already getting.
+   */
+  function approxWidth(text, size, family, tracking) {
+    var M = typeof window !== 'undefined' && window.RZDiagramMetrics;
+    if (M && M.textWidth) {
+      var face = /mono/i.test(family || 'JetBrains Mono') ? 'mono' : 'sans';
+      return M.textWidth(text, size || 6, face, { tracking: tracking || 0 });
+    }
+    return String(text).length * (size || 6) * 0.6;
+  }
 
   /**
    * spec: { x, y, text, param, params:[…more ids for a composite string], size, fill, anchor, weight, family, id, evidence, title }
@@ -74,7 +94,7 @@
     var E = evidenceApi().get(ev);
     var rec = record(s.param);
     var label = (rec && rec.label) || s.param;
-    var w = approxWidth(s.text, size);
+    var w = approxWidth(s.text, size, s.family, s.tracking);
     var mx = anchor === 'end' ? s.x + MARK_GAP + MARK_R : anchor === 'middle' ? s.x + w / 2 + MARK_GAP + MARK_R : s.x + w + MARK_GAP + MARK_R;
     var my = s.y - size * 0.32;
     var textAttrs = 'x="' + s.x + '" y="' + s.y + '" fill="' + (s.fill || 'var(--t2)') + '" font-family="' + (s.family || 'JetBrains Mono') + '" font-size="' + size + '"'

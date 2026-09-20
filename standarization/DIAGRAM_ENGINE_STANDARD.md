@@ -135,6 +135,41 @@ own paper. Purple is banned by **hue band** (HSL 238–310), gated by
 
 ---
 
+## 3b. The engine already reaches the existing drawings
+
+Migration is per diagram, but one piece of the engine reaches every cockpit immediately.
+
+`js/rz-svg-basis.js` places a provenance mark just past the end of its label. It sized that
+label with `String(text).length * size * 0.6`, and the constant beside it said so out loud:
+
+```js
+var MARK_GAP = 2.4;  // gap between the text end and the mark centre (approx; text width unknown at build time)
+```
+
+It is knowable now. `approxWidth()` asks `RZDiagramMetrics` when the engine is on the page:
+
+| label (size 6) | old estimate | measured |
+|---|---|---|
+| `440 kW` | 21.6 | 21.6 |
+| `PIPE RACK` tracked 0.18em | 32.4 | **42.1** |
+| `主控室` | 10.8 | **18.0** |
+| `iiiiii` | 21.6 | **11.5** |
+
+A flat per-character estimate puts the mark 10 units inside a tracked eyebrow and 7 inside a
+CJK label, and 10 units adrift of a narrow one. Three rules hold this hand-off:
+
+1. **The lookup is at call time, not load time.** A load-time capture would freeze whichever
+   script happened to parse first.
+2. **The fallback is the old estimate.** A page that has not adopted the engine keeps exactly
+   the behaviour it had — this is an improvement where the engine is present, never a
+   dependency.
+3. **The engine's script tag is synchronous and before its consumer.** `defer` or a later tag
+   leaves every mark silently on the approximation, which looks identical to working.
+
+Gated by `B1`–`B3` in `tools/test-rz-diagram-engine.mjs`.
+
+---
+
 ## 4. Authoring rules
 
 1. **New block diagrams go through the engine.** Do not add hand-typed coordinates.

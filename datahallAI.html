@@ -685,7 +685,7 @@ body[data-datahall-authority="unavailable"] #tabs,
 body[data-datahall-authority="unavailable"] .wrap{display:none !important}
 body[data-datahall-authority="unavailable"] .hdr-r>.dot{background:#64748b !important;box-shadow:none !important;animation:none !important}
 body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:none}
-</style>    <script src="js/rz-version.js?v=20260920-be4a4559" defer></script>
+</style>    <script src="js/rz-version.js?v=20260920-b4790053" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260920-b64c1545" defer></script>
     <!-- v3.5.0 — hold the 8.5px legibility floor by SCALE, not by font size. Five of this page's
          fifteen diagrams were already clear; the dense ones (cooling P&ID, the four SLDs, the hall
@@ -709,7 +709,12 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
          every id the registry publishes, so the allow-list is generated, never typed -->
     <script src="js/dcai-parameters.js?v=1.3.0" data-datahall-registry></script>
     <script src="js/rz-evidence.js?v=20260920-3f7c72db"></script>
-    <script src="js/rz-svg-basis.js?v=20260920-79f07a9c"></script>
+    <!-- v3.10.2 — the width budget, loaded BEFORE rz-svg-basis so a basis mark sits just past the
+         end of its label instead of past a length*size*0.6 estimate of it. Synchronous and
+         before its consumer: rz-svg-basis looks the engine up at call time, so a deferred or
+         later tag would silently leave every mark on the old approximation. -->
+    <script src="js/rz-diagram-metrics.js?v=20260920-1994fd2b"></script>
+    <script src="js/rz-svg-basis.js?v=20260920-b3fb44bd"></script>
     <script src="js/rz-basis-drawer.js?v=20260920-94a197f5" data-rz-registry="RZ_DCAI_PARAMETERS" defer></script>
     <!-- v1.130.0 operator decision-support modules. Pure deterministic models
          load before the page renderer; the DOM controller is deferred. -->
@@ -749,7 +754,7 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
          before the inspector so RZAlarmState is available when the Alarms tab
          renders. Closes review doc-27 §3.3 P0 + §4.3 P1. -->
     <script src="js/rz-alarm-state.js?v=20260920-a912ad23" defer></script>
-    <script src="js/rz-inspector.js?v=20260920-76c2d117" defer></script>
+    <script src="js/rz-inspector.js?v=20260920-5efe4744" defer></script>
     <!-- v1.43.2 — Data-quality service. Loaded before the inspector script so
          body[data-rz-data-mode] banner renders + RZTelemetryQuality is
          available when the inspector's Live tab renders its chip. Closes
@@ -7383,7 +7388,12 @@ s+=`<linearGradient id="supGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" s
 s+=`<linearGradient id="retGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="rgba(245,158,11,.7)"/><stop offset="100%" stop-color="rgba(245,158,11,.7)"/></linearGradient>`;
 // Heat shimmer filter for hot surfaces
 s+=`<filter id="shimmer" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="turbulence" baseFrequency="0.02 0.04" numOctaves="2" seed="2"><animate attributeName="baseFrequency" values="0.02 0.04;0.03 0.06;0.02 0.04" dur="3s" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="SourceGraphic" scale="1.5"/></filter>`;
-s+=tx(480,16,'COOLING & PIPING P&ID \u2014 LIQUID '+(capPct==null?'\u2014':capPct)+'% ('+gs('liquidHeatFmt')+' kW) + AIR '+(capPct==null?'\u2014':(100-capPct))+'% ('+gs('airHeatFmt')+' kW) = '+gs('itHallFmt')+' kW PER HALL','var(--t3)',8,'middle',1,bo('liquidHeatFmt',{also:['airHeatFmt','itHallFmt','liquidCapturePct']}));
+/* v3.10.2 — this title ran to x=674 at size 8 and the ASHRAE W4 chip starts at 640, so the
+   two collided. Measured with RZDiagramMetrics rather than guessed: the full string is 388
+   units wide, the split-only string is 204, and 480 +/- 102 clears the chip by 58.
+   The three kW figures are not lost - Performance Targets already prints all of them with
+   their own basis hooks, which is where the arithmetic belongs on this page. */
+s+=tx(480,16,'COOLING & PIPING P&ID \u2014 LIQUID '+(capPct==null?'\u2014':capPct)+'% + AIR '+(capPct==null?'\u2014':(100-capPct))+'%','var(--t3)',8,'middle',1,bo('liquidCapturePct'));
 // ===== HEADER STATUS STRIP — ASHRAE class + free-cooling state + ISA-5.1 tag legend =====
 // ASHRAE TC 9.9 thermal class label (W4 = facility-water inlet up to 27 °C)
 s+=`<rect x="640" y="6" width="80" height="16" rx="3" fill="rgba(34,197,94,.10)" stroke="var(--g)" stroke-width=".5"/>`;
@@ -8179,7 +8189,7 @@ else{ab.style.display='none';}
 // Idea 49: PUE badge (floating) — v1.22.8 GAP-2: engine-derived (was Math.random-driven COP shortcut producing ~1.17)
 var pueBadgeInit=(DH?DH.pue.toFixed(2):'—');
 var pueBadge=document.createElementNS('http://www.w3.org/2000/svg','g');
-pueBadge.innerHTML='<rect x="900" y="2" width="55" height="20" rx="4" fill="rgba(34,197,94,.12)" stroke="var(--g)" stroke-width=".6"/><text x="927" y="10" fill="var(--t3)" font-family="JetBrains Mono" font-size="4" text-anchor="middle">PUE</text><text x="927" y="18" fill="var(--g)" font-family="JetBrains Mono" font-size="8" text-anchor="middle" font-weight="700" id="pueBadgeV">'+pueBadgeInit+'</text>';
+pueBadge.innerHTML='<rect x="900" y="2" width="55" height="20" rx="4" fill="rgba(34,197,94,.12)" stroke="var(--g)" stroke-width=".6"/><text x="927" y="8" fill="var(--t3)" font-family="JetBrains Mono" font-size="4" text-anchor="middle">PUE</text><text x="927" y="19" fill="var(--g)" font-family="JetBrains Mono" font-size="7" text-anchor="middle" font-weight="700" id="pueBadgeV">'+pueBadgeInit+'</text>';
 pueBadge.setAttribute('class','rz-basis');pueBadge.setAttribute('data-basis-param','pue.design_day');pueBadge.setAttribute('tabindex','0');pueBadge.setAttribute('role','button');
 (function(){var ev=window.RZSvgBasis?RZSvgBasis.evidenceOf('pue.design_day'):'DERIVED',col=window.RZEvidence?RZEvidence.color(ev):'#3f9d6b';pueBadge.innerHTML+='<title>PUE design day \u00B7 '+ev+' \u00B7 pue.design_day</title><circle class="rz-basis-mark" cx="951" cy="9" r="2.2" fill="'+col+'" stroke="var(--bg2,#0b1220)" stroke-width="0.5"/>';})();
 el.appendChild(pueBadge);
