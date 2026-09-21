@@ -11,6 +11,61 @@ release sections rather than semver.
 
 ---
 
+## v3.11.0 — 2026-09-21
+
+### Eleven figures, fourteen reasons
+
+Explanatory figures for the article corpus, built rather than hand-drawn, and a written
+verdict for every article that did not get one.
+
+The corpus survey corrected an assumption first: counting `<svg>` per article returns 19–52
+and looks like a corpus rich in diagrams, but almost all of it is interface — share buttons,
+nav chevrons, icon glyphs. Counting only SVGs larger than 200 units gives thirteen real
+figures across twenty-nine articles, and **eight articles carrying no visual at all**.
+
+### Added
+
+- **`tools/build-article-diagrams.mjs`** — figures rendered at BUILD time, so they survive
+  the PDF export, the Markdown extraction into `llms-full.txt`, a reader with JavaScript
+  off, and the first paint. The author places an empty
+  `<figure data-rz-figure="id"></figure>` where the figure belongs; the tool fills it and
+  never inserts a placeholder itself, because where a figure belongs in an argument is an
+  editorial decision. Every definition records a `because` naming what it adds that the
+  prose cannot.
+- **Eleven figures**, each earning its place by showing a shape a table could not:
+  article&#8209;4 and 6/8 (what the calculator actually does — the output is a distribution
+  and the ranking is derived, not authored), 10 (the cooling loop §8.1 assumes but never
+  draws), 12 (the tariff gap, as a distance rather than a subtraction), 17 (Jevons as the
+  reinforcing loop it is, not three independent rows), 18 (two tables never connected — the
+  density trajectory crossed the air ceiling, so the heat path changed shape), 19 (the
+  corridor is one system, not a choice between two sites), 21 (the causal chain that makes a
+  20‑year PPA legible as a replacement for one link), 22 (drawn at the real 24:1 trace
+  ratio — the retimers exist only to pay for the distance), 26 (the escape routes bypass the
+  meter), 27 (two of three levers never reach the pool).
+- **`standarization/ARTICLE_FIGURE_AUDIT.md`** — every article, and the reason for each
+  verdict including the fourteen against building. Article 25 nearly received a static
+  duplicate of the 6 GW gap its own living diagram already animates; article 1 was excluded
+  by reading its code, which scores dimensions and runs no Monte Carlo at all.
+
+### Changed
+
+- The diagram engine gained the guards listed in `DIAGRAM_ENGINE_STANDARD` §3e. Colour may
+  never be the only channel (WCAG 1.4.1) — which caught hot and cold streams separated by
+  hue, and three node classes using ISA **alarm** hues as categories. A legend may not name
+  two things with an identical swatch, which found three such pairs already shipped. Ports,
+  node height, unknown options and the node budget all now report instead of failing quietly.
+- Figure size bounds travel with each figure, from its own viewBox. One blanket
+  `min-width:640px` had produced two opposite failures: wide figures shrank until their type
+  fell under the 8.5 px floor, narrow ones stretched until they shouted.
+
+### Fixed
+
+- `tools/test-asset-cache-tokens.mjs --fix <asset>` repairs the tokens it reports, for the
+  assets named explicitly. The manual sweep was forgotten twice in one session; a control
+  that has to be remembered is only a rule again.
+
+---
+
 ## v3.10.21 — 2026-09-21
 
 ### v3.10.20 fixed "two hamburgers" by shipping "no hamburger"
