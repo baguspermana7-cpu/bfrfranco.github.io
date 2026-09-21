@@ -99,8 +99,15 @@
   var TYPE = {
     'node-name': { size: 12, face: 'sans', weight: 600, tracking: 0 },
     sublabel: { size: 9, face: 'mono', weight: 400, tracking: 0 },
-    eyebrow: { size: 8, face: 'mono', weight: 500, tracking: 0.18, upper: true },
-    'arrow-label': { size: 8, face: 'mono', weight: 400, tracking: 0.06, upper: true },
+    /* v3.10.19 — 9, not 8. These two tiers are the smallest type the engine emits, and at 8
+       they render at exactly 8px against `audit-legibility.mjs`'s 8.5px floor: every figure
+       drawn with an eyebrow or an arrow label failed the gate the moment it shipped
+       (article-10 did, in bbd8ce4e). The type ramp and the legibility floor are both this
+       repository's own standards and they disagreed; the floor wins, because it is the one
+       measured against a rendered page. 9 is already `sublabel`'s size, so the ramp keeps
+       three distinct steps below `datum`. */
+    eyebrow: { size: 9, face: 'mono', weight: 500, tracking: 0.18, upper: true },
+    'arrow-label': { size: 9, face: 'mono', weight: 400, tracking: 0.06, upper: true },
     datum: { size: 11, face: 'mono', weight: 500, tracking: 0 },
     /* Legend entries are prose, not values, so they take the sans face. They
      * used to borrow `sublabel`, which is MONO — and the width was budgeted in

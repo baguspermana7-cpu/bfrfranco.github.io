@@ -212,6 +212,7 @@ gate "agent harness standard — privacy and release parity" node tools/test-age
 # source. terser -c -m is byte-reproducible for every twin here, so the check is exact.
 gate "index portrait — right face per theme, whole photo, sharp at every dpr" node tools/test-index-profile-photo.mjs
 gate "asset cache tokens — a token changes when its file does" node tools/test-asset-cache-tokens.mjs
+gate "cache tokens normalised — one asset, one token, adopted from the site not the clock" node tools/normalize-cache-tokens.mjs
 gate "min-twin freshness — no page runs a stale minified build" node tools/audit-min-twins.mjs --strict
 gate "OG card freshness — every card matches a fresh render of its generator" python3 tools/test-og-card-freshness.py
 gate "generator freshness — every generated artefact matches a fresh build" python3 tools/test-generator-freshness.py

@@ -11,6 +11,86 @@ release sections rather than semver.
 
 ---
 
+## v3.10.19 — 2026-09-21
+
+### The token followed the clock, and the clock moved
+
+v3.10.13 made every `?v=` token content-derived, `<yyyymmdd>-<first 8 of sha256>`. The digest half
+is stable and is the half the gate compares. **The date half was minted from `date.today()` by a
+sweep script retyped by hand at each ship**, and that is a defect with two faces:
+
+1. **Midnight churn.** Re-running the sweep the day after a release rewrites every token on every
+   page — 253 pages, for assets whose bytes never changed. Measured this morning: `index.html`
+   carries seven tokens, all dated `20260920`, every digest current. A clock-derived sweep would
+   have restamped all of them `20260921` for nothing.
+2. **A split token, introduced while fixing the first.** Regenerating ONE page with today's date
+   leaves it as the only page carrying a different token for a shared asset — precisely the "one
+   asset served under several tokens" defect `tools/test-asset-cache-tokens.mjs` exists to catch.
+
+The first face was found and fixed in `tools/build-changelog-html.py` (`ed5eb0f1`): the ship gate
+failed on a generated artifact nobody had touched, and the obvious remedy was the trap above.
+
+### Added
+
+- `tools/normalize-cache-tokens.mjs`, wired into `ship-gate.sh`. **The token follows the SITE, not
+  the clock:** it adopts the date the rest of the site already carries for this exact digest, and
+  mints today's date only when the digest shows the asset genuinely changed. A content change still
+  busts the cache, because the digest changes; a rebuild of an unchanged file does nothing.
+
+  Both halves proven by injection: with the tree clean it reports nothing to normalise; after a
+  real edit to `styles-index.css` it mints `?v=20260921-0409f1bd` for the one changed asset and
+  leaves the other six alone.
+
+  It uses the **local** date, not UTC. `build-changelog-html.py` mints with Python's `date.today()`,
+  which is local; this box is UTC+7, so the first cut of this tool minted `20260920` at 00:30 local
+  — two dates for one digest, which is the split it exists to prevent.
+
+### Why a tool and not a snippet
+
+This rule lived in an ad-hoc Python block pasted at each ship, which is exactly how the clock got
+into the token: **a rule that lives in the author's head is applied when the author remembers it.**
+`test-asset-cache-tokens.mjs` checks the digest; this writes it. Version pins are left alone — a tag
+carrying a `data-*-authority` attribute declares a CONTRACT version, and hashing those blanks the
+cockpit fail-closed.
+
+### Also in this release
+
+- **Dark-coverage measures the settled colour** (`17b031ca`). The body carries
+  `transition: background-color 0.3s`, so a theme flip ANIMATES, and `getComputedStyle` during the
+  transition returns the interpolated value — pure white under CPU contention. That is the
+  `body-lum=255 light-block=has-share-buttons` false positive that has cost three investigations,
+  shifts to a different page set every run, and names pages that render correctly in isolation.
+  Independently confirmed here before the fix landed: the four pages the v3.10.18 battery and a
+  solo re-run flagged — `article-2`, `article-25`, `article-7`, `FF-2` — all measure
+  `rgb(14, 15, 18)`, luminance **15**, when probed directly. Transitions are now suppressed before
+  the flip, so the reading no longer depends on how busy the machine is.
+
+### Fixed while shipping this
+
+- **Two type tiers in the diagram engine were below the legibility floor.** `article-10`'s new
+  loop figure rendered ten labels at 8px — "DOES THE WORK", "RAISE SETPOINTS", "RAISE CYCLES",
+  "DELIBERATE" and six more — and the legibility gate caught it on the release battery, having
+  reached `main` in `bbd8ce4e`.
+
+  **My first fix was wrong and a second gate caught it.** I edited the `font-size` attributes in
+  `article-10.html` directly; the article-diagrams gate immediately reported the page out of date
+  against its generator. The figure is GENERATED, and hand-editing generated output is the exact
+  mistake this repository's freshness gates exist to prevent — committed by the person who spent
+  the previous release writing them.
+
+  The real cause is `js/rz-diagram.js`: `eyebrow` and `arrow-label` are the smallest type the
+  engine emits and were `size: 8`, so **every figure carrying an eyebrow or an arrow label failed
+  the floor the moment it shipped.** Raised to 9 in the engine and all four figures rebuilt with
+  their own tool. The type ramp (from `documentation/design.md`) and the 8.5px legibility floor are
+  both this repository's standards and they disagreed; the floor wins, because it is the one
+  measured against a rendered page. 9 is already `sublabel`'s size, so the ramp keeps three
+  distinct steps below `datum`. Engine gates: 113/113 assertions, 0 collisions after the reflow.
+- `AGENT_HARNESS_STANDARD.md`'s `Last updated:` now matches the release date. The harness gate
+  asserts that parity and failed because this release crossed midnight — the same clock that put
+  this entry in the changelog.
+
+---
+
 ## v3.10.18 — 2026-09-20
 
 ### Four of my own audit findings were measurement artifacts
