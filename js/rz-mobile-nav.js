@@ -20,10 +20,87 @@
     }
 
     function findExistingBurger(navbar) {
+        /* v3.10.20 — `.mobile-nav-toggle` was missing from this list, and that is the whole
+           double-hamburger bug this file's header says it exists to prevent. Seven pages
+           (datacenter-solutions and the six pln-java-grid pages) mark their toggle up with that
+           class; the query missed it, the code fell through to the INJECT branch, and the reader
+           got two hamburgers in one header. The id is matched too, because a page that names the
+           element without classing it is the same page from a reader's point of view. */
         return navbar.querySelector(
             '.hamburger, .menu-toggle, [data-nav-toggle], .nav-toggle, ' +
-            '.mobile-menu-btn, button.menuButton'
+            '.mobile-menu-btn, button.menuButton, .mobile-nav-toggle, #mobileNavToggle'
         );
+    }
+
+    /* Does anything in this document actually style the open drawer?
+       The seven pages above do not load styles.min.css, so none of its 45 `body.rz-nav-open`
+       rules reach them: the burger set the class correctly and the menu stayed invisible. That
+       is the second half of "two buttons and neither works" — one button was a duplicate, and
+       the surviving one toggled a class with no listener.
+       Checked rather than assumed: a page that HAS the rules must not get a second, lower-quality
+       copy layered over them. Cross-origin sheets throw on .cssRules and are skipped. */
+    /* ONLY `body.rz-nav-open` counts as "this page already draws its own open menu", and the
+       reason is specificity, not taste.
+       89 pages carry a mobile block with `.nav-menu, .nav-links { display: none !important }`.
+       The shared stylesheet beats it, because `body.rz-nav-open .nav-links` is both !important AND
+       more specific. A page-local `.navbar.menu-open .nav-links` is NOT !important, so importance
+       beats it however specific it looks — which is why these seven pages shipped a drawer,
+       designed in their own palette, that could never open.
+       So the class is still toggled below (a page whose rule CAN win should get to use it), but it
+       does not count as coverage: treating it as coverage suppressed the fallback on exactly the
+       seven pages that needed one. */
+    function stylesDrawer(selector) {
+        return !!selector && selector.indexOf('rz-nav-open') !== -1;
+    }
+
+    function documentStylesTheDrawer() {
+        var sheets = document.styleSheets;
+        for (var i = 0; i < sheets.length; i++) {
+            var rules;
+            try { rules = sheets[i].cssRules; } catch (e) { continue; }
+            if (!rules) continue;
+            for (var j = 0; j < rules.length; j++) {
+                if (stylesDrawer(rules[j].selectorText)) return true;
+                /* the canonical rules live inside a @media block */
+                if (rules[j].cssRules) {
+                    for (var k = 0; k < rules[j].cssRules.length; k++) {
+                        if (stylesDrawer(rules[j].cssRules[k].selectorText)) return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    /* A minimal drawer, injected ONLY where the shared stylesheet is absent. Plain on purpose:
+       its job is that the menu OPENS, not that it matches the site's nicer one.
+
+       It hangs off the NAVBAR, not the viewport, and that is the part worth keeping. The first cut
+       used `position:fixed; top:56px; bottom:0` and rendered 48px tall. Nothing set a height —
+       `.navbar` carries `backdrop-filter: blur(20px)`, and a filtered ancestor becomes the
+       containing block for its fixed descendants, so the drawer resolved against a 64px bar
+       instead of the screen. The navbar is itself `position:fixed` on these pages, so anchoring
+       to it with `top:100%` is both correct and simpler than fighting the containing block. */
+    function injectDrawerStyles() {
+        if (document.getElementById('rz-nav-drawer-fallback')) return;
+        var style = document.createElement('style');
+        style.id = 'rz-nav-drawer-fallback';
+        style.textContent =
+            '@media (max-width:768px){' +
+            'body.rz-nav-open .nav-menu,body.rz-nav-open .nav-links{' +
+            'display:flex !important;position:absolute !important;' +
+            'top:100% !important;left:0 !important;right:0 !important;bottom:auto !important;' +
+            'flex-direction:column !important;align-items:stretch !important;' +
+            'height:auto !important;max-height:calc(100vh - 100%);overflow-y:auto;' +
+            'background:rgba(15,23,42,0.97);padding:0.5rem 1.25rem 1.5rem;margin:0;' +
+            'gap:0 !important;z-index:1000;' +
+            'border-top:1px solid rgba(255,255,255,0.10);}' +
+            'body.rz-nav-open .nav-menu a,body.rz-nav-open .nav-links a{' +
+            'display:block;padding:0.85rem 0.25rem;color:#f1f5f9;text-decoration:none;' +
+            'border-bottom:1px solid rgba(255,255,255,0.10);font-size:1rem;}' +
+            'body.rz-nav-open{overflow:hidden;}' +
+            '}';
+        document.head.appendChild(style);
     }
 
     function init() {
@@ -96,11 +173,15 @@
                                  : window.addEventListener('resize', applyBurgerDisplay));
         }
 
+        if (!documentStylesTheDrawer()) { injectDrawerStyles(); }
+
         // Store reference on window so the close-on-outside handler can find it
         window.__rzNavBurger = burger;
 
         function setOpen(open) {
             document.body.classList.toggle('rz-nav-open', open);
+            /* the page-local pattern, for navbars that style their own drawer */
+            navbar.classList.toggle('menu-open', open);
             burger.classList.toggle('open', open);
             burger.setAttribute('aria-expanded', open ? 'true' : 'false');
             // Prevent body scroll while drawer is open

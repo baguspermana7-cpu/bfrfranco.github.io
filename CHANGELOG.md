@@ -11,6 +11,63 @@ release sections rather than semver.
 
 ---
 
+## v3.10.20 — 2026-09-21
+
+### Two hamburgers, neither working
+
+Owner, on `datacenter-solutions.html` at phone width: *"Hamburger button utk menu ada 2 dan nggak
+working saat di klik. Ini critical."* Two buttons in one header, and neither did anything. Seven
+pages: `datacenter-solutions.html` and the six `pln-java-grid*` pages.
+
+`js/rz-mobile-nav.js` states in its own header that it exists to prevent exactly this — it detects
+an existing toggle and wires it up "instead of double-injecting". **Three compounding faults, and
+none of them is visible by reading the file.**
+
+1. **The detector's selector list did not include `.mobile-nav-toggle`**, which is how those seven
+   pages mark their button up. The query missed, the code fell through to the INJECT branch, and
+   the reader got a second hamburger beside the first.
+2. **Those pages do not load `styles.min.css`**, so none of its 45 `body.rz-nav-open` rules reach
+   them. The surviving burger set the class correctly and nothing listened.
+3. **They DO ship their own drawer** — `.navbar.menu-open .nav-links`, designed in their own
+   palette, `var(--pjg-bg)` and all — but 89 pages carry a mobile block with
+   `.nav-menu, .nav-links { display: none !important }`, and **importance beats specificity**. A
+   finished design sat behind a rule it could never win against, with nothing setting its class.
+
+### Fixed
+
+- `.mobile-nav-toggle` and `#mobileNavToggle` added to the detector. One hamburger, not two.
+- `menu-open` is now toggled on the navbar alongside `body.rz-nav-open`, so a page whose own drawer
+  rule CAN win gets to use it.
+- A minimal drawer is injected **only** where no `body.rz-nav-open` rule exists. The coverage test
+  deliberately does not count `.menu-open`: it is not `!important`, so it cannot beat the mobile
+  hide, and counting it suppressed the fallback on exactly the seven pages that needed one.
+
+### The CSS trap that cost the most time
+
+The first fallback used `position: fixed; top: 56px; bottom: 0` and rendered **48px tall**. No rule
+set a height and `max-height` was `none`. The cause: **`.navbar` carries `backdrop-filter:
+blur(20px)`, and a filtered ancestor becomes the containing block for its fixed descendants** — so
+the drawer resolved against a 64px bar instead of the screen. The navbar is itself `position: fixed`
+on these pages, so the fallback now hangs off it with `top: 100%`, which is both correct and simpler
+than fighting the containing block.
+
+### Added
+
+- `tools/test-mobile-nav.mjs`, wired into `ship-gate.sh`. At 390px on seven navbar shapes it
+  asserts exactly one VISIBLE toggle, that clicking it opens a menu of real size, that clicking
+  again closes it, and that no toggle is visible at 1280px. **Proven RED against the shipped code**,
+  where it reports precisely the owner's two symptoms: `found 2` toggles, and `menu 0x0px`.
+
+  Reading the source would not have caught any of this. Only a rendered page at a phone width,
+  clicked, answers the question the owner asked — which is why the gate drives a real browser.
+
+### Verified not to regress the 82 pages that already worked
+
+`index.html`, `articles.html`, `glossary.html` and `tools.html` each still show one toggle, open to
+a full drawer and close again.
+
+---
+
 ## v3.10.19 — 2026-09-21
 
 ### The token followed the clock, and the clock moved
