@@ -58,6 +58,137 @@ const { RZDiagram: D, RZDiagramMetrics: M, RZDiagramLayout: L } = sandbox;
  * ======================================================================== */
 const FIGURES = [
   {
+    id: 'corridor-model',
+    page: 'article-19.html',
+    caption:
+      'Not a choice between two sites \u2014 one system across both, split by what each side is ' +
+      'good at. Singapore keeps the front door because that is where the peering is; Batam takes ' +
+      'the engine room because that is where the power and land are. The dedicated interconnect ' +
+      'is what makes the split workable rather than a compromise.',
+    because:
+      'the section argues that the informed answer is neither site but a corridor spanning both. ' +
+      'That is a TOPOLOGY, and the article states it only in prose: which workloads stay, which ' +
+      'move, and the link that joins them. A reader who has been comparing two columns of costs ' +
+      'has to be shown that the comparison was the wrong frame.',
+    build() {
+      const ctx = D.create({
+        slug: 'corridor',
+        title: 'The Singapore-Batam corridor: one system, split by function',
+        desc: 'Front-end workloads \u2014 peering, low-latency applications and cloud ' +
+              'interconnect \u2014 stay in Singapore, whose growth is capped by land, power and ' +
+              'a 1.25 PUE sustainability framework. Back-end capacity \u2014 AI training, storage ' +
+              'and disaster recovery \u2014 moves to Batam, which absorbs the overflow. A ' +
+              'dedicated submarine interconnect of 24 fibre pairs at 20 Tbps each, targeted for ' +
+              'the fourth quarter of 2026, joins the two.'
+      });
+
+      const W = 360, LX = 56, RX = 620, NY = 96;
+
+      const front = ctx.node(LX, NY, {
+        id: 'front', tag: 'front door', name: 'Peering \u00B7 low latency \u00B7 interconnect',
+        sublabel: 'stays where the ecosystem is', w: W,
+        stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'Workload that cannot move'
+      });
+      const back = ctx.node(RX, NY, {
+        id: 'back', tag: 'engine room', name: 'AI training \u00B7 storage \u00B7 DR',
+        sublabel: 'moves to where power and land are', w: W,
+        stroke: 'rule-solid', fill: 'paper', tier: 2, legend: 'Workload that can'
+      });
+
+      /* The link is the point: without it this is two sites, not a corridor. */
+      ctx.edge({ x: front.x + front.w, y: front.y + front.h / 2 },
+               { x: back.x, y: back.y + back.h / 2 }, {
+        fromId: 'front', toId: 'back', stroke: 'ink', tier: 1, pattern: 'solid',
+        label: '24 pairs \u00B7 20 Tbps each', legend: 'Dedicated interconnect, Q4 2026'
+      });
+
+      ctx.zone(LX - 24, NY - 52, W + 48, 160, {
+        label: 'singapore \u2014 capped by land, power, PUE 1.25 and 50 % green',
+        tier: 3, dashed: true, stroke: 'accent'
+      });
+      ctx.zone(RX - 24, NY - 52, W + 48, 160, {
+        label: 'batam \u2014 absorbs what Singapore structurally cannot',
+        tier: 3, dashed: true
+      });
+
+      ctx.legend();
+      return ctx.fit(28);
+    }
+  },
+  {
+    id: 'jevons-loop',
+    page: 'article-17.html',
+    caption:
+      'The bear case reads the first arrow and stops. Efficiency does cut the cost of a query, ' +
+      'by about 90 % once model, hardware and quantisation gains compound \u2014 and that is ' +
+      'exactly what raises total volume by roughly a thousand per cent. The last step funds the ' +
+      'first, which is what makes it a loop rather than a saving.',
+    because:
+      'the article tabulates three efficiency factors against their effect on per-query cost and ' +
+      'on total demand. A table lists them as three independent rows; it cannot show that the ' +
+      'output returns to the input. Jevons is a REINFORCING CYCLE, and a cycle drawn as a list ' +
+      'reads as a set of unrelated savings \u2014 which is precisely the misreading the section ' +
+      'was written to correct.',
+    build() {
+      const ctx = D.create({
+        slug: 'jevons',
+        title: 'Why cheaper inference raises total demand',
+        desc: 'A reinforcing cycle in four steps. Efficiency gains in models, hardware and ' +
+              'quantisation cut the cost of a query. A cheaper query brings more users and more ' +
+              'use cases. More queries raise total compute demand. Rising demand funds the next ' +
+              'round of efficiency work, which returns to the first step. The per-unit cost falls ' +
+              'about 90 per cent while total volume rises about a thousand per cent.'
+      });
+
+      const L = 40, R = 560, TOP = 50, BOT = 236, W = 330;
+
+      const eff = ctx.node(L, TOP, {
+        id: 'eff', tag: 'step 1', name: 'Efficiency improves',
+        sublabel: 'model \u00B7 hardware \u00B7 quantisation', w: W,
+        stroke: 'accent', fill: 'paper-2', tier: 1,
+        legend: 'Where the bear case stops reading'
+      });
+      const cost = ctx.node(R, TOP, {
+        id: 'cost', tag: 'step 2', name: 'Cost per query falls',
+        sublabel: 'about \u221290 % per unit combined', w: W,
+        stroke: 'rule-solid', fill: 'paper', tier: 2, legend: 'Steps in the cycle'
+      });
+      const use = ctx.node(R, BOT, {
+        id: 'use', tag: 'step 3', name: 'More users, more use cases',
+        sublabel: 'about +1,000 % total volume', w: W,
+        stroke: 'rule-solid', fill: 'paper', tier: 2
+      });
+      const demand = ctx.node(L, BOT, {
+        id: 'demand', tag: 'step 4', name: 'Total compute demand rises',
+        sublabel: 'inference to 90 GW by 2030', w: W,
+        stroke: 'rule-solid', fill: 'paper', tier: 2
+      });
+
+      const midY = (n) => n.y + n.h / 2;
+      const midX = (n) => n.x + n.w / 2;
+
+      /* Clockwise, every leg axis-aligned: the cycle needs no elbow, so it gets
+       * none. The closing leg is the one the argument turns on, so it is the
+       * one that carries an accent and a label. */
+      ctx.edge({ x: eff.x + eff.w, y: midY(eff) }, { x: cost.x, y: midY(cost) }, {
+        fromId: 'eff', toId: 'cost', stroke: 'ink', tier: 2, pattern: 'solid'
+      });
+      ctx.edge({ x: midX(cost), y: cost.y + cost.h }, { x: midX(use), y: use.y }, {
+        fromId: 'cost', toId: 'use', stroke: 'ink', tier: 2, pattern: 'solid'
+      });
+      ctx.edge({ x: use.x, y: midY(use) }, { x: demand.x + demand.w, y: midY(demand) }, {
+        fromId: 'use', toId: 'demand', stroke: 'ink', tier: 2, pattern: 'solid'
+      });
+      ctx.edge({ x: midX(demand), y: demand.y }, { x: midX(eff), y: eff.y + eff.h }, {
+        fromId: 'demand', toId: 'eff', stroke: 'accent', tier: 1, pattern: 'solid',
+        label: 'funds the next round', legend: 'The leg that closes the loop'
+      });
+
+      ctx.legend();
+      return ctx.fit(28);
+    }
+  },
+  {
     id: 'cooling-water-loop',
     page: 'article-10.html',
     caption:
