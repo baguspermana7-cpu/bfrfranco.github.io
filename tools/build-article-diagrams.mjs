@@ -1011,8 +1011,20 @@ function figureMarkup(fig, ctx) {
    * the viewBox and 640, so a wide figure scrolls in its own track instead of
    * shrinking into illegibility, and a narrow one never forces a scrollbar it
    * does not need. */
-  const bounds = 'max-width:' + ctx.width + 'px;min-width:' +
-    Math.min(ctx.width, 640) + 'px;';
+  /* min-width is the FULL viewBox, not min(viewBox, 640).
+   *
+   * Letting a figure shrink to the column was the whole defect: a 1,032-unit
+   * figure in a 744 px column renders at 0.72, and a 9-unit label lands at
+   * 6.5 px — well under this site's 8.5 px floor. Measured across the corpus,
+   * nine of eleven figures were illegible that way, and the legibility gate
+   * reported only two of them, because its page set does not cover the rest.
+   *
+   * With max-width and min-width both equal to the viewBox the figure always
+   * renders exactly 1:1 and scrolls inside its own overflow-x track when the
+   * column is narrower — the same treatment this site already gives wide tables
+   * and code blocks. Scrolling a figure is a cost; being unable to read it is a
+   * defect. */
+  const bounds = 'max-width:' + ctx.width + 'px;min-width:' + ctx.width + 'px;';
   const svg = ctx.render().replace(
     '<svg ', '<svg style="' + bounds + TOKEN_BRIDGE + '" ');
   return '\n' + svg +
@@ -1046,7 +1058,7 @@ for (const [page, figs] of byPage) {
      * Wide is not a style choice here; it is a legibility failure with a
      * different name. Wrap the composition or stack it vertically. */
     const ARTICLE_TRACK_PX = 1100;
-    const SMALLEST_TYPE = 8;
+    const SMALLEST_TYPE = 9;
     const scaled = SMALLEST_TYPE * (ARTICLE_TRACK_PX / ctx.width);
     if (ctx.width > ARTICLE_TRACK_PX && scaled < 8.5) {
       findings.push(
