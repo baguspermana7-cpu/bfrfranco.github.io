@@ -11,12 +11,22 @@
     'use strict';
 
     function findNavbar() {
-        // Try most-specific to least-specific selectors
-        return document.querySelector(
-            'nav.navbar, header.navbar, .navbar, ' +
-            'nav.cx-nav, nav.rfs-navbar, ' +
-            'header > nav, body > nav:first-of-type'
-        );
+        /* One querySelector with a comma list returns the first match in DOCUMENT ORDER, not the
+           first selector that matches — so on 24 article pages, where `nav.toc-sidebar` sits above
+           `nav.navbar` in the markup, the LAST fallback (`body > nav:first-of-type`) claimed the
+           table-of-contents sidebar. That sidebar is `display:none` on a phone, so the burger was
+           injected into it and no reader ever saw a menu button. Ask in priority order instead. */
+        var selectors = [
+            'nav.navbar', 'header.navbar', '.navbar',
+            'nav.cx-nav', 'nav.rfs-navbar',
+            'header > nav', 'body > nav:first-of-type'
+        ];
+        for (var i = 0; i < selectors.length; i++) {
+            var hit = document.querySelector(selectors[i]);
+            /* a hidden shell is not the navbar a reader uses */
+            if (hit && hit.getClientRects().length) { return hit; }
+        }
+        return null;
     }
 
     function findExistingBurger(navbar) {
@@ -85,9 +95,25 @@
         if (document.getElementById('rz-nav-drawer-fallback')) return;
         var style = document.createElement('style');
         style.id = 'rz-nav-drawer-fallback';
+        /* The burger itself needs styling here too, not just the drawer. `.rz-nav-burger` and its
+           three <span> bars live in styles.min.css; on a page that does not load it, a WIRED
+           existing button renders its bars at zero width — spares-readiness-calculator measured a
+           4px-wide tap target that opened the menu correctly and could not be hit. The inject
+           branch sets those styles inline; the wire branch had nothing. */
+        var BURGER =
+            '.rz-nav-burger{display:inline-flex !important;flex-direction:column;' +
+            'align-items:center;justify-content:center;gap:5px;' +
+            'width:44px !important;min-width:44px;height:44px !important;min-height:44px;' +
+            'padding:0;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.18);' +
+            'border-radius:8px;color:#f1f5f9;cursor:pointer;}' +
+            '.rz-nav-burger>span{display:block !important;width:20px !important;height:2px !important;' +
+            'background:currentColor !important;border-radius:2px;flex-shrink:0;}';
+        /* every menu shape this site ships, not just the two most common */
+        var MENU = 'body.rz-nav-open .nav-menu,body.rz-nav-open .nav-links,' +
+                   'body.rz-nav-open .cx-nav-links,body.rz-nav-open .rfs-nav-links';
         style.textContent =
-            '@media (max-width:768px){' +
-            'body.rz-nav-open .nav-menu,body.rz-nav-open .nav-links{' +
+            '@media (max-width:768px){' + BURGER +
+            MENU + '{' +
             'display:flex !important;position:absolute !important;' +
             'top:100% !important;left:0 !important;right:0 !important;bottom:auto !important;' +
             'flex-direction:column !important;align-items:stretch !important;' +
@@ -95,8 +121,12 @@
             'background:rgba(15,23,42,0.97);padding:0.5rem 1.25rem 1.5rem;margin:0;' +
             'gap:0 !important;z-index:1000;' +
             'border-top:1px solid rgba(255,255,255,0.10);}' +
-            'body.rz-nav-open .nav-menu a,body.rz-nav-open .nav-links a{' +
-            'display:block;padding:0.85rem 0.25rem;color:#f1f5f9;text-decoration:none;' +
+            MENU.split(',').map(function(s){return s + ' a';}).join(',') + '{' +
+            /* !important because these pages hid surplus links at mobile width back when there
+               was no drawer to put them in — rfs-readiness-workbench had two of its three links
+               at `display:none`, so the menu opened showing one link. Inside an OPEN drawer there
+               is room, and hiding them there serves nobody. */
+            'display:block !important;padding:0.85rem 0.25rem;color:#f1f5f9;text-decoration:none;' +
             'border-bottom:1px solid rgba(255,255,255,0.10);font-size:1rem;}' +
             'body.rz-nav-open{overflow:hidden;}' +
             '}';
@@ -117,10 +147,19 @@
             // Wire up the existing button — preferred path (single hamburger)
             burger = existing;
             burger.classList.add('rz-nav-burger', 'rz-nav-burger-bound');
-            // Ensure it has the 3-line structure for the X-morph animation
-            if (!burger.querySelector('span')) {
+            /* Give it the 3-line structure ONLY if the button is empty.
+               v3.10.21 — this used to fire whenever the button had no <span>, which on
+               datacenter-solutions replaced its `<i class="fas fa-bars">` with three bare spans.
+               Those spans are styled by `.rz-nav-burger span` in styles.min.css, and that page
+               does not load it, so the button rendered 0px wide: the fix for "two hamburgers"
+               shipped "no hamburger". An existing icon is already a hamburger — leave it. */
+            if (!burger.firstElementChild && !burger.textContent.trim()) {
                 burger.innerHTML = '<span></span><span></span><span></span>';
             }
+            if (!burger.getAttribute('aria-label')) {
+                burger.setAttribute('aria-label', 'Toggle navigation menu');
+            }
+            burger.setAttribute('aria-expanded', 'false');
         } else {
             // Inject new — fallback when no toggle exists
             burger = document.createElement('button');

@@ -35,22 +35,28 @@
 import puppeteer from 'puppeteer-core';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
-/* One page per navbar shape, not a crawl: the shapes are what differ, and a full crawl of 176
-   pages at two viewports would cost more than it tells. `.mobile-nav-toggle` pages first —
-   they are the ones that shipped broken. */
-const PAGES = [
-    'datacenter-solutions.html',        // .mobile-nav-toggle + dropdowns
-    'pln-java-grid.html',               // .mobile-nav-toggle, own drawer design
-    'pln-java-grid-jatim.html',
-    'index.html',                       // .hamburger + shared stylesheet
-    'articles.html',
-    'glossary.html',
-    'tools.html',
-];
+/* EVERY page the sitemap publishes that has a navbar and a menu — 138 of them — not a sample.
+   The first cut of this gate sampled seven "navbar shapes" and passed while 25 pages were broken:
+   24 article/FF/geopolitics pages had NO visible toggle at all, and one had a 4px-wide one. A
+   sample tells you about the sample. */
+const ROOT_PAGES = (() => {
+    const xml = readFileSync(join(ROOT, 'sitemap.xml'), 'utf8');
+    const out = [];
+    for (const m of xml.matchAll(/<loc>https:\/\/resistancezero\.com\/([^<]*)<\/loc>/g)) {
+        const rel = m[1];
+        if (!rel.endsWith('.html') || !existsSync(join(ROOT, rel))) { continue; }
+        const html = readFileSync(join(ROOT, rel), 'utf8');
+        if (!/class="[^"]*\b(navbar|nav-bar|rfs-navbar|cx-nav)\b/.test(html)) { continue; }
+        if (!/class="[^"]*\b(nav-menu|nav-links|cx-nav-links|rfs-nav-links)\b/.test(html)) { continue; }
+        out.push(rel);
+    }
+    return out;
+})();
+const PAGES = ROOT_PAGES;
 
 const TOGGLES = '.rz-nav-burger, .mobile-nav-toggle, .hamburger, .menu-toggle, .nav-toggle';
 const MENUS = '.nav-menu, .nav-links, .cx-nav-links, .rfs-nav-links';
@@ -70,42 +76,64 @@ for (const rel of PAGES) {
     await page.goto('file://' + file, { waitUntil: 'networkidle0', timeout: 60000 });
     await new Promise((r) => setTimeout(r, 800));
 
+    /* offsetParent is null for a position:fixed element, so it is the wrong visibility test for a
+       navbar button; a real box is the right one. It also catches the 4px-wide burger that opened
+       the menu correctly and could not be hit. */
     const visibleToggles = await page.evaluate((sel) =>
-        [...document.querySelectorAll(sel)].filter((e) => e.offsetParent !== null).length, TOGGLES);
+        [...document.querySelectorAll(sel)]
+            .filter((e) => { const r = e.getBoundingClientRect(); return r.width > 8 && r.height > 8; })
+            .length, TOGGLES);
     if (visibleToggles !== 1) {
         findings.push({ page: rel, rule: 'N1 exactly one visible toggle', detail: `found ${visibleToggles}` });
         if (visibleToggles === 0) { continue; }
     }
 
+    /* "Open" is not a height. A closed slide-in drawer is 774px tall and parked at left:-601px;
+       a centre hit-test fails on a gated page because a root overlay sits above the menu. What a
+       reader needs is LINKS THEY CAN SEE AND TAP, so that is what is counted. */
     const measure = () => page.evaluate((sel) => {
         const m = document.querySelector(sel);
-        if (!m) { return { h: 0 }; }
+        if (!m) { return { on: false, w: 0, h: 0, links: 0 }; }
         const r = m.getBoundingClientRect();
-        return { h: Math.round(r.height), w: Math.round(r.width) };
+        const cs = getComputedStyle(m);
+        const onScreen = r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth;
+        const painted = cs.display !== 'none' && cs.visibility !== 'hidden'
+            && parseFloat(cs.opacity) > 0.05;
+        const links = Array.from(m.querySelectorAll('a')).filter((a) => {
+            const ar = a.getBoundingClientRect();
+            return ar.width > 20 && ar.height > 10
+                && ar.bottom > 0 && ar.top < innerHeight && ar.right > 0 && ar.left < innerWidth;
+        }).length;
+        return { on: onScreen && painted, w: Math.round(r.width), h: Math.round(r.height), links };
     }, MENUS);
     const click = () => page.evaluate((sel) => {
-        const t = [...document.querySelectorAll(sel)].find((e) => e.offsetParent !== null);
+        const t = [...document.querySelectorAll(sel)]
+            .find((e) => { const r = e.getBoundingClientRect(); return r.width > 8 && r.height > 8; });
         if (t) { t.click(); }
     }, TOGGLES);
 
     await click();
     await new Promise((r) => setTimeout(r, 500));
     const opened = await measure();
-    if (!(opened.h > 100 && opened.w > 100)) {
-        findings.push({ page: rel, rule: 'N2 the toggle opens the menu', detail: `menu ${opened.w}x${opened.h}px` });
+    if (!(opened.on && opened.links >= 2)) {
+        findings.push({ page: rel, rule: 'N2 the toggle opens a menu with tappable links',
+                        detail: `menu ${opened.w}x${opened.h}px, ${opened.links} link(s) on screen` });
     }
 
     await click();
     await new Promise((r) => setTimeout(r, 500));
     const closed = await measure();
-    if (closed.h > 100) {
-        findings.push({ page: rel, rule: 'N3 the toggle closes it again', detail: `menu still ${closed.h}px tall` });
+    if (closed.on && closed.links >= 2) {
+        findings.push({ page: rel, rule: 'N3 the toggle closes it again',
+                        detail: `${closed.links} link(s) still on screen` });
     }
 
     await page.setViewport({ width: 1280, height: 900 });
     await new Promise((r) => setTimeout(r, 400));
     const desktopToggles = await page.evaluate((sel) =>
-        [...document.querySelectorAll(sel)].filter((e) => e.offsetParent !== null).length, TOGGLES);
+        [...document.querySelectorAll(sel)]
+            .filter((e) => { const r = e.getBoundingClientRect(); return r.width > 8 && r.height > 8; })
+            .length, TOGGLES);
     if (desktopToggles !== 0) {
         findings.push({ page: rel, rule: 'N4 no toggle on desktop', detail: `${desktopToggles} visible at 1280px` });
     }

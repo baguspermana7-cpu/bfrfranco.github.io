@@ -11,6 +11,63 @@ release sections rather than semver.
 
 ---
 
+## v3.10.21 — 2026-09-21
+
+### v3.10.20 fixed "two hamburgers" by shipping "no hamburger"
+
+Owner, on the same page, after that release: *"Malah nggak ada navbar. Tolol. Audit fix yg bener."*
+He was right. Wiring the page's own button, the code replaced its `<i class="fas fa-bars">` with
+three bare `<span>`s — and those are styled by `.rz-nav-burger span` in `styles.min.css`, which
+these pages do not load. **The button rendered 0px wide.** An existing icon is already a hamburger;
+the span-morph is cosmetic and must never destroy content that is doing the job.
+
+### Then the sweep he asked for found far more than the seven pages v3.10.20 touched
+
+Every page the sitemap publishes that has a navbar and a menu — **138 of them**, not a sample:
+
+| fault | pages |
+|---|---|
+| no visible toggle at all | **24** — `article-1`…`18`, `FF-1`…`3`, `geopolitics-1`…`3` |
+| a 4px-wide toggle that opened the menu and could not be tapped | 1 — `spares-readiness-calculator` |
+| menu opened showing 1 of its 3 links | 1 — `rfs-readiness-workbench` |
+
+**The 24 had been broken all along, for a reason worth writing down.** `findNavbar()` used a single
+`querySelector` with a comma list, and that returns the first match in **document order, not
+selector priority**. On article pages `nav.toc-sidebar` sits above `nav.navbar` in the markup, so
+the last fallback in the list — `body > nav:first-of-type` — claimed the table-of-contents sidebar.
+That sidebar is `display:none` on a phone, so the burger was injected into a hidden element and no
+reader ever saw a menu button.
+
+### Fixed, all in `js/rz-mobile-nav.js`
+
+- **Never destroy an existing button's content.** Spans are added only when the button is empty.
+- **Selectors are asked in priority order**, and a candidate must have a rendered box — a hidden
+  shell is not the navbar a reader uses.
+- **The fallback styles the burger too, and all four menu shapes** (`.nav-menu`, `.nav-links`,
+  `.cx-nav-links`, `.rfs-nav-links`). The inject branch set burger styles inline; the wire branch
+  had nothing, which is how a 4px tap target opened a working menu.
+- **Drawer links are forced visible.** `rfs-readiness-workbench` hid two of its three links at
+  mobile width, from a time when there was no drawer to put them in. Inside an open drawer there is
+  room, and hiding them there serves nobody.
+
+### The gate now covers every navbar page, because a sample told me about the sample
+
+`tools/test-mobile-nav.mjs` sampled seven "navbar shapes" and passed while 25 pages were broken. It
+now walks all 138. **Proven RED against shipped v3.10.20: 28 findings on 28 pages** — 26 with the
+wrong number of visible toggles, 2 opening a menu with nothing tappable. 0 after.
+
+### I had to correct my own test twice, and both corrections are the same lesson
+
+- **Height is not "open".** A correctly CLOSED slide-in drawer measures 774px tall, parked at
+  `left:-601px`. Judging by height called two working pages broken.
+- **A centre hit-test is not "visible".** It fails on a root-gated page because the gate overlay
+  sits above the menu, and on another because the centre landed on a nested input.
+
+It now counts what a reader actually needs: **links they can see and tap**. Same lesson as v3.10.18 —
+measure the thing the metric is a proxy for, not the metric.
+
+---
+
 ## v3.10.20 — 2026-09-21
 
 ### Two hamburgers, neither working
