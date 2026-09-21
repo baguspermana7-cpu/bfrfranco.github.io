@@ -487,6 +487,20 @@
               var sameShape = kind === 'edge'
                 ? a.pattern === b.pattern
                 : (!!a.dashed === !!b.dashed && a.fill === b.fill);
+              /* Identical encoding, different label. Worse than a hue-only
+               * split, because there the reader can at least see two things —
+               * here the legend offers two names for one swatch and no way to
+               * tell which is which. Either the treatments differ or the
+               * entries are one entry. */
+              if (sameShape && a.stroke === b.stroke) {
+                warnings.push({
+                  kind: 'legend-indistinguishable',
+                  message: '"' + a.legend + '" and "' + b.legend + '" are drawn identically, ' +
+                           'so the legend names two things a reader cannot tell apart — ' +
+                           'give them different treatments, or make them one entry'
+                });
+                continue;
+              }
               if (sameShape && a.stroke !== b.stroke) {
                 warnings.push({
                   kind: 'colour-only',

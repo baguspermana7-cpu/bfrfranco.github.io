@@ -58,6 +58,158 @@ const { RZDiagram: D, RZDiagramMetrics: M, RZDiagramLayout: L } = sandbox;
  * ======================================================================== */
 const FIGURES = [
   {
+    id: 'three-levers',
+    page: 'article-27.html',
+    caption:
+      'Three levers, one pool. Substitute lowers how many people the work needs; Extend raises ' +
+      'what the people already there can do. Neither adds a qualified person. Only Create feeds ' +
+      'the pool \u2014 and it is the slowest of the three, which is the whole difficulty of ' +
+      'building a plan rather than a collection of initiatives.',
+    because:
+      'the table gives each lever a definition, a strategy list and a time horizon, and the ' +
+      'prose then states the finding: Create is the only lever that permanently increases ' +
+      'supply. In a table that sentence is a fourth column nobody reads against the others. ' +
+      'Drawn, it is the shape of the thing \u2014 two of the three arrows never reach the pool.',
+    build() {
+      const ctx = D.create({
+        slug: 'levers',
+        title: 'Three workforce levers, and which one actually adds people',
+        desc: 'The shortage of qualified data centre staff can be attacked three ways. Create ' +
+              'builds new qualified supply through apprenticeships, community college and ' +
+              'university pipelines, taking weeks through unions to six years or more through a ' +
+              'degree, and it is the only lever that adds to the pool. Substitute replaces human ' +
+              'labour with technology or outsourced services, lowering the number of people ' +
+              'needed. Extend raises the output of the people already present through tooling ' +
+              'and training. Neither Substitute nor Extend adds a qualified person.'
+      });
+
+      const LX = 40, W = 340, RX = 520;
+
+      /* The pool is drawn tall enough to span all three levers, so each one
+       * gets its own port opposite itself and every run is level. The first cut
+       * gave it a normal-height box and aimed three connectors at points 12 to
+       * 18 units apart; the router doglegged all three through one corridor and
+       * they wove into a rectangle nobody had declared. */
+      const POOL_TOP = 48, POOL_H = 400;
+      const pool = ctx.node(RX, POOL_TOP, {
+        id: 'pool', tag: 'the constraint', name: 'Qualified people available',
+        sublabel: 'the pool the 2026 cliff drains', w: W, h: POOL_H, vAlign: 'middle',
+        stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'What the shortage is'
+      });
+      const ports = ctx.ports(pool, 3, 'left', { id: 'pool' });
+
+      const create = ctx.node(LX, ports[0].y - 36, {
+        id: 'create', tag: 'weeks to 6+ yrs', name: 'CREATE',
+        sublabel: 'apprenticeship \u00B7 college \u00B7 degree', w: W,
+        stroke: 'accent', fill: 'paper', tier: 2, legend: 'Adds to the pool \u2014 and only this one'
+      });
+      const subst = ctx.node(LX, ports[1].y - 36, {
+        id: 'subst', tag: 'immediate to 7 yrs', name: 'SUBSTITUTE',
+        sublabel: 'NOCaaS \u00B7 automation \u00B7 outsourcing', w: W,
+        stroke: 'rule-solid', fill: 'paper', tier: 2, dashed: true,
+        legend: 'Changes the demand, not the supply'
+      });
+      const extend = ctx.node(LX, ports[2].y - 36, {
+        id: 'extend', tag: 'weeks to 18 mo', name: 'EXTEND',
+        sublabel: 'tooling \u00B7 training \u00B7 adjacent trades', w: W,
+        stroke: 'rule-solid', fill: 'paper', tier: 2, dashed: true
+      });
+
+      /* Only one arrow reaches the pool as a supply. The other two are drawn
+       * dotted to the same edge because they DO act on the shortage — they just
+       * act on the demand side of it, which the container spells out. */
+      ctx.edge({ x: create.x + create.w, y: ports[0].y }, { x: ports[0].x, y: ports[0].y }, {
+        fromId: 'create', toId: 'pool', stroke: 'accent', tier: 1, pattern: 'solid',
+        label: 'adds people', legend: 'Feeds the pool'
+      });
+      [subst, extend].forEach(function (n, i) {
+        ctx.edge({ x: n.x + n.w, y: ports[i + 1].y }, { x: ports[i + 1].x, y: ports[i + 1].y }, {
+          fromId: n.id, toId: 'pool', stroke: 'soft', tier: 2, pattern: 'dotted',
+          legend: i === 0 ? 'Eases the draw on it' : undefined
+        });
+      });
+
+      /* 24 units of headroom, not 34: at 34 the container's own eyebrow sat
+         across the CREATE box above it, which the geometry audit caught. */
+      ctx.zone(LX - 20, subst.y - 24, W + 40, (extend.y + extend.h + 18) - (subst.y - 24), {
+        label: 'neither adds a qualified person', tier: 3, dashed: true
+      });
+
+      ctx.legend();
+      return ctx.fit(28);
+    }
+  },
+  {
+    id: 'smr-cost-chain',
+    page: 'article-21.html',
+    caption:
+      'What actually cancelled the flagship SMR project, and the one link hyperscalers replace. ' +
+      'NuScale\'s costs did not kill it directly \u2014 they killed the subscription, because ' +
+      'utilities buying year to year will not underwrite a 158 % overrun. A twenty-year power ' +
+      'purchase agreement removes that link, which is why the buyer changing matters more than ' +
+      'the technology changing.',
+    because:
+      'the section gives the overrun as a table and the hyperscaler difference as a list of ' +
+      'contract terms. Between them sits a causal chain the article never draws: cost to LCOE to ' +
+      'subscription to cancellation. Seeing it as a chain is what makes the PPA legible as a ' +
+      'REPLACEMENT for one link rather than a nice contractual detail.',
+    build() {
+      const ctx = D.create({
+        slug: 'smr',
+        title: 'Why the Carbon Free Power Project was cancelled, and what changes with a hyperscaler buyer',
+        desc: 'NuScale\'s Carbon Free Power Project escalated from 3.6 to 9.3 billion dollars, a ' +
+              '158 per cent overrun, which pushed its levelised cost from 55 dollars per ' +
+              'megawatt-hour to between 89 and 102. Member utilities then declined to take up the ' +
+              'required 80 per cent subscription and the project was cancelled in November 2023. ' +
+              'A hyperscaler signing a twenty-year power purchase agreement replaces the ' +
+              'subscription link in that chain with contracted revenue certainty.'
+      });
+
+      const X = 40, W = 380, PITCH = 92;
+      const chain = [
+        { id: 'cost', tag: 'overrun', name: 'Cost: $3.6 B \u2192 $9.3 B', sub: '+158 %' },
+        { id: 'lcoe', tag: 'consequence', name: 'LCOE: $55 \u2192 $89\u2013102 / MWh', sub: '+62\u201385 %' },
+        { id: 'sub', tag: 'the link that broke', name: 'Utilities decline to subscribe',
+          sub: '80 % take-up never reached', focal: true },
+        { id: 'dead', tag: 'outcome', name: 'Cancelled, November 2023', sub: 'DOE had committed $232 M' }
+      ];
+      let y = 48;
+      const nodes = chain.map(function (c) {
+        const n = ctx.node(X, y, {
+          id: c.id, tag: c.tag, name: c.name, sublabel: c.sub, w: W,
+          stroke: c.focal ? 'accent' : 'rule-solid',
+          fill: c.focal ? 'paper-2' : 'paper', tier: c.focal ? 1 : 2,
+          legend: c.focal ? 'The pivot \u2014 the link that broke, and what replaces it'
+                          : (c.id === 'cost' ? 'The chain as it ran' : undefined)
+        });
+        y = n.y + PITCH;
+        return n;
+      });
+      for (let i = 0; i < nodes.length - 1; i++) {
+        ctx.edge({ x: nodes[i].x + nodes[i].w / 2, y: nodes[i].y + nodes[i].h },
+                 { x: nodes[i + 1].x + nodes[i + 1].w / 2, y: nodes[i + 1].y }, {
+          fromId: nodes[i].id, toId: nodes[i + 1].id, stroke: 'ink', tier: 2, pattern: 'solid'
+        });
+      }
+
+      const ppa = ctx.node(X + W + 190, nodes[2].y - 12, {
+        id: 'ppa', tag: 'what changes', name: '20-year PPA',
+        sublabel: 'Microsoft, and Amazon through 2042', w: 300,
+        stroke: 'accent', fill: 'paper-2', tier: 1
+        /* no legend entry: it shares the accent with the link it replaces, which is
+           the point, and two names for one swatch is a legend a reader cannot use */
+      });
+      ctx.edge({ x: ppa.x, y: ppa.y + ppa.h / 2 },
+               { x: nodes[2].x + nodes[2].w, y: nodes[2].y + nodes[2].h / 2 }, {
+        fromId: 'ppa', toId: 'sub', stroke: 'accent', tier: 1, pattern: 'dashed',
+        label: 'revenue certainty', legend: 'Removes the subscription risk'
+      });
+
+      ctx.legend();
+      return ctx.fit(28);
+    }
+  },
+  {
     id: 'method-montecarlo',
     page: 'article-4.html',
     caption:
@@ -366,7 +518,9 @@ const FIGURES = [
 
       const makeup = ctx.node(X_IN, BASIN_TOP + BASIN_H / 2 - 36, {
         id: 'makeup', tag: 'in', name: 'Make-up water', sublabel: 'drawn from the local supply',
-        w: W_IN, stroke: 'rule-solid', fill: 'paper', tier: 2, legend: 'Water entering'
+        /* no legend entry: drawn the same as the loss paths, and its own IN tag
+           already says what it is */
+        w: W_IN, stroke: 'rule-solid', fill: 'paper', tier: 2
       });
 
       const basin = ctx.node(X_MID, BASIN_TOP, {
@@ -446,7 +600,7 @@ const FIGURES = [
 
       const asicA = ctx.node(X0, ROW_A, {
         id: 'asic-a', tag: 'asic', name: 'Switch ASIC', sublabel: '224G PAM4 SerDes',
-        w: ASIC_W, stroke: 'rule-solid', fill: 'paper', tier: 2, legend: 'Silicon'
+        w: ASIC_W, stroke: 'rule-solid', fill: 'paper', tier: 2
       });
       const retimer = ctx.node(X0 + ASIC_W + LONG / 2 - 92, ROW_A, {
         id: 'retimer', tag: 'in path', name: 'Retimers · CDR · DSP',

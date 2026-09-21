@@ -815,6 +815,26 @@ const D = sandbox.RZDiagram;
   ok('U7', clash === 0, `legend entries must not overlap each other: ${clash} pair(s) do`);
 }
 
+/* U8: two legend entries drawn IDENTICALLY are worse than two that differ only
+ *     by hue. With hue the reader at least sees two things; here the legend
+ *     offers two names for one swatch and no way to tell which is which. Added
+ *     after this check found three such pairs in figures already shipped. */
+{
+  const c = D.create({ slug: 'u8', title: 'T', desc: 'D' });
+  c.node(0, 0, { name: 'A', stroke: 'rule-solid', fill: 'paper', legend: 'Silicon' });
+  c.node(0, 120, { name: 'B', stroke: 'rule-solid', fill: 'paper', legend: 'Conversion' });
+  c.legend();
+  ok('U8a', c.warnings.some(w => w.kind === 'legend-indistinguishable'),
+    'identical treatments with different labels must warn');
+
+  const ok2 = D.create({ slug: 'u8b', title: 'T', desc: 'D' });
+  ok2.node(0, 0, { name: 'A', stroke: 'rule-solid', fill: 'paper', legend: 'Silicon' });
+  ok2.node(0, 120, { name: 'B', stroke: 'accent', fill: 'paper-2', legend: 'Conversion' });
+  ok2.legend();
+  ok('U8b', !ok2.warnings.some(w => w.kind === 'legend-indistinguishable'),
+    'distinct treatments clear it');
+}
+
 /* ==========================================================================
  * TOKEN CONTRACT — a missing custom property fails silently, in one theme
  * ======================================================================== */
