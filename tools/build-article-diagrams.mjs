@@ -58,6 +58,80 @@ const { RZDiagram: D, RZDiagramMetrics: M, RZDiagramLayout: L } = sandbox;
  * ======================================================================== */
 const FIGURES = [
   {
+    id: 'tariff-gap',
+    page: 'article-12.html',
+    caption:
+      'A residential kilowatt-hour in Indonesia sells for less than it costs to generate. The ' +
+      'shortfall of IDR 579 does not vanish \u2014 it is carried, by the state budget and by ' +
+      'industrial users paying unsubsidised rates. Data centres sit on the industrial side of ' +
+      'this ledger, which is the section\'s point: the subsidy runs the other way from the ' +
+      'popular telling.',
+    because:
+      'the article gives the two prices and then lists the two things that cover the difference. ' +
+      'Prose puts the numbers in separate sentences and the list in a third place, so the reader ' +
+      'has to hold three facts and subtract. The gap is the whole argument, and a gap is a ' +
+      'quantity between two levels \u2014 something to be SHOWN, not recited.',
+    build() {
+      const ctx = D.create({
+        slug: 'tariff',
+        title: 'The Indonesian residential tariff gap, and who carries it',
+        desc: 'Electricity costs about 1,732 rupiah per kilowatt-hour to generate in Indonesia, ' +
+              'while residential tariffs average about 1,153 rupiah. The difference of 579 rupiah ' +
+              'per kilowatt-hour is covered by a government subsidy budgeted at 83 trillion ' +
+              'rupiah and by cross-subsidy from industrial users, who pay full rates without ' +
+              'subsidy. Data centres are industrial users.'
+      });
+
+      const LX = 48, W = 330, RX = 560;
+
+      const cost = ctx.node(LX, 56, {
+        id: 'cost', tag: 'what it costs', name: 'IDR 1,732 per kWh',
+        sublabel: 'cost to generate', w: W,
+        stroke: 'rule-solid', fill: 'paper', tier: 2, legend: 'The two prices'
+      });
+      const tariff = ctx.node(LX, 268, {
+        id: 'tariff', tag: 'what it sells for', name: 'IDR 1,153 per kWh',
+        sublabel: 'average residential tariff', w: W,
+        stroke: 'rule-solid', fill: 'paper', tier: 2
+      });
+
+      /* The gap is drawn as the space BETWEEN the two prices, because that is
+       * what it is. Labelling it in a box beside them would make it a third
+       * number to be read rather than a distance to be seen. */
+      ctx.zone(LX - 20, cost.y + cost.h + 16, W + 40,
+               tariff.y - (cost.y + cost.h) - 32, {
+        label: 'the gap \u2014 IDR 579 per kWh, and it does not vanish',
+        tier: 3, dashed: true, stroke: 'accent'
+      });
+
+      const subsidy = ctx.node(RX, 114, {
+        id: 'subsidy', tag: 'carried by', name: 'Government subsidy',
+        sublabel: 'IDR 83 trillion budget', w: W,
+        stroke: 'accent', fill: 'paper-2', tier: 2, legend: 'Who carries the gap'
+      });
+      const cross = ctx.node(RX, 190, {
+        id: 'cross', tag: 'carried by', name: 'Industrial cross-subsidy',
+        sublabel: 'full rates, no subsidy \u2014 data centres are here', w: W,
+        stroke: 'accent', fill: 'paper-2', tier: 2
+      });
+
+      /* Each carrier gets its OWN point on the gap's edge, and the nodes are
+       * placed so both runs are level. Aiming both at one point made the router
+       * dogleg around each other, and the two detours drew a rectangle that
+       * read as a box nobody had declared — rule 4 exists for this. */
+      [subsidy, cross].forEach(function (n) {
+        const y = n.y + n.h / 2;
+        ctx.edge({ x: n.x, y: y }, { x: LX + W + 20, y: y }, {
+          fromId: n.id, toId: 'gap', stroke: 'accent', tier: 2, pattern: 'solid',
+          legend: 'Flows into the gap'
+        });
+      });
+
+      ctx.legend();
+      return ctx.fit(28);
+    }
+  },
+  {
     id: 'corridor-model',
     page: 'article-19.html',
     caption:
