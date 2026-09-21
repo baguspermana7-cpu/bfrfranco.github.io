@@ -362,7 +362,11 @@ html[data-rz-register="editorial"] .rz-figure{
   margin:2.25rem 0;padding:0;max-width:100%;overflow-x:auto;
 }
 html[data-rz-register="editorial"] .rz-figure svg{
-  display:block;width:100%;height:auto;min-width:640px;
+  /* width/min-width/max-width are emitted per figure by
+     tools/build-article-diagrams.mjs, because they depend on that figure's own
+     viewBox: a blanket min-width:640px stretched narrow figures until their
+     type shouted and shrank wide ones until it vanished. */
+  display:block;width:100%;height:auto;
 }
 html[data-rz-register="editorial"] .rz-figcaption{
   margin-top:.85rem;max-width:68ch;line-height:1.6;

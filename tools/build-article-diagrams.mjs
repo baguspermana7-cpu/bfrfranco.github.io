@@ -58,6 +58,73 @@ const { RZDiagram: D, RZDiagramMetrics: M, RZDiagramLayout: L } = sandbox;
  * ======================================================================== */
 const FIGURES = [
   {
+    id: 'method-montecarlo',
+    page: 'article-4.html',
+    caption:
+      'What the calculator on this page actually does. The five phases are decomposed ' +
+      'deterministically from your inputs, then resampled 5,000 times against their uncertainty. ' +
+      'The result is a distribution, so the honest answer is a range \u2014 p10, p50, p90 \u2014 ' +
+      'and the recommendations are thresholds read off that range, not advice written in advance.',
+    because:
+      'the page hands the reader a Monte Carlo result and a ranked list of actions without ever ' +
+      'showing the path between them. Two things get lost: that the output is a DISTRIBUTION ' +
+      'rather than a number, and that the recommendations are DERIVED from it rather than ' +
+      'authored. Both are properties of the pipeline, which is a shape, and neither survives as a ' +
+      'sentence next to a table of results.',
+    build() {
+      const ctx = D.create({
+        slug: 'method',
+        title: 'How this page turns inputs into a ranked set of actions',
+        desc: 'Inputs describing the site are decomposed into the five MTTR phases — detection, ' +
+              'diagnosis, mobilisation, repair and verification — each scaled by skill level, ' +
+              'spares readiness and coverage. That deterministic model is then resampled five ' +
+              'thousand times to produce a distribution, reported at the tenth, fiftieth and ' +
+              'ninetieth percentiles. Recommendations are thresholds read off those results, ' +
+              'not text written in advance.'
+      });
+
+      /* Stacked, not strung out: five boxes in a row is 1,670 units and unreadable
+         once scaled to a reading column. A pipeline reads top-down just as well. */
+      const X = 40, W = 380, PITCH = 96;
+      const steps = [
+        { id: 'in', tag: 'you set', name: 'Inputs',
+          sub: 'skill \u00B7 spares \u00B7 coverage \u00B7 SLA', focal: false },
+        { id: 'model', tag: 'deterministic', name: 'Five-phase decomposition',
+          sub: 'detect \u00B7 diagnose \u00B7 mobilise \u00B7 repair \u00B7 verify' },
+        { id: 'mc', tag: '5,000 runs', name: 'Monte Carlo resample',
+          sub: 'each phase against its uncertainty', focal: true },
+        { id: 'dist', tag: 'the answer', name: 'A distribution',
+          sub: 'p10 \u00B7 p50 \u00B7 p90 \u2014 not one number' },
+        { id: 'rec', tag: 'derived', name: 'Ranked actions',
+          sub: 'thresholds read off the result' }
+      ];
+
+      let y = 48;
+      const nodes = steps.map(function (s) {
+        const n = ctx.node(X, y, {
+          id: s.id, tag: s.tag, name: s.name, sublabel: s.sub, w: W,
+          stroke: s.focal ? 'accent' : 'rule-solid',
+          fill: s.focal ? 'paper-2' : 'paper',
+          tier: s.focal ? 1 : 2,
+          legend: s.focal ? 'Where the uncertainty enters' : (s.id === 'in' ? 'Pipeline stage' : undefined)
+        });
+        y = n.y + PITCH;
+        return n;
+      });
+
+      for (let i = 0; i < nodes.length - 1; i++) {
+        ctx.edge({ x: nodes[i].x + nodes[i].w / 2, y: nodes[i].y + nodes[i].h },
+                 { x: nodes[i + 1].x + nodes[i + 1].w / 2, y: nodes[i + 1].y }, {
+          fromId: nodes[i].id, toId: nodes[i + 1].id,
+          stroke: 'ink', tier: 2, pattern: 'solid'
+        });
+      }
+
+      ctx.legend();
+      return ctx.fit(28);
+    }
+  },
+  {
     id: 'tariff-gap',
     page: 'article-12.html',
     caption:
@@ -672,8 +739,21 @@ const TOKEN_BRIDGE = [
 ].join(';');
 
 function figureMarkup(fig, ctx) {
+  /* Size bounds travel WITH the figure, because they depend on its own viewBox.
+   *
+   * `width:100%` alone fails in both directions. A 1,672-unit figure shrinks
+   * until its 8-unit type renders under 6 px; a 460-unit one is stretched until
+   * a 12-unit name renders at 18 and the figure shouts. A drawing should render
+   * at its own scale and shrink only when it must.
+   *
+   * max-width is the viewBox, so it never upscales. min-width is the smaller of
+   * the viewBox and 640, so a wide figure scrolls in its own track instead of
+   * shrinking into illegibility, and a narrow one never forces a scrollbar it
+   * does not need. */
+  const bounds = 'max-width:' + ctx.width + 'px;min-width:' +
+    Math.min(ctx.width, 640) + 'px;';
   const svg = ctx.render().replace(
-    '<svg ', '<svg style="' + TOKEN_BRIDGE + '" ');
+    '<svg ', '<svg style="' + bounds + TOKEN_BRIDGE + '" ');
   return '\n' + svg +
     '\n<figcaption class="rz-figcaption">' + fig.caption + '</figcaption>\n';
 }
@@ -698,6 +778,22 @@ for (const [page, figs] of byPage) {
         findings.push(`${page} · ${fig.id}: ${w.kind} — ${w.message}`);
       }
     }
+    /* A figure wider than the column it lands in is scaled down, and its
+     * smallest type goes with it. The article track is about 1,100 px at a
+     * desktop reading width, so a 1,672-unit viewBox renders 8 px eyebrows at
+     * under 6 px — below the 8.5 px floor this site enforces everywhere else.
+     * Wide is not a style choice here; it is a legibility failure with a
+     * different name. Wrap the composition or stack it vertically. */
+    const ARTICLE_TRACK_PX = 1100;
+    const SMALLEST_TYPE = 8;
+    const scaled = SMALLEST_TYPE * (ARTICLE_TRACK_PX / ctx.width);
+    if (ctx.width > ARTICLE_TRACK_PX && scaled < 8.5) {
+      findings.push(
+        `${page} · ${fig.id}: ${ctx.width} units wide renders its 8-unit type at ` +
+        `${scaled.toFixed(1)} px in a ${ARTICLE_TRACK_PX} px column, under the 8.5 px floor. ` +
+        `Stack or wrap the composition rather than letting it shrink.`);
+    }
+
     /* Audit the figure's own geometry before writing it. The engine warns about
      * what it was ASKED to do wrong; this catches what the composition did
      * wrong — two boxes the author placed on top of each other. Without it this
