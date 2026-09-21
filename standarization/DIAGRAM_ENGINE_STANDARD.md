@@ -223,6 +223,38 @@ travel together, so they are one node with the pumps as a sublabel. Six nodes be
 
 ---
 
+## 3e. What the engine refuses to draw
+
+Every guard below was added after the failure it prevents was found by RENDERING a figure,
+not by reasoning about one. That is the pattern worth keeping: this engine fails silently,
+and the only reliable detector has been a screenshot.
+
+| Guard | What it caught |
+|---|---|
+| `colour-only` | Hot and cold streams separated by hue alone — lost in greyscale, in PDF export, and for a reader with colour-vision deficiency (WCAG 1.4.1). Found three more in the node treatments, where green and cyan were ISA **alarm** channels being used as categories. |
+| `legend-indistinguishable` | Two legend entries drawn identically. Worse than a hue-only split: the legend offers two names for one swatch. Found three pairs in figures already shipped. |
+| `legend-duplicate` | The same label on a node swatch and a line — one entry drawn twice, when it was the air handlers and the heat path. |
+| `ports-crowded` | Five connectors on a 56-unit edge at 9-unit spacing. `fanPoints` had computed `crowded` from the start and nothing read it. **A computed warning nobody consumes is not a warning.** |
+| `node-overflow` (height) | Height was trusted where width was checked, so `h:52` on a node needing 72 drew its sublabel across its own bottom border. |
+| `unknown-option` | `sub` where `sublabel` was meant: the node quietly lost a line, nothing logged, nothing thrown. |
+| `over-budget` | The tenth node. Miller's 7±2, which the skill fixes at nine. |
+| figure too wide *(builder)* | 1,672 units renders 8-unit type under 6 px in an article column — below the 8.5 px floor this site enforces everywhere else. Wide is a legibility failure with a different name. |
+| geometry self-audit *(builder)* | Compositions that overlap. The engine warns about what it was ASKED to do wrong; this catches what the composition did wrong. |
+
+### Two rules that are not the same rule
+
+**Spacing that satisfies rule 4 is not spacing that fits the content.** Three ports on a
+128-unit edge sit 32 apart, which passes the 12-unit minimum, while the 72-unit nodes they
+feed overlap by 40. Size the edge to what hangs off it.
+
+**One blanket CSS rule produced two opposite failures.** `min-width:640px` on every figure
+shrank the wide ones until their type vanished and stretched the narrow ones until they
+shouted. Size bounds now travel with each figure, because they depend on its own viewBox:
+`max-width` is the viewBox so it never upscales, `min-width` is the smaller of the viewBox
+and 640 so a wide figure scrolls instead of shrinking.
+
+---
+
 ## 4. Authoring rules
 
 1. **New block diagrams go through the engine.** Do not add hand-typed coordinates.

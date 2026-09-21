@@ -38,7 +38,12 @@ window.RZ_VERSION_CODENAME = 'Pixel Rise';
 python3 tools/audit-script-tags.py --strict        # </script> in JS strings
 python3 tools/audit-js-syntax.py --strict          # unterminated strings / CSS-in-JS (v1.19.0)
 python3 tools/audit-version-stamp.py --strict      # version stamp on all pages
-node   tools/test-asset-cache-tokens.mjs           # a token changes when its file does — RUN AFTER ANY VERSION BUMP (v3.10.0 shipped a stale rz-version.js token on 175 pages; returning visitors read the old stamp)
+node   tools/test-asset-cache-tokens.mjs           # a token changes when its file does — RUN AFTER ANY VERSION BUMP OR ASSET EDIT
+node   tools/test-asset-cache-tokens.mjs --fix <asset> …   # repairs the tokens for the assets YOU named, across every page that loads them
+#   Forgotten twice in one session: js/rz-version.js shipped stale on 175 pages (v3.10.0) and
+#   css/rz-article-dark.css on 39 (v3.11 figures). Both times the rule was known and written down.
+#   --fix names assets EXPLICITLY because this repo is worked by more than one session at a time;
+#   a blanket rewrite would stamp a token onto someone else's in-flight file and make it look shipped.
 python3 tools/audit-mobile-responsive.py --strict  # responsive checkpoints (static scorer)
 node   tools/audit-responsive-layout.mjs --strict  # render gate: real horizontal-scroll + wide article tables (v1.49.8)
 python3 tools/audit-seo.py                         # SEO meta + JSON-LD

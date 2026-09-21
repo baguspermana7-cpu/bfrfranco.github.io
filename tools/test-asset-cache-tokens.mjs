@@ -138,12 +138,48 @@ if (split.length) {
     console.error(`\nFAIL — one asset served under several tokens (a fix reaches only some pages):\n  ${split.map(([href, t]) => `${href}: ${[...t].join(', ')}`).join('\n  ')}`);
 }
 if (strictAssets.length) {
-    failed = true;
-    console.error('\nFAIL — a STRICT asset changed without its token:');
-    for (const row of strictAssets) {
-        console.error(`  ${row.href} on ${row.pages} page(s): ?v=${row.token} but the file hashes to ${row.want}`);
+    /* --fix <asset> ... — rewrite the token for the NAMED assets only.
+     *
+     * Editing a shared asset means sweeping its token across every page that
+     * loads it, by hand, and that manual step has now been forgotten twice in
+     * one session: js/rz-version.js shipped stale on 175 pages, and
+     * css/rz-article-dark.css on 39. Both times the rule was known and written
+     * down. Knowing a rule is not a control; running one is, and a control that
+     * has to be remembered is only a rule again.
+     *
+     * Assets are named explicitly rather than fixed wholesale, because this
+     * repository is worked by more than one session at a time and a blanket
+     * rewrite would stamp tokens onto someone else's in-flight edit — making
+     * their half-written file look shipped. You fix what you changed. */
+    const fixIdx = process.argv.indexOf('--fix');
+    const toFix = fixIdx === -1 ? [] : process.argv.slice(fixIdx + 1).filter((a) => !a.startsWith('-'));
+    const fixable = strictAssets.filter((r) => toFix.includes(r.href));
+    const unfixed = strictAssets.filter((r) => !toFix.includes(r.href));
+
+    if (fixable.length) {
+        const { writeFile } = await import('node:fs/promises');
+        for (const row of fixable) {
+            const stamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+            const next = `${stamp}-${row.want}`;
+            let touched = 0;
+            for (const page of pages) {
+                const html = sources.get(page);
+                const re = new RegExp(`${row.href.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\?v=[A-Za-z0-9._-]+`, 'g');
+                const out = html.replace(re, `${row.href}?v=${next}`);
+                if (out !== html) { await writeFile(join(ROOT, page), out); sources.set(page, out); touched++; }
+            }
+            console.log(`  fixed ${row.href} -> ?v=${next} on ${touched} page(s)`);
+        }
     }
-    console.error('  Fix: set the token to <yyyymmdd>-<hash> for the built file, on every page that loads it.');
+
+    if (unfixed.length) {
+        failed = true;
+        console.error('\nFAIL — a STRICT asset changed without its token:');
+        for (const row of unfixed) {
+            console.error(`  ${row.href} on ${row.pages} page(s): ?v=${row.token} but the file hashes to ${row.want}`);
+        }
+        console.error('  Fix: re-run with --fix <asset> for the assets YOU changed, and leave the rest.');
+    }
 }
 if (failed) { process.exit(1); }
 console.log(`\nPASS — every STRICT asset's token matches its file${monitorAssets.length ? `; ${monitorAssets.length} asset(s) reported` : ''}`);
