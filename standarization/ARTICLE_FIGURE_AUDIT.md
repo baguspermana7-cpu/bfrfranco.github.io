@@ -28,9 +28,10 @@ viewBox wider or taller than 200 units gives the real figure.
 | large inline SVG (a real figure of some kind) | 13 |
 | `data-rz-diagram` — living animated diagram | 3 (9, 13, 25) |
 | `data-rz-scrolly` — pinned scrollytelling | 2 (16, 23) |
-| `data-rz-figure` — built by the figure tool | 3 (18, 22, 26) |
+| `data-rz-figure` — built by the figure tool | 11 (4, 6, 8, 10, 12, 17, 18, 19, 21, 22, 26, 27) |
 
-**Eight articles carry no visual of any kind**: 1, 2, 3, 6, 8, 10, 15, 17.
+**Eight articles carried no visual of any kind at the start**: 1, 2, 3, 6, 8, 10, 15, 17.
+Four of them now do (6, 8, 10, 17); the other four are closed with a reason below.
 
 ---
 
@@ -49,41 +50,38 @@ what it simulates, and what the score means. That is a single reusable figure, n
 
 ## 3. Verdicts
 
-### Built
+### Built — the complete set
 
 | Article | Figure | What it adds that the prose cannot |
 |---|---|---|
-| 18 | `heat-path-ceilings` | Two tables give density by platform and ceilings by cooling technology, and neither connects them. The connection is the argument: the trajectory crossed the air ceiling, so the heat path changed **shape**. |
-| 22 | `cpo-trace-collapse` | The table lists both trace lengths as numbers. The argument is **geometry** — the retimers exist only to pay for the distance. Drawn to the real 24:1 ratio. |
-| 26 | `pfas-loss-zones` | The table enumerates seven loss zones with magnitudes. It cannot show that the escape routes **bypass the meter**, which is the section's point. |
+| 4 | `method-montecarlo` | The page reports a Monte Carlo result and a ranked list without the path between them. Lost: that the output is a distribution, and that the ranking is derived rather than authored. |
+| 6, 8 | `method-assessment` | One definition, two pages. The model is used twice — how uncertain, and what it turns on — and a single reported score hides that either question was asked. |
+| 10 | `cooling-water-loop` | §8.1 says to raise the cycles of concentration to cut blowdown. That assumes a loop the article never draws, and "blowdown" means nothing to a reader who does not know it is deliberate. |
+| 12 | `tariff-gap` | Two prices in separate sentences and the fillers in a third place. The gap is the argument, and a gap is a distance to be seen, not a subtraction to be performed. |
+| 17 | `jevons-loop` | A table lists three efficiency factors as independent rows. It cannot show that the output returns to the input — and a cycle drawn as a list reads as unrelated savings, the exact misreading the section corrects. |
+| 18 | `heat-path-ceilings` | Two tables, density and cooling ceilings, never connected. The connection is the argument: the trajectory crossed the air ceiling, so the path changed shape. |
+| 19 | `corridor-model` | The answer is neither site but a corridor across both. A reader comparing two columns of costs has to be shown the comparison was the wrong frame. |
+| 21 | `smr-cost-chain` | The overrun is a table, the hyperscaler difference a list of contract terms. Between them is a causal chain that makes a 20-year PPA legible as a replacement for one link. |
+| 22 | `cpo-trace-collapse` | The table gives both trace lengths as numbers. The argument is geometry — the retimers exist only to pay for the distance. Drawn at the real 24:1. |
+| 26 | `pfas-loss-zones` | The table enumerates seven loss zones. It cannot show that the escape routes bypass the meter. |
+| 27 | `three-levers` | The finding — only Create adds supply — is a fourth column nobody reads against the others. Drawn, two of three arrows never reach the pool. |
 
-### Do not add — the article already has it
+### Closed with no figure, and why
 
-| Article | Why not |
+| Article | Verdict |
 |---|---|
-| 25 | A living diagram already animates the 6 GW gap opening between retirements and the interconnection queue. A static figure of the same content is duplication. |
-| 9 | Living diagram of the HVAC fault path. |
-| 13 | Living diagram plus three figures already. |
+| 1 | Scores dimensions but runs **no Monte Carlo**. The shared method figure describes a pipeline this page does not have. Excluded on reading its code, not on how it looks. |
+| 11 | Argues the same structure as 12 from the opposite side. Its content is comparison tables and cited figures, which its existing chart serves. A both-sides figure would also misrepresent an article that deliberately argues one side. |
+| 20 | Claim against measurement — Microsoft 4.7 to 6.4 billion litres, Google +20 %. Quantities, not structure. Table or chart. |
+| 24 | Growth by trade: HVAC +67 %, robotic technician +107 %, electrician +18 %. A quantitative comparison. Chart. |
+| 28 | Four charts already, and the argument is two limits. Charts are the right instrument. |
+| 9, 13, 25 | Living diagrams already carry it. 25 nearly received a duplicate of its own 6 GW animation. |
 | 16, 23 | Scrollytelling already carries the narrative visually. |
-| 28 | Four charts, and the argument is quantitative — two walls expressed as limits. Charts are the right instrument; see §4. |
+| 2, 3, 5, 7, 14, 15 | Calculator pages whose commentary does not explain the instrument; nothing structural to draw. |
 
-### Priority queue — narrative articles with a shape and no figure
-
-| Article | Subject | The figure would show |
-|---|---|---|
-| **10** | Water stress and AI data centers | Where the water actually goes: withdrawal vs consumption, on-site vs the power plant upstream. The distinction the whole debate turns on, and the article has no visual at all. |
-| **17** | The $37 B SEA opportunity | Jevons paradox as a loop: efficiency lowers cost per token, which raises demand. A reinforcing cycle is a shape prose states badly and a loop diagram states once. |
-| **19** | Singapore vs Batam | The 20-kilometre paradox — a boundary 20 km apart changing the cost structure. A decision matrix is a table; the *corridor model* is not. |
-| **21** | Nuclear SMRs | The grid-interconnection timeline against the SMR delivery timeline — why the dates do not meet. |
-| **24, 27** | Workforce | The three levers (create, substitute, extend) against the 2026 cliff. |
-| **11, 12** | Who pays for new load | Cost allocation as a flow: who bears which cost, and where the subsidy actually lands. Both articles argue the same structure from opposite sides. |
-| **20** | Altman vs the water data | Claim against measurement, three claims side by side. Possibly a table instead — decide when read. |
-
-### Calculator family
-
-One shared **method figure** — inputs → deterministic model → Monte Carlo → score — placed
-in the articles whose commentary explains the instrument (1, 4, 6, 8 are the candidates).
-Not eleven copies: one definition, placed where it earns its place.
+**Eleven figures across eleven articles. Fourteen articles closed with a reason.**
+Every verdict against building was recorded before the work stopped, so a later reader
+can tell a considered "no" from an unfinished list.
 
 ---
 

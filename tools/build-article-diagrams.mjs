@@ -56,7 +56,114 @@ const { RZDiagram: D, RZDiagramMetrics: M, RZDiagramLayout: L } = sandbox;
 /* ==========================================================================
  * FIGURES
  * ======================================================================== */
+/* ---- one definition, more than one page ---------------------------------
+ * Articles 6 and 8 run the same instrument: a dimension model scored from the
+ * reader's inputs, resampled ten thousand times for uncertainty AND swept
+ * separately to find which input dominates. Both facts were verified against
+ * each page's own code before this was placed — "it looks like the same kind of
+ * article" is not verification, and article-1 was excluded on exactly that
+ * check, since it scores dimensions but runs no Monte Carlo at all.
+ * --------------------------------------------------------------------- */
+function assessmentMethodFigure(D, M, L) {
+  const ctx = D.create({
+    slug: 'assess',
+    title: 'How this assessment turns your inputs into a ranked set of actions',
+    desc: 'Inputs are scored into a dimension model. That model is then used two ways: ' +
+          'resampled ten thousand times to give a distribution rather than a single number, ' +
+          'and swept one input at a time to find which of them the result is most sensitive ' +
+          'to. The ranked actions are thresholds read off both, not advice written in advance.'
+  });
+
+  /* Left to right, fork and join. The first cut stacked the branches and sent
+   * their results back to a node BELOW the fork, so each branch's outgoing edge
+   * left the same side its incoming edge arrived at and the two dashed returns
+   * ran back up through the outgoing pair. A fork that rejoins reads as a fork
+   * only if nothing flows backwards. */
+  const W = 280, BW = 300;
+  const C1 = 40, C2 = 390, C3 = 760;
+
+  const inputs = ctx.node(C1, 40, {
+    id: 'in', tag: 'you set', name: 'Your inputs', sublabel: 'site, staffing, practice', w: W,
+    stroke: 'rule-solid', fill: 'paper', tier: 2, legend: 'Pipeline stage'
+  });
+  const model = ctx.node(C1, 160, {
+    id: 'model', tag: 'deterministic', name: 'Dimension model',
+    sublabel: 'scored, not guessed', w: W,
+    stroke: 'rule-solid', fill: 'paper', tier: 2
+  });
+
+  /* The fork is the point. One branch answers "how uncertain is this?", the
+   * other "what is it most sensitive to?" — different questions, and a reader
+   * shown one number has no reason to know either was asked. */
+  const mc = ctx.node(C2, 108, {
+    id: 'mc', tag: '10,000 runs', name: 'Monte Carlo resample',
+    sublabel: 'p10 \u00B7 p50 \u00B7 p90, not one number', w: BW,
+    stroke: 'accent', fill: 'paper-2', tier: 1, legend: 'The two questions asked of the model'
+  });
+  const sens = ctx.node(C2, 228, {
+    id: 'sens', tag: 'one at a time', name: 'Sensitivity sweep',
+    sublabel: 'which input the answer turns on', w: BW,
+    stroke: 'accent', fill: 'paper-2', tier: 1
+  });
+
+  const actions = ctx.node(C3, 168, {
+    id: 'act', tag: 'derived', name: 'Ranked actions',
+    sublabel: 'thresholds read off both', w: W,
+    stroke: 'rule-solid', fill: 'paper', tier: 2
+  });
+
+  const cx = (n) => n.x + n.w / 2;
+  const my = (n) => n.y + n.h / 2;
+
+  ctx.edge({ x: cx(inputs), y: inputs.y + inputs.h }, { x: cx(model), y: model.y }, {
+    fromId: 'in', toId: 'model', stroke: 'ink', tier: 2, pattern: 'solid'
+  });
+
+  const forkPorts = ctx.ports(model, 2, 'right', { id: 'model' });
+  const joinPorts = ctx.ports(actions, 2, 'left', { id: 'act' });
+  [mc, sens].forEach(function (n, i) {
+    ctx.edge({ x: forkPorts[i].x, y: forkPorts[i].y }, { x: n.x, y: my(n) }, {
+      fromId: 'model', toId: n.id, stroke: 'ink', tier: 2, pattern: 'solid'
+    });
+    ctx.edge({ x: n.x + n.w, y: my(n) }, { x: joinPorts[i].x, y: joinPorts[i].y }, {
+      fromId: n.id, toId: 'act', stroke: 'muted', tier: 2, pattern: 'dashed',
+      legend: i === 0 ? 'Both feed the ranking' : undefined
+    });
+  });
+
+  ctx.legend();
+  return ctx.fit(28);
+}
+
 const FIGURES = [
+  {
+    id: 'method-assessment',
+    page: 'article-6.html',
+    caption:
+      'What the assessment on this page actually does. The model is used twice \u2014 once to ' +
+      'ask how uncertain the answer is, once to ask which input it turns on \u2014 and the ' +
+      'ranked actions are thresholds read off both. A single score reported on its own hides ' +
+      'that either question was asked.',
+    because:
+      'the page reports a score, a distribution and a ranked list without showing the path ' +
+      'between them. Two things get lost: that the output is a RANGE, and that the ranking is ' +
+      'DERIVED rather than authored. Both are properties of the pipeline, which is a shape.',
+    build: () => assessmentMethodFigure(D, M, L)
+  },
+  {
+    id: 'method-assessment',
+    page: 'article-8.html',
+    caption:
+      'What the assessment on this page actually does. The model is used twice \u2014 once to ' +
+      'ask how uncertain the answer is, once to ask which input it turns on \u2014 and the ' +
+      'ranked actions are thresholds read off both. A single score reported on its own hides ' +
+      'that either question was asked.',
+    because:
+      'the same reason as article-6, and verified separately against this page: it runs 10,000 ' +
+      'iterations and its own sensitivity analysis. One definition serves both because the ' +
+      'instrument is the same, not because the articles look alike.',
+    build: () => assessmentMethodFigure(D, M, L)
+  },
   {
     id: 'three-levers',
     page: 'article-27.html',
