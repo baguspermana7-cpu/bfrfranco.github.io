@@ -11,6 +11,52 @@ release sections rather than semver.
 
 ---
 
+## v3.11.4 — 2026-09-23
+
+### The climate arithmetic was built on the wrong Novec, again
+
+v3.11.1 found Novec 7100's vapour pressure sitting on the Novec 7000 row. The same
+transposition was sitting in the GWP column, and it had been there longer.
+
+`article-26` computed every CO₂e figure at **GWP100 = 320**, labelled
+`[vendor — representative]`. That is **3M's number for Novec 7100**. The article's narrative fluid
+is Novec **7000**, and the chart's own source string said so while carrying the other fluid's
+constant: *"3M Novec 7000, 100 L charge; GWP100 320 low-end, 3M TDS"*.
+
+The 6,000-row worked-model dataset disclosed the choice honestly — `"320 used as low-end
+illustrative"` — but its own cell in the same row stated the range as **370–575**, which 320 sits
+*below*. A conservative figure is defensible. A conservative figure borrowed from a different fluid
+and printed below the range you yourself quote is not.
+
+### Replaced with the primary reference, not a vendor range
+
+**IPCC AR6 WGI Table 7.SM.7** tabulates these compounds directly:
+
+| fluid | AR6 designation | lifetime | GWP100 | was |
+|---|---|---|---|---|
+| Novec 7000 | HFE-347mcc3 · CH₃OCF₂CF₂CF₃ | 5.1 yr | **576** | 320 in the article, 370–575 in the data |
+| Novec 7100 | HFE-449s1 · C₄F₉OCH₃ | 4.8 yr | **460** | 320 (3M literature) |
+| Fluorinert FC-72 | PFC-51-14 · n-C₆F₁₄ | 3100 yr | **8620** | 7910 — **the AR5 value, in a row that cited AR6** |
+
+AR6 also lists HFE-7100's isomers separately, n- at 544 and i- at 437, which brackets the 460
+mixture value and confirms the row matched is the right one rather than a same-formula coincidence.
+Novec 649 is **absent** from the table, consistent with its five-day lifetime; its GWP of ~1 rests
+on the lifetime rather than on a tabulated figure, and the dataset now says that instead of
+implying a citation. Opteon 2P50, R-1234yf and R-1233zd(E) already agreed with AR6 and now carry
+their AR6 designation so the next check is trivial.
+
+### What moved
+
+The worked example goes from **61 to 111 t CO₂e/yr** for a single tank at field loss — the same
+192 kg of fluid, correctly weighted. The chart's CO₂e series scales by 1.8×. The live calculator's
+`two-phase-pfas` constant goes 320 → 576. And the fluid-choice swing between a Novec-class HFE and
+a Galden-class PFPE is **~17×**, not the ~30× the understated figure produced.
+
+Every mass figure is unchanged. Only the weighting was wrong, and it was wrong in the direction of
+making the problem look smaller.
+
+---
+
 ## v3.11.3 — 2026-09-22
 
 ### The dataset gate now covers every dataset, not the one that broke

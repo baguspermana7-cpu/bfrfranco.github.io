@@ -1,4 +1,4 @@
 /* Single source of truth for site version. Bump on every release per VERSIONING_STANDARD.md. */
-window.RZ_VERSION = '3.11.3';
-window.RZ_VERSION_DATE = '2026-09-22';
-window.RZ_VERSION_CODENAME = 'Parse It, Do Not Read It';
+window.RZ_VERSION = '3.11.4';
+window.RZ_VERSION_DATE = '2026-09-23';
+window.RZ_VERSION_CODENAME = 'Cite The Row, Not The Range';
