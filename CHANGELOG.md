@@ -54,6 +54,44 @@ the run with a protocol error. Mobile and desktop are now two passes with the vi
 each; the number of navigations is identical. A page that fails to render is now reported as a
 finding instead of being skipped by a bare `catch`.
 
+### Fixed — article-26 quoted another fluid's vapour pressure
+
+`article-26` gave Novec 7000's vapour pressure as **270 hPa at 25 °C**. The 3M datasheet gives
+65 kPa — **650 hPa**. 270 hPa at 25 °C is **Novec 7100's** figure, and the article's own
+`data/article-26/fluid-properties.csv` carried the proof one row apart: the 7100 row reads
+`~27 kPa`. One row's value had been written onto another's.
+
+Verified three independent ways before anything was touched: the datasheet (65 kPa), a vendor spec
+quoted as 9.5 psi at room temperature (65.5 kPa), and Clausius-Clapeyron anchored on the 34 °C
+boiling point and the 142 kJ/kg heat of vaporisation — which uses neither of the other two and
+lands at 72.4 kPa. The article's own water comparison of 32 hPa is correct, so the units were
+consistent and the gap was real.
+
+**The correction makes the argument stronger, not weaker.** The number was being used to show that
+opening a two-phase system releases significant vapour, and the true figure is 2.4× larger. Liquid
+equivalent per m³ of headspace goes from 1.56 L to 3.75 L.
+
+A first count found nine occurrences. A sweep for the DERIVED claims found four more, because the
+error travelled without its own number attached: "eight times that of water" carried it in prose,
+and one passage credited the 8.4× to *industry documentation* when it came from the article's own
+division of 270 by 32. That ratio is now stated as a **vapour-pressure ratio of about 20×**, not an
+evaporation-rate ratio — a pressure quotient is not a rate, and since this molecule is ~11× heavier
+than water, calling it one understates the mass anyway.
+
+**The calculator's `0.008` coefficient is deliberately unchanged**, and settling that did not need
+the original author. Its comment claimed a basis of "vapor pressure 270 hPa, open surface ~2m², avg
+open time 4hr", but the implemented term scales with **fluid volume** while a surface-evaporation
+model does not scale with volume at all — so one cannot be derived from the other, and numerically
+the surface model over-predicts it by an order of magnitude at any tank size. `0.008` is an assumed
+per-event fraction, about three headspace exchanges plus film and drag-out. The comment now says
+so. Output is byte-identical. **Compare the shape of two models before asking which number came
+from which.**
+
+Scope beyond the article: `glossary.html`, the downloadable dataset, and **seven unpublished social
+drafts** that would have spread it to LinkedIn, Medium, Quora, Mastodon, TikTok and Facebook.
+Generated artefacts rebuilt from source and the explain-db token rotated on the 108 pages that load
+it.
+
 ---
 
 ## v3.11.0 — 2026-09-21
