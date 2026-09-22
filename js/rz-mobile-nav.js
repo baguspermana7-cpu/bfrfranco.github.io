@@ -111,14 +111,36 @@
         /* every menu shape this site ships, not just the two most common */
         var MENU = 'body.rz-nav-open .nav-menu,body.rz-nav-open .nav-links,' +
                    'body.rz-nav-open .cx-nav-links,body.rz-nav-open .rfs-nav-links';
+        /* The open drawer must sit above the page, and a z-index on the drawer alone does not do
+           it: the drawer lives inside `.navbar`, so it can only ever paint as high as the navbar's
+           own stacking context. On datacenter-solutions the hero H1 kept showing THROUGH a drawer
+           whose background measured `rgba(15,23,42,0.97)` and whose gutter pixels sampled
+           (23,30,49) — dark, correct, and still overprinted. Verified by screenshot, not by
+           reasoning about specificity: lifting the NAVBAR while the drawer is open is what makes
+           the page disappear behind it. The background is opaque here for the same reason — 3%
+           of a bright gradient headline is still legible. */
+        var LIFT = 'body.rz-nav-open .navbar,body.rz-nav-open .rfs-navbar,body.rz-nav-open .cx-nav' +
+                   '{z-index:2147483000 !important;}';
+        /* The BURGER rules stay inside the phone query: `display:inline-flex !important` would
+           otherwise beat the inline `display:none` the inject branch sets on desktop and put a
+           hamburger beside a full navigation bar.
+
+           The DRAWER and LIFT rules are deliberately NOT in a media query. They were, at
+           `max-width:768px`, and the pln-java-grid pages reveal their own toggle at
+           `max-width:900px` — so between 769px and 900px a tablet reader saw a hamburger, tapped
+           it, and nothing happened: the class was set and no rule listened. Keying on
+           `body.rz-nav-open` is the correct trigger, because that class exists only while a
+           reader has opened the menu, and the menu can only be opened where a toggle is visible.
+           A page's own breakpoint then decides where the burger appears, and the drawer follows
+           it instead of guessing. */
         style.textContent =
-            '@media (max-width:768px){' + BURGER +
+            '@media (max-width:768px){' + BURGER + '}' + LIFT +
             MENU + '{' +
             'display:flex !important;position:absolute !important;' +
             'top:100% !important;left:0 !important;right:0 !important;bottom:auto !important;' +
             'flex-direction:column !important;align-items:stretch !important;' +
             'height:auto !important;max-height:calc(100vh - 100%);overflow-y:auto;' +
-            'background:rgba(15,23,42,0.97);padding:0.5rem 1.25rem 1.5rem;margin:0;' +
+            'background:#0f172a !important;padding:0.5rem 1.25rem 1.5rem;margin:0;' +
             'gap:0 !important;z-index:1000;' +
             'border-top:1px solid rgba(255,255,255,0.10);}' +
             MENU.split(',').map(function(s){return s + ' a';}).join(',') + '{' +
@@ -128,8 +150,7 @@
                is room, and hiding them there serves nobody. */
             'display:block !important;padding:0.85rem 0.25rem;color:#f1f5f9;text-decoration:none;' +
             'border-bottom:1px solid rgba(255,255,255,0.10);font-size:1rem;}' +
-            'body.rz-nav-open{overflow:hidden;}' +
-            '}';
+            'body.rz-nav-open{overflow:hidden;}';
         document.head.appendChild(style);
     }
 

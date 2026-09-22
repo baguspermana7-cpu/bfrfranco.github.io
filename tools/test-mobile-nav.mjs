@@ -68,74 +68,186 @@ const browser = await puppeteer.launch({
 const page = await browser.newPage();
 const findings = [];
 
+/* The mobile viewport is set ONCE, before the loop. Flipping `isMobile` on a live page
+   makes Puppeteer reload it, and doing that per page crashed the run outright. */
+await page.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true });
 for (const rel of PAGES) {
     const file = join(ROOT, rel);
     if (!existsSync(file)) { findings.push({ page: rel, rule: 'page exists', detail: 'not on disk' }); continue; }
+    try {
 
-    await page.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true });
-    await page.goto('file://' + file, { waitUntil: 'networkidle0', timeout: 60000 });
-    await new Promise((r) => setTimeout(r, 800));
+        await page.goto('file://' + file, { waitUntil: 'domcontentloaded', timeout: 30000 });
+        await new Promise((r) => setTimeout(r, 800));
 
-    /* offsetParent is null for a position:fixed element, so it is the wrong visibility test for a
-       navbar button; a real box is the right one. It also catches the 4px-wide burger that opened
-       the menu correctly and could not be hit. */
-    const visibleToggles = await page.evaluate((sel) =>
-        [...document.querySelectorAll(sel)]
-            .filter((e) => { const r = e.getBoundingClientRect(); return r.width > 8 && r.height > 8; })
-            .length, TOGGLES);
-    if (visibleToggles !== 1) {
-        findings.push({ page: rel, rule: 'N1 exactly one visible toggle', detail: `found ${visibleToggles}` });
-        if (visibleToggles === 0) { continue; }
+        /* Kill transitions before touching anything. A drawer fades and slides in, and
+           getComputedStyle DURING that returns the interpolated value — so under the CPU load of
+           a 138-page sweep this gate read fully-working drawers as closed (opacity still climbing
+           past 0.05 at the moment of measurement) while simultaneously counting 22, 19 and 17
+           visible links inside them. Measured alone, every one reported opacity 1, and repeat runs
+           of the unchanged gate returned 4, then 3, then 1 finding — a shifting set, which is the
+           signature. `tools/audit-dark-coverage.mjs` hit the identical flake reading body colour
+           mid-theme-flip and settled it the same way: assert the SETTLED state, which is exactly
+           what the animation was delaying. */
+        await page.evaluate(() => {
+            const s = document.createElement('style');
+            s.id = 'rz-nav-audit-no-transition';
+            s.textContent = '*,*::before,*::after{transition:none !important;animation:none !important}';
+            document.head.appendChild(s);
+        });
+
+        /* offsetParent is null for a position:fixed element, so it is the wrong visibility test for a
+           navbar button; a real box is the right one. It also catches the 4px-wide burger that opened
+           the menu correctly and could not be hit. */
+        const visibleToggles = await page.evaluate((sel) =>
+            [...document.querySelectorAll(sel)]
+                .filter((e) => { const r = e.getBoundingClientRect(); return r.width > 8 && r.height > 8; })
+                .length, TOGGLES);
+        if (visibleToggles !== 1) {
+            findings.push({ page: rel, rule: 'N1 exactly one visible toggle', detail: `found ${visibleToggles}` });
+            if (visibleToggles === 0) { continue; }
+        }
+
+        /* "Open" is not a height. A closed slide-in drawer is 774px tall and parked at left:-601px;
+           a centre hit-test fails on a gated page because a root overlay sits above the menu. What a
+           reader needs is LINKS THEY CAN SEE AND TAP, so that is what is counted. */
+        const measure = () => page.evaluate((sel) => {
+            const m = document.querySelector(sel);
+            if (!m) { return { on: false, w: 0, h: 0, links: 0 }; }
+            const r = m.getBoundingClientRect();
+            const cs = getComputedStyle(m);
+            const onScreen = r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth;
+            const painted = cs.display !== 'none' && cs.visibility !== 'hidden'
+                && parseFloat(cs.opacity) > 0.05;
+            const links = Array.from(m.querySelectorAll('a')).filter((a) => {
+                const ar = a.getBoundingClientRect();
+                return ar.width > 20 && ar.height > 10
+                    && ar.bottom > 0 && ar.top < innerHeight && ar.right > 0 && ar.left < innerWidth;
+            }).length;
+            return { on: onScreen && painted, w: Math.round(r.width), h: Math.round(r.height), links };
+        }, MENUS);
+        const click = () => page.evaluate((sel) => {
+            const t = [...document.querySelectorAll(sel)]
+                .find((e) => { const r = e.getBoundingClientRect(); return r.width > 8 && r.height > 8; });
+            if (t) { t.click(); }
+        }, TOGGLES);
+
+        await click();
+        await new Promise((r) => setTimeout(r, 500));
+        const opened = await measure();
+        if (!(opened.on && opened.links >= 2)) {
+            findings.push({ page: rel, rule: 'N2 the toggle opens a menu with tappable links',
+                            detail: `menu ${opened.w}x${opened.h}px, ${opened.links} link(s) on screen` });
+        }
+
+        /* N5 — the open drawer must OBSCURE the page, not merely exist above it.
+           A link count passed a drawer the hero headline printed straight through: its background
+           measured rgba(15,23,42,0.97) and its gutter pixels sampled dark, yet the H1 overprinted it
+           because the drawer can only paint as high as the navbar's stacking context. Counting links
+           could never see that; a pixel can. Sample the drawer's own area and require it to be
+           uniform — a page bleeding through shows up as variance. */
+        if (opened.on && opened.links >= 2) {
+            const bleed = await page.evaluate((sel) => {
+                /* A root-gated page draws a full-screen overlay above everything, the drawer
+                   included. That is the gate doing its job, not the drawer failing to cover the
+                   page, so N5 has nothing to say here and says nothing. */
+                const gate = document.querySelector('.rz-restricted-overlay, .root-gate, #rzModalOverlay');
+                if (gate && gate.getBoundingClientRect().height > 200) { return { total: 0, inside: 0 }; }
+                const m = document.querySelector(sel);
+                const r = m.getBoundingClientRect();
+                const pts = [];
+                for (let i = 1; i <= 6; i += 1) {
+                    const y = r.top + (r.height * i) / 7;
+                    if (y < 0 || y > innerHeight) { continue; }
+                    const el = document.elementFromPoint(Math.min(innerWidth - 2, r.left + 4), y);
+                    pts.push(el && (el === m || m.contains(el)));
+                }
+                return { total: pts.length, inside: pts.filter(Boolean).length };
+            }, MENUS);
+            if (bleed.total && bleed.inside < bleed.total) {
+                findings.push({ page: rel, rule: 'N5 the open drawer covers the page',
+                                detail: `${bleed.total - bleed.inside} of ${bleed.total} sample points fall through to the page beneath` });
+            }
+        }
+
+        await click();
+        await new Promise((r) => setTimeout(r, 500));
+        const closed = await measure();
+        if (closed.on && closed.links >= 2) {
+            findings.push({ page: rel, rule: 'N3 the toggle closes it again',
+                            detail: `${closed.links} link(s) still on screen` });
+        }
+
+    } catch (error) {
+        /* a page that will not render is a finding, never a page to skip */
+        findings.push({ page: rel, rule: 'page renders', detail: String(error.message).slice(0, 60) });
     }
+}
 
-    /* "Open" is not a height. A closed slide-in drawer is 774px tall and parked at left:-601px;
-       a centre hit-test fails on a gated page because a root overlay sits above the menu. What a
-       reader needs is LINKS THEY CAN SEE AND TAP, so that is what is counted. */
-    const measure = () => page.evaluate((sel) => {
-        const m = document.querySelector(sel);
-        if (!m) { return { on: false, w: 0, h: 0, links: 0 }; }
-        const r = m.getBoundingClientRect();
-        const cs = getComputedStyle(m);
-        const onScreen = r.bottom > 0 && r.top < innerHeight && r.right > 0 && r.left < innerWidth;
-        const painted = cs.display !== 'none' && cs.visibility !== 'hidden'
-            && parseFloat(cs.opacity) > 0.05;
-        const links = Array.from(m.querySelectorAll('a')).filter((a) => {
-            const ar = a.getBoundingClientRect();
-            return ar.width > 20 && ar.height > 10
-                && ar.bottom > 0 && ar.top < innerHeight && ar.right > 0 && ar.left < innerWidth;
-        }).length;
-        return { on: onScreen && painted, w: Math.round(r.width), h: Math.round(r.height), links };
-    }, MENUS);
-    const click = () => page.evaluate((sel) => {
-        const t = [...document.querySelectorAll(sel)]
-            .find((e) => { const r = e.getBoundingClientRect(); return r.width > 8 && r.height > 8; });
-        if (t) { t.click(); }
-    }, TOGGLES);
-
-    await click();
-    await new Promise((r) => setTimeout(r, 500));
-    const opened = await measure();
-    if (!(opened.on && opened.links >= 2)) {
-        findings.push({ page: rel, rule: 'N2 the toggle opens a menu with tappable links',
-                        detail: `menu ${opened.w}x${opened.h}px, ${opened.links} link(s) on screen` });
+/* N6 — the TABLET band, where a breakpoint mismatch hides.
+   A page reveals its own toggle at its own breakpoint. The injected fallback drawer used to be
+   scoped `@media (max-width:768px)`, and the pln-java-grid pages reveal their toggle at
+   `max-width:900px` — so from 769px to 900px a reader saw a hamburger, tapped it, and nothing
+   happened. Neither 390px nor 1280px can see that: the phone pass is below the gap and the
+   desktop pass is above it. Wherever a toggle IS visible, it must work. */
+await page.setViewport({ width: 860, height: 900, isMobile: false, hasTouch: false });
+for (const rel of PAGES) {
+    const file = join(ROOT, rel);
+    if (!existsSync(file)) { continue; }
+    try {
+        await page.goto('file://' + file, { waitUntil: 'domcontentloaded', timeout: 30000 });
+        await new Promise((r) => setTimeout(r, 400));
+        await page.evaluate(() => {
+            const s = document.createElement('style');
+            s.textContent = '*,*::before,*::after{transition:none !important;animation:none !important}';
+            document.head.appendChild(s);
+        });
+        const n = await page.evaluate((sel) =>
+            [...document.querySelectorAll(sel)]
+                .filter((e) => { const r = e.getBoundingClientRect(); return r.width > 8 && r.height > 8; })
+                .length, TOGGLES);
+        if (n === 0) { continue; }          /* no toggle at this width is a valid design */
+        await page.evaluate((sel) => {
+            const b = [...document.querySelectorAll(sel)]
+                .find((e) => { const r = e.getBoundingClientRect(); return r.width > 8 && r.height > 8; });
+            if (b) { b.click(); }
+        }, TOGGLES);
+        await new Promise((r) => setTimeout(r, 350));
+        const open = await page.evaluate((sel) => {
+            const m = document.querySelector(sel);
+            if (!m) { return { links: 0 }; }
+            const links = [...m.querySelectorAll('a')].filter((a) => {
+                const ar = a.getBoundingClientRect();
+                return ar.width > 20 && ar.height > 10 && ar.bottom > 0 && ar.top < innerHeight;
+            }).length;
+            return { links };
+        }, MENUS);
+        if (open.links < 2) {
+            findings.push({ page: rel, rule: 'N6 a visible toggle works at tablet width',
+                            detail: `toggle shown at 860px, menu opened with ${open.links} link(s)` });
+        }
+    } catch (error) {
+        findings.push({ page: rel, rule: 'N6 a visible toggle works at tablet width',
+                        detail: `render error: ${String(error.message).slice(0, 44)}` });
     }
+}
 
-    await click();
-    await new Promise((r) => setTimeout(r, 500));
-    const closed = await measure();
-    if (closed.on && closed.links >= 2) {
-        findings.push({ page: rel, rule: 'N3 the toggle closes it again',
-                        detail: `${closed.links} link(s) still on screen` });
-    }
-
-    await page.setViewport({ width: 1280, height: 900 });
-    await new Promise((r) => setTimeout(r, 400));
-    const desktopToggles = await page.evaluate((sel) =>
-        [...document.querySelectorAll(sel)]
-            .filter((e) => { const r = e.getBoundingClientRect(); return r.width > 8 && r.height > 8; })
-            .length, TOGGLES);
-    if (desktopToggles !== 0) {
-        findings.push({ page: rel, rule: 'N4 no toggle on desktop', detail: `${desktopToggles} visible at 1280px` });
+/* N4 as its own pass, for the same reason. */
+await page.setViewport({ width: 1280, height: 900, isMobile: false, hasTouch: false });
+for (const rel of PAGES) {
+    const file = join(ROOT, rel);
+    if (!existsSync(file)) { continue; }
+    try {
+        await page.goto('file://' + file, { waitUntil: 'domcontentloaded', timeout: 30000 });
+        await new Promise((r) => setTimeout(r, 350));
+        const desktopToggles = await page.evaluate((sel) =>
+            [...document.querySelectorAll(sel)]
+                .filter((e) => { const r = e.getBoundingClientRect(); return r.width > 8 && r.height > 8; })
+                .length, TOGGLES);
+        if (desktopToggles !== 0) {
+            findings.push({ page: rel, rule: 'N4 no toggle on desktop', detail: `${desktopToggles} visible at 1280px` });
+        }
+    } catch (error) {
+        findings.push({ page: rel, rule: 'N4 no toggle on desktop', detail: `render error: ${String(error.message).slice(0, 44)}` });
     }
 }
 await browser.close();

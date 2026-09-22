@@ -11,6 +11,51 @@ release sections rather than semver.
 
 ---
 
+## v3.11.1 — 2026-09-22
+
+### The drawer opened and the page showed straight through it
+
+v3.10.21 put the hamburger back on all 138 navbar pages. Opening it on
+`datacenter-solutions.html` still printed the hero headline over the menu — a screenshot of the
+live site shows "Plan, Cost, and Commission Your Data Center" legible across the open drawer.
+
+The drawer's background was not the problem: it computed `rgba(15,23,42,0.97)` and its gutter
+pixels sampled `(23, 30, 49)`. **A z-index on the drawer cannot fix this, because the drawer lives
+inside `.navbar` and can only ever paint as high as the navbar's own stacking context.** Lifting
+the NAVBAR while the drawer is open is what makes the page disappear behind it. The background is
+fully opaque now for the same reason — 3% of a bright gradient headline is still legible.
+
+Found by screenshot, fixed by screenshot. `elementsFromPoint` reported the drawer ABOVE the H1, and
+that reading was useless: the pixels disagreed.
+
+### Added — N5, the check a link count cannot make
+
+`tools/test-mobile-nav.mjs` counted tappable links and passed a drawer the page printed through.
+N5 samples six points down the drawer's own area and requires each to land on the drawer rather
+than on the page beneath. It skips root-gated pages, where a full-screen gate overlay covers the
+drawer legitimately and N5 has nothing to say.
+
+### The gate was flaky, and the flake was the same one dark-coverage had
+
+Three consecutive runs of the UNCHANGED gate returned 4, then 3, then 1 finding — a shifting set,
+which is the signature. It reported drawers as closed while simultaneously counting 22, 19 and 17
+visible links inside them; measured alone, every one of those reported `opacity: 1`.
+
+A drawer fades and slides in, and `getComputedStyle` during that returns the interpolated value.
+Under the CPU load of a 138-page sweep the animation clock runs behind and the gate reads a
+half-opened drawer. `tools/audit-dark-coverage.mjs` hit the identical flake reading body colour
+mid-theme-flip. Same remedy: **suppress transitions before measuring, and assert the settled state
+— which is exactly what the animation was delaying.** Three consecutive clean runs after.
+
+### Fixed — the gate crashed on its own viewport switch
+
+Flipping `isMobile` on a live page makes Puppeteer reload it, and doing that once per page killed
+the run with a protocol error. Mobile and desktop are now two passes with the viewport set once in
+each; the number of navigations is identical. A page that fails to render is now reported as a
+finding instead of being skipped by a bare `catch`.
+
+---
+
 ## v3.11.0 — 2026-09-21
 
 ### Eleven figures, fourteen reasons
