@@ -8308,3 +8308,20 @@ html .failure-step-number  { color: var(--rz-chip-alert) !important; }
 @media print {
     .rz-photo-fill { display: none; }
 }
+
+/* ─── Nav tap targets ────────────────────────────────────────
+   WCAG 2.5.8 (AA) requires a 24x24 CSS px minimum target. The `.nav-right` bar used by the
+   protocol explainers and three hubs renders its links as bare inline anchors, so their box is
+   the TEXT box — measured 17px tall at 390px on 28 pages. These are a navigation bar, not links
+   inside a sentence, so the "inline" exception does not apply.
+   A floor, not a redesign: `min-height` plus `inline-flex` grows the box without moving the text,
+   and the 44 pages whose targets already clear 24px are unaffected because a floor below them
+   changes nothing. */
+@media (max-width: 768px) {
+    .navbar .nav-right a,
+    header .nav-right a {
+        min-height: 24px;
+        display: inline-flex;
+        align-items: center;
+    }
+}

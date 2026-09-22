@@ -11,6 +11,41 @@ release sections rather than semver.
 
 ---
 
+## v3.11.2 — 2026-09-22
+
+### Twenty-eight pages had navigation links too small to tap
+
+Found while verifying v3.11.1 on the live site rather than locally. The protocol explainers show no
+hamburger at phone width, which is a valid design — their navigation is two always-visible links.
+Measured, those links render **17px tall at 390px**, on 28 pages: all 25 `network/**` explainers
+plus `all-in-one-dashboard`, `network-compare` and `network-visualization-hub`.
+
+WCAG 2.2 SC 2.5.8 (Target Size, Minimum, AA) asks for 24×24 CSS px. Its "inline" exception covers
+targets inside a sentence; **a navigation bar is not a sentence**, and on those pages those links
+are the only way out.
+
+The cause is that `.nav-right` renders its links as bare inline anchors, so the target box is the
+TEXT box. The fix is a floor, not a redesign: `min-height: 24px` with `inline-flex` grows the box
+without moving the text, in the shared stylesheet all 28 already load. The 44 other `.nav-right`
+pages whose targets already clear 24px are unaffected, because a floor beneath them changes
+nothing.
+
+### Added
+
+- `tools/test-tap-targets.mjs`, wired into `ship-gate.sh`. Every page with a `.nav-right` bar, at
+  390px, must render each visible link at least 24px tall. **Proven RED against shipped v3.11.1:
+  28 pages. 0 after.**
+
+### Why the hamburger gate could not see this
+
+`test-mobile-nav.mjs` enumerates pages that have both a navbar AND a menu container, then asserts
+one working toggle. These pages have no toggle and no menu container — they were never in its
+population, and they were right not to be. A gate that asserts "the hamburger works" cannot notice
+a page that correctly has no hamburger and fails for a different reason. That is an argument for
+checking the rendered page against a different question, not for widening the first gate.
+
+---
+
 ## v3.11.1 — 2026-09-22
 
 ### The drawer opened and the page showed straight through it

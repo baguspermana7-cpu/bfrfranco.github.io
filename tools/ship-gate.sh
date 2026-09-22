@@ -221,6 +221,7 @@ gate "security zone ladder — SL-T never drops inward, life safety is monitor-o
 gate "commercial surface — no newsletter capture, no paid tier, no e-mail collection" node tools/test-no-commercial-surface.mjs
 gate "page metadata — every published page is visible to a search or answer engine" node tools/test-page-metadata.mjs
 gate "mobile nav — one hamburger per navbar, and it opens the menu" node tools/test-mobile-nav.mjs
+gate "nav tap targets — no navigation link under 24px at 390px (WCAG 2.5.8)" node tools/test-tap-targets.mjs
 # CACHE-KEY DRIFT is the min-twin bug's sibling: one shared asset requested under two `?v=`
 # tokens sits in two cache entries, so a fix reaches a page only if that page's own token moved.
 # Reporting only — `--apply` converges on the NEWEST token. The predecessor of this tool parsed no
