@@ -46,6 +46,54 @@ checking the rendered page against a different question, not for widening the fi
 
 ---
 
+## v3.11.2 — 2026-09-22
+
+### The downloadable dataset was corrupt for every parser, and nobody could see it
+
+v3.11.1 fixed a vapour pressure in `article-26` that belonged to a different fluid. Auditing the
+rest of the table it came from turned up a second defect of a different kind, in the same file.
+
+`data/article-26/fluid-properties.csv` is offered to readers as a download, so a stranger loads it
+into pandas and trusts the result. **Four of its eleven rows mis-parsed**, because chemical names
+like `cis-1,1,1,4,4,4-hexafluoro-2-butene` and `2,3,3,3-tetrafluoropropene` carry unquoted commas.
+Those rows silently shifted columns: R-1234yf reported `C3H2F4` where its boiling point belongs,
+and R-1233zd(E) reported a CAS number as a vapour pressure. Opened in a text editor the file looks
+perfect. **One of the four was introduced by the v3.11.1 fix itself** — writing
+`3M TDS (GWP, vapor pressure)` into the source cell added a comma and split the Novec 7000 row.
+
+All eleven rows are quoted properly now and parse to fifteen columns.
+
+### Added — `tools/audit-fluid-properties.py`, a gate the eye cannot be
+
+Two defects in one week, neither visible by reading the file, is a gate's job description.
+
+**Structure:** every row must parse to the header's column count. A row that does not is broken for
+every consumer, full stop.
+
+**Physics:** boiling point and vapour pressure at 25 °C are not independent. Trouton's rule gives
+the enthalpy of vaporisation from the boiling point alone (ΔS_vap ≈ 88 J/(mol·K)), and
+Clausius-Clapeyron turns that into a predicted p_sat(25 °C). **Needing only the boiling point is
+what makes it an independent check on the pressure cell** — exactly what the Novec 7000 defect
+lacked.
+
+Run against the repaired table, all seven pure compounds agree: Novec 7000 ×0.88, Novec 7100 ×0.96,
+Novec 649 ×0.93, Opteon 2P50 ×1.20, FC-72 ×0.89, R-1234yf ×0.87, R-1233zd(E) ×0.92. Run against the
+*unfixed* table it fails both original bugs — the transposed pressure at ×0.37, and the unquoted
+comma by column count — and exits 1 under `--strict`. A gate that has never been shown to fail is
+not a gate.
+
+**Mixtures are exempt by name, with the reason written down, never by pattern.** Galden HT55/HT70
+are polydisperse PFPE cuts whose "55" and "70" are nominal mid-cuts rather than normal boiling
+points; FC-40 is a blend; mineral oil gives ">300" and "negligible", neither of which is a number.
+The split turns out to be exact — every pure compound passes and every failure is a mixture — and
+that pattern is the evidence the method works, which a blanket "skip anything that looks like a
+mixture" would have hidden.
+
+Wired into the ship-audit list in `CLAUDE.md`, because a gate that exists and is not wired is a gate
+that does not exist.
+
+---
+
 ## v3.11.1 — 2026-09-22
 
 ### The drawer opened and the page showed straight through it
