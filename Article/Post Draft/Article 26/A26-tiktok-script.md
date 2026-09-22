@@ -51,10 +51,10 @@ SECTION 2: The Maintenance Sequence — What Actually Happens (2:00 — 4:30)
 
 "I've opened these systems hundreds of times. Here's what happens. You get a work order — component swap, inspection, fluid top-off. You suit up. You follow the procedure. And then you open the tank."
 
-[TEXT OVERLAY: "Novec 7000 vapor pressure: 270 hPa"]
+[TEXT OVERLAY: "Novec 7000 vapor pressure: 650 hPa"]
 [TEXT OVERLAY: "Water vapor pressure: 32 hPa"]
 
-"Novec 7000 has a vapor pressure of 270 hPa. Water is 32. That means the moment you expose the fluid surface — the moment that lid comes off — it starts vaporizing at eight times the rate of water. Into the room. Into the HVAC system. Out of the building."
+"Novec 7000 has a vapor pressure of 650 hPa. Water is 32. That means the moment you expose the fluid surface — the moment that lid comes off — it starts vaporizing at twenty times the driving pressure of water. Into the room. Into the HVAC system. Out of the building."
 
 [Beat]
 

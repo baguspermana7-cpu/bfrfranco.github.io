@@ -10,14 +10,14 @@ Four numbers that should be in every infrastructure sustainability conversation:
 
 — 17.1%/yr: Fluid charge measured lost to vapor in a field study of deployed two-phase systems — most of it during open maintenance, not sealed leaks
 — 12,000+: PFAS compound variants. Mandatory DC environmental reporting requirements: zero
-— 8x: How much faster Novec 7000 evaporates vs. water (270 hPa vs 32 hPa)
+— 20x: How much higher Novec 7000’s vapor pressure is vs. water (650 hPa vs 32 hPa)
 — <5%: Data centers with rack densities that actually require two-phase PFAS cooling
 
 ---
 
 The contamination pathway nobody talks about:
 
-When a technician opens a two-phase system for inspection, component swap, or top-off, the fluid surface is exposed. At 270 hPa vapor pressure, Novec 7000 vaporizes immediately into the facility air. Multiply that by maintenance frequency across a hyperscale fleet and you have a recurring, unmonitored release event. The single published field measurement — a DoD/LBNL study — clocked 17.1% of the charge gone to evaporation in one year. At fluid prices that is roughly $9,500 a year bleeding off a single tank, and it shows up nowhere but the consumables budget.
+When a technician opens a two-phase system for inspection, component swap, or top-off, the fluid surface is exposed. At 650 hPa vapor pressure, Novec 7000 vaporizes immediately into the facility air. Multiply that by maintenance frequency across a hyperscale fleet and you have a recurring, unmonitored release event. The single published field measurement — a DoD/LBNL study — clocked 17.1% of the charge gone to evaporation in one year. At fluid prices that is roughly $9,500 a year bleeding off a single tank, and it shows up nowhere but the consumables budget.
 
 The EPA's TRI applies to PFAS manufacturers — not to the data centers buying, storing, handling, and venting these chemicals during routine operations.
 

@@ -2,7 +2,7 @@ Imagine a chemical so persistent it will still be detectable in your bloodstream
 
 That's not hypothetical. That's the current state of two-phase PFAS cooling in data centers.
 
-I've spent 12 years as a data center engineer. I've opened these systems hundreds of times. The fluid inside evaporates eight times faster than water the moment it hits open air. Every maintenance session is a release event. We just never called it that, because nobody asked us to track it.
+I've spent 12 years as a data center engineer. I've opened these systems hundreds of times. The fluid inside has twenty times the vapor pressure of water, and it leaves the moment it hits open air. Every maintenance session is a release event. We just never called it that, because nobody asked us to track it.
 
 Here's the stat that stopped me: a field study of deployed systems measured 17% of the entire fluid charge lost to vapor in a single year — most of it during open service, not from sealed leaks. That's several times more than a sealed refrigerant loop is even allowed to leak. The leaks everyone worries about are not the main problem. Opening the tank is.
 

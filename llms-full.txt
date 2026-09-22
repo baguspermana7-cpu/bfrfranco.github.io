@@ -4323,7 +4323,7 @@ A clean agent fire suppressant manufactured by 3M with a global warming potentia
 
 ### Novec 7000 (HFE-7000, 3M)
 
-A two-phase immersion cooling fluid manufactured by 3M with a 34°C boiling point and 270 hPa vapor pressure (8.4× faster evaporation than water). Novec 7000 is a PFAS compound; 3M announced its exit from PFAS production in December 2022 and completed wind-down by end of 2025. The installed base in hyperscale and colocation deployments runs on stockpiled supply with no fully-equivalent replacement at scale; current alternatives are Chemours Opteon SF/2P50 and Solvay Galden HT.
+A two-phase immersion cooling fluid manufactured by 3M with a 34°C boiling point and 650 hPa vapor pressure at 25°C (about 20× that of water). Novec 7000 is a PFAS compound; 3M announced its exit from PFAS production in December 2022 and completed wind-down by end of 2025. The installed base in hyperscale and colocation deployments runs on stockpiled supply with no fully-equivalent replacement at scale; current alternatives are Chemours Opteon SF/2P50 and Solvay Galden HT.
  PFAS Vapor Release
 
 
@@ -44500,9 +44500,9 @@ The C-F bond has a dissociation energy of approximately 544 kJ/mol — the stron
  EPA MCL (PFOA + PFOS combined): 4 parts per trillion
  Analogy: 1 grain of sand dissolved in an Olympic swimming pool (2,500,000 L)
 
- Novec 7000 vapor pressure @ 25°C: 270 hPa
+ Novec 7000 vapor pressure @ 25°C: 650 hPa
  Water vapor pressure @ 25°C: 32 hPa
- Evaporation rate ratio: ~8.4× faster than water
+ Vapor pressure ratio: ~20× that of water
 
 
 
@@ -44561,11 +44561,11 @@ EPA's Toxic Release Inventory (TRI) under EPCRA Section 313 requires PFAS report
 
 
 
-The physics make this quantitatively significant. Novec 7000 has a vapor pressure of approximately 270 hPa at 25°C . Water, by comparison, has a vapor pressure of 32 hPa at the same temperature . This means Novec 7000 evaporates into the air approximately 8.4 times faster than water under identical ambient conditions. When a technician opens a system housing that has been running at operating temperature — even after completing a pre-maintenance drain-down cycle — the residual fluid on every surface inside that enclosure begins evaporating immediately. Pump housings, heat exchanger fins, manifold surfaces, server chassis interiors, cable management trays, all of it is coated with a thin film of Novec 7000 that will evaporate into the surrounding room air within minutes of the system being opened.
+The physics make this quantitatively significant. Novec 7000 has a vapor pressure of approximately 650 hPa at 25°C . Water, by comparison, has a vapor pressure of 32 hPa at the same temperature — a driving pressure roughly 20 times higher . And because the Novec molecule is about eleven times heavier than water, the mass leaving a given area of exposed film is larger again. When a technician opens a system housing that has been running at operating temperature — even after completing a pre-maintenance drain-down cycle — the residual fluid on every surface inside that enclosure begins evaporating immediately. Pump housings, heat exchanger fins, manifold surfaces, server chassis interiors, cable management trays, all of it is coated with a thin film of Novec 7000 that will evaporate into the surrounding room air within minutes of the system being opened.
 
 
 
-When the industry itself documents that their fluids evaporate eight times faster than water at room temperature, and the maintenance cycle requires opening these systems multiple times per year, the cumulative atmospheric release over the operational life of a large deployment is not trivial. *How much?* The honest answer is that no one has measured maintenance vapor release directly — which is the whole problem. But it can be bounded. The single published field measurement of fluid loss from a deployed two-phase system — a 2016 study of Novec 649 installations at U.S. Department of Defense sites — recorded 17.1% of the fluid charge lost to evaporation in one year (102 litres gone from a 595-litre charge), the bulk of it during the open service intervals these systems require [16]. Set that against the regulatory benchmark for a *sealed* refrigerant loop: EPA Section 608 treats a comfort-cooling system as defective above a 10% annual leak rate , and well-run sealed installations run below 3–5% [22]. On those two anchors, maintenance-dominated loss runs on the order of 3–6× a *tolerated* leak and 5–15× a well-maintained sealed loop. The 20–30× figure cited informally across the industry is best read as a modeled upper bound for the worst-maintained, highest-cadence GPU deployments — not a measured constant. The precise multiplier is unknown precisely because the release is unmetered, and that absence of measurement is itself the finding.
+When the fluid’s own datasheet puts its vapor pressure at roughly twenty times that of water at room temperature, and the maintenance cycle requires opening these systems multiple times per year, the cumulative atmospheric release over the operational life of a large deployment is not trivial. *How much?* The honest answer is that no one has measured maintenance vapor release directly — which is the whole problem. But it can be bounded. The single published field measurement of fluid loss from a deployed two-phase system — a 2016 study of Novec 649 installations at U.S. Department of Defense sites — recorded 17.1% of the fluid charge lost to evaporation in one year (102 litres gone from a 595-litre charge), the bulk of it during the open service intervals these systems require [16]. Set that against the regulatory benchmark for a *sealed* refrigerant loop: EPA Section 608 treats a comfort-cooling system as defective above a 10% annual leak rate , and well-run sealed installations run below 3–5% [22]. On those two anchors, maintenance-dominated loss runs on the order of 3–6× a *tolerated* leak and 5–15× a well-maintained sealed loop. The 20–30× figure cited informally across the industry is best read as a modeled upper bound for the worst-maintained, highest-cadence GPU deployments — not a measured constant. The precise multiplier is unknown precisely because the release is unmetered, and that absence of measurement is itself the finding.
 
 
 
@@ -44602,11 +44602,11 @@ Let me walk through the actual maintenance sequence for a quarterly inspection o
 
 
 
-The drain sequence begins with initiating the automated transfer pump cycle. Most modern two-phase systems have an integrated pump that pushes fluid from the tank into a sealed recovery drum. This takes 30-45 minutes for a 10-rack system. When the pump cycle completes, you have recovered the bulk of the fluid — but the system still holds substantial residual volume. The headspace above the fluid level in the tank has been saturated with vapor at roughly 270 hPa partial pressure throughout the operation. The moment you open the drain valve to initiate the cycle, that headspace vapor begins exchanging with room air. Step one of the maintenance sequence has already released PFAS vapor.
+The drain sequence begins with initiating the automated transfer pump cycle. Most modern two-phase systems have an integrated pump that pushes fluid from the tank into a sealed recovery drum. This takes 30-45 minutes for a 10-rack system. When the pump cycle completes, you have recovered the bulk of the fluid — but the system still holds substantial residual volume. The headspace above the fluid level in the tank has been saturated with vapor at roughly 650 hPa partial pressure at 25°C, and higher still at operating temperature, throughout the operation. The moment you open the drain valve to initiate the cycle, that headspace vapor begins exchanging with room air. Step one of the maintenance sequence has already released PFAS vapor.
 
 
 
-Opening the main access hatch is step two. The interior of the enclosure is now coated with a thin liquid film everywhere the fluid has been in contact — server chassis surfaces, copper heat exchangers, manifold fittings, pump housings, the structural members of the rack frames. That film has a vapor pressure eight times that of water. At 22°C ambient temperature, it is aggressively volatilizing into the enclosure's interior air. When you open the hatch, that vapor-laden air exchanges immediately with the room. For the remainder of the maintenance window — which might be three to five hours for a thorough inspection — the residual coating is continuously evaporating.
+Opening the main access hatch is step two. The interior of the enclosure is now coated with a thin liquid film everywhere the fluid has been in contact — server chassis surfaces, copper heat exchangers, manifold fittings, pump housings, the structural members of the rack frames. That film has a vapor pressure twenty times that of water. At 22°C ambient temperature, it is aggressively volatilizing into the enclosure's interior air. When you open the hatch, that vapor-laden air exchanges immediately with the room. For the remainder of the maintenance window — which might be three to five hours for a thorough inspection — the residual coating is continuously evaporating.
 
 
 
@@ -45030,7 +45030,7 @@ Genuinely PFAS-free alternatives for immersion cooling do exist. Mineral oil is 
 #### Novec 7000 (3M) — Legacy Installed Base
 
 
-PFAS compound (C 3 F 7 OCH 3 ). Boiling point 34°C, vapor pressure 270 hPa. Exceptional dielectric and thermal properties. Production ended 2025 — industry running on stockpiled supply. Environmental persistence: effectively indefinite.
+PFAS compound (C 3 F 7 OCH 3 ). Boiling point 34°C, vapor pressure 650 hPa at 25°C. Exceptional dielectric and thermal properties. Production ended 2025 — industry running on stockpiled supply. Environmental persistence: effectively indefinite.
 
 
  PFAS Classification
@@ -45632,7 +45632,7 @@ Querying the USGS Water Quality Portal for **trifluoroacetic acid (TFA)** — th
  [3]
 
  3M. *3M Novec 7000 Engineered Fluid — Product Datasheet.* (https://multimedia.3m.com/mws/media/65496O/3m-novec-7000-engineered-fluid.pdf)
- Boiling point 34°C, vapor pressure 270 hPa, dielectric properties.
+ Boiling point 34°C, vapor pressure 650 hPa at 25°C, dielectric properties.
 
 
 
