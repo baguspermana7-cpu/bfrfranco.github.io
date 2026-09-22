@@ -44,10 +44,6 @@ population, and they were right not to be. A gate that asserts "the hamburger wo
 a page that correctly has no hamburger and fails for a different reason. That is an argument for
 checking the rendered page against a different question, not for widening the first gate.
 
----
-
-## v3.11.2 — 2026-09-22
-
 ### The downloadable dataset was corrupt for every parser, and nobody could see it
 
 v3.11.1 fixed a vapour pressure in `article-26` that belonged to a different fluid. Auditing the
