@@ -53,7 +53,7 @@ node   tools/audit-interactions.mjs --strict      # REAL-input gate: palette, li
 node   tools/audit-a11y.mjs --strict               # axe-core render gate: 0 critical/serious on 8-page set x both themes (v1.50.41)
 node   tools/audit-page-gates.mjs --strict         # tier access-gate: any page with #rootGate/.root-gate/<body class=locked> MUST call enforceTierFeatureAccess() + wire #rootLoginBtn (v1.99.x — LTC labs stayed locked for root)
 node   tools/audit-hero-images.mjs --strict        # hero images: any page with .brief-hero-img / [data-rz-hero] MUST load js/rz-hero-fit.js (blur-letterbox; else the hero stretches/distorts)
-python3 tools/audit-fluid-properties.py --strict   # published dataset gate: every row must parse to the header's column count (four rows once mis-parsed on unquoted commas in chemical names), and every PURE fluid's vapour pressure must agree with Clausius-Clapeyron from its boiling point alone via Trouton's rule — the check that would have caught Novec 7100's pressure sitting on the Novec 7000 row. Mixtures are exempt BY NAME with a reason, never by pattern.
+python3 tools/audit-published-datasets.py --strict  # every downloadable CSV parses to its own header width (41k rows, 51 files — four rows once mis-parsed on unquoted commas in chemical names, one of them introduced BY the commit that fixed the other); clean-agent relations that hold by definition (design >= extinguishing, NOAEL <= LOAEL); and every PURE fluid's vapour pressure checked against its own boiling point via Trouton/Clausius-Clapeyron — the check that would have caught Novec 7100's pressure sitting on the Novec 7000 row. Mixtures exempt BY NAME with a reason, never by pattern.
 ```
 
 **Engine + accuracy tests** (v1.32.x accuracy-review work — gate any ship that touches the BMS cockpit pages):
@@ -366,7 +366,7 @@ Music: `my-video/public/audio/intro-music.mp3` — currently a synthesized elect
 | `tools/audit-responsive-layout.mjs` | render gate — fails real mobile/tablet horizontal scroll (actual `scrollX`) + article tables wider than the reading column — STRICT for CI (v1.49.8) |
 | `tools/audit-article-charts.mjs` | data-viz provenance gate — fails any `[data-rz-chart]` config missing `source`/`basisTag` — STRICT for CI (v1.50.1) |
 | `tools/audit-interactions.mjs` | interaction gate — exercises palette / living diagrams / scrollytelling / reading polish with real keyboard+scroll input (own HTTP server) — STRICT for CI (v1.50.34) |
-| `tools/audit-fluid-properties.py` | published fluid dataset — column-count integrity + bp↔vapour-pressure physics per row (Trouton/Clausius-Clapeyron), mixtures exempt by name — STRICT for CI (v3.11.2) |
+| `tools/audit-published-datasets.py` | downloadable datasets — column-count integrity across all 51 CSVs, definitional relations in the clean-agent table, and bp↔vapour-pressure physics per fluid row (Trouton/Clausius-Clapeyron); mixtures exempt by name — STRICT for CI (v3.11.3) |
 | `tools/audit-seo.py` | per-page SEO meta health — non-strict |
 | `tools/build-sitemap.py` | regen sitemap.xml from filesystem |
 | `tools/build-llms-txt.py` | regen llms.txt |

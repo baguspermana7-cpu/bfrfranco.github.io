@@ -11,6 +11,42 @@ release sections rather than semver.
 
 ---
 
+## v3.11.3 — 2026-09-22
+
+### The dataset gate now covers every dataset, not the one that broke
+
+v3.11.2 added `audit-fluid-properties.py` after four rows of one CSV turned out to mis-parse. That
+scope was wrong, and the reason is in the defect itself: unquoted commas are a property of
+hand-edited delimited text, not of chemistry. The four broken rows happened to be chemical names.
+The next one will not be.
+
+Renamed to **`tools/audit-published-datasets.py`** and widened to **41,469 rows across all 51
+published CSVs**, each parsed the way a consumer will parse it. All currently pass — the audit was
+run across every file before the gate was written, so this is a verified floor rather than a hope.
+
+### Added — relations that hold by definition, so they need no standard in hand
+
+`data/fire/clean-agent-properties.csv` is a fire-safety table, and two of its columns constrain
+each other regardless of which code is being followed: a design concentration cannot sit below the
+concentration that extinguishes, and a **no**-observed-adverse-effect level cannot exceed the
+**lowest**-observed one. Eight such relations across five agents, all holding.
+
+Blank cells are skipped, not read as zero. CO2 carries no NOAEL because it is lethal at design
+concentration and its own source cell says so; coercing that blank to 0 would manufacture a passing
+comparison out of missing data.
+
+**Deliberately not gated:** the 1.2× class-A safety factor and the occupied-space design ≤ NOAEL
+rule. Both are NFPA 2001 provisions with exceptions, and asserting a compliance rule from memory is
+the same mistake the whole gate exists because of.
+
+### Proven against four seeded defects before being trusted
+
+Structure, on a file unrelated to the original bug (`spares-oems.csv`, an injected comma). NOAEL and
+LOAEL swapped. A design concentration pushed below its extinguishing concentration. And the original
+transposed vapour pressure, at ×0.37. All four exit 1 under `--strict`; clean exits 0.
+
+---
+
 ## v3.11.2 — 2026-09-22
 
 ### Twenty-eight pages had navigation links too small to tap
