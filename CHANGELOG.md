@@ -11,6 +11,57 @@ release sections rather than semver.
 
 ---
 
+## v3.11.5 — 2026-09-23
+
+### Every text field on the site zoomed the page on iOS
+
+A full mobile audit of all 176 published pages at 390px, checking five defect classes. The
+worst finding by far: **1,471 form controls across 154 pages sized between 10px and 15.2px**.
+
+iOS Safari zooms the viewport whenever a focused text-entry control is under 16px, and it does not
+zoom back. The reader is left in a magnified page to pinch out of — on every field. On a site whose
+main offering is interactive calculators, that is most of the value of the site misbehaving on the
+device most readers arrive with. `spares-readiness-calculator.html` alone had **277**.
+
+### Fixed
+
+- A 16px floor at the phone breakpoint, scoped to controls that actually zoom: text-like `input`,
+  `select`, `textarea`. A checkbox, radio, range or colour swatch has no text to size and is left
+  alone — and the gate uses the same scope, so the fix and the check cannot disagree.
+- Delivered two ways because the site is not uniform: 123 pages take it from `styles.css`; the
+  other **31 are self-contained and carry the rule inline**, since a shared-stylesheet fix would
+  have silently missed them.
+- The floor needs `!important`. A page's own `.form-group input` (0,1,1) outranks a bare `input`
+  (0,0,1), and the first cut left **377 controls on 54 pages still zooming** for exactly that
+  reason. This is an accessibility floor at one breakpoint, not a style preference.
+
+Verified **1,471 → 0**, with **no horizontal overflow introduced on any page** — checked
+specifically on the 277-field page, where growing every control was most likely to break the
+layout.
+
+### Added
+
+- `tools/test-mobile-forms.mjs`, wired into `ship-gate.sh`. **Proven RED against shipped v3.11.2:
+  1,081 controls across 152 pages. 0 after.**
+
+### What the audit cleared, and one thing it taught
+
+Zero pages overflow horizontally at 390px. The three "off-screen content" findings in the first
+pass were a **news ticker that scrolls by design** — exempting marquees and transform-animated
+ancestors took that class from 40 findings to 0 before any of it was reported. Calibrating the
+probe against a handful of rendered pages first is what kept a scrolling headline out of a defect
+list.
+
+### Still open, measured and deliberately not swept
+
+- **1,042 tap targets under 24px** across 152 pages, nearly all navigation and footer links at
+  17–22px. WCAG 2.5.8 (AA) asks for 24×24. v3.11.2 fixed the `.nav-right` family; the rest is the
+  site's standard link styling and changing it site-wide is a design decision, not a bug fix.
+- **41 text runs under 10px**, mostly footnotes and source lines at 9.6–9.9px. A legitimate
+  typographic tier, on the small side.
+
+---
+
 ## v3.11.4 — 2026-09-23
 
 ### The climate arithmetic was built on the wrong Novec, again

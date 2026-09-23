@@ -8325,3 +8325,22 @@ html .failure-step-number  { color: var(--rz-chip-alert) !important; }
         align-items: center;
     }
 }
+
+/* ─── Mobile form controls: 16px, or iOS zooms ───────────────
+   iOS Safari zooms the viewport when a focused text field's font-size is under 16px, and it does
+   not zoom back out. Measured at 390px: 1,471 controls across 154 pages sat between 10px and
+   15.2px, so on a calculator-heavy site nearly every tap on a field threw the reader into a
+   zoomed page they then had to pinch out of. spares-readiness-calculator alone had 277.
+   Scoped to text-entry controls, because those are the ones that zoom — a checkbox, radio or
+   range has no text to size and is left alone. Verified not to introduce horizontal overflow,
+   including on the 277-field page. */
+@media (max-width: 768px) {
+    input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+    select,
+    textarea {
+        /* !important because a page's own `.form-group input` (0,1,1) outranks a bare element
+           selector (0,0,1): without it, 377 controls on 54 pages kept their 13-15px size and
+           kept zooming. This is an accessibility floor at one breakpoint, not a style opinion. */
+        font-size: 16px !important;
+    }
+}
