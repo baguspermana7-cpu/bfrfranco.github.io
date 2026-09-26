@@ -85,7 +85,7 @@ nothing in this repository can prove one.
 | # | finding | measured | why it is still open |
 |---|---|---|---|
 | 2 | 96 descriptions truncate mid-clause at the ~160-char display cut | **70** are a single list with no sentence boundary inside the window — there is nothing to trim *to*; the other **26** could end at a boundary only by DISCARDING the text after it | Not fixable mechanically: both paths delete authored content. This is a cosmetic SERP issue, not a loss of meaning, and it stays open rather than being "fixed" by deletion. |
-| 8 | `datahallAI.html` is 1,375 KB against a 55 KB median | 25× the median | Core Web Vitals liability on mobile. Splitting it is a large change and belongs with Track A. |
+| 8 | `datahallAI.html` is heavy enough to fail Core Web Vitals on mobile | **Re-measured 2026-09-26.** 1,408 KB raw but **381 KB over the wire** (GitHub Pages gzips; index.html is 30 KB). Composition: **1,236 KB inline JS = 88%** of the document, 558 KB of that template-literal SVG strings; only 168 KB is markup outside `<script>`. Live on a 390px / 4x-CPU / Slow-4G profile: **LCP 6,672 ms · TBT 3,884 ms · longest task 1,438 ms · CLS 0.163**, against index.html's 1,884 / 922 / 541 / 0.003. Fetch is NOT the bottleneck — all 45 resources land by 2.5 s; the dominant profile frame is `(program)` at **2,981 ms**, i.e. parse and compile of the inline mass. | **Partly addressed in v3.11.6**: 635 KB of hidden-panel DOM construction no longer runs before first paint, long tasks 30 → 23, gated by `tools/test-dcai-deferred-panels.mjs`. The remaining and dominant fix is extracting the inline scripts to external files, where V8 can stream-compile and disk-code-cache them. **Blocked on a prerequisite, not on effort: 37 tools read `datahallAI.html` as source text** and would go green-but-blind the moment the code moved (see `feedback_gate_exists_but_unwired`). That needs one shared page-source helper that concatenates the page with its extracted modules, landed and proven first. Track A ship, scoped, not started. |
 | 9 | Commercial artefacts in a PUBLIC repository | `rz-ops-p7x3k9m.html` (root-gated, noindex, sitemap-absent: Revenue Analytics, Mayar Payments, Tier Manager); `Data/Freemium Scheme/` (56 tracked files incl. a Mayar payment webhook) | No reader can reach either. **Deleting the files would not remove them from git history**, so deletion alone does not achieve what it appears to. Owner's decision. |
 
 ---
@@ -99,7 +99,9 @@ node tools/test-no-commercial-surface.mjs    # row C
 python3 tools/test-generator-freshness.py    # row E
 ```
 
-Rows 2, 8 and 9 have no gate — which is why they are open rather than closed.
+Rows 2 and 9 have no gate — which is why they are open rather than closed. Row 8 now has a PARTIAL one
+(`node tools/test-dcai-deferred-panels.mjs`, v3.11.6): it holds the hidden panels off the critical path, but
+nothing gates the page's total parse cost, and nothing can until the inline scripts are extracted.
 
 Also verified at v3.10.18 and found clean, so no row was opened for them: **0 pages carry more than
 one `<title>` in `<head>`**, and **0 titles are duplicated across pages**.

@@ -11,6 +11,67 @@ release sections rather than semver.
 
 ---
 
+## v3.11.6 — 2026-09-27
+
+### The cockpit painted nine panels nobody was looking at
+
+`datahallAI.html` opens on the `dash` tab. The other nine panels sit behind `.pn{display:none}`
+until the visitor clicks their tab — and the page built every one of them before first paint.
+Measured at the load event, four containers alone already held **635,446 characters** of generated
+markup: `hc` 313,776 (the hall mimic), `elecDH1C` 209,307 (one of four per-hall single-line
+diagrams), `bldgC` 107,802 and `overCards` 4,561.
+
+Profiled on a 390px viewport at 4x CPU throttling, `renderOverview`, `renderHall` and the four
+`drawDH` sheets owned ~0.4 s of self time on the critical path, and each one re-triggered the
+`rz-svg-legible` MutationObserver pass (256 ms of self time on its own).
+
+**Changed.** A small `RZDefer` queue in the page script. A panel now paints on the first activation
+of its tab — synchronously, before the panel is shown, so it can never flash empty — or on an idle
+slice after `load`, whichever comes first, one panel per task so the queue cannot rebuild the long
+task it was added to break up. The idle drain means print, find-in-page and every gate that waits
+for load+settle still see the whole document. `ensure()` is idempotent, so a panel never paints twice.
+
+**Measured effect, stated honestly.** The work is moved off the critical path, not removed: total
+CPU is unchanged. What is measurable without a clock: **635 KB of pre-paint DOM construction is
+gone** and long tasks fell **30 → 23**. FCP moved 6,644 → 6,360 ms in a local run, but wall-clock
+numbers on this machine swing with whatever else is running and are not evidence — the structural
+count is.
+
+**This does not close SEO ledger row 8.** Live, the page still measures LCP 6,672 ms / TBT 3,884 ms
+against index.html's 1,884 / 922, and the dominant term is `(program)` at 2,981 ms — parse and
+compile of **1,236 KB of inline JS** (88% of the document; 558 KB of it template-literal SVG
+strings). Fixing that means extracting the inline scripts to external files, and **37 tools read
+`datahallAI.html` as source text** — they would go green-but-blind the moment the code moved. That
+extraction needs one shared page-source helper first, and is scoped in the ledger rather than
+started here.
+
+### Added
+- `tools/test-dcai-deferred-panels.mjs` — asserts the structural invariant, not a millisecond
+  budget (a timing threshold on this box is a flake generator): every deferred container is empty at
+  the `load` event, the idle drain fills all of them with no click, activation alone paints a panel
+  with the idle drain suppressed, and a panel paints exactly once. Proven RED against the pre-change
+  tree in a detached worktree — 10 failures — and green after. Wired into `tools/ship-gate.sh`.
+
+### Changed
+- `datahallAI.html` — `RZDefer` queue; `renderOverview`/`renderOverviewCards`, `renderHall` and the
+  four `drawDH` calls moved into it; the tab click handler paints a panel before showing it.
+- `standarization/Audit result/SEO_AUDIT_LEDGER.md` — row 8 re-measured: 381 KB over the wire
+  (gzipped), not the 1,375 KB raw figure it quoted, with the composition, the live CWV numbers and
+  the 37-gate blast radius recorded.
+- `tools/lib/cockpit-tabs.mjs` — the tab-readiness wait is `READINESS_MS` (30 s, `RZ_TAB_READY_MS`
+  to override) instead of a hard 10 s. **Found while verifying this ship, and NOT caused by it:**
+  `test-conv-geometry` and `test-datahall-ai-inspector-runtime` were failing intermittently at that
+  timeout, and both fail identically on the pre-change tree, while walking all 21 datahallAI entries
+  through the same function readies every one. A cold navigation on this machine can exceed 45 s
+  while the file serves in 3 ms, so 10 s was asserting the machine's speed, not the page. This is a
+  readiness wait, not a speed budget: a tab that never readies still fails, and that was proven by
+  forcing `RZ_TAB_READY_MS=1` and confirming the timeouts return — a threshold is only loosened here
+  after the failure is shown false, per `feedback_gate_exists_but_unwired`.
+- `standarization/AGENT_HARNESS_STANDARD.md` — `Last updated` moved to the release date, which gate
+  86 requires of every release.
+
+---
+
 ## v3.11.5 — 2026-09-23
 
 ### Every text field on the site zoomed the page on iOS

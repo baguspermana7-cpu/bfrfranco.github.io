@@ -685,7 +685,7 @@ body[data-datahall-authority="unavailable"] #tabs,
 body[data-datahall-authority="unavailable"] .wrap{display:none !important}
 body[data-datahall-authority="unavailable"] .hdr-r>.dot{background:#64748b !important;box-shadow:none !important;animation:none !important}
 body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:none}
-</style>    <script src="js/rz-version.js?v=20260923-c5515487" defer></script>
+</style>    <script src="js/rz-version.js?v=20260927-314793c7" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <!-- v3.5.0 — hold the 8.5px legibility floor by SCALE, not by font size. Five of this page's
          fifteen diagrams were already clear; the dense ones (cooling P&ID, the four SLDs, the hall
@@ -1753,7 +1753,7 @@ function RZ_ALM(P,pt){var st=P&&P.state?P.state(pt):null;return (st&&['online','
 function bp(key,extra){var o={basis:'design.planes.'+key};if(extra)for(var k in extra)o[k]=extra[k];if(o.also){o.params=o.also.map(function(f){return window.DH_BASIS[f]||(f.indexOf('.')>0?f:'design.planes.'+f)});delete o.also}return o}
 
 setInterval(()=>{$('clk').textContent=new Date().toLocaleTimeString('en-GB')},1000);
-$('tabs').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')return;document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('on'));e.target.classList.add('on');document.querySelectorAll('.pn').forEach(p=>p.classList.remove('on'));const el=$('p-'+e.target.dataset.t);if(el)el.classList.add('on')});
+$('tabs').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')return;document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('on'));e.target.classList.add('on');document.querySelectorAll('.pn').forEach(p=>p.classList.remove('on'));const t=e.target.dataset.t;if(window.RZDefer)RZDefer.ensure(t);const el=$('p-'+t);if(el)el.classList.add('on')});
 /* v2.13.0 §A7 — network sub-tabs: own bar, own class names, own handler (never .et/.ep). */
 (function(){var bar=$('netTabs');if(!bar)return;
 function show(key){
@@ -3349,8 +3349,57 @@ function renderOverviewCards(){
   ].join('');
 }
 
-renderOverview();
-renderOverviewCards();
+/* ===== Deferred panel painting (v3.11.6) =====
+   Measured on a 4x-throttled 390px profile: the page painted every one of the
+   ten panels before first paint, although nine of them are hidden behind a tab
+   the visitor has not clicked. renderOverview, renderHall and the four drawDH
+   sheets alone owned ~0.4 s of self time on the critical path, and each one
+   also re-triggered the rz-svg-legible MutationObserver pass.
+
+   The work is not removed, it is moved off the critical path: a panel paints on
+   the first activation of its tab (synchronously, before the panel is shown, so
+   nothing can flash empty) or on an idle slice after the load event, whichever
+   comes first. The idle drain takes ONE panel per task, so the queue can never
+   rebuild the single long task it was added to break up, and it guarantees the
+   full DOM exists shortly after load for print, find-in-page and the gates.
+
+   ensure() is idempotent: whichever path fires first wins and the queue entry
+   is dropped, so a panel is never painted twice. */
+var RZDefer=(function(root){
+  var queue={},order=[];
+  function ensure(id){
+    var fns=queue[id];
+    if(!fns)return false;                 /* already painted, or nothing queued */
+    delete queue[id];
+    for(var i=0;i<fns.length;i++){
+      try{fns[i]();}
+      catch(e){if(root.console&&root.console.error)root.console.error('[rz-defer] '+id,e);}
+    }
+    return true;
+  }
+  function drain(){
+    var id;
+    while(order.length&&!queue[(id=order.shift())])id=null;
+    if(id)ensure(id);
+    if(order.length)schedule();
+  }
+  function schedule(){
+    /* timeout 200, not 2000: the drain must START promptly after load so a panel is already
+       painted by the time anything clicks its tab — a click still paints synchronously, but it
+       should almost never have to. First paint is already past by the time load fires. */
+    if(root.requestIdleCallback)root.requestIdleCallback(drain,{timeout:200});
+    else root.setTimeout(drain,60);
+  }
+  root.addEventListener('load',schedule);
+  return {
+    add:function(id,fn){if(!queue[id])order.push(id);(queue[id]=queue[id]||[]).push(fn);},
+    ensure:ensure,
+    pending:function(){var k=[];for(var n in queue)if(queue.hasOwnProperty(n))k.push(n);return k;}
+  };
+})(window);
+window.RZDefer=RZDefer;
+
+RZDefer.add('over',function(){renderOverview();renderOverviewCards();});
 
 var floorNames={gf:'Ground Floor — MEP & Chiller Plant',f2:'Floor 2 — Datahall 1 + Datahall 2',f3:'Floor 3 — Datahall 3 + Datahall 4',roof:'Roof — Heat Rejection (Dry Coolers + AHU)'};
 
@@ -4166,7 +4215,7 @@ s+=`<circle cx="777" cy="272" r="2" fill="var(--g)" opacity=".5"><animate attrib
 hc.innerHTML=s;
 }
 window.renderHall=renderHall;
-renderHall();
+RZDefer.add('hall',function(){renderHall();});
 
 /* One TTHT hot + cold readout per ROW (was: 4 per row-pair). The id scheme
    'H'+row+sensor+'t|h' is unchanged \u2014 only the row count moved with the basis. */
@@ -5402,10 +5451,12 @@ mc('var(--o)','Busway + RPP groups','2× '+dhaG(X.buswayA)+' A Cu trunk overhead
 }
 }
 
+RZDefer.add('elec',function(){
 drawDH(1,'elecDH1C','elecDH1Su','elecDH1Cards');
 drawDH(2,'elecDH2C','elecDH2Su','elecDH2Cards');
 drawDH(3,'elecDH3C','elecDH3Su','elecDH3Cards');
 drawDH(4,'elecDH4C','elecDH4Su','elecDH4Cards');
+});
 
 // ===== LIVE VALUE UPDATES (4-sec interval) =====
 setInterval(function(){

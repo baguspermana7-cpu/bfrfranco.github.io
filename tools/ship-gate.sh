@@ -219,6 +219,7 @@ gate "OG card freshness — every card matches a fresh render of its generator" 
 gate "generator freshness — every generated artefact matches a fresh build" python3 tools/test-generator-freshness.py
 gate "WAN traffic study — every printed figure follows from the view's own inputs" node tools/test-dcai-wan-study.mjs
 gate "security zone ladder — SL-T never drops inward, life safety is monitor-only" node tools/test-dcai-security-zones.mjs
+gate "deferred panels — the nine hidden panels do not paint before first paint" node tools/test-dcai-deferred-panels.mjs
 gate "commercial surface — no newsletter capture, no paid tier, no e-mail collection" node tools/test-no-commercial-surface.mjs
 gate "page metadata — every published page is visible to a search or answer engine" node tools/test-page-metadata.mjs
 gate "mobile nav — one hamburger per navbar, and it opens the menu" node tools/test-mobile-nav.mjs

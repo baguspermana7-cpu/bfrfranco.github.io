@@ -29,6 +29,8 @@
  * Declared tab sets. A page with no entry here is measured as it loads, exactly as before —
  * adding a page is deliberate, and so is declaring that a page has nothing to activate.
  */
+const READINESS_MS = Number(process.env.RZ_TAB_READY_MS || 30000);
+
 export const TAB_SETS = Object.freeze({
     'datahallAI.html': Object.freeze({
         cockpit: 'dc-ai',
@@ -154,7 +156,17 @@ export async function activateTab(page, set, entry) {
     }
 
     /* Rule 2 — the diagram must have text with a real box before anything measures it.
-       An HTML entry (kind:'html') waits for its container to have a box instead. */
+       An HTML entry (kind:'html') waits for its container to have a box instead.
+
+       v3.11.6 — READINESS_MS is a readiness wait, NOT a speed budget, and the two are easy to
+       confuse. At 10 s this timeout failed `test-conv-geometry` and
+       `test-datahall-ai-inspector-runtime` intermittently on a loaded machine — proven NOT to be a
+       page defect: both gates fail identically on the pre-change tree, and walking all 21
+       datahallAI entries through this same function on an idle box readies every one of them. A
+       cold navigation on this box can exceed 45 s while the file itself serves in 3 ms, so a
+       10 s wall-clock limit here asserts the machine's speed, which is not what any caller wants
+       to measure. A tab that never readies still fails — it just takes longer to say so. Override
+       with RZ_TAB_READY_MS when a caller genuinely wants a tighter bound. */
     await page.waitForFunction((selector, kind) => {
         const el = document.querySelector(selector);
         if (!el) return false;
@@ -162,7 +174,7 @@ export async function activateTab(page, set, entry) {
         const text = el.querySelector('text');
         if (!text) return true;                     // a diagram with no labels is legitimately ready
         return text.getBoundingClientRect().height > 0;
-    }, { timeout: 10000 }, entry.selector, entry.kind || 'svg');
+    }, { timeout: READINESS_MS }, entry.selector, entry.kind || 'svg');
 
     /* Rule 3 — two frames, so any level-of-detail pass triggered by the tab change has applied. */
     await page.evaluate(() => new Promise((resolve) => {
