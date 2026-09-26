@@ -688,6 +688,34 @@
   <li><strong>41 text runs under 10px</strong>, mostly footnotes and source lines at 9.6–9.9px. A legitimate</li>
 </ul>
 <p>typographic tier, on the small side.</p>
+<h3 class="cl-subhead">Fixed — one site, two GWPs for the same fluid, and one page citing the wrong report</h3>
+<p>Carrying v3.11.4's IPCC AR6 work across the rest of the site turned up two provenance defects.</p>
+<p>Shipped in this release as <code>550ae083</code>; the changelog line was owed because <code>CHANGELOG.md</code> was held</p>
+<p>by a parallel session at the time.</p>
+<p><strong><code>carbon-footprint.html</code> stated "Refrigerant GWP values from IPCC AR6" while using R-410A = 2088</strong>,</p>
+<p>which is the <strong>AR4</strong> value. On AR6 components that blend is about 2256 (HFC-32 at 771, HFC-125 at</p>
+<p>3740, Table 7.SM.7).</p>
+<p>The numbers were not the problem. This site is deliberately and consistently AR4 for refrigerants,</p>
+<p>because <strong>that is the basis EU F-gas regulation uses</strong>, and <code>rz-engine.js</code> documents it as</p>
+<p><em>"GWP100 IPCC AR4 (consistent with sitewide published values)"</em>. <code>manual/carbon.html</code> and</p>
+<p><code>capex-calculator.html</code> both say AR4 and both use AR4 numbers. Only this page's methodology line</p>
+<p>claimed otherwise, so <strong>the claim was corrected rather than the values</strong> — newer is not automatically</p>
+<p>more correct when a regulation mandates the older basis. The line now names the numbers and states</p>
+<p>what AR6 would give instead.</p>
+<p>That is the same defect class as the FC-72 row in v3.11.3: a figure attributed to a source that does</p>
+<p>not state it.</p>
+<p><strong>Second, <code>data/refrigerants.csv</code> and <code>rz-engine.js</code> both still carried Novec7000 at GWP 530</strong> after</p>
+<p>v3.11.4 had corrected the article's own dataset to 576. One site, two different GWPs for the same</p>
+<p>compound — and 530 is neither an AR4 nor an AR6 value. Both are now <strong>576</strong> from IPCC AR6 WGI</p>
+<p>Table 7.SM.7, where the fluid is listed as HFE-347mcc3 (CH₃OCF₂CF₂CF₃) with a 5.1-year lifetime. AR6</p>
+<p>rather than the AR4 basis used for the rows above it, because this fluid is not an F-gas refrigerant</p>
+<p>and that convention is a regulatory one which does not apply to it — stated in the row's own source</p>
+<p>cell so the mixed basis is visible rather than silent.</p>
+<p>Worth naming: <strong>correcting a number in the dataset that prompted the search is not correcting it.</strong></p>
+<p>The substance has to be grepped for across the whole repository, engine constants included.</p>
+<p>Engine chain run per <code>CLAUDE.md</code>: <code>rz-engine.min.js</code> reproducibly re-minified, <code>engine-catalog.json</code></p>
+<p>regenerated, and the <code>rz-engine.min.js</code> cache token rotated on the 59 pages that load it.</p>
+<p>test-rz-engine 763/763, value-bindings 85/85, reference-parity 155/155.</p>
       </div>
     </article>
 

@@ -60,6 +60,42 @@ list.
 - **41 text runs under 10px**, mostly footnotes and source lines at 9.6–9.9px. A legitimate
   typographic tier, on the small side.
 
+### Fixed — one site, two GWPs for the same fluid, and one page citing the wrong report
+
+Carrying v3.11.4's IPCC AR6 work across the rest of the site turned up two provenance defects.
+Shipped in this release as `550ae083`; the changelog line was owed because `CHANGELOG.md` was held
+by a parallel session at the time.
+
+**`carbon-footprint.html` stated "Refrigerant GWP values from IPCC AR6" while using R-410A = 2088**,
+which is the **AR4** value. On AR6 components that blend is about 2256 (HFC-32 at 771, HFC-125 at
+3740, Table 7.SM.7).
+
+The numbers were not the problem. This site is deliberately and consistently AR4 for refrigerants,
+because **that is the basis EU F-gas regulation uses**, and `rz-engine.js` documents it as
+*"GWP100 IPCC AR4 (consistent with sitewide published values)"*. `manual/carbon.html` and
+`capex-calculator.html` both say AR4 and both use AR4 numbers. Only this page's methodology line
+claimed otherwise, so **the claim was corrected rather than the values** — newer is not automatically
+more correct when a regulation mandates the older basis. The line now names the numbers and states
+what AR6 would give instead.
+
+That is the same defect class as the FC-72 row in v3.11.3: a figure attributed to a source that does
+not state it.
+
+**Second, `data/refrigerants.csv` and `rz-engine.js` both still carried Novec7000 at GWP 530** after
+v3.11.4 had corrected the article's own dataset to 576. One site, two different GWPs for the same
+compound — and 530 is neither an AR4 nor an AR6 value. Both are now **576** from IPCC AR6 WGI
+Table 7.SM.7, where the fluid is listed as HFE-347mcc3 (CH₃OCF₂CF₂CF₃) with a 5.1-year lifetime. AR6
+rather than the AR4 basis used for the rows above it, because this fluid is not an F-gas refrigerant
+and that convention is a regulatory one which does not apply to it — stated in the row's own source
+cell so the mixed basis is visible rather than silent.
+
+Worth naming: **correcting a number in the dataset that prompted the search is not correcting it.**
+The substance has to be grepped for across the whole repository, engine constants included.
+
+Engine chain run per `CLAUDE.md`: `rz-engine.min.js` reproducibly re-minified, `engine-catalog.json`
+regenerated, and the `rz-engine.min.js` cache token rotated on the 59 pages that load it.
+test-rz-engine 763/763, value-bindings 85/85, reference-parity 155/155.
+
 ---
 
 ## v3.11.4 — 2026-09-23
