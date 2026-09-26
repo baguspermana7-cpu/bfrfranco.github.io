@@ -656,12 +656,29 @@
 <p>task it was added to break up. The idle drain means print, find-in-page and every gate that waits</p>
 <p>for load+settle still see the whole document. <code>ensure()</code> is idempotent, so a panel never paints twice.</p>
 <p><strong>Measured effect, stated honestly.</strong> The work is moved off the critical path, not removed: total</p>
-<p>CPU is unchanged. What is measurable without a clock: **635 KB of pre-paint DOM construction is</p>
-<p>gone<strong> and long tasks fell </strong>30 → 23**. FCP moved 6,644 → 6,360 ms in a local run, but wall-clock</p>
-<p>numbers on this machine swing with whatever else is running and are not evidence — the structural</p>
-<p>count is.</p>
-<p><strong>This does not close SEO ledger row 8.</strong> Live, the page still measures LCP 6,672 ms / TBT 3,884 ms</p>
-<p>against index.html's 1,884 / 922, and the dominant term is <code>(program)</code> at 2,981 ms — parse and</p>
+<p>CPU is unchanged. The deterministic result is that <strong>635 KB of pre-paint DOM construction is gone</strong>,</p>
+<p>which is what the new gate holds.</p>
+<p>Controlled A/B, added after the first numbers in this entry proved untrustworthy — same harness,</p>
+<p>same concurrent local server, the two trees measured back to back at 390px with 4x CPU throttling,</p>
+<p>median of two runs:</p>
+<div class="cl-table-wrap"><table class="cl-table">
+<tr><th>variant</th><th>FCP</th><th>LCP</th><th>TBT</th><th>longest task</th><th>long tasks</th></tr>
+<tr><td>pre-ship (eager paint)</td><td>1,312 ms</td><td>3,952 ms</td><td>4,827 ms</td><td>1,596 ms</td><td>24</td></tr>
+<tr><td>this ship</td><td>1,448 ms</td><td><strong>3,148 ms</strong></td><td><strong>3,414 ms</strong></td><td><strong>895 ms</strong></td><td>28</td></tr>
+</table></div>
+<p><strong>A correction to this entry's first draft.</strong> It claimed long tasks fell 30 → 23. That came from a</p>
+<p>single-threaded <code>python -m http.server</code> harness whose own serialization dominated the numbers, and</p>
+<p>it is withdrawn. The long-task COUNT rises slightly (24 → 28) — that is the chunked drain working as</p>
+<p>designed, splitting one long task into several shorter ones. What falls is the longest task and the</p>
+<p>total blocking time.</p>
+<p><strong>Also tested and rejected: removing the idle drain entirely.</strong> Pure lazy paint (panels built only</p>
+<p>when their tab is opened) measured TBT 11,442 / 2,218 ms across two runs with a 6,867 ms outlier</p>
+<p>task — unstable and no better, so the chunked drain stays.</p>
+<p><strong>This does not close SEO ledger row 8.</strong> Live after this ship the page still measures LCP ~6.4 s</p>
+<p>and TBT ~5.0 s on that profile — live runs carry network variance and whatever else this machine is</p>
+<p>doing, so they are not a controlled comparison with the pre-ship live reading and no claim is made</p>
+<p>from them; what they do establish is that the page is still far outside the "good" band. The</p>
+<p>dominant term is <code>(program)</code> at 2,981 ms — parse and</p>
 <p>compile of <strong>1,236 KB of inline JS</strong> (88% of the document; 558 KB of it template-literal SVG</p>
 <p>strings). Fixing that means extracting the inline scripts to external files, and **37 tools read</p>
 <p><code>datahallAI.html</code> as source text** — they would go green-but-blind the moment the code moved. That</p>
