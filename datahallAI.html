@@ -685,7 +685,7 @@ body[data-datahall-authority="unavailable"] #tabs,
 body[data-datahall-authority="unavailable"] .wrap{display:none !important}
 body[data-datahall-authority="unavailable"] .hdr-r>.dot{background:#64748b !important;box-shadow:none !important;animation:none !important}
 body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:none}
-</style>    <script src="js/rz-version.js?v=20260927-314793c7" defer></script>
+</style>    <script src="js/rz-version.js?v=20260927-a3e608f9" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <!-- v3.5.0 — hold the 8.5px legibility floor by SCALE, not by font size. Five of this page's
          fifteen diagrams were already clear; the dense ones (cooling P&ID, the four SLDs, the hall
@@ -3349,27 +3349,34 @@ function renderOverviewCards(){
   ].join('');
 }
 
-/* ===== Deferred panel painting (v3.11.6) =====
-   Measured on a 4x-throttled 390px profile: the page painted every one of the
-   ten panels before first paint, although nine of them are hidden behind a tab
-   the visitor has not clicked. renderOverview, renderHall and the four drawDH
-   sheets alone owned ~0.4 s of self time on the critical path, and each one
-   also re-triggered the rz-svg-legible MutationObserver pass.
+/* ===== Lazy panel painting (v3.11.6, made fully lazy in v3.11.7) =====
+   datahallAI.html opens on the `dash` tab; the other nine panels sit behind `.pn{display:none}`
+   until the visitor clicks their tab. The page used to build every one of them before first paint.
 
-   The work is not removed, it is moved off the critical path: a panel paints on
-   the first activation of its tab (synchronously, before the panel is shown, so
-   nothing can flash empty) or on an idle slice after the load event, whichever
-   comes first. The idle drain takes ONE panel per task, so the queue can never
-   rebuild the single long task it was added to break up, and it guarantees the
-   full DOM exists shortly after load for print, find-in-page and the gates.
+   A panel now paints on the first activation of its tab and NEVER before — synchronously, inside
+   the click handler before the panel is shown, so it can never flash empty.
 
-   ensure() is idempotent: whichever path fires first wins and the queue entry
-   is dropped, so a panel is never painted twice. */
+   WHY THERE IS NO PRE-EMPTIVE DRAIN. v3.11.6 painted the queue on an idle slice after `load`, to
+   keep print, find-in-page and the gates seeing a complete document. Measured, that turned out to
+   buy nothing and cost a lot: same harness, same server, 390px at 4x CPU throttling, median of 5,
+
+     v3.11.6 (4 deferred, idle drain)   LCP 3,696  TBT 5,219  long tasks 33
+     8 deferred, idle drain             LCP 2,872  TBT 4,213  long tasks 29
+     8 deferred, no drain (this)        LCP 2,984  TBT 2,859  long tasks 17
+
+   The drain only moved the work a few hundred ms later, where it still blocked the main thread.
+   Dropping it is the only variant that removes work for a visitor who never leaves the dashboard.
+   Nothing depended on the drain: the page's own `@media print` block is empty, `display:none`
+   content is already invisible to find-in-page, and every gate reaches a panel through
+   `activateTab`, which clicks the real button.
+
+   ensure() is idempotent: the queue entry is dropped on the first paint, so a panel never paints
+   twice, and a second call is a cheap no-op. */
 var RZDefer=(function(root){
-  var queue={},order=[];
+  var queue={};
   function ensure(id){
     var fns=queue[id];
-    if(!fns)return false;                 /* already painted, or nothing queued */
+    if(!fns)return false;                 /* already painted, or nothing queued for this tab */
     delete queue[id];
     for(var i=0;i<fns.length;i++){
       try{fns[i]();}
@@ -3377,22 +3384,8 @@ var RZDefer=(function(root){
     }
     return true;
   }
-  function drain(){
-    var id;
-    while(order.length&&!queue[(id=order.shift())])id=null;
-    if(id)ensure(id);
-    if(order.length)schedule();
-  }
-  function schedule(){
-    /* timeout 200, not 2000: the drain must START promptly after load so a panel is already
-       painted by the time anything clicks its tab — a click still paints synchronously, but it
-       should almost never have to. First paint is already past by the time load fires. */
-    if(root.requestIdleCallback)root.requestIdleCallback(drain,{timeout:200});
-    else root.setTimeout(drain,60);
-  }
-  root.addEventListener('load',schedule);
   return {
-    add:function(id,fn){if(!queue[id])order.push(id);(queue[id]=queue[id]||[]).push(fn);},
+    add:function(id,fn){(queue[id]=queue[id]||[]).push(fn);},
     ensure:ensure,
     pending:function(){var k=[];for(var n in queue)if(queue.hasOwnProperty(n))k.push(n);return k;}
   };
@@ -7548,7 +7541,7 @@ svg.innerHTML=s;
 
 
 $('coolSu').textContent='Comprehensive P&ID: Dry-Cooler Array → HTW free-cooling loop → Row CDU plate HX → TCS 40/50 °C → Rack Cold Plates. The chiller plant serves the AIR path only at the design day | Dry-only heat rejection, zero water';
-(function(){const el=$('coolC');if(!el)return;let s='';
+(function __rzPaint_cool(){if(window.RZDefer&&!__rzPaint_cool.go){RZDefer.add('cool',function(){__rzPaint_cool.go=1;__rzPaint_cool();});return;}const el=$('coolC');if(!el)return;let s='';
 /* v2.0.0 GB300 basis — engine helpers. Every basis quantity on this P&ID is
  * read from DHE (the DCAI snapshot); anything the engine does not publish
  * renders '—', never a retired constant. No Math.random (Rule 2): the design
@@ -8429,7 +8422,7 @@ var pb=$('pueBadgeV');if(pb)pb.textContent=pue2;
  * adopted basis does not publish (per-device TDP, per-GPU memory) is NOT
  * invented here — it is simply absent.
  * ==========================================================================*/
-(function(){const el=$('rackC');if(!el)return;let s='';
+(function __rzPaint_rack(){if(window.RZDefer&&!__rzPaint_rack.go){RZDefer.add('rack',function(){__rzPaint_rack.go=1;__rzPaint_rack();});return;}const el=$('rackC');if(!el)return;let s='';
 /* v2.12.0 — REDRAWN (owner comment 2: overlaps, animation, responsiveness, non-standard symbols).
    Label tiers only (9 / 7.5 / 7 user units on a 960-wide sheet that never renders below 1200 px,
    so nothing sits under the 8.5 px legibility floor); no <animate> pulses (a rack is not a pump);
@@ -8598,7 +8591,7 @@ mc('var(--c)','Metering & SCADA','Power Monitoring',[['Branch','Schneider PM5xxx
 
 // NETWORK TOPOLOGY SVG - LIVE with laser animations and alarm simulation
 $('netSu').textContent='NVLink5 Intra-Domain ('+(DHE&&DHE.nvlinkDomainTBs!=null?DHE.nvlinkDomainTBs:'\u2014')+' TB/s per rack) + InfiniBand XDR Scale-Out ('+(DHE?DHE.leavesPerHall+' leaves / '+DHE.spinesPerHall+' spines / '+DHE.coresPerHall+' cores per hall':'\u2014')+', 4-rail fat-tree) + OOB Management';
-(function(){const el=$('netC');if(!el)return;let s='';
+(function __rzPaint_net(){if(window.RZDefer&&!__rzPaint_net.go){RZDefer.add('net',function(){__rzPaint_net.go=1;__rzPaint_net();});return;}const el=$('netC');if(!el)return;let s='';
 /* v2.13.0 §A7 — COMPUTE FABRIC at hall scale. The drawing used to show 4 spines, 8 leaves and
    27 representative racks — a GB200-era sketch beside an engine that computes 880 leaves,
    660 spines and 220 cores from radix arithmetic. Now every tier prints the ENGINE count,
@@ -9870,7 +9863,7 @@ var BMS_MODEL=(function(){
        {id:'DASHBOARD',fn:'Operator web and mobile views',src:'historian + live'}]
  };
 })();
-(function(){const el=$('bmsC');if(!el)return;let s='';
+(function __rzPaint_bms(){if(window.RZDefer&&!__rzPaint_bms.go){RZDefer.add('bms',function(){__rzPaint_bms.go=1;__rzPaint_bms();});return;}const el=$('bmsC');if(!el)return;let s='';
 const T1=9,T2=7.5,T3=7,M=BMS_MODEL;
 const SPECB=BMS_SPECB,MONB=BMS_MONB;
 function esc(t){return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}

@@ -11,6 +11,62 @@ release sections rather than semver.
 
 ---
 
+## v3.11.7 — 2026-09-27
+
+### A panel the visitor never opens is now never built
+
+v3.11.6 deferred four of the nine hidden panels on `datahallAI.html`, then painted them all on an
+idle slice after `load` so print, find-in-page and the gates would still see a complete document.
+This release defers the other four — the cooling P&ID, rack architecture, network fabric and BMS
+diagrams, 126 KB of builder bodies between them — and **removes the idle drain entirely**.
+
+Measured against the tree shipped an hour earlier: with the drain, a visitor who never left the
+dashboard still had **1,011,614 characters** of markup built for them — `hc` 313,776,
+`elecDH1C` 190,029, `coolC` 179,082, `bldgC` 107,802, `netC` 75,424, `rackC` 71,396, `bmsC` 69,544,
+`overCards` 4,561. None of it is built now until a tab is opened.
+
+Same harness, same concurrent server, 390px at 4x CPU throttling, median of five runs each:
+
+| variant | LCP | TBT | long tasks |
+|---|---|---|---|
+| v3.11.6 — 4 deferred, idle drain | 3,696 ms | 5,219 ms | 33 |
+| 8 deferred, idle drain | 2,872 ms | 4,213 ms | 29 |
+| **8 deferred, no drain (this ship)** | 2,984 ms | **2,859 ms** | **17** |
+
+The drain only moved the work a few hundred ms later, where it still blocked the main thread.
+Removing it is the only variant that *removes* work rather than relocating it.
+
+**Correction to the v3.11.6 record.** That entry said pure lazy paint was "tested and REJECTED —
+TBT 11,442 / 2,218 ms … unstable and no better". That was wrong, and the reason matters: the
+rejection rested on a single outlier run. An outlier of that shape has since appeared in **every**
+variant on this machine, including the shipped one (one v3.11.6 run measured 39,967 ms), so it was
+never evidence about pure lazy. Five runs and a median reverse the conclusion.
+
+**Correction to the row 8 plan.** v3.11.6 scoped the next fix as extracting the inline scripts to
+external files, blocked behind a shared page-source helper for the 37 tools that read
+`datahallAI.html` as source text. A devtools.timeline trace retires that plan: **`v8.compile` is
+208 ms** of the load, against `ParseHTML` 2,237 ms, `EvaluateScript` 2,163 ms (with `FunctionCall`
+1,864 ms inside it) and `Layout` + `UpdateLayoutTree` 2,069 ms. The cost is *running* the builders
+and laying out their DOM, not compiling them, so extraction would have risked blinding 37 gates to
+chase 208 ms. Not doing it.
+
+**Nothing depended on the drain**, checked rather than assumed: the page's own `@media print` block
+is empty, `display:none` content is already invisible to find-in-page, and every gate reaches a
+panel through `activateTab`, which clicks the real button.
+
+### Changed
+- `datahallAI.html` — `RZDefer` loses its `load` listener and idle drain; `add`/`ensure`/`pending`
+  remain. The four remaining builders defer through named self-registering IIFEs: the function names
+  itself, and on its first eager run it registers with `RZDefer` and returns, so the queue can call
+  it again later. That needs only an opening edit — a first attempt that rewrote both ends with a
+  hand-written brace matcher left a stray call behind and threw `RZDefer.add(...) is not a function`,
+  caught by the gate and reverted rather than patched.
+- `tools/test-dcai-deferred-panels.mjs` — widened to all eight containers and its D2 **inverted**:
+  v3.11.6 asserted the drain filled every panel, this asserts every panel is STILL empty seconds
+  later with no click. Proven RED against v3.11.6 in a detached worktree (16 findings, exit 1).
+
+---
+
 ## v3.11.6 — 2026-09-27
 
 ### The cockpit painted nine panels nobody was looking at
@@ -53,6 +109,10 @@ total blocking time.
 **Also tested and rejected: removing the idle drain entirely.** Pure lazy paint (panels built only
 when their tab is opened) measured TBT 11,442 / 2,218 ms across two runs with a 6,867 ms outlier
 task — unstable and no better, so the chunked drain stays.
+> **Withdrawn in v3.11.7.** That rejection rested on a single outlier run. An outlier of the same
+> shape has since appeared in EVERY variant on this machine, including this one (a v3.11.6 run
+> measured 39,967 ms), so it was never evidence about pure lazy. Five runs and a median reverse the
+> conclusion, and v3.11.7 removes the drain.
 
 **This does not close SEO ledger row 8.** Live after this ship the page still measures LCP ~6.4 s
 and TBT ~5.0 s on that profile — live runs carry network variance and whatever else this machine is

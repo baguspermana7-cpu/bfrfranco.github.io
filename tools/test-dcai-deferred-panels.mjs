@@ -25,10 +25,12 @@
  * here would be a flake generator. It asserts the STRUCTURAL fact that produces the win:
  *
  *   D1  at the `load` event, every deferred panel's container is still empty
- *   D2  without any click, the idle drain fills all of them — so print, find-in-page and every
- *       gate that waits for load+settle still see the whole document
- *   D3  with the idle drain suppressed, activating a tab paints its panel — the activation path
- *       alone is sufficient, so a panel can never be shown empty
+ *   D2  it is STILL empty seconds later with no click — v3.11.7 removed the idle drain, because
+ *       measured it only moved the work a few hundred ms later (median of 5: TBT 4,213 ms with the
+ *       drain against 2,859 ms without, long tasks 29 against 17). A panel a visitor never opens
+ *       must never be built, and this is the assertion that keeps it that way
+ *   D3  activating a tab paints its panel, synchronously enough that it is painted by the time the
+ *       panel is visible — so a panel can never be shown empty
  *   D4  a panel paints exactly once: `RZDefer.ensure` is false on a second call and the container
  *       does not grow
  *   D5  no page error on any of those paths
@@ -55,6 +57,14 @@ const PANELS = Object.freeze([
     { tab: 'over', container: 'overCards' },
     { tab: 'hall', container: 'hc' },
     { tab: 'elec', container: 'elecDH1C' },
+    /* v3.11.7 — the other four hidden diagrams, 126 KB of builder bodies between them. Added after
+       a devtools.timeline trace showed the remaining load is FunctionCall (1,864 ms) and Layout
+       (2,069 ms), not compile (208 ms): running these builders and laying out their DOM IS the
+       cost, so deferring more of them is the lever, and extracting scripts to external files is not. */
+    { tab: 'cool', container: 'coolC' },
+    { tab: 'rack', container: 'rackC' },
+    { tab: 'net', container: 'netC' },
+    { tab: 'bms', container: 'bmsC' },
 ]);
 
 const MIME = Object.freeze({ '.css': 'text/css', '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.woff2': 'font/woff2' });
@@ -112,22 +122,27 @@ const sizes = (tab) => tab.evaluate((ids) => {
         note(n === 0, `D1 ${container} (tab ${t}) already carried ${n} chars at the load event — its builder is back on the critical path`);
     }
 
-    /* the drain is idle-scheduled with a 2 s timeout, so give it room, then require it finished */
-    let pending = null;
-    for (let i = 0; i < 40; i++) {
-        pending = await tab.evaluate(() => (window.RZDefer ? window.RZDefer.pending() : ['RZDefer missing']));
-        if (Array.isArray(pending) && pending.length === 0) break;
-        await sleep(250);
+    /* D2 — give the page a generous window to paint something behind our back, then require that
+       it did not. This is the inverse of the v3.11.6 assertion, on purpose. */
+    await sleep(4000);
+    const idle = await sizes(tab);
+    for (const { tab: t, container } of PANELS) {
+        note(idle[container] === 0, `D2 ${container} (tab ${t}) painted ${idle[container]} chars with no click — a panel the visitor never opened is being built anyway`);
     }
-    note(Array.isArray(pending) && pending.length === 0, `D2 idle drain did not finish: still pending ${JSON.stringify(pending)}`);
+    const stillPending = await tab.evaluate(() => (window.RZDefer ? window.RZDefer.pending() : null));
+    note(stillPending !== null, 'D2 window.RZDefer is not defined');
+    note(stillPending === null || stillPending.length > 0, 'D2 the queue emptied itself with no click — something drains it');
+
+    /* D4 — activate every tab, then prove a second ensure() does not repaint */
+    for (const t of ['over', 'hall', 'elec', 'cool', 'rack', 'net', 'bms']) {
+        await tab.click(`.tabs button[data-t="${t}"]`);
+    }
     const after = await sizes(tab);
     for (const { tab: t, container } of PANELS) {
-        note(after[container] > 0, `D2 ${container} (tab ${t}) is still empty after the idle drain — a gate or a print would see a blank panel`);
+        note(after[container] > 0, `D4 ${container} (tab ${t}) is empty after its tab was activated`);
     }
-
-    /* D4: draining again must not paint a second copy */
     const again = await tab.evaluate(() => (window.RZDefer
-        ? ['over', 'hall', 'elec'].map((id) => window.RZDefer.ensure(id))
+        ? ['over', 'hall', 'elec', 'cool', 'rack', 'net', 'bms'].map((id) => window.RZDefer.ensure(id))
         : null));
     note(again !== null, 'D4 window.RZDefer is not defined — the deferred-paint queue is gone, so every panel paints eagerly');
     note(again === null || again.every((r) => r === false), `D4 RZDefer.ensure repainted an already-painted panel: ${JSON.stringify(again)}`);
@@ -135,18 +150,18 @@ const sizes = (tab) => tab.evaluate((ids) => {
     for (const { container } of PANELS) {
         note(twice[container] === after[container], `D4 ${container} grew from ${after[container]} to ${twice[container]} chars on a second ensure — painted twice`);
     }
-    note(errors.length === 0, `D5 page errors on the drain path: ${errors.join(' | ')}`);
+    note(errors.length === 0, `D5 page errors on the lazy path: ${errors.join(' | ')}`);
     await tab.close();
 }
 
-/* ---- D3: with the idle drain suppressed, a tab click alone paints its panel --------------- */
+/* ---- D3: a tab click paints its panel, and the panel is not visible before it does --------- */
 {
-    const { tab, errors } = await open({ freezeIdle: true });
+    const { tab, errors } = await open();
     const frozen = await sizes(tab);
     for (const { tab: t, container } of PANELS) {
-        note(frozen[container] === 0, `D3 ${container} (tab ${t}) painted although the idle drain was suppressed — something else paints it eagerly`);
+        note(frozen[container] === 0, `D3 ${container} (tab ${t}) painted before any click`);
     }
-    for (const t of ['over', 'hall', 'elec']) {
+    for (const t of ['over', 'hall', 'elec', 'cool', 'rack', 'net', 'bms']) {
         await tab.click(`.tabs button[data-t="${t}"]`);
         const shown = await tab.evaluate((id) => {
             const panel = document.getElementById('p-' + id);
@@ -166,6 +181,6 @@ await browser.close();
 server.close();
 
 if (JSON_OUT) console.log(JSON.stringify({ gate: 'dcai-deferred-panels', failures }, null, 2));
-else if (failures.length === 0) console.log(`DCAI DEFERRED PANELS — CLEAN (${PANELS.length} containers: empty at load, filled by idle drain and by activation, painted once)`);
+else if (failures.length === 0) console.log(`DCAI LAZY PANELS — CLEAN (${PANELS.length} containers: empty at load, still empty with no click, painted on activation, painted once)`);
 else { console.log(`DCAI DEFERRED PANELS — ${failures.length} FAILURE(S)`); for (const f of failures) console.log('  ' + f); }
 process.exit(failures.length ? 1 : 0);
