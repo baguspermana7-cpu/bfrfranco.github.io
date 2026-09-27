@@ -70,6 +70,23 @@ with them, with the reason recorded at the constant.
 - `rzPanelOn(id)` and `rzElemOn(el)` in the page. The element form exists because `#pplCount` is
   present in two panels, so naming one would have been a guess.
 
+### Also in this release
+- `standarization/Audit result/SEO_AUDIT_LEDGER.md` — row 8 re-traced live after v3.11.7 and v3.11.8:
+  FunctionCall 1,864 → **428 ms** (−77%), ParseHTML 2,237 → 1,064, UpdateLayoutTree 777 → 306,
+  Layout 1,292 → 793, EvaluateScript 2,163 → 1,431, Paint 260 → 161. It stays OPEN because the page
+  is still outside the good band, not because a fix is being skipped.
+- **New row 10, and it is an owner decision, not a defect being fixed.** `datahallAI.html` ships
+  `<body class="locked">` in its static HTML — `body.locked` blurs `.wrap`/`.mn` and kills pointer
+  events behind `#rootGate` — while `robots` says `index, follow` and the URL sits in `sitemap.xml`.
+  An anonymous visitor, including a rendering crawler, meets a blurred wall. Of the 5 root-gated
+  pages on the site the other 4 are `noindex, nofollow` and sitemap-absent, so this is the exception
+  to the site's own convention. Three options are recorded in the row; nothing is changed pending
+  the decision, because the indexability of the flagship cockpit is a product call.
+- A finding raised and **withdrawn** in the same pass: two root-level gated labs appeared to be
+  listed in the sitemap. They are not — the sitemap lists `manual/` pages that share their
+  basenames. Matching a filename without its directory is the same blindness that produced the
+  row A cache-token defect.
+
 ### Not claimed
 Idle long-task time read 1,263 / 1,885 / 2,144 ms across runs *including the unguarded baseline*.
 With five samples on this machine that is noise, and no claim is made from it. The mutation count is
