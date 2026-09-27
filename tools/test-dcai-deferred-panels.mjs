@@ -34,6 +34,12 @@
  *   D4  a panel paints exactly once: `RZDefer.ensure` is false on a second call and the container
  *       does not grow
  *   D5  no page error on any of those paths
+ *   D6  sitting on `dash`, NOTHING mutates inside a hidden panel. Measured before v3.11.7 this was
+ *       1,241 mutations per 20 s — 900 of them the fire cause & effect matrix, rebuilt on a 4 s tick
+ *       behind `display:none`, plus 200 electrical-overview values, 45 hall/BMS cells and the fire
+ *       summary strip. Every one of those tickers now tests `.pn.on` first
+ *   D7  the inverse, which matters just as much: once a panel IS active its subtree keeps mutating.
+ *       A visibility guard that never releases would be a worse bug than the waste it removed
  *
  * Usage: node tools/test-dcai-deferred-panels.mjs [--json]
  */
@@ -177,10 +183,53 @@ const sizes = (tab) => tab.evaluate((ids) => {
     await tab.close();
 }
 
+/* ---- D6 + D7: hidden panels are inert, active panels are not --------------------------------- */
+{
+    const { tab, errors } = await open();
+    const observe = () => tab.evaluate(() => {
+        window.__mut = {};
+        window.__obs = [];
+        document.querySelectorAll('.pn').forEach((panel) => {
+            const o = new MutationObserver((recs) => {
+                window.__mut[panel.id] = (window.__mut[panel.id] || 0) + recs.length;
+            });
+            o.observe(panel, { childList: true, subtree: true, characterData: true, attributes: true });
+            window.__obs.push(o);
+        });
+    });
+    const collect = () => tab.evaluate(() => {
+        window.__obs.forEach((o) => o.disconnect());
+        return window.__mut;
+    });
+
+    /* D6 — two 4 s ticks' worth of window, on the dash tab, touching nothing */
+    await observe();
+    await sleep(9000);
+    const idle = await collect();
+    for (const [panel, n] of Object.entries(idle)) {
+        if (panel === 'p-dash') continue;                 /* the active panel may tick */
+        note(n === 0, `D6 ${panel} mutated ${n} times while hidden — a ticker is repainting a panel nobody can see`);
+    }
+
+    /* D7 — the fire panel is the worst former offender and has a 4 s tick of its own: once shown,
+       its subtree must change again, or the guard has frozen it. */
+    await tab.click('.tabs button[data-t="fire"]');
+    await observe();
+    await sleep(9000);
+    const live = await collect();
+    note((live['p-fire'] || 0) > 0, `D7 p-fire did not mutate in 9 s while ACTIVE — the visibility guard is not releasing`);
+    for (const [panel, n] of Object.entries(live)) {
+        if (panel === 'p-fire') continue;
+        note(n === 0, `D7 ${panel} mutated ${n} times while hidden (fire active)`);
+    }
+    note(errors.length === 0, `D5 page errors on the ticker path: ${errors.join(' | ')}`);
+    await tab.close();
+}
+
 await browser.close();
 server.close();
 
 if (JSON_OUT) console.log(JSON.stringify({ gate: 'dcai-deferred-panels', failures }, null, 2));
-else if (failures.length === 0) console.log(`DCAI LAZY PANELS — CLEAN (${PANELS.length} containers: empty at load, still empty with no click, painted on activation, painted once)`);
+else if (failures.length === 0) console.log(`DCAI LAZY PANELS — CLEAN (${PANELS.length} containers lazy; hidden panels inert, active panel still ticking)`);
 else { console.log(`DCAI DEFERRED PANELS — ${failures.length} FAILURE(S)`); for (const f of failures) console.log('  ' + f); }
 process.exit(failures.length ? 1 : 0);

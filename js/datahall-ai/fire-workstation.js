@@ -439,9 +439,26 @@
   }
 
   /* ------------------------------------------------------------------ render + lifecycle */
+  /* v3.11.7 — the fire panel is display:none until its tab is clicked, but this module re-renders
+     on a 4 s tick forever. Measured on the dash tab over 20 s: 1,041 mutations inside #p-fire that
+     nobody could see, 900 of them the cause & effect matrix, which renderRun() rebuilds through
+     operator-ui.evaluateFire().
+
+     #fireImpairmentBanner sits outside .mn and the sidebar counters sit outside every panel: those
+     are page-wide by §A6 — a FIRE WATCH has to be visible on whatever tab the reader is on — so they
+     keep updating. Everything below them lives inside #p-fire and is skipped while it is hidden.
+     `.pn.on` is the activation state the page's tab handler sets; offsetParent would be the wrong
+     test, because it is also null for a position:fixed subtree. The tab handler calls render() on
+     activation, so a panel is never shown with a stale-by-one-tick body. */
+  function panelShown() {
+    var p = $('p-fire');
+    return !!(p && p.classList.contains('on'));
+  }
   function render() {
     if (!S.snap) { return; }
-    renderSummary(); renderBanner(); renderSidebar(); renderRun();
+    renderBanner(); renderSidebar();
+    if (!panelShown()) { return; }
+    renderSummary(); renderRun();
     if (S.view === 'points') { renderPoints(); }
     if (S.view === 'zones') { renderZones(); }
     var M = root.RZDatahallAIFireMimic; if (M && M.paint) { try { M.paint(S.snap, S.hall); } catch (e) { /* the mimic is optional */ } }

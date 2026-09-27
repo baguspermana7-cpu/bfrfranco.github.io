@@ -11,6 +11,72 @@ release sections rather than semver.
 
 ---
 
+## v3.11.8 — 2026-09-27
+
+### Six tickers were repainting panels nobody could see
+
+v3.11.7 stopped *building* hidden panels. This stops *repainting* them. Measured on the dash tab
+over a 20 s window, with a MutationObserver on every panel that is not the active one:
+
+| what was mutating | per 20 s | why |
+|---|---|---|
+| `p-fire #fireCauseEffectBody` | 900 | the cause & effect matrix, rebuilt on a 4 s tick behind `display:none` |
+| `p-elec #eOvIT*` / `#eOvGen*` | 200 | two separate tickers — the page's own, and `electrical-live.js` |
+| `p-fire #fireSummary` | 45 | the summary strip, which is panel-local (unlike the banner) |
+| `p-hall #kP…#kW` | 30 | `upd()`, every 3 s |
+| `p-bms` alarm counters | 15 | `paintBMSHealth()`, called unguarded from the alarm-strip interval |
+| **total** | **1,241** | |
+| `p-dash`, while any other tab is active | 52 per 9 s | `updateDashKPI()` — found only because the new D7 assertion flagged it |
+
+**After: 0.** Every panel-local ticker now tests `.pn.on` first.
+
+**What deliberately keeps running.** `#fireImpairmentBanner` sits outside `.mn` and the sidebar
+counters sit outside every panel: §A6 requires a FIRE WATCH to be visible on whatever tab the reader
+is on. `upd()` writes the page-wide `#sUA`/`#sUB` sidebar values alongside hall-local cells. Both
+functions were SPLIT rather than guarded wholesale — guarding either one would have frozen live
+data that belongs on every tab.
+
+**The fire inventory stays eager**, and that is a decision, not an oversight: the sidebar counters
+are derived from it, so deferring it would show em dashes on the dashboard — a visible regression
+traded for ~410 ms.
+
+`electrical-live.js` got an **additive** `shouldRender` predicate. With no predicate its behaviour is
+byte-for-byte what it was, which is what its fake-DOM gate exercises; the page supplies the `.pn.on`
+test for `#p-elec`.
+
+### Two defects this exposed that it did not cause
+
+**An SLD cell carried three undeclared numerals for months.** `#eDH<n>Live` has two writers with
+different formats: the builder draws seven numerals including a `(derived; cooling X + UPS/dist Y +
+aux Z kW)` breakdown, while `electrical-live.js` overwrote the cell with three (IT / Facility / PUE)
+within 4 s of load. The hook declared four ids, so the three breakdown numerals were never traced —
+and the coverage gate never saw them, because by the time it measured, the ticker had replaced the
+text. Guarding the ticker stopped the overwrite and the gate reported `drawn=7,648 registry=67,382`.
+Fixed by declaring what the drawing actually prints: `pb_cooling`, `pb_upsDist` and `pb_aux` all
+resolve through `DH_BASIS` to real registry ids.
+
+**A modified module would have shipped invisibly.** `electrical-live.js` is loaded under a version
+pin (`?v=3.7.0`), and `tools/normalize-cache-tokens.mjs` deliberately leaves pinned assets alone. So
+nothing would have made a returning browser fetch the new module: it would have kept the cached copy,
+kept repainting the hidden panel, and every gate would have passed. All three electrical module pins
+move to `?v=3.8.0` and `ASSET_VERSION` in `tools/test-datahall-ai-electrical-visual-map.mjs` moves
+with them, with the reason recorded at the constant.
+
+### Added
+- `tools/test-dcai-deferred-panels.mjs` gains **D6 and D7**. D6: nothing mutates inside a hidden
+  panel. D7: once a panel IS active its subtree keeps mutating — a visibility guard that never
+  releases would be a worse bug than the waste it removed, and D7 is what caught `updateDashKPI`.
+  Proven RED against v3.11.7 in a detached worktree: 8 findings, exit 1.
+- `rzPanelOn(id)` and `rzElemOn(el)` in the page. The element form exists because `#pplCount` is
+  present in two panels, so naming one would have been a guess.
+
+### Not claimed
+Idle long-task time read 1,263 / 1,885 / 2,144 ms across runs *including the unguarded baseline*.
+With five samples on this machine that is noise, and no claim is made from it. The mutation count is
+deterministic, which is why it is the number in the gate.
+
+---
+
 ## v3.11.7 — 2026-09-27
 
 ### A panel the visitor never opens is now never built

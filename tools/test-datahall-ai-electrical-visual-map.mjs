@@ -21,8 +21,12 @@ const HALLS = RACKS_FACILITY / RACKS_PER_HALL;
 /* the ?v= the cockpit must load these modules at once it adopts the aggregated ids */
 /* v3.7.0 — the three electrical modules changed together (HV-INTAKE / HV-BUS / MAIN-TX nodes and
    the bindings that reach them), so the token they share moves with them. A stale token here means
-   a browser keeps the old topology and the new SLD band binds to edges that module does not have. */
-const ASSET_VERSION = '3.7.0';
+   a browser keeps the old topology and the new SLD band binds to edges that module does not have.
+   v3.8.0 (site v3.11.8) — electrical-live.js gained the optional `shouldRender` predicate, so the
+   shared token moves again. This pin is why that matters: the normalizer deliberately leaves
+   version-pinned assets alone, so nothing else would have made a returning browser fetch the new
+   module, and it would have kept repainting the hidden electrical panel from cache. */
+const ASSET_VERSION = '3.8.0';
 
 function descriptor(lineId, extra = {}) {
   return { lineId, ...extra };

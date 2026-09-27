@@ -242,6 +242,13 @@
     if (!config.document || !interval) {
       throw new Error('Electrical live updater requires a document and interval scheduler');
     }
+    /* v3.11.7 — an optional visibility predicate. Every id render() writes lives inside the
+       electrical panel, which is display:none until its tab is clicked, so on any other tab this
+       tick computed a snapshot and wrote 80 DOM values per 20 s that nobody could see. The caller
+       supplies the test (the page passes `.pn.on` for #p-elec); with no predicate the behaviour is
+       exactly as before, which is what the fake-DOM gate exercises. The snapshot is still taken --
+       it is cheap and `lastValue` must stay current for renderFailure -- only the DOM write is
+       skipped. */
     tick = function () {
       try {
         lastValue = snapshot(
@@ -249,7 +256,9 @@
           config.electricalApi,
           scenarioFrom(config.document)
         );
-        render(config.document, lastValue);
+        if (typeof config.shouldRender !== 'function' || config.shouldRender()) {
+          render(config.document, lastValue);
+        }
       } catch (error) {
         renderFailure(config.document, lastValue, config.basis);
       }

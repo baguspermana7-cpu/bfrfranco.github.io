@@ -685,7 +685,7 @@ body[data-datahall-authority="unavailable"] #tabs,
 body[data-datahall-authority="unavailable"] .wrap{display:none !important}
 body[data-datahall-authority="unavailable"] .hdr-r>.dot{background:#64748b !important;box-shadow:none !important;animation:none !important}
 body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:none}
-</style>    <script src="js/rz-version.js?v=20260927-a3e608f9" defer></script>
+</style>    <script src="js/rz-version.js?v=20260927-6d53e7c6" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <!-- v3.5.0 — hold the 8.5px legibility floor by SCALE, not by font size. Five of this page's
          fifteen diagrams were already clear; the dense ones (cooling P&ID, the four SLDs, the hall
@@ -731,12 +731,12 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
       document.write('<script src="js/datahall-ai/rack-density.js?v=20260920-6cdbb0d2"><\/script>');
     }
     </script>
-    <script src="js/datahall-ai/electrical-topology.js?v=3.7.0"></script>
-    <script src="js/datahall-ai/electrical-live.js?v=3.7.0"></script>
+    <script src="js/datahall-ai/electrical-topology.js?v=3.8.0"></script>
+    <script src="js/datahall-ai/electrical-live.js?v=3.8.0"></script>
     <script src="js/datahall-ai/sim-telemetry.js?v=20260920-61df5c2d"></script>
     <script src="js/datahall-ai/hmi-payloads.js?v=20260920-f6f5cf81"></script>
     <script src="js/datahall-ai/hmi-points.js?v=20260920-d82032ae"></script>
-    <script src="js/datahall-ai/electrical-visual-map.js?v=3.7.0"></script>
+    <script src="js/datahall-ai/electrical-visual-map.js?v=3.8.0"></script>
     <script src="js/datahall-ai/fire-cause-effect.js?v=20260920-964e57d6"></script>
     <script src="js/datahall-ai/fire-points.js?v=20260920-080f8e3b"></script>
     <script src="js/rz-design-studio.js?v=20260920-6a4d3c17"></script>
@@ -782,7 +782,7 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
     <link rel="stylesheet" href="css/rz-design-studio.css?v=20260920-972eff8b">
     <script src="js/datahall-ai/operator-ui.js?v=20260920-b2c6eda7" defer></script>
     <script src="js/datahall-ai/equipment-inspector.js?v=20260920-bb3a33be" defer></script>
-    <script src="js/datahall-ai/fire-workstation.js?v=20260920-e46cfa71" defer></script>
+    <script src="js/datahall-ai/fire-workstation.js?v=20260927-520eede2" defer></script>
 <style id="rz-skiplink-v1">
 .skip-link{position:absolute;top:-50px;left:0;background:#1e3a5f;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 8px 0;transition:top .2s ease}
 .skip-link:focus{top:0}
@@ -1753,7 +1753,15 @@ function RZ_ALM(P,pt){var st=P&&P.state?P.state(pt):null;return (st&&['online','
 function bp(key,extra){var o={basis:'design.planes.'+key};if(extra)for(var k in extra)o[k]=extra[k];if(o.also){o.params=o.also.map(function(f){return window.DH_BASIS[f]||(f.indexOf('.')>0?f:'design.planes.'+f)});delete o.also}return o}
 
 setInterval(()=>{$('clk').textContent=new Date().toLocaleTimeString('en-GB')},1000);
-$('tabs').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')return;document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('on'));e.target.classList.add('on');document.querySelectorAll('.pn').forEach(p=>p.classList.remove('on'));const t=e.target.dataset.t;if(window.RZDefer)RZDefer.ensure(t);const el=$('p-'+t);if(el)el.classList.add('on')});
+$('tabs').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')return;document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('on'));e.target.classList.add('on');document.querySelectorAll('.pn').forEach(p=>p.classList.remove('on'));const t=e.target.dataset.t;const el=$('p-'+t);
+/* Mark the panel active BEFORE painting it: the lazy builders and the panel-local tickers both test
+   .pn.on, and the browser cannot paint until this handler returns, so nothing flashes. */
+if(el)el.classList.add('on');
+if(window.RZDefer)RZDefer.ensure(t);
+/* A panel whose body is a live tick is as old as the moment the reader left it — repaint on the way in. */
+if(t==='elec'&&window.__rzTickElec)window.__rzTickElec();
+if(t==='dash')updateDashKPI();
+const FW=window.RZDatahallAIFireWorkstation;if(t==='fire'&&FW&&FW.render)FW.render();});
 /* v2.13.0 §A7 — network sub-tabs: own bar, own class names, own handler (never .et/.ep). */
 (function(){var bar=$('netTabs');if(!bar)return;
 function show(key){
@@ -3392,6 +3400,15 @@ var RZDefer=(function(root){
 })(window);
 window.RZDefer=RZDefer;
 
+/* Is a panel the active one? Panel-local tickers use this to skip work nobody can see. `.pn.on` is
+   the state the tab handler sets; offsetParent is the wrong test here because it is also null for a
+   position:fixed subtree (see feedback_mobile_nav_traps). */
+function rzPanelOn(id){var p=document.getElementById('p-'+id);return !!(p&&p.classList.contains('on'));}
+/* Same question asked of an element rather than a panel id — for ids that exist in more than one
+   panel, where naming one would be a guess. An element outside every .pn counts as visible. */
+function rzElemOn(el){if(!el)return false;var p=el.closest?el.closest('.pn'):null;return p?p.classList.contains('on'):true;}
+window.rzPanelOn=rzPanelOn;window.rzElemOn=rzElemOn;
+
 RZDefer.add('over',function(){renderOverview();renderOverviewCards();});
 
 var floorNames={gf:'Ground Floor — MEP & Chiller Plant',f2:'Floor 2 — Datahall 1 + Datahall 2',f3:'Floor 3 — Datahall 3 + Datahall 4',roof:'Roof — Heat Rejection (Dry Coolers + AHU)'};
@@ -4224,13 +4241,17 @@ const SR=Math.ceil(_rpb/2)*_bk,SP=3;   /* containment pairs across the hall x po
    picks up a little on the throw, so the anchor walks with the point index — still declared
    simulated jitter about the engine air planes, never a field reading, and still 1 decimal
    (v2.18.0: five digits printed 25.78698 C on a 2.8 px glyph). */
-for(let r=0;r<SR;r++)for(let si=0;si<SP;si++){const ht=$('H'+r+si+'t'),hh=$('H'+r+si+'h'),ct=$('C'+r+si+'t'),ch=$('C'+r+si+'h');if(ht)ht.textContent=RZ_SIM('hac'+r+'-'+si,33.4+si*1.1,37.2+si*1.1,1)+'\u00B0C';if(hh)hh.textContent=RZ_SIM('hah'+r+'-'+si,40,65,1)+'%';if(ct)ct.textContent=RZ_SIM('cac'+r+'-'+si,25.3+r*0.05+si*0.22,25.8+r*0.05+si*0.22,1)+'\u00B0C';if(ch)ch.textContent=RZ_SIM('cah'+r+'-'+si,45,70,1)+'%'}
+if(rzPanelOn('hall'))for(let r=0;r<SR;r++)for(let si=0;si<SP;si++){const ht=$('H'+r+si+'t'),hh=$('H'+r+si+'h'),ct=$('C'+r+si+'t'),ch=$('C'+r+si+'h');if(ht)ht.textContent=RZ_SIM('hac'+r+'-'+si,33.4+si*1.1,37.2+si*1.1,1)+'\u00B0C';if(hh)hh.textContent=RZ_SIM('hah'+r+'-'+si,40,65,1)+'%';if(ct)ct.textContent=RZ_SIM('cac'+r+'-'+si,25.3+r*0.05+si*0.22,25.8+r*0.05+si*0.22,1)+'\u00B0C';if(ch)ch.textContent=RZ_SIM('cah'+r+'-'+si,45,70,1)+'%'}
 /* PUE/IT/DLC are ENGINE-DERIVED (not random). GPU% and W/GPU remain live
  * telemetry jitter (genuine sensor readings, not basis-of-design values). */
+/* v3.11.7 — these five cells live inside #p-hall; #sUA/#sUB below do not, so this function keeps
+   running and only its panel-local writes are skipped. */
+if(rzPanelOn('hall')){
 if(DH){$('kP').textContent=DH.pue.toFixed(2);}
 $('kG').textContent=RZ_SIM('page5',88,98,0);
 if(DH){$('kD').textContent=DH.tcsDeltaT.toFixed(1);$('kC').textContent=DH.liquidCapturePct+'%';}
 $('kW').textContent=RZ_SIM('page6',980,1180,0);
+}
 /* v2.0.0 (Track A §A2b WP4) — the TCS supply/return/deltaT rows in the telemetry spine
  * used to oscillate around the setpoint with Math.random(). They are now labelled as what
  * they are: DESIGN PLANES the engine publishes (p07/p08). A design plane does not jitter,
@@ -4242,8 +4263,8 @@ if(DH){var nrm=(DH.upsLoadPct/2).toFixed(0),fail=DH.upsLoadPct.toFixed(0);
 $('sUA').textContent=nrm+'% nrm / '+fail+'% fail';
 $('sUB').textContent=nrm+'% nrm / '+fail+'% fail';}
 // People count update
-const ppl=$('pplCount');if(ppl)ppl.textContent=RZ_SIM('page7',0,6,0);
-const le=$('lastEntry');if(le){const now=new Date();le.textContent=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')}
+const ppl=$('pplCount');if(ppl&&rzElemOn(ppl))ppl.textContent=RZ_SIM('page7',0,6,0);
+const le=$('lastEntry');if(le&&rzElemOn(le)){const now=new Date();le.textContent=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0')}
 // Sidebar alarm status updates
 /* v2.3.0 §A6: the fire sidebar counters (#sbFire … #sbMaint) are written by js/datahall-ai/fire-workstation.js from the point inventory and the isolation register — no roll, no literal */
 // CDU status updates
@@ -5364,7 +5385,7 @@ s+=lv(kpiB[kb].id,630,kby,kpiB[kb].v,'var(--g)',4.5,0,kpiB[kb].o);
 // DH Summary
 s+='<rect x="50" y="'+(L10+160)+'" width="880" height="28" rx="4" fill="rgba(245,158,11,.05)" stroke="rgba(245,158,11,.2)" stroke-width=".5"/>';
 s+=tx(490,L10+175,DH[n-1]+' POWER SUMMARY','var(--o)',5.5,'middle',1);
-s+=lv('eDH'+n+'Live',490,L10+186,(DHE?('IT: '+dhaG(DHE.itHall)+' kW | non-IT: '+dhaG(DHE.pb_nonIT)+' kW | Total: '+dhaG(DHE.pb_facility)+' kW | PUE: '+DHE.pue.toFixed(3)+' (derived; cooling '+dhaG(DHE.pb_cooling)+' + UPS/dist '+dhaG(DHE.pb_upsDist)+' + aux '+dhaG(DHE.pb_aux)+' kW)'):'—'),'var(--g)',5,'middle',bo('itHall',{also:['pb_nonIT','pb_facility','pue']}));
+s+=lv('eDH'+n+'Live',490,L10+186,(DHE?('IT: '+dhaG(DHE.itHall)+' kW | non-IT: '+dhaG(DHE.pb_nonIT)+' kW | Total: '+dhaG(DHE.pb_facility)+' kW | PUE: '+DHE.pue.toFixed(3)+' (derived; cooling '+dhaG(DHE.pb_cooling)+' + UPS/dist '+dhaG(DHE.pb_upsDist)+' + aux '+dhaG(DHE.pb_aux)+' kW)'):'—'),'var(--g)',5,'middle',bo('itHall',{also:['pb_nonIT','pb_facility','pue','pb_cooling','pb_upsDist','pb_aux']}));
 
 // ==== SPEC PANEL (right sidebar) ====
 s+='<rect x="1020" y="'+(L1-5)+'" width="175" height="'+(L10+195-L1+5)+'" rx="5" fill="var(--bg3)" stroke="var(--bd2)" stroke-width=".5"/>';
@@ -5452,7 +5473,11 @@ drawDH(4,'elecDH4C','elecDH4Su','elecDH4Cards');
 });
 
 // ===== LIVE VALUE UPDATES (4-sec interval) =====
-setInterval(function(){
+/* v3.11.7 — measured 200 mutations per 20 s inside #p-elec while the reader sat on the dash tab.
+   The assignment keeps a handle so the tab handler can repaint on activation rather than leaving the
+   panel up to 4 s stale. */
+setInterval(window.__rzTickElec=function(){
+if(!rzPanelOn('elec'))return;
 for(var i=1;i<=4;i++){
 /* Rule 2 — voltage and temperature are sensors and may jitter; IT load, UPS
    loading, busway loading and every current are BASIS quantities and are
@@ -5515,7 +5540,9 @@ window.RZDatahallAIElectricalLive.start({
 document:document,
 basis:DHE,
 electricalApi:window.RZDatahallAIElectrical,
-intervalMs:4000
+intervalMs:4000,
+/* every id this updater writes is inside #p-elec; do not rewrite them while that panel is hidden */
+shouldRender:function(){return rzPanelOn('elec');}
 });
 }
 })();
@@ -9521,6 +9548,10 @@ callEl.innerHTML=ch;
 // Sensor-class jitter (TCS sensors, people count, outdoor weather, alarm count) stays
 // random per reviewer's explicit allowance (doc-26 §AI-ACC-07 "Allowed behavior").
 function updateDashKPI(){
+/* v3.11.7 — every id below is inside #p-dash or drawn by its own builder; none is page-wide, so
+   this whole function is skipped while the reader is on another tab. It is called again on
+   activation, so the dashboard is never shown a tick stale. */
+if(!rzPanelOn('dash'))return;
 const el=id=>$(id);
 /* --- BASIS / DERIVED (deterministic, engine-bound; Rule 4: 3 dp, cyan) --- */
 var PUE=(DHE?DHE.pue.toFixed(3):'—');
@@ -13417,7 +13448,10 @@ function paintBMSHealth(){
 paintBMSHealth();
 setInterval(function(){
   for(var i=0;i<bars.length;i++){ if(bars[i].offsetParent!==null)paint(bars[i]); }
-  paintBMSHealth();
+  /* v3.11.7 — the three counters paintBMSHealth() writes are inside #p-bms. The bar loop above
+     already skips hidden panels via offsetParent; this call did not, so it rewrote them every 4 s
+     on every other tab. window.rzPanelOn lives in the page's main script block. */
+  if(!window.rzPanelOn||window.rzPanelOn('bms'))paintBMSHealth();
 },4000);
 })();
 </script>
