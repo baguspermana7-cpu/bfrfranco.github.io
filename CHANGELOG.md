@@ -11,6 +11,74 @@ release sections rather than semver.
 
 ---
 
+## v3.11.9 — 2026-09-27
+
+### The gated cockpit now says something true to a reader who cannot enter it
+
+`datahallAI.html` is in `sitemap.xml` and declares `robots: index, follow`, and it ships
+`<body class="locked">` in its static HTML. Until now `body.locked` applied
+`filter:blur(4px); pointer-events:none` to the cockpit behind a fixed scrim holding a **32-word**
+card that said "access required" and offered nothing else. So search traffic — and any rendering
+crawler — met a blurred wall, while the indexed text described a cockpit no visitor could read.
+Row 10 of the SEO ledger recorded that as an owner decision with three options; the owner delegated
+it (*"Yg terbaik walau ultraeffort"*), and this is option (c): **keep the page discoverable, give the
+public reader real engineering, and gate only the interactive cockpit.**
+
+**What a public visitor now gets.** An in-flow brief — the cockpit is hidden, not teased — with 270+
+words on what the model is and how the thermal and electrical chains are derived, links to the public
+manual and PRD, and eight headline figures:
+
+| | |
+|---|---|
+| Total IT load | 539.05 MW |
+| GB300 NVL72 racks | 3,520 at 142 kW |
+| Blackwell GPUs | 253,440 |
+| PUE, design day · WUE | 1.165 · 0.00 L/kWh |
+| Liquid capture · Intake | 85% · 150 kV |
+
+**The figures cannot drift from the model.** They are rendered from `window.RZ_DCAI_PARAMETERS` — the
+same registry twin the basis drawer reads — under the same basis ids the dashboard cells carry.
+Nothing is typed and nothing is re-derived, and each cell keeps its `data-basis-param`, so **a public
+reader can click any figure and get the full basis record**: derivation, evidence class and source.
+
+**It fails closed twice over.** With the registry absent every figure is an em dash rather than a
+plausible guess (P8). And because the brief reads the registry twin rather than the engine, it could
+have painted while the cockpit itself was showing em dashes — so it now also honours the page's
+authority contract: figures render only when `data-datahall-authority` is `current`, and a
+MutationObserver repaints when the engine validates (P9). A public reader is never shown a number the
+page itself refuses to stand behind.
+
+**Two things the gates caught, both real:**
+- The brief first sat ABOVE the header, pushing the site's own navigation below the fold — the
+  telemetry e2e gate reported `prd/datahallai.html` as no longer topmost. The brief now follows the
+  header.
+- The prose said "the live cockpit". On a page whose every number is simulated, the authority gate
+  forbids `live` phrasing, and it was right to: the word claims real telemetry. Reworded to
+  "interactive cockpit".
+
+**Also fixed while in here.** The gate card violated the site's own design standard — 14px radius, a
+filled green pill, centred text, a drop shadow — and is rebuilt on the 4px radius, 1px hairline,
+mono-label, tabular-numeral system with 44px controls. And the page's three descriptions advertised
+telemetry an anonymous visitor cannot use; they now describe the model, and the meta description is
+**146 characters**, written to finish inside the ~160 SERP cut rather than truncate mid-clause, which
+is the defect ledger row 2 exists for.
+
+### Added
+- `tools/test-dcai-public-brief.mjs` (P1–P9), wired into `tools/ship-gate.sh`: locked shows the brief
+  and hides the cockpit with nothing blurred; the brief is substantive; every figure equals its
+  registry value; a figure click opens a populated basis record; 390px carries no overflow, 44px
+  figures and 24px controls; unlocking restores the cockpit; and both fail-closed paths hold. Proven
+  RED against v3.11.8 in a detached worktree — **8 findings**, naming the defect directly: *"the
+  cockpit is blurred (blur(4px))"*, *"the brief carries only 32 words — a placeholder"*.
+
+### Changed
+- `data/dcai-parameters.json` + `js/dcai-parameters.js` regenerated through the builder (never by
+  hand): the brief's hooks moved R8 to **241/283 ids rendered**, 42 declared internal, STRICT.
+- `standarization/Audit result/SEO_AUDIT_LEDGER.md` — row 10 CLOSED with the option taken and the
+  gate that keeps it closed.
+
+---
+
 ## v3.11.8 — 2026-09-27
 
 ### Six tickers were repainting panels nobody could see

@@ -3,7 +3,7 @@
 
 <!-- SEO Meta Tags -->
 <title>AI Data Hall Dashboard | GB300 NVL72 Simulated Operations | Bagus Dwi Permana</title>
-<meta name="description" content="AI-ready data hall engineering dashboard with deterministic simulated rack density, liquid cooling, GPU utilization, and power distribution telemetry.">
+<meta name="description" content="A simulated 500 MW liquid-cooled AI data centre, derived end to end: thermal chain, electrical chain, equipment counts, a basis record per number.">
     <meta name="ai-content-declaration" content="human-authored">
 <meta name="keywords" content="AI Data Center, GB300 NVL72, Blackwell GPU, Direct Liquid Cooling, DLC, Data Center Telemetry, BMS Dashboard, DCIM, HPC Infrastructure, NVLink, InfiniBand">
 <meta name="author" content="Bagus Dwi Permana">
@@ -23,7 +23,7 @@
 <meta property="og:url" content="https://resistancezero.com/datahallAI.html">
 <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
 <meta property="og:title" content="AI Data Hall Dashboard | GB300 NVL72 Simulated Operations">
-<meta property="og:description" content="Deterministic simulated telemetry for Blackwell GPU infrastructure, direct liquid cooling, and BMS/DCIM engineering review.">
+<meta property="og:description" content="A simulated 500 MW AI data centre modelled end to end — thermal chain, electrical chain and equipment counts, with a traceable basis for every figure.">
 <meta property="og:image" content="https://resistancezero.com/assets/og/datahallAI.webp">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -33,7 +33,7 @@
 <!-- Twitter Card Meta Tags -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="AI Data Hall Dashboard | GB300 NVL72">
-<meta name="twitter:description" content="Deterministic simulated telemetry for AI/HPC infrastructure: Blackwell GPUs, DLC cooling, power distribution, and BMS monitoring.">
+<meta name="twitter:description" content="A simulated 500 MW AI data centre modelled end to end — thermal chain, electrical chain and equipment counts, with a traceable basis for every figure.">
 <meta name="twitter:image" content="https://resistancezero.com/assets/og/datahallAI.webp">
 <meta name="twitter:image:alt" content="AI Data Hall Dashboard">
 
@@ -557,15 +557,52 @@ svg text{user-select:none}
 [data-theme="light"] .dh-btn{background:#f1f5f9;color:#475569;border-color:#cbd5e1}
 [data-theme="light"] .dh-btn.active{background:rgba(100, 116, 139,.12);color:#64748b;border-color:rgba(100, 116, 139,.35)}
 .dh-head{padding:10px 8px 6px;border-bottom:1px solid var(--bd);margin-bottom:6px}
-.root-gate{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,.74);padding:1rem;backdrop-filter:blur(6px)}
-body.locked .root-gate{display:flex}
-body.locked .wrap,body.locked .mn{filter:blur(4px);pointer-events:none;user-select:none}
-.root-card{max-width:430px;width:100%;background:#0f172a;border:1px solid rgba(100, 116, 139,.38);border-radius:14px;padding:2rem;text-align:center;box-shadow:0 18px 36px rgba(0,0,0,.5)}
-.root-card h2{color:#f1f5f9;font-size:1.1rem;margin-bottom:.5rem}
-.root-card p{color:#94a3b8;font-size:.85rem;line-height:1.5}
-.root-actions{margin-top:1rem;display:flex;gap:.5rem;justify-content:center}
-.root-actions button{background:#10b981;color:#0f172a;border:none;padding:.5rem 1.2rem;border-radius:8px;font-weight:600;cursor:pointer}
-.root-actions a{padding:.5rem 1.2rem;border-radius:8px;border:1px solid rgba(148,163,184,.3);color:#94a3b8;text-decoration:none;font-size:.85rem}
+/* ============================================================================
+ * v3.11.9 — the gate is a PUBLIC BRIEF, not a blurred wall.
+ *
+ * It used to be a fixed scrim over a blurred cockpit: an anonymous visitor (and a
+ * rendering crawler) saw 4px-blurred, pointer-events:none content behind a 430px
+ * card that said "access required" and offered nothing else. The page is in
+ * sitemap.xml and says robots: index, follow, so search traffic landed on a wall.
+ *
+ * Now the gate is an in-flow section carrying real content — what the model is, its
+ * headline figures read from the parameter registry with the SAME basis ids the
+ * dashboard uses, and links to the public PRD and manual — while the interactive
+ * cockpit is hidden rather than teased. What is indexed is what a visitor can read.
+ * The interactive cockpit stays gated; only the wall is gone.
+ * ========================================================================== */
+.root-gate{display:none;max-width:1100px;margin:0 auto;padding:1.5rem 1rem 3rem}
+body.locked .root-gate{display:block}
+/* hidden, not blurred: teasing content nobody may read is what made this a wall */
+body.locked .wrap,body.locked .tabs{display:none}
+.root-card{border:1px solid var(--bd);border-radius:4px;background:var(--bg1);padding:1.25rem}
+.root-card h2{color:var(--t1);font-size:1.05rem;margin:0 0 .5rem;letter-spacing:.01em}
+.root-card p{color:var(--t2);font-size:.86rem;line-height:1.6;margin:0 0 .75rem;max-width:70ch}
+.rz-brief-eyebrow{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--t3);margin:0 0 .35rem}
+.rz-brief-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;
+  background:var(--bd);border:1px solid var(--bd);border-radius:4px;margin:1rem 0}
+.rz-brief-fig{background:var(--bg1);padding:.7rem .8rem;min-height:44px}
+.rz-brief-fig[data-basis-param]{cursor:pointer}
+.rz-brief-fig:focus-visible{outline:2px solid var(--c);outline-offset:-2px}
+.rz-brief-k{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:9.5px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--t3);display:block;margin-bottom:.25rem}
+.rz-brief-v{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:15px;font-variant-numeric:tabular-nums;
+  color:var(--t1)}
+.rz-brief-v[data-tone="derived"]{color:var(--c)}
+.rz-brief-u{font-size:10px;color:var(--t3);margin-left:.2rem}
+.root-actions{margin-top:1rem;display:flex;gap:.5rem;flex-wrap:wrap}
+.root-actions button,.root-actions a{font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;
+  letter-spacing:.04em;text-transform:uppercase;padding:.6rem 1rem;border-radius:4px;min-height:44px;
+  display:inline-flex;align-items:center;text-decoration:none;cursor:pointer;background:0;
+  border:1px solid var(--bd2);color:var(--t2)}
+.root-actions button{border-color:var(--g);color:var(--g)}
+.root-actions button:hover,.root-actions a:hover{border-color:var(--t2);color:var(--t1)}
+.rz-brief-links{margin:.75rem 0 0;padding:0;list-style:none;display:flex;gap:1rem;flex-wrap:wrap}
+.rz-brief-links a{font-size:.82rem;color:var(--c);text-decoration:none;border-bottom:1px solid transparent;
+  min-height:24px;display:inline-flex;align-items:center}
+.rz-brief-links a:hover{border-bottom-color:var(--c)}
+@media (max-width:600px){.root-gate{padding:1rem .75rem 2rem}.root-card{padding:1rem}}
 /* ============================================================================
  * v1.20.3 — Track 4 Stage 9: Basis-of-Design + Calculation-Audit drawer (P3)
  * ----------------------------------------------------------------------------
@@ -685,7 +722,7 @@ body[data-datahall-authority="unavailable"] #tabs,
 body[data-datahall-authority="unavailable"] .wrap{display:none !important}
 body[data-datahall-authority="unavailable"] .hdr-r>.dot{background:#64748b !important;box-shadow:none !important;animation:none !important}
 body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:none}
-</style>    <script src="js/rz-version.js?v=20260927-6d53e7c6" defer></script>
+</style>    <script src="js/rz-version.js?v=20260927-b8dce858" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <!-- v3.5.0 — hold the 8.5px legibility floor by SCALE, not by font size. Five of this page's
          fifteen diagrams were already clear; the dense ones (cooling P&ID, the four SLDs, the hall
@@ -799,16 +836,6 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
 </head><body class="locked" data-rz-data-mode="simulated" data-datahall-authority="unavailable" data-rz-inspector-dock="1">
 <a href="#main-content" class="skip-link">Skip to main content</a>
 
-<div class="root-gate" id="rootGate">
-<div class="root-card">
-<h2><i class="fas fa-lock" style="color:#64748b;margin-right:.3rem"></i> Full access or Educator access required</h2>
-<p>This module requires a Full access or Educator account. Sign in with one to continue, or contact us for access.</p>
-<div class="root-actions">
-<button id="rootLoginBtn">Sign In</button>
-<a href="datacenter-solutions.html">Back to DC Solutions</a>
-</div>
-</div>
-</div>
 
 <header class="hdr">
 <div class="hdr-main">
@@ -821,6 +848,43 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
 </div>
 <div class="hdr-r"><button class="dh-bod-trig" id="bodTrig" type="button" aria-haspopup="dialog" aria-disabled="true" disabled title="UNAVAILABLE until the current engine authority validates"><span aria-hidden="true">&#9432;</span> Basis of Design</button>&nbsp;<button class="dh-bod-trig" id="genDesignTrig" type="button" aria-haspopup="dialog" aria-disabled="true" disabled title="UNAVAILABLE until the current engine authority validates" style="background:rgba(245,158,11,.10);border-color:rgba(245,158,11,.32);color:#fbbf24"><i class="fas fa-file-lines" aria-hidden="true"></i>Generate Design</button>&nbsp;<button class="dh-bod-trig" id="faqTrig" type="button" aria-haspopup="dialog" aria-disabled="true" disabled title="UNAVAILABLE until the current engine authority validates" style="background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.28);color:#67e8f9">&#10067; FAQ</button>&nbsp;<button class="theme-toggle" id="themeToggle" title="Toggle theme">&#9790;</button><span class="dot"></span>&nbsp;<span id="clk">--:--:--</span> WIB</div>
 </header>
+
+<div class="root-gate" id="rootGate">
+<div class="root-card">
+<p class="rz-brief-eyebrow">Public brief &middot; simulated engineering model</p>
+<h2>A 500 MW liquid-cooled AI factory, modelled end to end</h2>
+<p>This module is a <strong>simulated teaching model</strong> of an AI data centre at GB300 NVL72
+density &mdash; not a built facility and not a vendor design. Every quantity below is computed by the
+page&rsquo;s own engine from a locked set of authored inputs, and each one is traceable: click a figure
+to open its basis record, with the derivation, evidence class and source.</p>
+<p>The figures are the facility totals. They are read from the same parameter registry, under the same
+basis ids, that the interactive cockpit uses &mdash; so this brief cannot drift from the model it describes.</p>
+
+<div class="rz-brief-grid" id="rzBriefGrid" data-rz-authored-basis="each figure is rendered from window.RZ_DCAI_PARAMETERS under the basis id named on the cell, so the brief and the cockpit cannot disagree">
+</div>
+
+<p class="rz-brief-eyebrow">How it is derived</p>
+<p>The thermal chain runs ambient &rarr; dry cooler &rarr; warm-water loop &rarr; row CDU &rarr; cold plate,
+with free cooling on the liquid path and no evaporative term, which is why the water figure is
+structurally zero. The electrical chain steps 150 kV to 20 kV to 400 V, with a transformer at every
+transition. The methodology, the parameter register and the worked examples are public:</p>
+<ul class="rz-brief-links">
+<li><a href="manual/datahallai.html">Methodology manual</a></li>
+<li><a href="prd/datahallai.html">Product requirements</a></li>
+<li><a href="datacenter-solutions.html">All DC modules</a></li>
+<li><a href="changelog.html">Engineering changelog</a></li>
+</ul>
+
+<p class="rz-brief-eyebrow" style="margin-top:1rem">Why the cockpit itself is gated</p>
+<p>The interactive cockpit carries operator surfaces &mdash; equipment HMIs, a fire-isolation register,
+cause-and-effect matrices &mdash; that are training instruments, and a half-read instrument is worse
+than none. Those need a Full access or Educator account. The engineering above does not.</p>
+<div class="root-actions">
+<button id="rootLoginBtn" type="button">Sign in for cockpit access</button>
+<a href="datacenter-solutions.html">Back to DC Solutions</a>
+</div>
+</div>
+</div>
 <section id="datahallAuthorityUnavailable" role="status" aria-live="assertive">
 <strong>AI DATA HALL ENGINE AUTHORITY — UNAVAILABLE</strong>
 Requested model/calculation versions and the complete locked schema must validate before telemetry, process studies, FAQs, or generated documents are exposed.
@@ -3408,6 +3472,77 @@ function rzPanelOn(id){var p=document.getElementById('p-'+id);return !!(p&&p.cla
    panel, where naming one would be a guess. An element outside every .pn counts as visible. */
 function rzElemOn(el){if(!el)return false;var p=el.closest?el.closest('.pn'):null;return p?p.classList.contains('on'):true;}
 window.rzPanelOn=rzPanelOn;window.rzElemOn=rzElemOn;
+
+/* ===== Public brief figures (v3.11.9) =====
+   The brief renders ONLY from window.RZ_DCAI_PARAMETERS — the same registry twin the basis drawer
+   reads and the same ids the dashboard cells carry. Nothing is re-derived here and no number is
+   typed, so the brief cannot disagree with the cockpit; a wrong id renders an em dash rather than a
+   plausible figure, which is the page's fail-closed rule (see ACCURACY_VALIDATION Rule 4).
+   Each cell keeps its data-basis-param, so a public reader gets the full basis drawer on click. */
+(function(){
+  var FIGS=[
+    {id:'power.total_it_mw',    label:'Total IT load',   unit:'MW',     dp:2, tone:'derived'},
+    {id:'compute.racks_facility',label:'GB300 NVL72 racks',unit:'',     dp:0},
+    {id:'power.rack_it_kw',     label:'Per rack',        unit:'kW',     dp:0},
+    {id:'compute.gpu_facility', label:'Blackwell GPUs',  unit:'',       dp:0},
+    {id:'pue.design_day',       label:'PUE, design day', unit:'',       dp:3, tone:'derived'},
+    {id:'wue.l_per_kwh',        label:'WUE',             unit:'L/kWh',  dp:2, tone:'derived'},
+    {id:'heat.liquid_capture_ratio',label:'Liquid capture',unit:'%',    dp:0, pct:true},
+    {id:'distribution.hv_intake_kv',label:'Intake',      unit:'kV',     dp:0}
+  ];
+  function registry(){
+    var R=window.RZ_DCAI_PARAMETERS;
+    if(!R)return null;
+    var list=R.parameters||R;
+    if(!list||!list.length)return null;
+    var byId={};
+    for(var i=0;i<list.length;i++)if(list[i]&&list[i].id)byId[list[i].id]=list[i];
+    return byId;
+  }
+  function thou(t){return String(t).replace(/\B(?=(\d{3})+(?!\d))/g,',');}
+  function fmt(v,dp,pct){
+    if(v==null||typeof v!=='number'||!isFinite(v))return null;
+    if(pct)v=v*100;
+    var t=v.toFixed(dp);
+    var parts=t.split('.');
+    return thou(parts[0])+(parts[1]?'.'+parts[1]:'');
+  }
+  /* The page's own contract: nothing renders an engine quantity until the authority validates
+     (ACCURACY_VALIDATION, and the fail-closed fixtures in test-datahall-ai-authority.mjs). The brief
+     reads the registry twin rather than the engine, so it COULD paint while the cockpit is showing em
+     dashes — it must not, or a public reader would be shown figures the page itself refuses to stand
+     behind. Authority resolves asynchronously, so the observer below repaints when it flips. */
+  function authorityCurrent(){
+    return document.body&&document.body.getAttribute('data-datahall-authority')==='current';
+  }
+  function paint(){
+    var host=document.getElementById('rzBriefGrid');
+    if(!host)return;
+    var byId=authorityCurrent()?registry():null;
+    var html='';
+    for(var i=0;i<FIGS.length;i++){
+      var f=FIGS[i];
+      var rec=byId?byId[f.id]:null;
+      var txt=rec?fmt(rec.value,f.dp,f.pct):null;
+      /* fail closed: an id that does not resolve prints an em dash, never a guess */
+      var shown=txt==null?'\u2014':txt;
+      html+='<div class="rz-brief-fig" data-basis-param="'+f.id+'" tabindex="0" role="button"'
+          + ' aria-label="'+f.label+' \u2014 open basis record">'
+          + '<span class="rz-brief-k">'+f.label+'</span>'
+          + '<span class="rz-brief-v"'+(f.tone?' data-tone="'+f.tone+'"':'')+'>'+shown
+          + (f.unit&&txt!=null?'<span class="rz-brief-u">'+f.unit+'</span>':'')+'</span></div>';
+    }
+    host.innerHTML=html;
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',paint);
+  else paint();
+  /* repaint when datahallPaintAuthority() flips the attribute, so the brief is em dashes until the
+     engine has validated and real figures immediately afterwards */
+  if(window.MutationObserver&&document.body){
+    new MutationObserver(paint).observe(document.body,{attributes:true,attributeFilter:['data-datahall-authority']});
+  }
+  window.rzPaintPublicBrief=paint;
+})();
 
 RZDefer.add('over',function(){renderOverview();renderOverviewCards();});
 
