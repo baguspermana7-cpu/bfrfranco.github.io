@@ -552,7 +552,7 @@
 :root:not([data-theme="dark"]) #btnProMode { color:#475569 !important; }
 :root:not([data-theme="dark"]) #modeIndicator { color:#155e75 !important; }
 </style>
-    <script src="js/rz-version.js?v=20260927-b8dce858" defer></script>
+    <script src="js/rz-version.js?v=20261003-e12ffa91" defer></script>
     <script src="js/rz-calc-utils.js?v=20260920-ef3425ae" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <script src="js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
@@ -2147,5 +2147,24 @@ html:not([data-theme="dark"]) #scoreGrade[style*="#f59e0b"] { color:#b45309 !imp
 <script type="module" src="js/rz-supabase.js?v=20260920-90bd6417"></script>
     <script src="js/rz-manual-fab.js?v=20260920-8972ee25" defer></script>
     <script src="js/rz-hero-fit.js?v=20260920-81ad63a8" defer></script>
+
+<script>
+    // The navbar theme button (id="navThemeBtn", onclick="toggleCalcTheme()") called a
+    // function that did not exist on this page, so the toggle did nothing -- while the
+    // page carries 93 [data-theme="dark"] rules and was fully ready for it. Same
+    // implementation as capex-calculator.html / opex-calculator.html / cx-calculator.html.
+    function toggleCalcTheme() {
+        var t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', t);
+        localStorage.setItem('theme', t);
+        var icon = document.getElementById('themeIcon');
+        if (icon) icon.className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    }
+    (function(){
+        var icon = document.getElementById('themeIcon');
+        var t = document.documentElement.getAttribute('data-theme');
+        if (icon) icon.className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+    })();
+</script>
 </body>
 </html>

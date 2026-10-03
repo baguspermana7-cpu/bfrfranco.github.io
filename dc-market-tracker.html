@@ -735,7 +735,7 @@
 .rz-version-num { color:#0a6e52 !important; } .rz-version-label { color:#5b6b82 !important; }
 [data-theme="dark"] .rz-version-num { color:#7dd3b0 !important; } [data-theme="dark"] .rz-version-label { color:#9aa8bb !important; }
 </style>
-    <script src="js/rz-version.js?v=20260927-b8dce858" defer></script>
+    <script src="js/rz-version.js?v=20261003-e12ffa91" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <script src="js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>    <meta property="og:image:alt" content="Global Data Center Market Tracker | Live Capacity &amp; Growth Dashboard">
 
@@ -1026,40 +1026,14 @@
     </div>
 
     <!-- Login Modal -->
-    <div id="dmtLoginModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);z-index:99999;align-items:center;justify-content:center;">
-        <div style="background:var(--dmt-bg);border-radius:20px;padding:2.5rem;max-width:420px;width:90%;box-shadow:0 25px 60px rgba(0,0,0,0.3);position:relative;animation:dmtModalIn 0.3s ease;">
-            <button onclick="closeLoginModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:1.2rem;color:var(--dmt-text3);cursor:pointer;padding:4px;">&times;</button>
-            <div style="text-align:center;margin-bottom:1.5rem;">
-                <div style="width:56px;height:56px;border-radius:16px;background:#64748b;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;">
-                    <i class="fas fa-crown" style="color:white;font-size:1.3rem;"></i>
-                </div>
-                <h3 style="font-size:1.3rem;font-weight:700;color:var(--dmt-text);margin-bottom:0.25rem;">Sign In</h3>
-                <p style="font-size:0.85rem;color:var(--dmt-text3);">Access advanced analytics, forecasts, and PDF export.</p>
-            </div>
-            <div id="dmtLoginError" style="display:none;padding:10px 14px;border-radius:8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#dc2626;font-size:0.8rem;margin-bottom:1rem;text-align:center;">Invalid credentials</div>
-            <div style="display:flex;flex-direction:column;gap:1rem;">
-                <div>
-                    <label style="display:block;font-size:0.8rem;font-weight:600;color:var(--dmt-text2);margin-bottom:6px;">Email</label>
-                    <input type="email" id="dmtLoginEmail" placeholder="your@email.com" style="width:100%;padding:12px 14px;border:2px solid var(--dmt-border);border-radius:10px;font-size:0.95rem;font-family:inherit;outline:none;transition:border-color 0.3s;background:var(--dmt-bg);color:var(--dmt-text);" onfocus="this.style.borderColor='#64748b'" onblur="this.style.borderColor=''" aria-label="your@email.com">
-                </div>
-                <div>
-                    <label style="display:block;font-size:0.8rem;font-weight:600;color:var(--dmt-text2);margin-bottom:6px;">Password</label>
-                    <input type="password" id="dmtLoginPassword" placeholder="Enter password" style="width:100%;padding:12px 14px;border:2px solid var(--dmt-border);border-radius:10px;font-size:0.95rem;font-family:inherit;outline:none;transition:border-color 0.3s;background:var(--dmt-bg);color:var(--dmt-text);" onfocus="this.style.borderColor='#64748b'" onblur="this.style.borderColor=''" onkeydown="if(event.key==='Enter')attemptLogin()" aria-label="Enter password">
-                </div>
-                <button onclick="attemptLogin()" style="padding:12px;border-radius:10px;border:none;background:#64748b;color:white;font-size:0.95rem;font-weight:600;font-family:inherit;cursor:pointer;transition:all 0.3s;box-shadow:0 4px 12px rgba(100, 116, 139,0.3);" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform='translateY(0)'">
-                    <i class="fas fa-unlock" style="margin-right:8px;"></i>Sign In
-                </button>
-            </div>
-            <div style="text-align:center;margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--dmt-border);">
-                <p style="font-size:0.75rem;color:var(--dmt-text3);">Features: Monte Carlo forecast, 5-year projections, tornado analysis, PDF export</p>
-                <div style="margin-top:12px;padding:10px 12px;border-radius:8px;background:rgba(100, 116, 139,0.08);border:1px solid rgba(100, 116, 139,0.2);font-size:0.78rem;color:var(--dmt-text3);line-height:1.6;">
-                    <span style="color:#64748b;font-weight:600;">Demo Account:</span><br>
-                    <code style="background:rgba(100, 116, 139,0.1);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#64748b;">demo@resistancezero.com</code> / <code style="background:rgba(100, 116, 139,0.1);padding:2px 6px;border-radius:4px;font-size:0.75rem;color:#64748b;">demo2026</code>
-                </div>
-                <p style="font-size:0.68rem;color:var(--dmt-text3);margin-top:12px;line-height:1.5;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#64748b;text-decoration:underline;" rel="noopener noreferrer">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#64748b;text-decoration:underline;" rel="noopener noreferrer">Privacy Policy</a>.</p>
-            </div>
-        </div>
-    </div>
+
+<!-- A bespoke login modal lived here and was UNREACHABLE: nothing in the page
+     ever set its display or added its open class, and its buttons called
+     handlers (attemptLogin, closeLoginModal) that were defined nowhere. It was the tail of the
+     migration to the shared auth modal (window._rzAuth.showModal), which this
+     page already uses. Removed 4650 chars including two inputs, one of them
+     type=password -- a password field with no handler is worse than dead weight,
+     because a password manager will offer to fill it. -->
 
     <!-- References -->
     <section class="references-section" style="background:#0f172a; padding:2rem; border-radius:16px; margin:3rem auto; max-width:1200px; border:1px solid #1e293b;">

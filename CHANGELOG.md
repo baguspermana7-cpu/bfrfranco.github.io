@@ -11,6 +11,75 @@ release sections rather than semver.
 
 ---
 
+## v3.11.10 — 2026-10-03
+
+### Fixed — being signed in was what broke the PFAS calculator
+
+Owner report: "Full analysis" stayed locked on `article-26.html` while signed in as root, "sering
+sekali". It was worse than locked. **The entire inline calculator script was dying**, and only when
+a session existed.
+
+`checkSession()` runs inline during parse. `auth.js` and `rz-engine.min.js` load at the end of the
+document with `defer`, so neither exists yet — `window.RZEngine` is undefined on that first call,
+always. With a session present the fallback reached `activatePremiumUI()`, which called
+`pfasSetMode('pro')` — assigned to `window` **56 lines further down**. A function expression on
+`window` is not hoisted, so that call threw and killed the rest of the script. Measured:
+
+```
+no session    typeof window.pfasSetMode === "function"
+root session  typeof window.pfasSetMode === "undefined"
+```
+
+Every later global — `pfasSetMode`, `pfasReset`, `pfasExportPDF`, `pfasHideLogin`,
+`pfasHandleLogin` — ended up undefined, and every `onclick` on the page was a no-op. The page
+returned 200, the HTML was intact, every static gate was green. **It worked for every visitor and
+broke only for the one person who is always logged in.**
+
+Also removed the early `return` that skipped the localStorage fallback when RZEngine was present but
+unhydrated, and widened the `rz-auth-change` listener: `auth.js` dispatches a bare `Event` in one
+path, and a handler testing only `detail.action === 'login'` ignored it.
+
+### Fixed — five login modals that could not be opened, and could not be submitted
+
+`attemptLogin`, `closeLoginModal`, `wcHandleLogin`, `rfsAttemptLogin` — referenced by `onclick`,
+defined **nowhere**. Reachability was measured before anything was written: all five modals had
+`shows-it = 0`. Nothing in any page ever set their display or added an open class. They were the
+tail of the migration to the shared `_rzAuth.showModal`, which those pages already use.
+
+So they were removed rather than repaired — 15,758 characters across `dc-market-tracker`,
+`pue-calculator`, `tia-942-checklist`, `article-20` and `rfs-readiness-workbench`, including **five
+dead login forms carrying a `type=password` input**. A password field with no handler is worse than
+dead weight: a password manager will offer to fill it.
+
+### Fixed — two more buttons that did nothing
+
+`exportTcoCSV` on `tco-calculator` was a bare `function` declaration trapped in scope while its
+neighbours use `window.exportPDF = ...`. `toggleCalcTheme` on `roi-calculator` was **never defined
+at all**, on a page carrying 93 `[data-theme="dark"]` rules and fully ready for it — the canonical
+implementation from `capex-calculator` now sits there.
+
+### Added — `tools/audit-runtime-handlers.mjs`, a gate that runs the page
+
+`audit-onclick-handlers.py` covers the neighbouring bug (a handler trapped in an IIFE) and could see
+none of this, for two reasons. It reads source instead of running the page, and — line 10 of its own
+usage text — *"If no files are given, scans spares-readiness-calculator.html"*. **It audits one file
+out of 179 and prints `[OK] No missing exports`**, which reads as a site-wide verdict.
+
+The new gate loads every page carrying inline handlers in **two auth states** and requires every
+referenced name to resolve. A handler dead in only one state is ranked above one dead in both,
+because that is the defect that passes every test run by someone in the other state.
+
+Proven both directions before being trusted: `--strict` exits **1** on the pre-fix `article-26`
+(five dead handlers, correctly labelled `dead-when-signed-in`) and **0** once fixed. Baseline is now
+**717 handlers across 105 pages**.
+
+Two things were rejected rather than reported. A finding named `function` was the tool's own regex
+catching an inline `forEach` callback. And two `page-error` rows were contention, not defects — run
+solo, `rz-ops-p7x3k9m.html` passes with 110 handlers. A navigation failure is now retried once with
+a longer budget, because a gate that reports contention as a defect teaches people to ignore it.
+
+---
+
 ## v3.11.9 — 2026-09-27
 
 ### The gated cockpit now says something true to a reader who cannot enter it

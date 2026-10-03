@@ -2019,7 +2019,7 @@
 [data-theme="dark"] .tco-disclaimer span { color:#94a3b8 !important; }
 [data-theme="dark"] .tco-methodology-item-title { color:#5eead4 !important; }
 </style>
-    <script src="js/rz-version.js?v=20260927-b8dce858" defer></script>
+    <script src="js/rz-version.js?v=20261003-e12ffa91" defer></script>
     <script src="js/rz-calc-utils.js?v=20260920-ef3425ae" defer></script>
     <script src="js/rz-explain-db.js?v=20260922-cc23355f" defer></script>
     <script src="js/rz-explain.js?v=20260920-d0317658" defer></script>
@@ -3267,6 +3267,9 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
 
         /* ─────────── DOM REFS ─────────── */
         function el(id) { return document.getElementById(id); }
+        // Exposed on window like its neighbours (window.exportPDF, window.handlePremiumTab):
+        // a bare `function` declaration inside this scope is not reachable from the
+        // inline onclick at line ~2528, so the CSV button did nothing.
         function exportTcoCSV() {
             if (!window.RZCalc) return;
             function txt(id) { var e = document.getElementById(id); return e ? (e.textContent || e.value || '') : ''; }
@@ -4646,6 +4649,7 @@ html:not([data-theme="dark"]) button.premium-active { color:#64748b !important; 
             win.document.close();
             setTimeout(function() { win.print(); }, 500);
         }
+        window.exportTcoCSV = exportTcoCSV;
         window.exportPDF = exportPDF;
 
         /* legacy initTooltips removed v1.59.x — RZExplain (js/rz-explain.js) owns all tooltips */

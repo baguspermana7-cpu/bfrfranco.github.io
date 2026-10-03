@@ -699,7 +699,7 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-insigh
 html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-danger-box h3 { color:#fcd34d !important; }
 html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-warning-box h3 { color:#fbbf24 !important; }
 </style>
-    <script src="js/rz-version.js?v=20260927-b8dce858" defer></script>
+    <script src="js/rz-version.js?v=20261003-e12ffa91" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <script src="js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
 <style id="rz-mobile-v18">
@@ -1656,7 +1656,7 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-warnin
                 <div class="pfas-kpi-sub" id="pfasRegSub">Based on current EPA/EU status</div>
             </div>
             <div class="pfas-kpi-card" id="pfasKpiVapor">
-                <div class="pfas-kpi-label">Est. Annual Vapor Release</div>
+                <div class="pfas-kpi-label">Est. Annual Vapor Release <span class="pfas-tt">?<span class="pfas-tt-box"><div class="pfas-tt-title">Where the per-event figure comes from</div><div class="pfas-tt-desc">Each opening releases 0.008&nbsp;kg of fluid per litre of charge. For the default 800&nbsp;L tank that is 6.4&nbsp;kg, or 0.57&nbsp;% of the charge per event.</div><div class="pfas-tt-bench">That constant has a physical scale behind it. A saturated headspace filling a third of an 800&nbsp;L tank holds about 2.0&nbsp;kg of Novec&nbsp;7000 vapour when the tank is opened at 32.5&nbsp;&deg;C, so 0.008 is roughly <strong>three full headspace exchanges</strong> &mdash; about five if the tank is opened cool at 22&nbsp;&deg;C, where the vapour is thinner. Film and drag-out sit inside that total, not on top of it. A multi-hour full-hatch entry turns the headspace over several times, which is the range this figure sits in. The coefficient is still an assumption, not a measurement &mdash; but it is an assumption of the right order.</div></span></span></div>
                 <div class="pfas-kpi-value" id="pfasVaporValue">—</div>
                 <div class="pfas-kpi-sub" id="pfasVaporSub">kg PFAS/year (no recovery)</div>
             </div>
@@ -2222,27 +2222,64 @@ function copyLink() {
     var pfasMode = 'free';
     var mcChart = null, regChart = null, tornadoChart = null;
 
-    // ===== SESSION CHECK ===== (S1 pilot: prefer RZEngine.auth.getSession)
-    (function checkSession() {
-        if (window.RZEngine && window.RZEngine.auth && window.RZEngine.auth.getSession) {
-            if (window.RZEngine.auth.getSession()) {
-                isPremium = true;
-                activatePremiumUI();
+    // ===== SESSION CHECK =====
+    // This runs INLINE, during parse. auth.js and rz-engine.min.js are loaded at
+    // the end of the document with `defer`, so neither exists yet on the first
+    // call — window.RZEngine is undefined here, always. The previous version
+    // `return`ed inside the RZEngine branch, so on any page where the engine had
+    // loaded but not hydrated, the localStorage fallback never ran and the panel
+    // stayed locked for a signed-in user until they logged in AGAIN. That is the
+    // "Full analysis is locked even though I'm root" report: intermittent by
+    // construction, because it depended on script timing.
+    //
+    // So: no early return, and re-check whenever auth can have appeared.
+    // DOMContentLoaded is the deterministic hook — deferred scripts are
+    // guaranteed to have executed before it fires. The rz-auth-change and
+    // storage listeners cover login in this tab and in another one.
+    function checkSession() {
+        if (isPremium) return;                       // already unlocked; nothing to do
+        var ok = false;
+        try {
+            if (window.RZEngine && window.RZEngine.auth && window.RZEngine.auth.getSession) {
+                ok = !!window.RZEngine.auth.getSession();
             }
-            return;
+        } catch (e) {}
+        if (!ok) {
+            try {
+                var s = JSON.parse(localStorage.getItem('rz_premium_session') || 'null');
+                ok = !!(s && (!s.expires || new Date(s.expires) > new Date()));
+            } catch (e) {}
         }
-        // Legacy fallback if engine missing
-        var s = null;
-        try { s = JSON.parse(localStorage.getItem('rz_premium_session')); } catch(e) {}
-        if (s && new Date(s.expires) > new Date()) {
-            isPremium = true;
-            activatePremiumUI();
-        }
-    })();
+        if (ok) { isPremium = true; activatePremiumUI(); }
+    }
+    checkSession();
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', checkSession);
+    }
+    window.addEventListener('storage', function (e) {
+        if (!e || e.key === 'rz_premium_session') checkSession();
+    });
 
     function activatePremiumUI() {
         isPremium = true;
-        pfasSetMode('pro');
+        // DO NOT call pfasSetMode() from here when the script is still parsing.
+        // checkSession() runs inline, ~56 lines BEFORE `window.pfasSetMode = ...`
+        // is assigned, and a function expression assigned to window is not
+        // hoisted. Calling it early threw a TypeError that killed the REST OF THE
+        // INLINE SCRIPT — every later global (pfasSetMode, pfasHandleLogin,
+        // pfasExportPDF …) ended up undefined and every onclick on the page was a
+        // no-op. Measured: with no session `typeof window.pfasSetMode` is
+        // "function"; with a valid session it was "undefined". Being signed in
+        // was what broke the calculator, which is why it looked intermittent.
+        if (typeof window.pfasSetMode === 'function') {
+            window.pfasSetMode('pro');
+        } else {
+            // finish switching to pro once the script has defined everything
+            document.addEventListener('DOMContentLoaded', function once() {
+                document.removeEventListener('DOMContentLoaded', once);
+                if (typeof window.pfasSetMode === 'function') window.pfasSetMode('pro');
+            });
+        }
     }
 
     // ===== AUTH ===== Login is handled by the shared auth.js modal; the
@@ -2265,8 +2302,14 @@ function copyLink() {
     }
 
     window.addEventListener('rz-auth-change', function(e) {
-        if (e.detail && e.detail.action === 'login') { isPremium = true; unlockPanels(); if (pfasMode === 'pro') updateProPanels(); }
-        else if (e.detail && e.detail.action === 'logout') { isPremium = false; lockPanels(); pfasSetMode('free'); }
+        var action = e && e.detail && e.detail.action;
+        if (action === 'logout') { isPremium = false; lockPanels(); pfasSetMode('free'); return; }
+        // 'login' OR a bare rz-auth-change with no detail — auth.js dispatches both
+        // (auth.js:1168 sends a plain Event). Treating only detail.action==='login'
+        // as a login meant that path unlocked nothing.
+        isPremium = false;            // let checkSession re-decide from the session
+        checkSession();
+        if (isPremium) { unlockPanels(); if (pfasMode === 'pro') updateProPanels(); }
     });
 
     // ===== MODE =====
@@ -2374,8 +2417,11 @@ function copyLink() {
         // 0.008 is an ASSUMED per-event release fraction, NOT derived from that
         // pressure: it scales with fluid volume, whereas a surface-evaporation
         // model (~2m² open surface, ~4hr open time) does not scale with volume at
-        // all. It corresponds to roughly three headspace exchanges plus film and
-        // drag-out per event, which is the right order for a full-hatch entry.
+        // all. Its scale is defensible though: for the default 800 L tank it is
+        // 6.4 kg, and a saturated headspace filling a third of that tank holds
+        // ~2.0 kg at 32.5 °C, so 0.008 is ~3 headspace exchanges (~5 at 22 °C).
+        // Film and drag-out sit INSIDE that total, not on top of it — an earlier
+        // version of this comment said "plus", which double-counted them.
         // Release rate ≈ fluid_vol × 0.008 × events_per_year
         var recoveryFactor = { 'none': 1.0, 'partial': 0.55, 'active': 0.25 }[inp.vaporRecovery] || 1.0;
         var eventsPerYear = inp.tankCount * maintPerYear;

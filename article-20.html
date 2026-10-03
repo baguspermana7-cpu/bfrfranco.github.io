@@ -957,7 +957,7 @@
 [data-theme="dark"] .vt-false { color:#fbbf24 !important; }
 [data-theme="dark"] .vt-true { color:#4ade80 !important; }
 </style>
-    <script src="js/rz-version.js?v=20260927-b8dce858" defer></script>
+    <script src="js/rz-version.js?v=20261003-e12ffa91" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <script src="js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
 <style id="rz-mobile-v18">
@@ -2902,21 +2902,14 @@ document.addEventListener('DOMContentLoaded', function() {
 <script src="js/rz-article-toc.js?v=20260920-ab1b6fdf" defer></script>
 
 <!-- Login Modal -->
-<div class="wc-login-overlay" id="wcLoginOverlay">
-    <div class="wc-login-box">
-        <button class="wc-login-close" onclick="wcHideLogin()">&times;</button>
-        <h3><i class="fas fa-lock" style="color:#fbbf24;margin-right:6px"></i> Full access Intelligence Engine</h3>
-        <p>Sign in for multi-model deep comparison, facility optimization analysis, cooling upgrade ROI, global trajectory projections, and dynamic executive narratives.</p>
-        <input type="email" id="wcLoginEmail" placeholder="Email address" aria-label="Email address">
-        <input type="password" id="wcLoginPass" placeholder="Password" aria-label="Password">
-        <button class="wc-login-submit" onclick="wcHandleLogin()">Sign In</button>
-        <div class="wc-login-error" id="wcLoginError">Invalid credentials.</div>
-        <div class="wc-login-demo">Demo Account: <code>demo@resistancezero.com</code> / <code>demo2026</code></div>
-        <p style="font-size:0.68rem;color:#64748b;margin-top:8px;line-height:1.5;">
-            By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#fbbf24;text-decoration:underline;" rel="noopener noreferrer">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#fbbf24;text-decoration:underline;" rel="noopener noreferrer">Privacy Policy</a>.
-        </p>
-    </div>
-</div>
+
+<!-- A bespoke login modal lived here and was UNREACHABLE: nothing in the page
+     ever set its display or added its open class, and its buttons called
+     handlers (wcHandleLogin, wcHideLogin) that were defined nowhere. It was the tail of the
+     migration to the shared auth modal (window._rzAuth.showModal), which this
+     page already uses. Removed 1348 chars including two inputs, one of them
+     type=password -- a password field with no handler is worse than dead weight,
+     because a password manager will offer to fill it. -->
 
 <script src="auth.js?v=20260920-040a6c54" defer></script>
 <script src="rz-engine.min.js?v=20260922-a7d3acc6" defer></script>
