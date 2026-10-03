@@ -11,6 +11,62 @@ release sections rather than semver.
 
 ---
 
+## v3.11.13 — 2026-10-03
+
+### The two-register system is a declaration almost nothing implements
+
+Following the v3.11.12 ledger's largest open row, measured properly instead of
+inferred.
+
+`documentation/design.md` §16.2 locks a two-register system — "Decision LOCKED
+2026-06-01: HYBRID" — and `DARK_MODE_STANDARD.md` states the tokens are "Defined
+in `css/rz-dark.css` under `[data-rz-register]`". A page opts in with one
+attribute on `<html>`.
+
+**90 pages declare a register — 74 editorial, 16 instrument. `css/rz-dark.css`
+is loaded by 3**, two of which are `rz-index-mockup.html` and
+`plan-dark-mode-standard.html`, and it is `@import`ed by nothing. Asked in a real
+browser whether the declared register's own custom properties resolve, **88 of
+90 answer no.** The shared token layer that two standards name as the single
+source of truth reaches almost nothing; every page paints its register with its
+own bespoke CSS.
+
+`tools/report-register-wiring.mjs` renders each page and asks
+`getComputedStyle(documentElement)` rather than grepping for a filename, because
+a resolved value proves the stylesheet arrived by whatever path.
+
+**It is a report and it exits 0, deliberately.** Those pages look right —
+`audit-dark-coverage` passes 161 content pages in both themes and the cockpits
+work — so a bespoke skin that satisfies the register's character is not in itself
+a defect, and a gate that failed all 88 on its first run is exactly how this repo
+has previously ended up with gates wired as `; true`. It was written as
+`audit-register-wiring.mjs` with `--strict`; that was wrong and is renamed.
+
+What the gap actually costs, which is narrower and real:
+- an edit to `css/rz-dark.css` changes almost nothing, while two standards call
+  it the definition;
+- `--rz-radius` per register resolves on 3 pages, so a rule keyed to the **token**
+  would measure nothing — which is why v3.11.12's register-aware radius ceilings
+  key off the CSS **selector scope** instead, and still work;
+- on the 32 editorial pages that load neither `css/rz-article-dark.css` nor
+  `js/rz-article-editorial.js`, `flattenWashes()` never runs, so **73 live
+  translucent card washes** sit on pages declaring the register whose own
+  standard bans them.
+
+Deciding what to do is a per-page visual judgement, not a sweep: 6 of those 32
+are calculators, where the editorial **article** surface may be the wrong register
+rather than a missing link. Recorded as ledger row B rather than guessed at.
+
+### A third retracted number
+
+The first pass at measuring those 32 pages reported prose measures from 284px to
+890px. Artifact: the probe took the first `<p>` over 200 characters, which on
+`pillar-*` and `spares-readiness-calculator` is a paragraph inside a card or grid
+cell, not body prose — and it read computed styles at `domcontentloaded`, before
+any runtime could have run. Both flaws were in the measurement. The wash count
+survived re-checking only because the runtime that would have flattened those
+washes is not loaded on those pages at all.
+
 ## v3.11.12 — 2026-10-03
 
 ### Register, not decoration — the article surface says what it means
