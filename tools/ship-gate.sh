@@ -223,6 +223,7 @@ gate "deferred panels — the nine hidden panels do not paint before first paint
 gate "public brief — the gated cockpit still says something true to a reader who cannot enter" node tools/test-dcai-public-brief.mjs
 gate "commercial surface — no newsletter capture, no paid tier, no e-mail collection" node tools/test-no-commercial-surface.mjs
 gate "page metadata — every published page is visible to a search or answer engine" node tools/test-page-metadata.mjs
+gate "meta description fit — every published description finishes inside the display cut" node tools/test-meta-description-fit.mjs
 gate "mobile nav — one hamburger per navbar, and it opens the menu" node tools/test-mobile-nav.mjs
 gate "nav tap targets — no navigation link under 24px at 390px (WCAG 2.5.8)" node tools/test-tap-targets.mjs
 gate "mobile form controls — 16px text fields, or iOS zooms the viewport" node tools/test-mobile-forms.mjs

@@ -11,6 +11,55 @@ release sections rather than semver.
 
 ---
 
+## v3.11.11 — 2026-10-03
+
+### 96 search snippets now finish instead of truncating
+
+Row 2 of the SEO ledger had been open since the audit: **96 published descriptions ran past the
+~160-character display cut**, 45 of them with no clause boundary anywhere inside the window. The row
+recorded it as not fixable, because the two obvious moves both destroy authored text — trim at a
+boundary and you discard the rest, leave it and it truncates mid-phrase.
+
+There was a third move the row did not consider: **rewrite the description so it finishes inside the
+cut.** Nothing authored is lost, because the sentence is composed to fit. Measured, most of the
+overflow was a redundant lead-in rather than substance — "Calculate X for your data center",
+"... on ResistanceZero", "Full engineering methodology for the ..." — so the information survived
+compression intact. 96 pages rewritten by hand, longest now **157 characters**, each one keeping its
+page's own vocabulary and spelling convention.
+
+### Added
+- `tools/test-meta-description-fit.mjs`, wired into `tools/ship-gate.sh`. Per page the sitemap
+  publishes: M1 a description of at least 50 characters, M2 at most 160, M3 no dangling connector or
+  trailing function word — the signature of a sentence that was cut rather than written. Proven RED
+  at exactly **96**, the same count the original audit found, which is the evidence it measures the
+  same defect.
+
+**The deferral mechanism, used and then emptied in the same release.** Three pages —
+`article-20.html`, `article-26.html`, `rfs-readiness-workbench.html` — were open in a parallel
+session's working tree (an inline-login-modal sweep), and editing a file another session is
+mid-change on means one of us silently reverts the other. They were deferred by name in a `PENDING`
+map, with rule **M4**: a pending page that already fits is reported as a FAILURE telling you to
+delete it from the list, so the exemption can only shrink and cannot quietly become where
+descriptions go to dodge the rule. Proven by shortening one in a throwaway worktree and watching M4
+fire. That session then pushed its sweep, so these three were rewritten too and **`PENDING` is empty
+again** — the only end state the mechanism accepts.
+
+This release was renumbered from v3.11.10 to **v3.11.11**: the parallel session published its own
+v3.11.10 while this work was still local, so the number was taken. Caught by comparing against
+`origin/main` before pushing rather than after.
+
+### Changed
+- `standarization/Audit result/SEO_AUDIT_LEDGER.md` — row 2 moved to CLOSED with the gate that keeps
+  it closed and the three pending pages named.
+- `llms.txt` / `llms-full.txt` regenerated: the crawler exports embed page descriptions, so all 93
+  rewrites appear there too. **18 OG cards rebuilt** for the same reason — the cards render the
+  description, so rewriting one leaves its image stale. The OG freshness gate caught all 18; none of
+  them belonged to the parallel session's pages, which was checked before rebuilding rather than
+  assumed. Regenerated with the parallel session's eight open files temporarily
+  reset to their committed content, so this release carries my text and not their unpushed work.
+
+---
+
 ## v3.11.10 — 2026-10-03
 
 ### Fixed — being signed in was what broke the PFAS calculator
