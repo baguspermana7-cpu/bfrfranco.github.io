@@ -1028,10 +1028,54 @@ function figureMarkup(fig, ctx) {
   const svg = ctx.render().replace(
     '<svg ', '<svg style="' + bounds + TOKEN_BRIDGE + '" ');
   return '\n' + svg +
-    '\n<figcaption class="rz-figcaption">' + fig.caption + '</figcaption>\n';
+    '\n<figcaption class="rz-figcaption">' + captionMarkup(fig.caption) + '</figcaption>\n';
 }
 
+/* A caption carries two different things, and they were being set in one voice.
+ *
+ * Measured across the whole corpus: all 13 captions run 276-367 characters, set
+ * in IBM Plex Mono at .78rem with .02em tracking. Mono with positive tracking is
+ * this site's instrument register -- a reading, a unit, a timestamp. Three
+ * sentences of argument in it is the typography claiming "machine output" about
+ * text that is the author arguing, and that mismatch is a large part of what the
+ * owner was pointing at.
+ *
+ * The split is not an editorial guess. Every caption was already written in the
+ * same shape: one short declarative sentence naming what the figure shows, then
+ * the argument. So the lead keeps the instrument register and the argument gets
+ * prose type. No caption text is altered -- and doing it HERE rather than in the
+ * HTML matters, because this tool owns everything between <figure> and </figure>:
+ * the same structure applied by hand in the pages was reported out of date by
+ * --check and would have been overwritten by the next build. */
+function captionMarkup(caption) {
+  const m = /\.\s+/.exec(caption);
+  if (!m) return caption;
+  const lead = caption.slice(0, m.index + 1).trim();
+  let rest = caption.slice(m.index + m[0].length).trim();
+  if (!rest || lead.length > 140) return caption;
+  // provenance stays instrument meta wherever a caption carries one
+  let src = '';
+  const sm = /Source:\s[\s\S]*$/.exec(rest);
+  if (sm) { src = sm[0].trim(); rest = rest.slice(0, sm.index).trim(); }
+  // the space between the spans is for the extractors, not the layout: both are
+  // display:block, but llms-full.txt, the PDF export and a screen reader all read
+  // the caption as continuous text and glued two sentences together without it.
+  let out = '<span class="rz-figcaption-lead">' + lead + '</span>' +
+            ' <span class="rz-figcaption-note">' + rest + '</span>';
+  if (src) out += ' <span class="rz-figcaption-src">' + src + '</span>';
+  return out;
+}
+
+/* --rz-measure: 46rem in css/rz-article-dark.css. Measured content column ~744 px;
+ * 736 is the token, and the token is what the figure has to live inside. */
+const ARTICLE_TRACK_PX = 736;
+const WIDTH_WARN_RATIO = 1.0;   // report any figure wider than the column
+const WIDTH_FAIL_RATIO = 2.0;   // past 2x, more of the figure is hidden than shown
+
 const findings = [];
+/* Overflow a reader can scroll to is a cost, not a defect. It belongs in the
+ * report so the author sees the bill, not in the exit code. */
+const notes = [];
 const written = [];
 const byPage = new Map();
 for (const fig of FIGURES) {
@@ -1051,20 +1095,34 @@ for (const [page, figs] of byPage) {
         findings.push(`${page} · ${fig.id}: ${w.kind} — ${w.message}`);
       }
     }
-    /* A figure wider than the column it lands in is scaled down, and its
-     * smallest type goes with it. The article track is about 1,100 px at a
-     * desktop reading width, so a 1,672-unit viewBox renders 8 px eyebrows at
-     * under 6 px — below the 8.5 px floor this site enforces everywhere else.
-     * Wide is not a style choice here; it is a legibility failure with a
-     * different name. Wrap the composition or stack it vertically. */
-    const ARTICLE_TRACK_PX = 1100;
-    const SMALLEST_TYPE = 9;
-    const scaled = SMALLEST_TYPE * (ARTICLE_TRACK_PX / ctx.width);
-    if (ctx.width > ARTICLE_TRACK_PX && scaled < 8.5) {
+    /* A built figure may be wider than the reading measure. That trade is
+     * deliberate and already recorded in figureMarkup(): "Scrolling a figure is
+     * a cost; being unable to read it is a defect." So the question is not
+     * whether it overflows, it is BY HOW MUCH, and where the cost stops being
+     * worth paying.
+     *
+     * This check used to compute the type size a wide figure "would" shrink to.
+     * That measured something that does not happen: .rz-figure gives the figure
+     * its own scroll track, and the SVG keeps its intrinsic size via the
+     * min-width pin -- it is clipped and scrolled, never scaled. And it was
+     * calibrated to a 1100 px column while the real one is --rz-measure: 46rem
+     * = 736 px, so it never fired once: 11 of the 12 built figures are wider
+     * than the column and the build reported PASS on all of them.
+     *
+     * What a reader actually loses is the fraction sitting outside the track on
+     * arrival. Report that for every overflowing figure; fail only past 2x,
+     * where more of the drawing is hidden than shown. */
+    const over = ctx.width / ARTICLE_TRACK_PX;
+    const hidden = Math.round((1 - 1 / over) * 100);
+    if (over > WIDTH_FAIL_RATIO) {
       findings.push(
-        `${page} · ${fig.id}: ${ctx.width} units wide renders its 8-unit type at ` +
-        `${scaled.toFixed(1)} px in a ${ARTICLE_TRACK_PX} px column, under the 8.5 px floor. ` +
-        `Stack or wrap the composition rather than letting it shrink.`);
+        `${page} · ${fig.id}: ${ctx.width} px is ${over.toFixed(2)}x the ${ARTICLE_TRACK_PX} px ` +
+        `reading column — ${hidden}% of the figure is off-screen on arrival. Past 2x the scroll ` +
+        `stops being a cost and becomes the whole experience. Stack or wrap the composition.`);
+    } else if (over > WIDTH_WARN_RATIO) {
+      notes.push(
+        `${page} · ${fig.id}: ${ctx.width} px, ${over.toFixed(2)}x the ${ARTICLE_TRACK_PX} px column ` +
+        `(${hidden}% off-screen on arrival, reachable by scrolling).`);
     }
 
     /* Audit the figure's own geometry before writing it. The engine warns about
@@ -1113,6 +1171,10 @@ console.log(`ARTICLE DIAGRAMS — ${FIGURES.length} figure(s) across ${byPage.si
 for (const fig of FIGURES) console.log(`  ${fig.page.padEnd(18)} ${fig.id}`);
 if (written.length) console.log(`  rebuilt: ${written.join(', ')}`);
 
+if (notes.length) {
+  console.log(`\n  ${notes.length} figure(s) wider than the ${ARTICLE_TRACK_PX} px reading column — scrollable, not clipped:`);
+  for (const n of notes) console.log('    ' + n);
+}
 if (findings.length) {
   console.log(`\nFAIL — ${findings.length} finding(s):`);
   for (const f of findings) console.log('  ' + f);

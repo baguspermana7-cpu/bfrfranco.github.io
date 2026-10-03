@@ -2513,9 +2513,26 @@ Muted mint           #7DDDB4   Auth pill only -- NOT primary accent
 
 ### Typography at a glance
 
+> **Reading measure — RESOLVED 2026-10-03 (v3.11.12).** Three different measures
+> were written down and none matched the CSS: this file said `1.55 / 70ch`,
+> `RESPONSIVE_STANDARD.md` said `1.75` in prose and `max-width: 760px` in a code
+> block, and the live token is `--rz-measure: 46rem` in `css/rz-article-dark.css`.
+> **The token is canonical: 46rem = 736px, 16px minimum, 1.75 leading,
+> left-aligned and justified.** `70ch` was the pre-v1.49.10 value and is the exact
+> defect that release removed — `ch` is font-size dependent, so the 1.14rem lead
+> paragraph and the 1rem body paragraph computed different widths and landed on
+> different left edges ("nggak lurus"). The 760px block in RESPONSIVE_STANDARD is
+> the legacy generic cap, overridden for editorial pages by
+> `.article-body{max-width:none}`. Grading figures or prose against any of the
+> other three numbers produces findings nobody can act on.
+>
+> One exception, deliberate: `.rz-figcaption` keeps `max-width: 68ch`. A caption
+> is a different element with its own type size, and `ch` there is bounded by the
+> prose column anyway.
+
 ```
 Headings:  IBM Plex Sans  700/600  (H1 64px down to H4 20px)
-Body:      IBM Plex Sans  400      16px / 1.55 line-height / 70ch max-width
+Body:      IBM Plex Sans  400      16px / 1.75 line-height / 46rem (736px) measure
 Numerics:  JetBrains Mono 400      tabular-nums slashed-zero (all data values)
 Captions:  JetBrains Mono 400      11px UPPERCASE 0.18em letter-spacing
 ```

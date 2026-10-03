@@ -237,6 +237,14 @@ filled the **full body width** — text stuck left, table wider than the prose, 
 .article-body > .table-wrap, .article-body > table {
     max-width: 760px; margin-left: auto; margin-right: auto;
 }
+/* NOT the editorial measure. This is the v1.49.8 GENERIC cap, and on editorial
+   pages it is overridden: css/rz-article-dark.css sets
+   .article-body{max-width:none} and caps each direct child at
+   var(--rz-measure) = 46rem = 736px, LEFT-aligned rather than centered.
+   The token is canonical -- see documentation/design.md, "Typography at a
+   glance". Resolved 2026-10-03 (v3.11.12), after three documents stated three
+   different measures and the figure-width gate was calibrated to a fourth
+   (1100px), which is why it reported PASS on all 12 built figures. */
 .article-body table { width: 100%; border-collapse: collapse; }
 @media (max-width: 900px) {
     .article-body table, .article-body .table-wrap {

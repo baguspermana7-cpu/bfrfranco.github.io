@@ -303,12 +303,29 @@ a:hover{text-decoration:underline;}
 .cx-drawer-body ol,.cx-drawer-body ul{margin:0 0 1rem 1.25rem;font-size:0.78rem;color:#94a3b8;line-height:1.7;}
 .cx-drawer-body li{margin-bottom:4px;}
 .cx-drawer-body p{font-size:0.78rem;color:#94a3b8;line-height:1.65;margin-bottom:0.75rem;}
-.cx-drawer-body .cx-acc-box{background:rgba(16,185,129,0.06);border-left:3px solid #10b981;border-radius:0 8px 8px 0;padding:12px 14px;margin-bottom:1rem;}
+/* Editorial callout language, not the rejected slab. These three carried a
+   translucent wash plus a 3px saturated accent border -- the pattern recorded as
+   rejected in CLAUDE.md ("Saturated gradient callout fills + 3-4px accent
+   borders") and flagged by audit-vibecode's colored-left-stripe rule once that
+   rule stopped exempting anything nested under a drawer. Replacement is the same
+   language css/rz-article-dark.css applies to article callouts: flat color-mix
+   tint, 1px hairline, a 2px semantic rail carried by a local --cl. The accent
+   values are the editorial semantic set, not the Tailwind defaults that were
+   here (#10b981 / #ef4444 / #3b82f6). */
+.cx-drawer-body .cx-acc-box,
+.cx-drawer-body .cx-safety-box,
+.cx-drawer-body .cx-tools-box{
+  background:color-mix(in srgb, var(--cl) 6%, transparent);
+  border:1px solid color-mix(in srgb, var(--cl) 22%, transparent);
+  border-left:2px solid var(--cl);
+  border-radius:4px;padding:12px 14px;margin-bottom:1rem;
+}
+.cx-drawer-body .cx-acc-box{ --cl:#0a8a5a; }
+.cx-drawer-body .cx-safety-box{ --cl:#dc2626; }
+.cx-drawer-body .cx-tools-box{ --cl:#1d4ed8; }
 .cx-drawer-body .cx-acc-box strong{color:#6ee7b7;font-size:0.75rem;}
 .cx-drawer-body .cx-acc-box p{color:#94a3b8;margin-bottom:4px;font-size:0.75rem;}
-.cx-drawer-body .cx-safety-box{background:rgba(239,68,68,0.06);border-left:3px solid #ef4444;border-radius:0 8px 8px 0;padding:12px 14px;margin-bottom:1rem;}
 .cx-drawer-body .cx-safety-box li{color:#fca5a5;font-size:0.75rem;}
-.cx-drawer-body .cx-tools-box{background:rgba(59,130,246,0.06);border-left:3px solid #3b82f6;border-radius:0 8px 8px 0;padding:12px 14px;margin-bottom:1rem;}
 .cx-drawer-body .cx-tools-box li{color:#93c5fd;font-size:0.75rem;}
 .cx-drawer-logsheet{width:100%;border-collapse:collapse;margin-bottom:1rem;}
 .cx-drawer-logsheet th{background:rgba(30,41,59,0.8);padding:8px 10px;text-align:left;font-size:0.7rem;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;border-bottom:1px solid rgba(148,163,184,0.1);}
@@ -627,8 +644,10 @@ a:hover{text-decoration:underline;}
 [data-theme="dark"] div > p { color:#94a3b8; }
 [data-theme="dark"] a[href$="opex-calculator.html"] { color:#34d399 !important; }
 [data-theme="dark"] #cookieDecline { color:#94a3b8 !important; }
-/* accent vars: darker in light theme (inline var() usages inherit) */
-{ --accent-purple:#64748b; --accent-emerald:#047857; --accent-cyan:#0e7490; --accent-gold:#92400e; --accent-amber:#92400e; --accent-red:#b91c1c; --accent-blue:#1d4ed8; }
+/* The block that used to sit here had NO SELECTOR -- `{ --accent-purple:...; }`
+   straight after a comment -- so the browser discarded the whole rule and none of
+   those tokens was ever defined. Removed rather than given a selector, because
+   `var(--accent-` appears zero times on this page: they were dead either way. */
 [data-theme="dark"] { --accent-purple:#67e8f9; }
 [style*="rgb(8,145,178)"] { color:#64748b !important; }
 [data-theme="dark"] [style*="rgb(8,145,178)"] { color:#67e8f9 !important; }
@@ -653,7 +672,7 @@ a[href$="opex-calculator.html"][href] { color:#34d399 !important; }
 .cx-disc-fine[class] { color:#94a3b8 !important; }
 .cx-disc-fine a { text-decoration:underline !important; text-underline-offset:2px; color:#93c5fd !important; }
 </style>
-    <script src="js/rz-version.js?v=20261003-f0e522ea" defer></script>
+    <script src="js/rz-version.js?v=20261003-d6645f1d" defer></script>
     <script src="js/rz-calc-utils.js?v=20260920-ef3425ae" defer></script>
     <script src="js/rz-explain-db.js?v=20260922-cc23355f" defer></script>
     <script src="js/rz-explain.js?v=20260920-d0317658" defer></script>

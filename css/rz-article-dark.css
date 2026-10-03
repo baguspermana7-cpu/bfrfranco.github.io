@@ -360,6 +360,26 @@ html[data-rz-register="editorial"] ::selection{
    overflow container so the PAGE never scrolls sideways because of it. --- */
 html[data-rz-register="editorial"] .rz-figure{
   margin:2.25rem 0;padding:0;max-width:100%;overflow-x:auto;
+  /* The scroll track is deliberate (see above), but it was INVISIBLE: measured on
+     article-26, 76px of 820 hidden at desktop and 370px hidden at phone width,
+     with no signal of any kind that the figure continued. A reader sees a diagram
+     that stops mid-stroke and concludes the page is broken -- which is exactly
+     what was reported.
+     The affordance is the native one, always shown rather than hover-revealed,
+     because on a touch device there is no hover to reveal it with. No animation:
+     a scrollbar that fades in is a scrollbar you can miss. */
+  scrollbar-width:thin;
+  scrollbar-color:var(--rz-line-tier-1,rgba(255,255,255,.18)) transparent;
+  padding-bottom:.35rem;
+  overscroll-behavior-x:contain;   /* a flick at the end must not navigate back */
+}
+html[data-rz-register="editorial"] .rz-figure::-webkit-scrollbar{height:6px;}
+html[data-rz-register="editorial"] .rz-figure::-webkit-scrollbar-track{background:transparent;}
+html[data-rz-register="editorial"] .rz-figure::-webkit-scrollbar-thumb{
+  background:var(--rz-line-tier-1,rgba(255,255,255,.18));border-radius:3px;
+}
+html[data-rz-register="editorial"] .rz-figure::-webkit-scrollbar-thumb:hover{
+  background:var(--rz-art-muted,rgba(255,255,255,.32));
 }
 html[data-rz-register="editorial"] .rz-figure svg{
   /* width/min-width/max-width are emitted per figure by
@@ -370,6 +390,47 @@ html[data-rz-register="editorial"] .rz-figure svg{
 }
 html[data-rz-register="editorial"] .rz-figcaption{
   margin-top:.85rem;max-width:68ch;line-height:1.6;
+}
+
+/* --- CAPTION REGISTER (v3.11.x) -----------------------------------------
+   Measured across the whole corpus, not one page: all 13 .rz-figcaption
+   entries run 276-367 characters, set in mono at .78rem with .02em tracking
+   on a 68ch measure. Mono with positive tracking is instrument meta -- a
+   reading, a unit, a timestamp. Three sentences of argument in it is the
+   register saying "machine output" about text that is the author arguing,
+   and that mismatch is most of what reads as slop here.
+
+   The captions were already written in two parts: one short declarative lead
+   naming what the figure shows, then the argument. So the split is the
+   author's own, not an editorial guess -- the lead keeps the instrument
+   register, the argument gets prose type. No caption text changes. */
+html[data-rz-register="editorial"] .rz-figcaption-lead{
+  display:block;
+  color:var(--rz-art-text,#e8ecf1) !important;
+  letter-spacing:.02em;
+}
+html[data-rz-register="editorial"] .rz-figcaption-note{
+  display:block;margin-top:.4rem;
+  font-family:'IBM Plex Sans',system-ui,-apple-system,sans-serif !important;
+  font-size:.875rem !important;
+  letter-spacing:normal;
+  line-height:1.62;
+  /* NOT plain --rz-art-muted. Taking the caption out of mono made it bigger
+     (12.5px -> 14px) but not darker, and axe measured 4.42:1 on the light theme
+     -- under the 4.5 floor for text below 18.66px. The muted token was sized for
+     short instrument meta, not for a paragraph.
+     The mix is theme-aware on purpose: it darkens toward the ink in light and
+     lightens toward it in dark, so one declaration clears both (measured 5.21:1
+     light, 8.08:1 dark) without a second hardcoded hex to keep in sync. */
+  color:color-mix(in srgb, var(--rz-art-muted) 80%, var(--rz-art-text)) !important;
+  /* 68ch in mono is a different width than 68ch in sans; the note inherits the
+     figcaption measure, which is already the narrower of the two. */
+}
+/* provenance stays instrument meta wherever a caption carries one */
+html[data-rz-register="editorial"] .rz-figcaption-src{
+  display:block;margin-top:.35rem;
+  font-size:.72rem !important;letter-spacing:.03em;
+  color:var(--rz-art-muted) !important;opacity:.85;
 }
 
 /* --- figure captions → mono, muted (matches the instrument-grade meta).

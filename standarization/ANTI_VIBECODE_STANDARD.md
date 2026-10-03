@@ -342,7 +342,34 @@ As of v1.135.2 the gate is **strict**, and coverage is:
 | Render-hosted (needs computed geometry, not text) | 20, 25 | 2 |
 | **Un-gateable judgement calls — declared, not faked** | 13, 16 | 2 |
 
-### Monitor + strict scope (v1.135.2)
+### Monitor + strict scope (v1.135.2) — OBSOLETE, see the note below
+
+> **Re-measured 2026-10-03 (v3.11.12): this carve-out no longer describes the tool, and the backlog
+> it was built for is gone.**
+>
+> - **`STRICT_SCOPE` does not exist in `tools/audit-vibecode.mjs`.** Zero occurrences. Every finding
+>   is pushed with `monitor: false`, so all three rules gate everywhere. The `monitored` channel in
+>   the reporting code can only ever be reached by `active-owner-hold`.
+> - **The baselines below are pre-sweep.** Rule 12 is recorded here at 1058 blocks / 169 files; the
+>   tool today reports **zero**. That is not a dead rule — instrumenting the funnel showed 252,319
+>   CSS blocks scanned, 56,633 passing the decorative vocabulary and **1,869 reaching the radius
+>   test**, with none over its ceiling. The radius slop really was swept.
+>
+> Leaving a pre-sweep baseline in the standard is how a working gate gets mistaken for an unwired
+> one: the UI/UX audit's first reading of "0 findings" was exactly that mistake, and it cost a
+> funnel instrumentation to disprove. A baseline in a standard needs the date it was true.
+>
+> What changed in the tool at v3.11.12, and is now the live behaviour:
+> - radius ceilings are **per register** — editorial ≤10px, instrument ≤3px, unscoped ≤8px
+> - `FUNC_SEL` is matched against the **final compound**, not the whole selector string, so slop
+>   nested under a nav/tab/drawer/form no longer disappears from all three decorative rules
+> - a **capsule** is exempt as a shape, with a panel disqualified first (see
+>   `standarization/UIUX_AUDIT_LEDGER.md` §Decisions recorded)
+>
+> Full ledger: `standarization/UIUX_AUDIT_LEDGER.md`.
+
+#### Original text (kept for the record)
+
 
 Rules 10, 11 and 12 carry a real backlog. Landing them strict site-wide would turn `main` red on
 220 files, and the only available response would be to weaken or mute them — which is exactly how

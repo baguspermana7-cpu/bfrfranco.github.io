@@ -85,7 +85,7 @@
          the editorial article skin (scoped to data-rz-register=editorial + dark),
          and the read-progress/entrance runtime. Light mode + structure untouched. -->
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
-    <link rel="stylesheet" href="css/rz-article-dark.css?v=20260921-5ead93bd">
+    <link rel="stylesheet" href="css/rz-article-dark.css?v=20261003-f67090b4">
     <script src="js/rz-explain-db.js?v=20260922-cc23355f" defer></script>
 <script src="js/rz-explain.js?v=20260920-d0317658" defer></script>
 <script src="js/rz-article-editorial.js?v=20260920-10bc5a1a" defer></script>
@@ -441,8 +441,11 @@
             font-size: 0.82rem;
             color: #e2e8f0;
             line-height: 1.8;
-            white-space: pre-wrap;
-            overflow-x: auto;
+            /* Was `pre-wrap` on the container, which is what made the markup
+             * indentation render as blank lines and the alignment spaces wrap.
+             * Preformatting now belongs to .pfas-chem-calc alone, so the
+             * container is ordinary flow and the source can be indented. */
+            white-space: normal;
         }
         @media (max-width: 768px) { .pfas-chem-block { font-size: 0.72rem; padding: 1rem 1.1rem; } }
         .pfas-chem-block .chem-label {
@@ -455,6 +458,107 @@
             display: block;
         }
         .pfas-chem-block .chem-highlight { color: #fbbf24; font-weight: 700; }
+
+        /* Two registers were sharing one class, and neither worked.
+         *
+         * `white-space: pre-wrap` preserves the alignment spaces AND wraps, so the
+         * dot leaders never held and the `overflow-x: auto` never engaged. Measured
+         * on the real 741 px column: all seven blocks wrapped, 8-16 extra lines
+         * each; at 390 px, 15-22. Block 6 rendered 14 source lines as 30, and more
+         * than half the rendered lines were continuation debris starting at the
+         * left margin -- the column where a key belongs.
+         *
+         * So the content is split by what it actually is:
+         *   .is-table        key -> value (-> provenance). That is a table. The
+         *                    label wraps in prose type; the value stays mono and
+         *                    unbroken.
+         *   .pfas-chem-calc  worked arithmetic, where column alignment carries
+         *                    meaning. `pre` + its own scroll keeps the alignment it
+         *                    promises instead of wrapping it away.
+         *   .pfas-chem-note  the read-out sentences that were sitting inside the
+         *                    mono block. Prose belongs in prose type. */
+        .pfas-chem-block.is-table { padding: 1.25rem 1.5rem 1rem; }
+
+        .pfas-chem-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+            margin: 0.35rem 0 0;
+        }
+        .pfas-chem-table td {
+            padding: 0.45rem 0.1rem;
+            border-top: 1px solid rgba(217,119,6,0.18);
+            vertical-align: baseline;
+        }
+        .pfas-chem-table tr:first-child td { border-top: 0; }
+        .pfas-chem-table .k {
+            font-family: 'IBM Plex Sans', system-ui, sans-serif;
+            color: #cbd5e1;
+            line-height: 1.5;
+            padding-right: 1rem;
+        }
+        .pfas-chem-table .v {
+            font-family: 'JetBrains Mono', monospace;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+            text-align: right;
+            color: #e2e8f0;
+            padding-right: 1rem;
+        }
+        .pfas-chem-table .n {
+            font-family: 'IBM Plex Sans', system-ui, sans-serif;
+            font-size: 0.72rem;
+            color: #94a3b8;
+            line-height: 1.45;
+            text-align: left;
+            white-space: normal;
+        }
+        .pfas-chem-table .grp td {
+            font-family: 'IBM Plex Sans', system-ui, sans-serif;
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #fcd34d;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(217,119,6,0.28);
+        }
+        /* Three columns do not fit 347 px. Below that each row becomes its own
+         * small block -- key, value, note -- in reading order. */
+        @media (max-width: 560px) {
+            .pfas-chem-table, .pfas-chem-table tbody, .pfas-chem-table tr, .pfas-chem-table td { display: block; }
+            .pfas-chem-table tr { border-top: 1px solid rgba(217,119,6,0.18); padding: 0.55rem 0; }
+            .pfas-chem-table tr:first-child { border-top: 0; }
+            .pfas-chem-table td { border-top: 0; padding: 0; }
+            .pfas-chem-table .v { text-align: left; white-space: normal; margin-top: 0.1rem; }
+            .pfas-chem-table .grp td { padding-top: 0; }
+        }
+
+        .pfas-chem-calc {
+            white-space: pre;
+            overflow-x: auto;
+            overscroll-behavior-x: contain;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(217,119,6,0.35) transparent;
+            padding-bottom: 0.3rem;
+            margin: 0;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .pfas-chem-calc::-webkit-scrollbar { height: 6px; }
+        .pfas-chem-calc::-webkit-scrollbar-track { background: transparent; }
+        .pfas-chem-calc::-webkit-scrollbar-thumb { background: rgba(217,119,6,0.35); border-radius: 3px; }
+        .pfas-chem-calc::-webkit-scrollbar-thumb:hover { background: rgba(217,119,6,0.55); }
+
+        .pfas-chem-note {
+            white-space: normal;
+            font-family: 'IBM Plex Sans', system-ui, sans-serif;
+            font-size: 0.86rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+            margin: 0.9rem 0 0;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(217,119,6,0.18);
+        }
+        .pfas-chem-note em { color: #94a3b8; font-style: normal; font-size: 0.78rem; }
 
         /* Card grid */
         .pfas-card-grid {
@@ -699,7 +803,7 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-insigh
 html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-danger-box h3 { color:#fcd34d !important; }
 html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-warning-box h3 { color:#fbbf24 !important; }
 </style>
-    <script src="js/rz-version.js?v=20261003-f0e522ea" defer></script>
+    <script src="js/rz-version.js?v=20261003-d6645f1d" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
     <script src="js/rz-cookie-consent.js?v=20260920-5569adcc" defer></script>
 <style id="rz-mobile-v18">
@@ -906,18 +1010,20 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-warnin
 
     <p>The C-F bond has a dissociation energy of approximately <span class="pfas-stat">544 kJ/mol</span> &mdash; the strongest bond in organic chemistry. Nothing in the natural world breaks it down efficiently. Not UV radiation, not biological enzymes, not soil bacteria, not the acidic environment of a human gut. This bond energy is why PFAS bioaccumulates across food chains, why it has been detected in the blood of polar bears in the Arctic and in the tissue of fish in remote mountain lakes with no industrial activity for hundreds of kilometers. Once a PFAS molecule is released into the environment, it persists. This persistence makes the amount released during operation and maintenance important to measure.</p>
 
-    <div class="pfas-chem-block">
+    <div class="pfas-chem-block is-table">
         <span class="chem-label">PFAS Bond Chemistry &mdash; Why Persistence Is the Problem</span>
-        C-F Bond Energy:  <span class="chem-highlight">544 kJ/mol</span>  (strongest bond in organic chemistry)
-        C-H Bond Energy:  413 kJ/mol  (what biodegradation enzymes target)
-        C-C Bond Energy:  347 kJ/mol
-
-        EPA MCL (PFOA + PFOS combined):  <span class="chem-highlight">4 parts per trillion</span>
-        Analogy: 1 grain of sand dissolved in an Olympic swimming pool (2,500,000 L)
-
-        Novec 7000 vapor pressure @ 25°C:  <span class="chem-highlight">650 hPa</span>
-        Water vapor pressure @ 25°C:       32 hPa
-        Vapor pressure ratio:              <span class="chem-highlight">~20× that of water</span>
+        <table class="pfas-chem-table">
+            <tr class="grp"><td colspan="3">Bond dissociation energy</td></tr>
+            <tr><td class="k">Carbon&ndash;fluorine (C&ndash;F)</td><td class="v"><span class="chem-highlight">544 kJ/mol</span></td><td class="n">Strongest bond in organic chemistry</td></tr>
+            <tr><td class="k">Carbon&ndash;hydrogen (C&ndash;H)</td><td class="v">413 kJ/mol</td><td class="n">What biodegradation enzymes target</td></tr>
+            <tr><td class="k">Carbon&ndash;carbon (C&ndash;C)</td><td class="v">347 kJ/mol</td><td class="n"></td></tr>
+            <tr class="grp"><td colspan="3">Regulatory threshold</td></tr>
+            <tr><td class="k">EPA MCL, PFOA + PFOS combined</td><td class="v"><span class="chem-highlight">4 ppt</span></td><td class="n">One grain of sand dissolved in an Olympic pool (2,500,000 L)</td></tr>
+            <tr class="grp"><td colspan="3">Volatility &mdash; why it leaves the tank</td></tr>
+            <tr><td class="k">Novec 7000 vapour pressure @ 25&nbsp;&deg;C</td><td class="v"><span class="chem-highlight">650 hPa</span></td><td class="n"></td></tr>
+            <tr><td class="k">Water vapour pressure @ 25&nbsp;&deg;C</td><td class="v">32 hPa</td><td class="n"></td></tr>
+            <tr><td class="k">Ratio</td><td class="v"><span class="chem-highlight">~20&times;</span></td><td class="n">That of water, at the same temperature</td></tr>
+        </table>
     </div>
 
     <p>The EPA's maximum contaminant level (MCL) for PFOA and PFOS in drinking water, finalized in 2024, is <span class="pfas-stat">4 parts per trillion</span> for each compound. To put that in physical terms: 4 parts per trillion is roughly equivalent to one grain of sand dissolved in 2.5 million liters of water. That regulatory threshold reflects the extreme bioaccumulation potential of these compounds. It is not that you need a large dose to cause harm &mdash; it is that small doses accumulate and concentrate in biological tissue over time.</p>
@@ -980,7 +1086,7 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-warnin
 
     <figure class="rz-figure" data-rz-figure="pfas-loss-zones">
 <svg style="max-width:820px;min-width:820px;--bg1:var(--rz-art-bg);--bg3:var(--rz-art-panel);--t1:var(--rz-art-strong);--t2:var(--rz-art-text);--t3:var(--rz-art-muted);--bd:var(--rz-art-line);--bd2:var(--rz-art-muted);--o:var(--rz-art-accent);--c:var(--rz-art-accent2);--g:var(--rz-art-accent2);--r:var(--rz-art-accent)" viewBox="0 0 820 636" role="img" aria-labelledby="pfas-loss-title pfas-loss-desc" preserveAspectRatio="xMidYMid meet"><title id="pfas-loss-title">Immersion fluid loss zones, and which ones cross a meter</title><desc id="pfas-loss-desc">A tank charge of two-phase immersion fluid leaves the system by five routes. Only the drain and transfer path is partially metered, through its recovery percentage. Maintenance vapour, quick-disconnect spillage, operating evaporative loss and three further zones carrying no published number at all are unmetered, and none of the five is reportable as an emission.</desc><defs><marker id="pfas-loss-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="var(--t2)"/></marker></defs><rect width="820" height="636" fill="var(--bg1)"/><rect x="362" y="165.33333333333334" width="430" height="353.9999999999999" rx="8" fill="none" stroke="var(--bd2)" stroke-width="0.6" stroke-dasharray="4,4"/><path d="M 272 132.66666666666669 L 380 132.66666666666669" fill="none" stroke="var(--t1)" stroke-width="1" marker-end="url(#pfas-loss-arrow)" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 272 209.33333333333334 L 372 209.33333333333334 A 8 8 0 0 1 380 217.33333333333334 L 380 235.33333333333334" fill="none" stroke="var(--t2)" stroke-width="1" stroke-dasharray="1.5,3" marker-end="url(#pfas-loss-arrow)" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 272 286 L 372 286 A 8 8 0 0 1 380 294 L 380 312" fill="none" stroke="var(--t2)" stroke-width="1" stroke-dasharray="1.5,3" marker-end="url(#pfas-loss-arrow)" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 272 362.6666666666667 L 372 362.6666666666667 A 8 8 0 0 1 380 370.6666666666667 L 380 388.6666666666667" fill="none" stroke="var(--t2)" stroke-width="1" stroke-dasharray="1.5,3" marker-end="url(#pfas-loss-arrow)" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 272 439.3333333333333 L 372 439.3333333333333 A 8 8 0 0 1 380 447.3333333333333 L 380 465.3333333333333" fill="none" stroke="var(--t2)" stroke-width="1" stroke-dasharray="1.5,3" marker-end="url(#pfas-loss-arrow)" data-rzd-transit="0" data-rzd-rerouted="0"/><rect x="40" y="56" width="232" height="460" rx="6" fill="var(--bg1)"/><rect x="40" y="56" width="232" height="460" rx="6" fill="var(--bg3)" stroke="var(--o)" stroke-width="1.4"/><rect x="52" y="262" width="52" height="12" rx="2" fill="none" stroke="var(--o)" stroke-width="0.8" opacity="0.5"/><rect x="380" y="96.66666666666669" width="394" height="72" rx="6" fill="var(--bg1)"/><rect x="380" y="96.66666666666669" width="394" height="72" rx="6" fill="var(--bg1)" stroke="var(--bd2)" stroke-width="1"/><rect x="392" y="108.66666666666669" width="59" height="12" rx="2" fill="none" stroke="var(--bd2)" stroke-width="0.8" opacity="0.5"/><rect x="380" y="199.33333333333334" width="394" height="72" rx="6" fill="var(--bg1)"/><rect x="380" y="199.33333333333334" width="394" height="72" rx="6" fill="var(--bg1)" stroke="var(--t3)" stroke-width="0.6" stroke-dasharray="4,3"/><rect x="392" y="211.33333333333334" width="66" height="12" rx="2" fill="none" stroke="var(--t3)" stroke-width="0.8" opacity="0.5"/><rect x="380" y="276" width="394" height="72" rx="6" fill="var(--bg1)"/><rect x="380" y="276" width="394" height="72" rx="6" fill="var(--bg1)" stroke="var(--t3)" stroke-width="0.6" stroke-dasharray="4,3"/><rect x="392" y="288" width="66" height="12" rx="2" fill="none" stroke="var(--t3)" stroke-width="0.8" opacity="0.5"/><rect x="380" y="352.6666666666667" width="394" height="72" rx="6" fill="var(--bg1)"/><rect x="380" y="352.6666666666667" width="394" height="72" rx="6" fill="var(--bg1)" stroke="var(--t3)" stroke-width="0.6" stroke-dasharray="4,3"/><rect x="392" y="364.6666666666667" width="66" height="12" rx="2" fill="none" stroke="var(--t3)" stroke-width="0.8" opacity="0.5"/><rect x="380" y="429.3333333333333" width="394" height="72" rx="6" fill="var(--bg1)"/><rect x="380" y="429.3333333333333" width="394" height="72" rx="6" fill="var(--bg1)" stroke="var(--t3)" stroke-width="0.6" stroke-dasharray="4,3"/><rect x="392" y="441.3333333333333" width="73" height="12" rx="2" fill="none" stroke="var(--t3)" stroke-width="0.8" opacity="0.5"/><text x="78" y="270.5" fill="var(--o)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">CHARGE</text><text x="156" y="290" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">TANK CHARGE</text><text x="156" y="304" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="400" text-anchor="middle" style="font-variant-numeric:tabular-nums">two-phase / immersion fluid</text><text x="421.5" y="117.16666666666669" fill="var(--bd2)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">PARTIAL</text><text x="577" y="136.66666666666669" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Drain / transfer residual</text><text x="577" y="150.66666666666669" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="400" text-anchor="middle" style="font-variant-numeric:tabular-nums">4-6 % retained · recovery logged</text><rect x="302.21" y="110.31666666666669" width="47.58" height="14.35" rx="2" fill="var(--bg1)"/><text x="326" y="120.66666666666669" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="400" letter-spacing="0.06em" text-anchor="middle" style="font-variant-numeric:tabular-nums">METERED</text><text x="425" y="219.83333333333334" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">NO METER</text><text x="577" y="239.33333333333334" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Maintenance vapour</text><text x="577" y="253.33333333333334" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="400" text-anchor="middle" style="font-variant-numeric:tabular-nums">3-12 L per service</text><text x="425" y="296.5" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">NO METER</text><text x="577" y="316" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Quick-disconnect spillage</text><text x="577" y="330" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="400" text-anchor="middle" style="font-variant-numeric:tabular-nums">2-3 mL per connect</text><text x="425" y="373.1666666666667" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">NO METER</text><text x="577" y="392.6666666666667" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Operating evaporative loss</text><text x="577" y="406.6666666666667" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="400" text-anchor="middle" style="font-variant-numeric:tabular-nums">17.1 %/yr measured · 1-2 %/yr claimed</text><text x="428.5" y="449.8333333333333" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">NO NUMBER</text><text x="577" y="469.3333333333333" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Three further zones</text><text x="577" y="483.3333333333333" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="400" text-anchor="middle" style="font-variant-numeric:tabular-nums">seal permeation · fill/flush · end-of-life</text><text x="374" y="179.33333333333334" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" style="font-variant-numeric:tabular-nums">OUTSIDE ANY METER — AND NONE OF IT REPORTABLE</text><line x1="32" y1="568" x2="792" y2="568" stroke="var(--bd)" stroke-width="0.8"/><text x="32" y="584" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" style="font-variant-numeric:tabular-nums">LEGEND</text><rect x="32" y="594" width="14" height="10" rx="2" fill="var(--bg3)" stroke="var(--o)" stroke-width="1.4"/><text x="54" y="602" fill="var(--t2)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="9" font-weight="400">The fluid being tracked</text><rect x="182.5924" y="594" width="14" height="10" rx="2" fill="var(--bg1)" stroke="var(--bd2)" stroke-width="1.4"/><text x="204.5924" y="602" fill="var(--t2)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="9" font-weight="400">Partially metered</text><rect x="306.5628" y="594" width="14" height="10" rx="2" fill="var(--bg1)" stroke="var(--t3)" stroke-width="1.4" stroke-dasharray="3,2"/><text x="328.5628" y="602" fill="var(--t2)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="9" font-weight="400">Unmetered</text><line x1="398.1692" y1="599" x2="414.1692" y2="599" stroke="var(--t1)" stroke-width="1.4"/><text x="420.1692" y="602" fill="var(--t2)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="9" font-weight="400">Crosses a meter</text><line x1="516.3976" y1="599" x2="532.3976" y2="599" stroke="var(--t2)" stroke-width="1.4" stroke-dasharray="1.5,3"/><text x="538.3976" y="602" fill="var(--t2)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="9" font-weight="400">No meter, no reporting line</text></svg>
-<figcaption class="rz-figcaption">Where the charge actually goes. Only the drain path crosses a meter, and even there only the recovery percentage is logged; every other route leaves the system unmeasured. The one field measurement that exists, 17.1 %/yr, is an order of magnitude above the sealed-system vendor figure.</figcaption>
+<figcaption class="rz-figcaption"><span class="rz-figcaption-lead">Where the charge actually goes.</span> <span class="rz-figcaption-note">Only the drain path crosses a meter, and even there only the recovery percentage is logged; every other route leaves the system unmeasured. The one field measurement that exists, 17.1 %/yr, is an order of magnitude above the sealed-system vendor figure.</span></figcaption>
 </figure>
     <div class="pfas-table-container">
         <table>
@@ -1184,87 +1290,75 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-warnin
     <figure class="rz-chart" data-rz-chart>
       <div class="rz-chart-canvas"><canvas></canvas></div>
       <script type="application/json" class="rz-chart-cfg">
-{"type": "line", "title": "Fluid loss — and its CO₂e footprint — scale linearly with make-up rate", "x": "Make-up rate (%/yr)", "labels": [0.5, 2, 5, 8, 10, 12, 15, 18, 20], "series": [{"label": "Annual fluid loss", "data": [0.7, 2.8, 7.0, 11.2, 14.0, 16.8, 21.0, 25.2, 28.0], "accent": "signal", "unit": "kg/yr", "axis": "y"}, {"label": "CO₂-equivalent", "data": [0.4032, 1.6128, 4.032, 6.4512, 8.064, 9.6768, 12.096, 14.5152, 16.128], "accent": "info", "unit": "t/yr", "axis": "y1"}], "y": "Fluid loss (kg/yr)", "y1": "CO₂e (t/yr)", "source": "RZ worked models · data/article-26/worked-model-scenarios.csv (3M Novec 7000, 100 L charge; GWP100 576 &mdash; IPCC AR6 WGI Table 7.SM.7, HFE-347mcc3). Field-measured make-up reaches 17.1%/yr (DoD/LBNL).", "basisTag": "modelled"}
+{"type": "line", "title": "Fluid loss — and its CO₂e footprint — scale linearly with make-up rate", "x": "Make-up rate (%/yr)", "labels": [0.5, 2, 5, 8, 10, 12, 15, 18, 20], "series": [{"label": "Annual fluid loss", "data": [0.7, 2.8, 7.0, 11.2, 14.0, 16.8, 21.0, 25.2, 28.0], "accent": "signal", "unit": "kg/yr", "axis": "y"}, {"label": "CO₂-equivalent", "data": [0.4032, 1.6128, 4.032, 6.4512, 8.064, 9.6768, 12.096, 14.5152, 16.128], "accent": "info", "unit": "t/yr", "axis": "y1"}], "y": "Fluid loss (kg/yr)", "y1": "CO₂e (t/yr)", "source": "RZ worked models · data/article-26/worked-model-scenarios.csv (3M Novec 7000, 100 L charge; GWP100 576 — IPCC AR6 WGI Table 7.SM.7, HFE-347mcc3). Field-measured make-up reaches 17.1%/yr (DoD/LBNL).", "basisTag": "modelled"}
       </script>
     </figure>
 
 
-    <div class="pfas-chem-block">
+    <div class="pfas-chem-block is-table">
         <span class="chem-label">Reference inputs (tagged)</span>
-        Single immersion tank charge .......  <span class="chem-highlight">800 L</span>        [illustrative — mid-range tank]
-        Fluid unit price ...................  <span class="chem-highlight">$70 / L</span>      [vendor — midpoint of $50–90/L]
-        Fluid density (HFE / Novec-class) ..  1.40 kg / L     [vendor datasheet]
-        Make-up rate — well-run ............  2 %/yr          [vendor — "sealed" claim, low end]
-        Make-up rate — measured field ......  <span class="chem-highlight">17.1 %/yr</span>     [published — DoD/LBNL [16]]
-        QD spillage ........................  3 mL / connect  [published — dry-break [16]]
-        100-yr GWP (Novec 7000 / HFE-7000) .   576            [IPCC AR6 — HFE-347mcc3]
-        100-yr GWP (Galden-class PFPE) .....  ~10,000         [vendor / literature]
+        <table class="pfas-chem-table">
+            <tr><td class="k">Single immersion tank charge</td><td class="v"><span class="chem-highlight">800 L</span></td><td class="n">Illustrative &mdash; mid-range tank</td></tr>
+            <tr><td class="k">Fluid unit price</td><td class="v"><span class="chem-highlight">$70 / L</span></td><td class="n">Vendor &mdash; midpoint of $50&ndash;90/L</td></tr>
+            <tr><td class="k">Fluid density (HFE / Novec-class)</td><td class="v">1.40 kg / L</td><td class="n">Vendor datasheet</td></tr>
+            <tr><td class="k">Make-up rate &mdash; well-run</td><td class="v">2 %/yr</td><td class="n">Vendor &mdash; &ldquo;sealed&rdquo; claim, low end</td></tr>
+            <tr><td class="k">Make-up rate &mdash; measured field</td><td class="v"><span class="chem-highlight">17.1 %/yr</span></td><td class="n">Published &mdash; DoD/LBNL [16]</td></tr>
+            <tr><td class="k">QD spillage</td><td class="v">3 mL / connect</td><td class="n">Published &mdash; dry-break [16]</td></tr>
+            <tr><td class="k">100-yr GWP (Novec 7000 / HFE-7000)</td><td class="v">576</td><td class="n">IPCC AR6 &mdash; HFE-347mcc3</td></tr>
+            <tr><td class="k">100-yr GWP (Galden-class PFPE)</td><td class="v">~10,000</td><td class="n">Vendor / literature</td></tr>
+        </table>
     </div>
 
     <div class="pfas-chem-block">
-        <span class="chem-label">Model A — annual loss &amp; cost, single 800 L tank</span>
-        Evaporative / maintenance loss
-          well-run :  0.020 × 800 L  =   <span class="chem-highlight">16 L/yr</span>
-          field    :  0.171 × 800 L  =  <span class="chem-highlight">137 L/yr</span>
+        <span class="chem-label">Model A &mdash; annual loss &amp; cost, single 800 L tank</span>
+        <p class="pfas-chem-calc">Evaporative / maintenance loss
+  well-run :  0.020 &times; 800 L  =   <span class="chem-highlight">16 L/yr</span>
+  field    :  0.171 &times; 800 L  =  <span class="chem-highlight">137 L/yr</span>
 
-        Quick-disconnect spillage (20 connects × 4 services/yr)
-          20 × 3 mL × 4  =  240 mL  =  0.24 L/yr     ← negligible beside evaporation
+Quick-disconnect spillage (20 connects &times; 4 services/yr)
+  20 &times; 3 mL &times; 4  =  240 mL  =  0.24 L/yr     &larr; negligible beside evaporation
 
-        Fluid replacement cost @ $70/L
-          well-run :   16 L × $70  =   <span class="chem-highlight">$1,120 / yr</span>
-          field    :  137 L × $70  =   <span class="chem-highlight">$9,590 / yr</span>
-
-        Read-out: even the "good" tank quietly spends four figures a year replacing
-        fluid that went to atmosphere; the measured-field tank approaches $10k/yr — per tank.
+Fluid replacement cost @ $70/L
+  well-run :   16 L &times; $70  =   <span class="chem-highlight">$1,120 / yr</span>
+  field    :  137 L &times; $70  =   <span class="chem-highlight">$9,590 / yr</span></p>
+        <p class="pfas-chem-note">Even the &ldquo;good&rdquo; tank quietly spends four figures a year replacing fluid that went to atmosphere; the measured-field tank approaches $10k/yr &mdash; per tank.</p>
     </div>
 
     <div class="pfas-chem-block">
-        <span class="chem-label">Model B — per-MW reference hall (8 × 800 L tanks ≈ 6,400 L)</span>
-        Charge ........................  8 × 800 L  =  6,400 L
-        Annual loss
-          well-run :  0.020 × 6,400  =    128 L/yr   →   $8,960 / yr
-          field    :  0.171 × 6,400  =  1,094 L/yr   →  <span class="chem-highlight">$76,600 / yr</span>
+        <span class="chem-label">Model B &mdash; per-MW reference hall (8 &times; 800 L tanks &asymp; 6,400 L)</span>
+        <p class="pfas-chem-calc">Charge  =  8 &times; 800 L  =  6,400 L
 
-        Per-MW fluid-replacement OPEX therefore runs ~$9k–$77k/yr.
-        Independent analyses put fluid loss at 5–12% of the OPEX savings that
-        justified the immersion build in the first place — a real erosion of the
-        business case, hidden inside the consumables line.
+Annual loss
+  well-run :  0.020 &times; 6,400  =    128 L/yr   &rarr;   $8,960 / yr
+  field    :  0.171 &times; 6,400  =  1,094 L/yr   &rarr;  <span class="chem-highlight">$76,600 / yr</span></p>
+        <p class="pfas-chem-note">Per-MW fluid-replacement OPEX therefore runs ~$9k&ndash;$77k/yr. Independent analyses put fluid loss at 5&ndash;12% of the OPEX savings that justified the immersion build in the first place &mdash; a real erosion of the business case, hidden inside the consumables line.</p>
     </div>
 
     <div class="pfas-chem-block">
-        <span class="chem-label">Model C — GWP-weighted emissions, single tank at field loss (137 L)</span>
-        Loss mass  =  137 L × 1.40 kg/L  =  <span class="chem-highlight">192 kg/yr</span>
+        <span class="chem-label">Model C &mdash; GWP-weighted emissions, single tank at field loss (137 L)</span>
+        <p class="pfas-chem-calc">Loss mass  =  137 L &times; 1.40 kg/L  =  <span class="chem-highlight">192 kg/yr</span>
 
-        CO₂e if HFE / Novec 7000 (GWP 576)
-          192 kg × 576 / 1000  =   <span class="chem-highlight">111 t CO₂e / yr</span>    ≈ 23 average US cars
+CO&#8322;e if HFE / Novec 7000 (GWP 576)
+  192 kg &times; 576 / 1000  =   <span class="chem-highlight">111 t CO&#8322;e / yr</span>    &asymp; 23 average US cars
 
-        CO₂e if Galden-class PFPE (GWP ~10,000 — commonly cited but disputed*)
-          192 kg × 10,000 / 1000  =  <span class="chem-highlight">1,920 t CO₂e / yr</span>  ≈ 400 cars
-
-        The fluid choice swings the climate footprint of the *same leak* by ~17×.
-        None of this appears in a facility's Scope-1 inventory today.
-        * PFPEs are nearly involatile, so the effective atmospheric GWP is contested;
-          treat the Galden line as an illustrative upper bound (see fluid-properties.csv).
+CO&#8322;e if Galden-class PFPE (GWP ~10,000 &mdash; commonly cited but disputed*)
+  192 kg &times; 10,000 / 1000  =  <span class="chem-highlight">1,920 t CO&#8322;e / yr</span>  &asymp; 400 cars</p>
+        <p class="pfas-chem-note">The fluid choice swings the climate footprint of the <i>same leak</i> by ~17&times;. None of this appears in a facility&rsquo;s Scope-1 inventory today.<br><em>* PFPEs are nearly involatile, so the effective atmospheric GWP is contested; treat the Galden line as an illustrative upper bound (see fluid-properties.csv).</em></p>
     </div>
 
     <div class="pfas-chem-block">
-        <span class="chem-label">Model D — HFO → TFA 10-year loading, single Opteon-class tank</span>
-        HFO density 1.37 kg/L ; MW(HFO-1336mzz-Z) 164 ; MW(TFA) 114 → ratio 0.695
-        TFA yield = the undisclosed variable → modelled at 50% and 100% of a single-TFA path
+        <span class="chem-label">Model D &mdash; HFO &rarr; TFA 10-year loading, single Opteon-class tank</span>
+        <p class="pfas-chem-calc">HFO density 1.37 kg/L ; MW(HFO-1336mzz-Z) 164 ; MW(TFA) 114  &rarr;  ratio 0.695
+TFA yield = the undisclosed variable  &rarr;  modelled at 50% and 100% of a single-TFA path
 
-        10-yr cumulative HFO loss (field 17.1%/yr × 800 L × 1.37 kg/L × 10)
-          ≈ 1,874 kg HFO over a decade
+10-yr cumulative HFO loss (field 17.1%/yr &times; 800 L &times; 1.37 kg/L &times; 10)
+  &asymp; 1,874 kg HFO over a decade
 
-        TFA formed over 10 yr
-          yield 50%  :  1,874 × 0.695 × 0.50  =   <span class="chem-highlight">651 kg TFA</span>
-          yield 100% :  1,874 × 0.695 × 1.00  =  <span class="chem-highlight">1,303 kg TFA</span>
-          (the molecule carries two CF₃ groups — a two-TFA path could double this)
-
-        Hundreds of kilograms to over a tonne of a persistent, water-mobile acid
-        from ONE tank over a typical service life — entering watersheds where the
-        modelled rainwater background is already ~0.89 µg/L [18]. This is the number
-        the "PFAS-free" replacement story leaves out, and the yield that would pin
-        it down is the figure vendors do not publish.
+TFA formed over 10 yr
+  yield  50%  :  1,874 &times; 0.695 &times; 0.50  =   <span class="chem-highlight">651 kg TFA</span>
+  yield 100%  :  1,874 &times; 0.695 &times; 1.00  =  <span class="chem-highlight">1,303 kg TFA</span>
+  (the molecule carries two CF&#8323; groups &mdash; a two-TFA path could double this)</p>
+        <p class="pfas-chem-note">Hundreds of kilograms to over a tonne of a persistent, water-mobile acid from ONE tank over a typical service life &mdash; entering watersheds where the modelled rainwater background is already ~0.89 &micro;g/L [18]. This is the number the &ldquo;PFAS-free&rdquo; replacement story leaves out, and the yield that would pin it down is the figure vendors do not publish.</p>
     </div>
 
     <div class="pfas-warning-box">
@@ -1281,21 +1375,22 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-warnin
 
     <p>Chemours' primary replacement offering, Opteon 2P50, is based on HFO-1336mzz-Z, a hydrofluoroolefin compound. The "hydrofluoroolefin" classification is meaningful: HFOs contain carbon-fluorine bonds (which is why they have the thermal and dielectric properties needed for immersion cooling), but they also have a carbon-carbon double bond that makes them more reactive &mdash; meaning they break down in the atmosphere significantly faster than traditional PFAS. Opteon 2P50 has an atmospheric half-life of approximately <span class="pfas-stat">26 days</span>, compared to effectively infinite persistence for PFOA and PFOS. This is a genuine improvement. It is not, however, the end of the story.</p>
 
-    <div class="pfas-chem-block">
+    <div class="pfas-chem-block is-table">
         <span class="chem-label">HFO Degradation Pathway &mdash; What Happens After Atmospheric Breakdown</span>
-        HFO-1336mzz-Z  →  (UV photolysis, OH radical reaction)  →  <span class="chem-highlight">CF3COOH</span>
-                                                                         (Trifluoroacetic Acid / TFA)
-
-        TFA Properties:
-          Atmospheric lifetime:    <span class="chem-highlight">Effectively persistent in water</span>
-          Water solubility:        Very high — leaches into groundwater rapidly
-          C-F bonds:              <span class="chem-highlight">3 C-F bonds per molecule</span>
-          Regulated by EPA:        No
-          Monitored in DCs:        No
-          Known health effects:    Under active research — reproductive &amp; developmental concerns
-
-        Global TFA background levels in rainwater: rising since 1990s
-        Projected increase from HFO adoption: <span class="chem-highlight">Not modeled by EPA or DOE</span>
+        <p class="pfas-chem-calc">HFO-1336mzz-Z  &rarr;  (UV photolysis, OH radical reaction)  &rarr;  <span class="chem-highlight">CF3COOH</span>
+                                                            (Trifluoroacetic acid / TFA)</p>
+        <table class="pfas-chem-table">
+            <tr class="grp"><td colspan="3">TFA properties</td></tr>
+            <tr><td class="k">Atmospheric lifetime</td><td class="v"><span class="chem-highlight">Persistent</span></td><td class="n">Effectively so, in water</td></tr>
+            <tr><td class="k">Water solubility</td><td class="v">Very high</td><td class="n">Leaches into groundwater rapidly</td></tr>
+            <tr><td class="k">C&ndash;F bonds per molecule</td><td class="v"><span class="chem-highlight">3</span></td><td class="n"></td></tr>
+            <tr><td class="k">Regulated by EPA</td><td class="v">No</td><td class="n"></td></tr>
+            <tr><td class="k">Monitored in data centres</td><td class="v">No</td><td class="n"></td></tr>
+            <tr><td class="k">Known health effects</td><td class="v">Under study</td><td class="n">Reproductive &amp; developmental concerns</td></tr>
+            <tr class="grp"><td colspan="3">Background trend</td></tr>
+            <tr><td class="k">Global TFA in rainwater</td><td class="v">Rising</td><td class="n">Since the 1990s</td></tr>
+            <tr><td class="k">Projected increase from HFO adoption</td><td class="v"><span class="chem-highlight">Not modelled</span></td><td class="n">Neither EPA nor DOE publishes one</td></tr>
+        </table>
     </div>
 
     <p>The primary atmospheric breakdown product of HFO-1336mzz-Z is trifluoroacetic acid &mdash; TFA. TFA contains three C-F bonds. TFA is highly water-soluble and integrates rapidly into the hydrological cycle: it washes out of the atmosphere in rainfall, accumulates in surface water and groundwater, and does not biodegrade under natural conditions &mdash; peer-reviewed reviews describe it as effectively non-removable by conventional water treatment and persistent at watershed scale [23]. The degradation yields are not uniform across these fluids: the closely related refrigerant R-1234yf degrades to TFA at a molar yield approaching 100%, while R-1233zd(E) yields only about 2% [17] &mdash; which is precisely why the yield for a given two-phase fluid matters and why vendors not disclosing it is a meaningful gap. TFA is not regulated by the EPA. It is not monitored by the EPA. It is not listed under PFAS regulatory frameworks because it was not among the compounds originally targeted by PFAS remediation efforts, and because its association with HFO degradation is a relatively recent area of scientific focus.</p>
@@ -1732,7 +1827,7 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-warnin
                     </div>
                     <div class="pfas-chart-container"><canvas id="pfasMCChart"></canvas></div>
                 </div>
-                <div class="pfas-gate" id="pfasGate1"><i class="fas fa-lock"></i><p>Monte Carlo analysis requires Full access access</p><button class="pfas-gate-btn" onclick="pfasSetMode('pro')">Sign in for the full analysis</button></div>
+                <div class="pfas-gate" id="pfasGate1"><i class="fas fa-lock"></i><p>Monte Carlo analysis requires full access</p><button class="pfas-gate-btn" onclick="pfasSetMode('pro')">Sign in for the full analysis</button></div>
             </div>
 
             <!-- Panel 2: Regulatory Timeline 2024-2029 -->
@@ -1749,7 +1844,7 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-warnin
                     </div>
                     <div class="pfas-chart-container"><canvas id="pfasRegChart"></canvas></div>
                 </div>
-                <div class="pfas-gate" id="pfasGate2"><i class="fas fa-lock"></i><p>Regulatory timeline requires Full access access</p><button class="pfas-gate-btn" onclick="pfasSetMode('pro')">Sign in for the full analysis</button></div>
+                <div class="pfas-gate" id="pfasGate2"><i class="fas fa-lock"></i><p>Regulatory timeline requires full access</p><button class="pfas-gate-btn" onclick="pfasSetMode('pro')">Sign in for the full analysis</button></div>
             </div>
 
             <!-- Panel 3: Sensitivity Tornado -->
@@ -1766,7 +1861,7 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-warnin
                     </div>
                     <div class="pfas-chart-container"><canvas id="pfasTornadoChart"></canvas></div>
                 </div>
-                <div class="pfas-gate" id="pfasGate3"><i class="fas fa-lock"></i><p>Sensitivity analysis requires Full access access</p><button class="pfas-gate-btn" onclick="pfasSetMode('pro')">Sign in for the full analysis</button></div>
+                <div class="pfas-gate" id="pfasGate3"><i class="fas fa-lock"></i><p>Sensitivity analysis requires full access</p><button class="pfas-gate-btn" onclick="pfasSetMode('pro')">Sign in for the full analysis</button></div>
             </div>
 
             <!-- Panel 4: Strategic Roadmap -->
@@ -1777,7 +1872,7 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-warnin
                 <div class="pfas-pro-panel-inner">
                     <div id="pfasRoadmap" style="font-size:0.875rem;line-height:1.7;color:#374151;"></div>
                 </div>
-                <div class="pfas-gate" id="pfasGate4"><i class="fas fa-lock"></i><p>Strategic roadmap requires Full access access</p><button class="pfas-gate-btn" onclick="pfasSetMode('pro')">Sign in for the full analysis</button></div>
+                <div class="pfas-gate" id="pfasGate4"><i class="fas fa-lock"></i><p>Strategic roadmap requires full access</p><button class="pfas-gate-btn" onclick="pfasSetMode('pro')">Sign in for the full analysis</button></div>
             </div>
 
             <!-- Panel 5: Fluid-Loss & Environmental Cost -->
@@ -1795,7 +1890,7 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-warnin
                     </div>
                     <p style="font-size:0.72rem;color:#9ca3af;margin:0.75rem 0 0;line-height:1.6;">Illustrative model — fluid density, unit price (<span style="white-space:nowrap;">$50–90/L</span>), GWP and TFA molar yield are representative published/vendor values; results scale linearly with the maintenance-vapor estimate above. Make-up rate shown as % of installed charge.</p>
                 </div>
-                <div class="pfas-gate" id="pfasGate5"><i class="fas fa-lock"></i><p>Fluid-loss cost model requires Full access access</p><button class="pfas-gate-btn" onclick="pfasSetMode('pro')">Sign in for the full analysis</button></div>
+                <div class="pfas-gate" id="pfasGate5"><i class="fas fa-lock"></i><p>Fluid-loss cost model requires full access</p><button class="pfas-gate-btn" onclick="pfasSetMode('pro')">Sign in for the full analysis</button></div>
             </div>
         </div>
 
@@ -1816,7 +1911,7 @@ html[data-rz-register="editorial"][data-theme="dark"] .article-body .pfas-warnin
     <div class="pfas-login-overlay" id="pfasLoginOverlay">
         <div class="pfas-login-box">
             <button class="pfas-login-close" onclick="pfasHideLogin()">&times;</button>
-            <h3><i class="fas fa-lock" style="color:#b45309;"></i> Full analysis — PFAS Risk</h3>
+            <h3><i class="fas fa-lock" style="color:var(--rz-signal-amber,#b45309);"></i> Full analysis — PFAS Risk</h3>
             <p>Sign in for Monte Carlo simulation, regulatory timeline 2024–2029, sensitivity tornado chart, and strategic roadmap for your facility.</p>
             <input type="email" id="pfasLoginEmail" placeholder="Email address" autocomplete="email" aria-label="Email address">
             <input type="password" id="pfasLoginPass" placeholder="Password" aria-label="Password">
@@ -2259,6 +2354,12 @@ function copyLink() {
     window.addEventListener('storage', function (e) {
         if (!e || e.key === 'rz_premium_session') checkSession();
     });
+    /* Signed out, nothing calls lockPanels() on arrival, so the affordance was
+     * only correct by accident -- the markup default. Measured: anon had the
+     * right icon and no aria-label at all. State the state once, explicitly. */
+    document.addEventListener('DOMContentLoaded', function () {
+        if (typeof syncLockAffordance === 'function') syncLockAffordance();
+    });
 
     function activatePremiumUI() {
         isPremium = true;
@@ -2328,7 +2429,24 @@ function copyLink() {
         calculate();
     };
 
+    /* The closed padlock on #pfasProBtn was hardcoded in the markup, so it stayed
+     * shut after the panels opened. An affordance that contradicts the state it
+     * describes is worse than no affordance: the reader trusts the icon and
+     * concludes the feature is broken -- which is how "full analysis tidak aktif"
+     * gets reported about a page that is working. Icon and label follow isPremium. */
+    function syncLockAffordance() {
+        var proBtn = document.getElementById('pfasProBtn');
+        if (!proBtn) return;
+        var icon = proBtn.querySelector('i');
+        if (icon) icon.className = isPremium ? 'fas fa-lock-open' : 'fas fa-lock';
+        proBtn.setAttribute('aria-label',
+            isPremium ? 'Full analysis — unlocked' : 'Full analysis — sign in required');
+        if (!isPremium) proBtn.setAttribute('aria-describedby', 'pfasGate1');
+        else proBtn.removeAttribute('aria-describedby');
+    }
+
     function unlockPanels() {
+        syncLockAffordance();
         ['pfasGate1','pfasGate2','pfasGate3','pfasGate4','pfasGate5'].forEach(function(id) {
             var el = document.getElementById(id);
             if (el) el.classList.add('hidden');
@@ -2336,6 +2454,7 @@ function copyLink() {
     }
 
     function lockPanels() {
+        syncLockAffordance();
         ['pfasGate1','pfasGate2','pfasGate3','pfasGate4','pfasGate5'].forEach(function(id) {
             var el = document.getElementById(id);
             if (el) el.classList.remove('hidden');

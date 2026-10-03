@@ -99,8 +99,63 @@ const DECOR_SEL = /(card|panel|tile|bento|hero|badge|chip|widget|item|box|callou
    'a modal backdrop is functional, not decorative glass'. */
 const FUNC_SEL = /(nav|navbar|modal|overlay|backdrop|gate|search|palette|ticker|dropdown|tooltip|sticky|header|drawer|sheet|toast|banner|menu|btn|button|input|select|field|form|dialog|popover|inspector|hmi|tab|scroll|cursor|marquee|share)/i;
 
+/* FUNC_SEL is tested against the FINAL compound -- the element that actually gets
+   painted -- not the whole selector string.
+   `.ltc-tab-panel > div > .feature-block { border-radius: 10px }` is a decorative
+   block, and it was exempt because the word "tab" appears on an ANCESTOR. Measured
+   across css/ and styles*: 31 decorative blocks were exempted only by an ancestor
+   compound. One of them carried an over-ceiling radius, so the leak is small --
+   but it is unbounded by construction, because any slop nested under a nav, tab,
+   drawer or form disappears from all three decorative rules at once. */
+function finalCompounds(sel) {
+  return sel.split(',').map(s => s.trim().split(/\s+|>|\+|~/).filter(Boolean).pop() || '');
+}
 function decorBlocks(t) {
-  return cssBlocks(t).filter((b) => /^(?:[.#[:]|html\b|body\b)/.test(b.sel) && DECOR_SEL.test(b.sel) && !FUNC_SEL.test(b.sel));
+  return cssBlocks(t).filter((b) => /^(?:[.#[:]|html\b|body\b)/.test(b.sel) && DECOR_SEL.test(b.sel)
+    && !finalCompounds(b.sel).some(c => FUNC_SEL.test(c)));
+}
+/* A CAPSULE is a shape, not a rounded panel.
+   `border-radius: 50px` on a 22px-tall inline pill is not "rounded everything" --
+   it is how a pill is drawn, and clamping it to 8px would make it a rounded
+   rectangle nobody asked for. DARK_MODE_STANDARD rule 5 is about panels.
+   The existing exemption only covered 50%/100%, which misses every capsule
+   written in px. Bounded deliberately: the radius must be large enough that it
+   can only be making a capsule (>= 24px, i.e. past any panel radius this site
+   uses) AND the painted element must name itself a capsule. An icon TILE does not
+   qualify -- a 58px square at 14px radius is a rounded panel with a glyph in it,
+   and it stays reported. */
+const CAPSULE_SEL = /(?:pill|badge|chip|tag|dot)\b/i;
+function isCapsule(sel, body, lengths) {
+  if (!CAPSULE_SEL.test(finalCompounds(sel).join(' '))) return false;
+  /* Disqualify a PANEL before looking at the radius at all. The first version of
+     this exemption checked "radius >= 24" first, and a seeded
+     `.probe-badge-panel { display:block; height:120px; border-radius:28px }`
+     walked straight through it -- the exemption I had just written to stop
+     laundering was laundering. A capsule is small and inline; a declared block
+     display, or a height past ~32px, says panel whatever the name claims. */
+  const h = /(?:^|[;{\s])height\s*:\s*(-?\d*\.?\d+)(px|rem)?/.exec(body);
+  if (h) {
+    const px = h[2] === 'rem' ? parseFloat(h[1]) * PIXELS_PER_REM : parseFloat(h[1]);
+    if (px > 32) return false;
+  }
+  if (/display\s*:\s*(?:block|flex|grid|table)\b/.test(body)) return false;
+  // written as a capsule outright: past any panel radius this site uses
+  if (lengths.some(l => l >= 24)) return true;
+  /* Or inferred from the box the same block declares. An INLINE element with no
+     height and <= 4px of vertical padding is text-height tall -- about 20-24px --
+     so a radius of 8-10px rounds it fully. `.staffing-table .fte-badge` is
+     `inline-block; padding: 2px 8px; border-radius: 10px`: a capsule, measured
+     22px tall, which a 24px threshold alone would have reported as a rounded
+     panel. Requiring all three signals keeps this from exempting a real panel
+     that merely has "badge" in its name. */
+  if (/height\s*:/.test(body)) return false;
+  if (!/display\s*:\s*inline(?:-block|-flex)?\b/.test(body)) return false;
+  const pad = /(?:^|[;{\s])padding\s*:\s*([^;}]+)/.exec(body);
+  if (!pad) return false;
+  const first = (pad[1].trim().match(/^(-?\d*\.?\d+)(px|rem)?/) || [])[0];
+  if (first === undefined) return false;
+  const vertical = /rem$/.test(first) ? parseFloat(first) * PIXELS_PER_REM : parseFloat(first);
+  return vertical <= 4 && lengths.some(l => l >= 8);
 }
 
 const PIXELS_PER_REM = 16;
@@ -151,8 +206,33 @@ function decorativeFindings(text, file, rule) {
     if (radii.some(value => /^(50%|100%)\s*(?:!important)?$/.test(value))) return false;
     if (/(?:login-box|tipbox|tt-box|side-panel)\b/i.test(block.sel)) return false;
     if (rule === 'large-radius') {
-      return declarations(block.body, 'border(?:-(?:top|bottom)-(?:left|right))?-radius')
-        .some(value => resolvedLengths(value, tokens).some(length => length >= 8));
+      /* The ceiling is the REGISTER's, not one number for the whole site.
+       *
+       * This rule read >= 8px everywhere while design.md s16.2 and
+       * DARK_MODE_STANDARD.md rule 5 sanction 10px for the editorial register and
+       * <= 3px for instrument -- so the project's own compliant editorial value
+       * failed its own gate, and an instrument surface could sit at 7px and pass.
+       * Grading against a rule that contradicts the standard produces findings
+       * nobody can act on, which is how a gate gets ignored.
+       *
+       * Measured before changing: of 86 blocks at radius >= 8px, 2 are
+       * editorial-scoped (both exactly 8px, both already exempt by name --
+       * `figure img`, `.rz-diagram svg`), 1 is instrument-scoped (4px, a
+       * dropdown, functional), and the other 83 are unscoped. NOTHING currently
+       * sits in the gap, so this closes a LATENT contradiction: it changes no
+       * live finding, and a later reader must not take "0 findings" as evidence
+       * the register logic was exercised. The fixtures seed one violation per
+       * register for exactly that reason.
+       *
+       * Unscoped keeps 8: a rule that names no register lands in both, so it has
+       * to satisfy the stricter of the two surfaces it will actually paint. */
+      const ceiling = /\[data-rz-register=["']?editorial/.test(block.sel) ? 10
+        : /\[data-rz-register=["']?instrument/.test(block.sel) ? 3
+        : 8;
+      const radiusLengths = declarations(block.body, 'border(?:-(?:top|bottom)-(?:left|right))?-radius')
+        .flatMap(value => resolvedLengths(value, tokens));
+      if (isCapsule(block.sel, block.body, radiusLengths)) return false;
+      return radiusLengths.some(length => length > ceiling);
     }
     if (rule === 'colored-left-stripe') {
       if (SAFETY_RAIL_SEL.test(block.sel)) return false;

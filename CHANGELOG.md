@@ -11,6 +11,137 @@ release sections rather than semver.
 
 ---
 
+## v3.11.12 — 2026-10-03
+
+### Register, not decoration — the article surface says what it means
+
+Owner report: the article theme still read as "AI design slop", with a figure
+cut off at the frame. Four defects, each measured in a browser before and after.
+
+**The figure-width gate had never fired once.** `ARTICLE_TRACK_PX` in
+`tools/build-article-diagrams.mjs` was 1100 while the real reading column is
+`--rz-measure: 46rem` = 736 px, so the build reported PASS on every figure —
+including the two widest, `method-assessment` at 1068 px in articles 6 and 8,
+which hide 31 % of themselves behind a scroll. It also measured the wrong thing:
+it computed the type size a wide figure "would" shrink to, but a figure is never
+scaled — `.rz-figure` gives it a scroll track and the min-width pin keeps it 1:1.
+Rewritten around the real mechanism: report each figure's overflow ratio and the
+fraction off-screen on arrival, fail only past 2× the column. Proven in both
+directions — 11 figures now reported, 0 failing; lowering the threshold to 1.4
+produces exactly the 3 expected failures.
+
+**The padlock contradicted the state it described.** `#pfasProBtn` carried
+`fa-lock` hardcoded in markup, so a signed-in root saw unlocked panels behind a
+button still wearing a closed padlock. `syncLockAffordance()` now drives the icon
+and `aria-label` from `isPremium`, and is called on arrival in both states —
+measured: anon previously had no `aria-label` at all. Five gate panels also said
+"requires Full access access"; the inline amber hex on the login heading now
+resolves through `--rz-signal-amber`.
+
+**The chemistry blocks were two registers sharing one class, and neither worked.**
+`white-space: pre-wrap` preserves alignment spaces *and* wraps, so the dot leaders
+never held and `overflow-x: auto` never engaged. Measured on the real 741 px
+column: all seven blocks wrapped, 8–16 extra lines each; at 390 px, 15–22. Block 6
+rendered 14 source lines as 30, more than half of them continuation debris in the
+column where a key belongs. Split by what the content is: three key→value blocks
+became real tables (`.pfas-chem-table`, stacking below 560 px), four worked
+calculations became `.pfas-chem-calc` with `white-space: pre` and their own
+scroller — alignment now holds, and all five scrollers reach their end on a phone
+viewport with no page-level horizontal scroll — and the read-out sentences that
+were sitting inside the mono blocks moved to `.pfas-chem-note` in prose type.
+
+**Captions were arguing in an instrument voice.** Measured across the whole corpus,
+not one page: all 13 `.rz-figcaption` entries run 276–367 characters in IBM Plex
+Mono at .78 rem with .02em tracking. Mono with positive tracking is this site's
+register for a reading or a unit; three sentences of argument in it is the
+typography claiming "machine output" about the author arguing. Every caption was
+already written as one short declarative lead plus the argument, so the split is
+the author's own: `.rz-figcaption-lead` keeps mono, `.rz-figcaption-note` gets
+prose type, provenance stays instrument meta in `.rz-figcaption-src`. No caption
+text changed — verified character-for-character against HEAD across all 13.
+
+The split lives in `captionMarkup()` inside the build tool, not in the pages: this
+tool owns everything between `<figure>` and `</figure>`, and the same structure
+applied by hand was reported out of date by `--check` and would have been
+overwritten by the next build. Article 28's figure is hand-authored and carries no
+`data-rz-figure`, so it keeps its own copy.
+
+### The rules the gates were graded against disagreed with each other
+
+Three documents stated three different reading measures and the figure gate was
+calibrated to a fourth. `--rz-measure: 46rem` = 736px is now canonical, recorded
+in `documentation/design.md`; `design.md`'s `1.55 / 70ch` was corrected (`70ch` is
+the pre-v1.49.10 value and is the exact defect that release removed — `ch` is
+font-size dependent, so the lead and body paragraphs landed on different left
+edges), and `RESPONSIVE_STANDARD.md`'s `760px` block is annotated as the legacy
+generic cap it is.
+
+**Radius ceilings are now per register** in `tools/audit-vibecode.mjs` — editorial
+≤10px, instrument ≤3px, unscoped ≤8px — matching `design.md` §16.2 and
+`DARK_MODE_STANDARD.md` rule 5. The gate had read ≥8px everywhere, so the
+project's own compliant editorial value failed its own gate while an instrument
+surface could sit at 7px and pass. Measured first: of 86 blocks at radius ≥8px,
+2 are editorial-scoped (both exactly 8px, both already exempt by name) and 1 is
+instrument-scoped (4px, functional) — nothing sat in the gap, so this closes a
+*latent* contradiction and changes no live finding. Fixtures seed one violation
+per register so a later reader cannot take "0 findings" as evidence the register
+logic was exercised.
+
+**`FUNC_SEL` now matches the final compound**, not the whole selector string.
+`.ltc-tab-panel > div > .feature-block { border-radius: 10px }` was exempt because
+the word "tab" appears on an *ancestor*; 31 decorative blocks were exempted that
+way, and any slop nested under a nav, tab, drawer or form disappeared from all
+three decorative rules at once. Tightening it surfaced 7 findings; a **capsule**
+exemption (a pill is a shape, not a rounded panel — with a panel disqualified
+first, after the first version of that exemption let a seeded
+`display:block;height:120px;border-radius:28px` straight through) removed the 3
+false positives, and the remaining 4 are fixed: three `cx-calculator.html` drawer
+callouts carrying the explicitly rejected wash + 3px saturated border in raw
+Tailwind hexes, and three square icon tiles at 10–14px radius.
+
+Also in `cx-calculator.html`: a rule with **no selector at all** —
+`{ --accent-purple:…; }` straight after a comment — which the browser discarded,
+so none of those 7 tokens was ever defined. Zero consumers, so it was dead either
+way; removed rather than given a selector. Nothing in the gate suite validates CSS
+structurally, which is now an OPEN ledger row.
+
+And the funnel was instrumented to answer why `audit-vibecode` reports zero:
+252,319 CSS blocks scanned, 56,633 pass the decorative vocabulary, **1,869 reach
+the radius test**, none over ceiling. The radius backlog really was swept — but
+`ANTI_VIBECODE_STANDARD.md` still printed the pre-sweep baseline (1058 blocks /
+169 files), which is what made a working gate read as an unwired one. That section
+is marked obsolete in place, with the measurement and the date it was true.
+
+### New: `standarization/UIUX_AUDIT_LEDGER.md`
+
+Living ledger in the proven format of the SEO one: every row carries a status,
+CLOSED only with the version **and** the gate that keeps it closed, a
+`Read this first` section for claims retracted as measurement artifacts, and the
+population stated as what was counted — **74 pages declaring
+`data-rz-register="editorial"`**, measured from the filesystem, not 29 articles.
+11 CLOSED, 1 PARTIAL, 5 OPEN, 2 WITHDRAWN.
+
+The largest OPEN row is the one worth repeating here: **32 of those 74 pages do
+not load `css/rz-article-dark.css`.** Every rule in that file — the callout
+language that replaced the rejected 3–4px slab, the caption registers, the figure
+scroll affordance — reaches 43 pages, not 74. Not yet measured in a browser what
+those 32 render, and that is deliberate: declaring a register whose stylesheet
+never arrives is either a missing link or a register that means nothing there, and
+the two have different fixes.
+
+One claim was withdrawn: "at ≤768px the page's `overflow-x:hidden` clips the
+figure instead of scrolling it" is false — `.rz-figure` has its own
+`overflow-x:auto` and scrolls inside the clipped page (`maxScrollReached: 370`).
+That came from reading the cascade instead of scrolling the element.
+
+### Also
+- A raw `&mdash;` inside a chart config's JSON `source:` string printed as literal
+  text to the reader (that field is rendered as text, not HTML).
+- The figure scroll track is now visible: a thin always-shown native scrollbar on
+  `.rz-figure` with `overscroll-behavior-x: contain`. It was invisible before —
+  76 px of 820 hidden at desktop, 370 px at phone width, with no signal that the
+  figure continued, which is what "terpotong dari framenya" was.
+
 ## v3.11.11 — 2026-10-03
 
 ### 96 search snippets now finish instead of truncating
