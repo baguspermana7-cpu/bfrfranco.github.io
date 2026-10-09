@@ -106,6 +106,9 @@ const API_BASE = 'https://bfrfranco-github-io-586770625232.us-central1.run.app';
 
 ---
 
+> **Moved 2026-10-09.** SQL schemas and cloud functions below now live in the private
+> `baguspermana7-cpu/rz-private-ops` repo under `Freemium Scheme/`.
+
 ## 2. Supabase Setup
 
 ### 2.1 Project Details
@@ -135,7 +138,7 @@ const API_BASE = 'https://bfrfranco-github-io-586770625232.us-central1.run.app';
 
 3. **Execute Schema**:
    - Supabase Dashboard → SQL Editor → New query
-   - Paste contents of `Sandbox/Data/Freemium Scheme/supabase_schema_v2.sql`
+   - Paste contents of `rz-private-ops/Freemium Scheme/supabase_schema_v2.sql`
    - Click Run
    - Expected result: "Success. No rows returned"
    - ✅ **Status**: Completed 2026-02-17
@@ -147,7 +150,7 @@ const API_BASE = 'https://bfrfranco-github-io-586770625232.us-central1.run.app';
 
 5. **Execute DC Intelligence Schema** (optional, for admin panel benchmarks):
    - Supabase Dashboard → SQL Editor → New query
-   - Paste contents of `Sandbox/Data/Freemium Scheme/supabase_dc_intelligence.sql`
+   - Paste contents of `rz-private-ops/Freemium Scheme/supabase_dc_intelligence.sql`
    - Click Run
    - Creates 4 tables + seeds 50 operators, 28 countries, 35 facilities, 19 market metrics
    - Verify: `cd cloud-functions && node seed-dc-intel.js`
@@ -155,9 +158,9 @@ const API_BASE = 'https://bfrfranco-github-io-586770625232.us-central1.run.app';
 
 ### 2.3 Schema Version
 - **Core Schema Version**: v2.0.0
-- **Core File**: `Sandbox/Data/Freemium Scheme/supabase_schema_v2.sql`
+- **Core File**: `rz-private-ops/Freemium Scheme/supabase_schema_v2.sql`
 - **Core Tables**: 14
-- **DC Intelligence File**: `Sandbox/Data/Freemium Scheme/supabase_dc_intelligence.sql`
+- **DC Intelligence File**: `rz-private-ops/Freemium Scheme/supabase_dc_intelligence.sql`
 - **DC Intel Tables**: 4 (dc_operators, dc_countries, dc_facilities, dc_market_summary)
 - **Total Tables**: 18
 - **Functions**: 4
@@ -216,7 +219,7 @@ const API_BASE = 'https://bfrfranco-github-io-586770625232.us-central1.run.app';
 ## 3. Backend Configuration
 
 ### 3.1 Environment Variables
-**File**: `Sandbox/Data/Freemium Scheme/cloud-functions/.env`
+**File**: `rz-private-ops/Freemium Scheme/cloud-functions/.env`
 **Template**: `cloud-functions/.env.example`
 
 | Variable | Source | Status |
@@ -307,7 +310,7 @@ cloud-functions/
 
 ### 5.1 Schema Test
 ```bash
-cd "Sandbox/Data/Freemium Scheme/cloud-functions"
+cd "rz-private-ops/Freemium Scheme/cloud-functions"
 node test-schema.js
 ```
 - Tests all 14 tables, 4 functions, triggers, RLS, constraints, cascades
@@ -316,7 +319,7 @@ node test-schema.js
 
 ### 5.2 Server Test
 ```bash
-cd "Sandbox/Data/Freemium Scheme/cloud-functions"
+cd "rz-private-ops/Freemium Scheme/cloud-functions"
 node index.js
 # Server starts on port 8080
 # Health check: curl http://localhost:8080/health

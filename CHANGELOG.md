@@ -11,6 +11,50 @@ release sections rather than semver.
 
 ---
 
+## v3.11.14 — 2026-10-09
+
+### A competitor brand name removed from everywhere but the index employer card, and the freemium plans moved private
+
+Two owner requests, one release.
+
+**A data-centre operator's brand name must not appear anywhere it could be read as scraped
+intelligence.** The owner keeps that operator as an employer/experience card on the index portfolio
+(its full company name, intact and untouched), but asked that the compressed brand string not appear
+on any other surface, because a stray mention could be screenshotted and used to allege data-mining
+of a former employer. The name is deliberately not repeated here. It was removed from: one row in the
+`rz-ops` operator console's 179-operator table; the matching row in the DC-intelligence SQL seed; a
+dead `.exp-logo-*` class in `styles.css`, `styles-index.css` and both `.min` twins (no HTML used it —
+the real employer card uses `bento-company-logo` and its own asset); two CHANGELOG lines that named
+the brand only to say "0 ... in committed data"; and a section plus a landmark in the legal-compliance
+standard, reworded brand-neutral. A tree-wide scan confirms the brand string is gone from every
+source, generated and committed surface — including this entry.
+
+**`Data/Freemium Scheme/` moved out of the public repo** (SEO ledger row 9). The 56 files — the
+freemium scheme, SQL schemas and cloud functions, including a payment webhook — now live in the
+private `baguspermana7-cpu/rz-private-ops` repository and are deleted from this public tree. Their
+references in `SUPABASE_FIREBASE_SETUP.md`, `PRO_MODE_STANDARDIZATION.md` and the F-tech-debt report
+repoint to the private repo. A secret scan before the move found no live secrets: API keys read
+`process.env`, the example private keys are placeholders, and the Supabase JWT is the public anon key.
+
+**The `rz-ops` operator console stays** (owner decision): root-gated, `noindex`, sitemap-absent, not
+served to any reader, and it needs the site's own `js`/`css` to run. Only its one brand data row was
+removed.
+
+**Honest boundary:** removing files from the working tree does not rewrite git history. The moved
+files and the former brand rows remain in past commits. Clearing them needs a history rewrite and
+force-push, which is destructive and left to the owner's call.
+
+### Changed
+- `rz-ops-p7x3k9m.html` — one operator row dropped from the table.
+- `styles.css`, `styles-index.css`, `styles.min.css`, `styles-index.min.css` — a dead experience-logo class removed.
+- `standarization/LEGAL_COMPLIANCE_STANDARD.md`, `SUPABASE_FIREBASE_SETUP.md`, `PRO_MODE_STANDARDIZATION.md`, `audit-reports/F-tech-debt.md` — references updated.
+- `standarization/Audit result/SEO_AUDIT_LEDGER.md` — row 9 RESOLVED.
+
+### Removed
+- `Data/Freemium Scheme/` (56 files) — moved to the private `rz-private-ops` repo.
+
+---
+
 ## v3.11.13 — 2026-10-03
 
 ### The two-register system is a declaration almost nothing implements
@@ -8886,7 +8930,7 @@ Four-phase DCMOC overhaul (owner: dossier too shallow "3 levels deeper" + "desig
 - **Prominent "Vector Index" entry CTA**: filled cyan→violet gradient pill with glow + shine (replaces the tiny buried icon), clearly signalling a major feature.
 
 ### Verified
-- Headless (puppeteer, root + non-root contexts): dashboard 8 tabs render · sort/filter/paginate + row-click cross-nav · Namespace/Time/Cluster/threshold/toggles drive the canvas · **0 console errors**. Graph page: CTA navigates · Force/Hierarchical/Fit/Orphan/filter all crash-free. Ship gates green; `vector-index.json` stays local/gitignored (0 PureDC in committed files).
+- Headless (puppeteer, root + non-root contexts): dashboard 8 tabs render · sort/filter/paginate + row-click cross-nav · Namespace/Time/Cluster/threshold/toggles drive the canvas · **0 console errors**. Graph page: CTA navigates · Force/Hierarchical/Fit/Orphan/filter all crash-free. Ship gates green; `vector-index.json` stays local/gitignored (0 competitor-brand rows in committed files).
 
 ## v1.108.0 — 2026-07-21 (Supply-Chain correctness fixes — adversarial review)
 
@@ -8914,7 +8958,7 @@ Four-phase DCMOC overhaul (owner: dossier too shallow "3 levels deeper" + "desig
 - three.js pinned to a single version (0.128) for the 2D/3D toggle.
 
 ### Verified
-- Headless (puppeteer): root unlocks both pages; all 8 tabs render real content; slider + back + tabs + zoom work; **0 console errors**. Non-root context → `index.html` locks and the Sign-In modal shows **visible Email + Password fields** (z 99999, unblurred). Padlock present on 61 pages. Viz data (`vector-index.json`) stays local/gitignored — 0 PureDC in committed files.
+- Headless (puppeteer): root unlocks both pages; all 8 tabs render real content; slider + back + tabs + zoom work; **0 console errors**. Non-root context → `index.html` locks and the Sign-In modal shows **visible Email + Password fields** (z 99999, unblurred). Padlock present on 61 pages. Viz data (`vector-index.json`) stays local/gitignored — 0 competitor-brand rows in committed files.
 
 ## v1.106.0 — 2026-07-21 (Ship-D: DC Corpus / KB dive-deep — new-domain sources + rack-power metric)
 

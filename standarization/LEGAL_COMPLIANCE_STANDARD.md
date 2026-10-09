@@ -97,7 +97,7 @@ These commercial sections were deleted:
 ## 3. Independence Disclaimer (`index.html`)
 
 ### Location
-Below the PureDC experience card in the bento experience section (line ~453).
+Below the last experience card in the bento experience section (line ~453).
 
 ### HTML Pattern
 ```html
@@ -218,16 +218,8 @@ if (!consent) { /* show banner */ }
 ### noindex Protection
 Non-public pages have `<meta name="robots" content="noindex, nofollow">`:
 - `dashboard.html`
-- `rz-ops-p7x3k9m.html` (DC Industry Intelligence console)
+- `rz-ops-p7x3k9m.html` (internal operations console)
 - `article-9-paper.html`
-
-### PureDC in Operator Console
-PureDC appears in `rz-ops-p7x3k9m.html` (rank 31, source: "PureDC, DCD"). Kept because:
-- Removing it would look more suspicious than keeping it
-- Source attribution is public (DCD = DatacenterDynamics trade publication)
-- Page is noindexed
-
----
 
 ## Checklist for New Content
 

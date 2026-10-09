@@ -525,7 +525,7 @@ Sandbox/
 ├── styles.css                 # Base styles
 ├── standarization/
 │   └── PRO_MODE_STANDARDIZATION.md  (this file)
-├── Data/Freemium Scheme/
+│   (Data/Freemium Scheme/ → private rz-private-ops repo, 2026-10-09)
 │   ├── article N review after deep-research-report.md
 │   └── article-N deep-research-report.md
 └── SESSION_NOTES.md

@@ -149,7 +149,7 @@
 | # | File(s) | Finding | Sev | Effort |
 |---|---------|---------|-----|--------|
 | F11-01 | `styles.min.css`, `styles-index.min.css`, `script.min.js`, `auth.min.js`, `rz-share-results.min.js` | Five minified build artifacts committed to the repo. On a zero-build site this is a deliberate choice, but they have no corresponding `.gitignore` guard, and updating the source without re-minifying (or vice versa) silently drifts the deployed code. | M | S |
-| F11-02 | `.gitignore` | `*.env.local` is gitignored but `*.env` alone is not (only `.env` is, missing `.env.production`, `.env.staging`, etc.). Cloud-function `.env` files in `Data/Freemium Scheme/` are not protected. | H | S |
+| F11-02 | `.gitignore` | `*.env.local` is gitignored but `*.env` alone is not (only `.env` is, missing `.env.production`, `.env.staging`, etc.). Cloud-function `.env` files have moved to the private `rz-private-ops` repo (2026-10-09); no longer in this public tree. | H | S |
 | F11-03 | Root | `.codex` (empty file, 0 bytes) committed. Appears to be an editor artefact from a Codex/OpenAI CLI session. | L | S |
 | F11-04 | `.qa-screens/` directory | `overflow-check.html` in a `.qa-screens/` directory committed and served publicly. QA tooling artefact. | L | S |
 
