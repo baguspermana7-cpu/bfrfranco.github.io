@@ -59,9 +59,31 @@ const CHECKS = () => {
     const inCascade = t.closest && t.closest('.viz-cascade');
     if ((s.endsWith('…') || s.endsWith('...')) && !inCascade) out.truncatedLabels.push(s);
     // a lone 1-2 char label that is not a pure axis number is suspicious
-    if (s.length && s.length <= 2 && !/^\d+$/.test(s)) out.tinyLabels.push(s);
+    // Exempt BY NAME, with the reason: "X" is the operator's actual name (X Corp, the
+    // x-twitter-oregon-fire-2025 dossier), not a label cut down to one character.
+    const REAL_SHORT_NAMES = new Set(['X']);
+    if (s.length && s.length <= 2 && !/^\d+$/.test(s) && !REAL_SHORT_NAMES.has(s)) out.tinyLabels.push(s);
   });
   out.hOverflow = document.documentElement.scrollWidth > document.documentElement.clientWidth + 1;
+  // FMEA criticality matrix: a label may not overlap another label or another
+  // marker. Co-located modes share one marker, and labels sit above or below it,
+  // but 43 incidents produce 43 different scatters and the placement rule is only
+  // as good as the worst one it meets.
+  out.fmeaCollisions = [];
+  const m = document.querySelector('.fm-matrix');
+  if (m) {
+    const boxes = [...m.querySelectorAll('.fm-pt-l')].map((e) => ({ k: 'label ' + e.textContent, r: e.getBoundingClientRect() }));
+    const dots = [...m.querySelectorAll('.fm-pt')].map((e, i) => ({ k: 'marker ' + i, r: e.getBoundingClientRect() }));
+    const hit = (a, b) => a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1;
+    for (let i = 0; i < boxes.length; i++) {
+      for (let j = i + 1; j < boxes.length; j++) if (hit(boxes[i].r, boxes[j].r)) out.fmeaCollisions.push(`${boxes[i].k} × ${boxes[j].k}`);
+      // A label's own marker is the circle drawn immediately before it (matrix_svg
+      // emits circle, text, circle, text...). Ownership is identity, NOT position:
+      // the first version exempted any marker sharing the label's x, so a label
+      // stacked exactly on a NEIGHBOUR's marker passed as its own.
+      dots.forEach((d, j) => { if (j !== i && hit(boxes[i].r, d.r)) out.fmeaCollisions.push(`${boxes[i].k} × ${d.k}`); });
+    }
+  }
   return out;
 };
 
@@ -75,13 +97,14 @@ async function run(file, prefix, regions, vp) {
   await new Promise((r) => setTimeout(r, 700));
   const shots = await shotRegions(page, prefix, regions);
   const c = await page.evaluate(CHECKS);
-  const bad = c.truncatedLabels.length || c.tinyLabels.length || c.hOverflow;
+  const bad = c.truncatedLabels.length || c.tinyLabels.length || c.hOverflow || c.fmeaCollisions.length;
   if (bad) problems++;
   console.log(`\n[${prefix}] ${file}`);
   console.log('  shots: ' + shots.join(' · '));
   console.log('  truncated SVG labels: ' + (c.truncatedLabels.join(', ') || 'none'));
   console.log('  suspicious 1-2char labels: ' + (c.tinyLabels.join(', ') || 'none'));
   console.log('  horizontal overflow: ' + (c.hOverflow ? 'YES ⚠' : 'no'));
+  console.log('  FMEA matrix label collisions: ' + (c.fmeaCollisions.join(', ') || 'none'));
   await page.close();
 }
 
@@ -93,6 +116,7 @@ await run('dc-incidents.html', 'hub', [
 for (const slug of SAMPLE) {
   await run(`incident-${slug}.html`, slug, [
     ['cascade', '.viz-cascade'], ['radar', '.viz-radar'], ['timeline', '.viz-timeline'],
+    ['fmea-bars', '.fm-pb'], ['fmea-matrix', '.fm-matrix'], ['fmea-sheet', '.fm-sheet'],
     ['share', '.share-buttons'],
   ], { width: 1100, height: 900, deviceScaleFactor: 1.4 });
 }

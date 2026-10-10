@@ -52,6 +52,12 @@
     .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
     .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
     .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:2px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    /* A chip carries the operator name, which can be a whole sentence ("Google Cloud
+       (impacted tenant); STT GDC / Tata Communications JV (named as the third-party …").
+       nowrap made that one chip 1120px wide and pushed the GCP Delhi dossier into a
+       1260px page at a 1100px viewport. Short chips are unaffected: normal wrapping
+       only engages when a chip would not fit its row. */
+    .chips .chip { max-width:100%; white-space:normal; overflow-wrap:anywhere; }
     .chip.cyan { color:var(--cyan); border-left:2px solid var(--cyan); }
     .chip.amber { color:var(--amber); border-left:2px solid var(--amber); }
     .chip.green { color:var(--green); border-left:2px solid var(--green); }
@@ -71,6 +77,11 @@
     /* rich incident table (reference-2 style) */
     table.itbl { min-width:1120px; }
     table.itbl td { vertical-align:middle; }
+    /* v1.134.20 — the title and summary columns ellipsise so the table's columns line up,
+       which is the right call for a dense index. But the cut text was reachable only by
+       navigating to the incident: a summary lost 238-298px of its sentence with no way to read
+       it in place. Each carries its full text in a title attribute now, so the truncation is
+       deliberate AND non-lossy — which is the condition the legibility audit checks for. */
     .itr { cursor:pointer; }
     .itr:hover td { background:var(--surface-2); }
     .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
@@ -240,7 +251,6 @@
        derive width = W px from the aspect ratio, so the drawing renders 1:1 at any event count
        and the panel scrolls instead of shrinking. */
     .viz-timeline svg { max-width:none; height:96px; width:auto; }
-
     .viz-radar svg { max-width:320px; margin:0 auto; }
     .vz-num { font-variant-numeric:tabular-nums slashed-zero; }
     .vz-box-t, .vz-box-s, .vz-lbl, .vz-hb-lbl, .vz-tl-t, .vz-pt, .vz-tick { pointer-events:auto; }
@@ -323,7 +333,86 @@
     }
     @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
 </style>
-    
+    <style>
+    /* ── FMEA (v3.12.3) — one hairline panel of rows, like the rest of the dossier.
+       No cards, no stripes: a row is a disclosure, state is a 7px dot. ── */
+    .fm-scope { color:var(--text-body); max-width:70ch; }
+    .fm-meta { flex-wrap:wrap; row-gap:0.25rem; }
+    .fm-viz { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:1.6rem; align-items:start; margin:1.2rem 0; }
+    @media (max-width:820px){ .fm-viz { grid-template-columns:1fr; } }
+    .fm-pb-row, .fm-pb-axis { display:grid; grid-template-columns:3.6rem minmax(0,1fr) 6.6rem; gap:0.6rem; align-items:center; }
+    .fm-pb-row { padding:0.32rem 0; }
+    .fm-pb-id, .fm-pb-val { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.8rem; }
+    .fm-pb-id { color:var(--muted); }
+    .fm-pb-val { color:var(--text-strong); white-space:nowrap; }
+    .fm-pb-track { display:flex; flex-direction:column; gap:3px; }
+    .fm-pb-bar { display:block; height:12px; }
+    .fm-pb-rev { display:block; height:4px; background:var(--text-body); opacity:0.55; }
+    .fm-pb-none { font-style:italic; font-size:0.72rem; color:var(--muted); line-height:1; }
+    .fm-pb-axis { margin-top:0.3rem; border-top:1px solid var(--line); padding-top:0.25rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .fm-pb-ticks { display:flex; justify-content:space-between; }
+    .fm-fig { margin:0; }
+    .fm-fig figcaption { font-size:0.8rem; color:var(--muted); margin-bottom:0.35rem; }
+    .fm-fig svg { width:100%; height:auto; display:block; }
+    .fm-fig-m svg { max-width:340px; }
+    .fm-matrix .fm-c-lo { fill:var(--surface); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-md { fill:color-mix(in srgb, var(--amber) 9%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-hi { fill:color-mix(in srgb, var(--red) 10%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .vz-axis { font-size:10px; fill:var(--muted); font-family:'IBM Plex Sans',sans-serif; }
+    .fm-matrix .fm-pt { stroke:var(--surface); stroke-width:1.5; }
+    .fm-matrix .fm-pt-l { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; fill:var(--text-strong);
+      paint-order:stroke; stroke:var(--surface); stroke-width:3px; stroke-linejoin:round; }
+    .fm-sheet { border:1px solid var(--line); border-radius:4px; margin-top:0.8rem; }
+    .fm-head, .fm-row > summary { display:grid; grid-template-columns:4.2rem minmax(0,1fr) 4.4rem 4.6rem 3.4rem; gap:0.6rem; align-items:baseline; padding:0.6rem 0.9rem; }
+    .fm-head { font-size:0.74rem; color:var(--muted); border-bottom:1px solid var(--line); }
+    .fm-row { border-top:1px solid var(--line); }
+    .fm-row:first-of-type { border-top:0; }
+    .fm-row > summary { cursor:pointer; list-style:none; }
+    .fm-row > summary::-webkit-details-marker { display:none; }
+    .fm-row > summary:hover { background:var(--surface-2); }
+    .fm-row > summary:focus-visible { outline:2px solid var(--cyan); outline-offset:-2px; }
+    .fm-id-cell, .fm-sod, .fm-rpn, .fm-rpn-rev { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.84rem; }
+    .fm-id-cell { color:var(--muted); }
+    .fm-mode { color:var(--text-strong); font-size:0.92rem; line-height:1.4; }
+    .fm-item { display:block; color:var(--muted); font-size:0.8rem; }
+    .fm-sod { color:var(--text-body); }
+    .fm-rpn { color:var(--text-strong); }
+    .fm-rpn-rev { color:var(--muted); }
+    .fm-dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:0.45rem; vertical-align:0.1em; }
+    .fm-body { padding:0.2rem 0.9rem 1rem 5.7rem; }
+    @media (max-width:640px){
+      .fm-head { display:none; }
+      .fm-row > summary { grid-template-columns:3.2rem minmax(0,1fr) auto; }
+      .fm-sod, .fm-rpn-rev { display:none; }
+      .fm-body { padding:0.2rem 0.9rem 1rem; }
+    }
+    .fm-kv { display:grid; grid-template-columns:9.5rem minmax(0,1fr); gap:0.3rem 0.9rem; margin:0.4rem 0 0.8rem; font-size:0.88rem; }
+    .fm-kv dt { color:var(--muted); }
+    .fm-kv dd { margin:0; color:var(--text-body); }
+    @media (max-width:640px){ .fm-kv { grid-template-columns:1fr; } .fm-kv dd { margin-bottom:0.4rem; } }
+    .fm-scores { margin:0 0 0.6rem; border-top:1px solid var(--line); }
+    .fm-sc { display:grid; grid-template-columns:3.2rem minmax(0,1fr); gap:0.6rem; padding:0.45rem 0; border-bottom:1px solid var(--line); font-size:0.86rem; }
+    .fm-sc dt { font-family:'JetBrains Mono',monospace; color:var(--muted); }
+    .fm-sc dt b { color:var(--text-strong); }
+    .fm-sc dd { margin:0; color:var(--text-body); }
+    .fm-sub { font-size:0.8rem; color:var(--muted); margin:0.7rem 0 0.25rem; }
+    .fm-sub b { color:var(--text-strong); }
+    .fm-acts, .fm-ev { margin:0; padding-left:1.1rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-acts li, .fm-ev li { margin:0.25rem 0; }
+    .fm-residual { color:var(--red); }
+    .fm-revline { font-size:0.86rem; color:var(--text-body); margin:0.4rem 0 0; }
+    .fm-ev-src { display:block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .fm-ev-src a { color:var(--cyan); }
+    .fm-ev-txt { display:block; }
+    .fm-method { margin-top:1rem; border:1px solid var(--line); border-radius:4px; }
+    .fm-method > summary { padding:0.6rem 0.9rem; cursor:pointer; font-size:0.9rem; color:var(--text-strong); }
+    .fm-method-body { padding:0 0.9rem 0.9rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-rubrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+    @media (max-width:760px){ .fm-rubrics { grid-template-columns:1fr; } }
+    .fm-rubric { width:100%; border-collapse:collapse; font-size:0.8rem; }
+    .fm-rubric td { padding:0.25rem 0.4rem; border-top:1px solid var(--line); vertical-align:top; }
+    .fm-rubric td:first-child { font-family:'JetBrains Mono',monospace; width:2rem; color:var(--text-strong); }
+</style>
 </head>
 <body class="locked">
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -397,6 +486,215 @@ Official confirmation. Official source genuinely established this pass. The MSIT
 
         <h2>Contributing factors</h2>
         <ul class="tight"><li>MAINTENANCE/MANAGEMENT LAPSE: Since installing Li-ion batteries in 2016, SK C&amp;C had never implemented any Li-ion-specific fireproofing or response measures over ~6 years — MSIT: &#x27;2016년 리튬이온배터리 도입 이후 현재까지 특화된 방화조치는 한 적이 없었던.&#x27;</li><li>DETECTION DESIGN FAILURE: The installed BMS was inadequate/malfunctioning as an early-warning layer — it held ~20°C during an active fire and captured no abnormal signs before ignition, so the primary battery-monitoring system detected nothing.</li><li>SUPPRESSION MISMATCH: The battery room was protected only by clean-agent/halogen gas suppression, which is physically incapable against sealed Li-ion cells in thermal runaway; no large-area water sprinkler system existed in the battery room.</li><li>POWER TOPOLOGY / SINGLE-UPS DESIGN: The UPS feeding the fire zone also fed the entire center, cabling was routed directly above the batteries (burning through immediately), and some UPS units were not fully partitioned from the battery room — making selective isolation impossible and forcing a whole-building shutdown.</li><li>NO EMERGENCY PLAN OR DRILLS: SK C&amp;C had no detailed large-scale emergency-response plan and no drills/simulations for a whole-center power-loss scenario.</li><li>KAKAO SINGLE-SITE DEPENDENCE: Kakao relied almost entirely on the single Pangyo site with no real contingency for the whole data center going dark; MSIT assigned fault to both SK C&amp;C and Kakao.</li><li>REGULATORY GAP: Enhanced data-center sprinkler requirements took effect Feb 2022 but were not applied retroactively to the 2016-built facility, so the battery room had no mandated water suppression.</li></ul>
+        <h2 id="fmea">Failure mode &amp; effects analysis (FMEA)</h2>
+        <p class="fm-scope">Two linked systems: the physical chain in SK C&amp;C&#x27;s Pangyo data center (the Li-ion UPS batteries on B3F, their BMS, the fire-detection and clean-agent gas suppression in the battery room, the UPS power topology that decided how much had to be de-energised, and the operator&#x27;s emergency isolation procedure) and tenant Kakao&#x27;s dependence on that one site, including its multi-day restart. The official record is MSIT&#x27;s investigation press release (6 Dec 2022) and NFS findings conveyed through Yonhap quotations; much of the fire timeline, the recovery timestamps and the impact figures rest on press and a single aggregator, and the NFS left the reason for the cell&#x27;s insulation breakdown officially undetermined. SK C&amp;C&#x27;s corrective actions are recorded only as recommendations whose implementation is not independently confirmed, so no facility mode carries a revised score; Kakao&#x27;s multi-site commitment is recorded as publicly committed, so one tenant mode does, as a claim about the action.</p>
+        <p class="metabar fm-meta"><span><b>7</b> failure modes</span><span class="sep">/</span><span><b>5</b> high priority</span><span class="sep">/</span><span><b>1 of 7</b> with a published action</span><span class="sep">/</span><span>total RPN <b>2479 → 2344</b> (−5%)</span></p>
+        <div class="fm-viz">
+            <figure class="fm-fig"><figcaption>Risk priority number (S × O × D), worst first — thin bar: after the published action</figcaption><div class="fm-pb" role="list" aria-label="Risk priority number per failure mode, before and after corrective action"><div class="fm-pb-row" role="listitem" title="FM-04 The UPS feeding the fire zone also feeds the whole center, cabling runs over the batteries and some UPS units are not partitioned from the battery room, so selective isolation is impossible"><span class="fm-pb-id">FM-04</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:86.4%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">432</span></div><div class="fm-pb-row" role="listitem" title="FM-06 Core functions, including Kakao&#x27;s sole authentication service, are concentrated at the Pangyo site with no working cross-site failover"><span class="fm-pb-id">FM-06</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:81.0%;background:var(--red)"></i><i class="fm-pb-rev" style="width:54.0%"></i></span><span class="fm-pb-val">405 → 270</span></div><div class="fm-pb-row" role="listitem" title="FM-02 The BMS captures no abnormal warning and reports a steady ~20C while the cell burns"><span class="fm-pb-id">FM-02</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:75.6%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">378</span></div><div class="fm-pb-row" role="listitem" title="FM-01 An aged cell develops an internal short and enters thermal runaway, igniting a fire on the UPS battery rack"><span class="fm-pb-id">FM-01</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:72.0%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">360</span></div><div class="fm-pb-row" role="listitem" title="FM-05 No detailed large-scale emergency plan or whole-center power-loss drills exist, and staff cannot identify in time which switches would isolate only the fire zone"><span class="fm-pb-id">FM-05</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:67.2%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">336</span></div><div class="fm-pb-row" role="listitem" title="FM-03 The gas system discharges correctly within about a minute but cannot extinguish a Li-ion thermal-runaway fire, and the room has no water suppression"><span class="fm-pb-id">FM-03</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:57.6%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">288</span></div><div class="fm-pb-row" role="listitem" title="FM-07 The fire-damaged electrical room cannot be re-energised immediately and ~32,000 servers must be restarted and re-synced at one site"><span class="fm-pb-id">FM-07</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:56.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">280</span></div><div class="fm-pb-axis" aria-hidden="true"><span></span><span class="fm-pb-ticks"><span>0</span><span>250</span><span>500</span></span><span></span></div></div></figure>
+            <figure class="fm-fig fm-fig-m"><figcaption>Criticality: severity × occurrence</figcaption><svg class="fm-matrix" viewBox="0 0 360 330" role="img" aria-label="Criticality matrix, severity against occurrence"><rect class="fm-c-lo" x="44" y="266" width="28" height="28"/><rect class="fm-c-lo" x="72" y="266" width="28" height="28"/><rect class="fm-c-lo" x="100" y="266" width="28" height="28"/><rect class="fm-c-lo" x="128" y="266" width="28" height="28"/><rect class="fm-c-lo" x="156" y="266" width="28" height="28"/><rect class="fm-c-lo" x="184" y="266" width="28" height="28"/><rect class="fm-c-lo" x="212" y="266" width="28" height="28"/><rect class="fm-c-lo" x="240" y="266" width="28" height="28"/><rect class="fm-c-lo" x="268" y="266" width="28" height="28"/><rect class="fm-c-lo" x="296" y="266" width="28" height="28"/><rect class="fm-c-lo" x="44" y="238" width="28" height="28"/><rect class="fm-c-lo" x="72" y="238" width="28" height="28"/><rect class="fm-c-lo" x="100" y="238" width="28" height="28"/><rect class="fm-c-lo" x="128" y="238" width="28" height="28"/><rect class="fm-c-lo" x="156" y="238" width="28" height="28"/><rect class="fm-c-lo" x="184" y="238" width="28" height="28"/><rect class="fm-c-lo" x="212" y="238" width="28" height="28"/><rect class="fm-c-lo" x="240" y="238" width="28" height="28"/><rect class="fm-c-md" x="268" y="238" width="28" height="28"/><rect class="fm-c-md" x="296" y="238" width="28" height="28"/><rect class="fm-c-lo" x="44" y="210" width="28" height="28"/><rect class="fm-c-lo" x="72" y="210" width="28" height="28"/><rect class="fm-c-lo" x="100" y="210" width="28" height="28"/><rect class="fm-c-lo" x="128" y="210" width="28" height="28"/><rect class="fm-c-lo" x="156" y="210" width="28" height="28"/><rect class="fm-c-md" x="184" y="210" width="28" height="28"/><rect class="fm-c-md" x="212" y="210" width="28" height="28"/><rect class="fm-c-md" x="240" y="210" width="28" height="28"/><rect class="fm-c-md" x="268" y="210" width="28" height="28"/><rect class="fm-c-md" x="296" y="210" width="28" height="28"/><rect class="fm-c-lo" x="44" y="182" width="28" height="28"/><rect class="fm-c-lo" x="72" y="182" width="28" height="28"/><rect class="fm-c-lo" x="100" y="182" width="28" height="28"/><rect class="fm-c-lo" x="128" y="182" width="28" height="28"/><rect class="fm-c-md" x="156" y="182" width="28" height="28"/><rect class="fm-c-md" x="184" y="182" width="28" height="28"/><rect class="fm-c-md" x="212" y="182" width="28" height="28"/><rect class="fm-c-md" x="240" y="182" width="28" height="28"/><rect class="fm-c-md" x="268" y="182" width="28" height="28"/><rect class="fm-c-hi" x="296" y="182" width="28" height="28"/><rect class="fm-c-lo" x="44" y="154" width="28" height="28"/><rect class="fm-c-lo" x="72" y="154" width="28" height="28"/><rect class="fm-c-lo" x="100" y="154" width="28" height="28"/><rect class="fm-c-md" x="128" y="154" width="28" height="28"/><rect class="fm-c-md" x="156" y="154" width="28" height="28"/><rect class="fm-c-md" x="184" y="154" width="28" height="28"/><rect class="fm-c-md" x="212" y="154" width="28" height="28"/><rect class="fm-c-hi" x="240" y="154" width="28" height="28"/><rect class="fm-c-hi" x="268" y="154" width="28" height="28"/><rect class="fm-c-hi" x="296" y="154" width="28" height="28"/><rect class="fm-c-lo" x="44" y="126" width="28" height="28"/><rect class="fm-c-lo" x="72" y="126" width="28" height="28"/><rect class="fm-c-md" x="100" y="126" width="28" height="28"/><rect class="fm-c-md" x="128" y="126" width="28" height="28"/><rect class="fm-c-md" x="156" y="126" width="28" height="28"/><rect class="fm-c-md" x="184" y="126" width="28" height="28"/><rect class="fm-c-hi" x="212" y="126" width="28" height="28"/><rect class="fm-c-hi" x="240" y="126" width="28" height="28"/><rect class="fm-c-hi" x="268" y="126" width="28" height="28"/><rect class="fm-c-hi" x="296" y="126" width="28" height="28"/><rect class="fm-c-lo" x="44" y="98" width="28" height="28"/><rect class="fm-c-lo" x="72" y="98" width="28" height="28"/><rect class="fm-c-md" x="100" y="98" width="28" height="28"/><rect class="fm-c-md" x="128" y="98" width="28" height="28"/><rect class="fm-c-md" x="156" y="98" width="28" height="28"/><rect class="fm-c-hi" x="184" y="98" width="28" height="28"/><rect class="fm-c-hi" x="212" y="98" width="28" height="28"/><rect class="fm-c-hi" x="240" y="98" width="28" height="28"/><rect class="fm-c-hi" x="268" y="98" width="28" height="28"/><rect class="fm-c-hi" x="296" y="98" width="28" height="28"/><rect class="fm-c-lo" x="44" y="70" width="28" height="28"/><rect class="fm-c-lo" x="72" y="70" width="28" height="28"/><rect class="fm-c-md" x="100" y="70" width="28" height="28"/><rect class="fm-c-md" x="128" y="70" width="28" height="28"/><rect class="fm-c-hi" x="156" y="70" width="28" height="28"/><rect class="fm-c-hi" x="184" y="70" width="28" height="28"/><rect class="fm-c-hi" x="212" y="70" width="28" height="28"/><rect class="fm-c-hi" x="240" y="70" width="28" height="28"/><rect class="fm-c-hi" x="268" y="70" width="28" height="28"/><rect class="fm-c-hi" x="296" y="70" width="28" height="28"/><rect class="fm-c-hi" x="44" y="42" width="28" height="28"/><rect class="fm-c-hi" x="72" y="42" width="28" height="28"/><rect class="fm-c-hi" x="100" y="42" width="28" height="28"/><rect class="fm-c-hi" x="128" y="42" width="28" height="28"/><rect class="fm-c-hi" x="156" y="42" width="28" height="28"/><rect class="fm-c-hi" x="184" y="42" width="28" height="28"/><rect class="fm-c-hi" x="212" y="42" width="28" height="28"/><rect class="fm-c-hi" x="240" y="42" width="28" height="28"/><rect class="fm-c-hi" x="268" y="42" width="28" height="28"/><rect class="fm-c-hi" x="296" y="42" width="28" height="28"/><rect class="fm-c-hi" x="44" y="14" width="28" height="28"/><rect class="fm-c-hi" x="72" y="14" width="28" height="28"/><rect class="fm-c-hi" x="100" y="14" width="28" height="28"/><rect class="fm-c-hi" x="128" y="14" width="28" height="28"/><rect class="fm-c-hi" x="156" y="14" width="28" height="28"/><rect class="fm-c-hi" x="184" y="14" width="28" height="28"/><rect class="fm-c-hi" x="212" y="14" width="28" height="28"/><rect class="fm-c-hi" x="240" y="14" width="28" height="28"/><rect class="fm-c-hi" x="268" y="14" width="28" height="28"/><rect class="fm-c-hi" x="296" y="14" width="28" height="28"/><text class="vz-tick" x="58.0" y="308" text-anchor="middle">1</text><text class="vz-tick" x="36" y="284.0" text-anchor="end">1</text><text class="vz-tick" x="86.0" y="308" text-anchor="middle">2</text><text class="vz-tick" x="36" y="256.0" text-anchor="end">2</text><text class="vz-tick" x="114.0" y="308" text-anchor="middle">3</text><text class="vz-tick" x="36" y="228.0" text-anchor="end">3</text><text class="vz-tick" x="142.0" y="308" text-anchor="middle">4</text><text class="vz-tick" x="36" y="200.0" text-anchor="end">4</text><text class="vz-tick" x="170.0" y="308" text-anchor="middle">5</text><text class="vz-tick" x="36" y="172.0" text-anchor="end">5</text><text class="vz-tick" x="198.0" y="308" text-anchor="middle">6</text><text class="vz-tick" x="36" y="144.0" text-anchor="end">6</text><text class="vz-tick" x="226.0" y="308" text-anchor="middle">7</text><text class="vz-tick" x="36" y="116.0" text-anchor="end">7</text><text class="vz-tick" x="254.0" y="308" text-anchor="middle">8</text><text class="vz-tick" x="36" y="88.0" text-anchor="end">8</text><text class="vz-tick" x="282.0" y="308" text-anchor="middle">9</text><text class="vz-tick" x="36" y="60.0" text-anchor="end">9</text><text class="vz-tick" x="310.0" y="308" text-anchor="middle">10</text><text class="vz-tick" x="36" y="32.0" text-anchor="end">10</text><text class="vz-axis" x="184" y="328" text-anchor="middle">Occurrence →</text><text class="vz-axis" transform="translate(11 154) rotate(-90)" text-anchor="middle">Severity →</text><circle class="fm-pt" cx="198.0" cy="28.0" r="6" fill="var(--red)"><title>FM-01 An aged cell develops an internal short and enters thermal runaway, igniting a fire on the UPS battery rack (S10 O6 D6)</title></circle><text class="fm-pt-l" x="198.0" y="18.0" text-anchor="middle">01</text><circle class="fm-pt" cx="170.0" cy="56.0" r="6" fill="var(--red)"><title>FM-06 Core functions, including Kakao&#x27;s sole authentication service, are concentrated at the Pangyo site with no working cross-site failover (S9 O5 D9)</title></circle><text class="fm-pt-l" x="170.0" y="46.0" text-anchor="middle">06</text><circle class="fm-pt" cx="198.0" cy="56.0" r="6" fill="var(--red)"><title>FM-04 The UPS feeding the fire zone also feeds the whole center, cabling runs over the batteries and some UPS units are not partitioned from the battery room, so selective isolation is impossible (S9 O6 D8)</title></circle><text class="fm-pt-l" x="198.0" y="46.0" text-anchor="middle">04</text><circle class="fm-pt" cx="198.0" cy="84.0" r="6" fill="var(--amber)"><title>FM-03 The gas system discharges correctly within about a minute but cannot extinguish a Li-ion thermal-runaway fire, and the room has no water suppression (S8 O6 D6)</title></circle><text class="fm-pt-l" x="198.0" y="74.0" text-anchor="middle">03</text><circle class="fm-pt" cx="170.0" cy="112.0" r="6" fill="var(--amber)"><title>FM-07 The fire-damaged electrical room cannot be re-energised immediately and ~32,000 servers must be restarted and re-synced at one site (S7 O5 D8)</title></circle><text class="fm-pt-l" x="170.0" y="102.0" text-anchor="middle">07</text><circle class="fm-pt" cx="198.0" cy="112.0" r="6" fill="var(--red)"><title>FM-02 The BMS captures no abnormal warning and reports a steady ~20C while the cell burns (S7 O6 D9); FM-05 No detailed large-scale emergency plan or whole-center power-loss drills exist, and staff cannot identify in time which switches would isolate only the fire zone (S7 O6 D8)</title></circle><text class="fm-pt-l" x="198.0" y="102.0" text-anchor="middle">02, 05</text></svg></figure>
+        </div>
+        <div class="fm-sheet">
+            <div class="fm-head" aria-hidden="true"><span>ID</span><span>Failure mode</span><span>S·O·D</span><span>RPN</span><span>After</span></div>
+            <details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-04</span>
+    <span class="fm-mode">The UPS feeding the fire zone also feeds the whole center, cabling runs over the batteries and some UPS units are not partitioned from the battery room, so selective isolation is impossible<span class="fm-item">UPS power topology and cabling in the battery room</span></span>
+    <span class="fm-sod" aria-label="Severity 9, occurrence 6, detection 8">9·6·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>432</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Allow one fire zone to be de-energised for firefighting without cutting power to the whole center</dd>
+      <dt>Effect</dt><dd>At about 16:52 a whole-building power cut de-energises all ~32,000 Kakao servers and other tenants&#x27; equipment, though the fire never reaches the server halls</dd>
+      <dt>Cause</dt><dd>Single-UPS coupling of the fire zone to the whole facility, cabling routed above the batteries, incomplete UPS/battery separation (MSIT findings)</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Found during the incident, when firefighters requested the power cut</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>9</b></dt><dd>Facility-wide loss of power for every tenant, which took down South Korea&#x27;s dominant messaging platform with no workaround: the rubric&#x27;s 9. Not 10 because no one was hurt by this step and the facility itself was not damaged beyond the battery room.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>A standing design condition, exercised whenever a fire in that zone needs water: &#x27;occasional&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>No recorded review revealed that selective isolation was impossible; it became evident only when the cut was requested: &#x27;detected after impact&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 432</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Zone UPS feeds and re-route cabling away from battery racks so one fire zone can be de-energised (recommended; implementation not independently confirmed) <span class="fm-ev-src">Correction of errors #2</span></li><li>Separate battery rooms from UPS units with fire-rated bulkheads and zone UPS feeds (analyst recommendation) <span class="fm-ev-src">Improvement #3</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="http://v.daum.net/v/20221018172414900" target="_blank" rel="noopener nofollow">Sequence of events #10</a></span><span class="fm-ev-txt">2022-10-15 16:52 — Because water needs the power off (electrocution risk), fire services formally request SK C&amp;C cut electricity to the B3F zone</span></li><li><span class="fm-ev-src"><a href="http://v.daum.net/v/20221018030244168" target="_blank" rel="noopener nofollow">Sequence of events #11</a></span><span class="fm-ev-txt">2022-10-15 ~16:52 — Selective isolation is impossible — the B3F UPS also feeds the whole center — so a WHOLE-BUILDING power cut is executed, de-energising all ~32,000 Kakao servers</span></li><li><span class="fm-ev-src">Contributing factor #4</span><span class="fm-ev-txt">POWER TOPOLOGY / SINGLE-UPS DESIGN: The UPS feeding the fire zone also fed the entire center, cabling was routed directly above the batteries (burning through immediately), and some UPS units were not fully partitioned from the battery room — making selective isolation impossible and forcing a whole-building shutdown.</span></li><li><span class="fm-ev-src"><a href="http://v.daum.net/v/20221018030244168" target="_blank" rel="noopener nofollow">Metric #7</a></span><span class="fm-ev-txt">Kakao servers de-energised by whole-building cut: ~32,000 servers (3만2000대)</span></li><li><span class="fm-ev-src"><a href="http://v.daum.net/v/20221206155455256" target="_blank" rel="noopener nofollow">Sequence of events #12</a></span><span class="fm-ev-txt">2022-10-15 evening — Containment holds: the fire stays within the B3F electrical/battery room and never reaches the server halls; the national outage is caused by loss of POWER, not fire damage to servers</span></li><li><span class="fm-ev-src">Technical deep-dive</span><span class="fm-ev-txt">“카카오 서버 전체인 3만2000대의 전원 공급이 끊겨”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-06</span>
+    <span class="fm-mode">Core functions, including Kakao&#x27;s sole authentication service, are concentrated at the Pangyo site with no working cross-site failover<span class="fm-item">Kakao service architecture (single-site dependence)</span></span>
+    <span class="fm-sod" aria-label="Severity 9, occurrence 5, detection 9">9·5·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>405</span>
+    <span class="fm-rpn-rev">270</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Keep KakaoTalk, authentication and dependent services running through the loss of any one data center</dd>
+      <dt>Effect</dt><dd>Nationwide outage of KakaoTalk (more than 11 hours), Daum, Kakao-linked banking, KakaoT and dozens of downstream services; co-tenant Naver, with its own data center, is far less affected</dd>
+      <dt>Cause</dt><dd>No effective distributed architecture; per the Korean record, nothing had changed since a similar single-site outage in April 2012</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>None before the incident; no drills for whole-site loss existed, so the dependency was revealed through customer impact</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>9</b></dt><dd>Provider-wide outage of a foundational national messaging and authentication service with no workaround: the rubric&#x27;s 9.</dd></div>
+      <div class="fm-sc"><dt>O <b>5</b></dt><dd>A standing design condition left unchanged for a decade, but it only fails when a whole site is lost: between &#x27;infrequent&#x27; and &#x27;occasional&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>No drill or test of whole-site loss is recorded; the dependency was found through the nationwide outage.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 405</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Establish geographic multi-site redundancy for critical services (Kakao; publicly committed post-incident, own-build DC / multi-region; details not verified) <span class="fm-ev-src">Correction of errors #4</span></li><li>Require geographic redundancy and full-scale power-loss drills for critical services (analyst recommendation) <span class="fm-ev-src">Improvement #5</span></li></ul>
+    <p class="fm-revline">After action: S6 · O5 · D9 → RPN 270. With services spread across sites, losing one facility should degrade Kakao rather than stop it nationwide (S 9→6). The dossier records the multi-site build as publicly committed with details not verified, so the reduction is a claim about the action, not a confirmed outcome. O and D are unchanged because the committed details do not confirm whole-site drills.</p>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #6</span><span class="fm-ev-txt">KAKAO SINGLE-SITE DEPENDENCE: Kakao relied almost entirely on the single Pangyo site with no real contingency for the whole data center going dark; MSIT assigned fault to both SK C&amp;C and Kakao.</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“the facility operated as a single point of failure and Kakao&#x27;s servers were insufficiently dispersed”</span></li><li><span class="fm-ev-src"><a href="http://v.daum.net/v/20221018030244168" target="_blank" rel="noopener nofollow">Sequence of events #18</a></span><span class="fm-ev-txt">2022-10-15 ~15:20 — National-scale service disruption begins as Kakao and Naver platforms fail following the power loss at the single Pangyo site</span></li><li><span class="fm-ev-src"><a href="https://www.allkpop.com/article/2022/10/fire-at-data-center-causes-kakaotalk-to-go-down-for-11-hours-longest-inoperable-period-of-apps-history" target="_blank" rel="noopener nofollow">Reference #20 · news</a></span><span class="fm-ev-txt">“KakaoTalk went down for 11+ hours”</span></li><li><span class="fm-ev-src"><a href="https://www.theregister.com/2022/10/17/sk_cc_naver_kaako_fire/" target="_blank" rel="noopener nofollow">Reference #21 · news</a></span><span class="fm-ev-txt">“Naver already operates one datacenter of its own”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-02</span>
+    <span class="fm-mode">The BMS captures no abnormal warning and reports a steady ~20C while the cell burns<span class="fm-item">Battery management system (BMS)</span></span>
+    <span class="fm-sod" aria-label="Severity 7, occurrence 6, detection 9">7·6·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>378</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Give early warning of an abnormal cell before it ignites</dd>
+      <dt>Effect</dt><dd>No pre-ignition warning; operators get false assurance from the battery-monitoring layer during an active fire</dd>
+      <dt>Cause</dt><dd>Pack-level temperature sensing that either could not see a cell-internal short or had failed silently (the dossier states both possibilities)</dd>
+      <dt>Prevention in place</dt><dd>BMS installed</dd>
+      <dt>Detection in place</dt><dd>None for the BMS&#x27;s own failure; it was established by the MSIT investigation</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>7</b></dt><dd>It removes the warning window rather than causing the fire, so it is scored below FM-01; losing the only pre-ignition layer on a battery room that feeds the whole center is still a major degradation of protection.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>Pack-level sensing that cannot see a cell-internal short is a standing design limitation, weakly guarded against the failure it exists to catch: &#x27;occasional&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>No control checked the BMS against this failure; its blindness was found only after the fire, by investigation.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 378</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Multi-modal early detection (cell-level thermal, off-gas/VOC, smoke, thermal imaging) beyond pack-temperature BMS (recommended; implementation not independently confirmed) <span class="fm-ev-src">Correction of errors #3</span></li><li>Upgrade battery monitoring to a multi-modal early-detection stack (analyst recommendation) <span class="fm-ev-src">Improvement #4</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="http://v.daum.net/v/20221206155455256" target="_blank" rel="noopener nofollow">Sequence of events #3</a></span><span class="fm-ev-txt">2022-10-15 ~15:19 — BMS fails as a detection layer — captures no abnormal warning and holds battery temperature at a steady ~20C even as the cell burns</span></li><li><span class="fm-ev-src"><a href="http://v.daum.net/v/20221206155455256" target="_blank" rel="noopener nofollow">Metric #2</a></span><span class="fm-ev-txt">BMS-reported battery temperature during active fire: ~20C (held steady; sensing failed)</span></li><li><span class="fm-ev-src">Contributing factor #2</span><span class="fm-ev-txt">DETECTION DESIGN FAILURE: The installed BMS was inadequate/malfunctioning as an early-warning layer — it held ~20°C during an active fire and captured no abnormal signs before ignition, so the primary battery-monitoring system detected nothing.</span></li><li><span class="fm-ev-src"><a href="http://v.daum.net/v/20221206155455256" target="_blank" rel="noopener nofollow">Reference #5 · press</a></span><span class="fm-ev-txt">“불이 났음에도 BMS상의 배터리 온도는 20도 수준을 일정하게 유지하고 있었는데”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-01</span>
+    <span class="fm-mode">An aged cell develops an internal short and enters thermal runaway, igniting a fire on the UPS battery rack<span class="fm-item">Li-ion UPS battery cell, B3F electrical/battery room</span></span>
+    <span class="fm-sod" aria-label="Severity 10, occurrence 6, detection 6">10·6·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>360</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Store ride-through energy for the UPS without becoming an ignition source</dd>
+      <dt>Effect</dt><dd>Fire in the B3F battery room consumes ~60 battery packs over ~40 sqm; 26 occupants self-evacuate with no casualties; the building&#x27;s power is later cut to fight it</dd>
+      <dt>Cause</dt><dd>Probable internal short from age-related insulation breakdown in a cell in service ~6 years (NFS); the reason for the breakdown is officially undetermined; no Li-ion-specific fire measures were added after the 2016 installation</dd>
+      <dt>Prevention in place</dt><dd>None Li-ion-specific recorded since 2016</dd>
+      <dt>Detection in place</dt><dd>A separate automatic fire-detection loop triggered about one minute after the spark; CCTV captured the spark</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>10</b></dt><dd>Rubric 10: a fire in an occupied building that forced 26 people to evacuate and led to the loss of the whole facility&#x27;s power. No one was hurt, but both the people hazard and the facility loss are present.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>An ageing cell population with no Li-ion-specific prevention or end-of-life programme for six years is a foreseeable condition, weakly guarded: &#x27;occasional&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>The fire-detection loop caught the fire about a minute after ignition, but nothing caught the ageing cell beforehand: &#x27;detected at onset, not prevented&#x27;. The BMS&#x27;s failure to warn is scored separately in FM-02.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 360</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Li-ion-specific fire-prevention and battery ageing/end-of-life replacement programme (recommended; implementation not independently confirmed) <span class="fm-ev-src">Correction of errors #6</span></li><li>Periodic cell inspection, degradation testing and end-of-life replacement (analyst recommendation) <span class="fm-ev-src">Improvement #2</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="http://v.daum.net/v/20221018172414900" target="_blank" rel="noopener nofollow">Sequence of events #2</a></span><span class="fm-ev-txt">2022-10-15 15:19 — CCTV captures a spark from a single Li-ion cell on a UPS battery rack in the B3F electrical room; internal short from age-related insulation breakdown initiates thermal runaway</span></li><li><span class="fm-ev-src"><a href="http://v.daum.net/v/20230330151845674" target="_blank" rel="noopener nofollow">Sequence of events #17</a></span><span class="fm-ev-txt">2023-03-30 — National Forensic Service announces mechanism: internal short from age-related insulation breakdown as probable ignition cause, external factors unlikely, precise trigger still under study</span></li><li><span class="fm-ev-src"><a href="http://v.daum.net/v/20221206140033953" target="_blank" rel="noopener nofollow">Metric #12</a></span><span class="fm-ev-txt">Ignition cell service age: ~6 years (installed 2016)</span></li><li><span class="fm-ev-src">Contributing factor #1</span><span class="fm-ev-txt">MAINTENANCE/MANAGEMENT LAPSE: Since installing Li-ion batteries in 2016, SK C&amp;C had never implemented any Li-ion-specific fireproofing or response measures over ~6 years — MSIT: &#x27;2016년 리튬이온배터리 도입 이후 현재까지 특화된 방화조치는 한 적이 없었던.&#x27;</span></li><li><span class="fm-ev-src"><a href="http://v.daum.net/v/20221016103044844" target="_blank" rel="noopener nofollow">Metric #9</a></span><span class="fm-ev-txt">Occupants evacuated / casualties: 26 self-evacuated / 0 casualties</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“The exact reason for the battery cell&#x27;s internal insulation breakdown remained officially undetermined”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-05</span>
+    <span class="fm-mode">No detailed large-scale emergency plan or whole-center power-loss drills exist, and staff cannot identify in time which switches would isolate only the fire zone<span class="fm-item">Operator emergency-response plan and isolation procedure</span></span>
+    <span class="fm-sod" aria-label="Severity 7, occurrence 6, detection 8">7·6·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>336</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Let operators and firefighters isolate a burning zone in minutes using pre-agreed, labelled switching</dd>
+      <dt>Effect</dt><dd>The only power cut available to firefighters is the whole building</dd>
+      <dt>Cause</dt><dd>No emergency plan or drills for a whole-center power-loss scenario (MSIT finding)</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Found during the incident</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>7</b></dt><dd>Contributes to the whole-building cut that FM-04 scores at 9; scored at 7 because with the topology as built a selective cut may not have been possible however well drilled the staff were.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>The absence of a plan and drills is a standing condition, weakly guarded: &#x27;occasional&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>The gap surfaced only when isolation was needed during the fire: &#x27;detected after impact&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 336</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Pre-agreed selective power-isolation maps and switch labelling for firefighters (analyst recommendation) <span class="fm-ev-src">Improvement #6</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #5</span><span class="fm-ev-txt">NO EMERGENCY PLAN OR DRILLS: SK C&amp;C had no detailed large-scale emergency-response plan and no drills/simulations for a whole-center power-loss scenario.</span></li><li><span class="fm-ev-src">Technical deep-dive</span><span class="fm-ev-txt">“Staff could not identify in time which zones/switches needed selective isolation”</span></li><li><span class="fm-ev-src"><a href="http://v.daum.net/v/20221206140033953" target="_blank" rel="noopener nofollow">Sequence of events #16</a></span><span class="fm-ev-txt">2022-12-06 — MSIT announces investigation results: BMS detection failure (held ~20C), cabling routed over batteries, no Li-ion-specific measures since 2016, UPS not fully separated; fault assigned to both SK C&amp;C and Kakao</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-03</span>
+    <span class="fm-mode">The gas system discharges correctly within about a minute but cannot extinguish a Li-ion thermal-runaway fire, and the room has no water suppression<span class="fm-item">Battery-room clean-agent gas suppression</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 6, detection 6">8·6·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>288</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Extinguish a fire in the battery room before it needs manual firefighting</dd>
+      <dt>Effect</dt><dd>Fire burns on; knocking it down takes about two hours and requires water, which requires the power off; full extinguishment takes 8 h 13 min</dd>
+      <dt>Cause</dt><dd>Oxygen-displacement agent mismatched to sealed Li-ion cells in runaway; enhanced suppression rules effective Feb 2022 were not applied retroactively to the 2016-built facility</dd>
+      <dt>Prevention in place</dt><dd>~1,500 kg clean-agent/halogen gas system, which activated as designed</dd>
+      <dt>Detection in place</dt><dd>Fire-detection loop at onset; the suppression failure was evident as the fire continued</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>This mode turned a one-minute suppression into hours of manual firefighting and is the reason water, and so a power cut, was needed; the facility loss itself is carried by FM-04, so it is scored at 8 rather than at 10 again.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>Gas-only protection against Li-ion is a standing design condition left in place by a code that did not apply retroactively: &#x27;occasional&#x27;. Not higher because it only matters once a cell runs away.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>The system&#x27;s failure to extinguish was visible at onset, but nothing could stop the fire from that point: &#x27;detected at onset, not prevented&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 288</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Replace or supplement gas-only suppression in Li-ion battery rooms with water-based cooling suppression (recommended; implementation not independently confirmed) <span class="fm-ev-src">Correction of errors #1</span></li><li>Extend the enhanced suppression code to pre-2022 facilities (regulator policy follow-up; status not stated as done) <span class="fm-ev-src">Correction of errors #5</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="http://v.daum.net/v/20221018172414900" target="_blank" rel="noopener nofollow">Sequence of events #5</a></span><span class="fm-ev-txt">2022-10-15 15:20 — Clean-agent/halogen GAS suppression discharges ~1,500 kg (50 kg x 30 cylinders); system activates correctly but does not extinguish the fire</span></li><li><span class="fm-ev-src"><a href="http://v.daum.net/v/20221206155455256" target="_blank" rel="noopener nofollow">Sequence of events #6</a></span><span class="fm-ev-txt">2022-10-15 ~15:20 — Gas suppression proven ineffective — sealed Li-ion cells in an enclosed basement room prevent oxygen-displacement agents from penetrating; only water (cooling) can arrest the runaway</span></li><li><span class="fm-ev-src">Contributing factor #3</span><span class="fm-ev-txt">SUPPRESSION MISMATCH: The battery room was protected only by clean-agent/halogen gas suppression, which is physically incapable against sealed Li-ion cells in thermal runaway; no large-area water sprinkler system existed in the battery room.</span></li><li><span class="fm-ev-src">Contributing factor #7</span><span class="fm-ev-txt">REGULATORY GAP: Enhanced data-center sprinkler requirements took effect Feb 2022 but were not applied retroactively to the 2016-built facility, so the battery room had no mandated water suppression.</span></li><li><span class="fm-ev-src"><a href="http://v.daum.net/v/20221016101349346" target="_blank" rel="noopener nofollow">Metric #10</a></span><span class="fm-ev-txt">Total time to full extinguishment: 8 hours 13 minutes (15:33 -&gt; 23:46)</span></li><li><span class="fm-ev-src"><a href="http://v.daum.net/v/20221018172414900" target="_blank" rel="noopener nofollow">Reference #4 · press</a></span><span class="fm-ev-txt">“40㎡ 남짓을 태운 불길을 잡는데만 2시간이 소요됐다.”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-07</span>
+    <span class="fm-mode">The fire-damaged electrical room cannot be re-energised immediately and ~32,000 servers must be restarted and re-synced at one site<span class="fm-item">Power restoration and fleet restart</span></span>
+    <span class="fm-sod" aria-label="Severity 7, occurrence 5, detection 8">7·5·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>280</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Bring the facility and Kakao&#x27;s fleet back quickly once the fire is out</dd>
+      <dt>Effect</dt><dd>Fire is out at 23:46 on 15 October, but Kakao services take 127 h 30 min to normalise fully</dd>
+      <dt>Cause</dt><dd>Damaged electrical room and the scale of a single-site cold restart with no geographic redundancy to carry load meanwhile</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>None before the incident; recovery time was learned during it</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>7</b></dt><dd>This mode sets the five-day tail rather than causing the outage, which FM-04 and FM-06 already carry; the multi-day partial service is a major degradation.</dd></div>
+      <div class="fm-sc"><dt>O <b>5</b></dt><dd>Exercised by any whole-site power loss at this facility with this tenant layout: between &#x27;infrequent&#x27; and &#x27;occasional&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>No full power-loss drill existed, so restart time was learned only after impact.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 280</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Multi-site redundancy and full-power-loss DR drills (Kakao; the committed details cover the own-build DC / multi-region, not confirmed drills) <span class="fm-ev-src">Correction of errors #4</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="http://v.daum.net/v/20221206155455256" target="_blank" rel="noopener nofollow">Metric #11</a></span><span class="fm-ev-txt">Kakao service full-recovery time: 127 hours 30 minutes (&gt;5 days)</span></li><li><span class="fm-ev-src"><a href="http://v.daum.net/v/20221206155455256" target="_blank" rel="noopener nofollow">Sequence of events #15</a></span><span class="fm-ev-txt">2022-10-20 ~19:00 — Kakao services fully normalized after 127 hours 30 minutes of degraded/failed operation — recovery driven by restarting a single-site fleet with no geographic redundancy</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“the fire-damaged electrical room could not be safely re-energized immediately”</span></li><li><span class="fm-ev-src"><a href="http://v.daum.net/v/20221016101349346" target="_blank" rel="noopener nofollow">Sequence of events #14</a></span><span class="fm-ev-txt">2022-10-15 23:46 — Full extinguishment declared — an 8h13m operation from the 15:33 report; peak mobilization 114 personnel and 46 apparatus</span></li></ul>
+  </div>
+</details>
+        </div>
+        <details class="fm-method"><summary>Scoring rubric and method</summary><div class="fm-method-body"><p>A retrospective FMEA: each row asks how this system could fail, how bad the effect was, how likely the cause was given the controls in place at the time, and how likely those controls were to catch it before customers did. Scales are adapted for data-centre operations from the 1–10 scales of IEC 60812:2018 and the AIAG-VDA FMEA handbook. RPN = S × O × D. Priority is High when S ≥ 9 with O ≥ 4 or D ≥ 7, or when RPN ≥ 300; Medium when RPN ≥ 120 or S ≥ 7; Low otherwise. Severity overrides the product because a large S multiplied by small O and D can hide a region-wide outage nothing would catch.</p><p>Every row cites evidence from this dossier, and every quote is checked verbatim against its source by <code>tools/test-incidents-fmea.py</code>. A revised score is only shown against a published corrective action. This is an RZ analyst assessment, not an operator document.</p><div class="fm-rubrics"><div><p class="fm-sub">Severity</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Hazard to people, or loss of the facility / several regions</td></tr><tr><td>9</td><td>Region-wide or provider-wide outage of a foundational service, no workaround</td></tr><tr><td>8</td><td>Full outage of a major service for hours</td></tr><tr><td>7</td><td>Major degradation of a major service</td></tr><tr><td>6</td><td>Partial outage confined to one zone or one service</td></tr><tr><td>5</td><td>Customer-visible degradation</td></tr><tr><td>4</td><td>Limited customer impact</td></tr><tr><td>3</td><td>Internal impact only</td></tr><tr><td>2</td><td>Negligible</td></tr><tr><td>1</td><td>No effect</td></tr></tbody></table></div><div><p class="fm-sub">Occurrence</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Near certain: the cause is present in normal operation</td></tr><tr><td>8</td><td>Frequent: routine work exercises the cause</td></tr><tr><td>6</td><td>Occasional: a foreseeable slip or condition, weakly guarded</td></tr><tr><td>4</td><td>Infrequent: needs an unusual combination</td></tr><tr><td>2</td><td>Remote: guarded by design</td></tr><tr><td>1</td><td>Eliminated by design</td></tr></tbody></table></div><div><p class="fm-sub">Detection</p><table class="fm-rubric"><tbody><tr><td>10</td><td>No control could detect it</td></tr><tr><td>9</td><td>Detected only through customer impact</td></tr><tr><td>8</td><td>Detected after impact by internal monitoring</td></tr><tr><td>6</td><td>Detected at onset, not prevented</td></tr><tr><td>4</td><td>Detected before impact with time to act</td></tr><tr><td>2</td><td>Automated interlock almost certainly stops it</td></tr><tr><td>1</td><td>Certain to be stopped</td></tr></tbody></table></div></div></div></details>
+
 
         <h2>Correction of errors (COE)</h2>
         <ul class="tight"><li>Replace/supplement gas-only suppression in Li-ion battery rooms with water-based cooling suppression (sprinkler, water-mist, or immersion) <span class="coe-meta">SK C&amp;C Facilities Engineering · Recommended (implementation not independently confirmed)</span></li><li>Zone UPS feeds and re-route power cabling away from and not above battery racks so a single fire zone can be selectively de-energised <span class="coe-meta">SK C&amp;C Data Center Engineering · Recommended (implementation not independently confirmed)</span></li><li>Deploy multi-modal early detection (cell-level thermal + off-gas/VOC + smoke + thermal imaging) beyond pack-temperature BMS <span class="coe-meta">SK C&amp;C Operations · Recommended (implementation not independently confirmed)</span></li><li>Establish geographic multi-site redundancy and mandatory full-power-loss disaster-recovery drills for critical services <span class="coe-meta">Kakao Infrastructure · Publicly committed post-incident (own-build DC / multi-region); details not verified here</span></li><li>Extend enhanced data-center suppression code (effective Feb 2022) to legacy pre-2022 facilities <span class="coe-meta">MSIT / fire safety regulators · Policy follow-up</span></li><li>Institute Li-ion-specific fire-prevention and battery aging/end-of-life replacement program <span class="coe-meta">SK C&amp;C Facilities Engineering · Recommended (implementation not independently confirmed)</span></li></ul>
@@ -437,7 +735,7 @@ But water and live UPS busbars are incompatible: electrocution risk. At 16:52 fi
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-1a1a084f"></script>
+    <script src="js/rz-version.js?v=20261010-00a1d9e8"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

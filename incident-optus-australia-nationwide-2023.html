@@ -52,6 +52,12 @@
     .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
     .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
     .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:2px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    /* A chip carries the operator name, which can be a whole sentence ("Google Cloud
+       (impacted tenant); STT GDC / Tata Communications JV (named as the third-party …").
+       nowrap made that one chip 1120px wide and pushed the GCP Delhi dossier into a
+       1260px page at a 1100px viewport. Short chips are unaffected: normal wrapping
+       only engages when a chip would not fit its row. */
+    .chips .chip { max-width:100%; white-space:normal; overflow-wrap:anywhere; }
     .chip.cyan { color:var(--cyan); border-left:2px solid var(--cyan); }
     .chip.amber { color:var(--amber); border-left:2px solid var(--amber); }
     .chip.green { color:var(--green); border-left:2px solid var(--green); }
@@ -71,6 +77,11 @@
     /* rich incident table (reference-2 style) */
     table.itbl { min-width:1120px; }
     table.itbl td { vertical-align:middle; }
+    /* v1.134.20 — the title and summary columns ellipsise so the table's columns line up,
+       which is the right call for a dense index. But the cut text was reachable only by
+       navigating to the incident: a summary lost 238-298px of its sentence with no way to read
+       it in place. Each carries its full text in a title attribute now, so the truncation is
+       deliberate AND non-lossy — which is the condition the legibility audit checks for. */
     .itr { cursor:pointer; }
     .itr:hover td { background:var(--surface-2); }
     .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
@@ -240,7 +251,6 @@
        derive width = W px from the aspect ratio, so the drawing renders 1:1 at any event count
        and the panel scrolls instead of shrinking. */
     .viz-timeline svg { max-width:none; height:96px; width:auto; }
-
     .viz-radar svg { max-width:320px; margin:0 auto; }
     .vz-num { font-variant-numeric:tabular-nums slashed-zero; }
     .vz-box-t, .vz-box-s, .vz-lbl, .vz-hb-lbl, .vz-tl-t, .vz-pt, .vz-tick { pointer-events:auto; }
@@ -323,7 +333,86 @@
     }
     @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
 </style>
-    
+    <style>
+    /* ── FMEA (v3.12.3) — one hairline panel of rows, like the rest of the dossier.
+       No cards, no stripes: a row is a disclosure, state is a 7px dot. ── */
+    .fm-scope { color:var(--text-body); max-width:70ch; }
+    .fm-meta { flex-wrap:wrap; row-gap:0.25rem; }
+    .fm-viz { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:1.6rem; align-items:start; margin:1.2rem 0; }
+    @media (max-width:820px){ .fm-viz { grid-template-columns:1fr; } }
+    .fm-pb-row, .fm-pb-axis { display:grid; grid-template-columns:3.6rem minmax(0,1fr) 6.6rem; gap:0.6rem; align-items:center; }
+    .fm-pb-row { padding:0.32rem 0; }
+    .fm-pb-id, .fm-pb-val { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.8rem; }
+    .fm-pb-id { color:var(--muted); }
+    .fm-pb-val { color:var(--text-strong); white-space:nowrap; }
+    .fm-pb-track { display:flex; flex-direction:column; gap:3px; }
+    .fm-pb-bar { display:block; height:12px; }
+    .fm-pb-rev { display:block; height:4px; background:var(--text-body); opacity:0.55; }
+    .fm-pb-none { font-style:italic; font-size:0.72rem; color:var(--muted); line-height:1; }
+    .fm-pb-axis { margin-top:0.3rem; border-top:1px solid var(--line); padding-top:0.25rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .fm-pb-ticks { display:flex; justify-content:space-between; }
+    .fm-fig { margin:0; }
+    .fm-fig figcaption { font-size:0.8rem; color:var(--muted); margin-bottom:0.35rem; }
+    .fm-fig svg { width:100%; height:auto; display:block; }
+    .fm-fig-m svg { max-width:340px; }
+    .fm-matrix .fm-c-lo { fill:var(--surface); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-md { fill:color-mix(in srgb, var(--amber) 9%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-hi { fill:color-mix(in srgb, var(--red) 10%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .vz-axis { font-size:10px; fill:var(--muted); font-family:'IBM Plex Sans',sans-serif; }
+    .fm-matrix .fm-pt { stroke:var(--surface); stroke-width:1.5; }
+    .fm-matrix .fm-pt-l { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; fill:var(--text-strong);
+      paint-order:stroke; stroke:var(--surface); stroke-width:3px; stroke-linejoin:round; }
+    .fm-sheet { border:1px solid var(--line); border-radius:4px; margin-top:0.8rem; }
+    .fm-head, .fm-row > summary { display:grid; grid-template-columns:4.2rem minmax(0,1fr) 4.4rem 4.6rem 3.4rem; gap:0.6rem; align-items:baseline; padding:0.6rem 0.9rem; }
+    .fm-head { font-size:0.74rem; color:var(--muted); border-bottom:1px solid var(--line); }
+    .fm-row { border-top:1px solid var(--line); }
+    .fm-row:first-of-type { border-top:0; }
+    .fm-row > summary { cursor:pointer; list-style:none; }
+    .fm-row > summary::-webkit-details-marker { display:none; }
+    .fm-row > summary:hover { background:var(--surface-2); }
+    .fm-row > summary:focus-visible { outline:2px solid var(--cyan); outline-offset:-2px; }
+    .fm-id-cell, .fm-sod, .fm-rpn, .fm-rpn-rev { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.84rem; }
+    .fm-id-cell { color:var(--muted); }
+    .fm-mode { color:var(--text-strong); font-size:0.92rem; line-height:1.4; }
+    .fm-item { display:block; color:var(--muted); font-size:0.8rem; }
+    .fm-sod { color:var(--text-body); }
+    .fm-rpn { color:var(--text-strong); }
+    .fm-rpn-rev { color:var(--muted); }
+    .fm-dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:0.45rem; vertical-align:0.1em; }
+    .fm-body { padding:0.2rem 0.9rem 1rem 5.7rem; }
+    @media (max-width:640px){
+      .fm-head { display:none; }
+      .fm-row > summary { grid-template-columns:3.2rem minmax(0,1fr) auto; }
+      .fm-sod, .fm-rpn-rev { display:none; }
+      .fm-body { padding:0.2rem 0.9rem 1rem; }
+    }
+    .fm-kv { display:grid; grid-template-columns:9.5rem minmax(0,1fr); gap:0.3rem 0.9rem; margin:0.4rem 0 0.8rem; font-size:0.88rem; }
+    .fm-kv dt { color:var(--muted); }
+    .fm-kv dd { margin:0; color:var(--text-body); }
+    @media (max-width:640px){ .fm-kv { grid-template-columns:1fr; } .fm-kv dd { margin-bottom:0.4rem; } }
+    .fm-scores { margin:0 0 0.6rem; border-top:1px solid var(--line); }
+    .fm-sc { display:grid; grid-template-columns:3.2rem minmax(0,1fr); gap:0.6rem; padding:0.45rem 0; border-bottom:1px solid var(--line); font-size:0.86rem; }
+    .fm-sc dt { font-family:'JetBrains Mono',monospace; color:var(--muted); }
+    .fm-sc dt b { color:var(--text-strong); }
+    .fm-sc dd { margin:0; color:var(--text-body); }
+    .fm-sub { font-size:0.8rem; color:var(--muted); margin:0.7rem 0 0.25rem; }
+    .fm-sub b { color:var(--text-strong); }
+    .fm-acts, .fm-ev { margin:0; padding-left:1.1rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-acts li, .fm-ev li { margin:0.25rem 0; }
+    .fm-residual { color:var(--red); }
+    .fm-revline { font-size:0.86rem; color:var(--text-body); margin:0.4rem 0 0; }
+    .fm-ev-src { display:block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .fm-ev-src a { color:var(--cyan); }
+    .fm-ev-txt { display:block; }
+    .fm-method { margin-top:1rem; border:1px solid var(--line); border-radius:4px; }
+    .fm-method > summary { padding:0.6rem 0.9rem; cursor:pointer; font-size:0.9rem; color:var(--text-strong); }
+    .fm-method-body { padding:0 0.9rem 0.9rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-rubrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+    @media (max-width:760px){ .fm-rubrics { grid-template-columns:1fr; } }
+    .fm-rubric { width:100%; border-collapse:collapse; font-size:0.8rem; }
+    .fm-rubric td { padding:0.25rem 0.4rem; border-top:1px solid var(--line); vertical-align:top; }
+    .fm-rubric td:first-child { font-family:'JetBrains Mono',monospace; width:2rem; color:var(--text-strong); }
+</style>
 </head>
 <body class="locked">
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -353,7 +442,7 @@
         <p class="lede">Following a routine Singtel-network software upgrade, a large, unexpected flood of routing information exceeded preset safety limits on Optus routers, which self-isolated and cascaded into a roughly 14-hour nationwide outage of Optus mobile and internet for about 10 million Australians — disrupting triple-zero (000) emergency calls, hospitals, transport and payments.</p>
 
         <h2>Failure cascade</h2>
-        <div class="viz viz-cascade"><svg viewBox="0 0 760 228" role="img" aria-label="Failure cascade block diagram"><title>Failure cascade: trigger → fault → downstream impact</title><defs><marker id="ic-ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path class="vz-arrhead" d="M0,0 L6,3 L0,6 Z"/></marker></defs><text class="vz-tl-ph" x="8" y="12">Trigger</text><text class="vz-tl-ph" x="248" y="12">Primary fault</text><text class="vz-tl-ph" x="516" y="12">Downstream impact</text><rect class="vz-box-trigger" x="8" y="86.0" width="176" height="56" rx="2"><title>Trigger — Network (2023-11-08)</title></rect><text class="vz-box-t" x="18" y="103.0">Trigger · Network</text><text class="vz-box-s" x="18" y="117.0"><title>2023-11-08</title>2023-11-08</text><rect class="vz-box-fault" x="240" y="86.0" width="224" height="56" rx="2"><title>Primary fault at Optus (Singtel) — Optus national network core</title></rect><text class="vz-box-t" x="250" y="103.0">Optus</text><text class="vz-box-s" x="250" y="117.0"><title>Optus national network core</title>Optus national network core</text><line class="vz-flow" x1="184" y1="114.0" x2="238" y2="114.0" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="26" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Optus mobile voice/data nationwide</title></rect><text class="vz-box-t" x="526" y="43">Optus mobile voice/data</text><text class="vz-box-t" x="526" y="56">nationwide…</text><line class="vz-flow" x1="464" y1="114.0" x2="514" y2="44" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="70" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Home internet</title></rect><text class="vz-box-t" x="526" y="87">Home internet</text><line class="vz-flow" x1="464" y1="114.0" x2="514" y2="88" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="114" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Triple-zero (000) emergency calling (partial)</title></rect><text class="vz-box-t" x="526" y="131">Triple-zero</text><line class="vz-flow" x1="464" y1="114.0" x2="514" y2="132" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="158" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Transport/payment dependencies</title></rect><text class="vz-box-t" x="526" y="175">Transport/payment dependencies</text><line class="vz-flow" x1="464" y1="114.0" x2="514" y2="176" marker-end="url(#ic-ar)"/></svg></div>
+        <div class="viz viz-cascade"><svg viewBox="0 0 760 228" role="img" aria-label="Failure cascade block diagram"><title>Failure cascade: trigger → fault → downstream impact</title><defs><marker id="ic-ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path class="vz-arrhead" d="M0,0 L6,3 L0,6 Z"/></marker></defs><text class="vz-tl-ph" x="8" y="12">Trigger</text><text class="vz-tl-ph" x="248" y="12">Primary fault</text><text class="vz-tl-ph" x="516" y="12">Downstream impact</text><rect class="vz-box-trigger" x="8" y="86.0" width="176" height="56" rx="2"><title>Trigger — Network (2023-11-08)</title></rect><text class="vz-box-t" x="18" y="103.0">Trigger · Network</text><text class="vz-box-s" x="18" y="117.0"><title>2023-11-08</title>2023-11-08</text><rect class="vz-box-fault" x="240" y="86.0" width="224" height="56" rx="2"><title>Primary fault at Optus (Singtel) — Optus national network core</title></rect><text class="vz-box-t" x="250" y="103.0">Optus</text><text class="vz-box-s" x="250" y="117.0"><title>Optus national network core</title>Optus national network core</text><line class="vz-flow" x1="184" y1="114.0" x2="238" y2="114.0" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="26" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Optus mobile voice/data nationwide</title></rect><text class="vz-box-t" x="526" y="43">Optus mobile voice/data</text><text class="vz-box-t" x="526" y="56">nationwide</text><line class="vz-flow" x1="464" y1="114.0" x2="514" y2="44" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="70" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Home internet</title></rect><text class="vz-box-t" x="526" y="87">Home internet</text><line class="vz-flow" x1="464" y1="114.0" x2="514" y2="88" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="114" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Triple-zero (000) emergency calling (partial)</title></rect><text class="vz-box-t" x="526" y="131">Triple-zero</text><line class="vz-flow" x1="464" y1="114.0" x2="514" y2="132" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="158" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Transport/payment dependencies</title></rect><text class="vz-box-t" x="526" y="175">Transport/payment dependencies</text><line class="vz-flow" x1="464" y1="114.0" x2="514" y2="176" marker-end="url(#ic-ar)"/></svg></div>
         <p class="disclaimer">Trigger → primary fault → downstream blast radius, derived from the sourced root cause and affected-services record.</p>
 
         <h2>Facility &amp; location</h2>
@@ -391,6 +480,159 @@ The latent root causes are two change-management/configuration design lapses evi
 
         <h2>Contributing factors</h2>
         <ul class="tight"><li>Configuration/maintenance lapse on Optus PE routers: they were left on &#x27;the pre-configured default threshold limits set by Cisco Systems&#x27; rather than thresholds tuned to Optus&#x27;s real route counts, so a foreseeable flood tripped a hard fail-safe instead of degrading gracefully (Wikipedia, citing the outage account).</li><li>Synchronized fail-safe design flaw: because the identical default limit tripped across ~90 PE routers near-simultaneously, the protective mechanism produced a fleet-wide disconnection cascade rather than isolating a single fault — the &#x27;containment&#x27; had no firebreak (Wikipedia).</li><li>Upstream peering-hygiene gap (inferred from mechanism): a North American Singtel exchange upgrade was allowed to propagate a ~940,000-route BGP event downstream toward AS4804 (normal &lt;3,000/hr) with no apparent upstream prefix-filtering or rate-limiting to contain it (Cloudflare figure via Wikipedia).</li><li>No automatic recovery / manual-only restoration: tripped BGP sessions did not self-heal, so restoration proceeded gradually (11% by 11:30, 88% by 13:00) and the outage ran ~12-13 hours (Wikipedia).</li><li>Triple-Zero (000) failover inadequacy: emergency 000 calls failed with no effective resilient fallback during the IP-core loss, later a central regulatory concern of ACMA / the Senate inquiry (Wikipedia).</li><li>Disputed / unclear change ownership at the Singtel-Optus boundary: Singtel was reported to have refuted early claims that its upgrade caused the outage (ZDNet, not re-verified this session), indicating unclear accountability and coordination.</li></ul>
+        <h2 id="fmea">Failure mode &amp; effects analysis (FMEA)</h2>
+        <p class="fm-scope">Optus&#x27;s national IP core and the upstream Singtel peering it depends on: the peering boundary that let a route flood through, the route-limit thresholds on Optus&#x27;s ~90 Cisco Provider Edge routers, the manual recovery of tripped BGP sessions, Triple-Zero (000) emergency calling, and change management across the Singtel-Optus boundary. This dossier is press-sourced: only Wikipedia was re-fetched (citing Cloudflare telemetry and Optus&#x27;s stated cause); the Bean review, Senate and ACMA findings were not retrievable, so no official finding is quoted. The upstream filtering gap and the manual, on-site recovery detail are the dossier&#x27;s inferences from the mechanism, not verbatim findings, and Singtel reportedly disputed that its upgrade caused the outage (single-sourced, not re-verified). No corrective action has a status stated as done or committed by Optus or Singtel, so no revised score is claimed: every mode is residual risk.</p>
+        <p class="metabar fm-meta"><span><b>5</b> failure modes</span><span class="sep">/</span><span><b>5</b> high priority</span><span class="sep">/</span><span><b>0 of 5</b> with a published action</span><span class="sep">/</span><span>total RPN <b>1800 → 1800</b> (−0%)</span></p>
+        <div class="fm-viz">
+            <figure class="fm-fig"><figcaption>Risk priority number (S × O × D), worst first — thin bar: after the published action</figcaption><div class="fm-pb" role="list" aria-label="Risk priority number per failure mode, before and after corrective action"><div class="fm-pb-row" role="listitem" title="FM-03 Tripped sessions do not re-establish on their own, and restoration proceeds by manual reconnection and reboot"><span class="fm-pb-id">FM-03</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:96.0%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">384</span></div><div class="fm-pb-row" role="listitem" title="FM-01 A software upgrade at a North American Singtel exchange makes one router disconnect, and the resulting flood of ~940,000 BGP announcements in an hour reaches Optus unfiltered"><span class="fm-pb-id">FM-01</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:90.0%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">360</span></div><div class="fm-pb-row" role="listitem" title="FM-02 The same Cisco default threshold trips on ~90 PE routers near-simultaneously and each tears down its BGP sessions, so the protective action isolates the whole IP core"><span class="fm-pb-id">FM-02</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:90.0%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">360</span></div><div class="fm-pb-row" role="listitem" title="FM-04 Emergency 000 calls fail for affected customers, with no effective fallback during the IP-core loss"><span class="fm-pb-id">FM-04</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:90.0%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">360</span></div><div class="fm-pb-row" role="listitem" title="FM-05 An upstream upgrade proceeds with no recorded joint staged rollout, blast-radius review or coordinated rollback, and ownership of the change is disputed afterwards"><span class="fm-pb-id">FM-05</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:84.0%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">336</span></div><div class="fm-pb-axis" aria-hidden="true"><span></span><span class="fm-pb-ticks"><span>0</span><span>200</span><span>400</span></span><span></span></div></div></figure>
+            <figure class="fm-fig fm-fig-m"><figcaption>Criticality: severity × occurrence</figcaption><svg class="fm-matrix" viewBox="0 0 360 330" role="img" aria-label="Criticality matrix, severity against occurrence"><rect class="fm-c-lo" x="44" y="266" width="28" height="28"/><rect class="fm-c-lo" x="72" y="266" width="28" height="28"/><rect class="fm-c-lo" x="100" y="266" width="28" height="28"/><rect class="fm-c-lo" x="128" y="266" width="28" height="28"/><rect class="fm-c-lo" x="156" y="266" width="28" height="28"/><rect class="fm-c-lo" x="184" y="266" width="28" height="28"/><rect class="fm-c-lo" x="212" y="266" width="28" height="28"/><rect class="fm-c-lo" x="240" y="266" width="28" height="28"/><rect class="fm-c-lo" x="268" y="266" width="28" height="28"/><rect class="fm-c-lo" x="296" y="266" width="28" height="28"/><rect class="fm-c-lo" x="44" y="238" width="28" height="28"/><rect class="fm-c-lo" x="72" y="238" width="28" height="28"/><rect class="fm-c-lo" x="100" y="238" width="28" height="28"/><rect class="fm-c-lo" x="128" y="238" width="28" height="28"/><rect class="fm-c-lo" x="156" y="238" width="28" height="28"/><rect class="fm-c-lo" x="184" y="238" width="28" height="28"/><rect class="fm-c-lo" x="212" y="238" width="28" height="28"/><rect class="fm-c-lo" x="240" y="238" width="28" height="28"/><rect class="fm-c-md" x="268" y="238" width="28" height="28"/><rect class="fm-c-md" x="296" y="238" width="28" height="28"/><rect class="fm-c-lo" x="44" y="210" width="28" height="28"/><rect class="fm-c-lo" x="72" y="210" width="28" height="28"/><rect class="fm-c-lo" x="100" y="210" width="28" height="28"/><rect class="fm-c-lo" x="128" y="210" width="28" height="28"/><rect class="fm-c-lo" x="156" y="210" width="28" height="28"/><rect class="fm-c-md" x="184" y="210" width="28" height="28"/><rect class="fm-c-md" x="212" y="210" width="28" height="28"/><rect class="fm-c-md" x="240" y="210" width="28" height="28"/><rect class="fm-c-md" x="268" y="210" width="28" height="28"/><rect class="fm-c-md" x="296" y="210" width="28" height="28"/><rect class="fm-c-lo" x="44" y="182" width="28" height="28"/><rect class="fm-c-lo" x="72" y="182" width="28" height="28"/><rect class="fm-c-lo" x="100" y="182" width="28" height="28"/><rect class="fm-c-lo" x="128" y="182" width="28" height="28"/><rect class="fm-c-md" x="156" y="182" width="28" height="28"/><rect class="fm-c-md" x="184" y="182" width="28" height="28"/><rect class="fm-c-md" x="212" y="182" width="28" height="28"/><rect class="fm-c-md" x="240" y="182" width="28" height="28"/><rect class="fm-c-md" x="268" y="182" width="28" height="28"/><rect class="fm-c-hi" x="296" y="182" width="28" height="28"/><rect class="fm-c-lo" x="44" y="154" width="28" height="28"/><rect class="fm-c-lo" x="72" y="154" width="28" height="28"/><rect class="fm-c-lo" x="100" y="154" width="28" height="28"/><rect class="fm-c-md" x="128" y="154" width="28" height="28"/><rect class="fm-c-md" x="156" y="154" width="28" height="28"/><rect class="fm-c-md" x="184" y="154" width="28" height="28"/><rect class="fm-c-md" x="212" y="154" width="28" height="28"/><rect class="fm-c-hi" x="240" y="154" width="28" height="28"/><rect class="fm-c-hi" x="268" y="154" width="28" height="28"/><rect class="fm-c-hi" x="296" y="154" width="28" height="28"/><rect class="fm-c-lo" x="44" y="126" width="28" height="28"/><rect class="fm-c-lo" x="72" y="126" width="28" height="28"/><rect class="fm-c-md" x="100" y="126" width="28" height="28"/><rect class="fm-c-md" x="128" y="126" width="28" height="28"/><rect class="fm-c-md" x="156" y="126" width="28" height="28"/><rect class="fm-c-md" x="184" y="126" width="28" height="28"/><rect class="fm-c-hi" x="212" y="126" width="28" height="28"/><rect class="fm-c-hi" x="240" y="126" width="28" height="28"/><rect class="fm-c-hi" x="268" y="126" width="28" height="28"/><rect class="fm-c-hi" x="296" y="126" width="28" height="28"/><rect class="fm-c-lo" x="44" y="98" width="28" height="28"/><rect class="fm-c-lo" x="72" y="98" width="28" height="28"/><rect class="fm-c-md" x="100" y="98" width="28" height="28"/><rect class="fm-c-md" x="128" y="98" width="28" height="28"/><rect class="fm-c-md" x="156" y="98" width="28" height="28"/><rect class="fm-c-hi" x="184" y="98" width="28" height="28"/><rect class="fm-c-hi" x="212" y="98" width="28" height="28"/><rect class="fm-c-hi" x="240" y="98" width="28" height="28"/><rect class="fm-c-hi" x="268" y="98" width="28" height="28"/><rect class="fm-c-hi" x="296" y="98" width="28" height="28"/><rect class="fm-c-lo" x="44" y="70" width="28" height="28"/><rect class="fm-c-lo" x="72" y="70" width="28" height="28"/><rect class="fm-c-md" x="100" y="70" width="28" height="28"/><rect class="fm-c-md" x="128" y="70" width="28" height="28"/><rect class="fm-c-hi" x="156" y="70" width="28" height="28"/><rect class="fm-c-hi" x="184" y="70" width="28" height="28"/><rect class="fm-c-hi" x="212" y="70" width="28" height="28"/><rect class="fm-c-hi" x="240" y="70" width="28" height="28"/><rect class="fm-c-hi" x="268" y="70" width="28" height="28"/><rect class="fm-c-hi" x="296" y="70" width="28" height="28"/><rect class="fm-c-hi" x="44" y="42" width="28" height="28"/><rect class="fm-c-hi" x="72" y="42" width="28" height="28"/><rect class="fm-c-hi" x="100" y="42" width="28" height="28"/><rect class="fm-c-hi" x="128" y="42" width="28" height="28"/><rect class="fm-c-hi" x="156" y="42" width="28" height="28"/><rect class="fm-c-hi" x="184" y="42" width="28" height="28"/><rect class="fm-c-hi" x="212" y="42" width="28" height="28"/><rect class="fm-c-hi" x="240" y="42" width="28" height="28"/><rect class="fm-c-hi" x="268" y="42" width="28" height="28"/><rect class="fm-c-hi" x="296" y="42" width="28" height="28"/><rect class="fm-c-hi" x="44" y="14" width="28" height="28"/><rect class="fm-c-hi" x="72" y="14" width="28" height="28"/><rect class="fm-c-hi" x="100" y="14" width="28" height="28"/><rect class="fm-c-hi" x="128" y="14" width="28" height="28"/><rect class="fm-c-hi" x="156" y="14" width="28" height="28"/><rect class="fm-c-hi" x="184" y="14" width="28" height="28"/><rect class="fm-c-hi" x="212" y="14" width="28" height="28"/><rect class="fm-c-hi" x="240" y="14" width="28" height="28"/><rect class="fm-c-hi" x="268" y="14" width="28" height="28"/><rect class="fm-c-hi" x="296" y="14" width="28" height="28"/><text class="vz-tick" x="58.0" y="308" text-anchor="middle">1</text><text class="vz-tick" x="36" y="284.0" text-anchor="end">1</text><text class="vz-tick" x="86.0" y="308" text-anchor="middle">2</text><text class="vz-tick" x="36" y="256.0" text-anchor="end">2</text><text class="vz-tick" x="114.0" y="308" text-anchor="middle">3</text><text class="vz-tick" x="36" y="228.0" text-anchor="end">3</text><text class="vz-tick" x="142.0" y="308" text-anchor="middle">4</text><text class="vz-tick" x="36" y="200.0" text-anchor="end">4</text><text class="vz-tick" x="170.0" y="308" text-anchor="middle">5</text><text class="vz-tick" x="36" y="172.0" text-anchor="end">5</text><text class="vz-tick" x="198.0" y="308" text-anchor="middle">6</text><text class="vz-tick" x="36" y="144.0" text-anchor="end">6</text><text class="vz-tick" x="226.0" y="308" text-anchor="middle">7</text><text class="vz-tick" x="36" y="116.0" text-anchor="end">7</text><text class="vz-tick" x="254.0" y="308" text-anchor="middle">8</text><text class="vz-tick" x="36" y="88.0" text-anchor="end">8</text><text class="vz-tick" x="282.0" y="308" text-anchor="middle">9</text><text class="vz-tick" x="36" y="60.0" text-anchor="end">9</text><text class="vz-tick" x="310.0" y="308" text-anchor="middle">10</text><text class="vz-tick" x="36" y="32.0" text-anchor="end">10</text><text class="vz-axis" x="184" y="328" text-anchor="middle">Occurrence →</text><text class="vz-axis" transform="translate(11 154) rotate(-90)" text-anchor="middle">Severity →</text><circle class="fm-pt" cx="142.0" cy="28.0" r="6" fill="var(--red)"><title>FM-04 Emergency 000 calls fail for affected customers, with no effective fallback during the IP-core loss (S10 O4 D9)</title></circle><text class="fm-pt-l" x="142.0" y="18.0" text-anchor="middle">04</text><circle class="fm-pt" cx="170.0" cy="56.0" r="6" fill="var(--red)"><title>FM-01 A software upgrade at a North American Singtel exchange makes one router disconnect, and the resulting flood of ~940,000 BGP announcements in an hour reaches Optus unfiltered (S9 O5 D8); FM-02 The same Cisco default threshold trips on ~90 PE routers near-simultaneously and each tears down its BGP sessions, so the protective action isolates the whole IP core (S9 O5 D8)</title></circle><text class="fm-pt-l" x="170.0" y="46.0" text-anchor="middle">01, 02</text><circle class="fm-pt" cx="198.0" cy="84.0" r="6" fill="var(--red)"><title>FM-03 Tripped sessions do not re-establish on their own, and restoration proceeds by manual reconnection and reboot (S8 O6 D8)</title></circle><text class="fm-pt-l" x="198.0" y="74.0" text-anchor="middle">03</text><circle class="fm-pt" cx="198.0" cy="112.0" r="6" fill="var(--red)"><title>FM-05 An upstream upgrade proceeds with no recorded joint staged rollout, blast-radius review or coordinated rollback, and ownership of the change is disputed afterwards (S7 O6 D8)</title></circle><text class="fm-pt-l" x="198.0" y="102.0" text-anchor="middle">05</text></svg></figure>
+        </div>
+        <div class="fm-sheet">
+            <div class="fm-head" aria-hidden="true"><span>ID</span><span>Failure mode</span><span>S·O·D</span><span>RPN</span><span>After</span></div>
+            <details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-03</span>
+    <span class="fm-mode">Tripped sessions do not re-establish on their own, and restoration proceeds by manual reconnection and reboot<span class="fm-item">Recovery of tripped BGP sessions</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 6, detection 8">8·6·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>384</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Bring the PE routers back into service quickly once the flood has passed</dd>
+      <dt>Effect</dt><dd>About 11% of the network restored by 11:30 AEDT and 88% by 13:00; full service after ~12-13 hours (some media report up to 14)</dd>
+      <dt>Cause</dt><dd>Standard max-prefix behaviour holds sessions down until an operator re-enables them; no automated or remote recovery recorded (the manual, on-site detail is inferred from the recovery profile)</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Known from onset; the pace of recovery was learned during the event</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>Sets the duration of the outage carried by FM-02: hours of full outage of a major service is the rubric&#x27;s 8.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>Hold-down is standard behaviour, so it applies every time the thresholds trip: &#x27;occasional&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>No recovery automation or drill is recorded, so the restoration time was learned only after impact.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 384</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Automated router-session recovery and pre-staged remote reboot capability (analyst recommendation) <span class="fm-ev-src">Improvement #5</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #4</span><span class="fm-ev-txt">No automatic recovery / manual-only restoration: tripped BGP sessions did not self-heal, so restoration proceeded gradually (11% by 11:30, 88% by 13:00) and the outage ran ~12-13 hours (Wikipedia).</span></li><li><span class="fm-ev-src"><a href="https://Wikipedia (2023_Optus_outage)" target="_blank" rel="noopener nofollow">Metric #5</a></span><span class="fm-ev-txt">Restoration progress: ~11% by 11:30 AEDT; ~88% by 13:00 AEDT</span></li><li><span class="fm-ev-src"><a href="https://Wikipedia (2023_Optus_outage)" target="_blank" rel="noopener nofollow">Metric #4</a></span><span class="fm-ev-txt">Outage duration: ~12-13 hours (some media reported up to 14)</span></li><li><span class="fm-ev-src"><a href="https://Analysis grounded in Wikipedia account" target="_blank" rel="noopener nofollow">Sequence of events #13</a></span><span class="fm-ev-txt">8 Nov 2023, morning-afternoon — Because tripped BGP sessions do not self-heal, engineers manually reconnected/rebooted affected routers (manual/on-site detail inferred from the recovery profile).</span></li><li><span class="fm-ev-src">Technical deep-dive</span><span class="fm-ev-txt">“tripped max-prefix sessions typically do not silently re-establish when the flood subsides”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-01</span>
+    <span class="fm-mode">A software upgrade at a North American Singtel exchange makes one router disconnect, and the resulting flood of ~940,000 BGP announcements in an hour reaches Optus unfiltered<span class="fm-item">Singtel international peering boundary to Optus AS4804</span></span>
+    <span class="fm-sod" aria-label="Severity 9, occurrence 5, detection 8">9·5·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>360</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Absorb an upstream routing event without passing an abnormal flood into Optus&#x27;s core</dd>
+      <dt>Effect</dt><dd>Optus&#x27;s edge routers receive about 300 times their normal hourly announcement rate, which trips their route limits (FM-02)</dd>
+      <dt>Cause</dt><dd>No apparent inbound prefix-filtering or route rate-limiting at the peering boundary (inferred from the mechanism, not a verbatim finding); causation reportedly disputed by Singtel</dd>
+      <dt>Prevention in place</dt><dd>None recorded at the boundary</dd>
+      <dt>Detection in place</dt><dd>Cloudflare telemetry registered the spike; nothing at the boundary is recorded to have caught it</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>9</b></dt><dd>This is the trigger of a nationwide outage of a foundational telecom service with no workaround for Optus customers: the rubric&#x27;s 9. The people hazard through 000 is scored in FM-04.</dd></div>
+      <div class="fm-sc"><dt>O <b>5</b></dt><dd>Software upgrades on peering routers are routine, and no boundary guard is recorded, but a flood of this size from an upgrade is not routine: between &#x27;infrequent&#x27; and &#x27;occasional&#x27;. Held at 5 because the filtering gap is inferred and causation is disputed.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>The spike was visible in external telemetry, but no control at the boundary is recorded to have caught it; its first internal effect was the outage, so &#x27;detected after impact&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 360</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Inbound prefix-filtering and route rate-limiting at the Singtel peering boundary (status: under review; ownership reportedly disputed) <span class="fm-ev-src">Correction of errors #2</span></li><li>Peering-boundary hygiene: prefix filters, route-count rate limits and AS-path checks at Singtel ingress (analyst recommendation) <span class="fm-ev-src">Improvement #2</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Wikipedia (2023_Optus_outage)" target="_blank" rel="noopener nofollow">Sequence of events #1</a></span><span class="fm-ev-txt">7-8 Nov 2023 (pre-onset) — Scheduled software upgrade performed on a router at a North American node of Singtel&#x27;s international peering network, the upstream infrastructure Optus&#x27;s IP core depends on.</span></li><li><span class="fm-ev-src"><a href="https://Wikipedia (2023_Optus_outage)" target="_blank" rel="noopener nofollow">Sequence of events #2</a></span><span class="fm-ev-txt">8 Nov 2023, ~04:05 AEDT — The Singtel exchange upgrade caused one router to disconnect, initiating an abnormal BGP route-advertisement event toward Optus&#x27;s AS4804.</span></li><li><span class="fm-ev-src"><a href="https://Cloudflare figure, as cited by Wikipedia" target="_blank" rel="noopener nofollow">Metric #1</a></span><span class="fm-ev-txt">BGP route-announcement flood: ~940,000 announcements in one hour vs &lt;3,000/hr normal (~300x)</span></li><li><span class="fm-ev-src">Contributing factor #3</span><span class="fm-ev-txt">Upstream peering-hygiene gap (inferred from mechanism): a North American Singtel exchange upgrade was allowed to propagate a ~940,000-route BGP event downstream toward AS4804 (normal &lt;3,000/hr) with no apparent upstream prefix-filtering or rate-limiting to contain it (Cloudflare figure via Wikipedia).</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“inferred from the mechanism, not a verbatim finding”</span></li><li><span class="fm-ev-src">Contributing factor #6</span><span class="fm-ev-txt">Disputed / unclear change ownership at the Singtel-Optus boundary: Singtel was reported to have refuted early claims that its upgrade caused the outage (ZDNet, not re-verified this session), indicating unclear accountability and coordination.</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-02</span>
+    <span class="fm-mode">The same Cisco default threshold trips on ~90 PE routers near-simultaneously and each tears down its BGP sessions, so the protective action isolates the whole IP core<span class="fm-item">Route-limit thresholds on Optus&#x27;s Cisco Provider Edge routers</span></span>
+    <span class="fm-sod" aria-label="Severity 9, occurrence 5, detection 8">9·5·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>360</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Protect each router from routing-update overload without cutting customers off the network</dd>
+      <dt>Effect</dt><dd>Nationwide loss of mobile and fixed service for more than 10 million people and 400,000 businesses; Melbourne trains, hospital phone lines and EFTPOS terminals disrupted</dd>
+      <dt>Cause</dt><dd>Thresholds left at &#x27;the pre-configured default threshold limits set by Cisco Systems&#x27; rather than tuned to Optus&#x27;s route counts, with hard session teardown as the response</dd>
+      <dt>Prevention in place</dt><dd>The threshold itself, which prevented CPU/memory exhaustion as designed</dd>
+      <dt>Detection in place</dt><dd>The routers detected the threshold breach; that detection triggered the teardown</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>9</b></dt><dd>Provider-wide outage of a foundational national telecom service for hours with no workaround: the rubric&#x27;s 9. The 000 failures are scored separately in FM-04 rather than here.</dd></div>
+      <div class="fm-sc"><dt>O <b>5</b></dt><dd>The default configuration is a standing condition, but it only fires on an abnormal flood: between &#x27;infrequent&#x27; and &#x27;occasional&#x27;. Scored like FM-01 so the trigger and the amplifier together are not counted as two frequent events.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>The only control that saw the flood was the threshold whose trip was the outage; no alerting that would allow action before customers lost service is recorded.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 360</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Tune PE route-limit thresholds off Cisco defaults with graceful warn/restart behaviour (directed by the Bean review / Senate inquiry; status not retrievable) <span class="fm-ev-src">Correction of errors #1</span></li><li>Operator-tuned limits with soft warning-then-restart behaviour (analyst recommendation) <span class="fm-ev-src">Improvement #1</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Wikipedia (2023_Optus_outage)" target="_blank" rel="noopener nofollow">Sequence of events #4</a></span><span class="fm-ev-txt">8 Nov 2023, ~04:05 AEDT — Optus&#x27;s Cisco PE routers registered the flood as incoming route updates crossed &#x27;the pre-configured default threshold limits set by Cisco Systems.&#x27;</span></li><li><span class="fm-ev-src"><a href="https://Wikipedia (2023_Optus_outage)" target="_blank" rel="noopener nofollow">Sequence of events #6</a></span><span class="fm-ev-txt">8 Nov 2023, ~04:05-04:10 AEDT — &#x27;Approximately 90 edge provider routers disconnected as an automated protective measure against routing update overload&#x27; — a synchronized self-isolation across the PE fleet.</span></li><li><span class="fm-ev-src"><a href="https://Wikipedia (2023_Optus_outage)" target="_blank" rel="noopener nofollow">Metric #2</a></span><span class="fm-ev-txt">Provider Edge routers self-disconnected: ~90 edge/PE routers</span></li><li><span class="fm-ev-src">Contributing factor #1</span><span class="fm-ev-txt">Configuration/maintenance lapse on Optus PE routers: they were left on &#x27;the pre-configured default threshold limits set by Cisco Systems&#x27; rather than thresholds tuned to Optus&#x27;s real route counts, so a foreseeable flood tripped a hard fail-safe instead of degrading gracefully (Wikipedia, citing the outage account).</span></li><li><span class="fm-ev-src">Contributing factor #2</span><span class="fm-ev-txt">Synchronized fail-safe design flaw: because the identical default limit tripped across ~90 PE routers near-simultaneously, the protective mechanism produced a fleet-wide disconnection cascade rather than isolating a single fault — the &#x27;containment&#x27; had no firebreak (Wikipedia).</span></li><li><span class="fm-ev-src"><a href="https://Wikipedia (2023_Optus_outage)" target="_blank" rel="noopener nofollow">Metric #3</a></span><span class="fm-ev-txt">People affected: &gt;10 million people and 400,000 businesses</span></li><li><span class="fm-ev-src"><a href="https://en.wikipedia.org/wiki/2023_Optus_outage" target="_blank" rel="noopener nofollow">Reference #1 · press</a></span><span class="fm-ev-txt">“Approximately 90 edge provider routers disconnected as an automated protective measure against routing update overload”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-04</span>
+    <span class="fm-mode">Emergency 000 calls fail for affected customers, with no effective fallback during the IP-core loss<span class="fm-item">Triple-Zero (000) emergency calling</span></span>
+    <span class="fm-sod" aria-label="Severity 10, occurrence 4, detection 9">10·4·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>360</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Connect emergency calls from Optus customers even when Optus&#x27;s IP core is down</dd>
+      <dt>Effect</dt><dd>Customers cannot reach emergency services; the exact number of failed calls is not in the retrievable record; this became the central concern of ACMA and the Senate inquiry</dd>
+      <dt>Cause</dt><dd>000 calling depended on the same IP core, with no resilient fallback path recorded</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Through failed calls</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>10</b></dt><dd>Rubric 10, hazard to people: emergency calls failed. No specific harm is recorded in the dossier, but losing access to emergency services is the hazard itself.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>Needs the IP core to fail first, which is infrequent; kept low so the single outage is not counted again at full weight.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>The failure was found when calls did not connect, the analogue of detection through customer impact.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 360</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Resilient 000 failover independent of the Optus IP core plus welfare-check procedures (regulatory focus; status not retrievable) <span class="fm-ev-src">Correction of errors #3</span></li><li>000 failover path independent of the Optus IP core with automated welfare checks (analyst recommendation) <span class="fm-ev-src">Improvement #4</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Wikipedia (2023_Optus_outage)" target="_blank" rel="noopener nofollow">Sequence of events #9</a></span><span class="fm-ev-txt">8 Nov 2023, morning — Emergency Triple-Zero (000) calls failed for affected customers; exact count of failed calls not in retrievable record.</span></li><li><span class="fm-ev-src"><a href="https://Wikipedia (2023_Optus_outage)" target="_blank" rel="noopener nofollow">Metric #10</a></span><span class="fm-ev-txt">Emergency-services impact: Triple-Zero (000) calls failed (exact count not in retrievable record)</span></li><li><span class="fm-ev-src">Contributing factor #5</span><span class="fm-ev-txt">Triple-Zero (000) failover inadequacy: emergency 000 calls failed with no effective resilient fallback during the IP-core loss, later a central regulatory concern of ACMA / the Senate inquiry (Wikipedia).</span></li><li><span class="fm-ev-src"><a href="https://Wikipedia (2023_Optus_outage)" target="_blank" rel="noopener nofollow">Sequence of events #18</a></span><span class="fm-ev-txt">20 Nov 2023 — Optus CEO Kelly Bayer Rosmarin resigned; a Senate public inquiry and an independent government (Bean) review were established.</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-05</span>
+    <span class="fm-mode">An upstream upgrade proceeds with no recorded joint staged rollout, blast-radius review or coordinated rollback, and ownership of the change is disputed afterwards<span class="fm-item">Change management across the Singtel-Optus boundary</span></span>
+    <span class="fm-sod" aria-label="Severity 7, occurrence 6, detection 8">7·6·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>336</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Review and stage changes on shared upstream infrastructure for their blast radius on Optus</dd>
+      <dt>Effect</dt><dd>A change in North America reaches 10 million Australians; accountability is contested after the event</dd>
+      <dt>Cause</dt><dd>No joint change process recorded between the two companies; Singtel reportedly refuted early causation claims (ZDNet, not re-verified)</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>None recorded before the change took effect</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>7</b></dt><dd>A process precursor whose consequence runs through FM-01 and FM-02; scored at 7 so the national outage is not counted a third time at full weight.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>Upgrades on shared infrastructure happen routinely and no joint guard is recorded: &#x27;occasional&#x27;. Held at 6 because the dossier&#x27;s evidence for the gap is the outcome and a disputed press report.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>No pre-change review is recorded that would have flagged the downstream risk; the gap surfaced through the outage.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 336</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Joint Singtel-Optus staged change management with blast-radius review and coordinated rollback (recommended; not verified) <span class="fm-ev-src">Correction of errors #4</span></li><li>Joint change management closing the accountability gap at the peering boundary (analyst recommendation) <span class="fm-ev-src">Improvement #3</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #6</span><span class="fm-ev-txt">Disputed / unclear change ownership at the Singtel-Optus boundary: Singtel was reported to have refuted early claims that its upgrade caused the outage (ZDNet, not re-verified this session), indicating unclear accountability and coordination.</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“Attribution of change ownership was reportedly disputed”</span></li><li><span class="fm-ev-src"><a href="https://Wikipedia (2023_Optus_outage)" target="_blank" rel="noopener nofollow">Sequence of events #1</a></span><span class="fm-ev-txt">7-8 Nov 2023 (pre-onset) — Scheduled software upgrade performed on a router at a North American node of Singtel&#x27;s international peering network, the upstream infrastructure Optus&#x27;s IP core depends on.</span></li></ul>
+  </div>
+</details>
+        </div>
+        <details class="fm-method"><summary>Scoring rubric and method</summary><div class="fm-method-body"><p>A retrospective FMEA: each row asks how this system could fail, how bad the effect was, how likely the cause was given the controls in place at the time, and how likely those controls were to catch it before customers did. Scales are adapted for data-centre operations from the 1–10 scales of IEC 60812:2018 and the AIAG-VDA FMEA handbook. RPN = S × O × D. Priority is High when S ≥ 9 with O ≥ 4 or D ≥ 7, or when RPN ≥ 300; Medium when RPN ≥ 120 or S ≥ 7; Low otherwise. Severity overrides the product because a large S multiplied by small O and D can hide a region-wide outage nothing would catch.</p><p>Every row cites evidence from this dossier, and every quote is checked verbatim against its source by <code>tools/test-incidents-fmea.py</code>. A revised score is only shown against a published corrective action. This is an RZ analyst assessment, not an operator document.</p><div class="fm-rubrics"><div><p class="fm-sub">Severity</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Hazard to people, or loss of the facility / several regions</td></tr><tr><td>9</td><td>Region-wide or provider-wide outage of a foundational service, no workaround</td></tr><tr><td>8</td><td>Full outage of a major service for hours</td></tr><tr><td>7</td><td>Major degradation of a major service</td></tr><tr><td>6</td><td>Partial outage confined to one zone or one service</td></tr><tr><td>5</td><td>Customer-visible degradation</td></tr><tr><td>4</td><td>Limited customer impact</td></tr><tr><td>3</td><td>Internal impact only</td></tr><tr><td>2</td><td>Negligible</td></tr><tr><td>1</td><td>No effect</td></tr></tbody></table></div><div><p class="fm-sub">Occurrence</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Near certain: the cause is present in normal operation</td></tr><tr><td>8</td><td>Frequent: routine work exercises the cause</td></tr><tr><td>6</td><td>Occasional: a foreseeable slip or condition, weakly guarded</td></tr><tr><td>4</td><td>Infrequent: needs an unusual combination</td></tr><tr><td>2</td><td>Remote: guarded by design</td></tr><tr><td>1</td><td>Eliminated by design</td></tr></tbody></table></div><div><p class="fm-sub">Detection</p><table class="fm-rubric"><tbody><tr><td>10</td><td>No control could detect it</td></tr><tr><td>9</td><td>Detected only through customer impact</td></tr><tr><td>8</td><td>Detected after impact by internal monitoring</td></tr><tr><td>6</td><td>Detected at onset, not prevented</td></tr><tr><td>4</td><td>Detected before impact with time to act</td></tr><tr><td>2</td><td>Automated interlock almost certainly stops it</td></tr><tr><td>1</td><td>Certain to be stopped</td></tr></tbody></table></div></div></div></details>
+
 
         <h2>Correction of errors (COE)</h2>
         <ul class="tight"><li>Tune all Provider Edge router route-limit thresholds off Cisco defaults to operator-specific values with graceful-degradation (warn/restart) behaviour instead of synchronized hard teardown <span class="coe-meta">Optus Network Engineering · Directed by Bean review / Senate inquiry (verbatim status not retrievable this session)</span></li><li>Implement inbound prefix-filtering and route rate-limiting at the Singtel peering boundary to Optus <span class="coe-meta">Singtel / Optus peering teams · Under review (change ownership reportedly disputed; ZDNet, not re-verified)</span></li><li>Establish a resilient Triple-Zero (000) failover independent of the Optus IP core plus mandated welfare-check procedures <span class="coe-meta">Optus / ACMA · Regulatory focus of ACMA and Senate inquiry (verbatim status not retrievable this session)</span></li><li>Institute joint Singtel-Optus staged change-management with blast-radius review and coordinated rollback <span class="coe-meta">Optus / Singtel change-management · Recommended (not verified this session)</span></li></ul>
@@ -425,7 +667,7 @@ The latent root causes are two change-management/configuration design lapses evi
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-1a1a084f"></script>
+    <script src="js/rz-version.js?v=20261010-00a1d9e8"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

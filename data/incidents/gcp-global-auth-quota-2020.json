@@ -313,5 +313,283 @@
   "confidence": "high-verified — root cause, timeline, duration, and blast radius from Google's own incident #20013 (fetched and cross-checked), independently corroborated by Wikipedia's UTC timeline (Pacific+8h). Gaps: no absolute user count and no financial figure exist in any reachable source; exact zeroed quota unit and Paxos-failover reasoning are undisclosed/inferred (flagged)."
  },
  "lastUpdated": "2026-07-31",
- "operatorShort": "Google Cloud"
+ "operatorShort": "Google Cloud",
+ "fmea": {
+  "scope": "Google's global User ID Service on 14 December 2020 — the October migration to a new quota system, the automated quota enforcement and its grace period, the Paxos-replicated account database, the GCP and Workspace services that authenticate through it, and the manual mitigation path. Analysed retrospectively from Google's official incident report #20013, which is the sole primary source, with Wikipedia, SecurityWeek and a Hacker News thread as secondary. All five corrective actions are recorded as committed in #20013, not as completed, so every revised score here is a claim about the action, not a confirmed outcome. The exact October change, grace-period length and reduced quota value are undisclosed.",
+  "modes": [
+   {
+    "id": "FM-01",
+    "item": "Quota-system migration for the User ID Service (October 2020 change)",
+    "function": "Move the service to the new quota system with its usage reported correctly",
+    "failureMode": "Parts of the old quota system are left in place and report the service's usage as 0",
+    "effect": "A false zero-usage signal sits dormant for about 6-10 weeks and later drives the automated quota cut that takes down authentication worldwide",
+    "cause": "Incomplete migration: the service was registered with the new system without removing residual old-system state; why the old parts were left is undisclosed",
+    "prevention": "None recorded for verifying the cutover",
+    "detection": "None at the latent stage; monitoring did not flag the zero-usage report in the interval",
+    "S": 9,
+    "O": 5,
+    "D": 9,
+    "rationale": {
+     "S": "This is the origin of a provider-wide outage of a foundational service, authentication for every Google account, with no workaround: the rubric's 9. Not 10: no people or facility involved.",
+     "O": "A partial cutover during a migration is a foreseeable slip, and nothing is recorded that checked the cutover; held at 5 because migrations of this kind are not routine daily work.",
+     "D": "The implausible zero reading went unflagged for weeks; it was found only after the outage it caused."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 0
+     },
+     {
+      "src": "soe",
+      "i": 1
+     },
+     {
+      "src": "metric",
+      "i": 5
+     },
+     {
+      "src": "metric",
+      "i": 6
+     },
+     {
+      "src": "ref",
+      "i": 0,
+      "quote": "parts of the previous quota system were left in place which incorrectly reported the usage for the User ID Service as 0"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Improve monitoring and alerting to catch incorrect configurations sooner",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     }
+    ],
+    "revised": {
+     "S": 9,
+     "O": 5,
+     "D": 4
+    },
+    "revisedRationale": "Monitoring that catches incorrect configurations would see a false zero-usage report during the weeks before enforcement, which is detection before impact with time to act (D 9→4). The migration slip itself can still happen (O unchanged). Recorded as committed in #20013, not as completed, so the reduction is a claim about the action, not a confirmed outcome."
+   },
+   {
+    "id": "FM-02",
+    "item": "Automated quota enforcement and its grace period",
+    "function": "Adjust quotas from reported usage without starving a live service",
+    "failureMode": "When the grace period expires, the automation acts on the zero-usage signal and cuts the account database's quota globally at once",
+    "effect": "The Paxos leader can no longer write; authentication lookups begin failing worldwide at 03:46 US/Pacific",
+    "cause": "Automation permitted a fast, global change on an implausible signal; the grace period only delayed enforcement and did not validate the signal",
+    "prevention": "A grace period on enforcing quota restrictions",
+    "detection": "Automated capacity alerts fired at 03:43, about 3 minutes before user-facing errors",
+    "S": 9,
+    "O": 4,
+    "D": 6,
+    "rationale": {
+     "S": "The global quota cut is the step that turned a bad reading into a provider-wide authentication outage, so it carries the event's severity.",
+     "O": "It needs a false usage signal first, which is an unusual combination: 'infrequent'. Kept below FM-01 so the event is not counted twice at full weight.",
+     "D": "Alerts fired about three minutes before user errors, which is effectively at onset: too short to act, so 'detected at onset, not prevented'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 2
+     },
+     {
+      "src": "soe",
+      "i": 3
+     },
+     {
+      "src": "metric",
+      "i": 1
+     },
+     {
+      "src": "factor",
+      "i": 2
+     },
+     {
+      "src": "rootCause",
+      "quote": "this masked rather than prevented the fault"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Review quota management automation to prevent fast implementation of global changes",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "text": "Harden the grace period into a fail-safe that blocks or alarms on implausible signals (analyst recommendation)",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     }
+    ],
+    "revised": {
+     "S": 6,
+     "O": 4,
+     "D": 6
+    },
+    "revisedRationale": "If quota changes cannot be applied globally at speed, a bad reduction reaches one part of the system before the rest, bounding the outage to a partial one (S 9→6). The implausibility fail-safe is an analyst recommendation and is not credited. The review is recorded as committed in #20013, not as completed, so the reduction is a claim about the action, not a confirmed outcome."
+   },
+   {
+    "id": "FM-03",
+    "item": "User ID account database (Paxos-replicated)",
+    "function": "Keep serving correct authentication reads when writes cannot be committed",
+    "failureMode": "With the Paxos leader unable to write, most reads become outdated and authentication lookups fail",
+    "effect": "OAuth token and cookie validation fails across all regions at once; all Google-account-authenticated services are affected for 47 minutes",
+    "cause": "A write failure was allowed to degrade read correctness in a single global identity store with no regional isolation",
+    "prevention": "None recorded",
+    "detection": "Seen at onset through authentication errors and capacity alerts",
+    "S": 9,
+    "O": 3,
+    "D": 6,
+    "rationale": {
+     "S": "This is how a quota cut on one database became a global authentication outage; it carries the provider-wide severity.",
+     "O": "It needs the leader's writes to be blocked first, which is infrequent; scored low so the event is not triple-counted with FM-01 and FM-02.",
+     "D": "The failure was visible as soon as lookups failed, but nothing in the design kept reads correct: 'detected at onset, not prevented'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 5
+     },
+     {
+      "src": "factor",
+      "i": 4
+     },
+     {
+      "src": "factor",
+      "i": 3
+     },
+     {
+      "src": "rootCause",
+      "quote": "the majority of read operations became outdated which resulted in errors on authentication lookups"
+     },
+     {
+      "src": "metric",
+      "i": 0
+     }
+    ],
+    "actions": [
+     {
+      "text": "Evaluate and implement improved write failure resilience into the User ID service database",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     }
+    ],
+    "revised": {
+     "S": 6,
+     "O": 3,
+     "D": 6
+    },
+    "revisedRationale": "If a blocked writer no longer makes reads stale, authentication keeps working on current data while writes are impaired, so the effect falls from a global outage to a degradation confined to the identity service (S 9→6). Recorded as committed ('evaluate and implement') in #20013, not as completed, so the reduction is a claim about the action, not a confirmed outcome."
+   },
+   {
+    "id": "FM-04",
+    "item": "Data planes of GCP services and authenticated Workspace apps",
+    "function": "Keep serving data-plane requests while the identity service is impaired",
+    "failureMode": "Dependent services fail their data-plane requests along with authentication",
+    "effect": "BigQuery streaming ~75% errors and jobs ~10%; ~15% of Cloud Storage requests using OAuth, HMAC or email authentication impacted; ~4% of GKE control-plane API requests failed; all authenticated Workspace apps down for the duration",
+    "cause": "Weak data-plane isolation from the identity plane",
+    "prevention": "None recorded",
+    "detection": "Customer-visible impact; reported by Google per service",
+    "S": 7,
+    "O": 3,
+    "D": 9,
+    "rationale": {
+     "S": "Major degradation across several major services for 47 minutes, short of hours of full outage; the global authentication failure itself is scored in FM-03.",
+     "O": "It needs the identity service to fail first, which is infrequent.",
+     "D": "The coupling was seen through customer request failures in each service."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 6
+     },
+     {
+      "src": "soe",
+      "i": 7
+     },
+     {
+      "src": "soe",
+      "i": 8
+     },
+     {
+      "src": "factor",
+      "i": 5
+     },
+     {
+      "src": "metric",
+      "i": 7
+     }
+    ],
+    "actions": [
+     {
+      "text": "Improve resilience of GCP services to more strictly limit the impact to the data plane during User ID Service failures",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     }
+    ],
+    "revised": {
+     "S": 5,
+     "O": 3,
+     "D": 9
+    },
+    "revisedRationale": "Stricter data-plane isolation would leave already-authorised data-plane work running during an identity failure, reducing the effect to customer-visible degradation (S 7→5). Recorded as committed in #20013, not as completed, so the reduction is a claim about the action, not a confirmed outcome."
+   },
+   {
+    "id": "FM-05",
+    "item": "Incident mitigation path",
+    "function": "Restore authentication quickly once the cause is known",
+    "failureMode": "Recovery depends on engineers finding the cause and disabling quota enforcement by hand, one datacenter and then all",
+    "effect": "Root cause and fix identified at 04:08, mitigation from 04:22 in one datacenter and 04:27 in all, error rates normal at 04:33: a 47-minute customer-facing outage",
+    "cause": "No automated rollback or override for a quota reduction is recorded",
+    "prevention": "None recorded",
+    "detection": "Paging at 03:48, five minutes after the first alert",
+    "S": 6,
+    "O": 4,
+    "D": 6,
+    "rationale": {
+     "S": "This mode sets the 47-minute length of the outage, not its existence; scored as a partial effect so the outage is not counted again.",
+     "O": "It matters only when a quota reduction has already caused an outage, which is infrequent.",
+     "D": "Engineers were paged within five minutes and the response was visible throughout, but there was no automatic path to shorten it: 'detected at onset, not prevented'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 9
+     },
+     {
+      "src": "soe",
+      "i": 10
+     },
+     {
+      "src": "soe",
+      "i": 11
+     },
+     {
+      "src": "soe",
+      "i": 12
+     },
+     {
+      "src": "metric",
+      "i": 2
+     },
+     {
+      "src": "metric",
+      "i": 3
+     }
+    ],
+    "actions": []
+   }
+  ]
+ }
 }

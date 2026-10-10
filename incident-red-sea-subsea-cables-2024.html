@@ -52,6 +52,12 @@
     .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
     .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
     .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:2px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    /* A chip carries the operator name, which can be a whole sentence ("Google Cloud
+       (impacted tenant); STT GDC / Tata Communications JV (named as the third-party …").
+       nowrap made that one chip 1120px wide and pushed the GCP Delhi dossier into a
+       1260px page at a 1100px viewport. Short chips are unaffected: normal wrapping
+       only engages when a chip would not fit its row. */
+    .chips .chip { max-width:100%; white-space:normal; overflow-wrap:anywhere; }
     .chip.cyan { color:var(--cyan); border-left:2px solid var(--cyan); }
     .chip.amber { color:var(--amber); border-left:2px solid var(--amber); }
     .chip.green { color:var(--green); border-left:2px solid var(--green); }
@@ -71,6 +77,11 @@
     /* rich incident table (reference-2 style) */
     table.itbl { min-width:1120px; }
     table.itbl td { vertical-align:middle; }
+    /* v1.134.20 — the title and summary columns ellipsise so the table's columns line up,
+       which is the right call for a dense index. But the cut text was reachable only by
+       navigating to the incident: a summary lost 238-298px of its sentence with no way to read
+       it in place. Each carries its full text in a title attribute now, so the truncation is
+       deliberate AND non-lossy — which is the condition the legibility audit checks for. */
     .itr { cursor:pointer; }
     .itr:hover td { background:var(--surface-2); }
     .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
@@ -240,7 +251,6 @@
        derive width = W px from the aspect ratio, so the drawing renders 1:1 at any event count
        and the panel scrolls instead of shrinking. */
     .viz-timeline svg { max-width:none; height:96px; width:auto; }
-
     .viz-radar svg { max-width:320px; margin:0 auto; }
     .vz-num { font-variant-numeric:tabular-nums slashed-zero; }
     .vz-box-t, .vz-box-s, .vz-lbl, .vz-hb-lbl, .vz-tl-t, .vz-pt, .vz-tick { pointer-events:auto; }
@@ -323,7 +333,86 @@
     }
     @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
 </style>
-    
+    <style>
+    /* ── FMEA (v3.12.3) — one hairline panel of rows, like the rest of the dossier.
+       No cards, no stripes: a row is a disclosure, state is a 7px dot. ── */
+    .fm-scope { color:var(--text-body); max-width:70ch; }
+    .fm-meta { flex-wrap:wrap; row-gap:0.25rem; }
+    .fm-viz { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:1.6rem; align-items:start; margin:1.2rem 0; }
+    @media (max-width:820px){ .fm-viz { grid-template-columns:1fr; } }
+    .fm-pb-row, .fm-pb-axis { display:grid; grid-template-columns:3.6rem minmax(0,1fr) 6.6rem; gap:0.6rem; align-items:center; }
+    .fm-pb-row { padding:0.32rem 0; }
+    .fm-pb-id, .fm-pb-val { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.8rem; }
+    .fm-pb-id { color:var(--muted); }
+    .fm-pb-val { color:var(--text-strong); white-space:nowrap; }
+    .fm-pb-track { display:flex; flex-direction:column; gap:3px; }
+    .fm-pb-bar { display:block; height:12px; }
+    .fm-pb-rev { display:block; height:4px; background:var(--text-body); opacity:0.55; }
+    .fm-pb-none { font-style:italic; font-size:0.72rem; color:var(--muted); line-height:1; }
+    .fm-pb-axis { margin-top:0.3rem; border-top:1px solid var(--line); padding-top:0.25rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .fm-pb-ticks { display:flex; justify-content:space-between; }
+    .fm-fig { margin:0; }
+    .fm-fig figcaption { font-size:0.8rem; color:var(--muted); margin-bottom:0.35rem; }
+    .fm-fig svg { width:100%; height:auto; display:block; }
+    .fm-fig-m svg { max-width:340px; }
+    .fm-matrix .fm-c-lo { fill:var(--surface); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-md { fill:color-mix(in srgb, var(--amber) 9%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-hi { fill:color-mix(in srgb, var(--red) 10%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .vz-axis { font-size:10px; fill:var(--muted); font-family:'IBM Plex Sans',sans-serif; }
+    .fm-matrix .fm-pt { stroke:var(--surface); stroke-width:1.5; }
+    .fm-matrix .fm-pt-l { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; fill:var(--text-strong);
+      paint-order:stroke; stroke:var(--surface); stroke-width:3px; stroke-linejoin:round; }
+    .fm-sheet { border:1px solid var(--line); border-radius:4px; margin-top:0.8rem; }
+    .fm-head, .fm-row > summary { display:grid; grid-template-columns:4.2rem minmax(0,1fr) 4.4rem 4.6rem 3.4rem; gap:0.6rem; align-items:baseline; padding:0.6rem 0.9rem; }
+    .fm-head { font-size:0.74rem; color:var(--muted); border-bottom:1px solid var(--line); }
+    .fm-row { border-top:1px solid var(--line); }
+    .fm-row:first-of-type { border-top:0; }
+    .fm-row > summary { cursor:pointer; list-style:none; }
+    .fm-row > summary::-webkit-details-marker { display:none; }
+    .fm-row > summary:hover { background:var(--surface-2); }
+    .fm-row > summary:focus-visible { outline:2px solid var(--cyan); outline-offset:-2px; }
+    .fm-id-cell, .fm-sod, .fm-rpn, .fm-rpn-rev { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.84rem; }
+    .fm-id-cell { color:var(--muted); }
+    .fm-mode { color:var(--text-strong); font-size:0.92rem; line-height:1.4; }
+    .fm-item { display:block; color:var(--muted); font-size:0.8rem; }
+    .fm-sod { color:var(--text-body); }
+    .fm-rpn { color:var(--text-strong); }
+    .fm-rpn-rev { color:var(--muted); }
+    .fm-dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:0.45rem; vertical-align:0.1em; }
+    .fm-body { padding:0.2rem 0.9rem 1rem 5.7rem; }
+    @media (max-width:640px){
+      .fm-head { display:none; }
+      .fm-row > summary { grid-template-columns:3.2rem minmax(0,1fr) auto; }
+      .fm-sod, .fm-rpn-rev { display:none; }
+      .fm-body { padding:0.2rem 0.9rem 1rem; }
+    }
+    .fm-kv { display:grid; grid-template-columns:9.5rem minmax(0,1fr); gap:0.3rem 0.9rem; margin:0.4rem 0 0.8rem; font-size:0.88rem; }
+    .fm-kv dt { color:var(--muted); }
+    .fm-kv dd { margin:0; color:var(--text-body); }
+    @media (max-width:640px){ .fm-kv { grid-template-columns:1fr; } .fm-kv dd { margin-bottom:0.4rem; } }
+    .fm-scores { margin:0 0 0.6rem; border-top:1px solid var(--line); }
+    .fm-sc { display:grid; grid-template-columns:3.2rem minmax(0,1fr); gap:0.6rem; padding:0.45rem 0; border-bottom:1px solid var(--line); font-size:0.86rem; }
+    .fm-sc dt { font-family:'JetBrains Mono',monospace; color:var(--muted); }
+    .fm-sc dt b { color:var(--text-strong); }
+    .fm-sc dd { margin:0; color:var(--text-body); }
+    .fm-sub { font-size:0.8rem; color:var(--muted); margin:0.7rem 0 0.25rem; }
+    .fm-sub b { color:var(--text-strong); }
+    .fm-acts, .fm-ev { margin:0; padding-left:1.1rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-acts li, .fm-ev li { margin:0.25rem 0; }
+    .fm-residual { color:var(--red); }
+    .fm-revline { font-size:0.86rem; color:var(--text-body); margin:0.4rem 0 0; }
+    .fm-ev-src { display:block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .fm-ev-src a { color:var(--cyan); }
+    .fm-ev-txt { display:block; }
+    .fm-method { margin-top:1rem; border:1px solid var(--line); border-radius:4px; }
+    .fm-method > summary { padding:0.6rem 0.9rem; cursor:pointer; font-size:0.9rem; color:var(--text-strong); }
+    .fm-method-body { padding:0 0.9rem 0.9rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-rubrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+    @media (max-width:760px){ .fm-rubrics { grid-template-columns:1fr; } }
+    .fm-rubric { width:100%; border-collapse:collapse; font-size:0.8rem; }
+    .fm-rubric td { padding:0.25rem 0.4rem; border-top:1px solid var(--line); vertical-align:top; }
+    .fm-rubric td:first-child { font-family:'JetBrains Mono',monospace; width:2rem; color:var(--text-strong); }
+</style>
 </head>
 <body class="locked">
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -391,6 +480,187 @@ LATENT ROOT (the real systemic lesson). The design/redundancy failure is ROUTE C
 
         <h2>Contributing factors</h2>
         <ul class="tight"><li>ROUTE / CORRIDOR CONCENTRATION (design redundancy gap): three nominally independent systems — Seacom/Tata TGN-Eurasia, AAE-1 and EIG — share the same narrow off-Yemen corridor, so one seabed event severed all at once (Cloudflare Radar Q1-2024).</li><li>NO ENFORCED ANCHORING-EXCLUSION / CABLE-PROTECTION ZONE in the Bab-el-Mandeb corridor — against the ICPC baseline that anchors and fishing cause ~70-80% of all cable faults, the single most expected fault mode was left unmitigated (ICPC industry baseline).</li><li>MARITIME PROCEDURE LAPSE: a war-damaged, abandoned, not-under-command vessel was left adrift with its anchor down in a known cable corridor for days (18-26 Feb) with no timely salvage or anchor-recovery — the proximate work-procedure failure that let the anchor drag across the cables (Wikipedia &#x27;MV Rubymar&#x27;).</li><li>REPAIR-ACCESS GOVERNANCE GAP: AAE-1 repairs stalled specifically due to &#x27;the refusal of permits from the Yemeni Government&#x27;, with no agreed safe-passage mechanism for repair ships in Houthi-contested waters, turning a routine repair into a ~4-5 month outage (Wikipedia &#x27;AAE-1&#x27;).</li><li>ACTIVE CONFLICT / WAR-RISK ENVIRONMENT: ongoing Houthi anti-ship missile and drone threat both created the initiating strike (two missiles, 18 Feb) and blocked timely repair-ship dispatch and salvage (Wikipedia &#x27;MV Rubymar&#x27;).</li><li>NO INSTRUMENTED FAULT FORENSICS PUBLISHED: absence of recovered anchor marks or matched fault-coordinate-versus-anchor-track survey means attribution rests on temporal/spatial coincidence only, hampering accountability and preventing a certified root cause (Wikipedia &#x27;AAE-1&#x27; — cause &#x27;currently unknown&#x27;).</li></ul>
+        <h2 id="fmea">Failure mode &amp; effects analysis (FMEA)</h2>
+        <p class="fm-scope">The Bab-el-Mandeb subsea cable corridor off Yemen and the three systems cut there (Seacom/Tata TGN-Eurasia, AAE-1, EIG): the initiating seabed event, corridor concentration and protection, fault detection and traffic rerouting, repair access under permit refusal and war risk, and fault forensics. There is no official post-mortem and no consortium or regulator root-cause report: the Rubymar dragging anchor is the &#x27;generally accepted&#x27; leading hypothesis, resting on temporal and spatial coincidence, and Wikipedia records the cause as &#x27;currently unknown&#x27;. The record is telemetry-vendor analysis and press. The ~25% capacity figure is an HGC estimate relayed by Wikipedia and the user count is uncorroborated, so severities are held at &#x27;major degradation&#x27; rather than outage, consistent with Cloudflare seeing no material end-user traffic loss in the East African markets it measured. Every corrective action in the dossier is &#x27;Recommended&#x27;, &#x27;Open&#x27; or &#x27;Not started&#x27;, so no revised score is claimed: all modes are residual risk.</p>
+        <p class="metabar fm-meta"><span><b>6</b> failure modes</span><span class="sep">/</span><span><b>0</b> high priority</span><span class="sep">/</span><span><b>0 of 6</b> with a published action</span><span class="sep">/</span><span>total RPN <b>1178 → 1178</b> (−0%)</span></p>
+        <div class="fm-viz">
+            <figure class="fm-fig"><figcaption>Risk priority number (S × O × D), worst first — thin bar: after the published action</figcaption><div class="fm-pb" role="list" aria-label="Risk priority number per failure mode, before and after corrective action"><div class="fm-pb-row" role="listitem" title="FM-04 Repair permits are refused, stalling the repair for months"><span class="fm-pb-id">FM-04</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:84.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">252</span></div><div class="fm-pb-row" role="listitem" title="FM-01 A disabled, abandoned vessel drifts with its anchor down across the corridor and, under the leading hypothesis, the dragging anchor shears the cables"><span class="fm-pb-id">FM-01</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:74.7%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">224</span></div><div class="fm-pb-row" role="listitem" title="FM-05 Dispatch is held back by active missile and drone threat, war-risk insurance and naval-security constraints"><span class="fm-pb-id">FM-05</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:72.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">216</span></div><div class="fm-pb-row" role="listitem" title="FM-02 Three systems sharing one narrow corridor are severed together by a single event"><span class="fm-pb-id">FM-02</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:70.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">210</span></div><div class="fm-pb-row" role="listitem" title="FM-06 No instrumented fault forensics are published: no fault coordinates, depths, anchor marks or anchor-track match"><span class="fm-pb-id">FM-06</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:64.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">192</span></div><div class="fm-pb-row" role="listitem" title="FM-03 Surviving cables and terrestrial paths lack the headroom to carry the diverted load"><span class="fm-pb-id">FM-03</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:28.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">84</span></div><div class="fm-pb-axis" aria-hidden="true"><span></span><span class="fm-pb-ticks"><span>0</span><span>150</span><span>300</span></span><span></span></div></div></figure>
+            <figure class="fm-fig fm-fig-m"><figcaption>Criticality: severity × occurrence</figcaption><svg class="fm-matrix" viewBox="0 0 360 330" role="img" aria-label="Criticality matrix, severity against occurrence"><rect class="fm-c-lo" x="44" y="266" width="28" height="28"/><rect class="fm-c-lo" x="72" y="266" width="28" height="28"/><rect class="fm-c-lo" x="100" y="266" width="28" height="28"/><rect class="fm-c-lo" x="128" y="266" width="28" height="28"/><rect class="fm-c-lo" x="156" y="266" width="28" height="28"/><rect class="fm-c-lo" x="184" y="266" width="28" height="28"/><rect class="fm-c-lo" x="212" y="266" width="28" height="28"/><rect class="fm-c-lo" x="240" y="266" width="28" height="28"/><rect class="fm-c-lo" x="268" y="266" width="28" height="28"/><rect class="fm-c-lo" x="296" y="266" width="28" height="28"/><rect class="fm-c-lo" x="44" y="238" width="28" height="28"/><rect class="fm-c-lo" x="72" y="238" width="28" height="28"/><rect class="fm-c-lo" x="100" y="238" width="28" height="28"/><rect class="fm-c-lo" x="128" y="238" width="28" height="28"/><rect class="fm-c-lo" x="156" y="238" width="28" height="28"/><rect class="fm-c-lo" x="184" y="238" width="28" height="28"/><rect class="fm-c-lo" x="212" y="238" width="28" height="28"/><rect class="fm-c-lo" x="240" y="238" width="28" height="28"/><rect class="fm-c-md" x="268" y="238" width="28" height="28"/><rect class="fm-c-md" x="296" y="238" width="28" height="28"/><rect class="fm-c-lo" x="44" y="210" width="28" height="28"/><rect class="fm-c-lo" x="72" y="210" width="28" height="28"/><rect class="fm-c-lo" x="100" y="210" width="28" height="28"/><rect class="fm-c-lo" x="128" y="210" width="28" height="28"/><rect class="fm-c-lo" x="156" y="210" width="28" height="28"/><rect class="fm-c-md" x="184" y="210" width="28" height="28"/><rect class="fm-c-md" x="212" y="210" width="28" height="28"/><rect class="fm-c-md" x="240" y="210" width="28" height="28"/><rect class="fm-c-md" x="268" y="210" width="28" height="28"/><rect class="fm-c-md" x="296" y="210" width="28" height="28"/><rect class="fm-c-lo" x="44" y="182" width="28" height="28"/><rect class="fm-c-lo" x="72" y="182" width="28" height="28"/><rect class="fm-c-lo" x="100" y="182" width="28" height="28"/><rect class="fm-c-lo" x="128" y="182" width="28" height="28"/><rect class="fm-c-md" x="156" y="182" width="28" height="28"/><rect class="fm-c-md" x="184" y="182" width="28" height="28"/><rect class="fm-c-md" x="212" y="182" width="28" height="28"/><rect class="fm-c-md" x="240" y="182" width="28" height="28"/><rect class="fm-c-md" x="268" y="182" width="28" height="28"/><rect class="fm-c-hi" x="296" y="182" width="28" height="28"/><rect class="fm-c-lo" x="44" y="154" width="28" height="28"/><rect class="fm-c-lo" x="72" y="154" width="28" height="28"/><rect class="fm-c-lo" x="100" y="154" width="28" height="28"/><rect class="fm-c-md" x="128" y="154" width="28" height="28"/><rect class="fm-c-md" x="156" y="154" width="28" height="28"/><rect class="fm-c-md" x="184" y="154" width="28" height="28"/><rect class="fm-c-md" x="212" y="154" width="28" height="28"/><rect class="fm-c-hi" x="240" y="154" width="28" height="28"/><rect class="fm-c-hi" x="268" y="154" width="28" height="28"/><rect class="fm-c-hi" x="296" y="154" width="28" height="28"/><rect class="fm-c-lo" x="44" y="126" width="28" height="28"/><rect class="fm-c-lo" x="72" y="126" width="28" height="28"/><rect class="fm-c-md" x="100" y="126" width="28" height="28"/><rect class="fm-c-md" x="128" y="126" width="28" height="28"/><rect class="fm-c-md" x="156" y="126" width="28" height="28"/><rect class="fm-c-md" x="184" y="126" width="28" height="28"/><rect class="fm-c-hi" x="212" y="126" width="28" height="28"/><rect class="fm-c-hi" x="240" y="126" width="28" height="28"/><rect class="fm-c-hi" x="268" y="126" width="28" height="28"/><rect class="fm-c-hi" x="296" y="126" width="28" height="28"/><rect class="fm-c-lo" x="44" y="98" width="28" height="28"/><rect class="fm-c-lo" x="72" y="98" width="28" height="28"/><rect class="fm-c-md" x="100" y="98" width="28" height="28"/><rect class="fm-c-md" x="128" y="98" width="28" height="28"/><rect class="fm-c-md" x="156" y="98" width="28" height="28"/><rect class="fm-c-hi" x="184" y="98" width="28" height="28"/><rect class="fm-c-hi" x="212" y="98" width="28" height="28"/><rect class="fm-c-hi" x="240" y="98" width="28" height="28"/><rect class="fm-c-hi" x="268" y="98" width="28" height="28"/><rect class="fm-c-hi" x="296" y="98" width="28" height="28"/><rect class="fm-c-lo" x="44" y="70" width="28" height="28"/><rect class="fm-c-lo" x="72" y="70" width="28" height="28"/><rect class="fm-c-md" x="100" y="70" width="28" height="28"/><rect class="fm-c-md" x="128" y="70" width="28" height="28"/><rect class="fm-c-hi" x="156" y="70" width="28" height="28"/><rect class="fm-c-hi" x="184" y="70" width="28" height="28"/><rect class="fm-c-hi" x="212" y="70" width="28" height="28"/><rect class="fm-c-hi" x="240" y="70" width="28" height="28"/><rect class="fm-c-hi" x="268" y="70" width="28" height="28"/><rect class="fm-c-hi" x="296" y="70" width="28" height="28"/><rect class="fm-c-hi" x="44" y="42" width="28" height="28"/><rect class="fm-c-hi" x="72" y="42" width="28" height="28"/><rect class="fm-c-hi" x="100" y="42" width="28" height="28"/><rect class="fm-c-hi" x="128" y="42" width="28" height="28"/><rect class="fm-c-hi" x="156" y="42" width="28" height="28"/><rect class="fm-c-hi" x="184" y="42" width="28" height="28"/><rect class="fm-c-hi" x="212" y="42" width="28" height="28"/><rect class="fm-c-hi" x="240" y="42" width="28" height="28"/><rect class="fm-c-hi" x="268" y="42" width="28" height="28"/><rect class="fm-c-hi" x="296" y="42" width="28" height="28"/><rect class="fm-c-hi" x="44" y="14" width="28" height="28"/><rect class="fm-c-hi" x="72" y="14" width="28" height="28"/><rect class="fm-c-hi" x="100" y="14" width="28" height="28"/><rect class="fm-c-hi" x="128" y="14" width="28" height="28"/><rect class="fm-c-hi" x="156" y="14" width="28" height="28"/><rect class="fm-c-hi" x="184" y="14" width="28" height="28"/><rect class="fm-c-hi" x="212" y="14" width="28" height="28"/><rect class="fm-c-hi" x="240" y="14" width="28" height="28"/><rect class="fm-c-hi" x="268" y="14" width="28" height="28"/><rect class="fm-c-hi" x="296" y="14" width="28" height="28"/><text class="vz-tick" x="58.0" y="308" text-anchor="middle">1</text><text class="vz-tick" x="36" y="284.0" text-anchor="end">1</text><text class="vz-tick" x="86.0" y="308" text-anchor="middle">2</text><text class="vz-tick" x="36" y="256.0" text-anchor="end">2</text><text class="vz-tick" x="114.0" y="308" text-anchor="middle">3</text><text class="vz-tick" x="36" y="228.0" text-anchor="end">3</text><text class="vz-tick" x="142.0" y="308" text-anchor="middle">4</text><text class="vz-tick" x="36" y="200.0" text-anchor="end">4</text><text class="vz-tick" x="170.0" y="308" text-anchor="middle">5</text><text class="vz-tick" x="36" y="172.0" text-anchor="end">5</text><text class="vz-tick" x="198.0" y="308" text-anchor="middle">6</text><text class="vz-tick" x="36" y="144.0" text-anchor="end">6</text><text class="vz-tick" x="226.0" y="308" text-anchor="middle">7</text><text class="vz-tick" x="36" y="116.0" text-anchor="end">7</text><text class="vz-tick" x="254.0" y="308" text-anchor="middle">8</text><text class="vz-tick" x="36" y="88.0" text-anchor="end">8</text><text class="vz-tick" x="282.0" y="308" text-anchor="middle">9</text><text class="vz-tick" x="36" y="60.0" text-anchor="end">9</text><text class="vz-tick" x="310.0" y="308" text-anchor="middle">10</text><text class="vz-tick" x="36" y="32.0" text-anchor="end">10</text><text class="vz-axis" x="184" y="328" text-anchor="middle">Occurrence →</text><text class="vz-axis" transform="translate(11 154) rotate(-90)" text-anchor="middle">Severity →</text><circle class="fm-pt" cx="114.0" cy="112.0" r="6" fill="var(--amber)"><title>FM-03 Surviving cables and terrestrial paths lack the headroom to carry the diverted load (S7 O3 D4)</title></circle><text class="fm-pt-l" x="114.0" y="102.0" text-anchor="middle">03</text><circle class="fm-pt" cx="142.0" cy="112.0" r="6" fill="var(--amber)"><title>FM-01 A disabled, abandoned vessel drifts with its anchor down across the corridor and, under the leading hypothesis, the dragging anchor shears the cables (S7 O4 D8)</title></circle><text class="fm-pt-l" x="142.0" y="102.0" text-anchor="middle">01</text><circle class="fm-pt" cx="170.0" cy="112.0" r="6" fill="var(--amber)"><title>FM-02 Three systems sharing one narrow corridor are severed together by a single event (S7 O5 D6)</title></circle><text class="fm-pt-l" x="170.0" y="102.0" text-anchor="middle">02</text><circle class="fm-pt" cx="198.0" cy="112.0" r="6" fill="var(--amber)"><title>FM-04 Repair permits are refused, stalling the repair for months (S7 O6 D6)</title></circle><text class="fm-pt-l" x="198.0" y="102.0" text-anchor="middle">04</text><circle class="fm-pt" cx="198.0" cy="140.0" r="6" fill="var(--amber)"><title>FM-05 Dispatch is held back by active missile and drone threat, war-risk insurance and naval-security constraints (S6 O6 D6)</title></circle><text class="fm-pt-l" x="198.0" y="130.0" text-anchor="middle">05</text><circle class="fm-pt" cx="254.0" cy="224.0" r="6" fill="var(--amber)"><title>FM-06 No instrumented fault forensics are published: no fault coordinates, depths, anchor marks or anchor-track match (S3 O8 D8)</title></circle><text class="fm-pt-l" x="254.0" y="214.0" text-anchor="middle">06</text></svg></figure>
+        </div>
+        <div class="fm-sheet">
+            <div class="fm-head" aria-hidden="true"><span>ID</span><span>Failure mode</span><span>S·O·D</span><span>RPN</span><span>After</span></div>
+            <details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-04</span>
+    <span class="fm-mode">Repair permits are refused, stalling the repair for months<span class="fm-item">Repair permitting in contested Yemeni waters</span></span>
+    <span class="fm-sod" aria-label="Severity 7, occurrence 6, detection 6">7·6·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>252</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Authorise repair ships to reach the fault promptly</dd>
+      <dt>Effect</dt><dd>AAE-1 repairs still pending on 13 May 2024 and completed only in July 2024, about 4-5 months after the cut; Seacom&#x27;s contribution to Remgro&#x27;s headline earnings fell from ~R32M to ~R2M, mainly on once-off cable-repair costs</dd>
+      <dt>Cause</dt><dd>No agreed permitting or safe-passage regime for repair ships; AAE-1 repairs stalled &#x27;due to the refusal of permits from the Yemeni Government&#x27;</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Known while the repair was pending</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>7</b></dt><dd>This mode sets how long the capacity loss lasted; months of degraded backbone capacity is a major degradation, scored no higher than the cut itself because end-user traffic was largely carried.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>In a contested jurisdiction with no standing regime, a permit obstacle is a foreseeable, weakly guarded condition: &#x27;occasional&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>The obstacle was visible as soon as repair was sought, but nothing could clear it: &#x27;detected at onset, not prevented&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 252</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Negotiate a standing permitting and safe-passage regime for repair ships in contested Yemeni waters (status: Open) <span class="fm-ev-src">Correction of errors #4</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Wikipedia &#x27;AAE-1&#x27;" target="_blank" rel="noopener nofollow">Sequence of events #14</a></span><span class="fm-ev-txt">2024-05 (by 13 May) — AAE-1 repairs still &#x27;pending due to the refusal of permits from the Yemeni Government&#x27;.</span></li><li><span class="fm-ev-src"><a href="https://Wikipedia &#x27;AAE-1&#x27;" target="_blank" rel="noopener nofollow">Sequence of events #15</a></span><span class="fm-ev-txt">2024-07 — &#x27;In July 2024, repairs were successfully carried out on the AAE-1 cable&#x27; — an ~4-5 month restoration versus the days-to-weeks typical in a permissive environment.</span></li><li><span class="fm-ev-src"><a href="https://Wikipedia &#x27;AAE-1&#x27;" target="_blank" rel="noopener nofollow">Metric #7</a></span><span class="fm-ev-txt">Restoration time (AAE-1): ~4-5 months (pending 13 May 2024 -&gt; completed July 2024)</span></li><li><span class="fm-ev-src">Contributing factor #4</span><span class="fm-ev-txt">REPAIR-ACCESS GOVERNANCE GAP: AAE-1 repairs stalled specifically due to &#x27;the refusal of permits from the Yemeni Government&#x27;, with no agreed safe-passage mechanism for repair ships in Houthi-contested waters, turning a routine repair into a ~4-5 month outage (Wikipedia &#x27;AAE-1&#x27;).</span></li><li><span class="fm-ev-src"><a href="https://techcentral.co.za/red-sea-cable-break-eats-away-at-seacom/261286/" target="_blank" rel="noopener nofollow">Reference #6 · news</a></span><span class="fm-ev-txt">“once-off cable repair costs incurred as a result of cable breaks”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-01</span>
+    <span class="fm-mode">A disabled, abandoned vessel drifts with its anchor down across the corridor and, under the leading hypothesis, the dragging anchor shears the cables<span class="fm-item">Seabed cable route through the Bab-el-Mandeb corridor (external anchor hazard)</span></span>
+    <span class="fm-sod" aria-label="Severity 7, occurrence 4, detection 8">7·4·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>224</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Keep armoured cables intact against ship anchors and other seabed activity</dd>
+      <dt>Effect</dt><dd>Three cable systems severed around 24 February 2024; about a quarter of Europe-Asia-Middle East capacity reported lost</dd>
+      <dt>Cause</dt><dd>Leading hypothesis, unproven: MV Rubymar, disabled by a Houthi missile on 18 February and abandoned by its 24 crew, drifted more than 70 km while not under command with its anchor down; no salvage or anchor recovery followed and no anchoring-exclusion zone exists in the corridor</dd>
+      <dt>Prevention in place</dt><dd>Cable armouring; no enforced anchoring-exclusion or cable-protection zone recorded</dd>
+      <dt>Detection in place</dt><dd>None recorded for the drift; the cuts were registered as loss of optical continuity and in BGP and traffic telemetry</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>7</b></dt><dd>Multi-system loss of international backbone capacity is a major degradation of a major service. Not 8 or 9: rerouting held end-user traffic in the markets Cloudflare measured, and the larger user figures are uncorroborated.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>Anchors are the industry&#x27;s most common cable-fault cause (~70-80% per the ICPC baseline), but this case needed an unusual combination, a war-damaged ship abandoned with its anchor down in the corridor: &#x27;infrequent&#x27;. The attribution itself is unproven.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>The drift lasted days and nothing recorded acted on it; the event was seen when optical continuity was lost: &#x27;detected after impact by internal monitoring&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 224</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Designate and enforce an anchoring-exclusion / cable-protection zone off Yemen with AIS monitoring and mariner advisories (status: Open) <span class="fm-ev-src">Correction of errors #2</span></li><li>Adopt a rapid salvage / anchor-recovery protocol for disabled not-under-command vessels in cable corridors (status: Open) <span class="fm-ev-src">Correction of errors #5</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Wikipedia &#x27;MV Rubymar&#x27;" target="_blank" rel="noopener nofollow">Sequence of events #2</a></span><span class="fm-ev-txt">2024-02-18 — All 24 crew evacuated by the container ship Lobivia; the disabled, not-under-command vessel is left adrift with its anchor down.</span></li><li><span class="fm-ev-src"><a href="https://Wikipedia &#x27;MV Rubymar&#x27;" target="_blank" rel="noopener nofollow">Sequence of events #3</a></span><span class="fm-ev-txt">2024-02-18 to 02-26 — Unmanned vessel &#x27;moved more than 70 kilometres (43 mi) while not under command&#x27;, dragging its anchor across the Bab-el-Mandeb seabed cable corridor.</span></li><li><span class="fm-ev-src">Contributing factor #3</span><span class="fm-ev-txt">MARITIME PROCEDURE LAPSE: a war-damaged, abandoned, not-under-command vessel was left adrift with its anchor down in a known cable corridor for days (18-26 Feb) with no timely salvage or anchor-recovery — the proximate work-procedure failure that let the anchor drag across the cables (Wikipedia &#x27;MV Rubymar&#x27;).</span></li><li><span class="fm-ev-src">Contributing factor #2</span><span class="fm-ev-txt">NO ENFORCED ANCHORING-EXCLUSION / CABLE-PROTECTION ZONE in the Bab-el-Mandeb corridor — against the ICPC baseline that anchors and fishing cause ~70-80% of all cable faults, the single most expected fault mode was left unmitigated (ICPC industry baseline).</span></li><li><span class="fm-ev-src"><a href="https://ICPC industry baseline (not re-fetched this pass)" target="_blank" rel="noopener nofollow">Metric #9</a></span><span class="fm-ev-txt">Industry baseline: faults from anchors/fishing: ~70-80% of all cable faults</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“ATTRIBUTION IS UNPROVEN”</span></li><li><span class="fm-ev-src"><a href="https://en.wikipedia.org/wiki/AAE-1" target="_blank" rel="noopener nofollow">Reference #2 · press</a></span><span class="fm-ev-txt">“The cause of the damage is currently unknown”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-05</span>
+    <span class="fm-mode">Dispatch is held back by active missile and drone threat, war-risk insurance and naval-security constraints<span class="fm-item">Repair-ship dispatch and spares under war risk</span></span>
+    <span class="fm-sod" aria-label="Severity 6, occurrence 6, detection 6">6·6·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>216</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Mobilise an insured repair vessel with cable and repeater spares into the fault zone</dd>
+      <dt>Effect</dt><dd>Adds to the months-long restoration in FM-04; repair carried out by an E-Marine cable ship only in July 2024</dd>
+      <dt>Cause</dt><dd>Active conflict in the repair zone; no pre-positioned war-risk-insured repair capacity recorded</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Known while the repair was pending</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>6</b></dt><dd>It shares the duration effect with FM-04, so it is scored one step lower to avoid counting the same months twice at full weight.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>The conflict that disabled the Rubymar was ongoing, so the war-risk condition was present for the whole repair window and weakly guarded: &#x27;occasional&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>Visible from the start, not preventable by any recorded control: &#x27;detected at onset, not prevented&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 216</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Pre-position war-risk-insured repair vessels and spare cable/repeater stocks for the Red Sea region (status: Open) <span class="fm-ev-src">Correction of errors #3</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Crawl forensic; Wikipedia &#x27;AAE-1&#x27;" target="_blank" rel="noopener nofollow">Sequence of events #13</a></span><span class="fm-ev-txt">2024-02 to 07 — Repair-ship dispatch gated by war-risk: active missile/drone threat, war-risk insurance and naval-security constraints delay intervention for months.</span></li><li><span class="fm-ev-src">Contributing factor #5</span><span class="fm-ev-txt">ACTIVE CONFLICT / WAR-RISK ENVIRONMENT: ongoing Houthi anti-ship missile and drone threat both created the initiating strike (two missiles, 18 Feb) and blocked timely repair-ship dispatch and salvage (Wikipedia &#x27;MV Rubymar&#x27;).</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“the security environment prevented it”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-02</span>
+    <span class="fm-mode">Three systems sharing one narrow corridor are severed together by a single event<span class="fm-item">Route diversity of Europe-Asia cable systems</span></span>
+    <span class="fm-sod" aria-label="Severity 7, occurrence 5, detection 6">7·5·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>210</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Keep nominally independent systems physically independent, so one seabed event cannot cut more than one</dd>
+      <dt>Effect</dt><dd>Seacom/TGN-Eurasia, AAE-1 and EIG lost at once; impact felt across East African and Gulf markets that lean on them</dd>
+      <dt>Cause</dt><dd>Route concentration: the systems share the same off-Yemen corridor at the Bab-el-Mandeb chokepoint</dd>
+      <dt>Prevention in place</dt><dd>Logical diversity across separate cable systems</dd>
+      <dt>Detection in place</dt><dd>Telemetry at the time of the cuts</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>7</b></dt><dd>This is the route by which one anchor became a three-cable loss, so it carries the same severity as FM-01.</dd></div>
+      <div class="fm-sc"><dt>O <b>5</b></dt><dd>A standing design condition that any seabed event in the corridor exercises; held at 5 so the single event is not counted twice at full weight with FM-01.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>Line monitoring and BGP telemetry saw the cuts as they happened, but nothing could prevent a co-located loss: &#x27;detected at onset, not prevented&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 210</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Commission a route-diversity study and fund at least one non-Bab-el-Mandeb path (status: Recommended) <span class="fm-ev-src">Correction of errors #1</span></li><li>Route future Europe-Asia systems through geographically diverse paths (analyst recommendation) <span class="fm-ev-src">Improvement #1</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #1</span><span class="fm-ev-txt">ROUTE / CORRIDOR CONCENTRATION (design redundancy gap): three nominally independent systems — Seacom/Tata TGN-Eurasia, AAE-1 and EIG — share the same narrow off-Yemen corridor, so one seabed event severed all at once (Cloudflare Radar Q1-2024).</span></li><li><span class="fm-ev-src"><a href="https://Cloudflare Radar Q1-2024" target="_blank" rel="noopener nofollow">Metric #1</a></span><span class="fm-ev-txt">Subsea cable systems severed: 3 (Seacom/Tata TGN-Eurasia, AAE-1, EIG); HGC reportedly cited 4</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“The design/redundancy failure is ROUTE CONCENTRATION”</span></li><li><span class="fm-ev-src"><a href="https://blog.cloudflare.com/east-african-internet-connectivity-again-impacted-by-submarine-cable-cuts" target="_blank" rel="noopener nofollow">Reference #4 · press</a></span><span class="fm-ev-txt">“the Seacom/Tata cable, the Asia Africa Europe-1 (AAE-1), and the Europe India Gateway (EIG)”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-06</span>
+    <span class="fm-mode">No instrumented fault forensics are published: no fault coordinates, depths, anchor marks or anchor-track match<span class="fm-item">Fault forensics and attribution</span></span>
+    <span class="fm-sod" aria-label="Severity 3, occurrence 8, detection 8">3·8·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>192</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Establish where and how each cable failed, so the cause can be confirmed and acted on</dd>
+      <dt>Effect</dt><dd>The cause stays &#x27;currently unknown&#x27; and rests on coincidence; accountability is hampered and the count of cut systems is reported as three or four</dd>
+      <dt>Cause</dt><dd>Consortia did not publish fault data; no physical evidence recovered</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Noted by analysts after the event</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>3</b></dt><dd>It does not extend the outage; its effect is on learning and accountability: &#x27;internal impact only&#x27;.</dd></div>
+      <div class="fm-sc"><dt>O <b>8</b></dt><dd>Non-publication was the outcome here and the action is &#x27;Not started&#x27;, so the condition is present whenever a major fault occurs: &#x27;frequent&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>The gap is visible only afterwards, when analysts try to attribute the cut: &#x27;detected after impact&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 192</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Publish instrumented fault forensics (coordinates, depth, sever-vs-shunt) for major cable faults (status: Not started) <span class="fm-ev-src">Correction of errors #6</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #6</span><span class="fm-ev-txt">NO INSTRUMENTED FAULT FORENSICS PUBLISHED: absence of recovered anchor marks or matched fault-coordinate-versus-anchor-track survey means attribution rests on temporal/spatial coincidence only, hampering accountability and preventing a certified root cause (Wikipedia &#x27;AAE-1&#x27; — cause &#x27;currently unknown&#x27;).</span></li><li><span class="fm-ev-src"><a href="https://Wikipedia &#x27;AAE-1&#x27;; Cloudflare Radar" target="_blank" rel="noopener nofollow">Sequence of events #16</a></span><span class="fm-ev-txt">post-incident — No consortium- or regulator-issued root-cause report published; cause officially &#x27;currently unknown&#x27; — the record remains telemetry-vendor analysis plus press.</span></li><li><span class="fm-ev-src"><a href="https://Cloudflare Radar Q1-2024" target="_blank" rel="noopener nofollow">Metric #1</a></span><span class="fm-ev-txt">Subsea cable systems severed: 3 (Seacom/Tata TGN-Eurasia, AAE-1, EIG); HGC reportedly cited 4</span></li><li><span class="fm-ev-src"><a href="https://techcentral.co.za/red-sea-cable-break-eats-away-at-seacom/261286/" target="_blank" rel="noopener nofollow">Reference #5 · news</a></span><span class="fm-ev-txt">“It&#x27;s generally accepted that the Rubymar dropped an anchor”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-03</span>
+    <span class="fm-mode">Surviving cables and terrestrial paths lack the headroom to carry the diverted load<span class="fm-item">Fault detection, optical isolation and traffic rerouting</span></span>
+    <span class="fm-sod" aria-label="Severity 7, occurrence 3, detection 4">7·3·4</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>84</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Detect the cut, isolate the severed segments and move traffic to surviving paths before users notice</dd>
+      <dt>Effect</dt><dd>Did not materialise in the markets measured: Cloudflare saw no material end-user traffic loss in Tanzania, Kenya, Uganda and Mozambique; analysts flag that losing more of the corridor would exhaust the headroom</dd>
+      <dt>Cause</dt><dd>Finite spare capacity on parallel and terrestrial routes</dd>
+      <dt>Prevention in place</dt><dd>Parallel Red Sea systems and terrestrial diversity; operators such as HGC rerouting traffic</dd>
+      <dt>Detection in place</dt><dd>Operator line monitoring/OTDR, plus external BGP, latency and traffic telemetry from Kentik, Cloudflare Radar and NetBlocks</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>7</b></dt><dd>If headroom ran out, the capacity loss would become end-user loss across the same markets: a major degradation.</dd></div>
+      <div class="fm-sc"><dt>O <b>3</b></dt><dd>Headroom held for a three-cable loss, so exhausting it needs a still larger simultaneous loss: between &#x27;remote&#x27; and &#x27;infrequent&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>4</b></dt><dd>The cuts were visible on capacity and routing telemetry while end-user traffic stayed up, so operators had time to re-groom wavelengths: &#x27;detected before impact with time to act&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 84</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Fund at least one non-Bab-el-Mandeb path to add headroom that does not share the corridor (status: Recommended) <span class="fm-ev-src">Correction of errors #1</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Cloudflare Radar Q1-2024" target="_blank" rel="noopener nofollow">Sequence of events #7</a></span><span class="fm-ev-txt">2024-02-22 to 02-28 — Cloudflare: &#x27;no loss of traffic was observed across these countries in Cloudflare Radar&#x27; (Tanzania, Kenya, Uganda, Mozambique) — fault visible on capacity/routing telemetry while end-user traffic stayed up.</span></li><li><span class="fm-ev-src"><a href="https://HGC statement (press, not re-fetched)" target="_blank" rel="noopener nofollow">Sequence of events #8</a></span><span class="fm-ev-txt">2024-02 (late) — Operator HGC reported rerouting affected traffic onto surviving cables and terrestrial paths (protection switching, not suppression).</span></li><li><span class="fm-ev-src"><a href="https://Crawl forensic; Cloudflare Radar" target="_blank" rel="noopener nofollow">Sequence of events #9</a></span><span class="fm-ev-txt">2024-02 (late) — Affected wavelengths dropped and re-groomed onto surviving fibres and parallel/terrestrial routes — optical-layer isolation of the severed segments.</span></li><li><span class="fm-ev-src"><a href="https://Cloudflare Radar Q1-2024" target="_blank" rel="noopener nofollow">Metric #3</a></span><span class="fm-ev-txt">End-user traffic loss observed (Feb 22-28): ~0 (no material loss across affected East-African markets)</span></li><li><span class="fm-ev-src"><a href="https://blog.cloudflare.com/q1-2024-internet-disruption-summary/" target="_blank" rel="noopener nofollow">Reference #1 · vendor-status</a></span><span class="fm-ev-txt">“no loss of traffic was observed across these countries in Cloudflare Radar”</span></li><li><span class="fm-ev-src">Technical deep-dive</span><span class="fm-ev-txt">“The residual risk analysts flag is that losing MORE of the corridor simultaneously would exhaust that headroom.”</span></li></ul>
+  </div>
+</details>
+        </div>
+        <details class="fm-method"><summary>Scoring rubric and method</summary><div class="fm-method-body"><p>A retrospective FMEA: each row asks how this system could fail, how bad the effect was, how likely the cause was given the controls in place at the time, and how likely those controls were to catch it before customers did. Scales are adapted for data-centre operations from the 1–10 scales of IEC 60812:2018 and the AIAG-VDA FMEA handbook. RPN = S × O × D. Priority is High when S ≥ 9 with O ≥ 4 or D ≥ 7, or when RPN ≥ 300; Medium when RPN ≥ 120 or S ≥ 7; Low otherwise. Severity overrides the product because a large S multiplied by small O and D can hide a region-wide outage nothing would catch.</p><p>Every row cites evidence from this dossier, and every quote is checked verbatim against its source by <code>tools/test-incidents-fmea.py</code>. A revised score is only shown against a published corrective action. This is an RZ analyst assessment, not an operator document.</p><div class="fm-rubrics"><div><p class="fm-sub">Severity</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Hazard to people, or loss of the facility / several regions</td></tr><tr><td>9</td><td>Region-wide or provider-wide outage of a foundational service, no workaround</td></tr><tr><td>8</td><td>Full outage of a major service for hours</td></tr><tr><td>7</td><td>Major degradation of a major service</td></tr><tr><td>6</td><td>Partial outage confined to one zone or one service</td></tr><tr><td>5</td><td>Customer-visible degradation</td></tr><tr><td>4</td><td>Limited customer impact</td></tr><tr><td>3</td><td>Internal impact only</td></tr><tr><td>2</td><td>Negligible</td></tr><tr><td>1</td><td>No effect</td></tr></tbody></table></div><div><p class="fm-sub">Occurrence</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Near certain: the cause is present in normal operation</td></tr><tr><td>8</td><td>Frequent: routine work exercises the cause</td></tr><tr><td>6</td><td>Occasional: a foreseeable slip or condition, weakly guarded</td></tr><tr><td>4</td><td>Infrequent: needs an unusual combination</td></tr><tr><td>2</td><td>Remote: guarded by design</td></tr><tr><td>1</td><td>Eliminated by design</td></tr></tbody></table></div><div><p class="fm-sub">Detection</p><table class="fm-rubric"><tbody><tr><td>10</td><td>No control could detect it</td></tr><tr><td>9</td><td>Detected only through customer impact</td></tr><tr><td>8</td><td>Detected after impact by internal monitoring</td></tr><tr><td>6</td><td>Detected at onset, not prevented</td></tr><tr><td>4</td><td>Detected before impact with time to act</td></tr><tr><td>2</td><td>Automated interlock almost certainly stops it</td></tr><tr><td>1</td><td>Certain to be stopped</td></tr></tbody></table></div></div></div></details>
+
 
         <h2>Correction of errors (COE)</h2>
         <ul class="tight"><li>Commission a geographic route-diversity study for Europe-Asia traffic and fund at least one non-Bab-el-Mandeb path. <span class="coe-meta">Cable consortia / carriers (AAE-1, EIG, Seacom, Tata) · Recommended</span></li><li>Designate and enforce an anchoring-exclusion / cable-protection zone off Yemen with AIS monitoring and mariner advisories. <span class="coe-meta">IMO / coastal states / ICPC · Open</span></li><li>Pre-position war-risk-insured repair vessels and spare cable/repeater stocks for the Red Sea region. <span class="coe-meta">Cable operators / regional maintenance authority · Open</span></li><li>Negotiate a standing permitting and safe-passage regime for repair ships in contested Yemeni waters. <span class="coe-meta">Governments (Aden) / UN / operators · Open</span></li><li>Adopt a rapid salvage / anchor-recovery protocol for disabled not-under-command vessels in cable corridors. <span class="coe-meta">Coastal states / salvors / IMO · Open</span></li><li>Publish instrumented fault forensics (coordinates, depth, sever-vs-shunt) for major cable faults. <span class="coe-meta">Cable consortia · Not started</span></li></ul>
@@ -437,7 +707,7 @@ CONTAINMENT / SPREAD. Impact was contained to the three cut systems and the East
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-1a1a084f"></script>
+    <script src="js/rz-version.js?v=20261010-00a1d9e8"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

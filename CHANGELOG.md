@@ -11,6 +11,84 @@ release sections rather than semver.
 
 ---
 
+## v3.13.0 — 2026-10-10
+
+### Every incident dossier now carries a retrospective FMEA
+
+Owner: *"per incident tambahkan detail comprehensive FMEA analysis, ada visual dan
+detail evidence atau supportive data."* All **43** dossiers in the root-gated DC
+Incidents library now have one — **284 failure modes** — rendered after
+*Contributing factors* on each incident page.
+
+**What each row holds.** Item and function, failure mode, effect, cause, the
+prevention and detection controls that existed at the time, Severity / Occurrence /
+Detection on 1–10 scales adapted for data-centre retrospectives from IEC 60812:2018
+and the AIAG-VDA handbook, a **written rationale for every score**, the published
+corrective action, and the score that action earns. RPN = S × O × D is computed by
+the builder, never typed. Priority is High when S ≥ 9 with O ≥ 4 or D ≥ 7, or
+RPN ≥ 300 — severity overrides the product, because 9 × 2 × 9 hides a region-wide
+outage nothing would catch.
+
+**What keeps it honest.** Every row cites evidence as pointers into the dossier — a
+sequence-of-events entry, a metric, a COE item, a reference — and every quote is
+checked **verbatim** against the field it names. A revised score is only shown
+against an action the operator stated as done or committed; analyst recommendations
+and undisclosed statuses are listed with no revised score; a mode with no action is
+shown as **residual risk**. Committed-but-unconfirmed actions say the reduction is a
+claim about the action, not a confirmed outcome. Press-sourced and disputed causes
+say so. That is why, for example, all six Alibaba 2023 modes and seven of eight
+OVHcloud SBG2 modes are residual: the operators published no completed fix for them.
+
+**Visuals.** RPN bars before and after the published action, as HTML rows rather
+than an SVG — the first version was an SVG on a 0–1000 axis, half empty, whose labels
+shrank to 7–8 px and were unreadable at 390 px. A severity × occurrence matrix with
+one marker per occupied cell, labels placed by **search** (above → below → right →
+left, the first slot clear of every marker and placed label) — the first rule passed
+the pilot and collided on the third dossier it met. The worksheet is a hairline list
+of disclosures, one per mode, with rationale, actions and evidence inside; the
+summary is a `.metabar` line, never a four-up stat strip. Scoring rubric and method
+behind a disclosure on every page.
+
+### Gates
+- `tools/test-incidents-fmea.py --strict --require-all` — schema, 1–10 ranges, a
+  rationale for every score, ≥ 2 evidence pointers per mode, every pointer resolves,
+  every quote verbatim, revised scores only against an action, and the rendered page
+  carries the section with one row per mode. Proven by seeding a fabricated quote, a
+  dangling index, a revised score with no action and a stale page: all four caught.
+- `tools/incidents-visual-qa.mjs` now screenshots the bars, matrix and worksheet and
+  fails on any matrix label overlapping another label or a marker that is not its
+  own. Ownership is by DOM identity: the first version exempted any marker sharing a
+  label's x, so a label stacked exactly on a neighbour passed. 43 / 43 clean.
+- `python3 tools/build-incidents.py --check` — **freshness**. Sweeps since v1.134.20
+  had hand-edited the 44 generated pages while the builder stood still since
+  2026-08-02, so any rebuild silently reverted a timeline fix, a legibility fix, a
+  mobile fix, the hub's title tooltips and every cache token. Those fixes now live in
+  the builder, cache tokens are read from what the site already serves, and a page
+  that differs from its generator fails.
+- `tools/test-incidents-corpus.mjs` fails a header date that is an uncorrected
+  first-of-the-month seed, or that falls after the first impact event.
+
+### Defects found on the way, fixed at the source
+- **Ten cascade labels carried a false "…"** — `_wrap()` compared the lines glued
+  *without* spaces against the original *with* them, so every two-line label counted
+  as cut: "core…", "trading…", "badge-in…", "2…" were all complete words. The same
+  false positive was what had been trimming over-long last lines, so that trim is
+  now explicit.
+- **Long operator chips** overflowed at desktop width — the GCP Delhi dossier was a
+  1260 px page in a 1100 px viewport.
+- **Four header dates and one duration contradicted their own dossiers** —
+  azure-west-us2 (2026-05-01 → 05-29, 480 → 1326 min), cyrusone (11-01 → 11-27),
+  digital-realty-singapore (09-01 → 09-10), x-twitter-oregon (05-24 → 05-22).
+
+### Not changed — `data/incidents/_review-queue.md`
+The FMEA agents read every dossier end to end and reported where each contradicts
+itself. Those that are a matter of definition or framing are queued for a decision
+rather than edited: what `durationMin` means across 12 dossiers (Rogers' header
+still carries a 15 h figure its own analysis retracted; the CRTC window is ≈ 26 h),
+internal timing conflicts in NIRS, Kakao and Equinix LD8, and one dossier —
+virginia-dc-alley-heatdome-2022 — whose title and category describe a cooling event
+its own root cause says did not happen.
+
 ## v3.12.3 — 2026-10-09
 
 ### The stat tile was AI design slop, and my first fix made it worse

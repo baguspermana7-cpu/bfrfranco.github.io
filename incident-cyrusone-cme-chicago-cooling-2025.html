@@ -52,6 +52,12 @@
     .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
     .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
     .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:2px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    /* A chip carries the operator name, which can be a whole sentence ("Google Cloud
+       (impacted tenant); STT GDC / Tata Communications JV (named as the third-party …").
+       nowrap made that one chip 1120px wide and pushed the GCP Delhi dossier into a
+       1260px page at a 1100px viewport. Short chips are unaffected: normal wrapping
+       only engages when a chip would not fit its row. */
+    .chips .chip { max-width:100%; white-space:normal; overflow-wrap:anywhere; }
     .chip.cyan { color:var(--cyan); border-left:2px solid var(--cyan); }
     .chip.amber { color:var(--amber); border-left:2px solid var(--amber); }
     .chip.green { color:var(--green); border-left:2px solid var(--green); }
@@ -71,6 +77,11 @@
     /* rich incident table (reference-2 style) */
     table.itbl { min-width:1120px; }
     table.itbl td { vertical-align:middle; }
+    /* v1.134.20 — the title and summary columns ellipsise so the table's columns line up,
+       which is the right call for a dense index. But the cut text was reachable only by
+       navigating to the incident: a summary lost 238-298px of its sentence with no way to read
+       it in place. Each carries its full text in a title attribute now, so the truncation is
+       deliberate AND non-lossy — which is the condition the legibility audit checks for. */
     .itr { cursor:pointer; }
     .itr:hover td { background:var(--surface-2); }
     .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
@@ -240,7 +251,6 @@
        derive width = W px from the aspect ratio, so the drawing renders 1:1 at any event count
        and the panel scrolls instead of shrinking. */
     .viz-timeline svg { max-width:none; height:96px; width:auto; }
-
     .viz-radar svg { max-width:320px; margin:0 auto; }
     .vz-num { font-variant-numeric:tabular-nums slashed-zero; }
     .vz-box-t, .vz-box-s, .vz-lbl, .vz-hb-lbl, .vz-tl-t, .vz-pt, .vz-tick { pointer-events:auto; }
@@ -323,7 +333,86 @@
     }
     @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
 </style>
-    
+    <style>
+    /* ── FMEA (v3.12.3) — one hairline panel of rows, like the rest of the dossier.
+       No cards, no stripes: a row is a disclosure, state is a 7px dot. ── */
+    .fm-scope { color:var(--text-body); max-width:70ch; }
+    .fm-meta { flex-wrap:wrap; row-gap:0.25rem; }
+    .fm-viz { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:1.6rem; align-items:start; margin:1.2rem 0; }
+    @media (max-width:820px){ .fm-viz { grid-template-columns:1fr; } }
+    .fm-pb-row, .fm-pb-axis { display:grid; grid-template-columns:3.6rem minmax(0,1fr) 6.6rem; gap:0.6rem; align-items:center; }
+    .fm-pb-row { padding:0.32rem 0; }
+    .fm-pb-id, .fm-pb-val { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.8rem; }
+    .fm-pb-id { color:var(--muted); }
+    .fm-pb-val { color:var(--text-strong); white-space:nowrap; }
+    .fm-pb-track { display:flex; flex-direction:column; gap:3px; }
+    .fm-pb-bar { display:block; height:12px; }
+    .fm-pb-rev { display:block; height:4px; background:var(--text-body); opacity:0.55; }
+    .fm-pb-none { font-style:italic; font-size:0.72rem; color:var(--muted); line-height:1; }
+    .fm-pb-axis { margin-top:0.3rem; border-top:1px solid var(--line); padding-top:0.25rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .fm-pb-ticks { display:flex; justify-content:space-between; }
+    .fm-fig { margin:0; }
+    .fm-fig figcaption { font-size:0.8rem; color:var(--muted); margin-bottom:0.35rem; }
+    .fm-fig svg { width:100%; height:auto; display:block; }
+    .fm-fig-m svg { max-width:340px; }
+    .fm-matrix .fm-c-lo { fill:var(--surface); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-md { fill:color-mix(in srgb, var(--amber) 9%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-hi { fill:color-mix(in srgb, var(--red) 10%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .vz-axis { font-size:10px; fill:var(--muted); font-family:'IBM Plex Sans',sans-serif; }
+    .fm-matrix .fm-pt { stroke:var(--surface); stroke-width:1.5; }
+    .fm-matrix .fm-pt-l { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; fill:var(--text-strong);
+      paint-order:stroke; stroke:var(--surface); stroke-width:3px; stroke-linejoin:round; }
+    .fm-sheet { border:1px solid var(--line); border-radius:4px; margin-top:0.8rem; }
+    .fm-head, .fm-row > summary { display:grid; grid-template-columns:4.2rem minmax(0,1fr) 4.4rem 4.6rem 3.4rem; gap:0.6rem; align-items:baseline; padding:0.6rem 0.9rem; }
+    .fm-head { font-size:0.74rem; color:var(--muted); border-bottom:1px solid var(--line); }
+    .fm-row { border-top:1px solid var(--line); }
+    .fm-row:first-of-type { border-top:0; }
+    .fm-row > summary { cursor:pointer; list-style:none; }
+    .fm-row > summary::-webkit-details-marker { display:none; }
+    .fm-row > summary:hover { background:var(--surface-2); }
+    .fm-row > summary:focus-visible { outline:2px solid var(--cyan); outline-offset:-2px; }
+    .fm-id-cell, .fm-sod, .fm-rpn, .fm-rpn-rev { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.84rem; }
+    .fm-id-cell { color:var(--muted); }
+    .fm-mode { color:var(--text-strong); font-size:0.92rem; line-height:1.4; }
+    .fm-item { display:block; color:var(--muted); font-size:0.8rem; }
+    .fm-sod { color:var(--text-body); }
+    .fm-rpn { color:var(--text-strong); }
+    .fm-rpn-rev { color:var(--muted); }
+    .fm-dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:0.45rem; vertical-align:0.1em; }
+    .fm-body { padding:0.2rem 0.9rem 1rem 5.7rem; }
+    @media (max-width:640px){
+      .fm-head { display:none; }
+      .fm-row > summary { grid-template-columns:3.2rem minmax(0,1fr) auto; }
+      .fm-sod, .fm-rpn-rev { display:none; }
+      .fm-body { padding:0.2rem 0.9rem 1rem; }
+    }
+    .fm-kv { display:grid; grid-template-columns:9.5rem minmax(0,1fr); gap:0.3rem 0.9rem; margin:0.4rem 0 0.8rem; font-size:0.88rem; }
+    .fm-kv dt { color:var(--muted); }
+    .fm-kv dd { margin:0; color:var(--text-body); }
+    @media (max-width:640px){ .fm-kv { grid-template-columns:1fr; } .fm-kv dd { margin-bottom:0.4rem; } }
+    .fm-scores { margin:0 0 0.6rem; border-top:1px solid var(--line); }
+    .fm-sc { display:grid; grid-template-columns:3.2rem minmax(0,1fr); gap:0.6rem; padding:0.45rem 0; border-bottom:1px solid var(--line); font-size:0.86rem; }
+    .fm-sc dt { font-family:'JetBrains Mono',monospace; color:var(--muted); }
+    .fm-sc dt b { color:var(--text-strong); }
+    .fm-sc dd { margin:0; color:var(--text-body); }
+    .fm-sub { font-size:0.8rem; color:var(--muted); margin:0.7rem 0 0.25rem; }
+    .fm-sub b { color:var(--text-strong); }
+    .fm-acts, .fm-ev { margin:0; padding-left:1.1rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-acts li, .fm-ev li { margin:0.25rem 0; }
+    .fm-residual { color:var(--red); }
+    .fm-revline { font-size:0.86rem; color:var(--text-body); margin:0.4rem 0 0; }
+    .fm-ev-src { display:block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .fm-ev-src a { color:var(--cyan); }
+    .fm-ev-txt { display:block; }
+    .fm-method { margin-top:1rem; border:1px solid var(--line); border-radius:4px; }
+    .fm-method > summary { padding:0.6rem 0.9rem; cursor:pointer; font-size:0.9rem; color:var(--text-strong); }
+    .fm-method-body { padding:0 0.9rem 0.9rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-rubrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+    @media (max-width:760px){ .fm-rubrics { grid-template-columns:1fr; } }
+    .fm-rubric { width:100%; border-collapse:collapse; font-size:0.8rem; }
+    .fm-rubric td { padding:0.25rem 0.4rem; border-top:1px solid var(--line); vertical-align:top; }
+    .fm-rubric td:first-child { font-family:'JetBrains Mono',monospace; width:2rem; color:var(--text-strong); }
+</style>
 </head>
 <body class="locked">
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -346,14 +435,14 @@
         <h1>CyrusOne Aurora Cooling Failure Halts CME Group Trading (November 2025)</h1>
         <div class="chips">
             <span class="chip">CyrusOne (tenant: CME Group)</span>
-            <span class="chip cyan">2025-11-01</span>
+            <span class="chip cyan">2025-11-27</span>
             <span class="chip amber">11h 0m core impact</span>
             <span class="chip cyan">Cooling</span><span class="chip red">Human error</span>
         </div>
         <p class="lede">A human-error cooling-tower switchover during a cold-weather changeover triggered a chiller-plant failure and temperatures above 100°F at CyrusOne&#x27;s Aurora facility, halting CME Group&#x27;s global futures and options trading for more than ten hours.</p>
 
         <h2>Failure cascade</h2>
-        <div class="viz viz-cascade"><svg viewBox="0 0 760 158" role="img" aria-label="Failure cascade block diagram"><title>Failure cascade: trigger → fault → downstream impact</title><defs><marker id="ic-ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path class="vz-arrhead" d="M0,0 L6,3 L0,6 Z"/></marker></defs><text class="vz-tl-ph" x="8" y="12">Trigger</text><text class="vz-tl-ph" x="248" y="12">Primary fault</text><text class="vz-tl-ph" x="516" y="12">Downstream impact</text><rect class="vz-box-trigger" x="8" y="51.0" width="176" height="56" rx="2"><title>Trigger — Cooling (2025-11-01)</title></rect><text class="vz-box-t" x="18" y="68.0">Trigger · Cooling</text><text class="vz-box-s" x="18" y="82.0"><title>2025-11-01</title>2025-11-01</text><rect class="vz-box-fault" x="240" y="51.0" width="224" height="56" rx="2"><title>Primary fault at CyrusOne (tenant: CME Group) — CyrusOne Aurora (Chicago-area)</title></rect><text class="vz-box-t" x="250" y="68.0">CyrusOne</text><text class="vz-box-s" x="250" y="82.0"><title>CyrusOne Aurora (Chicago-area)</title>CyrusOne Aurora</text><line class="vz-flow" x1="184" y1="79.0" x2="238" y2="79.0" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="26" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: CME Globex futures/options trading</title></rect><text class="vz-box-t" x="526" y="43">CME Globex futures/options</text><text class="vz-box-t" x="526" y="56">trading…</text><line class="vz-flow" x1="464" y1="79.0" x2="514" y2="44" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="70" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Market data feeds</title></rect><text class="vz-box-t" x="526" y="87">Market data feeds</text><line class="vz-flow" x1="464" y1="79.0" x2="514" y2="88" marker-end="url(#ic-ar)"/></svg></div>
+        <div class="viz viz-cascade"><svg viewBox="0 0 760 158" role="img" aria-label="Failure cascade block diagram"><title>Failure cascade: trigger → fault → downstream impact</title><defs><marker id="ic-ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path class="vz-arrhead" d="M0,0 L6,3 L0,6 Z"/></marker></defs><text class="vz-tl-ph" x="8" y="12">Trigger</text><text class="vz-tl-ph" x="248" y="12">Primary fault</text><text class="vz-tl-ph" x="516" y="12">Downstream impact</text><rect class="vz-box-trigger" x="8" y="51.0" width="176" height="56" rx="2"><title>Trigger — Cooling (2025-11-27)</title></rect><text class="vz-box-t" x="18" y="68.0">Trigger · Cooling</text><text class="vz-box-s" x="18" y="82.0"><title>2025-11-27</title>2025-11-27</text><rect class="vz-box-fault" x="240" y="51.0" width="224" height="56" rx="2"><title>Primary fault at CyrusOne (tenant: CME Group) — CyrusOne Aurora (Chicago-area)</title></rect><text class="vz-box-t" x="250" y="68.0">CyrusOne</text><text class="vz-box-s" x="250" y="82.0"><title>CyrusOne Aurora (Chicago-area)</title>CyrusOne Aurora</text><line class="vz-flow" x1="184" y1="79.0" x2="238" y2="79.0" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="26" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: CME Globex futures/options trading</title></rect><text class="vz-box-t" x="526" y="43">CME Globex futures/options</text><text class="vz-box-t" x="526" y="56">trading</text><line class="vz-flow" x1="464" y1="79.0" x2="514" y2="44" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="70" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Market data feeds</title></rect><text class="vz-box-t" x="526" y="87">Market data feeds</text><line class="vz-flow" x1="464" y1="79.0" x2="514" y2="88" marker-end="url(#ic-ar)"/></svg></div>
         <p class="disclaimer">Trigger → primary fault → downstream blast radius, derived from the sourced root cause and affected-services record.</p>
 
         <h2>Facility &amp; location</h2>
@@ -361,7 +450,7 @@
             <dt>Operator</dt><dd>CyrusOne (tenant: CME Group)</dd>
             <dt>Data center</dt><dd>CyrusOne Aurora (Chicago-area)</dd>
             <dt>Location</dt><dd>Aurora, Illinois, United States</dd>
-            <dt>Date</dt><dd>2025-11-01</dd>
+            <dt>Date</dt><dd>2025-11-27</dd>
         </dl>
 
         <h2>Impact &amp; scale</h2>
@@ -391,6 +480,187 @@ LATENT / SYSTEMIC ROOT. First, MECHANICAL REDUNDANCY DID NOT CARRY THE LOAD: a s
 
         <h2>Contributing factors</h2>
         <ul class="tight"><li>PROCEDURAL EXECUTION FAILURE DURING FREEZE-PREP (root, CONFIRMED): CyrusOne confirmed to Bloomberg that onsite staff and contractors failed to follow standard procedures when draining/preparing the cooling towers ahead of freezing weather (via DatacenterDynamics) - a seasonal cold-weather changeover mishandled on the live approach to a hard freeze.</li><li>INADEQUATE / COMMON-MODE MECHANICAL REDUNDANCY: a single procedural lapse took &#x27;multiple cooling units&#x27; offline at once with no backup cooling carrying the load, evidenced by CyrusOne&#x27;s post-incident fix of having &#x27;installed additional redundancy to the cooling systems&#x27; (confirmed verbatim via DCD) - i.e. the fault-tolerant protection a resilient plant should have provided was effectively absent for this failure mode.</li><li>COLD-WEATHER / SEASONAL-TRANSITION TIMING RISK: the failure hit during a hard-freeze approach in the Chicago suburbs on the Thanksgiving-window reopen (evening of Nov 27, into Nov 28), a known high-risk winterization window for water-cooled tower plants, executed under live IT load (CyrusOne statement; DCD).</li><li>SINGLE-SITE CONCENTRATION OF CRITICAL WORKLOAD: CME&#x27;s matching engines ran from the single Aurora campus, so one plant&#x27;s thermal failure halted global futures/options price discovery - a concentration-risk / missing geographic-diversity theme raised in trade commentary (attributed to DC Pulse; that specific commentary could not be independently re-fetched).</li><li>CONTRACTOR-BOUNDARY / CHANGE-MANAGEMENT GAP: the lapse spanned both onsite personnel and contractors, implying a method-statement / supervision boundary where the freeze-prep steps were not verified - though no accessible source names the specific procedure document, the contracting firm, or which checklist step was skipped (disclosed uncertainty; CyrusOne via Bloomberg/DCD).</li></ul>
+        <h2 id="fmea">Failure mode &amp; effects analysis (FMEA)</h2>
+        <p class="fm-scope">The cooling chain at CyrusOne&#x27;s CHI1 data center in Aurora, Illinois, and the CME Group trading systems it serves: the cooling-tower freeze-preparation procedure and its contractor boundary, the chiller plant and its redundancy, thermal detection and protective load-shed, chiller restart and recovery, and the concentration of CME&#x27;s matching engines on one campus. No official post-mortem exists. The record is press-sourced: CyrusOne statements relayed by DatacenterDynamics (confirmed), with Bloomberg, Reuters, CNBC and DC Pulse details cited but not re-fetched. Chiller counts, peak temperatures (the &gt;100°F figure is unverified), detection timing and the skipped procedure step are undisclosed, and several sequence entries are forensic reconstructions. The only confirmed corrective action is that CyrusOne &#x27;installed additional redundancy to the cooling systems&#x27;, with no tonnage or design disclosed; every other action is unconfirmed or open.</p>
+        <p class="metabar fm-meta"><span><b>6</b> failure modes</span><span class="sep">/</span><span><b>5</b> high priority</span><span class="sep">/</span><span><b>1 of 6</b> with a published action</span><span class="sep">/</span><span>total RPN <b>1799 → 1671</b> (−7%)</span></p>
+        <div class="fm-viz">
+            <figure class="fm-fig"><figcaption>Risk priority number (S × O × D), worst first — thin bar: after the published action</figcaption><div class="fm-pb" role="list" aria-label="Risk priority number per failure mode, before and after corrective action"><div class="fm-pb-row" role="listitem" title="FM-01 Onsite staff and contractors do not follow standard procedures when draining the cooling towers ahead of a hard freeze"><span class="fm-pb-id">FM-01</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:86.4%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">432</span></div><div class="fm-pb-row" role="listitem" title="FM-05 Recovery is manual: chillers restart at limited capacity and IT returns in stages"><span class="fm-pb-id">FM-05</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:72.0%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">360</span></div><div class="fm-pb-row" role="listitem" title="FM-02 No method statement, supervision or independent verification gates the changeover at the contractor boundary"><span class="fm-pb-id">FM-02</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:64.8%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">324</span></div><div class="fm-pb-row" role="listitem" title="FM-03 One procedural lapse trips multiple cooling units together and no backup cooling path carries the load"><span class="fm-pb-id">FM-03</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:64.0%;background:var(--red)"></i><i class="fm-pb-rev" style="width:38.4%"></i></span><span class="fm-pb-val">320 → 192</span></div><div class="fm-pb-row" role="listitem" title="FM-06 Globally critical matching engines depend on the single Aurora campus, so one plant&#x27;s thermal failure halts worldwide trading"><span class="fm-pb-id">FM-06</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:48.6%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">243</span></div><div class="fm-pb-row" role="listitem" title="FM-04 No automated link from thermal alarms to IT load-shed is recorded; protection depends on the tenant halting its own systems"><span class="fm-pb-id">FM-04</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:24.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">120</span></div><div class="fm-pb-axis" aria-hidden="true"><span></span><span class="fm-pb-ticks"><span>0</span><span>250</span><span>500</span></span><span></span></div></div></figure>
+            <figure class="fm-fig fm-fig-m"><figcaption>Criticality: severity × occurrence</figcaption><svg class="fm-matrix" viewBox="0 0 360 330" role="img" aria-label="Criticality matrix, severity against occurrence"><rect class="fm-c-lo" x="44" y="266" width="28" height="28"/><rect class="fm-c-lo" x="72" y="266" width="28" height="28"/><rect class="fm-c-lo" x="100" y="266" width="28" height="28"/><rect class="fm-c-lo" x="128" y="266" width="28" height="28"/><rect class="fm-c-lo" x="156" y="266" width="28" height="28"/><rect class="fm-c-lo" x="184" y="266" width="28" height="28"/><rect class="fm-c-lo" x="212" y="266" width="28" height="28"/><rect class="fm-c-lo" x="240" y="266" width="28" height="28"/><rect class="fm-c-lo" x="268" y="266" width="28" height="28"/><rect class="fm-c-lo" x="296" y="266" width="28" height="28"/><rect class="fm-c-lo" x="44" y="238" width="28" height="28"/><rect class="fm-c-lo" x="72" y="238" width="28" height="28"/><rect class="fm-c-lo" x="100" y="238" width="28" height="28"/><rect class="fm-c-lo" x="128" y="238" width="28" height="28"/><rect class="fm-c-lo" x="156" y="238" width="28" height="28"/><rect class="fm-c-lo" x="184" y="238" width="28" height="28"/><rect class="fm-c-lo" x="212" y="238" width="28" height="28"/><rect class="fm-c-lo" x="240" y="238" width="28" height="28"/><rect class="fm-c-md" x="268" y="238" width="28" height="28"/><rect class="fm-c-md" x="296" y="238" width="28" height="28"/><rect class="fm-c-lo" x="44" y="210" width="28" height="28"/><rect class="fm-c-lo" x="72" y="210" width="28" height="28"/><rect class="fm-c-lo" x="100" y="210" width="28" height="28"/><rect class="fm-c-lo" x="128" y="210" width="28" height="28"/><rect class="fm-c-lo" x="156" y="210" width="28" height="28"/><rect class="fm-c-md" x="184" y="210" width="28" height="28"/><rect class="fm-c-md" x="212" y="210" width="28" height="28"/><rect class="fm-c-md" x="240" y="210" width="28" height="28"/><rect class="fm-c-md" x="268" y="210" width="28" height="28"/><rect class="fm-c-md" x="296" y="210" width="28" height="28"/><rect class="fm-c-lo" x="44" y="182" width="28" height="28"/><rect class="fm-c-lo" x="72" y="182" width="28" height="28"/><rect class="fm-c-lo" x="100" y="182" width="28" height="28"/><rect class="fm-c-lo" x="128" y="182" width="28" height="28"/><rect class="fm-c-md" x="156" y="182" width="28" height="28"/><rect class="fm-c-md" x="184" y="182" width="28" height="28"/><rect class="fm-c-md" x="212" y="182" width="28" height="28"/><rect class="fm-c-md" x="240" y="182" width="28" height="28"/><rect class="fm-c-md" x="268" y="182" width="28" height="28"/><rect class="fm-c-hi" x="296" y="182" width="28" height="28"/><rect class="fm-c-lo" x="44" y="154" width="28" height="28"/><rect class="fm-c-lo" x="72" y="154" width="28" height="28"/><rect class="fm-c-lo" x="100" y="154" width="28" height="28"/><rect class="fm-c-md" x="128" y="154" width="28" height="28"/><rect class="fm-c-md" x="156" y="154" width="28" height="28"/><rect class="fm-c-md" x="184" y="154" width="28" height="28"/><rect class="fm-c-md" x="212" y="154" width="28" height="28"/><rect class="fm-c-hi" x="240" y="154" width="28" height="28"/><rect class="fm-c-hi" x="268" y="154" width="28" height="28"/><rect class="fm-c-hi" x="296" y="154" width="28" height="28"/><rect class="fm-c-lo" x="44" y="126" width="28" height="28"/><rect class="fm-c-lo" x="72" y="126" width="28" height="28"/><rect class="fm-c-md" x="100" y="126" width="28" height="28"/><rect class="fm-c-md" x="128" y="126" width="28" height="28"/><rect class="fm-c-md" x="156" y="126" width="28" height="28"/><rect class="fm-c-md" x="184" y="126" width="28" height="28"/><rect class="fm-c-hi" x="212" y="126" width="28" height="28"/><rect class="fm-c-hi" x="240" y="126" width="28" height="28"/><rect class="fm-c-hi" x="268" y="126" width="28" height="28"/><rect class="fm-c-hi" x="296" y="126" width="28" height="28"/><rect class="fm-c-lo" x="44" y="98" width="28" height="28"/><rect class="fm-c-lo" x="72" y="98" width="28" height="28"/><rect class="fm-c-md" x="100" y="98" width="28" height="28"/><rect class="fm-c-md" x="128" y="98" width="28" height="28"/><rect class="fm-c-md" x="156" y="98" width="28" height="28"/><rect class="fm-c-hi" x="184" y="98" width="28" height="28"/><rect class="fm-c-hi" x="212" y="98" width="28" height="28"/><rect class="fm-c-hi" x="240" y="98" width="28" height="28"/><rect class="fm-c-hi" x="268" y="98" width="28" height="28"/><rect class="fm-c-hi" x="296" y="98" width="28" height="28"/><rect class="fm-c-lo" x="44" y="70" width="28" height="28"/><rect class="fm-c-lo" x="72" y="70" width="28" height="28"/><rect class="fm-c-md" x="100" y="70" width="28" height="28"/><rect class="fm-c-md" x="128" y="70" width="28" height="28"/><rect class="fm-c-hi" x="156" y="70" width="28" height="28"/><rect class="fm-c-hi" x="184" y="70" width="28" height="28"/><rect class="fm-c-hi" x="212" y="70" width="28" height="28"/><rect class="fm-c-hi" x="240" y="70" width="28" height="28"/><rect class="fm-c-hi" x="268" y="70" width="28" height="28"/><rect class="fm-c-hi" x="296" y="70" width="28" height="28"/><rect class="fm-c-hi" x="44" y="42" width="28" height="28"/><rect class="fm-c-hi" x="72" y="42" width="28" height="28"/><rect class="fm-c-hi" x="100" y="42" width="28" height="28"/><rect class="fm-c-hi" x="128" y="42" width="28" height="28"/><rect class="fm-c-hi" x="156" y="42" width="28" height="28"/><rect class="fm-c-hi" x="184" y="42" width="28" height="28"/><rect class="fm-c-hi" x="212" y="42" width="28" height="28"/><rect class="fm-c-hi" x="240" y="42" width="28" height="28"/><rect class="fm-c-hi" x="268" y="42" width="28" height="28"/><rect class="fm-c-hi" x="296" y="42" width="28" height="28"/><rect class="fm-c-hi" x="44" y="14" width="28" height="28"/><rect class="fm-c-hi" x="72" y="14" width="28" height="28"/><rect class="fm-c-hi" x="100" y="14" width="28" height="28"/><rect class="fm-c-hi" x="128" y="14" width="28" height="28"/><rect class="fm-c-hi" x="156" y="14" width="28" height="28"/><rect class="fm-c-hi" x="184" y="14" width="28" height="28"/><rect class="fm-c-hi" x="212" y="14" width="28" height="28"/><rect class="fm-c-hi" x="240" y="14" width="28" height="28"/><rect class="fm-c-hi" x="268" y="14" width="28" height="28"/><rect class="fm-c-hi" x="296" y="14" width="28" height="28"/><text class="vz-tick" x="58.0" y="308" text-anchor="middle">1</text><text class="vz-tick" x="36" y="284.0" text-anchor="end">1</text><text class="vz-tick" x="86.0" y="308" text-anchor="middle">2</text><text class="vz-tick" x="36" y="256.0" text-anchor="end">2</text><text class="vz-tick" x="114.0" y="308" text-anchor="middle">3</text><text class="vz-tick" x="36" y="228.0" text-anchor="end">3</text><text class="vz-tick" x="142.0" y="308" text-anchor="middle">4</text><text class="vz-tick" x="36" y="200.0" text-anchor="end">4</text><text class="vz-tick" x="170.0" y="308" text-anchor="middle">5</text><text class="vz-tick" x="36" y="172.0" text-anchor="end">5</text><text class="vz-tick" x="198.0" y="308" text-anchor="middle">6</text><text class="vz-tick" x="36" y="144.0" text-anchor="end">6</text><text class="vz-tick" x="226.0" y="308" text-anchor="middle">7</text><text class="vz-tick" x="36" y="116.0" text-anchor="end">7</text><text class="vz-tick" x="254.0" y="308" text-anchor="middle">8</text><text class="vz-tick" x="36" y="88.0" text-anchor="end">8</text><text class="vz-tick" x="282.0" y="308" text-anchor="middle">9</text><text class="vz-tick" x="36" y="60.0" text-anchor="end">9</text><text class="vz-tick" x="310.0" y="308" text-anchor="middle">10</text><text class="vz-tick" x="36" y="32.0" text-anchor="end">10</text><text class="vz-axis" x="184" y="328" text-anchor="middle">Occurrence →</text><text class="vz-axis" transform="translate(11 154) rotate(-90)" text-anchor="middle">Severity →</text><circle class="fm-pt" cx="114.0" cy="56.0" r="6" fill="var(--red)"><title>FM-06 Globally critical matching engines depend on the single Aurora campus, so one plant&#x27;s thermal failure halts worldwide trading (S9 O3 D9)</title></circle><text class="fm-pt-l" x="114.0" y="46.0" text-anchor="middle">06</text><circle class="fm-pt" cx="142.0" cy="56.0" r="6" fill="var(--red)"><title>FM-02 No method statement, supervision or independent verification gates the changeover at the contractor boundary (S9 O4 D9)</title></circle><text class="fm-pt-l" x="142.0" y="46.0" text-anchor="middle">02</text><circle class="fm-pt" cx="198.0" cy="56.0" r="6" fill="var(--red)"><title>FM-01 Onsite staff and contractors do not follow standard procedures when draining the cooling towers ahead of a hard freeze (S9 O6 D8)</title></circle><text class="fm-pt-l" x="198.0" y="46.0" text-anchor="middle">01</text><circle class="fm-pt" cx="170.0" cy="84.0" r="6" fill="var(--red)"><title>FM-03 One procedural lapse trips multiple cooling units together and no backup cooling path carries the load (S8 O5 D8); FM-05 Recovery is manual: chillers restart at limited capacity and IT returns in stages (S8 O5 D9)</title></circle><text class="fm-pt-l" x="170.0" y="74.0" text-anchor="middle">03, 05</text><circle class="fm-pt" cx="142.0" cy="168.0" r="6" fill="var(--amber)"><title>FM-04 No automated link from thermal alarms to IT load-shed is recorded; protection depends on the tenant halting its own systems (S5 O4 D6)</title></circle><text class="fm-pt-l" x="142.0" y="158.0" text-anchor="middle">04</text></svg></figure>
+        </div>
+        <div class="fm-sheet">
+            <div class="fm-head" aria-hidden="true"><span>ID</span><span>Failure mode</span><span>S·O·D</span><span>RPN</span><span>After</span></div>
+            <details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-01</span>
+    <span class="fm-mode">Onsite staff and contractors do not follow standard procedures when draining the cooling towers ahead of a hard freeze<span class="fm-item">Cooling-tower freeze-preparation (draining) procedure</span></span>
+    <span class="fm-sod" aria-label="Severity 9, occurrence 6, detection 8">9·6·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>432</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Transition the water-cooled tower plant for freezing weather without interrupting chilled-water supply</dd>
+      <dt>Effect</dt><dd>A chiller-plant failure takes multiple cooling units offline; CME halts its global futures and options markets for about 11 hours</dd>
+      <dt>Cause</dt><dd>Procedure execution failure during a seasonal changeover under live IT load (confirmed by CyrusOne as human error; the skipped step is not disclosed)</dd>
+      <dt>Prevention in place</dt><dd>A standard procedure existed but was not followed</dd>
+      <dt>Detection in place</dt><dd>None recorded before the plant tripped; when and how the failure was first detected is not disclosed</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>9</b></dt><dd>Took down a global derivatives exchange&#x27;s futures and options trading, with no workaround for market participants, for about 11 hours: provider-wide outage of a foundational service, the rubric&#x27;s 9. Not 10: no hazard to people is recorded and the facility was not lost.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>Freeze preparation is routine seasonal work, and the only recorded guard was the procedure itself, which was not followed: &#x27;occasional, weakly guarded&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>No verification caught the mis-sequenced changeover before units tripped; detection came after impact, though the exact detection path is not in the record.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 432</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Rebuild the freeze-prep SOP as a checklist-gated changeover with two-person sign-off and a seasonal dry-run (not publicly confirmed) <span class="fm-ev-src">Correction of errors #1</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://www.datacenterdynamics.com/en/news/cme-data-center-shutdown-attributable-to-human-error-report/" target="_blank" rel="noopener nofollow">Reference #1 · press</a></span><span class="fm-ev-txt">“staff and contractors failed to follow standard procedures when draining cooling towers ahead of freezing weather”</span></li><li><span class="fm-ev-src"><a href="https://CyrusOne via Bloomberg, relayed by DatacenterDynamics (CME data-center shutdown attributable to human error)" target="_blank" rel="noopener nofollow">Sequence of events #1</a></span><span class="fm-ev-txt">2025-11-27 evening (CT) — On the live approach to a hard freeze in the Chicago suburbs (Thanksgiving-window reopen), onsite staff and contractors began preparing/draining CHI1&#x27;s cooling towers for freezing weather but failed to follow standard procedures for the winterization changeover (CyrusOne, confirmed to Bloomberg).</span></li><li><span class="fm-ev-src">Contributing factor #1</span><span class="fm-ev-txt">PROCEDURAL EXECUTION FAILURE DURING FREEZE-PREP (root, CONFIRMED): CyrusOne confirmed to Bloomberg that onsite staff and contractors failed to follow standard procedures when draining/preparing the cooling towers ahead of freezing weather (via DatacenterDynamics) - a seasonal cold-weather changeover mishandled on the live approach to a hard freeze.</span></li><li><span class="fm-ev-src"><a href="https://Bloomberg/CyrusOne via DatacenterDynamics (CONFIRMED ~11h); &#x27;over 11 hours&#x27; wording per Reuters (not re-fetched)" target="_blank" rel="noopener nofollow">Metric #1</a></span><span class="fm-ev-txt">Total outage duration: ~11 hours (reported &#x27;over 11 hours&#x27;)</span></li><li><span class="fm-ev-src">Improvement #3</span><span class="fm-ev-txt">“no verification caught the mis-sequenced changeover before multiple units tripped”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-05</span>
+    <span class="fm-mode">Recovery is manual: chillers restart at limited capacity and IT returns in stages<span class="fm-item">Chiller restart and cooling reconstitution</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 5, detection 9">8·5·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>360</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Restore chilled-water circulation quickly after a plant trip</dd>
+      <dt>Effect</dt><dd>Markets resume in stages, EBS at about 07:00 ET and full reopen at about 08:30 ET on 28 November per CNBC (not reconfirmed), about 11 hours after the halt</dd>
+      <dt>Cause</dt><dd>No recorded pre-staged rapid-response cooling; restart depended on mobilising engineers and contractors on site</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Not applicable before the incident; recovery time was learned during it</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>This mode sets the length of the outage rather than its existence: hours of full outage of a major service is the rubric&#x27;s 8.</dd></div>
+      <div class="fm-sc"><dt>O <b>5</b></dt><dd>A manual restart path applies to any plant-wide trip; present as a condition though rarely exercised.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>No rehearsal or pre-staged capacity is recorded that would have shown recovery time in advance. The &#x27;temporary and supplemental chillers&#x27; detail is unverified and not relied on.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 360</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Common-mode-resistant redundancy plus pre-staged rapid-response mobile cooling <span class="fm-ev-src">Improvement #2</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Technical deep-dive</span><span class="fm-ev-txt">“Recovery was mechanical and manual”</span></li><li><span class="fm-ev-src"><a href="https://Forensic reconstruction; supplemental-cooling wording attributed to DC Pulse (not re-fetched)" target="_blank" rel="noopener nofollow">Sequence of events #10</a></span><span class="fm-ev-txt">2025-11-28 early hours — Chillers restarted at limited capacity and cooling reconstituted to rebuild chilled-water circulation to a stable state (any &#x27;temporary/supplemental chillers and pipework&#x27; detail is attributed to DC Pulse and is unverified).</span></li><li><span class="fm-ev-src"><a href="https://CNBC - cited, not re-fetched" target="_blank" rel="noopener nofollow">Metric #6</a></span><span class="fm-ev-txt">EBS markets resume time: ~07:00 ET, 2025-11-28 (not independently reconfirmed)</span></li><li><span class="fm-ev-src"><a href="https://CNBC - cited, not re-fetched" target="_blank" rel="noopener nofollow">Metric #7</a></span><span class="fm-ev-txt">Full market reopen time: ~08:30 ET, 2025-11-28 (not independently reconfirmed)</span></li><li><span class="fm-ev-src"><a href="https://Forensic framing from CyrusOne restored-operations statement; contractor-callout detail attributed to DC Pulse (not re-fetched)" target="_blank" rel="noopener nofollow">Sequence of events #8</a></span><span class="fm-ev-txt">2025-11-27/28 overnight — Emergency MECHANICAL response (no fire department / 911): CyrusOne mobilized engineering teams and contractors on-site to restart chillers and reconstitute chilled-water circulation.</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-02</span>
+    <span class="fm-mode">No method statement, supervision or independent verification gates the changeover at the contractor boundary<span class="fm-item">Contractor-boundary change management for live freeze-prep</span></span>
+    <span class="fm-sod" aria-label="Severity 9, occurrence 4, detection 9">9·4·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>324</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Verify each freeze-prep step done by staff and contractors before it affects the live plant</dd>
+      <dt>Effect</dt><dd>The lapse is not caught before the chiller plant trips</dd>
+      <dt>Cause</dt><dd>Change-management gap spanning onsite personnel and contractors; no source names the procedure document, firm or skipped step</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>None recorded</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>9</b></dt><dd>Another route to the same exchange-wide outage, so it carries FM-01&#x27;s severity.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>Scored below FM-01 so the one event is not counted twice at full weight; the dossier itself infers this gap (&#x27;implying&#x27;) rather than stating it.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>No verification step is recorded; the gap became visible only through the plant failure.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 324</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Method statements, supervision and two-person verification at the contractor boundary (not publicly confirmed) <span class="fm-ev-src">Correction of errors #4</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #5</span><span class="fm-ev-txt">“no accessible source names the specific procedure document”</span></li><li><span class="fm-ev-src">Improvement #3</span><span class="fm-ev-txt">Process: Institute change-management controls at the contractor boundary for any live freeze-prep switchover - approved method statements, on-site supervision, and a two-person verify step - since the lapse spanned both onsite personnel and contractors and no verification caught the mis-sequenced changeover before multiple units tripped.</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“onsite staff and contractors failed to follow standard procedures”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-03</span>
+    <span class="fm-mode">One procedural lapse trips multiple cooling units together and no backup cooling path carries the load<span class="fm-item">CHI1 chiller plant and backup cooling</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 5, detection 8">8·5·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>320</span>
+    <span class="fm-rpn-rev">192</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Keep chilled water flowing to the data halls if one unit or one changeover step fails</dd>
+      <dt>Effect</dt><dd>Chilled-water circulation to the halls is lost and room and rack-inlet temperatures rise until CME halts its trading systems</dd>
+      <dt>Cause</dt><dd>Common-mode exposure: the redundant units shared the same changeover, so redundancy did not cover this failure mode</dd>
+      <dt>Prevention in place</dt><dd>Installed cooling redundancy, which did not carry the load</dd>
+      <dt>Detection in place</dt><dd>Not disclosed</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>Loss of cooling to the halls is the physical cause of the halt; scored 8 rather than 9 so the exchange outage already carried by FM-01 is not counted again at full weight.</dd></div>
+      <div class="fm-sc"><dt>O <b>5</b></dt><dd>Any changeover touching shared plant exercises the common mode; between &#x27;infrequent&#x27; and &#x27;occasional&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>Nothing recorded warned that redundancy would not survive a changeover error; it was learned when the units tripped.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 320</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Install additional redundancy to the CHI1 cooling systems <span class="fm-ev-src">Correction of errors #2</span></li></ul>
+    <p class="fm-revline">After action: S8 · O3 · D8 → RPN 192. CyrusOne confirmed it installed additional cooling redundancy, so one tripped unit is less likely to leave the halls without cooling (O 5→3). The reduction is kept small because no tonnage or design is disclosed, and the dossier cannot say whether the new redundancy is free of the same freeze-prep common mode.</p>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://CyrusOne statement via DatacenterDynamics (CONFIRMED quoted phrase)" target="_blank" rel="noopener nofollow">Sequence of events #2</a></span><span class="fm-ev-txt">“experienced a chiller plant failure affecting multiple cooling units”</span></li><li><span class="fm-ev-src"><a href="https://CyrusOne via DatacenterDynamics (CONFIRMED quoted phrase)" target="_blank" rel="noopener nofollow">Metric #2</a></span><span class="fm-ev-txt">Cooling units affected: &#x27;multiple cooling units&#x27; (common-mode; exact count not disclosed)</span></li><li><span class="fm-ev-src">Contributing factor #2</span><span class="fm-ev-txt">INADEQUATE / COMMON-MODE MECHANICAL REDUNDANCY: a single procedural lapse took &#x27;multiple cooling units&#x27; offline at once with no backup cooling carrying the load, evidenced by CyrusOne&#x27;s post-incident fix of having &#x27;installed additional redundancy to the cooling systems&#x27; (confirmed verbatim via DCD) - i.e. the fault-tolerant protection a resilient plant should have provided was effectively absent for this failure mode.</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“is an admission that pre-incident backup cooling did not save the load”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-06</span>
+    <span class="fm-mode">Globally critical matching engines depend on the single Aurora campus, so one plant&#x27;s thermal failure halts worldwide trading<span class="fm-item">Placement of CME matching engines on one campus</span></span>
+    <span class="fm-sod" aria-label="Severity 9, occurrence 3, detection 9">9·3·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>243</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Keep global price discovery running if one site loses cooling</dd>
+      <dt>Effect</dt><dd>Traders lose access to futures prices for commodities and stocks across CME&#x27;s derivatives markets for about 11 hours</dd>
+      <dt>Cause</dt><dd>Single-site concentration with no geographically diverse fallback recorded</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Customer-visible impact</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>9</b></dt><dd>Concentration is what made a facility cooling fault an exchange-wide outage with no workaround.</dd></div>
+      <div class="fm-sc"><dt>O <b>3</b></dt><dd>Needs a site-level failure first, which is infrequent. The concentration commentary is attributed to DC Pulse and could not be re-fetched.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>Seen through market participants losing access.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 243</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Geographically diverse cooling and power architecture for critical matching engines and a review of single-site concentration (open, not publicly confirmed) <span class="fm-ev-src">Correction of errors #5</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #4</span><span class="fm-ev-txt">SINGLE-SITE CONCENTRATION OF CRITICAL WORKLOAD: CME&#x27;s matching engines ran from the single Aurora campus, so one plant&#x27;s thermal failure halted global futures/options price discovery - a concentration-risk / missing geographic-diversity theme raised in trade commentary (attributed to DC Pulse; that specific commentary could not be independently re-fetched).</span></li><li><span class="fm-ev-src"><a href="https://CyrusOne via DCD (halt prevented access to futures prices for commodities and stocks); benchmark list attributed to trade reporting" target="_blank" rel="noopener nofollow">Sequence of events #6</a></span><span class="fm-ev-txt">2025-11-27/28 overnight — Global markets knocked out: the halt prevented traders from accessing futures prices for commodities and stocks across CME Group&#x27;s derivatives markets (specific benchmark list per trade reporting: S&amp;P 500, Nasdaq, Treasuries, WTI, gold, Nikkei, palm oil - not independently reconfirmed).</span></li><li><span class="fm-ev-src"><a href="https://Bloomberg/CyrusOne via DatacenterDynamics (CONFIRMED ~11h); &#x27;over 11 hours&#x27; wording per Reuters (not re-fetched)" target="_blank" rel="noopener nofollow">Metric #1</a></span><span class="fm-ev-txt">Total outage duration: ~11 hours (reported &#x27;over 11 hours&#x27;)</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-04</span>
+    <span class="fm-mode">No automated link from thermal alarms to IT load-shed is recorded; protection depends on the tenant halting its own systems<span class="fm-item">Thermal detection and protective load-shed</span></span>
+    <span class="fm-sod" aria-label="Severity 5, occurrence 4, detection 6">5·4·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>120</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Alarm on rising hall temperatures and shed IT heat load before safe inlet limits are crossed</dd>
+      <dt>Effect</dt><dd>CME halts its trading systems to protect hardware; hall temperatures above 100°F are reported by a secondary summary but not confirmed</dd>
+      <dt>Cause</dt><dd>Detection not wired to protection (an analyst recommendation in the dossier; the actual alarm path and timing are not disclosed)</dd>
+      <dt>Prevention in place</dt><dd>Tenant-initiated protective shutdown</dd>
+      <dt>Detection in place</dt><dd>BMS/DCIM alarms are inferred, not confirmed; no source states when the high-temperature threshold tripped</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>5</b></dt><dd>The halt itself is scored in FM-01; this mode covers the added exposure of hardware to heat before load was shed, which the record shows only as customer-visible degradation with no reported hardware damage.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>It matters only after a plant-wide cooling loss, which needs an unusual combination: &#x27;infrequent&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>Rising temperature was evidently seen, since CME halted, but nothing automated acted on it: &#x27;detected at onset, not prevented&#x27;. Scored with low confidence because detection timing is undisclosed.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 120</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Wire thermal early-warning to automated IT load-shed thresholds (open, not publicly confirmed) <span class="fm-ev-src">Correction of errors #6</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Forensic note (disclosed uncertainty); CyrusOne chiller-plant-failure statement via DCD" target="_blank" rel="noopener nofollow">Sequence of events #4</a></span><span class="fm-ev-txt">“No accessible source states the exact minute the high-temp threshold tripped.”</span></li><li><span class="fm-ev-src"><a href="https://Forensic framing note; CME/CyrusOne cooling-halt reporting via DCD" target="_blank" rel="noopener nofollow">Sequence of events #5</a></span><span class="fm-ev-txt">2025-11-27 late evening (ET) — Protective compute shutdown: to stop generating heat and protect hardware, CME&#x27;s trading systems (Globex and related markets) were halted/failed over - an &#x27;evacuation of compute&#x27; rather than any occupant evacuation (unmanned mechanical failure, no life-safety event).</span></li><li><span class="fm-ev-src"><a href="https://Incident-summary framing; no per-sensor peak disclosed by CyrusOne (disclosed uncertainty)" target="_blank" rel="noopener nofollow">Metric #5</a></span><span class="fm-ev-txt">Peak data-hall temperature (reported): &gt;100degF (UNVERIFIED - not disclosed by CyrusOne; from a secondary incident summary)</span></li><li><span class="fm-ev-src">Improvement #4</span><span class="fm-ev-txt">Safety: Tighten thermal early-warning and automated load-shed thresholds (BMS/DCIM high-temp alarms tied to protective IT throttling) so a chiller-plant trip is caught and heat load shed before halls exceed safe inlet temperatures - closing detection-to-protection latency.</span></li></ul>
+  </div>
+</details>
+        </div>
+        <details class="fm-method"><summary>Scoring rubric and method</summary><div class="fm-method-body"><p>A retrospective FMEA: each row asks how this system could fail, how bad the effect was, how likely the cause was given the controls in place at the time, and how likely those controls were to catch it before customers did. Scales are adapted for data-centre operations from the 1–10 scales of IEC 60812:2018 and the AIAG-VDA FMEA handbook. RPN = S × O × D. Priority is High when S ≥ 9 with O ≥ 4 or D ≥ 7, or when RPN ≥ 300; Medium when RPN ≥ 120 or S ≥ 7; Low otherwise. Severity overrides the product because a large S multiplied by small O and D can hide a region-wide outage nothing would catch.</p><p>Every row cites evidence from this dossier, and every quote is checked verbatim against its source by <code>tools/test-incidents-fmea.py</code>. A revised score is only shown against a published corrective action. This is an RZ analyst assessment, not an operator document.</p><div class="fm-rubrics"><div><p class="fm-sub">Severity</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Hazard to people, or loss of the facility / several regions</td></tr><tr><td>9</td><td>Region-wide or provider-wide outage of a foundational service, no workaround</td></tr><tr><td>8</td><td>Full outage of a major service for hours</td></tr><tr><td>7</td><td>Major degradation of a major service</td></tr><tr><td>6</td><td>Partial outage confined to one zone or one service</td></tr><tr><td>5</td><td>Customer-visible degradation</td></tr><tr><td>4</td><td>Limited customer impact</td></tr><tr><td>3</td><td>Internal impact only</td></tr><tr><td>2</td><td>Negligible</td></tr><tr><td>1</td><td>No effect</td></tr></tbody></table></div><div><p class="fm-sub">Occurrence</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Near certain: the cause is present in normal operation</td></tr><tr><td>8</td><td>Frequent: routine work exercises the cause</td></tr><tr><td>6</td><td>Occasional: a foreseeable slip or condition, weakly guarded</td></tr><tr><td>4</td><td>Infrequent: needs an unusual combination</td></tr><tr><td>2</td><td>Remote: guarded by design</td></tr><tr><td>1</td><td>Eliminated by design</td></tr></tbody></table></div><div><p class="fm-sub">Detection</p><table class="fm-rubric"><tbody><tr><td>10</td><td>No control could detect it</td></tr><tr><td>9</td><td>Detected only through customer impact</td></tr><tr><td>8</td><td>Detected after impact by internal monitoring</td></tr><tr><td>6</td><td>Detected at onset, not prevented</td></tr><tr><td>4</td><td>Detected before impact with time to act</td></tr><tr><td>2</td><td>Automated interlock almost certainly stops it</td></tr><tr><td>1</td><td>Certain to be stopped</td></tr></tbody></table></div></div></div></details>
+
 
         <h2>Correction of errors (COE)</h2>
         <ul class="tight"><li>Rebuild cooling-tower freeze-prep/winterization SOP as a checklist-gated changeover with independent two-person sign-off and seasonal dry-run <span class="coe-meta">CyrusOne Critical Facilities Operations · Not publicly confirmed (implied by stated root cause; only the redundancy fix was disclosed)</span></li><li>Install additional redundancy to the CHI1 cooling systems <span class="coe-meta">CyrusOne · Done (CyrusOne confirmed it &#x27;installed additional redundancy to the cooling systems&#x27;)</span></li><li>Restore stable and secure operations at CHI1 Aurora <span class="coe-meta">CyrusOne · Done (CyrusOne confirmed restored stable and secure operations)</span></li><li>Impose change-management controls (method statements, supervision, two-person verify) at the contractor boundary for live freeze-prep <span class="coe-meta">CyrusOne / contracting firm · Not publicly confirmed</span></li><li>Pursue geographically diverse cooling/power architecture for critical matching engines and review single-site concentration <span class="coe-meta">CME Group · Open / not publicly confirmed</span></li><li>Wire thermal early-warning to automated IT load-shed thresholds (BMS/DCIM) <span class="coe-meta">CyrusOne / CME · Open / not publicly confirmed</span></li><li>Regulatory awareness and market-integrity review of the outage <span class="coe-meta">CFTC / SEC · Reported aware/monitoring per Reuters (not independently reconfirmed)</span></li></ul>
@@ -429,7 +699,7 @@ RECONSTITUTION OF COOLING. There was no suppression system to activate because t
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-1a1a084f"></script>
+    <script src="js/rz-version.js?v=20261010-00a1d9e8"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

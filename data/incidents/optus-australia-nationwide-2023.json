@@ -289,5 +289,284 @@
   "officialPostmortem": false,
   "lastVerified": "2026-08-02 (seed — pending deep research)"
  },
- "lastUpdated": "2026-08-02"
+ "lastUpdated": "2026-08-02",
+ "fmea": {
+  "scope": "Optus's national IP core and the upstream Singtel peering it depends on: the peering boundary that let a route flood through, the route-limit thresholds on Optus's ~90 Cisco Provider Edge routers, the manual recovery of tripped BGP sessions, Triple-Zero (000) emergency calling, and change management across the Singtel-Optus boundary. This dossier is press-sourced: only Wikipedia was re-fetched (citing Cloudflare telemetry and Optus's stated cause); the Bean review, Senate and ACMA findings were not retrievable, so no official finding is quoted. The upstream filtering gap and the manual, on-site recovery detail are the dossier's inferences from the mechanism, not verbatim findings, and Singtel reportedly disputed that its upgrade caused the outage (single-sourced, not re-verified). No corrective action has a status stated as done or committed by Optus or Singtel, so no revised score is claimed: every mode is residual risk.",
+  "modes": [
+   {
+    "id": "FM-01",
+    "item": "Singtel international peering boundary to Optus AS4804",
+    "function": "Absorb an upstream routing event without passing an abnormal flood into Optus's core",
+    "failureMode": "A software upgrade at a North American Singtel exchange makes one router disconnect, and the resulting flood of ~940,000 BGP announcements in an hour reaches Optus unfiltered",
+    "effect": "Optus's edge routers receive about 300 times their normal hourly announcement rate, which trips their route limits (FM-02)",
+    "cause": "No apparent inbound prefix-filtering or route rate-limiting at the peering boundary (inferred from the mechanism, not a verbatim finding); causation reportedly disputed by Singtel",
+    "prevention": "None recorded at the boundary",
+    "detection": "Cloudflare telemetry registered the spike; nothing at the boundary is recorded to have caught it",
+    "S": 9,
+    "O": 5,
+    "D": 8,
+    "rationale": {
+     "S": "This is the trigger of a nationwide outage of a foundational telecom service with no workaround for Optus customers: the rubric's 9. The people hazard through 000 is scored in FM-04.",
+     "O": "Software upgrades on peering routers are routine, and no boundary guard is recorded, but a flood of this size from an upgrade is not routine: between 'infrequent' and 'occasional'. Held at 5 because the filtering gap is inferred and causation is disputed.",
+     "D": "The spike was visible in external telemetry, but no control at the boundary is recorded to have caught it; its first internal effect was the outage, so 'detected after impact'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 0
+     },
+     {
+      "src": "soe",
+      "i": 1
+     },
+     {
+      "src": "metric",
+      "i": 0
+     },
+     {
+      "src": "factor",
+      "i": 2
+     },
+     {
+      "src": "rootCause",
+      "quote": "inferred from the mechanism, not a verbatim finding"
+     },
+     {
+      "src": "factor",
+      "i": 5
+     }
+    ],
+    "actions": [
+     {
+      "text": "Inbound prefix-filtering and route rate-limiting at the Singtel peering boundary (status: under review; ownership reportedly disputed)",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "text": "Peering-boundary hygiene: prefix filters, route-count rate limits and AS-path checks at Singtel ingress (analyst recommendation)",
+      "evidence": {
+       "src": "improvement",
+       "i": 1
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-02",
+    "item": "Route-limit thresholds on Optus's Cisco Provider Edge routers",
+    "function": "Protect each router from routing-update overload without cutting customers off the network",
+    "failureMode": "The same Cisco default threshold trips on ~90 PE routers near-simultaneously and each tears down its BGP sessions, so the protective action isolates the whole IP core",
+    "effect": "Nationwide loss of mobile and fixed service for more than 10 million people and 400,000 businesses; Melbourne trains, hospital phone lines and EFTPOS terminals disrupted",
+    "cause": "Thresholds left at 'the pre-configured default threshold limits set by Cisco Systems' rather than tuned to Optus's route counts, with hard session teardown as the response",
+    "prevention": "The threshold itself, which prevented CPU/memory exhaustion as designed",
+    "detection": "The routers detected the threshold breach; that detection triggered the teardown",
+    "S": 9,
+    "O": 5,
+    "D": 8,
+    "rationale": {
+     "S": "Provider-wide outage of a foundational national telecom service for hours with no workaround: the rubric's 9. The 000 failures are scored separately in FM-04 rather than here.",
+     "O": "The default configuration is a standing condition, but it only fires on an abnormal flood: between 'infrequent' and 'occasional'. Scored like FM-01 so the trigger and the amplifier together are not counted as two frequent events.",
+     "D": "The only control that saw the flood was the threshold whose trip was the outage; no alerting that would allow action before customers lost service is recorded."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 3
+     },
+     {
+      "src": "soe",
+      "i": 5
+     },
+     {
+      "src": "metric",
+      "i": 1
+     },
+     {
+      "src": "factor",
+      "i": 0
+     },
+     {
+      "src": "factor",
+      "i": 1
+     },
+     {
+      "src": "metric",
+      "i": 2
+     },
+     {
+      "src": "ref",
+      "i": 0,
+      "quote": "Approximately 90 edge provider routers disconnected as an automated protective measure against routing update overload"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Tune PE route-limit thresholds off Cisco defaults with graceful warn/restart behaviour (directed by the Bean review / Senate inquiry; status not retrievable)",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "text": "Operator-tuned limits with soft warning-then-restart behaviour (analyst recommendation)",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-03",
+    "item": "Recovery of tripped BGP sessions",
+    "function": "Bring the PE routers back into service quickly once the flood has passed",
+    "failureMode": "Tripped sessions do not re-establish on their own, and restoration proceeds by manual reconnection and reboot",
+    "effect": "About 11% of the network restored by 11:30 AEDT and 88% by 13:00; full service after ~12-13 hours (some media report up to 14)",
+    "cause": "Standard max-prefix behaviour holds sessions down until an operator re-enables them; no automated or remote recovery recorded (the manual, on-site detail is inferred from the recovery profile)",
+    "prevention": "None recorded",
+    "detection": "Known from onset; the pace of recovery was learned during the event",
+    "S": 8,
+    "O": 6,
+    "D": 8,
+    "rationale": {
+     "S": "Sets the duration of the outage carried by FM-02: hours of full outage of a major service is the rubric's 8.",
+     "O": "Hold-down is standard behaviour, so it applies every time the thresholds trip: 'occasional'.",
+     "D": "No recovery automation or drill is recorded, so the restoration time was learned only after impact."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 3
+     },
+     {
+      "src": "metric",
+      "i": 4
+     },
+     {
+      "src": "metric",
+      "i": 3
+     },
+     {
+      "src": "soe",
+      "i": 12
+     },
+     {
+      "src": "tech",
+      "quote": "tripped max-prefix sessions typically do not silently re-establish when the flood subsides"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Automated router-session recovery and pre-staged remote reboot capability (analyst recommendation)",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-04",
+    "item": "Triple-Zero (000) emergency calling",
+    "function": "Connect emergency calls from Optus customers even when Optus's IP core is down",
+    "failureMode": "Emergency 000 calls fail for affected customers, with no effective fallback during the IP-core loss",
+    "effect": "Customers cannot reach emergency services; the exact number of failed calls is not in the retrievable record; this became the central concern of ACMA and the Senate inquiry",
+    "cause": "000 calling depended on the same IP core, with no resilient fallback path recorded",
+    "prevention": "None recorded",
+    "detection": "Through failed calls",
+    "S": 10,
+    "O": 4,
+    "D": 9,
+    "rationale": {
+     "S": "Rubric 10, hazard to people: emergency calls failed. No specific harm is recorded in the dossier, but losing access to emergency services is the hazard itself.",
+     "O": "Needs the IP core to fail first, which is infrequent; kept low so the single outage is not counted again at full weight.",
+     "D": "The failure was found when calls did not connect, the analogue of detection through customer impact."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 8
+     },
+     {
+      "src": "metric",
+      "i": 9
+     },
+     {
+      "src": "factor",
+      "i": 4
+     },
+     {
+      "src": "soe",
+      "i": 17
+     }
+    ],
+    "actions": [
+     {
+      "text": "Resilient 000 failover independent of the Optus IP core plus welfare-check procedures (regulatory focus; status not retrievable)",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "text": "000 failover path independent of the Optus IP core with automated welfare checks (analyst recommendation)",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-05",
+    "item": "Change management across the Singtel-Optus boundary",
+    "function": "Review and stage changes on shared upstream infrastructure for their blast radius on Optus",
+    "failureMode": "An upstream upgrade proceeds with no recorded joint staged rollout, blast-radius review or coordinated rollback, and ownership of the change is disputed afterwards",
+    "effect": "A change in North America reaches 10 million Australians; accountability is contested after the event",
+    "cause": "No joint change process recorded between the two companies; Singtel reportedly refuted early causation claims (ZDNet, not re-verified)",
+    "prevention": "None recorded",
+    "detection": "None recorded before the change took effect",
+    "S": 7,
+    "O": 6,
+    "D": 8,
+    "rationale": {
+     "S": "A process precursor whose consequence runs through FM-01 and FM-02; scored at 7 so the national outage is not counted a third time at full weight.",
+     "O": "Upgrades on shared infrastructure happen routinely and no joint guard is recorded: 'occasional'. Held at 6 because the dossier's evidence for the gap is the outcome and a disputed press report.",
+     "D": "No pre-change review is recorded that would have flagged the downstream risk; the gap surfaced through the outage."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 5
+     },
+     {
+      "src": "rootCause",
+      "quote": "Attribution of change ownership was reportedly disputed"
+     },
+     {
+      "src": "soe",
+      "i": 0
+     }
+    ],
+    "actions": [
+     {
+      "text": "Joint Singtel-Optus staged change management with blast-radius review and coordinated rollback (recommended; not verified)",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "text": "Joint change management closing the accountability gap at the peering boundary (analyst recommendation)",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     }
+    ]
+   }
+  ]
+ }
 }

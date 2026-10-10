@@ -267,5 +267,348 @@
   "officialPostmortem": false,
   "lastVerified": "2026-08-02 (seed — pending deep research)"
  },
- "lastUpdated": "2026-08-02"
+ "lastUpdated": "2026-08-02",
+ "fmea": {
+  "scope": "Power supply to the Northern Virginia data-center load pocket as the dossier actually records it: bulk transmission import capacity into eastern Loudoun (the July 2022 constraint), transmission line faults (a 2024 surge-arrestor failure and an undisclosed 2026 line fault), the data centers' protective and ride-through settings, on-site backup transfer, PJM/Dominion frequency balancing, a demand-side heat-stress episode, and event analysis. Although the title and header describe a 2022 heat-dome cooling event, the dossier's own root-cause analysis finds no cooling failure: the July 2022 event was a transmission-capacity disclosure, and the physical events it documents are in 2024 and 2026. No cooling-failure mode is scored because the dossier holds no evidence of one. There is no operator post-mortem; the 2022 and 2024 sources were not re-verified verbatim, the heat-stress episode is single-source with no date, and NERC's review of the 2026 event is ongoing. No customer service loss is recorded in any of these events, so severities are held low and several modes are near-misses. Only one action, Dominion's August 2022 commitment to two 500 kV lines, carries a revised score; the rest are open.",
+  "modes": [
+   {
+    "id": "FM-01",
+    "item": "Bulk transmission import capacity into eastern Loudoun",
+    "function": "Deliver enough transmission capacity for the load being connected to the pocket",
+    "failureMode": "Transmission build-out falls behind concentrated data-center load growth, creating a 'pinch point'",
+    "effect": "Dominion tells major customers on 29 July 2022 that new data-center deliveries could be delayed to ~2026 and new connections may pause",
+    "cause": "Planning and interconnection lag: record, geographically concentrated load growth against limited transmission import capability",
+    "prevention": "PJM and Dominion transmission planning",
+    "detection": "PJM planning material on 12 July 2022 warned of insufficient transmission capability by 2024/25",
+    "S": 4,
+    "O": 8,
+    "D": 4,
+    "rationale": {
+     "S": "It delays new capacity rather than interrupting running services; no outage of existing load is recorded: 'limited customer impact'.",
+     "O": "Load growth in the pocket is routine and outpaced build-out: 'frequent'.",
+     "D": "Grid planning flagged the constraint years before reliability issues were expected: 'detected before impact with time to act'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 0
+     },
+     {
+      "src": "soe",
+      "i": 1
+     },
+     {
+      "src": "soe",
+      "i": 2,
+      "quote": "transmission infrastructure, not power generation"
+     },
+     {
+      "src": "factor",
+      "i": 1
+     }
+    ],
+    "actions": [
+     {
+      "text": "Two new 500 kV transmission lines into eastern Loudoun, and geographic dispersal of new hyperscale load (Dominion; committed August 2022, in progress)",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "text": "Formalise RTO/utility/data-center coordination on interconnection sequencing and demand forecasting (analyst recommendation; no status)",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     }
+    ],
+    "revised": {
+     "S": 4,
+     "O": 5,
+     "D": 4
+    },
+    "revisedRationale": "Added import capacity reduces how often load growth meets a transmission ceiling (O 8→5); it does not change the severity or how the constraint is detected. The dossier records the lines as committed in August 2022 and in progress, from a source not re-verified verbatim, so the reduction is a claim about the action, not a confirmed outcome."
+   },
+   {
+    "id": "FM-02",
+    "item": "Transmission line components (230 kV surge arrestor in 2024; undisclosed component in 2026)",
+    "function": "Carry power into the load pocket without producing transients",
+    "failureMode": "A line component fails and causes a fast voltage transient across the pocket",
+    "effect": "Initiates the 2024 (~1,500 MW) and 2026 (~3 GW) load-loss events; on its own a localised line fault",
+    "cause": "2024: lightning/surge arrestor failure on a 230 kV line in Fairfax County; 2026: a Dominion transmission line fault whose voltage class and component are not disclosed. Whether an asset-condition or inspection lapse contributed is not disclosed",
+    "prevention": "None recorded; inspection and testing programmes are not disclosed",
+    "detection": "Grid telemetry at the moment of the fault (07:56:09 EDT on 22 July 2026)",
+    "S": 4,
+    "O": 6,
+    "D": 6,
+    "rationale": {
+     "S": "The fault's own effect is a transient; the multi-GW consequence comes from FM-03 and is scored there, so this mode is kept at 'limited customer impact' to avoid double counting.",
+     "O": "Two initiating faults in two years in the same pocket: 'occasional'. The cause of the 2026 fault is undisclosed.",
+     "D": "Telemetry saw the fault at once, but nothing recorded anticipated it: 'detected at onset, not prevented'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 4
+     },
+     {
+      "src": "soe",
+      "i": 6
+     },
+     {
+      "src": "metric",
+      "i": 5
+     },
+     {
+      "src": "factor",
+      "i": 3
+     },
+     {
+      "src": "ref",
+      "i": 0,
+      "quote": "a Dominion Energy transmission line fault in Northern Virginia"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Establish and disclose surge-arrestor and line-protection asset-condition inspection and testing on the 230 kV+ network (status: Open)",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-03",
+    "item": "Data-center protective relay, STS and UPS ride-through settings across the pocket",
+    "function": "Ride through a transmission transient that each facility could tolerate, rather than all transferring at once",
+    "failureMode": "Individually reasonable settings trip dozens of facilities simultaneously onto backup power",
+    "effect": "About 1,500 MW across ~60 data centers disconnects in 2024; more than 3 GW, about 3% of PJM system demand, drops within seconds in 2026",
+    "cause": "Un-coordinated protective and ride-through settings across ultra-dense co-located facilities, producing a common-mode response",
+    "prevention": "None recorded across facilities",
+    "detection": "RTO and market data (PJM, Yes Energy) and grid telemetry at onset",
+    "S": 5,
+    "O": 7,
+    "D": 6,
+    "rationale": {
+     "S": "A multi-GW load collapse visible to the public as flickering lights, with no loss of power and no reliability impact reported: 'customer-visible degradation'. It is a near-miss for the bulk system, not an outage.",
+     "O": "The same mechanism recurred in 2024 and 2026, and any line fault in the pocket exercises it: between 'occasional' and 'frequent'.",
+     "D": "Seen in seconds by grid telemetry, but no control coordinates the response: 'detected at onset, not prevented'."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 2
+     },
+     {
+      "src": "soe",
+      "i": 5
+     },
+     {
+      "src": "soe",
+      "i": 9
+     },
+     {
+      "src": "metric",
+      "i": 0
+     },
+     {
+      "src": "metric",
+      "i": 4
+     },
+     {
+      "src": "rootCause",
+      "quote": "Individually reasonable settings can produce a common-mode response when facilities react simultaneously to the same disturbance."
+     }
+    ],
+    "actions": [
+     {
+      "text": "Coordinate and standardise data-center ride-through and protective relay/UPS settings across the eastern-Loudoun pocket (status: Open)",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "text": "Coordinate ride-through and protective settings so facilities ride through transients instead of islanding en masse (analyst recommendation)",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-04",
+    "item": "On-site backup generation transfer at each facility",
+    "function": "Carry critical IT load on site when the utility feed is disturbed",
+    "failureMode": "Transfer to backup power fails, so IT load drops",
+    "effect": "Did not occur in the record: facilities transferred to backup power for a very short period and rode through, with no evacuation or emergency dispatch reported",
+    "cause": "Would require a failed transfer at the facility; none is recorded",
+    "prevention": "Protective relays, static transfer switches, UPS ride-through and on-site generation",
+    "detection": "Facility control systems acting automatically",
+    "S": 7,
+    "O": 2,
+    "D": 6,
+    "rationale": {
+     "S": "A failed transfer would drop the IT load of the facilities affected: a major degradation. The dossier records no such failure.",
+     "O": "The transfers worked in both the 2024 and 2026 events: 'remote: guarded by design'.",
+     "D": "A failed transfer would be seen at once but not prevented: 'detected at onset, not prevented'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 8
+     },
+     {
+      "src": "soe",
+      "i": 10
+     },
+     {
+      "src": "tech",
+      "quote": "Facilities did NOT shut down and were NOT evacuated"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Verify that simultaneous backup starts across many facilities do not create secondary safety hazards (status: Open)",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-05",
+    "item": "PJM/Dominion frequency balancing",
+    "function": "Hold system frequency when multi-GW of load disappears in seconds",
+    "failureMode": "Frequency excursion from an instantaneous multi-GW load swing",
+    "effect": "In 2026, a measurable frequency change with no reliability impacts; strongest impacts about two minutes, broader recovery close to ten minutes",
+    "cause": "Instantaneous loss of about 3% of system demand from FM-03",
+    "prevention": "PJM frequency-balancing operations",
+    "detection": "RTO telemetry at onset",
+    "S": 5,
+    "O": 5,
+    "D": 6,
+    "rationale": {
+     "S": "Grid-wide but absorbed: 'customer-visible degradation' at most, given flickering lights and no loss of power.",
+     "O": "Follows only from a common-mode trip like FM-03; held at 5 so the same events are not counted twice at full weight.",
+     "D": "PJM saw the frequency change as it happened: 'detected at onset, not prevented'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 11
+     },
+     {
+      "src": "soe",
+      "i": 12
+     },
+     {
+      "src": "metric",
+      "i": 2
+     },
+     {
+      "src": "ref",
+      "i": 1,
+      "quote": "about 3% of system demand at the time"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Harden PJM/Dominion frequency-balancing and mass generator-transfer playbooks for multi-GW instantaneous load swings (status: Open)",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-06",
+    "item": "Grid supply to Ashburn during summer heat and record demand",
+    "function": "Serve record summer peak demand without forcing data centers onto backup generation",
+    "failureMode": "Demand-side heat stress brings the utility close to moving every Ashburn data center to backup generation",
+    "effect": "Reported near-miss: Dominion 'minutes away from turning every data center in Ashburn to a backup generation' at a claimed PJM record peak, heat index 114; no transfer or outage recorded",
+    "cause": "Summer heat and record demand (single-source; date and peak figure not verified)",
+    "prevention": "Grid operations",
+    "detection": "Grid operators, minutes before action would have been needed",
+    "S": 5,
+    "O": 4,
+    "D": 4,
+    "rationale": {
+     "S": "The recorded outcome is a near-miss with no customer impact; a forced transfer of every Ashburn data center would have been a customer-visible stress, scored 5. Held there because the account is single-source.",
+     "O": "Needs extreme heat and record demand together: 'infrequent'.",
+     "D": "The operator saw the margin shrinking with minutes to act: 'detected before impact with time to act'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 13
+     },
+     {
+      "src": "factor",
+      "i": 4
+     },
+     {
+      "src": "metric",
+      "i": 7
+     }
+    ],
+    "actions": [
+     {
+      "text": "Formalise coordination on demand forecasting so transmission does not lag load (analyst recommendation; no status)",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-07",
+    "item": "Event analysis and disclosure",
+    "function": "Establish and publish what failed, so the cause can be fixed and checked",
+    "failureMode": "Failed components and fault details stay undisclosed; the 2026 review is incomplete",
+    "effect": "The 2024 arrestor's make, model and age, any inspection lapse, and the 2026 fault's voltage class and component remain unknown",
+    "cause": "No operator post-mortem; NERC review of the 2026 event ongoing",
+    "prevention": "NERC event-analysis process",
+    "detection": "Gaps noted after the events",
+    "S": 3,
+    "O": 8,
+    "D": 8,
+    "rationale": {
+     "S": "Affects learning and verification, not service: 'internal impact only'.",
+     "O": "Non-disclosure is the condition for both the 2024 and 2026 faults in the record: 'frequent'.",
+     "D": "Found only when the record is examined after the event."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 14
+     },
+     {
+      "src": "metric",
+      "i": 3
+     },
+     {
+      "src": "coe",
+      "i": 0
+     }
+    ],
+    "actions": [
+     {
+      "text": "Complete and publish the NERC/PJM analysis of the 22 July 2026 load loss, including voltage class and failed component (status: in progress)",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     }
+    ]
+   }
+  ]
+ }
 }

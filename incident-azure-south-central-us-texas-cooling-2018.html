@@ -52,6 +52,12 @@
     .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
     .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
     .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:2px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    /* A chip carries the operator name, which can be a whole sentence ("Google Cloud
+       (impacted tenant); STT GDC / Tata Communications JV (named as the third-party …").
+       nowrap made that one chip 1120px wide and pushed the GCP Delhi dossier into a
+       1260px page at a 1100px viewport. Short chips are unaffected: normal wrapping
+       only engages when a chip would not fit its row. */
+    .chips .chip { max-width:100%; white-space:normal; overflow-wrap:anywhere; }
     .chip.cyan { color:var(--cyan); border-left:2px solid var(--cyan); }
     .chip.amber { color:var(--amber); border-left:2px solid var(--amber); }
     .chip.green { color:var(--green); border-left:2px solid var(--green); }
@@ -71,6 +77,11 @@
     /* rich incident table (reference-2 style) */
     table.itbl { min-width:1120px; }
     table.itbl td { vertical-align:middle; }
+    /* v1.134.20 — the title and summary columns ellipsise so the table's columns line up,
+       which is the right call for a dense index. But the cut text was reachable only by
+       navigating to the incident: a summary lost 238-298px of its sentence with no way to read
+       it in place. Each carries its full text in a title attribute now, so the truncation is
+       deliberate AND non-lossy — which is the condition the legibility audit checks for. */
     .itr { cursor:pointer; }
     .itr:hover td { background:var(--surface-2); }
     .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
@@ -240,7 +251,6 @@
        derive width = W px from the aspect ratio, so the drawing renders 1:1 at any event count
        and the panel scrolls instead of shrinking. */
     .viz-timeline svg { max-width:none; height:96px; width:auto; }
-
     .viz-radar svg { max-width:320px; margin:0 auto; }
     .vz-num { font-variant-numeric:tabular-nums slashed-zero; }
     .vz-box-t, .vz-box-s, .vz-lbl, .vz-hb-lbl, .vz-tl-t, .vz-pt, .vz-tick { pointer-events:auto; }
@@ -323,7 +333,86 @@
     }
     @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
 </style>
-    
+    <style>
+    /* ── FMEA (v3.12.3) — one hairline panel of rows, like the rest of the dossier.
+       No cards, no stripes: a row is a disclosure, state is a 7px dot. ── */
+    .fm-scope { color:var(--text-body); max-width:70ch; }
+    .fm-meta { flex-wrap:wrap; row-gap:0.25rem; }
+    .fm-viz { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:1.6rem; align-items:start; margin:1.2rem 0; }
+    @media (max-width:820px){ .fm-viz { grid-template-columns:1fr; } }
+    .fm-pb-row, .fm-pb-axis { display:grid; grid-template-columns:3.6rem minmax(0,1fr) 6.6rem; gap:0.6rem; align-items:center; }
+    .fm-pb-row { padding:0.32rem 0; }
+    .fm-pb-id, .fm-pb-val { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.8rem; }
+    .fm-pb-id { color:var(--muted); }
+    .fm-pb-val { color:var(--text-strong); white-space:nowrap; }
+    .fm-pb-track { display:flex; flex-direction:column; gap:3px; }
+    .fm-pb-bar { display:block; height:12px; }
+    .fm-pb-rev { display:block; height:4px; background:var(--text-body); opacity:0.55; }
+    .fm-pb-none { font-style:italic; font-size:0.72rem; color:var(--muted); line-height:1; }
+    .fm-pb-axis { margin-top:0.3rem; border-top:1px solid var(--line); padding-top:0.25rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .fm-pb-ticks { display:flex; justify-content:space-between; }
+    .fm-fig { margin:0; }
+    .fm-fig figcaption { font-size:0.8rem; color:var(--muted); margin-bottom:0.35rem; }
+    .fm-fig svg { width:100%; height:auto; display:block; }
+    .fm-fig-m svg { max-width:340px; }
+    .fm-matrix .fm-c-lo { fill:var(--surface); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-md { fill:color-mix(in srgb, var(--amber) 9%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-hi { fill:color-mix(in srgb, var(--red) 10%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .vz-axis { font-size:10px; fill:var(--muted); font-family:'IBM Plex Sans',sans-serif; }
+    .fm-matrix .fm-pt { stroke:var(--surface); stroke-width:1.5; }
+    .fm-matrix .fm-pt-l { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; fill:var(--text-strong);
+      paint-order:stroke; stroke:var(--surface); stroke-width:3px; stroke-linejoin:round; }
+    .fm-sheet { border:1px solid var(--line); border-radius:4px; margin-top:0.8rem; }
+    .fm-head, .fm-row > summary { display:grid; grid-template-columns:4.2rem minmax(0,1fr) 4.4rem 4.6rem 3.4rem; gap:0.6rem; align-items:baseline; padding:0.6rem 0.9rem; }
+    .fm-head { font-size:0.74rem; color:var(--muted); border-bottom:1px solid var(--line); }
+    .fm-row { border-top:1px solid var(--line); }
+    .fm-row:first-of-type { border-top:0; }
+    .fm-row > summary { cursor:pointer; list-style:none; }
+    .fm-row > summary::-webkit-details-marker { display:none; }
+    .fm-row > summary:hover { background:var(--surface-2); }
+    .fm-row > summary:focus-visible { outline:2px solid var(--cyan); outline-offset:-2px; }
+    .fm-id-cell, .fm-sod, .fm-rpn, .fm-rpn-rev { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.84rem; }
+    .fm-id-cell { color:var(--muted); }
+    .fm-mode { color:var(--text-strong); font-size:0.92rem; line-height:1.4; }
+    .fm-item { display:block; color:var(--muted); font-size:0.8rem; }
+    .fm-sod { color:var(--text-body); }
+    .fm-rpn { color:var(--text-strong); }
+    .fm-rpn-rev { color:var(--muted); }
+    .fm-dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:0.45rem; vertical-align:0.1em; }
+    .fm-body { padding:0.2rem 0.9rem 1rem 5.7rem; }
+    @media (max-width:640px){
+      .fm-head { display:none; }
+      .fm-row > summary { grid-template-columns:3.2rem minmax(0,1fr) auto; }
+      .fm-sod, .fm-rpn-rev { display:none; }
+      .fm-body { padding:0.2rem 0.9rem 1rem; }
+    }
+    .fm-kv { display:grid; grid-template-columns:9.5rem minmax(0,1fr); gap:0.3rem 0.9rem; margin:0.4rem 0 0.8rem; font-size:0.88rem; }
+    .fm-kv dt { color:var(--muted); }
+    .fm-kv dd { margin:0; color:var(--text-body); }
+    @media (max-width:640px){ .fm-kv { grid-template-columns:1fr; } .fm-kv dd { margin-bottom:0.4rem; } }
+    .fm-scores { margin:0 0 0.6rem; border-top:1px solid var(--line); }
+    .fm-sc { display:grid; grid-template-columns:3.2rem minmax(0,1fr); gap:0.6rem; padding:0.45rem 0; border-bottom:1px solid var(--line); font-size:0.86rem; }
+    .fm-sc dt { font-family:'JetBrains Mono',monospace; color:var(--muted); }
+    .fm-sc dt b { color:var(--text-strong); }
+    .fm-sc dd { margin:0; color:var(--text-body); }
+    .fm-sub { font-size:0.8rem; color:var(--muted); margin:0.7rem 0 0.25rem; }
+    .fm-sub b { color:var(--text-strong); }
+    .fm-acts, .fm-ev { margin:0; padding-left:1.1rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-acts li, .fm-ev li { margin:0.25rem 0; }
+    .fm-residual { color:var(--red); }
+    .fm-revline { font-size:0.86rem; color:var(--text-body); margin:0.4rem 0 0; }
+    .fm-ev-src { display:block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .fm-ev-src a { color:var(--cyan); }
+    .fm-ev-txt { display:block; }
+    .fm-method { margin-top:1rem; border:1px solid var(--line); border-radius:4px; }
+    .fm-method > summary { padding:0.6rem 0.9rem; cursor:pointer; font-size:0.9rem; color:var(--text-strong); }
+    .fm-method-body { padding:0 0.9rem 0.9rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-rubrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+    @media (max-width:760px){ .fm-rubrics { grid-template-columns:1fr; } }
+    .fm-rubric { width:100%; border-collapse:collapse; font-size:0.8rem; }
+    .fm-rubric td { padding:0.25rem 0.4rem; border-top:1px solid var(--line); vertical-align:top; }
+    .fm-rubric td:first-child { font-family:'JetBrains Mono',monospace; width:2rem; color:var(--text-strong); }
+</style>
 </head>
 <body class="locked">
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -387,6 +476,215 @@
 
         <h2>Contributing factors</h2>
         <ul class="tight"><li>Surge-suppression margin was inadequate: protection was installed but could not prevent a lightning-scale voltage swell from tripping mechanical cooling — the power swells shut down the mechanical cooling systems DESPITE surge suppressors being in place (RCA; The Register: suppressors &#x27;overloaded&#x27;). This is a protection-adequacy/design gap, not a maintenance lapse; no inspection or testing failure is evidenced in the record.</li><li>No effective cooling redundancy took over before the thermal buffer expired: mechanical cooling was lost off a utility transient, and the engineered load-dependent thermal buffer merely delayed — did not prevent — the temperature breach once depleted (RCA).</li><li>Rate of temperature rise outran the integrity-shutdown mechanism: the automated device shutdown activated but temperatures increased so quickly in parts of the datacenter that some hardware was damaged before it could shut down, so the protective control was partially defeated in the fastest-heating zones (RCA; The Register).</li><li>Single-region service dependency on Azure Service Manager (ASM): its primary site is South Central US and ASM does not support automatic failover, which led to the widest impact for customers outside the region — turning a one-datacenter thermal event into a multi-region outage (RCA; The Register).</li><li>Co-location of critical global infrastructure in the affected datacenter: a North America Azure AD site and Visual Studio Team Services organizations were hosted there, widening customer impact when infrastructure shut down (RCA).</li><li>Status-page auto-scale misconfiguration: incorrect auto-scale configuration prevented the web app from scaling properly, producing intermittent 500 errors during the very event customers needed status information — a communications-resiliency failure independent of the datacenter (RCA).</li><li>Asynchronous geo-replication constrained response options: failover was rejected because it would have resulted in limited data loss due to the asynchronous nature of geo-replication, forcing the slower recover-in-place path (RCA; The Register).</li></ul>
+        <h2 id="fmea">Failure mode &amp; effects analysis (FMEA)</h2>
+        <p class="fm-scope">One South Central US datacenter&#x27;s cooling chain under a lightning-induced voltage transient — the chiller plant and its surge protection, the redundant cooling failover, the thermal integrity shutdown — and the service layer that spread the outage: storage recovery under asynchronous geo-replication, Azure Service Manager, the co-located Azure AD site, and the Azure status page. Analysed from Microsoft&#x27;s RCA as relayed by The Register and the official VSTS postmortem held in this dossier. The original Azure RCA page could not be re-fetched; the dossier marks several items, including the manual-mode cooling failover and the AAD autoscale chain, as officially stated but not independently re-verified, and the rationales below say where a score rests on them. All corrective actions except the forensic analysis are recorded as implied remediations, not operator commitments.</p>
+        <p class="metabar fm-meta"><span><b>7</b> failure modes</span><span class="sep">/</span><span><b>2</b> high priority</span><span class="sep">/</span><span><b>5 of 7</b> with a published action</span><span class="sep">/</span><span>total RPN <b>1648 → 1116</b> (−32%)</span></p>
+        <div class="fm-viz">
+            <figure class="fm-fig"><figcaption>Risk priority number (S × O × D), worst first — thin bar: after the published action</figcaption><div class="fm-pb" role="list" aria-label="Risk priority number per failure mode, before and after corrective action"><div class="fm-pb-row" role="listitem" title="FM-01 A lightning-scale voltage swell and sag shuts down and locks out the chillers despite surge suppressors"><span class="fm-pb-id">FM-01</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:81.0%;background:var(--red)"></i><i class="fm-pb-rev" style="width:54.0%"></i></span><span class="fm-pb-val">324 → 216</span></div><div class="fm-pb-row" role="listitem" title="FM-02 Does not take over: automatic failover was in manual mode and the cooling alerts were not actioned in time"><span class="fm-pb-id">FM-02</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:67.5%;background:var(--red)"></i><i class="fm-pb-rev" style="width:40.5%"></i></span><span class="fm-pb-val">270 → 162</span></div><div class="fm-pb-row" role="listitem" title="FM-07 Fails to scale under incident traffic and returns intermittent HTTP 500 errors"><span class="fm-pb-id">FM-07</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:67.5%;background:var(--amber)"></i><i class="fm-pb-rev" style="width:22.5%"></i></span><span class="fm-pb-val">270 → 90</span></div><div class="fm-pb-row" role="listitem" title="FM-04 Failover is rejected because it would lose data, forcing a slow recover-in-place"><span class="fm-pb-id">FM-04</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:64.0%;background:var(--amber)"></i><i class="fm-pb-rev" style="width:48.0%"></i></span><span class="fm-pb-val">256 → 192</span></div><div class="fm-pb-row" role="listitem" title="FM-05 Primary metadata site in South Central US with no automatic failover, so management operations fail outside the region"><span class="fm-pb-id">FM-05</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:54.0%;background:var(--amber)"></i><i class="fm-pb-rev" style="width:36.0%"></i></span><span class="fm-pb-val">216 → 144</span></div><div class="fm-pb-row" role="listitem" title="FM-06 Authentication degrades while traffic reroutes; scale-ahead depends on the impaired ASM API and throttling causes failures and timeouts"><span class="fm-pb-id">FM-06</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:42.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">168</span></div><div class="fm-pb-row" role="listitem" title="FM-03 Temperatures rise faster than shutdown in some zones, so hardware is damaged before it powers off"><span class="fm-pb-id">FM-03</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:36.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">144</span></div><div class="fm-pb-axis" aria-hidden="true"><span></span><span class="fm-pb-ticks"><span>0</span><span>200</span><span>400</span></span><span></span></div></div></figure>
+            <figure class="fm-fig fm-fig-m"><figcaption>Criticality: severity × occurrence</figcaption><svg class="fm-matrix" viewBox="0 0 360 330" role="img" aria-label="Criticality matrix, severity against occurrence"><rect class="fm-c-lo" x="44" y="266" width="28" height="28"/><rect class="fm-c-lo" x="72" y="266" width="28" height="28"/><rect class="fm-c-lo" x="100" y="266" width="28" height="28"/><rect class="fm-c-lo" x="128" y="266" width="28" height="28"/><rect class="fm-c-lo" x="156" y="266" width="28" height="28"/><rect class="fm-c-lo" x="184" y="266" width="28" height="28"/><rect class="fm-c-lo" x="212" y="266" width="28" height="28"/><rect class="fm-c-lo" x="240" y="266" width="28" height="28"/><rect class="fm-c-lo" x="268" y="266" width="28" height="28"/><rect class="fm-c-lo" x="296" y="266" width="28" height="28"/><rect class="fm-c-lo" x="44" y="238" width="28" height="28"/><rect class="fm-c-lo" x="72" y="238" width="28" height="28"/><rect class="fm-c-lo" x="100" y="238" width="28" height="28"/><rect class="fm-c-lo" x="128" y="238" width="28" height="28"/><rect class="fm-c-lo" x="156" y="238" width="28" height="28"/><rect class="fm-c-lo" x="184" y="238" width="28" height="28"/><rect class="fm-c-lo" x="212" y="238" width="28" height="28"/><rect class="fm-c-lo" x="240" y="238" width="28" height="28"/><rect class="fm-c-md" x="268" y="238" width="28" height="28"/><rect class="fm-c-md" x="296" y="238" width="28" height="28"/><rect class="fm-c-lo" x="44" y="210" width="28" height="28"/><rect class="fm-c-lo" x="72" y="210" width="28" height="28"/><rect class="fm-c-lo" x="100" y="210" width="28" height="28"/><rect class="fm-c-lo" x="128" y="210" width="28" height="28"/><rect class="fm-c-lo" x="156" y="210" width="28" height="28"/><rect class="fm-c-md" x="184" y="210" width="28" height="28"/><rect class="fm-c-md" x="212" y="210" width="28" height="28"/><rect class="fm-c-md" x="240" y="210" width="28" height="28"/><rect class="fm-c-md" x="268" y="210" width="28" height="28"/><rect class="fm-c-md" x="296" y="210" width="28" height="28"/><rect class="fm-c-lo" x="44" y="182" width="28" height="28"/><rect class="fm-c-lo" x="72" y="182" width="28" height="28"/><rect class="fm-c-lo" x="100" y="182" width="28" height="28"/><rect class="fm-c-lo" x="128" y="182" width="28" height="28"/><rect class="fm-c-md" x="156" y="182" width="28" height="28"/><rect class="fm-c-md" x="184" y="182" width="28" height="28"/><rect class="fm-c-md" x="212" y="182" width="28" height="28"/><rect class="fm-c-md" x="240" y="182" width="28" height="28"/><rect class="fm-c-md" x="268" y="182" width="28" height="28"/><rect class="fm-c-hi" x="296" y="182" width="28" height="28"/><rect class="fm-c-lo" x="44" y="154" width="28" height="28"/><rect class="fm-c-lo" x="72" y="154" width="28" height="28"/><rect class="fm-c-lo" x="100" y="154" width="28" height="28"/><rect class="fm-c-md" x="128" y="154" width="28" height="28"/><rect class="fm-c-md" x="156" y="154" width="28" height="28"/><rect class="fm-c-md" x="184" y="154" width="28" height="28"/><rect class="fm-c-md" x="212" y="154" width="28" height="28"/><rect class="fm-c-hi" x="240" y="154" width="28" height="28"/><rect class="fm-c-hi" x="268" y="154" width="28" height="28"/><rect class="fm-c-hi" x="296" y="154" width="28" height="28"/><rect class="fm-c-lo" x="44" y="126" width="28" height="28"/><rect class="fm-c-lo" x="72" y="126" width="28" height="28"/><rect class="fm-c-md" x="100" y="126" width="28" height="28"/><rect class="fm-c-md" x="128" y="126" width="28" height="28"/><rect class="fm-c-md" x="156" y="126" width="28" height="28"/><rect class="fm-c-md" x="184" y="126" width="28" height="28"/><rect class="fm-c-hi" x="212" y="126" width="28" height="28"/><rect class="fm-c-hi" x="240" y="126" width="28" height="28"/><rect class="fm-c-hi" x="268" y="126" width="28" height="28"/><rect class="fm-c-hi" x="296" y="126" width="28" height="28"/><rect class="fm-c-lo" x="44" y="98" width="28" height="28"/><rect class="fm-c-lo" x="72" y="98" width="28" height="28"/><rect class="fm-c-md" x="100" y="98" width="28" height="28"/><rect class="fm-c-md" x="128" y="98" width="28" height="28"/><rect class="fm-c-md" x="156" y="98" width="28" height="28"/><rect class="fm-c-hi" x="184" y="98" width="28" height="28"/><rect class="fm-c-hi" x="212" y="98" width="28" height="28"/><rect class="fm-c-hi" x="240" y="98" width="28" height="28"/><rect class="fm-c-hi" x="268" y="98" width="28" height="28"/><rect class="fm-c-hi" x="296" y="98" width="28" height="28"/><rect class="fm-c-lo" x="44" y="70" width="28" height="28"/><rect class="fm-c-lo" x="72" y="70" width="28" height="28"/><rect class="fm-c-md" x="100" y="70" width="28" height="28"/><rect class="fm-c-md" x="128" y="70" width="28" height="28"/><rect class="fm-c-hi" x="156" y="70" width="28" height="28"/><rect class="fm-c-hi" x="184" y="70" width="28" height="28"/><rect class="fm-c-hi" x="212" y="70" width="28" height="28"/><rect class="fm-c-hi" x="240" y="70" width="28" height="28"/><rect class="fm-c-hi" x="268" y="70" width="28" height="28"/><rect class="fm-c-hi" x="296" y="70" width="28" height="28"/><rect class="fm-c-hi" x="44" y="42" width="28" height="28"/><rect class="fm-c-hi" x="72" y="42" width="28" height="28"/><rect class="fm-c-hi" x="100" y="42" width="28" height="28"/><rect class="fm-c-hi" x="128" y="42" width="28" height="28"/><rect class="fm-c-hi" x="156" y="42" width="28" height="28"/><rect class="fm-c-hi" x="184" y="42" width="28" height="28"/><rect class="fm-c-hi" x="212" y="42" width="28" height="28"/><rect class="fm-c-hi" x="240" y="42" width="28" height="28"/><rect class="fm-c-hi" x="268" y="42" width="28" height="28"/><rect class="fm-c-hi" x="296" y="42" width="28" height="28"/><rect class="fm-c-hi" x="44" y="14" width="28" height="28"/><rect class="fm-c-hi" x="72" y="14" width="28" height="28"/><rect class="fm-c-hi" x="100" y="14" width="28" height="28"/><rect class="fm-c-hi" x="128" y="14" width="28" height="28"/><rect class="fm-c-hi" x="156" y="14" width="28" height="28"/><rect class="fm-c-hi" x="184" y="14" width="28" height="28"/><rect class="fm-c-hi" x="212" y="14" width="28" height="28"/><rect class="fm-c-hi" x="240" y="14" width="28" height="28"/><rect class="fm-c-hi" x="268" y="14" width="28" height="28"/><rect class="fm-c-hi" x="296" y="14" width="28" height="28"/><text class="vz-tick" x="58.0" y="308" text-anchor="middle">1</text><text class="vz-tick" x="36" y="284.0" text-anchor="end">1</text><text class="vz-tick" x="86.0" y="308" text-anchor="middle">2</text><text class="vz-tick" x="36" y="256.0" text-anchor="end">2</text><text class="vz-tick" x="114.0" y="308" text-anchor="middle">3</text><text class="vz-tick" x="36" y="228.0" text-anchor="end">3</text><text class="vz-tick" x="142.0" y="308" text-anchor="middle">4</text><text class="vz-tick" x="36" y="200.0" text-anchor="end">4</text><text class="vz-tick" x="170.0" y="308" text-anchor="middle">5</text><text class="vz-tick" x="36" y="172.0" text-anchor="end">5</text><text class="vz-tick" x="198.0" y="308" text-anchor="middle">6</text><text class="vz-tick" x="36" y="144.0" text-anchor="end">6</text><text class="vz-tick" x="226.0" y="308" text-anchor="middle">7</text><text class="vz-tick" x="36" y="116.0" text-anchor="end">7</text><text class="vz-tick" x="254.0" y="308" text-anchor="middle">8</text><text class="vz-tick" x="36" y="88.0" text-anchor="end">8</text><text class="vz-tick" x="282.0" y="308" text-anchor="middle">9</text><text class="vz-tick" x="36" y="60.0" text-anchor="end">9</text><text class="vz-tick" x="310.0" y="308" text-anchor="middle">10</text><text class="vz-tick" x="36" y="32.0" text-anchor="end">10</text><text class="vz-axis" x="184" y="328" text-anchor="middle">Occurrence →</text><text class="vz-axis" transform="translate(11 154) rotate(-90)" text-anchor="middle">Severity →</text><circle class="fm-pt" cx="170.0" cy="56.0" r="6" fill="var(--red)"><title>FM-02 Does not take over: automatic failover was in manual mode and the cooling alerts were not actioned in time (S9 O5 D6)</title></circle><text class="fm-pt-l" x="170.0" y="46.0" text-anchor="middle">02</text><circle class="fm-pt" cx="198.0" cy="56.0" r="6" fill="var(--red)"><title>FM-01 A lightning-scale voltage swell and sag shuts down and locks out the chillers despite surge suppressors (S9 O6 D6)</title></circle><text class="fm-pt-l" x="198.0" y="46.0" text-anchor="middle">01</text><circle class="fm-pt" cx="114.0" cy="84.0" r="6" fill="var(--amber)"><title>FM-03 Temperatures rise faster than shutdown in some zones, so hardware is damaged before it powers off (S8 O3 D6); FM-05 Primary metadata site in South Central US with no automatic failover, so management operations fail outside the region (S8 O3 D9)</title></circle><text class="fm-pt-l" x="114.0" y="74.0" text-anchor="middle">03, 05</text><circle class="fm-pt" cx="142.0" cy="84.0" r="6" fill="var(--amber)"><title>FM-04 Failover is rejected because it would lose data, forcing a slow recover-in-place (S8 O4 D8)</title></circle><text class="fm-pt-l" x="142.0" y="74.0" text-anchor="middle">04</text><circle class="fm-pt" cx="114.0" cy="112.0" r="6" fill="var(--amber)"><title>FM-06 Authentication degrades while traffic reroutes; scale-ahead depends on the impaired ASM API and throttling causes failures and timeouts (S7 O3 D8)</title></circle><text class="fm-pt-l" x="114.0" y="102.0" text-anchor="middle">06</text><circle class="fm-pt" cx="198.0" cy="168.0" r="6" fill="var(--amber)"><title>FM-07 Fails to scale under incident traffic and returns intermittent HTTP 500 errors (S5 O6 D9)</title></circle><text class="fm-pt-l" x="198.0" y="158.0" text-anchor="middle">07</text></svg></figure>
+        </div>
+        <div class="fm-sheet">
+            <div class="fm-head" aria-hidden="true"><span>ID</span><span>Failure mode</span><span>S·O·D</span><span>RPN</span><span>After</span></div>
+            <details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-01</span>
+    <span class="fm-mode">A lightning-scale voltage swell and sag shuts down and locks out the chillers despite surge suppressors<span class="fm-item">Chiller plant and its surge protection</span></span>
+    <span class="fm-sod" aria-label="Severity 9, occurrence 6, detection 6">9·6·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>324</span>
+    <span class="fm-rpn-rev">216</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Keep mechanical cooling running through utility voltage disturbances</dd>
+      <dt>Effect</dt><dd>Active cooling is lost in one datacenter at 08:42 UTC; the hall is left on its thermal buffer</dd>
+      <dt>Cause</dt><dd>Suppressor margin inadequate for a lightning-scale swell; the sag fell below the chillers&#x27; voltage specification and their protective logic locked them out by design</dd>
+      <dt>Prevention in place</dt><dd>Surge suppressors on the mechanical cooling supply; generator transfer for IT power</dd>
+      <dt>Detection in place</dt><dd>Cooling alerts raised at onset</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>9</b></dt><dd>Loss of cooling is the start of the chain that damaged hardware and produced a multi-day regional outage with out-of-region impact — the rubric&#x27;s 9. Not 10: no hazard to people is recorded and the facility was not lost.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>Storms producing sags and swells across the region&#x27;s feeds are a foreseeable condition in southern Texas, and the suppressors in place did not hold, so &#x27;occasional, weakly guarded&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>The cooling loss raised alerts at onset but nothing stopped the chillers tripping — &#x27;detected at onset, not prevented&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 324</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Improve surge suppression and protective isolation of the mechanical-cooling plant against lightning-scale swells <span class="fm-ev-src">Correction of errors #2</span></li></ul>
+    <p class="fm-revline">After action: S9 · O4 · D6 → RPN 216. Better suppression and isolation would make a cooling trip need a larger or rarer transient (O 6→4). The dossier records this as an implied remediation inferred from the identified design gap, not as a published commitment, so the reduction is a claim about the action, not a confirmed outcome.</p>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Azure RCA; The Register (2018-09-17)" target="_blank" rel="noopener nofollow">Sequence of events #2</a></span><span class="fm-ev-txt">2018-09-04 08:42 UTC — Lightning causes electrical activity on the utility supply, producing significant voltage swells on the feeds serving the region.</span></li><li><span class="fm-ev-src"><a href="https://Azure RCA; The Register (2018-09-17)" target="_blank" rel="noopener nofollow">Sequence of events #4</a></span><span class="fm-ev-txt">2018-09-04 08:42 UTC — The same power swells shut down the datacenter&#x27;s mechanical cooling systems despite surge suppressors being in place — cooling is lost (The Register: suppressors &#x27;overloaded&#x27;).</span></li><li><span class="fm-ev-src"><a href="https://azure.microsoft.com/en-us/blog/summary-of-azure-south-central-us-outage/" target="_blank" rel="noopener nofollow">Reference #1 · vendor-status</a></span><span class="fm-ev-txt">“these power swells shutdown the datacenter&#x27;s mechanical cooling systems despite having surge suppressors in place.”</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“the chiller plant&#x27;s protective logic powered the chillers down and locked them out to protect the mechanical equipment”</span></li><li><span class="fm-ev-src">Contributing factor #1</span><span class="fm-ev-txt">Surge-suppression margin was inadequate: protection was installed but could not prevent a lightning-scale voltage swell from tripping mechanical cooling — the power swells shut down the mechanical cooling systems DESPITE surge suppressors being in place (RCA; The Register: suppressors &#x27;overloaded&#x27;). This is a protection-adequacy/design gap, not a maintenance lapse; no inspection or testing failure is evidenced in the record.</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-02</span>
+    <span class="fm-mode">Does not take over: automatic failover was in manual mode and the cooling alerts were not actioned in time<span class="fm-item">Redundant cooling failover (MEP management control system)</span></span>
+    <span class="fm-sod" aria-label="Severity 9, occurrence 5, detection 6">9·5·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>270</span>
+    <span class="fm-rpn-rev">162</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Automatically invoke redundant cooling until the chiller plant recovers</dd>
+      <dt>Effect</dt><dd>Temperatures rise unchecked once the thermal buffer is depleted, leading to integrity shutdown and hardware damage</dd>
+      <dt>Cause</dt><dd>Failover switched to manual after new equipment was installed with testing not yet complete; onsite engineers were handling multiple concurrent alarms</dd>
+      <dt>Prevention in place</dt><dd>A documented manual failover procedure</dd>
+      <dt>Detection in place</dt><dd>Cooling alerts to onsite engineers, not actioned in time</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>9</b></dt><dd>This is the control whose absence turned a chiller trip into the regional outage; same effect as FM-01.</dd></div>
+      <div class="fm-sc"><dt>O <b>5</b></dt><dd>Running a safety automation in manual mode during incomplete commissioning, with a manual fallback that competes with other alarms, is a weakly guarded condition that lasts until testing finishes; it bites only with a cooling trip, so scored between &#x27;infrequent&#x27; and &#x27;occasional&#x27;. This cause rests on Microsoft&#x27;s RCA as relayed and is marked in the dossier as not independently re-verified.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>Alerts fired at onset, so the condition was detected, but the only remaining response was manual and was not taken in time — &#x27;detected at onset, not prevented&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 270</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Add cooling redundancy and failover to the mechanical-cooling plant <span class="fm-ev-src">Correction of errors #2</span></li></ul>
+    <p class="fm-revline">After action: S9 · O3 · D6 → RPN 162. Automatic redundant cooling that takes over without an operator would make this need a second failure (O 5→3). The action is recorded as implied, not committed, and the dossier records no action on the commissioning practice of leaving failover in manual mode or on alarm handling, so the reduction is a claim about the action and the human part of the cause is left untreated.</p>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“that automatic failover had been switched to MANUAL mode following installation of new equipment for which all testing had not yet been completed”</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“the cooling alerts were not manually actioned in time”</span></li><li><span class="fm-ev-src"><a href="https://Azure RCA" target="_blank" rel="noopener nofollow">Sequence of events #5</a></span><span class="fm-ev-txt">2018-09-04 08:42+ UTC — A load-dependent thermal buffer engineered into the cooling system absorbs heat, temporarily maintaining operational temperatures (finite ride-through, no active cooling).</span></li><li><span class="fm-ev-src">Contributing factor #2</span><span class="fm-ev-txt">No effective cooling redundancy took over before the thermal buffer expired: mechanical cooling was lost off a utility transient, and the engineered load-dependent thermal buffer merely delayed — did not prevent — the temperature breach once depleted (RCA).</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-07</span>
+    <span class="fm-mode">Fails to scale under incident traffic and returns intermittent HTTP 500 errors<span class="fm-item">Azure status page</span></span>
+    <span class="fm-sod" aria-label="Severity 5, occurrence 6, detection 9">5·6·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>270</span>
+    <span class="fm-rpn-rev">90</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Stay available to tell customers what is impaired during an outage</dd>
+      <dt>Effect</dt><dd>A subset of visitors cannot get status from about 12:30 to 23:05 UTC on 4 September</dd>
+      <dt>Cause</dt><dd>Incorrect auto-scale configuration on the status web app</dd>
+      <dt>Prevention in place</dt><dd>Auto-scale, misconfigured</dd>
+      <dt>Detection in place</dt><dd>Errors seen by visitors</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>5</b></dt><dd>It fails the communication, not the service — customer-visible degradation for about ten hours.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>A latent misconfiguration exposed by any traffic surge; incidents are when surges happen, so &#x27;occasional&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>Found through the errors visitors received.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 270</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Correct the status-page auto-scale configuration and decouple it from affected infrastructure <span class="fm-ev-src">Correction of errors #4</span></li></ul>
+    <p class="fm-revline">After action: S5 · O2 · D9 → RPN 90. A corrected and decoupled status page should scale with incident traffic (O 6→2). Recorded as an implied remediation, so the reduction is a claim about the action, not a confirmed outcome.</p>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Azure RCA" target="_blank" rel="noopener nofollow">Sequence of events #13</a></span><span class="fm-ev-txt">2018-09-04 ~12:30 UTC — Azure status page fails to scale under load due to incorrect auto-scale configuration, returning intermittent 500 errors to a subset of visitors.</span></li><li><span class="fm-ev-src"><a href="https://Azure RCA" target="_blank" rel="noopener nofollow">Sequence of events #18</a></span><span class="fm-ev-txt">2018-09-04 ~23:05 UTC — Azure status page impact mitigated after the auto-scale/load issue is resolved.</span></li><li><span class="fm-ev-src">Contributing factor #6</span><span class="fm-ev-txt">Status-page auto-scale misconfiguration: incorrect auto-scale configuration prevented the web app from scaling properly, producing intermittent 500 errors during the very event customers needed status information — a communications-resiliency failure independent of the datacenter (RCA).</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-04</span>
+    <span class="fm-mode">Failover is rejected because it would lose data, forcing a slow recover-in-place<span class="fm-item">Storage recovery under asynchronous geo-replication</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 4, detection 8">8·4·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>256</span>
+    <span class="fm-rpn-rev">192</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Restore customer storage quickly after a datacenter loses hardware</dd>
+      <dt>Effect</dt><dd>VSTS incident runs about 38 h 20 min with about 21 hours of primary recovery; broader Azure not fully mitigated until 08:40 UTC on 7 September</dd>
+      <dt>Cause</dt><dd>Asynchronous geo-replication makes failover lossy, so durability had to be bought with time: replace components, migrate data, validate integrity</dd>
+      <dt>Prevention in place</dt><dd>In-region data recovery with integrity validation</dd>
+      <dt>Detection in place</dt><dd>The recover-versus-failover trade-off was decided during the incident</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>Sets the duration, measured in days for some services — the rubric&#x27;s 8 for a full outage of a major service for hours.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>The replication design is always present but forces this choice only when a region&#x27;s storage is lost, which is &#x27;infrequent&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>The dossier records the trade-off being made under time pressure, which is after impact; no prior measured recovery time is recorded.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 256</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Review geo-replication RPO and synchronous-replication options to reduce the recover-versus-failover data-loss exposure <span class="fm-ev-src">Correction of errors #5</span></li></ul>
+    <p class="fm-revline">After action: S6 · O4 · D8 → RPN 192. Where synchronous replication is available, failover no longer loses data, so a repeat becomes a bounded failover rather than days of recovery (S 8→6). The action is a review, recorded as implied rather than committed, so the reduction is a claim about the action, not a confirmed outcome.</p>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Azure RCA; The Register (2018-09-17)" target="_blank" rel="noopener nofollow">Sequence of events #14</a></span><span class="fm-ev-txt">2018-09-04 (decision point) UTC — Recover-not-failover decision: failover is rejected because asynchronous geo-replication would cause limited data loss; teams commit to recovering data in place.</span></li><li><span class="fm-ev-src"><a href="https://Azure RCA; The Register (2018-09-17)" target="_blank" rel="noopener nofollow">Sequence of events #17</a></span><span class="fm-ev-txt">2018-09-04 (recovery phase 2) UTC — Recovery step two: recover storage servers and data — replace failed components, migrate customer data from damaged to healthy servers, and validate that no recovered data is corrupted.</span></li><li><span class="fm-ev-src"><a href="https://devblogs.microsoft.com/devopsservice/?p=17485" target="_blank" rel="noopener nofollow">Metric #4</a></span><span class="fm-ev-txt">VSTS incident duration (official window): ~38h20m (2300 min)</span></li><li><span class="fm-ev-src"><a href="https://devblogs.microsoft.com/devopsservice/?p=17485" target="_blank" rel="noopener nofollow">Metric #5</a></span><span class="fm-ev-txt">VSTS primary recovery: ~21 hours</span></li><li><span class="fm-ev-src">Contributing factor #7</span><span class="fm-ev-txt">Asynchronous geo-replication constrained response options: failover was rejected because it would have resulted in limited data loss due to the asynchronous nature of geo-replication, forcing the slower recover-in-place path (RCA; The Register).</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-05</span>
+    <span class="fm-mode">Primary metadata site in South Central US with no automatic failover, so management operations fail outside the region<span class="fm-item">Azure Service Manager (ASM) metadata</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 3, detection 9">8·3·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>216</span>
+    <span class="fm-rpn-rev">144</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Serve classic-resource management operations globally while one region is down</dd>
+      <dt>Effect</dt><dd>The widest impact for customers outside the region, until South Central US storage returned at 01:10 UTC on 5 September</dd>
+      <dt>Cause</dt><dd>Single-region primary for a global control-plane service</dd>
+      <dt>Prevention in place</dt><dd>Metadata kept in multiple locations, without automatic failover</dd>
+      <dt>Detection in place</dt><dd>Impact on customers outside the region</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>Full outage of classic management operations for customers worldwide for about 16 hours — the rubric&#x27;s 8. Not 9 because running workloads outside the region were not taken down by it.</dd></div>
+      <div class="fm-sc"><dt>O <b>3</b></dt><dd>Requires the South Central US site to be lost, which is infrequent.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>Seen through customer impact outside the region.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 216</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Add automatic failover and multi-region metadata for Azure Service Manager <span class="fm-ev-src">Correction of errors #3</span></li></ul>
+    <p class="fm-revline">After action: S8 · O2 · D9 → RPN 144. Automatic failover removes the single-region dependency, so losing South Central US would no longer take ASM down (O 3→2). Recorded as an implied remediation, so the reduction is a claim about the action, not a confirmed outcome.</p>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Azure RCA; The Register (2018-09-17)" target="_blank" rel="noopener nofollow">Sequence of events #11</a></span><span class="fm-ev-txt">2018-09-04 (post-shutdown) UTC — Single-region dependency propagates the outage: Azure Service Manager (primary site South Central US, no automatic failover) produces the widest impact for customers outside the region.</span></li><li><span class="fm-ev-src"><a href="https://Azure RCA; The Register (2018-09-17)" target="_blank" rel="noopener nofollow">Sequence of events #19</a></span><span class="fm-ev-txt">2018-09-05 01:10 UTC — ASM impact mitigated once the associated South Central US storage servers are brought back online — the out-of-region blast radius closes.</span></li><li><span class="fm-ev-src">Contributing factor #4</span><span class="fm-ev-txt">Single-region service dependency on Azure Service Manager (ASM): its primary site is South Central US and ASM does not support automatic failover, which led to the widest impact for customers outside the region — turning a one-datacenter thermal event into a multi-region outage (RCA; The Register).</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-06</span>
+    <span class="fm-mode">Authentication degrades while traffic reroutes; scale-ahead depends on the impaired ASM API and throttling causes failures and timeouts<span class="fm-item">North America Azure AD site in the affected datacenter</span></span>
+    <span class="fm-sod" aria-label="Severity 7, occurrence 3, detection 8">7·3·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>168</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Keep authentication available when one AAD site is lost</dd>
+      <dt>Effect</dt><dd>Authentication failures and timeouts until AAD impact was mitigated at about 14:40 UTC on 4 September</dd>
+      <dt>Cause</dt><dd>A co-located AAD site, an autoscale path that depended on the ASM API, QoS throttling near safe-utilisation limits and an Office-client retry bug</dd>
+      <dt>Prevention in place</dt><dd>Automatic routing of authentication to other sites</dd>
+      <dt>Detection in place</dt><dd>Customer-visible authentication failures</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>7</b></dt><dd>Major degradation of a major service for several hours; the self-healing reroute stopped it short of a full outage.</dd></div>
+      <div class="fm-sc"><dt>O <b>3</b></dt><dd>Needs a site loss, which is infrequent. The autoscale and retry-bug details rest on Microsoft&#x27;s RCA alone and are marked in the dossier as not independently re-verified.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>Rerouting started automatically, but the throttling and timeouts were seen as impact.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 168</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li class="fm-residual">No corrective action is recorded in the published sources. This mode is residual risk.</li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Azure RCA" target="_blank" rel="noopener nofollow">Sequence of events #12</a></span><span class="fm-ev-txt">2018-09-04 (post-shutdown) UTC — A North America Azure AD site in the affected datacenter goes down; authentication traffic begins automatically routing to other sites (self-healing failover).</span></li><li><span class="fm-ev-src"><a href="https://Azure RCA" target="_blank" rel="noopener nofollow">Sequence of events #15</a></span><span class="fm-ev-txt">2018-09-04 ~14:40 UTC — Azure AD customer impact mitigated as authentication routing to healthy sites stabilizes.</span></li><li><span class="fm-ev-src">Contributing factor #5</span><span class="fm-ev-txt">Co-location of critical global infrastructure in the affected datacenter: a North America Azure AD site and Visual Studio Team Services organizations were hosted there, widening customer impact when infrastructure shut down (RCA).</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“an Office-client aggressive-retry bug amplified load”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-03</span>
+    <span class="fm-mode">Temperatures rise faster than shutdown in some zones, so hardware is damaged before it powers off<span class="fm-item">Automated thermal integrity shutdown</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 3, detection 6">8·3·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>144</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Power down servers and storage cleanly before heat damages them</dd>
+      <dt>Effect</dt><dd>A significant number of storage servers and a small number of network devices and power units damaged; recovery requires replacing hardware and migrating data</dd>
+      <dt>Cause</dt><dd>Load-dependent thermal buffer depletes and the hottest zones outrun the shutdown sequence</dd>
+      <dt>Prevention in place</dt><dd>Load-dependent thermal buffer; automated integrity shutdown</dd>
+      <dt>Detection in place</dt><dd>Environmental monitoring registers the threshold breach</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>Physical damage is what lengthened the outage from a restart to a multi-day hardware-and-data recovery; hours of full outage is the rubric&#x27;s 8. Kept below 9 because the shutdown did protect most hardware.</dd></div>
+      <div class="fm-sc"><dt>O <b>3</b></dt><dd>Needs cooling loss without failover (FM-01 and FM-02) first, so &#x27;infrequent&#x27;; kept low so the same event is not counted twice at full weight.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>Monitoring saw the breach and the shutdown activated, but too slowly in parts of the hall — &#x27;detected at onset, not prevented&#x27;. Actual temperatures and thresholds are not disclosed.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 144</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li class="fm-residual">No corrective action is recorded in the published sources. This mode is residual risk.</li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Azure RCA" target="_blank" rel="noopener nofollow">Sequence of events #6</a></span><span class="fm-ev-txt">2018-09-04 (time not disclosed) UTC — Thermal buffer depletes; environmental/thermal monitoring registers datacenter temperature exceeding safe operational thresholds (actual temperatures/thresholds not disclosed in RCA).</span></li><li><span class="fm-ev-src"><a href="https://Azure RCA" target="_blank" rel="noopener nofollow">Sequence of events #7</a></span><span class="fm-ev-txt">2018-09-04 (time not disclosed) UTC — Automated integrity shutdown of devices is initiated to preserve infrastructure and data integrity (the functional protective action — not fire suppression; no suppression system was involved).</span></li><li><span class="fm-ev-src"><a href="https://Azure RCA; The Register (2018-09-17)" target="_blank" rel="noopener nofollow">Sequence of events #8</a></span><span class="fm-ev-txt">2018-09-04 ~09:29 UTC — Temperatures rise so fast in parts of the hall that some hardware is damaged before it can shut down: a significant number of storage servers, plus a small number of network devices and power units, are damaged.</span></li><li><span class="fm-ev-src">Technical deep-dive</span><span class="fm-ev-txt">“temperatures increased so quickly in parts of the datacenter that some hardware was damaged before it could shut down”</span></li><li><span class="fm-ev-src">Contributing factor #3</span><span class="fm-ev-txt">Rate of temperature rise outran the integrity-shutdown mechanism: the automated device shutdown activated but temperatures increased so quickly in parts of the datacenter that some hardware was damaged before it could shut down, so the protective control was partially defeated in the fastest-heating zones (RCA; The Register).</span></li></ul>
+  </div>
+</details>
+        </div>
+        <details class="fm-method"><summary>Scoring rubric and method</summary><div class="fm-method-body"><p>A retrospective FMEA: each row asks how this system could fail, how bad the effect was, how likely the cause was given the controls in place at the time, and how likely those controls were to catch it before customers did. Scales are adapted for data-centre operations from the 1–10 scales of IEC 60812:2018 and the AIAG-VDA FMEA handbook. RPN = S × O × D. Priority is High when S ≥ 9 with O ≥ 4 or D ≥ 7, or when RPN ≥ 300; Medium when RPN ≥ 120 or S ≥ 7; Low otherwise. Severity overrides the product because a large S multiplied by small O and D can hide a region-wide outage nothing would catch.</p><p>Every row cites evidence from this dossier, and every quote is checked verbatim against its source by <code>tools/test-incidents-fmea.py</code>. A revised score is only shown against a published corrective action. This is an RZ analyst assessment, not an operator document.</p><div class="fm-rubrics"><div><p class="fm-sub">Severity</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Hazard to people, or loss of the facility / several regions</td></tr><tr><td>9</td><td>Region-wide or provider-wide outage of a foundational service, no workaround</td></tr><tr><td>8</td><td>Full outage of a major service for hours</td></tr><tr><td>7</td><td>Major degradation of a major service</td></tr><tr><td>6</td><td>Partial outage confined to one zone or one service</td></tr><tr><td>5</td><td>Customer-visible degradation</td></tr><tr><td>4</td><td>Limited customer impact</td></tr><tr><td>3</td><td>Internal impact only</td></tr><tr><td>2</td><td>Negligible</td></tr><tr><td>1</td><td>No effect</td></tr></tbody></table></div><div><p class="fm-sub">Occurrence</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Near certain: the cause is present in normal operation</td></tr><tr><td>8</td><td>Frequent: routine work exercises the cause</td></tr><tr><td>6</td><td>Occasional: a foreseeable slip or condition, weakly guarded</td></tr><tr><td>4</td><td>Infrequent: needs an unusual combination</td></tr><tr><td>2</td><td>Remote: guarded by design</td></tr><tr><td>1</td><td>Eliminated by design</td></tr></tbody></table></div><div><p class="fm-sub">Detection</p><table class="fm-rubric"><tbody><tr><td>10</td><td>No control could detect it</td></tr><tr><td>9</td><td>Detected only through customer impact</td></tr><tr><td>8</td><td>Detected after impact by internal monitoring</td></tr><tr><td>6</td><td>Detected at onset, not prevented</td></tr><tr><td>4</td><td>Detected before impact with time to act</td></tr><tr><td>2</td><td>Automated interlock almost certainly stops it</td></tr><tr><td>1</td><td>Certain to be stopped</td></tr></tbody></table></div></div></div></details>
+
 
         <h2>Correction of errors (COE)</h2>
         <ul class="tight"><li>Conduct a detailed forensic analysis of the impacted datacenter hardware and systems. <span class="coe-meta">Microsoft Azure datacenter engineering · Committed in RCA</span></li><li>Improve surge suppression and protective isolation of the mechanical-cooling plant against lightning-scale voltage swells; add cooling redundancy/failover. <span class="coe-meta">Datacenter facilities/electrical engineering · Implied remediation (design gap identified)</span></li><li>Add automatic failover and multi-region metadata for Azure Service Manager to remove the single-region dependency. <span class="coe-meta">Azure platform / ASM team · Implied remediation (dependency identified)</span></li><li>Correct the Azure status-page auto-scale configuration and decouple it from affected infrastructure. <span class="coe-meta">Azure status/communications engineering · Implied remediation (misconfiguration identified)</span></li><li>Review geo-replication RPO and synchronous-replication options to reduce recover-vs-failover data-loss exposure. <span class="coe-meta">Azure Storage team · Implied remediation (tradeoff identified)</span></li></ul>
@@ -429,7 +727,7 @@ Recovery engineering. Microsoft chose recovery over failover deliberately: a fai
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-1a1a084f"></script>
+    <script src="js/rz-version.js?v=20261010-00a1d9e8"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

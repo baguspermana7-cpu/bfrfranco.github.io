@@ -8,8 +8,8 @@
   "city": "Quincy, Washington",
   "country": "United States"
  },
- "date": "2026-05-01",
- "durationMin": 480,
+ "date": "2026-05-29",
+ "durationMin": 1326,
  "category": [
   "power",
   "cooling"
@@ -253,5 +253,352 @@
   "officialPostmortem": true,
   "lastVerified": "2026-08-02 (seed — pending deep research)"
  },
- "lastUpdated": "2026-08-02"
+ "lastUpdated": "2026-08-02",
+ "fmea": {
+  "scope": "The electrical-to-thermal chain in Azure West US 2 (Quincy, Washington): utility supply and generator/UPS transfer under voltage sag/swell, the protection inside the mechanical cooling plant, data-hall thermal ride-through and the automated IT shutdown across two availability zones, cooling recovery, storage return-to-service, protective-state tooling and the Log Analytics telemetry tail. Analysed retrospectively from the official Azure Post Incident Review GHRP-84G, the dossier's single source; no independent press, regulator or utility corroboration is held, and figures are operator-reported. The dossier's date field (1 May 2026) and its 480-minute duration do not match the PIR it cites (29–30 May 2026, about 22 hours); this FMEA uses the PIR times. The cooling-plant components and protection devices are not disclosed. Azure's corrective actions are recorded as committed with targets from June to October 2026; the transfer-threshold review is an analyst recommendation only. Revised scores are claims about committed actions, not confirmed outcomes.",
+  "modes": [
+   {
+    "id": "FM-01",
+    "item": "Utility supply and generator/UPS automatic transfer",
+    "function": "Move the facilities to a stable on-site supply when utility power becomes unfit",
+    "failureMode": "Under voltage sag/swell the utility stays present but unstable, and transfer is inconsistent: some datacenters move to generator, others do not",
+    "effect": "Unstable voltage reaches protection inside the mechanical cooling plant in the facilities that stay on utility",
+    "cause": "Lightning-driven sag/swell events, and transfer logic that keys on utility present versus lost rather than on degraded supply; the PIR reports the divergence but does not state it as a lapse",
+    "prevention": "Automatic transfer to generator power, which engaged in some facilities and not others",
+    "detection": "Cooling protection components sensed abnormal electrical conditions at about 04:14 UTC",
+    "S": 8,
+    "O": 6,
+    "D": 6,
+    "rationale": {
+     "S": "Start of a chain that shut down infrastructure in two availability zones and took about 22 hours to clear: full outage of major services for hours, the rubric's 8. Not 9: the PIR names two AZs, not the whole region.",
+     "O": "Thunderstorm-driven power-quality disturbances are a foreseeable condition, and the transfer logic was weakly guarded against a supply that is present but unstable: 'occasional'.",
+     "D": "The abnormal conditions were sensed at onset, but nothing in the record turned that into a transfer everywhere: 'detected at onset, not prevented'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 0
+     },
+     {
+      "src": "soe",
+      "i": 6
+     },
+     {
+      "src": "factor",
+      "i": 3
+     },
+     {
+      "src": "ref",
+      "i": 0,
+      "quote": "Some datacenters transferred to generator power, while others did not"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Review and standardise generator/UPS transfer thresholds under voltage sag/swell across Quincy facilities",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-02",
+    "item": "Mechanical cooling plant protection",
+    "function": "Protect cooling equipment from abnormal electrical conditions while keeping cooling available",
+    "failureMode": "Protection latches into full lockout, with no staged or degraded operation and no automatic return once voltage is normal",
+    "effect": "Cooling capacity drops at 04:24 UTC and stays down until restored by hand",
+    "cause": "A design that prioritises equipment protection over operational continuity, so protection is all-or-nothing and latching",
+    "prevention": "None recorded beyond the protection itself",
+    "detection": "Lockout is immediate on abnormal electrical conditions",
+    "S": 8,
+    "O": 6,
+    "D": 6,
+    "rationale": {
+     "S": "The lockout is the step that turned a grid transient into a two-AZ thermal shutdown, so it carries the chain's severity.",
+     "O": "Whenever a sag/swell reaches the plant, the latching design produces the same lockout: a foreseeable condition, weakly guarded.",
+     "D": "The lockout and the loss of cooling were immediate and known, but the design gave no way to prevent the effect: 'detected at onset, not prevented'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 2
+     },
+     {
+      "src": "soe",
+      "i": 3
+     },
+     {
+      "src": "factor",
+      "i": 1
+     },
+     {
+      "src": "factor",
+      "i": 2
+     },
+     {
+      "src": "rootCause",
+      "quote": "resulted in a full lockout rather than staged or degraded operation"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Holistic cooling fail-state review: staged or degraded operation instead of full lockout, and automatic recovery once power stabilises",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     }
+    ],
+    "revised": {
+     "S": 8,
+     "O": 3,
+     "D": 6
+    },
+    "revisedRationale": "If protection degrades in stages and restarts itself, a transient is less likely to collapse cooling long enough to breach thermal limits (O 6→3). The action is a review committed for October 2026, which may or may not change the design, so the reduction is a claim about the action, not a confirmed outcome."
+   },
+   {
+    "id": "FM-03",
+    "item": "Data-hall thermal ride-through and automated IT shutdown",
+    "function": "Keep IT equipment within safe temperatures, and protect it if cooling is lost",
+    "failureMode": "With cooling locked out, hall temperatures exceed safe thresholds within about 10–16 minutes and infrastructure shuts down across two availability zones",
+    "effect": "Multi-service outage across AZ-01 and AZ-03; the shutdown protects hardware and no damage is reported",
+    "cause": "Little thermal ride-through once cooling stops while IT load continues; numeric temperatures, thresholds and rate of rise are not disclosed",
+    "prevention": "Automated shutdown to prevent damage and preserve data integrity, which worked as designed",
+    "detection": "Temperature thresholds trigger the shutdown at about 04:40 UTC",
+    "S": 8,
+    "O": 3,
+    "D": 6,
+    "rationale": {
+     "S": "This is where the mechanical fault becomes a customer outage across two AZs for hours: the rubric's 8.",
+     "O": "Needs cooling to be lost first; held low so the event is not counted twice at full weight with FM-02.",
+     "D": "The excursion was seen and acted on automatically at onset, but the action is the outage itself: 'detected at onset, not prevented'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 5
+     },
+     {
+      "src": "metric",
+      "i": 2
+     },
+     {
+      "src": "metric",
+      "i": 6
+     },
+     {
+      "src": "tech",
+      "quote": "The PIR gives no numeric temperature, threshold, or rate-of-rise"
+     }
+    ],
+    "actions": []
+   },
+   {
+    "id": "FM-04",
+    "item": "Cooling recovery process",
+    "function": "Restore cooling quickly after a protective lockout",
+    "failureMode": "Recovery depends on manual diagnosis and restoration under a process the PIR treats as needing better documentation",
+    "effect": "Cooling restored and temperatures stabilised at about 05:55 UTC, about 1.5 hours after impact",
+    "cause": "No automatic return from lockout, and a manual, under-documented restoration process",
+    "prevention": "Azure datacenter operations teams on site, starting diagnosis at about 04:31 UTC",
+    "detection": "Known from the lockout onward",
+    "S": 6,
+    "O": 6,
+    "D": 6,
+    "rationale": {
+     "S": "Sets the length of the thermal excursion, about 1.5 hours, which is a small part of the 22-hour outage: scored at 6.",
+     "O": "Every lockout requires the same manual path: 'occasional, weakly guarded'.",
+     "D": "The need for manual recovery was known at onset; nothing shortened it: 'detected at onset, not prevented'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 4
+     },
+     {
+      "src": "soe",
+      "i": 7
+     },
+     {
+      "src": "metric",
+      "i": 3
+     },
+     {
+      "src": "factor",
+      "i": 4
+     }
+    ],
+    "actions": [
+     {
+      "text": "Improve manual cooling recovery processes and documentation",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     }
+    ],
+    "revised": {
+     "S": 6,
+     "O": 4,
+     "D": 6
+    },
+    "revisedRationale": "Better-documented recovery makes a slow manual restoration less likely (O 6→4). Recorded as committed for June 2026; the dossier does not confirm completion, so the reduction is a claim about the action, not a confirmed outcome."
+   },
+   {
+    "id": "FM-05",
+    "item": "Storage return-to-service",
+    "function": "Validate and return storage nodes to service so dependent compute can resume",
+    "failureMode": "Storage validation runs for about 14 hours, constrained by platform limitations and manual, sequential coordination",
+    "effect": "About 50% of VMs back by 06:15 UTC but about 95% only by 12:00 UTC; this tail sets most of the outage duration",
+    "cause": "Platform limits on the speed of returning storage nodes to service and dependence on manual coordination steps",
+    "prevention": "None recorded",
+    "detection": "Seen during recovery",
+    "S": 7,
+    "O": 7,
+    "D": 9,
+    "rationale": {
+     "S": "Half the affected VMs waited roughly six more hours after cooling was back: major degradation of a major service.",
+     "O": "The platform limits and manual steps were standing conditions for any mass shutdown.",
+     "D": "Nothing in the record shows the return-to-service time was known before the event."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 8
+     },
+     {
+      "src": "soe",
+      "i": 9
+     },
+     {
+      "src": "soe",
+      "i": 10
+     },
+     {
+      "src": "metric",
+      "i": 4
+     },
+     {
+      "src": "metric",
+      "i": 5
+     },
+     {
+      "src": "factor",
+      "i": 5
+     }
+    ],
+    "actions": [
+     {
+      "text": "Remove platform limitations on storage-node return-to-service speed and reduce manual coordination",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     }
+    ],
+    "revised": {
+     "S": 7,
+     "O": 4,
+     "D": 9
+    },
+    "revisedRationale": "With the platform limits removed, a long, manual storage return becomes less likely to set the outage length (O 7→4). Recorded as committed for July 2026, not confirmed complete, so the reduction is a claim about the action, not a confirmed outcome."
+   },
+   {
+    "id": "FM-06",
+    "item": "Protective-state visibility tooling",
+    "function": "Show operators which devices have entered protective states and need manual recovery",
+    "failureMode": "Weak tooling makes it hard to identify devices in protective states and prioritise foundational infrastructure",
+    "effect": "Prioritised recovery across the two affected availability zones is slowed",
+    "cause": "Tooling gap, and limited cross-team awareness of thermal events on shared infrastructure",
+    "prevention": "None recorded",
+    "detection": "Found during recovery",
+    "S": 6,
+    "O": 6,
+    "D": 8,
+    "rationale": {
+     "S": "Lengthens recovery without causing impact; the dossier does not quantify how much, so it is scored at 6 rather than counted as part of FM-05's tail.",
+     "O": "Any event that puts many devices into protective states exercises the gap.",
+     "D": "The gap was found while operators were recovering, after impact."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 7
+     },
+     {
+      "src": "improvement",
+      "i": 5
+     }
+    ],
+    "actions": [
+     {
+      "text": "Improve tooling to identify devices in protective states and prioritise foundational infrastructure",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     }
+    ],
+    "revised": {
+     "S": 6,
+     "O": 6,
+     "D": 4
+    },
+    "revisedRationale": "Tooling that lists devices in protective states would show operators what needs manual recovery early enough to act (D 8→4). Recorded as committed for August 2026, not confirmed complete, so the reduction is a claim about the action, not a confirmed outcome."
+   },
+   {
+    "id": "FM-07",
+    "item": "Log Analytics and Application Insights telemetry",
+    "function": "Restart cleanly and process backlogs after infrastructure returns",
+    "failureMode": "Log Analytics cannot self-recover from transient initialisation failures and depends on a single cluster",
+    "effect": "All other services recovered by 20:18 UTC; telemetry backlogs not cleared until 02:30 UTC on 30 May, the last part of the outage",
+    "cause": "No startup resiliency and a single-cluster dependency",
+    "prevention": "None recorded",
+    "detection": "Seen during recovery",
+    "S": 6,
+    "O": 6,
+    "D": 8,
+    "rationale": {
+     "S": "Outage confined to two telemetry services for about six hours after everything else was back: the rubric's 6.",
+     "O": "Any mass restart exercises the same transient initialisation failures: 'occasional'.",
+     "D": "Found after impact while the services were processing backlogs."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 11
+     },
+     {
+      "src": "soe",
+      "i": 12
+     },
+     {
+      "src": "factor",
+      "i": 6
+     },
+     {
+      "src": "metric",
+      "i": 7
+     }
+    ],
+    "actions": [
+     {
+      "text": "Add Log Analytics startup resiliency and multi-cluster flexibility",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     }
+    ],
+    "revised": {
+     "S": 6,
+     "O": 3,
+     "D": 8
+    },
+    "revisedRationale": "Self-recovery from transient failures and multi-cluster flexibility remove the two causes recorded (O 6→3). Recorded as committed for June and August 2026, not confirmed complete, so the reduction is a claim about the action, not a confirmed outcome."
+   }
+  ]
+ }
 }

@@ -52,6 +52,12 @@
     .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
     .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
     .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:2px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    /* A chip carries the operator name, which can be a whole sentence ("Google Cloud
+       (impacted tenant); STT GDC / Tata Communications JV (named as the third-party …").
+       nowrap made that one chip 1120px wide and pushed the GCP Delhi dossier into a
+       1260px page at a 1100px viewport. Short chips are unaffected: normal wrapping
+       only engages when a chip would not fit its row. */
+    .chips .chip { max-width:100%; white-space:normal; overflow-wrap:anywhere; }
     .chip.cyan { color:var(--cyan); border-left:2px solid var(--cyan); }
     .chip.amber { color:var(--amber); border-left:2px solid var(--amber); }
     .chip.green { color:var(--green); border-left:2px solid var(--green); }
@@ -71,6 +77,11 @@
     /* rich incident table (reference-2 style) */
     table.itbl { min-width:1120px; }
     table.itbl td { vertical-align:middle; }
+    /* v1.134.20 — the title and summary columns ellipsise so the table's columns line up,
+       which is the right call for a dense index. But the cut text was reachable only by
+       navigating to the incident: a summary lost 238-298px of its sentence with no way to read
+       it in place. Each carries its full text in a title attribute now, so the truncation is
+       deliberate AND non-lossy — which is the condition the legibility audit checks for. */
     .itr { cursor:pointer; }
     .itr:hover td { background:var(--surface-2); }
     .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
@@ -240,7 +251,6 @@
        derive width = W px from the aspect ratio, so the drawing renders 1:1 at any event count
        and the panel scrolls instead of shrinking. */
     .viz-timeline svg { max-width:none; height:96px; width:auto; }
-
     .viz-radar svg { max-width:320px; margin:0 auto; }
     .vz-num { font-variant-numeric:tabular-nums slashed-zero; }
     .vz-box-t, .vz-box-s, .vz-lbl, .vz-hb-lbl, .vz-tl-t, .vz-pt, .vz-tick { pointer-events:auto; }
@@ -323,7 +333,86 @@
     }
     @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
 </style>
-    
+    <style>
+    /* ── FMEA (v3.12.3) — one hairline panel of rows, like the rest of the dossier.
+       No cards, no stripes: a row is a disclosure, state is a 7px dot. ── */
+    .fm-scope { color:var(--text-body); max-width:70ch; }
+    .fm-meta { flex-wrap:wrap; row-gap:0.25rem; }
+    .fm-viz { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:1.6rem; align-items:start; margin:1.2rem 0; }
+    @media (max-width:820px){ .fm-viz { grid-template-columns:1fr; } }
+    .fm-pb-row, .fm-pb-axis { display:grid; grid-template-columns:3.6rem minmax(0,1fr) 6.6rem; gap:0.6rem; align-items:center; }
+    .fm-pb-row { padding:0.32rem 0; }
+    .fm-pb-id, .fm-pb-val { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.8rem; }
+    .fm-pb-id { color:var(--muted); }
+    .fm-pb-val { color:var(--text-strong); white-space:nowrap; }
+    .fm-pb-track { display:flex; flex-direction:column; gap:3px; }
+    .fm-pb-bar { display:block; height:12px; }
+    .fm-pb-rev { display:block; height:4px; background:var(--text-body); opacity:0.55; }
+    .fm-pb-none { font-style:italic; font-size:0.72rem; color:var(--muted); line-height:1; }
+    .fm-pb-axis { margin-top:0.3rem; border-top:1px solid var(--line); padding-top:0.25rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .fm-pb-ticks { display:flex; justify-content:space-between; }
+    .fm-fig { margin:0; }
+    .fm-fig figcaption { font-size:0.8rem; color:var(--muted); margin-bottom:0.35rem; }
+    .fm-fig svg { width:100%; height:auto; display:block; }
+    .fm-fig-m svg { max-width:340px; }
+    .fm-matrix .fm-c-lo { fill:var(--surface); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-md { fill:color-mix(in srgb, var(--amber) 9%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-hi { fill:color-mix(in srgb, var(--red) 10%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .vz-axis { font-size:10px; fill:var(--muted); font-family:'IBM Plex Sans',sans-serif; }
+    .fm-matrix .fm-pt { stroke:var(--surface); stroke-width:1.5; }
+    .fm-matrix .fm-pt-l { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; fill:var(--text-strong);
+      paint-order:stroke; stroke:var(--surface); stroke-width:3px; stroke-linejoin:round; }
+    .fm-sheet { border:1px solid var(--line); border-radius:4px; margin-top:0.8rem; }
+    .fm-head, .fm-row > summary { display:grid; grid-template-columns:4.2rem minmax(0,1fr) 4.4rem 4.6rem 3.4rem; gap:0.6rem; align-items:baseline; padding:0.6rem 0.9rem; }
+    .fm-head { font-size:0.74rem; color:var(--muted); border-bottom:1px solid var(--line); }
+    .fm-row { border-top:1px solid var(--line); }
+    .fm-row:first-of-type { border-top:0; }
+    .fm-row > summary { cursor:pointer; list-style:none; }
+    .fm-row > summary::-webkit-details-marker { display:none; }
+    .fm-row > summary:hover { background:var(--surface-2); }
+    .fm-row > summary:focus-visible { outline:2px solid var(--cyan); outline-offset:-2px; }
+    .fm-id-cell, .fm-sod, .fm-rpn, .fm-rpn-rev { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.84rem; }
+    .fm-id-cell { color:var(--muted); }
+    .fm-mode { color:var(--text-strong); font-size:0.92rem; line-height:1.4; }
+    .fm-item { display:block; color:var(--muted); font-size:0.8rem; }
+    .fm-sod { color:var(--text-body); }
+    .fm-rpn { color:var(--text-strong); }
+    .fm-rpn-rev { color:var(--muted); }
+    .fm-dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:0.45rem; vertical-align:0.1em; }
+    .fm-body { padding:0.2rem 0.9rem 1rem 5.7rem; }
+    @media (max-width:640px){
+      .fm-head { display:none; }
+      .fm-row > summary { grid-template-columns:3.2rem minmax(0,1fr) auto; }
+      .fm-sod, .fm-rpn-rev { display:none; }
+      .fm-body { padding:0.2rem 0.9rem 1rem; }
+    }
+    .fm-kv { display:grid; grid-template-columns:9.5rem minmax(0,1fr); gap:0.3rem 0.9rem; margin:0.4rem 0 0.8rem; font-size:0.88rem; }
+    .fm-kv dt { color:var(--muted); }
+    .fm-kv dd { margin:0; color:var(--text-body); }
+    @media (max-width:640px){ .fm-kv { grid-template-columns:1fr; } .fm-kv dd { margin-bottom:0.4rem; } }
+    .fm-scores { margin:0 0 0.6rem; border-top:1px solid var(--line); }
+    .fm-sc { display:grid; grid-template-columns:3.2rem minmax(0,1fr); gap:0.6rem; padding:0.45rem 0; border-bottom:1px solid var(--line); font-size:0.86rem; }
+    .fm-sc dt { font-family:'JetBrains Mono',monospace; color:var(--muted); }
+    .fm-sc dt b { color:var(--text-strong); }
+    .fm-sc dd { margin:0; color:var(--text-body); }
+    .fm-sub { font-size:0.8rem; color:var(--muted); margin:0.7rem 0 0.25rem; }
+    .fm-sub b { color:var(--text-strong); }
+    .fm-acts, .fm-ev { margin:0; padding-left:1.1rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-acts li, .fm-ev li { margin:0.25rem 0; }
+    .fm-residual { color:var(--red); }
+    .fm-revline { font-size:0.86rem; color:var(--text-body); margin:0.4rem 0 0; }
+    .fm-ev-src { display:block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .fm-ev-src a { color:var(--cyan); }
+    .fm-ev-txt { display:block; }
+    .fm-method { margin-top:1rem; border:1px solid var(--line); border-radius:4px; }
+    .fm-method > summary { padding:0.6rem 0.9rem; cursor:pointer; font-size:0.9rem; color:var(--text-strong); }
+    .fm-method-body { padding:0 0.9rem 0.9rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-rubrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+    @media (max-width:760px){ .fm-rubrics { grid-template-columns:1fr; } }
+    .fm-rubric { width:100%; border-collapse:collapse; font-size:0.8rem; }
+    .fm-rubric td { padding:0.25rem 0.4rem; border-top:1px solid var(--line); vertical-align:top; }
+    .fm-rubric td:first-child { font-family:'JetBrains Mono',monospace; width:2rem; color:var(--text-strong); }
+</style>
 </head>
 <body class="locked">
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -393,6 +482,215 @@ LATENT ROOT (design / redundancy / change-management lapse): The proximate confi
 
         <h2>Contributing factors</h2>
         <ul class="tight"><li>Change-management / stagger scoping gap (admitted): &#x27;the stagger policy did not include an MCP data center until the final step&#x27; — no MCP spine was exercised until the change reached the MCP tier, converting a catchable local error into a broad one.</li><li>Stagger granularity too coarse (admitted): despite a stagger procedure, &#x27;the steps weren&#x27;t small enough to catch the error before it hit all of our spines.&#x27;</li><li>No MCP-specific validation in the change pipeline (admitted remediation): procedures &#x27;need to include MCP-specific test and deploy procedures to ensure there are no unintended consequences&#x27; — the existing process had no MCP-aware safeguard even though MCP spines ran a shared policy across the busiest half of the network.</li><li>Absence of an automated rollback safety-net: no &#x27;commit-confirm&#x27; auto-revert existed, so recovery was fully manual; Cloudflare states such automation &#x27;would have greatly reduced the Time-to-Resolve.&#x27;</li><li>Fragile policy design relying on implicit term ordering plus an explicit REJECT-THE-REST catch-all, so a simple reorder silently inverted advertisement behavior — the policy statement &#x27;will be redesigned to prevent an unintentional incorrect ordering.&#x27;</li><li>Uncoordinated manual recovery: &#x27;network engineers walked over each other&#x27;s changes, reverting the previous reverts,&#x27; extending time-to-resolve.</li><li>Recovery-access dependency on the failed path itself: withdrawing the site-locals &#x27;removed our direct access to all the impacted locations,&#x27; forcing engineers to fall back to backup take-control procedures.</li><li>Concentration risk: the 19 MCP sites were &#x27;only 4% of our total network&#x27; yet the outage &#x27;impacted 50% of total requests,&#x27; so a single-tier fault produced disproportionate global impact.</li></ul>
+        <h2 id="fmea">Failure mode &amp; effects analysis (FMEA)</h2>
+        <p class="fm-scope">The network-change path for Cloudflare&#x27;s 19 Multi-Colo PoP (MCP) core data centers: the AGGREGATES-OUT BGP export policy on the MCP spine routers, the staggered rollout and pre-deploy validation around it, the site-local prefixes that carry both reachability and internal load balancing (Multimog), and the rollback and recovery path. Analysed retrospectively from Cloudflare&#x27;s official post-mortem held in this dossier. The router vendor is not stated by Cloudflare (Juniper is only inferred from config syntax) and plays no part in the scoring. The monitoring signal that first flagged impact is not named in the source. Four corrective actions are recorded as committed with completion not confirmed; the single-controller reversion item is inferred, and the out-of-band access item carries no stated status.</p>
+        <p class="metabar fm-meta"><span><b>7</b> failure modes</span><span class="sep">/</span><span><b>3</b> high priority</span><span class="sep">/</span><span><b>4 of 7</b> with a published action</span><span class="sep">/</span><span>total RPN <b>1884 → 1184</b> (−37%)</span></p>
+        <div class="fm-viz">
+            <figure class="fm-fig"><figcaption>Risk priority number (S × O × D), worst first — thin bar: after the published action</figcaption><div class="fm-pb" role="list" aria-label="Risk priority number per failure mode, before and after corrective action"><div class="fm-pb-row" role="listitem" title="FM-01 A reorder moves the site-local advertisement terms below the REJECT-THE-REST catch-all, so first-match evaluation rejects and withdraws the site-local prefixes"><span class="fm-pb-id">FM-01</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:96.0%;background:var(--red)"></i><i class="fm-pb-rev" style="width:32.0%"></i></span><span class="fm-pb-val">384 → 128</span></div><div class="fm-pb-row" role="listitem" title="FM-05 No commit-confirm auto-revert exists, so recovery is fully manual"><span class="fm-pb-id">FM-05</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:84.0%;background:var(--red)"></i><i class="fm-pb-rev" style="width:60.0%"></i></span><span class="fm-pb-val">336 → 240</span></div><div class="fm-pb-row" role="listitem" title="FM-02 The stagger includes no MCP data center until the final step, so the change reaches all MCP spines at once"><span class="fm-pb-id">FM-02</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:80.0%;background:var(--red)"></i><i class="fm-pb-rev" style="width:25.0%"></i></span><span class="fm-pb-val">320 → 100</span></div><div class="fm-pb-row" role="listitem" title="FM-03 The change pipeline has no MCP-specific test, so an edit that is inert elsewhere is not checked on the tier where it is destructive"><span class="fm-pb-id">FM-03</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:64.0%;background:var(--amber)"></i><i class="fm-pb-rev" style="width:32.0%"></i></span><span class="fm-pb-val">256 → 128</span></div><div class="fm-pb-row" role="listitem" title="FM-04 One prefix withdrawal removes inbound reachability, outbound reachability to origins and east-west forwarding together"><span class="fm-pb-id">FM-04</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:54.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">216</span></div><div class="fm-pb-row" role="listitem" title="FM-06 Direct access depends on the site-local prefixes the fault withdrew, so engineers are locked out of the sites they need to fix"><span class="fm-pb-id">FM-06</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:48.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">192</span></div><div class="fm-pb-row" role="listitem" title="FM-07 Engineers overwrite each other&#x27;s changes and revert previous reverts"><span class="fm-pb-id">FM-07</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:45.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">180</span></div><div class="fm-pb-axis" aria-hidden="true"><span></span><span class="fm-pb-ticks"><span>0</span><span>200</span><span>400</span></span><span></span></div></div></figure>
+            <figure class="fm-fig fm-fig-m"><figcaption>Criticality: severity × occurrence</figcaption><svg class="fm-matrix" viewBox="0 0 360 330" role="img" aria-label="Criticality matrix, severity against occurrence"><rect class="fm-c-lo" x="44" y="266" width="28" height="28"/><rect class="fm-c-lo" x="72" y="266" width="28" height="28"/><rect class="fm-c-lo" x="100" y="266" width="28" height="28"/><rect class="fm-c-lo" x="128" y="266" width="28" height="28"/><rect class="fm-c-lo" x="156" y="266" width="28" height="28"/><rect class="fm-c-lo" x="184" y="266" width="28" height="28"/><rect class="fm-c-lo" x="212" y="266" width="28" height="28"/><rect class="fm-c-lo" x="240" y="266" width="28" height="28"/><rect class="fm-c-lo" x="268" y="266" width="28" height="28"/><rect class="fm-c-lo" x="296" y="266" width="28" height="28"/><rect class="fm-c-lo" x="44" y="238" width="28" height="28"/><rect class="fm-c-lo" x="72" y="238" width="28" height="28"/><rect class="fm-c-lo" x="100" y="238" width="28" height="28"/><rect class="fm-c-lo" x="128" y="238" width="28" height="28"/><rect class="fm-c-lo" x="156" y="238" width="28" height="28"/><rect class="fm-c-lo" x="184" y="238" width="28" height="28"/><rect class="fm-c-lo" x="212" y="238" width="28" height="28"/><rect class="fm-c-lo" x="240" y="238" width="28" height="28"/><rect class="fm-c-md" x="268" y="238" width="28" height="28"/><rect class="fm-c-md" x="296" y="238" width="28" height="28"/><rect class="fm-c-lo" x="44" y="210" width="28" height="28"/><rect class="fm-c-lo" x="72" y="210" width="28" height="28"/><rect class="fm-c-lo" x="100" y="210" width="28" height="28"/><rect class="fm-c-lo" x="128" y="210" width="28" height="28"/><rect class="fm-c-lo" x="156" y="210" width="28" height="28"/><rect class="fm-c-md" x="184" y="210" width="28" height="28"/><rect class="fm-c-md" x="212" y="210" width="28" height="28"/><rect class="fm-c-md" x="240" y="210" width="28" height="28"/><rect class="fm-c-md" x="268" y="210" width="28" height="28"/><rect class="fm-c-md" x="296" y="210" width="28" height="28"/><rect class="fm-c-lo" x="44" y="182" width="28" height="28"/><rect class="fm-c-lo" x="72" y="182" width="28" height="28"/><rect class="fm-c-lo" x="100" y="182" width="28" height="28"/><rect class="fm-c-lo" x="128" y="182" width="28" height="28"/><rect class="fm-c-md" x="156" y="182" width="28" height="28"/><rect class="fm-c-md" x="184" y="182" width="28" height="28"/><rect class="fm-c-md" x="212" y="182" width="28" height="28"/><rect class="fm-c-md" x="240" y="182" width="28" height="28"/><rect class="fm-c-md" x="268" y="182" width="28" height="28"/><rect class="fm-c-hi" x="296" y="182" width="28" height="28"/><rect class="fm-c-lo" x="44" y="154" width="28" height="28"/><rect class="fm-c-lo" x="72" y="154" width="28" height="28"/><rect class="fm-c-lo" x="100" y="154" width="28" height="28"/><rect class="fm-c-md" x="128" y="154" width="28" height="28"/><rect class="fm-c-md" x="156" y="154" width="28" height="28"/><rect class="fm-c-md" x="184" y="154" width="28" height="28"/><rect class="fm-c-md" x="212" y="154" width="28" height="28"/><rect class="fm-c-hi" x="240" y="154" width="28" height="28"/><rect class="fm-c-hi" x="268" y="154" width="28" height="28"/><rect class="fm-c-hi" x="296" y="154" width="28" height="28"/><rect class="fm-c-lo" x="44" y="126" width="28" height="28"/><rect class="fm-c-lo" x="72" y="126" width="28" height="28"/><rect class="fm-c-md" x="100" y="126" width="28" height="28"/><rect class="fm-c-md" x="128" y="126" width="28" height="28"/><rect class="fm-c-md" x="156" y="126" width="28" height="28"/><rect class="fm-c-md" x="184" y="126" width="28" height="28"/><rect class="fm-c-hi" x="212" y="126" width="28" height="28"/><rect class="fm-c-hi" x="240" y="126" width="28" height="28"/><rect class="fm-c-hi" x="268" y="126" width="28" height="28"/><rect class="fm-c-hi" x="296" y="126" width="28" height="28"/><rect class="fm-c-lo" x="44" y="98" width="28" height="28"/><rect class="fm-c-lo" x="72" y="98" width="28" height="28"/><rect class="fm-c-md" x="100" y="98" width="28" height="28"/><rect class="fm-c-md" x="128" y="98" width="28" height="28"/><rect class="fm-c-md" x="156" y="98" width="28" height="28"/><rect class="fm-c-hi" x="184" y="98" width="28" height="28"/><rect class="fm-c-hi" x="212" y="98" width="28" height="28"/><rect class="fm-c-hi" x="240" y="98" width="28" height="28"/><rect class="fm-c-hi" x="268" y="98" width="28" height="28"/><rect class="fm-c-hi" x="296" y="98" width="28" height="28"/><rect class="fm-c-lo" x="44" y="70" width="28" height="28"/><rect class="fm-c-lo" x="72" y="70" width="28" height="28"/><rect class="fm-c-md" x="100" y="70" width="28" height="28"/><rect class="fm-c-md" x="128" y="70" width="28" height="28"/><rect class="fm-c-hi" x="156" y="70" width="28" height="28"/><rect class="fm-c-hi" x="184" y="70" width="28" height="28"/><rect class="fm-c-hi" x="212" y="70" width="28" height="28"/><rect class="fm-c-hi" x="240" y="70" width="28" height="28"/><rect class="fm-c-hi" x="268" y="70" width="28" height="28"/><rect class="fm-c-hi" x="296" y="70" width="28" height="28"/><rect class="fm-c-hi" x="44" y="42" width="28" height="28"/><rect class="fm-c-hi" x="72" y="42" width="28" height="28"/><rect class="fm-c-hi" x="100" y="42" width="28" height="28"/><rect class="fm-c-hi" x="128" y="42" width="28" height="28"/><rect class="fm-c-hi" x="156" y="42" width="28" height="28"/><rect class="fm-c-hi" x="184" y="42" width="28" height="28"/><rect class="fm-c-hi" x="212" y="42" width="28" height="28"/><rect class="fm-c-hi" x="240" y="42" width="28" height="28"/><rect class="fm-c-hi" x="268" y="42" width="28" height="28"/><rect class="fm-c-hi" x="296" y="42" width="28" height="28"/><rect class="fm-c-hi" x="44" y="14" width="28" height="28"/><rect class="fm-c-hi" x="72" y="14" width="28" height="28"/><rect class="fm-c-hi" x="100" y="14" width="28" height="28"/><rect class="fm-c-hi" x="128" y="14" width="28" height="28"/><rect class="fm-c-hi" x="156" y="14" width="28" height="28"/><rect class="fm-c-hi" x="184" y="14" width="28" height="28"/><rect class="fm-c-hi" x="212" y="14" width="28" height="28"/><rect class="fm-c-hi" x="240" y="14" width="28" height="28"/><rect class="fm-c-hi" x="268" y="14" width="28" height="28"/><rect class="fm-c-hi" x="296" y="14" width="28" height="28"/><text class="vz-tick" x="58.0" y="308" text-anchor="middle">1</text><text class="vz-tick" x="36" y="284.0" text-anchor="end">1</text><text class="vz-tick" x="86.0" y="308" text-anchor="middle">2</text><text class="vz-tick" x="36" y="256.0" text-anchor="end">2</text><text class="vz-tick" x="114.0" y="308" text-anchor="middle">3</text><text class="vz-tick" x="36" y="228.0" text-anchor="end">3</text><text class="vz-tick" x="142.0" y="308" text-anchor="middle">4</text><text class="vz-tick" x="36" y="200.0" text-anchor="end">4</text><text class="vz-tick" x="170.0" y="308" text-anchor="middle">5</text><text class="vz-tick" x="36" y="172.0" text-anchor="end">5</text><text class="vz-tick" x="198.0" y="308" text-anchor="middle">6</text><text class="vz-tick" x="36" y="144.0" text-anchor="end">6</text><text class="vz-tick" x="226.0" y="308" text-anchor="middle">7</text><text class="vz-tick" x="36" y="116.0" text-anchor="end">7</text><text class="vz-tick" x="254.0" y="308" text-anchor="middle">8</text><text class="vz-tick" x="36" y="88.0" text-anchor="end">8</text><text class="vz-tick" x="282.0" y="308" text-anchor="middle">9</text><text class="vz-tick" x="36" y="60.0" text-anchor="end">9</text><text class="vz-tick" x="310.0" y="308" text-anchor="middle">10</text><text class="vz-tick" x="36" y="32.0" text-anchor="end">10</text><text class="vz-axis" x="184" y="328" text-anchor="middle">Occurrence →</text><text class="vz-axis" transform="translate(11 154) rotate(-90)" text-anchor="middle">Severity →</text><circle class="fm-pt" cx="114.0" cy="84.0" r="6" fill="var(--amber)"><title>FM-04 One prefix withdrawal removes inbound reachability, outbound reachability to origins and east-west forwarding together (S8 O3 D9)</title></circle><text class="fm-pt-l" x="114.0" y="74.0" text-anchor="middle">04</text><circle class="fm-pt" cx="142.0" cy="84.0" r="6" fill="var(--amber)"><title>FM-03 The change pipeline has no MCP-specific test, so an edit that is inert elsewhere is not checked on the tier where it is destructive (S8 O4 D8)</title></circle><text class="fm-pt-l" x="142.0" y="74.0" text-anchor="middle">03</text><circle class="fm-pt" cx="170.0" cy="84.0" r="6" fill="var(--red)"><title>FM-02 The stagger includes no MCP data center until the final step, so the change reaches all MCP spines at once (S8 O5 D8)</title></circle><text class="fm-pt-l" x="170.0" y="74.0" text-anchor="middle">02</text><circle class="fm-pt" cx="198.0" cy="84.0" r="6" fill="var(--red)"><title>FM-01 A reorder moves the site-local advertisement terms below the REJECT-THE-REST catch-all, so first-match evaluation rejects and withdraws the site-local prefixes (S8 O6 D8)</title></circle><text class="fm-pt-l" x="198.0" y="74.0" text-anchor="middle">01</text><circle class="fm-pt" cx="198.0" cy="112.0" r="6" fill="var(--red)"><title>FM-05 No commit-confirm auto-revert exists, so recovery is fully manual (S7 O6 D8)</title></circle><text class="fm-pt-l" x="198.0" y="102.0" text-anchor="middle">05</text><circle class="fm-pt" cx="142.0" cy="140.0" r="6" fill="var(--amber)"><title>FM-06 Direct access depends on the site-local prefixes the fault withdrew, so engineers are locked out of the sites they need to fix (S6 O4 D8)</title></circle><text class="fm-pt-l" x="142.0" y="130.0" text-anchor="middle">06</text><circle class="fm-pt" cx="170.0" cy="140.0" r="6" fill="var(--amber)"><title>FM-07 Engineers overwrite each other&#x27;s changes and revert previous reverts (S6 O5 D6)</title></circle><text class="fm-pt-l" x="170.0" y="130.0" text-anchor="middle">07</text></svg></figure>
+        </div>
+        <div class="fm-sheet">
+            <div class="fm-head" aria-hidden="true"><span>ID</span><span>Failure mode</span><span>S·O·D</span><span>RPN</span><span>After</span></div>
+            <details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-01</span>
+    <span class="fm-mode">A reorder moves the site-local advertisement terms below the REJECT-THE-REST catch-all, so first-match evaluation rejects and withdraws the site-local prefixes<span class="fm-item">AGGREGATES-OUT BGP export policy (MCP spines)</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 6, detection 8">8·6·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>384</span>
+    <span class="fm-rpn-rev">128</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Advertise the site-local prefixes of each MCP location and reject everything else</dd>
+      <dt>Effect</dt><dd>All 19 MCP data centers go offline at 06:27 UTC; about 50% of Cloudflare&#x27;s total requests cannot be served for about 75 minutes</dd>
+      <dt>Cause</dt><dd>Policy behaviour depends on implicit term order plus an explicit catch-all reject, so an edit that only changes order inverts what the policy does</dd>
+      <dt>Prevention in place</dt><dd>None recorded in the policy design</dd>
+      <dt>Detection in place</dt><dd>Incident declared at 06:32 UTC, about 5 minutes after onset; no pre-commit check is recorded</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>Half of global request volume failed for over an hour. Scored 8: more than a degradation, but not 9 because the other 96% of sites kept serving and the outage lasted about 75 minutes rather than many hours.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>The change was part of routine resilience-upgrade work, and nothing in the policy guarded against a reorder: &#x27;occasional, weakly guarded&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>No validation caught the inverted policy before commit; the fault was recognised through its impact, with an incident declared five minutes in.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 384</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Redesign AGGREGATES-OUT so site-local advertisement no longer depends on term order relative to REJECT-THE-REST <span class="fm-ev-src">Correction of errors #1</span></li></ul>
+    <p class="fm-revline">After action: S8 · O2 · D8 → RPN 128. If the policy no longer depends on order, a reorder can no longer withdraw the site-locals (O 6→2). Severity and detection are unchanged for any other policy error. Recorded as committed in the post-mortem, not as completed, so the reduction is a claim about the action, not a confirmed outcome.</p>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/" target="_blank" rel="noopener nofollow">Reference #1 · official-postmortem</a></span><span class="fm-ev-txt">“the 4-ADV-SITE-LOCALS and 6-ADV-SITE-LOCALS terms moved from the top to the bottom”</span></li><li><span class="fm-ev-src"><a href="https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/" target="_blank" rel="noopener nofollow">Sequence of events #3</a></span><span class="fm-ev-txt">2022-06-21 06:27 UTC — Rollout reaches MCP-enabled locations and the reordered AGGREGATES-OUT policy commits to the spines: this is when the incident started. Site-local terms now sit below REJECT-THE-REST and match &#x27;then reject;&#x27; first.</span></li><li><span class="fm-ev-src"><a href="https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/" target="_blank" rel="noopener nofollow">Sequence of events #4</a></span><span class="fm-ev-txt">2022-06-21 06:27 UTC — All 19 MCP data centers taken offline — the change withdrew the site-local prefixes across the MCP spines (no sub-staggering within the MCP tier).</span></li><li><span class="fm-ev-src"><a href="https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/" target="_blank" rel="noopener nofollow">Metric #3</a></span><span class="fm-ev-txt">Global request volume affected: ~50% of total requests impacted</span></li><li><span class="fm-ev-src">Contributing factor #5</span><span class="fm-ev-txt">Fragile policy design relying on implicit term ordering plus an explicit REJECT-THE-REST catch-all, so a simple reorder silently inverted advertisement behavior — the policy statement &#x27;will be redesigned to prevent an unintentional incorrect ordering.&#x27;</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-05</span>
+    <span class="fm-mode">No commit-confirm auto-revert exists, so recovery is fully manual<span class="fm-item">Automated rollback of network configuration</span></span>
+    <span class="fm-sod" aria-label="Severity 7, occurrence 6, detection 8">7·6·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>336</span>
+    <span class="fm-rpn-rev">240</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Revert a bad commit automatically if it is not confirmed</dd>
+      <dt>Effect</dt><dd>Root cause is found at 06:58 UTC, about 31 minutes in, but final reverts complete only at 07:42 UTC</dd>
+      <dt>Cause</dt><dd>No timed auto-revert on network configuration commits</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Not applicable before the incident; the gap mattered during recovery</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>7</b></dt><dd>This mode sets the duration of the outage rather than its existence; about 75 minutes of a half-network outage is scored 7 so the outage is not counted again at FM-01&#x27;s weight.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>The gap applies to every network configuration change, and no automated safeguard covered it: &#x27;occasional&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>Nothing recorded flagged the missing safety net before it was needed.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 336</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Implement automated commit-confirm rollback for network configuration changes <span class="fm-ev-src">Correction of errors #4</span></li></ul>
+    <p class="fm-revline">After action: S5 · O6 · D8 → RPN 240. A timed auto-revert would undo a bad commit without engineer access to the site, shortening a repeat of this outage to the revert timer (S 7→5). Recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome.</p>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #4</span><span class="fm-ev-txt">“would have greatly reduced the Time-to-Resolve”</span></li><li><span class="fm-ev-src"><a href="https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/" target="_blank" rel="noopener nofollow">Metric #8</a></span><span class="fm-ev-txt">Automated rollback available at time of incident: 0 (no commit-confirm; recovery fully manual)</span></li><li><span class="fm-ev-src"><a href="https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/" target="_blank" rel="noopener nofollow">Metric #5</a></span><span class="fm-ev-txt">Onset-to-root-cause-found: ~31 min (06:27 to 06:58)</span></li><li><span class="fm-ev-src"><a href="https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/" target="_blank" rel="noopener nofollow">Sequence of events #13</a></span><span class="fm-ev-txt">2022-06-21 07:42 UTC — Final reverts completed; core routing restored ~75 minutes after the 06:27 onset. AGGREGATES-OUT is back to correct term ordering and site-locals re-advertised.</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-02</span>
+    <span class="fm-mode">The stagger includes no MCP data center until the final step, so the change reaches all MCP spines at once<span class="fm-item">Staggered rollout of network-configuration changes</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 5, detection 8">8·5·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>320</span>
+    <span class="fm-rpn-rev">100</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Expose a change to a small, representative set of sites first so a fault is caught at minimal blast radius</dd>
+      <dt>Effect</dt><dd>Two earlier stages (03:56 and 06:17 UTC) pass with zero impact and give false confidence; the final step takes down all 19 MCP sites together</dd>
+      <dt>Cause</dt><dd>Stagger scoped by site list rather than by architecture class; steps too coarse</dd>
+      <dt>Prevention in place</dt><dd>A stagger procedure existed</dd>
+      <dt>Detection in place</dt><dd>Earlier stages could not detect the fault because they did not exercise the MCP configuration</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>The stagger gap is what let one error reach all 19 sites rather than one, so it carries the outage&#x27;s severity.</dd></div>
+      <div class="fm-sc"><dt>O <b>5</b></dt><dd>Present in every rollout that touches MCP spines, but it only matters when the change is faulty; between &#x27;infrequent&#x27; and &#x27;occasional&#x27;. Scored below FM-01 so the one event is not counted twice at full weight.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>The canary stages were blind to the MCP tier; the fault was seen only after the final step caused impact.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 320</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Automate an improved stagger policy that exercises an MCP data center early rather than only in the final step <span class="fm-ev-src">Correction of errors #3</span></li></ul>
+    <p class="fm-revline">After action: S5 · O5 · D4 → RPN 100. An MCP site early in the stagger would expose a fault of this class at one location with time to stop the rollout (D 8→4), bounding the effect to customer-visible degradation at that site (S 8→5); Cloudflare says this &#x27;would have significantly lessened the overall impact&#x27;. Recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome.</p>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #1</span><span class="fm-ev-txt">“the stagger policy did not include an MCP data center until the final step”</span></li><li><span class="fm-ev-src">Contributing factor #2</span><span class="fm-ev-txt">“the steps weren&#x27;t small enough to catch the error before it hit all of our spines”</span></li><li><span class="fm-ev-src"><a href="https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/" target="_blank" rel="noopener nofollow">Metric #9</a></span><span class="fm-ev-txt">Benign pre-MCP deploy stages before impact: 2 (03:56 UTC and 06:17 UTC, zero impact)</span></li><li><span class="fm-ev-src"><a href="https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/" target="_blank" rel="noopener nofollow">Sequence of events #2</a></span><span class="fm-ev-txt">2022-06-21 06:17 UTC — Change deployed to the busiest, non-MCP locations. Still no impact — the destructive path has not been touched.</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-03</span>
+    <span class="fm-mode">The change pipeline has no MCP-specific test, so an edit that is inert elsewhere is not checked on the tier where it is destructive<span class="fm-item">Pre-deploy validation for MCP-tier changes</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 4, detection 8">8·4·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>256</span>
+    <span class="fm-rpn-rev">128</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Test a network change against the MCP architecture before it is deployed there</dd>
+      <dt>Effect</dt><dd>The inverted export policy reaches production MCP spines unvalidated</dd>
+      <dt>Cause</dt><dd>Change procedures and automation without MCP-aware safeguards, although MCP spines shared one policy across the busiest sites</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>None before deployment</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>Another route to the same outage; carried at the outage&#x27;s severity.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>Kept at &#x27;infrequent&#x27; because it overlaps FM-01 and FM-02: the missing test only matters for a faulty MCP-only change.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>No check existed between authoring and production; detection came through impact.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 256</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Add MCP-specific test and deploy procedures to change procedures and automation <span class="fm-ev-src">Correction of errors #2</span></li></ul>
+    <p class="fm-revline">After action: S8 · O4 · D4 → RPN 128. An MCP-specific test would show the withdrawal before production (D 8→4). Recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome.</p>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #3</span><span class="fm-ev-txt">“need to include MCP-specific test and deploy procedures to ensure there are no unintended consequences”</span></li><li><span class="fm-ev-src"><a href="https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/" target="_blank" rel="noopener nofollow">Sequence of events #1</a></span><span class="fm-ev-txt">2022-06-21 03:56 UTC — Change deployed to the first location. No impact — this site runs the older, non-MCP architecture, confirming the edit is inert outside the MCP spine tier.</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“a single unvalidated edit to a shared policy could withdraw the busiest half of the network with no automatic backstop”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-04</span>
+    <span class="fm-mode">One prefix withdrawal removes inbound reachability, outbound reachability to origins and east-west forwarding together<span class="fm-item">Site-local prefixes and Multimog load balancing in MCP sites</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 3, detection 9">8·3·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>216</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Keep each MCP site reachable from outside, able to reach origins, and able to forward requests between its servers</dd>
+      <dt>Effect</dt><dd>Sites that are about 4% of the network carry about 50% of requests and lose all three paths at once; even surviving servers inside a site cannot be reached</dd>
+      <dt>Cause</dt><dd>Concentration of traffic on the MCP tier, and Multimog depending on the same site-local prefixes as external reachability</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Seen through impact</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>This coupling is why the withdrawal became a total loss of service at each site rather than a partial one.</dd></div>
+      <div class="fm-sc"><dt>O <b>3</b></dt><dd>Needs the site-local prefixes to be withdrawn first, which is infrequent.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>No control is recorded that would show the coupling before an outage; it became visible as customer impact.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 216</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li class="fm-residual">No corrective action is recorded in the published sources. This mode is residual risk.</li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/" target="_blank" rel="noopener nofollow">Sequence of events #5</a></span><span class="fm-ev-txt">2022-06-21 06:27 UTC — Withdrawal of site-local prefixes severs direct reachability to the 19 locations AND the servers&#x27; reachability to origin servers: it &#x27;removed our direct access to all the impacted locations, as well as removing the ability of our servers to reach origin servers.&#x27;</span></li><li><span class="fm-ev-src"><a href="https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/" target="_blank" rel="noopener nofollow">Sequence of events #6</a></span><span class="fm-ev-txt">2022-06-21 06:27 UTC — Internal load balancer Multimog collapses: it &#x27;could no longer forward requests between the servers&#x27; in the MCPs, so even surviving servers inside a data center cannot be reached east-west.</span></li><li><span class="fm-ev-src">Technical deep-dive</span><span class="fm-ev-txt">“could no longer forward requests between the servers”</span></li><li><span class="fm-ev-src">Contributing factor #8</span><span class="fm-ev-txt">“only 4% of our total network”</span></li><li><span class="fm-ev-src"><a href="https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/" target="_blank" rel="noopener nofollow">Metric #2</a></span><span class="fm-ev-txt">Affected sites as share of total network: ~4% (Cloudflare&#x27;s phrasing: &#x27;only 4% of our total network&#x27;)</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-06</span>
+    <span class="fm-mode">Direct access depends on the site-local prefixes the fault withdrew, so engineers are locked out of the sites they need to fix<span class="fm-item">Engineer access path to affected sites</span></span>
+    <span class="fm-sod" aria-label="Severity 6, occurrence 4, detection 8">6·4·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>192</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Let engineers reach the routers they must fix during a reachability failure</dd>
+      <dt>Effect</dt><dd>Engineers fall back to backup take-control procedures, slowing reversion</dd>
+      <dt>Cause</dt><dd>Recovery access shares a failure domain with the routes being changed</dd>
+      <dt>Prevention in place</dt><dd>Backup take-control procedures</dd>
+      <dt>Detection in place</dt><dd>Found during the incident</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>6</b></dt><dd>It lengthens recovery rather than causing the outage, and backup procedures still worked; scored 6 to avoid counting the same minutes again at FM-05&#x27;s weight.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>Needs a reachability-removing change first, which is infrequent.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>The dependency was found when engineers tried to reach the sites, after impact.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 192</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Preserve an out-of-band management and recovery path that does not depend on site-local prefixes being advertised <span class="fm-ev-src">Improvement #5</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #7</span><span class="fm-ev-txt">“removed our direct access to all the impacted locations”</span></li><li><span class="fm-ev-src"><a href="https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/" target="_blank" rel="noopener nofollow">Sequence of events #11</a></span><span class="fm-ev-txt">2022-06-21 06:58 UTC — Reversion of the problematic change begins. Because direct access was withdrawn, engineers fall back to backup take-control procedures — no automated commit-confirm rollback exists.</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-07</span>
+    <span class="fm-mode">Engineers overwrite each other&#x27;s changes and revert previous reverts<span class="fm-item">Manual emergency reversion</span></span>
+    <span class="fm-sod" aria-label="Severity 6, occurrence 5, detection 6">6·5·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>180</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Revert the change on all affected spines in one coordinated pass</dd>
+      <dt>Effect</dt><dd>The fault re-appears intermittently during reversion; final reverts slip to 07:42 UTC</dd>
+      <dt>Cause</dt><dd>No single controller for emergency changes</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Seen during recovery as the fault re-appearing</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>6</b></dt><dd>Extends a partial outage that is already scored elsewhere; confined to part of the recovery window.</dd></div>
+      <div class="fm-sc"><dt>O <b>5</b></dt><dd>Several engineers working the same devices under pressure is a foreseeable condition with no recorded guard, between &#x27;infrequent&#x27; and &#x27;occasional&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>The regression showed at once as the fault re-appearing, but nothing prevented it: &#x27;detected at onset, not prevented&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 180</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Single-controller coordination for emergency reversions (inferred remediation, not a formal commitment) <span class="fm-ev-src">Correction of errors #5</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #6</span><span class="fm-ev-txt">“network engineers walked over each other&#x27;s changes, reverting the previous reverts”</span></li><li><span class="fm-ev-src"><a href="https://blog.cloudflare.com/cloudflare-outage-on-june-21-2022/" target="_blank" rel="noopener nofollow">Sequence of events #12</a></span><span class="fm-ev-txt">2022-06-21 07:00-07:40 UTC — Recovery self-inflicts delay: &#x27;network engineers walked over each other&#x27;s changes, reverting the previous reverts,&#x27; causing the problem to re-appear intermittently during manual reversion.</span></li></ul>
+  </div>
+</details>
+        </div>
+        <details class="fm-method"><summary>Scoring rubric and method</summary><div class="fm-method-body"><p>A retrospective FMEA: each row asks how this system could fail, how bad the effect was, how likely the cause was given the controls in place at the time, and how likely those controls were to catch it before customers did. Scales are adapted for data-centre operations from the 1–10 scales of IEC 60812:2018 and the AIAG-VDA FMEA handbook. RPN = S × O × D. Priority is High when S ≥ 9 with O ≥ 4 or D ≥ 7, or when RPN ≥ 300; Medium when RPN ≥ 120 or S ≥ 7; Low otherwise. Severity overrides the product because a large S multiplied by small O and D can hide a region-wide outage nothing would catch.</p><p>Every row cites evidence from this dossier, and every quote is checked verbatim against its source by <code>tools/test-incidents-fmea.py</code>. A revised score is only shown against a published corrective action. This is an RZ analyst assessment, not an operator document.</p><div class="fm-rubrics"><div><p class="fm-sub">Severity</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Hazard to people, or loss of the facility / several regions</td></tr><tr><td>9</td><td>Region-wide or provider-wide outage of a foundational service, no workaround</td></tr><tr><td>8</td><td>Full outage of a major service for hours</td></tr><tr><td>7</td><td>Major degradation of a major service</td></tr><tr><td>6</td><td>Partial outage confined to one zone or one service</td></tr><tr><td>5</td><td>Customer-visible degradation</td></tr><tr><td>4</td><td>Limited customer impact</td></tr><tr><td>3</td><td>Internal impact only</td></tr><tr><td>2</td><td>Negligible</td></tr><tr><td>1</td><td>No effect</td></tr></tbody></table></div><div><p class="fm-sub">Occurrence</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Near certain: the cause is present in normal operation</td></tr><tr><td>8</td><td>Frequent: routine work exercises the cause</td></tr><tr><td>6</td><td>Occasional: a foreseeable slip or condition, weakly guarded</td></tr><tr><td>4</td><td>Infrequent: needs an unusual combination</td></tr><tr><td>2</td><td>Remote: guarded by design</td></tr><tr><td>1</td><td>Eliminated by design</td></tr></tbody></table></div><div><p class="fm-sub">Detection</p><table class="fm-rubric"><tbody><tr><td>10</td><td>No control could detect it</td></tr><tr><td>9</td><td>Detected only through customer impact</td></tr><tr><td>8</td><td>Detected after impact by internal monitoring</td></tr><tr><td>6</td><td>Detected at onset, not prevented</td></tr><tr><td>4</td><td>Detected before impact with time to act</td></tr><tr><td>2</td><td>Automated interlock almost certainly stops it</td></tr><tr><td>1</td><td>Certain to be stopped</td></tr></tbody></table></div></div></div></details>
+
 
         <h2>Correction of errors (COE)</h2>
         <ul class="tight"><li>Redesign the AGGREGATES-OUT export policy so advertisement of site-local prefixes no longer depends on implicit term order relative to REJECT-THE-REST (eliminate the reorder-inverts-behavior failure mode). <span class="coe-meta">Cloudflare Network Engineering · Committed (post-mortem &#x27;Architecture&#x27; item)</span></li><li>Update change procedures and automation to include MCP-specific test and deploy procedures so MCP-tier consequences are validated before broad rollout. <span class="coe-meta">Cloudflare Network Engineering / Change Management · Committed (post-mortem &#x27;Process&#x27; item)</span></li><li>Automate an improved stagger policy for network-config rollouts that exercises an MCP data center early rather than only in the final step. <span class="coe-meta">Cloudflare Network Automation · Committed (post-mortem &#x27;Automation&#x27; item)</span></li><li>Implement automated &#x27;commit-confirm&#x27; rollback for network configuration changes to bound Time-to-Resolve without requiring engineer access to affected sites. <span class="coe-meta">Cloudflare Network Automation · Committed (post-mortem &#x27;Automation&#x27; item)</span></li><li>Establish single-controller coordination for emergency reversions to prevent engineers overwriting each other&#x27;s reverts. <span class="coe-meta">Cloudflare Incident Response · Inferred remediation (implied by post-mortem; not itemized as a formal commitment)</span></li></ul>
@@ -435,7 +733,7 @@ Recovery was crippled by the outage&#x27;s own mechanism. Having withdrawn the s
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-1a1a084f"></script>
+    <script src="js/rz-version.js?v=20261010-00a1d9e8"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

@@ -52,6 +52,12 @@
     .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
     .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
     .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:2px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    /* A chip carries the operator name, which can be a whole sentence ("Google Cloud
+       (impacted tenant); STT GDC / Tata Communications JV (named as the third-party …").
+       nowrap made that one chip 1120px wide and pushed the GCP Delhi dossier into a
+       1260px page at a 1100px viewport. Short chips are unaffected: normal wrapping
+       only engages when a chip would not fit its row. */
+    .chips .chip { max-width:100%; white-space:normal; overflow-wrap:anywhere; }
     .chip.cyan { color:var(--cyan); border-left:2px solid var(--cyan); }
     .chip.amber { color:var(--amber); border-left:2px solid var(--amber); }
     .chip.green { color:var(--green); border-left:2px solid var(--green); }
@@ -71,6 +77,11 @@
     /* rich incident table (reference-2 style) */
     table.itbl { min-width:1120px; }
     table.itbl td { vertical-align:middle; }
+    /* v1.134.20 — the title and summary columns ellipsise so the table's columns line up,
+       which is the right call for a dense index. But the cut text was reachable only by
+       navigating to the incident: a summary lost 238-298px of its sentence with no way to read
+       it in place. Each carries its full text in a title attribute now, so the truncation is
+       deliberate AND non-lossy — which is the condition the legibility audit checks for. */
     .itr { cursor:pointer; }
     .itr:hover td { background:var(--surface-2); }
     .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
@@ -240,7 +251,6 @@
        derive width = W px from the aspect ratio, so the drawing renders 1:1 at any event count
        and the panel scrolls instead of shrinking. */
     .viz-timeline svg { max-width:none; height:96px; width:auto; }
-
     .viz-radar svg { max-width:320px; margin:0 auto; }
     .vz-num { font-variant-numeric:tabular-nums slashed-zero; }
     .vz-box-t, .vz-box-s, .vz-lbl, .vz-hb-lbl, .vz-tl-t, .vz-pt, .vz-tick { pointer-events:auto; }
@@ -323,7 +333,86 @@
     }
     @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
 </style>
-    
+    <style>
+    /* ── FMEA (v3.12.3) — one hairline panel of rows, like the rest of the dossier.
+       No cards, no stripes: a row is a disclosure, state is a 7px dot. ── */
+    .fm-scope { color:var(--text-body); max-width:70ch; }
+    .fm-meta { flex-wrap:wrap; row-gap:0.25rem; }
+    .fm-viz { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:1.6rem; align-items:start; margin:1.2rem 0; }
+    @media (max-width:820px){ .fm-viz { grid-template-columns:1fr; } }
+    .fm-pb-row, .fm-pb-axis { display:grid; grid-template-columns:3.6rem minmax(0,1fr) 6.6rem; gap:0.6rem; align-items:center; }
+    .fm-pb-row { padding:0.32rem 0; }
+    .fm-pb-id, .fm-pb-val { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.8rem; }
+    .fm-pb-id { color:var(--muted); }
+    .fm-pb-val { color:var(--text-strong); white-space:nowrap; }
+    .fm-pb-track { display:flex; flex-direction:column; gap:3px; }
+    .fm-pb-bar { display:block; height:12px; }
+    .fm-pb-rev { display:block; height:4px; background:var(--text-body); opacity:0.55; }
+    .fm-pb-none { font-style:italic; font-size:0.72rem; color:var(--muted); line-height:1; }
+    .fm-pb-axis { margin-top:0.3rem; border-top:1px solid var(--line); padding-top:0.25rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .fm-pb-ticks { display:flex; justify-content:space-between; }
+    .fm-fig { margin:0; }
+    .fm-fig figcaption { font-size:0.8rem; color:var(--muted); margin-bottom:0.35rem; }
+    .fm-fig svg { width:100%; height:auto; display:block; }
+    .fm-fig-m svg { max-width:340px; }
+    .fm-matrix .fm-c-lo { fill:var(--surface); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-md { fill:color-mix(in srgb, var(--amber) 9%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-hi { fill:color-mix(in srgb, var(--red) 10%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .vz-axis { font-size:10px; fill:var(--muted); font-family:'IBM Plex Sans',sans-serif; }
+    .fm-matrix .fm-pt { stroke:var(--surface); stroke-width:1.5; }
+    .fm-matrix .fm-pt-l { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; fill:var(--text-strong);
+      paint-order:stroke; stroke:var(--surface); stroke-width:3px; stroke-linejoin:round; }
+    .fm-sheet { border:1px solid var(--line); border-radius:4px; margin-top:0.8rem; }
+    .fm-head, .fm-row > summary { display:grid; grid-template-columns:4.2rem minmax(0,1fr) 4.4rem 4.6rem 3.4rem; gap:0.6rem; align-items:baseline; padding:0.6rem 0.9rem; }
+    .fm-head { font-size:0.74rem; color:var(--muted); border-bottom:1px solid var(--line); }
+    .fm-row { border-top:1px solid var(--line); }
+    .fm-row:first-of-type { border-top:0; }
+    .fm-row > summary { cursor:pointer; list-style:none; }
+    .fm-row > summary::-webkit-details-marker { display:none; }
+    .fm-row > summary:hover { background:var(--surface-2); }
+    .fm-row > summary:focus-visible { outline:2px solid var(--cyan); outline-offset:-2px; }
+    .fm-id-cell, .fm-sod, .fm-rpn, .fm-rpn-rev { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.84rem; }
+    .fm-id-cell { color:var(--muted); }
+    .fm-mode { color:var(--text-strong); font-size:0.92rem; line-height:1.4; }
+    .fm-item { display:block; color:var(--muted); font-size:0.8rem; }
+    .fm-sod { color:var(--text-body); }
+    .fm-rpn { color:var(--text-strong); }
+    .fm-rpn-rev { color:var(--muted); }
+    .fm-dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:0.45rem; vertical-align:0.1em; }
+    .fm-body { padding:0.2rem 0.9rem 1rem 5.7rem; }
+    @media (max-width:640px){
+      .fm-head { display:none; }
+      .fm-row > summary { grid-template-columns:3.2rem minmax(0,1fr) auto; }
+      .fm-sod, .fm-rpn-rev { display:none; }
+      .fm-body { padding:0.2rem 0.9rem 1rem; }
+    }
+    .fm-kv { display:grid; grid-template-columns:9.5rem minmax(0,1fr); gap:0.3rem 0.9rem; margin:0.4rem 0 0.8rem; font-size:0.88rem; }
+    .fm-kv dt { color:var(--muted); }
+    .fm-kv dd { margin:0; color:var(--text-body); }
+    @media (max-width:640px){ .fm-kv { grid-template-columns:1fr; } .fm-kv dd { margin-bottom:0.4rem; } }
+    .fm-scores { margin:0 0 0.6rem; border-top:1px solid var(--line); }
+    .fm-sc { display:grid; grid-template-columns:3.2rem minmax(0,1fr); gap:0.6rem; padding:0.45rem 0; border-bottom:1px solid var(--line); font-size:0.86rem; }
+    .fm-sc dt { font-family:'JetBrains Mono',monospace; color:var(--muted); }
+    .fm-sc dt b { color:var(--text-strong); }
+    .fm-sc dd { margin:0; color:var(--text-body); }
+    .fm-sub { font-size:0.8rem; color:var(--muted); margin:0.7rem 0 0.25rem; }
+    .fm-sub b { color:var(--text-strong); }
+    .fm-acts, .fm-ev { margin:0; padding-left:1.1rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-acts li, .fm-ev li { margin:0.25rem 0; }
+    .fm-residual { color:var(--red); }
+    .fm-revline { font-size:0.86rem; color:var(--text-body); margin:0.4rem 0 0; }
+    .fm-ev-src { display:block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .fm-ev-src a { color:var(--cyan); }
+    .fm-ev-txt { display:block; }
+    .fm-method { margin-top:1rem; border:1px solid var(--line); border-radius:4px; }
+    .fm-method > summary { padding:0.6rem 0.9rem; cursor:pointer; font-size:0.9rem; color:var(--text-strong); }
+    .fm-method-body { padding:0 0.9rem 0.9rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-rubrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+    @media (max-width:760px){ .fm-rubrics { grid-template-columns:1fr; } }
+    .fm-rubric { width:100%; border-collapse:collapse; font-size:0.8rem; }
+    .fm-rubric td { padding:0.25rem 0.4rem; border-top:1px solid var(--line); vertical-align:top; }
+    .fm-rubric td:first-child { font-family:'JetBrains Mono',monospace; width:2rem; color:var(--text-strong); }
+</style>
 </head>
 <body class="locked">
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -393,6 +482,243 @@ The MAINTENANCE thread is a documented contributing hypothesis, not a proven cau
 
         <h2>Contributing factors</h2>
         <ul class="tight"><li>No automatic fire-suppression system in ANY of the five SBG buildings (no sprinkler, water mist, or gas inerting) - a deliberate design choice per BEA-RI; the energy rooms had detection only, so the fire could not be attacked at its source. [BEA-RI report, via Wikipedia fr]</li><li>Absence of a readily accessible general site electrical cut-off: isolation required tripping the upstream source substation because client-owned HT posts sat inside the fire zone and could not be operated, delaying safe de-energisation from the ~00h58 cut order to ~02h30. [BEA-RI report]</li><li>MAINTENANCE / MONITORING GAP: the faulted inverter ASI2 had recurring, unexplained by-pass-mode trips and was serviced the very morning of the fire; the lead-acid batteries had NO scrutation/supervision, and OVH could not produce the inverters&#x27; operating parameters at the moment of failure. [BEA-RI report]</li><li>Free-cooling building design - raw-wood floors with intumescent treatment, single-skin aluminium-blade cladding, high air permeability - let fire and smoke climb vertically extremely fast; aspirating detectors sensed smoke on all floors within ~15 minutes. [BEA-RI report, free-cooling airflow confirmed via Wikipedia fr]</li><li>Grossly insufficient fire-water: a single public hydrant delivering under 60 m3/h, with no owned water reserve and no pumping means from the Rhine canal, forcing reliance on the fireboat EUROPA. [BEA-RI report]</li><li>Diesel generators slaved to supply continuity auto-started despite the fire and had to be manually neutralized to keep them from restarting on the cut, prolonging the live-electrical condition. [BEA-RI report]</li><li>Degraded passive protection: fire-stop doors were held open during evacuation, and the battery charge rooms did not meet the 2-hour fire resistance required under the 29/05/2000 arrete (rubric 2925). [BEA-RI report]</li><li>UPS and its associated batteries were located in DIFFERENT rooms, and two near-simultaneous departures occurred across both spaces, complicating any single-point containment. [BEA-RI report]</li><li>Customer-side resilience gap: many customers had no off-site/geo-redundant backup, so the SBG2 total loss destroyed both primary data and the only copies for those customers. [Wikipedia en]</li></ul>
+        <h2 id="fmea">Failure mode &amp; effects analysis (FMEA)</h2>
+        <p class="fm-scope">The SBG campus fire chain at OVHcloud Strasbourg: the UPS (ASI2) and lead-acid battery energy rooms where the fire started, their monitoring and maintenance, fire detection and the absent automatic suppression, the free-cooling building envelope and compartmentation, electrical isolation of the site, fire-water supply, the second battery-room fire in SBG1, and customer data placement. Analysed retrospectively from the BEA-RI technical investigation (accessed via secondary relays this pass; its granular times and figures are not corroborated by a second source) and the press record in this dossier. BEA-RI established where the fire started but not why: the ignition mechanism is undetermined and was deferred to judicial expertise. Only one corrective action (automatic suppression across the SBG estate) is recorded as an OVHcloud commitment, and its completion is not independently verified; the other actions are BEA-RI recommendations with unverified status, so those modes are shown as residual risk.</p>
+        <p class="metabar fm-meta"><span><b>8</b> failure modes</span><span class="sep">/</span><span><b>6</b> high priority</span><span class="sep">/</span><span><b>1 of 8</b> with a published action</span><span class="sep">/</span><span>total RPN <b>2400 → 2180</b> (−9%)</span></p>
+        <div class="fm-viz">
+            <figure class="fm-fig"><figcaption>Risk priority number (S × O × D), worst first — thin bar: after the published action</figcaption><div class="fm-pb" role="list" aria-label="Risk priority number per failure mode, before and after corrective action"><div class="fm-pb-row" role="listitem" title="FM-04 The building stays live for well over an hour after the cut order"><span class="fm-pb-id">FM-04</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:86.4%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">432</span></div><div class="fm-pb-row" role="listitem" title="FM-06 Primary data and its only backups sit in the same building"><span class="fm-pb-id">FM-06</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:86.4%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">432</span></div><div class="fm-pb-row" role="listitem" title="FM-05 Water supply is far below what a building-scale fire needs"><span class="fm-pb-id">FM-05</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:76.8%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">384</span></div><div class="fm-pb-row" role="listitem" title="FM-01 Near-simultaneous electrical faults on inverter ASI2 and on the lead-acid batteries, in two separate rooms, ignite a fire"><span class="fm-pb-id">FM-01</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:70.0%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">350</span></div><div class="fm-pb-row" role="listitem" title="FM-02 No automatic suppression exists, so a detected fire cannot be fought until the building is de-energised and the fire service commits water"><span class="fm-pb-id">FM-02</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:60.0%;background:var(--red)"></i><i class="fm-pb-rev" style="width:16.0%"></i></span><span class="fm-pb-val">300 → 80</span></div><div class="fm-pb-row" role="listitem" title="FM-03 The free-cooling envelope lets fire and smoke climb vertically at high speed, and passive barriers are degraded"><span class="fm-pb-id">FM-03</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:54.0%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">270</span></div><div class="fm-pb-row" role="listitem" title="FM-07 A second fire breaks out in a battery room of SBG1"><span class="fm-pb-id">FM-07</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:38.4%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">192</span></div><div class="fm-pb-row" role="listitem" title="FM-08 Staff exposed to smoke, fire or live electrical equipment"><span class="fm-pb-id">FM-08</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:8.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">40</span></div><div class="fm-pb-axis" aria-hidden="true"><span></span><span class="fm-pb-ticks"><span>0</span><span>250</span><span>500</span></span><span></span></div></div></figure>
+            <figure class="fm-fig fm-fig-m"><figcaption>Criticality: severity × occurrence</figcaption><svg class="fm-matrix" viewBox="0 0 360 330" role="img" aria-label="Criticality matrix, severity against occurrence"><rect class="fm-c-lo" x="44" y="266" width="28" height="28"/><rect class="fm-c-lo" x="72" y="266" width="28" height="28"/><rect class="fm-c-lo" x="100" y="266" width="28" height="28"/><rect class="fm-c-lo" x="128" y="266" width="28" height="28"/><rect class="fm-c-lo" x="156" y="266" width="28" height="28"/><rect class="fm-c-lo" x="184" y="266" width="28" height="28"/><rect class="fm-c-lo" x="212" y="266" width="28" height="28"/><rect class="fm-c-lo" x="240" y="266" width="28" height="28"/><rect class="fm-c-lo" x="268" y="266" width="28" height="28"/><rect class="fm-c-lo" x="296" y="266" width="28" height="28"/><rect class="fm-c-lo" x="44" y="238" width="28" height="28"/><rect class="fm-c-lo" x="72" y="238" width="28" height="28"/><rect class="fm-c-lo" x="100" y="238" width="28" height="28"/><rect class="fm-c-lo" x="128" y="238" width="28" height="28"/><rect class="fm-c-lo" x="156" y="238" width="28" height="28"/><rect class="fm-c-lo" x="184" y="238" width="28" height="28"/><rect class="fm-c-lo" x="212" y="238" width="28" height="28"/><rect class="fm-c-lo" x="240" y="238" width="28" height="28"/><rect class="fm-c-md" x="268" y="238" width="28" height="28"/><rect class="fm-c-md" x="296" y="238" width="28" height="28"/><rect class="fm-c-lo" x="44" y="210" width="28" height="28"/><rect class="fm-c-lo" x="72" y="210" width="28" height="28"/><rect class="fm-c-lo" x="100" y="210" width="28" height="28"/><rect class="fm-c-lo" x="128" y="210" width="28" height="28"/><rect class="fm-c-lo" x="156" y="210" width="28" height="28"/><rect class="fm-c-md" x="184" y="210" width="28" height="28"/><rect class="fm-c-md" x="212" y="210" width="28" height="28"/><rect class="fm-c-md" x="240" y="210" width="28" height="28"/><rect class="fm-c-md" x="268" y="210" width="28" height="28"/><rect class="fm-c-md" x="296" y="210" width="28" height="28"/><rect class="fm-c-lo" x="44" y="182" width="28" height="28"/><rect class="fm-c-lo" x="72" y="182" width="28" height="28"/><rect class="fm-c-lo" x="100" y="182" width="28" height="28"/><rect class="fm-c-lo" x="128" y="182" width="28" height="28"/><rect class="fm-c-md" x="156" y="182" width="28" height="28"/><rect class="fm-c-md" x="184" y="182" width="28" height="28"/><rect class="fm-c-md" x="212" y="182" width="28" height="28"/><rect class="fm-c-md" x="240" y="182" width="28" height="28"/><rect class="fm-c-md" x="268" y="182" width="28" height="28"/><rect class="fm-c-hi" x="296" y="182" width="28" height="28"/><rect class="fm-c-lo" x="44" y="154" width="28" height="28"/><rect class="fm-c-lo" x="72" y="154" width="28" height="28"/><rect class="fm-c-lo" x="100" y="154" width="28" height="28"/><rect class="fm-c-md" x="128" y="154" width="28" height="28"/><rect class="fm-c-md" x="156" y="154" width="28" height="28"/><rect class="fm-c-md" x="184" y="154" width="28" height="28"/><rect class="fm-c-md" x="212" y="154" width="28" height="28"/><rect class="fm-c-hi" x="240" y="154" width="28" height="28"/><rect class="fm-c-hi" x="268" y="154" width="28" height="28"/><rect class="fm-c-hi" x="296" y="154" width="28" height="28"/><rect class="fm-c-lo" x="44" y="126" width="28" height="28"/><rect class="fm-c-lo" x="72" y="126" width="28" height="28"/><rect class="fm-c-md" x="100" y="126" width="28" height="28"/><rect class="fm-c-md" x="128" y="126" width="28" height="28"/><rect class="fm-c-md" x="156" y="126" width="28" height="28"/><rect class="fm-c-md" x="184" y="126" width="28" height="28"/><rect class="fm-c-hi" x="212" y="126" width="28" height="28"/><rect class="fm-c-hi" x="240" y="126" width="28" height="28"/><rect class="fm-c-hi" x="268" y="126" width="28" height="28"/><rect class="fm-c-hi" x="296" y="126" width="28" height="28"/><rect class="fm-c-lo" x="44" y="98" width="28" height="28"/><rect class="fm-c-lo" x="72" y="98" width="28" height="28"/><rect class="fm-c-md" x="100" y="98" width="28" height="28"/><rect class="fm-c-md" x="128" y="98" width="28" height="28"/><rect class="fm-c-md" x="156" y="98" width="28" height="28"/><rect class="fm-c-hi" x="184" y="98" width="28" height="28"/><rect class="fm-c-hi" x="212" y="98" width="28" height="28"/><rect class="fm-c-hi" x="240" y="98" width="28" height="28"/><rect class="fm-c-hi" x="268" y="98" width="28" height="28"/><rect class="fm-c-hi" x="296" y="98" width="28" height="28"/><rect class="fm-c-lo" x="44" y="70" width="28" height="28"/><rect class="fm-c-lo" x="72" y="70" width="28" height="28"/><rect class="fm-c-md" x="100" y="70" width="28" height="28"/><rect class="fm-c-md" x="128" y="70" width="28" height="28"/><rect class="fm-c-hi" x="156" y="70" width="28" height="28"/><rect class="fm-c-hi" x="184" y="70" width="28" height="28"/><rect class="fm-c-hi" x="212" y="70" width="28" height="28"/><rect class="fm-c-hi" x="240" y="70" width="28" height="28"/><rect class="fm-c-hi" x="268" y="70" width="28" height="28"/><rect class="fm-c-hi" x="296" y="70" width="28" height="28"/><rect class="fm-c-hi" x="44" y="42" width="28" height="28"/><rect class="fm-c-hi" x="72" y="42" width="28" height="28"/><rect class="fm-c-hi" x="100" y="42" width="28" height="28"/><rect class="fm-c-hi" x="128" y="42" width="28" height="28"/><rect class="fm-c-hi" x="156" y="42" width="28" height="28"/><rect class="fm-c-hi" x="184" y="42" width="28" height="28"/><rect class="fm-c-hi" x="212" y="42" width="28" height="28"/><rect class="fm-c-hi" x="240" y="42" width="28" height="28"/><rect class="fm-c-hi" x="268" y="42" width="28" height="28"/><rect class="fm-c-hi" x="296" y="42" width="28" height="28"/><rect class="fm-c-hi" x="44" y="14" width="28" height="28"/><rect class="fm-c-hi" x="72" y="14" width="28" height="28"/><rect class="fm-c-hi" x="100" y="14" width="28" height="28"/><rect class="fm-c-hi" x="128" y="14" width="28" height="28"/><rect class="fm-c-hi" x="156" y="14" width="28" height="28"/><rect class="fm-c-hi" x="184" y="14" width="28" height="28"/><rect class="fm-c-hi" x="212" y="14" width="28" height="28"/><rect class="fm-c-hi" x="240" y="14" width="28" height="28"/><rect class="fm-c-hi" x="268" y="14" width="28" height="28"/><rect class="fm-c-hi" x="296" y="14" width="28" height="28"/><text class="vz-tick" x="58.0" y="308" text-anchor="middle">1</text><text class="vz-tick" x="36" y="284.0" text-anchor="end">1</text><text class="vz-tick" x="86.0" y="308" text-anchor="middle">2</text><text class="vz-tick" x="36" y="256.0" text-anchor="end">2</text><text class="vz-tick" x="114.0" y="308" text-anchor="middle">3</text><text class="vz-tick" x="36" y="228.0" text-anchor="end">3</text><text class="vz-tick" x="142.0" y="308" text-anchor="middle">4</text><text class="vz-tick" x="36" y="200.0" text-anchor="end">4</text><text class="vz-tick" x="170.0" y="308" text-anchor="middle">5</text><text class="vz-tick" x="36" y="172.0" text-anchor="end">5</text><text class="vz-tick" x="198.0" y="308" text-anchor="middle">6</text><text class="vz-tick" x="36" y="144.0" text-anchor="end">6</text><text class="vz-tick" x="226.0" y="308" text-anchor="middle">7</text><text class="vz-tick" x="36" y="116.0" text-anchor="end">7</text><text class="vz-tick" x="254.0" y="308" text-anchor="middle">8</text><text class="vz-tick" x="36" y="88.0" text-anchor="end">8</text><text class="vz-tick" x="282.0" y="308" text-anchor="middle">9</text><text class="vz-tick" x="36" y="60.0" text-anchor="end">9</text><text class="vz-tick" x="310.0" y="308" text-anchor="middle">10</text><text class="vz-tick" x="36" y="32.0" text-anchor="end">10</text><text class="vz-axis" x="184" y="328" text-anchor="middle">Occurrence →</text><text class="vz-axis" transform="translate(11 154) rotate(-90)" text-anchor="middle">Severity →</text><circle class="fm-pt" cx="86.0" cy="28.0" r="6" fill="var(--amber)"><title>FM-08 Staff exposed to smoke, fire or live electrical equipment (S10 O2 D2)</title></circle><text class="fm-pt-l" x="86.0" y="18.0" text-anchor="middle">08</text><circle class="fm-pt" cx="170.0" cy="28.0" r="6" fill="var(--red)"><title>FM-01 Near-simultaneous electrical faults on inverter ASI2 and on the lead-acid batteries, in two separate rooms, ignite a fire (S10 O5 D7); FM-02 No automatic suppression exists, so a detected fire cannot be fought until the building is de-energised and the fire service commits water (S10 O5 D6)</title></circle><text class="fm-pt-l" x="170.0" y="18.0" text-anchor="middle">01, 02</text><circle class="fm-pt" cx="170.0" cy="56.0" r="6" fill="var(--red)"><title>FM-03 The free-cooling envelope lets fire and smoke climb vertically at high speed, and passive barriers are degraded (S9 O5 D6)</title></circle><text class="fm-pt-l" x="170.0" y="46.0" text-anchor="middle">03</text><circle class="fm-pt" cx="198.0" cy="56.0" r="6" fill="var(--red)"><title>FM-04 The building stays live for well over an hour after the cut order (S9 O6 D8)</title></circle><text class="fm-pt-l" x="198.0" y="46.0" text-anchor="middle">04</text><circle class="fm-pt" cx="198.0" cy="84.0" r="6" fill="var(--red)"><title>FM-05 Water supply is far below what a building-scale fire needs (S8 O6 D8); FM-06 Primary data and its only backups sit in the same building (S8 O6 D9)</title></circle><text class="fm-pt-l" x="198.0" y="74.0" text-anchor="middle">05, 06</text><circle class="fm-pt" cx="142.0" cy="140.0" r="6" fill="var(--amber)"><title>FM-07 A second fire breaks out in a battery room of SBG1 (S6 O4 D8)</title></circle><text class="fm-pt-l" x="142.0" y="130.0" text-anchor="middle">07</text></svg></figure>
+        </div>
+        <div class="fm-sheet">
+            <div class="fm-head" aria-hidden="true"><span>ID</span><span>Failure mode</span><span>S·O·D</span><span>RPN</span><span>After</span></div>
+            <details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-04</span>
+    <span class="fm-mode">The building stays live for well over an hour after the cut order<span class="fm-item">Site electrical isolation (general cut-off, HT posts, generator logic, battery residual supply)</span></span>
+    <span class="fm-sod" aria-label="Severity 9, occurrence 6, detection 8">9·6·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>432</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>De-energise the burning building within minutes so firefighters can apply water safely</dd>
+      <dt>Effect</dt><dd>Cut ordered ~00h58; the upstream substation cut is effective ~01h50; current is still present at 02h14; massive water attack starts only ~02h30, after flashover at ~02h00; the site is fully dead only at 03h28</dd>
+      <dt>Cause</dt><dd>No accessible general site cut-off; client HT posts inside the fire zone could not be operated; diesel generators slaved to supply continuity auto-started and had to be neutralised by hand; charged lead-acid batteries supplied about 20 minutes of residual power</dd>
+      <dt>Prevention in place</dt><dd>None recorded for fast whole-site isolation</dd>
+      <dt>Detection in place</dt><dd>Firefighters observed electrical arcing in the energy room on arrival at 00h59; the delay was found during the incident</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>9</b></dt><dd>The dossier calls de-energisation the true bottleneck: it set the moment water could be committed, which came after flashover. Scored 9, not 10, because the facility loss is already carried at 10 upstream.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>The missing cut-off and the generator logic are standing conditions that any emergency isolation exercises, weakly guarded: &#x27;occasional&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>Nothing recorded tested emergency isolation beforehand; the obstacles surfaced as responders tried to make the site safe: &#x27;detected after impact&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 432</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Provide an accessible general electrical cut-off and separate UPS from associated batteries into fire-rated rooms (BEA-RI recommendation; implementation unverified) <span class="fm-ev-src">Correction of errors #2</span></li><li>Install an easily accessible general site cut-off and drill electrical-securing procedures <span class="fm-ev-src">Improvement #2</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #2</span><span class="fm-ev-txt">Absence of a readily accessible general site electrical cut-off: isolation required tripping the upstream source substation because client-owned HT posts sat inside the fire zone and could not be operated, delaying safe de-energisation from the ~00h58 cut order to ~02h30. [BEA-RI report]</span></li><li><span class="fm-ev-src">Contributing factor #6</span><span class="fm-ev-txt">Diesel generators slaved to supply continuity auto-started despite the fire and had to be manually neutralized to keep them from restarting on the cut, prolonging the live-electrical condition. [BEA-RI report]</span></li><li><span class="fm-ev-src"><a href="https://BEA-RI report" target="_blank" rel="noopener nofollow">Sequence of events #7</a></span><span class="fm-ev-txt">~00h58 — Order given to cut electrical supply to the whole site - but no accessible general cut-off exists to execute it quickly.</span></li><li><span class="fm-ev-src"><a href="https://BEA-RI report" target="_blank" rel="noopener nofollow">Sequence of events #13</a></span><span class="fm-ev-txt">~01h50 — SER cuts remotely at the upstream source substation (client HT posts inside the fire zone could not be operated) - remote cut becomes effective.</span></li><li><span class="fm-ev-src"><a href="https://BEA-RI report" target="_blank" rel="noopener nofollow">Sequence of events #15</a></span><span class="fm-ev-txt">02h14 — Current is STILL present in the fully-ablaze building 2 - residual lead-acid battery supply (~20 min) and auto-started diesel generators keep it live.</span></li><li><span class="fm-ev-src"><a href="https://BEA-RI report" target="_blank" rel="noopener nofollow">Metric #2</a></span><span class="fm-ev-txt">Detection-to-safe-de-energisation gap: first alarm 00h35 -&gt; site electrically secured ~02h30 (~1h55); full site dead only at 03h28</span></li><li><span class="fm-ev-src">Technical deep-dive</span><span class="fm-ev-txt">“at 02h14 there was STILL current in the fully-ablaze building 2”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-06</span>
+    <span class="fm-mode">Primary data and its only backups sit in the same building<span class="fm-item">Customer data placement and backups</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 6, detection 9">8·6·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>432</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Keep a recoverable copy of customer data outside the failed facility</dd>
+      <dt>Effect</dt><dd>All customer data and backups stored in SBG2 are lost; about 3.6 million websites and 464,000 domains stop responding; customers who relied solely on SBG2 lose data outright, and court awards were later cut on appeal under contractual liability caps</dd>
+      <dt>Cause</dt><dd>Many customers had no off-site or geo-redundant backup</dd>
+      <dt>Prevention in place</dt><dd>None recorded as a default</dd>
+      <dt>Detection in place</dt><dd>Customer impact</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>Permanent data loss for the affected customers is a full outage with no recovery for them; scored 8 so the facility loss carried in FM-01 to FM-04 is not counted again at 10.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>Single-site backup is a common, weakly guarded customer choice: &#x27;occasional&#x27;. The dossier records OVHcloud expanding backup offerings per its public messaging, not verified and with uptake unknown, so no reduction is claimed.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>The gap was found only when the building burned: &#x27;detected only through customer impact&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 432</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Advise and enable customers on geo-redundant backups (default off-site backup offering); expansion stated in public messaging, not verified <span class="fm-ev-src">Correction of errors #6</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #9</span><span class="fm-ev-txt">Customer-side resilience gap: many customers had no off-site/geo-redundant backup, so the SBG2 total loss destroyed both primary data and the only copies for those customers. [Wikipedia en]</span></li><li><span class="fm-ev-src"><a href="https://Wikipedia en (total loss); Netcraft via Wikipedia fr (3.6M/464k)" target="_blank" rel="noopener nofollow">Sequence of events #22</a></span><span class="fm-ev-txt">10 Mar, morning — SBG2 declared a total loss; all customer data and backups stored in SBG2 lost. Netcraft measured ~3.6 million websites / 464,000 domains ceasing to respond that morning.</span></li><li><span class="fm-ev-src"><a href="https://Netcraft, via Wikipedia fr" target="_blank" rel="noopener nofollow">Metric #8</a></span><span class="fm-ev-txt">Customer impact: ~3.6 million websites and 464,000 domain names ceased responding on 10 Mar</span></li><li><span class="fm-ev-src"><a href="https://Wikipedia en/fr" target="_blank" rel="noopener nofollow">Sequence of events #24</a></span><span class="fm-ev-txt">2023-2026 — First-instance courts awarded ~EUR100k (Bati Courtage, Lille 26 Jan 2023) and ~EUR145k (Bluepad, 9 Mar 2023) - together ~EUR250k to two customers; both were drastically cut on appeal (2025-2026) under OVH&#x27;s contractual liability caps (six months&#x27; fees). 130+ customers pursue a class action.</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-05</span>
+    <span class="fm-mode">Water supply is far below what a building-scale fire needs<span class="fm-item">On-site fire-water supply</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 6, detection 8">8·6·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>384</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Deliver enough water for a widespread-fire scenario once the site is safe</dd>
+      <dt>Effect</dt><dd>Fire service works with one or two lances; the fireboat EUROPA is requested ~01h49 and arrives ~02h57, after which it is described as decisive in sparing SBG1 and SBG3</dd>
+      <dt>Cause</dt><dd>A single public hydrant delivering under 60 m3/h, no owned water reserve and no pumping means from the Rhine canal</dd>
+      <dt>Prevention in place</dt><dd>None recorded beyond the public network</dd>
+      <dt>Detection in place</dt><dd>Found during the incident when on-site means proved insufficient</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>It limited the attack on a fire that was already destroying SBG2 and spreading; its own contribution is the extent of damage to neighbouring buildings, so it is scored below the modes that carry the facility loss.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>A standing under-provision exercised by any large fire, weakly guarded: &#x27;occasional&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>The shortfall was recognised only once firefighters needed the water: &#x27;detected after impact&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 384</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Provision owned fire-water reserves or canal pumping sized to the site (BEA-RI recommendation; status unverified) <span class="fm-ev-src">Correction of errors #4</span></li><li>Provide on-site extinguishing-water reserves or canal-pumping capability for a widespread-fire scenario <span class="fm-ev-src">Improvement #3</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #5</span><span class="fm-ev-txt">Grossly insufficient fire-water: a single public hydrant delivering under 60 m3/h, with no owned water reserve and no pumping means from the Rhine canal, forcing reliance on the fireboat EUROPA. [BEA-RI report]</span></li><li><span class="fm-ev-src"><a href="https://BEA-RI report" target="_blank" rel="noopener nofollow">Metric #3</a></span><span class="fm-ev-txt">On-site fire-water supply: single public hydrant, &lt;60 m3/h; no owned reserve, no canal pumping</span></li><li><span class="fm-ev-src"><a href="https://BEA-RI report" target="_blank" rel="noopener nofollow">Sequence of events #12</a></span><span class="fm-ev-txt">~01h49 — Fireboat EUROPA requested because on-site water means are insufficient (single hydrant &lt;60 m3/h).</span></li><li><span class="fm-ev-src"><a href="https://BEA-RI report" target="_blank" rel="noopener nofollow">Sequence of events #17</a></span><span class="fm-ev-txt">~02h57 — Fireboat EUROPA arrives, adding 3 pumps at 15,000 L/min and 2 foam/water lances at 4,500 L/min each - described as decisive in sparing SBG1/SBG3.</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-01</span>
+    <span class="fm-mode">Near-simultaneous electrical faults on inverter ASI2 and on the lead-acid batteries, in two separate rooms, ignite a fire<span class="fm-item">UPS ASI2 and lead-acid battery bank (ground-floor energy rooms)</span></span>
+    <span class="fm-sod" aria-label="Severity 10, occurrence 5, detection 7">10·5·7</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>350</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Carry the IT load through supply disturbances without itself becoming a source of fault</dd>
+      <dt>Effect</dt><dd>Fire starts in the energy rooms at 00h35 and, through the defences that failed below, ends in the total loss of SBG2, partial loss of SBG1 and about 3.6 million websites offline</dd>
+      <dt>Cause</dt><dd>Undetermined. BEA-RI lists candidate mechanisms for ASI2 (liquid or humidity from the nearby cooling system, the same-morning maintenance intervention, operation outside normal ranges) without concluding; the battery fault cause is also not established</dd>
+      <dt>Prevention in place</dt><dd>Maintenance of ASI2 in the days before and on the morning of the fire, prompted by recurring unexplained by-pass trips; return-to-service reports noted nothing singular</dd>
+      <dt>Detection in place</dt><dd>Ambient humidity and temperature sensors behind the inverters logged anomalies from about 23h15, but no action on them is recorded; the batteries had no supervision; the fault itself was detected as a fire alarm at 00h35</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>10</b></dt><dd>This is the initiating event of the loss of an entire facility plus damage to a neighbouring building: the rubric&#x27;s 10. No one was hurt, but the facility-loss criterion alone reaches 10.</dd></div>
+      <div class="fm-sc"><dt>O <b>5</b></dt><dd>Between &#x27;infrequent&#x27; and &#x27;occasional&#x27;: ASI2 had recurring unexplained by-pass trips, a weakly guarded condition, but BEA-RI notes internal short-circuits are rare on lead-acid chemistry and the mechanism is undetermined, so it is held at 5.</dd></div>
+      <div class="fm-sc"><dt>D <b>7</b></dt><dd>Between &#x27;detected at onset&#x27; (6) and &#x27;after impact&#x27; (8): precursor humidity and temperature readings existed, but with no battery supervision and no retained inverter operating parameters nothing turned them into a warning before the fire alarm.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 350</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Add UPS and battery supervision and operating-parameter logging; find the cause of recurring by-pass trips before returning an inverter to service (BEA-RI lesson; status unverified) <span class="fm-ev-src">Correction of errors #3</span></li><li>Deploy battery monitoring with manufacturer-based preventive-maintenance and replacement rules <span class="fm-ev-src">Improvement #5</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“The PRECISE failure mechanism was NOT established by BEA-RI”</span></li><li><span class="fm-ev-src"><a href="https://BEA-RI report" target="_blank" rel="noopener nofollow">Sequence of events #1</a></span><span class="fm-ev-txt">~23h15 (09 Mar) — Ambient sensors on the rear of the SBG2 inverters log an anomalous humidity spike - later cited as supporting the liquid/humidity short-circuit hypothesis for ASI2.</span></li><li><span class="fm-ev-src"><a href="https://BEA-RI report" target="_blank" rel="noopener nofollow">Sequence of events #3</a></span><span class="fm-ev-txt">00h35 — Near-simultaneous electrical faults strike the lead-acid batteries AND inverter ASI2 in two separate ground-floor energy rooms; first fire alarm reaches the site security PC. Optical and aspirating detectors &#x27;ont parfaitement joue leur role&#x27;.</span></li><li><span class="fm-ev-src">Contributing factor #3</span><span class="fm-ev-txt">MAINTENANCE / MONITORING GAP: the faulted inverter ASI2 had recurring, unexplained by-pass-mode trips and was serviced the very morning of the fire; the lead-acid batteries had NO scrutation/supervision, and OVH could not produce the inverters&#x27; operating parameters at the moment of failure. [BEA-RI report]</span></li><li><span class="fm-ev-src">Contributing factor #8</span><span class="fm-ev-txt">UPS and its associated batteries were located in DIFFERENT rooms, and two near-simultaneous departures occurred across both spaces, complicating any single-point containment. [BEA-RI report]</span></li><li><span class="fm-ev-src"><a href="https://www.igedd.developpement-durable.gouv.fr/IMG/pdf/rapport_ovh_67_vdif_cle01cf13.pdf" target="_blank" rel="noopener nofollow">Reference #2 · official-postmortem</a></span><span class="fm-ev-txt">“L&#x27;incendie a pris naissance au sein des locaux qui abritent les batteries et les ASI”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-02</span>
+    <span class="fm-mode">No automatic suppression exists, so a detected fire cannot be fought until the building is de-energised and the fire service commits water<span class="fm-item">Fire protection in energy rooms and data halls</span></span>
+    <span class="fm-sod" aria-label="Severity 10, occurrence 5, detection 6">10·5·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>300</span>
+    <span class="fm-rpn-rev">80</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Attack a fire at its source before it leaves the room of origin</dd>
+      <dt>Effect</dt><dd>Detection works and the building is evacuated by 00h39, but nothing acts on the fire; the first floor is fully involved within an hour and SBG2 reaches generalised flashover around 02h00</dd>
+      <dt>Cause</dt><dd>A deliberate design choice to fit no automatic fire-suppression system (sprinkler, water mist or gas) in any of the five SBG buildings</dd>
+      <dt>Prevention in place</dt><dd>Optical point and aspirating smoke detection, manual call points, hand extinguishers</dd>
+      <dt>Detection in place</dt><dd>Optical and aspirating detectors alarmed at 00h35 and traced smoke to all floors within about 15 minutes</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>10</b></dt><dd>The dossier&#x27;s own analysis names the suppression void as the decisive finding between an energy-room fire and the loss of the facility: the rubric&#x27;s 10.</dd></div>
+      <div class="fm-sc"><dt>O <b>5</b></dt><dd>The absence is a standing design condition, but it only produces this failure when an ignition occurs, which is infrequent; scored 5, between &#x27;infrequent&#x27; and &#x27;occasional&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>Detection performed at onset, as BEA-RI credits, but detection without suppression only enabled evacuation: &#x27;detected at onset, not prevented&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 300</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Fit automatic fire suppression to all energy and battery rooms and data halls across the SBG estate and rebuild <span class="fm-ev-src">Correction of errors #1</span></li><li>Rebuild energy rooms and buildings with automatic fire suppression and proper fire-behaviour construction <span class="fm-ev-src">Improvement #1</span></li></ul>
+    <p class="fm-revline">After action: S10 · O2 · D4 → RPN 80. Automatic suppression in the energy rooms would act on a fire without waiting for de-energisation, so an unsuppressed fire becomes guarded by design (O 5→2) and the response starts before spread (D 6→4). Severity is unchanged: if suppression failed, the outcome would be the same. OVHcloud&#x27;s commitment is recorded from public statements with independent completion not verified, so the reduction is a claim about the action, not a confirmed outcome.</p>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #1</span><span class="fm-ev-txt">No automatic fire-suppression system in ANY of the five SBG buildings (no sprinkler, water mist, or gas inerting) - a deliberate design choice per BEA-RI; the energy rooms had detection only, so the fire could not be attacked at its source. [BEA-RI report, via Wikipedia fr]</span></li><li><span class="fm-ev-src"><a href="https://www.datacenterdynamics.com/en/analysis/ovhcloud-fire-france-data-center/" target="_blank" rel="noopener nofollow">Reference #7 · news</a></span><span class="fm-ev-txt">“OVH has chosen not to equip any of the five buildings in its Strasbourg data center with an automatic fire protection system.”</span></li><li><span class="fm-ev-src"><a href="https://BEA-RI report" target="_blank" rel="noopener nofollow">Sequence of events #3</a></span><span class="fm-ev-txt">“ont parfaitement joue leur role”</span></li><li><span class="fm-ev-src"><a href="https://BEA-RI report" target="_blank" rel="noopener nofollow">Sequence of events #14</a></span><span class="fm-ev-txt">~02h00 — Generalized flashover of SBG2; upper-floor temperature sensors saturate.</span></li><li><span class="fm-ev-src"><a href="https://www.bea-ri.developpement-durable.gouv.fr/incendie-d-un-centre-de-donnees-le-10-mars-2021-a-a115.html" target="_blank" rel="noopener nofollow">Reference #1 · regulatory</a></span><span class="fm-ev-txt">“il n&#x27;y avait pas de systeme d&#x27;extinction automatise sur SBG2”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-03</span>
+    <span class="fm-mode">The free-cooling envelope lets fire and smoke climb vertically at high speed, and passive barriers are degraded<span class="fm-item">SBG2 building envelope and compartmentation</span></span>
+    <span class="fm-sod" aria-label="Severity 9, occurrence 5, detection 6">9·5·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>270</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Hold a fire and its smoke inside the compartment of origin and away from neighbouring buildings</dd>
+      <dt>Effect</dt><dd>Smoke reaches all floors in about 15 minutes; the whole six-level building is lost; fire spreads to SBG1 (4 of 12 rooms lost) and reaches SBG3, whose 2-hour firewall is weakened by fire-stop doors held open</dd>
+      <dt>Cause</dt><dd>Raw-wood intumescent-treated floors, single-skin aluminium-blade cladding and high air permeability chosen for free-cooling airflow; battery charge rooms not meeting the required 2-hour fire resistance; fire-stop doors held open during evacuation</dd>
+      <dt>Prevention in place</dt><dd>Intumescent treatment of floors; a 2-hour firewall to SBG3</dd>
+      <dt>Detection in place</dt><dd>Aspirating detectors registered smoke on every floor within about 15 minutes, which shows the spread but could not stop it</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>9</b></dt><dd>This mode decides how far beyond the room the fire goes, and it took a whole building plus part of a second. Scored 9 rather than 10 because the facility loss is already carried at 10 by FM-01 and FM-02 and is not counted a third time at full weight.</dd></div>
+      <div class="fm-sc"><dt>O <b>5</b></dt><dd>The envelope is a standing condition present whenever a fire starts, which is infrequent; held at 5 like FM-02.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>The detectors saw the spread as it happened: &#x27;detected at onset, not prevented&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 270</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Rebuild with proper fire-behaviour construction (BEA-RI lesson; no status recorded) <span class="fm-ev-src">Improvement #1</span></li><li>Treat the whole charging workshop as the regulated fire unit and design its compartmentation accordingly (no status recorded) <span class="fm-ev-src">Improvement #4</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #4</span><span class="fm-ev-txt">Free-cooling building design - raw-wood floors with intumescent treatment, single-skin aluminium-blade cladding, high air permeability - let fire and smoke climb vertically extremely fast; aspirating detectors sensed smoke on all floors within ~15 minutes. [BEA-RI report, free-cooling airflow confirmed via Wikipedia fr]</span></li><li><span class="fm-ev-src">Contributing factor #7</span><span class="fm-ev-txt">Degraded passive protection: fire-stop doors were held open during evacuation, and the battery charge rooms did not meet the 2-hour fire resistance required under the 29/05/2000 arrete (rubric 2925). [BEA-RI report]</span></li><li><span class="fm-ev-src"><a href="https://BEA-RI report; SBG1 partial loss confirmed via Wikipedia en" target="_blank" rel="noopener nofollow">Sequence of events #18</a></span><span class="fm-ev-txt">~02h30-03h00 — Fire spreads to SBG1 (container-type build, losing 4 of 12 rooms) and SBG3 (protected by a 2-hour firewall, though fire-stop doors were held open, degrading it).</span></li><li><span class="fm-ev-src"><a href="https://Wikipedia en (SBG2/SBG1); BEA-RI (4 of 12)" target="_blank" rel="noopener nofollow">Metric #7</a></span><span class="fm-ev-txt">Building loss: SBG2 (6-level) total loss; SBG1 partially damaged (4 of 12 rooms per BEA-RI); SBG3/SBG4 intact</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“made the building extremely permeable to air and smoke and let fire climb vertically at high speed”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-07</span>
+    <span class="fm-mode">A second fire breaks out in a battery room of SBG1<span class="fm-item">SBG1 battery room during recovery</span></span>
+    <span class="fm-sod" aria-label="Severity 6, occurrence 4, detection 8">6·4·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>192</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Stay safe while the campus is being recovered</dd>
+      <dt>Effect</dt><dd>A fresh site power-down on 19 March delays recovery</dd>
+      <dt>Cause</dt><dd>Not recorded in the dossier</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Not recorded in the dossier</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>6</b></dt><dd>It delayed restoration on a campus already out of service; no further loss is recorded, so &#x27;partial outage confined to one zone&#x27;.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>A second battery-room fire nine days later is an unusual combination, scored &#x27;infrequent&#x27;; its cause is not in the dossier.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>The dossier records only that the fire occurred and forced a power-down, so no pre-impact detection can be credited: scored 8.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 192</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Run a fleet-wide fire-vulnerability audit of all facilities (BEA-RI lesson; no status recorded) <span class="fm-ev-src">Improvement #6</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Wikipedia fr" target="_blank" rel="noopener nofollow">Sequence of events #23</a></span><span class="fm-ev-txt">19 Mar 2021 — A second fire breaks out in a battery room of SBG1 (&#x27;un nouvel incendie a lieu dans un local a batteries du batiment SBG1&#x27;), forcing a fresh site power-down and delaying recovery.</span></li><li><span class="fm-ev-src"><a href="https://fr.wikipedia.org/wiki/Incendie_du_centre_de_donn%C3%A9es_d%27OVHcloud_%C3%A0_Strasbourg" target="_blank" rel="noopener nofollow">Reference #5 · press</a></span><span class="fm-ev-txt">“un nouvel incendie a lieu dans un local a batteries du batiment SBG1”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-08</span>
+    <span class="fm-mode">Staff exposed to smoke, fire or live electrical equipment<span class="fm-item">Night crew and evacuation</span></span>
+    <span class="fm-sod" aria-label="Severity 10, occurrence 2, detection 2">10·2·2</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>40</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Get every person out of the building before the fire reaches them</dd>
+      <dt>Effect</dt><dd>Did not occur: the night crew was evacuated by 00h39 with zero fatalities and zero injuries</dd>
+      <dt>Cause</dt><dd>An energy-room fire in an occupied building</dd>
+      <dt>Prevention in place</dt><dd>Smoke detection and alarm to the security PC; evacuation procedure</dd>
+      <dt>Detection in place</dt><dd>First alarm at 00h35; guard at the room at 00h37; building evacuated at 00h39</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>10</b></dt><dd>Hazard to people is the rubric&#x27;s 10 by definition, even though no one was hurt here.</dd></div>
+      <div class="fm-sc"><dt>O <b>2</b></dt><dd>Exposure needs the fire to outrun evacuation; with a small crew and fast alarm that is &#x27;remote&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>2</b></dt><dd>Detection reached the security PC at ignition and evacuation took four minutes; the dossier credits detection with exactly this, so close to &#x27;almost certainly stops it&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 40</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li class="fm-residual">No corrective action is recorded in the published sources. This mode is residual risk.</li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://BEA-RI report; casualties confirmed via Wikipedia en/fr" target="_blank" rel="noopener nofollow">Sequence of events #5</a></span><span class="fm-ev-txt">00h39 — SBG2 evacuated; the small night crew is accounted for - zero victims, zero injuries.</span></li><li><span class="fm-ev-src"><a href="https://Wikipedia en/fr (BEA-RI)" target="_blank" rel="noopener nofollow">Metric #6</a></span><span class="fm-ev-txt">Personnel / casualties: night crew evacuated safely; 0 fatalities, 0 injuries</span></li><li><span class="fm-ev-src"><a href="https://BEA-RI report" target="_blank" rel="noopener nofollow">Sequence of events #3</a></span><span class="fm-ev-txt">00h35 — Near-simultaneous electrical faults strike the lead-acid batteries AND inverter ASI2 in two separate ground-floor energy rooms; first fire alarm reaches the site security PC. Optical and aspirating detectors &#x27;ont parfaitement joue leur role&#x27;.</span></li><li><span class="fm-ev-src">Technical deep-dive</span><span class="fm-ev-txt">“Detection is credited ONLY with enabling safe evacuation, never suppression.”</span></li></ul>
+  </div>
+</details>
+        </div>
+        <details class="fm-method"><summary>Scoring rubric and method</summary><div class="fm-method-body"><p>A retrospective FMEA: each row asks how this system could fail, how bad the effect was, how likely the cause was given the controls in place at the time, and how likely those controls were to catch it before customers did. Scales are adapted for data-centre operations from the 1–10 scales of IEC 60812:2018 and the AIAG-VDA FMEA handbook. RPN = S × O × D. Priority is High when S ≥ 9 with O ≥ 4 or D ≥ 7, or when RPN ≥ 300; Medium when RPN ≥ 120 or S ≥ 7; Low otherwise. Severity overrides the product because a large S multiplied by small O and D can hide a region-wide outage nothing would catch.</p><p>Every row cites evidence from this dossier, and every quote is checked verbatim against its source by <code>tools/test-incidents-fmea.py</code>. A revised score is only shown against a published corrective action. This is an RZ analyst assessment, not an operator document.</p><div class="fm-rubrics"><div><p class="fm-sub">Severity</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Hazard to people, or loss of the facility / several regions</td></tr><tr><td>9</td><td>Region-wide or provider-wide outage of a foundational service, no workaround</td></tr><tr><td>8</td><td>Full outage of a major service for hours</td></tr><tr><td>7</td><td>Major degradation of a major service</td></tr><tr><td>6</td><td>Partial outage confined to one zone or one service</td></tr><tr><td>5</td><td>Customer-visible degradation</td></tr><tr><td>4</td><td>Limited customer impact</td></tr><tr><td>3</td><td>Internal impact only</td></tr><tr><td>2</td><td>Negligible</td></tr><tr><td>1</td><td>No effect</td></tr></tbody></table></div><div><p class="fm-sub">Occurrence</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Near certain: the cause is present in normal operation</td></tr><tr><td>8</td><td>Frequent: routine work exercises the cause</td></tr><tr><td>6</td><td>Occasional: a foreseeable slip or condition, weakly guarded</td></tr><tr><td>4</td><td>Infrequent: needs an unusual combination</td></tr><tr><td>2</td><td>Remote: guarded by design</td></tr><tr><td>1</td><td>Eliminated by design</td></tr></tbody></table></div><div><p class="fm-sub">Detection</p><table class="fm-rubric"><tbody><tr><td>10</td><td>No control could detect it</td></tr><tr><td>9</td><td>Detected only through customer impact</td></tr><tr><td>8</td><td>Detected after impact by internal monitoring</td></tr><tr><td>6</td><td>Detected at onset, not prevented</td></tr><tr><td>4</td><td>Detected before impact with time to act</td></tr><tr><td>2</td><td>Automated interlock almost certainly stops it</td></tr><tr><td>1</td><td>Certain to be stopped</td></tr></tbody></table></div></div></div></details>
+
 
         <h2>Correction of errors (COE)</h2>
         <ul class="tight"><li>Fit automatic fire-suppression to all energy/battery rooms and datahalls across the SBG estate and rebuild <span class="coe-meta">OVHcloud (facilities/safety) · Committed post-incident per public statements; independent completion not verified in this review</span></li><li>Provide accessible general electrical cut-off and separate UPS from associated batteries into fire-rated rooms <span class="coe-meta">OVHcloud (electrical engineering) · BEA-RI recommendation; implementation status unverified</span></li><li>Add UPS/battery supervision and operating-parameter logging; RCA recurring ASI by-pass trips before return-to-service <span class="coe-meta">OVHcloud (maintenance/M&amp;O) · BEA-RI lesson; status unverified</span></li><li>Provision owned fire-water reserves/pumping sized to site (Rhine canal) beyond the single public hydrant <span class="coe-meta">OVHcloud + SDIS 67 · BEA-RI recommendation; status unverified</span></li><li>Publish and complete the BEA-RI technical investigation and cooperate with judicial expertise on precise ignition cause <span class="coe-meta">BEA-RI / judicial expert · BEA-RI report published 27 May 2022; precise cause deferred to judicial expertise</span></li><li>Advise/enable customers on geo-redundant backups (default off-site backup offering) <span class="coe-meta">OVHcloud (product) · Backup offerings expanded post-incident per public messaging; not verified here</span></li></ul>
@@ -431,7 +757,7 @@ The DE-ENERGISATION delay is the mechanism that turned a contained ignition into
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-1a1a084f"></script>
+    <script src="js/rz-version.js?v=20261010-00a1d9e8"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

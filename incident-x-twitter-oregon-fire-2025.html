@@ -52,6 +52,12 @@
     .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
     .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
     .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:2px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    /* A chip carries the operator name, which can be a whole sentence ("Google Cloud
+       (impacted tenant); STT GDC / Tata Communications JV (named as the third-party …").
+       nowrap made that one chip 1120px wide and pushed the GCP Delhi dossier into a
+       1260px page at a 1100px viewport. Short chips are unaffected: normal wrapping
+       only engages when a chip would not fit its row. */
+    .chips .chip { max-width:100%; white-space:normal; overflow-wrap:anywhere; }
     .chip.cyan { color:var(--cyan); border-left:2px solid var(--cyan); }
     .chip.amber { color:var(--amber); border-left:2px solid var(--amber); }
     .chip.green { color:var(--green); border-left:2px solid var(--green); }
@@ -71,6 +77,11 @@
     /* rich incident table (reference-2 style) */
     table.itbl { min-width:1120px; }
     table.itbl td { vertical-align:middle; }
+    /* v1.134.20 — the title and summary columns ellipsise so the table's columns line up,
+       which is the right call for a dense index. But the cut text was reachable only by
+       navigating to the incident: a summary lost 238-298px of its sentence with no way to read
+       it in place. Each carries its full text in a title attribute now, so the truncation is
+       deliberate AND non-lossy — which is the condition the legibility audit checks for. */
     .itr { cursor:pointer; }
     .itr:hover td { background:var(--surface-2); }
     .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
@@ -240,7 +251,6 @@
        derive width = W px from the aspect ratio, so the drawing renders 1:1 at any event count
        and the panel scrolls instead of shrinking. */
     .viz-timeline svg { max-width:none; height:96px; width:auto; }
-
     .viz-radar svg { max-width:320px; margin:0 auto; }
     .vz-num { font-variant-numeric:tabular-nums slashed-zero; }
     .vz-box-t, .vz-box-s, .vz-lbl, .vz-hb-lbl, .vz-tl-t, .vz-pt, .vz-tick { pointer-events:auto; }
@@ -323,7 +333,86 @@
     }
     @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
 </style>
-    
+    <style>
+    /* ── FMEA (v3.12.3) — one hairline panel of rows, like the rest of the dossier.
+       No cards, no stripes: a row is a disclosure, state is a 7px dot. ── */
+    .fm-scope { color:var(--text-body); max-width:70ch; }
+    .fm-meta { flex-wrap:wrap; row-gap:0.25rem; }
+    .fm-viz { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:1.6rem; align-items:start; margin:1.2rem 0; }
+    @media (max-width:820px){ .fm-viz { grid-template-columns:1fr; } }
+    .fm-pb-row, .fm-pb-axis { display:grid; grid-template-columns:3.6rem minmax(0,1fr) 6.6rem; gap:0.6rem; align-items:center; }
+    .fm-pb-row { padding:0.32rem 0; }
+    .fm-pb-id, .fm-pb-val { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.8rem; }
+    .fm-pb-id { color:var(--muted); }
+    .fm-pb-val { color:var(--text-strong); white-space:nowrap; }
+    .fm-pb-track { display:flex; flex-direction:column; gap:3px; }
+    .fm-pb-bar { display:block; height:12px; }
+    .fm-pb-rev { display:block; height:4px; background:var(--text-body); opacity:0.55; }
+    .fm-pb-none { font-style:italic; font-size:0.72rem; color:var(--muted); line-height:1; }
+    .fm-pb-axis { margin-top:0.3rem; border-top:1px solid var(--line); padding-top:0.25rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .fm-pb-ticks { display:flex; justify-content:space-between; }
+    .fm-fig { margin:0; }
+    .fm-fig figcaption { font-size:0.8rem; color:var(--muted); margin-bottom:0.35rem; }
+    .fm-fig svg { width:100%; height:auto; display:block; }
+    .fm-fig-m svg { max-width:340px; }
+    .fm-matrix .fm-c-lo { fill:var(--surface); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-md { fill:color-mix(in srgb, var(--amber) 9%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-hi { fill:color-mix(in srgb, var(--red) 10%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .vz-axis { font-size:10px; fill:var(--muted); font-family:'IBM Plex Sans',sans-serif; }
+    .fm-matrix .fm-pt { stroke:var(--surface); stroke-width:1.5; }
+    .fm-matrix .fm-pt-l { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; fill:var(--text-strong);
+      paint-order:stroke; stroke:var(--surface); stroke-width:3px; stroke-linejoin:round; }
+    .fm-sheet { border:1px solid var(--line); border-radius:4px; margin-top:0.8rem; }
+    .fm-head, .fm-row > summary { display:grid; grid-template-columns:4.2rem minmax(0,1fr) 4.4rem 4.6rem 3.4rem; gap:0.6rem; align-items:baseline; padding:0.6rem 0.9rem; }
+    .fm-head { font-size:0.74rem; color:var(--muted); border-bottom:1px solid var(--line); }
+    .fm-row { border-top:1px solid var(--line); }
+    .fm-row:first-of-type { border-top:0; }
+    .fm-row > summary { cursor:pointer; list-style:none; }
+    .fm-row > summary::-webkit-details-marker { display:none; }
+    .fm-row > summary:hover { background:var(--surface-2); }
+    .fm-row > summary:focus-visible { outline:2px solid var(--cyan); outline-offset:-2px; }
+    .fm-id-cell, .fm-sod, .fm-rpn, .fm-rpn-rev { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.84rem; }
+    .fm-id-cell { color:var(--muted); }
+    .fm-mode { color:var(--text-strong); font-size:0.92rem; line-height:1.4; }
+    .fm-item { display:block; color:var(--muted); font-size:0.8rem; }
+    .fm-sod { color:var(--text-body); }
+    .fm-rpn { color:var(--text-strong); }
+    .fm-rpn-rev { color:var(--muted); }
+    .fm-dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:0.45rem; vertical-align:0.1em; }
+    .fm-body { padding:0.2rem 0.9rem 1rem 5.7rem; }
+    @media (max-width:640px){
+      .fm-head { display:none; }
+      .fm-row > summary { grid-template-columns:3.2rem minmax(0,1fr) auto; }
+      .fm-sod, .fm-rpn-rev { display:none; }
+      .fm-body { padding:0.2rem 0.9rem 1rem; }
+    }
+    .fm-kv { display:grid; grid-template-columns:9.5rem minmax(0,1fr); gap:0.3rem 0.9rem; margin:0.4rem 0 0.8rem; font-size:0.88rem; }
+    .fm-kv dt { color:var(--muted); }
+    .fm-kv dd { margin:0; color:var(--text-body); }
+    @media (max-width:640px){ .fm-kv { grid-template-columns:1fr; } .fm-kv dd { margin-bottom:0.4rem; } }
+    .fm-scores { margin:0 0 0.6rem; border-top:1px solid var(--line); }
+    .fm-sc { display:grid; grid-template-columns:3.2rem minmax(0,1fr); gap:0.6rem; padding:0.45rem 0; border-bottom:1px solid var(--line); font-size:0.86rem; }
+    .fm-sc dt { font-family:'JetBrains Mono',monospace; color:var(--muted); }
+    .fm-sc dt b { color:var(--text-strong); }
+    .fm-sc dd { margin:0; color:var(--text-body); }
+    .fm-sub { font-size:0.8rem; color:var(--muted); margin:0.7rem 0 0.25rem; }
+    .fm-sub b { color:var(--text-strong); }
+    .fm-acts, .fm-ev { margin:0; padding-left:1.1rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-acts li, .fm-ev li { margin:0.25rem 0; }
+    .fm-residual { color:var(--red); }
+    .fm-revline { font-size:0.86rem; color:var(--text-body); margin:0.4rem 0 0; }
+    .fm-ev-src { display:block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .fm-ev-src a { color:var(--cyan); }
+    .fm-ev-txt { display:block; }
+    .fm-method { margin-top:1rem; border:1px solid var(--line); border-radius:4px; }
+    .fm-method > summary { padding:0.6rem 0.9rem; cursor:pointer; font-size:0.9rem; color:var(--text-strong); }
+    .fm-method-body { padding:0 0.9rem 0.9rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-rubrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+    @media (max-width:760px){ .fm-rubrics { grid-template-columns:1fr; } }
+    .fm-rubric { width:100%; border-collapse:collapse; font-size:0.8rem; }
+    .fm-rubric td { padding:0.25rem 0.4rem; border-top:1px solid var(--line); vertical-align:top; }
+    .fm-rubric td:first-child { font-family:'JetBrains Mono',monospace; width:2rem; color:var(--text-strong); }
+</style>
 </head>
 <body class="locked">
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -346,14 +435,14 @@
         <h1>X (Twitter) Oregon Data-Center Power-Cabinet Fire (May 2025)</h1>
         <div class="chips">
             <span class="chip">X (Twitter) / Digital Realty</span>
-            <span class="chip cyan">2025-05-24</span>
+            <span class="chip cyan">2025-05-22</span>
             <span class="chip amber">48h 0m core impact</span>
             <span class="chip red">Fire</span><span class="chip amber">Power</span>
         </div>
         <p class="lede">A fire that began inside a power cabinet at a Digital Realty Oregon facility hosting X (Twitter) caused multi-day intermittent global outages of the platform; reported equipment loss was modest but the platform <span data-explain="blast-radius" tabindex="0">blast radius</span> was large.</p>
 
         <h2>Failure cascade</h2>
-        <div class="viz viz-cascade"><svg viewBox="0 0 760 158" role="img" aria-label="Failure cascade block diagram"><title>Failure cascade: trigger → fault → downstream impact</title><defs><marker id="ic-ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path class="vz-arrhead" d="M0,0 L6,3 L0,6 Z"/></marker></defs><text class="vz-tl-ph" x="8" y="12">Trigger</text><text class="vz-tl-ph" x="248" y="12">Primary fault</text><text class="vz-tl-ph" x="516" y="12">Downstream impact</text><rect class="vz-box-trigger" x="8" y="51.0" width="176" height="56" rx="2"><title>Trigger — Fire (2025-05-24)</title></rect><text class="vz-box-t" x="18" y="68.0">Trigger · Fire</text><text class="vz-box-s" x="18" y="82.0"><title>2025-05-24</title>2025-05-24</text><rect class="vz-box-fault" x="240" y="51.0" width="224" height="56" rx="2"><title>Primary fault at X (Twitter) / Digital Realty — Digital Realty Oregon facility (Hillsboro/Portland)</title></rect><text class="vz-box-t" x="250" y="68.0">Digital Realty</text><text class="vz-box-s" x="250" y="82.0"><title>Digital Realty Oregon facility (Hillsboro/Portland)</title>Digital Realty Oregon facility</text><line class="vz-flow" x1="184" y1="79.0" x2="238" y2="79.0" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="26" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: X (Twitter) platform (intermittent, multi-day)</title></rect><text class="vz-box-t" x="526" y="43">X</text><line class="vz-flow" x1="464" y1="79.0" x2="514" y2="44" marker-end="url(#ic-ar)"/></svg></div>
+        <div class="viz viz-cascade"><svg viewBox="0 0 760 158" role="img" aria-label="Failure cascade block diagram"><title>Failure cascade: trigger → fault → downstream impact</title><defs><marker id="ic-ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path class="vz-arrhead" d="M0,0 L6,3 L0,6 Z"/></marker></defs><text class="vz-tl-ph" x="8" y="12">Trigger</text><text class="vz-tl-ph" x="248" y="12">Primary fault</text><text class="vz-tl-ph" x="516" y="12">Downstream impact</text><rect class="vz-box-trigger" x="8" y="51.0" width="176" height="56" rx="2"><title>Trigger — Fire (2025-05-22)</title></rect><text class="vz-box-t" x="18" y="68.0">Trigger · Fire</text><text class="vz-box-s" x="18" y="82.0"><title>2025-05-22</title>2025-05-22</text><rect class="vz-box-fault" x="240" y="51.0" width="224" height="56" rx="2"><title>Primary fault at X (Twitter) / Digital Realty — Digital Realty Oregon facility (Hillsboro/Portland)</title></rect><text class="vz-box-t" x="250" y="68.0">Digital Realty</text><text class="vz-box-s" x="250" y="82.0"><title>Digital Realty Oregon facility (Hillsboro/Portland)</title>Digital Realty Oregon facility</text><line class="vz-flow" x1="184" y1="79.0" x2="238" y2="79.0" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="26" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: X (Twitter) platform (intermittent, multi-day)</title></rect><text class="vz-box-t" x="526" y="43">X</text><line class="vz-flow" x1="464" y1="79.0" x2="514" y2="44" marker-end="url(#ic-ar)"/></svg></div>
         <p class="disclaimer">Trigger → primary fault → downstream blast radius, derived from the sourced root cause and affected-services record.</p>
 
         <h2>Facility &amp; location</h2>
@@ -361,7 +450,7 @@
             <dt>Operator</dt><dd>X (Twitter) / Digital Realty</dd>
             <dt>Data center</dt><dd>Digital Realty Oregon facility (Hillsboro/Portland)</dd>
             <dt>Location</dt><dd>Hillsboro, Oregon, United States</dd>
-            <dt>Date</dt><dd>2025-05-24</dd>
+            <dt>Date</dt><dd>2025-05-22</dd>
         </dl>
 
         <h2>Impact &amp; scale</h2>
@@ -391,6 +480,215 @@ The latent root cause cannot honestly be pinned to a maintenance, inspection, or
 
         <h2>Contributing factors</h2>
         <ul class="tight"><li>Energized-equipment hazard throttled the response: the cabinet was &#x27;still energized&#x27; on arrival, so crews could only HOLD the fire with CO2/dry-chem hand extinguishers &#x27;while waiting for the system to be de-energized&#x27; rather than fully suppress it (CRN, quoting the Hillsboro Fire &amp; Rescue report). The delay to electrical isolation extended the hazardous window; no source names who isolated it or how long it took.</li><li>No fixed suppression engagement is evidenced: the verified record shows handheld CO2 and dry-chemical extinguishers, with NO clean-agent/gaseous or pre-action sprinkler activation reported by any source (CRN). Whether a fixed system was absent, inhibited by the energized state, or simply undocumented is a disclosed gap — but the fire was fought by hand.</li><li>Combustible cabinet internals as first fuel: investigator Mahar found the first fuel ignited was &#x27;likely the plastic combustible components of the power cabinet&#x27; (CRN), meaning the equipment&#x27;s own plastic internals sustained the fire once an internal fault started it.</li><li>Single-room power topology created disproportionate blast radius: loss of one UPS room (~$250,000 equipment damage) was sufficient to trigger a near-global, roughly day-long intermittent outage of X (techgolly; hothardware), indicating the redundancy/failover design — not the fire&#x27;s size — drove the platform impact.</li><li>Maintenance/inspection posture is UNKNOWN, not clean: the investigation returned an UNDETERMINED cause and could not rule out internal electrical or mechanical failure (CRN); no source discloses the cabinet&#x27;s PM history, battery-replacement interval, or thermal-scan records, so a maintenance lapse can be neither confirmed nor excluded.</li><li>Undetermined internal fault mechanism: the ignition source was formally undetermined (CRN), leaving open whether an electrical fault (arc, connection failure) or a mechanical failure inside the Galaxy VX cabinet initiated the fire — a root-cause ambiguity that itself hampers corrective targeting.</li></ul>
+        <h2 id="fmea">Failure mode &amp; effects analysis (FMEA)</h2>
+        <p class="fm-scope">The fire chain in Room UPSA 240 at Digital Realty&#x27;s Hillsboro facility and its path to the X platform: the Schneider Electric Galaxy VX UPS power cabinet where the fire started, the cabinet&#x27;s combustible internals, fire detection and suppression, electrical isolation of the burning cabinet, personnel and responder safety, the power topology that let one room&#x27;s loss reach X users, and cause determination. The only official document is the Hillsboro Fire &amp; Rescue investigation, relayed by CRN; neither X nor Digital Realty published a post-mortem. The ignition source is officially UNDETERMINED, with internal electrical or mechanical failure not ruled out; the cabinet&#x27;s maintenance history, battery chemistry, age, detection details and isolation timing are not disclosed; and the link from the room to the platform outage rests on the dossier&#x27;s own inference, since no source describes X&#x27;s power topology or failover. Every corrective action in the dossier is &#x27;Recommended&#x27; except the fire report itself, which is done but left the cause undetermined, so no revised score is claimed: all modes are residual risk.</p>
+        <p class="metabar fm-meta"><span><b>7</b> failure modes</span><span class="sep">/</span><span><b>0</b> high priority</span><span class="sep">/</span><span><b>0 of 7</b> with a published action</span><span class="sep">/</span><span>total RPN <b>1300 → 1300</b> (−0%)</span></p>
+        <div class="fm-viz">
+            <figure class="fm-fig"><figcaption>Risk priority number (S × O × D), worst first — thin bar: after the published action</figcaption><div class="fm-pb" role="list" aria-label="Risk priority number per failure mode, before and after corrective action"><div class="fm-pb-row" role="listitem" title="FM-04 The cabinet is still energised when the fire service arrives, and full suppression waits on isolation"><span class="fm-pb-id">FM-04</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:96.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">288</span></div><div class="fm-pb-row" role="listitem" title="FM-05 Loss of one UPS room drops platform-serving load, and the outage reaches X users globally"><span class="fm-pb-id">FM-05</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:84.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">252</span></div><div class="fm-pb-row" role="listitem" title="FM-01 An internal fault, electrical or mechanical, ignites the cabinet on 22 May 2025"><span class="fm-pb-id">FM-01</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:65.3%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">196</span></div><div class="fm-pb-row" role="listitem" title="FM-02 The cabinet&#x27;s own plastic internals catch and sustain the fire"><span class="fm-pb-id">FM-02</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:60.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">180</span></div><div class="fm-pb-row" role="listitem" title="FM-03 No fixed suppression is evidenced to discharge; the fire is held by hand"><span class="fm-pb-id">FM-03</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:60.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">180</span></div><div class="fm-pb-row" role="listitem" title="FM-07 The investigation fixes the origin but cannot determine the ignition source"><span class="fm-pb-id">FM-07</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:48.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">144</span></div><div class="fm-pb-row" role="listitem" title="FM-06 People exposed to a burning, energised cabinet"><span class="fm-pb-id">FM-06</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:20.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">60</span></div><div class="fm-pb-axis" aria-hidden="true"><span></span><span class="fm-pb-ticks"><span>0</span><span>150</span><span>300</span></span><span></span></div></div></figure>
+            <figure class="fm-fig fm-fig-m"><figcaption>Criticality: severity × occurrence</figcaption><svg class="fm-matrix" viewBox="0 0 360 330" role="img" aria-label="Criticality matrix, severity against occurrence"><rect class="fm-c-lo" x="44" y="266" width="28" height="28"/><rect class="fm-c-lo" x="72" y="266" width="28" height="28"/><rect class="fm-c-lo" x="100" y="266" width="28" height="28"/><rect class="fm-c-lo" x="128" y="266" width="28" height="28"/><rect class="fm-c-lo" x="156" y="266" width="28" height="28"/><rect class="fm-c-lo" x="184" y="266" width="28" height="28"/><rect class="fm-c-lo" x="212" y="266" width="28" height="28"/><rect class="fm-c-lo" x="240" y="266" width="28" height="28"/><rect class="fm-c-lo" x="268" y="266" width="28" height="28"/><rect class="fm-c-lo" x="296" y="266" width="28" height="28"/><rect class="fm-c-lo" x="44" y="238" width="28" height="28"/><rect class="fm-c-lo" x="72" y="238" width="28" height="28"/><rect class="fm-c-lo" x="100" y="238" width="28" height="28"/><rect class="fm-c-lo" x="128" y="238" width="28" height="28"/><rect class="fm-c-lo" x="156" y="238" width="28" height="28"/><rect class="fm-c-lo" x="184" y="238" width="28" height="28"/><rect class="fm-c-lo" x="212" y="238" width="28" height="28"/><rect class="fm-c-lo" x="240" y="238" width="28" height="28"/><rect class="fm-c-md" x="268" y="238" width="28" height="28"/><rect class="fm-c-md" x="296" y="238" width="28" height="28"/><rect class="fm-c-lo" x="44" y="210" width="28" height="28"/><rect class="fm-c-lo" x="72" y="210" width="28" height="28"/><rect class="fm-c-lo" x="100" y="210" width="28" height="28"/><rect class="fm-c-lo" x="128" y="210" width="28" height="28"/><rect class="fm-c-lo" x="156" y="210" width="28" height="28"/><rect class="fm-c-md" x="184" y="210" width="28" height="28"/><rect class="fm-c-md" x="212" y="210" width="28" height="28"/><rect class="fm-c-md" x="240" y="210" width="28" height="28"/><rect class="fm-c-md" x="268" y="210" width="28" height="28"/><rect class="fm-c-md" x="296" y="210" width="28" height="28"/><rect class="fm-c-lo" x="44" y="182" width="28" height="28"/><rect class="fm-c-lo" x="72" y="182" width="28" height="28"/><rect class="fm-c-lo" x="100" y="182" width="28" height="28"/><rect class="fm-c-lo" x="128" y="182" width="28" height="28"/><rect class="fm-c-md" x="156" y="182" width="28" height="28"/><rect class="fm-c-md" x="184" y="182" width="28" height="28"/><rect class="fm-c-md" x="212" y="182" width="28" height="28"/><rect class="fm-c-md" x="240" y="182" width="28" height="28"/><rect class="fm-c-md" x="268" y="182" width="28" height="28"/><rect class="fm-c-hi" x="296" y="182" width="28" height="28"/><rect class="fm-c-lo" x="44" y="154" width="28" height="28"/><rect class="fm-c-lo" x="72" y="154" width="28" height="28"/><rect class="fm-c-lo" x="100" y="154" width="28" height="28"/><rect class="fm-c-md" x="128" y="154" width="28" height="28"/><rect class="fm-c-md" x="156" y="154" width="28" height="28"/><rect class="fm-c-md" x="184" y="154" width="28" height="28"/><rect class="fm-c-md" x="212" y="154" width="28" height="28"/><rect class="fm-c-hi" x="240" y="154" width="28" height="28"/><rect class="fm-c-hi" x="268" y="154" width="28" height="28"/><rect class="fm-c-hi" x="296" y="154" width="28" height="28"/><rect class="fm-c-lo" x="44" y="126" width="28" height="28"/><rect class="fm-c-lo" x="72" y="126" width="28" height="28"/><rect class="fm-c-md" x="100" y="126" width="28" height="28"/><rect class="fm-c-md" x="128" y="126" width="28" height="28"/><rect class="fm-c-md" x="156" y="126" width="28" height="28"/><rect class="fm-c-md" x="184" y="126" width="28" height="28"/><rect class="fm-c-hi" x="212" y="126" width="28" height="28"/><rect class="fm-c-hi" x="240" y="126" width="28" height="28"/><rect class="fm-c-hi" x="268" y="126" width="28" height="28"/><rect class="fm-c-hi" x="296" y="126" width="28" height="28"/><rect class="fm-c-lo" x="44" y="98" width="28" height="28"/><rect class="fm-c-lo" x="72" y="98" width="28" height="28"/><rect class="fm-c-md" x="100" y="98" width="28" height="28"/><rect class="fm-c-md" x="128" y="98" width="28" height="28"/><rect class="fm-c-md" x="156" y="98" width="28" height="28"/><rect class="fm-c-hi" x="184" y="98" width="28" height="28"/><rect class="fm-c-hi" x="212" y="98" width="28" height="28"/><rect class="fm-c-hi" x="240" y="98" width="28" height="28"/><rect class="fm-c-hi" x="268" y="98" width="28" height="28"/><rect class="fm-c-hi" x="296" y="98" width="28" height="28"/><rect class="fm-c-lo" x="44" y="70" width="28" height="28"/><rect class="fm-c-lo" x="72" y="70" width="28" height="28"/><rect class="fm-c-md" x="100" y="70" width="28" height="28"/><rect class="fm-c-md" x="128" y="70" width="28" height="28"/><rect class="fm-c-hi" x="156" y="70" width="28" height="28"/><rect class="fm-c-hi" x="184" y="70" width="28" height="28"/><rect class="fm-c-hi" x="212" y="70" width="28" height="28"/><rect class="fm-c-hi" x="240" y="70" width="28" height="28"/><rect class="fm-c-hi" x="268" y="70" width="28" height="28"/><rect class="fm-c-hi" x="296" y="70" width="28" height="28"/><rect class="fm-c-hi" x="44" y="42" width="28" height="28"/><rect class="fm-c-hi" x="72" y="42" width="28" height="28"/><rect class="fm-c-hi" x="100" y="42" width="28" height="28"/><rect class="fm-c-hi" x="128" y="42" width="28" height="28"/><rect class="fm-c-hi" x="156" y="42" width="28" height="28"/><rect class="fm-c-hi" x="184" y="42" width="28" height="28"/><rect class="fm-c-hi" x="212" y="42" width="28" height="28"/><rect class="fm-c-hi" x="240" y="42" width="28" height="28"/><rect class="fm-c-hi" x="268" y="42" width="28" height="28"/><rect class="fm-c-hi" x="296" y="42" width="28" height="28"/><rect class="fm-c-hi" x="44" y="14" width="28" height="28"/><rect class="fm-c-hi" x="72" y="14" width="28" height="28"/><rect class="fm-c-hi" x="100" y="14" width="28" height="28"/><rect class="fm-c-hi" x="128" y="14" width="28" height="28"/><rect class="fm-c-hi" x="156" y="14" width="28" height="28"/><rect class="fm-c-hi" x="184" y="14" width="28" height="28"/><rect class="fm-c-hi" x="212" y="14" width="28" height="28"/><rect class="fm-c-hi" x="240" y="14" width="28" height="28"/><rect class="fm-c-hi" x="268" y="14" width="28" height="28"/><rect class="fm-c-hi" x="296" y="14" width="28" height="28"/><text class="vz-tick" x="58.0" y="308" text-anchor="middle">1</text><text class="vz-tick" x="36" y="284.0" text-anchor="end">1</text><text class="vz-tick" x="86.0" y="308" text-anchor="middle">2</text><text class="vz-tick" x="36" y="256.0" text-anchor="end">2</text><text class="vz-tick" x="114.0" y="308" text-anchor="middle">3</text><text class="vz-tick" x="36" y="228.0" text-anchor="end">3</text><text class="vz-tick" x="142.0" y="308" text-anchor="middle">4</text><text class="vz-tick" x="36" y="200.0" text-anchor="end">4</text><text class="vz-tick" x="170.0" y="308" text-anchor="middle">5</text><text class="vz-tick" x="36" y="172.0" text-anchor="end">5</text><text class="vz-tick" x="198.0" y="308" text-anchor="middle">6</text><text class="vz-tick" x="36" y="144.0" text-anchor="end">6</text><text class="vz-tick" x="226.0" y="308" text-anchor="middle">7</text><text class="vz-tick" x="36" y="116.0" text-anchor="end">7</text><text class="vz-tick" x="254.0" y="308" text-anchor="middle">8</text><text class="vz-tick" x="36" y="88.0" text-anchor="end">8</text><text class="vz-tick" x="282.0" y="308" text-anchor="middle">9</text><text class="vz-tick" x="36" y="60.0" text-anchor="end">9</text><text class="vz-tick" x="310.0" y="308" text-anchor="middle">10</text><text class="vz-tick" x="36" y="32.0" text-anchor="end">10</text><text class="vz-axis" x="184" y="328" text-anchor="middle">Occurrence →</text><text class="vz-axis" transform="translate(11 154) rotate(-90)" text-anchor="middle">Severity →</text><circle class="fm-pt" cx="86.0" cy="28.0" r="6" fill="var(--amber)"><title>FM-06 People exposed to a burning, energised cabinet (S10 O2 D3)</title></circle><text class="fm-pt-l" x="86.0" y="18.0" text-anchor="middle">06</text><circle class="fm-pt" cx="142.0" cy="112.0" r="6" fill="var(--amber)"><title>FM-01 An internal fault, electrical or mechanical, ignites the cabinet on 22 May 2025 (S7 O4 D7); FM-05 Loss of one UPS room drops platform-serving load, and the outage reaches X users globally (S7 O4 D9)</title></circle><text class="fm-pt-l" x="142.0" y="102.0" text-anchor="middle">01, 05</text><circle class="fm-pt" cx="170.0" cy="140.0" r="6" fill="var(--amber)"><title>FM-02 The cabinet&#x27;s own plastic internals catch and sustain the fire (S6 O5 D6); FM-03 No fixed suppression is evidenced to discharge; the fire is held by hand (S6 O5 D6)</title></circle><text class="fm-pt-l" x="170.0" y="130.0" text-anchor="middle">02, 03</text><circle class="fm-pt" cx="198.0" cy="140.0" r="6" fill="var(--amber)"><title>FM-04 The cabinet is still energised when the fire service arrives, and full suppression waits on isolation (S6 O6 D8)</title></circle><text class="fm-pt-l" x="198.0" y="130.0" text-anchor="middle">04</text><circle class="fm-pt" cx="198.0" cy="224.0" r="6" fill="var(--amber)"><title>FM-07 The investigation fixes the origin but cannot determine the ignition source (S3 O6 D8)</title></circle><text class="fm-pt-l" x="198.0" y="214.0" text-anchor="middle">07</text></svg></figure>
+        </div>
+        <div class="fm-sheet">
+            <div class="fm-head" aria-hidden="true"><span>ID</span><span>Failure mode</span><span>S·O·D</span><span>RPN</span><span>After</span></div>
+            <details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-04</span>
+    <span class="fm-mode">The cabinet is still energised when the fire service arrives, and full suppression waits on isolation<span class="fm-item">Electrical isolation of the burning cabinet</span></span>
+    <span class="fm-sod" aria-label="Severity 6, occurrence 6, detection 8">6·6·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>288</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>De-energise a burning cabinet quickly so full suppression can begin</dd>
+      <dt>Effect</dt><dd>Firefighters can only hold the fire until the system is de-energised; who isolated it and how long that took are not recorded</dd>
+      <dt>Cause</dt><dd>No fast single-action isolation path is recorded for the energised cabinet</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Found by firefighters on arrival</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>6</b></dt><dd>It extended the fire in one room rather than spreading it: &#x27;partial outage confined to one zone&#x27;.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>A standing condition that any fire in an energised cabinet exercises, with no recorded guard: &#x27;occasional&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>Nothing recorded tested isolation beforehand; the delay surfaced as crews waited: &#x27;detected after impact&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 288</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Provision fast single-action de-energisation/isolation and a joint energised-fire runbook with the AHJ (status: Recommended) <span class="fm-ev-src">Correction of errors #2</span></li><li>Joint runbook with Hillsboro Fire &amp; Rescue on who de-energises and expected isolation time (analyst recommendation) <span class="fm-ev-src">Improvement #6</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://crn.com/news/data-center/2025/authorities-digital-realty-data-center-fire-began-in-schneider-electric-cabinet-but-cause-undetermined" target="_blank" rel="noopener nofollow">Sequence of events #2</a></span><span class="fm-ev-txt">“on fire and still energized”</span></li><li><span class="fm-ev-src"><a href="https://crn.com/news/data-center/2025/authorities-digital-realty-data-center-fire-began-in-schneider-electric-cabinet-but-cause-undetermined" target="_blank" rel="noopener nofollow">Sequence of events #6</a></span><span class="fm-ev-txt">2025-05-22 late morning PT — De-energisation of the cabinet awaited before full suppression; the report as quoted does not name who isolated the system or how long isolation took (disclosed gap).</span></li><li><span class="fm-ev-src">Contributing factor #1</span><span class="fm-ev-txt">Energized-equipment hazard throttled the response: the cabinet was &#x27;still energized&#x27; on arrival, so crews could only HOLD the fire with CO2/dry-chem hand extinguishers &#x27;while waiting for the system to be de-energized&#x27; rather than fully suppress it (CRN, quoting the Hillsboro Fire &amp; Rescue report). The delay to electrical isolation extended the hazardous window; no source names who isolated it or how long it took.</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-05</span>
+    <span class="fm-mode">Loss of one UPS room drops platform-serving load, and the outage reaches X users globally<span class="fm-item">Power topology and failover for X-serving load</span></span>
+    <span class="fm-sod" aria-label="Severity 7, occurrence 4, detection 9">7·4·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>252</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Keep the platform serving when one UPS room is lost</dd>
+      <dt>Effect</dt><dd>X disruption from about 11:00 AM PT Thursday to 10:35 AM PT Friday, with DownDetector reports peaking near ~26,000 and login degraded into Friday</dd>
+      <dt>Cause</dt><dd>Inferred in the dossier: single-room power topology with redundancy or failover insufficient for this loss. No source describes X&#x27;s topology</dd>
+      <dt>Prevention in place</dt><dd>Not disclosed</dd>
+      <dt>Detection in place</dt><dd>Customer impact; X acknowledged &#x27;a data center outage&#x27;</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>7</b></dt><dd>This is the route by which a one-room fire became a near-global intermittent outage, so it carries FM-01&#x27;s severity.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>Needs a whole UPS room to be lost first, which is infrequent; held there so the event is not counted twice at full weight. The topology is inferred, not documented.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>The platform impact was seen through user reports and X&#x27;s own acknowledgement of an outage: &#x27;detected only through customer impact&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 252</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Validate N+1/2N power topology and automated failover so a single UPS-room loss cannot drop platform-serving load; run a failover drill (status: Recommended) <span class="fm-ev-src">Correction of errors #3</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://idcnova.com/news/fire-breaks-out-at-oregon-data-center-leased-by-elon-musks-x-2880" target="_blank" rel="noopener nofollow">Sequence of events #8</a></span><span class="fm-ev-txt">2025-05-22 (Thu) — X engineering acknowledges the outage: &#x27;We are experiencing a data center outage and the team is actively working to remediate the issue.&#x27;</span></li><li><span class="fm-ev-src"><a href="https://techgolly.com/news/x-recovers-from-major-outage-tied-to-oregon-data-center-fire" target="_blank" rel="noopener nofollow">Sequence of events #9</a></span><span class="fm-ev-txt">2025-05-22 ~11:00 AM PT — X platform disruption from the data-center power loss begins in earnest; the outage &#x27;began around 11:00 AM PT&#x27; Thursday.</span></li><li><span class="fm-ev-src"><a href="https://techgolly.com/news/x-recovers-from-major-outage-tied-to-oregon-data-center-fire" target="_blank" rel="noopener nofollow">Sequence of events #13</a></span><span class="fm-ev-txt">2025-05-23 (Fri) — Renewed/degraded performance the following day as the facility runs degraded; login services in particular &#x27;are still experiencing degraded performance.&#x27;</span></li><li><span class="fm-ev-src"><a href="https://techgolly.com/news/x-recovers-from-major-outage-tied-to-oregon-data-center-fire" target="_blank" rel="noopener nofollow">Sequence of events #14</a></span><span class="fm-ev-txt">2025-05-23 10:35 AM PT — X outage &#x27;officially marked as resolved by 10:35 AM PT on Friday&#x27; — roughly a 24-hour platform-level impact window from the ~11:00 AM PT Thursday start.</span></li><li><span class="fm-ev-src"><a href="https://hothardware.com" target="_blank" rel="noopener nofollow">Metric #8</a></span><span class="fm-ev-txt">Peak outage reports: ~26,000 (majority on the mobile app); body-level figure not independently re-verified</span></li><li><span class="fm-ev-src">Contributing factor #4</span><span class="fm-ev-txt">“indicating the redundancy/failover design — not the fire&#x27;s size — drove the platform impact”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-01</span>
+    <span class="fm-mode">An internal fault, electrical or mechanical, ignites the cabinet on 22 May 2025<span class="fm-item">UPS power cabinet &#x27;240 UPSA2 Power Cabinet 1&#x27; (Schneider Electric Galaxy VX, GVXP250KD)</span></span>
+    <span class="fm-sod" aria-label="Severity 7, occurrence 4, detection 7">7·4·7</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>196</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Condition and carry critical power without an internal fault becoming a fire</dd>
+      <dt>Effect</dt><dd>Fire in Room UPSA 240; about $250,000 of equipment damage; loss of the room&#x27;s protected power and, through FM-05, a roughly day-long intermittent outage of X</dd>
+      <dt>Cause</dt><dd>Undetermined. The investigator could not rule out internal electrical or mechanical failure; no maintenance, inspection or work-procedure lapse is recorded or excluded</dd>
+      <dt>Prevention in place</dt><dd>Not disclosed: no PM history, battery-replacement interval or thermal-scan record for the cabinet is public</dd>
+      <dt>Detection in place</dt><dd>Facility fire-alarm system, which summoned Hillsboro Fire &amp; Rescue; no aspirating or pre-alarm detection is documented</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>7</b></dt><dd>It initiated a near-global, intermittent degradation of a major platform for about a day: &#x27;major degradation of a major service&#x27;. Not 8: the outage was intermittent, and the room-to-platform propagation is carried in FM-05.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>A fire inside a UPS power cabinet needs an unusual internal fault: &#x27;infrequent&#x27;. The mechanism is undetermined, so this score is uncertain.</dd></div>
+      <div class="fm-sc"><dt>D <b>7</b></dt><dd>The fire alarm worked once the cabinet was burning; no precursor detection or maintenance evidence is recorded, so between &#x27;detected at onset&#x27; (6) and &#x27;after impact&#x27; (8).</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 196</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Institute and evidence UPS-cabinet PM: IR thermography, connection/torque checks, battery condition monitoring, auditable records (status: Recommended) <span class="fm-ev-src">Correction of errors #4</span></li><li>Deploy VESDA/aspirating early-warning detection in UPS rooms and log alarm-to-ignition latency (status: Recommended) <span class="fm-ev-src">Correction of errors #5</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://crn.com/news/data-center/2025/authorities-digital-realty-data-center-fire-began-in-schneider-electric-cabinet-but-cause-undetermined" target="_blank" rel="noopener nofollow">Sequence of events #1</a></span><span class="fm-ev-txt">2025-05-22 late morning PT — Fire ignites inside the Schneider Electric Galaxy VX 250 kVA 400/480V UPS power cabinet &#x27;240 UPSA2 Power Cabinet 1&#x27; (model GVXP250KD), Room UPSA 240 (57&#x27; x 30&#x27;), 2nd floor of Digital Realty Hillsboro (PDX11-area campus X leases).</span></li><li><span class="fm-ev-src"><a href="https://crn.com/news/data-center/2025/authorities-digital-realty-data-center-fire-began-in-schneider-electric-cabinet-but-cause-undetermined" target="_blank" rel="noopener nofollow">Sequence of events #15</a></span><span class="fm-ev-txt">2025-06-24 — Hillsboro Fire &amp; Rescue investigation (Deputy Fire Commissioner Mike Mahar) filed: origin inside 240 UPSA2 Power Cabinet 1, cause UNDETERMINED, first fuel &#x27;likely the plastic combustible components,&#x27; ~$250,000 damage; could not rule out internal electrical or mechanical failure.</span></li><li><span class="fm-ev-src"><a href="https://CRN, quoting Hillsboro Fire &amp; Rescue report" target="_blank" rel="noopener nofollow">Metric #2</a></span><span class="fm-ev-txt">Origin equipment: Schneider Electric Galaxy VX 250 kVA 400/480V UPS power cabinet, model GVXP250KD (&#x27;240 UPSA2 Power Cabinet 1&#x27;)</span></li><li><span class="fm-ev-src"><a href="https://CRN, quoting Hillsboro Fire &amp; Rescue report" target="_blank" rel="noopener nofollow">Metric #4</a></span><span class="fm-ev-txt">Cause determination: UNDETERMINED; first fuel &#x27;likely the plastic combustible components&#x27;; internal electrical or mechanical failure not ruled out</span></li><li><span class="fm-ev-src">Contributing factor #5</span><span class="fm-ev-txt">Maintenance/inspection posture is UNKNOWN, not clean: the investigation returned an UNDETERMINED cause and could not rule out internal electrical or mechanical failure (CRN); no source discloses the cabinet&#x27;s PM history, battery-replacement interval, or thermal-scan records, so a maintenance lapse can be neither confirmed nor excluded.</span></li><li><span class="fm-ev-src"><a href="https://www.crn.com/news/data-center/2025/authorities-digital-realty-data-center-fire-began-in-schneider-electric-cabinet-but-cause-undetermined" target="_blank" rel="noopener nofollow">Reference #2 · press</a></span><span class="fm-ev-txt">“the ignition source was undetermined”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-02</span>
+    <span class="fm-mode">The cabinet&#x27;s own plastic internals catch and sustain the fire<span class="fm-item">Cabinet internal construction (fuel load)</span></span>
+    <span class="fm-sod" aria-label="Severity 6, occurrence 5, detection 6">6·5·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>180</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Limit what can burn inside an energised cabinet once a fault starts</dd>
+      <dt>Effect</dt><dd>An internal fault becomes a fire that fills the room with smoke and must be held until de-energisation</dd>
+      <dt>Cause</dt><dd>First fuel &#x27;likely the plastic combustible components of the power cabinet&#x27; per the investigator</dd>
+      <dt>Prevention in place</dt><dd>White steel cabinet enclosure</dd>
+      <dt>Detection in place</dt><dd>Fire alarm after ignition</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>6</b></dt><dd>The fire stayed in one room; this mode&#x27;s own effect is a room-level fire. The platform effect is counted in FM-01 and FM-05: &#x27;partial outage confined to one zone&#x27;.</dd></div>
+      <div class="fm-sc"><dt>O <b>5</b></dt><dd>Combustible internals are a standing property of the cabinet, exercised only when an internal fault occurs: between &#x27;infrequent&#x27; and &#x27;occasional&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>Once burning, the fire was detected, but nothing stopped the plastics catching: &#x27;detected at onset, not prevented&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 180</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Reduce combustible internal fuel load in UPS power cabinets; specify low-combustibility construction (status: Recommended, not confirmed adopted) <span class="fm-ev-src">Correction of errors #1</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #3</span><span class="fm-ev-txt">Combustible cabinet internals as first fuel: investigator Mahar found the first fuel ignited was &#x27;likely the plastic combustible components of the power cabinet&#x27; (CRN), meaning the equipment&#x27;s own plastic internals sustained the fire once an internal fault started it.</span></li><li><span class="fm-ev-src"><a href="https://CRN, quoting Hillsboro Fire &amp; Rescue report" target="_blank" rel="noopener nofollow">Metric #4</a></span><span class="fm-ev-txt">Cause determination: UNDETERMINED; first fuel &#x27;likely the plastic combustible components&#x27;; internal electrical or mechanical failure not ruled out</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“likely the plastic combustible components of the power cabinet”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-03</span>
+    <span class="fm-mode">No fixed suppression is evidenced to discharge; the fire is held by hand<span class="fm-item">Fire suppression in Room UPSA 240</span></span>
+    <span class="fm-sod" aria-label="Severity 6, occurrence 5, detection 6">6·5·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>180</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Extinguish a cabinet fire at its source</dd>
+      <dt>Effect</dt><dd>Crews use several CO2 and dry-chemical extinguishers to keep the fire under control rather than extinguish it; the room fills with smoke but the fire does not spread</dd>
+      <dt>Cause</dt><dd>Whether a fixed system was absent, inhibited by the energised state, or simply undocumented is not disclosed</dd>
+      <dt>Prevention in place</dt><dd>Hand extinguishers used by the fire service</dd>
+      <dt>Detection in place</dt><dd>Fire alarm; crews on scene around 10:21 AM PT</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>6</b></dt><dd>It lengthened the hazardous window in one room; containment held and no building spread occurred: &#x27;partial outage confined to one zone&#x27;.</dd></div>
+      <div class="fm-sc"><dt>O <b>5</b></dt><dd>Held at 5 because the dossier cannot say whether fixed suppression existed; the record shows only that none discharged.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>The fire was found at onset and fought by hand, but nothing automatic acted on it: &#x27;detected at onset, not prevented&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 180</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Provision cabinet-level suppression for energised UPS cabinets (status: Recommended) <span class="fm-ev-src">Correction of errors #2</span></li><li>Provision cabinet-level clean-agent or in-cabinet suppression (analyst recommendation) <span class="fm-ev-src">Improvement #2</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://crn.com/news/data-center/2025/authorities-digital-realty-data-center-fire-began-in-schneider-electric-cabinet-but-cause-undetermined" target="_blank" rel="noopener nofollow">Sequence of events #5</a></span><span class="fm-ev-txt">2025-05-22 late morning PT — Crews HOLD the fire manually with &#x27;several CO2 and dry-chem extinguishers to keep the fire under control while waiting for the system to be de-energized&#x27; — no fixed clean-agent or sprinkler discharge reported anywhere.</span></li><li><span class="fm-ev-src"><a href="https://CRN, quoting Hillsboro Fire &amp; Rescue report" target="_blank" rel="noopener nofollow">Metric #5</a></span><span class="fm-ev-txt">Suppression method: Manual only — &#x27;several CO2 and dry-chem extinguishers&#x27;; no fixed clean-agent/sprinkler discharge reported</span></li><li><span class="fm-ev-src">Contributing factor #2</span><span class="fm-ev-txt">No fixed suppression engagement is evidenced: the verified record shows handheld CO2 and dry-chemical extinguishers, with NO clean-agent/gaseous or pre-action sprinkler activation reported by any source (CRN). Whether a fixed system was absent, inhibited by the energized state, or simply undocumented is a disclosed gap — but the fire was fought by hand.</span></li><li><span class="fm-ev-src"><a href="https://idcnova.com/news/fire-breaks-out-at-oregon-data-center-leased-by-elon-musks-x-2880" target="_blank" rel="noopener nofollow">Sequence of events #7</a></span><span class="fm-ev-txt">2025-05-22 morning PT — Containment holds: the fire &#x27;had not spread to other parts of the building, but the room was full of smoke.&#x27;</span></li><li><span class="fm-ev-src"><a href="https://idcnova.com" target="_blank" rel="noopener nofollow">Metric #11</a></span><span class="fm-ev-txt">Fire spread: Contained to single UPS room; no building spread (&#x27;room was full of smoke&#x27;)</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-07</span>
+    <span class="fm-mode">The investigation fixes the origin but cannot determine the ignition source<span class="fm-item">Cause determination</span></span>
+    <span class="fm-sod" aria-label="Severity 3, occurrence 6, detection 8">3·6·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>144</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Identify the ignition source so corrective action can target it</dd>
+      <dt>Effect</dt><dd>Corrective action cannot be targeted at a confirmed mechanism; early &#x27;battery set&#x27; framing was superseded and maintenance culpability is neither established nor excluded</dd>
+      <dt>Cause</dt><dd>Report returned UNDETERMINED; no PM, inspection or work-order records disclosed</dd>
+      <dt>Prevention in place</dt><dd>Fire-service origin-and-cause investigation</dd>
+      <dt>Detection in place</dt><dd>Known when the report was filed on 24 June 2025</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>3</b></dt><dd>Affects learning and corrective targeting, not service: &#x27;internal impact only&#x27;.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>With no maintenance or telemetry records disclosed, an undetermined cause is a foreseeable outcome: &#x27;occasional&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>Known only after the investigation concluded.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 144</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Complete and publish official cause determination (done: report filed 24 June 2025, cause UNDETERMINED, so no risk reduction follows) <span class="fm-ev-src">Correction of errors #6</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #6</span><span class="fm-ev-txt">Undetermined internal fault mechanism: the ignition source was formally undetermined (CRN), leaving open whether an electrical fault (arc, connection failure) or a mechanical failure inside the Galaxy VX cabinet initiated the fire — a root-cause ambiguity that itself hampers corrective targeting.</span></li><li><span class="fm-ev-src"><a href="https://crn.com/news/data-center/2025/authorities-digital-realty-data-center-fire-began-in-schneider-electric-cabinet-but-cause-undetermined" target="_blank" rel="noopener nofollow">Sequence of events #15</a></span><span class="fm-ev-txt">2025-06-24 — Hillsboro Fire &amp; Rescue investigation (Deputy Fire Commissioner Mike Mahar) filed: origin inside 240 UPSA2 Power Cabinet 1, cause UNDETERMINED, first fuel &#x27;likely the plastic combustible components,&#x27; ~$250,000 damage; could not rule out internal electrical or mechanical failure.</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“this dossier will not manufacture one”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-06</span>
+    <span class="fm-mode">People exposed to a burning, energised cabinet<span class="fm-item">Personnel evacuation and responder safety</span></span>
+    <span class="fm-sod" aria-label="Severity 10, occurrence 2, detection 3">10·2·3</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>60</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Keep staff and firefighters out of harm from fire, smoke and energised equipment</dd>
+      <dt>Effect</dt><dd>Did not occur: all personnel were safely evacuated with no reported injuries; crews worked a fire that was still energised</dd>
+      <dt>Cause</dt><dd>An energised-equipment fire in an occupied facility</dd>
+      <dt>Prevention in place</dt><dd>Evacuation; manual CO2 and dry-chemical extinguishers suitable for electrical fires</dd>
+      <dt>Detection in place</dt><dd>Facility fire-alarm system</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>10</b></dt><dd>Hazard to people is the rubric&#x27;s 10 by definition, though no one was hurt.</dd></div>
+      <div class="fm-sc"><dt>O <b>2</b></dt><dd>Evacuation worked and the fire stayed in one room: &#x27;remote&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>3</b></dt><dd>The alarm summoned responders and staff were already out; the energised state was recognised and worked around. Close to &#x27;almost certainly stops it&#x27;, held at 3 because the alarm timing relative to ignition is not recorded.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 60</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Joint energised-fire runbook with the AHJ (status: Recommended) <span class="fm-ev-src">Correction of errors #2</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://idcnova.com/news/fire-breaks-out-at-oregon-data-center-leased-by-elon-musks-x-2880" target="_blank" rel="noopener nofollow">Sequence of events #4</a></span><span class="fm-ev-txt">2025-05-22 morning PT — All personnel already safely evacuated with no reported injuries; Digital Realty states &#x27;All personnel were safely evacuated, with no reported injuries.&#x27;</span></li><li><span class="fm-ev-src"><a href="https://idcnova.com (Digital Realty statement)" target="_blank" rel="noopener nofollow">Metric #7</a></span><span class="fm-ev-txt">Personnel evacuated / injuries: All personnel safely evacuated; 0 injuries</span></li><li><span class="fm-ev-src"><a href="https://www.idcnova.com/news/fire-breaks-out-at-oregon-data-center-leased-by-elon-musks-x-2880" target="_blank" rel="noopener nofollow">Reference #1 · vendor-status</a></span><span class="fm-ev-txt">“All personnel were safely evacuated, with no reported injuries.”</span></li></ul>
+  </div>
+</details>
+        </div>
+        <details class="fm-method"><summary>Scoring rubric and method</summary><div class="fm-method-body"><p>A retrospective FMEA: each row asks how this system could fail, how bad the effect was, how likely the cause was given the controls in place at the time, and how likely those controls were to catch it before customers did. Scales are adapted for data-centre operations from the 1–10 scales of IEC 60812:2018 and the AIAG-VDA FMEA handbook. RPN = S × O × D. Priority is High when S ≥ 9 with O ≥ 4 or D ≥ 7, or when RPN ≥ 300; Medium when RPN ≥ 120 or S ≥ 7; Low otherwise. Severity overrides the product because a large S multiplied by small O and D can hide a region-wide outage nothing would catch.</p><p>Every row cites evidence from this dossier, and every quote is checked verbatim against its source by <code>tools/test-incidents-fmea.py</code>. A revised score is only shown against a published corrective action. This is an RZ analyst assessment, not an operator document.</p><div class="fm-rubrics"><div><p class="fm-sub">Severity</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Hazard to people, or loss of the facility / several regions</td></tr><tr><td>9</td><td>Region-wide or provider-wide outage of a foundational service, no workaround</td></tr><tr><td>8</td><td>Full outage of a major service for hours</td></tr><tr><td>7</td><td>Major degradation of a major service</td></tr><tr><td>6</td><td>Partial outage confined to one zone or one service</td></tr><tr><td>5</td><td>Customer-visible degradation</td></tr><tr><td>4</td><td>Limited customer impact</td></tr><tr><td>3</td><td>Internal impact only</td></tr><tr><td>2</td><td>Negligible</td></tr><tr><td>1</td><td>No effect</td></tr></tbody></table></div><div><p class="fm-sub">Occurrence</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Near certain: the cause is present in normal operation</td></tr><tr><td>8</td><td>Frequent: routine work exercises the cause</td></tr><tr><td>6</td><td>Occasional: a foreseeable slip or condition, weakly guarded</td></tr><tr><td>4</td><td>Infrequent: needs an unusual combination</td></tr><tr><td>2</td><td>Remote: guarded by design</td></tr><tr><td>1</td><td>Eliminated by design</td></tr></tbody></table></div><div><p class="fm-sub">Detection</p><table class="fm-rubric"><tbody><tr><td>10</td><td>No control could detect it</td></tr><tr><td>9</td><td>Detected only through customer impact</td></tr><tr><td>8</td><td>Detected after impact by internal monitoring</td></tr><tr><td>6</td><td>Detected at onset, not prevented</td></tr><tr><td>4</td><td>Detected before impact with time to act</td></tr><tr><td>2</td><td>Automated interlock almost certainly stops it</td></tr><tr><td>1</td><td>Certain to be stopped</td></tr></tbody></table></div></div></div></details>
+
 
         <h2>Correction of errors (COE)</h2>
         <ul class="tight"><li>Reduce combustible (plastic) internal fuel load in UPS power cabinets; specify low-combustibility construction on new/replacement units <span class="coe-meta">Digital Realty facilities engineering / Schneider Electric · Recommended (not confirmed adopted)</span></li><li>Provision fast single-action de-energisation/isolation and cabinet-level suppression for energized UPS cabinets; joint energized-fire runbook with AHJ <span class="coe-meta">Digital Realty operations + Hillsboro Fire &amp; Rescue · Recommended</span></li><li>Validate N+1/2N power topology and automated failover so a single UPS-room loss cannot drop platform-serving load; run failover drill <span class="coe-meta">X (Twitter) infrastructure + Digital Realty · Recommended</span></li><li>Institute and evidence UPS-cabinet PM: IR thermography, connection/torque checks, battery condition monitoring, auditable records <span class="coe-meta">Digital Realty maintenance · Recommended</span></li><li>Deploy VESDA/aspirating early-warning detection in UPS rooms; log alarm-to-ignition latency <span class="coe-meta">Digital Realty fire-protection · Recommended</span></li><li>Complete and publish official cause determination <span class="coe-meta">Hillsboro Fire &amp; Rescue (Deputy Fire Commissioner Mike Mahar) · Done — report filed June 24, 2025; cause UNDETERMINED</span></li></ul>
@@ -435,7 +733,7 @@ A minor data note: CRN quotes the official report at &quot;$250,000 in damage&qu
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-1a1a084f"></script>
+    <script src="js/rz-version.js?v=20261010-00a1d9e8"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

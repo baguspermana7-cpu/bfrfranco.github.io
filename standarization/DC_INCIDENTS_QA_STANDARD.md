@@ -61,6 +61,66 @@ A dossier ships only if the reviewer confirms ALL of both dimensions.
 
 Before any ship touching a dossier or the generator's viz: run `tools/incidents-visual-qa.mjs` — it renders the hub + a sample of incident pages headless (root-unblurred), screenshots each visualization region, and a review agent (or the human) checks them against §3B. **A ship is blocked on any §3B failure.** This gate is why text-only review is insufficient and is not optional.
 
+## 4b · Retrospective FMEA (v3.13.0) — every dossier carries one
+
+Owner (2026-10-09): *"per incident tambahkan detail comprehensive FMEA analysis, ada visual dan detail
+evidence atau supportive data."* Implemented in `tools/incidents_fmea.py`, rendered after
+*Contributing factors* on every incident page, gated by `tools/test-incidents-fmea.py --strict`.
+
+**What it is.** For each way the system could fail: item and function, failure mode, effect, cause,
+the prevention and detection controls that existed at the time, Severity / Occurrence / Detection on
+1–10 scales adapted from IEC 60812:2018 and the AIAG-VDA handbook, a written rationale for EVERY
+score, the published corrective action, and the score that action earns. RPN = S × O × D is computed
+by the builder, never typed. Priority is High when S ≥ 9 with O ≥ 4 or D ≥ 7, or RPN ≥ 300 —
+severity overrides the product, because 9 × 2 × 9 hides a region-wide outage nothing would catch.
+
+**Writer rules (embed verbatim in any FMEA authoring prompt):**
+1. Nothing in the FMEA may be a fact the dossier does not hold — free text included (effect, cause,
+   controls, rationale), not only the evidence list. No outside knowledge, no new research.
+2. ≥ 4 modes, ≥ 2 evidence pointers each. A pointer names a dossier field — `soe|metric|coe|
+   improvement|ref|factor` by 0-based index, or `rootCause|tech` by quote — and any quote must be a
+   VERBATIM substring of the field it names. This is the anti-fabrication check, and it is machine-run.
+3. A revised score only against an action that points at a COE or improvement item whose status the
+   OPERATOR stated as done or committed. Analyst recommendations and undisclosed statuses are listed
+   as actions with NO revised score. No action at all → `actions: []` and the mode is shown as
+   **residual risk** — a legitimate finding, never softened.
+4. Committed-but-unconfirmed actions say so in `revisedRationale`: the reduction is a claim about the
+   action, not a confirmed outcome.
+5. Press-sourced or disputed causes are stated as such in the scope and the affected rationales.
+6. Calibrate: not every mode is S9; S10 is reserved for hazard to people or loss of a facility /
+   several regions; one event is not counted at full weight in several modes.
+7. Physical incidents cover the physical chain where the dossier supports it — initiating equipment,
+   detection, protection/suppression, isolation/transfer, recovery.
+
+**Exemplars.** Full official post-mortem: `aws-s3-us-east-1-2017`. Minimal disclosure, unconfirmed
+cause, every action undisclosed so every mode residual: `alibaba-cloud-global-2023`.
+
+**Visuals and their rules.**
+- RPN bars are HTML rows, not an SVG: the first version was an SVG on a 0–1000 axis, half empty
+  (worst RPN 504) and scaled with the column until labels rendered at 7–8 px — unreadable at 390 px.
+- The severity × occurrence matrix draws one marker per occupied cell carrying every ID in it, and
+  places labels by SEARCH (above → below → right → left, first slot clear of every marker and placed
+  label). The first rule — "above, unless the left neighbour took it" — passed the pilot and failed the
+  third dossier it met (AWS EBS 2011, a vertical collision). Before-and-after lives in the bars only;
+  movement lines on the matrix read as a shape, not as movement.
+- Summary is a `.metabar` line, never a four-up stat strip (the hero-metric template rejected in
+  v3.12.3).
+
+**Gates.** `python3 tools/test-incidents-fmea.py --strict [--require-all]` — schema, ranges,
+rationale per score, every pointer resolves, every quote verbatim, revised only against an action,
+and the rendered page carries the section with one row per mode (an invalid block is omitted by the
+builder AND reported, never a quiet gap). `tools/incidents-visual-qa.mjs` screenshots the bars,
+matrix and worksheet and fails on any matrix label overlapping another label or a marker that is not
+its own — ownership by DOM identity, not by position (the first version exempted any marker sharing a
+label's x, so a label stacked on a neighbour passed).
+
+**The generator was stale, and fixing it was a precondition.** Sweeps since v1.134.20 had edited
+the 44 generated pages directly (timeline 1:1 fix, `.vz-tl-ph` 10 px, mobile `.chip` wrap, hub title
+attributes, content-hash cache tokens) while `tools/build-incidents.py` was last changed 2026-08-02.
+Any rebuild reverted all of it. Those fixes now live in the builder; tokens are read from what the
+site already serves (`_asset_token`). **Never hand-edit an `incident-*.html` page again** — change
+the builder or the dossier, then rebuild.
+
 ## 5 · Model + process
 
 Research/QA runs on the **top Opus tier (Opus-5 class)**, multi-agent: crawlers (official · fire-authority/regulator · engineering/technical · facility-forensic) → assembler (this §2 prompt) → adversarial reviewer (this §3 checklist), minimum iterations until the depth floor is met with zero unverified claims. Batched (≤5 incidents/run) to respect session limits; ingest via `tools/_ingest_rca.py`; regenerate; run the §4 visual-QA gate; then the standard gate suite before ship.

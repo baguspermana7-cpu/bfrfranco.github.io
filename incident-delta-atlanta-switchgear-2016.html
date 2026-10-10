@@ -52,6 +52,12 @@
     .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
     .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
     .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:2px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    /* A chip carries the operator name, which can be a whole sentence ("Google Cloud
+       (impacted tenant); STT GDC / Tata Communications JV (named as the third-party …").
+       nowrap made that one chip 1120px wide and pushed the GCP Delhi dossier into a
+       1260px page at a 1100px viewport. Short chips are unaffected: normal wrapping
+       only engages when a chip would not fit its row. */
+    .chips .chip { max-width:100%; white-space:normal; overflow-wrap:anywhere; }
     .chip.cyan { color:var(--cyan); border-left:2px solid var(--cyan); }
     .chip.amber { color:var(--amber); border-left:2px solid var(--amber); }
     .chip.green { color:var(--green); border-left:2px solid var(--green); }
@@ -71,6 +77,11 @@
     /* rich incident table (reference-2 style) */
     table.itbl { min-width:1120px; }
     table.itbl td { vertical-align:middle; }
+    /* v1.134.20 — the title and summary columns ellipsise so the table's columns line up,
+       which is the right call for a dense index. But the cut text was reachable only by
+       navigating to the incident: a summary lost 238-298px of its sentence with no way to read
+       it in place. Each carries its full text in a title attribute now, so the truncation is
+       deliberate AND non-lossy — which is the condition the legibility audit checks for. */
     .itr { cursor:pointer; }
     .itr:hover td { background:var(--surface-2); }
     .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
@@ -240,7 +251,6 @@
        derive width = W px from the aspect ratio, so the drawing renders 1:1 at any event count
        and the panel scrolls instead of shrinking. */
     .viz-timeline svg { max-width:none; height:96px; width:auto; }
-
     .viz-radar svg { max-width:320px; margin:0 auto; }
     .vz-num { font-variant-numeric:tabular-nums slashed-zero; }
     .vz-box-t, .vz-box-s, .vz-lbl, .vz-hb-lbl, .vz-tl-t, .vz-pt, .vz-tick { pointer-events:auto; }
@@ -323,7 +333,86 @@
     }
     @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
 </style>
-    
+    <style>
+    /* ── FMEA (v3.12.3) — one hairline panel of rows, like the rest of the dossier.
+       No cards, no stripes: a row is a disclosure, state is a 7px dot. ── */
+    .fm-scope { color:var(--text-body); max-width:70ch; }
+    .fm-meta { flex-wrap:wrap; row-gap:0.25rem; }
+    .fm-viz { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:1.6rem; align-items:start; margin:1.2rem 0; }
+    @media (max-width:820px){ .fm-viz { grid-template-columns:1fr; } }
+    .fm-pb-row, .fm-pb-axis { display:grid; grid-template-columns:3.6rem minmax(0,1fr) 6.6rem; gap:0.6rem; align-items:center; }
+    .fm-pb-row { padding:0.32rem 0; }
+    .fm-pb-id, .fm-pb-val { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.8rem; }
+    .fm-pb-id { color:var(--muted); }
+    .fm-pb-val { color:var(--text-strong); white-space:nowrap; }
+    .fm-pb-track { display:flex; flex-direction:column; gap:3px; }
+    .fm-pb-bar { display:block; height:12px; }
+    .fm-pb-rev { display:block; height:4px; background:var(--text-body); opacity:0.55; }
+    .fm-pb-none { font-style:italic; font-size:0.72rem; color:var(--muted); line-height:1; }
+    .fm-pb-axis { margin-top:0.3rem; border-top:1px solid var(--line); padding-top:0.25rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .fm-pb-ticks { display:flex; justify-content:space-between; }
+    .fm-fig { margin:0; }
+    .fm-fig figcaption { font-size:0.8rem; color:var(--muted); margin-bottom:0.35rem; }
+    .fm-fig svg { width:100%; height:auto; display:block; }
+    .fm-fig-m svg { max-width:340px; }
+    .fm-matrix .fm-c-lo { fill:var(--surface); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-md { fill:color-mix(in srgb, var(--amber) 9%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-hi { fill:color-mix(in srgb, var(--red) 10%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .vz-axis { font-size:10px; fill:var(--muted); font-family:'IBM Plex Sans',sans-serif; }
+    .fm-matrix .fm-pt { stroke:var(--surface); stroke-width:1.5; }
+    .fm-matrix .fm-pt-l { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; fill:var(--text-strong);
+      paint-order:stroke; stroke:var(--surface); stroke-width:3px; stroke-linejoin:round; }
+    .fm-sheet { border:1px solid var(--line); border-radius:4px; margin-top:0.8rem; }
+    .fm-head, .fm-row > summary { display:grid; grid-template-columns:4.2rem minmax(0,1fr) 4.4rem 4.6rem 3.4rem; gap:0.6rem; align-items:baseline; padding:0.6rem 0.9rem; }
+    .fm-head { font-size:0.74rem; color:var(--muted); border-bottom:1px solid var(--line); }
+    .fm-row { border-top:1px solid var(--line); }
+    .fm-row:first-of-type { border-top:0; }
+    .fm-row > summary { cursor:pointer; list-style:none; }
+    .fm-row > summary::-webkit-details-marker { display:none; }
+    .fm-row > summary:hover { background:var(--surface-2); }
+    .fm-row > summary:focus-visible { outline:2px solid var(--cyan); outline-offset:-2px; }
+    .fm-id-cell, .fm-sod, .fm-rpn, .fm-rpn-rev { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.84rem; }
+    .fm-id-cell { color:var(--muted); }
+    .fm-mode { color:var(--text-strong); font-size:0.92rem; line-height:1.4; }
+    .fm-item { display:block; color:var(--muted); font-size:0.8rem; }
+    .fm-sod { color:var(--text-body); }
+    .fm-rpn { color:var(--text-strong); }
+    .fm-rpn-rev { color:var(--muted); }
+    .fm-dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:0.45rem; vertical-align:0.1em; }
+    .fm-body { padding:0.2rem 0.9rem 1rem 5.7rem; }
+    @media (max-width:640px){
+      .fm-head { display:none; }
+      .fm-row > summary { grid-template-columns:3.2rem minmax(0,1fr) auto; }
+      .fm-sod, .fm-rpn-rev { display:none; }
+      .fm-body { padding:0.2rem 0.9rem 1rem; }
+    }
+    .fm-kv { display:grid; grid-template-columns:9.5rem minmax(0,1fr); gap:0.3rem 0.9rem; margin:0.4rem 0 0.8rem; font-size:0.88rem; }
+    .fm-kv dt { color:var(--muted); }
+    .fm-kv dd { margin:0; color:var(--text-body); }
+    @media (max-width:640px){ .fm-kv { grid-template-columns:1fr; } .fm-kv dd { margin-bottom:0.4rem; } }
+    .fm-scores { margin:0 0 0.6rem; border-top:1px solid var(--line); }
+    .fm-sc { display:grid; grid-template-columns:3.2rem minmax(0,1fr); gap:0.6rem; padding:0.45rem 0; border-bottom:1px solid var(--line); font-size:0.86rem; }
+    .fm-sc dt { font-family:'JetBrains Mono',monospace; color:var(--muted); }
+    .fm-sc dt b { color:var(--text-strong); }
+    .fm-sc dd { margin:0; color:var(--text-body); }
+    .fm-sub { font-size:0.8rem; color:var(--muted); margin:0.7rem 0 0.25rem; }
+    .fm-sub b { color:var(--text-strong); }
+    .fm-acts, .fm-ev { margin:0; padding-left:1.1rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-acts li, .fm-ev li { margin:0.25rem 0; }
+    .fm-residual { color:var(--red); }
+    .fm-revline { font-size:0.86rem; color:var(--text-body); margin:0.4rem 0 0; }
+    .fm-ev-src { display:block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .fm-ev-src a { color:var(--cyan); }
+    .fm-ev-txt { display:block; }
+    .fm-method { margin-top:1rem; border:1px solid var(--line); border-radius:4px; }
+    .fm-method > summary { padding:0.6rem 0.9rem; cursor:pointer; font-size:0.9rem; color:var(--text-strong); }
+    .fm-method-body { padding:0 0.9rem 0.9rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-rubrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+    @media (max-width:760px){ .fm-rubrics { grid-template-columns:1fr; } }
+    .fm-rubric { width:100%; border-collapse:collapse; font-size:0.8rem; }
+    .fm-rubric td { padding:0.25rem 0.4rem; border-top:1px solid var(--line); vertical-align:top; }
+    .fm-rubric td:first-child { font-family:'JetBrains Mono',monospace; width:2rem; color:var(--text-strong); }
+</style>
 </head>
 <body class="locked">
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -387,6 +476,215 @@
 
         <h2>Contributing factors</h2>
         <ul class="tight"><li>UNDETECTED AS-BUILT A+B WIRING DEFECT (commissioning/inspection lapse) — VERIFIED: design intent was every server&#x27;s redundant PSUs on different power strips, but &#x27;300 of Delta&#x27;s 7,000 servers... were not linked to an alternate power source&#x27; (Availability Digest). No commissioning audit or failover test had caught the design-vs-installation gap; CEO Bastian &#x27;took full responsibility for the failure&#x27;.</li><li>MAINTENANCE/TEST PROCEDURE AS THE TRIGGER — VERIFIED: the fire &#x27;was the result of a routine scheduled switch for testing purposes to the backup generator&#x27; (Availability Digest). The resilience test itself ignited the gear, indicating the transfer sequence and/or the equipment&#x27;s condition were inadequately de-risked before a live transfer.</li><li>SINGLE DOWNSTREAM EVENT DEFEATED DUAL-FEED DESIGN — VERIFIED (mechanism) / REPORTED (nomenclature): a dual-utility-feed envelope was undone because one fire killed a transformer/feed AND left backups unpowered so failover failed. The specific &#x27;switchgear failure locked Delta out of its reserve generators as well as from Georgia Power&#x27; framing (Robert Mann, EE Power) is as-reported and was not independently re-verified.</li><li>TIGHT SYSTEM INTERDEPENDENCY / NO GRACEFUL DEGRADATION — VERIFIED: surviving servers &#x27;could not communicate with the servers that failed. This took down Delta&#x27;s entire system&#x27; (Availability Digest). Loss of only ~4% of servers collapsed the whole platform — insufficient partition tolerance / fault isolation.</li><li>LEGACY-SYSTEM RECOVERY FRICTION — VERIFIED: the core reservation platform runs on &#x27;a 52-year old legacy system called Deltamatic&#x27;; on restart &#x27;only the old Deltamatic green-screen interface was operational&#x27;, forcing manual check-in and handwritten boarding passes (Availability Digest) — extending impact far beyond power restoration.</li><li>FAILURE-TO-FAIL-SAFE / SURGE PROPAGATION — REPORTED, NOT VERIFIED: Delta stated the failing module &#x27;caus[ed] a surge to the transformer&#x27; (Gil West, ABC News, as reported), implying missing surge isolation/protective coordination. The verified record confirms only that &#x27;the fire caused a transformer to fail&#x27;, not the electrical surge mechanism.</li><li>OPAQUE / ABSENT COMPONENT RCA — SUPPORTED BY ABSENCE: no make, model, age, or chemistry of the failed gear was ever disclosed and no official root-cause analysis, regulatory, or vendor document was published; Georgia Power could only say it failed &#x27;for reasons that were not immediately clear&#x27; (as reported).</li><li>UNDOCUMENTED FIRE-PROTECTION POSTURE — DISCLOSED GAP: no detection or fixed-suppression system is named in any verifiable source and no discharge is confirmed; the power-control room&#x27;s fire-protection design and its performance were never validated in the public record.</li></ul>
+        <h2 id="fmea">Failure mode &amp; effects analysis (FMEA)</h2>
+        <p class="fm-scope">The power chain at Delta&#x27;s Atlanta headquarters data center and the operations platform it carried: the scheduled transfer to the backup generator and the power-control-room equipment it ignited, fire detection and suppression in that room, the transformer and transfer path between the two utility feeds and the generators, dual-cord power to servers, coupling between servers, recovery of the platform including the Deltamatic legacy system, and the root-cause disclosure. No official post-mortem exists. The verified spine is Availability Digest and Data Center Knowledge; the component names (&#x27;power control module&#x27;, &#x27;switchgear&#x27;), the surge mechanism and the claim that the failure locked Delta out of both generators and utility are reported but could not be re-verified, and detection and suppression are undocumented. No corrective action in the dossier has a confirmed status: the dual-cord fix is acknowledged but not verified, the IT-resilience investment is a general commitment of unverified scope, and the rest are undocumented or analyst recommendations. No revised score is claimed: all seven modes are residual risk.</p>
+        <p class="metabar fm-meta"><span><b>7</b> failure modes</span><span class="sep">/</span><span><b>4</b> high priority</span><span class="sep">/</span><span><b>0 of 7</b> with a published action</span><span class="sep">/</span><span>total RPN <b>2132 → 2132</b> (−0%)</span></p>
+        <div class="fm-viz">
+            <figure class="fm-fig"><figcaption>Risk priority number (S × O × D), worst first — thin bar: after the published action</figcaption><div class="fm-pb" role="list" aria-label="Risk priority number per failure mode, before and after corrective action"><div class="fm-pb-row" role="listitem" title="FM-01 The routine test transfer ignites a fire in the power-control room"><span class="fm-pb-id">FM-01</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:81.0%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">405</span></div><div class="fm-pb-row" role="listitem" title="FM-06 Recovery needs about 500 manual server reboots, and the 52-year-old Deltamatic returns with only its green-screen interface working"><span class="fm-pb-id">FM-06</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:72.0%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">360</span></div><div class="fm-pb-row" role="listitem" title="FM-04 About 300 of 7,000 servers are not linked to an alternate power source, and their backups are unpowered too"><span class="fm-pb-id">FM-04</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:64.8%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">324</span></div><div class="fm-pb-row" role="listitem" title="FM-03 One event in the power-control room kills a feed and leaves backups unpowered, so failover fails"><span class="fm-pb-id">FM-03</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:57.6%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">288</span></div><div class="fm-pb-row" role="listitem" title="FM-07 No root-cause analysis naming the failed component, its age or its failure mechanism is ever published"><span class="fm-pb-id">FM-07</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:57.6%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">288</span></div><div class="fm-pb-row" role="listitem" title="FM-05 Surviving servers cannot communicate with the failed ones and the whole system goes down"><span class="fm-pb-id">FM-05</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:48.6%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">243</span></div><div class="fm-pb-row" role="listitem" title="FM-02 The fire destroys a transformer before it is controlled; no detection or fixed suppression system is documented"><span class="fm-pb-id">FM-02</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:44.8%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">224</span></div><div class="fm-pb-axis" aria-hidden="true"><span></span><span class="fm-pb-ticks"><span>0</span><span>250</span><span>500</span></span><span></span></div></div></figure>
+            <figure class="fm-fig fm-fig-m"><figcaption>Criticality: severity × occurrence</figcaption><svg class="fm-matrix" viewBox="0 0 360 330" role="img" aria-label="Criticality matrix, severity against occurrence"><rect class="fm-c-lo" x="44" y="266" width="28" height="28"/><rect class="fm-c-lo" x="72" y="266" width="28" height="28"/><rect class="fm-c-lo" x="100" y="266" width="28" height="28"/><rect class="fm-c-lo" x="128" y="266" width="28" height="28"/><rect class="fm-c-lo" x="156" y="266" width="28" height="28"/><rect class="fm-c-lo" x="184" y="266" width="28" height="28"/><rect class="fm-c-lo" x="212" y="266" width="28" height="28"/><rect class="fm-c-lo" x="240" y="266" width="28" height="28"/><rect class="fm-c-lo" x="268" y="266" width="28" height="28"/><rect class="fm-c-lo" x="296" y="266" width="28" height="28"/><rect class="fm-c-lo" x="44" y="238" width="28" height="28"/><rect class="fm-c-lo" x="72" y="238" width="28" height="28"/><rect class="fm-c-lo" x="100" y="238" width="28" height="28"/><rect class="fm-c-lo" x="128" y="238" width="28" height="28"/><rect class="fm-c-lo" x="156" y="238" width="28" height="28"/><rect class="fm-c-lo" x="184" y="238" width="28" height="28"/><rect class="fm-c-lo" x="212" y="238" width="28" height="28"/><rect class="fm-c-lo" x="240" y="238" width="28" height="28"/><rect class="fm-c-md" x="268" y="238" width="28" height="28"/><rect class="fm-c-md" x="296" y="238" width="28" height="28"/><rect class="fm-c-lo" x="44" y="210" width="28" height="28"/><rect class="fm-c-lo" x="72" y="210" width="28" height="28"/><rect class="fm-c-lo" x="100" y="210" width="28" height="28"/><rect class="fm-c-lo" x="128" y="210" width="28" height="28"/><rect class="fm-c-lo" x="156" y="210" width="28" height="28"/><rect class="fm-c-md" x="184" y="210" width="28" height="28"/><rect class="fm-c-md" x="212" y="210" width="28" height="28"/><rect class="fm-c-md" x="240" y="210" width="28" height="28"/><rect class="fm-c-md" x="268" y="210" width="28" height="28"/><rect class="fm-c-md" x="296" y="210" width="28" height="28"/><rect class="fm-c-lo" x="44" y="182" width="28" height="28"/><rect class="fm-c-lo" x="72" y="182" width="28" height="28"/><rect class="fm-c-lo" x="100" y="182" width="28" height="28"/><rect class="fm-c-lo" x="128" y="182" width="28" height="28"/><rect class="fm-c-md" x="156" y="182" width="28" height="28"/><rect class="fm-c-md" x="184" y="182" width="28" height="28"/><rect class="fm-c-md" x="212" y="182" width="28" height="28"/><rect class="fm-c-md" x="240" y="182" width="28" height="28"/><rect class="fm-c-md" x="268" y="182" width="28" height="28"/><rect class="fm-c-hi" x="296" y="182" width="28" height="28"/><rect class="fm-c-lo" x="44" y="154" width="28" height="28"/><rect class="fm-c-lo" x="72" y="154" width="28" height="28"/><rect class="fm-c-lo" x="100" y="154" width="28" height="28"/><rect class="fm-c-md" x="128" y="154" width="28" height="28"/><rect class="fm-c-md" x="156" y="154" width="28" height="28"/><rect class="fm-c-md" x="184" y="154" width="28" height="28"/><rect class="fm-c-md" x="212" y="154" width="28" height="28"/><rect class="fm-c-hi" x="240" y="154" width="28" height="28"/><rect class="fm-c-hi" x="268" y="154" width="28" height="28"/><rect class="fm-c-hi" x="296" y="154" width="28" height="28"/><rect class="fm-c-lo" x="44" y="126" width="28" height="28"/><rect class="fm-c-lo" x="72" y="126" width="28" height="28"/><rect class="fm-c-md" x="100" y="126" width="28" height="28"/><rect class="fm-c-md" x="128" y="126" width="28" height="28"/><rect class="fm-c-md" x="156" y="126" width="28" height="28"/><rect class="fm-c-md" x="184" y="126" width="28" height="28"/><rect class="fm-c-hi" x="212" y="126" width="28" height="28"/><rect class="fm-c-hi" x="240" y="126" width="28" height="28"/><rect class="fm-c-hi" x="268" y="126" width="28" height="28"/><rect class="fm-c-hi" x="296" y="126" width="28" height="28"/><rect class="fm-c-lo" x="44" y="98" width="28" height="28"/><rect class="fm-c-lo" x="72" y="98" width="28" height="28"/><rect class="fm-c-md" x="100" y="98" width="28" height="28"/><rect class="fm-c-md" x="128" y="98" width="28" height="28"/><rect class="fm-c-md" x="156" y="98" width="28" height="28"/><rect class="fm-c-hi" x="184" y="98" width="28" height="28"/><rect class="fm-c-hi" x="212" y="98" width="28" height="28"/><rect class="fm-c-hi" x="240" y="98" width="28" height="28"/><rect class="fm-c-hi" x="268" y="98" width="28" height="28"/><rect class="fm-c-hi" x="296" y="98" width="28" height="28"/><rect class="fm-c-lo" x="44" y="70" width="28" height="28"/><rect class="fm-c-lo" x="72" y="70" width="28" height="28"/><rect class="fm-c-md" x="100" y="70" width="28" height="28"/><rect class="fm-c-md" x="128" y="70" width="28" height="28"/><rect class="fm-c-hi" x="156" y="70" width="28" height="28"/><rect class="fm-c-hi" x="184" y="70" width="28" height="28"/><rect class="fm-c-hi" x="212" y="70" width="28" height="28"/><rect class="fm-c-hi" x="240" y="70" width="28" height="28"/><rect class="fm-c-hi" x="268" y="70" width="28" height="28"/><rect class="fm-c-hi" x="296" y="70" width="28" height="28"/><rect class="fm-c-hi" x="44" y="42" width="28" height="28"/><rect class="fm-c-hi" x="72" y="42" width="28" height="28"/><rect class="fm-c-hi" x="100" y="42" width="28" height="28"/><rect class="fm-c-hi" x="128" y="42" width="28" height="28"/><rect class="fm-c-hi" x="156" y="42" width="28" height="28"/><rect class="fm-c-hi" x="184" y="42" width="28" height="28"/><rect class="fm-c-hi" x="212" y="42" width="28" height="28"/><rect class="fm-c-hi" x="240" y="42" width="28" height="28"/><rect class="fm-c-hi" x="268" y="42" width="28" height="28"/><rect class="fm-c-hi" x="296" y="42" width="28" height="28"/><rect class="fm-c-hi" x="44" y="14" width="28" height="28"/><rect class="fm-c-hi" x="72" y="14" width="28" height="28"/><rect class="fm-c-hi" x="100" y="14" width="28" height="28"/><rect class="fm-c-hi" x="128" y="14" width="28" height="28"/><rect class="fm-c-hi" x="156" y="14" width="28" height="28"/><rect class="fm-c-hi" x="184" y="14" width="28" height="28"/><rect class="fm-c-hi" x="212" y="14" width="28" height="28"/><rect class="fm-c-hi" x="240" y="14" width="28" height="28"/><rect class="fm-c-hi" x="268" y="14" width="28" height="28"/><rect class="fm-c-hi" x="296" y="14" width="28" height="28"/><text class="vz-tick" x="58.0" y="308" text-anchor="middle">1</text><text class="vz-tick" x="36" y="284.0" text-anchor="end">1</text><text class="vz-tick" x="86.0" y="308" text-anchor="middle">2</text><text class="vz-tick" x="36" y="256.0" text-anchor="end">2</text><text class="vz-tick" x="114.0" y="308" text-anchor="middle">3</text><text class="vz-tick" x="36" y="228.0" text-anchor="end">3</text><text class="vz-tick" x="142.0" y="308" text-anchor="middle">4</text><text class="vz-tick" x="36" y="200.0" text-anchor="end">4</text><text class="vz-tick" x="170.0" y="308" text-anchor="middle">5</text><text class="vz-tick" x="36" y="172.0" text-anchor="end">5</text><text class="vz-tick" x="198.0" y="308" text-anchor="middle">6</text><text class="vz-tick" x="36" y="144.0" text-anchor="end">6</text><text class="vz-tick" x="226.0" y="308" text-anchor="middle">7</text><text class="vz-tick" x="36" y="116.0" text-anchor="end">7</text><text class="vz-tick" x="254.0" y="308" text-anchor="middle">8</text><text class="vz-tick" x="36" y="88.0" text-anchor="end">8</text><text class="vz-tick" x="282.0" y="308" text-anchor="middle">9</text><text class="vz-tick" x="36" y="60.0" text-anchor="end">9</text><text class="vz-tick" x="310.0" y="308" text-anchor="middle">10</text><text class="vz-tick" x="36" y="32.0" text-anchor="end">10</text><text class="vz-axis" x="184" y="328" text-anchor="middle">Occurrence →</text><text class="vz-axis" transform="translate(11 154) rotate(-90)" text-anchor="middle">Severity →</text><circle class="fm-pt" cx="114.0" cy="56.0" r="6" fill="var(--red)"><title>FM-05 Surviving servers cannot communicate with the failed ones and the whole system goes down (S9 O3 D9)</title></circle><text class="fm-pt-l" x="114.0" y="46.0" text-anchor="middle">05</text><circle class="fm-pt" cx="142.0" cy="56.0" r="6" fill="var(--red)"><title>FM-04 About 300 of 7,000 servers are not linked to an alternate power source, and their backups are unpowered too (S9 O4 D9)</title></circle><text class="fm-pt-l" x="142.0" y="46.0" text-anchor="middle">04</text><circle class="fm-pt" cx="170.0" cy="56.0" r="6" fill="var(--red)"><title>FM-01 The routine test transfer ignites a fire in the power-control room (S9 O5 D9)</title></circle><text class="fm-pt-l" x="170.0" y="46.0" text-anchor="middle">01</text><circle class="fm-pt" cx="142.0" cy="84.0" r="6" fill="var(--amber)"><title>FM-03 One event in the power-control room kills a feed and leaves backups unpowered, so failover fails (S8 O4 D9)</title></circle><text class="fm-pt-l" x="142.0" y="74.0" text-anchor="middle">03</text><circle class="fm-pt" cx="170.0" cy="84.0" r="6" fill="var(--red)"><title>FM-06 Recovery needs about 500 manual server reboots, and the 52-year-old Deltamatic returns with only its green-screen interface working (S8 O5 D9)</title></circle><text class="fm-pt-l" x="170.0" y="74.0" text-anchor="middle">06</text><circle class="fm-pt" cx="142.0" cy="112.0" r="6" fill="var(--amber)"><title>FM-02 The fire destroys a transformer before it is controlled; no detection or fixed suppression system is documented (S7 O4 D8)</title></circle><text class="fm-pt-l" x="142.0" y="102.0" text-anchor="middle">02</text><circle class="fm-pt" cx="254.0" cy="196.0" r="6" fill="var(--amber)"><title>FM-07 No root-cause analysis naming the failed component, its age or its failure mechanism is ever published (S4 O8 D9)</title></circle><text class="fm-pt-l" x="254.0" y="186.0" text-anchor="middle">07</text></svg></figure>
+        </div>
+        <div class="fm-sheet">
+            <div class="fm-head" aria-hidden="true"><span>ID</span><span>Failure mode</span><span>S·O·D</span><span>RPN</span><span>After</span></div>
+            <details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-01</span>
+    <span class="fm-mode">The routine test transfer ignites a fire in the power-control room<span class="fm-item">Power-control-room equipment during the generator test transfer</span></span>
+    <span class="fm-sod" aria-label="Severity 9, occurrence 5, detection 9">9·5·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>405</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Transfer load to the backup generator for a scheduled test without damaging the gear</dd>
+      <dt>Effect</dt><dd>A fire at 02:30 EST destroys a transformer and kills one of two power feeds, starting the chain that took Delta&#x27;s entire system down</dd>
+      <dt>Cause</dt><dd>Undetermined. Delta reportedly named a &#x27;power control module&#x27; and Georgia Power reportedly named switchgear that failed &#x27;for reasons that were not immediately clear&#x27;; no make, model, age or failure mechanism was ever published</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>None recorded before the transfer; the dossier has no record of pre-test checks on the gear</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>9</b></dt><dd>It initiated a worldwide outage of an airline&#x27;s operations platform with no workaround, grounding the fleet: provider-wide outage of a foundational service, the rubric&#x27;s 9. Not 10: the fire stayed small and confined to the room and no injuries are reported.</dd></div>
+      <div class="fm-sc"><dt>O <b>5</b></dt><dd>A scheduled test transfer is routine work that exercised the cause, but the equipment-level cause is undetermined, so it is held at 5 rather than 6 or 8.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>No pre-transfer inspection or condition check is recorded; the failure announced itself as a fire.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 405</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Review switchgear and transfer maintenance and de-risk live generator-test transfers (not publicly documented) <span class="fm-ev-src">Correction of errors #4</span></li><li>Pre-test thermography and insulation checks, and staged transfers under controlled conditions <span class="fm-ev-src">Improvement #1</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Availability Digest (availabilitydigest.com/public_articles/1109/delta.pdf) — VERIFIED verbatim" target="_blank" rel="noopener nofollow">Sequence of events #1</a></span><span class="fm-ev-txt">“was the result of a routine scheduled switch for testing purposes to the backup generator”</span></li><li><span class="fm-ev-src"><a href="https://Availability Digest — VERIFIED verbatim" target="_blank" rel="noopener nofollow">Sequence of events #2</a></span><span class="fm-ev-txt">2016-08-08 02:30 EST — A fire erupts in the power-control room: &#x27;On Monday morning, August 8, 2016, at 2:30 AM EST, a fire erupted in the power control room of Delta&#x27;s data center at its Atlanta headquarters.&#x27;</span></li><li><span class="fm-ev-src"><a href="https://www.ajc.com/business/georgia-power-suspects-equipment-failure-caused-airport-fire-outage/LmQ9sG6pj8HnwP8nuUAlEJ" target="_blank" rel="noopener nofollow">Reference #2 · press</a></span><span class="fm-ev-txt">“Bastian said a power control module at the airline&#x27;s technology command center failed and caught fire.”</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“for reasons that were not immediately clear”</span></li><li><span class="fm-ev-src">Contributing factor #2</span><span class="fm-ev-txt">“The resilience test itself ignited the gear”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-06</span>
+    <span class="fm-mode">Recovery needs about 500 manual server reboots, and the 52-year-old Deltamatic returns with only its green-screen interface working<span class="fm-item">Platform recovery and the Deltamatic legacy reservation system</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 5, detection 9">8·5·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>360</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Return the operations platform to full service quickly once power is restored</dd>
+      <dt>Effect</dt><dd>Systems operational only at 08:30 EST, six hours after the fire; manual check-in and handwritten boarding passes; 2,100 flights cancelled over three days and about 2,400 delayed</dd>
+      <dt>Cause</dt><dd>Manual restart dependence and legacy-platform fragility</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Not applicable before the incident; recovery time was learned during it</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>This mode sets how long and how deep the outage ran rather than whether it happened: hours of full outage and a three-day operational tail are scored 8 so the outage is not counted again at 9.</dd></div>
+      <div class="fm-sc"><dt>O <b>5</b></dt><dd>The recovery path applies to any platform-wide loss; present as a standing condition though rarely exercised.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>No recovery drill is recorded that would have shown the restart time or the green-screen-only state in advance.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 360</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Invest in IT resilience and modernise reservation and passenger-service platforms (publicly committed in general terms; scope and completion not verified) <span class="fm-ev-src">Correction of errors #3</span></li><li>Geographically redundant reservation platform with tested automated failover to a second site <span class="fm-ev-src">Improvement #7</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Availability Digest (VERIFIED)" target="_blank" rel="noopener nofollow">Metric #3</a></span><span class="fm-ev-txt">Servers requiring manual reboot: ~500</span></li><li><span class="fm-ev-src"><a href="https://Availability Digest (VERIFIED)" target="_blank" rel="noopener nofollow">Metric #5</a></span><span class="fm-ev-txt">Time to systems operational: ~6 hours (02:30 → 08:30 EST)</span></li><li><span class="fm-ev-src"><a href="https://Availability Digest — VERIFIED verbatim" target="_blank" rel="noopener nofollow">Sequence of events #14</a></span><span class="fm-ev-txt">2016-08-08 morning EST — Core reservation platform returns degraded: the 52-year-old &#x27;Deltamatic&#x27; system comes back with &#x27;only the old Deltamatic green-screen interface... operational&#x27;, forcing manual check-in and handwritten boarding passes.</span></li><li><span class="fm-ev-src"><a href="https://Availability Digest (VERIFIED)" target="_blank" rel="noopener nofollow">Metric #8</a></span><span class="fm-ev-txt">Flights cancelled over 3 days: 2,100 (1,000 Mon / 800 Tue / 300 Wed)</span></li><li><span class="fm-ev-src">Contributing factor #5</span><span class="fm-ev-txt">LEGACY-SYSTEM RECOVERY FRICTION — VERIFIED: the core reservation platform runs on &#x27;a 52-year old legacy system called Deltamatic&#x27;; on restart &#x27;only the old Deltamatic green-screen interface was operational&#x27;, forcing manual check-in and handwritten boarding passes (Availability Digest) — extending impact far beyond power restoration.</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-04</span>
+    <span class="fm-mode">About 300 of 7,000 servers are not linked to an alternate power source, and their backups are unpowered too<span class="fm-item">Server dual-cord (A+B) power wiring</span></span>
+    <span class="fm-sod" aria-label="Severity 9, occurrence 4, detection 9">9·4·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>324</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Keep every server powered from an independent second source if one feed is lost</dd>
+      <dt>Effect</dt><dd>The single-fed servers go dark and cannot fail over to their backups</dd>
+      <dt>Cause</dt><dd>As-built wiring diverged from the A+B design intent and no commissioning audit or failover test caught it</dd>
+      <dt>Prevention in place</dt><dd>Design intent of redundant power supplies on different power strips</dd>
+      <dt>Detection in place</dt><dd>None; the defect is reported to have gone undetected until the live fault</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>9</b></dt><dd>This verified defect is what turned the loss of one feed into dead servers and, through FM-05, the airline-wide outage.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>A standing latent defect that only matters when a feed is lost, an unusual combination: &#x27;infrequent&#x27;. Kept at 4 so the single event is not scored at full weight again.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>No audit or drill had found it; it was revealed through the outage.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 324</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Correct the ~300 single-fed servers and audit dual-cord integrity across all 7,000 (acknowledged by the CEO; completion not publicly verified) <span class="fm-ev-src">Correction of errors #2</span></li><li>Independent commissioning, periodic A/B integrity audits and recurring pull-the-plug failover drills <span class="fm-ev-src">Improvement #2</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Availability Digest — VERIFIED verbatim" target="_blank" rel="noopener nofollow">Sequence of events #7</a></span><span class="fm-ev-txt">2016-08-08 ~02:32 EST — ~300 of 7,000 servers wired only to the failed feed lose power, and their backups are also dead: &#x27;300 of Delta&#x27;s 7,000 servers... were not linked to an alternate power source&#x27;; &#x27;many of them could not fail over to their backups, which were also down due to being unpowered.&#x27;</span></li><li><span class="fm-ev-src"><a href="https://Availability Digest (VERIFIED)" target="_blank" rel="noopener nofollow">Metric #2</a></span><span class="fm-ev-txt">Servers lacking alternate power source: ~300 of 7,000 (~4.3%)</span></li><li><span class="fm-ev-src">Contributing factor #1</span><span class="fm-ev-txt">“No commissioning audit or failover test had caught the design-vs-installation gap”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-03</span>
+    <span class="fm-mode">One event in the power-control room kills a feed and leaves backups unpowered, so failover fails<span class="fm-item">Transformer, transfer path and protective coordination between utility feeds and generators</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 4, detection 9">8·4·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>288</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Isolate a fault in one device so the other utility feed and the generators keep carrying the load</dd>
+      <dt>Effect</dt><dd>Despite two utilities entering opposite sides of the building, power to part of the IT load is lost; Delta said some critical systems and network equipment did not switch over to backup systems</dd>
+      <dt>Cause</dt><dd>A concentrated transfer node without selective isolation. The reported surge to the transformer and the claim that switchgear locked Delta out of both generators and Georgia Power are not re-verified</dd>
+      <dt>Prevention in place</dt><dd>Two separate utility feeds entering opposite sides of the building</dd>
+      <dt>Detection in place</dt><dd>None recorded</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>This is where the dual-feed design was defeated; scored 8 rather than 9 because the airline-wide outage is already carried by FM-01 and required the server-level defect in FM-04 as well.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>Needs a fault at the shared node, an unusual combination: &#x27;infrequent&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>No study or test of the node&#x27;s selectivity is recorded; the weakness showed only when backups did not take the load.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 288</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Selective breaker coordination and surge or fault isolation <span class="fm-ev-src">Improvement #4</span></li><li>Audit the topology so no single switchgear, transfer switch or transformer can sever a feed and defeat generator failover <span class="fm-ev-src">Improvement #5</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Availability Digest — VERIFIED verbatim" target="_blank" rel="noopener nofollow">Sequence of events #5</a></span><span class="fm-ev-txt">“The fire caused a transformer to fail, killing one of the two power feeds to the data center.”</span></li><li><span class="fm-ev-src"><a href="https://www.oxfordrmg.com/wp-content/uploads/2016/08/08.09.16-Delta-Meltdown-Reflects-Problems-With-Aging-Technology-WSJ.pdf" target="_blank" rel="noopener nofollow">Reference #1 · press</a></span><span class="fm-ev-txt">“some critical systems and network equipment didn&#x27;t switch over to Delta&#x27;s backup systems”</span></li><li><span class="fm-ev-src">Contributing factor #3</span><span class="fm-ev-txt">SINGLE DOWNSTREAM EVENT DEFEATED DUAL-FEED DESIGN — VERIFIED (mechanism) / REPORTED (nomenclature): a dual-utility-feed envelope was undone because one fire killed a transformer/feed AND left backups unpowered so failover failed. The specific &#x27;switchgear failure locked Delta out of its reserve generators as well as from Georgia Power&#x27; framing (Robert Mann, EE Power) is as-reported and was not independently re-verified.</span></li><li><span class="fm-ev-src"><a href="https://analyst Robert Mann, via EE Power — AS REPORTED, not independently verified" target="_blank" rel="noopener nofollow">Sequence of events #6</a></span><span class="fm-ev-txt">2016-08-08 ~02:31 EST — REPORTED, NOT RE-VERIFIED: a single transfer point is said to have isolated the load from both sources — &#x27;the switchgear failure locked Delta out of its reserve generators as well as from Georgia Power.&#x27; Source page not re-fetchable this pass.</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-07</span>
+    <span class="fm-mode">No root-cause analysis naming the failed component, its age or its failure mechanism is ever published<span class="fm-item">Post-incident root-cause analysis and disclosure</span></span>
+    <span class="fm-sod" aria-label="Severity 4, occurrence 8, detection 9">4·8·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>288</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Identify the failed component and mechanism so recurrence can be prevented and assessed</dd>
+      <dt>Effect</dt><dd>The physical failure mode remains officially unverified; this FMEA cannot score the initiating equipment or the fire protection beyond &#x27;undetermined&#x27;</dd>
+      <dt>Cause</dt><dd>Delta did not publish an RCA, and no regulatory or vendor document exists</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Visible only as the absence of a report</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>4</b></dt><dd>The missing report stops no service; it limits what others can learn and verify, which is &#x27;limited impact&#x27;.</dd></div>
+      <div class="fm-sc"><dt>O <b>8</b></dt><dd>The dossier records the absence as the standing state of the record, not a one-off delay.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>Nothing surfaces the gap except the missing document.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 288</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li class="fm-residual">No corrective action is recorded in the published sources. This mode is residual risk.</li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Correction of errors #1</span><span class="fm-ev-txt">Public root-cause analysis identifying the failed component (make/model/age) and failure mechanism (arc-fault vs mechanical) (Never published — official RCA absent (DISCLOSURE GAP))</span></li><li><span class="fm-ev-src">Contributing factor #7</span><span class="fm-ev-txt">OPAQUE / ABSENT COMPONENT RCA — SUPPORTED BY ABSENCE: no make, model, age, or chemistry of the failed gear was ever disclosed and no official root-cause analysis, regulatory, or vendor document was published; Georgia Power could only say it failed &#x27;for reasons that were not immediately clear&#x27; (as reported).</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“The physical failure mode is therefore officially unverified.”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-05</span>
+    <span class="fm-mode">Surviving servers cannot communicate with the failed ones and the whole system goes down<span class="fm-item">Coupling between servers in the operations platform</span></span>
+    <span class="fm-sod" aria-label="Severity 9, occurrence 3, detection 9">9·3·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>243</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Keep the platform running in degraded form when a minority of servers is lost</dd>
+      <dt>Effect</dt><dd>Check-in, baggage, websites, kiosks and airport displays go dark; Delta grounds its global fleet</dd>
+      <dt>Cause</dt><dd>Tight interdependency with no recorded fault isolation or degraded mode</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Customer-visible impact</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>9</b></dt><dd>Losing about 4% of servers collapsed 100% of the platform; this coupling is what made the outage airline-wide.</dd></div>
+      <div class="fm-sc"><dt>O <b>3</b></dt><dd>Needs a loss of servers first, which is infrequent.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>Seen through the outage itself.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 243</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Re-architect for partition tolerance, bulkheading and degraded-mode operation <span class="fm-ev-src">Improvement #6</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Availability Digest — VERIFIED verbatim" target="_blank" rel="noopener nofollow">Sequence of events #8</a></span><span class="fm-ev-txt">“could not communicate with the servers that failed. This took down Delta&#x27;s entire system.”</span></li><li><span class="fm-ev-src">Contributing factor #4</span><span class="fm-ev-txt">TIGHT SYSTEM INTERDEPENDENCY / NO GRACEFUL DEGRADATION — VERIFIED: surviving servers &#x27;could not communicate with the servers that failed. This took down Delta&#x27;s entire system&#x27; (Availability Digest). Loss of only ~4% of servers collapsed the whole platform — insufficient partition tolerance / fault isolation.</span></li><li><span class="fm-ev-src"><a href="https://Availability Digest (VERIFIED)" target="_blank" rel="noopener nofollow">Metric #2</a></span><span class="fm-ev-txt">Servers lacking alternate power source: ~300 of 7,000 (~4.3%)</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-02</span>
+    <span class="fm-mode">The fire destroys a transformer before it is controlled; no detection or fixed suppression system is documented<span class="fm-item">Fire detection and suppression in the power-control room</span></span>
+    <span class="fm-sod" aria-label="Severity 7, occurrence 4, detection 8">7·4·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>224</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Detect an electrical fire early and suppress it before it damages adjacent power equipment</dd>
+      <dt>Effect</dt><dd>One utility feed is lost; the fire itself stays confined to the room</dd>
+      <dt>Cause</dt><dd>Fire-protection design and performance for the room are undocumented in any verifiable source</dd>
+      <dt>Prevention in place</dt><dd>Unknown; no fixed suppression system is named and no discharge is confirmed</dd>
+      <dt>Detection in place</dt><dd>Unknown; no detection system or detection time is recorded, only the 02:30 origin time</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>7</b></dt><dd>Losing a feed to the fire is a major degradation of the facility&#x27;s power supply; the system-wide collapse that followed is scored in FM-04 and FM-05. The fire&#x27;s confinement to the room limits this score.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>Needs an electrical fire first, which is infrequent.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>These scores reflect the absence of any documented control, not an observed failure: the dossier cannot say when the fire was detected, and a secondary claim that it was &#x27;quickly extinguished&#x27; is not certified.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 224</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Validate power-control-room fire detection and fixed suppression design and performance (no public evidence of any review) <span class="fm-ev-src">Correction of errors #6</span></li><li>Very-early smoke detection, fixed suppression, arc-fault mitigation and auto de-energisation in power rooms <span class="fm-ev-src">Improvement #3</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #8</span><span class="fm-ev-txt">“no detection or fixed-suppression system is named in any verifiable source and no discharge is confirmed”</span></li><li><span class="fm-ev-src"><a href="https://Availability Digest (origin time only); no detection-system source exists (DISCLOSED GAP)" target="_blank" rel="noopener nofollow">Sequence of events #3</a></span><span class="fm-ev-txt">2016-08-08 02:30 EST — The fire is detected/sensed at origin, but NO verifiable source names the detection system (aspirating/VESDA, spot smoke, or heat) or the exact detection moment; the only fixed data point is the 2:30 AM origin time.</span></li><li><span class="fm-ev-src"><a href="https://Trade-press characterization (Network Computing), NOT re-verified (DISCLOSED UNCERTAINTY)" target="_blank" rel="noopener nofollow">Sequence of events #9</a></span><span class="fm-ev-txt">“a small fire that was quickly extinguished”</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“which was small and confined to the power-control room”</span></li></ul>
+  </div>
+</details>
+        </div>
+        <details class="fm-method"><summary>Scoring rubric and method</summary><div class="fm-method-body"><p>A retrospective FMEA: each row asks how this system could fail, how bad the effect was, how likely the cause was given the controls in place at the time, and how likely those controls were to catch it before customers did. Scales are adapted for data-centre operations from the 1–10 scales of IEC 60812:2018 and the AIAG-VDA FMEA handbook. RPN = S × O × D. Priority is High when S ≥ 9 with O ≥ 4 or D ≥ 7, or when RPN ≥ 300; Medium when RPN ≥ 120 or S ≥ 7; Low otherwise. Severity overrides the product because a large S multiplied by small O and D can hide a region-wide outage nothing would catch.</p><p>Every row cites evidence from this dossier, and every quote is checked verbatim against its source by <code>tools/test-incidents-fmea.py</code>. A revised score is only shown against a published corrective action. This is an RZ analyst assessment, not an operator document.</p><div class="fm-rubrics"><div><p class="fm-sub">Severity</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Hazard to people, or loss of the facility / several regions</td></tr><tr><td>9</td><td>Region-wide or provider-wide outage of a foundational service, no workaround</td></tr><tr><td>8</td><td>Full outage of a major service for hours</td></tr><tr><td>7</td><td>Major degradation of a major service</td></tr><tr><td>6</td><td>Partial outage confined to one zone or one service</td></tr><tr><td>5</td><td>Customer-visible degradation</td></tr><tr><td>4</td><td>Limited customer impact</td></tr><tr><td>3</td><td>Internal impact only</td></tr><tr><td>2</td><td>Negligible</td></tr><tr><td>1</td><td>No effect</td></tr></tbody></table></div><div><p class="fm-sub">Occurrence</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Near certain: the cause is present in normal operation</td></tr><tr><td>8</td><td>Frequent: routine work exercises the cause</td></tr><tr><td>6</td><td>Occasional: a foreseeable slip or condition, weakly guarded</td></tr><tr><td>4</td><td>Infrequent: needs an unusual combination</td></tr><tr><td>2</td><td>Remote: guarded by design</td></tr><tr><td>1</td><td>Eliminated by design</td></tr></tbody></table></div><div><p class="fm-sub">Detection</p><table class="fm-rubric"><tbody><tr><td>10</td><td>No control could detect it</td></tr><tr><td>9</td><td>Detected only through customer impact</td></tr><tr><td>8</td><td>Detected after impact by internal monitoring</td></tr><tr><td>6</td><td>Detected at onset, not prevented</td></tr><tr><td>4</td><td>Detected before impact with time to act</td></tr><tr><td>2</td><td>Automated interlock almost certainly stops it</td></tr><tr><td>1</td><td>Certain to be stopped</td></tr></tbody></table></div></div></div></details>
+
 
         <h2>Correction of errors (COE)</h2>
         <ul class="tight"><li>Public root-cause analysis identifying the failed component (make/model/age) and failure mechanism (arc-fault vs mechanical) <span class="coe-meta">Delta Air Lines (IT/Facilities) · Never published — official RCA absent (DISCLOSURE GAP)</span></li><li>Correct the ~300 single-fed servers and audit dual-cord A/B integrity across all 7,000 servers <span class="coe-meta">Delta Air Lines (Data Center Operations) · Vulnerability acknowledged by CEO (&#x27;took full responsibility&#x27;); remediation completion not publicly verified</span></li><li>Invest in IT resilience / modernize reservation and passenger-service platforms <span class="coe-meta">Delta Air Lines (CIO/CEO) · Delta publicly committed to IT-resilience investment post-incident; scope/completion not independently verified this pass</span></li><li>Review switchgear/transfer maintenance and de-risk live generator-test transfer procedures <span class="coe-meta">Delta Air Lines (Facilities/Engineering) · Not publicly documented</span></li><li>Confirm no area-grid cause and support Delta investigation <span class="coe-meta">Georgia Power · Georgia Power stated (as reported) it was Delta-equipment failure with &#x27;no area power outage&#x27;; not re-verified this pass</span></li><li>Validate power-control-room fire detection and fixed suppression design and performance <span class="coe-meta">Delta Air Lines (Facilities/Life-Safety) · No public evidence of any review — posture officially undocumented</span></li></ul>
@@ -421,7 +719,7 @@
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-1a1a084f"></script>
+    <script src="js/rz-version.js?v=20261010-00a1d9e8"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

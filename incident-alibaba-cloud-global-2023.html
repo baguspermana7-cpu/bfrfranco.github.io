@@ -52,6 +52,12 @@
     .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
     .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
     .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:2px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    /* A chip carries the operator name, which can be a whole sentence ("Google Cloud
+       (impacted tenant); STT GDC / Tata Communications JV (named as the third-party …").
+       nowrap made that one chip 1120px wide and pushed the GCP Delhi dossier into a
+       1260px page at a 1100px viewport. Short chips are unaffected: normal wrapping
+       only engages when a chip would not fit its row. */
+    .chips .chip { max-width:100%; white-space:normal; overflow-wrap:anywhere; }
     .chip.cyan { color:var(--cyan); border-left:2px solid var(--cyan); }
     .chip.amber { color:var(--amber); border-left:2px solid var(--amber); }
     .chip.green { color:var(--green); border-left:2px solid var(--green); }
@@ -71,6 +77,11 @@
     /* rich incident table (reference-2 style) */
     table.itbl { min-width:1120px; }
     table.itbl td { vertical-align:middle; }
+    /* v1.134.20 — the title and summary columns ellipsise so the table's columns line up,
+       which is the right call for a dense index. But the cut text was reachable only by
+       navigating to the incident: a summary lost 238-298px of its sentence with no way to read
+       it in place. Each carries its full text in a title attribute now, so the truncation is
+       deliberate AND non-lossy — which is the condition the legibility audit checks for. */
     .itr { cursor:pointer; }
     .itr:hover td { background:var(--surface-2); }
     .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
@@ -240,7 +251,6 @@
        derive width = W px from the aspect ratio, so the drawing renders 1:1 at any event count
        and the panel scrolls instead of shrinking. */
     .viz-timeline svg { max-width:none; height:96px; width:auto; }
-
     .viz-radar svg { max-width:320px; margin:0 auto; }
     .vz-num { font-variant-numeric:tabular-nums slashed-zero; }
     .vz-box-t, .vz-box-s, .vz-lbl, .vz-hb-lbl, .vz-tl-t, .vz-pt, .vz-tick { pointer-events:auto; }
@@ -323,7 +333,86 @@
     }
     @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
 </style>
-    
+    <style>
+    /* ── FMEA (v3.12.3) — one hairline panel of rows, like the rest of the dossier.
+       No cards, no stripes: a row is a disclosure, state is a 7px dot. ── */
+    .fm-scope { color:var(--text-body); max-width:70ch; }
+    .fm-meta { flex-wrap:wrap; row-gap:0.25rem; }
+    .fm-viz { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:1.6rem; align-items:start; margin:1.2rem 0; }
+    @media (max-width:820px){ .fm-viz { grid-template-columns:1fr; } }
+    .fm-pb-row, .fm-pb-axis { display:grid; grid-template-columns:3.6rem minmax(0,1fr) 6.6rem; gap:0.6rem; align-items:center; }
+    .fm-pb-row { padding:0.32rem 0; }
+    .fm-pb-id, .fm-pb-val { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.8rem; }
+    .fm-pb-id { color:var(--muted); }
+    .fm-pb-val { color:var(--text-strong); white-space:nowrap; }
+    .fm-pb-track { display:flex; flex-direction:column; gap:3px; }
+    .fm-pb-bar { display:block; height:12px; }
+    .fm-pb-rev { display:block; height:4px; background:var(--text-body); opacity:0.55; }
+    .fm-pb-none { font-style:italic; font-size:0.72rem; color:var(--muted); line-height:1; }
+    .fm-pb-axis { margin-top:0.3rem; border-top:1px solid var(--line); padding-top:0.25rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .fm-pb-ticks { display:flex; justify-content:space-between; }
+    .fm-fig { margin:0; }
+    .fm-fig figcaption { font-size:0.8rem; color:var(--muted); margin-bottom:0.35rem; }
+    .fm-fig svg { width:100%; height:auto; display:block; }
+    .fm-fig-m svg { max-width:340px; }
+    .fm-matrix .fm-c-lo { fill:var(--surface); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-md { fill:color-mix(in srgb, var(--amber) 9%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-hi { fill:color-mix(in srgb, var(--red) 10%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .vz-axis { font-size:10px; fill:var(--muted); font-family:'IBM Plex Sans',sans-serif; }
+    .fm-matrix .fm-pt { stroke:var(--surface); stroke-width:1.5; }
+    .fm-matrix .fm-pt-l { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; fill:var(--text-strong);
+      paint-order:stroke; stroke:var(--surface); stroke-width:3px; stroke-linejoin:round; }
+    .fm-sheet { border:1px solid var(--line); border-radius:4px; margin-top:0.8rem; }
+    .fm-head, .fm-row > summary { display:grid; grid-template-columns:4.2rem minmax(0,1fr) 4.4rem 4.6rem 3.4rem; gap:0.6rem; align-items:baseline; padding:0.6rem 0.9rem; }
+    .fm-head { font-size:0.74rem; color:var(--muted); border-bottom:1px solid var(--line); }
+    .fm-row { border-top:1px solid var(--line); }
+    .fm-row:first-of-type { border-top:0; }
+    .fm-row > summary { cursor:pointer; list-style:none; }
+    .fm-row > summary::-webkit-details-marker { display:none; }
+    .fm-row > summary:hover { background:var(--surface-2); }
+    .fm-row > summary:focus-visible { outline:2px solid var(--cyan); outline-offset:-2px; }
+    .fm-id-cell, .fm-sod, .fm-rpn, .fm-rpn-rev { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.84rem; }
+    .fm-id-cell { color:var(--muted); }
+    .fm-mode { color:var(--text-strong); font-size:0.92rem; line-height:1.4; }
+    .fm-item { display:block; color:var(--muted); font-size:0.8rem; }
+    .fm-sod { color:var(--text-body); }
+    .fm-rpn { color:var(--text-strong); }
+    .fm-rpn-rev { color:var(--muted); }
+    .fm-dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:0.45rem; vertical-align:0.1em; }
+    .fm-body { padding:0.2rem 0.9rem 1rem 5.7rem; }
+    @media (max-width:640px){
+      .fm-head { display:none; }
+      .fm-row > summary { grid-template-columns:3.2rem minmax(0,1fr) auto; }
+      .fm-sod, .fm-rpn-rev { display:none; }
+      .fm-body { padding:0.2rem 0.9rem 1rem; }
+    }
+    .fm-kv { display:grid; grid-template-columns:9.5rem minmax(0,1fr); gap:0.3rem 0.9rem; margin:0.4rem 0 0.8rem; font-size:0.88rem; }
+    .fm-kv dt { color:var(--muted); }
+    .fm-kv dd { margin:0; color:var(--text-body); }
+    @media (max-width:640px){ .fm-kv { grid-template-columns:1fr; } .fm-kv dd { margin-bottom:0.4rem; } }
+    .fm-scores { margin:0 0 0.6rem; border-top:1px solid var(--line); }
+    .fm-sc { display:grid; grid-template-columns:3.2rem minmax(0,1fr); gap:0.6rem; padding:0.45rem 0; border-bottom:1px solid var(--line); font-size:0.86rem; }
+    .fm-sc dt { font-family:'JetBrains Mono',monospace; color:var(--muted); }
+    .fm-sc dt b { color:var(--text-strong); }
+    .fm-sc dd { margin:0; color:var(--text-body); }
+    .fm-sub { font-size:0.8rem; color:var(--muted); margin:0.7rem 0 0.25rem; }
+    .fm-sub b { color:var(--text-strong); }
+    .fm-acts, .fm-ev { margin:0; padding-left:1.1rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-acts li, .fm-ev li { margin:0.25rem 0; }
+    .fm-residual { color:var(--red); }
+    .fm-revline { font-size:0.86rem; color:var(--text-body); margin:0.4rem 0 0; }
+    .fm-ev-src { display:block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .fm-ev-src a { color:var(--cyan); }
+    .fm-ev-txt { display:block; }
+    .fm-method { margin-top:1rem; border:1px solid var(--line); border-radius:4px; }
+    .fm-method > summary { padding:0.6rem 0.9rem; cursor:pointer; font-size:0.9rem; color:var(--text-strong); }
+    .fm-method-body { padding:0 0.9rem 0.9rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-rubrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+    @media (max-width:760px){ .fm-rubrics { grid-template-columns:1fr; } }
+    .fm-rubric { width:100%; border-collapse:collapse; font-size:0.8rem; }
+    .fm-rubric td { padding:0.25rem 0.4rem; border-top:1px solid var(--line); vertical-align:top; }
+    .fm-rubric td:first-child { font-family:'JetBrains Mono',monospace; width:2rem; color:var(--text-strong); }
+</style>
 </head>
 <body class="locked">
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -393,6 +482,187 @@ Latent / organisational root: (1) a single globally-shared Auth control plane wi
 
         <h2>Contributing factors</h2>
         <ul class="tight"><li>Single globally-shared Auth/IAM control plane with no regional isolation — one fault propagated to every region simultaneously</li><li>Circular dependency: the permission/Auth service depended on OSS, while OSS access required a permission check (reconstructed deadlock, unconfirmed by Alibaba)</li><li>Every management-plane operation (console + OpenAPI) authenticated through the same failed component, so operators lost the tools needed to diagnose and remediate</li><li>Change occurred immediately after the Double 11 peak — a high-risk change window with holiday staffing</li><li>No published root-cause post-mortem, leaving the exact triggering change and safeguards unverified</li><li>A recurring pattern: a near-identical console/OpenAPI control-plane failure hit database products 15 days later (27 Nov 2023)</li></ul>
+        <h2 id="fmea">Failure mode &amp; effects analysis (FMEA)</h2>
+        <p class="fm-scope">The shared authentication/authorization (Auth) control plane that Alibaba Cloud&#x27;s console, OpenAPI and HTTP-API services (OSS, OTS, SLS, MNS) verify every request against, the change process around it, its recovery path, and the dependent services and consumer apps. Alibaba published no root-cause post-mortem and acknowledged only an &#x27;anomaly&#x27; in console and API access: the Auth mechanism is an independent inference (Vonng) from which services failed and which survived, and the Auth-to-OSS deadlock is an unconfirmed reconstruction. Every corrective action in this dossier other than SLA vouchers is an analyst recommendation with status &#x27;not disclosed&#x27;, so no revised score is claimed for any mode: all six are shown as residual risk.</p>
+        <p class="metabar fm-meta"><span><b>6</b> failure modes</span><span class="sep">/</span><span><b>4</b> high priority</span><span class="sep">/</span><span><b>0 of 6</b> with a published action</span><span class="sep">/</span><span>total RPN <b>1635 → 1635</b> (−0%)</span></p>
+        <div class="fm-viz">
+            <figure class="fm-fig"><figcaption>Risk priority number (S × O × D), worst first — thin bar: after the published action</figcaption><div class="fm-pb" role="list" aria-label="Risk priority number per failure mode, before and after corrective action"><div class="fm-pb-row" role="listitem" title="FM-02 A change to the shared control plane takes effect everywhere at once, with no staged rollout or blast-radius cap recorded"><span class="fm-pb-id">FM-02</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:90.0%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">360</span></div><div class="fm-pb-row" role="listitem" title="FM-03 Recovery is slow because the permission service may depend on OSS, which itself needs a permission check (reconstructed deadlock, unconfirmed)"><span class="fm-pb-id">FM-03</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:90.0%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">360</span></div><div class="fm-pb-row" role="listitem" title="FM-06 No root-cause post-mortem is published, so the triggering change and any safeguards remain unverified"><span class="fm-pb-id">FM-06</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:72.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">288</span></div><div class="fm-pb-row" role="listitem" title="FM-05 Every request needs live AK/SK/IAM signature verification against central Auth, so the services fail with it"><span class="fm-pb-id">FM-05</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:60.8%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">243</span></div><div class="fm-pb-row" role="listitem" title="FM-01 Runs as one globally-shared failure domain, so its failure stops Auth-gated services in every region at the same instant"><span class="fm-pb-id">FM-01</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:54.0%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">216</span></div><div class="fm-pb-row" role="listitem" title="FM-04 Authenticates every operator action through the same failed Auth layer, so management is lost along with the gated services"><span class="fm-pb-id">FM-04</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:42.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">168</span></div><div class="fm-pb-axis" aria-hidden="true"><span></span><span class="fm-pb-ticks"><span>0</span><span>200</span><span>400</span></span><span></span></div></div></figure>
+            <figure class="fm-fig fm-fig-m"><figcaption>Criticality: severity × occurrence</figcaption><svg class="fm-matrix" viewBox="0 0 360 330" role="img" aria-label="Criticality matrix, severity against occurrence"><rect class="fm-c-lo" x="44" y="266" width="28" height="28"/><rect class="fm-c-lo" x="72" y="266" width="28" height="28"/><rect class="fm-c-lo" x="100" y="266" width="28" height="28"/><rect class="fm-c-lo" x="128" y="266" width="28" height="28"/><rect class="fm-c-lo" x="156" y="266" width="28" height="28"/><rect class="fm-c-lo" x="184" y="266" width="28" height="28"/><rect class="fm-c-lo" x="212" y="266" width="28" height="28"/><rect class="fm-c-lo" x="240" y="266" width="28" height="28"/><rect class="fm-c-lo" x="268" y="266" width="28" height="28"/><rect class="fm-c-lo" x="296" y="266" width="28" height="28"/><rect class="fm-c-lo" x="44" y="238" width="28" height="28"/><rect class="fm-c-lo" x="72" y="238" width="28" height="28"/><rect class="fm-c-lo" x="100" y="238" width="28" height="28"/><rect class="fm-c-lo" x="128" y="238" width="28" height="28"/><rect class="fm-c-lo" x="156" y="238" width="28" height="28"/><rect class="fm-c-lo" x="184" y="238" width="28" height="28"/><rect class="fm-c-lo" x="212" y="238" width="28" height="28"/><rect class="fm-c-lo" x="240" y="238" width="28" height="28"/><rect class="fm-c-md" x="268" y="238" width="28" height="28"/><rect class="fm-c-md" x="296" y="238" width="28" height="28"/><rect class="fm-c-lo" x="44" y="210" width="28" height="28"/><rect class="fm-c-lo" x="72" y="210" width="28" height="28"/><rect class="fm-c-lo" x="100" y="210" width="28" height="28"/><rect class="fm-c-lo" x="128" y="210" width="28" height="28"/><rect class="fm-c-lo" x="156" y="210" width="28" height="28"/><rect class="fm-c-md" x="184" y="210" width="28" height="28"/><rect class="fm-c-md" x="212" y="210" width="28" height="28"/><rect class="fm-c-md" x="240" y="210" width="28" height="28"/><rect class="fm-c-md" x="268" y="210" width="28" height="28"/><rect class="fm-c-md" x="296" y="210" width="28" height="28"/><rect class="fm-c-lo" x="44" y="182" width="28" height="28"/><rect class="fm-c-lo" x="72" y="182" width="28" height="28"/><rect class="fm-c-lo" x="100" y="182" width="28" height="28"/><rect class="fm-c-lo" x="128" y="182" width="28" height="28"/><rect class="fm-c-md" x="156" y="182" width="28" height="28"/><rect class="fm-c-md" x="184" y="182" width="28" height="28"/><rect class="fm-c-md" x="212" y="182" width="28" height="28"/><rect class="fm-c-md" x="240" y="182" width="28" height="28"/><rect class="fm-c-md" x="268" y="182" width="28" height="28"/><rect class="fm-c-hi" x="296" y="182" width="28" height="28"/><rect class="fm-c-lo" x="44" y="154" width="28" height="28"/><rect class="fm-c-lo" x="72" y="154" width="28" height="28"/><rect class="fm-c-lo" x="100" y="154" width="28" height="28"/><rect class="fm-c-md" x="128" y="154" width="28" height="28"/><rect class="fm-c-md" x="156" y="154" width="28" height="28"/><rect class="fm-c-md" x="184" y="154" width="28" height="28"/><rect class="fm-c-md" x="212" y="154" width="28" height="28"/><rect class="fm-c-hi" x="240" y="154" width="28" height="28"/><rect class="fm-c-hi" x="268" y="154" width="28" height="28"/><rect class="fm-c-hi" x="296" y="154" width="28" height="28"/><rect class="fm-c-lo" x="44" y="126" width="28" height="28"/><rect class="fm-c-lo" x="72" y="126" width="28" height="28"/><rect class="fm-c-md" x="100" y="126" width="28" height="28"/><rect class="fm-c-md" x="128" y="126" width="28" height="28"/><rect class="fm-c-md" x="156" y="126" width="28" height="28"/><rect class="fm-c-md" x="184" y="126" width="28" height="28"/><rect class="fm-c-hi" x="212" y="126" width="28" height="28"/><rect class="fm-c-hi" x="240" y="126" width="28" height="28"/><rect class="fm-c-hi" x="268" y="126" width="28" height="28"/><rect class="fm-c-hi" x="296" y="126" width="28" height="28"/><rect class="fm-c-lo" x="44" y="98" width="28" height="28"/><rect class="fm-c-lo" x="72" y="98" width="28" height="28"/><rect class="fm-c-md" x="100" y="98" width="28" height="28"/><rect class="fm-c-md" x="128" y="98" width="28" height="28"/><rect class="fm-c-md" x="156" y="98" width="28" height="28"/><rect class="fm-c-hi" x="184" y="98" width="28" height="28"/><rect class="fm-c-hi" x="212" y="98" width="28" height="28"/><rect class="fm-c-hi" x="240" y="98" width="28" height="28"/><rect class="fm-c-hi" x="268" y="98" width="28" height="28"/><rect class="fm-c-hi" x="296" y="98" width="28" height="28"/><rect class="fm-c-lo" x="44" y="70" width="28" height="28"/><rect class="fm-c-lo" x="72" y="70" width="28" height="28"/><rect class="fm-c-md" x="100" y="70" width="28" height="28"/><rect class="fm-c-md" x="128" y="70" width="28" height="28"/><rect class="fm-c-hi" x="156" y="70" width="28" height="28"/><rect class="fm-c-hi" x="184" y="70" width="28" height="28"/><rect class="fm-c-hi" x="212" y="70" width="28" height="28"/><rect class="fm-c-hi" x="240" y="70" width="28" height="28"/><rect class="fm-c-hi" x="268" y="70" width="28" height="28"/><rect class="fm-c-hi" x="296" y="70" width="28" height="28"/><rect class="fm-c-hi" x="44" y="42" width="28" height="28"/><rect class="fm-c-hi" x="72" y="42" width="28" height="28"/><rect class="fm-c-hi" x="100" y="42" width="28" height="28"/><rect class="fm-c-hi" x="128" y="42" width="28" height="28"/><rect class="fm-c-hi" x="156" y="42" width="28" height="28"/><rect class="fm-c-hi" x="184" y="42" width="28" height="28"/><rect class="fm-c-hi" x="212" y="42" width="28" height="28"/><rect class="fm-c-hi" x="240" y="42" width="28" height="28"/><rect class="fm-c-hi" x="268" y="42" width="28" height="28"/><rect class="fm-c-hi" x="296" y="42" width="28" height="28"/><rect class="fm-c-hi" x="44" y="14" width="28" height="28"/><rect class="fm-c-hi" x="72" y="14" width="28" height="28"/><rect class="fm-c-hi" x="100" y="14" width="28" height="28"/><rect class="fm-c-hi" x="128" y="14" width="28" height="28"/><rect class="fm-c-hi" x="156" y="14" width="28" height="28"/><rect class="fm-c-hi" x="184" y="14" width="28" height="28"/><rect class="fm-c-hi" x="212" y="14" width="28" height="28"/><rect class="fm-c-hi" x="240" y="14" width="28" height="28"/><rect class="fm-c-hi" x="268" y="14" width="28" height="28"/><rect class="fm-c-hi" x="296" y="14" width="28" height="28"/><text class="vz-tick" x="58.0" y="308" text-anchor="middle">1</text><text class="vz-tick" x="36" y="284.0" text-anchor="end">1</text><text class="vz-tick" x="86.0" y="308" text-anchor="middle">2</text><text class="vz-tick" x="36" y="256.0" text-anchor="end">2</text><text class="vz-tick" x="114.0" y="308" text-anchor="middle">3</text><text class="vz-tick" x="36" y="228.0" text-anchor="end">3</text><text class="vz-tick" x="142.0" y="308" text-anchor="middle">4</text><text class="vz-tick" x="36" y="200.0" text-anchor="end">4</text><text class="vz-tick" x="170.0" y="308" text-anchor="middle">5</text><text class="vz-tick" x="36" y="172.0" text-anchor="end">5</text><text class="vz-tick" x="198.0" y="308" text-anchor="middle">6</text><text class="vz-tick" x="36" y="144.0" text-anchor="end">6</text><text class="vz-tick" x="226.0" y="308" text-anchor="middle">7</text><text class="vz-tick" x="36" y="116.0" text-anchor="end">7</text><text class="vz-tick" x="254.0" y="308" text-anchor="middle">8</text><text class="vz-tick" x="36" y="88.0" text-anchor="end">8</text><text class="vz-tick" x="282.0" y="308" text-anchor="middle">9</text><text class="vz-tick" x="36" y="60.0" text-anchor="end">9</text><text class="vz-tick" x="310.0" y="308" text-anchor="middle">10</text><text class="vz-tick" x="36" y="32.0" text-anchor="end">10</text><text class="vz-axis" x="184" y="328" text-anchor="middle">Occurrence →</text><text class="vz-axis" transform="translate(11 154) rotate(-90)" text-anchor="middle">Severity →</text><circle class="fm-pt" cx="114.0" cy="56.0" r="6" fill="var(--red)"><title>FM-05 Every request needs live AK/SK/IAM signature verification against central Auth, so the services fail with it (S9 O3 D9)</title></circle><text class="fm-pt-l" x="114.0" y="46.0" text-anchor="middle">05</text><circle class="fm-pt" cx="142.0" cy="56.0" r="6" fill="var(--red)"><title>FM-01 Runs as one globally-shared failure domain, so its failure stops Auth-gated services in every region at the same instant (S9 O4 D6)</title></circle><text class="fm-pt-l" x="142.0" y="46.0" text-anchor="middle">01</text><circle class="fm-pt" cx="170.0" cy="56.0" r="6" fill="var(--red)"><title>FM-02 A change to the shared control plane takes effect everywhere at once, with no staged rollout or blast-radius cap recorded (S9 O5 D8)</title></circle><text class="fm-pt-l" x="170.0" y="46.0" text-anchor="middle">02</text><circle class="fm-pt" cx="170.0" cy="84.0" r="6" fill="var(--red)"><title>FM-03 Recovery is slow because the permission service may depend on OSS, which itself needs a permission check (reconstructed deadlock, unconfirmed) (S8 O5 D9)</title></circle><text class="fm-pt-l" x="170.0" y="74.0" text-anchor="middle">03</text><circle class="fm-pt" cx="142.0" cy="112.0" r="6" fill="var(--amber)"><title>FM-04 Authenticates every operator action through the same failed Auth layer, so management is lost along with the gated services (S7 O4 D6)</title></circle><text class="fm-pt-l" x="142.0" y="102.0" text-anchor="middle">04</text><circle class="fm-pt" cx="254.0" cy="196.0" r="6" fill="var(--amber)"><title>FM-06 No root-cause post-mortem is published, so the triggering change and any safeguards remain unverified (S4 O8 D9)</title></circle><text class="fm-pt-l" x="254.0" y="186.0" text-anchor="middle">06</text></svg></figure>
+        </div>
+        <div class="fm-sheet">
+            <div class="fm-head" aria-hidden="true"><span>ID</span><span>Failure mode</span><span>S·O·D</span><span>RPN</span><span>After</span></div>
+            <details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-02</span>
+    <span class="fm-mode">A change to the shared control plane takes effect everywhere at once, with no staged rollout or blast-radius cap recorded<span class="fm-item">Change process for the shared Auth/permission service</span></span>
+    <span class="fm-sod" aria-label="Severity 9, occurrence 5, detection 8">9·5·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>360</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Apply changes to the shared control plane in a way that limits how far a bad change can reach</dd>
+      <dt>Effect</dt><dd>One change (or fault) fails every region simultaneously; the outage begins one day after the Singles Day (Double 11) peak</dd>
+      <dt>Cause</dt><dd>Not officially disclosed. The dossier&#x27;s latent-cause analysis names change management around a high-risk shared component the day after Double 11; the specific change (a pushed permission/blacklist rule) is unconfirmed</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>None recorded before the change took effect; the failure was seen through the console/API anomaly</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>9</b></dt><dd>This is the route by which the provider-wide outage started, so it carries the same severity as FM-01.</dd></div>
+      <div class="fm-sc"><dt>O <b>5</b></dt><dd>Between &#x27;infrequent&#x27; and &#x27;occasional&#x27;: changes to a shared control plane are routine, and the dossier records no staged-rollout guard. Held at 5 rather than 6 because the triggering change is not confirmed by the operator.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>No canary or pre-impact check is recorded; internal monitoring saw the anomaly only once it was already global, so &#x27;detected after impact by internal monitoring&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 360</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li class="fm-residual">No corrective action is recorded in the published sources. This mode is residual risk.</li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #4</span><span class="fm-ev-txt">Change occurred immediately after the Double 11 peak — a high-risk change window with holiday staffing</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“change management around a high-risk shared component the day after the Double 11 peak”</span></li><li><span class="fm-ev-src"><a href="https://technode.com/2023/11/13/alibaba-cloud-suffers-second-outage-in-a-year-causing-major-apps-to-crash/" target="_blank" rel="noopener nofollow">Reference #2 · news</a></span><span class="fm-ev-txt">“one day after the Singles Day shopping event concluded”</span></li><li><span class="fm-ev-src"><a href="https://blog.vonng.com/en/cloud/aliyun/" target="_blank" rel="noopener nofollow">Sequence of events #9</a></span><span class="fm-ev-txt">2023-11-12 ~18:20 CST — Engineers work to restore the Auth/permission service; Alibaba published no play-by-play, so the specific remediation steps (e.g. rolling back the permission/blacklist change) are not officially disclosed (timestamp interpolated).</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-03</span>
+    <span class="fm-mode">Recovery is slow because the permission service may depend on OSS, which itself needs a permission check (reconstructed deadlock, unconfirmed)<span class="fm-item">Auth bootstrap and recovery path</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 5, detection 9">8·5·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>360</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Restore the permission service quickly without depending on a service it gates</dd>
+      <dt>Effect</dt><dd>Hangzhou and Beijing recover in about one hour; other availability zones take about three hours; full restoration at 21:11 CST, 207 minutes after onset</dd>
+      <dt>Cause</dt><dd>Reported circular dependency between the permission service and the object store it protects, with no break-glass path independent of that store. Flagged as rumor by Vonng and never confirmed by Alibaba</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>None recorded; the dependency, if real, was found during recovery</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>This mode sets the duration rather than the existence of the outage: hours of full outage of major services is the rubric&#x27;s 8.</dd></div>
+      <div class="fm-sc"><dt>O <b>5</b></dt><dd>If the reconstruction is right, the condition is present whenever Auth has to recover, which is more than an unusual combination. Held at 5 because the mechanism is unconfirmed.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>No control is recorded that would reveal the dependency before an incident needed the recovery path; the dossier itself only infers it after the fact.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 360</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li class="fm-residual">No corrective action is recorded in the published sources. This mode is residual risk.</li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #2</span><span class="fm-ev-txt">Circular dependency: the permission/Auth service depended on OSS, while OSS access required a permission check (reconstructed deadlock, unconfirmed by Alibaba)</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“Reconstructed circular-dependency (unconfirmed, flagged as rumor by Vonng)”</span></li><li><span class="fm-ev-src">Technical deep-dive</span><span class="fm-ev-txt">“a circular dependency with no bootstrap path independent of the gated store”</span></li><li><span class="fm-ev-src"><a href="https://blog.vonng.com/en/cloud/aliyun/" target="_blank" rel="noopener nofollow">Metric #3</a></span><span class="fm-ev-txt">Fast vs slow recovery: East China 1 &amp; North China 2 ~1 hour; other AZs ~3 hours</span></li><li><span class="fm-ev-src"><a href="https://blog.vonng.com/en/cloud/aliyun/" target="_blank" rel="noopener nofollow">Reference #1 · analysis</a></span><span class="fm-ev-txt">“Hangzhou (East China 1) and Beijing (North China 2) recovered in one hour while other AZs took three hours”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-06</span>
+    <span class="fm-mode">No root-cause post-mortem is published, so the triggering change and any safeguards remain unverified<span class="fm-item">Post-incident review and disclosure</span></span>
+    <span class="fm-sod" aria-label="Severity 4, occurrence 8, detection 9">4·8·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>288</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Establish and publish the root cause and safeguards so customers can assess residual risk</dd>
+      <dt>Effect</dt><dd>Customers cannot assess residual risk; a second console/OpenAPI failure hits database products in eight regions 15 days later, and the dossier cannot say whether it shared a cause</dd>
+      <dt>Cause</dt><dd>Alibaba acknowledged only an &#x27;anomaly&#x27; and did not release a post-mortem</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Visible to customers only as the absence of a report</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>4</b></dt><dd>The missing report does not itself stop a service; it limits what customers can do to protect themselves, which is &#x27;limited customer impact&#x27;. The 27 Nov outage is not scored here because no cause links it to this one.</dd></div>
+      <div class="fm-sc"><dt>O <b>8</b></dt><dd>The dossier records the refusal to publish as a stance rather than a one-off slip, so the condition is present as routine.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>Nothing inside the provider surfaces the gap; customers learn of it only by its absence.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 288</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li class="fm-residual">No corrective action is recorded in the published sources. This mode is residual risk.</li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://blog.vonng.com/en/cloud/aliyun/" target="_blank" rel="noopener nofollow">Sequence of events #14</a></span><span class="fm-ev-txt">2023-11-13 — Alibaba Cloud publicly attributes the incident only to a console/API &#x27;anomaly&#x27; and issues no detailed root-cause post-mortem; Vonng states Alibaba &#x27;refuses to publish a post-mortem report.&#x27;</span></li><li><span class="fm-ev-src">Contributing factor #5</span><span class="fm-ev-txt">No published root-cause post-mortem, leaving the exact triggering change and safeguards unverified</span></li><li><span class="fm-ev-src"><a href="https://blog.vonng.com/en/cloud/aliyun/" target="_blank" rel="noopener nofollow">Reference #1 · analysis</a></span><span class="fm-ev-txt">“Alibaba Cloud refuses to publish a post-mortem report”</span></li><li><span class="fm-ev-src"><a href="https://finance.yahoo.com/news/alibaba-cloud-suffers-second-outage-071836116.html" target="_blank" rel="noopener nofollow">Sequence of events #16</a></span><span class="fm-ev-txt">2023-11-27 09:16-10:58 CST — Follow-on outage 15 days later: console and OpenAPI access to database products (PostgreSQL, Redis, MySQL) fails for ~1 hour 42 minutes across eight regions incl. Beijing, Shanghai, Hong Kong and Virginia — a second console/API control-plane failure in a month.</span></li><li><span class="fm-ev-src">Correction of errors #1</span><span class="fm-ev-txt">Publish a detailed root-cause post-mortem for the 12 Nov global outage (Not done — no official post-mortem released (per Vonng))</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-05</span>
+    <span class="fm-mode">Every request needs live AK/SK/IAM signature verification against central Auth, so the services fail with it<span class="fm-item">Auth-gated HTTP-API services and the apps built on them</span></span>
+    <span class="fm-sod" aria-label="Severity 9, occurrence 3, detection 9">9·3·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>243</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Serve OSS, OTS, SLS and MNS requests, and the consumer apps that use them, while Auth is impaired</dd>
+      <dt>Effect</dt><dd>OSS, OTS, SLS and MNS down globally; Taobao, Xianyu and DingTalk crash; payment, messaging and logistics systems degrade; affected products fall to 99.5% monthly availability</dd>
+      <dt>Cause</dt><dd>Per-request hard dependency on the central Auth service with no recorded degraded mode</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Customer-visible impact</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>9</b></dt><dd>Turns an Auth fault into a global outage of object storage, table, log and messaging services and of consumer apps with large user bases.</dd></div>
+      <div class="fm-sc"><dt>O <b>3</b></dt><dd>Needs Auth to be impaired first, which is infrequent; kept low so the single event is not triple-counted with FM-01 and FM-02.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>Seen through the failure of customer requests and apps.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 243</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li class="fm-residual">No corrective action is recorded in the published sources. This mode is residual risk.</li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://blog.vonng.com/en/cloud/aliyun/" target="_blank" rel="noopener nofollow">Sequence of events #3</a></span><span class="fm-ev-txt">2023-11-12 ~17:45 CST — Object Storage Service (OSS) HTTP API calls fail: OSS requires AK/SK/IAM signature verification against the Auth component, which is now unavailable. Exact minute not individually disclosed (interpolated).</span></li><li><span class="fm-ev-src"><a href="https://blog.vonng.com/en/cloud/aliyun/" target="_blank" rel="noopener nofollow">Sequence of events #4</a></span><span class="fm-ev-txt">2023-11-12 ~17:50 CST — Table Store (OTS), Log Service (SLS) and Message Notification Service (MNS) fail because they share the same Auth dependency; ECS, RDS running instances and networking keep operating on their own built-in credentials.</span></li><li><span class="fm-ev-src"><a href="https://technode.com/2023/11/13/alibaba-cloud-suffers-second-outage-in-a-year-causing-major-apps-to-crash/" target="_blank" rel="noopener nofollow">Sequence of events #6</a></span><span class="fm-ev-txt">2023-11-12 ~18:00 CST — Downstream consumer applications break as they lose object storage and auth: Taobao (shopping), Xianyu/Idle Fish (resale) and DingTalk (work collaboration) briefly crash for users.</span></li><li><span class="fm-ev-src"><a href="https://blog.vonng.com/en/cloud/aliyun/" target="_blank" rel="noopener nofollow">Metric #4</a></span><span class="fm-ev-txt">Monthly availability impact: Dropped to 99.5% for affected products</span></li><li><span class="fm-ev-src">Technical deep-dive</span><span class="fm-ev-txt">“signature verification failed everywhere at once”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-01</span>
+    <span class="fm-mode">Runs as one globally-shared failure domain, so its failure stops Auth-gated services in every region at the same instant<span class="fm-item">Auth/IAM control plane (global)</span></span>
+    <span class="fm-sod" aria-label="Severity 9, occurrence 4, detection 6">9·4·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>216</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Verify request signatures and operator permissions for every region without letting one fault reach all of them</dd>
+      <dt>Effect</dt><dd>Console, OpenAPI, OSS, OTS, SLS and MNS fail in all global regions at once for about 3.5 hours</dd>
+      <dt>Cause</dt><dd>No regional or cell isolation of the shared Auth component (inferred from the simultaneous all-region failure; not confirmed by Alibaba)</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Alibaba monitoring detected an &#x27;anomaly&#x27; in console access and API calls at onset</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>9</b></dt><dd>Provider-wide outage of the foundational access layer across every region with no customer workaround for the gated services: the rubric&#x27;s 9. Not 10: no hazard to people, and the ECS/RDS/network data planes kept running.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>Losing the whole global domain needs a fault in Auth itself first, an unusual event, so &#x27;infrequent&#x27;. Scored below FM-02 so the same event is not counted twice at full weight.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>Monitoring saw the anomaly at onset, but nothing in the architecture contained it to one region: &#x27;detected at onset, not prevented&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 216</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li class="fm-residual">No corrective action is recorded in the published sources. This mode is residual risk.</li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://blog.vonng.com/en/cloud/aliyun/" target="_blank" rel="noopener nofollow">Sequence of events #1</a></span><span class="fm-ev-txt">2023-11-12 17:44 CST (UTC+8) — The shared global Auth/permission control plane begins returning errors; console and OpenAPI calls start failing simultaneously across every Alibaba Cloud region. Vonng (Feng Ruohang) fixes the outage window start at 17:44.</span></li><li><span class="fm-ev-src"><a href="https://finance.yahoo.com/news/alibaba-cloud-suffers-second-outage-071836116.html" target="_blank" rel="noopener nofollow">Sequence of events #8</a></span><span class="fm-ev-txt">2023-11-12 ~18:10 CST — Blast radius confirmed to span all major geographies — East Asia, Southeast Asia, the Middle East and North America — simultaneously, indicating a cross-regional shared component rather than a local fault.</span></li><li><span class="fm-ev-src">Contributing factor #1</span><span class="fm-ev-txt">Single globally-shared Auth/IAM control plane with no regional isolation — one fault propagated to every region simultaneously</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“every global region failed at the same instant”</span></li><li><span class="fm-ev-src"><a href="https://finance.yahoo.com/news/alibaba-cloud-suffers-second-outage-071836116.html" target="_blank" rel="noopener nofollow">Metric #2</a></span><span class="fm-ev-txt">Regions affected: All global regions simultaneously (East Asia, SE Asia, Middle East, North America)</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-04</span>
+    <span class="fm-mode">Authenticates every operator action through the same failed Auth layer, so management is lost along with the gated services<span class="fm-item">Console and OpenAPI management plane</span></span>
+    <span class="fm-sod" aria-label="Severity 7, occurrence 4, detection 6">7·4·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>168</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Let customers and operators view and manage resources during a control-plane fault</dd>
+      <dt>Effect</dt><dd>Customers worldwide cannot log in, view or manage resources even where data planes still run; operators lose the tools needed to diagnose and remediate</dd>
+      <dt>Cause</dt><dd>No out-of-band management path that bypasses the shared Auth layer</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Monitoring detected the console/API anomaly at onset</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>7</b></dt><dd>Major degradation of a major service: management is gone, but running ECS and RDS instances kept serving traffic, so it is not a full outage of every workload.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>Needs Auth itself to fail first, which is infrequent.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>The console/API anomaly is the one thing Alibaba says its monitoring detected, at onset; nothing prevented the loss.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 168</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li class="fm-residual">No corrective action is recorded in the published sources. This mode is residual risk.</li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://finance.yahoo.com/news/alibaba-cloud-suffers-second-outage-071836116.html" target="_blank" rel="noopener nofollow">Sequence of events #5</a></span><span class="fm-ev-txt">2023-11-12 ~17:50 CST — Cloud consoles and management APIs (OpenAPI) become unusable worldwide; customers cannot log in, view, or manage their resources even where data planes still run.</span></li><li><span class="fm-ev-src"><a href="https://technode.com/2023/11/13/alibaba-cloud-suffers-second-outage-in-a-year-causing-major-apps-to-crash/" target="_blank" rel="noopener nofollow">Sequence of events #2</a></span><span class="fm-ev-txt">2023-11-12 ~17:44 CST — Alibaba Cloud monitoring detects an &#x27;anomaly&#x27; in cloud product console access and API calls across regions — the only cause Alibaba publicly acknowledged.</span></li><li><span class="fm-ev-src">Contributing factor #3</span><span class="fm-ev-txt">Every management-plane operation (console + OpenAPI) authenticated through the same failed component, so operators lost the tools needed to diagnose and remediate</span></li><li><span class="fm-ev-src"><a href="https://technode.com/2023/11/13/alibaba-cloud-suffers-second-outage-in-a-year-causing-major-apps-to-crash/" target="_blank" rel="noopener nofollow">Reference #2 · news</a></span><span class="fm-ev-txt">“Alibaba Cloud attributed the incident to an &quot;anomaly&quot; in the cloud product console access and API calls”</span></li></ul>
+  </div>
+</details>
+        </div>
+        <details class="fm-method"><summary>Scoring rubric and method</summary><div class="fm-method-body"><p>A retrospective FMEA: each row asks how this system could fail, how bad the effect was, how likely the cause was given the controls in place at the time, and how likely those controls were to catch it before customers did. Scales are adapted for data-centre operations from the 1–10 scales of IEC 60812:2018 and the AIAG-VDA FMEA handbook. RPN = S × O × D. Priority is High when S ≥ 9 with O ≥ 4 or D ≥ 7, or when RPN ≥ 300; Medium when RPN ≥ 120 or S ≥ 7; Low otherwise. Severity overrides the product because a large S multiplied by small O and D can hide a region-wide outage nothing would catch.</p><p>Every row cites evidence from this dossier, and every quote is checked verbatim against its source by <code>tools/test-incidents-fmea.py</code>. A revised score is only shown against a published corrective action. This is an RZ analyst assessment, not an operator document.</p><div class="fm-rubrics"><div><p class="fm-sub">Severity</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Hazard to people, or loss of the facility / several regions</td></tr><tr><td>9</td><td>Region-wide or provider-wide outage of a foundational service, no workaround</td></tr><tr><td>8</td><td>Full outage of a major service for hours</td></tr><tr><td>7</td><td>Major degradation of a major service</td></tr><tr><td>6</td><td>Partial outage confined to one zone or one service</td></tr><tr><td>5</td><td>Customer-visible degradation</td></tr><tr><td>4</td><td>Limited customer impact</td></tr><tr><td>3</td><td>Internal impact only</td></tr><tr><td>2</td><td>Negligible</td></tr><tr><td>1</td><td>No effect</td></tr></tbody></table></div><div><p class="fm-sub">Occurrence</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Near certain: the cause is present in normal operation</td></tr><tr><td>8</td><td>Frequent: routine work exercises the cause</td></tr><tr><td>6</td><td>Occasional: a foreseeable slip or condition, weakly guarded</td></tr><tr><td>4</td><td>Infrequent: needs an unusual combination</td></tr><tr><td>2</td><td>Remote: guarded by design</td></tr><tr><td>1</td><td>Eliminated by design</td></tr></tbody></table></div><div><p class="fm-sub">Detection</p><table class="fm-rubric"><tbody><tr><td>10</td><td>No control could detect it</td></tr><tr><td>9</td><td>Detected only through customer impact</td></tr><tr><td>8</td><td>Detected after impact by internal monitoring</td></tr><tr><td>6</td><td>Detected at onset, not prevented</td></tr><tr><td>4</td><td>Detected before impact with time to act</td></tr><tr><td>2</td><td>Automated interlock almost certainly stops it</td></tr><tr><td>1</td><td>Certain to be stopped</td></tr></tbody></table></div></div></div></details>
+
 
         <h2>Correction of errors (COE)</h2>
         <ul class="tight"><li>Publish a detailed root-cause post-mortem for the 12 Nov global outage <span class="coe-meta">Alibaba Cloud · Not done — no official post-mortem released (per Vonng)</span></li><li>Regionally isolate the Auth/IAM control plane so a single change cannot fail all regions at once <span class="coe-meta">Alibaba Cloud (recommended, independently derived) · Not disclosed</span></li><li>Remove the circular dependency between the permission service and OSS; add a bootstrap/break-glass path independent of gated storage <span class="coe-meta">Alibaba Cloud (recommended) · Not disclosed</span></li><li>Enforce staged/canary rollout with automatic blast-radius limits for shared control-plane changes <span class="coe-meta">Alibaba Cloud (recommended) · Not disclosed</span></li><li>Freeze high-risk shared-component changes during and immediately after peak events (Double 11) <span class="coe-meta">Alibaba Cloud (recommended) · Not disclosed</span></li><li>Provide SLA voucher compensation (25-30% of monthly fees) to affected customers <span class="coe-meta">Alibaba Cloud · Done</span></li></ul>
@@ -427,7 +697,7 @@ Latent / organisational root: (1) a single globally-shared Auth control plane wi
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-1a1a084f"></script>
+    <script src="js/rz-version.js?v=20261010-00a1d9e8"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

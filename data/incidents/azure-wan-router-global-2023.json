@@ -365,5 +365,375 @@
   "officialPostmortem": true,
   "referenceCount": 6
  },
- "lastUpdated": "2026-08-08"
+ "lastUpdated": "2026-08-08",
+ "fmea": {
+  "scope": "Microsoft's global WAN (AS 8075) during a capacity-expansion change in Madrid — the IGP-purge command and its vendor-specific scope, the AAA command block-list, the change SOP and its qualification, Safe-Deployment device isolation, the alert path to the executing engineer, WAN and BGP reconvergence, incident triage, and the Exchange Online residual. Analysed retrospectively from Microsoft's customer post-incident report (MO502273) and third-party routing analysis held in this dossier. Every corrective action is recorded as committed with a target date in early 2023; only the Exchange fix carries a partial deployment figure, so each revised score is a claim about the action, not a confirmed outcome.",
+  "modes": [
+   {
+    "id": "FM-01",
+    "item": "IGP-database purge command on the third router vendor's platform",
+    "function": "Clear the IGP database on the router being integrated, without touching other routers",
+    "failureMode": "The command's default action on this platform is global, so every IGP-joined router in the backbone recomputes its topology and cannot forward packets correctly meanwhile",
+    "effect": "Backbone-wide packet loss across client-to-Azure, datacenter-to-datacenter and ExpressRoute paths; BGP prefixes withdrawn and readvertised; Azure and most of Microsoft 365 degraded worldwide for a core 5 h 35 min",
+    "cause": "Vendor-specific command behaviour (local on two vendors, global on the third) never characterised in that platform's high-impact-command evaluation, so the AAA block-list did not include it",
+    "prevention": "AAA real-time block-list of globally-impactful commands, which lacked this command for this router model",
+    "detection": "Monitoring alerted on-call within about 3–5 minutes, after impact",
+    "S": 9,
+    "O": 6,
+    "D": 8,
+    "rationale": {
+     "S": "Provider-wide outage of the backbone under Azure and Microsoft 365, with no customer workaround: the rubric's 9. Not 10: no hazard to people, no facility lost, and the WAN self-recovered within about 2.5 hours.",
+     "O": "Once the command was in the procedure, any run on that platform triggered the global action; a foreseeable condition, weakly guarded because the block-list had not been checked against it.",
+     "D": "No interlock stopped the command; monitoring alerted within minutes but only after packet loss began: 'detected after impact by internal monitoring'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 0
+     },
+     {
+      "src": "soe",
+      "i": 1
+     },
+     {
+      "src": "factor",
+      "i": 1
+     },
+     {
+      "src": "factor",
+      "i": 2
+     },
+     {
+      "src": "ref",
+      "i": 0,
+      "quote": "those from a third manufacturer execute across all IGP joined routers"
+     },
+     {
+      "src": "metric",
+      "i": 0
+     }
+    ],
+    "actions": [
+     {
+      "text": "Audit and block similar widespread-impact commands across all three router vendors and all WAN router roles",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     }
+    ],
+    "revised": {
+     "S": 9,
+     "O": 2,
+     "D": 2
+    },
+    "revisedRationale": "A block-list entry turns the slip into a refused command: the command can still be typed but no longer executes (O 6→2), and the refusal is an automated interlock (D 8→2). Recorded as committed for February 2023, not as completed, so the reduction is a claim about the action, not a confirmed outcome. Severity is unchanged: a globally-propagating command that escaped the audit would be just as wide."
+   },
+   {
+    "id": "FM-02",
+    "item": "WAN capacity-expansion SOP and its qualification",
+    "function": "Ensure every procedure run on the WAN has been validated in ONE and the lab, reviewed (Safe-Fly) and carries pre- and post-checks",
+    "failureMode": "An SOP edited to fix problems from earlier runs goes live without re-testing or proper pre- and post-checks",
+    "effect": "An untested purge step reaches a production router, and the edited SOP also omits the checks that would have told the engineer about the alerts",
+    "cause": "No rule that an edit de-qualifies the SOP until it is re-validated",
+    "prevention": "Four-step gate: ONE emulation, lab testing, Safe-Fly Review, Safe-Deployment — bypassed for the edited procedure",
+    "detection": "None before execution",
+    "S": 9,
+    "O": 4,
+    "D": 9,
+    "rationale": {
+     "S": "This is the route by which the provider-wide outage started, so it carries FM-01's severity.",
+     "O": "Shipping an edited SOP without re-qualification needs a lapse in an established gate: 'infrequent'. Held below FM-01 so the same event is not counted twice at full weight.",
+     "D": "Nothing checked that the edited SOP had been re-qualified before it was scheduled; the gap surfaced through the outage."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 0
+     },
+     {
+      "src": "rootCause",
+      "quote": "the edited procedure was never re-tested and shipped without proper pre- and post-checks"
+     },
+     {
+      "src": "rootCause",
+      "quote": "validation in the Open Network Emulator (ONE), lab testing, a documented Safe-Fly Review"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Change Advisory Board review of all SOPs still pending qualification within 30 days",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "text": "Regular mandatory operational training and attestation of following all SOPs",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "text": "Treat any SOP edit as de-qualifying until ONE/lab re-validation and pre/post-checks are done",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     }
+    ],
+    "revised": {
+     "S": 9,
+     "O": 3,
+     "D": 9
+    },
+    "revisedRationale": "The CAB sweep and attestation make an unqualified SOP less likely to be run (O 4→3). The stronger control, treating every edit as de-qualifying, is an analyst recommendation with no recorded status, so no D reduction is claimed. The CAB review is recorded as committed for April 2023, not completed, so the reduction is a claim about the action, not a confirmed outcome."
+   },
+   {
+    "id": "FM-03",
+    "item": "Safe-Deployment one-device-at-a-time access",
+    "function": "Bound the damage of a change to the single device being worked on",
+    "failureMode": "Device-level isolation gives no containment, because the accessible router is still IGP-joined to the whole backbone",
+    "effect": "A command run on one router reaches every IGP-joined router in AS 8075",
+    "cause": "The isolation model assumes damage travels through device access; this command's effect travelled through the routing protocol",
+    "prevention": "Single-device access restriction",
+    "detection": "None; the isolation does not observe protocol-level effects",
+    "S": 9,
+    "O": 3,
+    "D": 9,
+    "rationale": {
+     "S": "The missing containment is why one router's change became a global WAN outage.",
+     "O": "Needs a protocol-propagating command to be run first, an unusual combination; held low to avoid double-counting with FM-01.",
+     "D": "No control in the record would reveal that the isolation was ineffective before an event like this."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 3
+     },
+     {
+      "src": "tech",
+      "quote": "single-device access provided zero containment"
+     }
+    ],
+    "actions": []
+   },
+   {
+    "id": "FM-04",
+    "item": "Alert path to the engineer executing the change",
+    "function": "Stop a change in progress as soon as monitoring sees network impact",
+    "failureMode": "On-call is alerted within minutes but the executing engineer is not informed, and the same command is run on a second Madrid router",
+    "effect": "A second wave of connectivity failures about 33 minutes after the first",
+    "cause": "The edited SOP omitted the checks that would have linked alerts to the change, and on-call had no real-time view of who was changing which device",
+    "prevention": "None recorded",
+    "detection": "On-call alerts at 07:11 UTC, not relayed to the change executor",
+    "S": 7,
+    "O": 6,
+    "D": 8,
+    "rationale": {
+     "S": "Adds a second wave to an outage already in progress: major degradation, scored below FM-01 so the event is not double-counted.",
+     "O": "With no link between alerts and active changes, any change during an alert could continue: 'occasional, weakly guarded'.",
+     "D": "Internal monitoring saw the impact, but the signal did not reach the person who could stop the repeat: 'detected after impact'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 4
+     },
+     {
+      "src": "soe",
+      "i": 8
+     },
+     {
+      "src": "metric",
+      "i": 4
+     },
+     {
+      "src": "factor",
+      "i": 4
+     }
+    ],
+    "actions": [
+     {
+      "text": "Publish real-time visibility of approved-automated, break-glass and unqualified device activity to on-call engineers",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     }
+    ],
+    "revised": {
+     "S": 7,
+     "O": 6,
+     "D": 4
+    },
+    "revisedRationale": "If on-call can see the active change while alerts fire, the repeat can be stopped before it runs (D 8→4). Recorded as committed for February 2023, not completed, so the reduction is a claim about the action, not a confirmed outcome."
+   },
+   {
+    "id": "FM-05",
+    "item": "Incident triage and service monitoring",
+    "function": "Identify the source of a wide outage quickly",
+    "failureMode": "Investigation starts on DNS, tries Azure Front Door and an unrelated IPv6 revert, and per-farm alert noise hides the single service-wide event",
+    "effect": "Fault confirmed inside the WAN at 07:40 and the WAN change identified as the source at 08:20 UTC, about 72 minutes after onset",
+    "cause": "High-volume per-farm and per-feature alerts in SharePoint/OneDrive and Teams rather than detection of a service-wide event",
+    "prevention": "None recorded",
+    "detection": "Network alert at 07:11 UTC; source identification at 08:20 UTC",
+    "S": 6,
+    "O": 7,
+    "D": 8,
+    "rationale": {
+     "S": "Lengthens diagnosis rather than causing impact, and the WAN's automated recovery began before the source was named: scored at 6.",
+     "O": "Alert noise during wide outages was a standing condition.",
+     "D": "Internal monitoring detected the issue after impact but pointed first at the wrong layer."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 6
+     },
+     {
+      "src": "soe",
+      "i": 7
+     },
+     {
+      "src": "soe",
+      "i": 9
+     },
+     {
+      "src": "soe",
+      "i": 10
+     },
+     {
+      "src": "factor",
+      "i": 7
+     }
+    ],
+    "actions": [
+     {
+      "text": "Improve SPO/ODB monitoring to detect unexpected regional request-per-second changes rather than per-farm noise",
+      "evidence": {
+       "src": "coe",
+       "i": 7
+      }
+     },
+     {
+      "text": "Reduce Teams alerting noise during wide outages and improve anomaly-detection latency",
+      "evidence": {
+       "src": "coe",
+       "i": 8
+      }
+     }
+    ],
+    "revised": {
+     "S": 6,
+     "O": 7,
+     "D": 6
+    },
+    "revisedRationale": "Service-wide detection would show a wide event as one event at onset (D 8→6). These actions address M365 monitoring, not the WAN triage path, so the reduction is modest. Recorded as committed for March and May 2023, not completed, so it is a claim about the action, not a confirmed outcome."
+   },
+   {
+    "id": "FM-06",
+    "item": "WAN and BGP reconvergence",
+    "function": "Restore forwarding and prefix reachability quickly after a network-wide topology recomputation",
+    "failureMode": "Full prefix reconvergence takes about 1 h 40 min and two routers fail to recover automatically, leaving residual packet loss",
+    "effect": "Teams recovers at 09:40, SharePoint and OneDrive by 09:50; region-specific packet loss in India at 10:11; downstream M365 impact persists to 12:43 UTC",
+    "cause": "Size of the network, BGP re-validation of all prefixes, and two routers needing manual recovery",
+    "prevention": "Automated WAN recovery features, which began restoring the network just after 08:10 UTC",
+    "detection": "Telemetry during recovery",
+    "S": 8,
+    "O": 4,
+    "D": 8,
+    "rationale": {
+     "S": "This mode sets how long the outage lasted after the trigger stopped: hours of major-service outage is the rubric's 8.",
+     "O": "Needs a network-wide recomputation first, which is infrequent.",
+     "D": "Recovery problems such as the two stuck routers and the India packet loss were found by telemetry while impact continued."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 12
+     },
+     {
+      "src": "soe",
+      "i": 14
+     },
+     {
+      "src": "metric",
+      "i": 2
+     },
+     {
+      "src": "metric",
+      "i": 6
+     },
+     {
+      "src": "factor",
+      "i": 6
+     }
+    ],
+    "actions": []
+   },
+   {
+    "id": "FM-07",
+    "item": "Exchange Online CAFE components after machine restarts",
+    "function": "Return to full service after restarts without a degraded cache",
+    "failureMode": "A BitLocker / Shared Cache race condition after restarts leaves CAFE components degraded while still taking traffic",
+    "effect": "Residual Outlook on the web impact tracked under EX502694 until 03:50 UTC on 26 January",
+    "cause": "Race condition surfaced by restarts, which were themselves triggered by a low-memory bug; unhealthy components kept receiving production traffic",
+    "prevention": "None recorded",
+    "detection": "Telemetry after the main recovery; tracked as a separate incident",
+    "S": 5,
+    "O": 4,
+    "D": 8,
+    "rationale": {
+     "S": "Customer-visible degradation of one feature after the main outage had ended.",
+     "O": "Needs mass restarts to coincide with the race, an unusual combination.",
+     "D": "Seen after impact and handled as a separate incident."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 17
+     },
+     {
+      "src": "soe",
+      "i": 18
+     },
+     {
+      "src": "metric",
+      "i": 8
+     }
+    ],
+    "actions": [
+     {
+      "text": "Fix the BitLocker / Shared Cache race on CAFE components",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "text": "Stop routing production traffic to components in a known-unhealthy state",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     },
+     {
+      "text": "Fix the low-memory bug that caused unexpected reboots",
+      "evidence": {
+       "src": "coe",
+       "i": 6
+      }
+     }
+    ],
+    "revised": {
+     "S": 5,
+     "O": 2,
+     "D": 8
+    },
+    "revisedRationale": "Fixing the race and the reboot bug removes the two causes (O 4→2). The race fix is recorded as 99.48% deployed as of 6 February 2023 and the others as committed, so the reduction is a claim about the actions, not a confirmed outcome."
+   }
+  ]
+ }
 }

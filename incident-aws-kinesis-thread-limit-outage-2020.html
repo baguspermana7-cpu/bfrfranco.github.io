@@ -52,6 +52,12 @@
     .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
     .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
     .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:2px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    /* A chip carries the operator name, which can be a whole sentence ("Google Cloud
+       (impacted tenant); STT GDC / Tata Communications JV (named as the third-party …").
+       nowrap made that one chip 1120px wide and pushed the GCP Delhi dossier into a
+       1260px page at a 1100px viewport. Short chips are unaffected: normal wrapping
+       only engages when a chip would not fit its row. */
+    .chips .chip { max-width:100%; white-space:normal; overflow-wrap:anywhere; }
     .chip.cyan { color:var(--cyan); border-left:2px solid var(--cyan); }
     .chip.amber { color:var(--amber); border-left:2px solid var(--amber); }
     .chip.green { color:var(--green); border-left:2px solid var(--green); }
@@ -71,6 +77,11 @@
     /* rich incident table (reference-2 style) */
     table.itbl { min-width:1120px; }
     table.itbl td { vertical-align:middle; }
+    /* v1.134.20 — the title and summary columns ellipsise so the table's columns line up,
+       which is the right call for a dense index. But the cut text was reachable only by
+       navigating to the incident: a summary lost 238-298px of its sentence with no way to read
+       it in place. Each carries its full text in a title attribute now, so the truncation is
+       deliberate AND non-lossy — which is the condition the legibility audit checks for. */
     .itr { cursor:pointer; }
     .itr:hover td { background:var(--surface-2); }
     .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
@@ -240,7 +251,6 @@
        derive width = W px from the aspect ratio, so the drawing renders 1:1 at any event count
        and the panel scrolls instead of shrinking. */
     .viz-timeline svg { max-width:none; height:96px; width:auto; }
-
     .viz-radar svg { max-width:320px; margin:0 auto; }
     .vz-num { font-variant-numeric:tabular-nums slashed-zero; }
     .vz-box-t, .vz-box-s, .vz-lbl, .vz-hb-lbl, .vz-tl-t, .vz-pt, .vz-tick { pointer-events:auto; }
@@ -323,7 +333,86 @@
     }
     @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
 </style>
-    
+    <style>
+    /* ── FMEA (v3.12.3) — one hairline panel of rows, like the rest of the dossier.
+       No cards, no stripes: a row is a disclosure, state is a 7px dot. ── */
+    .fm-scope { color:var(--text-body); max-width:70ch; }
+    .fm-meta { flex-wrap:wrap; row-gap:0.25rem; }
+    .fm-viz { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:1.6rem; align-items:start; margin:1.2rem 0; }
+    @media (max-width:820px){ .fm-viz { grid-template-columns:1fr; } }
+    .fm-pb-row, .fm-pb-axis { display:grid; grid-template-columns:3.6rem minmax(0,1fr) 6.6rem; gap:0.6rem; align-items:center; }
+    .fm-pb-row { padding:0.32rem 0; }
+    .fm-pb-id, .fm-pb-val { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.8rem; }
+    .fm-pb-id { color:var(--muted); }
+    .fm-pb-val { color:var(--text-strong); white-space:nowrap; }
+    .fm-pb-track { display:flex; flex-direction:column; gap:3px; }
+    .fm-pb-bar { display:block; height:12px; }
+    .fm-pb-rev { display:block; height:4px; background:var(--text-body); opacity:0.55; }
+    .fm-pb-none { font-style:italic; font-size:0.72rem; color:var(--muted); line-height:1; }
+    .fm-pb-axis { margin-top:0.3rem; border-top:1px solid var(--line); padding-top:0.25rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .fm-pb-ticks { display:flex; justify-content:space-between; }
+    .fm-fig { margin:0; }
+    .fm-fig figcaption { font-size:0.8rem; color:var(--muted); margin-bottom:0.35rem; }
+    .fm-fig svg { width:100%; height:auto; display:block; }
+    .fm-fig-m svg { max-width:340px; }
+    .fm-matrix .fm-c-lo { fill:var(--surface); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-md { fill:color-mix(in srgb, var(--amber) 9%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-hi { fill:color-mix(in srgb, var(--red) 10%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .vz-axis { font-size:10px; fill:var(--muted); font-family:'IBM Plex Sans',sans-serif; }
+    .fm-matrix .fm-pt { stroke:var(--surface); stroke-width:1.5; }
+    .fm-matrix .fm-pt-l { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; fill:var(--text-strong);
+      paint-order:stroke; stroke:var(--surface); stroke-width:3px; stroke-linejoin:round; }
+    .fm-sheet { border:1px solid var(--line); border-radius:4px; margin-top:0.8rem; }
+    .fm-head, .fm-row > summary { display:grid; grid-template-columns:4.2rem minmax(0,1fr) 4.4rem 4.6rem 3.4rem; gap:0.6rem; align-items:baseline; padding:0.6rem 0.9rem; }
+    .fm-head { font-size:0.74rem; color:var(--muted); border-bottom:1px solid var(--line); }
+    .fm-row { border-top:1px solid var(--line); }
+    .fm-row:first-of-type { border-top:0; }
+    .fm-row > summary { cursor:pointer; list-style:none; }
+    .fm-row > summary::-webkit-details-marker { display:none; }
+    .fm-row > summary:hover { background:var(--surface-2); }
+    .fm-row > summary:focus-visible { outline:2px solid var(--cyan); outline-offset:-2px; }
+    .fm-id-cell, .fm-sod, .fm-rpn, .fm-rpn-rev { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.84rem; }
+    .fm-id-cell { color:var(--muted); }
+    .fm-mode { color:var(--text-strong); font-size:0.92rem; line-height:1.4; }
+    .fm-item { display:block; color:var(--muted); font-size:0.8rem; }
+    .fm-sod { color:var(--text-body); }
+    .fm-rpn { color:var(--text-strong); }
+    .fm-rpn-rev { color:var(--muted); }
+    .fm-dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:0.45rem; vertical-align:0.1em; }
+    .fm-body { padding:0.2rem 0.9rem 1rem 5.7rem; }
+    @media (max-width:640px){
+      .fm-head { display:none; }
+      .fm-row > summary { grid-template-columns:3.2rem minmax(0,1fr) auto; }
+      .fm-sod, .fm-rpn-rev { display:none; }
+      .fm-body { padding:0.2rem 0.9rem 1rem; }
+    }
+    .fm-kv { display:grid; grid-template-columns:9.5rem minmax(0,1fr); gap:0.3rem 0.9rem; margin:0.4rem 0 0.8rem; font-size:0.88rem; }
+    .fm-kv dt { color:var(--muted); }
+    .fm-kv dd { margin:0; color:var(--text-body); }
+    @media (max-width:640px){ .fm-kv { grid-template-columns:1fr; } .fm-kv dd { margin-bottom:0.4rem; } }
+    .fm-scores { margin:0 0 0.6rem; border-top:1px solid var(--line); }
+    .fm-sc { display:grid; grid-template-columns:3.2rem minmax(0,1fr); gap:0.6rem; padding:0.45rem 0; border-bottom:1px solid var(--line); font-size:0.86rem; }
+    .fm-sc dt { font-family:'JetBrains Mono',monospace; color:var(--muted); }
+    .fm-sc dt b { color:var(--text-strong); }
+    .fm-sc dd { margin:0; color:var(--text-body); }
+    .fm-sub { font-size:0.8rem; color:var(--muted); margin:0.7rem 0 0.25rem; }
+    .fm-sub b { color:var(--text-strong); }
+    .fm-acts, .fm-ev { margin:0; padding-left:1.1rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-acts li, .fm-ev li { margin:0.25rem 0; }
+    .fm-residual { color:var(--red); }
+    .fm-revline { font-size:0.86rem; color:var(--text-body); margin:0.4rem 0 0; }
+    .fm-ev-src { display:block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .fm-ev-src a { color:var(--cyan); }
+    .fm-ev-txt { display:block; }
+    .fm-method { margin-top:1rem; border:1px solid var(--line); border-radius:4px; }
+    .fm-method > summary { padding:0.6rem 0.9rem; cursor:pointer; font-size:0.9rem; color:var(--text-strong); }
+    .fm-method-body { padding:0 0.9rem 0.9rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-rubrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+    @media (max-width:760px){ .fm-rubrics { grid-template-columns:1fr; } }
+    .fm-rubric { width:100%; border-collapse:collapse; font-size:0.8rem; }
+    .fm-rubric td { padding:0.25rem 0.4rem; border-top:1px solid var(--line); vertical-align:top; }
+    .fm-rubric td:first-child { font-family:'JetBrains Mono',monospace; width:2rem; color:var(--text-strong); }
+</style>
 </head>
 <body class="locked">
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -391,6 +480,159 @@ In physical-forensic terms mapped to this software incident: there was no combus
 
         <h2>Contributing factors</h2>
         <ul class="tight"><li>Architectural design fault: coordination threads scale O(N) with fleet size — AWS confirms &#x27;each front-end server creates operating system threads for each of the other servers in the front-end fleet&#x27; and &#x27;the total threads each server must maintain is directly proportional to the number of servers in the fleet&#x27; — so routine horizontal scaling raised every server&#x27;s thread count toward the OS ceiling simultaneously (aws.amazon.com/message/11201).</li><li>Observability/maintenance gap: no fine-grained alarming existed for thread consumption; AWS commits to add &#x27;fine-grained alarming for thread consumption&#x27; only as a post-incident action, meaning operators had no early warning as the fleet approached the OS thread limit (aws.amazon.com/message/11201).</li><li>No failure-isolation barrier: the front-end fleet was not cellularized, so the limit breach hit &#x27;all of the servers in the fleet&#x27; at once instead of being confined to a cell — accelerating cellularization is named as the medium-term fix, confirming it was absent (aws.amazon.com/message/11201).</li><li>Detection sensed the symptom, not the cause: alarms fired at 5:15 AM for elevated Kinesis error rates — roughly 90 minutes after the 3:47 AM breach — and the thread-limit root cause was not confirmed until 9:39 AM, a slow path from alarm to diagnosis (aws.amazon.com/message/11201).</li><li>Fragile, expensive recovery path: because shard-map construction is metadata-heavy at fleet scale, servers could only be restored &#x27;at the rate of a few hundred per hour,&#x27; and the OS limit could not be safely raised mid-incident &#x27;without further testing,&#x27; extending the outage (aws.amazon.com/message/11201).</li><li>Unbounded downstream buffers: dependent services (Cognito, Lambda, CloudWatch) buffered data toward Kinesis with no back-pressure ceiling, so Cognito webservers &#x27;begin to block on the backlogged Kinesis Data Stream buffers&#x27; and Lambda metric buffering &#x27;caused memory contention on the underlying service hosts used for Lambda function invocations&#x27; — turning one service&#x27;s outage into a multi-service cascade (aws.amazon.com/message/11201).</li></ul>
+        <h2 id="fmea">Failure mode &amp; effects analysis (FMEA)</h2>
+        <p class="fm-scope">The Amazon Kinesis Data Streams front-end fleet in US-EAST-1 — its shard-map coordination design and OS thread limit, the capacity-addition change that triggered the breach, the alarming on that fleet, its fault-domain boundary and cold-restart path, and the AWS services that buffer data through Kinesis. Analysed retrospectively from the official AWS post-event summary held in this dossier. Every corrective action is recorded as committed by AWS; none is recorded as completed, so each revised score is a claim about the action, not a confirmed outcome.</p>
+        <p class="metabar fm-meta"><span><b>5</b> failure modes</span><span class="sep">/</span><span><b>3</b> high priority</span><span class="sep">/</span><span><b>5 of 5</b> with a published action</span><span class="sep">/</span><span>total RPN <b>1754 → 952</b> (−46%)</span></p>
+        <div class="fm-viz">
+            <figure class="fm-fig"><figcaption>Risk priority number (S × O × D), worst first — thin bar: after the published action</figcaption><div class="fm-pb" role="list" aria-label="Risk priority number per failure mode, before and after corrective action"><div class="fm-pb-row" role="listitem" title="FM-01 Per-server thread demand crosses the OS-configured maximum on every server at once after a small capacity addition, and shard-map construction fails"><span class="fm-pb-id">FM-01</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:84.0%;background:var(--red)"></i><i class="fm-pb-rev" style="width:36.0%"></i></span><span class="fm-pb-val">504 → 216</span></div><div class="fm-pb-row" role="listitem" title="FM-04 Restart throughput is capped at a few hundred servers per hour, because shard-map rebuild is metadata-heavy and a faster restart would re-trigger the failure"><span class="fm-pb-id">FM-04</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:84.0%;background:var(--red)"></i><i class="fm-pb-rev" style="width:48.0%"></i></span><span class="fm-pb-val">504 → 288</span></div><div class="fm-pb-row" role="listitem" title="FM-02 No alarm exists on thread consumption, so the first signal is downstream error rates and the cause takes hours to identify"><span class="fm-pb-id">FM-02</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:65.3%;background:var(--red)"></i><i class="fm-pb-rev" style="width:32.7%"></i></span><span class="fm-pb-val">392 → 196</span></div><div class="fm-pb-row" role="listitem" title="FM-05 Buffers toward Kinesis back up with no back-pressure ceiling, so dependents block or exhaust host memory and fail in turn"><span class="fm-pb-id">FM-05</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:32.0%;background:var(--amber)"></i><i class="fm-pb-rev" style="width:24.0%"></i></span><span class="fm-pb-val">192 → 144</span></div><div class="fm-pb-row" role="listitem" title="FM-03 The front-end fleet is not cellularized, so the thread-limit breach reaches every server at the same moment"><span class="fm-pb-id">FM-03</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:27.0%;background:var(--amber)"></i><i class="fm-pb-rev" style="width:18.0%"></i></span><span class="fm-pb-val">162 → 108</span></div><div class="fm-pb-axis" aria-hidden="true"><span></span><span class="fm-pb-ticks"><span>0</span><span>300</span><span>600</span></span><span></span></div></div></figure>
+            <figure class="fm-fig fm-fig-m"><figcaption>Criticality: severity × occurrence</figcaption><svg class="fm-matrix" viewBox="0 0 360 330" role="img" aria-label="Criticality matrix, severity against occurrence"><rect class="fm-c-lo" x="44" y="266" width="28" height="28"/><rect class="fm-c-lo" x="72" y="266" width="28" height="28"/><rect class="fm-c-lo" x="100" y="266" width="28" height="28"/><rect class="fm-c-lo" x="128" y="266" width="28" height="28"/><rect class="fm-c-lo" x="156" y="266" width="28" height="28"/><rect class="fm-c-lo" x="184" y="266" width="28" height="28"/><rect class="fm-c-lo" x="212" y="266" width="28" height="28"/><rect class="fm-c-lo" x="240" y="266" width="28" height="28"/><rect class="fm-c-lo" x="268" y="266" width="28" height="28"/><rect class="fm-c-lo" x="296" y="266" width="28" height="28"/><rect class="fm-c-lo" x="44" y="238" width="28" height="28"/><rect class="fm-c-lo" x="72" y="238" width="28" height="28"/><rect class="fm-c-lo" x="100" y="238" width="28" height="28"/><rect class="fm-c-lo" x="128" y="238" width="28" height="28"/><rect class="fm-c-lo" x="156" y="238" width="28" height="28"/><rect class="fm-c-lo" x="184" y="238" width="28" height="28"/><rect class="fm-c-lo" x="212" y="238" width="28" height="28"/><rect class="fm-c-lo" x="240" y="238" width="28" height="28"/><rect class="fm-c-md" x="268" y="238" width="28" height="28"/><rect class="fm-c-md" x="296" y="238" width="28" height="28"/><rect class="fm-c-lo" x="44" y="210" width="28" height="28"/><rect class="fm-c-lo" x="72" y="210" width="28" height="28"/><rect class="fm-c-lo" x="100" y="210" width="28" height="28"/><rect class="fm-c-lo" x="128" y="210" width="28" height="28"/><rect class="fm-c-lo" x="156" y="210" width="28" height="28"/><rect class="fm-c-md" x="184" y="210" width="28" height="28"/><rect class="fm-c-md" x="212" y="210" width="28" height="28"/><rect class="fm-c-md" x="240" y="210" width="28" height="28"/><rect class="fm-c-md" x="268" y="210" width="28" height="28"/><rect class="fm-c-md" x="296" y="210" width="28" height="28"/><rect class="fm-c-lo" x="44" y="182" width="28" height="28"/><rect class="fm-c-lo" x="72" y="182" width="28" height="28"/><rect class="fm-c-lo" x="100" y="182" width="28" height="28"/><rect class="fm-c-lo" x="128" y="182" width="28" height="28"/><rect class="fm-c-md" x="156" y="182" width="28" height="28"/><rect class="fm-c-md" x="184" y="182" width="28" height="28"/><rect class="fm-c-md" x="212" y="182" width="28" height="28"/><rect class="fm-c-md" x="240" y="182" width="28" height="28"/><rect class="fm-c-md" x="268" y="182" width="28" height="28"/><rect class="fm-c-hi" x="296" y="182" width="28" height="28"/><rect class="fm-c-lo" x="44" y="154" width="28" height="28"/><rect class="fm-c-lo" x="72" y="154" width="28" height="28"/><rect class="fm-c-lo" x="100" y="154" width="28" height="28"/><rect class="fm-c-md" x="128" y="154" width="28" height="28"/><rect class="fm-c-md" x="156" y="154" width="28" height="28"/><rect class="fm-c-md" x="184" y="154" width="28" height="28"/><rect class="fm-c-md" x="212" y="154" width="28" height="28"/><rect class="fm-c-hi" x="240" y="154" width="28" height="28"/><rect class="fm-c-hi" x="268" y="154" width="28" height="28"/><rect class="fm-c-hi" x="296" y="154" width="28" height="28"/><rect class="fm-c-lo" x="44" y="126" width="28" height="28"/><rect class="fm-c-lo" x="72" y="126" width="28" height="28"/><rect class="fm-c-md" x="100" y="126" width="28" height="28"/><rect class="fm-c-md" x="128" y="126" width="28" height="28"/><rect class="fm-c-md" x="156" y="126" width="28" height="28"/><rect class="fm-c-md" x="184" y="126" width="28" height="28"/><rect class="fm-c-hi" x="212" y="126" width="28" height="28"/><rect class="fm-c-hi" x="240" y="126" width="28" height="28"/><rect class="fm-c-hi" x="268" y="126" width="28" height="28"/><rect class="fm-c-hi" x="296" y="126" width="28" height="28"/><rect class="fm-c-lo" x="44" y="98" width="28" height="28"/><rect class="fm-c-lo" x="72" y="98" width="28" height="28"/><rect class="fm-c-md" x="100" y="98" width="28" height="28"/><rect class="fm-c-md" x="128" y="98" width="28" height="28"/><rect class="fm-c-md" x="156" y="98" width="28" height="28"/><rect class="fm-c-hi" x="184" y="98" width="28" height="28"/><rect class="fm-c-hi" x="212" y="98" width="28" height="28"/><rect class="fm-c-hi" x="240" y="98" width="28" height="28"/><rect class="fm-c-hi" x="268" y="98" width="28" height="28"/><rect class="fm-c-hi" x="296" y="98" width="28" height="28"/><rect class="fm-c-lo" x="44" y="70" width="28" height="28"/><rect class="fm-c-lo" x="72" y="70" width="28" height="28"/><rect class="fm-c-md" x="100" y="70" width="28" height="28"/><rect class="fm-c-md" x="128" y="70" width="28" height="28"/><rect class="fm-c-hi" x="156" y="70" width="28" height="28"/><rect class="fm-c-hi" x="184" y="70" width="28" height="28"/><rect class="fm-c-hi" x="212" y="70" width="28" height="28"/><rect class="fm-c-hi" x="240" y="70" width="28" height="28"/><rect class="fm-c-hi" x="268" y="70" width="28" height="28"/><rect class="fm-c-hi" x="296" y="70" width="28" height="28"/><rect class="fm-c-hi" x="44" y="42" width="28" height="28"/><rect class="fm-c-hi" x="72" y="42" width="28" height="28"/><rect class="fm-c-hi" x="100" y="42" width="28" height="28"/><rect class="fm-c-hi" x="128" y="42" width="28" height="28"/><rect class="fm-c-hi" x="156" y="42" width="28" height="28"/><rect class="fm-c-hi" x="184" y="42" width="28" height="28"/><rect class="fm-c-hi" x="212" y="42" width="28" height="28"/><rect class="fm-c-hi" x="240" y="42" width="28" height="28"/><rect class="fm-c-hi" x="268" y="42" width="28" height="28"/><rect class="fm-c-hi" x="296" y="42" width="28" height="28"/><rect class="fm-c-hi" x="44" y="14" width="28" height="28"/><rect class="fm-c-hi" x="72" y="14" width="28" height="28"/><rect class="fm-c-hi" x="100" y="14" width="28" height="28"/><rect class="fm-c-hi" x="128" y="14" width="28" height="28"/><rect class="fm-c-hi" x="156" y="14" width="28" height="28"/><rect class="fm-c-hi" x="184" y="14" width="28" height="28"/><rect class="fm-c-hi" x="212" y="14" width="28" height="28"/><rect class="fm-c-hi" x="240" y="14" width="28" height="28"/><rect class="fm-c-hi" x="268" y="14" width="28" height="28"/><rect class="fm-c-hi" x="296" y="14" width="28" height="28"/><text class="vz-tick" x="58.0" y="308" text-anchor="middle">1</text><text class="vz-tick" x="36" y="284.0" text-anchor="end">1</text><text class="vz-tick" x="86.0" y="308" text-anchor="middle">2</text><text class="vz-tick" x="36" y="256.0" text-anchor="end">2</text><text class="vz-tick" x="114.0" y="308" text-anchor="middle">3</text><text class="vz-tick" x="36" y="228.0" text-anchor="end">3</text><text class="vz-tick" x="142.0" y="308" text-anchor="middle">4</text><text class="vz-tick" x="36" y="200.0" text-anchor="end">4</text><text class="vz-tick" x="170.0" y="308" text-anchor="middle">5</text><text class="vz-tick" x="36" y="172.0" text-anchor="end">5</text><text class="vz-tick" x="198.0" y="308" text-anchor="middle">6</text><text class="vz-tick" x="36" y="144.0" text-anchor="end">6</text><text class="vz-tick" x="226.0" y="308" text-anchor="middle">7</text><text class="vz-tick" x="36" y="116.0" text-anchor="end">7</text><text class="vz-tick" x="254.0" y="308" text-anchor="middle">8</text><text class="vz-tick" x="36" y="88.0" text-anchor="end">8</text><text class="vz-tick" x="282.0" y="308" text-anchor="middle">9</text><text class="vz-tick" x="36" y="60.0" text-anchor="end">9</text><text class="vz-tick" x="310.0" y="308" text-anchor="middle">10</text><text class="vz-tick" x="36" y="32.0" text-anchor="end">10</text><text class="vz-axis" x="184" y="328" text-anchor="middle">Occurrence →</text><text class="vz-axis" transform="translate(11 154) rotate(-90)" text-anchor="middle">Severity →</text><circle class="fm-pt" cx="114.0" cy="56.0" r="6" fill="var(--amber)"><title>FM-03 The front-end fleet is not cellularized, so the thread-limit breach reaches every server at the same moment (S9 O3 D6)</title></circle><text class="fm-pt-l" x="114.0" y="46.0" text-anchor="middle">03</text><circle class="fm-pt" cx="226.0" cy="56.0" r="6" fill="var(--red)"><title>FM-01 Per-server thread demand crosses the OS-configured maximum on every server at once after a small capacity addition, and shard-map construction fails (S9 O7 D8)</title></circle><text class="fm-pt-l" x="226.0" y="46.0" text-anchor="middle">01</text><circle class="fm-pt" cx="114.0" cy="84.0" r="6" fill="var(--amber)"><title>FM-05 Buffers toward Kinesis back up with no back-pressure ceiling, so dependents block or exhaust host memory and fail in turn (S8 O3 D8)</title></circle><text class="fm-pt-l" x="114.0" y="74.0" text-anchor="middle">05</text><circle class="fm-pt" cx="226.0" cy="84.0" r="6" fill="var(--red)"><title>FM-04 Restart throughput is capped at a few hundred servers per hour, because shard-map rebuild is metadata-heavy and a faster restart would re-trigger the failure (S8 O7 D9)</title></circle><text class="fm-pt-l" x="226.0" y="74.0" text-anchor="middle">04</text><circle class="fm-pt" cx="226.0" cy="112.0" r="6" fill="var(--red)"><title>FM-02 No alarm exists on thread consumption, so the first signal is downstream error rates and the cause takes hours to identify (S7 O7 D8)</title></circle><text class="fm-pt-l" x="226.0" y="102.0" text-anchor="middle">02</text></svg></figure>
+        </div>
+        <div class="fm-sheet">
+            <div class="fm-head" aria-hidden="true"><span>ID</span><span>Failure mode</span><span>S·O·D</span><span>RPN</span><span>After</span></div>
+            <details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-01</span>
+    <span class="fm-mode">Per-server thread demand crosses the OS-configured maximum on every server at once after a small capacity addition, and shard-map construction fails<span class="fm-item">Front-end shard-map coordination and OS thread limit</span></span>
+    <span class="fm-sod" aria-label="Severity 9, occurrence 7, detection 8">9·7·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>504</span>
+    <span class="fm-rpn-rev">216</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Build each front-end server&#x27;s shard-map so it can authenticate, throttle and route requests to the right back-end shards</dd>
+      <dt>Effect</dt><dd>Front-end servers end up with useless shard-maps and cannot route; Kinesis errors and slows across US-EAST-1 for about 18.5 hours from the breach</dd>
+      <dt>Cause</dt><dd>Each front-end server creates one OS thread per peer, so thread count grows in proportion to fleet size, against an OS thread limit not dimensioned for that growth</dd>
+      <dt>Prevention in place</dt><dd>None recorded; the limit had never been checked against the fleet&#x27;s growth</dd>
+      <dt>Detection in place</dt><dd>None at the breach; the first alarm was on Kinesis error rates about 88 minutes later</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>9</b></dt><dd>Region-wide outage of a foundational data service that at least six other AWS services depend on, with no customer workaround: the rubric&#x27;s 9. Not 10: one region, no hazard to people.</dd></div>
+      <div class="fm-sc"><dt>O <b>7</b></dt><dd>Adding capacity is routine work, and with thread count tied to fleet size every addition moved the fleet toward the ceiling; scored just under &#x27;frequent&#x27; because the ceiling is only crossed once the fleet is large enough.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>Nothing checked thread headroom before or during the capacity addition; the breach was seen only through Kinesis error-rate alarms after impact, &#x27;detected after impact by internal monitoring&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 504</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Move the front-end fleet to larger CPU and memory servers, cutting the number of servers and so the per-server thread count <span class="fm-ev-src">Correction of errors #2</span></li><li>Raise the OS thread-count limit once it has been load tested <span class="fm-ev-src">Correction of errors #4</span></li></ul>
+    <p class="fm-revline">After action: S9 · O3 · D8 → RPN 216. Fewer, larger servers shrink the fleet size that drives thread count, and a tested higher limit adds headroom, so a routine capacity addition should no longer reach the ceiling (O 7→3). The O(N) coupling itself remains, so severity and detection are unchanged. Both actions are recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome.</p>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://aws.amazon.com/message/11201" target="_blank" rel="noopener nofollow">Sequence of events #2</a></span><span class="fm-ev-txt">2020-11-25 03:47 AM PST — Capacity addition finishes; the larger fleet pushes every server past the OS max-thread limit — &#x27;the new capacity had caused all of the servers in the fleet to exceed the maximum number of threads allowed by an operating system configuration.&#x27;</span></li><li><span class="fm-ev-src"><a href="https://aws.amazon.com/message/11201" target="_blank" rel="noopener nofollow">Sequence of events #3</a></span><span class="fm-ev-txt">2020-11-25 ~03:47 AM PST — Failure mechanism engages fleet-wide: &#x27;cache construction was failing to complete and front-end servers were ending up with useless shard-maps,&#x27; disabling authentication, throttling and request-routing.</span></li><li><span class="fm-ev-src"><a href="https://aws.amazon.com/message/11201" target="_blank" rel="noopener nofollow">Metric #7</a></span><span class="fm-ev-txt">Thread scaling relationship: O(N): threads per server proportional to fleet size</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“the total threads each server must maintain is directly proportional to the number of servers in the fleet”</span></li><li><span class="fm-ev-src"><a href="https://aws.amazon.com/message/11201" target="_blank" rel="noopener nofollow">Reference #1 · official-postmortem</a></span><span class="fm-ev-txt">“exceed the maximum number of threads allowed by an operating system configuration”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-04</span>
+    <span class="fm-mode">Restart throughput is capped at a few hundred servers per hour, because shard-map rebuild is metadata-heavy and a faster restart would re-trigger the failure<span class="fm-item">Front-end cold-restart path</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 7, detection 9">8·7·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>504</span>
+    <span class="fm-rpn-rev">288</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Bring the whole front-end fleet back into service quickly after a fleet-wide failure</dd>
+      <dt>Effect</dt><dd>Recovery span of 12 h 16 min from first restart (10:07 AM) to full Kinesis recovery (10:23 PM PST)</dd>
+      <dt>Cause</dt><dd>Expensive shard-map construction at fleet scale, membership propagation of up to an hour, and an OS limit that could not be raised mid-incident without further testing</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>None before the incident; the restart rate was learned during it</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>This mode sets the duration of the outage: hours of full outage of a major service is the rubric&#x27;s 8.</dd></div>
+      <div class="fm-sc"><dt>O <b>7</b></dt><dd>Whenever a fleet-wide restart is needed the cap applies; the condition was present the whole time.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>Nothing in the dossier shows the restart rate had been measured before the incident needed it.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 504</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Radically improve cold-start time for the front-end fleet <span class="fm-ev-src">Correction of errors #5</span></li></ul>
+    <p class="fm-revline">After action: S8 · O4 · D9 → RPN 288. A faster cold start makes a throttled, hours-long restart less likely to set the outage duration (O 7→4). Severity is held at 8 because the dossier gives no target restart time. Recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome.</p>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://aws.amazon.com/message/11201" target="_blank" rel="noopener nofollow">Sequence of events #7</a></span><span class="fm-ev-txt">2020-11-25 10:07 AM PST — Controlled, throttled restart of the front-end fleet begins; first servers take traffic again. Restart deliberately slow because too-fast recovery would overwhelm shard-map/metadata retrieval and re-trigger failure.</span></li><li><span class="fm-ev-src"><a href="https://aws.amazon.com/message/11201" target="_blank" rel="noopener nofollow">Sequence of events #13</a></span><span class="fm-ev-txt">2020-11-25 (throughout) — De-energisation/isolation analogue: the added capacity is removed and the fleet restarted under the existing OS limit; AWS deliberately defers raising the limit &#x27;without further testing,&#x27; adding only &#x27;a few hundred per hour.&#x27;</span></li><li><span class="fm-ev-src"><a href="https://aws.amazon.com/message/11201" target="_blank" rel="noopener nofollow">Metric #4</a></span><span class="fm-ev-txt">Constrained restart rate: a few hundred servers per hour</span></li><li><span class="fm-ev-src"><a href="https://aws.amazon.com/message/11201" target="_blank" rel="noopener nofollow">Metric #5</a></span><span class="fm-ev-txt">Recovery span (restart start to full recovery): 12h16m (10:07 AM to 10:23 PM PST)</span></li><li><span class="fm-ev-src">Contributing factor #5</span><span class="fm-ev-txt">Fragile, expensive recovery path: because shard-map construction is metadata-heavy at fleet scale, servers could only be restored &#x27;at the rate of a few hundred per hour,&#x27; and the OS limit could not be safely raised mid-incident &#x27;without further testing,&#x27; extending the outage (aws.amazon.com/message/11201).</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-02</span>
+    <span class="fm-mode">No alarm exists on thread consumption, so the first signal is downstream error rates and the cause takes hours to identify<span class="fm-item">Front-end fleet alarming</span></span>
+    <span class="fm-sod" aria-label="Severity 7, occurrence 7, detection 8">7·7·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>392</span>
+    <span class="fm-rpn-rev">196</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Warn operators before the fleet runs out of the resource it is about to exhaust</dd>
+      <dt>Effect</dt><dd>First alarm 1 h 28 min after the breach; root cause confirmed 5 h 52 min after the breach, delaying the start of recovery</dd>
+      <dt>Cause</dt><dd>Monitoring covered the symptom (Kinesis error rates) but not the limiting resource (thread count against the OS limit)</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Automated alarms on elevated Kinesis error rates at 05:15 AM PST</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>7</b></dt><dd>This mode lengthens the outage by delaying diagnosis rather than causing it; hours of added delay on a major service is scored as &#x27;major degradation&#x27;, below FM-01 so the same outage is not counted twice at full weight.</dd></div>
+      <div class="fm-sc"><dt>O <b>7</b></dt><dd>The missing alarm was a standing condition, present for any approach to the thread limit.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>Internal monitoring did fire, but only on the symptom and after impact: the rubric&#x27;s 8.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 392</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Add fine-grained alarming for thread consumption <span class="fm-ev-src">Correction of errors #3</span></li></ul>
+    <p class="fm-revline">After action: S7 · O7 · D4 → RPN 196. An alarm on the limiting resource would show the fleet approaching the ceiling with time to act (D 8→4). It does not remove the condition, so O is unchanged. Recorded as committed, not completed, so the reduction is a claim about the action, not a confirmed outcome.</p>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://aws.amazon.com/message/11201" target="_blank" rel="noopener nofollow">Sequence of events #4</a></span><span class="fm-ev-txt">2020-11-25 05:15 AM PST — Automated monitoring raises the first alarms for elevated Kinesis error rates — the sensor detects the symptom, not the underlying thread-limit breach, roughly 90 minutes after the breach. CloudWatch Events/EventBridge errors also begin at 5:15 AM.</span></li><li><span class="fm-ev-src"><a href="https://aws.amazon.com/message/11201" target="_blank" rel="noopener nofollow">Sequence of events #6</a></span><span class="fm-ev-txt">2020-11-25 09:39 AM PST — Root cause confirmed: the new capacity caused all servers to exceed the OS-configured maximum thread count — the &#x27;confirmation of the fire&#x27;s origin.&#x27;</span></li><li><span class="fm-ev-src"><a href="https://aws.amazon.com/message/11201" target="_blank" rel="noopener nofollow">Metric #2</a></span><span class="fm-ev-txt">Detection lag (breach to first alarm): ~1h28m (03:47 to 05:15 AM PST)</span></li><li><span class="fm-ev-src"><a href="https://aws.amazon.com/message/11201" target="_blank" rel="noopener nofollow">Metric #3</a></span><span class="fm-ev-txt">Time to confirmed root cause: ~5h52m after breach (03:47 to 09:39 AM PST)</span></li><li><span class="fm-ev-src">Contributing factor #2</span><span class="fm-ev-txt">Observability/maintenance gap: no fine-grained alarming existed for thread consumption; AWS commits to add &#x27;fine-grained alarming for thread consumption&#x27; only as a post-incident action, meaning operators had no early warning as the fleet approached the OS thread limit (aws.amazon.com/message/11201).</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-05</span>
+    <span class="fm-mode">Buffers toward Kinesis back up with no back-pressure ceiling, so dependents block or exhaust host memory and fail in turn<span class="fm-item">AWS services that buffer data through Kinesis (Cognito, Lambda, CloudWatch, EventBridge)</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 3, detection 8">8·3·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>192</span>
+    <span class="fm-rpn-rev">144</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Keep serving their own requests while Kinesis is impaired</dd>
+      <dt>Effect</dt><dd>Cognito authentication fails until 2:18 PM; Lambda error rates rise from host memory contention; CloudWatch PutMetricData and PutLogEvents error until 10:31 PM; EventBridge delays stall ECS and EKS cluster provisioning and scaling</dd>
+      <dt>Cause</dt><dd>Unbounded buffering toward Kinesis in dependent services, with no recorded degraded mode</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Error rates in each dependent service after Kinesis impact began</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>Turns one service&#x27;s outage into a multi-service regional outage lasting hours: the rubric&#x27;s 8. Not 9, because the region-wide Kinesis outage itself is scored in FM-01.</dd></div>
+      <div class="fm-sc"><dt>O <b>3</b></dt><dd>Needs Kinesis to be impaired first, which is infrequent.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>The dependent failures were seen and mitigated by AWS engineers only after they produced error rates: &#x27;detected after impact by internal monitoring&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 192</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Add back-pressure and graceful degradation so a Kinesis backlog no longer blocks webservers or exhausts host memory <span class="fm-ev-src">Correction of errors #6</span></li><li>Cognito webservers tolerate Kinesis errors without exhausting buffers; CloudWatch persists 3 hours of metrics locally <span class="fm-ev-src">Improvement #5</span></li></ul>
+    <p class="fm-revline">After action: S6 · O3 · D8 → RPN 144. If dependents degrade instead of failing, a Kinesis outage stays confined to Kinesis and its direct users (S 8→6). The COE item is recorded as &#x27;Committed / implied by remediation&#x27; and the improvement names only Cognito and CloudWatch, not Lambda or EventBridge, so the reduction is a claim about the action, not a confirmed outcome.</p>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://aws.amazon.com/message/11201" target="_blank" rel="noopener nofollow">Sequence of events #8</a></span><span class="fm-ev-txt">2020-11-25 10:15 AM PST — Cognito remediation deployment begins to reduce reliance on the backlogged Kinesis Data Stream buffers that were blocking Cognito webservers.</span></li><li><span class="fm-ev-src"><a href="https://aws.amazon.com/message/11201" target="_blank" rel="noopener nofollow">Sequence of events #9</a></span><span class="fm-ev-txt">2020-11-25 10:36 AM PST — Engineers act to mitigate Lambda memory contention — metric buffering that could not drain to Kinesis had &#x27;caused memory contention on the underlying service hosts used for Lambda function invocations&#x27; — resolving the increased error rates.</span></li><li><span class="fm-ev-src"><a href="https://aws.amazon.com/message/11201" target="_blank" rel="noopener nofollow">Sequence of events #10</a></span><span class="fm-ev-txt">2020-11-25 (daytime) — CloudWatch shows &#x27;increased error rates and latencies for the PutMetricData and PutLogEvents APIs&#x27;; ECS and EKS, which use EventBridge for internal workflows, see delays provisioning new clusters and scaling existing ones.</span></li><li><span class="fm-ev-src"><a href="https://aws.amazon.com/message/11201" target="_blank" rel="noopener nofollow">Metric #8</a></span><span class="fm-ev-txt">Downstream services impacted: 6+ (Cognito, CloudWatch, Lambda, EventBridge, ECS, EKS)</span></li><li><span class="fm-ev-src">Contributing factor #6</span><span class="fm-ev-txt">Unbounded downstream buffers: dependent services (Cognito, Lambda, CloudWatch) buffered data toward Kinesis with no back-pressure ceiling, so Cognito webservers &#x27;begin to block on the backlogged Kinesis Data Stream buffers&#x27; and Lambda metric buffering &#x27;caused memory contention on the underlying service hosts used for Lambda function invocations&#x27; — turning one service&#x27;s outage into a multi-service cascade (aws.amazon.com/message/11201).</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-03</span>
+    <span class="fm-mode">The front-end fleet is not cellularized, so the thread-limit breach reaches every server at the same moment<span class="fm-item">Front-end fleet fault domain</span></span>
+    <span class="fm-sod" aria-label="Severity 9, occurrence 3, detection 6">9·3·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>162</span>
+    <span class="fm-rpn-rev">108</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Confine a resource exhaustion to part of the fleet</dd>
+      <dt>Effect</dt><dd>Routing fails fleet-wide rather than for a fraction of streams</dd>
+      <dt>Cause</dt><dd>Front-end fleet not partitioned into cells, unlike the back-end</dd>
+      <dt>Prevention in place</dt><dd>None recorded for the front end; the back end was already cellularized</dd>
+      <dt>Detection in place</dt><dd>Error-rate alarms at onset of customer impact</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>9</b></dt><dd>The single fault domain is what makes the breach region-wide for Kinesis, so it carries FM-01&#x27;s severity.</dd></div>
+      <div class="fm-sc"><dt>O <b>3</b></dt><dd>Losing the whole fleet needs a fleet-wide trigger such as FM-01&#x27;s breach first, an unusual combination; held low so the event is not double-counted.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>The fleet-wide failure was visible to monitoring once impact began, but nothing in the architecture contained it: &#x27;detected at onset, not prevented&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 162</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Greatly accelerate cellularization of the front-end fleet to match the back-end <span class="fm-ev-src">Correction of errors #1</span></li></ul>
+    <p class="fm-revline">After action: S6 · O3 · D6 → RPN 108. With cells, a breach of this kind would stop one cell rather than the fleet (S 9→6). Recorded as committed (medium-term), not completed, so the reduction is a claim about the action, not a confirmed outcome.</p>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #3</span><span class="fm-ev-txt">No failure-isolation barrier: the front-end fleet was not cellularized, so the limit breach hit &#x27;all of the servers in the fleet&#x27; at once instead of being confined to a cell — accelerating cellularization is named as the medium-term fix, confirming it was absent (aws.amazon.com/message/11201).</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“the front-end fleet was not cellularized”</span></li><li><span class="fm-ev-src">Technical deep-dive</span><span class="fm-ev-txt">“cellularization &quot;to isolate the effects of failure within a service,&quot;”</span></li></ul>
+  </div>
+</details>
+        </div>
+        <details class="fm-method"><summary>Scoring rubric and method</summary><div class="fm-method-body"><p>A retrospective FMEA: each row asks how this system could fail, how bad the effect was, how likely the cause was given the controls in place at the time, and how likely those controls were to catch it before customers did. Scales are adapted for data-centre operations from the 1–10 scales of IEC 60812:2018 and the AIAG-VDA FMEA handbook. RPN = S × O × D. Priority is High when S ≥ 9 with O ≥ 4 or D ≥ 7, or when RPN ≥ 300; Medium when RPN ≥ 120 or S ≥ 7; Low otherwise. Severity overrides the product because a large S multiplied by small O and D can hide a region-wide outage nothing would catch.</p><p>Every row cites evidence from this dossier, and every quote is checked verbatim against its source by <code>tools/test-incidents-fmea.py</code>. A revised score is only shown against a published corrective action. This is an RZ analyst assessment, not an operator document.</p><div class="fm-rubrics"><div><p class="fm-sub">Severity</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Hazard to people, or loss of the facility / several regions</td></tr><tr><td>9</td><td>Region-wide or provider-wide outage of a foundational service, no workaround</td></tr><tr><td>8</td><td>Full outage of a major service for hours</td></tr><tr><td>7</td><td>Major degradation of a major service</td></tr><tr><td>6</td><td>Partial outage confined to one zone or one service</td></tr><tr><td>5</td><td>Customer-visible degradation</td></tr><tr><td>4</td><td>Limited customer impact</td></tr><tr><td>3</td><td>Internal impact only</td></tr><tr><td>2</td><td>Negligible</td></tr><tr><td>1</td><td>No effect</td></tr></tbody></table></div><div><p class="fm-sub">Occurrence</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Near certain: the cause is present in normal operation</td></tr><tr><td>8</td><td>Frequent: routine work exercises the cause</td></tr><tr><td>6</td><td>Occasional: a foreseeable slip or condition, weakly guarded</td></tr><tr><td>4</td><td>Infrequent: needs an unusual combination</td></tr><tr><td>2</td><td>Remote: guarded by design</td></tr><tr><td>1</td><td>Eliminated by design</td></tr></tbody></table></div><div><p class="fm-sub">Detection</p><table class="fm-rubric"><tbody><tr><td>10</td><td>No control could detect it</td></tr><tr><td>9</td><td>Detected only through customer impact</td></tr><tr><td>8</td><td>Detected after impact by internal monitoring</td></tr><tr><td>6</td><td>Detected at onset, not prevented</td></tr><tr><td>4</td><td>Detected before impact with time to act</td></tr><tr><td>2</td><td>Automated interlock almost certainly stops it</td></tr><tr><td>1</td><td>Certain to be stopped</td></tr></tbody></table></div></div></div></details>
+
 
         <h2>Correction of errors (COE)</h2>
         <ul class="tight"><li>Greatly accelerate cellularization of the front-end fleet &#x27;to match what we&#x27;ve done with the back-end&#x27; so a limit breach is contained to a single cell rather than the whole fleet. <span class="coe-meta">AWS Kinesis service team · Committed (medium-term)</span></li><li>Move the front-end fleet to &#x27;larger CPU and memory servers, reducing the total number of servers,&#x27; which cuts fleet size N and the per-server thread count directly. <span class="coe-meta">AWS Kinesis service team · Committed</span></li><li>Add &#x27;fine-grained alarming for thread consumption&#x27; so operators get early warning before the OS thread ceiling is approached. <span class="coe-meta">AWS Kinesis service team · Committed</span></li><li>Raise the operating-system thread-count limit after further load testing, removing the specific ceiling that failed once validated. <span class="coe-meta">AWS Kinesis service team · Committed</span></li><li>Radically improve the cold-start time for the front-end fleet so recovery is not constrained to &#x27;a few hundred per hour.&#x27; <span class="coe-meta">AWS Kinesis service team · Committed</span></li><li>Reduce Cognito, CloudWatch, and Lambda coupling to Kinesis by adding back-pressure/graceful degradation so a Kinesis backlog no longer blocks webservers or exhausts host memory. <span class="coe-meta">AWS dependent-service teams · Committed / implied by remediation</span></li></ul>
@@ -429,7 +671,7 @@ The blast radius was defined by which services buffer data through Kinesis. Amaz
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-1a1a084f"></script>
+    <script src="js/rz-version.js?v=20261010-00a1d9e8"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

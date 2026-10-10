@@ -52,6 +52,12 @@
     .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
     .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
     .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:2px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    /* A chip carries the operator name, which can be a whole sentence ("Google Cloud
+       (impacted tenant); STT GDC / Tata Communications JV (named as the third-party …").
+       nowrap made that one chip 1120px wide and pushed the GCP Delhi dossier into a
+       1260px page at a 1100px viewport. Short chips are unaffected: normal wrapping
+       only engages when a chip would not fit its row. */
+    .chips .chip { max-width:100%; white-space:normal; overflow-wrap:anywhere; }
     .chip.cyan { color:var(--cyan); border-left:2px solid var(--cyan); }
     .chip.amber { color:var(--amber); border-left:2px solid var(--amber); }
     .chip.green { color:var(--green); border-left:2px solid var(--green); }
@@ -71,6 +77,11 @@
     /* rich incident table (reference-2 style) */
     table.itbl { min-width:1120px; }
     table.itbl td { vertical-align:middle; }
+    /* v1.134.20 — the title and summary columns ellipsise so the table's columns line up,
+       which is the right call for a dense index. But the cut text was reachable only by
+       navigating to the incident: a summary lost 238-298px of its sentence with no way to read
+       it in place. Each carries its full text in a title attribute now, so the truncation is
+       deliberate AND non-lossy — which is the condition the legibility audit checks for. */
     .itr { cursor:pointer; }
     .itr:hover td { background:var(--surface-2); }
     .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
@@ -240,7 +251,6 @@
        derive width = W px from the aspect ratio, so the drawing renders 1:1 at any event count
        and the panel scrolls instead of shrinking. */
     .viz-timeline svg { max-width:none; height:96px; width:auto; }
-
     .viz-radar svg { max-width:320px; margin:0 auto; }
     .vz-num { font-variant-numeric:tabular-nums slashed-zero; }
     .vz-box-t, .vz-box-s, .vz-lbl, .vz-hb-lbl, .vz-tl-t, .vz-pt, .vz-tick { pointer-events:auto; }
@@ -323,7 +333,86 @@
     }
     @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
 </style>
-    
+    <style>
+    /* ── FMEA (v3.12.3) — one hairline panel of rows, like the rest of the dossier.
+       No cards, no stripes: a row is a disclosure, state is a 7px dot. ── */
+    .fm-scope { color:var(--text-body); max-width:70ch; }
+    .fm-meta { flex-wrap:wrap; row-gap:0.25rem; }
+    .fm-viz { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:1.6rem; align-items:start; margin:1.2rem 0; }
+    @media (max-width:820px){ .fm-viz { grid-template-columns:1fr; } }
+    .fm-pb-row, .fm-pb-axis { display:grid; grid-template-columns:3.6rem minmax(0,1fr) 6.6rem; gap:0.6rem; align-items:center; }
+    .fm-pb-row { padding:0.32rem 0; }
+    .fm-pb-id, .fm-pb-val { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.8rem; }
+    .fm-pb-id { color:var(--muted); }
+    .fm-pb-val { color:var(--text-strong); white-space:nowrap; }
+    .fm-pb-track { display:flex; flex-direction:column; gap:3px; }
+    .fm-pb-bar { display:block; height:12px; }
+    .fm-pb-rev { display:block; height:4px; background:var(--text-body); opacity:0.55; }
+    .fm-pb-none { font-style:italic; font-size:0.72rem; color:var(--muted); line-height:1; }
+    .fm-pb-axis { margin-top:0.3rem; border-top:1px solid var(--line); padding-top:0.25rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .fm-pb-ticks { display:flex; justify-content:space-between; }
+    .fm-fig { margin:0; }
+    .fm-fig figcaption { font-size:0.8rem; color:var(--muted); margin-bottom:0.35rem; }
+    .fm-fig svg { width:100%; height:auto; display:block; }
+    .fm-fig-m svg { max-width:340px; }
+    .fm-matrix .fm-c-lo { fill:var(--surface); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-md { fill:color-mix(in srgb, var(--amber) 9%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-hi { fill:color-mix(in srgb, var(--red) 10%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .vz-axis { font-size:10px; fill:var(--muted); font-family:'IBM Plex Sans',sans-serif; }
+    .fm-matrix .fm-pt { stroke:var(--surface); stroke-width:1.5; }
+    .fm-matrix .fm-pt-l { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; fill:var(--text-strong);
+      paint-order:stroke; stroke:var(--surface); stroke-width:3px; stroke-linejoin:round; }
+    .fm-sheet { border:1px solid var(--line); border-radius:4px; margin-top:0.8rem; }
+    .fm-head, .fm-row > summary { display:grid; grid-template-columns:4.2rem minmax(0,1fr) 4.4rem 4.6rem 3.4rem; gap:0.6rem; align-items:baseline; padding:0.6rem 0.9rem; }
+    .fm-head { font-size:0.74rem; color:var(--muted); border-bottom:1px solid var(--line); }
+    .fm-row { border-top:1px solid var(--line); }
+    .fm-row:first-of-type { border-top:0; }
+    .fm-row > summary { cursor:pointer; list-style:none; }
+    .fm-row > summary::-webkit-details-marker { display:none; }
+    .fm-row > summary:hover { background:var(--surface-2); }
+    .fm-row > summary:focus-visible { outline:2px solid var(--cyan); outline-offset:-2px; }
+    .fm-id-cell, .fm-sod, .fm-rpn, .fm-rpn-rev { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.84rem; }
+    .fm-id-cell { color:var(--muted); }
+    .fm-mode { color:var(--text-strong); font-size:0.92rem; line-height:1.4; }
+    .fm-item { display:block; color:var(--muted); font-size:0.8rem; }
+    .fm-sod { color:var(--text-body); }
+    .fm-rpn { color:var(--text-strong); }
+    .fm-rpn-rev { color:var(--muted); }
+    .fm-dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:0.45rem; vertical-align:0.1em; }
+    .fm-body { padding:0.2rem 0.9rem 1rem 5.7rem; }
+    @media (max-width:640px){
+      .fm-head { display:none; }
+      .fm-row > summary { grid-template-columns:3.2rem minmax(0,1fr) auto; }
+      .fm-sod, .fm-rpn-rev { display:none; }
+      .fm-body { padding:0.2rem 0.9rem 1rem; }
+    }
+    .fm-kv { display:grid; grid-template-columns:9.5rem minmax(0,1fr); gap:0.3rem 0.9rem; margin:0.4rem 0 0.8rem; font-size:0.88rem; }
+    .fm-kv dt { color:var(--muted); }
+    .fm-kv dd { margin:0; color:var(--text-body); }
+    @media (max-width:640px){ .fm-kv { grid-template-columns:1fr; } .fm-kv dd { margin-bottom:0.4rem; } }
+    .fm-scores { margin:0 0 0.6rem; border-top:1px solid var(--line); }
+    .fm-sc { display:grid; grid-template-columns:3.2rem minmax(0,1fr); gap:0.6rem; padding:0.45rem 0; border-bottom:1px solid var(--line); font-size:0.86rem; }
+    .fm-sc dt { font-family:'JetBrains Mono',monospace; color:var(--muted); }
+    .fm-sc dt b { color:var(--text-strong); }
+    .fm-sc dd { margin:0; color:var(--text-body); }
+    .fm-sub { font-size:0.8rem; color:var(--muted); margin:0.7rem 0 0.25rem; }
+    .fm-sub b { color:var(--text-strong); }
+    .fm-acts, .fm-ev { margin:0; padding-left:1.1rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-acts li, .fm-ev li { margin:0.25rem 0; }
+    .fm-residual { color:var(--red); }
+    .fm-revline { font-size:0.86rem; color:var(--text-body); margin:0.4rem 0 0; }
+    .fm-ev-src { display:block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .fm-ev-src a { color:var(--cyan); }
+    .fm-ev-txt { display:block; }
+    .fm-method { margin-top:1rem; border:1px solid var(--line); border-radius:4px; }
+    .fm-method > summary { padding:0.6rem 0.9rem; cursor:pointer; font-size:0.9rem; color:var(--text-strong); }
+    .fm-method-body { padding:0 0.9rem 0.9rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-rubrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+    @media (max-width:760px){ .fm-rubrics { grid-template-columns:1fr; } }
+    .fm-rubric { width:100%; border-collapse:collapse; font-size:0.8rem; }
+    .fm-rubric td { padding:0.25rem 0.4rem; border-top:1px solid var(--line); vertical-align:top; }
+    .fm-rubric td:first-child { font-family:'JetBrains Mono',monospace; width:2rem; color:var(--text-strong); }
+</style>
 </head>
 <body class="locked">
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -353,7 +442,7 @@
         <p class="lede">On the morning of Saturday 27 May 2017, an engineer working inside British Airways&#x27; Boadicea House data centre in West London disconnected a power supply and then reconnected it in an uncontrolled, unplanned manner. The resulting surge physically damaged servers and bypassed the site&#x27;s backup generators and batteries. Although the BoHo site itself was without power for only about 15 minutes, the physical damage plus a failed failover to the secondary data centre escalated a brief electrical fault into a multi-day service outage. British Airways grounded all flights at Heathrow and Gatwick, affecting roughly 75,000 passengers and as many as 672 flights. IAG later confirmed a loss of about £58m. No formal operator <span data-explain="postmortem" tabindex="0">postmortem</span> was ever published; BA sued its facilities supplier CBRE and the dispute settled in February 2019 with no admission of liability.</p>
 
         <h2>Failure cascade</h2>
-        <div class="viz viz-cascade"><svg viewBox="0 0 760 228" role="img" aria-label="Failure cascade block diagram"><title>Failure cascade: trigger → fault → downstream impact</title><defs><marker id="ic-ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path class="vz-arrhead" d="M0,0 L6,3 L0,6 Z"/></marker></defs><text class="vz-tl-ph" x="8" y="12">Trigger</text><text class="vz-tl-ph" x="248" y="12">Primary fault</text><text class="vz-tl-ph" x="516" y="12">Downstream impact</text><rect class="vz-box-trigger" x="8" y="86.0" width="176" height="56" rx="2"><title>Trigger — Power (2017-05-27)</title></rect><text class="vz-box-t" x="18" y="103.0">Trigger · Power</text><text class="vz-box-s" x="18" y="117.0"><title>2017-05-27</title>2017-05-27</text><rect class="vz-box-fault" x="240" y="86.0" width="224" height="56" rx="2"><title>Primary fault at British Airways (IAG); data-centre facility management by CBRE — Boadicea House (BoHo) data centre, West London</title></rect><text class="vz-box-t" x="250" y="103.0">British Airways</text><text class="vz-box-s" x="250" y="117.0"><title>Boadicea House (BoHo) data centre, West London</title>Boadicea House</text><line class="vz-flow" x1="184" y1="114.0" x2="238" y2="114.0" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="26" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Passenger check-in</title></rect><text class="vz-box-t" x="526" y="43">Passenger check-in</text><line class="vz-flow" x1="464" y1="114.0" x2="514" y2="44" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="70" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Baggage handling</title></rect><text class="vz-box-t" x="526" y="87">Baggage handling</text><line class="vz-flow" x1="464" y1="114.0" x2="514" y2="88" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="114" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Operational communications / core airline systems</title></rect><text class="vz-box-t" x="526" y="131">Operational communications /</text><text class="vz-box-t" x="526" y="144">core…</text><line class="vz-flow" x1="464" y1="114.0" x2="514" y2="132" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="158" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Online booking-data integrity (stale flight data)</title></rect><text class="vz-box-t" x="526" y="175">Online booking-data integrity</text><line class="vz-flow" x1="464" y1="114.0" x2="514" y2="176" marker-end="url(#ic-ar)"/></svg></div>
+        <div class="viz viz-cascade"><svg viewBox="0 0 760 228" role="img" aria-label="Failure cascade block diagram"><title>Failure cascade: trigger → fault → downstream impact</title><defs><marker id="ic-ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path class="vz-arrhead" d="M0,0 L6,3 L0,6 Z"/></marker></defs><text class="vz-tl-ph" x="8" y="12">Trigger</text><text class="vz-tl-ph" x="248" y="12">Primary fault</text><text class="vz-tl-ph" x="516" y="12">Downstream impact</text><rect class="vz-box-trigger" x="8" y="86.0" width="176" height="56" rx="2"><title>Trigger — Power (2017-05-27)</title></rect><text class="vz-box-t" x="18" y="103.0">Trigger · Power</text><text class="vz-box-s" x="18" y="117.0"><title>2017-05-27</title>2017-05-27</text><rect class="vz-box-fault" x="240" y="86.0" width="224" height="56" rx="2"><title>Primary fault at British Airways (IAG); data-centre facility management by CBRE — Boadicea House (BoHo) data centre, West London</title></rect><text class="vz-box-t" x="250" y="103.0">British Airways</text><text class="vz-box-s" x="250" y="117.0"><title>Boadicea House (BoHo) data centre, West London</title>Boadicea House</text><line class="vz-flow" x1="184" y1="114.0" x2="238" y2="114.0" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="26" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Passenger check-in</title></rect><text class="vz-box-t" x="526" y="43">Passenger check-in</text><line class="vz-flow" x1="464" y1="114.0" x2="514" y2="44" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="70" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Baggage handling</title></rect><text class="vz-box-t" x="526" y="87">Baggage handling</text><line class="vz-flow" x1="464" y1="114.0" x2="514" y2="88" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="114" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Operational communications / core airline systems</title></rect><text class="vz-box-t" x="526" y="131">Operational communications /</text><text class="vz-box-t" x="526" y="144">core</text><line class="vz-flow" x1="464" y1="114.0" x2="514" y2="132" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="158" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Online booking-data integrity (stale flight data)</title></rect><text class="vz-box-t" x="526" y="175">Online booking-data integrity</text><line class="vz-flow" x1="464" y1="114.0" x2="514" y2="176" marker-end="url(#ic-ar)"/></svg></div>
         <p class="disclaimer">Trigger → primary fault → downstream blast radius, derived from the sourced root cause and affected-services record.</p>
 
         <h2>Facility &amp; location</h2>
@@ -393,6 +482,215 @@ LATENT ROOT — maintenance / method-of-procedure. The implicated (never adjudic
 
         <h2>Contributing factors</h2>
         <ul class="tight"><li>MAINTENANCE / MOP FAILURE (proximate): the UPS was manually &#x27;over-ridden&#x27; and then power was restored &#x27;in an unplanned and uncontrolled fashion&#x27; — the opposite of a controlled, sequenced, load-verified re-energisation. No authorised method-of-procedure or work permit for the Saturday work has ever been made public, so whether a valid MOP existed or was breached is unestablished (leaked IAG email via The Register, 2017-06-02).</li><li>REDUNDANCY BYPASSED RATHER THAN TRANSFERRED: the override caused &#x27;the total immediate loss of power to the facility, bypassing the backup generators and batteries.&#x27; The N+ backup path (generators + battery strings) that should have carried the critical load was stranded instead of picking it up (leaked IAG email via The Register).</li><li>TIGHTLY-COUPLED ACTIVE:ACTIVE DESIGN: two data centres synchronised live state, so a fault at Boadicea House was not isolated — the reported (unconfirmed) mechanism is that corrupted synchronised data left the failover site &#x27;populated with enough bad data to crash all the systems depending on it,&#x27; turning redundancy into a shared failure path (The Register, source-attributed theory).</li><li>UNCONTROLLED RE-ENERGISATION WITH NO STAGED RAMP: reconnecting power without sequencing sources or verifying downstream state produced a damaging over-voltage (hypothesised battery+generator briefly in series, ~480 V vs ~240 V nominal) that physically destroyed hardware, forcing rebuild/restore rather than clean failover (The Register, expert hypothesis — unconfirmed).</li><li>SPLIT OPERATIONAL ACCOUNTABILITY BA/CBRE: the facility was managed by CBRE Global Workplace Solutions under contract to BA; the contractor allegedly involved was named only by the Daily Mail (via The Register) while CBRE said &#x27;no determination has been made yet regarding the cause,&#x27; indicating unclear ownership of the switching operation and its controls.</li><li>PHYSICAL HARDWARE DAMAGE (not just outage): the surge &#x27;created physical damage to the system,&#x27; meaning recovery required replacing/rebuilding damaged infrastructure rather than a seconds-long failover — a major driver of the multi-day operational impact (leaked IAG email via The Register).</li><li>TIMING / CHANGE-CONTROL EXPOSURE: live critical-power switching was performed on a bank-holiday Saturday at the start of a peak travel weekend, maximising passenger impact when a change-freeze on peak windows would have reduced exposure (Alex Cruz confirmed 09:30 Sat 27 May start, via The Register).</li></ul>
+        <h2 id="fmea">Failure mode &amp; effects analysis (FMEA)</h2>
+        <p class="fm-scope">The critical-power chain at British Airways&#x27; Boadicea House data centre and the IT recovery that followed — the UPS override, the generator and battery backup path, the re-energisation, the active:active failover to the second data centre, hardware rebuild and recovery, the BA/CBRE change-control and accountability around live power work, and post-incident disclosure. No operator post-mortem was published: the mechanism rests on a leaked IAG email, BA and IAG executives&#x27; statements and press reporting. The ~480 V series-surge figure and the corrupted-data failover mechanism are single-source (The Register) hypotheses, not established facts; the BA/IAG independent investigation was never released, and the BA/CBRE claim settled with no admission of liability, so the root cause was never adjudicated. No corrective action in the dossier is confirmed as done, so no revised score is claimed: all seven modes are residual risk.</p>
+        <p class="metabar fm-meta"><span><b>7</b> failure modes</span><span class="sep">/</span><span><b>5</b> high priority</span><span class="sep">/</span><span><b>0 of 7</b> with a published action</span><span class="sep">/</span><span>total RPN <b>2259 → 2259</b> (−0%)</span></p>
+        <div class="fm-viz">
+            <figure class="fm-fig"><figcaption>Risk priority number (S × O × D), worst first — thin bar: after the published action</figcaption><div class="fm-pb" role="list" aria-label="Risk priority number per failure mode, before and after corrective action"><div class="fm-pb-row" role="listitem" title="FM-05 Physically damaged hardware forces rebuild and restore rather than a clean failover, so recovery takes days"><span class="fm-pb-id">FM-05</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:86.4%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">432</span></div><div class="fm-pb-row" role="listitem" title="FM-01 A manual override of the UPS drops the whole facility&#x27;s load at once, bypassing the generators and batteries instead of transferring the load to them"><span class="fm-pb-id">FM-01</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:81.0%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">405</span></div><div class="fm-pb-row" role="listitem" title="FM-03 Power is turned back on in an unplanned and uncontrolled fashion, producing a surge that physically damages servers and infrastructure"><span class="fm-pb-id">FM-03</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:81.0%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">405</span></div><div class="fm-pb-row" role="listitem" title="FM-06 Live critical-power switching is performed on a bank-holiday Saturday at the start of a peak travel weekend, with unclear ownership between BA and its facilities manager"><span class="fm-pb-id">FM-06</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:64.8%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">324</span></div><div class="fm-pb-row" role="listitem" title="FM-07 The independent investigation is never released and the BA/CBRE claim settles privately, so no adjudicated root cause exists"><span class="fm-pb-id">FM-07</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:57.6%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">288</span></div><div class="fm-pb-row" role="listitem" title="FM-04 The peer site also collapses instead of taking over"><span class="fm-pb-id">FM-04</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:48.6%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">243</span></div><div class="fm-pb-row" role="listitem" title="FM-02 The backup sources are stranded rather than picking up the load"><span class="fm-pb-id">FM-02</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:32.4%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">162</span></div><div class="fm-pb-axis" aria-hidden="true"><span></span><span class="fm-pb-ticks"><span>0</span><span>250</span><span>500</span></span><span></span></div></div></figure>
+            <figure class="fm-fig fm-fig-m"><figcaption>Criticality: severity × occurrence</figcaption><svg class="fm-matrix" viewBox="0 0 360 330" role="img" aria-label="Criticality matrix, severity against occurrence"><rect class="fm-c-lo" x="44" y="266" width="28" height="28"/><rect class="fm-c-lo" x="72" y="266" width="28" height="28"/><rect class="fm-c-lo" x="100" y="266" width="28" height="28"/><rect class="fm-c-lo" x="128" y="266" width="28" height="28"/><rect class="fm-c-lo" x="156" y="266" width="28" height="28"/><rect class="fm-c-lo" x="184" y="266" width="28" height="28"/><rect class="fm-c-lo" x="212" y="266" width="28" height="28"/><rect class="fm-c-lo" x="240" y="266" width="28" height="28"/><rect class="fm-c-lo" x="268" y="266" width="28" height="28"/><rect class="fm-c-lo" x="296" y="266" width="28" height="28"/><rect class="fm-c-lo" x="44" y="238" width="28" height="28"/><rect class="fm-c-lo" x="72" y="238" width="28" height="28"/><rect class="fm-c-lo" x="100" y="238" width="28" height="28"/><rect class="fm-c-lo" x="128" y="238" width="28" height="28"/><rect class="fm-c-lo" x="156" y="238" width="28" height="28"/><rect class="fm-c-lo" x="184" y="238" width="28" height="28"/><rect class="fm-c-lo" x="212" y="238" width="28" height="28"/><rect class="fm-c-lo" x="240" y="238" width="28" height="28"/><rect class="fm-c-md" x="268" y="238" width="28" height="28"/><rect class="fm-c-md" x="296" y="238" width="28" height="28"/><rect class="fm-c-lo" x="44" y="210" width="28" height="28"/><rect class="fm-c-lo" x="72" y="210" width="28" height="28"/><rect class="fm-c-lo" x="100" y="210" width="28" height="28"/><rect class="fm-c-lo" x="128" y="210" width="28" height="28"/><rect class="fm-c-lo" x="156" y="210" width="28" height="28"/><rect class="fm-c-md" x="184" y="210" width="28" height="28"/><rect class="fm-c-md" x="212" y="210" width="28" height="28"/><rect class="fm-c-md" x="240" y="210" width="28" height="28"/><rect class="fm-c-md" x="268" y="210" width="28" height="28"/><rect class="fm-c-md" x="296" y="210" width="28" height="28"/><rect class="fm-c-lo" x="44" y="182" width="28" height="28"/><rect class="fm-c-lo" x="72" y="182" width="28" height="28"/><rect class="fm-c-lo" x="100" y="182" width="28" height="28"/><rect class="fm-c-lo" x="128" y="182" width="28" height="28"/><rect class="fm-c-md" x="156" y="182" width="28" height="28"/><rect class="fm-c-md" x="184" y="182" width="28" height="28"/><rect class="fm-c-md" x="212" y="182" width="28" height="28"/><rect class="fm-c-md" x="240" y="182" width="28" height="28"/><rect class="fm-c-md" x="268" y="182" width="28" height="28"/><rect class="fm-c-hi" x="296" y="182" width="28" height="28"/><rect class="fm-c-lo" x="44" y="154" width="28" height="28"/><rect class="fm-c-lo" x="72" y="154" width="28" height="28"/><rect class="fm-c-lo" x="100" y="154" width="28" height="28"/><rect class="fm-c-md" x="128" y="154" width="28" height="28"/><rect class="fm-c-md" x="156" y="154" width="28" height="28"/><rect class="fm-c-md" x="184" y="154" width="28" height="28"/><rect class="fm-c-md" x="212" y="154" width="28" height="28"/><rect class="fm-c-hi" x="240" y="154" width="28" height="28"/><rect class="fm-c-hi" x="268" y="154" width="28" height="28"/><rect class="fm-c-hi" x="296" y="154" width="28" height="28"/><rect class="fm-c-lo" x="44" y="126" width="28" height="28"/><rect class="fm-c-lo" x="72" y="126" width="28" height="28"/><rect class="fm-c-md" x="100" y="126" width="28" height="28"/><rect class="fm-c-md" x="128" y="126" width="28" height="28"/><rect class="fm-c-md" x="156" y="126" width="28" height="28"/><rect class="fm-c-md" x="184" y="126" width="28" height="28"/><rect class="fm-c-hi" x="212" y="126" width="28" height="28"/><rect class="fm-c-hi" x="240" y="126" width="28" height="28"/><rect class="fm-c-hi" x="268" y="126" width="28" height="28"/><rect class="fm-c-hi" x="296" y="126" width="28" height="28"/><rect class="fm-c-lo" x="44" y="98" width="28" height="28"/><rect class="fm-c-lo" x="72" y="98" width="28" height="28"/><rect class="fm-c-md" x="100" y="98" width="28" height="28"/><rect class="fm-c-md" x="128" y="98" width="28" height="28"/><rect class="fm-c-md" x="156" y="98" width="28" height="28"/><rect class="fm-c-hi" x="184" y="98" width="28" height="28"/><rect class="fm-c-hi" x="212" y="98" width="28" height="28"/><rect class="fm-c-hi" x="240" y="98" width="28" height="28"/><rect class="fm-c-hi" x="268" y="98" width="28" height="28"/><rect class="fm-c-hi" x="296" y="98" width="28" height="28"/><rect class="fm-c-lo" x="44" y="70" width="28" height="28"/><rect class="fm-c-lo" x="72" y="70" width="28" height="28"/><rect class="fm-c-md" x="100" y="70" width="28" height="28"/><rect class="fm-c-md" x="128" y="70" width="28" height="28"/><rect class="fm-c-hi" x="156" y="70" width="28" height="28"/><rect class="fm-c-hi" x="184" y="70" width="28" height="28"/><rect class="fm-c-hi" x="212" y="70" width="28" height="28"/><rect class="fm-c-hi" x="240" y="70" width="28" height="28"/><rect class="fm-c-hi" x="268" y="70" width="28" height="28"/><rect class="fm-c-hi" x="296" y="70" width="28" height="28"/><rect class="fm-c-hi" x="44" y="42" width="28" height="28"/><rect class="fm-c-hi" x="72" y="42" width="28" height="28"/><rect class="fm-c-hi" x="100" y="42" width="28" height="28"/><rect class="fm-c-hi" x="128" y="42" width="28" height="28"/><rect class="fm-c-hi" x="156" y="42" width="28" height="28"/><rect class="fm-c-hi" x="184" y="42" width="28" height="28"/><rect class="fm-c-hi" x="212" y="42" width="28" height="28"/><rect class="fm-c-hi" x="240" y="42" width="28" height="28"/><rect class="fm-c-hi" x="268" y="42" width="28" height="28"/><rect class="fm-c-hi" x="296" y="42" width="28" height="28"/><rect class="fm-c-hi" x="44" y="14" width="28" height="28"/><rect class="fm-c-hi" x="72" y="14" width="28" height="28"/><rect class="fm-c-hi" x="100" y="14" width="28" height="28"/><rect class="fm-c-hi" x="128" y="14" width="28" height="28"/><rect class="fm-c-hi" x="156" y="14" width="28" height="28"/><rect class="fm-c-hi" x="184" y="14" width="28" height="28"/><rect class="fm-c-hi" x="212" y="14" width="28" height="28"/><rect class="fm-c-hi" x="240" y="14" width="28" height="28"/><rect class="fm-c-hi" x="268" y="14" width="28" height="28"/><rect class="fm-c-hi" x="296" y="14" width="28" height="28"/><text class="vz-tick" x="58.0" y="308" text-anchor="middle">1</text><text class="vz-tick" x="36" y="284.0" text-anchor="end">1</text><text class="vz-tick" x="86.0" y="308" text-anchor="middle">2</text><text class="vz-tick" x="36" y="256.0" text-anchor="end">2</text><text class="vz-tick" x="114.0" y="308" text-anchor="middle">3</text><text class="vz-tick" x="36" y="228.0" text-anchor="end">3</text><text class="vz-tick" x="142.0" y="308" text-anchor="middle">4</text><text class="vz-tick" x="36" y="200.0" text-anchor="end">4</text><text class="vz-tick" x="170.0" y="308" text-anchor="middle">5</text><text class="vz-tick" x="36" y="172.0" text-anchor="end">5</text><text class="vz-tick" x="198.0" y="308" text-anchor="middle">6</text><text class="vz-tick" x="36" y="144.0" text-anchor="end">6</text><text class="vz-tick" x="226.0" y="308" text-anchor="middle">7</text><text class="vz-tick" x="36" y="116.0" text-anchor="end">7</text><text class="vz-tick" x="254.0" y="308" text-anchor="middle">8</text><text class="vz-tick" x="36" y="88.0" text-anchor="end">8</text><text class="vz-tick" x="282.0" y="308" text-anchor="middle">9</text><text class="vz-tick" x="36" y="60.0" text-anchor="end">9</text><text class="vz-tick" x="310.0" y="308" text-anchor="middle">10</text><text class="vz-tick" x="36" y="32.0" text-anchor="end">10</text><text class="vz-axis" x="184" y="328" text-anchor="middle">Occurrence →</text><text class="vz-axis" transform="translate(11 154) rotate(-90)" text-anchor="middle">Severity →</text><circle class="fm-pt" cx="114.0" cy="56.0" r="6" fill="var(--red)"><title>FM-02 The backup sources are stranded rather than picking up the load (S9 O3 D6); FM-04 The peer site also collapses instead of taking over (S9 O3 D9)</title></circle><text class="fm-pt-l" x="114.0" y="46.0" text-anchor="middle">02, 04</text><circle class="fm-pt" cx="170.0" cy="56.0" r="6" fill="var(--red)"><title>FM-01 A manual override of the UPS drops the whole facility&#x27;s load at once, bypassing the generators and batteries instead of transferring the load to them (S9 O5 D9); FM-03 Power is turned back on in an unplanned and uncontrolled fashion, producing a surge that physically damages servers and infrastructure (S9 O5 D9)</title></circle><text class="fm-pt-l" x="170.0" y="46.0" text-anchor="middle">01, 03</text><circle class="fm-pt" cx="198.0" cy="84.0" r="6" fill="var(--red)"><title>FM-05 Physically damaged hardware forces rebuild and restore rather than a clean failover, so recovery takes days (S8 O6 D9)</title></circle><text class="fm-pt-l" x="198.0" y="74.0" text-anchor="middle">05</text><circle class="fm-pt" cx="198.0" cy="140.0" r="6" fill="var(--red)"><title>FM-06 Live critical-power switching is performed on a bank-holiday Saturday at the start of a peak travel weekend, with unclear ownership between BA and its facilities manager (S6 O6 D9)</title></circle><text class="fm-pt-l" x="198.0" y="130.0" text-anchor="middle">06</text><circle class="fm-pt" cx="254.0" cy="196.0" r="6" fill="var(--amber)"><title>FM-07 The independent investigation is never released and the BA/CBRE claim settles privately, so no adjudicated root cause exists (S4 O8 D9)</title></circle><text class="fm-pt-l" x="254.0" y="186.0" text-anchor="middle">07</text></svg></figure>
+        </div>
+        <div class="fm-sheet">
+            <div class="fm-head" aria-hidden="true"><span>ID</span><span>Failure mode</span><span>S·O·D</span><span>RPN</span><span>After</span></div>
+            <details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-05</span>
+    <span class="fm-mode">Physically damaged hardware forces rebuild and restore rather than a clean failover, so recovery takes days<span class="fm-item">Hardware rebuild and IT recovery</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 6, detection 9">8·6·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>432</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Return airline systems to service quickly after a site loss</dd>
+      <dt>Effect</dt><dd>About 75,000 passengers and as many as 672 flights affected over a bank-holiday weekend; IAG confirmed a loss of about £58m (press figures range higher)</dd>
+      <dt>Cause</dt><dd>Hardware damage from the surge combined with the failed failover; no rehearsed rebuild runbook is recorded</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Found during recovery</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>Sets the duration rather than the existence of the outage: days of full outage of the airline&#x27;s core systems is at least the rubric&#x27;s 8, held below FM-01 to avoid double-counting.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>Any event that destroys hardware at one site while the other is unavailable leads to the same rebuild: &#x27;occasional&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>Nothing in the record shows the rebuild time had been assessed before the event.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 432</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Maintain out-of-band recovery capability and rehearsed rebuild runbooks that assume hardware destruction <span class="fm-ev-src">Improvement #6</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Leaked IAG email (&#x27;physical damage to the system&#x27;) via The Register" target="_blank" rel="noopener nofollow">Sequence of events #11</a></span><span class="fm-ev-txt">2017-05-27, day — De-energisation/isolation and recovery: because hardware was physically damaged (not merely powered down), recovery requires rebuild/restore of damaged infrastructure rather than a clean seconds-long failover.</span></li><li><span class="fm-ev-src"><a href="https://The Register / press-reported timeline" target="_blank" rel="noopener nofollow">Sequence of events #14</a></span><span class="fm-ev-txt">2017-05-28 onward — BA progressively restores IT systems and flight operations over the following days as damaged infrastructure is rebuilt/restored; service normalises after the bank-holiday weekend disruption.</span></li><li><span class="fm-ev-src">Contributing factor #6</span><span class="fm-ev-txt">PHYSICAL HARDWARE DAMAGE (not just outage): the surge &#x27;created physical damage to the system,&#x27; meaning recovery required replacing/rebuilding damaged infrastructure rather than a seconds-long failover — a major driver of the multi-day operational impact (leaked IAG email via The Register).</span></li><li><span class="fm-ev-src"><a href="https://Press (BBC/Reuters), widely reported — not re-verified this pass" target="_blank" rel="noopener nofollow">Metric #8</a></span><span class="fm-ev-txt">Passengers affected: ~75,000 (press-reported)</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-01</span>
+    <span class="fm-mode">A manual override of the UPS drops the whole facility&#x27;s load at once, bypassing the generators and batteries instead of transferring the load to them<span class="fm-item">Site UPS override / bypass operation</span></span>
+    <span class="fm-sod" aria-label="Severity 9, occurrence 5, detection 9">9·5·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>405</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Allow work on the UPS while the critical load stays powered</dd>
+      <dt>Effect</dt><dd>Total immediate loss of power to Boadicea House for a few minutes on Saturday 27 May 2017, around 09:30</dd>
+      <dt>Cause</dt><dd>Manual override during on-site work at the CBRE-managed facility; whether an approved method-of-procedure existed or was breached is not established in the public record</dd>
+      <dt>Prevention in place</dt><dd>Not disclosed; no MOP, work permit or maintenance log for the work has been made public</dd>
+      <dt>Detection in place</dt><dd>None before the action; the event was detected operationally as total loss of the data hall</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>9</b></dt><dd>Starts a chain that stopped British Airways&#x27; operations at Heathrow and Gatwick for about two days with no workaround: the rubric&#x27;s 9 for an operator-wide outage. Not 10: no hazard to people is reported and the building was not lost.</dd></div>
+      <div class="fm-sc"><dt>O <b>5</b></dt><dd>Manual switching on live critical power is a foreseeable slip, and nothing in the record shows it was guarded; held at 5 rather than 6 because whether a procedure existed is unestablished.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>Nothing is recorded that would catch the override before it dropped the load; it was found through its effect.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 405</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Publish and enforce an approved MOP/SOP/EOP for all UPS bypass and re-energisation operations <span class="fm-ev-src">Correction of errors #1</span></li><li>Enforce make-before-break maintenance bypass so the load transfers before any UPS work <span class="fm-ev-src">Improvement #2</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Leaked IAG email (Bill Francis) via The Register 2017-06-02" target="_blank" rel="noopener nofollow">Sequence of events #2</a></span><span class="fm-ev-txt">2017-05-27, ~09:30 (Saturday) — The UPS feeding the core Boadicea House data centre is manually &#x27;over-ridden&#x27; during on-site work at the CBRE-managed facility.</span></li><li><span class="fm-ev-src"><a href="https://Leaked IAG email via The Register" target="_blank" rel="noopener nofollow">Sequence of events #3</a></span><span class="fm-ev-txt">2017-05-27, ~09:30 — The override causes &#x27;the total immediate loss of power to the facility, bypassing the backup generators and batteries&#x27; — the redundant supply path is stranded rather than picking up the load.</span></li><li><span class="fm-ev-src">Contributing factor #1</span><span class="fm-ev-txt">MAINTENANCE / MOP FAILURE (proximate): the UPS was manually &#x27;over-ridden&#x27; and then power was restored &#x27;in an unplanned and uncontrolled fashion&#x27; — the opposite of a controlled, sequenced, load-verified re-energisation. No authorised method-of-procedure or work permit for the Saturday work has ever been made public, so whether a valid MOP existed or was breached is unestablished (leaked IAG email via The Register, 2017-06-02).</span></li><li><span class="fm-ev-src"><a href="https://www.ch-aviation.com/news/73249-british-airways-sues-cbre-over-it-meltdown" target="_blank" rel="noopener nofollow">Reference #4 · press</a></span><span class="fm-ev-txt">“accidentally unplugged from the power supply by an engineer”</span></li><li><span class="fm-ev-src"><a href="https://Alex Cruz / The Register 2017-06-02" target="_blank" rel="noopener nofollow">Metric #5</a></span><span class="fm-ev-txt">Incident start: 09:30, Saturday 27 May 2017</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-03</span>
+    <span class="fm-mode">Power is turned back on in an unplanned and uncontrolled fashion, producing a surge that physically damages servers and infrastructure<span class="fm-item">Re-energisation of the data centre</span></span>
+    <span class="fm-sod" aria-label="Severity 9, occurrence 5, detection 9">9·5·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>405</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Restore power in a staged, sequenced, verified way</dd>
+      <dt>Effect</dt><dd>A few-minute power loss becomes hardware destruction; recovery needs rebuild and restore rather than a restart</dd>
+      <dt>Cause</dt><dd>Unsequenced reconnection with no staged load ramp or downstream verification. The reported mechanism, battery and generator briefly in series giving about 480 V against 240 V nominal, is an unconfirmed press hypothesis</dd>
+      <dt>Prevention in place</dt><dd>None recorded; no source-transfer interlock or rack-level over-voltage protection is reported</dd>
+      <dt>Detection in place</dt><dd>None before damage; found as physical damage</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>9</b></dt><dd>The surge is what turned a short power loss into a multi-day grounding of the airline, so it is scored at 9.</dd></div>
+      <div class="fm-sc"><dt>O <b>5</b></dt><dd>After an unplanned power loss, an uncontrolled restoration is a foreseeable slip, weakly guarded; held at 5 because the switching mechanism is not confirmed.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>No interlock or protection is recorded that would stop the surge; the damage was found after the fact.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 405</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Mandate a peer-reviewed, staged, load-verified re-energisation procedure with independent step verification <span class="fm-ev-src">Improvement #1</span></li><li>Fit and test source-transfer interlocks and sync-check relays, and add rack/PDU over-voltage protection <span class="fm-ev-src">Improvement #3</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Leaked IAG email via The Register" target="_blank" rel="noopener nofollow">Sequence of events #5</a></span><span class="fm-ev-txt">2017-05-27, ~a few minutes after 09:30 — Power is &#x27;turned back on in an unplanned and uncontrolled fashion&#x27; — an unsequenced re-energisation with no staged load ramp or downstream verification.</span></li><li><span class="fm-ev-src"><a href="https://The Register (expert hypothesis, unconfirmed)" target="_blank" rel="noopener nofollow">Sequence of events #6</a></span><span class="fm-ev-txt">2017-05-27, ~a few minutes after 09:30 — The uncontrolled re-energisation produces a damaging over-voltage surge (hypothesised battery+generator briefly in series, ~480 V vs ~240 V nominal) that physically damages servers and infrastructure.</span></li><li><span class="fm-ev-src">Contributing factor #4</span><span class="fm-ev-txt">UNCONTROLLED RE-ENERGISATION WITH NO STAGED RAMP: reconnecting power without sequencing sources or verifying downstream state produced a damaging over-voltage (hypothesised battery+generator briefly in series, ~480 V vs ~240 V nominal) that physically destroyed hardware, forcing rebuild/restore rather than clean failover (The Register, expert hypothesis — unconfirmed).</span></li><li><span class="fm-ev-src"><a href="https://www.bbc.com/news/business-40159202" target="_blank" rel="noopener nofollow">Reference #5 · news</a></span><span class="fm-ev-txt">“turned back on in an unplanned and uncontrolled fashion, which created physical damage to the systems”</span></li><li><span class="fm-ev-src"><a href="https://www.theregister.com/2017/06/02/british_airways_data_centre_configuration/" target="_blank" rel="noopener nofollow">Reference #7 · analysis</a></span><span class="fm-ev-txt">“fed 480v instead of 240v”</span></li><li><span class="fm-ev-src"><a href="https://The Register 2017-06-02 (expert hypothesis)" target="_blank" rel="noopener nofollow">Metric #7</a></span><span class="fm-ev-txt">Hypothesised surge voltage: ~480 V vs ~240 V nominal (conjecture, unconfirmed)</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-06</span>
+    <span class="fm-mode">Live critical-power switching is performed on a bank-holiday Saturday at the start of a peak travel weekend, with unclear ownership between BA and its facilities manager<span class="fm-item">Change control and BA/CBRE accountability for live power work</span></span>
+    <span class="fm-sod" aria-label="Severity 6, occurrence 6, detection 9">6·6·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>324</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Decide who may switch critical power, when, and under whose sign-off</dd>
+      <dt>Effect</dt><dd>Impact is maximised on passengers; responsibility for the switching remains disputed</dd>
+      <dt>Cause</dt><dd>Split accountability between BA and CBRE; no change-freeze over peak periods is recorded</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>None recorded</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>6</b></dt><dd>Amplifies the impact of the outage rather than causing it, so it is scored at 6 and not counted at the outage&#x27;s full weight.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>Unclear ownership of critical-power switching is a standing, weakly guarded condition.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>No control is recorded that would flag risky timing or ownership before the work began.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 324</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Clarify the BA/CBRE RACI for critical-power switching and its interlock controls <span class="fm-ev-src">Correction of errors #4</span></li><li>Require BA change-authority sign-off and change-freeze windows over peak travel periods <span class="fm-ev-src">Improvement #5</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #5</span><span class="fm-ev-txt">SPLIT OPERATIONAL ACCOUNTABILITY BA/CBRE: the facility was managed by CBRE Global Workplace Solutions under contract to BA; the contractor allegedly involved was named only by the Daily Mail (via The Register) while CBRE said &#x27;no determination has been made yet regarding the cause,&#x27; indicating unclear ownership of the switching operation and its controls.</span></li><li><span class="fm-ev-src">Contributing factor #7</span><span class="fm-ev-txt">TIMING / CHANGE-CONTROL EXPOSURE: live critical-power switching was performed on a bank-holiday Saturday at the start of a peak travel weekend, maximising passenger impact when a change-freeze on peak windows would have reduced exposure (Alex Cruz confirmed 09:30 Sat 27 May start, via The Register).</span></li><li><span class="fm-ev-src"><a href="https://Leaked IAG email + CBRE statement + Daily Mail, via The Register 2017-06-02" target="_blank" rel="noopener nofollow">Sequence of events #15</a></span><span class="fm-ev-txt">2017-06-02 — Leaked internal IAG email from Bill Francis (Head of Group IT) detailing the UPS override and uncontrolled reconnection is reported; CBRE confirms it manages the site, &#x27;fully support[s]&#x27; the investigation and says &#x27;no determination has been made yet regarding the cause&#x27;; the Daily Mail names a CBRE Global Workplace Solutions contractor.</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-07</span>
+    <span class="fm-mode">The independent investigation is never released and the BA/CBRE claim settles privately, so no adjudicated root cause exists<span class="fm-item">Post-incident investigation and disclosure</span></span>
+    <span class="fm-sod" aria-label="Severity 4, occurrence 8, detection 9">4·8·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>288</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Establish and publish an adjudicated root cause so the risk can be assessed and reduced</dd>
+      <dt>Effect</dt><dd>The surge mechanism, the failover mechanism and who performed the switching remain unproven</dd>
+      <dt>Cause</dt><dd>No operator post-mortem; investigation report withheld; settlement with no admission as to liability</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Visible only as the absence of a report</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>4</b></dt><dd>The missing report does not stop a service; it limits what others can learn and verify: &#x27;limited customer impact&#x27;.</dd></div>
+      <div class="fm-sc"><dt>O <b>8</b></dt><dd>The investigation report was never released, so the condition persists.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>Nothing surfaces the gap except its absence.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 288</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li class="fm-residual">No corrective action is recorded in the published sources. This mode is residual risk.</li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Public record / The Register (litigation status reportedly settled, unverified this pass)" target="_blank" rel="noopener nofollow">Sequence of events #16</a></span><span class="fm-ev-txt">After 2017 — No adjudicated root cause is ever published: the BA/IAG-commissioned independent investigation report is not publicly released and the BA/CBRE civil claim is reportedly settled privately (not verified this pass).</span></li><li><span class="fm-ev-src">Correction of errors #2</span><span class="fm-ev-txt">Independent investigation to establish adjudicated root cause (Commissioned; report never publicly released)</span></li><li><span class="fm-ev-src"><a href="https://www.datacenterdynamics.com/en/news/ba-and-cbre-settle-dispute-over-2017-data-center-outage/" target="_blank" rel="noopener nofollow">Reference #8 · news</a></span><span class="fm-ev-txt">“with no admission as to liability”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-04</span>
+    <span class="fm-mode">The peer site also collapses instead of taking over<span class="fm-item">Active:active failover to the second data centre</span></span>
+    <span class="fm-sod" aria-label="Severity 9, occurrence 3, detection 9">9·3·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>243</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Let the peer data centre carry the whole load when Boadicea House fails</dd>
+      <dt>Effect</dt><dd>BA&#x27;s global operations go down; flights are cancelled at Heathrow Terminal 5 and Gatwick</dd>
+      <dt>Cause</dt><dd>Reported, unconfirmed: corrupted data synchronised to the peer site as Boadicea House failed, leaving it &#x27;populated with enough bad data to crash all the systems depending on it&#x27;</dd>
+      <dt>Prevention in place</dt><dd>Two data centres running active:active, about 500 cabinets across six halls</dd>
+      <dt>Detection in place</dt><dd>Operational failure of the peer site</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>9</b></dt><dd>Losing both sites removes every fallback for the airline&#x27;s core systems: the rubric&#x27;s 9.</dd></div>
+      <div class="fm-sc"><dt>O <b>3</b></dt><dd>Needs a dirty shutdown at one site first, an unusual combination; held low also because the mechanism is a single-source theory.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>No control is recorded that would detect corrupt replicated state before it took down the peer.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 243</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Re-architect active:active replication to gate on data integrity <span class="fm-ev-src">Correction of errors #3</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://The Register (source-attributed theory, unconfirmed)" target="_blank" rel="noopener nofollow">Sequence of events #8</a></span><span class="fm-ev-txt">2017-05-27, morning — Active:active redundancy fails to contain the event; the peer data centre also collapses — reported (unconfirmed) mechanism is that corrupted synchronised data left the failover DC &#x27;populated with enough bad data to crash all the systems depending on it.&#x27;</span></li><li><span class="fm-ev-src"><a href="https://The Register / press-reported" target="_blank" rel="noopener nofollow">Sequence of events #9</a></span><span class="fm-ev-txt">2017-05-27, morning — BA&#x27;s global operations go down; flights cancelled and passengers stranded at Heathrow Terminal 5 and Gatwick on a bank-holiday Saturday. No occupant evacuation of Boadicea House occurred (operational, not life-safety, impact).</span></li><li><span class="fm-ev-src">Contributing factor #3</span><span class="fm-ev-txt">TIGHTLY-COUPLED ACTIVE:ACTIVE DESIGN: two data centres synchronised live state, so a fault at Boadicea House was not isolated — the reported (unconfirmed) mechanism is that corrupted synchronised data left the failover site &#x27;populated with enough bad data to crash all the systems depending on it,&#x27; turning redundancy into a shared failure path (The Register, source-attributed theory).</span></li><li><span class="fm-ev-src"><a href="https://The Register 2017-06-02" target="_blank" rel="noopener nofollow">Metric #3</a></span><span class="fm-ev-txt">Data centres: 2, running active:active</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-02</span>
+    <span class="fm-mode">The backup sources are stranded rather than picking up the load<span class="fm-item">Generator and battery backup path</span></span>
+    <span class="fm-sod" aria-label="Severity 9, occurrence 3, detection 6">9·3·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>162</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Carry the critical load when the UPS or mains is unavailable</dd>
+      <dt>Effect</dt><dd>Generators and battery strings rated for up to 2.4 MW of backup provide no ride-through; the facility goes dark</dd>
+      <dt>Cause</dt><dd>A power path that let one operator action bypass both backup sources at once (break-before-make)</dd>
+      <dt>Prevention in place</dt><dd>UPS with battery strings and standby generators, replaced about three years earlier</dd>
+      <dt>Detection in place</dt><dd>Total loss of the data hall, seen at onset</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>9</b></dt><dd>This is the barrier whose failure let the override become a total power loss, so it carries FM-01&#x27;s severity.</dd></div>
+      <div class="fm-sc"><dt>O <b>3</b></dt><dd>Needs FM-01&#x27;s override first; held low so the same event is not counted twice at full weight.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>The loss of power was obvious at once, but nothing transferred the load: &#x27;detected at onset, not prevented&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 162</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Enforce true make-before-break maintenance bypass <span class="fm-ev-src">Improvement #2</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #2</span><span class="fm-ev-txt">REDUNDANCY BYPASSED RATHER THAN TRANSFERRED: the override caused &#x27;the total immediate loss of power to the facility, bypassing the backup generators and batteries.&#x27; The N+ backup path (generators + battery strings) that should have carried the critical load was stranded instead of picking it up (leaked IAG email via The Register).</span></li><li><span class="fm-ev-src"><a href="https://The Register 2017-06-02 (leaked IAG email)" target="_blank" rel="noopener nofollow">Metric #1</a></span><span class="fm-ev-txt">UPS backup rating: Up to 2.4 MW (Socomec Smart Powerport)</span></li><li><span class="fm-ev-src"><a href="https://The Register 2017-06-02" target="_blank" rel="noopener nofollow">Metric #4</a></span><span class="fm-ev-txt">UPS age at incident: ~3 years (replaced c.2014)</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“defeated — rather than transferred onto — the generator+battery redundancy”</span></li></ul>
+  </div>
+</details>
+        </div>
+        <details class="fm-method"><summary>Scoring rubric and method</summary><div class="fm-method-body"><p>A retrospective FMEA: each row asks how this system could fail, how bad the effect was, how likely the cause was given the controls in place at the time, and how likely those controls were to catch it before customers did. Scales are adapted for data-centre operations from the 1–10 scales of IEC 60812:2018 and the AIAG-VDA FMEA handbook. RPN = S × O × D. Priority is High when S ≥ 9 with O ≥ 4 or D ≥ 7, or when RPN ≥ 300; Medium when RPN ≥ 120 or S ≥ 7; Low otherwise. Severity overrides the product because a large S multiplied by small O and D can hide a region-wide outage nothing would catch.</p><p>Every row cites evidence from this dossier, and every quote is checked verbatim against its source by <code>tools/test-incidents-fmea.py</code>. A revised score is only shown against a published corrective action. This is an RZ analyst assessment, not an operator document.</p><div class="fm-rubrics"><div><p class="fm-sub">Severity</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Hazard to people, or loss of the facility / several regions</td></tr><tr><td>9</td><td>Region-wide or provider-wide outage of a foundational service, no workaround</td></tr><tr><td>8</td><td>Full outage of a major service for hours</td></tr><tr><td>7</td><td>Major degradation of a major service</td></tr><tr><td>6</td><td>Partial outage confined to one zone or one service</td></tr><tr><td>5</td><td>Customer-visible degradation</td></tr><tr><td>4</td><td>Limited customer impact</td></tr><tr><td>3</td><td>Internal impact only</td></tr><tr><td>2</td><td>Negligible</td></tr><tr><td>1</td><td>No effect</td></tr></tbody></table></div><div><p class="fm-sub">Occurrence</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Near certain: the cause is present in normal operation</td></tr><tr><td>8</td><td>Frequent: routine work exercises the cause</td></tr><tr><td>6</td><td>Occasional: a foreseeable slip or condition, weakly guarded</td></tr><tr><td>4</td><td>Infrequent: needs an unusual combination</td></tr><tr><td>2</td><td>Remote: guarded by design</td></tr><tr><td>1</td><td>Eliminated by design</td></tr></tbody></table></div><div><p class="fm-sub">Detection</p><table class="fm-rubric"><tbody><tr><td>10</td><td>No control could detect it</td></tr><tr><td>9</td><td>Detected only through customer impact</td></tr><tr><td>8</td><td>Detected after impact by internal monitoring</td></tr><tr><td>6</td><td>Detected at onset, not prevented</td></tr><tr><td>4</td><td>Detected before impact with time to act</td></tr><tr><td>2</td><td>Automated interlock almost certainly stops it</td></tr><tr><td>1</td><td>Certain to be stopped</td></tr></tbody></table></div></div></div></details>
+
 
         <h2>Correction of errors (COE)</h2>
         <ul class="tight"><li>Publish and enforce an approved MOP/SOP/EOP for all UPS bypass and re-energisation operations on critical power <span class="coe-meta">BA Group IT + CBRE Global Workplace Solutions · Not publicly confirmed</span></li><li>Independent investigation to establish adjudicated root cause <span class="coe-meta">BA / IAG · Commissioned; report never publicly released</span></li><li>Re-architect active:active replication to gate on data integrity and prevent corrupt-state propagation to the failover site <span class="coe-meta">BA Group IT · Unknown / not disclosed</span></li><li>Clarify BA/CBRE RACI for critical-power switching and its interlock/protection controls <span class="coe-meta">BA + CBRE · Unknown / not disclosed</span></li><li>Civil claim BA/IAG vs CBRE over the outage <span class="coe-meta">BA/IAG legal · Reportedly settled privately (not verified this pass)</span></li></ul>
@@ -435,7 +733,7 @@ What remains unproven. Every deep claim above traces to a single primary chain �
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-1a1a084f"></script>
+    <script src="js/rz-version.js?v=20261010-00a1d9e8"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

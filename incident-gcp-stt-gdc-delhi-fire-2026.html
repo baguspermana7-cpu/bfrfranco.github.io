@@ -52,6 +52,12 @@
     .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
     .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
     .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:2px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    /* A chip carries the operator name, which can be a whole sentence ("Google Cloud
+       (impacted tenant); STT GDC / Tata Communications JV (named as the third-party …").
+       nowrap made that one chip 1120px wide and pushed the GCP Delhi dossier into a
+       1260px page at a 1100px viewport. Short chips are unaffected: normal wrapping
+       only engages when a chip would not fit its row. */
+    .chips .chip { max-width:100%; white-space:normal; overflow-wrap:anywhere; }
     .chip.cyan { color:var(--cyan); border-left:2px solid var(--cyan); }
     .chip.amber { color:var(--amber); border-left:2px solid var(--amber); }
     .chip.green { color:var(--green); border-left:2px solid var(--green); }
@@ -71,6 +77,11 @@
     /* rich incident table (reference-2 style) */
     table.itbl { min-width:1120px; }
     table.itbl td { vertical-align:middle; }
+    /* v1.134.20 — the title and summary columns ellipsise so the table's columns line up,
+       which is the right call for a dense index. But the cut text was reachable only by
+       navigating to the incident: a summary lost 238-298px of its sentence with no way to read
+       it in place. Each carries its full text in a title attribute now, so the truncation is
+       deliberate AND non-lossy — which is the condition the legibility audit checks for. */
     .itr { cursor:pointer; }
     .itr:hover td { background:var(--surface-2); }
     .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
@@ -240,7 +251,6 @@
        derive width = W px from the aspect ratio, so the drawing renders 1:1 at any event count
        and the panel scrolls instead of shrinking. */
     .viz-timeline svg { max-width:none; height:96px; width:auto; }
-
     .viz-radar svg { max-width:320px; margin:0 auto; }
     .vz-num { font-variant-numeric:tabular-nums slashed-zero; }
     .vz-box-t, .vz-box-s, .vz-lbl, .vz-hb-lbl, .vz-tl-t, .vz-pt, .vz-tick { pointer-events:auto; }
@@ -323,7 +333,86 @@
     }
     @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
 </style>
-    
+    <style>
+    /* ── FMEA (v3.12.3) — one hairline panel of rows, like the rest of the dossier.
+       No cards, no stripes: a row is a disclosure, state is a 7px dot. ── */
+    .fm-scope { color:var(--text-body); max-width:70ch; }
+    .fm-meta { flex-wrap:wrap; row-gap:0.25rem; }
+    .fm-viz { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:1.6rem; align-items:start; margin:1.2rem 0; }
+    @media (max-width:820px){ .fm-viz { grid-template-columns:1fr; } }
+    .fm-pb-row, .fm-pb-axis { display:grid; grid-template-columns:3.6rem minmax(0,1fr) 6.6rem; gap:0.6rem; align-items:center; }
+    .fm-pb-row { padding:0.32rem 0; }
+    .fm-pb-id, .fm-pb-val { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.8rem; }
+    .fm-pb-id { color:var(--muted); }
+    .fm-pb-val { color:var(--text-strong); white-space:nowrap; }
+    .fm-pb-track { display:flex; flex-direction:column; gap:3px; }
+    .fm-pb-bar { display:block; height:12px; }
+    .fm-pb-rev { display:block; height:4px; background:var(--text-body); opacity:0.55; }
+    .fm-pb-none { font-style:italic; font-size:0.72rem; color:var(--muted); line-height:1; }
+    .fm-pb-axis { margin-top:0.3rem; border-top:1px solid var(--line); padding-top:0.25rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .fm-pb-ticks { display:flex; justify-content:space-between; }
+    .fm-fig { margin:0; }
+    .fm-fig figcaption { font-size:0.8rem; color:var(--muted); margin-bottom:0.35rem; }
+    .fm-fig svg { width:100%; height:auto; display:block; }
+    .fm-fig-m svg { max-width:340px; }
+    .fm-matrix .fm-c-lo { fill:var(--surface); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-md { fill:color-mix(in srgb, var(--amber) 9%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-hi { fill:color-mix(in srgb, var(--red) 10%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .vz-axis { font-size:10px; fill:var(--muted); font-family:'IBM Plex Sans',sans-serif; }
+    .fm-matrix .fm-pt { stroke:var(--surface); stroke-width:1.5; }
+    .fm-matrix .fm-pt-l { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; fill:var(--text-strong);
+      paint-order:stroke; stroke:var(--surface); stroke-width:3px; stroke-linejoin:round; }
+    .fm-sheet { border:1px solid var(--line); border-radius:4px; margin-top:0.8rem; }
+    .fm-head, .fm-row > summary { display:grid; grid-template-columns:4.2rem minmax(0,1fr) 4.4rem 4.6rem 3.4rem; gap:0.6rem; align-items:baseline; padding:0.6rem 0.9rem; }
+    .fm-head { font-size:0.74rem; color:var(--muted); border-bottom:1px solid var(--line); }
+    .fm-row { border-top:1px solid var(--line); }
+    .fm-row:first-of-type { border-top:0; }
+    .fm-row > summary { cursor:pointer; list-style:none; }
+    .fm-row > summary::-webkit-details-marker { display:none; }
+    .fm-row > summary:hover { background:var(--surface-2); }
+    .fm-row > summary:focus-visible { outline:2px solid var(--cyan); outline-offset:-2px; }
+    .fm-id-cell, .fm-sod, .fm-rpn, .fm-rpn-rev { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.84rem; }
+    .fm-id-cell { color:var(--muted); }
+    .fm-mode { color:var(--text-strong); font-size:0.92rem; line-height:1.4; }
+    .fm-item { display:block; color:var(--muted); font-size:0.8rem; }
+    .fm-sod { color:var(--text-body); }
+    .fm-rpn { color:var(--text-strong); }
+    .fm-rpn-rev { color:var(--muted); }
+    .fm-dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:0.45rem; vertical-align:0.1em; }
+    .fm-body { padding:0.2rem 0.9rem 1rem 5.7rem; }
+    @media (max-width:640px){
+      .fm-head { display:none; }
+      .fm-row > summary { grid-template-columns:3.2rem minmax(0,1fr) auto; }
+      .fm-sod, .fm-rpn-rev { display:none; }
+      .fm-body { padding:0.2rem 0.9rem 1rem; }
+    }
+    .fm-kv { display:grid; grid-template-columns:9.5rem minmax(0,1fr); gap:0.3rem 0.9rem; margin:0.4rem 0 0.8rem; font-size:0.88rem; }
+    .fm-kv dt { color:var(--muted); }
+    .fm-kv dd { margin:0; color:var(--text-body); }
+    @media (max-width:640px){ .fm-kv { grid-template-columns:1fr; } .fm-kv dd { margin-bottom:0.4rem; } }
+    .fm-scores { margin:0 0 0.6rem; border-top:1px solid var(--line); }
+    .fm-sc { display:grid; grid-template-columns:3.2rem minmax(0,1fr); gap:0.6rem; padding:0.45rem 0; border-bottom:1px solid var(--line); font-size:0.86rem; }
+    .fm-sc dt { font-family:'JetBrains Mono',monospace; color:var(--muted); }
+    .fm-sc dt b { color:var(--text-strong); }
+    .fm-sc dd { margin:0; color:var(--text-body); }
+    .fm-sub { font-size:0.8rem; color:var(--muted); margin:0.7rem 0 0.25rem; }
+    .fm-sub b { color:var(--text-strong); }
+    .fm-acts, .fm-ev { margin:0; padding-left:1.1rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-acts li, .fm-ev li { margin:0.25rem 0; }
+    .fm-residual { color:var(--red); }
+    .fm-revline { font-size:0.86rem; color:var(--text-body); margin:0.4rem 0 0; }
+    .fm-ev-src { display:block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .fm-ev-src a { color:var(--cyan); }
+    .fm-ev-txt { display:block; }
+    .fm-method { margin-top:1rem; border:1px solid var(--line); border-radius:4px; }
+    .fm-method > summary { padding:0.6rem 0.9rem; cursor:pointer; font-size:0.9rem; color:var(--text-strong); }
+    .fm-method-body { padding:0 0.9rem 0.9rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-rubrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+    @media (max-width:760px){ .fm-rubrics { grid-template-columns:1fr; } }
+    .fm-rubric { width:100%; border-collapse:collapse; font-size:0.8rem; }
+    .fm-rubric td { padding:0.25rem 0.4rem; border-top:1px solid var(--line); vertical-align:top; }
+    .fm-rubric td:first-child { font-family:'JetBrains Mono',monospace; width:2rem; color:var(--text-strong); }
+</style>
 </head>
 <body class="locked">
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -399,6 +488,215 @@ MAINTENANCE LAPSE — STATUS: No specific maintenance, inspection, BMS-calibrati
 
         <h2>Contributing factors</h2>
         <ul class="tight"><li>Colocation tenant-owned lithium battery installation in a shared third-floor battery room: DCD reported the igniting batteries &#x27;belonged to a company leasing space at the site,&#x27; meaning the failed energy-storage system was under tenant control inside a hall shared with Google, Netflix and ISP equipment — a segregation/compartmentation gap (Data Center Dynamics, unverified at review).</li><li>Absent or undocumented in-facility fire detection: no public source names any VESDA/aspirating or spot smoke/heat detection or a sensed-alarm time; the only detection event is the human ~02:45 IST call to the Delhi Fire Service, implying either no effective early automated detection or undisclosed detection (People Matters; forensic record).</li><li>No evidenced fixed fire-suppression activation: the record contains no description of a clean-agent, inert-gas, or pre-action system discharging or failing in the battery room; documented suppression was entirely manual DFS firefighting — leaving open whether a system was absent, ineffective against lithium runaway, or undisclosed (forensic record; Outlook, unverified).</li><li>Single-POP edge topology with cross-metro blast radius [OFFICIALLY CONFIRMED]: the emergency shutdown isolated one &#x27;non-compute local POP&#x27; in Delhi, and rerouting degraded Google Cloud ingress across the Delhi, Chennai and Mumbai metro areas — a network-redundancy gap distinct from any compute-region failure (Google Cloud Service Health 5fGQt4VbkDnr3Yp8PXPr).</li><li>Regulatory vacuum on data-centre safety/redundancy: India&#x27;s DPDP Draft Rules reportedly mandate localisation but set no facility fire-safety standard, redundancy requirement, or minimum-uptime obligation, and data centres are regulated as general buildings — a latent condition amplifying a single-site fire (MediaNama, unverified at review).</li><li>Prolonged post-fire hazard lockout extended restoration [OFFICIALLY CONFIRMED gating]: Google could restore all lost capacity only after obtaining safety clearance, with resolution on 2026-06-26 — the restoration bottleneck was structural/fire safety, not network engineering (Google Cloud Service Health).</li><li>Unknown battery-room maintenance/BMS/charging regime: no source evidences the inspection, thermal-monitoring, BMS-calibration, or charging-control status of the failed batteries; this remains pending the STT-commissioned independent RCA (Outlook, unverified; forensic record).</li></ul>
+        <h2 id="fmea">Failure mode &amp; effects analysis (FMEA)</h2>
+        <p class="fm-scope">Two linked systems: the physical chain in a third-party New Delhi colocation facility (a tenant-owned lithium battery installation, in-facility fire detection, fixed and manual suppression, shared-hall compartmentation, protective de-energisation, and safety-cleared re-entry) and the Google Cloud edge that depended on it (a non-compute Delhi POP whose loss degraded ingress across Delhi, Chennai and Mumbai). Only the network layer is confirmed by Google&#x27;s own Service Health record: the POP isolation, the three metros, the affected products, safety-clearance gating and resolution. The ignition source, battery-room location, tenant ownership, rack counts and firefighter injuries rest on secondary reporting the dossier marks as unverified, the injury report is contradicted by a later DCD report, and the exact failure mechanism is undetermined pending an independent RCA that was not public at review. No facility-side corrective action has a disclosed status, and Google&#x27;s durable topology fix is not confirmed, so no revised score is claimed: every mode is shown as residual risk.</p>
+        <p class="metabar fm-meta"><span><b>7</b> failure modes</span><span class="sep">/</span><span><b>3</b> high priority</span><span class="sep">/</span><span><b>0 of 7</b> with a published action</span><span class="sep">/</span><span>total RPN <b>1920 → 1920</b> (−0%)</span></p>
+        <div class="fm-viz">
+            <figure class="fm-fig"><figcaption>Risk priority number (S × O × D), worst first — thin bar: after the published action</figcaption><div class="fm-pb" role="list" aria-label="Risk priority number per failure mode, before and after corrective action"><div class="fm-pb-row" role="listitem" title="FM-03 No fixed suppression discharge is evidenced; the fire is fought manually by the fire service for several hours"><span class="fm-pb-id">FM-03</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:96.0%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">384</span></div><div class="fm-pb-row" role="listitem" title="FM-01 Battery units fail, reportedly through a suspected short circuit consistent with lithium-ion thermal runaway, and start a fire"><span class="fm-pb-id">FM-01</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:90.0%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">360</span></div><div class="fm-pb-row" role="listitem" title="FM-02 No automated detection or sensed-alarm time is documented; the only detection event is a human emergency call"><span class="fm-pb-id">FM-02</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:84.0%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">336</span></div><div class="fm-pb-row" role="listitem" title="FM-04 A tenant&#x27;s lithium battery installation shares a floor with Google&#x27;s peering hardware and other tenants&#x27; equipment without enough segregation"><span class="fm-pb-id">FM-04</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:72.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">288</span></div><div class="fm-pb-row" role="listitem" title="FM-07 Ignition mechanism, battery specification, detection and suppression performance remain undisclosed; the RCA is not public and the event is framed as force majeure"><span class="fm-pb-id">FM-07</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:72.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">288</span></div><div class="fm-pb-row" role="listitem" title="FM-05 The emergency power shutdown of networking equipment isolates one POP, and its loss reduces capacity enough to degrade ingress across three metros"><span class="fm-pb-id">FM-05</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:36.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">144</span></div><div class="fm-pb-row" role="listitem" title="FM-06 Full restoration waits on fire and structural safety clearance before Google can re-access and re-energise its equipment"><span class="fm-pb-id">FM-06</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:30.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">120</span></div><div class="fm-pb-axis" aria-hidden="true"><span></span><span class="fm-pb-ticks"><span>0</span><span>200</span><span>400</span></span><span></span></div></div></figure>
+            <figure class="fm-fig fm-fig-m"><figcaption>Criticality: severity × occurrence</figcaption><svg class="fm-matrix" viewBox="0 0 360 330" role="img" aria-label="Criticality matrix, severity against occurrence"><rect class="fm-c-lo" x="44" y="266" width="28" height="28"/><rect class="fm-c-lo" x="72" y="266" width="28" height="28"/><rect class="fm-c-lo" x="100" y="266" width="28" height="28"/><rect class="fm-c-lo" x="128" y="266" width="28" height="28"/><rect class="fm-c-lo" x="156" y="266" width="28" height="28"/><rect class="fm-c-lo" x="184" y="266" width="28" height="28"/><rect class="fm-c-lo" x="212" y="266" width="28" height="28"/><rect class="fm-c-lo" x="240" y="266" width="28" height="28"/><rect class="fm-c-lo" x="268" y="266" width="28" height="28"/><rect class="fm-c-lo" x="296" y="266" width="28" height="28"/><rect class="fm-c-lo" x="44" y="238" width="28" height="28"/><rect class="fm-c-lo" x="72" y="238" width="28" height="28"/><rect class="fm-c-lo" x="100" y="238" width="28" height="28"/><rect class="fm-c-lo" x="128" y="238" width="28" height="28"/><rect class="fm-c-lo" x="156" y="238" width="28" height="28"/><rect class="fm-c-lo" x="184" y="238" width="28" height="28"/><rect class="fm-c-lo" x="212" y="238" width="28" height="28"/><rect class="fm-c-lo" x="240" y="238" width="28" height="28"/><rect class="fm-c-md" x="268" y="238" width="28" height="28"/><rect class="fm-c-md" x="296" y="238" width="28" height="28"/><rect class="fm-c-lo" x="44" y="210" width="28" height="28"/><rect class="fm-c-lo" x="72" y="210" width="28" height="28"/><rect class="fm-c-lo" x="100" y="210" width="28" height="28"/><rect class="fm-c-lo" x="128" y="210" width="28" height="28"/><rect class="fm-c-lo" x="156" y="210" width="28" height="28"/><rect class="fm-c-md" x="184" y="210" width="28" height="28"/><rect class="fm-c-md" x="212" y="210" width="28" height="28"/><rect class="fm-c-md" x="240" y="210" width="28" height="28"/><rect class="fm-c-md" x="268" y="210" width="28" height="28"/><rect class="fm-c-md" x="296" y="210" width="28" height="28"/><rect class="fm-c-lo" x="44" y="182" width="28" height="28"/><rect class="fm-c-lo" x="72" y="182" width="28" height="28"/><rect class="fm-c-lo" x="100" y="182" width="28" height="28"/><rect class="fm-c-lo" x="128" y="182" width="28" height="28"/><rect class="fm-c-md" x="156" y="182" width="28" height="28"/><rect class="fm-c-md" x="184" y="182" width="28" height="28"/><rect class="fm-c-md" x="212" y="182" width="28" height="28"/><rect class="fm-c-md" x="240" y="182" width="28" height="28"/><rect class="fm-c-md" x="268" y="182" width="28" height="28"/><rect class="fm-c-hi" x="296" y="182" width="28" height="28"/><rect class="fm-c-lo" x="44" y="154" width="28" height="28"/><rect class="fm-c-lo" x="72" y="154" width="28" height="28"/><rect class="fm-c-lo" x="100" y="154" width="28" height="28"/><rect class="fm-c-md" x="128" y="154" width="28" height="28"/><rect class="fm-c-md" x="156" y="154" width="28" height="28"/><rect class="fm-c-md" x="184" y="154" width="28" height="28"/><rect class="fm-c-md" x="212" y="154" width="28" height="28"/><rect class="fm-c-hi" x="240" y="154" width="28" height="28"/><rect class="fm-c-hi" x="268" y="154" width="28" height="28"/><rect class="fm-c-hi" x="296" y="154" width="28" height="28"/><rect class="fm-c-lo" x="44" y="126" width="28" height="28"/><rect class="fm-c-lo" x="72" y="126" width="28" height="28"/><rect class="fm-c-md" x="100" y="126" width="28" height="28"/><rect class="fm-c-md" x="128" y="126" width="28" height="28"/><rect class="fm-c-md" x="156" y="126" width="28" height="28"/><rect class="fm-c-md" x="184" y="126" width="28" height="28"/><rect class="fm-c-hi" x="212" y="126" width="28" height="28"/><rect class="fm-c-hi" x="240" y="126" width="28" height="28"/><rect class="fm-c-hi" x="268" y="126" width="28" height="28"/><rect class="fm-c-hi" x="296" y="126" width="28" height="28"/><rect class="fm-c-lo" x="44" y="98" width="28" height="28"/><rect class="fm-c-lo" x="72" y="98" width="28" height="28"/><rect class="fm-c-md" x="100" y="98" width="28" height="28"/><rect class="fm-c-md" x="128" y="98" width="28" height="28"/><rect class="fm-c-md" x="156" y="98" width="28" height="28"/><rect class="fm-c-hi" x="184" y="98" width="28" height="28"/><rect class="fm-c-hi" x="212" y="98" width="28" height="28"/><rect class="fm-c-hi" x="240" y="98" width="28" height="28"/><rect class="fm-c-hi" x="268" y="98" width="28" height="28"/><rect class="fm-c-hi" x="296" y="98" width="28" height="28"/><rect class="fm-c-lo" x="44" y="70" width="28" height="28"/><rect class="fm-c-lo" x="72" y="70" width="28" height="28"/><rect class="fm-c-md" x="100" y="70" width="28" height="28"/><rect class="fm-c-md" x="128" y="70" width="28" height="28"/><rect class="fm-c-hi" x="156" y="70" width="28" height="28"/><rect class="fm-c-hi" x="184" y="70" width="28" height="28"/><rect class="fm-c-hi" x="212" y="70" width="28" height="28"/><rect class="fm-c-hi" x="240" y="70" width="28" height="28"/><rect class="fm-c-hi" x="268" y="70" width="28" height="28"/><rect class="fm-c-hi" x="296" y="70" width="28" height="28"/><rect class="fm-c-hi" x="44" y="42" width="28" height="28"/><rect class="fm-c-hi" x="72" y="42" width="28" height="28"/><rect class="fm-c-hi" x="100" y="42" width="28" height="28"/><rect class="fm-c-hi" x="128" y="42" width="28" height="28"/><rect class="fm-c-hi" x="156" y="42" width="28" height="28"/><rect class="fm-c-hi" x="184" y="42" width="28" height="28"/><rect class="fm-c-hi" x="212" y="42" width="28" height="28"/><rect class="fm-c-hi" x="240" y="42" width="28" height="28"/><rect class="fm-c-hi" x="268" y="42" width="28" height="28"/><rect class="fm-c-hi" x="296" y="42" width="28" height="28"/><rect class="fm-c-hi" x="44" y="14" width="28" height="28"/><rect class="fm-c-hi" x="72" y="14" width="28" height="28"/><rect class="fm-c-hi" x="100" y="14" width="28" height="28"/><rect class="fm-c-hi" x="128" y="14" width="28" height="28"/><rect class="fm-c-hi" x="156" y="14" width="28" height="28"/><rect class="fm-c-hi" x="184" y="14" width="28" height="28"/><rect class="fm-c-hi" x="212" y="14" width="28" height="28"/><rect class="fm-c-hi" x="240" y="14" width="28" height="28"/><rect class="fm-c-hi" x="268" y="14" width="28" height="28"/><rect class="fm-c-hi" x="296" y="14" width="28" height="28"/><text class="vz-tick" x="58.0" y="308" text-anchor="middle">1</text><text class="vz-tick" x="36" y="284.0" text-anchor="end">1</text><text class="vz-tick" x="86.0" y="308" text-anchor="middle">2</text><text class="vz-tick" x="36" y="256.0" text-anchor="end">2</text><text class="vz-tick" x="114.0" y="308" text-anchor="middle">3</text><text class="vz-tick" x="36" y="228.0" text-anchor="end">3</text><text class="vz-tick" x="142.0" y="308" text-anchor="middle">4</text><text class="vz-tick" x="36" y="200.0" text-anchor="end">4</text><text class="vz-tick" x="170.0" y="308" text-anchor="middle">5</text><text class="vz-tick" x="36" y="172.0" text-anchor="end">5</text><text class="vz-tick" x="198.0" y="308" text-anchor="middle">6</text><text class="vz-tick" x="36" y="144.0" text-anchor="end">6</text><text class="vz-tick" x="226.0" y="308" text-anchor="middle">7</text><text class="vz-tick" x="36" y="116.0" text-anchor="end">7</text><text class="vz-tick" x="254.0" y="308" text-anchor="middle">8</text><text class="vz-tick" x="36" y="88.0" text-anchor="end">8</text><text class="vz-tick" x="282.0" y="308" text-anchor="middle">9</text><text class="vz-tick" x="36" y="60.0" text-anchor="end">9</text><text class="vz-tick" x="310.0" y="308" text-anchor="middle">10</text><text class="vz-tick" x="36" y="32.0" text-anchor="end">10</text><text class="vz-axis" x="184" y="328" text-anchor="middle">Occurrence →</text><text class="vz-axis" transform="translate(11 154) rotate(-90)" text-anchor="middle">Severity →</text><circle class="fm-pt" cx="142.0" cy="28.0" r="6" fill="var(--red)"><title>FM-01 Battery units fail, reportedly through a suspected short circuit consistent with lithium-ion thermal runaway, and start a fire (S10 O4 D9)</title></circle><text class="fm-pt-l" x="142.0" y="18.0" text-anchor="middle">01</text><circle class="fm-pt" cx="142.0" cy="84.0" r="6" fill="var(--amber)"><title>FM-04 A tenant&#x27;s lithium battery installation shares a floor with Google&#x27;s peering hardware and other tenants&#x27; equipment without enough segregation (S8 O4 D9)</title></circle><text class="fm-pt-l" x="142.0" y="74.0" text-anchor="middle">04</text><circle class="fm-pt" cx="198.0" cy="84.0" r="6" fill="var(--red)"><title>FM-03 No fixed suppression discharge is evidenced; the fire is fought manually by the fire service for several hours (S8 O6 D8)</title></circle><text class="fm-pt-l" x="198.0" y="74.0" text-anchor="middle">03</text><circle class="fm-pt" cx="198.0" cy="112.0" r="6" fill="var(--red)"><title>FM-02 No automated detection or sensed-alarm time is documented; the only detection event is a human emergency call (S7 O6 D8)</title></circle><text class="fm-pt-l" x="198.0" y="102.0" text-anchor="middle">02</text><circle class="fm-pt" cx="142.0" cy="140.0" r="6" fill="var(--amber)"><title>FM-05 The emergency power shutdown of networking equipment isolates one POP, and its loss reduces capacity enough to degrade ingress across three metros (S6 O4 D6)</title></circle><text class="fm-pt-l" x="142.0" y="130.0" text-anchor="middle">05</text><circle class="fm-pt" cx="142.0" cy="168.0" r="6" fill="var(--amber)"><title>FM-06 Full restoration waits on fire and structural safety clearance before Google can re-access and re-energise its equipment (S5 O4 D6)</title></circle><text class="fm-pt-l" x="142.0" y="158.0" text-anchor="middle">06</text><circle class="fm-pt" cx="254.0" cy="196.0" r="6" fill="var(--amber)"><title>FM-07 Ignition mechanism, battery specification, detection and suppression performance remain undisclosed; the RCA is not public and the event is framed as force majeure (S4 O8 D9)</title></circle><text class="fm-pt-l" x="254.0" y="186.0" text-anchor="middle">07</text></svg></figure>
+        </div>
+        <div class="fm-sheet">
+            <div class="fm-head" aria-hidden="true"><span>ID</span><span>Failure mode</span><span>S·O·D</span><span>RPN</span><span>After</span></div>
+            <details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-03</span>
+    <span class="fm-mode">No fixed suppression discharge is evidenced; the fire is fought manually by the fire service for several hours<span class="fm-item">Battery-room fixed suppression and manual firefighting</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 6, detection 8">8·6·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>384</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Contain a battery fire in its room before it damages the hall around it</dd>
+      <dt>Effect</dt><dd>Ten fire tenders work for several hours; the fire is confined to the third floor but that floor&#x27;s racks and electrical infrastructure are reported destroyed</dd>
+      <dt>Cause</dt><dd>Undetermined: a fixed system may have been absent, ineffective against lithium runaway, or undisclosed; the dossier&#x27;s view that a gaseous agent would plausibly fail is inference, not fact</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>None recorded for the suppression system&#x27;s state</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>Sets the extent of the fire, loss of a floor&#x27;s equipment, while the people hazard is carried by FM-01; scored 8 so the single fire is not counted at 10 twice.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>The dossier records no lithium-appropriate suppression and argues gas agents cannot arrest runaway, a foreseeable condition weakly guarded: &#x27;occasional&#x27;. Held at 6 because the gas-agent argument is the dossier&#x27;s inference.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>No record shows the suppression state was known before or during the fire; the gap is visible only in the outcome, after impact.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 384</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Review lithium-appropriate suppression adequacy (status: unknown, pending RCA) <span class="fm-ev-src">Correction of errors #4</span></li><li>Cell/module-level runaway isolation, fire-rated barriers and lithium-rated suppression (analyst recommendation) <span class="fm-ev-src">Improvement #1</span></li><li>Periodic suppression discharge/functional testing and battery-room drills (analyst recommendation) <span class="fm-ev-src">Improvement #4</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://forensic record" target="_blank" rel="noopener nofollow">Sequence of events #3</a></span><span class="fm-ev-txt">“no source describes the battery room&#x27;s fixed suppression”</span></li><li><span class="fm-ev-src">Contributing factor #3</span><span class="fm-ev-txt">No evidenced fixed fire-suppression activation: the record contains no description of a clean-agent, inert-gas, or pre-action system discharging or failing in the battery room; documented suppression was entirely manual DFS firefighting — leaving open whether a system was absent, ineffective against lithium runaway, or undisclosed (forensic record; Outlook, unverified).</span></li><li><span class="fm-ev-src"><a href="https://People Matters; Outlook Business (unverified at review)" target="_blank" rel="noopener nofollow">Sequence of events #5</a></span><span class="fm-ev-txt">2026-06-05 early hours — Ten fire tenders reportedly deployed to the site; manual firefighting operation begins and continues for several hours.</span></li><li><span class="fm-ev-src"><a href="https://People Matters; Outlook Business (unverified at review)" target="_blank" rel="noopener nofollow">Metric #5</a></span><span class="fm-ev-txt">Fire tenders deployed: 10</span></li><li><span class="fm-ev-src"><a href="https://Outlook Business (unverified at review)" target="_blank" rel="noopener nofollow">Sequence of events #12</a></span><span class="fm-ev-txt">2026-06-05 (after several hours) — Fire brought under control and reportedly confined to the third floor; spread to other floors prevented.</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-01</span>
+    <span class="fm-mode">Battery units fail, reportedly through a suspected short circuit consistent with lithium-ion thermal runaway, and start a fire<span class="fm-item">Tenant-owned lithium battery units, third-floor battery room</span></span>
+    <span class="fm-sod" aria-label="Severity 10, occurrence 4, detection 9">10·4·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>360</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Store energy for a tenant installation without becoming an ignition source inside a shared facility</dd>
+      <dt>Effect</dt><dd>Fire on the third floor reportedly destroys server racks, ceiling panels and electrical infrastructure, affects about 50 Google racks and damages other tenants&#x27; equipment; two firefighters are reported injured, a figure a later report contradicts</dd>
+      <dt>Cause</dt><dd>Undetermined. A short circuit is cited only as a preliminary cause under investigation; chemistry, BMS design, charging regime, age and maintenance status are all undisclosed</dd>
+      <dt>Prevention in place</dt><dd>None recorded; the battery maintenance, BMS and charging regime are undisclosed</dd>
+      <dt>Detection in place</dt><dd>None recorded for the batteries themselves; the first documented signal is the emergency call to the fire service at ~02:45 IST</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>10</b></dt><dd>Rubric 10, hazard to people: the fire reportedly injured two firefighters and destroyed equipment across a floor. Scored on reported, unverified accounts, and a later DCD report of &#x27;no injuries&#x27; leaves the people-hazard element disputed.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>A battery-origin fire needs a cell or string fault that the dossier cannot explain, since the mechanism and maintenance record are unknown: &#x27;infrequent&#x27;. Not scored higher because no maintenance lapse is evidenced.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>No BMS alarm, off-gas sensing or thermal monitoring is recorded; the fault became known only as a fire reported by a phone call. Held at 9 rather than 10 because the battery telemetry is undisclosed, not shown to be absent.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 360</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Contractual colo safety SLA covering tenant battery maintenance, BMS telemetry and inspection cadence (status: not evidenced) <span class="fm-ev-src">Correction of errors #5</span></li><li>Governed battery-health programme for all batteries in shared halls, including tenant-owned ones (analyst recommendation) <span class="fm-ev-src">Improvement #3</span></li><li>Complete and publish the independent root-cause analysis of the ignition source and battery chemistry/BMS (commissioned; findings not public) <span class="fm-ev-src">Correction of errors #1</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Data Center Dynamics; People Matters (unverified at review)" target="_blank" rel="noopener nofollow">Sequence of events #1</a></span><span class="fm-ev-txt">“preliminary cause cited as a suspected short circuit”</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“EXACT FAILURE MECHANISM — NOT CONCLUSIVELY ESTABLISHED”</span></li><li><span class="fm-ev-src">Contributing factor #7</span><span class="fm-ev-txt">Unknown battery-room maintenance/BMS/charging regime: no source evidences the inspection, thermal-monitoring, BMS-calibration, or charging-control status of the failed batteries; this remains pending the STT-commissioned independent RCA (Outlook, unverified; forensic record).</span></li><li><span class="fm-ev-src"><a href="https://Outlook Business; People Matters; The Hindu (unverified at review)" target="_blank" rel="noopener nofollow">Metric #8</a></span><span class="fm-ev-txt">Firefighter casualties: 2 injured, 0 fatalities (DCD later reported &#x27;no injuries&#x27; — discrepancy)</span></li><li><span class="fm-ev-src"><a href="https://People Matters; NDTV Profit (unverified at review)" target="_blank" rel="noopener nofollow">Sequence of events #9</a></span><span class="fm-ev-txt">2026-06-05 — Approximately 50 Google server racks reportedly affected; footage showed destroyed server racks, collapsed ceiling panels, scattered debris and demolished electrical infrastructure on the third floor.</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-02</span>
+    <span class="fm-mode">No automated detection or sensed-alarm time is documented; the only detection event is a human emergency call<span class="fm-item">In-facility fire detection for the battery room</span></span>
+    <span class="fm-sod" aria-label="Severity 7, occurrence 6, detection 8">7·6·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>336</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Detect a battery fault or early fire automatically, before open flame, and raise a timed alarm</dd>
+      <dt>Effect</dt><dd>No evidence of warning before the fire was established; the firefighting response starts from the ~02:45 IST call</dd>
+      <dt>Cause</dt><dd>Detection either absent, ineffective, or undisclosed; no public source names a VESDA, spot smoke or heat system</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Human emergency call to the Delhi Fire Service at ~02:45 IST</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>7</b></dt><dd>This mode sets how early the fire could be fought rather than whether it started, so it is scored below FM-01 to avoid counting the same fire twice; losing the early-warning window on a battery fire in a shared hall is still a major degradation of the facility&#x27;s protection.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>The dossier treats the silence on detection as a standing gap, a weakly guarded condition: &#x27;occasional&#x27;. Not higher because absence is not proven, only undocumented.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>The only recorded detection came after the fire was burning, from people rather than a system: &#x27;detected after impact&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 336</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Review battery-room fire detection (VESDA/off-gas) adequacy (status: unknown, pending RCA) <span class="fm-ev-src">Correction of errors #4</span></li><li>Mandatory early multi-modal detection with lithium off-gas sensing and logged alarm timestamps (analyst recommendation) <span class="fm-ev-src">Improvement #2</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://People Matters; forensic record" target="_blank" rel="noopener nofollow">Sequence of events #2</a></span><span class="fm-ev-txt">“the only documented detection event”</span></li><li><span class="fm-ev-src">Contributing factor #2</span><span class="fm-ev-txt">Absent or undocumented in-facility fire detection: no public source names any VESDA/aspirating or spot smoke/heat detection or a sensed-alarm time; the only detection event is the human ~02:45 IST call to the Delhi Fire Service, implying either no effective early automated detection or undisclosed detection (People Matters; forensic record).</span></li><li><span class="fm-ev-src"><a href="https://People Matters (unverified at review)" target="_blank" rel="noopener nofollow">Metric #4</a></span><span class="fm-ev-txt">Fire-service call time (only documented detection): ~02:45 IST, 2026-06-05</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“the only detection datapoint is the human emergency call to the Delhi Fire Service at ~02:45 IST”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-04</span>
+    <span class="fm-mode">A tenant&#x27;s lithium battery installation shares a floor with Google&#x27;s peering hardware and other tenants&#x27; equipment without enough segregation<span class="fm-item">Shared-hall compartmentation and tenant energy-storage governance</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 4, detection 9">8·4·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>288</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Keep a fault in one tenant&#x27;s equipment from reaching other tenants&#x27; equipment</dd>
+      <dt>Effect</dt><dd>One tenant&#x27;s battery fire damages Google racks, Netflix and NCR ISP routers, and places about 20 years of Matrix Cellular data at risk</dd>
+      <dt>Cause</dt><dd>Tenant-controlled energy storage placed inside a shared hall with insufficient compartmentation (reported, unverified at review)</dd>
+      <dt>Prevention in place</dt><dd>Damage was confined to the third floor; no compartmentation within that floor is recorded</dd>
+      <dt>Detection in place</dt><dd>None recorded; the coupling became visible only in the fire</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>Spreads one tenant&#x27;s fault to several unrelated parties&#x27; equipment on the floor, a major loss, but it is the same fire as FM-01 so it is not scored at 10 again.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>The co-location is a standing condition, but it only causes harm once a battery fails: &#x27;infrequent&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>No inspection or control is recorded that would reveal inadequate segregation before a fire tested it.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 288</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Review battery-room compartmentation and segregate tenant-owned energy storage from shared IT/peering halls (status: unknown, pending RCA) <span class="fm-ev-src">Correction of errors #3</span></li><li>Prohibit tenant-owned lithium storage in shared IT halls without dedicated fire-rated rooms (analyst recommendation) <span class="fm-ev-src">Improvement #6</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #1</span><span class="fm-ev-txt">Colocation tenant-owned lithium battery installation in a shared third-floor battery room: DCD reported the igniting batteries &#x27;belonged to a company leasing space at the site,&#x27; meaning the failed energy-storage system was under tenant control inside a hall shared with Google, Netflix and ISP equipment — a segregation/compartmentation gap (Data Center Dynamics, unverified at review).</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“with insufficient compartmentation”</span></li><li><span class="fm-ev-src"><a href="https://The Hindu; Outlook Business (unverified at review)" target="_blank" rel="noopener nofollow">Sequence of events #10</a></span><span class="fm-ev-txt">2026-06-05 — Equipment worth hundreds of crores of rupees reportedly destroyed; routers/servers of Netflix and multiple NCR ISPs damaged; ~20 years of Matrix Cellular data placed at risk.</span></li><li><span class="fm-ev-src"><a href="https://Data Center Dynamics; People Matters (unverified at review)" target="_blank" rel="noopener nofollow">Sequence of events #1</a></span><span class="fm-ev-txt">“Batteries reportedly belonged to a tenant leasing space at the site.”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-07</span>
+    <span class="fm-mode">Ignition mechanism, battery specification, detection and suppression performance remain undisclosed; the RCA is not public and the event is framed as force majeure<span class="fm-item">Root-cause investigation and public disclosure</span></span>
+    <span class="fm-sod" aria-label="Severity 4, occurrence 8, detection 9">4·8·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>288</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Establish and publish the ignition cause and the performance of detection and suppression so tenants can assess residual risk</dd>
+      <dt>Effect</dt><dd>Tenants and Google customers cannot verify whether the facility-side causes have been addressed; every facility action in this dossier carries an unknown status</dd>
+      <dt>Cause</dt><dd>RCA commissioned by STT Global with findings not public at review; Google never named the facility, operator or ignition source</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Visible only as the absence of a published report</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>4</b></dt><dd>The missing report does not itself stop a service; it limits what customers can do to protect themselves: &#x27;limited customer impact&#x27;.</dd></div>
+      <div class="fm-sc"><dt>O <b>8</b></dt><dd>Non-disclosure covers every part of the physical record the dossier lists, not one omitted detail, so the condition is routine: &#x27;frequent&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>Nothing surfaces the gap except its absence: detected only through the customer&#x27;s own inability to find the facts.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 288</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Complete and publish the independent RCA (commissioned; findings not public at review) <span class="fm-ev-src">Correction of errors #1</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Outlook Business (unverified at review)" target="_blank" rel="noopener nofollow">Sequence of events #17</a></span><span class="fm-ev-txt">from 2026-06-23 (+5–7 weeks) — STT Global reportedly commissions an independent root-cause analysis (findings due late-July to early-August 2026); Novamesh (Tata Communications) reportedly characterises the event as &#x27;force majeure.&#x27;</span></li><li><span class="fm-ev-src">Correction of errors #1</span><span class="fm-ev-txt">Complete and publish the independent root-cause analysis of the ignition source, battery chemistry/BMS, and detection/suppression performance (Reported commissioned ~2026-06-23; findings due late-Jul–early-Aug 2026; not public at review)</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“Any maintenance root cause is therefore UNKNOWN pending the RCA”</span></li><li><span class="fm-ev-src"><a href="https://Outlook Business (unverified at review)" target="_blank" rel="noopener nofollow">Metric #9</a></span><span class="fm-ev-txt">Independent RCA timeline: ~5–7 weeks from 2026-06-23 (late-Jul to early-Aug 2026)</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-05</span>
+    <span class="fm-mode">The emergency power shutdown of networking equipment isolates one POP, and its loss reduces capacity enough to degrade ingress across three metros<span class="fm-item">Google Cloud non-compute Delhi POP (edge peering and ingress)</span></span>
+    <span class="fm-sod" aria-label="Severity 6, occurrence 4, detection 6">6·4·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>144</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Carry Delhi-metro ingress into Google Cloud so that losing one facility does not degrade traffic across metros</dd>
+      <dt>Effect</dt><dd>Traffic from Delhi, Chennai and Mumbai sees elevated latency, intermittent packet loss and non-optimal routing for Hybrid Connectivity, VPC and Media CDN, with no workaround, for about three weeks</dd>
+      <dt>Cause</dt><dd>Edge topology in which one non-compute POP carried enough peering capacity that rerouted demand exceeded regional capacity (officially confirmed)</dd>
+      <dt>Prevention in place</dt><dd>Rerouting over other paths, which proved insufficient for the rerouted demand</dd>
+      <dt>Detection in place</dt><dd>Google identified the shutdown and capacity loss; customer impact was first publicly disclosed on 9 June</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>6</b></dt><dd>Rubric 6: a degradation confined to one metro edge and three network products, with no compute or data loss on Google&#x27;s side. Not 7 because Google describes the latency as &#x27;slightly elevated&#x27;, though there was no workaround for about three weeks.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>The POP fails this way only when its host facility loses power to the networking equipment, which needs an unusual event such as a fire: &#x27;infrequent&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>The capacity loss was known as it happened, but nothing contained the degradation to Delhi: &#x27;detected at onset, not prevented&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 144</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Restore and diversify Delhi peering and augment out-of-region Chennai capacity (capacity restored; durable topology fix not confirmed) <span class="fm-ev-src">Correction of errors #2</span></li><li>Distribute Delhi peering across physically diverse POPs and pre-provision out-of-region failover peering (analyst recommendation) <span class="fm-ev-src">Improvement #5</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Google Cloud Service Health 5fGQt4VbkDnr3Yp8PXPr" target="_blank" rel="noopener nofollow">Sequence of events #6</a></span><span class="fm-ev-txt">2026-06-05 during response — Fire required an emergency power shutdown of networking equipment in the third-party facility — the pivotal protective de-energisation, not a compute-region failure.</span></li><li><span class="fm-ev-src"><a href="https://Google Cloud Service Health 5fGQt4VbkDnr3Yp8PXPr" target="_blank" rel="noopener nofollow">Sequence of events #7</a></span><span class="fm-ev-txt">2026-06-05 during response — The shutdown isolated a non-compute local Point of Presence (POP) in Delhi and reduced available network capacity in the metro area.</span></li><li><span class="fm-ev-src"><a href="https://Google Cloud Service Health 5fGQt4VbkDnr3Yp8PXPr" target="_blank" rel="noopener nofollow">Sequence of events #8</a></span><span class="fm-ev-txt">2026-06-05 during response — Traffic into Google Cloud from the Delhi, Chennai and Mumbai metro areas experiences slightly elevated latency and non-optimal network routing as rerouted demand exceeds regional capacity.</span></li><li><span class="fm-ev-src">Contributing factor #4</span><span class="fm-ev-txt">Single-POP edge topology with cross-metro blast radius [OFFICIALLY CONFIRMED]: the emergency shutdown isolated one &#x27;non-compute local POP&#x27; in Delhi, and rerouting degraded Google Cloud ingress across the Delhi, Chennai and Mumbai metro areas — a network-redundancy gap distinct from any compute-region failure (Google Cloud Service Health 5fGQt4VbkDnr3Yp8PXPr).</span></li><li><span class="fm-ev-src"><a href="https://status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr" target="_blank" rel="noopener nofollow">Reference #3 · official-status</a></span><span class="fm-ev-txt">“isolating a non-compute local Point of Presence (POP) in Delhi”</span></li><li><span class="fm-ev-src"><a href="https://Google Cloud Service Health 5fGQt4VbkDnr3Yp8PXPr (verified)" target="_blank" rel="noopener nofollow">Metric #3</a></span><span class="fm-ev-txt">Google Cloud services impacted: Hybrid Connectivity, Media CDN, VPC</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-06</span>
+    <span class="fm-mode">Full restoration waits on fire and structural safety clearance before Google can re-access and re-energise its equipment<span class="fm-item">Post-fire re-entry and capacity restoration</span></span>
+    <span class="fm-sod" aria-label="Severity 5, occurrence 4, detection 6">5·4·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>120</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Return the lost edge capacity to service quickly after the fire is out</dd>
+      <dt>Effect</dt><dd>Degraded ingress persists until all lost capacity is restored on 26 June; site access is reported around 22 June</dd>
+      <dt>Cause</dt><dd>Physical hazard lockout of the damaged floor; out-of-region capacity augmentation was the only interim path</dd>
+      <dt>Prevention in place</dt><dd>Interim augmentation of Delhi backbone and Chennai peering capacity</dd>
+      <dt>Detection in place</dt><dd>Known at onset: the safety-clearance gate was stated in Google&#x27;s status updates</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>5</b></dt><dd>This mode sets the duration of FM-05&#x27;s degradation rather than causing it, so it is scored one step lower at customer-visible degradation.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>A multi-week lockout follows only from a fire serious enough to damage the structure: &#x27;infrequent&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>The gating was known and published while the incident ran, but no recorded plan shortened it: &#x27;detected at onset, not prevented&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 120</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Augment out-of-region (Chennai) capacity (restored during the incident; durable fix not confirmed) <span class="fm-ev-src">Correction of errors #2</span></li><li>Pre-provision out-of-region failover peering for Delhi, Chennai and Mumbai (analyst recommendation) <span class="fm-ev-src">Improvement #5</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Google Cloud Service Health (safety-clearance gating confirmed)" target="_blank" rel="noopener nofollow">Sequence of events #14</a></span><span class="fm-ev-txt">2026-06-05 onward — Prolonged hazard lockout: full capacity restoration is gated on obtaining fire/structural safety clearance before Google can re-energise/re-access equipment.</span></li><li><span class="fm-ev-src">Contributing factor #6</span><span class="fm-ev-txt">Prolonged post-fire hazard lockout extended restoration [OFFICIALLY CONFIRMED gating]: Google could restore all lost capacity only after obtaining safety clearance, with resolution on 2026-06-26 — the restoration bottleneck was structural/fire safety, not network engineering (Google Cloud Service Health).</span></li><li><span class="fm-ev-src"><a href="https://Google Cloud Service Health 5fGQt4VbkDnr3Yp8PXPr" target="_blank" rel="noopener nofollow">Sequence of events #18</a></span><span class="fm-ev-txt">2026-06-26 12:00 (US/Pacific) — Google restores all lost capacity after safety clearance; incident &#x27;recovered and returned to normal service as of Friday, 2026-06-26 PDT.&#x27;</span></li><li><span class="fm-ev-src"><a href="https://status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr" target="_blank" rel="noopener nofollow">Reference #1 · vendor-status</a></span><span class="fm-ev-txt">“teams obtained access to the damaged site”</span></li><li><span class="fm-ev-src"><a href="https://status.cloud.google.com/incidents/5fGQt4VbkDnr3Yp8PXPr" target="_blank" rel="noopener nofollow">Reference #2 · vendor-status</a></span><span class="fm-ev-txt">“augmenting out-of-region Internet Edge regional peering capacity in Chennai”</span></li></ul>
+  </div>
+</details>
+        </div>
+        <details class="fm-method"><summary>Scoring rubric and method</summary><div class="fm-method-body"><p>A retrospective FMEA: each row asks how this system could fail, how bad the effect was, how likely the cause was given the controls in place at the time, and how likely those controls were to catch it before customers did. Scales are adapted for data-centre operations from the 1–10 scales of IEC 60812:2018 and the AIAG-VDA FMEA handbook. RPN = S × O × D. Priority is High when S ≥ 9 with O ≥ 4 or D ≥ 7, or when RPN ≥ 300; Medium when RPN ≥ 120 or S ≥ 7; Low otherwise. Severity overrides the product because a large S multiplied by small O and D can hide a region-wide outage nothing would catch.</p><p>Every row cites evidence from this dossier, and every quote is checked verbatim against its source by <code>tools/test-incidents-fmea.py</code>. A revised score is only shown against a published corrective action. This is an RZ analyst assessment, not an operator document.</p><div class="fm-rubrics"><div><p class="fm-sub">Severity</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Hazard to people, or loss of the facility / several regions</td></tr><tr><td>9</td><td>Region-wide or provider-wide outage of a foundational service, no workaround</td></tr><tr><td>8</td><td>Full outage of a major service for hours</td></tr><tr><td>7</td><td>Major degradation of a major service</td></tr><tr><td>6</td><td>Partial outage confined to one zone or one service</td></tr><tr><td>5</td><td>Customer-visible degradation</td></tr><tr><td>4</td><td>Limited customer impact</td></tr><tr><td>3</td><td>Internal impact only</td></tr><tr><td>2</td><td>Negligible</td></tr><tr><td>1</td><td>No effect</td></tr></tbody></table></div><div><p class="fm-sub">Occurrence</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Near certain: the cause is present in normal operation</td></tr><tr><td>8</td><td>Frequent: routine work exercises the cause</td></tr><tr><td>6</td><td>Occasional: a foreseeable slip or condition, weakly guarded</td></tr><tr><td>4</td><td>Infrequent: needs an unusual combination</td></tr><tr><td>2</td><td>Remote: guarded by design</td></tr><tr><td>1</td><td>Eliminated by design</td></tr></tbody></table></div><div><p class="fm-sub">Detection</p><table class="fm-rubric"><tbody><tr><td>10</td><td>No control could detect it</td></tr><tr><td>9</td><td>Detected only through customer impact</td></tr><tr><td>8</td><td>Detected after impact by internal monitoring</td></tr><tr><td>6</td><td>Detected at onset, not prevented</td></tr><tr><td>4</td><td>Detected before impact with time to act</td></tr><tr><td>2</td><td>Automated interlock almost certainly stops it</td></tr><tr><td>1</td><td>Certain to be stopped</td></tr></tbody></table></div></div></div></details>
+
 
         <h2>Correction of errors (COE)</h2>
         <ul class="tight"><li>Complete and publish the independent root-cause analysis of the ignition source, battery chemistry/BMS, and detection/suppression performance <span class="coe-meta">STT Global / STT GDC India · Reported commissioned ~2026-06-23; findings due late-Jul–early-Aug 2026; not public at review</span></li><li>Restore and diversify Delhi Internet Edge peering / augment out-of-region (Chennai) capacity to remove single-POP cross-metro blast radius <span class="coe-meta">Google Cloud · Officially confirmed restored/augmented; incident resolved 2026-06-26 (durable topology fix not confirmed)</span></li><li>Review battery-room compartmentation and segregate tenant-owned energy storage from shared IT/peering halls <span class="coe-meta">STT GDC (facility operator) · Unknown — pending RCA</span></li><li>Review battery-room fire detection (VESDA/off-gas) and lithium-appropriate suppression adequacy <span class="coe-meta">STT GDC (facility operator) · Unknown — pending RCA</span></li><li>Establish colo safety SLA governing tenant-owned battery maintenance, BMS telemetry and inspection cadence <span class="coe-meta">STT GDC / colocation tenants · Not evidenced</span></li><li>Advocate/adopt data-centre-specific fire-safety, redundancy and minimum-uptime standards under DPDP framework <span class="coe-meta">MeitY / regulator · Not started — regulatory gap per reporting</span></li></ul>
@@ -439,7 +737,7 @@ LAYER 3 — THE METRO-SCALE PROPAGATION [OFFICIALLY CONFIRMED]. Removing that PO
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-1a1a084f"></script>
+    <script src="js/rz-version.js?v=20261010-00a1d9e8"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

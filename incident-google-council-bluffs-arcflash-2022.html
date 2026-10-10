@@ -52,6 +52,12 @@
     .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
     .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
     .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:2px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    /* A chip carries the operator name, which can be a whole sentence ("Google Cloud
+       (impacted tenant); STT GDC / Tata Communications JV (named as the third-party …").
+       nowrap made that one chip 1120px wide and pushed the GCP Delhi dossier into a
+       1260px page at a 1100px viewport. Short chips are unaffected: normal wrapping
+       only engages when a chip would not fit its row. */
+    .chips .chip { max-width:100%; white-space:normal; overflow-wrap:anywhere; }
     .chip.cyan { color:var(--cyan); border-left:2px solid var(--cyan); }
     .chip.amber { color:var(--amber); border-left:2px solid var(--amber); }
     .chip.green { color:var(--green); border-left:2px solid var(--green); }
@@ -71,6 +77,11 @@
     /* rich incident table (reference-2 style) */
     table.itbl { min-width:1120px; }
     table.itbl td { vertical-align:middle; }
+    /* v1.134.20 — the title and summary columns ellipsise so the table's columns line up,
+       which is the right call for a dense index. But the cut text was reachable only by
+       navigating to the incident: a summary lost 238-298px of its sentence with no way to read
+       it in place. Each carries its full text in a title attribute now, so the truncation is
+       deliberate AND non-lossy — which is the condition the legibility audit checks for. */
     .itr { cursor:pointer; }
     .itr:hover td { background:var(--surface-2); }
     .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
@@ -240,7 +251,6 @@
        derive width = W px from the aspect ratio, so the drawing renders 1:1 at any event count
        and the panel scrolls instead of shrinking. */
     .viz-timeline svg { max-width:none; height:96px; width:auto; }
-
     .viz-radar svg { max-width:320px; margin:0 auto; }
     .vz-num { font-variant-numeric:tabular-nums slashed-zero; }
     .vz-box-t, .vz-box-s, .vz-lbl, .vz-hb-lbl, .vz-tl-t, .vz-pt, .vz-tick { pointer-events:auto; }
@@ -323,7 +333,86 @@
     }
     @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
 </style>
-    
+    <style>
+    /* ── FMEA (v3.12.3) — one hairline panel of rows, like the rest of the dossier.
+       No cards, no stripes: a row is a disclosure, state is a 7px dot. ── */
+    .fm-scope { color:var(--text-body); max-width:70ch; }
+    .fm-meta { flex-wrap:wrap; row-gap:0.25rem; }
+    .fm-viz { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:1.6rem; align-items:start; margin:1.2rem 0; }
+    @media (max-width:820px){ .fm-viz { grid-template-columns:1fr; } }
+    .fm-pb-row, .fm-pb-axis { display:grid; grid-template-columns:3.6rem minmax(0,1fr) 6.6rem; gap:0.6rem; align-items:center; }
+    .fm-pb-row { padding:0.32rem 0; }
+    .fm-pb-id, .fm-pb-val { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.8rem; }
+    .fm-pb-id { color:var(--muted); }
+    .fm-pb-val { color:var(--text-strong); white-space:nowrap; }
+    .fm-pb-track { display:flex; flex-direction:column; gap:3px; }
+    .fm-pb-bar { display:block; height:12px; }
+    .fm-pb-rev { display:block; height:4px; background:var(--text-body); opacity:0.55; }
+    .fm-pb-none { font-style:italic; font-size:0.72rem; color:var(--muted); line-height:1; }
+    .fm-pb-axis { margin-top:0.3rem; border-top:1px solid var(--line); padding-top:0.25rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .fm-pb-ticks { display:flex; justify-content:space-between; }
+    .fm-fig { margin:0; }
+    .fm-fig figcaption { font-size:0.8rem; color:var(--muted); margin-bottom:0.35rem; }
+    .fm-fig svg { width:100%; height:auto; display:block; }
+    .fm-fig-m svg { max-width:340px; }
+    .fm-matrix .fm-c-lo { fill:var(--surface); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-md { fill:color-mix(in srgb, var(--amber) 9%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-hi { fill:color-mix(in srgb, var(--red) 10%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .vz-axis { font-size:10px; fill:var(--muted); font-family:'IBM Plex Sans',sans-serif; }
+    .fm-matrix .fm-pt { stroke:var(--surface); stroke-width:1.5; }
+    .fm-matrix .fm-pt-l { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; fill:var(--text-strong);
+      paint-order:stroke; stroke:var(--surface); stroke-width:3px; stroke-linejoin:round; }
+    .fm-sheet { border:1px solid var(--line); border-radius:4px; margin-top:0.8rem; }
+    .fm-head, .fm-row > summary { display:grid; grid-template-columns:4.2rem minmax(0,1fr) 4.4rem 4.6rem 3.4rem; gap:0.6rem; align-items:baseline; padding:0.6rem 0.9rem; }
+    .fm-head { font-size:0.74rem; color:var(--muted); border-bottom:1px solid var(--line); }
+    .fm-row { border-top:1px solid var(--line); }
+    .fm-row:first-of-type { border-top:0; }
+    .fm-row > summary { cursor:pointer; list-style:none; }
+    .fm-row > summary::-webkit-details-marker { display:none; }
+    .fm-row > summary:hover { background:var(--surface-2); }
+    .fm-row > summary:focus-visible { outline:2px solid var(--cyan); outline-offset:-2px; }
+    .fm-id-cell, .fm-sod, .fm-rpn, .fm-rpn-rev { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.84rem; }
+    .fm-id-cell { color:var(--muted); }
+    .fm-mode { color:var(--text-strong); font-size:0.92rem; line-height:1.4; }
+    .fm-item { display:block; color:var(--muted); font-size:0.8rem; }
+    .fm-sod { color:var(--text-body); }
+    .fm-rpn { color:var(--text-strong); }
+    .fm-rpn-rev { color:var(--muted); }
+    .fm-dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:0.45rem; vertical-align:0.1em; }
+    .fm-body { padding:0.2rem 0.9rem 1rem 5.7rem; }
+    @media (max-width:640px){
+      .fm-head { display:none; }
+      .fm-row > summary { grid-template-columns:3.2rem minmax(0,1fr) auto; }
+      .fm-sod, .fm-rpn-rev { display:none; }
+      .fm-body { padding:0.2rem 0.9rem 1rem; }
+    }
+    .fm-kv { display:grid; grid-template-columns:9.5rem minmax(0,1fr); gap:0.3rem 0.9rem; margin:0.4rem 0 0.8rem; font-size:0.88rem; }
+    .fm-kv dt { color:var(--muted); }
+    .fm-kv dd { margin:0; color:var(--text-body); }
+    @media (max-width:640px){ .fm-kv { grid-template-columns:1fr; } .fm-kv dd { margin-bottom:0.4rem; } }
+    .fm-scores { margin:0 0 0.6rem; border-top:1px solid var(--line); }
+    .fm-sc { display:grid; grid-template-columns:3.2rem minmax(0,1fr); gap:0.6rem; padding:0.45rem 0; border-bottom:1px solid var(--line); font-size:0.86rem; }
+    .fm-sc dt { font-family:'JetBrains Mono',monospace; color:var(--muted); }
+    .fm-sc dt b { color:var(--text-strong); }
+    .fm-sc dd { margin:0; color:var(--text-body); }
+    .fm-sub { font-size:0.8rem; color:var(--muted); margin:0.7rem 0 0.25rem; }
+    .fm-sub b { color:var(--text-strong); }
+    .fm-acts, .fm-ev { margin:0; padding-left:1.1rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-acts li, .fm-ev li { margin:0.25rem 0; }
+    .fm-residual { color:var(--red); }
+    .fm-revline { font-size:0.86rem; color:var(--text-body); margin:0.4rem 0 0; }
+    .fm-ev-src { display:block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .fm-ev-src a { color:var(--cyan); }
+    .fm-ev-txt { display:block; }
+    .fm-method { margin-top:1rem; border:1px solid var(--line); border-radius:4px; }
+    .fm-method > summary { padding:0.6rem 0.9rem; cursor:pointer; font-size:0.9rem; color:var(--text-strong); }
+    .fm-method-body { padding:0 0.9rem 0.9rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-rubrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+    @media (max-width:760px){ .fm-rubrics { grid-template-columns:1fr; } }
+    .fm-rubric { width:100%; border-collapse:collapse; font-size:0.8rem; }
+    .fm-rubric td { padding:0.25rem 0.4rem; border-top:1px solid var(--line); vertical-align:top; }
+    .fm-rubric td:first-child { font-family:'JetBrains Mono',monospace; width:2rem; color:var(--text-strong); }
+</style>
 </head>
 <body class="locked">
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -393,6 +482,187 @@ DESIGN / REDUNDANCY / MAINTENANCE DISCLOSURE GAP: No arc-flash hazard study (NFP
 
         <h2>Contributing factors</h2>
         <ul class="tight"><li>Energized-work exposure: three electricians were physically accessing/working an electrical cabinet on the substation when the arc initiated (Data Center Frontier; WOWT: &#x27;accessing an electrical box when an arc occurred&#x27;). Whether the gear could have been de-energized for the task is not disclosed, but the fact that all three were within the arc-flash boundary at fault initiation is the proximate exposure.</li><li>Job-briefing / existing-conditions determination deficiency by the contractor: OSHA&#x27;s sole citation was 29 CFR 1926.950(b)(1)(i), the Subpart V general-requirements clause covering job briefings and energized-work condition determination — the regulator&#x27;s identified work-practice thread (verified: OSHA Inspection 1615410.015, standard &#x27;19260950 B01 I&#x27;). No specific procedural step is named in the public record.</li><li>Penalty increased in settlement: the proposed penalty rose from $13,052 to a current $20,000 via Informal Settlement, with the violation finally classified &#x27;Other&#x27; (verified: OSHA 1615410.015). The record I reviewed does not characterize the citation as willful; the increase is noted as a fact without inferring intent.</li><li>Undisclosed arc-flash-study / PPE adequacy: no NFPA 70E / IEEE 1584 incident-energy study, arc-flash label, or PPE-category finding appears in any retrievable source; whether the workers&#x27; PPE matched the incident energy at that cabinet is unknown — a documentation/analysis gap that is itself a latent contributor.</li><li>Host/contractor coordination boundary: Google was inspected separately (verified: 1615423.015, partial, no citations, closed 02/03/2023) and OSHA placed compliance on the contractor; the host/contractor information-transfer element embedded in 1926.950 is a known weak point in multi-employer worksites, though no specific coordination failure is published.</li><li>Undisclosed maintenance/testing state of the substation gear: no maintenance-interval, insulation-test, or equipment-condition record is public, so an asset-condition contribution can be neither confirmed nor excluded (disclosed uncertainty).</li></ul>
+        <h2 id="fmea">Failure mode &amp; effects analysis (FMEA)</h2>
+        <p class="fm-scope">The electrical work on a substation cabinet adjacent to Google&#x27;s Council Bluffs data-center buildings and the safety chain around it: the energized cabinet where the arc initiated, isolation before work, the contractor&#x27;s job briefing and existing-conditions determination, arc-flash hazard analysis and PPE, emergency detection and response, and the root-cause record. Google published no post-mortem; the causal record is OSHA&#x27;s inspection data (one citation to the contractor under 29 CFR 1926.950(b)(1)(i), none to Google) plus press reporting. The initiating fault, equipment identity, voltage class, incident energy, PPE adequacy and de-energisation status are all undisclosed, and the OSHA accident abstract could not be retrieved. The same-day Search and Maps disruption is not scored: Google attributed it to an internal software-update error, not to this incident. Every corrective action except the OSHA-directed abatement is an analyst recommendation with no public confirmation of adoption, so only that one carries a revised score.</p>
+        <p class="metabar fm-meta"><span><b>6</b> failure modes</span><span class="sep">/</span><span><b>4</b> high priority</span><span class="sep">/</span><span><b>1 of 6</b> with a published action</span><span class="sep">/</span><span>total RPN <b>1920 → 1792</b> (−7%)</span></p>
+        <div class="fm-viz">
+            <figure class="fm-fig"><figcaption>Risk priority number (S × O × D), worst first — thin bar: after the published action</figcaption><div class="fm-pb" role="list" aria-label="Risk priority number per failure mode, before and after corrective action"><div class="fm-pb-row" role="listitem" title="FM-02 Work proceeds with workers inside the arc-flash boundary of an energized cabinet; isolation and lockout status are not disclosed"><span class="fm-pb-id">FM-02</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:86.4%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">432</span></div><div class="fm-pb-row" role="listitem" title="FM-04 No arc-flash incident-energy study, cabinet label or PPE-adequacy finding exists in the public record"><span class="fm-pb-id">FM-04</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:86.4%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">432</span></div><div class="fm-pb-row" role="listitem" title="FM-03 The job briefing / existing-conditions determination required by 29 CFR 1926.950(b)(1)(i) is found deficient"><span class="fm-pb-id">FM-03</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:76.8%;background:var(--red)"></i><i class="fm-pb-rev" style="width:51.2%"></i></span><span class="fm-pb-val">384 → 256</span></div><div class="fm-pb-row" role="listitem" title="FM-01 An arc flash initiates at or inside the cabinet as three electricians access it"><span class="fm-pb-id">FM-01</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:72.0%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">360</span></div><div class="fm-pb-row" role="listitem" title="FM-06 No equipment identity, incident energy, PPE finding or de-energisation status is published, and the OSHA accident abstract cannot be retrieved"><span class="fm-pb-id">FM-06</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:43.2%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">216</span></div><div class="fm-pb-row" role="listitem" title="FM-05 No electrical, thermal or smoke detection activates; notification depends on a human report of a large explosion"><span class="fm-pb-id">FM-05</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:19.2%;background:var(--green)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">96</span></div><div class="fm-pb-axis" aria-hidden="true"><span></span><span class="fm-pb-ticks"><span>0</span><span>250</span><span>500</span></span><span></span></div></div></figure>
+            <figure class="fm-fig fm-fig-m"><figcaption>Criticality: severity × occurrence</figcaption><svg class="fm-matrix" viewBox="0 0 360 330" role="img" aria-label="Criticality matrix, severity against occurrence"><rect class="fm-c-lo" x="44" y="266" width="28" height="28"/><rect class="fm-c-lo" x="72" y="266" width="28" height="28"/><rect class="fm-c-lo" x="100" y="266" width="28" height="28"/><rect class="fm-c-lo" x="128" y="266" width="28" height="28"/><rect class="fm-c-lo" x="156" y="266" width="28" height="28"/><rect class="fm-c-lo" x="184" y="266" width="28" height="28"/><rect class="fm-c-lo" x="212" y="266" width="28" height="28"/><rect class="fm-c-lo" x="240" y="266" width="28" height="28"/><rect class="fm-c-lo" x="268" y="266" width="28" height="28"/><rect class="fm-c-lo" x="296" y="266" width="28" height="28"/><rect class="fm-c-lo" x="44" y="238" width="28" height="28"/><rect class="fm-c-lo" x="72" y="238" width="28" height="28"/><rect class="fm-c-lo" x="100" y="238" width="28" height="28"/><rect class="fm-c-lo" x="128" y="238" width="28" height="28"/><rect class="fm-c-lo" x="156" y="238" width="28" height="28"/><rect class="fm-c-lo" x="184" y="238" width="28" height="28"/><rect class="fm-c-lo" x="212" y="238" width="28" height="28"/><rect class="fm-c-lo" x="240" y="238" width="28" height="28"/><rect class="fm-c-md" x="268" y="238" width="28" height="28"/><rect class="fm-c-md" x="296" y="238" width="28" height="28"/><rect class="fm-c-lo" x="44" y="210" width="28" height="28"/><rect class="fm-c-lo" x="72" y="210" width="28" height="28"/><rect class="fm-c-lo" x="100" y="210" width="28" height="28"/><rect class="fm-c-lo" x="128" y="210" width="28" height="28"/><rect class="fm-c-lo" x="156" y="210" width="28" height="28"/><rect class="fm-c-md" x="184" y="210" width="28" height="28"/><rect class="fm-c-md" x="212" y="210" width="28" height="28"/><rect class="fm-c-md" x="240" y="210" width="28" height="28"/><rect class="fm-c-md" x="268" y="210" width="28" height="28"/><rect class="fm-c-md" x="296" y="210" width="28" height="28"/><rect class="fm-c-lo" x="44" y="182" width="28" height="28"/><rect class="fm-c-lo" x="72" y="182" width="28" height="28"/><rect class="fm-c-lo" x="100" y="182" width="28" height="28"/><rect class="fm-c-lo" x="128" y="182" width="28" height="28"/><rect class="fm-c-md" x="156" y="182" width="28" height="28"/><rect class="fm-c-md" x="184" y="182" width="28" height="28"/><rect class="fm-c-md" x="212" y="182" width="28" height="28"/><rect class="fm-c-md" x="240" y="182" width="28" height="28"/><rect class="fm-c-md" x="268" y="182" width="28" height="28"/><rect class="fm-c-hi" x="296" y="182" width="28" height="28"/><rect class="fm-c-lo" x="44" y="154" width="28" height="28"/><rect class="fm-c-lo" x="72" y="154" width="28" height="28"/><rect class="fm-c-lo" x="100" y="154" width="28" height="28"/><rect class="fm-c-md" x="128" y="154" width="28" height="28"/><rect class="fm-c-md" x="156" y="154" width="28" height="28"/><rect class="fm-c-md" x="184" y="154" width="28" height="28"/><rect class="fm-c-md" x="212" y="154" width="28" height="28"/><rect class="fm-c-hi" x="240" y="154" width="28" height="28"/><rect class="fm-c-hi" x="268" y="154" width="28" height="28"/><rect class="fm-c-hi" x="296" y="154" width="28" height="28"/><rect class="fm-c-lo" x="44" y="126" width="28" height="28"/><rect class="fm-c-lo" x="72" y="126" width="28" height="28"/><rect class="fm-c-md" x="100" y="126" width="28" height="28"/><rect class="fm-c-md" x="128" y="126" width="28" height="28"/><rect class="fm-c-md" x="156" y="126" width="28" height="28"/><rect class="fm-c-md" x="184" y="126" width="28" height="28"/><rect class="fm-c-hi" x="212" y="126" width="28" height="28"/><rect class="fm-c-hi" x="240" y="126" width="28" height="28"/><rect class="fm-c-hi" x="268" y="126" width="28" height="28"/><rect class="fm-c-hi" x="296" y="126" width="28" height="28"/><rect class="fm-c-lo" x="44" y="98" width="28" height="28"/><rect class="fm-c-lo" x="72" y="98" width="28" height="28"/><rect class="fm-c-md" x="100" y="98" width="28" height="28"/><rect class="fm-c-md" x="128" y="98" width="28" height="28"/><rect class="fm-c-md" x="156" y="98" width="28" height="28"/><rect class="fm-c-hi" x="184" y="98" width="28" height="28"/><rect class="fm-c-hi" x="212" y="98" width="28" height="28"/><rect class="fm-c-hi" x="240" y="98" width="28" height="28"/><rect class="fm-c-hi" x="268" y="98" width="28" height="28"/><rect class="fm-c-hi" x="296" y="98" width="28" height="28"/><rect class="fm-c-lo" x="44" y="70" width="28" height="28"/><rect class="fm-c-lo" x="72" y="70" width="28" height="28"/><rect class="fm-c-md" x="100" y="70" width="28" height="28"/><rect class="fm-c-md" x="128" y="70" width="28" height="28"/><rect class="fm-c-hi" x="156" y="70" width="28" height="28"/><rect class="fm-c-hi" x="184" y="70" width="28" height="28"/><rect class="fm-c-hi" x="212" y="70" width="28" height="28"/><rect class="fm-c-hi" x="240" y="70" width="28" height="28"/><rect class="fm-c-hi" x="268" y="70" width="28" height="28"/><rect class="fm-c-hi" x="296" y="70" width="28" height="28"/><rect class="fm-c-hi" x="44" y="42" width="28" height="28"/><rect class="fm-c-hi" x="72" y="42" width="28" height="28"/><rect class="fm-c-hi" x="100" y="42" width="28" height="28"/><rect class="fm-c-hi" x="128" y="42" width="28" height="28"/><rect class="fm-c-hi" x="156" y="42" width="28" height="28"/><rect class="fm-c-hi" x="184" y="42" width="28" height="28"/><rect class="fm-c-hi" x="212" y="42" width="28" height="28"/><rect class="fm-c-hi" x="240" y="42" width="28" height="28"/><rect class="fm-c-hi" x="268" y="42" width="28" height="28"/><rect class="fm-c-hi" x="296" y="42" width="28" height="28"/><rect class="fm-c-hi" x="44" y="14" width="28" height="28"/><rect class="fm-c-hi" x="72" y="14" width="28" height="28"/><rect class="fm-c-hi" x="100" y="14" width="28" height="28"/><rect class="fm-c-hi" x="128" y="14" width="28" height="28"/><rect class="fm-c-hi" x="156" y="14" width="28" height="28"/><rect class="fm-c-hi" x="184" y="14" width="28" height="28"/><rect class="fm-c-hi" x="212" y="14" width="28" height="28"/><rect class="fm-c-hi" x="240" y="14" width="28" height="28"/><rect class="fm-c-hi" x="268" y="14" width="28" height="28"/><rect class="fm-c-hi" x="296" y="14" width="28" height="28"/><text class="vz-tick" x="58.0" y="308" text-anchor="middle">1</text><text class="vz-tick" x="36" y="284.0" text-anchor="end">1</text><text class="vz-tick" x="86.0" y="308" text-anchor="middle">2</text><text class="vz-tick" x="36" y="256.0" text-anchor="end">2</text><text class="vz-tick" x="114.0" y="308" text-anchor="middle">3</text><text class="vz-tick" x="36" y="228.0" text-anchor="end">3</text><text class="vz-tick" x="142.0" y="308" text-anchor="middle">4</text><text class="vz-tick" x="36" y="200.0" text-anchor="end">4</text><text class="vz-tick" x="170.0" y="308" text-anchor="middle">5</text><text class="vz-tick" x="36" y="172.0" text-anchor="end">5</text><text class="vz-tick" x="198.0" y="308" text-anchor="middle">6</text><text class="vz-tick" x="36" y="144.0" text-anchor="end">6</text><text class="vz-tick" x="226.0" y="308" text-anchor="middle">7</text><text class="vz-tick" x="36" y="116.0" text-anchor="end">7</text><text class="vz-tick" x="254.0" y="308" text-anchor="middle">8</text><text class="vz-tick" x="36" y="88.0" text-anchor="end">8</text><text class="vz-tick" x="282.0" y="308" text-anchor="middle">9</text><text class="vz-tick" x="36" y="60.0" text-anchor="end">9</text><text class="vz-tick" x="310.0" y="308" text-anchor="middle">10</text><text class="vz-tick" x="36" y="32.0" text-anchor="end">10</text><text class="vz-axis" x="184" y="328" text-anchor="middle">Occurrence →</text><text class="vz-axis" transform="translate(11 154) rotate(-90)" text-anchor="middle">Severity →</text><circle class="fm-pt" cx="142.0" cy="28.0" r="6" fill="var(--red)"><title>FM-01 An arc flash initiates at or inside the cabinet as three electricians access it (S10 O4 D9)</title></circle><text class="fm-pt-l" x="142.0" y="18.0" text-anchor="middle">01</text><circle class="fm-pt" cx="198.0" cy="56.0" r="6" fill="var(--red)"><title>FM-02 Work proceeds with workers inside the arc-flash boundary of an energized cabinet; isolation and lockout status are not disclosed (S9 O6 D8)</title></circle><text class="fm-pt-l" x="198.0" y="46.0" text-anchor="middle">02</text><circle class="fm-pt" cx="198.0" cy="84.0" r="6" fill="var(--red)"><title>FM-03 The job briefing / existing-conditions determination required by 29 CFR 1926.950(b)(1)(i) is found deficient (S8 O6 D8); FM-04 No arc-flash incident-energy study, cabinet label or PPE-adequacy finding exists in the public record (S8 O6 D9)</title></circle><text class="fm-pt-l" x="198.0" y="74.0" text-anchor="middle">03, 04</text><circle class="fm-pt" cx="142.0" cy="196.0" r="6" fill="var(--green)"><title>FM-05 No electrical, thermal or smoke detection activates; notification depends on a human report of a large explosion (S4 O4 D6)</title></circle><text class="fm-pt-l" x="142.0" y="186.0" text-anchor="middle">05</text><circle class="fm-pt" cx="254.0" cy="224.0" r="6" fill="var(--amber)"><title>FM-06 No equipment identity, incident energy, PPE finding or de-energisation status is published, and the OSHA accident abstract cannot be retrieved (S3 O8 D9)</title></circle><text class="fm-pt-l" x="254.0" y="214.0" text-anchor="middle">06</text></svg></figure>
+        </div>
+        <div class="fm-sheet">
+            <div class="fm-head" aria-hidden="true"><span>ID</span><span>Failure mode</span><span>S·O·D</span><span>RPN</span><span>After</span></div>
+            <details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-02</span>
+    <span class="fm-mode">Work proceeds with workers inside the arc-flash boundary of an energized cabinet; isolation and lockout status are not disclosed<span class="fm-item">Isolation and lockout before cabinet work</span></span>
+    <span class="fm-sod" aria-label="Severity 9, occurrence 6, detection 8">9·6·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>432</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>De-energise and lock out the cabinet before workers access it, or justify live access in writing</dd>
+      <dt>Effect</dt><dd>All three workers are within reach of the arc when it initiates</dd>
+      <dt>Cause</dt><dd>Energized-work exposure; whether the gear could have been de-energised for the task is not disclosed</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>None recorded before the arc</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>9</b></dt><dd>This mode is what put people in the path of FM-01&#x27;s arc. It is scored one step below 10 only so the single arc flash is not counted twice at full weight; its consequence is the same injuries.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>Live access is the condition of the task, and the dossier records no permit or justification control: a foreseeable condition weakly guarded, &#x27;occasional&#x27;. Held at 6 because whether isolation was possible is unknown.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>No check is recorded that stopped live access; the exposure was identified afterwards, through the regulator&#x27;s inspection.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 432</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Mandate de-energisation-first with an energized-work permit and documented live-access justification (recommended; no public confirmation of adoption) <span class="fm-ev-src">Correction of errors #1</span></li><li>Enforce lockout/tagout for work on or inside substation cabinets (analyst recommendation) <span class="fm-ev-src">Improvement #1</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #1</span><span class="fm-ev-txt">Energized-work exposure: three electricians were physically accessing/working an electrical cabinet on the substation when the arc initiated (Data Center Frontier; WOWT: &#x27;accessing an electrical box when an arc occurred&#x27;). Whether the gear could have been de-energized for the task is not disclosed, but the fact that all three were within the arc-flash boundary at fault initiation is the proximate exposure.</span></li><li><span class="fm-ev-src"><a href="https://EC&amp;M; OSHA 1615410.015 (29 CFR 1926.950, Subpart V construction)" target="_blank" rel="noopener nofollow">Sequence of events #2</a></span><span class="fm-ev-txt">“an energized-work exposure”</span></li><li><span class="fm-ev-src"><a href="https://Disclosed gap — no source; inferred context OSHA 1615410.015 (Subpart V energized-work)" target="_blank" rel="noopener nofollow">Sequence of events #8</a></span><span class="fm-ev-txt">2022-08-08 (unspecified) — Power de-energisation / isolation of the affected cabinet is not disclosed; whether the equipment was isolated before or after the arc, and lockout status, is not public.</span></li><li><span class="fm-ev-src">Technical deep-dive</span><span class="fm-ev-txt">“whether it was energized by necessity or could have been isolated”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-04</span>
+    <span class="fm-mode">No arc-flash incident-energy study, cabinet label or PPE-adequacy finding exists in the public record<span class="fm-item">Arc-flash hazard analysis, cabinet labelling and PPE</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 6, detection 9">8·6·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>432</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Quantify incident energy at each cabinet and match workers&#x27; PPE to it so an arc does not cause serious burns</dd>
+      <dt>Effect</dt><dd>Whether the workers&#x27; PPE matched the hazard is unknown; one worker has burns to face, arm and thigh, and all three have serious burns</dd>
+      <dt>Cause</dt><dd>Analysis and documentation gap: no NFPA 70E / IEEE 1584 study, label or PPE category is published</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>None recorded</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>This mode governs how badly the workers were burned rather than whether the arc happened; scored at 8 to avoid counting the injuries at full weight again.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>The dossier treats the absence of any study or label as a latent contributor present across the task: &#x27;occasional&#x27;. Held at 6 because absence from the public record is not proof that no study existed.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>Nothing recorded would reveal a PPE/incident-energy mismatch before an arc; even after the event the question remains open.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 432</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Produce or refresh NFPA 70E / IEEE 1584 incident-energy studies and label cabinets campus-wide (recommended; no public record of a study) <span class="fm-ev-src">Correction of errors #2</span></li><li>Verify PPE arc-rating against labelled incident energy before access (analyst recommendation) <span class="fm-ev-src">Improvement #5</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #4</span><span class="fm-ev-txt">Undisclosed arc-flash-study / PPE adequacy: no NFPA 70E / IEEE 1584 incident-energy study, arc-flash label, or PPE-category finding appears in any retrievable source; whether the workers&#x27; PPE matched the incident energy at that cabinet is unknown — a documentation/analysis gap that is itself a latent contributor.</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“No arc-flash hazard study (NFPA 70E / IEEE 1584), no PPE-adequacy finding”</span></li><li><span class="fm-ev-src"><a href="https://The Register (dispatch detail); WOWT; EC&amp;M" target="_blank" rel="noopener nofollow">Sequence of events #4</a></span><span class="fm-ev-txt">“burns to face, arm and thigh”</span></li><li><span class="fm-ev-src"><a href="https://Data Center Frontier" target="_blank" rel="noopener nofollow">Metric #2</a></span><span class="fm-ev-txt">Peak arc-flash temperature: ~35,000 degrees F (trade-press physics figure)</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-03</span>
+    <span class="fm-mode">The job briefing / existing-conditions determination required by 29 CFR 1926.950(b)(1)(i) is found deficient<span class="fm-item">Contractor job briefing and host/contractor existing-conditions determination</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 6, detection 8">8·6·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>384</span>
+    <span class="fm-rpn-rev">256</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Establish, before each energized task, the energization state, hazards and controls, and transfer that information between host and contractor</dd>
+      <dt>Effect</dt><dd>The crew begins energized work without the planning the cited standard requires; OSHA issues one citation to the contractor, penalty raised from $13,052 to $20,000 in settlement</dd>
+      <dt>Cause</dt><dd>Contractor work-practice/procedure deficiency identified by OSHA; no specific procedural step is named in the public record</dd>
+      <dt>Prevention in place</dt><dd>Regulatory requirement under Subpart V</dd>
+      <dt>Detection in place</dt><dd>Found after the event by the OSHA Fat/Cat inspection</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>A procedural precursor whose consequence runs through FM-02 and FM-01; scored at 8 so the injuries are not counted at full weight a third time.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>Job briefings are routine on every task and OSHA found this one deficient, a foreseeable slip weakly guarded: &#x27;occasional&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>No internal check is recorded; the deficiency was established only by the regulator after the injuries.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 384</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Documented job briefing and host/contractor existing-conditions determination before each energized task (OSHA-directed abatement, due 03/17/2023; case closed 03/15/2023) <span class="fm-ev-src">Correction of errors #3</span></li><li>Briefing sign-off capturing energization state, incident energy and required PPE category (analyst recommendation) <span class="fm-ev-src">Improvement #4</span></li></ul>
+    <p class="fm-revline">After action: S8 · O4 · D8 → RPN 256. The cited abatement targets the deficient briefing directly, so a documented determination before each task makes the slip less likely (O 6→4). The dossier records the abatement as OSHA-directed with the case closed, but not what the contractor changed, so the reduction is a claim about the action, not a confirmed outcome. D is unchanged because no new check that would catch a missed briefing is recorded.</p>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #2</span><span class="fm-ev-txt">Job-briefing / existing-conditions determination deficiency by the contractor: OSHA&#x27;s sole citation was 29 CFR 1926.950(b)(1)(i), the Subpart V general-requirements clause covering job briefings and energized-work condition determination — the regulator&#x27;s identified work-practice thread (verified: OSHA Inspection 1615410.015, standard &#x27;19260950 B01 I&#x27;). No specific procedural step is named in the public record.</span></li><li><span class="fm-ev-src"><a href="https://OSHA 1615410.015 (verified)" target="_blank" rel="noopener nofollow">Metric #6</a></span><span class="fm-ev-txt">OSHA citation count against contractor: 1 citation (01001), classification &#x27;Other&#x27;, standard 29 CFR 1926.950(b)(1)(i)</span></li><li><span class="fm-ev-src"><a href="https://OSHA 1615410.015 (verified)" target="_blank" rel="noopener nofollow">Sequence of events #16</a></span><span class="fm-ev-txt">2023-01-31 — OSHA issues Citation 01001 to Capital Electric under 29 CFR 1926.950(b)(1)(i); abatement due 03/17/2023; case resolved by Informal Settlement, classification &#x27;Other,&#x27; penalty raised from $13,052 to $20,000; contractor case CLOSED 03/15/2023.</span></li><li><span class="fm-ev-src"><a href="https://www.osha.gov/ords/imis/establishment.inspection_detail?id=1615410.015" target="_blank" rel="noopener nofollow">Reference #1 · regulatory</a></span><span class="fm-ev-txt">“Citation Standard 19260950 B01 I”</span></li><li><span class="fm-ev-src"><a href="https://OSHA 1615410.015 (verified)" target="_blank" rel="noopener nofollow">Metric #5</a></span><span class="fm-ev-txt">OSHA penalty (initial to settled): $13,052 initial to $20,000 current (increased in settlement)</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-01</span>
+    <span class="fm-mode">An arc flash initiates at or inside the cabinet as three electricians access it<span class="fm-item">Energized electrical cabinet on the substation</span></span>
+    <span class="fm-sod" aria-label="Severity 10, occurrence 4, detection 9">10·4·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>360</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Contain fault energy inside the enclosure while it is accessed for construction/installation work</dd>
+      <dt>Effect</dt><dd>All three electricians suffer electrical/thermal burns; one is flown by helicopter in critical condition, two go by ground ambulance; all are reported stable the next day</dd>
+      <dt>Cause</dt><dd>Initiating fault not disclosed (dropped tool, insulation breakdown, misoperation, phase-to-phase bridging and racking are all named as unconfirmed possibilities); equipment make, voltage class and age unknown</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>None recorded; the fault announced itself as the explosion</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>10</b></dt><dd>Rubric 10, hazard to people: three workers burned, one in critical condition at the scene.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>An arc needs an initiating fault during access, and the dossier names no defect or repeated event: &#x27;infrequent&#x27;. Not lower because the work was being done on live gear with no recorded engineering control.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>No relay, sensor or interlock is recorded that could catch the fault before the arc; it was known only through the injuries, the analogue of detection through impact.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 360</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Adopt arc-resistant switchgear, remote racking and remote operators to move workers outside the arc-flash boundary (recommended, not confirmed) <span class="fm-ev-src">Correction of errors #4</span></li><li>Engineer out the exposure on frequently accessed cabinets rather than relying on PPE alone (analyst recommendation) <span class="fm-ev-src">Improvement #3</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://The Register; SFGATE (11:59 a.m. local)" target="_blank" rel="noopener nofollow">Sequence of events #3</a></span><span class="fm-ev-txt">2022-08-08 ~11:59 a.m. CDT — An arc flash initiates at/inside the electrical cabinet as the three workers access it; a &#x27;Large Electrical Explosion/No fire&#x27; event occurs. Exact initiating fault not disclosed.</span></li><li><span class="fm-ev-src"><a href="https://The Register (dispatch detail); WOWT; EC&amp;M" target="_blank" rel="noopener nofollow">Sequence of events #4</a></span><span class="fm-ev-txt">2022-08-08 ~11:59 a.m. CDT — Arc-flash thermal burst injures all three electricians: one with a lower-torso injury, another with burns to face, arm and thigh; all sustain electrical/thermal burns.</span></li><li><span class="fm-ev-src"><a href="https://CBS News; EC&amp;M; WOWT" target="_blank" rel="noopener nofollow">Metric #1</a></span><span class="fm-ev-txt">Workers injured: 3 electricians (all with electrical/thermal burns)</span></li><li><span class="fm-ev-src"><a href="https://CRN; CBS News" target="_blank" rel="noopener nofollow">Metric #4</a></span><span class="fm-ev-txt">Victim transport split: 3 to Nebraska Medical Center — 2 by ground ambulance, 1 by helicopter</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“The precise initiating fault (dropped tool, insulation breakdown, misoperation, phase-to-phase bridging, or a racking event) is NOT stated in any public source.”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-06</span>
+    <span class="fm-mode">No equipment identity, incident energy, PPE finding or de-energisation status is published, and the OSHA accident abstract cannot be retrieved<span class="fm-item">Root-cause record and disclosure</span></span>
+    <span class="fm-sod" aria-label="Severity 3, occurrence 8, detection 9">3·8·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>216</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Leave a durable, retrievable record of the initiating fault, equipment and controls so the industry can learn from it</dd>
+      <dt>Effect</dt><dd>The initiating fault and whether the gear could have been isolated remain unknown; the dossier&#x27;s corrective actions cannot be checked against a stated cause</dd>
+      <dt>Cause</dt><dd>No operator post-mortem; the accident abstract (Activity 1931208) was unretrievable in this review</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Visible only as the absence of a record</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>3</b></dt><dd>Affects learning and verification rather than any service or person directly: closest to &#x27;internal impact only&#x27;.</dd></div>
+      <div class="fm-sc"><dt>O <b>8</b></dt><dd>Every technical detail the dossier lists is undisclosed, so the gap is the routine state of the record: &#x27;frequent&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>Nothing surfaces the gap except its absence.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 216</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Retain and publish accessible root-cause abstracts for catastrophic electrical events (status: gap) <span class="fm-ev-src">Correction of errors #5</span></li><li>Make durable, retrievable incident records a programme requirement (analyst recommendation) <span class="fm-ev-src">Improvement #6</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Correction of errors #5</span><span class="fm-ev-txt">Retain and publish accessible root-cause abstracts for catastrophic electrical events (Gap — accident abstract (Activity 1931208) unretrievable in this review)</span></li><li><span class="fm-ev-src">Contributing factor #6</span><span class="fm-ev-txt">Undisclosed maintenance/testing state of the substation gear: no maintenance-interval, insulation-test, or equipment-condition record is public, so an asset-condition contribution can be neither confirmed nor excluded (disclosed uncertainty).</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“The absence of a published root-cause narrative is itself a limitation of this dossier”</span></li><li><span class="fm-ev-src">Technical deep-dive</span><span class="fm-ev-txt">“The OSHA accident abstract that would answer several of these could not be retrieved in this review”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-05</span>
+    <span class="fm-mode">No electrical, thermal or smoke detection activates; notification depends on a human report of a large explosion<span class="fm-item">Event detection and emergency response</span></span>
+    <span class="fm-sod" aria-label="Severity 4, occurrence 4, detection 6">4·4·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--green)"></i>96</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Raise the alarm and get the injured to definitive care quickly</dd>
+      <dt>Effect</dt><dd>Dispatch is initiated at about 11:59 a.m. with an air ambulance on standby; responders arrive within minutes and all three are taken to a regional burn centre. No delay is recorded</dd>
+      <dt>Cause</dt><dd>An arc flash is a blast and burn event classed &#x27;No fire&#x27;, so the data-center fire detection chain was not the operative safeguard</dd>
+      <dt>Prevention in place</dt><dd>Emergency dispatch with air-ambulance capability</dd>
+      <dt>Detection in place</dt><dd>Human report to emergency services</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>4</b></dt><dd>The record shows a prompt response and no fire spread, so this mode did not add measurable harm; scored low and shown so the detection link of the chain is assessed rather than assumed.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>Relying on human report is a standing condition, but it only matters when an arc occurs: &#x27;infrequent&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>People detected the event at onset and called it in; nothing could have prevented it at that point: &#x27;detected at onset, not prevented&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Low</b> · RPN 96</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li class="fm-residual">No corrective action is recorded in the published sources. This mode is residual risk.</li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://The Register; CBS News (fire chief: &#x27;notified of a large explosion&#x27;)" target="_blank" rel="noopener nofollow">Sequence of events #5</a></span><span class="fm-ev-txt">2022-08-08 ~noon CDT — No electrical/thermal/smoke detection system activation is reported; the event is an electrical explosion, not a fire, and was categorized &#x27;No fire.&#x27; Notification to emergency services is by human report of a &#x27;large explosion,&#x27; not an automated alarm.</span></li><li><span class="fm-ev-src"><a href="https://The Register; SFGATE" target="_blank" rel="noopener nofollow">Sequence of events #6</a></span><span class="fm-ev-txt">2022-08-08 ~11:59 a.m. CDT — 911/emergency dispatch is initiated. Council Bluffs Fire Department dispatches units with air-ambulance on standby per the dispatch detail.</span></li><li><span class="fm-ev-src"><a href="https://CRN; CBS News" target="_blank" rel="noopener nofollow">Sequence of events #9</a></span><span class="fm-ev-txt">2022-08-08 (post-triage) — All three burn victims transported to Nebraska Medical Center (regional burn/trauma center): two by ground ambulance, one flown by helicopter in critical condition.</span></li><li><span class="fm-ev-src"><a href="https://The Register" target="_blank" rel="noopener nofollow">Metric #8</a></span><span class="fm-ev-txt">Fire / combustion damage: None — dispatch reported as &#x27;Large Electrical Explosion/No fire&#x27;</span></li><li><span class="fm-ev-src"><a href="https://The Register (&#x27;No fire&#x27;); forensic synthesis" target="_blank" rel="noopener nofollow">Sequence of events #11</a></span><span class="fm-ev-txt">2022-08-08 (containment) — No fire spread; event contained to the electrical cabinet/substation being worked on. No structural fire and no reported damage to data-hall IT space.</span></li></ul>
+  </div>
+</details>
+        </div>
+        <details class="fm-method"><summary>Scoring rubric and method</summary><div class="fm-method-body"><p>A retrospective FMEA: each row asks how this system could fail, how bad the effect was, how likely the cause was given the controls in place at the time, and how likely those controls were to catch it before customers did. Scales are adapted for data-centre operations from the 1–10 scales of IEC 60812:2018 and the AIAG-VDA FMEA handbook. RPN = S × O × D. Priority is High when S ≥ 9 with O ≥ 4 or D ≥ 7, or when RPN ≥ 300; Medium when RPN ≥ 120 or S ≥ 7; Low otherwise. Severity overrides the product because a large S multiplied by small O and D can hide a region-wide outage nothing would catch.</p><p>Every row cites evidence from this dossier, and every quote is checked verbatim against its source by <code>tools/test-incidents-fmea.py</code>. A revised score is only shown against a published corrective action. This is an RZ analyst assessment, not an operator document.</p><div class="fm-rubrics"><div><p class="fm-sub">Severity</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Hazard to people, or loss of the facility / several regions</td></tr><tr><td>9</td><td>Region-wide or provider-wide outage of a foundational service, no workaround</td></tr><tr><td>8</td><td>Full outage of a major service for hours</td></tr><tr><td>7</td><td>Major degradation of a major service</td></tr><tr><td>6</td><td>Partial outage confined to one zone or one service</td></tr><tr><td>5</td><td>Customer-visible degradation</td></tr><tr><td>4</td><td>Limited customer impact</td></tr><tr><td>3</td><td>Internal impact only</td></tr><tr><td>2</td><td>Negligible</td></tr><tr><td>1</td><td>No effect</td></tr></tbody></table></div><div><p class="fm-sub">Occurrence</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Near certain: the cause is present in normal operation</td></tr><tr><td>8</td><td>Frequent: routine work exercises the cause</td></tr><tr><td>6</td><td>Occasional: a foreseeable slip or condition, weakly guarded</td></tr><tr><td>4</td><td>Infrequent: needs an unusual combination</td></tr><tr><td>2</td><td>Remote: guarded by design</td></tr><tr><td>1</td><td>Eliminated by design</td></tr></tbody></table></div><div><p class="fm-sub">Detection</p><table class="fm-rubric"><tbody><tr><td>10</td><td>No control could detect it</td></tr><tr><td>9</td><td>Detected only through customer impact</td></tr><tr><td>8</td><td>Detected after impact by internal monitoring</td></tr><tr><td>6</td><td>Detected at onset, not prevented</td></tr><tr><td>4</td><td>Detected before impact with time to act</td></tr><tr><td>2</td><td>Automated interlock almost certainly stops it</td></tr><tr><td>1</td><td>Certain to be stopped</td></tr></tbody></table></div></div></div></details>
+
 
         <h2>Correction of errors (COE)</h2>
         <ul class="tight"><li>Mandate de-energisation-first with energized-work permit and documented live-access justification for all substation-cabinet work <span class="coe-meta">Contractor (Capital Electric) EHS + Google host site safety · Recommended (no public confirmation of adoption)</span></li><li>Produce/refresh NFPA 70E / IEEE 1584 arc-flash incident-energy studies and apply cabinet incident-energy labels campus-wide <span class="coe-meta">Google data-center electrical engineering · Recommended (no public record of a study)</span></li><li>Require documented job briefing and host/contractor existing-conditions determination per 29 CFR 1926.950(b)(1)(i) before each energized task <span class="coe-meta">Contractor foreman + host coordinator · OSHA-directed abatement (due 03/17/2023, case closed 03/15/2023)</span></li><li>Adopt arc-resistant switchgear / remote racking / remote operators to move workers outside the arc-flash boundary during switching <span class="coe-meta">Google design/standards · Recommended (not confirmed)</span></li><li>Retain and publish accessible root-cause abstracts for catastrophic electrical events <span class="coe-meta">OSHA record-keeping / operator · Gap — accident abstract (Activity 1931208) unretrievable in this review</span></li></ul>
@@ -431,7 +701,7 @@ The regulatory framing is the strongest technical signal about causation. OSHA c
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-1a1a084f"></script>
+    <script src="js/rz-version.js?v=20261010-00a1d9e8"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

@@ -52,6 +52,12 @@
     .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
     .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
     .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:2px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    /* A chip carries the operator name, which can be a whole sentence ("Google Cloud
+       (impacted tenant); STT GDC / Tata Communications JV (named as the third-party …").
+       nowrap made that one chip 1120px wide and pushed the GCP Delhi dossier into a
+       1260px page at a 1100px viewport. Short chips are unaffected: normal wrapping
+       only engages when a chip would not fit its row. */
+    .chips .chip { max-width:100%; white-space:normal; overflow-wrap:anywhere; }
     .chip.cyan { color:var(--cyan); border-left:2px solid var(--cyan); }
     .chip.amber { color:var(--amber); border-left:2px solid var(--amber); }
     .chip.green { color:var(--green); border-left:2px solid var(--green); }
@@ -71,6 +77,11 @@
     /* rich incident table (reference-2 style) */
     table.itbl { min-width:1120px; }
     table.itbl td { vertical-align:middle; }
+    /* v1.134.20 — the title and summary columns ellipsise so the table's columns line up,
+       which is the right call for a dense index. But the cut text was reachable only by
+       navigating to the incident: a summary lost 238-298px of its sentence with no way to read
+       it in place. Each carries its full text in a title attribute now, so the truncation is
+       deliberate AND non-lossy — which is the condition the legibility audit checks for. */
     .itr { cursor:pointer; }
     .itr:hover td { background:var(--surface-2); }
     .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
@@ -240,7 +251,6 @@
        derive width = W px from the aspect ratio, so the drawing renders 1:1 at any event count
        and the panel scrolls instead of shrinking. */
     .viz-timeline svg { max-width:none; height:96px; width:auto; }
-
     .viz-radar svg { max-width:320px; margin:0 auto; }
     .vz-num { font-variant-numeric:tabular-nums slashed-zero; }
     .vz-box-t, .vz-box-s, .vz-lbl, .vz-hb-lbl, .vz-tl-t, .vz-pt, .vz-tick { pointer-events:auto; }
@@ -323,7 +333,86 @@
     }
     @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
 </style>
-    
+    <style>
+    /* ── FMEA (v3.12.3) — one hairline panel of rows, like the rest of the dossier.
+       No cards, no stripes: a row is a disclosure, state is a 7px dot. ── */
+    .fm-scope { color:var(--text-body); max-width:70ch; }
+    .fm-meta { flex-wrap:wrap; row-gap:0.25rem; }
+    .fm-viz { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:1.6rem; align-items:start; margin:1.2rem 0; }
+    @media (max-width:820px){ .fm-viz { grid-template-columns:1fr; } }
+    .fm-pb-row, .fm-pb-axis { display:grid; grid-template-columns:3.6rem minmax(0,1fr) 6.6rem; gap:0.6rem; align-items:center; }
+    .fm-pb-row { padding:0.32rem 0; }
+    .fm-pb-id, .fm-pb-val { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.8rem; }
+    .fm-pb-id { color:var(--muted); }
+    .fm-pb-val { color:var(--text-strong); white-space:nowrap; }
+    .fm-pb-track { display:flex; flex-direction:column; gap:3px; }
+    .fm-pb-bar { display:block; height:12px; }
+    .fm-pb-rev { display:block; height:4px; background:var(--text-body); opacity:0.55; }
+    .fm-pb-none { font-style:italic; font-size:0.72rem; color:var(--muted); line-height:1; }
+    .fm-pb-axis { margin-top:0.3rem; border-top:1px solid var(--line); padding-top:0.25rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .fm-pb-ticks { display:flex; justify-content:space-between; }
+    .fm-fig { margin:0; }
+    .fm-fig figcaption { font-size:0.8rem; color:var(--muted); margin-bottom:0.35rem; }
+    .fm-fig svg { width:100%; height:auto; display:block; }
+    .fm-fig-m svg { max-width:340px; }
+    .fm-matrix .fm-c-lo { fill:var(--surface); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-md { fill:color-mix(in srgb, var(--amber) 9%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-hi { fill:color-mix(in srgb, var(--red) 10%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .vz-axis { font-size:10px; fill:var(--muted); font-family:'IBM Plex Sans',sans-serif; }
+    .fm-matrix .fm-pt { stroke:var(--surface); stroke-width:1.5; }
+    .fm-matrix .fm-pt-l { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; fill:var(--text-strong);
+      paint-order:stroke; stroke:var(--surface); stroke-width:3px; stroke-linejoin:round; }
+    .fm-sheet { border:1px solid var(--line); border-radius:4px; margin-top:0.8rem; }
+    .fm-head, .fm-row > summary { display:grid; grid-template-columns:4.2rem minmax(0,1fr) 4.4rem 4.6rem 3.4rem; gap:0.6rem; align-items:baseline; padding:0.6rem 0.9rem; }
+    .fm-head { font-size:0.74rem; color:var(--muted); border-bottom:1px solid var(--line); }
+    .fm-row { border-top:1px solid var(--line); }
+    .fm-row:first-of-type { border-top:0; }
+    .fm-row > summary { cursor:pointer; list-style:none; }
+    .fm-row > summary::-webkit-details-marker { display:none; }
+    .fm-row > summary:hover { background:var(--surface-2); }
+    .fm-row > summary:focus-visible { outline:2px solid var(--cyan); outline-offset:-2px; }
+    .fm-id-cell, .fm-sod, .fm-rpn, .fm-rpn-rev { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.84rem; }
+    .fm-id-cell { color:var(--muted); }
+    .fm-mode { color:var(--text-strong); font-size:0.92rem; line-height:1.4; }
+    .fm-item { display:block; color:var(--muted); font-size:0.8rem; }
+    .fm-sod { color:var(--text-body); }
+    .fm-rpn { color:var(--text-strong); }
+    .fm-rpn-rev { color:var(--muted); }
+    .fm-dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:0.45rem; vertical-align:0.1em; }
+    .fm-body { padding:0.2rem 0.9rem 1rem 5.7rem; }
+    @media (max-width:640px){
+      .fm-head { display:none; }
+      .fm-row > summary { grid-template-columns:3.2rem minmax(0,1fr) auto; }
+      .fm-sod, .fm-rpn-rev { display:none; }
+      .fm-body { padding:0.2rem 0.9rem 1rem; }
+    }
+    .fm-kv { display:grid; grid-template-columns:9.5rem minmax(0,1fr); gap:0.3rem 0.9rem; margin:0.4rem 0 0.8rem; font-size:0.88rem; }
+    .fm-kv dt { color:var(--muted); }
+    .fm-kv dd { margin:0; color:var(--text-body); }
+    @media (max-width:640px){ .fm-kv { grid-template-columns:1fr; } .fm-kv dd { margin-bottom:0.4rem; } }
+    .fm-scores { margin:0 0 0.6rem; border-top:1px solid var(--line); }
+    .fm-sc { display:grid; grid-template-columns:3.2rem minmax(0,1fr); gap:0.6rem; padding:0.45rem 0; border-bottom:1px solid var(--line); font-size:0.86rem; }
+    .fm-sc dt { font-family:'JetBrains Mono',monospace; color:var(--muted); }
+    .fm-sc dt b { color:var(--text-strong); }
+    .fm-sc dd { margin:0; color:var(--text-body); }
+    .fm-sub { font-size:0.8rem; color:var(--muted); margin:0.7rem 0 0.25rem; }
+    .fm-sub b { color:var(--text-strong); }
+    .fm-acts, .fm-ev { margin:0; padding-left:1.1rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-acts li, .fm-ev li { margin:0.25rem 0; }
+    .fm-residual { color:var(--red); }
+    .fm-revline { font-size:0.86rem; color:var(--text-body); margin:0.4rem 0 0; }
+    .fm-ev-src { display:block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .fm-ev-src a { color:var(--cyan); }
+    .fm-ev-txt { display:block; }
+    .fm-method { margin-top:1rem; border:1px solid var(--line); border-radius:4px; }
+    .fm-method > summary { padding:0.6rem 0.9rem; cursor:pointer; font-size:0.9rem; color:var(--text-strong); }
+    .fm-method-body { padding:0 0.9rem 0.9rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-rubrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+    @media (max-width:760px){ .fm-rubrics { grid-template-columns:1fr; } }
+    .fm-rubric { width:100%; border-collapse:collapse; font-size:0.8rem; }
+    .fm-rubric td { padding:0.25rem 0.4rem; border-top:1px solid var(--line); vertical-align:top; }
+    .fm-rubric td:first-child { font-family:'JetBrains Mono',monospace; width:2rem; color:var(--text-strong); }
+</style>
 </head>
 <body class="locked">
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -346,14 +435,14 @@
         <h1>Azure West US 2 Grid-Disturbance Cooling Loss and Thermal Shutdown (May 2026)</h1>
         <div class="chips">
             <span class="chip">Microsoft Azure</span>
-            <span class="chip cyan">2026-05-01</span>
-            <span class="chip amber">8h 0m core impact</span>
+            <span class="chip cyan">2026-05-29</span>
+            <span class="chip amber">22h 6m core impact</span>
             <span class="chip amber">Power</span><span class="chip cyan">Cooling</span>
         </div>
         <p class="lede">A grid power-quality disturbance reduced cooling capacity across multiple Azure West US 2 availability zones, triggering automated thermal shutdowns of hardware and multi-service impact.</p>
 
         <h2>Failure cascade</h2>
-        <div class="viz viz-cascade"><svg viewBox="0 0 760 158" role="img" aria-label="Failure cascade block diagram"><title>Failure cascade: trigger → fault → downstream impact</title><defs><marker id="ic-ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path class="vz-arrhead" d="M0,0 L6,3 L0,6 Z"/></marker></defs><text class="vz-tl-ph" x="8" y="12">Trigger</text><text class="vz-tl-ph" x="248" y="12">Primary fault</text><text class="vz-tl-ph" x="516" y="12">Downstream impact</text><rect class="vz-box-trigger" x="8" y="51.0" width="176" height="56" rx="2"><title>Trigger — Power (2026-05-01)</title></rect><text class="vz-box-t" x="18" y="68.0">Trigger · Power</text><text class="vz-box-s" x="18" y="82.0"><title>2026-05-01</title>2026-05-01</text><rect class="vz-box-fault" x="240" y="51.0" width="224" height="56" rx="2"><title>Primary fault at Microsoft Azure — Azure West US 2 (Quincy, Washington)</title></rect><text class="vz-box-t" x="250" y="68.0">Microsoft Azure</text><text class="vz-box-s" x="250" y="82.0"><title>Azure West US 2 (Quincy, Washington)</title>Azure West US 2</text><line class="vz-flow" x1="184" y1="79.0" x2="238" y2="79.0" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="26" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Azure compute/storage in West US 2 (multi-AZ)</title></rect><text class="vz-box-t" x="526" y="43">Azure compute/storage in West US</text><text class="vz-box-t" x="526" y="56">2…</text><line class="vz-flow" x1="464" y1="79.0" x2="514" y2="44" marker-end="url(#ic-ar)"/></svg></div>
+        <div class="viz viz-cascade"><svg viewBox="0 0 760 158" role="img" aria-label="Failure cascade block diagram"><title>Failure cascade: trigger → fault → downstream impact</title><defs><marker id="ic-ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path class="vz-arrhead" d="M0,0 L6,3 L0,6 Z"/></marker></defs><text class="vz-tl-ph" x="8" y="12">Trigger</text><text class="vz-tl-ph" x="248" y="12">Primary fault</text><text class="vz-tl-ph" x="516" y="12">Downstream impact</text><rect class="vz-box-trigger" x="8" y="51.0" width="176" height="56" rx="2"><title>Trigger — Power (2026-05-29)</title></rect><text class="vz-box-t" x="18" y="68.0">Trigger · Power</text><text class="vz-box-s" x="18" y="82.0"><title>2026-05-29</title>2026-05-29</text><rect class="vz-box-fault" x="240" y="51.0" width="224" height="56" rx="2"><title>Primary fault at Microsoft Azure — Azure West US 2 (Quincy, Washington)</title></rect><text class="vz-box-t" x="250" y="68.0">Microsoft Azure</text><text class="vz-box-s" x="250" y="82.0"><title>Azure West US 2 (Quincy, Washington)</title>Azure West US 2</text><line class="vz-flow" x1="184" y1="79.0" x2="238" y2="79.0" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="26" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Azure compute/storage in West US 2 (multi-AZ)</title></rect><text class="vz-box-t" x="526" y="43">Azure compute/storage in West</text><text class="vz-box-t" x="526" y="56">US 2</text><line class="vz-flow" x1="464" y1="79.0" x2="514" y2="44" marker-end="url(#ic-ar)"/></svg></div>
         <p class="disclaimer">Trigger → primary fault → downstream blast radius, derived from the sourced root cause and affected-services record.</p>
 
         <h2>Facility &amp; location</h2>
@@ -361,7 +450,7 @@
             <dt>Operator</dt><dd>Microsoft Azure</dd>
             <dt>Data center</dt><dd>Azure West US 2 (Quincy, Washington)</dd>
             <dt>Location</dt><dd>Quincy, Washington, United States</dd>
-            <dt>Date</dt><dd>2026-05-01</dd>
+            <dt>Date</dt><dd>2026-05-29</dd>
         </dl>
 
         <h2>Impact &amp; scale</h2>
@@ -399,6 +488,215 @@ VERIFICATION STATUS: The account derives from a single official operator source,
 
         <h2>Contributing factors</h2>
         <ul class="tight"><li>EXTERNAL TRIGGER: A severe thunderstorm with lightning caused &#x27;utility power disturbances across multiple datacenter facilities&#x27; as &#x27;voltage sag/swell events&#x27; where &#x27;utility power remained present but was unstable&#x27; (GHRP-84G) — a degraded-but-present supply condition that is harder to protect against than a clean outage.</li><li>DESIGN — HARD LOCKOUT, NO STAGED DEGRADATION: Cooling protection &#x27;entered a lockout protective state&#x27;; the PIR states the design &#x27;resulted in a full lockout rather than staged or degraded operation&#x27; and a holistic cooling fail-state review is committed for October 2026, confirming the all-or-nothing design as a contributing factor.</li><li>DESIGN — NO COOLING AUTO-RECOVERY: The lockout &#x27;prevented parts of the cooling system from automatically returning to normal operation,&#x27; so cooling could not self-restore once the transient passed and required manual human diagnosis and restoration.</li><li>COMMISSIONING/TUNING (observed, not confirmed as a lapse): &#x27;Some datacenters transferred to generator power, while others did not, as utility power remained available&#x27; — inconsistent generator/UPS transfer under sag/swell implies threshold/transfer tuning sensitivity; the PIR reports the divergence but does not state it as a lapse.</li><li>PROCESS — MANUAL, UNDER-DOCUMENTED COOLING RECOVERY: Recovery depended on manual cooling diagnosis and restoration; Azure committed to improving cooling recovery processes and documentation (target June 2026), indicating the manual process contributed to duration.</li><li>PROCESS/PLATFORM — SLOW STORAGE RETURN-TO-SERVICE: Storage validation extended over ~14 hours; the PIR attributes this to &#x27;platform limitations that constrained the speed at which storage nodes could be returned to service&#x27; and to &#x27;dependencies on manual coordination steps&#x27; (Networking remediation, July 2026) — a recovery-architecture gap, not a maintenance failure.</li><li>DESIGN — TELEMETRY SINGLE-CLUSTER DEPENDENCY &amp; NO SELF-RECOVERY: Log Analytics could not self-recover from transient initialization failures and over-depended on a single cluster; remediations add startup resiliency (June 2026) and multi-cluster flexibility &#x27;reducing dependence on any single cluster or resource type&#x27; (August 2026), making telemetry the longest tail (backlog cleared 02:30 UTC 30 May).</li><li>TOOLING GAP: Weak tooling to &#x27;identify which infrastructure devices have entered protective states and require manual recovery&#x27; slowed prioritized recovery across the two affected availability zones (Networking remediation, target August 2026).</li><li>NOTE — NO MAINTENANCE/INSPECTION LAPSE EVIDENCED: The PIR neither evidences nor alleges any maintenance, inspection, or testing failure; root cause is framed as an external grid event plus design/automation gaps. Absence of disclosure is not proof of absence, but none is on the record.</li></ul>
+        <h2 id="fmea">Failure mode &amp; effects analysis (FMEA)</h2>
+        <p class="fm-scope">The electrical-to-thermal chain in Azure West US 2 (Quincy, Washington): utility supply and generator/UPS transfer under voltage sag/swell, the protection inside the mechanical cooling plant, data-hall thermal ride-through and the automated IT shutdown across two availability zones, cooling recovery, storage return-to-service, protective-state tooling and the Log Analytics telemetry tail. Analysed retrospectively from the official Azure Post Incident Review GHRP-84G, the dossier&#x27;s single source; no independent press, regulator or utility corroboration is held, and figures are operator-reported. The dossier&#x27;s date field (1 May 2026) and its 480-minute duration do not match the PIR it cites (29–30 May 2026, about 22 hours); this FMEA uses the PIR times. The cooling-plant components and protection devices are not disclosed. Azure&#x27;s corrective actions are recorded as committed with targets from June to October 2026; the transfer-threshold review is an analyst recommendation only. Revised scores are claims about committed actions, not confirmed outcomes.</p>
+        <p class="metabar fm-meta"><span><b>7</b> failure modes</span><span class="sep">/</span><span><b>1</b> high priority</span><span class="sep">/</span><span><b>5 of 7</b> with a published action</span><span class="sep">/</span><span>total RPN <b>1953 → 1260</b> (−35%)</span></p>
+        <div class="fm-viz">
+            <figure class="fm-fig"><figcaption>Risk priority number (S × O × D), worst first — thin bar: after the published action</figcaption><div class="fm-pb" role="list" aria-label="Risk priority number per failure mode, before and after corrective action"><div class="fm-pb-row" role="listitem" title="FM-05 Storage validation runs for about 14 hours, constrained by platform limitations and manual, sequential coordination"><span class="fm-pb-id">FM-05</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:88.2%;background:var(--red)"></i><i class="fm-pb-rev" style="width:50.4%"></i></span><span class="fm-pb-val">441 → 252</span></div><div class="fm-pb-row" role="listitem" title="FM-01 Under voltage sag/swell the utility stays present but unstable, and transfer is inconsistent: some datacenters move to generator, others do not"><span class="fm-pb-id">FM-01</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:57.6%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">288</span></div><div class="fm-pb-row" role="listitem" title="FM-02 Protection latches into full lockout, with no staged or degraded operation and no automatic return once voltage is normal"><span class="fm-pb-id">FM-02</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:57.6%;background:var(--amber)"></i><i class="fm-pb-rev" style="width:28.8%"></i></span><span class="fm-pb-val">288 → 144</span></div><div class="fm-pb-row" role="listitem" title="FM-06 Weak tooling makes it hard to identify devices in protective states and prioritise foundational infrastructure"><span class="fm-pb-id">FM-06</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:57.6%;background:var(--amber)"></i><i class="fm-pb-rev" style="width:28.8%"></i></span><span class="fm-pb-val">288 → 144</span></div><div class="fm-pb-row" role="listitem" title="FM-07 Log Analytics cannot self-recover from transient initialisation failures and depends on a single cluster"><span class="fm-pb-id">FM-07</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:57.6%;background:var(--amber)"></i><i class="fm-pb-rev" style="width:28.8%"></i></span><span class="fm-pb-val">288 → 144</span></div><div class="fm-pb-row" role="listitem" title="FM-04 Recovery depends on manual diagnosis and restoration under a process the PIR treats as needing better documentation"><span class="fm-pb-id">FM-04</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:43.2%;background:var(--amber)"></i><i class="fm-pb-rev" style="width:28.8%"></i></span><span class="fm-pb-val">216 → 144</span></div><div class="fm-pb-row" role="listitem" title="FM-03 With cooling locked out, hall temperatures exceed safe thresholds within about 10–16 minutes and infrastructure shuts down across two availability zones"><span class="fm-pb-id">FM-03</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:28.8%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">144</span></div><div class="fm-pb-axis" aria-hidden="true"><span></span><span class="fm-pb-ticks"><span>0</span><span>250</span><span>500</span></span><span></span></div></div></figure>
+            <figure class="fm-fig fm-fig-m"><figcaption>Criticality: severity × occurrence</figcaption><svg class="fm-matrix" viewBox="0 0 360 330" role="img" aria-label="Criticality matrix, severity against occurrence"><rect class="fm-c-lo" x="44" y="266" width="28" height="28"/><rect class="fm-c-lo" x="72" y="266" width="28" height="28"/><rect class="fm-c-lo" x="100" y="266" width="28" height="28"/><rect class="fm-c-lo" x="128" y="266" width="28" height="28"/><rect class="fm-c-lo" x="156" y="266" width="28" height="28"/><rect class="fm-c-lo" x="184" y="266" width="28" height="28"/><rect class="fm-c-lo" x="212" y="266" width="28" height="28"/><rect class="fm-c-lo" x="240" y="266" width="28" height="28"/><rect class="fm-c-lo" x="268" y="266" width="28" height="28"/><rect class="fm-c-lo" x="296" y="266" width="28" height="28"/><rect class="fm-c-lo" x="44" y="238" width="28" height="28"/><rect class="fm-c-lo" x="72" y="238" width="28" height="28"/><rect class="fm-c-lo" x="100" y="238" width="28" height="28"/><rect class="fm-c-lo" x="128" y="238" width="28" height="28"/><rect class="fm-c-lo" x="156" y="238" width="28" height="28"/><rect class="fm-c-lo" x="184" y="238" width="28" height="28"/><rect class="fm-c-lo" x="212" y="238" width="28" height="28"/><rect class="fm-c-lo" x="240" y="238" width="28" height="28"/><rect class="fm-c-md" x="268" y="238" width="28" height="28"/><rect class="fm-c-md" x="296" y="238" width="28" height="28"/><rect class="fm-c-lo" x="44" y="210" width="28" height="28"/><rect class="fm-c-lo" x="72" y="210" width="28" height="28"/><rect class="fm-c-lo" x="100" y="210" width="28" height="28"/><rect class="fm-c-lo" x="128" y="210" width="28" height="28"/><rect class="fm-c-lo" x="156" y="210" width="28" height="28"/><rect class="fm-c-md" x="184" y="210" width="28" height="28"/><rect class="fm-c-md" x="212" y="210" width="28" height="28"/><rect class="fm-c-md" x="240" y="210" width="28" height="28"/><rect class="fm-c-md" x="268" y="210" width="28" height="28"/><rect class="fm-c-md" x="296" y="210" width="28" height="28"/><rect class="fm-c-lo" x="44" y="182" width="28" height="28"/><rect class="fm-c-lo" x="72" y="182" width="28" height="28"/><rect class="fm-c-lo" x="100" y="182" width="28" height="28"/><rect class="fm-c-lo" x="128" y="182" width="28" height="28"/><rect class="fm-c-md" x="156" y="182" width="28" height="28"/><rect class="fm-c-md" x="184" y="182" width="28" height="28"/><rect class="fm-c-md" x="212" y="182" width="28" height="28"/><rect class="fm-c-md" x="240" y="182" width="28" height="28"/><rect class="fm-c-md" x="268" y="182" width="28" height="28"/><rect class="fm-c-hi" x="296" y="182" width="28" height="28"/><rect class="fm-c-lo" x="44" y="154" width="28" height="28"/><rect class="fm-c-lo" x="72" y="154" width="28" height="28"/><rect class="fm-c-lo" x="100" y="154" width="28" height="28"/><rect class="fm-c-md" x="128" y="154" width="28" height="28"/><rect class="fm-c-md" x="156" y="154" width="28" height="28"/><rect class="fm-c-md" x="184" y="154" width="28" height="28"/><rect class="fm-c-md" x="212" y="154" width="28" height="28"/><rect class="fm-c-hi" x="240" y="154" width="28" height="28"/><rect class="fm-c-hi" x="268" y="154" width="28" height="28"/><rect class="fm-c-hi" x="296" y="154" width="28" height="28"/><rect class="fm-c-lo" x="44" y="126" width="28" height="28"/><rect class="fm-c-lo" x="72" y="126" width="28" height="28"/><rect class="fm-c-md" x="100" y="126" width="28" height="28"/><rect class="fm-c-md" x="128" y="126" width="28" height="28"/><rect class="fm-c-md" x="156" y="126" width="28" height="28"/><rect class="fm-c-md" x="184" y="126" width="28" height="28"/><rect class="fm-c-hi" x="212" y="126" width="28" height="28"/><rect class="fm-c-hi" x="240" y="126" width="28" height="28"/><rect class="fm-c-hi" x="268" y="126" width="28" height="28"/><rect class="fm-c-hi" x="296" y="126" width="28" height="28"/><rect class="fm-c-lo" x="44" y="98" width="28" height="28"/><rect class="fm-c-lo" x="72" y="98" width="28" height="28"/><rect class="fm-c-md" x="100" y="98" width="28" height="28"/><rect class="fm-c-md" x="128" y="98" width="28" height="28"/><rect class="fm-c-md" x="156" y="98" width="28" height="28"/><rect class="fm-c-hi" x="184" y="98" width="28" height="28"/><rect class="fm-c-hi" x="212" y="98" width="28" height="28"/><rect class="fm-c-hi" x="240" y="98" width="28" height="28"/><rect class="fm-c-hi" x="268" y="98" width="28" height="28"/><rect class="fm-c-hi" x="296" y="98" width="28" height="28"/><rect class="fm-c-lo" x="44" y="70" width="28" height="28"/><rect class="fm-c-lo" x="72" y="70" width="28" height="28"/><rect class="fm-c-md" x="100" y="70" width="28" height="28"/><rect class="fm-c-md" x="128" y="70" width="28" height="28"/><rect class="fm-c-hi" x="156" y="70" width="28" height="28"/><rect class="fm-c-hi" x="184" y="70" width="28" height="28"/><rect class="fm-c-hi" x="212" y="70" width="28" height="28"/><rect class="fm-c-hi" x="240" y="70" width="28" height="28"/><rect class="fm-c-hi" x="268" y="70" width="28" height="28"/><rect class="fm-c-hi" x="296" y="70" width="28" height="28"/><rect class="fm-c-hi" x="44" y="42" width="28" height="28"/><rect class="fm-c-hi" x="72" y="42" width="28" height="28"/><rect class="fm-c-hi" x="100" y="42" width="28" height="28"/><rect class="fm-c-hi" x="128" y="42" width="28" height="28"/><rect class="fm-c-hi" x="156" y="42" width="28" height="28"/><rect class="fm-c-hi" x="184" y="42" width="28" height="28"/><rect class="fm-c-hi" x="212" y="42" width="28" height="28"/><rect class="fm-c-hi" x="240" y="42" width="28" height="28"/><rect class="fm-c-hi" x="268" y="42" width="28" height="28"/><rect class="fm-c-hi" x="296" y="42" width="28" height="28"/><rect class="fm-c-hi" x="44" y="14" width="28" height="28"/><rect class="fm-c-hi" x="72" y="14" width="28" height="28"/><rect class="fm-c-hi" x="100" y="14" width="28" height="28"/><rect class="fm-c-hi" x="128" y="14" width="28" height="28"/><rect class="fm-c-hi" x="156" y="14" width="28" height="28"/><rect class="fm-c-hi" x="184" y="14" width="28" height="28"/><rect class="fm-c-hi" x="212" y="14" width="28" height="28"/><rect class="fm-c-hi" x="240" y="14" width="28" height="28"/><rect class="fm-c-hi" x="268" y="14" width="28" height="28"/><rect class="fm-c-hi" x="296" y="14" width="28" height="28"/><text class="vz-tick" x="58.0" y="308" text-anchor="middle">1</text><text class="vz-tick" x="36" y="284.0" text-anchor="end">1</text><text class="vz-tick" x="86.0" y="308" text-anchor="middle">2</text><text class="vz-tick" x="36" y="256.0" text-anchor="end">2</text><text class="vz-tick" x="114.0" y="308" text-anchor="middle">3</text><text class="vz-tick" x="36" y="228.0" text-anchor="end">3</text><text class="vz-tick" x="142.0" y="308" text-anchor="middle">4</text><text class="vz-tick" x="36" y="200.0" text-anchor="end">4</text><text class="vz-tick" x="170.0" y="308" text-anchor="middle">5</text><text class="vz-tick" x="36" y="172.0" text-anchor="end">5</text><text class="vz-tick" x="198.0" y="308" text-anchor="middle">6</text><text class="vz-tick" x="36" y="144.0" text-anchor="end">6</text><text class="vz-tick" x="226.0" y="308" text-anchor="middle">7</text><text class="vz-tick" x="36" y="116.0" text-anchor="end">7</text><text class="vz-tick" x="254.0" y="308" text-anchor="middle">8</text><text class="vz-tick" x="36" y="88.0" text-anchor="end">8</text><text class="vz-tick" x="282.0" y="308" text-anchor="middle">9</text><text class="vz-tick" x="36" y="60.0" text-anchor="end">9</text><text class="vz-tick" x="310.0" y="308" text-anchor="middle">10</text><text class="vz-tick" x="36" y="32.0" text-anchor="end">10</text><text class="vz-axis" x="184" y="328" text-anchor="middle">Occurrence →</text><text class="vz-axis" transform="translate(11 154) rotate(-90)" text-anchor="middle">Severity →</text><circle class="fm-pt" cx="114.0" cy="84.0" r="6" fill="var(--amber)"><title>FM-03 With cooling locked out, hall temperatures exceed safe thresholds within about 10–16 minutes and infrastructure shuts down across two availability zones (S8 O3 D6)</title></circle><text class="fm-pt-l" x="114.0" y="74.0" text-anchor="middle">03</text><circle class="fm-pt" cx="198.0" cy="84.0" r="6" fill="var(--amber)"><title>FM-01 Under voltage sag/swell the utility stays present but unstable, and transfer is inconsistent: some datacenters move to generator, others do not (S8 O6 D6); FM-02 Protection latches into full lockout, with no staged or degraded operation and no automatic return once voltage is normal (S8 O6 D6)</title></circle><text class="fm-pt-l" x="198.0" y="74.0" text-anchor="middle">01, 02</text><circle class="fm-pt" cx="226.0" cy="112.0" r="6" fill="var(--red)"><title>FM-05 Storage validation runs for about 14 hours, constrained by platform limitations and manual, sequential coordination (S7 O7 D9)</title></circle><text class="fm-pt-l" x="226.0" y="102.0" text-anchor="middle">05</text><circle class="fm-pt" cx="198.0" cy="140.0" r="6" fill="var(--amber)"><title>FM-04 Recovery depends on manual diagnosis and restoration under a process the PIR treats as needing better documentation (S6 O6 D6); FM-06 Weak tooling makes it hard to identify devices in protective states and prioritise foundational infrastructure (S6 O6 D8); FM-07 Log Analytics cannot self-recover from transient initialisation failures and depends on a single cluster (S6 O6 D8)</title></circle><text class="fm-pt-l" x="198.0" y="130.0" text-anchor="middle">04, 06, 07</text></svg></figure>
+        </div>
+        <div class="fm-sheet">
+            <div class="fm-head" aria-hidden="true"><span>ID</span><span>Failure mode</span><span>S·O·D</span><span>RPN</span><span>After</span></div>
+            <details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-05</span>
+    <span class="fm-mode">Storage validation runs for about 14 hours, constrained by platform limitations and manual, sequential coordination<span class="fm-item">Storage return-to-service</span></span>
+    <span class="fm-sod" aria-label="Severity 7, occurrence 7, detection 9">7·7·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>441</span>
+    <span class="fm-rpn-rev">252</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Validate and return storage nodes to service so dependent compute can resume</dd>
+      <dt>Effect</dt><dd>About 50% of VMs back by 06:15 UTC but about 95% only by 12:00 UTC; this tail sets most of the outage duration</dd>
+      <dt>Cause</dt><dd>Platform limits on the speed of returning storage nodes to service and dependence on manual coordination steps</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Seen during recovery</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>7</b></dt><dd>Half the affected VMs waited roughly six more hours after cooling was back: major degradation of a major service.</dd></div>
+      <div class="fm-sc"><dt>O <b>7</b></dt><dd>The platform limits and manual steps were standing conditions for any mass shutdown.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>Nothing in the record shows the return-to-service time was known before the event.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 441</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Remove platform limitations on storage-node return-to-service speed and reduce manual coordination <span class="fm-ev-src">Correction of errors #4</span></li></ul>
+    <p class="fm-revline">After action: S7 · O4 · D9 → RPN 252. With the platform limits removed, a long, manual storage return becomes less likely to set the outage length (O 7→4). Recorded as committed for July 2026, not confirmed complete, so the reduction is a claim about the action, not a confirmed outcome.</p>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Azure PIR GHRP-84G" target="_blank" rel="noopener nofollow">Sequence of events #9</a></span><span class="fm-ev-txt">2026-05-29 06:15 UTC — Approximately 50% of affected virtual machines recovered as infrastructure is brought back online.</span></li><li><span class="fm-ev-src"><a href="https://Azure PIR GHRP-84G" target="_blank" rel="noopener nofollow">Sequence of events #10</a></span><span class="fm-ev-txt">2026-05-29 ~06:15-12:00 UTC — Storage layer requires extended validation before dependent compute can resume; storage validation extended over ~14 hours, constrained by platform limitations and manual, sequential coordination.</span></li><li><span class="fm-ev-src"><a href="https://Azure PIR GHRP-84G" target="_blank" rel="noopener nofollow">Sequence of events #11</a></span><span class="fm-ev-txt">2026-05-29 12:00 UTC — Approximately 95% of VMs recovered after storage largely restored.</span></li><li><span class="fm-ev-src"><a href="https://Azure PIR GHRP-84G" target="_blank" rel="noopener nofollow">Metric #5</a></span><span class="fm-ev-txt">Virtual machines recovered: ~50% by 06:15 UTC; ~95% by 12:00 UTC 29 May</span></li><li><span class="fm-ev-src"><a href="https://Azure PIR GHRP-84G" target="_blank" rel="noopener nofollow">Metric #6</a></span><span class="fm-ev-txt">Storage validation duration: ~14 hours</span></li><li><span class="fm-ev-src">Contributing factor #6</span><span class="fm-ev-txt">PROCESS/PLATFORM — SLOW STORAGE RETURN-TO-SERVICE: Storage validation extended over ~14 hours; the PIR attributes this to &#x27;platform limitations that constrained the speed at which storage nodes could be returned to service&#x27; and to &#x27;dependencies on manual coordination steps&#x27; (Networking remediation, July 2026) — a recovery-architecture gap, not a maintenance failure.</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-01</span>
+    <span class="fm-mode">Under voltage sag/swell the utility stays present but unstable, and transfer is inconsistent: some datacenters move to generator, others do not<span class="fm-item">Utility supply and generator/UPS automatic transfer</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 6, detection 6">8·6·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>288</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Move the facilities to a stable on-site supply when utility power becomes unfit</dd>
+      <dt>Effect</dt><dd>Unstable voltage reaches protection inside the mechanical cooling plant in the facilities that stay on utility</dd>
+      <dt>Cause</dt><dd>Lightning-driven sag/swell events, and transfer logic that keys on utility present versus lost rather than on degraded supply; the PIR reports the divergence but does not state it as a lapse</dd>
+      <dt>Prevention in place</dt><dd>Automatic transfer to generator power, which engaged in some facilities and not others</dd>
+      <dt>Detection in place</dt><dd>Cooling protection components sensed abnormal electrical conditions at about 04:14 UTC</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>Start of a chain that shut down infrastructure in two availability zones and took about 22 hours to clear: full outage of major services for hours, the rubric&#x27;s 8. Not 9: the PIR names two AZs, not the whole region.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>Thunderstorm-driven power-quality disturbances are a foreseeable condition, and the transfer logic was weakly guarded against a supply that is present but unstable: &#x27;occasional&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>The abnormal conditions were sensed at onset, but nothing in the record turned that into a transfer everywhere: &#x27;detected at onset, not prevented&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 288</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Review and standardise generator/UPS transfer thresholds under voltage sag/swell across Quincy facilities <span class="fm-ev-src">Correction of errors #6</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Azure PIR GHRP-84G, azure.status.microsoft" target="_blank" rel="noopener nofollow">Sequence of events #1</a></span><span class="fm-ev-txt">2026-05-29 ~04:14 UTC — Severe thunderstorm with lightning drives &#x27;voltage sag/swell events&#x27; across multiple West US 2 (Quincy, WA) datacenter facilities; utility power remains present but unstable. No fire — a grid power-quality disturbance.</span></li><li><span class="fm-ev-src"><a href="https://Azure PIR GHRP-84G" target="_blank" rel="noopener nofollow">Sequence of events #7</a></span><span class="fm-ev-txt">2026-05-29 ~04:40 UTC — Power behavior diverges: some datacenters transfer to on-site generator power while others do not, because utility power &#x27;remained available&#x27; despite instability — generator/UPS transfer inconsistent under sag/swell.</span></li><li><span class="fm-ev-src">Contributing factor #4</span><span class="fm-ev-txt">COMMISSIONING/TUNING (observed, not confirmed as a lapse): &#x27;Some datacenters transferred to generator power, while others did not, as utility power remained available&#x27; — inconsistent generator/UPS transfer under sag/swell implies threshold/transfer tuning sensitivity; the PIR reports the divergence but does not state it as a lapse.</span></li><li><span class="fm-ev-src"><a href="https://azure.status.microsoft/en-us/status/history/" target="_blank" rel="noopener nofollow">Reference #1 · vendor-status</a></span><span class="fm-ev-txt">“Some datacenters transferred to generator power, while others did not”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-02</span>
+    <span class="fm-mode">Protection latches into full lockout, with no staged or degraded operation and no automatic return once voltage is normal<span class="fm-item">Mechanical cooling plant protection</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 6, detection 6">8·6·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>288</span>
+    <span class="fm-rpn-rev">144</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Protect cooling equipment from abnormal electrical conditions while keeping cooling available</dd>
+      <dt>Effect</dt><dd>Cooling capacity drops at 04:24 UTC and stays down until restored by hand</dd>
+      <dt>Cause</dt><dd>A design that prioritises equipment protection over operational continuity, so protection is all-or-nothing and latching</dd>
+      <dt>Prevention in place</dt><dd>None recorded beyond the protection itself</dd>
+      <dt>Detection in place</dt><dd>Lockout is immediate on abnormal electrical conditions</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>The lockout is the step that turned a grid transient into a two-AZ thermal shutdown, so it carries the chain&#x27;s severity.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>Whenever a sag/swell reaches the plant, the latching design produces the same lockout: a foreseeable condition, weakly guarded.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>The lockout and the loss of cooling were immediate and known, but the design gave no way to prevent the effect: &#x27;detected at onset, not prevented&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 288</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Holistic cooling fail-state review: staged or degraded operation instead of full lockout, and automatic recovery once power stabilises <span class="fm-ev-src">Correction of errors #1</span></li></ul>
+    <p class="fm-revline">After action: S8 · O3 · D6 → RPN 144. If protection degrades in stages and restarts itself, a transient is less likely to collapse cooling long enough to breach thermal limits (O 6→3). The action is a review committed for October 2026, which may or may not change the design, so the reduction is a claim about the action, not a confirmed outcome.</p>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Azure PIR GHRP-84G" target="_blank" rel="noopener nofollow">Sequence of events #3</a></span><span class="fm-ev-txt">2026-05-29 04:24 UTC — PIR customer-impact window begins. Mechanical cooling protection components enter a &#x27;lockout&#x27; protective state; cooling capacity drops.</span></li><li><span class="fm-ev-src"><a href="https://Azure PIR GHRP-84G" target="_blank" rel="noopener nofollow">Sequence of events #4</a></span><span class="fm-ev-txt">2026-05-29 ~04:24 UTC — Cooling lockout latches off — a &#x27;full lockout rather than staged or degraded operation&#x27; — and prevents parts of the cooling system from automatically returning to normal; data-hall temperatures begin rising toward safe-operating thresholds.</span></li><li><span class="fm-ev-src">Contributing factor #2</span><span class="fm-ev-txt">DESIGN — HARD LOCKOUT, NO STAGED DEGRADATION: Cooling protection &#x27;entered a lockout protective state&#x27;; the PIR states the design &#x27;resulted in a full lockout rather than staged or degraded operation&#x27; and a holistic cooling fail-state review is committed for October 2026, confirming the all-or-nothing design as a contributing factor.</span></li><li><span class="fm-ev-src">Contributing factor #3</span><span class="fm-ev-txt">DESIGN — NO COOLING AUTO-RECOVERY: The lockout &#x27;prevented parts of the cooling system from automatically returning to normal operation,&#x27; so cooling could not self-restore once the transient passed and required manual human diagnosis and restoration.</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“resulted in a full lockout rather than staged or degraded operation”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-06</span>
+    <span class="fm-mode">Weak tooling makes it hard to identify devices in protective states and prioritise foundational infrastructure<span class="fm-item">Protective-state visibility tooling</span></span>
+    <span class="fm-sod" aria-label="Severity 6, occurrence 6, detection 8">6·6·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>288</span>
+    <span class="fm-rpn-rev">144</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Show operators which devices have entered protective states and need manual recovery</dd>
+      <dt>Effect</dt><dd>Prioritised recovery across the two affected availability zones is slowed</dd>
+      <dt>Cause</dt><dd>Tooling gap, and limited cross-team awareness of thermal events on shared infrastructure</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Found during recovery</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>6</b></dt><dd>Lengthens recovery without causing impact; the dossier does not quantify how much, so it is scored at 6 rather than counted as part of FM-05&#x27;s tail.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>Any event that puts many devices into protective states exercises the gap.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>The gap was found while operators were recovering, after impact.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 288</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Improve tooling to identify devices in protective states and prioritise foundational infrastructure <span class="fm-ev-src">Correction of errors #5</span></li></ul>
+    <p class="fm-revline">After action: S6 · O6 · D4 → RPN 144. Tooling that lists devices in protective states would show operators what needs manual recovery early enough to act (D 8→4). Recorded as committed for August 2026, not confirmed complete, so the reduction is a claim about the action, not a confirmed outcome.</p>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #8</span><span class="fm-ev-txt">TOOLING GAP: Weak tooling to &#x27;identify which infrastructure devices have entered protective states and require manual recovery&#x27; slowed prioritized recovery across the two affected availability zones (Networking remediation, target August 2026).</span></li><li><span class="fm-ev-src">Improvement #6</span><span class="fm-ev-txt">TOOLING — PROTECTIVE-STATE VISIBILITY (committed, August 2026): Improve tooling/processes to identify which infrastructure devices have entered protective states and require manual recovery, and improve cross-team awareness when thermal events affect shared infrastructure.</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-07</span>
+    <span class="fm-mode">Log Analytics cannot self-recover from transient initialisation failures and depends on a single cluster<span class="fm-item">Log Analytics and Application Insights telemetry</span></span>
+    <span class="fm-sod" aria-label="Severity 6, occurrence 6, detection 8">6·6·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>288</span>
+    <span class="fm-rpn-rev">144</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Restart cleanly and process backlogs after infrastructure returns</dd>
+      <dt>Effect</dt><dd>All other services recovered by 20:18 UTC; telemetry backlogs not cleared until 02:30 UTC on 30 May, the last part of the outage</dd>
+      <dt>Cause</dt><dd>No startup resiliency and a single-cluster dependency</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Seen during recovery</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>6</b></dt><dd>Outage confined to two telemetry services for about six hours after everything else was back: the rubric&#x27;s 6.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>Any mass restart exercises the same transient initialisation failures: &#x27;occasional&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>Found after impact while the services were processing backlogs.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 288</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Add Log Analytics startup resiliency and multi-cluster flexibility <span class="fm-ev-src">Correction of errors #3</span></li></ul>
+    <p class="fm-revline">After action: S6 · O3 · D8 → RPN 144. Self-recovery from transient failures and multi-cluster flexibility remove the two causes recorded (O 6→3). Recorded as committed for June and August 2026, not confirmed complete, so the reduction is a claim about the action, not a confirmed outcome.</p>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Azure PIR GHRP-84G" target="_blank" rel="noopener nofollow">Sequence of events #12</a></span><span class="fm-ev-txt">2026-05-29 20:18 UTC — All services recovered except Application Insights and Log Analytics, which are processing telemetry backlogs; Log Analytics could not self-recover from transient initialization failures and over-depended on a single cluster.</span></li><li><span class="fm-ev-src"><a href="https://Azure PIR GHRP-84G" target="_blank" rel="noopener nofollow">Sequence of events #13</a></span><span class="fm-ev-txt">2026-05-30 02:30 UTC — Full mitigation declared, including clearing telemetry backlogs (PIR window end). Total incident duration ~22 hours.</span></li><li><span class="fm-ev-src">Contributing factor #7</span><span class="fm-ev-txt">DESIGN — TELEMETRY SINGLE-CLUSTER DEPENDENCY &amp; NO SELF-RECOVERY: Log Analytics could not self-recover from transient initialization failures and over-depended on a single cluster; remediations add startup resiliency (June 2026) and multi-cluster flexibility &#x27;reducing dependence on any single cluster or resource type&#x27; (August 2026), making telemetry the longest tail (backlog cleared 02:30 UTC 30 May).</span></li><li><span class="fm-ev-src"><a href="https://Azure PIR GHRP-84G" target="_blank" rel="noopener nofollow">Metric #8</a></span><span class="fm-ev-txt">Full mitigation incl. telemetry backlog clearance: 02:30 UTC 30 May 2026</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-04</span>
+    <span class="fm-mode">Recovery depends on manual diagnosis and restoration under a process the PIR treats as needing better documentation<span class="fm-item">Cooling recovery process</span></span>
+    <span class="fm-sod" aria-label="Severity 6, occurrence 6, detection 6">6·6·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>216</span>
+    <span class="fm-rpn-rev">144</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Restore cooling quickly after a protective lockout</dd>
+      <dt>Effect</dt><dd>Cooling restored and temperatures stabilised at about 05:55 UTC, about 1.5 hours after impact</dd>
+      <dt>Cause</dt><dd>No automatic return from lockout, and a manual, under-documented restoration process</dd>
+      <dt>Prevention in place</dt><dd>Azure datacenter operations teams on site, starting diagnosis at about 04:31 UTC</dd>
+      <dt>Detection in place</dt><dd>Known from the lockout onward</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>6</b></dt><dd>Sets the length of the thermal excursion, about 1.5 hours, which is a small part of the 22-hour outage: scored at 6.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>Every lockout requires the same manual path: &#x27;occasional, weakly guarded&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>The need for manual recovery was known at onset; nothing shortened it: &#x27;detected at onset, not prevented&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 216</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Improve manual cooling recovery processes and documentation <span class="fm-ev-src">Correction of errors #2</span></li></ul>
+    <p class="fm-revline">After action: S6 · O4 · D6 → RPN 144. Better-documented recovery makes a slow manual restoration less likely (O 6→4). Recorded as committed for June 2026; the dossier does not confirm completion, so the reduction is a claim about the action, not a confirmed outcome.</p>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Azure PIR GHRP-84G (forensic mapping of 04:31 timestamp)" target="_blank" rel="noopener nofollow">Sequence of events #5</a></span><span class="fm-ev-txt">2026-05-29 ~04:31 UTC — Azure datacenter operations begin manual cooling diagnosis and restoration. No external emergency services — there was no fire; response is Azure&#x27;s own teams. No evacuation reported (lights-out mechanical/data-hall context).</span></li><li><span class="fm-ev-src"><a href="https://Azure PIR GHRP-84G" target="_blank" rel="noopener nofollow">Sequence of events #8</a></span><span class="fm-ev-txt">2026-05-29 ~05:55 UTC — All cooling restored in impacted datacenters and temperatures stabilized (~1.5 h from impact). Physical/thermal hazard contained; the long tail is now data/service recovery, not physical risk.</span></li><li><span class="fm-ev-src"><a href="https://Azure PIR GHRP-84G" target="_blank" rel="noopener nofollow">Metric #4</a></span><span class="fm-ev-txt">Cooling restored / temperatures stabilized: ~05:55 UTC 29 May (~1.5 h after impact)</span></li><li><span class="fm-ev-src">Contributing factor #5</span><span class="fm-ev-txt">PROCESS — MANUAL, UNDER-DOCUMENTED COOLING RECOVERY: Recovery depended on manual cooling diagnosis and restoration; Azure committed to improving cooling recovery processes and documentation (target June 2026), indicating the manual process contributed to duration.</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-03</span>
+    <span class="fm-mode">With cooling locked out, hall temperatures exceed safe thresholds within about 10–16 minutes and infrastructure shuts down across two availability zones<span class="fm-item">Data-hall thermal ride-through and automated IT shutdown</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 3, detection 6">8·3·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>144</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Keep IT equipment within safe temperatures, and protect it if cooling is lost</dd>
+      <dt>Effect</dt><dd>Multi-service outage across AZ-01 and AZ-03; the shutdown protects hardware and no damage is reported</dd>
+      <dt>Cause</dt><dd>Little thermal ride-through once cooling stops while IT load continues; numeric temperatures, thresholds and rate of rise are not disclosed</dd>
+      <dt>Prevention in place</dt><dd>Automated shutdown to prevent damage and preserve data integrity, which worked as designed</dd>
+      <dt>Detection in place</dt><dd>Temperature thresholds trigger the shutdown at about 04:40 UTC</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>This is where the mechanical fault becomes a customer outage across two AZs for hours: the rubric&#x27;s 8.</dd></div>
+      <div class="fm-sc"><dt>O <b>3</b></dt><dd>Needs cooling to be lost first; held low so the event is not counted twice at full weight with FM-02.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>The excursion was seen and acted on automatically at onset, but the action is the outage itself: &#x27;detected at onset, not prevented&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 144</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li class="fm-residual">No corrective action is recorded in the published sources. This mode is residual risk.</li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Azure PIR GHRP-84G" target="_blank" rel="noopener nofollow">Sequence of events #6</a></span><span class="fm-ev-txt">2026-05-29 ~04:40 UTC — Protective de-energisation: as temperatures &#x27;rose beyond safe operating thresholds,&#x27; cloud infrastructure automatically shuts down &#x27;to prevent damage&#x27; and &#x27;preserve data integrity&#x27; across two physical availability zones (AZ-01, AZ-03). Equipment self-protection, no agent/water discharge.</span></li><li><span class="fm-ev-src"><a href="https://Azure PIR GHRP-84G (approximate)" target="_blank" rel="noopener nofollow">Metric #3</a></span><span class="fm-ev-txt">Cooling loss to automated thermal shutdown: ~10-16 minutes (04:24 impact to ~04:40 shutdown)</span></li><li><span class="fm-ev-src"><a href="https://Azure PIR GHRP-84G" target="_blank" rel="noopener nofollow">Metric #7</a></span><span class="fm-ev-txt">Availability zones affected: 2 physical AZs (AZ-01 and AZ-03)</span></li><li><span class="fm-ev-src">Technical deep-dive</span><span class="fm-ev-txt">“The PIR gives no numeric temperature, threshold, or rate-of-rise”</span></li></ul>
+  </div>
+</details>
+        </div>
+        <details class="fm-method"><summary>Scoring rubric and method</summary><div class="fm-method-body"><p>A retrospective FMEA: each row asks how this system could fail, how bad the effect was, how likely the cause was given the controls in place at the time, and how likely those controls were to catch it before customers did. Scales are adapted for data-centre operations from the 1–10 scales of IEC 60812:2018 and the AIAG-VDA FMEA handbook. RPN = S × O × D. Priority is High when S ≥ 9 with O ≥ 4 or D ≥ 7, or when RPN ≥ 300; Medium when RPN ≥ 120 or S ≥ 7; Low otherwise. Severity overrides the product because a large S multiplied by small O and D can hide a region-wide outage nothing would catch.</p><p>Every row cites evidence from this dossier, and every quote is checked verbatim against its source by <code>tools/test-incidents-fmea.py</code>. A revised score is only shown against a published corrective action. This is an RZ analyst assessment, not an operator document.</p><div class="fm-rubrics"><div><p class="fm-sub">Severity</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Hazard to people, or loss of the facility / several regions</td></tr><tr><td>9</td><td>Region-wide or provider-wide outage of a foundational service, no workaround</td></tr><tr><td>8</td><td>Full outage of a major service for hours</td></tr><tr><td>7</td><td>Major degradation of a major service</td></tr><tr><td>6</td><td>Partial outage confined to one zone or one service</td></tr><tr><td>5</td><td>Customer-visible degradation</td></tr><tr><td>4</td><td>Limited customer impact</td></tr><tr><td>3</td><td>Internal impact only</td></tr><tr><td>2</td><td>Negligible</td></tr><tr><td>1</td><td>No effect</td></tr></tbody></table></div><div><p class="fm-sub">Occurrence</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Near certain: the cause is present in normal operation</td></tr><tr><td>8</td><td>Frequent: routine work exercises the cause</td></tr><tr><td>6</td><td>Occasional: a foreseeable slip or condition, weakly guarded</td></tr><tr><td>4</td><td>Infrequent: needs an unusual combination</td></tr><tr><td>2</td><td>Remote: guarded by design</td></tr><tr><td>1</td><td>Eliminated by design</td></tr></tbody></table></div><div><p class="fm-sub">Detection</p><table class="fm-rubric"><tbody><tr><td>10</td><td>No control could detect it</td></tr><tr><td>9</td><td>Detected only through customer impact</td></tr><tr><td>8</td><td>Detected after impact by internal monitoring</td></tr><tr><td>6</td><td>Detected at onset, not prevented</td></tr><tr><td>4</td><td>Detected before impact with time to act</td></tr><tr><td>2</td><td>Automated interlock almost certainly stops it</td></tr><tr><td>1</td><td>Certain to be stopped</td></tr></tbody></table></div></div></div></details>
+
 
         <h2>Correction of errors (COE)</h2>
         <ul class="tight"><li>Holistic cooling system fail-state review — evaluate staged/degraded operation vs. full lockout and enable automatic recovery once power stabilizes <span class="coe-meta">Azure Cloud Operations &amp; Innovation (Cooling) · Committed, target October 2026</span></li><li>Improve manual cooling recovery processes and documentation to shorten diagnosis/restoration <span class="coe-meta">Azure Datacenter Operations · Committed, target June 2026</span></li><li>Add Log Analytics startup resiliency (self-recover from transient init failures) and multi-cluster flexibility to reduce single-cluster dependence <span class="coe-meta">Azure Log Analytics team · Committed, June 2026 (startup) and August 2026 (multi-cluster)</span></li><li>Remove platform limitations constraining storage-node return-to-service speed and reduce manual coordination dependencies <span class="coe-meta">Azure Networking team · Committed, target July 2026</span></li><li>Improve tooling to identify devices in protective states and prioritize foundational infrastructure, with cross-team awareness of thermal events on shared infrastructure <span class="coe-meta">Azure Networking team · Committed, target August 2026</span></li><li>Review/standardize generator-UPS automatic-transfer thresholds under voltage sag/swell across Quincy facilities <span class="coe-meta">Azure Datacenter Engineering · Analyst-recommended; not explicitly committed in the PIR</span></li></ul>
@@ -441,7 +739,7 @@ Layer 4 — the recovery tail, which is where most of the ~22-hour duration live
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-1a1a084f"></script>
+    <script src="js/rz-version.js?v=20261010-00a1d9e8"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

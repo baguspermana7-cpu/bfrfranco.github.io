@@ -374,5 +374,320 @@
   "confidence": "high"
  },
  "lastUpdated": "2026-07-31",
- "operatorShort": "CrowdStrike"
+ "operatorShort": "CrowdStrike",
+ "fmea": {
+  "scope": "The Falcon Windows sensor's Rapid Response Content path: the IPC Template Type and the integration code that feeds it, the Content Validator and test suite that gate new Template Instances, the kernel-mode Content Interpreter in csagent.sys, the global delivery of Channel File 291, and recovery of hosts left in a boot loop. Analysed retrospectively from CrowdStrike's External Technical Root Cause Analysis, Preliminary PIR and Remediation Hub, with Microsoft's device estimate and press reports of sector impact. Most corrective actions are recorded as done with dates in the RCA, so revised scores are claimed for them; test expansion and canary granularity are recorded as partly done, and no recovery-tooling action is recorded for the boot-loop mode. The 8.5 million figure is Microsoft's estimate, and downstream dollar figures are not used to score severity.",
+  "modes": [
+   {
+    "id": "FM-01",
+    "item": "IPC Template Type and its sensor integration code (sensor 7.11)",
+    "function": "Supply the Content Interpreter with every input field the Template Type declares",
+    "failureMode": "The Template Type declares 21 input fields but the integration code supplies only 20",
+    "effect": "A latent defect ships in February 2024 and stays dormant until a Template Instance uses a non-wildcard criterion on the 21st field on 19 July",
+    "cause": "No compile-time check that a Template Type's declared input count matches what the sensor provides",
+    "prevention": "Build validation and testing, which the mismatch evaded",
+    "detection": "None; the mismatch 'was not detected during development of the IPC Template Type'",
+    "S": 10,
+    "O": 4,
+    "D": 9,
+    "rationale": {
+     "S": "The defect it enabled crashed an estimated 8.5 million Windows devices across every region and took down 911 lines in four US states and hospital operations: a hazard to people and loss of service across several regions, the rubric's 10.",
+     "O": "It stayed harmless while every instance wildcarded the 21st field, so harm needed an unusual combination with a non-wildcard instance: 'infrequent'.",
+     "D": "It evaded build validation and testing for about five months and was revealed only by hosts crashing."
+    },
+    "evidence": [
+     {
+      "src": "ref",
+      "i": 3,
+      "quote": "The IPC Template Type defined 21 input parameter fields, but the integration code"
+     },
+     {
+      "src": "metric",
+      "i": 2
+     },
+     {
+      "src": "factor",
+      "i": 0,
+      "quote": "evaded multiple layers of build validation and testing"
+     },
+     {
+      "src": "soe",
+      "i": 0
+     },
+     {
+      "src": "ref",
+      "i": 9,
+      "quote": "911 lines in multiple states were down, including Alaska, Arizona, New Hampshire and Ohio."
+     }
+    ],
+    "actions": [
+     {
+      "text": "Validate Template Type input-field count at sensor compile time, and confirm no other Template Type supplies a wrong count on any platform",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     }
+    ],
+    "revised": {
+     "S": 10,
+     "O": 2,
+     "D": 2
+    },
+    "revisedRationale": "The Sensor Content Compiler now rejects a count mismatch at build time, and CrowdStrike verified no other Template Type had one (O 4→2), with the compile check acting as an automated interlock (D 9→2). Recorded as in production on 27 July 2024. Severity is unchanged should a similar fault get through another way."
+   },
+   {
+    "id": "FM-02",
+    "item": "Content Validator",
+    "function": "Reject any Template Instance the runtime interpreter cannot safely consume",
+    "failureMode": "Validates against a 21-input contract while the interpreter receives 20, so the problematic instance passes",
+    "effect": "The instance with a non-wildcard 21st-field criterion is sent to the Content Interpreter on every online 7.11+ Windows host",
+    "cause": "Logic error in the validator: it assessed content against the Template Type definition rather than the inputs actually supplied",
+    "prevention": "The validator was the last automated gate before release",
+    "detection": "None before release",
+    "S": 10,
+    "O": 5,
+    "D": 9,
+    "rationale": {
+     "S": "This gate's failure released the content that caused the multi-region outage, so it carries the same severity as FM-01.",
+     "O": "The logic error was standing and any instance using the 21st field would test it; between 'infrequent' and 'occasional'.",
+     "D": "Nothing checked the validator's contract against the runtime; the failure became visible only through crashing hosts."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 2,
+      "quote": "based its assessment on the expectation that the IPC Template Type would be provided with 21 inputs"
+     },
+     {
+      "src": "ref",
+      "i": 1,
+      "quote": "Due to a bug in the Content Validator, one of the two Template Instances passed validation despite containing problematic content data."
+     },
+     {
+      "src": "soe",
+      "i": 2
+     }
+    ],
+    "actions": [
+     {
+      "text": "Harden the Content Validator to reject over-matching instances and allow only wildcard matching in the 21st field",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     }
+    ],
+    "revised": {
+     "S": 10,
+     "O": 5,
+     "D": 2
+    },
+    "revisedRationale": "The hardened validator now refuses an instance that matches over more fields than are provided, an automated interlock for this class (D 9→2). Recorded as released to production by 19 August 2024."
+   },
+   {
+    "id": "FM-03",
+    "item": "Template Type test suite",
+    "function": "Exercise the code paths that production content will use before release",
+    "failureMode": "All 12 static test cases wildcard the 21st field, so no test exercises a non-wildcard 21st input",
+    "effect": "The out-of-bounds read is never triggered in development or release builds",
+    "cause": "Test data mirrored the initial instances rather than the full contract",
+    "prevention": "Automated tests and a stress-test Template Instance",
+    "detection": "None; the tests passed",
+    "S": 10,
+    "O": 3,
+    "D": 9,
+    "rationale": {
+     "S": "Another gate on the route to the same outage; it carries that severity.",
+     "O": "Scored lower than FM-02 so the one event is not counted again at full weight: the gap only matters if the earlier defect exists and the validator also misses it.",
+     "D": "A passing test suite gave no signal; the gap was revealed through customer impact."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 1,
+      "quote": "a static set of 12 test cases"
+     },
+     {
+      "src": "metric",
+      "i": 5
+     },
+     {
+      "src": "rootCause",
+      "quote": "included a regex wildcard matching criterion in the 21st field for all Template Instances"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Expand test coverage to non-wildcard matching criteria for every field on all Template Types, and complete and extend fuzz testing",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     }
+    ],
+    "revised": {
+     "S": 10,
+     "O": 3,
+     "D": 4
+    },
+    "revisedRationale": "Non-wildcard tests on every field would surface a missing input before release (D 9→4). The dossier records this as done for existing types with expansion ongoing, so the reduction is partly a claim about the action rather than a confirmed outcome."
+   },
+   {
+    "id": "FM-04",
+    "item": "Content Interpreter in csagent.sys (kernel mode)",
+    "function": "Evaluate Template Instances against supplied inputs without faulting the kernel",
+    "failureMode": "Reads a 21st element from a 20-element input array with no bounds check, faulting the kernel",
+    "effect": "PAGE_FAULT_IN_NONPAGED_AREA (0x50) bugcheck and BSOD at the next named-pipe IPC event on each affected host",
+    "cause": "No runtime array-bounds or input-count check in the routine that retrieves input strings",
+    "prevention": "None recorded at runtime",
+    "detection": "The dossier does not record how CrowdStrike first detected the crashes; the first recorded signal is hosts crashing",
+    "S": 10,
+    "O": 4,
+    "D": 9,
+    "rationale": {
+     "S": "This is the point at which bad content becomes a kernel crash on millions of hosts across sectors and regions, including emergency services.",
+     "O": "It needs malformed content to reach the interpreter past the earlier gates: 'infrequent'.",
+     "D": "No runtime guard existed; the fault showed as hosts crashing, which is detection through impact."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 3,
+      "quote": "produced an out-of-bounds memory read beyond the end of the input data array and resulted in a system crash"
+     },
+     {
+      "src": "metric",
+      "i": 4
+     },
+     {
+      "src": "metric",
+      "i": 3
+     },
+     {
+      "src": "soe",
+      "i": 3
+     },
+     {
+      "src": "soe",
+      "i": 4
+     }
+    ],
+    "actions": [
+     {
+      "text": "Add runtime input-array bounds checking and array-size validation to the Content Interpreter, backported to all Windows sensors 7.11 and above",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     }
+    ],
+    "revised": {
+     "S": 4,
+     "O": 4,
+     "D": 9
+    },
+    "revisedRationale": "With bounds and size checks the same malformed content should no longer fault the kernel, so the effect drops from a crashed host to limited impact (S 10→4); the improvement wording is that parsing faults 'degrade gracefully', and the dossier does not describe the degraded behaviour itself. Recorded as added on 25 July 2024 and generally available by 9 August 2024."
+   },
+   {
+    "id": "FM-05",
+    "item": "Rapid Response Content delivery",
+    "function": "Release new Template Instances to a small population first and stop on a crash-rate spike",
+    "failureMode": "Channel File 291 is pushed to all online 7.11+ Windows hosts in one window, with no staged or canary rollout and no customer control over timing",
+    "effect": "The bad file is live for about 78 minutes (04:09 to 05:27 UTC) and reaches hosts worldwide within minutes",
+    "cause": "Template Instances treated as configuration data and not given code-grade staged delivery",
+    "prevention": "None recorded at the delivery stage",
+    "detection": "None before broad release",
+    "S": 10,
+    "O": 6,
+    "D": 9,
+    "rationale": {
+     "S": "Global one-shot delivery is what made a single content defect a multi-region, cross-sector event.",
+     "O": "Every content push used this path with no rollout guard, so any defect passing the earlier gates would go global: 'occasional, weakly guarded'.",
+     "D": "No canary health signal existed to stop the push; the fault was seen through crashing hosts."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 4,
+      "quote": "the file reached online 7.11+ Windows hosts globally in one window"
+     },
+     {
+      "src": "metric",
+      "i": 1
+     },
+     {
+      "src": "soe",
+      "i": 6
+     },
+     {
+      "src": "ref",
+      "i": 6,
+      "quote": "we currently estimate that CrowdStrike's update affected 8.5 million Windows devices"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Staged canary deployment for Template Instances with bake time and rollback, and customer control over Rapid Response Content delivery",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     }
+    ],
+    "revised": {
+     "S": 6,
+     "O": 6,
+     "D": 4
+    },
+    "revisedRationale": "A canary ring would show a crash on a small population with time to halt the release (D 9→4) and confine the effect to that ring (S 10→6). The dossier records the initial controls as shipped with granularity still being enhanced, so the size of the reduction is a claim about the action, not a confirmed outcome."
+   },
+   {
+    "id": "FM-06",
+    "item": "Recovery of hosts in a boot loop",
+    "function": "Return crashed hosts to service once the bad content is withdrawn",
+    "failureMode": "Hosts that crashed re-crash on every boot and cannot fetch the reverted file, so recovery needs hands-on work per machine",
+    "effect": "The 05:27 UTC revert does not heal crashed hosts; recovery means Safe Mode file deletion, slowed by BitLocker recovery keys, and about 99% of sensors are back online only by 29 July",
+    "cause": "csagent.sys is a boot-start driver that re-reads the same channel file before the host can reach the network",
+    "prevention": "None recorded",
+    "detection": "Seen through crashed hosts",
+    "S": 9,
+    "O": 5,
+    "D": 9,
+    "rationale": {
+     "S": "This mode sets how long the outage lasted rather than whether it happened; days of loss of critical hosts is scored 9 so the outage itself is not counted again at FM-01's 10.",
+     "O": "Any early-boot fault in the driver produces this condition, which is present by design though rarely triggered.",
+     "D": "No control is recorded that would have revealed the recovery gap before hosts were already looping."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 5,
+      "quote": "blocking the auto-reverted good channel file from reaching crashed hosts"
+     },
+     {
+      "src": "soe",
+      "i": 8
+     },
+     {
+      "src": "soe",
+      "i": 10
+     },
+     {
+      "src": "metric",
+      "i": 6
+     }
+    ],
+    "actions": [
+     {
+      "text": "Maintain pre-built, tested recovery tooling so boot-looping endpoints can be recovered quickly at scale",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     }
+    ]
+   }
+  ]
+ }
 }

@@ -52,6 +52,12 @@
     .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
     .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
     .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:2px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    /* A chip carries the operator name, which can be a whole sentence ("Google Cloud
+       (impacted tenant); STT GDC / Tata Communications JV (named as the third-party …").
+       nowrap made that one chip 1120px wide and pushed the GCP Delhi dossier into a
+       1260px page at a 1100px viewport. Short chips are unaffected: normal wrapping
+       only engages when a chip would not fit its row. */
+    .chips .chip { max-width:100%; white-space:normal; overflow-wrap:anywhere; }
     .chip.cyan { color:var(--cyan); border-left:2px solid var(--cyan); }
     .chip.amber { color:var(--amber); border-left:2px solid var(--amber); }
     .chip.green { color:var(--green); border-left:2px solid var(--green); }
@@ -71,6 +77,11 @@
     /* rich incident table (reference-2 style) */
     table.itbl { min-width:1120px; }
     table.itbl td { vertical-align:middle; }
+    /* v1.134.20 — the title and summary columns ellipsise so the table's columns line up,
+       which is the right call for a dense index. But the cut text was reachable only by
+       navigating to the incident: a summary lost 238-298px of its sentence with no way to read
+       it in place. Each carries its full text in a title attribute now, so the truncation is
+       deliberate AND non-lossy — which is the condition the legibility audit checks for. */
     .itr { cursor:pointer; }
     .itr:hover td { background:var(--surface-2); }
     .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
@@ -240,7 +251,6 @@
        derive width = W px from the aspect ratio, so the drawing renders 1:1 at any event count
        and the panel scrolls instead of shrinking. */
     .viz-timeline svg { max-width:none; height:96px; width:auto; }
-
     .viz-radar svg { max-width:320px; margin:0 auto; }
     .vz-num { font-variant-numeric:tabular-nums slashed-zero; }
     .vz-box-t, .vz-box-s, .vz-lbl, .vz-hb-lbl, .vz-tl-t, .vz-pt, .vz-tick { pointer-events:auto; }
@@ -323,7 +333,86 @@
     }
     @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
 </style>
-    
+    <style>
+    /* ── FMEA (v3.12.3) — one hairline panel of rows, like the rest of the dossier.
+       No cards, no stripes: a row is a disclosure, state is a 7px dot. ── */
+    .fm-scope { color:var(--text-body); max-width:70ch; }
+    .fm-meta { flex-wrap:wrap; row-gap:0.25rem; }
+    .fm-viz { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:1.6rem; align-items:start; margin:1.2rem 0; }
+    @media (max-width:820px){ .fm-viz { grid-template-columns:1fr; } }
+    .fm-pb-row, .fm-pb-axis { display:grid; grid-template-columns:3.6rem minmax(0,1fr) 6.6rem; gap:0.6rem; align-items:center; }
+    .fm-pb-row { padding:0.32rem 0; }
+    .fm-pb-id, .fm-pb-val { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.8rem; }
+    .fm-pb-id { color:var(--muted); }
+    .fm-pb-val { color:var(--text-strong); white-space:nowrap; }
+    .fm-pb-track { display:flex; flex-direction:column; gap:3px; }
+    .fm-pb-bar { display:block; height:12px; }
+    .fm-pb-rev { display:block; height:4px; background:var(--text-body); opacity:0.55; }
+    .fm-pb-none { font-style:italic; font-size:0.72rem; color:var(--muted); line-height:1; }
+    .fm-pb-axis { margin-top:0.3rem; border-top:1px solid var(--line); padding-top:0.25rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .fm-pb-ticks { display:flex; justify-content:space-between; }
+    .fm-fig { margin:0; }
+    .fm-fig figcaption { font-size:0.8rem; color:var(--muted); margin-bottom:0.35rem; }
+    .fm-fig svg { width:100%; height:auto; display:block; }
+    .fm-fig-m svg { max-width:340px; }
+    .fm-matrix .fm-c-lo { fill:var(--surface); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-md { fill:color-mix(in srgb, var(--amber) 9%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-hi { fill:color-mix(in srgb, var(--red) 10%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .vz-axis { font-size:10px; fill:var(--muted); font-family:'IBM Plex Sans',sans-serif; }
+    .fm-matrix .fm-pt { stroke:var(--surface); stroke-width:1.5; }
+    .fm-matrix .fm-pt-l { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; fill:var(--text-strong);
+      paint-order:stroke; stroke:var(--surface); stroke-width:3px; stroke-linejoin:round; }
+    .fm-sheet { border:1px solid var(--line); border-radius:4px; margin-top:0.8rem; }
+    .fm-head, .fm-row > summary { display:grid; grid-template-columns:4.2rem minmax(0,1fr) 4.4rem 4.6rem 3.4rem; gap:0.6rem; align-items:baseline; padding:0.6rem 0.9rem; }
+    .fm-head { font-size:0.74rem; color:var(--muted); border-bottom:1px solid var(--line); }
+    .fm-row { border-top:1px solid var(--line); }
+    .fm-row:first-of-type { border-top:0; }
+    .fm-row > summary { cursor:pointer; list-style:none; }
+    .fm-row > summary::-webkit-details-marker { display:none; }
+    .fm-row > summary:hover { background:var(--surface-2); }
+    .fm-row > summary:focus-visible { outline:2px solid var(--cyan); outline-offset:-2px; }
+    .fm-id-cell, .fm-sod, .fm-rpn, .fm-rpn-rev { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.84rem; }
+    .fm-id-cell { color:var(--muted); }
+    .fm-mode { color:var(--text-strong); font-size:0.92rem; line-height:1.4; }
+    .fm-item { display:block; color:var(--muted); font-size:0.8rem; }
+    .fm-sod { color:var(--text-body); }
+    .fm-rpn { color:var(--text-strong); }
+    .fm-rpn-rev { color:var(--muted); }
+    .fm-dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:0.45rem; vertical-align:0.1em; }
+    .fm-body { padding:0.2rem 0.9rem 1rem 5.7rem; }
+    @media (max-width:640px){
+      .fm-head { display:none; }
+      .fm-row > summary { grid-template-columns:3.2rem minmax(0,1fr) auto; }
+      .fm-sod, .fm-rpn-rev { display:none; }
+      .fm-body { padding:0.2rem 0.9rem 1rem; }
+    }
+    .fm-kv { display:grid; grid-template-columns:9.5rem minmax(0,1fr); gap:0.3rem 0.9rem; margin:0.4rem 0 0.8rem; font-size:0.88rem; }
+    .fm-kv dt { color:var(--muted); }
+    .fm-kv dd { margin:0; color:var(--text-body); }
+    @media (max-width:640px){ .fm-kv { grid-template-columns:1fr; } .fm-kv dd { margin-bottom:0.4rem; } }
+    .fm-scores { margin:0 0 0.6rem; border-top:1px solid var(--line); }
+    .fm-sc { display:grid; grid-template-columns:3.2rem minmax(0,1fr); gap:0.6rem; padding:0.45rem 0; border-bottom:1px solid var(--line); font-size:0.86rem; }
+    .fm-sc dt { font-family:'JetBrains Mono',monospace; color:var(--muted); }
+    .fm-sc dt b { color:var(--text-strong); }
+    .fm-sc dd { margin:0; color:var(--text-body); }
+    .fm-sub { font-size:0.8rem; color:var(--muted); margin:0.7rem 0 0.25rem; }
+    .fm-sub b { color:var(--text-strong); }
+    .fm-acts, .fm-ev { margin:0; padding-left:1.1rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-acts li, .fm-ev li { margin:0.25rem 0; }
+    .fm-residual { color:var(--red); }
+    .fm-revline { font-size:0.86rem; color:var(--text-body); margin:0.4rem 0 0; }
+    .fm-ev-src { display:block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .fm-ev-src a { color:var(--cyan); }
+    .fm-ev-txt { display:block; }
+    .fm-method { margin-top:1rem; border:1px solid var(--line); border-radius:4px; }
+    .fm-method > summary { padding:0.6rem 0.9rem; cursor:pointer; font-size:0.9rem; color:var(--text-strong); }
+    .fm-method-body { padding:0 0.9rem 0.9rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-rubrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+    @media (max-width:760px){ .fm-rubrics { grid-template-columns:1fr; } }
+    .fm-rubric { width:100%; border-collapse:collapse; font-size:0.8rem; }
+    .fm-rubric td { padding:0.25rem 0.4rem; border-top:1px solid var(--line); vertical-align:top; }
+    .fm-rubric td:first-child { font-family:'JetBrains Mono',monospace; width:2rem; color:var(--text-strong); }
+</style>
 </head>
 <body class="locked">
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -393,6 +482,159 @@ NO MAINTENANCE/INSPECTION/TESTING LAPSE IS EVIDENCED, neither confirmed nor excl
 
         <h2>Contributing factors</h2>
         <ul class="tight"><li>Sovereign-cloud incident-hosting separation: Azure operated by 21Vianet is &#x27;a physically separated instance of cloud services located in China&#x27; (learn.microsoft.com/en-us/azure/china/overview-operations) that published incident/status notices on China-only endpoints physically separate from the global Azure status page, so any China North 3 outage notice sat outside standard global-Azure and Western discovery paths.</li><li>Short Post-Incident-Review retention: the global status-history page retained only recent PIRs at inspection (a July-2026 West US preliminary PIR and two May-2026 PIRs) and listed no incidents for China North 3, so any November-2024 China North 3 PIR has aged out of public hosting (status.azure.com/en-us/status/history/, now azure.status.microsoft).</li><li>Dashboard redirection erased the old China feed&#x27;s address: www.azure.cn/en-us/support/service-dashboard/ now returns 301 -&gt; status.azure.com/zh-cn/status (VERIFIED live 2026-08-02), so the historic China-only incident channel no longer serves these notices at its original location.</li><li>Regulatory opacity: Chinese regulators (MIIT / local telecom authorities) do not publish cloud-region root-cause analyses the way a fire authority publishes a fire investigation, so no independent RCA is web-exposed and no maintenance, inspection, testing, or commissioning lapse can be confirmed or excluded (forensic note; no public PIR for the event).</li><li>Single-region deployment dependency (latent design factor): Azure China regions are paired China North 3 &lt;-&gt; China East 3 (learn.microsoft.com/en-us/azure/china/overview-regions), so customers deployed into only one region carry the full outage blast radius with no in-country failover, and availability zones alone do not cover a whole-region event, amplifying whatever the actual technical trigger was.</li><li>Discovery-tooling blockade in this environment (completeness caveat, not a cause of the outage): WebSearch budget exhausted (200/200) and open web search engines unreachable, leaving only live TLS/redirect inspection, Google News RSS, and Microsoft Learn, so absence of evidence here is partly a tooling artefact and disclosed as such (Google News RSS &#x27;Azure 21Vianet outage&#x27; = 0 items).</li></ul>
+        <h2 id="fmea">Failure mode &amp; effects analysis (FMEA)</h2>
+        <p class="fm-scope">The Azure China North 3 region as a customer sees it — the regional facility infrastructure whose failure is claimed, its recovery, single-region customer deployments, and the incident notification and post-incident record. This dossier holds no operator post-mortem: the root cause is recorded as undetermined, and the date, the ~50-hour duration and even the occurrence of the outage rest on an unverified task lead. Every score below is therefore a judgement about a claimed event, not a reconstruction of a documented one. The physical chain (initiating equipment, detection, suppression, isolation) is not scored mode by mode because the dossier records no physical event of any kind; inventing one would be fabrication. The corrective items in this dossier are recommendations, none evidenced as done.</p>
+        <p class="metabar fm-meta"><span><b>5</b> failure modes</span><span class="sep">/</span><span><b>1</b> high priority</span><span class="sep">/</span><span><b>1 of 5</b> with a published action</span><span class="sep">/</span><span>total RPN <b>1440 → 1386</b> (−4%)</span></p>
+        <div class="fm-viz">
+            <figure class="fm-fig"><figcaption>Risk priority number (S × O × D), worst first — thin bar: after the published action</figcaption><div class="fm-pb" role="list" aria-label="Risk priority number per failure mode, before and after corrective action"><div class="fm-pb-row" role="listitem" title="FM-01 An undetermined infrastructure failure takes regional services down"><span class="fm-pb-id">FM-01</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:90.0%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">360</span></div><div class="fm-pb-row" role="listitem" title="FM-02 Restoration takes about 50 hours (claimed, unverified)"><span class="fm-pb-id">FM-02</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:72.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">288</span></div><div class="fm-pb-row" role="listitem" title="FM-04 Notices sit only on China-only endpoints outside the standard global-Azure discovery path"><span class="fm-pb-id">FM-04</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:72.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">288</span></div><div class="fm-pb-row" role="listitem" title="FM-05 No post-incident review for the event survives in public hosting"><span class="fm-pb-id">FM-05</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:72.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">288</span></div><div class="fm-pb-row" role="listitem" title="FM-03 No in-country failover, so the customer absorbs the full regional outage"><span class="fm-pb-id">FM-03</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:54.0%;background:var(--amber)"></i><i class="fm-pb-rev" style="width:40.5%"></i></span><span class="fm-pb-val">216 → 162</span></div><div class="fm-pb-axis" aria-hidden="true"><span></span><span class="fm-pb-ticks"><span>0</span><span>200</span><span>400</span></span><span></span></div></div></figure>
+            <figure class="fm-fig fm-fig-m"><figcaption>Criticality: severity × occurrence</figcaption><svg class="fm-matrix" viewBox="0 0 360 330" role="img" aria-label="Criticality matrix, severity against occurrence"><rect class="fm-c-lo" x="44" y="266" width="28" height="28"/><rect class="fm-c-lo" x="72" y="266" width="28" height="28"/><rect class="fm-c-lo" x="100" y="266" width="28" height="28"/><rect class="fm-c-lo" x="128" y="266" width="28" height="28"/><rect class="fm-c-lo" x="156" y="266" width="28" height="28"/><rect class="fm-c-lo" x="184" y="266" width="28" height="28"/><rect class="fm-c-lo" x="212" y="266" width="28" height="28"/><rect class="fm-c-lo" x="240" y="266" width="28" height="28"/><rect class="fm-c-lo" x="268" y="266" width="28" height="28"/><rect class="fm-c-lo" x="296" y="266" width="28" height="28"/><rect class="fm-c-lo" x="44" y="238" width="28" height="28"/><rect class="fm-c-lo" x="72" y="238" width="28" height="28"/><rect class="fm-c-lo" x="100" y="238" width="28" height="28"/><rect class="fm-c-lo" x="128" y="238" width="28" height="28"/><rect class="fm-c-lo" x="156" y="238" width="28" height="28"/><rect class="fm-c-lo" x="184" y="238" width="28" height="28"/><rect class="fm-c-lo" x="212" y="238" width="28" height="28"/><rect class="fm-c-lo" x="240" y="238" width="28" height="28"/><rect class="fm-c-md" x="268" y="238" width="28" height="28"/><rect class="fm-c-md" x="296" y="238" width="28" height="28"/><rect class="fm-c-lo" x="44" y="210" width="28" height="28"/><rect class="fm-c-lo" x="72" y="210" width="28" height="28"/><rect class="fm-c-lo" x="100" y="210" width="28" height="28"/><rect class="fm-c-lo" x="128" y="210" width="28" height="28"/><rect class="fm-c-lo" x="156" y="210" width="28" height="28"/><rect class="fm-c-md" x="184" y="210" width="28" height="28"/><rect class="fm-c-md" x="212" y="210" width="28" height="28"/><rect class="fm-c-md" x="240" y="210" width="28" height="28"/><rect class="fm-c-md" x="268" y="210" width="28" height="28"/><rect class="fm-c-md" x="296" y="210" width="28" height="28"/><rect class="fm-c-lo" x="44" y="182" width="28" height="28"/><rect class="fm-c-lo" x="72" y="182" width="28" height="28"/><rect class="fm-c-lo" x="100" y="182" width="28" height="28"/><rect class="fm-c-lo" x="128" y="182" width="28" height="28"/><rect class="fm-c-md" x="156" y="182" width="28" height="28"/><rect class="fm-c-md" x="184" y="182" width="28" height="28"/><rect class="fm-c-md" x="212" y="182" width="28" height="28"/><rect class="fm-c-md" x="240" y="182" width="28" height="28"/><rect class="fm-c-md" x="268" y="182" width="28" height="28"/><rect class="fm-c-hi" x="296" y="182" width="28" height="28"/><rect class="fm-c-lo" x="44" y="154" width="28" height="28"/><rect class="fm-c-lo" x="72" y="154" width="28" height="28"/><rect class="fm-c-lo" x="100" y="154" width="28" height="28"/><rect class="fm-c-md" x="128" y="154" width="28" height="28"/><rect class="fm-c-md" x="156" y="154" width="28" height="28"/><rect class="fm-c-md" x="184" y="154" width="28" height="28"/><rect class="fm-c-md" x="212" y="154" width="28" height="28"/><rect class="fm-c-hi" x="240" y="154" width="28" height="28"/><rect class="fm-c-hi" x="268" y="154" width="28" height="28"/><rect class="fm-c-hi" x="296" y="154" width="28" height="28"/><rect class="fm-c-lo" x="44" y="126" width="28" height="28"/><rect class="fm-c-lo" x="72" y="126" width="28" height="28"/><rect class="fm-c-md" x="100" y="126" width="28" height="28"/><rect class="fm-c-md" x="128" y="126" width="28" height="28"/><rect class="fm-c-md" x="156" y="126" width="28" height="28"/><rect class="fm-c-md" x="184" y="126" width="28" height="28"/><rect class="fm-c-hi" x="212" y="126" width="28" height="28"/><rect class="fm-c-hi" x="240" y="126" width="28" height="28"/><rect class="fm-c-hi" x="268" y="126" width="28" height="28"/><rect class="fm-c-hi" x="296" y="126" width="28" height="28"/><rect class="fm-c-lo" x="44" y="98" width="28" height="28"/><rect class="fm-c-lo" x="72" y="98" width="28" height="28"/><rect class="fm-c-md" x="100" y="98" width="28" height="28"/><rect class="fm-c-md" x="128" y="98" width="28" height="28"/><rect class="fm-c-md" x="156" y="98" width="28" height="28"/><rect class="fm-c-hi" x="184" y="98" width="28" height="28"/><rect class="fm-c-hi" x="212" y="98" width="28" height="28"/><rect class="fm-c-hi" x="240" y="98" width="28" height="28"/><rect class="fm-c-hi" x="268" y="98" width="28" height="28"/><rect class="fm-c-hi" x="296" y="98" width="28" height="28"/><rect class="fm-c-lo" x="44" y="70" width="28" height="28"/><rect class="fm-c-lo" x="72" y="70" width="28" height="28"/><rect class="fm-c-md" x="100" y="70" width="28" height="28"/><rect class="fm-c-md" x="128" y="70" width="28" height="28"/><rect class="fm-c-hi" x="156" y="70" width="28" height="28"/><rect class="fm-c-hi" x="184" y="70" width="28" height="28"/><rect class="fm-c-hi" x="212" y="70" width="28" height="28"/><rect class="fm-c-hi" x="240" y="70" width="28" height="28"/><rect class="fm-c-hi" x="268" y="70" width="28" height="28"/><rect class="fm-c-hi" x="296" y="70" width="28" height="28"/><rect class="fm-c-hi" x="44" y="42" width="28" height="28"/><rect class="fm-c-hi" x="72" y="42" width="28" height="28"/><rect class="fm-c-hi" x="100" y="42" width="28" height="28"/><rect class="fm-c-hi" x="128" y="42" width="28" height="28"/><rect class="fm-c-hi" x="156" y="42" width="28" height="28"/><rect class="fm-c-hi" x="184" y="42" width="28" height="28"/><rect class="fm-c-hi" x="212" y="42" width="28" height="28"/><rect class="fm-c-hi" x="240" y="42" width="28" height="28"/><rect class="fm-c-hi" x="268" y="42" width="28" height="28"/><rect class="fm-c-hi" x="296" y="42" width="28" height="28"/><rect class="fm-c-hi" x="44" y="14" width="28" height="28"/><rect class="fm-c-hi" x="72" y="14" width="28" height="28"/><rect class="fm-c-hi" x="100" y="14" width="28" height="28"/><rect class="fm-c-hi" x="128" y="14" width="28" height="28"/><rect class="fm-c-hi" x="156" y="14" width="28" height="28"/><rect class="fm-c-hi" x="184" y="14" width="28" height="28"/><rect class="fm-c-hi" x="212" y="14" width="28" height="28"/><rect class="fm-c-hi" x="240" y="14" width="28" height="28"/><rect class="fm-c-hi" x="268" y="14" width="28" height="28"/><rect class="fm-c-hi" x="296" y="14" width="28" height="28"/><text class="vz-tick" x="58.0" y="308" text-anchor="middle">1</text><text class="vz-tick" x="36" y="284.0" text-anchor="end">1</text><text class="vz-tick" x="86.0" y="308" text-anchor="middle">2</text><text class="vz-tick" x="36" y="256.0" text-anchor="end">2</text><text class="vz-tick" x="114.0" y="308" text-anchor="middle">3</text><text class="vz-tick" x="36" y="228.0" text-anchor="end">3</text><text class="vz-tick" x="142.0" y="308" text-anchor="middle">4</text><text class="vz-tick" x="36" y="200.0" text-anchor="end">4</text><text class="vz-tick" x="170.0" y="308" text-anchor="middle">5</text><text class="vz-tick" x="36" y="172.0" text-anchor="end">5</text><text class="vz-tick" x="198.0" y="308" text-anchor="middle">6</text><text class="vz-tick" x="36" y="144.0" text-anchor="end">6</text><text class="vz-tick" x="226.0" y="308" text-anchor="middle">7</text><text class="vz-tick" x="36" y="116.0" text-anchor="end">7</text><text class="vz-tick" x="254.0" y="308" text-anchor="middle">8</text><text class="vz-tick" x="36" y="88.0" text-anchor="end">8</text><text class="vz-tick" x="282.0" y="308" text-anchor="middle">9</text><text class="vz-tick" x="36" y="60.0" text-anchor="end">9</text><text class="vz-tick" x="310.0" y="308" text-anchor="middle">10</text><text class="vz-tick" x="36" y="32.0" text-anchor="end">10</text><text class="vz-axis" x="184" y="328" text-anchor="middle">Occurrence →</text><text class="vz-axis" transform="translate(11 154) rotate(-90)" text-anchor="middle">Severity →</text><circle class="fm-pt" cx="114.0" cy="84.0" r="6" fill="var(--amber)"><title>FM-03 No in-country failover, so the customer absorbs the full regional outage (S8 O3 D9)</title></circle><text class="fm-pt-l" x="114.0" y="74.0" text-anchor="middle">03</text><circle class="fm-pt" cx="142.0" cy="84.0" r="6" fill="var(--amber)"><title>FM-02 Restoration takes about 50 hours (claimed, unverified) (S8 O4 D9)</title></circle><text class="fm-pt-l" x="142.0" y="74.0" text-anchor="middle">02</text><circle class="fm-pt" cx="170.0" cy="84.0" r="6" fill="var(--red)"><title>FM-01 An undetermined infrastructure failure takes regional services down (S8 O5 D9)</title></circle><text class="fm-pt-l" x="170.0" y="74.0" text-anchor="middle">01</text><circle class="fm-pt" cx="254.0" cy="196.0" r="6" fill="var(--amber)"><title>FM-04 Notices sit only on China-only endpoints outside the standard global-Azure discovery path (S4 O8 D9); FM-05 No post-incident review for the event survives in public hosting (S4 O8 D9)</title></circle><text class="fm-pt-l" x="254.0" y="186.0" text-anchor="middle">04, 05</text></svg></figure>
+        </div>
+        <div class="fm-sheet">
+            <div class="fm-head" aria-hidden="true"><span>ID</span><span>Failure mode</span><span>S·O·D</span><span>RPN</span><span>After</span></div>
+            <details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-01</span>
+    <span class="fm-mode">An undetermined infrastructure failure takes regional services down<span class="fm-item">Regional facility infrastructure (power or cooling chain — trigger undetermined)</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 5, detection 9">8·5·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>360</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Keep the China North 3 region&#x27;s scale units powered, cooled and serving</dd>
+      <dt>Effect</dt><dd>Claimed regional outage of about 50 hours for enterprise customers; which services, availability zones and customers were affected is unknown</dd>
+      <dt>Cause</dt><dd>Undetermined. The dossier names power-chain, cooling-loss and network/control-plane/storage failures only as plausible classes and asserts none</dd>
+      <dt>Prevention in place</dt><dd>None recorded; no maintenance, inspection or testing record is public</dd>
+      <dt>Detection in place</dt><dd>None recorded; no alarm, ticket or first-alert timestamp survives</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>Taken at face value, a ~50-hour outage of regional services is at least the rubric&#x27;s 8 (full outage of a major service for hours). Not scored 9 because the dossier cannot say which services or zones were down, so &#x27;region-wide, no workaround&#x27; is not established.</dd></div>
+      <div class="fm-sc"><dt>O <b>5</b></dt><dd>No basis exists to score occurrence: the trigger, the equipment and any maintenance lapse are all unknown. 5 is an analyst midpoint between &#x27;infrequent&#x27; and &#x27;occasional&#x27;, stated as a placeholder, not a finding.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>No detection event of any kind is on record, so the only detection the evidence supports is customer impact.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 360</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li class="fm-residual">No corrective action is recorded in the published sources. This mode is residual risk.</li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“ROOT CAUSE IS UNDETERMINED AND UNDOCUMENTED”</span></li><li><span class="fm-ev-src"><a href="https://status.azure.com/zh-cn/status" target="_blank" rel="noopener nofollow">Sequence of events #4</a></span><span class="fm-ev-txt">During claimed outage (NO RECORD) — No operator/first-responder response sequence is documented - no NOC action log, no runbook step, no escalation record. Root cause (power vs cooling vs network vs storage/control-plane vs - unlikely and unevidenced - fire) is entirely unknown.</span></li><li><span class="fm-ev-src"><a href="https://status.azure.cn/en-us/status/history/" target="_blank" rel="noopener nofollow">Sequence of events #9</a></span><span class="fm-ev-txt">During claimed outage (UNKNOWN SCOPE) — Impact scope - which services, availability zones, and customers were affected - is unknown. The region&#x27;s six named scale units (chinanorth3-01..06) are confirmed to exist via the live TLS certificate, but no per-service or per-AZ degradation record is public.</span></li><li><span class="fm-ev-src"><a href="https://status.azure.com/zh-cn/status" target="_blank" rel="noopener nofollow">Metric #1</a></span><span class="fm-ev-txt">Claimed outage duration: ~50 hours (UNVERIFIED - task lead only; not confirmed by any PIR, status entry, or press report)</span></li><li><span class="fm-ev-src">Contributing factor #4</span><span class="fm-ev-txt">Regulatory opacity: Chinese regulators (MIIT / local telecom authorities) do not publish cloud-region root-cause analyses the way a fire authority publishes a fire investigation, so no independent RCA is web-exposed and no maintenance, inspection, testing, or commissioning lapse can be confirmed or excluded (forensic note; no public PIR for the event).</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-02</span>
+    <span class="fm-mode">Restoration takes about 50 hours (claimed, unverified)<span class="fm-item">Regional recovery and restoration</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 4, detection 9">8·4·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>288</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Return regional services to customers within a bounded time after an infrastructure failure</dd>
+      <dt>Effect</dt><dd>Enterprise customers without another region are down for roughly two days</dd>
+      <dt>Cause</dt><dd>Undocumented; no restoration steps, phased service-return log or reason for the duration is recorded anywhere accessible</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>None recorded</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>This mode sets the length rather than the existence of the outage; two days of full outage is well inside the rubric&#x27;s 8. Not raised further because scope is unknown.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>A two-day restoration needs the initiating failure in FM-01 plus a slow recovery path, so &#x27;infrequent&#x27;; kept below FM-01 so the same event is not counted twice at full weight.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>No record shows the recovery time was known or forecast in advance; on the evidence it was experienced by customers.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 288</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li class="fm-residual">No corrective action is recorded in the published sources. This mode is residual risk.</li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://status.azure.com/zh-cn/status" target="_blank" rel="noopener nofollow">Sequence of events #12</a></span><span class="fm-ev-txt">+~50 hours (UNVERIFIED - task lead only) — Claimed regional recovery after roughly 50 hours. No restoration steps, no phased service-return log, and no reason for the ~50h duration are documented anywhere accessible.</span></li><li><span class="fm-ev-src"><a href="https://status.azure.com/zh-cn/status" target="_blank" rel="noopener nofollow">Sequence of events #11</a></span><span class="fm-ev-txt">+~50 hours (UNVERIFIED - task lead only) — Claimed ~50-hour disruption to enterprise customers in the region. The ~50h figure could not be confirmed against any operator PIR, status-history entry, or press report; it is reported as unverified.</span></li><li><span class="fm-ev-src"><a href="https://status.azure.com/zh-cn/status" target="_blank" rel="noopener nofollow">Metric #1</a></span><span class="fm-ev-txt">Claimed outage duration: ~50 hours (UNVERIFIED - task lead only; not confirmed by any PIR, status entry, or press report)</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-04</span>
+    <span class="fm-mode">Notices sit only on China-only endpoints outside the standard global-Azure discovery path<span class="fm-item">Sovereign-cloud incident notification channel</span></span>
+    <span class="fm-sod" aria-label="Severity 4, occurrence 8, detection 9">4·8·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>288</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Tell customers and the wider record that the region is impaired, while it is impaired</dd>
+      <dt>Effect</dt><dd>No first notice, tracking ID or status entry for the claimed outage can now be found; whether customers were informed in time is unknown</dd>
+      <dt>Cause</dt><dd>Azure operated by 21Vianet is a physically separated instance with its own status endpoints, since folded by 301 redirect into the global status page</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>None recorded</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>4</b></dt><dd>It fails the communication, not the service; the dossier cannot show that customers in the region were left uninformed, only that the notice is not discoverable, so &#x27;limited customer impact&#x27;.</dd></div>
+      <div class="fm-sc"><dt>O <b>8</b></dt><dd>The separation is the normal operating design of the sovereign cloud, so routine operation exercises it — &#x27;frequent&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>No control is recorded that would show a notice was missing; the gap was found by a researcher years later.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 288</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li class="fm-residual">No corrective action is recorded in the published sources. This mode is residual risk.</li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #1</span><span class="fm-ev-txt">Sovereign-cloud incident-hosting separation: Azure operated by 21Vianet is &#x27;a physically separated instance of cloud services located in China&#x27; (learn.microsoft.com/en-us/azure/china/overview-operations) that published incident/status notices on China-only endpoints physically separate from the global Azure status page, so any China North 3 outage notice sat outside standard global-Azure and Western discovery paths.</span></li><li><span class="fm-ev-src"><a href="https://www.azure.cn/en-us/support/service-dashboard/" target="_blank" rel="noopener nofollow">Sequence of events #3</a></span><span class="fm-ev-txt">At claimed onset (NO RECORD) — No control-room alarm, incident ticket, tracking ID, or first-alert timestamp is publicly retained. The China-only status feed that would have carried a first notice now 301-redirects into the global Azure status page and no matching entry survives.</span></li><li><span class="fm-ev-src"><a href="https://www.azure.cn/en-us/support/service-dashboard/" target="_blank" rel="noopener nofollow">Metric #8</a></span><span class="fm-ev-txt">China status dashboard redirect (record-availability): www.azure.cn service-dashboard 301 -&gt; status.azure.com/zh-cn/status (-&gt; azure.status.microsoft) - VERIFIED live 2026-08-02</span></li><li><span class="fm-ev-src">Technical deep-dive</span><span class="fm-ev-txt">“a physically separated instance of cloud services located in China”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-05</span>
+    <span class="fm-mode">No post-incident review for the event survives in public hosting<span class="fm-item">Post-incident review publication and retention</span></span>
+    <span class="fm-sod" aria-label="Severity 4, occurrence 8, detection 9">4·8·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>288</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Keep a durable public record of root cause, scope and timeline after a regional outage</dd>
+      <dt>Effect</dt><dd>Root cause, impact scope, duration and any maintenance or protection-system lapse cannot be confirmed or excluded; customers cannot use the event to judge the region&#x27;s risk</dd>
+      <dt>Cause</dt><dd>Short PIR retention on the status-history page, the redirected China dashboard, and no regulator-published cloud RCA</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>None recorded; the absence was found by this dossier&#x27;s research</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>4</b></dt><dd>No service effect; the impact is on customers&#x27; ability to assess risk and on the industry&#x27;s ability to learn from the event — &#x27;limited customer impact&#x27;.</dd></div>
+      <div class="fm-sc"><dt>O <b>8</b></dt><dd>Short retention ages out every PIR in normal operation, so the cause is exercised routinely — &#x27;frequent&#x27;. Whether a PIR was ever published for this event is itself unknown.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>Nothing flags a missing or expired PIR; it surfaces only when someone looks for it.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 288</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li class="fm-residual">No corrective action is recorded in the published sources. This mode is residual risk.</li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #2</span><span class="fm-ev-txt">Short Post-Incident-Review retention: the global status-history page retained only recent PIRs at inspection (a July-2026 West US preliminary PIR and two May-2026 PIRs) and listed no incidents for China North 3, so any November-2024 China North 3 PIR has aged out of public hosting (status.azure.com/en-us/status/history/, now azure.status.microsoft).</span></li><li><span class="fm-ev-src"><a href="https://status.azure.com/en-us/status/history/" target="_blank" rel="noopener nofollow">Metric #5</a></span><span class="fm-ev-txt">Public PIRs retained for the region/date: 0 for China North 3 Nov-2024 (page shows only a July-2026 and two May-2026 PIRs) - VERIFIED</span></li><li><span class="fm-ev-src"><a href="https://status.azure.com/en-us/status/history/" target="_blank" rel="noopener nofollow">Metric #7</a></span><span class="fm-ev-txt">Nearest Wayback archive capture to the incident date: 2024-12-05, and it is a 301 stub (no content) - VERIFIED</span></li><li><span class="fm-ev-src">Contributing factor #4</span><span class="fm-ev-txt">Regulatory opacity: Chinese regulators (MIIT / local telecom authorities) do not publish cloud-region root-cause analyses the way a fire authority publishes a fire investigation, so no independent RCA is web-exposed and no maintenance, inspection, testing, or commissioning lapse can be confirmed or excluded (forensic note; no public PIR for the event).</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-03</span>
+    <span class="fm-mode">No in-country failover, so the customer absorbs the full regional outage<span class="fm-item">Customer deployment confined to China North 3</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 3, detection 9">8·3·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>216</span>
+    <span class="fm-rpn-rev">162</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Keep a customer&#x27;s workload available when its region fails</dd>
+      <dt>Effect</dt><dd>Whatever the trigger, a customer deployed only in China North 3 is down for the whole outage; availability zones do not cover a whole-region event</dd>
+      <dt>Cause</dt><dd>Single-region deployment; the paired region, China East 3, is access-restricted to specific scenarios such as in-country disaster recovery</dd>
+      <dt>Prevention in place</dt><dd>Availability-zone support within China North 3, which does not protect against a whole-region event</dd>
+      <dt>Detection in place</dt><dd>Customer impact</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>For the affected customer this is a full outage measured in hours to days — the rubric&#x27;s 8.</dd></div>
+      <div class="fm-sc"><dt>O <b>3</b></dt><dd>The condition is standing for every single-region customer, but it bites only when the region itself fails, which is infrequent; kept low so it does not re-count FM-01.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>The customer learns of it through its own outage.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 216</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Deploy across the paired regions (China North 3 and China East 3) and validate cross-region failover <span class="fm-ev-src">Correction of errors #3</span></li></ul>
+    <p class="fm-revline">After action: S6 · O3 · D9 → RPN 162. A validated failover to the paired region turns a whole-region loss into a partial, time-bounded disruption for that customer (S 8→6). This is a recommended customer action, not an operator commitment, and China East 3 is access-restricted, so whether a given customer can adopt it is not established; the reduction is a claim about the action, not a confirmed outcome.</p>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://learn.microsoft.com/en-us/azure/china/overview-regions" target="_blank" rel="noopener nofollow">Sequence of events #10</a></span><span class="fm-ev-txt">During claimed outage (VERIFIED architecture, not event timing) — Single-region blast radius: China North 3 is paired with China East 3 (access-restricted for in-country disaster recovery) per Microsoft&#x27;s official region list; a single-region deployment has no in-country failover, so whatever the trigger, a customer in only China North 3 absorbed the full outage.</span></li><li><span class="fm-ev-src"><a href="https://learn.microsoft.com/en-us/azure/china/overview-regions" target="_blank" rel="noopener nofollow">Metric #4</a></span><span class="fm-ev-txt">Region pairing / in-country failover option: China North 3 paired with China East 3 (access-restricted for in-country DR); China North 3 has availability-zone support - VERIFIED (official)</span></li><li><span class="fm-ev-src">Contributing factor #5</span><span class="fm-ev-txt">Single-region deployment dependency (latent design factor): Azure China regions are paired China North 3 &lt;-&gt; China East 3 (learn.microsoft.com/en-us/azure/china/overview-regions), so customers deployed into only one region carry the full outage blast radius with no in-country failover, and availability zones alone do not cover a whole-region event, amplifying whatever the actual technical trigger was.</span></li><li><span class="fm-ev-src"><a href="https://learn.microsoft.com/en-us/azure/china/overview-regions" target="_blank" rel="noopener nofollow">Reference #2 · official-postmortem</a></span><span class="fm-ev-txt">“This region is access restricted to support specific customer scenarios, such as in-country disaster recovery.”</span></li></ul>
+  </div>
+</details>
+        </div>
+        <details class="fm-method"><summary>Scoring rubric and method</summary><div class="fm-method-body"><p>A retrospective FMEA: each row asks how this system could fail, how bad the effect was, how likely the cause was given the controls in place at the time, and how likely those controls were to catch it before customers did. Scales are adapted for data-centre operations from the 1–10 scales of IEC 60812:2018 and the AIAG-VDA FMEA handbook. RPN = S × O × D. Priority is High when S ≥ 9 with O ≥ 4 or D ≥ 7, or when RPN ≥ 300; Medium when RPN ≥ 120 or S ≥ 7; Low otherwise. Severity overrides the product because a large S multiplied by small O and D can hide a region-wide outage nothing would catch.</p><p>Every row cites evidence from this dossier, and every quote is checked verbatim against its source by <code>tools/test-incidents-fmea.py</code>. A revised score is only shown against a published corrective action. This is an RZ analyst assessment, not an operator document.</p><div class="fm-rubrics"><div><p class="fm-sub">Severity</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Hazard to people, or loss of the facility / several regions</td></tr><tr><td>9</td><td>Region-wide or provider-wide outage of a foundational service, no workaround</td></tr><tr><td>8</td><td>Full outage of a major service for hours</td></tr><tr><td>7</td><td>Major degradation of a major service</td></tr><tr><td>6</td><td>Partial outage confined to one zone or one service</td></tr><tr><td>5</td><td>Customer-visible degradation</td></tr><tr><td>4</td><td>Limited customer impact</td></tr><tr><td>3</td><td>Internal impact only</td></tr><tr><td>2</td><td>Negligible</td></tr><tr><td>1</td><td>No effect</td></tr></tbody></table></div><div><p class="fm-sub">Occurrence</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Near certain: the cause is present in normal operation</td></tr><tr><td>8</td><td>Frequent: routine work exercises the cause</td></tr><tr><td>6</td><td>Occasional: a foreseeable slip or condition, weakly guarded</td></tr><tr><td>4</td><td>Infrequent: needs an unusual combination</td></tr><tr><td>2</td><td>Remote: guarded by design</td></tr><tr><td>1</td><td>Eliminated by design</td></tr></tbody></table></div><div><p class="fm-sub">Detection</p><table class="fm-rubric"><tbody><tr><td>10</td><td>No control could detect it</td></tr><tr><td>9</td><td>Detected only through customer impact</td></tr><tr><td>8</td><td>Detected after impact by internal monitoring</td></tr><tr><td>6</td><td>Detected at onset, not prevented</td></tr><tr><td>4</td><td>Detected before impact with time to act</td></tr><tr><td>2</td><td>Automated interlock almost certainly stops it</td></tr><tr><td>1</td><td>Certain to be stopped</td></tr></tbody></table></div></div></div></details>
+
 
         <h2>Correction of errors (COE)</h2>
         <ul class="tight"><li>Publish (or recover from the operator portal) a Post-Incident Review for the claimed Nov-2024 China North 3 outage, including detection/de-energisation/recovery timeline and confirmed root cause <span class="coe-meta">Microsoft Azure operated by 21Vianet · Not evidenced as done - no public PIR exists</span></li><li>Retain power-chain and cooling PM/inspection/functional-test records long enough to survive post-incident forensics <span class="coe-meta">21Vianet facility operations · Recommended - not confirmed implemented</span></li><li>Deploy across paired regions (China North 3 + China East 3) and validate cross-region failover for in-country resilience <span class="coe-meta">Enterprise customers in Azure China · Recommended - customer action</span></li><li>Mirror sovereign-cloud incident history/PIRs to a durable long-retention public archive instead of a short-retention, redirecting status page <span class="coe-meta">Microsoft / 21Vianet status engineering · Recommended - not confirmed implemented</span></li><li>Re-attempt discovery with open Google/Bing/Baidu access and the login-gated 21Vianet operator portal to recover any Chinese-language PIR or trade report <span class="coe-meta">Follow-up researcher · Open - blocked by tooling in this environment</span></li></ul>
@@ -441,7 +683,7 @@ Net technical conclusion: the physical forensics the schema asks for (detection,
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-1a1a084f"></script>
+    <script src="js/rz-version.js?v=20261010-00a1d9e8"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

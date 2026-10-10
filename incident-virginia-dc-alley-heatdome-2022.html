@@ -52,6 +52,12 @@
     .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
     .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
     .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:2px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    /* A chip carries the operator name, which can be a whole sentence ("Google Cloud
+       (impacted tenant); STT GDC / Tata Communications JV (named as the third-party …").
+       nowrap made that one chip 1120px wide and pushed the GCP Delhi dossier into a
+       1260px page at a 1100px viewport. Short chips are unaffected: normal wrapping
+       only engages when a chip would not fit its row. */
+    .chips .chip { max-width:100%; white-space:normal; overflow-wrap:anywhere; }
     .chip.cyan { color:var(--cyan); border-left:2px solid var(--cyan); }
     .chip.amber { color:var(--amber); border-left:2px solid var(--amber); }
     .chip.green { color:var(--green); border-left:2px solid var(--green); }
@@ -71,6 +77,11 @@
     /* rich incident table (reference-2 style) */
     table.itbl { min-width:1120px; }
     table.itbl td { vertical-align:middle; }
+    /* v1.134.20 — the title and summary columns ellipsise so the table's columns line up,
+       which is the right call for a dense index. But the cut text was reachable only by
+       navigating to the incident: a summary lost 238-298px of its sentence with no way to read
+       it in place. Each carries its full text in a title attribute now, so the truncation is
+       deliberate AND non-lossy — which is the condition the legibility audit checks for. */
     .itr { cursor:pointer; }
     .itr:hover td { background:var(--surface-2); }
     .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
@@ -240,7 +251,6 @@
        derive width = W px from the aspect ratio, so the drawing renders 1:1 at any event count
        and the panel scrolls instead of shrinking. */
     .viz-timeline svg { max-width:none; height:96px; width:auto; }
-
     .viz-radar svg { max-width:320px; margin:0 auto; }
     .vz-num { font-variant-numeric:tabular-nums slashed-zero; }
     .vz-box-t, .vz-box-s, .vz-lbl, .vz-hb-lbl, .vz-tl-t, .vz-pt, .vz-tick { pointer-events:auto; }
@@ -323,7 +333,86 @@
     }
     @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
 </style>
-    
+    <style>
+    /* ── FMEA (v3.12.3) — one hairline panel of rows, like the rest of the dossier.
+       No cards, no stripes: a row is a disclosure, state is a 7px dot. ── */
+    .fm-scope { color:var(--text-body); max-width:70ch; }
+    .fm-meta { flex-wrap:wrap; row-gap:0.25rem; }
+    .fm-viz { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:1.6rem; align-items:start; margin:1.2rem 0; }
+    @media (max-width:820px){ .fm-viz { grid-template-columns:1fr; } }
+    .fm-pb-row, .fm-pb-axis { display:grid; grid-template-columns:3.6rem minmax(0,1fr) 6.6rem; gap:0.6rem; align-items:center; }
+    .fm-pb-row { padding:0.32rem 0; }
+    .fm-pb-id, .fm-pb-val { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.8rem; }
+    .fm-pb-id { color:var(--muted); }
+    .fm-pb-val { color:var(--text-strong); white-space:nowrap; }
+    .fm-pb-track { display:flex; flex-direction:column; gap:3px; }
+    .fm-pb-bar { display:block; height:12px; }
+    .fm-pb-rev { display:block; height:4px; background:var(--text-body); opacity:0.55; }
+    .fm-pb-none { font-style:italic; font-size:0.72rem; color:var(--muted); line-height:1; }
+    .fm-pb-axis { margin-top:0.3rem; border-top:1px solid var(--line); padding-top:0.25rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .fm-pb-ticks { display:flex; justify-content:space-between; }
+    .fm-fig { margin:0; }
+    .fm-fig figcaption { font-size:0.8rem; color:var(--muted); margin-bottom:0.35rem; }
+    .fm-fig svg { width:100%; height:auto; display:block; }
+    .fm-fig-m svg { max-width:340px; }
+    .fm-matrix .fm-c-lo { fill:var(--surface); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-md { fill:color-mix(in srgb, var(--amber) 9%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-hi { fill:color-mix(in srgb, var(--red) 10%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .vz-axis { font-size:10px; fill:var(--muted); font-family:'IBM Plex Sans',sans-serif; }
+    .fm-matrix .fm-pt { stroke:var(--surface); stroke-width:1.5; }
+    .fm-matrix .fm-pt-l { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; fill:var(--text-strong);
+      paint-order:stroke; stroke:var(--surface); stroke-width:3px; stroke-linejoin:round; }
+    .fm-sheet { border:1px solid var(--line); border-radius:4px; margin-top:0.8rem; }
+    .fm-head, .fm-row > summary { display:grid; grid-template-columns:4.2rem minmax(0,1fr) 4.4rem 4.6rem 3.4rem; gap:0.6rem; align-items:baseline; padding:0.6rem 0.9rem; }
+    .fm-head { font-size:0.74rem; color:var(--muted); border-bottom:1px solid var(--line); }
+    .fm-row { border-top:1px solid var(--line); }
+    .fm-row:first-of-type { border-top:0; }
+    .fm-row > summary { cursor:pointer; list-style:none; }
+    .fm-row > summary::-webkit-details-marker { display:none; }
+    .fm-row > summary:hover { background:var(--surface-2); }
+    .fm-row > summary:focus-visible { outline:2px solid var(--cyan); outline-offset:-2px; }
+    .fm-id-cell, .fm-sod, .fm-rpn, .fm-rpn-rev { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.84rem; }
+    .fm-id-cell { color:var(--muted); }
+    .fm-mode { color:var(--text-strong); font-size:0.92rem; line-height:1.4; }
+    .fm-item { display:block; color:var(--muted); font-size:0.8rem; }
+    .fm-sod { color:var(--text-body); }
+    .fm-rpn { color:var(--text-strong); }
+    .fm-rpn-rev { color:var(--muted); }
+    .fm-dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:0.45rem; vertical-align:0.1em; }
+    .fm-body { padding:0.2rem 0.9rem 1rem 5.7rem; }
+    @media (max-width:640px){
+      .fm-head { display:none; }
+      .fm-row > summary { grid-template-columns:3.2rem minmax(0,1fr) auto; }
+      .fm-sod, .fm-rpn-rev { display:none; }
+      .fm-body { padding:0.2rem 0.9rem 1rem; }
+    }
+    .fm-kv { display:grid; grid-template-columns:9.5rem minmax(0,1fr); gap:0.3rem 0.9rem; margin:0.4rem 0 0.8rem; font-size:0.88rem; }
+    .fm-kv dt { color:var(--muted); }
+    .fm-kv dd { margin:0; color:var(--text-body); }
+    @media (max-width:640px){ .fm-kv { grid-template-columns:1fr; } .fm-kv dd { margin-bottom:0.4rem; } }
+    .fm-scores { margin:0 0 0.6rem; border-top:1px solid var(--line); }
+    .fm-sc { display:grid; grid-template-columns:3.2rem minmax(0,1fr); gap:0.6rem; padding:0.45rem 0; border-bottom:1px solid var(--line); font-size:0.86rem; }
+    .fm-sc dt { font-family:'JetBrains Mono',monospace; color:var(--muted); }
+    .fm-sc dt b { color:var(--text-strong); }
+    .fm-sc dd { margin:0; color:var(--text-body); }
+    .fm-sub { font-size:0.8rem; color:var(--muted); margin:0.7rem 0 0.25rem; }
+    .fm-sub b { color:var(--text-strong); }
+    .fm-acts, .fm-ev { margin:0; padding-left:1.1rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-acts li, .fm-ev li { margin:0.25rem 0; }
+    .fm-residual { color:var(--red); }
+    .fm-revline { font-size:0.86rem; color:var(--text-body); margin:0.4rem 0 0; }
+    .fm-ev-src { display:block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .fm-ev-src a { color:var(--cyan); }
+    .fm-ev-txt { display:block; }
+    .fm-method { margin-top:1rem; border:1px solid var(--line); border-radius:4px; }
+    .fm-method > summary { padding:0.6rem 0.9rem; cursor:pointer; font-size:0.9rem; color:var(--text-strong); }
+    .fm-method-body { padding:0 0.9rem 0.9rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-rubrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+    @media (max-width:760px){ .fm-rubrics { grid-template-columns:1fr; } }
+    .fm-rubric { width:100%; border-collapse:collapse; font-size:0.8rem; }
+    .fm-rubric td { padding:0.25rem 0.4rem; border-top:1px solid var(--line); vertical-align:top; }
+    .fm-rubric td:first-child { font-family:'JetBrains Mono',monospace; width:2rem; color:var(--text-strong); }
+</style>
 </head>
 <body class="locked">
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -353,7 +442,7 @@
         <p class="lede">A July 2022 heat dome pushed dozens of Northern Virginia &#x27;Data Center Alley&#x27; facilities into cooling stress or proactive load shedding/shutdown, causing regional and global internet-traffic impact from the world&#x27;s densest data-center corridor.</p>
 
         <h2>Failure cascade</h2>
-        <div class="viz viz-cascade"><svg viewBox="0 0 760 158" role="img" aria-label="Failure cascade block diagram"><title>Failure cascade: trigger → fault → downstream impact</title><defs><marker id="ic-ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path class="vz-arrhead" d="M0,0 L6,3 L0,6 Z"/></marker></defs><text class="vz-tl-ph" x="8" y="12">Trigger</text><text class="vz-tl-ph" x="248" y="12">Primary fault</text><text class="vz-tl-ph" x="516" y="12">Downstream impact</text><rect class="vz-box-trigger" x="8" y="51.0" width="176" height="56" rx="2"><title>Trigger — Cooling (2022-07-24)</title></rect><text class="vz-box-t" x="18" y="68.0">Trigger · Cooling</text><text class="vz-box-s" x="18" y="82.0"><title>2022-07-24</title>2022-07-24</text><rect class="vz-box-fault" x="240" y="51.0" width="224" height="56" rx="2"><title>Primary fault at Multiple hyperscalers (Loudoun/Prince William, VA) — Northern Virginia data-center cluster (Loudoun/Prince William)</title></rect><text class="vz-box-t" x="250" y="68.0">NoVA Data Centers</text><text class="vz-box-s" x="250" y="82.0"><title>Northern Virginia data-center cluster (Loudoun/Prince William)</title>Northern Virginia data-center</text><line class="vz-flow" x1="184" y1="79.0" x2="238" y2="79.0" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="26" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Cooling-constrained load shedding across 45+ NoVA facilities</title></rect><text class="vz-box-t" x="526" y="43">Cooling-constrained load</text><text class="vz-box-t" x="526" y="56">shedding…</text><line class="vz-flow" x1="464" y1="79.0" x2="514" y2="44" marker-end="url(#ic-ar)"/></svg></div>
+        <div class="viz viz-cascade"><svg viewBox="0 0 760 158" role="img" aria-label="Failure cascade block diagram"><title>Failure cascade: trigger → fault → downstream impact</title><defs><marker id="ic-ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path class="vz-arrhead" d="M0,0 L6,3 L0,6 Z"/></marker></defs><text class="vz-tl-ph" x="8" y="12">Trigger</text><text class="vz-tl-ph" x="248" y="12">Primary fault</text><text class="vz-tl-ph" x="516" y="12">Downstream impact</text><rect class="vz-box-trigger" x="8" y="51.0" width="176" height="56" rx="2"><title>Trigger — Cooling (2022-07-24)</title></rect><text class="vz-box-t" x="18" y="68.0">Trigger · Cooling</text><text class="vz-box-s" x="18" y="82.0"><title>2022-07-24</title>2022-07-24</text><rect class="vz-box-fault" x="240" y="51.0" width="224" height="56" rx="2"><title>Primary fault at Multiple hyperscalers (Loudoun/Prince William, VA) — Northern Virginia data-center cluster (Loudoun/Prince William)</title></rect><text class="vz-box-t" x="250" y="68.0">NoVA Data Centers</text><text class="vz-box-s" x="250" y="82.0"><title>Northern Virginia data-center cluster (Loudoun/Prince William)</title>Northern Virginia data-center</text><line class="vz-flow" x1="184" y1="79.0" x2="238" y2="79.0" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="26" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Cooling-constrained load shedding across 45+ NoVA facilities</title></rect><text class="vz-box-t" x="526" y="43">Cooling-constrained load</text><text class="vz-box-t" x="526" y="56">shedding</text><line class="vz-flow" x1="464" y1="79.0" x2="514" y2="44" marker-end="url(#ic-ar)"/></svg></div>
         <p class="disclaimer">Trigger → primary fault → downstream blast radius, derived from the sourced root cause and affected-services record.</p>
 
         <h2>Facility &amp; location</h2>
@@ -395,6 +484,215 @@ The unifying LATENT root across the electrical variants is a DESIGN / PROTECTION
 
         <h2>Contributing factors</h2>
         <ul class="tight"><li>Extreme load concentration / density risk: Northern Virginia hosts roughly 250 data centers and more than 20% of known hyperscale capacity, concentrated in a single eastern-Loudoun pocket, so one transmission fault propagates as a coordinated multi-GW load loss (Route Fifty 2022; NERC 2024; corroborated by the 2026 ~3 GW event verified via DCK/RTO Insider/Ting Labs).</li><li>Transmission build-out lagging demand (planning/design lapse): Dominion warned in July 2022 of a &#x27;pinch point&#x27; in eastern Loudoun that could delay new connections to ~2025-2026, framed as &#x27;transmission infrastructure, not power generation&#x27;; PJM planning material warned the area would lack sufficient transmission capability by 2024/25 (Route Fifty — not re-verified verbatim this pass; facts corroborated by historical record).</li><li>Un-coordinated protective / ride-through settings (design lapse — the dominant real failure mode): &#x27;Individually reasonable settings can produce a common-mode response when facilities react simultaneously to the same disturbance&#x27; (Neil Osnato, DCK, verified); the same mechanism recurred in 2024 (~1,500 MW) and 2026 (~3 GW).</li><li>A discrete hardware failure initiated the 2024 precedent: a lightning/surge arrestor failed on a 230 kV transmission line (NERC event analysis; ~1.5 GW figure corroborated by DCK via Reuters). Whether this reflects an asset-condition or inspection/testing lapse is NOT disclosed in public sources (disclosed uncertainty); the failed arrestor&#x27;s make/model/age/chemistry are undisclosed.</li><li>Summer heat and record demand as an aggravator: a demand-side heat-stress episode reportedly left Dominion &#x27;minutes away from turning every data center in Ashburn to a backup generation&#x27; at a claimed PJM record peak of 168,158 MW and a 114 heat index (Loudoun Now — single-source, not independently verified this pass; retained as disclosed uncertainty).</li></ul>
+        <h2 id="fmea">Failure mode &amp; effects analysis (FMEA)</h2>
+        <p class="fm-scope">Power supply to the Northern Virginia data-center load pocket as the dossier actually records it: bulk transmission import capacity into eastern Loudoun (the July 2022 constraint), transmission line faults (a 2024 surge-arrestor failure and an undisclosed 2026 line fault), the data centers&#x27; protective and ride-through settings, on-site backup transfer, PJM/Dominion frequency balancing, a demand-side heat-stress episode, and event analysis. Although the title and header describe a 2022 heat-dome cooling event, the dossier&#x27;s own root-cause analysis finds no cooling failure: the July 2022 event was a transmission-capacity disclosure, and the physical events it documents are in 2024 and 2026. No cooling-failure mode is scored because the dossier holds no evidence of one. There is no operator post-mortem; the 2022 and 2024 sources were not re-verified verbatim, the heat-stress episode is single-source with no date, and NERC&#x27;s review of the 2026 event is ongoing. No customer service loss is recorded in any of these events, so severities are held low and several modes are near-misses. Only one action, Dominion&#x27;s August 2022 commitment to two 500 kV lines, carries a revised score; the rest are open.</p>
+        <p class="metabar fm-meta"><span><b>7</b> failure modes</span><span class="sep">/</span><span><b>0</b> high priority</span><span class="sep">/</span><span><b>1 of 7</b> with a published action</span><span class="sep">/</span><span>total RPN <b>988 → 940</b> (−5%)</span></p>
+        <div class="fm-viz">
+            <figure class="fm-fig"><figcaption>Risk priority number (S × O × D), worst first — thin bar: after the published action</figcaption><div class="fm-pb" role="list" aria-label="Risk priority number per failure mode, before and after corrective action"><div class="fm-pb-row" role="listitem" title="FM-03 Individually reasonable settings trip dozens of facilities simultaneously onto backup power"><span class="fm-pb-id">FM-03</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:70.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">210</span></div><div class="fm-pb-row" role="listitem" title="FM-07 Failed components and fault details stay undisclosed; the 2026 review is incomplete"><span class="fm-pb-id">FM-07</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:64.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">192</span></div><div class="fm-pb-row" role="listitem" title="FM-05 Frequency excursion from an instantaneous multi-GW load swing"><span class="fm-pb-id">FM-05</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:50.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">150</span></div><div class="fm-pb-row" role="listitem" title="FM-02 A line component fails and causes a fast voltage transient across the pocket"><span class="fm-pb-id">FM-02</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:48.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">144</span></div><div class="fm-pb-row" role="listitem" title="FM-01 Transmission build-out falls behind concentrated data-center load growth, creating a &#x27;pinch point&#x27;"><span class="fm-pb-id">FM-01</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:42.7%;background:var(--amber)"></i><i class="fm-pb-rev" style="width:26.7%"></i></span><span class="fm-pb-val">128 → 80</span></div><div class="fm-pb-row" role="listitem" title="FM-04 Transfer to backup power fails, so IT load drops"><span class="fm-pb-id">FM-04</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:28.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">84</span></div><div class="fm-pb-row" role="listitem" title="FM-06 Demand-side heat stress brings the utility close to moving every Ashburn data center to backup generation"><span class="fm-pb-id">FM-06</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:26.7%;background:var(--green)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">80</span></div><div class="fm-pb-axis" aria-hidden="true"><span></span><span class="fm-pb-ticks"><span>0</span><span>150</span><span>300</span></span><span></span></div></div></figure>
+            <figure class="fm-fig fm-fig-m"><figcaption>Criticality: severity × occurrence</figcaption><svg class="fm-matrix" viewBox="0 0 360 330" role="img" aria-label="Criticality matrix, severity against occurrence"><rect class="fm-c-lo" x="44" y="266" width="28" height="28"/><rect class="fm-c-lo" x="72" y="266" width="28" height="28"/><rect class="fm-c-lo" x="100" y="266" width="28" height="28"/><rect class="fm-c-lo" x="128" y="266" width="28" height="28"/><rect class="fm-c-lo" x="156" y="266" width="28" height="28"/><rect class="fm-c-lo" x="184" y="266" width="28" height="28"/><rect class="fm-c-lo" x="212" y="266" width="28" height="28"/><rect class="fm-c-lo" x="240" y="266" width="28" height="28"/><rect class="fm-c-lo" x="268" y="266" width="28" height="28"/><rect class="fm-c-lo" x="296" y="266" width="28" height="28"/><rect class="fm-c-lo" x="44" y="238" width="28" height="28"/><rect class="fm-c-lo" x="72" y="238" width="28" height="28"/><rect class="fm-c-lo" x="100" y="238" width="28" height="28"/><rect class="fm-c-lo" x="128" y="238" width="28" height="28"/><rect class="fm-c-lo" x="156" y="238" width="28" height="28"/><rect class="fm-c-lo" x="184" y="238" width="28" height="28"/><rect class="fm-c-lo" x="212" y="238" width="28" height="28"/><rect class="fm-c-lo" x="240" y="238" width="28" height="28"/><rect class="fm-c-md" x="268" y="238" width="28" height="28"/><rect class="fm-c-md" x="296" y="238" width="28" height="28"/><rect class="fm-c-lo" x="44" y="210" width="28" height="28"/><rect class="fm-c-lo" x="72" y="210" width="28" height="28"/><rect class="fm-c-lo" x="100" y="210" width="28" height="28"/><rect class="fm-c-lo" x="128" y="210" width="28" height="28"/><rect class="fm-c-lo" x="156" y="210" width="28" height="28"/><rect class="fm-c-md" x="184" y="210" width="28" height="28"/><rect class="fm-c-md" x="212" y="210" width="28" height="28"/><rect class="fm-c-md" x="240" y="210" width="28" height="28"/><rect class="fm-c-md" x="268" y="210" width="28" height="28"/><rect class="fm-c-md" x="296" y="210" width="28" height="28"/><rect class="fm-c-lo" x="44" y="182" width="28" height="28"/><rect class="fm-c-lo" x="72" y="182" width="28" height="28"/><rect class="fm-c-lo" x="100" y="182" width="28" height="28"/><rect class="fm-c-lo" x="128" y="182" width="28" height="28"/><rect class="fm-c-md" x="156" y="182" width="28" height="28"/><rect class="fm-c-md" x="184" y="182" width="28" height="28"/><rect class="fm-c-md" x="212" y="182" width="28" height="28"/><rect class="fm-c-md" x="240" y="182" width="28" height="28"/><rect class="fm-c-md" x="268" y="182" width="28" height="28"/><rect class="fm-c-hi" x="296" y="182" width="28" height="28"/><rect class="fm-c-lo" x="44" y="154" width="28" height="28"/><rect class="fm-c-lo" x="72" y="154" width="28" height="28"/><rect class="fm-c-lo" x="100" y="154" width="28" height="28"/><rect class="fm-c-md" x="128" y="154" width="28" height="28"/><rect class="fm-c-md" x="156" y="154" width="28" height="28"/><rect class="fm-c-md" x="184" y="154" width="28" height="28"/><rect class="fm-c-md" x="212" y="154" width="28" height="28"/><rect class="fm-c-hi" x="240" y="154" width="28" height="28"/><rect class="fm-c-hi" x="268" y="154" width="28" height="28"/><rect class="fm-c-hi" x="296" y="154" width="28" height="28"/><rect class="fm-c-lo" x="44" y="126" width="28" height="28"/><rect class="fm-c-lo" x="72" y="126" width="28" height="28"/><rect class="fm-c-md" x="100" y="126" width="28" height="28"/><rect class="fm-c-md" x="128" y="126" width="28" height="28"/><rect class="fm-c-md" x="156" y="126" width="28" height="28"/><rect class="fm-c-md" x="184" y="126" width="28" height="28"/><rect class="fm-c-hi" x="212" y="126" width="28" height="28"/><rect class="fm-c-hi" x="240" y="126" width="28" height="28"/><rect class="fm-c-hi" x="268" y="126" width="28" height="28"/><rect class="fm-c-hi" x="296" y="126" width="28" height="28"/><rect class="fm-c-lo" x="44" y="98" width="28" height="28"/><rect class="fm-c-lo" x="72" y="98" width="28" height="28"/><rect class="fm-c-md" x="100" y="98" width="28" height="28"/><rect class="fm-c-md" x="128" y="98" width="28" height="28"/><rect class="fm-c-md" x="156" y="98" width="28" height="28"/><rect class="fm-c-hi" x="184" y="98" width="28" height="28"/><rect class="fm-c-hi" x="212" y="98" width="28" height="28"/><rect class="fm-c-hi" x="240" y="98" width="28" height="28"/><rect class="fm-c-hi" x="268" y="98" width="28" height="28"/><rect class="fm-c-hi" x="296" y="98" width="28" height="28"/><rect class="fm-c-lo" x="44" y="70" width="28" height="28"/><rect class="fm-c-lo" x="72" y="70" width="28" height="28"/><rect class="fm-c-md" x="100" y="70" width="28" height="28"/><rect class="fm-c-md" x="128" y="70" width="28" height="28"/><rect class="fm-c-hi" x="156" y="70" width="28" height="28"/><rect class="fm-c-hi" x="184" y="70" width="28" height="28"/><rect class="fm-c-hi" x="212" y="70" width="28" height="28"/><rect class="fm-c-hi" x="240" y="70" width="28" height="28"/><rect class="fm-c-hi" x="268" y="70" width="28" height="28"/><rect class="fm-c-hi" x="296" y="70" width="28" height="28"/><rect class="fm-c-hi" x="44" y="42" width="28" height="28"/><rect class="fm-c-hi" x="72" y="42" width="28" height="28"/><rect class="fm-c-hi" x="100" y="42" width="28" height="28"/><rect class="fm-c-hi" x="128" y="42" width="28" height="28"/><rect class="fm-c-hi" x="156" y="42" width="28" height="28"/><rect class="fm-c-hi" x="184" y="42" width="28" height="28"/><rect class="fm-c-hi" x="212" y="42" width="28" height="28"/><rect class="fm-c-hi" x="240" y="42" width="28" height="28"/><rect class="fm-c-hi" x="268" y="42" width="28" height="28"/><rect class="fm-c-hi" x="296" y="42" width="28" height="28"/><rect class="fm-c-hi" x="44" y="14" width="28" height="28"/><rect class="fm-c-hi" x="72" y="14" width="28" height="28"/><rect class="fm-c-hi" x="100" y="14" width="28" height="28"/><rect class="fm-c-hi" x="128" y="14" width="28" height="28"/><rect class="fm-c-hi" x="156" y="14" width="28" height="28"/><rect class="fm-c-hi" x="184" y="14" width="28" height="28"/><rect class="fm-c-hi" x="212" y="14" width="28" height="28"/><rect class="fm-c-hi" x="240" y="14" width="28" height="28"/><rect class="fm-c-hi" x="268" y="14" width="28" height="28"/><rect class="fm-c-hi" x="296" y="14" width="28" height="28"/><text class="vz-tick" x="58.0" y="308" text-anchor="middle">1</text><text class="vz-tick" x="36" y="284.0" text-anchor="end">1</text><text class="vz-tick" x="86.0" y="308" text-anchor="middle">2</text><text class="vz-tick" x="36" y="256.0" text-anchor="end">2</text><text class="vz-tick" x="114.0" y="308" text-anchor="middle">3</text><text class="vz-tick" x="36" y="228.0" text-anchor="end">3</text><text class="vz-tick" x="142.0" y="308" text-anchor="middle">4</text><text class="vz-tick" x="36" y="200.0" text-anchor="end">4</text><text class="vz-tick" x="170.0" y="308" text-anchor="middle">5</text><text class="vz-tick" x="36" y="172.0" text-anchor="end">5</text><text class="vz-tick" x="198.0" y="308" text-anchor="middle">6</text><text class="vz-tick" x="36" y="144.0" text-anchor="end">6</text><text class="vz-tick" x="226.0" y="308" text-anchor="middle">7</text><text class="vz-tick" x="36" y="116.0" text-anchor="end">7</text><text class="vz-tick" x="254.0" y="308" text-anchor="middle">8</text><text class="vz-tick" x="36" y="88.0" text-anchor="end">8</text><text class="vz-tick" x="282.0" y="308" text-anchor="middle">9</text><text class="vz-tick" x="36" y="60.0" text-anchor="end">9</text><text class="vz-tick" x="310.0" y="308" text-anchor="middle">10</text><text class="vz-tick" x="36" y="32.0" text-anchor="end">10</text><text class="vz-axis" x="184" y="328" text-anchor="middle">Occurrence →</text><text class="vz-axis" transform="translate(11 154) rotate(-90)" text-anchor="middle">Severity →</text><circle class="fm-pt" cx="86.0" cy="112.0" r="6" fill="var(--amber)"><title>FM-04 Transfer to backup power fails, so IT load drops (S7 O2 D6)</title></circle><text class="fm-pt-l" x="86.0" y="102.0" text-anchor="middle">04</text><circle class="fm-pt" cx="142.0" cy="168.0" r="6" fill="var(--green)"><title>FM-06 Demand-side heat stress brings the utility close to moving every Ashburn data center to backup generation (S5 O4 D4)</title></circle><text class="fm-pt-l" x="142.0" y="158.0" text-anchor="middle">06</text><circle class="fm-pt" cx="170.0" cy="168.0" r="6" fill="var(--amber)"><title>FM-05 Frequency excursion from an instantaneous multi-GW load swing (S5 O5 D6)</title></circle><text class="fm-pt-l" x="170.0" y="158.0" text-anchor="middle">05</text><circle class="fm-pt" cx="226.0" cy="168.0" r="6" fill="var(--amber)"><title>FM-03 Individually reasonable settings trip dozens of facilities simultaneously onto backup power (S5 O7 D6)</title></circle><text class="fm-pt-l" x="226.0" y="158.0" text-anchor="middle">03</text><circle class="fm-pt" cx="198.0" cy="196.0" r="6" fill="var(--amber)"><title>FM-02 A line component fails and causes a fast voltage transient across the pocket (S4 O6 D6)</title></circle><text class="fm-pt-l" x="198.0" y="186.0" text-anchor="middle">02</text><circle class="fm-pt" cx="254.0" cy="196.0" r="6" fill="var(--amber)"><title>FM-01 Transmission build-out falls behind concentrated data-center load growth, creating a &#x27;pinch point&#x27; (S4 O8 D4)</title></circle><text class="fm-pt-l" x="254.0" y="186.0" text-anchor="middle">01</text><circle class="fm-pt" cx="254.0" cy="224.0" r="6" fill="var(--amber)"><title>FM-07 Failed components and fault details stay undisclosed; the 2026 review is incomplete (S3 O8 D8)</title></circle><text class="fm-pt-l" x="254.0" y="214.0" text-anchor="middle">07</text></svg></figure>
+        </div>
+        <div class="fm-sheet">
+            <div class="fm-head" aria-hidden="true"><span>ID</span><span>Failure mode</span><span>S·O·D</span><span>RPN</span><span>After</span></div>
+            <details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-03</span>
+    <span class="fm-mode">Individually reasonable settings trip dozens of facilities simultaneously onto backup power<span class="fm-item">Data-center protective relay, STS and UPS ride-through settings across the pocket</span></span>
+    <span class="fm-sod" aria-label="Severity 5, occurrence 7, detection 6">5·7·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>210</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Ride through a transmission transient that each facility could tolerate, rather than all transferring at once</dd>
+      <dt>Effect</dt><dd>About 1,500 MW across ~60 data centers disconnects in 2024; more than 3 GW, about 3% of PJM system demand, drops within seconds in 2026</dd>
+      <dt>Cause</dt><dd>Un-coordinated protective and ride-through settings across ultra-dense co-located facilities, producing a common-mode response</dd>
+      <dt>Prevention in place</dt><dd>None recorded across facilities</dd>
+      <dt>Detection in place</dt><dd>RTO and market data (PJM, Yes Energy) and grid telemetry at onset</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>5</b></dt><dd>A multi-GW load collapse visible to the public as flickering lights, with no loss of power and no reliability impact reported: &#x27;customer-visible degradation&#x27;. It is a near-miss for the bulk system, not an outage.</dd></div>
+      <div class="fm-sc"><dt>O <b>7</b></dt><dd>The same mechanism recurred in 2024 and 2026, and any line fault in the pocket exercises it: between &#x27;occasional&#x27; and &#x27;frequent&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>Seen in seconds by grid telemetry, but no control coordinates the response: &#x27;detected at onset, not prevented&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 210</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Coordinate and standardise data-center ride-through and protective relay/UPS settings across the eastern-Loudoun pocket (status: Open) <span class="fm-ev-src">Correction of errors #2</span></li><li>Coordinate ride-through and protective settings so facilities ride through transients instead of islanding en masse (analyst recommendation) <span class="fm-ev-src">Improvement #1</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Contributing factor #3</span><span class="fm-ev-txt">Un-coordinated protective / ride-through settings (design lapse — the dominant real failure mode): &#x27;Individually reasonable settings can produce a common-mode response when facilities react simultaneously to the same disturbance&#x27; (Neil Osnato, DCK, verified); the same mechanism recurred in 2024 (~1,500 MW) and 2026 (~3 GW).</span></li><li><span class="fm-ev-src"><a href="https://NERC event analysis; DCK (&#x27;roughly 1.5 GW … disconnected … in 2024&#x27;, verified)" target="_blank" rel="noopener nofollow">Sequence of events #6</a></span><span class="fm-ev-txt">2024-07-10 (seconds) — Common-mode load loss: roughly 1,500 MW across ~60 data centers disconnected simultaneously as their protective settings responded to the transmission disturbance — facilities transferred to backup generation, did not evacuate.</span></li><li><span class="fm-ev-src"><a href="https://RTO Insider (verified); Data Center Knowledge (verified)" target="_blank" rel="noopener nofollow">Sequence of events #10</a></span><span class="fm-ev-txt">2026-07-22 ~07:55-08:00 — &#x27;PJM and Yes Energy data show that about 3 GW of load suddenly dropped off the grid between 7:55 and 8 a.m.&#x27; — &#x27;more than 3 GW … about 3% of system demand&#x27; disconnected within seconds (vs ~1.5 GW in 2024).</span></li><li><span class="fm-ev-src"><a href="https://Data Center Knowledge (Jul 23 2026, verified); RTO Insider (verified)" target="_blank" rel="noopener nofollow">Metric #1</a></span><span class="fm-ev-txt">2026-07-22 load dropped: ~3 GW (more than 3 GW; about 3% of PJM system demand), within seconds</span></li><li><span class="fm-ev-src"><a href="https://NERC event analysis; ~1.5 GW corroborated by DCK via Reuters (verified)" target="_blank" rel="noopener nofollow">Metric #5</a></span><span class="fm-ev-txt">2024-07-10 load disconnected (common-mode trip): ~1,500 MW across ~60 data centers</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“Individually reasonable settings can produce a common-mode response when facilities react simultaneously to the same disturbance.”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-07</span>
+    <span class="fm-mode">Failed components and fault details stay undisclosed; the 2026 review is incomplete<span class="fm-item">Event analysis and disclosure</span></span>
+    <span class="fm-sod" aria-label="Severity 3, occurrence 8, detection 8">3·8·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>192</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Establish and publish what failed, so the cause can be fixed and checked</dd>
+      <dt>Effect</dt><dd>The 2024 arrestor&#x27;s make, model and age, any inspection lapse, and the 2026 fault&#x27;s voltage class and component remain unknown</dd>
+      <dt>Cause</dt><dd>No operator post-mortem; NERC review of the 2026 event ongoing</dd>
+      <dt>Prevention in place</dt><dd>NERC event-analysis process</dd>
+      <dt>Detection in place</dt><dd>Gaps noted after the events</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>3</b></dt><dd>Affects learning and verification, not service: &#x27;internal impact only&#x27;.</dd></div>
+      <div class="fm-sc"><dt>O <b>8</b></dt><dd>Non-disclosure is the condition for both the 2024 and 2026 faults in the record: &#x27;frequent&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>Found only when the record is examined after the event.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 192</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Complete and publish the NERC/PJM analysis of the 22 July 2026 load loss, including voltage class and failed component (status: in progress) <span class="fm-ev-src">Correction of errors #1</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Data Center Knowledge (John Moura, Jul 23 2026, verified verbatim)" target="_blank" rel="noopener nofollow">Sequence of events #15</a></span><span class="fm-ev-txt">post-event (2024-2026) — Regulatory follow-through: NERC documents the load-loss class and the review of the 2026 event is ongoing. NERC&#x27;s John Moura: &#x27;We expect to know more soon. We&#x27;ll review once all the processes are completed to see if there is anything significantly new.&#x27; Emphasis shifts to tightening data-center ride-through/protective settings.</span></li><li><span class="fm-ev-src"><a href="https://Ting Labs (verified); RTO Insider (verified)" target="_blank" rel="noopener nofollow">Metric #4</a></span><span class="fm-ev-txt">Cause of 2026 event: Dominion Energy transmission line fault (voltage class / failed component not disclosed)</span></li><li><span class="fm-ev-src">Correction of errors #1</span><span class="fm-ev-txt">Complete and publish the NERC/PJM event analysis of the July 22, 2026 ~3 GW load loss, including the fault&#x27;s voltage class and failed component (currently undisclosed). (In progress — &#x27;We&#x27;ll review once all the processes are completed&#x27; (John Moura, DCK, verified))</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-05</span>
+    <span class="fm-mode">Frequency excursion from an instantaneous multi-GW load swing<span class="fm-item">PJM/Dominion frequency balancing</span></span>
+    <span class="fm-sod" aria-label="Severity 5, occurrence 5, detection 6">5·5·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>150</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Hold system frequency when multi-GW of load disappears in seconds</dd>
+      <dt>Effect</dt><dd>In 2026, a measurable frequency change with no reliability impacts; strongest impacts about two minutes, broader recovery close to ten minutes</dd>
+      <dt>Cause</dt><dd>Instantaneous loss of about 3% of system demand from FM-03</dd>
+      <dt>Prevention in place</dt><dd>PJM frequency-balancing operations</dd>
+      <dt>Detection in place</dt><dd>RTO telemetry at onset</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>5</b></dt><dd>Grid-wide but absorbed: &#x27;customer-visible degradation&#x27; at most, given flickering lights and no loss of power.</dd></div>
+      <div class="fm-sc"><dt>O <b>5</b></dt><dd>Follows only from a common-mode trip like FM-03; held at 5 so the same events are not counted twice at full weight.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>PJM saw the frequency change as it happened: &#x27;detected at onset, not prevented&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 150</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Harden PJM/Dominion frequency-balancing and mass generator-transfer playbooks for multi-GW instantaneous load swings (status: Open) <span class="fm-ev-src">Correction of errors #5</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Data Center Knowledge (PJM statement, verified verbatim)" target="_blank" rel="noopener nofollow">Sequence of events #12</a></span><span class="fm-ev-txt">2026-07-22 — RTO assessment: PJM reported &#x27;a measurable frequency change but no reliability impacts&#x27; — an operational (frequency-balancing) response, not a physical fire response.</span></li><li><span class="fm-ev-src"><a href="https://Ting Labs (tingfire.com, verified verbatim)" target="_blank" rel="noopener nofollow">Sequence of events #13</a></span><span class="fm-ev-txt">2026-07-22 (~2-10 min) — &#x27;The strongest impacts of the disturbance lasted approximately two minutes, while the broader frequency recovery took close to ten minutes.&#x27;</span></li><li><span class="fm-ev-src"><a href="https://Ting Labs (tingfire.com, verified verbatim)" target="_blank" rel="noopener nofollow">Metric #3</a></span><span class="fm-ev-txt">Disturbance duration / recovery (2026-07-22): ~2 min strongest impact; ~10 min broader frequency recovery</span></li><li><span class="fm-ev-src"><a href="https://www.datacenterknowledge.com/outages/fault-in-data-center-alley-triggered-3-gw-load-drop-on-pjm" target="_blank" rel="noopener nofollow">Reference #2 · press</a></span><span class="fm-ev-txt">“about 3% of system demand at the time”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-02</span>
+    <span class="fm-mode">A line component fails and causes a fast voltage transient across the pocket<span class="fm-item">Transmission line components (230 kV surge arrestor in 2024; undisclosed component in 2026)</span></span>
+    <span class="fm-sod" aria-label="Severity 4, occurrence 6, detection 6">4·6·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>144</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Carry power into the load pocket without producing transients</dd>
+      <dt>Effect</dt><dd>Initiates the 2024 (~1,500 MW) and 2026 (~3 GW) load-loss events; on its own a localised line fault</dd>
+      <dt>Cause</dt><dd>2024: lightning/surge arrestor failure on a 230 kV line in Fairfax County; 2026: a Dominion transmission line fault whose voltage class and component are not disclosed. Whether an asset-condition or inspection lapse contributed is not disclosed</dd>
+      <dt>Prevention in place</dt><dd>None recorded; inspection and testing programmes are not disclosed</dd>
+      <dt>Detection in place</dt><dd>Grid telemetry at the moment of the fault (07:56:09 EDT on 22 July 2026)</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>4</b></dt><dd>The fault&#x27;s own effect is a transient; the multi-GW consequence comes from FM-03 and is scored there, so this mode is kept at &#x27;limited customer impact&#x27; to avoid double counting.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>Two initiating faults in two years in the same pocket: &#x27;occasional&#x27;. The cause of the 2026 fault is undisclosed.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>Telemetry saw the fault at once, but nothing recorded anticipated it: &#x27;detected at onset, not prevented&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 144</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Establish and disclose surge-arrestor and line-protection asset-condition inspection and testing on the 230 kV+ network (status: Open) <span class="fm-ev-src">Correction of errors #4</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://NERC event analysis (July 10 2024); 1.5 GW corroborated by DCK via Reuters" target="_blank" rel="noopener nofollow">Sequence of events #5</a></span><span class="fm-ev-txt">2024-07-10 ~19:00 ET — PRECEDENT, DIFFERENT EVENT (do not misattribute to 2022): a lightning/surge arrestor failed on a 230 kV transmission line in Fairfax County — the one disclosed discrete hardware failure in the record.</span></li><li><span class="fm-ev-src"><a href="https://RTO Insider (Michael Brooks, Jul 23 2026, verified); Ting Labs (verified)" target="_blank" rel="noopener nofollow">Sequence of events #7</a></span><span class="fm-ev-txt">2026-07-22 ~07:55 — A Dominion Energy transmission line fault occurs in Northern Virginia (voltage class / failed component not publicly detailed); no fire, no smoke, no VESDA event.</span></li><li><span class="fm-ev-src"><a href="https://NERC event analysis (not re-verified verbatim this pass)" target="_blank" rel="noopener nofollow">Metric #6</a></span><span class="fm-ev-txt">Failed component, 2024 precedent: lightning/surge arrestor on a 230 kV transmission line (make/model/age not disclosed)</span></li><li><span class="fm-ev-src">Contributing factor #4</span><span class="fm-ev-txt">A discrete hardware failure initiated the 2024 precedent: a lightning/surge arrestor failed on a 230 kV transmission line (NERC event analysis; ~1.5 GW figure corroborated by DCK via Reuters). Whether this reflects an asset-condition or inspection/testing lapse is NOT disclosed in public sources (disclosed uncertainty); the failed arrestor&#x27;s make/model/age/chemistry are undisclosed.</span></li><li><span class="fm-ev-src"><a href="https://www.tingfire.com/blog/what-happened-when-3-gigawatt-of-data-center-demand-disappeared-from-the-grid/" target="_blank" rel="noopener nofollow">Reference #1 · vendor-status</a></span><span class="fm-ev-txt">“a Dominion Energy transmission line fault in Northern Virginia”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-01</span>
+    <span class="fm-mode">Transmission build-out falls behind concentrated data-center load growth, creating a &#x27;pinch point&#x27;<span class="fm-item">Bulk transmission import capacity into eastern Loudoun</span></span>
+    <span class="fm-sod" aria-label="Severity 4, occurrence 8, detection 4">4·8·4</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>128</span>
+    <span class="fm-rpn-rev">80</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Deliver enough transmission capacity for the load being connected to the pocket</dd>
+      <dt>Effect</dt><dd>Dominion tells major customers on 29 July 2022 that new data-center deliveries could be delayed to ~2026 and new connections may pause</dd>
+      <dt>Cause</dt><dd>Planning and interconnection lag: record, geographically concentrated load growth against limited transmission import capability</dd>
+      <dt>Prevention in place</dt><dd>PJM and Dominion transmission planning</dd>
+      <dt>Detection in place</dt><dd>PJM planning material on 12 July 2022 warned of insufficient transmission capability by 2024/25</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>4</b></dt><dd>It delays new capacity rather than interrupting running services; no outage of existing load is recorded: &#x27;limited customer impact&#x27;.</dd></div>
+      <div class="fm-sc"><dt>O <b>8</b></dt><dd>Load growth in the pocket is routine and outpaced build-out: &#x27;frequent&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>4</b></dt><dd>Grid planning flagged the constraint years before reliability issues were expected: &#x27;detected before impact with time to act&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 128</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Two new 500 kV transmission lines into eastern Loudoun, and geographic dispersal of new hyperscale load (Dominion; committed August 2022, in progress) <span class="fm-ev-src">Correction of errors #3</span></li><li>Formalise RTO/utility/data-center coordination on interconnection sequencing and demand forecasting (analyst recommendation; no status) <span class="fm-ev-src">Improvement #3</span></li></ul>
+    <p class="fm-revline">After action: S4 · O5 · D4 → RPN 80. Added import capacity reduces how often load growth meets a transmission ceiling (O 8→5); it does not change the severity or how the constraint is detected. The dossier records the lines as committed in August 2022 and in progress, from a source not re-verified verbatim, so the reduction is a claim about the action, not a confirmed outcome.</p>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Route Fifty (2022) — not re-verified verbatim this pass" target="_blank" rel="noopener nofollow">Sequence of events #1</a></span><span class="fm-ev-txt">2022 summer — Record, geographically concentrated data-center load growth in eastern Loudoun collides with limited transmission import capacity; Dominion identifies a &#x27;pinch point&#x27; in eastern Loudoun County. No fire, no combustion, no detection event.</span></li><li><span class="fm-ev-src"><a href="https://Route Fifty (PJM Jul 12 2022 presentation) — not re-verified verbatim" target="_blank" rel="noopener nofollow">Sequence of events #2</a></span><span class="fm-ev-txt">2022-07-12 — Grid-planning detection (not fire detection): PJM planning material warns that without further transmission upgrades the area will not have sufficient transmission capability by 2024/25, expecting reliability issues as soon as 2024.</span></li><li><span class="fm-ev-src"><a href="https://Route Fifty (2022) — not re-verified verbatim" target="_blank" rel="noopener nofollow">Sequence of events #3</a></span><span class="fm-ev-txt">“transmission infrastructure, not power generation”</span></li><li><span class="fm-ev-src">Contributing factor #2</span><span class="fm-ev-txt">Transmission build-out lagging demand (planning/design lapse): Dominion warned in July 2022 of a &#x27;pinch point&#x27; in eastern Loudoun that could delay new connections to ~2025-2026, framed as &#x27;transmission infrastructure, not power generation&#x27;; PJM planning material warned the area would lack sufficient transmission capability by 2024/25 (Route Fifty — not re-verified verbatim this pass; facts corroborated by historical record).</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-04</span>
+    <span class="fm-mode">Transfer to backup power fails, so IT load drops<span class="fm-item">On-site backup generation transfer at each facility</span></span>
+    <span class="fm-sod" aria-label="Severity 7, occurrence 2, detection 6">7·2·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>84</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Carry critical IT load on site when the utility feed is disturbed</dd>
+      <dt>Effect</dt><dd>Did not occur in the record: facilities transferred to backup power for a very short period and rode through, with no evacuation or emergency dispatch reported</dd>
+      <dt>Cause</dt><dd>Would require a failed transfer at the facility; none is recorded</dd>
+      <dt>Prevention in place</dt><dd>Protective relays, static transfer switches, UPS ride-through and on-site generation</dd>
+      <dt>Detection in place</dt><dd>Facility control systems acting automatically</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>7</b></dt><dd>A failed transfer would drop the IT load of the facilities affected: a major degradation. The dossier records no such failure.</dd></div>
+      <div class="fm-sc"><dt>O <b>2</b></dt><dd>The transfers worked in both the 2024 and 2026 events: &#x27;remote: guarded by design&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>A failed transfer would be seen at once but not prevented: &#x27;detected at onset, not prevented&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 84</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Verify that simultaneous backup starts across many facilities do not create secondary safety hazards (status: Open) <span class="fm-ev-src">Correction of errors #5</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Data Center Knowledge (Shane Snider, Jul 23 2026, verified verbatim)" target="_blank" rel="noopener nofollow">Sequence of events #9</a></span><span class="fm-ev-txt">2026-07-22 ~07:55-08:00 — &#x27;Suppression&#x27; analogue = automatic ride-through/transfer: &#x27;the data centers&#x27; own control systems transferred them to backup power for a very short period of time&#x27; — protective relays/STS/UPS island critical load onto on-site generation.</span></li><li><span class="fm-ev-src"><a href="https://RTO Insider (Jul 23 2026, verified verbatim)" target="_blank" rel="noopener nofollow">Sequence of events #11</a></span><span class="fm-ev-txt">2026-07-22 — Public-visible effect limited to &#x27;flickering lights in the area but no loss of power&#x27; per Dominion Energy — no evacuation, no 911/fire dispatch reported at any facility.</span></li><li><span class="fm-ev-src">Technical deep-dive</span><span class="fm-ev-txt">“Facilities did NOT shut down and were NOT evacuated”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-06</span>
+    <span class="fm-mode">Demand-side heat stress brings the utility close to moving every Ashburn data center to backup generation<span class="fm-item">Grid supply to Ashburn during summer heat and record demand</span></span>
+    <span class="fm-sod" aria-label="Severity 5, occurrence 4, detection 4">5·4·4</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--green)"></i>80</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Serve record summer peak demand without forcing data centers onto backup generation</dd>
+      <dt>Effect</dt><dd>Reported near-miss: Dominion &#x27;minutes away from turning every data center in Ashburn to a backup generation&#x27; at a claimed PJM record peak, heat index 114; no transfer or outage recorded</dd>
+      <dt>Cause</dt><dd>Summer heat and record demand (single-source; date and peak figure not verified)</dd>
+      <dt>Prevention in place</dt><dd>Grid operations</dd>
+      <dt>Detection in place</dt><dd>Grid operators, minutes before action would have been needed</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>5</b></dt><dd>The recorded outcome is a near-miss with no customer impact; a forced transfer of every Ashburn data center would have been a customer-visible stress, scored 5. Held there because the account is single-source.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>Needs extreme heat and record demand together: &#x27;infrequent&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>4</b></dt><dd>The operator saw the margin shrinking with minutes to act: &#x27;detected before impact with time to act&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Low</b> · RPN 80</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Formalise coordination on demand forecasting so transmission does not lag load (analyst recommendation; no status) <span class="fm-ev-src">Improvement #3</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Loudoun Now — single-source, not independently verified" target="_blank" rel="noopener nofollow">Sequence of events #14</a></span><span class="fm-ev-txt">heat-stress episode (date not pinned) — Demand-driven grid stress (distinct sub-event): Dominion reportedly &#x27;minutes away from turning every data center in Ashburn to a backup generation&#x27; at a claimed PJM record peak of 168,158 MW; heat index 114. Exact date and PJM-record figure not independently verified (disclosed uncertainty).</span></li><li><span class="fm-ev-src">Contributing factor #5</span><span class="fm-ev-txt">Summer heat and record demand as an aggravator: a demand-side heat-stress episode reportedly left Dominion &#x27;minutes away from turning every data center in Ashburn to a backup generation&#x27; at a claimed PJM record peak of 168,158 MW and a 114 heat index (Loudoun Now — single-source, not independently verified this pass; retained as disclosed uncertainty).</span></li><li><span class="fm-ev-src"><a href="https://Loudoun Now — single-source, NOT independently verified" target="_blank" rel="noopener nofollow">Metric #8</a></span><span class="fm-ev-txt">Claimed PJM record peak during heat stress: 168,158 MW (~3,000 MW above Aug 2006 record); heat index 114</span></li></ul>
+  </div>
+</details>
+        </div>
+        <details class="fm-method"><summary>Scoring rubric and method</summary><div class="fm-method-body"><p>A retrospective FMEA: each row asks how this system could fail, how bad the effect was, how likely the cause was given the controls in place at the time, and how likely those controls were to catch it before customers did. Scales are adapted for data-centre operations from the 1–10 scales of IEC 60812:2018 and the AIAG-VDA FMEA handbook. RPN = S × O × D. Priority is High when S ≥ 9 with O ≥ 4 or D ≥ 7, or when RPN ≥ 300; Medium when RPN ≥ 120 or S ≥ 7; Low otherwise. Severity overrides the product because a large S multiplied by small O and D can hide a region-wide outage nothing would catch.</p><p>Every row cites evidence from this dossier, and every quote is checked verbatim against its source by <code>tools/test-incidents-fmea.py</code>. A revised score is only shown against a published corrective action. This is an RZ analyst assessment, not an operator document.</p><div class="fm-rubrics"><div><p class="fm-sub">Severity</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Hazard to people, or loss of the facility / several regions</td></tr><tr><td>9</td><td>Region-wide or provider-wide outage of a foundational service, no workaround</td></tr><tr><td>8</td><td>Full outage of a major service for hours</td></tr><tr><td>7</td><td>Major degradation of a major service</td></tr><tr><td>6</td><td>Partial outage confined to one zone or one service</td></tr><tr><td>5</td><td>Customer-visible degradation</td></tr><tr><td>4</td><td>Limited customer impact</td></tr><tr><td>3</td><td>Internal impact only</td></tr><tr><td>2</td><td>Negligible</td></tr><tr><td>1</td><td>No effect</td></tr></tbody></table></div><div><p class="fm-sub">Occurrence</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Near certain: the cause is present in normal operation</td></tr><tr><td>8</td><td>Frequent: routine work exercises the cause</td></tr><tr><td>6</td><td>Occasional: a foreseeable slip or condition, weakly guarded</td></tr><tr><td>4</td><td>Infrequent: needs an unusual combination</td></tr><tr><td>2</td><td>Remote: guarded by design</td></tr><tr><td>1</td><td>Eliminated by design</td></tr></tbody></table></div><div><p class="fm-sub">Detection</p><table class="fm-rubric"><tbody><tr><td>10</td><td>No control could detect it</td></tr><tr><td>9</td><td>Detected only through customer impact</td></tr><tr><td>8</td><td>Detected after impact by internal monitoring</td></tr><tr><td>6</td><td>Detected at onset, not prevented</td></tr><tr><td>4</td><td>Detected before impact with time to act</td></tr><tr><td>2</td><td>Automated interlock almost certainly stops it</td></tr><tr><td>1</td><td>Certain to be stopped</td></tr></tbody></table></div></div></div></details>
+
 
         <h2>Correction of errors (COE)</h2>
         <ul class="tight"><li>Complete and publish the NERC/PJM event analysis of the July 22, 2026 ~3 GW load loss, including the fault&#x27;s voltage class and failed component (currently undisclosed). <span class="coe-meta">NERC / PJM · In progress — &#x27;We&#x27;ll review once all the processes are completed&#x27; (John Moura, DCK, verified)</span></li><li>Coordinate and standardize data-center voltage/frequency ride-through and protective relay/UPS settings across the eastern-Loudoun load pocket to eliminate common-mode simultaneous transfers. <span class="coe-meta">PJM / Dominion / NERC with data-center operators · Open — dominant recurring failure mode across 2024 and 2026</span></li><li>Accelerate transmission import capacity (two new 500 kV lines) into concentrated load pockets and disperse new hyperscale load geographically. <span class="coe-meta">Dominion Energy · In progress — committed August 2022 (not re-verified verbatim this pass)</span></li><li>Establish and disclose surge-arrestor and line-protection asset-condition inspection/testing programs on the 230 kV+ network. <span class="coe-meta">Dominion / transmission owners · Open — disclosed uncertainty whether an inspection lapse contributed to the 2024 arrestor failure</span></li><li>Harden PJM/Dominion frequency-balancing and mass generator-transfer playbooks for multi-GW instantaneous load swings; verify simultaneous backup starts do not create secondary safety hazards. <span class="coe-meta">PJM / Dominion · Open</span></li></ul>
@@ -433,7 +731,7 @@ Critically, this is the OPPOSITE of a fire de-energisation. Facilities did NOT s
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-1a1a084f"></script>
+    <script src="js/rz-version.js?v=20261010-00a1d9e8"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

@@ -52,6 +52,12 @@
     .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
     .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
     .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:2px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    /* A chip carries the operator name, which can be a whole sentence ("Google Cloud
+       (impacted tenant); STT GDC / Tata Communications JV (named as the third-party …").
+       nowrap made that one chip 1120px wide and pushed the GCP Delhi dossier into a
+       1260px page at a 1100px viewport. Short chips are unaffected: normal wrapping
+       only engages when a chip would not fit its row. */
+    .chips .chip { max-width:100%; white-space:normal; overflow-wrap:anywhere; }
     .chip.cyan { color:var(--cyan); border-left:2px solid var(--cyan); }
     .chip.amber { color:var(--amber); border-left:2px solid var(--amber); }
     .chip.green { color:var(--green); border-left:2px solid var(--green); }
@@ -71,6 +77,11 @@
     /* rich incident table (reference-2 style) */
     table.itbl { min-width:1120px; }
     table.itbl td { vertical-align:middle; }
+    /* v1.134.20 — the title and summary columns ellipsise so the table's columns line up,
+       which is the right call for a dense index. But the cut text was reachable only by
+       navigating to the incident: a summary lost 238-298px of its sentence with no way to read
+       it in place. Each carries its full text in a title attribute now, so the truncation is
+       deliberate AND non-lossy — which is the condition the legibility audit checks for. */
     .itr { cursor:pointer; }
     .itr:hover td { background:var(--surface-2); }
     .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
@@ -240,7 +251,6 @@
        derive width = W px from the aspect ratio, so the drawing renders 1:1 at any event count
        and the panel scrolls instead of shrinking. */
     .viz-timeline svg { max-width:none; height:96px; width:auto; }
-
     .viz-radar svg { max-width:320px; margin:0 auto; }
     .vz-num { font-variant-numeric:tabular-nums slashed-zero; }
     .vz-box-t, .vz-box-s, .vz-lbl, .vz-hb-lbl, .vz-tl-t, .vz-pt, .vz-tick { pointer-events:auto; }
@@ -323,7 +333,86 @@
     }
     @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
 </style>
-    
+    <style>
+    /* ── FMEA (v3.12.3) — one hairline panel of rows, like the rest of the dossier.
+       No cards, no stripes: a row is a disclosure, state is a 7px dot. ── */
+    .fm-scope { color:var(--text-body); max-width:70ch; }
+    .fm-meta { flex-wrap:wrap; row-gap:0.25rem; }
+    .fm-viz { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:1.6rem; align-items:start; margin:1.2rem 0; }
+    @media (max-width:820px){ .fm-viz { grid-template-columns:1fr; } }
+    .fm-pb-row, .fm-pb-axis { display:grid; grid-template-columns:3.6rem minmax(0,1fr) 6.6rem; gap:0.6rem; align-items:center; }
+    .fm-pb-row { padding:0.32rem 0; }
+    .fm-pb-id, .fm-pb-val { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.8rem; }
+    .fm-pb-id { color:var(--muted); }
+    .fm-pb-val { color:var(--text-strong); white-space:nowrap; }
+    .fm-pb-track { display:flex; flex-direction:column; gap:3px; }
+    .fm-pb-bar { display:block; height:12px; }
+    .fm-pb-rev { display:block; height:4px; background:var(--text-body); opacity:0.55; }
+    .fm-pb-none { font-style:italic; font-size:0.72rem; color:var(--muted); line-height:1; }
+    .fm-pb-axis { margin-top:0.3rem; border-top:1px solid var(--line); padding-top:0.25rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .fm-pb-ticks { display:flex; justify-content:space-between; }
+    .fm-fig { margin:0; }
+    .fm-fig figcaption { font-size:0.8rem; color:var(--muted); margin-bottom:0.35rem; }
+    .fm-fig svg { width:100%; height:auto; display:block; }
+    .fm-fig-m svg { max-width:340px; }
+    .fm-matrix .fm-c-lo { fill:var(--surface); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-md { fill:color-mix(in srgb, var(--amber) 9%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-c-hi { fill:color-mix(in srgb, var(--red) 10%, var(--surface)); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .vz-axis { font-size:10px; fill:var(--muted); font-family:'IBM Plex Sans',sans-serif; }
+    .fm-matrix .fm-pt { stroke:var(--surface); stroke-width:1.5; }
+    .fm-matrix .fm-pt-l { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; fill:var(--text-strong);
+      paint-order:stroke; stroke:var(--surface); stroke-width:3px; stroke-linejoin:round; }
+    .fm-sheet { border:1px solid var(--line); border-radius:4px; margin-top:0.8rem; }
+    .fm-head, .fm-row > summary { display:grid; grid-template-columns:4.2rem minmax(0,1fr) 4.4rem 4.6rem 3.4rem; gap:0.6rem; align-items:baseline; padding:0.6rem 0.9rem; }
+    .fm-head { font-size:0.74rem; color:var(--muted); border-bottom:1px solid var(--line); }
+    .fm-row { border-top:1px solid var(--line); }
+    .fm-row:first-of-type { border-top:0; }
+    .fm-row > summary { cursor:pointer; list-style:none; }
+    .fm-row > summary::-webkit-details-marker { display:none; }
+    .fm-row > summary:hover { background:var(--surface-2); }
+    .fm-row > summary:focus-visible { outline:2px solid var(--cyan); outline-offset:-2px; }
+    .fm-id-cell, .fm-sod, .fm-rpn, .fm-rpn-rev { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.84rem; }
+    .fm-id-cell { color:var(--muted); }
+    .fm-mode { color:var(--text-strong); font-size:0.92rem; line-height:1.4; }
+    .fm-item { display:block; color:var(--muted); font-size:0.8rem; }
+    .fm-sod { color:var(--text-body); }
+    .fm-rpn { color:var(--text-strong); }
+    .fm-rpn-rev { color:var(--muted); }
+    .fm-dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:0.45rem; vertical-align:0.1em; }
+    .fm-body { padding:0.2rem 0.9rem 1rem 5.7rem; }
+    @media (max-width:640px){
+      .fm-head { display:none; }
+      .fm-row > summary { grid-template-columns:3.2rem minmax(0,1fr) auto; }
+      .fm-sod, .fm-rpn-rev { display:none; }
+      .fm-body { padding:0.2rem 0.9rem 1rem; }
+    }
+    .fm-kv { display:grid; grid-template-columns:9.5rem minmax(0,1fr); gap:0.3rem 0.9rem; margin:0.4rem 0 0.8rem; font-size:0.88rem; }
+    .fm-kv dt { color:var(--muted); }
+    .fm-kv dd { margin:0; color:var(--text-body); }
+    @media (max-width:640px){ .fm-kv { grid-template-columns:1fr; } .fm-kv dd { margin-bottom:0.4rem; } }
+    .fm-scores { margin:0 0 0.6rem; border-top:1px solid var(--line); }
+    .fm-sc { display:grid; grid-template-columns:3.2rem minmax(0,1fr); gap:0.6rem; padding:0.45rem 0; border-bottom:1px solid var(--line); font-size:0.86rem; }
+    .fm-sc dt { font-family:'JetBrains Mono',monospace; color:var(--muted); }
+    .fm-sc dt b { color:var(--text-strong); }
+    .fm-sc dd { margin:0; color:var(--text-body); }
+    .fm-sub { font-size:0.8rem; color:var(--muted); margin:0.7rem 0 0.25rem; }
+    .fm-sub b { color:var(--text-strong); }
+    .fm-acts, .fm-ev { margin:0; padding-left:1.1rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-acts li, .fm-ev li { margin:0.25rem 0; }
+    .fm-residual { color:var(--red); }
+    .fm-revline { font-size:0.86rem; color:var(--text-body); margin:0.4rem 0 0; }
+    .fm-ev-src { display:block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .fm-ev-src a { color:var(--cyan); }
+    .fm-ev-txt { display:block; }
+    .fm-method { margin-top:1rem; border:1px solid var(--line); border-radius:4px; }
+    .fm-method > summary { padding:0.6rem 0.9rem; cursor:pointer; font-size:0.9rem; color:var(--text-strong); }
+    .fm-method-body { padding:0 0.9rem 0.9rem; font-size:0.88rem; color:var(--text-body); }
+    .fm-rubrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+    @media (max-width:760px){ .fm-rubrics { grid-template-columns:1fr; } }
+    .fm-rubric { width:100%; border-collapse:collapse; font-size:0.8rem; }
+    .fm-rubric td { padding:0.25rem 0.4rem; border-top:1px solid var(--line); vertical-align:top; }
+    .fm-rubric td:first-child { font-family:'JetBrains Mono',monospace; width:2rem; color:var(--text-strong); }
+</style>
 </head>
 <body class="locked">
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -346,14 +435,14 @@
         <h1>Digital Realty Singapore Lithium-Ion UPS Fire (2024)</h1>
         <div class="chips">
             <span class="chip">Digital Realty</span>
-            <span class="chip cyan">2024-09-01</span>
+            <span class="chip cyan">2024-09-10</span>
             <span class="chip amber">10h 0m core impact</span>
             <span class="chip red">Fire</span><span class="chip amber">Power</span>
         </div>
         <p class="lede">A lithium-ion UPS battery fire at a Singapore data center forced an emergency power shutdown, disrupting customers including Alibaba and Lazada — another instance of Li-ion UPS risk in modern facilities.</p>
 
         <h2>Failure cascade</h2>
-        <div class="viz viz-cascade"><svg viewBox="0 0 760 158" role="img" aria-label="Failure cascade block diagram"><title>Failure cascade: trigger → fault → downstream impact</title><defs><marker id="ic-ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path class="vz-arrhead" d="M0,0 L6,3 L0,6 Z"/></marker></defs><text class="vz-tl-ph" x="8" y="12">Trigger</text><text class="vz-tl-ph" x="248" y="12">Primary fault</text><text class="vz-tl-ph" x="516" y="12">Downstream impact</text><rect class="vz-box-trigger" x="8" y="51.0" width="176" height="56" rx="2"><title>Trigger — Fire (2024-09-01)</title></rect><text class="vz-box-t" x="18" y="68.0">Trigger · Fire</text><text class="vz-box-s" x="18" y="82.0"><title>2024-09-01</title>2024-09-01</text><rect class="vz-box-fault" x="240" y="51.0" width="224" height="56" rx="2"><title>Primary fault at Digital Realty — Digital Realty Singapore data center</title></rect><text class="vz-box-t" x="250" y="68.0">Digital Realty</text><text class="vz-box-s" x="250" y="82.0"><title>Digital Realty Singapore data center</title>Digital Realty Singapore data</text><line class="vz-flow" x1="184" y1="79.0" x2="238" y2="79.0" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="26" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Alibaba/Lazada regional services (reported)</title></rect><text class="vz-box-t" x="526" y="43">Alibaba/Lazada regional services</text><line class="vz-flow" x1="464" y1="79.0" x2="514" y2="44" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="70" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Colocation customers</title></rect><text class="vz-box-t" x="526" y="87">Colocation customers</text><line class="vz-flow" x1="464" y1="79.0" x2="514" y2="88" marker-end="url(#ic-ar)"/></svg></div>
+        <div class="viz viz-cascade"><svg viewBox="0 0 760 158" role="img" aria-label="Failure cascade block diagram"><title>Failure cascade: trigger → fault → downstream impact</title><defs><marker id="ic-ar" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto"><path class="vz-arrhead" d="M0,0 L6,3 L0,6 Z"/></marker></defs><text class="vz-tl-ph" x="8" y="12">Trigger</text><text class="vz-tl-ph" x="248" y="12">Primary fault</text><text class="vz-tl-ph" x="516" y="12">Downstream impact</text><rect class="vz-box-trigger" x="8" y="51.0" width="176" height="56" rx="2"><title>Trigger — Fire (2024-09-10)</title></rect><text class="vz-box-t" x="18" y="68.0">Trigger · Fire</text><text class="vz-box-s" x="18" y="82.0"><title>2024-09-10</title>2024-09-10</text><rect class="vz-box-fault" x="240" y="51.0" width="224" height="56" rx="2"><title>Primary fault at Digital Realty — Digital Realty Singapore data center</title></rect><text class="vz-box-t" x="250" y="68.0">Digital Realty</text><text class="vz-box-s" x="250" y="82.0"><title>Digital Realty Singapore data center</title>Digital Realty Singapore data</text><line class="vz-flow" x1="184" y1="79.0" x2="238" y2="79.0" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="26" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Alibaba/Lazada regional services (reported)</title></rect><text class="vz-box-t" x="526" y="43">Alibaba/Lazada regional services</text><line class="vz-flow" x1="464" y1="79.0" x2="514" y2="44" marker-end="url(#ic-ar)"/><rect class="vz-box-down" x="516" y="70" width="236" height="36" rx="2"><title>Downstream service degraded by the fault: Colocation customers</title></rect><text class="vz-box-t" x="526" y="87">Colocation customers</text><line class="vz-flow" x1="464" y1="79.0" x2="514" y2="88" marker-end="url(#ic-ar)"/></svg></div>
         <p class="disclaimer">Trigger → primary fault → downstream blast radius, derived from the sourced root cause and affected-services record.</p>
 
         <h2>Facility &amp; location</h2>
@@ -361,7 +450,7 @@
             <dt>Operator</dt><dd>Digital Realty</dd>
             <dt>Data center</dt><dd>Digital Realty Singapore data center</dd>
             <dt>Location</dt><dd>Singapore, Singapore</dd>
-            <dt>Date</dt><dd>2024-09-01</dd>
+            <dt>Date</dt><dd>2024-09-10</dd>
         </dl>
 
         <h2>Impact &amp; scale</h2>
@@ -391,6 +480,187 @@ LATENT ROOT — DESIGN/SITING, NOT A MAINTENANCE VIOLATION: The salient systemic
 
         <h2>Contributing factors</h2>
         <ul class="tight"><li>Legacy above-grade battery siting: Li-ion energy-storage rooms were on the third-floor mezzanine, contrary to SCDF&#x27;s 2020 standard requiring ground-floor placement. Digital Realty states the 2016 facility predated the rule, so it was grandfathered — but the elevated siting is the single largest aggravating design factor (DCD).</li><li>Water-based suppression against Li-ion thermal runaway: sprinklers plus four SCDF water jets could only cool, not stop, self-sustaining cell-to-cell propagation, forcing a multi-day operation and generating the water volume that later reached the IT halls (Straits Times/SCDF).</li><li>Vertical co-location of burning batteries above live server halls: with no water-tight separation between the third-floor battery rooms and IT space, suppression water accumulated and leaked into server rooms, creating the short-circuit risk that drove the emergency shutdown (DCD; Alibaba via DCD).</li><li>Firefighting-protocol lockout of operators: Alibaba&#x27;s operation-and-maintenance engineers were unable to enter the building, delaying damage assessment, drying and restoration of water-exposed hardware (DCD).</li><li>Single-facility concentration risk for tenants: Alibaba Cloud Singapore Availability Zone C, and downstream Lazada and ByteDance/TikTok, had insufficient isolation from a single building event, so one battery-room fire produced a multi-tenant regional outage (DCD; The Star).</li><li>No public evidence of a maintenance/inspection/testing lapse: the trigger is described only as &#x27;an electrical issue in one of the battery rooms,&#x27; with battery make/model, chemistry, age and state of charge undisclosed — an evidentiary gap rather than a confirmed clean bill (Straits Times/SCDF).</li></ul>
+        <h2 id="fmea">Failure mode &amp; effects analysis (FMEA)</h2>
+        <p class="fm-scope">The physical chain at Digital Realty&#x27;s Digital Loyang facility in Singapore — the lithium-ion battery bank in the third-floor mezzanine battery rooms, the fire alarm and water-based suppression, the separation between battery rooms and the server halls below, the emergency power shutdown, operator re-entry and hardware drying, and the tenant availability zone (Alibaba Cloud Singapore AZ-C) and downstream services that depended on the building. Analysed retrospectively from press reporting only (DCD, Straits Times/SCDF, The Star): there is no official post-mortem, the trigger is described only as &#x27;an electrical issue in one of the battery rooms&#x27;, and battery make, model, chemistry, age and state of charge are undisclosed. Every facility-side corrective action in this dossier is an analyst recommendation with status &#x27;Open — no public evidence&#x27;, so no revised score is claimed for any mode: all are shown as residual risk.</p>
+        <p class="metabar fm-meta"><span><b>6</b> failure modes</span><span class="sep">/</span><span><b>3</b> high priority</span><span class="sep">/</span><span><b>0 of 6</b> with a published action</span><span class="sep">/</span><span>total RPN <b>1448 → 1448</b> (−0%)</span></p>
+        <div class="fm-viz">
+            <figure class="fm-fig"><figcaption>Risk priority number (S × O × D), worst first — thin bar: after the published action</figcaption><div class="fm-pb" role="list" aria-label="Risk priority number per failure mode, before and after corrective action"><div class="fm-pb-row" role="listitem" title="FM-04 Fire-safety protocol keeps O&amp;M engineers out of the building, so damage assessment, controlled shutdown and drying of wet hardware are delayed"><span class="fm-pb-id">FM-04</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:84.0%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">336</span></div><div class="fm-pb-row" role="listitem" title="FM-01 An electrical fault in one battery room initiates lithium-ion thermal runaway"><span class="fm-pb-id">FM-01</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:80.0%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">320</span></div><div class="fm-pb-row" role="listitem" title="FM-03 Firefighting and sprinkler water drains from the third-floor battery rooms into the server halls, forcing an emergency power shutdown of the building"><span class="fm-pb-id">FM-03</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:54.0%;background:var(--red)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">216</span></div><div class="fm-pb-row" role="listitem" title="FM-06 Only an early finding is public; the fault mechanism and battery details remain undisclosed"><span class="fm-pb-id">FM-06</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:54.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">216</span></div><div class="fm-pb-row" role="listitem" title="FM-02 Water suppression cools but cannot stop cell-to-cell thermal-runaway propagation, so the fire persists and the operation runs over two days"><span class="fm-pb-id">FM-02</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:48.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">192</span></div><div class="fm-pb-row" role="listitem" title="FM-05 The availability zone depends on one building, so one battery-room fire takes it offline and the outage reaches downstream services"><span class="fm-pb-id">FM-05</span><span class="fm-pb-track"><i class="fm-pb-bar" style="width:42.0%;background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">168</span></div><div class="fm-pb-axis" aria-hidden="true"><span></span><span class="fm-pb-ticks"><span>0</span><span>200</span><span>400</span></span><span></span></div></div></figure>
+            <figure class="fm-fig fm-fig-m"><figcaption>Criticality: severity × occurrence</figcaption><svg class="fm-matrix" viewBox="0 0 360 330" role="img" aria-label="Criticality matrix, severity against occurrence"><rect class="fm-c-lo" x="44" y="266" width="28" height="28"/><rect class="fm-c-lo" x="72" y="266" width="28" height="28"/><rect class="fm-c-lo" x="100" y="266" width="28" height="28"/><rect class="fm-c-lo" x="128" y="266" width="28" height="28"/><rect class="fm-c-lo" x="156" y="266" width="28" height="28"/><rect class="fm-c-lo" x="184" y="266" width="28" height="28"/><rect class="fm-c-lo" x="212" y="266" width="28" height="28"/><rect class="fm-c-lo" x="240" y="266" width="28" height="28"/><rect class="fm-c-lo" x="268" y="266" width="28" height="28"/><rect class="fm-c-lo" x="296" y="266" width="28" height="28"/><rect class="fm-c-lo" x="44" y="238" width="28" height="28"/><rect class="fm-c-lo" x="72" y="238" width="28" height="28"/><rect class="fm-c-lo" x="100" y="238" width="28" height="28"/><rect class="fm-c-lo" x="128" y="238" width="28" height="28"/><rect class="fm-c-lo" x="156" y="238" width="28" height="28"/><rect class="fm-c-lo" x="184" y="238" width="28" height="28"/><rect class="fm-c-lo" x="212" y="238" width="28" height="28"/><rect class="fm-c-lo" x="240" y="238" width="28" height="28"/><rect class="fm-c-md" x="268" y="238" width="28" height="28"/><rect class="fm-c-md" x="296" y="238" width="28" height="28"/><rect class="fm-c-lo" x="44" y="210" width="28" height="28"/><rect class="fm-c-lo" x="72" y="210" width="28" height="28"/><rect class="fm-c-lo" x="100" y="210" width="28" height="28"/><rect class="fm-c-lo" x="128" y="210" width="28" height="28"/><rect class="fm-c-lo" x="156" y="210" width="28" height="28"/><rect class="fm-c-md" x="184" y="210" width="28" height="28"/><rect class="fm-c-md" x="212" y="210" width="28" height="28"/><rect class="fm-c-md" x="240" y="210" width="28" height="28"/><rect class="fm-c-md" x="268" y="210" width="28" height="28"/><rect class="fm-c-md" x="296" y="210" width="28" height="28"/><rect class="fm-c-lo" x="44" y="182" width="28" height="28"/><rect class="fm-c-lo" x="72" y="182" width="28" height="28"/><rect class="fm-c-lo" x="100" y="182" width="28" height="28"/><rect class="fm-c-lo" x="128" y="182" width="28" height="28"/><rect class="fm-c-md" x="156" y="182" width="28" height="28"/><rect class="fm-c-md" x="184" y="182" width="28" height="28"/><rect class="fm-c-md" x="212" y="182" width="28" height="28"/><rect class="fm-c-md" x="240" y="182" width="28" height="28"/><rect class="fm-c-md" x="268" y="182" width="28" height="28"/><rect class="fm-c-hi" x="296" y="182" width="28" height="28"/><rect class="fm-c-lo" x="44" y="154" width="28" height="28"/><rect class="fm-c-lo" x="72" y="154" width="28" height="28"/><rect class="fm-c-lo" x="100" y="154" width="28" height="28"/><rect class="fm-c-md" x="128" y="154" width="28" height="28"/><rect class="fm-c-md" x="156" y="154" width="28" height="28"/><rect class="fm-c-md" x="184" y="154" width="28" height="28"/><rect class="fm-c-md" x="212" y="154" width="28" height="28"/><rect class="fm-c-hi" x="240" y="154" width="28" height="28"/><rect class="fm-c-hi" x="268" y="154" width="28" height="28"/><rect class="fm-c-hi" x="296" y="154" width="28" height="28"/><rect class="fm-c-lo" x="44" y="126" width="28" height="28"/><rect class="fm-c-lo" x="72" y="126" width="28" height="28"/><rect class="fm-c-md" x="100" y="126" width="28" height="28"/><rect class="fm-c-md" x="128" y="126" width="28" height="28"/><rect class="fm-c-md" x="156" y="126" width="28" height="28"/><rect class="fm-c-md" x="184" y="126" width="28" height="28"/><rect class="fm-c-hi" x="212" y="126" width="28" height="28"/><rect class="fm-c-hi" x="240" y="126" width="28" height="28"/><rect class="fm-c-hi" x="268" y="126" width="28" height="28"/><rect class="fm-c-hi" x="296" y="126" width="28" height="28"/><rect class="fm-c-lo" x="44" y="98" width="28" height="28"/><rect class="fm-c-lo" x="72" y="98" width="28" height="28"/><rect class="fm-c-md" x="100" y="98" width="28" height="28"/><rect class="fm-c-md" x="128" y="98" width="28" height="28"/><rect class="fm-c-md" x="156" y="98" width="28" height="28"/><rect class="fm-c-hi" x="184" y="98" width="28" height="28"/><rect class="fm-c-hi" x="212" y="98" width="28" height="28"/><rect class="fm-c-hi" x="240" y="98" width="28" height="28"/><rect class="fm-c-hi" x="268" y="98" width="28" height="28"/><rect class="fm-c-hi" x="296" y="98" width="28" height="28"/><rect class="fm-c-lo" x="44" y="70" width="28" height="28"/><rect class="fm-c-lo" x="72" y="70" width="28" height="28"/><rect class="fm-c-md" x="100" y="70" width="28" height="28"/><rect class="fm-c-md" x="128" y="70" width="28" height="28"/><rect class="fm-c-hi" x="156" y="70" width="28" height="28"/><rect class="fm-c-hi" x="184" y="70" width="28" height="28"/><rect class="fm-c-hi" x="212" y="70" width="28" height="28"/><rect class="fm-c-hi" x="240" y="70" width="28" height="28"/><rect class="fm-c-hi" x="268" y="70" width="28" height="28"/><rect class="fm-c-hi" x="296" y="70" width="28" height="28"/><rect class="fm-c-hi" x="44" y="42" width="28" height="28"/><rect class="fm-c-hi" x="72" y="42" width="28" height="28"/><rect class="fm-c-hi" x="100" y="42" width="28" height="28"/><rect class="fm-c-hi" x="128" y="42" width="28" height="28"/><rect class="fm-c-hi" x="156" y="42" width="28" height="28"/><rect class="fm-c-hi" x="184" y="42" width="28" height="28"/><rect class="fm-c-hi" x="212" y="42" width="28" height="28"/><rect class="fm-c-hi" x="240" y="42" width="28" height="28"/><rect class="fm-c-hi" x="268" y="42" width="28" height="28"/><rect class="fm-c-hi" x="296" y="42" width="28" height="28"/><rect class="fm-c-hi" x="44" y="14" width="28" height="28"/><rect class="fm-c-hi" x="72" y="14" width="28" height="28"/><rect class="fm-c-hi" x="100" y="14" width="28" height="28"/><rect class="fm-c-hi" x="128" y="14" width="28" height="28"/><rect class="fm-c-hi" x="156" y="14" width="28" height="28"/><rect class="fm-c-hi" x="184" y="14" width="28" height="28"/><rect class="fm-c-hi" x="212" y="14" width="28" height="28"/><rect class="fm-c-hi" x="240" y="14" width="28" height="28"/><rect class="fm-c-hi" x="268" y="14" width="28" height="28"/><rect class="fm-c-hi" x="296" y="14" width="28" height="28"/><text class="vz-tick" x="58.0" y="308" text-anchor="middle">1</text><text class="vz-tick" x="36" y="284.0" text-anchor="end">1</text><text class="vz-tick" x="86.0" y="308" text-anchor="middle">2</text><text class="vz-tick" x="36" y="256.0" text-anchor="end">2</text><text class="vz-tick" x="114.0" y="308" text-anchor="middle">3</text><text class="vz-tick" x="36" y="228.0" text-anchor="end">3</text><text class="vz-tick" x="142.0" y="308" text-anchor="middle">4</text><text class="vz-tick" x="36" y="200.0" text-anchor="end">4</text><text class="vz-tick" x="170.0" y="308" text-anchor="middle">5</text><text class="vz-tick" x="36" y="172.0" text-anchor="end">5</text><text class="vz-tick" x="198.0" y="308" text-anchor="middle">6</text><text class="vz-tick" x="36" y="144.0" text-anchor="end">6</text><text class="vz-tick" x="226.0" y="308" text-anchor="middle">7</text><text class="vz-tick" x="36" y="116.0" text-anchor="end">7</text><text class="vz-tick" x="254.0" y="308" text-anchor="middle">8</text><text class="vz-tick" x="36" y="88.0" text-anchor="end">8</text><text class="vz-tick" x="282.0" y="308" text-anchor="middle">9</text><text class="vz-tick" x="36" y="60.0" text-anchor="end">9</text><text class="vz-tick" x="310.0" y="308" text-anchor="middle">10</text><text class="vz-tick" x="36" y="32.0" text-anchor="end">10</text><text class="vz-axis" x="184" y="328" text-anchor="middle">Occurrence →</text><text class="vz-axis" transform="translate(11 154) rotate(-90)" text-anchor="middle">Severity →</text><circle class="fm-pt" cx="142.0" cy="28.0" r="6" fill="var(--red)"><title>FM-01 An electrical fault in one battery room initiates lithium-ion thermal runaway (S10 O4 D8)</title></circle><text class="fm-pt-l" x="142.0" y="18.0" text-anchor="middle">01</text><circle class="fm-pt" cx="142.0" cy="56.0" r="6" fill="var(--red)"><title>FM-03 Firefighting and sprinkler water drains from the third-floor battery rooms into the server halls, forcing an emergency power shutdown of the building (S9 O4 D6)</title></circle><text class="fm-pt-l" x="142.0" y="46.0" text-anchor="middle">03</text><circle class="fm-pt" cx="142.0" cy="84.0" r="6" fill="var(--amber)"><title>FM-02 Water suppression cools but cannot stop cell-to-cell thermal-runaway propagation, so the fire persists and the operation runs over two days (S8 O4 D6)</title></circle><text class="fm-pt-l" x="142.0" y="74.0" text-anchor="middle">02</text><circle class="fm-pt" cx="142.0" cy="112.0" r="6" fill="var(--amber)"><title>FM-05 The availability zone depends on one building, so one battery-room fire takes it offline and the outage reaches downstream services (S7 O4 D6)</title></circle><text class="fm-pt-l" x="142.0" y="102.0" text-anchor="middle">05</text><circle class="fm-pt" cx="198.0" cy="112.0" r="6" fill="var(--red)"><title>FM-04 Fire-safety protocol keeps O&amp;M engineers out of the building, so damage assessment, controlled shutdown and drying of wet hardware are delayed (S7 O6 D8)</title></circle><text class="fm-pt-l" x="198.0" y="102.0" text-anchor="middle">04</text><circle class="fm-pt" cx="198.0" cy="196.0" r="6" fill="var(--amber)"><title>FM-06 Only an early finding is public; the fault mechanism and battery details remain undisclosed (S4 O6 D9)</title></circle><text class="fm-pt-l" x="198.0" y="186.0" text-anchor="middle">06</text></svg></figure>
+        </div>
+        <div class="fm-sheet">
+            <div class="fm-head" aria-hidden="true"><span>ID</span><span>Failure mode</span><span>S·O·D</span><span>RPN</span><span>After</span></div>
+            <details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-04</span>
+    <span class="fm-mode">Fire-safety protocol keeps O&amp;M engineers out of the building, so damage assessment, controlled shutdown and drying of wet hardware are delayed<span class="fm-item">Operator re-entry and hardware recovery</span></span>
+    <span class="fm-sod" aria-label="Severity 7, occurrence 6, detection 8">7·6·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>336</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Let tenant engineers protect, assess and restore equipment as soon as the fire allows</dd>
+      <dt>Effect</dt><dd>Alibaba engineers cannot enter while the battery-room temperature threatens AZ-C; wet hardware has to be dried before migration and restoration, which continues after the site is declared stable on 12 Sep</dd>
+      <dt>Cause</dt><dd>No pre-agreed operator re-entry or safe-shutdown protocol with SCDF is recorded</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Found during the incident</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>7</b></dt><dd>This mode sets how long the tenant outage lasts after the fire rather than whether it happens: a major degradation of a major service. Scored below FM-03 so the shutdown is not counted twice.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>Exclusion of operators during active firefighting is the normal protocol, so the condition is present in any fire of this kind and only weakly guarded: &#x27;occasional&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>The lockout&#x27;s effect on recovery was learned during the incident, with internal awareness but after impact.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 336</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Pre-agree an operator re-entry and safe-shutdown protocol with SCDF (analyst recommendation, status not disclosed) <span class="fm-ev-src">Improvement #4</span></li><li>Dry, assess and restore water-exposed hardware — in progress for this incident; a recovery step, not a preventive control <span class="fm-ev-src">Correction of errors #4</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://DataCenterDynamics (impacts Alibaba Cloud)" target="_blank" rel="noopener nofollow">Sequence of events #8</a></span><span class="fm-ev-txt">2024-09-10 daytime — Alibaba warns of increasing likelihood of a complete network outage in Availability Zone C if battery-room temperatures are not controlled; O&amp;M engineers are unable to enter the building.</span></li><li><span class="fm-ev-src">Contributing factor #4</span><span class="fm-ev-txt">Firefighting-protocol lockout of operators: Alibaba&#x27;s operation-and-maintenance engineers were unable to enter the building, delaying damage assessment, drying and restoration of water-exposed hardware (DCD).</span></li><li><span class="fm-ev-src"><a href="https://DataCenterDynamics (Alibaba dries servers)" target="_blank" rel="noopener nofollow">Sequence of events #15</a></span><span class="fm-ev-txt">post-stabilisation (Sep 2024) — Alibaba carefully dries water-exposed hardware to ensure data security; migration and restoration of affected machinery proceeds as planned.</span></li><li><span class="fm-ev-src"><a href="https://DataCenterDynamics (Alibaba dries servers)" target="_blank" rel="noopener nofollow">Sequence of events #13</a></span><span class="fm-ev-txt">2024-09-12 — SCDF declares the site stable after multi-day cooling and damping-down operations.</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-01</span>
+    <span class="fm-mode">An electrical fault in one battery room initiates lithium-ion thermal runaway<span class="fm-item">Li-ion battery bank and battery-room electrical system (third-floor mezzanine)</span></span>
+    <span class="fm-sod" aria-label="Severity 10, occurrence 4, detection 8">10·4·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>320</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Store backup energy for the UPS without an electrical fault developing into a fire</dd>
+      <dt>Effect</dt><dd>Battery fire in an occupied building; about 20 occupants self-evacuate and all personnel are out by about 08:15 SGT with no injuries; the fire leads to a multi-day firefighting operation and an emergency power shutdown of the building</dd>
+      <dt>Cause</dt><dd>Undisclosed. Press relaying SCDF reports only &#x27;an electrical issue in one of the battery rooms&#x27;; whether it was a cell short, a charger/BMS fault or a connection arc is not public, and no maintenance or inspection lapse is identified</dd>
+      <dt>Prevention in place</dt><dd>None recorded; the battery make, chemistry, age and any inspection regime are not disclosed</dd>
+      <dt>Detection in place</dt><dd>Building fire-alarm activation is the first publicly indicated detection event; no earlier warning of the electrical fault is disclosed</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>10</b></dt><dd>A fire in an occupied building that also takes the whole facility out of service for days is the rubric&#x27;s 10, which it reserves for hazard to people or loss of a facility. The evacuation worked and no injuries are recorded, but the hazard was real.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>An electrical fault developing into thermal runaway needs an unusual combination, so &#x27;infrequent&#x27;. Held at 4 rather than higher because the dossier identifies no lapse that would make it routine; the cause itself is undisclosed.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>The first disclosed detection is the fire alarm, after the fault had already become a fire, so &#x27;detected after impact by internal monitoring&#x27;. Whether any battery monitoring existed is not public.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 320</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Battery-room electrical-integrity monitoring (BMS fault logging, connection and thermal inspection, state-of-charge and cell-age tracking) — analyst recommendation, status not disclosed <span class="fm-ev-src">Improvement #5</span></li><li>Root-cause investigation of the battery-room electrical fault — early investigation only, findings not public <span class="fm-ev-src">Correction of errors #6</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Straits Times / SCDF" target="_blank" rel="noopener nofollow">Sequence of events #1</a></span><span class="fm-ev-txt">2024-09-10 morning SGT — Electrical fault in a third-floor mezzanine battery room initiates Li-ion thermal runaway at the Digital Realty Digital Loyang data center, Loyang, Singapore. &#x27;Early investigations suggest an electrical issue in one of the battery rooms triggered the blaze.&#x27;</span></li><li><span class="fm-ev-src"><a href="https://www.datacenterdynamics.com/en/news/fire-at-digital-realty-data-center-in-singapore-impacts-alibaba-cloud/" target="_blank" rel="noopener nofollow">Reference #1 · press</a></span><span class="fm-ev-txt">“Early investigations suggest an electrical issue in one of the battery rooms triggered the blaze.”</span></li><li><span class="fm-ev-src"><a href="https://DataCenterDynamics (impacts Alibaba Cloud)" target="_blank" rel="noopener nofollow">Sequence of events #2</a></span><span class="fm-ev-txt">2024-09-10 morning SGT — Building fire-alarm system activates — the first publicly indicated detection event; no discrete smoke/heat-sensor timing is disclosed beyond this alarm.</span></li><li><span class="fm-ev-src"><a href="https://Straits Times / SCDF" target="_blank" rel="noopener nofollow">Metric #2</a></span><span class="fm-ev-txt">Occupants self-evacuated before firefighters arrived: ~20 people</span></li><li><span class="fm-ev-src"><a href="https://DataCenterDynamics (impacts Alibaba Cloud)" target="_blank" rel="noopener nofollow">Metric #3</a></span><span class="fm-ev-txt">Injuries: 0 (all personnel out by ~08:15 SGT)</span></li><li><span class="fm-ev-src">Contributing factor #6</span><span class="fm-ev-txt">No public evidence of a maintenance/inspection/testing lapse: the trigger is described only as &#x27;an electrical issue in one of the battery rooms,&#x27; with battery make/model, chemistry, age and state of charge undisclosed — an evidentiary gap rather than a confirmed clean bill (Straits Times/SCDF).</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-03</span>
+    <span class="fm-mode">Firefighting and sprinkler water drains from the third-floor battery rooms into the server halls, forcing an emergency power shutdown of the building<span class="fm-item">Separation between battery rooms and server halls (siting, bunding, drainage)</span></span>
+    <span class="fm-sod" aria-label="Severity 9, occurrence 4, detection 6">9·4·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>216</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Keep suppression water from a battery-room fire away from energised IT equipment</dd>
+      <dt>Effect</dt><dd>Water accumulates and leaks into server rooms with a risk of short circuits; the affected building is de-energised in the early hours of 11 Sep, about 18 hours after the alarm, which takes Alibaba Cloud Singapore AZ-C fully offline</dd>
+      <dt>Cause</dt><dd>Battery rooms sited above grade on the third-floor mezzanine within the same structure as the server halls, with no water-tight separation. The 2016 facility predates SCDF&#x27;s 2020 standard requiring ground-floor ESS rooms, so the siting was grandfathered rather than a breach (Digital Realty&#x27;s position, per DCD)</dd>
+      <dt>Prevention in place</dt><dd>None recorded; no bunding or drainage between battery rooms and IT space is described</dd>
+      <dt>Detection in place</dt><dd>Alibaba reported water accumulation and leaks in the server room before the shutdown</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>9</b></dt><dd>This is the route by which a battery fire became a de-energised building and a full availability-zone outage with downstream tenants: the rubric&#x27;s 9 for an outage with no workaround inside the facility. Not 10, because FM-01 already carries the facility loss and no hazard to people arises from this step.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>A standing design condition, but it is exercised only when suppression water is discharged in the battery rooms in volume, which needs a fire first: &#x27;infrequent&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>The water ingress was seen while it happened and there were hours before the shutdown, but nothing could stop the water once it was flowing, so &#x27;detected at onset, not prevented&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>High</b> · RPN 216</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Relocate or segregate Li-ion ESS battery rooms to ground-floor, water-contained enclosures per the SCDF 2020 ESS standard — status &#x27;Open — no public completion evidence&#x27; <span class="fm-ev-src">Correction of errors #1</span></li><li>Install water-tight bunding and drainage between battery rooms and server halls — status &#x27;Open — no public evidence&#x27; <span class="fm-ev-src">Correction of errors #2</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://DataCenterDynamics (Alibaba dries servers)" target="_blank" rel="noopener nofollow">Sequence of events #10</a></span><span class="fm-ev-txt">2024-09-10 overnight to 2024-09-11 — Firefighting and sprinkler water accumulates and leaks into server halls; Alibaba reports &#x27;water accumulation and leaks, posing a risk of electrical short circuits.&#x27;</span></li><li><span class="fm-ev-src"><a href="https://DataCenterDynamics (emergency power shutdown)" target="_blank" rel="noopener nofollow">Sequence of events #11</a></span><span class="fm-ev-txt">2024-09-11 early hours SGT — Emergency power shutdown of the affected building executed to prevent electrical short circuits from standing water — this de-energisation, not flame, takes Alibaba Cloud Availability Zone C fully offline (~01:46 per DCD, not re-verified this pass).</span></li><li><span class="fm-ev-src"><a href="https://DataCenterDynamics (emergency power shutdown)" target="_blank" rel="noopener nofollow">Metric #6</a></span><span class="fm-ev-txt">Alarm to emergency power shutdown: ~18 hours (DCD reconstruction; ~01:46, 11 Sep)</span></li><li><span class="fm-ev-src"><a href="https://DataCenterDynamics (emergency power shutdown)" target="_blank" rel="noopener nofollow">Metric #9</a></span><span class="fm-ev-txt">Battery-room location vs 2020 SCDF ESS standard: 3rd-floor mezzanine vs required ground floor</span></li><li><span class="fm-ev-src">Contributing factor #1</span><span class="fm-ev-txt">Legacy above-grade battery siting: Li-ion energy-storage rooms were on the third-floor mezzanine, contrary to SCDF&#x27;s 2020 standard requiring ground-floor placement. Digital Realty states the 2016 facility predated the rule, so it was grandfathered — but the elevated siting is the single largest aggravating design factor (DCD).</span></li><li><span class="fm-ev-src">Contributing factor #3</span><span class="fm-ev-txt">Vertical co-location of burning batteries above live server halls: with no water-tight separation between the third-floor battery rooms and IT space, suppression water accumulated and leaked into server rooms, creating the short-circuit risk that drove the emergency shutdown (DCD; Alibaba via DCD).</span></li><li><span class="fm-ev-src">Technical deep-dive</span><span class="fm-ev-txt">“This de-energisation, not flame, is what took Alibaba Cloud Singapore Availability Zone C fully offline”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-06</span>
+    <span class="fm-mode">Only an early finding is public; the fault mechanism and battery details remain undisclosed<span class="fm-item">Root-cause investigation and public disclosure</span></span>
+    <span class="fm-sod" aria-label="Severity 4, occurrence 6, detection 9">4·6·9</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>216</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Establish and publish the fault, battery make, chemistry and age so operators of similar battery rooms can act</dd>
+      <dt>Effect</dt><dd>Customers and other operators cannot tell whether the ignition cause exists elsewhere; this dossier cannot rule a maintenance lapse in or out</dd>
+      <dt>Cause</dt><dd>SCDF / Digital Realty investigation findings not publicly disclosed as of this review</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Visible only as the absence of findings</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>4</b></dt><dd>The missing findings do not stop a service; they limit what others can do to protect themselves: &#x27;limited customer impact&#x27;.</dd></div>
+      <div class="fm-sc"><dt>O <b>6</b></dt><dd>The dossier records only an early investigation with findings not disclosed, a foreseeable condition with nothing requiring publication: &#x27;occasional&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>9</b></dt><dd>Nothing surfaces the gap except its absence, which customers notice only from outside.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 216</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li class="fm-residual">No corrective action is recorded in the published sources. This mode is residual risk.</li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src">Correction of errors #6</span><span class="fm-ev-txt">Root-cause investigation of the battery-room electrical fault (make/model/chemistry/age) (Early investigation only — findings not publicly disclosed (Straits Times))</span></li><li><span class="fm-ev-src">Contributing factor #6</span><span class="fm-ev-txt">No public evidence of a maintenance/inspection/testing lapse: the trigger is described only as &#x27;an electrical issue in one of the battery rooms,&#x27; with battery make/model, chemistry, age and state of charge undisclosed — an evidentiary gap rather than a confirmed clean bill (Straits Times/SCDF).</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“No make/model/chemistry can be attributed without over-claiming.”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-02</span>
+    <span class="fm-mode">Water suppression cools but cannot stop cell-to-cell thermal-runaway propagation, so the fire persists and the operation runs over two days<span class="fm-item">Battery-room fire suppression (facility sprinklers and SCDF water jets)</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 4, detection 6">8·4·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>192</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Extinguish a battery-room fire quickly and with as little water as possible</dd>
+      <dt>Effect</dt><dd>Sprinklers and four SCDF water jets are needed; containment takes about half a day, an unmanned firefighting robot is used for damping-down on the second day, and the site is declared stable only on 12 Sep; the operation produces the water volume that later reaches the server halls</dd>
+      <dt>Cause</dt><dd>Water is the only firefighting medium recorded for the battery rooms, and it removes heat without arresting self-sustaining Li-ion propagation; the above-grade siting also complicated firefighter access and cooling</dd>
+      <dt>Prevention in place</dt><dd>Facility sprinkler systems over the battery and power rooms</dd>
+      <dt>Detection in place</dt><dd>The persistence of the fire was visible to responders from the start of firefighting</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>This mode sets the duration and the water load of the event rather than its existence; days of firefighting that keep the facility out of reach is the rubric&#x27;s 8. Not scored at 10 so the fire is not counted twice at full weight with FM-01.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>It needs a battery-room fire first, which is infrequent; given such a fire, water-only suppression would behave the same way.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>Responders could see at once that water was only cooling the batteries, but nothing in place could prevent the propagation: &#x27;detected at onset, not prevented&#x27;.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 192</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Deploy thermal-runaway-appropriate detection and suppression (cell-level, gas or aerosol) to shorten cooling and cut water volume — status &#x27;Open — no public evidence&#x27; <span class="fm-ev-src">Correction of errors #3</span></li><li>Supplement or replace water-only suppression in Li-ion battery rooms (analyst recommendation) <span class="fm-ev-src">Improvement #3</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://DataCenterDynamics (emergency power shutdown)" target="_blank" rel="noopener nofollow">Sequence of events #3</a></span><span class="fm-ev-txt">2024-09-10 morning SGT — Facility sprinkler systems activate over the involved battery/power rooms on the third-floor mezzanine.</span></li><li><span class="fm-ev-src"><a href="https://Straits Times / SCDF" target="_blank" rel="noopener nofollow">Metric #4</a></span><span class="fm-ev-txt">SCDF water jets deployed: 4 water jets</span></li><li><span class="fm-ev-src"><a href="https://Straits Times / SCDF" target="_blank" rel="noopener nofollow">Sequence of events #12</a></span><span class="fm-ev-txt">2024-09-11 second day — Operation spills into a second day; an unmanned firefighting robot is deployed for damping-down as manual entry remains too hazardous/hot.</span></li><li><span class="fm-ev-src"><a href="https://DataCenterDynamics (Alibaba dries servers)" target="_blank" rel="noopener nofollow">Metric #7</a></span><span class="fm-ev-txt">Total operation duration to &#x27;stable&#x27;: ~10 Sep to 12 Sep (~2 days)</span></li><li><span class="fm-ev-src">Contributing factor #2</span><span class="fm-ev-txt">Water-based suppression against Li-ion thermal runaway: sprinklers plus four SCDF water jets could only cool, not stop, self-sustaining cell-to-cell propagation, forcing a multi-day operation and generating the water volume that later reached the IT halls (Straits Times/SCDF).</span></li><li><span class="fm-ev-src">Technical deep-dive</span><span class="fm-ev-txt">“water is a coolant, not an extinguishant, for Li-ion thermal runaway”</span></li></ul>
+  </div>
+</details><details class="fm-row">
+  <summary>
+    <span class="fm-id-cell">FM-05</span>
+    <span class="fm-mode">The availability zone depends on one building, so one battery-room fire takes it offline and the outage reaches downstream services<span class="fm-item">Tenant availability-zone isolation (Alibaba Cloud Singapore AZ-C and downstream services)</span></span>
+    <span class="fm-sod" aria-label="Severity 7, occurrence 4, detection 6">7·4·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>168</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Keep a cloud availability zone and the services built on it running through the loss of one building</dd>
+      <dt>Effect</dt><dd>Alibaba detects network anomalies in AZ-C on 10 Sep and the zone goes fully offline at the shutdown; Lazada and ByteDance/TikTok are disrupted</dd>
+      <dt>Cause</dt><dd>Single-facility concentration: the zone and its downstream tenants had insufficient isolation from a single building event</dd>
+      <dt>Prevention in place</dt><dd>None recorded</dd>
+      <dt>Detection in place</dt><dd>Alibaba detected network anomalies in AZ-C and warned of a likely complete outage</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>7</b></dt><dd>One availability zone of one provider is the rubric&#x27;s 6, raised to 7 because the outage reached Lazada and ByteDance/TikTok as well: major degradation, not a region-wide outage.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>It needs the loss of the building first, which is infrequent; the concentration itself is a standing condition.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>Alibaba saw the network anomalies and warned of a complete outage hours before the shutdown, but Lazada and ByteDance/TikTok were already disrupted on 10 Sep, so &#x27;detected at onset, not prevented&#x27;. The dossier does not record whether workloads were moved in that window.</dd></div>
+    </dl>
+    <p class="fm-sub">Priority: <b>Medium</b> · RPN 168</p>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Improve tenant availability-zone isolation so a single-building event cannot take an entire zone offline (analyst recommendation, status not disclosed) <span class="fm-ev-src">Improvement #6</span></li></ul>
+    
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://DataCenterDynamics (impacts Alibaba Cloud)" target="_blank" rel="noopener nofollow">Sequence of events #7</a></span><span class="fm-ev-txt">2024-09-10 daytime — Alibaba Cloud detects network anomalies in Singapore Availability Zone C; Lazada and ByteDance/TikTok begin experiencing service disruption.</span></li><li><span class="fm-ev-src"><a href="https://DataCenterDynamics (impacts Alibaba Cloud)" target="_blank" rel="noopener nofollow">Sequence of events #8</a></span><span class="fm-ev-txt">2024-09-10 daytime — Alibaba warns of increasing likelihood of a complete network outage in Availability Zone C if battery-room temperatures are not controlled; O&amp;M engineers are unable to enter the building.</span></li><li><span class="fm-ev-src"><a href="https://The Star; DataCenterDynamics" target="_blank" rel="noopener nofollow">Metric #10</a></span><span class="fm-ev-txt">Tenants/services disrupted: Alibaba Cloud Singapore AZ-C, Lazada, ByteDance/TikTok</span></li><li><span class="fm-ev-src">Contributing factor #5</span><span class="fm-ev-txt">Single-facility concentration risk for tenants: Alibaba Cloud Singapore Availability Zone C, and downstream Lazada and ByteDance/TikTok, had insufficient isolation from a single building event, so one battery-room fire produced a multi-tenant regional outage (DCD; The Star).</span></li><li><span class="fm-ev-src"><a href="https://www.thestar.com.my/tech/tech-news/2024/09/11/fire-at-singapore-data-centre-affects-alibaba-cloud-services" target="_blank" rel="noopener nofollow">Reference #3 · press</a></span><span class="fm-ev-txt">“Alibaba Cloud services in Singapore, along with Lazada and ByteDance-owned TikTok, were disrupted”</span></li></ul>
+  </div>
+</details>
+        </div>
+        <details class="fm-method"><summary>Scoring rubric and method</summary><div class="fm-method-body"><p>A retrospective FMEA: each row asks how this system could fail, how bad the effect was, how likely the cause was given the controls in place at the time, and how likely those controls were to catch it before customers did. Scales are adapted for data-centre operations from the 1–10 scales of IEC 60812:2018 and the AIAG-VDA FMEA handbook. RPN = S × O × D. Priority is High when S ≥ 9 with O ≥ 4 or D ≥ 7, or when RPN ≥ 300; Medium when RPN ≥ 120 or S ≥ 7; Low otherwise. Severity overrides the product because a large S multiplied by small O and D can hide a region-wide outage nothing would catch.</p><p>Every row cites evidence from this dossier, and every quote is checked verbatim against its source by <code>tools/test-incidents-fmea.py</code>. A revised score is only shown against a published corrective action. This is an RZ analyst assessment, not an operator document.</p><div class="fm-rubrics"><div><p class="fm-sub">Severity</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Hazard to people, or loss of the facility / several regions</td></tr><tr><td>9</td><td>Region-wide or provider-wide outage of a foundational service, no workaround</td></tr><tr><td>8</td><td>Full outage of a major service for hours</td></tr><tr><td>7</td><td>Major degradation of a major service</td></tr><tr><td>6</td><td>Partial outage confined to one zone or one service</td></tr><tr><td>5</td><td>Customer-visible degradation</td></tr><tr><td>4</td><td>Limited customer impact</td></tr><tr><td>3</td><td>Internal impact only</td></tr><tr><td>2</td><td>Negligible</td></tr><tr><td>1</td><td>No effect</td></tr></tbody></table></div><div><p class="fm-sub">Occurrence</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Near certain: the cause is present in normal operation</td></tr><tr><td>8</td><td>Frequent: routine work exercises the cause</td></tr><tr><td>6</td><td>Occasional: a foreseeable slip or condition, weakly guarded</td></tr><tr><td>4</td><td>Infrequent: needs an unusual combination</td></tr><tr><td>2</td><td>Remote: guarded by design</td></tr><tr><td>1</td><td>Eliminated by design</td></tr></tbody></table></div><div><p class="fm-sub">Detection</p><table class="fm-rubric"><tbody><tr><td>10</td><td>No control could detect it</td></tr><tr><td>9</td><td>Detected only through customer impact</td></tr><tr><td>8</td><td>Detected after impact by internal monitoring</td></tr><tr><td>6</td><td>Detected at onset, not prevented</td></tr><tr><td>4</td><td>Detected before impact with time to act</td></tr><tr><td>2</td><td>Automated interlock almost certainly stops it</td></tr><tr><td>1</td><td>Certain to be stopped</td></tr></tbody></table></div></div></div></details>
+
 
         <h2>Correction of errors (COE)</h2>
         <ul class="tight"><li>Relocate/segregate Li-ion ESS battery rooms to ground-floor, water-contained enclosures per SCDF 2020 ESS standard <span class="coe-meta">Digital Realty (facility engineering) · Open — no public completion evidence</span></li><li>Install water-tight bunding/drainage between battery rooms and server halls to prevent suppression-water ingress into IT space <span class="coe-meta">Digital Realty (design/build) · Open — no public evidence</span></li><li>Deploy thermal-runaway-appropriate detection and suppression (cell-level/gas/aerosol) to shorten cooling and cut water volume <span class="coe-meta">Digital Realty with SCDF guidance · Open — no public evidence</span></li><li>Dry, assess and restore water-exposed hardware to ensure data security <span class="coe-meta">Alibaba Cloud O&amp;M · In progress — migration and restoration reported proceeding as planned (DCD)</span></li><li>Building-integrity assessment and closure orders for affected floors <span class="coe-meta">BCA / SCDF · Completed — structural integrity intact; closure orders issued (BCA/Straits Times)</span></li><li>Root-cause investigation of the battery-room electrical fault (make/model/chemistry/age) <span class="coe-meta">SCDF / Digital Realty · Early investigation only — findings not publicly disclosed (Straits Times)</span></li></ul>
@@ -427,7 +697,7 @@ The decisive engineering failure was hydraulic, not thermal. Because the battery
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-1a1a084f"></script>
+    <script src="js/rz-version.js?v=20261010-00a1d9e8"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

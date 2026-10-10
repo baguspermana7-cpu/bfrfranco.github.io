@@ -333,5 +333,319 @@
   "confidence": "Medium-high on cause and repair facts (named verbatim TechCentral/Remgro source, corroborated by Kentik), but the cause is explicitly a 'generally accepted' / 'leading theory' narrative, not a forensic RCA. Lower confidence on scope and magnitude: TGN-EA is named alongside Seacom by Kentik but its status as a distinct 4th cable (vs. shared with Seacom) is unconfirmed; the ~25%-traffic and 'tens of millions' figures are unattributed/uncorroborated in reachable sources; BGP timestamps are analyst-reasoned; and the absolute repair cost was never disclosed."
  },
  "lastUpdated": "2026-08-01",
- "operatorShort": "AAE-1/EIG/Seacom"
+ "operatorShort": "AAE-1/EIG/Seacom",
+ "fmea": {
+  "scope": "The Bab-el-Mandeb subsea cable corridor off Yemen and the three systems cut there (Seacom/Tata TGN-Eurasia, AAE-1, EIG): the initiating seabed event, corridor concentration and protection, fault detection and traffic rerouting, repair access under permit refusal and war risk, and fault forensics. There is no official post-mortem and no consortium or regulator root-cause report: the Rubymar dragging anchor is the 'generally accepted' leading hypothesis, resting on temporal and spatial coincidence, and Wikipedia records the cause as 'currently unknown'. The record is telemetry-vendor analysis and press. The ~25% capacity figure is an HGC estimate relayed by Wikipedia and the user count is uncorroborated, so severities are held at 'major degradation' rather than outage, consistent with Cloudflare seeing no material end-user traffic loss in the East African markets it measured. Every corrective action in the dossier is 'Recommended', 'Open' or 'Not started', so no revised score is claimed: all modes are residual risk.",
+  "modes": [
+   {
+    "id": "FM-01",
+    "item": "Seabed cable route through the Bab-el-Mandeb corridor (external anchor hazard)",
+    "function": "Keep armoured cables intact against ship anchors and other seabed activity",
+    "failureMode": "A disabled, abandoned vessel drifts with its anchor down across the corridor and, under the leading hypothesis, the dragging anchor shears the cables",
+    "effect": "Three cable systems severed around 24 February 2024; about a quarter of Europe-Asia-Middle East capacity reported lost",
+    "cause": "Leading hypothesis, unproven: MV Rubymar, disabled by a Houthi missile on 18 February and abandoned by its 24 crew, drifted more than 70 km while not under command with its anchor down; no salvage or anchor recovery followed and no anchoring-exclusion zone exists in the corridor",
+    "prevention": "Cable armouring; no enforced anchoring-exclusion or cable-protection zone recorded",
+    "detection": "None recorded for the drift; the cuts were registered as loss of optical continuity and in BGP and traffic telemetry",
+    "S": 7,
+    "O": 4,
+    "D": 8,
+    "rationale": {
+     "S": "Multi-system loss of international backbone capacity is a major degradation of a major service. Not 8 or 9: rerouting held end-user traffic in the markets Cloudflare measured, and the larger user figures are uncorroborated.",
+     "O": "Anchors are the industry's most common cable-fault cause (~70-80% per the ICPC baseline), but this case needed an unusual combination, a war-damaged ship abandoned with its anchor down in the corridor: 'infrequent'. The attribution itself is unproven.",
+     "D": "The drift lasted days and nothing recorded acted on it; the event was seen when optical continuity was lost: 'detected after impact by internal monitoring'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 1
+     },
+     {
+      "src": "soe",
+      "i": 2
+     },
+     {
+      "src": "factor",
+      "i": 2
+     },
+     {
+      "src": "factor",
+      "i": 1
+     },
+     {
+      "src": "metric",
+      "i": 8
+     },
+     {
+      "src": "rootCause",
+      "quote": "ATTRIBUTION IS UNPROVEN"
+     },
+     {
+      "src": "ref",
+      "i": 1,
+      "quote": "The cause of the damage is currently unknown"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Designate and enforce an anchoring-exclusion / cable-protection zone off Yemen with AIS monitoring and mariner advisories (status: Open)",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "text": "Adopt a rapid salvage / anchor-recovery protocol for disabled not-under-command vessels in cable corridors (status: Open)",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-02",
+    "item": "Route diversity of Europe-Asia cable systems",
+    "function": "Keep nominally independent systems physically independent, so one seabed event cannot cut more than one",
+    "failureMode": "Three systems sharing one narrow corridor are severed together by a single event",
+    "effect": "Seacom/TGN-Eurasia, AAE-1 and EIG lost at once; impact felt across East African and Gulf markets that lean on them",
+    "cause": "Route concentration: the systems share the same off-Yemen corridor at the Bab-el-Mandeb chokepoint",
+    "prevention": "Logical diversity across separate cable systems",
+    "detection": "Telemetry at the time of the cuts",
+    "S": 7,
+    "O": 5,
+    "D": 6,
+    "rationale": {
+     "S": "This is the route by which one anchor became a three-cable loss, so it carries the same severity as FM-01.",
+     "O": "A standing design condition that any seabed event in the corridor exercises; held at 5 so the single event is not counted twice at full weight with FM-01.",
+     "D": "Line monitoring and BGP telemetry saw the cuts as they happened, but nothing could prevent a co-located loss: 'detected at onset, not prevented'."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 0
+     },
+     {
+      "src": "metric",
+      "i": 0
+     },
+     {
+      "src": "rootCause",
+      "quote": "The design/redundancy failure is ROUTE CONCENTRATION"
+     },
+     {
+      "src": "ref",
+      "i": 3,
+      "quote": "the Seacom/Tata cable, the Asia Africa Europe-1 (AAE-1), and the Europe India Gateway (EIG)"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Commission a route-diversity study and fund at least one non-Bab-el-Mandeb path (status: Recommended)",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "text": "Route future Europe-Asia systems through geographically diverse paths (analyst recommendation)",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-03",
+    "item": "Fault detection, optical isolation and traffic rerouting",
+    "function": "Detect the cut, isolate the severed segments and move traffic to surviving paths before users notice",
+    "failureMode": "Surviving cables and terrestrial paths lack the headroom to carry the diverted load",
+    "effect": "Did not materialise in the markets measured: Cloudflare saw no material end-user traffic loss in Tanzania, Kenya, Uganda and Mozambique; analysts flag that losing more of the corridor would exhaust the headroom",
+    "cause": "Finite spare capacity on parallel and terrestrial routes",
+    "prevention": "Parallel Red Sea systems and terrestrial diversity; operators such as HGC rerouting traffic",
+    "detection": "Operator line monitoring/OTDR, plus external BGP, latency and traffic telemetry from Kentik, Cloudflare Radar and NetBlocks",
+    "S": 7,
+    "O": 3,
+    "D": 4,
+    "rationale": {
+     "S": "If headroom ran out, the capacity loss would become end-user loss across the same markets: a major degradation.",
+     "O": "Headroom held for a three-cable loss, so exhausting it needs a still larger simultaneous loss: between 'remote' and 'infrequent'.",
+     "D": "The cuts were visible on capacity and routing telemetry while end-user traffic stayed up, so operators had time to re-groom wavelengths: 'detected before impact with time to act'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 6
+     },
+     {
+      "src": "soe",
+      "i": 7
+     },
+     {
+      "src": "soe",
+      "i": 8
+     },
+     {
+      "src": "metric",
+      "i": 2
+     },
+     {
+      "src": "ref",
+      "i": 0,
+      "quote": "no loss of traffic was observed across these countries in Cloudflare Radar"
+     },
+     {
+      "src": "tech",
+      "quote": "The residual risk analysts flag is that losing MORE of the corridor simultaneously would exhaust that headroom."
+     }
+    ],
+    "actions": [
+     {
+      "text": "Fund at least one non-Bab-el-Mandeb path to add headroom that does not share the corridor (status: Recommended)",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-04",
+    "item": "Repair permitting in contested Yemeni waters",
+    "function": "Authorise repair ships to reach the fault promptly",
+    "failureMode": "Repair permits are refused, stalling the repair for months",
+    "effect": "AAE-1 repairs still pending on 13 May 2024 and completed only in July 2024, about 4-5 months after the cut; Seacom's contribution to Remgro's headline earnings fell from ~R32M to ~R2M, mainly on once-off cable-repair costs",
+    "cause": "No agreed permitting or safe-passage regime for repair ships; AAE-1 repairs stalled 'due to the refusal of permits from the Yemeni Government'",
+    "prevention": "None recorded",
+    "detection": "Known while the repair was pending",
+    "S": 7,
+    "O": 6,
+    "D": 6,
+    "rationale": {
+     "S": "This mode sets how long the capacity loss lasted; months of degraded backbone capacity is a major degradation, scored no higher than the cut itself because end-user traffic was largely carried.",
+     "O": "In a contested jurisdiction with no standing regime, a permit obstacle is a foreseeable, weakly guarded condition: 'occasional'.",
+     "D": "The obstacle was visible as soon as repair was sought, but nothing could clear it: 'detected at onset, not prevented'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 13
+     },
+     {
+      "src": "soe",
+      "i": 14
+     },
+     {
+      "src": "metric",
+      "i": 6
+     },
+     {
+      "src": "factor",
+      "i": 3
+     },
+     {
+      "src": "ref",
+      "i": 5,
+      "quote": "once-off cable repair costs incurred as a result of cable breaks"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Negotiate a standing permitting and safe-passage regime for repair ships in contested Yemeni waters (status: Open)",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-05",
+    "item": "Repair-ship dispatch and spares under war risk",
+    "function": "Mobilise an insured repair vessel with cable and repeater spares into the fault zone",
+    "failureMode": "Dispatch is held back by active missile and drone threat, war-risk insurance and naval-security constraints",
+    "effect": "Adds to the months-long restoration in FM-04; repair carried out by an E-Marine cable ship only in July 2024",
+    "cause": "Active conflict in the repair zone; no pre-positioned war-risk-insured repair capacity recorded",
+    "prevention": "None recorded",
+    "detection": "Known while the repair was pending",
+    "S": 6,
+    "O": 6,
+    "D": 6,
+    "rationale": {
+     "S": "It shares the duration effect with FM-04, so it is scored one step lower to avoid counting the same months twice at full weight.",
+     "O": "The conflict that disabled the Rubymar was ongoing, so the war-risk condition was present for the whole repair window and weakly guarded: 'occasional'.",
+     "D": "Visible from the start, not preventable by any recorded control: 'detected at onset, not prevented'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 12
+     },
+     {
+      "src": "factor",
+      "i": 4
+     },
+     {
+      "src": "rootCause",
+      "quote": "the security environment prevented it"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Pre-position war-risk-insured repair vessels and spare cable/repeater stocks for the Red Sea region (status: Open)",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-06",
+    "item": "Fault forensics and attribution",
+    "function": "Establish where and how each cable failed, so the cause can be confirmed and acted on",
+    "failureMode": "No instrumented fault forensics are published: no fault coordinates, depths, anchor marks or anchor-track match",
+    "effect": "The cause stays 'currently unknown' and rests on coincidence; accountability is hampered and the count of cut systems is reported as three or four",
+    "cause": "Consortia did not publish fault data; no physical evidence recovered",
+    "prevention": "None recorded",
+    "detection": "Noted by analysts after the event",
+    "S": 3,
+    "O": 8,
+    "D": 8,
+    "rationale": {
+     "S": "It does not extend the outage; its effect is on learning and accountability: 'internal impact only'.",
+     "O": "Non-publication was the outcome here and the action is 'Not started', so the condition is present whenever a major fault occurs: 'frequent'.",
+     "D": "The gap is visible only afterwards, when analysts try to attribute the cut: 'detected after impact'."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 5
+     },
+     {
+      "src": "soe",
+      "i": 15
+     },
+     {
+      "src": "metric",
+      "i": 0
+     },
+     {
+      "src": "ref",
+      "i": 4,
+      "quote": "It's generally accepted that the Rubymar dropped an anchor"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Publish instrumented fault forensics (coordinates, depth, sever-vs-shunt) for major cable faults (status: Not started)",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     }
+    ]
+   }
+  ]
+ }
 }

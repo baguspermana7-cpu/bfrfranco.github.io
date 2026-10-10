@@ -297,5 +297,328 @@
   "officialPostmortem": true,
   "lastVerified": "2026-08-02 (seed — pending deep research)"
  },
- "lastUpdated": "2026-08-02"
+ "lastUpdated": "2026-08-02",
+ "fmea": {
+  "scope": "The electrical work on a substation cabinet adjacent to Google's Council Bluffs data-center buildings and the safety chain around it: the energized cabinet where the arc initiated, isolation before work, the contractor's job briefing and existing-conditions determination, arc-flash hazard analysis and PPE, emergency detection and response, and the root-cause record. Google published no post-mortem; the causal record is OSHA's inspection data (one citation to the contractor under 29 CFR 1926.950(b)(1)(i), none to Google) plus press reporting. The initiating fault, equipment identity, voltage class, incident energy, PPE adequacy and de-energisation status are all undisclosed, and the OSHA accident abstract could not be retrieved. The same-day Search and Maps disruption is not scored: Google attributed it to an internal software-update error, not to this incident. Every corrective action except the OSHA-directed abatement is an analyst recommendation with no public confirmation of adoption, so only that one carries a revised score.",
+  "modes": [
+   {
+    "id": "FM-01",
+    "item": "Energized electrical cabinet on the substation",
+    "function": "Contain fault energy inside the enclosure while it is accessed for construction/installation work",
+    "failureMode": "An arc flash initiates at or inside the cabinet as three electricians access it",
+    "effect": "All three electricians suffer electrical/thermal burns; one is flown by helicopter in critical condition, two go by ground ambulance; all are reported stable the next day",
+    "cause": "Initiating fault not disclosed (dropped tool, insulation breakdown, misoperation, phase-to-phase bridging and racking are all named as unconfirmed possibilities); equipment make, voltage class and age unknown",
+    "prevention": "None recorded",
+    "detection": "None recorded; the fault announced itself as the explosion",
+    "S": 10,
+    "O": 4,
+    "D": 9,
+    "rationale": {
+     "S": "Rubric 10, hazard to people: three workers burned, one in critical condition at the scene.",
+     "O": "An arc needs an initiating fault during access, and the dossier names no defect or repeated event: 'infrequent'. Not lower because the work was being done on live gear with no recorded engineering control.",
+     "D": "No relay, sensor or interlock is recorded that could catch the fault before the arc; it was known only through the injuries, the analogue of detection through impact."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 2
+     },
+     {
+      "src": "soe",
+      "i": 3
+     },
+     {
+      "src": "metric",
+      "i": 0
+     },
+     {
+      "src": "metric",
+      "i": 3
+     },
+     {
+      "src": "rootCause",
+      "quote": "The precise initiating fault (dropped tool, insulation breakdown, misoperation, phase-to-phase bridging, or a racking event) is NOT stated in any public source."
+     }
+    ],
+    "actions": [
+     {
+      "text": "Adopt arc-resistant switchgear, remote racking and remote operators to move workers outside the arc-flash boundary (recommended, not confirmed)",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "text": "Engineer out the exposure on frequently accessed cabinets rather than relying on PPE alone (analyst recommendation)",
+      "evidence": {
+       "src": "improvement",
+       "i": 2
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-02",
+    "item": "Isolation and lockout before cabinet work",
+    "function": "De-energise and lock out the cabinet before workers access it, or justify live access in writing",
+    "failureMode": "Work proceeds with workers inside the arc-flash boundary of an energized cabinet; isolation and lockout status are not disclosed",
+    "effect": "All three workers are within reach of the arc when it initiates",
+    "cause": "Energized-work exposure; whether the gear could have been de-energised for the task is not disclosed",
+    "prevention": "None recorded",
+    "detection": "None recorded before the arc",
+    "S": 9,
+    "O": 6,
+    "D": 8,
+    "rationale": {
+     "S": "This mode is what put people in the path of FM-01's arc. It is scored one step below 10 only so the single arc flash is not counted twice at full weight; its consequence is the same injuries.",
+     "O": "Live access is the condition of the task, and the dossier records no permit or justification control: a foreseeable condition weakly guarded, 'occasional'. Held at 6 because whether isolation was possible is unknown.",
+     "D": "No check is recorded that stopped live access; the exposure was identified afterwards, through the regulator's inspection."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 0
+     },
+     {
+      "src": "soe",
+      "i": 1,
+      "quote": "an energized-work exposure"
+     },
+     {
+      "src": "soe",
+      "i": 7
+     },
+     {
+      "src": "tech",
+      "quote": "whether it was energized by necessity or could have been isolated"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Mandate de-energisation-first with an energized-work permit and documented live-access justification (recommended; no public confirmation of adoption)",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "text": "Enforce lockout/tagout for work on or inside substation cabinets (analyst recommendation)",
+      "evidence": {
+       "src": "improvement",
+       "i": 0
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-03",
+    "item": "Contractor job briefing and host/contractor existing-conditions determination",
+    "function": "Establish, before each energized task, the energization state, hazards and controls, and transfer that information between host and contractor",
+    "failureMode": "The job briefing / existing-conditions determination required by 29 CFR 1926.950(b)(1)(i) is found deficient",
+    "effect": "The crew begins energized work without the planning the cited standard requires; OSHA issues one citation to the contractor, penalty raised from $13,052 to $20,000 in settlement",
+    "cause": "Contractor work-practice/procedure deficiency identified by OSHA; no specific procedural step is named in the public record",
+    "prevention": "Regulatory requirement under Subpart V",
+    "detection": "Found after the event by the OSHA Fat/Cat inspection",
+    "S": 8,
+    "O": 6,
+    "D": 8,
+    "rationale": {
+     "S": "A procedural precursor whose consequence runs through FM-02 and FM-01; scored at 8 so the injuries are not counted at full weight a third time.",
+     "O": "Job briefings are routine on every task and OSHA found this one deficient, a foreseeable slip weakly guarded: 'occasional'.",
+     "D": "No internal check is recorded; the deficiency was established only by the regulator after the injuries."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 1
+     },
+     {
+      "src": "metric",
+      "i": 5
+     },
+     {
+      "src": "soe",
+      "i": 15
+     },
+     {
+      "src": "ref",
+      "i": 0,
+      "quote": "Citation Standard 19260950 B01 I"
+     },
+     {
+      "src": "metric",
+      "i": 4
+     }
+    ],
+    "actions": [
+     {
+      "text": "Documented job briefing and host/contractor existing-conditions determination before each energized task (OSHA-directed abatement, due 03/17/2023; case closed 03/15/2023)",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "text": "Briefing sign-off capturing energization state, incident energy and required PPE category (analyst recommendation)",
+      "evidence": {
+       "src": "improvement",
+       "i": 3
+      }
+     }
+    ],
+    "revised": {
+     "S": 8,
+     "O": 4,
+     "D": 8
+    },
+    "revisedRationale": "The cited abatement targets the deficient briefing directly, so a documented determination before each task makes the slip less likely (O 6→4). The dossier records the abatement as OSHA-directed with the case closed, but not what the contractor changed, so the reduction is a claim about the action, not a confirmed outcome. D is unchanged because no new check that would catch a missed briefing is recorded."
+   },
+   {
+    "id": "FM-04",
+    "item": "Arc-flash hazard analysis, cabinet labelling and PPE",
+    "function": "Quantify incident energy at each cabinet and match workers' PPE to it so an arc does not cause serious burns",
+    "failureMode": "No arc-flash incident-energy study, cabinet label or PPE-adequacy finding exists in the public record",
+    "effect": "Whether the workers' PPE matched the hazard is unknown; one worker has burns to face, arm and thigh, and all three have serious burns",
+    "cause": "Analysis and documentation gap: no NFPA 70E / IEEE 1584 study, label or PPE category is published",
+    "prevention": "None recorded",
+    "detection": "None recorded",
+    "S": 8,
+    "O": 6,
+    "D": 9,
+    "rationale": {
+     "S": "This mode governs how badly the workers were burned rather than whether the arc happened; scored at 8 to avoid counting the injuries at full weight again.",
+     "O": "The dossier treats the absence of any study or label as a latent contributor present across the task: 'occasional'. Held at 6 because absence from the public record is not proof that no study existed.",
+     "D": "Nothing recorded would reveal a PPE/incident-energy mismatch before an arc; even after the event the question remains open."
+    },
+    "evidence": [
+     {
+      "src": "factor",
+      "i": 3
+     },
+     {
+      "src": "rootCause",
+      "quote": "No arc-flash hazard study (NFPA 70E / IEEE 1584), no PPE-adequacy finding"
+     },
+     {
+      "src": "soe",
+      "i": 3,
+      "quote": "burns to face, arm and thigh"
+     },
+     {
+      "src": "metric",
+      "i": 1
+     }
+    ],
+    "actions": [
+     {
+      "text": "Produce or refresh NFPA 70E / IEEE 1584 incident-energy studies and label cabinets campus-wide (recommended; no public record of a study)",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "text": "Verify PPE arc-rating against labelled incident energy before access (analyst recommendation)",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-05",
+    "item": "Event detection and emergency response",
+    "function": "Raise the alarm and get the injured to definitive care quickly",
+    "failureMode": "No electrical, thermal or smoke detection activates; notification depends on a human report of a large explosion",
+    "effect": "Dispatch is initiated at about 11:59 a.m. with an air ambulance on standby; responders arrive within minutes and all three are taken to a regional burn centre. No delay is recorded",
+    "cause": "An arc flash is a blast and burn event classed 'No fire', so the data-center fire detection chain was not the operative safeguard",
+    "prevention": "Emergency dispatch with air-ambulance capability",
+    "detection": "Human report to emergency services",
+    "S": 4,
+    "O": 4,
+    "D": 6,
+    "rationale": {
+     "S": "The record shows a prompt response and no fire spread, so this mode did not add measurable harm; scored low and shown so the detection link of the chain is assessed rather than assumed.",
+     "O": "Relying on human report is a standing condition, but it only matters when an arc occurs: 'infrequent'.",
+     "D": "People detected the event at onset and called it in; nothing could have prevented it at that point: 'detected at onset, not prevented'."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 4
+     },
+     {
+      "src": "soe",
+      "i": 5
+     },
+     {
+      "src": "soe",
+      "i": 8
+     },
+     {
+      "src": "metric",
+      "i": 7
+     },
+     {
+      "src": "soe",
+      "i": 10
+     }
+    ],
+    "actions": []
+   },
+   {
+    "id": "FM-06",
+    "item": "Root-cause record and disclosure",
+    "function": "Leave a durable, retrievable record of the initiating fault, equipment and controls so the industry can learn from it",
+    "failureMode": "No equipment identity, incident energy, PPE finding or de-energisation status is published, and the OSHA accident abstract cannot be retrieved",
+    "effect": "The initiating fault and whether the gear could have been isolated remain unknown; the dossier's corrective actions cannot be checked against a stated cause",
+    "cause": "No operator post-mortem; the accident abstract (Activity 1931208) was unretrievable in this review",
+    "prevention": "None recorded",
+    "detection": "Visible only as the absence of a record",
+    "S": 3,
+    "O": 8,
+    "D": 9,
+    "rationale": {
+     "S": "Affects learning and verification rather than any service or person directly: closest to 'internal impact only'.",
+     "O": "Every technical detail the dossier lists is undisclosed, so the gap is the routine state of the record: 'frequent'.",
+     "D": "Nothing surfaces the gap except its absence."
+    },
+    "evidence": [
+     {
+      "src": "coe",
+      "i": 4
+     },
+     {
+      "src": "factor",
+      "i": 5
+     },
+     {
+      "src": "rootCause",
+      "quote": "The absence of a published root-cause narrative is itself a limitation of this dossier"
+     },
+     {
+      "src": "tech",
+      "quote": "The OSHA accident abstract that would answer several of these could not be retrieved in this review"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Retain and publish accessible root-cause abstracts for catastrophic electrical events (status: gap)",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "text": "Make durable, retrievable incident records a programme requirement (analyst recommendation)",
+      "evidence": {
+       "src": "improvement",
+       "i": 5
+      }
+     }
+    ]
+   }
+  ]
+ }
 }
