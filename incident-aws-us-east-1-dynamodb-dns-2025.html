@@ -516,7 +516,7 @@
         <div class="chips">
             <span class="chip">Amazon Web Services</span>
             <span class="chip cyan">2025-10-20</span>
-            <span class="chip amber">14h 32m core impact</span>
+            <span class="chip amber" title="DynamoDB endpoint IPs deleted 23:48 PDT 19 Oct → event concluded ~14:20 PDT 20 Oct">14h 32m to substantial restoration</span>
             <span class="chip amber">Software</span><span class="chip cyan">Network</span>
         </div>
         <p class="lede">A latent race condition in DynamoDB&#x27;s automated DNS management system left two DNS Enactor processes racing in the us-east-1 region. An unusually delayed Enactor applied an old plan that overwrote a newer one, and a second Enactor&#x27;s cleanup automation then deleted the plan as stale — instantly removing every IP address for the DynamoDB regional endpoint and leaving clients unable to resolve the service. Because core AWS control planes depend on DynamoDB, the fault cascaded: EC2&#x27;s DropletWorkflow Manager fell into congestive collapse (insufficient-capacity launch failures), and NLB health-checks began flapping as new instances were brought into service before their network state propagated. DynamoDB DNS was manually corrected by 2:25 AM PDT, but full recovery of dependent services did not complete until 2:20 PM PDT on October 20, 2025 — roughly 14.5 hours after onset. Downdetector logged millions of reports across more than a thousand consumer and enterprise services.</p>
@@ -538,6 +538,7 @@
             <dt>Users affected</dt><dd>Millions of end users across 1,000+ downstream internet services; press estimates of affected businesses range ~1,000-2,500 companies (secondary, unreconciled). AWS disclosed no official customer count.</dd>
             <dt>Financial</dt><dd>No official AWS figure. Analyst/press estimates: &gt;US$1B to the global economy, with one industry CEO suggesting the true toll could reach hundreds of billions in lost productivity (Catchpoint, via CNN) — estimates, not measured.</dd>
             <dt>Scope</dt><dd>Sev-1 / Large-scale multi-service regional disruption</dd>
+            <dt>Duration</dt><dd>14h 32m — DynamoDB endpoint IPs deleted 23:48 PDT 19 Oct → event concluded ~14:20 PDT 20 Oct</dd>
         </dl>
         <div class="card"><strong>Services / systems down</strong><ul class="tight"><li>Amazon DynamoDB</li><li>Amazon EC2</li><li>Amazon ECS</li><li>Amazon EKS</li><li>AWS Fargate</li><li>Amazon Connect</li><li>AWS STS</li><li>AWS IAM</li><li>Amazon Redshift</li><li>Network Load Balancer (NLB)</li></ul></div>
         <h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Onset</td><td class="mval">2025-10-19 23:48 PDT (06:48 UTC Oct 20)</td></tr><tr><td class="mlabel">DynamoDB DNS restored</td><td class="mval">2025-10-20 02:25 PDT</td></tr><tr><td class="mlabel">Event end / full recovery</td><td class="mval">2025-10-20 14:20 PDT</td></tr><tr><td class="mlabel">Total event duration</td><td class="mval">~14.5 hours (872 min)</td></tr><tr><td class="mlabel">DynamoDB API error window (derived)</td><td class="mval">~2h52m (11:48 PM-2:40 AM PDT)</td></tr><tr><td class="mlabel">EC2 launch-failure window (derived)</td><td class="mval">~14h (11:48 PM-1:50 PM PDT)</td></tr><tr><td class="mlabel">NLB connection-error window (derived)</td><td class="mval">~8h39m (5:30 AM-2:09 PM PDT)</td></tr><tr><td class="mlabel">Downstream services affected</td><td class="mval">1,000+ services (Downdetector-tracked)</td></tr><tr><td class="mlabel">Internal AWS services affected (press)</td><td class="mval">64 (secondary paraphrase; not an AWS-stated count)</td></tr><tr><td class="mlabel">Snapchat Downdetector peak</td><td class="mval">&gt;22,000 reports</td></tr><tr><td class="mlabel">Aggregate Downdetector volume (secondary, unreconciled)</td><td class="mval">~4M within 2h; ~6.5M worldwide</td></tr><tr><td class="mlabel">Affected businesses (secondary, unreconciled)</td><td class="mval">~1,000-2,500 companies (vs CyberCube ~70,000 orgs)</td></tr><tr><td class="mlabel">Estimated economic impact (analyst/press)</td><td class="mval">&gt;US$1B global; up to hundreds of billions (Catchpoint est.)</td></tr></tbody></table></div>
@@ -816,7 +817,7 @@ Because DynamoDB is a foundational dependency, the empty record cascaded into co
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-f5a61526"></script>
+    <script src="js/rz-version.js?v=20261010-dfa70012"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

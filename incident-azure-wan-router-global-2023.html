@@ -516,7 +516,7 @@
         <div class="chips">
             <span class="chip">Microsoft Azure</span>
             <span class="chip cyan">2023-01-25</span>
-            <span class="chip amber">5h 35m core impact</span>
+            <span class="chip amber" title="WAN IGP purge 07:08 UTC → impact no longer occurring for most customers 11:30 UTC 25 Jan">4h 22m to substantial restoration</span>
             <span class="chip cyan">Network</span><span class="chip muted">config-error</span><span class="chip muted">change-management</span>
         </div>
         <p class="lede">A single IGP-database-purge command, added to a WAN change procedure that was never re-tested, executed network-wide on one router vendor&#x27;s platform in Madrid — forcing every IGP-joined router in Microsoft&#x27;s global backbone (AS 8075) to recompute adjacency and forwarding tables and <span data-explain="bgp" tabindex="0">BGP</span> to re-validate all internet prefixes. The resulting packet loss took Azure and most of Microsoft 365 offline worldwide for roughly 5.5 hours, with a second wave triggered 33 minutes later when the same command was run on a second Madrid router.</p>
@@ -538,6 +538,7 @@
             <dt>Users affected</dt><dd>Not precisely disclosed by Microsoft. Any user served by the affected infrastructure worldwide; majority in Asia-Pacific and EMEA as it hit core business hours. Third-party Downdetector logged thousands of reports — more than 3,900 in India and over 900 in Japan (NPR).</dd>
             <dt>Financial</dt><dd>Not disclosed by Microsoft or any regulator.</dd>
             <dt>Scope</dt><dd>Sev-A global multi-service outage</dd>
+            <dt>Duration</dt><dd>4h 22m — WAN IGP purge 07:08 UTC → impact no longer occurring for most customers 11:30 UTC 25 Jan</dd>
         </dl>
         <div class="card"><strong>Services / systems down</strong><ul class="tight"><li>Microsoft Teams</li><li>Exchange Online / Outlook</li><li>SharePoint Online</li><li>OneDrive for Business</li><li>Microsoft Graph</li><li>Power BI / Power Platform</li><li>Microsoft 365 admin center</li><li>Microsoft Intune</li><li>Microsoft Defender for Cloud Apps / Identity / Endpoint</li><li>Azure client connectivity</li><li>Azure ExpressRoute</li><li>Azure Government (reported by news coverage; not itemised in the M365 PIR)</li></ul></div>
         <h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Core incident duration</td><td class="mval">5h 35m (07:08–12:43 UTC)</td></tr><tr><td class="mlabel">Bulk / peak impact window</td><td class="mval">~90 minutes</td></tr><tr><td class="mlabel">Full WAN prefix reconvergence time</td><td class="mval">~1 hour 40 minutes</td></tr><tr><td class="mlabel">Detection latency</td><td class="mval">Alerts to on-call within ~5 min (07:08 → 07:11 UTC)</td></tr><tr><td class="mlabel">Delay to second (repeat) wave</td><td class="mval">33 minutes after first command</td></tr><tr><td class="mlabel">SharePoint/OneDrive request drop</td><td class="mval">~10% reduction in worldwide RPS, 07:08–09:50 UTC vs prior week</td></tr><tr><td class="mlabel">Routers that failed automatic recovery</td><td class="mval">2</td></tr><tr><td class="mlabel">Autonomous System affected</td><td class="mval">AS 8075 — multiple prefixes (/24 and summary /12) withdrawn then readvertised</td></tr><tr><td class="mlabel">Residual Outlook-on-web full resolution</td><td class="mval">2023-01-26 03:50 UTC (EX502694)</td></tr><tr><td class="mlabel">Third-party outage reports (Downdetector)</td><td class="mval">&gt;3,900 reports in India, &gt;900 in Japan; thousands worldwide</td></tr></tbody></table></div>
@@ -812,7 +813,7 @@ Two safeguards failed to contain it. The real-time AAA system enforces a per-com
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-f5a61526"></script>
+    <script src="js/rz-version.js?v=20261010-dfa70012"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

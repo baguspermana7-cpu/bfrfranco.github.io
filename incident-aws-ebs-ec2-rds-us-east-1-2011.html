@@ -516,7 +516,7 @@
         <div class="chips">
             <span class="chip">Amazon Web Services</span>
             <span class="chip cyan">2011-04-21</span>
-            <span class="chip amber">90h 43m core impact</span>
+            <span class="chip amber" title="Volumes stuck 00:47 PDT 21 Apr → all but 2.2% of affected-AZ volumes restored 12:30 PDT 22 Apr (35h43m)">35h 43m to substantial restoration</span>
             <span class="chip cyan">Network</span><span class="chip muted">config-error</span><span class="chip amber">Software</span><span class="chip muted">storage</span>
         </div>
         <p class="lede">A routine network-capacity upgrade in one US-East-1 Availability Zone was executed incorrectly, shifting EBS traffic onto a low-capacity redundant network and isolating a large block of storage nodes. When connectivity returned, the nodes launched a self-reinforcing &quot;re-mirroring storm&quot; that exhausted spare capacity, left ~13% of the zone&#x27;s volumes &quot;stuck&quot;, and starved the region-wide EBS control plane — degrading EC2 and RDS for nearly four days and permanently losing 0.07% of the affected zone&#x27;s volumes.</p>
@@ -538,6 +538,7 @@
             <dt>Users affected</dt><dd>Not disclosed as a user count; blast radius covered one AZ directly plus region-wide EBS/EC2/RDS control-plane degradation. Consumer sites knocked offline included Reddit, Quora, Foursquare, Hootsuite and Heroku (also Engine Yard), per CNN Money and GovTech.</dd>
             <dt>Financial</dt><dd>Not disclosed by AWS. Direct remedy was a 10-day service credit equal to 100% of affected customers&#x27; EBS, EC2 and RDS usage in the affected AZ; aggregate dollar figure never published.</dd>
             <dt>Scope</dt><dd>Major multi-day regional service disruption (single AZ hard-down, region-wide control-plane impact)</dd>
+            <dt>Duration</dt><dd>35h 43m — Volumes stuck 00:47 PDT 21 Apr → all but 2.2% of affected-AZ volumes restored 12:30 PDT 22 Apr (35h43m)</dd>
         </dl>
         <div class="card"><strong>Services / systems down</strong><ul class="tight"><li>Amazon EBS (Elastic Block Store)</li><li>Amazon EC2 (EBS-backed instance launch/attach)</li><li>Amazon RDS (single-AZ and some multi-AZ)</li></ul></div>
         <h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Total disruption duration</td><td class="mval">~90 hours (approx; 12:47 AM PDT Apr 21 to effective end over the weekend of Apr 24; AWS gives no precise closing time)</td></tr><tr><td class="mlabel">Peak stuck EBS volumes (affected AZ)</td><td class="mval">~13% initial, +5% in second wave (~18% cumulative touched)</td></tr><tr><td class="mlabel">Volumes not yet restored by Apr 22 12:30 PDT</td><td class="mval">2.2%</td></tr><tr><td class="mlabel">Volumes not yet restored by Apr 24 12:30 PDT</td><td class="mval">1.04%</td></tr><tr><td class="mlabel">Permanent EBS data loss (affected AZ)</td><td class="mval">0.07% of volumes unrecoverable</td></tr><tr><td class="mlabel">RDS single-AZ instances with stuck I/O (peak)</td><td class="mval">45% at peak; 0.4% suffered unrecoverable storage</td></tr><tr><td class="mlabel">RDS single-AZ recovery pace</td><td class="mval">41.0% still stuck after 24h, 23.5% after 36h, 14.6% after 48h; the rest recovered over the weekend</td></tr><tr><td class="mlabel">RDS multi-AZ failover failures</td><td class="mval">2.5% failed to auto-failover due to a previously un-encountered bug</td></tr><tr><td class="mlabel">Stuck-volume spillover into healthy AZs (peak)</td><td class="mval">less than 0.07%</td></tr><tr><td class="mlabel">Customer remedy</td><td class="mval">10-day service credit = 100% of affected EBS, EC2 and RDS usage in the affected AZ</td></tr></tbody></table></div>
@@ -838,7 +839,7 @@ Latent / organisational root causes: (1) A change-management gap — a manual, e
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-f5a61526"></script>
+    <script src="js/rz-version.js?v=20261010-dfa70012"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

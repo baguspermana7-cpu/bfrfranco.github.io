@@ -516,7 +516,7 @@
         <div class="chips">
             <span class="chip">Microsoft Azure</span>
             <span class="chip cyan">2020-09-28</span>
-            <span class="chip amber">5h 0m core impact</span>
+            <span class="chip amber" title="Global auth failing 21:25Z 28 Sep → enough instances healthy for normal operation 00:23Z 29 Sep (2h58m)">2h 58m to substantial restoration</span>
             <span class="chip amber">Software</span>
         </div>
         <p class="lede">On 28 September 2020 a service update meant only for an internal Azure AD validation test ring crashed on startup and, because of a latent defect in the Safe Deployment Process (SDP) tooling, was pushed straight into global production. The same defect corrupted the deployment metadata so that all deployment rings were targeted at once and the automated rollback could not run, forcing a slower manual recovery. Users were locked out of Azure Portal, Microsoft 365, Teams, Exchange/Outlook and downstream apps for roughly five hours end-to-end. It is a textbook identity-plane blast-radius event: a single canary-scoped change became a worldwide authentication failure.</p>
@@ -538,6 +538,7 @@
             <dt>Users affected</dt><dd>Not disclosed by Microsoft — scope described only as &#x27;a subset of customers&#x27; across Azure Public and Azure Government clouds; impact quantified via regional authentication success rates rather than an absolute count</dd>
             <dt>Financial</dt><dd>Not disclosed — Microsoft published no SLA-credit total and no third party quantified business loss</dd>
             <dt>Scope</dt><dd>Tier 1 — global identity-plane / single-point-of-failure event</dd>
+            <dt>Duration</dt><dd>2h 58m — Global auth failing 21:25Z 28 Sep → enough instances healthy for normal operation 00:23Z 29 Sep (2h58m)</dd>
         </dl>
         <div class="card"><strong>Services / systems down</strong><ul class="tight"><li>Azure Active Directory (core)</li><li>Azure Portal</li><li>Microsoft 365</li><li>Microsoft Teams</li><li>Exchange / Outlook email</li><li>Microsoft Office desktop (some installations)</li><li>Visual Studio (licensing verification, some installations)</li><li>OneDrive / SharePoint (related follow-on disruption)</li></ul></div>
         <h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Primary impact duration (to normal operational parameters)</td><td class="mval">~2h58m (21:25 UTC 09-28 → 00:23 UTC 09-29)</td></tr><tr><td class="mlabel">End-to-end duration (to residual cleared)</td><td class="mval">~5h (21:25 UTC 09-28 → 02:25 UTC 09-29)</td></tr><tr><td class="mlabel">Auth success rate — Europe</td><td class="mval">~81% during outage</td></tr><tr><td class="mlabel">Auth success rate — Americas</td><td class="mval">17% at trough, improved to ~37% before mitigation</td></tr><tr><td class="mlabel">Auth success rate — Asia</td><td class="mval">72% initially, dropped to ~32% at peak business hours</td></tr><tr><td class="mlabel">Auth success rate — Australia</td><td class="mval">~37% during outage</td></tr><tr><td class="mlabel">Front-end error symptom</td><td class="mval">HTTP 503 (Service Unavailable) on AAD auth calls</td></tr><tr><td class="mlabel">Cloud scope</td><td class="mval">Azure Public + Azure Government clouds</td></tr><tr><td class="mlabel">Absolute users/tenants affected</td><td class="mval">Not disclosed (&#x27;a subset of customers&#x27;)</td></tr><tr><td class="mlabel">Financial impact</td><td class="mval">Not disclosed (no SLA-credit total, no third-party estimate)</td></tr><tr><td class="mlabel">Deployment rings targeted</td><td class="mval">All rings concurrently (intended: 1 validation test ring)</td></tr><tr><td class="mlabel">Comms remediation target</td><td class="mval">Initial customer comms within 15 min of impact (committed)</td></tr></tbody></table></div>
@@ -792,7 +793,7 @@ Blast radius was uneven by region and by session state. Regional success rates: 
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-f5a61526"></script>
+    <script src="js/rz-version.js?v=20261010-dfa70012"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

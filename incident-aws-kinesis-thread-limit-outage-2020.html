@@ -516,7 +516,7 @@
         <div class="chips">
             <span class="chip">Amazon Web Services</span>
             <span class="chip cyan">2020-11-25</span>
-            <span class="chip amber">17h 8m core impact</span>
+            <span class="chip amber" title="First customer-visible errors 05:15 PST → majority of downstream issues resolved 16:15 PST">11h 0m to substantial restoration</span>
             <span class="chip amber">Software</span>
         </div>
         <p class="lede">A small addition of capacity to the Kinesis Data Streams front-end fleet in US-EAST-1 pushed every server past an operating-system maximum thread-count limit. Because each front-end server creates OS threads for every other server in the fleet, the added hosts made the per-server thread count breach the OS ceiling; cache construction failed and servers were left with useless shard-maps, unable to route requests. Kinesis errored and slowed, and because many AWS services depend on Kinesis, CloudWatch, Cognito, Lambda, EventBridge and customer workloads cascaded down. Recovery was throttled by slow membership propagation and restart contention, so full Kinesis restoration took roughly 17 hours.</p>
@@ -538,6 +538,7 @@
             <dt>Users affected</dt><dd>Not publicly quantified by AWS; broad impact across many AWS customers in US-EAST-1 whose applications depend on Kinesis and dependent services (CloudWatch, Cognito, Lambda, EventBridge/CloudWatch Events, and downstream ECS/EKS provisioning and AWS Auto Scaling).</dd>
             <dt>Financial</dt><dd>Not published by AWS for this event. (The ~$34M Parametrix estimate belongs to the separate Dec 7, 2021 US-EAST-1 outage and does not apply here.)</dd>
             <dt>Scope</dt><dd>Major regional multi-service outage</dd>
+            <dt>Duration</dt><dd>11h 0m — First customer-visible errors 05:15 PST → majority of downstream issues resolved 16:15 PST</dd>
         </dl>
         <div class="card"><strong>Services / systems down</strong><ul class="tight"><li>Amazon Kinesis Data Streams</li><li>Amazon CloudWatch (metrics and alarms)</li><li>Amazon Cognito (User Pools)</li><li>AWS Lambda (invocation error rates)</li><li>Amazon EventBridge / CloudWatch Events</li><li>Amazon ECS / EKS (provisioning and scaling delays, via EventBridge)</li><li>AWS Auto Scaling (metric-dependent policy delays)</li></ul></div>
         <h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Capacity-addition (trigger) window</td><td class="mval">63 min (02:44–03:47 AM PST)</td></tr><tr><td class="mlabel">Detection lag (breach to first alarm)</td><td class="mval">~1h28m (03:47 to 05:15 AM PST)</td></tr><tr><td class="mlabel">Time to confirmed root cause</td><td class="mval">~5h52m after breach (03:47 to 09:39 AM PST)</td></tr><tr><td class="mlabel">Constrained restart rate</td><td class="mval">a few hundred servers per hour</td></tr><tr><td class="mlabel">Recovery span (restart start to full recovery)</td><td class="mval">12h16m (10:07 AM to 10:23 PM PST)</td></tr><tr><td class="mlabel">Total Kinesis outage duration</td><td class="mval">~18h36m from breach (03:47 AM to 10:23 PM PST)</td></tr><tr><td class="mlabel">Thread scaling relationship</td><td class="mval">O(N): threads per server proportional to fleet size</td></tr><tr><td class="mlabel">Downstream services impacted</td><td class="mval">6+ (Cognito, CloudWatch, Lambda, EventBridge, ECS, EKS)</td></tr><tr><td class="mlabel">Cognito recovery time</td><td class="mval">02:18 PM PST</td></tr><tr><td class="mlabel">CloudWatch full recovery</td><td class="mval">10:31 PM PST</td></tr></tbody></table></div>
@@ -758,7 +759,7 @@ The blast radius was defined by which services buffer data through Kinesis. Amaz
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-f5a61526"></script>
+    <script src="js/rz-version.js?v=20261010-dfa70012"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

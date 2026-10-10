@@ -516,7 +516,7 @@
         <div class="chips">
             <span class="chip">Alibaba Cloud</span>
             <span class="chip cyan">2023-11-12</span>
-            <span class="chip amber">3h 27m core impact</span>
+            <span class="chip amber" title="Auth plane failing 17:44 CST 12 Nov → all global regions restored 21:11 CST (HQ regions back ~18:44)">3h 27m to substantial restoration</span>
             <span class="chip amber">Software</span><span class="chip muted">config-error</span><span class="chip muted">control-plane</span><span class="chip muted">authentication</span>
         </div>
         <p class="lede">On 12 November 2023 Alibaba Cloud&#x27;s shared global authentication/authorization (Auth) <span data-explain="control-plane" tabindex="0">control plane</span> failed, and from 17:44 to 21:11 China Standard Time every global region simultaneously lost console and API access. Auth-dependent services (OSS, OTS, SLS, MNS) went down, crashing consumer apps such as Taobao and DingTalk, while compute/network data planes (ECS, RDS instances) that use their own credentials kept running. Alibaba officially acknowledged only an &#x27;anomaly&#x27; in console and API access and published no root-cause post-mortem; the Auth-control-plane mechanism is an independent inference corroborated by the service-failure pattern.</p>
@@ -538,6 +538,7 @@
             <dt>Users affected</dt><dd>Not quantified by Alibaba; consumer apps Taobao, Xianyu and DingTalk crashed (each with hundreds of millions of users) but no user figure was disclosed</dd>
             <dt>Financial</dt><dd>Not disclosed; only SLA voucher compensation of 25-30% of monthly service fees was offered</dd>
             <dt>Scope</dt><dd>Tier 1 — global multi-region control-plane outage</dd>
+            <dt>Duration</dt><dd>3h 27m — Auth plane failing 17:44 CST 12 Nov → all global regions restored 21:11 CST (HQ regions back ~18:44)</dd>
         </dl>
         <div class="card"><strong>Services / systems down</strong><ul class="tight"><li>Object Storage Service (OSS)</li><li>Table Store (OTS)</li><li>Log Service (SLS)</li><li>Message Notification Service (MNS)</li><li>Cloud consoles / management console</li><li>Management APIs (OpenAPI)</li></ul></div>
         <h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Outage duration</td><td class="mval">~3.5 hours (207 min), 17:44-21:11 CST</td></tr><tr><td class="mlabel">Regions affected</td><td class="mval">All global regions simultaneously (East Asia, SE Asia, Middle East, North America)</td></tr><tr><td class="mlabel">Fast vs slow recovery</td><td class="mval">East China 1 &amp; North China 2 ~1 hour; other AZs ~3 hours</td></tr><tr><td class="mlabel">Monthly availability impact</td><td class="mval">Dropped to 99.5% for affected products</td></tr><tr><td class="mlabel">SLA compensation</td><td class="mval">25-30% of monthly service fees in vouchers</td></tr><tr><td class="mlabel">Core services down</td><td class="mval">OSS, OTS, SLS, MNS + consoles &amp; OpenAPI</td></tr><tr><td class="mlabel">Follow-on outage (27 Nov 2023)</td><td class="mval">~1 hour 42 min (09:16-10:58 Beijing time), database OpenAPI, 8 regions</td></tr><tr><td class="mlabel">Financial impact (USD)</td><td class="mval">Not disclosed</td></tr><tr><td class="mlabel">Users affected (count)</td><td class="mval">Not disclosed by Alibaba</td></tr></tbody></table></div>
@@ -784,7 +785,7 @@ Latent / organisational root: (1) a single globally-shared Auth control plane wi
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-f5a61526"></script>
+    <script src="js/rz-version.js?v=20261010-dfa70012"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

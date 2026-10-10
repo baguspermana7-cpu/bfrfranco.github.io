@@ -516,7 +516,7 @@
         <div class="chips">
             <span class="chip">Meta (Facebook)</span>
             <span class="chip cyan">2021-10-04</span>
-            <span class="chip amber">7h 11m core impact</span>
+            <span class="chip amber" title="Outage 15:39 UTC → Cloudflare sees DNS back 21:20 and full reconnection 21:28 UTC.">5h 49m to substantial restoration</span>
             <span class="chip cyan">Network</span><span class="chip red">Human error</span>
         </div>
         <p class="lede">On 4 October 2021 a single command issued during routine backbone maintenance — intended only to assess global backbone capacity — unintentionally took down every connection in Facebook&#x27;s backbone, completely severing all of its data centers from the internet. With the backbone gone, Facebook&#x27;s DNS-serving locations followed their designed safety behavior and declared themselves unhealthy, withdrawing the BGP route advertisements for the authoritative nameservers. That withdrawal pulled Facebook&#x27;s DNS off the global internet: recursive resolvers everywhere lost any path to the nameservers, so Facebook, Messenger, Instagram, WhatsApp, Mapillary and Oculus all failed simultaneously rather than degrading gracefully. Recovery was slow because primary and out-of-band network access were also down, forcing engineers to travel on-site; the intentionally hardened physical and system security of the facilities made restarting systems difficult, with recovery advancing after a team reached and reset servers at the Santa Clara, California data center. The outage ran roughly six to seven hours (15:39 UTC start to general restoration around 22:50 UTC).</p>
@@ -538,6 +538,7 @@
             <dt>Users affected</dt><dd>All users of Facebook, Messenger, Instagram, WhatsApp, Mapillary and Oculus globally (family of apps served the same withdrawn authoritative DNS); precise user count not verified in primary sources</dd>
             <dt>Financial</dt><dd>Not verified in primary Meta or Cloudflare sources; widely-cited revenue/market-cap figures remain unsourced and are excluded here</dd>
             <dt>Scope</dt><dd>SEV-1 / Global total outage (characterized by CNBC as Facebook&#x27;s worst outage since 2008)</dd>
+            <dt>Duration</dt><dd>5h 49m — Outage 15:39 UTC → Cloudflare sees DNS back 21:20 and full reconnection 21:28 UTC.</dd>
         </dl>
         <div class="card"><strong>Services / systems down</strong><ul class="tight"><li>Facebook</li><li>Messenger</li><li>Instagram</li><li>WhatsApp</li><li>Mapillary</li><li>Oculus</li><li>Internal engineering tooling</li><li>Physical badge / building access</li></ul></div>
         <h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Outage start</td><td class="mval">15:39 UTC, 4 Oct 2021</td></tr><tr><td class="mlabel">BGP routing restored</td><td class="mval">~21:50 UTC</td></tr><tr><td class="mlabel">DNS services resumed</td><td class="mval">22:05 UTC</td></tr><tr><td class="mlabel">General platform restoration</td><td class="mval">~22:50 UTC</td></tr><tr><td class="mlabel">Total duration</td><td class="mval">~6-7 hours (431 min, 15:39-&gt;22:50 UTC)</td></tr><tr><td class="mlabel">External DNS-availability window (Cloudflare vantage)</td><td class="mval">~5.5 hours (~15:50 to ~21:20 UTC)</td></tr><tr><td class="mlabel">Meta properties globally unavailable</td><td class="mval">6 (Facebook, Messenger, Instagram, WhatsApp, Mapillary, Oculus)</td></tr><tr><td class="mlabel">Backbone connectivity lost</td><td class="mval">100% — complete data-center-to-internet disconnection</td></tr><tr><td class="mlabel">Historical scale</td><td class="mval">Worst Facebook outage since 2008 (per CNBC, via Wikipedia)</td></tr><tr><td class="mlabel">Published numbered COE action items</td><td class="mval">0 (no enumerated corrective list published)</td></tr></tbody></table></div>
@@ -820,7 +821,7 @@ Recovery could not use the normal remote path because the network carrying it wa
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-f5a61526"></script>
+    <script src="js/rz-version.js?v=20261010-dfa70012"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

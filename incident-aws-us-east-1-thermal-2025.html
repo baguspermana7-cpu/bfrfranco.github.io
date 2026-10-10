@@ -516,7 +516,7 @@
         <div class="chips">
             <span class="chip">Amazon Web Services</span>
             <span class="chip cyan">2026-05-07</span>
-            <span class="chip amber">20h 25m core impact</span>
+            <span class="chip amber" title="Cooling loss/shutdown ~16:20 PDT 7 May → incident marked resolved ~20:04 PDT 8 May (some damaged hardware remained impaired)">27h 44m to substantial restoration</span>
             <span class="chip cyan">Cooling</span><span class="chip amber">Power</span>
         </div>
         <p class="lede">On 7 May 2026 cooling systems failed in AWS&#x27;s use1-az4 availability zone in US-EAST-1 (Northern Virginia). As data-hall temperatures crossed operating thresholds, servers automatically shut down to protect hardware, cutting power to the EC2 instances and EBS volumes hosted on that gear. The compute and storage loss cascaded to dependent services — IoT Core, ELB, NAT Gateway and Redshift — with elevated error rates and slower provisioning. AWS shifted traffic off the impaired zone and advised customers to relaunch or redistribute workloads in other US-EAST-1 availability zones. AWS first flagged the problem at 5:25 PM PDT on 7 May and restored cooling to pre-incident capacity at 1:50 PM PDT on 8 May, roughly 20 hours 25 minutes later. Downstream, Coinbase reported a multi-hour outage in which users could not trade or move funds. No formal AWS post-incident report was published in the available sources.</p>
@@ -538,6 +538,7 @@
             <dt>Users affected</dt><dd>Not publicly quantified. Directly impaired EC2/EBS customers in use1-az4 plus downstream users of dependent services; named downstream victim Coinbase suffered a multi-hour trading and funds-movement outage, but no affected-user count was disclosed by any source.</dd>
             <dt>Financial</dt><dd>Not disclosed. No source states a dollar loss for AWS or for downstream customers; Coinbase impact was reported only qualitatively.</dd>
             <dt>Scope</dt><dd>Major single-AZ regional impairment with multi-service cascade and named downstream customer outage</dd>
+            <dt>Duration</dt><dd>27h 44m — Cooling loss/shutdown ~16:20 PDT 7 May → incident marked resolved ~20:04 PDT 8 May (some damaged hardware remained impaired)</dd>
         </dl>
         <div class="card"><strong>Services / systems down</strong><ul class="tight"><li>EC2 (direct)</li><li>EBS (direct)</li><li>IoT Core (cascaded)</li><li>ELB (cascaded)</li><li>NAT Gateway (cascaded)</li><li>Redshift (cascaded)</li></ul></div>
         <h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Total incident duration (onset to resolved)</td><td class="mval">~28 hours (reported)</td></tr><tr><td class="mlabel">Cooling-restoration duration (onset to pre-incident capacity)</td><td class="mval">~21.5 hours (4:20 PM PDT May 7 -&gt; 1:50 PM PDT May 8)</td></tr><tr><td class="mlabel">Threshold-exceedance / trigger time</td><td class="mval">4:20 PM PDT May 7 (23:20 UTC; Axis separately cites 23:50 UTC - internal inconsistency)</td></tr><tr><td class="mlabel">Coinbase customer downtime</td><td class="mval">~7 hours (reported)</td></tr><tr><td class="mlabel">Blast radius</td><td class="mval">1 data hall / 1 Availability Zone (use1-az4), described as a very heavily used AWS zone</td></tr><tr><td class="mlabel">Cooling units failed</td><td class="mval">&#x27;Multiple&#x27; / &#x27;multiple chiller units&#x27; near-simultaneously (exact count not disclosed)</td></tr><tr><td class="mlabel">Official AWS post-event summary published</td><td class="mval">0 (none for May 2026; latest PES entry is the Oct 19, 2025 DynamoDB disruption)</td></tr><tr><td class="mlabel">Temperature detail disclosed (deg / setpoint / threshold value)</td><td class="mval">Not disclosed - only &#x27;exceeded safe operating thresholds&#x27;, no numeric value</td></tr><tr><td class="mlabel">Chiller/CRAH make, model, age, refrigerant</td><td class="mval">Not disclosed in any source</td></tr><tr><td class="mlabel">Recency ranking of the outage</td><td class="mval">Reported as 4th significant us-east-1 outage since October 2025 (single-source, unverified)</td></tr></tbody></table></div>
@@ -806,7 +807,7 @@
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-f5a61526"></script>
+    <script src="js/rz-version.js?v=20261010-dfa70012"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

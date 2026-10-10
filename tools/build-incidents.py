@@ -669,6 +669,19 @@ def render_hub(incidents):
     return page_shell("DC Incidents — Case Library", "Root-only ranked library of major data-center and cloud incidents with full RCA, COE, SOE and lessons learnt, each source-cited.", "dc-incidents.html", body, base="", head_extra=LEAFLET_HEAD + f"<style>{incidents_fmea.CSS}{incidents_fmea.CORPUS_CSS}</style>")
 
 
+def _dur_chip(inc):
+    """Header chip for the one duration definition the library uses: customer-impact
+    onset to substantial restoration, from the dossier's own SOE (durationEvidence).
+    Where the dossier cannot support a number it says which of two reasons applies,
+    rather than showing a figure nobody can trace."""
+    st = inc.get("durationStatus")
+    if st == "measured" and inc.get("durationMin"):
+        return _dur(inc["durationMin"]) + " to substantial restoration"
+    if st == "no-outage":
+        return "no customer downtime recorded"
+    return "restoration time not established"
+
+
 def _dur(mins):
     if not mins:
         return "—"
@@ -1566,7 +1579,7 @@ def render_incident(inc, rank):
         <div class="chips">
             <span class="chip">{esc(inc.get('operator',''))}</span>
             <span class="chip cyan">{esc(inc.get('date',''))}</span>
-            <span class="chip amber">{esc(_dur(inc.get('durationMin')))} core impact</span>
+            <span class="chip amber" title="{esc(inc.get('durationBasis',''))}">{esc(_dur_chip(inc))}</span>
             {cat_chips(inc.get('category',[]))}
         </div>
         <p class="lede">{linkify(inc.get('brief',''), _used)}</p>
@@ -1588,6 +1601,7 @@ def render_incident(inc, rank):
             <dt>Users affected</dt><dd>{esc(sev.get('usersAffected','—'))}</dd>
             <dt>Financial</dt><dd>{esc(sev.get('impactUsd','—'))}</dd>
             <dt>Scope</dt><dd>{esc(sev.get('tier','—'))}</dd>
+            <dt>Duration</dt><dd>{esc(_dur(inc.get('durationMin')) + ' — ' if inc.get('durationMin') else '')}{esc(inc.get('durationBasis') or 'Basis not recorded')}</dd>
         </dl>
         <div class="card"><strong>Services / systems down</strong><ul class="tight">{down}</ul></div>
         {metrics_html}

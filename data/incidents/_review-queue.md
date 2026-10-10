@@ -20,33 +20,25 @@ wrong. `tools/test-incidents-corpus.mjs` now fails both classes.
 
 ## Needs a decision
 
-### Framing
-- **virginia-dc-alley-heatdome-2022** — title, brief, category `cooling`, `servicesDown`
-  ("cooling-constrained load shedding across 45+ facilities"), date 2022-07-24 and
-  durationMin 360 describe a heat-dome cooling event. The dossier's own rootCause and SOE
-  say there was NO cooling failure: July 2022 was a transmission-capacity disclosure, the
-  SOE has no 24 July entry, and the physical events are 2024 and 2026 load-loss episodes.
-  The FMEA scores no cooling mode and says so. Either re-frame the dossier (grid capacity
-  / large-load ride-through) or retire it.
+### Decided by the owner, done in v3.13.6
+- **virginia-dc-alley-heatdome-2022 — re-framed** (owner: "Bingkai ulang"). Title, brief,
+  category `power`, date 2022-07-29 (Dominion's constraint notice, the first IMPACT entry),
+  severity and magnitude rewritten to what the dossier records: a transmission constraint and two
+  mass load-loss events that rode through on backup, no customer downtime. Slug kept so the URL
+  does not break; it still says "heatdome".
+- **durationMin — one definition** (owner: "yang terbaik"): customer-impact onset → substantial
+  restoration, from the dossier's own SOE/metrics, with `durationEvidence` pointers whose quotes are
+  checked verbatim by `tools/test-incidents-corpus.mjs`. 31 of 43 changed. Where the dossier cannot
+  support a number, `durationMin` is null and `durationStatus` says why: `no-outage` (Council Bluffs,
+  Virginia) or `not-established` (Azure China North 3, BA Heathrow, DR LA, DR Singapore, NIRS, OVH,
+  PSN, Red Sea). Largest corrections: CrowdStrike 78 min → ~10.8 days (78 min was the source-side
+  exposure window, not customer impact); AWS EBS 2011 ~90 h → ~36 h (straggler tail excluded); Rogers
+  15 h → ~26 h (the figure the dossier itself had withdrawn).
 
-### What does `durationMin` mean? (rendered as "Xh core impact")
-The header carries one number; the dossiers measure different things. Pick a definition
-(e.g. customer-impact onset → substantial restoration) and apply it to all.
-
-| dossier | header | the dossier's own figures |
-|---|---|---|
-| rogers-canada-nationwide-2022 | 900 ("roughly 15 hours") | CRTC window 04:58 EDT 8 Jul → 07:00 EDT 9 Jul ≈ 26 h; the dossier's analysis says the 15–19 h figure was **removed as unsupported** — the header still uses it |
-| x-twitter-oregon-fire-2025 | 2880 (48 h); brief "multi-day" | metric and SOE ≈ 24 h (11:00 PT Thu → 10:35 PT Fri) |
-| london-heatwave-cooling-2022 | 1440 | ≈ 14 h 10 m to resolution, or ≈ 38 h 47 m official window |
-| gcp-global-service-control-2025 | 447 | analysis: global impact "roughly three hours"; us-central1 recovered ≈ 2 h 40 m |
-| fastly-global-cdn-2021 | 60 | 95% back at 49 min; most services ≈ 73 min; mitigated 2 h 48 m |
-| digital-realty-singapore-liion-fire-2024 | 600 | alarm morning 10 Sep → EPO ≈ 18 h later → stable 12 Sep |
-| nirs-daejeon-battery-fire-2025 | 600 (fire knock-down) | government services out for weeks |
-| optus-australia-nationwide-2023 | 840 (top media figure) | metrics ≈ 12–13 h |
-| psn-outage-2025 | 1440, stated as fact | own SOE and metrics call it disputed, ≈ 18 → 24+ h |
-| dyn-mirai-ddos-2016 | 660 (11:10–22:10 UTC) | includes a third wave reported as having no customer impact |
-| google-council-bluffs-arcflash-2022 | 180 | nothing in SOE or metrics supports a 3-hour figure |
-| gcp-stt-gdc-delhi-fire-2026 | 28673 (≈ 19.9 d) | metric ≈ 21.5 d; brief says resolved 29 Jun, SOE and metric say 26 Jun |
+### Still open after the duration change
+- `magnitude.durationScore` is a 0–10 judgement made against the OLD durations and was not
+  re-scored. Magnitude notes that quote an hour figure may now disagree with the header:
+  alibaba-cloud-global-2023, att-nationwide-outage-2024, aws-ebs-ec2-rds-us-east-1-2011, aws-kinesis-thread-limit-outage-2020, aws-us-east-1-dynamodb-dns-2025, aws-us-east-1-thermal-2025, azure-active-directory-2020, azure-front-door-config-change-2025, azure-south-central-us-texas-cooling-2018, cloudflare-bot-management-feature-file-2025, cloudflare-flexential-pdx-power-2023, cyrusone-cme-chicago-cooling-2025, delta-atlanta-switchgear-2016, dyn-mirai-ddos-2016, equinix-ld8-london-ups-2020, facebook-meta-bgp-dns-2021, fastly-global-cdn-2021, kakao-sk-cc-pangyo-fire-2022, optus-australia-nationwide-2023, rogers-canada-nationwide-2022.
 
 ### Internal contradictions between fields or sources
 - **nirs-daejeon-battery-fire-2025** — first report ~20:15 (SOE 3) before ~20:20 ignition

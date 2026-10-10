@@ -516,7 +516,7 @@
         <div class="chips">
             <span class="chip">Microsoft Azure</span>
             <span class="chip cyan">2018-09-04</span>
-            <span class="chip amber">38h 20m core impact</span>
+            <span class="chip amber" title="Customer impact 09:29 UTC 4 Sep → majority of Azure recovered 11:00 UTC 5 Sep (25h31m)">25h 31m to substantial restoration</span>
             <span class="chip cyan">Cooling</span><span class="chip amber">Power</span>
         </div>
         <p class="lede">On 4 September 2018, a high-energy thunderstorm with lightning struck southern Texas near Microsoft&#x27;s South Central US datacenters. Per The Register&#x27;s account of Azure&#x27;s RCA, a lightning strike at 08:42 UTC switched one datacenter to generator power and overloaded surge suppressors on the mechanical cooling plant, shutting it down; the official VSTS <span data-explain="postmortem" tabindex="0">postmortem</span> describes voltage sags and swells on the utility feed that impacted cooling. As temperatures climbed, automated datacenter integrity procedures forced a structured power-down of servers and storage to protect hardware. Utility power was restored in roughly nine hours (per Data Center Dynamics), but recovery of services took far longer: VSTS primary recovery ran about twenty-one hours, the official VSTS incident spanned 09:45 UTC on 4 September to 00:05 UTC on 6 September (the longest outage in that service&#x27;s history), and broader Azure — on the order of forty services per contemporaneous reporting — was not declared fully mitigated until 08:40 UTC on 7 September. A separate ~2-hour Release Management incident (a database going offline) occurred during recovery.</p>
@@ -538,6 +538,7 @@
             <dt>Users affected</dt><dd>Undisclosed by Microsoft; region-scoped impact to South Central US customers plus global Azure DevOps (VSTS) Marketplace users. No user/customer count was published in the official postmortem.</dd>
             <dt>Financial</dt><dd>Not publicly disclosed; no financial figure appears in Microsoft&#x27;s public write-up.</dd>
             <dt>Scope</dt><dd>Sev 1 / major regional outage (characterized by Microsoft as the longest VSTS outage in the service&#x27;s history)</dd>
+            <dt>Duration</dt><dd>25h 31m — Customer impact 09:29 UTC 4 Sep → majority of Azure recovered 11:00 UTC 5 Sep (25h31m)</dd>
         </dl>
         <div class="card"><strong>Services / systems down</strong><ul class="tight"><li>All VSTS Scale Units in South Central US</li><li>Azure DevOps Marketplace (global)</li><li>Release Management (US users)</li><li>Git (intermittent failures)</li><li>Package Management (intermittent failures)</li><li>VS / VS Code extension acquisition</li><li>Dashboards</li><li>User profiles hosted in South Central US</li><li>Hosted macOS build/release queue</li><li>~40 broader Azure services (per contemporaneous public reporting, not enumerated in the official postmortem)</li></ul></div>
         <h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Lightning strike (per Azure RCA via The Register)</td><td class="mval">2018-09-04 08:42 UTC</td></tr><tr><td class="mlabel">Incident start (VSTS window)</td><td class="mval">2018-09-04 09:45 UTC</td></tr><tr><td class="mlabel">Incident end (VSTS window)</td><td class="mval">2018-09-06 00:05 UTC</td></tr><tr><td class="mlabel">VSTS incident duration (official window)</td><td class="mval">~38h20m (2300 min)</td></tr><tr><td class="mlabel">VSTS primary recovery</td><td class="mval">~21 hours</td></tr><tr><td class="mlabel">Utility power restoration</td><td class="mval">~9 hours after onset (single-source; Data Center Dynamics, not independently re-verified)</td></tr><tr><td class="mlabel">Broader Azure recovery</td><td class="mval">Majority restored 11:00 UTC 5 Sep; full mitigation 08:40 UTC 7 Sep</td></tr><tr><td class="mlabel">Azure services affected</td><td class="mval">~40 (contemporaneous public reporting; not enumerated in official postmortem)</td></tr><tr><td class="mlabel">Committed remediation (COE) items</td><td class="mval">7</td></tr><tr><td class="mlabel">Severity framing</td><td class="mval">Longest VSTS outage in the service&#x27;s history</td></tr><tr><td class="mlabel">Secondary Release Management incident</td><td class="mval">~2 hours (database offline, during recovery)</td></tr><tr><td class="mlabel">Published user-impact / damage / temperature / cost figures</td><td class="mval">None (confirmed absent from official disclosure)</td></tr></tbody></table></div>
@@ -814,7 +815,7 @@ Recovery engineering. Microsoft chose recovery over failover deliberately: a fai
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-f5a61526"></script>
+    <script src="js/rz-version.js?v=20261010-dfa70012"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

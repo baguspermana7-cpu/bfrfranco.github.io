@@ -516,7 +516,7 @@
         <div class="chips">
             <span class="chip">Google Cloud</span>
             <span class="chip cyan">2025-06-12</span>
-            <span class="chip amber">7h 27m core impact</span>
+            <span class="chip amber" title="Crash loop 10:51 PDT 12 Jun → all regions except us-central1 recovered ~12:30 PDT.">1h 39m to substantial restoration</span>
             <span class="chip amber">Software</span>
         </div>
         <p class="lede">A latent, unguarded code path in Google Cloud&#x27;s Service Control quota system — added on 2025-05-29 without error handling or feature-flag protection — was triggered on 2025-06-12 when a policy change containing unintended blank fields was inserted into the regional Spanner tables Service Control reads for policy data. The blank metadata replicated globally within seconds; regional quota checks pulled the blank fields, exercised the unprotected path, dereferenced a null pointer, and, with no error handling to contain it, the Service Control binaries crashed and entered a global crash loop. Because Service Control gates API authorization, IAM could no longer issue tokens and most Google Cloud APIs failed worldwide for several hours. The failure cascaded into downstream platforms that depend on GCP, most notably Cloudflare, whose Workers KV backend relied on the affected infrastructure.</p>
@@ -538,6 +538,7 @@
             <dt>Users affected</dt><dd>Global — customers of dozens of Google Cloud products (~70+, approximate) across every region, plus downstream end-users of dependent platforms (Cloudflare, and widely reported others such as Spotify and Discord). No authoritative aggregate end-user count published; Downdetector peak report counts (e.g. Spotify ~46k) are report tallies, not user counts.</dd>
             <dt>Financial</dt><dd>Not publicly quantified — no official SLA-credit total, insurer, or analyst dollar estimate located.</dd>
             <dt>Scope</dt><dd>SEV-1 / global control-plane outage</dd>
+            <dt>Duration</dt><dd>1h 39m — Crash loop 10:51 PDT 12 Jun → all regions except us-central1 recovered ~12:30 PDT.</dd>
         </dl>
         <div class="card"><strong>Services / systems down</strong><ul class="tight"><li>Identity and Access Management (IAM token issuance)</li><li>Cloud Build</li><li>Cloud Key Management Service</li><li>Google Cloud Storage</li><li>Cloud Monitoring</li><li>Cloud Dataproc</li><li>Security Command Center</li><li>Artifact Registry</li><li>Cloud Workflows</li><li>Cloud Run</li><li>BigQuery</li><li>Cloud Spanner</li><li>Compute Engine</li><li>Cloud Firestore</li><li>Cloud Pub/Sub</li><li>Cloud SQL</li><li>Apigee</li><li>Vertex AI (Gemini API) / Vertex AI Search</li><li>Looker</li><li>Memorystore</li><li>Cloud Functions</li><li>Cloud Load Balancing</li><li>App Engine</li><li>Cloud Console</li><li>Cloud DNS</li><li>Google Security Operations</li></ul></div>
         <h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Total incident duration (GCP)</td><td class="mval">~7h27m (10:51–18:18 PDT)</td></tr><tr><td class="mlabel">Time to red-button mitigation</td><td class="mval">~40 min from incident begin</td></tr><tr><td class="mlabel">Longest region full-resolution (us-central1)</td><td class="mval">up to ~2h40m</td></tr><tr><td class="mlabel">Global metadata replication time</td><td class="mval">within seconds</td></tr><tr><td class="mlabel">Affected Google Cloud products (approximate)</td><td class="mval">~70+ (order-of-magnitude; status page enumerates on the order of 60–70)</td></tr><tr><td class="mlabel">Downstream Cloudflare outage window</td><td class="mval">17:52–20:28 UTC; Cloudflare states it &#x27;lasted 2h28m&#x27; (window spans ~2h36m by the clock)</td></tr><tr><td class="mlabel">Cloudflare Durable Objects (SQLite) / D1 peak error rate</td><td class="mval">22%</td></tr><tr><td class="mlabel">Cloudflare AI Gateway peak error rate</td><td class="mval">97%</td></tr><tr><td class="mlabel">Cloudflare Realtime TURN / Pages peak error rate</td><td class="mval">near 100% / ~100%</td></tr><tr><td class="mlabel">Cloudflare Stream peak error rate</td><td class="mval">&gt;90%</td></tr><tr><td class="mlabel">Cloudflare Workers / Workers for Platforms error rate</td><td class="mval">~2% / ~10%</td></tr><tr><td class="mlabel">Cloudflare Workers KV peak error rate</td><td class="mval">~90%</td></tr><tr><td class="mlabel">Cloudflare Images batch-upload failure at peak</td><td class="mval">100% (~97% success overall)</td></tr></tbody></table></div>
@@ -810,7 +811,7 @@ The latent root is a chain of change-management, validation and architecture lap
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-f5a61526"></script>
+    <script src="js/rz-version.js?v=20261010-dfa70012"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

@@ -36,6 +36,26 @@ for (const f of files) {
   }
   const fail = (m) => failures.push(`${id}: ${m}`);
 
+  // Duration: one definition — customer-impact onset to substantial restoration — traced
+  // to two SOE/metric entries whose quoted text must appear verbatim. Before v3.13.6
+  // durationMin meant five different things across the library (fire knock-down, a
+  // source-side exposure window, a media headline, a straggler tail, an unsupported guess).
+  {
+    const st = inc.durationStatus;
+    if (!['measured', 'no-outage', 'not-established'].includes(st)) fail(`durationStatus must be measured | no-outage | not-established, got ${st}`);
+    if (!String(inc.durationBasis || '').trim()) fail('durationBasis missing (what the duration runs from and to)');
+    if (st === 'measured') {
+      if (!Number.isInteger(inc.durationMin) || inc.durationMin <= 0) fail(`durationStatus measured but durationMin is ${inc.durationMin}`);
+      const ev = inc.durationEvidence || {};
+      for (const k of ['onset', 'restored']) {
+        const e = ev[k];
+        const list = e && (e.src === 'soe' ? inc.sequenceOfEvents : e.src === 'metric' ? inc.metrics : null);
+        const it = list && list[e.i];
+        const txt = it ? (e.src === 'soe' ? `${it.t || ''} ${it.event || ''}` : `${it.label || ''}: ${it.value || ''}`) : '';
+        if (!e || !e.quote || !txt.includes(e.quote)) fail(`durationEvidence.${k} does not resolve verbatim to ${e ? e.src + '#' + e.i : 'anything'}`);
+      }
+    } else if (inc.durationMin != null) fail(`durationStatus ${st} but durationMin is ${inc.durationMin} — a number the dossier cannot support`);
+  }
   for (const k of ['title', 'operator', 'dcName', 'date', 'brief', 'rootCause', 'technicalDeepDive']) {
     if (!inc[k] || String(inc[k]).trim() === '') fail(`missing/empty "${k}"`);
   }

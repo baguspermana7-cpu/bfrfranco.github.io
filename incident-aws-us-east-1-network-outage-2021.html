@@ -516,7 +516,7 @@
         <div class="chips">
             <span class="chip">Amazon Web Services</span>
             <span class="chip cyan">2021-12-07</span>
-            <span class="chip amber">6h 52m core impact</span>
+            <span class="chip amber" title="Congestion from 07:30 PST → all network devices recovered 14:22 PST 7 Dec">6h 52m to substantial restoration</span>
             <span class="chip cyan">Network</span><span class="chip amber">Software</span>
         </div>
         <p class="lede">On December 7, 2021, an automated capacity-scaling operation on a service hosted in AWS&#x27;s main network in US-EAST-1 provoked unexpected behavior from a large population of internal clients, generating a surge of connection activity that overwhelmed the networking devices bridging AWS&#x27;s internal network and its main network. Rising latency and errors drove clients to retry more aggressively, creating a self-reinforcing congestion loop — effectively a self-inflicted internal denial of service. Because the internal network hosts foundational services (monitoring, internal DNS, authorization, and parts of the EC2 <span data-explain="control-plane" tabindex="0">control plane</span>), the congestion cascaded into control-plane, authentication, DNS, and API failures across dozens of services for roughly seven hours. The same congestion blinded AWS&#x27;s own real-time monitoring, slowing diagnosis, and impaired the Service Health Dashboard tooling from failing over to its standby region, delaying public communication.</p>
@@ -538,6 +538,7 @@
             <dt>Users affected</dt><dd>Thousands of AWS-hosted services and their end users; consumer-facing names including Netflix, Disney+, Robinhood, and Ring were reported degraded (per press coverage, not the AWS postmortem)</dd>
             <dt>Financial</dt><dd>Not quantified against a primary source in the record; no confirmed aggregate dollar-loss figure</dd>
             <dt>Scope</dt><dd>SEV-1 / major multi-service regional impairment</dd>
+            <dt>Duration</dt><dd>6h 52m — Congestion from 07:30 PST → all network devices recovered 14:22 PST 7 Dec</dd>
         </dl>
         <div class="card"><strong>Services / systems down</strong><ul class="tight"><li>EC2 control-plane APIs (launch/describe)</li><li>Route 53 APIs</li><li>STS</li><li>AWS Console / login</li><li>API Gateway</li><li>EventBridge</li><li>Amazon Connect</li><li>ECS/EKS/Fargate APIs</li><li>RDS (unable to create resources — blocked EC2 launches)</li><li>EMR (unable to create resources — blocked EC2 launches)</li><li>WorkSpaces (unable to create resources — blocked EC2 launches)</li><li>Elastic Load Balancing APIs</li><li>Redshift (via STS login failures)</li><li>CloudWatch (monitoring delays/data loss)</li><li>S3/DynamoDB access via VPC endpoints</li><li>Support-case creation</li></ul></div>
         <h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Trigger time</td><td class="mval">07:30 AM PST, 7 Dec 2021</td></tr><tr><td class="mlabel">Total network-device impairment</td><td class="mval">~6 h 52 min (07:30 -&gt; 14:22 PST full recovery)</td></tr><tr><td class="mlabel">Route 53 API impairment window</td><td class="mval">7 h 00 min (07:30 AM -&gt; 02:30 PM PST)</td></tr><tr><td class="mlabel">EC2 API error onset</td><td class="mval">07:33 AM PST (launch/describe error rates + latencies)</td></tr><tr><td class="mlabel">Support Contact Center outage (case creation)</td><td class="mval">~6 h 52 min (07:33 AM -&gt; 02:25 PM PST)</td></tr><tr><td class="mlabel">Service Health Dashboard tooling restored</td><td class="mval">08:22 AM PST (~52 min after trigger; failover to standby region had failed)</td></tr><tr><td class="mlabel">Internal DNS resolution errors fully recovered</td><td class="mval">09:28 AM PST (~1 h 58 min after trigger)</td></tr><tr><td class="mlabel">Congestion significantly improved</td><td class="mval">01:34 PM PST</td></tr><tr><td class="mlabel">Latent code-path age</td><td class="mval">&#x27;in production for many years&#x27; (previously unobserved behavior); back-off fix to be deployed over the following ~two weeks</td></tr><tr><td class="mlabel">Geographic impact</td><td class="mval">Mainly Eastern United States; disrupted delivery service and streaming</td></tr></tbody></table></div>
@@ -790,7 +791,7 @@ Recovery was manual and staged: identifying the top sources of traffic to isolat
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-f5a61526"></script>
+    <script src="js/rz-version.js?v=20261010-dfa70012"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

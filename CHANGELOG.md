@@ -11,6 +11,42 @@ release sections rather than semver.
 
 ---
 
+## v3.13.5 — 2026-10-10
+
+### Incident durations mean one thing; the Virginia dossier says what actually happened
+
+Two owner decisions from `data/incidents/_review-queue.md`.
+
+**Changed — `durationMin`, one definition across the library.** Customer-impact onset → substantial
+restoration, taken from the dossier's own sequence of events and metrics. Before this it meant five
+different things: a fire's knock-down time, a vendor's source-side exposure window, a media headline,
+a straggler tail, and in some cases nothing the dossier could support. **31 of 43 changed.**
+- Every measured duration now carries `durationEvidence`: two pointers (onset, restored) into the
+  dossier whose quoted text is checked verbatim. The header reads "Xh to substantial restoration";
+  *Impact & scale* states the basis ("Customer impact 04:58 EDT 8 Jul → 07:00 EDT 9 Jul (CRTC window)").
+- Where the dossier cannot support a number, none is shown and the page says why: *no customer
+  downtime recorded* (Council Bluffs, Virginia) or *restoration time not established* (Azure China
+  North 3, BA Heathrow, Digital Realty LA and Singapore, NIRS, OVHcloud, PSN, Red Sea).
+- Largest corrections: CrowdStrike 78 min → ~10.8 days (78 min was CrowdStrike's own exposure window;
+  hosts needed manual recovery to ~99% by 29 Jul); AWS EBS 2011 ~90 h → ~36 h (97.8% of volumes back,
+  straggler tail excluded); Rogers 15 h → ~26 h (the dossier had already withdrawn 15 h as
+  unsupported); X Oregon 48 h → ~24 h; Azure West US 2 22 h → ~7.6 h (50% at 06:15, 95% at 12:00).
+
+**Changed — virginia-dc-alley-heatdome-2022 re-framed.** It was titled and categorised as a July 2022
+heat-dome cooling failure; its own root cause and SOE say there was none. Now: *Transmission
+Constraint and Mass Data-Center Load Loss (2022–2026)*, category power, dated to Dominion's 29 Jul 2022
+constraint notice, with the 2024 (~1,500 MW, ~60 data centers) and 2026 (~3 GW) load-loss events that
+rode through on backup. Magnitude re-scored (users 2, duration 2 — no customer downtime), so it drops
+in the ranking. Slug unchanged to keep the URL.
+
+**Gate** `tools/test-incidents-corpus.mjs`: every dossier carries `durationStatus` (measured |
+no-outage | not-established) and `durationBasis`; a measured duration must resolve both evidence
+quotes verbatim; a non-measured one may not carry a number. Seen to fail on one altered quote.
+
+**Also** `incidents-chunks.jsonl` regenerated — it still carried the four header dates corrected in
+v3.13.0. **Still open:** `magnitude.durationScore` was judged against the old durations and is not
+re-scored here; listed in the review queue.
+
 ## v3.13.4 — 2026-10-10
 
 ### The LTC manual describes the workbench that exists

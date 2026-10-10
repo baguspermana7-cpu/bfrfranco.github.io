@@ -516,7 +516,7 @@
         <div class="chips">
             <span class="chip">Cloudflare</span>
             <span class="chip cyan">2025-11-18</span>
-            <span class="chip amber">5h 46m core impact</span>
+            <span class="chip amber" title="Customer impact 11:28 UTC 18 Nov → correct config deployed, core traffic largely normal 14:30 UTC (dossier ~3h window)">3h 2m to substantial restoration</span>
             <span class="chip amber">Software</span>
         </div>
         <p class="lede">On 18 November 2025 an 11:05 UTC ClickHouse database permissions change exposed r0-database table metadata alongside the default database. A Bot Management feature-file generator ran a metadata query over system.columns with no database filter, which then returned duplicated column rows and more than doubled the feature file&#x27;s size past a hardcoded 200-feature preallocation limit (normal usage ~60 features). When the oversized file propagated network-wide, Cloudflare&#x27;s FL2 proxy module panicked on a Rust unwrap of an Err value, causing core traffic to return 5xx errors. Customer impact began at 11:28 UTC; responders first suspected a DDoS/Workers KV problem before identifying the config file, deployed a correct file globally at 14:30 UTC, and fully restored all operations by 17:06 UTC.</p>
@@ -538,6 +538,7 @@
             <dt>Users affected</dt><dd>Global; a large share of internet users behind Cloudflare. Cloudflare published a 5xx-volume graph but no numeric affected-user or affected-account count. Secondary aggregators (not Cloudflare-confirmed) reported 2.1M+ Downdetector issue reports (435,000+ from the US) and estimated ~20% of webpages and ~1/3 of the top-10,000 sites affected at peak.</dd>
             <dt>Financial</dt><dd>Not disclosed by Cloudflare (no revenue-loss or SLA-credit figure published). Third-party revenue-loss estimates ($180-360M) remain unverified secondary screening figures.</dd>
             <dt>Scope</dt><dd>Tier 1 - global, multi-service critical outage</dd>
+            <dt>Duration</dt><dd>3h 2m — Customer impact 11:28 UTC 18 Nov → correct config deployed, core traffic largely normal 14:30 UTC (dossier ~3h window)</dd>
         </dl>
         <div class="card"><strong>Services / systems down</strong><ul class="tight"><li>Cloudflare core CDN/proxy HTTP traffic (5xx errors)</li><li>Workers KV</li><li>Cloudflare Access</li><li>Cloudflare Dashboard / control-plane login (via Turnstile dependency)</li><li>Downstream customer platforms: X, ChatGPT, Spotify, Canva, League of Legends (seed); secondary coverage adds Zoom, Coinbase, retailers, Downdetector, Claude AI</li></ul></div>
         <h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Normal feature count in Bot Management file</td><td class="mval">~60 features</td></tr><tr><td class="mlabel">Hardcoded preallocation limit exceeded</td><td class="mval">200 features</td></tr><tr><td class="mlabel">File size change from unfiltered query</td><td class="mval">More than doubled (duplicate column rows)</td></tr><tr><td class="mlabel">Triggering permissions change deployed</td><td class="mval">11:05 UTC</td></tr><tr><td class="mlabel">Customer impact start</td><td class="mval">11:28 UTC (chart onset ~11:20)</td></tr><tr><td class="mlabel">Main impact resolved (correct config deployed)</td><td class="mval">14:30 UTC</td></tr><tr><td class="mlabel">All operations fully restored</td><td class="mval">17:06 UTC</td></tr><tr><td class="mlabel">End-to-end duration</td><td class="mval">~5h46m (11:20-17:06 UTC)</td></tr><tr><td class="mlabel">Main customer-impact window</td><td class="mval">~3h (11:28-14:30 UTC)</td></tr><tr><td class="mlabel">Time from impact to detection</td><td class="mval">~3 min (11:28 -&gt; 11:31)</td></tr><tr><td class="mlabel">Downdetector issue reports (SECONDARY, unconfirmed)</td><td class="mval">2.1M+ total; 435,000+ from US</td></tr><tr><td class="mlabel">Estimated web scope at peak (SECONDARY, unconfirmed)</td><td class="mval">~20% of webpages; ~1/3 of top-10,000 sites</td></tr></tbody></table></div>
@@ -844,7 +845,7 @@ Two proxy generations failed differently — a critical detail. FL2 (Rust/Oxy) c
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-f5a61526"></script>
+    <script src="js/rz-version.js?v=20261010-dfa70012"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

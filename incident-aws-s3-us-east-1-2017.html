@@ -516,7 +516,7 @@
         <div class="chips">
             <span class="chip">Amazon Web Services</span>
             <span class="chip cyan">2017-02-28</span>
-            <span class="chip amber">4h 35m core impact</span>
+            <span class="chip amber" title="Mistyped command 09:37 PST → all S3 APIs normal in US-EAST-1 13:54 PST (dossier: 4h17m)">4h 17m to substantial restoration</span>
             <span class="chip red">Human error</span><span class="chip amber">Software</span>
         </div>
         <p class="lede">An authorized S3 engineer running an established capacity-removal playbook mistyped one input; the command removed far more servers than intended, taking down the S3 index and placement subsystems in US-EAST-1. Because a very large number of services (and AWS&#x27;s own status dashboard) depend on S3, the ~4.5-hour disruption cascaded across a large fraction of the internet.</p>
@@ -538,6 +538,7 @@
             <dt>Users affected</dt><dd>Thousands of websites and services worldwide dependent on S3 US-EAST-1</dd>
             <dt>Financial</dt><dd>≈ US$150M+ estimated loss to S&amp;P-500 companies (Cyence, via press)</dd>
             <dt>Scope</dt><dd>Hyperscale public-cloud region</dd>
+            <dt>Duration</dt><dd>4h 17m — Mistyped command 09:37 PST → all S3 APIs normal in US-EAST-1 13:54 PST (dossier: 4h17m)</dd>
         </dl>
         <div class="card"><strong>Services / systems down</strong><ul class="tight"><li>Amazon S3 (GET/LIST/PUT/DELETE)</li><li>EC2 instance launches</li><li>EBS volumes</li><li>AWS Lambda</li><li>AWS Service Health Dashboard (couldn&#x27;t update — hosted on S3)</li></ul></div>
         <h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Trigger to first partial recovery (index serving GET/LIST/DELETE)</td><td class="mval">~2 h 49 min (09:37 to 12:26 PST)</td></tr><tr><td class="mlabel">Trigger to index subsystem full recovery</td><td class="mval">~3 h 41 min (09:37 to 13:18 PST)</td></tr><tr><td class="mlabel">Trigger to full S3 restoration (placement/PUT restored)</td><td class="mval">~4 h 17 min (09:37 to 13:54 PST)</td></tr><tr><td class="mlabel">Duration status could not be updated on the Service Health Dashboard</td><td class="mval">~2 h (09:37 event start to 11:37 PST); icons &#x27;stuck on green&#x27;</td></tr><tr><td class="mlabel">S3 subsystems requiring a full restart</td><td class="mval">2 (index + placement)</td></tr><tr><td class="mlabel">Time since the index/placement subsystems were last fully restarted in larger regions</td><td class="mval">&#x27;many years&#x27; (exact interval not disclosed)</td></tr><tr><td class="mlabel">Named major external sites/services reported down</td><td class="mval">11+ (Docker Registry Hub, Trello, Travis CI, GitHub, GitLab, Quora, Medium, Signal, Slack, Imgur, Twitch.tv)</td></tr><tr><td class="mlabel">AWS regions affected</td><td class="mval">1 (US-EAST-1, Northern Virginia)</td></tr><tr><td class="mlabel">Servers intended vs. actually removed / capacity thresholds</td><td class="mval">Not published — AWS states only that &#x27;a larger set of servers was removed than intended&#x27;</td></tr><tr><td class="mlabel">Authoritative dollar-loss figure</td><td class="mval">Not disclosed in the primary source; only third-party estimates exist (uncertain)</td></tr></tbody></table></div>
@@ -786,7 +787,7 @@ The cascade radiated across everything treating S3 as a storage primitive: the S
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-f5a61526"></script>
+    <script src="js/rz-version.js?v=20261010-dfa70012"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>

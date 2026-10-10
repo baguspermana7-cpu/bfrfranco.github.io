@@ -61,6 +61,17 @@ A dossier ships only if the reviewer confirms ALL of both dimensions.
 
 Before any ship touching a dossier or the generator's viz: run `tools/incidents-visual-qa.mjs` — it renders the hub + a sample of incident pages headless (root-unblurred), screenshots each visualization region, and a review agent (or the human) checks them against §3B. **A ship is blocked on any §3B failure.** This gate is why text-only review is insufficient and is not optional.
 
+## 4a · Duration — one definition (v3.13.5)
+
+`durationMin` = customer-impact onset → substantial restoration (the majority of affected service
+back), from the dossier's OWN sequence of events or metrics. Not the trigger (a latent bug planted
+months earlier is not onset), not the last straggler, not a media headline, not a fire's knock-down
+time. `durationEvidence.onset` / `.restored` point at the two entries, each with a verbatim quote.
+`durationStatus` is `measured`, `no-outage` (no customer downtime recorded) or `not-established`
+(the dossier has no restoration time) — the last two carry `durationMin: null`, because a number the
+dossier cannot trace is worse than none. `durationBasis` is the one-line from → to shown on the page.
+Gate: `node tools/test-incidents-corpus.mjs`.
+
 ## 4b · Retrospective FMEA (v3.13.0) — every dossier carries one
 
 Owner (2026-10-09): *"per incident tambahkan detail comprehensive FMEA analysis, ada visual dan detail

@@ -516,7 +516,7 @@
         <div class="chips">
             <span class="chip">CrowdStrike (impacting Microsoft Windows / Azure hosts)</span>
             <span class="chip cyan">2024-07-19</span>
-            <span class="chip amber">1h 18m core impact</span>
+            <span class="chip amber" title="Bad Channel File live 04:09 UTC 19 Jul → ~99% Windows sensors online 17:00 PT 29 Jul (00:00 UTC 30 Jul)">259h 51m to substantial restoration</span>
             <span class="chip amber">Software</span><span class="chip red">Human error</span>
         </div>
         <p class="lede">On 19 July 2024 CrowdStrike pushed a Rapid Response Content update to Channel File 291 that its own sensor could not safely parse. The IPC Template Type defined 21 input parameter fields, but the integration code supplied only 20 values; a new non-wildcard matching criterion introduced on the 21st field drove the Falcon Content Interpreter to read past the end of the input array. That out-of-bounds read crashed the Windows kernel, sending an estimated 8.5 million hosts into an immediate BSOD boot-loop. Because the content shipped globally with no staged rollout and slipped past a buggy Content Validator, a single defective file grounded airlines, disrupted 911 lines, forced hospitals to cancel surgeries, and froze banks within minutes. The faulty content was live for roughly 78 minutes, but because boot-looping machines could not pull the reverted file, recovery required a per-machine manual fix and stretched across days.</p>
@@ -538,6 +538,7 @@
             <dt>Users affected</dt><dd>~8.5 million Windows devices worldwide (&lt;1% of all Windows machines), disproportionately critical enterprise, aviation, healthcare, finance and emergency-services hosts</dd>
             <dt>Financial</dt><dd>~$25B CrowdStrike market-value loss; Delta alone claimed ~$500M in damages; broad third-party economic disruption across sectors</dd>
             <dt>Scope</dt><dd>Sev-1 / Global critical outage — described as one of the largest IT outages in history</dd>
+            <dt>Duration</dt><dd>259h 51m — Bad Channel File live 04:09 UTC 19 Jul → ~99% Windows sensors online 17:00 PT 29 Jul (00:00 UTC 30 Jul)</dd>
         </dl>
         <div class="card"><strong>Services / systems down</strong><ul class="tight"><li>Airline check-in/dispatch and airport operations</li><li>911 emergency call systems (Alaska, Arizona, New Hampshire, Ohio)</li><li>Hospital scheduling and elective surgery (Mass General Brigham, Mount Sinai, UVA Health, Harris Health, University of Miami Health)</li><li>Retail and consumer banking (Chase, Charles Schwab, TD Bank, Bank of America, Bradesco)</li><li>London Stock Exchange Group data/RNS news service</li><li>Broadcast, retail POS and government services globally</li></ul></div>
         <h2>Impact data &amp; metrics</h2><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Windows devices affected</td><td class="mval">8.5 million (&lt; 1% of all Windows machines)</td></tr><tr><td class="mlabel">Source-side exposure window (bad file live)</td><td class="mval">~78 minutes — 0409 UTC (bad) to 0527 UTC (reverted), 2024-07-19</td></tr><tr><td class="mlabel">Parameter-count mismatch</td><td class="mval">21 input fields defined vs 20 values supplied</td></tr><tr><td class="mlabel">Out-of-bounds access index</td><td class="mval">index 0x14 (21st element) into a 20-pointer array</td></tr><tr><td class="mlabel">Windows bugcheck code</td><td class="mval">PAGE_FAULT_IN_NONPAGED_AREA (0x50), IMAGE_NAME csagent.sys</td></tr><tr><td class="mlabel">Automated test cases in the suite</td><td class="mval">12 static cases, all wildcarding the 21st field</td></tr><tr><td class="mlabel">Fleet recovery</td><td class="mval">~99% of Windows sensors online by 2024-07-29 17:00 PT (vs ~1% normal weekly variance)</td></tr><tr><td class="mlabel">Affected sensor scope</td><td class="mval">Windows sensor v7.11 and above, online in-window; Mac and Linux hosts not impacted</td></tr><tr><td class="mlabel">Faulting read address</td><td class="mval">ffffd6030000006a (canonical kernel pointer, not-present/unmapped PTE)</td></tr></tbody></table></div>
@@ -790,7 +791,7 @@ Fixes trace directly to code. Runtime guard: &quot;Bounds checking was added to 
         </div>
     </div>
 
-    <script src="js/rz-version.js?v=20261010-f5a61526"></script>
+    <script src="js/rz-version.js?v=20261010-dfa70012"></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <script src="auth.js?v=20260920-040a6c54" defer></script>
     <script src="js/rz-mobile-nav.js?v=20260922-d3fce728" defer></script>
