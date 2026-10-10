@@ -157,7 +157,7 @@
         var centerCol = el('div', { id: 'ltc-center', className: 'ltc-center-col' });
 
         // Breadcrumb
-        centerCol.appendChild(el('div', { className: 'ltc-breadcrumb', textContent: 'Home › DC Solutions › Technical Manuals' }));
+        centerCol.appendChild(el('div', { className: 'ltc-breadcrumb', textContent: 'LTC Workbench › Model' }));
 
         // Title row
         var titleRow = el('div', { className: 'ltc-title-row' });
@@ -271,7 +271,7 @@
         // Compliance card
         var compCard = el('div', { className: 'ltc-rail-card' });
         var compHeader = el('div', { className: 'ltc-rail-header' });
-        compHeader.appendChild(el('span', { className: 'ltc-rail-title', textContent: 'COMPLIANCE & STANDARDS' }));
+        compHeader.appendChild(el('span', { className: 'ltc-rail-title', textContent: 'STANDARDS SCREEN' }));
         compHeader.appendChild(el('span', { className: 'ltc-pass-pill', id: 'ltcCompliancePill', textContent: '● PASS' }));
         compCard.appendChild(compHeader);
         compCard.appendChild(el('div', { className: 'ltc-compliance-list', id: 'ltcComplianceList' }));
@@ -599,18 +599,16 @@
     // ════════════════════════════════════════════════════════
     // buildSystemOverviewSVG — inline SVG schematic
     // ════════════════════════════════════════════════════════
-    // ── Engineering symbols from the RZ Engineering Symbol Atlas ────────────
-    // equinor PP001A (ISO P&ID centrifugal pump) + PV005A (gate valve) — solid
-    // paths recolored via fill=currentColor; lucide fan + server — stroke
-    // currentColor. Vendored verbatim; composed into one theme-aware schematic.
-    var SYM = {
-        pump: '<g fill="currentColor"><path d="M52 40.5C52 38.2909 50.2091 36.5 48 36.5C45.7909 36.5 44 38.2909 44 40.5C44 42.7091 45.7909 44.5 48 44.5C50.2091 44.5 52 42.7091 52 40.5ZM51 40.5C51 42.1569 49.6569 43.5 48 43.5C46.3431 43.5 45 42.1569 45 40.5C45 38.8431 46.3431 37.5 48 37.5C49.6569 37.5 51 38.8431 51 40.5Z"/><path d="M83 40.5C83 21.17 67.33 5.5 48 5.5C28.67 5.5 13 21.17 13 40.5C13 50.9622 17.5904 60.3522 24.8671 66.7659L13 90.5H83L71.1329 66.7659C78.4096 60.3522 83 50.9622 83 40.5ZM48 74.5C29.2223 74.5 14 59.2777 14 40.5C14 21.7223 29.2223 6.5 48 6.5C66.7777 6.5 82 21.7223 82 40.5C82 59.2777 66.7777 74.5 48 74.5ZM48 75.5C56.4973 75.5 64.2874 72.4719 70.3499 67.4359L81.382 89.5H14.618L25.6501 67.4359C31.7126 72.4719 39.5027 75.5 48 75.5Z"/></g>',
-        valve: '<path fill="currentColor" d="M24 12.5L43 22V2L24 11.5L5 2V22L24 12.5ZM6 3.61803L22.7639 12L6 20.382V3.61803ZM42 20.382L25.2361 12L42 3.61803V20.382Z"/>',
-        fan: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.827 16.379a6.082 6.082 0 0 1-8.618-7.002l5.412 1.45a6.082 6.082 0 0 1 7.002-8.618l-1.45 5.412a6.082 6.082 0 0 1 8.618 7.002l-5.412-1.45a6.082 6.082 0 0 1-7.002 8.618l1.45-5.412Z"/><path d="M12 12v.01"/></g>',
-        server: '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></g>'
-    };
-    function sym(name, x, y, w, h, vb) {
-        return '<svg x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" viewBox="' + vb + '">' + SYM[name] + '</svg>';
+    // ── Engineering symbols: js/rz-eng-symbols.js ─────────────────────────
+    // The IEC 60617 / ISA-5.1 library DCMOC draws its architecture with
+    // (assets/engineering/*.svg, one builder, two emitters). Authored in a 0..48
+    // box with currentColor strokes, so the schematic recolours with the theme.
+    function sym(name, x, y, w, h) {
+        var S = window.RZEngSymbols;
+        var m = S && S.MARKUP[name];
+        if (!m) return '';
+        return '<svg x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" viewBox="0 0 48 48" fill="none" stroke="currentColor"' +
+            ' stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + m + '</svg>';
     }
     function buildSystemOverviewSVG() {
         var eq = 'opacity=".8"';                       // equipment tone
@@ -627,9 +625,7 @@
         // ── DRY COOLER (heat rejection) — clickable trace group ──
         s.push('<g class="ltc-pid-node" data-ltc-trace="totalCoolingKw" ' + eq + '>',
             '<rect x="38" y="72" width="150" height="92" rx="8" fill="none" stroke="currentColor" stroke-width="1.6"/>',
-            sym('fan', 56, 82, 44, 44, '0 0 24 24'), sym('fan', 122, 82, 44, 44, '0 0 24 24'),
-            '<line x1="50" y1="140" x2="176" y2="140" stroke="currentColor" stroke-width="1.2" opacity=".5"/>',
-            '<line x1="50" y1="150" x2="176" y2="150" stroke="currentColor" stroke-width="1.2" opacity=".5"/>',
+            sym('dryCooler', 79, 84, 68, 68),
             '<rect x="38" y="72" width="150" height="92" rx="8" fill="transparent"/>',
             '</g>');
         s.push('<text x="113" y="185" ' + lbl + '>DRY COOLER</text>');
@@ -638,20 +634,20 @@
         // ── facility loop: dry cooler → valve → pump → HEX (hot to cooler on top, cooled back on bottom) ──
         s.push('<path d="M188 96 H 420" class="ltc-pid-return ltc-flow-return" marker-end="url(#pidArrR)" transform="rotate(180 304 96)"/>'); // HEX→cooler (hot)
         s.push('<path d="M188 140 H 236" class="ltc-pid-supply ltc-flow-supply"/>');
-        s.push(sym('valve', 238, 131, 36, 18, '0 0 48 24'));
+        s.push(sym('valve', 238, 122, 36, 36));
         s.push('<path d="M274 140 H 300" class="ltc-pid-supply ltc-flow-supply"/>');
-        s.push('<g class="ltc-pid-node" data-ltc-trace="pumpPowerKw">' + sym('pump', 298, 96, 64, 64, '0 0 96 96') +
+        s.push('<g class="ltc-pid-node" data-ltc-trace="pumpPowerKw">' + sym('pump', 298, 96, 64, 64) +
                '<rect x="296" y="94" width="68" height="68" fill="transparent"/></g>');
         s.push('<text x="330" y="185" ' + lbl + '>PUMP</text>');
         s.push('<text x="330" y="204" ' + chip + ' class="ltc-pid-chipval" id="schPumpKw">— kW</text>');
         s.push('<text x="330" y="221" font-size="10" text-anchor="middle" fill="currentColor" opacity=".55" id="schPumpHead">— m head · η —%</text>');
         s.push('<path d="M362 140 H 396" class="ltc-pid-supply ltc-flow-supply"/>');
-        s.push(sym('valve', 396, 131, 36, 18, '0 0 48 24'));
+        s.push(sym('valve', 396, 122, 36, 36));
         s.push('<path d="M432 140 H 470" class="ltc-pid-supply ltc-flow-supply" marker-end="url(#pidArrS)"/>');
 
         // ── CDU / PLATE HEX — clickable trace group ──
         s.push('<g class="ltc-pid-node" data-ltc-trace="cduCount" ' + eq + '><rect x="472" y="66" width="118" height="104" rx="8" fill="none" stroke="currentColor" stroke-width="1.6"/>');
-        for (var i = 0; i < 6; i++) s.push('<line x1="' + (492 + i * 16) + '" y1="80" x2="' + (492 + i * 16) + '" y2="156" stroke="currentColor" stroke-width="2" opacity=".55"/>');
+        s.push(sym('heatExchanger', 497, 84, 68, 68));
         s.push('<rect x="472" y="66" width="118" height="104" rx="8" fill="transparent"/></g>');
         s.push('<text x="531" y="185" ' + lbl + '>CDU / PLATE HEX</text>');
         s.push('<text x="531" y="204" ' + chip + ' class="ltc-pid-chipval" id="schCduN">— CDU</text>');
@@ -666,8 +662,7 @@
 
         // ── IT RACKS (cold plates) — clickable trace group ──
         s.push('<g class="ltc-pid-node" data-ltc-trace="liquidKw" ' + eq + '><rect x="792" y="60" width="170" height="116" rx="8" fill="none" stroke="currentColor" stroke-width="1.6"/>',
-            sym('server', 812, 76, 40, 40, '0 0 24 24'), sym('server', 866, 76, 40, 40, '0 0 24 24'), sym('server', 920, 76, 40, 40, '0 0 24 24'),
-            sym('server', 812, 122, 40, 40, '0 0 24 24'), sym('server', 866, 122, 40, 40, '0 0 24 24'), sym('server', 920, 122, 40, 40, '0 0 24 24'),
+            sym('rack', 806, 84, 52, 68), sym('rack', 851, 84, 52, 68), sym('rack', 896, 84, 52, 68),
             '<rect x="792" y="60" width="170" height="116" rx="8" fill="transparent"/></g>');
         s.push('<text x="877" y="196" ' + lbl + '>IT RACKS · LIQUID COLD PLATES</text>');
         s.push('<text x="877" y="215" ' + chip + ' class="ltc-pid-chipval" id="schItMw">— MW IT</text>');
@@ -879,12 +874,17 @@
 
         // Center nav (real destinations)
         var center = el('div', { className: 'ltc-nav-center' });
+        /* The model is one module of the LTC Workbench: its top bar lists the
+         * same seven modules as the workbench rail, so the lab and the standards
+         * tools read as one application rather than a page that links away. */
         [
-            ['Home', 'index.html', false],
-            ['DC Solutions', 'datacenter-solutions.html', false],
-            ['Technical Manuals', 'manual/index.html', false],
-            ['LTC Modelling Lab', '#', true],
-            ['Contact', 'index.html#contact', false]
+            ['Plant', 'standards-ltc-lab.html', false],
+            ['Model', '#', true],
+            ['ASHRAE', 'ltc-ashrae-thermal-control.html', false],
+            ['Tier', 'ltc-uptime-tier-alignment.html', false],
+            ['TIA', 'ltc-ansi-tia-topology-readiness.html', false],
+            ['NFPA', 'ltc-nfpa-fire-risk.html', false],
+            ['ISO', 'ltc-iso-energy-governance.html', false]
         ].forEach(function (l) {
             var a = el('a', { href: l[1], textContent: l[0],
                 className: 'ltc-nav-link' + (l[2] ? ' ltc-nav-link-active' : '') });
@@ -1088,20 +1088,25 @@
         var host = document.getElementById('ltcComplianceList');
         if (!host) return;
 
+        /* These are the model's 0–100 heuristic screening scores, one per
+         * standards domain — not compliance determinations. The list used to
+         * read "Compliant" and carried two rows with no score of their own:
+         * "ASHRAE 90.4" and "ISO 14644" (a cleanroom standard) both showed the
+         * ISO 50001 governance score. Each row now names the score it shows,
+         * and the word is "in band", never "compliant". */
         var items = [
-            { name: 'ASHRAE TC 9.9',    score: model.scores.ashrae },
-            { name: 'ASHRAE 90.4',      score: model.scores.iso },
-            { name: 'ISO 14644',        score: model.scores.iso },
-            { name: 'ANSI/BICSI 002',   score: model.scores.ansi },
-            { name: 'NFPA 75',          score: model.scores.nfpa },
-            { name: 'Uptime Institute', score: model.scores.uptime }
+            { name: 'ASHRAE TC 9.9 · thermal', score: model.scores.ashrae, href: 'ltc-ashrae-thermal-control.html' },
+            { name: 'ANSI/TIA · topology',     score: model.scores.ansi,   href: 'ltc-ansi-tia-topology-readiness.html' },
+            { name: 'ISO 50001 · energy',      score: model.scores.iso,    href: 'ltc-iso-energy-governance.html' },
+            { name: 'NFPA 75 · fire',          score: model.scores.nfpa,   href: 'ltc-nfpa-fire-risk.html' },
+            { name: 'Uptime · redundancy',     score: model.scores.uptime, href: 'ltc-uptime-tier-alignment.html' }
         ];
 
-        var allPass = items.every(function (it) { return it.score >= 60; });
+        var inBand = items.filter(function (it) { return (it.score || 0) >= 60; }).length;
         var pill = document.getElementById('ltcCompliancePill');
         if (pill) {
-            pill.textContent = allPass ? '● PASS' : '● REVIEW';
-            pill.classList.toggle('ltc-fail', !allPass);
+            pill.textContent = inBand + '/' + items.length + ' in band';
+            pill.classList.toggle('ltc-fail', inBand < items.length);
         }
 
         host.innerHTML = items.map(function (it) {
@@ -1109,11 +1114,12 @@
             return '<div class="ltc-comp-row">' +
                 '<span class="ltc-comp-check' + (ok ? '' : ' ltc-comp-check-fail') + '">' +
                     '<i class="fas fa-' + (ok ? 'check' : 'exclamation') + '"></i></span>' +
-                '<span class="ltc-comp-name">' + it.name + '</span>' +
+                '<a class="ltc-comp-name" href="' + it.href + '" style="color:inherit">' + it.name + '</a>' +
                 '<span class="ltc-comp-status' + (ok ? '' : ' ltc-comp-status-fail') + '">' +
-                    (ok ? 'Compliant' : 'Review') + '</span>' +
+                    fmt(it.score || 0, 0) + ' · ' + (ok ? 'in band' : 'review') + '</span>' +
                 '</div>';
-        }).join('');
+        }).join('') +
+        '<p class="ltc-muted" style="font-size:11.5px;margin:8px 0 0">Heuristic screening scores (0–100, band ≥ 60) — not a compliance finding. Each row opens the workbench tool for that standard.</p>';
     }
 
     // ════════════════════════════════════════════════════════

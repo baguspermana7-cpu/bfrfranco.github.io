@@ -885,6 +885,40 @@ const D = sandbox.RZDiagram;
 }
 
 /* ==========================================================================
+ * SYMBOLS — the IEC glyph a node carries (js/rz-eng-symbols.js)
+ * ======================================================================== */
+{
+  /* S1: a node with a symbol is TALLER than the same node without one, by the
+   *     glyph plus its gap — the height budget counts the glyph, so the name
+   *     cannot be drawn across it (the node-overflow height bug, for glyphs). */
+  vm.runInContext(readFileSync(join(root, 'js/rz-eng-symbols.js'), 'utf8'), sandbox, { filename: 'rz-eng-symbols.js' });
+  const D = sandbox.RZDiagram;
+  const d1 = D.create({ slug: 's1' });
+  const plain = d1.node(0, 0, { id: 'a', name: 'UPS-A', sublabel: '2N' });
+  const d2 = D.create({ slug: 's2' });
+  const glyph = d2.node(0, 0, { id: 'a', name: 'UPS-A', sublabel: '2N', symbol: 'ups' });
+  ok('S1', glyph.h >= plain.h + 32, `symbol node must budget the glyph: ${glyph.h} vs ${plain.h}`);
+  const svg = d2.render();
+  ok('S2', /class="rzd-sym"/.test(svg) && !/currentColor/.test(svg),
+    'glyph must be emitted and recoloured to a token — no currentColor may leave the engine');
+
+  /* S3: an unknown symbol is a WARNING, never a silent blank. */
+  const d3 = D.create({ slug: 's3' });
+  d3.node(0, 0, { id: 'x', name: 'X', symbol: 'nope' });
+  ok('S3', d3.warnings.some((w) => w.kind === 'unknown-symbol'), 'unknown symbol must warn');
+
+  /* S4: an interactive node paints its hit target LAST, after the labels, so a
+   *     click on the name reaches the node; and it is keyboard-reachable. */
+  const d4 = D.create({ slug: 's4' });
+  d4.node(0, 0, { id: 'gen-1', name: 'GEN-1', symbol: 'genset', interactive: true });
+  const out = d4.render();
+  const iHit = out.indexOf('data-rzd-hit="gen-1"');
+  const iText = out.lastIndexOf('<text');
+  ok('S4a', iHit > iText, 'hit target must be painted after every label');
+  ok('S4b', /data-rzd-hit="gen-1"[^>]*tabindex="0"[^>]*role="button"/.test(out), 'hit target must be focusable');
+}
+
+/* ==========================================================================
  * verdict
  * ======================================================================== */
 const total = pass + fails.length;

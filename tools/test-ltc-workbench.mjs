@@ -1,0 +1,156 @@
+#!/usr/bin/env node
+/* ============================================================================
+ * test-ltc-workbench.mjs — the LTC Workbench: its arithmetic and its frame
+ * ----------------------------------------------------------------------------
+ * The six standards pages (hub + ASHRAE, Tier, TIA, NFPA, ISO) were rebuilt in
+ * v3.12 from long-form articles into tools. A tool that computes the wrong
+ * number is worse than the article it replaced, so this gate pins each
+ * module's arithmetic to values that can be checked by hand or against the
+ * cited standard, and pins the frame every page must keep:
+ *
+ *   W1  ASHRAE psychrometrics and envelope classes (TC 9.9, 5th ed.)
+ *   W2  Tier simulator: the four Tiers must reach their own objectives —
+ *       I/II not concurrently maintainable, III maintainable but not fault
+ *       tolerant, IV both. A topology edit that breaks a Tier fails here.
+ *   W3  NFPA 2001 flooding equations against the published per-m³ figures
+ *   W4  TIA fiber budget, copper channel, TIA-607 conductor sizing
+ *   W5  ISO/IEC 30134 KPIs and the ISO 50006 regression recovering a known model
+ *   W6  every page: workbench shell, engine before the shell, the IEC symbol
+ *       library, inline diagram tokens, and the fail-closed access gate with
+ *       its own page key
+ *
+ *   node tools/test-ltc-workbench.mjs
+ * ==========================================================================*/
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+import vm from 'node:vm';
+
+const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+let pass = 0;
+const fails = [];
+function ok(id, cond, detail) { if (cond) pass++; else fails.push(`${id} — ${detail}`); }
+function near(id, got, want, tol, what) { ok(id, Math.abs(got - want) <= tol, `${what}: got ${got}, want ${want} ±${tol}`); }
+
+/* Load a module with no DOM: boot() waits for DOMContentLoaded, which never fires. */
+function load(rel) {
+  const sb = { console, Math, JSON };
+  sb.window = sb;
+  sb.document = { readyState: 'loading', addEventListener() {} };
+  sb.LTC = {};
+  vm.createContext(sb);
+  vm.runInContext(readFileSync(join(root, rel), 'utf8'), sb, { filename: rel });
+  return sb;
+}
+
+/* ---- W1 ASHRAE ----------------------------------------------------------- */
+{
+  const A = load('js/ltc-ashrae.js').LTCAshrae;
+  /* Magnus (17.62 / 243.12) is within ~0.3 % of the steam tables from −45 to 60 °C: 2.333 vs 2.339 kPa here */
+  near('W1a', A.es(20), 2.339, 0.008, 'saturation pressure at 20 °C, kPa');
+  near('W1b', A.pAlt(1500), 84.56, 0.05, 'standard-atmosphere pressure at 1,500 m, kPa');
+  near('W1c', A.dpFromPv(A.es(10)), 10, 1e-9, 'dew point inverts saturation pressure');
+  const A1 = A.CLASSES.find(c => c.id === 'A1'), A3 = A.CLASSES.find(c => c.id === 'A3');
+  near('W1d', A.derated(A1, 1500), 30.0, 1e-9, 'A1 max dry-bulb at 1,500 m (1 °C / 300 m above 900 m)');
+  near('W1e', A.derated(A3, 1500), 40 - 600 / 175, 1e-9, 'A3 max dry-bulb at 1,500 m (1 °C / 175 m)');
+  const r1 = A.check(24, 10, 0);
+  ok('W1f', r1.rec, '24 °C / 10 °C DP at sea level must be inside the recommended envelope');
+  const r2 = A.check(30, 16, 0);
+  ok('W1g', !r2.rec && r2.rows.find(x => x.c.id === 'A1').allow, '30 °C / 16 °C DP must be A1 allowable, not recommended');
+  const r3 = A.check(33, 10, 0);
+  ok('W1h', !r3.rows.find(x => x.c.id === 'A1').allow && r3.rows.find(x => x.c.id === 'A2').allow, '33 °C must leave A1 and stay in A2');
+  ok('W1i', A.REC.rhHi === 70 && A.REC.dpHi === 15 && A.REC.lo === 18 && A.REC.hi === 27, 'recommended envelope is the 2021 edition: 18–27 °C, 15 °C DP, 70 % RH');
+  const cls = t => A.LIQUID.find(k => t <= k.max).id;
+  ok('W1j', cls(32) === 'W32' && cls(33) === 'W40' && cls(46) === 'W+' && cls(17) === 'W17', 'W-class by maximum supply temperature');
+}
+
+/* ---- W2 Tier objectives --------------------------------------------------- */
+{
+  const T = load('js/ltc-tier.js').LTCTier;
+  const v = t => { const s = T.sweep(t); return { cm: s.every(r => r.maint), ft: s.every(r => r.fault) }; };
+  const t1 = v(1), t2 = v(2), t3 = v(3), t4 = v(4);
+  ok('W2a', !t1.cm && !t1.ft, 'Tier I must be neither maintainable nor fault tolerant');
+  ok('W2b', !t2.cm && !t2.ft, 'Tier II must not be concurrently maintainable (single path)');
+  ok('W2c', t3.cm && !t3.ft, `Tier III must be maintainable and NOT fault tolerant: cm=${t3.cm} ft=${t3.ft}`);
+  ok('W2d', t4.cm && t4.ft, `Tier IV must be maintainable and fault tolerant: cm=${t4.cm} ft=${t4.ft}`);
+  ok('W2e', T.powered(2, { 'ups#1': 1 }, false) && !T.powered(1, { 'ups#1': 1 }, false), 'an N+1 UPS survives one unit out, an N UPS does not');
+  near('W2f', T.kOfN(0.9, 3, 2), 0.972, 1e-12, '2-of-3 availability at A = 0.9');
+}
+
+/* ---- W3 NFPA 2001 -------------------------------------------------------- */
+{
+  const N = load('js/ltc-nfpa.js').LTCNfpa;
+  const h = N.agentCalc({ agent: 'HFC-227ea', v: 100, tMin: 21, tMax: 21, z: 0, c: 7 });
+  near('W3a', h.qty, 54.67, 0.05, 'HFC-227ea, 100 m³ at 21 °C and 7 % (≈ 0.547 kg/m³)');
+  near('W3b', h.cMax, 7, 1e-9, 'same temperature must give back the design concentration');
+  const f = N.agentCalc({ agent: 'FK-5-1-12', v: 100, tMin: 18, tMax: 32, z: 0, c: 4.5 });
+  ok('W3c', f.cMax > 4.5 && f.cMax < 10, `a hotter room raises the halocarbon concentration, still under NOAEL: ${f.cMax}`);
+  const i = N.agentCalc({ agent: 'IG-541', v: 1, tMin: 21, tMax: 21, z: 0, c: 38 });
+  near('W3d', i.X, 0.478, 0.002, 'IG-541 flooding factor at 38 % and 21 °C, m³/m³');
+  near('W3e', i.cMax, 38, 1e-6, 'inert gas at the same temperature returns the design concentration');
+  const hot = N.agentCalc({ agent: 'IG-541', v: 1, tMin: 18, tMax: 32, z: 0, c: 38 });
+  ok('W3f', hot.cMax > 38, `inert gas concentration must rise with room temperature: ${hot.cMax}`);
+  const alt = N.agentCalc({ agent: 'HFC-227ea', v: 100, tMin: 21, tMax: 21, z: 1500, c: 7 });
+  ok('W3g', alt.qty < h.qty && Math.abs(alt.cMax - 7) < 1e-9, 'altitude reduces mass, not concentration');
+  ok('W3h', N.areaPerDetector(60) === 125 && N.areaPerDetector(30) === 250 && N.areaPerDetector(40) === 125 && N.areaPerDetector(5) === 900,
+     'NFPA 72 high-airflow spacing, conservative between rows');
+}
+
+/* ---- W4 TIA -------------------------------------------------------------- */
+{
+  const X = load('js/ltc-tia.js').LTCTia;
+  const a = X.fiberCalc({ fiber: 'OM4', app: '100GBASE-SR4', len: 90, pairs: 2, splices: 0 });
+  near('W4a', a.loss, 1.77, 1e-9, 'OM4 90 m + 2 pairs (3.0 dB/km, 0.75 dB/pair)');
+  ok('W4b', a.lossOk && a.reachOk, '90 m OM4 with two pairs fits 100GBASE-SR4');
+  const b = X.fiberCalc({ fiber: 'OM4', app: '100GBASE-SR4', len: 120, pairs: 2, splices: 0 });
+  ok('W4c', !b.reachOk, '120 m exceeds the 100 m reach of 100GBASE-SR4 on OM4');
+  ok('W4d', X.APPS['100GBASE-SR4'].OM4[0] === 100 && X.APPS['10GBASE-SR'].OM3[0] === 300, 'IEEE 802.3 reaches');
+  ok('W4e', !X.copperCalc({ app: '10GBASE-T', cat: '6', pl: 50, cords: 10 }).chanOk, '10GBASE-T on Cat 6 is limited to 55 m');
+  ok('W4f', X.copperCalc({ app: '10GBASE-T', cat: '6A', pl: 90, cords: 10 }).chanOk, '10GBASE-T on Cat 6A carries a full 100 m channel');
+  ok('W4g', X.tbbSize(14)[1] === '1/0 AWG' && X.tbbSize(3)[1] === '6 AWG' && X.tbbSize(25)[1] === '3/0 AWG', 'TIA-607 TBB sizing by length');
+}
+
+/* ---- W5 ISO -------------------------------------------------------------- */
+{
+  const I = load('js/ltc-iso.js').LTCIso;
+  const k = I.kpi({ e: 130000, it1: 108000, it2: 105500, it3: 103800, ren: 40000, reuse: 0, water: 4200, ef: 0.72 });
+  near('W5a', k.pue3, 130000 / 103800, 1e-12, 'PUE category 3');
+  ok('W5b', k.pue1 < k.pue2 && k.pue2 < k.pue3, 'PUE rises as the metering point moves toward the IT input');
+  near('W5c', k.wue, 4200 / 103800, 1e-12, 'WUE L/kWh');
+  const rows = [];
+  for (let m = 0; m < 12; m++) { const it = 900 + 13 * m, cdd = 150 + (m * 37) % 50; rows.push({ m, it, cdd, fac: 520 + 1.18 * it + 0.62 * cdd }); }
+  const o = I.ols(rows);
+  near('W5d', o.b[0], 520, 1e-6, 'OLS intercept recovered'); near('W5e', o.b[1], 1.18, 1e-9, 'OLS IT slope recovered'); near('W5f', o.b[2], 0.62, 1e-9, 'OLS CDD slope recovered');
+}
+
+/* ---- W6 page frame -------------------------------------------------------- */
+const PAGES = {
+  'standards-ltc-lab.html': 'js/ltc-hub.js', 'ltc-ashrae-thermal-control.html': 'js/ltc-ashrae.js',
+  'ltc-uptime-tier-alignment.html': 'js/ltc-tier.js', 'ltc-ansi-tia-topology-readiness.html': 'js/ltc-tia.js',
+  'ltc-nfpa-fire-risk.html': 'js/ltc-nfpa.js', 'ltc-iso-energy-governance.html': 'js/ltc-iso.js'
+};
+for (const [page, mod] of Object.entries(PAGES)) {
+  const h = readFileSync(join(root, page), 'utf8');
+  const at = s => h.indexOf(s);
+  ok(`W6a:${page}`, at('css/ltc-app.css') > 0, 'loads the workbench stylesheet');
+  ok(`W6b:${page}`, at('js/rz-eng-symbols.js') > 0 && at('js/rz-eng-symbols.js') < at('js/rz-diagram.js') && at('js/rz-diagram.js') < at('js/ltc-app.js') && at('js/ltc-app.js') < at(mod),
+     'script order: symbols → engine → shell → module');
+  ok(`W6c:${page}`, /--bg1:/.test(h) && /:root\[data-theme="light"\]\{--bg1:/.test(h), 'defines the diagram tokens for both themes');
+  const key = page.replace('.html', '');
+  ok(`W6d:${page}`, h.includes(`enforceTierFeatureAccess('${key}')`) && h.includes('id="rootLoginBtn"') && /<body class="locked">/.test(h),
+     'fail-closed access gate with its own page key');
+  ok(`W6e:${page}`, !/Interview Prep|TPM Decision Framework|Microsoft TPM/i.test(h), 'no interview-prep filler');
+}
+{
+  /* comments may NAME the old defect; only code may not reintroduce it */
+  const lab = readFileSync(join(root, 'js/ltc-lab-ui.js'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/[^\n]*/g, '$1');
+  ok('W6f', !/ISO 14644/.test(lab) && !/'Compliant'/.test(lab), 'the model lab screens standards; it does not claim compliance (ISO 14644 is a cleanroom standard)');
+}
+
+const total = pass + fails.length;
+if (fails.length) {
+  console.log(`FAIL LTC workbench — ${fails.length} of ${total} assertions failed\n`);
+  for (const f of fails) console.log('  ' + f);
+  process.exit(1);
+}
+console.log(`PASS LTC workbench — ${pass}/${total} assertions (ASHRAE · Tier · NFPA 2001 · TIA · ISO 30134/50006 · page frame)`);

@@ -82,7 +82,15 @@
   /* Every option node() honours. Anything else is a typo — see the check in
    * node() for why that matters. */
   var NODE_OPTS = ['id', 'tag', 'name', 'sublabel', 'w', 'h', 'pad', 'stroke', 'fill',
-                   'tier', 'dashed', 'focal', 'radius', 'legend', 'vAlign', 'nameFill'];
+                   'tier', 'dashed', 'focal', 'radius', 'legend', 'vAlign', 'nameFill',
+                   'symbol', 'symbolFill', 'interactive', 'state'];
+
+  /* Symbol glyph size in diagram units, and the gap under it. The glyph is an
+   * IEC 60617 / ISA-5.1 drawing from js/rz-eng-symbols.js — the same library
+   * DCMOC draws its architecture with — authored in a 0..48 box. 28 units keeps
+   * the 2-unit stroke at ~1.2 units, inside the tier-2 hairline weight. */
+  var SYMBOL = 28;
+  var SYMBOL_GAP = 4;
 
   var PATTERN = {
     solid: '',
@@ -152,7 +160,7 @@
      * shipped skill paints labels BEFORE nodes and then needs a verifier to
      * catch masks that land under a node; painting labels last removes the
      * failure mode instead of detecting it. */
-    var layers = { zones: [], edges: [], nodes: [], labels: [] };
+    var layers = { zones: [], edges: [], nodes: [], labels: [], hits: [] };
     var warnings = [];
     var seq = 0;
     /* What was actually drawn, so the legend is DERIVED rather than typed. A
@@ -221,7 +229,23 @@
         var nameW = o.name ? M.textWidth(o.name, TYPE['node-name'].size, 'sans') : 0;
         var subW = o.sublabel ? M.textWidth(o.sublabel, TYPE.sublabel.size, 'mono') : 0;
         var tagW = o.tag ? M.textWidth(o.tag, TYPE.eyebrow.size, 'mono', { tracking: 0.18 }) + 10 : 0;
-        var need = M.grid4(Math.max(nameW, subW, tagW) + pad * 2);
+        /* An unknown symbol is the `sub`-for-`sublabel` failure again: the glyph
+         * would quietly not appear. The library is looked up at call time, not
+         * load time, so the script order of a page cannot freeze it empty. */
+        var lib = root.RZEngSymbols;
+        var symMarkup = null;
+        if (o.symbol) {
+          symMarkup = lib && lib.MARKUP ? lib.MARKUP[o.symbol] : null;
+          if (!symMarkup) {
+            warnings.push({
+              kind: 'unknown-symbol', id: o.id || o.name,
+              message: lib ? ('symbol "' + o.symbol + '" is not in RZEngSymbols')
+                           : 'node asks for symbol "' + o.symbol + '" but js/rz-eng-symbols.js is not loaded'
+            });
+          }
+        }
+        var symH = symMarkup ? SYMBOL + SYMBOL_GAP : 0;
+        var need = M.grid4(Math.max(nameW, subW, tagW, symMarkup ? SYMBOL : 0) + pad * 2);
         var w = o.w || need;
         if (o.w && need > o.w) {
           warnings.push({
@@ -236,7 +260,7 @@
          * warned — an asymmetry that let a caller force h:52 onto a node
          * needing 64 and get a sublabel drawn across its own bottom border. A
          * box too short clips its text exactly as a box too narrow does. */
-        var needH = M.grid4((o.tag ? 18 : 0) + (o.name ? 16 : 0) +
+        var needH = M.grid4((o.tag ? 18 : 0) + symH + (o.name ? 16 : 0) +
                             (o.sublabel ? 14 : 0) + pad * 2);
         var h = o.h || needH;
         if (o.h && needH > o.h) {
@@ -257,10 +281,17 @@
         var r = o.radius == null ? 6 : o.radius;
 
         var g = [];
+        var nid = o.id || '';
         /* opaque mask first so a connector cannot bleed through a tinted fill */
         g.push('<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h +
                '" rx="' + r + '" fill="' + tok('paper') + '"/>');
-        g.push('<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h +
+        /* State hooks only on nodes that asked for them, so every figure drawn
+         * before v3.12.0 renders byte-identical (the article figures are
+         * checked in, and build-article-diagrams --check compares bytes). */
+        var hook = (o.interactive || o.state) && nid;
+        g.push('<rect' + (hook ? ' data-rzd-node="' + esc(nid) + '"' : '') +
+               (o.state ? ' data-rzd-state="' + esc(o.state) + '"' : '') +
+               ' x="' + x + '" y="' + y + '" width="' + w + '" height="' + h +
                '" rx="' + r + '" fill="' + fill + '" stroke="' + stroke +
                '" stroke-width="' + TIER[o.tier || 2] + '"' +
                (o.dashed ? ' stroke-dasharray="4,3"' : '') + '/>');
@@ -283,6 +314,16 @@
             { role: 'eyebrow', anchor: 'middle', fill: o.stroke || 'soft' });
           cy += 18;
         }
+        if (symMarkup) {
+          var sc = SYMBOL / ((lib && lib.VIEW) || 48);
+          layers.nodes.push(
+            '<g class="rzd-sym"' + (hook ? ' data-rzd-sym="' + esc(nid) + '"' : '') +
+            ' transform="translate(' + (x + (w - SYMBOL) / 2) + ',' + cy + ') scale(' + sc + ')"' +
+            ' fill="none" stroke="' + tok(o.symbolFill || (o.focal ? 'accent' : 'muted')) +
+            '" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+            symMarkup.replace(/currentColor/g, tok(o.symbolFill || (o.focal ? 'accent' : 'muted'))) + '</g>');
+          cy += symH;
+        }
         if (o.name) {
           ctx.text(o.name, x + w / 2, cy + 10, { role: 'node-name', anchor: 'middle', fill: o.nameFill || 'ink' });
           cy += 16;
@@ -292,6 +333,16 @@
         }
 
         var box = { x: x, y: y, w: w, h: h };
+        /* An interactive node gets a transparent hit target painted with the
+         * labels — last — so a click on its name or glyph lands on the node and
+         * not on a <text> the page cannot route. Keyboard reach comes with it:
+         * a node a mouse can select and a keyboard cannot is half a control. */
+        if (o.interactive && nid) {
+          layers.hits.push('<rect class="rzd-hit" data-rzd-hit="' + esc(nid) + '" x="' + x +
+            '" y="' + y + '" width="' + w + '" height="' + h + '" rx="' + r +
+            '" fill="transparent" tabindex="0" role="button" aria-label="' +
+            esc((o.name || nid) + (o.sublabel ? ' — ' + o.sublabel : '')) + '"/>');
+        }
         /* Complexity budget. Miller's ~7±2 is why the skill caps a diagram at
          * nine nodes: past that a reader stops seeing a structure and starts
          * reading a list, and the answer is two diagrams, not a bigger one.
@@ -396,6 +447,8 @@
           '<path d="' + r.d + '" fill="none" stroke="' + stroke +
           '" stroke-width="' + TIER[o.tier || 2] + '"' + dash +
           (o.marker === false || r.transit ? '' : ' marker-end="url(#' + slug + '-arrow)"') +
+          (o.id ? ' data-rzd-edge="' + esc(o.id) + '"' : '') +
+          (o.state ? ' data-rzd-state="' + esc(o.state) + '"' : '') +
           ' data-rzd-transit="' + (r.transit ? '1' : '0') +
           '" data-rzd-rerouted="' + (r.rerouted ? '1' : '0') + '"/>');
 
@@ -592,6 +645,7 @@
         out.push(layers.edges.join(''));
         out.push(layers.nodes.join(''));
         out.push(layers.labels.join(''));
+        out.push(layers.hits.join(''));
         out.push('</svg>');
         return out.join('');
       }

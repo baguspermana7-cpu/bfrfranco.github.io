@@ -53,6 +53,7 @@ gate "datahall engine — 57/57 doc-21 examples" node tools/test-datahall-calc.m
 gate "article diagrams — figures current, and free of collisions" node tools/build-article-diagrams.mjs --check
 gate "diagram survey coverage — every cockpit measured, declared, or excused" node tools/test-diagram-survey-coverage.mjs
 gate "diagram engine — metrics, placement, routing, facade" node tools/test-rz-diagram-engine.mjs
+gate "LTC workbench — standards arithmetic + page frame" node tools/test-ltc-workbench.mjs
 gate "diagram engine — adoption ratchet (hand-authored geometry may fall, never rise)" node tools/test-diagram-engine-adoption.mjs
 gate "diagram engine — one real diagram renders with zero collisions" node tools/demo-rz-diagram.mjs
 gate "DC AI GB300 engine — identities, balance, cliff, perturbation" node tools/test-dcai-engine.mjs

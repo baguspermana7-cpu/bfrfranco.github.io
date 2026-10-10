@@ -11,6 +11,69 @@ release sections rather than semver.
 
 ---
 
+## v3.12.0 — 2026-10-10
+
+### The standards lab becomes a workbench: tools instead of articles
+
+Owner comment on `standards-ltc-lab.html` and its sub-pages: the text and styling read as AI design
+slop, there was far too much filler, and it should behave like an application — immersive, practical,
+with block diagrams drawn through the installed diagram tooling and IEC-standard symbols like DCMOC.
+
+**One application frame for seven pages.** `css/ltc-app.css` + `js/ltc-app.js` give the hub and the
+six modules the same shell: a module rail (bottom bar on phones), deep-linkable tool tabs, an inspector
+column (drawer on tablets, bottom sheet on phones), both themes. The model lab's own top bar now lists
+the same seven modules.
+
+**Filler removed, tools added.** The module pages were 3,800–8,600-word articles (interview prep, a
+TPM decision framework, case studies, per-page changelogs, abbreviation lists). Each is now a set of
+working tools with compact reference tables:
+
+- **Plant map (hub)** — one liquid-to-chip plant; each block opens what governs it, what is measured
+  there, and the tool that answers the question. Coverage matrix and a question index.
+- **ASHRAE** — inlet check on a computed psychrometric chart (Magnus saturation pressure, pressure at
+  altitude) against A1–A4 and H1 with altitude derating and the binding limit; W17…W+ facility-water
+  class with a dry-cooler free-cooling margin; rate-of-change check.
+- **Tier** — a Tier I–IV power-path simulator: take any unit out for maintenance or fail it, and a sweep
+  tests every element for concurrent maintainability and single-failure tolerance. Series/parallel
+  k-of-n availability calculator.
+- **TIA** — TIA-942-B functional spaces; TIA-568.3-D fiber loss budget against IEEE 802.3 reach and
+  channel loss; copper channel limits; TIA-607 bonding conductor size by length.
+- **NFPA** — NFPA 2001 halocarbon and inert-gas flooding quantities with the concentration reached at
+  the maximum room temperature checked against NOAEL; NFPA 72 detector count from air changes per hour;
+  a cross-zoned release sequence you can drive event by event.
+- **ISO** — ISO/IEC 30134 PUE by category 1/2/3, REF, ERF, WUE, CUE; an ISO 50006 regression baseline
+  judged by ASHRAE Guideline 14 limits, with avoided energy and a CUSUM.
+
+**Every block diagram is drawn by the RZ diagram engine**, which gained two node options: `symbol`
+(an IEC 60617 / ISA-5.1 / NFPA 170-style glyph, height budgeted so it cannot collide with the name) and
+`interactive` (a keyboard-reachable hit target painted last). The glyphs come from the same
+`assets/engineering/` library DCMOC uses; `tools/build-engineering-symbols.mjs` now also emits
+`js/rz-eng-symbols.js` for the static pages, with twelve new web-only symbols (smoke, heat and
+aspirating detectors, sprinkler, agent cylinder, manual station, EPO, energy meter, patch panel,
+temperature and humidity transmitters, two-way valve) kept out of DCMOC's exhaustive TypeScript union.
+
+**Corrected while rebuilding** — values the old pages carried that the cited documents do not:
+liquid classes were the pre-2021 W1–W5 (now W17, W27, W32, W40, W45, W+); the recommended upper humidity
+was 60 % RH (2021: 70 %); the altitude-derating table's A3/A4 rows did not follow the 1 °C/175 m and
+1 °C/125 m rules; the per-Tier availability percentages are not part of the Tier Standard and are now
+labelled so; 100GBASE-SR4 reaches 100 m on OM4, not 150 m; the ISA-71.04 severity order had G2 and GX
+swapped. In the model lab, the right-hand panel said "Compliant" against six standards from four
+heuristic scores — "ASHRAE 90.4" and "ISO 14644" (a cleanroom standard) both showed the ISO 50001
+governance score. It is now a five-row standards screen that shows each score and says "in band",
+never "compliant".
+
+**Gate.** `tools/test-ltc-workbench.mjs` (68 assertions, wired into the ship gate) pins each module's
+arithmetic to hand-checkable values — HFC-227ea at 7 % and 21 °C is 0.547 kg/m³, IG-541 at 38 % is
+0.478 m³/m³, OM4 90 m with two pairs loses 1.77 dB, a regression recovers a known model — requires
+each Tier topology to meet its own objective (III maintainable but not fault tolerant, IV both), and
+holds every page's frame: script order, diagram tokens in both themes, and the fail-closed access gate.
+Proven red against the previous tree. `tools/test-rz-diagram-engine.mjs` gained five symbol
+assertions, proven red against the previous engine.
+
+**Boundary.** Educational tools, labelled as such on every page. A clean-agent system is designed from
+the listed manufacturer's manual and approved by the AHJ; a Tier is certified by Uptime Institute only.
+The model lab keeps its own visual system for now; its restyle is a separate change.
+
 ## v3.11.14 — 2026-10-09
 
 ### A competitor brand name removed from everywhere but the index employer card, and the freemium plans moved private

@@ -96,6 +96,10 @@ first time this engine drew a real diagram.
 - Paint order is **zones, connectors, nodes, labels**. Labels last means a label can never
   be clipped by a node painted after it — the failure is removed by construction rather
   than detected by a verifier afterwards.
+- `symbol: '<kind>'` draws an IEC 60617 / ISA-5.1 glyph from `js/rz-eng-symbols.js` (the DCMOC
+  library) above the name; its height is budgeted, and an unknown kind warns (`unknown-symbol`).
+  `interactive: true` with an `id` paints a focusable hit target after the labels, so a click on the
+  name reaches the node. Both since v3.12.0.
 - Colours resolve to the page's own CSS custom properties. **No literal hex leaves the
   engine**, so one edit to a cockpit's `:root` re-skins every diagram on it, both themes.
 
@@ -305,6 +309,7 @@ no excuse. Both failure paths were injected and observed.
 | `datahallAI.html` — 21 measured drawings | **geometry CLEAN and STRICT** since v3.10.13 — 2,678 findings at entry → 0 |
 | `dc-conventional.html` and the Track B cockpits | hand-typed coordinates; 462 across 9 files |
 | Adoption ratchet | **shipped** v3.10.3 — baseline 3,114, may fall, never rise |
+| LTC Workbench — hub + ASHRAE, Tier, TIA, NFPA, ISO | **drawn by the engine** v3.12.0, with `symbol` (IEC glyphs from `js/rz-eng-symbols.js`) and `interactive` nodes; gate `tools/test-ltc-workbench.mjs` |
 | Basis marks (every cockpit) | **measured** v3.10.2 — no longer `length × size × 0.6` |
 
 ### The gate is strict on this page
